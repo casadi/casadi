@@ -30,16 +30,14 @@ A.sparsity().spy()
 numpy.random.seed(2)
 
 # We randomly permute this nice structure
-perm =  numpy.random.permutation(range(A.size1()))
+perm =  list(numpy.random.permutation(range(A.size1())))
 AP = A[perm,perm]
 
 AP.printMatrix()
 AP.sparsity().spy()
 
 # And use stronglyConnectedComponents to recover the blocks
-p = IVector()
-r = IVector()
-n = AP.sparsity(). stronglyConnectedComponents 	( p,r )
+n,p,r = AP.sparsity().stronglyConnectedComponents()
 
 APrestored = AP[p,p]
 

@@ -14,6 +14,6 @@ if(WITH_QPOASES)
   add_subdirectory(qpOASES)
 endif()
 
-if(WITH_DSDP)
+if(DSDP_FOUND)
   add_subdirectory(DSDP)
 endif()

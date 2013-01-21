@@ -326,6 +326,14 @@ class CRSSparsity : public SharedObject{
       - Number of components
       - Offset for each components (length: 1 + number of components) 
       - Indices for each components, component i has indices index[offset[i]], ..., index[offset[i+1]]
+      
+      In the case that the matrix is symmetric, the result has a particular interpretation:
+      Given a symmetric matrix A and
+      n = A.stronglyConnectedComponents(p,r)
+       
+      => A[p,p] will appear block-diagonal with n blocks and
+         with the indices of the block boundaries to be found in r. 
+      
   */
 #ifndef SWIG
   int stronglyConnectedComponents(std::vector<int>& offset, std::vector<int>& index) const;

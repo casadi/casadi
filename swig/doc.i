@@ -10292,13 +10292,38 @@ for Sparse Linear Systems by Davis (2006). ";
 
 %feature("docstring")  CasADi::CRSSparsity::stronglyConnectedComponents "
 
-Find the strongly connected components of a square matrix See Direct Methods
-for Sparse Linear Systems by Davis (2006). ";
+Find the strongly connected components of the bigraph defined by the
+sparsity pattern of a square matrix See Direct Methods for Sparse Linear
+Systems by Davis (2006). Returns:
+
+Number of components
+
+Offset for each components (length: 1 + number of components)
+
+Indices for each components, component i has indices index[offset[i]], ...,
+index[offset[i+1]]
+
+In the case that the matrix is symmetric, the result has a particular
+interpretation: Given a symmetric matrix A and n =
+A.stronglyConnectedComponents(p,r)
+
+=> A[p,p] will appear block-diagonal with n blocks and with the indices of
+the block boundaries to be found in r. ";
 
 %feature("docstring")  CasADi::CRSSparsity::dulmageMendelsohn "
 
 Compute the Dulmage-Mendelsohn decomposition See Direct Methods for Sparse
-Linear Systems by Davis (2006). ";
+Linear Systems by Davis (2006).
+
+Dulmage-Mendelsohn will try to bring your matrix into lower block-
+triangular (LBT) form. It will not care about the distance of off- diagonal
+elements to the diagonal: there is no guarantee you will get a block-
+diagonal matrix if you supply a randomly permuted block- diagonal matrix.
+
+If your matrix is symmetrical, this method is of limited use; permutation
+can make it non-symmetric.
+
+See:   stronglyConnectedComponents ";
 
 %feature("docstring")  CasADi::CRSSparsity::getElements "
 
@@ -20338,6 +20363,244 @@ Dual:
 max          trace(C Y)  Y   subject to             trace(A_i Y) = b_i Y
 positive semidefinite                  with Y dense symmetric ( n x n)
 
+On generality: you might have formulation with block partitioning:
+
+Primal:
+
+min          b' x   x  subject to               Pj = Sum_m A_ij x_i - Cj
+for all j               Pj positive semidefinite   for all j with x ( m x 1)
+b ( m x 1 )          C, A_i  sparse symmetric (n x n)          X dense
+symmetric ( n x n )
+
+Dual:max          Sum_j trace(Cj Yj)  Yj   subject to             Sum_j
+trace(A_ij Yj) = b_i   for all j             Yj positive semidefinite for
+all j                  with Y dense symmetric ( n x n)
+
+You can cast this into the standard form with: C = blkdiag(Cj for all j) Ai
+= blkdiag(A_ij for all j)
+
+Implementations of SDPSolver are encouraged to exploit this block structure.
+
+>Input scheme: CasADi::SDPInput (SDP_NUM_IN = 3)
++-------+--------------------------------------------------------+
+| Name  |                      Description                       |
++=======+========================================================+
+| SDP_A | The vertical stack of all matrices A_i: ( nm x n) [a]. |
++-------+--------------------------------------------------------+
+| SDP_B | The vector b: ( m x 1) [b].                            |
++-------+--------------------------------------------------------+
+| SDP_C | The matrix C: ( n x n) [c].                            |
++-------+--------------------------------------------------------+
+
+>Output scheme: CasADi::SDPOutput (SDP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| SDP_PRIMAL                         | The primal solution (m x 1) - may  |
+|                                    | be used as initial guess [primal]. |
++------------------------------------+------------------------------------+
+| SDP_PRIMAL_P                       | The solution P (n x n) - may be    |
+|                                    | used as initial guess [p].         |
++------------------------------------+------------------------------------+
+| SDP_DUAL                           | The dual solution (n x n) - may be |
+|                                    | used as initial guess [dual].      |
++------------------------------------+------------------------------------+
+| SDP_PRIMAL_COST                    | The primal optimal cost (1 x 1)    |
+|                                    | [primal_cost].                     |
++------------------------------------+------------------------------------+
+| SDP_DUAL_COST                      | The dual optimal cost (1 x 1)      |
+|                                    | [dual_cost].                       |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| calc_dual    | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
+|              |              |              | dual should  | olverInterna |
+|              |              |              | be allocated | l            |
+|              |              |              | and          |              |
+|              |              |              | calculated.  |              |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
+|              |              |              | this         |              |
+|              |              |              | variable for |              |
+|              |              |              | problems     |              |
+|              |              |              | with n       |              |
+|              |              |              | large, as is |              |
+|              |              |              | always dense |              |
+|              |              |              | (n x n).     |              |
++--------------+--------------+--------------+--------------+--------------+
+| calc_p       | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
+|              |              |              | the P-part   | olverInterna |
+|              |              |              | of primal    | l            |
+|              |              |              | solution     |              |
+|              |              |              | should be    |              |
+|              |              |              | allocated    |              |
+|              |              |              | and          |              |
+|              |              |              | calculated.  |              |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
+|              |              |              | this         |              |
+|              |              |              | variable for |              |
+|              |              |              | problems     |              |
+|              |              |              | with n       |              |
+|              |              |              | large, as is |              |
+|              |              |              | always dense |              |
+|              |              |              | (n x n).     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
 C++ includes: dsdp_internal.hpp ";
 
 %feature("docstring")  CasADi::DSDPInternal::hessian "
@@ -20755,7 +21018,245 @@ Dual:
 max          trace(C Y)  Y   subject to             trace(A_i Y) = b_i Y
 positive semidefinite                  with Y dense symmetric ( n x n)
 
+On generality: you might have formulation with block partitioning:
+
+Primal:
+
+min          b' x   x  subject to               Pj = Sum_m A_ij x_i - Cj
+for all j               Pj positive semidefinite   for all j with x ( m x 1)
+b ( m x 1 )          C, A_i  sparse symmetric (n x n)          X dense
+symmetric ( n x n )
+
+Dual:max          Sum_j trace(Cj Yj)  Yj   subject to             Sum_j
+trace(A_ij Yj) = b_i   for all j             Yj positive semidefinite for
+all j                  with Y dense symmetric ( n x n)
+
+You can cast this into the standard form with: C = blkdiag(Cj for all j) Ai
+= blkdiag(A_ij for all j)
+
+Implementations of SDPSolver are encouraged to exploit this block structure.
+
 Joris Gillis
+
+>Input scheme: CasADi::SDPInput (SDP_NUM_IN = 3)
++-------+--------------------------------------------------------+
+| Name  |                      Description                       |
++=======+========================================================+
+| SDP_A | The vertical stack of all matrices A_i: ( nm x n) [a]. |
++-------+--------------------------------------------------------+
+| SDP_B | The vector b: ( m x 1) [b].                            |
++-------+--------------------------------------------------------+
+| SDP_C | The matrix C: ( n x n) [c].                            |
++-------+--------------------------------------------------------+
+
+>Output scheme: CasADi::SDPOutput (SDP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| SDP_PRIMAL                         | The primal solution (m x 1) - may  |
+|                                    | be used as initial guess [primal]. |
++------------------------------------+------------------------------------+
+| SDP_PRIMAL_P                       | The solution P (n x n) - may be    |
+|                                    | used as initial guess [p].         |
++------------------------------------+------------------------------------+
+| SDP_DUAL                           | The dual solution (n x n) - may be |
+|                                    | used as initial guess [dual].      |
++------------------------------------+------------------------------------+
+| SDP_PRIMAL_COST                    | The primal optimal cost (1 x 1)    |
+|                                    | [primal_cost].                     |
++------------------------------------+------------------------------------+
+| SDP_DUAL_COST                      | The dual optimal cost (1 x 1)      |
+|                                    | [dual_cost].                       |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| calc_dual    | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
+|              |              |              | dual should  | olverInterna |
+|              |              |              | be allocated | l            |
+|              |              |              | and          |              |
+|              |              |              | calculated.  |              |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
+|              |              |              | this         |              |
+|              |              |              | variable for |              |
+|              |              |              | problems     |              |
+|              |              |              | with n       |              |
+|              |              |              | large, as is |              |
+|              |              |              | always dense |              |
+|              |              |              | (n x n).     |              |
++--------------+--------------+--------------+--------------+--------------+
+| calc_p       | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
+|              |              |              | the P-part   | olverInterna |
+|              |              |              | of primal    | l            |
+|              |              |              | solution     |              |
+|              |              |              | should be    |              |
+|              |              |              | allocated    |              |
+|              |              |              | and          |              |
+|              |              |              | calculated.  |              |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
+|              |              |              | this         |              |
+|              |              |              | variable for |              |
+|              |              |              | problems     |              |
+|              |              |              | with n       |              |
+|              |              |              | large, as is |              |
+|              |              |              | always dense |              |
+|              |              |              | (n x n).     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: dsdp_solver.hpp ";
 
@@ -50128,9 +50629,17 @@ Get a submatrix. ";
 
 %feature("docstring")  CasADi::Matrix::getSub "";
 
+%feature("docstring")  CasADi::Matrix::getSub "";
+
+%feature("docstring")  CasADi::Matrix::getSub "";
+
 %feature("docstring")  CasADi::Matrix::setSub "
 
 Set a submatrix. ";
+
+%feature("docstring")  CasADi::Matrix::setSub "";
+
+%feature("docstring")  CasADi::Matrix::setSub "";
 
 %feature("docstring")  CasADi::Matrix::setSub "";
 
@@ -70829,7 +71338,245 @@ Dual:
 max          trace(C Y)  Y   subject to             trace(A_i Y) = b_i Y
 positive semidefinite                  with Y dense symmetric ( n x n)
 
+On generality: you might have formulation with block partitioning:
+
+Primal:
+
+min          b' x   x  subject to               Pj = Sum_m A_ij x_i - Cj
+for all j               Pj positive semidefinite   for all j with x ( m x 1)
+b ( m x 1 )          C, A_i  sparse symmetric (n x n)          X dense
+symmetric ( n x n )
+
+Dual:max          Sum_j trace(Cj Yj)  Yj   subject to             Sum_j
+trace(A_ij Yj) = b_i   for all j             Yj positive semidefinite for
+all j                  with Y dense symmetric ( n x n)
+
+You can cast this into the standard form with: C = blkdiag(Cj for all j) Ai
+= blkdiag(A_ij for all j)
+
+Implementations of SDPSolver are encouraged to exploit this block structure.
+
 Joel Andersson
+
+>Input scheme: CasADi::SDPInput (SDP_NUM_IN = 3)
++-------+--------------------------------------------------------+
+| Name  |                      Description                       |
++=======+========================================================+
+| SDP_A | The vertical stack of all matrices A_i: ( nm x n) [a]. |
++-------+--------------------------------------------------------+
+| SDP_B | The vector b: ( m x 1) [b].                            |
++-------+--------------------------------------------------------+
+| SDP_C | The matrix C: ( n x n) [c].                            |
++-------+--------------------------------------------------------+
+
+>Output scheme: CasADi::SDPOutput (SDP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| SDP_PRIMAL                         | The primal solution (m x 1) - may  |
+|                                    | be used as initial guess [primal]. |
++------------------------------------+------------------------------------+
+| SDP_PRIMAL_P                       | The solution P (n x n) - may be    |
+|                                    | used as initial guess [p].         |
++------------------------------------+------------------------------------+
+| SDP_DUAL                           | The dual solution (n x n) - may be |
+|                                    | used as initial guess [dual].      |
++------------------------------------+------------------------------------+
+| SDP_PRIMAL_COST                    | The primal optimal cost (1 x 1)    |
+|                                    | [primal_cost].                     |
++------------------------------------+------------------------------------+
+| SDP_DUAL_COST                      | The dual optimal cost (1 x 1)      |
+|                                    | [dual_cost].                       |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| calc_dual    | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
+|              |              |              | dual should  | olverInterna |
+|              |              |              | be allocated | l            |
+|              |              |              | and          |              |
+|              |              |              | calculated.  |              |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
+|              |              |              | this         |              |
+|              |              |              | variable for |              |
+|              |              |              | problems     |              |
+|              |              |              | with n       |              |
+|              |              |              | large, as is |              |
+|              |              |              | always dense |              |
+|              |              |              | (n x n).     |              |
++--------------+--------------+--------------+--------------+--------------+
+| calc_p       | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
+|              |              |              | the P-part   | olverInterna |
+|              |              |              | of primal    | l            |
+|              |              |              | solution     |              |
+|              |              |              | should be    |              |
+|              |              |              | allocated    |              |
+|              |              |              | and          |              |
+|              |              |              | calculated.  |              |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
+|              |              |              | this         |              |
+|              |              |              | variable for |              |
+|              |              |              | problems     |              |
+|              |              |              | with n       |              |
+|              |              |              | large, as is |              |
+|              |              |              | always dense |              |
+|              |              |              | (n x n).     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: sdp_solver.hpp ";
 
@@ -71382,6 +72129,226 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::SDPSolverInternal "
 
 Internal class.
+
+>Input scheme: CasADi::SDPInput (SDP_NUM_IN = 3)
++-------+--------------------------------------------------------+
+| Name  |                      Description                       |
++=======+========================================================+
+| SDP_A | The vertical stack of all matrices A_i: ( nm x n) [a]. |
++-------+--------------------------------------------------------+
+| SDP_B | The vector b: ( m x 1) [b].                            |
++-------+--------------------------------------------------------+
+| SDP_C | The matrix C: ( n x n) [c].                            |
++-------+--------------------------------------------------------+
+
+>Output scheme: CasADi::SDPOutput (SDP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| SDP_PRIMAL                         | The primal solution (m x 1) - may  |
+|                                    | be used as initial guess [primal]. |
++------------------------------------+------------------------------------+
+| SDP_PRIMAL_P                       | The solution P (n x n) - may be    |
+|                                    | used as initial guess [p].         |
++------------------------------------+------------------------------------+
+| SDP_DUAL                           | The dual solution (n x n) - may be |
+|                                    | used as initial guess [dual].      |
++------------------------------------+------------------------------------+
+| SDP_PRIMAL_COST                    | The primal optimal cost (1 x 1)    |
+|                                    | [primal_cost].                     |
++------------------------------------+------------------------------------+
+| SDP_DUAL_COST                      | The dual optimal cost (1 x 1)      |
+|                                    | [dual_cost].                       |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| calc_dual    | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
+|              |              |              | dual should  | olverInterna |
+|              |              |              | be allocated | l            |
+|              |              |              | and          |              |
+|              |              |              | calculated.  |              |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
+|              |              |              | this         |              |
+|              |              |              | variable for |              |
+|              |              |              | problems     |              |
+|              |              |              | with n       |              |
+|              |              |              | large, as is |              |
+|              |              |              | always dense |              |
+|              |              |              | (n x n).     |              |
++--------------+--------------+--------------+--------------+--------------+
+| calc_p       | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
+|              |              |              | the P-part   | olverInterna |
+|              |              |              | of primal    | l            |
+|              |              |              | solution     |              |
+|              |              |              | should be    |              |
+|              |              |              | allocated    |              |
+|              |              |              | and          |              |
+|              |              |              | calculated.  |              |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
+|              |              |              | this         |              |
+|              |              |              | variable for |              |
+|              |              |              | problems     |              |
+|              |              |              | with n       |              |
+|              |              |              | large, as is |              |
+|              |              |              | always dense |              |
+|              |              |              | (n x n).     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: sdp_solver_internal.hpp ";
 
@@ -85583,11 +86550,44 @@ Helper function for 'QPOutput' Output arguments of an QP Solver
 
 %feature("docstring")  CasADi::sdpIn "
 
-Helper function for 'SDPInput' Input arguments of a SDP problem ";
+Helper function for 'SDPInput' Input arguments of a SDP problem
+
+>Input scheme: CasADi::SDPInput (SDP_NUM_IN = 3)
++-------+--------------------------------------------------------+
+| Name  |                      Description                       |
++=======+========================================================+
+| SDP_A | The vertical stack of all matrices A_i: ( nm x n) [a]. |
++-------+--------------------------------------------------------+
+| SDP_B | The vector b: ( m x 1) [b].                            |
++-------+--------------------------------------------------------+
+| SDP_C | The matrix C: ( n x n) [c].                            |
++-------+--------------------------------------------------------+
+";
 
 %feature("docstring")  CasADi::sdpOut "
 
-Helper function for 'SDPOutput' Output arguments of an SDP Solver ";
+Helper function for 'SDPOutput' Output arguments of an SDP Solver
+
+>Output scheme: CasADi::SDPOutput (SDP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| SDP_PRIMAL                         | The primal solution (m x 1) - may  |
+|                                    | be used as initial guess [primal]. |
++------------------------------------+------------------------------------+
+| SDP_PRIMAL_P                       | The solution P (n x n) - may be    |
+|                                    | used as initial guess [p].         |
++------------------------------------+------------------------------------+
+| SDP_DUAL                           | The dual solution (n x n) - may be |
+|                                    | used as initial guess [dual].      |
++------------------------------------+------------------------------------+
+| SDP_PRIMAL_COST                    | The primal optimal cost (1 x 1)    |
+|                                    | [primal_cost].                     |
++------------------------------------+------------------------------------+
+| SDP_DUAL_COST                      | The dual optimal cost (1 x 1)      |
+|                                    | [dual_cost].                       |
++------------------------------------+------------------------------------+
+";
 
 %feature("docstring")  CasADi::timesTwo "";
 
@@ -88269,6 +89269,9 @@ This file does absolutely nothing but including all headers ";
 // File: stl__vector__tools_8hpp.xml
 
 
+// File: stronglyConnectedComponents_8hpp.xml
+
+
 // File: submatrix_8hpp.xml
 
 
@@ -88454,13 +89457,16 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__IntegratorOutput.xml
 
 
-// File: group__scheme__MUSCOD__FCN__Output.xml
+// File: group__scheme__SDPOutput.xml
 
 
 // File: group__scheme__QPInput.xml
 
 
 // File: group__scheme__ACADO__Input.xml
+
+
+// File: group__scheme__SDPInput.xml
 
 
 // File: group__scheme__ACADO__FCN__Input.xml
@@ -88515,6 +89521,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: group__scheme__ControlSimulatorInput.xml
+
+
+// File: group__scheme__MUSCOD__FCN__Output.xml
 
 
 // File: group__scheme__LOFunOutputs.xml
@@ -88683,6 +89692,12 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: matrix_2coloring_8py-example.xml
+
+
+// File: matrix_2dulmageMendelsohn_8py-example.xml
+
+
+// File: matrix_2stronglyConnectedComponents_8py-example.xml
 
 
 // File: misc_2all_8cc-example.xml

@@ -57,8 +57,25 @@ class SDPSolverInternal : public FXInternal{
     /// The number of matrix constraints
     int m_;
     
-    /// A mapping from A to Ai
+    /// Number of identified blocks
+    int nb_;
+    
+    /// Block decomposition details
+    std::vector<int> block_boundaries_;
+    std::vector<int> block_sizes_;
+    
+    /** A mapping from (C,A) -> (C[p,p]_j,A_i[p,p]j)
+    *  input(0) = C
+    *  input(1) = A
+    *  output(j) = Cj
+    *  output((1+i)*nb_+j) = Aj
+    */
     FX mapping_;
+    
+    /** Make a mapping function from dense blocks to inversely-permuted block diagonal P
+    ** block_j(Pmapper.output()[p,p]) = Pmapper_.input(j) 
+    */
+    FX Pmapper_;
     
     /** \brief Indicate if dual should be allocated and calculated.
     * You may want to avoid calculating the dual variable for problems with n large, as the dual (n x n) is always dense.
