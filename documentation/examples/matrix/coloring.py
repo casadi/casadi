@@ -24,26 +24,47 @@ from casadi import *
 def color(A):
   print "="*80
   print "Original:"
-  A.spy()
+  print repr(IMatrix(A,1))
   print "Colored: "
-  A.unidirectionalColoring().spy()
+  print repr(IMatrix(A.unidirectionalColoring(),1))
 
 A = sp_diag(5)
 color(A)
-print "One direction needed to capture all"
+#! One direction needed to capture all
 color(sp_dense(5,10))
-print "We need 5 directions."
-print "The colored response reads: each row corresponds to a direction;"
-print " each column correspond to a row of the original matrix."
+#! We need 5 directions.
+#! The colored response reads: each row corresponds to a direction;
+#! each column correspond to a row of the original matrix.
 
 color(A+sp_triplet(5,5,[0],[4]))
-print "First 4 rows can be taken together, the fifth row is taken seperately"
+#! First 4 rows can be taken together, the fifth row is taken seperately
 color(A+sp_triplet(5,5,[4],[0]))
-print "First 4 rows can be taken together, the fifth row is taken seperately"
+#! First 4 rows can be taken together, the fifth row is taken seperately
 
 color(A+sp_triplet(5,5,[0]*5,range(5)))
-print "The first row is taken seperately."
-print "The remainding rows are lumped together in one direction."
+#! The first row is taken seperately.
+#! The remainding rows are lumped together in one direction.
 
 color(A+sp_triplet(5,5,range(5),[0]*5))
-print "We need 5 directions."
+#! We need 5 directions.
+
+#! Next, we look at starColoring
+
+def color(A):
+  print "="*80
+  print "Original:"
+  print repr(IMatrix(A,1))
+  print "Star colored: "
+  print repr(IMatrix(A.starColoring(1),1))
+  
+color(A)
+#! One direction needed to capture all
+
+color(sp_dense(5,5))
+#! We need 5 directions.
+
+color(A+sp_triplet(5,5,[0]*5,range(5))+sp_triplet(5,5,range(5),[0]*5))
+#! The first row/col is taken seperately.
+#! The remainding rows/cols are lumped together in one direction.
+
+
