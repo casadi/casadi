@@ -1179,6 +1179,25 @@ void SXFunctionInternal::spInit(bool fwd){
 }
 
 void SXFunctionInternal::spEvaluate(bool fwd){
+#ifdef WITH_OPENCL
+  
+  // Set OpenCL Kernel Parameters
+  cl_int ret;
+  char tt[128];
+  ret = clSetKernelArg(sparsity_propagation_kernel_.kernel, 0, sizeof(cl_mem), static_cast<void *>(&sparsity_propagation_kernel_.memobj));
+
+  // Execute OpenCL Kernel
+  ret = clEnqueueTask(sparsity_propagation_kernel_.command_queue, sparsity_propagation_kernel_.kernel, 0, NULL,NULL);
+
+  // Copy results from the memory buffer
+  ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, sparsity_propagation_kernel_.memobj, CL_TRUE, 0,
+			    128 * sizeof(char),tt, 0, NULL, NULL);
+  
+  // Display Result
+  cout << tt << endl;
+
+#endif // WITH_OPENCL
+
   // Get work array
   bvec_t *iwork = get_bvec_t(work_);
 
@@ -1258,6 +1277,88 @@ void SXFunctionInternal::spEvaluate(bool fwd){
     f.init();
     return f.jacobian(0,0,false,false);
   }
+
+#ifdef WITH_OPENCL
+
+#define SPARSITY_PROPAGATION_KERNEL \
+__kernel void sparsity_propagation(__global char* string){ \
+  string[0] = 'H';                         \
+  string[1] = 'e';                         \
+  string[2] = 'l';                         \
+  string[3] = 'l';                         \
+  string[4] = 'o';                         \
+  string[5] = ',';                         \
+  string[6] = ' ';                         \
+  string[7] = 'W';                         \
+  string[8] = 'o';                         \
+  string[9] = 'r';                         \
+  string[10] = 'l';                        \
+  string[11] = 'd';                        \
+  string[12] = '!';                        \
+  string[13] = '\0';                       \
+}
+
+  // Kernel as a string
+#define CODE_TO_STR1(x) #x
+#define CODE_TO_STR(x) CODE_TO_STR1(x)
+  const char* sparsity_propagation_kernel_str = CODE_TO_STR(SPARSITY_PROPAGATION_KERNEL);
+
+  SparsityPropagationKernel::SparsityPropagationKernel(){
+    device_id = 0;
+    context = 0;
+    command_queue = 0;
+    memobj = 0;
+    program = 0;
+    kernel = 0;
+    platform_id = 0;
+    cl_int ret;
+
+    // Get Platform and Device Info
+    ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
+    ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &device_id, &ret_num_devices);
+  
+    // Create OpenCL context
+    context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
+  
+    // Create Command Queue
+    command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
+   
+    // Create Memory Buffer
+    const int MEM_SIZE = 128;
+    char string[MEM_SIZE];
+    memobj = clCreateBuffer(context, CL_MEM_READ_WRITE,MEM_SIZE * sizeof(char), NULL, &ret);
+  
+    // Kernel source in source code
+    program = clCreateProgramWithSource(context, 1, (const char **)&sparsity_propagation_kernel_str,0, &ret);
+  
+    // Build Kernel Program
+    ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+  
+    // Create OpenCL Kernel
+    kernel = clCreateKernel(program, "sparsity_propagation", &ret);
+
+  }
+
+  SparsityPropagationKernel::~SparsityPropagationKernel(){
+    // Clean up
+    cl_int ret;
+    ret = clFlush(command_queue);
+    ret = clFinish(command_queue);
+    ret = clReleaseKernel(kernel);
+    ret = clReleaseProgram(program);
+    ret = clReleaseMemObject(memobj);
+    ret = clReleaseCommandQueue(command_queue);
+    ret = clReleaseContext(context);
+  }
+  
+  // Memory for the kernel singleton
+  SparsityPropagationKernel SXFunctionInternal::sparsity_propagation_kernel_;
+  
+#endif // WITH_OPENCL
+
+
+
+
 
 } // namespace CasADi
 
