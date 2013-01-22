@@ -34,7 +34,45 @@ namespace llvm{
 } // namespace llvm
 #endif // WITH_LLVM
 
+#ifdef WITH_OPENCL
+#ifdef __APPLE__
+#include <OpenCL/opencl.h>
+#else
+#include <CL/cl.h>
+#endif
+#endif // WITH_OPENCL
+
 namespace CasADi{
+#ifdef WITH_OPENCL
+  /** \brief Singleton for the sparsity propagation kernel
+      TODO: Move to a separate file and make non sparsity pattern specific
+      \author Joel Andersson
+      \date 2013
+  */
+  class SparsityPropagationKernel{
+  public:
+    // Default constructor
+    SparsityPropagationKernel();
+    
+    // Destructor
+    ~SparsityPropagationKernel();
+
+    // Copy constructor and equality operator (not implemented, declared to prevent use of the default ones)
+    SparsityPropagationKernel(const SparsityPropagationKernel& sparsityPropagationKernel);
+    SparsityPropagationKernel& operator=(const SparsityPropagationKernel& sparsityPropagationKernel);
+
+    // Data members (all public)
+    cl_device_id device_id;
+    cl_context context;
+    cl_command_queue command_queue;
+    cl_mem memobj;
+    cl_program program;
+    cl_kernel kernel;
+    cl_platform_id platform_id;
+    cl_uint ret_num_devices;
+    cl_uint ret_num_platforms;
+  };
+#endif // WITH_OPENCL
 
 /** \brief  Internal node class for SXFunction
   A regular user should never work with any Node class. Use SXFunction directly.
@@ -152,7 +190,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /// With just-in-time compilation
   bool just_in_time_;
   
-  #ifdef WITH_LLVM
+#ifdef WITH_LLVM
   llvm::Module *jit_module_;
   llvm::Function *jit_function_;
 
@@ -164,7 +202,12 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
 
   // References to input and output nonzeros
   std::vector<double*> input_ref_, output_ref_;
-  #endif // WITH_LLVM
+#endif // WITH_LLVM
+  
+#ifdef WITH_OPENCL
+  static SparsityPropagationKernel sparsity_propagation_kernel_;
+#endif // WITH_OPENCL
+
 };
 
 
