@@ -48,6 +48,7 @@ option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOAS
 option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" OFF)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
+option(WITH_OPENCL "Compile with OpenCL support" ON)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
@@ -187,6 +188,15 @@ else(WITH_LLVM)
   endif(WITH_DL)
 endif(WITH_LLVM)
 add_feature_info(just-in-time WITH_LLVM "Just-in-time compiliation via the LLVM compiler framework.")
+
+# OpenCL
+if(WITH_OPENCL)
+  # Core depends on OpenCL for GPU calculations
+  find_package(OpenCL REQUIRED)
+  set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} ${OPENCL_LIBRARIES})
+  add_definitions(-DWITH_OPENCL)
+  include_directories(${OPENCL_INCLUDE_DIRS})
+endif(WITH_OPENCL)
 
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
