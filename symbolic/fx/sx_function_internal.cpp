@@ -1180,19 +1180,49 @@ void SXFunctionInternal::spInit(bool fwd){
 
 void SXFunctionInternal::spEvaluate(bool fwd){
 #ifdef WITH_OPENCL
+  cout << "algorithm_.at(0).op = " << algorithm_.at(0).op << endl;
+  cout << "a + algorithm_.at(0).op = " << char('a' + algorithm_.at(0).op) << endl;
+  cout << "algorithm_.at(1).op = " << algorithm_.at(1).op << endl;
+  cout << "a + algorithm_.at(1).op = " << char('a' + algorithm_.at(1).op) << endl;
+  cout << "algorithm_.size() = " << algorithm_.size() << endl;
+  cout << "a + algorithm_.size() = " << char('a' + algorithm_.size()) << endl;
+
+  cl_int ret;
+    
+  // Create Memory Buffer for algorithm
+  cl_mem algorithm_memobj = clCreateBuffer(sparsity_propagation_kernel_.context, 
+  					   CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
+  					   algorithm_.size() * sizeof(SXAlgEl),
+  					   static_cast<void*>(&algorithm_.front()), &ret);
+
+  casadi_assert(algorithm_memobj != 0);
+  casadi_assert(ret == CL_SUCCESS);
   
   // Set OpenCL Kernel Parameters
-  cl_int ret;
   char tt[128];
   ret = clSetKernelArg(sparsity_propagation_kernel_.kernel, 0, sizeof(cl_mem), static_cast<void *>(&sparsity_propagation_kernel_.memobj));
+  casadi_assert(ret == CL_SUCCESS);
+  
+  ret = clSetKernelArg(sparsity_propagation_kernel_.kernel, 1, sizeof(cl_mem), static_cast<void *>(&algorithm_memobj));
+  casadi_assert(ret == CL_SUCCESS);
 
+  cl_int algorithm_size = algorithm_.size();
+  ret = clSetKernelArg(sparsity_propagation_kernel_.kernel, 2, sizeof(cl_int), static_cast<void *>(&algorithm_size));
+  casadi_assert(ret == CL_SUCCESS);
+    
   // Execute OpenCL Kernel
   ret = clEnqueueTask(sparsity_propagation_kernel_.command_queue, sparsity_propagation_kernel_.kernel, 0, NULL,NULL);
-
+  casadi_assert(ret == CL_SUCCESS);
+  
   // Copy results from the memory buffer
   ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, sparsity_propagation_kernel_.memobj, CL_TRUE, 0,
 			    128 * sizeof(char),tt, 0, NULL, NULL);
-  
+  casadi_assert(ret == CL_SUCCESS);
+
+  // Clean up object specific memory
+  ret = clReleaseMemObject(algorithm_memobj);
+  casadi_assert(ret == CL_SUCCESS);
+
   // Display Result
   cout << tt << endl;
 
@@ -1281,7 +1311,19 @@ void SXFunctionInternal::spEvaluate(bool fwd){
 #ifdef WITH_OPENCL
 
 #define SPARSITY_PROPAGATION_KERNEL \
-__kernel void sparsity_propagation(__global char* string){ \
+ \
+typedef int double_does_not_work;\
+\
+typedef struct {\
+  int op;   \
+  int res;  \
+  union{ \
+    double_does_not_work d; \
+    int i[2]; \
+  } arg;    \
+} SXAlgEl; \
+\
+ __kernel void sparsity_propagation(__global char* string, __global SXAlgEl* algorithm, int algorithm_size){ \
   string[0] = 'H';                         \
   string[1] = 'e';                         \
   string[2] = 'l';                         \
@@ -1292,11 +1334,29 @@ __kernel void sparsity_propagation(__global char* string){ \
   string[7] = 'W';                         \
   string[8] = 'o';                         \
   string[9] = 'r';                         \
-  string[10] = 'l';                        \
-  string[11] = 'd';                        \
-  string[12] = '!';                        \
+  string[10] = 'a' + algorithm_size;       \
+  string[11] = 'a' + algorithm[0].op;      \
+  string[12] = 'a' + algorithm[1].op;      \
   string[13] = '\0';                       \
 }
+
+# if 0
+  // Propagate sparsity forward
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+    switch(it->op){
+    case OP_CONST:
+    case OP_PARAMETER:
+      iwork[it->res] = bvec_t(0); break;
+    case OP_INPUT:
+      iwork[it->res] = reinterpret_cast<bvec_t*>(&inputNoCheck(it->arg.i[0]).front())[it->arg.i[1]]; break;
+    case OP_OUTPUT:
+      reinterpret_cast<bvec_t*>(&outputNoCheck(it->res).front())[it->arg.i[1]] = iwork[it->arg.i[0]]; break;
+    default: // Unary or binary operation
+      iwork[it->res] = iwork[it->arg.i[0]] | iwork[it->arg.i[1]]; break;
+    }
+  }
+#endif
+
 
   // Kernel as a string
 #define CODE_TO_STR1(x) #x
@@ -1326,10 +1386,12 @@ __kernel void sparsity_propagation(__global char* string){ \
     // Create Memory Buffer
     const int MEM_SIZE = 128;
     char string[MEM_SIZE];
-    memobj = clCreateBuffer(context, CL_MEM_READ_WRITE,MEM_SIZE * sizeof(char), NULL, &ret);
+    memobj = clCreateBuffer(context, CL_MEM_READ_WRITE, MEM_SIZE * sizeof(char), NULL, &ret);
   
     // Kernel source in source code
     program = clCreateProgramWithSource(context, 1, (const char **)&sparsity_propagation_kernel_str,0, &ret);
+    casadi_assert(ret == CL_SUCCESS);
+    casadi_assert(program != 0);
   
     // Build Kernel Program
     ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
