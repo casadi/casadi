@@ -21,6 +21,7 @@
 # 
 from casadi import *
 
+#! Read all about coloring in the seminal paper "What color is your Jacobian?" http://www.cs.odu.edu/~pothen/Papers/sirev2005.pdf
 def color(A):
   print "="*80
   print "Original:"
@@ -67,4 +68,8 @@ color(A+sp_triplet(5,5,[0]*5,range(5))+sp_triplet(5,5,range(5),[0]*5))
 #! The first row/col is taken seperately.
 #! The remainding rows/cols are lumped together in one direction.
 
+#! Let's take an example from the paper
 
+A = IMatrix([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
+makeSparse(A)
+color(A.sparsity())
