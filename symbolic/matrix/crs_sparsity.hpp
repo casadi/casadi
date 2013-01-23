@@ -108,11 +108,15 @@ class CRSSparsity : public SharedObject{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /// Check if two sparsity patterns are the same
-    bool operator==(const CRSSparsity& y) const;
+    /// \name Check if two sparsity patterns are identical
+    /// @{
+    bool isEqual(const CRSSparsity& y) const;
+    bool isEqual(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) const;
+    bool operator==(const CRSSparsity& y) const{ return isEqual(y);}
+    /// @}
     
     /// Check if two sparsity patterns are difference
-    bool operator!=(const CRSSparsity& y) const{return !operator==(y);}
+    bool operator!=(const CRSSparsity& y) const{return !isEqual(y);}
     
     /// Take the union of two sparsity patterns
     CRSSparsity operator+(const CRSSparsity& b) const;

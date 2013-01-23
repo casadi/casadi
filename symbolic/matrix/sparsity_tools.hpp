@@ -32,6 +32,11 @@ namespace CasADi{
     seed ^= v + 0x9e3779b9 + (seed << 6) + (seed >> 2);
   }
 
+  /** \brief Generate a hash value incrementally (function taken from boost) */
+  inline void hash_combine(std::size_t& seed, const std::vector<int>& v){
+    for(std::vector<int>::const_iterator i=v.begin(); i!=v.end(); ++i) hash_combine(seed,*i);
+  }
+
   /** \brief Hash a sparsity pattern */
   std::size_t hash_sparsity(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind);
 
