@@ -238,6 +238,32 @@ class Matrixtests(casadiTestCase):
     B = DMatrix(5,1)
    
     self.assertRaises(Exception, lambda : B[A])
+
+  def test_sparsity_indexing(self):
+    self.message("sparsity")
+
+    B = DMatrix([[1,2,3,4,5],[6,7,8,9,10]])
+    
+    A = IMatrix([[1,1,0,0,0],[0,0,1,0,0]])
+    makeSparse(A)
+    sp = A.sparsity()
+    
+    
+    self.checkarray(B[sp],DMatrix([[1,2,0,0,0],[0,0,8,0,0]]),"sparsity indexing")
+
+    B[sp] = -4
+    
+    self.checkarray(B,DMatrix([[-4,-4,3,4,5],[6,7,-4,9,10]]),"sparsity indexing assignement")
+
+    B = DMatrix([[1,2,3,4,5],[6,7,8,9,10]])
+    
+    B[sp] = 2*B
+    
+    self.checkarray(B,DMatrix([[2,4,3,4,5],[6,7,16,9,10]]),"Imatrix indexing assignement")
+    
+    self.assertRaises(Exception, lambda : B[sp_dense(4,4)])
+    
+  
   
   def test_IMatrix_index_slice(self):
     self.message("IMatrix combined with slice")
