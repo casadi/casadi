@@ -196,42 +196,32 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
 
     /** \brief  Create a matrix from a matrix with a different type of matrix entries (assuming that the scalar conversion is valid) */
     template<typename A>
-    Matrix(const Matrix<A>& x){
-      sparsity_ = x.sparsity();
-      data().resize(x.size());
+    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<T>(x.size())){
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
-    Matrix(const std::vector<A>& x){
-      sparsity_ = CRSSparsity(x.size(),1,true);
-      data().resize(x.size());
+    Matrix(const std::vector<A>& x) : sparsity_(CRSSparsity(x.size(),1,true)), data_(std::vector<T>(x.size())){
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create a non-vector expression from an stl vector */
     template<typename A>
-    Matrix(const std::vector<A>& x,  int n, int m){
+    Matrix(const std::vector<A>& x,  int n, int m) : sparsity_(CRSSparsity(n,m,true)), data_(std::vector<T>(x.size())){
       if(x.size() != n*m) throw CasadiException("Matrix::Matrix(const std::vector<T>& x,  int n, int m): dimension mismatch");
-      sparsity_ = CRSSparsity(n,m,true);
-      data().resize(x.size());
       copy(x.begin(),x.end(),begin());
     }
     
     /** \brief  ublas vector */
 #ifdef HAVE_UBLAS
     template<typename T, typename A>
-    explicit Matrix<T>(const ublas::vector<A> &x){
-      sparsity_ = CRSSparsity(x.size(),1,true);
-      std::vector<T>::resize(x.size());
+    explicit Matrix<T>(const ublas::vector<A> &x) : sparsity_(CRSSparsity(x.size(),1,true)), data_(std::vector<T>(x.size())){
       copy(x.begin(),x.end(),begin());
     }
 
     template<typename T, typename A>
-    explicit Matrix<T>(const ublas::matrix<A> &x){
-      sparsity_ = CRSSparsity(x.size1(),x.size2(),true);
-      data().resize(numel());
+    explicit Matrix<T>(const ublas::matrix<A> &x) : sparsity_(CRSSparsity(x.size1(),x.size2(),true)), data_(std::vector<T>(numel())){
       copy(x.begin(),x.end(),begin());
       return ret;
     }
