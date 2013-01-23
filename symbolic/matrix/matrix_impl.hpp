@@ -289,8 +289,21 @@ void Matrix<T>::setSub(const Matrix<int>& i, const Matrix<int>& j, const Matrix<
 
 template<class T>
 void Matrix<T>::setSub(const CRSSparsity& sp, int dummy, const Matrix<T>& el) {
-   casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
-   casadi_error("Not implemented yet");
+  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+  // TODO: optimize this for speed
+  Matrix<T> elm;
+  if (el.scalar()) {
+    elm = Matrix<T>(sp,el.at(0));
+  } else {
+    elm = el.getSub(sp);
+  }
+
+  for(int i=0; i<sp.rowind().size()-1; ++i){
+    for(int k=sp.rowind()[i]; k<sp.rowind()[i+1]; ++k){
+      int j=sp.col()[k];
+      elem(i,j)=elm.data()[k];
+    }
+  }
 }
 
 template<class T>
