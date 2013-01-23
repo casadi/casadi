@@ -3153,8 +3153,7 @@ void CRSSparsityInternal::spyMatlab(const std::string& mfile_name) const{
 	  if(h_ref!=h){ // The sparsity pattern has changed (the most likely event)
 
 	    // Create a new pattern
-	    CRSSparsity ret_new;
-	    ret_new.assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+	    CRSSparsity ret_new(new CRSSparsityInternal(nrow, ncol, col, rowind));
 
 	    // Cache this pattern instead of the old one
 	    wref = ret_new;
@@ -3187,8 +3186,7 @@ void CRSSparsityInternal::spyMatlab(const std::string& mfile_name) const{
 	}
 
 	// The cached entry has been deleted, create a new one
-	CRSSparsity ret;
-	ret.assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+	CRSSparsity ret(new CRSSparsityInternal(nrow, ncol, col, rowind));
 	
 	// Cache this pattern
 	wref = ret;
@@ -3199,8 +3197,7 @@ void CRSSparsityInternal::spyMatlab(const std::string& mfile_name) const{
     }
 
     // No matching sparsity pattern could be found, create a new one
-    CRSSparsity ret;
-    ret.assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+    CRSSparsity ret(new CRSSparsityInternal(nrow, ncol, col, rowind));
 
     // Record the current number of buckets (for garbage collection below)
 #ifdef USE_CXX11
