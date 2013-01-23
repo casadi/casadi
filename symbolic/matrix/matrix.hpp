@@ -464,7 +464,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     //@}
     
     /// Matrix-matrix product
-    Matrix<T> mul(const Matrix<T> &y) const;
+    Matrix<T> mul_full(const Matrix<T> &y) const;
 
     /// Matrix-matrix product, no memory allocation: z += mul(x,y)
     static void mul_no_alloc_nn(const Matrix<T>& x, const Matrix<T> &y, Matrix<T>& z);
