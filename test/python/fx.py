@@ -409,7 +409,94 @@ class FXtests(casadiTestCase):
         
         test(d.sparsity())
         
+  @skip(memcheck)
+  def test_hessians(self):
+    def test(sp):
+      x = ssym("x",sp.size2())
+      self.assertTrue(sp==sp.transpose())
+      f = SXFunction([x],[mul([x.T,DMatrix(sp,1),x])])
+      f.init()
+      J = f.hessian()
+      J.init()
+      sp2 = J.output().sparsity()
+      self.checkarray(sp.col(),sp2.col())
+      self.checkarray(sp.rowind(),sp2.rowind())
+      
+    A = IMatrix([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
+    makeSparse(A)
+    C = A.sparsity()
     
+    test(C)
+    
+    A = IMatrix([[1,0,0,0,0,0],[0,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
+    makeSparse(A)
+    C = A.sparsity()
+    
+    test(C)
+    
+    A = IMatrix([[1,0,0,0,0,0],[0,1,0,0,1,1],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
+    makeSparse(A)
+    C = A.sparsity()
+      
+    test(C)
+
+    A = IMatrix([[0,0,0,0,0,0],[0,1,0,0,1,1],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
+    makeSparse(A)
+    C = A.sparsity()
+      
+    test(C)
+
+    A = IMatrix([[0,0,0,0,0,0],[0,1,0,0,1,0],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,0,0,1,0,1]])
+    makeSparse(A)
+    C = A.sparsity()
+      
+    test(C)
+    
+    
+    for i in [63,64,65,100,127,128,129]:
+      d = sp_diag(i)
+      test(d)
+      
+      test(d + sp_rowcol([0],[5],i,i) + sp_rowcol([5],[0],i,i))
+      
+      b = sp_band(i,-1) + sp_band(i,1)
+      test(b)
+      test(b + sp_rowcol([0],[5],i,i) + sp_rowcol([5],[0],i,i))
+      
+      d = sp_dense(i,i)
+      test(d)
+      
+      d = sp_diag(i) + sp_triplet(i,i,[0]*i,range(i))+sp_triplet(i,i,range(i),[0]*i)
+      test(d)
+
+
+      sp = sp_dense(i,i)
+        
+      random.seed(0)
+      
+      I = IMatrix(sp,1)
+      for ii in range(i):
+        for jj in range(i):
+          if random.random()<0.5:
+            I[ii,jj] = 0
+            I[jj,ii] = 0
+      makeSparse(I)
+      
+      sp_holes = I.sparsity()
+      
+      test(sp_holes)
+      
+      z = IMatrix(sp_holes.shape[0],sp_holes.shape[1])
+      
+      R = 5
+      v = []
+      for r in range(R):
+        h = [z]*5
+        h[r] = I
+        v.append(horzcat(h))
+      d = vertcat(v)
+      
+      test(d.sparsity())
         
 if __name__ == '__main__':
     unittest.main()

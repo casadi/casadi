@@ -319,7 +319,7 @@ class FX : public OptionsFunctionality{
   FX derivative(int nfwd, int nadj);
 
   /// Get, if necessary generate, the sparsity of a Jacobian block
-  CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false);
+  CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
 
   /// Generate the sparsity of a Jacobian block
   void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact=false);
