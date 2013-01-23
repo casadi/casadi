@@ -83,6 +83,9 @@ class CRSSparsity : public SharedObject{
     /// Construct a sparsity pattern from vectors
     CRSSparsity(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind);
 
+    /** \brief  Create from node */
+    explicit CRSSparsity(CRSSparsityInternal *node);
+
     /** \brief Check if the dimensions and rowind,col vectors are compatible.
     * \param complete  set to true to also check elementwise
     * throws an error as possible result

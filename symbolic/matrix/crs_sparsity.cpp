@@ -31,8 +31,11 @@ using namespace std;
 namespace CasADi{
 
 CRSSparsity::CRSSparsity(){
-
 }
+  
+CRSSparsity::CRSSparsity(CRSSparsityInternal *node){
+  assignNode(node);
+}  
 
 CRSSparsity::CRSSparsity(int nrow, int ncol, bool dense){
   vector<int> col, rowind(nrow+1,0);
