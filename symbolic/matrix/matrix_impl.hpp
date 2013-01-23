@@ -1240,7 +1240,7 @@ void Matrix<T>::sanityCheck(bool complete) const {
 }
 
 template<class T>
-Matrix<T> Matrix<T>::mul(const Matrix<T> &y) const{
+Matrix<T> Matrix<T>::mul_full(const Matrix<T> &y) const{
   // First factor
   const Matrix<T>& x = *this;
   

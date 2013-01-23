@@ -140,6 +140,12 @@ class GenericMatrix{
 
     /** \brief Create an matrix with symbolic variables, given a sparsity pattern */
     static MatType sym(const std::string& name, const CRSSparsity& sp);
+    
+    /** \brief Matrix-matrix multiplication.
+    * Attempts to identify quick returns on matrix-level and 
+    * delegates to MatType::mul_full if no such quick returns are found.
+    */
+    MatType mul(const MatType& y) const;
 };
 
 #ifndef SWIG
@@ -203,6 +209,34 @@ bool GenericMatrix<MatType>::dense() const{
 template<typename MatType>
 bool GenericMatrix<MatType>::scalar() const{
   return numel()==1;
+}
+
+template<typename MatType>
+MatType GenericMatrix<MatType>::mul(const MatType& y) const {
+  const MatType& x = *static_cast<const MatType*>(this);
+
+  // Check if we can simplify the product
+  if(isIdentity(x)){
+    return y;
+  } else if(isIdentity(y)){
+    return x;
+  } else if(isZero(x) || isZero(y)){
+    // See if one of the arguments can be used as result
+    if(x.size()==0 && y.size1()==y.size2())
+      return x;
+    else if(y.size()==0 && x.size1()==x.size2())
+      return y;
+    else
+      return MatType::sparse(x.size1(),y.size2());
+  } else if(x.scalar() || y.scalar()){
+    return x*y;
+  } else if(x.sparsity().diagonal() && y.size2()==1){
+    return diag(x)*y;
+  } else if(y.sparsity().diagonal() && x.size1()==1){
+    return x*trans(diag(y));
+  } else {
+    return x.mul_full(y);
+  }
 }
 
 template<typename MatType>
