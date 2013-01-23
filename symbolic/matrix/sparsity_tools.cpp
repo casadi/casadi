@@ -411,8 +411,8 @@ CRSSparsity mul(const  CRSSparsity& a, const  CRSSparsity &b) {
     std::size_t ret=0;
     hash_combine(ret,nrow);
     hash_combine(ret,ncol);
-    for(std::vector<int>::const_iterator it=rowind.begin(); it!=rowind.end(); ++it) hash_combine(ret,*it);
-    for(std::vector<int>::const_iterator it=col.begin(); it!=col.end(); ++it) hash_combine(ret,*it);
+    hash_combine(ret,rowind);
+    hash_combine(ret,col);
     return ret;
   }
   

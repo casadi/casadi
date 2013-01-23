@@ -292,8 +292,12 @@ CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans, vector< vect
   return (*this)->patternProduct(y_trans,mapping);
 }
 
-bool CRSSparsity::operator==(const CRSSparsity& y) const{
+bool CRSSparsity::isEqual(const CRSSparsity& y) const{
   return (*this)->isEqual(y);
+}
+
+bool CRSSparsity::isEqual(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) const{
+  return (*this)->isEqual(nrow,ncol,col,rowind);
 }
 
 CRSSparsity CRSSparsity::operator+(const CRSSparsity& b) const {
