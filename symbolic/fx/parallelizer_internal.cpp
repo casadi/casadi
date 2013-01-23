@@ -233,7 +233,7 @@ void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){
   }
 }
 
-CRSSparsity ParallelizerInternal::getJacSparsity(int iind, int oind){
+CRSSparsity ParallelizerInternal::getJacSparsity(int iind, int oind, bool symmetric){
   // Number of tasks
   int ntask = inind_.size()-1;
   

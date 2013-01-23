@@ -498,7 +498,7 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   if(input(iind).empty() || output(oind).empty()) return MatType(0,0);
     
   // Create return object
-  MatType ret = MatType(jacSparsity(iind,oind,compact));
+  MatType ret = MatType(jacSparsity(iind,oind,compact,symmetric));
   if(verbose()) std::cout << "XFunctionInternal::jac allocated return value" << std::endl;
   
   // Get a bidirectional partition
@@ -521,7 +521,7 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   std::vector<std::vector<MatType> > fseed, aseed, fsens, asens;
   
   // Get the sparsity of the Jacobian block
-  const CRSSparsity& jsp = jacSparsity(iind,oind,true);
+  const CRSSparsity& jsp = jacSparsity(iind,oind,true,symmetric);
   const std::vector<int>& jsp_rowind = jsp.rowind();
   const std::vector<int>& jsp_col = jsp.col();
   
