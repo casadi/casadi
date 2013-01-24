@@ -2408,13 +2408,20 @@ CRSSparsity CRSSparsityInternal::patternUnion(const CRSSparsity& y, vector<unsig
   }
 }
 
+
+
 bool CRSSparsityInternal::isEqual(const CRSSparsity& y) const{
   // Quick true if the objects are the same
-  if(this == y.get())
-    return true;
+  if(this == y.get()) return true;  
   
+  // Otherwise, compare the patterns
+  return isEqual(y.size1(),y.size2(),y.col(),y.rowind());
+}
+
+
+bool CRSSparsityInternal::isEqual(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) const{
   // First check dimensions and number of non-zeros
-  if(size()!=y.size() || nrow_!=y.size1() || ncol_!=y.size2())
+  if(size()!=col.size() || nrow_!=nrow || ncol_!=ncol)
     return false;
 
   // Check if dense
@@ -2422,11 +2429,11 @@ bool CRSSparsityInternal::isEqual(const CRSSparsity& y) const{
     return true;
   
   // Check the number of non-zeros per row
-  if(!equal(rowind_.begin(),rowind_.end(),y.rowind().begin()))
+  if(!equal(rowind_.begin(),rowind_.end(),rowind.begin()))
     return false;
   
   // Finally check the column indices
-  if(!equal(col_.begin(),col_.end(),y.col().begin()))
+  if(!equal(col_.begin(),col_.end(),col.begin()))
     return false;
   
   // Equal if reached this point
@@ -3114,6 +3121,7 @@ void CRSSparsityInternal::spyMatlab(const std::string& mfile_name) const{
     return hash_sparsity(nrow_,ncol_,col_,rowind_);
   }
 
+  
 } // namespace CasADi
 
 

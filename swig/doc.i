@@ -1536,6 +1536,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::AcadoIntegratorInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -2907,6 +2913,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::AcadoOCPInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::setJacSparsity "
 
@@ -4778,6 +4790,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::CFunctionInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::CFunctionInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -6494,6 +6512,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::setJacSparsity
 "
@@ -8388,6 +8412,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::ControlSimulatorInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::ControlSimulatorInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -9045,6 +9075,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")  CasADi::CplexInternal::getJacSparsityHierarchicalSymm
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::CplexInternal::setJacSparsity "
 
@@ -10015,6 +10051,12 @@ Joel Andersson
 
 C++ includes: crs_sparsity.hpp ";
 
+/*  Check if two sparsity patterns are identical  */
+
+%feature("docstring")  CasADi::CRSSparsity::isEqual "";
+
+%feature("docstring")  CasADi::CRSSparsity::isEqual "";
+
 /*  Size and element counting  */
 
 %feature("docstring")  CasADi::CRSSparsity::size1 "
@@ -10074,6 +10116,10 @@ Construct a sparsity pattern (sparse/dense) ";
 %feature("docstring")  CasADi::CRSSparsity::CRSSparsity "
 
 Construct a sparsity pattern from vectors. ";
+
+%feature("docstring")  CasADi::CRSSparsity::CRSSparsity "
+
+Create from node. ";
 
 %feature("docstring")  CasADi::CRSSparsity::sanityCheck "
 
@@ -10617,6 +10663,10 @@ Sparsity pattern for a matrix-matrix product (details in public class) ";
 %feature("docstring")  CasADi::CRSSparsityInternal::patternUnion "
 
 Union of two sparsity patterns. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::isEqual "
+
+Check if two sparsity patterns are the same. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::isEqual "
 
@@ -11943,6 +11993,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::CSparseInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::CSparseInternal::setJacSparsity "
 
@@ -14164,6 +14220,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::CVodesInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::CVodesInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -15644,6 +15706,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::DerivativeInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::DerivativeInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -17101,6 +17169,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::DirectCollocationInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::DirectCollocationInternal::setJacSparsity "
 
@@ -18665,6 +18739,12 @@ recognition.
 Decide which ad_mode to take ";
 
 %feature("docstring")
+CasADi::DirectMultipleShootingInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
+%feature("docstring")
 CasADi::DirectMultipleShootingInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -20216,6 +20296,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::DirectSingleShootingInternal::setJacSparsity
 "
 
@@ -20879,6 +20965,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")  CasADi::DSDPInternal::getJacSparsityHierarchicalSymm
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::DSDPInternal::setJacSparsity "
 
@@ -23162,6 +23254,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::ExternalFunctionInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::ExternalFunctionInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -24825,6 +24923,11 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")  CasADi::FXInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::FXInternal::setJacSparsity "
 
@@ -27617,6 +27720,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")  CasADi::IdasInternal::getJacSparsityHierarchicalSymm
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::IdasInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -28940,6 +29049,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::ImplicitFunctionInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::setJacSparsity "
 
@@ -30699,6 +30814,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::IntegratorInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -31400,6 +31521,11 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")  CasADi::IPInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::IPInternal::setJacSparsity "
 
@@ -35700,6 +35826,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")  CasADi::IpoptInternal::getJacSparsityHierarchicalSymm
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::IpoptInternal::setJacSparsity "
 
@@ -40056,6 +40188,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::KinsolInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::KinsolInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -41856,6 +41994,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::KnitroInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::KnitroInternal::setJacSparsity "
 
@@ -44214,6 +44358,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::LapackLUDenseInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::LapackLUDenseInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -45535,6 +45685,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::LapackQRDenseInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::setJacSparsity "
 
@@ -47298,6 +47454,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::LiftedSQPInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -48003,6 +48165,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::LiftoptInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::LiftoptInternal::setJacSparsity "
 
@@ -50184,6 +50352,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::LinearSolverInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::setJacSparsity "
 
@@ -54302,6 +54476,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::MXFunctionInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -55225,6 +55405,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::NewtonImplicitInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::NewtonImplicitInternal::setJacSparsity "
 
@@ -56623,6 +56809,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::NLPImplicitInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::NLPImplicitInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -57996,6 +58188,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getJacSparsityHierarchicalSymm
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::NLPQPInternal::setJacSparsity "
 
@@ -60345,6 +60543,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::NLPSolverInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::setJacSparsity "
 
@@ -63216,6 +63420,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::OCPSolverInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::OCPSolverInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -63940,6 +64150,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")  CasADi::OOQPInternal::getJacSparsityHierarchicalSymm
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::OOQPInternal::setJacSparsity "
 
@@ -66567,6 +66783,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::ParallelizerInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -67218,6 +67440,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::QPOasesInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::QPOasesInternal::setJacSparsity "
 
@@ -69353,6 +69581,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::QPSolverInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::QPSolverInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -70985,6 +71219,10 @@ Get all statistics obtained at the end of the last evaluate call. ";
 
 Get single statistic obtained at the end of the last evaluate call. ";
 
+%feature("docstring")  CasADi::RKIntegratorInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
 %feature("docstring")  CasADi::RKIntegratorInternal::getJacSparsityPlain "
 
 A flavour of getJacSparsity without any magic. ";
@@ -70996,6 +71234,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::RKIntegratorInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::setJacSparsity "
 
@@ -72623,6 +72867,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::SDPSolverInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::SDPSolverInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -74159,6 +74409,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::SimulatorInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::SimulatorInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -75480,6 +75736,11 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")  CasADi::SQPInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::SQPInternal::setJacSparsity "
 
@@ -78486,6 +78747,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::SundialsInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::SundialsInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -80238,6 +80505,12 @@ A flavour of getJacSparsity that does hierachical block structure
 recognition.
 
 Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::SXFunctionInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::setJacSparsity "
 
@@ -83321,6 +83594,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")  CasADi::WorhpInternal::getJacSparsityHierarchicalSymm
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::WorhpInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -85537,6 +85816,12 @@ recognition.
 
 Decide which ad_mode to take ";
 
+%feature("docstring")
+CasADi::XFunctionInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
 %feature("docstring")  CasADi::XFunctionInternal::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
@@ -87064,6 +87349,10 @@ Get the sparsity resulting from a matrix multiplication. ";
 %feature("docstring")  CasADi::hash_sparsity "
 
 Hash a sparsity pattern. ";
+
+%feature("docstring")  CasADi::hash_combine "
+
+Generate a hash value incrementally (function taken from boost) ";
 
 %feature("docstring")  CasADi::hash_combine "
 

@@ -27,6 +27,17 @@
 #include <vector>
 #include <list>
 
+// Cashing requires a multimap (preferably a hash map)
+#ifdef USE_CXX11
+// Using C++11 unordered_multimap (hash map)
+#include <unordered_map>
+#define CACHING_MULTIMAP std::unordered_multimap
+#else // USE_CXX11
+// Falling back to std::map (binary search tree)
+#include <map>
+#define CACHING_MULTIMAP std::multimap
+#endif // USE_CXX11
+#include "../weak_ref.hpp"
 
 #ifdef SWIG
   %rename(getNZ_const) getNZ(int, int) const;
@@ -72,6 +83,11 @@ class CRSSparsityInternal;
  * \date 2010
 */
 class CRSSparsity : public SharedObject{
+  private:
+    /// Multimap holding all cached sparsity patterns (put first to ensure that it is initialized before being used)
+    typedef CACHING_MULTIMAP<std::size_t,WeakRef> CachingMap;
+    static CachingMap cached_;
+
   public:
   
     /// Default constructor
@@ -82,6 +98,12 @@ class CRSSparsity : public SharedObject{
 
     /// Construct a sparsity pattern from vectors
     CRSSparsity(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind);
+
+    /** \brief  Create from node */
+    explicit CRSSparsity(CRSSparsityInternal *node);
+
+    /** \brief Check if there is an identical copy of the sparsity pattern in the cache, and if so, make a shallow copy of that one */
+    void reCache();
 
     /** \brief Check if the dimensions and rowind,col vectors are compatible.
     * \param complete  set to true to also check elementwise
@@ -108,11 +130,15 @@ class CRSSparsity : public SharedObject{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /// Check if two sparsity patterns are the same
-    bool operator==(const CRSSparsity& y) const;
+    /// \name Check if two sparsity patterns are identical
+    /// @{
+    bool isEqual(const CRSSparsity& y) const;
+    bool isEqual(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) const;
+    bool operator==(const CRSSparsity& y) const{ return isEqual(y);}
+    /// @}
     
     /// Check if two sparsity patterns are difference
-    bool operator!=(const CRSSparsity& y) const{return !operator==(y);}
+    bool operator!=(const CRSSparsity& y) const{return !isEqual(y);}
     
     /// Take the union of two sparsity patterns
     CRSSparsity operator+(const CRSSparsity& b) const;
@@ -406,6 +432,12 @@ class CRSSparsity : public SharedObject{
     /** \brief Bitwise or of the nonzero entries of one sparsity pattern and the nonzero entries of another sparsity pattern */
     template<typename T>
     void bor(T* data, const T* val_data, CRSSparsity val_sp) const;
+
+
+private:
+  /// Construct a sparsity pattern from vectors, reuse cached pattern if possible
+  void assignCached(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind);
+
     #endif //SWIG
 };
 

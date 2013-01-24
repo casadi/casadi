@@ -27,8 +27,8 @@
 
 namespace CasADi{
 
-class CRSSparsityInternal : public SharedObjectNode{
-  public:
+  class CRSSparsityInternal : public SharedObjectNode{
+  public:    
     /// Construct a sparsity pattern from vectors
     CRSSparsityInternal(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) : nrow_(nrow), ncol_(ncol), col_(col), rowind_(rowind) { sanityCheck(false); }
     
@@ -176,6 +176,9 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Check if two sparsity patterns are the same
     bool isEqual(const CRSSparsity& y) const;
 
+    /// Check if two sparsity patterns are the same
+    bool isEqual(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) const;
+
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
     void enlargeRows(int nrow, const std::vector<int>& ii);
 
@@ -261,7 +264,6 @@ class CRSSparsityInternal : public SharedObjectNode{
     CRSSparsity getSub1(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
     /// Time complexity: O(ii.size()*(nnz per row))
     CRSSparsity getSub2(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
-
 };
 
 } // namespace CasADi

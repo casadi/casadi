@@ -423,25 +423,20 @@ bool Matrix<T>::vector() const{
 }
 
 template<class T>
-Matrix<T>::Matrix(){
-  sparsity_ = CRSSparsity(0,0,false);
+Matrix<T>::Matrix() : sparsity_(CRSSparsity(0,0,false)){
 }
 
 template<class T>
-Matrix<T>::Matrix(const Matrix<T>& m){
-  data_ = m.data_;
-  sparsity_ = m.sparsity_;
+Matrix<T>::Matrix(const Matrix<T>& m) : sparsity_(m.sparsity_), data_(m.data_){
 }
 
 template<class T>
-Matrix<T>::Matrix(const std::vector<T>& x) : data_(x){
-  sparsity_ = CRSSparsity(x.size(),1,true);
+Matrix<T>::Matrix(const std::vector<T>& x) : sparsity_(CRSSparsity(x.size(),1,true)), data_(x){
 }
 
 template<class T>
-Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : data_(x){
+Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : sparsity_(CRSSparsity(n,m,true)), data_(x){
   casadi_assert_message(x.size() == n*m, "Dimension mismatch." << std::endl << "You supplied a vector of length " << x.size() << ", but " << n << " x " << m << " = " << n*m);
-  sparsity_ = CRSSparsity(n,m,true);
 }
 
 template<class T>
@@ -452,14 +447,11 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T>& m){
 }
 
 template<class T>
-Matrix<T>::Matrix(int n, int m){
-  sparsity_ = CRSSparsity(n,m,false);
+Matrix<T>::Matrix(int n, int m) : sparsity_(CRSSparsity(n,m,false)){
 }
 
 template<class T>
-Matrix<T>::Matrix(int n, int m, const T& val){
-  sparsity_ = CRSSparsity(n,m,true);
-  data_.resize(n*m, val);
+Matrix<T>::Matrix(int n, int m, const T& val) : sparsity_(CRSSparsity(n,m,true)), data_(std::vector<T>(n*m, val)){
 }
 
 template<class T>
@@ -673,16 +665,13 @@ void Matrix<T>::clear(){
 }
 
 template<class T>
-Matrix<T>::Matrix(double val){
-  sparsity_ = CRSSparsity(1,1,true);
-  data().resize(1,val);
+Matrix<T>::Matrix(double val) : data_(std::vector<T>(1,val)), sparsity_(CRSSparsity(1,1,true)){
 }
 
 template<class T>
-Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& d) : data_(d){
-  sparsity_ = CRSSparsity(n,m,col,rowind);
+Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& d) : sparsity_(CRSSparsity(n,m,col,rowind)), data_(d){
   if(data_.size() != sparsity_.size())
-    data_.resize(sparsity_.size());
+    data_.resize(sparsity_.size()); // Why not throw an error?
   sanityCheck(true);
 }
 
@@ -712,15 +701,12 @@ Matrix<T>::Matrix(const std::vector< std::vector<T> >& d){
 }
 
 template<class T>
-Matrix<T>::Matrix(const CRSSparsity& sparsity, const T& val){
-  sparsity_ = sparsity.isNull() ? CRSSparsity(0,0,false) : sparsity;
-  data().resize(sparsity_.size(),val);
+Matrix<T>::Matrix(const CRSSparsity& sparsity, const T& val) : sparsity_(sparsity), data_(std::vector<T>(sparsity.size(),val)){
 }
 
 template<class T>
-Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& d) : data_(d) {
+Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& d) : sparsity_(sparsity), data_(d) {
   casadi_assert_message(sparsity.size()==d.size(),"Size mismatch." << std::endl << "You supplied a sparsity of " << sparsity.dimString() << ", but the supplied vector is of length " << d.size());
-  sparsity_ = sparsity.isNull() ? CRSSparsity(0,0,false) : sparsity;
 }
 
 template<class T>
