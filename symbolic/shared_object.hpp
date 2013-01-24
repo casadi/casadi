@@ -121,6 +121,9 @@ class SharedObject : public PrintableObject{
     
     #endif // SWIG
     
+    /// Print the pointer to the internal class
+    void printPtr(std::ostream &stream=std::cout) const;
+
     /// Initialize the object: more documentation in the node class (SharedObjectNode and derived classes)
     void init();
 

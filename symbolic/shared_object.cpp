@@ -153,6 +153,10 @@ void SharedObject::print(std::ostream &stream) const{
   else           (*this)->print(stream);
 }
 
+void SharedObject::printPtr(std::ostream &stream) const{
+  stream << node;
+}
+
 void SharedObjectNode::print(std::ostream &stream) const{
   // Print the name of the object by default
   stream << typeid(this).name();

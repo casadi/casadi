@@ -48,15 +48,20 @@ CRSSparsity::CRSSparsity(int nrow, int ncol, bool dense){
       for(int j=0; j<ncol; ++j)
         col[j+i*ncol] = j;
   }
-  //*this = CRSSparsityInternal::create(nrow, ncol, col, rowind);
+ 
+  // assignCached(nrow, ncol, col, rowind);
   assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
 }
 
 CRSSparsity::CRSSparsity(int nrow, int ncol, const vector<int>& col, const vector<int>& rowind){
-  //*this = CRSSparsityInternal::create(nrow, ncol, col, rowind);
+  //assignCached(nrow, ncol, col, rowind);
   assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
 }
-    
+
+void CRSSparsity::reCache(){
+  assignCached(size1(),size2(),col(),rowind());
+}
+ 
 CRSSparsityInternal* CRSSparsity::operator->(){
   makeUnique();
   return (CRSSparsityInternal*)(SharedObject::operator->());
@@ -461,5 +466,121 @@ bool CRSSparsity::isTranspose(const CRSSparsity& y) const{
   std::size_t CRSSparsity::hash() const{
     return (*this)->hash();
   }
+
+  void CRSSparsity::assignCached(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind){
+    // Hash the pattern
+    std::size_t h = hash_sparsity(nrow,ncol,col,rowind);
+
+    // Record the current number of buckets (for garbage collection below)
+#ifdef USE_CXX11
+    int bucket_count_before = cached_.bucket_count();
+#endif // USE_CXX11
+
+    // WORKAROUND, functions do not appear to work when bucket_count==0
+#ifdef USE_CXX11
+    if(bucket_count_before>0){
+#endif // USE_CXX11
+
+    // Find the range of patterns equal to the key (normally only zero or one)
+    pair<CachingMap::iterator,CachingMap::iterator> eq = cached_.equal_range(h);
+
+    // Loop over maching patterns
+    for(CachingMap::iterator i=eq.first; i!=eq.second; ++i){
+      
+      // Get a weak reference to the cached sparsity pattern
+      WeakRef& wref = i->second;
+      
+      // Check if the pattern still exists
+      if(wref.alive()){
+	
+	// Get an owning reference to the cached pattern
+	CRSSparsity ref = shared_cast<CRSSparsity>(wref.shared());
+	
+	// Check if the pattern matches
+	if(ref.isEqual(nrow,ncol,col,rowind)){
+	  
+	  // Found match!
+	  assignNode(ref.get());
+	  return;
+
+	} else {
+	  // There are two options, either the pattern has changed or there is a hash collision, so let's rehash the pattern
+	  std::size_t h_ref = ref.hash();
+	  
+	  if(h_ref!=h){ // The sparsity pattern has changed (the most likely event)
+
+	    // Create a new pattern
+	    assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+
+	    // Cache this pattern instead of the old one
+	    wref = *this;
+
+	    // Recache the old sparsity pattern 
+	    // TODO: recache "ref"
+	    return;
+
+	  } else { // There is a hash colision (unlikely, but possible)
+	    // Leave the pattern alone, continue to the next matching pattern
+	    continue; 
+	  }
+	}
+      } else {
+	// Check if one of the other cache entries indeed has a matching sparsity
+	CachingMap::iterator j=i;
+	j++; // Start at the next matching key
+	for(; j!=eq.second; ++j){
+	  if(j->second.alive()){
+	    
+	    // Recover cached sparsity
+	    CRSSparsity ref = shared_cast<CRSSparsity>(j->second.shared());
+	    
+	    // Match found if sparsity matches
+	    if(ref.isEqual(nrow,ncol,col,rowind)){
+	      assignNode(ref.get());
+	      return;
+	    }
+	  }
+	}
+
+	// The cached entry has been deleted, create a new one
+	assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+	
+	// Cache this pattern
+	wref = *this;
+
+	// Return
+	return;
+      }
+    }
+
+// END WORKAROUND
+#ifdef USE_CXX11
+   }
+#endif // USE_CXX11
+
+    // No matching sparsity pattern could be found, create a new one
+    assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+
+    // Cache this pattern
+    //cached_.insert(eq.second,std::pair<std::size_t,WeakRef>(h,ret));
+    cached_.insert(std::pair<std::size_t,WeakRef>(h,*this));
+
+    // Garbage collection (currently only supported for unordered_multimap)
+#ifdef USE_CXX11
+    int bucket_count_after = cached_.bucket_count();
+    
+    // We we increased the number of buckets, take time to garbage-collect deleted references
+    if(bucket_count_before!=bucket_count_after){
+      for(CachingMap::const_iterator i=cached_.begin(); i!=cached_.end(); ++i){
+        if(!i->second.alive()){
+          cached_.erase(i);
+        }
+      }
+    }
+#endif // USE_CXX11    
+  }
+
+  CRSSparsity::CachingMap CRSSparsity::cached_;
+
 
 } // namespace CasADi
