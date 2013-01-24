@@ -71,24 +71,18 @@ CRSSparsity sp_tril(int n) {
 
 CRSSparsity sp_diag(int n){
   casadi_assert_message(n>=0, "sp_diag expects a positive integer as argument");
-
-  // Return sparsity pattern
-  CRSSparsity ret(n,n);
   
-  // Set columns
-  std::vector<int>& col = ret.colRef();
-  col.resize(n);
+  // Construct sparsity pattern
+  std::vector<int> col(n);
+  std::vector<int> rowind(n+1);
+  int el = 0;
   for(int i=0; i<n; ++i){
-    col[i]=i;
+    rowind[i] = el;
+    col[el++] = i;
   }
-  
-  // Set row offsets
-  std::vector<int>& rowind = ret.rowindRef();
-  for(int i=0; i<=n; ++i){
-    rowind[i]=i;
-  }
+  rowind.back() = el;
 
-  return ret;
+  return CRSSparsity(n,n,col,rowind);
 }
 
 CRSSparsity sp_band(int n, int p) {
