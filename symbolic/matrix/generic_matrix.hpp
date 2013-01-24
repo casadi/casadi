@@ -227,7 +227,7 @@ MatType GenericMatrix<MatType>::mul(const MatType& y) const {
     else if(y.size()==0 && x.size1()==x.size2())
       return y;
     else
-      return MatType::sparse(x.size1(),y.size2());
+      return MatType::zeros(x.size1(),y.size2());
   } else if(x.scalar() || y.scalar()){
     return x*y;
   } else if(x.sparsity().diagonal() && y.size2()==1){
