@@ -664,31 +664,10 @@ std::string MX::dimString() const {
   return (*this)->sparsity_.dimString();
 }
 
-MX MX::mul(const MX& y) const{
+MX MX::mul_full(const MX& y) const{
   const MX& x = *this;
 
-  // Check if we can simplify the product
-  if(isIdentity(x)){
-    return y;
-  } else if(isIdentity(y)){
-    return x;
-  } else if(isZero(x) || isZero(y)){
-    // See if one of the arguments can be used as result
-    if(x.size()==0 && y.size1()==y.size2())
-      return x;
-    else if(y.size()==0 && x.size1()==x.size2())
-      return y;
-    else
-      return MX::sparse(x.size1(),y.size2());
-  } else if(x.scalar() || y.scalar()){
-    return x*y;
-  } else if(x.sparsity().diagonal() && y.size2()==1){
-    return diag(x)*y;
-  } else if(y.sparsity().diagonal() && x.size1()==1){
-    return x*trans(diag(y));
-  } else {
-    return MX::create(new Multiplication(x,trans(y)));
-  }
+  return MX::create(new Multiplication(x,trans(y)));
 }
 
 MX MX::inner_prod(const MX& y) const{

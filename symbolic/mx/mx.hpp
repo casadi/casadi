@@ -396,7 +396,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   MX __constpow__(const MX& b) const;
   MX __mrdivide__  (const MX& b) const;
   MX __mpower__(const MX& b) const;
-  MX mul(const MX& y) const;
+  MX mul_full(const MX& y) const;
   MX inner_prod(const MX& y) const;
   MX outer_prod(const MX& y) const;
   MX constpow(const MX& y) const;
