@@ -3125,9 +3125,19 @@ void CRSSparsityInternal::spyMatlab(const std::string& mfile_name) const{
     // Hash the pattern
     std::size_t h = hash_sparsity(nrow,ncol,col,rowind);
 
+    // Record the current number of buckets (for garbage collection below)
+#ifdef USE_CXX11
+    int bucket_count_before = cached_.bucket_count();
+#endif // USE_CXX11
+
+    // WORKAROUND, functions do not appear to work when bucket_count==0
+#ifdef USE_CXX11
+    if(bucket_count_before>0){
+#endif // USE_CXX11
+
     // Find the range of patterns equal to the key (normally only zero or one)
     pair<CachingMap::iterator,CachingMap::iterator> eq = cached_.equal_range(h);
-    
+
     // Loop over maching patterns
     for(CachingMap::iterator i=eq.first; i!=eq.second; ++i){
       
@@ -3196,16 +3206,17 @@ void CRSSparsityInternal::spyMatlab(const std::string& mfile_name) const{
       }
     }
 
+// END WORKAROUND
+#ifdef USE_CXX11
+   }
+#endif // USE_CXX11
+
     // No matching sparsity pattern could be found, create a new one
     CRSSparsity ret(new CRSSparsityInternal(nrow, ncol, col, rowind));
 
-    // Record the current number of buckets (for garbage collection below)
-#ifdef USE_CXX11
-    int bucket_count_before = cached_.bucket_count();
-#endif // USE_CXX11
-
     // Cache this pattern
-    cached_.insert(eq.second,std::pair<std::size_t,WeakRef>(h,ret));
+    //cached_.insert(eq.second,std::pair<std::size_t,WeakRef>(h,ret));
+    cached_.insert(std::pair<std::size_t,WeakRef>(h,ret));
 
     // Garbage collection (currently only supported for unordered_multimap)
 #ifdef USE_CXX11

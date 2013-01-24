@@ -48,10 +48,12 @@ CRSSparsity::CRSSparsity(int nrow, int ncol, bool dense){
       for(int j=0; j<ncol; ++j)
         col[j+i*ncol] = j;
   }
+  //*this = CRSSparsityInternal::create(nrow, ncol, col, rowind);
   assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
 }
 
 CRSSparsity::CRSSparsity(int nrow, int ncol, const vector<int>& col, const vector<int>& rowind){
+  //*this = CRSSparsityInternal::create(nrow, ncol, col, rowind);
   assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
 }
     
