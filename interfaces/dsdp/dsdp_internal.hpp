@@ -58,6 +58,9 @@ public:
     
     SDPCone sdpcone_;
     
+    std::map<int,std::string> terminationReason_;
+    std::map<int,std::string> solutionType_;
+    
     std::vector< std::vector< std::vector<int> > > pattern_;
     std::vector< std::vector< std::vector<double> > > values_;
     

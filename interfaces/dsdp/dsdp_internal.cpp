@@ -45,7 +45,13 @@ DSDPInternal* DSDPInternal::clone() const{
 DSDPInternal::DSDPInternal(const CRSSparsity &C, const CRSSparsity &A) : SDPSolverInternal(C,A){
  
   casadi_assert_message(double(n_)*(double(n_)+1)/2 < std::numeric_limits<int>::max(),"Your problem size n is too large to be handled by DSDP.");
- 
+
+  addOption("gapTol",OT_REAL,1e-8,"Convergence criterion based on distance between primal and dual objective");
+  addOption("maxIter",OT_INTEGER,500,"Maximum number of iterations");
+  addOption("dualTol",OT_REAL,1e-4,"Tolerance for dual infeasibility (translates to primal infeasibility in dsdp terms)");
+  addOption("primalTol",OT_REAL,1e-4,"Tolerance for primal infeasibility (translates to dual infeasibility in dsdp terms)");
+  addOption("stepTol",OT_REAL,5e-2,"Terminate the solver if the step length in the primal is below this tolerance. ");
+  
   // Set DSDP memory blocks to null
   dsdp_ = 0;
   sdpcone_ = 0;
@@ -62,6 +68,21 @@ void DSDPInternal::init(){
   // Initialize the base classes
   SDPSolverInternal::init();
 
+  terminationReason_[DSDP_CONVERGED]="DSDP_CONVERGED";
+  terminationReason_[DSDP_MAX_IT]="DSDP_MAX_IT";
+  terminationReason_[DSDP_INFEASIBLE_START]="DSDP_INFEASIBLE_START";
+  terminationReason_[DSDP_INDEFINITE_SCHUR_MATRIX]="DSDP_INDEFINITE SCHUR";
+  terminationReason_[DSDP_SMALL_STEPS]="DSDP_SMALL_STEPS";
+  terminationReason_[DSDP_NUMERICAL_ERROR]="DSDP_NUMERICAL_ERROR";
+  terminationReason_[DSDP_UPPERBOUND]="DSDP_UPPERBOUND";
+  terminationReason_[DSDP_USER_TERMINATION]="DSDP_USER_TERMINATION";
+  terminationReason_[CONTINUE_ITERATING]="CONTINUE_ITERATING";
+  
+  solutionType_[DSDP_PDFEASIBLE] = "DSDP_PDFEASIBLE";
+  solutionType_[DSDP_UNBOUNDED] = "DSDP_UNBOUNDED";
+  solutionType_[DSDP_INFEASIBLE] = "DSDP_INFEASIBLE";
+  solutionType_[DSDP_PDUNKNOWN] = "DSDP_PDUNKNOWN";
+  
   // A return flag used by DSDP
   int info;
   
@@ -73,6 +94,13 @@ void DSDPInternal::init(){
 
   // Allocate DSDP solver memory
   info = DSDPCreate(m_, &dsdp_);
+  DSDPSetStandardMonitor(dsdp_, 1);
+  DSDPSetGapTolerance(dsdp_, getOption("gapTol"));
+  DSDPSetMaxIts(dsdp_, getOption("maxIter"));
+  DSDPSetPTolerance(dsdp_,getOption("dualTol"));
+  DSDPSetRTolerance(dsdp_,getOption("primalTol"));
+  DSDPSetStepTolerance(dsdp_,getOption("stepTol"));
+  
   info = DSDPCreateSDPCone(dsdp_,nb_,&sdpcone_);
   for (int j=0;j<nb_;++j) {
     info = SDPConeSetBlockSize(sdpcone_, j, block_sizes_[j]);
@@ -146,6 +174,15 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   info = DSDPSolve(dsdp_);
 
   casadi_assert_message(info==0,"DSDPSolver failed");
+  
+  
+  DSDPTerminationReason reason;
+  DSDPStopReason(dsdp_, &reason);
+  std::cout << "Termination reason: " << (*terminationReason_.find(reason)).second << std::endl;
+  
+  DSDPSolutionType pdfeasible;
+  DSDPGetSolutionType(dsdp_,&pdfeasible);
+  std::cout << "Solution type: " << (*solutionType_.find(pdfeasible)).second << std::endl;
   
   info = DSDPGetY(dsdp_,&output(SDP_PRIMAL).at(0),m_);
   
