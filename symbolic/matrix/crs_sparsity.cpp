@@ -571,10 +571,13 @@ bool CRSSparsity::isTranspose(const CRSSparsity& y) const{
     
     // We we increased the number of buckets, take time to garbage-collect deleted references
     if(bucket_count_before!=bucket_count_after){
-      for(CachingMap::const_iterator i=cached_.begin(); i!=cached_.end(); ++i){
-        if(!i->second.alive()){
-          cached_.erase(i);
-        }
+      CachingMap::const_iterator i=cached_.begin();
+      while(i!=cached_.end()){
+	if(!i->second.alive()){
+	  i = cached_.erase(i);
+	} else {
+	  i++;
+	}
       }
     }
 #endif // USE_CXX11    
