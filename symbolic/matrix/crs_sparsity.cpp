@@ -49,13 +49,11 @@ CRSSparsity::CRSSparsity(int nrow, int ncol, bool dense){
         col[j+i*ncol] = j;
   }
  
-  // assignCached(nrow, ncol, col, rowind);
-  assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+  assignCached(nrow, ncol, col, rowind);
 }
 
 CRSSparsity::CRSSparsity(int nrow, int ncol, const vector<int>& col, const vector<int>& rowind){
-  //assignCached(nrow, ncol, col, rowind);
-  assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+  assignCached(nrow, ncol, col, rowind);
 }
 
 void CRSSparsity::reCache(){
