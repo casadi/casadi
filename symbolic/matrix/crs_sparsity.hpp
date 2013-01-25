@@ -105,6 +105,9 @@ class CRSSparsity : public SharedObject{
     /** \brief Check if there is an identical copy of the sparsity pattern in the cache, and if so, make a shallow copy of that one */
     void reCache();
 
+    /** \brief Clear the cache */
+    static void clearCache();
+
     /** \brief Check if the dimensions and rowind,col vectors are compatible.
     * \param complete  set to true to also check elementwise
     * throws an error as possible result
