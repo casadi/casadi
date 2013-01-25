@@ -87,6 +87,12 @@ class CRSSparsity : public SharedObject{
     /// Multimap holding all cached sparsity patterns (put first to ensure that it is initialized before being used)
     typedef CACHING_MULTIMAP<std::size_t,WeakRef> CachingMap;
     static CachingMap cached_;
+  
+    // Empty (i.e. 0-by-0) sparsity pattern 
+    static CRSSparsity empty_;
+
+    // Scalar (i.e. 1-by-1) sparsity pattern 
+    static CRSSparsity scalar_;  
 
   public:
   
