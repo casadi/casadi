@@ -466,21 +466,15 @@ bool CRSSparsity::isTranspose(const CRSSparsity& y) const{
   }
 
   void CRSSparsity::assignCached(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind){
-    // Quick return for empty patterns
-    if(nrow==0 && ncol==0){
-      assignNode(empty_.get());
-      return;
-    }
-
-    // Quick return for scalar patterns
-    if(nrow==1 && ncol==1){
-      assignNode(scalar_.get());
-      return;
-    }
-
     // Hash the pattern
     std::size_t h = hash_sparsity(nrow,ncol,col,rowind);
 
+    // Workaround: Disable caching for scalars and small empty matrices
+    if(nrow<=1 && ncol<=1){
+      assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+      return;
+    }
+    
     // Record the current number of buckets (for garbage collection below)
 #ifdef USE_CXX11
     int bucket_count_before = cached_.bucket_count();
@@ -598,10 +592,6 @@ bool CRSSparsity::isTranspose(const CRSSparsity& y) const{
   void CRSSparsity::clearCache(){
     cached_.clear();
   }
-
-  CRSSparsity CRSSparsity::empty_(new CRSSparsityInternal(0,0,range(0),range(1)));
-  
-  CRSSparsity CRSSparsity::scalar_(new CRSSparsityInternal(1,1,range(1),range(2)));
 
 
 } // namespace CasADi
