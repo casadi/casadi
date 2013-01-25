@@ -583,5 +583,9 @@ bool CRSSparsity::isTranspose(const CRSSparsity& y) const{
 
   CRSSparsity::CachingMap CRSSparsity::cached_;
 
+  void CRSSparsity::clearCache(){
+    cached_.clear();
+  }
+
 
 } // namespace CasADi
