@@ -27,6 +27,7 @@ import unittest
 from types import *
 from helpers import *
 
+@requires("SDPSolver")
 class SDPtests(casadiTestCase):
 
   def test_memleak1(self):
