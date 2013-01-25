@@ -20,6 +20,7 @@
 # 
 # 
 from casadi import *
+import casadi
 from numpy import *
 import unittest
 import sys
@@ -402,7 +403,18 @@ class run_only(object):
         else:
           print i
     return c
-    
+
+class requires(object):
+  def __init__(self,att):
+    self.att = att
+  
+  def __call__(self,c):
+    if hasattr(casadi,self.att):
+      return c
+    else:
+      print "Not available %s, skipping unittests" % self.att
+      return None
+
 class skip(object):
   def __init__(self, skip=True):
     self.skip = skip
