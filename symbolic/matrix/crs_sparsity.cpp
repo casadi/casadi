@@ -469,6 +469,12 @@ bool CRSSparsity::isTranspose(const CRSSparsity& y) const{
     // Hash the pattern
     std::size_t h = hash_sparsity(nrow,ncol,col,rowind);
 
+    // Workaround: Disable caching for scalars and small empty matrices
+    if(nrow<=1 && ncol<=1){
+      assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+      return;
+    }
+    
     // Record the current number of buckets (for garbage collection below)
 #ifdef USE_CXX11
     int bucket_count_before = cached_.bucket_count();
