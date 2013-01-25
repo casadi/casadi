@@ -133,6 +133,18 @@ class FX : public OptionsFunctionality{
   /** \brief  Set number of outputs  (normally invoked internally) */
   void setNumOutputs(int num_out);
   
+  /** \brief Set input scheme */
+  void setInputScheme(InputOutputScheme scheme);
+
+  /** \brief Set output scheme */
+  void setOutputScheme(InputOutputScheme scheme);
+
+  /** \brief Get input scheme */
+  InputOutputScheme getInputScheme() const;
+
+  /** \brief Get output scheme */
+  InputOutputScheme getOutputScheme() const;
+    
   /** \brief  Update the number of sensitivity directions during or after initialization (normally invoked internally) */
   void updateNumSens();
   

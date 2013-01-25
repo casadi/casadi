@@ -36,6 +36,8 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);
 int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name);
 std::string getSchemeName(InputOutputScheme scheme);
 std::string getSchemeEntryNames(InputOutputScheme scheme);
+std::string describeInput(InputOutputScheme scheme, int i);
+std::string describeOutput(InputOutputScheme scheme, int i);
 /// Helper function for 'ACADO_Input'
 /// Input arguments of an ACADO OCP solver
 /// 

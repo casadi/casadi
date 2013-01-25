@@ -228,6 +228,27 @@ autogenhpp.write("int getSchemeEntryEnum(InputOutputScheme scheme, const std::st
     
 autogenhpp.write("std::string getSchemeName(InputOutputScheme scheme);\n")
 autogenhpp.write("std::string getSchemeEntryNames(InputOutputScheme scheme);\n")
+autogenhpp.write("std::string describeInput(InputOutputScheme scheme, int i);\n")
+autogenhpp.write("std::string describeOutput(InputOutputScheme scheme, int i);\n")
+autogencpp.write("""
+std::string describeInput(InputOutputScheme scheme, int i) {
+  std::stringstream ss;
+  ss << "Input argument #" << i;
+  if (scheme!=SCHEME_unknown) {
+    ss << " (" << getSchemeEntryEnumName(scheme,i) <<  " aka '" << getSchemeEntryName(scheme,i) << "')";
+  }
+  return ss.str();
+}
+
+std::string describeOutput(InputOutputScheme scheme, int i) {
+  std::stringstream ss;
+  ss << "Output argument #" << i;
+  if (scheme!=SCHEME_unknown) {
+    ss << " (" << getSchemeEntryEnumName(scheme,i) <<  " aka '" << getSchemeEntryName(scheme,i) << "')";
+  }
+  return ss.str();
+}
+""")
 
 for p in schemes:
   print p.name

@@ -736,8 +736,10 @@ FX MXFunctionInternal::getNumericJacobian(int iind, int oind, bool compact, bool
   ret_out.push_back(jac(iind,oind,compact,symmetric,false,true));
   ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
   
+  MXFunction ret(inputv_,ret_out);
+  ret.setInputScheme(inputScheme);
   // Return function
-  return MXFunction(inputv_,ret_out);  
+  return ret;  
 }
 
 void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 

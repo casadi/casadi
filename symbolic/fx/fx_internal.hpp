@@ -206,6 +206,18 @@ class FXInternal : public OptionsFunctionalityNode{
     */
     int schemeEntry(InputOutputScheme scheme,const std::string &name) const;
     
+    /** \brief Set input scheme */
+    void setInputScheme(InputOutputScheme scheme);
+
+    /** \brief Set output scheme */
+    void setOutputScheme(InputOutputScheme scheme);
+
+    /** \brief Get input scheme */
+    InputOutputScheme getInputScheme() const;
+
+    /** \brief Get output scheme */
+    InputOutputScheme getOutputScheme() const;
+    
     /** \brief  Inputs of the function */
     std::vector<FunctionIO> input_;
 

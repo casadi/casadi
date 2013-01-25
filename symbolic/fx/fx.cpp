@@ -269,6 +269,23 @@ std::vector<SXMatrix> FX::symbolicInputSX() const{
   return (*this)->symbolicInputSX();
 }
 
+void FX::setInputScheme(InputOutputScheme scheme) {
+  return (*this)->setInputScheme(scheme);
+}
+
+
+void FX::setOutputScheme(InputOutputScheme scheme) {
+  return (*this)->setOutputScheme(scheme);
+}
+
+InputOutputScheme FX::getInputScheme() const {
+  return (*this)->getInputScheme();
+}
+
+InputOutputScheme FX::getOutputScheme() const {
+  return (*this)->getOutputScheme();
+}
+
 FX FX::operator[](int k) const {
 
   // Argument checking
@@ -286,6 +303,8 @@ FX FX::operator[](int k) const {
   
   // Construct an MXFunction with only the k'th output
   MXFunction ret(in,result[k]);
+  
+  ret.setInputScheme(getInputScheme());
   
   // Initialize it
   ret.init();
