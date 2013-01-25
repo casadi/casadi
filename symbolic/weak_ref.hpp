@@ -59,9 +59,6 @@ namespace CasADi{
     const WeakRefInternal* operator->() const;
 
 #ifndef SWIG
-    /** \brief Get a shared (owning) reference via implicit type conversion */
-    operator SharedObject();
-
   private:
     /** \brief Construct from a shared object (internal) */
     explicit WeakRef(SharedObjectNode* raw);

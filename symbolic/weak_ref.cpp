@@ -53,10 +53,6 @@ namespace CasADi{
     assignNode(shared.weak()->get());
   }
 
-  WeakRef::operator SharedObject(){
-    return shared();
-  }
-  
   WeakRef::WeakRef(SharedObjectNode* raw){
     assignNode(new WeakRefInternal(raw));
   }
