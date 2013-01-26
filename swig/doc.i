@@ -852,6 +852,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::init "
 
 Initialize the object: more documentation in the node class (
@@ -2394,6 +2398,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::AcadoOCP::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::AcadoOCP::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::AcadoOCP::init "
 
@@ -4325,6 +4333,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::CFunction::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::CFunction::init "
 
 Initialize the object: more documentation in the node class (
@@ -5835,6 +5847,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::CollocationIntegrator::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::init "
 
@@ -7856,6 +7872,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::ControlSimulator::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::ControlSimulator::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::ControlSimulator::init "
 
@@ -9978,6 +9998,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::CplexSolver::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::CplexSolver::init "
 
 Initialize the object: more documentation in the node class (
@@ -10120,6 +10144,11 @@ Construct a sparsity pattern from vectors. ";
 %feature("docstring")  CasADi::CRSSparsity::CRSSparsity "
 
 Create from node. ";
+
+%feature("docstring")  CasADi::CRSSparsity::reCache "
+
+Check if there is an identical copy of the sparsity pattern in the cache,
+and if so, make a shallow copy of that one. ";
 
 %feature("docstring")  CasADi::CRSSparsity::sanityCheck "
 
@@ -10467,6 +10496,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::CRSSparsity::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::CRSSparsity::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::CRSSparsity::init "
 
@@ -11510,6 +11543,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::CSparse::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::CSparse::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::CSparse::init "
 
@@ -13289,6 +13326,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::CVodesIntegrator::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::CVodesIntegrator::init "
 
@@ -15237,6 +15278,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::Derivative::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::Derivative::init "
 
 Initialize the object: more documentation in the node class (
@@ -16615,6 +16660,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::DirectCollocation::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::DirectCollocation::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::DirectCollocation::init "
 
@@ -18151,6 +18200,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::DirectMultipleShooting::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::DirectMultipleShooting::init "
 
@@ -19725,6 +19778,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::DirectSingleShooting::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::DirectSingleShooting::init "
 
 Initialize the object: more documentation in the node class (
@@ -21128,6 +21185,15 @@ You can cast this into the standard form with: C = blkdiag(Cj for all j) Ai
 
 Implementations of SDPSolver are encouraged to exploit this block structure.
 
+Warning: The solver DSDP breaks down when you try to achieve linear equality
+(Sum a_i x_i - c) == 0 by decomposing into two sets of inequalities: (Sum
+a_i x_i - c) >= 0 (Sum -a_i x_i - (-c)) >= 0
+
+You need to manually leave a gap between these eaualities: (Sum a_i x_i - c)
+>= 0 (Sum -a_i x_i - (-c-eps)) >= 0
+
+with eps = 1e-6 flor example.
+
 Joris Gillis
 
 >Input scheme: CasADi::SDPInput (SDP_NUM_IN = 3)
@@ -21868,6 +21934,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::DSDPSolver::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::DSDPSolver::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::DSDPSolver::init "
 
@@ -22784,6 +22854,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::ExternalFunction::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::ExternalFunction::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::ExternalFunction::init "
 
@@ -24433,6 +24507,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::FX::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::FX::init "
 
 Initialize the object: more documentation in the node class (
@@ -25182,6 +25260,12 @@ Get the sparsity pattern. ";
 
 Access the sparsity, make a copy if there are multiple references to it. ";
 
+%feature("docstring")  CasADi::GenericMatrix::mul "
+
+Matrix-matrix multiplication. Attempts to identify quick returns on matrix-
+level and delegates to MatType::mul_full if no such quick returns are found.
+";
+
 %feature("docstring")  CasADi::GenericMatrix::sym "";
 
 %feature("docstring")  CasADi::GenericMatrix::sym "";
@@ -25386,6 +25470,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::GenericType::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::GenericType::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::GenericType::init "
 
@@ -26702,6 +26790,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::IdasIntegrator::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::IdasIntegrator::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::IdasIntegrator::init "
 
@@ -28549,6 +28641,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::ImplicitFunction::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::init "
 
 Initialize the object: more documentation in the node class (
@@ -30214,6 +30310,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::Integrator::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::Integrator::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::Integrator::init "
 
@@ -32503,6 +32603,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::IPMethod::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::IPMethod::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::IPMethod::init "
 
@@ -39523,6 +39627,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::IpoptSolver::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::IpoptSolver::init "
 
 Initialize the object: more documentation in the node class (
@@ -41121,6 +41229,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::KinsolSolver::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::KinsolSolver::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::KinsolSolver::init "
 
@@ -43105,6 +43217,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::KnitroSolver::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::KnitroSolver::init "
 
 Initialize the object: more documentation in the node class (
@@ -43865,6 +43981,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::LapackLUDense::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::LapackLUDense::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::LapackLUDense::init "
 
@@ -45201,6 +45321,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::LapackQRDense::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::LapackQRDense::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::LapackQRDense::init "
 
@@ -46748,6 +46872,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::LiftedSQP::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::LiftedSQP::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::LiftedSQP::init "
 
@@ -49150,6 +49278,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::LiftoptSolver::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::LiftoptSolver::init "
 
 Initialize the object: more documentation in the node class (
@@ -49874,6 +50006,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::LinearSolver::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::LinearSolver::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::LinearSolver::init "
 
@@ -51257,7 +51393,7 @@ Make the matrix an dense n-by-m matrix. ";
 
 Make the matrix an empty n-by-m matrix. ";
 
-%feature("docstring")  CasADi::Matrix::mul "
+%feature("docstring")  CasADi::Matrix::mul_full "
 
 Matrix-matrix product. ";
 
@@ -51443,6 +51579,12 @@ Check if the matrix expression is dense. ";
 %feature("docstring")  CasADi::Matrix::scalar "
 
 Check if the matrix expression is scalar. ";
+
+%feature("docstring")  CasADi::Matrix::mul "
+
+Matrix-matrix multiplication. Attempts to identify quick returns on matrix-
+level and delegates to MatType::mul_full if no such quick returns are found.
+";
 
 %feature("docstring")  CasADi::Matrix::getRepresentation "
 
@@ -52314,6 +52456,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::MuscodInterface::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::MuscodInterface::init "
 
 Initialize the object: more documentation in the node class (
@@ -52995,7 +53141,7 @@ Division (with future.division in effect) ";
 
 %feature("docstring")  CasADi::MX::__mpower__ "";
 
-%feature("docstring")  CasADi::MX::mul "";
+%feature("docstring")  CasADi::MX::mul_full "";
 
 %feature("docstring")  CasADi::MX::inner_prod "";
 
@@ -53127,6 +53273,12 @@ Check if the matrix expression is dense. ";
 
 Check if the matrix expression is scalar. ";
 
+%feature("docstring")  CasADi::MX::mul "
+
+Matrix-matrix multiplication. Attempts to identify quick returns on matrix-
+level and delegates to MatType::mul_full if no such quick returns are found.
+";
+
 %feature("docstring")  CasADi::MX::clone "
 
 Deep copy. ";
@@ -53163,6 +53315,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::MX::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::MX::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::MX::init "
 
@@ -53955,6 +54111,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::MXFunction::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::MXFunction::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::MXFunction::init "
 
@@ -56284,6 +56444,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::NewtonImplicitSolver::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::NewtonImplicitSolver::init "
 
 Initialize the object: more documentation in the node class (
@@ -57659,6 +57823,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::NLPImplicitSolver::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::NLPImplicitSolver::init "
 
@@ -59051,6 +59219,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::NLPQPSolver::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::NLPQPSolver::init "
 
 Initialize the object: more documentation in the node class (
@@ -59927,6 +60099,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::NLPSolver::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::NLPSolver::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::NLPSolver::init "
 
@@ -62880,6 +63056,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::OCPSolver::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::OCPSolver::init "
 
 Initialize the object: more documentation in the node class (
@@ -65025,6 +65205,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::OOQPSolver::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::OOQPSolver::init "
 
 Initialize the object: more documentation in the node class (
@@ -65200,6 +65384,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::OptionsFunctionality::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::OptionsFunctionality::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::OptionsFunctionality::init "
 
@@ -66278,6 +66466,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::Parallelizer::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::Parallelizer::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::Parallelizer::init "
 
@@ -68319,6 +68511,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::QPOasesSolver::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::QPOasesSolver::init "
 
 Initialize the object: more documentation in the node class (
@@ -69076,6 +69272,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::QPSolver::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::QPSolver::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::QPSolver::init "
 
@@ -70630,6 +70830,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::RKIntegrator::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::RKIntegrator::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::RKIntegrator::init "
 
@@ -72339,6 +72543,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::SDPSolver::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::SDPSolver::init "
 
 Initialize the object: more documentation in the node class (
@@ -73087,6 +73295,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::SharedObject::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::SharedObject::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::SharedObject::init "
 
@@ -73916,6 +74128,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::Simulator::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::Simulator::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::Simulator::init "
 
@@ -76824,6 +77040,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::SQPMethod::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::SQPMethod::init "
 
 Initialize the object: more documentation in the node class (
@@ -77907,6 +78127,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::SundialsIntegrator::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::SundialsIntegrator::init "
 
@@ -79990,6 +80214,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::SXFunction::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::SXFunction::init "
 
 Initialize the object: more documentation in the node class (
@@ -82021,6 +82249,10 @@ Print a representation of the object. ";
 
 Print a destription of the object. ";
 
+%feature("docstring")  CasADi::Variable::printPtr "
+
+Print the pointer to the internal class. ";
+
 %feature("docstring")  CasADi::Variable::init "
 
 Initialize the object: more documentation in the node class (
@@ -82169,6 +82401,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::WeakRef::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::WeakRef::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::WeakRef::init "
 
@@ -85319,6 +85555,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::WorhpSolver::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::WorhpSolver::printPtr "
+
+Print the pointer to the internal class. ";
 
 %feature("docstring")  CasADi::WorhpSolver::init "
 
