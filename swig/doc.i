@@ -20616,6 +20616,24 @@ Implementations of SDPSolver are encouraged to exploit this block structure.
 |              |              |              | always dense |              |
 |              |              |              | (n x n).     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| dualTol      | OT_REAL      | 0.000        | Tolerance    | CasADi::DSDP |
+|              |              |              | for dual inf | Internal     |
+|              |              |              | easibility   |              |
+|              |              |              | (translates  |              |
+|              |              |              | to primal in |              |
+|              |              |              | feasibility  |              |
+|              |              |              | in dsdp      |              |
+|              |              |              | terms)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| gapTol       | OT_REAL      | 0.000        | Convergence  | CasADi::DSDP |
+|              |              |              | criterion    | Internal     |
+|              |              |              | based on     |              |
+|              |              |              | distance     |              |
+|              |              |              | between      |              |
+|              |              |              | primal and   |              |
+|              |              |              | dual         |              |
+|              |              |              | objective    |              |
++--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
 |              |              |              | wether       |              |
@@ -20635,6 +20653,10 @@ Implementations of SDPSolver are encouraged to exploit this block structure.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| maxIter      | OT_INTEGER   | 500          | Maximum      | CasADi::DSDP |
+|              |              |              | number of    | Internal     |
+|              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
@@ -20695,6 +20717,14 @@ Implementations of SDPSolver are encouraged to exploit this block structure.
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| primalTol    | OT_REAL      | 0.000        | Tolerance    | CasADi::DSDP |
+|              |              |              | for primal i | Internal     |
+|              |              |              | nfeasibility |              |
+|              |              |              | (translates  |              |
+|              |              |              | to dual infe |              |
+|              |              |              | asibility in |              |
+|              |              |              | dsdp terms)  |              |
++--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
 | heck         |              |              | exceptions   | ternal       |
 |              |              |              | when NaN or  |              |
@@ -20715,6 +20745,15 @@ Implementations of SDPSolver are encouraged to exploit this block structure.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| stepTol      | OT_REAL      | 0.050        | Terminate    | CasADi::DSDP |
+|              |              |              | the solver   | Internal     |
+|              |              |              | if the step  |              |
+|              |              |              | length in    |              |
+|              |              |              | the primal   |              |
+|              |              |              | is below     |              |
+|              |              |              | this         |              |
+|              |              |              | tolerance.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
 | ans          |              |              | references   | ternal       |
@@ -21288,6 +21327,24 @@ Joris Gillis
 |              |              |              | always dense |              |
 |              |              |              | (n x n).     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| dualTol      | OT_REAL      | 0.000        | Tolerance    | CasADi::DSDP |
+|              |              |              | for dual inf | Internal     |
+|              |              |              | easibility   |              |
+|              |              |              | (translates  |              |
+|              |              |              | to primal in |              |
+|              |              |              | feasibility  |              |
+|              |              |              | in dsdp      |              |
+|              |              |              | terms)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| gapTol       | OT_REAL      | 0.000        | Convergence  | CasADi::DSDP |
+|              |              |              | criterion    | Internal     |
+|              |              |              | based on     |              |
+|              |              |              | distance     |              |
+|              |              |              | between      |              |
+|              |              |              | primal and   |              |
+|              |              |              | dual         |              |
+|              |              |              | objective    |              |
++--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
 |              |              |              | wether       |              |
@@ -21307,6 +21364,10 @@ Joris Gillis
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| maxIter      | OT_INTEGER   | 500          | Maximum      | CasADi::DSDP |
+|              |              |              | number of    | Internal     |
+|              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
@@ -21367,6 +21428,14 @@ Joris Gillis
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| primalTol    | OT_REAL      | 0.000        | Tolerance    | CasADi::DSDP |
+|              |              |              | for primal i | Internal     |
+|              |              |              | nfeasibility |              |
+|              |              |              | (translates  |              |
+|              |              |              | to dual infe |              |
+|              |              |              | asibility in |              |
+|              |              |              | dsdp terms)  |              |
++--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
 | heck         |              |              | exceptions   | ternal       |
 |              |              |              | when NaN or  |              |
@@ -21387,6 +21456,15 @@ Joris Gillis
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| stepTol      | OT_REAL      | 0.050        | Terminate    | CasADi::DSDP |
+|              |              |              | the solver   | Internal     |
+|              |              |              | if the step  |              |
+|              |              |              | length in    |              |
+|              |              |              | the primal   |              |
+|              |              |              | is below     |              |
+|              |              |              | this         |              |
+|              |              |              | tolerance.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
 | ans          |              |              | references   | ternal       |
