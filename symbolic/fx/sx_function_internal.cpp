@@ -1184,29 +1184,24 @@ void SXFunctionInternal::spEvaluate(bool fwd){
 
     // Generate the kernel
     stringstream ss;
-    ss << "typedef int double_does_not_work;" << endl;
-    ss << endl;
-    ss << "typedef struct {"            << endl;
-    ss << "  int op;"                   << endl;
-    ss << "  int res;"                  << endl;
-    ss << "  union{ "                   << endl;
-    ss << "    double_does_not_work d;" << endl;
-    ss << "    int i[2];"               << endl;
-    ss << "  } arg;"			<< endl;
-    ss << "} SXAlgEl;"                  << endl;
-    ss << endl;
-    ss << " __kernel void sparsity_propagation(__global SXAlgEl* algorithm, int algorithm_size";
+    ss << " __kernel void sparsity_propagation(";
+    bool first=true;
     for(int i=0; i<getNumInputs(); ++i){
-      ss << ", __global unsigned long *x" << i;
+      if(first) first=false;
+      else      ss << ", ";
+      ss << "__global unsigned long *x" << i;
     }
     for(int i=0; i<getNumOutputs(); ++i){
-      ss << ", __global unsigned long *r" << i;
+      if(first) first=false;
+      else      ss << ", ";
+      ss << "__global unsigned long *r" << i;
     }
     ss << "){ " << endl;
 
-    // Which variables have been declared
-    vector<bool> declared(work_.size(),false);
     if(fwd){
+      // Which variables have been declared
+      vector<bool> declared(work_.size(),false);    
+
       // Propagate sparsity forward
       for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
 	if(it->op==OP_OUTPUT){
@@ -1320,13 +1315,6 @@ void SXFunctionInternal::spEvaluate(bool fwd){
     cl_kernel kernel = clCreateKernel(program, "sparsity_propagation", &ret);
     casadi_assert(ret == CL_SUCCESS);
 
-  // Create Memory Buffer for algorithm
-  cl_mem algorithm_memobj = clCreateBuffer(sparsity_propagation_kernel_.context, 
-  					   CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
-  					   algorithm_.size() * sizeof(SXAlgEl),
-  					   static_cast<void*>(getPtr(algorithm_)), &ret);
-  casadi_assert(ret == CL_SUCCESS);
-
   // Memory buffer for each of the input arrays
   vector<cl_mem> input_memobj(getNumInputs(),static_cast<cl_mem>(0));
   for(int i=0; i<input_memobj.size(); ++i){
@@ -1349,16 +1337,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
     
   // Set OpenCL Kernel Parameters
   int kernel_ind = 0;
-  
-  // Pass algorithm
-  ret = clSetKernelArg(kernel, kernel_ind++, sizeof(cl_mem), static_cast<void *>(&algorithm_memobj));
-  casadi_assert(ret == CL_SUCCESS);
-
-  // Pass algorithm size
-  cl_int algorithm_size = algorithm_.size();
-  ret = clSetKernelArg(kernel, kernel_ind++, sizeof(cl_int), static_cast<void *>(&algorithm_size));
-  casadi_assert(ret == CL_SUCCESS);
-    
+      
   // Pass inputs
   for(int i=0; i<getNumInputs(); ++i){
     ret = clSetKernelArg(kernel, kernel_ind++, sizeof(cl_mem), static_cast<void *>(&input_memobj[i]));
@@ -1403,12 +1382,6 @@ void SXFunctionInternal::spEvaluate(bool fwd){
       casadi_assert(ret == CL_SUCCESS);
     }
   }
-
-  casadi_assert(algorithm_memobj != 0);
-  casadi_assert(ret == CL_SUCCESS);
-
-  ret = clReleaseMemObject(algorithm_memobj);
-  casadi_assert(ret == CL_SUCCESS);
 
   ret = clReleaseKernel(kernel);
   casadi_assert(ret == CL_SUCCESS);  
