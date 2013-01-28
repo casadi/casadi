@@ -1180,18 +1180,7 @@ void SXFunctionInternal::spInit(bool fwd){
 
 void SXFunctionInternal::spEvaluate(bool fwd){
 #ifdef WITH_OPENCL
-  cout << "algorithm_.at(0).op = " << algorithm_.at(0).op << endl;
-  cout << "a + algorithm_.at(0).op = " << char('a' + algorithm_.at(0).op) << endl;
-  cout << "algorithm_.at(1).op = " << algorithm_.at(1).op << endl;
-  cout << "a + algorithm_.at(1).op = " << char('a' + algorithm_.at(1).op) << endl;
-  cout << "algorithm_.size() = " << algorithm_.size() << endl;
-  cout << "a + algorithm_.size() = " << char('a' + algorithm_.size()) << endl;
-  cout << "input 0 = " << (reinterpret_cast<bvec_t*>(inputNoCheck(0).ptr())[0]) << endl;
-  cout << "input 1 = " << (reinterpret_cast<bvec_t*>(inputNoCheck(0).ptr())[1]) << endl;
-  cout << "output 0 = " << (reinterpret_cast<bvec_t*>(outputNoCheck(0).ptr())[0]) << endl;
-
   cl_int ret;
-    
 
     // Generate the kernel
     stringstream ss;
@@ -1260,7 +1249,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
       // Propagate sparsity backward
       for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
 	if(it->op==OP_OUTPUT){
-	  ss << "r" << it->res << "[" << it->arg.i[1] << "]|=" << "a" << it->arg.i[0] << ";" << endl;
+	  ss << "a" << it->arg.i[0] << "|=r" << it->res << "[" << it->arg.i[1] << "];" << endl;
 	} else {
 	  if(it->op==OP_INPUT){
 	    ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]=a" << it->res << "; ";
@@ -1284,9 +1273,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
     
     // Form c-string
     std::string s = ss.str();
-
-    cout << s << endl;
-
+    //cout << s << endl;
     const char* cstr = s.c_str();
 
     // Kernel source in source code
@@ -1436,10 +1423,12 @@ void SXFunctionInternal::spEvaluate(bool fwd){
   ret = clReleaseProgram(program);
   casadi_assert(ret == CL_SUCCESS);
 
-  cout << "output 0 = " << (reinterpret_cast<bvec_t*>(outputNoCheck(0).ptr())[0]) << endl;
+  //cout << "output 0 = " << (reinterpret_cast<bvec_t*>(outputNoCheck(0).ptr())[0]) << endl;
 
   // Display Result
-  cout << tt << endl;
+  //  cout << tt << endl;
+
+  return;
 
 #endif // WITH_OPENCL
 
