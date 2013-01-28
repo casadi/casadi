@@ -1195,7 +1195,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
     ss << "  } arg;"			<< endl;
     ss << "} SXAlgEl;"                  << endl;
     ss << endl;
-    ss << " __kernel void sparsity_propagation(__global char* string, __global SXAlgEl* algorithm, int algorithm_size";
+    ss << " __kernel void sparsity_propagation(__global SXAlgEl* algorithm, int algorithm_size";
     for(int i=0; i<getNumInputs(); ++i){
       ss << ", __global unsigned long *x" << i;
     }
@@ -1348,10 +1348,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
   }
     
   // Set OpenCL Kernel Parameters
-  char tt[128];
   int kernel_ind = 0;
-  ret = clSetKernelArg(kernel, kernel_ind++, sizeof(cl_mem), static_cast<void *>(&sparsity_propagation_kernel_.memobj));
-  casadi_assert(ret == CL_SUCCESS);
   
   // Pass algorithm
   ret = clSetKernelArg(kernel, kernel_ind++, sizeof(cl_mem), static_cast<void *>(&algorithm_memobj));
@@ -1378,11 +1375,6 @@ void SXFunctionInternal::spEvaluate(bool fwd){
   ret = clEnqueueTask(sparsity_propagation_kernel_.command_queue, kernel, 0, NULL,NULL);
   casadi_assert(ret == CL_SUCCESS);
   
-  // Copy results from the memory buffer
-  ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, sparsity_propagation_kernel_.memobj, CL_TRUE, 0,
-			    128 * sizeof(char),tt, 0, NULL, NULL);
-  casadi_assert(ret == CL_SUCCESS);
-
   // Get inputs
   for(int i=0; i<input_memobj.size(); ++i){
     ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, input_memobj[i], CL_TRUE, 0,
@@ -1422,11 +1414,6 @@ void SXFunctionInternal::spEvaluate(bool fwd){
   casadi_assert(ret == CL_SUCCESS);  
   ret = clReleaseProgram(program);
   casadi_assert(ret == CL_SUCCESS);
-
-  //cout << "output 0 = " << (reinterpret_cast<bvec_t*>(outputNoCheck(0).ptr())[0]) << endl;
-
-  // Display Result
-  //  cout << tt << endl;
 
   return;
 
@@ -1518,7 +1505,6 @@ void SXFunctionInternal::spEvaluate(bool fwd){
     device_id = 0;
     context = 0;
     command_queue = 0;
-    memobj = 0;
     platform_id = 0;
     cl_int ret;
 
@@ -1534,15 +1520,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
 
     // Create Command Queue
     command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
-    casadi_assert(ret == CL_SUCCESS);
-   
-    // Create Memory Buffer
-    const int MEM_SIZE = 128;
-    char string[MEM_SIZE];
-    memobj = clCreateBuffer(context, CL_MEM_READ_WRITE, MEM_SIZE * sizeof(char), NULL, &ret);
-    casadi_assert(ret == CL_SUCCESS);
-    casadi_assert(memobj != 0);
-  
+    casadi_assert(ret == CL_SUCCESS);  
   }
 
   SparsityPropagationKernel::~SparsityPropagationKernel(){
@@ -1550,7 +1528,6 @@ void SXFunctionInternal::spEvaluate(bool fwd){
     cl_int ret;
     ret = clFlush(command_queue);
     ret = clFinish(command_queue);
-    ret = clReleaseMemObject(memobj);
     ret = clReleaseCommandQueue(command_queue);
     ret = clReleaseContext(context);
   }
