@@ -65,7 +65,6 @@ namespace CasADi{
     cl_device_id device_id;
     cl_context context;
     cl_command_queue command_queue;
-    cl_mem memobj;
     cl_platform_id platform_id;
     cl_uint ret_num_devices;
     cl_uint ret_num_platforms;
