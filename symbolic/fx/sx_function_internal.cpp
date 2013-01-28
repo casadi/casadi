@@ -1208,27 +1208,78 @@ void SXFunctionInternal::spEvaluate(bool fwd){
     ss << endl;
     ss << " __kernel void sparsity_propagation(__global char* string, __global SXAlgEl* algorithm, int algorithm_size";
     for(int i=0; i<getNumInputs(); ++i){
-      ss << ", __global unsigned long *input" << i;
+      ss << ", __global unsigned long *x" << i;
     }
     for(int i=0; i<getNumOutputs(); ++i){
-      ss << ", __global unsigned long *output" << i;
+      ss << ", __global unsigned long *r" << i;
     }
     ss << "){ " << endl;
-    ss << "output0[0] = 42;" << endl;
-    ss << "string[0] = 'a' + input0[0];" << endl;
-    ss << "string[1] = 'a' + input0[1];" << endl;
-    ss << "string[2] = 'l';" << endl;
-    ss << "string[3] = 'l';" << endl;
-    ss << "string[4] = 'a';" << endl;
-    ss << "string[5] = ',';" << endl;
-    ss << "string[6] = ' ';" << endl;
-    ss << "string[7] = 'W';" << endl;
-    ss << "string[8] = 'o';" << endl;
-    ss << "string[9] = 'r';" << endl;
-    ss << "string[10] = 'a' + algorithm_size;" << endl;
-    ss << "string[11] = 'a' + algorithm[0].op;" << endl;
-    ss << "string[12] = 'a' + algorithm[1].op;" << endl;
-    ss << "string[13] = '\\0';" << endl;
+
+    // Which variables have been declared
+    vector<bool> declared(work_.size(),false);
+    if(fwd){
+      // Propagate sparsity forward
+      for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+	if(it->op==OP_OUTPUT){
+	  ss << "r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
+	} else {
+	  // Declare result if not already declared
+	  if(!declared[it->res]){
+	    ss << "ulong ";
+	    declared[it->res]=true;
+	  }
+     
+	  // Where to store the result
+	  ss << "a" << it->res << "=";
+    
+	  // What to store
+	  if(it->op==OP_CONST || it->op==OP_PARAMETER){
+	    ss << "0";
+	  } else if(it->op==OP_INPUT){
+	    ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
+	  } else {
+	    int ndep = casadi_math<double>::ndeps(it->op);
+	    for(int c=0; c<ndep; ++c){
+	      if(c==1) ss << "|";
+	      ss << "a" << it->arg.i[c];
+	    }
+	  }
+	}
+	ss  << ";" << endl;
+      }
+      
+    } else { // Backward propagation
+      // Temporary variable
+      ss << "ulong t;" << endl;
+
+      // Declare and initialize work vector
+      for(int i=0; i<work_.size(); ++i){
+	ss << "ulong a" << i << "=0;"<< endl;
+      }
+
+      // Propagate sparsity backward
+      for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
+	if(it->op==OP_OUTPUT){
+	  ss << "r" << it->res << "[" << it->arg.i[1] << "]|=" << "a" << it->arg.i[0] << ";" << endl;
+	} else {
+	  if(it->op==OP_INPUT){
+	    ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]=a" << it->res << "; ";
+	    ss << "a" << it->res << "=0;" << endl;
+	  } else if(it->op==OP_CONST || it->op==OP_PARAMETER){
+	    ss << "a" << it->res << "=0;" << endl;
+	  } else {
+	    int ndep = casadi_math<double>::ndeps(it->op);
+	    ss << "t=a" << it->res << "; ";
+	    ss << "a" << it->res << "=0; ";
+	    ss << "a" << it->arg.i[0] << "|=" << "t" << "; ";
+	    if(ndep>1){
+	      ss << "a" << it->arg.i[1] << "|=" << "t" << "; ";
+	    }
+	    ss << endl;
+	  }
+	}
+      }
+    }
     ss << "}" << endl;
     
     // Form c-string
