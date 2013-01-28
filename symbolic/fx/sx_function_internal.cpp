@@ -1346,59 +1346,6 @@ void SXFunctionInternal::spEvaluate(bool fwd){
 
 #ifdef WITH_OPENCL
 
-#define SPARSITY_PROPAGATION_KERNEL \
- \
-typedef int double_does_not_work;\
-\
-typedef struct {\
-  int op;   \
-  int res;  \
-  union{ \
-    double_does_not_work d; \
-    int i[2]; \
-  } arg;    \
-} SXAlgEl; \
-\
- __kernel void sparsity_propagation(__global char* string, __global SXAlgEl* algorithm, int algorithm_size, __global __const unsigned long *input){ \
-  string[0] = 'a' + input[0];                         \
-  string[1] = 'a' + input[1];                         \
-  string[2] = 'l';                         \
-  string[3] = 'l';                         \
-  string[4] = 'o';                         \
-  string[5] = ',';                         \
-  string[6] = ' ';                         \
-  string[7] = 'W';                         \
-  string[8] = 'o';                         \
-  string[9] = 'r';                         \
-  string[10] = 'a' + algorithm_size;       \
-  string[11] = 'a' + algorithm[0].op;      \
-  string[12] = 'a' + algorithm[1].op;      \
-  string[13] = '\0';                       \
-}
-
-# if 0
-  // Propagate sparsity forward
-  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-    switch(it->op){
-    case OP_CONST:
-    case OP_PARAMETER:
-      iwork[it->res] = bvec_t(0); break;
-    case OP_INPUT:
-      iwork[it->res] = reinterpret_cast<bvec_t*>(&inputNoCheck(it->arg.i[0]).front())[it->arg.i[1]]; break;
-    case OP_OUTPUT:
-      reinterpret_cast<bvec_t*>(&outputNoCheck(it->res).front())[it->arg.i[1]] = iwork[it->arg.i[0]]; break;
-    default: // Unary or binary operation
-      iwork[it->res] = iwork[it->arg.i[0]] | iwork[it->arg.i[1]]; break;
-    }
-  }
-#endif
-
-
-  // Kernel as a string
-#define CODE_TO_STR1(x) #x
-#define CODE_TO_STR(x) CODE_TO_STR1(x)
-  const char* sparsity_propagation_kernel_str = CODE_TO_STR(SPARSITY_PROPAGATION_KERNEL);
-
   SparsityPropagationKernel::SparsityPropagationKernel(){
     device_id = 0;
     context = 0;
@@ -1430,8 +1377,42 @@ typedef struct {\
     casadi_assert(ret == CL_SUCCESS);
     casadi_assert(memobj != 0);
   
+    // Generte the kernel
+    stringstream ss;
+    ss << "typedef int double_does_not_work;" << endl;
+    ss << endl;
+    ss << "typedef struct {"            << endl;
+    ss << "  int op;"                   << endl;
+    ss << "  int res;"                  << endl;
+    ss << "  union{ "                   << endl;
+    ss << "    double_does_not_work d;" << endl;
+    ss << "    int i[2];"               << endl;
+    ss << "  } arg;"			<< endl;
+    ss << "} SXAlgEl;"                  << endl;
+    ss << endl;
+    ss << " __kernel void sparsity_propagation(__global char* string, __global SXAlgEl* algorithm, int algorithm_size, __global __const unsigned long *input){ " << endl;
+    ss << "string[0] = 'a' + input[0];" << endl;
+    ss << "string[1] = 'a' + input[1];" << endl;
+    ss << "string[2] = 'l';" << endl;
+    ss << "string[3] = 'l';" << endl;
+    ss << "string[4] = 'a';" << endl;
+    ss << "string[5] = ',';" << endl;
+    ss << "string[6] = ' ';" << endl;
+    ss << "string[7] = 'W';" << endl;
+    ss << "string[8] = 'o';" << endl;
+    ss << "string[9] = 'r';" << endl;
+    ss << "string[10] = 'a' + algorithm_size;" << endl;
+    ss << "string[11] = 'a' + algorithm[0].op;" << endl;
+    ss << "string[12] = 'a' + algorithm[1].op;" << endl;
+    ss << "string[13] = '\\0';" << endl;
+    ss << "}" << endl;
+    
+    // Form c-string
+    std::string s = ss.str();
+    const char* cstr = s.c_str();
+
     // Kernel source in source code
-    program = clCreateProgramWithSource(context, 1, (const char **)&sparsity_propagation_kernel_str,0, &ret);
+    program = clCreateProgramWithSource(context, 1, static_cast<const char **>(&cstr),0, &ret);
     casadi_assert(ret == CL_SUCCESS);
     casadi_assert(program != 0);
   
