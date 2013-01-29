@@ -1208,11 +1208,6 @@ void Matrix<T>::enlarge(int nrow, int ncol, const std::vector<int>& ii, const st
 }
 
 template<class T>
-std::string Matrix<T>::dimString() const {
-  return sparsity_.dimString();
-}
-
-template<class T>
 void Matrix<T>::sanityCheck(bool complete) const {
   sparsity_.sanityCheck(complete);
   
