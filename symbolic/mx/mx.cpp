@@ -660,10 +660,6 @@ MX::MX(int nrow, int ncol, const MX& val){
   (*this)->assign(val,vector<int>(sp.size(),0));
 }
 
-std::string MX::dimString() const {
-  return (*this)->sparsity_.dimString();
-}
-
 MX MX::mul_full(const MX& y) const{
   const MX& x = *this;
 

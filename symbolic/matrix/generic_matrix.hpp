@@ -80,6 +80,11 @@ class GenericMatrix{
     /** \brief Get the number if non-zeros for a given sparsity pattern */
     int size(Sparsity sp) const;
     
+    /** \brief Get string representation of dimensions.
+    The representation is (nrow x ncol = numel | size)
+    */
+    std::string dimString() const;
+    
     #ifndef SWIG  
     /** \brief  Get the shape */
     std::pair<int,int> shape() const;
@@ -197,6 +202,11 @@ std::pair<int,int> GenericMatrix<MatType>::shape() const{
 }
 
 template<typename MatType>
+std::string GenericMatrix<MatType>::dimString() const {
+  return sparsity().dimString();
+}
+
+template<typename MatType>
 bool GenericMatrix<MatType>::empty() const{
   return numel()==0;
 }
@@ -237,6 +247,7 @@ MatType GenericMatrix<MatType>::mul_smart(const MatType& y) const {
   } else if(x.sparsity().diagonal() && y.sparsity().diagonal()){
     return diag(diag(x)*diag(y));
   } else {
+    casadi_assert_message(size2()==y.size1(),"Matrix product with incompatible dimensions. Lhs is " << dimString() << " and rhs is " << y.dimString() << ".");
     return x.mul_full(y);
   }
 }
