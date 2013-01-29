@@ -733,7 +733,19 @@ class Matrixtests(casadiTestCase):
     makeSparse(r)
     self.checkarray(C,r)
     
-
+  def test_diag_sparse(self):
+    self.message("diag sparse")
+    
+    for n in [[0,1,0,0,2,3,4,5,6,0],[1,2,3,0],[0,1,2,3]]:
+      d = DMatrix(n)
+      D = DMatrix(n)
+      makeSparse(d)
+      m = c.diag(d)
+      M = c.diag(D)
+      makeSparse(M)
+      
+      self.checkarray(m.sparsity().rowind(),M.sparsity().rowind())
+      self.checkarray(m.sparsity().col(),M.sparsity().col())
 
     
 if __name__ == '__main__':
