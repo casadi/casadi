@@ -1380,27 +1380,44 @@ void SXFunctionInternal::spEvaluate(bool fwd){
     casadi_assert(ret == CL_SUCCESS);
   }
   
-  // Clean up object specific memory
+  // Clean up memory for input arguments
   for(vector<cl_mem>::iterator i=input_memobj.begin(); i!=input_memobj.end(); ++i){
     if(*i != 0){
       ret = clReleaseMemObject(*i);
-      casadi_assert(ret == CL_SUCCESS);
+      casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
     }
   }
+  input_memobj.clear();
 
+  // Clean up memory for output arguments
   for(vector<cl_mem>::iterator i=output_memobj.begin(); i!=output_memobj.end(); ++i){
     if(*i != 0){
       ret = clReleaseMemObject(*i);
-      casadi_assert(ret == CL_SUCCESS);
+      casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
     }
   }
+  output_memobj.clear();
 
-  ret = clReleaseKernel(fwd_kernel);
-  casadi_assert(ret == CL_SUCCESS);  
-  ret = clReleaseKernel(adj_kernel);
-  casadi_assert(ret == CL_SUCCESS);  
-  ret = clReleaseProgram(program);
-  casadi_assert(ret == CL_SUCCESS);
+  // Free opencl forward propagation kernel
+  if(fwd_kernel!=0){
+    ret = clReleaseKernel(fwd_kernel);
+    casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+    fwd_kernel = 0;
+  }
+
+  // Free opencl backward propagation kernel
+  if(adj_kernel!=0){
+    ret = clReleaseKernel(adj_kernel);
+    casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+    adj_kernel = 0;
+  }
+
+  // Free opencl program
+  if(program!=0){
+    ret = clReleaseProgram(program);
+    casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+    program = 0;
+  }
 
   return;
 
