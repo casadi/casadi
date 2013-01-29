@@ -1816,22 +1816,26 @@ CRSSparsity CRSSparsityInternal::diag(std::vector<int>& mapping) const{
     }
     
     // Return object
-    CRSSparsity ret(sp->ncol_,sp->ncol_);
-    ret.reserve(size(),sp->ncol_);
-    
     mapping.clear();
     mapping.resize(size());
+    
+    std::vector<int> rowind(sp->ncol_+1,0);
+    std::vector<int> col(sp->size());
+    
+    int i_prev = 0;
         
     // Loop over nonzero
     for(int k=0;k<size();k++) {
       mapping[k]=k; // mapping will just be a range(size())
-      
+     
       int i = sp->col_[k];
-      
-      ret.getNZ(i,i); // Create a nonzero into the ret sparsity pattern
+      std::fill(rowind.begin()+i_prev+1,rowind.begin()+i+1,k);
+      col[k]=i;
+      i_prev = i;
     }
+    std::fill(rowind.begin()+i_prev+1,rowind.end(),size());
     
-    return ret;
+    return CRSSparsity(sp->ncol_,sp->ncol_,col,rowind);
   } else {
     casadi_error("diag: wrong argument shape. Expecting square matrix or vector-like, but got " << dimString() << " instead.");
   }
