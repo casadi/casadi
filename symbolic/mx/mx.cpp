@@ -670,6 +670,10 @@ MX MX::mul_full(const MX& y) const{
   return MX::create(new Multiplication(x,trans(y)));
 }
 
+MX MX::mul(const MX& y) const{
+  return mul_smart(y);
+}
+
 MX MX::inner_prod(const MX& y) const{
   const MX& x = *this;
   casadi_assert_message(x.size2()==1,"inner_prod: first factor not a vector");
