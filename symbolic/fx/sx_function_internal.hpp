@@ -202,6 +202,20 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
 #endif // WITH_LLVM
   
 #ifdef WITH_OPENCL
+  // OpenCL memory
+  std::vector<cl_mem> input_memobj_, output_memobj_;
+  cl_kernel fwd_kernel_, adj_kernel_;
+  cl_program program_;
+
+  // Initialize OpenCL
+  void initOpenCL();
+
+  // Propagate sparsity using OpenCL
+  void spEvaluateOpenCL(bool fwd);
+
+  // Free OpenCL memory
+  void freeOpenCL();
+
   static SparsityPropagationKernel sparsity_propagation_kernel_;
 #endif // WITH_OPENCL
 
