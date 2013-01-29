@@ -186,6 +186,9 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
 
   /// With just-in-time compilation
   bool just_in_time_;
+
+  /// With just-in-time compilation for the sparsity propagation
+  bool just_in_time_sparsity_;
   
 #ifdef WITH_LLVM
   llvm::Module *jit_module_;

@@ -57,7 +57,8 @@ using namespace std;
 SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const vector<SXMatrix >& outputv) : 
   XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>(inputv,outputv) {
   setOption("name","unnamed_sx_function");
-  addOption("just_in_time",OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation (experimental)");
+  addOption("just_in_time", OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation (experimental)");
+  addOption("just_in_time_sparsity", OT_BOOLEAN,false,"Propagate sparsity patterns using just-in-time compilation to a CPU or GPU");
 
   // Check for duplicate entries among the input expressions
   bool has_duplicates = false;
@@ -88,9 +89,20 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const ve
   }
   
   casadi_assert(!outputv_.empty()); // NOTE: Remove?
+  
+  // Reset OpenCL memory
+#ifdef WITH_OPENCL
+  fwd_kernel_ = 0;
+  adj_kernel_ = 0;
+  program_ = 0;
+#endif // WITH_OPENCL
 }
 
 SXFunctionInternal::~SXFunctionInternal(){
+  // Free OpenCL memory
+#ifdef WITH_OPENCL
+  freeOpenCL();
+#endif // WITH_OPENCL
 }
 
 void SXFunctionInternal::evaluate(int nfdir, int nadir){
@@ -899,6 +911,16 @@ void SXFunctionInternal::init(){
     casadi_error("Option \"just_in_time\" true requires CasADi to have been compiled with WITH_LLVM=ON");
     #endif //WITH_LLVM
   }
+
+  // Initialize just-in-time compilation for sparsity pattern propagation
+  just_in_time_sparsity_ = getOption("just_in_time_sparsity");
+  if(just_in_time_sparsity_){
+#ifdef WITH_OPENCL
+    initOpenCL();
+#else // WITH_OPENCL
+    casadi_error("Option \"just_in_time_sparsity\" true requires CasADi to have been compiled with WITH_OPENCL=ON");
+#endif // WITH_OPENCL
+  }
   
   // Print
   if(verbose()){
@@ -1180,24 +1202,13 @@ void SXFunctionInternal::spInit(bool fwd){
 
 void SXFunctionInternal::spEvaluate(bool fwd){
 #ifdef WITH_OPENCL
-  // Move to constructor
-  fwd_kernel_ = 0;
-  adj_kernel_ = 0;
-  program_ = 0;
-
-  // Move to init
-  initOpenCL();  
-
-  // Evaluate with OpenCL
-  spEvaluateOpenCL(fwd);
-  
-  // Move to destructor
-  freeOpenCL();
-
-  return;
-
+  if(just_in_time_sparsity_){
+    // Evaluate with OpenCL
+    spEvaluateOpenCL(fwd);
+    return; // Quick return
+  }
 #endif // WITH_OPENCL
-
+  
   // Get work array
   bvec_t *iwork = get_bvec_t(work_);
 
