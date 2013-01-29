@@ -1180,244 +1180,19 @@ void SXFunctionInternal::spInit(bool fwd){
 
 void SXFunctionInternal::spEvaluate(bool fwd){
 #ifdef WITH_OPENCL
-  cl_int ret;
+  // Move to constructor
+  fwd_kernel_ = 0;
+  adj_kernel_ = 0;
+  program_ = 0;
 
-  // Generate the kernel
-  stringstream ss;
+  // Move to init
+  initOpenCL();  
+
+  // Evaluate with OpenCL
+  spEvaluateOpenCL(fwd);
   
-  const char* fcn_name[2] = {"sp_evaluate_fwd", "sp_evaluate_adj"};
-  for(int kernel=0; kernel<2; ++kernel){
-    bool use_fwd = kernel==0;
-    ss << "__kernel void " << fcn_name[kernel] << "(";
-    bool first=true;
-    for(int i=0; i<getNumInputs(); ++i){
-      if(first) first=false;
-      else      ss << ", ";
-      ss << "__global unsigned long *x" << i;
-    }
-    for(int i=0; i<getNumOutputs(); ++i){
-      if(first) first=false;
-      else      ss << ", ";
-      ss << "__global unsigned long *r" << i;
-    }
-    ss << "){ " << endl;
-    
-    if(use_fwd){
-      // Which variables have been declared
-      vector<bool> declared(work_.size(),false);    
-
-      // Propagate sparsity forward
-      for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-	if(it->op==OP_OUTPUT){
-	  ss << "r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
-	} else {
-	  // Declare result if not already declared
-	  if(!declared[it->res]){
-	    ss << "ulong ";
-	    declared[it->res]=true;
-	  }
-	  
-	  // Where to store the result
-	  ss << "a" << it->res << "=";
-	  
-	  // What to store
-	  if(it->op==OP_CONST || it->op==OP_PARAMETER){
-	    ss << "0";
-	  } else if(it->op==OP_INPUT){
-	    ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
-	  } else {
-	    int ndep = casadi_math<double>::ndeps(it->op);
-	    for(int c=0; c<ndep; ++c){
-	      if(c==1) ss << "|";
-	      ss << "a" << it->arg.i[c];
-	    }
-	  }
-	}
-	ss  << ";" << endl;
-      }
-      
-    } else { // Backward propagation
-      // Temporary variable
-      ss << "ulong t;" << endl;
-
-      // Declare and initialize work vector
-      for(int i=0; i<work_.size(); ++i){
-	ss << "ulong a" << i << "=0;"<< endl;
-      }
-      
-      // Propagate sparsity backward
-      for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
-	if(it->op==OP_OUTPUT){
-	  ss << "a" << it->arg.i[0] << "|=r" << it->res << "[" << it->arg.i[1] << "];" << endl;
-	} else {
-	  if(it->op==OP_INPUT){
-	    ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]=a" << it->res << "; ";
-	    ss << "a" << it->res << "=0;" << endl;
-	  } else if(it->op==OP_CONST || it->op==OP_PARAMETER){
-	    ss << "a" << it->res << "=0;" << endl;
-	  } else {
-	    int ndep = casadi_math<double>::ndeps(it->op);
-	    ss << "t=a" << it->res << "; ";
-	    ss << "a" << it->res << "=0; ";
-	    ss << "a" << it->arg.i[0] << "|=" << "t" << "; ";
-	    if(ndep>1){
-	      ss << "a" << it->arg.i[1] << "|=" << "t" << "; ";
-	    }
-	    ss << endl;
-	  }
-	}
-      }
-    }
-    ss << "}" << endl << endl;
-  }
-    
-  // Form c-string
-  std::string s = ss.str();
-  //cout << s << endl;
-  const char* cstr = s.c_str();
-
-  // Kernel source in source code
-  cl_program program = clCreateProgramWithSource(sparsity_propagation_kernel_.context, 1, static_cast<const char **>(&cstr),0, &ret);
-  casadi_assert(ret == CL_SUCCESS);
-  casadi_assert(program != 0);
-  
-  // Build Kernel Program
-  ret = clBuildProgram(program, 1, &sparsity_propagation_kernel_.device_id, NULL, NULL, NULL);
-  if(ret!=CL_SUCCESS){
-    const char* msg;
-    switch(ret){
-    case CL_INVALID_PROGRAM: msg = "Program is not a valid program object."; break;
-    case CL_INVALID_VALUE: msg = "(1) Device_list is NULL and num_devices is greater than zero, or device_list is not NULL and num_devices is zero. (2) pfn_notify is NULL but user_data is not NULL."; break;
-    case CL_INVALID_DEVICE: msg = "OpenCL devices listed in device_list are not in the list of devices associated with program"; break;
-    case CL_INVALID_BINARY: msg = "Program is created with clCreateWithProgramBinary and devices listed in device_list do not have a valid program binary loaded."; break;
-    case CL_INVALID_BUILD_OPTIONS: msg = "The build options specified by options are invalid. "; break;
-    case CL_INVALID_OPERATION: msg = "(1) The build of a program executable for any of the devices listed in device_list by a previous call to clBuildProgram for program has not completed. (2) There are kernel objects attached to program. "; break;
-    case CL_COMPILER_NOT_AVAILABLE: msg = "Program is created with clCreateProgramWithSource and a compiler is not available i.e. CL_DEVICE_COMPILER_AVAILABLE specified in table 4.3 is set to CL_FALSE."; break;
-    case CL_BUILD_PROGRAM_FAILURE:{
-      msg = "There is a failure to build the program executable. This error will be returned if clBuildProgram does not return until the build has completed. "; 
-      
-      // Determine the size of the log
-      size_t log_size;
-      clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
-      
-      // Allocate memory for the log
-      char log[log_size];
-      
-      // Print the log
-      clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
-      cerr << log << endl;
-      break;
-    }
-    case CL_OUT_OF_RESOURCES: msg = "There is a failure to allocate resources required by the OpenCL implementation on the device."; break;
-    case CL_OUT_OF_HOST_MEMORY: msg = "There is a failure to allocate resources required by the OpenCL implementation on the host."; break;
-    default: msg = "Unknown error"; break;
-    }
-    
-    casadi_error("clBuildProgram failed: " << msg);
-  }
-  
-  // Create OpenCL kernel for forward propatation
-  cl_kernel fwd_kernel = clCreateKernel(program, fcn_name[0], &ret);
-  casadi_assert(ret == CL_SUCCESS);
-
-  // Create OpenCL kernel for backward propatation
-  cl_kernel adj_kernel = clCreateKernel(program, fcn_name[1], &ret);
-  casadi_assert(ret == CL_SUCCESS);
-  
-  // Memory buffer for each of the input arrays
-  vector<cl_mem> input_memobj(getNumInputs(),static_cast<cl_mem>(0));
-  for(int i=0; i<input_memobj.size(); ++i){
-    input_memobj[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
-				     CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
-				     inputNoCheck(i).size() * sizeof(cl_ulong),     
-				     reinterpret_cast<void*>(inputNoCheck(i).ptr()), &ret);
-    casadi_assert(ret == CL_SUCCESS);
-  }
-  
-  // Memory buffer for each of the output arrays
-  vector<cl_mem> output_memobj(getNumOutputs(),static_cast<cl_mem>(0));
-  for(int i=0; i<output_memobj.size(); ++i){
-    output_memobj[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
-				      CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
-				      outputNoCheck(i).size() * sizeof(cl_ulong),     
-				      reinterpret_cast<void*>(outputNoCheck(i).ptr()), &ret);
-    casadi_assert(ret == CL_SUCCESS);
-  }
-
-  // Select a kernel
-  cl_kernel kernel = fwd ? fwd_kernel : adj_kernel;
-    
-  // Set OpenCL Kernel Parameters
-  int kernel_arg = 0;
-      
-  // Pass inputs
-  for(int i=0; i<getNumInputs(); ++i){
-    ret = clSetKernelArg(kernel, kernel_arg++, sizeof(cl_mem), static_cast<void *>(&input_memobj[i]));
-    casadi_assert(ret == CL_SUCCESS);
-  }
-
-  // Pass outputs
-  for(int i=0; i<getNumOutputs(); ++i){
-    ret = clSetKernelArg(kernel, kernel_arg++, sizeof(cl_mem), static_cast<void *>(&output_memobj[i]));
-    casadi_assert(ret == CL_SUCCESS);
-  }
-
-  // Execute OpenCL Kernel
-  ret = clEnqueueTask(sparsity_propagation_kernel_.command_queue, kernel, 0, NULL,NULL);
-  casadi_assert(ret == CL_SUCCESS);
-  
-  // Get inputs
-  for(int i=0; i<input_memobj.size(); ++i){
-    ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, input_memobj[i], CL_TRUE, 0,
-			      inputNoCheck(i).size() * sizeof(cl_ulong), reinterpret_cast<void*>(inputNoCheck(i).ptr()), 0, NULL, NULL);
-    casadi_assert(ret == CL_SUCCESS);
-  }
-
-  // Get outputs
-  for(int i=0; i<output_memobj.size(); ++i){
-    ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, output_memobj[i], CL_TRUE, 0,
-			      outputNoCheck(i).size() * sizeof(cl_ulong), reinterpret_cast<void*>(outputNoCheck(i).ptr()), 0, NULL, NULL);
-    casadi_assert(ret == CL_SUCCESS);
-  }
-  
-  // Clean up memory for input arguments
-  for(vector<cl_mem>::iterator i=input_memobj.begin(); i!=input_memobj.end(); ++i){
-    if(*i != 0){
-      ret = clReleaseMemObject(*i);
-      casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-    }
-  }
-  input_memobj.clear();
-
-  // Clean up memory for output arguments
-  for(vector<cl_mem>::iterator i=output_memobj.begin(); i!=output_memobj.end(); ++i){
-    if(*i != 0){
-      ret = clReleaseMemObject(*i);
-      casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-    }
-  }
-  output_memobj.clear();
-
-  // Free opencl forward propagation kernel
-  if(fwd_kernel!=0){
-    ret = clReleaseKernel(fwd_kernel);
-    casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-    fwd_kernel = 0;
-  }
-
-  // Free opencl backward propagation kernel
-  if(adj_kernel!=0){
-    ret = clReleaseKernel(adj_kernel);
-    casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-    adj_kernel = 0;
-  }
-
-  // Free opencl program
-  if(program!=0){
-    ret = clReleaseProgram(program);
-    casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-    program = 0;
-  }
+  // Move to destructor
+  freeOpenCL();
 
   return;
 
@@ -1539,6 +1314,261 @@ void SXFunctionInternal::spEvaluate(bool fwd){
   // Memory for the kernel singleton
   SparsityPropagationKernel SXFunctionInternal::sparsity_propagation_kernel_;
   
+void SXFunctionInternal::initOpenCL(){
+  // OpenCL return flag
+  cl_int ret;
+
+  // Generate the kernel
+  stringstream ss;
+  
+  const char* fcn_name[2] = {"sp_evaluate_fwd", "sp_evaluate_adj"};
+  for(int kernel=0; kernel<2; ++kernel){
+    bool use_fwd = kernel==0;
+    ss << "__kernel void " << fcn_name[kernel] << "(";
+    bool first=true;
+    for(int i=0; i<getNumInputs(); ++i){
+      if(first) first=false;
+      else      ss << ", ";
+      ss << "__global unsigned long *x" << i;
+    }
+    for(int i=0; i<getNumOutputs(); ++i){
+      if(first) first=false;
+      else      ss << ", ";
+      ss << "__global unsigned long *r" << i;
+    }
+    ss << "){ " << endl;
+    
+    if(use_fwd){
+      // Which variables have been declared
+      vector<bool> declared(work_.size(),false);    
+
+      // Propagate sparsity forward
+      for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+	if(it->op==OP_OUTPUT){
+	  ss << "r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
+	} else {
+	  // Declare result if not already declared
+	  if(!declared[it->res]){
+	    ss << "ulong ";
+	    declared[it->res]=true;
+	  }
+	  
+	  // Where to store the result
+	  ss << "a" << it->res << "=";
+	  
+	  // What to store
+	  if(it->op==OP_CONST || it->op==OP_PARAMETER){
+	    ss << "0";
+	  } else if(it->op==OP_INPUT){
+	    ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
+	  } else {
+	    int ndep = casadi_math<double>::ndeps(it->op);
+	    for(int c=0; c<ndep; ++c){
+	      if(c==1) ss << "|";
+	      ss << "a" << it->arg.i[c];
+	    }
+	  }
+	}
+	ss  << ";" << endl;
+      }
+      
+    } else { // Backward propagation
+      // Temporary variable
+      ss << "ulong t;" << endl;
+
+      // Declare and initialize work vector
+      for(int i=0; i<work_.size(); ++i){
+	ss << "ulong a" << i << "=0;"<< endl;
+      }
+      
+      // Propagate sparsity backward
+      for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
+	if(it->op==OP_OUTPUT){
+	  ss << "a" << it->arg.i[0] << "|=r" << it->res << "[" << it->arg.i[1] << "];" << endl;
+	} else {
+	  if(it->op==OP_INPUT){
+	    ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]=a" << it->res << "; ";
+	    ss << "a" << it->res << "=0;" << endl;
+	  } else if(it->op==OP_CONST || it->op==OP_PARAMETER){
+	    ss << "a" << it->res << "=0;" << endl;
+	  } else {
+	    int ndep = casadi_math<double>::ndeps(it->op);
+	    ss << "t=a" << it->res << "; ";
+	    ss << "a" << it->res << "=0; ";
+	    ss << "a" << it->arg.i[0] << "|=" << "t" << "; ";
+	    if(ndep>1){
+	      ss << "a" << it->arg.i[1] << "|=" << "t" << "; ";
+	    }
+	    ss << endl;
+	  }
+	}
+      }
+    }
+    ss << "}" << endl << endl;
+  }
+    
+  // Form c-string
+  std::string s = ss.str();
+  //cout << s << endl;
+  const char* cstr = s.c_str();
+
+  // Kernel source in source code
+  program_ = clCreateProgramWithSource(sparsity_propagation_kernel_.context, 1, static_cast<const char **>(&cstr),0, &ret);
+  casadi_assert(ret == CL_SUCCESS);
+  casadi_assert(program_ != 0);
+  
+  // Build Kernel Program
+  ret = clBuildProgram(program_, 1, &sparsity_propagation_kernel_.device_id, NULL, NULL, NULL);
+  if(ret!=CL_SUCCESS){
+    const char* msg;
+    switch(ret){
+    case CL_INVALID_PROGRAM: msg = "Program is not a valid program object."; break;
+    case CL_INVALID_VALUE: msg = "(1) Device_list is NULL and num_devices is greater than zero, or device_list is not NULL and num_devices is zero. (2) pfn_notify is NULL but user_data is not NULL."; break;
+    case CL_INVALID_DEVICE: msg = "OpenCL devices listed in device_list are not in the list of devices associated with program"; break;
+    case CL_INVALID_BINARY: msg = "Program is created with clCreateWithProgramBinary and devices listed in device_list do not have a valid program binary loaded."; break;
+    case CL_INVALID_BUILD_OPTIONS: msg = "The build options specified by options are invalid. "; break;
+    case CL_INVALID_OPERATION: msg = "(1) The build of a program executable for any of the devices listed in device_list by a previous call to clBuildProgram for program has not completed. (2) There are kernel objects attached to program. "; break;
+    case CL_COMPILER_NOT_AVAILABLE: msg = "Program is created with clCreateProgramWithSource and a compiler is not available i.e. CL_DEVICE_COMPILER_AVAILABLE specified in table 4.3 is set to CL_FALSE."; break;
+    case CL_BUILD_PROGRAM_FAILURE:{
+      msg = "There is a failure to build the program executable. This error will be returned if clBuildProgram does not return until the build has completed. "; 
+      
+      // Determine the size of the log
+      size_t log_size;
+      clGetProgramBuildInfo(program_, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+      
+      // Allocate memory for the log
+      char log[log_size];
+      
+      // Print the log
+      clGetProgramBuildInfo(program_, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
+      cerr << log << endl;
+      break;
+    }
+    case CL_OUT_OF_RESOURCES: msg = "There is a failure to allocate resources required by the OpenCL implementation on the device."; break;
+    case CL_OUT_OF_HOST_MEMORY: msg = "There is a failure to allocate resources required by the OpenCL implementation on the host."; break;
+    default: msg = "Unknown error"; break;
+    }
+    
+    casadi_error("clBuildProgram failed: " << msg);
+  }
+  
+  // Create OpenCL kernel for forward propatation
+  fwd_kernel_ = clCreateKernel(program_, fcn_name[0], &ret);
+  casadi_assert(ret == CL_SUCCESS);
+
+  // Create OpenCL kernel for backward propatation
+  adj_kernel_ = clCreateKernel(program_, fcn_name[1], &ret);
+  casadi_assert(ret == CL_SUCCESS);
+  
+  // Memory buffer for each of the input arrays
+  input_memobj_.resize(getNumInputs(),static_cast<cl_mem>(0));
+  for(int i=0; i<input_memobj_.size(); ++i){
+    input_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
+				     CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
+				     inputNoCheck(i).size() * sizeof(cl_ulong),     
+				     reinterpret_cast<void*>(inputNoCheck(i).ptr()), &ret);
+    casadi_assert(ret == CL_SUCCESS);
+  }
+  
+  // Memory buffer for each of the output arrays
+  output_memobj_.resize(getNumOutputs(),static_cast<cl_mem>(0));
+  for(int i=0; i<output_memobj_.size(); ++i){
+    output_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
+				      CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
+				      outputNoCheck(i).size() * sizeof(cl_ulong),     
+				      reinterpret_cast<void*>(outputNoCheck(i).ptr()), &ret);
+    casadi_assert(ret == CL_SUCCESS);
+  }
+}
+
+void SXFunctionInternal::spEvaluateOpenCL(bool fwd){
+  // OpenCL return flag
+  cl_int ret;
+
+  // Select a kernel
+  cl_kernel kernel = fwd ? fwd_kernel_ : adj_kernel_;
+    
+  // Set OpenCL Kernel Parameters
+  int kernel_arg = 0;
+      
+  // Pass inputs
+  for(int i=0; i<getNumInputs(); ++i){
+    ret = clSetKernelArg(kernel, kernel_arg++, sizeof(cl_mem), static_cast<void *>(&input_memobj_[i]));
+    casadi_assert(ret == CL_SUCCESS);
+  }
+
+  // Pass outputs
+  for(int i=0; i<getNumOutputs(); ++i){
+    ret = clSetKernelArg(kernel, kernel_arg++, sizeof(cl_mem), static_cast<void *>(&output_memobj_[i]));
+    casadi_assert(ret == CL_SUCCESS);
+  }
+
+  // Execute OpenCL Kernel
+  ret = clEnqueueTask(sparsity_propagation_kernel_.command_queue, kernel, 0, NULL,NULL);
+  casadi_assert(ret == CL_SUCCESS);
+  
+  // Get inputs
+  for(int i=0; i<input_memobj_.size(); ++i){
+    ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, input_memobj_[i], CL_TRUE, 0,
+			      inputNoCheck(i).size() * sizeof(cl_ulong), reinterpret_cast<void*>(inputNoCheck(i).ptr()), 0, NULL, NULL);
+    casadi_assert(ret == CL_SUCCESS);
+  }
+
+  // Get outputs
+  for(int i=0; i<output_memobj_.size(); ++i){
+    ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, output_memobj_[i], CL_TRUE, 0,
+			      outputNoCheck(i).size() * sizeof(cl_ulong), reinterpret_cast<void*>(outputNoCheck(i).ptr()), 0, NULL, NULL);
+    casadi_assert(ret == CL_SUCCESS);
+  }
+}
+
+void SXFunctionInternal::freeOpenCL(){
+  // OpenCL return flag
+  cl_int ret;
+
+  // Clean up memory for input buffers
+  for(vector<cl_mem>::iterator i=input_memobj_.begin(); i!=input_memobj_.end(); ++i){
+    if(*i != 0){
+      ret = clReleaseMemObject(*i);
+      casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+    }
+  }
+  input_memobj_.clear();
+
+  // Clean up memory for output buffers
+  for(vector<cl_mem>::iterator i=output_memobj_.begin(); i!=output_memobj_.end(); ++i){
+    if(*i != 0){
+      ret = clReleaseMemObject(*i);
+      casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+    }
+  }
+  output_memobj_.clear();
+
+  // Free opencl forward propagation kernel
+  if(fwd_kernel_!=0){
+    ret = clReleaseKernel(fwd_kernel_);
+    casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+    fwd_kernel_ = 0;
+  }
+
+  // Free opencl backward propagation kernel
+  if(adj_kernel_!=0){
+    ret = clReleaseKernel(adj_kernel_);
+    casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+    adj_kernel_ = 0;
+  }
+
+  // Free opencl program
+  if(program_!=0){
+    ret = clReleaseProgram(program_);
+    casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+    program_ = 0;
+  }    
+}
+
+
+
+
 #endif // WITH_OPENCL
 
 
