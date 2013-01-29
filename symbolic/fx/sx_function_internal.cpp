@@ -58,7 +58,8 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const ve
   XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>(inputv,outputv) {
   setOption("name","unnamed_sx_function");
   addOption("just_in_time", OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation (experimental)");
-  addOption("just_in_time_sparsity", OT_BOOLEAN,false,"Propagate sparsity patterns using just-in-time compilation to a CPU or GPU");
+  addOption("just_in_time_sparsity", OT_BOOLEAN,false,"Propagate sparsity patterns using just-in-time compilation to a CPU or GPU using OpenCL");
+  addOption("just_in_time_opencl", OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation using OpenCL (experimental)");
 
   // Check for duplicate entries among the input expressions
   bool has_duplicates = false;
@@ -92,16 +93,16 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const ve
   
   // Reset OpenCL memory
 #ifdef WITH_OPENCL
-  fwd_kernel_ = 0;
-  adj_kernel_ = 0;
-  program_ = 0;
+  sp_fwd_kernel_ = 0;
+  sp_adj_kernel_ = 0;
+  sp_program_ = 0;
 #endif // WITH_OPENCL
 }
 
 SXFunctionInternal::~SXFunctionInternal(){
   // Free OpenCL memory
 #ifdef WITH_OPENCL
-  freeOpenCL();
+  spFreeOpenCL();
 #endif // WITH_OPENCL
 }
 
@@ -912,11 +913,21 @@ void SXFunctionInternal::init(){
     #endif //WITH_LLVM
   }
 
-  // Initialize just-in-time compilation for sparsity pattern propagation
+  // Initialize just-in-time compilation for numeric evaluation using OpenCL
+  just_in_time_opencl_ = getOption("just_in_time_opencl");
+  if(just_in_time_opencl_){
+#ifdef WITH_OPENCL
+    //    allocOpenCL();
+#else // WITH_OPENCL
+    casadi_error("Option \"just_in_time_opencl\" true requires CasADi to have been compiled with WITH_OPENCL=ON");
+#endif // WITH_OPENCL
+  }
+
+  // Initialize just-in-time compilation for sparsity propagation using OpenCL
   just_in_time_sparsity_ = getOption("just_in_time_sparsity");
   if(just_in_time_sparsity_){
 #ifdef WITH_OPENCL
-    initOpenCL();
+    spAllocOpenCL();
 #else // WITH_OPENCL
     casadi_error("Option \"just_in_time_sparsity\" true requires CasADi to have been compiled with WITH_OPENCL=ON");
 #endif // WITH_OPENCL
@@ -1332,7 +1343,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
   // Memory for the kernel singleton
   SparsityPropagationKernel SXFunctionInternal::sparsity_propagation_kernel_;
   
-void SXFunctionInternal::initOpenCL(){
+void SXFunctionInternal::spAllocOpenCL(){
   // OpenCL return flag
   cl_int ret;
 
@@ -1431,12 +1442,12 @@ void SXFunctionInternal::initOpenCL(){
   const char* cstr = s.c_str();
 
   // Kernel source in source code
-  program_ = clCreateProgramWithSource(sparsity_propagation_kernel_.context, 1, static_cast<const char **>(&cstr),0, &ret);
+  sp_program_ = clCreateProgramWithSource(sparsity_propagation_kernel_.context, 1, static_cast<const char **>(&cstr),0, &ret);
   casadi_assert(ret == CL_SUCCESS);
-  casadi_assert(program_ != 0);
+  casadi_assert(sp_program_ != 0);
   
   // Build Kernel Program
-  ret = clBuildProgram(program_, 1, &sparsity_propagation_kernel_.device_id, NULL, NULL, NULL);
+  ret = clBuildProgram(sp_program_, 1, &sparsity_propagation_kernel_.device_id, NULL, NULL, NULL);
   if(ret!=CL_SUCCESS){
     const char* msg;
     switch(ret){
@@ -1452,13 +1463,13 @@ void SXFunctionInternal::initOpenCL(){
       
       // Determine the size of the log
       size_t log_size;
-      clGetProgramBuildInfo(program_, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+      clGetProgramBuildInfo(sp_program_, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
       
       // Allocate memory for the log
       char log[log_size];
       
       // Print the log
-      clGetProgramBuildInfo(program_, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
+      clGetProgramBuildInfo(sp_program_, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
       cerr << log << endl;
       break;
     }
@@ -1471,17 +1482,17 @@ void SXFunctionInternal::initOpenCL(){
   }
   
   // Create OpenCL kernel for forward propatation
-  fwd_kernel_ = clCreateKernel(program_, fcn_name[0], &ret);
+  sp_fwd_kernel_ = clCreateKernel(sp_program_, fcn_name[0], &ret);
   casadi_assert(ret == CL_SUCCESS);
 
   // Create OpenCL kernel for backward propatation
-  adj_kernel_ = clCreateKernel(program_, fcn_name[1], &ret);
+  sp_adj_kernel_ = clCreateKernel(sp_program_, fcn_name[1], &ret);
   casadi_assert(ret == CL_SUCCESS);
   
   // Memory buffer for each of the input arrays
-  input_memobj_.resize(getNumInputs(),static_cast<cl_mem>(0));
-  for(int i=0; i<input_memobj_.size(); ++i){
-    input_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
+  sp_input_memobj_.resize(getNumInputs(),static_cast<cl_mem>(0));
+  for(int i=0; i<sp_input_memobj_.size(); ++i){
+    sp_input_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
 				     CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
 				     inputNoCheck(i).size() * sizeof(cl_ulong),     
 				     reinterpret_cast<void*>(inputNoCheck(i).ptr()), &ret);
@@ -1489,9 +1500,9 @@ void SXFunctionInternal::initOpenCL(){
   }
   
   // Memory buffer for each of the output arrays
-  output_memobj_.resize(getNumOutputs(),static_cast<cl_mem>(0));
-  for(int i=0; i<output_memobj_.size(); ++i){
-    output_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
+  sp_output_memobj_.resize(getNumOutputs(),static_cast<cl_mem>(0));
+  for(int i=0; i<sp_output_memobj_.size(); ++i){
+    sp_output_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
 				      CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
 				      outputNoCheck(i).size() * sizeof(cl_ulong),     
 				      reinterpret_cast<void*>(outputNoCheck(i).ptr()), &ret);
@@ -1504,20 +1515,20 @@ void SXFunctionInternal::spEvaluateOpenCL(bool fwd){
   cl_int ret;
 
   // Select a kernel
-  cl_kernel kernel = fwd ? fwd_kernel_ : adj_kernel_;
+  cl_kernel kernel = fwd ? sp_fwd_kernel_ : sp_adj_kernel_;
     
   // Set OpenCL Kernel Parameters
   int kernel_arg = 0;
       
   // Pass inputs
   for(int i=0; i<getNumInputs(); ++i){
-    ret = clSetKernelArg(kernel, kernel_arg++, sizeof(cl_mem), static_cast<void *>(&input_memobj_[i]));
+    ret = clSetKernelArg(kernel, kernel_arg++, sizeof(cl_mem), static_cast<void *>(&sp_input_memobj_[i]));
     casadi_assert(ret == CL_SUCCESS);
   }
 
   // Pass outputs
   for(int i=0; i<getNumOutputs(); ++i){
-    ret = clSetKernelArg(kernel, kernel_arg++, sizeof(cl_mem), static_cast<void *>(&output_memobj_[i]));
+    ret = clSetKernelArg(kernel, kernel_arg++, sizeof(cl_mem), static_cast<void *>(&sp_output_memobj_[i]));
     casadi_assert(ret == CL_SUCCESS);
   }
 
@@ -1526,61 +1537,61 @@ void SXFunctionInternal::spEvaluateOpenCL(bool fwd){
   casadi_assert(ret == CL_SUCCESS);
   
   // Get inputs
-  for(int i=0; i<input_memobj_.size(); ++i){
-    ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, input_memobj_[i], CL_TRUE, 0,
+  for(int i=0; i<sp_input_memobj_.size(); ++i){
+    ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, sp_input_memobj_[i], CL_TRUE, 0,
 			      inputNoCheck(i).size() * sizeof(cl_ulong), reinterpret_cast<void*>(inputNoCheck(i).ptr()), 0, NULL, NULL);
     casadi_assert(ret == CL_SUCCESS);
   }
 
   // Get outputs
-  for(int i=0; i<output_memobj_.size(); ++i){
-    ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, output_memobj_[i], CL_TRUE, 0,
+  for(int i=0; i<sp_output_memobj_.size(); ++i){
+    ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, sp_output_memobj_[i], CL_TRUE, 0,
 			      outputNoCheck(i).size() * sizeof(cl_ulong), reinterpret_cast<void*>(outputNoCheck(i).ptr()), 0, NULL, NULL);
     casadi_assert(ret == CL_SUCCESS);
   }
 }
 
-void SXFunctionInternal::freeOpenCL(){
+void SXFunctionInternal::spFreeOpenCL(){
   // OpenCL return flag
   cl_int ret;
 
   // Clean up memory for input buffers
-  for(vector<cl_mem>::iterator i=input_memobj_.begin(); i!=input_memobj_.end(); ++i){
+  for(vector<cl_mem>::iterator i=sp_input_memobj_.begin(); i!=sp_input_memobj_.end(); ++i){
     if(*i != 0){
       ret = clReleaseMemObject(*i);
       casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
     }
   }
-  input_memobj_.clear();
+  sp_input_memobj_.clear();
 
   // Clean up memory for output buffers
-  for(vector<cl_mem>::iterator i=output_memobj_.begin(); i!=output_memobj_.end(); ++i){
+  for(vector<cl_mem>::iterator i=sp_output_memobj_.begin(); i!=sp_output_memobj_.end(); ++i){
     if(*i != 0){
       ret = clReleaseMemObject(*i);
       casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
     }
   }
-  output_memobj_.clear();
+  sp_output_memobj_.clear();
 
   // Free opencl forward propagation kernel
-  if(fwd_kernel_!=0){
-    ret = clReleaseKernel(fwd_kernel_);
+  if(sp_fwd_kernel_!=0){
+    ret = clReleaseKernel(sp_fwd_kernel_);
     casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-    fwd_kernel_ = 0;
+    sp_fwd_kernel_ = 0;
   }
 
   // Free opencl backward propagation kernel
-  if(adj_kernel_!=0){
-    ret = clReleaseKernel(adj_kernel_);
+  if(sp_adj_kernel_!=0){
+    ret = clReleaseKernel(sp_adj_kernel_);
     casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-    adj_kernel_ = 0;
+    sp_adj_kernel_ = 0;
   }
 
   // Free opencl program
-  if(program_!=0){
-    ret = clReleaseProgram(program_);
+  if(sp_program_!=0){
+    ret = clReleaseProgram(sp_program_);
     casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-    program_ = 0;
+    sp_program_ = 0;
   }    
 }
 

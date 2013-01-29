@@ -187,6 +187,9 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /// With just-in-time compilation
   bool just_in_time_;
 
+  /// With just-in-time compilation using OpenCL
+  bool just_in_time_opencl_;
+
   /// With just-in-time compilation for the sparsity propagation
   bool just_in_time_sparsity_;
   
@@ -205,21 +208,34 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
 #endif // WITH_LLVM
   
 #ifdef WITH_OPENCL
-  // OpenCL memory
-  std::vector<cl_mem> input_memobj_, output_memobj_;
-  cl_kernel fwd_kernel_, adj_kernel_;
-  cl_program program_;
+  // Initialize sparsity propagation using OpenCL
+  //void allocOpenCL();
 
-  // Initialize OpenCL
-  void initOpenCL();
+  // Propagate sparsity using OpenCL
+  //void evaluateOpenCL(bool fwd);
+
+  // Free memory for sparsity propagation using OpenCL
+  //void freeOpenCL();
+
+  // Initialize sparsity propagation using OpenCL
+  void spAllocOpenCL();
 
   // Propagate sparsity using OpenCL
   void spEvaluateOpenCL(bool fwd);
 
-  // Free OpenCL memory
-  void freeOpenCL();
+  // Free memory for sparsity propagation using OpenCL
+  void spFreeOpenCL();
 
+    // OpenCL memory object for the sparsity propagation
+  cl_program sp_program_;
+
+  // Buffers and kernels for sparsity propagation
+  std::vector<cl_mem> sp_input_memobj_, sp_output_memobj_;
+  cl_kernel sp_fwd_kernel_, sp_adj_kernel_;
+
+  // OpenCL context. TODO: Nothing class specific in this class, move to a central location
   static SparsityPropagationKernel sparsity_propagation_kernel_;
+
 #endif // WITH_OPENCL
 
 };
