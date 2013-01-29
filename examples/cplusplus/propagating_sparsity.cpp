@@ -59,6 +59,7 @@ int main(){
       SXMatrix x = ssym("x",3);
       SXMatrix z = x[0]*x[0]+x[2] + 3;
       f = SXFunction(x,z);
+      // f.setOption("just_in_time_sparsity",true);
     } else {
       cout << "MXFunction:" << endl;
       MX x = msym("x",3);

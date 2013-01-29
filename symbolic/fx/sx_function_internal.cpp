@@ -1194,6 +1194,13 @@ void SXFunctionInternal::clearSymbolic(){
 }
 
 void SXFunctionInternal::spInit(bool fwd){
+  // Quick return if just-in-time compilation for sparsity pattern propagation, no work vector needed
+#ifdef WITH_OPENCL
+  if(just_in_time_sparsity_){
+    return; // Quick return
+  }
+#endif // WITH_OPENCL
+
   // We need a work array containing unsigned long rather than doubles. Since the two datatypes have the same size (64 bits)
   // we can save overhead by reusing the double array
   bvec_t *iwork = get_bvec_t(work_);
