@@ -145,7 +145,7 @@ class GenericMatrix{
     * Attempts to identify quick returns on matrix-level and 
     * delegates to MatType::mul_full if no such quick returns are found.
     */
-    MatType mul(const MatType& y) const;
+    MatType mul_smart(const MatType& y) const;
 };
 
 #ifndef SWIG
@@ -212,7 +212,7 @@ bool GenericMatrix<MatType>::scalar() const{
 }
 
 template<typename MatType>
-MatType GenericMatrix<MatType>::mul(const MatType& y) const {
+MatType GenericMatrix<MatType>::mul_smart(const MatType& y) const {
   const MatType& x = *static_cast<const MatType*>(this);
 
   // Check if we can simplify the product
@@ -234,6 +234,8 @@ MatType GenericMatrix<MatType>::mul(const MatType& y) const {
     return diag(x)*y;
   } else if(y.sparsity().diagonal() && x.size1()==1){
     return x*trans(diag(y));
+  } else if(x.sparsity().diagonal() && y.sparsity().diagonal()){
+    return diag(diag(x)*diag(y));
   } else {
     return x.mul_full(y);
   }
