@@ -363,9 +363,16 @@ Consult the python docstrings for more information of how to use these helper fu
 print daeOut.__doc__
 \end{pytexoutput}
 
-All derived classes of \texttt{FX} come with a range of options that can be set. The API documentation shows the list of available options, along with their default values and descriptions.
-You can also query such a list from any object:
+All derived classes of \texttt{FX} come with a range of options that can be set. The API documentation shows the list of available options, along with their default values and descriptions. For example, here is an excerpt from the documentation for \texttt{SXFunction}:
 
+\begin{pytexoutput}
+docs = SXFunction.__doc__.split("\n")
+start = docs.index(filter(lambda x: "List of available options" in x,docs)[0])
+print "\n".join(docs[start:start+50])
+print "..."
+\end{pytexoutput}
+
+You can also query such a list from any object:
 \begin{pytex}
 x = ssym("x")
 f = SXFunction([x],[x])
@@ -373,13 +380,20 @@ f.init()
 f.printOptions()
 \end{pytex}
 
+\begin{pytexoutput}
+docs = SXFunction.__doc__.split("\n")
+start = docs.index(filter(lambda x: "List of available options" in x,docs)[0])
+print "\n".join(docs[start:start+15])
+print "..."
+\end{pytexoutput}
+
 Two options commonly used during debugging, are "verbose" (a boolean) and "monitor".
 The latter allows to specify a list of keywords that each trigger some numerical output to be dumped to the screen when the function is evaluated. A classic example to monitor the objective and constraint function values during NLP solution is as follows:
 \begin{verbatim}
 solver.setOption("monitor",["eval_f","eval_g"])
 \end{verbatim}
 
-Again check the API documentation for details. For example, here is an excerpt from the documentation for the constructor of a \texttt{IpoptSolver}:
+Again check the API documentation for details. For example, here is an excerpt from the documentation for of \texttt{IpoptSolver}:
 \begin{pytexoutput}
 docs = IpoptSolver.__doc__.split("\n")
 start = docs.index(filter(lambda x: "List of available monitors" in x,docs)[0])
