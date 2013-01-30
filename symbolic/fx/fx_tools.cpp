@@ -68,7 +68,7 @@ void reportConstraints(std::ostream &stream,const Matrix<double> &v, const Matri
     stream.width(5);
     stream << i << ". |   ";
          
-    if (abs(lb.at(i) - ub.at(i))<=tol) {
+    if (fabs(lb.at(i) - ub.at(i))<=tol) {
        stream.width(fieldlength);
        stream << lb.at(i) << " ==  ";
        stream.width(fieldlength);
@@ -79,10 +79,10 @@ void reportConstraints(std::ostream &stream,const Matrix<double> &v, const Matri
     } else {
       // BEGIN  - construct the constraint visualizer strip
       std::string indicator(indicator_length+2,'-');
-      indicator.at(0) = (abs(v.at(i)-lb.at(i))<=tol)? 'X' : 'o';
+      indicator.at(0) = (fabs(v.at(i)-lb.at(i))<=tol)? 'X' : 'o';
       if (lb.at(i)==-std::numeric_limits<double>::infinity()) indicator.at(0)='8';
 
-      indicator.at(indicator_length+1) = (abs(v.at(i)-ub.at(i))<=tol)? 'X' : 'o';
+      indicator.at(indicator_length+1) = (fabs(v.at(i)-ub.at(i))<=tol)? 'X' : 'o';
       if (ub.at(i)==std::numeric_limits<double>::infinity()) indicator.at(indicator_length+1)='8';
             
       if (v.at(i) <= (ub.at(i) + tol) && v.at(i) >= (lb.at(i) - tol)) {
