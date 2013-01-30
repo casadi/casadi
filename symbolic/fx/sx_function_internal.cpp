@@ -163,7 +163,7 @@ void SXFunctionInternal::evaluateGen(T1 nfdir_c, T2 nadir_c){
   #endif // WITH_LLVM
   
 #ifdef WITH_OPENCL
-  if(just_in_time_sparsity_ && nfdir==0 && nadir==0){
+  if(just_in_time_opencl_ && nfdir==0 && nadir==0){
     // Evaluate with OpenCL
     evaluateOpenCL();
     return; // Quick return
