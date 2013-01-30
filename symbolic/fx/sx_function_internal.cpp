@@ -1676,6 +1676,12 @@ void SXFunctionInternal::evaluateOpenCL(){
     casadi_assert(ret == CL_SUCCESS);
   }
 
+  // Pass outputs
+  for(int i=0; i<getNumOutputs(); ++i){
+    ret = clSetKernelArg(kernel_, kernel_arg++, sizeof(cl_mem), static_cast<void *>(&output_memobj_[i]));
+    casadi_assert(ret == CL_SUCCESS);
+  }
+
   // Execute OpenCL Kernel
   executeKernel(kernel_);
   
