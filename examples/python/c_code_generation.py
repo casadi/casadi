@@ -81,8 +81,20 @@ efcn_Os_opt = ExternalFunction("./"+objname_O3_opt)
 efcn_no_opt.init()
 efcn_O3_opt.init()
 efcn_Os_opt.init()
+f_test = [gfcn,efcn_no_opt,efcn_O3_opt,efcn_Os_opt]
 
-for f in [gfcn,efcn_no_opt,efcn_O3_opt,efcn_Os_opt]:
+# Just-in-time compilation with OpenCL
+if True:
+  print "Just-in-time compilation with OpenCL"
+  t1 = time.time()
+  gfcn_opencl = SXFunction([x],[gf])
+  gfcn_opencl.setOption("just_in_time_opencl",True)
+  gfcn_opencl.init()
+  t2 = time.time()
+  print "time = ", (t2-t1)*1e3, " ms"
+  f_test.append(gfcn_opencl)
+
+for f in f_test:
   f.setInput(x0)
   t1 = time.time()
   nrep = 10000
