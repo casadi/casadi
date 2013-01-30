@@ -197,6 +197,7 @@ if(WITH_OPENCL)
   add_definitions(-DWITH_OPENCL)
   include_directories(${OPENCL_INCLUDE_DIRS})
 endif(WITH_OPENCL)
+add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to CPUs and GPUs with OpenCL.")
 
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
