@@ -168,7 +168,10 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
 
   /** \brief  Print to a c file */
   void generateCode(const std::string& filename);
-      
+  
+  /** \brief Generate code for the actual algorithm */
+  virtual void printAlgorithmC(std::ostream &stream, const std::string& type, bool ptr_to_ptr) const;
+
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
   
@@ -209,13 +212,13 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   
 #ifdef WITH_OPENCL
   // Initialize sparsity propagation using OpenCL
-  //void allocOpenCL();
+  void allocOpenCL();
 
   // Propagate sparsity using OpenCL
-  //void evaluateOpenCL(bool fwd);
+  void evaluateOpenCL();
 
   // Free memory for sparsity propagation using OpenCL
-  //void freeOpenCL();
+  void freeOpenCL();
 
   // Initialize sparsity propagation using OpenCL
   void spAllocOpenCL();
@@ -226,8 +229,18 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   // Free memory for sparsity propagation using OpenCL
   void spFreeOpenCL();
 
-    // OpenCL memory object for the sparsity propagation
+  // Compile OpenCL kernel
+  static void compileKernel(cl_program program);
+
+  // OpenCL memory object for the numerical evaluation
+  cl_program program_;
+
+  // OpenCL memory object for the sparsity propagation
   cl_program sp_program_;
+
+  // Buffers and kernels for numerical evaluation
+  std::vector<cl_mem> input_memobj_, output_memobj_;
+  cl_kernel kernel_;
 
   // Buffers and kernels for sparsity propagation
   std::vector<cl_mem> sp_input_memobj_, sp_output_memobj_;
