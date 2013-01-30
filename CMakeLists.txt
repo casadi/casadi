@@ -48,7 +48,7 @@ option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOAS
 option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
-option(WITH_OPENCL "Compile with OpenCL support" ON)
+option(WITH_OPENCL "Compile with OpenCL support" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
