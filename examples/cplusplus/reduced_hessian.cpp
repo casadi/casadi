@@ -57,13 +57,18 @@ int main(){
   double inf = numeric_limits<double>::infinity();
 
   // Initial guess and bounds for the optimization variables
-  vector<double> x0  = {25,0,0};
-  vector<double> lbx = {-inf, -inf, -inf};
-  vector<double> ubx = { inf,  inf,  inf};
+  double x0_[]  = {25,0,0};
+  double lbx_[] = {-inf, -inf, -inf};
+  double ubx_[] = { inf,  inf,  inf};
+  vector<double> x0(x0_,x0_+3);
+  vector<double> lbx(lbx_,lbx_+3);
+  vector<double> ubx(ubx_,ubx_+3);
 
   // Nonlinear bounds
-  vector<double> lbg = {0.00};
-  vector<double> ubg = {0.00};
+  double lbg_[] = {0.00};
+  double ubg_[] = {0.00};
+  vector<double> lbg(lbg_,lbg_+1);
+  vector<double> ubg(ubg_,ubg_+1);
 
   // Create NLP solver
   SXFunction ffcn(x,f);
@@ -72,7 +77,8 @@ int main(){
 
   // Mark the parameters amongst the variables (see sIPOPT documentation)
   Dictionary var_integer_md;
-  var_integer_md["red_hessian"] = std::vector<int>{0,1,2};
+  int red_hessian[] = {0,1,2};
+  var_integer_md["red_hessian"] = std::vector<int>(red_hessian,red_hessian+3);
   solver.setOption("var_integer_md",var_integer_md);
 
   // Enable reduced hessian calculation
