@@ -25314,6 +25314,11 @@ Get the first dimension (i.e. m for a n-by-m matrix) ";
 
 Get the number if non-zeros for a given sparsity pattern. ";
 
+%feature("docstring")  CasADi::GenericMatrix::dimString "
+
+Get string representation of dimensions. The representation is (nrow x ncol
+= numel | size) ";
+
 %feature("docstring")  CasADi::GenericMatrix::shape "
 
 Get the shape. ";
@@ -25338,7 +25343,7 @@ Get the sparsity pattern. ";
 
 Access the sparsity, make a copy if there are multiple references to it. ";
 
-%feature("docstring")  CasADi::GenericMatrix::mul "
+%feature("docstring")  CasADi::GenericMatrix::mul_smart "
 
 Matrix-matrix multiplication. Attempts to identify quick returns on matrix-
 level and delegates to MatType::mul_full if no such quick returns are found.
@@ -51475,14 +51480,13 @@ Make the matrix an empty n-by-m matrix. ";
 
 Matrix-matrix product. ";
 
+%feature("docstring")  CasADi::Matrix::mul "
+
+Matrix-matrix product. ";
+
 %feature("docstring")  CasADi::Matrix::trans "
 
 Matrix transpose. ";
-
-%feature("docstring")  CasADi::Matrix::dimString "
-
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size) ";
 
 %feature("docstring")  CasADi::Matrix::col "";
 
@@ -51642,6 +51646,11 @@ Get the first dimension (i.e. n for a n-by-m matrix) ";
 
 Get the first dimension (i.e. m for a n-by-m matrix) ";
 
+%feature("docstring")  CasADi::Matrix::dimString "
+
+Get string representation of dimensions. The representation is (nrow x ncol
+= numel | size) ";
+
 %feature("docstring")  CasADi::Matrix::shape "
 
 Get the shape. ";
@@ -51658,7 +51667,7 @@ Check if the matrix expression is dense. ";
 
 Check if the matrix expression is scalar. ";
 
-%feature("docstring")  CasADi::Matrix::mul "
+%feature("docstring")  CasADi::Matrix::mul_smart "
 
 Matrix-matrix multiplication. Attempts to identify quick returns on matrix-
 level and delegates to MatType::mul_full if no such quick returns are found.
@@ -53186,11 +53195,6 @@ Set the temporary variable. ";
 
 Append a matrix to the end. ";
 
-%feature("docstring")  CasADi::MX::dimString "
-
-Get string representation of dimensions. The representation is (nrow x ncol
-= numel | size) ";
-
 %feature("docstring")  CasADi::MX::__add__ "";
 
 %feature("docstring")  CasADi::MX::__sub__ "";
@@ -53218,6 +53222,8 @@ Division (with future.division in effect) ";
 %feature("docstring")  CasADi::MX::__mrdivide__ "";
 
 %feature("docstring")  CasADi::MX::__mpower__ "";
+
+%feature("docstring")  CasADi::MX::mul "";
 
 %feature("docstring")  CasADi::MX::mul_full "";
 
@@ -53335,6 +53341,11 @@ Get the first dimension (i.e. n for a n-by-m matrix) ";
 
 Get the first dimension (i.e. m for a n-by-m matrix) ";
 
+%feature("docstring")  CasADi::MX::dimString "
+
+Get string representation of dimensions. The representation is (nrow x ncol
+= numel | size) ";
+
 %feature("docstring")  CasADi::MX::shape "
 
 Get the shape. ";
@@ -53351,7 +53362,7 @@ Check if the matrix expression is dense. ";
 
 Check if the matrix expression is scalar. ";
 
-%feature("docstring")  CasADi::MX::mul "
+%feature("docstring")  CasADi::MX::mul_smart "
 
 Matrix-matrix multiplication. Attempts to identify quick returns on matrix-
 level and delegates to MatType::mul_full if no such quick returns are found.
