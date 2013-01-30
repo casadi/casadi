@@ -132,3 +132,11 @@ if(IPOPT_FOUND AND USE_CXX11)
   )
 endif()
 
+# Test OpenCL and show all devices
+if(WITH_OPENCL)
+  add_executable(test_opencl test_opencl.cpp)
+  target_link_libraries(test_opencl ${OPENCL_LIBRARIES})
+endif()
+
+
+
