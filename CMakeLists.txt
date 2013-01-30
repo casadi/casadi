@@ -90,7 +90,7 @@ SET(${MYPATH} ${MYPATH_NEW} PARENT_SCOPE)
 endfunction() 
 
 # Check if the compiler supports C++11
-foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x")
+foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x" "-std=c++11 -stdlib=libc++" "-std=c++0x -stdlib=libc++")
   if(NOT USE_CXX11)
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11
