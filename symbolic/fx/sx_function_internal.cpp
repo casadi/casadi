@@ -1475,7 +1475,7 @@ void SXFunctionInternal::spAllocOpenCL(){
   casadi_assert(sp_program_ != 0);
   
   // Build Kernel Program
-  compileKernel(sp_program_);
+  compileProgram(sp_program_);
 
   // Create OpenCL kernel for forward propatation
   sp_fwd_kernel_ = clCreateKernel(sp_program_, fcn_name[0], &ret);
@@ -1529,8 +1529,7 @@ void SXFunctionInternal::spEvaluateOpenCL(bool fwd){
   }
 
   // Execute OpenCL Kernel
-  ret = clEnqueueTask(sparsity_propagation_kernel_.command_queue, kernel, 0, NULL,NULL);
-  casadi_assert(ret == CL_SUCCESS);
+  executeKernel(kernel);
   
   // Get inputs
   for(int i=0; i<sp_input_memobj_.size(); ++i){
@@ -1635,7 +1634,7 @@ void SXFunctionInternal::allocOpenCL(){
   casadi_assert(program_ != 0);
   
   // Build Kernel Program
-  compileKernel(program_);
+  compileProgram(program_);
 
   // Create OpenCL kernel for forward propatation
   kernel_ = clCreateKernel(program_, "evaluate", &ret);
@@ -1678,8 +1677,7 @@ void SXFunctionInternal::evaluateOpenCL(){
   }
 
   // Execute OpenCL Kernel
-  ret = clEnqueueTask(sparsity_propagation_kernel_.command_queue, kernel_, 0, NULL,NULL);
-  casadi_assert(ret == CL_SUCCESS);
+  executeKernel(kernel_);
   
   // Get outputs
   for(int i=0; i<output_memobj_.size(); ++i){
@@ -1726,7 +1724,7 @@ void SXFunctionInternal::freeOpenCL(){
   } 
 }
 
-void SXFunctionInternal::compileKernel(cl_program program){
+void SXFunctionInternal::compileProgram(cl_program program){
   // OpenCL return flag
   cl_int ret;
 
@@ -1764,6 +1762,38 @@ void SXFunctionInternal::compileKernel(cl_program program){
     casadi_error("clBuildProgram failed: " << msg);
   }
 }
+
+void SXFunctionInternal::executeKernel(cl_kernel kernel){
+  // OpenCL return flag
+  cl_int ret;
+  
+  // Execute OpenCL kernel
+  ret = clEnqueueTask(sparsity_propagation_kernel_.command_queue, kernel, 0, NULL,NULL);
+  if(ret!=CL_SUCCESS){
+    const char* msg;
+    switch(ret){
+    case CL_INVALID_PROGRAM_EXECUTABLE: msg = "There is no successfully built program executable available for device associated with command_queue."; break;
+    case CL_INVALID_COMMAND_QUEUE: msg = "Command_queue is not a valid command-queue."; break;
+    case CL_INVALID_KERNEL: msg = "Kernel is not a valid kernel object."; break;
+    case CL_INVALID_CONTEXT: msg = "Context associated with command_queue and kernel are not the same or if the context associated with command_queue and events in event_wait_list are not the same."; break;
+    case CL_INVALID_KERNEL_ARGS: msg = "The kernel argument values have not been specified."; break;
+    case CL_INVALID_WORK_GROUP_SIZE: msg = "A work-group size is specified for kernel using the __attribute__((reqd_work_group_size(X, Y, Z))) qualifier in program source and is not (1, 1, 1)."; break;
+    case CL_MISALIGNED_SUB_BUFFER_OFFSET: msg = "A sub-buffer object is specified as the value for an argument that is a buffer object and the offset specified when the sub-buffer object is created is not aligned to CL_DEVICE_MEM_BASE_ADDR_ALIGN value for device associated with queue."; break;
+    case CL_INVALID_IMAGE_SIZE: msg = "n image object is specified as an argument value and the image dimensions (image width, height, specified or compute row and/or slice pitch) are not supported by device associated with queue"; break;
+    case CL_OUT_OF_RESOURCES: msg = "(1) There is a failure to queue the execution instance of kernel on the command-queue because of insufficient resources needed to execute the kernel. (2) There is a failure to allocate resources required by the OpenCL implementation on the device."; break;
+    case CL_MEM_OBJECT_ALLOCATION_FAILURE: msg = "There is a failure to allocate memory for data store associated with image or buffer objects specified as arguments to kernel."; break;
+    case CL_INVALID_EVENT_WAIT_LIST: msg = "Event_wait_list is NULL and num_events_in_wait_list > 0, or event_wait_list is not NULL and num_events_in_wait_list is 0, or if event objects in event_wait_list are not valid events. "; break;
+    case CL_OUT_OF_HOST_MEMORY: msg = "There is a failure to allocate resources required by the OpenCL implementation on the host."; break;
+    default: msg = "Unknown error"; break;
+    }
+    
+    casadi_error("clEnqueueTask failed: " << msg);
+  }
+}
+
+
+
+
 
 #endif // WITH_OPENCL
 

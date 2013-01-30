@@ -229,8 +229,11 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   // Free memory for sparsity propagation using OpenCL
   void spFreeOpenCL();
 
-  // Compile OpenCL kernel
-  static void compileKernel(cl_program program);
+  // Compile OpenCL program
+  static void compileProgram(cl_program program);
+
+  // Execute OpenCL kernel
+  static void executeKernel(cl_kernel kernel);
 
   // OpenCL memory object for the numerical evaluation
   cl_program program_;
