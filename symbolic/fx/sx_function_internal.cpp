@@ -390,32 +390,9 @@ void SXFunctionInternal::generateCode(const string& src_name){
   for(int i=0; i<n_io; ++i){
     // Get the sparsity pattern
     const CRSSparsity& sp = i<n_i ? input(i).sparsity() : output(i-n_i).sparsity();
-    const void* h = static_cast<const void*>(sp.get());
-    
-    // Get the current number of patterns before looking for it
-    size_t num_patterns_before = sparsity_index.size();
 
-    // Get index of the pattern
-    int& ind = sparsity_index[h];
-
-    // Generate it if it does not exist
-    if(sparsity_index.size() > num_patterns_before){
-      // Add at the end
-      ind = num_patterns_before;
-
-      // Compact version of the sparsity pattern
-      std::vector<int> sp_compact = sp_compress(sp);
-      
-      // Give it a name
-      stringstream name;
-      name << "s" << ind;
-      
-      // Print to file
-      printVector(cfile,name.str(),sp_compact);
-
-      // Separate with an empty line
-      cfile << endl;
-    }
+    // Print the sparsity pattern or retrieve the index of an existing pattern
+    int ind = printSparsity(cfile,sp,sparsity_index);
 
     // Store the index    
     io_sparsity_index.insert(pair<int,int>(ind,i));
@@ -493,6 +470,36 @@ void SXFunctionInternal::generateCode(const string& src_name){
   
   // Close the results file
   cfile.close();
+}
+
+int SXFunctionInternal::printSparsity(std::ostream &stream, const CRSSparsity& sp, std::map<const void*,int>& sparsity_index){
+  // Get the current number of patterns before looking for it
+  size_t num_patterns_before = sparsity_index.size();
+
+  // Get index of the pattern
+  const void* h = static_cast<const void*>(sp.get());
+  int& ind = sparsity_index[h];
+
+  // Generate it if it does not exist
+  if(sparsity_index.size() > num_patterns_before){
+    // Add at the end
+    ind = num_patterns_before;
+    
+    // Compact version of the sparsity pattern
+    std::vector<int> sp_compact = sp_compress(sp);
+      
+    // Give it a name
+    stringstream name;
+    name << "s" << ind;
+    
+    // Print to file
+    printVector(stream,name.str(),sp_compact);
+    
+    // Separate with an empty line
+    stream << endl;
+  }
+
+  return ind;
 }
 
 void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, bool ptr_to_ptr) const{
