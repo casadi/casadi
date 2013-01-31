@@ -84,7 +84,7 @@ efcn_Os_opt.init()
 f_test = [gfcn,efcn_no_opt,efcn_O3_opt,efcn_Os_opt]
 
 # Just-in-time compilation with OpenCL
-if True:
+if False:
   print "Just-in-time compilation with OpenCL"
   t1 = time.time()
   gfcn_opencl = SXFunction([x],[gf])
