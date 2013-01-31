@@ -391,5 +391,9 @@ int FX::numAllocAdj() const{
   return (*this)->nadir_;
 }
 
+void FX::generateCode(const string& filename){
+  (*this)->generateCode(filename);
+}
+
 } // namespace CasADi
 

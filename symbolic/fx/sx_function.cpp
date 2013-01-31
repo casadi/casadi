@@ -116,10 +116,6 @@ const std::vector<SXMatrix> & SXFunction::outputExpr() const{
   return (*this)->outputv_;
 }
 
-void SXFunction::generateCode(const string& filename){
-  (*this)->generateCode(filename);
-}
-
 const vector<SXAlgEl>& SXFunction::algorithm() const{
   return (*this)->algorithm_;
 }

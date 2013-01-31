@@ -167,7 +167,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
 
   /** \brief  Print to a c file */
-  void generateCode(const std::string& filename);
+  virtual void generateCode(const std::string& filename);
   
   /** \brief Print a sparsity pattern to stream */
   static int printSparsity(std::ostream &stream, const CRSSparsity& sp, std::map<const void*,int>& sparsity_index);

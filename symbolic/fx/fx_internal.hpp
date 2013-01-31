@@ -141,6 +141,9 @@ class FXInternal : public OptionsFunctionalityNode{
 
     //@}
 
+    /** \brief  Print to a c file */
+    virtual void generateCode(const std::string& filename);
+
     /** \brief  Access an input */
     FunctionIO& iStruct(int i){
       try{

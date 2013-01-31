@@ -130,10 +130,7 @@ public:
   
   /** \brief Get all function outputs */
   const std::vector<SXMatrix> & outputExpr() const;
-  
-  /** \brief Export / Generate C code for the function */
-  void generateCode(const std::string& filename);
-  
+    
 #ifndef SWIG
   /** \brief Access the algorithm directly */
   const std::vector<SXAlgEl>& algorithm() const;

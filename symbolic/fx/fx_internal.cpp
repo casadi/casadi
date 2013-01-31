@@ -1492,5 +1492,9 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
   }
 
 
+void FXInternal::generateCode(const string& src_name){
+  casadi_error("FXInternal::generateCode: generateCode not defined for class " << typeid(*this).name());
+}
+
 } // namespace CasADi
 

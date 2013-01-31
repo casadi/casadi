@@ -323,6 +323,9 @@ class FX : public OptionsFunctionality{
 
   /// Generate the sparsity of a Jacobian block
   void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact=false);
+
+  /** \brief Export / Generate C code for the function */
+  void generateCode(const std::string& filename);
   
 #ifndef SWIG 
   /// Construct a function that has only the k'th output
