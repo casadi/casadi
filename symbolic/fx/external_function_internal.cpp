@@ -88,8 +88,8 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   }
   
   //
-  evaluate_ = (evaluatePtr) dlsym(handle_, "evaluate");
-  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"evaluate\" found");
+  evaluate_ = (evaluatePtr) dlsym(handle_, "evaluateWrap");
+  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"evaluateWrap\" found");
   
 #else // WITH_DL 
   throw CasadiException("WITH_DL  not activated");

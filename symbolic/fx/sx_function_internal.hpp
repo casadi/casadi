@@ -169,8 +169,11 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /** \brief  Print to a c file */
   void generateCode(const std::string& filename);
   
-  /** \brief Generate code for the actual algorithm */
-  virtual void printAlgorithmC(std::ostream &stream, const std::string& type, bool ptr_to_ptr) const;
+  /** \brief Generate code for the C functon */
+  void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type) const;
+
+  /** \brief Generate code for the body of the C function */
+  virtual void generateBody(std::ostream &stream, const std::string& type, bool ptr_to_ptr) const;
 
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();

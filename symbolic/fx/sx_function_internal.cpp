@@ -450,13 +450,28 @@ void SXFunctionInternal::generateCode(const string& src_name){
   // The sign function
   cfile << "double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl << endl;
   
-  // Define function
-  cfile << "int evaluate(const double** x, double** r){" << endl;
+  // Generate the actual function
+  generateFunction(cfile, "evaluateNew", "const double*","double*","d");
 
-  // Generate code for the actual algorithm
-  printAlgorithmC(cfile,"d",true);
+  // Define wrapper function
+  cfile << "int evaluateWrap(const double** x, double** r){" << endl;
+  cfile << "evaluateNew(";
+  bool first=true;
+  
+  // Pass inputs
+  for(int i=0; i<getNumInputs(); ++i){
+    if(first) first=false;
+    else      cfile << ", ";
+    cfile << "x[" << i << "]";
+  }
 
-  // Finalize function
+  // Pass outputs
+  for(int i=0; i<getNumOutputs(); ++i){
+    if(first) first=false;
+    else      cfile << ", ";
+    cfile << "r[" << i << "]";
+  }
+  cfile << "); " << endl;
   cfile << "return 0;" << endl;
   cfile << "}" << endl << endl;
   
@@ -464,7 +479,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
   cfile.close();
 }
 
-void SXFunctionInternal::printAlgorithmC(std::ostream &stream, const std::string& type, bool ptr_to_ptr) const{
+void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, bool ptr_to_ptr) const{
   // Which variables have been declared
   vector<bool> declared(work_.size(),false);
  
@@ -503,6 +518,33 @@ void SXFunctionInternal::printAlgorithmC(std::ostream &stream, const std::string
    }
    stream  << ";" << endl;
  }
+}
+
+void SXFunctionInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type) const{
+  // Define function
+  stream << "void " << fname << "(";
+  bool first=true;
+  
+  // Declare inputs
+  for(int i=0; i<getNumInputs(); ++i){
+    if(first) first=false;
+    else      stream << ", ";
+    stream << input_type << " x" << i;
+  }
+
+  // Declare outputs
+  for(int i=0; i<getNumOutputs(); ++i){
+    if(first) first=false;
+    else      stream << ", ";
+    stream << output_type << " r" << i;
+  }
+  stream << "){ " << endl;
+  
+  // Insert the function body
+  generateBody(stream,type,false);
+
+  // Finalize the function
+  stream << "}" << endl << endl;
 }
 
 void SXFunctionInternal::init(){
@@ -1597,26 +1639,11 @@ void SXFunctionInternal::allocOpenCL(){
   // Generate the kernel source code
   stringstream ss;
   
-  // Define function
-  ss << "__kernel void evaluate (";
-  bool first=true;
-  for(int i=0; i<getNumInputs(); ++i){
-    if(first) first=false;
-    else      ss << ", ";
-    ss << "__global const double *x" << i;
-  }
-  for(int i=0; i<getNumOutputs(); ++i){
-    if(first) first=false;
-    else      ss << ", ";
-    ss << "__global double *r" << i;
-  }
-  ss << "){ " << endl;
-  
-  // Insert the function body
-  printAlgorithmC(ss,"double",false);
+  // Add kernel prefix
+  ss << "__kernel ";
 
-  // Finalize the function
-  ss << "}" << endl << endl;
+  // Generate the function
+  generateFunction(ss, "evaluate", "__global const double*","__global double*","double");
   
   // Form c-string
   std::string s = ss.str();
