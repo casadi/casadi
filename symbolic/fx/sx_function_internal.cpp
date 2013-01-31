@@ -380,10 +380,6 @@ void SXFunctionInternal::generateCode(const string& src_name){
   int n_o = output_.size();
   int n_io = n_i + n_o;
 
-  // Dimensions
-  cfile << "int n_in_ = " << n_i << ";" << endl;
-  cfile << "int n_out_ = " << n_o << ";" << endl;
-
   // Number of rows and columns
   vector<int> nrow(n_io), ncol(n_io);
   for(int i=0; i<n_i; ++i){
@@ -433,8 +429,8 @@ void SXFunctionInternal::generateCode(const string& src_name){
   
   // Function to get dimensions
   cfile << "int init(int *n_in, int *n_out){" << endl;
-  cfile << "  *n_in = n_in_;" << endl;
-  cfile << "  *n_out = n_out_;" << endl;
+  cfile << "  *n_in = " << n_i << ";" << endl;
+  cfile << "  *n_out = " << n_o << ";" << endl;
   cfile << "  return 0;" << endl;
   cfile << "}" << endl << endl;
 
