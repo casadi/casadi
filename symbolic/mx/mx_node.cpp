@@ -174,7 +174,7 @@ const CRSSparsity& MXNode::sparsity() const{
   return sparsity_;
 }
 
-const CRSSparsity& MXNode::sparsity(int oind){
+const CRSSparsity& MXNode::sparsity(int oind) const{
   casadi_assert_message(oind==0, "Index out of bounds");
   return sparsity_;
 }

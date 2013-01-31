@@ -172,7 +172,7 @@ class MXNode : public SharedObjectNode{
     const CRSSparsity& sparsity() const;
 
     /// Get the sparsity of output oind
-    virtual const CRSSparsity& sparsity(int oind);
+    virtual const CRSSparsity& sparsity(int oind) const;
     
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return false;}

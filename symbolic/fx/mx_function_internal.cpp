@@ -1128,9 +1128,9 @@ void MXFunctionInternal::generateFunction(std::ostream &stream, const std::strin
   casadi_warning("Not implemented");
 }
 
-void MXFunctionInternal::generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index){
+void MXFunctionInternal::generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const{
   // Locate all sparsity patterns in the intermediate variables 
-  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     
     // Outputs do not result in any intermediate variables
     if(it->op==OP_OUTPUT) continue;
@@ -1144,6 +1144,20 @@ void MXFunctionInternal::generateSparsityPatterns(std::ostream &stream, std::map
       }
     }
   }
+}
+
+void MXFunctionInternal::generateWork(std::ostream &stream) const{
+  // Data structure to hold intermediate variables
+  stream << "struct wstruct{" << endl;
+
+  // Declare all work variables
+  for(int i=0; i<work_.size(); ++i){
+    stream << "  d a" << i << "[" << work_[i].data.size() << "];" << endl;
+  }
+
+  // Finalize work structure
+  stream << "} w;" << endl;
+  stream << endl;
 }
 
 } // namespace CasADi

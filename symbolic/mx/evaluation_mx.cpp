@@ -162,7 +162,7 @@ int EvaluationMX::getNumOutputs() const {
   return fcn_.getNumOutputs();
 }
 
-const CRSSparsity& EvaluationMX::sparsity(int oind) {
+const CRSSparsity& EvaluationMX::sparsity(int oind) const{
   return fcn_.output(oind).sparsity();
 }
 

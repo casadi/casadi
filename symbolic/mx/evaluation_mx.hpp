@@ -82,7 +82,7 @@ class EvaluationMX : public MultipleOutput{
     virtual int getNumOutputs() const;
         
     /** \brief  Get the sparsity of output oind */
-    virtual const CRSSparsity& sparsity(int oind);
+    virtual const CRSSparsity& sparsity(int oind) const;
 
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_CALL;}

@@ -68,7 +68,10 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     virtual void updateNumSens(bool recursive);
     
     /** \brief Generate code for sparsity patterns */
-    virtual void generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index);
+    virtual void generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const;
+
+    /** \brief Generate work array */
+    virtual void generateWork(std::ostream &stream) const;
 
     /** \brief Generate code for the C functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type) const;
