@@ -451,11 +451,11 @@ void SXFunctionInternal::generateCode(const string& src_name){
   cfile << "double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl << endl;
   
   // Generate the actual function
-  generateFunction(cfile, "evaluateNew", "const double*","double*","d");
+  generateFunction(cfile, "evaluate", "const double*","double*","d");
 
   // Define wrapper function
   cfile << "int evaluateWrap(const double** x, double** r){" << endl;
-  cfile << "evaluateNew(";
+  cfile << "evaluate(";
   bool first=true;
   
   // Pass inputs
