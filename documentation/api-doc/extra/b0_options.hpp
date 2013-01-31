@@ -2316,6 +2316,8 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>just_in_time</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
+<tr><td>just_in_time_opencl</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation using OpenCL (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
+<tr><td>just_in_time_sparsity</td><td>OT_BOOLEAN</td><td>false</td><td>Propagate sparsity patterns using just-in-time compilation to a CPU or GPU using OpenCL</td><td>CasADi::SXFunctionInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
@@ -2342,6 +2344,8 @@
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>just_in_time</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
+<tr><td>just_in_time_opencl</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation using OpenCL (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
+<tr><td>just_in_time_sparsity</td><td>OT_BOOLEAN</td><td>false</td><td>Propagate sparsity patterns using just-in-time compilation to a CPU or GPU using OpenCL</td><td>CasADi::SXFunctionInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
@@ -2371,7 +2375,7 @@
 <tr><td>dump_to_file</td><td>OT_BOOLEAN</td><td>false</td><td>Dumps QP to file in CPLEX format. Default: false</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>just_in_time</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation (experimental)</td><td>CasADi::CplexInternal</td></tr>
+<tr><td>just_in_time_opencl</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation using OpenCL (experimental)</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
@@ -2404,7 +2408,7 @@
 <tr><td>dump_to_file</td><td>OT_BOOLEAN</td><td>false</td><td>Dumps QP to file in CPLEX format. Default: false</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>just_in_time</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation (experimental)</td><td>CasADi::CplexInternal</td></tr>
+<tr><td>just_in_time_opencl</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation using OpenCL (experimental)</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>

@@ -80648,6 +80648,10 @@ Update the number of sensitivity directions during or after initialization.
 
 Print to a c file. ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::printAlgorithmC "
+
+Generate code for the actual algorithm. ";
+
 %feature("docstring")  CasADi::SXFunctionInternal::clearSymbolic "
 
 Clear the function from its symbolic representation, to free up memory, no
