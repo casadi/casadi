@@ -1123,6 +1123,10 @@ void MXFunctionInternal::allocTape(){
   }
 }
 
+void MXFunctionInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type) const{
+  stream << "#error MX_GENERATE_FUNCTION_NOT_IMPLEMENTED" << endl;
+  casadi_warning("Not implemented");
+}
 
 
 } // namespace CasADi

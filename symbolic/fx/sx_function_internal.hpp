@@ -163,17 +163,8 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /** \brief  Update the number of sensitivity directions during or after initialization */
   virtual void updateNumSens(bool recursive);
 
-  /** \brief  Print to a c file */
-  static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
-
-  /** \brief  Print to a c file */
-  virtual void generateCode(const std::string& filename);
-  
-  /** \brief Print a sparsity pattern to stream */
-  static int printSparsity(std::ostream &stream, const CRSSparsity& sp, std::map<const void*,int>& sparsity_index);
-
   /** \brief Generate code for the C functon */
-  void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type) const;
+  virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type) const;
 
   /** \brief Generate code for the body of the C function */
   virtual void generateBody(std::ostream &stream, const std::string& type, bool ptr_to_ptr) const;

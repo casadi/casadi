@@ -1496,5 +1496,44 @@ void FXInternal::generateCode(const string& src_name){
   casadi_error("FXInternal::generateCode: generateCode not defined for class " << typeid(*this).name());
 }
 
+void FXInternal::printVector(std::ostream &cfile, const std::string& name, const vector<int>& v){
+  cfile << "int " << name << "[] = {";
+  for(int i=0; i<v.size(); ++i){
+    if(i!=0) cfile << ",";
+    cfile << v[i];
+  }
+  cfile << "};" << endl;
+}
+
+int FXInternal::printSparsity(std::ostream &stream, const CRSSparsity& sp, std::map<const void*,int>& sparsity_index){
+  // Get the current number of patterns before looking for it
+  size_t num_patterns_before = sparsity_index.size();
+
+  // Get index of the pattern
+  const void* h = static_cast<const void*>(sp.get());
+  int& ind = sparsity_index[h];
+
+  // Generate it if it does not exist
+  if(sparsity_index.size() > num_patterns_before){
+    // Add at the end
+    ind = num_patterns_before;
+    
+    // Compact version of the sparsity pattern
+    std::vector<int> sp_compact = sp_compress(sp);
+      
+    // Give it a name
+    stringstream name;
+    name << "s" << ind;
+    
+    // Print to file
+    printVector(stream,name.str(),sp_compact);
+    
+    // Separate with an empty line
+    stream << endl;
+  }
+
+  return ind;
+}
+
 } // namespace CasADi
 

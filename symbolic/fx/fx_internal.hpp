@@ -144,6 +144,12 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Print to a c file */
     virtual void generateCode(const std::string& filename);
 
+    /** \brief  Print to a c file */
+    static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
+  
+    /** \brief Print a sparsity pattern to stream */
+    static int printSparsity(std::ostream &stream, const CRSSparsity& sp, std::map<const void*,int>& sparsity_index);
+
     /** \brief  Access an input */
     FunctionIO& iStruct(int i){
       try{
