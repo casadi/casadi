@@ -380,52 +380,46 @@ void SXFunctionInternal::generateCode(const string& src_name){
   int n_o = output_.size();
   int n_io = n_i + n_o;
 
-  // Number of rows and columns
-  vector<int> nrow(n_io), ncol(n_io);
-  for(int i=0; i<n_i; ++i){
-    nrow[i] = input(i).size1();
-    ncol[i] = input(i).size2();
-  }
-  for(int i=0; i<n_o; ++i){
-    nrow[i+n_i] = output(i).size1();
-    ncol[i+n_i] = output(i).size2();
-  }
-  
-  // Print to file
-  printVector(cfile,"nrow_",nrow);
-  printVector(cfile,"ncol_",ncol);
-  
-  // Print row offsets
+  // Get an index for every sparsity pattern we wish to generate
+  map<const void*,int> sparsity_index;
+
+  // Inputs and outputs for each parsity index
+  multimap<int,int> io_sparsity_index;
+
+  // Get the sparsity pattern of all inputs
   for(int i=0; i<n_io; ++i){
-    stringstream name;
-    name << "rowind_" << i << "_";
-    const vector<int>& rowind = i<n_i ? input(i).rowind() : output(i-n_i).rowind();
-    printVector(cfile,name.str(),rowind);
+    // Get the sparsity pattern
+    const CRSSparsity& sp = i<n_i ? input(i).sparsity() : output(i-n_i).sparsity();
+    const void* h = static_cast<const void*>(sp.get());
+    
+    // Get the current number of patterns before looking for it
+    size_t num_patterns_before = sparsity_index.size();
+
+    // Get index of the pattern
+    int& ind = sparsity_index[h];
+
+    // Generate it if it does not exist
+    if(sparsity_index.size() > num_patterns_before){
+      // Add at the end
+      ind = num_patterns_before;
+
+      // Compact version of the sparsity pattern
+      std::vector<int> sp_compact = sp_compress(sp);
+      
+      // Give it a name
+      stringstream name;
+      name << "s" << ind;
+      
+      // Print to file
+      printVector(cfile,name.str(),sp_compact);
+
+      // Separate with an empty line
+      cfile << endl;
+    }
+
+    // Store the index    
+    io_sparsity_index.insert(pair<int,int>(ind,i));
   }
-  
-  // Array of pointers to the arrays above
-  cfile << "int *rowind_[] = {";
-  for(int i=0; i<n_io; ++i){
-    if(i!=0) cfile << ",";
-    cfile << "rowind_" << i << "_"; 
-  }
-  cfile << "};" << endl;
-  
-  // Print columns
-  for(int i=0; i<n_io; ++i){
-    stringstream name;
-    name << "col_" << i << "_";
-    const vector<int>& col = i<n_i ? input(i).col() : output(i-n_i).col();
-    printVector(cfile,name.str(),col);
-  }
-  
-  // Array of pointers to the arrays above
-  cfile << "int *col_[] = {";
-  for(int i=0; i<n_io; ++i){
-    if(i!=0) cfile << ",";
-    cfile << "col_" << i << "_"; 
-  }
-  cfile << "};" << endl << endl;
   
   // Function to get dimensions
   cfile << "int init(int *n_in, int *n_out){" << endl;
@@ -434,12 +428,38 @@ void SXFunctionInternal::generateCode(const string& src_name){
   cfile << "  return 0;" << endl;
   cfile << "}" << endl << endl;
 
-  // Input sizes
+  // Get the sparsity
   cfile << "int getSparsity(int i, int *nrow, int *ncol, int **rowind, int **col){" << endl;
-  cfile << "  *nrow = nrow_[i];" << endl;
-  cfile << "  *ncol = ncol_[i];" << endl;
-  cfile << "  *rowind = rowind_[i];" << endl;
-  cfile << "  *col = col_[i];" << endl;
+
+  // Get the sparsity index using a switch
+  cfile << "  int* sp;" << endl;
+  cfile << "  switch(i){" << endl;
+  
+  // Loop over all sparsity patterns
+  for(int i=0; i<sparsity_index.size(); ++i){
+    // Get the range of matching sparsity patterns
+    typedef multimap<int,int>::const_iterator it_type;
+    pair<it_type,it_type> r = io_sparsity_index.equal_range(i);
+    
+    // Print the cases covered
+    for(it_type it=r.first; it!=r.second; ++it){
+      cfile << "    case " << it->second << ":" << endl;
+    }
+    
+    // Map to sparsity
+    cfile << "      sp = s" << i << "; break;" << endl;
+  }
+
+  // Finalize the switch
+  cfile << "    default:" << endl;
+  cfile << "      return 1;" << endl;
+  cfile << "  }" << endl << endl;
+  
+  // Decompress the sparsity pattern
+  cfile << "  *nrow = sp[0];" << endl;
+  cfile << "  *ncol = sp[1];" << endl;
+  cfile << "  *rowind = sp + 2;" << endl;
+  cfile << "  *col = sp + 2 + (*nrow + 1);" << endl;
   cfile << "  return 0;" << endl;
   cfile << "}" << endl << endl;
 
