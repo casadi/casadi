@@ -67,6 +67,10 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     /** \brief  Update the number of sensitivity directions during or after initialization */
     virtual void updateNumSens(bool recursive);
     
+    /** \brief Generate code for sparsity patterns */
+    virtual void generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index);
+
+    /** \brief Generate code for the C functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type) const;
 
     /** \brief Set the lifting function */

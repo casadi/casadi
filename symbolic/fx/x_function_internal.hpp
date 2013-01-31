@@ -97,6 +97,9 @@ class XFunctionInternal : public FXInternal{
     /** \brief  Print to a c file */
     virtual void generateCode(const std::string& filename);
 
+    /** \brief Generate code for sparsity patterns */
+    virtual void generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index){}
+
     /** \brief Generate code for the C functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type) const = 0;
 
@@ -999,6 +1002,12 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
     // Store the index    
     io_sparsity_index.insert(std::pair<int,int>(ind,i));
   }
+
+  // Store the number of patterns needed for the inputs and outputs
+  int num_io_patterns = sparsity_index.size();
+
+  // Codegen the rest of the sparsity patterns
+  generateSparsityPatterns(cfile,sparsity_index);
   
   // Function to get dimensions
   cfile << "int init(int *n_in, int *n_out){" << std::endl;
@@ -1015,7 +1024,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   cfile << "  switch(i){" << std::endl;
   
   // Loop over all sparsity patterns
-  for(int i=0; i<sparsity_index.size(); ++i){
+  for(int i=0; i<num_io_patterns; ++i){
     // Get the range of matching sparsity patterns
     typedef std::multimap<int,int>::const_iterator it_type;
     std::pair<it_type,it_type> r = io_sparsity_index.equal_range(i);
