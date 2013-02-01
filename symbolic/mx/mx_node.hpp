@@ -143,6 +143,9 @@ class MXNode : public SharedObjectNode{
     /** \brief  Get function reference */
     virtual FX& getFunction();
 
+    /** \brief  Get function reference */
+    virtual const FX& getFunction() const{ return const_cast<MXNode*>(this)->getFunction();}
+
     /** \brief  Get function input */
     virtual int getFunctionInput() const;
 

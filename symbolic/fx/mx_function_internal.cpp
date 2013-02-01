@@ -1123,7 +1123,7 @@ void MXFunctionInternal::allocTape(){
   }
 }
 
-void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index) const{
+void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
   stream << "#error MX_GENERATE_FUNCTION_NOT_COMPLETED" << endl;
   casadi_warning("Not ready for use");
 
@@ -1173,20 +1173,25 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
   }
 }
 
-void MXFunctionInternal::generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const{
-  // Locate all sparsity patterns in the intermediate variables 
-  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-    
-    // Outputs do not result in any intermediate variables
-    if(it->op==OP_OUTPUT) continue;
+void MXFunctionInternal::generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const{  
+  // Print all sparsity patterns in the intermediate variables
+  for(int i=0; i<work_.size(); ++i){
+    printSparsity(stream,work_[i].data.sparsity(),sparsity_index);
+  }
 
-    // For all non-null operator outputs
-    for(int c=0; c<it->res.size(); ++c){
-      if(it->res[c]>=0){
-          
-	// Print the pattern
-	printSparsity(stream,it->data->sparsity(c),sparsity_index);
-      }
+  // Also print the patterns in the embedded functions
+  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+    if(it->op==OP_CALL){
+      it->data->getFunction()->generateSparsityPatterns(stream,sparsity_index);
+    }
+  }
+}
+
+void MXFunctionInternal::generateDependents(std::ostream &stream, const std::map<const void*,int>& sparsity_index, std::map<const void*,int>& dependent_index) const{
+  // Generate code for the embedded functions
+  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+    if(it->op==OP_CALL){
+      printDependent(stream,it->data->getFunction(),sparsity_index,dependent_index);
     }
   }
 }

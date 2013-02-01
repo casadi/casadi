@@ -347,41 +347,44 @@ void SXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   stream << endl;
 }
 
-void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index) const{
+void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
   // Which variables have been declared
   vector<bool> declared(work_.size(),false);
  
   // Run the algorithm
   for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-   if(it->op==OP_OUTPUT){
-     stream << "r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
-   } else {
-     // Declare result if not already declared
-     if(!declared[it->res]){
-       stream << type << " ";
-       declared[it->res]=true;
-     }
-     
-     // Where to store the result
-     stream << "a" << it->res << "=";
-    
-     // What to store
-     if(it->op==OP_CONST){
-       stream << it->arg.d;
-     } else if(it->op==OP_INPUT){
-       stream << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
-     } else {
-       int ndep = casadi_math<double>::ndeps(it->op);
-       casadi_math<double>::printPre(it->op,stream);
-       for(int c=0; c<ndep; ++c){
-         if(c==1) casadi_math<double>::printSep(it->op,stream);
-         stream << "a" << it->arg.i[c];
-       }
-       casadi_math<double>::printPost(it->op,stream);
-     }
-   }
-   stream  << ";" << endl;
- }
+    // Indent
+    stream << "  ";
+
+    if(it->op==OP_OUTPUT){
+      stream << "r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
+    } else {
+      // Declare result if not already declared
+      if(!declared[it->res]){
+	stream << type << " ";
+	declared[it->res]=true;
+      }
+      
+      // Where to store the result
+      stream << "a" << it->res << "=";
+      
+      // What to store
+      if(it->op==OP_CONST){
+	stream << it->arg.d;
+      } else if(it->op==OP_INPUT){
+	stream << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
+      } else {
+	int ndep = casadi_math<double>::ndeps(it->op);
+	casadi_math<double>::printPre(it->op,stream);
+	for(int c=0; c<ndep; ++c){
+	  if(c==1) casadi_math<double>::printSep(it->op,stream);
+	  stream << "a" << it->arg.i[c];
+	}
+	casadi_math<double>::printPost(it->op,stream);
+      }
+    }
+    stream  << ";" << endl;
+  }
 }
 
 void SXFunctionInternal::init(){
@@ -1481,7 +1484,8 @@ void SXFunctionInternal::allocOpenCL(){
 
   // Generate the function
   std::map<const void*,int> sparsity_index;
-  generateFunction(ss, "evaluate", "__global const double*","__global double*","double",sparsity_index);
+  std::map<const void*,int> dependent_index;
+  generateFunction(ss, "evaluate", "__global const double*","__global double*","double",sparsity_index,dependent_index);
   
   // Form c-string
   std::string s = ss.str();

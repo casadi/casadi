@@ -70,11 +70,14 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     /** \brief Generate code for sparsity patterns */
     virtual void generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const;
 
+    /** \brief Generate code for dependent functions */
+    virtual void generateDependents(std::ostream &stream, const std::map<const void*,int>& sparsity_index, std::map<const void*,int>& dependent_index) const;
+
     /** \brief Generate work array */
     virtual void generateWork(std::ostream &stream) const;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index) const;
+    virtual void generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;
 
     /** \brief Generate auxiliary functions */
     virtual void generateAuxiliary(std::ostream &stream) const;

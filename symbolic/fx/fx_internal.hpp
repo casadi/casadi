@@ -144,14 +144,29 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Print to a c file */
     virtual void generateCode(const std::string& filename);
 
+    /** \brief Generate code for sparsity patterns */
+    virtual void generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const;
+
+    /** \brief Generate code for dependent functions */
+    virtual void generateDependents(std::ostream &stream, const std::map<const void*,int>& sparsity_index, std::map<const void*,int>& dependent_index) const;
+
+    /** \brief Generate code for the C functon */
+    virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;
+
     /** \brief  Print to a c file */
     static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
   
     /** \brief Print a sparsity pattern to stream */
     static int printSparsity(std::ostream &stream, const CRSSparsity& sp, std::map<const void*,int>& sparsity_index);
 
-    /** \brief Print a sparsity pattern to stream */
+    /** \brief Find an existing sparsity pattern */
     static int findSparsity(const CRSSparsity& sp, const std::map<const void*,int>& sparsity_index);
+
+    /** \brief Print a dependent function to stream */
+    static int printDependent(std::ostream &stream, const FX& f, const std::map<const void*,int>& sparsity_index, std::map<const void*,int>& dependent_index);
+
+    /** \brief Find an existing dependent function */
+    static int findDependent(const FX& f, const std::map<const void*,int>& dependent_index);
 
     /** \brief  Access an input */
     FunctionIO& iStruct(int i){

@@ -1542,5 +1542,50 @@ int FXInternal::findSparsity(const CRSSparsity& sp, const std::map<const void*,i
   return it->second;  
 }
 
+int FXInternal::printDependent(std::ostream &stream, const FX& f, const std::map<const void*,int>& sparsity_index, std::map<const void*,int>& dependent_index){
+  // Get the current number of functions before looking for it
+  size_t num_f_before = dependent_index.size();
+
+  // Get index of the pattern
+  const void* h = static_cast<const void*>(f.get());
+  int& ind = dependent_index[h];
+
+  // Generate it if it does not exist
+  if(dependent_index.size() > num_f_before){
+    // Add at the end
+    ind = num_f_before;
+          
+    // Give it a name
+    stringstream name;
+    name << "f" << ind;
+    
+    // Print to file
+    f->generateFunction(stream, name.str(), "const d*","d*","d",sparsity_index,dependent_index);
+  }
+
+  return ind;
+}
+
+int FXInternal::findDependent(const FX& f, const std::map<const void*,int>& dependent_index){
+  const void* h = static_cast<const void*>(f.get());
+  std::map<const void*,int>::const_iterator it=dependent_index.find(h);
+  casadi_assert(it!=dependent_index.end());
+  return it->second;
+}
+
+
+void FXInternal::generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const{
+  casadi_error("FXInternal::generateSparsityPatterns: generateSparsityPatterns not defined for class " << typeid(*this).name());
+}
+
+void FXInternal::generateDependents(std::ostream &stream, const std::map<const void*,int>& sparsity_index, std::map<const void*,int>& dependent_index) const{
+  casadi_error("FXInternal::generateDependents: generateDependents not defined for class " << typeid(*this).name());
+}
+
+void FXInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+  casadi_error("FXInternal::generateFunction: generateFunction not defined for class " << typeid(*this).name());
+}
+
+
 } // namespace CasADi
 

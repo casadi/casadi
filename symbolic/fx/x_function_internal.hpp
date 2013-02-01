@@ -103,14 +103,17 @@ class XFunctionInternal : public FXInternal{
     /** \brief Generate code for sparsity patterns */
     virtual void generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const{}
 
+    /** \brief Generate code for dependent functions */
+    virtual void generateDependents(std::ostream &stream, const std::map<const void*,int>& sparsity_index, std::map<const void*,int>& dependent_index) const{}
+  
     /** \brief Generate work array */
     virtual void generateWork(std::ostream &stream) const{}
 
     /** \brief Generate code for the C functon */
-    void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index) const;
+    virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index) const = 0;
+    virtual void generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const = 0;
 
     // Data members (all public)
     
@@ -1018,6 +1021,10 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   // Codegen the rest of the sparsity patterns
   generateSparsityPatterns(cfile,sparsity_index);
   
+  // Codegen the dependent functions
+  std::map<const void*,int> dependent_index;
+  generateDependents(cfile,sparsity_index,dependent_index);
+
   // Generate work array
   generateWork(cfile);
 
@@ -1067,10 +1074,10 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   generateAuxiliary(cfile);
   
   // Generate the actual function
-  generateFunction(cfile, "evaluate", "const double*","double*","d",sparsity_index);
+  generateFunction(cfile, "evaluate", "const d*","d*","d",sparsity_index,dependent_index);
 
   // Define wrapper function
-  cfile << "int evaluateWrap(const double** x, double** r){" << std::endl;
+  cfile << "int evaluateWrap(const d** x, d** r){" << std::endl;
   cfile << "  evaluate(";
   
   // Pass inputs
@@ -1094,7 +1101,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
 }
 
 template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index) const{
+void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
   // Define function
   stream << "void " << fname << "(";
   bool first=true;
@@ -1115,7 +1122,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
   stream << "){ " << std::endl;
   
   // Insert the function body
-  generateBody(stream,type,sparsity_index);
+  generateBody(stream,type,sparsity_index,dependent_index);
 
   // Finalize the function
   stream << "}" << std::endl << std::endl;
