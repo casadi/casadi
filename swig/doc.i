@@ -690,6 +690,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::indexed_one_based "";
 
 %feature("docstring")  CasADi::AcadoIntegrator::indexed_zero_based "";
@@ -1433,6 +1437,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::iStruct "
 
@@ -2233,6 +2241,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::AcadoOCP::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::AcadoOCP::indexed_one_based "";
 
 %feature("docstring")  CasADi::AcadoOCP::indexed_zero_based "";
@@ -2817,6 +2829,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::AcadoOCPInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::iStruct "
 
@@ -4167,6 +4183,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::CFunction::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::CFunction::indexed_one_based "";
 
 %feature("docstring")  CasADi::CFunction::indexed_zero_based "";
@@ -4697,6 +4717,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::CFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::CFunctionInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::iStruct "
 
@@ -5686,6 +5710,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::indexed_one_based "";
 
 %feature("docstring")  CasADi::CollocationIntegrator::indexed_zero_based "";
@@ -6416,6 +6444,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::iStruct "
 
@@ -7707,6 +7739,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::ControlSimulator::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::ControlSimulator::indexed_one_based "";
 
 %feature("docstring")  CasADi::ControlSimulator::indexed_zero_based "";
@@ -8325,6 +8361,10 @@ Call a function, MX type (overloaded) ";
 
 Call a function, SX type (overloaded) ";
 
+%feature("docstring")  CasADi::ControlSimulatorInternal::generateCode "
+
+Print to a c file. ";
+
 %feature("docstring")  CasADi::ControlSimulatorInternal::iStruct "
 
 Access an input. ";
@@ -8679,11 +8719,12 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | just_in_time | OT_BOOLEAN   | false        | Just-in-time | CasADi::Cple |
-|              |              |              | compilation  | xInternal    |
+| _opencl      |              |              | compilation  | xInternal    |
 |              |              |              | for numeric  |              |
-|              |              |              | evaluation ( |              |
-|              |              |              | experimental |              |
-|              |              |              | )            |              |
+|              |              |              | evaluation   |              |
+|              |              |              | using OpenCL |              |
+|              |              |              | (experimenta |              |
+|              |              |              | l)           |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
@@ -8992,6 +9033,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::CplexInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::CplexInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::CplexInternal::iStruct "
 
@@ -9346,11 +9391,12 @@ Attila Kozma, Joel Andersson
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | just_in_time | OT_BOOLEAN   | false        | Just-in-time | CasADi::Cple |
-|              |              |              | compilation  | xInternal    |
+| _opencl      |              |              | compilation  | xInternal    |
 |              |              |              | for numeric  |              |
-|              |              |              | evaluation ( |              |
-|              |              |              | experimental |              |
-|              |              |              | )            |              |
+|              |              |              | evaluation   |              |
+|              |              |              | using OpenCL |              |
+|              |              |              | (experimenta |              |
+|              |              |              | l)           |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
@@ -9831,6 +9877,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::CplexSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::CplexSolver::generateCode "
+
+Export / Generate C code for the function. ";
 
 %feature("docstring")  CasADi::CplexSolver::indexed_one_based "";
 
@@ -11378,6 +11428,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::CSparse::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::CSparse::indexed_one_based "";
 
 %feature("docstring")  CasADi::CSparse::indexed_zero_based "";
@@ -11927,6 +11981,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::CSparseInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::CSparseInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::CSparseInternal::iStruct "
 
@@ -13165,6 +13223,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::CVodesIntegrator::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::CVodesIntegrator::indexed_one_based "";
 
 %feature("docstring")  CasADi::CVodesIntegrator::indexed_zero_based "";
@@ -14158,6 +14220,10 @@ Call a function, MX type (overloaded) ";
 
 Call a function, SX type (overloaded) ";
 
+%feature("docstring")  CasADi::CVodesInternal::generateCode "
+
+Print to a c file. ";
+
 %feature("docstring")  CasADi::CVodesInternal::iStruct "
 
 Access an input. ";
@@ -15108,6 +15174,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Derivative::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::Derivative::indexed_one_based "";
 
 %feature("docstring")  CasADi::Derivative::indexed_zero_based "";
@@ -15646,6 +15716,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::DerivativeInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DerivativeInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::DerivativeInternal::iStruct "
 
@@ -16491,6 +16565,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::DirectCollocation::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::DirectCollocation::indexed_one_based "";
 
 %feature("docstring")  CasADi::DirectCollocation::indexed_zero_based "";
@@ -17110,6 +17188,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::DirectCollocationInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::DirectCollocationInternal::iStruct "
 
@@ -18030,6 +18112,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::DirectMultipleShooting::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::DirectMultipleShooting::indexed_one_based "";
 
 %feature("docstring")  CasADi::DirectMultipleShooting::indexed_zero_based "";
@@ -18675,6 +18761,11 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::DirectMultipleShootingInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::generateCode
+"
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::DirectMultipleShootingInternal::iStruct "
 
@@ -19608,6 +19699,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::DirectSingleShooting::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::DirectSingleShooting::indexed_one_based "";
 
 %feature("docstring")  CasADi::DirectSingleShooting::indexed_zero_based "";
@@ -20242,6 +20337,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::DirectSingleShootingInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::DirectSingleShootingInternal::iStruct "
 
@@ -20958,6 +21057,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::DSDPInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DSDPInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::DSDPInternal::iStruct "
 
@@ -21846,6 +21949,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::DSDPSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DSDPSolver::generateCode "
+
+Export / Generate C code for the function. ";
 
 %feature("docstring")  CasADi::DSDPSolver::indexed_one_based "";
 
@@ -22767,6 +22874,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::ExternalFunction::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::ExternalFunction::indexed_one_based "";
 
 %feature("docstring")  CasADi::ExternalFunction::indexed_zero_based "";
@@ -23298,6 +23409,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::iStruct "
 
@@ -24415,6 +24530,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::FX::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::FX::indexed_one_based "";
 
 %feature("docstring")  CasADi::FX::indexed_zero_based "";
@@ -24976,6 +25095,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::FXInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::FXInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::FXInternal::iStruct "
 
@@ -26712,6 +26835,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::IdasIntegrator::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::IdasIntegrator::indexed_one_based "";
 
 %feature("docstring")  CasADi::IdasIntegrator::indexed_zero_based "";
@@ -27792,6 +27919,10 @@ Call a function, MX type (overloaded) ";
 
 Call a function, SX type (overloaded) ";
 
+%feature("docstring")  CasADi::IdasInternal::generateCode "
+
+Print to a c file. ";
+
 %feature("docstring")  CasADi::IdasInternal::iStruct "
 
 Access an input. ";
@@ -28558,6 +28689,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::ImplicitFunction::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::indexed_one_based "";
 
 %feature("docstring")  CasADi::ImplicitFunction::indexed_zero_based "";
@@ -29121,6 +29256,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::iStruct "
 
@@ -30232,6 +30371,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Integrator::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::Integrator::indexed_one_based "";
 
 %feature("docstring")  CasADi::Integrator::indexed_zero_based "";
@@ -30892,6 +31035,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::IntegratorInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::IntegratorInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::iStruct "
 
@@ -31601,6 +31748,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::IPInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::IPInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::IPInternal::iStruct "
 
@@ -32520,6 +32671,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::IPMethod::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPMethod::generateCode "
+
+Export / Generate C code for the function. ";
 
 %feature("docstring")  CasADi::IPMethod::indexed_one_based "";
 
@@ -35910,6 +36065,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::IpoptInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::IpoptInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::IpoptInternal::iStruct "
 
@@ -39544,6 +39703,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::IpoptSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::IpoptSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::IpoptSolver::indexed_zero_based "";
@@ -40275,6 +40438,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::KinsolInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::KinsolInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::KinsolInternal::iStruct "
 
@@ -41146,6 +41313,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::KinsolSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::KinsolSolver::generateCode "
+
+Export / Generate C code for the function. ";
 
 %feature("docstring")  CasADi::KinsolSolver::indexed_one_based "";
 
@@ -42086,6 +42257,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::KnitroInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::KnitroInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::KnitroInternal::iStruct "
 
@@ -43134,6 +43309,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::KnitroSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::KnitroSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::KnitroSolver::indexed_zero_based "";
@@ -43899,6 +44078,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::LapackLUDense::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::LapackLUDense::indexed_one_based "";
 
 %feature("docstring")  CasADi::LapackLUDense::indexed_zero_based "";
@@ -44456,6 +44639,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::LapackLUDenseInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::LapackLUDenseInternal::iStruct "
 
@@ -45239,6 +45426,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::LapackQRDense::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::LapackQRDense::indexed_one_based "";
 
 %feature("docstring")  CasADi::LapackQRDense::indexed_zero_based "";
@@ -45788,6 +45979,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::LapackQRDenseInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::iStruct "
 
@@ -46790,6 +46985,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::LiftedSQP::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::LiftedSQP::indexed_one_based "";
 
 %feature("docstring")  CasADi::LiftedSQP::indexed_zero_based "";
@@ -47561,6 +47760,10 @@ Call a function, MX type (overloaded) ";
 
 Call a function, SX type (overloaded) ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::generateCode "
+
+Print to a c file. ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::iStruct "
 
 Access an input. ";
@@ -48273,6 +48476,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::LiftoptInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::LiftoptInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::LiftoptInternal::iStruct "
 
@@ -49195,6 +49402,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::LiftoptSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::LiftoptSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::LiftoptSolver::indexed_zero_based "";
@@ -49924,6 +50135,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::LinearSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::LinearSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::LinearSolver::indexed_zero_based "";
@@ -50467,6 +50682,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::LinearSolverInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::iStruct "
 
@@ -54035,6 +54254,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::MXFunction::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::MXFunction::indexed_one_based "";
 
 %feature("docstring")  CasADi::MXFunction::indexed_zero_based "";
@@ -54523,6 +54746,23 @@ Initialize. ";
 Update the number of sensitivity directions during or after initialization.
 ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::generateSparsityPatterns
+"
+
+Generate code for sparsity patterns. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::generateWork "
+
+Generate work array. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::generateBody "
+
+Generate code for the body of the C function. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::generateAuxiliary "
+
+Generate auxiliary functions. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::setLiftingFunction "
 
 Set the lifting function. ";
@@ -54608,6 +54848,14 @@ Symbolic expressions for the forward seeds. ";
 %feature("docstring")  CasADi::MXFunctionInternal::symbolicAdjSeed "
 
 Symbolic expressions for the adjoint seeds. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::generateCode "
+
+Print to a c file. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::generateFunction "
+
+Generate code for the C functon. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::evaluateCompressed "
 
@@ -55551,6 +55799,10 @@ Call a function, MX type (overloaded) ";
 
 Call a function, SX type (overloaded) ";
 
+%feature("docstring")  CasADi::NewtonImplicitInternal::generateCode "
+
+Print to a c file. ";
+
 %feature("docstring")  CasADi::NewtonImplicitInternal::iStruct "
 
 Access an input. ";
@@ -56367,6 +56619,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::NewtonImplicitSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::NewtonImplicitSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::NewtonImplicitSolver::indexed_zero_based "";
@@ -56957,6 +57213,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::NLPImplicitInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::NLPImplicitInternal::iStruct "
 
@@ -57747,6 +58007,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::NLPImplicitSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::NLPImplicitSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::NLPImplicitSolver::indexed_zero_based "";
@@ -58342,6 +58606,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::NLPQPInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPQPInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::NLPQPInternal::iStruct "
 
@@ -59141,6 +59409,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::NLPQPSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::generateCode "
+
+Export / Generate C code for the function. ";
 
 %feature("docstring")  CasADi::NLPQPSolver::indexed_one_based "";
 
@@ -60023,6 +60295,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::NLPSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::NLPSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::NLPSolver::indexed_zero_based "";
@@ -60704,6 +60980,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::NLPSolverInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::iStruct "
 
@@ -62975,6 +63255,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::OCPSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::OCPSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::OCPSolver::indexed_zero_based "";
@@ -63584,6 +63868,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::OCPSolverInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::iStruct "
 
@@ -64316,6 +64604,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::OOQPInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::OOQPInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::OOQPInternal::iStruct "
 
@@ -65127,6 +65419,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::OOQPSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::OOQPSolver::generateCode "
+
+Export / Generate C code for the function. ";
 
 %feature("docstring")  CasADi::OOQPSolver::indexed_one_based "";
 
@@ -66386,6 +66682,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Parallelizer::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::Parallelizer::indexed_one_based "";
 
 %feature("docstring")  CasADi::Parallelizer::indexed_zero_based "";
@@ -66963,6 +67263,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::ParallelizerInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::iStruct "
 
@@ -67618,6 +67922,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::QPOasesInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::QPOasesInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::QPOasesInternal::iStruct "
 
@@ -68434,6 +68742,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::QPOasesSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::QPOasesSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::QPOasesSolver::indexed_zero_based "";
@@ -69196,6 +69508,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::QPSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::QPSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::QPSolver::indexed_zero_based "";
@@ -69765,6 +70081,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::QPSolverInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::QPSolverInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::iStruct "
 
@@ -70758,6 +71078,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::RKIntegrator::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::RKIntegrator::indexed_one_based "";
 
 %feature("docstring")  CasADi::RKIntegrator::indexed_zero_based "";
@@ -71423,6 +71747,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::RKIntegratorInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::iStruct "
 
@@ -72466,6 +72794,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::SDPSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::SDPSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::SDPSolver::indexed_zero_based "";
@@ -73059,6 +73391,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::SDPSolverInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::SDPSolverInternal::iStruct "
 
@@ -74052,6 +74388,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::Simulator::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::Simulator::indexed_one_based "";
 
 %feature("docstring")  CasADi::Simulator::indexed_zero_based "";
@@ -74609,6 +74949,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::SimulatorInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::SimulatorInternal::generateCode "
+
+Print to a c file. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::iStruct "
 
@@ -75939,6 +76283,10 @@ Call a function, MX type (overloaded) ";
 
 Call a function, SX type (overloaded) ";
 
+%feature("docstring")  CasADi::SQPInternal::generateCode "
+
+Print to a c file. ";
+
 %feature("docstring")  CasADi::SQPInternal::iStruct "
 
 Access an input. ";
@@ -76962,6 +77310,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::SQPMethod::setJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SQPMethod::generateCode "
+
+Export / Generate C code for the function. ";
 
 %feature("docstring")  CasADi::SQPMethod::indexed_one_based "";
 
@@ -78055,6 +78407,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::SundialsIntegrator::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::SundialsIntegrator::indexed_one_based "";
 
 %feature("docstring")  CasADi::SundialsIntegrator::indexed_zero_based "";
@@ -78956,6 +79312,10 @@ Call a function, MX type (overloaded) ";
 
 Call a function, SX type (overloaded) ";
 
+%feature("docstring")  CasADi::SundialsInternal::generateCode "
+
+Print to a c file. ";
+
 %feature("docstring")  CasADi::SundialsInternal::iStruct "
 
 Access an input. ";
@@ -79562,6 +79922,24 @@ Joel Andersson
 |              |              |              | experimental |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| just_in_time | OT_BOOLEAN   | false        | Just-in-time | CasADi::SXFu |
+| _opencl      |              |              | compilation  | nctionIntern |
+|              |              |              | for numeric  | al           |
+|              |              |              | evaluation   |              |
+|              |              |              | using OpenCL |              |
+|              |              |              | (experimenta |              |
+|              |              |              | l)           |              |
++--------------+--------------+--------------+--------------+--------------+
+| just_in_time | OT_BOOLEAN   | false        | Propagate    | CasADi::SXFu |
+| _sparsity    |              |              | sparsity     | nctionIntern |
+|              |              |              | patterns     | al           |
+|              |              |              | using just-  |              |
+|              |              |              | in-time      |              |
+|              |              |              | compilation  |              |
+|              |              |              | to a CPU or  |              |
+|              |              |              | GPU using    |              |
+|              |              |              | OpenCL       |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
@@ -79863,10 +80241,6 @@ Get all function inputs. ";
 
 Get all function outputs. ";
 
-%feature("docstring")  CasADi::SXFunction::generateCode "
-
-Export / Generate C code for the function. ";
-
 %feature("docstring")  CasADi::SXFunction::algorithm "
 
 Access the algorithm directly. ";
@@ -80141,6 +80515,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::SXFunction::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::SXFunction::input "
 
 Const access input argument. ";
@@ -80398,6 +80776,24 @@ Joel Andersson
 |              |              |              | experimental |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| just_in_time | OT_BOOLEAN   | false        | Just-in-time | CasADi::SXFu |
+| _opencl      |              |              | compilation  | nctionIntern |
+|              |              |              | for numeric  | al           |
+|              |              |              | evaluation   |              |
+|              |              |              | using OpenCL |              |
+|              |              |              | (experimenta |              |
+|              |              |              | l)           |              |
++--------------+--------------+--------------+--------------+--------------+
+| just_in_time | OT_BOOLEAN   | false        | Propagate    | CasADi::SXFu |
+| _sparsity    |              |              | sparsity     | nctionIntern |
+|              |              |              | patterns     | al           |
+|              |              |              | using just-  |              |
+|              |              |              | in-time      |              |
+|              |              |              | compilation  |              |
+|              |              |              | to a CPU or  |              |
+|              |              |              | GPU using    |              |
+|              |              |              | OpenCL       |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
@@ -80644,13 +81040,13 @@ Initialize. ";
 Update the number of sensitivity directions during or after initialization.
 ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::generateCode "
+%feature("docstring")  CasADi::SXFunctionInternal::generateBody "
 
-Print to a c file. ";
+Generate code for the body of the C function. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::printAlgorithmC "
+%feature("docstring")  CasADi::SXFunctionInternal::generateAuxiliary "
 
-Generate code for the actual algorithm. ";
+Generate auxiliary functions. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::clearSymbolic "
 
@@ -80706,6 +81102,23 @@ Symbolic expressions for the forward seeds. ";
 %feature("docstring")  CasADi::SXFunctionInternal::symbolicAdjSeed "
 
 Symbolic expressions for the adjoint seeds. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::generateCode "
+
+Print to a c file. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::generateSparsityPatterns
+"
+
+Generate code for sparsity patterns. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::generateWork "
+
+Generate work array. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::generateFunction "
+
+Generate code for the C functon. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::evaluateCompressed "
 
@@ -83820,6 +84233,10 @@ Call a function, MX type (overloaded) ";
 
 Call a function, SX type (overloaded) ";
 
+%feature("docstring")  CasADi::WorhpInternal::generateCode "
+
+Print to a c file. ";
+
 %feature("docstring")  CasADi::WorhpInternal::iStruct "
 
 Access an input. ";
@@ -85483,6 +85900,10 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::WorhpSolver::generateCode "
+
+Export / Generate C code for the function. ";
+
 %feature("docstring")  CasADi::WorhpSolver::indexed_one_based "";
 
 %feature("docstring")  CasADi::WorhpSolver::indexed_zero_based "";
@@ -85991,6 +86412,30 @@ Symbolic expressions for the forward seeds. ";
 %feature("docstring")  CasADi::XFunctionInternal::symbolicAdjSeed "
 
 Symbolic expressions for the adjoint seeds. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::generateCode "
+
+Print to a c file. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::generateAuxiliary "
+
+Generate auxiliary functions. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::generateSparsityPatterns "
+
+Generate code for sparsity patterns. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::generateWork "
+
+Generate work array. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::generateFunction "
+
+Generate code for the C functon. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::generateBody "
+
+Generate code for the body of the C function. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::evaluate "
 
