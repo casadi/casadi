@@ -1592,5 +1592,56 @@ std::string FXInternal::numToString(int n){
   return ss.str();
 }
 
+void FXInternal::generateCopySparse(std::ostream &stream){
+  // COPY: y <- x
+  stream << "inline void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
+  stream << "  int i;" << endl;
+  stream << "  for(i=0; i<n; ++i){" << endl;
+  stream << "    *y = *x;" << endl;
+  stream << "    x += inc_x;" << endl;
+  stream << "    y += inc_y;" << endl;
+  stream << "  }" << endl;
+  stream << "}" << endl;
+  stream << endl;
+
+  stream << "inline void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y){" << endl;
+  stream << "  int nrow_x = sp_x[0];" << endl;
+  stream << "  int ncol_x = sp_x[1];" << endl;
+  stream << "  const int* rowind_x = sp_x+2;" << endl;
+  stream << "  const int* col_x = sp_x + 2 + nrow_x+1;" << endl;
+  stream << "  int nnz_x = rowind_x[nrow_x];" << endl;
+  stream << "  int nrow_y = sp_y[0];" << endl;
+  stream << "  int ncol_y = sp_y[1];" << endl;
+  stream << "  const int* rowind_y = sp_y+2;" << endl;
+  stream << "  const int* col_y = sp_y + 2 + nrow_y+1;" << endl;
+  stream << "  int nnz_y = rowind_y[nrow_y];" << endl;
+  stream << "  if(sp_x==sp_y){" << endl;
+  stream << "    casadi_copy(nnz_x,x,1,y,1);" << endl;
+  stream << "  } else {" << endl;
+  stream << "    int i;" << endl;
+  stream << "    for(i=0; i<nrow_x; ++i){" << endl;
+  stream << "      int el_x = rowind_x[i];" << endl;
+  stream << "      int el_x_end = rowind_x[i+1];" << endl;
+  stream << "      int j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
+  stream << "      int el_y;" << endl;
+  stream << "      for(el_y=rowind_y[i]; el_y!=rowind_y[i+1]; ++el_y){" << endl;
+  stream << "        int j=col_y[el_y];" << endl;
+  stream << "        while(j_x<j){" << endl;
+  stream << "          el_x++;" << endl;
+  stream << "          j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
+  stream << "        }" << endl;
+  stream << "        if(j_x==j){" << endl;
+  stream << "          y[el_y] = x[el_x++];" << endl;
+  stream << "          j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
+  stream << "        } else {" << endl;
+  stream << "          y[el_y] = 0;" << endl;
+  stream << "        }" << endl;
+  stream << "      }" << endl;
+  stream << "    }" << endl;
+  stream << "  }" << endl;
+  stream << "}" << endl;
+  stream << endl;
+}
+
 } // namespace CasADi
 

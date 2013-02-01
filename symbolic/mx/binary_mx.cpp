@@ -405,7 +405,7 @@ void SparseSparseOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, 
 
 void ScalarNonzerosOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
   // Store the scalar
-  stream << "  r=" << arg.at(0) << "[0];" << endl;
+  stream << "  t=" << arg.at(0) << "[0];" << endl;
 
   // Print all nonzeros row by row
   for(int k=0; k<size(); ++k){

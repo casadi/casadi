@@ -1124,7 +1124,7 @@ void MXFunctionInternal::allocTape(){
 }
 
 void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
-  casadi_warning("Not ready for use");
+  casadi_warning("MX code generation is still experimental.");
 
   // Operation number (for printing)
   int k=0;
@@ -1213,9 +1213,10 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   // BLAS Level 1
 
   // SWAP: x <-> y
-  stream << "inline void casadi_copy(int n, d* x, int inc_x, d* y, int inc_y){" << endl;
+  stream << "inline void casadi_swap(int n, d* x, int inc_x, d* y, int inc_y){" << endl;
   stream << "  d t;" << endl;
-  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "  int i;" << endl;
+  stream << "  for(i=0; i<n; ++i){" << endl;
   stream << "    t = *x;" << endl;
   stream << "    *x = *y;" << endl;
   stream << "    *y = t;" << endl;
@@ -1227,26 +1228,18 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
 
   // SCAL: x <- alpha*x
   stream << "inline void casadi_scal(int n, d alpha, d* x, int inc_x){" << endl;
-  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "  int i;" << endl;
+  stream << "  for(i=0; i<n; ++i){" << endl;
   stream << "    *x *= alpha;" << endl;
   stream << "    x += inc_x;" << endl;
   stream << "  }" << endl;
   stream << "}" << endl;
   stream << endl;
 
-  // COPY: y <- x
-  stream << "inline void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
-  stream << "  for(int i=0; i<n; ++i){" << endl;
-  stream << "    *x = *y;" << endl;
-  stream << "    x += inc_x;" << endl;
-  stream << "    y += inc_y;" << endl;
-  stream << "  }" << endl;
-  stream << "}" << endl;
-  stream << endl;
-
   // AXPY: y <- a*x + y
   stream << "inline void casadi_axpy(int n, d alpha, const d* x, int inc_x, d* y, int inc_y){" << endl;
-  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "  int i;" << endl;
+  stream << "  for(i=0; i<n; ++i){" << endl;
   stream << "    *y += alpha**x;" << endl;
   stream << "    x += inc_x;" << endl;
   stream << "    y += inc_y;" << endl;
@@ -1257,7 +1250,8 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   // DOT: inner_prod(x,y) -> return
   stream << "inline d casadi_dot(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
   stream << "  d r = 0;" << endl;
-  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "  int i;" << endl;
+  stream << "  for(i=0; i<n; ++i){" << endl;
   stream << "    r += *x**y;" << endl;
   stream << "    x += inc_x;" << endl;
   stream << "    y += inc_y;" << endl;
@@ -1269,7 +1263,8 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   // NRM2: ||x||_2 -> return
   stream << "inline d casadi_nrm2(int n, const d* x, int inc_x){" << endl;
   stream << "  d r = 0;" << endl;
-  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "  int i;" << endl;
+  stream << "  for(i=0; i<n; ++i){" << endl;
   stream << "    r += *x**x;" << endl;
   stream << "    x += inc_x;" << endl;
   stream << "  }" << endl;
@@ -1278,9 +1273,10 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   stream << endl;
 
   // ASUM: ||x||_1 -> return
-  stream << "inline d casadi_nrm2(int n, const d* x, int inc_x){" << endl;
+  stream << "inline d casadi_asum(int n, const d* x, int inc_x){" << endl;
   stream << "  d r = 0;" << endl;
-  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "  int i;" << endl;
+  stream << "  for(i=0; i<n; ++i){" << endl;
   stream << "    r += fabs(*x);" << endl;
   stream << "    x += inc_x;" << endl;
   stream << "  }" << endl;
@@ -1293,7 +1289,8 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   stream << "  d t;" << endl;
   stream << "  d largest_value = -1.0;" << endl;
   stream << "  int largest_index = -1;" << endl;
-  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "  int i;" << endl;
+  stream << "  for(i=0; i<n; ++i){" << endl;
   stream << "    t = fabs(*x);" << endl;
   stream << "    x += inc_x;" << endl;
   stream << "    if(t>largest_value){" << endl;
@@ -1305,51 +1302,14 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   stream << "}" << endl;
   stream << endl;
 
-
   // MISC CasADi
 
   // FILL: x <- alpha
   stream << "inline void casadi_fill(int n, d alpha, d* x, int inc_x){" << endl;
-  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "  int i;" << endl;
+  stream << "  for(i=0; i<n; ++i){" << endl;
   stream << "    *x = alpha;" << endl;
   stream << "    x += inc_x;" << endl;
-  stream << "  }" << endl;
-  stream << "}" << endl;
-  stream << endl;
-
-  // COPY sparse: y <- x, (see CRSSparsity::set)
-  stream << "inline void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y){" << endl;
-  stream << "  int nrow_x = sp_x[0];" << endl;
-  stream << "  int ncol_x = sp_x[1];" << endl;
-  stream << "  const int* rowind_x = sp_x+2;" << endl;
-  stream << "  const int* int col_x = sp_x + 2 + nrow_x+1;" << endl;
-  stream << "  int nnz_x = rowind_x[nrow_x];" << endl;
-  stream << "  int nrow_y = sp_y[0];" << endl;
-  stream << "  int ncol_y = sp_y[1];" << endl;
-  stream << "  const int* rowind_y = sp_y+2;" << endl;
-  stream << "  const int* col_y = sp_y + 2 + nrow_y+1;" << endl;
-  stream << "  int nnz_y = rowind_y[nrow_y];" << endl;
-  stream << "  if(sp_x==sp_y){" << endl;
-  stream << "    casadi_copy(nnz_x,x,1,y,1);" << endl;
-  stream << "  } else {" << endl;
-  stream << "    for(int i=0; i<nrow_x; ++i){" << endl;
-  stream << "      int el_x = rowind_x[i];" << endl;
-  stream << "      int el_x_end = rowind_x[i+1];" << endl;
-  stream << "      int j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
-  stream << "      for(int el_y=rowind_y[i]; el_y!=rowind_y[i+1]; ++el_y){" << endl;
-  stream << "        int j=col_y[el];" << endl;
-  stream << "        while(j_x<j){" << endl;
-  stream << "          el_x++;" << endl;
-  stream << "          j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
-  stream << "        }" << endl;
-  stream << "        if(j_x==j){" << endl;
-  stream << "          y[el_y] = x[el_x++];" << endl;
-  stream << "          j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
-  stream << "        } else {" << endl;
-  stream << "          y[el_y] = 0;" << endl;
-  stream << "        }" << endl;
-  stream << "      }" << endl;
-  stream << "    }" << endl;
   stream << "  }" << endl;
   stream << "}" << endl;
   stream << endl;
@@ -1360,7 +1320,7 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   stream << "  int nrow_x = sp_x[0];" << endl;
   stream << "  int ncol_x = sp_x[1];" << endl;
   stream << "  const int* rowind_x = sp_x+2;" << endl;
-  stream << "  const int* int col_x = sp_x + 2 + nrow_x+1;" << endl;
+  stream << "  const int* col_x = sp_x + 2 + nrow_x+1;" << endl;
   stream << "  int nnz_x = rowind_x[nrow_x];" << endl;
 
   stream << "  int ncol_y = sp_trans_y[0];" << endl;
@@ -1372,23 +1332,26 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   stream << "  int nrow_z = sp_z[0];" << endl;
   stream << "  int ncol_z = sp_z[1];" << endl;
   stream << "  const int* rowind_z = sp_z+2;" << endl;
-  stream << "  const int* int col_z = sp_z + 2 + nrow_z+1;" << endl;
+  stream << "  const int* col_z = sp_z + 2 + nrow_z+1;" << endl;
   stream << "  int nnz_z = rowind_z[nrow_z];" << endl;
   
-  stream << "  for(int i=0; i<nrow_z; ++i){" << endl;
-  stream << "    for(int el=rowind_z[i]; el<rowind_z[i+1]; ++el){" << endl;
-  stream << "    int j = col_z[el];" << endl;
-  stream << "    int el1 = rowind_x[i];" << endl;
-  stream << "    int el2 = colind_z[j];" << endl;
-  stream << "    while(el1 < rowind_x[i+1] && el2 < colind_y[j+1]){ " << endl;
-  stream << "      int j1 = col_x[el1];" << endl;
-  stream << "      int i2 = row_y[el2];" << endl;
-  stream << "      if(j1==i2){" << endl;
-  stream << "        z[el] += x[el1++] * trans_y[el2++];" << endl;
-  stream << "      } else if(j1<i2) {" << endl;
-  stream << "        el1++;" << endl;
-  stream << "      } else {" << endl;
-  stream << "        el2++;" << endl;
+  stream << "  int i;" << endl;
+  stream << "  for(i=0; i<nrow_z; ++i){" << endl;
+  stream << "    int el;" << endl;
+  stream << "    for(el=rowind_z[i]; el<rowind_z[i+1]; ++el){" << endl;
+  stream << "      int j = col_z[el];" << endl;
+  stream << "      int el1 = rowind_x[i];" << endl;
+  stream << "      int el2 = colind_y[j];" << endl;
+  stream << "      while(el1 < rowind_x[i+1] && el2 < colind_y[j+1]){ " << endl;
+  stream << "        int j1 = col_x[el1];" << endl;
+  stream << "        int i2 = row_y[el2];" << endl;
+  stream << "        if(j1==i2){" << endl;
+  stream << "          z[el] += x[el1++] * trans_y[el2++];" << endl;
+  stream << "        } else if(j1<i2) {" << endl;
+  stream << "          el1++;" << endl;
+  stream << "        } else {" << endl;
+  stream << "          el2++;" << endl;
+  stream << "        }" << endl;
   stream << "      }" << endl;
   stream << "    }" << endl;
   stream << "  }" << endl;

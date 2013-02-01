@@ -1021,6 +1021,12 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   // Codegen the rest of the sparsity patterns
   generateSparsityPatterns(cfile,sparsity_index);
   
+  // Declare auxiliary functions
+  generateAuxiliary(cfile);
+
+  // Quick-hack (should be somewhere else)
+  generateCopySparse(cfile);
+
   // Codegen the dependent functions
   std::map<const void*,int> dependent_index;
   generateDependents(cfile,sparsity_index,dependent_index);
@@ -1069,9 +1075,6 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   cfile << "  *col = sp + 2 + (*nrow + 1);" << std::endl;
   cfile << "  return 0;" << std::endl;
   cfile << "}" << std::endl << std::endl;
-
-  // Declare auxiliary functions
-  generateAuxiliary(cfile);
   
   // Generate the actual function
   generateFunction(cfile, "evaluate", "const d*","d*","d",sparsity_index,dependent_index);
@@ -1191,6 +1194,10 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
   stream << "}" << std::endl;
   stream << std::endl;
 }
+
+
+
+
 
 
 } // namespace CasADi

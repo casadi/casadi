@@ -152,6 +152,9 @@ class FXInternal : public OptionsFunctionalityNode{
 
     /** \brief Generate code for the C functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;
+  
+    /** \brief COPY sparse: y <- x, (see CRSSparsity::set) */
+    static void generateCopySparse(std::ostream &stream);
 
     /** Convert in integer to a string */
     static std::string numToString(int n);
