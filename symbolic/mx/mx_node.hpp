@@ -103,6 +103,9 @@ class MXNode : public SharedObjectNode{
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const = 0;
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;
     
     /** \brief  Evaluate the function */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 

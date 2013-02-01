@@ -1586,6 +1586,11 @@ void FXInternal::generateFunction(std::ostream &stream, const std::string& fname
   casadi_error("FXInternal::generateFunction: generateFunction not defined for class " << typeid(*this).name());
 }
 
+std::string FXInternal::numToString(int n){
+  stringstream ss;
+  ss << n;
+  return ss.str();
+}
 
 } // namespace CasADi
 

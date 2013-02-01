@@ -1127,48 +1127,44 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
   stream << "#error MX_GENERATE_FUNCTION_NOT_COMPLETED" << endl;
   casadi_warning("Not ready for use");
 
-  // Dummy function name
-  int f=0;
+  // Operation number (for printing)
+  int k=0;
+
+  // Names of operation argument and results
+  vector<string> arg,res;
 
   // Codegen the algorithm
   for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-    if(it->op==OP_OUTPUT){
-      stream << "  casadi_copy_n(w.a" << it->arg.front() << "," << output(it->res.front()).size() << ",r" << it->res.front() << ");" << endl;
-    } else if(it->op==OP_INPUT){
-      stream << "  casadi_copy_n(x" << it->arg.front() << "," << input(it->arg.front()).size() << ",w.a" << it->res.front() << ");" << endl;
+    // Mark the beginning of the operation
+    stream << "  /* " << k++ << " */" << endl; 
+
+    // Get the names of the operation arguments
+    arg.resize(it->arg.size());
+    if(it->op == OP_INPUT){
+      arg.front() = "x" + numToString(it->arg.front());
     } else {
-      // Declare the function NOTE: Dummy function name
-      stream << "  f" << f++ << "(";
-      
-      // Pass input arguments
       for(int i=0; i<it->arg.size(); ++i){
-	if(it->arg[i]>=0){
-	  stream << "w.a" << it->arg[i] << "," << "s" << findSparsity(work_[it->arg[i]].data.sparsity(),sparsity_index);
-	} else {
-	  stream << "0,0";
-	}
-	if(i+1<it->arg.size() + it->res.size()){
-	  stream << ", ";
-	}
+	arg.at(i) = "w.a" + numToString(it->arg.front());
       }
+    }
 
-      // Add two spaces to facilitate debugging
-      stream << "  ";
-
-      // Pass output arguments
+    // Get the names of the operation results
+    res.resize(it->res.size());
+    if(it->op == OP_OUTPUT){
+      res.front() = "r" + numToString(it->res.front());
+    } else {
       for(int i=0; i<it->res.size(); ++i){
-	if(it->res[i]>=0){
-	  stream << "w.a" << it->res[i] << "," << "s" << findSparsity(it->data->sparsity(i),sparsity_index);
-	} else {
-	  stream << "0,0";
-	}
-	if(i+1<it->res.size()){
-	  stream << ", ";
-	}
+	res.at(i) = "w.a" + numToString(it->res.front());
       }
+    }
 
-      // Finish the operation
-      stream << ");" << endl;
+    // Print the operation
+    if(it->op==OP_OUTPUT){
+      stream << "  casadi_copy_n(" << arg.front() << "," << output(it->res.front()).size() << "," << res.front() << ");" << endl;
+    } else if(it->op==OP_INPUT){
+      stream << "  casadi_copy_n(" << arg.front() << "," << input(it->arg.front()).size() << "," << res.front() << ");" << endl;
+    } else {
+      it->data->generateOperation(stream,arg,res,sparsity_index,dependent_index);
     }
   }
 }

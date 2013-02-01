@@ -153,6 +153,9 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief Generate code for the C functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;
 
+    /** Convert in integer to a string */
+    static std::string numToString(int n);
+
     /** \brief  Print to a c file */
     static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
   
