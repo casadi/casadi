@@ -24,7 +24,7 @@
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
 #include "../stl_vector_tools.hpp"
-#include <vector>
+#include "../fx/fx_internal.hpp"
 
 using namespace std;
 
@@ -102,6 +102,20 @@ void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtr
 void Multiplication::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
   DMatrix::mul_sparsity(*input[0],*input[1],*output[0],fwd);
 }
+
+void Multiplication::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+  
+  // Clear the result
+  stream << "  casadi_fill(" << sparsity().size() << ",0.0," << res.front() << ",1);" << endl;
+
+  // Perform sparse matrix multiplication
+  stream << "  casadi_mm_nt_sparse(";
+  for(int i=0; i<2; ++i){
+    stream << arg.at(i) << ",s" << FXInternal::findSparsity(dep(i).sparsity(),sparsity_index) << ",";
+  }
+  stream << res.front() << "," << FXInternal::findSparsity(sparsity(),sparsity_index) << ");" << endl;
+}
+
 
 } // namespace CasADi
 

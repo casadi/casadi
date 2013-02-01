@@ -1308,6 +1308,15 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
 
   // MISC CasADi
 
+  // FILL: x <- alpha
+  stream << "inline void casadi_fill(int n, d alpha, d* x, int inc_x){" << endl;
+  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "    *x = alpha;" << endl;
+  stream << "    x += inc_x;" << endl;
+  stream << "  }" << endl;
+  stream << "}" << endl;
+  stream << endl;
+
   // COPY sparse: y <- x, (see CRSSparsity::set)
   stream << "inline void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y){" << endl;
   stream << "  int nrow_x = sp_x[0];" << endl;
@@ -1342,8 +1351,49 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   stream << "      }" << endl;
   stream << "    }" << endl;
   stream << "  }" << endl;
+  stream << "}" << endl;
   stream << endl;
 
+  // Sparse matrix-matrix multiplication, the second argument is transposed: z <- z + x*y'
+  stream << "inline void casadi_mm_nt_sparse(const d* x, const int* sp_x, const d* trans_y, const int* sp_trans_y, d* z, const int* sp_z){" << std::endl;
+
+  stream << "  int nrow_x = sp_x[0];" << endl;
+  stream << "  int ncol_x = sp_x[1];" << endl;
+  stream << "  const int* rowind_x = sp_x+2;" << endl;
+  stream << "  const int* int col_x = sp_x + 2 + nrow_x+1;" << endl;
+  stream << "  int nnz_x = rowind_x[nrow_x];" << endl;
+
+  stream << "  int ncol_y = sp_trans_y[0];" << endl;
+  stream << "  int nrow_y = sp_trans_y[1];" << endl;
+  stream << "  const int* colind_y = sp_trans_y+2;" << endl;
+  stream << "  const int* row_y = sp_trans_y + 2 + ncol_y+1;" << endl;
+  stream << "  int nnz_y = colind_y[ncol_y];" << endl;
+
+  stream << "  int nrow_z = sp_z[0];" << endl;
+  stream << "  int ncol_z = sp_z[1];" << endl;
+  stream << "  const int* rowind_z = sp_z+2;" << endl;
+  stream << "  const int* int col_z = sp_z + 2 + nrow_z+1;" << endl;
+  stream << "  int nnz_z = rowind_z[nrow_z];" << endl;
+  
+  stream << "  for(int i=0; i<nrow_z; ++i){" << endl;
+  stream << "    for(int el=rowind_z[i]; el<rowind_z[i+1]; ++el){" << endl;
+  stream << "    int j = col_z[el];" << endl;
+  stream << "    int el1 = rowind_x[i];" << endl;
+  stream << "    int el2 = colind_z[j];" << endl;
+  stream << "    while(el1 < rowind_x[i+1] && el2 < colind_y[j+1]){ " << endl;
+  stream << "      int j1 = col_x[el1];" << endl;
+  stream << "      int i2 = row_y[el2];" << endl;
+  stream << "      if(j1==i2){" << endl;
+  stream << "        z[el] += x[el1++] * trans_y[el2++];" << endl;
+  stream << "      } else if(j1<i2) {" << endl;
+  stream << "        el1++;" << endl;
+  stream << "      } else {" << endl;
+  stream << "        el2++;" << endl;
+  stream << "      }" << endl;
+  stream << "    }" << endl;
+  stream << "  }" << endl;
+  stream << "}" << endl;
+  stream << endl;
 }
 
 } // namespace CasADi
