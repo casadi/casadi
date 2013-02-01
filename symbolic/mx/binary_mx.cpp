@@ -403,6 +403,26 @@ void SparseSparseOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, 
   }
 }
 
+void ScalarNonzerosOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+  // Store the scalar
+  stream << "  r=" << arg.at(0) << "[0];" << endl;
+
+  // Print all nonzeros row by row
+  for(int k=0; k<size(); ++k){
+    
+    // Print left hand side of assignment
+    stream << "  " << res.front() << "[" << k << "]=";
+        
+    // Print right hand side of assignment
+    casadi_math<double>::printPre(op_,stream);
+    stream << "t";
+    casadi_math<double>::printSep(op_,stream);
+    stream << arg.at(1) << "[" << k << "]";
+    casadi_math<double>::printPost(op_,stream);
+    stream << ";" << endl;
+  }
+}
+
 
 } // namespace CasADi
 

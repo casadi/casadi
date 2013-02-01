@@ -133,6 +133,9 @@ class ScalarNonzerosOp : public BinaryMX{
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
     void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;
 };
 
 /// A matrix-matrix binary operation with matching nonzeros

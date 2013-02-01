@@ -1132,6 +1132,10 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
   // Names of operation argument and results
   vector<string> arg,res;
 
+  // Codegen a temporary variable
+  stream << "  /* Temporary */" << endl;
+  stream << "  d t;" << endl;
+
   // Codegen the algorithm
   for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     // Mark the beginning of the operation
