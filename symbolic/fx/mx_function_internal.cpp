@@ -1212,7 +1212,16 @@ void MXFunctionInternal::generateWork(std::ostream &stream) const{
 void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   // BLAS Level 1
 
-  // COPY
+  // SCAL: x = alpha*x
+  stream << "inline void casadi_scal(int n, d alpha, d* x, int incx){" << endl;
+  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "    *x *= alpha;" << endl;
+  stream << "    x += incx;" << endl;
+  stream << "  }" << endl;
+  stream << "}" << endl;
+  stream << endl;
+
+  // COPY: y = x
   stream << "inline void casadi_copy(int n, const d* x, int incx, d* y, int incy){" << endl;
   stream << "  for(int i=0; i<n; ++i){" << endl;
   stream << "    *x = *y;" << endl;
@@ -1222,7 +1231,7 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   stream << "}" << endl;
   stream << endl;
 
-  // AXPY
+  // AXPY: y += a*x
   stream << "inline void casadi_axpy(int n, d alpha, const d* x, int incx, d* y, int incy){" << endl;
   stream << "  for(int i=0; i<n; ++i){" << endl;
   stream << "    *y += alpha * *x;" << endl;
