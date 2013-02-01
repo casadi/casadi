@@ -152,6 +152,15 @@ MX UnaryMX::create(int op, const MX& x){
   }
 }
 
+void UnaryMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+  stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
+  stream << res.at(0) << "[i]=";
+  casadi_math<double>::printPre(op_,stream);
+  stream << arg.at(0) << "[i]";
+  casadi_math<double>::printPost(op_,stream);
+  stream << ";" << endl;
+}
+
 
 } // namespace CasADi
 
