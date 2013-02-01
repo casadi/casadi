@@ -1212,7 +1212,20 @@ void MXFunctionInternal::generateWork(std::ostream &stream) const{
 void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   // BLAS Level 1
 
-  // SCAL: x = alpha*x
+  // SWAP: x <-> y
+  stream << "inline void casadi_copy(int n, d* x, int incx, d* y, int incy){" << endl;
+  stream << "  d t;" << endl;
+  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "    t = *x;" << endl;
+  stream << "    *x = *y;" << endl;
+  stream << "    *y = t;" << endl;
+  stream << "    x += incx;" << endl;
+  stream << "    y += incy;" << endl;
+  stream << "  }" << endl;
+  stream << "}" << endl;
+  stream << endl;
+
+  // SCAL: x <- alpha*x
   stream << "inline void casadi_scal(int n, d alpha, d* x, int incx){" << endl;
   stream << "  for(int i=0; i<n; ++i){" << endl;
   stream << "    *x *= alpha;" << endl;
@@ -1221,7 +1234,7 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   stream << "}" << endl;
   stream << endl;
 
-  // COPY: y = x
+  // COPY: y <- x
   stream << "inline void casadi_copy(int n, const d* x, int incx, d* y, int incy){" << endl;
   stream << "  for(int i=0; i<n; ++i){" << endl;
   stream << "    *x = *y;" << endl;
@@ -1231,15 +1244,68 @@ void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   stream << "}" << endl;
   stream << endl;
 
-  // AXPY: y += a*x
+  // AXPY: y <- a*x + y
   stream << "inline void casadi_axpy(int n, d alpha, const d* x, int incx, d* y, int incy){" << endl;
   stream << "  for(int i=0; i<n; ++i){" << endl;
-  stream << "    *y += alpha * *x;" << endl;
+  stream << "    *y += alpha**x;" << endl;
   stream << "    x += incx;" << endl;
   stream << "    y += incy;" << endl;
   stream << "  }" << endl;
   stream << "}" << endl;
   stream << endl;
+
+  // DOT: inner_prod(x,y) -> return
+  stream << "inline d casadi_dot(int n, const d* x, int incx, d* y, int incy){" << endl;
+  stream << "  d r = 0;" << endl;
+  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "    r += *x**y;" << endl;
+  stream << "    x += incx;" << endl;
+  stream << "    y += incy;" << endl;
+  stream << "  }" << endl;
+  stream << "  return r;" << endl;
+  stream << "}" << endl;
+  stream << endl;
+
+  // NRM2: ||x||_2 -> return
+  stream << "inline d casadi_nrm2(int n, const d* x, int incx){" << endl;
+  stream << "  d r = 0;" << endl;
+  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "    r += *x**x;" << endl;
+  stream << "    x += incx;" << endl;
+  stream << "  }" << endl;
+  stream << "  return sqrt(r);" << endl;
+  stream << "}" << endl;
+  stream << endl;
+
+  // ASUM: ||x||_1 -> return
+  stream << "inline d casadi_nrm2(int n, const d* x, int incx){" << endl;
+  stream << "  d r = 0;" << endl;
+  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "    r += fabs(*x);" << endl;
+  stream << "    x += incx;" << endl;
+  stream << "  }" << endl;
+  stream << "  return r;" << endl;
+  stream << "}" << endl;
+  stream << endl;
+
+  // IAMAX: index corresponding to the entry with the largest absolute value 
+  stream << "inline int casadi_iamax(int n, const d* x, int incx){" << endl;
+  stream << "  d t;" << endl;
+  stream << "  d largest_value = -1.0;" << endl;
+  stream << "  int largest_index = -1;" << endl;
+  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "    t = fabs(*x);" << endl;
+  stream << "    x += incx;" << endl;
+  stream << "    if(t>largest_value){" << endl;
+  stream << "      largest_value = t;" << endl;
+  stream << "      largest_index = i;" << endl;
+  stream << "    }" << endl;
+  stream << "  }" << endl;
+  stream << "  return largest_index;" << endl;
+  stream << "}" << endl;
+  stream << endl;
+
+
 }
 
 } // namespace CasADi
