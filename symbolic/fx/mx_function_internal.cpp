@@ -1163,9 +1163,9 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
 
     // Print the operation
     if(it->op==OP_OUTPUT){
-      stream << "  casadi_copy_n(" << arg.front() << "," << output(it->res.front()).size() << "," << res.front() << ");" << endl;
+      stream << "  casadi_copy(" << output(it->res.front()).size() << "," <<  arg.front() << ",1," << res.front() << ",1);" << endl;
     } else if(it->op==OP_INPUT){
-      stream << "  casadi_copy_n(" << arg.front() << "," << input(it->arg.front()).size() << "," << res.front() << ");" << endl;
+      stream << "  casadi_copy(" << input(it->arg.front()).size() << "," << arg.front() << ",1," << res.front() << ",1);" << endl;
     } else {
       it->data->generateOperation(stream,arg,res,sparsity_index,dependent_index);
     }
@@ -1210,9 +1210,24 @@ void MXFunctionInternal::generateWork(std::ostream &stream) const{
 }
 
 void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
-  stream << "inline void casadi_copy_n(const d* x, int n, d* r){" << endl;
+  // BLAS Level 1
+
+  // COPY
+  stream << "inline void casadi_copy(int n, const d* x, int incx, d* y, int incy){" << endl;
   stream << "  for(int i=0; i<n; ++i){" << endl;
-  stream << "    r[i] = x[i];" << endl;
+  stream << "    *x = *y;" << endl;
+  stream << "    x += incx;" << endl;
+  stream << "    y += incy;" << endl;
+  stream << "  }" << endl;
+  stream << "}" << endl;
+  stream << endl;
+
+  // AXPY
+  stream << "inline void casadi_axpy(int n, d alpha, const d* x, int incx, d* y, int incy){" << endl;
+  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "    *y += alpha * *x;" << endl;
+  stream << "    x += incx;" << endl;
+  stream << "    y += incy;" << endl;
   stream << "  }" << endl;
   stream << "}" << endl;
   stream << endl;
