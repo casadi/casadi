@@ -640,4 +640,27 @@ bool Mapping::isTranspose() const{
   return true;
 }
 
+void Mapping::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+  // Loop over output nonzeros
+  for(int k=0; k<output_sorted_.size(); ++k){
+    
+    // Get the set of operations
+    const std::vector<OutputNZ>& v = output_sorted_.at(k);
+    
+    // Print left hand side of assignment
+    stream << "  " << res.front() << "[" << k << "]=";
+    
+    // Print right hand side of assignment
+    if(v.size()==0){
+      stream << "0";
+    } else {
+      for(int j=0; j<v.size(); ++j){
+	if(j!=0) stream << "+";
+	stream << arg.at(v[j].iind) << "[" << v[j].inz << "]";
+      }
+    }
+    stream << ";" << endl;
+  }
+}
+
 } // namespace CasADi

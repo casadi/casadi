@@ -1124,7 +1124,6 @@ void MXFunctionInternal::allocTape(){
 }
 
 void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
-  stream << "#error MX_GENERATE_FUNCTION_NOT_COMPLETED" << endl;
   casadi_warning("Not ready for use");
 
   // Operation number (for printing)
