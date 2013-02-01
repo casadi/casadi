@@ -1535,5 +1535,12 @@ int FXInternal::printSparsity(std::ostream &stream, const CRSSparsity& sp, std::
   return ind;
 }
 
+int FXInternal::findSparsity(const CRSSparsity& sp, const std::map<const void*,int>& sparsity_index){
+  const void* h = static_cast<const void*>(sp.get());
+  std::map<const void*,int>::const_iterator it=sparsity_index.find(h);
+  casadi_assert(it!=sparsity_index.end());
+  return it->second;  
+}
+
 } // namespace CasADi
 

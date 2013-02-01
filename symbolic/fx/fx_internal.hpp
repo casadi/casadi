@@ -150,6 +150,9 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief Print a sparsity pattern to stream */
     static int printSparsity(std::ostream &stream, const CRSSparsity& sp, std::map<const void*,int>& sparsity_index);
 
+    /** \brief Print a sparsity pattern to stream */
+    static int findSparsity(const CRSSparsity& sp, const std::map<const void*,int>& sparsity_index);
+
     /** \brief  Access an input */
     FunctionIO& iStruct(int i){
       try{

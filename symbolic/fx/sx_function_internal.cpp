@@ -341,18 +341,20 @@ void SXFunctionInternal::print(ostream &stream) const{
   }
 }
 
-void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, bool ptr_to_ptr) const{
+void SXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
+  // The sign function
+  stream << "inline double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl;
+  stream << endl;
+}
+
+void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index) const{
   // Which variables have been declared
   vector<bool> declared(work_.size(),false);
  
-  // Input index prefix and suffix
-  const char* array_prefix = ptr_to_ptr ? "[" : "";
-  const char* array_suffix = ptr_to_ptr ? "]" : "";
-
   // Run the algorithm
   for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
    if(it->op==OP_OUTPUT){
-     stream << "r" << array_prefix << it->res << array_suffix << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
+     stream << "r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
    } else {
      // Declare result if not already declared
      if(!declared[it->res]){
@@ -367,7 +369,7 @@ void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
      if(it->op==OP_CONST){
        stream << it->arg.d;
      } else if(it->op==OP_INPUT){
-       stream << "x" << array_prefix << it->arg.i[0] << array_suffix << "[" << it->arg.i[1] << "]";
+       stream << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
      } else {
        int ndep = casadi_math<double>::ndeps(it->op);
        casadi_math<double>::printPre(it->op,stream);
@@ -380,33 +382,6 @@ void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
    }
    stream  << ";" << endl;
  }
-}
-
-void SXFunctionInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type) const{
-  // Define function
-  stream << "void " << fname << "(";
-  bool first=true;
-  
-  // Declare inputs
-  for(int i=0; i<getNumInputs(); ++i){
-    if(first) first=false;
-    else      stream << ", ";
-    stream << input_type << " x" << i;
-  }
-
-  // Declare outputs
-  for(int i=0; i<getNumOutputs(); ++i){
-    if(first) first=false;
-    else      stream << ", ";
-    stream << output_type << " r" << i;
-  }
-  stream << "){ " << endl;
-  
-  // Insert the function body
-  generateBody(stream,type,false);
-
-  // Finalize the function
-  stream << "}" << endl << endl;
 }
 
 void SXFunctionInternal::init(){
@@ -1505,7 +1480,8 @@ void SXFunctionInternal::allocOpenCL(){
   ss << "__kernel ";
 
   // Generate the function
-  generateFunction(ss, "evaluate", "__global const double*","__global double*","double");
+  std::map<const void*,int> sparsity_index;
+  generateFunction(ss, "evaluate", "__global const double*","__global double*","double",sparsity_index);
   
   // Form c-string
   std::string s = ss.str();

@@ -97,6 +97,9 @@ class XFunctionInternal : public FXInternal{
     /** \brief  Print to a c file */
     virtual void generateCode(const std::string& filename);
 
+    /** \brief Generate auxiliary functions */
+    virtual void generateAuxiliary(std::ostream &stream) const{}  
+
     /** \brief Generate code for sparsity patterns */
     virtual void generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const{}
 
@@ -104,7 +107,10 @@ class XFunctionInternal : public FXInternal{
     virtual void generateWork(std::ostream &stream) const{}
 
     /** \brief Generate code for the C functon */
-    virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type) const = 0;
+    void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index) const = 0;
 
     // Data members (all public)
     
@@ -1057,37 +1063,64 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   cfile << "  return 0;" << std::endl;
   cfile << "}" << std::endl << std::endl;
 
-  // The sign function
-  cfile << "double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;}" << std::endl << std::endl;
+  // Declare auxiliary functions
+  generateAuxiliary(cfile);
   
   // Generate the actual function
-  generateFunction(cfile, "evaluate", "const double*","double*","d");
+  generateFunction(cfile, "evaluate", "const double*","double*","d",sparsity_index);
 
   // Define wrapper function
   cfile << "int evaluateWrap(const double** x, double** r){" << std::endl;
-  cfile << "evaluate(";
-  bool first=true;
+  cfile << "  evaluate(";
   
   // Pass inputs
-  for(int i=0; i<getNumInputs(); ++i){
-    if(first) first=false;
-    else      cfile << ", ";
+  for(int i=0; i<n_i; ++i){
+    if(i!=0) cfile << ",";
     cfile << "x[" << i << "]";
   }
 
   // Pass outputs
-  for(int i=0; i<getNumOutputs(); ++i){
-    if(first) first=false;
-    else      cfile << ", ";
+  for(int i=0; i<n_o; ++i){
+    if(i+n_i!= 0) cfile << ",";
     cfile << "r[" << i << "]";
   }
+
   cfile << "); " << std::endl;
-  cfile << "return 0;" << std::endl;
+  cfile << "  return 0;" << std::endl;
   cfile << "}" << std::endl << std::endl;
   
   // Close the results file
   cfile.close();
 }
+
+template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index) const{
+  // Define function
+  stream << "void " << fname << "(";
+  bool first=true;
+  
+  // Declare inputs
+  for(int i=0; i<getNumInputs(); ++i){
+    if(first) first=false;
+    else      stream << ", ";
+    stream << input_type << " x" << i;
+  }
+
+  // Declare outputs
+  for(int i=0; i<getNumOutputs(); ++i){
+    if(first) first=false;
+    else      stream << ", ";
+    stream << output_type << " r" << i;
+  }
+  stream << "){ " << std::endl;
+  
+  // Insert the function body
+  generateBody(stream,type,sparsity_index);
+
+  // Finalize the function
+  stream << "}" << std::endl << std::endl;
+}
+
 
 } // namespace CasADi
 

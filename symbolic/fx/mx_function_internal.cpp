@@ -1123,9 +1123,54 @@ void MXFunctionInternal::allocTape(){
   }
 }
 
-void MXFunctionInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type) const{
-  stream << "#error MX_GENERATE_FUNCTION_NOT_IMPLEMENTED" << endl;
-  casadi_warning("Not implemented");
+void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index) const{
+  stream << "#error MX_GENERATE_FUNCTION_NOT_COMPLETED" << endl;
+  casadi_warning("Not ready for use");
+
+  // Dummy function name
+  int f=0;
+
+  // Codegen the algorithm
+  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+    if(it->op==OP_OUTPUT){
+      stream << "  casadi_copy_n(w.a" << it->arg.front() << "," << output(it->res.front()).size() << ",r" << it->res.front() << ");" << endl;
+    } else if(it->op==OP_INPUT){
+      stream << "  casadi_copy_n(x" << it->arg.front() << "," << input(it->arg.front()).size() << ",w.a" << it->res.front() << ");" << endl;
+    } else {
+      // Declare the function NOTE: Dummy function name
+      stream << "  f" << f++ << "(";
+      
+      // Pass input arguments
+      for(int i=0; i<it->arg.size(); ++i){
+	if(it->arg[i]>=0){
+	  stream << "w.a" << it->arg[i] << "," << "s" << findSparsity(work_[it->arg[i]].data.sparsity(),sparsity_index);
+	} else {
+	  stream << "0,0";
+	}
+	if(i+1<it->arg.size() + it->res.size()){
+	  stream << ", ";
+	}
+      }
+
+      // Add two spaces to facilitate debugging
+      stream << "  ";
+
+      // Pass output arguments
+      for(int i=0; i<it->res.size(); ++i){
+	if(it->res[i]>=0){
+	  stream << "w.a" << it->res[i] << "," << "s" << findSparsity(it->data->sparsity(i),sparsity_index);
+	} else {
+	  stream << "0,0";
+	}
+	if(i+1<it->res.size()){
+	  stream << ", ";
+	}
+      }
+
+      // Finish the operation
+      stream << ");" << endl;
+    }
+  }
 }
 
 void MXFunctionInternal::generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const{
@@ -1157,6 +1202,15 @@ void MXFunctionInternal::generateWork(std::ostream &stream) const{
 
   // Finalize work structure
   stream << "} w;" << endl;
+  stream << endl;
+}
+
+void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
+  stream << "inline void casadi_copy_n(const d* x, int n, d* r){" << endl;
+  stream << "  for(int i=0; i<n; ++i){" << endl;
+  stream << "    r[i] = x[i];" << endl;
+  stream << "  }" << endl;
+  stream << "}" << endl;
   stream << endl;
 }
 
