@@ -1102,22 +1102,25 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
 
 template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
 void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+  // Number of inpus and outputs
+  int n_in = getNumInputs();
+  int n_out = getNumOutputs();
+  
   // Define function
   stream << "void " << fname << "(";
-  bool first=true;
   
   // Declare inputs
-  for(int i=0; i<getNumInputs(); ++i){
-    if(first) first=false;
-    else      stream << ", ";
+  for(int i=0; i<n_in; ++i){
     stream << input_type << " x" << i;
+    if(i+1<n_in+n_out)
+      stream << ",";
   }
 
   // Declare outputs
-  for(int i=0; i<getNumOutputs(); ++i){
-    if(first) first=false;
-    else      stream << ", ";
+  for(int i=0; i<n_out; ++i){
     stream << output_type << " r" << i;
+    if(i+1<n_out)
+      stream << ",";
   }
   stream << "){ " << std::endl;
   
@@ -1125,7 +1128,68 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
   generateBody(stream,type,sparsity_index,dependent_index);
 
   // Finalize the function
-  stream << "}" << std::endl << std::endl;
+  stream << "}" << std::endl;
+  stream << std::endl;
+
+  // Also generate a buffered function
+  stream << "void " << fname << "_buffered(";
+  
+  // Declare inputs with sparsities
+  for(int i=0; i<n_in; ++i){
+    stream << input_type << " x" << i;
+    stream << ", const int* s_x" << i;
+    if(i+1<n_in+n_out)
+      stream << ",";
+  }
+
+  // Declare outputs
+  for(int i=0; i<n_out; ++i){
+    stream << output_type << " r" << i;
+    stream << ", const int* s_r" << i;
+    if(i+1<n_out)
+      stream << ",";
+  }
+  stream << "){ " << std::endl;
+  
+  // Declare input buffers
+  for(int i=0; i<n_in; ++i){
+    stream << "  d t_x" << i << "[" << findSparsity(input(i).sparsity(),sparsity_index) << "];" << std::endl;
+  }
+
+  // Declare output buffers
+  for(int i=0; i<n_out; ++i){
+    stream << "  d t_r" << i << "[" << findSparsity(output(i).sparsity(),sparsity_index) << "];" << std::endl;
+  }
+
+  // Copy inputs to buffers
+  for(int i=0; i<n_in; ++i){
+    stream << "  casadi_copy_sparse(x" << i << ",s_x" << i << ",t_x" << i << ",s" << findSparsity(input(i).sparsity(),sparsity_index) << ");" << std::endl;
+  }
+
+  // Pass inputs
+  stream << "  " << fname << "(";
+  for(int i=0; i<n_in; ++i){
+    stream << "t_x" << i;
+    if(i+1<n_in+n_out)
+      stream << ",";
+  }
+
+  // Pass output buffers
+  for(int i=0; i<n_out; ++i){
+    stream << "t_r" << i;
+    if(i+1<n_out)
+      stream << ",";
+  }
+  stream << "); " << std::endl;
+
+  // Get result from output buffers
+  for(int i=0; i<n_out; ++i){
+    stream << "  casadi_copy_sparse(t_r" << i << ",s" << findSparsity(output(i).sparsity(),sparsity_index) << ",r" << i << ",s_r" << i << ");" << std::endl;
+  }
+
+  // Finalize the function
+  stream << "}" << std::endl;
+  stream << std::endl;
 }
 
 

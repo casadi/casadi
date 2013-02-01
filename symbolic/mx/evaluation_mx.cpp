@@ -490,4 +490,43 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   }
 }
 
+void EvaluationMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+  
+  // Get the index of the function
+  int f = FXInternal::findDependent(fcn_,dependent_index);
+  stream << "  f" << f << "_buffered(";
+  
+  // Pass inputs to the function input buffers
+  for(int i=0; i<arg.size(); ++i){
+    // Pass argument to the function
+    stream << arg.at(i) << ",";
+    
+    // Pass argument sparsity to the function
+    int sp_i = FXInternal::findSparsity(dep(i).sparsity(),sparsity_index);
+    stream << "s" << sp_i;
+
+    // Separate with a space to visualize argument grouping
+    if(i+1<arg.size()+res.size()) stream << ", ";
+  }
+
+  // Separate arguments and results with two extra spaces
+  stream << "  ";
+
+  // Pass results to the function input buffers
+  for(int i=0; i<res.size(); ++i){
+    // Pass results buffer to the function
+    stream << res.at(i) << ",";
+    
+    // Pass argument sparsity to the function
+    int sp_i = FXInternal::findSparsity(sparsity(i),sparsity_index);
+    stream << "s" << sp_i;
+
+    // Separate with a space to visualize argument grouping
+    if(i+1<res.size()) stream << ", ";
+  }
+  
+  // Finalize the function call
+  stream << ");" << endl;  
+}
+
 } // namespace CasADi
