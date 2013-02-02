@@ -1146,7 +1146,7 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
       arg.front() = "x" + numToString(it->arg.front());
     } else {
       for(int i=0; i<it->arg.size(); ++i){
-	arg.at(i) = "w.a" + numToString(it->arg.front());
+	arg.at(i) = "w.a" + numToString(it->arg.at(i));
       }
     }
 
@@ -1156,7 +1156,7 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
       res.front() = "r" + numToString(it->res.front());
     } else {
       for(int i=0; i<it->res.size(); ++i){
-	res.at(i) = "w.a" + numToString(it->res.front());
+	res.at(i) = "w.a" + numToString(it->res.at(i));
       }
     }
 
