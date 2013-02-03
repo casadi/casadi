@@ -1496,10 +1496,10 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
     casadi_error("FXInternal::generateCode: generateCode not defined for class " << typeid(*this).name());
   }
 
-  void FXInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+  void FXInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const{
     casadi_error("FXInternal::generateFunction: generateFunction not defined for class " << typeid(*this).name());
   }
-  
+ 
   void FXInternal::generateIO(CodeGenerator& gen){
     // Short-hands
     int n_i = input_.size();

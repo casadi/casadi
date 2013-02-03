@@ -39,6 +39,12 @@ namespace CasADi{
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     int addSparsity(const CRSSparsity& sp);
 
+    /** \brief Get the index of an existing sparsity pattern */
+    int getSparsity(const CRSSparsity& sp) const;
+
+    /** \brief Add a dependent function */
+    int addDependent(const FX& f);
+
     /// Flush generated file to a stream
     void flush(std::ostream& s);
     
@@ -56,9 +62,6 @@ namespace CasADi{
 
     /** \brief Find an existing sparsity pattern */
     static int findSparsity(const CRSSparsity& sp, const std::map<const void*,int>& sparsity_index);
-
-    /** \brief Print a dependent function to stream */
-    static int printDependent(std::ostream &stream, const FX& f, const std::map<const void*,int>& sparsity_index, std::map<const void*,int>& dependent_index);
 
     /** \brief Find an existing dependent function */
     static int findDependent(const FX& f, const std::map<const void*,int>& dependent_index);

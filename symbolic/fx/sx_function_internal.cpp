@@ -1483,9 +1483,8 @@ void SXFunctionInternal::allocOpenCL(){
   ss << "__kernel ";
 
   // Generate the function
-  std::map<const void*,int> sparsity_index;
-  std::map<const void*,int> dependent_index;
-  generateFunction(ss, "evaluate", "__global const double*","__global double*","double",sparsity_index,dependent_index);
+  CodeGenerator gen;
+  generateFunction(ss, "evaluate", "__global const double*","__global double*","double",gen);
   
   // Form c-string
   std::string s = ss.str();

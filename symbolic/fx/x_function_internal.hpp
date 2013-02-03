@@ -107,7 +107,7 @@ class XFunctionInternal : public FXInternal{
     virtual void generateWork(std::ostream &stream) const{}
 
     /** \brief Generate code for the C functon */
-    virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;
+    virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
 
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const = 0;
@@ -1006,12 +1006,12 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   // Generate work array
   generateWork(gen.function_);
 
+  // Generate the actual function
+  generateFunction(gen.function_, "evaluate", "const d*","d*","d",gen);
+
   // Flush the code generator
   gen.flush(cfile);
   
-  // Generate the actual function
-  generateFunction(cfile, "evaluate", "const d*","d*","d",gen.added_sparsities_,gen.added_dependents_);
-
   // Define wrapper function
   cfile << "int evaluateWrap(const d** x, d** r){" << std::endl;
   cfile << "  evaluate(";
@@ -1042,7 +1042,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
 }
 
 template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const{
   // Number of inpus and outputs
   int n_in = getNumInputs();
   int n_out = getNumOutputs();
@@ -1066,7 +1066,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
   stream << "){ " << std::endl;
   
   // Insert the function body
-  generateBody(stream,type,sparsity_index,dependent_index);
+  generateBody(stream,type,gen.added_sparsities_,gen.added_dependents_);
 
   // Finalize the function
   stream << "}" << std::endl;
@@ -1104,7 +1104,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
 
   // Copy inputs to buffers
   for(int i=0; i<n_in; ++i){
-    stream << "  casadi_copy_sparse(x" << i << ",s_x" << i << ",t_x" << i << ",s" << CodeGenerator::findSparsity(input(i).sparsity(),sparsity_index) << ");" << std::endl;
+    stream << "  casadi_copy_sparse(x" << i << ",s_x" << i << ",t_x" << i << ",s" << gen.getSparsity(input(i).sparsity()) << ");" << std::endl;
   }
 
   // Pass inputs
@@ -1125,7 +1125,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
 
   // Get result from output buffers
   for(int i=0; i<n_out; ++i){
-    stream << "  casadi_copy_sparse(t_r" << i << ",s" << CodeGenerator::findSparsity(output(i).sparsity(),sparsity_index) << ",r" << i << ",s_r" << i << ");" << std::endl;
+    stream << "  casadi_copy_sparse(t_r" << i << ",s" << gen.getSparsity(output(i).sparsity()) << ",r" << i << ",s_r" << i << ");" << std::endl;
   }
 
   // Finalize the function

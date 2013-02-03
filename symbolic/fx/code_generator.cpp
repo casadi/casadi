@@ -107,16 +107,16 @@ int CodeGenerator::findSparsity(const CRSSparsity& sp, const std::map<const void
   return it->second;  
 }
 
-int CodeGenerator::printDependent(std::ostream &stream, const FX& f, const std::map<const void*,int>& sparsity_index, std::map<const void*,int>& dependent_index){
+int CodeGenerator::addDependent(const FX& f){
   // Get the current number of functions before looking for it
-  size_t num_f_before = dependent_index.size();
+  size_t num_f_before = added_dependents_.size();
 
   // Get index of the pattern
   const void* h = static_cast<const void*>(f.get());
-  int& ind = dependent_index[h];
+  int& ind = added_dependents_[h];
 
   // Generate it if it does not exist
-  if(dependent_index.size() > num_f_before){
+  if(added_dependents_.size() > num_f_before){
     // Add at the end
     ind = num_f_before;
           
@@ -125,7 +125,7 @@ int CodeGenerator::printDependent(std::ostream &stream, const FX& f, const std::
     name << "f" << ind;
     
     // Print to file
-    f->generateFunction(stream, name.str(), "const d*","d*","d",sparsity_index,dependent_index);
+    f->generateFunction(dependents_, name.str(), "const d*","d*","d",*this);
   }
 
   return ind;
@@ -195,6 +195,11 @@ int CodeGenerator::printSparsity(std::ostream &stream, const CRSSparsity& sp, st
   int CodeGenerator::addSparsity(const CRSSparsity& sp){
     printSparsity(sparsities_,sp,added_sparsities_);
   }
+
+  int CodeGenerator::getSparsity(const CRSSparsity& sp) const{
+    findSparsity(sp,added_sparsities_);
+  }
+
 
 } // namespace CasADi
 

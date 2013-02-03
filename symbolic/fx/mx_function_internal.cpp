@@ -1181,7 +1181,7 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
     // Generate code for the embedded functions
     for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
       if(it->op==OP_CALL){
-	CodeGenerator::printDependent(gen.dependents_,it->data->getFunction(),gen.added_sparsities_,gen.added_dependents_);
+	gen.addDependent(it->data->getFunction());
       }
     }
   }
