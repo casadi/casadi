@@ -111,9 +111,9 @@ void Multiplication::generateOperation(std::ostream &stream, const std::vector<s
   // Perform sparse matrix multiplication
   stream << "  casadi_mm_nt_sparse(";
   for(int i=0; i<2; ++i){
-    stream << arg.at(i) << ",s" << FXInternal::findSparsity(dep(i).sparsity(),sparsity_index) << ",";
+    stream << arg.at(i) << ",s" << CodeGenerator::findSparsity(dep(i).sparsity(),sparsity_index) << ",";
   }
-  stream << res.front() << ",s" << FXInternal::findSparsity(sparsity(),sparsity_index) << ");" << endl;
+  stream << res.front() << ",s" << CodeGenerator::findSparsity(sparsity(),sparsity_index) << ");" << endl;
 }
 
 

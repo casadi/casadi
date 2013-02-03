@@ -1143,20 +1143,20 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
     // Get the names of the operation arguments
     arg.resize(it->arg.size());
     if(it->op == OP_INPUT){
-      arg.front() = "x" + numToString(it->arg.front());
+      arg.front() = "x" + CodeGenerator::numToString(it->arg.front());
     } else {
       for(int i=0; i<it->arg.size(); ++i){
-	arg.at(i) = "w.a" + numToString(it->arg.at(i));
+	arg.at(i) = "w.a" + CodeGenerator::numToString(it->arg.at(i));
       }
     }
 
     // Get the names of the operation results
     res.resize(it->res.size());
     if(it->op == OP_OUTPUT){
-      res.front() = "r" + numToString(it->res.front());
+      res.front() = "r" + CodeGenerator::numToString(it->res.front());
     } else {
       for(int i=0; i<it->res.size(); ++i){
-	res.at(i) = "w.a" + numToString(it->res.at(i));
+	res.at(i) = "w.a" + CodeGenerator::numToString(it->res.at(i));
       }
     }
 
@@ -1174,7 +1174,7 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
 void MXFunctionInternal::generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const{  
   // Print all sparsity patterns in the intermediate variables
   for(int i=0; i<work_.size(); ++i){
-    printSparsity(stream,work_[i].data.sparsity(),sparsity_index);
+    CodeGenerator::printSparsity(stream,work_[i].data.sparsity(),sparsity_index);
   }
 
   // Also print the patterns in the embedded functions
@@ -1189,7 +1189,7 @@ void MXFunctionInternal::generateDependents(std::ostream &stream, const std::map
   // Generate code for the embedded functions
   for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     if(it->op==OP_CALL){
-      printDependent(stream,it->data->getFunction(),sparsity_index,dependent_index);
+      CodeGenerator::printDependent(stream,it->data->getFunction(),sparsity_index,dependent_index);
     }
   }
 }

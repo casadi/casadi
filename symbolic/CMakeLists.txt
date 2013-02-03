@@ -74,6 +74,7 @@ SET(CASADI_SRCS
   fx/sdp_solver.hpp          fx/sdp_solver.cpp          fx/sdp_solver_internal.hpp          fx/sdp_solver_internal.cpp
   fx/fx_tools.hpp            fx/fx_tools.cpp
   fx/xfunction_tools.hpp     fx/xfunction_tools.cpp
+  fx/code_generator.hpp      fx/code_generator.cpp
 
   # User include class with the most essential includes
   casadi.hpp
