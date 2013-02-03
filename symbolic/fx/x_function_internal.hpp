@@ -98,7 +98,7 @@ class XFunctionInternal : public FXInternal{
     virtual void generateCode(const std::string& filename);
 
     /** \brief Generate auxiliary functions */
-    virtual void generateAuxiliary(std::ostream &stream) const{}  
+    virtual void generateAuxiliary(CodeGenerator &gen) const{}  
 
     /** \brief Generate code for dependent functions */
     virtual void generateDependencies(CodeGenerator& gen) const{}
@@ -995,10 +995,10 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   generateIO(gen);
   
   // Declare auxiliary functions REMOVE
-  generateAuxiliary(gen.auxiliaries_);
+  generateAuxiliary(gen);
 
   // Quick-hack (should be somewhere else)
-  gen.generateCopySparse();
+  gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
   
   // Codegen the dependent functions REMOVE
   generateDependencies(gen);

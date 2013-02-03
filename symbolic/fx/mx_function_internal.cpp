@@ -1200,154 +1200,19 @@ void MXFunctionInternal::generateWork(std::ostream &stream) const{
   stream << endl;
 }
 
-void MXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
-  // BLAS Level 1
+void MXFunctionInternal::generateAuxiliary(CodeGenerator &gen) const{
+  gen.addAuxiliary(CodeGenerator::AUX_SWAP);
+  gen.addAuxiliary(CodeGenerator::AUX_SCAL);
+  gen.addAuxiliary(CodeGenerator::AUX_AXPY);
+  gen.addAuxiliary(CodeGenerator::AUX_DOT);
+  gen.addAuxiliary(CodeGenerator::AUX_NRM2);
+  gen.addAuxiliary(CodeGenerator::AUX_IAMAX);
+  gen.addAuxiliary(CodeGenerator::AUX_FILL);
+  gen.addAuxiliary(CodeGenerator::AUX_MM_NT_SPARSE);
 
-  // SWAP: x <-> y
-  stream << "inline void casadi_swap(int n, d* x, int inc_x, d* y, int inc_y){" << endl;
-  stream << "  d t;" << endl;
-  stream << "  int i;" << endl;
-  stream << "  for(i=0; i<n; ++i){" << endl;
-  stream << "    t = *x;" << endl;
-  stream << "    *x = *y;" << endl;
-  stream << "    *y = t;" << endl;
-  stream << "    x += inc_x;" << endl;
-  stream << "    y += inc_y;" << endl;
-  stream << "  }" << endl;
-  stream << "}" << endl;
-  stream << endl;
+  stringstream& stream = gen.auxiliaries_;
 
-  // SCAL: x <- alpha*x
-  stream << "inline void casadi_scal(int n, d alpha, d* x, int inc_x){" << endl;
-  stream << "  int i;" << endl;
-  stream << "  for(i=0; i<n; ++i){" << endl;
-  stream << "    *x *= alpha;" << endl;
-  stream << "    x += inc_x;" << endl;
-  stream << "  }" << endl;
-  stream << "}" << endl;
-  stream << endl;
 
-  // AXPY: y <- a*x + y
-  stream << "inline void casadi_axpy(int n, d alpha, const d* x, int inc_x, d* y, int inc_y){" << endl;
-  stream << "  int i;" << endl;
-  stream << "  for(i=0; i<n; ++i){" << endl;
-  stream << "    *y += alpha**x;" << endl;
-  stream << "    x += inc_x;" << endl;
-  stream << "    y += inc_y;" << endl;
-  stream << "  }" << endl;
-  stream << "}" << endl;
-  stream << endl;
-
-  // DOT: inner_prod(x,y) -> return
-  stream << "inline d casadi_dot(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
-  stream << "  d r = 0;" << endl;
-  stream << "  int i;" << endl;
-  stream << "  for(i=0; i<n; ++i){" << endl;
-  stream << "    r += *x**y;" << endl;
-  stream << "    x += inc_x;" << endl;
-  stream << "    y += inc_y;" << endl;
-  stream << "  }" << endl;
-  stream << "  return r;" << endl;
-  stream << "}" << endl;
-  stream << endl;
-
-  // NRM2: ||x||_2 -> return
-  stream << "inline d casadi_nrm2(int n, const d* x, int inc_x){" << endl;
-  stream << "  d r = 0;" << endl;
-  stream << "  int i;" << endl;
-  stream << "  for(i=0; i<n; ++i){" << endl;
-  stream << "    r += *x**x;" << endl;
-  stream << "    x += inc_x;" << endl;
-  stream << "  }" << endl;
-  stream << "  return sqrt(r);" << endl;
-  stream << "}" << endl;
-  stream << endl;
-
-  // ASUM: ||x||_1 -> return
-  stream << "inline d casadi_asum(int n, const d* x, int inc_x){" << endl;
-  stream << "  d r = 0;" << endl;
-  stream << "  int i;" << endl;
-  stream << "  for(i=0; i<n; ++i){" << endl;
-  stream << "    r += fabs(*x);" << endl;
-  stream << "    x += inc_x;" << endl;
-  stream << "  }" << endl;
-  stream << "  return r;" << endl;
-  stream << "}" << endl;
-  stream << endl;
-
-  // IAMAX: index corresponding to the entry with the largest absolute value 
-  stream << "inline int casadi_iamax(int n, const d* x, int inc_x){" << endl;
-  stream << "  d t;" << endl;
-  stream << "  d largest_value = -1.0;" << endl;
-  stream << "  int largest_index = -1;" << endl;
-  stream << "  int i;" << endl;
-  stream << "  for(i=0; i<n; ++i){" << endl;
-  stream << "    t = fabs(*x);" << endl;
-  stream << "    x += inc_x;" << endl;
-  stream << "    if(t>largest_value){" << endl;
-  stream << "      largest_value = t;" << endl;
-  stream << "      largest_index = i;" << endl;
-  stream << "    }" << endl;
-  stream << "  }" << endl;
-  stream << "  return largest_index;" << endl;
-  stream << "}" << endl;
-  stream << endl;
-
-  // MISC CasADi
-
-  // FILL: x <- alpha
-  stream << "inline void casadi_fill(int n, d alpha, d* x, int inc_x){" << endl;
-  stream << "  int i;" << endl;
-  stream << "  for(i=0; i<n; ++i){" << endl;
-  stream << "    *x = alpha;" << endl;
-  stream << "    x += inc_x;" << endl;
-  stream << "  }" << endl;
-  stream << "}" << endl;
-  stream << endl;
-
-  // Sparse matrix-matrix multiplication, the second argument is transposed: z <- z + x*y'
-  stream << "inline void casadi_mm_nt_sparse(const d* x, const int* sp_x, const d* trans_y, const int* sp_trans_y, d* z, const int* sp_z){" << std::endl;
-
-  stream << "  int nrow_x = sp_x[0];" << endl;
-  stream << "  int ncol_x = sp_x[1];" << endl;
-  stream << "  const int* rowind_x = sp_x+2;" << endl;
-  stream << "  const int* col_x = sp_x + 2 + nrow_x+1;" << endl;
-  //  stream << "  int nnz_x = rowind_x[nrow_x];" << endl;
-
-  stream << "  int ncol_y = sp_trans_y[0];" << endl;
-  stream << "  int nrow_y = sp_trans_y[1];" << endl;
-  stream << "  const int* colind_y = sp_trans_y+2;" << endl;
-  stream << "  const int* row_y = sp_trans_y + 2 + ncol_y+1;" << endl;
-  //  stream << "  int nnz_y = colind_y[ncol_y];" << endl;
-
-  stream << "  int nrow_z = sp_z[0];" << endl;
-  stream << "  int ncol_z = sp_z[1];" << endl;
-  stream << "  const int* rowind_z = sp_z+2;" << endl;
-  stream << "  const int* col_z = sp_z + 2 + nrow_z+1;" << endl;
-  //  stream << "  int nnz_z = rowind_z[nrow_z];" << endl;
-  
-  stream << "  int i;" << endl;
-  stream << "  for(i=0; i<nrow_z; ++i){" << endl;
-  stream << "    int el;" << endl;
-  stream << "    for(el=rowind_z[i]; el<rowind_z[i+1]; ++el){" << endl;
-  stream << "      int j = col_z[el];" << endl;
-  stream << "      int el1 = rowind_x[i];" << endl;
-  stream << "      int el2 = colind_y[j];" << endl;
-  stream << "      while(el1 < rowind_x[i+1] && el2 < colind_y[j+1]){ " << endl;
-  stream << "        int j1 = col_x[el1];" << endl;
-  stream << "        int i2 = row_y[el2];" << endl;
-  stream << "        if(j1==i2){" << endl;
-  stream << "          z[el] += x[el1++] * trans_y[el2++];" << endl;
-  stream << "        } else if(j1<i2) {" << endl;
-  stream << "          el1++;" << endl;
-  stream << "        } else {" << endl;
-  stream << "          el2++;" << endl;
-  stream << "        }" << endl;
-  stream << "      }" << endl;
-  stream << "    }" << endl;
-  stream << "  }" << endl;
-  stream << "}" << endl;
-  stream << endl;
 }
 
 } // namespace CasADi

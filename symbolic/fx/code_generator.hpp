@@ -48,19 +48,77 @@ namespace CasADi{
     /** \brief Get the index of an existing dependency */
     int getDependency(const FX& f) const;
 
+    /** \brief Auxiliary functions */
+    enum Auxiliary{
+      // BLAS Level 1
+      AUX_COPY,
+      AUX_SWAP,
+      AUX_SCAL,
+      AUX_AXPY,
+      AUX_DOT,
+      AUX_NRM2,
+      AUX_IAMAX,
+      AUX_FILL,
+      AUX_ASUM,
+
+      // Misc
+      AUX_SIGN,
+      AUX_MM_NT_SPARSE,
+      AUX_COPY_SPARSE
+    };
+    
+    /** \brief Add a built-in axiliary function */
+    void addAuxiliary(Auxiliary f);
+
     /// Flush generated file to a stream
     void flush(std::ostream& s);
     
-    /** \brief COPY sparse: y <- x, (see CRSSparsity::set) */
-    void generateCopySparse();
-
     /** Convert in integer to a string */
     static std::string numToString(int n);
 
     /** \brief  Print to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);
-  
+
+  private:
+
+    /// COPY: y <-x
+    void auxCopy();
+
+    /// SWAP: x <-> y
+    void auxSwap();
+    
+    // SCAL: x <- alpha*x
+    void auxScal();
+
+    // AXPY: y <- a*x + y
+    void auxAxpy();
+
+    // DOT: inner_prod(x,y) -> return
+    void auxDot();
+
+    // ASUM: ||x||_1 -> return
+    void auxAsum();
+
+    // IAMAX: index corresponding to the entry with the largest absolute value 
+    void auxIamax();
+
+    // NRM2: ||x||_2 -> return
+    void auxNrm2();
+
+    // FILL: x <- alpha
+    void auxFill();
+    
+    // Sparse matrix-matrix multiplication, the second argument is transposed: z <- z + x*y'
+    void auxMmNtSparse();
+
+    /// SIGN
+    void auxSign();
+
+    /// COPY sparse: y <- x
+    void auxCopySparse();
+
     //  private:
+  public:
     
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes_;
@@ -71,10 +129,9 @@ namespace CasADi{
     std::stringstream finalization_;
     
     // Set of already included header files
-    typedef std::set<std::string> StringSet;
     typedef std::map<const void*,int> PointerMap;
-    StringSet added_includes_;
-    StringSet added_auxiliaries_;
+    std::set<std::string> added_includes_;
+    std::set<Auxiliary> added_auxiliaries_;
     PointerMap added_sparsities_;
     PointerMap added_dependencies_;
 

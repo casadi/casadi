@@ -77,7 +77,7 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
 
     /** \brief Generate auxiliary functions */
-    virtual void generateAuxiliary(std::ostream &stream) const;
+    virtual void generateAuxiliary(CodeGenerator &gen) const;
 
     /** \brief Set the lifting function */
     void setLiftingFunction(LiftingFunction liftfun, void* user_data);

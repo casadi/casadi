@@ -341,10 +341,8 @@ void SXFunctionInternal::print(ostream &stream) const{
   }
 }
 
-void SXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
-  // The sign function
-  stream << "inline double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl;
-  stream << endl;
+void SXFunctionInternal::generateAuxiliary(CodeGenerator& gen) const{
+  gen.addAuxiliary(CodeGenerator::AUX_SIGN);
 }
 
 void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
