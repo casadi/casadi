@@ -145,11 +145,11 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Print to a c file */
     virtual void generateCode(const std::string& filename);
 
-    /** \brief Generate code for sparsity patterns */
-    virtual void generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const;
+    /** \brief Generate code for function inputs and outputs */
+    void generateIO(CodeGenerator& gen);
 
     /** \brief Generate code for dependent functions */
-    virtual void generateDependents(std::ostream &stream, const std::map<const void*,int>& sparsity_index, std::map<const void*,int>& dependent_index) const;
+    virtual void generateDependents(CodeGenerator& gen) const{}
 
     /** \brief Generate code for the C functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;

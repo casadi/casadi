@@ -27,72 +27,71 @@
 using namespace std;
 namespace CasADi{
   
-  CodeGenerator::CodeGenerator(std::ostream& s) : s_(s){
-  }
-  
-  void CodeGenerator::flush(){
-    s_ << includes_.str();
-    s_ << endl;
+  void CodeGenerator::flush(std::ostream& s){
+    s << includes_.str();
+    s << endl;
 
     // Space saving macro
-    s_ << "#define d double" << endl << endl;
+    s << "#define d double" << endl << endl;
     
-    s_ << auxiliaries_.str();
-    s_ << sparsities_.str();
-    s_ << dependents_.str();
-    s_ << function_.str();
-    s_ << finalization_.str();
+    s << auxiliaries_.str();
+    s << sparsities_.str();
+    s << dependents_.str();
+    s << function_.str();
+    s << finalization_.str();
   }
   
-void CodeGenerator::generateCopySparse(std::ostream &stream){
-  // COPY: y <- x
-  stream << "inline void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
-  stream << "  int i;" << endl;
-  stream << "  for(i=0; i<n; ++i){" << endl;
-  stream << "    *y = *x;" << endl;
-  stream << "    x += inc_x;" << endl;
-  stream << "    y += inc_y;" << endl;
-  stream << "  }" << endl;
-  stream << "}" << endl;
-  stream << endl;
+void CodeGenerator::generateCopySparse(){
+  stringstream& s = auxiliaries_;
 
-  stream << "inline void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y){" << endl;
-  stream << "  int nrow_x = sp_x[0];" << endl;
-  stream << "  int ncol_x = sp_x[1];" << endl;
-  stream << "  const int* rowind_x = sp_x+2;" << endl;
-  stream << "  const int* col_x = sp_x + 2 + nrow_x+1;" << endl;
-  stream << "  int nnz_x = rowind_x[nrow_x];" << endl;
-  stream << "  int nrow_y = sp_y[0];" << endl;
-  stream << "  int ncol_y = sp_y[1];" << endl;
-  stream << "  const int* rowind_y = sp_y+2;" << endl;
-  stream << "  const int* col_y = sp_y + 2 + nrow_y+1;" << endl;
-  stream << "  int nnz_y = rowind_y[nrow_y];" << endl;
-  stream << "  if(sp_x==sp_y){" << endl;
-  stream << "    casadi_copy(nnz_x,x,1,y,1);" << endl;
-  stream << "  } else {" << endl;
-  stream << "    int i;" << endl;
-  stream << "    for(i=0; i<nrow_x; ++i){" << endl;
-  stream << "      int el_x = rowind_x[i];" << endl;
-  stream << "      int el_x_end = rowind_x[i+1];" << endl;
-  stream << "      int j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
-  stream << "      int el_y;" << endl;
-  stream << "      for(el_y=rowind_y[i]; el_y!=rowind_y[i+1]; ++el_y){" << endl;
-  stream << "        int j=col_y[el_y];" << endl;
-  stream << "        while(j_x<j){" << endl;
-  stream << "          el_x++;" << endl;
-  stream << "          j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
-  stream << "        }" << endl;
-  stream << "        if(j_x==j){" << endl;
-  stream << "          y[el_y] = x[el_x++];" << endl;
-  stream << "          j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
-  stream << "        } else {" << endl;
-  stream << "          y[el_y] = 0;" << endl;
-  stream << "        }" << endl;
-  stream << "      }" << endl;
-  stream << "    }" << endl;
-  stream << "  }" << endl;
-  stream << "}" << endl;
-  stream << endl;
+  // COPY: y <- x
+  s << "inline void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
+  s << "  int i;" << endl;
+  s << "  for(i=0; i<n; ++i){" << endl;
+  s << "    *y = *x;" << endl;
+  s << "    x += inc_x;" << endl;
+  s << "    y += inc_y;" << endl;
+  s << "  }" << endl;
+  s << "}" << endl;
+  s << endl;
+
+  s << "inline void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y){" << endl;
+  s << "  int nrow_x = sp_x[0];" << endl;
+  s << "  int ncol_x = sp_x[1];" << endl;
+  s << "  const int* rowind_x = sp_x+2;" << endl;
+  s << "  const int* col_x = sp_x + 2 + nrow_x+1;" << endl;
+  s << "  int nnz_x = rowind_x[nrow_x];" << endl;
+  s << "  int nrow_y = sp_y[0];" << endl;
+  s << "  int ncol_y = sp_y[1];" << endl;
+  s << "  const int* rowind_y = sp_y+2;" << endl;
+  s << "  const int* col_y = sp_y + 2 + nrow_y+1;" << endl;
+  s << "  int nnz_y = rowind_y[nrow_y];" << endl;
+  s << "  if(sp_x==sp_y){" << endl;
+  s << "    casadi_copy(nnz_x,x,1,y,1);" << endl;
+  s << "  } else {" << endl;
+  s << "    int i;" << endl;
+  s << "    for(i=0; i<nrow_x; ++i){" << endl;
+  s << "      int el_x = rowind_x[i];" << endl;
+  s << "      int el_x_end = rowind_x[i+1];" << endl;
+  s << "      int j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
+  s << "      int el_y;" << endl;
+  s << "      for(el_y=rowind_y[i]; el_y!=rowind_y[i+1]; ++el_y){" << endl;
+  s << "        int j=col_y[el_y];" << endl;
+  s << "        while(j_x<j){" << endl;
+  s << "          el_x++;" << endl;
+  s << "          j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
+  s << "        }" << endl;
+  s << "        if(j_x==j){" << endl;
+  s << "          y[el_y] = x[el_x++];" << endl;
+  s << "          j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
+  s << "        } else {" << endl;
+  s << "          y[el_y] = 0;" << endl;
+  s << "        }" << endl;
+  s << "      }" << endl;
+  s << "    }" << endl;
+  s << "  }" << endl;
+  s << "}" << endl;
+  s << endl;
 }
 
 std::string CodeGenerator::numToString(int n){
@@ -196,8 +195,6 @@ int CodeGenerator::printSparsity(std::ostream &stream, const CRSSparsity& sp, st
   int CodeGenerator::addSparsity(const CRSSparsity& sp){
     printSparsity(sparsities_,sp,added_sparsities_);
   }
-
-
 
 } // namespace CasADi
 

@@ -33,20 +33,17 @@ namespace CasADi{
   class CodeGenerator{
   public:
 
-    /// Constructor
-    CodeGenerator(std::ostream& s);
-
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     void addInclude(const std::string& new_include, bool relative_path = false);
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
     int addSparsity(const CRSSparsity& sp);
 
-    /// Flush generated file to stream
-    void flush();
+    /// Flush generated file to a stream
+    void flush(std::ostream& s);
     
     /** \brief COPY sparse: y <- x, (see CRSSparsity::set) */
-    static void generateCopySparse(std::ostream &stream);
+    void generateCopySparse();
 
     /** Convert in integer to a string */
     static std::string numToString(int n);
@@ -68,9 +65,6 @@ namespace CasADi{
 
     //  private:
     
-    // Reference to the stream to which the code is to be flushed
-    std::ostream &s_;
-
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes_;
     std::stringstream auxiliaries_;
@@ -86,6 +80,7 @@ namespace CasADi{
     StringSet added_auxiliaries_;
     PointerMap added_sparsities_;
     PointerMap added_dependents_;
+
   };
   
   

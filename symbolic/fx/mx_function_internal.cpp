@@ -1171,28 +1171,20 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
   }
 }
 
-void MXFunctionInternal::generateSparsityPatterns(std::ostream &stream, std::map<const void*,int>& sparsity_index) const{  
-  // Print all sparsity patterns in the intermediate variables
-  for(int i=0; i<work_.size(); ++i){
-    CodeGenerator::printSparsity(stream,work_[i].data.sparsity(),sparsity_index);
-  }
+  void MXFunctionInternal::generateDependents(CodeGenerator& gen) const{
 
-  // Also print the patterns in the embedded functions
-  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-    if(it->op==OP_CALL){
-      it->data->getFunction()->generateSparsityPatterns(stream,sparsity_index);
+    // Add sparsity patterns in the intermediate variables
+    for(int i=0; i<work_.size(); ++i){
+      gen.addSparsity(work_[i].data.sparsity());
+    }
+    
+    // Generate code for the embedded functions
+    for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+      if(it->op==OP_CALL){
+	CodeGenerator::printDependent(gen.dependents_,it->data->getFunction(),gen.added_sparsities_,gen.added_dependents_);
+      }
     }
   }
-}
-
-void MXFunctionInternal::generateDependents(std::ostream &stream, const std::map<const void*,int>& sparsity_index, std::map<const void*,int>& dependent_index) const{
-  // Generate code for the embedded functions
-  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-    if(it->op==OP_CALL){
-      CodeGenerator::printDependent(stream,it->data->getFunction(),sparsity_index,dependent_index);
-    }
-  }
-}
 
 void MXFunctionInternal::generateWork(std::ostream &stream) const{
   // Data structure to hold intermediate variables
