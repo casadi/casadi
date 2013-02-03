@@ -103,7 +103,7 @@ void Multiplication::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, 
   DMatrix::mul_sparsity(*input[0],*input[1],*output[0],fwd);
 }
 
-void Multiplication::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+void Multiplication::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
   
   // Clear the result
   stream << "  casadi_fill(" << sparsity().size() << ",0.0," << res.front() << ",1);" << endl;
@@ -111,9 +111,9 @@ void Multiplication::generateOperation(std::ostream &stream, const std::vector<s
   // Perform sparse matrix multiplication
   stream << "  casadi_mm_nt_sparse(";
   for(int i=0; i<2; ++i){
-    stream << arg.at(i) << ",s" << CodeGenerator::findSparsity(dep(i).sparsity(),sparsity_index) << ",";
+    stream << arg.at(i) << ",s" << gen.getSparsity(dep(i).sparsity()) << ",";
   }
-  stream << res.front() << ",s" << CodeGenerator::findSparsity(sparsity(),sparsity_index) << ");" << endl;
+  stream << res.front() << ",s" << gen.getSparsity(sparsity()) << ");" << endl;
 }
 
 

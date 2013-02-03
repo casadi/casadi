@@ -91,7 +91,7 @@ void ConstantMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
   }
 }
 
-void ConstantMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+void ConstantMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
   // Print all nonzeros row by row
   for(int k=0; k<x_.size(); ++k){
     

@@ -640,7 +640,7 @@ bool Mapping::isTranspose() const{
   return true;
 }
 
-void Mapping::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+void Mapping::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
   // Loop over output nonzeros
   for(int k=0; k<output_sorted_.size(); ++k){
     

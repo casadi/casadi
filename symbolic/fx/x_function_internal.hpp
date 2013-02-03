@@ -101,7 +101,7 @@ class XFunctionInternal : public FXInternal{
     virtual void generateAuxiliary(std::ostream &stream) const{}  
 
     /** \brief Generate code for dependent functions */
-    virtual void generateDependents(CodeGenerator& gen) const{}
+    virtual void generateDependencies(CodeGenerator& gen) const{}
   
     /** \brief Generate work array */
     virtual void generateWork(std::ostream &stream) const{}
@@ -110,7 +110,7 @@ class XFunctionInternal : public FXInternal{
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const = 0;
+    virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const = 0;
 
     // Data members (all public)
     
@@ -1001,7 +1001,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   gen.generateCopySparse();
   
   // Codegen the dependent functions REMOVE
-  generateDependents(gen);
+  generateDependencies(gen);
 
   // Generate work array
   generateWork(gen.function_);
@@ -1066,7 +1066,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
   stream << "){ " << std::endl;
   
   // Insert the function body
-  generateBody(stream,type,gen.added_sparsities_,gen.added_dependents_);
+  generateBody(stream,type,gen);
 
   // Finalize the function
   stream << "}" << std::endl;

@@ -43,7 +43,10 @@ namespace CasADi{
     int getSparsity(const CRSSparsity& sp) const;
 
     /** \brief Add a dependent function */
-    int addDependent(const FX& f);
+    int addDependency(const FX& f);
+
+    /** \brief Get the index of an existing dependency */
+    int getDependency(const FX& f) const;
 
     /// Flush generated file to a stream
     void flush(std::ostream& s);
@@ -55,24 +58,15 @@ namespace CasADi{
     static std::string numToString(int n);
 
     /** \brief  Print to a c file */
-    static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
+    static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);
   
-    /** \brief Print a sparsity pattern to stream */
-    static int printSparsity(std::ostream &stream, const CRSSparsity& sp, std::map<const void*,int>& sparsity_index);
-
-    /** \brief Find an existing sparsity pattern */
-    static int findSparsity(const CRSSparsity& sp, const std::map<const void*,int>& sparsity_index);
-
-    /** \brief Find an existing dependent function */
-    static int findDependent(const FX& f, const std::map<const void*,int>& dependent_index);
-
     //  private:
     
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes_;
     std::stringstream auxiliaries_;
     std::stringstream sparsities_;
-    std::stringstream dependents_;
+    std::stringstream dependencies_;
     std::stringstream function_;
     std::stringstream finalization_;
     
@@ -82,7 +76,7 @@ namespace CasADi{
     StringSet added_includes_;
     StringSet added_auxiliaries_;
     PointerMap added_sparsities_;
-    PointerMap added_dependents_;
+    PointerMap added_dependencies_;
 
   };
   

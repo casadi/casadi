@@ -403,7 +403,7 @@ void SparseSparseOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, 
   }
 }
 
-void ScalarNonzerosOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+void ScalarNonzerosOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
   stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
   stream << res.at(0) << "[i]=";
   casadi_math<double>::printPre(op_,stream);
@@ -414,7 +414,7 @@ void ScalarNonzerosOp::generateOperation(std::ostream &stream, const std::vector
   stream << ";" << endl;
 }
 
-void NonzerosScalarOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+void NonzerosScalarOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
   stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
   stream << res.at(0) << "[i]=";
   casadi_math<double>::printPre(op_,stream);
@@ -425,7 +425,7 @@ void NonzerosScalarOp::generateOperation(std::ostream &stream, const std::vector
   stream << ";" << endl;
 }
 
-void NonzerosNonzerosOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+void NonzerosNonzerosOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
   stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
   stream << res.at(0) << "[i]=";
   casadi_math<double>::printPre(op_,stream);

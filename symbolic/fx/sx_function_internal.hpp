@@ -164,7 +164,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   virtual void updateNumSens(bool recursive);
 
   /** \brief Generate code for the body of the C function */
-  virtual void generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;
+  virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
 
   /** \brief Generate auxiliary functions */
   virtual void generateAuxiliary(std::ostream &stream) const;

@@ -66,7 +66,7 @@ public:
   virtual int getOp() const{ return op_;}
     
   /** \brief Generate code for the operation */
-  virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;
+  virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
   //! \brief operation
   Operation op_;

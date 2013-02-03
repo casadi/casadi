@@ -490,10 +490,10 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   }
 }
 
-void EvaluationMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+void EvaluationMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
   
   // Get the index of the function
-  int f = CodeGenerator::findDependent(fcn_,dependent_index);
+  int f = gen.getDependency(fcn_);
   stream << "  f" << f << "_buffered(";
   
   // Pass inputs to the function input buffers
@@ -502,7 +502,7 @@ void EvaluationMX::generateOperation(std::ostream &stream, const std::vector<std
     stream << arg.at(i) << ",";
     
     // Pass argument sparsity to the function
-    int sp_i = CodeGenerator::findSparsity(dep(i).sparsity(),sparsity_index);
+    int sp_i = gen.getSparsity(dep(i).sparsity());
     stream << "s" << sp_i;
 
     // Separate with a space to visualize argument grouping
@@ -518,7 +518,7 @@ void EvaluationMX::generateOperation(std::ostream &stream, const std::vector<std
     stream << res.at(i) << ",";
     
     // Pass argument sparsity to the function
-    int sp_i = CodeGenerator::findSparsity(sparsity(i),sparsity_index);
+    int sp_i = gen.getSparsity(sparsity(i));
     stream << "s" << sp_i;
 
     // Separate with a space to visualize argument grouping

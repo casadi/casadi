@@ -26,6 +26,7 @@
 #include "mx.hpp"
 #include "../sx/sx.hpp"
 #include "../casadi_math.hpp"
+#include "../fx/code_generator.hpp"
 #include <vector>
 #include <stack>
 
@@ -105,7 +106,7 @@ class MXNode : public SharedObjectNode{
     virtual void printPart(std::ostream &stream, int part) const = 0;
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
     
     /** \brief  Evaluate the function */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 

@@ -1123,7 +1123,7 @@ void MXFunctionInternal::allocTape(){
   }
 }
 
-void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
   casadi_warning("MX code generation is still experimental.");
 
   // Operation number (for printing)
@@ -1166,12 +1166,12 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
     } else if(it->op==OP_INPUT){
       stream << "  casadi_copy(" << input(it->arg.front()).size() << "," << arg.front() << ",1," << res.front() << ",1);" << endl;
     } else {
-      it->data->generateOperation(stream,arg,res,sparsity_index,dependent_index);
+      it->data->generateOperation(stream,arg,res,gen);
     }
   }
 }
 
-  void MXFunctionInternal::generateDependents(CodeGenerator& gen) const{
+  void MXFunctionInternal::generateDependencies(CodeGenerator& gen) const{
 
     // Add sparsity patterns in the intermediate variables
     for(int i=0; i<work_.size(); ++i){
@@ -1181,7 +1181,7 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
     // Generate code for the embedded functions
     for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
       if(it->op==OP_CALL){
-	gen.addDependent(it->data->getFunction());
+	gen.addDependency(it->data->getFunction());
       }
     }
   }

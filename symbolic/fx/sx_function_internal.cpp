@@ -347,7 +347,7 @@ void SXFunctionInternal::generateAuxiliary(std::ostream &stream) const{
   stream << endl;
 }
 
-void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, const std::map<const void*,int>& sparsity_index, const std::map<const void*,int>& dependent_index) const{
+void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
   // Which variables have been declared
   vector<bool> declared(work_.size(),false);
  
