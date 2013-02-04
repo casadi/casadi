@@ -1160,6 +1160,11 @@ Matrix<T> Matrix<T>::if_else_zero(const Matrix<T>& y) const{
 }
 
 template<class T>
+Matrix<T> Matrix<T>::lift() const{
+  return unary(OP_LIFT,*this);
+}
+
+template<class T>
 std::vector<T>& Matrix<T>::data(){
   return data_;  
 }
