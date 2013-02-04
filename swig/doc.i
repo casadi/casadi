@@ -1442,12 +1442,12 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")
-CasADi::AcadoIntegratorInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::AcadoIntegratorInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::generateDependents "
+%feature("docstring")  CasADi::AcadoIntegratorInternal::generateDependencies
+"
 
 Generate code for dependent functions. ";
 
@@ -2847,11 +2847,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::AcadoOCPInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::generateDependents "
+%feature("docstring")  CasADi::AcadoOCPInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -4755,11 +4755,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::CFunctionInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::CFunctionInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::CFunctionInternal::generateDependents "
+%feature("docstring")  CasADi::CFunctionInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -4990,6 +4990,41 @@ Assert that the object has been initialized. ";
 %feature("docstring")  CasADi::CFunctionInternal::weak "
 
 Get a weak reference to the object. ";
+
+
+// File: classCasADi_1_1CodeGenerator.xml
+%feature("docstring") CasADi::CodeGenerator "C++ includes:
+code_generator.hpp ";
+
+%feature("docstring")  CasADi::CodeGenerator::addInclude "
+
+Add an include file optionally using a relative path \"...\" instead of an
+absolute path <...> ";
+
+%feature("docstring")  CasADi::CodeGenerator::addSparsity "
+
+Add an include file optionally using a relative path \"...\" instead of an
+absolute path <...> ";
+
+%feature("docstring")  CasADi::CodeGenerator::getSparsity "
+
+Get the index of an existing sparsity pattern. ";
+
+%feature("docstring")  CasADi::CodeGenerator::addDependency "
+
+Add a dependent function. ";
+
+%feature("docstring")  CasADi::CodeGenerator::getDependency "
+
+Get the index of an existing dependency. ";
+
+%feature("docstring")  CasADi::CodeGenerator::addAuxiliary "
+
+Add a built-in axiliary function. ";
+
+%feature("docstring")  CasADi::CodeGenerator::flush "
+
+Flush generated file to a stream. ";
 
 
 // File: classCasADi_1_1CollocationIntegrator.xml
@@ -6494,13 +6529,12 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")
-CasADi::CollocationIntegratorInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::CollocationIntegratorInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
 %feature("docstring")
-CasADi::CollocationIntegratorInternal::generateDependents "
+CasADi::CollocationIntegratorInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -8433,13 +8467,12 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
+%feature("docstring")  CasADi::ControlSimulatorInternal::generateIO "
+
+Generate code for function inputs and outputs. ";
+
 %feature("docstring")
-CasADi::ControlSimulatorInternal::generateSparsityPatterns "
-
-Generate code for sparsity patterns. ";
-
-%feature("docstring")  CasADi::ControlSimulatorInternal::generateDependents
-"
+CasADi::ControlSimulatorInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -9120,11 +9153,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::CplexInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::CplexInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::CplexInternal::generateDependents "
+%feature("docstring")  CasADi::CplexInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -12080,11 +12113,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::CSparseInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::CSparseInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::CSparseInternal::generateDependents "
+%feature("docstring")  CasADi::CSparseInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -14330,11 +14363,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::CVodesInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::CVodesInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::CVodesInternal::generateDependents "
+%feature("docstring")  CasADi::CVodesInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -15847,12 +15880,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::DerivativeInternal::generateSparsityPatterns
-"
+%feature("docstring")  CasADi::DerivativeInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::DerivativeInternal::generateDependents "
+%feature("docstring")  CasADi::DerivativeInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -17332,13 +17364,12 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
+%feature("docstring")  CasADi::DirectCollocationInternal::generateIO "
+
+Generate code for function inputs and outputs. ";
+
 %feature("docstring")
-CasADi::DirectCollocationInternal::generateSparsityPatterns "
-
-Generate code for sparsity patterns. ";
-
-%feature("docstring")  CasADi::DirectCollocationInternal::generateDependents
-"
+CasADi::DirectCollocationInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -18920,13 +18951,12 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")
-CasADi::DirectMultipleShootingInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
 %feature("docstring")
-CasADi::DirectMultipleShootingInternal::generateDependents "
+CasADi::DirectMultipleShootingInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -20510,13 +20540,12 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")
-CasADi::DirectSingleShootingInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::DirectSingleShootingInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
 %feature("docstring")
-CasADi::DirectSingleShootingInternal::generateDependents "
+CasADi::DirectSingleShootingInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -21245,11 +21274,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::DSDPInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::DSDPInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::DSDPInternal::generateDependents "
+%feature("docstring")  CasADi::DSDPInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -23617,13 +23646,12 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
+%feature("docstring")  CasADi::ExternalFunctionInternal::generateIO "
+
+Generate code for function inputs and outputs. ";
+
 %feature("docstring")
-CasADi::ExternalFunctionInternal::generateSparsityPatterns "
-
-Generate code for sparsity patterns. ";
-
-%feature("docstring")  CasADi::ExternalFunctionInternal::generateDependents
-"
+CasADi::ExternalFunctionInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -25317,11 +25345,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::FXInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::FXInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::FXInternal::generateDependents "
+%feature("docstring")  CasADi::FXInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -28152,11 +28180,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::IdasInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::IdasInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::IdasInternal::generateDependents "
+%feature("docstring")  CasADi::IdasInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -29502,13 +29530,12 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
+%feature("docstring")  CasADi::ImplicitFunctionInternal::generateIO "
+
+Generate code for function inputs and outputs. ";
+
 %feature("docstring")
-CasADi::ImplicitFunctionInternal::generateSparsityPatterns "
-
-Generate code for sparsity patterns. ";
-
-%feature("docstring")  CasADi::ImplicitFunctionInternal::generateDependents
-"
+CasADi::ImplicitFunctionInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -31295,12 +31322,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::generateSparsityPatterns
-"
+%feature("docstring")  CasADi::IntegratorInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::generateDependents "
+%feature("docstring")  CasADi::IntegratorInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -32021,11 +32047,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::IPInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::IPInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::IPInternal::generateDependents "
+%feature("docstring")  CasADi::IPInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -36350,11 +36376,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::IpoptInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::IpoptInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::IpoptInternal::generateDependents "
+%feature("docstring")  CasADi::IpoptInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -40735,11 +40761,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::KinsolInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::KinsolInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::KinsolInternal::generateDependents "
+%feature("docstring")  CasADi::KinsolInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -42566,11 +42592,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::KnitroInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::KnitroInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::KnitroInternal::generateDependents "
+%feature("docstring")  CasADi::KnitroInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -44960,12 +44986,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")
-CasADi::LapackLUDenseInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::LapackLUDenseInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::LapackLUDenseInternal::generateDependents "
+%feature("docstring")  CasADi::LapackLUDenseInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -46313,12 +46338,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")
-CasADi::LapackQRDenseInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::LapackQRDenseInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::LapackQRDenseInternal::generateDependents "
+%feature("docstring")  CasADi::LapackQRDenseInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -48106,11 +48130,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::LiftedSQPInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::generateDependents "
+%feature("docstring")  CasADi::LiftedSQPInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -48835,11 +48859,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::LiftoptInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::LiftoptInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::LiftoptInternal::generateDependents "
+%feature("docstring")  CasADi::LiftoptInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -51053,12 +51077,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")
-CasADi::LinearSolverInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::LinearSolverInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::LinearSolverInternal::generateDependents "
+%feature("docstring")  CasADi::LinearSolverInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -55149,12 +55172,7 @@ Initialize. ";
 Update the number of sensitivity directions during or after initialization.
 ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::generateSparsityPatterns
-"
-
-Generate code for sparsity patterns. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::generateDependents "
+%feature("docstring")  CasADi::MXFunctionInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -55279,6 +55297,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::MXFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::generateIO "
+
+Generate code for function inputs and outputs. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::iStruct "
 
@@ -56218,12 +56240,12 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")
-CasADi::NewtonImplicitInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::NewtonImplicitInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::NewtonImplicitInternal::generateDependents "
+%feature("docstring")  CasADi::NewtonImplicitInternal::generateDependencies
+"
 
 Generate code for dependent functions. ";
 
@@ -57646,12 +57668,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::NLPImplicitInternal::generateSparsityPatterns
-"
+%feature("docstring")  CasADi::NLPImplicitInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::NLPImplicitInternal::generateDependents "
+%feature("docstring")  CasADi::NLPImplicitInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -59052,11 +59073,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::NLPQPInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::NLPQPInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::NLPQPInternal::generateDependents "
+%feature("docstring")  CasADi::NLPQPInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -61438,11 +61459,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::NLPSolverInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::generateDependents "
+%feature("docstring")  CasADi::NLPSolverInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -64394,11 +64415,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::OCPSolverInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::generateDependents "
+%feature("docstring")  CasADi::OCPSolverInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -65142,11 +65163,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::OOQPInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::OOQPInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::OOQPInternal::generateDependents "
+%feature("docstring")  CasADi::OOQPInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -67821,12 +67842,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")
-CasADi::ParallelizerInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::ParallelizerInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::generateDependents "
+%feature("docstring")  CasADi::ParallelizerInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -68493,11 +68513,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::QPOasesInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::QPOasesInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::QPOasesInternal::generateDependents "
+%feature("docstring")  CasADi::QPOasesInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -70664,11 +70684,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::QPSolverInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::QPSolverInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::QPSolverInternal::generateDependents "
+%feature("docstring")  CasADi::QPSolverInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -72342,12 +72362,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")
-CasADi::RKIntegratorInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::RKIntegratorInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::generateDependents "
+%feature("docstring")  CasADi::RKIntegratorInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -74007,11 +74026,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::SDPSolverInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::SDPSolverInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::SDPSolverInternal::generateDependents "
+%feature("docstring")  CasADi::SDPSolverInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -75577,11 +75596,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::SimulatorInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::SimulatorInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::SimulatorInternal::generateDependents "
+%feature("docstring")  CasADi::SimulatorInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -76938,11 +76957,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::SQPInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::SQPInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::SQPInternal::generateDependents "
+%feature("docstring")  CasADi::SQPInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -79979,11 +79998,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::SundialsInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::SundialsInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::SundialsInternal::generateDependents "
+%feature("docstring")  CasADi::SundialsInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -81782,12 +81801,7 @@ Symbolic expressions for the adjoint seeds. ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::generateSparsityPatterns
-"
-
-Generate code for sparsity patterns. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::generateDependents "
+%feature("docstring")  CasADi::SXFunctionInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -81818,6 +81832,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::SXFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::generateIO "
+
+Generate code for function inputs and outputs. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::iStruct "
 
@@ -84932,11 +84950,11 @@ Call a function, SX type (overloaded) ";
 
 Print to a c file. ";
 
-%feature("docstring")  CasADi::WorhpInternal::generateSparsityPatterns "
+%feature("docstring")  CasADi::WorhpInternal::generateIO "
 
-Generate code for sparsity patterns. ";
+Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::WorhpInternal::generateDependents "
+%feature("docstring")  CasADi::WorhpInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -87128,11 +87146,7 @@ Print to a c file. ";
 
 Generate auxiliary functions. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::generateSparsityPatterns "
-
-Generate code for sparsity patterns. ";
-
-%feature("docstring")  CasADi::XFunctionInternal::generateDependents "
+%feature("docstring")  CasADi::XFunctionInternal::generateDependencies "
 
 Generate code for dependent functions. ";
 
@@ -87200,6 +87214,10 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::XFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::XFunctionInternal::generateIO "
+
+Generate code for function inputs and outputs. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::iStruct "
 
@@ -90250,10 +90268,13 @@ h:  internal expressions which the user may wish to inspect ";
 // File: casadi__options_8hpp.xml
 
 
-// File: casadi__types_8cpp.xml
-
-
 // File: casadi__types_8hpp.xml
+
+
+// File: code__generator_8cpp.xml
+
+
+// File: code__generator_8hpp.xml
 
 
 // File: collocation__integrator_8cpp.xml
