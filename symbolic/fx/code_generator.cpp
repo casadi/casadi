@@ -27,7 +27,7 @@
 using namespace std;
 namespace CasADi{
   
-  void CodeGenerator::flush(std::ostream& s){
+  void CodeGenerator::flush(std::ostream& s) const{
     s << includes_.str();
     s << endl;
 

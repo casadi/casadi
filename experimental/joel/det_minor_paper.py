@@ -22,6 +22,9 @@
 from casadi import *
 from time import *
 import numpy as NP
+from os import system
+import sys
+
 
 # Calculates the determinant by minor expansion
 def f(A):
@@ -47,15 +50,15 @@ check_sx_oo = True
 check_sx_sct = False
 check_mx_oo = False
 check_mx_sx_oo = False
+check_mx_sx_sct = True
 
 # Check scalar representation
 if check_sx_oo:
   print "SX OO"
-  for n in range(5,11):
+  for n in range(5,10):
     # Create function
     x = ssym("X",n,n)
     F = SXFunction([x],[f(x)])
-    F.setOption("live_variables",True)
     F.init()
     
     # Calculate gradient
@@ -158,3 +161,41 @@ if check_mx_sx_oo:
 #X = msym("X",2,2)
 #print "f(X) = ", f(X)
 
+# Check matrix representation
+if check_mx_sx_sct:
+  print "MX+SX SCT"
+  for n in range(n_small,10):
+    # Create function
+    x = msym("X",n,n)
+    F = MXFunction([x],[f_mod(x)])
+    F.init()
+    
+    # Form the gradient
+    GF = F.gradient()
+    GF.init()
+
+    # Generate c-code for the gradient
+    fname = "grad_det_mx" + str(n)
+    cname = fname + ".c"    
+    GF.generateCode(fname+".c")
+    print "Generated ", cname
+
+    # Compile the c-code to a DLL
+    dllname = fname + ".so"
+    system("gcc -fPIC -shared " + cname + " -o " + dllname)
+    print "Compiled ", dllname
+
+    # Load the DLL
+    GFE = ExternalFunction("./" + dllname)
+    GFE.init()
+    print "Loaded ", dllname
+
+    # Calculate gradient
+    GFE.setInput(x0[n])
+    print "starting evaluation "
+    t1 = time()
+    n_repeats = 100
+    for _ in range(n_repeats):
+      GFE.evaluate()
+    t2 = time()
+    print n, ": ", (t2-t1)/n_repeats, " s, ", GFE.output()

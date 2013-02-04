@@ -1104,7 +1104,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
 
   // Copy inputs to buffers
   for(int i=0; i<n_in; ++i){
-    stream << "  casadi_copy_sparse(x" << i << ",s_x" << i << ",t_x" << i << ",s" << gen.getSparsity(input(i).sparsity()) << ");" << std::endl;
+    stream << "  if(x" << i << "!=0) casadi_copy_sparse(x" << i << ",s_x" << i << ",t_x" << i << ",s" << gen.addSparsity(input(i).sparsity()) << ");" << std::endl;
   }
 
   // Pass inputs
@@ -1125,7 +1125,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
 
   // Get result from output buffers
   for(int i=0; i<n_out; ++i){
-    stream << "  casadi_copy_sparse(t_r" << i << ",s" << gen.getSparsity(output(i).sparsity()) << ",r" << i << ",s_r" << i << ");" << std::endl;
+    stream << "  if(r" << i << "!=0) casadi_copy_sparse(t_r" << i << ",s" << gen.addSparsity(output(i).sparsity()) << ",r" << i << ",s_r" << i << ");" << std::endl;
   }
 
   // Finalize the function

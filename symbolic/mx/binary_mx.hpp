@@ -77,6 +77,9 @@ class SparseSparseOp : public BinaryMX{
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+
     //! \brief Which argument for each nonzero
     std::vector<unsigned char> mapping_;
 };

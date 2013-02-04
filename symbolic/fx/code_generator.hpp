@@ -71,7 +71,7 @@ namespace CasADi{
     void addAuxiliary(Auxiliary f);
 
     /// Flush generated file to a stream
-    void flush(std::ostream& s);
+    void flush(std::ostream& s) const;
     
     /** Convert in integer to a string */
     static std::string numToString(int n);
