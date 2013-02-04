@@ -42,11 +42,12 @@ def f(A):
     else:           R -= A[i,0]*f(M)
   return R
 
+
 # Random matrices of different sizes
 x0 = list(NP.random.rand(n,n) for n in range(15))
 
 # What to check
-check_sx_oo = True
+check_sx_oo = False
 check_sx_sct = False
 check_mx_oo = False
 check_mx_sx_oo = False
@@ -112,16 +113,16 @@ if check_mx_oo:
     print n, ": ", (t2-t1)/n_repeats, " s, ", F.adjSens()
 
 # Create a function for calculating the determinant of a "small" matrix
-n_small = 7
+n_small = 5
 x_small = ssym("x",n_small,n_small)
 F_small = SXFunction([x_small],[f(x_small)])
 F_small.init()
 
 # Calculates the determinant by minor expansion
-def f_mod(A):
+def f_mod(A,n_min,F_min):
   n = A.shape[0]    # Number of rows
-  if n==n_small:
-    [d] = F_small.call([A]) # Create a function call
+  if n==n_min:
+    [d] = F_min.call([A]) # Create a function call
     return d
   
   # Expand along the first column
@@ -131,17 +132,17 @@ def f_mod(A):
     M = A[range(i)+range(i+1,n),1:,]
     
     # Add/subtract the minor
-    if i % 2 == 0:  R += A[i,0]*f_mod(M)
-    else:           R -= A[i,0]*f_mod(M)
+    if i % 2 == 0:  R += A[i,0]*f_mod(M,n_min,F_min)
+    else:           R -= A[i,0]*f_mod(M,n_min,F_min)
   return R
-    
+
 # Check matrix representation
 if check_mx_sx_oo:
   print "MX+SX OO"
   for n in range(n_small,12):
     # Create function
     x = msym("X",n,n)
-    F = MXFunction([x],[f_mod(x)])
+    F = MXFunction([x],[f_mod(x,n_small,F_small)])
     F.init()
     
     # Calculate gradient
@@ -164,11 +165,20 @@ if check_mx_sx_oo:
 # Check matrix representation
 if check_mx_sx_sct:
   print "MX+SX SCT"
-  for n in range(n_small,10):
+  FF = [F_small]
+  for n in range(n_small+1,10):
     # Create function
+
+    print FF
+    print "last n = ", FF[-1].input().size()
+    print "n = ", n
+    
     x = msym("X",n,n)
-    F = MXFunction([x],[f_mod(x)])
+    F = MXFunction([x],[f_mod(x,n-1,FF[-1])])
     F.init()
+    FF.append(F)
+
+    
     
     # Form the gradient
     GF = F.gradient()

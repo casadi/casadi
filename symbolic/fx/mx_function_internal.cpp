@@ -1150,7 +1150,6 @@ void MXFunctionInternal::allocTape(){
   }
 
   void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
-    casadi_warning("MX code generation is still experimental.");
     
     // Data structure to hold intermediate variables
     stream << "  struct wstruct{" << endl;
