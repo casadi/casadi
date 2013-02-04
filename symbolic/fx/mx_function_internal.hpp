@@ -76,6 +76,9 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     /** \brief Set the lifting function */
     void setLiftingFunction(LiftingFunction liftfun, void* user_data);
 
+    /** \brief Extract the residual function G and the modified function Z out of an expression (see Albersmeyer2010 paper) */
+    void generateLiftingFunctions(MXFunction& F, MXFunction& G, MXFunction& Z);
+			       
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
     virtual FX getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
     
