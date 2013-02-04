@@ -47,7 +47,7 @@ def f(A):
 x0 = list(NP.random.rand(n,n) for n in range(15))
 
 # What to check
-check_sx_oo = False
+check_sx_oo = True
 check_sx_sct = False
 check_mx_oo = False
 check_mx_sx_oo = False
@@ -168,17 +168,10 @@ if check_mx_sx_sct:
   FF = [F_small]
   for n in range(n_small+1,10):
     # Create function
-
-    print FF
-    print "last n = ", FF[-1].input().size()
-    print "n = ", n
-    
     x = msym("X",n,n)
     F = MXFunction([x],[f_mod(x,n-1,FF[-1])])
     F.init()
     FF.append(F)
-
-    
     
     # Form the gradient
     GF = F.gradient()
