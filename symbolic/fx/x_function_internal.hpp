@@ -97,15 +97,6 @@ class XFunctionInternal : public FXInternal{
     /** \brief  Print to a c file */
     virtual void generateCode(const std::string& filename);
 
-    /** \brief Generate auxiliary functions */
-    virtual void generateAuxiliary(CodeGenerator &gen) const{}  
-
-    /** \brief Generate code for dependent functions */
-    virtual void generateDependencies(CodeGenerator& gen) const{}
-  
-    /** \brief Generate work array */
-    virtual void generateWork(std::ostream &stream) const{}
-
     /** \brief Generate code for the C functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
 
@@ -994,18 +985,6 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   // Generate function inputs and outputs information
   generateIO(gen);
   
-  // Declare auxiliary functions REMOVE
-  generateAuxiliary(gen);
-
-  // Quick-hack (should be somewhere else)
-  gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
-  
-  // Codegen the dependent functions REMOVE
-  generateDependencies(gen);
-
-  // Generate work array
-  generateWork(gen.function_);
-
   // Generate the actual function
   generateFunction(gen.function_, "evaluate", "const d*","d*","d",gen);
 

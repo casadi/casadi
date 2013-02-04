@@ -341,9 +341,13 @@ void SXFunctionInternal::print(ostream &stream) const{
   }
 }
 
-void SXFunctionInternal::generateAuxiliary(CodeGenerator& gen) const{
-  gen.addAuxiliary(CodeGenerator::AUX_SIGN);
-}
+  void SXFunctionInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const{
+    // Add auxiliaries. TODO: Only add the auxiliaries that are actually used
+    gen.addAuxiliary(CodeGenerator::AUX_SIGN);
+    
+    // Call the base class
+    XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>::generateFunction(stream,fname,input_type,output_type,type,gen);
+  }
 
 void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
   // Which variables have been declared

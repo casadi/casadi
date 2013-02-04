@@ -148,9 +148,6 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief Generate code for function inputs and outputs */
     void generateIO(CodeGenerator& gen);
 
-    /** \brief Generate code for dependent functions */
-    virtual void generateDependencies(CodeGenerator& gen) const{}
-
     /** \brief Generate code for the C functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
       

@@ -1123,63 +1123,18 @@ void MXFunctionInternal::allocTape(){
   }
 }
 
-void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
-  casadi_warning("MX code generation is still experimental.");
-
-  // Operation number (for printing)
-  int k=0;
-
-  // Names of operation argument and results
-  vector<string> arg,res;
-
-  // Codegen a temporary variable
-  stream << "  int i;" << endl;
-
-  // Codegen the algorithm
-  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-    // Mark the beginning of the operation
-    stream << "  /* " << k++ << " */" << endl; 
-
-    // Get the names of the operation arguments
-    arg.resize(it->arg.size());
-    if(it->op == OP_INPUT){
-      arg.front() = "x" + CodeGenerator::numToString(it->arg.front());
-    } else {
-      for(int i=0; i<it->arg.size(); ++i){
-	if(it->arg.at(i)>=0){
-	  arg.at(i) = "w.a" + CodeGenerator::numToString(it->arg.at(i));
-	} else {
-	  arg.at(i) = "0";
-	}
-      }
-    }
-
-    // Get the names of the operation results
-    res.resize(it->res.size());
-    if(it->op == OP_OUTPUT){
-      res.front() = "r" + CodeGenerator::numToString(it->res.front());
-    } else {
-      for(int i=0; i<it->res.size(); ++i){
-	if(it->res.at(i)>=0){
-	  res.at(i) = "w.a" + CodeGenerator::numToString(it->res.at(i));
-	} else {
-	  res.at(i) = "0";
-	}
-      }
-    }
-
-    // Print the operation
-    if(it->op==OP_OUTPUT){
-      stream << "  casadi_copy(" << output(it->res.front()).size() << "," <<  arg.front() << ",1," << res.front() << ",1);" << endl;
-    } else if(it->op==OP_INPUT){
-      stream << "  casadi_copy(" << input(it->arg.front()).size() << "," << arg.front() << ",1," << res.front() << ",1);" << endl;
-    } else {
-      it->data->generateOperation(stream,arg,res,gen);
-    }
-  }
-}
-
-  void MXFunctionInternal::generateDependencies(CodeGenerator& gen) const{
+  void MXFunctionInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const{
+    
+    // Add auxiliaries. TODO: Only add the auxiliaries that are actually used
+    gen.addAuxiliary(CodeGenerator::AUX_SWAP);
+    gen.addAuxiliary(CodeGenerator::AUX_SCAL);
+    gen.addAuxiliary(CodeGenerator::AUX_AXPY);
+    gen.addAuxiliary(CodeGenerator::AUX_DOT);
+    gen.addAuxiliary(CodeGenerator::AUX_NRM2);
+    gen.addAuxiliary(CodeGenerator::AUX_IAMAX);
+    gen.addAuxiliary(CodeGenerator::AUX_FILL);
+    gen.addAuxiliary(CodeGenerator::AUX_MM_NT_SPARSE);
+    gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
 
     // Add sparsity patterns in the intermediate variables
     for(int i=0; i<work_.size(); ++i){
@@ -1192,36 +1147,79 @@ void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
 	gen.addDependency(it->data->getFunction());
       }
     }
+
+    // Call the base class
+    XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>::generateFunction(stream,fname,input_type,output_type,type,gen);
   }
 
-void MXFunctionInternal::generateWork(std::ostream &stream) const{
-  // Data structure to hold intermediate variables
-  stream << "struct wstruct{" << endl;
+  void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
+    casadi_warning("MX code generation is still experimental.");
+    
+    // Data structure to hold intermediate variables
+    stream << "  struct wstruct{" << endl;
+    
+    // Declare all work variables
+    for(int i=0; i<work_.size(); ++i){
+      stream << "    d a" << i << "[" << work_[i].data.size() << "];" << endl;
+    }
+    
+    // Finalize work structure
+    stream << "  } w;" << endl;
+    stream << endl;
 
-  // Declare all work variables
-  for(int i=0; i<work_.size(); ++i){
-    stream << "  d a" << i << "[" << work_[i].data.size() << "];" << endl;
+    // Operation number (for printing)
+    int k=0;
+    
+    // Names of operation argument and results
+    vector<string> arg,res;
+    
+    // Codegen a temporary variable
+    stream << "  int i;" << endl;
+    
+    // Codegen the algorithm
+    for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+      // Mark the beginning of the operation
+      stream << "  /* " << k++ << " */" << endl; 
+      
+      // Get the names of the operation arguments
+      arg.resize(it->arg.size());
+      if(it->op == OP_INPUT){
+	arg.front() = "x" + CodeGenerator::numToString(it->arg.front());
+      } else {
+	for(int i=0; i<it->arg.size(); ++i){
+	  if(it->arg.at(i)>=0){
+	    arg.at(i) = "w.a" + CodeGenerator::numToString(it->arg.at(i));
+	  } else {
+	    arg.at(i) = "0";
+	  }
+	}
+      }
+      
+      // Get the names of the operation results
+      res.resize(it->res.size());
+      if(it->op == OP_OUTPUT){
+	res.front() = "r" + CodeGenerator::numToString(it->res.front());
+      } else {
+	for(int i=0; i<it->res.size(); ++i){
+	  if(it->res.at(i)>=0){
+	    res.at(i) = "w.a" + CodeGenerator::numToString(it->res.at(i));
+	  } else {
+	    res.at(i) = "0";
+	  }
+	}
+      }
+      
+      // Print the operation
+      if(it->op==OP_OUTPUT){
+	stream << "  casadi_copy(" << output(it->res.front()).size() << "," <<  arg.front() << ",1," << res.front() << ",1);" << endl;
+      } else if(it->op==OP_INPUT){
+	stream << "  casadi_copy(" << input(it->arg.front()).size() << "," << arg.front() << ",1," << res.front() << ",1);" << endl;
+      } else {
+	it->data->generateOperation(stream,arg,res,gen);
+      }
+    }
   }
-
-  // Finalize work structure
-  stream << "} w;" << endl;
-  stream << endl;
-}
-
-void MXFunctionInternal::generateAuxiliary(CodeGenerator &gen) const{
-  gen.addAuxiliary(CodeGenerator::AUX_SWAP);
-  gen.addAuxiliary(CodeGenerator::AUX_SCAL);
-  gen.addAuxiliary(CodeGenerator::AUX_AXPY);
-  gen.addAuxiliary(CodeGenerator::AUX_DOT);
-  gen.addAuxiliary(CodeGenerator::AUX_NRM2);
-  gen.addAuxiliary(CodeGenerator::AUX_IAMAX);
-  gen.addAuxiliary(CodeGenerator::AUX_FILL);
-  gen.addAuxiliary(CodeGenerator::AUX_MM_NT_SPARSE);
-
-  stringstream& stream = gen.auxiliaries_;
-
-
-}
+  
 
 } // namespace CasADi
 
