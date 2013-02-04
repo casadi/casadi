@@ -84,6 +84,7 @@ enum Operation{
   
   OP_ERFINV,
   OP_PRINTME,
+  OP_LIFT,
   NUM_BUILT_IN_OPS
 };
 
@@ -226,11 +227,17 @@ enum Operation{
 
   //@{
   /** \brief  CasADi additions */
-  template<class T> T constpow(const T &x, const T &n){ return x.constpow(n);}
-  
+  template<class T> T constpow(const T &x, const T &n){ return x.constpow(n);}  
   template<class T> T printme(const T &x, const T &y){ return x.printme(y);}
   inline double printme(double x, double y){ 
     std::cout << "|> " << y << " : " << x << std::endl;
+    return x;
+  }
+
+  /// "Lift" expression
+  template<class T> T lift(const T &x){ return x.lift();}
+  template<class T> T lift(const T &x, const T &y){ return x.printme(y);}
+  inline double lift(double x){
     return x;
   }
   
@@ -749,6 +756,13 @@ struct BinaryOperation<OP_IF_ELSE_ZERO>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = if_else_zero(x,y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=0; d[1]=x;}
+};
+
+/// Inverse of error function
+template<>
+struct UnaryOperation<OP_LIFT>{
+  template<typename T> static inline void fcn(const T& x, T& f){ f = lift(x);}
+  template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1; }
 };
 
 #endif // SWIG

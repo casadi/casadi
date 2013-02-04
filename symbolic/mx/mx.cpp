@@ -802,6 +802,10 @@ MX MX::logic_not() const{
   return UnaryMX::create(OP_NOT,*this);
 }
 
+MX MX::lift() const{ 
+  return UnaryMX::create(OP_LIFT,*this);
+}
+
 MX MX::__add__(const MX& y) const{
   const MX& x = *this;
   bool samedim = x.size1()==y.size1() && x.size2()==y.size2();

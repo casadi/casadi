@@ -257,6 +257,10 @@ namespace CasADi{
   /// Checks if vector does not contain NaN or Inf
   template<typename T>
   bool isRegular(const std::vector<T> &vec);
+
+  /// "Lift" a set of expressions
+  template<typename T>
+  std::vector<T> lift(const std::vector<T> &v);
   
 } // namespace CasADi
 
@@ -595,6 +599,15 @@ namespace CasADi{
     return true;
   }
   
+  template<typename T>
+  std::vector<T> lift(const std::vector<T> &v) {
+    std::vector<T> ret(v);
+    for(typename std::vector<T>::iterator it=ret.begin(); it!=ret.end(); ++it){
+      *it = lift(*it);
+    }
+    return ret;
+  }
+
   template<typename T>
   T inner_prod(const std::vector<T>& a, const std::vector<T>& b){
     T ret = 0;

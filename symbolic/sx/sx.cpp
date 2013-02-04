@@ -663,6 +663,10 @@ SX SX::arctan2(const SX &b) const{
   return BinarySX::create(OP_ATAN2,*this,b);
 }
 
+SX SX::lift() const{
+  return UnarySX::create(OP_LIFT,*this);
+}
+
 SX SX::printme(const SX &b) const{
   return BinarySX::create(OP_PRINTME,*this,b);
 }

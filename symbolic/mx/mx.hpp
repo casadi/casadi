@@ -428,6 +428,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   MX arccosh() const;
   MX arctanh() const;
   MX logic_not() const;
+  MX lift() const;
 
   /** \brief  Returns the IMatrix that represents the mapping of a Mapping node
   *

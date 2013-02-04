@@ -242,6 +242,7 @@ class SX : public GenericExpression<SX>{
     SX logic_and(const SX& y) const;
     SX logic_or(const SX& y) const;
     SX if_else_zero(const SX& y) const;
+    SX lift() const;
 
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;
