@@ -30,6 +30,11 @@
 #include <algorithm>
 #include "casadi_exception.hpp"
 
+// Define pi if the compiler fails to do so
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif // M_PI
+
 namespace CasADi{
 
 /// Enum for quick access to any node
