@@ -90,41 +90,38 @@ public:
   double tolgl_;
 
   /// Residual
-  DMatrix d_k_;
+  vector<double> d_k_;
    
   /// Primal step
-  DMatrix x_k_, dx_k_;
+  vector<double> dx_k_;
    
-   /// Dual step
-   DMatrix dlam_x_k_, dlam_g_k_;
-
-   /// Indices
-   enum GIn{G_X,G_LAM_X,G_LAM_G,G_NUM_IN};
-   enum GOut{G_D,G_G,G_F,G_NUM_OUT};
-   
-   enum LinIn{LIN_X,LIN_LAM_X,LIN_LAM_G,LIN_D,LIN_NUM_IN};
-   enum LinOut{LIN_F1,LIN_J1,LIN_F2,LIN_J2,LIN_NUM_OUT};
-
-   enum ExpIn{ERR_X,EXP_EXP_X,EXP_LAM_G,EXP_D,EXP_DU,EXP_DLAM_F2,EXP_NUM_IN};
-   enum ExpOut{EXP_E,EXP_NUM_OUT};
-
-   /// Residual function
-   FX rfcn_;
-   
-   /// Quadratic approximation
-   FX lfcn_;
-   
-   /// Step expansion
-   FX efcn_;
-   
+  /// Dual step
+  vector<double> dlambda_u_, dlambda_g_;
+  
+  /// Indices
+  enum GIn{G_X,G_LAM_X,G_LAM_G,G_NUM_IN};
+  enum GOut{G_D,G_G,G_F,G_NUM_OUT};
+  
+  enum LinIn{LIN_X,LIN_LAM_X,LIN_LAM_G,LIN_D,LIN_NUM_IN};
+  enum LinOut{LIN_F1,LIN_J1,LIN_F2,LIN_J2,LIN_NUM_OUT};
+  
+  enum ExpIn{ERR_X,EXP_EXP_X,EXP_LAM_G,EXP_D,EXP_DU,EXP_DLAM_F2,EXP_NUM_IN};
+  enum ExpOut{EXP_E,EXP_NUM_OUT};
+  
+  /// Residual function
+  FX rfcn_;
+  
+  /// Quadratic approximation
+  FX lfcn_;
+  
+  /// Step expansion
+  FX efcn_;
+  
   /// Dimensions
-  int nu, nv;
+  int nu_, nv_, nx_;
   
-
-    int nx;
-
-  DMatrix x_init_, lbx_, ubx_, x_opt_, lambda_x_, g_, lbg_, ubg_, lambda_g_;
-  
+  vector<double> u_init_, lbu_, ubu_, u_opt_, lambda_u_, g_, lbg_, ubg_, lambda_g_;
+  vector<double> v_init_, lbv_, ubv_, v_opt_, lambda_v_, h_, lbh_, ubh_, lambda_h_;
 
 };
 
@@ -288,15 +285,13 @@ void Tester::simulate(double drag_true, double depth_true){
 void Tester::transcribe(bool single_shooting){
   single_shooting_ = single_shooting;
   
-  // Number of NLP variables
-  int nX = 2;
-  if(!single_shooting) 
-    nX += n_boxes_*n_boxes_*n_meas_;
-  
+  // NLP variables
+  MX nlp_u = msym("u",2);
+  MX nlp_v = msym("v",single_shooting ? 0 : n_boxes_*n_boxes_*n_meas_);
+
   // Variables in the lifted NLP
-  MX X = msym("X",nX);
-  MX P = X[Slice(0,2)];
-  int X_offset = 2;
+  MX P = nlp_u;
+  int v_offset = 0;
   
   // Least-squares objective function
   MX F;
@@ -306,7 +301,6 @@ void Tester::transcribe(bool single_shooting){
   
   // Generate full-space NLP
   MX U = u0_;  MX V = v0_;  MX H = h0_;
-  int offset = 0;
   for(int k=0; k<n_meas_; ++k){
     // Take a step
     MX f_arg[4] = {P,U,V,H};
@@ -316,9 +310,9 @@ void Tester::transcribe(bool single_shooting){
     if(!single_shooting){
       // Lift the variable
       MX H_def = H;
-      H = X[Slice(X_offset,X_offset+n_boxes_*n_boxes_)];
+      H = nlp_v[Slice(v_offset,v_offset+n_boxes_*n_boxes_)];
       H = reshape(H,h0_.sparsity());
-      X_offset += H.size();
+      v_offset += H.size();
       
       // Constraint function term
       G.append(flatten(H_def-H));
@@ -329,15 +323,17 @@ void Tester::transcribe(bool single_shooting){
     // Objective function term
     F.append(flatten(H-H_meas_[k]));
   }
-  
-  // Number of lifted variables
-  nv = G.size();
-  
+ 
   // Function which calculates the objective terms and constraints
+  vector<MX> fg_in;
+  fg_in.push_back(nlp_u);
+  fg_in.push_back(nlp_v);
+
   vector<MX> fg_out;
   fg_out.push_back(F);
   fg_out.push_back(G);
-  fg_mx_ = MXFunction(X,fg_out);
+
+  fg_mx_ = MXFunction(fg_in,fg_out);
   fg_mx_.init();
   cout << "Generated lifted NLP (" << fg_mx_.countNodes() << " nodes)" << endl;
   
@@ -346,19 +342,27 @@ void Tester::transcribe(bool single_shooting){
   fg_sx_.init();
   cout << "expanded lifted NLP (" << fg_sx_.getAlgorithmSize() << " nodes)" << endl;
   
-  this->nx = X.size();
-  this->nu = this->nx - nv;
+  nu_ = nlp_u.size();
+  nv_ = nlp_v.size();
+  nx_ = nu_ + nv_;
 
-  x_init_ = DMatrix(X.sparsity());
-  x_opt_ = DMatrix(X.sparsity());
-  lbx_ = DMatrix(X.sparsity(),-numeric_limits<double>::infinity());
-  ubx_ = DMatrix(X.sparsity(), numeric_limits<double>::infinity());
-  lambda_x_ = DMatrix(X.sparsity(),0.0);
 
-  g_ = DMatrix(G.sparsity());
-  lbg_ = DMatrix(G.sparsity(),-numeric_limits<double>::infinity());
-  ubg_ = DMatrix(G.sparsity(), numeric_limits<double>::infinity());
-  lambda_g_ = DMatrix(G.sparsity(),0.0);  
+  u_init_.resize(nx_,0);
+  u_opt_.resize(nx_,0);
+  lbu_.resize(nx_,-numeric_limits<double>::infinity());
+  ubu_.resize(nx_, numeric_limits<double>::infinity());
+  lambda_u_.resize(nx_,0);
+
+  v_init_.resize(nv_,0);
+  v_opt_.resize(nv_,0);
+  lbv_.resize(nv_,-numeric_limits<double>::infinity());
+  ubv_.resize(nv_, numeric_limits<double>::infinity());
+  lambda_v_.resize(nv_,0);
+
+  g_.resize(G.size());
+  lbg_.resize(G.size(),-numeric_limits<double>::infinity());
+  ubg_.resize(G.size(), numeric_limits<double>::infinity());
+  lambda_g_.resize(G.size(),0);
 
   // Prepare the NLP solver
   prepare();
@@ -385,9 +389,6 @@ void Tester::prepareNew(){
 
   return;
 
-  CRSSparsity d_sparsity, B1_sparsity, B2_sparsity;
-
-  
   // Residual function G
   vector<MX> G_in(G_NUM_IN);
   G_in[G_X] = veccat(G.inputExpr());
@@ -564,51 +565,6 @@ void Tester::prepareNew(){
   if(verbose_){
     cout << "Generated step expansion function ( " << shared_cast<MXFunction>(efcn_).getAlgorithmSize() << " nodes)." << endl;
   }    
-
-  d_sparsity = zfcn_in[Z_D].sparsity();
-  B1_sparsity = B1.sparsity();
-  B2_sparsity = B2.sparsity();
-  
-      
-  // Current guess for the primal solution
-  //    DMatrix &x_k = output(NLP_X_OPT);
-  
-  // Current guess for the dual solution
-  //  DMatrix &lam_x_k = output(NLP_LAMBDA_X);
-  //  DMatrix &lam_g_k = output(NLP_LAMBDA_G);
-  
-  // Allocate a QP solver
-  qp_solver_ = QPOasesSolver(B1_sparsity,B2_sparsity);
-  qp_solver_.setOption("printLevel","none");
-  
-  // Initialize the QP solver
-  qp_solver_.init();
-  if(verbose_){
-    cout << "Allocated QP solver." << endl;
-  }
-  
-  // Residual
-  d_k_ = DMatrix(d_sparsity,0);
-  
-  // Primal step
-  dx_k_ = DMatrix(lfcn_in[LIN_X].sparsity());
-  
-  // Dual step
-  //    dlam_x_k_ = DMatrix(lam_x_k.sparsity());
-  //    dlam_g_k_ = DMatrix(lam_g_k.sparsity());
-  
-  
-  x_init_ = dx_k_;
-  lbx_ = DMatrix(dx_k_.sparsity(),-numeric_limits<double>::infinity());
-  ubx_ = DMatrix(dx_k_.sparsity(), numeric_limits<double>::infinity());
-  x_opt_ = dx_k_;
-  lambda_x_ = DMatrix(dx_k_.sparsity(), 0.);
-  
-  const CRSSparsity& new_g = G_out[G_D].sparsity();
-  g_ = vertcat(g_,DMatrix(new_g,0.));
-  lbg_ = DMatrix(g_.sparsity(),-numeric_limits<double>::infinity());
-  ubg_ = DMatrix(g_.sparsity(), numeric_limits<double>::infinity());
-  lambda_g_ = DMatrix(g_.sparsity(), 0.0);        
 }
 
 
@@ -619,19 +575,17 @@ void Tester::prepare(){
   bool gauss_newton_ = true;
     
   // Extract the free variables and split into independent and dependent variables
-  SXMatrix x = fg_sx_.inputExpr(0);
-  int nx = x.size();
-  nu = nx-nv;
-  SXMatrix u = x[Slice(0,nu)];
-  SXMatrix v = x[Slice(nu,nu+nv)];
+  SXMatrix u = fg_sx_.inputExpr(0);
+  SXMatrix v = fg_sx_.inputExpr(1);
+  SXMatrix x = vertcat(u,v);
 
   // Extract the constraint equations and split into constraints and definitions of dependent variables
   SXMatrix f1 = fg_sx_.outputExpr(0);
   int nf1 = f1.numel();
   SXMatrix g = fg_sx_.outputExpr(1);
-  int nf2 = g.numel()-nv;
-  SXMatrix v_eq = g(Slice(0,nv));
-  SXMatrix f2 = g(Slice(nv,nv+nf2));
+  int nf2 = g.numel()-nv_;
+  SXMatrix v_eq = g(Slice(0,nv_));
+  SXMatrix f2 = g(Slice(nv_,nv_+nf2));
   
   // Definition of v
   SXMatrix v_def = v_eq + v;
@@ -652,16 +606,16 @@ void Tester::prepare(){
     f = f1;
     
     // Lagrange multipliers for the simple bounds on u
-    SXMatrix lam_u = ssym("lam_u",nu);
+    SXMatrix lam_u = ssym("lam_u",nu_);
     
     // Lagrange multipliers for the simple bounds on v
-    SXMatrix lam_v = ssym("lam_v",nv);
+    SXMatrix lam_v = ssym("lam_v",nv_);
     
     // Lagrange multipliers for the simple bounds on x
     lam_x = vertcat(lam_u,lam_v);
 
     // Lagrange multipliers corresponding to the definition of the dependent variables
-    SXMatrix lam_v_eq = ssym("lam_v_eq",nv);
+    SXMatrix lam_v_eq = ssym("lam_v_eq",nv_);
 
     // Lagrange multipliers for the nonlinear constraints that aren't eliminated
     lam_f2 = ssym("lam_f2",nf2);
@@ -680,18 +634,18 @@ void Tester::prepare(){
     
     // Gradient of the Lagrangian
     SXMatrix lgrad = CasADi::gradient(lag,x);
-    if(!v.empty()) lgrad -= vertcat(SXMatrix::zeros(nu),lam_v_eq); // Put here to ensure that lgrad is of the form "h_extended -v_extended"
+    if(!v.empty()) lgrad -= vertcat(SXMatrix::zeros(nu_),lam_v_eq); // Put here to ensure that lgrad is of the form "h_extended -v_extended"
     makeDense(lgrad);
     if(verbose_){
       cout << "Generated the gradient of the Lagrangian." << endl;
     }
 
     // Condensed gradient of the Lagrangian
-    f1 = lgrad[Slice(0,nu)];
-    nf1 = nu;
+    f1 = lgrad[Slice(0,nu_)];
+    nf1 = nu_;
     
     // Gradient of h
-    SXMatrix v_eq_grad = lgrad[Slice(nu,nu+nv)];
+    SXMatrix v_eq_grad = lgrad[Slice(nu_,nx_)];
     
     // Reverse lam_v_eq and v_eq_grad
     SXMatrix v_eq_grad_reversed = v_eq_grad;
@@ -724,9 +678,9 @@ void Tester::prepare(){
   }
   
   // Difference vector d
-  SXMatrix d = ssym("d",nv);
+  SXMatrix d = ssym("d",nv_);
   if(!gauss_newton_){
-    vector<SX> dg = ssym("dg",nv).data();
+    vector<SX> dg = ssym("dg",nv_).data();
     reverse(dg.begin(),dg.end());
     d.append(dg);
   }
@@ -771,13 +725,13 @@ void Tester::prepare(){
   }
   
   // Step in u
-  SXMatrix du = ssym("du",nu);
+  SXMatrix du = ssym("du",nu_);
   SXMatrix dlam_f2 = ssym("dlam_f2",lam_f2.sparsity());
   
   SXMatrix b1 = f1_z;
   SXMatrix b2 = f2_z;
   SXMatrix e;
-  if(nv > 0){
+  if(nv_ > 0){
     
     // Directional derivative of Z
     vector<vector<SXMatrix> > Z_fwdSeed(2,zfcn_in);
@@ -855,13 +809,6 @@ void Tester::prepare(){
     cout << "Generated step expansion function ( " << shared_cast<SXFunction>(efcn_).getAlgorithmSize() << " nodes)." << endl;
   }
   
-  // Current guess for the primal solution
-  DMatrix &x_k = x_opt_;
-  
-  // Current guess for the dual solution
-  DMatrix &lam_x_k = lambda_x_;
-  DMatrix &lam_g_k = lambda_g_;
-
   // Allocate a QP solver
   qp_solver_ = QPOasesSolver(B1.sparsity(),B2.sparsity());
   qp_solver_.setOption("printLevel","none");
@@ -873,15 +820,14 @@ void Tester::prepare(){
   }
 
   // Residual
-  d_k_ = DMatrix(d.sparsity(),0);
+  d_k_.resize(d.size(),0);
   
   // Primal step
-  dx_k_ = DMatrix(x_k.sparsity());
+  dx_k_.resize(nx_);
 
   // Dual step
-  dlam_x_k_ = DMatrix(lam_x_k.sparsity());
-  dlam_g_k_ = DMatrix(lam_g_k.sparsity());
-
+  dlambda_u_.resize(lambda_u_.size());
+  dlambda_g_.resize(lambda_g_.size());
 }
 
 void Tester::solve(int& iter_count){
@@ -895,20 +841,8 @@ void Tester::solve(int& iter_count){
   double f_k = numeric_limits<double>::quiet_NaN();
   
   // Current guess for the primal solution
-  DMatrix &x_k = x_opt_;
-  const DMatrix &x_init = x_init_;
-  copy(x_init.begin(),x_init.end(),x_k.begin());
+  copy(u_init_.begin(),u_init_.end(),u_opt_.begin());
   
-  // Current guess for the dual solution
-  DMatrix &lam_x_k = lambda_x_;
-  DMatrix &lam_g_k = lambda_g_;
-
-  // Bounds
-  const DMatrix &x_min = lbx_;
-  const DMatrix &x_max = ubx_;
-  
-  const DMatrix &g_min = lbg_;
-  const DMatrix &g_max = ubg_;
   int k=0;
   
   // Does G depend on the multipliers?
@@ -918,20 +852,19 @@ void Tester::solve(int& iter_count){
   
   while(true){
     // Evaluate residual
-    rfcn_.setInput(x_k,G_X);
-    if(has_lam_x) rfcn_.setInput(lam_x_k,G_LAM_X);
-    if(has_lam_g) rfcn_.setInput(lam_g_k,G_LAM_G);
+    rfcn_.setInput(u_opt_,G_X);
+    if(has_lam_x) rfcn_.setInput(lambda_u_,G_LAM_X);
+    if(has_lam_g) rfcn_.setInput(lambda_g_,G_LAM_G);
     rfcn_.evaluate();
     rfcn_.getOutput(d_k_,G_D);
     f_k = rfcn_.output(G_F).toScalar();
     const DMatrix& g_k = rfcn_.output(G_G);
     
     // Construct the QP
-    //    lfcn_.setInput(x_k,LIN_X);
-    lfcn_.input(LIN_X).set(x_k.ptr());
-
-    if(has_lam_x) lfcn_.setInput(lam_x_k,LIN_LAM_X);
-    if(has_lam_g) lfcn_.setInput(lam_g_k,LIN_LAM_G);
+    lfcn_.setInput(u_opt_,LIN_X);
+    
+    if(has_lam_x) lfcn_.setInput(lambda_u_,LIN_LAM_X);
+    if(has_lam_g) lfcn_.setInput(lambda_g_,LIN_LAM_G);
     lfcn_.setInput(d_k_,LIN_D);
     lfcn_.evaluate();
     DMatrix& B1_k = lfcn_.output(LIN_J1);
@@ -944,7 +877,7 @@ void Tester::solve(int& iter_count){
     bool regularization = true;
     
     // Check the smallest eigenvalue of the Hessian
-    if(regularization && nu==2){
+    if(regularization && nu_==2){
       double a = B1_k.elem(0,0);
       double b = B1_k.elem(0,1);
       double c = B1_k.elem(1,0);
@@ -975,10 +908,10 @@ void Tester::solve(int& iter_count){
     qp_solver_.setInput(B1_k,QP_H);
     qp_solver_.setInput(b1_k,QP_G);
     qp_solver_.setInput(B2_k,QP_A);
-    std::transform(x_min.begin(),x_min.begin()+nu,x_k.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
-    std::transform(x_max.begin(),x_max.begin()+nu,x_k.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
-    std::transform(g_min.begin()+nv,g_min.end(), b2_k.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
-    std::transform(g_max.begin()+nv,g_max.end(), b2_k.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
+    std::transform(lbu_.begin(),lbu_.begin()+nu_,u_opt_.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
+    std::transform(ubu_.begin(),ubu_.begin()+nu_,u_opt_.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
+    std::transform(lbg_.begin()+nv_,lbg_.end(), b2_k.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
+    std::transform(ubg_.begin()+nv_,ubg_.end(), b2_k.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
     qp_solver_.evaluate();
     const DMatrix& du_k = qp_solver_.output(QP_PRIMAL);
     const DMatrix& dlam_u_k = qp_solver_.output(QP_LAMBDA_X);
@@ -995,34 +928,34 @@ void Tester::solve(int& iter_count){
     
     // Expanded primal step
     copy(du_k.begin(),du_k.end(),dx_k_.begin());
-    copy(dv_k.begin(),dv_k.begin()+nv,dx_k_.begin()+nu);
+    copy(dv_k.begin(),dv_k.begin()+nv_,dx_k_.begin()+nu_);
 
     // Expanded dual step
-    copy(dlam_u_k.begin(),dlam_u_k.end(),dlam_x_k_.begin());
-    copy(dlam_f2_k.begin(),dlam_f2_k.end(),dlam_g_k_.begin()+nv);
-    copy(dv_k.rbegin(),dv_k.rbegin()+nv,dlam_g_k_.begin());
+    copy(dlam_u_k.begin(),dlam_u_k.end(),dlambda_u_.begin());
+    copy(dlam_f2_k.begin(),dlam_f2_k.end(),dlambda_g_.begin()+nv_);
+    copy(dv_k.rbegin(),dv_k.rbegin()+nv_,dlambda_g_.begin());
     
     // Take a full step
-    transform(dx_k_.begin(),dx_k_.end(),x_k.begin(),x_k.begin(),plus<double>());
-    copy(dlam_x_k_.begin(),dlam_x_k_.end(),lam_x_k.begin());
-    transform(dlam_g_k_.begin(),dlam_g_k_.end(),lam_g_k.begin(),lam_g_k.begin(),plus<double>());
+    transform(dx_k_.begin(),dx_k_.end(),u_opt_.begin(),u_opt_.begin(),plus<double>());
+    copy(dlambda_u_.begin(),dlambda_u_.end(),lambda_u_.begin());
+    transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),lambda_g_.begin(),plus<double>());
 
     // Step size
     double norm_step=0;
     for(vector<double>::const_iterator it=dx_k_.begin(); it!=dx_k_.end(); ++it)  norm_step += *it**it;
     if(!gauss_newton_){
-      for(vector<double>::const_iterator it=dlam_g_k_.begin(); it!=dlam_g_k_.end(); ++it) norm_step += *it**it;
+      for(vector<double>::const_iterator it=dlambda_g_.begin(); it!=dlambda_g_.end(); ++it) norm_step += *it**it;
     }
     norm_step = sqrt(norm_step);
     
     // Constraint violation
     double norm_viol = 0;
-    for(int i=0; i<x_k.size(); ++i){
-      double d = ::fmax(x_k.at(i)-x_max.at(i),0.) + ::fmax(x_min.at(i)-x_k.at(i),0.);
+    for(int i=0; i<nx_; ++i){
+      double d = ::fmax(u_opt_.at(i)-ubu_.at(i),0.) + ::fmax(lbu_.at(i)-u_opt_.at(i),0.);
       norm_viol += d*d;
     }
     for(int i=0; i<g_k.size(); ++i){
-      double d = ::fmax(g_k.at(i)-g_max.at(i),0.) + ::fmax(g_min.at(i)-g_k.at(i),0.);
+      double d = ::fmax(g_k.at(i)-ubg_.at(i),0.) + ::fmax(lbg_.at(i)-g_k.at(i),0.);
       norm_viol += d*d;
     }
     norm_viol = sqrt(norm_viol);
@@ -1057,30 +990,30 @@ void Tester::solve(int& iter_count){
 
 void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est){
   // Initial guess for the parameters
-  x_init_.setZero();
-  x_init_[0] = drag_guess;
-  x_init_[1] = depth_guess;
+  fill(u_init_.begin(),u_init_.end(),0);
+  u_init_[0] = drag_guess;
+  u_init_[1] = depth_guess;
 
   // Initial guess for the heights
   if(!single_shooting_){
-    vector<double>::iterator it=x_init_.begin()+2;
+    vector<double>::iterator it=u_init_.begin()+2;
     for(int k=0; k<n_meas_; ++k){
       copy(H_meas_[k].begin(),H_meas_[k].end(),it);
       it += n_boxes_*n_boxes_;
     }
   }
   
-  lbg_.setZero();
-  ubg_.setZero();
+  fill(lbg_.begin(),lbg_.end(),0);
+  fill(ubg_.begin(),ubg_.end(),0);
   // 	ubg_[nv] = numeric_limits<double>::infinity();
   // 	ubg_[nv+1] = numeric_limits<double>::infinity();
   // 	lbg_[nv] = -numeric_limits<double>::infinity();
   // 	lbg_[nv+1] = -numeric_limits<double>::infinity();
 	
-  //   lbx_.setAll(-1000.);
-  //   ubx_.setAll( 1000.);
-  lbx_[0] = 0;
-  lbx_[1] = 0;
+  //   lbu_.setAll(-1000.);
+  //   ubu_.setAll( 1000.);
+  lbu_[0] = 0;
+  lbu_[1] = 0;
 
   clock_t time1 = clock();
   solve(iter_count);
@@ -1088,8 +1021,8 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   
   // Solution statistics  
   sol_time = double(time2-time1)/CLOCKS_PER_SEC;
-  drag_est = x_opt_.at(0);
-  depth_est = x_opt_.at(1);
+  drag_est = u_opt_.at(0);
+  depth_est = u_opt_.at(1);
 }
 
 int main(){
