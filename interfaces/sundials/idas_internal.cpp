@@ -483,6 +483,13 @@ void IdasInternal::res(double t, const double* xz, const double* xzdot, double* 
   f_.setInput(xz+nx_,DAE_Z);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
+  if(monitored("res")){
+    cout << "DAE_T    = " << t << endl;
+    cout << "DAE_X    = " << f_.input(DAE_X) << endl;
+    cout << "DAE_Z    = " << f_.input(DAE_Z) << endl;
+    cout << "DAE_P    = " << f_.input(DAE_P) << endl;
+  }
+  
   // Evaluate
   f_.evaluate();
   
@@ -490,38 +497,20 @@ void IdasInternal::res(double t, const double* xz, const double* xzdot, double* 
   f_.getOutput(r,DAE_ODE);
   f_.getOutput(r+nx_,DAE_ALG);
   
+  if(monitored("res")){
+    cout << "ODE rhs  = " << f_.output(DAE_ODE) << endl;
+    cout << "ALG rhs  = " << f_.output(DAE_ALG) << endl;
+  }
+  
+  if (regularity_check_) {
+    casadi_assert_message(isRegular(f_.output(DAE_ODE).data()),"IdasInternal::res: f.output(DAE_ODE) is not regular.");
+    casadi_assert_message(isRegular(f_.output(DAE_ALG).data()),"IdasInternal::res: f.output(DAE_ALG) is not regular.");
+  }
+  
   // Subtract state derivative to get residual
   for(int i=0; i<nx_; ++i){
     r[i] -= xzdot[i];
   }
-  
-  if(monitored("res")){
-    cout << "DAE_T    = " << t << endl;
-    cout << "DAE_X    = " << f_.input(DAE_X) << endl;
-    cout << "DAE_Z    = " << f_.input(DAE_Z) << endl;
-    cout << "DAE_P    = " << f_.input(DAE_P) << endl;
-  }
-
-  // Check the result for consistency
-  for(int i=0; i<nx_+nz_; ++i){
-    if(isnan(r[i]) || isinf(r[i])){
-      if(verbose_){
-        stringstream ss;
-        ss << "Warning: The " << i << "-th component of the DAE residual is " << r[i] << " at time t=" << t << ".";
-        log("IdasInternal::res",ss.str());
-        if(monitored("res")){
-          cout << "DAE_T    = " << t << endl;
-          cout << "DAE_X    = " << f_.input(DAE_X) << endl;
-          cout << "DAE_Z    = " << f_.input(DAE_Z) << endl;
-          cout << "DAE_P    = " << f_.input(DAE_P) << endl;
-          cout << "ODE rhs  = " << f_.output(DAE_ODE) << endl;
-          cout << "ALG rhs  = " << f_.output(DAE_ALG) << endl;
-        }
-      }
-      throw 1;
-    }
-  }
-  
   
   time2 = clock();
   t_res += double(time2-time1)/CLOCKS_PER_SEC;
