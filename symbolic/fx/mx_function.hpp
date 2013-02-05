@@ -138,6 +138,9 @@ public:
   /** \brief Get all the free variables of the function */
   std::vector<MX> getFree() const;
   
+  /** \brief Extract the residual function G and the modified function Z out of an expression (see Albersmeyer2010 paper) */
+  void generateLiftingFunctions(MXFunction& F, MXFunction& G, MXFunction& Z);
+
   /** \brief Get the corresponding matrix type */
   typedef MX MatType;  
 };
