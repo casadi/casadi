@@ -127,5 +127,10 @@ int MXFunction::getWorkSize() const{
   return (*this)->work_.size();
 }
 
+  void MXFunction::generateLiftingFunctions(MXFunction& F, MXFunction& G, MXFunction& Z){
+    (*this)->generateLiftingFunctions(F,G,Z);
+  }
+
+
 } // namespace CasADi
 
