@@ -99,13 +99,13 @@ public:
   vector<double> dlambda_u_, dlambda_g_;
   
   /// Indices
-  enum GIn{G_X,G_LAM_X,G_LAM_G,G_NUM_IN};
+  enum GIn{G_U,G_V,G_LAM_X,G_LAM_G,G_NUM_IN};
   enum GOut{G_D,G_G,G_F,G_NUM_OUT};
   
-  enum LinIn{LIN_X,LIN_LAM_X,LIN_LAM_G,LIN_D,LIN_NUM_IN};
+  enum LinIn{LIN_U,LIN_V,LIN_LAM_X,LIN_LAM_G,LIN_D,LIN_NUM_IN};
   enum LinOut{LIN_F1,LIN_J1,LIN_F2,LIN_J2,LIN_NUM_OUT};
   
-  enum ExpIn{ERR_X,EXP_EXP_X,EXP_LAM_G,EXP_D,EXP_DU,EXP_DLAM_F2,EXP_NUM_IN};
+  enum ExpIn{EXP_U,EXP,V,EXP_EXP_X,EXP_LAM_G,EXP_D,EXP_DU,EXP_DLAM_F2,EXP_NUM_IN};
   enum ExpOut{EXP_E,EXP_NUM_OUT};
   
   /// Residual function
@@ -347,10 +347,10 @@ void Tester::transcribe(bool single_shooting){
   nx_ = nu_ + nv_;
 
 
-  u_init_.resize(nx_,0);
-  u_opt_.resize(nx_,0);
-  lbu_.resize(nx_,-numeric_limits<double>::infinity());
-  ubu_.resize(nx_, numeric_limits<double>::infinity());
+  u_init_.resize(nu_,0);
+  u_opt_.resize(nu_,0);
+  lbu_.resize(nu_,-numeric_limits<double>::infinity());
+  ubu_.resize(nu_, numeric_limits<double>::infinity());
   lambda_u_.resize(nx_,0);
 
   v_init_.resize(nv_,0);
@@ -373,6 +373,7 @@ void Tester::prepareNew(){
   bool gauss_newton_ = true;
 
   if(!single_shooting_) return;
+  return;
 
   // Extract the expressions
   MX x = fg_mx_.inputExpr(0);
@@ -391,7 +392,7 @@ void Tester::prepareNew(){
 
   // Residual function G
   vector<MX> G_in(G_NUM_IN);
-  G_in[G_X] = veccat(G.inputExpr());
+  G_in[G_U] = veccat(G.inputExpr());
   //    G_in[G_LAM_X] = lam_x;
   //    G_in[G_LAM_G] = lam_g;
   vector<MX> G_out(G_NUM_OUT);
@@ -527,7 +528,7 @@ void Tester::prepareNew(){
 
   // Quadratic approximation
   vector<MX> lfcn_in(LIN_NUM_IN);
-  lfcn_in[LIN_X] =     veccat(G.inputExpr());
+  lfcn_in[LIN_U] =     veccat(G.inputExpr());
   //u; // FIXME?
   lfcn_in[LIN_D] = zfcn_in[Z_D];
   lfcn_in[LIN_LAM_X] = MX(0,1); // lam_x;
@@ -660,7 +661,8 @@ void Tester::prepare(){
 
   // Residual function G
   SXMatrixVector G_in(G_NUM_IN);
-  G_in[G_X] = x;
+  G_in[G_U] = u;
+  G_in[G_V] = v;
   G_in[G_LAM_X] = lam_x;
   G_in[G_LAM_G] = lam_g;
 
@@ -775,7 +777,8 @@ void Tester::prepare(){
   
   // Quadratic approximation
   SXMatrixVector lfcn_in(LIN_NUM_IN);
-  lfcn_in[LIN_X] = x;
+  lfcn_in[LIN_U] = u;
+  lfcn_in[LIN_V] = v;
   lfcn_in[LIN_D] = d;
   lfcn_in[LIN_LAM_X] = lam_x;
   lfcn_in[LIN_LAM_G] = lam_g;
@@ -842,6 +845,7 @@ void Tester::solve(int& iter_count){
   
   // Current guess for the primal solution
   copy(u_init_.begin(),u_init_.end(),u_opt_.begin());
+  copy(v_init_.begin(),v_init_.end(),v_opt_.begin());
   
   int k=0;
   
@@ -852,7 +856,8 @@ void Tester::solve(int& iter_count){
   
   while(true){
     // Evaluate residual
-    rfcn_.setInput(u_opt_,G_X);
+    rfcn_.setInput(u_opt_,G_U);
+    rfcn_.setInput(v_opt_,G_V);
     if(has_lam_x) rfcn_.setInput(lambda_u_,G_LAM_X);
     if(has_lam_g) rfcn_.setInput(lambda_g_,G_LAM_G);
     rfcn_.evaluate();
@@ -861,7 +866,8 @@ void Tester::solve(int& iter_count){
     const DMatrix& g_k = rfcn_.output(G_G);
     
     // Construct the QP
-    lfcn_.setInput(u_opt_,LIN_X);
+    lfcn_.setInput(u_opt_,LIN_U);
+    lfcn_.setInput(v_opt_,LIN_V);
     
     if(has_lam_x) lfcn_.setInput(lambda_u_,LIN_LAM_X);
     if(has_lam_g) lfcn_.setInput(lambda_g_,LIN_LAM_G);
@@ -908,8 +914,8 @@ void Tester::solve(int& iter_count){
     qp_solver_.setInput(B1_k,QP_H);
     qp_solver_.setInput(b1_k,QP_G);
     qp_solver_.setInput(B2_k,QP_A);
-    std::transform(lbu_.begin(),lbu_.begin()+nu_,u_opt_.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
-    std::transform(ubu_.begin(),ubu_.begin()+nu_,u_opt_.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
+    std::transform(lbu_.begin(),lbu_.end(),u_opt_.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
+    std::transform(ubu_.begin(),ubu_.end(),u_opt_.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
     std::transform(lbg_.begin()+nv_,lbg_.end(), b2_k.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
     std::transform(ubg_.begin()+nv_,ubg_.end(), b2_k.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
     qp_solver_.evaluate();
@@ -936,7 +942,9 @@ void Tester::solve(int& iter_count){
     copy(dv_k.rbegin(),dv_k.rbegin()+nv_,dlambda_g_.begin());
     
     // Take a full step
-    transform(dx_k_.begin(),dx_k_.end(),u_opt_.begin(),u_opt_.begin(),plus<double>());
+    transform(dx_k_.begin(),dx_k_.begin()+nu_,u_opt_.begin(),u_opt_.begin(),plus<double>());
+    transform(dx_k_.begin()+nu_,dx_k_.end(),v_opt_.begin(),v_opt_.begin(),plus<double>());
+
     copy(dlambda_u_.begin(),dlambda_u_.end(),lambda_u_.begin());
     transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),lambda_g_.begin(),plus<double>());
 
@@ -950,8 +958,12 @@ void Tester::solve(int& iter_count){
     
     // Constraint violation
     double norm_viol = 0;
-    for(int i=0; i<nx_; ++i){
+    for(int i=0; i<nu_; ++i){
       double d = ::fmax(u_opt_.at(i)-ubu_.at(i),0.) + ::fmax(lbu_.at(i)-u_opt_.at(i),0.);
+      norm_viol += d*d;
+    }
+    for(int i=0; i<nv_; ++i){
+      double d = ::fmax(v_opt_.at(i)-ubv_.at(i),0.) + ::fmax(lbv_.at(i)-v_opt_.at(i),0.);
       norm_viol += d*d;
     }
     for(int i=0; i<g_k.size(); ++i){
@@ -990,13 +1002,13 @@ void Tester::solve(int& iter_count){
 
 void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est){
   // Initial guess for the parameters
-  fill(u_init_.begin(),u_init_.end(),0);
   u_init_[0] = drag_guess;
   u_init_[1] = depth_guess;
+  fill(v_init_.begin(),v_init_.end(),0);
 
   // Initial guess for the heights
   if(!single_shooting_){
-    vector<double>::iterator it=u_init_.begin()+2;
+    vector<double>::iterator it=v_init_.begin();
     for(int k=0; k<n_meas_; ++k){
       copy(H_meas_[k].begin(),H_meas_[k].end(),it);
       it += n_boxes_*n_boxes_;
