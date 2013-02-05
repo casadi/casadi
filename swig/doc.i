@@ -1446,11 +1446,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::generateDependencies
-"
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::AcadoIntegratorInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -2850,10 +2845,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::AcadoOCPInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::AcadoOCPInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::generateFunction "
 
@@ -4759,10 +4750,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::CFunctionInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::CFunctionInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -6532,11 +6519,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")
-CasADi::CollocationIntegratorInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")
 CasADi::CollocationIntegratorInternal::generateFunction "
@@ -8471,11 +8453,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")
-CasADi::ControlSimulatorInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::ControlSimulatorInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -9156,10 +9133,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::CplexInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::CplexInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::CplexInternal::generateFunction "
 
@@ -12117,10 +12090,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::CSparseInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::CSparseInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -14367,10 +14336,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::CVodesInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::CVodesInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -15884,10 +15849,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::DerivativeInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::DerivativeInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -17367,11 +17328,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::DirectCollocationInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")
-CasADi::DirectCollocationInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::DirectCollocationInternal::generateFunction "
 
@@ -18954,11 +18910,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::DirectMultipleShootingInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")
-CasADi::DirectMultipleShootingInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")
 CasADi::DirectMultipleShootingInternal::generateFunction "
@@ -20545,11 +20496,6 @@ Print to a c file. ";
 Generate code for function inputs and outputs. ";
 
 %feature("docstring")
-CasADi::DirectSingleShootingInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
-%feature("docstring")
 CasADi::DirectSingleShootingInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -21277,10 +21223,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::DSDPInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::DSDPInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::DSDPInternal::generateFunction "
 
@@ -23650,11 +23592,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")
-CasADi::ExternalFunctionInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::ExternalFunctionInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -25348,10 +25285,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::FXInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::FXInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::FXInternal::generateFunction "
 
@@ -28184,10 +28117,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::IdasInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::IdasInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -29533,11 +29462,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")
-CasADi::ImplicitFunctionInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::generateFunction "
 
@@ -31326,10 +31250,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::IntegratorInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -32050,10 +31970,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::IPInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::IPInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::IPInternal::generateFunction "
 
@@ -36379,10 +36295,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::IpoptInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::IpoptInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::IpoptInternal::generateFunction "
 
@@ -40765,10 +40677,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::KinsolInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::KinsolInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -42595,10 +42503,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::KnitroInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::KnitroInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::KnitroInternal::generateFunction "
 
@@ -44990,10 +44894,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::LapackLUDenseInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::LapackLUDenseInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -46341,10 +46241,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::LapackQRDenseInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::LapackQRDenseInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::generateFunction "
 
@@ -48134,10 +48030,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::LiftedSQPInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -48862,10 +48754,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::LiftoptInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::LiftoptInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::LiftoptInternal::generateFunction "
 
@@ -51080,10 +50968,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::LinearSolverInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::LinearSolverInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::generateFunction "
 
@@ -55172,21 +55056,13 @@ Initialize. ";
 Update the number of sensitivity directions during or after initialization.
 ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::generateDependencies "
+%feature("docstring")  CasADi::MXFunctionInternal::generateFunction "
 
-Generate code for dependent functions. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::generateWork "
-
-Generate work array. ";
+Generate code for the C functon. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::generateBody "
 
 Generate code for the body of the C function. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::generateAuxiliary "
-
-Generate auxiliary functions. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::setLiftingFunction "
 
@@ -55277,10 +55153,6 @@ Symbolic expressions for the adjoint seeds. ";
 %feature("docstring")  CasADi::MXFunctionInternal::generateCode "
 
 Print to a c file. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::generateFunction "
-
-Generate code for the C functon. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::evaluateCompressed "
 
@@ -56243,11 +56115,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::NewtonImplicitInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::NewtonImplicitInternal::generateDependencies
-"
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::NewtonImplicitInternal::generateFunction "
 
@@ -57672,10 +57539,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::NLPImplicitInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::NLPImplicitInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -59076,10 +58939,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::NLPQPInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::NLPQPInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::NLPQPInternal::generateFunction "
 
@@ -61462,10 +61321,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::NLPSolverInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::NLPSolverInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::generateFunction "
 
@@ -64419,10 +64274,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::OCPSolverInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -65166,10 +65017,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::OOQPInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::OOQPInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::OOQPInternal::generateFunction "
 
@@ -67846,10 +67693,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::ParallelizerInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -68516,10 +68359,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::QPOasesInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::QPOasesInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::QPOasesInternal::generateFunction "
 
@@ -70688,10 +70527,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::QPSolverInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::QPSolverInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -72366,10 +72201,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::RKIntegratorInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -74030,10 +73861,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::SDPSolverInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::SDPSolverInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -75600,10 +75427,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::SimulatorInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::SimulatorInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -76163,6 +75986,10 @@ Evaluate the function symbolically ( SX) ";
 
 Propagate sparsity. ";
 
+%feature("docstring")  CasADi::SparseSparseOp::generateOperation "
+
+Generate code for the operation. ";
+
 %feature("docstring")  CasADi::SparseSparseOp::printPart "
 
 Print a part of the expression. ";
@@ -76198,10 +76025,6 @@ Print a description. ";
 %feature("docstring")  CasADi::SparseSparseOp::print "
 
 Print expression (make sure number of calls is not exceeded) ";
-
-%feature("docstring")  CasADi::SparseSparseOp::generateOperation "
-
-Generate code for the operation. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::evaluateD "
 
@@ -76960,10 +76783,6 @@ Print to a c file. ";
 %feature("docstring")  CasADi::SQPInternal::generateIO "
 
 Generate code for function inputs and outputs. ";
-
-%feature("docstring")  CasADi::SQPInternal::generateDependencies "
-
-Generate code for dependent functions. ";
 
 %feature("docstring")  CasADi::SQPInternal::generateFunction "
 
@@ -80002,10 +79821,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::SundialsInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::SundialsInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -81734,13 +81549,13 @@ Initialize. ";
 Update the number of sensitivity directions during or after initialization.
 ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::generateFunction "
+
+Generate code for the C functon. ";
+
 %feature("docstring")  CasADi::SXFunctionInternal::generateBody "
 
 Generate code for the body of the C function. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::generateAuxiliary "
-
-Generate auxiliary functions. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::clearSymbolic "
 
@@ -81800,18 +81615,6 @@ Symbolic expressions for the adjoint seeds. ";
 %feature("docstring")  CasADi::SXFunctionInternal::generateCode "
 
 Print to a c file. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::generateWork "
-
-Generate work array. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::generateFunction "
-
-Generate code for the C functon. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::evaluateCompressed "
 
@@ -84954,10 +84757,6 @@ Print to a c file. ";
 
 Generate code for function inputs and outputs. ";
 
-%feature("docstring")  CasADi::WorhpInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
 %feature("docstring")  CasADi::WorhpInternal::generateFunction "
 
 Generate code for the C functon. ";
@@ -87141,18 +86940,6 @@ Symbolic expressions for the adjoint seeds. ";
 %feature("docstring")  CasADi::XFunctionInternal::generateCode "
 
 Print to a c file. ";
-
-%feature("docstring")  CasADi::XFunctionInternal::generateAuxiliary "
-
-Generate auxiliary functions. ";
-
-%feature("docstring")  CasADi::XFunctionInternal::generateDependencies "
-
-Generate code for dependent functions. ";
-
-%feature("docstring")  CasADi::XFunctionInternal::generateWork "
-
-Generate work array. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::generateFunction "
 
