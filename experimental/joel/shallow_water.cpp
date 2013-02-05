@@ -46,6 +46,7 @@ public:
 
   // Prepare NLP
   void prepare();
+  void prepareNew();
 
   // Solve NLP
   void solve(int& iter_count);
@@ -73,7 +74,8 @@ public:
   bool single_shooting_;
 
   // NLP
-  SXFunction F_, G_;
+  SXFunction fg_sx_;
+  MXFunction fg_mx_;
 
   /// QP solver for the subproblems
   QPSolver qp_solver_;
@@ -87,20 +89,10 @@ public:
   /// stopping criterion for the lagrangian gradient
   double tolgl_;
 
-  /// Linesearch parameters
-  //@{
-  double sigma_;
-  double rho_;
-  double mu_safety_;
-  double eta_;
-  double tau_;
-  int maxiter_ls_;
-  //@}
-  
-   /// Residual
-   DMatrix d_k_;
+  /// Residual
+  DMatrix d_k_;
    
-   /// Primal step
+  /// Primal step
   DMatrix x_k_, dx_k_;
    
    /// Dual step
@@ -125,8 +117,8 @@ public:
    /// Step expansion
    FX efcn_;
    
-   /// Dimensions
-   int nu, nv;
+  /// Dimensions
+  int nu, nv;
   
 
     int nx;
@@ -211,23 +203,19 @@ void Tester::model(){
     }
   }
   
-  SXFunction f_step;
-  {
-    // Create an integrator function
-    vector<SXMatrix> f_step_in(4);
-    f_step_in[0] = p;
-    f_step_in[1] = uk;
-    f_step_in[2] = vk;
-    f_step_in[3] = hk;
-    vector<SXMatrix> f_step_out(3);
-    f_step_out[0] = u;
-    f_step_out[1] = v;
-    f_step_out[2] = h;
-    f_step = SXFunction(f_step_in,f_step_out);
-    //     f_step.setOption("live_variables",true);
-    f_step.init();
-    cout << "generated single step dynamics (" << f_step.getAlgorithmSize() << " nodes)" << endl;
-  }
+  // Create an integrator function
+  vector<SXMatrix> f_step_in(4);
+  f_step_in[0] = p;
+  f_step_in[1] = uk;
+  f_step_in[2] = vk;
+  f_step_in[3] = hk;
+  vector<SXMatrix> f_step_out(3);
+  f_step_out[0] = u;
+  f_step_out[1] = v;
+  f_step_out[2] = h;
+  SXFunction f_step(f_step_in,f_step_out);
+  f_step.init();
+  cout << "generated single step dynamics (" << f_step.getAlgorithmSize() << " nodes)" << endl;
   
   // Integrate over one interval
   vector<MX> f_in(4);
@@ -252,15 +240,18 @@ void Tester::model(){
   }
   
   // Create an integrator function
-  f_ = MXFunction(f_in,f_out);
-  f_.init();
-  cout << "generated discrete dynamics, MX (" << shared_cast<MXFunction>(f_).countNodes() << " nodes)" << endl;
+  MXFunction f_mx(f_in,f_out);
+  f_mx.init();
+  cout << "generated discrete dynamics, MX (" << f_mx.countNodes() << " nodes)" << endl;
   
   // Expand the discrete dynamics
   if(false){
-    f_ = SXFunction(shared_cast<MXFunction>(f_));
-    f_.init();
-    cout << "generated discrete dynamics, SX (" << shared_cast<SXFunction>(f_).getAlgorithmSize() << " nodes)" << endl;
+    SXFunction f_sx(f_mx);
+    f_sx.init();
+    cout << "generated discrete dynamics, SX (" << f_sx.getAlgorithmSize() << " nodes)" << endl;
+    f_ = f_sx;
+  } else {
+    f_ = f_mx;
   }
 }
 
@@ -314,17 +305,13 @@ void Tester::transcribe(bool single_shooting){
   MX G = MX::sparse(0,1);
   
   // Generate full-space NLP
-  MX U = u0_;
-  MX V = v0_;
-  MX H = h0_;
+  MX U = u0_;  MX V = v0_;  MX H = h0_;
   int offset = 0;
   for(int k=0; k<n_meas_; ++k){
     // Take a step
     MX f_arg[4] = {P,U,V,H};
     vector<MX> f_res = f_.call(vector<MX>(f_arg,f_arg+4));
-    U = f_res[0];
-    V = f_res[1];
-    H = f_res[2];
+    U = f_res[0];    V = f_res[1];    H = f_res[2];
     
     if(!single_shooting){
       // Lift the variable
@@ -335,156 +322,106 @@ void Tester::transcribe(bool single_shooting){
       
       // Constraint function term
       G.append(flatten(H_def-H));
+    } else {
+      H = lift(H);
     }
     
     // Objective function term
     F.append(flatten(H-H_meas_[k]));
   }
   
-  // Number of lifted
-  int nv = G.size();
+  // Number of lifted variables
+  nv = G.size();
   
   // Function which calculates the objective terms and constraints
   vector<MX> fg_out;
   fg_out.push_back(F);
   fg_out.push_back(G);
-  MXFunction fg(X,fg_out);
-  fg.init();
-  cout << "Generated lifted NLP (" << fg.countNodes() << " nodes)" << endl;
+  fg_mx_ = MXFunction(X,fg_out);
+  fg_mx_.init();
+  cout << "Generated lifted NLP (" << fg_mx_.countNodes() << " nodes)" << endl;
   
   // Expand NLP
-  SXFunction fg_expanded(fg);
-  fg_expanded.init();
-  cout << "expanded lifted NLP (" << fg_expanded.getAlgorithmSize() << " nodes)" << endl;
+  fg_sx_ = SXFunction(fg_mx_);
+  fg_sx_.init();
+  cout << "expanded lifted NLP (" << fg_sx_.getAlgorithmSize() << " nodes)" << endl;
   
-  // Formulate the NLP
-  SXMatrix nlp_x = fg_expanded.inputExpr(0);
-  SXMatrix nlp_f = fg_expanded.outputExpr(0);
-  SXMatrix nlp_g = fg_expanded.outputExpr(1);
-  F_ = SXFunction(nlp_x,nlp_f);
-  G_ = SXFunction(nlp_x,nlp_g);
-  
-  this->nv = nv;
-  this->nx = nlp_x.size();
+  this->nx = X.size();
   this->nu = this->nx - nv;
 
-  x_init_ = DMatrix(nlp_x.sparsity());
-  x_opt_ = DMatrix(nlp_x.sparsity());
-  lbx_ = DMatrix(nlp_x.sparsity(),-numeric_limits<double>::infinity());
-  ubx_ = DMatrix(nlp_x.sparsity(), numeric_limits<double>::infinity());
-  lambda_x_ = DMatrix(nlp_x.sparsity(),0.0);
+  x_init_ = DMatrix(X.sparsity());
+  x_opt_ = DMatrix(X.sparsity());
+  lbx_ = DMatrix(X.sparsity(),-numeric_limits<double>::infinity());
+  ubx_ = DMatrix(X.sparsity(), numeric_limits<double>::infinity());
+  lambda_x_ = DMatrix(X.sparsity(),0.0);
 
-  g_ = DMatrix(nlp_g.sparsity());
-  lbg_ = DMatrix(nlp_g.sparsity(),-numeric_limits<double>::infinity());
-  ubg_ = DMatrix(nlp_g.sparsity(), numeric_limits<double>::infinity());
-  lambda_g_ = DMatrix(nlp_g.sparsity(),0.0);  
+  g_ = DMatrix(G.sparsity());
+  lbg_ = DMatrix(G.sparsity(),-numeric_limits<double>::infinity());
+  ubg_ = DMatrix(G.sparsity(), numeric_limits<double>::infinity());
+  lambda_g_ = DMatrix(G.sparsity(),0.0);  
 
+  // Prepare the NLP solver
   prepare();
 }
 
-void Tester::prepare(){
+void Tester::prepareNew(){
   bool verbose_ = false;
   bool gauss_newton_ = true;
-  
+
+  if(!single_shooting_) return;
+
+  // Extract the expressions
+  MX x = fg_mx_.inputExpr(0);
+  MX f = fg_mx_.outputExpr(0);
+  MX g = fg_mx_.outputExpr(1);
+
+  // Generate lifting functions
+  MXFunction F,G,Z;
+  fg_mx_.generateLiftingFunctions(F,G,Z);
+  F.init();
+  G.init();
+
+
+
+  return;
+
   CRSSparsity d_sparsity, B1_sparsity, B2_sparsity;
 
-  // New implementation
-  if(is_a<MXFunction>(F_) && is_a<MXFunction>(G_)){
-    MXFunction ffcn = shared_cast<MXFunction>(F_);
-    MXFunction gfcn = shared_cast<MXFunction>(G_);
-
-    // Extract the expressions
-    MX x = ffcn.inputExpr(0);
-    MX f = ffcn.outputExpr(0);
-    MX g = gfcn.outputExpr(0);
-
-    //    cout << "g.numel = " << g.numel() << endl;
-
-    // Function that calculates both F and G
-    vector<MX> fg;
-    fg.push_back(f);
-    fg.push_back(g);
-    MXFunction fgfcn(x,fg);
-    fgfcn.init();
-
-    // Generate lifting functions
-    MXFunction F,G,Z;
-    fgfcn.generateLiftingFunctions(F,G,Z);
-    F.init();
-    G.init();
-
-#if 0    
-    for(int k=0; k<fgfcn.getNumInputs(); ++k){
-      cout << "FG" << k << ": " << fgfcn.input(k).numel() << endl;
-    }
-	
-    for(int k=0; k<F.getNumInputs(); ++k){
-      cout << "F" << k << ": " << F.input(k).numel() << endl;
-    }
-	
-    for(int k=0; k<G.getNumInputs(); ++k){
-      cout << "G" << k << ": " << G.input(k).numel() << endl;
-    }
-	
-    for(int k=0; k<Z.getNumInputs(); ++k){
-      cout << "Z" << k << ": " << Z.input(k).numel() << endl;
-    }	
-
-
-    for(int k=0; k<fgfcn.getNumOutputs(); ++k){
-      cout << "FGout" << k << ": " << fgfcn.output(k).numel() << endl;
-    }
-	
-    for(int k=0; k<F.getNumOutputs(); ++k){
-      cout << "Fout" << k << ": " << F.output(k).numel() << endl;
-    }
-	
-    for(int k=0; k<G.getNumOutputs(); ++k){
-      cout << "Gout" << k << ": " << G.output(k).numel() << endl;
-    }
-	
-    for(int k=0; k<Z.getNumOutputs(); ++k){
-      cout << "Zout" << k << ": " << Z.output(k).numel() << endl;
-    }
-#endif
-
-    // Residual function G
-    vector<MX> G_in(G_NUM_IN);
-    G_in[G_X] = veccat(G.inputExpr());
-    //    G_in[G_LAM_X] = lam_x;
-    //    G_in[G_LAM_G] = lam_g;
-
-    vector<MX> G_out(G_NUM_OUT);
-
-    vector<MX> v_eq = G.outputExpr();
-    MX f1 = v_eq.at(v_eq.size()-2);
-    f = inner_prod(f1,f1)/2;
-    g = v_eq.at(v_eq.size()-1);
-    v_eq.resize(v_eq.size()-2);
-    
-    G_out[G_D] = veccat(v_eq);
-    G_out[G_G] = g;
-    G_out[G_F] = f;
-    
-    rfcn_ = MXFunction(G_in,G_out);
-    rfcn_.setOption("name","rfcn");
-
-    G_in = shared_cast<MXFunction>(rfcn_).inputExpr();
-    G_out = shared_cast<MXFunction>(rfcn_).outputExpr();
-
-    rfcn_.setOption("number_of_fwd_dir",0);
-    rfcn_.setOption("number_of_adj_dir",0);
-    rfcn_.init();
-    if(verbose_){
-      cout << "Generated residual function ( " << shared_cast<MXFunction>(rfcn_).getAlgorithmSize() << " nodes)." << endl;
-    }
   
+  // Residual function G
+  vector<MX> G_in(G_NUM_IN);
+  G_in[G_X] = veccat(G.inputExpr());
+  //    G_in[G_LAM_X] = lam_x;
+  //    G_in[G_LAM_G] = lam_g;
+  vector<MX> G_out(G_NUM_OUT);
+  
+  vector<MX> v_eq = G.outputExpr();
+  MX f1 = v_eq.at(v_eq.size()-2);
+  f = inner_prod(f1,f1)/2;
+  g = v_eq.at(v_eq.size()-1);
+  v_eq.resize(v_eq.size()-2);
+  
+  G_out[G_D] = veccat(v_eq);
+  G_out[G_G] = g;
+  G_out[G_F] = f;
+  
+  rfcn_ = MXFunction(G_in,G_out);
+  rfcn_.setOption("name","rfcn");
+  
+  G_in = shared_cast<MXFunction>(rfcn_).inputExpr();
+  G_out = shared_cast<MXFunction>(rfcn_).outputExpr();
+  
+  rfcn_.setOption("number_of_fwd_dir",0);
+  rfcn_.setOption("number_of_adj_dir",0);
+  rfcn_.init();
+  if(verbose_){
+    cout << "Generated residual function ( " << shared_cast<MXFunction>(rfcn_).getAlgorithmSize() << " nodes)." << endl;
+  }
   
   // Modified function Z
   enum ZIn{Z_U,Z_D,Z_LAM_X,Z_LAM_F2,Z_NUM_IN};
   vector<MX> zfcn_in(Z_NUM_IN);
-
-  
+    
   vector<MX> d = Z.inputExpr();
   MX u = d.front();
   d.erase(d.begin());
@@ -493,7 +430,6 @@ void Tester::prepare(){
   zfcn_in[Z_D] = veccat(d);
   //  zfcn_in[Z_LAM_X] = lam_x;
   //  zfcn_in[Z_LAM_F2] = lam_f2;
-
 
   enum ZOut{Z_D_DEF,Z_F12,Z_NUM_OUT};
   vector<MX> zfcn_out(Z_NUM_OUT);
@@ -529,8 +465,7 @@ void Tester::prepare(){
     cout << "Formed B1 (dimension " << B1.size1() << "-by-" << B1.size2() << ", "<< B1.size() << " nonzeros) " <<
     "and B2 (dimension " << B2.size1() << "-by-" << B2.size2() << ", "<< B2.size() << " nonzeros)." << endl;
   }
-
-
+  
   int nu = u.numel();
 
   MX lam_f2 = msym("lam_f2",0);
@@ -630,78 +565,70 @@ void Tester::prepare(){
     cout << "Generated step expansion function ( " << shared_cast<MXFunction>(efcn_).getAlgorithmSize() << " nodes)." << endl;
   }    
 
-
-    d_sparsity = zfcn_in[Z_D].sparsity();
-    B1_sparsity = B1.sparsity();
-    B2_sparsity = B2.sparsity();
-
-    //    casadi_error("not finished");
-
-    
-
-    
-    // Current guess for the primal solution
-    //    DMatrix &x_k = output(NLP_X_OPT);
+  d_sparsity = zfcn_in[Z_D].sparsity();
+  B1_sparsity = B1.sparsity();
+  B2_sparsity = B2.sparsity();
+  
+      
+  // Current guess for the primal solution
+  //    DMatrix &x_k = output(NLP_X_OPT);
   
   // Current guess for the dual solution
-    //  DMatrix &lam_x_k = output(NLP_LAMBDA_X);
-    //  DMatrix &lam_g_k = output(NLP_LAMBDA_G);
-
-    // Allocate a QP solver
-    qp_solver_ = QPOasesSolver(B1_sparsity,B2_sparsity);
-    qp_solver_.setOption("printLevel","none");
-
-    // Initialize the QP solver
-    qp_solver_.init();
-    if(verbose_){
-      cout << "Allocated QP solver." << endl;
-    }
-
-    // Residual
-    d_k_ = DMatrix(d_sparsity,0);
+  //  DMatrix &lam_x_k = output(NLP_LAMBDA_X);
+  //  DMatrix &lam_g_k = output(NLP_LAMBDA_G);
   
-    // Primal step
-    dx_k_ = DMatrix(lfcn_in[LIN_X].sparsity());
-
-    // Dual step
-    //    dlam_x_k_ = DMatrix(lam_x_k.sparsity());
-    //    dlam_g_k_ = DMatrix(lam_g_k.sparsity());
-
-
-    x_init_ = dx_k_;
-    lbx_ = DMatrix(dx_k_.sparsity(),-numeric_limits<double>::infinity());
-    ubx_ = DMatrix(dx_k_.sparsity(), numeric_limits<double>::infinity());
-    x_opt_ = dx_k_;
-    lambda_x_ = DMatrix(dx_k_.sparsity(), 0.);
-
-    const CRSSparsity& new_g = G_out[G_D].sparsity();
-    g_ = vertcat(g_,DMatrix(new_g,0.));
-    lbg_ = DMatrix(g_.sparsity(),-numeric_limits<double>::infinity());
-    ubg_ = DMatrix(g_.sparsity(), numeric_limits<double>::infinity());
-    lambda_g_ = DMatrix(g_.sparsity(), 0.0);        
-    return;
+  // Allocate a QP solver
+  qp_solver_ = QPOasesSolver(B1_sparsity,B2_sparsity);
+  qp_solver_.setOption("printLevel","none");
+  
+  // Initialize the QP solver
+  qp_solver_.init();
+  if(verbose_){
+    cout << "Allocated QP solver." << endl;
   }
-
-
-
-
-  // Assume SXFunction for now
-  SXFunction ffcn = shared_cast<SXFunction>(F_);
-  casadi_assert(!ffcn.isNull());
-  SXFunction gfcn = shared_cast<SXFunction>(G_);
-  casadi_assert(!gfcn.isNull());
   
+  // Residual
+  d_k_ = DMatrix(d_sparsity,0);
+  
+  // Primal step
+  dx_k_ = DMatrix(lfcn_in[LIN_X].sparsity());
+  
+  // Dual step
+  //    dlam_x_k_ = DMatrix(lam_x_k.sparsity());
+  //    dlam_g_k_ = DMatrix(lam_g_k.sparsity());
+  
+  
+  x_init_ = dx_k_;
+  lbx_ = DMatrix(dx_k_.sparsity(),-numeric_limits<double>::infinity());
+  ubx_ = DMatrix(dx_k_.sparsity(), numeric_limits<double>::infinity());
+  x_opt_ = dx_k_;
+  lambda_x_ = DMatrix(dx_k_.sparsity(), 0.);
+  
+  const CRSSparsity& new_g = G_out[G_D].sparsity();
+  g_ = vertcat(g_,DMatrix(new_g,0.));
+  lbg_ = DMatrix(g_.sparsity(),-numeric_limits<double>::infinity());
+  ubg_ = DMatrix(g_.sparsity(), numeric_limits<double>::infinity());
+  lambda_g_ = DMatrix(g_.sparsity(), 0.0);        
+}
+
+
+void Tester::prepare(){
+  prepareNew();
+
+  bool verbose_ = false;
+  bool gauss_newton_ = true;
+    
   // Extract the free variables and split into independent and dependent variables
-  SXMatrix x = ffcn.inputExpr(0);
+  SXMatrix x = fg_sx_.inputExpr(0);
   int nx = x.size();
   nu = nx-nv;
   SXMatrix u = x[Slice(0,nu)];
   SXMatrix v = x[Slice(nu,nu+nv)];
 
   // Extract the constraint equations and split into constraints and definitions of dependent variables
-  SXMatrix f1 = ffcn.outputExpr(0);
+  SXMatrix f1 = fg_sx_.outputExpr(0);
   int nf1 = f1.numel();
-  SXMatrix g = gfcn.outputExpr(0);
+  SXMatrix g = fg_sx_.outputExpr(1);
   int nf2 = g.numel()-nv;
   SXMatrix v_eq = g(Slice(0,nv));
   SXMatrix f2 = g(Slice(nv,nv+nf2));
@@ -1220,7 +1147,9 @@ int main(){
     // Transcribe as an NLP
     bool single_shooting = sol==0;
     t.transcribe(single_shooting);
-    
+  
+    //    continue;
+  
     // Run tests
     for(int test=0; test<n_tests; ++test){
       // Print progress
