@@ -433,23 +433,35 @@ void Tester::prepare(){
       cout << "Allocated intermediate variables." << endl;
     }
     
-    // Lagrangian function
+    // Lagrangian
     SXMatrix lag = obj;
     if(!u.empty()) lag += inner_prod(lam_u,u);
     if(!g.empty()) lag += inner_prod(lam_g,g);
     if(!h.empty()) lag += inner_prod(lam_h,h);
-    
-    // Gradient of the Lagrangian
-    SXMatrix gL = CasADi::gradient(lag,vertcat(u,v));
-    makeDense(gL);
+
+    // Lagrangian function
+    vector<SXMatrix> x(2);
+    x[0] = u;
+    x[1] = v;
+    SXFunction lfcn(x,lag);
+    lfcn.init();
+
+    // Adjoint sweep to get gradient
+    vector<SXMatrix> lfcn_in = lfcn.inputExpr();
+    vector<SXMatrix> lfcn_out = lfcn.outputExpr();
+    vector<vector<SXMatrix> > fseed,fsens,aseed(1),asens(1);
+    aseed[0].resize(1,1.0);
+    asens[0].resize(2);
+    lfcn.eval(lfcn_in,lfcn_out,fseed,fsens,aseed,asens,true);
+    gL_u = asens[0].at(0);
+    gL_v = asens[0].at(1);
+    makeDense(gL_u);
+    makeDense(gL_v);
+    ngL_ = nu_;
+
     if(verbose_){
       cout << "Generated the gradient of the Lagrangian." << endl;
     }
-
-    // Gradient of the Lagrangian
-    gL_u = gL[Slice(0,nu_)];
-    gL_v = gL[Slice(nu_,nu_+nv_)];
-    ngL_ = nu_;
   }
 
   // Residual function G
@@ -472,7 +484,7 @@ void Tester::prepare(){
   if(verbose_){
     cout << "Generated residual function ( " << shared_cast<SXFunction>(rfcn_).getAlgorithmSize() << " nodes)." << endl;
   }
-  
+
   // Declare difference vector d and substitute out v
   SXMatrix d = ssym("d",nv_);
   SXMatrix d_def = h-d;
@@ -739,9 +751,13 @@ void Tester::solve(int& iter_count){
     const DMatrix& dlam_g = qp_solver_.output(QP_LAMBDA_A);    
     
     // Expand the step
-    for(int i=0; i<LIN_NUM_IN; ++i){
-      efcn_.setInput(lfcn_.input(i),i);
-    }
+    efcn_.setInput(lfcn_.input(LIN_U),EXP_U);
+    efcn_.setInput(lfcn_.input(LIN_LAM_U),EXP_LAM_U);
+    efcn_.setInput(lfcn_.input(LIN_LAM_G),EXP_LAM_G);
+    efcn_.setInput(lfcn_.input(LIN_V),EXP_V);
+    efcn_.setInput(lfcn_.input(LIN_LAM_H),EXP_LAM_H);
+    efcn_.setInput(lfcn_.input(LIN_D),EXP_D);
+    efcn_.setInput(lfcn_.input(LIN_LAM_D),EXP_LAM_D);
     efcn_.setInput(du,EXP_DU);
     if(has_lam_g) efcn_.setInput(dlam_g,EXP_DLAM_G);
     efcn_.evaluate();
