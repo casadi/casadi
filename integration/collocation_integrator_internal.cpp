@@ -457,7 +457,14 @@ void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_stor
 
         // Skip algebraic variables (for now) // FIXME
         if(j>0){
-          offs += nz_;
+          if (has_startup_integrator && startup_integrator_.hasOption("init_z")) {
+            std::vector<double> init_z = startup_integrator_.getOption("init_z");
+            for(int i=0; i<nz_; ++i){
+              v.at(offs++) = init_z.at(i);
+            }
+          } else {
+            offs += nz_;
+          }
         }
         
         // Skip backward states // FIXME
