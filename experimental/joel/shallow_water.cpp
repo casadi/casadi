@@ -100,15 +100,18 @@ public:
   vector<double> dlambda_u_, dlambda_h_, dlambda_g_;
   
   /// Indices
-  enum GIn{G_U,G_V,G_LAM_X,G_LAM_HG,G_NUM_IN};
+  enum GIn{G_U,G_LAM_U,G_LAM_G,G_V,G_LAM_V,G_LAM_H,G_NUM_IN};
   enum GOut{G_D,G_G,G_F,G_NUM_OUT};
   
-  enum LinIn{LIN_U,LIN_V,LIN_LAM_X,LIN_LAM_HG,LIN_D,LIN_NUM_IN};
+  enum LinIn{LIN_U,LIN_LAM_U,LIN_LAM_G,LIN_V,LIN_LAM_V,LIN_LAM_H,LIN_D,LIN_NUM_IN};
   enum LinOut{LIN_F1,LIN_J1,LIN_G,LIN_J2,LIN_NUM_OUT};
   
-  enum ExpIn{EXP_U,EXP,V,EXP_EXP_X,EXP_LAM_HG,EXP_D,EXP_DU,EXP_DLAM_G,EXP_NUM_IN};
+  enum ExpIn{EXP_U,EXP_LAM_U,EXP_LAM_G,EXP_V,EXP_LAM_V,EXP_LAM_H,EXP_D,EXP_DU,EXP_DLAM_G,EXP_NUM_IN};
   enum ExpOut{EXP_E,EXP_NUM_OUT};
-  
+
+  enum ZIn{Z_U,Z_D,Z_LAM_U,Z_LAM_V,Z_LAM_G,Z_NUM_IN};
+  enum ZOut{Z_D_DEF,Z_FG,Z_NUM_OUT};
+
   /// Residual function
   FX rfcn_;
   
@@ -123,7 +126,7 @@ public:
   
   vector<double> u_init_, lbu_, ubu_, u_opt_, lambda_u_;
   vector<double> lbg_, ubg_, lambda_g_;
-  vector<double> v_init_, lbv_, ubv_, v_opt_;
+  vector<double> v_init_, lbv_, ubv_, v_opt_, lambda_v_;
   vector<double> lambda_h_;
 };
 
@@ -395,7 +398,7 @@ void Tester::prepare(){
   v_opt_.resize(nv_,0);
   lbv_.resize(nv_,-numeric_limits<double>::infinity());
   ubv_.resize(nv_, numeric_limits<double>::infinity());
-  //lambda_v_.resize(nv_,0);
+  lambda_v_.resize(nv_,0);
 
   lbg_.resize(ng_,-numeric_limits<double>::infinity());
   ubg_.resize(ng_, numeric_limits<double>::infinity());
@@ -411,7 +414,7 @@ void Tester::prepare(){
   SXMatrix obj;
   
   // Multipliers
-  SXMatrix lam_x, lam_hg, lam_g;
+  SXMatrix lam_u, lam_v, lam_g, lam_h;
   if(gauss_newton_){
     
     // Least square objective
@@ -423,16 +426,16 @@ void Tester::prepare(){
     obj = f;
     
     // Lagrange multipliers for the simple bounds on u
-    SXMatrix lam_u = ssym("lam_u",nu_);
+    lam_u = ssym("lam_u",nu_);
     
     // Lagrange multipliers for the simple bounds on v
-    SXMatrix lam_v = ssym("lam_v",nv_);
+    lam_v = ssym("lam_v",nv_);
     
     // Lagrange multipliers for the simple bounds on x
-    lam_x = vertcat(lam_u,lam_v);
+    SXMatrix lam_x = vertcat(lam_u,lam_v);
 
     // Lagrange multipliers corresponding to the definition of the dependent variables
-    SXMatrix lam_h = ssym("lam_h",nv_);
+    lam_h = ssym("lam_h",nv_);
 
     // Lagrange multipliers for the nonlinear constraints that aren't eliminated
     lam_g = ssym("lam_g",ng_);
@@ -440,9 +443,6 @@ void Tester::prepare(){
     if(verbose_){
       cout << "Allocated intermediate variables." << endl;
     }
-    
-    // Lagrange multipliers for constraints
-    lam_hg = vertcat(lam_h,lam_g);
     
     // Lagrangian function
     SXMatrix lag = obj + inner_prod(lam_x,x);
@@ -479,8 +479,10 @@ void Tester::prepare(){
   vector<SXMatrix> G_in(G_NUM_IN);
   G_in[G_U] = u;
   G_in[G_V] = v;
-  G_in[G_LAM_X] = lam_x;
-  G_in[G_LAM_HG] = lam_hg;
+  G_in[G_LAM_U] = lam_u;
+  G_in[G_LAM_V] = lam_v;
+  G_in[G_LAM_G] = lam_g;
+  G_in[G_LAM_H] = lam_h;
 
   vector<SXMatrix> G_out(G_NUM_OUT);
   G_out[G_D] = h;
@@ -515,14 +517,13 @@ void Tester::prepare(){
   SXMatrix obj_z = ex[2];
   
   // Modified function Z
-  enum ZIn{Z_U,Z_D,Z_LAM_X,Z_LAM_G,Z_NUM_IN};
   vector<SXMatrix> zfcn_in(Z_NUM_IN);
   zfcn_in[Z_U] = u;
   zfcn_in[Z_D] = d;
-  zfcn_in[Z_LAM_X] = lam_x;
+  zfcn_in[Z_LAM_U] = lam_u;
+  zfcn_in[Z_LAM_V] = lam_v;
   zfcn_in[Z_LAM_G] = lam_g;
   
-  enum ZOut{Z_D_DEF,Z_FG,Z_NUM_OUT};
   vector<SXMatrix> zfcn_out(Z_NUM_OUT);
   zfcn_out[Z_D_DEF] = d_def;
   zfcn_out[Z_FG] = vertcat(f_z,g_z);
@@ -559,12 +560,14 @@ void Tester::prepare(){
     
     Z_fwdSeed[0][Z_U].setZero();
     Z_fwdSeed[0][Z_D] = -d;
-    Z_fwdSeed[0][Z_LAM_X].setZero();
+    Z_fwdSeed[0][Z_LAM_U].setZero();
+    Z_fwdSeed[0][Z_LAM_V].setZero();
     Z_fwdSeed[0][Z_LAM_G].setZero();
     
     Z_fwdSeed[1][Z_U] = du;
     Z_fwdSeed[1][Z_D] = -d;
-    Z_fwdSeed[1][Z_LAM_X].setZero();
+    Z_fwdSeed[1][Z_LAM_U].setZero();
+    Z_fwdSeed[1][Z_LAM_V].setZero();
     Z_fwdSeed[1][Z_LAM_G] = dlam_g;
     
     zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
@@ -596,8 +599,10 @@ void Tester::prepare(){
   lfcn_in[LIN_U] = u;
   lfcn_in[LIN_V] = v;
   lfcn_in[LIN_D] = d;
-  lfcn_in[LIN_LAM_X] = lam_x;
-  lfcn_in[LIN_LAM_HG] = lam_hg;
+  lfcn_in[LIN_LAM_U] = lam_u;
+  lfcn_in[LIN_LAM_V] = lam_v;
+  lfcn_in[LIN_LAM_G] = lam_g;
+  lfcn_in[LIN_LAM_H] = lam_h;
   
   vector<SXMatrix> lfcn_out(LIN_NUM_OUT);
   lfcn_out[LIN_F1] = b1;
@@ -665,19 +670,21 @@ void Tester::solve(int& iter_count){
   int k=0;
   
   // Does G depend on the multipliers?
-  bool has_lam_x =  !rfcn_.input(G_LAM_X).empty();
-  bool has_lam_hg =  !rfcn_.input(G_LAM_HG).empty();
-  bool has_lam_g = !efcn_.input(EXP_DLAM_G).empty();
+  bool has_lam_u =  !gauss_newton_ && nu_>0;
+  bool has_lam_v =  !gauss_newton_ && nv_>0;
+  bool has_lam_g =  !gauss_newton_ && ng_>0;
+  bool has_lam_h =  !gauss_newton_ && nv_>0;
   
   while(true){
     // Evaluate residual
     rfcn_.setInput(u_opt_,G_U);
     rfcn_.setInput(v_opt_,G_V);
-    if(has_lam_x) rfcn_.setInput(lambda_u_,G_LAM_X);
-    if(has_lam_hg){
-      copy(lambda_g_.begin(),lambda_g_.end(),rfcn_.input(G_LAM_HG).begin()+nv_);
-      copy(lambda_h_.begin(),lambda_h_.end(),rfcn_.input(G_LAM_HG).begin());
-    }
+
+    if(has_lam_u) rfcn_.setInput(lambda_u_,G_LAM_U);
+    if(has_lam_v) rfcn_.setInput(lambda_v_,G_LAM_V);
+    if(has_lam_g) rfcn_.setInput(lambda_g_,G_LAM_G);
+    if(has_lam_h) rfcn_.setInput(lambda_h_,G_LAM_H);
+
     rfcn_.evaluate();
     rfcn_.getOutput(d_k_,G_D);
     f_k = rfcn_.output(G_F).toScalar();
@@ -687,11 +694,11 @@ void Tester::solve(int& iter_count){
     lfcn_.setInput(u_opt_,LIN_U);
     lfcn_.setInput(v_opt_,LIN_V);
     
-    if(has_lam_x) lfcn_.setInput(lambda_u_,LIN_LAM_X);
-    if(has_lam_hg){
-      copy(lambda_g_.begin(),lambda_g_.end(),lfcn_.input(LIN_LAM_HG).begin()+nv_);
-      copy(lambda_h_.begin(),lambda_h_.end(),lfcn_.input(LIN_LAM_HG).begin());
-    }
+    if(has_lam_u) lfcn_.setInput(lambda_u_,LIN_LAM_U);
+    if(has_lam_g) lfcn_.setInput(lambda_g_,LIN_LAM_U);
+    if(has_lam_v) lfcn_.setInput(lambda_v_,LIN_LAM_V);
+    if(has_lam_h) lfcn_.setInput(lambda_h_,LIN_LAM_H);
+
     lfcn_.setInput(d_k_,LIN_D);
     lfcn_.evaluate();
     DMatrix& B1_k = lfcn_.output(LIN_J1);
