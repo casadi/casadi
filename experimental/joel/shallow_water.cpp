@@ -106,8 +106,8 @@ public:
   enum LinIn{LIN_U,LIN_LAM_U,LIN_LAM_G,LIN_V,LIN_LAM_H,LIN_D,LIN_LAM_D,LIN_NUM_IN};
   enum LinOut{LIN_F1,LIN_J1,LIN_G,LIN_J2,LIN_NUM_OUT};
   
-  enum ExpIn{EXP_U,EXP_LAM_U,EXP_LAM_G,EXP_V,EXP_LAM_H,EXP_D,EXP_LAM_D,EXP_DU,EXP_DLAM_G,EXP_NUM_IN};
-  enum ExpOut{EXP_V_DEF,EXP_LAM_H_DEF,EXP_NUM_OUT};
+  enum ExpIn{EXP_U,EXP_LAM_U,EXP_LAM_G,EXP_D,EXP_LAM_D,EXP_DU,EXP_DLAM_G,EXP_NUM_IN};
+  enum ExpOut{EXP_V,EXP_LAM_H,EXP_NUM_OUT};
 
   enum ZIn{Z_U,Z_D,Z_LAM_D,Z_LAM_U,Z_LAM_G,Z_NUM_IN};
   enum ZOut{Z_D_DEF,Z_LAM_D_DEF,Z_FG,Z_NUM_OUT};
@@ -616,12 +616,16 @@ void Tester::prepare(){
     
   // Step expansion
   vector<SXMatrix> efcn_in(EXP_NUM_IN);
-  copy(lfcn_in.begin(),lfcn_in.end(),efcn_in.begin());
+  efcn_in[EXP_U] = u;
+  efcn_in[EXP_D] = d;
+  efcn_in[EXP_LAM_D] = lam_d;
+  efcn_in[EXP_LAM_U] = lam_u;
+  efcn_in[EXP_LAM_G] = lam_g;
   efcn_in[EXP_DU] = du;
   efcn_in[EXP_DLAM_G] = dlam_g;
   vector<SXMatrix> efcn_out(EXP_NUM_OUT);
-  efcn_out[EXP_V_DEF] = e;
-  efcn_out[EXP_LAM_H_DEF] = eL;
+  efcn_out[EXP_V] = e;
+  efcn_out[EXP_LAM_H] = eL;
   efcn_ = SXFunction(efcn_in,efcn_out);
   efcn_.setOption("number_of_fwd_dir",0);
   efcn_.setOption("number_of_adj_dir",0);
@@ -754,15 +758,13 @@ void Tester::solve(int& iter_count){
     efcn_.setInput(lfcn_.input(LIN_U),EXP_U);
     efcn_.setInput(lfcn_.input(LIN_LAM_U),EXP_LAM_U);
     efcn_.setInput(lfcn_.input(LIN_LAM_G),EXP_LAM_G);
-    efcn_.setInput(lfcn_.input(LIN_V),EXP_V);
-    efcn_.setInput(lfcn_.input(LIN_LAM_H),EXP_LAM_H);
     efcn_.setInput(lfcn_.input(LIN_D),EXP_D);
     efcn_.setInput(lfcn_.input(LIN_LAM_D),EXP_LAM_D);
     efcn_.setInput(du,EXP_DU);
     if(has_lam_g) efcn_.setInput(dlam_g,EXP_DLAM_G);
     efcn_.evaluate();
-    const DMatrix& dv = efcn_.output(EXP_V_DEF);
-    const DMatrix& dlam_h = efcn_.output(EXP_LAM_H_DEF);
+    const DMatrix& dv = efcn_.output(EXP_V);
+    const DMatrix& dlam_h = efcn_.output(EXP_LAM_H);
     
     // Expanded primal step
     copy(du.begin(),du.end(),du_.begin());
