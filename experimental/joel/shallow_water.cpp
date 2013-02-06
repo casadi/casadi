@@ -89,29 +89,10 @@ public:
   
   /// stopping criterion for the lagrangian gradient
   double tolgl_;
-
-  /// Residual
-  vector<double> d_, lam_d_;
-   
-  /// Primal step
-  vector<double> du_,dv_;
-   
-  /// Dual step
-  vector<double> dlambda_u_, dlambda_h_, dlambda_g_;
   
-  /// Indices
-  enum GIn{G_U,G_LAM_U,G_LAM_G,G_V,G_LAM_H,G_NUM_IN};
-  enum GOut{G_D,G_LAM_D,G_G,G_F,G_NUM_OUT};
+  /// Outputs of the linearization function
+  enum LinOut{LIN_QPG,LIN_H,LIN_QPB,LIN_QPA,LIN_NUM_OUT};
   
-  enum LinIn{LIN_U,LIN_LAM_U,LIN_LAM_G,LIN_V,LIN_LAM_H,LIN_D,LIN_LAM_D,LIN_NUM_IN};
-  enum LinOut{LIN_F1,LIN_J1,LIN_G,LIN_J2,LIN_NUM_OUT};
-  
-  enum ExpIn{EXP_U,EXP_LAM_U,EXP_LAM_G,EXP_D,EXP_LAM_D,EXP_DU,EXP_DLAM_G,EXP_NUM_IN};
-  enum ExpOut{EXP_V,EXP_LAM_H,EXP_NUM_OUT};
-
-  enum ZIn{Z_U,Z_D,Z_LAM_D,Z_LAM_U,Z_LAM_G,Z_NUM_IN};
-  enum ZOut{Z_D_DEF,Z_LAM_D_DEF,Z_FG,Z_NUM_OUT};
-
   /// Residual function
   FX rfcn_;
   
@@ -122,12 +103,40 @@ public:
   FX efcn_;
   
   /// Dimensions
-  int nu_, nv_, ng_, ngL_;
-  
-  vector<double> u_init_, lbu_, ubu_, u_opt_, lambda_u_;
-  vector<double> lbg_, ubg_, lambda_g_;
-  vector<double> v_init_, lbv_, ubv_, v_opt_;
-  vector<double> lambda_h_;
+  int ng_, ngL_;
+
+  /// Dual step
+  vector<double> lbg_, ubg_, lambda_g_, dlambda_g_;
+
+  int g_con_;
+  int g_f_, g_g_;
+
+  int z_con_;
+  int z_fg_;
+
+  int l_con_;
+
+  int e_du_, e_dlam_g_, e_con_;
+
+  struct Var{
+    int n;
+
+    int g_var, g_lam;
+    int g_d, g_lam_d;
+
+    int z_var, z_lam;
+    int z_def, z_defL;
+
+    int l_var, l_lam, l_res, l_resL;
+
+    int e_var, e_lam;
+    int e_exp, e_expL;
+
+    vector<double> dx, init, lb, ub, opt, lam, dlam;
+    vector<double> res, resL;
+    
+  };
+  vector<Var> x_;  
 };
 
 void Tester::model(){
@@ -292,12 +301,12 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
   gauss_newton_ = gauss_newton;
   
   // NLP variables
-  MX nlp_u = msym("u",2);
-  MX nlp_v = msym("v",single_shooting ? 0 : n_boxes_*n_boxes_*n_meas_);
+  MX P = msym("P",2);
+  MX nlp_u = P;
 
   // Variables in the lifted NLP
-  MX P = nlp_u;
-  int v_offset = 0;
+  vector<MX> nlp_v;
+  stringstream ss;
   
   // Least-squares objective function
   MX nlp_f;
@@ -306,7 +315,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
   MX nlp_g = MX::sparse(0,1);
   
   // Lifted equations
-  MX nlp_h = MX::sparse(0,1);
+  vector<MX> nlp_h;
 
   // Generate full-space NLP
   MX U = u0_;  MX V = v0_;  MX H = h0_;
@@ -319,12 +328,13 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
     if(!single_shooting){
       // Lift the variable
       MX H_def = H;
-      H = nlp_v[Slice(v_offset,v_offset+n_boxes_*n_boxes_)];
-      H = reshape(H,h0_.sparsity());
-      v_offset += H.size();
+      ss.str(string());
+      ss << "v" << nlp_v.size();
+      H = msym(ss.str(),H_def.sparsity());
+      nlp_v.push_back(H);
       
       // Constraint function term
-      nlp_h.append(flatten(H_def));
+      nlp_h.push_back(H_def);
     }
     
     // Objective function term
@@ -339,12 +349,12 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
   // Function which calculates the objective terms and constraints
   vector<MX> fg_in;
   fg_in.push_back(nlp_u);
-  fg_in.push_back(nlp_v);
+  fg_in.insert(fg_in.end(),nlp_v.begin(),nlp_v.end());
 
   vector<MX> fg_out;
   fg_out.push_back(nlp_f);
   fg_out.push_back(nlp_g);
-  fg_out.push_back(nlp_h);
+  fg_out.insert(fg_out.end(),nlp_h.begin(),nlp_h.end());
 
   fg_mx_ = MXFunction(fg_in,fg_out);
   fg_mx_.init();
@@ -369,62 +379,79 @@ void Tester::prepare(){
   //  G.init();
   //  Z.init();
 
-  // Extract the free variables and split into independent and dependent variables
-  SXMatrix u = fg_sx_.inputExpr(0);
-  SXMatrix v = fg_sx_.inputExpr(1);
+  // Extract the free variables
+  vector<SXMatrix> var(2);
+  var[0] = fg_sx_.inputExpr(0);
+  var[1] = SXMatrix::sparse(0,1);
+  x_.resize(2);
+  for(int i=1; i<fg_sx_.getNumInputs(); ++i){
+    SXMatrix vv = fg_sx_.inputExpr(i);
+    var[1].append(flatten(vv));
+    x_[1].n += vv.size();
+  }
 
-  // Extract the constraint equations and split into constraints and definitions of dependent variables
+  // Extract the constraint equations
   SXMatrix f = fg_sx_.outputExpr(0);
-  SXMatrix g = fg_sx_.outputExpr(1);
-  SXMatrix h = fg_sx_.outputExpr(2);
-  makeDense(h);
+  vector<SXMatrix> con(2); 
+  con[0] = fg_sx_.outputExpr(1);
+  con[1] = SXMatrix::sparse(0,1);
+  for(int i=2; i<fg_sx_.getNumOutputs(); ++i){
+    SXMatrix hh = fg_sx_.outputExpr(i);
+    makeDense(hh);
+    con[1].append(flatten(hh));
+  }
 
   // Get the dimensions
-  nu_ = u.size();
-  nv_ = v.size();
-  ng_ = g.size();
- 
-  u_init_.resize(nu_,0);
-  u_opt_.resize(nu_,0);
-  lbu_.resize(nu_,-numeric_limits<double>::infinity());
-  ubu_.resize(nu_, numeric_limits<double>::infinity());
-  lambda_u_.resize(nu_,0);
-
-  v_init_.resize(nv_,0);
-  v_opt_.resize(nv_,0);
-  lbv_.resize(nv_,-numeric_limits<double>::infinity());
-  ubv_.resize(nv_, numeric_limits<double>::infinity());
+  for(int i=0; i<x_.size(); ++i){
+    x_[i].n = var[i].size();
+  }
+  ng_ = con[0].size();
 
   lbg_.resize(ng_,-numeric_limits<double>::infinity());
   ubg_.resize(ng_, numeric_limits<double>::infinity());
   lambda_g_.resize(ng_,0);
-  lambda_h_.resize(nv_,0);
+  dlambda_g_.resize(ng_,0);
+ 
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    it->init.resize(it->n,0);
+    it->opt.resize(it->n,0);
+    it->lb.resize(it->n,-numeric_limits<double>::infinity());
+    it->ub.resize(it->n, numeric_limits<double>::infinity());
+    it->lam.resize(it->n,0);
+    it->dlam.resize(it->n,0);
+    it->dx.resize(it->n,0);
+  }
         
   // Scalar objective function
   SXMatrix obj;
   
   // Lagrangian gradient of the objective function with respect to u and v
-  SXMatrix gL_u, gL_v;
+  vector<SXMatrix> gL(x_.size());
 
   // Multipliers
-  SXMatrix lam_u, lam_g, lam_h;
+  SXMatrix lam_g;
+  vector<SXMatrix> lam(x_.size());
+
+
   if(gauss_newton_){
     
     // Least square objective
     obj = inner_prod(f,f)/2;
-    gL_u = f;
-    ngL_ = gL_u.size();
+    gL[0] = f;
+    ngL_ = gL[0].size();
 
   } else {
     
     // Scalar objective function
     obj = f;
     
-    // Lagrange multipliers for the simple bounds on u
-    lam_u = ssym("lam_u",nu_);
-        
-    // Lagrange multipliers corresponding to the definition of the dependent variables
-    lam_h = ssym("lam_h",nv_);
+    // Lagrange multipliers for the simple bounds on u and Lagrange multipliers corresponding to the definition of the dependent variables
+    stringstream ss;
+    for(int i=0; i<x_.size(); ++i){
+      ss.str(string());
+      ss << "lam_x" << i;
+      lam[i] = ssym(ss.str(),x_[i].n);
+    }
 
     // Lagrange multipliers for the nonlinear constraints that aren't eliminated
     lam_g = ssym("lam_g",ng_);
@@ -432,18 +459,17 @@ void Tester::prepare(){
     if(verbose_){
       cout << "Allocated intermediate variables." << endl;
     }
-    
+   
     // Lagrangian
     SXMatrix lag = obj;
-    if(!u.empty()) lag += inner_prod(lam_u,u);
-    if(!g.empty()) lag += inner_prod(lam_g,g);
-    if(!h.empty()) lag += inner_prod(lam_h,h);
+    if(!con[0].empty()) lag += inner_prod(lam_g,con[0]);
+    if(!var[0].empty()) lag += inner_prod(lam[0],var[0]);
+    for(int i=1; i<x_.size(); ++i){
+      if(!con[i].empty()) lag += inner_prod(lam[i],con[i]);
+    }
 
     // Lagrangian function
-    vector<SXMatrix> x(2);
-    x[0] = u;
-    x[1] = v;
-    SXFunction lfcn(x,lag);
+    SXFunction lfcn(var,lag);
     lfcn.init();
 
     // Adjoint sweep to get gradient
@@ -453,11 +479,11 @@ void Tester::prepare(){
     aseed[0].resize(1,1.0);
     asens[0].resize(2);
     lfcn.eval(lfcn_in,lfcn_out,fseed,fsens,aseed,asens,true);
-    gL_u = asens[0].at(0);
-    gL_v = asens[0].at(1);
-    makeDense(gL_u);
-    makeDense(gL_v);
-    ngL_ = nu_;
+    for(int i=0; i<x_.size(); ++i){
+      gL[i] = asens[0].at(i);
+      makeDense(gL[i]);
+    }
+    ngL_ = x_[0].n;
 
     if(verbose_){
       cout << "Generated the gradient of the Lagrangian." << endl;
@@ -465,18 +491,28 @@ void Tester::prepare(){
   }
 
   // Residual function G
-  vector<SXMatrix> G_in(G_NUM_IN);
-  G_in[G_U] = u;
-  G_in[G_V] = v;
-  G_in[G_LAM_U] = lam_u;
-  G_in[G_LAM_G] = lam_g;
-  G_in[G_LAM_H] = lam_h;
 
-  vector<SXMatrix> G_out(G_NUM_OUT);
-  G_out[G_D] = h-v;
-  G_out[G_LAM_D] = gL_v-lam_h;
-  G_out[G_G] = vertcat(h-v,g);
-  G_out[G_F] = obj;
+  // Inputs
+  vector<SXMatrix> G_in(1+2*x_.size());
+  int n=0;
+  G_in[g_con_ = n++] = lam_g;
+  for(int i=0; i<x_.size(); ++i){
+    G_in[x_[i].g_var=n++] = var[i];
+    G_in[x_[i].g_lam=n++] = lam[i];    
+  }
+  casadi_assert(n==G_in.size());
+
+  // Outputs
+  n=0;
+  vector<SXMatrix> G_out(2+2*(x_.size()-1));
+  G_out[g_f_=n++] = obj;
+  G_out[g_g_=n++] = con[0];
+  for(int i=1; i<x_.size(); ++i){
+    G_out[x_[i].g_d=n++] = con[i]-var[i];
+    G_out[x_[i].g_lam_d=n++] = gL[i]-lam[i];
+  }
+  casadi_assert(n==G_out.size());
+
   rfcn_ = SXFunction(G_in,G_out);
   rfcn_.setOption("number_of_fwd_dir",0);
   rfcn_.setOption("number_of_adj_dir",0);
@@ -486,45 +522,66 @@ void Tester::prepare(){
   }
 
   // Declare difference vector d and substitute out v
-  SXMatrix d = ssym("d",nv_);
-  SXMatrix d_def = h-d;
-  vector<SXMatrix> ex(4);
-  ex[0] = gL_u;
-  ex[1] = g;
-  ex[2] = obj;
-  ex[3] = gL_v;
-  substituteInPlace(v, d_def, ex, false);
-  SXMatrix gL_u_z = ex[0];
-  SXMatrix g_z = ex[1];
-  SXMatrix obj_z = ex[2];
-  SXMatrix gL_v_z = ex[3];
+  vector<SXMatrix> d(x_.size());
+  vector<SXMatrix> d_def(x_.size());
+  stringstream ss;
+  for(int i=1; i<x_.size(); ++i){
+    ss.str(string());
+    ss << "d" << i;
+    d[i] = ssym(ss.str(),x_[i].n);
+    d_def[i] = con[i]-d[i];
+  }
 
-  // Declare difference vector lam_d and substitute out lam_h
-  SXMatrix lam_d;
-  SXMatrix lam_d_def;
+  vector<SXMatrix> ex(4);
+  ex[2] = obj;
+  ex[1] = con[0];
+  ex[0] = gL[0];
+  ex[3] = gL[1];
+  substituteInPlace(var[1], d_def[1], ex, false);
+  vector<SXMatrix> gL_z(x_.size());
+  SXMatrix obj_z = ex[2];
+  SXMatrix g_z = ex[1];
+  gL_z[0] = ex[0];
+  gL_z[1] = ex[3];
+
+  // Declare difference vector lam_d and substitute out lam_v
+  vector<SXMatrix> lam_d(x_.size());
+  vector<SXMatrix> lam_d_def(x_.size());
   if(!gauss_newton_){
-    lam_d = ssym("lam_d",nv_);
-    lam_d_def = lam_h-lam_d;
+    for(int i=1; i<x_.size(); ++i){
+      ss.str(string());
+      ss << "lam_d" << i;
+      lam_d[i] = ssym(ss.str(),x_[i].n);
+      lam_d_def[i] = lam[i]-lam_d[i];
+    }
+
     ex.resize(2);
-    substituteInPlace(lam_h, lam_d_def, ex, false);    
-    gL_u_z = ex[0];
+    substituteInPlace(lam[1], lam_d_def[1], ex, false);    
+    gL_z[0] = ex[0];
     g_z = ex[1];
   }
   
   // Modified function Z
-  vector<SXMatrix> zfcn_in(Z_NUM_IN);
-  zfcn_in[Z_U] = u;
-  zfcn_in[Z_D] = d;
-  zfcn_in[Z_LAM_D] = lam_d;
-  zfcn_in[Z_LAM_U] = lam_u;
-  zfcn_in[Z_LAM_G] = lam_g;
-  
-  vector<SXMatrix> zfcn_out(Z_NUM_OUT);
-  zfcn_out[Z_D_DEF] = d_def;
-  zfcn_out[Z_LAM_D_DEF] = lam_d_def;
-  zfcn_out[Z_FG] = vertcat(gL_u_z,g_z);
-  
-  SXFunction zfcn(zfcn_in,zfcn_out);
+  vector<SXMatrix> z_in(1+2*x_.size());
+  n=0;
+  z_in[z_con_ = n++] = lam_g;
+  for(int i=0; i<x_.size(); ++i){
+    z_in[x_[i].z_var=n++] = i==0 ? var[0] :     d[i];
+    z_in[x_[i].z_lam=n++] = i==0 ? lam[0] : lam_d[i];    
+  }
+  casadi_assert(n==z_in.size());
+
+  // Outputs
+  n=0;
+  vector<SXMatrix> z_out(1+2*(x_.size()-1));
+  z_out[z_fg_=n++] = vertcat(gL_z[0],g_z);
+  for(int i=1; i<x_.size(); ++i){
+    z_out[x_[i].z_def=n++] =  d_def[i];
+    z_out[x_[i].z_defL=n++] = lam_d_def[i];
+  }
+  casadi_assert(n==z_out.size());
+
+  SXFunction zfcn(z_in,z_out);
   zfcn.setOption("name","zfcn");
   zfcn.init();
   if(verbose_){
@@ -532,79 +589,92 @@ void Tester::prepare(){
   }
 
   // Matrix A and B in lifted Newton
-  SXMatrix B = zfcn.jac(Z_U,Z_FG);
-  SXMatrix B1 = B(Slice(0,ngL_),Slice(0,B.size2()));
-  SXMatrix B2 = B(Slice(ngL_,B.size1()),Slice(0,B.size2()));
+  SXMatrix B = zfcn.jac(x_[0].z_var,z_fg_);
+  SXMatrix qpH = B(Slice(0,ngL_),Slice(0,B.size2()));
+  SXMatrix qpA = B(Slice(ngL_,B.size1()),Slice(0,B.size2()));
   if(verbose_){
-    cout << "Formed B1 (dimension " << B1.size1() << "-by-" << B1.size2() << ", "<< B1.size() << " nonzeros) " <<
-    "and B2 (dimension " << B2.size1() << "-by-" << B2.size2() << ", "<< B2.size() << " nonzeros)." << endl;
+    cout << "Formed qpH (dimension " << qpH.size1() << "-by-" << qpH.size2() << ", "<< qpH.size() << " nonzeros) " <<
+    "and qpA (dimension " << qpA.size1() << "-by-" << qpA.size2() << ", "<< qpA.size() << " nonzeros)." << endl;
   }
   
   // Step in u
-  SXMatrix du = ssym("du",nu_);
+  SXMatrix du = ssym("du",x_[0].n);
   SXMatrix dlam_g = ssym("dlam_g",lam_g.sparsity());
   
-  SXMatrix b1 = gL_u_z;
-  SXMatrix b2 = g_z;
-  SXMatrix e, eL;
-  if(nv_ > 0){
+  SXMatrix qpG = gL_z[0];
+  SXMatrix qpB = g_z;
+  vector<SXMatrix> v_exp(x_.size());
+  vector<SXMatrix> vL_exp(x_.size());
+  //  if(x_.size()>1){
+  if(x_[1].n > 0){
     
     // Directional derivative of Z
-    vector<vector<SXMatrix> > Z_fwdSeed(2,zfcn_in);
-    vector<vector<SXMatrix> > Z_fwdSens(2,zfcn_out);
+    vector<vector<SXMatrix> > Z_fwdSeed(1,z_in);
+    vector<vector<SXMatrix> > Z_fwdSens(1,z_out);
     vector<vector<SXMatrix> > Z_adjSeed;
     vector<vector<SXMatrix> > Z_adjSens;
+    for(int sweep=0; sweep<2; ++sweep){
+      Z_fwdSeed[0][z_con_].setZero();
+      if(sweep==0){
+	Z_fwdSeed[0][x_[0].z_var].setZero();
+      } else {
+	Z_fwdSeed[0][x_[0].z_var] = du;
+      }
+      Z_fwdSeed[0][x_[0].z_lam].setZero();
+      for(int i=1; i<x_.size(); ++i){
+	Z_fwdSeed[0][x_[i].z_var] = -d[i];
+	Z_fwdSeed[0][x_[i].z_lam].setZero();
+      }      
+      zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
     
-    Z_fwdSeed[0][Z_U].setZero();
-    Z_fwdSeed[0][Z_D] = -d;
-    Z_fwdSeed[0][Z_LAM_U].setZero();
-    Z_fwdSeed[0][Z_LAM_G].setZero();
-    
-    Z_fwdSeed[1][Z_U] = du;
-    Z_fwdSeed[1][Z_D] = -d;
-    Z_fwdSeed[1][Z_LAM_U].setZero();
-    Z_fwdSeed[1][Z_LAM_G] = dlam_g;
-    
-    zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
-    
-    b1 += Z_fwdSens[0][Z_FG](Slice(0,ngL_));
-    b2 += Z_fwdSens[0][Z_FG](Slice(ngL_,B.size1()));
-    e = Z_fwdSens[1][Z_D_DEF];
-    eL = Z_fwdSens[1][Z_LAM_D_DEF];
+      if(sweep==0){
+	qpG += Z_fwdSens[0][z_fg_](Slice(0,ngL_));
+	qpB += Z_fwdSens[0][z_fg_](Slice(ngL_,B.size1()));
+      } else {
+	for(int i=1; i<x_.size(); ++i){
+	  v_exp[i] = Z_fwdSens[0][x_[i].z_def];
+	  vL_exp[i] = Z_fwdSens[0][x_[i].z_defL];
+	}
+      }
+    }
   }
   if(verbose_){
-    cout << "Formed b1 (dimension " << b1.size1() << "-by-" << b1.size2() << ", "<< b1.size() << " nonzeros) " <<
-    "and b2 (dimension " << b2.size1() << "-by-" << b2.size2() << ", "<< b2.size() << " nonzeros)." << endl;
+    cout << "Formed qpG (dimension " << qpG.size1() << "-by-" << qpG.size2() << ", "<< qpG.size() << " nonzeros) " <<
+    "and qpB (dimension " << qpB.size1() << "-by-" << qpB.size2() << ", "<< qpB.size() << " nonzeros)." << endl;
   }
   
   // Generate Gauss-Newton Hessian
   if(gauss_newton_){
-    b1 = mul(trans(B1),b1);
-    B1 = mul(trans(B1),B1);
+    qpG = mul(trans(qpH),qpG);
+    qpH = mul(trans(qpH),qpH);
     if(verbose_){
-      cout << "Gauss Newton Hessian (dimension " << B1.size1() << "-by-" << B1.size2() << ", "<< B1.size() << " nonzeros)." << endl;
+      cout << "Gauss Newton Hessian (dimension " << qpH.size1() << "-by-" << qpH.size2() << ", "<< qpH.size() << " nonzeros)." << endl;
     }
   }
   
-  // Make sure b1 and b2 are dense vectors
-  makeDense(b1);
-  makeDense(b2);
-  
+  // Make sure qpG and qpB are dense vectors
+  makeDense(qpG);
+  makeDense(qpB);
+
   // Quadratic approximation
-  vector<SXMatrix> lfcn_in(LIN_NUM_IN);
-  lfcn_in[LIN_U] = u;
-  lfcn_in[LIN_V] = v;
-  lfcn_in[LIN_D] = d;
-  lfcn_in[LIN_LAM_D] = lam_d;
-  lfcn_in[LIN_LAM_U] = lam_u;
-  lfcn_in[LIN_LAM_G] = lam_g;
-  lfcn_in[LIN_LAM_H] = lam_h;
+  vector<SXMatrix> lfcn_in(1+2+ 4*(x_.size()-1));
+  n=0;
+  lfcn_in[l_con_ = n++] = lam_g;
+  for(int i=0; i<x_.size(); ++i){
+    lfcn_in[x_[i].l_var=n++] = var[i];
+    lfcn_in[x_[i].l_lam=n++] = lam[i];
+    if(i>0){
+      lfcn_in[x_[i].l_res=n++] = d[i];
+      lfcn_in[x_[i].l_resL=n++] = lam_d[i];
+    }
+  }
+  casadi_assert(n==lfcn_in.size());  
   
   vector<SXMatrix> lfcn_out(LIN_NUM_OUT);
-  lfcn_out[LIN_F1] = b1;
-  lfcn_out[LIN_J1] = B1;
-  lfcn_out[LIN_G] = b2;
-  lfcn_out[LIN_J2] = B2;
+  lfcn_out[LIN_QPG] = qpG;
+  lfcn_out[LIN_H] = qpH;
+  lfcn_out[LIN_QPB] = qpB;
+  lfcn_out[LIN_QPA] = qpA;
   lfcn_ = SXFunction(lfcn_in,lfcn_out);
   lfcn_.setOption("name","lfcn");
   lfcn_.setOption("number_of_fwd_dir",0);
@@ -615,17 +685,25 @@ void Tester::prepare(){
   }
     
   // Step expansion
-  vector<SXMatrix> efcn_in(EXP_NUM_IN);
-  efcn_in[EXP_U] = u;
-  efcn_in[EXP_D] = d;
-  efcn_in[EXP_LAM_D] = lam_d;
-  efcn_in[EXP_LAM_U] = lam_u;
-  efcn_in[EXP_LAM_G] = lam_g;
-  efcn_in[EXP_DU] = du;
-  efcn_in[EXP_DLAM_G] = dlam_g;
-  vector<SXMatrix> efcn_out(EXP_NUM_OUT);
-  efcn_out[EXP_V] = e;
-  efcn_out[EXP_LAM_H] = eL;
+  vector<SXMatrix> efcn_in(3+2*x_.size());
+  n=0;
+  efcn_in[e_con_ = n++] = lam_g;
+  efcn_in[e_du_ = n++] = du;
+  efcn_in[e_dlam_g_ = n++] = dlam_g;
+  for(int i=0; i<x_.size(); ++i){
+    efcn_in[x_[i].e_var=n++] = i==0 ? var[0] :     d[i];
+    efcn_in[x_[i].e_lam=n++] = i==0 ? lam[0] : lam_d[i];
+  }
+  casadi_assert(n==efcn_in.size());
+
+  vector<SXMatrix> efcn_out(2*(x_.size()-1));
+  n=0;
+  for(int i=1; i<x_.size(); ++i){
+    efcn_out[x_[i].e_exp=n++]  = v_exp[i];
+    efcn_out[x_[i].e_expL=n++] = vL_exp[i];
+  }
+  casadi_assert(n==efcn_out.size());
+
   efcn_ = SXFunction(efcn_in,efcn_out);
   efcn_.setOption("number_of_fwd_dir",0);
   efcn_.setOption("number_of_adj_dir",0);
@@ -636,7 +714,7 @@ void Tester::prepare(){
   }
   
   // Allocate a QP solver
-  qp_solver_ = QPOasesSolver(B1.sparsity(),B2.sparsity());
+  qp_solver_ = QPOasesSolver(qpH.sparsity(),qpA.sparsity());
   qp_solver_.setOption("printLevel","none");
   
   // Initialize the QP solver
@@ -646,17 +724,10 @@ void Tester::prepare(){
   }
 
   // Residual
-  d_.resize(d.size(),0);
-  lam_d_.resize(lam_d.size(),0);
-  
-  // Primal step
-  du_.resize(nu_);
-  dv_.resize(nv_);
-
-  // Dual step
-  dlambda_u_.resize(nu_);
-  dlambda_g_.resize(ng_);
-  dlambda_h_.resize(nv_);
+  for(int i=1; i<x_.size(); ++i){
+    x_[i].res.resize(d[i].size(),0);
+    x_[i].resL.resize(lam_d[i].size(),0);
+  }
 }
 
 void Tester::solve(int& iter_count){
@@ -667,58 +738,66 @@ void Tester::solve(int& iter_count){
   double f_k = numeric_limits<double>::quiet_NaN();
   
   // Current guess for the primal solution
-  copy(u_init_.begin(),u_init_.end(),u_opt_.begin());
-  copy(v_init_.begin(),v_init_.end(),v_opt_.begin());
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    copy(it->init.begin(),it->init.end(),it->opt.begin());
+  }
   
-  int k=0;
-  
-  // Does G depend on the multipliers?
-  bool has_lam_u =  !gauss_newton_ && nu_>0;
-  bool has_lam_g =  !gauss_newton_ && ng_>0;
-  bool has_lam_h =  !gauss_newton_ && nv_>0;
-  
+  int k=0;  
   while(true){
 
     // Evaluate residual
-    rfcn_.setInput(u_opt_,G_U);
-    rfcn_.setInput(v_opt_,G_V);
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      rfcn_.setInput(it->opt,it->g_var);
+    }
 
-    if(has_lam_u) rfcn_.setInput(lambda_u_,G_LAM_U);
-    if(has_lam_g) rfcn_.setInput(lambda_g_,G_LAM_G);
-    if(has_lam_h) rfcn_.setInput(lambda_h_,G_LAM_H);
+    if(!gauss_newton_){
+      rfcn_.setInput(lambda_g_,g_con_);
+      for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+	rfcn_.setInput(it->lam,it->g_lam);
+      }
+    }
 
     rfcn_.evaluate();
-    rfcn_.getOutput(d_,G_D);
-    rfcn_.getOutput(lam_d_,G_LAM_D);
-    f_k = rfcn_.output(G_F).toScalar();
-    const DMatrix& g_k = rfcn_.output(G_G);
+    f_k = rfcn_.output(g_f_).toScalar();
+    const DMatrix& r_g = rfcn_.output(g_g_);
+    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+      rfcn_.getOutput(it->res,  it->g_d);
+      rfcn_.getOutput(it->resL, it->g_lam_d);
+    }
     
     // Construct the QP
-    lfcn_.setInput(u_opt_,LIN_U);
-    lfcn_.setInput(v_opt_,LIN_V);
-    
-    if(has_lam_u) lfcn_.setInput(lambda_u_,LIN_LAM_U);
-    if(has_lam_g) lfcn_.setInput(lambda_g_,LIN_LAM_G);
-    if(has_lam_h) lfcn_.setInput(lambda_h_,LIN_LAM_H);
+    lfcn_.setInput(lambda_g_,l_con_);
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      lfcn_.setInput(it->opt,it->l_var);
+      if(!gauss_newton_){
+	lfcn_.setInput(it->lam,it->l_lam);	
+      }
+    }
 
-    lfcn_.setInput(d_,LIN_D);
-    lfcn_.setInput(lam_d_,LIN_LAM_D);
+    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+      lfcn_.setInput(it->res, it->l_res);
+      if(!gauss_newton_){
+	lfcn_.setInput(it->resL,it->l_resL);
+      }
+    }
+
     lfcn_.evaluate();
-    DMatrix& B1_k = lfcn_.output(LIN_J1);
-    const DMatrix& b1_k = lfcn_.output(LIN_F1);
-    const DMatrix& B2_k = lfcn_.output(LIN_J2);
-    const DMatrix& b2_k = lfcn_.output(LIN_G);
+
+    DMatrix& qpH = lfcn_.output(LIN_H);
+    const DMatrix& qpG = lfcn_.output(LIN_QPG);
+    const DMatrix& qpA = lfcn_.output(LIN_QPA);
+    const DMatrix& qpB = lfcn_.output(LIN_QPB);
 
     // Regularization
     double reg = 0;
     bool regularization = true;
     
     // Check the smallest eigenvalue of the Hessian
-    if(regularization && nu_==2){
-      double a = B1_k.elem(0,0);
-      double b = B1_k.elem(0,1);
-      double c = B1_k.elem(1,0);
-      double d = B1_k.elem(1,1);
+    if(regularization && x_[0].n==2){
+      double a = qpH.elem(0,0);
+      double b = qpH.elem(0,1);
+      double c = qpH.elem(1,0);
+      double d = qpH.elem(1,1);
       
       // Make sure no not a numbers
       casadi_assert(a==a && b==b && c==c &&  d==d);
@@ -726,7 +805,7 @@ void Tester::solve(int& iter_count){
       // Make sure symmetric
       if(b!=c){
 	casadi_assert_warning(fabs(b-c)<1e-10,"Hessian is not symmetric: " << b << " != " << c);
-	B1_k.elem(1,0) = c = b;
+	qpH.elem(1,0) = c = b;
       }
       
       double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
@@ -735,81 +814,108 @@ void Tester::solve(int& iter_count){
 	// Regularization
 	reg = threshold-eig_smallest;
 	std::cerr << "Regularization with " << reg << " to ensure positive definite Hessian." << endl;
-	B1_k(0,0) += reg;
-	B1_k(1,1) += reg;
+	qpH(0,0) += reg;
+	qpH(1,1) += reg;
       }
     }
     
     
     // Solve the QP
-    qp_solver_.setInput(B1_k,QP_H);
-    qp_solver_.setInput(b1_k,QP_G);
-    qp_solver_.setInput(B2_k,QP_A);
-    std::transform(lbu_.begin(),lbu_.end(),u_opt_.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
-    std::transform(ubu_.begin(),ubu_.end(),u_opt_.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
-    std::transform(lbg_.begin(),lbg_.end(), b2_k.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
-    std::transform(ubg_.begin(),ubg_.end(), b2_k.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
+    qp_solver_.setInput(qpH,QP_H);
+    qp_solver_.setInput(qpG,QP_G);
+    qp_solver_.setInput(qpA,QP_A);
+    std::transform(x_[0].lb.begin(),x_[0].lb.end(),x_[0].opt.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
+    std::transform(x_[0].ub.begin(),x_[0].ub.end(),x_[0].opt.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
+    std::transform(lbg_.begin(),lbg_.end(), qpB.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
+    std::transform(ubg_.begin(),ubg_.end(), qpB.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
     qp_solver_.evaluate();
     const DMatrix& du = qp_solver_.output(QP_PRIMAL);
     const DMatrix& dlam_u = qp_solver_.output(QP_LAMBDA_X);
     const DMatrix& dlam_g = qp_solver_.output(QP_LAMBDA_A);    
     
     // Expand the step
-    efcn_.setInput(lfcn_.input(LIN_U),EXP_U);
-    efcn_.setInput(lfcn_.input(LIN_LAM_U),EXP_LAM_U);
-    efcn_.setInput(lfcn_.input(LIN_LAM_G),EXP_LAM_G);
-    efcn_.setInput(lfcn_.input(LIN_D),EXP_D);
-    efcn_.setInput(lfcn_.input(LIN_LAM_D),EXP_LAM_D);
-    efcn_.setInput(du,EXP_DU);
-    if(has_lam_g) efcn_.setInput(dlam_g,EXP_DLAM_G);
+    efcn_.setInput(du,e_du_);
+    efcn_.setInput(lfcn_.input(x_[0].l_var),x_[0].e_var);
+    for(int i=1; i<x_.size(); ++i){
+      efcn_.setInput(lfcn_.input(x_[i].l_res),x_[i].e_var);
+    }
+    if(!gauss_newton_){
+      efcn_.setInput(dlam_g,e_dlam_g_);
+      efcn_.setInput(lfcn_.input(l_con_),e_con_);
+      efcn_.setInput(lfcn_.input(x_[0].l_lam),x_[0].e_lam);
+      for(int i=1; i<x_.size(); ++i){
+	efcn_.setInput(lfcn_.input(x_[i].l_resL),x_[i].e_lam);
+      }
+    }
     efcn_.evaluate();
-    const DMatrix& dv = efcn_.output(EXP_V);
-    const DMatrix& dlam_h = efcn_.output(EXP_LAM_H);
-    
-    // Expanded primal step
-    copy(du.begin(),du.end(),du_.begin());
-    copy(dv.begin(),dv.end(),dv_.begin());
 
+    // Expanded primal step
+    copy(du.begin(),du.end(),x_[0].dx.begin());
+    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+      const DMatrix& dv = efcn_.output(it->e_exp);
+      copy(dv.begin(),dv.end(),it->dx.begin());
+    }
+    
     // Expanded dual step
-    copy(dlam_u.begin(),dlam_u.end(),dlambda_u_.begin());
     copy(dlam_g.begin(),dlam_g.end(),dlambda_g_.begin());
-    copy(dlam_h.begin(),dlam_h.end(),dlambda_h_.begin());
+    copy(dlam_u.begin(),dlam_u.end(),x_[0].dlam.begin());
+    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+      const DMatrix& dlam_v = efcn_.output(it->e_expL);
+      copy(dlam_v.begin(),dlam_v.end(),x_[1].dlam.begin());
+    }
     
     // Take a full step
-    transform(du_.begin(),du_.end(),u_opt_.begin(),u_opt_.begin(),plus<double>());
-    transform(dv_.begin(),dv_.end(),v_opt_.begin(),v_opt_.begin(),plus<double>());
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      transform(it->dx.begin(),it->dx.end(),it->opt.begin(),it->opt.begin(),plus<double>());
+    }
 
-    copy(dlambda_u_.begin(),dlambda_u_.end(),lambda_u_.begin());
     transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),lambda_g_.begin(),plus<double>());
-    transform(dlambda_h_.begin(),dlambda_h_.end(),lambda_h_.begin(),lambda_h_.begin(),plus<double>());
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      if(it==x_.begin()){
+	copy(it->dlam.begin(),it->dlam.end(),it->lam.begin()); // BUG?
+      } else {
+	transform(it->dlam.begin(),it->dlam.end(),it->lam.begin(),it->lam.begin(),plus<double>()); // BUG?
+      }
+    }
 
     // Step size
     double norm_step=0;
-    for(vector<double>::const_iterator it=du_.begin(); it!=du_.end(); ++it)  norm_step += *it**it;
-    for(vector<double>::const_iterator it=dv_.begin(); it!=dv_.end(); ++it)  norm_step += *it**it;
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      for(vector<double>::const_iterator i=it->dx.begin(); i!=it->dx.end(); ++i){
+	norm_step += *i**i;
+      }
+    }
     if(!gauss_newton_){
-      for(vector<double>::const_iterator it=dlambda_g_.begin(); it!=dlambda_g_.end(); ++it) norm_step += *it**it;
-      for(vector<double>::const_iterator it=dlambda_h_.begin(); it!=dlambda_h_.end(); ++it) norm_step += *it**it;
+      for(vector<double>::const_iterator i=dlambda_g_.begin();	i!=dlambda_g_.end(); ++i){
+	norm_step += *i**i;
+      }
+      for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+	for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i){
+	  norm_step += *i**i;
+	}
+      }
     }
     norm_step = sqrt(norm_step);
     
     // Constraint violation
     double norm_viol = 0;
-    for(int i=0; i<nu_; ++i){
-      double d = ::fmax(u_opt_.at(i)-ubu_.at(i),0.) + ::fmax(lbu_.at(i)-u_opt_.at(i),0.);
-      norm_viol += d*d;
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      for(int i=0; i<it->n; ++i){
+	double d = ::fmax(it->opt.at(i) - it->ub.at(i),0.) + ::fmax(it->lb.at(i) - it->opt.at(i),0.);
+	norm_viol += d*d;
+      }
     }
-    for(int i=0; i<nv_; ++i){
-      double d = ::fmax(v_opt_.at(i)-ubv_.at(i),0.) + ::fmax(lbv_.at(i)-v_opt_.at(i),0.);
-      norm_viol += d*d;
-    }
+
     for(int i=0; i<ng_; ++i){
-      double d = ::fmax(g_k.at(nv_+i)-ubg_.at(i),0.) + ::fmax(lbg_.at(i)-g_k.at(nv_+i),0.);
+      double d = ::fmax(r_g.at(i)-ubg_.at(i),0.) + ::fmax(lbg_.at(i)-r_g.at(i),0.);
       norm_viol += d*d;
     }
-    for(int i=0; i<nv_; ++i){
-      double d = ::fmax(g_k.at(i),0.) + ::fmax(-g_k.at(i),0.);
-      norm_viol += d*d;
+
+    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+      for(int i=0; i<it->n; ++i){
+	double d = ::fmax(it->res.at(i),0.) + ::fmax(-it->res.at(i),0.);
+	norm_viol += d*d;
+      }
     }
 
     norm_viol = sqrt(norm_viol);
@@ -844,13 +950,16 @@ void Tester::solve(int& iter_count){
 
 void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est){
   // Initial guess for the parameters
-  u_init_[0] = drag_guess;
-  u_init_[1] = depth_guess;
-  fill(v_init_.begin(),v_init_.end(),0);
+  x_[0].init[0] = drag_guess;
+  x_[0].init[1] = depth_guess;
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    if(it==x_.begin()) continue;
+    fill(it->init.begin(),it->init.end(),0);
+  }
 
   // Initial guess for the heights
   if(!single_shooting_){
-    vector<double>::iterator it=v_init_.begin();
+    vector<double>::iterator it=x_[1].init.begin();
     for(int k=0; k<n_meas_; ++k){
       copy(H_meas_[k].begin(),H_meas_[k].end(),it);
       it += n_boxes_*n_boxes_;
@@ -859,8 +968,8 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   
   fill(lbg_.begin(),lbg_.end(),0);
   fill(ubg_.begin(),ubg_.end(),0);
-  lbu_[0] = 0;
-  lbu_[1] = 0;
+  x_[0].lb[0] = 0;
+  x_[0].lb[1] = 0;
 
   clock_t time1 = clock();
   solve(iter_count);
@@ -868,8 +977,8 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   
   // Solution statistics  
   sol_time = double(time2-time1)/CLOCKS_PER_SEC;
-  drag_est = u_opt_.at(0);
-  depth_est = u_opt_.at(1);
+  drag_est = x_[0].opt.at(0);
+  depth_est = x_[0].opt.at(1);
 }
 
 int main(){
