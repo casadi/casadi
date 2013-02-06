@@ -21,6 +21,7 @@
  */
 
 #include "csparse_internal.hpp"
+#include "symbolic/matrix/matrix_tools.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -92,13 +93,25 @@ void CSparseInternal::prepare(){
   if(N_) cs_nfree(N_);
   N_ = cs_lu(&AT_, S_, tol) ;                 // numeric LU factorization 
   if(N_==0){
-	stringstream ss;
-	ss << "CSparseInternal::prepare: factorization failed, check if Jacobian is singular" << endl;
-	if(verbose()){
-	  ss << "Sparsity of the linear system: " << endl;
-	  sparsity_.print(ss); // print detailed
-	}
-    throw CasadiException(ss.str());
+    DMatrix temp = input();
+    makeSparse(temp);
+    if (isSingular(temp.sparsity())) {
+    	stringstream ss;
+	    ss << "CSparseInternal::prepare: factorization failed due to matrix being singular. Matrix contains numerical zeros which are structurally non-zero. Promoting these zeros to be structural zeros, the matrix was found to be structurally rank deficient. sprank: " << rank(temp.sparsity()) << " <-> " << temp.size1() << endl;
+	    if(verbose()){
+	      ss << "Sparsity of the linear system: " << endl;
+	      sparsity_.print(ss); // print detailed
+	    }
+      throw CasadiException(ss.str());
+    } else {
+    	stringstream ss;
+	    ss << "CSparseInternal::prepare: factorization failed, check if Jacobian is singular" << endl;
+	    if(verbose()){
+	      ss << "Sparsity of the linear system: " << endl;
+	      sparsity_.print(ss); // print detailed
+	    }
+      throw CasadiException(ss.str());
+    }
   }
   casadi_assert(N_!=0);
 
