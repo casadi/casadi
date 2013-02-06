@@ -94,10 +94,10 @@ public:
   vector<double> d_k_;
    
   /// Primal step
-  vector<double> dx_k_;
+  vector<double> du_,dv_;
    
   /// Dual step
-  vector<double> dlambda_u_, dlambda_hg_;
+  vector<double> dlambda_u_, dlambda_h_, dlambda_g_;
   
   /// Indices
   enum GIn{G_U,G_V,G_LAM_X,G_LAM_HG,G_NUM_IN};
@@ -121,9 +121,10 @@ public:
   /// Dimensions
   int nu_, nv_, nx_, ng_, nf_;
   
-  vector<double> u_init_, lbu_, ubu_, u_opt_, lambda_u_, g_, lbg_, ubg_, lambda_g_;
-  vector<double> v_init_, lbv_, ubv_, v_opt_, lambda_v_, h_, lambda_h_;
-
+  vector<double> u_init_, lbu_, ubu_, u_opt_, lambda_u_;
+  vector<double> lbg_, ubg_, lambda_g_;
+  vector<double> v_init_, lbv_, ubv_, v_opt_;
+  vector<double> lambda_h_;
 };
 
 void Tester::model(){
@@ -394,14 +395,11 @@ void Tester::prepare(){
   v_opt_.resize(nv_,0);
   lbv_.resize(nv_,-numeric_limits<double>::infinity());
   ubv_.resize(nv_, numeric_limits<double>::infinity());
-  lambda_v_.resize(nv_,0);
+  //lambda_v_.resize(nv_,0);
 
-  g_.resize(ng_ + nv_);
-  lbg_.resize(ng_ + nv_,-numeric_limits<double>::infinity());
-  ubg_.resize(ng_ + nv_, numeric_limits<double>::infinity());
-  lambda_g_.resize(ng_ + nv_,0);
-
-  h_.resize(nv_,0);
+  lbg_.resize(ng_,-numeric_limits<double>::infinity());
+  ubg_.resize(ng_, numeric_limits<double>::infinity());
+  lambda_g_.resize(ng_,0);
   lambda_h_.resize(nv_,0);
         
   SXMatrix hg = vertcat(h,g);
@@ -644,11 +642,13 @@ void Tester::prepare(){
   d_k_.resize(d.size(),0);
   
   // Primal step
-  dx_k_.resize(nx_);
+  du_.resize(nu_);
+  dv_.resize(nv_);
 
   // Dual step
-  dlambda_u_.resize(lambda_u_.size());
-  dlambda_hg_.resize(lambda_g_.size());
+  dlambda_u_.resize(nu_);
+  dlambda_g_.resize(ng_);
+  dlambda_h_.resize(nv_);
 }
 
 void Tester::solve(int& iter_count){
@@ -674,7 +674,10 @@ void Tester::solve(int& iter_count){
     rfcn_.setInput(u_opt_,G_U);
     rfcn_.setInput(v_opt_,G_V);
     if(has_lam_x) rfcn_.setInput(lambda_u_,G_LAM_X);
-    if(has_lam_hg) rfcn_.setInput(lambda_g_,G_LAM_HG);
+    if(has_lam_hg){
+      copy(lambda_g_.begin(),lambda_g_.end(),rfcn_.input(G_LAM_HG).begin()+nv_);
+      copy(lambda_h_.begin(),lambda_h_.end(),rfcn_.input(G_LAM_HG).begin());
+    }
     rfcn_.evaluate();
     rfcn_.getOutput(d_k_,G_D);
     f_k = rfcn_.output(G_F).toScalar();
@@ -685,7 +688,10 @@ void Tester::solve(int& iter_count){
     lfcn_.setInput(v_opt_,LIN_V);
     
     if(has_lam_x) lfcn_.setInput(lambda_u_,LIN_LAM_X);
-    if(has_lam_hg) lfcn_.setInput(lambda_g_,LIN_LAM_HG);
+    if(has_lam_hg){
+      copy(lambda_g_.begin(),lambda_g_.end(),lfcn_.input(LIN_LAM_HG).begin()+nv_);
+      copy(lambda_h_.begin(),lambda_h_.end(),lfcn_.input(LIN_LAM_HG).begin());
+    }
     lfcn_.setInput(d_k_,LIN_D);
     lfcn_.evaluate();
     DMatrix& B1_k = lfcn_.output(LIN_J1);
@@ -731,8 +737,8 @@ void Tester::solve(int& iter_count){
     qp_solver_.setInput(B2_k,QP_A);
     std::transform(lbu_.begin(),lbu_.end(),u_opt_.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
     std::transform(ubu_.begin(),ubu_.end(),u_opt_.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
-    std::transform(lbg_.begin()+nv_,lbg_.end(), b2_k.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
-    std::transform(ubg_.begin()+nv_,ubg_.end(), b2_k.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
+    std::transform(lbg_.begin(),lbg_.end(), b2_k.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
+    std::transform(ubg_.begin(),ubg_.end(), b2_k.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
     qp_solver_.evaluate();
     const DMatrix& du_k = qp_solver_.output(QP_PRIMAL);
     const DMatrix& dlam_u_k = qp_solver_.output(QP_LAMBDA_X);
@@ -748,26 +754,29 @@ void Tester::solve(int& iter_count){
     const DMatrix& dv_k = efcn_.output();
     
     // Expanded primal step
-    copy(du_k.begin(),du_k.end(),dx_k_.begin());
-    copy(dv_k.begin(),dv_k.begin()+nv_,dx_k_.begin()+nu_);
+    copy(du_k.begin(),du_k.end(),du_.begin());
+    copy(dv_k.begin(),dv_k.end(),dv_.begin());
 
     // Expanded dual step
     copy(dlam_u_k.begin(),dlam_u_k.end(),dlambda_u_.begin());
-    copy(dlam_g_k.begin(),dlam_g_k.end(),dlambda_hg_.begin()+nv_);
-    copy(dv_k.rbegin(),dv_k.rbegin()+nv_,dlambda_hg_.begin());
+    copy(dlam_g_k.begin(),dlam_g_k.end(),dlambda_g_.begin());
+    copy(dv_k.rbegin(),dv_k.rbegin()+nv_,dlambda_h_.begin());
     
     // Take a full step
-    transform(dx_k_.begin(),dx_k_.begin()+nu_,u_opt_.begin(),u_opt_.begin(),plus<double>());
-    transform(dx_k_.begin()+nu_,dx_k_.end(),v_opt_.begin(),v_opt_.begin(),plus<double>());
+    transform(du_.begin(),du_.end(),u_opt_.begin(),u_opt_.begin(),plus<double>());
+    transform(dv_.begin(),dv_.end(),v_opt_.begin(),v_opt_.begin(),plus<double>());
 
     copy(dlambda_u_.begin(),dlambda_u_.end(),lambda_u_.begin());
-    transform(dlambda_hg_.begin(),dlambda_hg_.end(),lambda_g_.begin(),lambda_g_.begin(),plus<double>());
+    transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),lambda_g_.begin(),plus<double>());
+    transform(dlambda_h_.begin(),dlambda_h_.end(),lambda_h_.begin(),lambda_h_.begin(),plus<double>());
 
     // Step size
     double norm_step=0;
-    for(vector<double>::const_iterator it=dx_k_.begin(); it!=dx_k_.end(); ++it)  norm_step += *it**it;
+    for(vector<double>::const_iterator it=du_.begin(); it!=du_.end(); ++it)  norm_step += *it**it;
+    for(vector<double>::const_iterator it=dv_.begin(); it!=dv_.end(); ++it)  norm_step += *it**it;
     if(!gauss_newton_){
-      for(vector<double>::const_iterator it=dlambda_hg_.begin(); it!=dlambda_hg_.end(); ++it) norm_step += *it**it;
+      for(vector<double>::const_iterator it=dlambda_g_.begin(); it!=dlambda_g_.end(); ++it) norm_step += *it**it;
+      for(vector<double>::const_iterator it=dlambda_h_.begin(); it!=dlambda_h_.end(); ++it) norm_step += *it**it;
     }
     norm_step = sqrt(norm_step);
     
@@ -781,10 +790,15 @@ void Tester::solve(int& iter_count){
       double d = ::fmax(v_opt_.at(i)-ubv_.at(i),0.) + ::fmax(lbv_.at(i)-v_opt_.at(i),0.);
       norm_viol += d*d;
     }
-    for(int i=0; i<g_k.size(); ++i){
-      double d = ::fmax(g_k.at(i)-ubg_.at(i),0.) + ::fmax(lbg_.at(i)-g_k.at(i),0.);
+    for(int i=0; i<ng_; ++i){
+      double d = ::fmax(g_k.at(nv_+i)-ubg_.at(i),0.) + ::fmax(lbg_.at(i)-g_k.at(nv_+i),0.);
       norm_viol += d*d;
     }
+    for(int i=0; i<nv_; ++i){
+      double d = ::fmax(g_k.at(i),0.) + ::fmax(-g_k.at(i),0.);
+      norm_viol += d*d;
+    }
+
     norm_viol = sqrt(norm_viol);
     
     // Print progress (including the header every 10 rows)
@@ -832,13 +846,6 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   
   fill(lbg_.begin(),lbg_.end(),0);
   fill(ubg_.begin(),ubg_.end(),0);
-  // 	ubg_[nv] = numeric_limits<double>::infinity();
-  // 	ubg_[nv+1] = numeric_limits<double>::infinity();
-  // 	lbg_[nv] = -numeric_limits<double>::infinity();
-  // 	lbg_[nv+1] = -numeric_limits<double>::infinity();
-	
-  //   lbu_.setAll(-1000.);
-  //   ubu_.setAll( 1000.);
   lbu_[0] = 0;
   lbu_[1] = 0;
 
