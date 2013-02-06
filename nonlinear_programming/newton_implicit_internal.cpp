@@ -23,6 +23,7 @@
 #include "newton_implicit_internal.hpp"
 
 #include "symbolic/mx/mx_tools.hpp"
+#include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/fx/mx_function.hpp"
 
 using namespace std;
@@ -42,9 +43,10 @@ NewtonImplicitInternal* NewtonImplicitInternal::clone() const{
 }
   
 NewtonImplicitInternal::NewtonImplicitInternal(const FX& f, int nrhs) : ImplicitFunctionInternal(f,nrhs) {
-  addOption("abstol",                      OT_REAL,1e-12,"Stopping criterion tolerance");
+  addOption("abstol",                      OT_REAL,1e-12,"Stopping criterion tolerance on max(|F|)");
+  addOption("abstolStep",                  OT_REAL,1e-12,"Stopping criterion tolerance on step size");
   addOption("max_iter",  OT_INTEGER, 1000, "Maximum number of Newton iterations to perform before returning.");
-  addOption("monitor",   OT_STRINGVECTOR, GenericType(),  "", "step|stepsize|J|F", true);
+  addOption("monitor",   OT_STRINGVECTOR, GenericType(),  "", "step|stepsize|J|F|normF", true);
 }
 
 NewtonImplicitInternal::~NewtonImplicitInternal(){ 
@@ -83,7 +85,16 @@ void NewtonImplicitInternal::evaluate(int nfdir, int nadir) {
     J_.evaluate();
     
     if (monitored("F")) std::cout << "  F = " << F << std::endl;
+    if (monitored("normF")) std::cout << "  F (min, max, 1-norm, 2-norm) = " << (*std::min_element(F.data().begin(),F.data().end())) << ", " << (*std::max_element(F.data().begin(),F.data().end())) << ", " << sumAll(fabs(F)) << ", " << sqrt(sumAll(F*F)) << std::endl;
     if (monitored("J")) std::cout << "  J = " << J << std::endl;
+
+    if ( numeric_limits<double>::infinity() != abstol_ ) {
+      double maxF = ((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
+      if (maxF <= abstol_) {
+        casadi_log("Converged to acceptable tolerance - abstol: " << abstol_);
+        break;
+      }
+    } 
     
     // Prepare the linear solver with J
     linsol_.setInput(J,0);
@@ -96,17 +107,13 @@ void NewtonImplicitInternal::evaluate(int nfdir, int nadir) {
       std::cout << "  step = " << F << std::endl;
     }
     
-    if ( numeric_limits<double>::infinity() != abstol_ ) {
-      double maxF = 0;
-      for (int k=0;k<F.size();++k) {
-        if (F.data()[k]>maxF)  maxF = F.data()[k];
-        if (-F.data()[k]>maxF) maxF = -F.data()[k];
-      }
+    if ( numeric_limits<double>::infinity() != abstolStep_ ) {
+      double maxF = ((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
       if (monitored("stepsize")) {
         std::cout << "  stepsize = " << maxF << std::endl;
       }
-      if (maxF <= abstol_) {
-        log("evaluate","Converged to acceptable tolerance");
+      if (maxF <= abstolStep_) {
+        casadi_log("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
         break;
       }
     } 
@@ -144,6 +151,10 @@ void NewtonImplicitInternal::init(){
     
   if (hasSetOption("abstol"))
     abstol_ = getOption("abstol");
+
+  if (hasSetOption("abstolStep"))
+    abstolStep_ = getOption("abstolStep");
+    
 }
 
 } // namespace CasADi

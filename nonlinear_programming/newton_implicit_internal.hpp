@@ -63,6 +63,9 @@ public:
     
     /// Absolute tolerance that should be met on residual
     double abstol_;
+    
+    /// Absolute tolerance that should be met on step
+    double abstolStep_;
 };
 
 } // namespace CasADi
