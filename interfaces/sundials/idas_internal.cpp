@@ -56,7 +56,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("cj_scaling",                  OT_BOOLEAN,          false,          "IDAS scaling on cj for the user-defined linear solver module");
   addOption("extra_fsens_calc_ic",         OT_BOOLEAN,          false,          "Call calc ic an extra time, with fsens=0");
   addOption("disable_internal_warnings",   OT_BOOLEAN,          false,          "Disable IDAS internal warning messages");
-  addOption("monitor",                     OT_STRINGVECTOR,     GenericType(),  "", "correctInitialConditions|res|resS|resB|rhsQB|bjacB|jtimesB|psetupB|psolveB", true);
+  addOption("monitor",                     OT_STRINGVECTOR,     GenericType(),  "", "correctInitialConditions|res|resS|resB|rhsQB|bjacB|jtimesB|psetupB|psolveB|psetup", true);
   addOption("init_xdot",                   OT_REALVECTOR,       GenericType(),  "Initial values for the state derivatives");
   addOption("init_z",                      OT_REALVECTOR,       GenericType(),  "Initial values for the algebraic states");
   
@@ -1662,9 +1662,21 @@ void IdasInternal::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, do
   jac_.setInput(input(INTEGRATOR_P),DAE_P);
   jac_.setInput(cj,DAE_NUM_IN);
 
+  if(monitored("psetup")) {
+    cout << "DAE_T    = " << t << endl;
+    cout << "DAE_X    = " << jac_.input(DAE_X) << endl;
+    cout << "DAE_Z    = " << jac_.input(DAE_Z) << endl;
+    cout << "DAE_P    = " << jac_.input(DAE_P) << endl;
+    cout << "cj = " << cj << endl;
+  }
+  
   // Evaluate jacobian
   jac_.evaluate();
 
+  if(monitored("psetup")){
+    cout << "psetup = " << jac_.output() << endl;
+  }
+  
   // Log time duration
   time2 = clock();
   t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
