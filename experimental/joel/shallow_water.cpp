@@ -324,9 +324,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
       v_offset += H.size();
       
       // Constraint function term
-      nlp_h.append(flatten(H_def-H));
-    } else {
-      H = lift(H);
+      nlp_h.append(flatten(H_def));
     }
     
     // Objective function term
@@ -362,7 +360,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
 }
 
 void Tester::prepare(){
-  verbose_ = false;
+  verbose_ = true;
 
   // Generate lifting functions
   //  MXFunction F,G,Z;
@@ -380,6 +378,7 @@ void Tester::prepare(){
   SXMatrix f = fg_sx_.outputExpr(0);
   SXMatrix g = fg_sx_.outputExpr(1);
   SXMatrix h = fg_sx_.outputExpr(2);
+  makeDense(h);
 
   // Get the dimensions
   nu_ = u.size();
@@ -405,11 +404,6 @@ void Tester::prepare(){
   lambda_g_.resize(ng_,0);
   lambda_h_.resize(nv_,0);
         
-  SXMatrix hg = vertcat(h,g);
-  
-  // Definition of v
-  SXMatrix v_def = h + v;
-
   // Scalar objective function
   SXMatrix obj;
   
@@ -431,9 +425,6 @@ void Tester::prepare(){
     // Lagrange multipliers for the simple bounds on v
     lam_v = ssym("lam_v",nv_);
     
-    // Lagrange multipliers for the simple bounds on x
-    SXMatrix lam_x = vertcat(lam_u,lam_v);
-
     // Lagrange multipliers corresponding to the definition of the dependent variables
     lam_h = ssym("lam_h",nv_);
 
@@ -445,13 +436,14 @@ void Tester::prepare(){
     }
     
     // Lagrangian function
-    SXMatrix lag = obj + inner_prod(lam_x,x);
+    SXMatrix lag = obj;
+    if(!u.empty()) lag += inner_prod(lam_u,u);
+    if(!v.empty()) lag += inner_prod(lam_v,v);
     if(!g.empty()) lag += inner_prod(lam_g,g);
-    if(!v.empty()) lag += inner_prod(lam_h,v_def);
+    if(!h.empty()) lag += inner_prod(lam_h,h);
     
     // Gradient of the Lagrangian
     SXMatrix lgrad = CasADi::gradient(lag,x);
-    if(!v.empty()) lgrad -= vertcat(SXMatrix::zeros(nu_),lam_h); // Put here to ensure that lgrad is of the form "h_extended -v_extended"
     makeDense(lgrad);
     if(verbose_){
       cout << "Generated the gradient of the Lagrangian." << endl;
@@ -485,8 +477,8 @@ void Tester::prepare(){
   G_in[G_LAM_H] = lam_h;
 
   vector<SXMatrix> G_out(G_NUM_OUT);
-  G_out[G_D] = h;
-  G_out[G_G] = hg;
+  G_out[G_D] = h-v;
+  G_out[G_G] = vertcat(h-v,g);
   G_out[G_F] = obj;
 
   rfcn_ = SXFunction(G_in,G_out);
@@ -506,7 +498,7 @@ void Tester::prepare(){
   }
 
   // Substitute out the v from the h
-  SXMatrix d_def = (h + v)-d;
+  SXMatrix d_def = h-d;
   vector<SXMatrix> ex(3);
   ex[0] = f;
   ex[1] = g;
@@ -624,7 +616,8 @@ void Tester::prepare(){
   copy(lfcn_in.begin(),lfcn_in.end(),efcn_in.begin());
   efcn_in[EXP_DU] = du;
   efcn_in[EXP_DLAM_G] = dlam_g;
-  efcn_ = SXFunction(efcn_in,e);
+  vector<SXMatrix> efcn_out(1,e);
+  efcn_ = SXFunction(efcn_in,efcn_out);
   efcn_.setOption("number_of_fwd_dir",0);
   efcn_.setOption("number_of_adj_dir",0);
   efcn_.setOption("live_variables",true);
