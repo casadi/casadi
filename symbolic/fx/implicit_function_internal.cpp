@@ -59,6 +59,10 @@ void ImplicitFunctionInternal::init(){
   if(J_.isNull()) J_ = f_.jacobian(0,0);
   J_.init();
   
+  casadi_assert_message(J_.output().size1()==J_.output().size2(),"ImplicitFunctionInternal::init: the jacobian must be square but got " << J_.output().dimString());
+  
+  casadi_assert_message(!isSingular(J_.output().sparsity()),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(J_.output()) << " (in stead of "<< J_.output().size1() << ")");
+  
   // Get the linear solver creator function
   if(linsol_.isNull() && hasSetOption("linear_solver")){
     linearSolverCreator linear_solver_creator = getOption("linear_solver");

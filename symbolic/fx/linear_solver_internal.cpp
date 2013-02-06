@@ -34,6 +34,10 @@ void LinearSolverInternal::init(){
   // Transpose?
   transpose_ = getOption("trans");
   
+  casadi_assert_message(sparsity_.size1()==sparsity_.size2(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity_.dimString());
+  
+  casadi_assert_message(!isSingular(sparsity_),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity_) << " (in stead of "<< sparsity_.size1() << ")");
+  
   // Allocate space for inputs
   input_.resize(2);
   input(0) = DMatrix(sparsity_);
