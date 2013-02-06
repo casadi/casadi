@@ -122,7 +122,7 @@ public:
   FX efcn_;
   
   /// Dimensions
-  int nu_, nv_, nx_, ng_, nf_;
+  int nu_, nv_, nx_, ng_, ngL_;
   
   vector<double> u_init_, lbu_, ubu_, u_opt_, lambda_u_;
   vector<double> lbg_, ubg_, lambda_g_;
@@ -384,7 +384,6 @@ void Tester::prepare(){
   nu_ = u.size();
   nv_ = v.size();
   nx_ = nu_ + nv_;
-  nf_ = f.size();
   ng_ = g.size();
  
   u_init_.resize(nu_,0);
@@ -407,12 +406,17 @@ void Tester::prepare(){
   // Scalar objective function
   SXMatrix obj;
   
+  // Lagrangian gradient of the objective function with respect to u and v
+  SXMatrix gL_u, gL_v;
+
   // Multipliers
   SXMatrix lam_u, lam_v, lam_g, lam_h;
   if(gauss_newton_){
     
     // Least square objective
     obj = inner_prod(f,f)/2;
+    gL_u = f;
+    ngL_ = gL_u.size();
 
   } else {
     
@@ -443,22 +447,20 @@ void Tester::prepare(){
     if(!h.empty()) lag += inner_prod(lam_h,h);
     
     // Gradient of the Lagrangian
-    SXMatrix lgrad = CasADi::gradient(lag,x);
-    makeDense(lgrad);
+    SXMatrix gL = CasADi::gradient(lag,x);
+    makeDense(gL);
     if(verbose_){
       cout << "Generated the gradient of the Lagrangian." << endl;
     }
 
-    // Condensed gradient of the Lagrangian
-    f = lgrad[Slice(0,nu_)];
-    nf_ = nu_;
-    
-    // Gradient of h
-    SXMatrix h_grad = lgrad[Slice(nu_,nx_)];
+    // Gradient of the Lagrangian
+    gL_u = gL[Slice(0,nu_)];
+    gL_v = gL[Slice(nu_,nu_+nv_)];
+    ngL_ = nu_;
     
     // Reverse lam_h and h_grad
-    SXMatrix h_grad_reversed = h_grad;
-    copy(h_grad.rbegin(),h_grad.rend(),h_grad_reversed.begin());
+    SXMatrix h_grad_reversed = gL_v;
+    copy(gL_v.rbegin(),gL_v.rend(),h_grad_reversed.begin());
     SXMatrix lam_h_reversed = lam_h;
     copy(lam_h.rbegin(),lam_h.rend(),lam_h_reversed.begin());
     
@@ -500,7 +502,7 @@ void Tester::prepare(){
   // Substitute out the v from the h
   SXMatrix d_def = h-d;
   vector<SXMatrix> ex(3);
-  ex[0] = f;
+  ex[0] = gL_u;
   ex[1] = g;
   ex[2] = obj;
   substituteInPlace(v, d_def, ex, false);
@@ -528,8 +530,8 @@ void Tester::prepare(){
 
   // Matrix A and B in lifted Newton
   SXMatrix B = zfcn.jac(Z_U,Z_FG);
-  SXMatrix B1 = B(Slice(0,nf_),Slice(0,B.size2()));
-  SXMatrix B2 = B(Slice(nf_,B.size1()),Slice(0,B.size2()));
+  SXMatrix B1 = B(Slice(0,ngL_),Slice(0,B.size2()));
+  SXMatrix B2 = B(Slice(ngL_,B.size1()),Slice(0,B.size2()));
   if(verbose_){
     cout << "Formed B1 (dimension " << B1.size1() << "-by-" << B1.size2() << ", "<< B1.size() << " nonzeros) " <<
     "and B2 (dimension " << B2.size1() << "-by-" << B2.size2() << ", "<< B2.size() << " nonzeros)." << endl;
@@ -564,8 +566,8 @@ void Tester::prepare(){
     
     zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
     
-    b1 += Z_fwdSens[0][Z_FG](Slice(0,nf_));
-    b2 += Z_fwdSens[0][Z_FG](Slice(nf_,B.size1()));
+    b1 += Z_fwdSens[0][Z_FG](Slice(0,ngL_));
+    b2 += Z_fwdSens[0][Z_FG](Slice(ngL_,B.size1()));
     e = Z_fwdSens[1][Z_D_DEF];
   }
   if(verbose_){
