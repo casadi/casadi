@@ -117,9 +117,6 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
     }
     
     casadi_assert(v.size()==vdef.size());
-    for (int i=0;i<v.size();++i) {
-       std::cout << v[i] << " -> " << vdef[i] << std::endl;
-    }
 
     // Replace expressions
     outputv_ = substitute(outputv_,v,vdef);
