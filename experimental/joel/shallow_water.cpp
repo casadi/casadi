@@ -91,7 +91,7 @@ public:
   double tolgl_;
 
   /// Residual
-  vector<double> d_k_;
+  vector<double> d_, lam_d_;
    
   /// Primal step
   vector<double> du_,dv_;
@@ -100,17 +100,17 @@ public:
   vector<double> dlambda_u_, dlambda_h_, dlambda_g_;
   
   /// Indices
-  enum GIn{G_U,G_LAM_U,G_LAM_G,G_V,G_LAM_V,G_LAM_H,G_NUM_IN};
-  enum GOut{G_D,G_G,G_F,G_NUM_OUT};
+  enum GIn{G_U,G_LAM_U,G_LAM_G,G_V,G_LAM_H,G_NUM_IN};
+  enum GOut{G_D,G_LAM_D,G_G,G_F,G_NUM_OUT};
   
-  enum LinIn{LIN_U,LIN_LAM_U,LIN_LAM_G,LIN_V,LIN_LAM_V,LIN_LAM_H,LIN_D,LIN_NUM_IN};
+  enum LinIn{LIN_U,LIN_LAM_U,LIN_LAM_G,LIN_V,LIN_LAM_H,LIN_D,LIN_LAM_D,LIN_NUM_IN};
   enum LinOut{LIN_F1,LIN_J1,LIN_G,LIN_J2,LIN_NUM_OUT};
   
-  enum ExpIn{EXP_U,EXP_LAM_U,EXP_LAM_G,EXP_V,EXP_LAM_V,EXP_LAM_H,EXP_D,EXP_DU,EXP_DLAM_G,EXP_NUM_IN};
-  enum ExpOut{EXP_E,EXP_NUM_OUT};
+  enum ExpIn{EXP_U,EXP_LAM_U,EXP_LAM_G,EXP_V,EXP_LAM_H,EXP_D,EXP_LAM_D,EXP_DU,EXP_DLAM_G,EXP_NUM_IN};
+  enum ExpOut{EXP_V_DEF,EXP_LAM_H_DEF,EXP_NUM_OUT};
 
-  enum ZIn{Z_U,Z_D,Z_LAM_U,Z_LAM_V,Z_LAM_G,Z_NUM_IN};
-  enum ZOut{Z_D_DEF,Z_FG,Z_NUM_OUT};
+  enum ZIn{Z_U,Z_D,Z_LAM_D,Z_LAM_U,Z_LAM_G,Z_NUM_IN};
+  enum ZOut{Z_D_DEF,Z_LAM_D_DEF,Z_FG,Z_NUM_OUT};
 
   /// Residual function
   FX rfcn_;
@@ -122,11 +122,11 @@ public:
   FX efcn_;
   
   /// Dimensions
-  int nu_, nv_, nx_, ng_, ngL_;
+  int nu_, nv_, ng_, ngL_;
   
   vector<double> u_init_, lbu_, ubu_, u_opt_, lambda_u_;
   vector<double> lbg_, ubg_, lambda_g_;
-  vector<double> v_init_, lbv_, ubv_, v_opt_, lambda_v_;
+  vector<double> v_init_, lbv_, ubv_, v_opt_;
   vector<double> lambda_h_;
 };
 
@@ -372,7 +372,6 @@ void Tester::prepare(){
   // Extract the free variables and split into independent and dependent variables
   SXMatrix u = fg_sx_.inputExpr(0);
   SXMatrix v = fg_sx_.inputExpr(1);
-  SXMatrix x = vertcat(u,v);
 
   // Extract the constraint equations and split into constraints and definitions of dependent variables
   SXMatrix f = fg_sx_.outputExpr(0);
@@ -383,20 +382,18 @@ void Tester::prepare(){
   // Get the dimensions
   nu_ = u.size();
   nv_ = v.size();
-  nx_ = nu_ + nv_;
   ng_ = g.size();
  
   u_init_.resize(nu_,0);
   u_opt_.resize(nu_,0);
   lbu_.resize(nu_,-numeric_limits<double>::infinity());
   ubu_.resize(nu_, numeric_limits<double>::infinity());
-  lambda_u_.resize(nx_,0);
+  lambda_u_.resize(nu_,0);
 
   v_init_.resize(nv_,0);
   v_opt_.resize(nv_,0);
   lbv_.resize(nv_,-numeric_limits<double>::infinity());
   ubv_.resize(nv_, numeric_limits<double>::infinity());
-  lambda_v_.resize(nv_,0);
 
   lbg_.resize(ng_,-numeric_limits<double>::infinity());
   ubg_.resize(ng_, numeric_limits<double>::infinity());
@@ -410,7 +407,7 @@ void Tester::prepare(){
   SXMatrix gL_u, gL_v;
 
   // Multipliers
-  SXMatrix lam_u, lam_v, lam_g, lam_h;
+  SXMatrix lam_u, lam_g, lam_h;
   if(gauss_newton_){
     
     // Least square objective
@@ -425,10 +422,7 @@ void Tester::prepare(){
     
     // Lagrange multipliers for the simple bounds on u
     lam_u = ssym("lam_u",nu_);
-    
-    // Lagrange multipliers for the simple bounds on v
-    lam_v = ssym("lam_v",nv_);
-    
+        
     // Lagrange multipliers corresponding to the definition of the dependent variables
     lam_h = ssym("lam_h",nv_);
 
@@ -442,12 +436,11 @@ void Tester::prepare(){
     // Lagrangian function
     SXMatrix lag = obj;
     if(!u.empty()) lag += inner_prod(lam_u,u);
-    if(!v.empty()) lag += inner_prod(lam_v,v);
     if(!g.empty()) lag += inner_prod(lam_g,g);
     if(!h.empty()) lag += inner_prod(lam_h,h);
     
     // Gradient of the Lagrangian
-    SXMatrix gL = CasADi::gradient(lag,x);
+    SXMatrix gL = CasADi::gradient(lag,vertcat(u,v));
     makeDense(gL);
     if(verbose_){
       cout << "Generated the gradient of the Lagrangian." << endl;
@@ -457,16 +450,6 @@ void Tester::prepare(){
     gL_u = gL[Slice(0,nu_)];
     gL_v = gL[Slice(nu_,nu_+nv_)];
     ngL_ = nu_;
-    
-    // Reverse lam_h and h_grad
-    SXMatrix h_grad_reversed = gL_v;
-    copy(gL_v.rbegin(),gL_v.rend(),h_grad_reversed.begin());
-    SXMatrix lam_h_reversed = lam_h;
-    copy(lam_h.rbegin(),lam_h.rend(),lam_h_reversed.begin());
-    
-    // Augment h and lam_h
-    h.append(h_grad_reversed);
-    v.append(lam_h_reversed);
   }
 
   // Residual function G
@@ -474,15 +457,14 @@ void Tester::prepare(){
   G_in[G_U] = u;
   G_in[G_V] = v;
   G_in[G_LAM_U] = lam_u;
-  G_in[G_LAM_V] = lam_v;
   G_in[G_LAM_G] = lam_g;
   G_in[G_LAM_H] = lam_h;
 
   vector<SXMatrix> G_out(G_NUM_OUT);
   G_out[G_D] = h-v;
+  G_out[G_LAM_D] = gL_v-lam_h;
   G_out[G_G] = vertcat(h-v,g);
   G_out[G_F] = obj;
-
   rfcn_ = SXFunction(G_in,G_out);
   rfcn_.setOption("number_of_fwd_dir",0);
   rfcn_.setOption("number_of_adj_dir",0);
@@ -491,38 +473,47 @@ void Tester::prepare(){
     cout << "Generated residual function ( " << shared_cast<SXFunction>(rfcn_).getAlgorithmSize() << " nodes)." << endl;
   }
   
-  // Difference vector d
+  // Declare difference vector d and substitute out v
   SXMatrix d = ssym("d",nv_);
-  if(!gauss_newton_){
-    vector<SX> dg = ssym("dg",nv_).data();
-    reverse(dg.begin(),dg.end());
-    d.append(dg);
-  }
-
-  // Substitute out the v from the h
   SXMatrix d_def = h-d;
-  vector<SXMatrix> ex(3);
+  vector<SXMatrix> ex(4);
   ex[0] = gL_u;
   ex[1] = g;
   ex[2] = obj;
+  ex[3] = gL_v;
   substituteInPlace(v, d_def, ex, false);
-  SXMatrix f_z = ex[0];
+  SXMatrix gL_u_z = ex[0];
   SXMatrix g_z = ex[1];
   SXMatrix obj_z = ex[2];
+  SXMatrix gL_v_z = ex[3];
+
+  // Declare difference vector lam_d and substitute out lam_h
+  SXMatrix lam_d;
+  SXMatrix lam_d_def;
+  if(!gauss_newton_){
+    lam_d = ssym("lam_d",nv_);
+    lam_d_def = lam_h-lam_d;
+    ex.resize(2);
+    substituteInPlace(lam_h, lam_d_def, ex, false);    
+    gL_u_z = ex[0];
+    g_z = ex[1];
+  }
   
   // Modified function Z
   vector<SXMatrix> zfcn_in(Z_NUM_IN);
   zfcn_in[Z_U] = u;
   zfcn_in[Z_D] = d;
+  zfcn_in[Z_LAM_D] = lam_d;
   zfcn_in[Z_LAM_U] = lam_u;
-  zfcn_in[Z_LAM_V] = lam_v;
   zfcn_in[Z_LAM_G] = lam_g;
   
   vector<SXMatrix> zfcn_out(Z_NUM_OUT);
   zfcn_out[Z_D_DEF] = d_def;
-  zfcn_out[Z_FG] = vertcat(f_z,g_z);
+  zfcn_out[Z_LAM_D_DEF] = lam_d_def;
+  zfcn_out[Z_FG] = vertcat(gL_u_z,g_z);
   
   SXFunction zfcn(zfcn_in,zfcn_out);
+  zfcn.setOption("name","zfcn");
   zfcn.init();
   if(verbose_){
     cout << "Generated reconstruction function ( " << zfcn.getAlgorithmSize() << " nodes)." << endl;
@@ -541,9 +532,9 @@ void Tester::prepare(){
   SXMatrix du = ssym("du",nu_);
   SXMatrix dlam_g = ssym("dlam_g",lam_g.sparsity());
   
-  SXMatrix b1 = f_z;
+  SXMatrix b1 = gL_u_z;
   SXMatrix b2 = g_z;
-  SXMatrix e;
+  SXMatrix e, eL;
   if(nv_ > 0){
     
     // Directional derivative of Z
@@ -555,13 +546,11 @@ void Tester::prepare(){
     Z_fwdSeed[0][Z_U].setZero();
     Z_fwdSeed[0][Z_D] = -d;
     Z_fwdSeed[0][Z_LAM_U].setZero();
-    Z_fwdSeed[0][Z_LAM_V].setZero();
     Z_fwdSeed[0][Z_LAM_G].setZero();
     
     Z_fwdSeed[1][Z_U] = du;
     Z_fwdSeed[1][Z_D] = -d;
     Z_fwdSeed[1][Z_LAM_U].setZero();
-    Z_fwdSeed[1][Z_LAM_V].setZero();
     Z_fwdSeed[1][Z_LAM_G] = dlam_g;
     
     zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
@@ -569,6 +558,7 @@ void Tester::prepare(){
     b1 += Z_fwdSens[0][Z_FG](Slice(0,ngL_));
     b2 += Z_fwdSens[0][Z_FG](Slice(ngL_,B.size1()));
     e = Z_fwdSens[1][Z_D_DEF];
+    eL = Z_fwdSens[1][Z_LAM_D_DEF];
   }
   if(verbose_){
     cout << "Formed b1 (dimension " << b1.size1() << "-by-" << b1.size2() << ", "<< b1.size() << " nonzeros) " <<
@@ -593,8 +583,8 @@ void Tester::prepare(){
   lfcn_in[LIN_U] = u;
   lfcn_in[LIN_V] = v;
   lfcn_in[LIN_D] = d;
+  lfcn_in[LIN_LAM_D] = lam_d;
   lfcn_in[LIN_LAM_U] = lam_u;
-  lfcn_in[LIN_LAM_V] = lam_v;
   lfcn_in[LIN_LAM_G] = lam_g;
   lfcn_in[LIN_LAM_H] = lam_h;
   
@@ -604,10 +594,9 @@ void Tester::prepare(){
   lfcn_out[LIN_G] = b2;
   lfcn_out[LIN_J2] = B2;
   lfcn_ = SXFunction(lfcn_in,lfcn_out);
-//   lfcn_.setOption("verbose",true);
+  lfcn_.setOption("name","lfcn");
   lfcn_.setOption("number_of_fwd_dir",0);
   lfcn_.setOption("number_of_adj_dir",0);
-  lfcn_.setOption("live_variables",true);
   lfcn_.init();
   if(verbose_){
     cout << "Generated linearization function ( " << shared_cast<SXFunction>(lfcn_).getAlgorithmSize() << " nodes)." << endl;
@@ -618,11 +607,13 @@ void Tester::prepare(){
   copy(lfcn_in.begin(),lfcn_in.end(),efcn_in.begin());
   efcn_in[EXP_DU] = du;
   efcn_in[EXP_DLAM_G] = dlam_g;
-  vector<SXMatrix> efcn_out(1,e);
+  vector<SXMatrix> efcn_out(EXP_NUM_OUT);
+  efcn_out[EXP_V_DEF] = e;
+  efcn_out[EXP_LAM_H_DEF] = eL;
   efcn_ = SXFunction(efcn_in,efcn_out);
   efcn_.setOption("number_of_fwd_dir",0);
   efcn_.setOption("number_of_adj_dir",0);
-  efcn_.setOption("live_variables",true);
+  efcn_.setOption("name","efcn");
   efcn_.init();
   if(verbose_){
     cout << "Generated step expansion function ( " << shared_cast<SXFunction>(efcn_).getAlgorithmSize() << " nodes)." << endl;
@@ -639,7 +630,8 @@ void Tester::prepare(){
   }
 
   // Residual
-  d_k_.resize(d.size(),0);
+  d_.resize(d.size(),0);
+  lam_d_.resize(lam_d.size(),0);
   
   // Primal step
   du_.resize(nu_);
@@ -666,22 +658,22 @@ void Tester::solve(int& iter_count){
   
   // Does G depend on the multipliers?
   bool has_lam_u =  !gauss_newton_ && nu_>0;
-  bool has_lam_v =  !gauss_newton_ && nv_>0;
   bool has_lam_g =  !gauss_newton_ && ng_>0;
   bool has_lam_h =  !gauss_newton_ && nv_>0;
   
   while(true){
+
     // Evaluate residual
     rfcn_.setInput(u_opt_,G_U);
     rfcn_.setInput(v_opt_,G_V);
 
     if(has_lam_u) rfcn_.setInput(lambda_u_,G_LAM_U);
-    if(has_lam_v) rfcn_.setInput(lambda_v_,G_LAM_V);
     if(has_lam_g) rfcn_.setInput(lambda_g_,G_LAM_G);
     if(has_lam_h) rfcn_.setInput(lambda_h_,G_LAM_H);
 
     rfcn_.evaluate();
-    rfcn_.getOutput(d_k_,G_D);
+    rfcn_.getOutput(d_,G_D);
+    rfcn_.getOutput(lam_d_,G_LAM_D);
     f_k = rfcn_.output(G_F).toScalar();
     const DMatrix& g_k = rfcn_.output(G_G);
     
@@ -690,11 +682,11 @@ void Tester::solve(int& iter_count){
     lfcn_.setInput(v_opt_,LIN_V);
     
     if(has_lam_u) lfcn_.setInput(lambda_u_,LIN_LAM_U);
-    if(has_lam_g) lfcn_.setInput(lambda_g_,LIN_LAM_U);
-    if(has_lam_v) lfcn_.setInput(lambda_v_,LIN_LAM_V);
+    if(has_lam_g) lfcn_.setInput(lambda_g_,LIN_LAM_G);
     if(has_lam_h) lfcn_.setInput(lambda_h_,LIN_LAM_H);
 
-    lfcn_.setInput(d_k_,LIN_D);
+    lfcn_.setInput(d_,LIN_D);
+    lfcn_.setInput(lam_d_,LIN_LAM_D);
     lfcn_.evaluate();
     DMatrix& B1_k = lfcn_.output(LIN_J1);
     const DMatrix& b1_k = lfcn_.output(LIN_F1);
@@ -742,27 +734,28 @@ void Tester::solve(int& iter_count){
     std::transform(lbg_.begin(),lbg_.end(), b2_k.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
     std::transform(ubg_.begin(),ubg_.end(), b2_k.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
     qp_solver_.evaluate();
-    const DMatrix& du_k = qp_solver_.output(QP_PRIMAL);
-    const DMatrix& dlam_u_k = qp_solver_.output(QP_LAMBDA_X);
-    const DMatrix& dlam_g_k = qp_solver_.output(QP_LAMBDA_A);    
+    const DMatrix& du = qp_solver_.output(QP_PRIMAL);
+    const DMatrix& dlam_u = qp_solver_.output(QP_LAMBDA_X);
+    const DMatrix& dlam_g = qp_solver_.output(QP_LAMBDA_A);    
     
     // Expand the step
     for(int i=0; i<LIN_NUM_IN; ++i){
       efcn_.setInput(lfcn_.input(i),i);
     }
-    efcn_.setInput(du_k,EXP_DU);
-    if(has_lam_g) efcn_.setInput(dlam_g_k,EXP_DLAM_G);
+    efcn_.setInput(du,EXP_DU);
+    if(has_lam_g) efcn_.setInput(dlam_g,EXP_DLAM_G);
     efcn_.evaluate();
-    const DMatrix& dv_k = efcn_.output();
+    const DMatrix& dv = efcn_.output(EXP_V_DEF);
+    const DMatrix& dlam_h = efcn_.output(EXP_LAM_H_DEF);
     
     // Expanded primal step
-    copy(du_k.begin(),du_k.end(),du_.begin());
-    copy(dv_k.begin(),dv_k.end(),dv_.begin());
+    copy(du.begin(),du.end(),du_.begin());
+    copy(dv.begin(),dv.end(),dv_.begin());
 
     // Expanded dual step
-    copy(dlam_u_k.begin(),dlam_u_k.end(),dlambda_u_.begin());
-    copy(dlam_g_k.begin(),dlam_g_k.end(),dlambda_g_.begin());
-    copy(dv_k.rbegin(),dv_k.rbegin()+nv_,dlambda_h_.begin());
+    copy(dlam_u.begin(),dlam_u.end(),dlambda_u_.begin());
+    copy(dlam_g.begin(),dlam_g.end(),dlambda_g_.begin());
+    copy(dlam_h.begin(),dlam_h.end(),dlambda_h_.begin());
     
     // Take a full step
     transform(du_.begin(),du_.end(),u_opt_.begin(),u_opt_.begin(),plus<double>());
@@ -917,8 +910,6 @@ int main(){
     bool single_shooting = sol==0;
     bool gauss_newton = true;
     t.transcribe(single_shooting,gauss_newton);
-  
-    //    continue;
   
     // Run tests
     for(int test=0; test<n_tests; ++test){
