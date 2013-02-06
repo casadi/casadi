@@ -452,7 +452,21 @@ CRSSparsity mul(const  CRSSparsity& a, const  CRSSparsity &b) {
     return CRSSparsity(nrow, ncol, vector<int>(col,col+nnz), vector<int>(rowind,rowind+nrow+1));
   }
   
+int rank(const CRSSparsity& a) {
+  std::vector< int > rowperm;
+  std::vector< int > colperm;
+  std::vector< int > rowblock;
+  std::vector< int > colblock;
+  std::vector< int > coarse_rowblock;
+  std::vector< int > coarse_colblock;
+  a.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+  return coarse_colblock.at(3);
+}
 
+bool isSingular(const CRSSparsity& a) {
+  casadi_assert_message(a.size1()==a.size2(),"isSingular: only defined for square matrices, but got " << a.dimString());
+  return rank(a)!=a.size1();
+}
 
 } // namespace CasADi
 

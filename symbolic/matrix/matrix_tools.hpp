@@ -347,6 +347,10 @@ const T* getPtr(const Matrix<T> &v);
 template<typename T>
 Matrix<T> project(const Matrix<T>& A, const CRSSparsity& sparsity);
 
+/// Obtain the structural rank of a sparsity-pattern
+template<typename T>
+int sprank(const Matrix<T>& A);
+
 } // namespace CasADi
 
 // Global namespace
@@ -1228,6 +1232,11 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
     return ret;
   }
 
+  template<typename T>
+  int sprank(const Matrix<T>& A) {
+    return rank(A.sparsity());
+  }
+
 
 } // namespace CasADi
 
@@ -1296,7 +1305,7 @@ MTT_INST(T,addMultiple) \
 MTT_INST(T,veccat) \
 MTT_INST(T,vecNZcat) \
 MTT_INST(T,project) \
-
+MTT_INST(T,sprank) 
 #endif //SWIG
 
 #endif // MATRIX_TOOLS_HPP

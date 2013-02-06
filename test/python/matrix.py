@@ -747,6 +747,32 @@ class Matrixtests(casadiTestCase):
       self.checkarray(m.sparsity().rowind(),M.sparsity().rowind())
       self.checkarray(m.sparsity().col(),M.sparsity().col())
 
+  def test_sprank(self):
+    self.message("sprank")
+    
+    a = DMatrix([[1,0,0],[0,1,0],[0,0,1]])
+    makeSparse(a)
+    self.assertEqual(sprank(a),3)
+
+    a = DMatrix([[1,0,0],[0,0,0],[0,0,1]])
+    makeSparse(a)
+    self.assertEqual(sprank(a),2)
+
+    a = DMatrix([[0,0,0],[0,0,0],[0,0,1]])
+    makeSparse(a)
+    self.assertEqual(sprank(a),1)
+
+    a = DMatrix([[0,0,0],[0,0,0],[0,0,0]])
+    makeSparse(a)
+    self.assertEqual(sprank(a),0)
+    
+    self.assertEqual(sprank(DMatrix.ones(1,3)),1)
+    self.assertEqual(sprank(DMatrix.ones(3,1)),1)
+    self.assertEqual(sprank(DMatrix.ones(2,3)),2)
+    self.assertEqual(sprank(DMatrix.ones(3,2)),2)
+    self.assertEqual(sprank(DMatrix.ones(3,3)),3)
+    self.assertEqual(sprank(DMatrix.ones(3,3)),3)
+    
     
 if __name__ == '__main__':
     unittest.main()

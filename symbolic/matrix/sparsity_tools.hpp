@@ -164,6 +164,12 @@ CRSSparsity sp_band(int n, int p);
   CRSSparsity sp_compress(const int* v);
 #endif // SWIG  
 
+  /// Obtain the structural rank of a sparsity-pattern
+  int rank(const CRSSparsity& a);
+  
+  /// Check whether the sparsity-pattern inidcates structural singularity
+  bool isSingular(const CRSSparsity& a);
+
   /// @}
 
 }
