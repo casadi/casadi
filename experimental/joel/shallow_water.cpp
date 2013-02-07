@@ -827,7 +827,7 @@ void Tester::solve(int& iter_count){
       }
       
       double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
-      double threshold = 1e-8;
+      double threshold = 1e-12;
       if(eig_smallest<threshold){
 	// Regularization
 	reg = threshold-eig_smallest;
@@ -1043,9 +1043,7 @@ int main(){
   vector<double> depth_est_eh(n_tests,-1);
   
   // Create a tester object
-  // Tester t(3,20,20); // The largest dimensions which work with SX and IPOPT
-  Tester t(15,10,10); // The largest dimensions which work with SX and exact Hessian
-  // Tester t(20,10,50); // The largest dimensions which work with SX and Gauss-Newton Hessian
+  Tester t(30,1000,10);
     
   // Perform the modelling
   t.model();
