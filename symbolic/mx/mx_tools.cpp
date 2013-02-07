@@ -559,74 +559,67 @@ void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool rev
 }
 
 void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse){
-  casadi_error("Not supported in the current version of CasADi awaiting completion of #480. Please contact the developers for enabling this feature.");
-#if 0
   casadi_assert_message(v.size()==vdef.size(),"Mismatch in the number of expression to substitute.");
   for(int k=0; k<v.size(); ++k){
     casadi_assert_message(isSymbolic(v[k]),"Variable " << k << " is not symbolic");
     casadi_assert_message(v[k].sparsity() == vdef[k].sparsity(), "Inconsistent sparsity for variable " << k << ".");
   }
-  
+  casadi_assert_message(reverse==false,"Not implemented");
+
   // quick return if nothing to replace
   if(v.empty()) return;
+
+  // Function inputs
+  std::vector<MX> f_in = v;
 
   // Function outputs
   std::vector<MX> f_out = vdef;
   f_out.insert(f_out.end(),ex.begin(),ex.end());
   
   // Write the mapping function
-  MXFunction f(v,f_out);
+  MXFunction f(f_in,f_out);
   f.init();
 
   // Get references to the internal data structures
-  const std::vector<int>& input_ind = f->input_ind_;
-  std::vector<int>& output_ind = f->output_ind_;
   std::vector<MXAlgEl>& algorithm = f->algorithm_;
-  
-  // Create the filter
-  vector<int> filter = range(f->work_.size());
+  vector<MX> work(f.getWorkSize());
+  MXPtrV input_p, output_p;
+  MXPtrVV dummy_p;
 
-  // Replace expression
-  for(int k=0; k<v.size(); ++k){
-    if(reverse){
-      filter[output_ind[k]] = input_ind[k];
-    } else {
-      output_ind[k] = filter[output_ind[k]];
-      filter[input_ind[k]] = output_ind[k];
-    }
-  }
-
-  // Now filter out the variables from the algorithm
   for(vector<MXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
-    for(vector<int>::iterator it2=it->arg.begin(); it2!=it->arg.end(); ++it2){
-      *it2 = filter[*it2];
+    switch(it->op){
+    case OP_INPUT:
+      work.at(it->res.front()) = vdef.at(it->arg.front());
+      break;
+    case OP_PARAMETER:
+    case OP_CONST:
+      work.at(it->res.front()) = it->data;
+      break;
+    case OP_OUTPUT:
+      if(it->res.front()<vdef.size()){
+	vdef.at(it->res.front()) = work.at(it->arg.front());
+      } else {
+	ex.at(it->res.front()-vdef.size()) = work.at(it->arg.front());
+      }
+      break;
+    default:
+      {
+	input_p.resize(it->arg.size());
+	for(int i=0; i<input_p.size(); ++i){
+	  int el = it->arg[i];
+	  input_p[i] = el<0 ? 0 : &work.at(el);
+	}
+	
+	output_p.resize(it->res.size());
+	for(int i=0; i<output_p.size(); ++i){
+	  int el = it->res[i];
+	  output_p[i] = el<0 ? 0 : &work.at(el);
+	}
+	
+	it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
+      }
     }
-  }
-
-  // Filter the variables from the dependent expressions
-  for(int i=0; i<ex.size(); ++i){
-    int& ex_ind = f->output_ind_.at(i+v.size());
-    ex_ind = filter[ex_ind];
-  }
-
-  // No sensitivities
-  vector<vector<MX> > dummy;
-
-  // Replace expression
-  std::vector<MX> outputv = f->outputv_;
-  f.eval(f->inputv_, outputv, dummy, dummy, dummy, dummy, false);
-  
-  // Replace the result
-  std::vector<MX>::iterator outputv_it = outputv.begin();
-  for(vector<MX>::iterator it=vdef.begin(); it!=vdef.end(); ++it){
-    *it = *outputv_it++;
-  }
-  
-  // Get the replaced expressions
-  for(vector<MX>::iterator it=ex.begin(); it!=ex.end(); ++it){
-    *it = *outputv_it++;
-  }
-#endif
+  }  
 }
 
 std::vector<MX> msym(const std::string& name, const CRSSparsity& sp, int p){
