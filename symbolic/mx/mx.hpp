@@ -346,13 +346,13 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   const MX getSub(const std::vector<int>& i, const std::vector<int>& j) const;
   const MX getSub(const Matrix<int>& k, int dummy=0) const;
   const MX getSub(const CRSSparsity& sp, int dummy=0) const;
-  const MX getSub(const std::vector<int>& i, const Matrix<int>& k) const;
+  const MX getSub(const std::vector<int>& i, const Matrix<int>& j) const;
   const MX getSub(const Matrix<int>& k, const std::vector<int>& j) const;
   const MX getSub(const Slice& i, int j) const {return getSub(i.getAll(size1()),j);}
-  const MX getSub(int i, const Slice& j) const {return getSub(i,j.getAll(size1()));}
+  const MX getSub(int i, const Slice& j) const {return getSub(i,j.getAll(size2()));}
   const MX getSub(const Slice& i, const Slice& j) const {return getSub(i.getAll(size1()),j.getAll(size2()));}
-  const MX getSub(const Slice& i, const Matrix<int>& k) const {return getSub(i.getAll(size1()),k);}
-  const MX getSub(const Matrix<int>& k, const Slice& j) const {return getSub(k,j.getAll(size2()));}
+  const MX getSub(const Slice& i, const Matrix<int>& j) const {return getSub(i.getAll(size1()),j);}
+  const MX getSub(const Matrix<int>& i, const Slice& j) const {return getSub(i,j.getAll(size2()));}
   const MX getSub(const Matrix<int>& i, const Matrix<int>& j) const;
       
   void setSub(int i, int j, const MX& el);
