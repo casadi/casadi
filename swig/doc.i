@@ -10979,7 +10979,10 @@ Get a weak reference to the object. ";
 
 LinearSolver with CSparse Interface.
 
-Solves the linear system A.x = b for x
+Solves the linear system A.x = b for x with A square and non-singular
+
+If A is structurally singular, an error will be thrown during init. If A is
+numerically singular, the prepare step will fail.
 
 CSparse is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to
 one output [x (vector)].
@@ -11735,7 +11738,10 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1CSparseInternal.xml
 %feature("docstring") CasADi::CSparseInternal "
 
-Solves the linear system A.x = b for x
+Solves the linear system A.x = b for x with A square and non-singular
+
+If A is structurally singular, an error will be thrown during init. If A is
+numerically singular, the prepare step will fail.
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -43764,7 +43770,10 @@ Return a string with a destription (for SWIG) ";
 
 LU LinearSolver with Lapack Interface.
 
-Solves the linear system A.x = b for x
+Solves the linear system A.x = b for x with A square and non-singular
+
+If A is structurally singular, an error will be thrown during init. If A is
+numerically singular, the prepare step will fail.
 
 This class solves the linear system A.x=b by making an LU factorization of
 A:  A = L.U, with L lower and U upper triangular
@@ -45128,7 +45137,10 @@ Get a weak reference to the object. ";
 
 QR LinearSolver with Lapack Interface.
 
-Solves the linear system A.x = b for x
+Solves the linear system A.x = b for x with A square and non-singular
+
+If A is structurally singular, an error will be thrown during init. If A is
+numerically singular, the prepare step will fail.
 
 This class solves the linear system A.x=b by making an QR factorization of
 A:  A = Q.R, with Q orthogonal and R upper triangular
@@ -49888,7 +49900,10 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::LinearSolver "
 
 Abstract base class for the linear solver classes Solves the linear system
-A.x = b for x
+A.x = b for x with A square and non-singular
+
+If A is structurally singular, an error will be thrown during init. If A is
+numerically singular, the prepare step will fail.
 
 Joel Andersson
 
@@ -50620,7 +50635,11 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1LinearSolverInternal.xml
 %feature("docstring") CasADi::LinearSolverInternal "
 
-Internal class Solves the linear system A.x = b for x
+Internal class Solves the linear system A.x = b for x with A square and non-
+singular
+
+If A is structurally singular, an error will be thrown during init. If A is
+numerically singular, the prepare step will fail.
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -87538,6 +87557,14 @@ Decompress a sparsity pattern. ";
 
 Decompress a sparsity pattern (array version) ";
 
+%feature("docstring")  CasADi::rank "
+
+Obtain the structural rank of a sparsity-pattern. ";
+
+%feature("docstring")  CasADi::isSingular "
+
+Check whether the sparsity-pattern inidcates structural singularity. ";
+
 %feature("docstring")  CasADi::ptrVec "
 
 Convenience function, convert vectors to vectors of pointers. ";
@@ -88539,6 +88566,10 @@ Get a pointer to the data contained in the vector. ";
 
 Create a new matrix with a given sparsity pattern but with the nonzeros
 taken from an existing matrix. ";
+
+%feature("docstring")  CasADi::sprank "
+
+Obtain the structural rank of a sparsity-pattern. ";
 
 %feature("docstring")  CasADi::all "";
 
