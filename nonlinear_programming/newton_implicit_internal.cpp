@@ -89,7 +89,7 @@ void NewtonImplicitInternal::evaluate(int nfdir, int nadir) {
     if (monitored("J")) std::cout << "  J = " << J << std::endl;
 
     if ( numeric_limits<double>::infinity() != abstol_ ) {
-      double maxF = ((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
+      double maxF = std::max((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
       if (maxF <= abstol_) {
         casadi_log("Converged to acceptable tolerance - abstol: " << abstol_);
         break;
@@ -108,7 +108,7 @@ void NewtonImplicitInternal::evaluate(int nfdir, int nadir) {
     }
     
     if ( numeric_limits<double>::infinity() != abstolStep_ ) {
-      double maxF = ((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
+      double maxF = std::max((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
       if (monitored("stepsize")) {
         std::cout << "  stepsize = " << maxF << std::endl;
       }
