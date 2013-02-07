@@ -695,6 +695,39 @@ void Tester::prepareNew(){
   if(verbose_){
     cout << "Generated linearization function ( " << shared_cast<MXFunction>(lfcn_).getAlgorithmSize() << " nodes)." << endl;
   }
+
+  // Step expansion
+  vector<MX> efcn_in(3+2*x_.size());
+  n=0;
+  efcn_in[e_con_ = n++] = lam_g;
+  efcn_in[e_du_ = n++] = du;
+  efcn_in[e_dlam_g_ = n++] = dlam_g;
+  for(int i=0; i<x_.size(); ++i){
+    efcn_in[x_[i].e_var=n++] = i==0 ? var[0] :     d[i];
+    efcn_in[x_[i].e_lam=n++] = i==0 ? lam[0] : lam_d[i];
+  }
+  casadi_assert(n==efcn_in.size());
+
+  if(x_.size()>1){
+    vector<MX> efcn_out(2*(x_.size()-1));
+    n=0;
+    for(int i=1; i<x_.size(); ++i){
+      efcn_out[x_[i].e_exp=n++]  = v_exp[i];
+      efcn_out[x_[i].e_expL=n++] = vL_exp[i];
+    }
+    casadi_assert(n==efcn_out.size());
+    
+    efcn_ = MXFunction(efcn_in,efcn_out);
+    efcn_.setOption("number_of_fwd_dir",0);
+    efcn_.setOption("number_of_adj_dir",0);
+    efcn_.setOption("name","efcn");
+    efcn_.init();
+    if(verbose_){
+      cout << "Generated step expansion function ( " << shared_cast<MXFunction>(efcn_).getAlgorithmSize() << " nodes)." << endl;
+    }
+  }
+
+
 }
 
 void Tester::prepare(){
@@ -1033,6 +1066,7 @@ void Tester::prepare(){
     }
     casadi_assert(n==efcn_out.size());
     
+#if 0
     efcn_ = SXFunction(efcn_in,efcn_out);
     efcn_.setOption("number_of_fwd_dir",0);
     efcn_.setOption("number_of_adj_dir",0);
@@ -1041,6 +1075,7 @@ void Tester::prepare(){
     if(verbose_){
       cout << "Generated step expansion function ( " << shared_cast<SXFunction>(efcn_).getAlgorithmSize() << " nodes)." << endl;
     }
+#endif
   }
   
   // Allocate a QP solver
