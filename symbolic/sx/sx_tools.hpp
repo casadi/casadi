@@ -178,6 +178,9 @@ void substituteInPlace(const SXMatrix& v, SXMatrix &vdef, bool reverse=false);
 /** \brief Substitute variable var out of or into an expression expr, with an arbitrary number of other expressions piggyback */
 void substituteInPlace(const SXMatrix& v, SXMatrix &vdef, std::vector<SXMatrix>& ex, bool reverse=false);
 
+/** \brief Substitute variable var out of or into an expression expr, with an arbitrary number of other expressions piggyback (vector version) */
+void substituteInPlace(const std::vector<SXMatrix>& v, std::vector<SXMatrix>& vdef, std::vector<SXMatrix>& ex, bool reverse=false);
+
 /** \brief Evaluate an SX graph numerically
 * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
 */

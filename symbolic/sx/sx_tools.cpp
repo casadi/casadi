@@ -1140,6 +1140,48 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
   }
 }
 
+  void substituteInPlace(const std::vector<SXMatrix>& v, std::vector<SXMatrix>& vdef, std::vector<SXMatrix>& ex, bool reverse){
+    casadi_assert(v.size()==vdef.size());
+    
+    // Quick return if empty or single expression
+    if(v.empty()){
+      return;
+     } else if(v.size()==1){
+      substituteInPlace(v.front(),vdef.front(),ex,reverse);
+      return;
+    }
+
+    // Count number of scalar variables
+    int n =0;
+    for(int i=0; i<v.size(); ++i){
+      casadi_assert_message(v[i].sparsity() == vdef[i].sparsity(),"the sparsity patterns of the expression and its defining expression do not match");
+      n += v[i].size();
+    }
+
+    // Gather all variables
+    SXMatrix v_all(n,1,0);
+    SXMatrix vdef_all(n,1,0);
+    vector<SX>::iterator it_v = v_all.begin();
+    vector<SX>::iterator it_vdef = vdef_all.begin();
+    for(int i=0; i<v.size(); ++i){
+      int nv = v[i].size();
+      copy(v[i].begin(),v[i].end(),it_v);
+      copy(vdef[i].begin(),vdef[i].end(),it_vdef);
+      it_v += nv;  it_vdef += nv;
+    }
+
+    // Substitute
+    substituteInPlace(v_all,vdef_all,ex,reverse);
+
+    // Collect the result
+    it_vdef = vdef_all.begin();
+    for(int i=0; i<v.size(); ++i){
+      int nv = v[i].size();
+       copy(it_vdef,it_vdef+nv,vdef[i].begin());
+       it_vdef += nv;
+    }
+  }
+
 } // namespace CasADi
 
 
