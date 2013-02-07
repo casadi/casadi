@@ -46,6 +46,7 @@ public:
 
   // Prepare NLP
   void prepare();
+  void prepareNew();
 
   // Solve NLP
   void solve(int& iter_count);
@@ -367,15 +368,157 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
   prepare();
 }
 
-void Tester::prepare(){
+void Tester::prepareNew(){
   verbose_ = true;
-
+  
   // Generate lifting functions
   //  MXFunction F,G,Z;
   //  fg_mx_.generateLiftingFunctions(F,G,Z);
   //  F.init();
   //  G.init();
   //  Z.init();
+
+  // Extract the expressions
+  vector<MX> var = fg_mx_.inputExpr();
+  vector<MX> con = fg_mx_.outputExpr();
+  MX f = fg_mx_.outputExpr(0);
+  con.erase(con.begin());
+  for(int i=0; i<con.size(); ++i){
+    makeDense(con[i]);
+  }
+  
+  // Get the dimensions
+  ng_ = con[0].size();
+  x_.resize(var.size());
+  for(int i=0; i<x_.size(); ++i){
+    x_[i].n = var[i].size();
+  }
+
+  // Allocate memory
+  lbg_.resize(ng_,-numeric_limits<double>::infinity());
+  ubg_.resize(ng_, numeric_limits<double>::infinity());
+  lambda_g_.resize(ng_,0);
+  dlambda_g_.resize(ng_,0);
+ 
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    it->init.resize(it->n,0);
+    it->opt.resize(it->n,0);
+    it->lb.resize(it->n,-numeric_limits<double>::infinity());
+    it->ub.resize(it->n, numeric_limits<double>::infinity());
+    it->lam.resize(it->n,0);
+    it->dlam.resize(it->n,0);
+    it->dx.resize(it->n,0);
+  }
+        
+  // Scalar objective function
+  MX obj;
+
+  // Lagrangian gradient of the objective function with respect to u and v
+  vector<MX> gL(x_.size());
+
+  // Multipliers
+  MX lam_g;
+  vector<MX> lam(x_.size());
+
+  if(gauss_newton_){
+    
+    // Least square objective
+    obj = inner_prod(f,f)/2;
+    gL[0] = f;
+    ngL_ = gL[0].size();
+
+  } else {
+
+#if 0
+#error    
+    // Scalar objective function
+    obj = f;
+    
+    // Lagrange multipliers for the simple bounds on u and Lagrange multipliers corresponding to the definition of the dependent variables
+    stringstream ss;
+    for(int i=0; i<x_.size(); ++i){
+      ss.str(string());
+      ss << "lam_x" << i;
+      lam[i] = msym(ss.str(),var[i].sparsity());
+    }
+
+    // Lagrange multipliers for the nonlinear constraints that aren't eliminated
+    lam_g = msym("lam_g",ng_);
+
+    if(verbose_){
+      cout << "Allocated intermediate variables." << endl;
+    }
+   
+    // Lagrangian
+    MX lag = obj;
+    if(!con[0].empty()) lag += inner_prod(lam_g,con[0]);
+    if(!var[0].empty()) lag += inner_prod(lam[0],var[0]);
+    for(int i=1; i<x_.size(); ++i){
+      if(!con[i].empty()) lag += inner_prod(flatten(lam[i]),flatten(con[i])); // note: equal to trace(mul(lam.T,con))
+    }
+
+    // Lagrangian function
+    MXFunction lfcn(var,lag);
+    lfcn.init();
+
+    // Adjoint sweep to get gradient
+    vector<MX> lfcn_in = lfcn.inputExpr();
+    vector<MX> lfcn_out = lfcn.outputExpr();
+    vector<vector<MX> > fseed,fsens,aseed(1),asens(1);
+    aseed[0].resize(1,1.0);
+    asens[0].resize(2);
+    lfcn.eval(lfcn_in,lfcn_out,fseed,fsens,aseed,asens,true);
+    for(int i=0; i<x_.size(); ++i){
+      gL[i] = asens[0].at(i);
+      makeDense(gL[i]);
+    }
+    ngL_ = x_[0].n;
+
+    if(verbose_){
+      cout << "Generated the gradient of the Lagrangian." << endl;
+    }
+#endif
+  }
+
+  // Residual function G
+
+  // Inputs
+  vector<MX> G_in(1+2*x_.size());
+  int n=0;
+  G_in[g_con_ = n++] = lam_g;
+  for(int i=0; i<x_.size(); ++i){
+    G_in[n] = var[i];    x_[i].g_var = n++;
+    G_in[n] = lam[i];    x_[i].g_lam = n++;
+  }
+  casadi_assert(n==G_in.size());
+
+  // Outputs
+  n=0;
+  vector<MX> G_out(2+2*(x_.size()-1));
+  G_out[n] = obj;     g_f_ = n++;
+  G_out[n] = con[0];  g_g_ = n++;
+  for(int i=1; i<x_.size(); ++i){
+    G_out[n] = con[i]-var[i];     x_[i].g_d = n++;
+    if(!lam[i].isNull()){
+      G_out[n] = gL[i]-lam[i];
+    }
+    x_[i].g_lam_d = n++;
+  }
+  casadi_assert(n==G_out.size());
+
+  rfcn_ = MXFunction(G_in,G_out);
+  rfcn_.setOption("number_of_fwd_dir",0);
+  rfcn_.setOption("number_of_adj_dir",0);
+  rfcn_.init();
+  if(verbose_){
+    cout << "Generated residual function ( " << shared_cast<MXFunction>(rfcn_).getAlgorithmSize() << " nodes)." << endl;
+  }
+}
+
+void Tester::prepare(){
+  prepareNew();
+
+  verbose_ = true;
 
   // Expand NLP
   fg_sx_ = SXFunction(fg_mx_);
@@ -505,6 +648,7 @@ void Tester::prepare(){
   }
   casadi_assert(n==G_out.size());
 
+#if 0
   rfcn_ = SXFunction(G_in,G_out);
   rfcn_.setOption("number_of_fwd_dir",0);
   rfcn_.setOption("number_of_adj_dir",0);
@@ -512,6 +656,7 @@ void Tester::prepare(){
   if(verbose_){
     cout << "Generated residual function ( " << shared_cast<SXFunction>(rfcn_).getAlgorithmSize() << " nodes)." << endl;
   }
+#endif
 
   // Declare difference vector d and substitute out v
   vector<SXMatrix> d(x_.size());
