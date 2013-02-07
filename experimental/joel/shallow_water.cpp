@@ -513,6 +513,188 @@ void Tester::prepareNew(){
   if(verbose_){
     cout << "Generated residual function ( " << shared_cast<MXFunction>(rfcn_).getAlgorithmSize() << " nodes)." << endl;
   }
+
+  // Declare difference vector d and substitute out v
+  vector<MX> d(x_.size());
+  vector<MX> d_def(x_.size());
+  stringstream ss;
+  for(int i=1; i<x_.size(); ++i){
+    ss.str(string());
+    ss << "d" << i;
+    d[i] = msym(ss.str(),var[i].sparsity());
+    d_def[i] = con[i]-d[i];
+  }
+
+  vector<MX> ex(2);
+  ex[0] = obj;
+  ex[1] = con[0];
+  ex.insert(ex.end(),gL.begin(),gL.end());
+ 
+  vector<MX> svar, sdef;
+  svar.insert(svar.end(),var.begin()+1,var.end());
+  sdef.insert(sdef.end(),d_def.begin()+1,d_def.end());
+  substituteInPlace(svar, sdef, ex, false);
+  copy(sdef.begin(),sdef.end(),d_def.begin()+1);  
+
+  vector<MX> gL_z(x_.size());
+  MX obj_z = ex[0];
+  MX g_z = ex[1];
+  for(int i=0; i<x_.size(); ++i){
+    gL_z[i] = ex[2+i];
+  }
+
+  // Declare difference vector lam_d and substitute out lam_v
+  vector<MX> lam_d(x_.size());
+  vector<MX> lam_d_def(x_.size());
+  if(!gauss_newton_){
+#if 0
+#error
+    for(int i=1; i<x_.size(); ++i){
+      ss.str(string());
+      ss << "lam_d" << i;
+      lam_d[i] = msym(ss.str(),var[i].sparsity());
+      lam_d_def[i] = lam[i]-lam_d[i];
+    }
+
+    ex[0] = gL_z[0];
+    ex[1] = g_z[1];
+    ex.resize(2);
+    substituteInPlace(lam[1], lam_d_def[1], ex, false);    
+    gL_z[0] = ex[0];
+    g_z = ex[1];
+#endif
+  }
+  
+  // Modified function Z
+  vector<MX> z_in(1+2*x_.size());
+  n=0;
+  z_in[z_con_ = n++] = lam_g;
+  for(int i=0; i<x_.size(); ++i){
+    z_in[x_[i].z_var=n++] = i==0 ? var[0] :     d[i];
+    z_in[x_[i].z_lam=n++] = i==0 ? lam[0] : lam_d[i];    
+  }
+  casadi_assert(n==z_in.size());
+
+  // Outputs
+  n=0;
+  vector<MX> z_out(1+2*(x_.size()-1));
+  z_out[z_fg_=n++] = vertcat(gL_z[0],g_z);
+  for(int i=1; i<x_.size(); ++i){
+    z_out[x_[i].z_def=n++] =  d_def[i];
+    z_out[x_[i].z_defL=n++] = lam_d_def[i];
+  }
+  casadi_assert(n==z_out.size());
+
+  MXFunction zfcn(z_in,z_out);
+  zfcn.setOption("name","zfcn");
+  zfcn.init();
+  if(verbose_){
+    cout << "Generated reconstruction function ( " << zfcn.getAlgorithmSize() << " nodes)." << endl;
+  }
+
+  // Matrix A and B in lifted Newton
+  MX B = zfcn.jac(x_[0].z_var,z_fg_);
+  MX qpH = B(Slice(0,ngL_),Slice(0,B.size2()));
+  MX qpA = B(Slice(ngL_,B.size1()),Slice(0,B.size2()));
+  if(verbose_){
+    cout << "Formed qpH (dimension " << qpH.size1() << "-by-" << qpH.size2() << ", "<< qpH.size() << " nonzeros) " <<
+    "and qpA (dimension " << qpA.size1() << "-by-" << qpA.size2() << ", "<< qpA.size() << " nonzeros)." << endl;
+  }
+  
+  // Step in u
+  MX du = msym("du",x_[0].n);
+  MX dlam_g;
+  if(!lam_g.isNull()){
+    dlam_g = msym("dlam_g",lam_g.sparsity());
+  }
+  MX qpG = gL_z[0];
+  MX qpB = g_z;
+  vector<MX> v_exp(x_.size());
+  vector<MX> vL_exp(x_.size());
+
+  if(x_.size()>1){
+    
+    // Directional derivative of Z
+    vector<vector<MX> > Z_fwdSeed(1,z_in);
+    vector<vector<MX> > Z_fwdSens(1,z_out);
+    vector<vector<MX> > Z_adjSeed;
+    vector<vector<MX> > Z_adjSens;
+    for(int sweep=0; sweep<2; ++sweep){
+      Z_fwdSeed[0][z_con_] = MX();
+      if(sweep==0){
+	Z_fwdSeed[0][x_[0].z_var] = MX();
+      } else {
+	Z_fwdSeed[0][x_[0].z_var] = du;
+      }
+      Z_fwdSeed[0][x_[0].z_lam] = MX();
+      for(int i=1; i<x_.size(); ++i){
+	Z_fwdSeed[0][x_[i].z_var] = -d[i];
+	Z_fwdSeed[0][x_[i].z_lam] = MX();
+      }      
+      zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
+    
+      if(sweep==0){
+	qpG += Z_fwdSens[0][z_fg_](Slice(0,ngL_));
+	qpB += Z_fwdSens[0][z_fg_](Slice(ngL_,B.size1()));
+      } else {
+	for(int i=1; i<x_.size(); ++i){
+	  v_exp[i] = Z_fwdSens[0][x_[i].z_def];
+	  vL_exp[i] = Z_fwdSens[0][x_[i].z_defL];
+	}
+      }
+    }
+  }
+  if(verbose_){
+    cout << "Formed qpG (dimension " << qpG.size1() << "-by-" << qpG.size2() << ", "<< qpG.size() << " nonzeros) " <<
+    "and qpB (dimension " << qpB.size1() << "-by-" << qpB.size2() << ", "<< qpB.size() << " nonzeros)." << endl;
+  }
+  
+  // Generate Gauss-Newton Hessian
+  if(gauss_newton_){
+    qpG = mul(trans(qpH),qpG);
+    qpH = mul(trans(qpH),qpH);
+    if(verbose_){
+      cout << "Gauss Newton Hessian (dimension " << qpH.size1() << "-by-" << qpH.size2() << ", "<< qpH.size() << " nonzeros)." << endl;
+    }
+  }
+  
+  // Make sure qpG and qpB are dense vectors
+  makeDense(qpG);
+  makeDense(qpB);
+
+  // Quadratic approximation
+  vector<MX> lfcn_in(1+2+ 4*(x_.size()-1));
+  n=0;
+  lfcn_in[n] = lam_g;          l_con_ = n++;
+  for(int i=0; i<x_.size(); ++i){
+    lfcn_in[n] = var[i];       x_[i].l_var = n++;
+    if(!lam[i].isNull()){
+      lfcn_in[n] = lam[i];
+    }
+    x_[i].l_lam = n++;
+    if(i>0){
+      lfcn_in[n] = d[i];       x_[i].l_res = n++;
+      if(!lam_d[i].isNull()){
+	lfcn_in[n] = lam_d[i];
+      }
+      x_[i].l_resL = n++;
+    }
+  }
+  casadi_assert(n==lfcn_in.size());  
+  
+  vector<MX> lfcn_out(LIN_NUM_OUT);
+  lfcn_out[LIN_QPG] = qpG;
+  lfcn_out[LIN_H] = qpH;
+  lfcn_out[LIN_QPB] = qpB;
+  lfcn_out[LIN_QPA] = qpA;
+  lfcn_ = MXFunction(lfcn_in,lfcn_out);
+  lfcn_.setOption("name","lfcn");
+  lfcn_.setOption("number_of_fwd_dir",0);
+  lfcn_.setOption("number_of_adj_dir",0);
+  lfcn_.init();
+  if(verbose_){
+    cout << "Generated linearization function ( " << shared_cast<MXFunction>(lfcn_).getAlgorithmSize() << " nodes)." << endl;
+  }
 }
 
 void Tester::prepare(){
@@ -819,6 +1001,7 @@ void Tester::prepare(){
   lfcn_out[LIN_H] = qpH;
   lfcn_out[LIN_QPB] = qpB;
   lfcn_out[LIN_QPA] = qpA;
+#if 0
   lfcn_ = SXFunction(lfcn_in,lfcn_out);
   lfcn_.setOption("name","lfcn");
   lfcn_.setOption("number_of_fwd_dir",0);
@@ -827,6 +1010,7 @@ void Tester::prepare(){
   if(verbose_){
     cout << "Generated linearization function ( " << shared_cast<SXFunction>(lfcn_).getAlgorithmSize() << " nodes)." << endl;
   }
+#endif
     
   // Step expansion
   vector<SXMatrix> efcn_in(3+2*x_.size());
