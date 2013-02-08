@@ -25,6 +25,7 @@
 
 #include <iomanip>
 #include <ctime>
+#include <cstdlib>
 
 using namespace CasADi;
 using namespace std;
@@ -45,13 +46,16 @@ public:
   void transcribe(bool single_shooting, bool gauss_newton);
 
   // Prepare NLP
-  void prepare();
+  void prepare(bool codegen);
  
   // Solve NLP
   void solve(int& iter_count);
 
   // Perform the parameter estimation
   void optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est);
+
+  // Codegen function
+  void dynamicCompilation(MXFunction& f, FX& f_gen, std::string fname, std::string fdescr);
 
   // Dimensions
   int n_boxes_;
@@ -363,13 +367,17 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
   fg_mx_.init();
   cout << "Generated lifted NLP (" << fg_mx_.countNodes() << " nodes)" << endl;
     
-  // Prepare the NLP solver
-  prepare();
 }
 
-void Tester::prepare(){
+void Tester::prepare(bool codegen){
   verbose_ = true;
   
+  if(codegen){
+    // Make sure that command processor is available
+    int flag = system(static_cast<const char*>(0));
+    casadi_assert_message(flag!=0, "No command procesor available");
+  }
+
   // Generate lifting functions
   //  MXFunction F,G,Z;
   //  fg_mx_.generateLiftingFunctions(F,G,Z);
@@ -479,38 +487,47 @@ void Tester::prepare(){
 #endif
   }
 
-  // Residual function G
+  // Residual function
 
   // Inputs
-  vector<MX> G_in(1+2*x_.size());
+  vector<MX> rfcn_in(1+2*x_.size());
   int n=0;
-  G_in[g_con_ = n++] = lam_g;
+  rfcn_in[n] = lam_g;
+  g_con_ = n++;
   for(int i=0; i<x_.size(); ++i){
-    G_in[n] = var[i];    x_[i].g_var = n++;
-    G_in[n] = lam[i];    x_[i].g_lam = n++;
+    rfcn_in[n] = var[i];    x_[i].g_var = n++;
+    rfcn_in[n] = lam[i];    x_[i].g_lam = n++;
   }
-  casadi_assert(n==G_in.size());
+  casadi_assert(n==rfcn_in.size());
 
   // Outputs
   n=0;
-  vector<MX> G_out(2+2*(x_.size()-1));
-  G_out[n] = obj;     g_f_ = n++;
-  G_out[n] = con[0];  g_g_ = n++;
+  vector<MX> rfcn_out(2+2*(x_.size()-1));
+  rfcn_out[n] = obj;               g_f_ = n++;
+  rfcn_out[n] = con[0];            g_g_ = n++;
   for(int i=1; i<x_.size(); ++i){
-    G_out[n] = con[i]-var[i];     x_[i].g_d = n++;
+    rfcn_out[n] = con[i]-var[i];   x_[i].g_d = n++;
     if(!lam[i].isNull()){
-      G_out[n] = gL[i]-lam[i];
+      rfcn_out[n] = gL[i]-lam[i];
     }
     x_[i].g_lam_d = n++;
   }
-  casadi_assert(n==G_out.size());
+  casadi_assert(n==rfcn_out.size());
 
-  rfcn_ = MXFunction(G_in,G_out);
-  rfcn_.setOption("number_of_fwd_dir",0);
-  rfcn_.setOption("number_of_adj_dir",0);
-  rfcn_.init();
+  // Generate function
+  MXFunction rfcn(rfcn_in,rfcn_out);
+  rfcn.setOption("number_of_fwd_dir",0);
+  rfcn.setOption("number_of_adj_dir",0);
+  rfcn.init();
   if(verbose_){
-    cout << "Generated residual function ( " << shared_cast<MXFunction>(rfcn_).getAlgorithmSize() << " nodes)." << endl;
+    cout << "Generated residual function ( " << rfcn.getAlgorithmSize() << " nodes)." << endl;
+  }
+
+  // Generate c code and load as DLL
+  if(codegen){
+    dynamicCompilation(rfcn,rfcn_,"rfcn","residual function");
+  } else {
+    rfcn_ = rfcn;
   }
 
   // Declare difference vector d and substitute out v
@@ -686,43 +703,62 @@ void Tester::prepare(){
   lfcn_out[LIN_H] = qpH;
   lfcn_out[LIN_QPB] = qpB;
   lfcn_out[LIN_QPA] = qpA;
-  lfcn_ = MXFunction(lfcn_in,lfcn_out);
-  lfcn_.setOption("name","lfcn");
-  lfcn_.setOption("number_of_fwd_dir",0);
-  lfcn_.setOption("number_of_adj_dir",0);
-  lfcn_.init();
+  
+
+  MXFunction lfcn(lfcn_in,lfcn_out);
+  lfcn.setOption("name","lfcn");
+  lfcn.setOption("number_of_fwd_dir",0);
+  lfcn.setOption("number_of_adj_dir",0);
+  lfcn.init();
   if(verbose_){
-    cout << "Generated linearization function ( " << shared_cast<MXFunction>(lfcn_).getAlgorithmSize() << " nodes)." << endl;
+    cout << "Generated linearization function ( " << lfcn.getAlgorithmSize() << " nodes)." << endl;
   }
 
-  // Step expansion
-  vector<MX> efcn_in(3+2*x_.size());
-  n=0;
-  efcn_in[e_con_ = n++] = lam_g;
-  efcn_in[e_du_ = n++] = du;
-  efcn_in[e_dlam_g_ = n++] = dlam_g;
-  for(int i=0; i<x_.size(); ++i){
-    efcn_in[x_[i].e_var=n++] = i==0 ? var[0] :     d[i];
-    efcn_in[x_[i].e_lam=n++] = i==0 ? lam[0] : lam_d[i];
+  // Generate c code and load as DLL
+  if(codegen){
+    dynamicCompilation(lfcn,lfcn_,"lfcn","linearization function");
+  } else {
+    lfcn_ = lfcn;
   }
-  casadi_assert(n==efcn_in.size());
 
+  // Step expansion function
   if(x_.size()>1){
+    // Function input
+    vector<MX> efcn_in(3+2*x_.size());
+    n=0;
+    efcn_in[n] = lam_g;                        e_con_ = n++;
+    efcn_in[n] = du;                           e_du_ = n++;
+    efcn_in[n] = dlam_g;                       e_dlam_g_ = n++;
+    for(int i=0; i<x_.size(); ++i){
+      efcn_in[n] = i==0 ? var[0] :     d[i];   x_[i].e_var = n++;
+      efcn_in[n] = i==0 ? lam[0] : lam_d[i];   x_[i].e_lam = n++;
+    }
+    casadi_assert(n==efcn_in.size());
+
+    // Function outputs
     vector<MX> efcn_out(2*(x_.size()-1));
     n=0;
     for(int i=1; i<x_.size(); ++i){
-      efcn_out[x_[i].e_exp=n++]  = v_exp[i];
-      efcn_out[x_[i].e_expL=n++] = vL_exp[i];
+      efcn_out[n]  = v_exp[i];                 x_[i].e_exp = n++;
+      efcn_out[n] = vL_exp[i];                 x_[i].e_expL = n++;
     }
     casadi_assert(n==efcn_out.size());
     
-    efcn_ = MXFunction(efcn_in,efcn_out);
-    efcn_.setOption("number_of_fwd_dir",0);
-    efcn_.setOption("number_of_adj_dir",0);
-    efcn_.setOption("name","efcn");
-    efcn_.init();
+    // Form function object
+    MXFunction efcn(efcn_in,efcn_out);
+    efcn.setOption("number_of_fwd_dir",0);
+    efcn.setOption("number_of_adj_dir",0);
+    efcn.setOption("name","efcn");
+    efcn.init();
     if(verbose_){
-      cout << "Generated step expansion function ( " << shared_cast<MXFunction>(efcn_).getAlgorithmSize() << " nodes)." << endl;
+      cout << "Generated step expansion function ( " << efcn.getAlgorithmSize() << " nodes)." << endl;
+    }
+
+    // Generate c code and load as DLL
+    if(codegen){
+      dynamicCompilation(efcn,efcn_,"efcn","step expansion function");
+    } else {
+      efcn_ = efcn;
     }
   }
   
@@ -745,6 +781,61 @@ void Tester::prepare(){
   
   if(verbose_){
     cout << "NLP preparation completed" << endl;
+  }
+}
+
+void Tester::dynamicCompilation(MXFunction& f, FX& f_gen, std::string fname, std::string fdescr){
+  // Append "ss" if single shooting to avoid name conflict
+  if(single_shooting_){
+    fname = fname + "_ss";
+  }
+
+  // C compiler
+  string compiler = "gcc";
+  //string compiler = "clang";
+
+  // Optimization flag
+  //  string oflag = "-O1";
+  string oflag = "";
+
+  // Filenames
+  string cname = fname + ".c";
+  string dlname = fname + ".so";
+  
+  // Remove existing files, if any
+  string rm_command = "rm -rf " + cname + " " + dlname;
+  int flag = system(rm_command.c_str());
+  casadi_assert_message(flag==0, "Failed to remove old source");
+
+  // Codegen it
+  f.generateCode(cname);
+  if(verbose_){
+    cout << "Generated c-code for " << fdescr << " (" << cname << ")" << endl;
+  }
+  
+  // Compile it
+  string compile_command = compiler + " -fPIC " + oflag + " -shared " + cname + " -o " + dlname;
+  if(verbose_){
+    cout << "Compiling " << fdescr <<  " using \"" << compile_command << "\"" << endl;
+  }
+
+  time_t time1 = time(0);
+  flag = system(compile_command.c_str());
+  time_t time2 = time(0);
+  double comp_time = difftime(time2,time1);
+  casadi_assert_message(flag==0, "Compilation failed");
+  if(verbose_){
+    cout << "Compiled " << fdescr << " (" << dlname << ") in " << comp_time << " s."  << endl;
+  }
+
+  // Load it
+  f_gen = ExternalFunction("./" + dlname);
+  f_gen.setOption("number_of_fwd_dir",0);
+  f_gen.setOption("number_of_adj_dir",0);
+  f_gen.setOption("name",fname + "_gen");
+  f_gen.init();
+  if(verbose_){
+    cout << "Dynamically loaded " << fdescr << " (" << dlname << ")" << endl;
   }
 }
 
@@ -1043,7 +1134,9 @@ int main(){
   vector<double> depth_est_eh(n_tests,-1);
   
   // Create a tester object
-  Tester t(30,1000,10);
+  //  Tester t(100,100,20);
+  //Tester t(30,1000,10); // Paper
+  Tester t(15,20,20);
     
   // Perform the modelling
   t.model();
@@ -1059,6 +1152,10 @@ int main(){
     bool gauss_newton = true;
     t.transcribe(single_shooting,gauss_newton);
   
+    // Prepare the NLP solver
+    bool codegen = false;
+    t.prepare(codegen);
+
     // Run tests
     for(int test=0; test<n_tests; ++test){
       // Print progress

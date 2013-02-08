@@ -37,13 +37,14 @@
 
 // Scalar expressions
 #include "sx/sx_tools.hpp"
-#include "fx/sx_function.hpp"
 
 // Matrix expressions
 #include "mx/mx.hpp"
 #include "mx/mx_tools.hpp"
+
+// Misc functions
+#include "fx/sx_function.hpp"
 #include "fx/mx_function.hpp"
-
-
+#include "fx/external_function.hpp"
 
 #endif //CASADI_HPP
