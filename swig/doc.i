@@ -26340,7 +26340,8 @@ Joel Andersson
 |              |              |              | resS|resB|rh |              |
 |              |              |              | sQB|bjacB|jt |              |
 |              |              |              | imesB|psetup |              |
-|              |              |              | B|psolveB)   |              |
+|              |              |              | B|psolveB|ps |              |
+|              |              |              | etup)        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -26537,6 +26538,8 @@ Joel Andersson
 | jtimesB                  | CasADi::IdasInternal |
 +--------------------------+----------------------+
 | outputs                  | CasADi::FXInternal   |
++--------------------------+----------------------+
+| psetup                   | CasADi::IdasInternal |
 +--------------------------+----------------------+
 | psetupB                  | CasADi::IdasInternal |
 +--------------------------+----------------------+
@@ -27611,7 +27614,8 @@ rx, rz and rp.
 |              |              |              | resS|resB|rh |              |
 |              |              |              | sQB|bjacB|jt |              |
 |              |              |              | imesB|psetup |              |
-|              |              |              | B|psolveB)   |              |
+|              |              |              | B|psolveB|ps |              |
+|              |              |              | etup)        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -27808,6 +27812,8 @@ rx, rz and rp.
 | jtimesB                  | CasADi::IdasInternal |
 +--------------------------+----------------------+
 | outputs                  | CasADi::FXInternal   |
++--------------------------+----------------------+
+| psetup                   | CasADi::IdasInternal |
 +--------------------------+----------------------+
 | psetupB                  | CasADi::IdasInternal |
 +--------------------------+----------------------+
@@ -55735,7 +55741,13 @@ ImplicitFunction.
 +==============+==============+==============+==============+==============+
 | abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Newt |
 |              |              |              | criterion    | onImplicitIn |
-|              |              |              | tolerance    | ternal       |
+|              |              |              | tolerance on | ternal       |
+|              |              |              | max(|F|)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| abstolStep   | OT_REAL      | 0.000        | Stopping     | CasADi::Newt |
+|              |              |              | criterion    | onImplicitIn |
+|              |              |              | tolerance on | ternal       |
+|              |              |              | step size    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
@@ -55819,7 +55831,7 @@ ImplicitFunction.
 |              |              |              | (inputs|outp | ADi::NewtonI |
 |              |              |              | uts)  (step| | mplicitInter |
 |              |              |              | stepsize|J|F | nal          |
-|              |              |              | )            |              |
+|              |              |              | |normF)      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -55919,6 +55931,8 @@ ImplicitFunction.
 | J        | CasADi::NewtonImplicitInternal |
 +----------+--------------------------------+
 | inputs   | CasADi::FXInternal             |
++----------+--------------------------------+
+| normF    | CasADi::NewtonImplicitInternal |
 +----------+--------------------------------+
 | outputs  | CasADi::FXInternal             |
 +----------+--------------------------------+
@@ -56395,7 +56409,13 @@ Joris Gillis
 +==============+==============+==============+==============+==============+
 | abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Newt |
 |              |              |              | criterion    | onImplicitIn |
-|              |              |              | tolerance    | ternal       |
+|              |              |              | tolerance on | ternal       |
+|              |              |              | max(|F|)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| abstolStep   | OT_REAL      | 0.000        | Stopping     | CasADi::Newt |
+|              |              |              | criterion    | onImplicitIn |
+|              |              |              | tolerance on | ternal       |
+|              |              |              | step size    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
@@ -56479,7 +56499,7 @@ Joris Gillis
 |              |              |              | (inputs|outp | ADi::NewtonI |
 |              |              |              | uts)  (step| | mplicitInter |
 |              |              |              | stepsize|J|F | nal          |
-|              |              |              | )            |              |
+|              |              |              | |normF)      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -56579,6 +56599,8 @@ Joris Gillis
 | J        | CasADi::NewtonImplicitInternal |
 +----------+--------------------------------+
 | inputs   | CasADi::FXInternal             |
++----------+--------------------------------+
+| normF    | CasADi::NewtonImplicitInternal |
 +----------+--------------------------------+
 | outputs  | CasADi::FXInternal             |
 +----------+--------------------------------+
