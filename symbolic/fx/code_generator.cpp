@@ -166,7 +166,7 @@ namespace CasADi{
   void CodeGenerator::auxCopy(){
     stringstream& s = auxiliaries_;
 
-    s << "inline void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
+    s << "void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
     s << "  int i;" << endl;
     s << "  for(i=0; i<n; ++i){" << endl;
     s << "    *y = *x;" << endl;
@@ -180,7 +180,7 @@ namespace CasADi{
   void CodeGenerator::auxSwap(){
     stringstream& s = auxiliaries_;
 
-    s << "inline void casadi_swap(int n, d* x, int inc_x, d* y, int inc_y){" << endl;
+    s << "void casadi_swap(int n, d* x, int inc_x, d* y, int inc_y){" << endl;
     s << "  d t;" << endl;
     s << "  int i;" << endl;
     s << "  for(i=0; i<n; ++i){" << endl;
@@ -198,7 +198,7 @@ namespace CasADi{
     addAuxiliary(AUX_COPY);
     stringstream& s = auxiliaries_;
 
-    s << "inline void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y){" << endl;
+    s << "void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y){" << endl;
     s << "  int nrow_x = sp_x[0];" << endl;
     s << "  int ncol_x = sp_x[1];" << endl;
     s << "  const int* rowind_x = sp_x+2;" << endl;
@@ -247,7 +247,7 @@ namespace CasADi{
   void CodeGenerator::auxScal(){
     stringstream& s = auxiliaries_;
     
-    s << "inline void casadi_scal(int n, d alpha, d* x, int inc_x){" << endl;
+    s << "void casadi_scal(int n, d alpha, d* x, int inc_x){" << endl;
     s << "  int i;" << endl;
     s << "  for(i=0; i<n; ++i){" << endl;
     s << "    *x *= alpha;" << endl;
@@ -260,7 +260,7 @@ namespace CasADi{
   void CodeGenerator::auxAxpy(){
     stringstream& s = auxiliaries_;
 
-    s << "inline void casadi_axpy(int n, d alpha, const d* x, int inc_x, d* y, int inc_y){" << endl;
+    s << "void casadi_axpy(int n, d alpha, const d* x, int inc_x, d* y, int inc_y){" << endl;
     s << "  int i;" << endl;
     s << "  for(i=0; i<n; ++i){" << endl;
     s << "    *y += alpha**x;" << endl;
@@ -274,7 +274,7 @@ namespace CasADi{
   void CodeGenerator::auxDot(){
     stringstream& s = auxiliaries_;
 
-    s << "inline d casadi_dot(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
+    s << "d casadi_dot(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
     s << "  d r = 0;" << endl;
     s << "  int i;" << endl;
     s << "  for(i=0; i<n; ++i){" << endl;
@@ -290,7 +290,7 @@ namespace CasADi{
   void CodeGenerator::auxAsum(){
     stringstream& s = auxiliaries_;
 
-    s << "inline d casadi_asum(int n, const d* x, int inc_x){" << endl;
+    s << "d casadi_asum(int n, const d* x, int inc_x){" << endl;
     s << "  d r = 0;" << endl;
     s << "  int i;" << endl;
     s << "  for(i=0; i<n; ++i){" << endl;
@@ -305,7 +305,7 @@ namespace CasADi{
   void CodeGenerator::auxIamax(){
     stringstream& s = auxiliaries_;
     
-    s << "inline int casadi_iamax(int n, const d* x, int inc_x){" << endl;
+    s << "int casadi_iamax(int n, const d* x, int inc_x){" << endl;
     s << "  d t;" << endl;
     s << "  d largest_value = -1.0;" << endl;
     s << "  int largest_index = -1;" << endl;
@@ -326,7 +326,7 @@ namespace CasADi{
   void CodeGenerator::auxFill(){
     stringstream& s = auxiliaries_;
 
-    s << "inline void casadi_fill(int n, d alpha, d* x, int inc_x){" << endl;
+    s << "void casadi_fill(int n, d alpha, d* x, int inc_x){" << endl;
     s << "  int i;" << endl;
     s << "  for(i=0; i<n; ++i){" << endl;
     s << "    *x = alpha;" << endl;
@@ -339,7 +339,7 @@ namespace CasADi{
   void CodeGenerator::auxMmNtSparse(){
     stringstream& s = auxiliaries_;
 
-    s << "inline void casadi_mm_nt_sparse(const d* x, const int* sp_x, const d* trans_y, const int* sp_trans_y, d* z, const int* sp_z){" << std::endl;
+    s << "void casadi_mm_nt_sparse(const d* x, const int* sp_x, const d* trans_y, const int* sp_trans_y, d* z, const int* sp_z){" << std::endl;
     
     s << "  int nrow_x = sp_x[0];" << endl;
     s << "  int ncol_x = sp_x[1];" << endl;
@@ -387,7 +387,7 @@ namespace CasADi{
   void CodeGenerator::auxNrm2(){
     stringstream& s = auxiliaries_;
 
-    s << "inline d casadi_nrm2(int n, const d* x, int inc_x){" << endl;
+    s << "d casadi_nrm2(int n, const d* x, int inc_x){" << endl;
     s << "  d r = 0;" << endl;
     s << "  int i;" << endl;
     s << "  for(i=0; i<n; ++i){" << endl;
