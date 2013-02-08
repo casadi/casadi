@@ -229,12 +229,12 @@ add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX."
 if(WITH_OOQP AND BLAS_FOUND)
   find_package (OOQP)
 endif()
-add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP.")
+add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP (requires BLAS).")
 
-if(WITH_WORHP)
+if(WITH_WORHP AND LIBXML2_FOUND)
   find_package (WORHP)
 endif()
-add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp.")
+add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp (requires LibXml2 headers).")
 
 # Use the included dsdp
 if(WITH_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
@@ -242,7 +242,7 @@ if(WITH_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
   set(DSDP_LIBRARIES casadi_dsdp)
   set(DSDP_FOUND true)
 endif()
-add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP solver DSDP.")
+add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP solver DSDP (requires BLAS and LAPACK).")
 
 add_subdirectory(symbolic)
 add_subdirectory(optimal_control)
