@@ -99,7 +99,7 @@ if(IPOPT_FOUND AND WITH_QPOASES)
   target_link_libraries(albersmeyer_toy_example casadi_integration casadi_nonlinear_programming casadi_qpoases_interface casadi_ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES} ${QPOASES_LIBRARIES})
 endif()
 
-if(WITH_QPOASES)
+if(WITH_QPOASES AND WITH_DL)
   add_executable(shallow_water shallow_water.cpp)
   target_link_libraries(shallow_water casadi_qpoases_interface casadi ${CASADI_DEPENDENCIES} ${QPOASES_LIBRARIES})
 endif()
