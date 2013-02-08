@@ -124,6 +124,20 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
 
+  def test_slicestepnegative(self):
+    self.message("Slice step negative")
+    a1 = [1,2,3,4,5]
+    a2 = DMatrix(a1)
+
+    self.checkarray(a2[0:4:-1,0],DMatrix(a1[0:4:-1])) # gives empty set
+    self.checkarray(a2[4:0:-1,0],DMatrix(a1[4:0:-1])) # gives [5, 4, 3, 2]
+    self.checkarray(a2[0:4:-2,0],DMatrix(a1[0:4:-2])) # gives empty set
+    self.checkarray(a2[4:0:-2,0],DMatrix(a1[4:0:-2])) # gives [5, 4, 3, 2]
+    self.checkarray(a2[1:4:-2,0],DMatrix(a1[1:4:-2])) # gives empty set
+    self.checkarray(a2[4:1:-2,0],DMatrix(a1[4:1:-2])) # gives [5, 4, 3, 2]
+    self.checkarray(a2[0:3:-2,0],DMatrix(a1[0:3:-2])) # gives empty set
+    self.checkarray(a2[3:0:-2,0],DMatrix(a1[3:0:-2])) # gives [5, 4, 3, 2]
+    
   def test_indexingOutOfBounds(self):
     self.message("Indexing out of bounds")
     y = DMatrix.zeros(4, 5) 
