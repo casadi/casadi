@@ -51789,6 +51789,8 @@ compatibility. ";
 
 %feature("docstring")  CasADi::Matrix::if_else_zero "";
 
+%feature("docstring")  CasADi::Matrix::lift "";
+
 %feature("docstring")  CasADi::Matrix::print "
 
 Printing. ";
@@ -53711,6 +53713,12 @@ Set the temporary variable. ";
 
 %feature("docstring")  CasADi::MX::getSub "";
 
+%feature("docstring")  CasADi::MX::getSub "";
+
+%feature("docstring")  CasADi::MX::getSub "";
+
+%feature("docstring")  CasADi::MX::getSub "";
+
 %feature("docstring")  CasADi::MX::setSub "";
 
 %feature("docstring")  CasADi::MX::setSub "";
@@ -53846,6 +53854,8 @@ Division (with future.division in effect) ";
 %feature("docstring")  CasADi::MX::arctanh "";
 
 %feature("docstring")  CasADi::MX::logic_not "";
+
+%feature("docstring")  CasADi::MX::lift "";
 
 %feature("docstring")  CasADi::MX::mapping "
 
@@ -54359,6 +54369,11 @@ Expand the matrix valued graph into a scalar valued graph. ";
 %feature("docstring")  CasADi::MXFunction::getFree "
 
 Get all the free variables of the function. ";
+
+%feature("docstring")  CasADi::MXFunction::generateLiftingFunctions "
+
+Extract the residual function G and the modified function Z out of an
+expression (see Albersmeyer2010 paper) ";
 
 %feature("docstring")  CasADi::MXFunction::getNumInputs "
 
@@ -55092,6 +55107,12 @@ Generate code for the body of the C function. ";
 %feature("docstring")  CasADi::MXFunctionInternal::setLiftingFunction "
 
 Set the lifting function. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::generateLiftingFunctions
+"
+
+Extract the residual function G and the modified function Z out of an
+expression (see Albersmeyer2010 paper) ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::getNumericJacobian "
 
@@ -80364,6 +80385,8 @@ allow unambigous access. ";
 
 %feature("docstring")  CasADi::SX::if_else_zero "";
 
+%feature("docstring")  CasADi::SX::lift "";
+
 %feature("docstring")  CasADi::SX::fmin "";
 
 %feature("docstring")  CasADi::SX::fmax "";
@@ -82866,6 +82889,14 @@ C++ includes: casadi_calculus.hpp ";
 %feature("docstring") CasADi::UnaryOperation< OP_INV > "
 
 Elementwise inverse.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__LIFT_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_LIFT > "
+
+Inverse of error function.
 
 C++ includes: casadi_calculus.hpp ";
 
@@ -87518,6 +87549,14 @@ CasADi additions. ";
 
 %feature("docstring")  CasADi::printme "";
 
+%feature("docstring")  CasADi::lift "
+
+\"Lift\" expression ";
+
+%feature("docstring")  CasADi::lift "";
+
+%feature("docstring")  CasADi::lift "";
+
 %feature("docstring")  CasADi::sign "
 
 Sign function, note that sign(nan) == nan. ";
@@ -89178,6 +89217,10 @@ ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...) ";
 
 Checks if vector does not contain NaN or Inf. ";
 
+%feature("docstring")  CasADi::lift "
+
+\"Lift\" a set of expressions ";
+
 %feature("docstring")  CasADi::inner_prod "";
 
 %feature("docstring")  CasADi::norm_inf "";
@@ -89422,6 +89465,11 @@ Extract shared subexpressions from an set of expressions. ";
 %feature("docstring")  CasADi::printCompact "
 
 Print compact, introducing new variables for shared subexpressions. ";
+
+%feature("docstring")  CasADi::substituteInPlace "
+
+Substitute variable var out of or into an expression expr, with an arbitrary
+number of other expressions piggyback (vector version) ";
 
 %feature("docstring")  CasADi::if_else "
 
