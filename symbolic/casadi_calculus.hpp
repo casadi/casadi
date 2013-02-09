@@ -233,13 +233,6 @@ enum Operation{
     std::cout << "|> " << y << " : " << x << std::endl;
     return x;
   }
-
-  /// "Lift" expression
-  template<class T> T lift(const T &x){ return x.lift();}
-  template<class T> T lift(const T &x, const T &y){ return x.printme(y);}
-  inline double lift(double x){
-    return x;
-  }
   
   /// Sign function, note that sign(nan) == nan
   template<class T> T sign(const T &x){return x.sign();}
@@ -760,9 +753,9 @@ struct BinaryOperation<OP_IF_ELSE_ZERO>{
 
 /// Inverse of error function
 template<>
-struct UnaryOperation<OP_LIFT>{
-  template<typename T> static inline void fcn(const T& x, T& f){ f = lift(x);}
-  template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1; }
+struct BinaryOperation<OP_LIFT>{
+  template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x;}
+  template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0] = 1; d[1] = 0; }
 };
 
 #endif // SWIG

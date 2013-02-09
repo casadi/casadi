@@ -326,7 +326,8 @@ inline int casadi_math<T>::ndeps(unsigned char op){
     case OP_FMIN:\
     case OP_FMAX:\
     case OP_ATAN2:\
-    case OP_PRINTME:
+    case OP_PRINTME:\
+    case OP_LIFT:
   
   switch(op){
     case OP_CONST:

@@ -515,7 +515,6 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Matrix<T> logic_and(const Matrix<T>& y) const;
     Matrix<T> logic_or(const Matrix<T>& y) const;
     Matrix<T> if_else_zero(const Matrix<T>& y) const;
-    Matrix<T> lift() const;
     //@}
     
     //@{
@@ -531,7 +530,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     void printSparse(std::ostream &stream=std::cout) const; // print sparse matrix style
     void printDense(std::ostream &stream=std::cout) const; // Print dense matrix stype
     //@}
-
+  
     // Get the sparsity pattern
     const std::vector<int>& col() const;
     const std::vector<int>& rowind() const;

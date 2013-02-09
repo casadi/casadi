@@ -97,6 +97,9 @@ public:
   /// Outputs of the linearization function
   enum LinOut{LIN_QPG,LIN_H,LIN_QPB,LIN_QPA,LIN_NUM_OUT};
   
+  /// Generate initial guess for lifted variables
+  FX vinit_fcn_;
+
   /// Residual function
   FX rfcn_;
   
@@ -306,10 +309,8 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
   
   // NLP variables
   MX P = msym("P",2);
-  MX nlp_u = P;
 
   // Variables in the lifted NLP
-  vector<MX> nlp_v;
   stringstream ss;
   
   // Least-squares objective function
@@ -318,9 +319,6 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
   // Constraint function
   MX nlp_g = MX::sparse(0,1);
   
-  // Lifted equations
-  vector<MX> nlp_h;
-
   // Generate full-space NLP
   MX U = u0_;  MX V = v0_;  MX H = h0_;
   for(int k=0; k<n_meas_; ++k){
@@ -329,16 +327,20 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
     vector<MX> f_res = f_.call(vector<MX>(f_arg,f_arg+4));
     U = f_res[0];    V = f_res[1];    H = f_res[2];
     
+    // Lift the height
     if(!single_shooting){
-      // Lift the variable
-      MX H_def = H;
-      ss.str(string());
-      ss << "v" << nlp_v.size();
-      H = msym(ss.str(),H_def.sparsity());
-      nlp_v.push_back(H);
+      // Initialize with measurements
+      H.lift(H_meas_[k]);
+
+      // Initialize with initial conditions
+      //U.lift(u0_);
+      //V.lift(v0_);
+      //H.lift(h0_);
       
-      // Constraint function term
-      nlp_h.push_back(H_def);
+      // Initialize through simulation
+      //      U.lift(U);
+      //      V.lift(V);
+      //      H.lift(H);
     }
     
     // Objective function term
@@ -355,13 +357,11 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
  
   // Function which calculates the objective terms and constraints
   vector<MX> fg_in;
-  fg_in.push_back(nlp_u);
-  fg_in.insert(fg_in.end(),nlp_v.begin(),nlp_v.end());
+  fg_in.push_back(P);
 
   vector<MX> fg_out;
   fg_out.push_back(nlp_f);
   fg_out.push_back(nlp_g);
-  fg_out.insert(fg_out.end(),nlp_h.begin(),nlp_h.end());
 
   fg_mx_ = MXFunction(fg_in,fg_out);
   fg_mx_.init();
@@ -379,21 +379,22 @@ void Tester::prepare(bool codegen){
   }
 
   // Generate lifting functions
-  //  MXFunction F,G,Z;
-  //  fg_mx_.generateLiftingFunctions(F,G,Z);
-  //  F.init();
-  //  G.init();
-  //  Z.init();
+  MXFunction vdef_fcn, vinit_fcn;
+  fg_mx_.generateLiftingFunctions(vdef_fcn,vinit_fcn);
+  vdef_fcn.init();
+  vinit_fcn.init();
+  vinit_fcn_ = vinit_fcn;
 
   // Extract the expressions
-  vector<MX> var = fg_mx_.inputExpr();
-  vector<MX> con = fg_mx_.outputExpr();
-  MX f = fg_mx_.outputExpr(0);
+  vector<MX> var = vdef_fcn.inputExpr();
+  vector<MX> con = vdef_fcn.outputExpr();
+
+  MX f = con.front();
   con.erase(con.begin());
   for(int i=0; i<con.size(); ++i){
     makeDense(con[i]);
   }
-  
+
   // Get the dimensions
   ng_ = con[0].size();
   x_.resize(var.size());
@@ -416,7 +417,7 @@ void Tester::prepare(bool codegen){
     it->dlam.resize(it->n,0);
     it->dx.resize(it->n,0);
   }
-        
+
   // Scalar objective function
   MX obj;
 
@@ -795,8 +796,12 @@ void Tester::dynamicCompilation(MXFunction& f, FX& f_gen, std::string fname, std
   //string compiler = "clang";
 
   // Optimization flag
-  //  string oflag = "-O1";
+  //   string oflag = "-O3";
   string oflag = "";
+
+  // Flag to get a DLL
+  string dlflag = " -dynamiclib";
+  //string dlflag = " -shared";
 
   // Filenames
   string cname = fname + ".c";
@@ -814,7 +819,7 @@ void Tester::dynamicCompilation(MXFunction& f, FX& f_gen, std::string fname, std
   }
   
   // Compile it
-  string compile_command = compiler + " -fPIC " + oflag + " -shared " + cname + " -o " + dlname;
+  string compile_command = compiler + " -fPIC " + dlflag + " " + oflag + " " + cname + " -o " + dlname;
   if(verbose_){
     cout << "Compiling " << fdescr <<  " using \"" << compile_command << "\"" << endl;
   }
@@ -918,7 +923,7 @@ void Tester::solve(int& iter_count){
       }
       
       double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
-      double threshold = 1e-12;
+      double threshold = 1e-8;
       if(eig_smallest<threshold){
 	// Regularization
 	reg = threshold-eig_smallest;
@@ -1065,14 +1070,17 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   if(verbose_){
     cout << "Starting parameter estimation" << endl;
   }
-
+  
   // Initial guess
-  for(int i=0; i<x_.size(); ++i){
-    if(i==0){
-      x_[0].init[0] = drag_guess;
-      x_[0].init[1] = depth_guess;
-    } else {
-      copy(H_meas_[i-1].begin(),H_meas_[i-1].end(),x_[i].init.begin());
+  x_[0].init[0] = drag_guess;
+  x_[0].init[1] = depth_guess;
+
+  if(x_.size()>1){
+    // Initialize lifted variables using the generated function
+    vinit_fcn_.setInput(x_[0].init);
+    vinit_fcn_.evaluate();    
+    for(int i=1; i<x_.size(); ++i){
+      vinit_fcn_.getOutput(x_[i].init,i-1);
     }
   }
   if(verbose_){
@@ -1134,7 +1142,7 @@ int main(){
   vector<double> depth_est_eh(n_tests,-1);
   
   // Create a tester object
-  //  Tester t(100,100,20);
+  //Tester t(100,100,20);
   //Tester t(30,1000,10); // Paper
   Tester t(15,20,20);
     

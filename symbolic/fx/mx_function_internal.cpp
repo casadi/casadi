@@ -1216,56 +1216,44 @@ void MXFunctionInternal::allocTape(){
     }
   }
   
-  void MXFunctionInternal::generateLiftingFunctions(MXFunction& F, MXFunction& G, MXFunction& Z){
-    assertInit();    
+  void MXFunctionInternal::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn){
+    assertInit();
 
     vector<MX> swork(work_.size());
 
     MXPtrV input_p, output_p;
     MXPtrVV dummy_p;
 
-    // x and F in Algorithm 1
-    vector<MX> x;
-    vector<MX> f_F(getNumOutputs());
-
-    // y, G and F in algorithm 2
+    // Definition of intermediate variables
     vector<MX> y;
     vector<MX> g;
     vector<MX> f_G(getNumOutputs());
     
-    // d, z and F in algorithm 3
-    vector<MX> d;
-    vector<MX> z;
-    vector<MX> f_Z(getNumOutputs());
-    
+    // Initial guess for intermediate variables
+    vector<MX> x_init;
+
     // Temporary stringstream
     stringstream ss;
 
-    for(int algNo=1; algNo<=3; ++algNo){
+    for(int algNo=0; algNo<2; ++algNo){
       for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
 	switch(it->op){
 	case OP_LIFT:
 	  {
-	    MX& arg = swork[it->arg.front()];
+	    MX& arg = swork[it->arg.at(0)];
+	    MX& arg_init = swork[it->arg.at(1)];
 	    MX& res = swork[it->res.front()];
 	    switch(algNo){
-	    case 1: 
-	      x.push_back(arg);
-	      res = arg;
-	      break;
-	    case 2:
+	    case 0:
 	      ss.str(string());
 	      ss << "y" << y.size();
 	      y.push_back(msym(ss.str(),arg.sparsity()));
-	      g.push_back(arg-y.back());
+	      g.push_back(arg);
 	      res = y.back();
 	      break;
-	    case 3:
-	      ss.str(string());
-	      ss << "d" << d.size();
-	      d.push_back(msym(ss.str(),arg.sparsity()));
-	      z.push_back(arg-d.back());
-	      res = z.back();
+	    case 1:
+	      x_init.push_back(arg_init);
+	      res = arg_init;
 	      break;
 	    }
 	    break;
@@ -1275,10 +1263,8 @@ void MXFunctionInternal::allocTape(){
 	  swork[it->res.front()] = it->data;
 	  break;
 	case OP_OUTPUT:
-	  switch(algNo){
-	  case 1:  f_F[it->res.front()] = swork[it->arg.front()]; break;
-	  case 2:  f_G[it->res.front()] = swork[it->arg.front()]; break;
-	  case 3:  f_Z[it->res.front()] = swork[it->arg.front()]; break;
+	  if(algNo==0){
+	    f_G[it->res.front()] = swork[it->arg.front()];
 	  }
 	  break;
 	default:
@@ -1301,25 +1287,17 @@ void MXFunctionInternal::allocTape(){
       }
     }
     
-    // F
+    // Definition of intermediate variables
     vector<MX> f_in = inputv_;
-    vector<MX> f_out = x;
-    f_out.insert(f_out.end(),f_F.begin(),f_F.end());
-    F = MXFunction(f_in,f_out);
-
-    // G
-    f_in = inputv_;
     f_in.insert(f_in.end(),y.begin(),y.end());
-    f_out = g;
-    f_out.insert(f_out.end(),f_G.begin(),f_G.end());
-    G = MXFunction(f_in,f_out);
+    vector<MX> f_out = f_G;
+    f_out.insert(f_out.end(),g.begin(),g.end());
+    vdef_fcn = MXFunction(f_in,f_out);
 
-    // Z
+    // Initial guess of intermediate variables
     f_in = inputv_;
-    f_in.insert(f_in.end(),d.begin(),d.end());
-    f_out = z;
-    f_out.insert(f_out.end(),f_Z.begin(),f_Z.end());
-    Z = MXFunction(f_in,f_out);
+    f_out = x_init;
+    vinit_fcn = MXFunction(f_in,f_out);
   }
 
 } // namespace CasADi

@@ -127,8 +127,8 @@ int MXFunction::getWorkSize() const{
   return (*this)->work_.size();
 }
 
-  void MXFunction::generateLiftingFunctions(MXFunction& F, MXFunction& G, MXFunction& Z){
-    (*this)->generateLiftingFunctions(F,G,Z);
+  void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn){
+    (*this)->generateLiftingFunctions(vdef_fcn,vinit_fcn);
   }
 
 

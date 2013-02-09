@@ -802,8 +802,8 @@ MX MX::logic_not() const{
   return UnaryMX::create(OP_NOT,*this);
 }
 
-MX MX::lift() const{ 
-  return UnaryMX::create(OP_LIFT,*this);
+void MX::lift(const MX& x_guess){ 
+  *this = MX::binary(OP_LIFT,*this,x_guess);
 }
 
 MX MX::__add__(const MX& y) const{
