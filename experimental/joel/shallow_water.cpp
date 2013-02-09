@@ -110,10 +110,13 @@ public:
   FX efcn_;
   
   /// Dimensions
-  int ng_, ngL_;
+  int nu_, ng_, ngL_;
 
-  /// Dual step
-  vector<double> lbg_, ubg_, lambda_g_, dlambda_g_;
+  // Simple and nonlinear bounds
+  vector<double> lbu_, ubu_, lbg_, ubg_;
+
+  /// Multipliers for the nonlinear bounds
+  vector<double> lambda_g_, dlambda_g_;
 
   int g_con_;
   int g_f_, g_g_;
@@ -139,7 +142,7 @@ public:
     int e_var, e_lam;
     int e_exp, e_expL;
 
-    vector<double> dx, init, lb, ub, opt, lam, dlam;
+    vector<double> step, init, opt, lam, dlam;
     vector<double> res, resL;
     
   };
@@ -396,6 +399,7 @@ void Tester::prepare(bool codegen){
   }
 
   // Get the dimensions
+  nu_ = var[0].size();
   ng_ = con[0].size();
   x_.resize(var.size());
   for(int i=0; i<x_.size(); ++i){
@@ -403,6 +407,8 @@ void Tester::prepare(bool codegen){
   }
 
   // Allocate memory
+  lbu_.resize(nu_,-numeric_limits<double>::infinity());
+  ubu_.resize(nu_, numeric_limits<double>::infinity());
   lbg_.resize(ng_,-numeric_limits<double>::infinity());
   ubg_.resize(ng_, numeric_limits<double>::infinity());
   lambda_g_.resize(ng_,0);
@@ -411,11 +417,9 @@ void Tester::prepare(bool codegen){
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
     it->init.resize(it->n,0);
     it->opt.resize(it->n,0);
-    it->lb.resize(it->n,-numeric_limits<double>::infinity());
-    it->ub.resize(it->n, numeric_limits<double>::infinity());
     it->lam.resize(it->n,0);
     it->dlam.resize(it->n,0);
-    it->dx.resize(it->n,0);
+    it->step.resize(it->n,0);
   }
 
   // Scalar objective function
@@ -480,7 +484,7 @@ void Tester::prepare(bool codegen){
       gL[i] = asens[0].at(i);
       makeDense(gL[i]);
     }
-    ngL_ = x_[0].n;
+    ngL_ = nu_;
 
     if(verbose_){
       cout << "Generated the gradient of the Lagrangian." << endl;
@@ -611,15 +615,15 @@ void Tester::prepare(bool codegen){
 
   // Matrix A and B in lifted Newton
   MX B = zfcn.jac(x_[0].z_var,z_fg_);
-  MX qpH = B(Slice(0,ngL_),Slice(0,B.size2()));
-  MX qpA = B(Slice(ngL_,B.size1()),Slice(0,B.size2()));
+  MX qpH = B( Slice(    0, ngL_     ), Slice() );
+  MX qpA = B( Slice( ngL_, ngL_+ng_ ), Slice() );
   if(verbose_){
     cout << "Formed qpH (dimension " << qpH.size1() << "-by-" << qpH.size2() << ", "<< qpH.size() << " nonzeros) " <<
-    "and qpA (dimension " << qpA.size1() << "-by-" << qpA.size2() << ", "<< qpA.size() << " nonzeros)." << endl;
+               "and qpA (dimension " << qpA.size1() << "-by-" << qpA.size2() << ", "<< qpA.size() << " nonzeros)." << endl;
   }
   
   // Step in u
-  MX du = msym("du",x_[0].n);
+  MX du = msym("du",nu_);
   MX dlam_g;
   if(!lam_g.isNull()){
     dlam_g = msym("dlam_g",lam_g.sparsity());
@@ -663,7 +667,7 @@ void Tester::prepare(bool codegen){
   }
   if(verbose_){
     cout << "Formed qpG (dimension " << qpG.size1() << "-by-" << qpG.size2() << ", "<< qpG.size() << " nonzeros) " <<
-    "and qpB (dimension " << qpB.size1() << "-by-" << qpB.size2() << ", "<< qpB.size() << " nonzeros)." << endl;
+               "and qpB (dimension " << qpB.size1() << "-by-" << qpB.size2() << ", "<< qpB.size() << " nonzeros)." << endl;
   }
   
   // Generate Gauss-Newton Hessian
@@ -859,11 +863,12 @@ void Tester::solve(int& iter_count){
   int k=0;  
   while(true){
 
-    // Evaluate residual
+    // Pass primal variables to the residual function
     for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
       rfcn_.setInput(it->opt,it->g_var);
     }
 
+    // Pass dual variables to the residual function
     if(!gauss_newton_){
       rfcn_.setInput(lambda_g_,g_con_);
       for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
@@ -871,7 +876,10 @@ void Tester::solve(int& iter_count){
       }
     }
 
+    // Evaluate residual function
     rfcn_.evaluate();
+
+    // Store residual
     f_k = rfcn_.output(g_f_).toScalar();
     const DMatrix& r_g = rfcn_.output(g_g_);
     for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
@@ -879,15 +887,18 @@ void Tester::solve(int& iter_count){
       rfcn_.getOutput(it->resL, it->g_lam_d);
     }
     
-    // Construct the QP
-    lfcn_.setInput(lambda_g_,l_con_);
+    // Pass primal variables to the linearization function
     for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
       lfcn_.setInput(it->opt,it->l_var);
       if(!gauss_newton_){
 	lfcn_.setInput(it->lam,it->l_lam);	
       }
     }
+    
+    // Pass dual variables to the linearization function
+    lfcn_.setInput(lambda_g_,l_con_);
 
+    // Pass residual
     for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
       lfcn_.setInput(it->res, it->l_res);
       if(!gauss_newton_){
@@ -895,8 +906,10 @@ void Tester::solve(int& iter_count){
       }
     }
 
+    // Evaluate to get QP
     lfcn_.evaluate();
-
+    
+    // QP
     DMatrix& qpH = lfcn_.output(LIN_H);
     const DMatrix& qpG = lfcn_.output(LIN_QPG);
     const DMatrix& qpA = lfcn_.output(LIN_QPA);
@@ -938,8 +951,8 @@ void Tester::solve(int& iter_count){
     qp_solver_.setInput(qpH,QP_H);
     qp_solver_.setInput(qpG,QP_G);
     qp_solver_.setInput(qpA,QP_A);
-    std::transform(x_[0].lb.begin(),x_[0].lb.end(),x_[0].opt.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
-    std::transform(x_[0].ub.begin(),x_[0].ub.end(),x_[0].opt.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
+    std::transform(lbu_.begin(),lbu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
+    std::transform(ubu_.begin(),ubu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
     std::transform(lbg_.begin(),lbg_.end(), qpB.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
     std::transform(ubg_.begin(),ubg_.end(), qpB.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
     qp_solver_.evaluate();
@@ -948,7 +961,7 @@ void Tester::solve(int& iter_count){
     const DMatrix& dlam_g = qp_solver_.output(QP_LAMBDA_A);    
     
     // Condensed step
-    copy(du.begin(),du.end(),x_[0].dx.begin());
+    copy(du.begin(),du.end(),x_[0].step.begin());
     copy(dlam_g.begin(),dlam_g.end(),dlambda_g_.begin());
     copy(dlam_u.begin(),dlam_u.end(),x_[0].dlam.begin());
 
@@ -972,7 +985,7 @@ void Tester::solve(int& iter_count){
       // Expanded primal step
       for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
 	const DMatrix& dv = efcn_.output(it->e_exp);
-	copy(dv.begin(),dv.end(),it->dx.begin());
+	copy(dv.begin(),dv.end(),it->step.begin());
       }
       
       // Expanded dual step
@@ -984,7 +997,7 @@ void Tester::solve(int& iter_count){
     
     // Take a full step
     for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      transform(it->dx.begin(),it->dx.end(),it->opt.begin(),it->opt.begin(),plus<double>());
+      transform(it->step.begin(),it->step.end(),it->opt.begin(),it->opt.begin(),plus<double>());
     }
 
     transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),lambda_g_.begin(),plus<double>());
@@ -999,7 +1012,7 @@ void Tester::solve(int& iter_count){
     // Step size
     double norm_step=0;
     for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      for(vector<double>::const_iterator i=it->dx.begin(); i!=it->dx.end(); ++i){
+      for(vector<double>::const_iterator i=it->step.begin(); i!=it->step.end(); ++i){
 	norm_step += *i**i;
       }
     }
@@ -1017,25 +1030,33 @@ void Tester::solve(int& iter_count){
     
     // Constraint violation
     double norm_viol = 0;
+
+    // Variable bounds
     for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      for(int i=0; i<it->n; ++i){
-	double d = ::fmax(it->opt.at(i) - it->ub.at(i),0.) + ::fmax(it->lb.at(i) - it->opt.at(i),0.);
-	norm_viol += d*d;
+      if(it==x_.begin()){
+
+	// Simple bounds
+	for(int i=0; i<it->n; ++i){
+	  double d = ::fmax(it->opt[i]-ubu_[i],0.) + ::fmax(lbu_[i]-it->opt[i],0.);
+	  norm_viol += d*d;
+	}
+      } else {
+
+	// Lifted variables
+	for(int i=0; i<it->n; ++i){
+	  double d = it->res[i];
+	  norm_viol += d*d;
+	}
       }
     }
 
+    // Nonlinear bounds
     for(int i=0; i<ng_; ++i){
-      double d = ::fmax(r_g.at(i)-ubg_.at(i),0.) + ::fmax(lbg_.at(i)-r_g.at(i),0.);
+      double d = ::fmax(r_g.at(i)-ubg_[i],0.) + ::fmax(lbg_[i]-r_g.at(i),0.);
       norm_viol += d*d;
     }
-
-    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
-      for(int i=0; i<it->n; ++i){
-	double d = ::fmax(it->res.at(i),0.) + ::fmax(-it->res.at(i),0.);
-	norm_viol += d*d;
-      }
-    }
-
+        
+    // Square root to get 2-norm
     norm_viol = sqrt(norm_viol);
     
     // Print progress (including the header every 10 rows)
@@ -1087,11 +1108,10 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
     cout << "Passed initial guess" << endl;
   }
 
-
+  // Bounds on the variables
+  fill(lbu_.begin(),lbu_.end(),0);
   fill(lbg_.begin(),lbg_.end(),0);
   fill(ubg_.begin(),ubg_.end(),0);
-  x_[0].lb[0] = 0;
-  x_[0].lb[1] = 0;
 
   clock_t time1 = clock();
   solve(iter_count);
