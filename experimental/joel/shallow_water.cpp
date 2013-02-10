@@ -441,8 +441,6 @@ void Tester::prepare(bool codegen){
 
   } else {
 
-#if 0
-#error    
     // Scalar objective function
     obj = f;
     
@@ -454,7 +452,7 @@ void Tester::prepare(bool codegen){
       lam[i] = msym(ss.str(),var[i].sparsity());
     }
 
-    // Lagrange multipliers for the nonlinear constraints that aren't eliminated
+    // Lagrange multipliers for the nonlinear constraints
     lam_g = msym("lam_g",ng_);
 
     if(verbose_){
@@ -489,35 +487,34 @@ void Tester::prepare(bool codegen){
     if(verbose_){
       cout << "Generated the gradient of the Lagrangian." << endl;
     }
-#endif
   }
 
   // Residual function
 
   // Inputs
-  vector<MX> rfcn_in(1+2*x_.size());
+  vector<MX> rfcn_in;
   int n=0;
-  rfcn_in[n] = lam_g;
-  g_con_ = n++;
-  for(int i=0; i<x_.size(); ++i){
-    rfcn_in[n] = var[i];    x_[i].g_var = n++;
-    rfcn_in[n] = lam[i];    x_[i].g_lam = n++;
+  if(!gauss_newton_){
+    rfcn_in.push_back(lam_g);       g_con_ = n++;
   }
-  casadi_assert(n==rfcn_in.size());
+  for(int i=0; i<x_.size(); ++i){
+    rfcn_in.push_back(var[i]);      x_[i].g_var = n++;
+    if(!gauss_newton_){
+      rfcn_in.push_back(lam[i]);    x_[i].g_lam = n++;
+    }
+  }
 
   // Outputs
+  vector<MX> rfcn_out;
   n=0;
-  vector<MX> rfcn_out(2+2*(x_.size()-1));
-  rfcn_out[n] = obj;               g_f_ = n++;
-  rfcn_out[n] = con[0];            g_g_ = n++;
+  rfcn_out.push_back(obj);               g_f_ = n++;
+  rfcn_out.push_back(con[0]);            g_g_ = n++;
   for(int i=1; i<x_.size(); ++i){
-    rfcn_out[n] = con[i]-var[i];   x_[i].g_d = n++;
-    if(!lam[i].isNull()){
-      rfcn_out[n] = gL[i]-lam[i];
+    rfcn_out.push_back(con[i]-var[i]);   x_[i].g_d = n++;
+    if(!gauss_newton_){
+      rfcn_out.push_back(gL[i]-lam[i]);  x_[i].g_lam_d = n++;
     }
-    x_[i].g_lam_d = n++;
   }
-  casadi_assert(n==rfcn_out.size());
 
   // Generate function
   MXFunction rfcn(rfcn_in,rfcn_out);
@@ -551,11 +548,19 @@ void Tester::prepare(bool codegen){
   ex[1] = con[0];
   ex.insert(ex.end(),gL.begin(),gL.end());
  
+  // Variables to be substituted and their definitions
   vector<MX> svar, sdef;
   svar.insert(svar.end(),var.begin()+1,var.end());
   sdef.insert(sdef.end(),d_def.begin()+1,d_def.end());
+
+
+
+
   substituteInPlace(svar, sdef, ex, false);
   copy(sdef.begin(),sdef.end(),d_def.begin()+1);  
+
+
+
 
   vector<MX> gL_z(x_.size());
   MX obj_z = ex[0];
@@ -587,24 +592,28 @@ void Tester::prepare(bool codegen){
   }
   
   // Modified function Z
-  vector<MX> z_in(1+2*x_.size());
+  vector<MX> z_in;
   n=0;
-  z_in[z_con_ = n++] = lam_g;
-  for(int i=0; i<x_.size(); ++i){
-    z_in[x_[i].z_var=n++] = i==0 ? var[0] :     d[i];
-    z_in[x_[i].z_lam=n++] = i==0 ? lam[0] : lam_d[i];    
+  if(!gauss_newton_){
+    z_in.push_back(lam_g);                       z_con_ = n++;
   }
-  casadi_assert(n==z_in.size());
+  for(int i=0; i<x_.size(); ++i){
+    z_in.push_back(i==0 ? var[0] :     d[i]);    x_[i].z_var = n++;
+    if(!gauss_newton_){
+      z_in.push_back(i==0 ? lam[0] : lam_d[i]);  x_[i].z_lam = n++;
+    }
+  }
 
   // Outputs
   n=0;
-  vector<MX> z_out(1+2*(x_.size()-1));
-  z_out[z_fg_=n++] = vertcat(gL_z[0],g_z);
+  vector<MX> z_out;
+  z_out.push_back(vertcat(gL_z[0],g_z));  z_fg_ = n++;
   for(int i=1; i<x_.size(); ++i){
-    z_out[x_[i].z_def=n++] =  d_def[i];
-    z_out[x_[i].z_defL=n++] = lam_d_def[i];
+    z_out.push_back(d_def[i]);            x_[i].z_def = n++;
+    if(!gauss_newton_){
+      z_out.push_back(lam_d_def[i]);      x_[i].z_defL = n++;
+    }
   }
-  casadi_assert(n==z_out.size());
 
   MXFunction zfcn(z_in,z_out);
   zfcn.setOption("name","zfcn");
@@ -625,7 +634,7 @@ void Tester::prepare(bool codegen){
   // Step in u
   MX du = msym("du",nu_);
   MX dlam_g;
-  if(!lam_g.isNull()){
+  if(!gauss_newton_){
     dlam_g = msym("dlam_g",lam_g.sparsity());
   }
   MX qpG = gL_z[0];
@@ -641,16 +650,22 @@ void Tester::prepare(bool codegen){
     vector<vector<MX> > Z_adjSeed;
     vector<vector<MX> > Z_adjSens;
     for(int sweep=0; sweep<2; ++sweep){
-      Z_fwdSeed[0][z_con_] = MX();
+      if(!gauss_newton_){
+	Z_fwdSeed[0][z_con_] = MX();
+      }
       if(sweep==0){
 	Z_fwdSeed[0][x_[0].z_var] = MX();
       } else {
 	Z_fwdSeed[0][x_[0].z_var] = du;
       }
-      Z_fwdSeed[0][x_[0].z_lam] = MX();
+      if(!gauss_newton_){
+	Z_fwdSeed[0][x_[0].z_lam] = MX();
+      }
       for(int i=1; i<x_.size(); ++i){
 	Z_fwdSeed[0][x_[i].z_var] = -d[i];
-	Z_fwdSeed[0][x_[i].z_lam] = MX();
+	if(!gauss_newton_){
+	  Z_fwdSeed[0][x_[i].z_lam] = MX();
+	}
       }      
       zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
     
@@ -660,7 +675,9 @@ void Tester::prepare(bool codegen){
       } else {
 	for(int i=1; i<x_.size(); ++i){
 	  v_exp[i] = Z_fwdSens[0][x_[i].z_def];
-	  vL_exp[i] = Z_fwdSens[0][x_[i].z_defL];
+	  if(!gauss_newton_){
+	    vL_exp[i] = Z_fwdSens[0][x_[i].z_defL];
+	  }
 	}
       }
     }
@@ -684,21 +701,21 @@ void Tester::prepare(bool codegen){
   makeDense(qpB);
 
   // Quadratic approximation
-  vector<MX> lfcn_in(1+2+ 4*(x_.size()-1));
+  vector<MX> lfcn_in;
   n=0;
-  lfcn_in[n] = lam_g;          l_con_ = n++;
+  if(!gauss_newton_){
+    lfcn_in.push_back(lam_g);        l_con_ = n++;
+  }
   for(int i=0; i<x_.size(); ++i){
-    lfcn_in[n] = var[i];       x_[i].l_var = n++;
-    if(!lam[i].isNull()){
-      lfcn_in[n] = lam[i];
+    lfcn_in.push_back(var[i]);       x_[i].l_var = n++;
+    if(!gauss_newton_){
+      lfcn_in.push_back(lam[i]);     x_[i].l_lam = n++;
     }
-    x_[i].l_lam = n++;
     if(i>0){
-      lfcn_in[n] = d[i];       x_[i].l_res = n++;
-      if(!lam_d[i].isNull()){
-	lfcn_in[n] = lam_d[i];
+      lfcn_in.push_back(d[i]);       x_[i].l_res = n++;
+      if(!gauss_newton_){
+	lfcn_in.push_back(lam_d[i]); x_[i].l_resL = n++;
       }
-      x_[i].l_resL = n++;
     }
   }
   casadi_assert(n==lfcn_in.size());  
@@ -729,25 +746,32 @@ void Tester::prepare(bool codegen){
   // Step expansion function
   if(x_.size()>1){
     // Function input
-    vector<MX> efcn_in(3+2*x_.size());
+    vector<MX> efcn_in;
     n=0;
-    efcn_in[n] = lam_g;                        e_con_ = n++;
-    efcn_in[n] = du;                           e_du_ = n++;
-    efcn_in[n] = dlam_g;                       e_dlam_g_ = n++;
-    for(int i=0; i<x_.size(); ++i){
-      efcn_in[n] = i==0 ? var[0] :     d[i];   x_[i].e_var = n++;
-      efcn_in[n] = i==0 ? lam[0] : lam_d[i];   x_[i].e_lam = n++;
+    if(!gauss_newton_){
+      efcn_in.push_back(lam_g);                         e_con_ = n++;
     }
-    casadi_assert(n==efcn_in.size());
+    efcn_in.push_back(du);                              e_du_ = n++;
+    if(!gauss_newton_){
+      efcn_in.push_back(dlam_g);                        e_dlam_g_ = n++;
+    }
+    
+    for(int i=0; i<x_.size(); ++i){
+      efcn_in.push_back(   i==0 ? var[0] :     d[i]);   x_[i].e_var = n++;
+      if(!gauss_newton_){
+	efcn_in.push_back( i==0 ? lam[0] : lam_d[i]);   x_[i].e_lam = n++;
+      }
+    }
 
     // Function outputs
-    vector<MX> efcn_out(2*(x_.size()-1));
+    vector<MX> efcn_out;
     n=0;
     for(int i=1; i<x_.size(); ++i){
-      efcn_out[n]  = v_exp[i];                 x_[i].e_exp = n++;
-      efcn_out[n] = vL_exp[i];                 x_[i].e_expL = n++;
+      efcn_out.push_back(v_exp[i]);                     x_[i].e_exp = n++;
+      if(!gauss_newton_){
+	efcn_out.push_back(vL_exp[i]);                  x_[i].e_expL = n++;
+      }
     }
-    casadi_assert(n==efcn_out.size());
     
     // Form function object
     MXFunction efcn(efcn_in,efcn_out);
@@ -780,8 +804,9 @@ void Tester::prepare(bool codegen){
   // Residual
   for(int i=1; i<x_.size(); ++i){
     x_[i].res.resize(d[i].size(),0);
-    int sz = lam_d[i].isNull() ? 0 : lam_d[i].size();
-    x_[i].resL.resize(sz,0);
+    if(!gauss_newton_){
+      x_[i].resL.resize(lam_d[i].size(),0);
+    }
   }
   
   if(verbose_){
@@ -884,7 +909,9 @@ void Tester::solve(int& iter_count){
     const DMatrix& r_g = rfcn_.output(g_g_);
     for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
       rfcn_.getOutput(it->res,  it->g_d);
-      rfcn_.getOutput(it->resL, it->g_lam_d);
+      if(!gauss_newton_){
+	rfcn_.getOutput(it->resL, it->g_lam_d);
+      }
     }
     
     // Pass primal variables to the linearization function
@@ -896,7 +923,9 @@ void Tester::solve(int& iter_count){
     }
     
     // Pass dual variables to the linearization function
-    lfcn_.setInput(lambda_g_,l_con_);
+    if(!gauss_newton_){
+      lfcn_.setInput(lambda_g_,l_con_);
+    }
 
     // Pass residual
     for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
