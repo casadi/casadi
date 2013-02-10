@@ -338,7 +338,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
       // Initialize with initial conditions
       //U.lift(u0_);
       //V.lift(v0_);
-      //H.lift(h0_);
+      //H.lift(DMatrix::zeros(n_boxes_  ,n_boxes_));
       
       // Initialize through simulation
       //      U.lift(U);
@@ -411,15 +411,19 @@ void Tester::prepare(bool codegen){
   ubu_.resize(nu_, numeric_limits<double>::infinity());
   lbg_.resize(ng_,-numeric_limits<double>::infinity());
   ubg_.resize(ng_, numeric_limits<double>::infinity());
-  lambda_g_.resize(ng_,0);
-  dlambda_g_.resize(ng_,0);
+  if(!gauss_newton_){
+    lambda_g_.resize(ng_,0);
+    dlambda_g_.resize(ng_,0);
+  }
  
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
     it->init.resize(it->n,0);
     it->opt.resize(it->n,0);
-    it->lam.resize(it->n,0);
-    it->dlam.resize(it->n,0);
     it->step.resize(it->n,0);
+    if(!gauss_newton_){
+      it->lam.resize(it->n,0);
+      it->dlam.resize(it->n,0);
+    }
   }
 
   // Scalar objective function
@@ -533,14 +537,37 @@ void Tester::prepare(bool codegen){
   }
 
   // Declare difference vector d and substitute out v
-  vector<MX> d(x_.size());
-  vector<MX> d_def(x_.size());
+  vector<MX> d;
+  vector<MX> d_def;
   stringstream ss;
   for(int i=1; i<x_.size(); ++i){
     ss.str(string());
     ss << "d" << i;
-    d[i] = msym(ss.str(),var[i].sparsity());
-    d_def[i] = con[i]-d[i];
+    MX d_i = msym(ss.str(),var[i].sparsity());
+    d.push_back(d_i);
+    d_def.push_back(con[i]-d_i);
+  }
+
+  // Declare difference vector lam_d and substitute out lam_v
+  vector<MX> lam_d;
+  vector<MX> lam_d_def;
+  if(!gauss_newton_){
+    for(int i=1; i<x_.size(); ++i){
+      ss.str(string());
+      ss << "lam_d" << i;
+      MX lam_d_i = msym(ss.str(),var[i].sparsity());
+      lam_d.push_back(lam_d_i);
+      lam_d_def.push_back(lam[i]-lam_d_i);
+    }
+  }
+
+  // Variables to be substituted and their definitions
+  vector<MX> svar, sdef;
+  svar.insert(svar.end(),var.begin()+1,var.end());
+  sdef.insert(sdef.end(),d_def.begin(),d_def.end());
+  if(!gauss_newton_){
+    svar.insert(svar.end(),lam.rbegin(),lam.rend()-1);
+    sdef.insert(sdef.end(),lam_d_def.rbegin(),lam_d_def.rend());    
   }
 
   vector<MX> ex(2);
@@ -548,48 +575,15 @@ void Tester::prepare(bool codegen){
   ex[1] = con[0];
   ex.insert(ex.end(),gL.begin(),gL.end());
  
-  // Variables to be substituted and their definitions
-  vector<MX> svar, sdef;
-  svar.insert(svar.end(),var.begin()+1,var.end());
-  sdef.insert(sdef.end(),d_def.begin()+1,d_def.end());
-
-
-
-
   substituteInPlace(svar, sdef, ex, false);
-  copy(sdef.begin(),sdef.end(),d_def.begin()+1);  
+  copy_n(sdef.begin(),d_def.size(),d_def.begin());  
+  if(!gauss_newton_){
+    copy_n(sdef.rbegin(),lam_d_def.size(),lam_d_def.begin());
+  }
 
-
-
-
-  vector<MX> gL_z(x_.size());
   MX obj_z = ex[0];
   MX g_z = ex[1];
-  for(int i=0; i<x_.size(); ++i){
-    gL_z[i] = ex[2+i];
-  }
-
-  // Declare difference vector lam_d and substitute out lam_v
-  vector<MX> lam_d(x_.size());
-  vector<MX> lam_d_def(x_.size());
-  if(!gauss_newton_){
-#if 0
-#error
-    for(int i=1; i<x_.size(); ++i){
-      ss.str(string());
-      ss << "lam_d" << i;
-      lam_d[i] = msym(ss.str(),var[i].sparsity());
-      lam_d_def[i] = lam[i]-lam_d[i];
-    }
-
-    ex[0] = gL_z[0];
-    ex[1] = g_z[1];
-    ex.resize(2);
-    substituteInPlace(lam[1], lam_d_def[1], ex, false);    
-    gL_z[0] = ex[0];
-    g_z = ex[1];
-#endif
-  }
+  vector<MX> gL_z(ex.begin()+2,ex.end());
   
   // Modified function Z
   vector<MX> z_in;
@@ -598,9 +592,9 @@ void Tester::prepare(bool codegen){
     z_in.push_back(lam_g);                       z_con_ = n++;
   }
   for(int i=0; i<x_.size(); ++i){
-    z_in.push_back(i==0 ? var[0] :     d[i]);    x_[i].z_var = n++;
+    z_in.push_back(i==0 ? var[0] :     d[i-1]);    x_[i].z_var = n++;
     if(!gauss_newton_){
-      z_in.push_back(i==0 ? lam[0] : lam_d[i]);  x_[i].z_lam = n++;
+      z_in.push_back(i==0 ? lam[0] : lam_d[i-1]);  x_[i].z_lam = n++;
     }
   }
 
@@ -609,9 +603,9 @@ void Tester::prepare(bool codegen){
   vector<MX> z_out;
   z_out.push_back(vertcat(gL_z[0],g_z));  z_fg_ = n++;
   for(int i=1; i<x_.size(); ++i){
-    z_out.push_back(d_def[i]);            x_[i].z_def = n++;
+    z_out.push_back(d_def[i-1]);            x_[i].z_def = n++;
     if(!gauss_newton_){
-      z_out.push_back(lam_d_def[i]);      x_[i].z_defL = n++;
+      z_out.push_back(lam_d_def[i-1]);      x_[i].z_defL = n++;
     }
   }
 
@@ -662,7 +656,7 @@ void Tester::prepare(bool codegen){
 	Z_fwdSeed[0][x_[0].z_lam] = MX();
       }
       for(int i=1; i<x_.size(); ++i){
-	Z_fwdSeed[0][x_[i].z_var] = -d[i];
+	Z_fwdSeed[0][x_[i].z_var] = -d[i-1];
 	if(!gauss_newton_){
 	  Z_fwdSeed[0][x_[i].z_lam] = MX();
 	}
@@ -712,9 +706,9 @@ void Tester::prepare(bool codegen){
       lfcn_in.push_back(lam[i]);     x_[i].l_lam = n++;
     }
     if(i>0){
-      lfcn_in.push_back(d[i]);       x_[i].l_res = n++;
+      lfcn_in.push_back(d[i-1]);       x_[i].l_res = n++;
       if(!gauss_newton_){
-	lfcn_in.push_back(lam_d[i]); x_[i].l_resL = n++;
+	lfcn_in.push_back(lam_d[i-1]); x_[i].l_resL = n++;
       }
     }
   }
@@ -757,9 +751,9 @@ void Tester::prepare(bool codegen){
     }
     
     for(int i=0; i<x_.size(); ++i){
-      efcn_in.push_back(   i==0 ? var[0] :     d[i]);   x_[i].e_var = n++;
+      efcn_in.push_back(   i==0 ? var[0] :     d[i-1]);   x_[i].e_var = n++;
       if(!gauss_newton_){
-	efcn_in.push_back( i==0 ? lam[0] : lam_d[i]);   x_[i].e_lam = n++;
+	efcn_in.push_back( i==0 ? lam[0] : lam_d[i-1]);   x_[i].e_lam = n++;
       }
     }
 
@@ -803,9 +797,9 @@ void Tester::prepare(bool codegen){
 
   // Residual
   for(int i=1; i<x_.size(); ++i){
-    x_[i].res.resize(d[i].size(),0);
+    x_[i].res.resize(d[i-1].size(),0);
     if(!gauss_newton_){
-      x_[i].resL.resize(lam_d[i].size(),0);
+      x_[i].resL.resize(lam_d[i-1].size(),0);
     }
   }
   
@@ -991,8 +985,10 @@ void Tester::solve(int& iter_count){
     
     // Condensed step
     copy(du.begin(),du.end(),x_[0].step.begin());
-    copy(dlam_g.begin(),dlam_g.end(),dlambda_g_.begin());
-    copy(dlam_u.begin(),dlam_u.end(),x_[0].dlam.begin());
+    if(!gauss_newton_){
+      copy(dlam_g.begin(),dlam_g.end(),dlambda_g_.begin());
+      copy(dlam_u.begin(),dlam_u.end(),x_[0].dlam.begin());
+    }
 
     // Expand the step
     if(x_.size()>1){
@@ -1018,9 +1014,11 @@ void Tester::solve(int& iter_count){
       }
       
       // Expanded dual step
-      for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
-	const DMatrix& dlam_v = efcn_.output(it->e_expL);
-	copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
+      if(!gauss_newton_){
+	for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+	  const DMatrix& dlam_v = efcn_.output(it->e_expL);
+	  copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
+	}
       }
     }
     
@@ -1029,12 +1027,14 @@ void Tester::solve(int& iter_count){
       transform(it->step.begin(),it->step.end(),it->opt.begin(),it->opt.begin(),plus<double>());
     }
 
-    transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),lambda_g_.begin(),plus<double>());
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      if(it==x_.begin()){
-	copy(it->dlam.begin(),it->dlam.end(),it->lam.begin()); // BUG?
-      } else {
-	transform(it->dlam.begin(),it->dlam.end(),it->lam.begin(),it->lam.begin(),plus<double>()); // BUG?
+    if(!gauss_newton_){
+      transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),lambda_g_.begin(),plus<double>());
+      for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+	//	if(it==x_.begin()){
+	  copy(it->dlam.begin(),it->dlam.end(),it->lam.begin()); // BUG?
+	  //	} else {
+	  transform(it->dlam.begin(),it->dlam.end(),it->lam.begin(),it->lam.begin(),plus<double>()); // BUG?
+	  //	}
       }
     }
 
@@ -1137,8 +1137,24 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
     cout << "Passed initial guess" << endl;
   }
 
+  // Reset dual guess
+  if(!gauss_newton_){
+    fill(lambda_g_.begin(),lambda_g_.end(),0);
+    fill(dlambda_g_.begin(),dlambda_g_.end(),0);
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      fill(it->lam.begin(),it->lam.end(),0);
+      fill(it->dlam.begin(),it->dlam.end(),0);
+    }
+  }
+
   // Bounds on the variables
-  fill(lbu_.begin(),lbu_.end(),0);
+  lbu_.at(0) = 1e-4; // drag positive
+  lbu_.at(1) = 1e-4; // depth positive
+
+  ubu_.at(0) = 1e2; // max drag
+  ubu_.at(1) = 1e2; // max depth
+
+  // Constraint bounds
   fill(lbg_.begin(),lbg_.end(),0);
   fill(ubg_.begin(),ubg_.end(),0);
 
