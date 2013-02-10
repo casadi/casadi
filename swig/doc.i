@@ -3455,6 +3455,14 @@ Less or equal to.
 C++ includes: casadi_calculus.hpp ";
 
 
+// File: structCasADi_1_1BinaryOperation_3_01OP__LIFT_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_LIFT > "
+
+Inverse of error function.
+
+C++ includes: casadi_calculus.hpp ";
+
+
 // File: structCasADi_1_1BinaryOperation_3_01OP__LT_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< OP_LT > "
 
@@ -51789,8 +51797,6 @@ compatibility. ";
 
 %feature("docstring")  CasADi::Matrix::if_else_zero "";
 
-%feature("docstring")  CasADi::Matrix::lift "";
-
 %feature("docstring")  CasADi::Matrix::print "
 
 Printing. ";
@@ -53855,7 +53861,9 @@ Division (with future.division in effect) ";
 
 %feature("docstring")  CasADi::MX::logic_not "";
 
-%feature("docstring")  CasADi::MX::lift "";
+%feature("docstring")  CasADi::MX::lift "
+
+Lift an expression. ";
 
 %feature("docstring")  CasADi::MX::mapping "
 
@@ -54372,8 +54380,7 @@ Get all the free variables of the function. ";
 
 %feature("docstring")  CasADi::MXFunction::generateLiftingFunctions "
 
-Extract the residual function G and the modified function Z out of an
-expression (see Albersmeyer2010 paper) ";
+Extract the functions needed for the Lifted Newton method. ";
 
 %feature("docstring")  CasADi::MXFunction::getNumInputs "
 
@@ -80385,8 +80392,6 @@ allow unambigous access. ";
 
 %feature("docstring")  CasADi::SX::if_else_zero "";
 
-%feature("docstring")  CasADi::SX::lift "";
-
 %feature("docstring")  CasADi::SX::fmin "";
 
 %feature("docstring")  CasADi::SX::fmax "";
@@ -82889,14 +82894,6 @@ C++ includes: casadi_calculus.hpp ";
 %feature("docstring") CasADi::UnaryOperation< OP_INV > "
 
 Elementwise inverse.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01OP__LIFT_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< OP_LIFT > "
-
-Inverse of error function.
 
 C++ includes: casadi_calculus.hpp ";
 
@@ -87549,14 +87546,6 @@ CasADi additions. ";
 
 %feature("docstring")  CasADi::printme "";
 
-%feature("docstring")  CasADi::lift "
-
-\"Lift\" expression ";
-
-%feature("docstring")  CasADi::lift "";
-
-%feature("docstring")  CasADi::lift "";
-
 %feature("docstring")  CasADi::sign "
 
 Sign function, note that sign(nan) == nan. ";
@@ -89216,10 +89205,6 @@ ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...) ";
 %feature("docstring")  CasADi::isRegular "
 
 Checks if vector does not contain NaN or Inf. ";
-
-%feature("docstring")  CasADi::lift "
-
-\"Lift\" a set of expressions ";
 
 %feature("docstring")  CasADi::inner_prod "";
 
