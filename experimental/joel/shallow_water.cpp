@@ -581,9 +581,9 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
   ex.insert(ex.end(),gL.begin(),gL.end());
  
   substituteInPlace(svar, sdef, ex, false);
-  copy_n(sdef.begin(),d_def.size(),d_def.begin());  
+  copy(sdef.begin(),sdef.begin()+d_def.size(),d_def.begin());  
   if(!gauss_newton_){
-    copy_n(sdef.rbegin(),lam_d_def.size(),lam_d_def.begin());
+    copy(sdef.rbegin(),sdef.rbegin()+lam_d_def.size(),lam_d_def.begin());
   }
 
   MX obj_z = ex[0];
