@@ -22,6 +22,8 @@
 
 #include <symbolic/casadi.hpp>
 #include <interfaces/qpoases/qpoases_solver.hpp>
+#include <interfaces/ipopt/ipopt_solver.hpp>
+#include <nonlinear_programming/nlp_qp_solver.hpp>
 
 #include <iomanip>
 #include <ctime>
@@ -29,7 +31,6 @@
 
 using namespace CasADi;
 using namespace std;
-
 
 class Tester{
 public:
@@ -46,7 +47,7 @@ public:
   void transcribe(bool single_shooting, bool gauss_newton);
 
   // Prepare NLP
-  void prepare(bool codegen);
+  void prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization, double reg_threshold);
  
   // Solve NLP
   void solve(int& iter_count);
@@ -77,6 +78,8 @@ public:
   bool single_shooting_;
   bool verbose_;
   bool gauss_newton_;
+  bool regularization_;
+  double reg_threshold_;
 
   // NLP
   SXFunction fg_sx_;
@@ -372,8 +375,10 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton){
     
 }
 
-void Tester::prepare(bool codegen){
+void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization, double reg_threshold){
   verbose_ = true;
+  regularization_ = regularization;
+  reg_threshold_ = reg_threshold;
   
   if(codegen){
     // Make sure that command processor is available
@@ -786,8 +791,18 @@ void Tester::prepare(bool codegen){
   }
   
   // Allocate a QP solver
-  qp_solver_ = QPOasesSolver(qpH.sparsity(),qpA.sparsity());
-  qp_solver_.setOption("printLevel","none");
+  if(ipopt_as_qp_solver){
+    qp_solver_ = NLPQPSolver(qpH.sparsity(),qpA.sparsity());
+    qp_solver_.setOption("nlp_solver",IpoptSolver::creator);
+    Dictionary nlp_solver_options;
+    nlp_solver_options["tol"] = 1e-12;
+    nlp_solver_options["print_level"] = 0;
+    nlp_solver_options["print_time"] = false;
+    qp_solver_.setOption("nlp_solver_options",nlp_solver_options);
+  } else {
+    qp_solver_ = QPOasesSolver(qpH.sparsity(),qpA.sparsity());
+    qp_solver_.setOption("printLevel","none");
+  }
   
   // Initialize the QP solver
   qp_solver_.init();
@@ -940,10 +955,9 @@ void Tester::solve(int& iter_count){
 
     // Regularization
     double reg = 0;
-    bool regularization = true;
     
     // Check the smallest eigenvalue of the Hessian
-    if(regularization && x_[0].n==2){
+    if(regularization_ && x_[0].n==2){
       double a = qpH.elem(0,0);
       double b = qpH.elem(0,1);
       double c = qpH.elem(1,0);
@@ -959,10 +973,9 @@ void Tester::solve(int& iter_count){
       }
       
       double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
-      double threshold = 1e-8;
-      if(eig_smallest<threshold){
+      if(eig_smallest<reg_threshold_){
 	// Regularization
-	reg = threshold-eig_smallest;
+	reg = reg_threshold_-eig_smallest;
 	std::cerr << "Regularization with " << reg << " to ensure positive definite Hessian." << endl;
 	qpH(0,0) += reg;
 	qpH(1,1) += reg;
@@ -1170,9 +1183,28 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
 
 int main(){
 
-  double drag_true = 2.0; // => u(0)
-  double depth_true = 0.01; // => u(1)
- 
+  // True parameter values
+  double drag_true = 2.0, depth_true = 0.01;
+  
+  // Use IPOPT as QP solver (can handle non-convex QPs)
+  bool ipopt_as_qp_solver = false;
+
+  // Use Gauss-Newton method
+  bool gauss_newton = true;
+
+  // Codegen the Lifted Newton functions
+  bool codegen = false;
+  
+  // Regularize the QP
+  bool regularization = true;
+
+  // Smallest allowed eigenvalue for the regularization
+  double reg_threshold = 1e-8;
+
+  // Problem size
+  //  int n_boxes = 100, n_euler = 100, n_meas = 20;
+  //  int n_boxes = 30, n_euler = 1000, n_meas = 20; // Paper
+  int n_boxes = 15, n_euler = 20, n_meas = 20;
 
   // Initial guesses
   vector<double> drag_guess, depth_guess;
@@ -1207,9 +1239,7 @@ int main(){
   vector<double> depth_est_eh(n_tests,-1);
   
   // Create a tester object
-  //Tester t(100,100,20);
-  //Tester t(30,1000,10); // Paper
-  Tester t(15,20,20);
+  Tester t(n_boxes,n_euler,n_meas);
     
   // Perform the modelling
   t.model();
@@ -1222,12 +1252,10 @@ int main(){
 
     // Transcribe as an NLP
     bool single_shooting = sol==0;
-    bool gauss_newton = true;
     t.transcribe(single_shooting,gauss_newton);
   
     // Prepare the NLP solver
-    bool codegen = false;
-    t.prepare(codegen);
+    t.prepare(codegen, ipopt_as_qp_solver, regularization, reg_threshold);
 
     // Run tests
     for(int test=0; test<n_tests; ++test){
