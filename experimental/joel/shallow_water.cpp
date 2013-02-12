@@ -126,7 +126,8 @@ public:
   int g_f_, g_g_;
 
   int z_con_;
-  int z_fg_;
+  int z_obj_;
+  int z_g_;
 
   int l_con_;
 
@@ -630,7 +631,8 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
   // Outputs
   n=0;
   vector<MX> z_out;
-  z_out.push_back(vertcat(gL_z[0],g_z));  z_fg_ = n++;
+  z_out.push_back(gL_z[0]);                 z_obj_ = n++;
+  z_out.push_back(g_z);                     z_g_ = n++;
   for(int i=1; i<x_.size(); ++i){
     z_out.push_back(d_def[i-1]);            x_[i].z_def = n++;
     if(!gauss_newton_){
@@ -645,10 +647,15 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
     cout << "Generated reconstruction function ( " << zfcn.getAlgorithmSize() << " nodes)." << endl;
   }
 
-  // Matrix A and B in lifted Newton
-  MX B = zfcn.jac(x_[0].z_var,z_fg_);
-  MX qpH = B( Slice(    0, ngL_     ), Slice() );
-  MX qpA = B( Slice( ngL_, ngL_+ng_ ), Slice() );
+  // Matrix A and B in lifted Newton  
+  MX qpH = zfcn.jac(x_[0].z_var,z_obj_,false,!gauss_newton_); // Exploit Hessian symmetry
+  MX qpA = zfcn.jac(x_[0].z_var,z_g_,false);
+
+  // Make sure that A has the right dimensions if empty
+  if(qpA.empty()){
+    qpA = MX::sparse(0,nu_);
+  }
+
   if(verbose_){
     cout << "Formed qpH (dimension " << qpH.size1() << "-by-" << qpH.size2() << ", "<< qpH.size() << " nonzeros) " <<
                "and qpA (dimension " << qpA.size1() << "-by-" << qpA.size2() << ", "<< qpA.size() << " nonzeros)." << endl;
@@ -693,8 +700,8 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
       zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
     
       if(sweep==0){
-	qpG += Z_fwdSens[0][z_fg_](Slice(0,ngL_));
-	qpB += Z_fwdSens[0][z_fg_](Slice(ngL_,B.size1()));
+	qpG += Z_fwdSens[0][z_obj_];
+	qpB += Z_fwdSens[0][z_g_];
       } else {
 	for(int i=1; i<x_.size(); ++i){
 	  v_exp[i] = Z_fwdSens[0][x_[i].z_def];
