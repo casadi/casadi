@@ -61,6 +61,11 @@ Abstract base class for the implicit function classes
 \author Joel Andersson
 \date 2011
 */
+/**
+Abstract base class for the implicit function classes
+
+@copydoc QPSolver_doc
+*/
 class ImplicitFunction : public FX{
 public:
   

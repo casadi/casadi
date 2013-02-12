@@ -53,7 +53,7 @@ SundialsInternal::SundialsInternal(const FX& f, const FX& g) : IntegratorInterna
   addOption("stop_at_end",                 OT_BOOLEAN,          true,          "Stop the integrator at the end of the interval");
   
   // Quadratures
-  addOption("quad_err_con",                OT_BOOLEAN,          false,          "Should the quadratures affect the step size control");
+  addOption("quad_err_con",                OT_BOOLEAN,          true,          "Should the quadratures affect the step size control");
 
   // Forward sensitivity problem
   addOption("fsens_err_con",               OT_BOOLEAN,          true,           "include the forward sensitivities in all error controls");

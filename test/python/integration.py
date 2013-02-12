@@ -38,12 +38,14 @@ except:
 integrators = []
 
 try:
-  integrators.append((CVodesIntegrator,["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False}))
+  integrators.append((CVodesIntegrator,["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True}))
+  pass
 except:
   pass
   
 try:
   integrators.append((IdasIntegrator,["dae","ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"calc_icB":True}))
+  pass
 except:
   pass
 
@@ -55,6 +57,7 @@ print "Will test these integrators:"
 for cl, t, options in integrators:
   print cl.__name__, " : ", t
   
+@run_only(["lsolvers"])
 class Integrationtests(casadiTestCase):
 
   @skip(memcheck)
@@ -194,7 +197,7 @@ class Integrationtests(casadiTestCase):
     
     integrators = [
               (IdasIntegrator,["dae","ode"],{"abstol": 1e-9,"reltol":1e-9,"fsens_err_con": True,"calc_ic":True,"calc_icB":True}),
-              (CVodesIntegrator,["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False})
+              (CVodesIntegrator,["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True})
               ]
               
     def checks():  
@@ -350,7 +353,7 @@ class Integrationtests(casadiTestCase):
         yield (["ode"],{'x':x},{'ode': x,'quad':0},{},{},si,{'qf':0},pointA,ti)
         yield (["ode"],{'x':x},{'ode': x,'quad':1},{},{},si,{'qf':(tend-tstart)},pointA,ti)
         yield (["ode"],{'x':x},{'ode': 0,'quad':x},{},{},si,{'qf':x*(tend-tstart)},pointA,ti)
-        #yield ({'x':x},{'ode': 1,'quad':x},{'qf':(x-tstart)*(tend-tstart)+(tend**2/2-tstart**2/2)}), # bug in cvodes quad_err_con
+        #yield (["ode"],{'x':x},{'ode': 1,'quad':x},{},{},si,{'qf':(x-tstart)*(tend-tstart)+(tend**2/2-tstart**2/2)},pointA,ti)
         yield (["ode"],{'x':x},{'ode': x,'quad':x},{},{},si,{'qf':x*(exp(tend-tstart)-1)},pointA,ti)
         yield (["ode"],{'x':x,'t':t},{'ode': x,'quad':t},{},{},si,{'qf':(tend**2/2-tstart**2/2)},pointA,ti)
         yield (["ode"],{'x':x,'t':t},{'ode': x,'quad':x*t},{},{},si,{'qf':x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA,ti)

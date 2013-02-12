@@ -49,6 +49,8 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
     has_mapping_inputs = has_mapping_inputs || it->isMapping();
   }
   
+  std::cout << inputv << ":" << has_mapping_inputs << std::endl;
+  
   // If one or more inputs is a mapping, elimination needed before creating function
   if(has_mapping_inputs){
     
@@ -121,6 +123,9 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
     // Replace expressions
     outputv_ = substitute(outputv_,v,vdef);
   }
+  
+  
+  
   
   // Check for duplicate entries among the input expressions
   bool has_duplicates = false;
