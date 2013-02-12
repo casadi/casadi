@@ -856,7 +856,7 @@ void Tester::dynamicCompilation(MXFunction& f, FX& f_gen, std::string fname, std
   // C compiler
 #ifdef __APPLE__
   string compiler = "gcc";
-#ifdef // __APPLE__
+#else // __APPLE__
   string compiler = "clang";
 #endif // __APPLE__
 
