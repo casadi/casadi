@@ -1140,14 +1140,20 @@ void Tester::solve(int& iter_count){
     
     // Print progress (including the header every 10 rows)
     if(k % 10 == 0){
-      cout << setw(4) << "iter" << setw(20) << "objective" << setw(20) << "norm_step" << setw(20) << "norm_viol" << endl;
+      cout << setw(4) << "iter" << setw(20) << "objective" << setw(20) << "drag"          << setw(20) << "depth"          << setw(20) << "norm_step" << setw(20) << "norm_viol" << endl;
     }
-    cout   << setw(4) <<     k  << setw(20) <<  f_k        << setw(20) <<  norm_step  << setw(20) <<  norm_viol  << endl;
+    cout   << setw(4) <<     k  << setw(20) <<  f_k        << setw(20) << x_[0].opt.at(0) << setw(20) << x_[0].opt.at(1) << setw(20) <<  norm_step  << setw(20) <<  norm_viol  << endl;
     
     
     // Check if stopping criteria is satisfied
     if(norm_viol + norm_step < toldx_){
       cout << "Convergence achieved!" << endl;
+      break;
+    }
+
+    // Check if not-a-number
+    if(f_k!=f_k || norm_step != norm_step || norm_viol != norm_viol){
+      cout << "Aborted, nan detected" << endl;
       break;
     }
     
@@ -1245,6 +1251,7 @@ int main(){
 
   // Initial guesses
   vector<double> drag_guess, depth_guess;
+  drag_guess.push_back( 2.0); depth_guess.push_back(0.01); // Optimal solution
   drag_guess.push_back( 0.5); depth_guess.push_back(0.01);
   drag_guess.push_back( 5.0); depth_guess.push_back(0.01);
   drag_guess.push_back(15.0); depth_guess.push_back(0.01);
