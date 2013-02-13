@@ -134,16 +134,16 @@ class FX : public OptionsFunctionality{
   void setNumOutputs(int num_out);
   
   /** \brief Set input scheme */
-  void setInputScheme(InputOutputScheme scheme);
+  void setInputScheme(CasADi::InputOutputScheme scheme);
 
   /** \brief Set output scheme */
-  void setOutputScheme(InputOutputScheme scheme);
+  void setOutputScheme(CasADi::InputOutputScheme scheme);
 
   /** \brief Get input scheme */
-  InputOutputScheme getInputScheme() const;
+  CasADi::InputOutputScheme getInputScheme() const;
 
   /** \brief Get output scheme */
-  InputOutputScheme getOutputScheme() const;
+  CasADi::InputOutputScheme getOutputScheme() const;
     
   /** \brief  Update the number of sensitivity directions during or after initialization (normally invoked internally) */
   void updateNumSens();
