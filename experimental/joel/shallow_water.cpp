@@ -655,39 +655,54 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
 
   // Step expansion function
   if(x_.size()>1){
-    vector<MX> v_exp(x_.size());
-    vector<MX> vL_exp(x_.size());
-    
-    // Step in u and lambda_g
-    MX du = msym("du",nu_);
-    MX dlam_g;
-    if(!gauss_newton_){
-      dlam_g = msym("dlam_g",lam_g.sparsity());
-    }
 
-    Z_fwdSeed[0][x_[0].z_var] = du;
+    // Vectors a in Lifted Newton (Section 2.1 in Alberspeyer2010)
+    vector<MX> a_v(x_.size());
+    vector<MX> a_vL(x_.size());
+    fill(Z_fwdSeed[0].begin(),Z_fwdSeed[0].end(),MX());
     for(int i=1; i<x_.size(); ++i){
       Z_fwdSeed[0][x_[i].z_var] = -d[i-1];
     }
 
+    // Interpret the Jacobian-vector multiplication as a forward directional derivative, could have been done together with the A times a vector below, but we need a_v/a_vL later again
     if(!gauss_newton_){
-      Z_fwdSeed[0][z_con_] = dlam_g;
-      Z_fwdSeed[0][x_[0].z_lam] = MX();
       for(int i=1; i<x_.size(); ++i){
 	Z_fwdSeed[0][x_[i].z_lam] = -lam_d[i-1];
       }
     }
-
-    zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
-    
+    zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);    
     for(int i=1; i<x_.size(); ++i){
-      v_exp[i] = Z_fwdSens[0][x_[i].z_def];
+      a_v[i] = Z_fwdSens[0][x_[i].z_def];
       if(!gauss_newton_){
-	vL_exp[i] = Z_fwdSens[0][x_[i].z_defL];
+	a_vL[i] = Z_fwdSens[0][x_[i].z_defL];
       }
     }
     
-    // Function input
+    // Matrix A in Lifted Newton times a step (Section 2.1 in Alberspeyer2010)
+    vector<MX> A_times_step_v(x_.size());
+    vector<MX> A_times_step_vL(x_.size());
+    MX du = msym("du",nu_);   // Step in u
+    MX dlam_g;                // Step lambda_g
+    if(!gauss_newton_){
+      dlam_g = msym("dlam_g",lam_g.sparsity());
+    }
+
+    // Interpret the Matrix-vector multiplication as a forward directional derivative
+    fill(Z_fwdSeed[0].begin(),Z_fwdSeed[0].end(),MX());
+    Z_fwdSeed[0][x_[0].z_var] = du;
+    if(!gauss_newton_){
+      Z_fwdSeed[0][z_con_] = dlam_g;
+    }
+
+    zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
+    for(int i=1; i<x_.size(); ++i){
+      A_times_step_v[i] = Z_fwdSens[0][x_[i].z_def];
+      if(!gauss_newton_){
+	A_times_step_vL[i] = Z_fwdSens[0][x_[i].z_defL];
+      }
+    }
+    
+    // Step expansion function inputs
     vector<MX> efcn_in;
     n=0;
     if(!gauss_newton_){
@@ -705,17 +720,17 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
       }
     }
 
-    // Function outputs
+    // Step expansion function outputs
     vector<MX> efcn_out;
     n=0;
     for(int i=1; i<x_.size(); ++i){
-      efcn_out.push_back(v_exp[i]);                     x_[i].e_exp = n++;
+      efcn_out.push_back(a_v[i] + A_times_step_v[i]);    x_[i].e_exp = n++;
       if(!gauss_newton_){
-	efcn_out.push_back(vL_exp[i]);                  x_[i].e_expL = n++;
+	efcn_out.push_back(a_vL[i] + A_times_step_vL[i]); x_[i].e_expL = n++;
       }
     }
-    
-    // Form function object
+
+    // Step expansion function
     MXFunction efcn(efcn_in,efcn_out);
     efcn.setOption("number_of_fwd_dir",0);
     efcn.setOption("number_of_adj_dir",0);
@@ -731,6 +746,9 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
     } else {
       efcn_ = efcn;
     }
+
+
+
   }
   
   // Matrix A and B in lifted Newton  
