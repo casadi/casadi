@@ -680,23 +680,23 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
     vector<vector<MX> > Z_adjSeed;
     vector<vector<MX> > Z_adjSens;
     for(int sweep=0; sweep<2; ++sweep){
-      if(!gauss_newton_){
-	Z_fwdSeed[0][z_con_] = MX();
-      }
       if(sweep==0){
 	Z_fwdSeed[0][x_[0].z_var] = MX();
       } else {
 	Z_fwdSeed[0][x_[0].z_var] = du;
       }
-      if(!gauss_newton_){
-	Z_fwdSeed[0][x_[0].z_lam] = MX();
-      }
       for(int i=1; i<x_.size(); ++i){
 	Z_fwdSeed[0][x_[i].z_var] = -d[i-1];
-	if(!gauss_newton_){
+      }
+
+      if(!gauss_newton_){
+	Z_fwdSeed[0][z_con_] = MX();
+	Z_fwdSeed[0][x_[0].z_lam] = MX();
+	for(int i=1; i<x_.size(); ++i){
 	  Z_fwdSeed[0][x_[i].z_lam] = MX();
 	}
-      }      
+      }
+
       zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
     
       if(sweep==0){
