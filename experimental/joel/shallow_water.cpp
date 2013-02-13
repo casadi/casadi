@@ -108,7 +108,7 @@ public:
   FX rfcn_;
   
   /// Quadratic approximation
-  FX lfcn_;
+  FX lfcn_, lfcn_new_;
   
   /// Step expansion
   FX efcn_;
@@ -656,15 +656,15 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
   // Step expansion function
   if(x_.size()>1){
 
-    // Vectors a in Lifted Newton (Section 2.1 in Alberspeyer2010)
+    // Vector(s) a in Lifted Newton (Section 2.1 in Alberspeyer2010)
     vector<MX> a_v(x_.size());
     vector<MX> a_vL(x_.size());
+
+    // Interpret the Jacobian-vector multiplication as a forward directional derivative, could have been done together with the A times a vector below, but we need a_v/a_vL later again
     fill(Z_fwdSeed[0].begin(),Z_fwdSeed[0].end(),MX());
     for(int i=1; i<x_.size(); ++i){
       Z_fwdSeed[0][x_[i].z_var] = -d[i-1];
     }
-
-    // Interpret the Jacobian-vector multiplication as a forward directional derivative, could have been done together with the A times a vector below, but we need a_v/a_vL later again
     if(!gauss_newton_){
       for(int i=1; i<x_.size(); ++i){
 	Z_fwdSeed[0][x_[i].z_lam] = -lam_d[i-1];
@@ -747,9 +747,166 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
       efcn_ = efcn;
     }
 
+    // Vector(s) b in Lifted Newton (Equation (2.12 in Alberspeyer2010)
+    MX b_obj;
+    MX b_g;
 
+    // Interpret the Jacobian-vector multiplication as a forward directional derivative
+    fill(Z_fwdSeed[0].begin(),Z_fwdSeed[0].end(),MX());
+    for(int i=1; i<x_.size(); ++i){
+      Z_fwdSeed[0][x_[i].z_var] = a_v[i];
+    }
+    if(!gauss_newton_){
+      for(int i=1; i<x_.size(); ++i){
+	Z_fwdSeed[0][x_[i].z_lam] = a_vL[i];
+      }
+    }
+    zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);    
+    b_obj = z_out[z_obj_] + Z_fwdSens[0][z_obj_];
+    b_g = z_out[z_g_] + Z_fwdSens[0][z_g_];
 
+    // Matrix B in Lifted Newton times a step (Equation (2.12 in Alberspeyer2010)
+    MX B_times_step_obj;
+    MX B_times_step_g;
+
+    // Interpret the Matrix-vector multiplication as a forward directional derivative
+    fill(Z_fwdSeed[0].begin(),Z_fwdSeed[0].end(),MX());
+    Z_fwdSeed[0][x_[0].z_var] = du;
+    for(int i=1; i<x_.size(); ++i){
+      Z_fwdSeed[0][x_[i].z_var] = A_times_step_v[i];
+    }
+    if(!gauss_newton_){
+      Z_fwdSeed[0][z_con_] = dlam_g;
+      for(int i=1; i<x_.size(); ++i){
+	Z_fwdSeed[0][x_[i].z_lam] = A_times_step_vL[i];
+      }
+    }
+    zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
+    B_times_step_obj = Z_fwdSens[0][z_obj_];
+    B_times_step_g = Z_fwdSens[0][z_g_];    
+    vector<MX> B_times_step(2);
+    B_times_step[0] = B_times_step_obj;
+    B_times_step[1] = B_times_step_g;
+
+    // Create a function of the step to allow getting the Jacobian
+    vector<MX> step(2);
+    step[0] = du;
+    step[1] = dlam_g;
+    MXFunction B_times_step_fcn(step,B_times_step);
+    B_times_step_fcn.init();
+
+    // Differentiate with respect to the step to get the matrix B in Lifted Newton
+    MX B_obj = B_times_step_fcn.jac(0,0,false,!gauss_newton_); // Exploit Hessian symmetry
+    MX B_g = B_times_step_fcn.jac(0,1);
+    
+    // Make sure that B_g has the right dimensions if empty
+    if(B_g.empty()){
+      B_g = MX::sparse(0,nu_);
+    }
+
+    // Quickfix
+    B_obj = substitute(B_obj,du,MX(du.sparsity()));
+    B_g = substitute(B_g,du,MX(du.sparsity()));
+
+    // Get the condensed QP
+    MX qpH = gauss_newton_ ? mul(trans(B_obj),B_obj) : B_obj;
+    MX qpG = gauss_newton_ ? mul(trans(B_obj),b_obj) : b_obj;
+    MX qpA = B_g;
+    MX qpB = b_g;
+
+    // Make sure qpG and qpB are dense vectors
+    makeDense(qpG);
+    makeDense(qpB);
+      
+    if(verbose_){
+      cout << "Formed qpH (" << qpH.size1() << "-by-" << qpH.size2() << ", "<< qpH.size() << " nnz)," << endl;
+      cout << "       qpG (" << qpG.size1() << "-by-" << qpG.size2() << ", "<< qpG.size() << " nnz)," << endl;
+      cout << "       qpA (" << qpA.size1() << "-by-" << qpA.size2() << ", "<< qpA.size() << " nnz) and" << endl;
+      cout << "       qpB (" << qpB.size1() << "-by-" << qpB.size2() << ", "<< qpB.size() << " nnz)." << endl;
+    }
+    
+    // Quadratic approximation
+    vector<MX> lfcn_in;
+    n=0;
+    if(!gauss_newton_){
+      lfcn_in.push_back(lam_g);        l_con_ = n++;
+    }
+    for(int i=0; i<x_.size(); ++i){
+      lfcn_in.push_back(var[i]);       x_[i].l_var = n++;
+      if(!gauss_newton_){
+	lfcn_in.push_back(lam[i]);     x_[i].l_lam = n++;
+      }
+      if(i>0){
+	lfcn_in.push_back(d[i-1]);       x_[i].l_res = n++;
+	if(!gauss_newton_){
+	  lfcn_in.push_back(lam_d[i-1]); x_[i].l_resL = n++;
+	}
+      }
+    }
+    casadi_assert(n==lfcn_in.size());  
+    
+    vector<MX> lfcn_out(LIN_NUM_OUT);
+    lfcn_out[LIN_QPG] = qpG;
+    lfcn_out[LIN_H] = qpH;
+    lfcn_out[LIN_QPB] = qpB;
+    lfcn_out[LIN_QPA] = qpA;
+    
+    MXFunction lfcn(lfcn_in,lfcn_out);
+    lfcn.setOption("name","lfcn");
+    lfcn.setOption("number_of_fwd_dir",0);
+    lfcn.setOption("number_of_adj_dir",0);
+    lfcn.init();
+    if(verbose_){
+      cout << "Generated linearization function ( " << lfcn.getAlgorithmSize() << " nodes)." << endl;
+    }
+
+    lfcn_new_ = lfcn;
+
+#if 0
+    
+    // Generate c code and load as DLL
+    if(codegen){
+      dynamicCompilation(lfcn,lfcn_,"lfcn","linearization function");
+    } else {
+      lfcn_ = lfcn;
+    }
+
+    // Allocate a QP solver
+    if(ipopt_as_qp_solver){
+      qp_solver_ = NLPQPSolver(qpH.sparsity(),qpA.sparsity());
+      qp_solver_.setOption("nlp_solver",IpoptSolver::creator);
+      Dictionary nlp_solver_options;
+      nlp_solver_options["tol"] = 1e-12;
+      nlp_solver_options["print_level"] = 0;
+      nlp_solver_options["print_time"] = false;
+      qp_solver_.setOption("nlp_solver_options",nlp_solver_options);
+    } else {
+      qp_solver_ = QPOasesSolver(qpH.sparsity(),qpA.sparsity());
+      qp_solver_.setOption("printLevel","none");
+    }
+    
+    // Initialize the QP solver
+    qp_solver_.init();
+    if(verbose_){
+      cout << "Allocated QP solver." << endl;
+    }
+    
+    // Residual
+    for(int i=1; i<x_.size(); ++i){
+      x_[i].res.resize(d[i-1].size(),0);
+      if(!gauss_newton_){
+	x_[i].resL.resize(lam_d[i-1].size(),0);
+      }
+    }
+    
+    if(verbose_){
+      cout << "NLP preparation completed" << endl;
+    }
+
+    return;
+#endif
   }
+
   
   // Matrix A and B in lifted Newton  
   MX qpH = zfcn.jac(x_[0].z_var,z_obj_,false,!gauss_newton_); // Exploit Hessian symmetry
@@ -1016,6 +1173,49 @@ void Tester::solve(int& iter_count){
     const DMatrix& qpG = lfcn_.output(LIN_QPG);
     const DMatrix& qpA = lfcn_.output(LIN_QPA);
     const DMatrix& qpB = lfcn_.output(LIN_QPB);
+
+    if(false){
+
+
+    cout << "qpH " << endl;
+    qpH.printDense();
+    cout << "qpG " << endl;
+    qpG.printDense();
+    // cout << "qpA " << endl;
+    // qpA.printDense();
+    // cout << "qpB " << endl;
+    // qpB.printDense();
+
+
+
+    if(!lfcn_new_.isNull()){
+
+    for(int i=0; i<lfcn_.getNumInputs(); ++i){
+      lfcn_new_.setInput(lfcn_.input(i),i);      
+    }
+    lfcn_new_.evaluate();
+    DMatrix& qpH_new = lfcn_new_.output(LIN_H);
+    const DMatrix& qpG_new = lfcn_new_.output(LIN_QPG);
+    const DMatrix& qpA_new = lfcn_new_.output(LIN_QPA);
+    const DMatrix& qpB_new = lfcn_new_.output(LIN_QPB);
+
+
+
+
+    cout << "qpH new " << endl;
+    qpH_new.printDense();
+    cout << "qpG new " << endl;
+    qpG_new.printDense();
+    // cout << "qpA new " << endl;
+    // qpA_new.printDense();
+    // cout << "qpB new " << endl;
+    // qpB_new.printDense();
+
+
+    }
+    }
+
+
 
     // Regularization
     double reg = 0;
