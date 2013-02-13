@@ -53,8 +53,8 @@ option(WITH_OPENCL "Compile with OpenCL support" OFF)
 # For code optimization
 if(CMAKE_BUILD_TYPE)
 else(CMAKE_BUILD_TYPE)
- # set(CMAKE_BUILD_TYPE Release)
- set(CMAKE_BUILD_TYPE Debug)
+ set(CMAKE_BUILD_TYPE Release)
+ # set(CMAKE_BUILD_TYPE Debug)
 endif(CMAKE_BUILD_TYPE)
 
 # Necessary for Visual C++
