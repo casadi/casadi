@@ -487,6 +487,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -1492,6 +1508,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -2045,6 +2077,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::AcadoOCP::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::AcadoOCP::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::AcadoOCP::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::AcadoOCP::updateNumSens "
 
@@ -2891,6 +2939,22 @@ adheres to SCHEME_NLPINput. ";
 Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::getPartition "
 
@@ -4012,6 +4076,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::CFunction::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::CFunction::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::CFunction::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::CFunction::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::CFunction::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -4804,6 +4884,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::CFunctionInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::CFunctionInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -5581,6 +5677,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::CollocationIntegrator::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::updateNumSens "
 
@@ -6576,6 +6688,26 @@ adheres to SCHEME_NLPINput. ";
 Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::setInputScheme
+"
+
+Set input scheme. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getInputScheme
+"
+
+Get input scheme. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::getPartition "
 
@@ -7628,6 +7760,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::ControlSimulator::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::ControlSimulator::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::ControlSimulator::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::ControlSimulator::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::ControlSimulator::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -8507,6 +8655,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::ControlSimulatorInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::ControlSimulatorInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -9188,6 +9352,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::CplexInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::CplexInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::CplexInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::CplexInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::CplexInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -9782,6 +9962,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::CplexSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::CplexSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::CplexSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::CplexSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::CplexSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::CplexSolver::updateNumSens "
 
@@ -11340,6 +11536,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::CSparse::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::CSparse::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::CSparse::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::CSparse::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::CSparse::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -12149,6 +12361,22 @@ adheres to SCHEME_NLPINput. ";
 Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::CSparseInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::CSparseInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::CSparseInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::CSparseInternal::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::CSparseInternal::getPartition "
 
@@ -13141,6 +13369,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::CVodesIntegrator::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::CVodesIntegrator::updateNumSens "
 
@@ -14396,6 +14640,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::CVodesInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::CVodesInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::CVodesInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::CVodesInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::CVodesInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -15108,6 +15368,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::Derivative::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::Derivative::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::Derivative::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::Derivative::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::Derivative::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::Derivative::updateNumSens "
 
@@ -15909,6 +16185,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::DerivativeInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::DerivativeInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -16507,6 +16799,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::DirectCollocation::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectCollocation::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::DirectCollocation::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::DirectCollocation::updateNumSens "
 
@@ -17390,6 +17698,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::DirectCollocationInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::DirectCollocationInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -18062,6 +18386,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::DirectMultipleShooting::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::DirectMultipleShooting::updateNumSens "
 
@@ -18974,6 +19314,26 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::DirectMultipleShootingInternal::getPartition
 "
 
@@ -19658,6 +20018,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::DirectSingleShooting::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::DirectSingleShooting::updateNumSens "
 
@@ -20558,6 +20934,26 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::DirectSingleShootingInternal::setInputScheme
+"
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::setOutputScheme
+"
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getInputScheme
+"
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getOutputScheme
+"
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::DirectSingleShootingInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -21284,6 +21680,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::DSDPInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::DSDPInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::DSDPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -21926,6 +22338,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::DSDPSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DSDPSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::DSDPSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::DSDPSolver::updateNumSens "
 
@@ -22859,6 +23287,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::ExternalFunction::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::ExternalFunction::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::ExternalFunction::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::ExternalFunction::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::ExternalFunction::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -23651,6 +24095,22 @@ adheres to SCHEME_NLPINput. ";
 Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::getPartition "
 
@@ -24523,6 +24983,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::FX::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::FX::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::FX::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::FX::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::FX::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -25345,6 +25821,22 @@ adheres to SCHEME_NLPINput. ";
 Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::FXInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::FXInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::FXInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::FXInternal::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::FXInternal::getPartition "
 
@@ -26839,6 +27331,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::IdasIntegrator::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::IdasIntegrator::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::IdasIntegrator::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::IdasIntegrator::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::IdasIntegrator::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -28183,6 +28691,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::IdasInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::IdasInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::IdasInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::IdasInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::IdasInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -28703,6 +29227,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::ImplicitFunction::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::ImplicitFunction::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::updateNumSens "
 
@@ -29528,6 +30068,22 @@ adheres to SCHEME_NLPINput. ";
 Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getPartition "
 
@@ -30393,6 +30949,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::Integrator::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::Integrator::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::Integrator::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::Integrator::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::Integrator::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::Integrator::updateNumSens "
 
@@ -31316,6 +31888,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::IntegratorInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -32037,6 +32625,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::IPInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::IPInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::IPInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::IPInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::IPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -32710,6 +33314,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::IPMethod::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::IPMethod::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::IPMethod::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::IPMethod::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::IPMethod::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::IPMethod::updateNumSens "
 
@@ -36362,6 +36982,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::IpoptInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::IpoptInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::IpoptInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -39750,6 +40386,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::IpoptSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::IpoptSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::IpoptSolver::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -40743,6 +41395,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::KinsolInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::KinsolInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::KinsolInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::KinsolInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::KinsolInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -41368,6 +42036,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::KinsolSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::KinsolSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::KinsolSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::KinsolSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::KinsolSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::KinsolSolver::updateNumSens "
 
@@ -42570,6 +43254,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::KnitroInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::KnitroInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::KnitroInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -43372,6 +44072,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::KnitroSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::KnitroSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::KnitroSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::KnitroSolver::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::KnitroSolver::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -44147,6 +44863,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::LapackLUDense::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::LapackLUDense::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::LapackLUDense::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::LapackLUDense::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::LapackLUDense::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::LapackLUDense::updateNumSens "
 
@@ -44963,6 +45695,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::LapackLUDenseInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::LapackLUDenseInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -45506,6 +46254,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::LapackQRDense::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::LapackQRDense::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::LapackQRDense::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::LapackQRDense::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::LapackQRDense::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::LapackQRDense::updateNumSens "
 
@@ -46314,6 +47078,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::LapackQRDenseInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::LapackQRDenseInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -47069,6 +47849,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::LiftedSQP::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::LiftedSQP::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::LiftedSQP::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::LiftedSQP::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::LiftedSQP::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::LiftedSQP::updateNumSens "
 
@@ -48102,6 +48898,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -48827,6 +49639,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::LiftoptInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::LiftoptInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -49502,6 +50330,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::LiftoptSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::LiftoptSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::LiftoptSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::LiftoptSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::LiftoptSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::LiftoptSolver::updateNumSens "
 
@@ -50242,6 +51086,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::LinearSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::LinearSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::LinearSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::LinearSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::LinearSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::LinearSolver::updateNumSens "
 
@@ -51047,6 +51907,22 @@ adheres to SCHEME_NLPINput. ";
 Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::getPartition "
 
@@ -54408,6 +55284,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::MXFunction::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::MXFunction::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::MXFunction::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::MXFunction::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::MXFunction::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -55264,6 +56156,22 @@ adheres to SCHEME_NLPINput. ";
 Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::getPartition "
 
@@ -56223,6 +57131,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::NewtonImplicitInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::NewtonImplicitInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -56801,6 +57725,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::NewtonImplicitSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::NewtonImplicitSolver::updateNumSens "
 
@@ -57654,6 +58594,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::NLPImplicitInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::NLPImplicitInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -58197,6 +59153,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::NLPImplicitSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::NLPImplicitSolver::updateNumSens "
 
@@ -59055,6 +60027,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::NLPQPInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::NLPQPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -59608,6 +60596,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::NLPQPSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::NLPQPSolver::updateNumSens "
 
@@ -60493,6 +61497,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::NLPSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::NLPSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::NLPSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::NLPSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::NLPSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::NLPSolver::updateNumSens "
 
@@ -61436,6 +62456,22 @@ adheres to SCHEME_NLPINput. ";
 Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::getPartition "
 
@@ -63518,6 +64554,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::OCPSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::OCPSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::OCPSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::OCPSolver::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::OCPSolver::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -64389,6 +65441,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::OCPSolverInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::OCPSolverInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -65133,6 +66201,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::OOQPInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::OOQPInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::OOQPInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::OOQPInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::OOQPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -65698,6 +66782,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::OOQPSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::OOQPSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::OOQPSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::OOQPSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::OOQPSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::OOQPSolver::updateNumSens "
 
@@ -66969,6 +68069,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Parallelizer::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::Parallelizer::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::Parallelizer::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::Parallelizer::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::Parallelizer::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -67808,6 +68924,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -68475,6 +69607,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::QPOasesInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::QPOasesInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -69044,6 +70192,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::QPOasesSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::QPOasesSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::QPOasesSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::QPOasesSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::QPOasesSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::QPOasesSolver::updateNumSens "
 
@@ -69810,6 +70974,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::QPSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::QPSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::QPSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::QPSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::QPSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::QPSolver::updateNumSens "
 
@@ -70642,6 +71822,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::QPSolverInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::QPSolverInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -71388,6 +72584,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::RKIntegrator::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::RKIntegrator::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::RKIntegrator::updateNumSens "
 
@@ -72316,6 +73528,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::RKIntegratorInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::RKIntegratorInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -73120,6 +74348,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::SDPSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SDPSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::SDPSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::SDPSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::SDPSolver::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::SDPSolver::updateNumSens "
 
@@ -73976,6 +75220,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::SDPSolverInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::SDPSolverInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -74722,6 +75982,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::Simulator::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::Simulator::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::Simulator::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::Simulator::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::Simulator::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::Simulator::updateNumSens "
 
@@ -75541,6 +76817,22 @@ adheres to SCHEME_NLPINput. ";
 Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::getPartition "
 
@@ -76899,6 +78191,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::SQPInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::SQPInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::SQPInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::SQPInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::SQPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -77677,6 +78985,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::SQPMethod::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SQPMethod::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::SQPMethod::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::SQPMethod::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::SQPMethod::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::SQPMethod::updateNumSens "
 
@@ -78773,6 +80097,22 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::SundialsIntegrator::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::SundialsIntegrator::updateNumSens "
 
@@ -79936,6 +81276,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::SundialsInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::SundialsInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::SundialsInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::SundialsInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::SundialsInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -80890,6 +82246,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::SXFunction::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::SXFunction::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::SXFunction::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::SXFunction::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::SXFunction::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -81746,6 +83118,22 @@ adheres to SCHEME_NLPINput. ";
 Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getOutputScheme "
+
+Get output scheme. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::getPartition "
 
@@ -84872,6 +86260,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::WorhpInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::WorhpInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::WorhpInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -86290,6 +87694,22 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::WorhpSolver::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::WorhpSolver::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization
@@ -87117,6 +88537,22 @@ Find the index for a string describing a particular entry of a scheme
 example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
 to SCHEME_NLPINput. ";
 
+%feature("docstring")  CasADi::XFunctionInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getOutputScheme "
+
+Get output scheme. ";
+
 %feature("docstring")  CasADi::XFunctionInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -87724,6 +89160,10 @@ symbolic variables. ";
 %feature("docstring")  CasADi::ssym "
 
 Create a symbolic matrix out of a numeric one. ";
+
+%feature("docstring")  CasADi::describeInput "";
+
+%feature("docstring")  CasADi::describeOutput "";
 
 %feature("docstring")  CasADi::getSchemeName "";
 
