@@ -86,13 +86,8 @@ public:
   SXFunction fg_sx_;
   MXFunction fg_mx_;
 
-
-  MXFunction full_space_;
-  FX full_space_HL_, full_space_JG_;
-
-
   /// QP solver for the subproblems
-  QPSolver qp_solver_, qp_solver_full_;
+  QPSolver qp_solver_;
 
   /// maximum number of sqp iterations
   int maxiter_; 
@@ -454,79 +449,6 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
     x_[i].n = var[i].size();
   }
 
-
-  {
-    // Variables
-    MX X = MX::sparse(0,1);
-    for(int i=0; i<var.size(); ++i){
-      X.append(flatten(var[i]));
-    }
-
-    // Constraints
-    MX G = MX::sparse(0,1);
-    for(int i=1; i<con.size(); ++i){
-      G.append(flatten(con[i]-var[i]));
-    }
-    
-    vector<MX> fg_full;
-    fg_full.push_back(f);
-    fg_full.push_back(G);
-    MXFunction full_space(X,fg_full);
-    full_space_ = full_space;
-    full_space_.init();
-  
-
-    // Lagrange multiplier
-    MX lag = msym("lag",full_space.output(1).sparsity());
-    MX L = full_space.outputExpr(0) + inner_prod(lag,full_space.outputExpr(1));
-    vector<MX> x_and_lag;
-    x_and_lag.push_back(full_space.inputExpr(0));
-    x_and_lag.push_back(lag);
-
-    MXFunction lfcn(x_and_lag,L);
-    lfcn.init();
-
-    full_space_HL_ = lfcn.hessian();
-    full_space_JG_ = full_space_.jacobian(0,1);
-    
-    full_space_HL_.init();
-    full_space_JG_.init();
-
-    MX HH = msym("a", full_space_HL_.output().sparsity());
-    MX AA = msym("a", full_space_JG_.output().sparsity());
-    
-    if(AA.size()==0){
-      AA = msym("aa",0,HH.size1());
-    }
-
-
-
-    //    qp_solver_full_ = QPOasesSolver(HH.sparsity(),AA.sparsity());
-    //    qp_solver_full_.setOption("printLevel","none");
-
-    
-    qp_solver_full_ = NLPQPSolver(HH.sparsity(),AA.sparsity());
-    qp_solver_full_.setOption("nlp_solver",IpoptSolver::creator);
-    Dictionary nlp_solver_options;
-    nlp_solver_options["tol"] = 1e-15;
-    nlp_solver_options["print_level"] = 0;
-    nlp_solver_options["print_time"] = false;
-    qp_solver_full_.setOption("nlp_solver_options",nlp_solver_options);
-   
-    qp_solver_full_.init();
-
-    
-    
-  }
-
-
-
-
-
-
-
-
-
   // Allocate memory
   lbu_.resize(nu_,-numeric_limits<double>::infinity());
   ubu_.resize(nu_, numeric_limits<double>::infinity());
@@ -557,15 +479,13 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
   MX lam_g;
   vector<MX> lam(x_.size());
 
-  if(gauss_newton_){
-    
+  if(gauss_newton_){    
     // Least square objective
     obj = inner_prod(f,f)/2;
     lam_con[0] = f;
     ngL_ = lam_con[0].size();
 
   } else {
-
     // Scalar objective function
     obj = f;
     
@@ -656,7 +576,7 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
     d_def.push_back(con[i]-d_i);
   }
 
-  // Declare difference vector lam_d and substitute out lam_v
+  // Declare difference vector lam_d and substitute out lam
   vector<MX> lam_d;
   vector<MX> lam_d_def;
   if(!gauss_newton_){
@@ -1050,99 +970,6 @@ void Tester::solve(int& iter_count){
     const DMatrix& qpA = lfcn_.output(LIN_QPA);
     const DMatrix& qpB = lfcn_.output(LIN_QPB);
 
-    if(false){
-      // cout << "qpH " << endl;
-      // qpH.printDense();
-      // cout << "qpG " << endl;
-      // qpG.printDense();
-      // cout << "qpA " << endl;
-      // qpA.printDense();
-      // cout << "qpB " << endl;
-      // qpB.printDense();
-      
-      
-      // Evaluate the full-space QP
-      vector<double>::iterator j = full_space_.input().begin();
-      for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-	copy(it->opt.begin(), it->opt.end(), j);
-	j += it->opt.size();
-      }
-      casadi_assert(j==full_space_.input().end());
-      full_space_.evaluate();
-
-      DMatrix F = full_space_.output(0);
-      // cout << "F full " << endl;
-      // F.printDense();
-      
-
-      DMatrix G = full_space_.output(1);
-      // cout << "G full " << endl;
-      // G.printDense();
-
-      full_space_HL_.setInput(full_space_.input(),0);
-      j = full_space_HL_.input(1).begin();
-      for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
-	copy(it->lam.begin(), it->lam.end(), j);
-       	j += it->lam.size();
-      }
-      casadi_assert(j==full_space_HL_.input(1).end());
-      full_space_HL_.evaluate();
-
-      DMatrix HL = full_space_HL_.output(0);
-      DMatrix GL = full_space_HL_.output(1);
-
-      full_space_JG_.setInput(full_space_.input());
-      full_space_JG_.evaluate();
-      DMatrix JG = full_space_JG_.output();      
-
-      // cout << "p0 = " << full_space_.input(0).at(0) << endl;
-      // cout << "p1 = " << full_space_.input(0).at(1) << endl;
-
-      //      full_space_.input(0).at(0) *= 1.1;
-      full_space_.evaluate();
-      // DMatrix Gmod = full_space_.output(1);
-      // cout << "Gmod full " << endl;
-      // Gmod.printVector();
-
-
-      DMatrix qpH = HL;
-      // cout << "qpH full " << endl;
-      // qpH.printDense();
-      
-      DMatrix qpG = GL;
-      // cout << "qpG full " << endl;
-      // qpG.printDense();
-      
-      DMatrix qpA = JG;
-      // cout << "qpA full " << endl;
-      // qpA.printDense();
-
-      DMatrix qpB = G;
-      // cout << "qpB full " << endl;
-      // qpB.printDense();
-      
-
-      qp_solver_full_.setInput(qpH,QP_H);
-      qp_solver_full_.setInput(qpG,QP_G);
-      qp_solver_full_.setInput(qpA,QP_A);
-      qp_solver_full_.setInput(-qpB,QP_UBA);
-      qp_solver_full_.setInput(-qpB,QP_LBA);
-
-      std::transform(lbu_.begin(),lbu_.end(), x_[0].opt.begin(),qp_solver_full_.input(QP_LBX).begin(),std::minus<double>());
-      std::transform(ubu_.begin(),ubu_.end(), x_[0].opt.begin(),qp_solver_full_.input(QP_UBX).begin(),std::minus<double>());
-
-      qp_solver_full_.evaluate();
-
-      //      cout << "optimal qp objective: " << qp_solver_full_.output(QP_COST).toScalar() << endl;
-      
-      DMatrix pr_step = qp_solver_full_.output(QP_PRIMAL);
-      vector<double> du_correct(pr_step.begin(),  pr_step.begin()+2);
-      cout << "du correct = " << du_correct << endl;
-
-      vector<double> du_step_x = qp_solver_full_.output(QP_LAMBDA_X).data();
-    }
-
-
     // Regularization
     double reg = 0;
     
@@ -1409,23 +1236,23 @@ int main(){
   // Problem size
   // int  n_boxes = 100, n_euler = 100, n_finite_elements = 1, n_meas = 20;
   //int  n_boxes = 30, n_euler = 40, n_finite_elements = 25, n_meas = 20; // Paper
-  int n_boxes = 4, n_euler = 40, n_finite_elements = 1, n_meas = 2;
+  int n_boxes = 15, n_euler = 20, n_finite_elements = 1, n_meas = 20;
 
   // Initial guesses
   vector<double> drag_guess, depth_guess;
   drag_guess.push_back( 2.0); depth_guess.push_back(0.01); // Optimal solution
   drag_guess.push_back( 0.5); depth_guess.push_back(0.01);
-  // drag_guess.push_back( 5.0); depth_guess.push_back(0.01);
-  // drag_guess.push_back(15.0); depth_guess.push_back(0.01);
-  // drag_guess.push_back(30.0); depth_guess.push_back(0.01);
-  // drag_guess.push_back( 2.0); depth_guess.push_back(0.005);
-  // drag_guess.push_back( 2.0); depth_guess.push_back(0.02);
-  // drag_guess.push_back( 2.0); depth_guess.push_back(0.1);
-  // drag_guess.push_back( 0.2); depth_guess.push_back(0.001);
-  // drag_guess.push_back( 1.0); depth_guess.push_back(0.005);
-  // drag_guess.push_back( 4.0); depth_guess.push_back(0.02);
-  // drag_guess.push_back( 1.0); depth_guess.push_back(0.02);
-  // drag_guess.push_back(20.0); depth_guess.push_back(0.001);
+  drag_guess.push_back( 5.0); depth_guess.push_back(0.01);
+  drag_guess.push_back(15.0); depth_guess.push_back(0.01);
+  drag_guess.push_back(30.0); depth_guess.push_back(0.01);
+  drag_guess.push_back( 2.0); depth_guess.push_back(0.005);
+  drag_guess.push_back( 2.0); depth_guess.push_back(0.02);
+  drag_guess.push_back( 2.0); depth_guess.push_back(0.1);
+  drag_guess.push_back( 0.2); depth_guess.push_back(0.001);
+  drag_guess.push_back( 1.0); depth_guess.push_back(0.005);
+  drag_guess.push_back( 4.0); depth_guess.push_back(0.02);
+  drag_guess.push_back( 1.0); depth_guess.push_back(0.02);
+  drag_guess.push_back(20.0); depth_guess.push_back(0.001);
   
   // Number of tests
   const int n_tests = drag_guess.size();
@@ -1454,7 +1281,7 @@ int main(){
   t.simulate(drag_true, depth_true);
   
   // For both single and multiple shooting
-  for(int sol=1; sol<2; ++sol){
+  for(int sol=0; sol<2; ++sol){
 
     // Transcribe as an NLP
     bool single_shooting = sol==0;
