@@ -835,6 +835,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -1657,6 +1673,25 @@ Get the default of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")
+CasADi::AcadoIntegratorInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::AcadoIntegratorInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::setOptionByEnumValue
+"
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::hasOption "
 
 check if there is an option str ";
@@ -2426,6 +2461,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::AcadoOCP::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCP::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::AcadoOCP::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCP::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::AcadoOCP::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -3085,6 +3136,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::AcadoOCPInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::hasOption "
 
@@ -4424,6 +4491,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::CFunction::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::CFunction::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::CFunction::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::CFunction::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::CFunction::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -5029,6 +5112,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::CFunctionInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::hasOption "
 
@@ -6026,6 +6125,24 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::getOptionAllowedIndex
+"
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::CollocationIntegrator::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -6853,6 +6970,26 @@ Get the default of a certain option. ";
 CasADi::CollocationIntegratorInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::hasOption "
 
@@ -8108,6 +8245,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::ControlSimulator::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::ControlSimulator::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::ControlSimulator::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::ControlSimulator::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::ControlSimulator::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -8805,6 +8958,26 @@ Get the default of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")
+CasADi::ControlSimulatorInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::ControlSimulatorInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getOptionEnumValue
+"
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")
+CasADi::ControlSimulatorInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::ControlSimulatorInternal::hasOption "
 
 check if there is an option str ";
@@ -9496,6 +9669,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::CplexInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::CplexInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::CplexInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::CplexInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::CplexInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::CplexInternal::hasOption "
 
@@ -10310,6 +10499,22 @@ Get the type name of a certain option. ";
 %feature("docstring")  CasADi::CplexSolver::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::CplexSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::CplexSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::CplexSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::CplexSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::CplexSolver::getOptionDefault "
 
@@ -11880,6 +12085,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::CSparse::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::CSparse::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::CSparse::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::CSparse::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::CSparse::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -12506,6 +12727,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::CSparseInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::CSparseInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::CSparseInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::CSparseInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::CSparseInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::CSparseInternal::hasOption "
 
@@ -13718,6 +13955,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::CVodesIntegrator::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::CVodesIntegrator::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -14785,6 +15038,22 @@ Get the default of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::CVodesInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::CVodesInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::CVodesInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::CVodesInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::CVodesInternal::hasOption "
 
 check if there is an option str ";
@@ -15721,6 +15990,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::Derivative::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::Derivative::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::Derivative::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::Derivative::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::Derivative::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -16330,6 +16615,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::DerivativeInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::DerivativeInternal::hasOption "
 
@@ -17152,6 +17453,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::DirectCollocation::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocation::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocation::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::DirectCollocation::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -17848,6 +18165,26 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::DirectCollocationInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectCollocationInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectCollocationInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getOptionEnumValue
+"
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")
+CasADi::DirectCollocationInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::DirectCollocationInternal::hasOption "
 
@@ -18740,6 +19077,25 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::DirectMultipleShooting::getOptionAllowedIndex
+"
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShooting::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setOptionByEnumValue
+"
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::DirectMultipleShooting::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -19481,6 +19837,26 @@ Get the default of a certain option. ";
 CasADi::DirectMultipleShootingInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::DirectMultipleShootingInternal::hasOption "
 
@@ -20371,6 +20747,23 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::DirectSingleShooting::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setOptionByAllowedIndex
+"
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::DirectSingleShooting::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -21094,6 +21487,26 @@ Get the default of a certain option. ";
 CasADi::DirectSingleShootingInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::DirectSingleShootingInternal::hasOption "
 
@@ -21824,6 +22237,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::DSDPInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::DSDPInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::DSDPInternal::hasOption "
 
@@ -22686,6 +23115,22 @@ Get the type name of a certain option. ";
 %feature("docstring")  CasADi::DSDPSolver::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::DSDPSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::DSDPSolver::getOptionDefault "
 
@@ -23635,6 +24080,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::ExternalFunction::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::ExternalFunction::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::ExternalFunction::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::ExternalFunction::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::ExternalFunction::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -24245,6 +24706,26 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")
+CasADi::ExternalFunctionInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::ExternalFunctionInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getOptionEnumValue
+"
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")
+CasADi::ExternalFunctionInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::hasOption "
 
@@ -25335,6 +25816,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::FX::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::FX::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::FX::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::FX::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::FX::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -25965,6 +26462,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::FXInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::FXInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::FXInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::FXInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::FXInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::FXInternal::hasOption "
 
@@ -27679,6 +28192,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::IdasIntegrator::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::IdasIntegrator::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::IdasIntegrator::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::IdasIntegrator::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::IdasIntegrator::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -28836,6 +29365,22 @@ Get the default of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::IdasInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::IdasInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::IdasInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::IdasInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::IdasInternal::hasOption "
 
 check if there is an option str ";
@@ -29576,6 +30121,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::ImplicitFunction::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -30218,6 +30779,26 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")
+CasADi::ImplicitFunctionInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::ImplicitFunctionInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getOptionEnumValue
+"
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")
+CasADi::ImplicitFunctionInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::hasOption "
 
@@ -31298,6 +31879,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::Integrator::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::Integrator::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::Integrator::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::Integrator::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::Integrator::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -32034,6 +32631,22 @@ Get the default of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::IntegratorInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::hasOption "
 
 check if there is an option str ";
@@ -32768,6 +33381,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::IPInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::IPInternal::hasOption "
 
@@ -33662,6 +34291,22 @@ Get the type name of a certain option. ";
 %feature("docstring")  CasADi::IPMethod::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::IPMethod::getOptionDefault "
 
@@ -37126,6 +37771,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::IpoptInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::IpoptInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::IpoptInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::IpoptInternal::hasOption "
 
@@ -40734,6 +41395,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::IpoptSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::IpoptSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::IpoptSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::IpoptSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::IpoptSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -41539,6 +42216,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::KinsolInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::KinsolInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::KinsolInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::KinsolInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::KinsolInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::KinsolInternal::hasOption "
 
@@ -42384,6 +43077,22 @@ Get the type name of a certain option. ";
 %feature("docstring")  CasADi::KinsolSolver::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::KinsolSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::KinsolSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::KinsolSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::KinsolSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::KinsolSolver::getOptionDefault "
 
@@ -43398,6 +44107,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::KnitroInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::KnitroInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::KnitroInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::KnitroInternal::hasOption "
 
@@ -44420,6 +45145,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::KnitroSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::KnitroSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::KnitroSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::KnitroSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::KnitroSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -45208,6 +45949,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::LapackLUDense::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::LapackLUDense::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::LapackLUDense::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::LapackLUDense::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::LapackLUDense::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -45840,6 +46597,24 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::LapackLUDenseInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getOptionAllowedIndex
+"
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::LapackLUDenseInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::LapackLUDenseInternal::hasOption "
 
@@ -46599,6 +47374,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::LapackQRDense::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::LapackQRDense::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::LapackQRDense::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::LapackQRDense::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::LapackQRDense::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -47223,6 +48014,24 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::LapackQRDenseInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getOptionAllowedIndex
+"
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::LapackQRDenseInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::hasOption "
 
@@ -48198,6 +49007,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::LiftedSQP::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::LiftedSQP::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::LiftedSQP::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::LiftedSQP::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::LiftedSQP::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -49044,6 +49869,22 @@ Get the default of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::hasOption "
 
 check if there is an option str ";
@@ -49783,6 +50624,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::LiftoptInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::LiftoptInternal::hasOption "
 
@@ -50679,6 +51536,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::LiftoptSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::LiftoptSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::LiftoptSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::LiftoptSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::LiftoptSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -51431,6 +52304,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::LinearSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::LinearSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::LinearSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::LinearSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::LinearSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -52053,6 +52942,23 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::LinearSolverInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::setOptionByAllowedIndex
+"
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::hasOption "
 
@@ -53940,6 +54846,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::MuscodInterface::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::MuscodInterface::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::MuscodInterface::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::MuscodInterface::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::MuscodInterface::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -54158,6 +55080,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::MuscodInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::MuscodInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::MuscodInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::MuscodInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::MuscodInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::MuscodInternal::hasOption "
 
@@ -55632,6 +56570,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::MXFunction::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::MXFunction::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::MXFunction::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::MXFunction::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::MXFunction::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -56297,6 +57251,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::MXFunctionInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::hasOption "
 
@@ -57278,6 +58248,25 @@ Get the default of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::NewtonImplicitInternal::getOptionAllowedIndex
+"
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::NewtonImplicitInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::setOptionByEnumValue
+"
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::NewtonImplicitInternal::hasOption "
 
 check if there is an option str ";
@@ -58074,6 +59063,23 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::NewtonImplicitSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setOptionByAllowedIndex
+"
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::NewtonImplicitSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -58739,6 +59745,23 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::NLPImplicitInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::setOptionByAllowedIndex
+"
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::NLPImplicitInternal::hasOption "
 
@@ -59502,6 +60525,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::NLPImplicitSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::NLPImplicitSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -60171,6 +61210,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::NLPQPInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::NLPQPInternal::hasOption "
 
@@ -60944,6 +61999,22 @@ Get the type name of a certain option. ";
 %feature("docstring")  CasADi::NLPQPSolver::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::NLPQPSolver::getOptionDefault "
 
@@ -61846,6 +62917,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::NLPSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::NLPSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::NLPSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::NLPSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::NLPSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -62602,6 +63689,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::NLPSolverInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::hasOption "
 
@@ -64906,6 +66009,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::OCPSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::OCPSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::OCPSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::OCPSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::OCPSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -65586,6 +66705,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::OCPSolverInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::hasOption "
 
@@ -66345,6 +67480,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::OOQPInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::OOQPInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::OOQPInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::OOQPInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::OOQPInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::OOQPInternal::hasOption "
 
@@ -67131,6 +68282,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::OOQPSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::OOQPSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::OOQPSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::OOQPSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::OOQPSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -67311,6 +68478,23 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::OptionsFunctionality::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::OptionsFunctionality::setOptionByAllowedIndex
+"
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::OptionsFunctionality::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::OptionsFunctionality::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::OptionsFunctionality::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -67448,6 +68632,26 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::OptionsFunctionalityNode::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")
+CasADi::OptionsFunctionalityNode::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")
+CasADi::OptionsFunctionalityNode::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::OptionsFunctionalityNode::getOptionEnumValue
+"
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")
+CasADi::OptionsFunctionalityNode::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::OptionsFunctionalityNode::hasOption "
 
@@ -68421,6 +69625,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::Parallelizer::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::Parallelizer::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::Parallelizer::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::Parallelizer::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::Parallelizer::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -69065,6 +70285,23 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::ParallelizerInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::setOptionByAllowedIndex
+"
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::hasOption "
 
@@ -69751,6 +70988,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::QPOasesInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::QPOasesInternal::hasOption "
 
@@ -70541,6 +71794,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::QPOasesSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::QPOasesSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::QPOasesSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::QPOasesSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::QPOasesSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -71323,6 +72592,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::QPSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::QPSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::QPSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::QPSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::QPSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -71967,6 +73252,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::QPSolverInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::hasOption "
 
@@ -72933,6 +74234,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::RKIntegrator::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::RKIntegrator::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::RKIntegrator::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -73673,6 +74990,23 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::RKIntegratorInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setOptionByAllowedIndex
+"
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::hasOption "
 
@@ -74697,6 +76031,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::SDPSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::SDPSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::SDPSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::SDPSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -75365,6 +76715,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::SDPSolverInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::SDPSolverInternal::hasOption "
 
@@ -76331,6 +77697,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::Simulator::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::Simulator::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::Simulator::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::Simulator::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::Simulator::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -76963,6 +78345,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::SimulatorInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::hasOption "
 
@@ -78335,6 +79733,22 @@ Get the default of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::SQPInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::SQPInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::SQPInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::SQPInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::SQPInternal::hasOption "
 
 check if there is an option str ";
@@ -79333,6 +80747,22 @@ Get the type name of a certain option. ";
 %feature("docstring")  CasADi::SQPMethod::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SQPMethod::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::SQPMethod::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::SQPMethod::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::SQPMethod::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::SQPMethod::getOptionDefault "
 
@@ -80446,6 +81876,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::SundialsIntegrator::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::SundialsIntegrator::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -81421,6 +82867,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::SundialsInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SundialsInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::SundialsInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::SundialsInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::SundialsInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::SundialsInternal::hasOption "
 
@@ -82590,6 +84052,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::SXFunction::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::SXFunction::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::SXFunction::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::SXFunction::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::SXFunction::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -83264,6 +84742,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::SXFunctionInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::hasOption "
 
@@ -86405,6 +87899,22 @@ Get the default of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::WorhpInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::WorhpInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::WorhpInternal::hasOption "
 
 check if there is an option str ";
@@ -88042,6 +89552,22 @@ Get the type name of a certain option. ";
 
 Get the allowed values of a certain option. ";
 
+%feature("docstring")  CasADi::WorhpSolver::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::WorhpSolver::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
 %feature("docstring")  CasADi::WorhpSolver::getOptionDefault "
 
 Get the default of a certain option. ";
@@ -88682,6 +90208,22 @@ Get the default of a certain option. ";
 %feature("docstring")  CasADi::XFunctionInternal::getOptionAllowed "
 
 Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::hasOption "
 
