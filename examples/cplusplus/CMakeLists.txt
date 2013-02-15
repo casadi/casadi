@@ -142,3 +142,8 @@ if(WITH_DL AND WITH_IPOPT)
   add_executable(nlp_codegen nlp_codegen.cpp)
   target_link_libraries(nlp_codegen casadi_ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
 endif()
+
+if(WITH_DL)
+  add_executable(codegen_usage codegen_usage.cpp)
+  target_link_libraries(codegen_usage casadi ${CASADI_DEPENDENCIES})
+endif()
