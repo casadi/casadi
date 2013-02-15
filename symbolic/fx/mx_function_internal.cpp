@@ -1133,7 +1133,6 @@ void MXFunctionInternal::allocTape(){
     gen.addAuxiliary(CodeGenerator::AUX_IAMAX);
     gen.addAuxiliary(CodeGenerator::AUX_FILL);
     gen.addAuxiliary(CodeGenerator::AUX_MM_NT_SPARSE);
-    gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
 
     // Add sparsity patterns in the intermediate variables
     for(int i=0; i<work_.size(); ++i){

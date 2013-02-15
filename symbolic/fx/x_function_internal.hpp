@@ -1080,6 +1080,9 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
   for(int i=0; i<n_out; ++i){
     stream << "  d t_r" << i << "[" << output(i).sparsity().size() << "];" << std::endl;
   }
+  
+  // Codegen "copy sparse"
+  gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
 
   // Copy inputs to buffers
   for(int i=0; i<n_in; ++i){
