@@ -71,24 +71,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -1016,24 +1010,18 @@ thus x := [xd,xa]
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -1754,24 +1742,18 @@ Get a weak reference to the object. ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | auto_init    | OT_BOOLEAN   | false        | initialize   | CasADi::Acad |
 |              |              |              | differential | oOCPInternal |
@@ -2565,24 +2547,18 @@ Return a string with a destription (for SWIG) ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | auto_init    | OT_BOOLEAN   | false        | initialize   | CasADi::Acad |
 |              |              |              | differential | oOCPInternal |
@@ -3840,24 +3816,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -4596,24 +4566,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -5273,24 +5237,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -6250,24 +6208,18 @@ Return a string with a destription (for SWIG) ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -7423,24 +7375,18 @@ Joris Gillis
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | control_endp | OT_BOOLEAN   | false        | Include a    | CasADi::Cont |
 | oint         |              |              | control      | rolSimulator |
@@ -8366,24 +8312,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | control_endp | OT_BOOLEAN   | false        | Include a    | CasADi::Cont |
 | oint         |              |              | control      | rolSimulator |
@@ -9091,24 +9031,18 @@ If H is not positive-definite, the solver should throw an error.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | CasADi::Cple |
 | ter          |              |              | number of    | xInternal    |
@@ -9803,24 +9737,18 @@ Attila Kozma, Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | CasADi::Cple |
 | ter          |              |              | number of    | xInternal    |
@@ -11418,24 +11346,18 @@ therefore more expensive if A is invariant.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -12191,24 +12113,18 @@ numerically singular, the prepare step will fail.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -12870,24 +12786,18 @@ times t_i.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -14107,24 +14017,18 @@ rx, rz and rp.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -15343,24 +15247,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -16095,24 +15993,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -16739,24 +16631,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | collocation_ | OT_STRING    | \"radau\"      | Collocation  | CasADi::Dire |
 | scheme       |              |              | scheme (rada | ctCollocatio |
@@ -17598,24 +17484,18 @@ Return a string with a destription (for SWIG) ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | collocation_ | OT_STRING    | \"radau\"      | Collocation  | CasADi::Dire |
 | scheme       |              |              | scheme (rada | ctCollocatio |
@@ -18304,24 +18184,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | final_time   | OT_REAL      | 1            |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
@@ -19225,24 +19099,18 @@ Return a string with a destription (for SWIG) ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | final_time   | OT_REAL      | 1            |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
@@ -19980,24 +19848,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | final_time   | OT_REAL      | 1            |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
@@ -20893,24 +20755,18 @@ Return a string with a destription (for SWIG) ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | final_time   | OT_REAL      | 1            |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
@@ -21642,24 +21498,18 @@ Implementations of SDPSolver are encouraged to exploit this block structure.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | calc_dual    | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
 |              |              |              | dual should  | olverInterna |
@@ -22397,24 +22247,18 @@ Joris Gillis
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | calc_dual    | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
 |              |              |              | dual should  | olverInterna |
@@ -23431,24 +23275,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -24181,24 +24019,18 @@ Return a string with a destription (for SWIG) ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -25160,24 +24992,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -25944,24 +25770,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -27041,24 +26861,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -28347,24 +28161,18 @@ rx, rz and rp.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -29461,24 +29269,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -30224,24 +30026,18 @@ Internal class.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -31144,24 +30940,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -32020,24 +31810,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -32756,24 +32540,18 @@ Get a weak reference to the object. ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
 |              |              |              | objective    | olverInterna |
@@ -33519,24 +33297,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
 |              |              |              | objective    | olverInterna |
@@ -34517,21 +34289,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 | ad_mode      | OT_STRING    | automatic    | How to       | CasADi::Ipop |
 |              |              |              | calculate    | tInternal    |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
+|              |              |              | Jacobians.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adaptive_mu_ | OT_STRING    | obj-constr-  | Globalizatio | CasADi::Ipop |
 | globalizatio |              | filter       | n strategy   | tInternal    |
@@ -37993,21 +37751,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 | ad_mode      | OT_STRING    | automatic    | How to       | CasADi::Ipop |
 |              |              |              | calculate    | tInternal    |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
+|              |              |              | Jacobians.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adaptive_mu_ | OT_STRING    | obj-constr-  | Globalizatio | CasADi::Ipop |
 | globalizatio |              | filter       | n strategy   | tInternal    |
@@ -41574,24 +41318,18 @@ Retrieve information about variables and constraints ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | constraints  | OT_INTEGERVE |              |              | CasADi::Kins |
 |              | CTOR         |              |              | olInternal   |
@@ -42329,24 +42067,18 @@ See:   ImplicitFunction for more information
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | constraints  | OT_INTEGERVE |              |              | CasADi::Kins |
 |              | CTOR         |              |              | olInternal   |
@@ -43459,24 +43191,18 @@ n: number of decision variables (x)     m: number of constraints (A)
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | contype      | OT_INTEGERVE |              |              | CasADi::Knit |
 |              | CTOR         |              |              | roInternal   |
@@ -44344,24 +44070,18 @@ n: number of decision variables (x)     m: number of constraints (A)
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | contype      | OT_INTEGERVE |              |              | CasADi::Knit |
 |              | CTOR         |              |              | roInternal   |
@@ -45274,24 +44994,18 @@ therefore more expensive if A is invariant.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | allow_equili | OT_BOOLEAN   | false        |              | CasADi::Lapa |
 | bration_fail |              |              |              | ckLUDenseInt |
@@ -46052,24 +45766,18 @@ Internal class.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | allow_equili | OT_BOOLEAN   | false        |              | CasADi::Lapa |
 | bration_fail |              |              |              | ckLUDenseInt |
@@ -46707,24 +46415,18 @@ therefore more expensive if A is invariant.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -47477,24 +47179,18 @@ Internal class.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -48151,24 +47847,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | eta          | OT_REAL      | 0.000        | Linesearch   | CasADi::Lift |
 |              |              |              | parameter:   | edSQPInterna |
@@ -49158,24 +48848,18 @@ Return a string with a destription (for SWIG) ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | eta          | OT_REAL      | 0.000        | Linesearch   | CasADi::Lift |
 |              |              |              | parameter:   | edSQPInterna |
@@ -50002,24 +49686,18 @@ n: number of decision variables (x)     m: number of constraints (A)
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
 |              |              |              | objective    | olverInterna |
@@ -50758,24 +50436,18 @@ n: number of decision variables (x)     m: number of constraints (A)
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
 |              |              |              | objective    | olverInterna |
@@ -51645,24 +51317,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -52411,24 +52077,18 @@ numerically singular, the prepare step will fail.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -55851,24 +55511,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -56675,24 +56329,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -57658,24 +57306,18 @@ ImplicitFunction.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -58361,24 +58003,18 @@ Joris Gillis
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -59184,24 +58820,18 @@ ImplicitFunction.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -59847,24 +59477,18 @@ Joris Gillis
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -60678,24 +60302,18 @@ If H is not positive-definite, the solver should throw an error.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -61344,24 +60962,18 @@ Joris Gillis
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -62159,24 +61771,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
 |              |              |              | objective    | olverInterna |
@@ -63076,24 +62682,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
 |              |              |              | objective    | olverInterna |
@@ -65346,24 +64946,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | final_time   | OT_REAL      | 1            |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
@@ -66158,24 +65752,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | final_time   | OT_REAL      | 1            |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
@@ -66924,24 +66512,18 @@ If H is not positive-definite, the solver should throw an error.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | artol        | OT_REAL      | 0.000        | tolerance as | CasADi::OOQP |
 |              |              |              | provided     | Internal     |
@@ -67618,24 +67200,18 @@ reInit();
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | artol        | OT_REAL      | 0.000        | tolerance as | CasADi::OOQP |
 |              |              |              | provided     | Internal     |
@@ -68951,24 +68527,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -69730,24 +69300,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -70453,21 +70017,136 @@ If H is not positive-definite, the solver should throw an error.
 | ad_mode      | OT_STRING    | automatic    | How to       | CasADi::QPOa |
 |              |              |              | calculate    | sesInternal  |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
+|              |              |              | Jacobians.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| boundRelaxat | OT_REAL      | double       | Initial      | CasADi::QPOa |
+| ion          |              |              | relaxation   | sesInternal  |
+|              |              |              | of bounds to |              |
+|              |              |              | start        |              |
+|              |              |              | homotopy and |              |
+|              |              |              | initial      |              |
+|              |              |              | value for    |              |
+|              |              |              | far bounds.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| boundToleran | OT_REAL      | double       | If upper and | CasADi::QPOa |
+| ce           |              |              | lower bounds | sesInternal  |
+|              |              |              | differ less  |              |
+|              |              |              | than this    |              |
+|              |              |              | tolerance,   |              |
+|              |              |              | they are     |              |
+|              |              |              | regarded     |              |
+|              |              |              | equal, i.e.  |              |
+|              |              |              | as equality  |              |
+|              |              |              | constraint.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableCholes | OT_INTEGER   | int          | Specifies    | CasADi::QPOa |
+| kyRefactoris |              |              | the          | sesInternal  |
+| ation        |              |              | frequency of |              |
+|              |              |              | a full re-fa |              |
+|              |              |              | ctorisation  |              |
+|              |              |              | of projected |              |
+|              |              |              | Hessian      |              |
+|              |              |              | matrix: 0:   |              |
+|              |              |              | turns them   |              |
+|              |              |              | off, 1: uses |              |
+|              |              |              | them at each |              |
+|              |              |              | iteration    |              |
+|              |              |              | etc.         |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableDriftC | OT_INTEGER   | int          | Specifies    | CasADi::QPOa |
+| orrection    |              |              | the          | sesInternal  |
+|              |              |              | frequency of |              |
+|              |              |              | drift        |              |
+|              |              |              | corrections: |              |
+|              |              |              | 0: turns     |              |
+|              |              |              | them off.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableEquali | OT_BOOLEAN   | BooleanType_ | Specifies    | CasADi::QPOa |
+| ties         |              | to_bool      | whether      | sesInternal  |
+|              |              |              | equalities   |              |
+|              |              |              | should be    |              |
+|              |              |              | treated as   |              |
+|              |              |              | always       |              |
+|              |              |              | active       |              |
+|              |              |              | (True) or    |              |
+|              |              |              | not (False)  |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableFarBou | OT_BOOLEAN   | BooleanType_ | Enables the  | CasADi::QPOa |
+| nds          |              | to_bool      | use of far   | sesInternal  |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableFlippi | OT_BOOLEAN   | BooleanType_ | Enables the  | CasADi::QPOa |
+| ngBounds     |              | to_bool      | use of       | sesInternal  |
+|              |              |              | flipping     |              |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableFullLI | OT_BOOLEAN   | BooleanType_ | Enables      | CasADi::QPOa |
+| Tests        |              | to_bool      | condition-   | sesInternal  |
+|              |              |              | hardened     |              |
+|              |              |              | (but more    |              |
+|              |              |              | expensive)   |              |
+|              |              |              | LI test.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableNZCTes | OT_BOOLEAN   | BooleanType_ | Enables      | CasADi::QPOa |
+| ts           |              | to_bool      | nonzero      | sesInternal  |
+|              |              |              | curvature    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableRampin | OT_BOOLEAN   | BooleanType_ | Enables      | CasADi::QPOa |
+| g            |              | to_bool      | ramping.     | sesInternal  |
++--------------+--------------+--------------+--------------+--------------+
+| enableRegula | OT_BOOLEAN   | BooleanType_ | Enables      | CasADi::QPOa |
+| risation     |              | to_bool      | automatic    | sesInternal  |
+|              |              |              | Hessian regu |              |
+|              |              |              | larisation.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsDen       | OT_REAL      | double       | Denominator  | CasADi::QPOa |
+|              |              |              | tolerance    | sesInternal  |
+|              |              |              | for ratio    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsFlipping  | OT_REAL      | double       | Tolerance of | CasADi::QPOa |
+|              |              |              | squared      | sesInternal  |
+|              |              |              | Cholesky     |              |
+|              |              |              | diagonal     |              |
+|              |              |              | factor which |              |
+|              |              |              | triggers     |              |
+|              |              |              | flipping     |              |
+|              |              |              | bound.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsIterRef   | OT_REAL      | double       | Early        | CasADi::QPOa |
+|              |              |              | termination  | sesInternal  |
+|              |              |              | tolerance    |              |
+|              |              |              | for          |              |
+|              |              |              | iterative    |              |
+|              |              |              | refinement.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsLITests   | OT_REAL      | double       | Tolerance    | CasADi::QPOa |
+|              |              |              | for linear   | sesInternal  |
+|              |              |              | independence |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsNZCTests  | OT_REAL      | double       | Tolerance    | CasADi::QPOa |
+|              |              |              | for nonzero  | sesInternal  |
+|              |              |              | curvature    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsNum       | OT_REAL      | double       | Numerator    | CasADi::QPOa |
+|              |              |              | tolerance    | sesInternal  |
+|              |              |              | for ratio    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsRegularis | OT_REAL      | double       | Scaling      | CasADi::QPOa |
+| ation        |              |              | factor of    | sesInternal  |
+|              |              |              | identity     |              |
+|              |              |              | matrix used  |              |
+|              |              |              | for Hessian  |              |
+|              |              |              | regularisati |              |
+|              |              |              | on.          |              |
++--------------+--------------+--------------+--------------+--------------+
+| finalRamping | OT_REAL      | double       | Final value  | CasADi::QPOa |
+|              |              |              | for ramping  | sesInternal  |
+|              |              |              | strategy.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | False        | Flag to      | CasADi::QPOa |
 |              |              |              | indicate     | sesInternal  |
@@ -70475,6 +70154,37 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| growFarBound | OT_REAL      | double       | Factor to    | CasADi::QPOa |
+| s            |              |              | grow far     | sesInternal  |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialFarBo | OT_REAL      | double       | Initial size | CasADi::QPOa |
+| unds         |              |              | for far      | sesInternal  |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialRampi | OT_REAL      | double       | Start value  | CasADi::QPOa |
+| ng           |              |              | for ramping  | sesInternal  |
+|              |              |              | strategy.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialStatu | OT_STRING    | SubjectToSta | Initial      | CasADi::QPOa |
+| sBounds      |              | tus_to_strin | status of    | sesInternal  |
+|              |              | g            | bounds at    |              |
+|              |              |              | first        |              |
+|              |              |              | iteration:   |              |
+|              |              |              | \"inactive\":  |              |
+|              |              |              | all bounds   |              |
+|              |              |              | inactive,    |              |
+|              |              |              | \"lower\": all |              |
+|              |              |              | bounds       |              |
+|              |              |              | active at    |              |
+|              |              |              | their lower  |              |
+|              |              |              | bound,       |              |
+|              |              |              | \"upper\": all |              |
+|              |              |              | bounds       |              |
+|              |              |              | active at    |              |
+|              |              |              | their upper  |              |
+|              |              |              | bound.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | None         | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | pointer that | sesInternal  |
@@ -70488,6 +70198,22 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| maxDualJump  | OT_REAL      | double       | Maximum      | CasADi::QPOa |
+|              |              |              | allowed jump | sesInternal  |
+|              |              |              | in dual      |              |
+|              |              |              | variables in |              |
+|              |              |              | linear       |              |
+|              |              |              | independence |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| maxPrimalJum | OT_REAL      | double       | Maximum      | CasADi::QPOa |
+| p            |              |              | allowed jump | sesInternal  |
+|              |              |              | in primal    |              |
+|              |              |              | variables in |              |
+|              |              |              | nonzero      |              |
+|              |              |              | curvature    |              |
+|              |              |              | tests.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::QPOa |
 | f_adj_dir    |              |              | r_of_adj_dir | sesInternal  |
@@ -70520,6 +70246,18 @@ If H is not positive-definite, the solver should throw an error.
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | unnamed_shar | n/a          | CasADi::QPOa |
 |              |              | ed_object    |              | sesInternal  |
++--------------+--------------+--------------+--------------+--------------+
+| numRefinemen | OT_INTEGER   | int          | Maximum      | CasADi::QPOa |
+| tSteps       |              |              | number of    | sesInternal  |
+|              |              |              | iterative    |              |
+|              |              |              | refinement   |              |
+|              |              |              | steps.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numRegularis | OT_INTEGER   | int          | Maximum      | CasADi::QPOa |
+| ationSteps   |              |              | number of    | sesInternal  |
+|              |              |              | successive r |              |
+|              |              |              | egularisatio |              |
+|              |              |              | n steps.     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::QPOa |
 | j_dir        |              |              | adjoint      | sesInternal  |
@@ -70597,6 +70335,12 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | Jacobians    |              |
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| terminationT | OT_REAL      | double       | Relative     | CasADi::QPOa |
+| olerance     |              |              | termination  | sesInternal  |
+|              |              |              | tolerance to |              |
+|              |              |              | stop         |              |
+|              |              |              | homotopy.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | None         | A user-      | CasADi::QPOa |
 |              |              |              | defined      | sesInternal  |
@@ -71135,21 +70879,136 @@ Joris Gillis, Joel Andersson
 | ad_mode      | OT_STRING    | automatic    | How to       | CasADi::QPOa |
 |              |              |              | calculate    | sesInternal  |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
+|              |              |              | Jacobians.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| boundRelaxat | OT_REAL      | double       | Initial      | CasADi::QPOa |
+| ion          |              |              | relaxation   | sesInternal  |
+|              |              |              | of bounds to |              |
+|              |              |              | start        |              |
+|              |              |              | homotopy and |              |
+|              |              |              | initial      |              |
+|              |              |              | value for    |              |
+|              |              |              | far bounds.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| boundToleran | OT_REAL      | double       | If upper and | CasADi::QPOa |
+| ce           |              |              | lower bounds | sesInternal  |
+|              |              |              | differ less  |              |
+|              |              |              | than this    |              |
+|              |              |              | tolerance,   |              |
+|              |              |              | they are     |              |
+|              |              |              | regarded     |              |
+|              |              |              | equal, i.e.  |              |
+|              |              |              | as equality  |              |
+|              |              |              | constraint.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableCholes | OT_INTEGER   | int          | Specifies    | CasADi::QPOa |
+| kyRefactoris |              |              | the          | sesInternal  |
+| ation        |              |              | frequency of |              |
+|              |              |              | a full re-fa |              |
+|              |              |              | ctorisation  |              |
+|              |              |              | of projected |              |
+|              |              |              | Hessian      |              |
+|              |              |              | matrix: 0:   |              |
+|              |              |              | turns them   |              |
+|              |              |              | off, 1: uses |              |
+|              |              |              | them at each |              |
+|              |              |              | iteration    |              |
+|              |              |              | etc.         |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableDriftC | OT_INTEGER   | int          | Specifies    | CasADi::QPOa |
+| orrection    |              |              | the          | sesInternal  |
+|              |              |              | frequency of |              |
+|              |              |              | drift        |              |
+|              |              |              | corrections: |              |
+|              |              |              | 0: turns     |              |
+|              |              |              | them off.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableEquali | OT_BOOLEAN   | BooleanType_ | Specifies    | CasADi::QPOa |
+| ties         |              | to_bool      | whether      | sesInternal  |
+|              |              |              | equalities   |              |
+|              |              |              | should be    |              |
+|              |              |              | treated as   |              |
+|              |              |              | always       |              |
+|              |              |              | active       |              |
+|              |              |              | (True) or    |              |
+|              |              |              | not (False)  |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableFarBou | OT_BOOLEAN   | BooleanType_ | Enables the  | CasADi::QPOa |
+| nds          |              | to_bool      | use of far   | sesInternal  |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableFlippi | OT_BOOLEAN   | BooleanType_ | Enables the  | CasADi::QPOa |
+| ngBounds     |              | to_bool      | use of       | sesInternal  |
+|              |              |              | flipping     |              |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableFullLI | OT_BOOLEAN   | BooleanType_ | Enables      | CasADi::QPOa |
+| Tests        |              | to_bool      | condition-   | sesInternal  |
+|              |              |              | hardened     |              |
+|              |              |              | (but more    |              |
+|              |              |              | expensive)   |              |
+|              |              |              | LI test.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableNZCTes | OT_BOOLEAN   | BooleanType_ | Enables      | CasADi::QPOa |
+| ts           |              | to_bool      | nonzero      | sesInternal  |
+|              |              |              | curvature    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableRampin | OT_BOOLEAN   | BooleanType_ | Enables      | CasADi::QPOa |
+| g            |              | to_bool      | ramping.     | sesInternal  |
++--------------+--------------+--------------+--------------+--------------+
+| enableRegula | OT_BOOLEAN   | BooleanType_ | Enables      | CasADi::QPOa |
+| risation     |              | to_bool      | automatic    | sesInternal  |
+|              |              |              | Hessian regu |              |
+|              |              |              | larisation.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsDen       | OT_REAL      | double       | Denominator  | CasADi::QPOa |
+|              |              |              | tolerance    | sesInternal  |
+|              |              |              | for ratio    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsFlipping  | OT_REAL      | double       | Tolerance of | CasADi::QPOa |
+|              |              |              | squared      | sesInternal  |
+|              |              |              | Cholesky     |              |
+|              |              |              | diagonal     |              |
+|              |              |              | factor which |              |
+|              |              |              | triggers     |              |
+|              |              |              | flipping     |              |
+|              |              |              | bound.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsIterRef   | OT_REAL      | double       | Early        | CasADi::QPOa |
+|              |              |              | termination  | sesInternal  |
+|              |              |              | tolerance    |              |
+|              |              |              | for          |              |
+|              |              |              | iterative    |              |
+|              |              |              | refinement.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsLITests   | OT_REAL      | double       | Tolerance    | CasADi::QPOa |
+|              |              |              | for linear   | sesInternal  |
+|              |              |              | independence |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsNZCTests  | OT_REAL      | double       | Tolerance    | CasADi::QPOa |
+|              |              |              | for nonzero  | sesInternal  |
+|              |              |              | curvature    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsNum       | OT_REAL      | double       | Numerator    | CasADi::QPOa |
+|              |              |              | tolerance    | sesInternal  |
+|              |              |              | for ratio    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsRegularis | OT_REAL      | double       | Scaling      | CasADi::QPOa |
+| ation        |              |              | factor of    | sesInternal  |
+|              |              |              | identity     |              |
+|              |              |              | matrix used  |              |
+|              |              |              | for Hessian  |              |
+|              |              |              | regularisati |              |
+|              |              |              | on.          |              |
++--------------+--------------+--------------+--------------+--------------+
+| finalRamping | OT_REAL      | double       | Final value  | CasADi::QPOa |
+|              |              |              | for ramping  | sesInternal  |
+|              |              |              | strategy.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | False        | Flag to      | CasADi::QPOa |
 |              |              |              | indicate     | sesInternal  |
@@ -71157,6 +71016,37 @@ Joris Gillis, Joel Andersson
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| growFarBound | OT_REAL      | double       | Factor to    | CasADi::QPOa |
+| s            |              |              | grow far     | sesInternal  |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialFarBo | OT_REAL      | double       | Initial size | CasADi::QPOa |
+| unds         |              |              | for far      | sesInternal  |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialRampi | OT_REAL      | double       | Start value  | CasADi::QPOa |
+| ng           |              |              | for ramping  | sesInternal  |
+|              |              |              | strategy.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialStatu | OT_STRING    | SubjectToSta | Initial      | CasADi::QPOa |
+| sBounds      |              | tus_to_strin | status of    | sesInternal  |
+|              |              | g            | bounds at    |              |
+|              |              |              | first        |              |
+|              |              |              | iteration:   |              |
+|              |              |              | \"inactive\":  |              |
+|              |              |              | all bounds   |              |
+|              |              |              | inactive,    |              |
+|              |              |              | \"lower\": all |              |
+|              |              |              | bounds       |              |
+|              |              |              | active at    |              |
+|              |              |              | their lower  |              |
+|              |              |              | bound,       |              |
+|              |              |              | \"upper\": all |              |
+|              |              |              | bounds       |              |
+|              |              |              | active at    |              |
+|              |              |              | their upper  |              |
+|              |              |              | bound.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | None         | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | pointer that | sesInternal  |
@@ -71170,6 +71060,22 @@ Joris Gillis, Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| maxDualJump  | OT_REAL      | double       | Maximum      | CasADi::QPOa |
+|              |              |              | allowed jump | sesInternal  |
+|              |              |              | in dual      |              |
+|              |              |              | variables in |              |
+|              |              |              | linear       |              |
+|              |              |              | independence |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| maxPrimalJum | OT_REAL      | double       | Maximum      | CasADi::QPOa |
+| p            |              |              | allowed jump | sesInternal  |
+|              |              |              | in primal    |              |
+|              |              |              | variables in |              |
+|              |              |              | nonzero      |              |
+|              |              |              | curvature    |              |
+|              |              |              | tests.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::QPOa |
 | f_adj_dir    |              |              | r_of_adj_dir | sesInternal  |
@@ -71202,6 +71108,18 @@ Joris Gillis, Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | unnamed_shar | n/a          | CasADi::QPOa |
 |              |              | ed_object    |              | sesInternal  |
++--------------+--------------+--------------+--------------+--------------+
+| numRefinemen | OT_INTEGER   | int          | Maximum      | CasADi::QPOa |
+| tSteps       |              |              | number of    | sesInternal  |
+|              |              |              | iterative    |              |
+|              |              |              | refinement   |              |
+|              |              |              | steps.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numRegularis | OT_INTEGER   | int          | Maximum      | CasADi::QPOa |
+| ationSteps   |              |              | number of    | sesInternal  |
+|              |              |              | successive r |              |
+|              |              |              | egularisatio |              |
+|              |              |              | n steps.     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::QPOa |
 | j_dir        |              |              | adjoint      | sesInternal  |
@@ -71279,6 +71197,12 @@ Joris Gillis, Joel Andersson
 |              |              |              | Jacobians    |              |
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| terminationT | OT_REAL      | double       | Relative     | CasADi::QPOa |
+| olerance     |              |              | termination  | sesInternal  |
+|              |              |              | tolerance to |              |
+|              |              |              | stop         |              |
+|              |              |              | homotopy.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | None         | A user-      | CasADi::QPOa |
 |              |              |              | defined      | sesInternal  |
@@ -71949,24 +71873,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -72737,24 +72655,18 @@ Internal class.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -73458,24 +73370,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -74357,24 +74263,18 @@ Return a string with a destription (for SWIG) ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -75353,24 +75253,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | calc_dual    | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
 |              |              |              | dual should  | olverInterna |
@@ -76165,24 +76059,18 @@ Internal class.
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | calc_dual    | OT_BOOLEAN   | true         | Indicate if  | CasADi::SDPS |
 |              |              |              | dual should  | olverInterna |
@@ -77016,24 +76904,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -77815,24 +77697,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -78984,24 +78860,18 @@ Get a weak reference to the object. ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | beta         | OT_REAL      | 0.800        | Line-search  | CasADi::SQPI |
 |              |              |              | parameter,   | nternal      |
@@ -79880,24 +79750,18 @@ Attila Kozma, Joel Andersson and Joris Gillis
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | beta         | OT_REAL      | 0.800        | Line-search  | CasADi::SQPI |
 |              |              |              | parameter,   | nternal      |
@@ -80906,24 +80770,18 @@ Constructor. ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -82014,24 +81872,18 @@ Return a string with a destription (for SWIG) ";
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -83272,24 +83124,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -84158,24 +84004,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
@@ -87225,21 +87065,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 | ad_mode      | OT_STRING    | automatic    | How to       | CasADi::Worh |
 |              |              |              | calculate    | pInternal    |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
+|              |              |              | Jacobians.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | eps          | OT_REAL      | 0.000        | Machine      | CasADi::Worh |
 |              |              |              | epsilon      | pInternal    |
@@ -87412,6 +87238,196 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | about        |              |
 |              |              |              | execution    |              |
 |              |              |              | time         |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipBarrier | OT_REAL      | 7.800        | IP barrier   | CasADi::Worh |
+|              |              |              | parameter.   | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipComTol  | OT_REAL      | 0.000        | IP complemen | CasADi::Worh |
+|              |              |              | tarity       | pInternal    |
+|              |              |              | tolerance.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipFracBou | OT_REAL      | 0.880        | IP fraction- | CasADi::Worh |
+| nd           |              |              | to-the-      | pInternal    |
+|              |              |              | boundary     |              |
+|              |              |              | parameter.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipLsMetho | OT_STRING    | None         | Select the   | CasADi::Worh |
+| d            |              |              | direct       | pInternal    |
+|              |              |              | linear       |              |
+|              |              |              | solver used  |              |
+|              |              |              | by the IP    |              |
+|              |              |              | method.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipMinAlph | OT_REAL      | 0.000        | IP line      | CasADi::Worh |
+| a            |              |              | search       | pInternal    |
+|              |              |              | minimum step |              |
+|              |              |              | size.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipRelaxDi | OT_REAL      | 2            | The          | CasADi::Worh |
+| v            |              |              | relaxation   | pInternal    |
+|              |              |              | term is      |              |
+|              |              |              | divided by   |              |
+|              |              |              | this value   |              |
+|              |              |              | if           |              |
+|              |              |              | successful.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipRelaxMa | OT_REAL      | 0.000        | Maximum      | CasADi::Worh |
+| x            |              |              | relaxation   | pInternal    |
+|              |              |              | value.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipRelaxMi | OT_REAL      | 0.000        | Mimimum      | CasADi::Worh |
+| n            |              |              | relaxation   | pInternal    |
+|              |              |              | value.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipRelaxMu | OT_REAL      | 10           | The          | CasADi::Worh |
+| lt           |              |              | relaxation   | pInternal    |
+|              |              |              | term is      |              |
+|              |              |              | multiplied   |              |
+|              |              |              | by this      |              |
+|              |              |              | value if uns |              |
+|              |              |              | uccessful.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipResTol  | OT_REAL      | 0.000        | IP residuals | CasADi::Worh |
+|              |              |              | tolerance.   | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipTryRela | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| x            |              |              | relaxation   | pInternal    |
+|              |              |              | strategy     |              |
+|              |              |              | when         |              |
+|              |              |              | encountering |              |
+|              |              |              | an error.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsItMaxIt | OT_INTEGER   | 1000         | Maximum      | CasADi::Worh |
+| er           |              |              | number of    | pInternal    |
+|              |              |              | iterations   |              |
+|              |              |              | of the       |              |
+|              |              |              | iterative    |              |
+|              |              |              | linear       |              |
+|              |              |              | solvers.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsItMetho | OT_STRING    | None         | Select the   | CasADi::Worh |
+| d            |              |              | iterative    | pInternal    |
+|              |              |              | linear       |              |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsItPreco | OT_STRING    | None         | Select preco | CasADi::Worh |
+| ndMethod     |              |              | nditioner    | pInternal    |
+|              |              |              | for the      |              |
+|              |              |              | iterative    |              |
+|              |              |              | linear       |              |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsRefineM | OT_INTEGER   | 10           | Maximum      | CasADi::Worh |
+| axIter       |              |              | number of    | pInternal    |
+|              |              |              | iterative    |              |
+|              |              |              | refinement   |              |
+|              |              |              | steps of the |              |
+|              |              |              | direct       |              |
+|              |              |              | linear       |              |
+|              |              |              | solvers.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsScale   | OT_BOOLEAN   | True         | Enables      | CasADi::Worh |
+|              |              |              | scaling on   | pInternal    |
+|              |              |              | linear       |              |
+|              |              |              | solver       |              |
+|              |              |              | level.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsTol     | OT_REAL      | 0.000        | Tolerance    | CasADi::Worh |
+|              |              |              | for the      | pInternal    |
+|              |              |              | linear       |              |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsTrySimp | OT_BOOLEAN   | False        | Some         | CasADi::Worh |
+| le           |              |              | matrices can | pInternal    |
+|              |              |              | be solved    |              |
+|              |              |              | without      |              |
+|              |              |              | calling a    |              |
+|              |              |              | linear       |              |
+|              |              |              | equation sol |              |
+|              |              |              | ver.Currentl |              |
+|              |              |              | y only       |              |
+|              |              |              | diagonal     |              |
+|              |              |              | matrices are |              |
+|              |              |              | supported.   |              |
+|              |              |              | Non-diagonal |              |
+|              |              |              | matrices     |              |
+|              |              |              | will         |              |
+|              |              |              | besolved     |              |
+|              |              |              | with the     |              |
+|              |              |              | chosen       |              |
+|              |              |              | linear       |              |
+|              |              |              | equation     |              |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_maxIter   | OT_INTEGER   | 80           | Imposes an   | CasADi::Worh |
+|              |              |              | upper limit  | pInternal    |
+|              |              |              | on the       |              |
+|              |              |              | number of    |              |
+|              |              |              | minor solver |              |
+|              |              |              | iterations,  |              |
+|              |              |              | i.e. for     |              |
+|              |              |              | thequadratic |              |
+|              |              |              | subproblem   |              |
+|              |              |              | solver. If   |              |
+|              |              |              | the limit is |              |
+|              |              |              | reached      |              |
+|              |              |              | before conve |              |
+|              |              |              | rgence,WORHP |              |
+|              |              |              | will         |              |
+|              |              |              | activate QP  |              |
+|              |              |              | recovery     |              |
+|              |              |              | strategies   |              |
+|              |              |              | to prevent a |              |
+|              |              |              | solver       |              |
+|              |              |              | breakdown.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_method    | OT_STRING    | None         | Select the   | CasADi::Worh |
+|              |              |              | solution     | pInternal    |
+|              |              |              | method used  |              |
+|              |              |              | by the QP    |              |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnBeta   | OT_REAL      | 0.900        | NSN stepsize | CasADi::Worh |
+|              |              |              | decrease     | pInternal    |
+|              |              |              | factor.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnGradSt | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| ep           |              |              | gradient     | pInternal    |
+|              |              |              | steps in the |              |
+|              |              |              | NSN method.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnKKT    | OT_REAL      | 0.000        | NSN KKT      | CasADi::Worh |
+|              |              |              | tolerance.   | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnLsMeth | OT_STRING    | None         | Select the   | CasADi::Worh |
+| od           |              |              | direct       | pInternal    |
+|              |              |              | linear       |              |
+|              |              |              | solver used  |              |
+|              |              |              | by the NSN   |              |
+|              |              |              | method.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnMinAlp | OT_REAL      | 0.000        | NSN line     | CasADi::Worh |
+| ha           |              |              | search       | pInternal    |
+|              |              |              | minimum step |              |
+|              |              |              | size.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnSigma  | OT_REAL      | 0.010        | NSN line     | CasADi::Worh |
+|              |              |              | search slope | pInternal    |
+|              |              |              | parameter.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_printLeve | OT_STRING    | None         | Controls the | CasADi::Worh |
+| l            |              |              | amount of QP | pInternal    |
+|              |              |              | solver       |              |
+|              |              |              | output.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_scaleInte | OT_BOOLEAN   | False        | Enable       | CasADi::Worh |
+| rn           |              |              | scaling on   | pInternal    |
+|              |              |              | QP level.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_strict    | OT_BOOLEAN   | True         | Use strict   | CasADi::Worh |
+|              |              |              | termination  | pInternal    |
+|              |              |              | criteria in  |              |
+|              |              |              | IP method.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | True         | Throw        | CasADi::Worh |
 | heck         |              |              | exceptions   | pInternal    |
@@ -88737,21 +88753,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 | ad_mode      | OT_STRING    | automatic    | How to       | CasADi::Worh |
 |              |              |              | calculate    | pInternal    |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
+|              |              |              | Jacobians.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | eps          | OT_REAL      | 0.000        | Machine      | CasADi::Worh |
 |              |              |              | epsilon      | pInternal    |
@@ -88924,6 +88926,196 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | about        |              |
 |              |              |              | execution    |              |
 |              |              |              | time         |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipBarrier | OT_REAL      | 7.800        | IP barrier   | CasADi::Worh |
+|              |              |              | parameter.   | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipComTol  | OT_REAL      | 0.000        | IP complemen | CasADi::Worh |
+|              |              |              | tarity       | pInternal    |
+|              |              |              | tolerance.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipFracBou | OT_REAL      | 0.880        | IP fraction- | CasADi::Worh |
+| nd           |              |              | to-the-      | pInternal    |
+|              |              |              | boundary     |              |
+|              |              |              | parameter.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipLsMetho | OT_STRING    | None         | Select the   | CasADi::Worh |
+| d            |              |              | direct       | pInternal    |
+|              |              |              | linear       |              |
+|              |              |              | solver used  |              |
+|              |              |              | by the IP    |              |
+|              |              |              | method.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipMinAlph | OT_REAL      | 0.000        | IP line      | CasADi::Worh |
+| a            |              |              | search       | pInternal    |
+|              |              |              | minimum step |              |
+|              |              |              | size.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipRelaxDi | OT_REAL      | 2            | The          | CasADi::Worh |
+| v            |              |              | relaxation   | pInternal    |
+|              |              |              | term is      |              |
+|              |              |              | divided by   |              |
+|              |              |              | this value   |              |
+|              |              |              | if           |              |
+|              |              |              | successful.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipRelaxMa | OT_REAL      | 0.000        | Maximum      | CasADi::Worh |
+| x            |              |              | relaxation   | pInternal    |
+|              |              |              | value.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipRelaxMi | OT_REAL      | 0.000        | Mimimum      | CasADi::Worh |
+| n            |              |              | relaxation   | pInternal    |
+|              |              |              | value.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipRelaxMu | OT_REAL      | 10           | The          | CasADi::Worh |
+| lt           |              |              | relaxation   | pInternal    |
+|              |              |              | term is      |              |
+|              |              |              | multiplied   |              |
+|              |              |              | by this      |              |
+|              |              |              | value if uns |              |
+|              |              |              | uccessful.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipResTol  | OT_REAL      | 0.000        | IP residuals | CasADi::Worh |
+|              |              |              | tolerance.   | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| qp_ipTryRela | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| x            |              |              | relaxation   | pInternal    |
+|              |              |              | strategy     |              |
+|              |              |              | when         |              |
+|              |              |              | encountering |              |
+|              |              |              | an error.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsItMaxIt | OT_INTEGER   | 1000         | Maximum      | CasADi::Worh |
+| er           |              |              | number of    | pInternal    |
+|              |              |              | iterations   |              |
+|              |              |              | of the       |              |
+|              |              |              | iterative    |              |
+|              |              |              | linear       |              |
+|              |              |              | solvers.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsItMetho | OT_STRING    | None         | Select the   | CasADi::Worh |
+| d            |              |              | iterative    | pInternal    |
+|              |              |              | linear       |              |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsItPreco | OT_STRING    | None         | Select preco | CasADi::Worh |
+| ndMethod     |              |              | nditioner    | pInternal    |
+|              |              |              | for the      |              |
+|              |              |              | iterative    |              |
+|              |              |              | linear       |              |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsRefineM | OT_INTEGER   | 10           | Maximum      | CasADi::Worh |
+| axIter       |              |              | number of    | pInternal    |
+|              |              |              | iterative    |              |
+|              |              |              | refinement   |              |
+|              |              |              | steps of the |              |
+|              |              |              | direct       |              |
+|              |              |              | linear       |              |
+|              |              |              | solvers.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsScale   | OT_BOOLEAN   | True         | Enables      | CasADi::Worh |
+|              |              |              | scaling on   | pInternal    |
+|              |              |              | linear       |              |
+|              |              |              | solver       |              |
+|              |              |              | level.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsTol     | OT_REAL      | 0.000        | Tolerance    | CasADi::Worh |
+|              |              |              | for the      | pInternal    |
+|              |              |              | linear       |              |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_lsTrySimp | OT_BOOLEAN   | False        | Some         | CasADi::Worh |
+| le           |              |              | matrices can | pInternal    |
+|              |              |              | be solved    |              |
+|              |              |              | without      |              |
+|              |              |              | calling a    |              |
+|              |              |              | linear       |              |
+|              |              |              | equation sol |              |
+|              |              |              | ver.Currentl |              |
+|              |              |              | y only       |              |
+|              |              |              | diagonal     |              |
+|              |              |              | matrices are |              |
+|              |              |              | supported.   |              |
+|              |              |              | Non-diagonal |              |
+|              |              |              | matrices     |              |
+|              |              |              | will         |              |
+|              |              |              | besolved     |              |
+|              |              |              | with the     |              |
+|              |              |              | chosen       |              |
+|              |              |              | linear       |              |
+|              |              |              | equation     |              |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_maxIter   | OT_INTEGER   | 80           | Imposes an   | CasADi::Worh |
+|              |              |              | upper limit  | pInternal    |
+|              |              |              | on the       |              |
+|              |              |              | number of    |              |
+|              |              |              | minor solver |              |
+|              |              |              | iterations,  |              |
+|              |              |              | i.e. for     |              |
+|              |              |              | thequadratic |              |
+|              |              |              | subproblem   |              |
+|              |              |              | solver. If   |              |
+|              |              |              | the limit is |              |
+|              |              |              | reached      |              |
+|              |              |              | before conve |              |
+|              |              |              | rgence,WORHP |              |
+|              |              |              | will         |              |
+|              |              |              | activate QP  |              |
+|              |              |              | recovery     |              |
+|              |              |              | strategies   |              |
+|              |              |              | to prevent a |              |
+|              |              |              | solver       |              |
+|              |              |              | breakdown.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_method    | OT_STRING    | None         | Select the   | CasADi::Worh |
+|              |              |              | solution     | pInternal    |
+|              |              |              | method used  |              |
+|              |              |              | by the QP    |              |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnBeta   | OT_REAL      | 0.900        | NSN stepsize | CasADi::Worh |
+|              |              |              | decrease     | pInternal    |
+|              |              |              | factor.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnGradSt | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| ep           |              |              | gradient     | pInternal    |
+|              |              |              | steps in the |              |
+|              |              |              | NSN method.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnKKT    | OT_REAL      | 0.000        | NSN KKT      | CasADi::Worh |
+|              |              |              | tolerance.   | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnLsMeth | OT_STRING    | None         | Select the   | CasADi::Worh |
+| od           |              |              | direct       | pInternal    |
+|              |              |              | linear       |              |
+|              |              |              | solver used  |              |
+|              |              |              | by the NSN   |              |
+|              |              |              | method.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnMinAlp | OT_REAL      | 0.000        | NSN line     | CasADi::Worh |
+| ha           |              |              | search       | pInternal    |
+|              |              |              | minimum step |              |
+|              |              |              | size.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_nsnSigma  | OT_REAL      | 0.010        | NSN line     | CasADi::Worh |
+|              |              |              | search slope | pInternal    |
+|              |              |              | parameter.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_printLeve | OT_STRING    | None         | Controls the | CasADi::Worh |
+| l            |              |              | amount of QP | pInternal    |
+|              |              |              | solver       |              |
+|              |              |              | output.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_scaleInte | OT_BOOLEAN   | False        | Enable       | CasADi::Worh |
+| rn           |              |              | scaling on   | pInternal    |
+|              |              |              | QP level.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_strict    | OT_BOOLEAN   | True         | Use strict   | CasADi::Worh |
+|              |              |              | termination  | pInternal    |
+|              |              |              | criteria in  |              |
+|              |              |              | IP method.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | True         | Throw        | CasADi::Worh |
 | heck         |              |              | exceptions   | pInternal    |
@@ -89659,24 +89851,18 @@ Joel Andersson
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
 |              |              |              | decides      |              |
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
 |              |              |              | indicate     | ternal       |
