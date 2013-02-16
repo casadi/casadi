@@ -240,7 +240,7 @@ namespace CasADi{
   void CodeGenerator::auxSign(){
     stringstream& s = auxiliaries_;
 
-    s << "inline double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl;
+    s << "inline d sign(d x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl;
     s << endl;
   }
 
