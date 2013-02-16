@@ -45,7 +45,7 @@ int usage_c_known_signature(){
   printf("\n");
 
   /* Signature of the entry point */
-  typedef int (*evaluatePtr)(const double* x0, const double* x1, double* r0, double* r1);
+  typedef void (*evaluatePtr)(const double* x0, const double* x1, double* r0, double* r1);
   
   /* Handle to the dll */
   void* handle;
