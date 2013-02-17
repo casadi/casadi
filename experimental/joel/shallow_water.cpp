@@ -64,6 +64,21 @@ public:
   // Evaluate the residual function
   void eval_res();
 
+  // Form the condensed QP
+  void eval_qpf();
+
+  // Regularize the condensed QP
+  void regularize();
+
+  // Solve the QP to get the (full) step
+  void solve_qp();
+
+  // Perform the line-search to take the step
+  void line_search(int& ls_iter, bool& ls_success);
+
+  // Evaluate the step expansion
+  void eval_exp();
+
   // Dimensions
   int n_boxes_;
   int n_euler_;
@@ -126,21 +141,21 @@ public:
   double obj_k_;
 
   // Simple and nonlinear bounds
-  vector<double> lbu_, ubu_, g_, lbg_, ubg_;
+  vector<double> lbu_, ubu_, g_, lbg_, ubg_, gL_;
 
   /// Multipliers for the nonlinear bounds
   vector<double> lambda_g_, dlambda_g_;
 
   int res_lam_g_;
-  int res_obj_, res_g_;
+  int res_obj_, res_gl_, res_g_;
 
   int z_lam_g_;
   int z_obj_, z_gl_, z_g_;
 
   int qpf_lam_g_;
 
-  int e_du_, e_dlam_g_, e_lam_g_;
-  int e_osens_;
+  int exp_du_, exp_dlam_g_, exp_lam_g_;
+  int exp_osens_;
 
   struct Var{
     int n;
@@ -153,14 +168,20 @@ public:
 
     int qpf_var, qpf_lam, qpf_res, qpf_resL;
 
-    int e_var, e_lam;
-    int e_exp, e_expL;
+    int exp_var, exp_lam;
+    int exp_def, exp_defL;
 
     vector<double> step, init, opt, lam, dlam;
     vector<double> res, resL;
     
   };
   vector<Var> x_;  
+
+  // Best merit function encountered so far
+  double meritmax_;
+  
+  // Penalty parameter of merit function
+  double sigma_;
 };
 
 void Tester::model(){
@@ -464,6 +485,7 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
   lbg_.resize(ng_,-numeric_limits<double>::infinity());
   ubg_.resize(ng_, numeric_limits<double>::infinity());
   g_.resize(ng_, numeric_limits<double>::quiet_NaN());
+  gL_.resize(ngL_, numeric_limits<double>::quiet_NaN());
   if(!gauss_newton_){
     lambda_g_.resize(ng_,0);
     dlambda_g_.resize(ng_,0);
@@ -550,6 +572,9 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
   vector<MX> res_fcn_out;
   n=0;
   res_fcn_out.push_back(obj);               res_obj_ = n++;
+  if(!gauss_newton_){
+    res_fcn_out.push_back(lam_con[0]);      res_gl_ = n++;
+  }
   res_fcn_out.push_back(con[0]);            res_g_ = n++;
   for(int i=1; i<x_.size(); ++i){
     res_fcn_out.push_back(con[i]-var[i]);   x_[i].res_d = n++;
@@ -687,28 +712,28 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
   vector<MX> exp_fcn_in;
   n=0;
   if(!gauss_newton_){
-    exp_fcn_in.push_back(lam_g);                         e_lam_g_ = n++;
+    exp_fcn_in.push_back(lam_g);                         exp_lam_g_ = n++;
   }
-  exp_fcn_in.push_back(du);                              e_du_ = n++;
+  exp_fcn_in.push_back(du);                              exp_du_ = n++;
   if(!gauss_newton_){
-    exp_fcn_in.push_back(dlam_g);                        e_dlam_g_ = n++;
+    exp_fcn_in.push_back(dlam_g);                        exp_dlam_g_ = n++;
   }
   
   for(int i=0; i<x_.size(); ++i){
-    exp_fcn_in.push_back(   i==0 ? var[0] :     d[i-1]);   x_[i].e_var = n++;
+    exp_fcn_in.push_back(   i==0 ? var[0] :     d[i-1]);   x_[i].exp_var = n++;
     if(!gauss_newton_){
-      exp_fcn_in.push_back( i==0 ? lam[0] : lam_d[i-1]);   x_[i].e_lam = n++;
+      exp_fcn_in.push_back( i==0 ? lam[0] : lam_d[i-1]);   x_[i].exp_lam = n++;
     }
   }
   
   // Step expansion function outputs
   vector<MX> exp_fcn_out;
   n=0;
-  exp_fcn_out.push_back(Z_fwdSens[0][z_obj_]);           e_osens_ = n++;
+  exp_fcn_out.push_back(Z_fwdSens[0][z_obj_]);           exp_osens_ = n++;
   for(int i=1; i<x_.size(); ++i){
-    exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_def]);    x_[i].e_exp = n++;
+    exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_def]);    x_[i].exp_def = n++;
     if(!gauss_newton_){
-      exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_defL]); x_[i].e_expL = n++;
+      exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_defL]); x_[i].exp_defL = n++;
     }
   }
     
@@ -918,11 +943,9 @@ void Tester::solve(int& iter_count){
   // Objective value
   obj_k_ = numeric_limits<double>::quiet_NaN();
 
-  // Best merit function encountered so far
-  double meritmax = numeric_limits<double>::infinity();
-  
-  // Penalty parameter of merit function
-  double sigma_ = 0;
+  // Reset line-search
+  meritmax_ = numeric_limits<double>::infinity();
+  sigma_ = 0;
 
   // Current guess for the primal solution
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
@@ -934,224 +957,24 @@ void Tester::solve(int& iter_count){
 
   int k=0;  
   while(true){
-    
-    // Pass primal variables to the linearization function
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      qp_fcn_.setInput(it->opt,it->qpf_var);
-      if(!gauss_newton_){
-	qp_fcn_.setInput(it->lam,it->qpf_lam);	
-      }
-    }
-    
-    // Pass dual variables to the linearization function
-    if(!gauss_newton_){
-      qp_fcn_.setInput(lambda_g_,qpf_lam_g_);
+    // Form the condensed QP
+    eval_qpf();
+
+    // Regularize the QP
+    if(regularization_){
+      regularize();
     }
 
-    // Pass residual
-    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
-      qp_fcn_.setInput(it->res, it->qpf_res);
-      if(!gauss_newton_){
-	qp_fcn_.setInput(it->resL,it->qpf_resL);
-      }
-    }
-
-    // Evaluate to get QP
-    qp_fcn_.evaluate();
-    
-    // QP
-    DMatrix& qpH = qp_fcn_.output(QPF_H);
-    const DMatrix& qpG = qp_fcn_.output(QPF_G);
-    const DMatrix& qpA = qp_fcn_.output(QPF_A);
-    const DMatrix& qpB = qp_fcn_.output(QPF_B);
-
-    // Regularization
-    double reg = 0;
-    
-    // Check the smallest eigenvalue of the Hessian
-    if(regularization_ && x_[0].n==2){
-      double a = qpH.elem(0,0);
-      double b = qpH.elem(0,1);
-      double c = qpH.elem(1,0);
-      double d = qpH.elem(1,1);
-      
-      // Make sure no not a numbers
-      casadi_assert(a==a && b==b && c==c &&  d==d);
-      
-      // Make sure symmetric
-      if(b!=c){
-	casadi_assert_warning(fabs(b-c)<1e-10,"Hessian is not symmetric: " << b << " != " << c);
-	qpH.elem(1,0) = c = b;
-      }
-      
-      double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
-      if(eig_smallest<reg_threshold_){
-	// Regularization
-	reg = reg_threshold_-eig_smallest;
-	std::cerr << "Regularization with " << reg << " to ensure positive definite Hessian." << endl;
-	qpH(0,0) += reg;
-	qpH(1,1) += reg;
-      }
-    }
-    
-    // Solve the QP
-    qp_solver_.setInput(qpH,QP_H);
-    qp_solver_.setInput(qpG,QP_G);
-    qp_solver_.setInput(qpA,QP_A);
-    std::transform(lbu_.begin(),lbu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
-    std::transform(ubu_.begin(),ubu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
-
-
-    //    std::transform(lbg_.begin(),lbg_.end(), qpB.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
-    std::transform(ubg_.begin(),ubg_.end(), qpB.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
-
-    //    cout << "lba = " << qp_solver_.input(QP_LBA).data() << endl;
-    //    cout << "uba = " << qp_solver_.input(QP_UBA).data() << endl;
-
-    qp_solver_.evaluate();
-    
-    // Condensed step
-    const DMatrix& du = qp_solver_.output(QP_PRIMAL);
-    copy(du.begin(),du.end(),x_[0].step.begin());
-
-    if(!gauss_newton_){
-      const DMatrix& lam_g_new = qp_solver_.output(QP_LAMBDA_A);
-      copy(lam_g_new.begin(),lam_g_new.end(),dlambda_g_.begin());
-      std::transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),dlambda_g_.begin(),std::minus<double>());
-
-      const DMatrix& dlam_u = qp_solver_.output(QP_LAMBDA_X);
-      copy(dlam_u.begin(),dlam_u.end(),x_[0].dlam.begin());
-    }
+    // Solve the condensed QP
+    solve_qp();
 
     // Expand the step
-    exp_fcn_.setInput(du,e_du_);
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      if(it==x_.begin()){
-	exp_fcn_.setInput(it->opt,it->e_var);
-      } else {
-	exp_fcn_.setInput(it->res,it->e_var);
-      }
-    }
-    
-    if(!gauss_newton_){
-      exp_fcn_.setInput(dlambda_g_,e_dlam_g_);
-      exp_fcn_.setInput(lambda_g_,e_lam_g_);
-      for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-	if(it==x_.begin()){
-	  exp_fcn_.setInput(it->lam,it->e_lam);
-	} else {
-	  exp_fcn_.setInput(it->resL,it->e_lam);
-	}
-      }
-    }
-    exp_fcn_.evaluate();
-    
-    // Expanded primal step
-    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
-      const DMatrix& dv = exp_fcn_.output(it->e_exp);
-      copy(dv.begin(),dv.end(),it->step.begin());
-    }
-    
-    // Expanded dual step
-    if(!gauss_newton_){
-      for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
-	const DMatrix& dlam_v = exp_fcn_.output(it->e_expL);
-	copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
-      }
-    }
+    eval_exp();
   
-    // Calculate penalty parameter of merit function
-    sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_X).data()));
-    sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_A).data()));
-
-    // Calculate L1-merit function in the actual iterate
-    double l1_infeas = primalInfeasibility();
-
-    // Right-hand side of Armijo condition
-    double F_sens = exp_fcn_.output(e_osens_).toScalar();
-    double L1dir = F_sens - sigma_ * l1_infeas;
-    double L1merit = obj_k_ + sigma_ * l1_infeas;
-    
-    // Store the actual merit function
-    if(L1merit<meritmax){
-      meritmax = L1merit;
-    }
-
-    // Stepsize
-    double t = 1.0, t_prev = 0.0;
-    double fk_cand;
-
-    // Merit function value in candidate
-    double L1merit_cand = 0;
-    
-    // Reset line-search counter, success marker
-    int ls_iter = 0;
-    bool ls_success = false;
-    int maxiter_ls_ = 1;
-    
-    // Line-search parameter, restoration factor of stepsize
-    double beta_ = 0.8;
-
-    // Armijo condition, coefficient of decrease in merit
-    double c1_ = 1e-4;
-
-    // Line-search
-    //log("Starting line-search");
-      
-    // Line-search loop
-    while (true){
-     
-      // Take the primal step
-      for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-	for(int i=0; i<it->n; ++i){
-	  it->opt[i] += (t-t_prev) * it->step[i];
-	}
-      }
-      
-      // Take the dual step
-      if(!gauss_newton_){
-	for(int i=0; i<ng_; ++i){
-	  lambda_g_[i] += (t-t_prev) * dlambda_g_[i];
-	}
-	for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-	  if(it==x_.begin()){
-	    //copy(it->dlam.begin(),it->dlam.end(),it->lam.begin()); // BUG?
-	  } else {
-	    for(int i=0; i<it->n; ++i){
-	      it->lam[i] += (t-t_prev) * it->dlam[i];
-	    }
-	  }
-	}
-      }
-      
-      // Evaluate residual function to get objective and constraints (and residuals for the next iteration)
-      eval_res();
-      ls_iter++;      
-      
-      // Calculating merit-function in candidate
-      l1_infeas = primalInfeasibility();
-      L1merit_cand = obj_k_ + sigma_ * l1_infeas;
-
-      // Calculating maximal merit function value so far
-      if (L1merit_cand <= meritmax + t * c1_ * L1dir){
-	
-	// Accepting candidate
-	ls_success = true;
-	//log("Line-search completed, candidate accepted");
-	break;
-      }
-      
-      // Line-search not successful, but we accept it.
-      if(ls_iter == maxiter_ls_){
-	//log("Line-search completed, maximum number of iterations");
-	break;
-      }
-      
-      // Backtracking
-      t_prev = t;
-      t = beta_ * t;
-    }
-
+    // Line-search to take the step
+    int ls_iter;
+    bool ls_success;
+    line_search(ls_iter, ls_success);
 
     // Step size
     double norm_step=0;
@@ -1257,6 +1080,11 @@ void Tester::eval_res(){
   // Get objective
   obj_k_ = res_fcn_.output(res_obj_).toScalar();
 
+  // Get objective gradient
+  if(!gauss_newton_){
+    res_fcn_.getOutput(gL_,res_gl_);
+  }
+
   // Get constraints
   res_fcn_.getOutput(g_,res_g_);
 
@@ -1267,6 +1095,238 @@ void Tester::eval_res(){
       res_fcn_.getOutput(it->resL, it->res_lam_d);
     }
   }
+}
+
+void Tester::eval_qpf(){
+  // Pass primal variables to the linearization function
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    qp_fcn_.setInput(it->opt,it->qpf_var);
+    if(!gauss_newton_){
+      qp_fcn_.setInput(it->lam,it->qpf_lam);	
+    }
+  }
+  
+  // Pass dual variables to the linearization function
+  if(!gauss_newton_){
+    qp_fcn_.setInput(lambda_g_,qpf_lam_g_);
+  }
+  
+  // Pass residual
+  for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+    qp_fcn_.setInput(it->res, it->qpf_res);
+    if(!gauss_newton_){
+      qp_fcn_.setInput(it->resL,it->qpf_resL);
+    }
+  }
+  
+  // Evaluate to get QP
+  qp_fcn_.evaluate();
+}
+
+void Tester::regularize(){
+  casadi_assert(x_[0].n==2);
+
+  DMatrix& qpH = qp_fcn_.output(QPF_H);
+  
+  // Regularization
+  double reg = 0;
+  
+  // Check the smallest eigenvalue of the Hessian
+  double a = qpH.elem(0,0);
+  double b = qpH.elem(0,1);
+  double c = qpH.elem(1,0);
+  double d = qpH.elem(1,1);
+  
+  // Make sure no not a numbers
+  casadi_assert(a==a && b==b && c==c &&  d==d);
+  
+  // Make sure symmetric
+  if(b!=c){
+    casadi_assert_warning(fabs(b-c)<1e-10,"Hessian is not symmetric: " << b << " != " << c);
+    qpH.elem(1,0) = c = b;
+  }
+  
+  double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
+  if(eig_smallest<reg_threshold_){
+    // Regularization
+    reg = reg_threshold_-eig_smallest;
+    std::cerr << "Regularization with " << reg << " to ensure positive definite Hessian." << endl;
+    qpH(0,0) += reg;
+    qpH(1,1) += reg;
+  }
+}
+
+void Tester::solve_qp(){
+  // QP
+  const DMatrix& qpH = qp_fcn_.output(QPF_H);
+  const DMatrix& qpG = qp_fcn_.output(QPF_G);
+  const DMatrix& qpA = qp_fcn_.output(QPF_A);
+  const DMatrix& qpB = qp_fcn_.output(QPF_B);
+  
+  // Solve the QP
+  qp_solver_.setInput(qpH,QP_H);
+  qp_solver_.setInput(qpG,QP_G);
+  qp_solver_.setInput(qpA,QP_A);
+  std::transform(lbu_.begin(),lbu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
+  std::transform(ubu_.begin(),ubu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
+  
+  
+  //    std::transform(lbg_.begin(),lbg_.end(), qpB.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
+  std::transform(ubg_.begin(),ubg_.end(), qpB.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
+  
+  //    cout << "lba = " << qp_solver_.input(QP_LBA).data() << endl;
+  //    cout << "uba = " << qp_solver_.input(QP_UBA).data() << endl;
+  
+  qp_solver_.evaluate();
+  
+  // Condensed step
+  const DMatrix& du = qp_solver_.output(QP_PRIMAL);
+  copy(du.begin(),du.end(),x_[0].step.begin());
+  
+  if(!gauss_newton_){
+    const DMatrix& lam_g_new = qp_solver_.output(QP_LAMBDA_A);
+    copy(lam_g_new.begin(),lam_g_new.end(),dlambda_g_.begin());
+    std::transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),dlambda_g_.begin(),std::minus<double>());
+    
+    const DMatrix& dlam_u = qp_solver_.output(QP_LAMBDA_X);
+    copy(dlam_u.begin(),dlam_u.end(),x_[0].dlam.begin());
+  }  
+}
+
+void Tester::line_search(int& ls_iter, bool& ls_success){
+  // Calculate penalty parameter of merit function
+  sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_X).data()));
+  sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_A).data()));
+  
+  // Calculate L1-merit function in the actual iterate
+  double l1_infeas = primalInfeasibility();
+  
+  // Right-hand side of Armijo condition
+  double F_sens = exp_fcn_.output(exp_osens_).toScalar();
+  double L1dir = F_sens - sigma_ * l1_infeas;
+  double L1merit = obj_k_ + sigma_ * l1_infeas;
+  
+  // Store the actual merit function
+  if(L1merit<meritmax_){
+    meritmax_ = L1merit;
+  }
+  
+  // Stepsize
+  double t = 1.0, t_prev = 0.0;
+  double fk_cand;
+  
+  // Merit function value in candidate
+  double L1merit_cand = 0;
+  
+  // Reset line-search counter, success marker
+  ls_iter = 0;
+  ls_success = false;
+  int maxiter_ls_ = 1;
+  
+  // Line-search parameter, restoration factor of stepsize
+  double beta_ = 0.8;
+  
+  // Armijo condition, coefficient of decrease in merit
+  double c1_ = 1e-4;
+  
+  // Line-search
+  //log("Starting line-search");
+  
+  // Line-search loop
+  while (true){
+    
+    // Take the primal step
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      for(int i=0; i<it->n; ++i){
+	it->opt[i] += (t-t_prev) * it->step[i];
+      }
+    }
+    
+    // Take the dual step
+    if(!gauss_newton_){
+      for(int i=0; i<ng_; ++i){
+	lambda_g_[i] += (t-t_prev) * dlambda_g_[i];
+      }
+      for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+	if(it==x_.begin()){
+	  //copy(it->dlam.begin(),it->dlam.end(),it->lam.begin()); // BUG?
+	} else {
+	  for(int i=0; i<it->n; ++i){
+	    it->lam[i] += (t-t_prev) * it->dlam[i];
+	  }
+	}
+      }
+    }
+    
+    // Evaluate residual function to get objective and constraints (and residuals for the next iteration)
+    eval_res();
+    ls_iter++;      
+    
+    // Calculating merit-function in candidate
+    l1_infeas = primalInfeasibility();
+    L1merit_cand = obj_k_ + sigma_ * l1_infeas;
+    
+    // Calculating maximal merit function value so far
+    if (L1merit_cand <= meritmax_ + t * c1_ * L1dir){
+      
+      // Accepting candidate
+      ls_success = true;
+      //log("Line-search completed, candidate accepted");
+      break;
+    }
+    
+    // Line-search not successful, but we accept it.
+    if(ls_iter == maxiter_ls_){
+      //log("Line-search completed, maximum number of iterations");
+      break;
+    }
+    
+    // Backtracking
+    t_prev = t;
+    t = beta_ * t;
+  }
+}
+
+void Tester::eval_exp(){
+  // Pass primal step/variables
+  exp_fcn_.setInput(x_[0].step, exp_du_);
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    if(it==x_.begin()){
+      exp_fcn_.setInput(it->opt,it->exp_var);
+    } else {
+      exp_fcn_.setInput(it->res,it->exp_var);
+    }
+  }
+  
+  // Pass dual step/variables
+  if(!gauss_newton_){
+    exp_fcn_.setInput(dlambda_g_,exp_dlam_g_);
+    exp_fcn_.setInput(lambda_g_,exp_lam_g_);
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      if(it==x_.begin()){
+	exp_fcn_.setInput(it->lam,it->exp_lam);
+      } else {
+	exp_fcn_.setInput(it->resL,it->exp_lam);
+      }
+    }
+  }
+
+  // Perform the step expansion
+  exp_fcn_.evaluate();
+
+  // Expanded primal step
+  for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+    const DMatrix& dv = exp_fcn_.output(it->exp_def);
+    copy(dv.begin(),dv.end(),it->step.begin());
+  }
+  
+  // Expanded dual step
+  if(!gauss_newton_){
+    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+      const DMatrix& dlam_v = exp_fcn_.output(it->exp_defL);
+      copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
+    }
+  }  
 }
 
 void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est){
