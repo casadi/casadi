@@ -898,15 +898,11 @@ void Tester::dynamicCompilation(MXFunction& f, FX& f_gen, std::string fname, std
   }
 
   // C compiler
-#ifdef __APPLE__
-  string compiler = "gcc";
-#else // __APPLE__
   string compiler = "clang";
-#endif // __APPLE__
 
   // Optimization flag
   //string oflag = "-O3";
-  string oflag = "";
+  string oflag = "-O2";
 
   // Flag to get a DLL
 #ifdef __APPLE__
@@ -1218,7 +1214,7 @@ void Tester::line_search(int& ls_iter, bool& ls_success){
   // Reset line-search counter, success marker
   ls_iter = 0;
   ls_success = false;
-  int maxiter_ls_ = 1;
+  int maxiter_ls_ = 3;
   
   // Line-search parameter, restoration factor of stepsize
   double beta_ = 0.8;
@@ -1521,8 +1517,8 @@ int main(){
 
   // Problem size
   // int  n_boxes = 100, n_euler = 100, n_finite_elements = 1, n_meas = 20;
-  //int  n_boxes = 30, n_euler = 40, n_finite_elements = 25, n_meas = 20; // Paper
-  int n_boxes = 15, n_euler = 20, n_finite_elements = 1, n_meas = 20;
+  int  n_boxes = 30, n_euler = 10, n_finite_elements = 10, n_meas = 100; // Paper
+  //  int n_boxes = 15, n_euler = 20, n_finite_elements = 1, n_meas = 20;
 
   // Initial guesses
   vector<double> drag_guess, depth_guess;
