@@ -61,6 +61,9 @@ public:
   // Calculate the L1-norm of the primal infeasibility
   double primalInfeasibility();
 
+  // Calculate the L1-norm of the dual infeasibility
+  double dualInfeasibility();
+
   // Evaluate the residual function
   void eval_res();
 
@@ -78,6 +81,13 @@ public:
 
   // Evaluate the step expansion
   void eval_exp();
+
+  // Print iteration header
+  void printIteration(std::ostream &stream);
+  
+  // Print iteration
+  void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
+                      double reg, int ls_trials, bool ls_success);
 
   // Dimensions
   int n_boxes_;
@@ -182,6 +192,16 @@ public:
   
   // Penalty parameter of merit function
   double sigma_;
+
+  // 1-norm of last primal step
+  double pr_step_;
+  
+  // 1-norm of last dual step
+  double du_step_;
+
+  // Regularization
+  double reg_;
+
 };
 
 void Tester::model(){
@@ -485,7 +505,6 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
   lbg_.resize(ng_,-numeric_limits<double>::infinity());
   ubg_.resize(ng_, numeric_limits<double>::infinity());
   g_.resize(ng_, numeric_limits<double>::quiet_NaN());
-  gL_.resize(ngL_, numeric_limits<double>::quiet_NaN());
   if(!gauss_newton_){
     lambda_g_.resize(ng_,0);
     dlambda_g_.resize(ng_,0);
@@ -552,6 +571,7 @@ void Tester::prepare(bool codegen, bool ipopt_as_qp_solver, bool regularization,
       cout << "Generated the gradient of the Lagrangian." << endl;
     }
   }
+  gL_.resize(ngL_, numeric_limits<double>::quiet_NaN());
 
   // Residual function
 
@@ -951,12 +971,69 @@ void Tester::solve(int& iter_count){
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
     copy(it->init.begin(),it->init.end(),it->opt.begin());
   }
-  
+
   // Initial evaluation of the residual function
   eval_res();
 
-  int k=0;  
+  // Number of SQP iterations
+  int iter = 0;
+
+  // Reset last step-size
+  pr_step_ = 0;
+  du_step_ = 0;
+  
+  // Reset line-search
+  int ls_iter = 0;
+  bool ls_success = true;
+
+  // Reset regularization
+  reg_ = 0;
+
+  // MAIN OPTIMIZATION LOOP
   while(true){
+    
+    // 1-norm of the primal infeasibility
+    double pr_inf = primalInfeasibility();
+    
+    // 1-norm of the dual infeasibility
+    double du_inf = dualInfeasibility();
+    
+    // Print header occasionally
+    if(iter % 10 == 0) printIteration(cout);
+    
+    // Printing information about the actual iterate
+    printIteration(cout,iter,obj_k_,pr_inf,du_inf,reg_,ls_iter,ls_success);
+
+    // Checking convergence criteria
+    double tol_pr_ = 1e-6; // Stopping criterion for primal infeasibility
+    double tol_du_ = 1e-6; // Stopping criterion for dual infeasability
+    bool converged;
+    if(gauss_newton_){
+      converged = iter!=0 && pr_inf < tol_pr_ && pr_step_ < toldx_; // Use step size as stopping criterion
+    } else {
+      converged = pr_inf < tol_pr_ && du_inf < tol_du_ && pr_step_ < toldx_; // Use lagrangian gradient as stopping criterion
+    }
+    if(converged){
+      cout << endl;
+      cout << "CasADi::SCPgen: Convergence achieved after " << iter << " iterations." << endl;
+      break;
+    }
+    
+    if (iter >= maxiter_){
+      cout << endl;
+      cout << "CasADi::SCPgen: Maximum number of iterations reached." << endl;
+      break;
+    }
+
+    // Check if not-a-number
+    if(obj_k_!=obj_k_ || pr_step_ != pr_step_ || pr_inf != pr_inf){
+      cout << "CasADi::SCPgen: Aborted, nan detected" << endl;
+      break;
+    }
+    
+    // Start a new iteration
+    iter++;
+    
     // Form the condensed QP
     eval_qpf();
 
@@ -972,92 +1049,12 @@ void Tester::solve(int& iter_count){
     eval_exp();
   
     // Line-search to take the step
-    int ls_iter;
-    bool ls_success;
     line_search(ls_iter, ls_success);
-
-    // Step size
-    double norm_step=0;
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      for(vector<double>::const_iterator i=it->step.begin(); i!=it->step.end(); ++i){
-	norm_step += *i**i;
-      }
-    }
-    if(!gauss_newton_){
-      for(vector<double>::const_iterator i=dlambda_g_.begin();	i!=dlambda_g_.end(); ++i){
-	norm_step += *i**i;
-      }
-      for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-	for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i){
-	  norm_step += *i**i;
-	}
-      }
-    }
-    norm_step = sqrt(norm_step);
-    
-    // Constraint violation
-    double norm_viol = 0;
-
-    // Variable bounds
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      if(it==x_.begin()){
-
-	// Simple bounds
-	for(int i=0; i<it->n; ++i){
-	  double d = ::fmax(it->opt[i]-ubu_[i],0.) + ::fmax(lbu_[i]-it->opt[i],0.);
-	  norm_viol += d*d;
-	}
-      } else {
-
-	// Lifted variables
-	for(int i=0; i<it->n; ++i){
-	  double d = it->res[i];
-	  norm_viol += d*d;
-	}
-      }
-    }
-
-    // Nonlinear bounds
-    for(int i=0; i<ng_; ++i){
-      double d = ::fmax(g_[i]-ubg_[i],0.) + ::fmax(lbg_[i]-g_[i],0.);
-      norm_viol += d*d;
-    }
-        
-    // Square root to get 2-norm
-    norm_viol = sqrt(norm_viol);
-    
-    // Print progress (including the header every 10 rows)
-    if(k % 10 == 0){
-      cout << setw(4) << "iter" << setw(20) << "objective" << setw(20) << "drag"          << setw(20) << "depth"          << setw(20) << "norm_step" << setw(20) << "norm_viol" << setw(4) << "ls" << endl;
-    }
-    cout   << setw(4) <<     k  << setw(20) <<  obj_k_        << setw(20) << x_[0].opt.at(0) << setw(20) << x_[0].opt.at(1) << setw(20) <<  norm_step  << setw(20) <<  norm_viol << setw(4) << ls_iter << (ls_success ? " " : "f") << endl;
-    
-    
-    // Check if stopping criteria is satisfied
-    if(norm_viol + norm_step < toldx_){
-      cout << "Convergence achieved!" << endl;
-      break;
-    }
-
-    // Check if not-a-number
-    if(obj_k_!=obj_k_ || norm_step != norm_step || norm_viol != norm_viol){
-      cout << "Aborted, nan detected" << endl;
-      break;
-    }
-    
-    // Increase iteration count
-    k = k+1;
-    
-    // Check if number of iterations have been reached
-    if(k >= maxiter_){
-      cout << "Maximum number of iterations (" << maxiter_ << ") reached" << endl;
-      break;
-    }
   }
   
   // Store optimal value
   cout << "optimal cost = " << obj_k_ << endl;
-  iter_count = k;
+  iter_count = iter;
 }
 
 void Tester::eval_res(){
@@ -1129,7 +1126,7 @@ void Tester::regularize(){
   DMatrix& qpH = qp_fcn_.output(QPF_H);
   
   // Regularization
-  double reg = 0;
+  reg_ = 0;
   
   // Check the smallest eigenvalue of the Hessian
   double a = qpH.elem(0,0);
@@ -1149,10 +1146,10 @@ void Tester::regularize(){
   double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
   if(eig_smallest<reg_threshold_){
     // Regularization
-    reg = reg_threshold_-eig_smallest;
-    std::cerr << "Regularization with " << reg << " to ensure positive definite Hessian." << endl;
-    qpH(0,0) += reg;
-    qpH(1,1) += reg;
+    reg_ = reg_threshold_-eig_smallest;
+    std::cerr << "Regularization with " << reg_ << " to ensure positive definite Hessian." << endl;
+    qpH(0,0) += reg_;
+    qpH(1,1) += reg_;
   }
 }
 
@@ -1285,6 +1282,34 @@ void Tester::line_search(int& ls_iter, bool& ls_success){
     t_prev = t;
     t = beta_ * t;
   }
+
+  // Calculate primal step-size
+  pr_step_ = 0;
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    for(vector<double>::const_iterator i=it->step.begin(); i!=it->step.end(); ++i){
+      pr_step_ += fabs(*i);
+    }
+  }
+  pr_step_ *= t;
+
+  // Calculate the dual step-size
+  if(!gauss_newton_){
+    du_step_ = 0;
+    for(vector<double>::const_iterator i=dlambda_g_.begin(); i!=dlambda_g_.end(); ++i){
+      du_step_ += fabs(*i);
+    }
+
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      if(it==x_.begin()){
+	// ?
+      } else {
+	for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i){
+	  du_step_ += fabs(*i);
+	}
+      }
+    }
+    du_step_ *= t;
+  }
 }
 
 void Tester::eval_exp(){
@@ -1409,6 +1434,71 @@ double Tester::primalInfeasibility(){
   return pr_inf;
 }  
 
+double Tester::dualInfeasibility(){
+  // Not implemented for Gauss-Newton
+  if(gauss_newton_) return 0;
+
+  // L1-norm of the dual infeasibility
+  double du_inf = 0;
+  
+  // Lifted variables
+  for(int i=0; i<ngL_; ++i) du_inf += ::fabs(gL_[i]);
+
+  return du_inf;
+}
+
+void Tester::printIteration(std::ostream &stream){
+  stream << setw(4)  << "iter";
+  stream << setw(14) << "objective";
+  stream << setw(11) << "inf_pr";
+  stream << setw(11) << "inf_du";
+  stream << setw(11) << "pr_step";
+  stream << setw(11) << "du_step";
+  stream << setw(8) << "lg(rg)";
+  stream << setw(3) << "ls";
+  stream << ' ';
+
+  // Problem specific: generic functionality needed
+  stream << setw(9) << "drag";
+  stream << setw(9) << "depth";
+
+  stream << endl;
+}
+  
+void Tester::printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, double rg, int ls_trials, bool ls_success){
+  stream << setw(4) << iter;
+  stream << scientific;
+  stream << setw(14) << setprecision(6) << obj;
+  stream << setw(11) << setprecision(2) << pr_inf;
+  stream << setw(11);
+  if(gauss_newton_){
+    stream << "-";
+  } else {
+    stream << setprecision(2) << du_inf;
+  }
+  stream << setw(11) << setprecision(2) << pr_step_;
+  stream << setw(11);
+  if(gauss_newton_){
+    stream << "-";
+  } else {
+    stream << setprecision(2) << du_step_;
+  }
+  stream << fixed;
+  if(rg>0){
+    stream << setw(8) << setprecision(2) << log10(rg);
+  } else {
+    stream << setw(8) << "-";
+  }
+  stream << setw(3) << ls_trials;
+  stream << (ls_success ? ' ' : 'F');
+
+  // Problem specific: generic functionality needed
+  stream << setw(9) << setprecision(3) << x_[0].opt.at(0);
+  stream << setw(9) << setprecision(3) << x_[0].opt.at(1);
+
+  stream << endl;
+}
+
 int main(){
 
   // True parameter values
@@ -1418,7 +1508,7 @@ int main(){
   bool ipopt_as_qp_solver = true;
 
   // Use Gauss-Newton method
-  bool gauss_newton = true;
+  bool gauss_newton = false;
 
   // Codegen the Lifted Newton functions
   bool codegen = false;
