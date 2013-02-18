@@ -106,6 +106,9 @@ public:
   // Generated measurements
   vector<DMatrix> H_meas_;
 
+  // Scaling factors for the parameters
+  vector<double> p_scale_;
+
   // Options
   bool single_shooting_;
   bool verbose_;
@@ -245,11 +248,22 @@ void Tester::model(){
     h0_.elem(i_splash,j_splash) = spheight;
   }
   
-  // Free parameters
-  SX drag("b");
-  SX depth("H");
-  vector<SX> p(2); p[0]=drag; p[1]=depth;
+  // Free parameters (nominal values)
+  SX drag_nom("b");
+  SX depth_nom("H");
+  vector<SX> p(2); p[0]=drag_nom; p[1]=depth_nom;
   
+  // Scaling factors for the parameters
+  double drag_scale = 1;
+  double depth_scale = 0.01;
+  p_scale_.resize(2);
+  p_scale_[0] = drag_scale;
+  p_scale_[1] = depth_scale;
+
+  // Real parameter values
+  SX drag = drag_nom*drag_scale;
+  SX depth = depth_nom*depth_scale;
+
   // The state at a measurement
   SXMatrix uk = ssym("uk",n_boxes_+1, n_boxes_);
   SXMatrix vk = ssym("vk",n_boxes_  , n_boxes_+1);
@@ -368,8 +382,13 @@ void Tester::simulate(double drag_true, double depth_true){
   // Measurements
   H_meas_.reserve(n_meas_);
   
-  // Simulate once to generate "measurements"
+  // Unscaled parameter values
   vector<double> p_true(2); p_true[0]=drag_true; p_true[1]=depth_true;
+  for(int i=0; i<2; ++i){
+    p_true[i] /= p_scale_[i];
+  }
+
+  // Simulate once to generate "measurements"
   f_.setInput(p_true,0);
   f_.setInput(u0_,1);
   f_.setInput(v0_,2);
@@ -1356,8 +1375,8 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   }
   
   // Initial guess
-  x_[0].init[0] = drag_guess;
-  x_[0].init[1] = depth_guess;
+  x_[0].init[0] = drag_guess/p_scale_[0];
+  x_[0].init[1] = depth_guess/p_scale_[1];
 
   if(x_.size()>1){
     // Initialize lifted variables using the generated function
@@ -1382,16 +1401,16 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   }
 
   // Bounds on the variables
-  lbu_.at(0) = 1e-4; // drag positive
-  lbu_.at(1) = 1e-4; // depth positive
+  lbu_.at(0) = 1e-4 / p_scale_[0]; // drag positive
+  lbu_.at(1) = 1e-4 / p_scale_[1]; // depth positive
 
-  ubu_.at(0) = 1e2; // max drag
-  ubu_.at(1) = 1e2; // max depth
+  ubu_.at(0) = 1e2 / p_scale_[0]; // max drag
+  ubu_.at(1) = 1e2 / p_scale_[1]; // max depth
 
   // Constraint bounds
   //  fill(lbg_.begin(),lbg_.end(),0);
 
-    fill(ubg_.begin(),ubg_.end(),10);
+  //    fill(ubg_.begin(),ubg_.end(),10);
 
 
   clock_t time1 = clock();
@@ -1400,8 +1419,8 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   
   // Solution statistics  
   sol_time = double(time2-time1)/CLOCKS_PER_SEC;
-  drag_est = x_[0].opt.at(0);
-  depth_est = x_[0].opt.at(1);
+  drag_est = x_[0].opt.at(0)*p_scale_[0];
+  depth_est = x_[0].opt.at(1)*p_scale_[1];
 }
 
 double Tester::primalInfeasibility(){
@@ -1489,8 +1508,10 @@ void Tester::printIteration(std::ostream &stream, int iter, double obj, double p
   stream << (ls_success ? ' ' : 'F');
 
   // Problem specific: generic functionality needed
-  stream << setw(9) << setprecision(3) << x_[0].opt.at(0);
-  stream << setw(9) << setprecision(3) << x_[0].opt.at(1);
+  stream << setw(9) << setprecision(4) << x_[0].opt.at(0)*p_scale_[0];
+  stream << setw(9) << setprecision(4) << x_[0].opt.at(1)*p_scale_[1];
+
+  stream << scientific;
 
   stream << endl;
 }
