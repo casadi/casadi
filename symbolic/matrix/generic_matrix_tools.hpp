@@ -28,6 +28,7 @@
 #include "nonzeros.hpp"
 #include "crs_sparsity.hpp"
 #include "../casadi_math.hpp"
+#include "../casadi_exception.hpp"
 
 namespace CasADi{
 
@@ -36,6 +37,12 @@ namespace CasADi{
 */
 template<typename T>
 T linspace(const GenericMatrix<T> &a, const GenericMatrix<T> &b, int nsteps);
+
+/** \brief Matlab's cross command
+*/
+template<typename T>
+T cross(const GenericMatrix<T> &a, const GenericMatrix<T> &b, int dim = -1);
+
 
 #ifndef SWIG
 template<typename T>
@@ -54,6 +61,41 @@ T linspace(const GenericMatrix<T> &a_, const GenericMatrix<T> &b_, int nsteps){
 }
 #endif // SWIG
 
+#ifndef SWIG
+template<typename T>
+T cross(const GenericMatrix<T> &a, const GenericMatrix<T> &b, int dim) {
+  casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),"cross(a,b): Inconsistent dimensions. Dimension of a (" << a.dimString() << " ) must equal that of b (" << b.dimString() << ").");
+  
+  casadi_assert_message(a.size1()==3 || a.size2()==3,"cross(a,b): One of the dimensions of a should have length 3, but got " << a.dimString() << ".");
+  casadi_assert_message(dim==-1 || dim==1 || dim==2,"cross(a,b,dim): Dim must be 1, 2 or -1 (automatic).");
+  
+  
+  std::vector<T> ret(3);
+  
+  
+  bool t = a.size1()==3;
+  
+  if (dim==1) t = true;
+  if (dim==2) t = false;
+  
+  T a1 = t ? a(0,ALL) : a(ALL,0);
+  T a2 = t ? a(1,ALL) : a(ALL,1);
+  T a3 = t ? a(2,ALL) : a(ALL,2);
+
+  T b1 = t ? b(0,ALL) : b(ALL,0);
+  T b2 = t ? b(1,ALL) : b(ALL,1);
+  T b3 = t ? b(2,ALL) : b(ALL,2);
+    
+  ret[0] = a2*b3-a3*b2;
+  ret[1] = a3*b1-a1*b3;
+  ret[2] = a1*b2-a2*b1;
+    
+  return t ? vertcat(ret) : horzcat(ret);
+  
+}
+#endif // SWIG
+
+
 } // namespace CasADi
 
 #ifdef SWIG
@@ -65,6 +107,7 @@ T linspace(const GenericMatrix<T> &a_, const GenericMatrix<T> &b_, int nsteps){
 // Define template instanciations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES(T) \
 GMTT_INST(T,linspace) \
+GMTT_INST(T,cross)
 
 #endif //SWIG
 
