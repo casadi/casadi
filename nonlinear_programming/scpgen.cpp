@@ -20,21 +20,34 @@
  *
  */
 
-%{
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/scpgen.hpp"
-#include "nonlinear_programming/ip_method.hpp"
-#include "nonlinear_programming/lifted_sqp.hpp"
-#include "nonlinear_programming/nlp_qp_solver.hpp"
-#include "nonlinear_programming/nlp_implicit_solver.hpp"
-#include "nonlinear_programming/newton_implicit_solver.hpp"
-%}
+#include "scpgen_internal.hpp"
 
-%include "nonlinear_programming/symbolic_nlp.hpp"
-%include "nonlinear_programming/scpgen.hpp"
-%include "nonlinear_programming/ip_method.hpp"
-%include "nonlinear_programming/lifted_sqp.hpp"
-%include "nonlinear_programming/nlp_qp_solver.hpp"
-%include "nonlinear_programming/nlp_implicit_solver.hpp"
-%include "nonlinear_programming/newton_implicit_solver.hpp"
+using namespace std;
+
+namespace CasADi{
+
+SCPgen::SCPgen(){
+}
+  
+SCPgen::SCPgen(const FX& F, const FX& G, const FX& H, const FX& J){
+  assignNode(new SCPgenInternal(F,G,H,J));
+}
+
+SCPgenInternal* SCPgen::operator->(){
+  return static_cast<SCPgenInternal*>(NLPSolver::operator->());
+}
+
+const SCPgenInternal* SCPgen::operator->() const{
+  return static_cast<const SCPgenInternal*>(NLPSolver::operator->());
+}
+    
+bool SCPgen::checkNode() const{
+  return dynamic_cast<const SCPgenInternal*>(get())!=0;
+}
+
+const QPSolver SCPgen::getQPSolver() const {
+  return (*this)->getQPSolver();
+}
+    
+
+} // namespace CasADi
