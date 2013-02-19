@@ -96,13 +96,38 @@ void SCPgenInternal::init(){
   //    setOption("hessian_approximation", "exact");
   //  }
 
+  // Form a function that calculates noth the objective and constraints
+  casadi_assert(!F_.isNull() || !G_.isNull());
+  casadi_assert(F_.isNull() || is_a<MXFunction>(F_));
+  casadi_assert(G_.isNull() || is_a<MXFunction>(G_));
+  MXFunction F = shared_cast<MXFunction>(F_);
+  MXFunction G = shared_cast<MXFunction>(G_);
+  
+  MX nlp_x, nlp_f, nlp_g;
+  if(F.isNull()){
+    // Root-finding problem
+    nlp_x = G.inputExpr(0);
+    nlp_g = G.outputExpr(0);
+  } else {
+    // Minimization problem
+    nlp_x = F.inputExpr(0);
+    nlp_f = F.outputExpr(0);
+    if(G.isNull()){
+      nlp_g = MX::sparse(0,1);
+    } else {
+      nlp_g = G.outputExpr(0);
+    }
+  }
+  
+  vector<MX> fg_in;
+  fg_in.push_back(nlp_x);
 
+  vector<MX> fg_out;
+  fg_out.push_back(nlp_f);
+  fg_out.push_back(nlp_g);
 
-
-  // get the following
-  MXFunction fg_mx_;
-  casadi_error("not ready");
-
+  MXFunction fg(fg_in,fg_out);
+  fg.init();
   
   if(codegen_){
 #ifdef WITH_DL 
@@ -116,7 +141,7 @@ void SCPgenInternal::init(){
 
   // Generate lifting functions
   MXFunction vdef_fcn, vinit_fcn;
-  fg_mx_.generateLiftingFunctions(vdef_fcn,vinit_fcn);
+  fg.generateLiftingFunctions(vdef_fcn,vinit_fcn);
   vdef_fcn.init();
   vinit_fcn.init();
   vinit_fcn_ = vinit_fcn;
@@ -499,20 +524,14 @@ void SCPgenInternal::init(){
     }
 
     // Allocate a QP solver
-#if 0
-    if(ipopt_as_qp_solver){
-      qp_solver_ = NLPQPSolver(qpH.sparsity(),qpA.sparsity());
-      qp_solver_.setOption("nlp_solver",IpoptSolver::creator);
-      Dictionary nlp_solver_options;
-      nlp_solver_options["tol"] = 1e-12;
-      nlp_solver_options["print_level"] = 0;
-      nlp_solver_options["print_time"] = false;
-      qp_solver_.setOption("nlp_solver_options",nlp_solver_options);
-    } else {
-      qp_solver_ = QPOasesSolver(qpH.sparsity(),qpA.sparsity());
-      qp_solver_.setOption("printLevel","none");
+    QPSolverCreator qp_solver_creator = getOption("qp_solver");
+    qp_solver_ = qp_solver_creator(qpH.sparsity(),qpA.sparsity());
+    
+    // Set options if provided
+    if(hasSetOption("qp_solver_options")){
+      Dictionary qp_solver_options = getOption("qp_solver_options");
+      qp_solver_.setOption(qp_solver_options);
     }
-#endif
     
     // Initialize the QP solver
     qp_solver_.init();
@@ -536,6 +555,42 @@ void SCPgenInternal::init(){
 
 void SCPgenInternal::evaluate(int nfdir, int nadir){
   casadi_assert(nfdir==0 && nadir==0);
+
+  checkInitialBounds();
+  
+  // Get problem data
+  const vector<double>& x_init = input(NLP_X_INIT).data();
+  const vector<double>& lbx = input(NLP_LBX).data();
+  const vector<double>& ubx = input(NLP_UBX).data();
+  const vector<double>& lbg = input(NLP_LBG).data();
+  const vector<double>& ubg = input(NLP_UBG).data();
+
+  copy(x_init.begin(),x_init.end(),x_[0].init.begin());
+  
+  if(x_.size()>1){
+    // Initialize lifted variables using the generated function
+    vinit_fcn_.setInput(x_[0].init);
+    vinit_fcn_.evaluate();    
+    for(int i=1; i<x_.size(); ++i){
+      vinit_fcn_.getOutput(x_[i].init,i-1);
+    }
+  }
+  if(verbose_){
+    cout << "Passed initial guess" << endl;
+  }
+
+  // Reset dual guess
+  if(!gauss_newton_){
+    fill(lambda_g_.begin(),lambda_g_.end(),0);
+    fill(dlambda_g_.begin(),dlambda_g_.end(),0);
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      fill(it->lam.begin(),it->lam.end(),0);
+      fill(it->dlam.begin(),it->dlam.end(),0);
+    }
+  }
+
+
+
   
   double toldx_ = 1e-9;
 
@@ -634,8 +689,17 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   // Store optimal value
   cout << "optimal cost = " << obj_k_ << endl;
 
-  //  iter_count = iter;
-  casadi_error("not ready");
+  // Save results to outputs
+  output(NLP_COST).set(obj_k_);
+  output(NLP_X_OPT).set(x_[0].opt);
+  if(!gauss_newton_){
+    output(NLP_LAMBDA_G).set(lambda_g_);
+    output(NLP_LAMBDA_X).set(x_[0].lam);
+  }
+  output(NLP_G).set(g_);
+  
+  // Save statistics
+  stats_["iter_count"] = iter;
 }  
 
 void SCPgenInternal::dynamicCompilation(FX& f, FX& f_gen, std::string fname, std::string fdescr){
@@ -750,7 +814,7 @@ void SCPgenInternal::printIteration(std::ostream &stream){
   stream << setw(3) << "ls";
   stream << ' ';
 
-#if 0
+#if 1
   // Problem specific: generic functionality needed
   stream << setw(9) << "drag";
   stream << setw(9) << "depth";
@@ -787,9 +851,9 @@ void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, 
   stream << (ls_success ? ' ' : 'F');
 
   // Problem specific: generic functionality needed
-#if 0
-  stream << setw(9) << setprecision(4) << x_[0].opt.at(0)*p_scale_[0];
-  stream << setw(9) << setprecision(4) << x_[0].opt.at(1)*p_scale_[1];
+#if 1
+  stream << setw(9) << setprecision(4) << x_[0].opt.at(0)*1.00;
+  stream << setw(9) << setprecision(4) << x_[0].opt.at(1)*0.01;
 #endif
 
   stream << scientific;

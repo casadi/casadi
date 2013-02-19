@@ -110,22 +110,7 @@ public:
   // Storage for merit function
   std::deque<double> merit_mem_;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   // Options
-  bool gauss_newton_;
   double reg_threshold_;
 
   /// stopping criterion for the stepsize
