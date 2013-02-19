@@ -21,17 +21,16 @@
  */
 
 #include "scpgen_internal.hpp"
-#include "symbolic/stl_vector_tools.hpp"
-#include "symbolic/matrix/sparsity_tools.hpp"
-#include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/casadi_calculus.hpp"
+#include "symbolic/casadi.hpp"
 #include <ctime>
 #include <iomanip>
 #include <fstream>
 #include <cmath>
 #include <cfloat>
+
+#ifdef WITH_DL 
+#include <cstdlib>
+#endif // WITH_DL 
 
 using namespace std;
 namespace CasADi{
@@ -53,6 +52,8 @@ SCPgenInternal::SCPgenInternal(const FX& F, const FX& G, const FX& H, const FX& 
   addOption("lbfgs_memory",      OT_INTEGER,     10,              "Size of L-BFGS memory.");
   addOption("regularize",        OT_BOOLEAN,  false,              "Automatic regularization of Lagrange Hessian.");
   addOption("print_header",      OT_BOOLEAN,   true,              "Print the header with problem statistics");
+  addOption("codegen",           OT_BOOLEAN,  false,              "C-code generation");
+  addOption("reg_threshold",     OT_REAL,      1e-8,              "Threshold for the regularization.");
   
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
@@ -76,234 +77,522 @@ void SCPgenInternal::init(){
   tol_pr_ = getOption("tol_pr");
   tol_du_ = getOption("tol_du");
   regularize_ = getOption("regularize");
-  if(getOption("hessian_approximation")=="exact")
-    hess_mode_ = HESS_EXACT;
-  else if(getOption("hessian_approximation")=="limited-memory")
-    hess_mode_ = HESS_BFGS;
+  codegen_ = getOption("codegen");
+  reg_threshold_ = getOption("reg_threshold");
+
+  //  if(getOption("hessian_approximation")=="exact")
+  //    hess_mode_ = HESS_EXACT;
+  //  else if(getOption("hessian_approximation")=="limited-memory")
+  //    hess_mode_ = HESS_BFGS;
    
-  if (hess_mode_== HESS_EXACT && H_.isNull()) {
-    if (!getOption("generate_hessian")){
-      casadi_error("SCPgenInternal::evaluate: you set option 'hessian_approximation' to 'exact', but no hessian was supplied. Try with option \"generate_hessian\".");
+  //  if (hess_mode_== HESS_EXACT && H_.isNull()) {
+  //    if (!getOption("generate_hessian")){
+  //      casadi_error("SCPgenInternal::evaluate: you set option 'hessian_approximation' to 'exact', but no hessian was supplied. Try with option \"generate_hessian\".");
+  //   }
+  //  }
+  
+  //  // If the Hessian is generated, we use exact approximation by default
+  //  if (bool(getOption("generate_hessian"))){
+  //    setOption("hessian_approximation", "exact");
+  //  }
+
+
+
+
+  // get the following
+  MXFunction fg_mx_;
+  casadi_error("not ready");
+
+  
+  if(codegen_){
+#ifdef WITH_DL 
+    // Make sure that command processor is available
+    int flag = system(static_cast<const char*>(0));
+    casadi_assert_message(flag!=0, "No command procesor available");
+#else // WITH_DL 
+    casadi_error("Codegen in SCPgen requires CasADi to be compiled with option \"WITH_DL\" enabled");
+#endif // WITH_DL 
+  }
+
+  // Generate lifting functions
+  MXFunction vdef_fcn, vinit_fcn;
+  fg_mx_.generateLiftingFunctions(vdef_fcn,vinit_fcn);
+  vdef_fcn.init();
+  vinit_fcn.init();
+  vinit_fcn_ = vinit_fcn;
+
+  // Extract the expressions
+  vector<MX> vdef_in = vdef_fcn.inputExpr();
+  vector<MX> vdef_out = vdef_fcn.outputExpr();
+  vector<MX> var = vdef_in;
+  MX f = vdef_out.front();
+  vector<MX> con(vdef_out.begin()+1,vdef_out.end());
+  for(int i=0; i<con.size(); ++i){
+    makeDense(con[i]);
+  }
+
+  // Get the dimensions
+  nu_ = var[0].size();
+  ng_ = con[0].size();
+  x_.resize(var.size());
+  for(int i=0; i<x_.size(); ++i){
+    x_[i].n = var[i].size();
+  }
+
+  // Allocate memory
+  lbu_.resize(nu_,-numeric_limits<double>::infinity());
+  ubu_.resize(nu_, numeric_limits<double>::infinity());
+  lbg_.resize(ng_,-numeric_limits<double>::infinity());
+  ubg_.resize(ng_, numeric_limits<double>::infinity());
+  g_.resize(ng_, numeric_limits<double>::quiet_NaN());
+  if(!gauss_newton_){
+    lambda_g_.resize(ng_,0);
+    dlambda_g_.resize(ng_,0);
+  }
+ 
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    it->init.resize(it->n,0);
+    it->opt.resize(it->n,0);
+    it->step.resize(it->n,0);
+    if(!gauss_newton_){
+      it->lam.resize(it->n,0);
+      it->dlam.resize(it->n,0);
+    }
+  }
+
+  // Scalar objective function
+  MX obj;
+
+  // Definition of the lifted dual variables
+  vector<MX> lam_con(x_.size());
+
+  // Multipliers
+  MX lam_g;
+  vector<MX> lam(x_.size());
+
+  if(gauss_newton_){    
+    // Least square objective
+    obj = inner_prod(f,f)/2;
+    lam_con[0] = f;
+    ngL_ = lam_con[0].size();
+
+  } else {
+    // Scalar objective function
+    obj = f;
+    
+    // Lagrange multipliers for the simple bounds on u and Lagrange multipliers corresponding to the definition of the dependent variables
+    stringstream ss;
+    for(int i=0; i<x_.size(); ++i){
+      ss.str(string());
+      ss << "lam_x" << i;
+      lam[i] = msym(ss.str(),var[i].sparsity());
+    }
+
+    // Lagrange multipliers for the nonlinear constraints
+    lam_g = msym("lam_g",ng_);
+
+    if(verbose_){
+      cout << "Allocated intermediate variables." << endl;
+    }
+   
+    // Adjoint sweep to get the definitions of the lifted dual variables (Equation 3.8 in Albersmeyer2010)
+    vector<vector<MX> > fseed,fsens,aseed(1),asens(1);
+    aseed[0].push_back(1.0);
+    aseed[0].push_back(lam_g);
+    aseed[0].insert(aseed[0].end(),lam.begin()+1,lam.end());
+    vdef_fcn.eval(vdef_in,vdef_out,fseed,fsens,aseed,asens,true);
+
+    for(int i=0; i<x_.size(); ++i){
+      lam_con[i] = asens[0].at(i);
+    }
+    ngL_ = nu_;
+
+    if(verbose_){
+      cout << "Generated the gradient of the Lagrangian." << endl;
+    }
+  }
+  gL_.resize(ngL_, numeric_limits<double>::quiet_NaN());
+
+  // Residual function
+
+  // Inputs
+  vector<MX> res_fcn_in;
+  int n=0;
+  if(!gauss_newton_){
+    res_fcn_in.push_back(lam_g);       res_lam_g_ = n++;
+  }
+  for(int i=0; i<x_.size(); ++i){
+    res_fcn_in.push_back(var[i]);      x_[i].res_var = n++;
+    if(!gauss_newton_){
+      res_fcn_in.push_back(lam[i]);    x_[i].res_lam = n++;
+    }
+  }
+
+  // Outputs
+  vector<MX> res_fcn_out;
+  n=0;
+  res_fcn_out.push_back(obj);               res_obj_ = n++;
+  if(!gauss_newton_){
+    res_fcn_out.push_back(lam_con[0]);      res_gl_ = n++;
+  }
+  res_fcn_out.push_back(con[0]);            res_g_ = n++;
+  for(int i=1; i<x_.size(); ++i){
+    res_fcn_out.push_back(con[i]-var[i]);   x_[i].res_d = n++;
+    if(!gauss_newton_){
+      res_fcn_out.push_back(lam_con[i]-lam[i]);  x_[i].res_lam_d = n++;
+    }
+  }
+
+  // Generate function
+  MXFunction res_fcn(res_fcn_in,res_fcn_out);
+  res_fcn.setOption("number_of_fwd_dir",0);
+  res_fcn.setOption("number_of_adj_dir",0);
+  res_fcn.init();
+  if(verbose_){
+    cout << "Generated residual function ( " << res_fcn.getAlgorithmSize() << " nodes)." << endl;
+  }
+
+  // Generate c code and load as DLL
+  if(codegen_){
+    dynamicCompilation(res_fcn,res_fcn_,"res_fcn","residual function");
+  } else {
+    res_fcn_ = res_fcn;
+  }
+
+  // Declare difference vector d and substitute out v
+  vector<MX> d;
+  vector<MX> d_def;
+  stringstream ss;
+  for(int i=1; i<x_.size(); ++i){
+    ss.str(string());
+    ss << "d" << i;
+    MX d_i = msym(ss.str(),var[i].sparsity());
+    d.push_back(d_i);
+    d_def.push_back(con[i]-d_i);
+  }
+
+  // Declare difference vector lam_d and substitute out lam
+  vector<MX> lam_d;
+  vector<MX> lam_d_def;
+  if(!gauss_newton_){
+    for(int i=1; i<x_.size(); ++i){
+      ss.str(string());
+      ss << "lam_d" << i;
+      MX lam_d_i = msym(ss.str(),var[i].sparsity());
+      lam_d.push_back(lam_d_i);
+      lam_d_def.push_back(lam_con[i]-lam_d_i);
+    }
+  }
+
+  // Variables to be substituted and their definitions
+  vector<MX> svar, sdef;
+  svar.insert(svar.end(),var.begin()+1,var.end());
+  sdef.insert(sdef.end(),d_def.begin(),d_def.end());
+  if(!gauss_newton_){
+    svar.insert(svar.end(),lam.rbegin(),lam.rend()-1);
+    sdef.insert(sdef.end(),lam_d_def.rbegin(),lam_d_def.rend());    
+  }
+
+  vector<MX> ex(3);
+  ex[0] = obj;
+  ex[1] = con[0];
+  ex[2] = lam_con[0];
+
+  substituteInPlace(svar, sdef, ex, false);
+  copy(sdef.begin(),sdef.begin()+d_def.size(),d_def.begin());  
+  if(!gauss_newton_){
+    copy(sdef.rbegin(),sdef.rbegin()+lam_d_def.size(),lam_d_def.begin());
+  }
+
+  MX obj_z = ex[0];
+  MX g_z = ex[1];
+  MX gL_z = ex[2];
+  
+  // Modified function Z
+  vector<MX> z_in;
+  n=0;
+  if(!gauss_newton_){
+    z_in.push_back(lam_g);                         z_lam_g_ = n++;
+  }
+  for(int i=0; i<x_.size(); ++i){
+    z_in.push_back(i==0 ? var[0] :     d[i-1]);    x_[i].z_var = n++;
+    if(!gauss_newton_){
+      z_in.push_back(i==0 ? lam[0] : lam_d[i-1]);  x_[i].z_lam = n++;
+    }
+  }
+
+  // Outputs
+  n=0;
+  vector<MX> z_out;
+  z_out.push_back(obj_z);                   z_obj_ = n++;
+  z_out.push_back(gL_z);                    z_gl_ = n++;
+  z_out.push_back(g_z);                     z_g_ = n++;
+  for(int i=1; i<x_.size(); ++i){
+    z_out.push_back(d_def[i-1]);            x_[i].z_def = n++;
+    if(!gauss_newton_){
+      z_out.push_back(lam_d_def[i-1]);      x_[i].z_defL = n++;
+    }
+  }
+
+  MXFunction zfcn(z_in,z_out);
+  zfcn.setOption("name","zfcn");
+  zfcn.init();
+  if(verbose_){
+    cout << "Generated reconstruction function ( " << zfcn.getAlgorithmSize() << " nodes)." << endl;
+  }
+
+  // Directional derivative of Z
+  vector<vector<MX> > Z_fwdSeed(1,z_in);
+  vector<vector<MX> > Z_fwdSens(1,z_out);
+  vector<vector<MX> > Z_adjSeed;
+  vector<vector<MX> > Z_adjSens;
+
+  // Expression a + A*du in Lifted Newton (Section 2.1 in Alberspeyer2010)
+  MX du = msym("du",nu_);   // Step in u
+  MX dlam_g;                // Step lambda_g
+  if(!gauss_newton_){
+    dlam_g = msym("dlam_g",lam_g.sparsity());
+  }
+  
+  // Interpret the Jacobian-vector multiplication as a forward directional derivative
+  fill(Z_fwdSeed[0].begin(),Z_fwdSeed[0].end(),MX());
+  Z_fwdSeed[0][x_[0].z_var] = du;
+  for(int i=1; i<x_.size(); ++i){
+    Z_fwdSeed[0][x_[i].z_var] = -d[i-1];
+  }
+  if(!gauss_newton_){
+    Z_fwdSeed[0][z_lam_g_] = dlam_g;
+    for(int i=1; i<x_.size(); ++i){
+      Z_fwdSeed[0][x_[i].z_lam] = -lam_d[i-1];
+    }
+  }
+  zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);    
+  
+  // Step expansion function inputs
+  vector<MX> exp_fcn_in;
+  n=0;
+  if(!gauss_newton_){
+    exp_fcn_in.push_back(lam_g);                         exp_lam_g_ = n++;
+  }
+  exp_fcn_in.push_back(du);                              exp_du_ = n++;
+  if(!gauss_newton_){
+    exp_fcn_in.push_back(dlam_g);                        exp_dlam_g_ = n++;
+  }
+  
+  for(int i=0; i<x_.size(); ++i){
+    exp_fcn_in.push_back(   i==0 ? var[0] :     d[i-1]);   x_[i].exp_var = n++;
+    if(!gauss_newton_){
+      exp_fcn_in.push_back( i==0 ? lam[0] : lam_d[i-1]);   x_[i].exp_lam = n++;
     }
   }
   
-  // If the Hessian is generated, we use exact approximation by default
-  if (bool(getOption("generate_hessian"))){
-    setOption("hessian_approximation", "exact");
-  }
-  
-  // Allocate a QP solver
-  CRSSparsity H_sparsity = hess_mode_==HESS_EXACT ? H_.output().sparsity() : sp_dense(n_,n_);
-  H_sparsity = H_sparsity + DMatrix::eye(n_).sparsity();
-  CRSSparsity A_sparsity = J_.isNull() ? CRSSparsity(0,n_,false) : J_.output().sparsity();
-
-  QPSolverCreator qp_solver_creator = getOption("qp_solver");
-  qp_solver_ = qp_solver_creator(H_sparsity,A_sparsity);
-
-  // Set options if provided
-  if(hasSetOption("qp_solver_options")){
-    Dictionary qp_solver_options = getOption("qp_solver_options");
-    qp_solver_.setOption(qp_solver_options);
-  }
-  qp_solver_.init();
-  
-  // Lagrange multipliers of the NLP
-  mu_.resize(m_);
-  mu_x_.resize(n_);
-  
-  // Lagrange gradient in the next iterate
-  gLag_.resize(n_);
-  gLag_old_.resize(n_);
-
-  // Current linearization point
-  x_.resize(n_);
-  x_cand_.resize(n_);
-  x_old_.resize(n_);
-
-  // Constraint function value
-  gk_.resize(m_);
-  gk_cand_.resize(m_);
-  
-  // Hessian approximation
-  Bk_ = DMatrix(H_sparsity);
-  
-  // Jacobian
-  Jk_ = DMatrix(A_sparsity);
-
-  // Bounds of the QP
-  qp_LBA_.resize(m_);
-  qp_UBA_.resize(m_);
-  qp_LBX_.resize(n_);
-  qp_UBX_.resize(n_);
-
-  // QP solution
-  dx_.resize(n_);
-  qp_DUAL_X_.resize(n_);
-  qp_DUAL_A_.resize(m_);
-
-  // Gradient of the objective
-  gf_.resize(n_);
-
-  // Create Hessian update function
-  if(hess_mode_ == HESS_BFGS){
-    // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
-    SXMatrix Bk = ssym("Bk",H_sparsity);
-    SXMatrix x = ssym("x",input(NLP_X_INIT).sparsity());
-    SXMatrix x_old = ssym("x",x.sparsity());
-    SXMatrix gLag = ssym("gLag",x.sparsity());
-    SXMatrix gLag_old = ssym("gLag_old",x.sparsity());
-    
-    SXMatrix sk = x - x_old;
-    SXMatrix yk = gLag - gLag_old;
-    SXMatrix qk = mul(Bk, sk);
-    
-    // Calculating theta
-    SXMatrix skBksk = inner_prod(sk, qk);
-    SXMatrix omega = if_else(inner_prod(yk, sk) < 0.2 * inner_prod(sk, qk),
-                             0.8 * skBksk / (skBksk - inner_prod(sk, yk)),
-                             1);
-    yk = omega * yk + (1 - omega) * qk;
-    SXMatrix theta = 1. / inner_prod(sk, yk);
-    SXMatrix phi = 1. / inner_prod(qk, sk);
-    SXMatrix Bk_new = Bk + theta * mul(yk, trans(yk)) - phi * mul(qk, trans(qk));
-    
-    // Inputs of the BFGS update function
-    vector<SXMatrix> bfgs_in(BFGS_NUM_IN);
-    bfgs_in[BFGS_BK] = Bk;
-    bfgs_in[BFGS_X] = x;
-    bfgs_in[BFGS_X_OLD] = x_old;
-    bfgs_in[BFGS_GLAG] = gLag;
-    bfgs_in[BFGS_GLAG_OLD] = gLag_old;
-    bfgs_ = SXFunction(bfgs_in,Bk_new);
-    bfgs_.setOption("number_of_fwd_dir",0);
-    bfgs_.setOption("number_of_adj_dir",0);
-    bfgs_.init();
-    
-    // Initial Hessian approximation
-    B_init_ = DMatrix::eye(n_);
-  }
-  
-  // Header
-  if(bool(getOption("print_header"))){
-    cout << "-------------------------------------------" << endl;
-    cout << "This is CasADi::SCPgen." << endl;
-    switch (hess_mode_) {
-      case HESS_EXACT:
-        cout << "Using exact Hessian" << endl;
-        break;
-      case HESS_BFGS:
-        cout << "Using limited memory BFGS Hessian approximation" << endl;
-        break;
+  // Step expansion function outputs
+  vector<MX> exp_fcn_out;
+  n=0;
+  exp_fcn_out.push_back(Z_fwdSens[0][z_obj_]);           exp_osens_ = n++;
+  for(int i=1; i<x_.size(); ++i){
+    exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_def]);    x_[i].exp_def = n++;
+    if(!gauss_newton_){
+      exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_defL]); x_[i].exp_defL = n++;
     }
-    cout << endl;
-    cout << "Number of variables:                       " << setw(9) << n_ << endl;
-    cout << "Number of constraints:                     " << setw(9) << m_ << endl;
-    cout << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.size() << endl;
-    cout << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.size() << endl;
-    cout << endl;
   }
+    
+  // Step expansion function
+  MXFunction exp_fcn(exp_fcn_in,exp_fcn_out);
+  exp_fcn.setOption("number_of_fwd_dir",0);
+  exp_fcn.setOption("number_of_adj_dir",0);
+  exp_fcn.setOption("name","exp_fcn");
+  exp_fcn.init();
+  if(verbose_){
+    cout << "Generated step expansion function ( " << exp_fcn.getAlgorithmSize() << " nodes)." << endl;
+  }
+  
+  // Generate c code and load as DLL
+  if(codegen_){
+    dynamicCompilation(exp_fcn,exp_fcn_,"exp_fcn","step expansion function");
+  } else {
+    exp_fcn_ = exp_fcn;
+  }
+  
+  // Equation (2.12 in Alberspeyer2010)
+  fill(Z_fwdSeed[0].begin(),Z_fwdSeed[0].end(),MX());
+  for(int i=1; i<x_.size(); ++i){
+    Z_fwdSeed[0][x_[i].z_var] = d[i-1];
+  }
+  if(!gauss_newton_){
+    for(int i=1; i<x_.size(); ++i){
+      Z_fwdSeed[0][x_[i].z_lam] = lam_d[i-1];
+    }
+  }
+  zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);   
+  
+  // Vector(s) b in Lifted Newton
+  MX b_obj = z_out[z_gl_] - Z_fwdSens[0][z_gl_];
+  MX b_g = z_out[z_g_] - Z_fwdSens[0][z_g_];
+
+  // Differentiate with respect to the step to get the matrix B in Lifted Newton
+  MX B_obj = zfcn.jac(x_[0].z_var,z_gl_,false,!gauss_newton_); // Exploit Hessian symmetry
+  MX B_g = zfcn.jac(x_[0].z_var,z_g_);
+  
+  // Make sure that B_g has the right dimensions if empty
+  if(B_g.empty()){
+    B_g = MX::sparse(0,nu_);
+  }
+  
+  // Get the condensed QP
+  MX qpH = gauss_newton_ ? mul(trans(B_obj),B_obj) : B_obj;
+  MX qpG = gauss_newton_ ? mul(trans(B_obj),b_obj) : b_obj - mul(trans(B_g),lam_g);
+  MX qpA = B_g;
+  MX qpB = b_g;
+  
+  // Make sure qpG and qpB are dense vectors
+  makeDense(qpG);
+  makeDense(qpB);
+
+  if(verbose_){
+    cout << "Formed qpH (" << qpH.size1() << "-by-" << qpH.size2() << ", "<< qpH.size() << " nnz)," << endl;
+    cout << "       qpG (" << qpG.size1() << "-by-" << qpG.size2() << ", "<< qpG.size() << " nnz)," << endl;
+    cout << "       qpA (" << qpA.size1() << "-by-" << qpA.size2() << ", "<< qpA.size() << " nnz) and" << endl;
+    cout << "       qpB (" << qpB.size1() << "-by-" << qpB.size2() << ", "<< qpB.size() << " nnz)." << endl;
+  }
+  
+  // Quadratic approximation
+  vector<MX> qp_fcn_in;
+  n=0;
+  if(!gauss_newton_){
+    qp_fcn_in.push_back(lam_g);        qpf_lam_g_ = n++;
+  }
+  for(int i=0; i<x_.size(); ++i){
+    qp_fcn_in.push_back(var[i]);       x_[i].qpf_var = n++;
+    if(!gauss_newton_){
+      qp_fcn_in.push_back(lam[i]);     x_[i].qpf_lam = n++;
+    }
+    if(i>0){
+      qp_fcn_in.push_back(d[i-1]);       x_[i].qpf_res = n++;
+      if(!gauss_newton_){
+	qp_fcn_in.push_back(lam_d[i-1]); x_[i].qpf_resL = n++;
+      }
+    }
+  }
+  casadi_assert(n==qp_fcn_in.size());  
+  
+  vector<MX> qp_fcn_out(QPF_NUM_OUT);
+  qp_fcn_out[QPF_G] = qpG;
+  qp_fcn_out[QPF_H] = qpH;
+  qp_fcn_out[QPF_B] = qpB;
+  qp_fcn_out[QPF_A] = qpA;
+  
+  MXFunction qp_fcn(qp_fcn_in,qp_fcn_out);
+  qp_fcn.setOption("name","qp_fcn");
+    qp_fcn.setOption("number_of_fwd_dir",0);
+    qp_fcn.setOption("number_of_adj_dir",0);
+    qp_fcn.init();
+    if(verbose_){
+      cout << "Generated linearization function ( " << qp_fcn.getAlgorithmSize() << " nodes)." << endl;
+    }
+    
+    // Generate c code and load as DLL
+    if(codegen_){
+      dynamicCompilation(qp_fcn,qp_fcn_,"qp_fcn","linearization function");
+    } else {
+      qp_fcn_ = qp_fcn;
+    }
+
+    // Allocate a QP solver
+#if 0
+    if(ipopt_as_qp_solver){
+      qp_solver_ = NLPQPSolver(qpH.sparsity(),qpA.sparsity());
+      qp_solver_.setOption("nlp_solver",IpoptSolver::creator);
+      Dictionary nlp_solver_options;
+      nlp_solver_options["tol"] = 1e-12;
+      nlp_solver_options["print_level"] = 0;
+      nlp_solver_options["print_time"] = false;
+      qp_solver_.setOption("nlp_solver_options",nlp_solver_options);
+    } else {
+      qp_solver_ = QPOasesSolver(qpH.sparsity(),qpA.sparsity());
+      qp_solver_.setOption("printLevel","none");
+    }
+#endif
+    
+    // Initialize the QP solver
+    qp_solver_.init();
+    if(verbose_){
+      cout << "Allocated QP solver." << endl;
+    }
+    
+    // Residual
+    for(int i=1; i<x_.size(); ++i){
+      x_[i].res.resize(d[i-1].size(),0);
+      if(!gauss_newton_){
+	x_[i].resL.resize(lam_d[i-1].size(),0);
+      }
+    }
+    
+    if(verbose_){
+      cout << "NLP preparation completed" << endl;
+    }
+  
 }
 
 void SCPgenInternal::evaluate(int nfdir, int nadir){
   casadi_assert(nfdir==0 && nadir==0);
   
-  checkInitialBounds();
-  
-  // Get problem data
-  const vector<double>& x_init = input(NLP_X_INIT).data();
-  const vector<double>& lbx = input(NLP_LBX).data();
-  const vector<double>& ubx = input(NLP_UBX).data();
-  const vector<double>& lbg = input(NLP_LBG).data();
-  const vector<double>& ubg = input(NLP_UBG).data();
-  
-  // Set the static parameter
-  if (parametric_) {
-    const vector<double>& p = input(NLP_P).data();
-    if (!F_.isNull()) F_.setInput(p,F_.getNumInputs()-1);
-    if (!G_.isNull()) G_.setInput(p,G_.getNumInputs()-1);
-    if (!H_.isNull()) H_.setInput(p,H_.getNumInputs()-1);
-    if (!J_.isNull()) J_.setInput(p,J_.getNumInputs()-1);
-  }
-    
-  // Set linearization point to initial guess
-  copy(x_init.begin(),x_init.end(),x_.begin());
-  
-  // Lagrange multipliers of the NLP
-  fill(mu_.begin(),mu_.end(),0);
-  fill(mu_x_.begin(),mu_x_.end(),0);
+  double toldx_ = 1e-9;
 
-  // Initial constraint Jacobian
-  eval_jac_g(x_,gk_,Jk_);
-  
-  // Initial objective gradient
-  eval_grad_f(x_,fk_,gf_);
-  
-  // Initialize or reset the Hessian or Hessian approximation
-  reg_ = 0;
-  if( hess_mode_ == HESS_BFGS){
-    reset_h();
-  } else {
-    eval_h(x_,mu_,1.0,Bk_);
+  // Objective value
+  obj_k_ = numeric_limits<double>::quiet_NaN();
+
+  // Reset line-search
+  meritmax_ = numeric_limits<double>::infinity();
+  sigma_ = 0;
+
+  // Current guess for the primal solution
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    copy(it->init.begin(),it->init.end(),it->opt.begin());
   }
 
-  // Evaluate the initial gradient of the Lagrangian
-  copy(gf_.begin(),gf_.end(),gLag_.begin());
-  if(m_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_);
-  // gLag += mu_x_;
-  transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>());
+  // Initial evaluation of the residual function
+  eval_res();
 
   // Number of SQP iterations
   int iter = 0;
 
-  // Number of line-search iterations
+  // Reset last step-size
+  pr_step_ = 0;
+  du_step_ = 0;
+  
+  // Reset line-search
   int ls_iter = 0;
-  
-  // Last linesearch successfull
   bool ls_success = true;
-  
-  // Reset
-  merit_mem_.clear();
-  sigma_ = 0.;    // NOTE: Move this into the main optimization loop
 
-  // Default stepsize
-  double t = 0;
-  
-  // MAIN OPTIMIZATION LOOP
+  // Reset regularization
+  reg_ = 0;
+
+  // MAIN OPTIMZATION LOOP
   while(true){
     
-    // Primal infeasability
-    double pr_inf = primalInfeasibility(x_, lbx, ubx, gk_, lbg, ubg);
+    // 1-norm of the primal infeasibility
+    double pr_inf = primalInfeasibility();
     
-    // 1-norm of lagrange gradient
-    double gLag_norm1 = norm_1(gLag_);
-    
-    // 1-norm of step
-    double dx_norm1 = norm_1(dx_);
+    // 1-norm of the dual infeasibility
+    double du_inf = dualInfeasibility();
     
     // Print header occasionally
     if(iter % 10 == 0) printIteration(cout);
     
     // Printing information about the actual iterate
-    printIteration(cout,iter,fk_,pr_inf,gLag_norm1,dx_norm1,reg_,ls_iter,ls_success);
-    
-    // Call callback function if present
-    if (!callback_.isNull()) {
-      callback_.input(NLP_COST).set(fk_);
-      callback_.input(NLP_X_OPT).set(x_);
-      callback_.input(NLP_LAMBDA_G).set(mu_);
-      callback_.input(NLP_LAMBDA_X).set(mu_x_);
-      callback_.input(NLP_G).set(gk_);
-      callback_.evaluate();
-      
-      if (callback_.output(0).at(0)) {
-        cout << endl;
-        cout << "CasADi::SCPgen: aborted by callback..." << endl;
-        break;
-      }
-    }
-    
+    printIteration(cout,iter,obj_k_,pr_inf,du_inf,reg_,ls_iter,ls_success);
+
     // Checking convergence criteria
-    if (pr_inf < tol_pr_ && gLag_norm1 < tol_du_){
+    double tol_pr_ = 1e-6; // Stopping criterion for primal infeasibility
+    double tol_du_ = 1e-6; // Stopping criterion for dual infeasability
+    bool converged;
+    if(gauss_newton_){
+      converged = iter!=0 && pr_inf < tol_pr_ && pr_step_ < toldx_; // Use step size as stopping criterion
+    } else {
+      converged = pr_inf < tol_pr_ && du_inf < tol_du_ && pr_step_ < toldx_; // Use lagrangian gradient as stopping criterion
+    }
+    if(converged){
       cout << endl;
       cout << "CasADi::SCPgen: Convergence achieved after " << iter << " iterations." << endl;
       break;
@@ -314,427 +603,496 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
       cout << "CasADi::SCPgen: Maximum number of iterations reached." << endl;
       break;
     }
+
+    // Check if not-a-number
+    if(obj_k_!=obj_k_ || pr_step_ != pr_step_ || pr_inf != pr_inf){
+      cout << "CasADi::SCPgen: Aborted, nan detected" << endl;
+      break;
+    }
     
     // Start a new iteration
     iter++;
     
-    // Formulate the QP
-    transform(lbx.begin(),lbx.end(),x_.begin(),qp_LBX_.begin(),minus<double>());
-    transform(ubx.begin(),ubx.end(),x_.begin(),qp_UBX_.begin(),minus<double>());
-    transform(lbg.begin(),lbg.end(),gk_.begin(),qp_LBA_.begin(),minus<double>());
-    transform(ubg.begin(),ubg.end(),gk_.begin(),qp_UBA_.begin(),minus<double>());
+    // Form the condensed QP
+    eval_qpf();
 
-    // Solve the QP
-    solve_QP(Bk_,gf_,qp_LBX_,qp_UBX_,Jk_,qp_LBA_,qp_UBA_,dx_,qp_DUAL_X_,qp_DUAL_A_);
-    log("QP solved");
-
-    // Detecting indefiniteness
-    double gain = quad_form(dx_,Bk_);
-    if (gain < 0){
-      casadi_warning("Indefinite Hessian detected...");
-    }
-        
-    // Calculate penalty parameter of merit function
-    sigma_ = std::max(sigma_,1.01*norm_inf(qp_DUAL_X_));
-    sigma_ = std::max(sigma_,1.01*norm_inf(qp_DUAL_A_));
-
-    // Calculate L1-merit function in the actual iterate
-    double l1_infeas = primalInfeasibility(x_, lbx, ubx, gk_, lbg, ubg);
-
-    // Right-hand side of Armijo condition
-    double F_sens = inner_prod(dx_, gf_);    
-    double L1dir = F_sens - sigma_ * l1_infeas;
-    double L1merit = fk_ + sigma_ * l1_infeas;
-
-    // Storing the actual merit function value in a list
-    merit_mem_.push_back(L1merit);
-    if (merit_mem_.size() > merit_memsize_){
-      merit_mem_.pop_front();
-    }
-    // Stepsize
-    t = 1.0;
-    double fk_cand;
-    // Merit function value in candidate
-    double L1merit_cand = 0;
-
-    // Reset line-search counter, success marker
-    ls_iter = 0;
-    ls_success = true;
-
-    // Line-search
-    log("Starting line-search");
-    if(maxiter_ls_>0){ // maxiter_ls_== 0 disables line-search
-      
-      // Line-search loop
-      while (true){
-        for(int i=0; i<n_; ++i) x_cand_[i] = x_[i] + t * dx_[i];
-      
-        // Evaluating objective and constraints
-        eval_f(x_cand_,fk_cand);
-        eval_g(x_cand_,gk_cand_);
-        ls_iter++;
-
-        // Calculating merit-function in candidate
-        l1_infeas = primalInfeasibility(x_cand_, lbx, ubx, gk_cand_, lbg, ubg);
-      
-        L1merit_cand = fk_cand + sigma_ * l1_infeas;
-        // Calculating maximal merit function value so far
-        double meritmax = *max_element(merit_mem_.begin(), merit_mem_.end());
-        if (L1merit_cand <= meritmax + t * c1_ * L1dir){
-          // Accepting candidate
-	  log("Line-search completed, candidate accepted");
-          break;
-        }
-      
-        // Line-search not successful, but we accept it.
-        if(ls_iter == maxiter_ls_){
-          ls_success = false;
-	  log("Line-search completed, maximum number of iterations");
-          break;
-        }
-      
-        // Backtracking
-        t = beta_ * t;
-      }
+    // Regularize the QP
+    if(regularize_){
+      regularize();
     }
 
-    // Candidate accepted, update dual variables
-    for(int i=0; i<m_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
-    for(int i=0; i<n_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
-    
-    if( hess_mode_ == HESS_BFGS){
-      // Evaluate the gradient of the Lagrangian with the old x but new mu (for BFGS)
-      copy(gf_.begin(),gf_.end(),gLag_old_.begin());
-      if(m_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_old_);
-      // gLag_old += mu_x_;
-      transform(gLag_old_.begin(),gLag_old_.end(),mu_x_.begin(),gLag_old_.begin(),plus<double>());
-    }
-    
-    // Candidate accepted, update the primal variable
-    copy(x_.begin(),x_.end(),x_old_.begin());
-    copy(x_cand_.begin(),x_cand_.end(),x_.begin());
+    // Solve the condensed QP
+    solve_qp();
 
-    // Evaluate the constraint Jacobian
-    log("Evaluating jac_g");
-    eval_jac_g(x_,gk_,Jk_);
-    
-    // Evaluate the gradient of the objective function
-    log("Evaluating grad_f");
-    eval_grad_f(x_,fk_,gf_);
-    
-    // Evaluate the gradient of the Lagrangian with the new x and new mu
-    copy(gf_.begin(),gf_.end(),gLag_.begin());
-    if(m_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_);
-    // gLag += mu_x_;
-    transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>());
-
-    // Updating Lagrange Hessian
-    if( hess_mode_ == HESS_BFGS){
-      log("Updating Hessian (BFGS)");
-      // BFGS with careful updates and restarts
-      if (iter % lbfgs_memory_ == 0){
-        // Reset Hessian approximation by dropping all off-diagonal entries
-        const vector<int>& rowind = Bk_.rowind();      // Access sparsity (row offset)
-        const vector<int>& col = Bk_.col();            // Access sparsity (column)
-        vector<double>& data = Bk_.data();             // Access nonzero elements
-        for(int i=0; i<rowind.size()-1; ++i){          // Loop over the rows of the Hessian
-          for(int el=rowind[i]; el<rowind[i+1]; ++el){ // Loop over the nonzero elements of the row
-            if(i!=col[el]) data[el] = 0;               // Remove if off-diagonal entries
-          }
-        }
-      }
-      
-      // Pass to BFGS update function
-      bfgs_.setInput(Bk_,BFGS_BK);
-      bfgs_.setInput(x_,BFGS_X);
-      bfgs_.setInput(x_old_,BFGS_X_OLD);
-      bfgs_.setInput(gLag_,BFGS_GLAG);
-      bfgs_.setInput(gLag_old_,BFGS_GLAG_OLD);
-      
-      // Update the Hessian approximation
-      bfgs_.evaluate();
-      
-      // Get the updated Hessian
-      bfgs_.getOutput(Bk_);
-    } else {
-      // Exact Hessian
-      log("Evaluating hessian");
-      eval_h(x_,mu_,1.0,Bk_);
-    }
+    // Expand the step
+    eval_exp();
+  
+    // Line-search to take the step
+    line_search(ls_iter, ls_success);
   }
   
-  // Save results to outputs
-  output(NLP_COST).set(fk_);
-  output(NLP_X_OPT).set(x_);
-  output(NLP_LAMBDA_G).set(mu_);
-  output(NLP_LAMBDA_X).set(mu_x_);
-  output(NLP_G).set(gk_);
+  // Store optimal value
+  cout << "optimal cost = " << obj_k_ << endl;
+
+  //  iter_count = iter;
+  casadi_error("not ready");
+}  
+
+void SCPgenInternal::dynamicCompilation(FX& f, FX& f_gen, std::string fname, std::string fdescr){
+#ifdef WITH_DL 
+
+  // C compiler
+  string compiler = "clang";
+
+  // Optimization flag
+  //string oflag = "-O3";
+  string oflag = "-O2";
+
+  // Flag to get a DLL
+#ifdef __APPLE__
+  string dlflag = " -dynamiclib";
+#else // __APPLE__
+  string dlflag = " -shared";
+#endif // __APPLE__
+
+  // Filenames
+  string cname = fname + ".c";
+  string dlname = fname + ".so";
   
-  // Save statistics
-  stats_["iter_count"] = iter;
-}
-  
-void SCPgenInternal::printIteration(std::ostream &stream){
-  stream << setw(4)  << "iter";
-  stream << setw(14) << "objective";
-  stream << setw(9) << "inf_pr";
-  stream << setw(9) << "inf_du";
-  stream << setw(9) << "||d||";
-  stream << setw(7) << "lg(rg)";
-  stream << setw(3) << "ls";
-  stream << ' ';
-  stream << endl;
-}
-  
-void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
-                                 double dx_norm, double rg, int ls_trials, bool ls_success){
-  stream << setw(4) << iter;
-  stream << scientific;
-  stream << setw(14) << setprecision(6) << obj;
-  stream << setw(9) << setprecision(2) << pr_inf;
-  stream << setw(9) << setprecision(2) << du_inf;
-  stream << setw(9) << setprecision(2) << dx_norm;
-  stream << fixed;
-  if(rg>0){
-    stream << setw(7) << setprecision(2) << log10(rg);
-  } else {
-    stream << setw(7) << "-";
+  // Remove existing files, if any
+  string rm_command = "rm -rf " + cname + " " + dlname;
+  int flag = system(rm_command.c_str());
+  casadi_assert_message(flag==0, "Failed to remove old source");
+
+  // Codegen it
+  f.generateCode(cname);
+  if(verbose_){
+    cout << "Generated c-code for " << fdescr << " (" << cname << ")" << endl;
   }
-  stream << setw(3) << ls_trials;
-  stream << (ls_success ? ' ' : 'F');
-  stream << endl;
+  
+  // Compile it
+  string compile_command = compiler + " -fPIC " + dlflag + " " + oflag + " " + cname + " -o " + dlname;
+  if(verbose_){
+    cout << "Compiling " << fdescr <<  " using \"" << compile_command << "\"" << endl;
+  }
+
+  time_t time1 = time(0);
+  flag = system(compile_command.c_str());
+  time_t time2 = time(0);
+  double comp_time = difftime(time2,time1);
+  casadi_assert_message(flag==0, "Compilation failed");
+  if(verbose_){
+    cout << "Compiled " << fdescr << " (" << dlname << ") in " << comp_time << " s."  << endl;
+  }
+
+  // Load it
+  f_gen = ExternalFunction("./" + dlname);
+  f_gen.setOption("number_of_fwd_dir",0);
+  f_gen.setOption("number_of_adj_dir",0);
+  f_gen.setOption("name",fname + "_gen");
+  f_gen.init();
+  if(verbose_){
+    cout << "Dynamically loaded " << fdescr << " (" << dlname << ")" << endl;
+  }
+
+#else // WITH_DL 
+    casadi_error("Codegen in SCPgen requires CasADi to be compiled with option \"WITH_DL\" enabled");
+#endif // WITH_DL 
 }
 
-double SCPgenInternal::quad_form(const std::vector<double>& x, const DMatrix& A){
-  // Assert dimensions
-  casadi_assert(x.size()==A.size1() && x.size()==A.size2());
-  
-  // Access the internal data of A
-  const std::vector<int> &A_rowind = A.rowind();
-  const std::vector<int> &A_col = A.col();
-  const std::vector<double> &A_data = A.data();
-  
-  // Return value
-  double ret=0;
-
-  // Loop over the rows of A
-  for(int i=0; i<x.size(); ++i){
-    // Loop over the nonzeros of A
-    for(int el=A_rowind[i]; el<A_rowind[i+1]; ++el){
-      // Get column
-      int j = A_col[el];
-      
-      // Add contribution
-      ret += x[i]*A_data[el]*x[j];
-    }
-  }
-  
-  return ret;
-}
-
-void SCPgenInternal::reset_h(){
-  // Initial Hessian approximation of BFGS
-  if ( hess_mode_ == HESS_BFGS){
-    Bk_.set(B_init_);
-  }
-
-  if (monitored("eval_h")) {
-    cout << "x = " << x_ << endl;
-    cout << "H = " << endl;
-    Bk_.printSparse();
-  }
-}
-
-  double SCPgenInternal::getRegularization(const Matrix<double>& H){
-    const vector<int>& rowind = H.rowind();
-    const vector<int>& col = H.col();
-    const vector<double>& data = H.data();
-    double reg_param = 0;
-    for(int i=0; i<rowind.size()-1; ++i){
-      double mineig = 0;
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        int j = col[el];
-        if(i == j){
-          mineig += data[el];
-        } else {
-          mineig -= fabs(data[el]);
-        }
-      }
-      reg_param = fmin(reg_param,mineig);
-    }
-    return -reg_param;
-  }
-  
-  void SCPgenInternal::regularize(Matrix<double>& H, double reg){
-    const vector<int>& rowind = H.rowind();
-    const vector<int>& col = H.col();
-    vector<double>& data = H.data();
-    
-    for(int i=0; i<rowind.size()-1; ++i){
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        int j = col[el];
-        if(i==j){
-          data[el] += reg;
-        }
-      }
-    }
-  }
-
-  
-void SCPgenInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H){
-  int n_hess_in = H_.getNumInputs() - (parametric_ ? 1 : 0);
-  H_.setInput(x);
-  if(n_hess_in>1){
-    H_.setInput(lambda, n_hess_in == 4 ? 2 : 1);
-    H_.setInput(sigma, n_hess_in == 4 ? 3 : 2);
-  }
-  H_.evaluate();
-  H_.getOutput(H);
-    
-  // Determing regularization parameter with Gershgorin theorem
-  if(regularize_){
-    reg_ = getRegularization(H);
-    if(reg_ > 0){
-      regularize(H,reg_);
-    }
-  }
-  
-  if (monitored("eval_h")) {
-    cout << "x = " << x << endl;
-    cout << "H = " << endl;
-    H.printSparse();
-  }
-}
-
-void SCPgenInternal::eval_g(const std::vector<double>& x, std::vector<double>& g){
-  // Quick return if no constraints
-  if(m_==0) return;
-  
-  G_.setInput(x);
-  G_.evaluate();
-  G_.output().get(g,DENSE);
-  
-  if (monitored("eval_g")) {
-    cout << "x = " << x << endl;
-    cout << "g = " << g << endl;
-  } 
-}
-
-void SCPgenInternal::eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J){
-  // Quick return if no constraints
-  if(m_==0) return;
-
-  J_.setInput(x);
-  J_.evaluate();
-  J_.output(1).get(g,DENSE);
-  J_.output(0).get(J);
-
-  if (monitored("eval_jac_g")) {
-    cout << "x = " << x << endl;
-    cout << "g = " << g << endl;
-    cout << "J = " << endl;
-    J.printSparse();
-  }
-}
-
-void SCPgenInternal::eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f){
-  F_.setInput(x);
-  F_.setAdjSeed(1.0);
-  F_.evaluate(0,1);
-  F_.output().get(f);
-  F_.adjSens().get(grad_f,DENSE);
-  
-  if (monitored("eval_f")){
-    cout << "x = " << x << endl;
-    cout << "f = " << f << endl;
-  }
-  
-  if (monitored("eval_grad_f")) {
-    cout << "x      = " << x << endl;
-    cout << "grad_f = " << grad_f << endl;
-  }
-}
-
-  
-void SCPgenInternal::eval_f(const std::vector<double>& x, double& f){
-  F_.setInput(x);
-  F_.evaluate();
-  F_.output().get(f);
-
-  if (monitored("eval_f")){
-    cout << "x = " << x << endl;
-    cout << "f = " << f << endl;
-  }
-}
-  
-void SCPgenInternal::solve_QP(const Matrix<double>& H, const std::vector<double>& g,
-			   const std::vector<double>& lbx, const std::vector<double>& ubx,
-			   const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
-			   std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt){
-
-  // Pass data to QP solver
-  qp_solver_.setInput(H, QP_H);
-  qp_solver_.setInput(g,QP_G);
-
-  // Hot-starting if possible
-  qp_solver_.setInput(x_opt, QP_X_INIT);
-  
-  //TODO: Fix hot-starting of dual variables
-  //qp_solver_.setInput(lambda_A_opt, QP_LAMBDA_INIT);
-  
-  // Pass simple bounds
-  qp_solver_.setInput(lbx, QP_LBX);
-  qp_solver_.setInput(ubx, QP_UBX);
-
-  // Pass linear bounds
-  if(m_>0){
-    qp_solver_.setInput(A, QP_A);
-    qp_solver_.setInput(lbA, QP_LBA);
-    qp_solver_.setInput(ubA, QP_UBA);
-  }
-  
-  if (monitored("qp")) {
-    cout << "H = " << endl;
-    H.printDense();
-    cout << "A = " << endl;
-    A.printDense();
-    cout << "g = " << g << endl;
-    cout << "lbx = " << lbx << endl;
-    cout << "ubx = " << ubx << endl;
-    cout << "lbA = " << lbA << endl;
-    cout << "ubA = " << ubA << endl;
-  }
-
-  // Solve the QP
-  qp_solver_.evaluate();
-  
-  // Get the optimal solution
-  qp_solver_.getOutput(x_opt,QP_PRIMAL);
-  qp_solver_.getOutput(lambda_x_opt,QP_LAMBDA_X);
-  qp_solver_.getOutput(lambda_A_opt,QP_LAMBDA_A);
-  if (monitored("dx")){
-    cout << "dx = " << x_opt << endl;
-  }
-}
-  
-double SCPgenInternal::primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,
-                                        const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg){
+double SCPgenInternal::primalInfeasibility(){
   // L1-norm of the primal infeasibility
   double pr_inf = 0;
   
-  // Bound constraints
-  for(int j=0; j<x.size(); ++j){
-    pr_inf += max(0., lbx[j] - x[j]);
-    pr_inf += max(0., x[j] - ubx[j]);
+  // Variable bounds
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    if(it==x_.begin()){
+      
+      // Simple bounds
+      for(int i=0; i<it->n; ++i) pr_inf +=  ::fmax(it->opt[i]-ubu_[i],0.);
+      for(int i=0; i<it->n; ++i) pr_inf +=  ::fmax(lbu_[i]-it->opt[i],0.);
+
+    } else {
+      
+      // Lifted variables
+      for(int i=0; i<it->n; ++i) pr_inf += ::fabs(it->res[i]);
+    }
   }
   
-  // Nonlinear constraints
-  for(int j=0; j<g.size(); ++j){
-    pr_inf += max(0., lbg[j] - g[j]);
-    pr_inf += max(0., g[j] - ubg[j]);
-  }
+  // Nonlinear bounds
+  for(int i=0; i<ng_; ++i) pr_inf += ::fmax(g_[i]-ubg_[i],0.);
+  for(int i=0; i<ng_; ++i) pr_inf += ::fmax(lbg_[i]-g_[i],0.);
   
   return pr_inf;
 }  
+
+double SCPgenInternal::dualInfeasibility(){
+  // Not implemented for Gauss-Newton
+  if(gauss_newton_) return 0;
+
+  // L1-norm of the dual infeasibility
+  double du_inf = 0;
+  
+  // Lifted variables
+  for(int i=0; i<ngL_; ++i) du_inf += ::fabs(gL_[i]);
+
+  return du_inf;
+}
+
+void SCPgenInternal::printIteration(std::ostream &stream){
+  stream << setw(4)  << "iter";
+  stream << setw(14) << "objective";
+  stream << setw(11) << "inf_pr";
+  stream << setw(11) << "inf_du";
+  stream << setw(11) << "pr_step";
+  stream << setw(11) << "du_step";
+  stream << setw(8) << "lg(rg)";
+  stream << setw(3) << "ls";
+  stream << ' ';
+
+#if 0
+  // Problem specific: generic functionality needed
+  stream << setw(9) << "drag";
+  stream << setw(9) << "depth";
+#endif
+
+  stream << endl;
+}
+  
+void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, double rg, int ls_trials, bool ls_success){
+  stream << setw(4) << iter;
+  stream << scientific;
+  stream << setw(14) << setprecision(6) << obj;
+  stream << setw(11) << setprecision(2) << pr_inf;
+  stream << setw(11);
+  if(gauss_newton_){
+    stream << "-";
+  } else {
+    stream << setprecision(2) << du_inf;
+  }
+  stream << setw(11) << setprecision(2) << pr_step_;
+  stream << setw(11);
+  if(gauss_newton_){
+    stream << "-";
+  } else {
+    stream << setprecision(2) << du_step_;
+  }
+  stream << fixed;
+  if(rg>0){
+    stream << setw(8) << setprecision(2) << log10(rg);
+  } else {
+    stream << setw(8) << "-";
+  }
+  stream << setw(3) << ls_trials;
+  stream << (ls_success ? ' ' : 'F');
+
+  // Problem specific: generic functionality needed
+#if 0
+  stream << setw(9) << setprecision(4) << x_[0].opt.at(0)*p_scale_[0];
+  stream << setw(9) << setprecision(4) << x_[0].opt.at(1)*p_scale_[1];
+#endif
+
+  stream << scientific;
+
+  stream << endl;
+}
+
+void SCPgenInternal::eval_res(){
+  // Pass primal variables to the residual function for initial evaluation
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    res_fcn_.setInput(it->opt,it->res_var);
+  }
+  
+  // Pass dual variables to the residual function for initial evaluation
+  if(!gauss_newton_){
+    res_fcn_.setInput(lambda_g_,res_lam_g_);
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      res_fcn_.setInput(it->lam,it->res_lam);
+    }
+  }
+  
+  // Evaluate residual function
+  res_fcn_.evaluate();
+
+  // Get objective
+  obj_k_ = res_fcn_.output(res_obj_).toScalar();
+
+  // Get objective gradient
+  if(!gauss_newton_){
+    res_fcn_.getOutput(gL_,res_gl_);
+  }
+
+  // Get constraints
+  res_fcn_.getOutput(g_,res_g_);
+
+  // Get residuals
+  for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+    res_fcn_.getOutput(it->res,  it->res_d);
+    if(!gauss_newton_){
+      res_fcn_.getOutput(it->resL, it->res_lam_d);
+    }
+  }
+}
+
+void SCPgenInternal::eval_qpf(){
+  // Pass primal variables to the linearization function
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    qp_fcn_.setInput(it->opt,it->qpf_var);
+    if(!gauss_newton_){
+      qp_fcn_.setInput(it->lam,it->qpf_lam);	
+    }
+  }
+  
+  // Pass dual variables to the linearization function
+  if(!gauss_newton_){
+    qp_fcn_.setInput(lambda_g_,qpf_lam_g_);
+  }
+  
+  // Pass residual
+  for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+    qp_fcn_.setInput(it->res, it->qpf_res);
+    if(!gauss_newton_){
+      qp_fcn_.setInput(it->resL,it->qpf_resL);
+    }
+  }
+  
+  // Evaluate to get QP
+  qp_fcn_.evaluate();
+}
+
+void SCPgenInternal::regularize(){
+  casadi_assert(x_[0].n==2);
+
+  DMatrix& qpH = qp_fcn_.output(QPF_H);
+  
+  // Regularization
+  reg_ = 0;
+  
+  // Check the smallest eigenvalue of the Hessian
+  double a = qpH.elem(0,0);
+  double b = qpH.elem(0,1);
+  double c = qpH.elem(1,0);
+  double d = qpH.elem(1,1);
+  
+  // Make sure no not a numbers
+  casadi_assert(a==a && b==b && c==c &&  d==d);
+  
+  // Make sure symmetric
+  if(b!=c){
+    casadi_assert_warning(fabs(b-c)<1e-10,"Hessian is not symmetric: " << b << " != " << c);
+    qpH.elem(1,0) = c = b;
+  }
+  
+  double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
+  if(eig_smallest<reg_threshold_){
+    // Regularization
+    reg_ = reg_threshold_-eig_smallest;
+    std::cerr << "Regularization with " << reg_ << " to ensure positive definite Hessian." << endl;
+    qpH(0,0) += reg_;
+    qpH(1,1) += reg_;
+  }
+}
+
+void SCPgenInternal::solve_qp(){
+  // QP
+  const DMatrix& qpH = qp_fcn_.output(QPF_H);
+  const DMatrix& qpG = qp_fcn_.output(QPF_G);
+  const DMatrix& qpA = qp_fcn_.output(QPF_A);
+  const DMatrix& qpB = qp_fcn_.output(QPF_B);
+  
+  // Solve the QP
+  qp_solver_.setInput(qpH,QP_H);
+  qp_solver_.setInput(qpG,QP_G);
+  qp_solver_.setInput(qpA,QP_A);
+  std::transform(lbu_.begin(),lbu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
+  std::transform(ubu_.begin(),ubu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
+  
+  
+  //    std::transform(lbg_.begin(),lbg_.end(), qpB.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
+  std::transform(ubg_.begin(),ubg_.end(), qpB.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
+  
+  //    cout << "lba = " << qp_solver_.input(QP_LBA).data() << endl;
+  //    cout << "uba = " << qp_solver_.input(QP_UBA).data() << endl;
+  
+  qp_solver_.evaluate();
+  
+  // Condensed step
+  const DMatrix& du = qp_solver_.output(QP_PRIMAL);
+  copy(du.begin(),du.end(),x_[0].step.begin());
+  
+  if(!gauss_newton_){
+    const DMatrix& lam_g_new = qp_solver_.output(QP_LAMBDA_A);
+    copy(lam_g_new.begin(),lam_g_new.end(),dlambda_g_.begin());
+    std::transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),dlambda_g_.begin(),std::minus<double>());
+    
+    const DMatrix& dlam_u = qp_solver_.output(QP_LAMBDA_X);
+    copy(dlam_u.begin(),dlam_u.end(),x_[0].dlam.begin());
+  }  
+}
+
+void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
+  // Calculate penalty parameter of merit function
+  sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_X).data()));
+  sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_A).data()));
+  
+  // Calculate L1-merit function in the actual iterate
+  double l1_infeas = primalInfeasibility();
+  
+  // Right-hand side of Armijo condition
+  double F_sens = exp_fcn_.output(exp_osens_).toScalar();
+  double L1dir = F_sens - sigma_ * l1_infeas;
+  double L1merit = obj_k_ + sigma_ * l1_infeas;
+  
+  // Store the actual merit function
+  if(L1merit<meritmax_){
+    meritmax_ = L1merit;
+  }
+  
+  // Stepsize
+  double t = 1.0, t_prev = 0.0;
+  double fk_cand;
+  
+  // Merit function value in candidate
+  double L1merit_cand = 0;
+  
+  // Reset line-search counter, success marker
+  ls_iter = 0;
+  ls_success = false;
+  int maxiter_ls_ = 3;
+  
+  // Line-search parameter, restoration factor of stepsize
+  double beta_ = 0.8;
+  
+  // Armijo condition, coefficient of decrease in merit
+  double c1_ = 1e-4;
+  
+  // Line-search
+  //log("Starting line-search");
+  
+  // Line-search loop
+  while (true){
+    
+    // Take the primal step
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      for(int i=0; i<it->n; ++i){
+	it->opt[i] += (t-t_prev) * it->step[i];
+      }
+    }
+    
+    // Take the dual step
+    if(!gauss_newton_){
+      for(int i=0; i<ng_; ++i){
+	lambda_g_[i] += (t-t_prev) * dlambda_g_[i];
+      }
+      for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+	if(it==x_.begin()){
+	  //copy(it->dlam.begin(),it->dlam.end(),it->lam.begin()); // BUG?
+	} else {
+	  for(int i=0; i<it->n; ++i){
+	    it->lam[i] += (t-t_prev) * it->dlam[i];
+	  }
+	}
+      }
+    }
+    
+    // Evaluate residual function to get objective and constraints (and residuals for the next iteration)
+    eval_res();
+    ls_iter++;      
+    
+    // Calculating merit-function in candidate
+    l1_infeas = primalInfeasibility();
+    L1merit_cand = obj_k_ + sigma_ * l1_infeas;
+    
+    // Calculating maximal merit function value so far
+    if (L1merit_cand <= meritmax_ + t * c1_ * L1dir){
+      
+      // Accepting candidate
+      ls_success = true;
+      //log("Line-search completed, candidate accepted");
+      break;
+    }
+    
+    // Line-search not successful, but we accept it.
+    if(ls_iter == maxiter_ls_){
+      //log("Line-search completed, maximum number of iterations");
+      break;
+    }
+    
+    // Backtracking
+    t_prev = t;
+    t = beta_ * t;
+  }
+
+  // Calculate primal step-size
+  pr_step_ = 0;
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    for(vector<double>::const_iterator i=it->step.begin(); i!=it->step.end(); ++i){
+      pr_step_ += fabs(*i);
+    }
+  }
+  pr_step_ *= t;
+
+  // Calculate the dual step-size
+  if(!gauss_newton_){
+    du_step_ = 0;
+    for(vector<double>::const_iterator i=dlambda_g_.begin(); i!=dlambda_g_.end(); ++i){
+      du_step_ += fabs(*i);
+    }
+
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      if(it==x_.begin()){
+	// ?
+      } else {
+	for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i){
+	  du_step_ += fabs(*i);
+	}
+      }
+    }
+    du_step_ *= t;
+  }
+}
+
+void SCPgenInternal::eval_exp(){
+  // Pass primal step/variables
+  exp_fcn_.setInput(x_[0].step, exp_du_);
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    if(it==x_.begin()){
+      exp_fcn_.setInput(it->opt,it->exp_var);
+    } else {
+      exp_fcn_.setInput(it->res,it->exp_var);
+    }
+  }
+  
+  // Pass dual step/variables
+  if(!gauss_newton_){
+    exp_fcn_.setInput(dlambda_g_,exp_dlam_g_);
+    exp_fcn_.setInput(lambda_g_,exp_lam_g_);
+    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      if(it==x_.begin()){
+	exp_fcn_.setInput(it->lam,it->exp_lam);
+      } else {
+	exp_fcn_.setInput(it->resL,it->exp_lam);
+      }
+    }
+  }
+
+  // Perform the step expansion
+  exp_fcn_.evaluate();
+
+  // Expanded primal step
+  for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+    const DMatrix& dv = exp_fcn_.output(it->exp_def);
+    copy(dv.begin(),dv.end(),it->step.begin());
+  }
+  
+  // Expanded dual step
+  if(!gauss_newton_){
+    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+      const DMatrix& dlam_v = exp_fcn_.output(it->exp_defL);
+      copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
+    }
+  }  
+}
+  
 
 } // namespace CasADi

@@ -39,6 +39,43 @@ public:
   
   virtual void init();
   virtual void evaluate(int nfdir, int nadir);
+
+  // Codegen function
+  void dynamicCompilation(FX& f, FX& f_gen, std::string fname, std::string fdescr);
+
+  // Calculate the L1-norm of the primal infeasibility
+  double primalInfeasibility();
+
+  // Calculate the L1-norm of the dual infeasibility
+  double dualInfeasibility();
+
+  // Print iteration header
+  void printIteration(std::ostream &stream);
+  
+  // Print iteration
+  void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
+                      double reg, int ls_trials, bool ls_success);
+
+  // Evaluate the residual function
+  void eval_res();
+
+  // Form the condensed QP
+  void eval_qpf();
+
+  // Regularize the condensed QP
+  void regularize();
+
+  // Solve the QP to get the (full) step
+  void solve_qp();
+
+  // Perform the line-search to take the step
+  void line_search(int& ls_iter, bool& ls_success);
+
+  // Evaluate the step expansion
+  void eval_exp();
+
+
+
   
   /// QP solver for the subproblems
   QPSolver qp_solver_;
@@ -55,112 +92,122 @@ public:
 
   /// Linesearch parameters
   //@{
-  double sigma_;
   double c1_;
   double beta_;
   int maxiter_ls_;
   int merit_memsize_;
   //@}
 
-  /// Hessian regularization
-  double reg_;
-  
+  /// Enable Code generation
+  bool codegen_;
+
   /// Access QPSolver
   const QPSolver getQPSolver() const { return qp_solver_;}
   
-  /// Lagrange multipliers of the NLP
-  std::vector<double> mu_, mu_x_;
-  
-  /// Current cost function value
-  double fk_;
-  
-  /// Current and previous linearization point and candidate
-  std::vector<double> x_, x_old_, x_cand_;
-  
-  /// Lagrange gradient in the next iterate
-  std::vector<double> gLag_, gLag_old_;
-  
-  /// Constraint function value
-  std::vector<double> gk_, gk_cand_;
-  
-  /// Gradient of the objective function
-  std::vector<double> gf_;
-
-  /// BFGS update function
-  enum BFGSMdoe{ BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN}; 
-  FX bfgs_;
-  
-  /// Supported Hessian modes
-  enum HessMode{ HESS_EXACT, HESS_BFGS};
-
-  /// Hessian mode
-  HessMode hess_mode_;
-
-  /// Initial Hessian approximation (BFGS)
-  DMatrix B_init_;
-  
-  /// Current Hessian approximation
-  DMatrix Bk_;
-  
-  // Current Jacobian
-  DMatrix Jk_;
-
-  // Bounds of the QP
-  std::vector<double> qp_LBA_, qp_UBA_, qp_LBX_, qp_UBX_;
-
-  // QP solution
-  std::vector<double> dx_, qp_DUAL_X_, qp_DUAL_A_;
-
   /// Regularization
   bool regularize_;
 
   // Storage for merit function
   std::deque<double> merit_mem_;
 
-  /// Print iteration header
-  void printIteration(std::ostream &stream);
-  
-  /// Print iteration
-  void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
-                      double dx_norm, double reg, int ls_trials, bool ls_success);
 
-  // Reset the Hessian or Hessian approximation
-  void reset_h();
 
-  // Evaluate the gradient of the objective
-  virtual void eval_f(const std::vector<double>& x, double& f);
-  
-  // Evaluate the gradient of the objective
-  virtual void eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f);
-  
-  // Evaluate the constraints
-  virtual void eval_g(const std::vector<double>& x, std::vector<double>& g);
 
-  // Evaluate the Jacobian of the constraints
-  virtual void eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J);
 
-  // Evaluate the Hessian of the Lagrangian
-  virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H);
+
+
+
+
+
+
+
+
+
+
+  // Options
+  bool gauss_newton_;
+  double reg_threshold_;
+
+  /// stopping criterion for the stepsize
+  double toldx_;
   
-  // Calculate the regularization parameter using Gershgorin theorem
-  double getRegularization(const Matrix<double>& H);
+  /// stopping criterion for the lagrangian gradient
+  double tolgl_;
   
-  // Regularize by adding a multiple of the identity
-  void regularize(Matrix<double>& H, double reg);
+  /// Outputs of the linearization function
+  enum QPFOut{QPF_G,QPF_H,QPF_B,QPF_A,QPF_NUM_OUT};
   
-  // Solve the QP subproblem
-  virtual void solve_QP(const Matrix<double>& H, const std::vector<double>& g,
-			const std::vector<double>& lbx, const std::vector<double>& ubx,
-			const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
-			std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt);
+  /// Generate initial guess for lifted variables
+  FX vinit_fcn_;
+
+  /// Residual function
+  FX res_fcn_;
+ 
+  /// Quadratic approximation
+  FX qp_fcn_;
+
+  /// Step expansion
+  FX exp_fcn_;
   
-  // Calculate the L1-norm of the primal infeasibility
-  double primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,
-                             const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg);
+  /// Dimensions
+  int nu_, ng_, ngL_;
+
+  // Objective value
+  double obj_k_;
+
+  // Simple and nonlinear bounds
+  std::vector<double> lbu_, ubu_, g_, lbg_, ubg_, gL_;
+
+  /// Multipliers for the nonlinear bounds
+  std::vector<double> lambda_g_, dlambda_g_;
+
+  int res_lam_g_;
+  int res_obj_, res_gl_, res_g_;
+
+  int z_lam_g_;
+  int z_obj_, z_gl_, z_g_;
+
+  int qpf_lam_g_;
+
+  int exp_du_, exp_dlam_g_, exp_lam_g_;
+  int exp_osens_;
+
+  struct Var{
+    int n;
+
+    int res_var, res_lam;
+    int res_d, res_lam_d;
+
+    int z_var, z_lam;
+    int z_def, z_defL;
+
+    int qpf_var, qpf_lam, qpf_res, qpf_resL;
+
+    int exp_var, exp_lam;
+    int exp_def, exp_defL;
+
+    std::vector<double> step, init, opt, lam, dlam;
+    std::vector<double> res, resL;
+    
+  };
+  std::vector<Var> x_;  
+
+  // Best merit function encountered so far
+  double meritmax_;
   
-  /// Calculates inner_prod(x,mul(A,x))
-  static double quad_form(const std::vector<double>& x, const DMatrix& A);
+  // Penalty parameter of merit function
+  double sigma_;
+
+  // 1-norm of last primal step
+  double pr_step_;
   
+  // 1-norm of last dual step
+  double du_step_;
+
+  // Regularization
+  double reg_;
+  
+    
 };
 
 } // namespace CasADi
