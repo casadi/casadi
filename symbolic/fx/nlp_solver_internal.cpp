@@ -79,6 +79,10 @@ void NLPSolverInternal::init(){
   n_ = F_.input(0).numel();
   m_ = G_.isNull() ? 0 : G_.output(0).numel();
 
+  // Remove G if it has zero dimension
+  if(m_ == 0 && !G_.isNull())
+    G_ = FX();
+
   parametric_ = getOption("parametric");
   
   if (parametric_) {
