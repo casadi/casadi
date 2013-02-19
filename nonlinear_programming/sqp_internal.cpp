@@ -263,7 +263,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   
   // Reset
   merit_mem_.clear();
-  sigma_ = 0.;
+  sigma_ = 0.;    // NOTE: Move this into the main optimization loop
 
   // Default stepsize
   double t = 0;
