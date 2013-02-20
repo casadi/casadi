@@ -75172,6 +75172,1116 @@ Assert that the object has been initialized. ";
 Get a weak reference to the object. ";
 
 
+// File: classCasADi_1_1SCPgen.xml
+%feature("docstring") CasADi::SCPgen "
+
+A structure-exploiting sequential quadratic programming (to be come
+sequential convex programming) method for nonlinear programming.
+
+Joel Andersson, Attila Kozma and Joris Gillis
+
+C++ includes: scpgen.hpp ";
+
+/*  Setters  */
+
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::SCPgen::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::SCPgen::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::SCPgen::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::SCPgen::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::SCPgen::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::SCPgen::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::SCPgen::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::SCPgen::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::SCPgen::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::SCPgen::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::SCPgen::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::SCPgen::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::SCPgen::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::SCPgen::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::SCPgen::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::SCPgen::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::SCPgen::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::SCPgen::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::SCPgen::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::SCPgen::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::SCPgen::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::SCPgen::makeUnique "";
+
+%feature("docstring")  CasADi::SCPgen::SCPgen "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::SCPgen::SCPgen "
+
+Constuct an NLP with non-linear constraints and provided hessian
+approximation. ";
+
+%feature("docstring")  CasADi::SCPgen::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::SCPgen::getQPSolver "
+
+Access the QPSolver used internally. ";
+
+%feature("docstring")  CasADi::SCPgen::reportConstraints "
+
+Prints out a human readable report about possible constraint violations,
+after solving. ";
+
+%feature("docstring")  CasADi::SCPgen::getReportConstraints "";
+
+%feature("docstring")  CasADi::SCPgen::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
+
+%feature("docstring")  CasADi::SCPgen::getF "
+
+Access the objective function F. ";
+
+%feature("docstring")  CasADi::SCPgen::getG "
+
+Access the objective function G. ";
+
+%feature("docstring")  CasADi::SCPgen::getH "
+
+Access the hessian of the Lagrangian function H. ";
+
+%feature("docstring")  CasADi::SCPgen::getJ "
+
+Access the jacobian of the constraint function J. ";
+
+%feature("docstring")  CasADi::SCPgen::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::SCPgen::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::SCPgen::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::SCPgen::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::SCPgen::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SCPgen::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SCPgen::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::SCPgen::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::SCPgen::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::SCPgen::getOutputScheme "
+
+Get output scheme. ";
+
+%feature("docstring")  CasADi::SCPgen::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::SCPgen::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
+%feature("docstring")  CasADi::SCPgen::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::SCPgen::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
+%feature("docstring")  CasADi::SCPgen::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::SCPgen::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
+%feature("docstring")  CasADi::SCPgen::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::SCPgen::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs. ";
+
+%feature("docstring")  CasADi::SCPgen::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
+
+%feature("docstring")  CasADi::SCPgen::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
+
+%feature("docstring")  CasADi::SCPgen::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
+%feature("docstring")  CasADi::SCPgen::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::SCPgen::call "
+
+Create a function call ( MX graph) ";
+
+%feature("docstring")  CasADi::SCPgen::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::SCPgen::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::SCPgen::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::SCPgen::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::SCPgen::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::SCPgen::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::SCPgen::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::SCPgen::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::SCPgen::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::SCPgen::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::SCPgen::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::SCPgen::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
+%feature("docstring")  CasADi::SCPgen::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SCPgen::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SCPgen::generateCode "
+
+Export / Generate C code for the function. ";
+
+%feature("docstring")  CasADi::SCPgen::indexed_one_based "";
+
+%feature("docstring")  CasADi::SCPgen::indexed_zero_based "";
+
+%feature("docstring")  CasADi::SCPgen::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SCPgen::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SCPgen::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SCPgen::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SCPgen::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SCPgen::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::SCPgen::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::SCPgen::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::SCPgen::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SCPgen::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SCPgen::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::SCPgen::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::SCPgen::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SCPgen::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SCPgen::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SCPgen::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SCPgen::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
+
+%feature("docstring")  CasADi::SCPgen::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
+
+%feature("docstring")  CasADi::SCPgen::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SCPgen::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SCPgen::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SCPgen::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::SCPgen::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::SCPgen::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::SCPgen::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgen::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgen::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgen::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgen::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgen::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::SCPgen::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::SCPgen::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
+%feature("docstring")  CasADi::SCPgen::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgen::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::SCPgen::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::SCPgen::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::SCPgen::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::SCPgen::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::SCPgen::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::SCPgen::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::SCPgen::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::SCPgen::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::SCPgen::printPtr "
+
+Print the pointer to the internal class. ";
+
+%feature("docstring")  CasADi::SCPgen::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::SCPgen::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::SCPgen::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::SCPgen::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::SCPgen::weak "
+
+Get a weak reference to the object. ";
+
+%feature("docstring")  CasADi::SCPgen::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::SCPgen::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1SCPgenInternal.xml
+%feature("docstring") CasADi::SCPgenInternal "C++ includes:
+scpgen_internal.hpp ";
+
+%feature("docstring")  CasADi::SCPgenInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getHessian "";
+
+%feature("docstring")  CasADi::SCPgenInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getGradient "";
+
+%feature("docstring")  CasADi::SCPgenInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getJacobian "";
+
+%feature("docstring")  CasADi::SCPgenInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::SCPgenInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::SCPgenInternal::getFullJacobian "";
+
+%feature("docstring")  CasADi::SCPgenInternal::derivative "
+
+Return function that calculates forward derivatives This method returns a
+cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
+if no cached version is available. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getDerivative "
+
+Constructs and returns a function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::input "";
+
+%feature("docstring")  CasADi::SCPgenInternal::input "";
+
+%feature("docstring")  CasADi::SCPgenInternal::input "";
+
+%feature("docstring")  CasADi::SCPgenInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::output "
+
+Access output argument. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::output "";
+
+%feature("docstring")  CasADi::SCPgenInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::fwdSeed "";
+
+%feature("docstring")  CasADi::SCPgenInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::fwdSens "";
+
+%feature("docstring")  CasADi::SCPgenInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::adjSeed "";
+
+%feature("docstring")  CasADi::SCPgenInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::adjSens "";
+
+%feature("docstring")  CasADi::SCPgenInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::SCPgenInternal::SCPgenInternal "";
+
+%feature("docstring")  CasADi::SCPgenInternal::~SCPgenInternal "";
+
+%feature("docstring")  CasADi::SCPgenInternal::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::init "
+
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::dynamicCompilation "";
+
+%feature("docstring")  CasADi::SCPgenInternal::primalInfeasibility "";
+
+%feature("docstring")  CasADi::SCPgenInternal::dualInfeasibility "";
+
+%feature("docstring")  CasADi::SCPgenInternal::printIteration "";
+
+%feature("docstring")  CasADi::SCPgenInternal::printIteration "";
+
+%feature("docstring")  CasADi::SCPgenInternal::eval_res "";
+
+%feature("docstring")  CasADi::SCPgenInternal::eval_qpf "";
+
+%feature("docstring")  CasADi::SCPgenInternal::regularize "";
+
+%feature("docstring")  CasADi::SCPgenInternal::solve_qp "";
+
+%feature("docstring")  CasADi::SCPgenInternal::line_search "";
+
+%feature("docstring")  CasADi::SCPgenInternal::eval_exp "";
+
+%feature("docstring")  CasADi::SCPgenInternal::getQPSolver "
+
+Access QPSolver. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::reportConstraints "
+
+Prints out a human readable report about possible constraint violations -
+all constraints. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::checkInitialBounds "
+
+Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
+";
+
+%feature("docstring")  CasADi::SCPgenInternal::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::requestNumSens "
+
+Request a number of forward/adjoint derivative directions. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::SCPgenInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::call "
+
+Call a function, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::SCPgenInternal::call "
+
+Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::SCPgenInternal::generateCode "
+
+Print to a c file. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::generateIO "
+
+Generate code for function inputs and outputs. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::generateFunction "
+
+Generate code for the C functon. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::setInputScheme "
+
+Set input scheme. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::setOutputScheme "
+
+Set output scheme. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getInputScheme "
+
+Get input scheme. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getOutputScheme "
+
+Get output scheme. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::SCPgenInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
+
+%feature("docstring")
+CasADi::SCPgenInternal::getJacSparsityHierarchicalSymm "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition for symmetric jacobians. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::SCPgenInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::SCPgenInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::SCPgenInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getOptionAllowedIndex "
+
+Get the index into allowed options of a certain option. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::setOptionByAllowedIndex "
+
+Set a certain option by giving its index into the allowed values. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getOptionEnumValue "
+
+Get the enum value corresponding to th certain option. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::setOptionByEnumValue "
+
+Set a certain option by giving an enum value. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::SCPgenInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::SCPgenInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::SCPgenInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::SCPgenInternal::weak "
+
+Get a weak reference to the object. ";
+
+
 // File: classCasADi_1_1SDPSolver.xml
 %feature("docstring") CasADi::SDPSolver "
 
@@ -85777,6 +86887,11 @@ print ";
 %feature("docstring")  CasADi::UnarySX::mark "";
 
 
+// File: structCasADi_1_1SCPgenInternal_1_1Var.xml
+%feature("docstring") CasADi::SCPgenInternal::Var "C++ includes:
+scpgen_internal.hpp ";
+
+
 // File: classCasADi_1_1Variable.xml
 %feature("docstring") CasADi::Variable "
 
@@ -91527,6 +92642,10 @@ and 0 otherwise. ";
 
 Matlab's linspace command. ";
 
+%feature("docstring")  CasADi::cross "
+
+Matlab's cross command. ";
+
 %feature("docstring")  CasADi::trans "
 
 Transpose of a matrix. ";
@@ -94024,6 +95143,18 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: rk__integrator__internal_8hpp.xml
+
+
+// File: scpgen_8cpp.xml
+
+
+// File: scpgen_8hpp.xml
+
+
+// File: scpgen__internal_8cpp.xml
+
+
+// File: scpgen__internal_8hpp.xml
 
 
 // File: sdp__solver_8cpp.xml

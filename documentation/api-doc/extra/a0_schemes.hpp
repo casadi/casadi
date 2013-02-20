@@ -476,6 +476,20 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
+/** \class CasADi::SCPgenInternal
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
+/** \class CasADi::SCPgen
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
 /** \class CasADi::OOQPInternal
 \n
 \par

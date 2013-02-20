@@ -42,6 +42,24 @@
 <tr><td>iter_count</td><td>CasADi::LiftedSQPInternal</td></tr>
 </table>
 */
+/** \class CasADi::SCPgenInternal
+\n
+\par
+<table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iter_count</td><td>CasADi::SCPgenInternal</td></tr>
+</table>
+*/
+/** \class CasADi::SCPgen
+\n
+\par
+<table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iter_count</td><td>CasADi::SCPgenInternal</td></tr>
+</table>
+*/
 /** \class CasADi::IpoptInternal
 \n
 \par
