@@ -1022,13 +1022,6 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
   // Reset line-search counter, success marker
   ls_iter = 0;
   ls_success = false;
-  int maxiter_ls_ = 3;
-  
-  // Line-search parameter, restoration factor of stepsize
-  double beta_ = 0.8;
-  
-  // Armijo condition, coefficient of decrease in merit
-  double c1_ = 1e-4;
   
   // Line-search
   //log("Starting line-search");
