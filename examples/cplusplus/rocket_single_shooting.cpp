@@ -22,6 +22,8 @@
 
 #include <iostream>
 #include <symbolic/casadi.hpp>
+#include <nonlinear_programming/scpgen.hpp>
+#include <nonlinear_programming/nlp_qp_solver.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include "interfaces/sundials/cvodes_integrator.hpp"
 #include "interfaces/sundials/idas_integrator.hpp"
@@ -32,6 +34,7 @@ using namespace std;
 
 bool sundials_integrator = true;
 bool explicit_integrator = false;
+bool lifted_newton = false;
 
 int main(){
   
@@ -129,6 +132,11 @@ int main(){
 
     // Integrate
     X = integrator.call(input).at(0);
+
+    // Lift X
+    if(lifted_newton){
+      X.lift(X);
+    }
   }
 
   // Objective function
@@ -142,13 +150,33 @@ int main(){
   MXFunction gfcn(U,G); // constraint function
 
   // Allocate an NLP solver
-  // LiftedNewtonSolver solver(ffcn,gfcn);
-  IpoptSolver solver(ffcn,gfcn);
-  
-  // Set options
-  solver.setOption("tol",1e-10);
-  solver.setOption("hessian_approximation","limited-memory");
-  
+  NLPSolver solver;
+  if(lifted_newton){
+    solver = SCPgen(ffcn,gfcn);
+
+    solver.setOption("verbose",true);
+    solver.setOption("regularize",false);
+    solver.setOption("maxiter_ls",1);
+    solver.setOption("maxiter",100);
+    
+    // Use IPOPT as QP solver
+    solver.setOption("qp_solver",NLPQPSolver::creator);
+    Dictionary qp_solver_options;
+    qp_solver_options["nlp_solver"] = IpoptSolver::creator;
+    Dictionary ipopt_options;
+    ipopt_options["tol"] = 1e-12;
+    ipopt_options["print_level"] = 0;
+    ipopt_options["print_time"] = false;
+    qp_solver_options["nlp_solver_options"] = ipopt_options;
+    solver.setOption("qp_solver_options",qp_solver_options);
+  } else {
+    solver = IpoptSolver(ffcn,gfcn);
+    
+    // Set options
+    solver.setOption("tol",1e-10);
+    solver.setOption("hessian_approximation","limited-memory");
+  }
+
   // initialize the solver
   solver.init();
 
