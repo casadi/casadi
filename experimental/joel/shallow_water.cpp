@@ -351,6 +351,16 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   nlp_solver_.setOption("reg_threshold",reg_threshold);
   nlp_solver_.setOption("maxiter_ls",1);
   nlp_solver_.setOption("maxiter",100);
+  
+  // Name the variables
+  vector<string> variable_name;
+  variable_name.push_back("drag");
+  variable_name.push_back("depth");
+  nlp_solver_.setOption("name_x",variable_name);
+
+  // Print both of the variables
+  nlp_solver_.setOption("print_x",range(2));
+
   Dictionary qp_solver_options;
   if(ipopt_as_qp_solver){
     nlp_solver_.setOption("qp_solver",NLPQPSolver::creator);

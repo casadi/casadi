@@ -192,7 +192,12 @@ public:
   // Regularization
   double reg_;
   
-    
+  // Names of the components
+  std::vector<std::string> name_x_;
+
+  // Components to print
+  std::vector<int> print_x_;
+
 };
 
 } // namespace CasADi

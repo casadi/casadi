@@ -54,6 +54,8 @@ SCPgenInternal::SCPgenInternal(const FX& F, const FX& G, const FX& H, const FX& 
   addOption("print_header",      OT_BOOLEAN,   true,              "Print the header with problem statistics");
   addOption("codegen",           OT_BOOLEAN,  false,              "C-code generation");
   addOption("reg_threshold",     OT_REAL,      1e-8,              "Threshold for the regularization.");
+  addOption("name_x",      OT_STRINGVECTOR,  GenericType(),       "Names of the variables.");
+  addOption("print_x",           OT_INTEGERVECTOR,  GenericType(), "Which variables to print.");
   
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
@@ -79,6 +81,27 @@ void SCPgenInternal::init(){
   regularize_ = getOption("regularize");
   codegen_ = getOption("codegen");
   reg_threshold_ = getOption("reg_threshold");
+
+  // Name the components
+  if(hasSetOption("name_x")){
+    name_x_ = getOption("name_x");
+    casadi_assert(name_x_.size()==n_);
+  } else {
+    stringstream ss;
+    name_x_.resize(n_);
+    for(int i=0; i<n_; ++i){
+      ss.str(string());
+      ss << "x" << i;
+      name_x_[i] = ss.str();
+    }
+  }
+
+  // Components to print
+  if(hasSetOption("print_x")){
+    print_x_ = getOption("print_x");
+  } else {
+    print_x_.resize(0);
+  }
 
   //  if(getOption("hessian_approximation")=="exact")
   //    hess_mode_ = HESS_EXACT;
@@ -818,11 +841,10 @@ void SCPgenInternal::printIteration(std::ostream &stream){
   stream << setw(3) << "ls";
   stream << ' ';
 
-#if 1
-  // Problem specific: generic functionality needed
-  stream << setw(9) << "drag";
-  stream << setw(9) << "depth";
-#endif
+  // Print variables
+  for(vector<int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i){
+    stream << setw(9) << name_x_.at(*i);
+  }
 
   stream << endl;
 }
@@ -854,14 +876,12 @@ void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, 
   stream << setw(3) << ls_trials;
   stream << (ls_success ? ' ' : 'F');
 
-  // Problem specific: generic functionality needed
-#if 1
-  stream << setw(9) << setprecision(4) << x_[0].opt.at(0)*1.00;
-  stream << setw(9) << setprecision(4) << x_[0].opt.at(1)*0.01;
-#endif
+  // Print variables
+  for(vector<int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i){
+    stream << setw(9) << setprecision(4) << x_[0].opt.at(*i);
+  }
 
   stream << scientific;
-
   stream << endl;
 }
 
