@@ -21,12 +21,8 @@
  */
 
 #include <iostream>
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/mx/mx_tools.hpp>
-#include <symbolic/fx/mx_function.hpp>
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
 #include "interfaces/sundials/cvodes_integrator.hpp"
 #include "interfaces/sundials/idas_integrator.hpp"
 #include "integration/rk_integrator.hpp"
