@@ -566,6 +566,10 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   const vector<double>& ubg = input(NLP_UBG).data();
 
   copy(x_init.begin(),x_init.end(),x_[0].init.begin());
+  copy(lbx.begin(),lbx.end(),lbu_.begin());
+  copy(ubx.begin(),ubx.end(),ubu_.begin());
+  copy(lbg.begin(),lbg.end(),lbg_.begin());
+  copy(ubg.begin(),ubg.end(),ubg_.begin());
   
   if(x_.size()>1){
     // Initialize lifted variables using the generated function
