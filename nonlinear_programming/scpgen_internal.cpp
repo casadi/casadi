@@ -436,13 +436,14 @@ void SCPgenInternal::init(){
   vector<MX> exp_fcn_out;
   n=0;
   exp_fcn_out.push_back(Z_fwdSens[0][z_obj_]);           exp_osens_ = n++;
+  exp_fcn_out.push_back(Z_fwdSens[0][z_gl_]);            exp_curve_ = n++;
   for(int i=1; i<x_.size(); ++i){
     exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_def]);    x_[i].exp_def = n++;
     if(!gauss_newton_){
       exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_defL]); x_[i].exp_defL = n++;
     }
   }
-    
+  
   // Step expansion function
   MXFunction exp_fcn(exp_fcn_in,exp_fcn_out);
   exp_fcn.setOption("number_of_fwd_dir",0);
@@ -1040,6 +1041,22 @@ void SCPgenInternal::solve_qp(){
 }
 
 void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
+  // Make sure that we have a decent direction 
+  if(!gauss_newton_){
+    // Get the reduced Hessian times the step
+    const vector<double>& qpH_times_du = exp_fcn_.output(exp_curve_).data();
+    casadi_assert(qpH_times_du.size()==nu_);
+    
+    // Scalar product with du to get gain
+    double gain = 0;
+    for(int i=0; i<nu_; ++i){
+      gain += x_[0].step[i] * qpH_times_du[i];
+    }
+    if (gain < 0){
+      casadi_warning("Hessian indefinite in the search direction");
+    }
+  }
+
   // Calculate penalty parameter of merit function
   sigma_ = 0;
   sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_X).data()));
