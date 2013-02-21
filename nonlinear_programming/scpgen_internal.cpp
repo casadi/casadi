@@ -647,8 +647,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   obj_k_ = numeric_limits<double>::quiet_NaN();
 
   // Reset line-search
-  meritmax_ = numeric_limits<double>::infinity();
-  sigma_ = 0;
+  merit_mem_.clear();
 
   // Current guess for the primal solution
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
@@ -1042,22 +1041,24 @@ void SCPgenInternal::solve_qp(){
 
 void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
   // Calculate penalty parameter of merit function
+  sigma_ = 0;
   sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_X).data()));
   sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_A).data()));
   
   // Calculate L1-merit function in the actual iterate
   double l1_infeas = primalInfeasibility();
-  
+
   // Right-hand side of Armijo condition
   double F_sens = exp_fcn_.output(exp_osens_).toScalar();
   double L1dir = F_sens - sigma_ * l1_infeas;
   double L1merit = obj_k_ + sigma_ * l1_infeas;
   
-  // Store the actual merit function
-  if(L1merit<meritmax_){
-    meritmax_ = L1merit;
+  // Storing the actual merit function value in a list
+  merit_mem_.push_back(L1merit);
+  if (merit_mem_.size() > merit_memsize_){
+    merit_mem_.pop_front();
   }
-  
+
   // Stepsize
   double t = 1.0, t_prev = 0.0;
   double fk_cand;
@@ -1107,7 +1108,8 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
     L1merit_cand = obj_k_ + sigma_ * l1_infeas;
     
     // Calculating maximal merit function value so far
-    if (L1merit_cand <= meritmax_ + t * c1_ * L1dir){
+    double meritmax = *max_element(merit_mem_.begin(), merit_mem_.end());
+    if (L1merit_cand <= meritmax + t * c1_ * L1dir){
       
       // Accepting candidate
       ls_success = true;
