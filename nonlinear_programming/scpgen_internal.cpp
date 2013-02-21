@@ -572,6 +572,30 @@ void SCPgenInternal::init(){
       cout << "NLP preparation completed" << endl;
     }
   
+  // Header
+  if(bool(getOption("print_header"))){
+    cout << "-------------------------------------------" << endl;
+    cout << "This is CasADi::SCPgen." << endl;
+    if(gauss_newton_) {
+      cout << "Using Gauss-Newton Hessian" << endl;
+    } else {
+      cout << "Using exact Hessian" << endl;
+    }
+
+    // Count the total number of variables
+    int n_lifted = 0;
+    for(vector<Var>::const_iterator i=x_.begin()+1; i!=x_.end(); ++i){
+      n_lifted += i->n;
+    }
+
+    cout << endl;
+    cout << "Number of reduced variables:               " << setw(9) << n_ << endl;
+    cout << "Number of reduced constraints:             " << setw(9) << m_ << endl;
+    cout << "Number of lifted variables/constraints:    " << setw(9) << n_lifted << endl;
+    cout << "Total number of variables:                 " << setw(9) << (n_+n_lifted) << endl;
+    cout << "Total number of constraints:               " << setw(9) << (m_+n_lifted) << endl;
+    cout << endl;
+  }
 }
 
 void SCPgenInternal::evaluate(int nfdir, int nadir){
