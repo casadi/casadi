@@ -104,3 +104,8 @@ if(WITH_QPOASES AND WITH_DL AND WITH_IPOPT)
   target_link_libraries(shallow_water casadi_qpoases_interface casadi_nonlinear_programming casadi_ipopt_interface casadi ${QPOASES_LIBRARIES} ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
 endif()
 
+if(WITH_QPOASES AND WITH_DL AND WITH_IPOPT)
+  add_executable(nmpc_example nmpc_example.cpp)
+  target_link_libraries(nmpc_example casadi_qpoases_interface casadi_nonlinear_programming casadi_ipopt_interface casadi ${QPOASES_LIBRARIES} ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
+endif()
+
