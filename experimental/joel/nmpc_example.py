@@ -21,17 +21,18 @@
 # 
 from casadi import *
 
-n  = 30              # Num. intervals
-u = msym("u",n)      # Control
+# Formulate the NLP
+u = msym("u",30)     # Control
 J = inner_prod(u,u)  # NLP objective
 G = MX.zeros(0,1)    # NLP constraints
 x = 0.02             # State
-for k in range(n):
+for k in range(30):
     x = x +  0.1*(x*(x+1) + u[k])
-    x.lift(0.)       # Zero initial guess
+    x.lift(0.0)      # Treat as NLP variable
     J = J + x*x      # Add to objective
     G.append(x)      # Add to constraints
 
+# Setup the NLP solver
 f = MXFunction([u],[J]) # Objective function
 g = MXFunction([u],[G]) # Constraint function
 S = SCPgen(f,g)      # NLP solver instance
@@ -40,10 +41,15 @@ S.setOption("qp_solver_options",\
                     {"printLevel":"none"})
 S.init()
     
-# Pass bounds and solve
+# Pass bounds and solve the NLP
 S.setInput(-1.0, NLP_LBX)  # u_min
 S.setInput( 1.0, NLP_UBX)  # u_max
 S.setInput(-1.0, NLP_LBG)  # x_min
 S.setInput( 1.0, NLP_UBG)  # x_max
 S.solve()
+
+# Visualize the trajectory
+from matplotlib.pylab import *
+plot(S.output(NLP_X_OPT))
+show()
 
