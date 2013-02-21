@@ -41,7 +41,7 @@ SCPgenInternal::SCPgenInternal(const FX& F, const FX& G, const FX& H, const FX& 
   addOption("qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the QP solver");
   addOption("hessian_approximation", OT_STRING, "limited-memory", "limited-memory|exact");
   addOption("maxiter",           OT_INTEGER,      50,             "Maximum number of SQP iterations");
-  addOption("maxiter_ls",        OT_INTEGER,       3,             "Maximum number of linesearch iterations");
+  addOption("maxiter_ls",        OT_INTEGER,       1,             "Maximum number of linesearch iterations");
   addOption("tol_pr",            OT_REAL,       1e-6,             "Stopping criterion for primal infeasibility");
   addOption("tol_du",            OT_REAL,       1e-6,             "Stopping criterion for dual infeasability");
   addOption("c1",                OT_REAL,       1E-4,             "Armijo condition, coefficient of decrease in merit");
