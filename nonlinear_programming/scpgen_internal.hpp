@@ -155,7 +155,7 @@ public:
   int qpf_lam_g_;
 
   int exp_du_, exp_dlam_g_, exp_lam_g_;
-  int exp_osens_;
+  int exp_osens_, exp_curve_;
 
   struct Var{
     int n;
