@@ -177,9 +177,6 @@ public:
   };
   std::vector<Var> x_;  
 
-  // Best merit function encountered so far
-  double meritmax_;
-  
   // Penalty parameter of merit function
   double sigma_;
 
