@@ -119,9 +119,6 @@ public:
   /// stopping criterion for the lagrangian gradient
   double tolgl_;
   
-  /// Outputs of the linearization function
-  enum QPFOut{QPF_G,QPF_H,QPF_B,QPF_A,QPF_NUM_OUT};
-  
   /// Generate initial guess for lifted variables
   FX vinit_fcn_;
 
@@ -153,6 +150,7 @@ public:
   int z_obj_, z_gl_, z_g_;
 
   int qpf_lam_g_;
+  int qpf_b_obj_, qpf_B_obj_, qpf_b_g_, qpf_B_g_;
 
   int exp_du_, exp_dlam_g_, exp_lam_g_;
   int exp_osens_, exp_curve_;
@@ -167,6 +165,7 @@ public:
     int z_def, z_defL;
 
     int qpf_var, qpf_lam, qpf_res, qpf_resL;
+    int qpf_def, qpf_defL;
 
     int exp_var, exp_lam;
     int exp_def, exp_defL;
