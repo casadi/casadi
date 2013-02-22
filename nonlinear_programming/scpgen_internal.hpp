@@ -157,6 +157,7 @@ public:
 
   struct Var{
     int n;
+    MX v;
 
     int res_var, res_lam;
     int res_d, res_lam_d;
