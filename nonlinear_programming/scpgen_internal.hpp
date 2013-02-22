@@ -132,7 +132,7 @@ public:
   FX exp_fcn_;
   
   /// Dimensions
-  int nu_, ng_, ngL_;
+  int ngL_;
 
   // Objective value
   double obj_k_;
