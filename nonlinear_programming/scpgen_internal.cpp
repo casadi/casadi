@@ -278,9 +278,7 @@ void SCPgenInternal::init(){
   vector<MX> res_fcn_out;
   n=0;
   res_fcn_out.push_back(obj);               res_obj_ = n++;
-  if(!gauss_newton_){
-    res_fcn_out.push_back(lam_con[0]);      res_gl_ = n++;
-  }
+  res_fcn_out.push_back(lam_con[0]);        res_gl_ = n++;
   res_fcn_out.push_back(con[0]);            res_g_ = n++;
   for(int i=1; i<x_.size(); ++i){
     res_fcn_out.push_back(con[i]-var[i]);   x_[i].res_d = n++;
@@ -474,8 +472,8 @@ void SCPgenInternal::init(){
   zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);   
   
   // Vector(s) b in Lifted Newton
-  MX b_obj = z_out[z_gl_] - Z_fwdSens[0][z_gl_];
-  MX b_g = z_out[z_g_] - Z_fwdSens[0][z_g_];
+  MX b_obj = Z_fwdSens[0][z_gl_];
+  MX b_g = Z_fwdSens[0][z_g_];
 
   // Differentiate with respect to the step to get the matrix B in Lifted Newton
   MX B_obj = zfcn.jac(x_[0].z_var,z_gl_,false,!gauss_newton_); // Exploit Hessian symmetry
@@ -485,22 +483,21 @@ void SCPgenInternal::init(){
   if(B_g.empty()){
     B_g = MX::sparse(0,nu_);
   }
-  
-  // Get the condensed QP
-  MX qpH = gauss_newton_ ? mul(trans(B_obj),B_obj) : B_obj;
-  MX qpG = gauss_newton_ ? mul(trans(B_obj),b_obj) : b_obj - mul(trans(B_g),lam_g);
-  MX qpA = B_g;
-  MX qpB = b_g;
-  
-  // Make sure qpG and qpB are dense vectors
-  makeDense(qpG);
-  makeDense(qpB);
+
+  // Make sure that the vectors are dense
+  makeDense(b_obj);
+  makeDense(b_g);
+
+  // Allocate QP data
+  CRSSparsity sp_tr_B_obj = B_obj.sparsity().transpose();
+  qpH_ = DMatrix(sp_tr_B_obj.patternProduct(sp_tr_B_obj));
+  qpA_ = DMatrix(B_g.sparsity());
+  qpG_.resize(nu_);
+  qpB_.resize(ng_);
 
   if(verbose_){
-    cout << "Formed qpH (" << qpH.size1() << "-by-" << qpH.size2() << ", "<< qpH.size() << " nnz)," << endl;
-    cout << "       qpG (" << qpG.size1() << "-by-" << qpG.size2() << ", "<< qpG.size() << " nnz)," << endl;
-    cout << "       qpA (" << qpA.size1() << "-by-" << qpA.size2() << ", "<< qpA.size() << " nnz) and" << endl;
-    cout << "       qpB (" << qpB.size1() << "-by-" << qpB.size2() << ", "<< qpB.size() << " nnz)." << endl;
+    cout << "Formed qpH (" << qpH_.size1() << "-by-" << qpH_.size2() << ", "<< qpH_.size() << " nnz)" << endl;
+    cout << "       qpA (" << qpA_.size1() << "-by-" << qpA_.size2() << ", "<< qpA_.size() << " nnz)" << endl;
   }
   
   // Quadratic approximation
@@ -524,10 +521,10 @@ void SCPgenInternal::init(){
   casadi_assert(n==qp_fcn_in.size());  
   
   vector<MX> qp_fcn_out(QPF_NUM_OUT);
-  qp_fcn_out[QPF_G] = qpG;
-  qp_fcn_out[QPF_H] = qpH;
-  qp_fcn_out[QPF_B] = qpB;
-  qp_fcn_out[QPF_A] = qpA;
+  qp_fcn_out[QPF_G] = b_obj;
+  qp_fcn_out[QPF_H] = B_obj;
+  qp_fcn_out[QPF_B] = b_g;
+  qp_fcn_out[QPF_A] = B_g;
   
   MXFunction qp_fcn(qp_fcn_in,qp_fcn_out);
   qp_fcn.setOption("name","qp_fcn");
@@ -547,7 +544,7 @@ void SCPgenInternal::init(){
 
     // Allocate a QP solver
     QPSolverCreator qp_solver_creator = getOption("qp_solver");
-    qp_solver_ = qp_solver_creator(qpH.sparsity(),qpA.sparsity());
+    qp_solver_ = qp_solver_creator(qpH_.sparsity(),qpA_.sparsity());
     
     // Set options if provided
     if(hasSetOption("qp_solver_options")){
@@ -928,9 +925,7 @@ void SCPgenInternal::eval_res(){
   obj_k_ = res_fcn_.output(res_obj_).toScalar();
 
   // Get objective gradient
-  if(!gauss_newton_){
-    res_fcn_.getOutput(gL_,res_gl_);
-  }
+  res_fcn_.getOutput(gL_,res_gl_);
 
   // Get constraints
   res_fcn_.getOutput(g_,res_g_);
@@ -968,21 +963,50 @@ void SCPgenInternal::eval_qpf(){
   
   // Evaluate to get QP
   qp_fcn_.evaluate();
+
+  // Get condensed vectors
+  transform(g_.begin(),g_.end(),qp_fcn_.output(QPF_A).begin(),qpA_.begin(),std::minus<double>());
+  transform(gL_.begin(),gL_.end(),qp_fcn_.output(QPF_G).begin(),gL_.begin(),std::minus<double>());
+  
+  // Get condensed linear constraint
+  qp_fcn_.getOutput(qpB_,QPF_B);
+
+  // Get the reduced Hessian
+  if(gauss_newton_){
+    const DMatrix& B_obj =  qp_fcn_.output(QPF_H);
+    fill(qpH_.begin(),qpH_.end(),0);
+    DMatrix::mul_no_alloc_tn(B_obj,B_obj,qpH_);
+
+    fill(qpG_.begin(),qpG_.end(),0);
+    DMatrix::mul_no_alloc_tn(B_obj,gL_,qpG_);
+  } else {
+    qp_fcn_.getOutput(qpH_,QPF_H);
+    copy(gL_.begin(),gL_.end(),qpG_.begin());
+  }
+
+  // Change the gradient of the Lagrangian to the gradient of the objective
+  if(!gauss_newton_){
+    // Subtract a multiple of the condensed Hessian to 
+    for(int i=0; i<qpA_.size1(); ++i){
+      for(int el=qpA_.rowind(i); el<qpA_.rowind(i+1); ++el){
+	int j=qpA_.col(el);
+	qpG_[j] -= qpA_.at(el)*lambda_g_[i];
+      }
+    }
+  }
 }
 
 void SCPgenInternal::regularize(){
   casadi_assert(x_[0].n==2);
-
-  DMatrix& qpH = qp_fcn_.output(QPF_H);
   
   // Regularization
   reg_ = 0;
   
   // Check the smallest eigenvalue of the Hessian
-  double a = qpH.elem(0,0);
-  double b = qpH.elem(0,1);
-  double c = qpH.elem(1,0);
-  double d = qpH.elem(1,1);
+  double a = qpH_.elem(0,0);
+  double b = qpH_.elem(0,1);
+  double c = qpH_.elem(1,0);
+  double d = qpH_.elem(1,1);
   
   // Make sure no not a numbers
   casadi_assert(a==a && b==b && c==c &&  d==d);
@@ -990,7 +1014,7 @@ void SCPgenInternal::regularize(){
   // Make sure symmetric
   if(b!=c){
     casadi_assert_warning(fabs(b-c)<1e-10,"Hessian is not symmetric: " << b << " != " << c);
-    qpH.elem(1,0) = c = b;
+    qpH_.elem(1,0) = c = b;
   }
   
   double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
@@ -998,28 +1022,20 @@ void SCPgenInternal::regularize(){
     // Regularization
     reg_ = reg_threshold_-eig_smallest;
     std::cerr << "Regularization with " << reg_ << " to ensure positive definite Hessian." << endl;
-    qpH(0,0) += reg_;
-    qpH(1,1) += reg_;
+    qpH_(0,0) += reg_;
+    qpH_(1,1) += reg_;
   }
 }
 
-void SCPgenInternal::solve_qp(){
-  // QP
-  const DMatrix& qpH = qp_fcn_.output(QPF_H);
-  const DMatrix& qpG = qp_fcn_.output(QPF_G);
-  const DMatrix& qpA = qp_fcn_.output(QPF_A);
-  const DMatrix& qpB = qp_fcn_.output(QPF_B);
-  
+void SCPgenInternal::solve_qp(){  
   // Solve the QP
-  qp_solver_.setInput(qpH,QP_H);
-  qp_solver_.setInput(qpG,QP_G);
-  qp_solver_.setInput(qpA,QP_A);
+  qp_solver_.setInput(qpH_,QP_H);
+  qp_solver_.setInput(qpG_,QP_G);
+  qp_solver_.setInput(qpA_,QP_A);
   std::transform(lbu_.begin(),lbu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
-  std::transform(ubu_.begin(),ubu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
-  
-  
-  //    std::transform(lbg_.begin(),lbg_.end(), qpB.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
-  std::transform(ubg_.begin(),ubg_.end(), qpB.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
+  std::transform(ubu_.begin(),ubu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>()); 
+  std::transform(lbg_.begin(),lbg_.end(), qpB_.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
+  std::transform(ubg_.begin(),ubg_.end(), qpB_.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
   
   //    cout << "lba = " << qp_solver_.input(QP_LBA).data() << endl;
   //    cout << "uba = " << qp_solver_.input(QP_UBA).data() << endl;

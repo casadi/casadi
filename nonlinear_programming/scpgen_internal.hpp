@@ -195,6 +195,9 @@ public:
   // Components to print
   std::vector<int> print_x_;
 
+  // QP
+  DMatrix qpH_, qpA_;
+  std::vector<double> qpG_, qpB_;
 };
 
 } // namespace CasADi
