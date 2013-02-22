@@ -401,14 +401,8 @@ void SCPgenInternal::init(){
   // Interpret the Jacobian-vector multiplication as a forward directional derivative
   fill(Z_fwdSeed[0].begin(),Z_fwdSeed[0].end(),MX());
   Z_fwdSeed[0][x_[0].z_var] = du;
-  for(int i=1; i<x_.size(); ++i){
-    Z_fwdSeed[0][x_[i].z_var] = -d[i-1];
-  }
   if(!gauss_newton_){
     Z_fwdSeed[0][z_lam_g_] = dlam_g;
-    for(int i=1; i<x_.size(); ++i){
-      Z_fwdSeed[0][x_[i].z_lam] = -lam_d[i-1];
-    }
   }
   zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);    
   
@@ -477,28 +471,20 @@ void SCPgenInternal::init(){
 
   // Differentiate with respect to the step to get the matrix B in Lifted Newton
   MX B_obj = zfcn.jac(x_[0].z_var,z_gl_,false,!gauss_newton_); // Exploit Hessian symmetry
+  if(verbose_){
+    cout << "Formed B_obj (" << B_obj.size1() << "-by-" << B_obj.size2() << ", "<< B_obj.size() << " nnz)" << endl;
+  }
   MX B_g = zfcn.jac(x_[0].z_var,z_g_);
-  
-  // Make sure that B_g has the right dimensions if empty
   if(B_g.empty()){
     B_g = MX::sparse(0,nu_);
   }
-
+  if(verbose_){
+    cout << "Formed B_g (" << B_g.size1() << "-by-" << B_g.size2() << ", "<< B_g.size() << " nnz)" << endl;
+  }
+  
   // Make sure that the vectors are dense
   makeDense(b_obj);
   makeDense(b_g);
-
-  // Allocate QP data
-  CRSSparsity sp_tr_B_obj = B_obj.sparsity().transpose();
-  qpH_ = DMatrix(sp_tr_B_obj.patternProduct(sp_tr_B_obj));
-  qpA_ = DMatrix(B_g.sparsity());
-  qpG_.resize(nu_);
-  qpB_.resize(ng_);
-
-  if(verbose_){
-    cout << "Formed qpH (" << qpH_.size1() << "-by-" << qpH_.size2() << ", "<< qpH_.size() << " nnz)" << endl;
-    cout << "       qpA (" << qpA_.size1() << "-by-" << qpA_.size2() << ", "<< qpA_.size() << " nnz)" << endl;
-  }
   
   // Quadratic approximation
   vector<MX> qp_fcn_in;
@@ -519,56 +505,71 @@ void SCPgenInternal::init(){
     }
   }
   casadi_assert(n==qp_fcn_in.size());  
-  
-  vector<MX> qp_fcn_out(QPF_NUM_OUT);
-  qp_fcn_out[QPF_G] = b_obj;
-  qp_fcn_out[QPF_H] = B_obj;
-  qp_fcn_out[QPF_B] = b_g;
-  qp_fcn_out[QPF_A] = B_g;
+
+  vector<MX> qp_fcn_out;
+  n=0;
+  qp_fcn_out.push_back(b_obj);       qpf_b_obj_ = n++;
+  qp_fcn_out.push_back(B_obj);       qpf_B_obj_ = n++;
+  qp_fcn_out.push_back(b_g);         qpf_b_g_ = n++;
+  qp_fcn_out.push_back(B_g);         qpf_B_g_ = n++;
+   for(int i=1; i<x_.size(); ++i){
+    qp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_def]);    x_[i].qpf_def = n++;
+    if(!gauss_newton_){
+      qp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_defL]); x_[i].qpf_defL = n++;
+    }
+   }
+  casadi_assert(n==qp_fcn_out.size());
   
   MXFunction qp_fcn(qp_fcn_in,qp_fcn_out);
   qp_fcn.setOption("name","qp_fcn");
-    qp_fcn.setOption("number_of_fwd_dir",0);
-    qp_fcn.setOption("number_of_adj_dir",0);
-    qp_fcn.init();
-    if(verbose_){
-      cout << "Generated linearization function ( " << qp_fcn.getAlgorithmSize() << " nodes)." << endl;
-    }
-    
-    // Generate c code and load as DLL
-    if(codegen_){
-      dynamicCompilation(qp_fcn,qp_fcn_,"qp_fcn","linearization function");
-    } else {
-      qp_fcn_ = qp_fcn;
-    }
+  qp_fcn.setOption("number_of_fwd_dir",0);
+  qp_fcn.setOption("number_of_adj_dir",0);
+  qp_fcn.init();
+  if(verbose_){
+    cout << "Generated linearization function ( " << qp_fcn.getAlgorithmSize() << " nodes)." << endl;
+  }
+  
+  // Generate c code and load as DLL
+  if(codegen_){
+    dynamicCompilation(qp_fcn,qp_fcn_,"qp_fcn","linearization function");
+  } else {
+    qp_fcn_ = qp_fcn;
+  }
+  
+  // Allocate QP data
+  CRSSparsity sp_tr_B_obj = B_obj.sparsity().transpose();
+  qpH_ = DMatrix(sp_tr_B_obj.patternProduct(sp_tr_B_obj));
+  qpA_ = DMatrix(B_g.sparsity());
+  qpG_.resize(nu_);
+  qpB_.resize(ng_);
 
-    // Allocate a QP solver
-    QPSolverCreator qp_solver_creator = getOption("qp_solver");
-    qp_solver_ = qp_solver_creator(qpH_.sparsity(),qpA_.sparsity());
-    
-    // Set options if provided
-    if(hasSetOption("qp_solver_options")){
-      Dictionary qp_solver_options = getOption("qp_solver_options");
-      qp_solver_.setOption(qp_solver_options);
+  // Allocate a QP solver
+  QPSolverCreator qp_solver_creator = getOption("qp_solver");
+  qp_solver_ = qp_solver_creator(qpH_.sparsity(),qpA_.sparsity());
+  
+  // Set options if provided
+  if(hasSetOption("qp_solver_options")){
+    Dictionary qp_solver_options = getOption("qp_solver_options");
+    qp_solver_.setOption(qp_solver_options);
+  }
+  
+  // Initialize the QP solver
+  qp_solver_.init();
+  if(verbose_){
+    cout << "Allocated QP solver." << endl;
+  }
+  
+  // Residual
+  for(int i=1; i<x_.size(); ++i){
+    x_[i].res.resize(d[i-1].size(),0);
+    if(!gauss_newton_){
+      x_[i].resL.resize(lam_d[i-1].size(),0);
     }
-    
-    // Initialize the QP solver
-    qp_solver_.init();
-    if(verbose_){
-      cout << "Allocated QP solver." << endl;
-    }
-    
-    // Residual
-    for(int i=1; i<x_.size(); ++i){
-      x_[i].res.resize(d[i-1].size(),0);
-      if(!gauss_newton_){
-	x_[i].resL.resize(lam_d[i-1].size(),0);
-      }
-    }
-    
-    if(verbose_){
-      cout << "NLP preparation completed" << endl;
-    }
+  }
+  
+  if(verbose_){
+    cout << "NLP preparation completed" << endl;
+  }
   
   // Header
   if(bool(getOption("print_header"))){
@@ -654,7 +655,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
 
   // Initial evaluation of the residual function
   eval_res();
-
+  
   // Number of SQP iterations
   int iter = 0;
 
@@ -965,22 +966,22 @@ void SCPgenInternal::eval_qpf(){
   qp_fcn_.evaluate();
 
   // Get condensed vectors
-  transform(g_.begin(),g_.end(),qp_fcn_.output(QPF_A).begin(),qpA_.begin(),std::minus<double>());
-  transform(gL_.begin(),gL_.end(),qp_fcn_.output(QPF_G).begin(),gL_.begin(),std::minus<double>());
+  transform(g_.begin(),g_.end(),qp_fcn_.output(qpf_b_g_).begin(),qpB_.begin(),std::minus<double>());
+  transform(gL_.begin(),gL_.end(),qp_fcn_.output(qpf_b_obj_).begin(),gL_.begin(),std::minus<double>());
   
   // Get condensed linear constraint
-  qp_fcn_.getOutput(qpB_,QPF_B);
-
+  qp_fcn_.getOutput(qpA_,qpf_B_g_);
+  
   // Get the reduced Hessian
   if(gauss_newton_){
-    const DMatrix& B_obj =  qp_fcn_.output(QPF_H);
+    const DMatrix& B_obj =  qp_fcn_.output(qpf_B_obj_);
     fill(qpH_.begin(),qpH_.end(),0);
     DMatrix::mul_no_alloc_tn(B_obj,B_obj,qpH_);
 
     fill(qpG_.begin(),qpG_.end(),0);
     DMatrix::mul_no_alloc_tn(B_obj,gL_,qpG_);
   } else {
-    qp_fcn_.getOutput(qpH_,QPF_H);
+    qp_fcn_.getOutput(qpH_,qpf_B_obj_);
     copy(gL_.begin(),gL_.end(),qpG_.begin());
   }
 
@@ -992,6 +993,20 @@ void SCPgenInternal::eval_qpf(){
 	int j=qpA_.col(el);
 	qpG_[j] -= qpA_.at(el)*lambda_g_[i];
       }
+    }
+  }
+
+  // Expanded primal step (first part)
+  for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+    const DMatrix& dv = qp_fcn_.output(it->qpf_def);
+    copy(dv.begin(),dv.end(),it->step.begin());
+  }
+  
+  // Expanded dual step (first part)
+  if(!gauss_newton_){
+    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+      const DMatrix& dlam_v = qp_fcn_.output(it->qpf_defL);
+      copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
     }
   }
 }
@@ -1217,17 +1232,17 @@ void SCPgenInternal::eval_exp(){
   // Perform the step expansion
   exp_fcn_.evaluate();
 
-  // Expanded primal step
+  // Expanded primal step (second part)
   for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
     const DMatrix& dv = exp_fcn_.output(it->exp_def);
-    copy(dv.begin(),dv.end(),it->step.begin());
+    transform(dv.begin(),dv.end(),it->step.begin(),it->step.begin(),std::minus<double>());
   }
   
-  // Expanded dual step
+  // Expanded dual step (second part)
   if(!gauss_newton_){
     for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
       const DMatrix& dlam_v = exp_fcn_.output(it->exp_defL);
-      copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
+      transform(dlam_v.begin(),dlam_v.end(),it->dlam.begin(),it->dlam.begin(),std::minus<double>());
     }
   }  
 }
