@@ -75180,6 +75180,400 @@ sequential convex programming) method for nonlinear programming.
 
 Joel Andersson, Attila Kozma and Joris Gillis
 
+>Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1) [x_init].                  |
++------------------------------------+------------------------------------+
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf [lbx].          |
++------------------------------------+------------------------------------+
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf [ubx].          |
++------------------------------------+------------------------------------+
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf [lbg].                |
++------------------------------------+------------------------------------+
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf [ubg].                |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
++------------------------------------+------------------------------------+
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend [p].  |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_OPT                          | Decision variables for optimal     |
+|                                    | solution (n x 1) [x_opt].          |
++------------------------------------+------------------------------------+
+| NLP_COST                           | Objective/cost function for        |
+|                                    | optimal solution (1 x 1) [cost].   |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) [lambda_x].                |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1) [g].      |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| beta         | OT_REAL      | 0.800        | Line-search  | CasADi::SCPg |
+|              |              |              | parameter,   | enInternal   |
+|              |              |              | restoration  |              |
+|              |              |              | factor of    |              |
+|              |              |              | stepsize     |              |
++--------------+--------------+--------------+--------------+--------------+
+| c1           | OT_REAL      | 0.000        | Armijo       | CasADi::SCPg |
+|              |              |              | condition,   | enInternal   |
+|              |              |              | coefficient  |              |
+|              |              |              | of decrease  |              |
+|              |              |              | in merit     |              |
++--------------+--------------+--------------+--------------+--------------+
+| codegen      | OT_BOOLEAN   | false        | C-code       | CasADi::SCPg |
+|              |              |              | generation   | enInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hessian_appr | OT_STRING    | \"limited-    | limited-     | CasADi::SCPg |
+| oximation    |              | memory\"      | memory|exact | enInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| lbfgs_memory | OT_INTEGER   | 10           | Size of      | CasADi::SCPg |
+|              |              |              | L-BFGS       | enInternal   |
+|              |              |              | memory.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| maxiter      | OT_INTEGER   | 50           | Maximum      | CasADi::SCPg |
+|              |              |              | number of    | enInternal   |
+|              |              |              | SQP          |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| maxiter_ls   | OT_INTEGER   | 3            | Maximum      | CasADi::SCPg |
+|              |              |              | number of    | enInternal   |
+|              |              |              | linesearch   |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| merit_memory | OT_INTEGER   | 4            | Size of      | CasADi::SCPg |
+|              |              |              | memory to    | enInternal   |
+|              |              |              | store        |              |
+|              |              |              | history of   |              |
+|              |              |              | merit        |              |
+|              |              |              | function     |              |
+|              |              |              | values       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (inputs|outp | ADi::SCPgenI |
+|              |              |              | uts)  (eval_ | nternal      |
+|              |              |              | f|eval_g|eva |              |
+|              |              |              | l_jac_g|eval |              |
+|              |              |              | _grad_f|eval |              |
+|              |              |              | _h|qp|dx)    |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_header | OT_BOOLEAN   | true         | Print the    | CasADi::SCPg |
+|              |              |              | header with  | enInternal   |
+|              |              |              | problem      |              |
+|              |              |              | statistics   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_solver    | OT_QPSOLVER  | GenericType( | The QP       | CasADi::SCPg |
+|              |              | )            | solver to be | enInternal   |
+|              |              |              | used by the  |              |
+|              |              |              | SQP method   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_solver_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::SCPg |
+| tions        | Y            | )            | be passed to | enInternal   |
+|              |              |              | the QP       |              |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| reg_threshol | OT_REAL      | 0.000        | Threshold    | CasADi::SCPg |
+| d            |              |              | for the regu | enInternal   |
+|              |              |              | larization.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularize   | OT_BOOLEAN   | false        | Automatic re | CasADi::SCPg |
+|              |              |              | gularization | enInternal   |
+|              |              |              | of Lagrange  |              |
+|              |              |              | Hessian.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_du       | OT_REAL      | 0.000        | Stopping     | CasADi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for dual inf |              |
+|              |              |              | easability   |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_pr       | OT_REAL      | 0.000        | Stopping     | CasADi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for primal i |              |
+|              |              |              | nfeasibility |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+------------------------+
+|     Id      |        Used in         |
++=============+========================+
+| dx          | CasADi::SCPgenInternal |
++-------------+------------------------+
+| eval_f      | CasADi::SCPgenInternal |
++-------------+------------------------+
+| eval_g      | CasADi::SCPgenInternal |
++-------------+------------------------+
+| eval_grad_f | CasADi::SCPgenInternal |
++-------------+------------------------+
+| eval_h      | CasADi::SCPgenInternal |
++-------------+------------------------+
+| eval_jac_g  | CasADi::SCPgenInternal |
++-------------+------------------------+
+| inputs      | CasADi::FXInternal     |
++-------------+------------------------+
+| outputs     | CasADi::FXInternal     |
++-------------+------------------------+
+| qp          | CasADi::SCPgenInternal |
++-------------+------------------------+
+
+>List of available stats
++------------+------------------------+
+|     Id     |        Used in         |
++============+========================+
+| iter_count | CasADi::SCPgenInternal |
++------------+------------------------+
+
 C++ includes: scpgen.hpp ";
 
 /*  Setters  */
@@ -75804,8 +76198,403 @@ Return a string with a destription (for SWIG) ";
 
 
 // File: classCasADi_1_1SCPgenInternal.xml
-%feature("docstring") CasADi::SCPgenInternal "C++ includes:
-scpgen_internal.hpp ";
+%feature("docstring") CasADi::SCPgenInternal "
+
+>Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1) [x_init].                  |
++------------------------------------+------------------------------------+
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf [lbx].          |
++------------------------------------+------------------------------------+
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf [ubx].          |
++------------------------------------+------------------------------------+
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf [lbg].                |
++------------------------------------+------------------------------------+
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf [ubg].                |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
++------------------------------------+------------------------------------+
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend [p].  |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_OPT                          | Decision variables for optimal     |
+|                                    | solution (n x 1) [x_opt].          |
++------------------------------------+------------------------------------+
+| NLP_COST                           | Objective/cost function for        |
+|                                    | optimal solution (1 x 1) [cost].   |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) [lambda_x].                |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1) [g].      |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| beta         | OT_REAL      | 0.800        | Line-search  | CasADi::SCPg |
+|              |              |              | parameter,   | enInternal   |
+|              |              |              | restoration  |              |
+|              |              |              | factor of    |              |
+|              |              |              | stepsize     |              |
++--------------+--------------+--------------+--------------+--------------+
+| c1           | OT_REAL      | 0.000        | Armijo       | CasADi::SCPg |
+|              |              |              | condition,   | enInternal   |
+|              |              |              | coefficient  |              |
+|              |              |              | of decrease  |              |
+|              |              |              | in merit     |              |
++--------------+--------------+--------------+--------------+--------------+
+| codegen      | OT_BOOLEAN   | false        | C-code       | CasADi::SCPg |
+|              |              |              | generation   | enInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hessian_appr | OT_STRING    | \"limited-    | limited-     | CasADi::SCPg |
+| oximation    |              | memory\"      | memory|exact | enInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| lbfgs_memory | OT_INTEGER   | 10           | Size of      | CasADi::SCPg |
+|              |              |              | L-BFGS       | enInternal   |
+|              |              |              | memory.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| maxiter      | OT_INTEGER   | 50           | Maximum      | CasADi::SCPg |
+|              |              |              | number of    | enInternal   |
+|              |              |              | SQP          |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| maxiter_ls   | OT_INTEGER   | 3            | Maximum      | CasADi::SCPg |
+|              |              |              | number of    | enInternal   |
+|              |              |              | linesearch   |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| merit_memory | OT_INTEGER   | 4            | Size of      | CasADi::SCPg |
+|              |              |              | memory to    | enInternal   |
+|              |              |              | store        |              |
+|              |              |              | history of   |              |
+|              |              |              | merit        |              |
+|              |              |              | function     |              |
+|              |              |              | values       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (inputs|outp | ADi::SCPgenI |
+|              |              |              | uts)  (eval_ | nternal      |
+|              |              |              | f|eval_g|eva |              |
+|              |              |              | l_jac_g|eval |              |
+|              |              |              | _grad_f|eval |              |
+|              |              |              | _h|qp|dx)    |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_header | OT_BOOLEAN   | true         | Print the    | CasADi::SCPg |
+|              |              |              | header with  | enInternal   |
+|              |              |              | problem      |              |
+|              |              |              | statistics   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_solver    | OT_QPSOLVER  | GenericType( | The QP       | CasADi::SCPg |
+|              |              | )            | solver to be | enInternal   |
+|              |              |              | used by the  |              |
+|              |              |              | SQP method   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_solver_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::SCPg |
+| tions        | Y            | )            | be passed to | enInternal   |
+|              |              |              | the QP       |              |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| reg_threshol | OT_REAL      | 0.000        | Threshold    | CasADi::SCPg |
+| d            |              |              | for the regu | enInternal   |
+|              |              |              | larization.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularize   | OT_BOOLEAN   | false        | Automatic re | CasADi::SCPg |
+|              |              |              | gularization | enInternal   |
+|              |              |              | of Lagrange  |              |
+|              |              |              | Hessian.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_du       | OT_REAL      | 0.000        | Stopping     | CasADi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for dual inf |              |
+|              |              |              | easability   |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_pr       | OT_REAL      | 0.000        | Stopping     | CasADi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for primal i |              |
+|              |              |              | nfeasibility |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+------------------------+
+|     Id      |        Used in         |
++=============+========================+
+| dx          | CasADi::SCPgenInternal |
++-------------+------------------------+
+| eval_f      | CasADi::SCPgenInternal |
++-------------+------------------------+
+| eval_g      | CasADi::SCPgenInternal |
++-------------+------------------------+
+| eval_grad_f | CasADi::SCPgenInternal |
++-------------+------------------------+
+| eval_h      | CasADi::SCPgenInternal |
++-------------+------------------------+
+| eval_jac_g  | CasADi::SCPgenInternal |
++-------------+------------------------+
+| inputs      | CasADi::FXInternal     |
++-------------+------------------------+
+| outputs     | CasADi::FXInternal     |
++-------------+------------------------+
+| qp          | CasADi::SCPgenInternal |
++-------------+------------------------+
+
+>List of available stats
++------------+------------------------+
+|     Id     |        Used in         |
++============+========================+
+| iter_count | CasADi::SCPgenInternal |
++------------+------------------------+
+
+C++ includes: scpgen_internal.hpp ";
 
 %feature("docstring")  CasADi::SCPgenInternal::hessian "
 
