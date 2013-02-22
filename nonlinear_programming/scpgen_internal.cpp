@@ -272,7 +272,6 @@ void SCPgenInternal::init(){
     res_fcn_in.push_back(lam_g);       res_lam_g_ = n++;
   }
   for(int i=0; i<x_.size(); ++i){
-    if(i==1) continue;
     res_fcn_in.push_back(x[i]);      x_[i].res_var = n++;
     if(!gauss_newton_){
       res_fcn_in.push_back(lam[i]);    x_[i].res_lam = n++;
@@ -615,7 +614,11 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   const vector<double>& lbx = input(NLP_LBX).data();
   const vector<double>& ubx = input(NLP_UBX).data();
   const vector<double>& lbg = input(NLP_LBG).data();
-  const vector<double>& ubg = input(NLP_UBG).data();
+  const vector<double>& ubg = input(NLP_UBG).data();  
+  if(parametric_){
+    const vector<double>& p = input(NLP_P).data();
+    copy(p.begin(),p.end(),x_[1].init.begin());
+  }
 
   copy(x_init.begin(),x_init.end(),x_[0].init.begin());
   copy(lbx.begin(),lbx.end(),lbu_.begin());
@@ -625,9 +628,8 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   
   if(x_.size()>2){
     // Initialize lifted variables using the generated function
-    vinit_fcn_.setInput(x_[0].init);
-    if(parametric_){
-      vinit_fcn_.setInput(input(NLP_P),1);
+    for(int i=0; i<2; ++i){
+      vinit_fcn_.setInput(x_[i].init,i);
     }
     vinit_fcn_.evaluate();    
     for(int i=2; i<x_.size(); ++i){
@@ -647,9 +649,6 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
       fill(it->dlam.begin(),it->dlam.end(),0);
     }
   }
-
-
-
   
   double toldx_ = 1e-9;
 
@@ -921,7 +920,6 @@ void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, 
 void SCPgenInternal::eval_res(){
   // Pass primal variables to the residual function for initial evaluation
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    if(it==x_.begin()+1) continue;
     res_fcn_.setInput(it->opt,it->res_var);
   }
   
@@ -929,7 +927,6 @@ void SCPgenInternal::eval_res(){
   if(!gauss_newton_){
     res_fcn_.setInput(lambda_g_,res_lam_g_);
     for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      if(it==x_.begin()+1) continue;
       res_fcn_.setInput(it->lam,it->res_lam);
     }
   }
