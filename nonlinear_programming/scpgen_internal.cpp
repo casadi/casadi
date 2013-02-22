@@ -341,11 +341,11 @@ void SCPgenInternal::init(){
 
   // Variables to be substituted and their definitions
   vector<MX> svar, sdef;
-  svar.insert(svar.end(),x.begin()+2,x.end());
-  sdef.insert(sdef.end(),d_def.begin()+1,d_def.end());
+  svar.insert(svar.end(),x.begin()+1,x.end());
+  sdef.insert(sdef.end(),d_def.begin(),d_def.end());
   if(!gauss_newton_){
-    svar.insert(svar.end(),lam.rbegin(),lam.rend()-2);
-    sdef.insert(sdef.end(),lam_d_def.rbegin(),lam_d_def.rend()-1);    
+    svar.insert(svar.end(),lam.rbegin(),lam.rend()-1);
+    sdef.insert(sdef.end(),lam_d_def.rbegin(),lam_d_def.rend());    
   }
 
   vector<MX> ex(3);
@@ -354,9 +354,9 @@ void SCPgenInternal::init(){
   ex[2] = lam_con[0];
 
   substituteInPlace(svar, sdef, ex, false);
-  copy(sdef.begin(),sdef.begin()+d_def.size()-1,d_def.begin()+1);  
+  copy(sdef.begin(),sdef.begin()+d_def.size(),d_def.begin());  
   if(!gauss_newton_){
-    copy(sdef.rbegin(),sdef.rbegin()+lam_d_def.size()-1,lam_d_def.begin()+1);
+    copy(sdef.rbegin(),sdef.rbegin()+lam_d_def.size(),lam_d_def.begin());
   }
 
   MX obj_z = ex[0];
@@ -364,33 +364,32 @@ void SCPgenInternal::init(){
   MX gL_z = ex[2];
   
   // Modified function Z
-  vector<MX> z_in;
+  vector<MX> zfcn_in;
   n=0;
   if(!gauss_newton_){
-    z_in.push_back(lam_g);                         z_lam_g_ = n++;
+    zfcn_in.push_back(lam_g);                         z_lam_g_ = n++;
   }
   for(int i=0; i<x_.size(); ++i){
-    if(i==1) continue;
-    z_in.push_back(i==0 ? x[0] :     d[i-1]);    x_[i].z_var = n++;
+    zfcn_in.push_back(i==0 ? x[0] :     d[i-1]);    x_[i].z_var = n++;
     if(!gauss_newton_){
-      z_in.push_back(i==0 ? lam[0] : lam_d[i-1]);  x_[i].z_lam = n++;
+      zfcn_in.push_back(i==0 ? lam[0] : lam_d[i-1]);  x_[i].z_lam = n++;
     }
   }
 
   // Outputs
   n=0;
-  vector<MX> z_out;
-  z_out.push_back(obj_z);                   z_obj_ = n++;
-  z_out.push_back(gL_z);                    z_gl_ = n++;
-  z_out.push_back(g_z);                     z_g_ = n++;
-  for(int i=2; i<x_.size(); ++i){
-    z_out.push_back(d_def[i-1]);            x_[i].z_def = n++;
+  vector<MX> zfcn_out;
+  zfcn_out.push_back(obj_z);                   z_obj_ = n++;
+  zfcn_out.push_back(gL_z);                    z_gl_ = n++;
+  zfcn_out.push_back(g_z);                     z_g_ = n++;
+  for(int i=1; i<x_.size(); ++i){
+    zfcn_out.push_back(d_def[i-1]);            x_[i].z_def = n++;
     if(!gauss_newton_){
-      z_out.push_back(lam_d_def[i-1]);      x_[i].z_defL = n++;
+      zfcn_out.push_back(lam_d_def[i-1]);      x_[i].z_defL = n++;
     }
   }
 
-  MXFunction zfcn(z_in,z_out);
+  MXFunction zfcn(zfcn_in,zfcn_out);
   zfcn.setOption("name","zfcn");
   zfcn.init();
   if(verbose_){
@@ -398,8 +397,8 @@ void SCPgenInternal::init(){
   }
 
   // Directional derivative of Z
-  vector<vector<MX> > Z_fwdSeed(1,z_in);
-  vector<vector<MX> > Z_fwdSens(1,z_out);
+  vector<vector<MX> > Z_fwdSeed(1,zfcn_in);
+  vector<vector<MX> > Z_fwdSens(1,zfcn_out);
   vector<vector<MX> > Z_adjSeed;
   vector<vector<MX> > Z_adjSens;
 
@@ -416,7 +415,7 @@ void SCPgenInternal::init(){
   if(!gauss_newton_){
     Z_fwdSeed[0][z_lam_g_] = dlam_g;
   }
-  zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);    
+  zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);    
   
   // Step expansion function inputs
   vector<MX> exp_fcn_in;
@@ -430,7 +429,6 @@ void SCPgenInternal::init(){
   }
   
   for(int i=0; i<x_.size(); ++i){
-    if(i==1) continue;
     exp_fcn_in.push_back(   i==0 ? x[0] :     d[i-1]);   x_[i].exp_var = n++;
     if(!gauss_newton_){
       exp_fcn_in.push_back( i==0 ? lam[0] : lam_d[i-1]);   x_[i].exp_lam = n++;
@@ -442,7 +440,7 @@ void SCPgenInternal::init(){
   n=0;
   exp_fcn_out.push_back(Z_fwdSens[0][z_obj_]);           exp_osens_ = n++;
   exp_fcn_out.push_back(Z_fwdSens[0][z_gl_]);            exp_curve_ = n++;
-  for(int i=2; i<x_.size(); ++i){
+  for(int i=1; i<x_.size(); ++i){
     exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_def]);    x_[i].exp_def = n++;
     if(!gauss_newton_){
       exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_defL]); x_[i].exp_defL = n++;
@@ -476,7 +474,7 @@ void SCPgenInternal::init(){
       Z_fwdSeed[0][x_[i].z_lam] = lam_d[i-1];
     }
   }
-  zfcn.eval(z_in,z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);   
+  zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);   
   
   // Vector(s) b in Lifted Newton
   MX b_obj = Z_fwdSens[0][z_gl_];
@@ -1233,7 +1231,6 @@ void SCPgenInternal::eval_exp(){
   // Pass primal step/variables
   exp_fcn_.setInput(x_[0].step, exp_du_);
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    if(it==x_.begin()+1) continue;
     if(it==x_.begin()){
       exp_fcn_.setInput(it->opt,it->exp_var);
     } else {
@@ -1246,7 +1243,6 @@ void SCPgenInternal::eval_exp(){
     exp_fcn_.setInput(dlambda_g_,exp_dlam_g_);
     exp_fcn_.setInput(lambda_g_,exp_lam_g_);
     for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      if(it==x_.begin()+1) continue;
       if(it==x_.begin()){
 	exp_fcn_.setInput(it->lam,it->exp_lam);
       } else {
@@ -1259,14 +1255,14 @@ void SCPgenInternal::eval_exp(){
   exp_fcn_.evaluate();
 
   // Expanded primal step (second part)
-  for(vector<Var>::iterator it=x_.begin()+2; it!=x_.end(); ++it){
+  for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
     const DMatrix& dv = exp_fcn_.output(it->exp_def);
     transform(dv.begin(),dv.end(),it->step.begin(),it->step.begin(),std::minus<double>());
   }
   
   // Expanded dual step (second part)
   if(!gauss_newton_){
-    for(vector<Var>::iterator it=x_.begin()+2; it!=x_.end(); ++it){
+    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
       const DMatrix& dlam_v = exp_fcn_.output(it->exp_defL);
       transform(dlam_v.begin(),dlam_v.end(),it->dlam.begin(),it->dlam.begin(),std::minus<double>());
     }
