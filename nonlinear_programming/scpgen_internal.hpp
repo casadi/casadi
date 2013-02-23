@@ -85,10 +85,12 @@ public:
 
   /// Memory size of L-BFGS method
   int lbfgs_memory_;
-  /// Tolerance of primal infeasibility
+  /// Tolerance on primal infeasibility
   double tol_pr_;
-  /// Tolerance of dual infeasibility
+  /// Tolerance on dual infeasibility
   double tol_du_;
+  /// Tolerance on regularization
+  double tol_reg_;
 
   /// Linesearch parameters
   //@{
@@ -195,6 +197,9 @@ public:
   // Components to print
   std::vector<int> print_x_;
 
+  // Message applying to a particular iteration
+  std::string iteration_note_;
+  
   // QP
   DMatrix qpH_, qpA_;
   std::vector<double> qpG_, qpB_;
