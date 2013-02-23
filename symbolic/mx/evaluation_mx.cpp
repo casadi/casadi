@@ -502,8 +502,12 @@ void EvaluationMX::generateOperation(std::ostream &stream, const std::vector<std
     stream << arg.at(i) << ",";
     
     // Pass argument sparsity to the function
-    int sp_i = gen.getSparsity(dep(i).sparsity());
-    stream << "s" << sp_i;
+    if(dep(i).isNull()){
+      stream << "0";
+    } else {
+      int sp_i = gen.getSparsity(dep(i).sparsity());
+      stream << "s" << sp_i;
+    }
 
     // Separate with a space to visualize argument grouping
     if(i+1<arg.size()+res.size()) stream << ", ";
