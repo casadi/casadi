@@ -44,6 +44,7 @@ SCPgenInternal::SCPgenInternal(const FX& F, const FX& G, const FX& H, const FX& 
   addOption("maxiter_ls",        OT_INTEGER,       1,             "Maximum number of linesearch iterations");
   addOption("tol_pr",            OT_REAL,       1e-6,             "Stopping criterion for primal infeasibility");
   addOption("tol_du",            OT_REAL,       1e-6,             "Stopping criterion for dual infeasability");
+  addOption("tol_reg",           OT_REAL,       1e-11,            "Stopping criterion for regularization");
   addOption("c1",                OT_REAL,       1E-4,             "Armijo condition, coefficient of decrease in merit");
   addOption("beta",              OT_REAL,       0.8,              "Line-search parameter, restoration factor of stepsize");
   addOption("merit_memory",      OT_INTEGER,      4,              "Size of memory to store history of merit function values");
@@ -76,6 +77,7 @@ void SCPgenInternal::init(){
   lbfgs_memory_ = getOption("lbfgs_memory");
   tol_pr_ = getOption("tol_pr");
   tol_du_ = getOption("tol_du");
+  tol_reg_ = getOption("tol_reg");
   regularize_ = getOption("regularize");
   codegen_ = getOption("codegen");
   reg_threshold_ = getOption("reg_threshold");
@@ -251,13 +253,17 @@ void SCPgenInternal::init(){
     aseed[0].push_back(lam_g);
     aseed[0].insert(aseed[0].end(),lam.begin()+2,lam.end());
     vdef_fcn.eval(x,f,fseed,fsens,aseed,asens,true);
-
     for(int i=0; i<x_.size(); ++i){
       lam_con[i] = asens[0].at(i);
       if(lam_con[i].isNull()){
 	lam_con[i] = MX(x[i].sparsity());
       }
     }
+    
+    // Multipliers for the simple bounds
+    lam_con[0] += lam[0];
+    lam_con[1] += lam[1];
+
     ngL_ = n_;
 
     if(verbose_){
@@ -291,7 +297,7 @@ void SCPgenInternal::init(){
     res_fcn_out.push_back(i==1 ? -x[i] : f[i]-x[i]);  x_[i].res_d = n++;
 
     if(!gauss_newton_){
-      res_fcn_out.push_back(lam_con[i]-lam[i]);  x_[i].res_lam_d = n++;
+      res_fcn_out.push_back(lam_con[i]-lam[i]);       x_[i].res_lam_d = n++;
     }
   }
 
@@ -363,14 +369,14 @@ void SCPgenInternal::init(){
   // Modified function Z
   vector<MX> zfcn_in;
   n=0;
-  zfcn_in.push_back(x[1]);                               z_p_ = n++;
+  zfcn_in.push_back(x[1]);                             z_p_ = n++;
   if(!gauss_newton_){
-    zfcn_in.push_back(lam_g);                         z_lam_g_ = n++;
+    zfcn_in.push_back(lam_g);                          z_lam_g_ = n++;
   }
   for(int i=0; i<x_.size(); ++i){
-    zfcn_in.push_back(i==0 ? x[0] :     d[i-1]);    x_[i].z_var = n++;
+    zfcn_in.push_back(i==0 ? x[0] :     d[i-1]);       x_[i].z_var = n++;
     if(!gauss_newton_){
-      zfcn_in.push_back(i==0 ? lam[0] : lam_d[i-1]);  x_[i].z_lam = n++;
+      zfcn_in.push_back(i==0 ? lam[0] : lam_d[i-1]);   x_[i].z_lam = n++;
     }
   }
 
@@ -600,6 +606,20 @@ void SCPgenInternal::init(){
     cout << "Total number of variables:                 " << setw(9) << (n_+n_lifted) << endl;
     cout << "Total number of constraints:               " << setw(9) << (m_+n_lifted) << endl;
     cout << endl;
+    cout << "Iteration options:" << endl;
+
+    cout << "{ \"maxiter\":" << maxiter_ << ", ";
+    cout << "\"maxiter_ls\":" << maxiter_ls_ << ", ";
+    cout << "\"c1\":" << c1_ << ", ";
+    cout << "\"beta\":" << beta_ << ", ";
+    cout << "\"merit_memsize\":" << merit_memsize_ << ", ";
+    cout << "\"regularize\":" << regularize_ << ", ";
+    cout << endl << "  ";
+    cout << "\"tol_pr\":" << tol_pr_ << ", ";
+    cout << "\"tol_du\":" << tol_du_ << ", ";
+    cout << "\"tol_reg\":" << tol_reg_ << ", ";
+    cout << "\"reg_threshold\":" << reg_threshold_ << "}" << endl;
+    cout << endl;
   }
 }
 
@@ -678,6 +698,9 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
 
   // Reset regularization
   reg_ = 0;
+  
+  // Reset iteration message
+  iteration_note_ = string();
 
   // MAIN OPTIMZATION LOOP
   while(true){
@@ -695,13 +718,11 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     printIteration(cout,iter,obj_k_,pr_inf,du_inf,reg_,ls_iter,ls_success);
 
     // Checking convergence criteria
-    double tol_pr_ = 1e-6; // Stopping criterion for primal infeasibility
-    double tol_du_ = 1e-6; // Stopping criterion for dual infeasability
-    bool converged;
+    bool converged = pr_inf <= tol_pr_ && pr_step_ <= toldx_ && reg_ <= tol_reg_;
     if(gauss_newton_){
-      converged = iter!=0 && pr_inf < tol_pr_ && pr_step_ < toldx_; // Use step size as stopping criterion
+      converged = converged && iter!=0;
     } else {
-      converged = pr_inf < tol_pr_ && du_inf < tol_du_ && pr_step_ < toldx_; // Use lagrangian gradient as stopping criterion
+      converged = converged && du_inf <= tol_du_;
     }
     if(converged){
       cout << endl;
@@ -873,8 +894,9 @@ void SCPgenInternal::printIteration(std::ostream &stream){
   for(vector<int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i){
     stream << setw(9) << name_x_.at(*i);
   }
-
+  
   stream << endl;
+  stream.unsetf( std::ios::floatfield);
 }
   
 void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, double rg, int ls_trials, bool ls_success){
@@ -909,7 +931,13 @@ void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, 
     stream << setw(9) << setprecision(4) << x_[0].opt.at(*i);
   }
 
-  stream << scientific;
+  // Print note
+  if(!iteration_note_.empty()){
+    stream << "   " << iteration_note_;
+    iteration_note_ = string();
+  }
+
+  stream.unsetf( std::ios::floatfield);
   stream << endl;
 }
 
@@ -1045,7 +1073,6 @@ void SCPgenInternal::regularize(){
   if(eig_smallest<reg_threshold_){
     // Regularization
     reg_ = reg_threshold_-eig_smallest;
-    std::cerr << "Regularization with " << reg_ << " to ensure positive definite Hessian." << endl;
     qpH_(0,0) += reg_;
     qpH_(1,1) += reg_;
   }
@@ -1061,23 +1088,24 @@ void SCPgenInternal::solve_qp(){
   std::transform(lbg_.begin(),lbg_.end(), qpB_.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
   std::transform(ubg_.begin(),ubg_.end(), qpB_.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
   
-  //    cout << "lba = " << qp_solver_.input(QP_LBA).data() << endl;
-  //    cout << "uba = " << qp_solver_.input(QP_UBA).data() << endl;
-  
   qp_solver_.evaluate();
   
-  // Condensed step
+  // Condensed primal step
   const DMatrix& du = qp_solver_.output(QP_PRIMAL);
   copy(du.begin(),du.end(),x_[0].step.begin());
   
   if(!gauss_newton_){
+
+    // Condensed dual step (simple bounds)
+    const DMatrix& lam_x_new = qp_solver_.output(QP_LAMBDA_X);
+    copy(lam_x_new.begin(),lam_x_new.end(),x_[0].dlam.begin());
+    std::transform(x_[0].dlam.begin(),x_[0].dlam.end(),x_[0].lam.begin(),x_[0].dlam.begin(),std::minus<double>());
+
+    // Condensed dual step (nonlinear bounds)
     const DMatrix& lam_g_new = qp_solver_.output(QP_LAMBDA_A);
     copy(lam_g_new.begin(),lam_g_new.end(),dlambda_g_.begin());
     std::transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),dlambda_g_.begin(),std::minus<double>());
-    
-    const DMatrix& dlam_u = qp_solver_.output(QP_LAMBDA_X);
-    copy(dlam_u.begin(),dlam_u.end(),x_[0].dlam.begin());
-  }  
+  }
 }
 
 void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
@@ -1093,7 +1121,7 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
       gain += x_[0].step[i] * qpH_times_du[i];
     }
     if (gain < 0){
-      casadi_warning("Hessian indefinite in the search direction");
+      iteration_note_ = "Hessian indefinite in the search direction";
     }
   }
 
@@ -1146,12 +1174,8 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
 	lambda_g_[i] += (t-t_prev) * dlambda_g_[i];
       }
       for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-	if(it==x_.begin()){
-	  //copy(it->dlam.begin(),it->dlam.end(),it->lam.begin()); // BUG?
-	} else {
-	  for(int i=0; i<it->n; ++i){
-	    it->lam[i] += (t-t_prev) * it->dlam[i];
-	  }
+	for(int i=0; i<it->n; ++i){
+	  it->lam[i] += (t-t_prev) * it->dlam[i];
 	}
       }
     }
@@ -1202,12 +1226,8 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
     }
 
     for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      if(it==x_.begin()){
-	// ?
-      } else {
-	for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i){
-	  du_step_ += fabs(*i);
-	}
+      for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i){
+	du_step_ += fabs(*i);
       }
     }
     du_step_ *= t;

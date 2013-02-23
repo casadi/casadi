@@ -349,7 +349,9 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   nlp_solver_.setOption("regularize",regularize);
   nlp_solver_.setOption("codegen",codegen);
   nlp_solver_.setOption("reg_threshold",reg_threshold);
-  nlp_solver_.setOption("maxiter_ls",1);
+  nlp_solver_.setOption("maxiter_ls",3);
+  nlp_solver_.setOption("beta",0.5);
+  //nlp_solver_.setOption("merit_memory",1);
   nlp_solver_.setOption("maxiter",100);
   
   // Name the variables
@@ -391,12 +393,12 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
 
   // Bounds on the variables
   vector<double> lbu(2), ubu(2);  
-  lbu.at(0) = 1e-4 / p_scale_[0]; // drag positive
-  lbu.at(1) = 1e-4 / p_scale_[1]; // depth positive
+  lbu.at(0) = 1.0e-1 / p_scale_[0]; // drag positive
+  lbu.at(1) = 5.0e-4 / p_scale_[1]; // depth positive
   nlp_solver_.setInput(lbu,NLP_LBX);
 
-  ubu.at(0) = 1e2 / p_scale_[0]; // max drag
-  ubu.at(1) = 1e2 / p_scale_[1]; // max depth
+  ubu.at(0) = 50.0 / p_scale_[0]; // max drag
+  ubu.at(1) =  0.05 / p_scale_[1]; // max depth
   nlp_solver_.setInput(ubu,NLP_UBX);
 
   // Constraint bounds
@@ -422,7 +424,7 @@ int main(){
   double drag_true = 2.0, depth_true = 0.01;
   
   // Use IPOPT as QP solver (can handle non-convex QPs)
-  bool ipopt_as_qp_solver = true;
+  bool ipopt_as_qp_solver = false;
 
   // Use Gauss-Newton method
   bool gauss_newton = true;
@@ -431,7 +433,7 @@ int main(){
   bool codegen = false;
   
   // Regularize the QP
-  bool regularize = false;
+  bool regularize = true;
 
   // Smallest allowed eigenvalue for the regularization
   double reg_threshold = 1e-8;
