@@ -67,6 +67,9 @@ public:
   // Generated measurements
   vector<DMatrix> H_meas_;
 
+  // Height of the splash
+  double spheight_;
+
   // Scaling factors for the parameters
   vector<double> p_scale_;
 
@@ -79,7 +82,7 @@ void Tester::model(){
   double g = 9.81; // gravity
   double poolwidth = 0.2;
   double sprad = 0.03;
-  double spheight = 0.01;
+  spheight_ = 0.01;
   double endtime = 1.0;
     
   // Discretization
@@ -102,7 +105,7 @@ void Tester::model(){
     for(int j=0; j<n_boxes_; ++j){
       double spdist = sqrt(pow((x[i]-0.04),2.) + pow((y[j]-0.04),2.));
       if(spdist<sprad/3.0){
-	h0_.elem(i,j) = spheight * cos(3.0*M_PI*spdist/(2.0*sprad));
+	h0_.elem(i,j) = spheight_ * cos(3.0*M_PI*spdist/(2.0*sprad));
 	any_point_in_domain = true;
       }
     }
@@ -112,7 +115,7 @@ void Tester::model(){
   if(!any_point_in_domain){
     int i_splash = std::min(int(0.04/dx),n_boxes_-1);
     int j_splash = std::min(int(0.04/dy),n_boxes_-1);
-    h0_.elem(i_splash,j_splash) = spheight;
+    h0_.elem(i_splash,j_splash) = spheight_;
   }
   
   // Free parameters (nominal values)
@@ -291,7 +294,6 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   MX nlp_f;
   
   // Constraint function
-  //  MX nlp_g = P;
   MX nlp_g = MX::sparse(0,1);
   
   // Generate full-space NLP
@@ -320,13 +322,14 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     
     // Objective function term
     nlp_f.append(H-H_meas_[k]);
+
+    // Add to the constraints
+    nlp_g.append(H);
   }
 
-  // Reshape to a vector
+  // Reshape to vectors
   nlp_f = flatten(nlp_f);
-
-  // Add some regularize on p
-  //  nlp_f.append(1e-3*P);
+  nlp_g = flatten(nlp_g);
 
   // Form scalar objective function if not Gauss-Newton
   if(!gauss_newton){
@@ -402,9 +405,8 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   nlp_solver_.setInput(ubu,NLP_UBX);
 
   // Constraint bounds
-  //  fill(lbg_.begin(),lbg_.end(),0);
-
-  //    fill(ubg_.begin(),ubg_.end(),10);
+  nlp_solver_.setInput(-spheight_, NLP_LBG);
+  nlp_solver_.setInput( spheight_, NLP_UBG);
 
   clock_t time1 = clock();
   nlp_solver_.solve();
