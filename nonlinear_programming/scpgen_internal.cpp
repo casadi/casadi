@@ -1120,6 +1120,14 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
     for(int i=0; i<n_; ++i){
       gain += x_[0].step[i] * qpH_times_du[i];
     }
+    
+    // Add contribution from regularization
+    if(reg_>0){
+      for(vector<double>::const_iterator i=x_[0].step.begin(); i!=x_[0].step.end(); ++i){
+	gain += reg_**i**i;
+      }
+    }
+
     if (gain < 0){
       iteration_note_ = "Hessian indefinite in the search direction";
     }
