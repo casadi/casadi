@@ -75381,7 +75381,7 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |              |              |              | SQP          |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| maxiter_ls   | OT_INTEGER   | 3            | Maximum      | CasADi::SCPg |
+| maxiter_ls   | OT_INTEGER   | 1            | Maximum      | CasADi::SCPg |
 |              |              |              | number of    | enInternal   |
 |              |              |              | linesearch   |              |
 |              |              |              | iterations   |              |
@@ -75406,6 +75406,9 @@ Joel Andersson, Attila Kozma and Joris Gillis
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| name_x       | OT_STRINGVEC | GenericType( | Names of the | CasADi::SCPg |
+|              | TOR          | )            | variables.   | enInternal   |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -75459,6 +75462,10 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |              |              |              | header with  | enInternal   |
 |              |              |              | problem      |              |
 |              |              |              | statistics   |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_x      | OT_INTEGERVE | GenericType( | Which        | CasADi::SCPg |
+|              | CTOR         | )            | variables to | enInternal   |
+|              |              |              | print.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | qp_solver    | OT_QPSOLVER  | GenericType( | The QP       | CasADi::SCPg |
 |              |              | )            | solver to be | enInternal   |
@@ -76401,7 +76408,7 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | SQP          |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| maxiter_ls   | OT_INTEGER   | 3            | Maximum      | CasADi::SCPg |
+| maxiter_ls   | OT_INTEGER   | 1            | Maximum      | CasADi::SCPg |
 |              |              |              | number of    | enInternal   |
 |              |              |              | linesearch   |              |
 |              |              |              | iterations   |              |
@@ -76426,6 +76433,9 @@ Return a string with a destription (for SWIG) ";
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| name_x       | OT_STRINGVEC | GenericType( | Names of the | CasADi::SCPg |
+|              | TOR          | )            | variables.   | enInternal   |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -76479,6 +76489,10 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | header with  | enInternal   |
 |              |              |              | problem      |              |
 |              |              |              | statistics   |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_x      | OT_INTEGERVE | GenericType( | Which        | CasADi::SCPg |
+|              | CTOR         | )            | variables to | enInternal   |
+|              |              |              | print.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | qp_solver    | OT_QPSOLVER  | GenericType( | The QP       | CasADi::SCPg |
 |              |              | )            | solver to be | enInternal   |
