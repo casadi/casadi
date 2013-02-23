@@ -23,9 +23,10 @@ from casadi import *
 
 # Formulate the NLP
 u = msym("u",30)     # Control
+p = msym("p")        # Parameter
 J = inner_prod(u,u)  # NLP objective
 G = MX.zeros(0,1)    # NLP constraints
-x = 0.02             # State
+x = p                # State
 for k in range(30):
     x = x +  0.1*(x*(x+1) + u[k])
     x.lift(0.0)      # Treat as NLP variable
@@ -33,15 +34,17 @@ for k in range(30):
     G.append(x)      # Add to constraints
 
 # Setup the NLP solver
-f = MXFunction([u],[J]) # Objective function
-g = MXFunction([u],[G]) # Constraint function
+f = MXFunction([u,p],[J]) # Objective function
+g = MXFunction([u,p],[G]) # Constraint function
 S = SCPgen(f,g)      # NLP solver instance
+S.setOption("parametric",True)
 S.setOption("qp_solver",QPOasesSolver)
 S.setOption("qp_solver_options",\
                     {"printLevel":"none"})
 S.init()
-    
+
 # Pass bounds and solve the NLP
+S.setInput(0.30, NLP_P)    # p
 S.setInput(-1.0, NLP_LBX)  # u_min
 S.setInput( 1.0, NLP_UBX)  # u_max
 S.setInput(-1.0, NLP_LBG)  # x_min
