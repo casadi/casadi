@@ -73,6 +73,9 @@ enum Operation{
   // Solve linear system of equations
   OP_SOLVE,
   
+  // Matrix transpose
+  OP_TRANSPOSE,
+
   // Nonzero mapping
   OP_MAPPING,
   
