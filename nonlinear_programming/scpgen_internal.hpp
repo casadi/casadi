@@ -59,6 +59,9 @@ public:
   // Evaluate jacobian of the constraints
   void eval_jac();
 
+  // Evaluate Hessian of the Lagrangian
+  void eval_hess();
+
   // Evaluate the residual function
   void eval_res();
 
@@ -161,7 +164,7 @@ public:
   int z_obj_, z_gl_, z_g_;
 
   int qpf_p_, qpf_lam_g_;
-  int qpf_b_obj_, qpf_B_obj_, qpf_b_g_;
+  int qpf_b_obj_, qpf_b_g_;
 
   int exp_p_, exp_du_, exp_dlam_g_, exp_lam_g_;
   int exp_osens_, exp_curve_;
