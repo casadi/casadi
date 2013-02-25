@@ -490,13 +490,9 @@ void SCPgenInternal::init(){
   if(verbose_){
     cout << "Formed B_obj (" << B_obj.size1() << "-by-" << B_obj.size2() << ", "<< B_obj.size() << " nnz)" << endl;
   }
-  MX B_g = zfcn.jac(x_[0].z_var,z_g_);
-  if(B_g.empty()){
-    B_g = MX::sparse(0,n_);
-  }
-  if(verbose_){
-    cout << "Formed B_g (" << B_g.size1() << "-by-" << B_g.size2() << ", "<< B_g.size() << " nnz)" << endl;
-  }
+  jac_fcn_ = MXFunction(zfcn_in,zfcn.jac(x_[0].z_var,z_g_));
+  jac_fcn_.init();
+  log("Formed Jacobian of the constraints.");
   
   // Make sure that the vectors are dense
   makeDense(b_obj);
@@ -522,7 +518,6 @@ void SCPgenInternal::init(){
   qp_fcn_out.push_back(b_obj);       qpf_b_obj_ = n++;
   qp_fcn_out.push_back(B_obj);       qpf_B_obj_ = n++;
   qp_fcn_out.push_back(b_g);         qpf_b_g_ = n++;
-  qp_fcn_out.push_back(B_g);         qpf_B_g_ = n++;
    for(int i=1; i<x_.size(); ++i){
     qp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_def]);    x_[i].qpf_def = n++;
     if(!gauss_newton_){
@@ -550,7 +545,7 @@ void SCPgenInternal::init(){
   // Allocate QP data
   CRSSparsity sp_tr_B_obj = B_obj.sparsity().transpose();
   qpH_ = DMatrix(sp_tr_B_obj.patternProduct(sp_tr_B_obj));
-  qpA_ = DMatrix(B_g.sparsity());
+  qpA_ = jac_fcn_.output();
   qpG_.resize(n_);
   qpB_.resize(m_);
 
@@ -941,6 +936,22 @@ void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, 
   stream << endl;
 }
 
+void SCPgenInternal::eval_jac(){
+  // Pass current parameter guess
+  jac_fcn_.setInput(x_[1].opt,z_p_);
+
+  // Pass primal step/variables
+  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    jac_fcn_.setInput(it==x_.begin() ? it->opt : it->res, it->z_var);
+  }
+
+  // Evaluate condensed Jacobian
+  jac_fcn_.evaluate();
+
+  // Get the Jacobian
+  jac_fcn_.getOutput(qpA_);
+}
+
 void SCPgenInternal::eval_res(){
   // Pass primal variables to the residual function for initial evaluation
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
@@ -1006,8 +1017,8 @@ void SCPgenInternal::eval_qpf(){
   transform(g_.begin(),g_.end(),qp_fcn_.output(qpf_b_g_).begin(),qpB_.begin(),std::minus<double>());
   transform(gL_.begin(),gL_.end(),qp_fcn_.output(qpf_b_obj_).begin(),gL_.begin(),std::minus<double>());
   
-  // Get condensed linear constraint
-  qp_fcn_.getOutput(qpA_,qpf_B_g_);
+  // Evaluate the constraint Jacobian
+  eval_jac();
   
   // Get the reduced Hessian
   if(gauss_newton_){
@@ -1164,7 +1175,7 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
   ls_success = false;
   
   // Line-search
-  //log("Starting line-search");
+  log("Starting line-search");
   
   // Line-search loop
   while (true){
@@ -1202,13 +1213,13 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
       
       // Accepting candidate
       ls_success = true;
-      //log("Line-search completed, candidate accepted");
+      log("Line-search completed, candidate accepted");
       break;
     }
     
     // Line-search not successful, but we accept it.
     if(ls_iter == maxiter_ls_){
-      //log("Line-search completed, maximum number of iterations");
+      log("Line-search completed, maximum number of iterations");
       break;
     }
     
