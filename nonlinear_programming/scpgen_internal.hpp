@@ -56,6 +56,9 @@ public:
   void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
                       double reg, int ls_trials, bool ls_success);
 
+  // Evaluate jacobian of the constraints
+  void eval_jac();
+
   // Evaluate the residual function
   void eval_res();
 
@@ -127,6 +130,12 @@ public:
   /// Residual function
   FX res_fcn_;
  
+  // Hessian function
+  FX hess_fcn_;
+
+  // Jacobian function
+  FX jac_fcn_;
+
   /// Quadratic approximation
   FX qp_fcn_;
 
@@ -152,7 +161,7 @@ public:
   int z_obj_, z_gl_, z_g_;
 
   int qpf_p_, qpf_lam_g_;
-  int qpf_b_obj_, qpf_B_obj_, qpf_b_g_, qpf_B_g_;
+  int qpf_b_obj_, qpf_B_obj_, qpf_b_g_;
 
   int exp_p_, exp_du_, exp_dlam_g_, exp_lam_g_;
   int exp_osens_, exp_curve_;
