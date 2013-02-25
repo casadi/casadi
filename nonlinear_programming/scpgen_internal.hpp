@@ -66,7 +66,7 @@ public:
   void eval_res();
 
   // Form the condensed QP
-  void eval_qpf();
+  void eval_tan();
 
   // Regularize the condensed QP
   void regularize();
@@ -134,13 +134,13 @@ public:
   FX res_fcn_;
  
   // Hessian function
-  FX hess_fcn_;
+  FX hes_fcn_;
 
   // Jacobian function
   FX jac_fcn_;
 
   /// Quadratic approximation
-  FX qp_fcn_;
+  FX tan_fcn_;
 
   /// Step expansion
   FX exp_fcn_;
@@ -157,32 +157,29 @@ public:
   /// Multipliers for the nonlinear bounds
   std::vector<double> lambda_g_, dlambda_g_;
 
+  // Residual function io indices
   int res_lam_g_;
   int res_obj_, res_gl_, res_g_;
 
-  int z_p_, z_lam_g_;
-  int z_obj_, z_gl_, z_g_;
+  // Modifier function io indices
+  int mod_p_, mod_lam_g_;
+  int mod_obj_, mod_gl_, mod_g_;
+  int mod_du_, mod_dlam_g_;
 
-  int qpf_p_, qpf_lam_g_;
-  int qpf_b_obj_, qpf_b_g_;
+  // Tangental function
+  int tan_b_obj_, tan_b_g_;
 
-  int exp_p_, exp_du_, exp_dlam_g_, exp_lam_g_;
+  // step expansion function
   int exp_osens_, exp_curve_;
 
   struct Var{
     int n;
     MX v;
 
-    int res_var, res_lam;
-    int res_d, res_lam_d;
-
-    int z_var, z_lam;
-    int z_def, z_defL;
-
-    int qpf_var, qpf_lam;
-    int qpf_def, qpf_defL;
-
-    int exp_var, exp_lam;
+    // Indices of function inputs and outputs
+    int res_var, res_lam, res_d, res_lam_d;
+    int mod_var, mod_lam, mod_def, mod_defL;
+    int tan_lin, tan_linL;
     int exp_def, exp_defL;
 
     std::vector<double> step, init, opt, lam, dlam;

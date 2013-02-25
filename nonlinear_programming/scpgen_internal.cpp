@@ -367,139 +367,128 @@ void SCPgenInternal::init(){
   MX gL_z = ex[2];
   
   // Modified function inputs
-  vector<MX> zfcn_in;
+  vector<MX> mfcn_in;
   n=0;
-  zfcn_in.push_back(x[1]);                             z_p_ = n++;
+  mfcn_in.push_back(x[1]);                             mod_p_ = n++;
   for(int i=0; i<x_.size(); ++i){
-    zfcn_in.push_back(i==0 ? x[0] :     d[i-1]);       x_[i].z_var = n++;
+    mfcn_in.push_back(i==0 ? x[0] :     d[i-1]);       x_[i].mod_var = n++;
   }
 
   // Modified function outputs
   n=0;
-  vector<MX> zfcn_out;  
-  zfcn_out.push_back(g_z);                             z_g_ = n++;
+  vector<MX> mfcn_out;  
+  mfcn_out.push_back(g_z);                             mod_g_ = n++;
   
   // Constraint function
-  MXFunction gfcn(zfcn_in,zfcn_out);
+  MXFunction gfcn(mfcn_in,mfcn_out);
   gfcn.init();
 
   // Jacobian of the constraints
-  jac_fcn_ = MXFunction(zfcn_in,gfcn.jac(x_[0].z_var,z_g_));
-  jac_fcn_.init();
+  MXFunction jac_fcn(mfcn_in,gfcn.jac(x_[0].mod_var,mod_g_));
+  jac_fcn.init();
   log("Formed Jacobian of the constraints.");
   
+  // Generate c code and load as DLL
+  if(codegen_){
+    dynamicCompilation(jac_fcn,jac_fcn_,"jac_fcn","Jacobian function");
+  } else {
+    jac_fcn_ = jac_fcn;
+  }
+
   // Add multipliers to function inputs
   if(!gauss_newton_){
-    n = zfcn_in.size();
-    zfcn_in.push_back(lam_g);                          z_lam_g_ = n++;
+    n = mfcn_in.size();
+    mfcn_in.push_back(lam_g);                          mod_lam_g_ = n++;
     for(int i=0; i<x_.size(); ++i){
-      zfcn_in.push_back(i==0 ? lam[0] : lam_d[i-1]);   x_[i].z_lam = n++;
+      mfcn_in.push_back(i==0 ? lam[0] : lam_d[i-1]);   x_[i].mod_lam = n++;
     }
   }
 
   // Add gradient of the Lagrangian
-  n = zfcn_out.size();
-  zfcn_out.push_back(obj_z);                           z_obj_ = n++;
-  zfcn_out.push_back(gL_z);                            z_gl_ = n++;  
+  n = mfcn_out.size();
+  mfcn_out.push_back(obj_z);                           mod_obj_ = n++;
+  mfcn_out.push_back(gL_z);                            mod_gl_ = n++;  
   
   // Lagrangian gradient function
-  MXFunction lgrad(zfcn_in,zfcn_out);
+  MXFunction lgrad(mfcn_in,mfcn_out);
   lgrad.init();
   
   // Hessian of the Lagrangian
-  hess_fcn_ = MXFunction(zfcn_in,lgrad.jac(x_[0].z_var,z_gl_,false,!gauss_newton_));
-  hess_fcn_.init();
-  log("Formed Hessian of the constraints.");
+  MXFunction hes_fcn(mfcn_in,lgrad.jac(x_[0].mod_var,mod_gl_,false,!gauss_newton_));
+  hes_fcn.init();
+  log("Formed Hessian of the Lagrangian.");
+
+  if(codegen_){
+    dynamicCompilation(hes_fcn,hes_fcn_,"hes_fcn","Hessian function");
+  } else {
+    hes_fcn_ = hes_fcn;
+  }
 
   // Definition of intermediate variables
-  n = zfcn_out.size();
+  n = mfcn_out.size();
   for(int i=1; i<x_.size(); ++i){
-    zfcn_out.push_back(d_def[i-1]);            x_[i].z_def = n++;
+    mfcn_out.push_back(d_def[i-1]);            x_[i].mod_def = n++;
     if(!gauss_newton_){
-      zfcn_out.push_back(lam_d_def[i-1]);      x_[i].z_defL = n++;
+      mfcn_out.push_back(lam_d_def[i-1]);      x_[i].mod_defL = n++;
     }
   }
 
-  MXFunction zfcn(zfcn_in,zfcn_out);
-  zfcn.setOption("name","zfcn");
-  zfcn.init();
+  // Modifier function
+  MXFunction mfcn(mfcn_in,mfcn_out);
+  mfcn.init();
 
   // Directional derivative of Z
-  vector<vector<MX> > Z_fwdSeed(1,zfcn_in);
-  vector<vector<MX> > Z_fwdSens(1,zfcn_out);
-  vector<vector<MX> > Z_adjSeed;
-  vector<vector<MX> > Z_adjSens;
+  vector<vector<MX> > mfcn_fwdSeed(1,mfcn_in), mfcn_fwdSens(1,mfcn_out);
+  vector<vector<MX> > mfcn_adjSeed,            mfcn_adjSens;
 
   // Linearization in the d-direction (see Equation (2.12) in Alberspeyer2010)
-  fill(Z_fwdSeed[0].begin(),Z_fwdSeed[0].end(),MX());
+  fill(mfcn_fwdSeed[0].begin(),mfcn_fwdSeed[0].end(),MX());
   for(int i=1; i<x_.size(); ++i){
-    Z_fwdSeed[0][x_[i].z_var] = d[i-1];
+    mfcn_fwdSeed[0][x_[i].mod_var] = d[i-1];
   }
   if(!gauss_newton_){
     for(int i=1; i<x_.size(); ++i){
-      Z_fwdSeed[0][x_[i].z_lam] = lam_d[i-1];
+      mfcn_fwdSeed[0][x_[i].mod_lam] = lam_d[i-1];
     }
   }
-  zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);   
+  mfcn.eval(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens,true);
   
   // Vector(s) b in Lifted Newton
-  MX b_obj = Z_fwdSens[0][z_gl_];
-  MX b_g = Z_fwdSens[0][z_g_];
+  MX b_obj = mfcn_fwdSens[0][mod_gl_];
+  MX b_g = mfcn_fwdSens[0][mod_g_];
   
   // Make sure that the vectors are dense
   makeDense(b_obj);
   makeDense(b_g);
   
-  // Linearization
-  vector<MX> qp_fcn_in;
+  // Tangent function
+  vector<MX> tan_fcn_out;
   n=0;
-  qp_fcn_in.push_back(x[1]);             qpf_p_ = n++;
-  if(!gauss_newton_){
-    qp_fcn_in.push_back(lam_g);          qpf_lam_g_ = n++;
-  }
-  for(int i=0; i<x_.size(); ++i){
-    qp_fcn_in.push_back(i==0 ?     x[i] : d[i-1]);        x_[i].qpf_var = n++;
-    if(!gauss_newton_){
-      qp_fcn_in.push_back(i==0 ? lam[i] : lam_d[i-1]);    x_[i].qpf_lam = n++;
-    }
-  }
-  casadi_assert(n==qp_fcn_in.size());  
-
-  vector<MX> qp_fcn_out;
-  n=0;
-  qp_fcn_out.push_back(b_obj);       qpf_b_obj_ = n++;
-  qp_fcn_out.push_back(b_g);         qpf_b_g_ = n++;
+  tan_fcn_out.push_back(b_obj);                          tan_b_obj_ = n++;
+  tan_fcn_out.push_back(b_g);                            tan_b_g_ = n++;
    for(int i=1; i<x_.size(); ++i){
-    qp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_def]);    x_[i].qpf_def = n++;
+    tan_fcn_out.push_back(mfcn_fwdSens[0][x_[i].mod_def]);    x_[i].tan_lin = n++;
     if(!gauss_newton_){
-      qp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_defL]); x_[i].qpf_defL = n++;
+      tan_fcn_out.push_back(mfcn_fwdSens[0][x_[i].mod_defL]); x_[i].tan_linL = n++;
     }
    }
-  casadi_assert(n==qp_fcn_out.size());
+  casadi_assert(n==tan_fcn_out.size());
   
-  MXFunction qp_fcn(qp_fcn_in,qp_fcn_out);
-  qp_fcn.setOption("name","qp_fcn");
-  qp_fcn.setOption("number_of_fwd_dir",0);
-  qp_fcn.setOption("number_of_adj_dir",0);
-  qp_fcn.init();
+  MXFunction tan_fcn(mfcn_in,tan_fcn_out);
+  tan_fcn.setOption("name","tan_fcn");
+  tan_fcn.setOption("number_of_fwd_dir",0);
+  tan_fcn.setOption("number_of_adj_dir",0);
+  tan_fcn.init();
   if(verbose_){
-    cout << "Generated linearization function ( " << qp_fcn.getAlgorithmSize() << " nodes)." << endl;
+    cout << "Generated linearization function ( " << tan_fcn.getAlgorithmSize() << " nodes)." << endl;
   }
   
   // Generate c code and load as DLL
   if(codegen_){
-    dynamicCompilation(qp_fcn,qp_fcn_,"qp_fcn","linearization function");
+    dynamicCompilation(tan_fcn,tan_fcn_,"tan_fcn","linearization function");
   } else {
-    qp_fcn_ = qp_fcn;
+    tan_fcn_ = tan_fcn;
   }
-
-
-
-
-
-
-
-
 
   // Expression a + A*du in Lifted Newton (Section 2.1 in Alberspeyer2010)
   MX du = msym("du",n_);   // Step in u
@@ -509,46 +498,34 @@ void SCPgenInternal::init(){
   }
   
   // Interpret the Jacobian-vector multiplication as a forward directional derivative
-  fill(Z_fwdSeed[0].begin(),Z_fwdSeed[0].end(),MX());
-  Z_fwdSeed[0][x_[0].z_var] = du;
+  fill(mfcn_fwdSeed[0].begin(),mfcn_fwdSeed[0].end(),MX());
+  mfcn_fwdSeed[0][x_[0].mod_var] = du;
   if(!gauss_newton_){
-    Z_fwdSeed[0][z_lam_g_] = dlam_g;
+    mfcn_fwdSeed[0][mod_lam_g_] = dlam_g;
   }
-  zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);    
+  mfcn.eval(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens,true);    
   
   // Step expansion function inputs
-  vector<MX> exp_fcn_in;
-  n=0;
-  exp_fcn_in.push_back(x[1]);                            exp_p_ = n++;
+  n = mfcn_in.size();
+  mfcn_in.push_back(du);                                 mod_du_ = n++;
   if(!gauss_newton_){
-    exp_fcn_in.push_back(lam_g);                         exp_lam_g_ = n++;
+    mfcn_in.push_back(dlam_g);                           mod_dlam_g_ = n++;
   }
-  exp_fcn_in.push_back(du);                              exp_du_ = n++;
-  if(!gauss_newton_){
-    exp_fcn_in.push_back(dlam_g);                        exp_dlam_g_ = n++;
-  }
-  
-  for(int i=0; i<x_.size(); ++i){
-    exp_fcn_in.push_back(   i==0 ? x[0] :     d[i-1]);   x_[i].exp_var = n++;
-    if(!gauss_newton_){
-      exp_fcn_in.push_back( i==0 ? lam[0] : lam_d[i-1]);   x_[i].exp_lam = n++;
-    }
-  }
-  
+    
   // Step expansion function outputs
   vector<MX> exp_fcn_out;
   n=0;
-  exp_fcn_out.push_back(Z_fwdSens[0][z_obj_]);           exp_osens_ = n++;
-  exp_fcn_out.push_back(Z_fwdSens[0][z_gl_]);            exp_curve_ = n++;
+  exp_fcn_out.push_back(mfcn_fwdSens[0][mod_obj_]);           exp_osens_ = n++;
+  exp_fcn_out.push_back(mfcn_fwdSens[0][mod_gl_]);            exp_curve_ = n++;
   for(int i=1; i<x_.size(); ++i){
-    exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_def]);    x_[i].exp_def = n++;
+    exp_fcn_out.push_back(mfcn_fwdSens[0][x_[i].mod_def]);    x_[i].exp_def = n++;
     if(!gauss_newton_){
-      exp_fcn_out.push_back(Z_fwdSens[0][x_[i].z_defL]); x_[i].exp_defL = n++;
+      exp_fcn_out.push_back(mfcn_fwdSens[0][x_[i].mod_defL]); x_[i].exp_defL = n++;
     }
   }
   
   // Step expansion function
-  MXFunction exp_fcn(exp_fcn_in,exp_fcn_out);
+  MXFunction exp_fcn(mfcn_in,exp_fcn_out);
   exp_fcn.setOption("number_of_fwd_dir",0);
   exp_fcn.setOption("number_of_adj_dir",0);
   exp_fcn.setOption("name","exp_fcn");
@@ -565,7 +542,7 @@ void SCPgenInternal::init(){
   }  
   
   // Allocate QP data
-  CRSSparsity sp_tr_B_obj = hess_fcn_.output().sparsity().transpose();
+  CRSSparsity sp_tr_B_obj = hes_fcn_.output().sparsity().transpose();
   qpH_ = DMatrix(sp_tr_B_obj.patternProduct(sp_tr_B_obj));
   qpA_ = jac_fcn_.output();
   qpG_.resize(n_);
@@ -763,7 +740,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     iter++;
     
     // Form the condensed QP
-    eval_qpf();
+    eval_tan();
 
     // Regularize the QP
     if(regularize_){
@@ -960,11 +937,11 @@ void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, 
 
 void SCPgenInternal::eval_jac(){
   // Pass current parameter guess
-  jac_fcn_.setInput(x_[1].opt,z_p_);
+  jac_fcn_.setInput(x_[1].opt,mod_p_);
 
   // Pass primal step/variables
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    jac_fcn_.setInput(it==x_.begin() ? it->opt : it->res, it->z_var);
+    jac_fcn_.setInput(it==x_.begin() ? it->opt : it->res, it->mod_var);
   }
 
   // Evaluate condensed Jacobian
@@ -976,34 +953,34 @@ void SCPgenInternal::eval_jac(){
 
 void SCPgenInternal::eval_hess(){
   // Pass current parameter guess
-  hess_fcn_.setInput(x_[1].opt,z_p_);
+  hes_fcn_.setInput(x_[1].opt,mod_p_);
 
   // Pass primal step/variables
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    hess_fcn_.setInput(it==x_.begin() ? it->opt : it->res, it->z_var);
+    hes_fcn_.setInput(it==x_.begin() ? it->opt : it->res, it->mod_var);
   }
 
   // Pass dual steps/variables
   if(!gauss_newton_){
-    hess_fcn_.setInput(lambda_g_,z_lam_g_);
+    hes_fcn_.setInput(lambda_g_,mod_lam_g_);
     for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      hess_fcn_.setInput(it==x_.begin() ? it->lam : it->resL, it->z_lam);
+      hes_fcn_.setInput(it==x_.begin() ? it->lam : it->resL, it->mod_lam);
     }
   }
 
   // Evaluate condensed Hessian
-  hess_fcn_.evaluate();
+  hes_fcn_.evaluate();
 
   // Get the reduced Hessian
   if(gauss_newton_){
-    const DMatrix& B_obj =  hess_fcn_.output();
+    const DMatrix& B_obj =  hes_fcn_.output();
     fill(qpH_.begin(),qpH_.end(),0);
     DMatrix::mul_no_alloc_tn(B_obj,B_obj,qpH_);
 
     fill(qpG_.begin(),qpG_.end(),0);
     DMatrix::mul_no_alloc_tn(B_obj,gL_,qpG_);
   } else {
-    hess_fcn_.getOutput(qpH_);
+    hes_fcn_.getOutput(qpH_);
     copy(gL_.begin(),gL_.end(),qpG_.begin());
   }
 }
@@ -1049,29 +1026,29 @@ void SCPgenInternal::eval_res(){
   }
 }
 
-void SCPgenInternal::eval_qpf(){
+void SCPgenInternal::eval_tan(){
   // Pass current parameter guess
-  qp_fcn_.setInput(x_[1].opt,qpf_p_);
+  tan_fcn_.setInput(x_[1].opt,mod_p_);
 
   // Pass primal step/variables
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    qp_fcn_.setInput(it==x_.begin() ? it->opt : it->res, it->qpf_var);
+    tan_fcn_.setInput(it==x_.begin() ? it->opt : it->res, it->mod_var);
   }
 
   // Pass dual steps/variables
   if(!gauss_newton_){
-    qp_fcn_.setInput(lambda_g_,qpf_lam_g_);
+    tan_fcn_.setInput(lambda_g_,mod_lam_g_);
     for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      qp_fcn_.setInput(it==x_.begin() ? it->lam : it->resL, it->qpf_lam);
+      tan_fcn_.setInput(it==x_.begin() ? it->lam : it->resL, it->mod_lam);
     }
   }
 
   // Evaluate to get QP
-  qp_fcn_.evaluate();
+  tan_fcn_.evaluate();
 
   // Get condensed vectors
-  transform(g_.begin(),g_.end(),qp_fcn_.output(qpf_b_g_).begin(),qpB_.begin(),std::minus<double>());
-  transform(gL_.begin(),gL_.end(),qp_fcn_.output(qpf_b_obj_).begin(),gL_.begin(),std::minus<double>());
+  transform(g_.begin(),g_.end(),tan_fcn_.output(tan_b_g_).begin(),qpB_.begin(),std::minus<double>());
+  transform(gL_.begin(),gL_.end(),tan_fcn_.output(tan_b_obj_).begin(),gL_.begin(),std::minus<double>());
   
   // Evaluate the constraint Jacobian
   eval_jac();
@@ -1092,14 +1069,14 @@ void SCPgenInternal::eval_qpf(){
 
   // Expanded primal step (first part)
   for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
-    const DMatrix& dv = qp_fcn_.output(it->qpf_def);
+    const DMatrix& dv = tan_fcn_.output(it->tan_lin);
     copy(dv.begin(),dv.end(),it->step.begin());
   }
   
   // Expanded dual step (first part)
   if(!gauss_newton_){
     for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
-      const DMatrix& dlam_v = qp_fcn_.output(it->qpf_defL);
+      const DMatrix& dlam_v = tan_fcn_.output(it->tan_linL);
       copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
     }
   }
@@ -1221,7 +1198,7 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
   ls_success = false;
   
   // Line-search
-  log("Starting line-search");
+  //log("Starting line-search");
   
   // Line-search loop
   while (true){
@@ -1259,13 +1236,13 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
       
       // Accepting candidate
       ls_success = true;
-      log("Line-search completed, candidate accepted");
+      //log("Line-search completed, candidate accepted");
       break;
     }
     
     // Line-search not successful, but we accept it.
     if(ls_iter == maxiter_ls_){
-      log("Line-search completed, maximum number of iterations");
+      //log("Line-search completed, maximum number of iterations");
       break;
     }
     
@@ -1301,27 +1278,27 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
 
 void SCPgenInternal::eval_exp(){
   // Pass current parameter guess
-  exp_fcn_.setInput(x_[1].opt, exp_p_);
+  exp_fcn_.setInput(x_[1].opt, mod_p_);
 
   // Pass primal step/variables
-  exp_fcn_.setInput(x_[0].step, exp_du_);
+  exp_fcn_.setInput(x_[0].step, mod_du_);
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
     if(it==x_.begin()){
-      exp_fcn_.setInput(it->opt,it->exp_var);
+      exp_fcn_.setInput(it->opt,it->mod_var);
     } else {
-      exp_fcn_.setInput(it->res,it->exp_var);
+      exp_fcn_.setInput(it->res,it->mod_var);
     }
   }
   
   // Pass dual step/variables
   if(!gauss_newton_){
-    exp_fcn_.setInput(dlambda_g_,exp_dlam_g_);
-    exp_fcn_.setInput(lambda_g_,exp_lam_g_);
+    exp_fcn_.setInput(dlambda_g_,mod_dlam_g_);
+    exp_fcn_.setInput(lambda_g_,mod_lam_g_);
     for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
       if(it==x_.begin()){
-	exp_fcn_.setInput(it->lam,it->exp_lam);
+	exp_fcn_.setInput(it->lam,it->mod_lam);
       } else {
-	exp_fcn_.setInput(it->resL,it->exp_lam);
+	exp_fcn_.setInput(it->resL,it->mod_lam);
       }
     }
   }
