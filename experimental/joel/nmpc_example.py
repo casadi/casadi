@@ -22,37 +22,49 @@
 from casadi import *
 
 # Formulate the NLP
-u = msym("u",30)     # Control
-p = msym("p")        # Parameter
-J = inner_prod(u,u)  # NLP objective
-G = MX.zeros(0,1)    # NLP constraints
-x = p                # State
-for k in range(30):
-    x = x +  0.1*(x*(x+1) + u[k])
-    x.lift(0.0)      # Treat as NLP variable
-    J = J + x*x      # Add to objective
-    G.append(x)      # Add to constraints
+N = 30
+u = msym("u",N); p = msym("p")
+f = inner_prod(u,u)
+g = MX([]); gmax = []; gmin = []
+x = p
+for k in range(N):
+  x = x+0.1*(x*(x+1)+u[k])
+  x.lift(0.0)
+  f = f + x*x
+  g.append(x)
+  gmin.append(-1 if k<N-1 else 0)
+  gmax.append( 1 if k<N-1 else 0)
 
-# Setup the NLP solver
-f = MXFunction([u,p],[J]) # Objective function
-g = MXFunction([u,p],[G]) # Constraint function
-S = SCPgen(f,g)      # NLP solver instance
-S.setOption("parametric",True)
-S.setOption("qp_solver",QPOasesSolver)
-S.setOption("qp_solver_options",\
-                    {"printLevel":"none"})
+# Allocate NLP solver
+#h = MXFunction([u,p],[f,g]) # New syntax
+#S = SCPgen(h)
+h1 = MXFunction([u,p],[f]) # Old syntax
+h2 = MXFunction([u,p],[g]) # Old syntax
+S = SCPgen(h1,h2)
+S.setOption("qp_solver",\
+             QPOasesSolver)
+S.setOption("parametric",True) # Should be automatic
+S.setOption("qp_solver_options",{"printLevel":"none"}) # Should be automatic
 S.init()
 
-# Pass bounds and solve the NLP
-S.setInput(0.30, NLP_P)    # p
-S.setInput(-1.0, NLP_LBX)  # u_min
-S.setInput( 1.0, NLP_UBX)  # u_max
-S.setInput(-1.0, NLP_LBG)  # x_min
-S.setInput( 1.0, NLP_UBG)  # x_max
+# Pass bounds and solve
+S.setInput( 0.3,NLP_P)    # S.setInput( 0.3,"p")
+S.setInput(-1.0,NLP_LBX)  # S.setInput(-1.0,"lbx")
+S.setInput( 1.0,NLP_UBX)  # S.setInput( 1.0,"ubx")
+S.setInput(gmin,NLP_LBG)  # S.setInput(gmin,"lbg")
+S.setInput(gmax,NLP_UBG)  # S.setInput(gmax,"ubg")
 S.solve()
 
 # Visualize the trajectory
 from matplotlib.pylab import *
-plot(S.output(NLP_X_OPT))
+u = S.output(NLP_X_OPT)
+plot(u)
+x = DMatrix(0.30)
+for k in range(30):
+    xk = x[-1,0]
+    x.append(xk + 0.1*(xk*(xk+1) + u[k]))
+plot(x)
+legend(['u','x'])
+grid()
 show()
 
