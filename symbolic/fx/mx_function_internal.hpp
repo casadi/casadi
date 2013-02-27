@@ -34,12 +34,12 @@
 
 namespace CasADi{
 
-/** \brief  Internal node class for MXFunction
-  \author Joel Andersson 
-  \date 2010
-*/
-class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>{
-  friend class MXFunction;
+  /** \brief  Internal node class for MXFunction
+      \author Joel Andersson 
+      \date 2010
+  */
+  class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>{
+    friend class MXFunction;
   
   public:
 
@@ -90,7 +90,13 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
 
     /** \brief  Working vector for numeric calculation */
     std::vector<FunctionIO> work_;
+  
+    /** \brief  Temporary vectors needed for the evaluation (integer) */
+    std::vector<int> itmp_;
     
+    /** \brief  Temporary vectors needed for the evaluation (real) */
+    std::vector<double> rtmp_;
+
     /** \brief  "Tape" with spilled variables */
     std::vector<std::pair<std::pair<int,int>,DMatrix> > tape_;
     
@@ -148,7 +154,7 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     /// Allocate tape
     void allocTape();
     
-};
+  };
 
 } // namespace CasADi
 

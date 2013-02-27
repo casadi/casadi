@@ -29,46 +29,46 @@ using namespace std;
 
 namespace CasADi{
 
-Transpose::Transpose(const MX& x){
-  setDependencies(x);
-  setSparsity(x.sparsity().transpose());
-}
-
-Transpose* Transpose::clone() const{
-  return new Transpose(*this);
-}
-
-void Transpose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-  evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
-}
-
-void Transpose::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-  evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
-}
-
-template<typename T, typename MatV, typename MatVV>
-void Transpose::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
-  casadi_assert(0);
-}
-
-void Transpose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-  casadi_assert(0);
-}
-
-void Transpose::printPart(std::ostream &stream, int part) const{
-  if(part==0){
-    stream << "trans(";
-  } else {
-    stream << ")";
+  Transpose::Transpose(const MX& x){
+    setDependencies(x);
+    setSparsity(x.sparsity().transpose());
   }
-}
 
-void Transpose::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-  *output[0] = trans(*input[0]);
-}
+  Transpose* Transpose::clone() const{
+    return new Transpose(*this);
+  }
 
-void Transpose::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-  casadi_assert(0);
-}
+  void Transpose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens,itmp,rtmp);
+  }
+
+  void Transpose::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens,itmp,rtmp);
+  }
+
+  template<typename T, typename MatV, typename MatVV>
+  void Transpose::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens, std::vector<int>& itmp, std::vector<T>& rtmp){
+    casadi_assert(0);
+  }
+
+  void Transpose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd){
+    casadi_assert(0);
+  }
+
+  void Transpose::printPart(std::ostream &stream, int part) const{
+    if(part==0){
+      stream << "trans(";
+    } else {
+      stream << ")";
+    }
+  }
+
+  void Transpose::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+    *output[0] = trans(*input[0]);
+  }
+
+  void Transpose::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    casadi_assert(0);
+  }
 
 } // namespace CasADi

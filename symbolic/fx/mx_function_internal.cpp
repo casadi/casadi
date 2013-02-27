@@ -346,15 +346,22 @@ void MXFunctionInternal::init(){
   // Allocate work vectors (numeric)
   work_.resize(0);
   work_.resize(worksize);
+  size_t nitmp=0, nrtmp=0;
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     if(it->op!=OP_OUTPUT){
       for(int c=0; c<it->res.size(); ++c){
         if(it->res[c]>=0 && work_[it->res[c]].data.empty()){
           work_[it->res[c]].data = Matrix<double>(it->data->sparsity(c),0);
+	  size_t nr=0, ni=0;
+	  it->data->nTmp(ni,nr);
+	  nitmp = std::max(nitmp,ni);
+	  nrtmp = std::max(nrtmp,nr);
         }
       }
     }
   }
+  itmp_.resize(nitmp);
+  rtmp_.resize(nrtmp);
   
   // Reset the temporary variables
   for(int i=0; i<nodes.size(); ++i){
@@ -519,7 +526,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
       updatePointers(*it,nfdir,0);
 
       // Evaluate
-      it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
+      it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
   
       // Lifting
       if(liftfun_ && it->data->isNonLinear()){
@@ -567,7 +574,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
         updatePointers(*it,0,nadir);
         
         // Evaluate
-        it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
+        it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
       }
       
       if(it->op!=OP_OUTPUT){
@@ -683,7 +690,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
         updatePointers(*it,0,0);
 
         // Propagate sparsity forwards
-        it->data->propagateSparsity(mx_input_, mx_output_,true);
+        it->data->propagateSparsity(mx_input_, mx_output_, itmp_, rtmp_, true);
       }
     }
     
@@ -712,7 +719,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
         updatePointers(*it,0,0);
         
         // Propagate sparsity backwards
-        it->data->propagateSparsity(mx_input_, mx_output_,false);
+        it->data->propagateSparsity(mx_input_, mx_output_, itmp_, rtmp_, false);
       }
       
       // Clear the seeds for the next sweep
@@ -1002,6 +1009,9 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
       }
     }
   }
+
+  // Create a temporary vector
+  vector<SX> rtmp(rtmp_.size());
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   vector<SXMatrix*> sxarg;
@@ -1026,7 +1036,7 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
         int ind = it->res[c];
         sxres[c] = ind<0 ? 0 : &swork[ind];
       }
-      it->data->evaluateSX(sxarg,sxres);
+      it->data->evaluateSX(sxarg,sxres,itmp_,rtmp);
     }
   }
 }

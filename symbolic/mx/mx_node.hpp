@@ -68,13 +68,12 @@ namespace CasADi{
 
   
   /** \brief Node class for MX objects
-    \author Joel Andersson 
-    \date 2010
-    Internal class.
-*/
-class MXNode : public SharedObjectNode{
-  friend class MX;
-  friend class MXFunctionInternal;
+      \author Joel Andersson 
+      \date 2010
+      Internal class.
+  */
+  class MXNode : public SharedObjectNode{
+    friend class MX;
   
   public:
     /// Constructor
@@ -111,18 +110,21 @@ class MXNode : public SharedObjectNode{
     /** \brief  Evaluate the function */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 
                            const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
-                           const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens) = 0;
+                           const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, 
+			   std::vector<int>& itmp, std::vector<double>& rtmp){evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);}
 
     /** \brief  Evaluate the function, no derivatives*/
-    void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output);
+    void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
                             const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
-                            const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens) = 0;
+                            const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens, 
+			    std::vector<int>& itmp, std::vector<SX>& rtmp){ evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);}
 
     /** \brief  Evaluate symbolically (SX), no derivatives */
-    void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output);
+    void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
+		    std::vector<int>& itmp, std::vector<SX>& rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, 
@@ -133,7 +135,7 @@ class MXNode : public SharedObjectNode{
     void evaluateMX(const MXPtrV& input, MXPtrV& output);
     
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) = 0;
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd){ propagateSparsity(input,output,fwd);}
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;
@@ -187,6 +189,9 @@ class MXNode : public SharedObjectNode{
     /// Set the sparsity
     void setSparsity(const CRSSparsity& sparsity);
     
+    /// Get number of temporary variables needed
+    virtual void nTmp(size_t& ni, size_t& nr){ ni=0; nr=0;}
+
     /// Set unary dependency
     void setDependencies(const MX& dep);
     
@@ -229,8 +234,8 @@ class MXNode : public SharedObjectNode{
     static std::vector<std::vector<T> > getVector(const std::vector<std::vector<T*> > v);
 
     /** Temporary variables to be used in user algorithms like sorting, 
-    the user is resposible of making sure that use is thread-safe
-    The variable is initialized to zero
+	the user is resposible of making sure that use is thread-safe
+	The variable is initialized to zero
     */
     int temp;
     
@@ -239,29 +244,44 @@ class MXNode : public SharedObjectNode{
     
     /** \brief  The sparsity pattern */
     CRSSparsity sparsity_;
-};
+    
+  protected:
 
-// Implementations
+    /** \brief  Evaluate the function (no work)*/
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 
+                           const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
+                           const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
-template<typename T>
-std::vector<T> MXNode::getVector(const std::vector<T*> v){
-	std::vector<T> ret(v.size());
-	for(int i=0; i<v.size(); i++){
-		if(v[i]!=0){
-			ret[i] = *v[i];
-		}
-	}
-	return ret;
-}
+    /** \brief  Evaluate symbolically (SX), no work */
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
+                            const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
+                            const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
-template<typename T>
-std::vector<std::vector<T> > MXNode::getVector(const std::vector<std::vector<T*> > v){
-	std::vector<std::vector<T> > ret(v.size());
-	for(int i=0; i<v.size(); i++){
-		ret[i] = getVector(v[i]);
-	}
-	return ret;
-}
+    /** \brief  Propagate sparsity, no work */
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+  };
+
+  // Implementations
+
+  template<typename T>
+  std::vector<T> MXNode::getVector(const std::vector<T*> v){
+    std::vector<T> ret(v.size());
+    for(int i=0; i<v.size(); i++){
+      if(v[i]!=0){
+	ret[i] = *v[i];
+      }
+    }
+    return ret;
+  }
+
+  template<typename T>
+  std::vector<std::vector<T> > MXNode::getVector(const std::vector<std::vector<T*> > v){
+    std::vector<std::vector<T> > ret(v.size());
+    for(int i=0; i<v.size(); i++){
+      ret[i] = getVector(v[i]);
+    }
+    return ret;
+  }
 
 
 } // namespace CasADi

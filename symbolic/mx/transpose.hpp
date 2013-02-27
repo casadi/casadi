@@ -29,10 +29,10 @@
 
 namespace CasADi{
   /** \brief Matrix transpose
-  \author Joel Andersson
-  \date 2013
-*/
-class Transpose : public MXNode{
+      \author Joel Andersson
+      \date 2013
+  */
+  class Transpose : public MXNode{
   public:
 
     /// Constructor
@@ -45,16 +45,16 @@ class Transpose : public MXNode{
     virtual ~Transpose(){}
     
     /// Evaluate the function numerically
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens, std::vector<int>& itmp, std::vector<SX>& rtmp);
 
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -64,14 +64,17 @@ class Transpose : public MXNode{
 
     /// Evaluate the function (template)
     template<typename T, typename MatV, typename MatVV> 
-    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens, std::vector<int>& itmp, std::vector<T>& rtmp);
         
     /// Check if the mapping is in fact a transpose
     bool isTranspose() const{ return true;}
 
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_TRANSPOSE;}    
-};
+
+    /// Get number of temporary variables needed
+    virtual void nTmp(size_t& ni, size_t& nr){ ni=size1(); nr=0;}
+  };
 
 } // namespace CasADi
 
