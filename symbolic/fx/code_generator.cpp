@@ -23,6 +23,7 @@
 
 #include "code_generator.hpp"
 #include "fx_internal.hpp"
+#include <iomanip>
 
 using namespace std;
 namespace CasADi{
@@ -36,6 +37,7 @@ namespace CasADi{
     
     s << auxiliaries_.str();
     s << sparsities_.str();
+    s << constants_.str();
     s << dependencies_.str();
     s << function_.str();
     s << finalization_.str();
@@ -80,6 +82,15 @@ namespace CasADi{
     s << "};" << endl;
   }
 
+  void CodeGenerator::printVector(std::ostream &s, const std::string& name, const vector<double>& v){
+    s << "d " << name << "[] = {";
+    for(int i=0; i<v.size(); ++i){
+      if(i!=0) s << ",";
+      s << v[i];
+    }
+    s << "};" << endl;
+  }
+
   void CodeGenerator::addInclude(const std::string& new_include, bool relative_path){
     // Register the new element
     bool added = added_includes_.insert(new_include).second;
@@ -105,24 +116,24 @@ namespace CasADi{
 
     // Generate it if it does not exist
     if(added_sparsities_.size() > num_patterns_before){
-    // Add at the end
-    ind = num_patterns_before;
-    
-    // Compact version of the sparsity pattern
-    std::vector<int> sp_compact = sp_compress(sp);
+      // Add at the end
+      ind = num_patterns_before;
       
-    // Give it a name
-    stringstream name;
-    name << "s" << ind;
+      // Compact version of the sparsity pattern
+      std::vector<int> sp_compact = sp_compress(sp);
+      
+      // Give it a name
+      stringstream name;
+      name << "s" << ind;
+      
+      // Print to file
+      printVector(sparsities_,name.str(),sp_compact);
+      
+      // Separate with an empty line
+      sparsities_ << endl;
+    }
     
-    // Print to file
-    printVector(sparsities_,name.str(),sp_compact);
-    
-    // Separate with an empty line
-    sparsities_ << endl;
-  }
-
-  return ind;
+    return ind;
   }
 
   int CodeGenerator::getSparsity(const CRSSparsity& sp) const{
@@ -130,6 +141,47 @@ namespace CasADi{
     PointerMap::const_iterator it=added_sparsities_.find(h);
     casadi_assert(it!=added_sparsities_.end());
     return it->second;  
+  }
+
+  int CodeGenerator::addConstant(const MX& x){
+    casadi_assert(x.isConstant());
+
+    // Get the current number of patterns before looking for it
+    size_t num_constants_before = added_constants_.size();
+
+    // Get index of the pattern
+    const void* h = static_cast<const void*>(x.get());
+    int& ind = added_constants_[h];
+
+    // Generate it if it does not exist
+    if(added_constants_.size() > num_constants_before){
+      // Add at the end
+      ind = num_constants_before;
+      
+      // Give it a name
+      stringstream name;
+      name << "c" << ind;
+ 
+      // Set format
+      constants_ << std::scientific << std::fixed;
+      constants_ << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+
+      // Print to file
+      printVector(constants_,name.str(),x.getConstant().data());
+      
+      // Separate with an empty line
+      constants_ << endl;
+    }
+    
+    return ind;
+  }
+
+  int CodeGenerator::getConstant(const MX& x) const{
+    casadi_assert(x.isConstant());
+    const void* h = static_cast<const void*>(x.get());
+    PointerMap::const_iterator it=added_constants_.find(h);
+    casadi_assert(it!=added_constants_.end());
+    return it->second;
   }
 
   int CodeGenerator::getDependency(const FX& f) const{
