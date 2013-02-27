@@ -22,6 +22,7 @@
 
 #include "mx_tools.hpp"
 #include "mapping.hpp"
+#include "transpose.hpp"
 #include "norm.hpp"
 #include "constant_mx.hpp"
 #include "../fx/mx_function.hpp"
@@ -200,28 +201,25 @@ void simplifyMapping(MX& ex){
 }
 
 bool isTranspose(const MX& ex){
-  // Make sure that we have a mapping 
-  const Mapping* n = dynamic_cast<const Mapping*>(ex.get());
-  if(n==0) return false;
-  
-  // Check if transpose
-  return n->isTranspose();
+  if(ex.isNull()){
+    return false;
+  } else {
+    return ex->getOp()==OP_TRANSPOSE;
+  }
 }
 
 MX trans(const MX &x){
   // Quick return if null or scalar
   if(x.isNull() || x.numel()==1)
     return x;
-  
-  // Get the tranposed matrix and the corresponding mapping
-  vector<int> nzind;
-  CRSSparsity sp = x->sparsity().transpose(nzind);
-  MX ret = MX::create(new Mapping(sp));
-  ret->assign(x,nzind);
-  
-  // Check if the matrix is in fact an identity mapping (this will make sure that trans(trans(x)) -> x
-  simplifyMapping(ret);
-  
+
+  // Simplify if transpose of transpose
+  if(isTranspose(x)){
+    return x->dep(0);
+  }
+
+  // Form the transpose
+  MX ret = MX::create(new Transpose(x));  
   return ret;
 }
 

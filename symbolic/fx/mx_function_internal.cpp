@@ -350,13 +350,15 @@ void MXFunctionInternal::init(){
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     if(it->op!=OP_OUTPUT){
       for(int c=0; c<it->res.size(); ++c){
-        if(it->res[c]>=0 && work_[it->res[c]].data.empty()){
-          work_[it->res[c]].data = Matrix<double>(it->data->sparsity(c),0);
+        if(it->res[c]>=0){
 	  size_t nr=0, ni=0;
 	  it->data->nTmp(ni,nr);
 	  nitmp = std::max(nitmp,ni);
 	  nrtmp = std::max(nrtmp,nr);
-        }
+	  if(work_[it->res[c]].data.empty()){
+	    work_[it->res[c]].data = Matrix<double>(it->data->sparsity(c),0);
+	  }
+	}
       }
     }
   }

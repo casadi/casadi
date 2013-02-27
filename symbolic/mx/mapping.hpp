@@ -114,9 +114,6 @@ class Mapping : public MXNode{
     /// Check if the mapping is in fact an identity mapping
     bool isIdentity() const;
     
-    /// Check if the mapping is in fact a transpose
-    bool isTranspose() const;
-
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_MAPPING;}    
 };

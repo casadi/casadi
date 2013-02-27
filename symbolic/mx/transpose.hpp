@@ -66,14 +66,11 @@ namespace CasADi{
     template<typename T, typename MatV, typename MatVV> 
     void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens, std::vector<int>& itmp, std::vector<T>& rtmp);
         
-    /// Check if the mapping is in fact a transpose
-    bool isTranspose() const{ return true;}
-
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_TRANSPOSE;}    
 
     /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr){ ni=size1(); nr=0;}
+    virtual void nTmp(size_t& ni, size_t& nr){ ni=size1()+1; nr=0;}
   };
 
 } // namespace CasADi
