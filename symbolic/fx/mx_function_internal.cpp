@@ -1142,7 +1142,6 @@ void MXFunctionInternal::allocTape(){
     gen.addAuxiliary(CodeGenerator::AUX_NRM2);
     gen.addAuxiliary(CodeGenerator::AUX_IAMAX);
     gen.addAuxiliary(CodeGenerator::AUX_FILL);
-    gen.addAuxiliary(CodeGenerator::AUX_MM_NT_SPARSE);
 
     // Add sparsity patterns in the intermediate variables
     for(int i=0; i<work_.size(); ++i){
@@ -1173,6 +1172,10 @@ void MXFunctionInternal::allocTape(){
     // Finalize work structure
     stream << "  } w;" << endl;
     stream << endl;
+
+    // Temporary variables
+    stream << "  int itmp[" << itmp_.size() << "];" << endl;
+    stream << "  d rtmp[" << rtmp_.size() << "];" << endl;
 
     // Operation number (for printing)
     int k=0;

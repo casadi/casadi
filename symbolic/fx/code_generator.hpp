@@ -64,7 +64,8 @@ namespace CasADi{
       // Misc
       AUX_SIGN,
       AUX_MM_NT_SPARSE,
-      AUX_COPY_SPARSE
+      AUX_COPY_SPARSE,
+      AUX_TRANS
     };
     
     /** \brief Add a built-in axiliary function */
@@ -116,6 +117,9 @@ namespace CasADi{
 
     /// COPY sparse: y <- x
     void auxCopySparse();
+
+    /// TRANS: y <- trans(x)
+    void auxTrans();
 
     //  private:
   public:

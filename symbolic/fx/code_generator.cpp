@@ -160,6 +160,7 @@ namespace CasADi{
     case AUX_MM_NT_SPARSE: auxMmNtSparse(); break;
     case AUX_SIGN: auxSign(); break;
     case AUX_COPY_SPARSE: auxCopySparse(); break;
+    case AUX_TRANS: auxTrans(); break;
     }
   }
 
@@ -395,6 +396,23 @@ namespace CasADi{
     s << "    x += inc_x;" << endl;
     s << "  }" << endl;
     s << "  return sqrt(r);" << endl;
+    s << "}" << endl;
+    s << endl;
+  }
+
+  void CodeGenerator::auxTrans(){
+    stringstream& s = auxiliaries_;
+    s << "void casadi_trans(const d* x, const int* sp_x, d* y, const int* sp_y, int *tmp){" << endl;
+    s << "  int nrow_x = sp_x[0];" << endl;
+    s << "  int nnz_x = sp_x[2 + nrow_x];" << endl;
+    s << "  const int* col_x = sp_x + 2 + nrow_x+1;" << endl;
+    s << "  int nrow_y = sp_y[0];" << endl;
+    s << "  const int* rowind_y = sp_y+2;" << endl;
+    s << "  int k;" << endl;
+    s << "  for(k=0; k<nrow_y; ++k) tmp[k] = rowind_y[k];" << endl;   
+    s << "  for(k=0; k<nnz_x; ++k){" << endl;
+    s << "    y[tmp[col_x[k]]++] = x[k];" << endl;
+    s << "  }" << endl;
     s << "}" << endl;
     s << endl;
   }

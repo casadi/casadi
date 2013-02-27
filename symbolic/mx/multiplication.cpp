@@ -104,7 +104,8 @@ void Multiplication::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, 
 }
 
 void Multiplication::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-  
+  gen.addAuxiliary(CodeGenerator::AUX_MM_NT_SPARSE);
+
   // Clear the result
   stream << "  casadi_fill(" << sparsity().size() << ",0.0," << res.front() << ",1);" << endl;
 
