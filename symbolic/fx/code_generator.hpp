@@ -42,6 +42,12 @@ namespace CasADi{
     /** \brief Get the index of an existing sparsity pattern */
     int getSparsity(const CRSSparsity& sp) const;
 
+    /// Add a constant
+    int addConstant(const MX& x);
+
+    /** \brief Get the index of an existing constant */
+    int getConstant(const MX& x) const;
+
     /** \brief Add a dependent function */
     int addDependency(const FX& f);
 
@@ -77,8 +83,11 @@ namespace CasADi{
     /** Convert in integer to a string */
     static std::string numToString(int n);
 
-    /** \brief  Print to a c file */
+    /** \brief  Print int vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);
+
+    /** \brief  Print real vector to a c file */
+    static void printVector(std::ostream &s, const std::string& name, const std::vector<double>& v);
 
   private:
 
@@ -128,6 +137,7 @@ namespace CasADi{
     std::stringstream includes_;
     std::stringstream auxiliaries_;
     std::stringstream sparsities_;
+    std::stringstream constants_;
     std::stringstream dependencies_;
     std::stringstream function_;
     std::stringstream finalization_;
@@ -137,6 +147,7 @@ namespace CasADi{
     std::set<std::string> added_includes_;
     std::set<Auxiliary> added_auxiliaries_;
     PointerMap added_sparsities_;
+    PointerMap added_constants_;
     PointerMap added_dependencies_;
 
   };

@@ -92,15 +92,13 @@ void ConstantMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
 }
 
 void ConstantMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-  // Print all nonzeros row by row
-  for(int k=0; k<x_.size(); ++k){
-    
-    // Print left hand side of assignment
-    stream << "  " << res.front() << "[" << k << "]=";
-        
-    // Print right hand side of assignment
-    stream << x_.at(k) << ";" << endl;
-  }
+  // Print the constant
+  int ind = gen.addConstant(shared_from_this<MX>());
+
+  // Copy the constant to the work vector
+  stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
+  stream << res.at(0) << "[i]=";
+  stream << "c" << ind << "[i];" << endl;
 }
 
 
