@@ -76745,9 +76745,13 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::SCPgenInternal::printIteration "";
 
+%feature("docstring")  CasADi::SCPgenInternal::eval_jac "";
+
+%feature("docstring")  CasADi::SCPgenInternal::eval_hess "";
+
 %feature("docstring")  CasADi::SCPgenInternal::eval_res "";
 
-%feature("docstring")  CasADi::SCPgenInternal::eval_qpf "";
+%feature("docstring")  CasADi::SCPgenInternal::eval_tan "";
 
 %feature("docstring")  CasADi::SCPgenInternal::regularize "";
 
@@ -87192,6 +87196,226 @@ An elemenent of the tape.
 C++ includes: sx_function_internal.hpp ";
 
 
+// File: classCasADi_1_1Transpose.xml
+%feature("docstring") CasADi::Transpose "
+
+Matrix transpose.
+
+Joel Andersson
+
+C++ includes: transpose.hpp ";
+
+%feature("docstring")  CasADi::Transpose::Transpose "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::Transpose::clone "
+
+Clone function. ";
+
+%feature("docstring")  CasADi::Transpose::~Transpose "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::Transpose::evaluateD "
+
+Evaluate the function numerically. ";
+
+%feature("docstring")  CasADi::Transpose::evaluateSX "
+
+Evaluate the function symbolically ( SX) ";
+
+%feature("docstring")  CasADi::Transpose::evaluateMX "
+
+Evaluate the function symbolically ( MX) ";
+
+%feature("docstring")  CasADi::Transpose::propagateSparsity "
+
+Propagate sparsity. ";
+
+%feature("docstring")  CasADi::Transpose::printPart "
+
+Print a part of the expression */. ";
+
+%feature("docstring")  CasADi::Transpose::generateOperation "
+
+Generate code for the operation. ";
+
+%feature("docstring")  CasADi::Transpose::evaluateGen "
+
+Evaluate the function (template) ";
+
+%feature("docstring")  CasADi::Transpose::isTranspose "
+
+Check if the mapping is in fact a transpose. ";
+
+%feature("docstring")  CasADi::Transpose::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::Transpose::__nonzero__ "
+
+Check the truth value of this node. ";
+
+%feature("docstring")  CasADi::Transpose::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::Transpose::repr "
+
+Print a representation. ";
+
+%feature("docstring")  CasADi::Transpose::print "
+
+Print a description. ";
+
+%feature("docstring")  CasADi::Transpose::print "
+
+Print expression (make sure number of calls is not exceeded) ";
+
+%feature("docstring")  CasADi::Transpose::evaluateD "
+
+Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::Transpose::evaluateSX "
+
+Evaluate symbolically ( SX), no derivatives. ";
+
+%feature("docstring")  CasADi::Transpose::evaluateMX "
+
+Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::Transpose::getName "
+
+Get the name. ";
+
+%feature("docstring")  CasADi::Transpose::isOutputNode "
+
+Check if evaluation output. ";
+
+%feature("docstring")  CasADi::Transpose::isMultipleOutput "
+
+Check if a multiple output node. ";
+
+%feature("docstring")  CasADi::Transpose::getFunction "
+
+Get function reference. ";
+
+%feature("docstring")  CasADi::Transpose::getFunction "
+
+Get function reference. ";
+
+%feature("docstring")  CasADi::Transpose::getFunctionInput "
+
+Get function input. ";
+
+%feature("docstring")  CasADi::Transpose::getFunctionOutput "
+
+Get function output. ";
+
+%feature("docstring")  CasADi::Transpose::dep "
+
+dependencies - functions that have to be evaluated before this one ";
+
+%feature("docstring")  CasADi::Transpose::dep "";
+
+%feature("docstring")  CasADi::Transpose::ndep "
+
+Number of dependencies. ";
+
+%feature("docstring")  CasADi::Transpose::hasDep "
+
+Does the node depend on other nodes. ";
+
+%feature("docstring")  CasADi::Transpose::getNumOutputs "
+
+Number of outputs. ";
+
+%feature("docstring")  CasADi::Transpose::getOutput "
+
+Get an output. ";
+
+%feature("docstring")  CasADi::Transpose::sparsity "
+
+Get the sparsity. ";
+
+%feature("docstring")  CasADi::Transpose::sparsity "
+
+Get the sparsity of output oind. ";
+
+%feature("docstring")  CasADi::Transpose::isNonLinear "
+
+Is the node nonlinear. ";
+
+%feature("docstring")  CasADi::Transpose::setSparsity "
+
+Set the sparsity. ";
+
+%feature("docstring")  CasADi::Transpose::setDependencies "
+
+Set unary dependency. ";
+
+%feature("docstring")  CasADi::Transpose::setDependencies "
+
+Set binary dependencies. ";
+
+%feature("docstring")  CasADi::Transpose::setDependencies "
+
+Set ternary dependencies. ";
+
+%feature("docstring")  CasADi::Transpose::setDependencies "
+
+Set multiple dependencies. ";
+
+%feature("docstring")  CasADi::Transpose::addDependency "
+
+Add a dependency. ";
+
+%feature("docstring")  CasADi::Transpose::assign "
+
+Assign nonzeros (mapping matrix) ";
+
+%feature("docstring")  CasADi::Transpose::assign "
+
+Assign nonzeros (mapping matrix), output indices sequential. ";
+
+%feature("docstring")  CasADi::Transpose::numel "
+
+Number of elements. ";
+
+%feature("docstring")  CasADi::Transpose::size "
+
+Get size. ";
+
+%feature("docstring")  CasADi::Transpose::size1 "
+
+Get size. ";
+
+%feature("docstring")  CasADi::Transpose::size2 "
+
+Get size. ";
+
+%feature("docstring")  CasADi::Transpose::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::Transpose::init "
+
+Initialize the object. ";
+
+%feature("docstring")  CasADi::Transpose::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Transpose::assertInit "
+
+Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::Transpose::weak "
+
+Get a weak reference to the object. ";
+
+
 // File: classCasADi_1_1UnaryMX.xml
 %feature("docstring") CasADi::UnaryMX "
 
@@ -96133,6 +96357,12 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: tolerance_8hpp.xml
+
+
+// File: transpose_8cpp.xml
+
+
+// File: transpose_8hpp.xml
 
 
 // File: unary__mx_8cpp.xml
