@@ -48,7 +48,15 @@ namespace CasADi{
   }
 
   MX::MX(double x){
-    assignNode(new ConstantDMatrix(x));
+    if(x==0){
+      assignNode(new ConstantInt<0>(CRSSparsity(1,1,true)));
+    } else if(x==1){
+      assignNode(new ConstantInt<1>(CRSSparsity(1,1,true)));
+    } else if(x==-1){
+      assignNode(new ConstantInt<-1>(CRSSparsity(1,1,true)));
+    } else {
+      assignNode(new ConstantDMatrix(x));
+    }
   }
 
   MX::MX(const Matrix<double> &x){
