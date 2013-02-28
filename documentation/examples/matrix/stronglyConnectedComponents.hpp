@@ -1,9 +1,8 @@
 /** 
 * This example looks at stronglyConnectedComponents
 *
-* <a href="matrix/stronglyConnectedComponents.pdf">View output (PDF)</a> 
 *
-* \example matrix/stronglyConnectedComponents.py
+* \pythonexample{matrix/stronglyConnectedComponents}
 *
 * \sa
 * \code

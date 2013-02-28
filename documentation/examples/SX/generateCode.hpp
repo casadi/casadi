@@ -1,9 +1,8 @@
 /** 
 * This example looks at symbolic substitution is SX graphs
 *
-* <a href="SX/generateCode.pdf">View output (PDF)</a>
 *
-* \example SX/generateCode.py
+* \pythonexample{SX/generateCode}
 * \include SX/generateCode.txt
 *
 * \sa

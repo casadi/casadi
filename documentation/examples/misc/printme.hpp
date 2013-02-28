@@ -1,9 +1,8 @@
 /** 
 * This example looks at the printme method
 *
-* <a href="misc/printme.pdf">View output (PDF)</a> 
 *
-* \example misc/printme.py
+* \pythonexample{misc/printme}
 *
 * \sa
 * \code

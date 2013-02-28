@@ -1,9 +1,8 @@
 /** 
 * This example looks at max/fmax
 *
-* <a href="operators/SX/minmax.pdf">View output (PDF)</a>
 *
-* \example operators/SX/minmax.py
+* \pythonexample{operators/SX/minmax}
 *
 * \sa
 * \code
