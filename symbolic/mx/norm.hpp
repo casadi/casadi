@@ -41,6 +41,9 @@ class Norm : public MXNode{
     /** \brief  Constructor */
     Norm(const MX& x);
 
+    /** \brief  Destructor */
+    virtual ~Norm(){}
+
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
