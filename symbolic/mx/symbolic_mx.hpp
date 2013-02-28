@@ -40,7 +40,10 @@ class SymbolicMX : public MXNode{
 
     /** \brief  Constructors */
     explicit SymbolicMX(const std::string& name, const CRSSparsity & sp);
-    
+
+    /// Destructor
+    virtual ~SymbolicMX(){}
+
     /** \brief  Clone function */
     virtual SymbolicMX* clone() const;
 
