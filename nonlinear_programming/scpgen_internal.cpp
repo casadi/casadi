@@ -46,9 +46,10 @@ SCPgenInternal::SCPgenInternal(const FX& F, const FX& G, const FX& H, const FX& 
   addOption("tol_du",            OT_REAL,       1e-6,             "Stopping criterion for dual infeasability");
   addOption("tol_reg",           OT_REAL,       1e-11,            "Stopping criterion for regularization");
   addOption("tol_pr_step",       OT_REAL,       1e-6,             "Stopping criterion for the step size");
-  addOption("c1",                OT_REAL,       1E-4,             "Armijo condition, coefficient of decrease in merit");
+  addOption("c1",                OT_REAL,       1e-4,             "Armijo condition, coefficient of decrease in merit");
   addOption("beta",              OT_REAL,       0.8,              "Line-search parameter, restoration factor of stepsize");
-  addOption("merit_memory",      OT_INTEGER,      4,              "Size of memory to store history of merit function values");
+  addOption("merit_memsize",     OT_INTEGER,      4,              "Size of memory to store history of merit function values");
+  addOption("merit_start",       OT_REAL,      1e-8,              "Lower bound for the merit function parameter");
   addOption("lbfgs_memory",      OT_INTEGER,     10,              "Size of L-BFGS memory.");
   addOption("regularize",        OT_BOOLEAN,  false,              "Automatic regularization of Lagrange Hessian.");
   addOption("print_header",      OT_BOOLEAN,   true,              "Print the header with problem statistics");
@@ -76,7 +77,6 @@ void SCPgenInternal::init(){
   maxiter_ls_ = getOption("maxiter_ls");
   c1_ = getOption("c1");
   beta_ = getOption("beta");
-  merit_memsize_ = getOption("merit_memory");
   lbfgs_memory_ = getOption("lbfgs_memory");
   tol_pr_ = getOption("tol_pr");
   tol_du_ = getOption("tol_du");
@@ -86,6 +86,8 @@ void SCPgenInternal::init(){
   reg_threshold_ = getOption("reg_threshold");
   print_time_ = getOption("print_time");
   tol_pr_step_ = getOption("tol_pr_step");
+  merit_memsize_ = getOption("merit_memsize");
+  merit_start_ = getOption("merit_start");
 
   // Name the components
   if(hasSetOption("name_x")){
@@ -228,6 +230,9 @@ void SCPgenInternal::init(){
       it->dlam.resize(it->n,0);
     }
   }
+
+  // Line-search memory
+  merit_mem_.resize(merit_memsize_);
 
   // Scalar objective function
   MX obj;
@@ -710,7 +715,8 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   obj_k_ = numeric_limits<double>::quiet_NaN();
 
   // Reset line-search
-  merit_mem_.clear();
+  fill(merit_mem_.begin(),merit_mem_.end(),0.0);
+  merit_ind_ = 0;
 
   // Current guess for the primal solution
   copy(x_init_.begin(),x_init_.end(),x_opt_.begin());
@@ -1268,10 +1274,8 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
   double L1merit = obj_k_ + sigma_ * l1_infeas;
   
   // Storing the actual merit function value in a list
-  merit_mem_.push_back(L1merit);
-  if (merit_mem_.size() > merit_memsize_){
-    merit_mem_.pop_front();
-  }
+  merit_mem_[merit_ind_] = L1merit;
+  ++merit_ind_ %= merit_memsize_;
 
   // Stepsize
   double t = 1.0, t_prev = 0.0;

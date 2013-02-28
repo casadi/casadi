@@ -112,7 +112,10 @@ public:
   double c1_;
   double beta_;
   int maxiter_ls_;
+  std::vector<double> merit_mem_;
   int merit_memsize_;
+  double merit_start_;
+  int merit_ind_;
   //@}
 
   /// Enable Code generation
@@ -123,9 +126,6 @@ public:
   
   /// Regularization
   bool regularize_;
-
-  // Storage for merit function
-  std::deque<double> merit_mem_;
 
   // Options
   double reg_threshold_;
