@@ -71,6 +71,7 @@ void NLPSolverInternal::init(){
     log("Objective function initialized");
   }
   if(!G_.isNull() && !G_.isInit()){
+    G_.setOption("verbose",getOption("verbose"));
     G_.init();
     log("Constraint function initialized");
   }

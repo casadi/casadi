@@ -1074,37 +1074,50 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
     
   } else {
     
-    // Test unidirectional coloring using forward mode
-    if(test_ad_fwd){
-      log("FXInternal::getPartition unidirectional coloring (forward mode)");
-      D1 = AT.unidirectionalColoring(A);
-      if(verbose()){
-        cout << "Forward mode coloring completed: " << D1.size1() << " directional derivatives needed (" << A.size2() << " without coloring)." << endl;
-      }
-    }
-      
-    // Test unidirectional coloring using reverse mode
-    if(test_ad_adj){
-      log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
-      D2 = A.unidirectionalColoring(AT);
-      if(verbose()){
-        cout << "Adjoint mode coloring completed: " << D2.size1() << " directional derivatives needed (" << A.size1() << " without coloring)." << endl;
-      }
-    }
-    
     // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
     int adj_penalty = 2;
 
-    // Use whatever required less colors if we tried both (with preference to forward mode)
-    if(test_ad_fwd && test_ad_adj){
-      if((D1.size1() <= adj_penalty*D2.size1())){
-        D2=CRSSparsity();
-        log("Forward mode chosen");
+    // Best coloring encountered so far
+    int best_coloring = numeric_limits<int>::max();
+
+    // Test forward mode first?
+    bool test_fwd_first = A.size2() <= adj_penalty*A.size1();
+    int mode_fwd = test_fwd_first ? 0 : 1;
+
+    // Test both coloring modes
+    for(int mode=0; mode<2; ++mode){
+      // Is this the forward mode?
+      bool fwd = mode==mode_fwd;
+      
+      // Skip?
+      if(!test_ad_fwd && fwd) continue;
+      if(!test_ad_adj && !fwd) continue;
+
+      // Perform the coloring
+      if(fwd){
+	log("FXInternal::getPartition unidirectional coloring (forward mode)");
+	D1 = AT.unidirectionalColoring(A,best_coloring);
+	if(D1.isNull()){
+	  if(verbose()) cout << "Forward mode coloring interrupted (more than " << best_coloring << " needed)." << endl; 
+	} else {
+	  if(verbose()) cout << "Forward mode coloring completed: " << D1.size1() << " directional derivatives needed (" << A.size2() << " without coloring)." << endl;
+	  D2 = CRSSparsity();
+	  best_coloring = D1.size1();
+	}
       } else {
-        D1=CRSSparsity();
-        log("Adjoint mode chosen");
+	log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
+	int max_colorings_to_test = best_coloring/adj_penalty;
+	D2 = A.unidirectionalColoring(AT,max_colorings_to_test);	
+	if(D2.isNull()){
+	  if(verbose()) cout << "Adjoint mode coloring interrupted (more than " << max_colorings_to_test << " needed)." << endl; 
+	} else {
+	  if(verbose()) cout << "Adjoint mode coloring completed: " << D2.size1() << " directional derivatives needed (" << A.size1() << " without coloring)." << endl;
+	  D1 = CRSSparsity();
+	  best_coloring = D2.size1();
+	}
       }
     }
+
     log("FXInternal::getPartition end");
   }
 }
