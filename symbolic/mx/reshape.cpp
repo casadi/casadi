@@ -59,7 +59,7 @@ namespace CasADi{
     // Nondifferentiated outputs and forward sensitivities
     for(int d=-1; d<nfwd; ++d){
       vector<T>& res = d==-1 ? output[0]->data() : fwdSens[d][0]->data();
-      const vector<T>& arg = d==-1 ? input[0]->data() : fwdSeed[0][0]->data();
+      const vector<T>& arg = d==-1 ? input[0]->data() : fwdSeed[d][0]->data();
       copy(arg.begin(),arg.end(),res.begin());
     }
     
@@ -94,7 +94,7 @@ namespace CasADi{
     if(!output_given){
       *output[0] = reshape(*input[0],sparsity());
     }
-    
+
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for(int d = 0; d<nfwd; ++d){
