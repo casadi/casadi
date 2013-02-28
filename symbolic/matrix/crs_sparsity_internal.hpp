@@ -246,10 +246,10 @@ namespace CasADi{
     std::vector<int> rowind_;
     
     /// Perform a unidirectional coloring: A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) 
-    CRSSparsity unidirectionalColoring(const CRSSparsity& AT) const;
+    CRSSparsity unidirectionalColoring(const CRSSparsity& AT, int cutoff) const;
 
     /// Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
-    CRSSparsity starColoring(int ordering) const;
+    CRSSparsity starColoring(int ordering, int cutoff) const;
 
     /// Order the rows by decreasing degree
     std::vector<int> largestFirstOrdering() const;
