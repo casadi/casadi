@@ -23,6 +23,7 @@
 #include "mx_tools.hpp"
 #include "mapping.hpp"
 #include "transpose.hpp"
+#include "vertcat.hpp"
 #include "norm.hpp"
 #include "constant_mx.hpp"
 #include "../fx/mx_function.hpp"
@@ -55,19 +56,18 @@ MX vertcat(const vector<MX>& comp){
       sp.append(c[i].sparsity());
     }
 
-    // Create a mapping matrix with the corresponding sparsity
-    MX ret = MX::create(new Mapping(sp));
-    
-    // Map the dependencies
-    int offset=0;
-    for(int i=0; i<c.size(); ++i){
-      int nz = c[i].size();
-      ret->assign(c[i],range(nz),range(offset,offset+nz));
-      offset += nz;
+    // Split up existing vertcats
+    vector<MX> c_split;
+    c_split.reserve(c.size());
+    for(vector<MX>::const_iterator i=c.begin(); i!=c.end(); ++i){
+      if(i->getOp()==OP_VERTCAT){	
+	c_split.insert(c_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
+      } else {
+	c_split.push_back(*i);
+      }
     }
-    
-    simplifyMapping(ret);
-    return ret;
+
+    return MX::create(new Vertcat(c_split,sp));
   }
 }
 
@@ -319,8 +319,8 @@ bool isSymbolic(const MX& ex){
 bool isSymbolicSparse(const MX& ex){
   if(ex.isNull()){
     return false;
-  } else if(ex.isMapping()){
-    // Check if the expression is a mapping where all dependencies are symbolic primitives
+  } else if(ex.getOp()==OP_VERTCAT){
+    // Check if the expression is a vertcat where all components are symbolic primitives
     for(int d=0; d<ex->ndep(); ++d){
       if(!ex->dep(d).isSymbolic()){
         return false;

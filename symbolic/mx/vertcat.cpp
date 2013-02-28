@@ -93,6 +93,7 @@ namespace CasADi{
       bvec_t *arg_i_ptr = get_bvec_t(arg_i);
       if(fwd){
 	copy(arg_i_ptr, arg_i_ptr+arg_i.size(), res_ptr);
+	res_ptr += arg_i.size();
       } else {
 	for(int k=0; k<arg_i.size(); ++k) *arg_i_ptr++ |= *res_ptr++;
       }
@@ -123,12 +124,15 @@ namespace CasADi{
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      int row_begin = 0;
+      int row_offset = 0;
       const MX& aseed = *adjSeed[d][0];
       for(int i=0; i<input.size(); ++i){
-	int row_end = row_begin + aseed.size1();
-	*adjSens[d][i] += aseed(Slice(row_begin,row_end),Slice());
+	MX& asens = *adjSens[d][i];
+	int nrow = asens.size1();
+	asens += aseed(Slice(row_offset,row_offset+nrow),Slice());
+	row_offset += nrow;
       }
+      casadi_assert(row_offset == aseed.size1());
     }
   }
 
@@ -137,8 +141,9 @@ namespace CasADi{
     for(int i=0; i<arg.size(); ++i){
       int nz = dep(i).size();
       stream << "  for(i=0; i<" << nz << "; ++i) " << res.front() << "[i+" << nz_offset << "] = " << arg.at(i) << "[i];" << endl;
-      nz_offset = nz_offset + nz;
+      nz_offset += nz;
     }
+    casadi_assert(nz_offset == size());
   }
 
 } // namespace CasADi

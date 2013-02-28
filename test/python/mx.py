@@ -1942,23 +1942,25 @@ class MXtests(casadiTestCase):
     J = [] + msym("x")
     J = msym("x") + []
     
-  def test_issue556(self):
-    self.message("Regression test #556")
-    V = msym("V",2)
-
-    a = V[0]
-    b = V[1]
-
-
-    f = MXFunction([a,b],[a*b])
-    f.init()
     
-    f.input(0).set(4)
-    f.input(1).set(3)
+  # Mapping input other than vertcat no longer allowed
+  # def test_issue556(self):
+  #   self.message("Regression test #556")
+  #   V = msym("V",2)
 
-    f.evaluate()
+  #   a = V[0]
+  #   b = V[1]
+
+
+  #   f = MXFunction([a,b],[a*b])
+  #   f.init()
     
-    self.assertAlmostEqual(f.output(),12)
+  #   f.input(0).set(4)
+  #   f.input(1).set(3)
+
+  #   f.evaluate()
+    
+  #   self.assertAlmostEqual(f.output(),12)
     
   def test_jacobian_tools(self):
     self.message("jacobian")
