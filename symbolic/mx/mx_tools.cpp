@@ -245,14 +245,8 @@ MX reshape(const MX &x, const CRSSparsity& sp){
   // make sure that the number of zeros agree
   casadi_assert(x.size()==sp.size());
   
-  // Create a mapping
-  MX ret = MX::create(new Mapping(sp));
-  ret->assign(x,range(x.size()));
-  
-  // Simplify mapping if possible
-  simplifyMapping(ret);
-  
-  return ret;
+  // Create a reshape node
+  return MX::create(new Reshape(x,sp));
 }
 
 MX vec(const MX &x) {
