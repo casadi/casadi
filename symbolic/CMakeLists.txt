@@ -52,6 +52,7 @@ SET(CASADI_SRCS
   mx/norm.cpp                mx/norm.hpp                # 1-norm, 2-norm and infinity-norm
   mx/transpose.cpp           mx/transpose.hpp           # Transpose
   mx/vertcat.cpp             mx/vertcat.hpp             # Vertical concatenation
+  mx/reshape.cpp             mx/reshape.hpp             # Reshape
   mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
   mx/densification.cpp       mx/densification.hpp       # Makes a matrix dense
   mx/multiple_output.cpp     mx/multiple_output.hpp     # Base class for nodes with multiple outputs
