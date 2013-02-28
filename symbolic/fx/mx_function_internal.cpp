@@ -43,14 +43,14 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
   setOption("numeric_jacobian", true);
   setOption("numeric_hessian", true);
   
-  // Check if any inputs is a mapping
-  bool has_mapping_inputs = false;
+  // Check if any inputs is a vertcat
+  bool has_vertcat_inputs = false;
   for(vector<MX>::const_iterator it = inputv_.begin(); it!=inputv_.end(); ++it){
-    has_mapping_inputs = has_mapping_inputs || it->isMapping();
+    has_vertcat_inputs = has_vertcat_inputs || it->getOp()==OP_VERTCAT;
   }
   
-  // If one or more inputs is a mapping, elimination needed before creating function
-  if(has_mapping_inputs){
+  // If one or more inputs is a vertcat, elimination needed before creating function
+  if(has_vertcat_inputs){
     
     // Name of replaced variable
     stringstream rep_name;
@@ -62,55 +62,26 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
     // Find new variables and expressions for all inputs that needs to be eliminated
     std::vector<MX> v, vdef;
     for(vector<MX>::iterator it = inputv_.begin(); it!=inputv_.end(); ++it, ++ind){
-      if(it->isMapping()){
-        
-        // Get the mapping node
-        Mapping* n = dynamic_cast<Mapping*>(it->get());
-        
-        // Initialize the mapping, i.e. sort by input and output index
-        n->init();
-        
+      if(it->getOp()==OP_VERTCAT){
+
         // Create a new variable
-        rep_name.str("");
-        rep_name.clear();
+        rep_name.str(string());
         rep_name << "r_" << ind;
-        MX new_var = msym(rep_name.str(),n->sparsity());
+        MX new_var = msym(rep_name.str(),it->sparsity());
         
-        // For all dependencies to be replaced
-        for(int iind=0; iind<n->ndep(); ++iind){
-          
-          // Variable to be replaced
-          MX v_dep = n->dep(iind);
-          casadi_assert_message(v_dep.isSymbolic(),"Mapping inputs may only map to symbolic variables.");
+	// Get the subvariables
+	vector<MX> sub = (*it)->dep_;
+	v.insert(v.end(),sub.begin(),sub.end());
 
-          // Check if variable exists already in the list of to-be-replaced-variables
-          bool exists = false;
-          for (int i=0;i<v.size();++i) {
-            if (v[i].get() == v_dep.get()) {
-              exists = true;
-              break;
-            }
-          }
-          if (!exists) {
-            // Save variable to list of variables to be replaced
-            v.push_back(v_dep);
-            vdef.push_back(MX::create(new Mapping(v_dep.sparsity())));
-          }
-          MX &vdef_dep = vdef.back();
-          
-          // Express this variable in terms of the new variable
-          const vector<pair<int,int> >& assigns = n->index_output_sorted_[0][iind];
-          inz.clear();
-          onz.clear();
-          for(vector<pair<int,int> >::const_iterator it_ass=assigns.begin(); it_ass!=assigns.end(); ++it_ass){
-            inz.push_back(it_ass->second);
-            onz.push_back(it_ass->first);
-          }
-          // TODO: error if onz is already taken
-          vdef_dep->assign(new_var,inz,onz);
-
-
-        }
+	// Get the the definition of the subvariables
+	int row_offset = 0;
+	for(int i=0; i<sub.size(); ++i){
+	  int nrow = sub[i].size1();
+	  vdef.push_back(new_var(Slice(row_offset,row_offset+nrow),Slice()));
+	  row_offset += nrow;
+	}
+	casadi_assert(row_offset == new_var.size1());
+	
         // Replace variable
         *it = new_var;
       }

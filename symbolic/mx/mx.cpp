@@ -949,12 +949,7 @@ bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryMX*>(get
 bool MX::isUnary() const { return !isNull() ? dynamic_cast<const UnaryMX*>(get()) != 0 : false;  }
  	
 int MX::getOp() const {
-  casadi_assert_message(isBinary() || isUnary(),"MX::getOp: must be binary or unary operation");
-  if (isBinary()) {
-    return dynamic_cast<const BinaryMX*>(get())->op_;
-  } else {
-    return dynamic_cast<const UnaryMX*>(get())->op_;
-  }
+  return (*this)->getOp();
 }
  	
 bool MX::isCommutative() const {
