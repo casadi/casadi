@@ -37,18 +37,14 @@ namespace CasADi{
 */
   class ConstantMX : public MXNode{
   public:
-
-    /** \brief  Constructor */
-    ConstantMX(const Matrix<double> &x);
+    /// Destructor
+    explicit ConstantMX(const CRSSparsity& sp);
 
     /// Destructor
-    virtual ~ConstantMX(){}
+    virtual ~ConstantMX() = 0;
 
     /** \brief  Clone function */
-    virtual ConstantMX* clone() const;
-
-    /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const;
+    virtual ConstantMX* clone() const = 0;
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
@@ -70,11 +66,92 @@ namespace CasADi{
     
     /// Return truth value of an MX
     virtual bool __nonzero__() const;
+  };
 
+  class ConstantDMatrix : public ConstantMX{
+  public:
+
+    /** \brief  Constructor */
+    explicit ConstantDMatrix(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x){}
+    
+    /// Destructor
+    virtual ~ConstantDMatrix(){}
+
+    /** \brief  Clone function */
+    virtual ConstantDMatrix* clone() const{ return new ConstantDMatrix(*this);}
+
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const{
+      x_.print(stream);
+    }
+    
+    /** \brief  Evaluate the function numerically */
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){ 
+      output[0]->set(x_);
+      ConstantMX::evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+    }
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+      output[0]->set(SXMatrix(x_));
+      ConstantMX::evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+    }
+
+    /** \brief  Check if a particular integer value */
+    virtual bool isZero() const;
+    virtual bool isOne() const;
+    virtual bool isMinusOne() const;
+    virtual bool isIdentity() const;
+  
     /** \brief  data member */
     Matrix<double> x_;
-
   };
+
+  template<int value>
+  class ConstantInt : public ConstantMX{
+  public:
+    
+    /** \brief  Constructor */
+    ConstantInt(const CRSSparsity& sp) : ConstantMX(sp){}
+
+    /// Destructor
+    virtual ~ConstantInt(){}
+
+    /** \brief  Clone function */
+    virtual ConstantInt* clone() const{ return new ConstantInt<value>(*this);}
+
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const{
+      stream << value;
+    }
+    
+    /** \brief  Evaluate the function numerically */
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+      output[0]->set(double(value));
+      ConstantMX::evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+    }
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+      output[0]->set(SX(value));
+      ConstantMX::evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+    }
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+      // Copy the constant to the work vector
+      stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
+      stream << res.at(0) << "[i]=";
+      stream << value << ";" << std::endl;
+    }
+
+    /** \brief  Check if a particular integer value */
+    virtual bool isZero() const{ return value==0;}
+    virtual bool isOne() const{ return value==1;}
+    virtual bool isMinusOne() const{ return value==-1;}
+    virtual bool isIdentity() const{ return value==1 && sparsity().diagonal();}
+  };
+
 
 } // namespace CasADi
 
