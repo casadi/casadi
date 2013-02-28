@@ -3412,6 +3412,10 @@ Is the node nonlinear. ";
 
 Set the sparsity. ";
 
+%feature("docstring")  CasADi::BinaryMX::nTmp "
+
+Get number of temporary variables needed. ";
+
 %feature("docstring")  CasADi::BinaryMX::setDependencies "
 
 Set unary dependency. ";
@@ -7109,7 +7113,15 @@ Print expression (make sure number of calls is not exceeded) ";
 
 %feature("docstring")  CasADi::ConstantMX::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::ConstantMX::evaluateD "
+
 Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::ConstantMX::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::ConstantMX::evaluateSX "
 
@@ -7118,6 +7130,10 @@ Evaluate symbolically ( SX), no derivatives. ";
 %feature("docstring")  CasADi::ConstantMX::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::ConstantMX::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::ConstantMX::getName "
 
@@ -7184,6 +7200,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::ConstantMX::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::ConstantMX::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::ConstantMX::setDependencies "
 
@@ -15078,7 +15098,15 @@ Generate code for the operation. ";
 
 %feature("docstring")  CasADi::Densification::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::Densification::evaluateD "
+
 Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::Densification::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::Densification::evaluateSX "
 
@@ -15087,6 +15115,10 @@ Evaluate symbolically ( SX), no derivatives. ";
 %feature("docstring")  CasADi::Densification::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::Densification::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::Densification::getName "
 
@@ -15153,6 +15185,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::Densification::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::Densification::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::Densification::setDependencies "
 
@@ -23152,7 +23188,15 @@ Print expression (make sure number of calls is not exceeded) ";
 
 %feature("docstring")  CasADi::EvaluationMX::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::EvaluationMX::evaluateD "
+
 Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::EvaluationMX::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::EvaluationMX::evaluateSX "
 
@@ -23161,6 +23205,10 @@ Evaluate symbolically ( SX), no derivatives. ";
 %feature("docstring")  CasADi::EvaluationMX::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::EvaluationMX::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::EvaluationMX::getName "
 
@@ -23195,6 +23243,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::EvaluationMX::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::EvaluationMX::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::EvaluationMX::setDependencies "
 
@@ -52762,10 +52814,6 @@ Get mapping from the output non-zero index of the dependency index. ";
 
 Check if the mapping is in fact an identity mapping. ";
 
-%feature("docstring")  CasADi::Mapping::isTranspose "
-
-Check if the mapping is in fact a transpose. ";
-
 %feature("docstring")  CasADi::Mapping::getOp "
 
 Get the operation. ";
@@ -52794,7 +52842,15 @@ Print expression (make sure number of calls is not exceeded) ";
 
 %feature("docstring")  CasADi::Mapping::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::Mapping::evaluateD "
+
 Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::Mapping::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::Mapping::evaluateSX "
 
@@ -52803,6 +52859,10 @@ Evaluate symbolically ( SX), no derivatives. ";
 %feature("docstring")  CasADi::Mapping::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::Mapping::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::Mapping::getName "
 
@@ -52869,6 +52929,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::Mapping::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::Mapping::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::Mapping::setDependencies "
 
@@ -54020,6 +54084,10 @@ Is the node nonlinear. ";
 
 Set the sparsity. ";
 
+%feature("docstring")  CasADi::MultipleOutput::nTmp "
+
+Get number of temporary variables needed. ";
+
 %feature("docstring")  CasADi::MultipleOutput::setDependencies "
 
 Set unary dependency. ";
@@ -54157,7 +54225,15 @@ Print expression (make sure number of calls is not exceeded) ";
 
 %feature("docstring")  CasADi::Multiplication::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::Multiplication::evaluateD "
+
 Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::Multiplication::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::Multiplication::evaluateSX "
 
@@ -54166,6 +54242,10 @@ Evaluate symbolically ( SX), no derivatives. ";
 %feature("docstring")  CasADi::Multiplication::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::Multiplication::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::Multiplication::getName "
 
@@ -54232,6 +54312,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::Multiplication::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::Multiplication::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::Multiplication::setDependencies "
 
@@ -57111,6 +57195,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::MXNode::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::MXNode::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::MXNode::setDependencies "
 
@@ -63470,11 +63558,23 @@ Print expression (make sure number of calls is not exceeded) ";
 
 %feature("docstring")  CasADi::NonzerosNonzerosOp::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::NonzerosNonzerosOp::evaluateD "
+
 Evaluate the function, no derivatives. ";
 
 %feature("docstring")  CasADi::NonzerosNonzerosOp::evaluateSX "
 
+Evaluate symbolically ( SX) ";
+
+%feature("docstring")  CasADi::NonzerosNonzerosOp::evaluateSX "
+
 Evaluate symbolically ( SX), no derivatives. ";
+
+%feature("docstring")  CasADi::NonzerosNonzerosOp::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::NonzerosNonzerosOp::getName "
 
@@ -63541,6 +63641,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::NonzerosNonzerosOp::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::NonzerosNonzerosOp::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::NonzerosNonzerosOp::setDependencies "
 
@@ -63685,11 +63789,23 @@ Print expression (make sure number of calls is not exceeded) ";
 
 %feature("docstring")  CasADi::NonzerosScalarOp::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::NonzerosScalarOp::evaluateD "
+
 Evaluate the function, no derivatives. ";
 
 %feature("docstring")  CasADi::NonzerosScalarOp::evaluateSX "
 
+Evaluate symbolically ( SX) ";
+
+%feature("docstring")  CasADi::NonzerosScalarOp::evaluateSX "
+
 Evaluate symbolically ( SX), no derivatives. ";
+
+%feature("docstring")  CasADi::NonzerosScalarOp::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::NonzerosScalarOp::getName "
 
@@ -63756,6 +63872,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::NonzerosScalarOp::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::NonzerosScalarOp::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::NonzerosScalarOp::setDependencies "
 
@@ -63890,7 +64010,15 @@ Generate code for the operation. ";
 
 %feature("docstring")  CasADi::Norm::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::Norm::evaluateD "
+
 Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::Norm::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::Norm::evaluateSX "
 
@@ -63899,6 +64027,10 @@ Evaluate symbolically ( SX), no derivatives. ";
 %feature("docstring")  CasADi::Norm::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::Norm::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::Norm::getName "
 
@@ -63969,6 +64101,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::Norm::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::Norm::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::Norm::setDependencies "
 
@@ -64070,11 +64206,19 @@ Evaluate the function numerically. ";
 
 %feature("docstring")  CasADi::Norm1::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::Norm1::evaluateD "
+
 Evaluate the function, no derivatives. ";
 
 %feature("docstring")  CasADi::Norm1::evaluateSX "
 
 Evaluate the function symbolically ( SX) ";
+
+%feature("docstring")  CasADi::Norm1::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::Norm1::evaluateSX "
 
@@ -64087,6 +64231,10 @@ Evaluate the function symbolically ( MX) ";
 %feature("docstring")  CasADi::Norm1::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::Norm1::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::Norm1::propagateSparsity "
 
@@ -64181,6 +64329,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::Norm1::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::Norm1::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::Norm1::setDependencies "
 
@@ -64282,11 +64434,19 @@ Evaluate the function numerically. ";
 
 %feature("docstring")  CasADi::Norm2::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::Norm2::evaluateD "
+
 Evaluate the function, no derivatives. ";
 
 %feature("docstring")  CasADi::Norm2::evaluateSX "
 
 Evaluate the function symbolically ( SX) ";
+
+%feature("docstring")  CasADi::Norm2::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::Norm2::evaluateSX "
 
@@ -64299,6 +64459,10 @@ Evaluate the function symbolically ( MX) ";
 %feature("docstring")  CasADi::Norm2::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::Norm2::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::Norm2::propagateSparsity "
 
@@ -64393,6 +64557,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::Norm2::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::Norm2::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::Norm2::setDependencies "
 
@@ -64494,11 +64662,19 @@ Evaluate the function numerically. ";
 
 %feature("docstring")  CasADi::NormF::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::NormF::evaluateD "
+
 Evaluate the function, no derivatives. ";
 
 %feature("docstring")  CasADi::NormF::evaluateSX "
 
 Evaluate the function symbolically ( SX) ";
+
+%feature("docstring")  CasADi::NormF::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::NormF::evaluateSX "
 
@@ -64511,6 +64687,10 @@ Evaluate the function symbolically ( MX) ";
 %feature("docstring")  CasADi::NormF::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::NormF::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::NormF::propagateSparsity "
 
@@ -64605,6 +64785,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::NormF::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::NormF::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::NormF::setDependencies "
 
@@ -64706,11 +64890,19 @@ Evaluate the function numerically. ";
 
 %feature("docstring")  CasADi::NormInf::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::NormInf::evaluateD "
+
 Evaluate the function, no derivatives. ";
 
 %feature("docstring")  CasADi::NormInf::evaluateSX "
 
 Evaluate the function symbolically ( SX) ";
+
+%feature("docstring")  CasADi::NormInf::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::NormInf::evaluateSX "
 
@@ -64723,6 +64915,10 @@ Evaluate the function symbolically ( MX) ";
 %feature("docstring")  CasADi::NormInf::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::NormInf::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::NormInf::propagateSparsity "
 
@@ -64817,6 +65013,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::NormInf::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::NormInf::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::NormInf::setDependencies "
 
@@ -68380,7 +68580,15 @@ Generate code for the operation. ";
 
 %feature("docstring")  CasADi::OutputNode::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::OutputNode::evaluateD "
+
 Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::OutputNode::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::OutputNode::evaluateSX "
 
@@ -68389,6 +68597,10 @@ Evaluate symbolically ( SX), no derivatives. ";
 %feature("docstring")  CasADi::OutputNode::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::OutputNode::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::OutputNode::getName "
 
@@ -68439,6 +68651,10 @@ Get the sparsity of output oind. ";
 %feature("docstring")  CasADi::OutputNode::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::OutputNode::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::OutputNode::setDependencies "
 
@@ -75035,11 +75251,23 @@ Print expression (make sure number of calls is not exceeded) ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::ScalarNonzerosOp::evaluateD "
+
 Evaluate the function, no derivatives. ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::evaluateSX "
 
+Evaluate symbolically ( SX) ";
+
+%feature("docstring")  CasADi::ScalarNonzerosOp::evaluateSX "
+
 Evaluate symbolically ( SX), no derivatives. ";
+
+%feature("docstring")  CasADi::ScalarNonzerosOp::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::getName "
 
@@ -75106,6 +75334,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::ScalarNonzerosOp::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::ScalarNonzerosOp::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::setDependencies "
 
@@ -75528,6 +75760,11 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |              |              |              | criterion    | enInternal   |
 |              |              |              | for primal i |              |
 |              |              |              | nfeasibility |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_reg      | OT_REAL      | 0.000        | Stopping     | CasADi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for regulari |              |
+|              |              |              | zation       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -76555,6 +76792,11 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | criterion    | enInternal   |
 |              |              |              | for primal i |              |
 |              |              |              | nfeasibility |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_reg      | OT_REAL      | 0.000        | Stopping     | CasADi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for regulari |              |
+|              |              |              | zation       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -80366,7 +80608,15 @@ Generate code for the operation. ";
 
 %feature("docstring")  CasADi::Solve::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::Solve::evaluateD "
+
 Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::Solve::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::Solve::evaluateSX "
 
@@ -80375,6 +80625,10 @@ Evaluate symbolically ( SX), no derivatives. ";
 %feature("docstring")  CasADi::Solve::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::Solve::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::Solve::getName "
 
@@ -80441,6 +80695,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::Solve::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::Solve::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::Solve::setDependencies "
 
@@ -80580,11 +80838,23 @@ Print expression (make sure number of calls is not exceeded) ";
 
 %feature("docstring")  CasADi::SparseSparseOp::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::SparseSparseOp::evaluateD "
+
 Evaluate the function, no derivatives. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::evaluateSX "
 
+Evaluate symbolically ( SX) ";
+
+%feature("docstring")  CasADi::SparseSparseOp::evaluateSX "
+
 Evaluate symbolically ( SX), no derivatives. ";
+
+%feature("docstring")  CasADi::SparseSparseOp::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::getName "
 
@@ -80651,6 +80921,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::SparseSparseOp::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::SparseSparseOp::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::setDependencies "
 
@@ -86741,7 +87015,15 @@ Generate code for the operation. ";
 
 %feature("docstring")  CasADi::SymbolicMX::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::SymbolicMX::evaluateD "
+
 Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::SymbolicMX::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::SymbolicMX::evaluateSX "
 
@@ -86750,6 +87032,10 @@ Evaluate symbolically ( SX), no derivatives. ";
 %feature("docstring")  CasADi::SymbolicMX::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::SymbolicMX::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::SymbolicMX::isOutputNode "
 
@@ -86812,6 +87098,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::SymbolicMX::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::SymbolicMX::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::SymbolicMX::setDependencies "
 
@@ -87245,13 +87535,13 @@ Generate code for the operation. ";
 
 Evaluate the function (template) ";
 
-%feature("docstring")  CasADi::Transpose::isTranspose "
-
-Check if the mapping is in fact a transpose. ";
-
 %feature("docstring")  CasADi::Transpose::getOp "
 
 Get the operation. ";
+
+%feature("docstring")  CasADi::Transpose::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::Transpose::__nonzero__ "
 
@@ -87483,7 +87773,15 @@ Print expression (make sure number of calls is not exceeded) ";
 
 %feature("docstring")  CasADi::UnaryMX::evaluateD "
 
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::UnaryMX::evaluateD "
+
 Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::UnaryMX::evaluateSX "
+
+Evaluate symbolically ( SX) ";
 
 %feature("docstring")  CasADi::UnaryMX::evaluateSX "
 
@@ -87492,6 +87790,10 @@ Evaluate symbolically ( SX), no derivatives. ";
 %feature("docstring")  CasADi::UnaryMX::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::UnaryMX::propagateSparsity "
+
+Propagate sparsity. ";
 
 %feature("docstring")  CasADi::UnaryMX::getName "
 
@@ -87558,6 +87860,10 @@ Is the node nonlinear. ";
 %feature("docstring")  CasADi::UnaryMX::setSparsity "
 
 Set the sparsity. ";
+
+%feature("docstring")  CasADi::UnaryMX::nTmp "
+
+Get number of temporary variables needed. ";
 
 %feature("docstring")  CasADi::UnaryMX::setDependencies "
 
