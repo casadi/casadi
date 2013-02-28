@@ -79,6 +79,9 @@ enum Operation{
   // Vertical concatenation
   OP_VERTCAT,
 
+  // Reshape an expression
+  OP_RESHAPE,
+
   // Nonzero mapping
   OP_MAPPING,
   
