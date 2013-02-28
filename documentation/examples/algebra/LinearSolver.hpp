@@ -1,9 +1,8 @@
 /** 
 * This example looks at the use of different instances of CasADi::LinearSolver
 *
-* <a href="algebra/LinearSolver.pdf">View output (PDF)</a>
 *
-* \example algebra/LinearSolver.py
+* \pythonexample{algebra/LinearSolver}
 *
 * \sa
 * \code

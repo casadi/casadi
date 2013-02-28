@@ -1,9 +1,8 @@
 /** 
 * This example looks at symbolic substitution is SX graphs
 *
-* <a href="SX/symbolicsubstitution.pdf">View output (PDF)</a>
+* \pythonexample{SX/symbolicsubstitution}
 *
-* \example SX/symbolicsubstitution.py
 *
 * \sa
 * \code

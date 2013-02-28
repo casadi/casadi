@@ -1,9 +1,8 @@
 /** 
 * This example looks at the mapping method
 *
-* <a href="MX/mapping.pdf">View output (PDF)</a> 
 *
-* \example MX/mapping.py
+* \pythonexample{MX/mapping}
 *
 * \sa
 * \code

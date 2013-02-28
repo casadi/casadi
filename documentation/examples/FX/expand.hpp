@@ -1,9 +1,8 @@
 /** 
 * This example looks at the expand method
 *
-* <a href="FX/expand.pdf">View output (PDF)</a>
 *
-* \example FX/expand.py
+* \pythonexample{FX/expand}
 *
 * \sa
 * \code

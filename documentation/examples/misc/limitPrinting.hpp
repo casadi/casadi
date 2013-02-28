@@ -2,9 +2,8 @@
 *
 * This example looks at the mechanism to limit printing of long expressions
 *
-* <a href="misc/limitPrinting.pdf">View output (PDF)</a> 
 *
-* \example misc/limitPrinting.py
+* \pythonexample{misc/limitPrinting}
 *
 * \sa
 * \code

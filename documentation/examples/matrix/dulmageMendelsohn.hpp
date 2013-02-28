@@ -1,9 +1,8 @@
 /** 
 * This example looks at dulmageMendelsohn
 *
-* <a href="matrix/dulmageMendelsohn.pdf">View output (PDF)</a> 
 *
-* \example matrix/dulmageMendelsohn.py
+* \pythonexample{matrix/dulmageMendelsohn}
 *
 * \sa
 * \code

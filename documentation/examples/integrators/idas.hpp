@@ -1,9 +1,8 @@
 /** 
 * This example looks at the use of CasADi::IdasIntegrator();
 *
-* <a href="integrators/idas.pdf">View output (PDF)</a>
 *
-* \example integrators/idas.py
+* \pythonexample{integrators/idas}
 *
 * \sa
 * \code
