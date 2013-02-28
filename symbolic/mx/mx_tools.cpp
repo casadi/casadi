@@ -22,6 +22,7 @@
 
 #include "mx_tools.hpp"
 #include "mapping.hpp"
+#include "reshape.hpp"
 #include "transpose.hpp"
 #include "vertcat.hpp"
 #include "norm.hpp"
@@ -262,7 +263,7 @@ MX vec(const MX &x) {
   }
 }
 
-MX flatten(const MX &x) {
+MX flatten(const MX& x) {
   if(x.size2()==1){
     return x;
   } else {
@@ -270,13 +271,12 @@ MX flatten(const MX &x) {
   }
 }
 
-MX vecNZ(const MX &x) {
-  // Create a mapping
-  MX ret = MX::create(new Mapping(CRSSparsity(x.size(),1,true)));
-  IMatrix ind(x.sparsity(),range(x.size()));
-  ret->assign(x,trans(ind).data());
-  simplifyMapping(ret);
-  return ret;
+MX vecNZ(const MX& x) {
+  if(x.dense() && x.size2()==1){
+    return x;
+  } else {
+    return MX::create(new Reshape(trans(x),CRSSparsity(x.size(),1,true)));
+  }
 }
 
 MX if_else(const MX &cond, const MX &if_true, const MX &if_false){
