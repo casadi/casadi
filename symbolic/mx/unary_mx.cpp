@@ -143,7 +143,7 @@ MX UnaryMX::create(int op, const MX& x){
     DMatrix r_val;
     casadi_math<DMatrix>::fun(op,x_val,y_val,r_val);
     return r_val;
-  } else*/ if(operation_checker<F0XChecker>(op) && isZero(x)){
+    } else*/ if(operation_checker<F0XChecker>(op) && CasADi::isZero(x)){
     // If identically zero
     return MX::sparse(x.size1(),x.size2());
   } else {

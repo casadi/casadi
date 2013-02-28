@@ -88,6 +88,18 @@ namespace CasADi{
     /** \brief Check the truth value of this node
      */
     virtual bool __nonzero__() const;
+    
+    /** \brief Check if identically zero */
+    virtual bool isZero() const{ return false;}
+
+    /** \brief Check if identically one */
+    virtual bool isOne() const{ return false;}
+
+    /** \brief Check if identically minus one */
+    virtual bool isMinusOne() const{ return false;}
+
+    /** \brief Check if identity matrix */
+    virtual bool isIdentity() const{ return false;}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

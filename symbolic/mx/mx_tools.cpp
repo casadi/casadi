@@ -26,7 +26,6 @@
 #include "transpose.hpp"
 #include "vertcat.hpp"
 #include "norm.hpp"
-#include "constant_mx.hpp"
 #include "../fx/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
@@ -146,39 +145,20 @@ bool isZero(const MX& ex){
   if(ex.size()==0){
     return true;
   } else {
-    const ConstantMX* n = dynamic_cast<const ConstantMX*>(ex.get());
-    if(n==0){
-      return false;
-    } else {
-      return isZero(n->x_);
-    }
+    return ex->isZero();
   }
 }
 
 bool isOne(const MX& ex){
-  const ConstantMX* n = dynamic_cast<const ConstantMX*>(ex.get());
-  if(n==0){
-    return false;
-  } else {
-    return isOne(n->x_);
-  }
+  return !ex.isNull() && ex->isOne();
 }
 
 bool isMinusOne(const MX& ex){
-  const ConstantMX* n = dynamic_cast<const ConstantMX*>(ex.get());
-  if(n==0){
-    return false;
-  } else {
-    return isMinusOne(n->x_);
-  }
+  return !ex.isNull() && ex->isMinusOne();
 }
 
 bool isIdentity(const MX& ex){
-  const ConstantMX* n = dynamic_cast<const ConstantMX*>(ex.get());
-  if(n==0)
-    return false;
-  else
-    return isIdentity(n->x_);
+  return !ex.isNull() && ex->isIdentity();
 }
 
 MX inner_prod(const MX &x, const MX &y){

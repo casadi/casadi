@@ -25,82 +25,88 @@
 #include <vector>
 #include <algorithm>
 #include "../stl_vector_tools.hpp"
+#include "../matrix/matrix_tools.hpp"
 
 using namespace std;
 
 namespace CasADi{
 
-ConstantMX::ConstantMX(const Matrix<double> &x) : x_(x){
-  setSparsity(x.sparsity());
-}
-
-ConstantMX* ConstantMX::clone() const{
-  return new ConstantMX(*this);
-}
-
-void ConstantMX::printPart(std::ostream &stream, int part) const{
-  x_.print(stream);
-}
-
-void ConstantMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-  int nfwd = fwdSens.size();
-  output[0]->set(x_);
-  for(int d=0; d<nfwd; ++d){
-    fwdSens[d][0]->setZero();
+  ConstantMX::ConstantMX(const CRSSparsity& sp){
+    setSparsity(sp);
   }
-}
 
-bool ConstantMX::__nonzero__() const {
-  if (numel()!=1) casadi_error("Can only determine truth value of scalar MX.");
-  if (size()!=1) casadi_error("Can only determine truth value of dense scalar MX.");
-  return x_.at(0)!=0;
-}
+  ConstantMX::~ConstantMX(){
+  }
 
-void ConstantMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-  SXMatrix r(x_);
-  casadi_assert(output[0]->sparsity()==r.sparsity());
-  output[0]->set(r);
-}
-
-void ConstantMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-
-  // Evaluate nondifferentiated
-  if(!output_given){
-    if(output[0]){
-      *output[0] = x_;
+  void ConstantMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+    int nfwd = fwdSens.size();
+    for(int d=0; d<nfwd; ++d){
+      fwdSens[d][0]->setZero();
     }
   }
+
+  void ConstantMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  }
+
+  void ConstantMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+    // Evaluate nondifferentiated
+    if(!output_given){
+      if(output[0]){
+	*output[0] = shared_from_this<MX>();
+      }
+    }
   
-  // Number of derivative directions
-  int nfwd = fwdSens.size();
-  if(nfwd==0) return; // Quick return
+    // Number of derivative directions
+    int nfwd = fwdSens.size();
+    if(nfwd==0) return; // Quick return
   
-  // Derivatives
-  MX zero_sens = MX::sparse(size1(),size2());
-  for(int d=0; d<nfwd; ++d){
-    if(fwdSens[d][0]){
-      *fwdSens[d][0] = zero_sens;
+    // Derivatives
+    MX zero_sens = MX::sparse(size1(),size2());
+    for(int d=0; d<nfwd; ++d){
+      if(fwdSens[d][0]){
+	*fwdSens[d][0] = zero_sens;
+      }
     }
   }
-}
 
-void ConstantMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-  if(fwd){
-    bvec_t *outputd = get_bvec_t(output[0]->data());
-    fill_n(outputd,output[0]->size(),0);
+  void ConstantMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+    if(fwd){
+      bvec_t *outputd = get_bvec_t(output[0]->data());
+      fill_n(outputd,output[0]->size(),0);
+    }
   }
-}
 
-void ConstantMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-  // Print the constant
-  int ind = gen.addConstant(shared_from_this<MX>());
+  void ConstantMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    // Print the constant
+    int ind = gen.addConstant(shared_from_this<MX>());
 
-  // Copy the constant to the work vector
-  stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
-  stream << res.at(0) << "[i]=";
-  stream << "c" << ind << "[i];" << endl;
-}
+    // Copy the constant to the work vector
+    stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
+    stream << res.at(0) << "[i]=";
+    stream << "c" << ind << "[i];" << endl;
+  }
 
+  bool ConstantMX::__nonzero__() const{
+    if (numel()!=1) casadi_error("Can only determine truth value of scalar MX.");
+    if (size()!=1) casadi_error("Can only determine truth value of dense scalar MX.");
+    return !isZero();
+  }
+
+  bool ConstantDMatrix::isZero() const{
+    return CasADi::isZero(x_);
+  }
+
+  bool ConstantDMatrix::isOne() const{
+    return CasADi::isOne(x_);
+  }
+
+  bool ConstantDMatrix::isMinusOne() const{
+    return CasADi::isMinusOne(x_);
+  }
+
+  bool ConstantDMatrix::isIdentity() const{
+    return CasADi::isIdentity(x_);
+  }
 
 } // namespace CasADi
 
