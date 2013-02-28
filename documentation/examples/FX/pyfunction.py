@@ -26,6 +26,7 @@ from casadi import *
 
 
 #! We start with a python function with CFunctionWrapper-like arguments
+#! The function calculates the factorial of its input
 def fac(f,nfwd,nadj,userdata):
   x = f.input()[0,0]
   y = 1
@@ -80,24 +81,52 @@ c.evaluate(0,0)
 #! Of course, since we don't alter f.output, the result is meaningless
 print c.output()
 
-#! Jacobians
+
+#! Providing sensitivities
 #!==============================
-x = MX("x",3,1)
-[y] = c.call([x])
 
-f = MXFunction([x],[y])
-f.init()
+#! This function calculates (x,y) -> (y+x**2,x*y)
+#! Note that CasADi will in general request multiple seeding directions.
+#! Our function must accomodate this.
+def squares(f,nfwd,nadj,userdata):
+  print "Called squares with :", (nfwd,nadj)
+  x = f.input(0)[0]
+  y = f.input(0)[1]
 
+  f.output(0).set(f.input(0)**2)
+  f.output(0).set(f.input(0)**2)
+  
+  for i in range(nfwd):
+    xdot = f.fwdSeed(0,i)[0]
+    ydot = f.fwdSeed(0,i)[1]
+    f.fwdSens(0,i).set([2*x*xdot+ydot,y*xdot+x*ydot])
+    
+  for i in range(nadj):
+    xb = f.adjSeed(0,i)[0]
+    yb = f.adjSeed(0,i)[1]
+    f.adjSens(0,i).set([2*x*xb+y*yb,xb+x*yb])
+    
+c = PyFunction( squares, [sp_dense(2,1)], [sp_dense(2,1)] )
+c.init()
 
-J = f.jacobian()
+#! Let's calculate the jacobian:
+
+J = c.jacobian()
 J.init()
-
-c.setUserData({"foo": "bar"})
-
-#! Our function will be called with forward seeds.
-#! Of course, since we don't alter f.fwdSens, the result is meaningless
+J.setInput([3,5])
 J.evaluate()
 
+print J.output()
+
+#! Forcing ad_mode is currently non-functional. See https://github.com/casadi/casadi/issues/614
+c.setOption("ad_mode","reverse")
+c.init()
+J = c.jacobian()
+J.init()
+J.setInput([3,5])
+J.evaluate()
+
+print J.output()
 
 
 
