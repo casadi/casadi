@@ -29,17 +29,20 @@ namespace CasADi{
 
 /** \brief Represents an MX that is only composed of a constant.
 	\author Joel Andersson 
-	\date 2010
+	\date 2010-2013
 
 	A regular user is not supposed to work with this Node class.
 	This user can call MX(double) directly, or even rely on implicit typecasting.
 	\sa zeros , ones
 */
-class ConstantMX : public MXNode{
+  class ConstantMX : public MXNode{
   public:
 
     /** \brief  Constructor */
     ConstantMX(const Matrix<double> &x);
+
+    /// Destructor
+    virtual ~ConstantMX(){}
 
     /** \brief  Clone function */
     virtual ConstantMX* clone() const;
@@ -68,13 +71,10 @@ class ConstantMX : public MXNode{
     /// Return truth value of an MX
     virtual bool __nonzero__() const;
 
-    /// Symbolic evaluation (matrix graph)
-    virtual MX eval(const std::vector<MX>& x){return MX::create(this);}
-
     /** \brief  data member */
     Matrix<double> x_;
 
-};
+  };
 
 } // namespace CasADi
 
