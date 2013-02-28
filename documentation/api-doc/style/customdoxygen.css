@@ -137,12 +137,8 @@ dl.el {
 	font-size: 105%;
 }
 
-.fragment {
+div.line {
   white-space: pre;
-}
-
-.fragment div {
-  display: inline;
 }
 
 pre.fragment {
