@@ -76,6 +76,9 @@ enum Operation{
   // Matrix transpose
   OP_TRANSPOSE,
 
+  // Vertical concatenation
+  OP_VERTCAT,
+
   // Nonzero mapping
   OP_MAPPING,
   
