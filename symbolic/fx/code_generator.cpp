@@ -163,7 +163,7 @@ namespace CasADi{
       name << "c" << ind;
  
       // Set format
-      constants_ << std::scientific << std::fixed;
+      constants_ << std::scientific;
       constants_ << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
       // Print to file

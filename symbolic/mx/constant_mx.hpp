@@ -195,7 +195,7 @@ namespace CasADi{
       stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
       stream << res.at(0) << "[i]=";
       std::ios_base::fmtflags fmtfl = stream.flags(); // get current format flags
-      stream << std::scientific << std::fixed << std::setprecision(std::numeric_limits<double>::digits10 + 1); // full precision NOTE: hex better?
+      stream << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1); // full precision NOTE: hex better?
       stream << v_.value << ";" << std::endl;
       stream.flags(fmtfl); // reset current format flags
     }
