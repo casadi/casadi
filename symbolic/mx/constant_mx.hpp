@@ -122,7 +122,22 @@ namespace CasADi{
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const{
-      stream << value;
+      stream << "ConstInt<" << value << ">(";
+      if(sparsity().scalar()){
+	stream << "scalar";
+      } else {
+	stream << size1() << "x" << size2() << ": ";
+	if(sparsity().dense()){
+	  stream << "dense";
+	} else if(sparsity().size()==0){
+	  stream << "empty";	  
+	} else if(sparsity().diagonal()){
+	  stream << "diagonal";
+	} else {
+	  stream << double(size())/sparsity().numel() << " %";
+	}	
+      }
+      stream << ")";
     }
     
     /** \brief  Evaluate the function numerically */
