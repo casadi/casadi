@@ -49,11 +49,11 @@ namespace CasADi{
 
   MX::MX(double x){
     if(x==0){
-      assignNode(new ConstantInt<0>(CRSSparsity(1,1,true)));
+      assignNode(new Constant<CompiletimeConst<0> >(CRSSparsity(1,1,true)));
     } else if(x==1){
-      assignNode(new ConstantInt<1>(CRSSparsity(1,1,true)));
+      assignNode(new Constant<CompiletimeConst<1> >(CRSSparsity(1,1,true)));
     } else if(x==-1){
-      assignNode(new ConstantInt<-1>(CRSSparsity(1,1,true)));
+      assignNode(new Constant<CompiletimeConst< -1> >(CRSSparsity(1,1,true)));
     } else {
       assignNode(new ConstantDMatrix(x));
     }
@@ -80,7 +80,7 @@ namespace CasADi{
   }
 
   MX::MX(int nrow, int ncol){
-    assignNode(new Mapping(CRSSparsity(nrow,ncol)));
+    assignNode(new Constant<CompiletimeConst<0> >(CRSSparsity(nrow,ncol)));
   }
 
   MX::MX(const CRSSparsity& sp, const MX& val){
