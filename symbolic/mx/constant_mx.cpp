@@ -39,9 +39,11 @@ namespace CasADi{
   }
 
   void ConstantMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    int nfwd = fwdSens.size();
-    for(int d=0; d<nfwd; ++d){
+    for(int d=0; d<fwdSens.size(); ++d){
       fwdSens[d][0]->setZero();
+    }
+    for(int d=0; d<adjSeed.size(); ++d){
+      adjSeed[d][0]->setZero();
     }
   }
 
