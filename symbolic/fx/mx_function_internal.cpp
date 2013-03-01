@@ -698,14 +698,16 @@ void MXFunctionInternal::spEvaluate(bool fwd){
         // Propagate sparsity backwards
         it->data->propagateSparsity(mx_input_, mx_output_, itmp_, rtmp_, false);
 	
+	if(it->op > OP_PARAMETER){
 
-        for(int oind=0; oind<it->res.size(); ++oind){
-          int el = it->res[oind];
-          if(el>=0){
-            vector<double> &w = work_[el].data.data();
-            fill_n(get_bvec_t(w),w.size(),bvec_t(0));
-          }
-        }
+	  for(int oind=0; oind<it->res.size(); ++oind){
+	    int el = it->res[oind];
+	    if(el>=0){
+	      vector<double> &w = work_[el].data.data();
+	      fill_n(get_bvec_t(w),w.size(),bvec_t(0));
+	    }
+	  }
+	}
       }
     }
   }

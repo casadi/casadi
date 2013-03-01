@@ -57,10 +57,8 @@ const std::string& SymbolicMX::getName() const{
 }
 
 void SymbolicMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-  if(fwd){
-    bvec_t *outputd = get_bvec_t(output[0]->data());
-    fill_n(outputd,output[0]->size(),0);
-  }
+  bvec_t *outputd = get_bvec_t(output[0]->data());
+  fill_n(outputd,output[0]->size(),0);
 }
 
 
