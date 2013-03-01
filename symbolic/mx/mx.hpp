@@ -230,8 +230,11 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   /// Get the name.
   std::string getName() const;
   
-  /// Get the constant - only valid when isConstant() is true
-  const Matrix<double> & getConstant() const; 
+  /// Get the value (only for scalar constant nodes)
+  double getValue() const;
+    
+  /// Get the value (only for constant nodes)
+  Matrix<double> getMatrixValue() const;
   
   /// Check if symbolic
   bool isSymbolic () const;

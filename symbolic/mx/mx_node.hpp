@@ -240,6 +240,9 @@ namespace CasADi{
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const;
     
+    /// Get the value (only for constant nodes)
+    virtual Matrix<double> getMatrixValue() const;
+    
     /// Convert vector of pointers to vector of objects
     template<typename T>
     static std::vector<T> getVector(const std::vector<T*> v);
