@@ -131,6 +131,7 @@ void UnaryMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fw
     int nz = input[0]->data().size();
     for(int el=0; el<nz; ++el){
       inputd[el] |= outputd[el];
+      outputd[el] = 0;
     }
   }
 }

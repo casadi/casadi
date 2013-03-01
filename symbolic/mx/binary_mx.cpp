@@ -335,6 +335,7 @@ void NonzerosNonzerosOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& outp
     } else {
       input0[el] |= outputd[el];
       input1[el] |= outputd[el];
+      outputd[el] = 0;
     }
   }
 }
@@ -349,6 +350,7 @@ void NonzerosScalarOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output
     } else {
       input0[el] |= outputd[el];
       input1[0]  |= outputd[el];
+      outputd[el] = 0;
     }
   }
 }
@@ -363,6 +365,7 @@ void ScalarNonzerosOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output
     } else {
       input0[0]  |= outputd[el]; 
       input1[el] |= outputd[el];
+      outputd[el] = 0;
     }
   }
 }
@@ -393,6 +396,7 @@ void SparseSparseOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, 
       } else {
         if(nz0) input0[el0] |= outputd[el];
         if(nz1) input1[el1] |= outputd[el];
+	outputd[el] = 0;
         el++;
       }
     }

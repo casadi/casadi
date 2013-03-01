@@ -681,6 +681,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
         bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
         for(int k=0; k<w.size(); ++k){
           swork[k] = iwork[k];
+	  iwork[k] = 0;
         }
       } else if(it->op==OP_OUTPUT){
         // Pass output seeds
@@ -696,10 +697,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
         
         // Propagate sparsity backwards
         it->data->propagateSparsity(mx_input_, mx_output_, itmp_, rtmp_, false);
-      }
-      
-      // Clear the seeds for the next sweep
-      if(it->op!=OP_OUTPUT){
+	
         for(int oind=0; oind<it->res.size(); ++oind){
           int el = it->res[oind];
           if(el>=0){
