@@ -698,7 +698,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
         // Propagate sparsity backwards
         it->data->propagateSparsity(mx_input_, mx_output_, itmp_, rtmp_, false);
 	
-	if(it->op > OP_PARAMETER){
+	if(it->op > OP_CALL){
 
 	  for(int oind=0; oind<it->res.size(); ++oind){
 	    int el = it->res[oind];

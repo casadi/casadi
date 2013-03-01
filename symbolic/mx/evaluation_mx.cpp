@@ -294,7 +294,7 @@ void EvaluationMX::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool us
             get_bvec_t(fcn_.output(oind).data()),
             get_bvec_t(res[oind]->data()),
             res[oind]->sparsity());
-	fill_n(get_bvec_t(res[oind]->data()),res[oind]->size(),0);
+	if(!use_fwd) fill_n(get_bvec_t(res[oind]->data()),res[oind]->size(),bvec_t(0));
       }
     }
 
@@ -399,6 +399,14 @@ void EvaluationMX::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool us
             }
           }
         }
+      }
+    }
+    if(!use_fwd){
+      for(int oind=0; oind<res.size(); ++oind){
+	if(res[oind]!=0){
+	  vector<double> &w = res[oind]->data();
+	  fill_n(get_bvec_t(w),w.size(),bvec_t(0));
+	}
       }
     }
   }
