@@ -138,6 +138,11 @@ void Mapping::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fw
         }
       }
     }
+    // Clear adjoint seeds
+    if(!fwd && output[oind]!=0){
+      bvec_t *outputd = get_bvec_t(output[oind]->data());
+      fill_n(outputd,output[oind]->size(),0);
+    }
   }
 }
 
