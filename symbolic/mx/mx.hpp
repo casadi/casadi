@@ -301,31 +301,35 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   //@}
 
   //@{
-  /** \brief  Sparse matrix of all zeros */  
+  /** \brief  Sparse matrix of all zeros */
   static MX sparse(int nrow, int ncol=1);
   static MX sparse(const std::pair<int, int> &nm);
   //@}
   
   //@{
   /** \brief  Dense matrix of all zeros */
+  static MX zeros(const CRSSparsity& sp);
   static MX zeros(int nrow, int ncol=1); 
   static MX zeros(const std::pair<int, int> &nm);
   //@}
 
   //@{
   /** \brief  Matrix of all ones */  
+  static MX ones(const CRSSparsity& sp);
   static MX ones(int nrow, int ncol=1); 
   static MX ones(const std::pair<int, int> &nm);
   //@}
 
   //@{
   /** \brief  create a matrix with all inf */
+  static MX inf(const CRSSparsity& sp);
   static MX inf(int nrow=1, int ncol=1);
   static MX inf(const std::pair<int,int>& nm);
   //@}
   
   //@{
   /** \brief  create a matrix with all nan */
+  static MX nan(const CRSSparsity& sp);
   static MX nan(int nrow=1, int ncol=1);
   static MX nan(const std::pair<int,int>& nm);
   //@}
@@ -338,7 +342,6 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
 
   /** \brief  Identity matrix */  
   static MX eye(int nrow);
-
   
   const MX getSub(int i, int j) const;
   const MX getSub(int i, const std::vector<int>& j) const;

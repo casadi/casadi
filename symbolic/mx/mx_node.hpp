@@ -236,6 +236,9 @@ namespace CasADi{
     
     /// Get size
     int size2() const;
+
+    /// Get the value (only for scalar constant nodes)
+    virtual double getValue() const;
     
     /// Convert vector of pointers to vector of objects
     template<typename T>

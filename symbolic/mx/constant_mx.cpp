@@ -92,6 +92,45 @@ namespace CasADi{
     return !isZero();
   }
 
+  ConstantMX* ConstantMX::create(const CRSSparsity& sp, int val){
+    switch(val){
+    case 0: return new Constant<CompiletimeConst<0> >(sp);
+    case 1: return new Constant<CompiletimeConst<1> >(sp);
+    case -1: return new Constant<CompiletimeConst<(-1)> >(sp);
+    default: return new Constant<RuntimeConst<int> >(sp,val);	
+    }
+  }
+
+  ConstantMX* ConstantMX::create(const CRSSparsity& sp, double val){
+    int intval(val);
+    if(intval-val==0){
+      return create(sp,intval);
+    } else {
+      return new Constant<RuntimeConst<double> >(sp,val);
+    }
+  }
+
+  ConstantMX* ConstantMX::create(const Matrix<double>& val){
+    if(val.size()==0){
+      return create(val.sparsity(),0);
+    } else if(val.scalar()){
+      return create(val.sparsity(),val.toScalar());
+    } else {
+      // Check if all values are the same
+      const vector<double> vdata = val.data();
+      double v = vdata[0];
+      for(vector<double>::const_iterator i=vdata.begin(); i!=vdata.end(); ++i){
+	if(*i!=v){
+	  // Values not all the same
+	  return new ConstantDMatrix(val);
+	}
+      }
+
+      // All values identical if reached this point
+      return create(val.sparsity(),v);
+    }
+  }
+
   bool ConstantDMatrix::isZero() const{
     return CasADi::isZero(x_);
   }
@@ -107,6 +146,7 @@ namespace CasADi{
   bool ConstantDMatrix::isIdentity() const{
     return CasADi::isIdentity(x_);
   }
+
 
 } // namespace CasADi
 
