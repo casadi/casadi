@@ -24,6 +24,8 @@
 #define CONSTANT_MX_HPP
 
 #include "mx_node.hpp"
+#include <iomanip>
+#include <iostream>
 
 namespace CasADi{
 
@@ -107,22 +109,36 @@ namespace CasADi{
     Matrix<double> x_;
   };
 
-  template<int value>
-  class ConstantInt : public ConstantMX{
+  /** \brief Constant known at runtime */
+  template<typename T>
+  struct RuntimeConst{
+    const T value;
+    RuntimeConst(){}
+    RuntimeConst(T v) : value(v){}
+  };
+  
+  /** \brief  Constant known at compiletime */
+  template<int v>
+  struct CompiletimeConst{
+    static const int value = v;
+  };
+
+  template<typename Value>
+  class Constant : public ConstantMX{
   public:
     
     /** \brief  Constructor */
-    ConstantInt(const CRSSparsity& sp) : ConstantMX(sp){}
+    explicit Constant(const CRSSparsity& sp, Value v = Value()) : ConstantMX(sp), v_(v){}
 
     /// Destructor
-    virtual ~ConstantInt(){}
+    virtual ~Constant(){}
 
     /** \brief  Clone function */
-    virtual ConstantInt* clone() const{ return new ConstantInt<value>(*this);}
+    virtual Constant* clone() const{ return new Constant<Value>(*this);}
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const{
-      stream << "ConstInt<" << value << ">(";
+      stream << "ConstInt<" << v_.value << ">(";
       if(sparsity().scalar()){
 	stream << "scalar";
       } else {
@@ -142,13 +158,13 @@ namespace CasADi{
     
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-      output[0]->set(double(value));
+      output[0]->set(double(v_.value));
       ConstantMX::evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-      output[0]->set(SX(value));
+      output[0]->set(SX(v_.value));
       ConstantMX::evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
     }
 
@@ -157,14 +173,20 @@ namespace CasADi{
       // Copy the constant to the work vector
       stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
       stream << res.at(0) << "[i]=";
-      stream << value << ";" << std::endl;
+      std::ios_base::fmtflags fmtfl = stream.flags(); // get current format flags
+      stream << std::scientific << std::fixed << std::setprecision(std::numeric_limits<double>::digits10 + 1); // full precision NOTE: hex better?
+      stream << v_.value << ";" << std::endl;
+      stream.flags(fmtfl); // reset current format flags
     }
 
     /** \brief  Check if a particular integer value */
-    virtual bool isZero() const{ return value==0;}
-    virtual bool isOne() const{ return value==1;}
-    virtual bool isMinusOne() const{ return value==-1;}
-    virtual bool isIdentity() const{ return value==1 && sparsity().diagonal();}
+    virtual bool isZero() const{ return v_.value==0;}
+    virtual bool isOne() const{ return v_.value==1;}
+    virtual bool isMinusOne() const{ return v_.value==-1;}
+    virtual bool isIdentity() const{ return v_.value==1 && sparsity().diagonal();}
+    
+    /** \brief The actual numerical value */
+    Value v_;
   };
 
 
