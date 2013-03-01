@@ -105,9 +105,6 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
     it->setTemp(0);
   }
   casadi_assert_message(!has_duplicates, "The input expressions are not independent.");
-  
-  liftfun_ = 0;
-  liftfun_ud_ = 0;
 }
 
 
@@ -411,11 +408,6 @@ void MXFunctionInternal::updateNumSens(bool recursive){
   }
 }
 
-void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_data){
-  liftfun_ = liftfun;
-  liftfun_ud_ = user_data;
-}
-
 void MXFunctionInternal::updatePointers(const AlgEl& el, int nfdir, int nadir){
   mx_input_.resize(el.arg.size());
   mx_output_.resize(el.res.size());
@@ -498,8 +490,6 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
       for(int dir=0; dir<nfdir; ++dir){
         work_[it->arg.front()].dataF.at(dir).get(fwdSens(it->res.front(),dir));
       }
-    } else if(it->op==OP_PARAMETER){
-      //casadi_error("The algorithm contains free parameters"); // FIXME
     } else {
 
       // Point pointers to the data corresponding to the element
@@ -507,13 +497,6 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
       // Evaluate
       it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
-  
-      // Lifting
-      if(liftfun_ && it->data->isNonLinear()){
-        for(int i=0; i<it->res.size(); ++i){
-          liftfun_(&mx_output_[i]->front(),mx_output_[i]->size(),liftfun_ud_);
-        }
-      }
     }
   }
   
@@ -547,8 +530,6 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
           DMatrix& aseed_dest = work_[it->arg.front()].dataA.at(dir);
           transform(aseed_dest.begin(),aseed_dest.end(),aseed.begin(),aseed_dest.begin(),std::plus<double>());
         }
-      } else if(it->op==OP_PARAMETER){
-        //casadi_error("The algorithm contains free parameters"); // FIXME
       } else {
         // Point pointers to the data corresponding to the element
         updatePointers(*it,0,nadir);

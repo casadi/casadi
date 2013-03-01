@@ -73,9 +73,6 @@ namespace CasADi{
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
 
-    /** \brief Set the lifting function */
-    void setLiftingFunction(LiftingFunction liftfun, void* user_data);
-
     /** \brief Extract the residual function G and the modified function Z out of an expression (see Albersmeyer2010 paper) */
     void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
 
@@ -102,11 +99,7 @@ namespace CasADi{
     
     /// Free variables
     std::vector<MX> free_vars_;
-    
-    // Lifting function
-    LiftingFunction liftfun_;
-    void* liftfun_ud_;
-    
+        
     /** \brief Evaluate symbolically, SX type*/
     virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
                         const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 

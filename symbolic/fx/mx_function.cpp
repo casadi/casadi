@@ -103,10 +103,6 @@ int MXFunction::countNodes() const{
   return algorithm().size();
 }
 
-void MXFunction::setLiftingFunction(LiftingFunction liftfun, void* user_data){
-  (*this)->setLiftingFunction(liftfun,user_data);
-}
-
 MX MXFunction::jac(int iind, int oind, bool compact, bool symmetric){
   return (*this)->jac(iind,oind,compact,symmetric);
 }

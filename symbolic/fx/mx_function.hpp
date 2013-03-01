@@ -53,9 +53,6 @@ struct MXAlgEl{
 %template(MXAlgElVector) std::vector<CasADi::MXAlgEl>;
 #endif // SWIG
 
-// Lifting function to be passed to the evalutator in order to lift the evaluations
-typedef void (*LiftingFunction)(double *v, int n, void *user_data);
-
 namespace CasADi{
 
 /** \brief  Forward declaration of internal class */
@@ -119,9 +116,6 @@ public:
   
   /** \brief Number of nodes in the algorithm */
   int countNodes() const;
-  
-  /** \brief Set the lifting function */
-  void setLiftingFunction(LiftingFunction liftfun, void* user_data=0);
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
