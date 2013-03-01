@@ -48,28 +48,15 @@ namespace CasADi{
   }
 
   MX::MX(double x){
-    CRSSparsity sp(1,1,true);
-    MXNode* n;
-    int intval(x);
-    if(intval-x==0){
-      switch(intval){
-      case 0: n = new Constant<CompiletimeConst<0> >(sp); break;
-      case 1: n = new Constant<CompiletimeConst<1> >(sp); break;
-      case -1: n = new Constant<CompiletimeConst<(-1)> >(sp); break;
-      default: n = new Constant<RuntimeConst<int> >(sp,intval);	
-      }
-    } else {
-      n = new Constant<RuntimeConst<double> >(sp,x);
-    }
-    assignNode(n);
+    assignNode(ConstantMX::create(sp_dense(1,1),x));
   }
 
-  MX::MX(const Matrix<double> &x){
-    assignNode(new ConstantDMatrix(x));
+  MX::MX(const Matrix<double>& x){
+    assignNode(ConstantMX::create(x));
   }
 
-  MX::MX(const vector<double> &x){
-    assignNode(new ConstantDMatrix(x));
+  MX::MX(const vector<double>& x){
+    assignNode(ConstantMX::create(x));
   }
 
   MX::MX(const string& name, int n, int m){
