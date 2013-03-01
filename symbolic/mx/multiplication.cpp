@@ -101,6 +101,7 @@ void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtr
 
 void Multiplication::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
   DMatrix::mul_sparsity(*input[0],*input[1],*output[0],fwd);
+  if(!fwd) fill_n(get_bvec_t(output[0]->data()),output[0]->size(),bvec_t(0));
 }
 
 void Multiplication::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
