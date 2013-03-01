@@ -167,7 +167,8 @@ namespace CasADi{
       constants_ << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
       // Print to file
-      printVector(constants_,name.str(),x.getConstant().data());
+      DMatrix v = x.getMatrixValue();
+      printVector(constants_,name.str(),v.data());
       
       // Separate with an empty line
       constants_ << endl;

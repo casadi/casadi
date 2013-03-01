@@ -78,6 +78,9 @@ namespace CasADi{
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const = 0;
 
+    /// Get the value (only for constant nodes)
+    virtual Matrix<double> getMatrixValue() const = 0;
+
     /// Return truth value of an MX
     virtual bool __nonzero__() const;
   };
@@ -119,6 +122,9 @@ namespace CasADi{
   
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const{return x_.toScalar();}
+
+    /// Get the value (only for constant nodes)
+    virtual Matrix<double> getMatrixValue() const{ return x_;}
 
     /** \brief  data member */
     Matrix<double> x_;
@@ -203,6 +209,11 @@ namespace CasADi{
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const{
       casadi_assert(sparsity().scalar());
+      return v_.value;
+    }
+
+    /// Get the value (only for constant nodes)
+    virtual Matrix<double> getMatrixValue() const{
       return v_.value;
     }
 

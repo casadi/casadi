@@ -955,10 +955,12 @@ namespace CasADi{
 
   FX MX::getFunction () {  return (*this)->getFunction(); }
  	
-  const Matrix<double> & MX::getConstant() const {
-    const ConstantDMatrix* n = dynamic_cast<const ConstantDMatrix*>(get());
-    casadi_assert_message(n != 0,"MX::getConstant: must be constant");
-    return n->x_;
+  double MX::getValue() const{
+    return (*this)->getValue();
+  }
+
+  Matrix<double> MX::getMatrixValue() const{
+    return (*this)->getMatrixValue();
   }
  	  
   bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryMX*>(get()) != 0 : false;  }
