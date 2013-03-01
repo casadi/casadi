@@ -69,6 +69,9 @@ namespace CasADi{
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_RESHAPE;}
 
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    virtual bool allowInplace() const{ return false;}
+
   };
 
 } // namespace CasADi

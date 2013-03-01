@@ -52,6 +52,9 @@ namespace CasADi{
 
   template<typename T, typename MatV, typename MatVV>
   void Reshape::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+    // Quick return if inplace
+    if(input[0]==output[0]) return;
+
     // Number of derivatives
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
@@ -72,6 +75,9 @@ namespace CasADi{
   }
 
   void Reshape::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+    // Quick return if inplace
+    if(input[0]==output[0]) return;
+
     bvec_t *res_ptr = get_bvec_t(output[0]->data());
     vector<double>& arg = input[0]->data();
     bvec_t *arg_ptr = get_bvec_t(arg);
@@ -91,6 +97,9 @@ namespace CasADi{
   }
 
   void Reshape::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+    // Quick return if inplace
+    if(input[0]==output[0]) return;
+
     if(!output_given){
       *output[0] = reshape(*input[0],sparsity());
     }
@@ -111,6 +120,9 @@ namespace CasADi{
   }
 
   void Reshape::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    // Quick return if inplace
+    if(arg[0].compare(res[0])==0) return;
+
     stream << "  for(i=0; i<" << size() << "; ++i) " << res.front() << "[i] = " << arg.front() << "[i];" << endl;
   }
 

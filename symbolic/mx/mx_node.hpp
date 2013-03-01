@@ -243,6 +243,9 @@ namespace CasADi{
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const;
     
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    virtual bool allowInplace() const{ return false;}
+
     /// Convert vector of pointers to vector of objects
     template<typename T>
     static std::vector<T> getVector(const std::vector<T*> v);

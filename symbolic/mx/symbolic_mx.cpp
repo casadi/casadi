@@ -56,10 +56,6 @@ const std::string& SymbolicMX::getName() const{
   return name_;
 }
 
-std::vector<MX> SymbolicMX::partial(const std::vector<MX>& x){
-  return std::vector<MX>(1,MX::eye(sparsity().numel()));
-}
-
 void SymbolicMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
   if(fwd){
     bvec_t *outputd = get_bvec_t(output[0]->data());

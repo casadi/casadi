@@ -67,12 +67,6 @@ class SymbolicMX : public MXNode{
 
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_PARAMETER;}
-    
-    /// Symbolic evaluation (matrix graph)
-    virtual MX eval(const std::vector<MX>& x){return MX::create(this);}
-
-    /// Partial derivatives
-    virtual std::vector<MX> partial(const std::vector<MX>& x);
 
   protected:
     // Name of the varible
