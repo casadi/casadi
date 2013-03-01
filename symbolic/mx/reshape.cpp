@@ -84,7 +84,10 @@ namespace CasADi{
     if(fwd){
       copy(arg_ptr, arg_ptr+arg.size(), res_ptr);
     } else {
-      for(int k=0; k<arg.size(); ++k) *arg_ptr++ |= *res_ptr++;
+      for(int k=0; k<arg.size(); ++k){
+	*arg_ptr++ |= *res_ptr;
+	*res_ptr++ = 0;
+      }
     }
   }
 

@@ -106,9 +106,11 @@ namespace CasADi{
       if(fwd){
 	xT[itmp[j]++] = x[el];
       } else {
-	x[el] |= xT[itmp[j]++];
+	int elT = itmp[j]++;
+	x[el] |= xT[elT];
+	xT[elT] = 0;
       }
-    }      
+    }    
   }
 
   void Transpose::printPart(std::ostream &stream, int part) const{

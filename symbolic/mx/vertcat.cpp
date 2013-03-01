@@ -95,7 +95,10 @@ namespace CasADi{
 	copy(arg_i_ptr, arg_i_ptr+arg_i.size(), res_ptr);
 	res_ptr += arg_i.size();
       } else {
-	for(int k=0; k<arg_i.size(); ++k) *arg_i_ptr++ |= *res_ptr++;
+	for(int k=0; k<arg_i.size(); ++k){
+	  *arg_i_ptr++ |= *res_ptr;
+	  *res_ptr++ = 0;
+	}
       }
     }
   }
