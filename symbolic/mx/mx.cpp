@@ -48,15 +48,20 @@ namespace CasADi{
   }
 
   MX::MX(double x){
-    if(x==0){
-      assignNode(new Constant<CompiletimeConst<0> >(CRSSparsity(1,1,true)));
-    } else if(x==1){
-      assignNode(new Constant<CompiletimeConst<1> >(CRSSparsity(1,1,true)));
-    } else if(x==-1){
-      assignNode(new Constant<CompiletimeConst< -1> >(CRSSparsity(1,1,true)));
+    CRSSparsity sp(1,1,true);
+    MXNode* n;
+    int intval(x);
+    if(intval-x==0){
+      switch(intval){
+      case 0: n = new Constant<CompiletimeConst<0> >(sp); break;
+      case 1: n = new Constant<CompiletimeConst<1> >(sp); break;
+      case -1: n = new Constant<CompiletimeConst<(-1)> >(sp); break;
+      default: n = new Constant<RuntimeConst<int> >(sp,intval);	
+      }
     } else {
-      assignNode(new ConstantDMatrix(x));
+      n = new Constant<RuntimeConst<double> >(sp,x);
     }
+    assignNode(n);
   }
 
   MX::MX(const Matrix<double> &x){
