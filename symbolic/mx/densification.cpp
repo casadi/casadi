@@ -103,7 +103,7 @@ void Densification::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, b
     for(int el=rowind[i]; el<rowind[i+1]; ++el){ // loop over the non-zero elements
       int j=col[el];  // column
       for(; k<i*d2+j; ++k){
-        if(fwd) outputd[k] = 0; // add zeros before the non-zero element
+	outputd[k] = 0; // add zeros before the non-zero element
       }
       
       // add the non-zero element
@@ -111,6 +111,7 @@ void Densification::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, b
         outputd[k] = inputd[el];
       } else {
         inputd[el] |= outputd[k];
+	outputd[k] = 0;
       }
       k++;
     }
@@ -118,7 +119,7 @@ void Densification::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, b
   
   // add sparse zeros at the end of the matrix
   for(; k<d1*d2; ++k)
-    if(fwd) outputd[k] = 0;
+    outputd[k] = 0;
 }
 
 
