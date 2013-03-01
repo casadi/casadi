@@ -108,6 +108,7 @@ void SparseSparseOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, co
         // Propagate adjoint seeds
         for(int d=0; d<nadj; ++d){
           double s = adjSeed[d][0]->data()[el];
+	  adjSeed[d][0]->data()[el] = 0;
           if(nz0) adjSens[d][0]->data()[el0] += s*pd[nz0][0];
           if(nz1) adjSens[d][1]->data()[el1] += s*pd[nz1][1];
         }
@@ -210,6 +211,7 @@ void NonzerosScalarOp::evaluateGen(const MatV& input, MatV& output, const MatVV&
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
         T s = adjSeed[d][0]->data()[el];
+	adjSeed[d][0]->data()[el] = 0;
         adjSens[d][0]->data()[el] += s*pd[0];
         adjSens[d][1]->data()[0]  += s*pd[1];
       }
@@ -259,6 +261,7 @@ void ScalarNonzerosOp::evaluateGen(const MatV& input, MatV& output, const MatVV&
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
         T s = adjSeed[d][0]->data()[el];
+	adjSeed[d][0]->data()[el] = 0;
         adjSens[d][0]->data()[0]  += s*pd[0];
         adjSens[d][1]->data()[el] += s*pd[1];
       }
@@ -310,6 +313,7 @@ void NonzerosNonzerosOp::evaluateGen(const MatV& input, MatV& output, const MatV
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
         T s = adjSeed[d][0]->data()[el];
+	adjSeed[d][0]->data()[el] = 0;
         adjSens[d][0]->data()[el] += s*pd[0];
         adjSens[d][1]->data()[el] += s*pd[1];
       }
@@ -333,9 +337,10 @@ void NonzerosNonzerosOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& outp
     if(fwd){
       outputd[el] = input0[el] | input1[el];
     } else {
-      input0[el] |= outputd[el];
-      input1[el] |= outputd[el];
+      bvec_t s = outputd[el];
       outputd[el] = 0;
+      input0[el] |= s;
+      input1[el] |= s;
     }
   }
 }
@@ -348,9 +353,10 @@ void NonzerosScalarOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output
     if(fwd){
       outputd[el] = input0[el] | input1[0];
     } else {
-      input0[el] |= outputd[el];
-      input1[0]  |= outputd[el];
+      bvec_t s = outputd[el];
       outputd[el] = 0;
+      input0[el] |= s;
+      input1[0]  |= s;
     }
   }
 }
@@ -363,9 +369,10 @@ void ScalarNonzerosOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output
     if(fwd){
       outputd[el] = input0[0] | input1[el];
     } else {
-      input0[0]  |= outputd[el]; 
-      input1[el] |= outputd[el];
+      bvec_t s = outputd[el];
       outputd[el] = 0;
+      input0[0]  |= s;
+      input1[el] |= s;
     }
   }
 }
@@ -394,10 +401,10 @@ void SparseSparseOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, 
       if(fwd){
         outputd[el++] = (nz0 ? input0[el0] : zero) | (nz1 ? input1[el1] : zero);
       } else {
-        if(nz0) input0[el0] |= outputd[el];
-        if(nz1) input1[el1] |= outputd[el];
-	outputd[el] = 0;
-        el++;
+	bvec_t s = outputd[el];
+	outputd[el++] = 0;
+        if(nz0) input0[el0] |= s;
+        if(nz1) input1[el1] |= s;
       }
     }
     

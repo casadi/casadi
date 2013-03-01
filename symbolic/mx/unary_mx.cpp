@@ -79,7 +79,9 @@ void UnaryMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMa
 
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
-        adjSens[d][0]->data()[i] += adjSeed[d][0]->data()[i]*tmp[0];
+	double s = adjSeed[d][0]->data()[i];
+	adjSeed[d][0]->data()[i] = 0;
+        adjSens[d][0]->data()[i] += s*tmp[0];
       }
     }
   }
@@ -130,8 +132,9 @@ void UnaryMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fw
   } else {
     int nz = input[0]->data().size();
     for(int el=0; el<nz; ++el){
-      inputd[el] |= outputd[el];
+      bvec_t s = outputd[el];
       outputd[el] = 0;
+      inputd[el] |= s;
     }
   }
 }
