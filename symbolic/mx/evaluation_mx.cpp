@@ -257,7 +257,7 @@ void EvaluationMX::deepCopyMembers(
   fcn_ = deepcopy(fcn_, already_copied);
 }
 
-void EvaluationMX::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res,bool use_fwd) {
+void EvaluationMX::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool use_fwd) {
   if (fcn_.spCanEvaluate(use_fwd)) {
     // Propagating sparsity pattern supported
     
@@ -294,6 +294,7 @@ void EvaluationMX::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res,bool use
             get_bvec_t(fcn_.output(oind).data()),
             get_bvec_t(res[oind]->data()),
             res[oind]->sparsity());
+	fill_n(get_bvec_t(res[oind]->data()),res[oind]->size(),0);
       }
     }
 
