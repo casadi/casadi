@@ -271,4 +271,9 @@ namespace CasADi{
     stream << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
   }
 
+  double MXNode::getValue() const{
+    throw CasadiException(string("MXNode::getValue not defined for class ") + typeid(*this).name());    
+  }
+
+
 } // namespace CasADi

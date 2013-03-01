@@ -45,6 +45,15 @@ namespace CasADi{
     /// Destructor
     virtual ~ConstantMX() = 0;
 
+    // Creator (all values are the same integer)
+    static ConstantMX* create(const CRSSparsity& sp, int val);
+
+    // Creator (all values are the same floating point value)
+    static ConstantMX* create(const CRSSparsity& sp, double val);
+
+    // Creator (values may be different)
+    static ConstantMX* create(const Matrix<double>& val);
+
     /** \brief  Clone function */
     virtual ConstantMX* clone() const = 0;
 
@@ -66,6 +75,9 @@ namespace CasADi{
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_CONST;}
     
+    /// Get the value (only for scalar constant nodes)
+    virtual double getValue() const = 0;
+
     /// Return truth value of an MX
     virtual bool __nonzero__() const;
   };
@@ -105,6 +117,9 @@ namespace CasADi{
     virtual bool isMinusOne() const;
     virtual bool isIdentity() const;
   
+    /// Get the value (only for scalar constant nodes)
+    virtual double getValue() const{return x_.toScalar();}
+
     /** \brief  data member */
     Matrix<double> x_;
   };
@@ -185,6 +200,12 @@ namespace CasADi{
     virtual bool isMinusOne() const{ return v_.value==-1;}
     virtual bool isIdentity() const{ return v_.value==1 && sparsity().diagonal();}
     
+    /// Get the value (only for scalar constant nodes)
+    virtual double getValue() const{
+      casadi_assert(sparsity().scalar());
+      return v_.value;
+    }
+
     /** \brief The actual numerical value */
     Value v_;
   };

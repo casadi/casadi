@@ -98,7 +98,7 @@ namespace CasADi{
       assignNode(new Mapping(sp));
       (*this)->assign(val,vector<int>(sp.size(),0));
       simplifyMapping(*this);
-    } else {
+     } else {
       // Empty matrix
       *this = sparse(sp.size1(),sp.size2());
     }
@@ -572,15 +572,23 @@ namespace CasADi{
   }
 
   MX MX::zeros(int nrow, int ncol){
-    return MX(Matrix<double>::zeros(nrow,ncol));
+    return zeros(sp_dense(nrow,ncol));
   }
 
   MX MX::zeros(const std::pair<int, int> &nm){
     return zeros(nm.first,nm.second);
   }
 
+  MX MX::zeros(const CRSSparsity& sp){
+    return create(ConstantMX::create(sp,0));
+  }
+
+  MX MX::ones(const CRSSparsity& sp){
+    return create(ConstantMX::create(sp,1));
+  }
+
   MX MX::ones(int nrow, int ncol){
-    return MX(Matrix<double>::ones(nrow,ncol));
+    return ones(sp_dense(nrow,ncol));
   }
 
   MX MX::ones(const std::pair<int, int> &nm){
@@ -588,19 +596,27 @@ namespace CasADi{
   }
 
   MX MX::inf(int nrow, int ncol){
-    return MX(Matrix<double>::inf(nrow,ncol));
+    return inf(sp_dense(nrow,ncol));
   }
 
   MX MX::inf(const std::pair<int, int> &nm){
     return inf(nm.first,nm.second);
   }
 
+  MX MX::inf(const CRSSparsity& sp){
+    return create(ConstantMX::create(sp,numeric_limits<double>::infinity()));
+  }
+
   MX MX::nan(int nrow, int ncol){
-    return MX(Matrix<double>::nan(nrow,ncol));
+    return nan(sp_dense(nrow,ncol));
   }
 
   MX MX::nan(const std::pair<int, int> &nm){
     return nan(nm.first,nm.second);
+  }
+
+  MX MX::nan(const CRSSparsity& sp){
+    return create(ConstantMX::create(sp,numeric_limits<double>::quiet_NaN()));
   }
 
   MX MX::eye(int n){
