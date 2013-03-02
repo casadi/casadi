@@ -97,6 +97,7 @@ void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtr
   for(int d=0; d<nadj; ++d){
     *adjSens[d][0] += mul(*adjSeed[d][0],*input[1]);
     *adjSens[d][1] += mul(trans(*adjSeed[d][0]),*input[0]);
+    *adjSeed[d][0] = MX();
   }
 }
 
