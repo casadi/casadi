@@ -912,10 +912,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       } else if(it->op==OP_OUTPUT){
         // Pass the adjoint seeds
         for(int d=0; d<nadir; ++d){
-          if(dwork[it->arg.front()][d].isNull())
-            dwork[it->arg.front()][d] = aseed[d][it->res.front()];
-          else
-            dwork[it->arg.front()][d] += aseed[d][it->res.front()];
+	  dwork[it->arg.front()][d] += aseed[d][it->res.front()];
         }
       } else if(it->op!=OP_PARAMETER){
         // Get the arguments of the evaluation
