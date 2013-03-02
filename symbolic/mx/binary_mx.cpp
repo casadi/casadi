@@ -170,8 +170,10 @@ void BinaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fw
     
     // Propagate adjoint seeds
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] += pd[0]*(*adjSeed[d][0]);
-      *adjSens[d][1] += pd[1]*(*adjSeed[d][0]);
+      MX s = *adjSeed[d][0];
+      *adjSeed[d][0] = MX();
+      *adjSens[d][0] += pd[0]*s;
+      *adjSens[d][1] += pd[1]*s;
     }
   }
 }
