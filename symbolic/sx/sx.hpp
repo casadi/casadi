@@ -39,24 +39,24 @@
 
 namespace CasADi{
 
-/** \brief  forward declaration of Node and Matrix */
-class SXNode; // include will follow in the end
+  /** \brief  forward declaration of Node and Matrix */
+  class SXNode; // include will follow in the end
 
-/** \brief The basic scalar symbolic class of CasADi
-  \author Joel Andersson 
-  \date 2010
-*/ 
+  /** \brief The basic scalar symbolic class of CasADi
+      \author Joel Andersson 
+      \date 2010
+  */ 
 
 #ifdef SWIG
 #ifdef WITH_IMPLICITCONV
-%implicitconv SX;
+  %implicitconv SX;
 #endif // WITH_IMPLICITCONV
 #endif // SWIG
 
 
-class SX : public GenericExpression<SX>{
-  friend class SXNode;
-  friend class BinarySXNode;
+  class SX : public GenericExpression<SX>{
+    friend class SXNode;
+    friend class BinarySXNode;
 
   public:
     
@@ -109,9 +109,9 @@ class SX : public GenericExpression<SX>{
     friend std::ostream& operator<<(std::ostream &stream, const SX &scalar);
 
     /** \brief  print to stream, limited */
-    #ifndef SWIG
+#ifndef SWIG
     void print(std::ostream &stream, long& remaining_calls) const;
-    #endif // SWIG
+#endif // SWIG
     
     /** \brief  string representation (SWIG workaround) */
     std::string toString() const;
@@ -122,7 +122,7 @@ class SX : public GenericExpression<SX>{
     /** \brief  Access functions of the node */
     const SXNode* operator->() const;
     SXNode* operator->();
-  #endif // SWIG
+#endif // SWIG
     
     /** \brief  Perform operations by ID */
     static SX binary(int op, const SX& x, const SX& y);
@@ -134,9 +134,9 @@ class SX : public GenericExpression<SX>{
     bool __nonzero__() const;
     
     /** \brief check if this SX is a leaf of the SX graph
-    *
-    * An SX qualifies as leaf when it has no dependencies.
-    */
+     *
+     * An SX qualifies as leaf when it has no dependencies.
+     */
     bool isLeaf() const;
     bool isConstant() const;
     bool isInteger() const;
@@ -181,8 +181,8 @@ class SX : public GenericExpression<SX>{
     int getNdeps() const;
     
     /** \brief Returns a number that is unique for a given SXNode. 
-    * If the SX does not point to any node, 0 is returned.
-    */
+     * If the SX does not point to any node, 0 is returned.
+     */
     long __hash__() const;
 
     /** \brief  Negation */
@@ -278,6 +278,9 @@ class SX : public GenericExpression<SX>{
     /** \brief Assign the node to something, without invoking the deletion of the node, if the count reaches 0 */
     SXNode* assignNoDelete(const SX& scalar);
     
+    /** \brief SX nodes are not allowed to be null */
+    inline bool isNull(){return false;}
+
 #ifndef SWIG
   private:
     // Maximum number of calls
@@ -293,25 +296,25 @@ class SX : public GenericExpression<SX>{
     friend SX if_else(const SX& cond, const SX& if_true, const SX& if_false); // replaces the ternary conditional operator "?:", which cannot be overloaded
 #endif // SWIG
 
-};
+  };
 
 
 #ifdef SWIG
-%extend SX {
-std::string __str__()  { return $self->toString(); }
-std::string __repr__() { return $self->toString(); }
-double __float__() { return $self->getValue();}
-int __int__() { return $self->getIntValue();}
-}
+  %extend SX {
+    std::string __str__()  { return $self->toString(); }
+    std::string __repr__() { return $self->toString(); }
+    double __float__() { return $self->getValue();}
+    int __int__() { return $self->getIntValue();}
+  }
 #endif // SWIG
 
 #ifndef SWIG
-// Template specializations
-template<>
-bool __nonzero__(const SX& val);
+  // Template specializations
+  template<>
+  bool __nonzero__(const SX& val);
 
-template<>
-class casadi_limits<SX>{
+  template<>
+  class casadi_limits<SX>{
   public:
     static bool isZero(const SX& val);
     static bool isOne(const SX& val);
@@ -329,7 +332,7 @@ class casadi_limits<SX>{
     static const SX nan;
     static const SX inf; 
     static const SX minus_inf;
-};
+  };
 
 #endif // SWIG
 
@@ -356,8 +359,8 @@ namespace CasADi{
 } // namespace CasADi
 
 namespace std{
-template<>
-class numeric_limits<CasADi::SX>{
+  template<>
+  class numeric_limits<CasADi::SX>{
   public:
     static const bool is_specialized = true;
     static CasADi::SX min() throw();
@@ -378,12 +381,12 @@ class numeric_limits<CasADi::SX>{
     static const bool has_infinity = true;
     static const bool has_quiet_NaN = true;
     static const bool has_signaling_NaN = false;
-//    static const float_denorm_style has_denorm = denorm absent;
+    //    static const float_denorm_style has_denorm = denorm absent;
     static const bool has_denorm_loss = false;
     static CasADi::SX infinity() throw();
     static CasADi::SX quiet_NaN() throw();
-//    static SX signaling_NaN() throw();
-//    static SX denorm_min() throw();
+    //    static SX signaling_NaN() throw();
+    //    static SX denorm_min() throw();
     static const bool is_iec559 = false;
     static const bool is_bounded = false;
     static const bool is_modulo = false;
@@ -391,7 +394,7 @@ class numeric_limits<CasADi::SX>{
     static const bool traps = false;
     static const bool tinyness_before = false;
     static const float_round_style round_style = round_toward_zero;
-};
+  };
 } //namespace std
 
 /** \brief  The following functions needs the class so they cannot be included in the beginning of the header */
