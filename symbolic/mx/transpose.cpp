@@ -73,12 +73,14 @@ namespace CasADi{
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
       vector<T>& x = adjSens[d][0]->data();
-      const vector<T>& xT = adjSeed[d][0]->data();
+      vector<T>& xT = adjSeed[d][0]->data();
       
       // Transpose
       copy(xT_rowind.begin(),xT_rowind.end(),itmp.begin());
       for(int el=0; el<x_col.size(); ++el){
-	x[el] += xT[itmp[x_col[el]]++];
+	int elT = itmp[x_col[el]]++;
+	x[el] += xT[elT];
+	xT[elT] = 0;
       }
     }
   }
