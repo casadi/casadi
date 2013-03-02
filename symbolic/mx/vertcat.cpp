@@ -77,10 +77,11 @@ namespace CasADi{
     
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      typename vector<T>::const_iterator arg_it = adjSeed[d][0]->data().begin();
+      typename vector<T>::iterator arg_it = adjSeed[d][0]->data().begin();
       for(int i=0; i<input.size(); ++i){
 	vector<T>& res_i = adjSens[d][i]->data();
 	transform(res_i.begin(),res_i.end(),arg_it,res_i.begin(),std::plus<T>());
+	fill_n(arg_it, res_i.size(), 0);
 	arg_it += res_i.size();
       }
     }

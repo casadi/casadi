@@ -68,9 +68,10 @@ namespace CasADi{
     
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      const vector<T>& arg = adjSeed[d][0]->data();
-      vector<T>& res = adjSens[d][0]->data();
-      transform(res.begin(),res.end(),arg.begin(),res.begin(),std::plus<T>());
+      vector<T>& aseed = adjSeed[d][0]->data();
+      vector<T>& asens = adjSens[d][0]->data();
+      transform(asens.begin(),asens.end(),aseed.begin(),asens.begin(),std::plus<T>());
+      fill(aseed.begin(),aseed.end(),0);
     }
   }
 
