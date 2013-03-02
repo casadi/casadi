@@ -848,18 +848,24 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
     vector<pair<pair<int,int>,MX> >::const_reverse_iterator tape_it = tape.rbegin();
     
     int alg_counter = algorithm_.size()-1;
-    for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it, --alg_counter){      
+    for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it, --alg_counter){
       if(it->op == OP_INPUT){
         // Collect the symbolic adjoint sensitivities
         for(int d=0; d<nadir; ++d){
           asens[d][it->arg.front()] = dwork[it->res.front()][d];
+	  dwork[it->res.front()][d] = MX();
         }
       } else if(it->op==OP_OUTPUT){
         // Pass the adjoint seeds
         for(int d=0; d<nadir; ++d){
-	  dwork[it->arg.front()][d] += aseed[d][it->res.front()];
+	  dwork[it->arg.front()][d] += aseed[d][it->res.front()];	  
         }
-      } else if(it->op!=OP_PARAMETER){
+      } else if(it->op==OP_PARAMETER){
+	// Clear adjoint seeds
+        for(int d=0; d<nadir; ++d){
+	  dwork[it->res.front()][d] = MX();
+	}
+      } else {
         // Get the arguments of the evaluation
         input_p.resize(it->arg.size());
         for(int i=0; i<input_p.size(); ++i){
@@ -912,7 +918,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
           }
         }
         
-	if(it->op > OP_CONST){
+	if(it->op > OP_PARAMETER){
 	  // Free memory for reuse
 	  for(int oind=0; oind<it->res.size(); ++oind){
 	    int el = it->res[oind];
