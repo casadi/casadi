@@ -117,9 +117,10 @@ namespace CasADi{
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      const MX& aseed = *adjSeed[d][0];
+      MX& aseed = *adjSeed[d][0];
       MX& asens = *adjSens[d][0];
       asens += reshape(aseed,dep().sparsity());
+      aseed = MX();
     }
   }
 

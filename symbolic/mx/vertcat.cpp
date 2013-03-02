@@ -129,13 +129,14 @@ namespace CasADi{
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
       int row_offset = 0;
-      const MX& aseed = *adjSeed[d][0];
+      MX& aseed = *adjSeed[d][0];
       for(int i=0; i<input.size(); ++i){
 	MX& asens = *adjSens[d][i];
 	int nrow = asens.size1();
 	asens += aseed(Slice(row_offset,row_offset+nrow),Slice());
 	row_offset += nrow;
       }
+      aseed = MX();
       casadi_assert(row_offset == aseed.size1());
     }
   }
