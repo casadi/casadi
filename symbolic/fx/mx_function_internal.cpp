@@ -548,7 +548,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
           }
         }
         
-	if(it->op > OP_PARAMETER){
+	if(it->op > OP_CALL){
 	  // Free memory for reuse
 	  for(int oind=0; oind<it->res.size(); ++oind){
 	    int el = it->res[oind];

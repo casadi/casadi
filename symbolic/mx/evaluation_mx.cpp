@@ -156,6 +156,9 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
     offset_nfdir += nfdir_f_batch;
     offset_nadir += nadir_f_batch;
   }
+
+  // Clear adjoint seeds
+  clearVector(aseed);
 }
 
 int EvaluationMX::getNumOutputs() const {
