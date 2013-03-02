@@ -916,21 +916,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
             swork[*c] = tape_it->second;
             tape_it++;
           }
-        }
-        
-	if(it->op > OP_MAPPING){
-	  // Free memory for reuse
-	  for(int oind=0; oind<it->res.size(); ++oind){
-	    int el = it->res[oind];
-	    if(el>=0){
-	      for(int d=0; d<nadir; ++d){
-		dwork[el][d] = MX();
-	      }
-	    }
-	  }	  
-        }
-
-
+        }        
       }
     }
   }

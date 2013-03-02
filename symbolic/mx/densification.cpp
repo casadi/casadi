@@ -87,6 +87,7 @@ void Densification::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrV
   int nadj = adjSeed.size();
   for(int d=0; d<nadj; ++d){
     *adjSens[d][0] += *adjSeed[d][0];
+    *adjSeed[d][0] = MX();
   }
 }
 
