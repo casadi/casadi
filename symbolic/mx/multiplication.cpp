@@ -73,6 +73,7 @@ void Multiplication::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, co
   for(int d=0; d<nadj; ++d){
     DMatrix::mul_no_alloc_nn(*adjSeed[d][0],*input[1],*adjSens[d][0]);
     DMatrix::mul_no_alloc_tn(*adjSeed[d][0],*input[0],*adjSens[d][1]);
+    adjSeed[d][0]->setZero();
   }
 }
 
