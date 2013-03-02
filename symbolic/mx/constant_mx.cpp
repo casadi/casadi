@@ -58,16 +58,21 @@ namespace CasADi{
       }
     }
   
-    // Number of derivative directions
-    int nfwd = fwdSens.size();
-    if(nfwd==0) return; // Quick return
-  
-    // Derivatives
-    MX zero_sens = MX::sparse(size1(),size2());
-    for(int d=0; d<nfwd; ++d){
-      if(fwdSens[d][0]){
-	*fwdSens[d][0] = zero_sens;
+    // Forward sensitivities
+    if(!fwdSens.empty()){
+      MX zero_sens = MX::sparse(size1(),size2());
+      for(int d=0; d<fwdSens.size(); ++d){
+	if(fwdSens[d][0]!=0){
+	  *fwdSens[d][0] = zero_sens;
+	}
       }
+    }
+    
+    // Clear adjoint seeds
+    for(int d=0; d<adjSeed.size(); ++d){
+      if(adjSeed[d][0]!=0){
+	*adjSeed[d][0] = MX();
+      }      
     }
   }
 

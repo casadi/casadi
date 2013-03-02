@@ -912,7 +912,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
           }
         }
         
-	if(it->op > OP_ATAN2){
+	if(it->op > OP_CONST){
 	  // Free memory for reuse
 	  for(int oind=0; oind<it->res.size(); ++oind){
 	    int el = it->res[oind];
