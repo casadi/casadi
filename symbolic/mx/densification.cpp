@@ -62,6 +62,7 @@ void Densification::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, con
   // Propagate adjoint seeds
   for(int d=0; d<nadj; ++d){
     adjSens[d][0]->set(adjSeed[d][0]->data(),DENSE);
+    adjSeed[d][0]->setZero();
   }
 }
 

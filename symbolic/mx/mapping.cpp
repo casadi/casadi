@@ -104,6 +104,7 @@ void Mapping::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed,
       }
     }
   }
+  clearVector(adjSeed);
 }
 
 void Mapping::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
