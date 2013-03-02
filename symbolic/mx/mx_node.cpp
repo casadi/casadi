@@ -279,5 +279,4 @@ namespace CasADi{
     throw CasadiException(string("MXNode::getMatrixValue not defined for class ") + typeid(*this).name());    
   }
 
-
 } // namespace CasADi

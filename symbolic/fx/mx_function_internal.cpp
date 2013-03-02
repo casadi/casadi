@@ -518,22 +518,23 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     int alg_counter = algorithm_.size()-1;
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it, --alg_counter){
+      // Point pointers to the data corresponding to the element
+      updatePointers(*it,0,nadir);
+      
       if(it->op==OP_INPUT){
         // Get the adjoint sensitivity
         for(int dir=0; dir<nadir; ++dir){
-          work_[it->res.front()].dataA.at(dir).get(adjSens(it->arg.front(),dir));
+          mx_adjSeed_[dir].front()->get(adjSens(it->arg.front(),dir));
+	  mx_adjSeed_[dir].front()->setZero();
         }
       } else if(it->op==OP_OUTPUT){
         // Pass the adjoint seeds
         for(int dir=0; dir<nadir; ++dir){
-          const DMatrix& aseed = adjSeed(it->res.front(),dir);
-          DMatrix& aseed_dest = work_[it->arg.front()].dataA.at(dir);
+	  const DMatrix& aseed = adjSeed(it->res.front(),dir);
+          DMatrix& aseed_dest = *mx_adjSens_[dir].front();
           transform(aseed_dest.begin(),aseed_dest.end(),aseed.begin(),aseed_dest.begin(),std::plus<double>());
         }
-      } else {
-        // Point pointers to the data corresponding to the element
-        updatePointers(*it,0,nadir);
-        
+      } else {        
         // Evaluate
         it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
       }
@@ -547,7 +548,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
           }
         }
         
-	if(it->op > OP_CONST){
+	if(it->op > OP_PARAMETER){
 	  // Free memory for reuse
 	  for(int oind=0; oind<it->res.size(); ++oind){
 	    int el = it->res[oind];

@@ -280,6 +280,10 @@ namespace CasADi{
 
     /** \brief  Propagate sparsity, no work */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+
+    /** \brief Free adjoint memory */
+    template<typename T> 
+    static void clearVector(const std::vector<std::vector<T*> > v);
   };
 
   // Implementations
@@ -302,6 +306,17 @@ namespace CasADi{
       ret[i] = getVector(v[i]);
     }
     return ret;
+  }
+
+  template<typename T>
+  void MXNode::clearVector(const std::vector<std::vector<T*> > v){
+    for(int i=0; i<v.size(); ++i){
+      for(int j=0; j<v[i].size(); ++j){
+	if(v[i][j]!= 0){
+	  v[i][j]->setZero();
+	}
+      }
+    }
   }
 
 
