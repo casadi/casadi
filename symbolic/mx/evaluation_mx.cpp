@@ -223,6 +223,9 @@ void EvaluationMX::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fse
   for (MXPtrVV::const_iterator i = aseed.begin(); i != aseed.end(); ++i) {
     tmp = getVector(*i);
     d_arg.insert(d_arg.end(), tmp.begin(), tmp.end());
+    for (MXPtrV::const_iterator j = i->begin(); j != i->end(); ++j){
+      if(*j!=0) **j = MX();
+    }
   }
 
   // Evaluate symbolically
