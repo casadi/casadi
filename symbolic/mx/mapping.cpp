@@ -542,9 +542,16 @@ void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       // Save to adjoint sensitivities
       *adjSens[d][iind] += s;
     }
+    
+    // Clear adjoint seeds
+    for(int i=0; i<adjSeed[d].size(); ++i){
+      if(adjSeed[d][i] != 0){
+	*adjSeed[d][i] = MX();
+      }
+    }
   }
 }
-
+  
 Matrix<int> Mapping::mapping(int iind) const {
   casadi_assert_message(iind < ndep(),"Mapping::mapping(int): first argument (" << iind << ") must be smaller than ndep (" << ndep() << ").");
   // TODO: make this efficient
