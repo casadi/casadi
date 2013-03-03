@@ -13,7 +13,7 @@ SET(CASADI_SRCS
   shared_object.hpp           shared_object.cpp         # This base class implements the reference counting (garbage collection) framework used in CasADi
   weak_ref.hpp                weak_ref.cpp              # Provides weak reference functionality (non-owning smart pointers)
   generic_type.hpp            generic_type.cpp          # Generic type used for options and for compatibility with dynamically typed languages like Python
-  generic_type_internal.hpp   generic_type_internal.cpp # Internal class for the same
+  generic_type_internal.hpp                             # Internal class for the same
   options_functionality.cpp   options_functionality.hpp # Functionality for getting and setting options of a derived class
   stl_vector_tools.hpp        stl_vector_tools.cpp      # Set of useful functions for the vector template class in STL
 
