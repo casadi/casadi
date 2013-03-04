@@ -94,9 +94,11 @@ void SparseSparseOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, co
         if(nz1) a[1][1] = input1[el1];
         
         // Evaluate and get partial derivatives
-        casadi_math<double>::fun(op_,a[0][nz0], a[1][nz1],output0[el]);
-        casadi_math<double>::der(op_,a[0][nz0], a[1][nz1],output0[el],pd[1]);
-        
+	double f;
+        casadi_math<double>::fun(op_,a[0][nz0], a[1][nz1],f);
+        casadi_math<double>::der(op_,a[0][nz0], a[1][nz1],f,pd[1]);
+        output0[el] = f;
+
         // Propagate forward seeds
         for(int d=0; d<nfwd; ++d){
           double s = 0;
@@ -151,8 +153,11 @@ void SparseSparseOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output,
 
 void BinaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   // Evaluate function
-  if(!output_given){
-    casadi_math<MX>::fun(op_,*input[0],*input[1],*output[0]);
+  MX f; // Function value
+  if(output_given){
+    f = *output[0];
+  } else {
+    casadi_math<MX>::fun(op_,*input[0],*input[1],f);
   }
 
   // Number of forward directions
@@ -161,7 +166,7 @@ void BinaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fw
   if(nfwd>0 || nadj>0){
     // Get partial derivatives
     MX pd[2];
-    casadi_math<MX>::der(op_,*input[0],*input[1],*output[0],pd);
+    casadi_math<MX>::der(op_,*input[0],*input[1],f,pd);
     
     // Propagate forward seeds
     for(int d=0; d<nfwd; ++d){
@@ -172,9 +177,15 @@ void BinaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fw
     for(int d=0; d<nadj; ++d){
       MX s = *adjSeed[d][0];
       *adjSeed[d][0] = MX();
-      *adjSens[d][0] += pd[0]*s;
-      *adjSens[d][1] += pd[1]*s;
+      for(int c=0; c<2; ++c){
+	//	if(adjSens[d][c]->isNull()) *adjSens[d][c] = MX::sparse(dep(c).size1(),dep(c).size2());
+	*adjSens[d][c] += pd[c]*s;
+      }
     }
+  }
+
+  if(!output_given){
+    *output[0] = f;
   }
 }
 
@@ -198,13 +209,14 @@ void NonzerosScalarOp::evaluateGen(const MatV& input, MatV& output, const MatVV&
     }
   } else {
 
-    // Partial derivatives
-    T pd[2];
+    // Function and partial derivatives
+    T f,pd[2];
 
     for(int el=0; el<input0.size(); ++el){
-      casadi_math<T>::fun(op_,input0[el],input1[0],output0[el]);
-      casadi_math<T>::der(op_,input0[el],input1[0],output0[el],pd);
-      
+      casadi_math<T>::fun(op_,input0[el],input1[0],f);
+      casadi_math<T>::der(op_,input0[el],input1[0],f,pd);
+      output0[el] = f;
+
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
         fwdSens[d][0]->data()[el] = pd[0]*fwdSeed[d][0]->data()[el] + pd[1]*fwdSeed[d][1]->data()[0];
@@ -249,12 +261,14 @@ void ScalarNonzerosOp::evaluateGen(const MatV& input, MatV& output, const MatVV&
     }
   } else {
 
-    // Partial derivatives
-    T pd[2];
+    // Function and partial derivatives
+    T f,pd[2];
 
-    for(int el=0; el<input1.size(); ++el){
-      casadi_math<T>::fun(op_,input0[0],input1[el],output0[el]);
-      casadi_math<T>::der(op_,input0[0],input1[el],output0[el],pd);
+    for(int el=0; el<input1.size(); ++el){      
+      casadi_math<T>::fun(op_,input0[0],input1[el],f);
+      casadi_math<T>::der(op_,input0[0],input1[el],f,pd);
+      output0[el] = f;
+
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
         fwdSens[d][0]->data()[el] = pd[0]*fwdSeed[d][0]->data()[0] + pd[1]*fwdSeed[d][1]->data()[el];
@@ -300,13 +314,14 @@ void NonzerosNonzerosOp::evaluateGen(const MatV& input, MatV& output, const MatV
     }
   } else {
 
-    // Partial derivatives
-    T pd[2];
+    // Function and partial derivatives
+    T f,pd[2];
 
     for(int el=0; el<input0.size(); ++el){
-      casadi_math<T>::fun(op_,input0[el],input1[el],output0[el]);
-      casadi_math<T>::der(op_,input0[el],input1[el],output0[el],pd);
-      
+      casadi_math<T>::fun(op_,input0[el],input1[el],f);
+      casadi_math<T>::der(op_,input0[el],input1[el],f,pd);
+      output0[el] = f;
+
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
         fwdSens[d][0]->data()[el] = pd[0]*fwdSeed[d][0]->data()[el] + pd[1]*fwdSeed[d][1]->data()[el];
@@ -340,7 +355,7 @@ void NonzerosNonzerosOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& outp
       outputd[el] = input0[el] | input1[el];
     } else {
       bvec_t s = outputd[el];
-      outputd[el] = 0;
+      outputd[el] = bvec_t(0);
       input0[el] |= s;
       input1[el] |= s;
     }
@@ -356,7 +371,7 @@ void NonzerosScalarOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output
       outputd[el] = input0[el] | input1[0];
     } else {
       bvec_t s = outputd[el];
-      outputd[el] = 0;
+      outputd[el] = bvec_t(0);
       input0[el] |= s;
       input1[0]  |= s;
     }
@@ -372,7 +387,7 @@ void ScalarNonzerosOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output
       outputd[el] = input0[0] | input1[el];
     } else {
       bvec_t s = outputd[el];
-      outputd[el] = 0;
+      outputd[el] = bvec_t(0);
       input0[0]  |= s;
       input1[el] |= s;
     }
@@ -404,7 +419,7 @@ void SparseSparseOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, 
         outputd[el++] = (nz0 ? input0[el0] : zero) | (nz1 ? input1[el1] : zero);
       } else {
 	bvec_t s = outputd[el];
-	outputd[el++] = 0;
+	outputd[el++] = zero;
         if(nz0) input0[el0] |= s;
         if(nz1) input1[el1] |= s;
       }

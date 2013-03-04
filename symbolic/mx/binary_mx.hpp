@@ -50,6 +50,9 @@ class BinaryMX : public MXNode{
     /** \brief  Evaluate the function symbolically (SX) */
     //virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    virtual bool allowInplace() const{ return true;}
+
     //! \brief Operation
     Operation op_;
     
@@ -172,7 +175,6 @@ class NonzerosNonzerosOp : public BinaryMX{
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-
 };
 
 
