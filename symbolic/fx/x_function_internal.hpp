@@ -1017,7 +1017,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   cfile << "}" << std::endl << std::endl;
   
   // Create a main for debugging and profiling: TODO: Cleanup and expose to user, see #617
-  if(false){
+  if(true){
     int n_in = getNumInputs();
     int n_out = getNumOutputs();
 
@@ -1099,73 +1099,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
   // Finalize the function
   stream << "}" << std::endl;
   stream << std::endl;
-
-  // Also generate a buffered function
-  stream << "void " << fname << "_buffered(";
-  
-  // Declare inputs with sparsities
-  for(int i=0; i<n_in; ++i){
-    stream << input_type << " x" << i;
-    stream << ", const int* s_x" << i;
-    if(i+1<n_in+n_out)
-      stream << ",";
-  }
-
-  // Declare outputs
-  for(int i=0; i<n_out; ++i){
-    stream << output_type << " r" << i;
-    stream << ", const int* s_r" << i;
-    if(i+1<n_out)
-      stream << ",";
-  }
-  stream << "){ " << std::endl;
-  
-  // Declare input buffers
-  for(int i=0; i<n_in; ++i){
-    stream << "  d t_x" << i << "[" << input(i).sparsity().size() << "];" << std::endl;
-  }
-
-  // Declare output buffers
-  for(int i=0; i<n_out; ++i){
-    stream << "  d t_r" << i << "[" << output(i).sparsity().size() << "];" << std::endl;
-  }
-  
-  // Codegen "copy sparse"
-  gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
-
-  // Copy inputs to buffers
-  for(int i=0; i<n_in; ++i){
-    stream << "  if(x" << i << "!=0) casadi_copy_sparse(x" << i << ",s_x" << i << ",t_x" << i << ",s" << gen.addSparsity(input(i).sparsity()) << ");" << std::endl;
-  }
-
-  // Pass inputs
-  stream << "  " << fname << "(";
-  for(int i=0; i<n_in; ++i){
-    stream << "t_x" << i;
-    if(i+1<n_in+n_out)
-      stream << ",";
-  }
-
-  // Pass output buffers
-  for(int i=0; i<n_out; ++i){
-    stream << "t_r" << i;
-    if(i+1<n_out)
-      stream << ",";
-  }
-  stream << "); " << std::endl;
-
-  // Get result from output buffers
-  for(int i=0; i<n_out; ++i){
-    stream << "  if(r" << i << "!=0) casadi_copy_sparse(t_r" << i << ",s" << gen.addSparsity(output(i).sparsity()) << ",r" << i << ",s_r" << i << ");" << std::endl;
-  }
-
-  // Finalize the function
-  stream << "}" << std::endl;
-  stream << std::endl;
 }
-
-
-
 
 
 
