@@ -24,6 +24,10 @@
 // for example vertcat(SXMatrixVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303
 
+// Incude cmath early on, see #622
+%begin %{
+#include <cmath>
+%}
 
 #ifdef SWIGPYTHON
 %pythoncode %{
