@@ -32,450 +32,456 @@
 
 namespace CasADi{
 
-/** \brief  Structure that contains the numerical values for the inputs or outputs of a function
-  \author Joel Andersson 
-  \date 2010-2011
-*/
-struct FunctionIO{
+  /** \brief  Structure that contains the numerical values for the inputs or outputs of a function
+      \author Joel Andersson 
+      \date 2010-2011
+  */
+  struct FunctionIO{    
     /// Input/output data
     Matrix<double> data;
-    
+  
     /// Forward derivative data
     std::vector< Matrix<double> > dataF;
     
     /// Adjoint derivative data
     std::vector< Matrix<double> > dataA;
-};
-  
-/** Forward declaration of internal class */
-class FXInternal;
 
-/** \brief General function
+    /// Temporary marker (initialized to zero)
+    int tmp;
 
-  A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
-  Number of inputs:  nin    getNumInputs()\n
-  Number of outputs: nout   getNumOutputs()\n
+    // Constructor
+    FunctionIO() : tmp(0){}
+  };
   
-  We can view this function as a being composed of a (nin, nout) grid of single-input, single-output primitive functions.\n
-  Each such primitive function \f$f_{i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$, 
-  in which n,m,p,q can take different values for every (i,j) pair.\n
+  /** Forward declaration of internal class */
+  class FXInternal;
+
+  /** \brief General function
+
+      A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
+      Number of inputs:  nin    getNumInputs()\n
+      Number of outputs: nout   getNumOutputs()\n
   
-  When passing input, you specify which partition i is active.     You pass the numbers flattened, as a vector of size \f$(n*m)\f$.\n
-  When requesting output, you specify which partition j is active. You get the numbers flattened, as a vector of size \f$(p*q)\f$.\n
+      We can view this function as a being composed of a (nin, nout) grid of single-input, single-output primitive functions.\n
+      Each such primitive function \f$f_{i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$, 
+      in which n,m,p,q can take different values for every (i,j) pair.\n
   
-  To calculate jacobians, you need to have \f$(m=1,q=1)\f$.
+      When passing input, you specify which partition i is active.     You pass the numbers flattened, as a vector of size \f$(n*m)\f$.\n
+      When requesting output, you specify which partition j is active. You get the numbers flattened, as a vector of size \f$(p*q)\f$.\n
   
-  Write the jacobian as \f$J_{i,j} = \nabla f_{i,j} = \frac{\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
+      To calculate jacobians, you need to have \f$(m=1,q=1)\f$.
   
-  Using \f$\vec{v} \in \mathbf{R}^n\f$ as a forward seed:  setFwdSeed(v,i)\n
-  Retrieving \f$\vec{s}_f \in \mathbf{R}^p\f$ from:        getFwdSens(sf,j)\n
+      Write the jacobian as \f$J_{i,j} = \nabla f_{i,j} = \frac{\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
   
-  Using \f$\vec{w} \in \mathbf{R}^p\f$ as a forward seed:  setAdjSeed(w,j)\n
-  Retrieving \f$\vec{s}_a \in \mathbf{R}^n \f$ from:        getAdjSens(sa,i)\n
+      Using \f$\vec{v} \in \mathbf{R}^n\f$ as a forward seed:  setFwdSeed(v,i)\n
+      Retrieving \f$\vec{s}_f \in \mathbf{R}^p\f$ from:        getFwdSens(sf,j)\n
   
-  We have the following relationships for function mapping from a column vector to a column vector:
+      Using \f$\vec{w} \in \mathbf{R}^p\f$ as a forward seed:  setAdjSeed(w,j)\n
+      Retrieving \f$\vec{s}_a \in \mathbf{R}^n \f$ from:        getAdjSens(sa,i)\n
   
-  \f$ \vec{s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
-  \f$ \vec{s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
+      We have the following relationships for function mapping from a column vector to a column vector:
   
-  Some quantities is these formulas must be transposed: \n 
-    input  row: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
-    output row: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
+      \f$ \vec{s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
+      \f$ \vec{s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
+  
+      Some quantities is these formulas must be transposed: \n 
+      input  row: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
+      output row: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
     
-  NOTE: FX's are allowed to modify their input arguments when evaluating: implicitFunction, IDAS solver
-    Futher releases may disallow this.
+      NOTE: FX's are allowed to modify their input arguments when evaluating: implicitFunction, IDAS solver
+      Futher releases may disallow this.
     
-  \section Notes for developers
+      \section Notes for developers
   
-  Each function consists of 4 files:\n
-  1. public class header file: imported in python\n
-  2. public class implementation\n
-  3. internal class header file: should only be used by derived classes\n
-  4. internal class implementation\n
+      Each function consists of 4 files:\n
+      1. public class header file: imported in python\n
+      2. public class implementation\n
+      3. internal class header file: should only be used by derived classes\n
+      4. internal class implementation\n
   
-  python and c++ should be 1-to-1\n
-  There should be no extra features in 1.\n
-  All the functionality should exist in 1.\n
-  If it means that c++ will be more "pythonic", so be it.
+      python and c++ should be 1-to-1\n
+      There should be no extra features in 1.\n
+      All the functionality should exist in 1.\n
+      If it means that c++ will be more "pythonic", so be it.
   
-  \author Joel Andersson 
-  \date 2010
-*/
-class FX : public OptionsFunctionality{
+      \author Joel Andersson 
+      \date 2010
+  */
+  class FX : public OptionsFunctionality{
 
   public:
-  /** \brief  default constructor */
-  FX(); 
+    /** \brief  default constructor */
+    FX(); 
 
-  /** \brief  Destructor */
-  ~FX();
+    /** \brief  Destructor */
+    ~FX();
 
 #ifndef SWIG
-  /** \brief  Create from node */
-  static FX create(FXInternal* node);
+    /** \brief  Create from node */
+    static FX create(FXInternal* node);
 #endif // SWIG
   
-  /** \brief  Get number of inputs */
-  int getNumInputs() const;
+    /** \brief  Get number of inputs */
+    int getNumInputs() const;
 
-  /** \brief  Get number of outputs */
-  int getNumOutputs() const;
+    /** \brief  Get number of outputs */
+    int getNumOutputs() const;
   
-  /** \brief  Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs) */
-  int getNumScalarInputs() const;
+    /** \brief  Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs) */
+    int getNumScalarInputs() const;
 
-  /** \brief  Get total number of scalar outputs (i.e. the number of nonzeros in all of the matrix-valued outputs) */
-  int getNumScalarOutputs() const;
+    /** \brief  Get total number of scalar outputs (i.e. the number of nonzeros in all of the matrix-valued outputs) */
+    int getNumScalarOutputs() const;
   
-  /** \brief  Set number of inputs (normally invoked internally) */
-  void setNumInputs(int num_in);
+    /** \brief  Set number of inputs (normally invoked internally) */
+    void setNumInputs(int num_in);
 
-  /** \brief  Set number of outputs  (normally invoked internally) */
-  void setNumOutputs(int num_out);
+    /** \brief  Set number of outputs  (normally invoked internally) */
+    void setNumOutputs(int num_out);
   
-  /** \brief Set input scheme */
-  void setInputScheme(CasADi::InputOutputScheme scheme);
+    /** \brief Set input scheme */
+    void setInputScheme(CasADi::InputOutputScheme scheme);
 
-  /** \brief Set output scheme */
-  void setOutputScheme(CasADi::InputOutputScheme scheme);
+    /** \brief Set output scheme */
+    void setOutputScheme(CasADi::InputOutputScheme scheme);
 
-  /** \brief Get input scheme */
-  CasADi::InputOutputScheme getInputScheme() const;
+    /** \brief Get input scheme */
+    CasADi::InputOutputScheme getInputScheme() const;
 
-  /** \brief Get output scheme */
-  CasADi::InputOutputScheme getOutputScheme() const;
+    /** \brief Get output scheme */
+    CasADi::InputOutputScheme getOutputScheme() const;
     
-  /** \brief  Update the number of sensitivity directions during or after initialization (normally invoked internally) */
-  void updateNumSens();
+    /** \brief  Update the number of sensitivity directions during or after initialization (normally invoked internally) */
+    void updateNumSens();
   
-  /** \brief Request a number of forward/adjoint derivative directions 
-      This function tries to increase the number of directional derivatives allocated for the function
-      so that the the number at least amounts to "nfwd" and "nadj" for forward and adjoint mode derivatives
-      respectively. The allocated number is never decreased and never increased beyond the number set by 
-      the option "max_number_of_fwd_dir" and "max_number_of_adj_dir".
+    /** \brief Request a number of forward/adjoint derivative directions 
+	This function tries to increase the number of directional derivatives allocated for the function
+	so that the the number at least amounts to "nfwd" and "nadj" for forward and adjoint mode derivatives
+	respectively. The allocated number is never decreased and never increased beyond the number set by 
+	the option "max_number_of_fwd_dir" and "max_number_of_adj_dir".
       
-      If the number was changed during the call, updateNumSens() is automatically invoked.
-   */
-  void requestNumSens(int nfwd, int nadj);
+	If the number was changed during the call, updateNumSens() is automatically invoked.
+    */
+    void requestNumSens(int nfwd, int nadj);
   
-  /** \brief Get the number of allocated forward directional derivatives */
-  int numAllocFwd() const;
+    /** \brief Get the number of allocated forward directional derivatives */
+    int numAllocFwd() const;
 
-  /** \brief Get the number of allocated adjoint directional derivatives */
-  int numAllocAdj() const;
+    /** \brief Get the number of allocated adjoint directional derivatives */
+    int numAllocAdj() const;
 
-  /** \brief  Evaluate */
-  void evaluate(int nfdir=0, int nadir=0);
+    /** \brief  Evaluate */
+    void evaluate(int nfdir=0, int nadir=0);
   
-  /** \brief  Evaluate with directional derivative compression */
-  void evaluateCompressed(int nfdir=0, int nadir=0);
+    /** \brief  Evaluate with directional derivative compression */
+    void evaluateCompressed(int nfdir=0, int nadir=0);
   
-  /// the same as evaluate(0,0)
-  void solve();
+    /// the same as evaluate(0,0)
+    void solve();
     
-  /** \brief Generate a Jacobian function of output oind with respect to input iind
-  * \param iind The index of the input
-  * \param oind The index of the output
-  *
-  * The default behavior of this class is defined by the derived class.
-  * If compact is set to true, only the nonzeros of the input and output expressions are considered.
-  * If symmetric is set to true, the Jacobian being calculated is known to be symmetric (usually a Hessian),
-  * which can be exploited by the algorithm.
-  * 
-  * The generated Jacobian has one more output than the calling function corresponding to the Jacobian and the same number of inputs.
-  * 
-  */
-  FX jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    /** \brief Generate a Jacobian function of output oind with respect to input iind
+     * \param iind The index of the input
+     * \param oind The index of the output
+     *
+     * The default behavior of this class is defined by the derived class.
+     * If compact is set to true, only the nonzeros of the input and output expressions are considered.
+     * If symmetric is set to true, the Jacobian being calculated is known to be symmetric (usually a Hessian),
+     * which can be exploited by the algorithm.
+     * 
+     * The generated Jacobian has one more output than the calling function corresponding to the Jacobian and the same number of inputs.
+     * 
+     */
+    FX jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
   
-  /** \brief Generate a gradient function of output oind with respect to input iind
-  * \param iind The index of the input
-  * \param oind The index of the output
-  *
-  * The default behavior of this class is defined by the derived class.
-  * Note that the output must be scalar. In other cases, use the Jacobian instead.
-  * 
-  */
-  FX gradient(int iind=0, int oind=0);
+    /** \brief Generate a gradient function of output oind with respect to input iind
+     * \param iind The index of the input
+     * \param oind The index of the output
+     *
+     * The default behavior of this class is defined by the derived class.
+     * Note that the output must be scalar. In other cases, use the Jacobian instead.
+     * 
+     */
+    FX gradient(int iind=0, int oind=0);
   
-  /** \brief Generate a Hessian function of output oind with respect to input iind 
-  * \param iind The index of the input
-  * \param oind The index of the output
-  *
-  * The generated Hessian has two more outputs than the calling function corresponding to the Hessian
-  * and the gradients.
-  * 
-  */
-  FX hessian(int iind=0, int oind=0);
+    /** \brief Generate a Hessian function of output oind with respect to input iind 
+     * \param iind The index of the input
+     * \param oind The index of the output
+     *
+     * The generated Hessian has two more outputs than the calling function corresponding to the Hessian
+     * and the gradients.
+     * 
+     */
+    FX hessian(int iind=0, int oind=0);
 
-  /** \brief Generate a Jacobian function of all the inputs nonzeros (getNumScalarInputs()) with respect to all the output nonzeros (getNumScalarOutputs()).
-  */
-  FX fullJacobian();
+    /** \brief Generate a Jacobian function of all the inputs nonzeros (getNumScalarInputs()) with respect to all the output nonzeros (getNumScalarOutputs()).
+     */
+    FX fullJacobian();
 
 #ifndef SWIG
-  /** \brief  Create a function call (single input) */
-  std::vector<MX> call(const MX &arg);
+    /** \brief  Create a function call (single input) */
+    std::vector<MX> call(const MX &arg);
 #endif // SWIG
   
-  /** \brief  Create a function call (MX graph) */
-  std::vector<MX> call(const std::vector<MX> &arg);
+    /** \brief  Create a function call (MX graph) */
+    std::vector<MX> call(const std::vector<MX> &arg);
 
-  /** \brief  Create a function call with directional derivatives 
-   * Note: return by reference with SWIG
-   */
-  #ifndef SWIG
-  void call(const MXVector& arg, MXVector& res, 
-	    const MXVectorVector& fseed, MXVectorVector& fsens, 
-	    const MXVectorVector& aseed, MXVectorVector& asens,
-	    bool output_given=false);
-  #else // SWIG
-  void call(const MXVector& arg, MXVector& OUTPUT, 
-	    const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
-	    const MXVectorVector& aseed, MXVectorVector& OUTPUT,
-	    bool output_given=false);
-  #endif // SWIG
+    /** \brief  Create a function call with directional derivatives 
+     * Note: return by reference with SWIG
+     */
+#ifndef SWIG
+    void call(const MXVector& arg, MXVector& res, 
+	      const MXVectorVector& fseed, MXVectorVector& fsens, 
+	      const MXVectorVector& aseed, MXVectorVector& asens,
+	      bool output_given=false);
+#else // SWIG
+    void call(const MXVector& arg, MXVector& OUTPUT, 
+	      const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
+	      const MXVectorVector& aseed, MXVectorVector& OUTPUT,
+	      bool output_given=false);
+#endif // SWIG
   
-  /** \brief  Evaluate symbolically in parallel (matrix graph)
-      paropt: Set of options to be passed to the Parallelizer
-  */
-  std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
+    /** \brief  Evaluate symbolically in parallel (matrix graph)
+	paropt: Set of options to be passed to the Parallelizer
+    */
+    std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
 
   
-  /// evaluate symbolically, SX type (overloaded)
-  std::vector<SXMatrix> eval(const std::vector<SXMatrix>& arg){ return evalSX(arg);}
+    /// evaluate symbolically, SX type (overloaded)
+    std::vector<SXMatrix> eval(const std::vector<SXMatrix>& arg){ return evalSX(arg);}
 
-  /// evaluate symbolically, MX type (overloaded)
-  std::vector<MX> eval(const std::vector<MX>& arg){return evalMX(arg);}
+    /// evaluate symbolically, MX type (overloaded)
+    std::vector<MX> eval(const std::vector<MX>& arg){return evalMX(arg);}
   
-  /// evaluate symbolically, MX type (unambiguous)
-  std::vector<MX> evalMX(const std::vector<MX>& arg);
+    /// evaluate symbolically, MX type (unambiguous)
+    std::vector<MX> evalMX(const std::vector<MX>& arg);
 
-  /// evaluate symbolically, SX type (unambiguous)
-  std::vector<SXMatrix> evalSX(const std::vector<SXMatrix>& arg);
+    /// evaluate symbolically, SX type (unambiguous)
+    std::vector<SXMatrix> evalSX(const std::vector<SXMatrix>& arg);
   
-  /** \brief Evaluate symbolically with with directional derivatives, SX type
-   * The first two arguments are the nondifferentiated inputs and results of the evaluation,
-   * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
-   * the length of the vector being the number of forward directions.
-   * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
-   * the length of the vector being the number of adjoint directions.
-   * The boolean argument allows the second argument to the functions to be used as an input instead of output,
-   * assuming it is already known.
-   */
-  void evalSX(const SXMatrixVector& arg, SXMatrixVector& res, 
+    /** \brief Evaluate symbolically with with directional derivatives, SX type
+     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
+     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
+     * the length of the vector being the number of forward directions.
+     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
+     * the length of the vector being the number of adjoint directions.
+     * The boolean argument allows the second argument to the functions to be used as an input instead of output,
+     * assuming it is already known.
+     */
+    void evalSX(const SXMatrixVector& arg, SXMatrixVector& res, 
+		const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
+		const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens,
+		bool output_given=false);
+
+    /** \brief Evaluate symbolically with with directional derivatives, MX type
+     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
+     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
+     * the length of the vector being the number of forward directions.
+     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
+     * the length of the vector being the number of adjoint directions.
+     * The boolean argument allows the second argument to the functions to be used as an input instead of output,
+     * assuming it is already known.
+     */
+    void evalMX(const MXVector& arg, MXVector& res, 
+		const MXVectorVector& fseed, MXVectorVector& fsens, 
+		const MXVectorVector& aseed, MXVectorVector& asens,
+		bool output_given=false);
+                        
+    /** \brief Evaluate symbolically with with directional derivatives, SX type, overloaded
+     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
+     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
+     * the length of the vector being the number of forward directions.
+     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
+     * the length of the vector being the number of adjoint directions.
+     * The boolean argument allows the second argument to the functions to be used as an input instead of output,
+     * assuming it is already known.
+     */
+    void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& res, 
 	      const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
 	      const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens,
 	      bool output_given=false);
 
-  /** \brief Evaluate symbolically with with directional derivatives, MX type
-   * The first two arguments are the nondifferentiated inputs and results of the evaluation,
-   * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
-   * the length of the vector being the number of forward directions.
-   * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
-   * the length of the vector being the number of adjoint directions.
-   * The boolean argument allows the second argument to the functions to be used as an input instead of output,
-   * assuming it is already known.
-   */
-  void evalMX(const MXVector& arg, MXVector& res, 
+    /** \brief Evaluate symbolically with with directional derivatives, MX type, overloaded
+     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
+     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
+     * the length of the vector being the number of forward directions.
+     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
+     * the length of the vector being the number of adjoint directions.
+     * The boolean argument allows the second argument to the functions to be used as an input instead of output,
+     * assuming it is already known.
+     */
+    void eval(const MXVector& arg, MXVector& res, 
 	      const MXVectorVector& fseed, MXVectorVector& fsens, 
 	      const MXVectorVector& aseed, MXVectorVector& asens,
 	      bool output_given=false);
-                        
-  /** \brief Evaluate symbolically with with directional derivatives, SX type, overloaded
-   * The first two arguments are the nondifferentiated inputs and results of the evaluation,
-   * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
-   * the length of the vector being the number of forward directions.
-   * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
-   * the length of the vector being the number of adjoint directions.
-   * The boolean argument allows the second argument to the functions to be used as an input instead of output,
-   * assuming it is already known.
-   */
-  void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& res, 
-	    const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
-	    const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens,
-	    bool output_given=false);
-
-  /** \brief Evaluate symbolically with with directional derivatives, MX type, overloaded
-   * The first two arguments are the nondifferentiated inputs and results of the evaluation,
-   * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
-   * the length of the vector being the number of forward directions.
-   * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
-   * the length of the vector being the number of adjoint directions.
-   * The boolean argument allows the second argument to the functions to be used as an input instead of output,
-   * assuming it is already known.
-   */
-  void eval(const MXVector& arg, MXVector& res, 
-	    const MXVectorVector& fseed, MXVectorVector& fsens, 
-	    const MXVectorVector& aseed, MXVectorVector& asens,
-	    bool output_given=false);
   
 #ifndef SWIG
-  /// evaluate symbolically, single input, single output 
-  SXMatrix eval(const SXMatrix& arg){ return eval(std::vector<SXMatrix>(1,arg)).at(0);}
+    /// evaluate symbolically, single input, single output 
+    SXMatrix eval(const SXMatrix& arg){ return eval(std::vector<SXMatrix>(1,arg)).at(0);}
 #endif // SWIG
   
-  /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
-   * 	Returns a function with (1+nfwd)*n_in+nadj*n_out inputs
-   * 	and (1+nfwd)*n_out + nadj*n_in outputs.
-   * 	The first n_in inputs corresponds to nondifferentiated inputs. The next nfwd*n_in inputs
-   * 	corresponds to forward seeds, one direction at a time and the last nadj*n_out inputs
-   * 	corresponds to adjoint seeds, one direction at a time.
-   * 	The first n_out outputs corresponds to nondifferentiated outputs. The next nfwd*n_out outputs
-   * 	corresponds to forward sensitivities, one direction at a time and the last nadj*n_in outputs
-   * 	corresponds to  adjoint sensitivties, one direction at a time.
-   *
-   * 	(n_in = getNumInputs(), n_out = getNumOutputs())
-   *
-   *	The functions returned are cached, meaning that if called multiple timed with the same value,
-   *	then multiple references to the same function will be returned.
-   */
-  FX derivative(int nfwd, int nadj);
+    /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+     * 	Returns a function with (1+nfwd)*n_in+nadj*n_out inputs
+     * 	and (1+nfwd)*n_out + nadj*n_in outputs.
+     * 	The first n_in inputs corresponds to nondifferentiated inputs. The next nfwd*n_in inputs
+     * 	corresponds to forward seeds, one direction at a time and the last nadj*n_out inputs
+     * 	corresponds to adjoint seeds, one direction at a time.
+     * 	The first n_out outputs corresponds to nondifferentiated outputs. The next nfwd*n_out outputs
+     * 	corresponds to forward sensitivities, one direction at a time and the last nadj*n_in outputs
+     * 	corresponds to  adjoint sensitivties, one direction at a time.
+     *
+     * 	(n_in = getNumInputs(), n_out = getNumOutputs())
+     *
+     *	The functions returned are cached, meaning that if called multiple timed with the same value,
+     *	then multiple references to the same function will be returned.
+     */
+    FX derivative(int nfwd, int nadj);
 
-  /// Get, if necessary generate, the sparsity of a Jacobian block
-  CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    /// Get, if necessary generate, the sparsity of a Jacobian block
+    CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
 
-  /// Generate the sparsity of a Jacobian block
-  void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact=false);
+    /// Generate the sparsity of a Jacobian block
+    void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact=false);
 
-  /** \brief Export / Generate C code for the function */
-  void generateCode(const std::string& filename);
+    /** \brief Export / Generate C code for the function */
+    void generateCode(const std::string& filename);
   
 #ifndef SWIG 
-  /// Construct a function that has only the k'th output
-  FX operator[](int k) const;
+    /// Construct a function that has only the k'th output
+    FX operator[](int k) const;
 #endif //SWIG 
 
-  FX indexed_one_based(int k) const{ return operator[](k-1);}
-  FX indexed_zero_based(int k) const{ return operator[](k);}
+    FX indexed_one_based(int k) const{ return operator[](k-1);}
+    FX indexed_zero_based(int k) const{ return operator[](k);}
   
-  /** \brief  Access functions of the node */
-  FXInternal* operator->();
+    /** \brief  Access functions of the node */
+    FXInternal* operator->();
 
-  /** \brief  Const access functions of the node */
-  const FXInternal* operator->() const;
+    /** \brief  Const access functions of the node */
+    const FXInternal* operator->() const;
 
-  /// Check if the node is pointing to the right type of object
-  virtual bool checkNode() const;
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
   
-  /// Const access input argument
-  const Matrix<double>& input(int iind=0) const;
+    /// Const access input argument
+    const Matrix<double>& input(int iind=0) const;
 
-  /// Const access input argument
-  const Matrix<double>& input(const std::string &iname) const;
+    /// Const access input argument
+    const Matrix<double>& input(const std::string &iname) const;
 
-  /// Const access input argument
-  const Matrix<double>& output(int oind=0) const;
+    /// Const access input argument
+    const Matrix<double>& output(int oind=0) const;
 
-  /// Const access forward seed
-  const Matrix<double>& fwdSeed(int iind=0, int dir=0) const;
+    /// Const access forward seed
+    const Matrix<double>& fwdSeed(int iind=0, int dir=0) const;
 
-  /// Const access forward sensitivity
-  const Matrix<double>& fwdSens(int oind=0, int dir=0) const;
+    /// Const access forward sensitivity
+    const Matrix<double>& fwdSens(int oind=0, int dir=0) const;
   
-  /// Const access adjoint seed
-  const Matrix<double>& adjSeed(int oind=0, int dir=0) const;
+    /// Const access adjoint seed
+    const Matrix<double>& adjSeed(int oind=0, int dir=0) const;
 
-  /// Const access forward sensitivity
-  const Matrix<double>& adjSens(int iind=0, int dir=0) const;
+    /// Const access forward sensitivity
+    const Matrix<double>& adjSens(int iind=0, int dir=0) const;
 
 #ifdef SWIG
-  // Rename the following functions in Python to avoid creating objects which can change the internal data of the FX class by mistake
-  %rename(inputRef) input;
-  %rename(outputRef) output;
-  %rename(fwdSeedRef) fwdSeed;
-  %rename(fwdSensRef) fwdSens;
-  %rename(adjSeedRef) adjSeed;
-  %rename(adjSensRef) adjSens;
+    // Rename the following functions in Python to avoid creating objects which can change the internal data of the FX class by mistake
+    %rename(inputRef) input;
+    %rename(outputRef) output;
+    %rename(fwdSeedRef) fwdSeed;
+    %rename(fwdSensRef) fwdSens;
+    %rename(adjSeedRef) adjSeed;
+    %rename(adjSensRef) adjSens;
 #endif // SWIG
 
-  /// Access input argument
-  Matrix<double>& input(int iind=0);
+    /// Access input argument
+    Matrix<double>& input(int iind=0);
 
-  /// Access input argument
-  Matrix<double>& input(const std::string &iname);
+    /// Access input argument
+    Matrix<double>& input(const std::string &iname);
   
-  /** \brief Access output argument
-  Note that copies in Python are shallow by default and fx.output() gives a reference/pointer to an internal data structure. So if you want save fx.output(), you need to make a deep copy using for example DMatrix(fx.output()).
-  */
-  Matrix<double>& output(int oind=0);  
+    /** \brief Access output argument
+	Note that copies in Python are shallow by default and fx.output() gives a reference/pointer to an internal data structure. So if you want save fx.output(), you need to make a deep copy using for example DMatrix(fx.output()).
+    */
+    Matrix<double>& output(int oind=0);  
 
-  /// Access forward seed
-  Matrix<double>& fwdSeed(int iind=0, int dir=0);
+    /// Access forward seed
+    Matrix<double>& fwdSeed(int iind=0, int dir=0);
   
-  /// Access forward sensitivity
-  Matrix<double>& fwdSens(int oind=0, int dir=0);
+    /// Access forward sensitivity
+    Matrix<double>& fwdSens(int oind=0, int dir=0);
 
-  /// Access adjoint seed
-  Matrix<double>& adjSeed(int oind=0, int dir=0);
+    /// Access adjoint seed
+    Matrix<double>& adjSeed(int oind=0, int dir=0);
 
-  /// Access forward sensitivity
-  Matrix<double>& adjSens(int iind=0, int dir=0);
+    /// Access forward sensitivity
+    Matrix<double>& adjSens(int iind=0, int dir=0);
   
 
   
   
 #ifdef DOXYGENPROC
-//// \defgroup setter_getter_T
-//// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-/// Assumes a properly allocated val.\n
+    //// \defgroup setter_getter_T
+    //// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+    /// Assumes a properly allocated val.\n
 
-/// \name Setters
-/// Set/get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
-/// \copydoc setter_getter_T
-/// 
-/// @{
-/** 
-    \brief Reads in the input argument from val.
-    \copydoc setter_getter_T
-*/
-void setInput(T val, int ind=0) const;
-/** 
-    \brief Reads in the output argument from val.
-    \copydoc setter_getter_T
-*/
-void setOutput(T val, int ind=0) const;
-/** 
-    \brief Reads in the forward seed from val.
-    \copydoc setter_getter_T
-*/
-void setFwdSeed(T val,  int ind=0, int dir=0) const;
-/** 
-    \brief Reads in the forward sensitivity from val.
-*/
-void setFwdSens(T val, int ind=0, int dir=0) const ;
-/** 
-    \brief Reads in the adjoint seed from val.
-    \copydoc setter_getter_T
-*/
-void setAdjSeed(T val,  int ind=0, int dir=0) const;
-/** 
-    \brief Reads in the adjoint sensitivity from val.
-    \copydoc setter_getter_T
-*/
-void setAdjSens(T val, int ind=0, int dir=0) const ;
-/// @}
+    /// \name Setters
+    /// Set/get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
+    /// \copydoc setter_getter_T
+    /// 
+    /// @{
+    /** 
+	\brief Reads in the input argument from val.
+	\copydoc setter_getter_T
+    */
+    void setInput(T val, int ind=0) const;
+    /** 
+	\brief Reads in the output argument from val.
+	\copydoc setter_getter_T
+    */
+    void setOutput(T val, int ind=0) const;
+    /** 
+	\brief Reads in the forward seed from val.
+	\copydoc setter_getter_T
+    */
+    void setFwdSeed(T val,  int ind=0, int dir=0) const;
+    /** 
+	\brief Reads in the forward sensitivity from val.
+    */
+    void setFwdSens(T val, int ind=0, int dir=0) const ;
+    /** 
+	\brief Reads in the adjoint seed from val.
+	\copydoc setter_getter_T
+    */
+    void setAdjSeed(T val,  int ind=0, int dir=0) const;
+    /** 
+	\brief Reads in the adjoint sensitivity from val.
+	\copydoc setter_getter_T
+    */
+    void setAdjSens(T val, int ind=0, int dir=0) const ;
+    /// @}
 
 #endif
 
-#define SETTERS(T)\
-  void setInput(T val, int ind=0)             { assertInit(); input(ind).set(val);  } \
-  void setOutput(T val, int ind=0)            { assertInit(); output(ind).set(val); } \
-  void setFwdSeed(T val, int ind=0, int dir=0){ assertInit(); fwdSeed(ind,dir).set(val); } \
-  void setFwdSens(T val, int ind=0, int dir=0){ assertInit(); fwdSens(ind,dir).set(val); } \
-  void setAdjSeed(T val, int ind=0, int dir=0){ assertInit(); adjSeed(ind,dir).set(val); } \
-  void setAdjSens(T val, int ind=0, int dir=0){ assertInit(); adjSens(ind,dir).set(val); }
+#define SETTERS(T)							\
+    void setInput(T val, int ind=0)             { assertInit(); input(ind).set(val);  } \
+    void setOutput(T val, int ind=0)            { assertInit(); output(ind).set(val); } \
+    void setFwdSeed(T val, int ind=0, int dir=0){ assertInit(); fwdSeed(ind,dir).set(val); } \
+    void setFwdSens(T val, int ind=0, int dir=0){ assertInit(); fwdSens(ind,dir).set(val); } \
+    void setAdjSeed(T val, int ind=0, int dir=0){ assertInit(); adjSeed(ind,dir).set(val); } \
+    void setAdjSens(T val, int ind=0, int dir=0){ assertInit(); adjSens(ind,dir).set(val); }
 
 #ifndef DOXYGENPROC
-SETTERS(double);
+    SETTERS(double);
 #ifndef SWIG
-SETTERS(const double*);
+    SETTERS(const double*);
 #endif // SWIG
-SETTERS(const std::vector<double>&);
-SETTERS(const Matrix<double>&);
+    SETTERS(const std::vector<double>&);
+    SETTERS(const Matrix<double>&);
 #endif // DOXYGENPROC
 
 #undef SETTERS
 
-#define GETTERS(T)\
+#define GETTERS(T)							\
     void getInput(T val, int ind=0) const             { assertInit(); input(ind).get(val);} \
     void getOutput(T val, int ind=0) const            { assertInit(); output(ind).get(val);} \
     void getFwdSeed(T val, int ind=0, int dir=0) const{ assertInit(); fwdSeed(ind,dir).get(val);} \
@@ -484,90 +490,90 @@ SETTERS(const Matrix<double>&);
     void getAdjSens(T val, int ind=0, int dir=0) const{ assertInit(); adjSens(ind,dir).get(val);}
 
 #ifndef DOXYGENPROC
-GETTERS(double&);
+    GETTERS(double&);
 #ifndef SWIG
-GETTERS(double*);
+    GETTERS(double*);
 #endif // SWIG
-GETTERS(std::vector<double>&);
-GETTERS(Matrix<double>&);
+    GETTERS(std::vector<double>&);
+    GETTERS(Matrix<double>&);
 #endif // DOXYGENPROC
 #undef GETTERS
 
 #ifdef DOXYGENPROC
-/// \name Getters
-/// A group of accessor for numerical data that operate on preallocated data.\n
-/// get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
-/// \copydoc setter_getter_T
-/// @{
+    /// \name Getters
+    /// A group of accessor for numerical data that operate on preallocated data.\n
+    /// get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
+    /// \copydoc setter_getter_T
+    /// @{
 
-/** \brief Writes out the input argument into val.
-    \copydoc setter_getter_T
-*/
-void getInput(T val, int ind=0) const;
+    /** \brief Writes out the input argument into val.
+	\copydoc setter_getter_T
+    */
+    void getInput(T val, int ind=0) const;
  
-/** 
-    \brief Writes out the output argument into val.
-    \copydoc setter_getter_T
-*/
-void getOutput(T val, int ind=0) const;
+    /** 
+	\brief Writes out the output argument into val.
+	\copydoc setter_getter_T
+    */
+    void getOutput(T val, int ind=0) const;
 
-/** 
-    \brief Writes out the forward seed into val.
-    \copydoc setter_getter_T
-*/
-void getFwdSeed(T val,  int ind=0, int dir=0) const;
+    /** 
+	\brief Writes out the forward seed into val.
+	\copydoc setter_getter_T
+    */
+    void getFwdSeed(T val,  int ind=0, int dir=0) const;
 
-/**  
-    \brief Writes out the forward sensitivity into val.
-    \copydoc setter_getter_T
-*/
-void getFwdSens(T val, int ind=0, int dir=0) const;
-/** 
-    \brief Writes out the adjoint seed into val.
-    \copydoc setter_getter_T
-*/
-void getAdjSeed(T val,  int ind=0, int dir=0) const ;
+    /**  
+	 \brief Writes out the forward sensitivity into val.
+	 \copydoc setter_getter_T
+    */
+    void getFwdSens(T val, int ind=0, int dir=0) const;
+    /** 
+	\brief Writes out the adjoint seed into val.
+	\copydoc setter_getter_T
+    */
+    void getAdjSeed(T val,  int ind=0, int dir=0) const ;
 
-/** 
-    \brief Writes out the adjoint sensitivity into val.
-    \copydoc setter_getter_T
-*/
-void getAdjSens(T val, int ind=0, int dir=0) const;
-/// @}
+    /** 
+	\brief Writes out the adjoint sensitivity into val.
+	\copydoc setter_getter_T
+    */
+    void getAdjSens(T val, int ind=0, int dir=0) const;
+    /// @}
 #endif
 
-  /// Get all statistics obtained at the end of the last evaluate call
-  const Dictionary& getStats() const;
+    /// Get all statistics obtained at the end of the last evaluate call
+    const Dictionary& getStats() const;
 
-  /// Get a single statistic obtained at the end of the last evaluate call
-  GenericType getStat(const std::string& name) const;
+    /// Get a single statistic obtained at the end of the last evaluate call
+    GenericType getStat(const std::string& name) const;
 
-  /** \brief  Get a vector of symbolic variables with the same dimensions as the inputs
-  * There is no guarantee that consecutive calls return identical objects
-  */
-  std::vector<MX> symbolicInput() const;
+    /** \brief  Get a vector of symbolic variables with the same dimensions as the inputs
+     * There is no guarantee that consecutive calls return identical objects
+     */
+    std::vector<MX> symbolicInput() const;
   
-  /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
-  * There is no guarantee that consecutive calls return identical objects
-  */
-  std::vector<SXMatrix> symbolicInputSX() const;
+    /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
+     * There is no guarantee that consecutive calls return identical objects
+     */
+    std::vector<SXMatrix> symbolicInputSX() const;
 
-  /** \brief Is the class able to propate seeds through the algorithm? (for usage, see the example propagating_sparsity.cpp) */
-  bool spCanEvaluate(bool fwd);
+    /** \brief Is the class able to propate seeds through the algorithm? (for usage, see the example propagating_sparsity.cpp) */
+    bool spCanEvaluate(bool fwd);
 
-  /** \brief Reset the sparsity propagation (for usage, see the example propagating_sparsity.cpp) */
-  void spInit(bool fwd);
+    /** \brief Reset the sparsity propagation (for usage, see the example propagating_sparsity.cpp) */
+    void spInit(bool fwd);
 
-  /** \brief Propagate the sparsity pattern through a set of directional derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
-  void spEvaluate(bool fwd);
+    /** \brief Propagate the sparsity pattern through a set of directional derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
+    void spEvaluate(bool fwd);
 
-  /** \brief Add modules to be monitored */
-  void addMonitor(const std::string& mon);
+    /** \brief Add modules to be monitored */
+    void addMonitor(const std::string& mon);
   
-  /** \brief Remove modules to be monitored */
-  void removeMonitor(const std::string& mon);
+    /** \brief Remove modules to be monitored */
+    void removeMonitor(const std::string& mon);
 
-};
+  };
 } // namespace CasADi
 
 #ifdef SWIG

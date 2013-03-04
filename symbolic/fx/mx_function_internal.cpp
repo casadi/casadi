@@ -426,27 +426,33 @@ void MXFunctionInternal::updatePointers(const AlgEl& el, int nfdir, int nadir){
     mx_adjSeed_[d].resize(mx_output_.size());
   }
   
-  for(int i=0; i<mx_input_.size(); ++i){
-    if(el.arg[i]>=0){
-      mx_input_[i] = &work_[el.arg[i]].data;
-      for(int d=0; d<nfdir; ++d) mx_fwdSeed_[d][i] = &work_[el.arg[i]].dataF[d];
-      for(int d=0; d<nadir; ++d) mx_adjSens_[d][i] = &work_[el.arg[i]].dataA[d];
-    } else {
-      mx_input_[i] = 0;
-      for(int d=0; d<nfdir; ++d) mx_fwdSeed_[d][i] = 0;
-      for(int d=0; d<nadir; ++d) mx_adjSens_[d][i] = 0;
+  if(el.op!=OP_INPUT){
+    for(int i=0; i<mx_input_.size(); ++i){
+      if(el.arg[i]>=0){
+	int k = el.arg[i];
+	int tmp = work_[k].tmp; // Positive if the data should be retrieved from the tape instead of the work vector
+	mx_input_[i] = tmp==0 ? &work_[k].data : &tape_[tmp-1].second;
+	for(int d=0; d<nfdir; ++d) mx_fwdSeed_[d][i] = &work_[k].dataF[d];
+	for(int d=0; d<nadir; ++d) mx_adjSens_[d][i] = &work_[k].dataA[d];
+      } else {
+	mx_input_[i] = 0;
+	for(int d=0; d<nfdir; ++d) mx_fwdSeed_[d][i] = 0;
+	for(int d=0; d<nadir; ++d) mx_adjSens_[d][i] = 0;
+      }
     }
   }
   
-  for(int i=0; i<mx_output_.size(); ++i){
-    if(el.res[i]>=0){
-      mx_output_[i] = &work_[el.res[i]].data;
-      for(int d=0; d<nfdir; ++d) mx_fwdSens_[d][i] = &work_[el.res[i]].dataF[d];
-      for(int d=0; d<nadir; ++d) mx_adjSeed_[d][i] = &work_[el.res[i]].dataA[d];
-    } else {
-      mx_output_[i] = 0;
-      for(int d=0; d<nfdir; ++d) mx_fwdSens_[d][i] = 0;
-      for(int d=0; d<nadir; ++d) mx_adjSeed_[d][i] = 0;
+  if(el.op!=OP_OUTPUT){
+    for(int i=0; i<mx_output_.size(); ++i){
+      if(el.res[i]>=0){
+	mx_output_[i] = &work_[el.res[i]].data;
+	for(int d=0; d<nfdir; ++d) mx_fwdSens_[d][i] = &work_[el.res[i]].dataF[d];
+	for(int d=0; d<nadir; ++d) mx_adjSeed_[d][i] = &work_[el.res[i]].dataA[d];
+      } else {
+	mx_output_[i] = 0;
+	for(int d=0; d<nfdir; ++d) mx_fwdSens_[d][i] = 0;
+	for(int d=0; d<nadir; ++d) mx_adjSeed_[d][i] = 0;
+      }
     }
   }
 }
@@ -461,8 +467,8 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
   }
   
-  // Tape iterator
-  vector<pair<pair<int,int>,DMatrix> >::iterator tape_it = tape_.begin();
+  // Tape counter
+  int tt = 0;
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   int alg_counter = 0;
@@ -471,9 +477,8 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     // Spill existing work elements if needed
     if(nadir>0 && it->op!=OP_OUTPUT){
       for(vector<int>::const_iterator c=it->res.begin(); c!=it->res.end(); ++c){
-        if(*c >=0 && tape_it!=tape_.end() && tape_it->first == make_pair(alg_counter,*c)){
-          tape_it->second.set(work_[*c].data);
-          tape_it++;
+        if(*c >=0 && tt<tape_.size() && tape_[tt].first == make_pair(alg_counter,*c)){
+          tape_[tt++].second.set(work_[*c].data);
         }
       }
     }
@@ -505,9 +510,6 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   if(nadir>0){
     casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):adjoints:begin "  << getOption("name"));
     
-    // Tape iterator (reuse same name to prevent usage of the forward iterator)
-    vector<pair<pair<int,int>,DMatrix> >::const_reverse_iterator tape_it = tape_.rbegin();
-    
     // Clear the adjoint seeds
     for(vector<FunctionIO>::iterator it=work_.begin(); it!=work_.end(); it++){
       for(int dir=0; dir<nadir; ++dir){
@@ -517,7 +519,19 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     int alg_counter = algorithm_.size()-1;
+    tt--;
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it, --alg_counter){
+      
+      // Mark spilled work vector elements to be recovered to allow the operator input to be updated but not the operator output 
+      // (important for inplace operations)
+      if(it->op!=OP_OUTPUT){
+        for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){
+          if(*c >=0 && tt>=0 && tape_[tt].first==make_pair(alg_counter,*c)){
+	    work_[*c].tmp = 1 + tt--;
+          }
+        }
+      }
+
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,nadir);
       
@@ -538,13 +552,13 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
         // Evaluate
         it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
       }
-      
+
+      // Recover the spilled elements to the work vector for later access (delayed for inplace operations)
       if(it->op!=OP_OUTPUT){
-        // Recover spilled work vector elements
-        for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){
-          if(*c >=0 && tape_it!=tape_.rend() && tape_it->first==make_pair(alg_counter,*c)){
-            tape_it->second.get(work_[*c].data);
-            tape_it++;
+        for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){	  
+          if(*c >=0 && work_[*c].tmp > 0){
+	    tape_[work_[*c].tmp-1].second.get(work_[*c].data);
+	    work_[*c].tmp = 0;
           }
         }
       }
@@ -715,13 +729,16 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
     }
   }
 
-  // Tape iterator
-  vector<pair<pair<int,int>,MX> >::iterator tape_it = tape.begin();
+  // Tape counter
+  int tt = 0;
   
   // Allocate outputs
   if(!output_given){
     res.resize(outputv_.size());
   }
+
+  // Temporary vector to hold function outputs
+  vector<MX> output_tmp;
   
   // Allocate forward sensitivities
   fsens.resize(nfdir);
@@ -749,12 +766,13 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   // Loop over computational nodes in forward order
   int alg_counter = 0;
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter){
+
     // Spill existing work elements if needed
     if(nadir>0 && it->op!=OP_OUTPUT){
       for(vector<int>::const_iterator c=it->res.begin(); c!=it->res.end(); ++c){
-        if(*c >=0 && tape_it!=tape.end() && tape_it->first == make_pair(alg_counter,*c)){
-          tape_it->second = swork[*c];
-          tape_it++;
+        if(*c >=0 && tt<tape.size() && tape[tt].first == make_pair(alg_counter,*c)){
+          tape[tt++].second = swork[*c];
+	  cout << "spilled " << swork[*c] << endl;
         }
       }
     }
@@ -783,6 +801,16 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       }
     } else {
     
+      // Get expressions for the result of the operation, if known
+      if(output_given){
+	output_tmp.resize(it->res.size());
+	for(int i=0; i<it->res.size(); ++i){
+	  if(it->res[i]>=0){
+	    output_tmp[i] = it->data.getOutput(i);
+	  }
+	}
+      }
+
       // Pointers to the arguments of the evaluation
       input_p.resize(it->arg.size());
       for(int i=0; i<input_p.size(); ++i){
@@ -794,21 +822,9 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       output_p.resize(it->res.size());
       for(int i=0; i<output_p.size(); ++i){
         int el = it->res[i]; // index of the output
-        output_p[i] = el<0 ? 0 : &swork[el];
+        output_p[i] = el<0 ? 0 : output_given ? &output_tmp[i] : &swork[el];
       }
-
-      // Copy answer of the evaluation, if known
-      if(output_given){
-        for(int oind=0; oind<output_p.size(); ++oind){
-          if(output_p[oind]){
-            *output_p[oind] = it->data.getOutput(oind);
-          }
-        }
-        
-        // Quick continue if no evaluation needed
-        if(nfdir==0) continue;
-      }
-
+      
       // Forward seeds and sensitivities
       for(int d=0; d<nfdir; ++d){
         fseed_p[d].resize(it->arg.size());
@@ -834,7 +850,17 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       }
 
       // Call the evaluation function
-      it->data->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
+      if(!output_given || nfdir>0){
+	it->data->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
+      }
+
+      // Save results of the operation to work vector, if known (not earlier to allow inplace operations)
+      if(output_given){
+	for(int i=0; i<it->res.size(); ++i){
+	  int el = it->res[i]; // index of the output
+	  if(el>=0) swork[el] = output_tmp[i];
+	}
+      }
     }
   }
   
@@ -844,11 +870,19 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
     fill(dwork.begin(),dwork.end(),std::vector<MX>(nadir));
     log("MXFunctionInternal::evalMX allocated derivative work vector (adjoint mode)");
     
-    // Tape iterator (reuse same name to prevent usage of the forward iterator)
-    vector<pair<pair<int,int>,MX> >::const_reverse_iterator tape_it = tape.rbegin();
-    
     int alg_counter = algorithm_.size()-1;
+    tt--;
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it, --alg_counter){
+      // Mark spilled work vector elements to be recovered to allow the operator input to be updated but not the operator output 
+      // (important for inplace operations)
+      if(it->op!=OP_OUTPUT){
+        for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){
+          if(*c >=0 && tt>=0 && tape[tt].first==make_pair(alg_counter,*c)){
+	    work_[*c].tmp = 1 + tt--;
+          }
+        }
+      }
+
       if(it->op == OP_INPUT){
         // Collect the symbolic adjoint sensitivities
         for(int d=0; d<nadir; ++d){
@@ -870,7 +904,12 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
         input_p.resize(it->arg.size());
         for(int i=0; i<input_p.size(); ++i){
           int el = it->arg[i]; // index of the argument
-          input_p[i] = el<0 ? 0 : &swork[el];
+	  if(el<0){
+	    input_p[i] = 0;
+	  } else {
+	    int tmp = work_[el].tmp; // Positive if the data should be retrieved from the tape instead of the work vector
+	    input_p[i] = tmp==0 ? &swork[el] : &tape[tmp-1].second;
+	  }
         }
             
         // Result of the evaluation
@@ -909,14 +948,16 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
         it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
       }
       
+      // Recover the spilled elements to the work vector for later access (delayed for inplace operations)
       if(it->op!=OP_OUTPUT){
-        // Recover spilled work vector elements
-        for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){
-          if(*c >=0 && tape_it!=tape.rend() && tape_it->first == make_pair(alg_counter,*c)){
-            swork[*c] = tape_it->second;
-            tape_it++;
+        for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){	  
+          if(*c >=0 && work_[*c].tmp > 0){
+	    swork[*c] = tape[work_[*c].tmp-1].second;
+	    work_[*c].tmp = 0;
+
+	    cout << "recovered " << swork[*c] << endl;
           }
-        }        
+        }
       }
     }
   }
@@ -1117,10 +1158,19 @@ void MXFunctionInternal::allocTape(){
     // Codegen a temporary variable
     stream << "  int i;" << endl;
     
+    // Print class (for debugging)
+    bool codegen_class = true;
+    
     // Codegen the algorithm
     for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
       // Mark the beginning of the operation
-      stream << "  /* " << k++ << " */" << endl; 
+      stream << "  /* " << k++;
+      if(codegen_class){
+	if(it->data.get()!=0){
+	  stream << " : " << typeid(*it->data.get()).name();
+	}
+      }
+      stream << " */" << endl;
       
       // Get the names of the operation arguments
       arg.resize(it->arg.size());
