@@ -1102,15 +1102,8 @@ void MXFunctionInternal::allocTape(){
 }
 
   void MXFunctionInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const{
-    
-    // Add auxiliaries. TODO: Only add the auxiliaries that are actually used
-    gen.addAuxiliary(CodeGenerator::AUX_SWAP);
-    gen.addAuxiliary(CodeGenerator::AUX_SCAL);
-    gen.addAuxiliary(CodeGenerator::AUX_AXPY);
-    gen.addAuxiliary(CodeGenerator::AUX_DOT);
-    gen.addAuxiliary(CodeGenerator::AUX_NRM2);
-    gen.addAuxiliary(CodeGenerator::AUX_IAMAX);
-    gen.addAuxiliary(CodeGenerator::AUX_FILL);
+    // Add auxiliaries
+    gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
 
     // Add sparsity patterns in the intermediate variables
     for(int i=0; i<work_.size(); ++i){
