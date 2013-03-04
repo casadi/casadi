@@ -68,6 +68,9 @@ public:
   /** \brief Generate code for the operation */
   virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
+  /// Can the operation be performed inplace (i.e. overwrite the result)
+  virtual bool allowInplace() const{ return true;}
+
   //! \brief operation
   Operation op_;
 };

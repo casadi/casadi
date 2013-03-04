@@ -66,12 +66,13 @@ void UnaryMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMa
     
   } else {
     // Sensitivities
-    double tmp[2];  // temporary variable to hold value and partial derivatives of the function
+    double f, tmp[2];  // temporary variable to hold value and partial derivatives of the function
     for(int i=0; i<size(); ++i){
       // Evaluate and get partial derivatives
-      casadi_math<double>::fun(op_,inputd[i],nan,outputd[i]);
-      casadi_math<double>::der(op_,inputd[i],nan,outputd[i],tmp);
-      
+      casadi_math<double>::fun(op_,inputd[i],nan,f);
+      casadi_math<double>::der(op_,inputd[i],nan,f,tmp);
+      outputd[i] = f;
+
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
         fwdSens[d][0]->data()[i] = tmp[0]*fwdSeed[d][0]->data()[i];
@@ -99,9 +100,11 @@ void UnaryMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const 
 
 void UnaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   // Evaluate function
-  MX dummy;   // Dummy second argument
-  if(!output_given){
-    casadi_math<MX>::fun(op_,*input[0],dummy,*output[0]);
+  MX f, dummy; // Function value, dummy second argument
+  if(output_given){
+    f = *output[0];
+  } else {
+    casadi_math<MX>::fun(op_,*input[0],dummy,f);
   }
 
   // Number of forward directions
@@ -110,7 +113,7 @@ void UnaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   if(nfwd>0 || nadj>0){
     // Get partial derivatives
     MX pd[2];
-    casadi_math<MX>::der(op_,*input[0],dummy,*output[0],pd);
+    casadi_math<MX>::der(op_,*input[0],dummy,f,pd);
     
     // Propagate forward seeds
     for(int d=0; d<nfwd; ++d){
@@ -124,9 +127,15 @@ void UnaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       *adjSens[d][0] += pd[0]*s;
     }
   }
+  if(!output_given){
+    *output[0] = f;
+  }
 }
 
 void UnaryMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  // Quick return if inplace
+  if(input[0]==output[0]) return;
+
   bvec_t *inputd = get_bvec_t(input[0]->data());
   bvec_t *outputd = get_bvec_t(output[0]->data());
   if(fwd){
@@ -135,7 +144,7 @@ void UnaryMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fw
     int nz = input[0]->data().size();
     for(int el=0; el<nz; ++el){
       bvec_t s = outputd[el];
-      outputd[el] = 0;
+      outputd[el] = bvec_t(0);
       inputd[el] |= s;
     }
   }
