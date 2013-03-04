@@ -772,7 +772,6 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       for(vector<int>::const_iterator c=it->res.begin(); c!=it->res.end(); ++c){
         if(*c >=0 && tt<tape.size() && tape[tt].first == make_pair(alg_counter,*c)){
           tape[tt++].second = swork[*c];
-	  cout << "spilled " << swork[*c] << endl;
         }
       }
     }
@@ -954,8 +953,6 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
           if(*c >=0 && work_[*c].tmp > 0){
 	    swork[*c] = tape[work_[*c].tmp-1].second;
 	    work_[*c].tmp = 0;
-
-	    cout << "recovered " << swork[*c] << endl;
           }
         }
       }
@@ -1202,7 +1199,7 @@ void MXFunctionInternal::allocTape(){
       
       // Print the operation
       if(it->op==OP_OUTPUT){
-	stream << "  casadi_copy(" << output(it->res.front()).size() << "," <<  arg.front() << ",1," << res.front() << ",1);" << endl;
+	stream << "  if(" << res.front() << "!=0) casadi_copy(" << output(it->res.front()).size() << "," <<  arg.front() << ",1," << res.front() << ",1);" << endl;
       } else if(it->op==OP_INPUT){
 	stream << "  casadi_copy(" << input(it->arg.front()).size() << "," << arg.front() << ",1," << res.front() << ",1);" << endl;
       } else {

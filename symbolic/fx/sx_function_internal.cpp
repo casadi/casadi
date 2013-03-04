@@ -359,7 +359,7 @@ void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
     stream << "  ";
 
     if(it->op==OP_OUTPUT){
-      stream << "r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
+      stream << "if(r" << it->res << "!=0) r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
     } else {
       // Declare result if not already declared
       if(!declared[it->res]){
@@ -1281,7 +1281,7 @@ void SXFunctionInternal::spAllocOpenCL(){
       // Propagate sparsity forward
       for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
 	if(it->op==OP_OUTPUT){
-	  ss << "r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
+	  ss << "if(r" << it->res << "!=0) r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
 	} else {
 	  // Declare result if not already declared
 	  if(!declared[it->res]){
@@ -1320,7 +1320,7 @@ void SXFunctionInternal::spAllocOpenCL(){
       // Propagate sparsity backward
       for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
 	if(it->op==OP_OUTPUT){
-	  ss << "a" << it->arg.i[0] << "|=r" << it->res << "[" << it->arg.i[1] << "];" << endl;
+	  ss << "if(r" << it->res << "!=0) a" << it->arg.i[0] << "|=r" << it->res << "[" << it->arg.i[1] << "];" << endl;
 	} else {
 	  if(it->op==OP_INPUT){
 	    ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]=a" << it->res << "; ";
