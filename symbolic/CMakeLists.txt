@@ -53,6 +53,8 @@ SET(CASADI_SRCS
   mx/transpose.cpp           mx/transpose.hpp           # Transpose
   mx/vertcat.cpp             mx/vertcat.hpp             # Vertical concatenation
   mx/reshape.cpp             mx/reshape.hpp             # Reshape
+  mx/subref.cpp              mx/subref.hpp              # Submatrix reference
+  mx/subassign.cpp           mx/subassign.hpp           # Submatrix assignment
   mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
   mx/densification.cpp       mx/densification.hpp       # Makes a matrix dense
   mx/multiple_output.cpp     mx/multiple_output.hpp     # Base class for nodes with multiple outputs

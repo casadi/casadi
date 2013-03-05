@@ -26,72 +26,77 @@
 #include <vector>
 #include "../casadi_exception.hpp"
 #include <limits>
+#include <iostream>
 
 namespace CasADi{
   
   /** Class representing a slice
-  */
+   */
   class Slice{
-    public:
-      /// Defailt constructor - all elements
-      Slice();
-      
-      /// A single element
-      Slice(int i);
-      
-      /// A slice
-      Slice(int start, int stop, int step=1);
-      
-      /// Get a vector of indices
-      std::vector<int> getAll(int len) const;
-      
-      /// start value: negative values will get added to length
-      int start_;
-      /// stop value: use std::numeric_limits<int>::max() to indicate unboundedness
-      int stop_; 
-      int step_;
+  public:
+    /// Defailt constructor - all elements
+    Slice();
+    
+    /// A single element
+    Slice(int i);
+    
+    /// A slice
+    Slice(int start, int stop, int step=1);
+    
+    /// Get a vector of indices
+    std::vector<int> getAll(int len) const;
+
+    /// Print a representation of the object to a stream
+    friend std::ostream& operator<<(std::ostream& stream, const Slice& slice){ slice.print(stream); return stream;}
+    void print(std::ostream& stream) const;
+
+    /// start value: negative values will get added to length
+    int start_;
+    /// stop value: use std::numeric_limits<int>::max() to indicate unboundedness
+    int stop_; 
+    int step_;
   };
   static Slice ALL;
   
   /** Class representing a set of indices of arbitrary order */
   class IndexSet{
-    public:
+  public:
     
-      /// A single element
-      IndexSet(int i);
-  
-      /// A set of indices
-      IndexSet(const std::vector<int>& v);
-      
-      /// Get a vector of indices
-      const std::vector<int>& getAll(int len) const;
-      
-      /// Data members (all public)
-      std::vector<int> v_;
+    /// A single element
+    IndexSet(int i);
+    
+    /// A set of indices
+    IndexSet(const std::vector<int>& v);
+    
+    /// Get a vector of indices
+    const std::vector<int>& getAll(int len) const;
+    
+    /// Data members (all public)
+    std::vector<int> v_;
   };
   
   
-   /**  Class representing a non-regular (and thus non-slice) index list 
+  /**  Class representing a non-regular (and thus non-slice) index list 
    */
   class IndexList{
-    private:
-
-    public:
-      enum Type {NILL, INT, SLICE, IVECTOR};
-      /// Constructor
-      IndexList();
-      explicit IndexList(int i);
-      explicit IndexList(const std::vector<int> &i);
-      explicit IndexList(const Slice &i);
-      
-      /// Get a vector of indices
-      std::vector<int> getAll(int len) const;
-      
-      /// Data members (all public)
-      Slice slice;
-      int i;
-      std::vector<int> iv;
-      Type type;
+  private:
+    
+  public:
+    enum Type {NILL, INT, SLICE, IVECTOR};
+    /// Constructor
+    IndexList();
+    explicit IndexList(int i);
+    explicit IndexList(const std::vector<int> &i);
+    explicit IndexList(const Slice &i);
+    
+    /// Get a vector of indices
+    std::vector<int> getAll(int len) const;
+    
+    /// Data members (all public)
+    Slice slice;
+    int i;
+    std::vector<int> iv;
+    Type type;
   };
   
 } // namespace CasADi

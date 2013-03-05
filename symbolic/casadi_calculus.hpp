@@ -81,7 +81,13 @@ enum Operation{
 
   // Reshape an expression
   OP_RESHAPE,
-
+  
+  // Submatrix reference
+  OP_SUBREF,
+  
+  // Submatrix assignment
+  OP_SUBASSIGN,
+  
   // Nonzero mapping
   OP_MAPPING,
   
