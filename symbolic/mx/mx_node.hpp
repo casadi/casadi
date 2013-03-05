@@ -262,7 +262,13 @@ namespace CasADi{
     
     /// Matrix multiplcation
     virtual MX getMultiplication(const MX& y) const;
-    
+
+    /// Get submatrix reference
+    virtual MX getSubRef(const Slice& i, const Slice& j) const;    
+
+    /// Get submatrix assignment
+    virtual MX getSubAssign(const MX& y, const Slice& i, const Slice& j) const;    
+
     /** Temporary variables to be used in user algorithms like sorting, 
 	the user is resposible of making sure that use is thread-safe
 	The variable is initialized to zero

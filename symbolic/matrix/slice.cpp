@@ -25,57 +25,71 @@
 
 namespace CasADi{
 
-Slice::Slice() : start_(0), stop_(std::numeric_limits<int>::max()), step_(1){ 
-}
-      
-Slice::Slice(int i) : start_(i), stop_(i+1), step_(1){
-}
-
-Slice::Slice(int start, int stop, int step) : start_(start), stop_(stop), step_(step){
-}
-
-std::vector<int> Slice::getAll(int len) const{
-  int start = start_;
-  int stop  = stop_;
-  if (start<0) start+=len;
-  if (stop<0) stop+=len;
-  if (stop==std::numeric_limits<int>::max()) stop = len;
-
-  casadi_assert_message(stop<=len,"Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") out of bounds with supplied length of " << len);
-  casadi_assert_message(start>=0, "Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") out of bounds with start<0.");
-  if (stop>=start && step_<0 || stop<=start && step_>0) return std::vector<int>();
-
-  return range(start,stop,step_,len);
-}
-
-IndexSet::IndexSet(int i) : v_(1,i){
-}
-  
-IndexSet::IndexSet(const std::vector<int>& v) : v_(v){
-}
-      
-const std::vector<int>& IndexSet::getAll(int len) const{
-  return v_;
-}
-
-
-IndexList::IndexList() : type(NILL) {}
-IndexList::IndexList(int i_) : i(i_), type(INT) {}
-IndexList::IndexList(const std::vector<int> &i_) : iv(i_) ,type(IVECTOR) {}
-IndexList::IndexList(const Slice &s) : slice(s), type(SLICE) {}
-
-std::vector<int> IndexList::getAll(int len) const {
-  if (type == INT)  {
-    if (i<0) return std::vector<int>(1,i+len);
-    return std::vector<int>(1,i);
-  } else if (type == IVECTOR) {
-    return iv;
-  } else {
-    casadi_assert(type == SLICE);
-    return slice.getAll(len);
+  Slice::Slice() : start_(0), stop_(std::numeric_limits<int>::max()), step_(1){ 
   }
-}
+      
+  Slice::Slice(int i) : start_(i), stop_(i+1), step_(1){
+  }
 
+  Slice::Slice(int start, int stop, int step) : start_(start), stop_(stop), step_(step){
+  }
+
+  std::vector<int> Slice::getAll(int len) const{
+    int start = start_;
+    int stop  = stop_;
+    if (start<0) start+=len;
+    if (stop<0) stop+=len;
+    if (stop==std::numeric_limits<int>::max()) stop = len;
+
+    casadi_assert_message(stop<=len,"Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") out of bounds with supplied length of " << len);
+    casadi_assert_message(start>=0, "Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") out of bounds with start<0.");
+    if (stop>=start && step_<0 || stop<=start && step_>0) return std::vector<int>();
+
+    return range(start,stop,step_,len);
+  }
+
+  IndexSet::IndexSet(int i) : v_(1,i){
+  }
+  
+  IndexSet::IndexSet(const std::vector<int>& v) : v_(v){
+  }
+      
+  const std::vector<int>& IndexSet::getAll(int len) const{
+    return v_;
+  }
+
+
+  IndexList::IndexList() : type(NILL) {}
+  IndexList::IndexList(int i_) : i(i_), type(INT) {}
+  IndexList::IndexList(const std::vector<int> &i_) : iv(i_) ,type(IVECTOR) {}
+  IndexList::IndexList(const Slice &s) : slice(s), type(SLICE) {}
+
+  std::vector<int> IndexList::getAll(int len) const {
+    if (type == INT)  {
+      if (i<0) return std::vector<int>(1,i+len);
+      return std::vector<int>(1,i);
+    } else if (type == IVECTOR) {
+      return iv;
+    } else {
+      casadi_assert(type == SLICE);
+      return slice.getAll(len);
+    }
+  }
+
+  void Slice::print(std::ostream& stream) const{
+    bool from_beginning = start_ == 0;
+    bool till_end = stop_ == std::numeric_limits<int>::max();
+    bool skip_none = step_==1;
+    if(stop_==start_+1){
+      stream << start_;
+    } else {
+      if(!from_beginning) stream << start_;
+      stream << ":";
+      if(!till_end) stream << stop_;
+      if(!skip_none) stream << ":" << step_;
+    }
+  }
+  
   
 } // namespace CasADi
 
