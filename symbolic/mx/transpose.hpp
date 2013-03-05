@@ -71,6 +71,9 @@ namespace CasADi{
 
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr){ ni=size1()+1; nr=0;}
+
+    /// Transpose
+    virtual MX getTranspose() const{ return dep();}
   };
 
 } // namespace CasADi

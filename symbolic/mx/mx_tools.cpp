@@ -22,8 +22,6 @@
 
 #include "mx_tools.hpp"
 #include "mapping.hpp"
-#include "reshape.hpp"
-#include "transpose.hpp"
 #include "vertcat.hpp"
 #include "norm.hpp"
 #include "../fx/mx_function.hpp"
@@ -193,15 +191,8 @@ MX trans(const MX &x){
   // Quick return if null or scalar
   if(x.isNull() || x.numel()==1)
     return x;
-
-  // Simplify if transpose of transpose
-  if(isTranspose(x)){
-    return x->dep(0);
-  }
-
-  // Form the transpose
-  MX ret = MX::create(new Transpose(x));  
-  return ret;
+  else
+    return x->getTranspose();
 }
 
 MX reshape(const MX &x, const std::vector<int> sz){
@@ -226,7 +217,7 @@ MX reshape(const MX &x, const CRSSparsity& sp){
   casadi_assert(x.size()==sp.size());
   
   // Create a reshape node
-  return MX::create(new Reshape(x,sp));
+  return x->getReshape(sp);
 }
 
 MX vec(const MX &x) {
@@ -246,11 +237,7 @@ MX flatten(const MX& x) {
 }
 
 MX vecNZ(const MX& x) {
-  if(x.dense() && x.size2()==1){
-    return x;
-  } else {
-    return MX::create(new Reshape(trans(x),CRSSparsity(x.size(),1,true)));
-  }
+  return reshape(trans(x),sp_dense(x.size(),1));
 }
 
 MX if_else(const MX &cond, const MX &if_true, const MX &if_false){

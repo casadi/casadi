@@ -71,7 +71,9 @@ namespace CasADi{
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual bool allowInplace() const{ return false;}
-
+    
+    /// Reshape
+    virtual MX getReshape(const CRSSparsity& sp) const;
   };
 
 } // namespace CasADi
