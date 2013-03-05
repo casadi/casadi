@@ -33,7 +33,6 @@
 #include "mx_tools.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "multiplication.hpp"
 #include "densification.hpp"
 #include "norm.hpp"
 #include "../casadi_math.hpp"
@@ -678,8 +677,7 @@ namespace CasADi{
 
   MX MX::mul_full(const MX& y) const{
     const MX& x = *this;
-
-    return MX::create(new Multiplication(x,trans(y)));
+    return x->getMultiplication(y);
   }
 
   MX MX::mul(const MX& y) const{

@@ -254,6 +254,15 @@ namespace CasADi{
     template<typename T>
     static std::vector<std::vector<T> > getVector(const std::vector<std::vector<T*> > v);
 
+    /// Transpose
+    virtual MX getTranspose() const;
+
+    /// Reshape
+    virtual MX getReshape(const CRSSparsity& sp) const;
+    
+    /// Matrix multiplcation
+    virtual MX getMultiplication(const MX& y) const;
+    
     /** Temporary variables to be used in user algorithms like sorting, 
 	the user is resposible of making sure that use is thread-safe
 	The variable is initialized to zero

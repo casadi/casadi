@@ -26,6 +26,9 @@
 #include <cassert>
 #include <typeinfo> 
 #include "../matrix/matrix_tools.hpp"
+#include "transpose.hpp"
+#include "reshape.hpp"
+#include "multiplication.hpp"
 
 using namespace std;
 
@@ -277,6 +280,18 @@ namespace CasADi{
 
   Matrix<double> MXNode::getMatrixValue() const{
     throw CasadiException(string("MXNode::getMatrixValue not defined for class ") + typeid(*this).name());    
+  }
+
+  MX MXNode::getTranspose() const{
+    return MX::create(new Transpose(shared_from_this<MX>()));
+  }
+
+  MX MXNode::getReshape(const CRSSparsity& sp) const{
+    return MX::create(new Reshape(shared_from_this<MX>(),sp));
+  }
+  
+  MX MXNode::getMultiplication(const MX& y) const{
+    return MX::create(new Multiplication(shared_from_this<MX>(),trans(y)));
   }
 
 } // namespace CasADi
