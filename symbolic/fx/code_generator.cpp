@@ -163,8 +163,7 @@ namespace CasADi{
       name << "c" << ind;
  
       // Set format
-      constants_ << std::scientific;
-      constants_ << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+      constants_ << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
       // Print to file
       DMatrix v = x.getMatrixValue();
@@ -468,6 +467,17 @@ namespace CasADi{
     s << "  }" << endl;
     s << "}" << endl;
     s << endl;
+  }
+
+  void CodeGenerator::printConstant(std::ostream& s, double v) const{
+    int v_int(v);
+    if(v_int==v){
+      // Print integer
+      s << v_int << ".0";
+    } else {
+      // Print real
+      s << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1) << v;
+    }
   }
 
 } // namespace CasADi
