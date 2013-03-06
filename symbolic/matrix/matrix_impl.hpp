@@ -66,17 +66,17 @@ bool Matrix<T>::__nonzero__() const {
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(int i, int j) const{
+const Matrix<T> Matrix<T>::sub(int i, int j) const{
   return elem(i,j);
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
+const Matrix<T> Matrix<T>::sub(const std::vector<int>& ii, const std::vector<int>& jj) const{
   // Nonzero mapping from submatrix to full
   std::vector<int> mapping;
   
   // Get the sparsity pattern - does bounds checking
-  CRSSparsity sp = sparsity().getSub(ii,jj,mapping);
+  CRSSparsity sp = sparsity().sub(ii,jj,mapping);
 
   // Create return object
   Matrix<T> ret(sp);
@@ -90,7 +90,7 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const Matrix<int>& k) const{
+const Matrix<T> Matrix<T>::sub(const std::vector<int>& ii, const Matrix<int>& k) const{
   std::vector< int > cols = range(size2());
   std::vector< Matrix<T> > temp;
   
@@ -110,7 +110,7 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const Matrix<int>&
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(const Matrix<int>& k, const std::vector<int>& jj) const{
+const Matrix<T> Matrix<T>::sub(const Matrix<int>& k, const std::vector<int>& jj) const{
   std::vector< int > rows = range(size1());
   std::vector< Matrix<T> > temp;
 
@@ -130,8 +130,8 @@ const Matrix<T> Matrix<T>::getSub(const Matrix<int>& k, const std::vector<int>& 
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(const Matrix<int>& i, const Matrix<int>& j) const {
-   casadi_assert_message(i.sparsity()==j.sparsity(),"getSub(Imatrix i, Imatrix j): sparsities must match. Got " << i.dimString() << " and " << j.dimString() << ".");
+const Matrix<T> Matrix<T>::sub(const Matrix<int>& i, const Matrix<int>& j) const {
+   casadi_assert_message(i.sparsity()==j.sparsity(),"sub(Imatrix i, Imatrix j): sparsities must match. Got " << i.dimString() << " and " << j.dimString() << ".");
 
    Matrix<T> ret(i.sparsity());
    for (int k=0;k<i.size();++k) {
@@ -142,8 +142,8 @@ const Matrix<T> Matrix<T>::getSub(const Matrix<int>& i, const Matrix<int>& j) co
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(const CRSSparsity& sp, int dummy) const {
-  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+const Matrix<T> Matrix<T>::sub(const CRSSparsity& sp, int dummy) const {
+  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"sub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
   Matrix<T> ret(sp);
 
   std::vector<unsigned char> mapping; // Mapping that will be filled by patternunion
@@ -289,13 +289,13 @@ void Matrix<T>::setSub(const Matrix<int>& i, const Matrix<int>& j, const Matrix<
 
 template<class T>
 void Matrix<T>::setSub(const CRSSparsity& sp, int dummy, const Matrix<T>& el) {
-  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"sub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
   // TODO: optimize this for speed
   Matrix<T> elm;
   if (el.scalar()) {
     elm = Matrix<T>(sp,el.at(0));
   } else {
-    elm = el.getSub(sp);
+    elm = el.sub(sp);
   }
 
   for(int i=0; i<sp.rowind().size()-1; ++i){

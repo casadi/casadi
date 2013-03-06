@@ -288,21 +288,21 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
 
     //@{
     /// Get a submatrix
-    const Matrix<T> getSub(int i, int j) const;
-    const Matrix<T> getSub(int i, const std::vector<int>& j) const{ return getSub(std::vector<int>(1,i),j);}
-    const Matrix<T> getSub(const std::vector<int>& i, int j) const{ return getSub(i,std::vector<int>(1,j));}
-    const Matrix<T> getSub(const std::vector<int>& i, const std::vector<int>& j) const;
-    const Matrix<T> getSub(const std::vector<int>& i, const Slice& j) const { return getSub(i,j.getAll(size2()));}
-    const Matrix<T> getSub(const Slice& i, const std::vector<int>& j) const { return getSub(i.getAll(size1()),j);}
-    const Matrix<T> getSub(const Slice& i, const Slice& j) const{ return getSub(i.getAll(size1()),j.getAll(size2()));}
-    const Matrix<T> getSub(int i, const Slice& j) const{ return getSub(std::vector<int>(1,i),j.getAll(size2()));}
-    const Matrix<T> getSub(const Slice& i, int j) const{ return getSub(i.getAll(size1()),std::vector<int>(1,j));}
-    const Matrix<T> getSub(const std::vector<int>& i, const Matrix<int>& k) const;
-    const Matrix<T> getSub(const Matrix<int>& k, const std::vector<int>& j) const;
-    const Matrix<T> getSub(const Slice& i, const Matrix<int>& k) const {return getSub(i.getAll(size1()),k);}
-    const Matrix<T> getSub(const Matrix<int>& k, const Slice& j) const {return getSub(k,j.getAll(size2()));}
-    const Matrix<T> getSub(const Matrix<int>& i, const Matrix<int>& j) const;
-    const Matrix<T> getSub(const CRSSparsity& sp, int dummy = 0) const;
+    const Matrix<T> sub(int i, int j) const;
+    const Matrix<T> sub(int i, const std::vector<int>& j) const{ return sub(std::vector<int>(1,i),j);}
+    const Matrix<T> sub(const std::vector<int>& i, int j) const{ return sub(i,std::vector<int>(1,j));}
+    const Matrix<T> sub(const std::vector<int>& i, const std::vector<int>& j) const;
+    const Matrix<T> sub(const std::vector<int>& i, const Slice& j) const { return sub(i,j.getAll(size2()));}
+    const Matrix<T> sub(const Slice& i, const std::vector<int>& j) const { return sub(i.getAll(size1()),j);}
+    const Matrix<T> sub(const Slice& i, const Slice& j) const{ return sub(i.getAll(size1()),j.getAll(size2()));}
+    const Matrix<T> sub(int i, const Slice& j) const{ return sub(std::vector<int>(1,i),j.getAll(size2()));}
+    const Matrix<T> sub(const Slice& i, int j) const{ return sub(i.getAll(size1()),std::vector<int>(1,j));}
+    const Matrix<T> sub(const std::vector<int>& i, const Matrix<int>& k) const;
+    const Matrix<T> sub(const Matrix<int>& k, const std::vector<int>& j) const;
+    const Matrix<T> sub(const Slice& i, const Matrix<int>& k) const {return sub(i.getAll(size1()),k);}
+    const Matrix<T> sub(const Matrix<int>& k, const Slice& j) const {return sub(k,j.getAll(size2()));}
+    const Matrix<T> sub(const Matrix<int>& i, const Matrix<int>& j) const;
+    const Matrix<T> sub(const CRSSparsity& sp, int dummy = 0) const;
     //@}
 
     //@{

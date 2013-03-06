@@ -37,7 +37,7 @@ template<typename M, typename I, typename J>
 class SubMatrix : public M{
   public:
     /// Constructor
-    SubMatrix(M& mat, const I& i, const J& j) : M(mat.getSub(i,j)), mat_(mat), i_(i), j_(j){}
+    SubMatrix(M& mat, const I& i, const J& j) : M(mat.sub(i,j)), mat_(mat), i_(i), j_(j){}
 
     //@{
     /// Methods that modify a part of the parent obejct (A(i,j) = ?, A(i,j) += ?, etc.)

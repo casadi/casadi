@@ -116,14 +116,14 @@ class GenericMatrix{
 
     /** \brief  Get vector element or slice */
     template<typename I>
-    const MatType operator()(const I& i) const{ return static_cast<const MatType*>(this)->getSub(i,0);}
+    const MatType operator()(const I& i) const{ return static_cast<const MatType*>(this)->sub(i,0);}
 
     /** \brief  Get Sparsity slice */
-    const MatType operator()(const CRSSparsity& sp) const{ return static_cast<const MatType*>(this)->getSub(sp); }
+    const MatType operator()(const CRSSparsity& sp) const{ return static_cast<const MatType*>(this)->sub(sp); }
     
     /** \brief  Get Matrix element or slice */
     template<typename I, typename J>
-    const MatType operator()(const I& i, const J& j) const{ return static_cast<const MatType*>(this)->getSub(i,j); }
+    const MatType operator()(const I& i, const J& j) const{ return static_cast<const MatType*>(this)->sub(i,j); }
 
     /** \brief  Access vector element or slice */
     template<typename I>

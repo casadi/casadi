@@ -101,20 +101,20 @@ namespace CasADi{
     return (operator->())->__nonzero__();
   }
 
-  const MX MX::getSub(int i, const std::vector<int>& j) const{
-    return getSub(vector<int>(1,i),j);
+  const MX MX::sub(int i, const std::vector<int>& j) const{
+    return sub(vector<int>(1,i),j);
   }
 
-  const MX MX::getSub(const std::vector<int>& i, int j) const{
-    return getSub(i,vector<int>(1,j));
+  const MX MX::sub(const std::vector<int>& i, int j) const{
+    return sub(i,vector<int>(1,j));
   }
 
-  const MX MX::getSub(const vector<int>& ii, const vector<int>& jj) const{
+  const MX MX::sub(const vector<int>& ii, const vector<int>& jj) const{
     // Nonzero mapping from submatrix to full
     vector<int> mapping;
   
     // Get the sparsity pattern
-    CRSSparsity sp = sparsity().getSub(ii,jj,mapping);
+    CRSSparsity sp = sparsity().sub(ii,jj,mapping);
  
     // Create return MX
     MX ret = MX::create(new Mapping(sp));
@@ -123,19 +123,19 @@ namespace CasADi{
     return ret;
   }
 
-  const MX MX::getSub(const Matrix<int>& k, int dummy) const {
+  const MX MX::sub(const Matrix<int>& k, int dummy) const {
     MX ret = MX::create(new Mapping(k.sparsity()));
     int s = size();
     const std::vector<int> & d = k.data();
     for (int i=0;i< k.size();i++) {
-      if (d[i]>=s) casadi_error("MX::getSub: a non-zero element at position " << d[i] << " was requested, but MX is only " << dimString());
+      if (d[i]>=s) casadi_error("MX::sub: a non-zero element at position " << d[i] << " was requested, but MX is only " << dimString());
     }
     ret->assign(*this,k.data());
     simplifyMapping(ret);
     return ret;
   }
 
-  const MX MX::getSub(int i, int j) const{
+  const MX MX::sub(int i, int j) const{
     int ind = sparsity().getNZ(i,j);
 
     MX ret;
@@ -152,14 +152,14 @@ namespace CasADi{
     return ret;
   }
 
-  const MX MX::getSub(const std::vector<int>& ii, const Matrix<int>& k) const{
+  const MX MX::sub(const std::vector<int>& ii, const Matrix<int>& k) const{
     std::vector< int > cols = range(size2());
     std::vector< MX > temp;
 
     for (int i=0;i<ii.size();++i) {
       MX m(k.sparsity(),MX(0));
       for (int j=0;j<m.size();++j) {
-	m[j] = getSub(ii.at(i),k.at(j));
+	m[j] = sub(ii.at(i),k.at(j));
       }
       temp.push_back(m);
     }
@@ -168,14 +168,14 @@ namespace CasADi{
     return ret;
   }
 
-  const MX MX::getSub(const Matrix<int>& k, const std::vector<int>& jj) const{
+  const MX MX::sub(const Matrix<int>& k, const std::vector<int>& jj) const{
     std::vector< int > rows = range(size1());
     std::vector< MX > temp;
 
     for (int j=0;j<jj.size();++j) {
       MX m(k.sparsity(),MX(0));
       for (int i=0;i<m.size();++i) {
-	m[i] = getSub(k.at(i),jj.at(j));
+	m[i] = sub(k.at(i),jj.at(j));
       }
       temp.push_back(m);
     }
@@ -184,19 +184,19 @@ namespace CasADi{
     return ret;
   }
 
-  const MX MX::getSub(const Matrix<int>& i, const Matrix<int>& j) const {
-    casadi_assert_message(i.sparsity()==j.sparsity(),"getSub(Imatrix i, Imatrix j): sparsities must match. Got " << i.dimString() << " and " << j.dimString() << ".");
+  const MX MX::sub(const Matrix<int>& i, const Matrix<int>& j) const {
+    casadi_assert_message(i.sparsity()==j.sparsity(),"sub(Imatrix i, Imatrix j): sparsities must match. Got " << i.dimString() << " and " << j.dimString() << ".");
 
     MX ret(i.sparsity(),MX(0));
     for (int k=0;k<i.size();++k) {
-      ret[k] = getSub(i.at(k),j.at(k));
+      ret[k] = sub(i.at(k),j.at(k));
     }
     simplifyMapping(ret);
     return ret;
   }
 
-  const MX MX::getSub(const CRSSparsity& sp, int dummy) const {
-    casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+  const MX MX::sub(const CRSSparsity& sp, int dummy) const {
+    casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"sub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
     vector<unsigned char> mappingc; // Mapping that will be filled by patternunion
   
     sparsity().patternUnion(sp,mappingc,true, false, true);
@@ -359,7 +359,7 @@ namespace CasADi{
   }
 
   void MX::setSub(const CRSSparsity& sp, int dummy, const MX& el) {
-    casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+    casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"setSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
     casadi_error("Not implemented yet");
   }
 

@@ -2159,7 +2159,7 @@ namespace CasADi{
     return ret;
   }
 
-  CRSSparsity CRSSparsityInternal::getSub(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
+  CRSSparsity CRSSparsityInternal::sub(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
     if (!inBounds(ii,nrow_)) {
       casadi_error("Slicing [ii,jj] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
     }
@@ -2171,17 +2171,17 @@ namespace CasADi{
       // Typical use case:
       // a = ssym("a",sp_diag(50000))
       // a[:,:]
-      return getSub2(ii,jj,mapping);
+      return sub2(ii,jj,mapping);
     } else {
       // Typical use case:
       // a = DMatrix.ones(1000,1000)
       // a[[0,1],[0,1]]
-      return getSub1(ii,jj,mapping);
+      return sub1(ii,jj,mapping);
     }
 
   }
 
-  CRSSparsity CRSSparsityInternal::getSub2(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
+  CRSSparsity CRSSparsityInternal::sub2(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
     std::vector<int> jj_sorted;
     std::vector<int> jj_sorted_index;
 
@@ -2245,8 +2245,7 @@ namespace CasADi{
     return ret;
   }
 
-
-  CRSSparsity CRSSparsityInternal::getSub1(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
+  CRSSparsity CRSSparsityInternal::sub1(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
 
     std::vector<int> jj_sorted;
     std::vector<int> jj_sorted_index;
