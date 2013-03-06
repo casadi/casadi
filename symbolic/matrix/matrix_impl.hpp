@@ -25,6 +25,7 @@
 
 // The declaration of the class is in a separate file
 #include "matrix.hpp"
+#include "matrix_tools.hpp"
 
 #ifdef WITH_EIGEN3
 #include <Eigen/Dense>

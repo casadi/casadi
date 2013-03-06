@@ -28,7 +28,6 @@ namespace CasADi{
 
   SubRef::SubRef(const MX& x, const Slice& i, const Slice& j) : i_(i), j_(j) {
     setDependencies(x);
-    casadi_error("not ready");
   }
   
   SubRef* SubRef::clone() const{
@@ -45,7 +44,20 @@ namespace CasADi{
 
   template<typename T, typename MatV, typename MatVV>
   void SubRef::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
-    casadi_error("not ready");
+
+    // Nondifferentiated outputs
+    input[0]->getSub(*output[0],i_,j_);
+    
+    // Forward sensitivities
+    for(int d=0; d<fwdSens.size(); ++d){
+      fwdSeed[d][0]->getSub(*fwdSens[d][0],i_,j_);
+    }
+    
+    // Adjoint sensitivities
+    for(int d=0; d<adjSeed.size(); ++d){
+      adjSens[d][0]->addSub(*adjSeed[d][0],i_,j_);
+      adjSeed[d][0]->setZero();
+    }
   }
 
   void SubRef::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
