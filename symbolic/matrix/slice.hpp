@@ -25,6 +25,7 @@
 
 #include <vector>
 #include "../casadi_exception.hpp"
+#include "../printable_object.hpp"
 #include <limits>
 #include <iostream>
 
@@ -32,7 +33,7 @@ namespace CasADi{
   
   /** Class representing a slice
    */
-  class Slice{
+  class Slice : public PrintableObject{
   public:
     /// Defailt constructor - all elements
     Slice();
@@ -46,9 +47,10 @@ namespace CasADi{
     /// Get a vector of indices
     std::vector<int> getAll(int len) const;
 
+#ifndef SWIG
     /// Print a representation of the object to a stream
-    friend std::ostream& operator<<(std::ostream& stream, const Slice& slice){ slice.print(stream); return stream;}
-    void print(std::ostream& stream) const;
+    virtual void print(std::ostream& stream=std::cout) const;
+#endif // SWIG
 
     /// start value: negative values will get added to length
     int start_;
