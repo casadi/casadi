@@ -53,6 +53,9 @@ namespace CasADi{
 
     /** \brief Get the index of an existing dependency */
     int getDependency(const FX& f) const;
+    
+    /** \brief Print a constant in a lossless but compact manner */
+    void printConstant(std::ostream& s, double v) const;
 
     /** \brief Auxiliary functions */
     enum Auxiliary{

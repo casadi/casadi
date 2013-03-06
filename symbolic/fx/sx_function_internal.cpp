@@ -27,6 +27,7 @@
 #include <deque>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 #include "../stl_vector_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../sx/sx_node.hpp"
@@ -372,7 +373,7 @@ void SXFunctionInternal::generateBody(std::ostream &stream, const std::string& t
       
       // What to store
       if(it->op==OP_CONST){
-	stream << it->arg.d;
+	gen.printConstant(stream,it->arg.d);
       } else if(it->op==OP_INPUT){
 	stream << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
       } else {
