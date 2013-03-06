@@ -158,7 +158,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
     void indexed_one_based_assignment(int i, int j, const MX &m){ (*this)(i-1,j-1) = m;}
     void indexed_zero_based_assignment(int i, int j, const MX &m){ (*this)(i,j) = m;}
     void indexed_assignment(const IndexList &i, const IndexList &j, const MX &m){
-      setSub(i.getAll(size1()),j.getAll(size2()),m);
+      setSub(m,i.getAll(size1()),j.getAll(size2()));
     }
     
     void indexed_assignment(const Slice &i, const Slice &j, const MX &m){
@@ -360,19 +360,18 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   const MX sub(const Slice& i, const Matrix<int>& j) const {return sub(i.getAll(size1()),j);}
   const MX sub(const Matrix<int>& i, const Slice& j) const {return sub(i,j.getAll(size2()));}
   const MX sub(const Matrix<int>& i, const Matrix<int>& j) const;
-      
-  void setSub(int i, int j, const MX& el);
-  void setSub(int i, const std::vector<int>& j, const MX& el);
-  void setSub(const std::vector<int>& i, int j, const MX& el);
-  void setSub(const std::vector<int>& i, const std::vector<int>& j, const MX& el);
-  void setSub(const Matrix<int>& k, const MX& el);
-  
-  void setSub(const std::vector<int>& i, const Matrix<int>& k, const MX& m);
-  void setSub(const Matrix<int>& k, const std::vector<int>& j, const MX& m);
-  //void setSub(const Slice& i, const Matrix<int>& k, const MX& m) {return setSub(i.getAll(size1()),k,m);}
-  //void setSub(const Matrix<int>& k, const Slice& j, const MX& m) {return setSub(k,j.getAll(size2()),m);}
-  void setSub(const Matrix<int>& i, const Matrix<int>& j, const MX& m);
-  void setSub(const CRSSparsity& sp, int dummy, const MX& m);
+
+  void setSub(const MX& m, int i, int j);
+  void setSub(const MX& m, int i, const std::vector<int>& j);
+  void setSub(const MX& m, const std::vector<int>& i, int j);
+  void setSub(const MX& m, const std::vector<int>& i, const std::vector<int>& j);
+  void setSub(const MX& m, const Matrix<int>& k);
+  void setSub(const MX& m, const std::vector<int>& i, const Matrix<int>& k);
+  void setSub(const MX& m, const Matrix<int>& k, const std::vector<int>& j);
+  //void setSub(const MX& m, const Slice& i, const Matrix<int>& k) {return setSub(m,i.getAll(size1()),k);}
+  //void setSub(const MX& m, const Matrix<int>& k, const Slice& j) {return setSub(m,k,j.getAll(size2()));}
+  void setSub(const MX& m, const Matrix<int>& i, const Matrix<int>& j);
+  void setSub(const MX& m, const CRSSparsity& sp, int dummy);
     
   MX getNZ(int k) const;
   MX getNZ(const std::vector<int>& k) const;
