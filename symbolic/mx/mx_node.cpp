@@ -297,7 +297,11 @@ namespace CasADi{
   }
   
   MX MXNode::getMultiplication(const MX& y) const{
-    return MX::create(new Multiplication(shared_from_this<MX>(),trans(y)));
+    if(sparsity().dense() && y.dense()){
+      return MX::create(new DenseMultiplication(shared_from_this<MX>(),trans(y)));
+    } else {
+      return MX::create(new Multiplication(shared_from_this<MX>(),trans(y)));    
+    }
   }
   
   MX MXNode::getSubRef(const Slice& i, const Slice& j) const{

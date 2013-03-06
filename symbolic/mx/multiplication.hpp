@@ -26,11 +26,11 @@
 #include "mx_node.hpp"
 
 namespace CasADi{
-/** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
-  \author Joel Andersson 
-  \date 2010
+  /** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
+      \author Joel Andersson 
+      \date 2010
   */
-class Multiplication : public MXNode{
+  class Multiplication : public MXNode{
   public:
     
     /** \brief  Constructor */
@@ -40,7 +40,7 @@ class Multiplication : public MXNode{
     virtual ~Multiplication(){}
 
     /** \brief  Clone function */
-    virtual Multiplication* clone() const;
+    virtual Multiplication* clone() const{ return new Multiplication(*this);}
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -62,7 +62,28 @@ class Multiplication : public MXNode{
     
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_MATMUL;}
-};
+  };
+
+  /** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
+      \author Joel Andersson 
+      \date 2010
+  */
+  class DenseMultiplication : public Multiplication{
+  public:
+    
+    /** \brief  Constructor */
+    DenseMultiplication(const MX& x, const MX& y_trans) : Multiplication(x,y_trans){}
+
+    /** \brief  Destructor */
+    virtual ~DenseMultiplication(){}
+
+    /** \brief  Clone function */
+    virtual DenseMultiplication* clone() const{ return new DenseMultiplication(*this);}
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+  };
+
 
 } // namespace CasADi
 

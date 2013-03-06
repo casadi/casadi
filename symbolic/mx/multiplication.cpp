@@ -30,97 +30,103 @@ using namespace std;
 
 namespace CasADi{
 
-Multiplication::Multiplication(const MX& x, const MX& y_trans){
-  casadi_assert_message(x.size2() == y_trans.size2(),"Multiplication::Multiplication: dimension mismatch. Attempting to multiply " << x.dimString() << " with " << y_trans.dimString());
-  setDependencies(x,y_trans);
+  Multiplication::Multiplication(const MX& x, const MX& y_trans){
+    casadi_assert_message(x.size2() == y_trans.size2(),"Multiplication::Multiplication: dimension mismatch. Attempting to multiply " << x.dimString() << " with " << y_trans.dimString());
+    setDependencies(x,y_trans);
 
-  // Create the sparsity pattern for the matrix-matrix product
-  CRSSparsity spres = x->sparsity().patternProduct(y_trans.sparsity());
+    // Create the sparsity pattern for the matrix-matrix product
+    CRSSparsity spres = x->sparsity().patternProduct(y_trans.sparsity());
 
-  // Save sparsity
-  setSparsity(spres);
-}
-
-Multiplication* Multiplication::clone() const{
-  return new Multiplication(*this);
-}
-
-void Multiplication::printPart(std::ostream &stream, int part) const{
-  if(part==0){
-    stream << "mul(";
-  } else if(part==1){
-    stream << ",trans(";
-  } else {
-    stream << "))";
-  }
-}
-
-void Multiplication::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-  int nfwd = fwdSens.size();
-  int nadj = adjSeed.size();
-
-  fill(output[0]->begin(),output[0]->end(),0);
-  DMatrix::mul_no_alloc_nt(*input[0],*input[1],*output[0]);
-
-  // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
-  for(int d=0; d<nfwd; ++d){
-    fill(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),0);
-    DMatrix::mul_no_alloc_nt(*fwdSeed[d][0],*input[1],*fwdSens[d][0]);
-    DMatrix::mul_no_alloc_nt(*input[0],*fwdSeed[d][1],*fwdSens[d][0]);
+    // Save sparsity
+    setSparsity(spres);
   }
 
-  // Adjoint sensitivities
-  for(int d=0; d<nadj; ++d){
-    DMatrix::mul_no_alloc_nn(*adjSeed[d][0],*input[1],*adjSens[d][0]);
-    DMatrix::mul_no_alloc_tn(*adjSeed[d][0],*input[0],*adjSens[d][1]);
-    adjSeed[d][0]->setZero();
+  void Multiplication::printPart(std::ostream &stream, int part) const{
+    if(part==0){
+      stream << "mul(";
+    } else if(part==1){
+      stream << ",trans(";
+    } else {
+      stream << "))";
+    }
   }
-}
 
-void Multiplication::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-  fill(output[0]->begin(),output[0]->end(),0);
-  SXMatrix::mul_no_alloc_nt(*input[0],*input[1],*output[0]);
-}
+  void Multiplication::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+    int nfwd = fwdSens.size();
+    int nadj = adjSeed.size();
 
-void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-  if(!output_given)
-    *output[0] = mul(*input[0],trans(*input[1]));
+    fill(output[0]->begin(),output[0]->end(),0);
+    DMatrix::mul_no_alloc_nt(*input[0],*input[1],*output[0]);
 
-  // Forward sensitivities
-  int nfwd = fwdSens.size();
-  for(int d=0; d<nfwd; ++d){
-    *fwdSens[d][0] = mul(*fwdSeed[d][0],trans(*input[1])) + mul(*input[0],trans(*fwdSeed[d][1]));
+    // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
+    for(int d=0; d<nfwd; ++d){
+      fill(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),0);
+      DMatrix::mul_no_alloc_nt(*fwdSeed[d][0],*input[1],*fwdSens[d][0]);
+      DMatrix::mul_no_alloc_nt(*input[0],*fwdSeed[d][1],*fwdSens[d][0]);
+    }
+
+    // Adjoint sensitivities
+    for(int d=0; d<nadj; ++d){
+      DMatrix::mul_no_alloc_nn(*adjSeed[d][0],*input[1],*adjSens[d][0]);
+      DMatrix::mul_no_alloc_tn(*adjSeed[d][0],*input[0],*adjSens[d][1]);
+      adjSeed[d][0]->setZero();
+    }
   }
+
+  void Multiplication::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+    fill(output[0]->begin(),output[0]->end(),0);
+    SXMatrix::mul_no_alloc_nt(*input[0],*input[1],*output[0]);
+  }
+
+  void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+    if(!output_given)
+      *output[0] = mul(*input[0],trans(*input[1]));
+
+    // Forward sensitivities
+    int nfwd = fwdSens.size();
+    for(int d=0; d<nfwd; ++d){
+      *fwdSens[d][0] = mul(*fwdSeed[d][0],trans(*input[1])) + mul(*input[0],trans(*fwdSeed[d][1]));
+    }
   
-  // Adjoint sensitivities
-  int nadj = adjSeed.size();
-  for(int d=0; d<nadj; ++d){
-    *adjSens[d][0] += mul(*adjSeed[d][0],*input[1]);
-    *adjSens[d][1] += mul(trans(*adjSeed[d][0]),*input[0]);
-    *adjSeed[d][0] = MX();
+    // Adjoint sensitivities
+    int nadj = adjSeed.size();
+    for(int d=0; d<nadj; ++d){
+      *adjSens[d][0] += mul(*adjSeed[d][0],*input[1]);
+      *adjSens[d][1] += mul(trans(*adjSeed[d][0]),*input[0]);
+      *adjSeed[d][0] = MX();
+    }
   }
-}
 
-void Multiplication::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-  DMatrix::mul_sparsity(*input[0],*input[1],*output[0],fwd);
-  if(!fwd) fill_n(get_bvec_t(output[0]->data()),output[0]->size(),bvec_t(0));
-}
-
-void Multiplication::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-  gen.addAuxiliary(CodeGenerator::AUX_MM_NT_SPARSE);
-  gen.addAuxiliary(CodeGenerator::AUX_FILL);
-
-  // Clear the result
-  stream << "  casadi_fill(" << sparsity().size() << ",0.0," << res.front() << ",1);" << endl;
-
-  // Perform sparse matrix multiplication
-  stream << "  casadi_mm_nt_sparse(";
-  for(int i=0; i<2; ++i){
-    stream << arg.at(i) << ",s" << gen.getSparsity(dep(i).sparsity()) << ",";
+  void Multiplication::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+    DMatrix::mul_sparsity(*input[0],*input[1],*output[0],fwd);
+    if(!fwd) fill_n(get_bvec_t(output[0]->data()),output[0]->size(),bvec_t(0));
   }
-  stream << res.front() << ",s" << gen.getSparsity(sparsity()) << ");" << endl;
-}
 
+  void Multiplication::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    gen.addAuxiliary(CodeGenerator::AUX_MM_NT_SPARSE);
+    gen.addAuxiliary(CodeGenerator::AUX_FILL);
+
+    // Clear the result
+    stream << "  casadi_fill(" << sparsity().size() << ",0.0," << res.front() << ",1);" << endl;
+
+    // Perform sparse matrix multiplication
+    stream << "  casadi_mm_nt_sparse(";
+    for(int i=0; i<2; ++i){
+      stream << arg.at(i) << ",s" << gen.getSparsity(dep(i).sparsity()) << ",";
+    }
+    stream << res.front() << ",s" << gen.getSparsity(sparsity()) << ");" << endl;
+  }
+
+  void DenseMultiplication::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    int nrow_x = dep(0).size1();
+    int ncol_x = dep(0).size2();
+    int nrow_y = dep(1).size1();
+    stream << "  for(i=0; i<" << nrow_x << "; ++i) for(j=0; j<" << nrow_y << "; ++j){" << endl;
+    stream << "    d r=0, *x=" << arg.at(0) << "+i*" << ncol_x << ", *y=" << arg.at(1) << "+j*" << ncol_x << ";" << endl;
+    stream << "    for(k=0; k<" << ncol_x << "; ++k) r += *x++**y++;" << endl;
+    stream << "    " << res.front() << "[j+i*" << nrow_y << "] = r;" << endl;
+    stream << "  }" << endl;
+  }
 
 } // namespace CasADi
 
