@@ -39,7 +39,7 @@ namespace CasADi{
     Transpose(const MX& x);
 
     /// Clone function
-    virtual Transpose* clone() const;
+    virtual Transpose* clone() const{ return new Transpose(*this);}
       
     /// Destructor
     virtual ~Transpose(){}
@@ -75,6 +75,44 @@ namespace CasADi{
     /// Transpose
     virtual MX getTranspose() const{ return dep();}
   };
+
+  /** \brief Matrix transpose (dense)
+      \author Joel Andersson
+      \date 2013
+  */
+  class DenseTranspose : public Transpose{
+  public:
+
+    /// Constructor
+    DenseTranspose(const MX& x) : Transpose(x){}
+
+    /// Clone function
+    virtual DenseTranspose* clone() const{ return new DenseTranspose(*this);}
+      
+    /// Destructor
+    virtual ~DenseTranspose(){}
+    
+    /// Evaluate the function numerically
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, std::vector<int>& itmp, std::vector<double>& rtmp);
+
+    /// Evaluate the function symbolically (SX)
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens, std::vector<int>& itmp, std::vector<SX>& rtmp);
+
+    /// Propagate sparsity
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+
+    /// Evaluate the function (template)
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens, std::vector<int>& itmp, std::vector<T>& rtmp);
+        
+    /// Get number of temporary variables needed
+    virtual void nTmp(size_t& ni, size_t& nr){ ni=0; nr=0;}
+  };
+
+
 
 } // namespace CasADi
 

@@ -285,7 +285,11 @@ namespace CasADi{
   }
 
   MX MXNode::getTranspose() const{
-    return MX::create(new Transpose(shared_from_this<MX>()));
+    if(sparsity().dense()){
+      return MX::create(new DenseTranspose(shared_from_this<MX>()));
+    } else {
+      return MX::create(new Transpose(shared_from_this<MX>()));
+    }
   }
 
   MX MXNode::getReshape(const CRSSparsity& sp) const{

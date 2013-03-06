@@ -1146,7 +1146,7 @@ void MXFunctionInternal::allocTape(){
     vector<string> arg,res;
     
     // Codegen a temporary variable
-    stream << "  int i;" << endl;
+    stream << "  int i,j,k;" << endl;
     
     // Print class (for debugging)
     bool codegen_class = true;
