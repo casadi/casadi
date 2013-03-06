@@ -136,8 +136,8 @@ namespace CasADi{
 	asens += aseed(Slice(row_offset,row_offset+nrow),Slice());
 	row_offset += nrow;
       }
-      aseed = MX();
       casadi_assert(row_offset == aseed.size1());
+      aseed = MX();
     }
   }
 
