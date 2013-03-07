@@ -105,13 +105,13 @@ namespace CasADi{
     if(input[0]==output[0]) return;
 
     if(!output_given){
-      *output[0] = reshape(*input[0],sparsity());
+      *output[0] = reshape(*input[0],size1(),size2());
     }
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for(int d = 0; d<nfwd; ++d){
-      *fwdSens[d][0] = reshape(*fwdSeed[d][0],sparsity());
+      *fwdSens[d][0] = reshape(*fwdSeed[d][0],size1(),size2());
     }
     
     // Adjoint sensitivities
@@ -119,7 +119,7 @@ namespace CasADi{
     for(int d=0; d<nadj; ++d){
       MX& aseed = *adjSeed[d][0];
       MX& asens = *adjSens[d][0];
-      asens += reshape(aseed,dep().sparsity());
+      asens += reshape(aseed,dep().size1(),dep().size2());
       aseed = MX();
     }
   }
