@@ -554,6 +554,10 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   std::vector<int> input_row = input(iind).sparsity().getRow();
   const std::vector<int>& input_col = input(iind).col();
 
+  // Output sparsity
+  std::vector<int> output_row = output(oind).sparsity().getRow();
+  const std::vector<int>& output_col = output(oind).col();
+
   // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
   if(verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;
   std::vector<int> mapping;
@@ -631,12 +635,10 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
     // Adjoint seeds
     aseed.resize(nadir_batch);
     for(int d=0; d<nadir_batch; ++d){
-      //initialize to zero
-      aseed[d].resize(getNumOutputs());
-      for(int ind=0; ind<aseed[d].size(); ++ind){
-        aseed[d][ind] = MatType(output(ind).sparsity(),0);
-      }
-      
+      // Nonzeros of the seed matrix
+      seed_row.clear();
+      seed_col.clear();
+
       // For all the directions
       for(int el = D2.rowind(offset_nadir+d); el<D2.rowind(offset_nadir+d+1); ++el){
         
@@ -644,7 +646,19 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
         int c = D2.col(el);
 
         // Give a seed in the direction
-        aseed[d][oind].at(c) = 1; // NOTE: should be +=, right?
+	seed_row.push_back(output_row[c]);
+	seed_col.push_back(output_col[c]);
+      }
+
+      //initialize to zero
+      aseed[d].resize(getNumOutputs());
+      for(int ind=0; ind<aseed[d].size(); ++ind){
+	int nrow = output(ind).size1(), ncol = output(ind).size2(); // Output dimensions
+	if(ind==oind){
+	  aseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
+	} else {
+	  aseed[d][ind] = MatType::sparse(nrow,ncol);
+	}
       }
     }
 
