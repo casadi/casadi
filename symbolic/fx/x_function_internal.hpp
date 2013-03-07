@@ -550,6 +550,10 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   const std::vector<int>& jsp_rowind = jsp.rowind();
   const std::vector<int>& jsp_col = jsp.col();
   
+  // Input sparsity
+  std::vector<int> input_row = input(iind).sparsity().getRow();
+  const std::vector<int>& input_col = input(iind).col();
+
   // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
   if(verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;
   std::vector<int> mapping;
@@ -575,6 +579,9 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   int nsweep = std::max(nsweep_fwd,nsweep_adj);
   if(verbose())   std::cout << "XFunctionInternal::jac " << nsweep << " sweeps needed for " << nfdir << " forward and " << nadir << " adjoint directions"  << std::endl;
   
+  // Sparsity of the seeds
+  vector<int> seed_row, seed_col;
+
   // Evaluate until everything has been determinated
   for(int s=0; s<nsweep; ++s){
     // Print progress
@@ -594,13 +601,10 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
     // Forward seeds
     fseed.resize(nfdir_batch);
     for(int d=0; d<nfdir_batch; ++d){
-      
-      // initialize to zero
-      fseed[d].resize(getNumInputs());
-      for(int ind=0; ind<fseed[d].size(); ++ind){
-        fseed[d][ind] = MatType(input(ind).sparsity(),0);
-      }
-      
+      // Nonzeros of the seed matrix
+      seed_row.clear();
+      seed_col.clear();
+
       // For all the directions
       for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
         
@@ -608,7 +612,19 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
         int c = D1.col(el);
 
         // Give a seed in the direction
-        fseed[d][iind].at(c) = 1;
+	seed_row.push_back(input_row[c]);
+	seed_col.push_back(input_col[c]);
+      }
+
+      // initialize to zero
+      fseed[d].resize(getNumInputs());
+      for(int ind=0; ind<fseed[d].size(); ++ind){
+	int nrow = input(ind).size1(), ncol = input(ind).size2(); // Input dimensions
+	if(ind==iind){
+	  fseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
+	} else {
+	  fseed[d][ind] = MatType::sparse(nrow,ncol);
+	}
       }
     }
     

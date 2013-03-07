@@ -655,24 +655,28 @@ namespace CasADi{
     
     //@{
     /** \brief  create a dense matrix with all zeros */
+    static Matrix<T> zeros(const CRSSparsity& sp);
     static Matrix<T> zeros(int nrow, int ncol=1);
     static Matrix<T> zeros(const std::pair<int,int>& nm);
     //@}
 
     //@{
     /** \brief  create a matrix with all ones */
+    static Matrix<T> ones(const CRSSparsity& sp);
     static Matrix<T> ones(int nrow, int ncol=1);
     static Matrix<T> ones(const std::pair<int,int>& nm);
     //@}
 
     //@{
     /** \brief  create a matrix with all inf */
+    static Matrix<T> inf(const CRSSparsity& sp);
     static Matrix<T> inf(int nrow=1, int ncol=1);
     static Matrix<T> inf(const std::pair<int,int>& nm);
     //@}
     
     //@{
     /** \brief  create a matrix with all nan */
+    static Matrix<T> nan(const CRSSparsity& sp);
     static Matrix<T> nan(int nrow=1, int ncol=1);
     static Matrix<T> nan(const std::pair<int,int>& nm);
     //@}

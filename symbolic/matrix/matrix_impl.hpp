@@ -26,6 +26,7 @@
 // The declaration of the class is in a separate file
 #include "matrix.hpp"
 #include "matrix_tools.hpp"
+#include "sparsity_tools.hpp"
 
 #ifdef WITH_EIGEN3
 #include <Eigen/Dense>
@@ -1691,13 +1692,23 @@ Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>&
 }
 
 template<class T>
+Matrix<T> Matrix<T>::zeros(const CRSSparsity& sp){
+  return Matrix<T>(sp,0);
+}
+
+template<class T>
 Matrix<T> Matrix<T>::zeros(const std::pair<int,int> &nm){
   return zeros(nm.first,nm.second);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::zeros(int n, int m){
-  return Matrix<T>(n,m,0);
+  return zeros(sp_dense(n,m));
+}
+
+template<class T>
+Matrix<T> Matrix<T>::ones(const CRSSparsity& sp){
+  return Matrix<T>(sp,1);
 }
 
 template<class T>
@@ -1707,7 +1718,7 @@ Matrix<T> Matrix<T>::ones(const std::pair<int,int> &nm){
 
 template<class T>
 Matrix<T> Matrix<T>::ones(int n, int m){
-  return Matrix<T>(n,m,1);
+  return ones(sp_dense(n,m));
 }
 
 template<class T>
@@ -1734,14 +1745,26 @@ Matrix<T> Matrix<T>::eye(int n){
 }
 
 template<class T>
+Matrix<T> Matrix<T>::inf(const CRSSparsity& sp){
+  casadi_assert_message(std::numeric_limits<T>::has_infinity,"Datatype cannot represent infinity");
+  return Matrix<T>(sp,std::numeric_limits<T>::infinity());
+}
+
+
+template<class T>
 Matrix<T> Matrix<T>::inf(const std::pair<int,int>& nm){
   return inf(nm.first, nm.second);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::inf(int n, int m){
-  casadi_assert_message(std::numeric_limits<T>::has_infinity,"Datatype cannot represent infinity");
-  return Matrix<T>(n,m,std::numeric_limits<T>::infinity());
+  return inf(sp_dense(n,m));
+}
+
+template<class T>
+Matrix<T> Matrix<T>::nan(const CRSSparsity& sp){
+  casadi_assert_message(std::numeric_limits<T>::has_quiet_NaN,"Datatype cannot represent not-a-number");
+  return Matrix<T>(sp,std::numeric_limits<T>::quiet_NaN());
 }
 
 template<class T>
@@ -1751,8 +1774,7 @@ Matrix<T> Matrix<T>::nan(const std::pair<int,int>& nm){
 
 template<class T>
 Matrix<T> Matrix<T>::nan(int n, int m){
-  casadi_assert_message(std::numeric_limits<T>::has_quiet_NaN,"Datatype cannot represent not-a-number");
-  return Matrix<T>(n,m,std::numeric_limits<T>::quiet_NaN());
+  return nan(sp_dense(n,m));
 }
 
 template<class T>
