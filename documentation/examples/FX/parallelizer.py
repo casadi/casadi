@@ -39,6 +39,7 @@ f.init()
 
 #! Evaluate this function ten times in parallel
 p = Parallelizer([f]*n)
+p.setOption("gather_stats",True)
 p.setOption("parallelization","openmp")
 p.init()
 

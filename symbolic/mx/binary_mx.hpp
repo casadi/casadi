@@ -77,6 +77,9 @@ class SparseSparseOp : public BinaryMX{
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+
     //! \brief Which argument for each nonzero
     std::vector<unsigned char> mapping_;
 };
@@ -106,6 +109,9 @@ class NonzerosScalarOp : public BinaryMX{
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
     void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 };
 
 /// A scalar-matrix binary operation where one loops only over nonzeros of the matrix
@@ -133,6 +139,9 @@ class ScalarNonzerosOp : public BinaryMX{
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
     void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 };
 
 /// A matrix-matrix binary operation with matching nonzeros
@@ -160,6 +169,10 @@ class NonzerosNonzerosOp : public BinaryMX{
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
     void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+
 };
 
 

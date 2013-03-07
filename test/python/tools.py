@@ -29,9 +29,123 @@ from casadi.tools import *
 
 class Toolstests(casadiTestCase):
 
+  def test_collection(self):
+      self.message("Collection")
+
+      p = Collection()
+      p.x = ssym("x",2)
+      p.z = ssym("z",2,4)
+      p.y = ssym("y",3,2)
+
+      p.freeze()
+      
+      self.assertTrue(isinstance(p[...],SXMatrix))
+      self.assertEqual(p.size,16)
+      self.assertEqual(p[...].shape[0],16)
+      self.assertEqual(p[...].shape[1],1)
+
+      self.assertTrue(isEqual(p.x,p["x"]))
+      self.assertTrue(isEqual(p.y,p["y"]))
+      self.assertTrue(isEqual(p.z,p["z"]))
+
+      self.checkarray(p.i_x,IMatrix([0,1]),"")
+      self.checkarray(p.i_z,IMatrix([[2,4,6,8],[3,5,7,9]]),"")
+      self.checkarray(p.i_y,IMatrix([[10,13],[11,14],[12,15]]),"")
+      
+      self.checkarray(p.iv_x,list(IMatrix([0,1])),"")
+      
+      p = Collection()
+      p.x = [ssym("x")]
+      p.z = [ssym("z%d" % i) for i in range(2)]
+      p.y = [[ssym("y%d%d"% (i,j)) for i in range(2)] for j in range(3)]
+      p.setOrder(["x","y","z"])
+      p.freeze()
+      
+      self.assertTrue(isinstance(p[...],SXMatrix))
+      self.assertEqual(p.size,9)
+
+      self.assertTrue(all(map(isEqual,p.x,p["x"])))
+      self.assertTrue(all(map(isEqual,p.z,p["z"])))
+      self.assertTrue(all(map(lambda a,b: all(map(isEqual,a,b)),p.y,p["y"])))
+      self.checkarray(p[...],vertcat([p.x[0],p.y[0][0],p.y[0][1],p.y[1][0],p.y[1][1],p.y[2][0],p.y[2][1],p.z[0],p.z[1]]),"")
+
+      self.checkarray(p.i_x[0],0,"")
+      self.checkarray(p.i_z[0],7,"")
+      self.checkarray(p.i_z[1],8,"")
+      self.checkarray(p.i_y[0],[1,2],"")
+      self.checkarray(p.i_y[1],[3,4],"")
+      
+      self.checkarray(p.i_y.__getitem__(0),[1,2],"")
+      #self.checkarray(p.i_y.__getitem__((0,)),[1,2],"")
+
+      self.checkarray(p.i_y,[[1,2],[3,4],[5,6]],"")
+      
+      #self.checkarray(p.i_y[:,0],[1,3,5],"")
+      #self.checkarray(p.i_y[:,1],[2,4,6],"")
+      
+      #self.checkarray(p.i_y[0,:],[1,2],"")
+      #self.checkarray(p.i_y[1,:],[3,4],"")
+      
+      #self.checkarray(p._i["y",0],[1,2],"")
+      #self.checkarray(p._i["y",:,0],[1,3,5],"")
+      
+      p = Collection()
+      p.x = [ssym("x")]
+      p.z = [ssym("z%d" % i) for i in range(2)]
+      p.y = [[ssym("y%d%d"% (i,j)) for i in range(2)] for j in range(3)]
+      p.setOrder(["x",("y","z")])
+      p.freeze()
+      
+      self.assertTrue(isinstance(p[...],SXMatrix))
+      self.assertEqual(p.size,9)
+
+      self.assertTrue(all(map(isEqual,p.x,p["x"])))
+      self.assertTrue(all(map(isEqual,p.z,p["z"])))
+      self.assertTrue(all(map(lambda a,b: all(map(isEqual,a,b)),p.y,p["y"])))
+      self.checkarray(p[...],vertcat([p.x[0],p.y[0][0],p.y[0][1],p.z[0],p.y[1][0],p.y[1][1],p.z[1],p.y[2][0],p.y[2][1]]),"")
+
+      self.checkarray(p.z[...],vertcat([p.z[0],p.z[1]]),"")
+      self.checkarray(p.y[...],vertcat([p.y[0][0],p.y[0][1],p.y[1][0],p.y[1][1],p.y[2][0],p.y[2][1]]),"")
+      
+      self.checkarray(p.i_x[0],0,"")
+      self.checkarray(p.i_z[0],3,"")
+      self.checkarray(p.i_z[1],6,"")
+      self.checkarray(p.i_z[...],IMatrix([3,6]),"")
+      self.checkarray(p.i_y[0],[1,2],"")
+      self.checkarray(p.i_y[1],[4,5],"")
+      self.checkarray(p.i_y[2],[7,8],"")
+      self.checkarray(p.i_y[...],IMatrix([1,2,4,5,7,8]),"")
+    
+      p = Collection()
+      p.a = ssym("a")
+      p.b = ssym("b")
+      p.freeze()
+
+      g = Collection()
+      g.c = ssym("c")
+      g.d = p
+      g.e = ssym("e")
+      g.freeze()
+       
+      self.assertEqual(g.size,4)
+      self.checkarray(g[...],vertcat([g.c,p.a,p.b,g.e]),"")
+
+      self.assertEqual(p.size,2)
+      self.checkarray(p[...],vertcat([p.a,p.b]),"")
+      
+      self.checkarray(p.i_a,0)
+      self.checkarray(p.i_b,1)
+
+      self.checkarray(g.i_c,0)
+      self.checkarray(g.i_d["a"],1)
+      self.checkarray(g.i_d["b"],2)
+      self.checkarray(g.i_e,3)
+      
+      self.checkarray(g.d[...],vertcat([p.a,p.b]),"")
+      
+
   def test_variables(self):
       self.message("Variables")
-      # -*- coding: utf-8 -*-
              
       p = Variables()
 

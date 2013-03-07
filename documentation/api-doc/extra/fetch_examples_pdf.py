@@ -45,7 +45,9 @@ for example in examples:
   if m:
     try:
       os.makedirs(os.path.dirname('html/'+m.group(1) + '.pdf'))
+      os.makedirs(os.path.dirname('html/'+m.group(1) + '.py'))
     except:
       pass
     shutil.copyfile(src+m.group(1) + '.pdf','html/'+m.group(1) + '.pdf')
+    shutil.copyfile(src+m.group(1) + '.py', 'html/'+m.group(1) + '.py')
     print m.group(1) + '.pdf'

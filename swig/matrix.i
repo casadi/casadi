@@ -356,6 +356,10 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
   binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
   binopsFull(const CasADi::Matrix<double> & b,,CasADi::Matrix<double>,CasADi::Matrix<double>)
   binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
+  %pythoncode %{
+    def __abs__(self):
+      return int(self.__int__())
+  %}
 } // extend Matrix<int>
 } // namespace CasADi
 #endif // SWIGPYTHON

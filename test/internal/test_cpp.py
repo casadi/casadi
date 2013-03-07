@@ -39,7 +39,7 @@ else:
 
 t = TestSuite(dirname=src,
   suffix="run",
-  command = lambda dir,fn:  ['./'+fn],
+  command = lambda dir,fn,opt:  ['./'+fn]+opt,
   skipdirs=[".svn","ctemplate"],
     args=sys.argv[2:]
   )

@@ -118,7 +118,19 @@ class OptionsFunctionality : public SharedObject{
     
     /** \brief Get the allowed values of a certain option */
     std::vector<GenericType> getOptionAllowed(const std::string &str) const;
+    
+    /** \brief Get the index into allowed options of a certain option */
+    int getOptionAllowedIndex(const std::string &name) const;
 
+    /** \brief Set a certain option by giving its index into the allowed values */
+    void setOptionByAllowedIndex(const std::string &name, int i);
+    
+    /** \brief Get the enum value corresponding to th certain option */
+    int getOptionEnumValue(const std::string &name) const;
+
+    /** \brief Set a certain option by giving an enum value */
+    void setOptionByEnumValue(const std::string &name, int v);
+  
     /** \brief Get the default of a certain option */
     GenericType getOptionDefault(const std::string &str) const;
 
@@ -172,6 +184,18 @@ virtual ~OptionsFunctionalityNode();
   std::vector<GenericType> getOptionAllowed(const std::string &str) const;
   #endif // SWIG
   
+  /** \brief Get the index into allowed options of a certain option */
+  int getOptionAllowedIndex(const std::string &name) const;
+  
+  /** \brief Set a certain option by giving its index into the allowed values */
+  void setOptionByAllowedIndex(const std::string &name, int i);
+
+  /** \brief Get the enum value corresponding to th certain option */
+  int getOptionEnumValue(const std::string &name) const;
+
+  /** \brief Set a certain option by giving an enum value */
+  void setOptionByEnumValue(const std::string &name, int v);
+  
   /** \brief  check if there is an option str */
   bool hasOption(const std::string &str) const;
 
@@ -220,7 +244,7 @@ virtual ~OptionsFunctionalityNode();
 
 protected:
 
-  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType(), const std::string& desc="n/a", const std::vector<GenericType> &allowed_vals = std::vector<GenericType>(), bool inherit = false);
+  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType(), const std::string& desc="n/a", const std::vector<GenericType> &allowed_vals = std::vector<GenericType>(), bool inherit = false, std::vector<int> enum_values= std::vector<int>(), std::vector<std::string> enum_descr= std::vector<std::string>());
   void addOption(const std::string &str, const opt_type& type, const GenericType &def_val, const std::string& desc, const std::string &allowed_vals, bool inherit = false);
   
 void assert_exists(const std::string &str) const;
@@ -246,11 +270,16 @@ private:
   
 /** \brief  Allowed values for the options */
   std::map<std::string, std::vector<GenericType> > allowed_vals_;
+  
+/** \brief  Enum values */
+  std::map<std::string, std::vector<int> > enum_values_;
 
+/** \brief  Enum descriptions */
+  std::map<std::string, std::vector<std::string> > enum_descr_;
+  
 };
 
 #endif // SWIG
-
 
 } // namespace CasADi
 

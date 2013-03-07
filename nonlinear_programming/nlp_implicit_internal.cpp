@@ -30,26 +30,26 @@ namespace CasADi {
 
 NLPImplicitInternal* NLPImplicitInternal::clone() const{
   // Return a deep copy
-  NLPImplicitInternal* node = new NLPImplicitInternal(f_,nrhs_);
-  if(!node->is_init_)
+  FX f = shared_cast<FX>(f_.clone());
+  NLPImplicitInternal* node = new NLPImplicitInternal(f,nrhs_);
+  node->setOption(dictionary());
+  node->J_= shared_cast<FX>(J_.clone());
+  node->linsol_ =shared_cast<LinearSolver>(linsol_.clone());
+  
+  if(isInit())
     node->init();
   return node;
 }
   
 NLPImplicitInternal::NLPImplicitInternal(const FX& f, int nrhs) : ImplicitFunctionInternal(f,nrhs) {
-
   addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSolver used to solve the implicit system.");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSolver");
-  
-
 }
 
 NLPImplicitInternal::~NLPImplicitInternal(){ 
 }
 
 void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("NLPImplicitInternal::evaluate() not implemented for forward or backward mode");
-  
   // Obtain initial guess
   nlp_solver_.input(NLP_X_INIT).set(output(0));
   
@@ -70,6 +70,12 @@ void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
   for(int i=1; i<getNumOutputs(); ++i){
     output(i).set(f_.output(i));
   }
+    
+  // End of function if no sensitivities
+  if(nfdir==0 && nadir==0)
+    return;
+  
+  evaluate_sens(nfdir,nadir);
   
 }
 

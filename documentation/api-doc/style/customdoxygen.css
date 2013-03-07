@@ -137,6 +137,10 @@ dl.el {
 	font-size: 105%;
 }
 
+div.line {
+  white-space: pre;
+}
+
 pre.fragment {
 	border: 1px solid #C4CFE5;
 	background-color: #FBFCFD;

@@ -8,8 +8,7 @@
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/idas_integrator.hpp>
 
-#include <optimal_control/multiple_shooting.hpp>
-#include <optimal_control/multiple_shooting_internal.hpp>
+#include <optimal_control/direct_multiple_shooting.hpp>
 
 int main(int argc, char *argv[])
 {

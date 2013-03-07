@@ -3862,6 +3862,11 @@ int IDAInitialSetup(IDAMem IDA_mem)
 {
   booleantype conOK;
   int ier, retval;
+  
+  /* Shut off error control of quadrature states if there are no quadrature states
+     Avoids errors when integrating a system with forward quadratures but no backwards quadratures
+  */
+  errconQ = errconQ && N_VLength(phiQ[0])>0;
 
   /* Test for more vector operations, depending on options */
   if (suppressalg)

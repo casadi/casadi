@@ -271,12 +271,7 @@ void Mapping::init(){
 void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   // Sparsity
   const CRSSparsity &sp = sparsity();
-  const vector<int>& rowind = sp.rowind();
-  const vector<int>& col = sp.col();
   vector<int> row = sp.getRow();
-
-  // Dimensions
-  int d1=sp.size1(), d2=sp.size2();
   
   // Number of derivative directions
   int nfwd = fwdSens.size();
@@ -643,6 +638,29 @@ bool Mapping::isTranspose() const{
   
   // True if reached this point
   return true;
+}
+
+void Mapping::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  // Loop over output nonzeros
+  for(int k=0; k<output_sorted_.size(); ++k){
+    
+    // Get the set of operations
+    const std::vector<OutputNZ>& v = output_sorted_.at(k);
+    
+    // Print left hand side of assignment
+    stream << "  " << res.front() << "[" << k << "]=";
+    
+    // Print right hand side of assignment
+    if(v.size()==0){
+      stream << "0";
+    } else {
+      for(int j=0; j<v.size(); ++j){
+	if(j!=0) stream << "+";
+	stream << arg.at(v[j].iind) << "[" << v[j].inz << "]";
+      }
+    }
+    stream << ";" << endl;
+  }
 }
 
 } // namespace CasADi

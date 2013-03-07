@@ -67,8 +67,17 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     /** \brief  Update the number of sensitivity directions during or after initialization */
     virtual void updateNumSens(bool recursive);
     
+    /** \brief Generate code for the C functon */
+    virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+
     /** \brief Set the lifting function */
     void setLiftingFunction(LiftingFunction liftfun, void* user_data);
+
+    /** \brief Extract the residual function G and the modified function Z out of an expression (see Albersmeyer2010 paper) */
+    void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
 
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
     virtual FX getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
@@ -82,6 +91,9 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     /** \brief  Working vector for numeric calculation */
     std::vector<FunctionIO> work_;
     
+    /** \brief  "Tape" with spilled variables */
+    std::vector<std::pair<std::pair<int,int>,DMatrix> > tape_;
+    
     /// Free variables
     std::vector<MX> free_vars_;
     
@@ -93,7 +105,7 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
                         const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
                         const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                        bool output_given, int offset_begin=0, int offset_end=0);
+                        bool output_given);
                         
     /** \brief Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
@@ -105,7 +117,7 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     SXFunction expand(const std::vector<SXMatrix>& inputv );
     
     // Update pointers to a particular element
-    void updatePointers(const AlgEl& el, int nfwd, int nadj);
+    void updatePointers(const AlgEl& el, int nfdir, int nadir);
     
     // Vectors to hold pointers during evaluation
     DMatrixPtrV mx_input_;
@@ -126,6 +138,16 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
 
     /// Reset the sparsity propagation
     virtual void spInit(bool fwd);
+    
+    /// Print work vector
+    void printWork(int nfdir=0, int nadir=0, std::ostream &stream=std::cout);
+    
+    /// Print tape
+    void printTape(std::ostream &stream=std::cout);
+    
+    /// Allocate tape
+    void allocTape();
+    
 };
 
 } // namespace CasADi

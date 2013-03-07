@@ -60,13 +60,13 @@ class ParallelizerInternal : public FXInternal{
     virtual void evaluateTask(int task, int nfdir, int nadir);
 
     /// Reset the sparsity propagation
-    virtual void spInit(bool fwd);
+    virtual void spInit(bool use_fwd);
     
     /// Propagate the sparsity pattern through a set of directional derivatives forward or backward
-    virtual void spEvaluate(bool fwd);
+    virtual void spEvaluate(bool use_fwd);
     
     /// Propagate the sparsity pattern through a set of directional derivatives forward or backward, one task only
-    void spEvaluateTask(bool fwd, int task);
+    void spEvaluateTask(bool use_fwd, int task);
 
     /// Is the class able to propate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd){ return true;}
@@ -81,7 +81,7 @@ class ParallelizerInternal : public FXInternal{
     virtual void init();
 
     /// Generate the sparsity of a Jacobian block
-    virtual CRSSparsity getJacSparsity(int iind, int oind);
+    virtual CRSSparsity getJacSparsity(int iind, int oind, bool symmetric);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

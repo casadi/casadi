@@ -78,22 +78,6 @@ MXFunctionInternal* MXFunction::operator->(){
   return (MXFunctionInternal*)FX::operator->();
 }
 
-const MX MXFunction::inputMX(int iind) const{
-  return (*this)->inputv_.at(iind);
-}
-
-const MX MXFunction::outputMX(int oind) const{
-  return (*this)->outputv_.at(oind);
-}
-
-const std::vector<MX>& MXFunction::inputsMX() const {
-  return (*this)->inputv_;
-}
-  
-const std::vector<MX>& MXFunction::outputsMX() const {
-  return (*this)->outputv_;
-}
-
 const MX& MXFunction::inputExpr(int ind) const{
   return (*this)->inputv_.at(ind);
 }
@@ -138,6 +122,15 @@ SXFunction MXFunction::expand(const std::vector<SXMatrix>& inputv){
 std::vector<MX> MXFunction::getFree() const{
   return (*this)->free_vars_;
 }
+
+int MXFunction::getWorkSize() const{
+  return (*this)->work_.size();
+}
+
+  void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn){
+    (*this)->generateLiftingFunctions(vdef_fcn,vinit_fcn);
+  }
+
 
 } // namespace CasADi
 

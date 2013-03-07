@@ -26,6 +26,7 @@ import unittest
 from types import *
 from helpers import *
 import numpy
+from itertools import *
 
 class Matrixtests(casadiTestCase):
   def test_constructorlol(self):
@@ -123,6 +124,20 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
 
+  def test_slicestepnegative(self):
+    self.message("Slice step negative")
+    a1 = [1,2,3,4,5]
+    a2 = DMatrix(a1)
+
+    self.checkarray(a2[0:4:-1,0],DMatrix(a1[0:4:-1])) # gives empty set
+    self.checkarray(a2[4:0:-1,0],DMatrix(a1[4:0:-1])) # gives [5, 4, 3, 2]
+    self.checkarray(a2[0:4:-2,0],DMatrix(a1[0:4:-2])) # gives empty set
+    self.checkarray(a2[4:0:-2,0],DMatrix(a1[4:0:-2])) # gives [5, 4, 3, 2]
+    self.checkarray(a2[1:4:-2,0],DMatrix(a1[1:4:-2])) # gives empty set
+    self.checkarray(a2[4:1:-2,0],DMatrix(a1[4:1:-2])) # gives [5, 4, 3, 2]
+    self.checkarray(a2[0:3:-2,0],DMatrix(a1[0:3:-2])) # gives empty set
+    self.checkarray(a2[3:0:-2,0],DMatrix(a1[3:0:-2])) # gives [5, 4, 3, 2]
+    
   def test_indexingOutOfBounds(self):
     self.message("Indexing out of bounds")
     y = DMatrix.zeros(4, 5) 
@@ -237,6 +252,32 @@ class Matrixtests(casadiTestCase):
     B = DMatrix(5,1)
    
     self.assertRaises(Exception, lambda : B[A])
+
+  def test_sparsity_indexing(self):
+    self.message("sparsity")
+
+    B = DMatrix([[1,2,3,4,5],[6,7,8,9,10]])
+    
+    A = IMatrix([[1,1,0,0,0],[0,0,1,0,0]])
+    makeSparse(A)
+    sp = A.sparsity()
+    
+    
+    self.checkarray(B[sp],DMatrix([[1,2,0,0,0],[0,0,8,0,0]]),"sparsity indexing")
+
+    B[sp] = -4
+    
+    self.checkarray(B,DMatrix([[-4,-4,3,4,5],[6,7,-4,9,10]]),"sparsity indexing assignement")
+
+    B = DMatrix([[1,2,3,4,5],[6,7,8,9,10]])
+    
+    B[sp] = 2*B
+    
+    self.checkarray(B,DMatrix([[2,4,3,4,5],[6,7,16,9,10]]),"Imatrix indexing assignement")
+    
+    self.assertRaises(Exception, lambda : B[sp_dense(4,4)])
+    
+  
   
   def test_IMatrix_index_slice(self):
     self.message("IMatrix combined with slice")
@@ -644,7 +685,125 @@ class Matrixtests(casadiTestCase):
     self.assertTrue(bool(DMatrix([-0.2])))
     self.assertRaises(Exception, lambda : bool(DMatrix([2.0,3])))
     self.assertRaises(Exception, lambda : bool(DMatrix()))
+    
+  def test_listslice(self):
+    def check(d,rowbase,colbase):
+      for col in permutations(colbase):
+        for row in permutations(rowbase):
+          r = IMatrix.zeros(len(row),len(col))
+          for i,ii in enumerate(row):
+            for j,jj in enumerate(col):
+              r[i,j] = d[ii,jj]
+          self.checkarray(d[row,col],r,"%s[%s,%s]" % (repr(d),str(row),str(col)))
+          
+    
+    # getSub1
+    check(IMatrix(sp_dense(3,3),range(3*3)),[0,1,2],[0,1,2])
+    check(IMatrix(sp_dense(4,4),range(4*4)),[0,1,3],[0,2,3])
+    check(IMatrix(sp_dense(3,3),range(3*3)),[0,0,1],[0,0,1])
+    check(IMatrix(sp_dense(3,3),range(3*3)),[0,0,2],[0,0,2])
+    check(IMatrix(sp_dense(3,3),range(3*3)),[1,1,2],[1,1,2])
 
+    sp = sp_tril(4)
+    d = IMatrix(sp,range(sp.size()))
+    check(d,[0,1,3],[0,2,3])
+    check(d.T,[0,1,3],[0,2,3])
+
+    sp = sp_rowcol([0,1,2],[0,1],4,4)
+    d = IMatrix(sp,range(sp.size()))
+    check(d,[0,3],[0,2])
+    
+    # getSub2
+    check(IMatrix(sp_dense(2,2),range(2*2)),[0,0,0],[0,0,0])
+    check(IMatrix(sp_dense(2,2),range(2*2)),[0,0,1],[0,0,1])
+    check(IMatrix(sp_dense(2,2),range(2*2)),[1,1,0],[1,1,0])
+    check(IMatrix(sp_dense(2,2),range(2*2)),[1,1,1],[1,1,1])
+
+    sp = sp_tril(3)
+    d = IMatrix(sp,range(sp.size()))
+    check(d,[0,1,2],[0,1,2])
+    check(d.T,[0,1,2],[0,1,2])
+    
+    sp = sp_rowcol([0,2],[0,1],4,4)
+    d = IMatrix(sp,range(sp.size()))
+    check(d,[0,1,3],[0,2,3])
+
+  def test_sparsesym(self):
+    self.message("sparsesym")
+    D = DMatrix([[1,2,-3],[2,-1,0],[-3,0,5]])
+    makeSparse(D)
+    i = DVector(5)
+    
+    D.get(i,SPARSESYM)
+    self.checkarray(list(i),[1,2,-1,-3,5])
+    A = 2*D
+    A.set(i,SPARSESYM)
+    self.checkarray(A,D)
+    
+  def test_blkdiag(self):
+    self.message("blkdiag")
+    C = blkdiag([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
+    r = DMatrix([[-1.4,-3.2,0,0,0,0,0],[-3.2,-28,0,0,0,0,0],[0,0,15,-12,2.1,0,0],[0,0,-12,16,-3.8,0,0],[0,0,2.1,-3.8,15,0,0],[0,0,0,0,0,1.8,0],[0,0,0,0,0,0,-4]])
+    makeSparse(r)
+    self.checkarray(C,r)
+    
+  def test_diag_sparse(self):
+    self.message("diag sparse")
+    
+    for n in [[0,1,0,0,2,3,4,5,6,0],[1,2,3,0],[0,1,2,3]]:
+      d = DMatrix(n)
+      D = DMatrix(n)
+      makeSparse(d)
+      m = c.diag(d)
+      M = c.diag(D)
+      makeSparse(M)
+      
+      self.checkarray(m.sparsity().rowind(),M.sparsity().rowind())
+      self.checkarray(m.sparsity().col(),M.sparsity().col())
+
+  def test_sprank(self):
+    self.message("sprank")
+    
+    a = DMatrix([[1,0,0],[0,1,0],[0,0,1]])
+    makeSparse(a)
+    self.assertEqual(sprank(a),3)
+
+    a = DMatrix([[1,0,0],[0,0,0],[0,0,1]])
+    makeSparse(a)
+    self.assertEqual(sprank(a),2)
+
+    a = DMatrix([[0,0,0],[0,0,0],[0,0,1]])
+    makeSparse(a)
+    self.assertEqual(sprank(a),1)
+
+    a = DMatrix([[0,0,0],[0,0,0],[0,0,0]])
+    makeSparse(a)
+    self.assertEqual(sprank(a),0)
+    
+    self.assertEqual(sprank(DMatrix.ones(1,3)),1)
+    self.assertEqual(sprank(DMatrix.ones(3,1)),1)
+    self.assertEqual(sprank(DMatrix.ones(2,3)),2)
+    self.assertEqual(sprank(DMatrix.ones(3,2)),2)
+    self.assertEqual(sprank(DMatrix.ones(3,3)),3)
+    self.assertEqual(sprank(DMatrix.ones(3,3)),3)
+    
+  def test_cross(self):
+    self.message("cross products")
+    
+    crossc = c.cross
+    
+    self.checkarray(crossc(DMatrix([1,0,0]),DMatrix([0,1,0])),DMatrix([0,0,1]))
+    
+    self.checkarray(crossc(DMatrix([1.1,1.3,1.7]),DMatrix([2,3,13])),DMatrix([11.8,-10.9,0.7]))
+    self.checkarray(crossc(DMatrix([1.1,1.3,1.7]).T,DMatrix([2,3,13]).T),DMatrix([11.8,-10.9,0.7]).T)
+    
+    self.checkarray(crossc(DMatrix([[1.1,1.3,1.7],[1,0,0],[0,0,1],[4,5,6]]),DMatrix([[2,3,13],[0,1,0],[0,0,1],[1,0,1]])),DMatrix([[11.8,-10.9,0.7],[0,0,1],[0,0,0],[5,2,-5]]))
+    self.checkarray(crossc(DMatrix([[1.1,1.3,1.7],[1,0,0],[0,0,1],[4,5,6]]).T,DMatrix([[2,3,13],[0,1,0],[0,0,1],[1,0,1]]).T),DMatrix([[11.8,-10.9,0.7],[0,0,1],[0,0,0],[5,2,-5]]).T)
+    
+    self.checkarray(crossc(DMatrix([[1.1,1.3,1.7],[1,0,0],[0,0,1],[4,5,6]]),DMatrix([[2,3,13],[0,1,0],[0,0,1],[1,0,1]]),2),DMatrix([[11.8,-10.9,0.7],[0,0,1],[0,0,0],[5,2,-5]]))
+    
+    self.checkarray(crossc(DMatrix([[1.1,1.3,1.7],[1,0,0],[0,0,1],[4,5,6]]).T,DMatrix([[2,3,13],[0,1,0],[0,0,1],[1,0,1]]).T,1),DMatrix([[11.8,-10.9,0.7],[0,0,1],[0,0,0],[5,2,-5]]).T)
+    
 if __name__ == '__main__':
     unittest.main()
 

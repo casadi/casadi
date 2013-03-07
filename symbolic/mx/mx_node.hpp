@@ -26,6 +26,7 @@
 #include "mx.hpp"
 #include "../sx/sx.hpp"
 #include "../casadi_math.hpp"
+#include "../fx/code_generator.hpp"
 #include <vector>
 #include <stack>
 
@@ -103,6 +104,9 @@ class MXNode : public SharedObjectNode{
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const = 0;
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
     
     /** \brief  Evaluate the function */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 
@@ -143,6 +147,9 @@ class MXNode : public SharedObjectNode{
     /** \brief  Get function reference */
     virtual FX& getFunction();
 
+    /** \brief  Get function reference */
+    virtual const FX& getFunction() const{ return const_cast<MXNode*>(this)->getFunction();}
+
     /** \brief  Get function input */
     virtual int getFunctionInput() const;
 
@@ -164,12 +171,15 @@ class MXNode : public SharedObjectNode{
     
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const{ return 1;}
+    
+    /** \brief  Get an output */
+    virtual MX getOutput(int oind) const;
 
     /// Get the sparsity
     const CRSSparsity& sparsity() const;
 
     /// Get the sparsity of output oind
-    virtual const CRSSparsity& sparsity(int oind);
+    virtual const CRSSparsity& sparsity(int oind) const;
     
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return false;}

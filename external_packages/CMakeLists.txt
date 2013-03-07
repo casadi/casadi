@@ -13,3 +13,7 @@ endif()
 if(WITH_QPOASES)
   add_subdirectory(qpOASES)
 endif()
+
+if(DSDP_FOUND)
+  add_subdirectory(DSDP)
+endif()

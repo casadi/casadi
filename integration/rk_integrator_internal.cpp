@@ -54,9 +54,7 @@ void RKIntegratorInternal::init(){
   
   // Interpolation order
   int deg = getOption("interpolation_order");
-
-  // Assume explicit ODE
-  bool explicit_ode = f_.input(DAE_XDOT).size()==0;
+  casadi_assert_message(deg==1, "Not implemented");
 
   // Expand f?
   bool expand_f = getOption("expand_f");
@@ -79,9 +77,6 @@ void RKIntegratorInternal::init(){
   // Dummy time
   MX T = 0;
   
-  // Zero YDOT argument to get an explicit ode
-  MX YDOT = MX::zeros(Y.shape());
-  
   // Integrate until the end
   for(int k=0; k<nk; ++k){
     
@@ -89,7 +84,6 @@ void RKIntegratorInternal::init(){
     vector<MX> f_in(DAE_NUM_IN);
     f_in[DAE_T] = T;
     f_in[DAE_X] = Y;
-    f_in[DAE_XDOT] = YDOT;
     f_in[DAE_P] = P;
     vector<MX> f_out = f_.call(f_in);
     MX ode_rhs = f_out[DAE_ODE];

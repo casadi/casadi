@@ -1,4 +1,4 @@
-build/
+build*
 documentation/api-doc/html
 documentation/api-doc/XML
 documentation/api-doc/latex
@@ -19,6 +19,10 @@ octave-core
 *.xml
 *.out
 *.orig
+*.pyc
 documentation/examples/ctemplate/compiler.sh
 documentation/examples/ctemplate/linker.sh
 
+# Eclipse
+.project
+.cproject

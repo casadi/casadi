@@ -27,12 +27,6 @@
 
 namespace CasADi{
   
-/// Input arguments of the Jacobian in the nonlinear iteration: M = 1 - gamma*df/dy
-enum MInput{M_T, M_Y, M_P, M_GAMMA, M_NUM_IN};
-
-/// Output arguments of the Jacobian function
-enum MOutput{M_M, M_NUM_OUT};
-  
 // Forward declaration of internal class 
 class CVodesInternal;
 
@@ -57,7 +51,9 @@ public:
   *   \param f dynamical system
   * \copydoc scheme_DAEInput
   * \copydoc scheme_DAEOutput
-  *
+  *   \param g backwards system
+  * \copydoc scheme_RDAEInput
+  * \copydoc scheme_RDAEOutput
   */
   explicit CVodesIntegrator(const FX& f, const FX& g=FX());
   

@@ -174,7 +174,7 @@ const CRSSparsity& MXNode::sparsity() const{
   return sparsity_;
 }
 
-const CRSSparsity& MXNode::sparsity(int oind){
+const CRSSparsity& MXNode::sparsity(int oind) const{
   casadi_assert_message(oind==0, "Index out of bounds");
   return sparsity_;
 }
@@ -246,7 +246,13 @@ void MXNode::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_c
   dep_ = deepcopy(dep_,already_copied);
 }
 
+MX MXNode::getOutput(int oind) const{
+  casadi_assert_message(oind==0,"Output index out of bounds");
+  return shared_from_this<MX>();
+}
 
-
+void MXNode::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  stream << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
+}
 
 } // namespace CasADi

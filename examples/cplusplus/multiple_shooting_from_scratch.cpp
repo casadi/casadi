@@ -20,7 +20,7 @@
  *
  */
 
-/** Writing a multiple shooting code from scratch 
+/** \brief Writing a multiple shooting code from scratch 
 
   This example demonstrates how to write a simple, yet powerful multiple shooting code from 
   scratch using CasADi. For clarity, the code below uses a simple formulation with only states 
@@ -34,19 +34,11 @@
   solve optimal control problems in differential-algebraic equations.
   
   \author Joel Andersson
-  \date 2011
+  \date 2011-2012
 */
 
-
-
 // CasADi core
-#include <symbolic/fx/fx_tools.hpp>
-#include <symbolic/mx/mx_tools.hpp>
-#include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/matrix/matrix_tools.hpp>
-#include <symbolic/stl_vector_tools.hpp>
-#include <symbolic/fx/sx_function.hpp>
-#include <symbolic/fx/mx_function.hpp>
+#include <symbolic/casadi.hpp>
 
 // Interfaces
 #include <interfaces/ipopt/ipopt_solver.hpp>
@@ -58,38 +50,32 @@ using namespace std;
 // Infinity
 double inf = numeric_limits<double>::infinity();
 
-// Exact hessian?
-bool exact_hessian = false;
-
 int main(){
 
   // Declare variables
-  SX t("t"); // time
-  SX u("u"); // control
-  SX r("r"), s("s"), lterm("lterm"); // states
+  SXMatrix u = ssym("u"); // control
+  SXMatrix r = ssym("r"), s = ssym("s"); // states
+  SXMatrix x = vertcat(r,s);
 
   // Number of differential states
-  const int nx = 3;
+  int nx = x.size1();
   
   // Number of controls
-  const int nu = 1;
-
-  // All states
-  vector<SX> x(nx);  x[0] = r;  x[1] = s;  x[2] = lterm;
+  int nu = u.size1();
 
   // Bounds and initial guess for the control
-  double u_min[nu] =  { -0.75 };
-  double u_max[nu]  = {  1.0  };
-  double u_init[nu] = {  0.0  };
+  double u_min[] =  { -0.75 };
+  double u_max[]  = {  1.0  };
+  double u_init[] = {  0.0  };
 
   // Bounds and initial guess for the state
-  double x0_min[nx] = {   0,   1,   0 };
-  double x0_max[nx] = {   0,   1,   0 };
-  double x_min[nx]  = {-inf,-inf,-inf };
-  double x_max[nx]  = { inf, inf, inf };
-  double xf_min[nx] = {   0,   0,-inf };
-  double xf_max[nx] = {   0,   0, inf };
-  double x_init[nx] = {   0,   0,   0 };
+  double x0_min[] = {   0,    1 };
+  double x0_max[] = {   0,    1 };
+  double x_min[]  = {-inf, -inf };
+  double x_max[]  = { inf,  inf };
+  double xf_min[] = {   0,    0 };
+  double xf_max[] = {   0,    0 };
+  double x_init[] = {   0,    0 };
 
   // Final time
   double tf = 20.0;
@@ -97,62 +83,67 @@ int main(){
   // Number of shooting nodes
   int ns = 50;
 
-  // Input to the ODE/DAE functions
-  vector<SXMatrix> rhs_in = daeIn<SXMatrix>("x",x, "p",u, "t",t);
+  // ODE right hand side and quadrature
+  SXMatrix ode = vertcat((1 - s*s)*r - s + u, r);
+  SXMatrix quad = r*r + s*s + u*u;
+  SXFunction rhs(daeIn("x",x,"p",u),daeOut("ode",ode,"quad",quad));
 
-  // ODE right hand side
-  vector<SX> ode(3);
-  ode[0] = (1 - s*s)*r - s + u;
-  ode[1] = r;
-  ode[2] = r*r + s*s + u*u;
-  vector<SXMatrix> rhs_out = daeOut<SXMatrix>("ode",ode);
-  SXFunction rhs(rhs_in,rhs_out);
-
-  // Mayer objective function
-  SXFunction mterm(x, lterm);
-  mterm.init();
-
-  //Create an integrator (CVodes)
+  // Create an integrator (CVodes)
   CVodesIntegrator integrator(rhs);
-  integrator.setOption("abstol",1e-8); //abs. tolerance
-  integrator.setOption("reltol",1e-8); //rel. tolerance
-  integrator.setOption("steps_per_checkpoint",500);
-  integrator.setOption("stop_at_end",true);
   integrator.setOption("t0",0);
   integrator.setOption("tf",tf/ns);
-  integrator.setOption("number_of_fwd_dir",7);
-  //integrator.setOption("verbose",true);
   integrator.init();
   
   // Total number of NLP variables
   int NV = nx*(ns+1) + nu*ns;
-           
-  // Declare variable vector for the NLP
-  MX V("V",NV);
-
-  // offset in the variable vector
-  int el=0; 
   
-  // Disretized variables for each shooting node
-  vector<MX> X(ns+1), U(ns);
-  for(int k=0; k<=ns; ++k){ // interior nodes
+  // Declare variable vector for the NLP
+  MX V = msym("V",NV);
+
+  // NLP variable bounds and initial guess
+  vector<double> v_min,v_max,v_init;
+  
+  // Offset in V
+  int offset=0; 
+
+  // State at each shooting node and control for each shooting interval
+  vector<MX> X, U;
+  for(int k=0; k<ns; ++k){
     // Local state
-    X[k] = V[range(el,el+nx)];
-    el += nx;
-    
-    // Variables below do not appear at the end point
-    if(k==ns) break;
+    X.push_back( V[Slice(offset,offset+nx)] );
+    if(k==0){
+      v_min.insert(v_min.end(),x0_min,x0_min+nx);
+      v_max.insert(v_max.end(),x0_max,x0_max+nx);
+    } else {
+      v_min.insert(v_min.end(),x_min,x_min+nx);
+      v_max.insert(v_max.end(),x_max,x_max+nx);
+    }
+    v_init.insert(v_init.end(),x_init,x_init+nx);    
+    offset += nx;
     
     // Local control
-    U[k] = V[range(el,el+nu)];
-    el += nu;
+    U.push_back( V[Slice(offset,offset+nu)] );
+    v_min.insert(v_min.end(),u_min,u_min+nu);
+    v_max.insert(v_max.end(),u_max,u_max+nu);
+    v_init.insert(v_init.end(),u_init,u_init+nu);    
+    offset += nu;
   }
   
+  // State at end
+  X.push_back(V[Slice(offset,offset+nx)]);
+  v_min.insert(v_min.end(),xf_min,xf_min+nx);
+  v_max.insert(v_max.end(),xf_max,xf_max+nx);
+  v_init.insert(v_init.end(),x_init,x_init+nx);    
+  offset += nx;
+  
   // Make sure that the size of the variable vector is consistent with the number of variables that we have referenced
-  casadi_assert(el==NV);
+  casadi_assert(offset==NV);
 
-  //Constraint function
-  vector<MX> g(ns);
+  // Objective function
+  MX J = 0;
+  
+  //Constraint function and bounds
+  vector<MX> g;
 
   // Loop over shooting nodes
   for(int k=0; k<ns; ++k){
@@ -165,94 +156,34 @@ int main(){
     vector<MX> I_out = integrator.call(int_in);
 
     // Save continuity constraints
-    g[k] = I_out[INTEGRATOR_XF] - X[k+1];
+    g.push_back( I_out[INTEGRATOR_XF] - X[k+1] );
+    
+    // Add objective function contribution
+    J += I_out[INTEGRATOR_QF];
   }
   
   // NLP objective function
-  MX ff = mterm.call(X.back()).front();
-  MXFunction F(V,ff);
+  MXFunction jfcn(V,J);
 
   // NLP constraint function
-  MX gg = vertcat(g);
-  MXFunction G(V,gg);
-  G.setOption("number_of_fwd_dir",7);
-  G.setOption("ad_mode","forward");
-  G.setOption("numeric_jacobian",false);
-  G.setOption("name","NLP constraint function");
-  G.init();
-  
-  FX h_jac;
-  if(exact_hessian){
-    // Lagrange multiplier
-    MX lag("lag",gg.size1());
-
-    // Objective function scaling factor
-    MX sigma("sigma");
-    
-    // Lagrangian function
-    vector<MX> lfcn_in(3);
-    lfcn_in[0] = V;
-    lfcn_in[1] = lag;
-    lfcn_in[2] = sigma;
-    MXFunction lfcn(lfcn_in,sigma*ff + inner_prod(lag,gg));
-    lfcn.init();
-    
-    // Gradient of the lagrangian
-    MX lgrad = lfcn.grad();
-    MXFunction lgfcn(lfcn_in,lgrad);
-    lgfcn.init();
-
-    // Hessian of the lagrangian
-    h_jac = lgfcn.jacobian();
-    h_jac.init();
-  }
+  MXFunction gfcn(V,vertcat(g));
   
   // Create an NLP solver instance
-  IpoptSolver nlp_solver(F,G,h_jac);
+  IpoptSolver nlp_solver(jfcn,gfcn);
   nlp_solver.setOption("tol",1e-5);
-  if(!exact_hessian)
-    nlp_solver.setOption("hessian_approximation", "limited-memory");
+  nlp_solver.setOption("generate_hessian", true);
   nlp_solver.setOption("max_iter",100);
   nlp_solver.setOption("linear_solver","ma57");
-  // nlp_solver.setOption("verbose",true);
-  // nlp_solver.setOption("derivative_test","first-order");
   nlp_solver.init();
     
   // Initial guess and bounds on variables
-  Matrix<double>& V_init = nlp_solver.input(NLP_X_INIT);
-  Matrix<double>& V_min  = nlp_solver.input(NLP_LBX);
-  Matrix<double>& V_max  = nlp_solver.input(NLP_UBX);
+  nlp_solver.setInput(v_init,NLP_X_INIT);
+  nlp_solver.setInput(v_min,NLP_LBX);
+  nlp_solver.setInput(v_max,NLP_UBX);
   
   // All nonlinear constraints are equality constraints
-  nlp_solver.input(NLP_LBG).setAll(0);
-  nlp_solver.input(NLP_UBG).setAll(0);
-  
-  // Running index
-  el=0;
-  
-  for(int k=0; k<=ns; ++k){
-    // Pass bounds and guess for state
-    for(int i=0; i<nx; ++i){
-      V_init.at(el) = x_init[i];
-      V_min.at(el) = k == 0 ? x0_min[i] : k==ns ? xf_min[i] : x_min[i];
-      V_max.at(el) = k == 0 ? x0_max[i] : k==ns ? xf_max[i] : x_max[i];
-      el++;
-    }
-    
-    // Variables below do not appear at the end point
-    if(k==ns) break;
-
-    // Pass bounds and guess for control
-    for(int i=0; i<nu; ++i){
-      V_init.at(el) = u_init[i];
-      V_min.at(el) = u_min[i];
-      V_max.at(el) = u_max[i];
-      el++;
-    }
-  }
-  
-  // Make sure all values set
-  casadi_assert(el==NV);
+  nlp_solver.setInput(0.,NLP_LBG);
+  nlp_solver.setInput(0.,NLP_UBG);
   
   // Solve the problem
   nlp_solver.solve();

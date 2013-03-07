@@ -75,6 +75,7 @@ bool operation_checker(unsigned int op){
     case OP_ERFINV:        return F<OP_ERFINV>::check;
     case OP_PRINTME:       return F<OP_PRINTME>::check;
     case OP_ATAN2:         return F<OP_ATAN2>::check;
+    case OP_LIFT:          return F<OP_LIFT>::check;
   }
   
   // False by default
@@ -191,6 +192,7 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
     case OP_ATANH:     BinaryOperation<OP_ATANH>::fcn(X,Y,F);         break;\
     case OP_ATAN2:     BinaryOperation<OP_ATAN2>::fcn(X,Y,F);         break; \
     case OP_ERFINV:    BinaryOperation<OP_ERFINV>::fcn(X,Y,F);        break;\
+    case OP_LIFT:      BinaryOperation<OP_LIFT>::fcn(X,Y,F);          break;\
     case OP_PRINTME:   BinaryOperation<OP_PRINTME>::fcn(X,Y,F);       break;
   
   switch(op){
@@ -241,8 +243,9 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case OP_ASINH:     BinaryOperation<OP_ASINH>::der(X,Y,F,D);      break;\
     case OP_ACOSH:     BinaryOperation<OP_ACOSH>::der(X,Y,F,D);      break;\
     case OP_ATANH:     BinaryOperation<OP_ATANH>::der(X,Y,F,D);      break;\
-    case OP_ATAN2:      BinaryOperation<OP_ATAN2>::der(X,Y,F,D);     break;\
+    case OP_ATAN2:     BinaryOperation<OP_ATAN2>::der(X,Y,F,D);      break;\
     case OP_ERFINV:    BinaryOperation<OP_ERFINV>::der(X,Y,F,D);     break;\
+    case OP_LIFT:      BinaryOperation<OP_LIFT>::der(X,Y,F,D);       break;\
     case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X,Y,F,D);    break;
   
   switch(op){
@@ -296,6 +299,7 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case OP_ATANH:     DerBinaryOpertion<OP_ATANH>::derf(X,Y,F,D);      break;\
     case OP_ATAN2:     DerBinaryOpertion<OP_ATAN2>::derf(X,Y,F,D);      break;\
     case OP_ERFINV:    DerBinaryOpertion<OP_ERFINV>::derf(X,Y,F,D);     break;\
+    case OP_LIFT:      DerBinaryOpertion<OP_LIFT>::derf(X,Y,F,D);       break;\
     case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X,Y,F,D);    break;
   
   switch(op){
@@ -322,7 +326,8 @@ inline int casadi_math<T>::ndeps(unsigned char op){
     case OP_FMIN:\
     case OP_FMAX:\
     case OP_ATAN2:\
-    case OP_PRINTME:
+    case OP_PRINTME:\
+    case OP_LIFT:
   
   switch(op){
     case OP_CONST:
@@ -396,6 +401,7 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
     case OP_ATAN2:     stream << "atan2(";   break;
     case OP_ERFINV:    stream << "erfinv(";  break;
     case OP_PRINTME:   stream << "printme("; break;
+    case OP_LIFT:      stream << "lift(";    break;
   }
 }
 

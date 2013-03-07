@@ -93,9 +93,6 @@ void CollocationIntegratorInternal::init(){
   // Interpolation order
   int deg = getOption("interpolation_order");
 
-  // Assume explicit ODE
-  bool explicit_ode = f_.input(DAE_XDOT).size()==0;
-  
   // All collocation time points
   double* tau_root = use_radau ? radau_points[deg] : legendre_points[deg];
 
@@ -107,9 +104,15 @@ void CollocationIntegratorInternal::init(){
     
   // Coefficients of the collocation equation
   vector<vector<MX> > C(deg+1,vector<MX>(deg+1));
+  
+  // Coefficients of the collocation equation as DMatrix
+  DMatrix C_num = DMatrix(deg+1,deg+1,0);
 
   // Coefficients of the continuity equation
   vector<MX> D(deg+1);
+  
+  // Coefficients of the collocation equation as DMatrix
+  DMatrix D_num = DMatrix(deg+1,1,0);
 
   // Collocation point
   SXMatrix tau = ssym("tau");
@@ -131,6 +134,7 @@ void CollocationIntegratorInternal::init(){
     lfcn.setInput(1.0);
     lfcn.evaluate();
     D[j] = lfcn.output();
+    D_num(j) = lfcn.output();
 
     // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
     for(int j2=0; j2<deg+1; ++j2){
@@ -138,8 +142,19 @@ void CollocationIntegratorInternal::init(){
       lfcn.setFwdSeed(1.0);
       lfcn.evaluate(1,0);
       C[j][j2] = lfcn.fwdSens();
+      C_num(j,j2) = lfcn.fwdSens();
     }
   }
+
+
+  C_num(std::vector<int>(1,0),ALL) = 0;
+  C_num(0,0)   = 1;
+  
+  // Coefficients of the quadrature
+  DMatrix Q = solve(C_num,D_num);
+  
+  casadi_assert_message(fabs(sumAll(Q)-1)<1e-9,"Check on quadrature coefficients");
+  casadi_assert_message(fabs(sumAll(D_num)-1)<1e-9,"Check on collocation coefficients");
   
   // Initial state
   MX X0("X0",nx_);
@@ -191,7 +206,7 @@ void CollocationIntegratorInternal::init(){
       offset += nrx_;
       
       // Get the local time
-      coll_time_[k][j] = h*(k + tau_root[j]);
+      coll_time_[k][j] = t0_ + h*(k + tau_root[j]);
       
       // Get expressions for the algebraic variables
       if(j>0){
@@ -242,16 +257,8 @@ void CollocationIntegratorInternal::init(){
       f_in[DAE_Z] = Z[k][j-1];
       
       vector<MX> f_out;
-      if(explicit_ode){
-        // Assume equation of the form ydot = f(t,y,p)
-        f_out = f_.call(f_in);
-        g.push_back(h_mx*f_out[DAE_ODE] - xp_jk);
-      } else {
-        // Assume equation of the form 0 = f(t,y,ydot,p)
-        f_in[DAE_XDOT] = xp_jk/h_mx;
-        f_out = f_.call(f_in);
-        g.push_back(f_out[DAE_ODE]);
-      }
+      f_out = f_.call(f_in);
+      g.push_back(h_mx*f_out[DAE_ODE] - xp_jk);
       
       // Add the algebraic conditions
       if(nz_>0){
@@ -260,7 +267,7 @@ void CollocationIntegratorInternal::init(){
       
       // Add the quadrature
       if(nq_>0){
-        QF += D[j]*h_mx*f_out[DAE_QUAD];
+        QF += Q[j]*h_mx*f_out[DAE_QUAD];
       }
       
       // Now for the backward problem
@@ -283,17 +290,8 @@ void CollocationIntegratorInternal::init(){
         g_in[RDAE_RZ] = RZ[k][j-1];
         
         vector<MX> g_out;
-        if(explicit_ode){
-          // Assume equation of the form xdot = f(t,x,p)
-          g_out = g_.call(g_in);
-          g.push_back(h_mx*g_out[RDAE_ODE] - rxp_jk);
-        } else {
-          // Assume equation of the form 0 = f(t,x,xdot,p)
-          g_in[RDAE_XDOT] = xp_jk/h_mx;
-          g_in[RDAE_RXDOT] = rxp_jk/h_mx;
-          g_out = g_.call(g_in);
-          g.push_back(g_out[RDAE_ODE]);
-        }
+        g_out = g_.call(g_in);
+        g.push_back(h_mx*g_out[RDAE_ODE] + rxp_jk);
         
         // Add the algebraic conditions
         if(nrz_>0){
@@ -302,7 +300,7 @@ void CollocationIntegratorInternal::init(){
         
         // Add the backward quadrature
         if(nrq_>0){
-          RQF += D[j]*h_mx*g_out[RDAE_QUAD];
+          RQF += Q[j]*h_mx*g_out[RDAE_QUAD];
         }
       }
     }
@@ -459,7 +457,14 @@ void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_stor
 
         // Skip algebraic variables (for now) // FIXME
         if(j>0){
-          offs += nz_;
+          if (has_startup_integrator && startup_integrator_.hasOption("init_z")) {
+            std::vector<double> init_z = startup_integrator_.getOption("init_z");
+            for(int i=0; i<nz_; ++i){
+              v.at(offs++) = init_z.at(i);
+            }
+          } else {
+            offs += nz_;
+          }
         }
         
         // Skip backward states // FIXME

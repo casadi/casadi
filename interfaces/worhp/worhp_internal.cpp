@@ -187,6 +187,42 @@ WorhpInternal::WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J,
   addOption("DebugMarker06",OT_INTEGER,worhp_p.DebugMarker06,"Debug marker, only needed for ASTOS integration");
   addOption("initialised",OT_BOOLEAN,worhp_p.initialised,"Automatically added initialisation flag. ");
   
+  addOption("qp_ipBarrier",OT_REAL,worhp_p.qp.ipBarrier,"IP barrier parameter.");
+  addOption("qp_ipComTol",OT_REAL,worhp_p.qp.ipComTol,"IP complementarity tolerance.");
+  addOption("qp_ipFracBound",OT_REAL,worhp_p.qp.ipFracBound,"IP fraction-to-the-boundary parameter.");
+  addOption("qp_ipLsMethod",OT_STRING,GenericType(),"Select the direct linear solver used by the IP method.","LAPACK::0|MA57: only available if provided by the user:1|SuperLU::2|PARDISO: only available if provided by the user, subject to license availability:3|MUMPS: currently Linux platforms only:5|WSMP: subject to license availability:6|MA86: experimental, only available if provided by the user:7|MA97:experimental, only available if provided by the user:8");
+  setOptionByEnumValue("qp_ipLsMethod",worhp_p.qp.ipLsMethod);
+  addOption("qp_ipMinAlpha",OT_REAL,worhp_p.qp.ipMinAlpha,"IP line search minimum step size.");
+  addOption("qp_ipTryRelax",OT_BOOLEAN,worhp_p.qp.ipTryRelax,"Enable relaxation strategy when encountering an error.");
+  addOption("qp_ipRelaxDiv",OT_REAL,worhp_p.qp.ipRelaxDiv,"The relaxation term is divided by this value if successful.");
+  addOption("qp_ipRelaxMult",OT_REAL,worhp_p.qp.ipRelaxMult,"The relaxation term is multiplied by this value if unsuccessful.");
+  addOption("qp_ipRelaxMax",OT_REAL,worhp_p.qp.ipRelaxMax,"Maximum relaxation value.");
+  addOption("qp_ipRelaxMin",OT_REAL,worhp_p.qp.ipRelaxMin,"Mimimum relaxation value.");
+  addOption("qp_ipResTol",OT_REAL,worhp_p.qp.ipResTol,"IP residuals tolerance.");
+  addOption("qp_lsItMaxIter",OT_INTEGER,worhp_p.qp.lsItMaxIter,"Maximum number of iterations of the iterative linear solvers.");
+  addOption("qp_lsItMethod",OT_STRING,GenericType(),"Select the iterative linear solver.","none:Deactivate; use a direct linear solver.:0|CGNR::1|CGNE::2|CGS::3|BiCGSTAB::4");
+  setOptionByEnumValue("qp_lsItMethod",worhp_p.qp.lsItMethod);
+  addOption("qp_lsItPrecondMethod",OT_STRING,GenericType(),"Select preconditioner for the iterative linear solver.","none:No preconditioner.:0|static:Static preconditioner (KKT-matrix with constant lower-right block).:1|full:Full KKT-matrix.:2");
+  setOptionByEnumValue("qp_lsItPrecondMethod",worhp_p.qp.lsItPrecondMethod);
+  addOption("qp_lsRefineMaxIter",OT_INTEGER,worhp_p.qp.lsRefineMaxIter,"Maximum number of iterative refinement steps of the direct linear solvers.");
+  addOption("qp_lsScale",OT_BOOLEAN,worhp_p.qp.lsScale,"Enables scaling on linear solver level.");
+  addOption("qp_lsTrySimple",OT_BOOLEAN,worhp_p.qp.lsTrySimple,"Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported. Non-diagonal matrices will besolved with the chosen linear equation solver.");
+  addOption("qp_lsTol",OT_REAL,worhp_p.qp.lsTol,"Tolerance for the linear solver.");
+  addOption("qp_maxIter",OT_INTEGER,worhp_p.qp.maxIter,"Imposes an upper limit on the number of minor solver iterations, i.e. for thequadratic subproblem solver. If the limit is reached before convergence,WORHP will activate QP recovery strategies to prevent a solver breakdown.");
+  addOption("qp_method",OT_STRING,GenericType(),"Select the solution method used by the QP solver.","ip:Interior-Point method.:1|nsn:Nonsmooth-Newton method.:2|automatic: Prefer IP and fall back to NSN on error.:12");
+  setOptionByEnumValue("qp_method",worhp_p.qp.method);
+  addOption("qp_nsnBeta",OT_REAL,worhp_p.qp.nsnBeta,"NSN stepsize decrease factor.");
+  addOption("qp_nsnGradStep",OT_BOOLEAN,worhp_p.qp.nsnGradStep,"Enable gradient steps in the NSN method.");
+  addOption("qp_nsnKKT",OT_REAL,worhp_p.qp.nsnKKT,"NSN KKT tolerance.");
+  addOption("qp_nsnLsMethod",OT_STRING,GenericType(),"Select the direct linear solver used by the NSN method.","SuperLU::2|MA48: only available if provided by the user:4");
+  setOptionByEnumValue("qp_nsnLsMethod",worhp_p.qp.nsnLsMethod);
+  addOption("qp_nsnMinAlpha",OT_REAL,worhp_p.qp.nsnMinAlpha,"NSN line search minimum step size.");
+  addOption("qp_nsnSigma",OT_REAL,worhp_p.qp.nsnSigma,"NSN line search slope parameter.");
+  addOption("qp_printLevel",OT_STRING,GenericType(),"Controls the amount of QP solver output.","none:No output.:0|warn:Print warnings and errors.:1|iterations:Print iterations.:2");
+  setOptionByEnumValue("qp_printLevel",worhp_p.qp.printLevel);
+  addOption("qp_scaleIntern",OT_BOOLEAN,worhp_p.qp.scaleIntern,"Enable scaling on QP level.");
+  addOption("qp_strict",OT_BOOLEAN,worhp_p.qp.strict,"Use strict termination criteria in IP method.");
+  
   worhp_o.initialised = false;
   worhp_w.initialised = false;
   worhp_p.initialised = false;
@@ -448,6 +484,37 @@ void WorhpInternal::passOptions() {
   if (hasSetOption("ReinitFilter")) worhp_p.ReinitFilter = getOption("ReinitFilter");
   if (hasSetOption("DebugMarker06")) worhp_p.DebugMarker06 = getOption("DebugMarker06");
   if (hasSetOption("initialised")) worhp_p.initialised = getOption("initialised"); 
+  
+  if (hasSetOption("qp_ipBarrier")) worhp_p.qp.ipBarrier = getOption("qp_ipBarrier");
+  if (hasSetOption("qp_ipComTol")) worhp_p.qp.ipComTol = getOption("qp_ipComTol");
+  if (hasSetOption("qp_ipFracBound")) worhp_p.qp.ipFracBound = getOption("qp_ipFracBound");
+  if (hasSetOption("qp_ipLsMethod")) worhp_p.qp.ipLsMethod = getOptionEnumValue("qp_ipLsMethod");
+  if (hasSetOption("qp_ipMinAlpha")) worhp_p.qp.ipMinAlpha = getOption("qp_ipMinAlpha");
+  if (hasSetOption("qp_ipTryRelax")) worhp_p.qp.ipTryRelax = getOption("qp_ipTryRelax");
+  if (hasSetOption("qp_ipRelaxDiv")) worhp_p.qp.ipRelaxDiv = getOption("qp_ipRelaxDiv");
+  if (hasSetOption("qp_ipRelaxMult")) worhp_p.qp.ipRelaxMult = getOption("qp_ipRelaxMult");
+  if (hasSetOption("qp_ipRelaxMax")) worhp_p.qp.ipRelaxMax = getOption("qp_ipRelaxMax");
+  if (hasSetOption("qp_ipRelaxMin")) worhp_p.qp.ipRelaxMin = getOption("qp_ipRelaxMin");
+  if (hasSetOption("qp_ipResTol")) worhp_p.qp.ipResTol = getOption("qp_ipResTol");
+  if (hasSetOption("qp_lsItMaxIter")) worhp_p.qp.lsItMaxIter = getOption("qp_lsItMaxIter");
+  if (hasSetOption("qp_lsItMethod")) worhp_p.qp.lsItMethod = getOptionEnumValue("qp_lsItMethod");
+  if (hasSetOption("qp_lsItPrecondMethod")) worhp_p.qp.lsItPrecondMethod = getOptionEnumValue("qp_lsItPrecondMethod");
+  if (hasSetOption("qp_lsRefineMaxIter")) worhp_p.qp.lsRefineMaxIter = getOption("qp_lsRefineMaxIter");
+  if (hasSetOption("qp_lsScale")) worhp_p.qp.lsScale = getOption("qp_lsScale");
+  if (hasSetOption("qp_lsTrySimple")) worhp_p.qp.lsTrySimple = getOption("qp_lsTrySimple");
+  if (hasSetOption("qp_lsTol")) worhp_p.qp.lsTol = getOption("qp_lsTol");
+  if (hasSetOption("qp_maxIter")) worhp_p.qp.maxIter = getOption("qp_maxIter");
+  if (hasSetOption("qp_method")) worhp_p.qp.method = getOptionEnumValue("qp_method");
+  if (hasSetOption("qp_nsnBeta")) worhp_p.qp.nsnBeta = getOption("qp_nsnBeta");
+  if (hasSetOption("qp_nsnGradStep")) worhp_p.qp.nsnGradStep = getOption("qp_nsnGradStep");
+  if (hasSetOption("qp_nsnKKT")) worhp_p.qp.nsnKKT = getOption("qp_nsnKKT");
+  if (hasSetOption("qp_nsnLsMethod")) worhp_p.qp.nsnLsMethod = getOptionEnumValue("qp_nsnLsMethod");
+  if (hasSetOption("qp_nsnMinAlpha")) worhp_p.qp.nsnMinAlpha = getOption("qp_nsnMinAlpha");
+  if (hasSetOption("qp_nsnSigma")) worhp_p.qp.nsnSigma = getOption("qp_nsnSigma");
+  if (hasSetOption("qp_printLevel")) worhp_p.qp.printLevel = getOptionEnumValue("qp_printLevel");
+  if (hasSetOption("qp_scaleIntern")) worhp_p.qp.scaleIntern = getOption("qp_scaleIntern");
+  if (hasSetOption("qp_strict")) worhp_p.qp.strict = getOption("qp_strict");
+  
 }
 
 void WorhpInternal::checkinit() {
@@ -1240,6 +1307,37 @@ bool WorhpInternal::eval_grad_f(const double* x,double scale , double* grad_f )
     setOption("ReinitFilter",worhp_p.ReinitFilter);
     setOption("DebugMarker06",worhp_p.DebugMarker06);
     setOption("initialised",worhp_p.initialised);
+    
+    setOption("qp_ipBarrier",worhp_p.qp.ipBarrier);
+    setOption("qp_ipComTol",worhp_p.qp.ipComTol);
+    setOption("qp_ipFracBound",worhp_p.qp.ipFracBound);
+    setOptionByEnumValue("qp_ipLsMethod",worhp_p.qp.ipLsMethod );
+    setOption("qp_ipMinAlpha",worhp_p.qp.ipMinAlpha);
+    setOption("qp_ipTryRelax",worhp_p.qp.ipTryRelax);
+    setOption("qp_ipRelaxDiv",worhp_p.qp.ipRelaxDiv);
+    setOption("qp_ipRelaxMult",worhp_p.qp.ipRelaxMult);
+    setOption("qp_ipRelaxMax",worhp_p.qp.ipRelaxMax);
+    setOption("qp_ipRelaxMin",worhp_p.qp.ipRelaxMin);
+    setOption("qp_ipResTol",worhp_p.qp.ipResTol);
+    setOption("qp_lsItMaxIter",worhp_p.qp.lsItMaxIter);
+    setOptionByEnumValue("qp_lsItMethod",worhp_p.qp.lsItMethod );
+    setOptionByEnumValue("qp_lsItPrecondMethod",worhp_p.qp.lsItPrecondMethod );
+    setOption("qp_lsRefineMaxIter",worhp_p.qp.lsRefineMaxIter);
+    setOption("qp_lsScale",worhp_p.qp.lsScale);
+    setOption("qp_lsTrySimple",worhp_p.qp.lsTrySimple);
+    setOption("qp_lsTol",worhp_p.qp.lsTol);
+    setOption("qp_maxIter",worhp_p.qp.maxIter);
+    setOptionByEnumValue("qp_method",worhp_p.qp.method );
+    setOption("qp_nsnBeta",worhp_p.qp.nsnBeta);
+    setOption("qp_nsnGradStep",worhp_p.qp.nsnGradStep);
+    setOption("qp_nsnKKT",worhp_p.qp.nsnKKT);
+    setOptionByEnumValue("qp_nsnLsMethod",worhp_p.qp.nsnLsMethod );
+    setOption("qp_nsnMinAlpha",worhp_p.qp.nsnMinAlpha);
+    setOption("qp_nsnSigma",worhp_p.qp.nsnSigma);
+    setOptionByEnumValue("qp_printLevel",worhp_p.qp.printLevel );
+    setOption("qp_scaleIntern",worhp_p.qp.scaleIntern);
+    setOption("qp_strict",worhp_p.qp.strict);
+      
     std::cout << "readparams status: " << status << std::endl;
   }
 

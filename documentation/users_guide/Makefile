@@ -1,4 +1,4 @@
-SVNREVISION=$(shell svn info | grep Revision | cut -d " " -f 2)$(shell git svn info | grep Revision | cut -d " " -f 2)
+REVISION=$(shell git rev-parse HEAD)
 
 default: html pdf
 

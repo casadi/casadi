@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.0)
 project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "1.4.1")
+set(PACKAGE_VERSION "1.6.0")
 
 # find the macports python libs if they exist
 if(APPLE)
@@ -39,23 +39,16 @@ option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" 
 # option(WITH_GSL "Compile the GSL interface" ON)
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
-option(WITH_FORTRAN "Enable Fortran linking, if this is set to OFF, no Fortran linking will be invoked (should not be needed, CMakeDetermineFortranCompiler should do the job)" ON)
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
 option(WITH_WORHP "Compile the WORHP interface" ON) 
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
 option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
+option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
-
-# Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
-if(WITH_FORTRAN)
-  include(CMakeDetermineFortranCompiler)
-  if(CMAKE_Fortran_COMPILER)
-    enable_language(Fortran)
-  endif()
-endif()
+option(WITH_OPENCL "Compile with OpenCL support" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
@@ -67,7 +60,7 @@ endif(CMAKE_BUILD_TYPE)
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+add_definitions(-DCASADIVERSION=${PACKAGE_VERSION})
 
 if(WITH_DL)
   add_definitions(-DWITH_DL)
@@ -97,7 +90,7 @@ SET(${MYPATH} ${MYPATH_NEW} PARENT_SCOPE)
 endfunction() 
 
 # Check if the compiler supports C++11
-foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x")
+foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x" "-std=c++11 --DUSE_TR1_HASHMAP" "-std=c++0x -DUSE_TR1_HASHMAP")
   if(NOT USE_CXX11)
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11
@@ -152,7 +145,7 @@ if(WITH_QPOASES)
 endif()
 add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP solver qpOASES.")
 
-# Use the included qpOASES
+# Use the included csparse
 if(WITH_CSPARSE)
   set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse/Include)
   set(CSPARSE_LIBRARIES casadi_csparse)
@@ -196,6 +189,16 @@ else(WITH_LLVM)
 endif(WITH_LLVM)
 add_feature_info(just-in-time WITH_LLVM "Just-in-time compiliation via the LLVM compiler framework.")
 
+# OpenCL
+if(WITH_OPENCL)
+  # Core depends on OpenCL for GPU calculations
+  find_package(OpenCL REQUIRED)
+  set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} ${OPENCL_LIBRARIES})
+  add_definitions(-DWITH_OPENCL)
+  include_directories(${OPENCL_INCLUDE_DIRS})
+endif(WITH_OPENCL)
+add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to CPUs and GPUs with OpenCL.")
+
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
 find_package(LibXml2) 
@@ -223,15 +226,23 @@ add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX."
 #   find_package (GSL)
 # endif()
 
-if(WITH_OOQP)
+if(WITH_OOQP AND BLAS_FOUND)
   find_package (OOQP)
 endif()
-add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP.")
+add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP (requires BLAS).")
 
-if(WITH_WORHP)
+if(WITH_WORHP AND LIBXML2_FOUND)
   find_package (WORHP)
 endif()
-add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp.")
+add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp (requires LibXml2 headers).")
+
+# Use the included dsdp
+if(WITH_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
+  set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
+  set(DSDP_LIBRARIES casadi_dsdp)
+  set(DSDP_FOUND true)
+endif()
+add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP solver DSDP (requires BLAS and LAPACK).")
 
 add_subdirectory(symbolic)
 add_subdirectory(optimal_control)

@@ -27,32 +27,15 @@
 
 /**
 * \defgroup IdasIntegrator_doc
-  Solves an initial value problem in differential-algebraic equations of the form:
   
+  @copydoc DAE_doc
   
-  Creates an integrator instance which solves initial value problems in differential-algebraic equations
-  of the form:
-  
-  \verbatim
-  f(t,y,der(y),z,p) == 0
-  der(q) = g(t,y,z,p)
-  \endverbatim
-  
-  The DAE thus consists of a fully implicit part (f) and an explicit quadrature part (g). In the same way,
-  the state vector is also composed of two parts, the differential states and the quadrature states,
-  i.e. x = [y,q]
 */
 
 namespace CasADi{
 
 // Forward declaration of internal class
 class IdasInternal;
-
-/// Input arguments of a jacobian function: J = [df/dx + cj*df/dxdot, df/dz]
-enum JACInput{JAC_T, JAC_X, JAC_Z, JAC_XDOT, JAC_P, JAC_CJ, JAC_NUM_IN};
-
-/// Output arguments of an DAE residual function
-enum JACOutput{JAC_J, JAC_NUM_OUT};
 
 /** Interface to IDAS from the Sundials suite.
 
@@ -76,7 +59,9 @@ public:
   *   \param f dynamical system
   * \copydoc scheme_DAEInput
   * \copydoc scheme_DAEOutput
-  *
+  *   \param g backwards system
+  * \copydoc scheme_RDAEInput
+  * \copydoc scheme_RDAEOutput
   */
   explicit IdasIntegrator(const FX& f, const FX& g=FX());
 

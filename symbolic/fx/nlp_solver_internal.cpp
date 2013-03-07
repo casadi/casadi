@@ -71,6 +71,7 @@ void NLPSolverInternal::init(){
     log("Objective function initialized");
   }
   if(!G_.isNull() && !G_.isInit()){
+    G_.setOption("verbose",getOption("verbose"));
     G_.init();
     log("Constraint function initialized");
   }
@@ -78,6 +79,10 @@ void NLPSolverInternal::init(){
   // Get dimensions
   n_ = F_.input(0).numel();
   m_ = G_.isNull() ? 0 : G_.output(0).numel();
+
+  // Remove G if it has zero dimension
+  if(m_ == 0 && !G_.isNull())
+    G_ = FX();
 
   parametric_ = getOption("parametric");
   
@@ -139,8 +144,6 @@ void NLPSolverInternal::init(){
       
       // Try to expand the MXFunction
       F_ = F_mx.expand(inputv);
-      F_.setOption("number_of_fwd_dir",F_mx.getOption("number_of_fwd_dir"));
-      F_.setOption("number_of_adj_dir",F_mx.getOption("number_of_adj_dir"));
       F_.init();
     }
   }
@@ -166,8 +169,6 @@ void NLPSolverInternal::init(){
       
       // Try to expand the MXFunction
       G_ = G_mx.expand(inputv);
-      G_.setOption("number_of_fwd_dir",G_mx.getOption("number_of_fwd_dir"));
-      G_.setOption("number_of_adj_dir",G_mx.getOption("number_of_adj_dir"));
       G_.init();
     }
   }
@@ -178,9 +179,8 @@ void NLPSolverInternal::init(){
     casadi_assert_message(!gauss_newton_,"Automatic generation of Gauss-Newton Hessian not yet supported");
     log("generating hessian");
     
-    // Simple if unconstrained
-    if(G_.isNull()){
-      // Create Hessian of the objective function
+    if(G_.isNull()){ // unconstrained
+      // Calculate Hessian and wrap to get required syntax
       FX HF = F_.hessian();
       HF.init();
       
@@ -203,34 +203,19 @@ void NLPSolverInternal::init(){
       
       // Create the scaled Hessian function
       H_ = MXFunction(H_in, sigma*hf);
+      H_.setOption("name","nlp_hessian");
       log("Unconstrained Hessian function generated");
       
-    } else { // G_.isNull()
+    } else { // Constrained
       
-      // Check if the functions are SXFunctions
-      SXFunction F_sx = shared_cast<SXFunction>(F_);
-      SXFunction G_sx = shared_cast<SXFunction>(G_);
-      
-      // Efficient if both functions are SXFunction
-      if(!F_sx.isNull() && !G_sx.isNull()){
+      // SXFunction if both functions are SXFunction
+      if(is_a<SXFunction>(F_) && is_a<SXFunction>(G_)){
+        SXFunction F = shared_cast<SXFunction>(F_);
+        SXFunction G = shared_cast<SXFunction>(G_);
+        
         // Expression for f and g
-        SXMatrix f = F_sx.outputSX();
-        SXMatrix g = G_sx.outputSX();
-        
-        // Numeric hessian
-        bool f_num_hess = F_sx.getOption("numeric_hessian");
-        bool g_num_hess = G_sx.getOption("numeric_hessian");
-        
-        // Number of derivative directions
-        int f_num_fwd = F_sx.getOption("number_of_fwd_dir");
-        int g_num_fwd = G_sx.getOption("number_of_fwd_dir");
-        int f_num_adj = F_sx.getOption("number_of_adj_dir");
-        int g_num_adj = G_sx.getOption("number_of_adj_dir");
-        
-        // Substitute symbolic variables in f if different input variables from g
-        if(!isEqual(F_sx.inputSX(),G_sx.inputSX())){
-          f = substitute(f,F_sx.inputSX(),G_sx.inputSX());
-        }
+        SXMatrix g = G.outputExpr(0);
+        SXMatrix f = substitute(F.outputExpr(),F.inputExpr(),G.inputExpr()).front();
         
         // Lagrange multipliers
         SXMatrix lam = ssym("lambda",g.size1());
@@ -240,98 +225,79 @@ void NLPSolverInternal::init(){
         
         // Lagrangian function
         vector<SXMatrix> lfcn_in(parametric_? 4: 3);
-        lfcn_in[0] = G_sx.inputSX();
+        lfcn_in[0] = G.inputExpr(0);
         lfcn_in[1] = lam;
         lfcn_in[2] = sigma;
-        if (parametric_) lfcn_in[3] = G_sx.inputSX(1);
+        if (parametric_) lfcn_in[3] = G.inputExpr(1);
         SXFunction lfcn(lfcn_in, sigma*f + inner_prod(lam,g));
-        lfcn.setOption("verbose",getOption("verbose"));
-        lfcn.setOption("numeric_hessian",f_num_hess || g_num_hess);
-        lfcn.setOption("number_of_fwd_dir",std::min(f_num_fwd,g_num_fwd));
-        lfcn.setOption("number_of_adj_dir",std::min(f_num_adj,g_num_adj));
+        lfcn.setOption("verbose",verbose());
+	lfcn.setOption("name","nlp_lagrangian");
         lfcn.init();
+        if(verbose()) 
+          cout << "SX Lagrangian function generated: algorithm size " << lfcn.getAlgorithmSize() << ", work size = " << lfcn.getWorkSize() << endl;
         
         // Hessian of the Lagrangian
-        H_ = static_cast<FX&>(lfcn).hessian();
-        H_.setOption("verbose",getOption("verbose"));
+        H_ = lfcn.hessian();
+	H_.setOption("name","nlp_hessian");
         log("SX Hessian function generated");
         
-      } else { // !F_sx.isNull() && !G_sx.isNull()
-        // Check if the functions are SXFunctions
-        MXFunction F_mx = shared_cast<MXFunction>(F_);
-        MXFunction G_mx = shared_cast<MXFunction>(G_);
+      } else { // MXFunction otherwise
+
+        // Try to cast into MXFunction
+        MXFunction F = shared_cast<MXFunction>(F_);
+        MXFunction G = shared_cast<MXFunction>(G_);
+
+        // Expressions in F and G
+        vector<MX> FG_in;
+        MX f, g;
         
-        // If they are, check if the arguments are the same
-        if(!F_mx.isNull() && !G_mx.isNull() && isEqual(F_mx.inputMX(),G_mx.inputMX())){
-          casadi_warning("Exact Hessian calculation for MX is still experimental");
-          
-          // Expression for f and g
-          MX f = F_mx.outputMX();
-          MX g = G_mx.outputMX();
-          
-          // Lagrange multipliers
-          MX lam("lam",g.size1());
-      
-          // Objective function scaling
-          MX sigma("sigma");
-
-          // Inputs of the Lagrangian function
-          vector<MX> lfcn_in(parametric_? 4:3);
-          lfcn_in[0] = G_mx.inputMX();
-          lfcn_in[1] = lam;
-          lfcn_in[2] = sigma;
-          if (parametric_) lfcn_in[3] = G_mx.inputMX(1);
-
-          // Lagrangian function
-          MXFunction lfcn(lfcn_in,sigma*f+ inner_prod(lam,g));
-          lfcn.init();
-	  log("SX Lagrangian function generated");
-          
-/*          cout << "countNodes(lfcn.outputMX()) = " << countNodes(lfcn.outputMX()) << endl;*/
-      
-          bool adjoint_mode = true;
-          if(adjoint_mode){
-          
-            // Gradient of the lagrangian
-            MX gL = lfcn.grad();
-            log("MX Lagrangian gradient generated");
-
-            MXFunction glfcn(lfcn_in,gL);
-            glfcn.init();
-            log("MX Lagrangian gradient function initialized");
-//           cout << "countNodes(glfcn.outputMX()) = " << countNodes(glfcn.outputMX()) << endl;
-
-            // Get Hessian sparsity
-            CRSSparsity H_sp = glfcn.jacSparsity();
-            log("MX Lagrangian Hessian sparsity determined");
-            
-            // Uni-directional coloring (note, the hessian is symmetric)
-            CRSSparsity coloring = H_sp.unidirectionalColoring(H_sp);
-            log("MX Lagrangian Hessian coloring determined");
-
-            // Number of colors needed is the number of rows
-            int nfwd_glfcn = coloring.size1();
-            log("MX Lagrangian gradient function number of sensitivity directions determined");
-
-            glfcn.setOption("number_of_fwd_dir",nfwd_glfcn);
-            glfcn.updateNumSens();
-            log("MX Lagrangian gradient function number of sensitivity directions updated");
-            
-            // Hessian of the Lagrangian
-            H_ = glfcn.jacobian();
-          } else {
-
-            // Hessian of the Lagrangian
-            H_ = lfcn.hessian();
-            
+        // Convert to MX if cast failed and make sure that they use the same expressions if cast was successful
+        if(!G.isNull()){
+          FG_in = G.inputExpr();
+          g = G.outputExpr(0);
+          if(!F.isNull()){ // Both are MXFunction, make sure they use the same variables
+            f = substitute(F.outputExpr(),F.inputExpr(),FG_in).front();
+          } else { // G_ but not F_ MXFunction
+            f = F_.call(FG_in).front();
           }
-          log("MX Lagrangian Hessian function generated");
-          
         } else {
-          casadi_assert_message(0, "Automatic calculation of exact Hessian currently only for F and G both SXFunction or MXFunction ");
+          if(!F.isNull()){ // F_ but not G_ MXFunction
+            FG_in = F.inputExpr();
+            f = F.outputExpr(0);
+            g = G_.call(FG_in).front();
+          } else { // None of them MXFunction
+            FG_in = G_.symbolicInput();
+            g = G_.call(FG_in).front();
+            f = F_.call(FG_in).front();
+          }
         }
-      } // !F_sx.isNull() && !G_sx.isNull()
-    } // G_.isNull()
+         
+        // Lagrange multipliers
+        MX lam = msym("lam",g.size1());
+      
+        // Objective function scaling
+        MX sigma = msym("sigma");
+
+        // Lagrangian function
+        vector<MX> lfcn_in(parametric_? 4: 3);
+        lfcn_in[0] = FG_in.at(0);
+        lfcn_in[1] = lam;
+        lfcn_in[2] = sigma;
+        if (parametric_) lfcn_in[3] = FG_in.at(1);
+        MXFunction lfcn(lfcn_in,sigma*f + inner_prod(lam,g));
+        lfcn.setOption("verbose",verbose());
+	lfcn.setOption("name","nlp_lagrangian");
+        lfcn.init();
+        if(verbose())
+          cout << "MX Lagrangian function generated: algorithm size " << lfcn.getAlgorithmSize() << ", work size = " << lfcn.getWorkSize() << endl;
+          
+        // Hessian of the Lagrangian
+        H_ = lfcn.hessian();
+	H_.setOption("name","nlp_hessian");
+        log("MX Lagrangian Hessian function generated");
+          
+      } // SXFunction/MXFunction
+    } // constrained/unconstrained
   } // generate_hessian && H_.isNull()
   if(!H_.isNull() && !H_.isInit()) {
     H_.init();
@@ -343,11 +309,7 @@ void NLPSolverInternal::init(){
   if(generate_jacobian && !G_.isNull() && J_.isNull()){
     log("Generating Jacobian");
     J_ = G_.jacobian();
-    
-    // Use live variables if SXFunction
-    if(!shared_cast<SXFunction>(J_).isNull()){
-      J_.setOption("live_variables",true);
-    }
+    J_.setOption("name","nlp_jacobian");
     log("Jacobian function generated");
   }
     
@@ -419,7 +381,7 @@ void NLPSolverInternal::init(){
      for (int i=0;i<NLP_NUM_OUT;i++) {
        casadi_assert_message(callback_.input(i).sparsity()==output(i).sparsity(),
          "Callback function should have the output scheme of NLPSolver as input scheme. " << 
-         "Input #" << i << " (" << getSchemeEntryEnumName(SCHEME_NLPOutput,i) <<  " aka '" << getSchemeEntryName(SCHEME_NLPOutput,i) << "') was found to be " << callback_.input(i).dimString() << " instead of expected " << output(i).dimString() << "."
+         describeInput(inputScheme,i) << " was found to be " << callback_.input(i).dimString() << " instead of expected " << output(i).dimString() << "."
        );
        callback_.input(i).setAll(0);
      }

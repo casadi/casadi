@@ -578,6 +578,10 @@ class SXtests(casadiTestCase):
     self.assertTrue(isZero(r))
     self.assertEqual(getIntValue(r),0)
     self.assertEqual(getValue(r),0)
+    y = ssym("y",2)
+    y = substitute(y+6,y,0)
+    self.assertEqual(getIntValue(y[0]),6)
+    self.assertEqual(getIntValue(y[1]),6)
    
   def test_primitivefunctions(self):
     self.message("Primitive functions")
@@ -818,12 +822,12 @@ class SXtests(casadiTestCase):
     
     SX.getMaxNumCallsInPrint()
     
-  def test_isEquivalent(self):
+  def test_isEqual(self):
     self.message("equivalent")
     x = SX("x")
     a = x*x
     b = x*x
-    self.assertTrue(a.isEquivalent(b))
+    self.assertTrue(a.isEqual(b,1))
     
   def test_SXsimplifications(self):
     self.message("simplifications")
@@ -989,6 +993,12 @@ class SXtests(casadiTestCase):
     self.checkarray(f.output(),x0**3,"if_else sens")
     self.checkarray(f.fwdSens(),3*(-x0)**2*dx,"if_else sens")
     self.checkarray(f.adjSens(),3*(-x0)**2*dx,"if_else sens")
+    
+  def test_issue548(self):
+    x = ssym('x',100)
+    f = SXFunction([x],[sum(x)**2])
+    f.init()
+    h = f.hessian()
 
 if __name__ == '__main__':
     unittest.main()

@@ -75,7 +75,7 @@ class IdasInternal : public SundialsInternal{
   /** \brief Initialize the taping */
   virtual void initTaping();
   
-  /** \brief Initialize the adjoint problem (can only be called after the first integration) */
+  /** \brief Initialize the backward problem (can only be called after the first integration) */
   virtual void initAdj();
   
   /** \brief  Reset the forward problem and bring the time back to t0 */
@@ -96,12 +96,26 @@ class IdasInternal : public SundialsInternal{
   /** \brief  Print solver statistics */  
   virtual void printStats(std::ostream &stream) const;
   
-  /// Get the Jacobian
+  /** \brief  Get the integrator Jacobian for the forward problem (generic) */
+  template<typename FunctionType>
+  FunctionType getJacobianGen();
+  
+  /** \brief  Get the integrator Jacobian for the backward problem (generic) 
+  *   Structure:
+  *
+  *
+  *   | diff(gx,rx) + cj*diff(gx,dot(rx))  |   diff(gx,rz) |
+  *   | diff(gz,rx)                        |   diff(gz,rz) |
+  */
+  template<typename FunctionType>
+  FunctionType getJacobianGenB();
+
+  /** \brief  Get the integrator Jacobian for the forward problem */
   virtual FX getJacobian();
   
-  /// Get the Linear solver
-  virtual LinearSolver getLinearSolver();
-
+  /** \brief  Get the integrator Jacobian for the backward problem */
+  virtual FX getJacobianB();
+  
   /// Correct the initial conditions, i.e. calculate
   void correctInitialConditions();
   
@@ -111,34 +125,47 @@ class IdasInternal : public SundialsInternal{
   void res(double t, const double* xz, const double* xzdot, double* rr);
   void ehfun(int error_code, const char *module, const char *function, char *msg);
   void jtimes(double t, const double *xz, const double *xzdot, const double *rr, const double *v, double *Jv, double cj, double *tmp1, double *tmp2);
+  void jtimesB(double t, const double *xz, const double *xzdot, const double *xzB, const double *xzdotB, const double *resvalB, const double *vB, double *JvB, double cjB, double * tmp1B, double * tmp2B);
   void resS(int Ns, double t, const double* xz, const double* xzdot, const double *resval, N_Vector *xzF, N_Vector* xzdotF, N_Vector *rrF, double *tmp1, double *tmp2, double *tmp3);
   void rhsQ(double t, const double* xz, const double* xzdot, double* qdot);
   void rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF, N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  void resB(double t, const double* y, const double* xzdot, const double* xA, const double* xzdotA, double* rrA);
-  void rhsQB(double t, const double* y, const double* xzdot, const double* xA, const double* xzdotA, double *qdotA);
+  void resB(double t, const double* y, const double* xzdot, const double* xA, const double* xzdotB, double* rrB);
+  void rhsQB(double t, const double* y, const double* xzdot, const double* xA, const double* xzdotB, double *qdotA);
   void psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, N_Vector tmp);
+  void psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB, double deltaB, N_Vector tmpB);
   void psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, double cjB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   void djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void djacB(long NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   void bjac(long Neq, long mupper, long mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3);
-  void lsetup(IDAMem IDA_mem, N_Vector xzp, N_Vector xzdotp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-  void lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xzcur, N_Vector xzdotcur, N_Vector rescur);
-
+  void bjacB(long NeqB, long mupperB, long mlowerB, double tt, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+  void lsetup(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  void lsetupB(double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  void lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz, N_Vector xzdot, N_Vector rr);
+  void lsolveB(double t, double cj, double cjratio, N_Vector b, N_Vector weight, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rr);
+  
   // Static wrappers to be passed to Sundials
   static int res_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);
+  static int resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, void *user_data);
   static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data);
   static int jtimes_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v, N_Vector Jv, double cj, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int jtimesB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB, double cjB, void *user_data, N_Vector tmp1B, N_Vector tmp2B);
   static int resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval, N_Vector *xzF, N_Vector *xzdotF, N_Vector *resF, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int rhsQ_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, void *user_data);
+  static int rhsQB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector qdotA, void *user_data);
   static int rhsQS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF, N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  static int resB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotA, N_Vector resA, void *user_dataB);
-  static int rhsQB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotA, N_Vector qdotA, void *user_dataB);
   static int psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, void *user_data, N_Vector tmp);
   static int psetup_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj, void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int psolveB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB, double deltaB, void *user_dataB, N_Vector tmpB);
+  static int psetupB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, double cjB, void *user_dataB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   static int djac_wrapper(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  static int bjac_wrapper(long Neq, long mupper, long mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3);
+  static int djacB_wrapper(long NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+  static int bjac_wrapper(long Neq, long mupper, long mlower, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3);
+  static int bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   static int lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   static int lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector xzdotcur, N_Vector rescur);
-  
+  static int lsetupB_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  static int lsolveB_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector xzdotcur, N_Vector rescur);
  public:
 
   // Idas memory block
@@ -155,12 +182,6 @@ class IdasInternal : public SundialsInternal{
 
   // sensitivity method
   int ism_;
-  
-  // Calculate the error message map
-  static std::map<int,std::string> calc_flagmap();
-  
-  // Error message map
-  static std::map<int,std::string> flagmap;
  
   // Throw error
   static void idas_error(const std::string& module, int flag);
@@ -198,7 +219,7 @@ class IdasInternal : public SundialsInternal{
   // Accummulated time since last reset:
   double t_res; // time spent in the DAE residual
   double t_fres; // time spent in the forward sensitivity residual
-  double t_jac; // time spent in the jacobian, or jacobian times vector function
+  double t_jac, t_jacB; // time spent in the jacobian, or jacobian times vector function
   double t_lsolve; // preconditioner/linear solver solve function
   double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
   double t_lsetup_fac; // preconditioner setup function, factorize jacobian
@@ -213,9 +234,6 @@ class IdasInternal : public SundialsInternal{
   // Scaling of cj
   bool cj_scaling_;
 
-  // Set linear solver
-  virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
-  
   // Disable IDAS internal warning messages
   bool disable_internal_warnings_;
   

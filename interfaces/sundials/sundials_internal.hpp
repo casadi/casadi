@@ -53,18 +53,15 @@ public:
   /** \brief  Set stop time for the integration */
   virtual void setStopTime(double tf) = 0;
   
-  /// Jacobian of the ODE/DAE with respect to the state and state derivatives (to be removed)
-  FX jac_;
-
-  /// Linear solver
-  LinearSolver linsol_;
+  /// Linear solver forward, backward
+  LinearSolver linsol_, linsolB_;
   
   //@{
   /// options
-  bool exact_jacobian_;
+  bool exact_jacobian_, exact_jacobianB_;
   double abstol_, reltol_;
   double fsens_abstol_, fsens_reltol_;
-  double asens_abstol_, asens_reltol_;
+  double abstolB_, reltolB_;
   int max_num_steps_;
   bool finite_difference_fsens_;  
   bool stop_at_end_;
@@ -94,8 +91,20 @@ public:
   /// Preconditioning
   int pretype_f_, pretype_g_;
   
+  /// Max krylov size
+  int max_krylov_, max_krylovB_;
+  
   /// Use preconditioning
-  bool use_preconditioner_;
+  bool use_preconditioner_, use_preconditionerB_;
+  
+  // Jacobian of the DAE with respect to the state and state derivatives
+  FX jac_, jacB_;
+  
+  /** \brief  Get the integrator Jacobian for the forward problem */
+  virtual FX getJacobian()=0;
+  
+  /** \brief  Get the integrator Jacobian for the backward problem */
+  virtual FX getJacobianB()=0;
   
 };
   

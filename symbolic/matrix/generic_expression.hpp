@@ -52,10 +52,22 @@ class GenericExpression{
     inline friend ExType operator/(const ExType &x, const ExType &y){ return x.__div__(y); }
 
     /// In-place addition
-    inline ExType& operator+=(const ExType &y){return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__add__(y);}
+    inline ExType& operator+=(const ExType &y){
+      if(static_cast<ExType&>(*this).isNull()){
+	return static_cast<ExType&>(*this) = y;
+      } else {
+	return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__add__(y);
+      }
+    }
 
     /// In-place subtraction
-    inline ExType& operator-=(const ExType &y){return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__sub__(y);}
+    inline ExType& operator-=(const ExType &y){
+      if(static_cast<ExType&>(*this).isNull()){
+	return static_cast<ExType&>(*this) = -y;
+      } else {
+	return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__sub__(y);
+      }
+    }
 
     /// In-place elementwise multiplication
     inline ExType& operator*=(const ExType &y){return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__mul__(y);}
@@ -104,7 +116,7 @@ class GenericExpression{
     /// Division (with __future__.division in effect)
     inline ExType __truediv__(const ExType& y) const {return static_cast<const ExType&>(*this)/y;};
 
-    /** @name Operations from the right
+    /** @name Operations from the left
      *  For Python
      */
     //@{

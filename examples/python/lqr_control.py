@@ -22,7 +22,7 @@
 from pylab import *
 from numpy import *
 from casadi import *
-from casadi.tools import Variables
+from casadi.tools import Collection
 import scipy.linalg
 import numpy as np
 
@@ -72,7 +72,6 @@ assert(rank==ns)
 # -----------------------------------
 
 y  = ssym("y",ns)
-dy  = ssym("dy",ns)
 u  = ssym("u",nu)
 
 x0 = DMatrix([1,0,0])
@@ -82,7 +81,7 @@ u_ = DMatrix([[ -1, 1 ],[1,-1]]*((N-1)/2))
 p = SX("p")
 
 tn = np.linspace(0,te,N)
-cdae = SXFunction(controldaeIn(x=y,xdot=dy,u=u),[mul(A,y)+mul(B,u)])
+cdae = SXFunction(controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
 cdae.init()
 
 
@@ -190,7 +189,7 @@ legend(('s1 dev', 's2 dev','s3 dev','s1 dev (est.)', 's2 dev (est.)','s3 dev (es
 x0 = vertcat([1,0,0])
 xref_e = vertcat([1,0,0])
 
-states = Variables()
+states = Collection()
 eAt = states.eAt = ssym("eAt",ns,ns) # The matrix exponential exp(A*t)
 Wt  = states.Wt = ssym("Wt",ns,ns)   # The Gramian matrix
 states.freeze()
@@ -201,22 +200,23 @@ t1 = te
 # Initial conditions
 e = DMatrix.eye(ns)
 makeDense(e)
-states.eAt_ = e
-states.Wt_ = DMatrix.zeros((ns,ns))
+states_ = states.numbers()
+states_[states.i_eAt] = e
+states_[states.i_Wt] = DMatrix.zeros((ns,ns))
 
-rhs = Variables()
+rhs = Collection()
 rhs.eAt = mul(A,eAt)
 rhs.Wt  = mul([eAt,B,B.T,eAt.T])
 rhs.freeze()
 
-dae = SXFunction(daeIn(x=states.veccat()),daeOut(ode=rhs.veccat()))
+dae = SXFunction(daeIn(x=states[...]),daeOut(ode=rhs[...]))
 dae.init()
 
 integrator = CVodesIntegrator(dae)
 integrator.setOption("tf",t1)
 integrator.setOption("reltol",1e-12)
 integrator.init()
-integrator.setInput(states.veccat_(),INTEGRATOR_X0)
+integrator.setInput(states_,INTEGRATOR_X0)
 integrator.evaluate()
 
 Wt_  = integrator.output()[states.i_Wt]
@@ -229,27 +229,28 @@ assert(e<1e-7)
 # Simulate with feedforward controls
 # -----------------------------------
 
-states = Variables()
+states = Collection()
 states.y = y # The regular states of the LTI system
 eAt = states.eAt = ssym("eAt",ns,ns) # The matrix exponential exp(A*(t1-t))
 states.freeze()
 
 # Initial conditions
-states.y_ = x0
-states.eAt_ = eAt_
+states_ = states.numbers()
+states_[states.i_y] = x0
+states_[states.i_eAt] = eAt_
 
 u = mul([B.T,eAt.T,inv(Wt_),xref_e-mul(eAt_,x0)])
 
-rhs = Variables()
+rhs = Collection()
 rhs.y   = mul(A,y)+mul(B,u)
 rhs.eAt = -mul(A,eAt)
 rhs.freeze()
 
-cdae = SXFunction(controldaeIn(x=states.veccat(), xdot=ssym("dy",states.shape)),[rhs.veccat()])
+cdae = SXFunction(controldaeIn(x=states[...]),[rhs[...]])
 cdae.init()
 
 # Output function
-out = SXFunction(controldaeIn(x=states.veccat(), xdot=ssym("dy",states.shape)),[states.veccat(),u])
+out = SXFunction(controldaeIn(x=states[...]),[states[...],u])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -257,7 +258,7 @@ sim.setOption("integrator", CVodesIntegrator)
 sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-12})
 sim.setOption("nf",20)
 sim.init()
-sim.setInput(states.veccat_(),CONTROLSIMULATOR_X0)
+sim.setInput(states_,CONTROLSIMULATOR_X0)
 sim.evaluate()
 sim.output()
 
@@ -295,6 +296,7 @@ dae.init()
 # We solve the ricatti equation by simulating backwards in time until steady state is reached.
 integrator = CVodesIntegrator(dae)
 integrator.setOption("reltol",1e-16)
+integrator.setOption("stop_at_end",False)
 integrator.init()
 # Start from P = identity matrix
 u = DMatrix.eye(ns)
@@ -325,7 +327,8 @@ print "(positive definite)"
 # Check that it does indeed satisfy the ricatti equation
 dae.setInput(integrator.output(),DAE_X)
 dae.evaluate()
-assert(max(fabs(dae.output()))<1e-9)
+print max(fabs(dae.output()))
+assert(max(fabs(dae.output()))<1e-8)
 
 # From P, obtain a feedback matrix K
 K = mul([inv(R),B.T,P_])
@@ -342,6 +345,7 @@ dae.init()
 
 integrator = CVodesIntegrator(dae)
 integrator.setOption("reltol",1e-16)
+integrator.setOption("stop_at_end",False)
 integrator.init()
 integrator.setInput(flatten(P_),INTEGRATOR_X0)
 integrator.input(INTEGRATOR_X0)[0] += 1e-9 # Put a tiny perturbation
@@ -376,7 +380,6 @@ print "Forward riccati eigenvalues = ", D
 x0 = DMatrix([1,0,0])
 
 y  = ssym("y",ns)
-dy  = ssym("dy",ns)
 
 C = DMatrix([[1,0,0],[0,1,0]])
 D = DMatrix([[0,0],[0,0]])
@@ -393,10 +396,10 @@ figure(6)
 for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-1,sin(t)])]):
   u = -mul(K,y) + mul(mul(K,F)+Nm,yref)
   rhs = mul(A,y)+mul(B,u)
-  cdae = SXFunction(controldaeIn(t=t, x=y, xdot=dy),[rhs])
+  cdae = SXFunction(controldaeIn(t=t, x=y),[rhs])
 
   # Output function
-  out = SXFunction(controldaeIn(t=t, x=y, xdot=dy),[y,mul(C,y),u,yref])
+  out = SXFunction(controldaeIn(t=t, x=y),[y,mul(C,y),u,yref])
   out.init()
 
   sim = ControlSimulator(cdae,out,tn)
@@ -430,35 +433,38 @@ for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-
 x0 = vertcat([1,0,0])
 
 # Now simulate with open-loop controls
-states = Variables()
+states = Collection()
 states.y = y  = ssym("y",ns)    # The regular states of the LTI system
 states.yref   = ssym("yref",ns) # States that constitute a tracking reference for the LTI system
 states.eAt = eAt = ssym("eAt",ns,ns) # The matrix exponential exp(A*(t1-t))
 states.freeze()
 
 # Initial conditions
-states.y_    = 2*x0
-states.yref_ = x0
-states.eAt_  = eAt_
+states_ = states.numbers()
+states_[states.i_y]    = 2*x0
+states_[states.i_yref] = x0
+states_[states.i_eAt]  = eAt_
 
-param = Variables()
+param = Collection()
 param.K = ssym("K",nu,ns)
 param.freeze()
+
+param_ = param.numbers()
 
 uref = mul([B.T,eAt.T,inv(Wt_),xref_e-mul(eAt_,x0)])
 u    = uref - mul(param.K,y-states.yref)
 
-rhs = Variables()
+rhs = Collection()
 rhs.y      =  mul(A,y)+mul(B,u)
 rhs.yref   =  mul(A,states.yref)+mul(B,uref)
 rhs.eAt    = -mul(A,eAt)
 rhs.freeze()
 
-cdae = SXFunction(controldaeIn(x=states.veccat(), xdot=ssym("dy",states.shape), p=param.veccat()),[rhs.veccat()])
+cdae = SXFunction(controldaeIn(x=states[...], p=param[...]),[rhs[...]])
 cdae.init()
 
 # Output function
-out = SXFunction(controldaeIn(x=states.veccat(), xdot=ssym("dy",states.shape), p=param.veccat()),[states.veccat(),u,uref,states.yref])
+out = SXFunction(controldaeIn(x=states[...], p=param[...]),[states[...],u,uref,states.yref])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -473,10 +479,10 @@ jacsim.init()
 figure(7)
   
 for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)]):
-  param.K_ = K_
+  param_[param.i_K] = K_
 
-  sim.setInput(states.veccat_(),CONTROLSIMULATOR_X0)
-  sim.setInput(param.veccat_(),CONTROLSIMULATOR_P)
+  sim.setInput(states_,CONTROLSIMULATOR_X0)
+  sim.setInput(param_,CONTROLSIMULATOR_P)
   sim.evaluate()
   sim.output()
 
@@ -494,8 +500,8 @@ for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)
   title('controls (%s)' % caption)
 
   # Calculate monodromy matrix
-  jacsim.setInput(states.veccat_(),CONTROLSIMULATOR_X0)
-  jacsim.setInput(param.veccat_(),CONTROLSIMULATOR_P)
+  jacsim.setInput(states_,CONTROLSIMULATOR_X0)
+  jacsim.setInput(param_,CONTROLSIMULATOR_P)
   jacsim.evaluate()
   M = jacsim.output()[-states.shape[0]:,:][list(states.i_y),list(states.i_y)]
   
@@ -523,7 +529,7 @@ u_ = horzcat([controls_,yref_])
 
 x0 = DMatrix([1,0,0])
 
-controls = Variables()
+controls = Collection()
 controls.uref = ssym("uref",nu)
 controls.yref = ssym("yref",ns)
 controls.freeze()
@@ -534,10 +540,10 @@ dy    = ssym("dy",ns)
 u     = controls.uref-mul(param.K,y-controls.yref)
 rhs   = mul(A,y)+mul(B,u)
 
-cdae = SXFunction(controldaeIn(x=y, xdot=dy, u=controls.veccat(), p=param.veccat()),[rhs])
+cdae = SXFunction(controldaeIn(x=y, u=controls[...], p=param[...]),[rhs])
 
 # Output function
-out = SXFunction(controldaeIn(x=y, xdot=dy, u=controls.veccat(), p=param.veccat()),[y,u,controls.uref,controls.yref])
+out = SXFunction(controldaeIn(x=y, u=controls[...], p=param[...]),[y,u,controls.uref,controls.yref])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -546,7 +552,7 @@ sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
 sim.setOption("nf",20)
 sim.init()
 sim.setInput(2*x0,CONTROLSIMULATOR_X0)
-sim.setInput(param.veccat_(),CONTROLSIMULATOR_P)
+sim.setInput(param_,CONTROLSIMULATOR_P)
 sim.setInput(u_,CONTROLSIMULATOR_U)
 sim.evaluate()
 
@@ -569,7 +575,7 @@ jacsim.init()
 
 # Calculate monodromy matrix
 jacsim.setInput(x0,CONTROLSIMULATOR_X0)
-jacsim.setInput(param.veccat_(),CONTROLSIMULATOR_P)
+jacsim.setInput(param_,CONTROLSIMULATOR_P)
 jacsim.setInput(u_,CONTROLSIMULATOR_U)
 jacsim.evaluate()
 M = jacsim.output()[-ns:,:]
@@ -589,10 +595,10 @@ y0     = ssym("y0",ns)
 u     = controls.uref-mul(param.K,y0-controls.yref)
 rhs   = mul(A,y)+mul(B,u)
 
-cdae = SXFunction(controldaeIn(x=y, xdot=dy, x_major=y0, u=controls.veccat(), p=param.veccat()),[rhs])
+cdae = SXFunction(controldaeIn(x=y, x_major=y0, u=controls[...], p=param[...]),[rhs])
 
 # Output function
-out = SXFunction(controldaeIn(x=y, xdot=dy, x_major=y0, u=controls.veccat(), p=param.veccat()),[y,u,controls.uref,controls.yref])
+out = SXFunction(controldaeIn(x=y, x_major=y0, u=controls[...], p=param[...]),[y,u,controls.uref,controls.yref])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -601,7 +607,7 @@ sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
 sim.setOption("nf",20)
 sim.init()
 sim.setInput(2*x0,CONTROLSIMULATOR_X0)
-sim.setInput(param.veccat_(),CONTROLSIMULATOR_P)
+sim.setInput(param_,CONTROLSIMULATOR_P)
 sim.setInput(u_,CONTROLSIMULATOR_U)
 sim.evaluate()
 
@@ -624,7 +630,7 @@ jacsim.init()
 
 # Calculate monodromy matrix
 jacsim.setInput(x0,CONTROLSIMULATOR_X0)
-jacsim.setInput(param.veccat_(),CONTROLSIMULATOR_P)
+jacsim.setInput(param_,CONTROLSIMULATOR_P)
 jacsim.setInput(u_,CONTROLSIMULATOR_U)
 jacsim.evaluate()
 M = jacsim.output()[-ns:,:]

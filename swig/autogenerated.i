@@ -214,12 +214,11 @@ def controldaeIn(*dummy,**kwargs):
     p        -- Parameter vector (dimension np-by-1). [CONTROL_DAE_P]
     u        -- Control vector (dimension nu-by-1). [CONTROL_DAE_U]
     u_interp -- Control vector, linearly interpolated (dimension nu-by-1). [CONTROL_DAE_U_INTERP]
-    xdot     -- State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [CONTROL_DAE_XDOT]
     x_major  -- State vector (dimension nx-by-1) at the last major time-step [CONTROL_DAE_X_MAJOR]
     t0       -- Time at start of control interval (1-by-1) [CONTROL_DAE_T0]
     tf       -- Time at end of control interval (1-by-1) [CONTROL_DAE_TF]
   """
-  if(len(dummy)>0): raise Exception("Error in controldaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n controldaeIn(my_t, my_x, my_z, my_p, my_u, my_u_interp, my_xdot, my_x_major, my_t0, my_tf)\nmust be written\n controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, xdot=my_xdot, x_major=my_x_major, t0=my_t0, tf=my_tf)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in controldaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n controldaeIn(my_t, my_x, my_z, my_p, my_u, my_u_interp, my_x_major, my_t0, my_tf)\nmust be written\n controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, x_major=my_x_major, t0=my_t0, tf=my_tf)\nwhere any keyword is optional.")
   t = []
   if 't' in kwargs:
     t = kwargs['t']
@@ -238,9 +237,6 @@ def controldaeIn(*dummy,**kwargs):
   u_interp = []
   if 'u_interp' in kwargs:
     u_interp = kwargs['u_interp']
-  xdot = []
-  if 'xdot' in kwargs:
-    xdot = kwargs['xdot']
   x_major = []
   if 'x_major' in kwargs:
     x_major = kwargs['x_major']
@@ -251,9 +247,9 @@ def controldaeIn(*dummy,**kwargs):
   if 'tf' in kwargs:
     tf = kwargs['tf']
   for k in kwargs.keys():
-    if not(k in ['t','x','z','p','u','u_interp','xdot','x_major','t0','tf']):
-      raise Exception("Keyword error in controldaeIn: '%s' is not recognized. Available keywords are: t, x, z, p, u, u_interp, xdot, x_major, t0, tf" % k )
-  return [t,x,z,p,u,u_interp,xdot,x_major,t0,tf]
+    if not(k in ['t','x','z','p','u','u_interp','x_major','t0','tf']):
+      raise Exception("Keyword error in controldaeIn: '%s' is not recognized. Available keywords are: t, x, z, p, u, u_interp, x_major, t0, tf" % k )
+  return [t,x,z,p,u,u_interp,x_major,t0,tf]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -306,13 +302,12 @@ def daeIn(*dummy,**kwargs):
   Input arguments of an ODE/DAE function
   
   Keyword arguments:
-    x    -- Differential state [DAE_X]
-    z    -- Algebraic state [DAE_Z]
-    p    -- Parameter [DAE_P]
-    t    -- Explicit time dependence [DAE_T]
-    xdot -- Time derivative of differential states [DAE_XDOT]
+    x -- Differential state [DAE_X]
+    z -- Algebraic state [DAE_Z]
+    p -- Parameter [DAE_P]
+    t -- Explicit time dependence [DAE_T]
   """
-  if(len(dummy)>0): raise Exception("Error in daeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n daeIn(my_x, my_z, my_p, my_t, my_xdot)\nmust be written\n daeIn(x=my_x, z=my_z, p=my_p, t=my_t, xdot=my_xdot)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in daeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n daeIn(my_x, my_z, my_p, my_t)\nmust be written\n daeIn(x=my_x, z=my_z, p=my_p, t=my_t)\nwhere any keyword is optional.")
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -325,13 +320,10 @@ def daeIn(*dummy,**kwargs):
   t = []
   if 't' in kwargs:
     t = kwargs['t']
-  xdot = []
-  if 'xdot' in kwargs:
-    xdot = kwargs['xdot']
   for k in kwargs.keys():
-    if not(k in ['x','z','p','t','xdot']):
-      raise Exception("Keyword error in daeIn: '%s' is not recognized. Available keywords are: x, z, p, t, xdot" % k )
-  return [x,z,p,t,xdot]
+    if not(k in ['x','z','p','t']):
+      raise Exception("Keyword error in daeIn: '%s' is not recognized. Available keywords are: x, z, p, t" % k )
+  return [x,z,p,t]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -384,17 +376,15 @@ def rdaeIn(*dummy,**kwargs):
   Input arguments of an ODE/DAE backward integration function
   
   Keyword arguments:
-    rx    -- Backward differential state [RDAE_RX]
-    rz    -- Backward algebraic state [RDAE_RZ]
-    rp    -- Backward  parameter vector [RDAE_RP]
-    x     -- Forward differential state [RDAE_X]
-    z     -- Forward algebraic state [RDAE_Z]
-    p     -- Parameter vector [RDAE_P]
-    t     -- Explicit time dependence [RDAE_T]
-    xdot  -- Time derivative of differential states [RDAE_XDOT]
-    rxdot -- Time derivative of backward differential state [RDAE_RXDOT]
+    rx -- Backward differential state [RDAE_RX]
+    rz -- Backward algebraic state [RDAE_RZ]
+    rp -- Backward  parameter vector [RDAE_RP]
+    x  -- Forward differential state [RDAE_X]
+    z  -- Forward algebraic state [RDAE_Z]
+    p  -- Parameter vector [RDAE_P]
+    t  -- Explicit time dependence [RDAE_T]
   """
-  if(len(dummy)>0): raise Exception("Error in rdaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n rdaeIn(my_rx, my_rz, my_rp, my_x, my_z, my_p, my_t, my_xdot, my_rxdot)\nmust be written\n rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t, xdot=my_xdot, rxdot=my_rxdot)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in rdaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n rdaeIn(my_rx, my_rz, my_rp, my_x, my_z, my_p, my_t)\nmust be written\n rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t)\nwhere any keyword is optional.")
   rx = []
   if 'rx' in kwargs:
     rx = kwargs['rx']
@@ -416,16 +406,10 @@ def rdaeIn(*dummy,**kwargs):
   t = []
   if 't' in kwargs:
     t = kwargs['t']
-  xdot = []
-  if 'xdot' in kwargs:
-    xdot = kwargs['xdot']
-  rxdot = []
-  if 'rxdot' in kwargs:
-    rxdot = kwargs['rxdot']
   for k in kwargs.keys():
-    if not(k in ['rx','rz','rp','x','z','p','t','xdot','rxdot']):
-      raise Exception("Keyword error in rdaeIn: '%s' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t, xdot, rxdot" % k )
-  return [rx,rz,rp,x,z,p,t,xdot,rxdot]
+    if not(k in ['rx','rz','rp','x','z','p','t']):
+      raise Exception("Keyword error in rdaeIn: '%s' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t" % k )
+  return [rx,rz,rp,x,z,p,t]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -689,28 +673,21 @@ def ocpIn(*dummy,**kwargs):
   nh: Number of point constraints: from cfcn.input(0).size()
   
   Keyword arguments:
-    t       -- Time grid: ((ns+1) x 1) - default: linspace(0,t_final,ns+1) [OCP_T]
-    lbx     -- States lower bounds (nx x (ns+1)) [OCP_LBX]
-    ubx     -- States upper bounds (nx x (ns+1)) [OCP_UBX]
-    x_init  -- States initial guess (nx x (ns+1)) [OCP_X_INIT]
-    lbxp    -- States deriatives lower bounds (nx x (ns+1)) [OCP_LBXP]
-    ubxp    -- States deriatives upper bounds (nx x (ns+1)) [OCP_UBXP]
-    xp_init -- States deriatives initial guess (nx x (ns+1)) [OCP_XP_INIT]
-    lbu     -- Controls lower bounds (nu x ns) [OCP_LBU]
-    ubu     -- Controls upper bounds (nu x ns) [OCP_UBU]
-    u_init  -- Controls initial guess (nu x ns) [OCP_U_INIT]
-    lbp     -- Parameters lower bounds (np x 1) [OCP_LBP]
-    ubp     -- Parameters upper bounds (np x 1) [OCP_UBP]
-    p_init  -- Parameters initial guess (np x 1) [OCP_P_INIT]
-    lbh     -- Point constraint lower bound (nh x (ns+1)) [OCP_LBH]
-    ubh     -- Point constraint upper bound (nh x (ns+1)) [OCP_UBH]
-    lbg     -- Lower bound for the coupling constraints [OCP_LBG]
-    ubg     -- Upper bound for the coupling constraints [OCP_UBG]
+    lbx    -- States lower bounds (nx x (ns+1)) [OCP_LBX]
+    ubx    -- States upper bounds (nx x (ns+1)) [OCP_UBX]
+    x_init -- States initial guess (nx x (ns+1)) [OCP_X_INIT]
+    lbu    -- Controls lower bounds (nu x ns) [OCP_LBU]
+    ubu    -- Controls upper bounds (nu x ns) [OCP_UBU]
+    u_init -- Controls initial guess (nu x ns) [OCP_U_INIT]
+    lbp    -- Parameters lower bounds (np x 1) [OCP_LBP]
+    ubp    -- Parameters upper bounds (np x 1) [OCP_UBP]
+    p_init -- Parameters initial guess (np x 1) [OCP_P_INIT]
+    lbh    -- Point constraint lower bound (nh x (ns+1)) [OCP_LBH]
+    ubh    -- Point constraint upper bound (nh x (ns+1)) [OCP_UBH]
+    lbg    -- Lower bound for the coupling constraints [OCP_LBG]
+    ubg    -- Upper bound for the coupling constraints [OCP_UBG]
   """
-  if(len(dummy)>0): raise Exception("Error in ocpIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpIn(my_t, my_lbx, my_ubx, my_x_init, my_lbxp, my_ubxp, my_xp_init, my_lbu, my_ubu, my_u_init, my_lbp, my_ubp, my_p_init, my_lbh, my_ubh, my_lbg, my_ubg)\nmust be written\n ocpIn(t=my_t, lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lbxp=my_lbxp, ubxp=my_ubxp, xp_init=my_xp_init, lbu=my_lbu, ubu=my_ubu, u_init=my_u_init, lbp=my_lbp, ubp=my_ubp, p_init=my_p_init, lbh=my_lbh, ubh=my_ubh, lbg=my_lbg, ubg=my_ubg)\nwhere any keyword is optional.")
-  t = []
-  if 't' in kwargs:
-    t = kwargs['t']
+  if(len(dummy)>0): raise Exception("Error in ocpIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpIn(my_lbx, my_ubx, my_x_init, my_lbu, my_ubu, my_u_init, my_lbp, my_ubp, my_p_init, my_lbh, my_ubh, my_lbg, my_ubg)\nmust be written\n ocpIn(lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lbu=my_lbu, ubu=my_ubu, u_init=my_u_init, lbp=my_lbp, ubp=my_ubp, p_init=my_p_init, lbh=my_lbh, ubh=my_ubh, lbg=my_lbg, ubg=my_ubg)\nwhere any keyword is optional.")
   lbx = []
   if 'lbx' in kwargs:
     lbx = kwargs['lbx']
@@ -720,15 +697,6 @@ def ocpIn(*dummy,**kwargs):
   x_init = []
   if 'x_init' in kwargs:
     x_init = kwargs['x_init']
-  lbxp = []
-  if 'lbxp' in kwargs:
-    lbxp = kwargs['lbxp']
-  ubxp = []
-  if 'ubxp' in kwargs:
-    ubxp = kwargs['ubxp']
-  xp_init = []
-  if 'xp_init' in kwargs:
-    xp_init = kwargs['xp_init']
   lbu = []
   if 'lbu' in kwargs:
     lbu = kwargs['lbu']
@@ -760,9 +728,9 @@ def ocpIn(*dummy,**kwargs):
   if 'ubg' in kwargs:
     ubg = kwargs['ubg']
   for k in kwargs.keys():
-    if not(k in ['t','lbx','ubx','x_init','lbxp','ubxp','xp_init','lbu','ubu','u_init','lbp','ubp','p_init','lbh','ubh','lbg','ubg']):
-      raise Exception("Keyword error in ocpIn: '%s' is not recognized. Available keywords are: t, lbx, ubx, x_init, lbxp, ubxp, xp_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg" % k )
-  return [t,lbx,ubx,x_init,lbxp,ubxp,xp_init,lbu,ubu,u_init,lbp,ubp,p_init,lbh,ubh,lbg,ubg]
+    if not(k in ['lbx','ubx','x_init','lbu','ubu','u_init','lbp','ubp','p_init','lbh','ubh','lbg','ubg']):
+      raise Exception("Keyword error in ocpIn: '%s' is not recognized. Available keywords are: lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg" % k )
+  return [lbx,ubx,x_init,lbu,ubu,u_init,lbp,ubp,p_init,lbh,ubh,lbg,ubg]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -780,28 +748,28 @@ def ocpOut(*dummy,**kwargs):
   Output arguments of an OCP Solver
   
   Keyword arguments:
-    x_opt  -- Optimal state trajectory [OCP_X_OPT]
-    u_opt  -- Optimal control trajectory [OCP_U_OPT]
-    xp_opt -- Optimal state derivative trajectory [OCP_XP_OPT]
-    p_opt  -- Optimal parameters [OCP_P_OPT]
+    x_opt -- Optimal state trajectory [OCP_X_OPT]
+    u_opt -- Optimal control trajectory [OCP_U_OPT]
+    p_opt -- Optimal parameters [OCP_P_OPT]
+    cost  -- Objective/cost function for optimal solution (1 x 1) [OCP_COST]
   """
-  if(len(dummy)>0): raise Exception("Error in ocpOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpOut(my_x_opt, my_u_opt, my_xp_opt, my_p_opt)\nmust be written\n ocpOut(x_opt=my_x_opt, u_opt=my_u_opt, xp_opt=my_xp_opt, p_opt=my_p_opt)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in ocpOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpOut(my_x_opt, my_u_opt, my_p_opt, my_cost)\nmust be written\n ocpOut(x_opt=my_x_opt, u_opt=my_u_opt, p_opt=my_p_opt, cost=my_cost)\nwhere any keyword is optional.")
   x_opt = []
   if 'x_opt' in kwargs:
     x_opt = kwargs['x_opt']
   u_opt = []
   if 'u_opt' in kwargs:
     u_opt = kwargs['u_opt']
-  xp_opt = []
-  if 'xp_opt' in kwargs:
-    xp_opt = kwargs['xp_opt']
   p_opt = []
   if 'p_opt' in kwargs:
     p_opt = kwargs['p_opt']
+  cost = []
+  if 'cost' in kwargs:
+    cost = kwargs['cost']
   for k in kwargs.keys():
-    if not(k in ['x_opt','u_opt','xp_opt','p_opt']):
-      raise Exception("Keyword error in ocpOut: '%s' is not recognized. Available keywords are: x_opt, u_opt, xp_opt, p_opt" % k )
-  return [x_opt,u_opt,xp_opt,p_opt]
+    if not(k in ['x_opt','u_opt','p_opt','cost']):
+      raise Exception("Keyword error in ocpOut: '%s' is not recognized. Available keywords are: x_opt, u_opt, p_opt, cost" % k )
+  return [x_opt,u_opt,p_opt,cost]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -906,5 +874,83 @@ def qpOut(*dummy,**kwargs):
 namespace CasADi {
 %template(qpOut) qpOut<SXMatrix>;
 %template(qpOut) qpOut<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def sdpIn(*dummy,**kwargs):
+  """
+  Helper function for 'SDPInput'
+
+  Input arguments of a SDP problem
+  
+  Keyword arguments:
+    a -- The vertical stack of all matrices A_i: ( nm x n) [SDP_A]
+    b -- The vector b: ( m x 1) [SDP_B]
+    c -- The matrix C: ( n x n) [SDP_C]
+  """
+  if(len(dummy)>0): raise Exception("Error in sdpIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n sdpIn(my_a, my_b, my_c)\nmust be written\n sdpIn(a=my_a, b=my_b, c=my_c)\nwhere any keyword is optional.")
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  b = []
+  if 'b' in kwargs:
+    b = kwargs['b']
+  c = []
+  if 'c' in kwargs:
+    c = kwargs['c']
+  for k in kwargs.keys():
+    if not(k in ['a','b','c']):
+      raise Exception("Keyword error in sdpIn: '%s' is not recognized. Available keywords are: a, b, c" % k )
+  return [a,b,c]
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(sdpIn) sdpIn<SXMatrix>;
+%template(sdpIn) sdpIn<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def sdpOut(*dummy,**kwargs):
+  """
+  Helper function for 'SDPOutput'
+
+  Output arguments of an SDP Solver
+  
+  Keyword arguments:
+    primal      -- The primal solution (m x 1) - may be used as initial guess [SDP_PRIMAL]
+    p           -- The solution P (n x n) - may be used as initial guess [SDP_PRIMAL_P]
+    dual        -- The dual solution (n x n) - may be used as initial guess [SDP_DUAL]
+    primal_cost -- The primal optimal cost (1 x 1) [SDP_PRIMAL_COST]
+    dual_cost   -- The dual optimal cost (1 x 1) [SDP_DUAL_COST]
+  """
+  if(len(dummy)>0): raise Exception("Error in sdpOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n sdpOut(my_primal, my_p, my_dual, my_primal_cost, my_dual_cost)\nmust be written\n sdpOut(primal=my_primal, p=my_p, dual=my_dual, primal_cost=my_primal_cost, dual_cost=my_dual_cost)\nwhere any keyword is optional.")
+  primal = []
+  if 'primal' in kwargs:
+    primal = kwargs['primal']
+  p = []
+  if 'p' in kwargs:
+    p = kwargs['p']
+  dual = []
+  if 'dual' in kwargs:
+    dual = kwargs['dual']
+  primal_cost = []
+  if 'primal_cost' in kwargs:
+    primal_cost = kwargs['primal_cost']
+  dual_cost = []
+  if 'dual_cost' in kwargs:
+    dual_cost = kwargs['dual_cost']
+  for k in kwargs.keys():
+    if not(k in ['primal','p','dual','primal_cost','dual_cost']):
+      raise Exception("Keyword error in sdpOut: '%s' is not recognized. Available keywords are: primal, p, dual, primal_cost, dual_cost" % k )
+  return [primal,p,dual,primal_cost,dual_cost]
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(sdpOut) sdpOut<SXMatrix>;
+%template(sdpOut) sdpOut<MX>;
 }
 #endif //SWIGPYTHON

@@ -1,9 +1,8 @@
 /** 
 * This example looks at the effect of the 'reltol' setting of CasADi::CVodesIntegrator.
 *
-* <a href="integrators/tolerance.pdf">View output (PDF)</a>
 *
-* \example integrators/tolerance.py
+* \pythonexample{integrators/tolerance}
 *
 * \sa
 * \code

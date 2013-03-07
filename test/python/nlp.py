@@ -219,7 +219,7 @@ class NLPtests(casadiTestCase):
     
     sigma=SX("sigma")
     lambd=SX("lambd")
-    h=SXFunction([vertcat([x,y]),lambd,sigma],[sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputSX(0),vertcat([x,y]))])
+    h=SXFunction([vertcat([x,y]),lambd,sigma],[sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputExpr(0),vertcat([x,y]))])
     h.init()
     h.input().set([0.5,0.5])
     h.input(1).set(-40)
@@ -329,7 +329,7 @@ class NLPtests(casadiTestCase):
     
     sigma=SX("sigma")
     lambd=SX("lambd")
-    h=SXFunction([vertcat([x,y]),lambd,sigma],[sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputSX(0),vertcat([x,y]))])
+    h=SXFunction([vertcat([x,y]),lambd,sigma],[sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputExpr(0),vertcat([x,y]))])
 
     for Solver in solvers:
       self.message(str(Solver))
@@ -719,49 +719,6 @@ class NLPtests(casadiTestCase):
       # todo: catch error when set([0, 3 , 5]) two times
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],solver.output(NLP_X_OPT)[1],10,"IPOPT")
       
-  def testKINSol1(self):
-    self.message("Scalar KINSol problem, n=0")
-    x=SX("x")
-    f=SXFunction([x],[sin(x)])
-    f.init()
-    solver=KinsolSolver(f,1)
-    solver.init()
-    solver.output().set(6)
-    solver.solve()
-    self.assertAlmostEqual(solver.output()[0],2*pi,5)
-
-  def testKINSol2(self):
-    self.message("Scalar KINSol problem, n=1")
-    x=SX("x")
-    y=SX("y")
-    n=0.2
-    f=SXFunction([y,x],[sin(x)-y])
-    f.init()
-    solver=KinsolSolver(f,1)
-    solver.setOption("linear_solver_creator",CSparse) # NOTE by Joel: Sensitivities of an implicit function requires a user-provided linear solver 
-    solver.init()
-    solver.fwdSeed().set(1)
-    solver.adjSeed().set(1)
-    solver.input().set(n)
-    solver.evaluate(1,1)
-    self.assertAlmostEqual(solver.output()[0],sin(n),6)
-    self.assertAlmostEqual(solver.fwdSens()[0],cos(n),6)
-    self.assertAlmostEqual(solver.adjSens()[0],cos(n),6)
-
-  def testKINSol1c(self):
-    self.message("Scalar KINSol problem, n=0, constraint")
-    x=SX("x")
-    f=SXFunction([x],[sin(x)])
-    f.init()
-    solver=KinsolSolver(f,1)
-    solver.setOption("constraints",[-1])
-    print solver.dictionary()
-    solver.init()
-    solver.output().set(-6)
-    solver.solve()
-    self.assertAlmostEqual(solver.output()[0],-2*pi,5)
-    
-    
   def testXfreeChange(self):
     self.message("Change in X settings")
     x=SX("x")

@@ -611,7 +611,7 @@ class typemaptests(casadiTestCase):
     
     f = SXFunction([x],[w])
     
-    W = f.outputSX()
+    W = f.outputExpr(0)
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
 
@@ -622,7 +622,7 @@ class typemaptests(casadiTestCase):
     
     f = MXFunction([x],[w])
     
-    W = f.outputMX()
+    W = f.outputExpr(0)
 
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
@@ -733,6 +733,86 @@ class typemaptests(casadiTestCase):
     m = DMatrix.ones(5,5)
     m.setAll(DMatrix(4))
     m.setAll(IMatrix(4))
+    
+  def test_issue_(self):
+    self.message("Ticket #533")
+
+
+    x=ssym("x")
+    z=ssym("z")
+    p=ssym("p")
+    f = SXFunction(daeIn(x=x,p=p,z=z),daeOut(ode=z/p,alg=z-x))
+    f.init()
+
+    integr = IdasIntegrator(f)
+    integr.setOption("init_xdot",GenericType())
+    integr.setOption("calc_icB",True)
+    integr.setOption("t0",0.2)
+    integr.setOption("tf",2.3)
+    integr.init()
+
+    integr.input(INTEGRATOR_X0).set(7.1)
+    integr.input(INTEGRATOR_P).set(2)
+
+    integr.evaluate(1,1)
+
+    print integr.dictionary()
+
+
+    integr = IdasIntegrator(f)
+    integr.setOption("init_xdot",None)
+    integr.setOption("calc_icB",True)
+    integr.setOption("t0",0.2)
+    integr.setOption("tf",2.3)
+    integr.init()
+
+    integr.input(INTEGRATOR_X0).set(7.1)
+    integr.input(INTEGRATOR_P).set(2)
+
+    integr.evaluate(1,1)
+
+    print integr.dictionary()
+
+    integr = IdasIntegrator(f)
+    integr.setOption("init_xdot",[7.1])
+    integr.setOption("calc_icB",True)
+    integr.setOption("augmented_options", {"init_xdot":GenericType()})
+
+    integr.setOption("t0",0.2)
+    integr.setOption("tf",2.3)
+    integr.init()
+
+    integr.input(INTEGRATOR_X0).set(7.1)
+    integr.input(INTEGRATOR_P).set(2)
+
+    integr.evaluate(1,1)
+
+    print integr.dictionary()
+
+    integr = IdasIntegrator(f)
+    integr.setOption("init_xdot",[7.1])
+    integr.setOption("calc_icB",True)
+    integr.setOption("augmented_options", {"init_xdot":None})
+
+    integr.setOption("t0",0.2)
+    integr.setOption("tf",2.3)
+    integr.init()
+
+    integr.input(INTEGRATOR_X0).set(7.1)
+    integr.input(INTEGRATOR_P).set(2)
+
+    integr.evaluate(1,1)
+
+    print integr.dictionary()
+    
+  def test_issue570(self):
+    self.message("Issue #570: long int")
+    longint = 10**50
+    print type(longint)
+    print casadi.SX('x') + longint
+    print longint + casadi.SX('x')
+    print casadi.ssym('x') + longint
+    print longint + casadi.ssym('x')
 
 if __name__ == '__main__':
     unittest.main()

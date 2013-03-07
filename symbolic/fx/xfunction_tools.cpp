@@ -34,8 +34,8 @@ SXFunction vec (const SXFunction &a) {
   if (a.isNull()) return SXFunction();
   
   /// Get the SX input and output vectors
-  std::vector<SXMatrix> symbolicInputSX = a.inputsSX();
-  std::vector<SXMatrix> symbolicOutputSX = a.outputsSX();
+  std::vector<SXMatrix> symbolicInputSX = a.inputExpr();
+  std::vector<SXMatrix> symbolicOutputSX = a.outputExpr();
   
   // Apply vec to them
   for (int i=0;i<symbolicInputSX.size();++i)

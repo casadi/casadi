@@ -49,7 +49,7 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(rocket_single_shooting rocket_single_shooting.cpp)
   target_link_libraries(rocket_single_shooting 
-    casadi_sundials_interface casadi_ipopt_interface casadi_integration casadi 
+    casadi_sundials_interface casadi_ipopt_interface casadi_integration casadi_nonlinear_programming casadi 
     ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
@@ -89,12 +89,12 @@ if(WITH_CSPARSE)
   )
 endif()
 
-# Sundials - just integrate
-if(WITH_SUNDIALS AND LAPACK_FOUND AND BLAS_FOUND AND WITH_CSPARSE)
-  add_executable(sundials_testing sundials_testing.cpp)
-  target_link_libraries(sundials_testing
-    casadi_sundials_interface casadi_lapack_interface casadi_csparse_interface casadi
-    ${SUNDIALS_LIBRARIES} ${LAPACK_LIBRARIES} ${CSPARSE_LIBRARIES} ${BLAS_LIBRARIES} ${CASADI_DEPENDENCIES}
+# Test integrators
+if(WITH_SUNDIALS AND WITH_CSPARSE)
+  add_executable(sensitivity_analysis sensitivity_analysis.cpp)
+  target_link_libraries(sensitivity_analysis
+    casadi_integration casadi_sundials_interface casadi_csparse_interface casadi
+    ${SUNDIALS_LIBRARIES} ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
 
@@ -132,3 +132,18 @@ if(IPOPT_FOUND AND USE_CXX11)
   )
 endif()
 
+# Test OpenCL and show all devices
+if(WITH_OPENCL)
+  add_executable(test_opencl test_opencl.cpp)
+  target_link_libraries(test_opencl ${OPENCL_LIBRARIES})
+endif()
+
+if(WITH_DL AND WITH_IPOPT)
+  add_executable(nlp_codegen nlp_codegen.cpp)
+  target_link_libraries(nlp_codegen casadi_ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
+endif()
+
+if(WITH_DL)
+  add_executable(codegen_usage codegen_usage.cpp)
+  target_link_libraries(codegen_usage casadi ${CASADI_DEPENDENCIES})
+endif()

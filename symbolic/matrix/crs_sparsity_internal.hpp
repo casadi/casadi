@@ -27,10 +27,10 @@
 
 namespace CasADi{
 
-class CRSSparsityInternal : public SharedObjectNode{
-  public:
+  class CRSSparsityInternal : public SharedObjectNode{
+  public:    
     /// Construct a sparsity pattern from vectors
-    CRSSparsityInternal(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind) : nrow_(nrow), ncol_(ncol), col_(col), rowind_(rowind) { sanityCheck(false); }
+    CRSSparsityInternal(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) : nrow_(nrow), ncol_(ncol), col_(col), rowind_(rowind) { sanityCheck(false); }
     
     /// Check if the dimensions and rowind,col vectors are compatible
     void sanityCheck(bool complete=false) const;
@@ -176,6 +176,9 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Check if two sparsity patterns are the same
     bool isEqual(const CRSSparsity& y) const;
 
+    /// Check if two sparsity patterns are the same
+    bool isEqual(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) const;
+
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
     void enlargeRows(int nrow, const std::vector<int>& ii);
 
@@ -204,7 +207,7 @@ class CRSSparsityInternal : public SharedObjectNode{
     int getNZ(int i, int j) const;
     
     /// Get a set of non-zero element - does bounds checking
-    std::vector<int> getNZ(std::vector<int> ii, std::vector<int> jj) const;
+    std::vector<int> getNZ(const std::vector<int>& ii, const std::vector<int>& jj) const;
 
     /// Get the nonzero index for a set of elements (see descripion in public class)
     void getNZInplace(std::vector<int>& indices) const;
@@ -218,6 +221,9 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Get element index for each nonzero
     void getElements(std::vector<int>& loc, bool row_major) const;
     
+    /// Hash the sparsity pattern
+    std::size_t hash() const;
+
     /// Clone
     virtual CRSSparsityInternal* clone() const{ return new CRSSparsityInternal(*this); }
 
@@ -240,10 +246,10 @@ class CRSSparsityInternal : public SharedObjectNode{
     std::vector<int> rowind_;
     
     /// Perform a unidirectional coloring: A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) 
-    CRSSparsity unidirectionalColoring(const CRSSparsity& AT) const;
+    CRSSparsity unidirectionalColoring(const CRSSparsity& AT, int cutoff) const;
 
     /// Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
-    CRSSparsity starColoring(int ordering) const;
+    CRSSparsity starColoring(int ordering, int cutoff) const;
 
     /// Order the rows by decreasing degree
     std::vector<int> largestFirstOrdering() const;
@@ -258,7 +264,6 @@ class CRSSparsityInternal : public SharedObjectNode{
     CRSSparsity getSub1(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
     /// Time complexity: O(ii.size()*(nnz per row))
     CRSSparsity getSub2(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
-
 };
 
 } // namespace CasADi

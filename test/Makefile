@@ -23,9 +23,10 @@ cpp: examples_indoc_cpp  examples_code_cpp
 unittests: unittests_py unittests_oct
 
 unittests_py:
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py symbolic.py" $(MEMCHECK)
-	python internal/test_py.py python -skipfiles="$(shell cd python && ls *.py | grep -v symbolic.py && cd ..) complexity.py speed.py mx_jacobian_sparsity.py"
-  
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" # No memory checks
+ifdef MEMCHECK
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="memcheck$(MEMCHECK)"
+endif
 unittests_oct:
 	python internal/test_oct.py octave
 
@@ -48,7 +49,7 @@ examples_indoc_cpp:
 	
 # No memchecks because it's slow
 examples_code_cpp:
-	python internal/test_cppcmake.py '../examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp parametric_sensitivities.cpp reduced_hessian.cpp"
+	python internal/test_cppcmake.py '../examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp parametric_sensitivities.cpp reduced_hessian.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp"
 
 examples_indoc_oct:
 	python internal/test_oct.py '../documentation/examples'

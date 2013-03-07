@@ -24,7 +24,9 @@
 #define FX_INTERNAL_HPP
 
 #include "fx.hpp"
+#include "../weak_ref.hpp"
 #include <set>
+#include "code_generator.hpp"
 
 // This macro is for documentation purposes
 #define INPUTSCHEME(name)
@@ -52,6 +54,9 @@ class FXInternal : public OptionsFunctionalityNode{
 
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir) = 0;
+  
+    /** \brief  Evaluate with directional derivative compression */
+    void evaluateCompressed(int nfdir, int nadir);
 
     /** \brief Initialize
       Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
@@ -78,7 +83,7 @@ class FXInternal : public OptionsFunctionalityNode{
     virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                         const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
                         const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-                        bool output_given, int offset_begin=0, int offset_end=0);
+                        bool output_given);
 
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
@@ -118,11 +123,34 @@ class FXInternal : public OptionsFunctionalityNode{
     //@}
     
     //@{
-    /** \brief Return function that calculates forward derivatives */
-    FX derivative(int nfwd, int nadj);
-    virtual FX getDerivative(int nfwd, int nadj);
+    /** \brief Return Jacobian of all input nonzeros with respect to all output nonzeros */
+    FX fullJacobian();
+    virtual FX getFullJacobian();
     //@}
 
+    //@{
+    /** \brief Return function that calculates forward derivatives 
+    *    This method returns a cached instance if available, and calls FX getDerivative(int nfwd, int nadj) if no cached version is available.
+    */
+    FX derivative(int nfwd, int nadj);
+
+    /** \brief Constructs and returns a function that calculates forward derivatives */
+    virtual FX getDerivative(int nfwd, int nadj);
+
+    /** \brief Constructs and returns a function that calculates forward derivatives by creating the Jacobian then multiplying */
+    virtual FX getDerivativeViaJac(int nfwd, int nadj);
+
+    //@}
+
+    /** \brief  Print to a c file */
+    virtual void generateCode(const std::string& filename);
+
+    /** \brief Generate code for function inputs and outputs */
+    void generateIO(CodeGenerator& gen);
+
+    /** \brief Generate code for the C functon */
+    virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
+      
     /** \brief  Access an input */
     FunctionIO& iStruct(int i){
       try{
@@ -177,6 +205,18 @@ class FXInternal : public OptionsFunctionalityNode{
     * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
     */
     int schemeEntry(InputOutputScheme scheme,const std::string &name) const;
+    
+    /** \brief Set input scheme */
+    void setInputScheme(InputOutputScheme scheme);
+
+    /** \brief Set output scheme */
+    void setOutputScheme(InputOutputScheme scheme);
+
+    /** \brief Get input scheme */
+    InputOutputScheme getInputScheme() const;
+
+    /** \brief Get output scheme */
+    InputOutputScheme getOutputScheme() const;
     
     /** \brief  Inputs of the function */
     std::vector<FunctionIO> input_;
@@ -320,13 +360,22 @@ class FXInternal : public OptionsFunctionalityNode{
     GenericType getStat(const std::string & name) const;
     
     /// Generate the sparsity of a Jacobian block
-    virtual CRSSparsity getJacSparsity(int iind, int oind);
+    virtual CRSSparsity getJacSparsity(int iind, int oind, bool symmetric);
+    
+    /// A flavour of getJacSparsity without any magic
+    CRSSparsity getJacSparsityPlain(int iind, int oind);
+    
+    /// A flavour of getJacSparsity that does hierachical block structure recognition
+    CRSSparsity getJacSparsityHierarchical(int iind, int oind);
+    
+    /// A flavour of getJacSparsity that does hierachical block structure recognition for symmetric jacobians
+    CRSSparsity getJacSparsityHierarchicalSymm(int iind, int oind);
     
     /// Generate the sparsity of a Jacobian block
     void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact);
     
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    CRSSparsity& jacSparsity(int iind, int oind, bool compact);
+    CRSSparsity& jacSparsity(int iind, int oind, bool compact, bool symmetric);
     
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const;
@@ -351,12 +400,21 @@ class FXInternal : public OptionsFunctionalityNode{
     
     /** \brief  Dictionary of statistics (resulting from evaluate) */
     Dictionary stats_;
+    
+    /** \brief  Flag to indicate wether statistics must be gathered */
+    bool gather_stats_;
 
     /// Cache for functions to evaluate directional derivatives
-    std::vector<std::vector<FX> > derivative_fcn_;
+    std::vector<std::vector<FX> > derivative_fcn_; // NOTE: This can result in circular dependencies!
+
+    /// Cache for full Jacobian
+    WeakRef full_jacobian_;
 
     /// Cache for sparsities of the Jacobian blocks
     std::vector<std::vector<CRSSparsity> > jac_sparsity_, jac_sparsity_compact_;
+
+    /// Which derivative directions are currently being compressed
+    std::vector<bool> compressed_fwd_, compressed_adj_;
 
     /// User-provided Jacobian generator function
     JacobianGenerator jacgen_;

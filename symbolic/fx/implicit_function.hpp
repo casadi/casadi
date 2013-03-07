@@ -29,7 +29,7 @@ namespace CasADi{
 // Forward declaration of internal class
 class ImplicitFunctionInternal;
 
-/** Abstract base class for the implicit function classes
+/** 
  \defgroup ImplicitFunction_doc
 
   The equation:
@@ -42,13 +42,22 @@ class ImplicitFunctionInternal;
   
   
   
-  F should be an FX mapping from (n+1) inputs to 1 output.
-  ImplicitFunction (G) is an FX mapping from n inputs to 1 output. 
+  F should be an FX mapping from (n+1) inputs to m outputs.
+  The first output is the residual that should be zero.
   
+  ImplicitFunction (G) is an FX mapping from n inputs to m outputs. 
   n may be zero.
+  The first output is the solved for z.
   
   You can provide an initial guess for z by setting output(0) of ImplicitFunction.
   
+
+*/
+/**
+Abstract base class for the implicit function classes
+
+@copydoc ImplicitFunction_doc
+
 \author Joel Andersson
 \date 2011
 */
@@ -63,6 +72,12 @@ public:
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
+  
+  /// Set the jacobian of F
+  void setJacobian(FX &J);
+  
+  /// Access F
+  FX getF() const;
 };
 
 } // namespace CasADi

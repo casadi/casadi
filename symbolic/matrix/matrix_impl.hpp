@@ -43,6 +43,13 @@ const T& Matrix<T>::elem(int i, int j) const{
 }
 
 template<class T>
+int Matrix<T>::stream_precision_ = 6;
+template<class T>
+int Matrix<T>::stream_width_ = 0;
+template<class T>
+bool Matrix<T>::stream_scientific_ = false;
+
+template<class T>
 T& Matrix<T>::elem(int i, int j){
   int oldsize = sparsity().size();
   int ind = sparsityRef().getNZ(i,j);
@@ -282,8 +289,21 @@ void Matrix<T>::setSub(const Matrix<int>& i, const Matrix<int>& j, const Matrix<
 
 template<class T>
 void Matrix<T>::setSub(const CRSSparsity& sp, int dummy, const Matrix<T>& el) {
-   casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
-   casadi_error("Not implemented yet");
+  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+  // TODO: optimize this for speed
+  Matrix<T> elm;
+  if (el.scalar()) {
+    elm = Matrix<T>(sp,el.at(0));
+  } else {
+    elm = el.getSub(sp);
+  }
+
+  for(int i=0; i<sp.rowind().size()-1; ++i){
+    for(int k=sp.rowind()[i]; k<sp.rowind()[i+1]; ++k){
+      int j=sp.col()[k];
+      elem(i,j)=elm.data()[k];
+    }
+  }
 }
 
 template<class T>
@@ -403,25 +423,20 @@ bool Matrix<T>::vector() const{
 }
 
 template<class T>
-Matrix<T>::Matrix(){
-  sparsity_ = CRSSparsity(0,0,false);
+Matrix<T>::Matrix() : sparsity_(CRSSparsity(0,0,false)){
 }
 
 template<class T>
-Matrix<T>::Matrix(const Matrix<T>& m){
-  data_ = m.data_;
-  sparsity_ = m.sparsity_;
+Matrix<T>::Matrix(const Matrix<T>& m) : sparsity_(m.sparsity_), data_(m.data_){
 }
 
 template<class T>
-Matrix<T>::Matrix(const std::vector<T>& x) : data_(x){
-  sparsity_ = CRSSparsity(x.size(),1,true);
+Matrix<T>::Matrix(const std::vector<T>& x) : sparsity_(CRSSparsity(x.size(),1,true)), data_(x){
 }
 
 template<class T>
-Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : data_(x){
+Matrix<T>::Matrix(const std::vector<T>& x, int n, int m) : sparsity_(CRSSparsity(n,m,true)), data_(x){
   casadi_assert_message(x.size() == n*m, "Dimension mismatch." << std::endl << "You supplied a vector of length " << x.size() << ", but " << n << " x " << m << " = " << n*m);
-  sparsity_ = CRSSparsity(n,m,true);
 }
 
 template<class T>
@@ -432,14 +447,11 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T>& m){
 }
 
 template<class T>
-Matrix<T>::Matrix(int n, int m){
-  sparsity_ = CRSSparsity(n,m,false);
+Matrix<T>::Matrix(int n, int m) : sparsity_(CRSSparsity(n,m,false)){
 }
 
 template<class T>
-Matrix<T>::Matrix(int n, int m, const T& val){
-  sparsity_ = CRSSparsity(n,m,true);
-  data_.resize(n*m, val);
+Matrix<T>::Matrix(int n, int m, const T& val) : sparsity_(CRSSparsity(n,m,true)), data_(std::vector<T>(n*m, val)){
 }
 
 template<class T>
@@ -454,12 +466,42 @@ std::string Matrix<T>::className(){ return std::string("Matrix<") + typeName<T>(
 template<class T>
 void Matrix<T>::printScalar(std::ostream &stream) const {
   casadi_assert_message(numel()==1, "Not a scalar");
+  
+  std::streamsize precision = stream.precision();
+  std::streamsize width = stream.width();
+  std::ios_base::fmtflags flags = stream.flags();
+  
+  stream.precision(stream_precision_);
+  stream.width(stream_width_);
+  if (stream_scientific_) {
+    stream.setf(std::ios::scientific);
+  } else {
+    stream.unsetf(std::ios::scientific);
+  }
+  
   stream << toScalar();
+  
+  stream.precision(precision);
+  stream.width(width);
+  stream.flags(flags); 
 }
   
 template<class T>
 void Matrix<T>::printVector(std::ostream &stream) const {
   casadi_assert_message(vector(),"Not a vector");
+  
+  std::streamsize precision = stream.precision();
+  std::streamsize width = stream.width();
+  std::ios_base::fmtflags flags = stream.flags();
+  
+  stream.precision(stream_precision_);
+  stream.width(stream_width_);
+  if (stream_scientific_) {
+    stream.setf(std::ios::scientific);
+  } else {
+    stream.unsetf(std::ios::scientific);
+  }
+  
   stream << "[";
   
   // Loop over rows
@@ -474,11 +516,28 @@ void Matrix<T>::printVector(std::ostream &stream) const {
       stream << data()[rowind(i)];
     }
   }
-  stream << "]";  
+  stream << "]"; 
+    
+  stream.precision(precision);
+  stream.width(width);
+  stream.flags(flags); 
 }
 
 template<class T>
 void Matrix<T>::printMatrix(std::ostream &stream) const{
+
+  std::streamsize precision = stream.precision();
+  std::streamsize width = stream.width();
+  std::ios_base::fmtflags flags = stream.flags();
+  
+  stream.precision(stream_precision_);
+  stream.width(stream_width_);
+  if (stream_scientific_) {
+    stream.setf(std::ios::scientific);
+  } else {
+    stream.unsetf(std::ios::scientific);
+  }
+  
   for(int i=0; i<size1(); ++i){
     if(i==0)
       stream << "[[";
@@ -507,6 +566,11 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
     else
       stream << "]" << std::endl;
   }
+  
+    
+  stream.precision(precision);
+  stream.width(width);
+  stream.flags(flags);
 }
 
 template<class T>
@@ -519,7 +583,7 @@ void Matrix<T>::printDense(std::ostream &stream) const{
 template<class T>
 void Matrix<T>::printSparse(std::ostream &stream) const {
   stream << className() << "(rows = " << size1() << ", cols = " << size2() << ", nnz = " << size() << ")";
-  if (size()>0) stream << ":";
+  if (size()>0) stream << ":" << std::endl;
   for(int i=0; i<size1(); ++i)
     for(int el=rowind(i); el<rowind(i+1); ++el){
       int j=col(el);
@@ -601,16 +665,13 @@ void Matrix<T>::clear(){
 }
 
 template<class T>
-Matrix<T>::Matrix(double val){
-  sparsity_ = CRSSparsity(1,1,true);
-  data().resize(1,val);
+Matrix<T>::Matrix(double val) : data_(std::vector<T>(1,val)), sparsity_(CRSSparsity(1,1,true)){
 }
 
 template<class T>
-Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& d) : data_(d){
-  sparsity_ = CRSSparsity(n,m,col,rowind);
+Matrix<T>::Matrix(int n, int m, const std::vector<int>& col, const std::vector<int>& rowind, const std::vector<T>& d) : sparsity_(CRSSparsity(n,m,col,rowind)), data_(d){
   if(data_.size() != sparsity_.size())
-    data_.resize(sparsity_.size());
+    data_.resize(sparsity_.size()); // Why not throw an error?
   sanityCheck(true);
 }
 
@@ -640,15 +701,12 @@ Matrix<T>::Matrix(const std::vector< std::vector<T> >& d){
 }
 
 template<class T>
-Matrix<T>::Matrix(const CRSSparsity& sparsity, const T& val){
-  sparsity_ = sparsity.isNull() ? CRSSparsity(0,0,false) : sparsity;
-  data().resize(sparsity_.size(),val);
+Matrix<T>::Matrix(const CRSSparsity& sparsity, const T& val) : sparsity_(sparsity), data_(std::vector<T>(sparsity.size(),val)){
 }
 
 template<class T>
-Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& d) : data_(d) {
+Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& d) : sparsity_(sparsity), data_(d) {
   casadi_assert_message(sparsity.size()==d.size(),"Size mismatch." << std::endl << "You supplied a sparsity of " << sparsity.dimString() << ", but the supplied vector is of length " << d.size());
-  sparsity_ = sparsity.isNull() ? CRSSparsity(0,0,false) : sparsity;
 }
 
 template<class T>
@@ -860,7 +918,7 @@ void Matrix<T>::getArray(T* val, int len, Sparsity sp) const{
       }
     }
   } else {
-    casadi_error("Matrix<T>::getArray: not SPARSE or DENSE");
+    casadi_error("Matrix<T>::getArray: not SPARSE, SPARSESYM  or DENSE");
   }
 }
 
@@ -913,8 +971,21 @@ void Matrix<T>::setArray(const T* val, int len, Sparsity sp){
         // Set the element
         v[el] = val[i*size2()+j];
     }
+  } else if(sp==SPARSESYM) {
+    std::vector<int> mapping;
+    sparsity().transpose(mapping,false);
+    // copy to the result vector
+    int nz = 0;
+    for(int row=0; row<size1(); ++row){
+      // Loop over the elements in the row
+      for(int el=rowind(row); el<rowind(row+1); ++el){ // loop over the non-zero elements
+        if(col(el) > row) break; // break inner loop (only lower triangular part is used)
+        v[el] = val[nz++];
+        v[mapping[el]] = v[el];
+      }
+    }
   } else {
-    throw CasadiException("Matrix<T>::setArray: not SPARSE or DENSE");
+    throw CasadiException("Matrix<T>::setArray: not SPARSE, SPARSESYM or DENSE");
   }
 }
 
@@ -1137,20 +1208,6 @@ void Matrix<T>::enlarge(int nrow, int ncol, const std::vector<int>& ii, const st
 }
 
 template<class T>
-std::string Matrix<T>::dimString() const {
-  std::stringstream ss;
-  ss << "(" << size1() << " x " << size2();
-  if (size1()!=1 && size2()!=1)  ss << " = " << numel();
-  if (numel()==size()) {
-    ss << " dense";
-  } else {
-    ss << " | " << size();
-  }
-  ss << ")";
-  return ss.str();
-}
-
-template<class T>
 void Matrix<T>::sanityCheck(bool complete) const {
   sparsity_.sanityCheck(complete);
   
@@ -1164,127 +1221,175 @@ void Matrix<T>::sanityCheck(bool complete) const {
 }
 
 template<class T>
-Matrix<T> Matrix<T>::mul(const Matrix<T> &y) const{
+Matrix<T> Matrix<T>::mul(const Matrix<T> &y) const {
+  return this->mul_smart(y);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::mul_full(const Matrix<T> &y) const{
   // First factor
   const Matrix<T>& x = *this;
   
   // Return object (assure RVO)
   Matrix<T> ret;
-  
-  if (x.numel()==1 || y.numel()==1){
-    // Elementwise multiplication when either x or y is a scalar
-    ret = x*y;
-    
-  } else {
-    // Matrix multiplication
-    
-    casadi_assert_message(x.size2() == y.size1(),
-      "Matrix<T>::mul: dimension mismatch. Attemping product of (" << x.size1() << " x " << x.size2() << ") " << std::endl <<
-      "with (" << y.size1() << " x " << y.size2() << ") matrix."
-    );
 
-    // Form the transpose of y
-    Matrix<T> y_trans = y.trans();
-  
-    // Create the sparsity pattern for the matrix-matrix product
-    CRSSparsity spres = x.sparsity().patternProduct(y_trans.sparsity());
-  
-    // Create the return object
-    ret = Matrix<T>(spres, 0);
-  
-    // Carry out the matrix product
-    mul_no_alloc(x,y_trans,ret);
-  }
+  // Matrix multiplication
+
+  // Form the transpose of y
+  Matrix<T> y_trans = y.trans();
+
+  // Create the sparsity pattern for the matrix-matrix product
+  CRSSparsity spres = x.sparsity().patternProduct(y_trans.sparsity());
+
+  // Create the return object
+  ret = Matrix<T>(spres, 0);
+
+  // Carry out the matrix product
+  mul_no_alloc_nt(x,y_trans,ret);
   
   return ret;
 }
 
 template<class T>
-void Matrix<T>::mul_no_alloc1(Matrix<T> &x, const Matrix<T> &y_trans, const Matrix<T>& z){
-
-  // Direct access to the arrays
-  const std::vector<T> &z_data = z.data();
-  const std::vector<int> &z_col = z.col();
-  const std::vector<int> &z_rowind = z.rowind();
-  std::vector<T> &x_data = x.data();
-  const std::vector<int> &x_col = x.col();
-  const std::vector<T> &y_trans_data = y_trans.data();
-  const std::vector<int> &y_row = y_trans.col();
-  const std::vector<int> &x_rowind = x.rowind();
-  const std::vector<int> &y_colind = y_trans.rowind();
-
-  // loop over the row of the resulting matrix)
-  for(int i=0; i<z.size1(); ++i){
-    for(int el=z_rowind[i]; el<z_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
-      int j = z_col[el];
-      int el1 = x_rowind[i];
-      int el2 = y_colind[j];
-      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
-        int j1 = x_col[el1];
-        int i2 = y_row[el2];      
-        if(j1==i2){
-          x_data[el1++] += z_data[el]*y_trans_data[el2++];
-        } else if(j1<i2) {
-          el1++;
-        } else {
-          el2++;
-        }
-      }
-    }
-  }
-}
-
-
-template<class T>
-void Matrix<T>::mul_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z){
-
-  // Direct access to the arrays
-  const std::vector<T> &z_data = z.data();
-  const std::vector<int> &z_col = z.col();
-  const std::vector<int> &z_rowind = z.rowind();
-  const std::vector<T> &x_data = x.data();
-  const std::vector<int> &x_col = x.col();
-  std::vector<T> &y_trans_data = y_trans.data();
-  const std::vector<int> &y_row = y_trans.col();
-  const std::vector<int> &x_rowind = x.rowind();
-  const std::vector<int> &y_colind = y_trans.rowind();
-
-  // loop over the row of the resulting matrix)
-  for(int i=0; i<z.size1(); ++i){
-    for(int el=z_rowind[i]; el<z_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
-      int j = z_col[el];
-      int el1 = x_rowind[i];
-      int el2 = y_colind[j];
-      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
-        int j1 = x_col[el1];
-        int i2 = y_row[el2];      
-        if(j1==i2){
-          y_trans_data[el2++] += z_data[el] * x_data[el1++];
-        } else if(j1<i2) {
-          el1++;
-        } else {
-          el2++;
-        }
-      }
-    }
-  }
-}
-
-template<class T>
-void Matrix<T>::mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z){
-  // Direct access to the arrays
-  const std::vector<int> &z_col = z.col();
-  const std::vector<int> &z_rowind = z.rowind();
-  const std::vector<int> &x_col = x.col();
-  const std::vector<int> &y_row = y_trans.col();
-  const std::vector<int> &x_rowind = x.rowind();
-  const std::vector<int> &y_colind = y_trans.rowind();
-
-  const std::vector<T> &x_data = x.data();
-  const std::vector<T> &y_trans_data = y_trans.data();
-  std::vector<T> &z_data = z.data();
+void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& z){
+  // Assert dimensions
+  casadi_assert(x.size1()==z.size1());
+  casadi_assert(y.size2()==z.size2());
+  casadi_assert(x.size2()==y.size1());
   
+  // Direct access to the arrays
+  const std::vector<int> &x_rowind = x.rowind();
+  const std::vector<int> &x_col = x.col();
+  const std::vector<T> &x_data = x.data();
+  const std::vector<int> &y_rowind = y.rowind();
+  const std::vector<int> &y_col = y.col();
+  const std::vector<T> &y_data = y.data();
+  const std::vector<int> &z_rowind = z.rowind();
+  const std::vector<int> &z_col = z.col();
+  std::vector<T> &z_data = z.data();
+
+  // loop over the rows of the first argument
+  for(int i=0; i<x_rowind.size()-1; ++i){
+    for(int el=x_rowind[i]; el<x_rowind[i+1]; ++el){ // loop over the non-zeros of the first argument
+      int j = x_col[el];
+      int el1 = z_rowind[i];
+      int el2 = y_rowind[j];
+      while(el1 < z_rowind[i+1] && el2 < y_rowind[j+1]){ // loop over matching non-zero elements
+        int j1 = z_col[el1];
+        int i2 = y_col[el2];      
+        if(j1==i2){
+          z_data[el1++] += x_data[el]*y_data[el2++];
+        } else if(j1<i2) {
+          el1++;
+        } else {
+          el2++;
+        }
+      }
+    }
+  }
+}
+
+  template<class T>
+  void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const std::vector<T> &y, std::vector<T>& z){
+    // Assert dimensions
+    casadi_assert(x.size1()==z.size());
+    casadi_assert(x.size2()==y.size());
+    
+    // Direct access to the arrays
+    const std::vector<int> &x_rowind = x.rowind();
+    const std::vector<int> &x_col = x.col();
+    const std::vector<T> &x_data = x.data();
+    
+    // loop over the rows of the matrix
+    for(int i=0; i<x_rowind.size()-1; ++i){
+      for(int el=x_rowind[i]; el<x_rowind[i+1]; ++el){ // loop over the non-zeros of the matrix
+        int j = x_col[el];
+        
+        // Perform operation
+        z[i] += x_data[el] * y[j];
+      }
+    }
+  }
+  
+  template<class T>
+  void Matrix<T>::mul_no_alloc_tn(const Matrix<T>& x_trans, const std::vector<T> &y, std::vector<T> &z){
+    // Assert dimensions
+    casadi_assert(x_trans.size2()==z.size());
+    casadi_assert(x_trans.size1()==y.size());
+    
+    // Direct access to the arrays
+    const std::vector<int> &x_colind = x_trans.rowind();
+    const std::vector<int> &x_row = x_trans.col();
+    const std::vector<T> &x_trans_data = x_trans.data();
+    
+    // loop over the columns of the matrix
+    for(int i=0; i<x_colind.size()-1; ++i){
+      for(int el=x_colind[i]; el<x_colind[i+1]; ++el){ // loop over the non-zeros of the matrix
+        int j = x_row[el];
+        z[j] += x_trans_data[el] * y[i];
+      }
+    }
+  }
+  
+template<class T>
+void Matrix<T>::mul_no_alloc_tn(const Matrix<T>& x_trans, const Matrix<T> &y, Matrix<T> &z){
+  // Assert dimensions
+  casadi_assert(x_trans.size2()==z.size1());
+  casadi_assert(y.size2()==z.size2());
+  casadi_assert(x_trans.size1()==y.size1());
+  
+  // Direct access to the arrays
+  const std::vector<int> &x_colind = x_trans.rowind();
+  const std::vector<int> &x_row = x_trans.col();
+  const std::vector<T> &x_trans_data = x_trans.data();
+  const std::vector<int> &y_rowind = y.rowind();
+  const std::vector<int> &y_col = y.col();
+  const std::vector<T> &y_data = y.data();
+  const std::vector<int> &z_rowind = z.rowind();
+  const std::vector<int> &z_col = z.col();
+  std::vector<T> &z_data = z.data();
+
+  // loop over the columns of the first argument
+  for(int i=0; i<x_colind.size()-1; ++i){
+    for(int el=x_colind[i]; el<x_colind[i+1]; ++el){ // loop over the non-zeros of the first argument
+      int j = x_row[el];
+      int el1 = y_rowind[i];
+      int el2 = z_rowind[j];
+      while(el1 < y_rowind[i+1] && el2 < z_rowind[j+1]){ // loop over matching non-zero elements
+        int j1 = y_col[el1];
+        int i2 = z_col[el2];      
+        if(j1==i2){
+          z_data[el2++] += x_trans_data[el] * y_data[el1++];
+        } else if(j1<i2) {
+          el1++;
+        } else {
+          el2++;
+        }
+      }
+    }
+  }
+}
+
+template<class T>
+void Matrix<T>::mul_no_alloc_nt(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z){
+  // Assert dimensions
+  casadi_assert(x.size1()==z.size1());
+  casadi_assert(y_trans.size1()==z.size2());
+  casadi_assert(x.size2()==y_trans.size2());
+  
+  // Direct access to the arrays
+  const std::vector<int> &x_rowind = x.rowind();
+  const std::vector<int> &x_col = x.col();
+  const std::vector<T> &x_data = x.data();
+  const std::vector<int> &y_colind = y_trans.rowind();
+  const std::vector<int> &y_row = y_trans.col();
+  const std::vector<T> &y_trans_data = y_trans.data();
+  const std::vector<int> &z_rowind = z.rowind();
+  const std::vector<int> &z_col = z.col();
+  std::vector<T> &z_data = z.data();
+
   #ifdef WITH_EIGEN3
+  // NOTE: this doesn't belong here. It should be put at some higher level. Also, is this really fast than the implementation below?
   if (x.dense() && y_trans.dense() && z.dense()) {
     Eigen::Map< const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic , Eigen::RowMajor > > X(&x_data[0],x.size1(),x.size2());
     Eigen::Map< const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic > > Y(&y_trans_data[0],y_trans.size2(),y_trans.size1());
@@ -1294,7 +1399,7 @@ void Matrix<T>::mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matri
   }
   #endif
   
-  // loop over the rows of the resulting matrix)
+  // loop over the rows of the resulting matrix
   for(int i=0; i<z_rowind.size()-1; ++i){
     for(int el=z_rowind[i]; el<z_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
       int j = z_col[el];
@@ -1561,6 +1666,27 @@ Matrix<T> Matrix<T>::sparse(const std::pair<int,int> &nm){
 template<class T>
 Matrix<T> Matrix<T>::sparse(int n, int m){
   return Matrix<T>(n,m);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d) {
+  return sparse(row,col,d,*std::max_element(row.begin(),row.end()),*std::max_element(col.begin(),col.end()));
+}
+
+template<class T>
+Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& nm) {
+  return sparse(row,col,d,nm.first,nm.second);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int n, int m) {
+  casadi_assert_message(row.size()==col.size() && row.size()==d.size(),"Argument error in Matrix<T>::sparse(row,col,d): supplied lists must all be of equal length, but got: " << row.size() << ", " << col.size()  << " and " << d.size());
+  std::vector<int> mapping;
+  Matrix<T> ret(sp_triplet(n,m,row,col,mapping),0);
+  
+  for (int k=0;k<mapping.size();++k) ret.data()[k] = d[mapping[k]];
+  
+  return ret;
 }
 
 template<class T>

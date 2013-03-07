@@ -100,6 +100,7 @@ N_Vector N_VNewEmpty_Serial(long int length)
   ops->nvinvtest         = N_VInvTest_Serial;
   ops->nvconstrmask      = N_VConstrMask_Serial;
   ops->nvminquotient     = N_VMinQuotient_Serial;
+  ops->nvlength          = N_VLength_Serial;
 
   /* Create content */
   content = NULL;
@@ -314,6 +315,7 @@ N_Vector N_VCloneEmpty_Serial(N_Vector w)
   ops->nvinvtest         = w->ops->nvinvtest;
   ops->nvconstrmask      = w->ops->nvconstrmask;
   ops->nvminquotient     = w->ops->nvminquotient;
+  ops->nvlength          = w->ops->nvlength;
 
   /* Create content */
   content = NULL;
@@ -838,6 +840,11 @@ realtype N_VMinQuotient_Serial(N_Vector num, N_Vector denom)
   }
 
   return(min);
+}
+
+long int N_VLength_Serial(N_Vector x)
+{
+  return NV_LENGTH_S(x);
 }
 
 /*

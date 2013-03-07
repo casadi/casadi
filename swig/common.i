@@ -24,6 +24,10 @@
 // for example vertcat(SXMatrixVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303
 
+// Incude cmath early on, see #622
+%begin %{
+#include <cmath>
+%}
 
 #ifdef SWIGPYTHON
 %pythoncode %{
@@ -178,8 +182,10 @@ _object = _copyableObject
 
 %{
 #include "symbolic/casadi_options.hpp" 
+#include "symbolic/casadi_meta.hpp" 
 %}
 %include "symbolic/casadi_options.hpp"
+%include "symbolic/casadi_meta.hpp"
 
 %{
 #define START \
@@ -355,7 +361,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 
 #include "optimal_control/ocp_tools.hpp"
-#include "optimal_control/multiple_shooting.hpp"
+#include "optimal_control/direct_multiple_shooting.hpp"
 #include "optimal_control/symbolic_ocp.hpp"
 
 %}

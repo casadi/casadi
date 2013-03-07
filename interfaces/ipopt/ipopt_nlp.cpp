@@ -143,6 +143,8 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
   /// See also: http://list.coin-or.org/pipermail/ipopt/2010-July/002078.html
   // http://list.coin-or.org/pipermail/ipopt/2010-April/001965.html
   
+  bool full_callback = false;
+    
 #ifdef WITH_IPOPT_CALLBACK 
   double time1 = clock();
   OrigIpoptNLP* orignlp = dynamic_cast<OrigIpoptNLP*>(GetRawPtr(ip_cq->GetIpoptNLP()));
@@ -189,9 +191,10 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
   }
   double time2 = clock();
   solver->t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
+  full_callback = true;
 #endif // WITH_IPOPT_CALLBACK 
-  
-  return solver->intermediate_callback(x_,z_L_,z_U_,g_,lambda_,obj_value,iter,inf_pr,inf_du,mu,d_norm,regularization_size,alpha_du,alpha_pr,ls_trials);
+
+  return solver->intermediate_callback(x_,z_L_,z_U_,g_,lambda_,obj_value,iter,inf_pr,inf_du,mu,d_norm,regularization_size,alpha_du,alpha_pr,ls_trials,full_callback);
 
                  
 }

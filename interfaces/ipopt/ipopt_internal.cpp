@@ -366,28 +366,26 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
   
 }
 
-bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials) {
+bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials,bool full_callback) {
   try {
     log("intermediate_callback started");
     double time1 = clock();
     if (!callback_.isNull()) {
-#ifdef WITH_IPOPT_CALLBACK 
-      copy(x,x+n_,callback_.input(NLP_X_OPT).begin());
-      
-      vector<double>& lambda_x = callback_.input(NLP_LAMBDA_X).data();
-      for(int i=0; i<lambda_x.size(); ++i){
-        lambda_x[i] = z_U[i]-z_L[i];
+      if(full_callback) {
+        copy(x,x+n_,callback_.input(NLP_X_OPT).begin());
+        
+        vector<double>& lambda_x = callback_.input(NLP_LAMBDA_X).data();
+        for(int i=0; i<lambda_x.size(); ++i){
+          lambda_x[i] = z_U[i]-z_L[i];
+        }
+        copy(lambda,lambda+m_,callback_.input(NLP_LAMBDA_G).begin());
+        copy(g,g+m_,callback_.input(NLP_G).begin());
+      } else {
+         if (iter==0) {
+            cerr << "Warning: intermediate_callback is disfunctional in your installation. You will only be able to use getStats(). See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it." << endl;
+         }
       }
-      copy(lambda,lambda+m_,callback_.input(NLP_LAMBDA_G).begin());
-      copy(g,g+m_,callback_.input(NLP_G).begin());
-      
-#endif // WITH_IPOPT_CALLBACK 
 
-#ifndef WITH_IPOPT_CALLBACK 
-   if (iter==0) {
-      cerr << "Warning: intermediate_callback is disfunctional in your installation. You will only be able to use getStats(). See https://sourceforge.net/apps/trac/symbolic/wiki/enableIpoptCallback to enable it." << endl;
-   }
-#endif // WITH_IPOPT_CALLBACK 
       callback_.input(NLP_COST).at(0) = obj_value;
       callback_->stats_["iter"] = iter;
       callback_->stats_["inf_pr"] = inf_pr;
@@ -642,10 +640,11 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
       F_.evaluate(0,1);
 
       // Get the result
-      F_.getAdjSens(grad_f);
+      F_.adjSens().getArray(grad_f,n,DENSE);
 
       // Printing
       if(monitored("eval_grad_f")){
+        cout << "x = " << F_.input() << endl;
         cout << "grad_f = " << F_.adjSens() << endl;
       }
       
@@ -660,10 +659,11 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
       GF_.evaluate();
 
       // Get the result
-      GF_.getOutput(grad_f);
+      GF_.output().getArray(grad_f,n,DENSE);
       
       // Printing
       if(monitored("eval_grad_f")){
+        cout << "x = " << GF_.input() << endl;
         cout << "grad_f = " << GF_.output() << endl;
       }
 

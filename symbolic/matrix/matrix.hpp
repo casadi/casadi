@@ -165,6 +165,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     using B::empty;
     using B::scalar;
     using B::dense;
+    using B::dimString;
     using B::operator[];
     using B::operator();
 
@@ -196,42 +197,32 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
 
     /** \brief  Create a matrix from a matrix with a different type of matrix entries (assuming that the scalar conversion is valid) */
     template<typename A>
-    Matrix(const Matrix<A>& x){
-      sparsity_ = x.sparsity();
-      data().resize(x.size());
+    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<T>(x.size())){
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
-    Matrix(const std::vector<A>& x){
-      sparsity_ = CRSSparsity(x.size(),1,true);
-      data().resize(x.size());
+    Matrix(const std::vector<A>& x) : sparsity_(CRSSparsity(x.size(),1,true)), data_(std::vector<T>(x.size())){
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create a non-vector expression from an stl vector */
     template<typename A>
-    Matrix(const std::vector<A>& x,  int n, int m){
+    Matrix(const std::vector<A>& x,  int n, int m) : sparsity_(CRSSparsity(n,m,true)), data_(std::vector<T>(x.size())){
       if(x.size() != n*m) throw CasadiException("Matrix::Matrix(const std::vector<T>& x,  int n, int m): dimension mismatch");
-      sparsity_ = CRSSparsity(n,m,true);
-      data().resize(x.size());
       copy(x.begin(),x.end(),begin());
     }
     
     /** \brief  ublas vector */
 #ifdef HAVE_UBLAS
     template<typename T, typename A>
-    explicit Matrix<T>(const ublas::vector<A> &x){
-      sparsity_ = CRSSparsity(x.size(),1,true);
-      std::vector<T>::resize(x.size());
+    explicit Matrix<T>(const ublas::vector<A> &x) : sparsity_(CRSSparsity(x.size(),1,true)), data_(std::vector<T>(x.size())){
       copy(x.begin(),x.end(),begin());
     }
 
     template<typename T, typename A>
-    explicit Matrix<T>(const ublas::matrix<A> &x){
-      sparsity_ = CRSSparsity(x.size1(),x.size2(),true);
-      data().resize(numel());
+    explicit Matrix<T>(const ublas::matrix<A> &x) : sparsity_(CRSSparsity(x.size1(),x.size2(),true)), data_(std::vector<T>(numel())){
       copy(x.begin(),x.end(),begin());
       return ret;
     }
@@ -301,6 +292,8 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     const Matrix<T> getSub(int i, const std::vector<int>& j) const{ return getSub(std::vector<int>(1,i),j);}
     const Matrix<T> getSub(const std::vector<int>& i, int j) const{ return getSub(i,std::vector<int>(1,j));}
     const Matrix<T> getSub(const std::vector<int>& i, const std::vector<int>& j) const;
+    const Matrix<T> getSub(const std::vector<int>& i, const Slice& j) const { return getSub(i,j.getAll(size2()));}
+    const Matrix<T> getSub(const Slice& i, const std::vector<int>& j) const { return getSub(i.getAll(size1()),j);}
     const Matrix<T> getSub(const Slice& i, const Slice& j) const{ return getSub(i.getAll(size1()),j.getAll(size2()));}
     const Matrix<T> getSub(int i, const Slice& j) const{ return getSub(std::vector<int>(1,i),j.getAll(size2()));}
     const Matrix<T> getSub(const Slice& i, int j) const{ return getSub(i.getAll(size1()),std::vector<int>(1,j));}
@@ -318,6 +311,8 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     void setSub(int i, const std::vector<int>& j, const Matrix<T>& m){ setSub(std::vector<int>(1,i),j,m);}
     void setSub(const std::vector<int>& i, int j, const Matrix<T>& m){ setSub(i,std::vector<int>(1,j),m);}
     void setSub(const std::vector<int>& i, const std::vector<int>& j, const Matrix<T>& m);
+    void setSub(const std::vector<int>& i, const Slice& j, const Matrix<T>& m) { setSub(i,j.getAll(size2()),m); }
+    void setSub(const Slice& i, const std::vector<int>& j, const Matrix<T>& m){ setSub(i.getAll(size1()),j,m);}
     void setSub(const Slice& i, const Slice& j, const Matrix<T>& m){ setSub(i.getAll(size1()),j.getAll(size2()),m);}
     void setSub(const std::vector<int>& i, const Matrix<int>& k, const Matrix<T>& m);
     void setSub(const Matrix<int>& k, const std::vector<int>& j, const Matrix<T>& m);
@@ -459,18 +454,27 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Matrix<T> __mrdivide__  (const Matrix<T> &y) const;
     //@}
     
-    /// Matrix product
+    /// Matrix-matrix product
+    Matrix<T> mul_full(const Matrix<T> &y) const;
+
+    /// Matrix-matrix product
     Matrix<T> mul(const Matrix<T> &y) const;
-
-    /// Matrix product, no memory allocation: z += mul(x,y)
-    static void mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z);
-
-    /// Matrix product, no memory allocation: x += mul(z,trans(y))
-    static void mul_no_alloc1(Matrix<T> &x, const Matrix<T> &y_trans, const Matrix<T>& z);
-
-    /// Matrix product, no memory allocation: y += mul(trans(x),z)
-    static void mul_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z);
     
+    /// Matrix-matrix product, no memory allocation: z += mul(x,y)
+    static void mul_no_alloc_nn(const Matrix<T>& x, const Matrix<T> &y, Matrix<T>& z);
+    
+    /// Matrix-matrix product, no memory allocation: z += mul(x,trans(y))
+    static void mul_no_alloc_nt(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z);
+
+    /// Matrix-matrix product, no memory allocation: z += mul(trans(x),y)
+    static void mul_no_alloc_tn(const Matrix<T>& trans_x, const Matrix<T> &y, Matrix<T>& z);
+  
+    /// Matrix-vector product, no memory allocation: z += mul(x,y)
+    static void mul_no_alloc_nn(const Matrix<T>& x, const std::vector<T> &y, std::vector<T>& z);
+
+    /// vector-matrix product, no memory allocation: z += mul(trans(x),y)
+    static void mul_no_alloc_tn(const Matrix<T>& trans_x, const std::vector<T> &y, std::vector<T>& z);
+  
     /// Propagate sparsity using 0-1 logic through a matrix product, no memory allocation: z = mul(x,y)
     static void mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, bool fwd);
     
@@ -526,12 +530,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     void printSparse(std::ostream &stream=std::cout) const; // print sparse matrix style
     void printDense(std::ostream &stream=std::cout) const; // Print dense matrix stype
     //@}
-    
-    /** \brief Get string representation of dimensions.
-    The representation is (nrow x ncol = numel | size)
-    */
-    std::string dimString() const;
-
+  
     // Get the sparsity pattern
     const std::vector<int>& col() const;
     const std::vector<int>& rowind() const;
@@ -630,7 +629,18 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     static Matrix<T> sparse(int nrow, int ncol=1);
     static Matrix<T> sparse(const std::pair<int,int>& nm);
     //@}
-
+    
+    /* \brief Construct a sparse matrix from triplet form
+    * Matrix size will be max(row) x max(col)
+    */
+    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d);
+    
+    //@{
+    /// \brief Construct a sparse matrix from triplet form
+    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int n, int m);
+    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& nm);
+    //@}
+    
     //@{
     /** \brief  create a dense matrix with all zeros */
     static Matrix<T> zeros(int nrow, int ncol=1);
@@ -667,12 +677,25 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     /** \brief  The following function is used to ensure similarity to MX, which is reference counted */
     bool isNull() const{ return false;}
     
+    // @{
+    /// Set the 'precision, width & scientific' used in printing and serializing to streams
+    static void setPrecision(int precision) { stream_precision_ = precision; }
+    static void setWidth(int width) { stream_width_ = width; }
+    static void setScientific(bool scientific) { stream_width_ = scientific; }
+    // @}
+    
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;
     
     /// Nonzero elements
     std::vector<T> data_;
+    
+    /// Precision used in streams
+    static int stream_precision_;
+    static int stream_width_;
+    static bool stream_scientific_;
+    
 };
 
 } // namespace CasADi

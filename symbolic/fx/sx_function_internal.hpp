@@ -34,7 +34,42 @@ namespace llvm{
 } // namespace llvm
 #endif // WITH_LLVM
 
+#ifdef WITH_OPENCL
+#ifdef __APPLE__
+#include <OpenCL/opencl.h>
+#else
+#include <CL/cl.h>
+#endif
+#endif // WITH_OPENCL
+
 namespace CasADi{
+#ifdef WITH_OPENCL
+  /** \brief Singleton for the sparsity propagation kernel
+      TODO: Move to a separate file and make non sparsity pattern specific
+      \author Joel Andersson
+      \date 2013
+  */
+  class SparsityPropagationKernel{
+  public:
+    // Default constructor
+    SparsityPropagationKernel();
+    
+    // Destructor
+    ~SparsityPropagationKernel();
+
+    // Copy constructor and equality operator (not implemented, declared to prevent use of the default ones)
+    SparsityPropagationKernel(const SparsityPropagationKernel& sparsityPropagationKernel);
+    SparsityPropagationKernel& operator=(const SparsityPropagationKernel& sparsityPropagationKernel);
+
+    // Data members (all public)
+    cl_device_id device_id;
+    cl_context context;
+    cl_command_queue command_queue;
+    cl_platform_id platform_id;
+    cl_uint ret_num_devices;
+    cl_uint ret_num_platforms;
+  };
+#endif // WITH_OPENCL
 
 /** \brief  Internal node class for SXFunction
   A regular user should never work with any Node class. Use SXFunction directly.
@@ -83,7 +118,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                       const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
                       const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-                      bool output_given, int offset_begin=0, int offset_end=0);
+                      bool output_given);
                           
   /** \brief  Check if smooth */
   bool isSmooth() const;
@@ -128,12 +163,12 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /** \brief  Update the number of sensitivity directions during or after initialization */
   virtual void updateNumSens(bool recursive);
 
-  /** \brief  Print to a c file */
-  static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
+  /** \brief Generate code for the C functon */
+  virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
 
-  /** \brief  Print to a c file */
-  void generateCode(const std::string& filename);
-      
+  /** \brief Generate code for the body of the C function */
+  virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
   
@@ -145,11 +180,20 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
 
   /// Reset the sparsity propagation
   virtual void spInit(bool fwd);
+  
+  /// Get jacobian of all nonzero outputs with respect to all nonzero inputs
+  virtual FX getFullJacobian();
 
   /// With just-in-time compilation
   bool just_in_time_;
+
+  /// With just-in-time compilation using OpenCL
+  bool just_in_time_opencl_;
+
+  /// With just-in-time compilation for the sparsity propagation
+  bool just_in_time_sparsity_;
   
-  #ifdef WITH_LLVM
+#ifdef WITH_LLVM
   llvm::Module *jit_module_;
   llvm::Function *jit_function_;
 
@@ -161,7 +205,52 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
 
   // References to input and output nonzeros
   std::vector<double*> input_ref_, output_ref_;
-  #endif // WITH_LLVM
+#endif // WITH_LLVM
+  
+#ifdef WITH_OPENCL
+  // Initialize sparsity propagation using OpenCL
+  void allocOpenCL();
+
+  // Propagate sparsity using OpenCL
+  void evaluateOpenCL();
+
+  // Free memory for sparsity propagation using OpenCL
+  void freeOpenCL();
+
+  // Initialize sparsity propagation using OpenCL
+  void spAllocOpenCL();
+
+  // Propagate sparsity using OpenCL
+  void spEvaluateOpenCL(bool fwd);
+
+  // Free memory for sparsity propagation using OpenCL
+  void spFreeOpenCL();
+
+  // Compile OpenCL program
+  static void compileProgram(cl_program program);
+
+  // Execute OpenCL kernel
+  static void executeKernel(cl_kernel kernel);
+
+  // OpenCL memory object for the numerical evaluation
+  cl_program program_;
+
+  // OpenCL memory object for the sparsity propagation
+  cl_program sp_program_;
+
+  // Buffers and kernels for numerical evaluation
+  std::vector<cl_mem> input_memobj_, output_memobj_;
+  cl_kernel kernel_;
+
+  // Buffers and kernels for sparsity propagation
+  std::vector<cl_mem> sp_input_memobj_, sp_output_memobj_;
+  cl_kernel sp_fwd_kernel_, sp_adj_kernel_;
+
+  // OpenCL context. TODO: Nothing class specific in this class, move to a central location
+  static SparsityPropagationKernel sparsity_propagation_kernel_;
+
+#endif // WITH_OPENCL
+
 };
 
 

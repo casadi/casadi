@@ -403,6 +403,75 @@ void SparseSparseOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, 
   }
 }
 
+void ScalarNonzerosOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
+  stream << res.at(0) << "[i]=";
+  casadi_math<double>::printPre(op_,stream);
+  stream << arg.at(0) << "[0]";
+  casadi_math<double>::printSep(op_,stream);
+  stream << arg.at(1) << "[i]";
+  casadi_math<double>::printPost(op_,stream);
+  stream << ";" << endl;
+}
+
+void NonzerosScalarOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
+  stream << res.at(0) << "[i]=";
+  casadi_math<double>::printPre(op_,stream);
+  stream << arg.at(0) << "[i]";
+  casadi_math<double>::printSep(op_,stream);
+  stream << arg.at(1) << "[0]";
+  casadi_math<double>::printPost(op_,stream);
+  stream << ";" << endl;
+}
+
+void NonzerosNonzerosOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
+  stream << res.at(0) << "[i]=";
+  casadi_math<double>::printPre(op_,stream);
+  stream << arg.at(0) << "[i]";
+  casadi_math<double>::printSep(op_,stream);
+  stream << arg.at(1) << "[i]";
+  casadi_math<double>::printPost(op_,stream);
+  stream << ";" << endl;
+}
+
+void SparseSparseOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  // Nonzero counters
+  int el0=0, el1=0, el=0;
+  
+  // Loop over nonzero elements
+  for(int i=0; i<mapping_.size(); ++i){
+    // Check which elements are nonzero
+    unsigned char m = mapping_[i];
+    bool nz0(m & 1);
+    bool nz1(m & 2);
+    bool skip_nz(m & 4);
+    
+    // Evaluate
+    if(!skip_nz){
+      stream << "  " << res.at(0) << "[" << el++ <<  "]=";
+      casadi_math<double>::printPre(op_,stream);
+      if(nz0){
+	stream << arg.at(0) << "[" << el0 << "]";
+      } else {
+	stream << "0";
+      }
+      casadi_math<double>::printSep(op_,stream);
+      if(nz1){
+	stream << arg.at(1) << "[" << el1 << "]";
+      } else {
+	stream << "0";
+      }
+      casadi_math<double>::printPost(op_,stream);
+      stream << ";" << endl;
+    }
+    
+    // Go to next nonzero
+    el0 += nz0;
+    el1 += nz1;
+  }
+}
 
 } // namespace CasADi
 

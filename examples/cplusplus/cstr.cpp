@@ -20,29 +20,23 @@
  *
  */
 
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/casadi.hpp>
+
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include <interfaces/sundials/idas_integrator.hpp>
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/kinsol_solver.hpp>
 #include <interfaces/csparse/csparse.hpp>
 
-#include <symbolic/fx/fx_tools.hpp>
-#include <symbolic/mx/mx_tools.hpp>
-#include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/matrix/matrix_tools.hpp>
-
 #include <optimal_control/symbolic_ocp.hpp>
 #include <optimal_control/ocp_tools.hpp>
 #include <optimal_control/variable_tools.hpp>
-#include <optimal_control/multiple_shooting.hpp>
+#include <optimal_control/direct_multiple_shooting.hpp>
 
 using namespace CasADi;
 using namespace std;
 
 int main(){
-
-  bool use_kinsol = false;
 
   // Allocate an OCP object
   SymbolicOCP ocp;
@@ -52,10 +46,8 @@ int main(){
   parse_options["scale_variables"] = true;
   parse_options["eliminate_dependent"] = true;
   parse_options["scale_equations"] = false;
+  parse_options["make_explicit"] = true;
   ocp.parseFMI("../examples/xml_files/cstr.xml",parse_options);
-  
-  // To explicit form
-//   ocp.makeExplicit();
   
   // Print the ocp to screen
   ocp.print();
@@ -71,7 +63,6 @@ int main(){
   // Variables
   SXMatrix t = ocp.t;
   SXMatrix x = var(ocp.x);
-  SXMatrix xdot = der(ocp.x);
   SXMatrix u = var(ocp.u);
     
   // Initial guess and bounds for the state
@@ -89,11 +80,6 @@ int main(){
 
   // Set integrator options
   Dictionary integrator_options;
-  integrator_options["number_of_fwd_dir"]=1;
-  integrator_options["number_of_adj_dir"]=0;
-  integrator_options["exact_jacobian"]=true;
-  integrator_options["fsens_err_con"]=true;
-  integrator_options["quad_err_con"]=true;
   integrator_options["abstol"]=1e-8;
   integrator_options["reltol"]=1e-8;
   integrator_options["tf"]=ocp.tf/num_nodes;
@@ -102,32 +88,13 @@ int main(){
   SXMatrix xf = ssym("xf",x.size(),1);
   SXFunction mterm(xf, xf[0]);
   
-  // Create a multiple shooting discretization
-  MultipleShooting ocp_solver;
-  if(use_kinsol){
-    // Create an implicit function residual
-    vector<SXMatrix > impres_in(DAE_NUM_IN+1);
-    impres_in[0] = xdot;
-    impres_in[1+DAE_T] = t;
-    impres_in[1+DAE_X] = x;
-    impres_in[1+DAE_P] = u;
-    SXFunction impres(impres_in,ocp.ode);
+  // DAE residual function
+  SXFunction dae(daeIn("x",x, "p",u, "t",t),daeOut("ode",ocp.ode));
 
-    // Create an implicit function (KINSOL)
-    KinsolSolver ode(impres);
-    ode.setOption("linear_solver_creator",CSparse::creator);
-    ode.init();
-    
-    // Create OCP solver
-    ocp_solver = MultipleShooting(ode,mterm);
-    ocp_solver.setOption("integrator",CVodesIntegrator::creator);
-  } else {
-    // DAE residual function
-    SXFunction dae(daeIn("x",x, "p",u, "t",t, "xdot",xdot),daeOut("ode",ocp.ode));
-    
-    ocp_solver = MultipleShooting(dae,mterm);
-    ocp_solver.setOption("integrator",IdasIntegrator::creator);
-  }
+  // Create a multiple shooting discretization
+  DirectMultipleShooting ocp_solver;
+  ocp_solver = DirectMultipleShooting(dae,mterm);
+  ocp_solver.setOption("integrator",IdasIntegrator::creator);
   ocp_solver.setOption("integrator_options",integrator_options);
   ocp_solver.setOption("number_of_grid_points",num_nodes);
   ocp_solver.setOption("final_time",ocp.tf);

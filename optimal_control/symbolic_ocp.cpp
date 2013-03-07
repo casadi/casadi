@@ -427,8 +427,8 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
   }
   
   // Make sure that the dimensions are consistent at this point
-  casadi_assert(x.size()==ode.size());
-  casadi_assert(z.size()==alg.size());
+  casadi_assert_warning(x.size()==ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
+  casadi_assert_warning(z.size()==alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
   casadi_assert(q.size()==quad.size());
   casadi_assert(y.size()==dep.size());
   
@@ -680,7 +680,7 @@ void SymbolicOCP::eliminateInterdependencies(){
 }
 
 vector<SXMatrix> SymbolicOCP::substituteDependents(const vector<SXMatrix>& x) const{
-  return substitute(x,var(y),dep);
+  return substitute(x,vector<SXMatrix>(1,var(y)),vector<SXMatrix>(1,dep));
 }
 
 void SymbolicOCP::eliminateDependent(bool eliminate_dependents_with_bounds){

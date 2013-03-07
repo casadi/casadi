@@ -69,16 +69,22 @@ int main(){
   double inf = numeric_limits<double>::infinity();
   
   // Initial guess and bounds for the optimization variables
-  vector<double> x0  = {0.15, 0.15, 0.00};
-  vector<double> lbx = {0.00, 0.00, 0.00};
-  vector<double> ubx = { inf,  inf,  inf};
+  double x0_[]  = {0.15, 0.15, 0.00};
+  double lbx_[] = {0.00, 0.00, 0.00};
+  double ubx_[] = { inf,  inf,  inf};
+  vector<double> x0(x0_,x0_+3);
+  vector<double> lbx(lbx_,lbx_+3);
+  vector<double> ubx(ubx_,ubx_+3);
   
   // Nonlinear bounds
-  vector<double> lbg = {0.00, 0.00};
-  vector<double> ubg = {0.00, 0.00};
+  double lbg_[] = {0.00, 0.00};
+  double ubg_[] = {0.00, 0.00};
+  vector<double> lbg(lbg_,lbg_+2);
+  vector<double> ubg(ubg_,ubg_+2);
   
   // Original parameter values
-  vector<double> p0  = {5.00,1.00};
+  double p0_[]  = {5.00,1.00};
+  vector<double> p0(p0_,p0_+2);
 
   // Input arguments for f(x,p) and g(x,p)
   vector<SXMatrix> x_and_p(2);

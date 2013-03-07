@@ -29,6 +29,7 @@
 #include "../stl_vector_tools.hpp"
 #include "densification.hpp"
 #include "../fx/mx_function_internal.hpp"
+#include "solve.hpp"
 
 using namespace std;
 
@@ -54,8 +55,7 @@ MX vertcat(const vector<MX>& comp){
     }
 
     // Create a mapping matrix with the corresponding sparsity
-    MX ret;
-    ret.assignNode(new Mapping(sp));
+    MX ret = MX::create(new Mapping(sp));
     
     // Map the dependencies
     int offset=0;
@@ -114,21 +114,15 @@ void applymap(void (*f)(MX&), vector<MX>& comp) {
 }
 
 MX norm_2(const MX &x){
-  MX ret;
-  ret.assignNode(new Norm2(x));
-  return ret;
+  return MX::create(new Norm2(x));
 }
 
 MX norm_1(const MX &x){
-  MX ret;
-  ret.assignNode(new Norm1(x));
-  return ret;
+  return MX::create(new Norm1(x));
 }
 
 MX norm_inf(const MX &x){
-  MX ret;
-  ret.assignNode(new NormInf(x));
-  return ret;
+  return MX::create(new NormInf(x));
 }
 
 MX mul(const MX &x, const MX &y){
@@ -311,8 +305,7 @@ MX unite(const MX& A, const MX& B){
   }
   
   // Create mapping
-  MX ret;
-  ret.assignNode(new Mapping(sp));
+  MX ret = MX::create(new Mapping(sp));
   ret->assign(A,range(nzA.size()),nzA);
   ret->assign(B,range(nzB.size()),nzB);
   simplifyMapping(ret);
@@ -566,74 +559,67 @@ void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool rev
 }
 
 void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse){
-  casadi_error("Not supported in the current version of CasADi awaiting completion of #480. Please contact the developers for enabling this feature.");
-#if 0
   casadi_assert_message(v.size()==vdef.size(),"Mismatch in the number of expression to substitute.");
   for(int k=0; k<v.size(); ++k){
     casadi_assert_message(isSymbolic(v[k]),"Variable " << k << " is not symbolic");
     casadi_assert_message(v[k].sparsity() == vdef[k].sparsity(), "Inconsistent sparsity for variable " << k << ".");
   }
-  
+  casadi_assert_message(reverse==false,"Not implemented");
+
   // quick return if nothing to replace
   if(v.empty()) return;
+
+  // Function inputs
+  std::vector<MX> f_in = v;
 
   // Function outputs
   std::vector<MX> f_out = vdef;
   f_out.insert(f_out.end(),ex.begin(),ex.end());
   
   // Write the mapping function
-  MXFunction f(v,f_out);
+  MXFunction f(f_in,f_out);
   f.init();
 
   // Get references to the internal data structures
-  const std::vector<int>& input_ind = f->input_ind_;
-  std::vector<int>& output_ind = f->output_ind_;
   std::vector<MXAlgEl>& algorithm = f->algorithm_;
-  
-  // Create the filter
-  vector<int> filter = range(f->work_.size());
+  vector<MX> work(f.getWorkSize());
+  MXPtrV input_p, output_p;
+  MXPtrVV dummy_p;
 
-  // Replace expression
-  for(int k=0; k<v.size(); ++k){
-    if(reverse){
-      filter[output_ind[k]] = input_ind[k];
-    } else {
-      output_ind[k] = filter[output_ind[k]];
-      filter[input_ind[k]] = output_ind[k];
-    }
-  }
-
-  // Now filter out the variables from the algorithm
   for(vector<MXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
-    for(vector<int>::iterator it2=it->arg.begin(); it2!=it->arg.end(); ++it2){
-      *it2 = filter[*it2];
+    switch(it->op){
+    case OP_INPUT:
+      work.at(it->res.front()) = vdef.at(it->arg.front());
+      break;
+    case OP_PARAMETER:
+    case OP_CONST:
+      work.at(it->res.front()) = it->data;
+      break;
+    case OP_OUTPUT:
+      if(it->res.front()<vdef.size()){
+	vdef.at(it->res.front()) = work.at(it->arg.front());
+      } else {
+	ex.at(it->res.front()-vdef.size()) = work.at(it->arg.front());
+      }
+      break;
+    default:
+      {
+	input_p.resize(it->arg.size());
+	for(int i=0; i<input_p.size(); ++i){
+	  int el = it->arg[i];
+	  input_p[i] = el<0 ? 0 : &work.at(el);
+	}
+	
+	output_p.resize(it->res.size());
+	for(int i=0; i<output_p.size(); ++i){
+	  int el = it->res[i];
+	  output_p[i] = el<0 ? 0 : &work.at(el);
+	}
+	
+	it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
+      }
     }
-  }
-
-  // Filter the variables from the dependent expressions
-  for(int i=0; i<ex.size(); ++i){
-    int& ex_ind = f->output_ind_.at(i+v.size());
-    ex_ind = filter[ex_ind];
-  }
-
-  // No sensitivities
-  vector<vector<MX> > dummy;
-
-  // Replace expression
-  std::vector<MX> outputv = f->outputv_;
-  f.eval(f->inputv_, outputv, dummy, dummy, dummy, dummy, false);
-  
-  // Replace the result
-  std::vector<MX>::iterator outputv_it = outputv.begin();
-  for(vector<MX>::iterator it=vdef.begin(); it!=vdef.end(); ++it){
-    *it = *outputv_it++;
-  }
-  
-  // Get the replaced expressions
-  for(vector<MX>::iterator it=ex.begin(); it!=ex.end(); ++it){
-    *it = *outputv_it++;
-  }
-#endif
+  }  
 }
 
 std::vector<MX> msym(const std::string& name, const CRSSparsity& sp, int p){
@@ -664,11 +650,190 @@ std::vector<std::vector<MX> > msym(const std::string& name, int n, int m, int p,
   return msym(name,sp_dense(n,m),p,r);
 }
 
+MX substitute(const MX &ex, const MX& v, const MX& vdef){
+  return substitute(vector<MX>(1,ex),vector<MX>(1,v),vector<MX>(1,vdef)).front();
+}
+
 std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef){
+  // Assert consistent dimensions
+  casadi_assert(v.size()==vdef.size());
+  
+  // Quick return if all equal
+  bool all_equal = true;
+  for(int k=0; k<v.size(); ++k){
+    if(!isEqual(v[k],vdef[k])){
+      all_equal = false;
+      break;
+    }
+  }
+  if(all_equal) return ex;
+  
+  // Otherwise, evaluate symbolically     
   MXFunction F(v,ex);
   F.init();
   return F.evalMX(vdef);
 }
+
+void extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef, const std::string& v_prefix, const std::string& v_suffix){
+  
+  // Sort the expression
+  MXFunction f(vector<MX>(),ex);
+  f.init();
+
+  // Get references to the internal data structures
+  const vector<MXAlgEl>& algorithm = f.algorithm();
+  vector<MX> work(f.getWorkSize());
+  
+  // Count how many times an expression has been used
+  vector<int> usecount(work.size(),0);
+  
+  // Remember the origin of every calculation
+  vector<pair<int,int> > origin(work.size(),make_pair(-1,-1));
+    
+  // Which evaluations to replace
+  vector<pair<int,int> > replace;
+  
+  // Evaluate the algorithm to identify which evaluations to replace
+  int k=0;
+  for(vector<MXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it, ++k){
+    // Increase usage counters
+    switch(it->op){
+      case OP_CONST:
+      case OP_PARAMETER:
+        break;
+      default: // Unary operation, binary operation or output
+        for(int c=0; c<it->arg.size(); ++c){
+          if(usecount[it->arg[c]]==0){
+            usecount[it->arg[c]]=1;
+          } else if(usecount[it->arg[c]]==1){
+            replace.push_back(origin[it->arg[c]]);
+            usecount[it->arg[c]]=-1; // Extracted, do not extract again
+          }
+        }
+    }
+        
+    // Perform the operation
+    switch(it->op){
+      case OP_OUTPUT: 
+        break;
+      case OP_CONST:
+      case OP_PARAMETER:
+        usecount[it->res.front()] = -1; // Never extract since it is a primitive type
+        break;
+      default:
+        for(int c=0; c<it->res.size(); ++c){
+          if(it->res[c]>=0){
+            work[it->res[c]] = it->data.getOutput(c);
+            usecount[it->res[c]] = 0; // Not (yet) extracted
+            origin[it->res[c]] = make_pair(k,c);
+          }
+        }
+        break;
+    }
+  }
+  
+  // New variables and definitions
+  v.clear();
+  v.reserve(replace.size());
+  vdef.clear();
+  vdef.reserve(replace.size());
+  
+  // Quick return
+  if(replace.empty()) return;
+  
+  // Sort the elements to be replaced in the order of appearence in the algorithm
+  sort(replace.begin(),replace.end());
+  vector<pair<int,int> >::const_iterator replace_it=replace.begin();
+  
+  // Name of intermediate variables
+  stringstream v_name;
+  
+  // Arguments for calling the atomic operations
+  MXPtrV input_p, output_p;
+  MXPtrVV dummy_p;
+  
+  // Evaluate the algorithm
+  k=0;
+  for(vector<MXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it, ++k){
+    switch(it->op){
+      case OP_OUTPUT:     ex[it->res.front()] = work[it->arg.front()];      break;
+      case OP_CONST:
+      case OP_PARAMETER:  work[it->res.front()] = it->data; break;
+      default:
+      {
+        // Pointers to the arguments of the evaluation
+        input_p.resize(it->arg.size());
+        for(int i=0; i<input_p.size(); ++i){
+          int el = it->arg[i]; // index of the argument
+          input_p[i] = el<0 ? 0 : &work[el];
+        }
+        
+        // Pointers to the result of the evaluation
+        output_p.resize(it->res.size());
+        for(int i=0; i<output_p.size(); ++i){
+          int el = it->res[i]; // index of the output
+          output_p[i] = el<0 ? 0 : &work[el];
+        }
+        
+        // Evaluate atomic operation
+        const_cast<MX&>(it->data)->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
+        
+        // Possibly replace results with new variables
+        for(int c=0; c<it->res.size(); ++c){
+          int ind = it->res[c];
+          if(ind>=0 && replace_it->first==k && replace_it->second==c){
+            // Store the result
+            vdef.push_back(work[ind]);
+            
+            // Create a new variable
+            v_name.str(string());
+            v_name << v_prefix << v.size() << v_suffix;
+            v.push_back(MX(v_name.str()));
+            
+            // Use in calculations
+            work[ind] = v.back();
+            
+            // Go to the next element to be replaced
+            replace_it++;
+          }
+        }
+      }
+    }
+  }
+}
+
+void printCompact(const MX& ex, std::ostream &stream){
+  // Extract shared subexpressions from ex
+  vector<MX> v,vdef;
+  vector<MX> ex_extracted(1,ex);
+  extractShared(ex_extracted,v,vdef,"@","");
+  
+  // Print the expression without shared subexpressions
+  ex_extracted.front().print(stream);
+  
+  // Print the shared subexpressions
+  if(!v.empty()){
+    stream << endl << "where:" << endl;
+    for(int i=0; i<v.size(); ++i){
+      stream << v[i] << " := " << vdef[i] << endl;
+    }
+  }
+}
+
+MX solve(const MX& A, const MX& b){
+  return MX::create(new Solve(A,b));
+}
+
+MX jacobian(const MX& ex, const MX &arg) {
+  MXFunction temp(arg,ex); // make a runtime
+  temp.init();
+  return temp.jac();
+}
+
+MX gradient(const MX& ex, const MX &arg) {
+  return trans(jacobian(ex,arg));
+}
+
 
 } // namespace CasADi
 

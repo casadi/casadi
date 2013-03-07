@@ -43,7 +43,9 @@ SimulatorInternal::~SimulatorInternal(){
 void SimulatorInternal::init(){
   // Let the integration time start from the first point of the time grid.
   if (!grid_.empty()) integrator_.setOption("t0",grid_[0]);
-
+  // Let the integration time stop at the last point of the time grid.
+  if (!grid_.empty()) integrator_.setOption("tf",grid_[grid_.size()-1]);
+  
   casadi_assert_message(isNonDecreasing(grid_),"The supplied time grid must be non-decreasing."); 
   
   // Initialize the integrator
@@ -53,14 +55,12 @@ void SimulatorInternal::init(){
   if(output_fcn_.isNull()){
     SXMatrix t = ssym("t");
     SXMatrix x = ssym("x",integrator_.input(INTEGRATOR_X0).sparsity());
-    SXMatrix xdot = ssym("xp",integrator_.input(INTEGRATOR_X0).sparsity());
     SXMatrix p = ssym("p",integrator_.input(INTEGRATOR_P).sparsity());
 
     vector<SXMatrix> arg(DAE_NUM_IN);
     arg[DAE_T] = t;
     arg[DAE_X] = x;
     arg[DAE_P] = p;
-    arg[DAE_XDOT] = xdot;
 
     vector<SXMatrix> out(INTEGRATOR_NUM_OUT);
     out[INTEGRATOR_XF] = x;

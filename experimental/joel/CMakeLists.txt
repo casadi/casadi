@@ -83,19 +83,29 @@ target_link_libraries(ticket_484 casadi ${CASADI_DEPENDENCIES})
 add_executable(ticket_491 ticket_491.cpp )
 target_link_libraries(ticket_491 casadi ${CASADI_DEPENDENCIES})
 
+add_executable(issue_548 issue_548.cpp )
+target_link_libraries(issue_548 casadi ${CASADI_DEPENDENCIES})
+
 if(WITH_LLVM)
   add_subdirectory(llvm)
 endif(WITH_LLVM)
 
 # single shooting using a RK4 integrator and SQP
-if(IPOPT_FOUND AND WITH_QPOASES AND ACADO_SHARED_LIBRARIES)
+if(IPOPT_FOUND AND WITH_QPOASES)
   add_executable(vdp_lifted_newton vdp_lifted_newton.cpp)
-  target_link_libraries(vdp_lifted_newton casadi_integration casadi_nonlinear_programming casadi_qpoases_interface casadi_ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES} ${ACADO_SHARED_LIBRARIES})
+  target_link_libraries(vdp_lifted_newton casadi_integration casadi_nonlinear_programming casadi_qpoases_interface casadi_ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES} ${QPOASES_LIBRARIES})
 
   add_executable(albersmeyer_toy_example albersmeyer_toy_example.cpp)
-  target_link_libraries(albersmeyer_toy_example casadi_integration casadi_nonlinear_programming casadi_qpoases_interface casadi_ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES} ${ACADO_SHARED_LIBRARIES})
+  target_link_libraries(albersmeyer_toy_example casadi_integration casadi_nonlinear_programming casadi_qpoases_interface casadi_ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES} ${QPOASES_LIBRARIES})
+endif()
 
-  add_executable(shallow_water_lifted_newton shallow_water_lifted_newton.cpp)
-  target_link_libraries(shallow_water_lifted_newton casadi_integration casadi_nonlinear_programming casadi_qpoases_interface casadi_ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES} ${ACADO_SHARED_LIBRARIES})
+if(WITH_QPOASES AND WITH_IPOPT)
+  add_executable(shallow_water shallow_water.cpp)
+  target_link_libraries(shallow_water casadi_qpoases_interface casadi_nonlinear_programming casadi_ipopt_interface casadi ${QPOASES_LIBRARIES} ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
+endif()
+
+if(WITH_QPOASES AND WITH_IPOPT)
+  add_executable(nmpc_example nmpc_example.cpp)
+  target_link_libraries(nmpc_example casadi_qpoases_interface casadi_nonlinear_programming casadi_ipopt_interface casadi ${QPOASES_LIBRARIES} ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
 endif()
 

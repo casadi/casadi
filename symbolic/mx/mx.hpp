@@ -218,6 +218,12 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   /** \brief Get the nth dependency as MX */
   MX getDep(int ch=0) const;
   
+  /** \brief  Number of outputs */
+  int getNumOutputs() const;
+  
+  /** \brief  Get an output */
+  MX getOutput(int oind=0) const;
+
   /** \brief Get the number of dependencies of a binary SX */
   int getNdeps() const;
     
@@ -340,10 +346,13 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   const MX getSub(const std::vector<int>& i, const std::vector<int>& j) const;
   const MX getSub(const Matrix<int>& k, int dummy=0) const;
   const MX getSub(const CRSSparsity& sp, int dummy=0) const;
-  const MX getSub(const std::vector<int>& i, const Matrix<int>& k) const;
+  const MX getSub(const std::vector<int>& i, const Matrix<int>& j) const;
   const MX getSub(const Matrix<int>& k, const std::vector<int>& j) const;
-  const MX getSub(const Slice& i, const Matrix<int>& k) const {return getSub(i.getAll(size1()),k);}
-  const MX getSub(const Matrix<int>& k, const Slice& j) const {return getSub(k,j.getAll(size2()));}
+  const MX getSub(const Slice& i, int j) const {return getSub(i.getAll(size1()),j);}
+  const MX getSub(int i, const Slice& j) const {return getSub(i,j.getAll(size2()));}
+  const MX getSub(const Slice& i, const Slice& j) const {return getSub(i.getAll(size1()),j.getAll(size2()));}
+  const MX getSub(const Slice& i, const Matrix<int>& j) const {return getSub(i.getAll(size1()),j);}
+  const MX getSub(const Matrix<int>& i, const Slice& j) const {return getSub(i,j.getAll(size2()));}
   const MX getSub(const Matrix<int>& i, const Matrix<int>& j) const;
       
   void setSub(int i, int j, const MX& el);
@@ -371,11 +380,6 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   /** \brief Append a matrix to the end. */
   void append(const MX& y);
   
-  /** \brief Get string representation of dimensions.
-  The representation is (nrow x ncol = numel | size)
-  */
-  std::string dimString() const;
-  
   // all binary operations
   MX __add__(const MX& y) const;
   MX __sub__(const MX& y) const;
@@ -391,6 +395,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   MX __mrdivide__  (const MX& b) const;
   MX __mpower__(const MX& b) const;
   MX mul(const MX& y) const;
+  MX mul_full(const MX& y) const;
   MX inner_prod(const MX& y) const;
   MX outer_prod(const MX& y) const;
   MX constpow(const MX& y) const;
@@ -426,6 +431,9 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   MX arccosh() const;
   MX arctanh() const;
   MX logic_not() const;
+
+  /// Lift an expression
+  void lift(const MX& x_guess);
 
   /** \brief  Returns the IMatrix that represents the mapping of a Mapping node
   *

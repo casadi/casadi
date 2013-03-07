@@ -268,26 +268,19 @@ class OCPtests(casadiTestCase):
     t = ssym("t")
     x0 = ssym("x0",nx)
     p = ssym("p",nu)
-    xp0 = ssym("x0",nx)
     xf = x0 + p[0]
-    daeres = SXFunction(daeIn(t=t, x=x0, p=p, xdot=xp0),daeOut(ode=xf))
+    daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
     mayer = SXFunction([x0],[7*x0[0]])
-    ms = MultipleShooting(daeres,mayer)
+    ms = DirectMultipleShooting(daeres,mayer)
     ms.setOption("integrator",CVodesIntegrator)
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("final_time",tf)
     ms.setOption("nlp_solver",IpoptSolver)
     ms.init()
-    self.checkarray(linspace(0,tf,ns+1),ms.input(OCP_T),"timegrid")
     
     for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
       self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
       
-
-    self.checkarray(ms.input(OCP_LBXP).shape,(nx,ns+1),"shape")
-    self.checkarray(ms.input(OCP_UBXP).shape,(nx,ns+1),"shape")
-    self.checkarray(ms.input(OCP_XP_INIT).shape,(0,0),"shape") # is this a bug?
-    
     for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
       self.checkarray(ms.input(i).shape,(nu,ns),"shape")
     
@@ -307,32 +300,25 @@ class OCPtests(casadiTestCase):
     t = ssym("t")
     x0 = ssym("x0",nx)
     p = ssym("p",nu+np)
-    xp0 = ssym("x0",nx)
     xf = x0 + p[0]
-    daeres = SXFunction(daeIn(t=t, x=x0, p=p, xdot=xp0),daeOut(ode=xf))
+    daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
     mayer = SXFunction([x0],[7*x0[0]])
     
     t = SX("t")
-    cfcn = SXFunction(daeIn(t=t,x=x0, p=p, xdot=xp0),[x0[:nh,0]])
+    cfcn = SXFunction(daeIn(t=t,x=x0, p=p),[x0[:nh,0]])
     cfcn.init()
     
-    ms = MultipleShooting(daeres,mayer,cfcn)
+    ms = DirectMultipleShooting(daeres,mayer,cfcn)
     ms.setOption("integrator",CVodesIntegrator)
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("number_of_parameters",np)
     ms.setOption("final_time",tf)
     ms.setOption("nlp_solver",IpoptSolver)
     ms.init()
-    self.checkarray(linspace(0,tf,ns+1),ms.input(OCP_T),"timegrid")
     
     for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
       self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
       
-
-    self.checkarray(ms.input(OCP_LBXP).shape,(nx,ns+1),"shape")
-    self.checkarray(ms.input(OCP_UBXP).shape,(nx,ns+1),"shape")
-    self.checkarray(ms.input(OCP_XP_INIT).shape,(0,0),"shape") # is this a bug?
-    
     for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
       self.checkarray(ms.input(i).shape,(nu,ns),"shape")
     
@@ -363,9 +349,8 @@ class OCPtests(casadiTestCase):
     N = 20
     t=SX("t")
     y=ssym("y",3,1)
-    yd=ssym("yd",3,1)
     p=SX("p")
-    f=SXFunction(daeIn(t=t, x=y, p=p, xdot=yd),daeOut(ode=vertcat([y[1,0],-y[0,0],p*y[0,0]])))
+    f=SXFunction(daeIn(t=t, x=y, p=p),daeOut(ode=vertcat([y[1,0],-y[0,0],p*y[0,0]])))
     f.init()
     
     # Options to be passed to the integrator
@@ -379,7 +364,7 @@ class OCPtests(casadiTestCase):
     mayer = SXFunction([y],[-y[2]])
     mayer.init()
     
-    ms = MultipleShooting(f,mayer)
+    ms = DirectMultipleShooting(f,mayer)
     ms.setOption("integrator",CVodesIntegrator)
     ms.setOption("integrator_options",integrator_options)
     ms.setOption("number_of_grid_points",N)
@@ -436,12 +421,11 @@ class OCPtests(casadiTestCase):
     """
     te = 1
     N = 20
-    t=SX("t")
-    x=SX("x")
-    xd=SX("xd")
-    a=SX("a")
-    u=SX("u")
-    f=SXFunction(daeIn(t=t, x=x, p=[a,u], xdot=xd),[[a*x+u]])
+    t=ssym("t")
+    x=ssym("x")
+    a=ssym("a")
+    u=ssym("u")
+    f=SXFunction(daeIn(t=t, x=x, p=vertcat([a,u])),daeOut(a*x+u))
     f.init()
     
     integrator_options = {}
@@ -454,7 +438,7 @@ class OCPtests(casadiTestCase):
     mayer = SXFunction([x],[-x])
     mayer.init()
     
-    ms = MultipleShooting(f,mayer)
+    ms = DirectMultipleShooting(f,mayer)
     ms.setOption("integrator",CVodesIntegrator)
     ms.setOption("integrator_options",integrator_options)
     ms.setOption("number_of_grid_points",N);

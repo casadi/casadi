@@ -133,6 +133,18 @@ class FX : public OptionsFunctionality{
   /** \brief  Set number of outputs  (normally invoked internally) */
   void setNumOutputs(int num_out);
   
+  /** \brief Set input scheme */
+  void setInputScheme(CasADi::InputOutputScheme scheme);
+
+  /** \brief Set output scheme */
+  void setOutputScheme(CasADi::InputOutputScheme scheme);
+
+  /** \brief Get input scheme */
+  CasADi::InputOutputScheme getInputScheme() const;
+
+  /** \brief Get output scheme */
+  CasADi::InputOutputScheme getOutputScheme() const;
+    
   /** \brief  Update the number of sensitivity directions during or after initialization (normally invoked internally) */
   void updateNumSens();
   
@@ -146,8 +158,17 @@ class FX : public OptionsFunctionality{
    */
   void requestNumSens(int nfwd, int nadj);
   
+  /** \brief Get the number of allocated forward directional derivatives */
+  int numAllocFwd() const;
+
+  /** \brief Get the number of allocated adjoint directional derivatives */
+  int numAllocAdj() const;
+
   /** \brief  Evaluate */
   void evaluate(int nfdir=0, int nadir=0);
+  
+  /** \brief  Evaluate with directional derivative compression */
+  void evaluateCompressed(int nfdir=0, int nadir=0);
   
   /// the same as evaluate(0,0)
   void solve();
@@ -161,7 +182,7 @@ class FX : public OptionsFunctionality{
   * If symmetric is set to true, the Jacobian being calculated is known to be symmetric (usually a Hessian),
   * which can be exploited by the algorithm.
   * 
-  * The generated Jacobian has one more output than the calling function corresponding to the Jacobian.
+  * The generated Jacobian has one more output than the calling function corresponding to the Jacobian and the same number of inputs.
   * 
   */
   FX jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
@@ -186,6 +207,9 @@ class FX : public OptionsFunctionality{
   */
   FX hessian(int iind=0, int oind=0);
 
+  /** \brief Generate a Jacobian function of all the inputs nonzeros (getNumScalarInputs()) with respect to all the output nonzeros (getNumScalarOutputs()).
+  */
+  FX fullJacobian();
 
 #ifndef SWIG
   /** \brief  Create a function call (single input) */
@@ -307,10 +331,13 @@ class FX : public OptionsFunctionality{
   FX derivative(int nfwd, int nadj);
 
   /// Get, if necessary generate, the sparsity of a Jacobian block
-  CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false);
+  CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
 
   /// Generate the sparsity of a Jacobian block
   void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact=false);
+
+  /** \brief Export / Generate C code for the function */
+  void generateCode(const std::string& filename);
   
 #ifndef SWIG 
   /// Construct a function that has only the k'th output

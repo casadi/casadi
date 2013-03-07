@@ -113,6 +113,7 @@ namespace CasADi{
   *  lookupvector[i]!=-1     <=>  v contains i
   *  v[lookupvector[i]] == i <=>  v contains i
   *
+  *  Duplicates are treated by looking up last occurence
   */
   std::vector<int> lookupvector(const std::vector<int> &v, int size);
   
@@ -459,7 +460,6 @@ namespace CasADi{
     while(!getline(file, line, '\n').eof()) {
       std::istringstream reader(line);
       std::vector<T> lineData;
-      std::string::const_iterator i = line.begin();
       
       while(!reader.eof()) {
         T val;
@@ -593,6 +593,33 @@ namespace CasADi{
       if (vec[k]!=vec[k] || vec[k]==std::numeric_limits<T>::infinity() || vec[k]==-std::numeric_limits<T>::infinity() ) return false;
     }
     return true;
+  }
+  
+  template<typename T>
+  T inner_prod(const std::vector<T>& a, const std::vector<T>& b){
+    T ret = 0;
+    for(int k=0; k<a.size(); ++k){
+      ret += a[k]*b[k];
+    }
+    return ret;
+  }
+  
+  template<typename T>
+  T norm_inf(const std::vector<T>& x){
+    T ret = 0;
+    for(int k=0; k<x.size(); ++k){
+      ret = fmax(ret,fabs(x[k]));
+    }
+    return ret;
+  }
+  
+  template<typename T>
+  T norm_1(const std::vector<T>& x){
+    T ret = 0;
+    for(int k=0; k<x.size(); ++k){
+      ret += fabs(x[k]);
+    }
+    return ret;
   }
   
 } // namespace CasADi

@@ -52,8 +52,10 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>djacB</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>psetupB</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>res</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>resB</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>resQB</td><td>CasADi::CVodesInternal</td></tr>
@@ -66,8 +68,10 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>djacB</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>psetupB</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>res</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>resB</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>resQB</td><td>CasADi::CVodesInternal</td></tr>
@@ -106,6 +110,40 @@
 <tr><td>qp</td><td>CasADi::LiftedSQPInternal</td></tr>
 </table>
 */
+/** \class CasADi::SCPgenInternal
+\n
+\par
+<table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>dx</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>qp</td><td>CasADi::SCPgenInternal</td></tr>
+</table>
+*/
+/** \class CasADi::SCPgen
+\n
+\par
+<table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>dx</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::SCPgenInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>qp</td><td>CasADi::SCPgenInternal</td></tr>
+</table>
+*/
 /** \class CasADi::IpoptInternal
 \n
 \par
@@ -140,11 +178,18 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>bjacB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>correctInitialConditions</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jtimesB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>psetup</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>psetupB</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>psolveB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>res</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>resB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>resS</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>rhsQB</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
 /** \class CasADi::IdasIntegrator
@@ -153,11 +198,48 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>bjacB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>correctInitialConditions</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jtimesB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>psetup</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>psetupB</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>psolveB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>res</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>resB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>resS</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>rhsQB</td><td>CasADi::IdasInternal</td></tr>
+</table>
+*/
+/** \class CasADi::NewtonImplicitInternal
+\n
+\par
+<table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>F</td><td>CasADi::NewtonImplicitInternal</td></tr>
+<tr><td>J</td><td>CasADi::NewtonImplicitInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>normF</td><td>CasADi::NewtonImplicitInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>step</td><td>CasADi::NewtonImplicitInternal</td></tr>
+<tr><td>stepsize</td><td>CasADi::NewtonImplicitInternal</td></tr>
+</table>
+*/
+/** \class CasADi::NewtonImplicitSolver
+\n
+\par
+<table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>F</td><td>CasADi::NewtonImplicitInternal</td></tr>
+<tr><td>J</td><td>CasADi::NewtonImplicitInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>normF</td><td>CasADi::NewtonImplicitInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>step</td><td>CasADi::NewtonImplicitInternal</td></tr>
+<tr><td>stepsize</td><td>CasADi::NewtonImplicitInternal</td></tr>
 </table>
 */
 /** \class CasADi::KnitroInternal
@@ -186,16 +268,6 @@
 <tr><td>eval_grad_f</td><td>CasADi::KnitroInternal</td></tr>
 <tr><td>eval_h</td><td>CasADi::KnitroInternal</td></tr>
 <tr><td>eval_jac_g</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::XFunctionInternal
-\n
-\par
-<table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -245,6 +317,16 @@
 </table>
 */
 /** \class CasADi::FX
+\n
+\par
+<table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::XFunctionInternal
 \n
 \par
 <table>

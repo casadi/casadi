@@ -51,16 +51,12 @@ void IPInternal::init(){
   SXFunction GG = shared_cast<SXFunction>(G_);
 
   // Split up the problem
-  SXMatrix x = FF.inputSX();
-  SXMatrix f = FF.outputSX();
-  SXMatrix g = GG.outputSX();
+  SXMatrix x = FF.inputExpr(0);
+  SXMatrix f = FF.outputExpr(0);
+  SXMatrix g = GG.outputExpr(0);
 //   cout << "x = " << x << endl;
 //   cout << "f = " << f << endl;
 //   cout << "g = " << g << endl;
-  
-  // Get the dimensions
-  int n = x.size();
-  int m = g.size();
   
   // Barrier parameter
   SXMatrix t = ssym("t");
@@ -78,13 +74,13 @@ void IPInternal::init(){
 //  cout << "A = " << A << endl;
   
   // Form the KKT matrix
-  SXMatrix K = vertcat(horzcat(H,trans(A)),horzcat(A,SXMatrix::sparse(m,m)));
+  SXMatrix K = vertcat(horzcat(H,trans(A)),horzcat(A,SXMatrix::sparse(m_,m_)));
   if(verbose()){
     cout << "K = " << K << endl;
   }
   
   // Form the right hand side of the KKT system
-  SXMatrix k = vertcat(-CasADi::gradient(f_eq,x),SXMatrix::sparse(m));
+  SXMatrix k = vertcat(-CasADi::gradient(f_eq,x),SXMatrix::sparse(m_));
   makeDense(k);
   if(verbose()){
     cout << "k = " << k << endl;

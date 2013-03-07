@@ -35,6 +35,8 @@ class CollocationIntegratorInternal;
   
   The method is still under development
   
+  @copydoc DAE_doc
+  
   \author Joel Andersson
   \date 2011
 */
@@ -47,7 +49,9 @@ class CollocationIntegrator : public Integrator {
     *   \param f dynamical system
     * \copydoc scheme_DAEInput
     * \copydoc scheme_DAEOutput
-    *
+    *   \param g backwards system
+    * \copydoc scheme_RDAEInput
+    * \copydoc scheme_RDAEOutput
     */
     explicit CollocationIntegrator(const FX& f, const FX& g=FX());
 

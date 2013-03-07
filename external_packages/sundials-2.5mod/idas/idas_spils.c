@@ -1011,9 +1011,9 @@ int IDASpilsSetJacTimesVecFnB(void *ida_mem, int which, IDASpilsJacTimesVecFnB j
   idaspilsB_mem->s_jtimesB   = jtvB;
 
   if (jtvB != NULL) {
-    flag = IDASpilsSetJacTimesVecFn(IDAB_mem, IDAAspilsJacTimesVec);
+    flag = IDASpilsSetJacTimesVecFn(ida_memB, IDAAspilsJacTimesVec);
   } else {
-    flag = IDASpilsSetJacTimesVecFn(IDAB_mem, NULL);
+    flag = IDASpilsSetJacTimesVecFn(ida_memB, NULL);
   }
   return(flag);
 }

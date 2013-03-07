@@ -25,10 +25,12 @@ from typemaps import *
 from integration import *
 from ocp import *
 from nlp import *
+from implicitfunction import *
 from ad import *
 from sparsity import *
 from matrix import *
 from qpsolver import *
+from sdp import *
 from misc import *
 from fx import *
 from tools import *

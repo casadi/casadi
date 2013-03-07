@@ -35,7 +35,6 @@ EvaluationMX::EvaluationMX(const FX& fcn, const std::vector<MX> &arg) : fcn_(fcn
       
   // Number inputs and outputs
   int num_in = fcn.getNumInputs();
-  int num_out = fcn.getNumOutputs();
 
   // All dependencies of the function
   vector<MX> d = arg;
@@ -68,15 +67,15 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
   int num_out = fcn_.getNumOutputs();
 
   // Number of derivative directions to calculate
-  int nfwd = fsens.size();
-  int nadj = aseed.size();
+  int nfdir = fsens.size();
+  int nadir = aseed.size();
 
   // Number of derivative directions supported by the function
-  int max_nfwd = fcn_->nfdir_;
-  int max_nadj = fcn_->nadir_;
+  int max_nfdir = fcn_.numAllocFwd();
+  int max_nadir = fcn_.numAllocAdj();
 
   // Current forward and adjoint direction
-  int offset_fwd = 0, offset_adj = 0;
+  int offset_nfdir = 0, offset_nadir = 0;
 
   // Has the function been evaluated once
   bool fcn_evaluated = false;
@@ -84,34 +83,46 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
   // Pass the inputs to the function
   for (int i = 0; i < num_in; ++i) {
     DMatrix *a = arg[i];
-    if(a != 0) fcn_.setInput(*a, i);
+    if(a != 0){
+      fcn_.setInput(*a, i);
+    } else {
+      fcn_.setInput(0., i);
+    }
   }
   
   // Evaluate until everything has been determinated
-  while (!fcn_evaluated || offset_fwd < nfwd || offset_adj < nadj) {
+  while (!fcn_evaluated || offset_nfdir < nfdir || offset_nadir < nadir) {
 
     // Number of forward and adjoint directions in the current "batch"
-    int nfwd_f_batch = std::min(nfwd - offset_fwd, max_nfwd);
-    int nadj_f_batch = std::min(nadj - offset_adj, max_nadj);
+    int nfdir_f_batch = std::min(nfdir - offset_nfdir, max_nfdir);
+    int nadir_f_batch = std::min(nadir - offset_nadir, max_nadir);
 
     // Pass the forward seeds to the function
-    for(int d = 0; d < nfwd_f_batch; ++d){
+    for(int d = 0; d < nfdir_f_batch; ++d){
       for(int i = 0; i < num_in; ++i){
-        DMatrix *a = fseed[offset_fwd + d][i];
-        if(a != 0) fcn_.setFwdSeed(*a, i, d);
+        DMatrix *a = fseed[offset_nfdir + d][i];
+        if(a != 0){
+          fcn_.setFwdSeed(*a, i, d);
+        } else {
+          fcn_.setFwdSeed(0., i, d);
+        }
       }
     }
 
     // Pass the adjoint seed to the function
-    for(int d = 0; d < nadj_f_batch; ++d){
+    for(int d = 0; d < nadir_f_batch; ++d){
       for(int i = 0; i < num_out; ++i) {
-        DMatrix *a = aseed[offset_adj + d][i];
-        if(a != 0) fcn_.setAdjSeed(*a, i, d);
+        DMatrix *a = aseed[offset_nadir + d][i];
+        if(a != 0){
+          fcn_.setAdjSeed(*a, i, d);
+        } else {
+          fcn_.setAdjSeed(0., i, d);
+        }
       }
     }
 
     // Evaluate
-    fcn_.evaluate(nfwd_f_batch, nadj_f_batch);
+    fcn_.evaluate(nfdir_f_batch, nadir_f_batch);
     
     // Get the outputs if first evaluation
     if(!fcn_evaluated){
@@ -124,17 +135,17 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
     fcn_evaluated = true;
 
     // Get the forward sensitivities
-    for(int d = 0; d < nfwd_f_batch; ++d){
+    for(int d = 0; d < nfdir_f_batch; ++d){
       for(int i = 0; i < num_out; ++i) {
-        DMatrix *a = fsens[offset_fwd + d][i];
+        DMatrix *a = fsens[offset_nfdir + d][i];
         if(a != 0) fcn_.getFwdSens(*a, i, d);
       }
     }
 
     // Get the adjoint sensitivities
-    for (int d = 0; d < nadj_f_batch; ++d) {
+    for (int d = 0; d < nadir_f_batch; ++d) {
       for (int i = 0; i < num_in; ++i) {
-        DMatrix *a = asens[offset_adj + d][i];
+        DMatrix *a = asens[offset_nadir + d][i];
         if(a != 0){
           a->sparsity().add(a->ptr(),fcn_.adjSens(i,d).ptr(),fcn_.adjSens(i,d).sparsity());
         }
@@ -142,8 +153,8 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
     }
 
     // Update direction offsets
-    offset_fwd += nfwd_f_batch;
-    offset_adj += nadj_f_batch;
+    offset_nfdir += nfdir_f_batch;
+    offset_nadir += nadir_f_batch;
   }
 }
 
@@ -151,7 +162,7 @@ int EvaluationMX::getNumOutputs() const {
   return fcn_.getNumOutputs();
 }
 
-const CRSSparsity& EvaluationMX::sparsity(int oind) {
+const CRSSparsity& EvaluationMX::sparsity(int oind) const{
   return fcn_.output(oind).sparsity();
 }
 
@@ -164,7 +175,12 @@ void EvaluationMX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
     const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens) {
   
   // Create input arguments
-  vector<SXMatrix> argv = getVector(arg);
+  vector<SXMatrix> argv(arg.size());
+  for(int i=0; i<arg.size(); ++i){
+    argv[i] = SXMatrix(fcn_.input(i).sparsity(),0.);
+    if(arg[i] != 0)
+      argv[i].set(*arg[i]);
+  }
 
   // Evaluate symbolically
   vector<SXMatrix> resv = fcn_.eval(argv);
@@ -179,13 +195,13 @@ void EvaluationMX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
 void EvaluationMX::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given) {
   
   // Number of sensitivity directions
-  int nfwd = fsens.size();
-  casadi_assert(nfwd==0 || fcn_.spCanEvaluate(true));
-  int nadj = aseed.size();
-  casadi_assert(nadj==0 || fcn_.spCanEvaluate(false));
+  int nfdir = fsens.size();
+  casadi_assert(nfdir==0 || fcn_.spCanEvaluate(true));
+  int nadir = aseed.size();
+  casadi_assert(nadir==0 || fcn_.spCanEvaluate(false));
 
   // Get/generate the derivative function
-  FX d = fcn_.derivative(nfwd, nadj);
+  FX d = fcn_.derivative(nfdir, nadir);
 
   // Temporary
   vector<MX> tmp;
@@ -298,7 +314,7 @@ void EvaluationMX::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res,bool use
     } else {
       for (int iind = 0; iind < arg.size(); ++iind) {
         if (arg[iind] != 0) {
-          arg[iind]->sparsity().set(
+          arg[iind]->sparsity().bor(
               get_bvec_t(arg[iind]->data()),
               get_bvec_t(fcn_.input(iind).data()),
               fcn_.input(iind).sparsity());
@@ -398,31 +414,32 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   int num_out = fcn.getNumOutputs();
 
   // Number of directional derivatives
-  int nfwd = fseed.size();
-  int nadj = aseed.size();
+  int nfdir = fseed.size();
+  int nadir = aseed.size();
 
   // Create the evaluation node
   MX ev;
-  if(nfwd>0 || nadj>0){
+  if(nfdir>0 || nadir>0){
     // Create derivative function
-    Derivative dfcn(fcn,nfwd,nadj);
+    Derivative dfcn(fcn,nfdir,nadir);
     stringstream ss;
-    ss << "der_" << fcn.getOption("name") << "_" << nfwd << "_" << nadj;
+    ss << "der_" << fcn.getOption("name") << "_" << nfdir << "_" << nadir;
+    dfcn.setOption("verbose",fcn.getOption("verbose"));
     dfcn.setOption("name",ss.str());
     dfcn.init();
     
     // All inputs
     vector<MX> darg;
-    darg.reserve(num_in*(1+nfwd) + num_out*nadj);
+    darg.reserve(num_in*(1+nfdir) + num_out*nadir);
     darg.insert(darg.end(),arg.begin(),arg.end());
     
     // Forward seeds
-    for(int dir=0; dir<nfwd; ++dir){
+    for(int dir=0; dir<nfdir; ++dir){
       darg.insert(darg.end(),fseed[dir].begin(),fseed[dir].end());
     }
     
     // Adjoint seeds
-    for(int dir=0; dir<nadj; ++dir){
+    for(int dir=0; dir<nadir; ++dir){
       darg.insert(darg.end(),aseed[dir].begin(),aseed[dir].end());
     }
     
@@ -447,8 +464,8 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   }
 
   // Forward sensitivities
-  fsens.resize(nfwd);
-  for(int dir = 0; dir < nfwd; ++dir){
+  fsens.resize(nfdir);
+  for(int dir = 0; dir < nfdir; ++dir){
     fsens[dir].resize(num_out);
     for (int i = 0; i < num_out; ++i, ++ind) {
       if (!fcn.output(i).empty()){
@@ -460,8 +477,8 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   }
 
   // Adjoint sensitivities
-  asens.resize(nadj);
-  for (int dir = 0; dir < nadj; ++dir) {
+  asens.resize(nadir);
+  for (int dir = 0; dir < nadir; ++dir) {
     asens[dir].resize(num_in);
     for (int i = 0; i < num_in; ++i, ++ind) {
       if (!fcn.input(i).empty()) {
@@ -471,6 +488,49 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
       }
     }
   }
+}
+
+void EvaluationMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  
+  // Get the index of the function
+  int f = gen.getDependency(fcn_);
+  stream << "  f" << f << "_buffered(";
+  
+  // Pass inputs to the function input buffers
+  for(int i=0; i<arg.size(); ++i){
+    // Pass argument to the function
+    stream << arg.at(i) << ",";
+    
+    // Pass argument sparsity to the function
+    if(dep(i).isNull()){
+      stream << "0";
+    } else {
+      int sp_i = gen.getSparsity(dep(i).sparsity());
+      stream << "s" << sp_i;
+    }
+
+    // Separate with a space to visualize argument grouping
+    if(i+1<arg.size()+res.size()) stream << ", ";
+  }
+
+  // Separate arguments and results with two extra spaces
+  stream << "  ";
+
+  // Pass results to the function input buffers
+  for(int i=0; i<res.size(); ++i){
+    // Pass results buffer to the function
+    stream << res.at(i) << ",";
+    
+    // Pass argument sparsity to the function
+    int sp_i = gen.getSparsity(sparsity(i));
+    stream << "s" << sp_i;
+
+    // Separate with a space to visualize argument grouping
+    if(i+1<res.size()) stream << ", ";
+  }
+  
+  // Finalize the function call
+  stream << ");" << endl;  
 }
 
 } // namespace CasADi

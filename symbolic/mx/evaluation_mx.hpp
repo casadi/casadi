@@ -54,6 +54,9 @@ class EvaluationMX : public MultipleOutput{
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
@@ -82,7 +85,7 @@ class EvaluationMX : public MultipleOutput{
     virtual int getNumOutputs() const;
         
     /** \brief  Get the sparsity of output oind */
-    virtual const CRSSparsity& sparsity(int oind);
+    virtual const CRSSparsity& sparsity(int oind) const;
 
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_CALL;}

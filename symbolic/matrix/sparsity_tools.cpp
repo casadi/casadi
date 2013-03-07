@@ -71,24 +71,18 @@ CRSSparsity sp_tril(int n) {
 
 CRSSparsity sp_diag(int n){
   casadi_assert_message(n>=0, "sp_diag expects a positive integer as argument");
-
-  // Return sparsity pattern
-  CRSSparsity ret(n,n);
   
-  // Set columns
-  std::vector<int>& col = ret.colRef();
-  col.resize(n);
+  // Construct sparsity pattern
+  std::vector<int> col(n);
+  std::vector<int> rowind(n+1);
+  int el = 0;
   for(int i=0; i<n; ++i){
-    col[i]=i;
+    rowind[i] = el;
+    col[el++] = i;
   }
-  
-  // Set row offsets
-  std::vector<int>& rowind = ret.rowindRef();
-  for(int i=0; i<=n; ++i){
-    rowind[i]=i;
-  }
+  rowind.back() = el;
 
-  return ret;
+  return CRSSparsity(n,n,col,rowind);
 }
 
 CRSSparsity sp_band(int n, int p) {
@@ -120,7 +114,7 @@ CRSSparsity sp_banded(int n, int p) {
 }
 
 
-CRSSparsity sp_rowcol(std::vector<int> row, std::vector<int> col, int nrow, int ncol) {
+CRSSparsity sp_rowcol(const std::vector<int>& row, const std::vector<int>& col, int nrow, int ncol) {
   std::vector<int> rowind(nrow+1);
   std::vector<int> col_new(row.size()*col.size());
   
@@ -406,7 +400,73 @@ CRSSparsity mul(const  CRSSparsity& a, const  CRSSparsity &b) {
   return (mul(DMatrix(a,1),DMatrix(b,1))).sparsity();
 }
 
-
+  std::size_t hash_sparsity(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind){
+    // Condense the sparsity pattern to a single, deterministric number
+    std::size_t ret=0;
+    hash_combine(ret,nrow);
+    hash_combine(ret,ncol);
+    hash_combine(ret,rowind);
+    hash_combine(ret,col);
+    return ret;
+  }
   
+  std::vector<int> sp_compress(const CRSSparsity& a){
+    // Get the sparsity pattern
+    int nrow = a.size1();
+    int ncol = a.size2();
+    const vector<int>& rowind = a.rowind();
+    const vector<int>& col = a.col();
+    
+    // Create compressed pattern
+    vector<int> ret;
+    ret.reserve(1 + 1 + rowind.size() + col.size());
+    ret.push_back(nrow);
+    ret.push_back(ncol);
+    ret.insert(ret.end(),rowind.begin(),rowind.end());
+    ret.insert(ret.end(),col.begin(),col.end());
+    return ret;
+  }
+  
+  CRSSparsity sp_compress(const std::vector<int>& v){
+    // Check consistency
+    casadi_assert(v.size() >= 2);
+    int nrow = v[0];
+    int ncol = v[1];
+    casadi_assert(v.size() >= 2 + nrow+1);
+    int nnz = v[2 + nrow];
+    casadi_assert(v.size() == 2 + nrow+1 + nnz);
+
+    // Call array version
+    return sp_compress(&v.front());
+  }
+  
+  CRSSparsity sp_compress(const int* v){
+    // Get sparsity pattern
+    int nrow = v[0];
+    int ncol = v[1];
+    const int *rowind = v+2;
+    int nnz = rowind[nrow];
+    const int *col = v + 2 + nrow+1;
+    
+    // Construct sparsity pattern
+    return CRSSparsity(nrow, ncol, vector<int>(col,col+nnz), vector<int>(rowind,rowind+nrow+1));
+  }
+  
+int rank(const CRSSparsity& a) {
+  std::vector< int > rowperm;
+  std::vector< int > colperm;
+  std::vector< int > rowblock;
+  std::vector< int > colblock;
+  std::vector< int > coarse_rowblock;
+  std::vector< int > coarse_colblock;
+  a.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+  return coarse_colblock.at(3);
+}
+
+bool isSingular(const CRSSparsity& a) {
+  casadi_assert_message(a.size1()==a.size2(),"isSingular: only defined for square matrices, but got " << a.dimString());
+  return rank(a)!=a.size1();
+}
+
 } // namespace CasADi
 

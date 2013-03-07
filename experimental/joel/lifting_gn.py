@@ -80,10 +80,10 @@ for (i,x0) in enumerate([0.08]):
   u_max = u_max*DMatrix.ones(nk)
 
   # Lifted variables
-  L = []
+  L = SXMatrix()
 
   # Objective terms
-  F = []
+  F = SXMatrix()
 
   # Get an expression for the state that the final time
   x = SXMatrix(x0)
@@ -131,7 +131,7 @@ for (i,x0) in enumerate([0.08]):
   #raise Exception("a")
 
   # Lifting function
-  ifcn = SXFunction([u],[vertcat(L)])
+  ifcn = SXFunction([u],[L])
 
   # Problem formulation ends
   # Everything below should go into a lifted newton SQP solver class
@@ -141,10 +141,10 @@ for (i,x0) in enumerate([0.08]):
   max_iter = 30  # Maximum number of iterations
 
   # Extract the free variable and expressions for F and xdef
-  u = F1.inputSX()
-  f1 = F1.outputSX()
-  f2 = F2.outputSX()
-  xdef = ifcn.outputSX()
+  u = F1.inputExpr(0)
+  f1 = F1.outputExpr(0)
+  f2 = F2.outputExpr(0)
+  xdef = ifcn.outputExpr(0)
 
   ## Lifted variables
   x = ssym("x",xdef.size())
@@ -178,8 +178,8 @@ for (i,x0) in enumerate([0.08]):
     xdotdef = lgrad[u.size1():,0]
     
     # Reverse direction of x
-    xdot[:,0] = list(reversed(list(xdot)))
-    xdotdef[:,0] = list(reversed(list(xdotdef)))
+    xdot[:,0] = SXMatrix(list(reversed(list(xdot))))
+    xdotdef[:,0] = SXMatrix(list(reversed(list(xdotdef))))
     
     # Append to xdef and x
     x.append(xdot)
@@ -195,7 +195,7 @@ for (i,x0) in enumerate([0.08]):
   # Substitute out the x from the zdef
   z = xdef-d
   ex = SXMatrixVector([f1,f2])
-  substituteInPlace(x, z, ex, False, False)
+  substituteInPlace(x, z, ex, False)
   [f1,f2] = ex
 
   # Modified function Z

@@ -481,12 +481,8 @@ MX MX::binary(int op, const MX &x, const MX &y){
 }
 
 MX MX::unary(int op, const MX &x){
-  // Quick return if zero
-  if(operation_checker<F0XChecker>(op) && isZero(x)){
-    return sparse(x.size1(),x.size2());
-  } else {
-    return create(new UnaryMX(Operation(op),x));
-  }
+  // TODO: Should result in a switch to enable simplifications
+  return UnaryMX::create(Operation(op),x);
 }
 
 MX MX::scalar_matrix(int op, const MX &x, const MX &y){
@@ -605,7 +601,7 @@ MX MX::operator-() const{
   if((*this)->getOp()==OP_NEG){
     return (*this)->dep(0);
   } else {
-    return unary(OP_NEG,*this);
+    return UnaryMX::create(OP_NEG,*this);
   }
 }
 
@@ -664,37 +660,14 @@ MX::MX(int nrow, int ncol, const MX& val){
   (*this)->assign(val,vector<int>(sp.size(),0));
 }
 
-std::string MX::dimString() const {
-  std::stringstream ss;
-  ss << "(" << size1() << "x" << size2() << "=" << numel() << "|" << size() << ")";
-  return ss.str();
+MX MX::mul_full(const MX& y) const{
+  const MX& x = *this;
+
+  return MX::create(new Multiplication(x,trans(y)));
 }
 
 MX MX::mul(const MX& y) const{
-  const MX& x = *this;
-
-  // Check if we can simplify the product
-  if(isIdentity(x)){
-    return y;
-  } else if(isIdentity(y)){
-    return x;
-  } else if(isZero(x) || isZero(y)){
-    // See if one of the arguments can be used as result
-    if(x.size()==0 && y.size1()==y.size2())
-      return x;
-    else if(y.size()==0 && x.size1()==x.size2())
-      return y;
-    else
-      return MX::sparse(x.size1(),y.size2());
-  } else if(x.scalar() || y.scalar()){
-    return x*y;
-  } else if(x.sparsity().diagonal() && y.size2()==1){
-    return diag(x)*y;
-  } else if(y.sparsity().diagonal() && x.size1()==1){
-    return x*trans(diag(y));
-  } else {
-    return MX::create(new Multiplication(x,trans(y)));
-  }
+  return mul_smart(y);
 }
 
 MX MX::inner_prod(const MX& y) const{
@@ -702,10 +675,7 @@ MX MX::inner_prod(const MX& y) const{
   casadi_assert_message(x.size2()==1,"inner_prod: first factor not a vector");
   casadi_assert_message(y.size2()==1, "inner_prod: second factor not a vector");
   casadi_assert_message(x.size1()==y.size1(),"inner_prod: dimension mismatch");
-  MX sum = 0;
-  for(int i=0; i<x.size1(); ++i)
-    sum += x(i)*y(i);
-  return sum;
+  return CasADi::mul(trans(x),y);
 }
 
 MX MX::outer_prod(const MX& y) const{
@@ -741,11 +711,11 @@ MX MX::printme(const MX& b) const{
 }
 
 MX MX::exp() const{ 
-  return unary(OP_EXP,*this);
+  return UnaryMX::create(OP_EXP,*this);
 }
 
 MX MX::log() const{ 
-  return unary(OP_LOG,*this);
+  return UnaryMX::create(OP_LOG,*this);
 }
 
 MX MX::log10() const{ 
@@ -753,83 +723,87 @@ MX MX::log10() const{
 }
 
 MX MX::sqrt() const{ 
-  return unary(OP_SQRT,*this);
+  return UnaryMX::create(OP_SQRT,*this);
 }
 
 MX MX::sin() const{ 
-  return unary(OP_SIN,*this);
+  return UnaryMX::create(OP_SIN,*this);
 }
 
 MX MX::cos() const{ 
-  return unary(OP_COS,*this);
+  return UnaryMX::create(OP_COS,*this);
 }
 
 MX MX::tan() const{ 
-  return unary(OP_TAN,*this);
+  return UnaryMX::create(OP_TAN,*this);
 }
 
 MX MX::arcsin() const{ 
-  return unary(OP_ASIN,*this);
+  return UnaryMX::create(OP_ASIN,*this);
 }
 
 MX MX::arccos() const{ 
-  return unary(OP_ACOS,*this);
+  return UnaryMX::create(OP_ACOS,*this);
 }
 
 MX MX::arctan() const{ 
-  return unary(OP_ATAN,*this);
+  return UnaryMX::create(OP_ATAN,*this);
 }
 
 MX MX::sinh() const{ 
-  return unary(OP_SINH,*this);
+  return UnaryMX::create(OP_SINH,*this);
 }
 
 MX MX::cosh() const{ 
-  return unary(OP_COSH,*this);
+  return UnaryMX::create(OP_COSH,*this);
 }
 
 MX MX::tanh() const{ 
-  return unary(OP_TANH,*this);
+  return UnaryMX::create(OP_TANH,*this);
 }
 
 MX MX::arcsinh() const{ 
-  return unary(OP_ASINH,*this);
+  return UnaryMX::create(OP_ASINH,*this);
 }
 
 MX MX::arccosh() const{ 
-  return unary(OP_ACOSH,*this);
+  return UnaryMX::create(OP_ACOSH,*this);
 }
 
 MX MX::arctanh() const{ 
-  return unary(OP_ATANH,*this);
+  return UnaryMX::create(OP_ATANH,*this);
 }
 
 MX MX::floor() const{ 
-  return unary(OP_FLOOR,*this);
+  return UnaryMX::create(OP_FLOOR,*this);
 }
 
 MX MX::ceil() const{ 
-  return unary(OP_CEIL,*this);
+  return UnaryMX::create(OP_CEIL,*this);
 }
 
 MX MX::fabs() const{ 
-  return unary(OP_FABS,*this);
+  return UnaryMX::create(OP_FABS,*this);
 }
 
 MX MX::sign() const{ 
-  return unary(OP_SIGN,*this);
+  return UnaryMX::create(OP_SIGN,*this);
 }
 
 MX MX::erfinv() const{ 
-  return unary(OP_ERFINV,*this);
+  return UnaryMX::create(OP_ERFINV,*this);
 }
 
 MX MX::erf() const{ 
-  return unary(OP_ERF,*this);
+  return UnaryMX::create(OP_ERF,*this);
 }
 
 MX MX::logic_not() const{ 
-  return unary(OP_NOT,*this);
+  return UnaryMX::create(OP_NOT,*this);
+}
+
+void MX::lift(const MX& x_guess){ 
+  *this = MX::binary(OP_LIFT,*this,x_guess);
 }
 
 MX MX::__add__(const MX& y) const{
@@ -967,7 +941,7 @@ FX MX::getFunction () {  return (*this)->getFunction(); }
  	
 const Matrix<double> & MX::getConstant() const {
   casadi_assert_message(isConstant(),"MX::getConstant: must be constant");
-  return dynamic_cast<const ConstantMX*>(get())->x_;
+  return static_cast<const ConstantMX*>(get())->x_;
 }
  	  
 bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryMX*>(get()) != 0 : false;  }
@@ -1017,5 +991,12 @@ void MX::setTemp(int t){
   (*this)->temp = t;
 }
 
+int MX::getNumOutputs() const{
+  return (*this)->getNumOutputs();
+}
+  
+MX MX::getOutput(int oind) const{
+  return (*this)->getOutput(oind);
+}
  	  
 } // namespace CasADi

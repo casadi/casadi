@@ -21,12 +21,10 @@
  */
 
 #include <iostream>
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/casadi.hpp>
+#include <nonlinear_programming/scpgen.hpp>
+#include <nonlinear_programming/nlp_qp_solver.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/mx/mx_tools.hpp>
-#include <symbolic/fx/mx_function.hpp>
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
 #include "interfaces/sundials/cvodes_integrator.hpp"
 #include "interfaces/sundials/idas_integrator.hpp"
 #include "integration/rk_integrator.hpp"
@@ -36,6 +34,7 @@ using namespace std;
 
 bool sundials_integrator = true;
 bool explicit_integrator = false;
+bool lifted_newton = false;
 
 int main(){
   
@@ -65,13 +64,6 @@ int main(){
   x[1] = v;
   x[2] = m;
 
-  // State derivative
-  SX sdot("sdot"), vdot("vdot"), mdot("mdot");
-  vector<SX> xdot(3); 
-  xdot[0] = sdot;
-  xdot[1] = vdot;
-  xdot[2] = mdot;
-
   // Control
   SX u("u");
 
@@ -79,10 +71,10 @@ int main(){
   SX beta = 0.1; // fuel consumption rate
   
   // Differential equation
-  vector<SX> res(3);
-  res[0] = v               - sdot;
-  res[1] = (u-alpha*v*v)/m - vdot;
-  res[2] = -beta*u*u       - mdot;
+  vector<SX> rhs(3);
+  rhs[0] = v;
+  rhs[1] = (u-alpha*v*v)/m;
+  rhs[2] = -beta*u*u;
 
   // Initial conditions
   vector<double> x0(3);
@@ -91,7 +83,7 @@ int main(){
   x0[2] = 1;
 
   // DAE residual function
-  SXFunction daefcn(daeIn<SXMatrix>("x",x, "p",u, "t",t, "xdot",xdot),daeOut<SXMatrix>("ode",res));
+  SXFunction daefcn(daeIn<SXMatrix>("x",x, "p",u, "t",t),daeOut<SXMatrix>("ode",rhs));
   daefcn.setOption("name","DAE residual");
 
   // Integrator
@@ -140,6 +132,11 @@ int main(){
 
     // Integrate
     X = integrator.call(input).at(0);
+
+    // Lift X
+    if(lifted_newton){
+      X.lift(X);
+    }
   }
 
   // Objective function
@@ -153,13 +150,33 @@ int main(){
   MXFunction gfcn(U,G); // constraint function
 
   // Allocate an NLP solver
-  // LiftedNewtonSolver solver(ffcn,gfcn);
-  IpoptSolver solver(ffcn,gfcn);
-  
-  // Set options
-  solver.setOption("tol",1e-10);
-  solver.setOption("hessian_approximation","limited-memory");
-  
+  NLPSolver solver;
+  if(lifted_newton){
+    solver = SCPgen(ffcn,gfcn);
+
+    solver.setOption("verbose",true);
+    solver.setOption("regularize",false);
+    solver.setOption("maxiter_ls",1);
+    solver.setOption("maxiter",100);
+    
+    // Use IPOPT as QP solver
+    solver.setOption("qp_solver",NLPQPSolver::creator);
+    Dictionary qp_solver_options;
+    qp_solver_options["nlp_solver"] = IpoptSolver::creator;
+    Dictionary ipopt_options;
+    ipopt_options["tol"] = 1e-12;
+    ipopt_options["print_level"] = 0;
+    ipopt_options["print_time"] = false;
+    qp_solver_options["nlp_solver_options"] = ipopt_options;
+    solver.setOption("qp_solver_options",qp_solver_options);
+  } else {
+    solver = IpoptSolver(ffcn,gfcn);
+    
+    // Set options
+    solver.setOption("tol",1e-10);
+    solver.setOption("hessian_approximation","limited-memory");
+  }
+
   // initialize the solver
   solver.init();
 

@@ -8,8 +8,7 @@
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/idas_integrator.hpp>
 
-#include <optimal_control/multiple_shooting.hpp>
-#include <optimal_control/multiple_shooting_internal.hpp>
+#include <optimal_control/direct_multiple_shooting.hpp>
 
 using namespace CasADi;
 using namespace std;
@@ -36,9 +35,8 @@ int main(){
   f[2] = x*x + y*y + u*u;
   
   // DAE residual
-  SXMatrix xxdot = ssym("xxdot",xx.size());
-  vector<SXMatrix> res_in = daeIn<SXMatrix>("x",xx, "p",u, "t",t, "xdot",xxdot);
-  SXFunction res(res_in,daeOut<SXMatrix>("ode",f-xxdot));
+  vector<SXMatrix> res_in = daeIn<SXMatrix>("x",xx, "p",u, "t",t);
+  SXFunction res(res_in,daeOut<SXMatrix>("ode",f));
   
   Dictionary integrator_options;
   integrator_options["abstol"]=1e-8; //abs. tolerance
@@ -62,7 +60,7 @@ int main(){
   SXFunction mterm(xf, xf[nx-1]);
 
   // Create a multiple shooting discretization
-  MultipleShooting ms(res,mterm);
+  DirectMultipleShooting ms(res,mterm);
   ms.setOption("integrator",CVodesIntegrator::creator);
   //ms.setOption("integrator",IdasIntegrator::creator);
   ms.setOption("integrator_options",integrator_options);

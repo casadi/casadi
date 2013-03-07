@@ -43,5 +43,5 @@ number_out = f.getNumOutputs()
 
 for i = 0:3
   disp(["Output:"])
-  disp(f.outputSX(i))
+  disp(f.outputExpr(i))
 end

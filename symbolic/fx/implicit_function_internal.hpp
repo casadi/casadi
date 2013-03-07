@@ -25,6 +25,7 @@
 
 #include "implicit_function.hpp"
 #include "fx_internal.hpp"
+#include "symbolic/fx/linear_solver.hpp"
 
 namespace CasADi{
   
@@ -46,10 +47,13 @@ class ImplicitFunctionInternal : public FXInternal{
     /// Initialize
     virtual void init();
     
+    /** \brief  Update the number of sensitivity directions during or after initialization */
+    virtual void updateNumSens(bool recursive);
+
     /// Solve the system of equations
     virtual void evaluate(int nfdir, int nadir) = 0;
     
-    /// Sparsity in CRS format
+    /// The function F(z, x1, x2, ..., xn) == 0
     FX f_;
     
     /// Number of equations
@@ -58,11 +62,29 @@ class ImplicitFunctionInternal : public FXInternal{
     /// Number of right hand sides
     int nrhs_;
     
-    /// Number of forward derivative directions of the function
-    int nfdir_fcn_;
+    /** \brief  Create a new ImplicitFunctionInternal */
+    virtual ImplicitFunctionInternal* create(const FX& f, int nrhs=1) const = 0;
     
-    /// Number of adjoint derivative directions of the function
-    int nadir_fcn_;
+    /** \brief Generate a linear solver for the sensitivity equations */
+    ImplicitFunction jac(int iind, int oind=0);
+    
+    /** \brief Generate a linear solver for the sensitivity equations */
+    ImplicitFunction jac(const std::vector<int> iind, int oind=0);
+    
+    /// Set the jacobian of F
+    void setJacobian(FX &J);
+    
+    /// Jacobian
+    FX J_;
+    
+    /// Linear solver
+    LinearSolver linsol_; 
+  protected:
+  
+    /** Calculate sensitivities of implicit solver
+    * \param linsol_prepared may specify that the linear solver is already prepared with the Jacobian
+    */
+    void evaluate_sens(int nfdir, int nadir, bool linsol_prepared=false);
 };
 
 

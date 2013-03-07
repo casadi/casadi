@@ -68,7 +68,6 @@ void ControlSimulatorInternal::init(){
     vector<MX> dae_in_ = control_dae_.symbolicInput();
     control_dae_in_[CONTROL_DAE_T]    = dae_in_[DAE_T];
     control_dae_in_[CONTROL_DAE_X]    = dae_in_[DAE_X];
-    control_dae_in_[CONTROL_DAE_XDOT] = dae_in_[DAE_XDOT];
     control_dae_in_[CONTROL_DAE_Z]    = dae_in_[DAE_Z];
     control_dae_in_[CONTROL_DAE_P]    = dae_in_[DAE_P];
     control_dae_ = MXFunction(control_dae_in_,control_dae_.call(dae_in_));
@@ -81,7 +80,6 @@ void ControlSimulatorInternal::init(){
   
   dae_in_[DAE_T]    = MX("tau",control_dae_.input(CONTROL_DAE_T).sparsity());
   dae_in_[DAE_X]    = MX("x",control_dae_.input(CONTROL_DAE_X).sparsity());
-  dae_in_[DAE_XDOT] = MX("xdot",control_dae_.input(CONTROL_DAE_XDOT).sparsity());
   dae_in_[DAE_Z]    = MX("z",control_dae_.input(CONTROL_DAE_Z).sparsity());
   
   np_ = control_dae_.input(CONTROL_DAE_P).size();
@@ -125,8 +123,6 @@ void ControlSimulatorInternal::init(){
   if (!control_dae_.input(CONTROL_DAE_TF).empty())
     control_dae_in_[CONTROL_DAE_TF]       = dae_in_[DAE_P](iTF);
   control_dae_in_[CONTROL_DAE_X]        = dae_in_[DAE_X];
-  if (!control_dae_.input(CONTROL_DAE_XDOT).empty())
-    control_dae_in_[CONTROL_DAE_XDOT]     = dae_in_[DAE_XDOT]/(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0));
   if (!control_dae_.input(CONTROL_DAE_Z).empty())
     control_dae_in_[CONTROL_DAE_Z]        = dae_in_[DAE_Z];
   control_dae_in_[CONTROL_DAE_P]        = dae_in_[DAE_P](iP);
@@ -205,7 +201,6 @@ void ControlSimulatorInternal::init(){
     SXMatrix t0       = ssym("t0",control_dae_.input(CONTROL_DAE_T0).sparsity());
     SXMatrix tf       = ssym("tf",control_dae_.input(CONTROL_DAE_TF).sparsity());
     SXMatrix x        = ssym("x",control_dae_.input(CONTROL_DAE_X).sparsity());
-    SXMatrix xdot     = ssym("xp",control_dae_.input(CONTROL_DAE_XDOT).sparsity());
     SXMatrix z        = ssym("z",control_dae_.input(CONTROL_DAE_Z).sparsity());
     SXMatrix p        = ssym("p",control_dae_.input(CONTROL_DAE_P).sparsity());
     SXMatrix u        = ssym("u",control_dae_.input(CONTROL_DAE_U).sparsity());
@@ -216,7 +211,6 @@ void ControlSimulatorInternal::init(){
     arg[CONTROL_DAE_T]  = t;
     arg[CONTROL_DAE_X]  = x;
     arg[CONTROL_DAE_P]  = p;
-    arg[CONTROL_DAE_XDOT] = xdot;
     arg[CONTROL_DAE_Z] = z;
     arg[CONTROL_DAE_X_MAJOR] = x0;
     arg[CONTROL_DAE_U] = u;
@@ -246,7 +240,6 @@ void ControlSimulatorInternal::init(){
   
   vector<MX> output_fcn_out_(2 + output_fcn_.getNumOutputs());
   output_fcn_out_[0] = output_fcn_in_[CONTROL_DAE_X];
-  output_fcn_out_[1] = output_fcn_in_[CONTROL_DAE_XDOT];
   
   vector<MX> output_fcn_call_ = output_fcn_.call(output_fcn_in_);
     
@@ -278,8 +271,6 @@ void ControlSimulatorInternal::init(){
   if (!output_fcn_.input(CONTROL_DAE_TF).empty())
     output_fcn_in_[CONTROL_DAE_TF]       = dae_in_[DAE_P](iTF);
   output_fcn_in_[CONTROL_DAE_X]        = dae_in_[DAE_X];
-  if (!output_fcn_.input(CONTROL_DAE_XDOT).empty())
-    output_fcn_in_[CONTROL_DAE_XDOT]     = dae_in_[DAE_XDOT]/(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0));
   output_fcn_in_[CONTROL_DAE_P]        = dae_in_[DAE_P](iP);
   if (!output_fcn_.input(CONTROL_DAE_U).empty())
     output_fcn_in_[CONTROL_DAE_U]        = dae_in_[DAE_P](iUstart);
@@ -361,15 +352,15 @@ void ControlSimulatorInternal::init(){
     simulator_out = simulator_.call(simulator_in);
     
     // Remember the end state and dstate for next iteration in this loop
-    Xk = trans(simulator_out[0](simulator_out[0].size1()-1,range(simulator_out[0].size2())));
+    Xk = trans(simulator_out[0](simulator_out[0].size1()-1,ALL));
     
     // Copy all the outputs (but not those 2 extra we introduced)
     for (int i=0;i<simulator_out.size()-2;++i) {
       if(simulator_out[i+2].isNull()) continue; // NOTE: Joel: quick-fix
       
-      simulator_outputs[i].push_back(simulator_out[i+2](range(nf_),range(simulator_out[i+2].size2())));
+      simulator_outputs[i].push_back(simulator_out[i+2](range(nf_),ALL));
       if (k+1==ns_-1) {  // Output of the last minor step of the last major step
-        simulator_outputs[i].push_back(simulator_out[i+2](std::vector<int>(1,nf_),range(simulator_out[i+2].size2())));
+        simulator_outputs[i].push_back(simulator_out[i+2](std::vector<int>(1,nf_),ALL));
       }
     }
     

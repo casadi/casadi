@@ -3,15 +3,17 @@ cmake_minimum_required(VERSION 2.0)
 SET(CASADI_SRCS
   # MISC
   casadi_limits.hpp
-  casadi_types.hpp            casadi_types.cpp
+  casadi_types.hpp
   casadi_exception.hpp
   casadi_calculus.hpp
   casadi_math.hpp
   casadi_options.hpp          casadi_options.cpp
+  casadi_meta.hpp             casadi_meta.cpp
   printable_object.hpp        printable_object.cpp      # Base class enabling printing a Python-style "description" as well as a shorter "representation" of a class
   shared_object.hpp           shared_object.cpp         # This base class implements the reference counting (garbage collection) framework used in CasADi
+  weak_ref.hpp                weak_ref.cpp              # Provides weak reference functionality (non-owning smart pointers)
   generic_type.hpp            generic_type.cpp          # Generic type used for options and for compatibility with dynamically typed languages like Python
-  generic_type_internal.hpp   generic_type_internal.cpp # Internal class for the same
+  generic_type_internal.hpp                             # Internal class for the same
   options_functionality.cpp   options_functionality.hpp # Functionality for getting and setting options of a derived class
   stl_vector_tools.hpp        stl_vector_tools.cpp      # Set of useful functions for the vector template class in STL
 
@@ -45,8 +47,10 @@ SET(CASADI_SRCS
   mx/unary_mx.cpp            mx/unary_mx.hpp            # Unary operation
   mx/binary_mx.cpp           mx/binary_mx.hpp           # Binary operation
   mx/multiplication.cpp      mx/multiplication.hpp      # Matrix multiplication
+  mx/solve.cpp               mx/solve.hpp               # Solve linear system of equations
   mx/evaluation_mx.cpp       mx/evaluation_mx.hpp       # FX function evaluation
   mx/norm.cpp                mx/norm.hpp                # 1-norm, 2-norm and infinity-norm
+  mx/transpose.cpp           mx/transpose.hpp           # Transpose
   mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
   mx/densification.cpp       mx/densification.hpp       # Makes a matrix dense
   mx/multiple_output.cpp     mx/multiple_output.hpp     # Base class for nodes with multiple outputs
@@ -68,8 +72,10 @@ SET(CASADI_SRCS
   fx/parallelizer.hpp        fx/parallelizer.cpp        fx/parallelizer_internal.hpp        fx/parallelizer_internal.cpp
   fx/ocp_solver.hpp          fx/ocp_solver.cpp          fx/ocp_solver_internal.hpp          fx/ocp_solver_internal.cpp
   fx/qp_solver.hpp           fx/qp_solver.cpp           fx/qp_solver_internal.hpp           fx/qp_solver_internal.cpp
+  fx/sdp_solver.hpp          fx/sdp_solver.cpp          fx/sdp_solver_internal.hpp          fx/sdp_solver_internal.cpp
   fx/fx_tools.hpp            fx/fx_tools.cpp
   fx/xfunction_tools.hpp     fx/xfunction_tools.cpp
+  fx/code_generator.hpp      fx/code_generator.cpp
 
   # User include class with the most essential includes
   casadi.hpp

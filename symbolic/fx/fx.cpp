@@ -45,11 +45,11 @@ FX FX::create(FXInternal* node){
 }
 
 const FXInternal* FX::operator->() const{
-  return (const FXInternal*)OptionsFunctionality::operator->();
+  return static_cast<const FXInternal*>(OptionsFunctionality::operator->());
 }
 
 FXInternal* FX::operator->(){
-  return (FXInternal*)OptionsFunctionality::operator->();
+  return static_cast<FXInternal*>(OptionsFunctionality::operator->());
 }
 
 vector<MX> FX::call(const MX &arg){
@@ -120,6 +120,13 @@ void FX::evaluate(int nfdir, int nadir){
   (*this)->evaluate(nfdir,nadir);
 }
 
+void FX::evaluateCompressed(int nfdir, int nadir){
+  assertInit();
+  casadi_assert(nfdir<=(*this)->nfdir_);
+  casadi_assert(nadir<=(*this)->nadir_);
+  (*this)->evaluateCompressed(nfdir,nadir);
+}
+
 void FX::solve(){
   evaluate(0,0);
 }
@@ -162,6 +169,11 @@ FX FX::gradient(int iind, int oind){
 FX FX::hessian(int iind, int oind){
   assertInit();
   return (*this)->hessian(iind,oind);  
+}
+
+FX FX::fullJacobian(){
+  assertInit();
+  return (*this)->fullJacobian();
 }
 
 bool FX::checkNode() const{
@@ -241,8 +253,8 @@ GenericType FX::getStat(const string& name) const{
   return (*this)->getStat(name);
 }
 
-CRSSparsity& FX::jacSparsity(int iind, int oind, bool compact){
-  return (*this)->jacSparsity(iind,oind,compact);
+CRSSparsity& FX::jacSparsity(int iind, int oind, bool compact, bool symmetric){
+  return (*this)->jacSparsity(iind,oind,compact, symmetric);
 }
 
 void FX::setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact){
@@ -255,6 +267,23 @@ std::vector<MX> FX::symbolicInput() const{
 
 std::vector<SXMatrix> FX::symbolicInputSX() const{
   return (*this)->symbolicInputSX();
+}
+
+void FX::setInputScheme(InputOutputScheme scheme) {
+  return (*this)->setInputScheme(scheme);
+}
+
+
+void FX::setOutputScheme(InputOutputScheme scheme) {
+  return (*this)->setOutputScheme(scheme);
+}
+
+InputOutputScheme FX::getInputScheme() const {
+  return (*this)->getInputScheme();
+}
+
+InputOutputScheme FX::getOutputScheme() const {
+  return (*this)->getOutputScheme();
 }
 
 FX FX::operator[](int k) const {
@@ -274,6 +303,8 @@ FX FX::operator[](int k) const {
   
   // Construct an MXFunction with only the k'th output
   MXFunction ret(in,result[k]);
+  
+  ret.setInputScheme(getInputScheme());
   
   // Initialize it
   ret.init();
@@ -371,6 +402,17 @@ FX FX::derivative(int nfwd, int nadj){
   return (*this)->derivative(nfwd,nadj);
 }
 
+int FX::numAllocFwd() const{
+  return (*this)->nfdir_;
+}
+
+int FX::numAllocAdj() const{
+  return (*this)->nadir_;
+}
+
+void FX::generateCode(const string& filename){
+  (*this)->generateCode(filename);
+}
 
 } // namespace CasADi
 

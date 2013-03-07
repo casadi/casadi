@@ -41,7 +41,7 @@ SnoptInterface::~SnoptInterface()
 // SnoptInterface::SnoptInterface(const SXFunction& user_F) : Ftotal(user_F)
 // {
 // 	Ftotal.init();
-// 	designVariables = Ftotal.inputSX();
+// 	designVariables = Ftotal.inputExpr(0);
 
 // 	si = this;
 
@@ -53,7 +53,7 @@ SnoptInterface::~SnoptInterface()
 	
 // 	Ftotal 
 // 	Ftotal.init();
-// 	designVariables = &Ftotal.inputSX();
+// 	designVariables = &Ftotal.inputExpr(0);
 
 // 	si = this;
 
@@ -83,7 +83,7 @@ SnoptInterface::SnoptInterface( Ocp& _ocp ) : designVariables(_ocp.designVariabl
 	// 	cout << "A[" << iAfun[k] << "," << jAvar[k] << "]: " << A[k] << endl;
 	// cout << endl;
 	// for (int k=0; k < neG; k++)
-	// 	cout << "G[" << iGfun[k] << "," << jGvar[k] << "]: " << Gfcn.outputSX().getElement(k) << endl;
+	// 	cout << "G[" << iGfun[k] << "," << jGvar[k] << "]: " << Gfcn.outputExpr(0).getElement(k) << endl;
 }
 
 
@@ -145,17 +145,17 @@ SnoptInterface::init()
 
 	for(int r=0; r<rowind.size()-1; ++r)
         for(int el=rowind[r]; el<rowind[r+1]; ++el)
-			if (gradF.outputSX().getElement(r, col[el]).isConstant()){
-				A_.push_back( gradF.outputSX().getElement(r, col[el]).getValue() );
+			if (gradF.outputExpr(0).getElement(r, col[el]).isConstant()){
+				A_.push_back( gradF.outputExpr(0).getElement(r, col[el]).getValue() );
 				iAfun_.push_back( r + FIRST_FORTRAN_INDEX );
 				jAvar_.push_back( col[el] + FIRST_FORTRAN_INDEX );
 
 				// subtract out linear part
-				SXMatrix linearpart = gradF.outputSX().getElement(r, col[el])*designVariables[col[el]];
+				SXMatrix linearpart = gradF.outputExpr(0).getElement(r, col[el])*designVariables[col[el]];
 				fnonlinear[r] -= linearpart.at(0);
 				simplify(fnonlinear.at(r));
 			} else {
-				G_.push_back( gradF.outputSX().getElement(r, col[el]) );
+				G_.push_back( gradF.outputExpr(0).getElement(r, col[el]) );
 				iGfun_.push_back( r + FIRST_FORTRAN_INDEX );
 				jGvar_.push_back( col[el] + FIRST_FORTRAN_INDEX );
 			}
@@ -188,7 +188,7 @@ SnoptInterface::init()
 	copy( iGfun_.begin(), iGfun_.end(), iGfun);
 	copy( jGvar_.begin(), jGvar_.end(), jGvar);
 
-	Gfcn = SXFunction( Ftotal.inputSX(), G_ );
+	Gfcn = SXFunction( Ftotal.inputExpr(0), G_ );
 	Gfcn.init();
 }
 

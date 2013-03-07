@@ -30,6 +30,11 @@
 #include <algorithm>
 #include "casadi_exception.hpp"
 
+// Define pi if the compiler fails to do so
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif // M_PI
+
 namespace CasADi{
 
 /// Enum for quick access to any node
@@ -65,6 +70,12 @@ enum Operation{
   // Matrix multiplication
   OP_MATMUL,
   
+  // Solve linear system of equations
+  OP_SOLVE,
+  
+  // Matrix transpose
+  OP_TRANSPOSE,
+
   // Nonzero mapping
   OP_MAPPING,
   
@@ -76,6 +87,7 @@ enum Operation{
   
   OP_ERFINV,
   OP_PRINTME,
+  OP_LIFT,
   NUM_BUILT_IN_OPS
 };
 
@@ -218,8 +230,7 @@ enum Operation{
 
   //@{
   /** \brief  CasADi additions */
-  template<class T> T constpow(const T &x, const T &n){ return x.constpow(n);}
-  
+  template<class T> T constpow(const T &x, const T &n){ return x.constpow(n);}  
   template<class T> T printme(const T &x, const T &y){ return x.printme(y);}
   inline double printme(double x, double y){ 
     std::cout << "|> " << y << " : " << x << std::endl;
@@ -741,6 +752,13 @@ struct BinaryOperation<OP_IF_ELSE_ZERO>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = if_else_zero(x,y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=0; d[1]=x;}
+};
+
+/// Inverse of error function
+template<>
+struct BinaryOperation<OP_LIFT>{
+  template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x;}
+  template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0] = 1; d[1] = 0; }
 };
 
 #endif // SWIG

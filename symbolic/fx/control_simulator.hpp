@@ -41,8 +41,6 @@ enum ControlledDAEInput{
   CONTROL_DAE_U,
   /// Control vector, linearly interpolated (dimension nu-by-1). [u_interp] 
   CONTROL_DAE_U_INTERP,
-  /// State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [xdot] 
-  CONTROL_DAE_XDOT,
   /// State vector (dimension nx-by-1) at the last major time-step [x_major]
   CONTROL_DAE_X_MAJOR,
   /// Time at start of control interval (1-by-1) [t0]

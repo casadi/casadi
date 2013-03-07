@@ -14,7 +14,6 @@ endif()
 
 find_package(PythonLibs)
 find_package(NUMPY)
-find_package(MPI)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
 
@@ -23,11 +22,6 @@ set(SWIG_LINK_LIBRARIES_LIST "")
 
 # Include the use swig file
 include (../cmake_modules/UseSWIGMOD.cmake)
-
-if(MPI_FOUND) 
-  include_directories (${MPI_INCLUDE_PATH}) 
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY}) 
-endif()
 
 if(IPOPT_FOUND)
   link_directories(${IPOPT_LIBRARY_DIRS})
@@ -57,6 +51,11 @@ endif()
 if(WITH_QPOASES)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_QPOASES")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_qpoases_interface ${QPOASES_LIBRARIES})
+endif()
+
+if(DSDP_FOUND)
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_DSDP")
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_dsdp_interface ${DSDP_LIBRARIES})
 endif()
 
 if(WITH_CSPARSE)
@@ -307,9 +306,13 @@ if(PYTHONINTERP_FOUND)
     string(REGEX REPLACE "\\\\" "/" PYTHON_INSTALLATION_PATH ${PYTHON_INSTALLATION_PATH})
   endif()
 
+  if(NOT DEFINED PYTHON_PREFIX )
+    set(PYTHON_PREFIX  ${PYTHON_INSTALLATION_PATH} CACHE INTERNAL "Python installation prefix")
+  endif()
+
   #since in the main CMakeLists.txt we used "add_subdirectory(swig EXCLUDE_FROM_ALL)" the following install command won't add anything to "make install"
   install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi 
-    DESTINATION ${PYTHON_INSTALLATION_PATH}
+    DESTINATION ${PYTHON_PREFIX}
     COMPONENT install_python
     USE_SOURCE_PERMISSIONS
     PATTERN .svn EXCLUDE
@@ -355,6 +358,7 @@ endif()
 # begin Patch swig to get concat functionality
 find_package(OCTAVE)
 if(OCTAVE_FOUND)
+include_directories (${OCTAVE_INCLUDE_DIR})
 EXECUTE_PROCESS(COMMAND ${SWIG_EXECUTABLE} -swiglib OUTPUT_VARIABLE ORIG_SWIGDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 ADD_CUSTOM_COMMAND(

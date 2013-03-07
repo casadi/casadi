@@ -94,32 +94,28 @@ public:
   /** \brief  Const access functions of the node */
   const MXFunctionInternal* operator->() const;
 
-  /// get function input argument (to be deprecated)
-  const MX inputMX(int iind=0) const;
-  
-  /// get function output argument (to be deprecated)
-  const MX outputMX(int oind=0) const;
-  
-  /// get function inputs argument (to be deprecated)
-  const std::vector<MX> & inputsMX() const;
-  
-  /// get function outputs argument (to be deprecated)
-  const std::vector<MX> & outputsMX() const;
-  
-  /** \brief get function input */
+  /** \brief Get function input */
   const MX& inputExpr(int ind) const;
   
-  /** \brief get function output */
+  /** \brief Get function output */
   const MX& outputExpr(int ind) const;
   
-  /** \brief get function inputs */
+  /** \brief Get all function inputs */
   const std::vector<MX>& inputExpr() const;
   
-  /** \brief get function outputs */
+  /** \brief Get all function outputs */
   const std::vector<MX> & outputExpr() const;
   
-  /** \brief Access the algorithm */
+#ifndef SWIG
+  /** \brief Access the algorithm directly */
   const std::vector<MXAlgEl>& algorithm() const;
+#endif // SWIG
+  
+  /** \brief Get the number of atomic operations */
+  int getAlgorithmSize() const{ return algorithm().size();}
+
+  /** \brief Get the length of the work vector */
+  int getWorkSize() const;
   
   /** \brief Number of nodes in the algorithm */
   int countNodes() const;
@@ -141,6 +137,12 @@ public:
   
   /** \brief Get all the free variables of the function */
   std::vector<MX> getFree() const;
+  
+  /** \brief Extract the functions needed for the Lifted Newton method */
+  void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
+
+  /** \brief Get the corresponding matrix type */
+  typedef MX MatType;  
 };
 
 } // namespace CasADi

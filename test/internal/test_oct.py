@@ -32,7 +32,7 @@ if 'CASADILIBDIR' in os.environ:
 
 t = TestSuite(dirname=src,
   suffix="m",
-  command = lambda dir,fn:  ["octave",'--no-init-file','-p', path, fn],
+  command = lambda dir,fn, opt:  ["octave",'--no-init-file','-p', path, fn]+opt,
   skipdirs=[".svn","ctemplate"],
   allowable_returncodes=[127],
   stderr_trigger = ["error"],

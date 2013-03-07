@@ -92,16 +92,16 @@ void LiftedSQPInternal::init(){
   casadi_assert(!gfcn.isNull());
   
   // Extract the free variables and split into independent and dependent variables
-  SXMatrix x = ffcn.inputSX();
+  SXMatrix x = ffcn.inputExpr(0);
   int nx = x.size();
   nu = nx-nv;
   SXMatrix u = x[Slice(0,nu)];
   SXMatrix v = x[Slice(nu,nu+nv)];
 
   // Extract the constraint equations and split into constraints and definitions of dependent variables
-  SXMatrix f1 = ffcn.outputSX();
+  SXMatrix f1 = ffcn.outputExpr(0);
   int nf1 = f1.numel();
-  SXMatrix g = gfcn.outputSX();
+  SXMatrix g = gfcn.outputExpr(0);
   int nf2 = g.numel()-nv;
   SXMatrix v_eq = g(Slice(0,nv));
   SXMatrix f2 = g(Slice(nv,nv+nf2));

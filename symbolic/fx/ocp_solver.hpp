@@ -50,20 +50,12 @@ enum MayerInput{
 ///   np: Number of parameters: from option number_of_parameters\n
 ///   nh: Number of point constraints: from cfcn.input(0).size()
 enum OCPInput{
-  /// Time grid: ((ns+1) x 1) - default: linspace(0,t_final,ns+1) [t] 
-  OCP_T,   
   /// States lower bounds (nx x (ns+1)) [lbx]
   OCP_LBX,
   /// States upper bounds (nx x (ns+1)) [ubx]
   OCP_UBX,
   /// States initial guess (nx x (ns+1)) [x_init]
   OCP_X_INIT,
-  /// States deriatives lower bounds (nx x (ns+1)) [lbxp]
-  OCP_LBXP,
-  /// States deriatives upper bounds (nx x (ns+1)) [ubxp]
-  OCP_UBXP,
-  /// States deriatives initial guess (nx x (ns+1)) [xp_init]
-  OCP_XP_INIT,
   /// Controls lower bounds (nu x ns) [lbu]
   OCP_LBU,
   /// Controls upper bounds (nu x ns) [ubu]
@@ -94,10 +86,10 @@ enum OCPOutput{
   OCP_X_OPT, 
   /// Optimal control trajectory [u_opt]
   OCP_U_OPT, 
-  /// Optimal state derivative trajectory [xp_opt]
-  OCP_XP_OPT, 
   /// Optimal parameters [p_opt]
   OCP_P_OPT, 
+  /// Objective/cost function for optimal solution (1 x 1) [cost]
+  OCP_COST,
   /// Number of outputs to an OCP solver
   OCP_NUM_OUT
 };
@@ -109,7 +101,7 @@ enum OCPOutput{
    *
    *
       \author Joel Andersson
-      \date 2011
+      \date 2011-2013
   */ 
   class OCPSolver : public FX{
   public:

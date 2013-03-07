@@ -49,7 +49,7 @@ void ParallelizerInternal::init(){
   } else if(getOption("parallelization")=="mpi") {
     mode_ = MPI;
   } else {
-    throw CasadiException(string("Parallelization mode: ")+getOption("parallelization").toString());
+    casadi_error("Parallelization mode " << getOption("parallelization") << " unknown.");
   }
 
   // Switch to serial mode if OPENMP is not supported
@@ -134,7 +134,7 @@ void ParallelizerInternal::evaluate(int nfdir, int nadir){
     int cnt=0;
     #pragma omp parallel for firstprivate(cnt)
     for(int task=0; task<funcs_.size(); ++task) {
-      if (task==0) {
+      if (gather_stats_ && task==0) {
         stats_["max_threads"] = omp_get_max_threads();
         stats_["num_threads"] = omp_get_num_threads();
       }
@@ -148,25 +148,28 @@ void ParallelizerInternal::evaluate(int nfdir, int nadir){
       task_cputime[task] =  task_endtime[task] - task_starttime[task];
       task_order[task] = cnt++;
     }
-    stats_["task_allocation"] = task_allocation;
-    stats_["task_order"] = task_order;
-    stats_["task_cputime"] = task_cputime;
-    
+    if (gather_stats_) {
+      stats_["task_allocation"] = task_allocation;
+      stats_["task_order"] = task_order;
+      stats_["task_cputime"] = task_cputime;
+    }
     // Measure all times relative to the earliest start_time.
     double start = *std::min_element(task_starttime.begin(),task_starttime.end());
     for (int task=0; task<funcs_.size(); ++task) {
       task_starttime[task] =  task_starttime[task] - start;
       task_endtime[task] = task_endtime[task] - start;
     }
-    stats_["task_starttime"] = task_starttime;
-    stats_["task_endtime"] = task_endtime;
+    if (gather_stats_) {
+      stats_["task_starttime"] = task_starttime;
+      stats_["task_endtime"] = task_endtime;
+    }
     
     #endif //WITH_OPENMP
     #ifndef WITH_OPENMP
-      throw CasadiException("ParallelizerInternal::evaluate: OPENMP support was not available during CasADi compilation");
+      casadi_error("ParallelizerInternal::evaluate: OPENMP support was not available during CasADi compilation");
     #endif //WITH_OPENMP
   } else if(mode_ == MPI){
-    throw CasadiException("ParallelizerInternal::evaluate: MPI not implemented");
+    casadi_error("ParallelizerInternal::evaluate: MPI not implemented");
   }
   first_call_ = false;
 }
@@ -179,6 +182,11 @@ void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){
   // Copy inputs to functions
   for(int j=inind_[task]; j<inind_[task+1]; ++j){
     fcn.input(j-inind_[task]).set(input(j));
+  }
+  
+  // Copy outputs to functions (outputs are sometimes used for initialization)
+  for(int j=outind_[task]; j<outind_[task+1]; ++j){
+    fcn.output(j-outind_[task]).set(output(j));
   }
   
   // Copy forward seeds
@@ -225,7 +233,7 @@ void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){
   }
 }
 
-CRSSparsity ParallelizerInternal::getJacSparsity(int iind, int oind){
+CRSSparsity ParallelizerInternal::getJacSparsity(int iind, int oind, bool symmetric){
   // Number of tasks
   int ntask = inind_.size()-1;
   
@@ -277,24 +285,24 @@ void ParallelizerInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObje
   funcs_ = deepcopy(funcs_,already_copied);
 }
 
-void ParallelizerInternal::spInit(bool fwd){
+void ParallelizerInternal::spInit(bool use_fwd){
   for(vector<FX>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it){
-    it->spInit(fwd);
+    it->spInit(use_fwd);
   }
 }
 
-void ParallelizerInternal::spEvaluate(bool fwd){
+void ParallelizerInternal::spEvaluate(bool use_fwd){
   // This function can be parallelized. Move logic in "evaluate" to a template function.
   for(int task=0; task<funcs_.size(); ++task){
-    spEvaluateTask(fwd,task);
+    spEvaluateTask(use_fwd,task);
   }
 }
 
-void ParallelizerInternal::spEvaluateTask(bool fwd, int task){
+void ParallelizerInternal::spEvaluateTask(bool use_fwd, int task){
   // Get a reference to the function
   FX& fcn = funcs_[task];
 
-  if(fwd){
+  if(use_fwd){
     // Set input influence
     for(int j=inind_[task]; j<inind_[task+1]; ++j){
       int nv = input(j).size();
@@ -304,9 +312,9 @@ void ParallelizerInternal::spEvaluateTask(bool fwd, int task){
     }
     
     // Propagate
-    fcn.spEvaluate(fwd);
+    fcn.spEvaluate(use_fwd);
     
-    // Get output dependend
+    // Get output dependence
     for(int j=outind_[task]; j<outind_[task+1]; ++j){
       int nv = output(j).size();
       bvec_t* p_v = get_bvec_t(output(j).data());
@@ -325,16 +333,14 @@ void ParallelizerInternal::spEvaluateTask(bool fwd, int task){
     }
     
     // Propagate
-    fcn.spEvaluate(fwd);
+    fcn.spEvaluate(use_fwd);
     
-    // Get input dependend
+    // Get input dependence
     for(int j=inind_[task]; j<inind_[task+1]; ++j){
       int nv = input(j).size();
       bvec_t* p_v = get_bvec_t(input(j).data());
       const bvec_t* f_v = get_bvec_t(fcn.input(j-inind_[task]).data());
-      for(int k=0; k<nv; ++k){
-        p_v[k] |= f_v[k];
-      }
+      copy(f_v,f_v+nv,p_v);
     }
   }
 }

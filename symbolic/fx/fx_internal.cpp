@@ -27,6 +27,7 @@
 #include "mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
+#include "../mx/mx_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
 using namespace std;
@@ -44,12 +45,13 @@ FXInternal::FXInternal(){
   addOption("store_jacobians",          OT_BOOLEAN,             false,          "keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times");
   addOption("numeric_jacobian",         OT_BOOLEAN,             false,          "Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method");
   addOption("numeric_hessian",          OT_BOOLEAN,             false,          "Calculate Hessians numerically (using directional derivatives) rather than with the built-in method");
-  addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)","forward|reverse|automatic");
+  addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians.","forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate");
   addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines");
   addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
   addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","inputs|outputs");
   addOption("regularity_check",         OT_BOOLEAN,             true,          "Throw exceptions when NaN or Inf appears during evaluation");
+  addOption("gather_stats",             OT_BOOLEAN,             false,         "Flag to indicate wether statistics must be gathered");
   
   verbose_ = false;
   jacgen_ = 0;
@@ -105,6 +107,7 @@ void FXInternal::init(){
   monitor_inputs_ = monitored("inputs");
   monitor_outputs_ = monitored("outputs");
   
+  gather_stats_ = getOption("gather_stats");
 
   // Mark the function as initialized
   is_init_ = true;
@@ -128,16 +131,16 @@ void FXInternal::updateNumSens(bool recursive){
     it->dataF.resize(nfdir_,it->data);
     it->dataA.resize(nadir_,it->data);
   }
+
+  // Allocate memory for compression marker
+  compressed_fwd_.resize(nfdir_);
+  compressed_adj_.resize(nadir_);
 }
 
 void FXInternal::requestNumSens(int nfwd, int nadj){
-  // Start with the current number of directions
-  int nfwd_new = nfdir_;
-  int nadj_new = nadir_;
-  
-  // Increase to the number set in the options (but possibly not yet initialized)
-  nfwd_new = std::max(nfwd_new,int(getOption("number_of_fwd_dir")));
-  nadj_new = std::max(nadj_new,int(getOption("number_of_adj_dir")));
+  // Request the number of directions to the number that we would ideally have
+  int nfwd_new = std::max(nfwd,std::max(nfdir_,int(getOption("number_of_fwd_dir"))));
+  int nadj_new = std::max(nadj,std::max(nadir_,int(getOption("number_of_adj_dir"))));
   
   // Cap at the maximum
   nfwd_new = std::min(nfwd_new,int(getOption("max_number_of_fwd_dir")));
@@ -153,19 +156,33 @@ void FXInternal::requestNumSens(int nfwd, int nadj){
 
 void FXInternal::print(ostream &stream) const{
   if (getNumInputs()==1) {
-    stream << " Input: " << input().dimString() << std::endl;
+    stream << " Input: " << input().dimString() << endl;
   } else{
-    stream << " Inputs (" << getNumInputs() << "):" << std::endl;
-    for (int i=0;i<getNumInputs();i++) {
-      stream << "  " << i+1 << ". " << input(i).dimString() << std::endl;
+    if (inputScheme==SCHEME_unknown) {
+      stream << " Inputs (" << getNumInputs() << "):" << std::endl;
+      for (int i=0;i<getNumInputs();i++) {
+        stream << "  " << i+1 << ". " << input(i).dimString() << std::endl;
+      }
+    } else {
+      stream << " Inputs (" << getSchemeName(inputScheme) << ": " << getNumInputs() << "):" << std::endl;
+      for (int i=0;i<getNumInputs();i++) {
+        stream << "  " << i+1  << ". (" << getSchemeEntryEnumName(inputScheme,i) << " aka " << getSchemeEntryName(inputScheme,i) << ")   " << input(i).dimString() << std::endl;
+      }
     }
   }
   if (getNumOutputs()==1) {
-    stream << " Output: " << output().dimString() << std::endl;
+    stream << " Output: " << output().dimString() << endl;
   } else {
-    stream << " Outputs (" << getNumOutputs() << "):" << std::endl;
-    for (int i=0;i<getNumOutputs();i++) {
-      stream << "  " << i+1 << ". " << output(i).dimString() << std::endl;
+    if (outputScheme==SCHEME_unknown) {
+      stream << " Outputs (" << getNumOutputs() << "):" << std::endl;
+      for (int i=0;i<getNumOutputs();i++) {
+        stream << "  " << i+1 << ". " << output(i).dimString() << std::endl;
+      }
+    } else { 
+      stream << " Outputs (" << getSchemeName(outputScheme) << ": " << getNumOutputs() << "):" << std::endl;
+      for (int i=0;i<getNumOutputs();i++) {
+        stream << "  " << i+1 << ". (" << getSchemeEntryEnumName(outputScheme,i) << " aka " << getSchemeEntryName(outputScheme,i) << ")   " << output(i).dimString() << std::endl;
+      }
     }
   }
 }
@@ -190,6 +207,8 @@ FX FXInternal::gradient(int iind, int oind){
 }
   
 FX FXInternal::hessian(int iind, int oind){
+  log("FXInternal::hessian");
+  
   // Assert scalar
   casadi_assert_message(output(oind).scalar(),"Only hessians of scalar functions allowed.");
   
@@ -209,12 +228,18 @@ FX FXInternal::getGradient(int iind, int oind){
 }
   
 FX FXInternal::getHessian(int iind, int oind){
+  log("FXInternal::getHessian");
+
   // Create gradient function
+  log("FXInternal::getHessian generating gradient");
   FX g = gradient(iind,oind);
   g.setOption("numeric_jacobian",getOption("numeric_hessian"));
+  g.setOption("verbose",getOption("verbose"));
+  g.setInputScheme(inputScheme);
   g.init();
   
   // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
+  log("FXInternal::getHessian generating Jacobian of gradient");
   return g.jacobian(iind,0,false,true);
 }
   
@@ -284,11 +309,26 @@ std::vector<SXMatrix> FXInternal::symbolicInputSX() const{
   return ret;
 }
 
-CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
-  // Check if we are able to propagate dependencies throught he function
-  if(spCanEvaluate(true) || spCanEvaluate(false)){
-    
-    // Number of nonzero inputs
+void bvec_toggle(bvec_t* s, int begin, int end,int j) {
+  for(int i=begin; i<end; ++i){
+    s[i] ^= (bvec_t(1) << j);
+  }
+}
+
+void bvec_clear(bvec_t* s, int begin, int end) {
+  for(int i=begin; i<end; ++i){
+    s[i] = 0;
+  }
+}
+
+
+void bvec_or(bvec_t* s, bvec_t & r, int begin, int end) {
+  r = 0;
+  for(int i=begin; i<end; ++i) r |= s[i];
+}
+
+CRSSparsity FXInternal::getJacSparsityPlain(int iind, int oind){
+// Number of nonzero inputs
     int nz_in = input(iind).size();
     
     // Number of nonzero outputs
@@ -340,14 +380,10 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
     int nz_seed = use_fwd ? nz_in  : nz_out;
     int nz_sens = use_fwd ? nz_out : nz_in;
 
-    // Input/output index
-    int ind_seed = use_fwd ? iind : oind;
-    int ind_sens = use_fwd ? oind : iind;
-
     // Print
     if(verbose()){
       std::cout << "FXInternal::getJacSparsity: using " << (use_fwd ? "forward" : "adjoint") << " mode: ";
-      std::cout << nsweep << " sweeps needed for " << nz_seed << " directions" << std::endl;
+      std::cout << nsweep << " sweeps needed for " << nz_seed << " directions" << endl;
     }
     
     // Progress
@@ -365,7 +401,7 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
         // Print when entering a new decade
         if(progress_new / 10 > progress / 10){
           progress = progress_new;
-          std::cout << progress << " %"  << std::endl;
+          std::cout << progress << " %"  << endl;
         }
       }
       
@@ -425,9 +461,512 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
     // Return sparsity pattern
     if(verbose()){
       std::cout << "Formed Jacobian sparsity pattern (dimension " << ret.shape() << ", " << 100*double(ret.size())/ret.numel() << " \% nonzeros)." << endl;
-      std::cout << "FXInternal::getJacSparsity end " << std::endl;
+      std::cout << "FXInternal::getJacSparsity end " << endl;
     }
     return ret;
+}
+
+CRSSparsity FXInternal::getJacSparsityHierarchicalSymm(int iind, int oind){
+    casadi_assert(spCanEvaluate(true));
+
+    // Number of nonzero inputs
+    int nz = input(iind).size();
+    
+    // Clear the forward seeds/adjoint sensitivities
+    for(int ind=0; ind<getNumInputs(); ++ind){
+      vector<double> &v = inputNoCheck(ind).data();
+      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
+    }
+
+    // Clear the adjoint seeds/forward sensitivities
+    for(int ind=0; ind<getNumOutputs(); ++ind){
+      vector<double> &v = outputNoCheck(ind).data();
+      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
+    }
+
+    // Sparsity triplet accumulator
+    std::vector<int> jrow, jcol;
+    
+    // Rows/cols of the coarse blocks
+    std::vector<int> coarse(2,0); coarse[1] = nz;
+    
+    // Rows/cols of the fine blocks
+    std::vector<int> fine;
+    
+    // In each iteration, subdivide each coarse block in this many fine blocks
+    int subdivision = bvec_size;
+
+    CRSSparsity r = sp_dense(1,1);
+    
+    // The size of a block
+    int granularity = nz;
+    
+    int nsweeps = 0;
+    
+    bool hasrun = false;
+    
+    while (!hasrun || coarse.size()!=nz+1) {
+      casadi_log("Block size: " << granularity);
+    
+      // Clear the sparsity triplet acccumulator
+      jrow.clear();
+      jcol.clear();
+      
+      // Clear the fine block structure
+      fine.clear();
+      
+      CRSSparsity D = r.starColoring();
+
+      casadi_log("Star coloring: " << D.size1() << " <-> " << D.size2());
+      
+      // Reset the virtual machine
+      spInit(true);
+      
+      // Get seeds and sensitivities
+      bvec_t* input_v = get_bvec_t(inputNoCheck(iind).data());
+      bvec_t* output_v = get_bvec_t(outputNoCheck(oind).data());
+      bvec_t* seed_v = input_v;
+      bvec_t* sens_v = output_v;
+      
+      // Clear the seeds
+      for(int i=0; i<nz; ++i) seed_v[i]=0;
+      
+      // Subdivide the coarse block
+      for (int k=0;k<coarse.size()-1;++k) {
+        int diff = coarse[k+1]-coarse[k];
+        int new_diff = diff/subdivision;
+        if(diff%subdivision>0) new_diff++;
+        std::vector<int> temp = range(coarse[k],coarse[k+1],new_diff);
+        fine.insert(fine.end(),temp.begin(),temp.end());
+      }
+      if (fine.back()!=coarse.back()) fine.push_back(coarse.back());
+
+      granularity = fine[1] - fine[0];
+      
+      // The index into the bvec bit vector
+      int bvec_i = 0;
+      
+      // Create lookup tables for the fine blocks
+      std::vector<int> fine_lookup = lookupvector(fine,nz+1);
+      
+      // Triplet data used as a lookup table
+      std::vector<int> lookup_row;
+      std::vector<int> lookup_col;
+      std::vector<int> lookup_value;
+      
+      // Loop over all coarse seed directions from the coloring
+      for(int csd=0; csd<D.size1(); ++csd) {
+         // The maximum number of fine blocks contained in one coarse block
+         int n_fine_blocks_max = fine_lookup[coarse[1]]-fine_lookup[coarse[0]];
+         
+         int fci_offset = 0;
+         int fci_cap = bvec_size-bvec_i;
+         
+         // Flag to indicate if all fine blocks have been handled
+         bool f_finished = false;
+         
+         // Loop while not finished
+         while(!f_finished) {
+    
+           // Loop over all coarse columns that are found in the coloring for this coarse seed direction
+           for(int k=D.rowind()[csd]; k<D.rowind()[csd+1]; ++k){
+             int cci = D.col()[k];
+             
+             // The first and last columns of the fine block
+             int fci_start = fine_lookup[coarse[cci]];
+             int fci_end   = fine_lookup[coarse[cci+1]];
+             
+             // Local counter that modifies index into bvec
+             int bvec_i_mod = 0;
+             
+             int value = -bvec_i + fci_offset + fci_start;
+             
+             //casadi_assert(value>=0);
+             
+             // Loop over the columns of the fine block
+             for (int fci = fci_offset;fci<min(fci_end-fci_start,fci_cap);++fci) {
+             
+               // Loop over the coarse block rows that appear in the coloring for the current coarse seed direction
+               for (int cri=r.rowind()[cci];cri<r.rowind()[cci+1];++cri) {
+                 lookup_row.push_back(r.col()[cri]);
+                 lookup_col.push_back(bvec_i+bvec_i_mod);
+                 lookup_value.push_back(value);
+               }
+
+               // Toggle on seeds
+               bvec_toggle(seed_v,fine[fci+fci_start],fine[fci+fci_start+1],bvec_i+bvec_i_mod);
+               bvec_i_mod++;
+             }
+           }
+           
+           // Bump bvec_i for next major coarse direction
+           bvec_i+= min(n_fine_blocks_max,fci_cap);
+           
+           // Check if bvec buffer is full
+           if (bvec_i==bvec_size || csd==D.size1()-1) {
+              // Calculate sparsity for bvec_size directions at once
+              
+              // Statistics
+              nsweeps+=1;
+              
+              // Construct lookup table
+              IMatrix lookup = IMatrix::sparse(lookup_row,lookup_col,lookup_value,coarse.size(),bvec_size);
+
+              std::reverse(lookup_row.begin(),lookup_row.end());
+              std::reverse(lookup_col.begin(),lookup_col.end());
+              std::reverse(lookup_value.begin(),lookup_value.end());
+              IMatrix duplicates = IMatrix::sparse(lookup_row,lookup_col,lookup_value,coarse.size(),bvec_size) - lookup;
+              makeSparse(duplicates);
+              lookup(duplicates.sparsity()) = -bvec_size;
+              
+              // Propagate the dependencies
+              spEvaluate(true);
+              
+              // Temporary bit work vector
+              bvec_t spsens;
+              
+              // Loop over the rows of coarse blocks
+              for (int cri=0;cri<coarse.size()-1;++cri) {
+
+                // Loop over the rows of fine blocks within the current coarse block
+                for (int fri=fine_lookup[coarse[cri]];fri<fine_lookup[coarse[cri+1]];++fri) {
+                  // Lump individual sensitivities together into fine block
+                  bvec_or(sens_v,spsens,fine[fri],fine[fri+1]);
+  
+                  // Loop over all bvec_bits
+                  for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
+                    if (spsens & (bvec_t(1) << bvec_i)) {
+                      // if dependency is found, add it to the new sparsity pattern
+                      int lk = lookup.elem(cri,bvec_i);
+                      if (lk>-bvec_size) {
+                        jcol.push_back(bvec_i+lk);
+                        jrow.push_back(fri);
+                        jcol.push_back(fri);
+                        jrow.push_back(bvec_i+lk);
+                      }
+                    }
+                  }
+                }
+              }
+              
+              // Clean seed vector, ready for next bvec sweep
+              for(int i=0; i<nz; ++i) seed_v[i]=0;
+              
+              // Clean lookup table
+              lookup_row.clear();
+              lookup_col.clear();
+              lookup_value.clear();
+           }
+           
+           if (n_fine_blocks_max>fci_cap) {
+             fci_offset += min(n_fine_blocks_max,fci_cap);
+             bvec_i = 0;
+             fci_cap = bvec_size;
+           } else {
+             f_finished = true;
+           }
+         
+         }
+         
+      }
+
+      // Construct fine sparsity pattern
+      r = sp_triplet(fine.size()-1, fine.size()-1, jrow, jcol);
+      coarse = fine;
+      hasrun = true;
+    }
+    
+    casadi_log("Number of sweeps: " << nsweeps );
+    
+    return r;
+}
+
+CRSSparsity FXInternal::getJacSparsityHierarchical(int iind, int oind){
+ // Number of nonzero inputs
+    int nz_in = input(iind).size();
+    
+    // Number of nonzero outputs
+    int nz_out = output(oind).size();
+    
+    // Clear the forward seeds/adjoint sensitivities
+    for(int ind=0; ind<getNumInputs(); ++ind){
+      vector<double> &v = inputNoCheck(ind).data();
+      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
+    }
+
+    // Clear the adjoint seeds/forward sensitivities
+    for(int ind=0; ind<getNumOutputs(); ++ind){
+      vector<double> &v = outputNoCheck(ind).data();
+      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
+    }
+
+    // Sparsity triplet accumulator
+    std::vector<int> jrow, jcol;
+    
+    // Rows of the coarse blocks
+    std::vector<int> coarse_row(2,0); coarse_row[1] = nz_out;
+    // Cols of the coarse blocks
+    std::vector<int> coarse_col(2,0); coarse_col[1] = nz_in;
+    
+    // Rows of the fine blocks
+    std::vector<int> fine_row;
+    
+    // Cols of the fine blocks
+    std::vector<int> fine_col;
+    
+    // In each iteration, subdivide each coarse block in this many fine blocks
+    int subdivision = bvec_size;
+
+    CRSSparsity r = sp_dense(1,1);
+    
+    // The size of a block
+    int granularity_col = nz_in;
+    int granularity_row = nz_out;
+    
+    bool use_fwd = true;
+    
+    int nsweeps = 0;
+    
+    bool hasrun = false;
+    
+    while (!hasrun || coarse_row.size()!=nz_out+1 || coarse_col.size()!=nz_in+1) {
+      casadi_log("Block size: " << granularity_row << " x " << granularity_col);
+    
+      // Clear the sparsity triplet acccumulator
+      jrow.clear();
+      jcol.clear();
+      
+      // Clear the fine block structure
+      fine_col.clear();
+      fine_row.clear();
+    
+      // r transpose will be needed in the algorithm
+      CRSSparsity rT = r.transpose();
+      
+      /**       Decide which ad_mode to take           */
+      CRSSparsity D1 = rT.unidirectionalColoring(r);
+      CRSSparsity D2 = r.unidirectionalColoring(rT);
+      
+      // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
+      int adj_penalty = 2;
+      
+      int fwd_cost = use_fwd ? granularity_col: granularity_row;
+      int adj_cost = use_fwd ? granularity_row: granularity_col;
+      
+      // Use whatever required less colors if we tried both (with preference to forward mode)
+      if((D1.size1()*fwd_cost <= adj_penalty*D2.size1()*adj_cost)){
+        use_fwd = true;
+        casadi_log("Forward mode chosen: " << D1.size1()*fwd_cost << " <-> " << adj_penalty*D2.size1()*adj_cost);
+      } else {
+        use_fwd = false;
+        casadi_log("Adjoint mode chosen: " << D1.size1()*fwd_cost << " <-> " << adj_penalty*D2.size1()*adj_cost);
+      }
+      
+      use_fwd = spCanEvaluate(true) && use_fwd;
+          
+      // Override default behavior?
+      if(getOption("ad_mode") == "forward"){
+        use_fwd = true;
+      } else if(getOption("ad_mode") == "reverse"){
+        use_fwd = false;
+      }
+      
+      // Reset the virtual machine
+      spInit(use_fwd);
+      
+      // Get seeds and sensitivities
+      bvec_t* input_v = get_bvec_t(inputNoCheck(iind).data());
+      bvec_t* output_v = get_bvec_t(outputNoCheck(oind).data());
+      bvec_t* seed_v = use_fwd ? input_v : output_v;
+      bvec_t* sens_v = use_fwd ? output_v : input_v;
+      
+      // The number of zeros in the seed and sensitivity directions
+      int nz_seed = use_fwd ? nz_in  : nz_out;
+      int nz_sens = use_fwd ? nz_out : nz_in;
+      
+      // Clear the seeds
+      for(int i=0; i<nz_seed; ++i) seed_v[i]=0;
+      
+      // Choose the active jacobian coloring scheme
+      CRSSparsity D = use_fwd ? D1 : D2;
+      
+      // Adjoint mode amounts to swapping
+      if (!use_fwd) {
+        std::swap(coarse_row,coarse_col);
+        std::swap(granularity_row,granularity_col);
+        std::swap(r,rT);
+      }
+      
+      // Subdivide the coarse block rows
+      for (int k=0;k<coarse_row.size()-1;++k) {
+        int diff = coarse_row[k+1]-coarse_row[k];
+        int new_diff = diff/subdivision;
+        if(diff%subdivision>0) new_diff++;
+        std::vector<int> temp = range(coarse_row[k],coarse_row[k+1],new_diff);
+        fine_row.insert(fine_row.end(),temp.begin(),temp.end());
+      }
+      // Subdivide the coarse block columns
+      for (int k=0;k<coarse_col.size()-1;++k) {
+        int diff = coarse_col[k+1]-coarse_col[k];
+        int new_diff = diff/subdivision;
+        if(diff%subdivision>0) new_diff++;
+        std::vector<int> temp = range(coarse_col[k],coarse_col[k+1],new_diff);
+        fine_col.insert(fine_col.end(),temp.begin(),temp.end());
+      }
+      if (fine_col.back()!=coarse_col.back()) fine_col.push_back(coarse_col.back());
+      if (fine_row.back()!=coarse_row.back()) fine_row.push_back(coarse_row.back());
+
+      granularity_row = fine_row[1] - fine_row[0];
+      granularity_col = fine_col[1] - fine_col[0];
+      
+      // The index into the bvec bit vector
+      int bvec_i = 0;
+      
+      // Create lookup tables for the fine blocks
+      std::vector<int> fine_row_lookup = lookupvector(fine_row,nz_sens+1);
+      std::vector<int> fine_col_lookup = lookupvector(fine_col,nz_seed+1);
+      
+      // Triplet data used as a lookup table
+      std::vector<int> lookup_row;
+      std::vector<int> lookup_col;
+      std::vector<int> lookup_value;
+      
+      // Loop over all coarse seed directions from the coloring
+      for(int csd=0; csd<D.size1(); ++csd) {
+      
+         // The maximum number of fine blocks contained in one coarse block
+         int n_fine_blocks_max = fine_col_lookup[coarse_col[1]]-fine_col_lookup[coarse_col[0]];
+         
+         int fci_offset = 0;
+         int fci_cap = bvec_size-bvec_i;
+         
+         // Flag to indicate if all fine blocks have been handled
+         bool f_finished = false;
+         
+         // Loop while not finished
+         while(!f_finished) {
+    
+           // Loop over all coarse columns that are found in the coloring for this coarse seed direction
+           for(int k=D.rowind()[csd]; k<D.rowind()[csd+1]; ++k){
+             int cci = D.col()[k];
+
+             // The first and last columns of the fine block
+             int fci_start = fine_col_lookup[coarse_col[cci]];
+             int fci_end   = fine_col_lookup[coarse_col[cci+1]];
+             
+             // Local counter that modifies index into bvec
+             int bvec_i_mod = 0;
+             
+             int value = -bvec_i + fci_offset + fci_start;
+             
+             // Loop over the columns of the fine block
+             for (int fci = fci_offset;fci<min(fci_end-fci_start,fci_cap);++fci) {
+             
+               // Loop over the coarse block rows that appear in the coloring for the current coarse seed direction
+               for (int cri=rT.rowind()[cci];cri<rT.rowind()[cci+1];++cri) {
+                 lookup_row.push_back(rT.col()[cri]);
+                 lookup_col.push_back(bvec_i+bvec_i_mod);
+                 lookup_value.push_back(value);
+               }
+
+               // Toggle on seeds
+               bvec_toggle(seed_v,fine_col[fci+fci_start],fine_col[fci+fci_start+1],bvec_i+bvec_i_mod);
+               bvec_i_mod++;
+             }
+           }
+           
+           // Bump bvec_i for next major coarse direction
+           bvec_i+= min(n_fine_blocks_max,fci_cap);
+           
+           // Check if bvec buffer is full
+           if (bvec_i==bvec_size || csd==D.size1()-1) {
+              // Calculate sparsity for bvec_size directions at once
+              
+              // Statistics
+              nsweeps+=1; 
+              
+              // Construct lookup table
+              IMatrix lookup = IMatrix::sparse(lookup_row,lookup_col,lookup_value,coarse_row.size(),bvec_size);
+
+              // Propagate the dependencies
+              spEvaluate(use_fwd);
+              
+              // Temporary bit work vector
+              bvec_t spsens;
+              
+              // Loop over the rows of coarse blocks
+              for (int cri=0;cri<coarse_row.size()-1;++cri) {
+
+                // Loop over the rows of fine blocks within the current coarse block
+                for (int fri=fine_row_lookup[coarse_row[cri]];fri<fine_row_lookup[coarse_row[cri+1]];++fri) {
+                  // Lump individual sensitivities together into fine block
+                  bvec_or(sens_v,spsens,fine_row[fri],fine_row[fri+1]);
+  
+                  // Loop over all bvec_bits
+                  for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
+                    if (spsens & (bvec_t(1) << bvec_i)) {
+                      // if dependency is found, add it to the new sparsity pattern
+                      jcol.push_back(bvec_i+lookup.elem(cri,bvec_i));
+                      jrow.push_back(fri);
+                    }
+                  }
+                }
+              }
+              
+              // Clean seed vector, ready for next bvec sweep
+              for(int i=0; i<nz_seed; ++i) seed_v[i]=0;
+              
+              // Clean lookup table
+              lookup_row.clear();
+              lookup_col.clear();
+              lookup_value.clear();
+           }
+           
+           if (n_fine_blocks_max>fci_cap) {
+             fci_offset += min(n_fine_blocks_max,fci_cap);
+             bvec_i = 0;
+             fci_cap = bvec_size;
+           } else {
+             f_finished = true;
+           }
+         
+         }
+         
+      }
+
+      // Swap results if adjoint mode was used
+      if (use_fwd) {
+       // Construct fine sparsity pattern
+       r = sp_triplet(fine_row.size()-1, fine_col.size()-1, jrow, jcol);
+       coarse_row = fine_row;
+       coarse_col = fine_col;
+      } else {
+       // Construct fine sparsity pattern
+       r = sp_triplet( fine_col.size()-1,fine_row.size()-1, jcol, jrow);
+       coarse_row = fine_col;
+       coarse_col = fine_row;
+      }
+      hasrun = true;
+    }
+    casadi_log("Number of sweeps: " << nsweeps );
+    
+    return r;
+}
+
+CRSSparsity FXInternal::getJacSparsity(int iind, int oind, bool symmetric){
+  // Check if we are able to propagate dependencies through the function
+  if(spCanEvaluate(true) || spCanEvaluate(false)){
+    
+    if (input(iind).size()>1 && output(oind).size()>1) {
+      if (symmetric) {
+        return getJacSparsityHierarchicalSymm(iind, oind);
+      } else {
+        return getJacSparsityHierarchical(iind, oind);
+      }
+    } else {
+      return getJacSparsityPlain(iind, oind);
+    }
+
 
   } else {
     // Dense sparsity by default
@@ -443,7 +982,7 @@ void FXInternal::setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool 
   }
 }
 
-CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact){
+CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact, bool symmetric){
   casadi_assert_message(isInit(),"Function not initialized.");
 
   // Get a reference to the block
@@ -454,7 +993,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact){
     if(compact){
       if(spgen_==0){
         // Use internal routine to determine sparsity
-        jsp = getJacSparsity(iind,oind);
+        jsp = getJacSparsity(iind,oind,symmetric);
       } else {
         // Create a temporary FX instance
         FX tmp;
@@ -466,7 +1005,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact){
     } else {
       
       // Get the compact sparsity pattern
-      CRSSparsity sp = jacSparsity(iind,oind,true);
+      CRSSparsity sp = jacSparsity(iind,oind,true,symmetric);
 
       // Enlarge if sparse output 
       if(output(oind).numel()!=sp.size1()){
@@ -508,7 +1047,7 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
   log("FXInternal::getPartition begin");
   
   // Sparsity pattern with transpose
-  CRSSparsity &A = jacSparsity(iind,oind,compact);
+  CRSSparsity &A = jacSparsity(iind,oind,compact,symmetric);
   vector<int> mapping;
   CRSSparsity AT = symmetric ? A : A.transpose(mapping);
   mapping.clear();
@@ -529,34 +1068,157 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
     // Star coloring if symmetric
     log("FXInternal::getPartition starColoring");
     D1 = A.starColoring();
+    if(verbose()){
+      cout << "Star coloring completed: " << D1.size1() << " directional derivatives needed (" << A.size2() << " without coloring)." << endl;
+    }
     
   } else {
     
-    // Test unidirectional coloring using forward mode
-    if(test_ad_fwd){
-      log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
-      D1 = AT.unidirectionalColoring(A);
-    }
-      
-    // Test unidirectional coloring using reverse mode
-    if(test_ad_adj){
-      log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
-      D2 = A.unidirectionalColoring(AT);
-    }
+    // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
+    int adj_penalty = 2;
 
-    // Use whatever required less colors if we tried both (with preference to forward mode)
-    if(test_ad_fwd && test_ad_adj){
-      if((D1.size1() <= D2.size1())){
-        D2=CRSSparsity();
+    // Best coloring encountered so far
+    int best_coloring = numeric_limits<int>::max();
+
+    // Test forward mode first?
+    bool test_fwd_first = A.size2() <= adj_penalty*A.size1();
+    int mode_fwd = test_fwd_first ? 0 : 1;
+
+    // Test both coloring modes
+    for(int mode=0; mode<2; ++mode){
+      // Is this the forward mode?
+      bool fwd = mode==mode_fwd;
+      
+      // Skip?
+      if(!test_ad_fwd && fwd) continue;
+      if(!test_ad_adj && !fwd) continue;
+
+      // Perform the coloring
+      if(fwd){
+	log("FXInternal::getPartition unidirectional coloring (forward mode)");
+	D1 = AT.unidirectionalColoring(A,best_coloring);
+	if(D1.isNull()){
+	  if(verbose()) cout << "Forward mode coloring interrupted (more than " << best_coloring << " needed)." << endl; 
+	} else {
+	  if(verbose()) cout << "Forward mode coloring completed: " << D1.size1() << " directional derivatives needed (" << A.size2() << " without coloring)." << endl;
+	  D2 = CRSSparsity();
+	  best_coloring = D1.size1();
+	}
       } else {
-        D1=CRSSparsity();
+	log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
+	int max_colorings_to_test = best_coloring/adj_penalty;
+	D2 = A.unidirectionalColoring(AT,max_colorings_to_test);	
+	if(D2.isNull()){
+	  if(verbose()) cout << "Adjoint mode coloring interrupted (more than " << max_colorings_to_test << " needed)." << endl; 
+	} else {
+	  if(verbose()) cout << "Adjoint mode coloring completed: " << D2.size1() << " directional derivatives needed (" << A.size1() << " without coloring)." << endl;
+	  D1 = CRSSparsity();
+	  best_coloring = D2.size1();
+	}
       }
     }
-    if(verbose()){
-      bool use_fwd = D2.isNull();
-      int ndir = use_fwd ? D1.size1() : D2.size1();
-      const char* mode = use_fwd ? "forward" : "adjoint";
-      cout << "FXInternal::getPartition end, " << ndir << " " << mode << " mode directional derivatives needed." << endl;
+
+    log("FXInternal::getPartition end");
+  }
+}
+
+void FXInternal::evaluateCompressed(int nfdir, int nadir){
+  // Counter for compressed forward directions
+  int nfdir_compressed=0;
+
+  // Check if any forward directions are all zero
+  for(int dir=0; dir<nfdir; ++dir){
+    
+    // Can we compress this direction?
+    compressed_fwd_[dir] = true;
+
+    // Look out for nonzeros
+    for(int ind=0; compressed_fwd_[dir] && ind<getNumInputs(); ++ind){
+      const vector<double>& v = fwdSeedNoCheck(ind,dir).data();
+      for(vector<double>::const_iterator it=v.begin(); compressed_fwd_[dir] && it!=v.end(); ++it){
+	if(*it!=0) compressed_fwd_[dir]=false;
+      }
+    }
+
+    // Skip if we can indeed compress
+    if(compressed_fwd_[dir]) continue;
+    
+    // Move the direction to a previous direction if different
+    if(dir!=nfdir_compressed){
+      for(int ind=0; ind<getNumInputs(); ++ind){
+	const vector<double>& v_old = fwdSeedNoCheck(ind,dir).data();
+	vector<double>& v_new = fwdSeedNoCheck(ind,nfdir_compressed).data();
+	copy(v_old.begin(),v_old.end(),v_new.begin());
+      }
+    }
+    
+    // Increase direction counter
+    nfdir_compressed++;
+  }
+
+  // Counter for compressed adjoint directions
+  int nadir_compressed=0;
+
+  // Check if any adjoint directions are all zero
+  for(int dir=0; dir<nadir; ++dir){
+    
+    // Can we compress this direction?
+    compressed_adj_[dir] = true;
+
+    // Look out for nonzeros
+    for(int ind=0; compressed_adj_[dir] && ind<getNumOutputs(); ++ind){
+      const vector<double>& v = adjSeedNoCheck(ind,dir).data();
+      for(vector<double>::const_iterator it=v.begin(); compressed_adj_[dir] && it!=v.end(); ++it){
+	if(*it!=0) compressed_adj_[dir]=false;
+      }
+    }
+
+    // Skip if we can indeed compress
+    if(compressed_adj_[dir]) continue;
+    
+    // Move the direction to a previous direction if different
+    if(dir!=nadir_compressed){
+      for(int ind=0; ind<getNumOutputs(); ++ind){
+	const vector<double>& v_old = adjSeedNoCheck(ind,dir).data();
+	vector<double>& v_new = adjSeedNoCheck(ind,nadir_compressed).data();
+	copy(v_old.begin(),v_old.end(),v_new.begin());
+      }
+    }
+    
+    // Increase direction counter
+    nadir_compressed++;
+  }
+  
+  // Evaluate compressed
+  evaluate(nfdir_compressed,nadir_compressed);
+
+  // Decompress forward directions in reverse order
+  for(int dir=nfdir-1; dir>=0; --dir){
+    if(compressed_fwd_[dir]){
+      for(int ind=0; ind<getNumOutputs(); ++ind){
+	fwdSensNoCheck(ind,dir).setZero();
+      }
+    } else if(--nfdir_compressed != dir){
+      for(int ind=0; ind<getNumOutputs(); ++ind){
+	const vector<double>& v_old = fwdSensNoCheck(ind,nfdir_compressed).data();
+	vector<double>& v_new = fwdSensNoCheck(ind,dir).data();
+	copy(v_old.begin(),v_old.end(),v_new.begin());
+      }
+    }
+  }
+
+  // Decompress adjoint directions in reverse order
+  for(int dir=nadir-1; dir>=0; --dir){
+    if(compressed_adj_[dir]){
+      for(int ind=0; ind<getNumInputs(); ++ind){
+	adjSensNoCheck(ind,dir).setZero();
+      }
+    } else if(--nadir_compressed != dir){
+      for(int ind=0; ind<getNumInputs(); ++ind){
+	const vector<double>& v_old = adjSensNoCheck(ind,nadir_compressed).data();
+	vector<double>& v_new = adjSensNoCheck(ind,dir).data();
+	copy(v_old.begin(),v_old.end(),v_new.begin());
+      }
     }
   }
 }
@@ -564,7 +1226,7 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
 void FXInternal::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
       const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
       const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-      bool output_given, int offset_begin, int offset_end){
+      bool output_given){
   casadi_error("FXInternal::evalSX not defined for class " << typeid(*this).name());
 }
 
@@ -642,6 +1304,7 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
   ss << "jacobian_" << getOption("name") << "_" << iind << "_" << oind;
   ret.setOption("name",ss.str());
   ret.setOption("verbose",getOption("verbose"));
+  ret.setInputScheme(inputScheme);
   return ret;
 }
 
@@ -666,10 +1329,31 @@ FX FXInternal::derivative(int nfwd, int nadj){
   // Return value
   FX& ret = derivative_fcn_[nfwd][nadj];
 
-  // Check if already cached
+  // Generate if not already cached
   if(ret.isNull()){
-    // Generate a new function
-    ret = getDerivative(nfwd,nadj);
+
+    // Get the number of scalar inputs and outputs
+    int num_in_scalar = getNumScalarInputs();
+    int num_out_scalar = getNumScalarOutputs();
+  
+    // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
+    int adj_penalty = 2;
+    
+    // Crude estimate of the cost of calculating the full Jacobian
+    int full_jac_cost = std::min(num_in_scalar, adj_penalty*num_out_scalar);
+    
+    // Crude estimate of the cost of calculating the directional derivatives
+    int der_dir_cost = nfwd + adj_penalty*nadj;
+    
+    // Check if it is cheaper to calculate the full Jacobian and then multiply
+    if(2*full_jac_cost < der_dir_cost){
+      // Generate the Jacobian and then multiply to get the derivative
+      //ret = getDerivativeViaJac(nfwd,nadj); // NOTE: Uncomment this line (and remove the next line) to enable this feature
+      ret = getDerivative(nfwd,nadj);    
+    } else {
+      // Generate a new function
+      ret = getDerivative(nfwd,nadj);    
+    }
     
     // Give it a suitable name
     stringstream ss;
@@ -686,6 +1370,16 @@ FX FXInternal::derivative(int nfwd, int nadj){
 
 FX FXInternal::getDerivative(int nfwd, int nadj){
   casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
+}
+
+FX FXInternal::getDerivativeViaJac(int nfwd, int nadj){
+  // Wrap in an MXFunction
+  vector<MX> arg = symbolicInput();
+  vector<MX> res = shared_from_this<FX>().call(arg);
+  FX f = MXFunction(arg,res);
+  f.setInputScheme(getInputScheme());
+  f.init();
+  return f->getDerivativeViaJac(nfwd,nadj);
 }
 
 int FXInternal::getNumScalarInputs() const{
@@ -713,7 +1407,7 @@ int FXInternal::outputSchemeEntry(const std::string &name) const {
 }
 
 int FXInternal::schemeEntry(InputOutputScheme scheme, const std::string &name) const {
-  if (scheme=SCHEME_unknown) casadi_error("Unable to look up '" <<  name<< "' in input scheme, as the input scheme of this function is unknown. You can only index with integers.");
+  if (scheme==SCHEME_unknown) casadi_error("Unable to look up '" <<  name<< "' in input scheme, as the input scheme of this function is unknown. You can only index with integers.");
   if (name=="") casadi_error("FXInternal::inputSchemeEntry: you supplied an empty string as the name of a entry in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
   int n = getSchemeEntryEnum(scheme,name);
   if (n==-1) casadi_error("FXInternal::inputSchemeEntry: could not find entry '" << name << "' in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
@@ -741,10 +1435,10 @@ void FXInternal::call(const MXVector& arg, MXVector& res,  const MXVectorVector&
 
     // Assumes initialised
     for(int i=0; i<arg.size(); ++i){
-      if(arg[i].isNull() || arg[i].empty()) continue;
+      if(arg[i].isNull() || arg[i].empty() || input(i).isNull() || input(i).empty()) continue;
       casadi_assert_message(arg[i].size1()==input(i).size1() && arg[i].size2()==input(i).size2(),
                             "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
-                            std::endl << "Input argument " << i << " has shape (" << input(i).size1() << 
+                            std::endl << describeInput(inputScheme,i) <<  " has shape (" << input(i).size1() << 
                             "," << input(i).size2() << ") while a shape (" << arg[i].size1() << "," << arg[i].size2() << 
                             ") was supplied.");
     }
@@ -765,10 +1459,159 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
   vector<MX> arg = symbolicInput();
   vector<MX> res = shared_from_this<FX>().call(arg);
   FX f = MXFunction(arg,res);
-  f.setOption("numeric_jacobian", false);
+  f.setOption("numeric_jacobian", false); // BUG ?
+  f.setInputScheme(getInputScheme());
   f.init();
   return f->getNumericJacobian(iind,oind,compact,symmetric);
 }
+
+  FX FXInternal::fullJacobian(){
+    if(full_jacobian_.alive()){
+      // Return cached Jacobian
+      return shared_cast<FX>(full_jacobian_.shared());
+    } else {
+      // Generate a new Jacobian
+      FX ret;
+      if(getNumInputs()==1 && getNumOutputs()==1){
+	ret = jacobian(0,0,true,false);
+      } else {
+	getFullJacobian();
+      }
+
+      // Return and cache it for reuse
+      full_jacobian_ = ret;
+      return ret;
+    }
+  }
+
+  FX FXInternal::getFullJacobian(){
+    // Count the total number of inputs and outputs
+    int num_in_scalar = getNumScalarInputs();
+    int num_out_scalar = getNumScalarOutputs();
+
+    // Generate a function from all input nonzeros to all output nonzeros
+    MX arg = msym("arg",num_in_scalar);
+    
+    // Assemble vector inputs
+    int nz_offset = 0; // Current nonzero offset
+    vector<MX> argv(getNumInputs());
+    for(int ind=0; ind<argv.size(); ++ind){
+      const CRSSparsity& sp = input(ind).sparsity();
+      argv[ind] = reshape(arg[Slice(nz_offset,nz_offset+sp.size())],sp);
+      nz_offset += sp.size();
+    }
+    casadi_assert(nz_offset == num_in_scalar);
+
+    // Call function to get vector outputs
+    vector<MX> resv = shared_from_this<FX>().call(argv);
+
+    // Get the nonzeros of each output
+    for(int ind=0; ind<resv.size(); ++ind){
+      if(resv[ind].size2()!=1 || !resv[ind].dense()){
+	resv[ind] = resv[ind][Slice()];
+      }
+    }
+
+    // Concatenate to get all output nonzeros
+    MX res = vertcat(resv);
+    casadi_assert(res.size() == num_out_scalar);
+
+    // Form function of all inputs nonzeros to all output nonzeros and return Jacobian of this
+    FX f = MXFunction(arg,res);
+    f.init();
+    return f.jacobian(0,0,false,false);
+  }
+  
+  void FXInternal::setInputScheme(InputOutputScheme scheme) {
+    inputScheme = scheme;
+  }
+
+  void FXInternal::setOutputScheme(InputOutputScheme scheme) {
+    outputScheme = scheme;
+  }
+  
+  InputOutputScheme FXInternal::getInputScheme() const { return inputScheme; }
+  InputOutputScheme FXInternal::getOutputScheme() const { return outputScheme; }
+
+
+  void FXInternal::generateCode(const string& src_name){
+    casadi_error("FXInternal::generateCode: generateCode not defined for class " << typeid(*this).name());
+  }
+
+  void FXInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const{
+    casadi_error("FXInternal::generateFunction: generateFunction not defined for class " << typeid(*this).name());
+  }
+ 
+  void FXInternal::generateIO(CodeGenerator& gen){
+    // Short-hands
+    int n_i = input_.size();
+    int n_o = output_.size();
+    int n_io = n_i + n_o;
+    stringstream &s = gen.function_;
+    
+    // Function that returns the number of inputs and outputs
+    s << "int init(int *n_in, int *n_out){" << endl;
+    s << "  *n_in = " << n_i << ";" << endl;
+    s << "  *n_out = " << n_o << ";" << endl;
+    s << "  return 0;" << endl;
+    s << "}" << endl;
+    s << endl;
+
+    // Inputs and outputs for each parsity index
+    std::multimap<int,int> io_sparsity_index;
+  
+    // The number of patterns needed for the inputs and outputs
+    int num_io_patterns = 0;
+
+    // Get the sparsity pattern of all inputs
+    for(int i=0; i<n_io; ++i){
+      // Get the sparsity pattern
+      const CRSSparsity& sp = i<n_i ? input(i).sparsity() : output(i-n_i).sparsity();
+      
+      // Print the sparsity pattern or retrieve the index of an existing pattern
+      int ind = gen.addSparsity(sp);
+      num_io_patterns = std::max(num_io_patterns,ind+1);
+      
+      // Store the index    
+      io_sparsity_index.insert(std::pair<int,int>(ind,i));
+    }
+
+    // Function that returns the sparsity pattern
+    s << "int getSparsity(int i, int *nrow, int *ncol, int **rowind, int **col){" << endl;
+    
+    // Get the sparsity index using a switch
+    s << "  int* sp;" << endl;
+    s << "  switch(i){" << endl;
+    
+    // Loop over all sparsity patterns
+    for(int i=0; i<num_io_patterns; ++i){
+      // Get the range of matching sparsity patterns
+      typedef std::multimap<int,int>::const_iterator it_type;
+      std::pair<it_type,it_type> r = io_sparsity_index.equal_range(i);
+      
+      // Print the cases covered
+      for(it_type it=r.first; it!=r.second; ++it){
+	s << "    case " << it->second << ":" << endl;
+      }
+      
+      // Map to sparsity
+      s << "      sp = s" << i << "; break;" << endl;
+    }
+    
+    // Finalize the switch
+    s << "    default:" << endl;
+    s << "      return 1;" << endl;
+    s << "  }" << endl << endl;
+    
+    // Decompress the sparsity pattern
+    s << "  *nrow = sp[0];" << endl;
+    s << "  *ncol = sp[1];" << endl;
+    s << "  *rowind = sp + 2;" << endl;
+    s << "  *col = sp + 2 + (*nrow + 1);" << endl;
+    s << "  return 0;" << endl;
+    s << "}" << endl << endl;
+  }
+
 
 } // namespace CasADi
 

@@ -8,24 +8,15 @@
 <tr><td>INTEGRATOR_RQF</td><td>Backward quadrature state at the initial time [rqf].</td></tr>
 </table>
 */
-/** \defgroup scheme_JACInput
+/** \defgroup scheme_SDPOutput
 <table>
-<caption>Input scheme: CasADi::JACInput  (JAC_NUM_IN = 6) </caption>
+<caption>Output scheme: CasADi::SDPOutput  (SDP_NUM_OUT = 5) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>JAC_T</td><td></td></tr>
-<tr><td>JAC_X</td><td></td></tr>
-<tr><td>JAC_Z</td><td></td></tr>
-<tr><td>JAC_XDOT</td><td></td></tr>
-<tr><td>JAC_P</td><td></td></tr>
-<tr><td>JAC_CJ</td><td></td></tr>
-</table>
-*/
-/** \defgroup scheme_MUSCOD_FCN_Output
-<table>
-<caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 2) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>MUSCOD_FCN_RHS</td><td></td></tr>
-<tr><td>MUSCOD_FCN_RES</td><td></td></tr>
+<tr><td>SDP_PRIMAL</td><td>The primal solution (m x 1) - may be used as initial guess [primal].</td></tr>
+<tr><td>SDP_PRIMAL_P</td><td>The solution P (n x n) - may be used as initial guess [p].</td></tr>
+<tr><td>SDP_DUAL</td><td>The dual solution (n x n) - may be used as initial guess [dual].</td></tr>
+<tr><td>SDP_PRIMAL_COST</td><td>The primal optimal cost (1 x 1) [primal_cost].</td></tr>
+<tr><td>SDP_DUAL_COST</td><td>The dual optimal cost (1 x 1) [dual_cost].</td></tr>
 </table>
 */
 /** \defgroup scheme_QPInput
@@ -33,7 +24,7 @@
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>QP_H</td><td>The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h].</td></tr>
-<tr><td>QP_G</td><td>The column vector G: dense, (nx x 1) [g].</td></tr>
+<tr><td>QP_G</td><td>The vector G: dense, (nx x 1) [g].</td></tr>
 <tr><td>QP_A</td><td>The matrix A: sparse, (nc x nx) - product with x must be dense. [a].</td></tr>
 <tr><td>QP_LBA</td><td>dense, (nc x 1) [lba]</td></tr>
 <tr><td>QP_UBA</td><td>dense, (nc x 1) [uba]</td></tr>
@@ -66,6 +57,15 @@
 <tr><td>ACADO_UBR</td><td>Upper bound on the initial constraint function (default: 0) [ubr].</td></tr>
 </table>
 */
+/** \defgroup scheme_SDPInput
+<table>
+<caption>Input scheme: CasADi::SDPInput  (SDP_NUM_IN = 3) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>SDP_A</td><td>The vertical stack of all matrices A_i: ( nm x n) [a].</td></tr>
+<tr><td>SDP_B</td><td>The vector b: ( m x 1) [b].</td></tr>
+<tr><td>SDP_C</td><td>The matrix C: ( n x n) [c].</td></tr>
+</table>
+*/
 /** \defgroup scheme_ACADO_FCN_Input
 <table>
 <caption>Input scheme: CasADi::ACADO_FCN_Input  (ACADO_FCN_NUM_IN = 6) </caption>
@@ -80,7 +80,7 @@
 */
 /** \defgroup scheme_RDAEInput
 <table>
-<caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 9) </caption>
+<caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>RDAE_RX</td><td>Backward differential state [rx].</td></tr>
 <tr><td>RDAE_RZ</td><td>Backward algebraic state [rz].</td></tr>
@@ -89,8 +89,6 @@
 <tr><td>RDAE_Z</td><td>Forward algebraic state [z].</td></tr>
 <tr><td>RDAE_P</td><td>Parameter vector [p].</td></tr>
 <tr><td>RDAE_T</td><td>Explicit time dependence [t].</td></tr>
-<tr><td>RDAE_XDOT</td><td>Time derivative of differential states [xdot].</td></tr>
-<tr><td>RDAE_RXDOT</td><td>Time derivative of backward differential state [rxdot].</td></tr>
 </table>
 */
 /** \defgroup scheme_LOFunInputs
@@ -122,22 +120,14 @@
 <tr><td>NLP_G</td><td>The constraints evaluated at the optimal solution (m x 1) [g].</td></tr>
 </table>
 */
-/** \defgroup scheme_JACOutput
-<table>
-<caption>Output scheme: CasADi::JACOutput  (JAC_NUM_OUT = 1) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>JAC_J</td><td></td></tr>
-</table>
-*/
 /** \defgroup scheme_DAEInput
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 5) </caption>
+<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>DAE_X</td><td>Differential state [x].</td></tr>
 <tr><td>DAE_Z</td><td>Algebraic state [z].</td></tr>
 <tr><td>DAE_P</td><td>Parameter [p].</td></tr>
 <tr><td>DAE_T</td><td>Explicit time dependence [t].</td></tr>
-<tr><td>DAE_XDOT</td><td>Time derivative of differential states [xdot].</td></tr>
 </table>
 */
 /** \defgroup scheme_ACADO_Output
@@ -161,7 +151,7 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <table>
-<caption>Input scheme: CasADi::InputOutputScheme  ( = 18) </caption>
+<caption>Input scheme: CasADi::InputOutputScheme  ( = 20) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -181,12 +171,14 @@
 <tr><td>SCHEME_OCPOutput</td><td></td></tr>
 <tr><td>SCHEME_QPInput</td><td></td></tr>
 <tr><td>SCHEME_QPOutput</td><td></td></tr>
+<tr><td>SCHEME_SDPInput</td><td></td></tr>
+<tr><td>SCHEME_SDPOutput</td><td></td></tr>
 <tr><td>SCHEME_unknown</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
 <table>
-<caption>Output scheme: CasADi::InputOutputScheme  ( = 18) </caption>
+<caption>Output scheme: CasADi::InputOutputScheme  ( = 20) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -206,14 +198,9 @@
 <tr><td>SCHEME_OCPOutput</td><td></td></tr>
 <tr><td>SCHEME_QPInput</td><td></td></tr>
 <tr><td>SCHEME_QPOutput</td><td></td></tr>
+<tr><td>SCHEME_SDPInput</td><td></td></tr>
+<tr><td>SCHEME_SDPOutput</td><td></td></tr>
 <tr><td>SCHEME_unknown</td><td></td></tr>
-</table>
-*/
-/** \defgroup scheme_MOutput
-<table>
-<caption>Output scheme: CasADi::MOutput  (M_NUM_OUT = 1) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>M_M</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_MayerInput
@@ -226,7 +213,7 @@
 */
 /** \defgroup scheme_ControlledDAEInput
 <table>
-<caption>Input scheme: CasADi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 10) </caption>
+<caption>Input scheme: CasADi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>CONTROL_DAE_T</td><td>Global physical time. (1-by-1) [t].</td></tr>
 <tr><td>CONTROL_DAE_X</td><td>State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [x].</td></tr>
@@ -234,7 +221,6 @@
 <tr><td>CONTROL_DAE_P</td><td>Parameter vector (dimension np-by-1). [p].</td></tr>
 <tr><td>CONTROL_DAE_U</td><td>Control vector (dimension nu-by-1). [u].</td></tr>
 <tr><td>CONTROL_DAE_U_INTERP</td><td>Control vector, linearly interpolated (dimension nu-by-1). [u_interp].</td></tr>
-<tr><td>CONTROL_DAE_XDOT</td><td>State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [xdot].</td></tr>
 <tr><td>CONTROL_DAE_X_MAJOR</td><td>State vector (dimension nx-by-1) at the last major time-step [x_major].</td></tr>
 <tr><td>CONTROL_DAE_T0</td><td>Time at start of control interval (1-by-1) [t0].</td></tr>
 <tr><td>CONTROL_DAE_TF</td><td>Time at end of control interval (1-by-1) [tf].</td></tr>
@@ -269,8 +255,8 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>OCP_X_OPT</td><td>Optimal state trajectory [x_opt].</td></tr>
 <tr><td>OCP_U_OPT</td><td>Optimal control trajectory [u_opt].</td></tr>
-<tr><td>OCP_XP_OPT</td><td>Optimal state derivative trajectory [xp_opt].</td></tr>
 <tr><td>OCP_P_OPT</td><td>Optimal parameters [p_opt].</td></tr>
+<tr><td>OCP_COST</td><td>Objective/cost function for optimal solution (1 x 1) [cost].</td></tr>
 </table>
 */
 /** \defgroup scheme_RDAEOutput
@@ -295,15 +281,11 @@
 */
 /** \defgroup scheme_OCPInput
 <table>
-<caption>Input scheme: CasADi::OCPInput  (OCP_NUM_IN = 17) </caption>
+<caption>Input scheme: CasADi::OCPInput  (OCP_NUM_IN = 13) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>OCP_T</td><td>Time grid: ((ns+1) x 1) - default: linspace(0,t_final,ns+1) [t].</td></tr>
 <tr><td>OCP_LBX</td><td>States lower bounds (nx x (ns+1)) [lbx].</td></tr>
 <tr><td>OCP_UBX</td><td>States upper bounds (nx x (ns+1)) [ubx].</td></tr>
 <tr><td>OCP_X_INIT</td><td>States initial guess (nx x (ns+1)) [x_init].</td></tr>
-<tr><td>OCP_LBXP</td><td>States deriatives lower bounds (nx x (ns+1)) [lbxp].</td></tr>
-<tr><td>OCP_UBXP</td><td>States deriatives upper bounds (nx x (ns+1)) [ubxp].</td></tr>
-<tr><td>OCP_XP_INIT</td><td>States deriatives initial guess (nx x (ns+1)) [xp_init].</td></tr>
 <tr><td>OCP_LBU</td><td>Controls lower bounds (nu x ns) [lbu].</td></tr>
 <tr><td>OCP_UBU</td><td>Controls upper bounds (nu x ns) [ubu].</td></tr>
 <tr><td>OCP_U_INIT</td><td>Controls initial guess (nu x ns) [u_init].</td></tr>
@@ -325,14 +307,12 @@
 <tr><td>CONTROLSIMULATOR_U</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nu) [u].</td></tr>
 </table>
 */
-/** \defgroup scheme_MInput
+/** \defgroup scheme_MUSCOD_FCN_Output
 <table>
-<caption>Input scheme: CasADi::MInput  (M_NUM_IN = 4) </caption>
+<caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>M_T</td><td></td></tr>
-<tr><td>M_Y</td><td></td></tr>
-<tr><td>M_P</td><td></td></tr>
-<tr><td>M_GAMMA</td><td></td></tr>
+<tr><td>MUSCOD_FCN_RHS</td><td></td></tr>
+<tr><td>MUSCOD_FCN_RES</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_LOFunOutputs
@@ -402,20 +382,6 @@
 <br/>
 @copydoc scheme_IntegratorOutput
 */
-/** \class CasADi::CollocationInternal
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
-/** \class CasADi::Collocation
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
 /** \class CasADi::IPInternal
 \n
 \par
@@ -468,6 +434,34 @@
 <br/>
 @copydoc scheme_QPOutput
 */
+/** \class CasADi::DSDPInternal
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
+*/
+/** \class CasADi::DSDPSolver
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
+*/
+/** \class CasADi::DirectSingleShootingInternal
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
+/** \class CasADi::DirectSingleShooting
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
 /** \class CasADi::LiftedSQPInternal
 \n
 \par
@@ -476,6 +470,20 @@
 @copydoc scheme_NLPOutput
 */
 /** \class CasADi::LiftedSQP
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
+/** \class CasADi::SCPgenInternal
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
+/** \class CasADi::SCPgen
 \n
 \par
 @copydoc scheme_NLPInput
@@ -510,19 +518,19 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
-/** \class CasADi::MultipleShootingInternal
+/** \class CasADi::SDPSolverInternal
 \n
 \par
-@copydoc scheme_OCPInput
+@copydoc scheme_SDPInput
 <br/>
-@copydoc scheme_OCPOutput
+@copydoc scheme_SDPOutput
 */
-/** \class CasADi::MultipleShooting
+/** \class CasADi::SDPSolver
 \n
 \par
-@copydoc scheme_OCPInput
+@copydoc scheme_SDPInput
 <br/>
-@copydoc scheme_OCPOutput
+@copydoc scheme_SDPOutput
 */
 /** \class CasADi::IdasInternal
 \n
@@ -608,6 +616,20 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
+/** \class CasADi::DirectMultipleShootingInternal
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
+/** \class CasADi::DirectMultipleShooting
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
 /** \class CasADi::RKIntegratorInternal
 \n
 \par
@@ -673,6 +695,20 @@
 \n
 \par
 @copydoc scheme_ControlSimulatorInput
+*/
+/** \class CasADi::DirectCollocationInternal
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
+/** \class CasADi::DirectCollocation
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
 */
 /** \class CasADi::WorhpInternal
 \n
