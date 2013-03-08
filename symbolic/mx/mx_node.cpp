@@ -307,10 +307,14 @@ namespace CasADi{
   }
   
   MX MXNode::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
-    MX ret = MX::create(new GetNonzeros(sp));
-    ret->assign(shared_from_this<MX>(),nz);
-    simplify(ret);
-    return ret;
+    if(nz.size()>0){
+      MX ret = MX::create(new GetNonzeros(sp));
+      ret->assign(shared_from_this<MX>(),nz);
+      simplify(ret);
+      return ret;
+    } else {
+      return MX::zeros(sp);
+    }
   }
 
   MX MXNode::getSetNonzeros(const MX& y, const std::vector<int>& nz) const{
