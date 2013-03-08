@@ -42,23 +42,6 @@ namespace CasADi{
     return new GetNonzeros(*this);
   }
 
-  template<typename T>
-  void GetNonzeros::evaluateBlock(int iind, const vector<T>& idata, vector<T>& odata, bool fwd) const{
-    // Get references to the assignment operations
-    const IOMap& assigns = input_sorted_[iind];
-  
-    if(fwd){
-      // Assignment operations
-      for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it)
-	odata[it->second] += idata[it->first];
-
-    } else {
-      // Assignment operations
-      for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it)
-	odata[it->first] += idata[it->second];
-    }
-  }
-
   void GetNonzeros::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
@@ -85,18 +68,21 @@ namespace CasADi{
     
     // Nondifferentiated outputs
     if(input[0]!=0 && output[0]!=0)
-      evaluateBlock(0,input[0]->data(),output[0]->data(),true);
+      for(vector<pair<int,int> >::const_iterator it=assigns_.begin(); it!=assigns_.end(); ++it)
+	output[0]->data()[it->second] += input[0]->data()[it->first];
     
     // Forward sensitivities
     for(int d=0; d<nfwd; ++d){
       if(fwdSeed[d][0]!=0 && fwdSens[d][0]!=0)
-	evaluateBlock(0,fwdSeed[d][0]->data(),fwdSens[d][0]->data(),true);
+	for(vector<pair<int,int> >::const_iterator it=assigns_.begin(); it!=assigns_.end(); ++it)
+	  fwdSens[d][0]->data()[it->second] += fwdSeed[d][0]->data()[it->first];
     }
       
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
       if(adjSeed[d][0]!=0 && adjSens[d][0]!=0)
-	evaluateBlock(0,adjSeed[d][0]->data(),adjSens[d][0]->data(),false);
+	for(vector<pair<int,int> >::const_iterator it=assigns_.begin(); it!=assigns_.end(); ++it)
+	  adjSens[d][0]->data()[it->first] += adjSeed[d][0]->data()[it->second];
     }
     
     clearVector(adjSeed);
@@ -115,12 +101,11 @@ namespace CasADi{
     if(input[0]!=0 && output[0]!=0){
       
       // Get references to the assignment operations and data
-      const IOMap& assigns = input_sorted_[0];
       bvec_t *outputd = get_bvec_t(output[0]->data());
       bvec_t *inputd = get_bvec_t(input[0]->data());
       
       // Propate sparsity
-      for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it){
+      for(vector<pair<int,int> >::const_iterator it=assigns_.begin(); it!=assigns_.end(); ++it){
 	if(fwd){
 	  outputd[it->second] |= inputd[it->first];
 	} else {
@@ -142,7 +127,7 @@ namespace CasADi{
     } else if(numel()==1 && size()==1 && ndep()==1 && nz_sorted_[0].size()==1){
       if(part==1)
 	if(dep(0).numel()>1)
-	  stream << "[" << nz_sorted_[0][0].inz << "]";
+	  stream << "[" << nz_sorted_[0][0] << "]";
     } else {
       if(part==0){
 	stream << "mapping(";
@@ -154,12 +139,7 @@ namespace CasADi{
 	stream << "], nonzeros: [";
 	for(int k=0; k<nz_sorted_.size(); ++k){
 	  for(int kk=0; kk<nz_sorted_[k].size(); ++kk){
-	    if(ndep()>1){
-	      stream << nz_sorted_[k][kk].inz << "(" << nz_sorted_[k][kk].iind << ")";
-	    } else {
-	      stream << nz_sorted_[k][kk].inz;
-	    }
-	    stream << ",";
+	    stream << nz_sorted_[k][kk] << ",";
 	  }
 	}
 	stream << "])";      
@@ -180,19 +160,11 @@ namespace CasADi{
     casadi_assert(!d.isNull());
     
     // Add the node if it is not already a dependency
-    std::map<const MXNode*, int>::const_iterator it = depmap_.find(static_cast<const MXNode*>(d.get()));
-    int depind;
-    if(it==depmap_.end()){
-      depind = addDependency(d);
-      depmap_[static_cast<const MXNode*>(d.get())] = depind;
-    } else {
-      depind = it->second;
-    }
-    casadi_assert(depind==0);
+    int depind = addDependency(d);
     
     // Save the mapping
     for(int k=0; k<inz.size(); ++k){
-      OutputNZ new_el = {inz[k],depind};
+      int new_el = inz[k];
       if(!add) nz_sorted_[onz[k]].clear();
       nz_sorted_[onz[k]].push_back(new_el);
     }
@@ -205,20 +177,12 @@ namespace CasADi{
     casadi_assert(ndep()==1);
   
     // Clear the runtime
-    input_sorted_.resize(1);
-    input_sorted_[0].clear();
+    assigns_.clear();
   
     // For all the output nonzeros
     for(int onz=0; onz<nz_sorted_.size(); ++onz){
-
-      // Get the sum
-      const std::vector<OutputNZ>& sum = nz_sorted_[onz];
-    
-      // For all elements in the sum
-      for(std::vector<OutputNZ>::const_iterator it=sum.begin(); it!=sum.end(); ++it){
-      
-	// Add the element to the runtime
-	input_sorted_[it->iind].push_back(pair<int,int>(it->inz,onz));
+      for(std::vector<int>::const_iterator it=nz_sorted_[onz].begin(); it!=nz_sorted_[onz].end(); ++it){
+	assigns_.push_back(pair<int,int>(*it,onz));
       }
     }
   }
@@ -235,25 +199,13 @@ namespace CasADi{
     int nadj = adjSeed.size();
 
     // Function evaluation in sparse triplet format
-    vector<int> r_row, r_col, r_inz, r_offset;
-    if(!output_given){
-      r_offset.resize(1,0);
-    }
+    vector<int> r_row, r_col, r_inz;
   
     // Sensitivity matrices in sparse triplet format for all forward sensitivities
-    vector<vector<int> > f_row(nfwd), f_col(nfwd), f_inz(nfwd), f_offset(nfwd);
-    for(int d=0; d<nfwd; ++d){
-      f_offset[d].resize(1,0);
-    }
+    vector<vector<int> > f_row(nfwd), f_col(nfwd), f_inz(nfwd);
   
     // Sensitivity matrices in sparse triplet format for all adjoint sensitivities
-    vector<vector<vector<int> > > a_row(nadj), a_col(nadj), a_onz(nadj), a_offset(nadj);
-    for(int d=0; d<nadj; ++d){
-      a_row[d].resize(1);
-      a_col[d].resize(1);
-      a_onz[d].resize(1);
-      a_offset[d].resize(1,vector<int>(1,0));
-    }
+    vector<vector<int> > a_row(nadj), a_col(nadj), a_onz(nadj);
     
     // For all outputs
     if(output[0]!=0){
@@ -271,19 +223,16 @@ namespace CasADi{
 	const vector<int>& icol = isp.col();
 	vector<int> irow = isp.getRow();
 
-	// Get references to the assignment operations
-	const IOMap& assigns = input_sorted_[0];
-
 	// Find out which matrix elements that we are trying to calculate
-	vector<int> el_wanted(assigns.size()); // TODO: Move outside loop
-	for(int k=0; k<assigns.size(); ++k){
-	  el_wanted[k] = orow[assigns[k].second] + ocol[assigns[k].second]*osp.size1();
+	vector<int> el_wanted(assigns_.size()); // TODO: Move outside loop
+	for(int k=0; k<assigns_.size(); ++k){
+	  el_wanted[k] = orow[assigns_[k].second] + ocol[assigns_[k].second]*osp.size1();
 	}
 
 	// We next need to resort the assigns vector with increasing inputs instead of outputs
 	// Start by counting the number of inputs corresponding to each nonzero
 	vector<int> inz_count(icol.size()+1,0);
-	for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it){
+	for(vector<pair<int,int> >::const_iterator it=assigns_.begin(); it!=assigns_.end(); ++it){
 	  inz_count[it->first+1]++;
 	}
       
@@ -293,17 +242,17 @@ namespace CasADi{
 	}
       
 	// Get the order of assignments
-	vector<int> assigns_order(assigns.size()); // TODO: Move allocation outside loop
-	for(int k=0; k<assigns.size(); ++k){
+	vector<int> assigns_order(assigns_.size()); // TODO: Move allocation outside loop
+	for(int k=0; k<assigns_.size(); ++k){
 	  // Save the new index
-	  assigns_order[inz_count[assigns[k].first]++] = k;
+	  assigns_order[inz_count[assigns_[k].first]++] = k;
 	}
 
 	// Find out which matrix elements that we are trying to calculate
-	vector<int> el_known(assigns.size()); // TODO: Move allocation outside loop
-	for(int k=0; k<assigns.size(); ++k){
+	vector<int> el_known(assigns_.size()); // TODO: Move allocation outside loop
+	for(int k=0; k<assigns_.size(); ++k){
 	  // Get output nonzero
-	  int inz_k = assigns[assigns_order[k]].first;
+	  int inz_k = assigns_[assigns_order[k]].first;
         
 	  // Get element
 	  el_known[k] = irow[inz_k] + icol[inz_k]*isp.size1();
@@ -319,14 +268,13 @@ namespace CasADi{
 	  input[0]->sparsity().getNZInplace(temp);
 
 	  // Add to sparsity pattern
-	  for(int k=0; k<assigns.size(); ++k){
+	  for(int k=0; k<assigns_.size(); ++k){
 	    if(temp[k]!=-1){
 	      r_inz.push_back(temp[k]);
-	      r_col.push_back(ocol[assigns[assigns_order[k]].second]);
-	      r_row.push_back(orow[assigns[assigns_order[k]].second]);
+	      r_col.push_back(ocol[assigns_[assigns_order[k]].second]);
+	      r_row.push_back(orow[assigns_[assigns_order[k]].second]);
 	    }
 	  }
-	  r_offset.push_back(r_inz.size());
 	}
       
 	// Forward sensitivities
@@ -337,14 +285,13 @@ namespace CasADi{
 	  fwdSeed[d][0]->sparsity().getNZInplace(temp);
 
 	  // Add to sparsity pattern
-	  for(int k=0; k<assigns.size(); ++k){
+	  for(int k=0; k<assigns_.size(); ++k){
 	    if(temp[k]!=-1){
 	      f_inz[d].push_back(temp[k]);
-	      f_col[d].push_back(ocol[assigns[assigns_order[k]].second]);
-	      f_row[d].push_back(orow[assigns[assigns_order[k]].second]);
+	      f_col[d].push_back(ocol[assigns_[assigns_order[k]].second]);
+	      f_row[d].push_back(orow[assigns_[assigns_order[k]].second]);
 	    }
 	  }
-	  f_offset[d].push_back(f_inz[d].size());
 	}
       
 	// Continue of no adjoint sensitivities
@@ -361,21 +308,20 @@ namespace CasADi{
 	    adjSeed[d][0]->sparsity().getNZInplace(temp);
 	    
 	    // Add to sparsity pattern
-	    for(int k=0; k<assigns.size(); ++k){
+	    for(int k=0; k<assigns_.size(); ++k){
 	      if(temp[k]!=-1){
-		a_onz[d][0].push_back(temp[k]);
-		a_col[d][0].push_back(icol[assigns[k].first]);
-		a_row[d][0].push_back(irow[assigns[k].first]);
+		a_onz[d].push_back(temp[k]);
+		a_col[d].push_back(icol[assigns_[k].first]);
+		a_row[d].push_back(irow[assigns_[k].first]);
 	      }
 	    }
-	    a_offset[d][0].push_back(a_onz[d][0].size());
 	  }
 	}
       }
     }
     
     // Non-differentiated output
-    vector<int> r_onz, inz_local, onz_local;
+    vector<int> r_onz;
     if(!output_given){
       // For all outputs
       if(output[0]!=0){
@@ -389,22 +335,9 @@ namespace CasADi{
 	if(input[0]==0){
 	  *output[0] = MX::zeros(r_sp);
 	} else {
-	
-	  // Get the elements corresponding to the input index
-	  int iind0 = r_offset[0], iind1 = r_offset[1];
-
-	  // Get the input nonzeros
-	  inz_local.resize(iind1-iind0);
-	  copy(r_inz.begin()+iind0,r_inz.begin()+iind1,inz_local.begin());
-        
-	  // Get the output nonzeros
-	  onz_local.resize(iind1-iind0);
-	  copy(r_onz.begin()+iind0,r_onz.begin()+iind1,onz_local.begin());
-        
-	  // Save to mapping
-	  if(inz_local.size()>0){
+	  if(r_inz.size()>0){
 	    *output[0] = MX::create(new GetNonzeros(r_sp));
-	    (*output[0])->assign(*input[0],inz_local,onz_local,true);
+	    (*output[0])->assign(*input[0],r_inz,r_onz,true);
 	  } else {
 	    *output[0] = MX::zeros(r_sp);
 	  }
@@ -424,26 +357,12 @@ namespace CasADi{
 	// Create a sparsity pattern from vectors
 	CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),f_row[d],f_col[d],f_onz,true);
       
-	// Skip if input doesn't exist
 	if(input[0]==0){
 	  *fwdSens[d][0] = MX::zeros(f_sp);
 	} else {
-        
-	  // Get the elements corresponding to the input index
-	  int iind0 = f_offset[d][0], iind1 = f_offset[d][1];
-
-	  // Get the input nonzeros
-	  inz_local.resize(iind1-iind0);
-	  copy(f_inz[d].begin()+iind0,f_inz[d].begin()+iind1,inz_local.begin());
-        
-	  // Get the output nonzeros
-	  onz_local.resize(iind1-iind0);
-	  copy(f_onz.begin()+iind0,f_onz.begin()+iind1,onz_local.begin());
-        
-	  // Save to mapping
-	  if(inz_local.size()>0){
+	  if(f_inz[d].size()>0){
 	    *fwdSens[d][0] = MX::create(new GetNonzeros(f_sp));
-	    (*fwdSens[d][0])->assign(*fwdSeed[d][0],inz_local,onz_local,true);
+	    (*fwdSens[d][0])->assign(*fwdSeed[d][0],f_inz[d],f_onz,true);
 	  } else {
 	    *fwdSens[d][0] = MX::zeros(f_sp);
 	  }
@@ -462,27 +381,14 @@ namespace CasADi{
 	const CRSSparsity &isp = input[0]->sparsity();
       
 	// Create a sparsity pattern from vectors
-	CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),a_row[d][0],a_col[d][0],a_inz,true);
+	CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),a_row[d],a_col[d],a_inz,true);
       
 	// Create a mapping matrix
 	MX s = MX::create(new Mapping(a_sp));
      
 	// Add dependencies
 	if(output[0]!=0){
-          
-	  // Get the elements corresponding to the input index
-	  int oind0 = a_offset[d][0][0], oind1 = a_offset[d][0].at(1); // BUG!!!
-
-	  // Get the input nonzeros
-	  inz_local.resize(oind1-oind0);
-	  copy(a_inz.begin()+oind0,a_inz.begin()+oind1,inz_local.begin());
-        
-	  // Get the output nonzeros
-	  onz_local.resize(oind1-oind0);
-	  copy(a_onz[d][0].begin()+oind0,a_onz[d][0].begin()+oind1,onz_local.begin());
-        
-	  // Save to mapping
-	  s->assign(*adjSeed[d][0],onz_local,inz_local,true);
+	  s->assign(*adjSeed[d][0],a_onz[d],a_onz[d],true);
 	}
       
 	// Save to adjoint sensitivities
@@ -507,22 +413,15 @@ namespace CasADi{
     Matrix<int> ret(size1(),size2());
     for (int k=0;k<nz_sorted_.size();++k) { // Loop over output non-zeros
       for (int i=0;i<nz_sorted_[k].size(); ++i) { // Loop over elements to be summed
-	const OutputNZ &el = nz_sorted_[k][i];
-	if (el.iind==0) ret(row[k],col[k]) = el.inz;
+	int el = nz_sorted_[k][i];
+	ret(row[k],col[k]) = el;
       }
     }
     return ret;
   }
 
   std::vector<int> GetNonzeros::getDepInd() const {
-    // TODO: make this efficient
-    std::vector<int> ret(size());
-    for (int k=0;k<nz_sorted_.size();++k) { // Loop over output non-zeros
-      for (int i=0;i<nz_sorted_[k].size(); ++i) { // Loop over elements to be summed
-	const OutputNZ &el = nz_sorted_[k][i];
-	ret[k] = el.iind;
-      }
-    }
+    std::vector<int> ret(size(),0);
     return ret;
   }
 
@@ -539,8 +438,8 @@ namespace CasADi{
     // Check if the nonzeros follow in increasing order
     for(int k=0; k<nz_sorted_.size(); ++k){
       if(nz_sorted_[k].size()!=1) return false;
-      const OutputNZ &e = nz_sorted_[k].front();
-      if(e.inz != k || e.iind !=0) return false;
+      int e = nz_sorted_[k].front();
+      if(e != k) return false;
     }
     
     // True if reached this point
@@ -552,19 +451,18 @@ namespace CasADi{
     stream << "  for(i=0; i<" << sparsity().size() << "; ++i) " << res.front() << "[i]=0;" << endl;
 
     vector<int> tmp1,tmp2;
-    const IOMap& assigns = input_sorted_[0];
-    tmp1.resize(assigns.size());
-    tmp2.resize(assigns.size());
-    for(int i=0; i<assigns.size(); ++i){
-      tmp1[i] = assigns[i].first;
-      tmp2[i] = assigns[i].second;
+    tmp1.resize(assigns_.size());
+    tmp2.resize(assigns_.size());
+    for(int i=0; i<assigns_.size(); ++i){
+      tmp1[i] = assigns_[i].first;
+      tmp2[i] = assigns_[i].second;
     }
     // Condegen the indices
     int ind1 = gen.getConstant(tmp1,true);
     int ind2 = gen.getConstant(tmp2,true);
     
     // Codegen the assignments
-    stream << "  for(i=0; i<" << assigns.size() << "; ++i) " << res.front() << "[s" << ind2 << "[i]] += " << arg.front() << "[s" << ind1 << "[i]];" << endl;
+    stream << "  for(i=0; i<" << assigns_.size() << "; ++i) " << res.front() << "[s" << ind2 << "[i]] += " << arg.front() << "[s" << ind1 << "[i]];" << endl;
   }
 
   void GetNonzeros::simplifyMe(MX& ex){

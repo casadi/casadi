@@ -70,30 +70,17 @@ namespace CasADi{
 
     /// Initialize
     virtual void init();
-
-    /// Map to locate the dependencies
-    std::map<const MXNode*, int> depmap_;
-
-    /// Input nonzero and dependency index
-    struct OutputNZ{
-      int inz, iind;
-    };
     
     /// Operation sequence
-    typedef std::vector<std::pair<int,int> > IOMap;
-    
+        
     /* Operations sorted by output nonzero - always available
      *  The outer vector is size size()
      *  The inner vector lists elements to be summed
      */
-    std::vector<std::vector<OutputNZ> > nz_sorted_;
+    std::vector<std::vector<int> > nz_sorted_;
     
     /// Operations sorted by input (this is the runtime)
-    std::vector<IOMap> input_sorted_;
-
-    /// Evaluate a block given the data vectors
-    template<typename T>
-    void evaluateBlock(int iind, const std::vector<T>& idata, std::vector<T>& odata, bool fwd) const;
+    std::vector<std::pair<int,int> > assigns_;
 
     /// Evaluate the function (template)
     template<typename T, typename MatV, typename MatVV> 
