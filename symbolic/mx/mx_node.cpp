@@ -31,6 +31,7 @@
 #include "multiplication.hpp"
 #include "subref.hpp"
 #include "subassign.hpp"
+#include "mapping.hpp"
 
 using namespace std;
 
@@ -303,6 +304,23 @@ namespace CasADi{
       return MX::create(new Multiplication(shared_from_this<MX>(),trans(y)));    
     }
   }
+  
+  MX MXNode::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
+    MX ret = MX::create(new Mapping(sp));
+    ret->assign(shared_from_this<MX>(),nz);
+    simplifyMapping(ret);
+    return ret;
+  }
+
+  MX MXNode::getSetNonzeros(const MX& y, const std::vector<int>& nz) const{
+    return MX();
+  }
+
+
+  MX MXNode::getAddNonzeros(const MX& y, const std::vector<int>& nz) const{
+    return MX();
+  }
+
   
   MX MXNode::getSubRef(const Slice& i, const Slice& j) const{
     return MX::create(new SubRef(shared_from_this<MX>(),i,j));

@@ -80,10 +80,7 @@ namespace CasADi{
   
     // Dense matrix if val dense
     if(val.dense()){
-      // Create mapping
-      assignNode(new Mapping(sp));
-      (*this)->assign(val,vector<int>(sp.size(),0));
-      simplifyMapping(*this);
+      *this = val->getGetNonzeros(sp,vector<int>(sp.size(),0));
      } else {
       // Empty matrix
       *this = sparse(sp.size1(),sp.size2());
@@ -117,39 +114,25 @@ namespace CasADi{
     CRSSparsity sp = sparsity().sub(ii,jj,mapping);
  
     // Create return MX
-    MX ret = MX::create(new Mapping(sp));
-    ret->assign(*this,mapping);
-    simplifyMapping(ret);
-    return ret;
+    return (*this)->getGetNonzeros(sp,mapping);
   }
 
   const MX MX::sub(const Matrix<int>& k, int dummy) const {
-    MX ret = MX::create(new Mapping(k.sparsity()));
     int s = size();
     const std::vector<int> & d = k.data();
     for (int i=0;i< k.size();i++) {
       if (d[i]>=s) casadi_error("MX::sub: a non-zero element at position " << d[i] << " was requested, but MX is only " << dimString());
     }
-    ret->assign(*this,k.data());
-    simplifyMapping(ret);
-    return ret;
+    return (*this)->getGetNonzeros(k.sparsity(),k.data());
   }
 
   const MX MX::sub(int i, int j) const{
     int ind = sparsity().getNZ(i,j);
-
-    MX ret;
     if (ind>=0) {
-      const CRSSparsity& sp = CRSSparsity::scalarSparsity;
-      ret.assignNode(new Mapping(sp));
-      ret->assign(*this,vector<int>(1,ind));
+      return (*this)->getGetNonzeros(CRSSparsity::scalarSparsity,vector<int>(1,ind));
     } else {
-      const CRSSparsity& sp = CRSSparsity::scalarSparsitySparse;
-      ret.assignNode(new Mapping(sp));
-      ret->assign(*this,vector<int>(0));
+      return (*this)->getGetNonzeros(CRSSparsity::scalarSparsitySparse,vector<int>(0));
     }
-    simplifyMapping(ret);
-    return ret;
   }
 
   const MX MX::sub(const std::vector<int>& ii, const Matrix<int>& k) const{
@@ -371,25 +354,18 @@ namespace CasADi{
 
   MX MX::getNZ(const vector<int>& k) const{
     CRSSparsity sp(k.size(),1,true);
-    MX ret;
   
     for (int i=0;i<k.size();i++) {
       casadi_assert_message(k[i] < size(),"Mapping::assign: index vector reaches " << k[i] << ", while dependant is only of size " << size());
     }
   
-    ret.assignNode(new Mapping(sp));
-    ret->assign(*this,k);
-    simplifyMapping(ret);
+    MX ret = (*this)->getGetNonzeros(sp,k);
     return ret;
   }
 
   MX MX::getNZ(const Matrix<int>& k) const{
     CRSSparsity sp(k.size(),1,true);
-    MX ret;
-
-    ret.assignNode(new Mapping(sp));
-    ret->assign(*this,k.data());
-  
+    MX ret = (*this)->getGetNonzeros(sp,k.data());
     return ret;
   }
 
@@ -645,10 +621,7 @@ namespace CasADi{
   
     // Create new matrix
     if(mapping.size()!=size()){
-      MX ret;
-      ret.assignNode(new Mapping(sp));
-      ret->assign(*this,mapping);
-      simplifyMapping(ret);
+      MX ret = (*this)->getGetNonzeros(sp,mapping);
       *this = ret;
     }
   }
@@ -657,11 +630,7 @@ namespace CasADi{
     CRSSparsity sp = sparsity();
     sp.enlarge(nrow,ncol,ii,jj);
   
-    MX ret;
-    ret.assignNode(new Mapping(sp));
-    ret->assign(*this,range(size()));
-    simplifyMapping(ret);
-
+    MX ret = (*this)->getGetNonzeros(sp,range(size()));
     *this = ret;
   }
 
@@ -671,8 +640,7 @@ namespace CasADi{
     casadi_assert(val.dense());
   
     CRSSparsity sp(nrow,ncol,true);
-    assignNode(new Mapping(sp));
-    (*this)->assign(val,vector<int>(sp.size(),0));
+    *this = val->getGetNonzeros(sp,vector<int>(sp.size(),0));
   }
 
   MX MX::mul_full(const MX& y) const{

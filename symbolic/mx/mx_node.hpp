@@ -263,6 +263,15 @@ namespace CasADi{
     /// Matrix multiplcation
     virtual MX getMultiplication(const MX& y) const;
 
+    /// Get a submatrix: negative index in nz means zero
+    virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
+
+    /// Set a submatrix: negative index in nz means ignore
+    virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
+
+    /// Add a submatrix: negative index in nz means ignore
+    virtual MX getAddNonzeros(const MX& y, const std::vector<int>& nz) const;
+
     /// Get submatrix reference
     virtual MX getSubRef(const Slice& i, const Slice& j) const;    
 
