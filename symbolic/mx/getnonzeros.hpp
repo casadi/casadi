@@ -64,20 +64,9 @@ namespace CasADi{
 
     virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
 
-    /// Initialize
-    virtual void init();
-    
     /// Operation sequence
-        
-    /* Operations sorted by output nonzero - always available
-     *  The outer vector is size size()
-     *  The inner vector lists elements to be summed
-     */
     std::vector<int> assigns_;
     
-    /// Operations sorted by input (this is the runtime)
-    std::vector<std::pair<int,int> > assigns2_;
-
     /// Evaluate the function (template)
     template<typename T, typename MatV, typename MatVV> 
     void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);

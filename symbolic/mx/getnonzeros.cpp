@@ -149,21 +149,6 @@ namespace CasADi{
     }
   }
 
-  void GetNonzeros::init(){
-    // Call init of the base class
-    MXNode::init();
-
-    casadi_assert(ndep()==1);
-  
-    // Clear the runtime
-    assigns2_.clear();
-  
-    // For all the output nonzeros
-    for(int onz=0; onz<assigns_.size(); ++onz){
-      assigns2_.push_back(pair<int,int>(assigns_[onz],onz));
-    }
-  }
-
   void GetNonzeros::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     casadi_assert(input.size()==1);
 
@@ -201,16 +186,16 @@ namespace CasADi{
 	vector<int> irow = isp.getRow();
 
 	// Find out which matrix elements that we are trying to calculate
-	vector<int> el_wanted(assigns2_.size()); // TODO: Move outside loop
-	for(int k=0; k<assigns2_.size(); ++k){
-	  el_wanted[k] = orow[assigns2_[k].second] + ocol[assigns2_[k].second]*osp.size1();
+	vector<int> el_wanted(assigns_.size()); // TODO: Move outside loop
+	for(int k=0; k<assigns_.size(); ++k){
+	  el_wanted[k] = orow[k] + ocol[k]*osp.size1();
 	}
 
 	// We next need to resort the assigns vector with increasing inputs instead of outputs
 	// Start by counting the number of inputs corresponding to each nonzero
 	vector<int> inz_count(icol.size()+1,0);
-	for(vector<pair<int,int> >::const_iterator it=assigns2_.begin(); it!=assigns2_.end(); ++it){
-	  inz_count[it->first+1]++;
+	for(vector<int>::const_iterator it=assigns_.begin(); it!=assigns_.end(); ++it){
+	  inz_count[*it+1]++;
 	}
       
 	// Cumsum to get index offset for input nonzero
@@ -219,17 +204,17 @@ namespace CasADi{
 	}
       
 	// Get the order of assignments
-	vector<int> assigns2_order(assigns2_.size()); // TODO: Move allocation outside loop
-	for(int k=0; k<assigns2_.size(); ++k){
+	vector<int> assigns_order(assigns_.size()); // TODO: Move allocation outside loop
+	for(int k=0; k<assigns_.size(); ++k){
 	  // Save the new index
-	  assigns2_order[inz_count[assigns2_[k].first]++] = k;
+	  assigns_order[inz_count[assigns_[k]]++] = k;
 	}
 
 	// Find out which matrix elements that we are trying to calculate
-	vector<int> el_known(assigns2_.size()); // TODO: Move allocation outside loop
-	for(int k=0; k<assigns2_.size(); ++k){
+	vector<int> el_known(assigns_.size()); // TODO: Move allocation outside loop
+	for(int k=0; k<assigns_.size(); ++k){
 	  // Get output nonzero
-	  int inz_k = assigns2_[assigns2_order[k]].first;
+	  int inz_k = assigns_[assigns_order[k]];
         
 	  // Get element
 	  el_known[k] = irow[inz_k] + icol[inz_k]*isp.size1();
@@ -245,11 +230,11 @@ namespace CasADi{
 	  input[0]->sparsity().getNZInplace(temp);
 
 	  // Add to sparsity pattern
-	  for(int k=0; k<assigns2_.size(); ++k){
+	  for(int k=0; k<assigns_.size(); ++k){
 	    if(temp[k]!=-1){
 	      r_inz.push_back(temp[k]);
-	      r_col.push_back(ocol[assigns2_[assigns2_order[k]].second]);
-	      r_row.push_back(orow[assigns2_[assigns2_order[k]].second]);
+	      r_col.push_back(ocol[assigns_order[k]]);
+	      r_row.push_back(orow[assigns_order[k]]);
 	    }
 	  }
 	}
@@ -262,11 +247,11 @@ namespace CasADi{
 	  fwdSeed[d][0]->sparsity().getNZInplace(temp);
 
 	  // Add to sparsity pattern
-	  for(int k=0; k<assigns2_.size(); ++k){
+	  for(int k=0; k<assigns_.size(); ++k){
 	    if(temp[k]!=-1){
 	      f_inz[d].push_back(temp[k]);
-	      f_col[d].push_back(ocol[assigns2_[assigns2_order[k]].second]);
-	      f_row[d].push_back(orow[assigns2_[assigns2_order[k]].second]);
+	      f_col[d].push_back(ocol[assigns_order[k]]);
+	      f_row[d].push_back(orow[assigns_order[k]]);
 	    }
 	  }
 	}
@@ -285,11 +270,11 @@ namespace CasADi{
 	    adjSeed[d][0]->sparsity().getNZInplace(temp);
 	    
 	    // Add to sparsity pattern
-	    for(int k=0; k<assigns2_.size(); ++k){
+	    for(int k=0; k<assigns_.size(); ++k){
 	      if(temp[k]!=-1){
 		a_onz[d].push_back(temp[k]);
-		a_col[d].push_back(icol[assigns2_[k].first]);
-		a_row[d].push_back(irow[assigns2_[k].first]);
+		a_col[d].push_back(icol[assigns_[k]]);
+		a_row[d].push_back(irow[assigns_[k]]);
 	      }
 	    }
 	  }
@@ -417,18 +402,18 @@ namespace CasADi{
     stream << "  for(i=0; i<" << sparsity().size() << "; ++i) " << res.front() << "[i]=0;" << endl;
 
     vector<int> tmp1,tmp2;
-    tmp1.resize(assigns2_.size());
-    tmp2.resize(assigns2_.size());
-    for(int i=0; i<assigns2_.size(); ++i){
-      tmp1[i] = assigns2_[i].first;
-      tmp2[i] = assigns2_[i].second;
+    tmp1.resize(assigns_.size());
+    tmp2.resize(assigns_.size());
+    for(int i=0; i<assigns_.size(); ++i){
+      tmp1[i] = assigns_[i];
+      tmp2[i] = i;
     }
     // Condegen the indices
     int ind1 = gen.getConstant(tmp1,true);
     int ind2 = gen.getConstant(tmp2,true);
     
     // Codegen the assignments
-    stream << "  for(i=0; i<" << assigns2_.size() << "; ++i) " << res.front() << "[s" << ind2 << "[i]] += " << arg.front() << "[s" << ind1 << "[i]];" << endl;
+    stream << "  for(i=0; i<" << assigns_.size() << "; ++i) " << res.front() << "[s" << ind2 << "[i]] += " << arg.front() << "[s" << ind1 << "[i]];" << endl;
   }
 
   void GetNonzeros::simplifyMe(MX& ex){
