@@ -29,10 +29,10 @@
 
 namespace CasADi{
   /** \brief Maps non-zero elements
-  \author Joel Andersson
-  \date 2011
-*/
-class Mapping : public MXNode{
+      \author Joel Andersson
+      \date 2011
+  */
+  class Mapping : public MXNode{
   public:
 
     /// Constructor
@@ -83,17 +83,17 @@ class Mapping : public MXNode{
     typedef std::vector<std::pair<int,int> > IOMap;
     
     /* Operations sorted by output nonzero - always available
-    *  The outer vector is size size()
-    *  The inner vector lists elements to be summed
-    */
-    std::vector<std::vector<OutputNZ> > output_sorted_;
+     *  The outer vector is size size()
+     *  The inner vector lists elements to be summed
+     */
+    std::vector<std::vector<OutputNZ> > nz_sorted_;
     
-    /// Operations sorted by input and output index and then by output nonzero (this is the runtime)
-    std::vector<std::vector<IOMap> > index_output_sorted_;
+    /// Operations sorted by input (this is the runtime)
+    std::vector<IOMap> input_sorted_;
 
     /// Evaluate a block given the data vectors
     template<typename T>
-    void evaluateBlock(int iind, int oind, const std::vector<T>& idata, std::vector<T>& odata, bool fwd) const;
+    void evaluateBlock(int iind, const std::vector<T>& idata, std::vector<T>& odata, bool fwd) const;
 
     /// Evaluate the function (template)
     template<typename T, typename MatV, typename MatVV> 
@@ -116,7 +116,7 @@ class Mapping : public MXNode{
     
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_MAPPING;}    
-};
+  };
 
 } // namespace CasADi
 

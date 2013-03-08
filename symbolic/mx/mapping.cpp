@@ -36,7 +36,7 @@ namespace CasADi{
 
   Mapping::Mapping(const CRSSparsity& sp){
     setSparsity(sp);
-    output_sorted_.resize(sp.size());
+    nz_sorted_.resize(sp.size());
   }
 
   Mapping* Mapping::clone() const{
@@ -44,9 +44,9 @@ namespace CasADi{
   }
 
   template<typename T>
-  void Mapping::evaluateBlock(int iind, int oind, const vector<T>& idata, vector<T>& odata, bool fwd) const{
+  void Mapping::evaluateBlock(int iind, const vector<T>& idata, vector<T>& odata, bool fwd) const{
     // Get references to the assignment operations
-    const IOMap& assigns = index_output_sorted_[oind][iind];
+    const IOMap& assigns = input_sorted_[iind];
   
     if(fwd){
       // Assignment operations
@@ -74,34 +74,31 @@ namespace CasADi{
     int nadj = adjSeed.size();
     int nfwd = fwdSens.size();
 
-    // Loop over outputs
-    for(int oind=0; oind<output.size(); ++oind){
+    // Clear output and forward sensitivities
+    if(output[0]!=0)
+      output[0]->setZero();
 
-      // Clear output and forward sensitivities
-      if(output[oind]!=0)
-	output[oind]->setZero();
-      for(int d=0; d<nfwd; ++d)
-	if(fwdSens[d][oind]!=0)
-	  fwdSens[d][oind]->setZero();
+    for(int d=0; d<nfwd; ++d)
+      if(fwdSens[d][0]!=0)
+	fwdSens[d][0]->setZero();
     
-      // Loop over inputs
-      for(int iind=0; iind<input.size(); ++iind){
-    
-	// Nondifferentiated outputs
-	if(input[iind]!=0 && output[oind]!=0)
-	  evaluateBlock(iind,oind,input[iind]->data(),output[oind]->data(),true);
-
-	// Forward sensitivities
-	for(int d=0; d<nfwd; ++d){
-	  if(fwdSeed[d][iind]!=0 && fwdSens[d][oind]!=0)
-	    evaluateBlock(iind,oind,fwdSeed[d][iind]->data(),fwdSens[d][oind]->data(),true);
-	}
+    // Loop over inputs
+    for(int iind=0; iind<input.size(); ++iind){
       
-	// Adjoint sensitivities
-	for(int d=0; d<nadj; ++d){
-	  if(adjSeed[d][oind]!=0 && adjSens[d][iind]!=0)
-	    evaluateBlock(iind,oind,adjSeed[d][oind]->data(),adjSens[d][iind]->data(),false);
-	}
+      // Nondifferentiated outputs
+      if(input[iind]!=0 && output[0]!=0)
+	evaluateBlock(iind,input[iind]->data(),output[0]->data(),true);
+      
+      // Forward sensitivities
+      for(int d=0; d<nfwd; ++d){
+	if(fwdSeed[d][iind]!=0 && fwdSens[d][0]!=0)
+	  evaluateBlock(iind,fwdSeed[d][iind]->data(),fwdSens[d][0]->data(),true);
+      }
+      
+      // Adjoint sensitivities
+      for(int d=0; d<nadj; ++d){
+	if(adjSeed[d][0]!=0 && adjSens[d][iind]!=0)
+	  evaluateBlock(iind,adjSeed[d][0]->data(),adjSens[d][iind]->data(),false);
       }
     }
     clearVector(adjSeed);
@@ -109,51 +106,47 @@ namespace CasADi{
 
   void Mapping::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
   
-    // Loop over outputs
-    for(int oind=0; oind<output.size(); ++oind){
-
-      // Clear output
-      if(fwd && output[oind]!=0){
-	bvec_t *outputd = get_bvec_t(output[oind]->data());
-	fill_n(outputd,output[oind]->size(),0);
-      }
+    // Clear output
+    if(fwd && output[0]!=0){
+      bvec_t *outputd = get_bvec_t(output[0]->data());
+      fill_n(outputd,output[0]->size(),0);
+    }
     
-      // Loop over inputs
-      for(int iind=0; iind<input.size(); ++iind){
-    
-	// Nondifferentiated outputs
-	if(input[iind]!=0 && output[oind]!=0){
-
-	  // Get references to the assignment operations and data
-	  const IOMap& assigns = index_output_sorted_[oind][iind];
-	  bvec_t *outputd = get_bvec_t(output[oind]->data());
-	  bvec_t *inputd = get_bvec_t(input[iind]->data());
+    // Loop over inputs
+    for(int iind=0; iind<input.size(); ++iind){
+      
+      // Nondifferentiated outputs
+      if(input[iind]!=0 && output[0]!=0){
+	
+	// Get references to the assignment operations and data
+	const IOMap& assigns = input_sorted_[iind];
+	bvec_t *outputd = get_bvec_t(output[0]->data());
+	bvec_t *inputd = get_bvec_t(input[iind]->data());
         
-	  // Propate sparsity
-	  for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it){
-	    if(fwd){
-	      outputd[it->second] |= inputd[it->first];
-	    } else {
-	      inputd[it->first] |= outputd[it->second];
-	    }
+	// Propate sparsity
+	for(IOMap::const_iterator it=assigns.begin(); it!=assigns.end(); ++it){
+	  if(fwd){
+	    outputd[it->second] |= inputd[it->first];
+	  } else {
+	    inputd[it->first] |= outputd[it->second];
 	  }
 	}
       }
-      // Clear adjoint seeds
-      if(!fwd && output[oind]!=0){
-	bvec_t *outputd = get_bvec_t(output[oind]->data());
-	fill_n(outputd,output[oind]->size(),0);
-      }
+    }
+    // Clear adjoint seeds
+    if(!fwd && output[0]!=0){
+      bvec_t *outputd = get_bvec_t(output[0]->data());
+      fill_n(outputd,output[0]->size(),0);
     }
   }
 
   void Mapping::printPart(std::ostream &stream, int part) const{
     if(ndep()==0){
       stream << "sparse(" << size1() << "," << size2() << ")";
-    } else if(numel()==1 && size()==1 && ndep()==1 && output_sorted_[0].size()==1){
+    } else if(numel()==1 && size()==1 && ndep()==1 && nz_sorted_[0].size()==1){
       if(part==1)
 	if(dep(0).numel()>1)
-	  stream << "[" << output_sorted_[0][0].inz << "]";
+	  stream << "[" << nz_sorted_[0][0].inz << "]";
     } else {
       if(part==0){
 	stream << "mapping(";
@@ -163,12 +156,12 @@ namespace CasADi{
 	stream << " " << size1() << "-by-" << size2() << " matrix, dependencies: [";
       } else if(part==ndep()){
 	stream << "], nonzeros: [";
-	for(int k=0; k<output_sorted_.size(); ++k){
-	  for(int kk=0; kk<output_sorted_[k].size(); ++kk){
+	for(int k=0; k<nz_sorted_.size(); ++k){
+	  for(int kk=0; kk<nz_sorted_[k].size(); ++kk){
 	    if(ndep()>1){
-	      stream << output_sorted_[k][kk].inz << "(" << output_sorted_[k][kk].iind << ")";
+	      stream << nz_sorted_[k][kk].inz << "(" << nz_sorted_[k][kk].iind << ")";
 	    } else {
-	      stream << output_sorted_[k][kk].inz;
+	      stream << nz_sorted_[k][kk].inz;
 	    }
 	    stream << ",";
 	  }
@@ -194,7 +187,7 @@ namespace CasADi{
       // Clear the existing element if we are not adding
       if(!add){
 	for(int k=0; k<onz.size(); ++k){
-	  output_sorted_[onz[k]].clear();
+	  nz_sorted_[onz[k]].clear();
 	}
       }
     
@@ -207,7 +200,7 @@ namespace CasADi{
       for(int k=0; k<inz.size(); ++k){
       
 	// Get the sum
-	const std::vector<OutputNZ>& sum = dnode->output_sorted_[inz[k]];
+	const std::vector<OutputNZ>& sum = dnode->nz_sorted_[inz[k]];
       
 	// Add the elements in the sum
 	for(std::vector<OutputNZ>::const_iterator it2=sum.begin(); it2!=sum.end(); ++it2){
@@ -234,8 +227,8 @@ namespace CasADi{
       // Save the mapping
       for(int k=0; k<inz.size(); ++k){
 	OutputNZ new_el = {inz[k],depind};
-	if(!add) output_sorted_[onz[k]].clear();
-	output_sorted_[onz[k]].push_back(new_el);
+	if(!add) nz_sorted_[onz[k]].clear();
+	nz_sorted_[onz[k]].push_back(new_el);
       }
     }
   }
@@ -245,23 +238,22 @@ namespace CasADi{
     MXNode::init();
   
     // Clear the runtime
-    index_output_sorted_.resize(1);
-    index_output_sorted_[0].resize(ndep());
-    for(int iind=0; iind<index_output_sorted_[0].size(); ++iind){
-      index_output_sorted_[0][iind].clear();
+    input_sorted_.resize(ndep());
+    for(int iind=0; iind<input_sorted_.size(); ++iind){
+      input_sorted_[iind].clear();
     }
   
     // For all the outputs
-    for(int onz=0; onz<output_sorted_.size(); ++onz){
+    for(int onz=0; onz<nz_sorted_.size(); ++onz){
 
       // Get the sum
-      const std::vector<OutputNZ>& sum = output_sorted_[onz];
+      const std::vector<OutputNZ>& sum = nz_sorted_[onz];
     
       // For all elements in the sum
       for(std::vector<OutputNZ>::const_iterator it=sum.begin(); it!=sum.end(); ++it){
       
 	// Add the element to the runtime
-	index_output_sorted_[0][it->iind].push_back(pair<int,int>(it->inz,onz));
+	input_sorted_[it->iind].push_back(pair<int,int>(it->inz,onz));
       }
     }
   }
@@ -277,24 +269,17 @@ namespace CasADi{
 
     // Number of inputs and outputs
     int niind = input.size();
-    int noind = output.size();
   
     // Function evaluation in sparse triplet format
-    vector<vector<int> > r_row, r_col, r_inz, r_offset;
+    vector<int> r_row, r_col, r_inz, r_offset;
     if(!output_given){
-      r_row.resize(noind);
-      r_col.resize(noind);
-      r_inz.resize(noind);
-      r_offset.resize(noind,vector<int>(1,0));
+      r_offset.resize(1,0);
     }
   
     // Sensitivity matrices in sparse triplet format for all forward sensitivities
-    vector<vector<vector<int> > > f_row(nfwd), f_col(nfwd), f_inz(nfwd), f_offset(nfwd);
+    vector<vector<int> > f_row(nfwd), f_col(nfwd), f_inz(nfwd), f_offset(nfwd);
     for(int d=0; d<nfwd; ++d){
-      f_row[d].resize(noind);
-      f_col[d].resize(noind);
-      f_inz[d].resize(noind);
-      f_offset[d].resize(noind,vector<int>(1,0));
+      f_offset[d].resize(1,0);
     }
   
     // Sensitivity matrices in sparse triplet format for all adjoint sensitivities
@@ -307,11 +292,10 @@ namespace CasADi{
     }
     
     // For all outputs
-    for(int oind=0; oind<output.size(); ++oind){
-      if(output[oind]==0) continue; // Skip if output doesn't exist
+    if(output[0]!=0){
     
       // Output sparsity
-      const CRSSparsity &osp = sparsity(oind);
+      const CRSSparsity &osp = sparsity();
       const vector<int>& ocol = osp.col();
       vector<int> orow = osp.getRow();
     
@@ -327,7 +311,7 @@ namespace CasADi{
 	vector<int> irow = isp.getRow();
 
 	// Get references to the assignment operations
-	const IOMap& assigns = index_output_sorted_[oind][iind];
+	const IOMap& assigns = input_sorted_[iind];
 
 	// Find out which matrix elements that we are trying to calculate
 	vector<int> el_wanted(assigns.size()); // TODO: Move outside loop
@@ -376,12 +360,12 @@ namespace CasADi{
 	  // Add to sparsity pattern
 	  for(int k=0; k<assigns.size(); ++k){
 	    if(temp[k]!=-1){
-	      r_inz[oind].push_back(temp[k]);
-	      r_col[oind].push_back(ocol[assigns[assigns_order[k]].second]);
-	      r_row[oind].push_back(orow[assigns[assigns_order[k]].second]);
+	      r_inz.push_back(temp[k]);
+	      r_col.push_back(ocol[assigns[assigns_order[k]].second]);
+	      r_row.push_back(orow[assigns[assigns_order[k]].second]);
 	    }
 	  }
-	  r_offset[oind].push_back(r_inz[oind].size());
+	  r_offset.push_back(r_inz.size());
 	}
       
 	// Forward sensitivities
@@ -394,12 +378,12 @@ namespace CasADi{
 	  // Add to sparsity pattern
 	  for(int k=0; k<assigns.size(); ++k){
 	    if(temp[k]!=-1){
-	      f_inz[d][oind].push_back(temp[k]);
-	      f_col[d][oind].push_back(ocol[assigns[assigns_order[k]].second]);
-	      f_row[d][oind].push_back(orow[assigns[assigns_order[k]].second]);
+	      f_inz[d].push_back(temp[k]);
+	      f_col[d].push_back(ocol[assigns[assigns_order[k]].second]);
+	      f_row[d].push_back(orow[assigns[assigns_order[k]].second]);
 	    }
 	  }
-	  f_offset[d][oind].push_back(f_inz[d][oind].size());
+	  f_offset[d].push_back(f_inz[d].size());
 	}
       
 	// Continue of no adjoint sensitivities
@@ -413,7 +397,7 @@ namespace CasADi{
         
 	  // Get the matching nonzeros
 	  copy(el_wanted.begin(),el_wanted.end(),temp.begin());
-	  adjSeed[d][oind]->sparsity().getNZInplace(temp);
+	  adjSeed[d][0]->sparsity().getNZInplace(temp);
 
 	  // Add to sparsity pattern
 	  for(int k=0; k<assigns.size(); ++k){
@@ -432,35 +416,34 @@ namespace CasADi{
     vector<int> r_onz, inz_local, onz_local;
     if(!output_given){
       // For all outputs
-      for(int oind=0; oind<output.size(); ++oind){
-	if(output[oind]==0) continue; // Skip if output doesn't exist
+      if(output[0]!=0){
 
 	// Output sparsity
-	const CRSSparsity &osp = sparsity(oind);
+	const CRSSparsity &osp = sparsity();
 
 	// Create a sparsity pattern from vectors
-	CRSSparsity r_sp = sp_triplet(osp.size1(),osp.size2(),r_row[oind],r_col[oind],r_onz,true);
+	CRSSparsity r_sp = sp_triplet(osp.size1(),osp.size2(),r_row,r_col,r_onz,true);
       
 	// Create a mapping matrix
-	*output[oind] = MX::create(new Mapping(r_sp));
+	*output[0] = MX::create(new Mapping(r_sp));
       
 	// Add all the dependencies
 	for(int iind=0; iind<input.size(); ++iind){
 	  if(input[iind]==0) continue; // Skip if input doesn't exist
         
 	  // Get the elements corresponding to the input index
-	  int iind0 = r_offset[oind][iind], iind1 = r_offset[oind][iind+1];
+	  int iind0 = r_offset[iind], iind1 = r_offset[iind+1];
 
 	  // Get the input nonzeros
 	  inz_local.resize(iind1-iind0);
-	  copy(r_inz[oind].begin()+iind0,r_inz[oind].begin()+iind1,inz_local.begin());
+	  copy(r_inz.begin()+iind0,r_inz.begin()+iind1,inz_local.begin());
         
 	  // Get the output nonzeros
 	  onz_local.resize(iind1-iind0);
 	  copy(r_onz.begin()+iind0,r_onz.begin()+iind1,onz_local.begin());
         
 	  // Save to mapping
-	  (*output[oind])->assign(*input[iind],inz_local,onz_local,true);
+	  (*output[0])->assign(*input[iind],inz_local,onz_local,true);
 	}
       }
     }
@@ -469,36 +452,34 @@ namespace CasADi{
     vector<int>& f_onz = r_onz; // reuse
     for(int d=0; d<nfwd; ++d){
     
-      // For all outputs
-      for(int oind=0; oind<output.size(); ++oind){
-	if(output[oind]==0) continue; // Skip if output doesn't exist
+      if(output[0]!=0){
 
 	// Output sparsity
-	const CRSSparsity &osp = sparsity(oind);
+	const CRSSparsity &osp = sparsity();
 
 	// Create a sparsity pattern from vectors
-	CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),f_row[d][oind],f_col[d][oind],f_onz,true);
+	CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),f_row[d],f_col[d],f_onz,true);
       
 	// Create a mapping matrix
-	*fwdSens[d][oind] = MX::create(new Mapping(f_sp));
+	*fwdSens[d][0] = MX::create(new Mapping(f_sp));
       
 	// Add all the dependencies
 	for(int iind=0; iind<input.size(); ++iind){
 	  if(input[iind]==0) continue; // Skip if input doesn't exist
         
 	  // Get the elements corresponding to the input index
-	  int iind0 = f_offset[d][oind][iind], iind1 = f_offset[d][oind][iind+1];
+	  int iind0 = f_offset[d][iind], iind1 = f_offset[d][iind+1];
 
 	  // Get the input nonzeros
 	  inz_local.resize(iind1-iind0);
-	  copy(f_inz[d][oind].begin()+iind0,f_inz[d][oind].begin()+iind1,inz_local.begin());
+	  copy(f_inz[d].begin()+iind0,f_inz[d].begin()+iind1,inz_local.begin());
         
 	  // Get the output nonzeros
 	  onz_local.resize(iind1-iind0);
 	  copy(f_onz.begin()+iind0,f_onz.begin()+iind1,onz_local.begin());
         
 	  // Save to mapping
-	  (*fwdSens[d][oind])->assign(*fwdSeed[d][iind],inz_local,onz_local,true);
+	  (*fwdSens[d][0])->assign(*fwdSeed[d][iind],inz_local,onz_local,true);
 	}
       }
     }
@@ -520,12 +501,11 @@ namespace CasADi{
 	// Create a mapping matrix
 	MX s = MX::create(new Mapping(a_sp));
      
-	// Add all dependencies
-	for(int oind=0; oind<output.size(); ++oind){
-	  if(output[oind]==0) continue; // Skip if output doesn't exist
+	// Add dependencies
+	if(output[0]!=0){
           
 	  // Get the elements corresponding to the input index
-	  int oind0 = a_offset[d][iind][oind], oind1 = a_offset[d][iind][oind+1];
+	  int oind0 = a_offset[d][iind][0], oind1 = a_offset[d][iind].at(1); // BUG!!!
 
 	  // Get the input nonzeros
 	  inz_local.resize(oind1-oind0);
@@ -536,7 +516,7 @@ namespace CasADi{
 	  copy(a_onz[d][iind].begin()+oind0,a_onz[d][iind].begin()+oind1,onz_local.begin());
         
 	  // Save to mapping
-	  s->assign(*adjSeed[d][oind],onz_local,inz_local,true);
+	  s->assign(*adjSeed[d][0],onz_local,inz_local,true);
 	}
       
 	// Save to adjoint sensitivities
@@ -544,10 +524,8 @@ namespace CasADi{
       }
     
       // Clear adjoint seeds
-      for(int i=0; i<adjSeed[d].size(); ++i){
-	if(adjSeed[d][i] != 0){
-	  *adjSeed[d][i] = MX();
-	}
+      if(adjSeed[d][0] != 0){
+	*adjSeed[d][0] = MX();
       }
     }
   }
@@ -559,9 +537,9 @@ namespace CasADi{
     std::vector< int > col;
     sparsity().getSparsity(row,col);
     Matrix<int> ret(size1(),size2());
-    for (int k=0;k<output_sorted_.size();++k) { // Loop over output non-zeros
-      for (int i=0;i<output_sorted_[k].size(); ++i) { // Loop over elements to be summed
-	const OutputNZ &el = output_sorted_[k][i];
+    for (int k=0;k<nz_sorted_.size();++k) { // Loop over output non-zeros
+      for (int i=0;i<nz_sorted_[k].size(); ++i) { // Loop over elements to be summed
+	const OutputNZ &el = nz_sorted_[k][i];
 	if (el.iind==iind) ret(row[k],col[k]) = el.inz;
       }
     }
@@ -571,9 +549,9 @@ namespace CasADi{
   std::vector<int> Mapping::getDepInd() const {
     // TODO: make this efficient
     std::vector<int> ret(size());
-    for (int k=0;k<output_sorted_.size();++k) { // Loop over output non-zeros
-      for (int i=0;i<output_sorted_[k].size(); ++i) { // Loop over elements to be summed
-	const OutputNZ &el = output_sorted_[k][i];
+    for (int k=0;k<nz_sorted_.size();++k) { // Loop over output non-zeros
+      for (int i=0;i<nz_sorted_[k].size(); ++i) { // Loop over elements to be summed
+	const OutputNZ &el = nz_sorted_[k][i];
 	ret[k] = el.iind;
       }
     }
@@ -589,9 +567,9 @@ namespace CasADi{
       return false;
       
     // Check if the nonzeros follow in increasing order
-    for(int k=0; k<output_sorted_.size(); ++k){
-      if(output_sorted_[k].size()!=1) return false;
-      const OutputNZ &e = output_sorted_[k].front();
+    for(int k=0; k<nz_sorted_.size(); ++k){
+      if(nz_sorted_[k].size()!=1) return false;
+      const OutputNZ &e = nz_sorted_[k].front();
       if(e.inz != k || e.iind !=0) return false;
     }
     
@@ -606,7 +584,7 @@ namespace CasADi{
     // For all inputs
     vector<int> tmp1,tmp2;
     for(int iind=0; iind<arg.size(); ++iind){
-      const IOMap& assigns = index_output_sorted_[0][iind];
+      const IOMap& assigns = input_sorted_[iind];
       tmp1.resize(assigns.size());
       tmp2.resize(assigns.size());
       for(int i=0; i<assigns.size(); ++i){
