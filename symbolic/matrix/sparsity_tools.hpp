@@ -27,9 +27,14 @@
 
 namespace CasADi{
 
+  /** \brief Hash value of an integer */
+  template<typename T>
+  inline size_t hash_value(T v){ return size_t(v);}
+
   /** \brief Generate a hash value incrementally (function taken from boost) */
-  inline void hash_combine(std::size_t& seed, int v){
-    seed ^= v + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+  template<typename T>
+  inline void hash_combine(std::size_t& seed, T v){
+    seed ^= hash_value(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
   }
 
   /** \brief Generate a hash value incrementally (function taken from boost) */

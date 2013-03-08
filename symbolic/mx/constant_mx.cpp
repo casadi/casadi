@@ -81,9 +81,9 @@ namespace CasADi{
     fill_n(outputd,output[0]->size(),0);
   }
 
-  void ConstantMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void ConstantDMatrix::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     // Print the constant
-    int ind = gen.addConstant(shared_from_this<MX>());
+    int ind = gen.getConstant(x_.data(),true);
 
     // Copy the constant to the work vector
     stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";

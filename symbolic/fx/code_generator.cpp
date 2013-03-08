@@ -23,6 +23,7 @@
 
 #include "code_generator.hpp"
 #include "fx_internal.hpp"
+#include "../matrix/sparsity_tools.hpp"
 #include <iomanip>
 
 using namespace std;
@@ -37,7 +38,22 @@ namespace CasADi{
     
     s << auxiliaries_.str();
     s << sparsities_.str();
-    s << constants_.str();
+
+    // Print constants
+    stringstream name;
+    for(int i=0; i<double_constants_.size(); ++i){
+      name.str(string());
+      name << "c" << i;
+      printVector(s,name.str(),double_constants_[i]);
+    }
+
+    // Print constants
+    for(int i=0; i<integer_constants_.size(); ++i){
+      name.str(string());
+      name << "i" << i;
+      printVector(s,name.str(),integer_constants_[i]);
+    }
+
     s << dependencies_.str();
     s << function_.str();
     s << finalization_.str();
@@ -86,7 +102,7 @@ namespace CasADi{
     s << "d " << name << "[] = {";
     for(int i=0; i<v.size(); ++i){
       if(i!=0) s << ",";
-      s << v[i];
+      printConstant(s,v[i]);
     }
     s << "};" << endl;
   }
@@ -143,45 +159,68 @@ namespace CasADi{
     return it->second;  
   }
 
-  int CodeGenerator::addConstant(const MX& x){
-    casadi_assert(x.isConstant());
-
-    // Get the current number of patterns before looking for it
-    size_t num_constants_before = added_constants_.size();
-
-    // Get index of the pattern
-    const void* h = static_cast<const void*>(x.get());
-    int& ind = added_constants_[h];
-
-    // Generate it if it does not exist
-    if(added_constants_.size() > num_constants_before){
-      // Add at the end
-      ind = num_constants_before;
-      
-      // Give it a name
-      stringstream name;
-      name << "c" << ind;
- 
-      // Set format
-      constants_ << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
-
-      // Print to file
-      DMatrix v = x.getMatrixValue();
-      printVector(constants_,name.str(),v.data());
-      
-      // Separate with an empty line
-      constants_ << endl;
+  size_t CodeGenerator::hash(const std::vector<double>& v){
+    // Calculate a hash value for the vector
+    std::size_t seed=0;
+    if(!v.empty()){
+      casadi_assert(sizeof(double) % sizeof(size_t)==0);
+      const int int_len = v.size()*(sizeof(double)/sizeof(size_t));
+      const size_t* int_v = reinterpret_cast<const size_t*>(&v.front());
+      for(size_t i=0; i<int_len; ++i){
+	hash_combine(seed,int_v[i]);
+      }
     }
-    
-    return ind;
+    return seed;
+  }  
+
+  size_t CodeGenerator::hash(const std::vector<int>& v){
+    size_t seed=0;
+    hash_combine(seed,v);
+    return seed;
   }
 
-  int CodeGenerator::getConstant(const MX& x) const{
-    casadi_assert(x.isConstant());
-    const void* h = static_cast<const void*>(x.get());
-    PointerMap::const_iterator it=added_constants_.find(h);
-    casadi_assert(it!=added_constants_.end());
-    return it->second;
+  int CodeGenerator::getConstant(const std::vector<double>& v, bool allow_adding){
+    // Hash the vector
+    size_t h = hash(v);
+    
+    // Try to locate it in already added constants
+    pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq = added_double_constants_.equal_range(h);
+    for(multimap<size_t,size_t>::iterator i=eq.first; i!=eq.second; ++i){
+      if(equal(v,double_constants_[i->second])) return i->second;
+    }
+    
+    if(allow_adding){
+      // Add to constants
+      int ind = double_constants_.size();
+      double_constants_.push_back(v);
+      added_double_constants_.insert(pair<size_t,size_t>(h,ind));
+      return ind;
+    } else {
+      casadi_error("Constant not found");
+      return -1;
+    }
+  }
+
+  int CodeGenerator::getConstant(const std::vector<int>& v, bool allow_adding){
+    // Hash the vector
+    size_t h = hash(v);
+    
+    // Try to locate it in already added constants
+    pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq = added_integer_constants_.equal_range(h);
+    for(multimap<size_t,size_t>::iterator i=eq.first; i!=eq.second; ++i){
+      if(equal(v,integer_constants_[i->second])) return i->second;
+    }
+    
+    if(allow_adding){
+      // Add to constants
+      int ind = integer_constants_.size();
+      integer_constants_.push_back(v);
+      added_integer_constants_.insert(pair<size_t,size_t>(h,ind));
+      return ind;
+    } else {
+      casadi_error("Constant not found");
+      return -1;
+    }
   }
 
   int CodeGenerator::getDependency(const FX& f) const{
@@ -469,7 +508,7 @@ namespace CasADi{
     s << endl;
   }
 
-  void CodeGenerator::printConstant(std::ostream& s, double v) const{
+  void CodeGenerator::printConstant(std::ostream& s, double v){
     int v_int(v);
     if(v_int==v){
       // Print integer

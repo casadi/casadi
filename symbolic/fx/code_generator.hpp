@@ -42,11 +42,11 @@ namespace CasADi{
     /** \brief Get the index of an existing sparsity pattern */
     int getSparsity(const CRSSparsity& sp) const;
 
-    /// Add a constant
-    int addConstant(const MX& x);
+    /** \brief Get or add a constant */
+    int getConstant(const std::vector<double>& v, bool allow_adding=false);
 
-    /** \brief Get the index of an existing constant */
-    int getConstant(const MX& x) const;
+    /** \brief Get or add am integer constant */
+    int getConstant(const std::vector<int>& v, bool allow_adding=false);
 
     /** \brief Add a dependent function */
     int addDependency(const FX& f);
@@ -55,7 +55,7 @@ namespace CasADi{
     int getDependency(const FX& f) const;
     
     /** \brief Print a constant in a lossless but compact manner */
-    void printConstant(std::ostream& s, double v) const;
+    static void printConstant(std::ostream& s, double v);
 
     /** \brief Auxiliary functions */
     enum Auxiliary{
@@ -140,7 +140,6 @@ namespace CasADi{
     std::stringstream includes_;
     std::stringstream auxiliaries_;
     std::stringstream sparsities_;
-    std::stringstream constants_;
     std::stringstream dependencies_;
     std::stringstream function_;
     std::stringstream finalization_;
@@ -150,9 +149,27 @@ namespace CasADi{
     std::set<std::string> added_includes_;
     std::set<Auxiliary> added_auxiliaries_;
     PointerMap added_sparsities_;
-    PointerMap added_constants_;
     PointerMap added_dependencies_;
+    std::multimap<size_t,size_t> added_double_constants_;
+    std::multimap<size_t,size_t> added_integer_constants_;
 
+    // Constants
+    std::vector<std::vector<double> > double_constants_;
+    std::vector<std::vector<int> > integer_constants_;
+
+    // Hash a vector
+    static size_t hash(const std::vector<double>& v);
+    static size_t hash(const std::vector<int>& v);
+
+    // Compare two vectors
+    template<typename T>
+    static bool equal(const std::vector<T>& v1, const std::vector<T>& v2){
+      if(v1.size()!=v2.size()) return false;
+      for(int j=0; j<v1.size(); ++j){
+	if(v1[j]!=v2[j]) return false;
+      }
+      return true;
+    }
   };
   
   

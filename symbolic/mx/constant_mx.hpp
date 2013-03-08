@@ -57,9 +57,6 @@ namespace CasADi{
     /** \brief  Clone function */
     virtual ConstantMX* clone() const = 0;
 
-    /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
@@ -113,6 +110,9 @@ namespace CasADi{
       output[0]->set(SXMatrix(x_));
       ConstantMX::evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
     }
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const;
