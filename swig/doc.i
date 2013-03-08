@@ -7051,6 +7051,10 @@ C++ includes: constant_mx.hpp ";
 
 Constructor. ";
 
+%feature("docstring")  CasADi::ConstantMX::~ConstantMX "
+
+Destructor. ";
+
 %feature("docstring")  CasADi::ConstantMX::clone "
 
 Clone function. ";
@@ -7086,10 +7090,6 @@ Get the operation. ";
 %feature("docstring")  CasADi::ConstantMX::__nonzero__ "
 
 Return truth value of an MX. ";
-
-%feature("docstring")  CasADi::ConstantMX::eval "
-
-Symbolic evaluation (matrix graph) ";
 
 %feature("docstring")  CasADi::ConstantMX::deepCopyMembers "
 
@@ -63840,6 +63840,10 @@ C++ includes: norm.hpp ";
 
 Constructor. ";
 
+%feature("docstring")  CasADi::Norm::~Norm "
+
+Destructor. ";
+
 %feature("docstring")  CasADi::Norm::evaluateD "
 
 Evaluate the function numerically. ";
@@ -75529,6 +75533,11 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |              |              |              | for primal i |              |
 |              |              |              | nfeasibility |              |
 +--------------+--------------+--------------+--------------+--------------+
+| tol_reg      | OT_REAL      | 0.000        | Stopping     | CasADi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for regulari |              |
+|              |              |              | zation       |              |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
 |              |              |              | field that   |              |
@@ -76555,6 +76564,11 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | criterion    | enInternal   |
 |              |              |              | for primal i |              |
 |              |              |              | nfeasibility |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_reg      | OT_REAL      | 0.000        | Stopping     | CasADi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for regulari |              |
+|              |              |              | zation       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -85005,6 +85019,10 @@ given depth. ";
 Assign the node to something, without invoking the deletion of the node, if
 the count reaches 0. ";
 
+%feature("docstring")  CasADi::SX::isNull "
+
+SX nodes are not allowed to be null. ";
+
 %feature("docstring")  CasADi::SX::__mldivide__ "
 
 Matrix division from left. ";
@@ -86674,6 +86692,10 @@ Constructors. ";
 %feature("docstring")  CasADi::SymbolicMX::SymbolicMX "
 
 Constructors. ";
+
+%feature("docstring")  CasADi::SymbolicMX::~SymbolicMX "
+
+Destructor. ";
 
 %feature("docstring")  CasADi::SymbolicMX::clone "
 
@@ -95714,9 +95736,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: generic__type_8hpp.xml
-
-
-// File: generic__type__internal_8cpp.xml
 
 
 // File: generic__type__internal_8hpp.xml
