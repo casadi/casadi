@@ -79,22 +79,15 @@ namespace CasADi{
       if(adjSeed[d][0]!=0 && adjSens[d][0]!=0){
 	for(int k=0; k<assigns_.size(); ++k){
 	  adjSens[d][0]->data()[assigns_[k]] += adjSeed[d][0]->data()[k];
+	  adjSeed[d][0]->data()[k] = 0;
 	}
       }
     }
-    
-    clearVector(adjSeed);
   }
 
   void GetNonzeros::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     casadi_assert(input.size()==1);
-  
-    // Clear output
-    if(fwd && output[0]!=0){
-      bvec_t *outputd = get_bvec_t(output[0]->data());
-      fill_n(outputd,output[0]->size(),0);
-    }
-    
+      
     // Nondifferentiated outputs
     if(input[0]!=0 && output[0]!=0){
       
@@ -103,19 +96,14 @@ namespace CasADi{
       bvec_t *inputd = get_bvec_t(input[0]->data());
       
       // Propate sparsity
-      for(vector<pair<int,int> >::const_iterator it=assigns2_.begin(); it!=assigns2_.end(); ++it){
+      for(int k=0; k<assigns_.size(); ++k){
 	if(fwd){
-	  outputd[it->second] |= inputd[it->first];
+	  outputd[k] = inputd[assigns_[k]];
 	} else {
-	  inputd[it->first] |= outputd[it->second];
+	  inputd[assigns_[k]] |= outputd[k];
+	  outputd[k] = 0;
 	}
       }
-    }
-    
-    // Clear adjoint seeds
-    if(!fwd && output[0]!=0){
-      bvec_t *outputd = get_bvec_t(output[0]->data());
-      fill_n(outputd,output[0]->size(),0);
     }
   }
 
