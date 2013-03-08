@@ -28,8 +28,6 @@
 #include "../fx/sx_function.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
-const bool ELIMINATE_NESTED = true;
-
 using namespace std;
 
 namespace CasADi{
@@ -182,54 +180,22 @@ namespace CasADi{
     if(inz.empty()) return;
   
     casadi_assert(!d.isNull());
-  
-    if(ELIMINATE_NESTED && d->getOp()==OP_GETNONZEROS){ // Move this logic to init!
-      // Clear the existing element if we are not adding
-      if(!add){
-	for(int k=0; k<onz.size(); ++k){
-	  nz_sorted_[onz[k]].clear();
-	}
-      }
     
-      // Eliminate if a mapping node
-      const GetNonzeros* dnode = static_cast<const GetNonzeros*>(d.get());
-      vector<MX> d2 = dnode->dep_;
-    
-      // Split the vector according to dependency index
-      vector<vector<int> > inz2(d2.size()), onz2(d2.size());
-      for(int k=0; k<inz.size(); ++k){
-      
-	// Get the sum
-	const std::vector<OutputNZ>& sum = dnode->nz_sorted_[inz[k]];
-      
-	// Add the elements in the sum
-	for(std::vector<OutputNZ>::const_iterator it2=sum.begin(); it2!=sum.end(); ++it2){
-	  inz2[it2->iind].push_back(it2->inz);
-	  onz2[it2->iind].push_back(onz[k]);
-	}
-      }
-    
-      // Call the function recursively
-      for(int i=0; i<d2.size(); ++i){
-	assign(d2[i],inz2[i],onz2[i],true);
-      }
+    // Add the node if it is not already a dependency
+    std::map<const MXNode*, int>::const_iterator it = depmap_.find(static_cast<const MXNode*>(d.get()));
+    int depind;
+    if(it==depmap_.end()){
+      depind = addDependency(d);
+      depmap_[static_cast<const MXNode*>(d.get())] = depind;
     } else {
-      // Add the node if it is not already a dependency
-      std::map<const MXNode*, int>::const_iterator it = depmap_.find(static_cast<const MXNode*>(d.get()));
-      int depind;
-      if(it==depmap_.end()){
-	depind = addDependency(d);
-	depmap_[static_cast<const MXNode*>(d.get())] = depind;
-      } else {
-	depind = it->second;
-      }
+      depind = it->second;
+    }
     
-      // Save the mapping
-      for(int k=0; k<inz.size(); ++k){
-	OutputNZ new_el = {inz[k],depind};
-	if(!add) nz_sorted_[onz[k]].clear();
-	nz_sorted_[onz[k]].push_back(new_el);
-      }
+    // Save the mapping
+    for(int k=0; k<inz.size(); ++k){
+      OutputNZ new_el = {inz[k],depind};
+      if(!add) nz_sorted_[onz[k]].clear();
+      nz_sorted_[onz[k]].push_back(new_el);
     }
   }
 
