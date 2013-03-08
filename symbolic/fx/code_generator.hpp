@@ -139,7 +139,6 @@ namespace CasADi{
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes_;
     std::stringstream auxiliaries_;
-    std::stringstream sparsities_;
     std::stringstream dependencies_;
     std::stringstream function_;
     std::stringstream finalization_;

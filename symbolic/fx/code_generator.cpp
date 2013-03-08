@@ -37,21 +37,20 @@ namespace CasADi{
     s << "#define d double" << endl << endl;
     
     s << auxiliaries_.str();
-    s << sparsities_.str();
 
-    // Print constants
+    // Print integer constants
     stringstream name;
+    for(int i=0; i<integer_constants_.size(); ++i){
+      name.str(string());
+      name << "s" << i;
+      printVector(s,name.str(),integer_constants_[i]);
+    }
+
+    // Print double constants
     for(int i=0; i<double_constants_.size(); ++i){
       name.str(string());
       name << "c" << i;
       printVector(s,name.str(),double_constants_[i]);
-    }
-
-    // Print constants
-    for(int i=0; i<integer_constants_.size(); ++i){
-      name.str(string());
-      name << "i" << i;
-      printVector(s,name.str(),integer_constants_[i]);
     }
 
     s << dependencies_.str();
@@ -132,21 +131,12 @@ namespace CasADi{
 
     // Generate it if it does not exist
     if(added_sparsities_.size() > num_patterns_before){
-      // Add at the end
-      ind = num_patterns_before;
-      
+
       // Compact version of the sparsity pattern
       std::vector<int> sp_compact = sp_compress(sp);
-      
-      // Give it a name
-      stringstream name;
-      name << "s" << ind;
-      
-      // Print to file
-      printVector(sparsities_,name.str(),sp_compact);
-      
-      // Separate with an empty line
-      sparsities_ << endl;
+
+      // Codegen vector
+      ind = getConstant(sp_compact,true);
     }
     
     return ind;
