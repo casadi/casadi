@@ -36,7 +36,7 @@ namespace CasADi{
   public:
 
     /// Constructor
-    GetNonzeros(const CRSSparsity& sp);
+    GetNonzeros(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz);
 
     /// Clone function
     virtual GetNonzeros* clone() const;
@@ -61,11 +61,6 @@ namespace CasADi{
     
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-
-    virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
-
-    /// Operation sequence
-    std::vector<int> assigns_;
     
     /// Evaluate the function (template)
     template<typename T, typename MatV, typename MatVV> 
@@ -91,6 +86,9 @@ namespace CasADi{
 
     /// Simplify
     virtual void simplifyMe(MX& ex);
+
+    /// Operation sequence
+    std::vector<int> nz_;
   };
 
 } // namespace CasADi
