@@ -62,10 +62,6 @@ namespace CasADi{
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
-    /// Assign/add nonzeros
-    virtual void assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add=false);
-
-    /// Assign/add nonzeros, outputs sequential
     virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
 
     /// Initialize
@@ -77,10 +73,10 @@ namespace CasADi{
      *  The outer vector is size size()
      *  The inner vector lists elements to be summed
      */
-    std::vector<std::vector<int> > nz_sorted_;
+    std::vector<int> assigns_;
     
     /// Operations sorted by input (this is the runtime)
-    std::vector<std::pair<int,int> > assigns_;
+    std::vector<std::pair<int,int> > assigns2_;
 
     /// Evaluate the function (template)
     template<typename T, typename MatV, typename MatVV> 
