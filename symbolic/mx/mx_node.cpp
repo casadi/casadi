@@ -308,7 +308,7 @@ namespace CasADi{
   MX MXNode::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
     MX ret = MX::create(new Mapping(sp));
     ret->assign(shared_from_this<MX>(),nz);
-    simplifyMapping(ret);
+    simplify(ret);
     return ret;
   }
 

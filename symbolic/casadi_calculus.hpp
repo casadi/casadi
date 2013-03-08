@@ -88,6 +88,9 @@ enum Operation{
   // Submatrix assignment
   OP_SUBASSIGN,
   
+  // Nonzero reference
+  OP_GETNONZEROS,
+
   // Nonzero mapping
   OP_MAPPING,
   

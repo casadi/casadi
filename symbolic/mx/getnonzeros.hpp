@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MAPPING_HPP
-#define MAPPING_HPP
+#ifndef GETNONZEROS_HPP
+#define GETNONZEROS_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -32,17 +32,17 @@ namespace CasADi{
       \author Joel Andersson
       \date 2011
   */
-  class Mapping : public MXNode{
+  class GetNonzeros : public MXNode{
   public:
 
     /// Constructor
-    Mapping(const CRSSparsity& sp);
+    GetNonzeros(const CRSSparsity& sp);
 
     /// Clone function
-    virtual Mapping* clone() const;
+    virtual GetNonzeros* clone() const;
       
     /// Destructor
-    virtual ~Mapping(){}
+    virtual ~GetNonzeros(){}
     
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
@@ -115,7 +115,7 @@ namespace CasADi{
     bool isIdentity() const;
     
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_MAPPING;}    
+    virtual int getOp() const{ return OP_GETNONZEROS;}
 
     /// Simplify
     virtual void simplifyMe(MX& ex);
@@ -123,4 +123,4 @@ namespace CasADi{
 
 } // namespace CasADi
 
-#endif // MAPPING_HPP
+#endif // GETNONZEROS_HPP

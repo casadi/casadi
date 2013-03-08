@@ -20,7 +20,7 @@
  *
  */
 
-#include "mapping.hpp"
+#include "getnonzeros.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
@@ -34,17 +34,17 @@ using namespace std;
 
 namespace CasADi{
 
-  Mapping::Mapping(const CRSSparsity& sp){
+  GetNonzeros::GetNonzeros(const CRSSparsity& sp){
     setSparsity(sp);
     nz_sorted_.resize(sp.size());
   }
 
-  Mapping* Mapping::clone() const{
-    return new Mapping(*this);
+  GetNonzeros* GetNonzeros::clone() const{
+    return new GetNonzeros(*this);
   }
 
   template<typename T>
-  void Mapping::evaluateBlock(int iind, const vector<T>& idata, vector<T>& odata, bool fwd) const{
+  void GetNonzeros::evaluateBlock(int iind, const vector<T>& idata, vector<T>& odata, bool fwd) const{
     // Get references to the assignment operations
     const IOMap& assigns = input_sorted_[iind];
   
@@ -60,16 +60,16 @@ namespace CasADi{
     }
   }
 
-  void Mapping::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  void GetNonzeros::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  void Mapping::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  void GetNonzeros::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void Mapping::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void GetNonzeros::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
     // Number of sensitivities
     int nadj = adjSeed.size();
     int nfwd = fwdSens.size();
@@ -104,7 +104,7 @@ namespace CasADi{
     clearVector(adjSeed);
   }
 
-  void Mapping::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  void GetNonzeros::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
   
     // Clear output
     if(fwd && output[0]!=0){
@@ -140,7 +140,7 @@ namespace CasADi{
     }
   }
 
-  void Mapping::printPart(std::ostream &stream, int part) const{
+  void GetNonzeros::printPart(std::ostream &stream, int part) const{
     if(ndep()==0){
       stream << "sparse(" << size1() << "," << size2() << ")";
     } else if(numel()==1 && size()==1 && ndep()==1 && nz_sorted_[0].size()==1){
@@ -173,17 +173,17 @@ namespace CasADi{
     }
   }
 
-  void Mapping::assign(const MX& d, const std::vector<int>& inz, bool add){
+  void GetNonzeros::assign(const MX& d, const std::vector<int>& inz, bool add){
     assign(d,inz,range(inz.size()),add);
   }
 
-  void Mapping::assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add){
+  void GetNonzeros::assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add){
     // Quick return if no elements
     if(inz.empty()) return;
   
     casadi_assert(!d.isNull());
   
-    if(ELIMINATE_NESTED && d->getOp()==OP_MAPPING){ // Move this logic to init!
+    if(ELIMINATE_NESTED && d->getOp()==OP_GETNONZEROS){ // Move this logic to init!
       // Clear the existing element if we are not adding
       if(!add){
 	for(int k=0; k<onz.size(); ++k){
@@ -192,7 +192,7 @@ namespace CasADi{
       }
     
       // Eliminate if a mapping node
-      const Mapping* dnode = static_cast<const Mapping*>(d.get());
+      const GetNonzeros* dnode = static_cast<const GetNonzeros*>(d.get());
       vector<MX> d2 = dnode->dep_;
     
       // Split the vector according to dependency index
@@ -233,7 +233,7 @@ namespace CasADi{
     }
   }
 
-  void Mapping::init(){
+  void GetNonzeros::init(){
     // Call init of the base class
     MXNode::init();
   
@@ -258,7 +258,7 @@ namespace CasADi{
     }
   }
 
-  void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void GetNonzeros::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     // Sparsity
     const CRSSparsity &sp = sparsity();
     vector<int> row = sp.getRow();
@@ -425,7 +425,7 @@ namespace CasADi{
 	CRSSparsity r_sp = sp_triplet(osp.size1(),osp.size2(),r_row,r_col,r_onz,true);
       
 	// Create a mapping matrix
-	*output[0] = MX::create(new Mapping(r_sp));
+	*output[0] = MX::create(new GetNonzeros(r_sp));
       
 	// Add all the dependencies
 	for(int iind=0; iind<input.size(); ++iind){
@@ -461,7 +461,7 @@ namespace CasADi{
 	CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),f_row[d],f_col[d],f_onz,true);
       
 	// Create a mapping matrix
-	*fwdSens[d][0] = MX::create(new Mapping(f_sp));
+	*fwdSens[d][0] = MX::create(new GetNonzeros(f_sp));
       
 	// Add all the dependencies
 	for(int iind=0; iind<input.size(); ++iind){
@@ -499,7 +499,7 @@ namespace CasADi{
 	CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),a_row[d][iind],a_col[d][iind],a_inz,true);
       
 	// Create a mapping matrix
-	MX s = MX::create(new Mapping(a_sp));
+	MX s = MX::create(new GetNonzeros(a_sp));
      
 	// Add dependencies
 	if(output[0]!=0){
@@ -530,8 +530,8 @@ namespace CasADi{
     }
   }
   
-  Matrix<int> Mapping::mapping(int iind) const {
-    casadi_assert_message(iind < ndep(),"Mapping::mapping(int): first argument (" << iind << ") must be smaller than ndep (" << ndep() << ").");
+  Matrix<int> GetNonzeros::mapping(int iind) const {
+    casadi_assert_message(iind < ndep(),"GetNonzeros::mapping(int): first argument (" << iind << ") must be smaller than ndep (" << ndep() << ").");
     // TODO: make this efficient
     std::vector< int > row;
     std::vector< int > col;
@@ -546,7 +546,7 @@ namespace CasADi{
     return ret;
   }
 
-  std::vector<int> Mapping::getDepInd() const {
+  std::vector<int> GetNonzeros::getDepInd() const {
     // TODO: make this efficient
     std::vector<int> ret(size());
     for (int k=0;k<nz_sorted_.size();++k) { // Loop over output non-zeros
@@ -558,7 +558,7 @@ namespace CasADi{
     return ret;
   }
 
-  bool Mapping::isIdentity() const{
+  bool GetNonzeros::isIdentity() const{
     // Make sure that there is at least one dependency
     if(ndep()<1) return false;
   
@@ -577,7 +577,7 @@ namespace CasADi{
     return true;
   }
 
-  void Mapping::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void GetNonzeros::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     // Clear the result
     stream << "  for(i=0; i<" << sparsity().size() << "; ++i) " << res.front() << "[i]=0;" << endl;
 
@@ -600,12 +600,13 @@ namespace CasADi{
     }
   }
 
-  void Mapping::simplifyMe(MX& ex){
+  void GetNonzeros::simplifyMe(MX& ex){
     // Simplify if identity
     if(isIdentity()){
       MX t = dep(0);
       ex = t;
     }
   }
+
 
 } // namespace CasADi

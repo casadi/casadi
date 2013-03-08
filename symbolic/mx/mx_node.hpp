@@ -254,6 +254,9 @@ namespace CasADi{
     template<typename T>
     static std::vector<std::vector<T> > getVector(const std::vector<std::vector<T*> > v);
 
+    /// Simplify the expression (ex is a reference to the node)
+    virtual void simplifyMe(MX& ex){}
+
     /// Transpose
     virtual MX getTranspose() const;
 

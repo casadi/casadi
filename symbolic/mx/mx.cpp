@@ -147,7 +147,7 @@ namespace CasADi{
       temp.push_back(m);
     }
     MX ret = vertcat(temp);
-    simplifyMapping(ret);
+    simplify(ret);
     return ret;
   }
 
@@ -163,7 +163,7 @@ namespace CasADi{
       temp.push_back(m);
     }
     MX ret = horzcat(temp);
-    simplifyMapping(ret);
+    simplify(ret);
     return ret;
   }
 
@@ -174,7 +174,7 @@ namespace CasADi{
     for (int k=0;k<i.size();++k) {
       ret[k] = sub(i.at(k),j.at(k));
     }
-    simplifyMapping(ret);
+    simplify(ret);
     return ret;
   }
 
@@ -415,7 +415,7 @@ namespace CasADi{
   
     // Add to mapping
     (*this)->assign(el,inz,k);
-    simplifyMapping(*this);
+    simplify(*this);
   }
 
   void MX::setNZ(const Matrix<int>& kk, const MX& m){
