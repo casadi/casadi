@@ -132,6 +132,7 @@ namespace CasADi{
   }
 
   void AddNonzeros::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+    casadi_error("not implemented");
 
     // Output sparsity
     const CRSSparsity &osp = sparsity();

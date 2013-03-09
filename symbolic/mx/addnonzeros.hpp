@@ -81,6 +81,9 @@ namespace CasADi{
     /// Add the nonzeros of a matrix to another matrix
     virtual MX getAddNonzeros(const MX& y, const std::vector<int>& nz) const;
 
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    virtual int numInplace() const{ return 1;}
+
     /// Operation sequence
     std::vector<int> nz_;
   };
