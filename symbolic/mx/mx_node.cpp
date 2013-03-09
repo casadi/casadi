@@ -34,6 +34,7 @@
 #include "mapping.hpp"
 #include "getnonzeros.hpp"
 #include "addnonzeros.hpp"
+#include "densification.hpp"
 
 using namespace std;
 
@@ -330,6 +331,10 @@ namespace CasADi{
       simplify(ret);
       return ret;
     }
+  }
+
+  MX MXNode::getDensification(const CRSSparsity& sp) const{
+    return MX::create(new Densification(shared_from_this<MX>(),sp));
   }
 
   

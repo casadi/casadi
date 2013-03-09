@@ -281,6 +281,9 @@ namespace CasADi{
     /// Get submatrix assignment
     virtual MX getSubAssign(const MX& y, const Slice& i, const Slice& j) const;    
 
+    /// Get densification
+    virtual MX getDensification(const CRSSparsity& sp) const;
+
     /** Temporary variables to be used in user algorithms like sorting, 
 	the user is resposible of making sure that use is thread-safe
 	The variable is initialized to zero

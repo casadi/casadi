@@ -27,7 +27,6 @@
 #include "../fx/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
-#include "densification.hpp"
 #include "../fx/mx_function_internal.hpp"
 #include "solve.hpp"
 
@@ -349,7 +348,7 @@ namespace CasADi{
     if(x.dense()) return;
   
     // Densify
-    x = MX::create(new Densification(x));
+    x = x->getDensification(sp_dense(x.size1(),x.size2()));
   }
 
   MX createParent(std::vector<MX> &deps) {

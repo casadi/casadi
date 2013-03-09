@@ -217,6 +217,11 @@ namespace CasADi{
       return v_.value;
     }
 
+    /// Get densification
+    virtual MX getDensification(const CRSSparsity& sp) const{
+      return MX::create(new Constant<Value>(sp,v_));
+    }
+
     /** \brief The actual numerical value */
     Value v_;
   };
