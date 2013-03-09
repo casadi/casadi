@@ -51,7 +51,7 @@ namespace CasADi{
     //virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual bool allowInplace() const{ return true;}
+    virtual int numInplace() const{ return 2;}
 
     /** \brief Generate code for the operation (generic) */
     void generateOperationGen(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen,

@@ -250,63 +250,66 @@ void MXFunctionInternal::init(){
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     
     // There are two tasks, allocate memory of the result and free the memory off the arguments, order depends on whether inplace is possible
-    bool allow_inplace = it->op==OP_OUTPUT || it->data->allowInplace();
+    int first_to_free = 0;
+    int last_to_free = it->op==OP_OUTPUT ? 1 : it->data->numInplace();
     for(int task=0; task<2; ++task){
-      if(task == allow_inplace ? 0 : 1){
-
-	// Dereference or free the memory of the arguments
-	for(int c=it->arg.size()-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
+      
+      // Dereference or free the memory of the arguments
+      for(int c=last_to_free-1; c>=first_to_free; --c){ // reverse order so that the first argument will end up at the top of the stack
+	
+	// Index of the argument
+	int& ch_ind = it->arg[c];
+	if(ch_ind>=0){
 	  
-	  // Index of the argument
-	  int& ch_ind = it->arg[c];
-	  if(ch_ind>=0){
+	  // Decrease reference count and add to the stack of unused variables if the count hits zero
+	  int remaining = --refcount[ch_ind];
+	  
+	  // Free variable for reuse
+	  if(live_variables && remaining==0){
 	    
-	    // Decrease reference count and add to the stack of unused variables if the count hits zero
-	    int remaining = --refcount[ch_ind];
+	    // Get a pointer to the sparsity pattern of the argument that can be freed
+	    const void* sp = nodes[ch_ind]->sparsity().get();
 	    
-	    // Free variable for reuse
-	    if(live_variables && remaining==0){
-	      
-	      // Get a pointer to the sparsity pattern of the argument that can be freed
-	      const void* sp = nodes[ch_ind]->sparsity().get();
-	      
-	      // Add to the stack of unused work vector elements for the current sparsity
-	      unused_all[sp].push(place[ch_ind]);
-	    }
-	    
-	    // Point to the place in the work vector instead of to the place in the list of nodes
-	    ch_ind = place[ch_ind];
+	    // Add to the stack of unused work vector elements for the current sparsity
+	    unused_all[sp].push(place[ch_ind]);
 	  }
-	}
-      } else {	
-	// Allocate/reuse memory for the results of the operation
-	if(it->op!=OP_OUTPUT){
-	  // Allocate new variables
-	  for(int c=0; c<it->res.size(); ++c){
-	    if(it->res[c]>=0){
-	      
-	      // Are reuse of variables (live variables) enabled?
-	      if(live_variables){
-		// Get a pointer to the sparsity pattern node
-		const void* sp = it->data->sparsity(c).get();
-		
-		// Get a reference to the stack for the current sparsity
-		stack<int>& unused = unused_all[sp];
-		
-		// Try to reuse a variable from the stack if possible (last in, first out)
-		if(!unused.empty()){
-		  it->res[c] = place[it->res[c]] = unused.top();
-		  unused.pop();
-		  continue; // Success, no new element needed in the work vector
-		}
-	      }
-	      
-	      // Allocate a new element in the work vector
-	      it->res[c] = place[it->res[c]] = worksize++;
-	    }
-	  }
+	  
+	  // Point to the place in the work vector instead of to the place in the list of nodes
+	  ch_ind = place[ch_ind];
 	}
       }
+      
+      // Nothing more to allocate
+      if(it->op==OP_OUTPUT || task==1) break;
+      
+      // Free the rest in the next iteration
+      first_to_free = last_to_free;
+      last_to_free = it->arg.size();
+
+      // Allocate/reuse memory for the results of the operation
+      for(int c=0; c<it->res.size(); ++c){
+	if(it->res[c]>=0){
+	  
+	  // Are reuse of variables (live variables) enabled?
+	  if(live_variables){
+	    // Get a pointer to the sparsity pattern node
+	    const void* sp = it->data->sparsity(c).get();
+	    
+	    // Get a reference to the stack for the current sparsity
+	    stack<int>& unused = unused_all[sp];
+	    
+	    // Try to reuse a variable from the stack if possible (last in, first out)
+	    if(!unused.empty()){
+	      it->res[c] = place[it->res[c]] = unused.top();
+	      unused.pop();
+	      continue; // Success, no new element needed in the work vector
+	    }
+	  }
+	  
+	  // Allocate a new element in the work vector
+	  it->res[c] = place[it->res[c]] = worksize++;
+	}
+      }      
     }
   }
   

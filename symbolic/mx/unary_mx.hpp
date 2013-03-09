@@ -69,7 +69,7 @@ public:
   virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
   /// Can the operation be performed inplace (i.e. overwrite the result)
-  virtual bool allowInplace() const{ return true;}
+  virtual int numInplace() const{ return 1;}
 
   //! \brief operation
   Operation op_;

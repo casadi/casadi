@@ -70,7 +70,7 @@ namespace CasADi{
     virtual int getOp() const{ return OP_RESHAPE;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual bool allowInplace() const{ return false;}
+    virtual int numInplace() const{ return 1;}
     
     /// Reshape
     virtual MX getReshape(const CRSSparsity& sp) const;

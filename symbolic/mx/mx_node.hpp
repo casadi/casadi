@@ -244,7 +244,7 @@ namespace CasADi{
     virtual Matrix<double> getMatrixValue() const;
     
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual bool allowInplace() const{ return false;}
+    virtual int numInplace() const{ return 0;}
 
     /// Convert vector of pointers to vector of objects
     template<typename T>

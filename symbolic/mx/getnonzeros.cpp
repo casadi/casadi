@@ -232,20 +232,60 @@ namespace CasADi{
       for(int k=0; k<nz_.size(); ++k){
 	if(temp[k]!=-1){
 	  r_nz.push_back(temp[k]);
-	  r_col.push_back(icol[nz_[k]]);
-	  r_row.push_back(irow[nz_[k]]);
+	  r_col.push_back(ocol[k]);
+	  r_row.push_back(orow[k]);
 	}
       }
 
-      // Create a sparsity pattern from vectors
-      CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),r_row,r_col,temp,true);
-      if(r_nz.size()>0){
-	// Create a mapping matrix
-	MX s = MX::create(new Mapping(a_sp));
-	s->assign(*adjSeed[d][0],r_nz,temp,true);
-	
-	// Save to adjoint sensitivities
-	*adjSens[d][0] += s;
+      // Quick return if nothing to add
+      if(nz_.size()!=0){
+
+	// Get the adjoint seed with ignored entries removed
+	MX aseed;
+	if(temp.size()==nz_.size()){
+	  // No need to drop any entries
+	  aseed = *adjSeed[d][0];
+	} else {
+	  // Drop entries that do will not be used
+	  CRSSparsity aseed_sp = sp_triplet(osp.size1(),osp.size2(),r_row,r_col,temp);
+	  aseed = (*adjSeed[d][0])->getGetNonzeros(aseed_sp,r_nz);
+	}
+
+	for(int iter=0; iter<2; ++iter){	  
+	  // Get the corresponding output 
+	  temp.resize(el_known.size());
+	  copy(el_known.begin(),el_known.end(),temp.begin());
+	  adjSens[d][0]->sparsity().getNZInplace(temp);
+	  
+	  // Check if any additions aren't included in the current value of the sensitivity
+	  bool spilled = false;
+	  for(vector<int>::iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
+	    if(temp[nz_[*i]]<0){
+	      spilled = true;
+	      break;
+	    }
+	  }
+	  
+	  // All additions fit
+	  if(!spilled) break;
+
+	  // Densify the sensitivitity and make another loop (never more than two needed)
+	  casadi_assert(iter<2);
+
+	  // Create a new pattern which includes both the the previous seed and the addition
+	  vector<unsigned char> tmp1;
+	  CRSSparsity sp = adjSens[d][0]->sparsity().patternUnion(dep().sparsity(),tmp1);
+	  MX t = (*adjSens[d][0])->getDensification(sp);
+	  *adjSens[d][0] = t;
+	}
+
+	// Get location in the matrix being added to
+	for(vector<int>::iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
+	  *i = temp[nz_[*i]];
+	}
+
+	// Add to the element
+	*adjSens[d][0] = aseed->getAddNonzeros(*adjSens[d][0],r_nz);
       }
       
       // Clear adjoint seeds
