@@ -65,18 +65,9 @@ namespace CasADi{
     /// Evaluate the function (template)
     template<typename T, typename MatV, typename MatVV> 
     void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
-    
-    /// Compare output index
-    static bool outputSmaller(const std::pair<int,int>& el1, const std::pair<int,int>& el2){return el1.second<el2.second;}
-    
-    /// Check equality for output index
-    static bool outputEqual(const std::pair<int,int>& el1, const std::pair<int,int>& el2){return el1.second==el2.second;}
-    
+        
     /// Construct the IMatrix that maps from the iind'th input to the output 
     Matrix<int> mapping(int iind=0) const;
-    
-    /// Get mapping from the output non-zero index of the dependency index
-    std::vector<int> getDepInd() const;
     
     /// Check if the mapping is in fact an identity mapping
     bool isIdentity() const;
@@ -86,6 +77,9 @@ namespace CasADi{
 
     /// Simplify
     virtual void simplifyMe(MX& ex);
+
+    /// Get a submatrix
+    virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
 
     /// Operation sequence
     std::vector<int> nz_;

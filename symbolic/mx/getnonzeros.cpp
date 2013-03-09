@@ -271,7 +271,7 @@ namespace CasADi{
       
       // Create a sparsity pattern from vectors
       CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),a_row[d],a_col[d],a_inz,true);
-      
+
       // Create a mapping matrix
       MX s = MX::create(new Mapping(a_sp));
       s->assign(*adjSeed[d][0],a_onz[d],a_inz,true);
@@ -318,5 +318,13 @@ namespace CasADi{
     }
   }
 
+  MX GetNonzeros::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
+    // Eliminate recursive calls
+    vector<int> nz_new(nz);
+    for(vector<int>::iterator i=nz_new.begin(); i!=nz_new.end(); ++i){
+      *i = nz_[*i];
+    }
+    return dep()->getGetNonzeros(sp,nz_new);
+  }
 
 } // namespace CasADi
