@@ -28,9 +28,9 @@
 #include <stack>
 
 namespace CasADi{
-  /** \brief Maps non-zero elements
+  /** \brief Get nonzeros of a matrix
       \author Joel Andersson
-      \date 2011
+      \date 2013
   */
   class GetNonzeros : public MXNode{
   public:
@@ -69,7 +69,7 @@ namespace CasADi{
     /// Construct the IMatrix that maps from the iind'th input to the output 
     Matrix<int> mapping(int iind=0) const;
     
-    /// Check if the mapping is in fact an identity mapping
+    /// Check if the instance is in fact an identity mapping (that can be simplified)
     bool isIdentity() const;
     
     /** \brief Get the operation */
@@ -78,7 +78,7 @@ namespace CasADi{
     /// Simplify
     virtual void simplifyMe(MX& ex);
 
-    /// Get a submatrix
+    /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
 
     /// Operation sequence

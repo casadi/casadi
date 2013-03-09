@@ -107,25 +107,7 @@ namespace CasADi{
   }
 
   void GetNonzeros::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-    casadi_assert(input.size()==1);
 
-    // Sparsity
-    const CRSSparsity &sp = sparsity();
-    vector<int> row = sp.getRow();
-  
-    // Number of derivative directions
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    // Function evaluation in sparse triplet format
-    vector<int> r_row, r_col, r_inz;
-  
-    // Sensitivity matrices in sparse triplet format for all forward sensitivities
-    vector<vector<int> > f_row(nfwd), f_col(nfwd), f_inz(nfwd);
-  
-    // Sensitivity matrices in sparse triplet format for all adjoint sensitivities
-    vector<vector<int> > a_row(nadj), a_col(nadj), a_onz(nadj);
-    
     // Output sparsity
     const CRSSparsity &osp = sparsity();
     const vector<int>& ocol = osp.col();
@@ -135,15 +117,22 @@ namespace CasADi{
     const CRSSparsity &isp = dep().sparsity();
     const vector<int>& icol = isp.col();
     vector<int> irow = isp.getRow();
-    
+
+    // Number of derivative directions
+    int nfwd = fwdSens.size();
+    int nadj = adjSeed.size();
+
+    // Sparsity patterns in sparse triplet format of quantities being calculated
+    vector<int> r_row, r_col, r_nz;
+  
     // Find out which matrix elements that we are trying to calculate
-    vector<int> el_wanted(nz_.size()); // TODO: Move outside loop
+    vector<int> el_wanted(nz_.size());
     for(int k=0; k<nz_.size(); ++k){
       el_wanted[k] = orow[k] + ocol[k]*osp.size1();
     }
     
-    // We next need to resort the assigns vector with increasing inputs instead of outputs
-    // Start by counting the number of inputs corresponding to each nonzero
+    // We next need to resort the assignment vector by inputs instead of outputs
+    // Start by counting the number of input nonzeros corresponding to each output nonzero
     vector<int> inz_count(icol.size()+1,0);
     for(vector<int>::const_iterator it=nz_.begin(); it!=nz_.end(); ++it){
       inz_count[*it+1]++;
@@ -155,14 +144,15 @@ namespace CasADi{
     }
     
     // Get the order of assignments
-    vector<int> nz_order(nz_.size()); // TODO: Move allocation outside loop
+    vector<int> nz_order(nz_.size());
     for(int k=0; k<nz_.size(); ++k){
       // Save the new index
       nz_order[inz_count[nz_[k]]++] = k;
     }
     
-    // Find out which matrix elements that we are trying to calculate
-    vector<int> el_known(nz_.size()); // TODO: Move allocation outside loop
+    // Find out which elements are given
+    vector<int>& el_known = inz_count; // Reuse memory
+    el_known.resize(nz_.size());
     for(int k=0; k<nz_.size(); ++k){
       // Get output nonzero
       int inz_k = nz_[nz_order[k]];
@@ -171,22 +161,30 @@ namespace CasADi{
       el_known[k] = irow[inz_k] + icol[inz_k]*isp.size1();
     }
     
-    // Temporary vectors
-    vector<int> temp = el_known;
+    // Temporary vector
+    vector<int> temp(el_known);
     
     // Evaluate the nondifferentiated function
     if(!output_given){
       
-      // Get the matching nonzeros
+      // Get the matching nonzeros (temp==el_known)
       input[0]->sparsity().getNZInplace(temp);
       
       // Add to sparsity pattern
       for(int k=0; k<nz_.size(); ++k){
 	if(temp[k]!=-1){
-	  r_inz.push_back(temp[k]);
+	  r_nz.push_back(temp[k]);
 	  r_col.push_back(ocol[nz_order[k]]);
 	  r_row.push_back(orow[nz_order[k]]);
 	}
+      }
+
+      // Create a sparsity pattern from vectors
+      CRSSparsity r_sp = sp_triplet(osp.size1(),osp.size2(),r_row,r_col,temp);      
+      if(r_nz.size()==0){
+	*output[0] = MX::zeros(r_sp);
+      } else {
+	*output[0] = (*input[0])->getGetNonzeros(r_sp,r_nz);
       }
     }
     
@@ -194,90 +192,61 @@ namespace CasADi{
     for(int d=0; d<nfwd; ++d){
       
       // Get the matching nonzeros
+      temp.resize(el_known.size());
       copy(el_known.begin(),el_known.end(),temp.begin());
       fwdSeed[d][0]->sparsity().getNZInplace(temp);
       
       // Add to sparsity pattern
+      r_nz.clear();
+      r_col.clear();
+      r_row.clear();
       for(int k=0; k<nz_.size(); ++k){
 	if(temp[k]!=-1){
-	  f_inz[d].push_back(temp[k]);
-	  f_col[d].push_back(ocol[nz_order[k]]);
-	  f_row[d].push_back(orow[nz_order[k]]);
+	  r_nz.push_back(temp[k]);
+	  r_col.push_back(ocol[nz_order[k]]);
+	  r_row.push_back(orow[nz_order[k]]);
 	}
       }
-    }
-    
-    // Continue of no adjoint sensitivities
-    if(nadj>0){
-      
-      // Resize temp to be able to hold el_wanted
-      temp.resize(el_wanted.size());
-      
-      // Adjoint sensitivities
-      for(int d=0; d<nadj; ++d){
-	
-	// Get the matching nonzeros
-	copy(el_wanted.begin(),el_wanted.end(),temp.begin());
-	adjSeed[d][0]->sparsity().getNZInplace(temp);
-	
-	// Add to sparsity pattern
-	for(int k=0; k<nz_.size(); ++k){
-	  if(temp[k]!=-1){
-	    a_onz[d].push_back(temp[k]);
-	    a_col[d].push_back(icol[nz_[k]]);
-	    a_row[d].push_back(irow[nz_[k]]);
-	  }
-	}
-      }
-    }
-    
-    // Non-differentiated output
-    if(!output_given){
-      
-      // Output sparsity
-      const CRSSparsity &osp = sparsity();
-      
+
       // Create a sparsity pattern from vectors
-      CRSSparsity r_sp = sp_triplet(osp.size1(),osp.size2(),r_row,r_col);
-      
-      if(r_inz.size()>0){
-	*output[0] = (*input[0])->getGetNonzeros(r_sp,r_inz);
-      } else {
-	*output[0] = MX::zeros(r_sp);
-      }
-    }
-    
-    // Create the forward sensitivity matrices
-    for(int d=0; d<nfwd; ++d){
-    
-      // Output sparsity
-      const CRSSparsity &osp = sparsity();
-      
-      // Create a sparsity pattern from vectors
-      CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),f_row[d],f_col[d]);
-      if(f_inz[d].size()>0){
-	*fwdSens[d][0] = (*fwdSeed[d][0])->getGetNonzeros(f_sp,f_inz[d]);
-      } else {
+      CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),r_row,r_col,temp);
+      if(r_nz.size()==0){
 	*fwdSens[d][0] = MX::zeros(f_sp);
+      } else {
+	*fwdSens[d][0] = (*fwdSeed[d][0])->getGetNonzeros(f_sp,r_nz);
       }
     }
-  
-    // Create the adjoint sensitivity matrices
-    vector<int> a_inz;
+    
+    // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-
-      // Input sparsity
-      const CRSSparsity &isp = input[0]->sparsity();
       
+      // Get the matching nonzeros
+      temp.resize(el_wanted.size());
+      copy(el_wanted.begin(),el_wanted.end(),temp.begin());
+      adjSeed[d][0]->sparsity().getNZInplace(temp);
+      
+      // Add to sparsity pattern
+      r_nz.clear();
+      r_col.clear();
+      r_row.clear();
+      for(int k=0; k<nz_.size(); ++k){
+	if(temp[k]!=-1){
+	  r_nz.push_back(temp[k]);
+	  r_col.push_back(icol[nz_[k]]);
+	  r_row.push_back(irow[nz_[k]]);
+	}
+      }
+
       // Create a sparsity pattern from vectors
-      CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),a_row[d],a_col[d],a_inz,true);
-
-      // Create a mapping matrix
-      MX s = MX::create(new Mapping(a_sp));
-      s->assign(*adjSeed[d][0],a_onz[d],a_inz,true);
-      
-      // Save to adjoint sensitivities
-      *adjSens[d][0] += s;
+      CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),r_row,r_col,temp,true);
+      if(r_nz.size()>0){
+	// Create a mapping matrix
+	MX s = MX::create(new Mapping(a_sp));
+	s->assign(*adjSeed[d][0],r_nz,temp,true);
+	
+	// Save to adjoint sensitivities
+	*adjSens[d][0] += s;
+      }
       
       // Clear adjoint seeds
       *adjSeed[d][0] = MX();
@@ -304,7 +273,7 @@ namespace CasADi{
 
   void GetNonzeros::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     if(nz_.size()==1){
-      // Compact if just a scalar
+      // Compact if just a scalar (TODO: extend to slices)
       stream << "  " << res.front() << "[0]=" << arg.front() << "[" << nz_.front() << "];" << endl;
     } else {
       // Condegen the indices
