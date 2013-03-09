@@ -509,5 +509,24 @@ namespace CasADi{
     }
   }
 
+  void CodeGenerator::copyVector(std::ostream &s, const std::string& arg, std::size_t n, const std::string& res, const std::string& it, bool only_if_exists) const{
+    // Quick return if nothing to do
+    if(n==0) return;
+
+    // Print condition
+    if(only_if_exists){
+      s << "  if(" << res << "!=0) ";
+    }
+
+    if(n==1){
+      // Simplify if scalar assignment
+      s << "*" << res << "=*" << arg << ";" << endl;
+    } else {
+      // For loop
+      s << "for(" << it << "=0; " << it << "<" << n << "; ++" << it << ") " << res << "[" << it << "]=" << arg << "[" << it << "];" << endl;
+    }
+    
+  }
+
 } // namespace CasADi
 

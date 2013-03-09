@@ -92,6 +92,9 @@ namespace CasADi{
     /** \brief  Print real vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<double>& v);
 
+    /** \brief Copy a vector to another */
+    void copyVector(std::ostream &s, const std::string& arg, std::size_t n, const std::string& res, const std::string& it="i", bool only_if_exists=false) const;
+
   private:
 
     /// COPY: y <-x
