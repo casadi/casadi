@@ -266,13 +266,13 @@ namespace CasADi{
     /// Matrix multiplcation
     virtual MX getMultiplication(const MX& y) const;
 
-    /// Get a submatrix
+    /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
 
     /// Set a submatrix
     virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
 
-    /// Add a submatrix
+    /// Add the nonzeros of a matrix to another matrix
     virtual MX getAddNonzeros(const MX& y, const std::vector<int>& nz) const;
 
     /// Get submatrix reference

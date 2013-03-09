@@ -33,6 +33,7 @@
 #include "subassign.hpp"
 #include "mapping.hpp"
 #include "getnonzeros.hpp"
+#include "addnonzeros.hpp"
 
 using namespace std;
 
@@ -307,12 +308,12 @@ namespace CasADi{
   }
   
   MX MXNode::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
-    if(nz.size()>0){
+    if(nz.size()==0){
+      return MX::zeros(sp);
+    } else {
       MX ret = MX::create(new GetNonzeros(sp,shared_from_this<MX>(),nz));
       simplify(ret);
       return ret;
-    } else {
-      return MX::zeros(sp);
     }
   }
 
@@ -322,7 +323,13 @@ namespace CasADi{
 
 
   MX MXNode::getAddNonzeros(const MX& y, const std::vector<int>& nz) const{
-    return MX();
+    if(nz.size()==0){
+      return y;
+    } else {
+      MX ret = MX::create(new AddNonzeros(y,shared_from_this<MX>(),nz));
+      simplify(ret);
+      return ret;
+    }
   }
 
   

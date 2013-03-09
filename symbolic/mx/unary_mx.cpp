@@ -127,6 +127,8 @@ void UnaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
       *adjSens[d][0] += pd[0]*s;
     }
   }
+ 
+  // Perform the assignment (which may be inplace, hence delayed)
   if(!output_given){
     *output[0] = f;
   }
