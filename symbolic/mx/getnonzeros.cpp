@@ -101,8 +101,8 @@ namespace CasADi{
   }
 
   void GetNonzeros::printPart(std::ostream &stream, int part) const{
-    if(part==1){
-      stream << nz_;
+    switch(part){
+    case 1: stream << nz_; break;
     }
   }
 
@@ -303,11 +303,16 @@ namespace CasADi{
   }
 
   void GetNonzeros::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    // Condegen the indices
-    int ind = gen.getConstant(nz_,true);
-    
-    // Codegen the assignments
-    stream << "  for(i=0; i<" << nz_.size() << "; ++i) " << res.front() << "[i]=" << arg.front() << "[s" << ind << "[i]];" << endl;
+    if(nz_.size()==1){
+      // Compact if just a scalar
+      stream << "  " << res.front() << "[0]=" << arg.front() << "[" << nz_.front() << "];" << endl;
+    } else {
+      // Condegen the indices
+      int ind = gen.getConstant(nz_,true);
+      
+      // Codegen the assignments
+      stream << "  for(i=0; i<" << nz_.size() << "; ++i) " << res.front() << "[i]=" << arg.front() << "[s" << ind << "[i]];" << endl;
+    }
   }
 
   void GetNonzeros::simplifyMe(MX& ex){
