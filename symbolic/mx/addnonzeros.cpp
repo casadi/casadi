@@ -343,7 +343,7 @@ namespace CasADi{
 
   void AddNonzeros::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     // Check if inplace
-    bool inplace = arg.front().compare(res.front())==0;
+    bool inplace = arg.at(0).compare(res.front())==0;
 
     // Copy first argument if not implace
     if(!inplace){      
@@ -358,7 +358,7 @@ namespace CasADi{
       int ind = gen.getConstant(nz_,true);
       
       // Codegen the additions
-      stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.front() << "; ii!=s" << ind << "+" << nz_.size() << "; ++ii, ++ss) if(*ii>=0) rr[*ii] += *ss;" << endl;
+      stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.at(1) << "; ii!=s" << ind << "+" << nz_.size() << "; ++ii, ++ss) if(*ii>=0) rr[*ii] += *ss;" << endl;
     }
   }
 
