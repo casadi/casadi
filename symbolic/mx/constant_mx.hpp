@@ -222,6 +222,20 @@ namespace CasADi{
       return MX::create(new Constant<Value>(sp,v_));
     }
 
+    /// Get the nonzeros of matrix
+    virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
+      if(v_.value!=0){
+	// Check if any "holes"
+	for(std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k){
+	  if(*k<0){
+	    // Do not simplify
+	    return MXNode::getGetNonzeros(sp,nz);
+	  }
+	}
+      }
+      return MX::create(new Constant<Value>(sp,v_));
+    }
+
     /** \brief The actual numerical value */
     Value v_;
   };
