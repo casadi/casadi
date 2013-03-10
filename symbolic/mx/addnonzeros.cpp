@@ -59,25 +59,25 @@ namespace CasADi{
     
     // Nondifferentiated outputs
     const vector<T>& idata0 = input[0]->data();
-    const vector<T>& idata = input[1]->data();
+    typename vector<T>::const_iterator idata_it = input[1]->begin();
     vector<T>& odata = output[0]->data();
     if(&idata0 != &odata){
       copy(idata0.begin(),idata0.end(),odata.begin());
     }
-    for(int k=0; k<nz_.size(); ++k){
-      odata[nz_[k]] += idata[k];
+    for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k, ++idata_it){
+      if(*k>=0) odata[*k] += *idata_it;
     }
     
     // Forward sensitivities
     for(int d=0; d<nfwd; ++d){
       const vector<T>& fseed0 = fwdSeed[d][0]->data();
-      const vector<T>& fseed = fwdSeed[d][1]->data();
+      typename vector<T>::const_iterator fseed_it = fwdSeed[d][1]->begin();
       vector<T>& fsens = fwdSens[d][0]->data();
       if(&fseed0 != &fsens){
 	copy(fseed0.begin(),fseed0.end(),fsens.begin());
       }
-      for(int k=0; k<nz_.size(); ++k){
-	fsens[nz_[k]] += fseed[k];
+      for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k, ++fseed_it){
+	if(*k>=0) fsens[*k] += *fseed_it;
       }
     }
       
@@ -85,9 +85,9 @@ namespace CasADi{
     for(int d=0; d<nadj; ++d){
       vector<T>& aseed = adjSeed[d][0]->data();
       vector<T>& asens0 = adjSens[d][0]->data();
-      vector<T>& asens = adjSens[d][1]->data();
-      for(int k=0; k<nz_.size(); ++k){
-	asens[k] += aseed[nz_[k]];
+      typename vector<T>::iterator asens_it = adjSens[d][1]->begin();
+      for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k, ++asens_it){
+	if(*k>=0) *asens_it += aseed[*k];
       }
       if(&aseed != &asens0){
 	transform(aseed.begin(),aseed.end(),asens0.begin(),asens0.begin(),std::plus<T>());
@@ -107,12 +107,12 @@ namespace CasADi{
       if(outputd != inputd0){
 	copy(inputd0,inputd0+input[0]->size(),outputd);
       }
-      for(int k=0; k<nz_.size(); ++k){
-	outputd[nz_[k]] |= inputd[k];
+      for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k, ++inputd){
+	if(*k>=0) outputd[*k] |= *inputd;
       }
     } else {
-      for(int k=0; k<nz_.size(); ++k){
-	inputd[k] |= outputd[nz_[k]];
+      for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k, ++inputd){
+	if(*k>=0) *inputd |= outputd[*k];
       }
       if(outputd != inputd0){
 	for(int k=0; k<input[0]->size(); ++k){
@@ -347,7 +347,7 @@ namespace CasADi{
     bool inplace = arg.front().compare(res.front())==0;
 
     // Copy first argument if not implace
-    if(!inplace){
+    if(!inplace){      
       stream << "  for(i=0; i<" << size() << "; ++i) " << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 
@@ -359,7 +359,7 @@ namespace CasADi{
       int ind = gen.getConstant(nz_,true);
       
       // Codegen the additions
-      stream << "  for(i=0; i<" << nz_.size() << "; ++i) " << res.front() << "[s" << ind << "[i]]+=" << arg.at(1) << "[i];" << endl;
+      stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.front() << "; ii!=s" << ind << "+" << nz_.size() << "; ++ii, ++ss) if(*ii>=0) rr[*ii] += *ss;" << endl;
     }
   }
 
