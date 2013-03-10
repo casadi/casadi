@@ -57,6 +57,7 @@ SET(CASADI_SRCS
   mx/subassign.cpp           mx/subassign.hpp           # Submatrix assignment
   mx/getnonzeros.cpp         mx/getnonzeros.hpp         # Get the nonzeros of matrix
   mx/addnonzeros.cpp         mx/addnonzeros.hpp         # Add the nonzeros of a matrix to another matrix
+  mx/setnonzeros.cpp         mx/setnonzeros.hpp         # Assign the nonzeros of a matrix to another matrix
   mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
   mx/densification.cpp       mx/densification.hpp       # Makes a matrix dense
   mx/multiple_output.cpp     mx/multiple_output.hpp     # Base class for nodes with multiple outputs

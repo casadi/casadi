@@ -94,6 +94,9 @@ enum Operation{
   // Nonzero addition
   OP_ADDNONZEROS,
 
+  // Nonzero assignment
+  OP_SETNONZEROS,
+
   // Nonzero mapping
   OP_MAPPING,
   

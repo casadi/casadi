@@ -137,6 +137,7 @@ namespace CasADi{
     // Start by counting the number of input nonzeros corresponding to each output nonzero
     vector<int> inz_count(icol.size()+1,0);
     for(vector<int>::const_iterator it=nz_.begin(); it!=nz_.end(); ++it){
+      casadi_assert_message(*it>=0,"Not implemented");
       inz_count[*it+1]++;
     }
     
@@ -223,35 +224,21 @@ namespace CasADi{
     for(int d=0; d<nadj; ++d){
       
       // Get the matching nonzeros
-      temp.resize(el_wanted.size());
-      copy(el_wanted.begin(),el_wanted.end(),temp.begin());
-      adjSeed[d][0]->sparsity().getNZInplace(temp);
+      r_nz.resize(el_wanted.size());
+      copy(el_wanted.begin(),el_wanted.end(),r_nz.begin());
+      adjSeed[d][0]->sparsity().getNZInplace(r_nz);
       
-      // Add to sparsity pattern
-      r_nz.clear();
-      r_col.clear();
-      r_row.clear();
-      for(int k=0; k<nz_.size(); ++k){
-	if(temp[k]!=-1){
-	  r_nz.push_back(temp[k]);
-	  r_col.push_back(ocol[k]);
-	  r_row.push_back(orow[k]);
+      // Check if nothing to add
+      bool nothing_to_add = true;
+      for(vector<int>::const_iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
+	if(*i>=0){
+	  nothing_to_add = false;
+	  break;
 	}
       }
-
+      
       // Quick return if nothing to add
-      if(nz_.size()!=0){
-
-	// Get the adjoint seed with ignored entries removed
-	MX aseed;
-	if(temp.size()==nz_.size()){
-	  // No need to drop any entries
-	  aseed = *adjSeed[d][0];
-	} else {
-	  // Drop entries that do will not be used
-	  CRSSparsity aseed_sp = sp_triplet(osp.size1(),osp.size2(),r_row,r_col,temp);
-	  aseed = (*adjSeed[d][0])->getGetNonzeros(aseed_sp,r_nz);
-	}
+      if(!nothing_to_add){
 
 	for(int iter=0; iter<2; ++iter){	  
 	  // Get the corresponding output 
@@ -262,7 +249,7 @@ namespace CasADi{
 	  // Check if any additions aren't included in the current value of the sensitivity
 	  bool spilled = false;
 	  for(vector<int>::iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
-	    if(temp[nz_[*i]]<0){
+	    if(*i>=0 && temp[nz_[*i]]<0){
 	      spilled = true;
 	      break;
 	    }
@@ -282,12 +269,16 @@ namespace CasADi{
 	}
 
 	// Get location in the matrix being added to
-	for(vector<int>::iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
-	  *i = temp[nz_[*i]];
+	int n=0;
+	for(vector<int>::const_iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
+	  if(*i>=0){
+	    r_nz[n++] = temp[nz_[*i]];
+	  }
 	}
+	r_nz.resize(n);
 
 	// Add to the element
-	*adjSens[d][0] = aseed->getAddNonzeros(*adjSens[d][0],r_nz);
+	*adjSens[d][0] = (*adjSeed[d][0])->getAddNonzeros(*adjSens[d][0],r_nz);
       }
       
       // Clear adjoint seeds

@@ -34,6 +34,7 @@
 #include "mapping.hpp"
 #include "getnonzeros.hpp"
 #include "addnonzeros.hpp"
+#include "setnonzeros.hpp"
 #include "densification.hpp"
 
 using namespace std;
@@ -319,7 +320,13 @@ namespace CasADi{
   }
 
   MX MXNode::getSetNonzeros(const MX& y, const std::vector<int>& nz) const{
-    return MX();
+    if(nz.size()==0){
+      return y;
+    } else {
+      MX ret = MX::create(new SetNonzeros(y,shared_from_this<MX>(),nz));
+      simplify(ret);
+      return ret;
+    }
   }
 
 

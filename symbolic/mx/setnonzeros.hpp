@@ -20,29 +20,29 @@
  *
  */
 
-#ifndef ADDNONZEROS_HPP
-#define ADDNONZEROS_HPP
+#ifndef SETNONZEROS_HPP
+#define SETNONZEROS_HPP
 
 #include "mx_node.hpp"
 #include <map>
 #include <stack>
 
 namespace CasADi{
-  /** \brief Add the nonzeros of a matrix to another matrix
+  /** \brief Assign the nonzeros of a matrix to another matrix
       \author Joel Andersson
       \date 2013
   */
-  class AddNonzeros : public MXNode{
+  class SetNonzeros : public MXNode{
   public:
 
     /// Constructor
-    AddNonzeros(const MX& y, const MX& x, const std::vector<int>& nz);
+    SetNonzeros(const MX& y, const MX& x, const std::vector<int>& nz);
 
     /// Clone function
-    virtual AddNonzeros* clone() const;
+    virtual SetNonzeros* clone() const;
       
     /// Destructor
-    virtual ~AddNonzeros(){}
+    virtual ~SetNonzeros(){}
     
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
@@ -70,10 +70,10 @@ namespace CasADi{
     Matrix<int> mapping(int iind=0) const;
     
     /// Check if the instance is in fact a simple assignment
-    bool isAddition() const;
+    bool isAssignment() const;
     
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_ADDNONZEROS;}
+    virtual int getOp() const{ return OP_SETNONZEROS;}
 
     /// Simplify
     virtual void simplifyMe(MX& ex);
@@ -87,4 +87,4 @@ namespace CasADi{
 
 } // namespace CasADi
 
-#endif // ADDNONZEROS_HPP
+#endif // SETNONZEROS_HPP
