@@ -578,7 +578,11 @@ void MXFunctionInternal::print(ostream &stream) const{
     if(it->op==OP_OUTPUT){
       stream << "output[" << it->res.front() << "] = @" << it->arg.front();
     } else {
-      if(it->res.size()==1){
+      if(it->op==OP_SETNONZEROS || it->op==OP_ADDNONZEROS){
+	if(it->res.front()!=it->arg.front()){
+	  stream << "@" << it->res.front() << " = @" << it->arg.front() << "; ";
+	}
+      } else if(it->res.size()==1){
         stream << "@" << it->res.front() << " = ";
       } else {
         stream << "{";

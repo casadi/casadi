@@ -396,6 +396,20 @@ namespace CasADi{
     // Quick return if no assignments to be made
     if(k.empty()) return;
 
+#if 0
+    // Temporary
+    MX x;
+
+    // Project scalars
+    if(k.size()!=el.size() && el.scalar() && el.dense()){      
+      MX new_el = el->getGetNonzeros(sp_dense(k.size(),1),vector<int>(k.size(),0));
+      x = new_el->getSetNonzeros(*this,k);
+    } else {
+      // Create a nonzero assignment node
+      x = el->getSetNonzeros(*this,k);
+    }
+    *this = x;
+#else
     // Make mapping if not already so
     if(!isMapping()){
       MX x;
@@ -415,6 +429,7 @@ namespace CasADi{
   
     // Add to mapping
     (*this)->assign(el,inz,k);
+#endif
     simplify(*this);
   }
 

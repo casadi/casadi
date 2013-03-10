@@ -36,6 +36,7 @@ namespace CasADi{
   SetNonzeros::SetNonzeros(const MX& y, const MX& x, const std::vector<int>& nz) : nz_(nz){
     setSparsity(y.sparsity());
     setDependencies(y,x);
+    casadi_assert(nz.size()==x.size());
   }
 
   SetNonzeros* SetNonzeros::clone() const{
@@ -131,9 +132,7 @@ namespace CasADi{
 
   void SetNonzeros::printPart(std::ostream &stream, int part) const{
     switch(part){
-    case 0: stream << "("; break;
-    case 1: stream << nz_ << "="; break;
-    case 2: stream << ")"; break;
+    case 1: stream << nz_ << " = "; break;
     }
   }
 
