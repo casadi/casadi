@@ -55,6 +55,7 @@ SCPgenInternal::SCPgenInternal(const FX& F, const FX& G, const FX& H, const FX& 
   addOption("reg_threshold",     OT_REAL,      1e-8,              "Threshold for the regularization.");
   addOption("name_x",      OT_STRINGVECTOR,  GenericType(),       "Names of the variables.");
   addOption("print_x",           OT_INTEGERVECTOR,  GenericType(), "Which variables to print.");
+  addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",    "Compiler command to be used for compiling generated code");
   
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
@@ -776,12 +777,8 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
 void SCPgenInternal::dynamicCompilation(FX& f, FX& f_gen, std::string fname, std::string fdescr){
 #ifdef WITH_DL 
 
-  // C compiler
-  string compiler = "clang";
-
-  // Optimization flag
-  //string oflag = "-O3";
-  string oflag = "-O2";
+  // C compiler command
+  string compiler = getOption("compiler");
 
   // Flag to get a DLL
 #ifdef __APPLE__
@@ -806,7 +803,7 @@ void SCPgenInternal::dynamicCompilation(FX& f, FX& f_gen, std::string fname, std
   }
   
   // Compile it
-  string compile_command = compiler + " -fPIC " + dlflag + " " + oflag + " " + cname + " -o " + dlname;
+  string compile_command = compiler + " " + dlflag + " " + cname + " -o " + dlname;
   if(verbose_){
     cout << "Compiling " << fdescr <<  " using \"" << compile_command << "\"" << endl;
   }

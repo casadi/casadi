@@ -356,7 +356,8 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   nlp_solver_.setOption("beta",0.5);
   //nlp_solver_.setOption("merit_memory",1);
   nlp_solver_.setOption("maxiter",100);
-  
+  nlp_solver_.setOption("compiler","clang -fPIC"); // No optimization, fast compilation
+
   // Name the variables
   vector<string> variable_name;
   variable_name.push_back("drag");
