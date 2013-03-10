@@ -122,8 +122,8 @@ namespace CasADi{
     int ncol_x = dep(0).size2();
     int nrow_y = dep(1).size1();
     stream << "  for(i=0; i<" << nrow_x << "; ++i) for(j=0; j<" << nrow_y << "; ++j){" << endl;
-    stream << "    d r=0, *x=" << arg.at(0) << "+i*" << ncol_x << ", *y=" << arg.at(1) << "+j*" << ncol_x << ";" << endl;
-    stream << "    for(k=0; k<" << ncol_x << "; ++k) r += *x++**y++;" << endl;
+    stream << "    r=0;" << endl;
+    stream << "    for(k=0, ss=" << arg.at(0) << "+i*" << ncol_x << ", tt=" << arg.at(1) << "+j*" << ncol_x << "; k<" << ncol_x << "; ++k) r += *ss++**tt++;" << endl;
     stream << "    " << res.front() << "[j+i*" << nrow_y << "] = r;" << endl;
     stream << "  }" << endl;
   }

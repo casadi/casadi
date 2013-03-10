@@ -209,7 +209,7 @@ namespace CasADi{
 
     stream << "  casadi_trans(";
     stream << arg.front() << ",s" << gen.getSparsity(dep().sparsity()) << ",";
-    stream << res.front() << ",s" << gen.getSparsity(sparsity()) << ",itmp);" << endl;
+    stream << res.front() << ",s" << gen.getSparsity(sparsity()) << ",iii);" << endl;
   }
 
   void DenseTranspose::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{

@@ -513,9 +513,12 @@ namespace CasADi{
     // Quick return if nothing to do
     if(n==0) return;
 
+    // Indent
+    s << "  ";
+
     // Print condition
     if(only_if_exists){
-      s << "  if(" << res << "!=0) ";
+      s << "if(" << res << "!=0) ";
     }
 
     if(n==1){

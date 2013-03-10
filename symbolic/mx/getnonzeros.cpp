@@ -59,27 +59,27 @@ namespace CasADi{
     
     // Nondifferentiated outputs
     const vector<T>& idata = input[0]->data();
-    vector<T>& odata = output[0]->data();
-    for(int k=0; k<nz_.size(); ++k){
-      odata[k] = idata[nz_[k]];
+    typename vector<T>::iterator odata_it = output[0]->begin();
+    for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
+      *odata_it++ = *k>=0 ? idata[*k] : 0;
     }
     
     // Forward sensitivities
     for(int d=0; d<nfwd; ++d){
       const vector<T>& fseed = fwdSeed[d][0]->data();
-      vector<T>& fsens = fwdSens[d][0]->data();
-      for(int k=0; k<nz_.size(); ++k){
-	fsens[k] = fseed[nz_[k]];
+      typename vector<T>::iterator fsens_it = fwdSens[d][0]->begin();
+      for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
+     	*fsens_it++ = *k>=0 ? fseed[*k] : 0;
       }
     }
       
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      vector<T>& aseed = adjSeed[d][0]->data();
+      typename vector<T>::iterator aseed_it = adjSeed[d][0]->begin();
       vector<T>& asens = adjSens[d][0]->data();
-      for(int k=0; k<nz_.size(); ++k){
-	asens[nz_[k]] += aseed[k];
-	aseed[k] = 0;
+      for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
+	if(*k>=0) asens[*k] += *aseed_it;
+	*aseed_it++ = 0;
       }
     }
   }
@@ -90,12 +90,14 @@ namespace CasADi{
     bvec_t *inputd = get_bvec_t(input[0]->data());
     
     // Propate sparsity
-    for(int k=0; k<nz_.size(); ++k){
-      if(fwd){
-	outputd[k] = inputd[nz_[k]];
-      } else {
-	inputd[nz_[k]] |= outputd[k];
-	outputd[k] = 0;
+    if(fwd){
+      for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
+	*outputd++ = *k>=0 ? inputd[*k] : 0;
+      }
+    } else {
+      for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
+	if(*k>=0) inputd[*k] |= *outputd;
+	*outputd++ = 0;
       }
     }
   }
@@ -312,7 +314,7 @@ namespace CasADi{
   }
 
   void GetNonzeros::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    if(nz_.size()==1){
+    if(nz_.size()==1 && nz_.front()>=0){
       // Compact if just a scalar (TODO: extend to slices)
       stream << "  " << res.front() << "[0]=" << arg.front() << "[" << nz_.front() << "];" << endl;
     } else {
@@ -320,7 +322,7 @@ namespace CasADi{
       int ind = gen.getConstant(nz_,true);
       
       // Codegen the assignments
-      stream << "  for(i=0; i<" << nz_.size() << "; ++i) " << res.front() << "[i]=" << arg.front() << "[s" << ind << "[i]];" << endl;
+      stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.front() << "; ii!=s" << ind << "+" << nz_.size() << "; ++ii) *rr++ = *ii>=0 ? ss[*ii] : 0;" << endl;
     }
   }
 

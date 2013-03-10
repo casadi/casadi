@@ -1136,19 +1136,16 @@ void MXFunctionInternal::allocTape(){
     stream << "  } w;" << endl;
     stream << endl;
 
-    // Temporary variables
-    stream << "  int itmp[" << itmp_.size() << "];" << endl;
-    stream << "  d rtmp[" << rtmp_.size() << "];" << endl;
+    // Temporary variables and vectors
+    stream << "  int i,j,k,*ii,*jj,*kk,iii[" << itmp_.size() << "];" << endl;
+    stream << "  d r,s,t,*rr,*ss,*tt,rrr[" << rtmp_.size() << "];" << endl;
 
     // Operation number (for printing)
     int k=0;
     
     // Names of operation argument and results
     vector<string> arg,res;
-    
-    // Codegen a temporary variable
-    stream << "  int i,j,k;" << endl;
-    
+        
     // Print class (for debugging)
     bool codegen_class = true;
     

@@ -514,7 +514,7 @@ namespace CasADi {
     vector<string> arg_mod = arg;
     for(int i=0; i<fcn_.getNumInputs(); ++i){
       if(dep(i).isNull() || dep(i).sparsity()!=fcn_.input(i).sparsity()){
-	arg_mod[i] = "rtmp+" + CodeGenerator::numToString(nr);
+	arg_mod[i] = "rrr+" + CodeGenerator::numToString(nr);
 	nr += fcn_.input(i).size();
 	if(!dep(i).isNull()){
 	  // Codegen "copy sparse"
