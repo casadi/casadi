@@ -222,7 +222,7 @@ namespace CasADi{
     
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      
+
       // Get the matching nonzeros
       r_nz.resize(el_wanted.size());
       copy(el_wanted.begin(),el_wanted.end(),r_nz.begin());
@@ -230,31 +230,40 @@ namespace CasADi{
       
       // Check if nothing to add
       bool nothing_to_add = true;
-      for(vector<int>::const_iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
-	if(*i>=0){
+      for(int i=0; i<nz_.size(); ++i){
+	if(nz_[i]>=0 && r_nz[i]>=0){
 	  nothing_to_add = false;
 	  break;
 	}
       }
-      
+
       // Quick return if nothing to add
       if(!nothing_to_add){
 
-	for(int iter=0; iter<2; ++iter){	  
+	for(int iter=0; iter<2; ++iter){
+	  // Use r_row as temporary memory
+	  vector<int>& temp2 = r_row;
+
 	  // Get the corresponding output 
-	  temp.resize(el_known.size());
-	  copy(el_known.begin(),el_known.end(),temp.begin());
-	  adjSens[d][0]->sparsity().getNZInplace(temp);
-	  
+	  temp2.resize(el_known.size());
+	  copy(el_known.begin(),el_known.end(),temp2.begin());
+	  adjSens[d][0]->sparsity().getNZInplace(temp2);
+
+	  // Resort in the order of the inputs
+	  temp.resize(temp2.size());
+	  for(int i=0; i<nz_order.size(); ++i){
+	    temp[nz_order[i]] = temp2[i];
+	  }
+
 	  // Check if any additions aren't included in the current value of the sensitivity
 	  bool spilled = false;
-	  for(vector<int>::iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
-	    if(*i>=0 && temp[nz_[*i]]<0){
+	  for(int i=0; i<nz_.size(); ++i){
+	    if(r_nz[i]>=0 && nz_[i]>=0 && temp[i]<0){
 	      spilled = true;
 	      break;
 	    }
 	  }
-	  
+
 	  // All additions fit
 	  if(!spilled) break;
 
@@ -268,11 +277,11 @@ namespace CasADi{
 	  *adjSens[d][0] = t;
 	}
 
-	// Get location in the matrix being added to
-	int n=0;
-	for(vector<int>::const_iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
-	  if(*i>=0){
-	    r_nz[n++] = temp[nz_[*i]];
+	// Compress the nonzeros to the size of the seed
+	int n=0;	
+	for(int i=0; i<nz_.size(); ++i){
+	  if(r_nz[i]>=0){
+	    r_nz[n++] = nz_[i]>=0 ? temp[i] : -1;
 	  }
 	}
 	r_nz.resize(n);
