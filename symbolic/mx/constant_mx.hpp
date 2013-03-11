@@ -159,7 +159,7 @@ namespace CasADi{
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const{
-      stream << "ConstInt<" << v_.value << ">(";
+      stream << "Const<" << v_.value << ">(";
       if(sparsity().scalar()){
 	stream << "scalar";
       } else {
