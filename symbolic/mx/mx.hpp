@@ -368,6 +368,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   void setSub(const MX& m, const Matrix<int>& k);
   void setSub(const MX& m, const std::vector<int>& i, const Matrix<int>& k);
   void setSub(const MX& m, const Matrix<int>& k, const std::vector<int>& j);
+  void setSub(const MX& m, const Slice& i, const Slice& j);
   //void setSub(const MX& m, const Slice& i, const Matrix<int>& k) {return setSub(m,i.getAll(size1()),k);}
   //void setSub(const MX& m, const Matrix<int>& k, const Slice& j) {return setSub(m,k,j.getAll(size2()));}
   void setSub(const MX& m, const Matrix<int>& i, const Matrix<int>& j);

@@ -232,6 +232,10 @@ namespace CasADi{
     casadi_error("MX::setSub not implemented yet");
   }
 
+  void MX::setSub(const MX& m, const Slice& i, const Slice& j){
+    setSub(m,i.getAll(size1()),j.getAll(size2()));
+  }
+
 
   void MX::setSub(const MX& m, const vector<int>& ii, const vector<int>& jj){
     // Allow m to be a 1x1
@@ -248,11 +252,14 @@ namespace CasADi{
     if(dense() && m.dense()){
       // Dense mode
       int ld = size2(), ld_el = m.size2(); // leading dimensions
+      vector<int> kk1, kk2;
       for(int i=0; i<ii.size(); ++i) {
 	for(int j=0; j<jj.size(); ++j) {
-	  (*this)[ii[i]*ld + jj[j]]=m[i*ld_el+j];
+	  kk1.push_back(ii[i]*ld + jj[j]);
+	  kk2.push_back(i*ld_el+j);
 	}
       }
+      (*this)[kk1]=m[kk2];
     } else {
       // Sparse mode
 
