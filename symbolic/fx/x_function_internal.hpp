@@ -569,6 +569,9 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   // The nonzeros of the sensitivity matrix
   std::vector<int> nzmap, nzmap2;
   
+  // Additions to the jacobian matrix
+  std::vector<int> adds, adds2;
+
   // A vector used to resolve collitions between directions
   std::vector<int> hits;
   
@@ -717,6 +720,13 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
         fsens[d][oind].sparsity().getNZInplace(nzmap2);
       }
       
+      // Assignments to the Jacobian
+      adds.resize(fsens[d][oind].size());
+      fill(adds.begin(),adds.end(),-1);
+      if(symmetric){
+	adds2.resize(adds.size());
+	fill(adds2.begin(),adds2.end(),-1);
+      }
       
       // For all the input nonzeros treated in the sweep
       for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
@@ -743,14 +753,20 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
           
           if(symmetric){
             if(hits[r_out]==1){
-              ret.at(el_out) = fsens[d][oind].at(f_out);
-              ret.at(elJ) = fsens[d][oind].at(f_out);
+	      adds[f_out] = el_out;
+	      adds2[f_out] = elJ;
             }
           } else {
             // Get the output seed
-            ret.at(elJ) = fsens[d][oind].at(f_out);
+	    adds[f_out] = elJ;
           }
         }
+      }
+
+      // Add contribution to the Jacobian
+      assignIgnore(ret,fsens[d][oind],adds);
+      if(symmetric){
+	assignIgnore(ret,fsens[d][oind],adds2);
       }
     }
         

@@ -396,7 +396,6 @@ namespace CasADi{
     // Quick return if no assignments to be made
     if(k.empty()) return;
 
-#if 0
     // Temporary
     MX x;
 
@@ -409,27 +408,6 @@ namespace CasADi{
       x = el->getSetNonzeros(*this,k);
     }
     *this = x;
-#else
-    // Make mapping if not already so
-    if(!isMapping()){
-      MX x;
-      x.assignNode(new Mapping(sparsity()));
-      x->assign(*this,range(size()));
-      *this = x;
-    }
-  
-    // Make sure that the assignment does not affect other nodes
-    makeUnique(false);
-  
-    // Input nonzeros (see Mapping class)
-    std::vector<int> inz(k.size(),0);
-    if(!(el.scalar() && el.dense())){
-      for(int i=0; i<inz.size(); ++i) inz[i]=i;
-    }
-  
-    // Add to mapping
-    (*this)->assign(el,inz,k);
-#endif
     simplify(*this);
   }
 

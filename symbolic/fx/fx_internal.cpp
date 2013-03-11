@@ -1612,6 +1612,22 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
     s << "}" << endl << endl;
   }
 
+  void FXInternal::assignIgnore(MX& y, const MX& x, const std::vector<int>& nz){
+    y[nz] = x;
+  }
+
+  void FXInternal::assignIgnore(SXMatrix& y, const SXMatrix& x, const std::vector<int>& nz){
+    vector<SX>& y_data = y.data();
+    const vector<SX>& x_data = x.data();
+    casadi_assert(nz.size()==x_data.size());
+    for(int k=0; k<nz.size(); ++k){
+      if(nz[k]>=0){
+	y_data.at(nz[k]) = x_data.at(k);
+      }
+    }
+  }
+
+
 
 } // namespace CasADi
 
