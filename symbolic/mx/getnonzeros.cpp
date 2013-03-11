@@ -192,12 +192,8 @@ namespace CasADi{
     // Done if no adjoint sensitivities
     if(nadj==0) return;
     
-    // Reuse r_row and r_col as temporary memory
-    vector<int>& temp2 = r_row;
-    vector<int>& temp3 = r_col;
-
-    // Find out which matrix elements that we are trying to calculate
-    vector<int>& el_wanted = temp3;
+    // Find out which matrix elements that we are trying to calculate, reuse memory
+    vector<int>& el_wanted = r_col;
     el_wanted.resize(nz_.size());
     for(int k=0; k<nz_.size(); ++k){
       el_wanted[k] = orow[k] + ocol[k]*osp.size1();
@@ -225,7 +221,8 @@ namespace CasADi{
 
 	for(int iter=0; iter<2; ++iter){
 
-	  // Get the corresponding output 
+	  // Get the corresponding output, reuse memory
+	  vector<int>& temp2 = r_row;
 	  temp2.resize(el_known.size());
 	  copy(el_known.begin(),el_known.end(),temp2.begin());
 	  adjSens[d][0]->sparsity().getNZInplace(temp2);
@@ -268,7 +265,6 @@ namespace CasADi{
 	r_nz.resize(n);
 
 	// Add to the element
-	cout << "(*adjSeed[d][0]) = " << (*adjSeed[d][0]) << endl;
 	casadi_assert(adjSeed[d][0]->size()==r_nz.size());
 	*adjSens[d][0] = (*adjSeed[d][0])->getAddNonzeros(*adjSens[d][0],r_nz);
       }
