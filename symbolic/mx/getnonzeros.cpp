@@ -314,9 +314,10 @@ namespace CasADi{
   }
 
   void GetNonzeros::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    if(nz_.size()==1 && nz_.front()>=0){
-      // Compact if just a scalar (TODO: extend to slices)
-      stream << "  " << res.front() << "[0]=" << arg.front() << "[" << nz_.front() << "];" << endl;
+    if(Slice::isSlice(nz_)){
+      // Compact if a Slice (TODO: Move to separate class)
+      Slice s(nz_);
+      stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << s.start_ << "; ss!=" << arg.front() << "+" << s.stop_ << "; ss+=" << s.step_ << ") *rr++ = *ss;" << endl;
     } else {
       // Condegen the indices
       int ind = gen.getConstant(nz_,true);

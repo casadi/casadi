@@ -350,9 +350,10 @@ namespace CasADi{
       stream << "  for(i=0; i<" << size() << "; ++i) " << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 
-    if(nz_.size()==1){
-      // Compact if just a scalar (TODO: extend to slices)
-      stream << "  " << res.front() << "[" << nz_.front() << "]+=" << arg.at(1) << "[0];" << endl;
+    if(Slice::isSlice(nz_)){
+      // Compact if a Slice (TODO: Move to separate class)
+      Slice s(nz_);
+      stream << "  for(rr=" << res.front() << "+" << s.start_ << ", ss=" << arg.at(1) << "; rr!=" << res.front() << "+" << s.stop_ << "; rr+=" << s.step_ << ") *rr += *ss++;" << endl;
     } else {
       // Condegen the indices
       int ind = gen.getConstant(nz_,true);

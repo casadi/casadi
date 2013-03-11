@@ -89,6 +89,50 @@ namespace CasADi{
       if(!skip_none) stream << ":" << step_;
     }
   }
+
+  Slice::Slice(const std::vector<int>& v){
+    casadi_assert_message(isSlice(v),"Cannot be represented as a Slice");
+    if(v.size()==0){
+      start_=stop_=0;
+      step_ = 1;
+    } else if(v.size()==1){
+      start_ = v.front();
+      stop_ = start_ + 1;
+      step_ = 1;
+    } else {
+      start_ = v[0];
+      step_ = v[1]-v[0];
+      stop_ = start_ + step_*v.size();
+    }
+  }
+
+  bool Slice::isSlice(const std::vector<int>& v){
+    // Always false if negative numbers
+    for(int i=0; i<v.size(); ++i){
+      if(v[i]<0) return false;
+    }
+    
+    // Always true if less than 2 elements
+    if(v.size()<2) return true;
+    
+    // If two elements, true if they are different
+    if(v.size()==2) return v[0]!=v[1];
+    
+    // We can now get the beginning, end and step
+    int start = v[0];
+    int step = v[1]-v[0];
+    int stop = start + step*v.size();
+    
+    // Check for consistency
+    for(int i=2; i<v.size(); ++i){
+      if(v[i]!=start+i*step) return false;
+    }
+    
+    // True if reached this point
+    return true;
+  }
+
+
   
   
 } // namespace CasADi

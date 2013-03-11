@@ -44,6 +44,12 @@ namespace CasADi{
     /// A slice
     Slice(int start, int stop, int step=1);
     
+    /// Construct from an index vector (requires isSlice(v) to be true)
+    explicit Slice(const std::vector<int>& v);
+
+    /// Check if an index vector can be represented more efficiently as a slice
+    static bool isSlice(const std::vector<int>& v);
+
     /// Get a vector of indices
     std::vector<int> getAll(int len) const;
 
