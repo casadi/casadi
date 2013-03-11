@@ -119,9 +119,9 @@ void Tester::model(){
   }
   
   // Free parameters (nominal values)
-  SXMatrix p = ssym("p",2);
-  SXMatrix drag_nom = p[0];
-  SXMatrix depth_nom = p[1];
+  MX p = msym("p",2);
+  MX drag_nom = p[0];
+  MX depth_nom = p[1];
   
   // Scaling factors for the parameters
   double drag_scale = 1;
@@ -131,22 +131,22 @@ void Tester::model(){
   p_scale_[1] = depth_scale;
 
   // Real parameter values
-  SXMatrix drag = drag_nom*drag_scale;
-  SXMatrix depth = depth_nom*depth_scale;
+  MX drag = drag_nom*drag_scale;
+  MX depth = depth_nom*depth_scale;
 
   // The state at a measurement
-  SXMatrix uk = ssym("uk",n_+1, n_);
-  SXMatrix vk = ssym("vk",n_  , n_+1);
-  SXMatrix hk = ssym("hk",n_  , n_);
+  MX uk = msym("uk",n_+1, n_);
+  MX vk = msym("vk",n_  , n_+1);
+  MX hk = msym("hk",n_  , n_);
   
   // Take one step of the integrator
-  SXMatrix u = uk;
-  SXMatrix v = vk;
-  SXMatrix h = hk;
+  MX u = uk;
+  MX v = vk;
+  MX h = hk;
   
   // Update u
-  SXMatrix d1 = -dt*g/dx;
-  SXMatrix d2 = dt*drag;
+  MX d1 = -dt*g/dx;
+  MX d2 = dt*drag;
   u(Slice(1,n_),Slice()) += d1*(h(Slice(1,n_),Slice())-h(Slice(0,n_-1),Slice())) - d2*u(Slice(1,n_),Slice());
   
   // Update v
@@ -159,19 +159,31 @@ void Tester::model(){
   h += d1*(u(Slice(1,n_+1),Slice())-u(Slice(0,n_),Slice())) + d2*(v(Slice(),Slice(1,n_+1))-v(Slice(),Slice(0,n_)));
   
   // Create an integrator function
-  vector<SXMatrix> f_step_in(4);
+  vector<MX> f_step_in(4);
   f_step_in[0] = p;
   f_step_in[1] = uk;
   f_step_in[2] = vk;
   f_step_in[3] = hk;
-  vector<SXMatrix> f_step_out(3);
+  vector<MX> f_step_out(3);
   f_step_out[0] = u;
   f_step_out[1] = v;
   f_step_out[2] = h;
-  SXFunction f_step(f_step_in,f_step_out);
-  f_step.init();
-  cout << "generated single step dynamics (" << f_step.getAlgorithmSize() << " nodes)" << endl;
+  MXFunction f_step_mx(f_step_in,f_step_out);
+  f_step_mx.init();
+  cout << "generated single step dynamics (" << f_step_mx.getAlgorithmSize() << " nodes)" << endl;
   
+  f_step_mx.generateCode("f_step.c");
+
+
+  // Expand the discrete dynamics?
+  FX f_step = f_step_mx;
+  if(true){
+    SXFunction f_step_sx(f_step_mx);
+    f_step_sx.init();
+    cout << "generated single step dynamics, SX (" << f_step_sx.getAlgorithmSize() << " nodes)" << endl;
+    f_step = f_step_sx;
+  }
+
   // Integrate over one subinterval
   vector<MX> f_in(4);
   MX P = msym("P",2);
@@ -343,6 +355,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   //nlp_solver_.setOption("merit_memory",1);
   nlp_solver_.setOption("maxiter",100);
   nlp_solver_.setOption("compiler","clang -fPIC"); // No optimization, fast compilation
+  //nlp_solver_.setOption("compiler","clang -fPIC -O2"); // Optimization
 
   // Name the variables
   vector<string> variable_name;
