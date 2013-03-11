@@ -38,10 +38,6 @@ namespace CasADi{
     setDependencies(y);
   }
 
-  GetNonzeros* GetNonzeros::clone() const{
-    return new GetNonzeros(*this);
-  }
-
   void GetNonzeros::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
@@ -110,6 +106,10 @@ namespace CasADi{
 
   void GetNonzeros::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
 
+    // Number of derivative directions
+    int nfwd = fwdSens.size();
+    int nadj = adjSeed.size();
+
     // Output sparsity
     const CRSSparsity &osp = sparsity();
     const vector<int>& ocol = osp.col();
@@ -119,20 +119,7 @@ namespace CasADi{
     const CRSSparsity &isp = dep().sparsity();
     const vector<int>& icol = isp.col();
     vector<int> irow = isp.getRow();
-
-    // Number of derivative directions
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    // Sparsity patterns in sparse triplet format of quantities being calculated
-    vector<int> r_row, r_col, r_nz;
-  
-    // Find out which matrix elements that we are trying to calculate
-    vector<int> el_wanted(nz_.size());
-    for(int k=0; k<nz_.size(); ++k){
-      el_wanted[k] = orow[k] + ocol[k]*osp.size1();
-    }
-    
+      
     // We next need to resort the assignment vector by inputs instead of outputs
     // Start by counting the number of input nonzeros corresponding to each output nonzero
     vector<int> inz_count(icol.size()+1,0);
@@ -164,60 +151,56 @@ namespace CasADi{
       el_known[k] = irow[inz_k] + icol[inz_k]*isp.size1();
     }
     
-    // Temporary vector
-    vector<int> temp(el_known);
-    
-    // Evaluate the nondifferentiated function
-    if(!output_given){
-      
-      // Get the matching nonzeros (temp==el_known)
-      input[0]->sparsity().getNZInplace(temp);
-      
-      // Add to sparsity pattern
-      for(int k=0; k<nz_.size(); ++k){
-	if(temp[k]!=-1){
-	  r_nz.push_back(temp[k]);
-	  r_col.push_back(ocol[nz_order[k]]);
-	  r_row.push_back(orow[nz_order[k]]);
-	}
-      }
-
-      // Create a sparsity pattern from vectors
-      CRSSparsity r_sp = sp_triplet(osp.size1(),osp.size2(),r_row,r_col,temp);      
-      if(r_nz.size()==0){
-	*output[0] = MX::zeros(r_sp);
-      } else {
-	*output[0] = (*input[0])->getGetNonzeros(r_sp,r_nz);
-      }
-    }
-    
-    // Forward sensitivities
+    // Temporary vectors
+    vector<int> r_row, r_col, r_nz, temp;
+        
+    // Nondifferentiated function and forward sensitivities
+    int first_d = output_given ? 0 : -1;
     for(int d=0; d<nfwd; ++d){
+
+      // Get references to arguments and results
+      MX& arg = d<0 ? *input[0] : *fwdSeed[d][0];
+      MX& res = d<0 ? *output[0] : *fwdSens[d][0];      
       
       // Get the matching nonzeros
-      temp.resize(el_known.size());
-      copy(el_known.begin(),el_known.end(),temp.begin());
-      fwdSeed[d][0]->sparsity().getNZInplace(temp);
+      r_nz.resize(el_known.size());
+      copy(el_known.begin(),el_known.end(),r_nz.begin());
+      arg.sparsity().getNZInplace(r_nz);
       
       // Add to sparsity pattern
-      r_nz.clear();
+      int n=0;
       r_col.clear();
       r_row.clear();
       for(int k=0; k<nz_.size(); ++k){
-	if(temp[k]!=-1){
-	  r_nz.push_back(temp[k]);
+	if(r_nz[k]!=-1){
+	  r_nz[n++] = r_nz[k];
 	  r_col.push_back(ocol[nz_order[k]]);
 	  r_row.push_back(orow[nz_order[k]]);
 	}
       }
+      r_nz.resize(n);
 
       // Create a sparsity pattern from vectors
       CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),r_row,r_col,temp);
       if(r_nz.size()==0){
-	*fwdSens[d][0] = MX::zeros(f_sp);
+	res = MX::zeros(f_sp);
       } else {
-	*fwdSens[d][0] = (*fwdSeed[d][0])->getGetNonzeros(f_sp,r_nz);
+	res = arg->getGetNonzeros(f_sp,r_nz);
       }
+    }
+
+    // Done if no adjoint sensitivities
+    if(nadj==0) return;
+    
+    // Reuse r_row and r_col as temporary memory
+    vector<int>& temp2 = r_row;
+    vector<int>& temp3 = r_col;
+
+    // Find out which matrix elements that we are trying to calculate
+    vector<int>& el_wanted = temp3;
+    el_wanted.resize(nz_.size());
+    for(int k=0; k<nz_.size(); ++k){
+      el_wanted[k] = orow[k] + ocol[k]*osp.size1();
     }
     
     // Adjoint sensitivities
@@ -227,7 +210,7 @@ namespace CasADi{
       r_nz.resize(el_wanted.size());
       copy(el_wanted.begin(),el_wanted.end(),r_nz.begin());
       adjSeed[d][0]->sparsity().getNZInplace(r_nz);
-      
+
       // Check if nothing to add
       bool nothing_to_add = true;
       for(int i=0; i<nz_.size(); ++i){
@@ -241,8 +224,6 @@ namespace CasADi{
       if(!nothing_to_add){
 
 	for(int iter=0; iter<2; ++iter){
-	  // Use r_row as temporary memory
-	  vector<int>& temp2 = r_row;
 
 	  // Get the corresponding output 
 	  temp2.resize(el_known.size());
@@ -287,6 +268,8 @@ namespace CasADi{
 	r_nz.resize(n);
 
 	// Add to the element
+	cout << "(*adjSeed[d][0]) = " << (*adjSeed[d][0]) << endl;
+	casadi_assert(adjSeed[d][0]->size()==r_nz.size());
 	*adjSens[d][0] = (*adjSeed[d][0])->getAddNonzeros(*adjSens[d][0],r_nz);
       }
       
@@ -314,17 +297,11 @@ namespace CasADi{
   }
 
   void GetNonzeros::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    if(Slice::isSlice(nz_)){
-      // Compact if a Slice (TODO: Move to separate class)
-      Slice s(nz_);
-      stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << s.start_ << "; ss!=" << arg.front() << "+" << s.stop_ << "; ss+=" << s.step_ << ") *rr++ = *ss;" << endl;
-    } else {
-      // Condegen the indices
-      int ind = gen.getConstant(nz_,true);
-      
-      // Codegen the assignments
-      stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.front() << "; ii!=s" << ind << "+" << nz_.size() << "; ++ii) *rr++ = *ii>=0 ? ss[*ii] : 0;" << endl;
-    }
+    // Condegen the indices
+    int ind = gen.getConstant(nz_,true);
+    
+    // Codegen the assignments
+    stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.front() << "; ii!=s" << ind << "+" << nz_.size() << "; ++ii) *rr++ = *ii>=0 ? ss[*ii] : 0;" << endl;
   }
 
   void GetNonzeros::simplifyMe(MX& ex){
@@ -343,5 +320,18 @@ namespace CasADi{
     }
     return dep()->getGetNonzeros(sp,nz_new);
   }
+
+  GetNonzerosSlice::GetNonzerosSlice(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz) : GetNonzeros(sp,x,nz), s_(Slice(nz)){
+  }
+ 
+  void GetNonzerosSlice::printPart(std::ostream &stream, int part) const{
+    switch(part){
+    case 1: stream << "[" << s_ << "]"; break;
+    }
+  }
+
+    void GetNonzerosSlice::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+      stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << s_.start_ << "; ss!=" << arg.front() << "+" << s_.stop_ << "; ss+=" << s_.step_ << ") *rr++ = *ss;" << endl;
+    }
 
 } // namespace CasADi
