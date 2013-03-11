@@ -313,7 +313,12 @@ namespace CasADi{
     if(nz.size()==0){
       return MX::zeros(sp);
     } else {
-      MX ret = MX::create(new GetNonzeros(sp,shared_from_this<MX>(),nz));
+      MX ret;
+      if(Slice::isSlice(nz)){
+	ret = MX::create(new GetNonzerosSlice(sp,shared_from_this<MX>(),nz));
+      } else {
+	ret = MX::create(new GetNonzeros(sp,shared_from_this<MX>(),nz));
+      }
       simplify(ret);
       return ret;
     }
