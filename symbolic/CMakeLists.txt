@@ -55,6 +55,7 @@ SET(CASADI_SRCS
   mx/reshape.cpp             mx/reshape.hpp             # Reshape
   mx/subref.cpp              mx/subref.hpp              # Submatrix reference
   mx/subassign.cpp           mx/subassign.hpp           # Submatrix assignment
+  mx/nonzeros_base.cpp       mx/nonzeros_base.hpp       # Base class for GetNonzeros, SetNonzeros and AddNonzeros
   mx/getnonzeros.cpp         mx/getnonzeros.hpp         # Get the nonzeros of matrix
   mx/addnonzeros.cpp         mx/addnonzeros.hpp         # Add the nonzeros of a matrix to another matrix
   mx/setnonzeros.cpp         mx/setnonzeros.hpp         # Assign the nonzeros of a matrix to another matrix

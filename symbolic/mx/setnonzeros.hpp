@@ -23,7 +23,7 @@
 #ifndef SETNONZEROS_HPP
 #define SETNONZEROS_HPP
 
-#include "mx_node.hpp"
+#include "nonzeros_base.hpp"
 #include <map>
 #include <stack>
 
@@ -32,7 +32,7 @@ namespace CasADi{
       \author Joel Andersson
       \date 2013
   */
-  class SetNonzeros : public MXNode{
+  class SetNonzeros : public NonzerosBase{
   public:
 
     /// Constructor
@@ -80,9 +80,6 @@ namespace CasADi{
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const{ return 1;}
-
-    /// Operation sequence
-    std::vector<int> nz_;
   };
 
 } // namespace CasADi

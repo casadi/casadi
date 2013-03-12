@@ -21,7 +21,6 @@
  */
 
 #include "addnonzeros.hpp"
-#include "mapping.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
@@ -33,7 +32,7 @@ using namespace std;
 
 namespace CasADi{
 
-  AddNonzeros::AddNonzeros(const MX& y, const MX& x, const std::vector<int>& nz) : nz_(nz){
+  AddNonzeros::AddNonzeros(const MX& y, const MX& x, const std::vector<int>& nz) : NonzerosBase(nz){
     setSparsity(y.sparsity());
     setDependencies(y,x);
     casadi_assert(nz.size()==x.size());
@@ -131,196 +130,7 @@ namespace CasADi{
   }
 
   void AddNonzeros::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-    casadi_error("not implemented");
-
-    // Output sparsity
-    const CRSSparsity &osp = sparsity();
-    const vector<int>& ocol = osp.col();
-    vector<int> orow = osp.getRow();
-
-    // Input sparsity (first input same as output)
-    const CRSSparsity &isp = dep(1).sparsity();
-    const vector<int>& icol = isp.col();
-    vector<int> irow = isp.getRow();
-
-    // Number of derivative directions
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    // Sparsity patterns in sparse triplet format of quantities being calculated
-    vector<int> r_row, r_col, r_nz;
-  
-    // Find out which matrix elements that we are trying to add
-    vector<int> el_input(nz_.size());
-    for(int k=0; k<nz_.size(); ++k){
-      el_input[k] = irow[k] + icol[k]*isp.size1();
-    }
-    
-    // We next need to resort the addition vector by outputs instead of inputs
-    // Start by counting the number of outputs nonzeros corresponding to each input nonzero
-    vector<int> onz_count(ocol.size()+1,0);
-    for(vector<int>::const_iterator it=nz_.begin(); it!=nz_.end(); ++it){
-      onz_count[*it+1]++;
-    }
-    
-    // Cumsum to get index offset for output nonzero
-    for(int i=0; i<ocol.size(); ++i){
-      onz_count[i+1] += onz_count[i];
-    }
-    
-    // Get the order of assignments
-    vector<int> nz_order(nz_.size());
-    for(int k=0; k<nz_.size(); ++k){
-      // Save the new index
-      nz_order[onz_count[nz_[k]]++] = k;
-    }
-    
-    // Find out the destination of the elements
-    vector<int>& el_output = onz_count; // Reuse memory
-    el_output.resize(nz_.size());
-    for(int k=0; k<nz_.size(); ++k){
-      // Get input nonzero
-      int onz_k = nz_[nz_order[k]];
-      
-      // Get element
-      el_output[k] = orow[onz_k] + ocol[onz_k]*osp.size1();
-    }
-    
-    // Temporary vector
-    vector<int> temp(el_input);
-    
-    // Evaluate the nondifferentiated function
-    if(!output_given){
-
-      // Get the matching nonzeros in the source
-      input[1]->sparsity().getNZInplace(temp);
-      
-      // Add to sparsity pattern
-      for(int k=0; k<nz_.size(); ++k){
-	if(temp[k]!=-1){
-	  r_nz.push_back(temp[k]);
-	  r_col.push_back(icol[k]);
-	  r_row.push_back(irow[k]);
-	}
-      }
-      
-      // Check if anything needs to be added
-      if(r_nz.size()==0){
-
-	// Simple assignment of nothing to be added
-	*output[0] = *input[0];
-      } else {
-
-	// Get argument to be added with ignored entries removed
-	MX arg;
-	if(temp.size()==nz_.size()){
-	  // No need to drop any entries
-	  arg = *input[1];
-	} else {
-	  // Drop entries that do will not be used
-	  CRSSparsity r_sp = sp_triplet(isp.size1(),isp.size2(),r_row,r_col,temp);
-	  arg = (*input[1])->getGetNonzeros(r_sp,r_nz);
-	}
-      }
-
-     
-
-// Get the matching nonzeros in the destination
-//       temp.resize(el_destination.size());
-//       copy(el_destination.begin(),el_destination.end(),temp.begin());
-//       input[0]->sparsity().getNZInplace(temp);
-
-
-
-
-//       if(r_nz.size()==0){
-// 	// Nothing to add
-// 	*output[0] = *input[0];
-//       } else {
-
-
-	
-// 	// Now get the destination in the output vector
-// 	for(vector<int>::iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
-// 	  *i = el_destination[*i];
-// 	}
-	//	temp.resize(el_known.size());
-	//	copy(el_known.begin(),el_known.end(),temp.begin());
-	//	arg->sparsity().getNZInplace(temp);
-	
-
-    }
-
-    casadi_error("not ready");
-
-#if 0
-    
-    // Forward sensitivities
-    for(int d=0; d<nfwd; ++d){
-      
-      // Get the matching nonzeros
-      temp.resize(el_known.size());
-      copy(el_known.begin(),el_known.end(),temp.begin());
-      fwdSeed[d][0]->sparsity().getNZInplace(temp);
-      
-      // Add to sparsity pattern
-      r_nz.clear();
-      r_col.clear();
-      r_row.clear();
-      for(int k=0; k<nz_.size(); ++k){
-	if(temp[k]!=-1){
-	  r_nz.push_back(temp[k]);
-	  r_col.push_back(ocol[nz_order[k]]);
-	  r_row.push_back(orow[nz_order[k]]);
-	}
-      }
-
-      // Create a sparsity pattern from vectors
-      CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),r_row,r_col,temp);
-      if(r_nz.size()==0){
-	*fwdSens[d][0] = MX::zeros(f_sp);
-      } else {
-	*fwdSens[d][0] = (*fwdSeed[d][0])->getGetNonzeros(f_sp,r_nz);
-      }
-    }
-    
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      
-      // Get the matching nonzeros
-      temp.resize(el_wanted.size());
-      copy(el_wanted.begin(),el_wanted.end(),temp.begin());
-      adjSeed[d][0]->sparsity().getNZInplace(temp);
-      
-      // Add to sparsity pattern
-      r_nz.clear();
-      r_col.clear();
-      r_row.clear();
-      for(int k=0; k<nz_.size(); ++k){
-	if(temp[k]!=-1){
-	  r_nz.push_back(temp[k]);
-	  r_col.push_back(icol[nz_[k]]);
-	  r_row.push_back(irow[nz_[k]]);
-	}
-      }
-
-      // Create a sparsity pattern from vectors
-      CRSSparsity a_sp = sp_triplet(isp.size1(),isp.size2(),r_row,r_col,temp,true);
-      if(r_nz.size()>0){
-	// Create a mapping matrix
-	MX s = MX::create(new Mapping(a_sp));
-	s->assign(*adjSeed[d][0],r_nz,temp,true);
-	
-	// Save to adjoint sensitivities
-	*adjSens[d][0] += s;
-      }
-      
-      // Clear adjoint seeds
-      *adjSeed[d][0] = MX();
-    }
-
-#endif
-
+    evaluateMXBase(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,true);
   }
   
   Matrix<int> AddNonzeros::mapping(int iind) const {

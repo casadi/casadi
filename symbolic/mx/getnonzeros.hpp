@@ -23,7 +23,7 @@
 #ifndef GETNONZEROS_HPP
 #define GETNONZEROS_HPP
 
-#include "mx_node.hpp"
+#include "nonzeros_base.hpp"
 #include <map>
 #include <stack>
 
@@ -32,7 +32,7 @@ namespace CasADi{
       \author Joel Andersson
       \date 2013
   */
-  class GetNonzeros : public MXNode{
+  class GetNonzeros : public NonzerosBase{
   public:
 
     /// Constructor
@@ -80,9 +80,6 @@ namespace CasADi{
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
-
-    /// Operation sequence
-    std::vector<int> nz_;
   };
 
   // Specialization of the above when nz_ is a Slice

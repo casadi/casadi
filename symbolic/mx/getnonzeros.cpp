@@ -21,7 +21,6 @@
  */
 
 #include "getnonzeros.hpp"
-#include "mapping.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
@@ -33,7 +32,7 @@ using namespace std;
 
 namespace CasADi{
 
-  GetNonzeros::GetNonzeros(const CRSSparsity& sp, const MX& y, const std::vector<int>& nz) : nz_(nz){
+  GetNonzeros::GetNonzeros(const CRSSparsity& sp, const MX& y, const std::vector<int>& nz) : NonzerosBase(nz){
     setSparsity(sp);
     setDependencies(y);
   }
@@ -141,47 +140,49 @@ namespace CasADi{
     }
     
     // Find out which elements are given
-    vector<int>& el_known = inz_count; // Reuse memory
-    el_known.resize(nz_.size());
+    vector<int>& el_input = inz_count; // Reuse memory
+    el_input.resize(nz_.size());
     for(int k=0; k<nz_.size(); ++k){
       // Get output nonzero
       int inz_k = nz_[nz_order[k]];
       
-      // Get element
-      el_known[k] = irow[inz_k] + icol[inz_k]*isp.size1();
+      // Get element (note: may contain duplicates)
+      el_input[k] = irow[inz_k] + icol[inz_k]*isp.size1();
     }
     
-    // Temporary vectors
-    vector<int> r_row, r_col, r_nz, temp;
+    // Sparsity pattern being formed and corresponding nonzero mapping
+    vector<int> r_rowind, r_col, r_nz;
         
     // Nondifferentiated function and forward sensitivities
     int first_d = output_given ? 0 : -1;
-    for(int d=0; d<nfwd; ++d){
+    for(int d=first_d; d<nfwd; ++d){
 
       // Get references to arguments and results
       MX& arg = d<0 ? *input[0] : *fwdSeed[d][0];
       MX& res = d<0 ? *output[0] : *fwdSens[d][0];      
       
       // Get the matching nonzeros
-      r_nz.resize(el_known.size());
-      copy(el_known.begin(),el_known.end(),r_nz.begin());
+      r_nz.resize(el_input.size());
+      copy(el_input.begin(),el_input.end(),r_nz.begin());
       arg.sparsity().getNZInplace(r_nz);
       
       // Add to sparsity pattern
       int n=0;
       r_col.clear();
-      r_row.clear();
+      r_rowind.resize(osp.size1()+1); // Row count
+      fill(r_rowind.begin(),r_rowind.end(),0);
       for(int k=0; k<nz_.size(); ++k){
 	if(r_nz[k]!=-1){
 	  r_nz[n++] = r_nz[k];
 	  r_col.push_back(ocol[nz_order[k]]);
-	  r_row.push_back(orow[nz_order[k]]);
+	  r_rowind[1+orow[nz_order[k]]]++;
 	}
       }
       r_nz.resize(n);
+      for(int i=1; i<r_rowind.size(); ++i) r_rowind[i] += r_rowind[i-1]; // row count -> row offset
 
       // Create a sparsity pattern from vectors
-      CRSSparsity f_sp = sp_triplet(osp.size1(),osp.size2(),r_row,r_col,temp);
+      CRSSparsity f_sp(osp.size1(),osp.size2(),r_col,r_rowind);
       if(r_nz.size()==0){
 	res = MX::zeros(f_sp);
       } else {
@@ -189,88 +190,77 @@ namespace CasADi{
       }
     }
 
-    // Done if no adjoint sensitivities
+    // Quick return if no adjoints
     if(nadj==0) return;
+
+    // Get all input elements (this time without duplicates)
+    isp.getElements(el_input,false);
     
-    // Find out which matrix elements that we are trying to calculate, reuse memory
-    vector<int>& el_wanted = r_col;
-    el_wanted.resize(nz_.size());
-    for(int k=0; k<nz_.size(); ++k){
-      el_wanted[k] = orow[k] + ocol[k]*osp.size1();
-    }
-    
+    // Temporary for sparsity pattern unions
+    vector<unsigned char> tmp1;
+
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
 
-      // Get the matching nonzeros
-      r_nz.resize(el_wanted.size());
-      copy(el_wanted.begin(),el_wanted.end(),r_nz.begin());
-      adjSeed[d][0]->sparsity().getNZInplace(r_nz);
+      // Get an owning references to the seeds and sensitivities and clear the seeds for the next run
+      MX aseed = *adjSeed[d][0];
+      *adjSeed[d][0] = MX();
+      MX& asens = *adjSens[d][0]; // Sensitivity after addition
+      MX asens0 = asens; // Sensitivity before addition
+      
 
-      // Check if nothing to add
-      bool nothing_to_add = true;
-      for(int i=0; i<nz_.size(); ++i){
-	if(nz_[i]>=0 && r_nz[i]>=0){
-	  nothing_to_add = false;
+      // Get all the seeds
+      aseed.sparsity().getElements(r_nz,false);
+
+      // Get the corresponding nz locations in the output sparsity pattern
+      osp.getNZInplace(r_nz);
+
+      // Filter out ignored entries and check if there is anything to add at all
+      bool elements_to_add = false;
+      for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
+	if(*k>=0){
+	  if(nz_[*k]>=0){
+	    elements_to_add = true;
+	  } else {
+	    *k = -1;
+	  }
+	}
+      }
+
+      // Quick continue of no elements to add
+      if(!elements_to_add) continue;
+     
+      // Get the nz locations in the adjoint sensitivity corresponding to the inputs
+      vector<int> &r_nz2 = r_col; // Reuse memory
+      r_nz2.resize(el_input.size());
+      copy(el_input.begin(),el_input.end(),r_nz2.begin());
+      asens0.sparsity().getNZInplace(r_nz2);
+      
+      // Enlarge the sparsity pattern of the sensitivity if not all additions fit
+      for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
+	if(*k>=0 && r_nz2[nz_[*k]]<0){
+	  
+	  // Create a new pattern which includes both the the previous seed and the addition
+	  CRSSparsity sp = asens0.sparsity().patternUnion(dep().sparsity(),tmp1);
+	  asens0 = asens0->getDensification(sp);
+
+	  // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
+	  copy(el_input.begin(),el_input.end(),r_nz2.begin());
+	  asens0.sparsity().getNZInplace(r_nz2);
+
 	  break;
 	}
       }
 
-      // Quick return if nothing to add
-      if(!nothing_to_add){
-
-	for(int iter=0; iter<2; ++iter){
-
-	  // Get the corresponding output, reuse memory
-	  vector<int>& temp2 = r_row;
-	  temp2.resize(el_known.size());
-	  copy(el_known.begin(),el_known.end(),temp2.begin());
-	  adjSens[d][0]->sparsity().getNZInplace(temp2);
-
-	  // Resort in the order of the inputs
-	  temp.resize(temp2.size());
-	  for(int i=0; i<nz_order.size(); ++i){
-	    temp[nz_order[i]] = temp2[i];
-	  }
-
-	  // Check if any additions aren't included in the current value of the sensitivity
-	  bool spilled = false;
-	  for(int i=0; i<nz_.size(); ++i){
-	    if(r_nz[i]>=0 && nz_[i]>=0 && temp[i]<0){
-	      spilled = true;
-	      break;
-	    }
-	  }
-
-	  // All additions fit
-	  if(!spilled) break;
-
-	  // Densify the sensitivitity and make another loop (never more than two needed)
-	  casadi_assert(iter<2);
-
-	  // Create a new pattern which includes both the the previous seed and the addition
-	  vector<unsigned char> tmp1;
-	  CRSSparsity sp = adjSens[d][0]->sparsity().patternUnion(dep().sparsity(),tmp1);
-	  MX t = (*adjSens[d][0])->getDensification(sp);
-	  *adjSens[d][0] = t;
+      // Have r_nz point to locations in the sensitivity instead of the output
+      for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
+	if(*k>=0){
+	  *k = r_nz2[nz_[*k]];
 	}
-
-	// Compress the nonzeros to the size of the seed
-	int n=0;	
-	for(int i=0; i<nz_.size(); ++i){
-	  if(r_nz[i]>=0){
-	    r_nz[n++] = nz_[i]>=0 ? temp[i] : -1;
-	  }
-	}
-	r_nz.resize(n);
-
-	// Add to the element
-	casadi_assert(adjSeed[d][0]->size()==r_nz.size());
-	*adjSens[d][0] = (*adjSeed[d][0])->getAddNonzeros(*adjSens[d][0],r_nz);
       }
-      
-      // Clear adjoint seeds
-      *adjSeed[d][0] = MX();
+
+      // Add to the element to the sensitivity
+      asens = aseed->getAddNonzeros(asens0,r_nz);
     }
   }
   
