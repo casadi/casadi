@@ -1069,12 +1069,11 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
 
     cfile << "#include <stdio.h>" << std::endl;
     cfile << "int main(){" << std::endl;
-    cfile << "  int i;" << std::endl;
+    cfile << "  int i,j;" << std::endl;
 
     // Declare input buffers
     for(int i=0; i<n_in; ++i){
       cfile << "  d t_x" << i << "[" << input(i).sparsity().size() << "];" << std::endl;
-      cfile << "  for(i=0; i<" << input(i).sparsity().size() << "; ++i) t_x" << i << "[i] = sin(2.2*i+sqrt(4.3/i));" << std::endl;
     }
 
     // Declare output buffers
@@ -1082,8 +1081,16 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
       cfile << "  d t_r" << i << "[" << output(i).sparsity().size() << "];" << std::endl;
     }
 
+    // Repeat 10 times
+    cfile << "  for(j=0; j<10; ++j){" << std::endl;
+
+    // Dummy input values
+    for(int i=0; i<n_in; ++i){
+      cfile << "    for(i=0; i<" << input(i).sparsity().size() << "; ++i) t_x" << i << "[i] = sin(2.2*i+sqrt(4.3/(j+1)));" << std::endl;
+    }
+
     // Pass inputs
-    cfile << "  evaluate(";
+    cfile << "    evaluate(";
     for(int i=0; i<n_in; ++i){
       cfile << "t_x" << i;
       if(i+1<n_in+n_out)
@@ -1102,9 +1109,12 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
     // Dummy printout
     for(int i=0; i<n_out; ++i){
       if(output(i).sparsity().size()>4){
-	cfile << "  printf(\"%g,%g,%g,%g\\n\",t_r" << i << "[0],t_r" << i << "[1],t_r" << i << "[2],t_r" << i << "[3]);" << std::endl;
+	cfile << "    printf(\"%g,%g,%g,%g\\n\",t_r" << i << "[0],t_r" << i << "[1],t_r" << i << "[2],t_r" << i << "[3]);" << std::endl;
       }
     }
+
+    // End repeat
+    cfile << "  }" << std::endl;
 
     cfile << "  return 0;" << std::endl;
     cfile << "}" << std::endl << std::endl;
