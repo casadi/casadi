@@ -30,13 +30,13 @@ namespace CasADi{
 
   /** 
       \author Joel Andersson 
-      \date 2010-2011
+      \date 2010-2013
   */
   class EvaluationMX : public MultipleOutput{
   public:
 
     /** \brief  Constructor */
-    explicit EvaluationMX(const FX& fcn, const std::vector<MX> &arg);
+    explicit EvaluationMX(const FX& fcn, std::vector<MX> arg);
 
     /** \brief  Creator function, arranges the outputs */
     static void create(const FX& fcn, 

@@ -31,16 +31,21 @@ using namespace std;
 
 namespace CasADi {
 
-  EvaluationMX::EvaluationMX(const FX& fcn, const std::vector<MX> &arg) : fcn_(fcn) {
-      
+  EvaluationMX::EvaluationMX(const FX& fcn, std::vector<MX> arg) : fcn_(fcn) {
+
     // Number inputs and outputs
     int num_in = fcn.getNumInputs();
+    casadi_assert(arg.size()<=num_in);
 
-    // All dependencies of the function
-    vector<MX> d = arg;
-    d.resize(num_in);
+    // Add arguments if needed
+    arg.resize(num_in);
 
-    setDependencies(d);
+    // Replace nulls with zeros of the right dimension
+    for(int i=0; i<arg.size(); ++i){
+      if(arg[i].isNull()) arg[i] = MX::zeros(fcn_.input(i).sparsity());
+    }
+
+    setDependencies(arg);
     setSparsity(CRSSparsity(1, 1, true));
   }
 
@@ -513,17 +518,16 @@ namespace CasADi {
     // Copy arguments with nonmatching sparsities to the temp vector
     vector<string> arg_mod = arg;
     for(int i=0; i<fcn_.getNumInputs(); ++i){
-      if(dep(i).isNull() || dep(i).sparsity()!=fcn_.input(i).sparsity()){
+      if(dep(i).sparsity()!=fcn_.input(i).sparsity()){
 	arg_mod[i] = "rrr+" + CodeGenerator::numToString(nr);
 	nr += fcn_.input(i).size();
-	if(!dep(i).isNull()){
-	  // Codegen "copy sparse"
-	  gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
-
-	  int sp_arg = gen.getSparsity(dep(i).sparsity());
-	  int sp_input = gen.addSparsity(fcn_.input(i).sparsity());
-	  stream << "  casadi_copy_sparse(" << arg[i] << ",s" << sp_arg << "," << arg_mod[i] << ",s" << sp_input << ");" << std::endl;
-	}
+	
+	// Codegen "copy sparse"
+	gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
+	
+	int sp_arg = gen.getSparsity(dep(i).sparsity());
+	int sp_input = gen.addSparsity(fcn_.input(i).sparsity());
+	stream << "  casadi_copy_sparse(" << arg[i] << ",s" << sp_arg << "," << arg_mod[i] << ",s" << sp_input << ");" << std::endl;
       }
     }
 
