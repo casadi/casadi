@@ -178,8 +178,16 @@ namespace CasADi{
 	MX s = *adjSeed[d][0];
 	*adjSeed[d][0] = MX();
 	for(int c=0; c<2; ++c){
-	  //	if(adjSens[d][c]->isNull()) *adjSens[d][c] = MX::sparse(dep(c).size1(),dep(c).size2());
-	  *adjSens[d][c] += pd[c]*s;
+	  // Get increment of sensitivity c
+	  MX t = pd[c]*s;
+	  
+	  // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
+	  if(!t.scalar() && t.shape() != dep(c).shape()){
+	    t = sumAll(t);
+	  }
+	  
+	  // Propagate the seeds
+	  *adjSens[d][c] += t;
 	}
       }
     }
