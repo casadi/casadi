@@ -131,6 +131,7 @@ class meta {
           Py_DECREF(pe);
         }
         Py_DECREF(it);
+        if (PyErr_Occurred()) { PyErr_Clear(); return false; }
         return true;
       } else {
         return false;
