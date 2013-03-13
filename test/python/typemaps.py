@@ -813,12 +813,127 @@ class typemaptests(casadiTestCase):
     print longint + casadi.SX('x')
     print casadi.ssym('x') + longint
     print longint + casadi.ssym('x')
+    
+  def test_casting_DMatrix(self):
+    self.message("casting DMatrix")
+    
+    x = ssym("x")
+    f = SXFunction([x],[x])
+    f.init()
+    class Foo:
+      def __DMatrix__(self):
+        return DMatrix([4])
+        
+    f.setInput(Foo())
+    self.assertEqual(f.input(),4)
+
+    class Foo:
+      def __DMatrix__(self):
+        return SXMatrix([4])
+        
+    self.assertRaises(TypeError,lambda :f.setInput(Foo()))
+    
+    class Foo:
+      def __DMatrix__(self):
+        raise Exception("15")
+        
+    self.assertRaises(TypeError,lambda :f.setInput(Foo()))
+
+    class Foo:
+      pass
+        
+    self.assertRaises(NotImplementedError,lambda :f.setInput(Foo()))
+
+  def test_casting_IMatrix(self):
+    self.message("casting IMatrix")
+
+    class Foo:
+      def __IMatrix__(self):
+        return IMatrix([[4,6],[2,4]])
+        
+    self.assertEqual(det(Foo()),4)
+
+    class Foo:
+      def __IMatrix__(self):
+        return SXMatrix([[4,6],[2,4]])
+        
+    self.assertRaises(TypeError,lambda :det(Foo()))
+    
+    class Foo:
+      def __IMatrix__(self):
+        raise Exception("15")
+        
+    self.assertRaises(TypeError,lambda :det(Foo()))
+
+    class Foo:
+      pass
+        
+    self.assertRaises(NotImplementedError,lambda : det(Foo()))
+
+  def test_casting_SXMatrix(self):
+    self.message("casting SXMatrix")
+    
+    
+    x = ssym("x")
+    
+    class Foo:
+      def __SXMatrix__(self):
+        return x
+        
+    SXFunction([x],[Foo()])
+    
+    class Foo:
+      def __SXMatrix__(self):
+        return MX("x")
+        
+    self.assertRaises(TypeError,lambda : SXFunction([x],[Foo()]))
+    
+    class Foo:
+      def __SXMatrix__(self):
+        raise Exception("15")
+        
+    self.assertRaises(TypeError,lambda : SXFunction([x],[Foo()]))
+
+    class Foo:
+      pass
+        
+    self.assertRaises(NotImplementedError,lambda :SXFunction([x],[Foo()]))
+
+
+  def test_casting_MX(self):
+    self.message("casting MX")
+    
+    
+    x = msym("x")
+    
+    class Foo:
+      def __MX__(self):
+        return x
+        
+    MXFunction([x],[Foo()])
+    
+    class Foo:
+      def __MX__(self):
+        return ssym("x")
+        
+    self.assertRaises(TypeError,lambda : MXFunction([x],[Foo()]))
+    
+    class Foo:
+      def __MX__(self):
+        raise Exception("15")
+        
+    self.assertRaises(TypeError,lambda : MXFunction([x],[Foo()]))
+    class Foo:
+      pass
+        
+    self.assertRaises(NotImplementedError,lambda :MXFunction([x],[Foo()]))
 
   def test_cvar(self):
     self.message("We must not have cvar, to avoid bug #652")
     # Wrap all static global things in #ifdef SWIG 
     with self.assertRaises(Exception):
       cvar
-
+    
+    
 if __name__ == '__main__':
     unittest.main()
