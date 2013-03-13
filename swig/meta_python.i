@@ -414,6 +414,13 @@ int meta< CasADi::Matrix<int> >::as(PyObject * p,CasADi::Matrix<int> &m) {
     int res = meta< int >::as_vector(p,t);
     m = CasADi::Matrix<int>(t,t.size(),1);
     return res;
+  } else if (PyObject_HasAttrString(p,"__IMatrix__")) {
+    char name[] = "__IMatrix__";
+    PyObject *cr = PyObject_CallMethod(p, name,0);
+    if (!cr) { return false; }
+    int result = meta< CasADi::Matrix<int> >::as(cr,m);
+    Py_DECREF(cr);
+    return result;
   } else {
     SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
@@ -424,7 +431,7 @@ int meta< CasADi::Matrix<int> >::as(PyObject * p,CasADi::Matrix<int> &m) {
 // Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
 template <>
 bool meta< CasADi::Matrix<int> >::couldbe(PyObject * p) {
-  return meta< int >::couldbe(p) || meta< int >::couldbe_sequence(p) || meta< CasADi::Matrix<int> >::isa(p);
+  return meta< int >::couldbe(p) || meta< int >::couldbe_sequence(p) || meta< CasADi::Matrix<int> >::isa(p) || PyObject_HasAttrString(p,"__IMatrix__");
 }
 
 meta_vector(CasADi::Matrix<int>)
@@ -523,6 +530,13 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
       m = CasADi::Matrix<double>(t,t.size(),0);
     }
     return res;
+  } else if (PyObject_HasAttrString(p,"__DMatrix__")) {
+    char name[] = "__DMatrix__";
+    PyObject *cr = PyObject_CallMethod(p, name,0);
+    if (!cr) { return false; }
+    int result = meta< CasADi::Matrix<double> >::as(cr,m);
+    Py_DECREF(cr);
+    return result;
   } else {
     SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
@@ -533,7 +547,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
 // Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
 template <>
 bool meta< CasADi::Matrix<double> >::couldbe(PyObject * p) {
-  return meta< double >::couldbe(p) || ((is_array(p) && array_numdims(p)==2) && array_type(p)!=NPY_OBJECT|| PyObjectHasClassName(p,"csr_matrix") || PyObjectHasClassName(p,"DMatrix")) || meta< double >::couldbe_sequence(p) || meta< CasADi::Matrix<int> >::couldbe(p);
+  return meta< double >::couldbe(p) || ((is_array(p) && array_numdims(p)==2) && array_type(p)!=NPY_OBJECT|| PyObjectHasClassName(p,"csr_matrix") || PyObjectHasClassName(p,"DMatrix")) || meta< double >::couldbe_sequence(p) || meta< CasADi::Matrix<int> >::couldbe(p) || PyObject_HasAttrString(p,"__DMatrix__");
 }
 
 meta_vector(CasADi::Matrix<double>)
@@ -579,6 +593,13 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(PyObject * p,CasADi::Matrix<CasADi::S
 		}
     Py_DECREF(it);
 		m = CasADi::Matrix< CasADi::SX >(v, nrows, ncols);
+  } else if (PyObject_HasAttrString(p,"__SXMatrix__")) {
+    char name[] = "__SXMatrix__";
+    PyObject *cr = PyObject_CallMethod(p, name,0);
+    if (!cr) { return false; }
+    int result = meta< CasADi::Matrix<CasADi::SX> >::as(cr,m);
+    Py_DECREF(cr);
+    return result;
 	} else {
     SWIG_Error(SWIG_TypeError, "asSXMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
@@ -595,7 +616,7 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {
     return true;
   }
   
-  return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p);
+  return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p) || PyObject_HasAttrString(p,"__SXMatrix__");
 }
 
 meta_vector(std::vector<CasADi::SX>);
@@ -608,7 +629,7 @@ template<> char meta< CasADi::MX >::expected_message[] = "Expecting (MX, numbera
 
 template <>
 bool meta< CasADi::MX >::couldbe(PyObject * p) {
-  return (meta< CasADi::MX >::isa(p) || meta< CasADi::Matrix<double> >::couldbe(p) );
+  return meta< CasADi::MX >::isa(p) || meta< CasADi::Matrix<double> >::couldbe(p) || PyObject_HasAttrString(p,"__MX__");
 }
 
 template <>
@@ -621,6 +642,13 @@ int meta< CasADi::MX >::as(PyObject * p,CasADi::MX &m) {
       return false;
     m = CasADi::MX(mt);
     return true;
+  } else if (PyObject_HasAttrString(p,"__MX__")) {
+    char name[] = "__MX__";
+    PyObject *cr = PyObject_CallMethod(p, name,0);
+    if (!cr) { return false; }
+    int result = meta< CasADi::MX >::as(cr,m);
+    Py_DECREF(cr);
+    return result;
   }
   return false;
 }
