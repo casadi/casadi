@@ -1108,9 +1108,11 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
     
     // Dummy printout
     for(int i=0; i<n_out; ++i){
-      if(output(i).sparsity().size()>4){
-	cfile << "    printf(\"%g,%g,%g,%g\\n\",t_r" << i << "[0],t_r" << i << "[1],t_r" << i << "[2],t_r" << i << "[3]);" << std::endl;
+      int n = output(i).sparsity().size();
+      for(int j=0; j<n && j<5; ++j){
+	cfile << "    printf(\"%g \",t_r" << i << "[" << j << "]);" << std::endl;
       }
+      cfile << "    printf(\"\\n\");" << std::endl;
     }
 
     // End repeat
