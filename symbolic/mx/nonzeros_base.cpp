@@ -63,7 +63,7 @@ namespace CasADi{
 
     // Nondifferentiated function and forward sensitivities
     int first_d = output_given ? 0 : -1;
-    for(int d=0; d<nfwd; ++d){
+    for(int d=first_d; d<nfwd; ++d){
 
       // Get references to arguments and results
       MX& arg = d<0 ? *input[1] : *fwdSeed[d][1];
@@ -89,7 +89,10 @@ namespace CasADi{
       }
 
       // Quick continue of no elements to set
-      if(!elements_to_set) continue;
+      if(!elements_to_set){
+	res = arg0;
+	continue;
+      }
      
       // Get the nz locations in the argument corresponding to the inputs
       vector<int> &r_nz2 = r_col; // Reuse memory
