@@ -576,13 +576,18 @@ void MXFunctionInternal::print(ostream &stream) const{
   FXInternal::print(stream);
   for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     if(it->op==OP_OUTPUT){
-      stream << "output[" << it->res.front() << "] = @" << it->arg.front();
+      stream << "output[" << it->res.front() << "] = @" << it->arg.at(0);
+    } else if(it->op==OP_SETNONZEROS || it->op==OP_ADDNONZEROS){
+      if(it->res.front()!=it->arg.at(0)){
+	stream << "@" << it->res.front() << " = @" << it->arg.at(0) << "; ";
+      }
+      it->data->printPart(stream,0);
+      stream << "@" << it->res.front();
+      it->data->printPart(stream,1);
+      stream << "@" << it->arg.at(1);
+      it->data->printPart(stream,2);
     } else {
-      if(it->op==OP_SETNONZEROS || it->op==OP_ADDNONZEROS){
-	if(it->res.front()!=it->arg.front()){
-	  stream << "@" << it->res.front() << " = @" << it->arg.front() << "; ";
-	}
-      } else if(it->res.size()==1){
+      if(it->res.size()==1){
         stream << "@" << it->res.front() << " = ";
       } else {
         stream << "{";
