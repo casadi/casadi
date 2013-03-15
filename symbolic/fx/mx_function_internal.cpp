@@ -1134,7 +1134,7 @@ void MXFunctionInternal::allocTape(){
   void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
     
     // Data structure to hold intermediate variables
-    stream << "  struct wstruct{" << endl;
+    stream << "  static struct wstruct{" << endl;
     
     // Declare all work variables
     for(int i=0; i<work_.size(); ++i){
@@ -1146,8 +1146,10 @@ void MXFunctionInternal::allocTape(){
     stream << endl;
 
     // Temporary variables and vectors
-    stream << "  int i,j,k,*ii,*jj,*kk,iii[" << itmp_.size() << "];" << endl;
-    stream << "  d r,s,t,*rr,*ss,*tt,rrr[" << rtmp_.size() << "];" << endl;
+    stream << "  int i,j,k,*ii,*jj,*kk;" << endl;
+    stream << "  d r,s,t,*rr,*ss,*tt;" << endl;
+    stream << "  static int iii[" << itmp_.size() << "];" << endl;
+    stream << "  static d rrr[" << rtmp_.size() << "];" << endl;
 
     // Operation number (for printing)
     int k=0;
