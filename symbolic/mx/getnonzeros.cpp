@@ -208,11 +208,8 @@ namespace CasADi{
       MX& asens = *adjSens[d][0]; // Sensitivity after addition
       MX asens0 = asens; // Sensitivity before addition
       
-
-      // Get all the seeds
-      aseed.sparsity().getElements(r_nz,false);
-
       // Get the corresponding nz locations in the output sparsity pattern
+      aseed.sparsity().getElements(r_nz,false);
       osp.getNZInplace(r_nz);
 
       // Filter out ignored entries and check if there is anything to add at all
