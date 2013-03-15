@@ -56,6 +56,7 @@ SCPgenInternal::SCPgenInternal(const FX& F, const FX& G, const FX& H, const FX& 
   addOption("name_x",      OT_STRINGVECTOR,  GenericType(),       "Names of the variables.");
   addOption("print_x",           OT_INTEGERVECTOR,  GenericType(), "Which variables to print.");
   addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",    "Compiler command to be used for compiling generated code");
+  addOption("print_time",        OT_BOOLEAN, true,                 "Print information about execution time");
   
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
@@ -82,6 +83,7 @@ void SCPgenInternal::init(){
   regularize_ = getOption("regularize");
   codegen_ = getOption("codegen");
   reg_threshold_ = getOption("reg_threshold");
+  print_time_ = getOption("print_time");
 
   // Name the components
   if(hasSetOption("name_x")){
@@ -697,6 +699,10 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   // Reset iteration message
   iteration_note_ = string();
 
+  // Get current time and reset timers
+  double time1 = clock();
+  t_eval_jac_ = t_eval_hes_ = t_eval_res_ = t_eval_tan_ = t_eval_exp_ = t_solve_qp_ = 0;
+
   // MAIN OPTIMZATION LOOP
   while(true){
     
@@ -757,6 +763,9 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     // Line-search to take the step
     line_search(ls_iter, ls_success);
   }
+
+  double time2 = clock();
+  t_mainloop_ = double(time2-time1)/CLOCKS_PER_SEC;
   
   // Store optimal value
   cout << "optimal cost = " << obj_k_ << endl;
@@ -770,8 +779,22 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   }
   output(NLP_G).set(g_);
   
+  // Write timers
+  if(print_time_){
+    cout << endl;
+    cout << "time spent in eval_hes:    " << setw(9) << t_eval_hes_ << " s." << endl;
+    cout << "time spent in eval_jac:    " << setw(9) << t_eval_jac_ << " s." << endl;
+    cout << "time spent in eval_res:    " << setw(9) << t_eval_res_ << " s." << endl;
+    cout << "time spent in eval_tan:    " << setw(9) << t_eval_tan_ << " s." << endl;
+    cout << "time spent in eval_exp:    " << setw(9) << t_eval_exp_ << " s." << endl;
+    cout << "time spent in solve_qp:    " << setw(9) << t_solve_qp_ << " s." << endl;
+    cout << "time spent in main loop:   " << setw(9) << t_mainloop_ << " s." << endl;
+  }
+
   // Save statistics
   stats_["iter_count"] = iter;
+
+  cout << endl;
 }  
 
 void SCPgenInternal::dynamicCompilation(FX& f, FX& f_gen, std::string fname, std::string fdescr){
@@ -933,6 +956,9 @@ void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, 
 }
 
 void SCPgenInternal::eval_jac(){
+  // Get current time
+  double time1 = clock();
+
   // Pass current parameter guess
   jac_fcn_.setInput(x_[1].opt,mod_p_);
 
@@ -946,9 +972,15 @@ void SCPgenInternal::eval_jac(){
 
   // Get the Jacobian
   jac_fcn_.getOutput(qpA_);
+
+  double time2 = clock();
+  t_eval_jac_ += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 void SCPgenInternal::eval_hess(){
+  // Get current time
+  double time1 = clock();
+
   // Pass current parameter guess
   hes_fcn_.setInput(x_[1].opt,mod_p_);
 
@@ -980,9 +1012,15 @@ void SCPgenInternal::eval_hess(){
     hes_fcn_.getOutput(qpH_);
     copy(gL_.begin(),gL_.end(),qpG_.begin());
   }
+
+  double time2 = clock();
+  t_eval_hes_ += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 void SCPgenInternal::eval_res(){
+  // Get current time
+  double time1 = clock();
+
   // Pass primal variables to the residual function for initial evaluation
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
     res_fcn_.setInput(it->opt,it->res_var);
@@ -1021,9 +1059,15 @@ void SCPgenInternal::eval_res(){
     const vector<double>& p = input(NLP_P).data();
     transform(x_[1].res.begin(),x_[1].res.end(),p.begin(),x_[1].res.begin(),std::plus<double>());
   }
+
+  double time2 = clock();
+  t_eval_res_ += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 void SCPgenInternal::eval_tan(){
+  // Get current time
+  double time1 = clock();
+
   // Pass current parameter guess
   tan_fcn_.setInput(x_[1].opt,mod_p_);
 
@@ -1077,6 +1121,9 @@ void SCPgenInternal::eval_tan(){
       copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
     }
   }
+
+  double time2 = clock();
+  t_eval_tan_ += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 void SCPgenInternal::regularize(){
@@ -1110,6 +1157,9 @@ void SCPgenInternal::regularize(){
 }
 
 void SCPgenInternal::solve_qp(){  
+  // Get current time
+  double time1 = clock();
+
   // Solve the QP
   qp_solver_.setInput(qpH_,QP_H);
   qp_solver_.setInput(qpG_,QP_G);
@@ -1137,6 +1187,9 @@ void SCPgenInternal::solve_qp(){
     copy(lam_g_new.begin(),lam_g_new.end(),dlambda_g_.begin());
     std::transform(dlambda_g_.begin(),dlambda_g_.end(),lambda_g_.begin(),dlambda_g_.begin(),std::minus<double>());
   }
+
+  double time2 = clock();
+  t_solve_qp_ += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
@@ -1274,6 +1327,9 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
 }
 
 void SCPgenInternal::eval_exp(){
+  // Get current time
+  double time1 = clock();
+
   // Pass current parameter guess
   exp_fcn_.setInput(x_[1].opt, mod_p_);
 
@@ -1315,7 +1371,10 @@ void SCPgenInternal::eval_exp(){
       const DMatrix& dlam_v = exp_fcn_.output(it->exp_defL);
       transform(dlam_v.begin(),dlam_v.end(),it->dlam.begin(),it->dlam.begin(),std::minus<double>());
     }
-  }  
+  }
+
+  double time2 = clock();
+  t_eval_exp_ += double(time2-time1)/CLOCKS_PER_SEC;
 }
   
 

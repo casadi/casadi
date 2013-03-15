@@ -79,9 +79,9 @@ public:
 
   // Evaluate the step expansion
   void eval_exp();
-
-
-
+  
+  // Timings
+  double t_eval_hes_, t_eval_jac_, t_eval_res_, t_eval_tan_, t_eval_exp_, t_solve_qp_, t_mainloop_;
   
   /// QP solver for the subproblems
   QPSolver qp_solver_;
@@ -127,6 +127,9 @@ public:
   /// stopping criterion for the lagrangian gradient
   double tolgl_;
   
+  /// Print timers
+  bool print_time_;
+
   /// Generate initial guess for lifted variables
   FX vinit_fcn_;
 
