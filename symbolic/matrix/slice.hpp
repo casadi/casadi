@@ -47,11 +47,20 @@ namespace CasADi{
     /// Construct from an index vector (requires isSlice(v) to be true)
     explicit Slice(const std::vector<int>& v);
 
+    /// Construct nested slices from an index vector (requires isSlice2(v) to be true)
+    explicit Slice(const std::vector<int>& v, Slice& outer);
+
     /// Check if an index vector can be represented more efficiently as a slice
     static bool isSlice(const std::vector<int>& v);
 
+    /// Check if an index vector can be represented more efficiently as two nested slices
+    static bool isSlice2(const std::vector<int>& v);
+
     /// Get a vector of indices
     std::vector<int> getAll(int len) const;
+
+    /// Get a vector of indices (nested slice)
+    std::vector<int> getAll(const Slice& outer, int len) const;
 
 #ifndef SWIG
     /// Print a representation of the object to a stream

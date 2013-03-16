@@ -90,7 +90,7 @@ namespace CasADi{
     GetNonzerosSlice(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz);
 
     /// Clone function
-    virtual GetNonzeros* clone() const{ return new GetNonzerosSlice(*this);}
+    virtual GetNonzerosSlice* clone() const{ return new GetNonzerosSlice(*this);}
       
     /// Destructor
     virtual ~GetNonzerosSlice(){}
@@ -103,6 +103,29 @@ namespace CasADi{
     
     // Data member
     Slice s_;
+  };
+
+  // Specialization of the above when nz_ is a nester Slice
+  class GetNonzerosSlice2 : public GetNonzeros{
+  public:
+
+    /// Constructor
+    GetNonzerosSlice2(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz);
+
+    /// Clone function
+    virtual GetNonzerosSlice2* clone() const{ return new GetNonzerosSlice2(*this);}
+      
+    /// Destructor
+    virtual ~GetNonzerosSlice2(){}
+
+    /// Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+    
+    // Data member
+    Slice inner_, outer_;
   };
 
 

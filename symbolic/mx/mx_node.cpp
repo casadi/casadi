@@ -316,6 +316,8 @@ namespace CasADi{
       MX ret;
       if(Slice::isSlice(nz)){
 	ret = MX::create(new GetNonzerosSlice(sp,shared_from_this<MX>(),nz));
+      } else if(Slice::isSlice2(nz)){
+	ret = MX::create(new GetNonzerosSlice2(sp,shared_from_this<MX>(),nz));
       } else {
 	ret = MX::create(new GetNonzeros(sp,shared_from_this<MX>(),nz));
       }

@@ -164,6 +164,13 @@ namespace CasADi{
       // Compact if a Slice (TODO: Move to separate class)
       Slice s(nz_);
       stream << "  for(rr=" << res.front() << "+" << s.start_ << ", ss=" << arg.at(1) << "; rr!=" << res.front() << "+" << s.stop_ << "; rr+=" << s.step_ << ") *rr += *ss++;" << endl;
+    } else if(Slice::isSlice2(nz_)){
+      // Compact if a Slice (TODO: Move to separate class)
+      Slice outer_;
+      Slice inner_(nz_,outer_);
+      stream << "  for(rr=" << res.front() << "+" << outer_.start_ << ", ss=" << arg.at(1) << "; rr!=" << res.front() << "+" << outer_.stop_ << "; rr+=" << outer_.step_ << ")";
+      stream << " for(tt=rr+" << inner_.start_ << "; tt!=rr+" << inner_.stop_ << "; tt+=" << inner_.step_ << ")";
+      stream << " *tt += *ss++;" << endl;
     } else {
       // Condegen the indices
       int ind = gen.getConstant(nz_,true);

@@ -314,7 +314,24 @@ namespace CasADi{
   }
 
     void GetNonzerosSlice::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-      stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << s_.start_ << "; ss!=" << arg.front() << "+" << s_.stop_ << "; ss+=" << s_.step_ << ") *rr++ = *ss;" << endl;
+      stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << s_.start_ << "; ss!=" << arg.front() << "+" << s_.stop_ << "; ss+=" << s_.step_ << ") ";
+      stream << "*rr++ = *ss;" << endl;
     }
+
+  GetNonzerosSlice2::GetNonzerosSlice2(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz) : GetNonzeros(sp,x,nz){
+    inner_ = Slice(nz,outer_);
+  }
+ 
+  void GetNonzerosSlice2::printPart(std::ostream &stream, int part) const{
+    switch(part){
+    case 1: stream << "[" << outer_ << ";" << inner_ << "]"; break;
+    }
+  }
+
+  void GetNonzerosSlice2::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << outer_.start_ << "; ss!=" << arg.front() << "+" << outer_.stop_ << "; ss+=" << outer_.step_ << ") ";
+    stream << "for(tt=ss+" << inner_.start_ << "; tt!=ss+" << inner_.stop_ << "; tt+=" << inner_.step_ << ") ";
+    stream << "*rr++ = *tt;" << endl;
+  }
 
 } // namespace CasADi

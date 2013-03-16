@@ -23,6 +23,7 @@
 #include "slice.hpp"
 #include "matrix_tools.hpp"
 
+using namespace std;
 namespace CasADi{
 
   Slice::Slice() : start_(0), stop_(std::numeric_limits<int>::max()), step_(1){ 
@@ -107,9 +108,11 @@ namespace CasADi{
   }
 
   bool Slice::isSlice(const std::vector<int>& v){
-    // Always false if negative numbers
+    // Always false if negative numbers or non-increasing
+    int last_v = -1;
     for(int i=0; i<v.size(); ++i){
-      if(v[i]<0) return false;
+      if(v[i]<=last_v) return false;
+      last_v = v[i];
     }
     
     // Always true if less than 2 elements
@@ -123,7 +126,7 @@ namespace CasADi{
     int step = v[1]-v[0];
     int stop = start + step*v.size();
     
-    // Check for consistency
+    // Consistency check
     for(int i=2; i<v.size(); ++i){
       if(v[i]!=start+i*step) return false;
     }
@@ -132,8 +135,100 @@ namespace CasADi{
     return true;
   }
 
+  bool Slice::isSlice2(const std::vector<int>& v){
+    // Always true if 1D slice
+    if(isSlice(v)) return true;
+    
+    // Always false if negative numbers or non-increasing
+    int last_v = -1;
+    for(int i=0; i<v.size(); ++i){
+      if(v[i]<=last_v) return false;
+      last_v = v[i];
+    }
 
+    // Get the slices
+    int start_outer = 0;
+    int step_outer = -1;
+    int start_inner = v.front();
+    int step_inner = v[1]-v[0];
+    int stop_inner = -1;
+    for(int i=2; i<v.size(); ++i){
+      int predicted_v = start_inner+i*step_inner;
+      if(v[i]!=predicted_v){
+	stop_inner = predicted_v;
+	step_outer = v[i] - start_inner;
+	break;
+      }
+    }
+    casadi_assert(stop_inner>=0);
+
+    // Get the end of the outer slice
+    int stop_outer = v.back();
+    do{
+      if(step_outer>0) stop_outer++;
+      else             stop_outer--;
+    } while(stop_outer % step_outer!=0);
+    
+    // Check consistency
+    std::vector<int>::const_iterator it=v.begin();
+    for(int i=start_outer; i!=stop_outer; i+=step_outer){
+      for(int j=i+start_inner; j!=i+stop_inner; j+=step_inner){
+	// False if we've reached the end
+	if(it==v.end()) return false;
+	
+	// Check if value matches
+	if(*it++ != j) return false;
+      }
+    }
+    
+    // True if reached this point
+    return true;
+  }
+
+  Slice::Slice(const std::vector<int>& v, Slice& outer){
+    casadi_assert_message(isSlice2(v),"Cannot be represented as a nested Slice");
+    
+    // If simple slice
+    if(isSlice(v)){
+      *this = Slice(v);
+      outer.start_ = 0;
+      outer.step_ = outer.stop_ = stop_;
+      return;
+    }
+
+    // Get the slices
+    outer.start_ = 0;
+    outer.step_ = -1;
+    start_ = v.front();
+    step_ = v[1]-v[0];
+    stop_ = -1;
+    for(int i=2; i<v.size(); ++i){
+      int predicted_v = start_+i*step_;
+      if(v[i]!=predicted_v){
+	stop_ = predicted_v;
+	outer.step_ = v[i] - start_;
+	break;
+      }
+    }
+
+    // Get the end of the outer slice
+    outer.stop_ = v.back();
+    do{
+      if(outer.step_>0) outer.stop_++;
+      else              outer.stop_--;
+    } while(outer.stop_ % outer.step_!=0);
+  }
   
+  std::vector<int> Slice::getAll(const Slice& outer, int len) const{
+    std::vector<int> ret;
+    for(int i=outer.start_; i!=outer.stop_; i+=outer.step_){
+      for(int j=i+start_; j!=i+stop_; j+=step_){
+	ret.push_back(j);
+      }
+    }
+    return ret;
+  }
+
   
 } // namespace CasADi
 
