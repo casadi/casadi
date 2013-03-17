@@ -32,21 +32,21 @@ using namespace std;
 
 namespace CasADi{
 
-  GetNonzeros::GetNonzeros(const CRSSparsity& sp, const MX& y, const std::vector<int>& nz) : NonzerosBase(nz){
+  GetNonzeros::GetNonzeros(const CRSSparsity& sp, const MX& y){
     setSparsity(sp);
     setDependencies(y);
   }
 
-  void GetNonzeros::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  void GetNonzerosVector::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  void GetNonzeros::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  void GetNonzerosVector::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void GetNonzeros::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void GetNonzerosVector::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
 
     // Number of sensitivities
     int nadj = adjSeed.size();
@@ -181,7 +181,7 @@ namespace CasADi{
     }
   }
   
-  void GetNonzeros::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  void GetNonzerosVector::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd = get_bvec_t(input[0]->data());
@@ -239,13 +239,27 @@ namespace CasADi{
     }
   }
 
-  void GetNonzeros::printPart(std::ostream &stream, int part) const{
+  void GetNonzerosVector::printPart(std::ostream &stream, int part) const{
     switch(part){
     case 1: stream << nz_; break;
     }
   }
 
+  void GetNonzerosSlice::printPart(std::ostream &stream, int part) const{
+    switch(part){
+    case 1: stream << "[" << s_ << "]"; break;
+    }
+  }
+
+  void GetNonzerosSlice2::printPart(std::ostream &stream, int part) const{
+    switch(part){
+    case 1: stream << "[" << outer_ << ";" << inner_ << "]"; break;
+    }
+  }
+
   void GetNonzeros::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+    // Get all the nonzeros
+    vector<int> nz = getAll();
 
     // Number of derivative directions
     int nfwd = fwdSens.size();
@@ -264,7 +278,7 @@ namespace CasADi{
     // We next need to resort the assignment vector by inputs instead of outputs
     // Start by counting the number of input nonzeros corresponding to each output nonzero
     vector<int> inz_count(icol.size()+1,0);
-    for(vector<int>::const_iterator it=nz_.begin(); it!=nz_.end(); ++it){
+    for(vector<int>::const_iterator it=nz.begin(); it!=nz.end(); ++it){
       casadi_assert_message(*it>=0,"Not implemented");
       inz_count[*it+1]++;
     }
@@ -275,18 +289,18 @@ namespace CasADi{
     }
     
     // Get the order of assignments
-    vector<int> nz_order(nz_.size());
-    for(int k=0; k<nz_.size(); ++k){
+    vector<int> nz_order(nz.size());
+    for(int k=0; k<nz.size(); ++k){
       // Save the new index
-      nz_order[inz_count[nz_[k]]++] = k;
+      nz_order[inz_count[nz[k]]++] = k;
     }
     
     // Find out which elements are given
     vector<int>& el_input = inz_count; // Reuse memory
-    el_input.resize(nz_.size());
-    for(int k=0; k<nz_.size(); ++k){
+    el_input.resize(nz.size());
+    for(int k=0; k<nz.size(); ++k){
       // Get output nonzero
-      int inz_k = nz_[nz_order[k]];
+      int inz_k = nz[nz_order[k]];
       
       // Get element (note: may contain duplicates)
       el_input[k] = irow[inz_k] + icol[inz_k]*isp.size1();
@@ -313,7 +327,7 @@ namespace CasADi{
       r_col.clear();
       r_rowind.resize(osp.size1()+1); // Row count
       fill(r_rowind.begin(),r_rowind.end(),0);
-      for(int k=0; k<nz_.size(); ++k){
+      for(int k=0; k<nz.size(); ++k){
 	if(r_nz[k]!=-1){
 	  r_nz[n++] = r_nz[k];
 	  r_col.push_back(ocol[nz_order[k]]);
@@ -358,7 +372,7 @@ namespace CasADi{
       bool elements_to_add = false;
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
 	if(*k>=0){
-	  if(nz_[*k]>=0){
+	  if(nz[*k]>=0){
 	    elements_to_add = true;
 	  } else {
 	    *k = -1;
@@ -377,7 +391,7 @@ namespace CasADi{
       
       // Enlarge the sparsity pattern of the sensitivity if not all additions fit
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
-	if(*k>=0 && r_nz2[nz_[*k]]<0){
+	if(*k>=0 && r_nz2[nz[*k]]<0){
 	  
 	  // Create a new pattern which includes both the the previous seed and the addition
 	  CRSSparsity sp = asens0.sparsity().patternUnion(dep().sparsity(),tmp1);
@@ -394,7 +408,7 @@ namespace CasADi{
       // Have r_nz point to locations in the sensitivity instead of the output
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
 	if(*k>=0){
-	  *k = r_nz2[nz_[*k]];
+	  *k = r_nz2[nz[*k]];
 	}
       }
 
@@ -404,24 +418,25 @@ namespace CasADi{
   }
   
   Matrix<int> GetNonzeros::mapping(int iind) const {
-    return Matrix<int>(sparsity(),nz_);
+    vector<int> nz = getAll();
+    return Matrix<int>(sparsity(),nz);
   }
 
-  bool GetNonzeros::isIdentity() const{
+  bool GetNonzerosSlice::isIdentity() const{
     // Check sparsity
     if(!(sparsity() == dep().sparsity()))
       return false;
       
     // Check if the nonzeros follow in increasing order
-    for(int k=0; k<nz_.size(); ++k){
-      if(nz_[k] != k) return false;
-    }
+    if(s_.start_ != 0) return false;
+    if(s_.step_ != 1) return false;
+    if(s_.stop_ != size()) return false;
     
     // True if reached this point
     return true;
   }
 
-  void GetNonzeros::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void GetNonzerosVector::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     // Condegen the indices
     int ind = gen.getConstant(nz_,true);
     
@@ -429,7 +444,7 @@ namespace CasADi{
     stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.front() << "; ii!=s" << ind << "+" << nz_.size() << "; ++ii) *rr++ = *ii>=0 ? ss[*ii] : 0;" << endl;
   }
 
-  void GetNonzeros::simplifyMe(MX& ex){
+  void GetNonzerosSlice::simplifyMe(MX& ex){
     // Simplify if identity
     if(isIdentity()){
       MX t = dep(0);
@@ -438,38 +453,22 @@ namespace CasADi{
   }
 
   MX GetNonzeros::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
+    // Get all the nonzeros
+    vector<int> nz_all = getAll();
+
     // Eliminate recursive calls
     vector<int> nz_new(nz);
     for(vector<int>::iterator i=nz_new.begin(); i!=nz_new.end(); ++i){
-      *i = nz_[*i];
+      if(*i>=0) *i = nz_all[*i];
     }
     return dep()->getGetNonzeros(sp,nz_new);
   }
-
-  GetNonzerosSlice::GetNonzerosSlice(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz) : GetNonzeros(sp,x,nz), s_(Slice(nz)){
-  }
  
-  void GetNonzerosSlice::printPart(std::ostream &stream, int part) const{
-    switch(part){
-    case 1: stream << "[" << s_ << "]"; break;
-    }
-  }
-
   void GetNonzerosSlice::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << s_.start_ << "; ss!=" << arg.front() << "+" << s_.stop_ << "; ss+=" << s_.step_ << ") ";
     stream << "*rr++ = *ss;" << endl;
   }
-  
-  GetNonzerosSlice2::GetNonzerosSlice2(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz) : GetNonzeros(sp,x,nz){
-    inner_ = Slice(nz,outer_);
-  }
- 
-  void GetNonzerosSlice2::printPart(std::ostream &stream, int part) const{
-    switch(part){
-    case 1: stream << "[" << outer_ << ";" << inner_ << "]"; break;
-    }
-  }
-
+   
   void GetNonzerosSlice2::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << outer_.start_ << "; ss!=" << arg.front() << "+" << outer_.stop_ << "; ss+=" << outer_.step_ << ") ";
     stream << "for(tt=ss+" << inner_.start_ << "; tt!=ss+" << inner_.stop_ << "; tt+=" << inner_.step_ << ") ";

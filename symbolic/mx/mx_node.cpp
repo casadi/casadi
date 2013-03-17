@@ -315,11 +315,13 @@ namespace CasADi{
     } else {
       MX ret;
       if(Slice::isSlice(nz)){
-	ret = MX::create(new GetNonzerosSlice(sp,shared_from_this<MX>(),nz));
+	ret = MX::create(new GetNonzerosSlice(sp,shared_from_this<MX>(),Slice(nz)));
       } else if(Slice::isSlice2(nz)){
-	ret = MX::create(new GetNonzerosSlice2(sp,shared_from_this<MX>(),nz));
+	Slice outer;
+	Slice inner(nz,outer);
+	ret = MX::create(new GetNonzerosSlice2(sp,shared_from_this<MX>(),inner,outer));
       } else {
-	ret = MX::create(new GetNonzeros(sp,shared_from_this<MX>(),nz));
+	ret = MX::create(new GetNonzerosVector(sp,shared_from_this<MX>(),nz));
       }
       simplify(ret);
       return ret;

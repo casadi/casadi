@@ -23,7 +23,7 @@
 #ifndef GETNONZEROS_HPP
 #define GETNONZEROS_HPP
 
-#include "nonzeros_base.hpp"
+#include "mx_node.hpp"
 #include <map>
 #include <stack>
 
@@ -32,17 +32,44 @@ namespace CasADi{
       \author Joel Andersson
       \date 2013
   */
-  class GetNonzeros : public NonzerosBase{
+  class GetNonzeros : public MXNode{
   public:
 
     /// Constructor
-    GetNonzeros(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz);
-
-    /// Clone function
-    virtual GetNonzeros* clone() const{ return new GetNonzeros(*this);}
+    GetNonzeros(const CRSSparsity& sp, const MX& x);
       
     /// Destructor
     virtual ~GetNonzeros(){}
+
+    /// Evaluate the function symbolically (MX)
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
+            
+    /// Construct the IMatrix that maps from the iind'th input to the output 
+    Matrix<int> mapping(int iind=0) const;
+    
+    /// Get all the nonzeros
+    virtual std::vector<int> getAll() const = 0;
+
+    /** \brief Get the operation */
+    virtual int getOp() const{ return OP_GETNONZEROS;}
+
+    /// Get the nonzeros of matrix
+    virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
+  };
+
+  class GetNonzerosVector : public GetNonzeros{
+  public:
+    /// Constructor
+    GetNonzerosVector(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz) : GetNonzeros(sp,x), nz_(nz){}
+    
+    /// Clone function
+    virtual GetNonzerosVector* clone() const{ return new GetNonzerosVector(*this);}
+      
+    /// Destructor
+    virtual ~GetNonzerosVector(){}
+
+    /// Get all the nonzeros
+    virtual std::vector<int> getAll() const{ return nz_;}
 
     /// Propagate sparsity
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
@@ -57,29 +84,14 @@ namespace CasADi{
     /// Evaluate the function symbolically (SX)
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
-    /// Evaluate the function symbolically (MX)
-    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
-
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
     
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-            
-    /// Construct the IMatrix that maps from the iind'th input to the output 
-    Matrix<int> mapping(int iind=0) const;
-    
-    /// Check if the instance is in fact an identity mapping (that can be simplified)
-    bool isIdentity() const;
-    
-    /** \brief Get the operation */
-    virtual int getOp() const{ return OP_GETNONZEROS;}
 
-    /// Simplify
-    virtual void simplifyMe(MX& ex);
-
-    /// Get the nonzeros of matrix
-    virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
+    /// Operation sequence
+    std::vector<int> nz_;
   };
 
   // Specialization of the above when nz_ is a Slice
@@ -87,13 +99,22 @@ namespace CasADi{
   public:
 
     /// Constructor
-    GetNonzerosSlice(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz);
+    GetNonzerosSlice(const CRSSparsity& sp, const MX& x, const Slice& s) : GetNonzeros(sp,x), s_(s){}
 
     /// Clone function
     virtual GetNonzerosSlice* clone() const{ return new GetNonzerosSlice(*this);}
       
     /// Destructor
     virtual ~GetNonzerosSlice(){}
+
+    /// Get all the nonzeros
+    virtual std::vector<int> getAll() const{ return s_.getAll(s_.stop_);}
+
+    /// Check if the instance is in fact an identity mapping (that can be simplified)
+    bool isIdentity() const;    
+
+    /// Simplify
+    virtual void simplifyMe(MX& ex);
 
     /// Propagate sparsity
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
@@ -118,18 +139,21 @@ namespace CasADi{
     Slice s_;
   };
 
-  // Specialization of the above when nz_ is a nester Slice
+  // Specialization of the above when nz_ is a nested Slice
   class GetNonzerosSlice2 : public GetNonzeros{
   public:
 
     /// Constructor
-    GetNonzerosSlice2(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz);
+    GetNonzerosSlice2(const CRSSparsity& sp, const MX& x, const Slice& inner, const Slice& outer) : GetNonzeros(sp,x), inner_(inner), outer_(outer){}
 
     /// Clone function
     virtual GetNonzerosSlice2* clone() const{ return new GetNonzerosSlice2(*this);}
       
     /// Destructor
     virtual ~GetNonzerosSlice2(){}
+
+    /// Get all the nonzeros
+    virtual std::vector<int> getAll() const{ return inner_.getAll(outer_,outer_.stop_);}
 
     /// Propagate sparsity
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
@@ -150,7 +174,7 @@ namespace CasADi{
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
     
-    // Data member
+    // Data members
     Slice inner_, outer_;
   };
 
