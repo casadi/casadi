@@ -96,9 +96,11 @@ namespace CasADi{
     
     // Nondifferentiated outputs
     const vector<T>& idata = input[0]->data();
-    typename vector<T>::iterator odata_it = output[0]->begin();
-    for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
-      *odata_it++ = idata[k];
+    const T* idata_ptr = getPtr(idata) + s_.start_;
+    const T* idata_stop = getPtr(idata) + s_.stop_;
+    T* odata_ptr = getPtr(output[0]->data());
+    for(; idata_ptr != idata_stop; idata_ptr += s_.step_){
+      *odata_ptr++ = *idata_ptr;
     }
     
     // Forward sensitivities
@@ -138,10 +140,12 @@ namespace CasADi{
     
     // Nondifferentiated outputs
     const vector<T>& idata = input[0]->data();
-    typename vector<T>::iterator odata_it = output[0]->begin();
-    for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
-      for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
-	*odata_it++ = idata[k2];
+    const T* outer_ptr = getPtr(idata) + outer_.start_;
+    const T* outer_stop = getPtr(idata) + outer_.stop_;
+    T* odata_ptr = getPtr(output[0]->data());
+    for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
+      for(const T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+	*odata_ptr++ = *inner_ptr;
       }
     }
     
