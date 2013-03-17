@@ -333,7 +333,84 @@ namespace CasADi{
 	}
       }
       if(outputd != inputd0){
-	for(int k=0; k<input[0]->size(); ++k){
+	int n = input[0]->size();
+	for(int k=0; k<n; ++k){
+	  inputd0[k] |= outputd[k];
+	  outputd[k] = 0;
+	}
+      }
+    }
+  }
+
+  template<bool ADD>
+  void SetNonzerosSlice<ADD>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+    // Get references to the assignment operations and data
+    bvec_t *outputd = get_bvec_t(output[0]->data());
+    bvec_t *inputd0 = get_bvec_t(input[0]->data());
+    bvec_t *inputd = get_bvec_t(input[1]->data());
+
+    // Propate sparsity
+    if(fwd){
+      if(outputd != inputd0){
+	copy(inputd0,inputd0+input[0]->size(),outputd);
+      }
+      for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
+	if(ADD){
+	  outputd[k] |= *inputd++;
+	} else {
+	  outputd[k] = *inputd++;
+	}
+      }
+    } else {
+      for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
+	*inputd++ |= outputd[k];
+	if(!ADD){
+	  outputd[k] = 0;
+	}
+      }
+      if(outputd != inputd0){
+	int n = input[0]->size();
+	for(int k=0; k<n; ++k){
+	  inputd0[k] |= outputd[k];
+	  outputd[k] = 0;
+	}
+      }
+    }
+  }
+
+  template<bool ADD>
+  void SetNonzerosSlice2<ADD>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+    // Get references to the assignment operations and data
+    bvec_t *outputd = get_bvec_t(output[0]->data());
+    bvec_t *inputd0 = get_bvec_t(input[0]->data());
+    bvec_t *inputd = get_bvec_t(input[1]->data());
+
+    // Propate sparsity
+    if(fwd){
+      if(outputd != inputd0){
+	copy(inputd0,inputd0+input[0]->size(),outputd);
+      }
+      for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
+	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
+	  if(ADD){
+	    outputd[k2] |= *inputd++;
+	  } else {
+	    outputd[k2] = *inputd++;
+	  }
+	}
+      }
+    } else {
+      for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
+	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
+	  *inputd++ |= outputd[k2];
+	  if(!ADD){
+	    outputd[k2] = 0;
+	  }
+	}
+      }
+      if(outputd != inputd0){
+	int n = input[0]->size();
+	for(int k=0; k<n; ++k){
 	  inputd0[k] |= outputd[k];
 	  outputd[k] = 0;
 	}

@@ -121,7 +121,7 @@ namespace CasADi{
     virtual ~SetNonzerosSlice(){}
 
     /// Propagate sparsity
-    //    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
 
     /// Evaluate the function (template)
     //    template<typename T, typename MatV, typename MatVV> 
@@ -156,9 +156,9 @@ namespace CasADi{
       
     /// Destructor
     virtual ~SetNonzerosSlice2(){}
-
+    
     /// Propagate sparsity
-    //    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
 
     /// Evaluate the function (template)
     //    template<typename T, typename MatV, typename MatVV> 
