@@ -374,6 +374,87 @@ namespace CasADi{
   }
   
   template<bool ADD>
+  void SetNonzerosSlice2<ADD>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  }
+
+  template<bool ADD>
+  void SetNonzerosSlice2<ADD>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  }
+
+  template<bool ADD>
+  template<typename T, typename MatV, typename MatVV>
+  void SetNonzerosSlice2<ADD>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+
+    // Number of sensitivities
+    int nadj = adjSeed.size();
+    int nfwd = fwdSens.size();
+    
+    // Nondifferentiated outputs
+    const vector<T>& idata0 = input[0]->data();
+    vector<T>& odata = output[0]->data();
+    if(&idata0 != &odata){
+      copy(idata0.begin(),idata0.end(),odata.begin());
+    }
+    const vector<T>& idata = input[1]->data();
+    const T* idata_ptr = getPtr(idata);
+    T* outer_ptr = getPtr(odata) + outer_.start_;
+    T* outer_stop = getPtr(odata) + outer_.stop_;
+    for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
+      for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+	if(ADD){
+	  *inner_ptr += *idata_ptr++;
+	} else {
+	  *inner_ptr = *idata_ptr++;
+	}
+      }
+    }
+    
+    // Forward sensitivities
+    for(int d=0; d<nfwd; ++d){
+      const vector<T>& fseed0 = fwdSeed[d][0]->data();
+      vector<T>& fsens = fwdSens[d][0]->data();
+      if(&fseed0 != &fsens){
+	copy(fseed0.begin(),fseed0.end(),fsens.begin());
+      }
+      const vector<T>& fseed = fwdSeed[d][1]->data();
+      const T* fseed_ptr = getPtr(fseed);
+      T* outer_ptr = getPtr(fsens) + outer_.start_;
+      T* outer_stop = getPtr(fsens) + outer_.stop_;
+      for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
+	for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+	  if(ADD){
+	    *inner_ptr += *fseed_ptr++;
+	  } else {
+	    *inner_ptr = *fseed_ptr++;
+	  }
+	}
+      }
+    }
+    
+    // Adjoint sensitivities
+    for(int d=0; d<nadj; ++d){
+      vector<T>& aseed = adjSeed[d][0]->data();
+      vector<T>& asens = adjSens[d][1]->data();
+      T* asens_ptr = getPtr(asens);
+      T* outer_ptr = getPtr(aseed) + outer_.start_;
+      T* outer_stop = getPtr(aseed) + outer_.stop_;
+      for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
+	for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+	  *asens_ptr++ += *inner_ptr;
+	  if(!ADD) *inner_ptr = 0;
+	}
+      }
+      vector<T>& asens0 = adjSens[d][0]->data();
+      if(&aseed != &asens0){
+	transform(aseed.begin(),aseed.end(),asens0.begin(),asens0.begin(),std::plus<T>());
+	fill(aseed.begin(),aseed.end(),0);
+      }
+    }
+  }
+
+  template<bool ADD>
   void SetNonzerosVector<ADD>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
