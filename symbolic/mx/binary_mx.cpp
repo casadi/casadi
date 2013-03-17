@@ -212,9 +212,7 @@ namespace CasADi{
     const vector<T> &input1 = input[1]->data();
   
     if(nfwd==0 && nadj==0){
-      for(int el=0; el<input0.size(); ++el){
-	casadi_math<T>::fun(op_,input0[el],input1[0],output0[el]);
-      }
+      casadi_math<T>::fun(op_,getPtr(input0),input1[0],getPtr(output0),input0.size());
     } else {
 
       // Function and partial derivatives
@@ -264,9 +262,7 @@ namespace CasADi{
     const vector<T> &input1 = input[1]->data();
   
     if(nfwd==0 && nadj==0){
-      for(int el=0; el<input1.size(); ++el){
-	casadi_math<T>::fun(op_,input0[0],input1[el],output0[el]);
-      }
+      casadi_math<T>::fun(op_,input0[0],getPtr(input1),getPtr(output0),input1.size());
     } else {
 
       // Function and partial derivatives
@@ -317,9 +313,7 @@ namespace CasADi{
     const vector<T> &input1 = input[1]->data();
   
     if(nfwd==0 && nadj==0){
-      for(int el=0; el<input0.size(); ++el){
-	casadi_math<T>::fun(op_,input0[el],input1[el],output0[el]);
-      }
+      casadi_math<T>::fun(op_,getPtr(input0),getPtr(input1),getPtr(output0),input0.size());
     } else {
 
       // Function and partial derivatives
