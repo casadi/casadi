@@ -230,7 +230,7 @@ namespace CasADi{
     }
   }
 
-    template<bool ADD>
+  template<bool ADD>
   void SetNonzerosVector<ADD>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
@@ -285,18 +285,87 @@ namespace CasADi{
       vector<T>& aseed = adjSeed[d][0]->data();
       vector<T>& asens0 = adjSens[d][0]->data();
       typename vector<T>::iterator asens_it = adjSens[d][1]->begin();
-      if(ADD){
-	for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++asens_it){
-	  if(*k>=0) *asens_it += aseed[*k];
-	}
-      } else {
-	for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++asens_it){
-	  if(*k>=0){
-	    *asens_it += aseed[*k];
-	    aseed[*k] = 0;
-	  }
+      for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++asens_it){
+	if(*k>=0){
+	  *asens_it += aseed[*k];
+	  if(!ADD) aseed[*k] = 0;	      
 	}
       }
+      if(&aseed != &asens0){
+	transform(aseed.begin(),aseed.end(),asens0.begin(),asens0.begin(),std::plus<T>());
+	fill(aseed.begin(),aseed.end(),0);
+      }
+    }
+  }
+
+  template<bool ADD>
+  void SetNonzerosSlice<ADD>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  }
+
+  template<bool ADD>
+  void SetNonzerosSlice<ADD>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  }
+
+  template<bool ADD>
+  template<typename T, typename MatV, typename MatVV>
+  void SetNonzerosSlice<ADD>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+
+    // Number of sensitivities
+    int nadj = adjSeed.size();
+    int nfwd = fwdSens.size();
+    
+    // Nondifferentiated outputs
+    const vector<T>& idata0 = input[0]->data();
+    vector<T>& odata = output[0]->data();
+    if(&idata0 != &odata){
+      copy(idata0.begin(),idata0.end(),odata.begin());
+    }
+    const vector<T>& idata = input[1]->data();
+    const T* idata_ptr = getPtr(idata);
+    T* odata_ptr = getPtr(odata) + s_.start_;
+    T* odata_stop = getPtr(odata) + s_.stop_;
+    for(; odata_ptr != odata_stop; odata_ptr += s_.step_){
+      if(ADD){
+	*odata_ptr += *idata_ptr++;
+      } else {
+	*odata_ptr = *idata_ptr++;
+      }
+    }
+    
+    // Forward sensitivities
+    for(int d=0; d<nfwd; ++d){
+      const vector<T>& fseed0 = fwdSeed[d][0]->data();
+      vector<T>& fsens = fwdSens[d][0]->data();
+      if(&fseed0 != &fsens){
+	copy(fseed0.begin(),fseed0.end(),fsens.begin());
+      }
+      const vector<T>& fseed = fwdSeed[d][1]->data();
+      const T* fseed_ptr = getPtr(fseed);
+      T* fsens_ptr = getPtr(fsens) + s_.start_;
+      T* fsens_stop = getPtr(fsens) + s_.stop_;
+      for(; fsens_ptr != fsens_stop; fsens_ptr += s_.step_){
+	if(ADD){
+	  *fsens_ptr += *fseed_ptr++;
+	} else {
+	  *fsens_ptr = *fseed_ptr++;
+	}
+      }
+    }
+    
+    // Adjoint sensitivities
+    for(int d=0; d<nadj; ++d){
+      vector<T>& aseed = adjSeed[d][0]->data();
+      vector<T>& asens = adjSens[d][1]->data();
+      T* asens_ptr = getPtr(asens);
+      T* aseed_ptr = getPtr(aseed) + s_.start_;
+      T* aseed_stop = getPtr(aseed) + s_.stop_;
+      for(; aseed_ptr != aseed_stop; aseed_ptr += s_.step_){
+	*asens_ptr++ += *aseed_ptr;
+	if(!ADD) *aseed_ptr = 0;
+      }
+      vector<T>& asens0 = adjSens[d][0]->data();
       if(&aseed != &asens0){
 	transform(aseed.begin(),aseed.end(),asens0.begin(),asens0.begin(),std::plus<T>());
 	fill(aseed.begin(),aseed.end(),0);
