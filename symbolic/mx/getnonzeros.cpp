@@ -106,19 +106,23 @@ namespace CasADi{
     // Forward sensitivities
     for(int d=0; d<nfwd; ++d){
       const vector<T>& fseed = fwdSeed[d][0]->data();
-      typename vector<T>::iterator fsens_it = fwdSens[d][0]->begin();
-      for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
-     	*fsens_it++ = fseed[k];
+      const T* fseed_ptr = getPtr(fseed) + s_.start_;
+      const T* fseed_stop = getPtr(fseed) + s_.stop_;
+      T* fsens_ptr = getPtr(fwdSens[d][0]->data());
+      for(; fseed_ptr != fseed_stop; fseed_ptr += s_.step_){
+     	*fsens_ptr++ = *fseed_ptr;
       }
     }
       
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      typename vector<T>::iterator aseed_it = adjSeed[d][0]->begin();
       vector<T>& asens = adjSens[d][0]->data();
-      for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
-	asens[k] += *aseed_it;
-	*aseed_it++ = 0;
+      T* asens_ptr = getPtr(asens) + s_.start_;
+      T* asens_stop = getPtr(asens) + s_.stop_;
+      T* aseed_ptr = getPtr(adjSeed[d][0]->data());
+      for(; asens_ptr != asens_stop; asens_ptr += s_.step_){
+	*asens_ptr += *aseed_ptr;
+	*aseed_ptr++ = 0;
       }
     }
   }
@@ -152,22 +156,26 @@ namespace CasADi{
     // Forward sensitivities
     for(int d=0; d<nfwd; ++d){
       const vector<T>& fseed = fwdSeed[d][0]->data();
-      typename vector<T>::iterator fsens_it = fwdSens[d][0]->begin();
-      for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
-	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
-	  *fsens_it++ = fseed[k2];
+      const T* outer_ptr = getPtr(fseed) + outer_.start_;
+      const T* outer_stop = getPtr(fseed) + outer_.stop_;
+      T* fsens_ptr = getPtr(fwdSens[d][0]->data());
+      for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
+	for(const T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+	  *fsens_ptr++ = *inner_ptr;
 	}
       }
     }
       
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      typename vector<T>::iterator aseed_it = adjSeed[d][0]->begin();
-      vector<T>& asens = adjSens[d][0]->data();      
-      for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
-	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
-	  asens[k2] += *aseed_it;
-	  *aseed_it++ = 0;
+      vector<T>& asens = adjSens[d][0]->data();
+      T* outer_ptr = getPtr(asens) + outer_.start_;
+      T* outer_stop = getPtr(asens) + outer_.stop_;
+      T* aseed_ptr = getPtr(adjSeed[d][0]->data());
+      for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
+	for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+	  *inner_ptr += *aseed_ptr;
+	  *aseed_ptr++ = 0;
 	}
       }
     }
