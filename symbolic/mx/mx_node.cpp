@@ -33,9 +33,11 @@
 #include "subassign.hpp"
 #include "mapping.hpp"
 #include "getnonzeros.hpp"
-#include "addnonzeros.hpp"
 #include "setnonzeros.hpp"
 #include "densification.hpp"
+
+// Template implementations
+#include "setnonzeros_impl.hpp"
 
 using namespace std;
 
@@ -332,7 +334,14 @@ namespace CasADi{
     if(nz.size()==0){
       return y;
     } else {
-      MX ret = MX::create(new SetNonzeros(y,shared_from_this<MX>(),nz));
+      MX ret;
+      if(Slice::isSlice(nz)){
+	ret = MX::create(new SetNonzerosSlice<false>(y,shared_from_this<MX>(),nz));
+      } else if(Slice::isSlice2(nz)){
+	ret = MX::create(new SetNonzerosSlice2<false>(y,shared_from_this<MX>(),nz));
+      } else {
+	ret = MX::create(new SetNonzerosVector<false>(y,shared_from_this<MX>(),nz));
+      }
       simplify(ret);
       return ret;
     }
@@ -343,7 +352,14 @@ namespace CasADi{
     if(nz.size()==0){
       return y;
     } else {
-      MX ret = MX::create(new AddNonzeros(y,shared_from_this<MX>(),nz));
+      MX ret;
+      if(Slice::isSlice(nz)){
+	ret = MX::create(new SetNonzerosSlice<true>(y,shared_from_this<MX>(),nz));
+      } else if(Slice::isSlice2(nz)){
+	ret = MX::create(new SetNonzerosSlice2<true>(y,shared_from_this<MX>(),nz));
+      } else {
+	ret = MX::create(new SetNonzerosVector<true>(y,shared_from_this<MX>(),nz));
+      }
       simplify(ret);
       return ret;
     }
