@@ -78,6 +78,96 @@ namespace CasADi{
       }
     }
   }
+
+  void GetNonzerosSlice::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  }
+
+  void GetNonzerosSlice::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  }
+
+  template<typename T, typename MatV, typename MatVV>
+  void GetNonzerosSlice::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+
+    // Number of sensitivities
+    int nadj = adjSeed.size();
+    int nfwd = fwdSens.size();
+    
+    // Nondifferentiated outputs
+    const vector<T>& idata = input[0]->data();
+    typename vector<T>::iterator odata_it = output[0]->begin();
+    for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
+      *odata_it++ = idata[k];
+    }
+    
+    // Forward sensitivities
+    for(int d=0; d<nfwd; ++d){
+      const vector<T>& fseed = fwdSeed[d][0]->data();
+      typename vector<T>::iterator fsens_it = fwdSens[d][0]->begin();
+      for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
+     	*fsens_it++ = fseed[k];
+      }
+    }
+      
+    // Adjoint sensitivities
+    for(int d=0; d<nadj; ++d){
+      typename vector<T>::iterator aseed_it = adjSeed[d][0]->begin();
+      vector<T>& asens = adjSens[d][0]->data();
+      for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
+	asens[k] += *aseed_it;
+	*aseed_it++ = 0;
+      }
+    }
+  }
+
+  void GetNonzerosSlice2::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  }
+
+  void GetNonzerosSlice2::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  }
+
+  template<typename T, typename MatV, typename MatVV>
+  void GetNonzerosSlice2::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+
+    // Number of sensitivities
+    int nadj = adjSeed.size();
+    int nfwd = fwdSens.size();
+    
+    // Nondifferentiated outputs
+    const vector<T>& idata = input[0]->data();
+    typename vector<T>::iterator odata_it = output[0]->begin();
+    for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
+      for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
+	*odata_it++ = idata[k2];
+      }
+    }
+    
+    // Forward sensitivities
+    for(int d=0; d<nfwd; ++d){
+      const vector<T>& fseed = fwdSeed[d][0]->data();
+      typename vector<T>::iterator fsens_it = fwdSens[d][0]->begin();
+      for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
+	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
+	  *fsens_it++ = fseed[k2];
+	}
+      }
+    }
+      
+    // Adjoint sensitivities
+    for(int d=0; d<nadj; ++d){
+      typename vector<T>::iterator aseed_it = adjSeed[d][0]->begin();
+      vector<T>& asens = adjSens[d][0]->data();      
+      for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
+	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
+	  asens[k2] += *aseed_it;
+	  *aseed_it++ = 0;
+	}
+      }
+    }
+  }
   
   void GetNonzeros::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     // Get references to the assignment operations and data
@@ -93,6 +183,46 @@ namespace CasADi{
       for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
 	if(*k>=0) inputd[*k] |= *outputd;
 	*outputd++ = 0;
+      }
+    }
+  }
+
+  void GetNonzerosSlice::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+    // Get references to the assignment operations and data
+    bvec_t *outputd = get_bvec_t(output[0]->data());
+    bvec_t *inputd = get_bvec_t(input[0]->data());
+    
+    // Propate sparsity
+    if(fwd){
+      for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
+	*outputd++ = inputd[k];
+      }
+    } else {
+      for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
+	inputd[k] |= *outputd;
+	*outputd++ = 0;
+      }
+    }
+  }
+
+  void GetNonzerosSlice2::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+    // Get references to the assignment operations and data
+    bvec_t *outputd = get_bvec_t(output[0]->data());
+    bvec_t *inputd = get_bvec_t(input[0]->data());
+    
+    // Propate sparsity
+    if(fwd){
+      for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
+	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
+	  *outputd++ = inputd[k2];
+	}
+      }
+    } else {
+      for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
+	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
+	  inputd[k2] |= *outputd;
+	  *outputd++ = 0;
+	}
       }
     }
   }
@@ -313,11 +443,11 @@ namespace CasADi{
     }
   }
 
-    void GetNonzerosSlice::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-      stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << s_.start_ << "; ss!=" << arg.front() << "+" << s_.stop_ << "; ss+=" << s_.step_ << ") ";
-      stream << "*rr++ = *ss;" << endl;
-    }
-
+  void GetNonzerosSlice::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << s_.start_ << "; ss!=" << arg.front() << "+" << s_.stop_ << "; ss+=" << s_.step_ << ") ";
+    stream << "*rr++ = *ss;" << endl;
+  }
+  
   GetNonzerosSlice2::GetNonzerosSlice2(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz) : GetNonzeros(sp,x,nz){
     inner_ = Slice(nz,outer_);
   }

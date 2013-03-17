@@ -43,7 +43,14 @@ namespace CasADi{
       
     /// Destructor
     virtual ~GetNonzeros(){}
-    
+
+    /// Propagate sparsity
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
+
+    /// Evaluate the function (template)
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
@@ -53,19 +60,12 @@ namespace CasADi{
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
-    /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
-
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
     
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-    
-    /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
-    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
-        
+            
     /// Construct the IMatrix that maps from the iind'th input to the output 
     Matrix<int> mapping(int iind=0) const;
     
@@ -95,6 +95,19 @@ namespace CasADi{
     /// Destructor
     virtual ~GetNonzerosSlice(){}
 
+    /// Propagate sparsity
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
+
+    /// Evaluate the function (template)
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+
+    /// Evaluate the function numerically
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+
+    /// Evaluate the function symbolically (SX)
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
@@ -117,6 +130,19 @@ namespace CasADi{
       
     /// Destructor
     virtual ~GetNonzerosSlice2(){}
+
+    /// Propagate sparsity
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
+
+    /// Evaluate the function (template)
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+
+    /// Evaluate the function numerically
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+
+    /// Evaluate the function symbolically (SX)
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
