@@ -1468,6 +1468,34 @@ void Matrix<T>::mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, boo
 }
 
 template<class T>
+T Matrix<T>::quad_form(const Matrix<T>& A, const std::vector<T>& x){
+  // Assert dimensions
+  casadi_assert(x.size()==A.size1() && x.size()==A.size2());
+  
+  // Access the internal data of A
+  const std::vector<int> &A_rowind = A.rowind();
+  const std::vector<int> &A_col = A.col();
+  const std::vector<T> &A_data = A.data();
+  
+  // Return value
+  T ret=0;
+
+  // Loop over the rows of A
+  for(int i=0; i<x.size(); ++i){
+    // Loop over the nonzeros of A
+    for(int el=A_rowind[i]; el<A_rowind[i+1]; ++el){
+      // Get column
+      int j = A_col[el];
+      
+      // Add contribution
+      ret += x[i]*A_data[el]*x[j];
+    }
+  }
+  
+  return ret;
+}
+
+template<class T>
 Matrix<T> Matrix<T>::trans() const{
   // quick return if empty or scalar
   if((size1()==0 && size2()==0) || scalar()) return *this;

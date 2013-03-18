@@ -172,9 +172,6 @@ public:
   // Tangental function
   int tan_b_obj_, tan_b_g_;
 
-  // step expansion function
-  int exp_osens_, exp_curve_;
-
   struct Var{
     int n;
     MX v;
@@ -215,6 +212,9 @@ public:
   // QP
   DMatrix qpH_, qpA_;
   std::vector<double> qpG_, qpB_;
+
+  // Hessian times a step
+  std::vector<double> qpH_times_du_;
 };
 
 } // namespace CasADi

@@ -204,6 +204,7 @@ void SCPgenInternal::init(){
     lambda_g_.resize(m_,0);
     dlambda_g_.resize(m_,0);
   }
+  qpH_times_du_.resize(n_);
  
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
     it->init.resize(it->n,0);
@@ -518,8 +519,6 @@ void SCPgenInternal::init(){
   // Step expansion function outputs
   vector<MX> exp_fcn_out;
   n=0;
-  exp_fcn_out.push_back(mfcn_fwdSens[0][mod_obj_]);           exp_osens_ = n++;
-  exp_fcn_out.push_back(mfcn_fwdSens[0][mod_gl_]);            exp_curve_ = n++;
   for(int i=1; i<x_.size(); ++i){
     exp_fcn_out.push_back(mfcn_fwdSens[0][x_[i].mod_def]);    x_[i].exp_def = n++;
     if(!gauss_newton_){
@@ -679,6 +678,10 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     copy(it->init.begin(),it->init.end(),it->opt.begin());
   }
 
+  // Get current time and reset timers
+  double time1 = clock();
+  t_eval_jac_ = t_eval_hes_ = t_eval_res_ = t_eval_tan_ = t_eval_exp_ = t_solve_qp_ = 0;
+
   // Initial evaluation of the residual function
   eval_res();
 
@@ -698,10 +701,6 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   
   // Reset iteration message
   iteration_note_ = string();
-
-  // Get current time and reset timers
-  double time1 = clock();
-  t_eval_jac_ = t_eval_hes_ = t_eval_res_ = t_eval_tan_ = t_eval_exp_ = t_solve_qp_ = 0;
 
   // MAIN OPTIMZATION LOOP
   while(true){
@@ -749,6 +748,12 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     // Form the condensed QP
     eval_tan();
 
+    // Evaluate the constraint Jacobian
+    eval_jac();
+    
+    // Evaluate the condensed Hessian
+    eval_hess();
+    
     // Regularize the QP
     if(regularize_){
       regularize();
@@ -1000,17 +1005,28 @@ void SCPgenInternal::eval_hess(){
   // Evaluate condensed Hessian
   hes_fcn_.evaluate();
 
-  // Get the reduced Hessian
+  // Get the objective function terms in the QP
   if(gauss_newton_){
+    // Hessian of the lagrangian
     const DMatrix& B_obj =  hes_fcn_.output();
     fill(qpH_.begin(),qpH_.end(),0);
     DMatrix::mul_no_alloc_tn(B_obj,B_obj,qpH_);
 
+    // Gradient of the objective
     fill(qpG_.begin(),qpG_.end(),0);
     DMatrix::mul_no_alloc_tn(B_obj,gL_,qpG_);
   } else {
+    // Hessian of the lagrangian
     hes_fcn_.getOutput(qpH_);
+
+    // Gradient of the objective
     copy(gL_.begin(),gL_.end(),qpG_.begin());
+    for(int i=0; i<qpA_.size1(); ++i){
+      for(int el=qpA_.rowind(i); el<qpA_.rowind(i+1); ++el){
+	int j=qpA_.col(el);
+	qpG_[j] -= qpA_.at(el)*lambda_g_[i];
+      }
+    }
   }
 
   double time2 = clock();
@@ -1091,23 +1107,6 @@ void SCPgenInternal::eval_tan(){
   transform(g_.begin(),g_.end(),tan_fcn_.output(tan_b_g_).begin(),qpB_.begin(),std::minus<double>());
   transform(gL_.begin(),gL_.end(),tan_fcn_.output(tan_b_obj_).begin(),gL_.begin(),std::minus<double>());
   
-  // Evaluate the constraint Jacobian
-  eval_jac();
-  
-  // Evaluate the condensed Hessian
-  eval_hess();
-
-  // Change the gradient of the Lagrangian to the gradient of the objective
-  if(!gauss_newton_){
-    // Subtract a multiple of the condensed Hessian to 
-    for(int i=0; i<qpA_.size1(); ++i){
-      for(int el=qpA_.rowind(i); el<qpA_.rowind(i+1); ++el){
-	int j=qpA_.col(el);
-	qpG_[j] -= qpA_.at(el)*lambda_g_[i];
-      }
-    }
-  }
-
   // Expanded primal step (first part)
   for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
     const DMatrix& dv = tan_fcn_.output(it->tan_lin);
@@ -1195,23 +1194,8 @@ void SCPgenInternal::solve_qp(){
 void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
   // Make sure that we have a decent direction 
   if(!gauss_newton_){
-    // Get the reduced Hessian times the step
-    const vector<double>& qpH_times_du = exp_fcn_.output(exp_curve_).data();
-    casadi_assert(qpH_times_du.size()==n_);
-    
-    // Scalar product with du to get gain
-    double gain = 0;
-    for(int i=0; i<n_; ++i){
-      gain += x_[0].step[i] * qpH_times_du[i];
-    }
-    
-    // Add contribution from regularization
-    if(reg_>0){
-      for(vector<double>::const_iterator i=x_[0].step.begin(); i!=x_[0].step.end(); ++i){
-	gain += reg_**i**i;
-      }
-    }
-
+    // Get the curvature in the step direction
+    double gain = DMatrix::quad_form(qpH_,x_[0].step);
     if (gain < 0){
       iteration_note_ = "Hessian indefinite in the search direction";
     }
@@ -1226,7 +1210,8 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
   double l1_infeas = primalInfeasibility();
 
   // Right-hand side of Armijo condition
-  double F_sens = exp_fcn_.output(exp_osens_).toScalar();
+  double F_sens = 0;
+  for(int i=0; i<n_; ++i) F_sens += x_[0].step[i] * qpG_[i];
   double L1dir = F_sens - sigma_ * l1_infeas;
   double L1merit = obj_k_ + sigma_ * l1_infeas;
   
