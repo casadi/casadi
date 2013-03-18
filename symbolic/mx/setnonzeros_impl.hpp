@@ -36,11 +36,19 @@ using namespace std;
 namespace CasADi{
 
   template<bool ADD>
-  SetNonzerosBase<ADD>:: ~SetNonzerosBase(){
+  SetNonzeros<ADD>::SetNonzeros(const MX& y, const MX& x){
+    this->setSparsity(y.sparsity());
+    this->setDependencies(y,x);
   }
 
   template<bool ADD>
-  void SetNonzerosBase<ADD>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  SetNonzeros<ADD>:: ~SetNonzeros(){
+  }
+
+  template<bool ADD>
+  void SetNonzeros<ADD>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+    // Get all the nonzeros
+    vector<int> nz = getAll();
 
     // Number of derivative directions
     int nfwd = fwdSens.size();
@@ -59,7 +67,7 @@ namespace CasADi{
     // We next need to resort the assignment vector by outputs instead of inputs
     // Start by counting the number of output nonzeros corresponding to each input nonzero
     vector<int> onz_count(ocol.size()+1,0);
-    for(vector<int>::const_iterator it=nz_.begin(); it!=nz_.end(); ++it){
+    for(vector<int>::const_iterator it=nz.begin(); it!=nz.end(); ++it){
       casadi_assert_message(*it>=0,"Not implemented");
       onz_count[*it+1]++;
     }
@@ -70,18 +78,18 @@ namespace CasADi{
     }
     
     // Get the order of assignments
-    vector<int> nz_order(nz_.size());
-    for(int k=0; k<nz_.size(); ++k){
+    vector<int> nz_order(nz.size());
+    for(int k=0; k<nz.size(); ++k){
       // Save the new index
-      nz_order[onz_count[nz_[k]]++] = k;
+      nz_order[onz_count[nz[k]]++] = k;
     }
 
     // Find out which elements are being set
     vector<int>& with_duplicates = onz_count; // Reuse memory
-    onz_count.resize(nz_.size());
-    for(int k=0; k<nz_.size(); ++k){
+    onz_count.resize(nz.size());
+    for(int k=0; k<nz.size(); ++k){
       // Get output nonzero
-      int onz_k = nz_[nz_order[k]];
+      int onz_k = nz[nz_order[k]];
       
       // Get element (note: may contain duplicates)
       with_duplicates[k] = orow[onz_k] + ocol[onz_k]*osp.size1();
@@ -140,7 +148,7 @@ namespace CasADi{
       
       // Enlarge the sparsity pattern of the arguments if not all assignments fit
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
-	if(*k>=0 && nz_[*k]>=0 && r_nz2[nz_[*k]]<0){
+	if(*k>=0 && nz[*k]>=0 && r_nz2[nz[*k]]<0){
 	  
 	  // Create a new pattern which includes both the the previous seed and the addition/assignment
 	  CRSSparsity sp = arg0.sparsity().patternUnion(osp,tmp1);
@@ -158,7 +166,7 @@ namespace CasADi{
       bool elements_to_add = false;
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
 	if(*k>=0){
-	  int k2 = nz_[*k];
+	  int k2 = nz[*k];
 	  if(k2>=0){
 	    *k = r_nz2[k2];
 	    elements_to_add = true;
@@ -195,7 +203,7 @@ namespace CasADi{
       r_col.clear();
       r_rowind.resize(isp.size1()+1); // Row count
       fill(r_rowind.begin(),r_rowind.end(),0);
-      for(int k=0; k<nz_.size(); ++k){
+      for(int k=0; k<nz.size(); ++k){
 	if(r_nz[k]!=-1){
 	  r_nz[n++] = r_nz[k];
 	  int i=irow[nz_order[k]];
@@ -569,22 +577,6 @@ namespace CasADi{
   }
 
   template<bool ADD>
-  SetNonzerosVector<ADD>::SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz) : SetNonzerosBase<ADD>(nz){
-    this->setSparsity(y.sparsity());
-    this->setDependencies(y,x);
-    casadi_assert(nz.size()==x.size());
-  }
-
-  template<bool ADD>
-  SetNonzerosSlice<ADD>::SetNonzerosSlice(const MX& y, const MX& x, const std::vector<int>& nz) : SetNonzerosVector<ADD>(y,x,nz), s_(Slice(nz)){
-  }
-
-  template<bool ADD>
-  SetNonzerosSlice2<ADD>::SetNonzerosSlice2(const MX& y, const MX& x, const std::vector<int>& nz) : SetNonzerosVector<ADD>(y,x,nz){
-    inner_ = Slice(nz,outer_);
-  }
-
-  template<bool ADD>
   void SetNonzerosVector<ADD>::printPart(std::ostream &stream, int part) const{
     switch(part){
     case 0: stream << "(";           break;
@@ -612,20 +604,21 @@ namespace CasADi{
   }
   
   template<bool ADD>
-  Matrix<int> SetNonzerosVector<ADD>::mapping(int iind) const {
-    return Matrix<int>(this->sparsity(),this->nz_);
+  Matrix<int> SetNonzeros<ADD>::mapping(int iind) const {
+    vector<int> nz = getAll();
+    return Matrix<int>(this->sparsity(),nz);
   }
 
   template<bool ADD>
-  bool SetNonzerosVector<ADD>::isAssignment() const{
+  bool SetNonzerosSlice<ADD>::isAssignment() const{
     // Check sparsity
     if(!(this->sparsity() == this->dep(1).sparsity()))
       return false;
       
     // Check if the nonzeros follow in increasing order
-    for(int k=0; k<this->nz_.size(); ++k){
-      if(this->nz_[k] != k) return false;
-    }
+    if(s_.start_ != 0) return false;
+    if(s_.step_ != 1) return false;
+    if(s_.stop_ != this->size()) return false;
     
     // True if reached this point
     return true;
@@ -681,7 +674,7 @@ namespace CasADi{
   }
 
   template<bool ADD>
-  void SetNonzerosVector<ADD>::simplifyMe(MX& ex){
+  void SetNonzerosSlice<ADD>::simplifyMe(MX& ex){
     // Simplify if addition
     if(isAssignment()){
       MX t = this->dep(1);

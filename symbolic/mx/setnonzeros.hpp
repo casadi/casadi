@@ -34,17 +34,20 @@ namespace CasADi{
       \date 2013
   */
   template<bool ADD>
-  class SetNonzerosBase : public MXNode{
+  class SetNonzeros : public MXNode{
   public:
 
     /// Constructor
-    SetNonzerosBase(const std::vector<int>& nz) : nz_(nz){}
+    SetNonzeros(const MX& y, const MX& x);
 
     /// Destructor
-    virtual ~SetNonzerosBase() = 0;
+    virtual ~SetNonzeros() = 0;
+
+    /// Get all the nonzeros
+    virtual std::vector<int> getAll() const = 0;    
 
     /// Clone function
-    virtual SetNonzerosBase* clone() const = 0;
+    virtual SetNonzeros* clone() const = 0;
     
     /// Evaluate the function symbolically (MX)
     void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
@@ -52,8 +55,11 @@ namespace CasADi{
     /** \brief Get the operation */
     virtual int getOp() const{ return ADD ? OP_ADDNONZEROS : OP_SETNONZEROS;}
 
-    /// Operation sequence
-    std::vector<int> nz_;
+    /// Construct the IMatrix that maps from the iind'th input to the output 
+    Matrix<int> mapping(int iind=0) const;
+
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    virtual int numInplace() const{ return 1;}
   };
 
 
@@ -62,17 +68,20 @@ namespace CasADi{
       \date 2013
   */
   template<bool ADD>
-  class SetNonzerosVector : public SetNonzerosBase<ADD>{
+  class SetNonzerosVector : public SetNonzeros<ADD>{
   public:
 
     /// Constructor
-    SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz);
+    SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz) : SetNonzeros<ADD>(y,x), nz_(nz){}
 
     /// Clone function
     virtual SetNonzerosVector* clone() const{ return new SetNonzerosVector(*this);}
       
     /// Destructor
     virtual ~SetNonzerosVector(){}
+
+    /// Get all the nonzeros
+    virtual std::vector<int> getAll() const{ return nz_;}
 
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
@@ -93,32 +102,32 @@ namespace CasADi{
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
             
-    /// Construct the IMatrix that maps from the iind'th input to the output 
-    Matrix<int> mapping(int iind=0) const;
-    
-    /// Check if the instance is in fact a simple assignment
-    bool isAssignment() const;
-    
-    /// Simplify
-    virtual void simplifyMe(MX& ex);
-
-    /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual int numInplace() const{ return 1;}
+    /// Operation sequence
+    std::vector<int> nz_;
   };
 
   // Specialization of the above when nz_ is a Slice
   template<bool ADD>
-  class SetNonzerosSlice : public SetNonzerosVector<ADD>{
+  class SetNonzerosSlice : public SetNonzeros<ADD>{
   public:
 
     /// Constructor
-    SetNonzerosSlice(const MX& y, const MX& x, const std::vector<int>& nz);
+    SetNonzerosSlice(const MX& y, const MX& x, const Slice& s) : SetNonzeros<ADD>(y,x), s_(s){}
 
     /// Clone function
     virtual SetNonzerosSlice* clone() const{ return new SetNonzerosSlice(*this);}
       
     /// Destructor
     virtual ~SetNonzerosSlice(){}
+
+    /// Get all the nonzeros
+    virtual std::vector<int> getAll() const{ return s_.getAll(s_.stop_);}
+
+    /// Check if the instance is in fact a simple assignment
+    bool isAssignment() const;
+    
+    /// Simplify
+    virtual void simplifyMe(MX& ex);
 
     /// Propagate sparsity
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
@@ -145,11 +154,11 @@ namespace CasADi{
 
   // Specialization of the above when nz_ is a nested Slice
   template<bool ADD>
-  class SetNonzerosSlice2 : public SetNonzerosVector<ADD>{
+  class SetNonzerosSlice2 : public SetNonzeros<ADD>{
   public:
 
     /// Constructor
-    SetNonzerosSlice2(const MX& y, const MX& x, const std::vector<int>& nz);
+    SetNonzerosSlice2(const MX& y, const MX& x, const Slice& inner, const Slice& outer) : SetNonzeros<ADD>(y,x), inner_(inner), outer_(outer){}
 
     /// Clone function
     virtual SetNonzerosSlice2* clone() const{ return new SetNonzerosSlice2(*this);}
@@ -157,6 +166,9 @@ namespace CasADi{
     /// Destructor
     virtual ~SetNonzerosSlice2(){}
     
+    /// Get all the nonzeros
+    virtual std::vector<int> getAll() const{ return inner_.getAll(outer_,outer_.stop_);}
+
     /// Propagate sparsity
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
 

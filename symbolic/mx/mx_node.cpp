@@ -336,9 +336,11 @@ namespace CasADi{
     } else {
       MX ret;
       if(Slice::isSlice(nz)){
-	ret = MX::create(new SetNonzerosSlice<false>(y,shared_from_this<MX>(),nz));
+	ret = MX::create(new SetNonzerosSlice<false>(y,shared_from_this<MX>(),Slice(nz)));
       } else if(Slice::isSlice2(nz)){
-	ret = MX::create(new SetNonzerosSlice2<false>(y,shared_from_this<MX>(),nz));
+	Slice outer;
+	Slice inner(nz,outer);
+	ret = MX::create(new SetNonzerosSlice2<false>(y,shared_from_this<MX>(),inner,outer));
       } else {
 	ret = MX::create(new SetNonzerosVector<false>(y,shared_from_this<MX>(),nz));
       }
@@ -354,9 +356,11 @@ namespace CasADi{
     } else {
       MX ret;
       if(Slice::isSlice(nz)){
-	ret = MX::create(new SetNonzerosSlice<true>(y,shared_from_this<MX>(),nz));
+	ret = MX::create(new SetNonzerosSlice<true>(y,shared_from_this<MX>(),Slice(nz)));
       } else if(Slice::isSlice2(nz)){
-	ret = MX::create(new SetNonzerosSlice2<true>(y,shared_from_this<MX>(),nz));
+	Slice outer;
+	Slice inner(nz,outer);
+	ret = MX::create(new SetNonzerosSlice2<true>(y,shared_from_this<MX>(),inner,outer));
       } else {
 	ret = MX::create(new SetNonzerosVector<true>(y,shared_from_this<MX>(),nz));
       }
