@@ -956,8 +956,8 @@ CRSSparsity FXInternal::getJacSparsityHierarchical(int iind, int oind){
 CRSSparsity FXInternal::getJacSparsity(int iind, int oind, bool symmetric){
   // Check if we are able to propagate dependencies through the function
   if(spCanEvaluate(true) || spCanEvaluate(false)){
-    
-    if (input(iind).size()>1 && output(oind).size()>1) {
+
+    if (input(iind).size()>3*bvec_size && output(oind).size()>3*bvec_size) {
       if (symmetric) {
         return getJacSparsityHierarchicalSymm(iind, oind);
       } else {
