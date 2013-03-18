@@ -721,27 +721,31 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   if(output_given){
     casadi_assert_message(res.size()==getNumOutputs(),"Wrong number of output arguments");
   }
-  
-  // Symbolic work, non-differentiated
-  vector<MX> swork(work_.size());
-  log("MXFunctionInternal::evalMX allocated work vector");
-  
-  // Get the number of directions
-  const int nfdir = fseed.size();
-  const int nadir = aseed.size();
 
-  // "Tape" with spilled variables
-  vector<pair<pair<int,int>,MX> > tape;
-  if(nadir>0){
-    tape.resize(tape_.size());
-    for(int k=0; k<tape.size(); ++k){
-      tape[k].first = tape_[k].first;
+  // Skip forward sensitivities if no nonempty seeds
+  bool skip_fwd = true;
+  for(vector<vector<MX> >::const_iterator i=fseed.begin(); i!=fseed.end() && skip_fwd; ++i){
+    for(vector<MX>::const_iterator j=i->begin(); j!=i->end() && skip_fwd; ++j){
+      if(!j->isNull() && j->size()>0){
+	skip_fwd = false;
+      }
     }
   }
 
-  // Tape counter
-  int tt = 0;
-  
+  // Skip forward sensitivities if no nonempty seeds
+  bool skip_adj = true;
+  for(vector<vector<MX> >::const_iterator i=aseed.begin(); i!=aseed.end() && skip_adj; ++i){
+    for(vector<MX>::const_iterator j=i->begin(); j!=i->end() && skip_adj; ++j){
+      if(!j->isNull() && j->size()>0){
+	skip_adj = false;
+      }
+    }
+  }
+    
+  // Get the number of directions
+  int nfdir = fseed.size();
+  int nadir = aseed.size();
+
   // Allocate outputs
   if(!output_given){
     res.resize(outputv_.size());
@@ -754,15 +758,52 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   fsens.resize(nfdir);
   for(int d=0; d<nfdir; ++d){
     fsens[d].resize(outputv_.size());
+    if(skip_fwd){
+      for(int i=0; i<fsens[d].size(); ++i){
+	fsens[d][i] = MX::sparse(output(i).size1(),output(i).size2());
+      }
+    }
   }
+  
+  // Skip if trivial
+  if(skip_fwd) nfdir = 0;
   
   // Allocate adjoint sensitivities
   asens.resize(nadir);
   for(int d=0; d<nadir; ++d){
     asens[d].resize(inputv_.size());
+    if(skip_adj){
+      for(int i=0; i<asens[d].size(); ++i){
+	asens[d][i] = MX::sparse(input(i).size1(),input(i).size2());
+      }
+    }
   }
-  log("MXFunctionInternal::evalMX allocated return value");
+
+  // Skip if trivial
+  if(skip_adj) nadir = 0;
+
+  // Quick return if nothing to calculate
+  if(output_given && nfdir==0 && nadir==0){
+    log("MXFunctionInternal::evalMX quick return");
+    return;
+  }
   
+  // Symbolic work, non-differentiated
+  vector<MX> swork(work_.size());
+  log("MXFunctionInternal::evalMX allocated work vector");
+
+  // "Tape" with spilled variables
+  vector<pair<pair<int,int>,MX> > tape;
+  if(nadir>0){
+    tape.resize(tape_.size());
+    for(int k=0; k<tape.size(); ++k){
+      tape[k].first = tape_[k].first;
+    }
+  }
+
+  // Tape counter
+  int tt = 0;  
+
   MXPtrV input_p, output_p;
   MXPtrVV fseed_p(nfdir), fsens_p(nfdir);
   MXPtrVV aseed_p(nadir), asens_p(nadir);
