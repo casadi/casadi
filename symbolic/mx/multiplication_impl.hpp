@@ -34,109 +34,148 @@ using namespace std;
 namespace CasADi{
 
   template<bool TrX, bool TrY>
-  Multiplication<TrX,TrY>::Multiplication(const MX& x, const MX& y_trans){
-    casadi_assert_message(x.size2() == y_trans.size2(),"Multiplication::Multiplication: dimension mismatch. Attempting to multiply " << x.dimString() << " with " << y_trans.dimString());
-    setDependencies(x,y_trans);
-
-    // Create the sparsity pattern for the matrix-matrix product
-    CRSSparsity spres = x->sparsity().patternProduct(y_trans.sparsity());
-
-    // Save sparsity
-    setSparsity(spres);
+  Multiplication<TrX,TrY>::Multiplication(const MX& z, const MX& x, const MX& y){
+    casadi_assert_message(x.size2() == y.size2(),"Multiplication::Multiplication: dimension mismatch. Attempting to multiply " << x.dimString() << " with " << y.dimString());
+    setDependencies(z,x,y);
+    setSparsity(z.sparsity());
+    casadi_assert_message(!TrX || TrY, "Illegal combination");
+    casadi_assert_message(!TrX, "Not implemented");
+    casadi_assert_message(TrY,"Not implemented");
   }
 
   template<bool TrX, bool TrY>
   void Multiplication<TrX,TrY>::printPart(std::ostream &stream, int part) const{
     if(part==0){
-      stream << "mul(";
+      stream << "(";
     } else if(part==1){
-      stream << ",trans(";
+      stream << "+mul(";
+    } else if(part==2){
+      if(TrX) stream << "'";
+      stream << ",";
     } else {
+      if(TrY) stream << "'";
       stream << "))";
     }
   }
 
   template<bool TrX, bool TrY>
   void Multiplication<TrX,TrY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    fill(output[0]->begin(),output[0]->end(),0);
-    DMatrix::mul_no_alloc_nt(*input[0],*input[1],*output[0]);
-
-    // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
-    for(int d=0; d<nfwd; ++d){
-      fill(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),0);
-      DMatrix::mul_no_alloc_nt(*fwdSeed[d][0],*input[1],*fwdSens[d][0]);
-      DMatrix::mul_no_alloc_nt(*input[0],*fwdSeed[d][1],*fwdSens[d][0]);
-    }
-
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      DMatrix::mul_no_alloc_nn(*adjSeed[d][0],*input[1],*adjSens[d][0]);
-      DMatrix::mul_no_alloc_tn(*adjSeed[d][0],*input[0],*adjSens[d][1]);
-      adjSeed[d][0]->setZero();
-    }
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
   template<bool TrX, bool TrY>
   void Multiplication<TrX,TrY>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    fill(output[0]->begin(),output[0]->end(),0);
-    SXMatrix::mul_no_alloc_nt(*input[0],*input[1],*output[0]);
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  }
+
+  template<bool TrX, bool TrY>
+  template<typename T, typename MatV, typename MatVV>
+  void Multiplication<TrX,TrY>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+    int nfwd = fwdSens.size();
+    int nadj = adjSeed.size();
+
+    if(input[0]!=output[0]){
+      copy(input[0]->begin(),input[0]->end(),output[0]->begin());
+    }
+    Matrix<T>::mul_no_alloc_nt(*input[1],*input[2],*output[0]);
+
+    // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
+    for(int d=0; d<nfwd; ++d){
+      if(fwdSeed[d][0]!=fwdSens[d][0]){
+	copy(fwdSeed[d][0]->begin(),fwdSeed[d][0]->end(),fwdSens[d][0]->begin());
+      }
+      Matrix<T>::mul_no_alloc_nt(*fwdSeed[d][1],*input[2],*fwdSens[d][0]);
+      Matrix<T>::mul_no_alloc_nt(*input[1],*fwdSeed[d][2],*fwdSens[d][0]);
+    }
+
+    // Adjoint sensitivities
+    for(int d=0; d<nadj; ++d){
+      Matrix<T>::mul_no_alloc_nn(*adjSeed[d][0],*input[2],*adjSens[d][1]);
+      Matrix<T>::mul_no_alloc_tn(*adjSeed[d][0],*input[1],*adjSens[d][2]);
+      if(adjSeed[d][0]!=adjSens[d][0]){
+	transform(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),adjSens[d][0]->begin(),adjSens[d][0]->begin(),std::plus<T>());
+	adjSeed[d][0]->setZero();
+      }
+    }
   }
 
   template<bool TrX, bool TrY>
   void Multiplication<TrX,TrY>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     if(!output_given)
-      *output[0] = mul(*input[0],trans(*input[1]));
+      *output[0] = *input[0] + mul(tr<TrX>(*input[1]),tr<TrY>(*input[2]));
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for(int d=0; d<nfwd; ++d){
-      *fwdSens[d][0] = mul(*fwdSeed[d][0],trans(*input[1])) + mul(*input[0],trans(*fwdSeed[d][1]));
+      *fwdSens[d][0] = *fwdSeed[d][0] + mul(tr<TrX>(*fwdSeed[d][1]),tr<TrY>(*input[2])) + mul(tr<TrX>(*input[1]),tr<TrY>(*fwdSeed[d][2]));
     }
   
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] += mul(*adjSeed[d][0],*input[1]);
-      *adjSens[d][1] += mul(trans(*adjSeed[d][0]),*input[0]);
-      *adjSeed[d][0] = MX();
+      *adjSens[d][1] += tr<TrX>(mul(*adjSeed[d][0],tr<!TrY>(*input[2])));
+      *adjSens[d][2] += tr<TrY>(mul(tr<!TrX>(*input[1]),*adjSeed[d][0]));
+      if(adjSeed[d][0]!=adjSens[d][0]){
+	*adjSens[d][0] += *adjSeed[d][0];
+	*adjSeed[d][0] = MX();
+      }
     }
   }
 
   template<bool TrX, bool TrY>
   void Multiplication<TrX,TrY>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-    DMatrix::mul_sparsity(*input[0],*input[1],*output[0],fwd);
-    if(!fwd) fill_n(get_bvec_t(output[0]->data()),output[0]->size(),bvec_t(0));
+    bvec_t *zd = get_bvec_t(input[0]->data());
+    bvec_t *rd = get_bvec_t(output[0]->data());
+    const size_t n = this->size();
+    if(fwd){
+      if(zd!=rd) copy(zd,zd+n,rd);
+      DMatrix::mul_sparsity<true>(*input[1],*input[2],*input[0]);
+    } else {
+      DMatrix::mul_sparsity<false>(*input[1],*input[2],*output[0]);
+      if(zd!=rd){
+	for(int i=0; i<n; ++i){
+	  zd[i] |= rd[i];
+	  rd[i] = bvec_t(0);
+	}
+      }
+    }
   }
 
   template<bool TrX, bool TrY>
   void Multiplication<TrX,TrY>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    gen.addAuxiliary(CodeGenerator::AUX_MM_NT_SPARSE);
-    gen.addAuxiliary(CodeGenerator::AUX_FILL);
+    // Check if inplace
+    bool inplace = arg.at(0).compare(res.front())==0;
 
-    // Clear the result
-    stream << "  casadi_fill(" << sparsity().size() << ",0.0," << res.front() << ",1);" << endl;
+    // Copy first argument if not inplace
+    if(!inplace){      
+      stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
+    }
 
     // Perform sparse matrix multiplication
+    gen.addAuxiliary(CodeGenerator::AUX_MM_NT_SPARSE);
     stream << "  casadi_mm_nt_sparse(";
-    for(int i=0; i<2; ++i){
-      stream << arg.at(i) << ",s" << gen.getSparsity(dep(i).sparsity()) << ",";
-    }
+    stream << arg.at(1) << ",s" << gen.getSparsity(dep(1).sparsity()) << ",";
+    stream << arg.at(2) << ",s" << gen.getSparsity(dep(2).sparsity()) << ",";
     stream << res.front() << ",s" << gen.getSparsity(sparsity()) << ");" << endl;
   }
 
   template<bool TrX, bool TrY>
   void DenseMultiplication<TrX,TrY>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    int nrow_x = this->dep(0).size1();
-    int ncol_x = this->dep(0).size2();
-    int nrow_y = this->dep(1).size1();
-    stream << "  for(i=0; i<" << nrow_x << "; ++i) for(j=0; j<" << nrow_y << "; ++j){" << endl;
-    stream << "    r=0;" << endl;
-    stream << "    for(k=0, ss=" << arg.at(0) << "+i*" << ncol_x << ", tt=" << arg.at(1) << "+j*" << ncol_x << "; k<" << ncol_x << "; ++k) r += *ss++**tt++;" << endl;
-    stream << "    " << res.front() << "[j+i*" << nrow_y << "] = r;" << endl;
-    stream << "  }" << endl;
+    // Check if inplace
+    bool inplace = arg.at(0).compare(res.front())==0;
+
+    // Copy first argument if not inplace
+    if(!inplace){      
+      stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
+    }
+
+    int nrow_x = this->dep(1).size1();
+    int ncol_x = this->dep(1).size2();
+    int nrow_y = this->dep(2).size1();
+    stream << "  for(i=0, rr=" << res.front() <<"; i<" << nrow_x << "; ++i)";
+    stream << " for(j=0; j<" << nrow_y << "; ++j, ++rr)";
+    stream << " for(k=0, ss=" << arg.at(1) << "+i*" << ncol_x << ", tt=" << arg.at(2) << "+j*" << ncol_x << "; k<" << ncol_x << "; ++k)";
+    stream << " *rr += *ss++**tt++;" << endl;
   }
 
 } // namespace CasADi

@@ -305,10 +305,14 @@ namespace CasADi{
   }
   
   MX MXNode::getMultiplication(const MX& y) const{
+    // Transpose the second argument
+    MX trans_y = trans(y);
+    CRSSparsity sp_z = sparsity().patternProduct(trans_y.sparsity());
+    MX z = MX::zeros(sp_z);
     if(sparsity().dense() && y.dense()){
-      return MX::create(new DenseMultiplication<false,true>(shared_from_this<MX>(),trans(y)));
+      return MX::create(new DenseMultiplication<false,true>(z,shared_from_this<MX>(),trans_y));
     } else {
-      return MX::create(new Multiplication<false,true>(shared_from_this<MX>(),trans(y)));    
+      return MX::create(new Multiplication<false,true>(z,shared_from_this<MX>(),trans_y));    
     }
   }
   

@@ -35,7 +35,7 @@ namespace CasADi{
   public:
     
     /** \brief  Constructor */
-    Multiplication(const MX& x, const MX& y_trans);
+    Multiplication(const MX& z, const MX& x, const MX& y);
 
     /** \brief  Destructor */
     virtual ~Multiplication(){}
@@ -49,10 +49,14 @@ namespace CasADi{
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
-    /** \brief  Evaluate the function numerically */
+    /// Evaluate the function (template)
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+
+    /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
-    /** \brief  Evaluate the function symbolically (SX) */
+    /// Evaluate the function symbolically (SX)
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /** \brief  Evaluate the function symbolically (MX) */
@@ -63,7 +67,15 @@ namespace CasADi{
     
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_MATMUL;}
+
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    virtual int numInplace() const{ return 1;}
+    
+    /// Helper class
+    template<bool Tr>
+    static MX tr(const MX& x){ return Tr ? trans(x) : x;}
   };
+
 
   /** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
       \author Joel Andersson 
@@ -74,7 +86,7 @@ namespace CasADi{
   public:
     
     /** \brief  Constructor */
-    DenseMultiplication(const MX& x, const MX& y_trans) : Multiplication<TrX,TrY>(x,y_trans){}
+    DenseMultiplication(const MX& z, const MX& x, const MX& y) : Multiplication<TrX,TrY>(z,x,y){}
 
     /** \brief  Destructor */
     virtual ~DenseMultiplication(){}

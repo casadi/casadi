@@ -1423,7 +1423,8 @@ void Matrix<T>::mul_no_alloc_nt(const Matrix<T> &x, const Matrix<T> &y_trans, Ma
 }
 
 template<class T>
-void Matrix<T>::mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, bool fwd){
+template<bool Fwd>
+void Matrix<T>::mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z){
   // Direct access to the arrays
   const std::vector<int> &z_col = z.col();
   const std::vector<int> &z_rowind = z.rowind();
@@ -1443,13 +1444,12 @@ void Matrix<T>::mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, boo
       int j = z_col[el];
       int el1 = x_rowind[i];
       int el2 = y_colind[j];
-      if(fwd) z_data[el] = 0;
       while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
         int j1 = x_col[el1];
         int i2 = y_row[el2];      
         if(j1==i2){
           // | and not & since we are propagating dependencies
-          if(fwd){
+          if(Fwd){
             z_data[el] |= x_data[el1] | y_trans_data[el2];
           } else {
             x_data[el1] |= z_data[el];
