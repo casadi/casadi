@@ -20,6 +20,9 @@
  *
  */
 
+#ifndef MULTIPLICATION_IMPL_HPP
+#define MULTIPLICATION_IMPL_HPP
+
 #include "multiplication.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
@@ -30,7 +33,8 @@ using namespace std;
 
 namespace CasADi{
 
-  Multiplication::Multiplication(const MX& x, const MX& y_trans){
+  template<bool TrX, bool TrY>
+  Multiplication<TrX,TrY>::Multiplication(const MX& x, const MX& y_trans){
     casadi_assert_message(x.size2() == y_trans.size2(),"Multiplication::Multiplication: dimension mismatch. Attempting to multiply " << x.dimString() << " with " << y_trans.dimString());
     setDependencies(x,y_trans);
 
@@ -41,7 +45,8 @@ namespace CasADi{
     setSparsity(spres);
   }
 
-  void Multiplication::printPart(std::ostream &stream, int part) const{
+  template<bool TrX, bool TrY>
+  void Multiplication<TrX,TrY>::printPart(std::ostream &stream, int part) const{
     if(part==0){
       stream << "mul(";
     } else if(part==1){
@@ -51,7 +56,8 @@ namespace CasADi{
     }
   }
 
-  void Multiplication::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  template<bool TrX, bool TrY>
+  void Multiplication<TrX,TrY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
 
@@ -73,12 +79,14 @@ namespace CasADi{
     }
   }
 
-  void Multiplication::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  template<bool TrX, bool TrY>
+  void Multiplication<TrX,TrY>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     fill(output[0]->begin(),output[0]->end(),0);
     SXMatrix::mul_no_alloc_nt(*input[0],*input[1],*output[0]);
   }
 
-  void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  template<bool TrX, bool TrY>
+  void Multiplication<TrX,TrY>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     if(!output_given)
       *output[0] = mul(*input[0],trans(*input[1]));
 
@@ -97,12 +105,14 @@ namespace CasADi{
     }
   }
 
-  void Multiplication::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  template<bool TrX, bool TrY>
+  void Multiplication<TrX,TrY>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     DMatrix::mul_sparsity(*input[0],*input[1],*output[0],fwd);
     if(!fwd) fill_n(get_bvec_t(output[0]->data()),output[0]->size(),bvec_t(0));
   }
 
-  void Multiplication::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  template<bool TrX, bool TrY>
+  void Multiplication<TrX,TrY>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     gen.addAuxiliary(CodeGenerator::AUX_MM_NT_SPARSE);
     gen.addAuxiliary(CodeGenerator::AUX_FILL);
 
@@ -117,10 +127,11 @@ namespace CasADi{
     stream << res.front() << ",s" << gen.getSparsity(sparsity()) << ");" << endl;
   }
 
-  void DenseMultiplication::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    int nrow_x = dep(0).size1();
-    int ncol_x = dep(0).size2();
-    int nrow_y = dep(1).size1();
+  template<bool TrX, bool TrY>
+  void DenseMultiplication<TrX,TrY>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    int nrow_x = this->dep(0).size1();
+    int ncol_x = this->dep(0).size2();
+    int nrow_y = this->dep(1).size1();
     stream << "  for(i=0; i<" << nrow_x << "; ++i) for(j=0; j<" << nrow_y << "; ++j){" << endl;
     stream << "    r=0;" << endl;
     stream << "    for(k=0, ss=" << arg.at(0) << "+i*" << ncol_x << ", tt=" << arg.at(1) << "+j*" << ncol_x << "; k<" << ncol_x << "; ++k) r += *ss++**tt++;" << endl;
@@ -129,4 +140,6 @@ namespace CasADi{
   }
 
 } // namespace CasADi
+
+#endif // MULTIPLICATION_IMPL_HPP
 

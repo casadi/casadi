@@ -30,6 +30,7 @@ namespace CasADi{
       \author Joel Andersson 
       \date 2010
   */
+  template<bool TrX, bool TrY>
   class Multiplication : public MXNode{
   public:
     
@@ -68,11 +69,12 @@ namespace CasADi{
       \author Joel Andersson 
       \date 2010
   */
-  class DenseMultiplication : public Multiplication{
+  template<bool TrX, bool TrY>
+  class DenseMultiplication : public Multiplication<TrX,TrY>{
   public:
     
     /** \brief  Constructor */
-    DenseMultiplication(const MX& x, const MX& y_trans) : Multiplication(x,y_trans){}
+    DenseMultiplication(const MX& x, const MX& y_trans) : Multiplication<TrX,TrY>(x,y_trans){}
 
     /** \brief  Destructor */
     virtual ~DenseMultiplication(){}

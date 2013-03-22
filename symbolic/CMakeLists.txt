@@ -46,7 +46,7 @@ SET(CASADI_SRCS
   mx/symbolic_mx.hpp         mx/symbolic_mx.cpp         # A symbolic MX variable
   mx/unary_mx.hpp            mx/unary_mx.cpp            # Unary operation
   mx/binary_mx.hpp           mx/binary_mx.cpp           # Binary operation
-  mx/multiplication.hpp      mx/multiplication.cpp      # Matrix multiplication
+  mx/multiplication.hpp      mx/multiplication_impl.hpp # Matrix multiplication
   mx/solve.hpp               mx/solve.cpp               # Solve linear system of equations
   mx/evaluation_mx.hpp       mx/evaluation_mx.cpp       # FX function evaluation
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm

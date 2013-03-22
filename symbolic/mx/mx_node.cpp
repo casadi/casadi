@@ -38,6 +38,7 @@
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
+#include "multiplication_impl.hpp"
 
 using namespace std;
 
@@ -305,9 +306,9 @@ namespace CasADi{
   
   MX MXNode::getMultiplication(const MX& y) const{
     if(sparsity().dense() && y.dense()){
-      return MX::create(new DenseMultiplication(shared_from_this<MX>(),trans(y)));
+      return MX::create(new DenseMultiplication<false,true>(shared_from_this<MX>(),trans(y)));
     } else {
-      return MX::create(new Multiplication(shared_from_this<MX>(),trans(y)));    
+      return MX::create(new Multiplication<false,true>(shared_from_this<MX>(),trans(y)));    
     }
   }
   
