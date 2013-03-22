@@ -35,10 +35,12 @@
 #include "getnonzeros.hpp"
 #include "setnonzeros.hpp"
 #include "densification.hpp"
+#include "solve.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
 #include "multiplication_impl.hpp"
+#include "solve_impl.hpp"
 
 using namespace std;
 
@@ -315,7 +317,15 @@ namespace CasADi{
       return MX::create(new Multiplication<false,true>(z,shared_from_this<MX>(),trans_y));    
     }
   }
-  
+    
+  MX MXNode::getSolve(const MX& r, bool tr) const{
+    if(tr){
+      return MX::create(new Solve<true>(r,shared_from_this<MX>()));
+    } else {
+      return MX::create(new Solve<false>(r,shared_from_this<MX>()));
+    }
+  }
+
   MX MXNode::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
     if(nz.size()==0){
       return MX::zeros(sp);

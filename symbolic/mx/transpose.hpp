@@ -74,6 +74,9 @@ namespace CasADi{
 
     /// Transpose
     virtual MX getTranspose() const{ return dep();}
+
+    /// Solve for square linear system
+    virtual MX getSolve(const MX& r, bool tr) const{ return dep()->getSolve(r,!tr);}
   };
 
   /** \brief Matrix transpose (dense)

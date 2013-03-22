@@ -266,6 +266,9 @@ namespace CasADi{
     /// Matrix multiplcation
     virtual MX getMultiplication(const MX& y) const;
 
+    /// Solve for square linear system
+    virtual MX getSolve(const MX& r, bool tr) const;
+
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
 

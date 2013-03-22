@@ -28,7 +28,6 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../fx/mx_function_internal.hpp"
-#include "solve.hpp"
 
 using namespace std;
 
@@ -772,8 +771,8 @@ namespace CasADi{
     }
   }
 
-  MX solve(const MX& A, const MX& b){
-    return MX::create(new Solve(A,b));
+  MX solve(const MX& A, const MX& r){
+    return trans(A->getSolve(trans(r),true));
   }
 
   MX jacobian(const MX& ex, const MX &arg) {
