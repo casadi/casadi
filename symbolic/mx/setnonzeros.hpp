@@ -33,7 +33,7 @@ namespace CasADi{
       \author Joel Andersson
       \date 2013
   */
-  template<bool ADD>
+  template<bool Add>
   class SetNonzeros : public MXNode{
   public:
 
@@ -53,7 +53,7 @@ namespace CasADi{
     void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return ADD ? OP_ADDNONZEROS : OP_SETNONZEROS;}
+    virtual int getOp() const{ return Add ? OP_ADDNONZEROS : OP_SETNONZEROS;}
 
     /// Construct the IMatrix that maps from the iind'th input to the output 
     Matrix<int> mapping(int iind=0) const;
@@ -67,12 +67,12 @@ namespace CasADi{
       \author Joel Andersson
       \date 2013
   */
-  template<bool ADD>
-  class SetNonzerosVector : public SetNonzeros<ADD>{
+  template<bool Add>
+  class SetNonzerosVector : public SetNonzeros<Add>{
   public:
 
     /// Constructor
-    SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz) : SetNonzeros<ADD>(y,x), nz_(nz){}
+    SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz) : SetNonzeros<Add>(y,x), nz_(nz){}
 
     /// Clone function
     virtual SetNonzerosVector* clone() const{ return new SetNonzerosVector(*this);}
@@ -107,12 +107,12 @@ namespace CasADi{
   };
 
   // Specialization of the above when nz_ is a Slice
-  template<bool ADD>
-  class SetNonzerosSlice : public SetNonzeros<ADD>{
+  template<bool Add>
+  class SetNonzerosSlice : public SetNonzeros<Add>{
   public:
 
     /// Constructor
-    SetNonzerosSlice(const MX& y, const MX& x, const Slice& s) : SetNonzeros<ADD>(y,x), s_(s){}
+    SetNonzerosSlice(const MX& y, const MX& x, const Slice& s) : SetNonzeros<Add>(y,x), s_(s){}
 
     /// Clone function
     virtual SetNonzerosSlice* clone() const{ return new SetNonzerosSlice(*this);}
@@ -153,12 +153,12 @@ namespace CasADi{
   };
 
   // Specialization of the above when nz_ is a nested Slice
-  template<bool ADD>
-  class SetNonzerosSlice2 : public SetNonzeros<ADD>{
+  template<bool Add>
+  class SetNonzerosSlice2 : public SetNonzeros<Add>{
   public:
 
     /// Constructor
-    SetNonzerosSlice2(const MX& y, const MX& x, const Slice& inner, const Slice& outer) : SetNonzeros<ADD>(y,x), inner_(inner), outer_(outer){}
+    SetNonzerosSlice2(const MX& y, const MX& x, const Slice& inner, const Slice& outer) : SetNonzeros<Add>(y,x), inner_(inner), outer_(outer){}
 
     /// Clone function
     virtual SetNonzerosSlice2* clone() const{ return new SetNonzerosSlice2(*this);}

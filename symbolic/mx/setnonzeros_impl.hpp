@@ -35,18 +35,18 @@ using namespace std;
 
 namespace CasADi{
 
-  template<bool ADD>
-  SetNonzeros<ADD>::SetNonzeros(const MX& y, const MX& x){
+  template<bool Add>
+  SetNonzeros<Add>::SetNonzeros(const MX& y, const MX& x){
     this->setSparsity(y.sparsity());
     this->setDependencies(y,x);
   }
 
-  template<bool ADD>
-  SetNonzeros<ADD>:: ~SetNonzeros(){
+  template<bool Add>
+  SetNonzeros<Add>:: ~SetNonzeros(){
   }
 
-  template<bool ADD>
-  void SetNonzeros<ADD>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  template<bool Add>
+  void SetNonzeros<Add>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     // Get all the nonzeros
     vector<int> nz = getAll();
 
@@ -115,7 +115,7 @@ namespace CasADi{
       MX& res = d<0 ? *output[0] : *fwdSens[d][0];
 
       // Entries in arg0 with elements zero'ed out
-      if(!ADD){
+      if(!Add){
 
 	// Get the nz locations in arg0 corresponding to the output sparsity pattern
 	r_nz.resize(with_duplicates.size());
@@ -227,7 +227,7 @@ namespace CasADi{
 	CRSSparsity f_sp(isp.size1(),isp.size2(),r_col,r_rowind);
 	asens += aseed->getGetNonzeros(f_sp,r_nz);
 
-	if(ADD){
+	if(Add){
 	  // The corresponding nonzeros remain in the seed
 	  asens0 = aseed;
 	} else {
@@ -238,19 +238,19 @@ namespace CasADi{
     }
   }
 
-  template<bool ADD>
-  void SetNonzerosVector<ADD>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  template<bool Add>
+  void SetNonzerosVector<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  template<bool ADD>
-  void SetNonzerosVector<ADD>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  template<bool Add>
+  void SetNonzerosVector<Add>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  template<bool ADD>
+  template<bool Add>
   template<typename T, typename MatV, typename MatVV>
-  void SetNonzerosVector<ADD>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void SetNonzerosVector<Add>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
 
     // Number of sensitivities
     int nadj = adjSeed.size();
@@ -264,7 +264,7 @@ namespace CasADi{
       copy(idata0.begin(),idata0.end(),odata.begin());
     }
     for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++idata_it){
-      if(ADD){
+      if(Add){
 	if(*k>=0) odata[*k] += *idata_it;
       } else {
 	if(*k>=0) odata[*k] = *idata_it;
@@ -280,7 +280,7 @@ namespace CasADi{
 	copy(fseed0.begin(),fseed0.end(),fsens.begin());
       }
       for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++fseed_it){
-	if(ADD){
+	if(Add){
 	  if(*k>=0) fsens[*k] += *fseed_it;
 	} else {
 	  if(*k>=0) fsens[*k] = *fseed_it;
@@ -296,7 +296,7 @@ namespace CasADi{
       for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++asens_it){
 	if(*k>=0){
 	  *asens_it += aseed[*k];
-	  if(!ADD) aseed[*k] = 0;	      
+	  if(!Add) aseed[*k] = 0;	      
 	}
       }
       if(&aseed != &asens0){
@@ -306,19 +306,19 @@ namespace CasADi{
     }
   }
 
-  template<bool ADD>
-  void SetNonzerosSlice<ADD>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  template<bool Add>
+  void SetNonzerosSlice<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  template<bool ADD>
-  void SetNonzerosSlice<ADD>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  template<bool Add>
+  void SetNonzerosSlice<Add>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  template<bool ADD>
+  template<bool Add>
   template<typename T, typename MatV, typename MatVV>
-  void SetNonzerosSlice<ADD>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void SetNonzerosSlice<Add>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
 
     // Number of sensitivities
     int nadj = adjSeed.size();
@@ -335,7 +335,7 @@ namespace CasADi{
     T* odata_ptr = getPtr(odata) + s_.start_;
     T* odata_stop = getPtr(odata) + s_.stop_;
     for(; odata_ptr != odata_stop; odata_ptr += s_.step_){
-      if(ADD){
+      if(Add){
 	*odata_ptr += *idata_ptr++;
       } else {
 	*odata_ptr = *idata_ptr++;
@@ -354,7 +354,7 @@ namespace CasADi{
       T* fsens_ptr = getPtr(fsens) + s_.start_;
       T* fsens_stop = getPtr(fsens) + s_.stop_;
       for(; fsens_ptr != fsens_stop; fsens_ptr += s_.step_){
-	if(ADD){
+	if(Add){
 	  *fsens_ptr += *fseed_ptr++;
 	} else {
 	  *fsens_ptr = *fseed_ptr++;
@@ -371,7 +371,7 @@ namespace CasADi{
       T* aseed_stop = getPtr(aseed) + s_.stop_;
       for(; aseed_ptr != aseed_stop; aseed_ptr += s_.step_){
 	*asens_ptr++ += *aseed_ptr;
-	if(!ADD) *aseed_ptr = 0;
+	if(!Add) *aseed_ptr = 0;
       }
       vector<T>& asens0 = adjSens[d][0]->data();
       if(&aseed != &asens0){
@@ -381,19 +381,19 @@ namespace CasADi{
     }
   }
   
-  template<bool ADD>
-  void SetNonzerosSlice2<ADD>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  template<bool Add>
+  void SetNonzerosSlice2<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  template<bool ADD>
-  void SetNonzerosSlice2<ADD>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  template<bool Add>
+  void SetNonzerosSlice2<Add>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  template<bool ADD>
+  template<bool Add>
   template<typename T, typename MatV, typename MatVV>
-  void SetNonzerosSlice2<ADD>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void SetNonzerosSlice2<Add>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
 
     // Number of sensitivities
     int nadj = adjSeed.size();
@@ -411,7 +411,7 @@ namespace CasADi{
     T* outer_stop = getPtr(odata) + outer_.stop_;
     for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
       for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
-	if(ADD){
+	if(Add){
 	  *inner_ptr += *idata_ptr++;
 	} else {
 	  *inner_ptr = *idata_ptr++;
@@ -432,7 +432,7 @@ namespace CasADi{
       T* outer_stop = getPtr(fsens) + outer_.stop_;
       for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
 	for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
-	  if(ADD){
+	  if(Add){
 	    *inner_ptr += *fseed_ptr++;
 	  } else {
 	    *inner_ptr = *fseed_ptr++;
@@ -451,7 +451,7 @@ namespace CasADi{
       for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
 	for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
 	  *asens_ptr++ += *inner_ptr;
-	  if(!ADD) *inner_ptr = 0;
+	  if(!Add) *inner_ptr = 0;
 	}
       }
       vector<T>& asens0 = adjSens[d][0]->data();
@@ -462,8 +462,8 @@ namespace CasADi{
     }
   }
 
-  template<bool ADD>
-  void SetNonzerosVector<ADD>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  template<bool Add>
+  void SetNonzerosVector<Add>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd0 = get_bvec_t(input[0]->data());
@@ -475,7 +475,7 @@ namespace CasADi{
 	copy(inputd0,inputd0+input[0]->size(),outputd);
       }
       for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++inputd){
-	if(ADD){
+	if(Add){
 	  if(*k>=0) outputd[*k] |= *inputd;
 	} else {
 	  if(*k>=0) outputd[*k] = *inputd;
@@ -485,7 +485,7 @@ namespace CasADi{
       for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++inputd){
 	if(*k>=0){
 	  *inputd |= outputd[*k];
-	  if(!ADD){
+	  if(!Add){
 	    outputd[*k] = 0;
 	  }
 	}
@@ -500,8 +500,8 @@ namespace CasADi{
     }
   }
 
-  template<bool ADD>
-  void SetNonzerosSlice<ADD>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  template<bool Add>
+  void SetNonzerosSlice<Add>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd0 = get_bvec_t(input[0]->data());
@@ -513,7 +513,7 @@ namespace CasADi{
 	copy(inputd0,inputd0+input[0]->size(),outputd);
       }
       for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
-	if(ADD){
+	if(Add){
 	  outputd[k] |= *inputd++;
 	} else {
 	  outputd[k] = *inputd++;
@@ -522,7 +522,7 @@ namespace CasADi{
     } else {
       for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
 	*inputd++ |= outputd[k];
-	if(!ADD){
+	if(!Add){
 	  outputd[k] = 0;
 	}
       }
@@ -536,8 +536,8 @@ namespace CasADi{
     }
   }
 
-  template<bool ADD>
-  void SetNonzerosSlice2<ADD>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  template<bool Add>
+  void SetNonzerosSlice2<Add>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd0 = get_bvec_t(input[0]->data());
@@ -550,7 +550,7 @@ namespace CasADi{
       }
       for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
 	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
-	  if(ADD){
+	  if(Add){
 	    outputd[k2] |= *inputd++;
 	  } else {
 	    outputd[k2] = *inputd++;
@@ -561,7 +561,7 @@ namespace CasADi{
       for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
 	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
 	  *inputd++ |= outputd[k2];
-	  if(!ADD){
+	  if(!Add){
 	    outputd[k2] = 0;
 	  }
 	}
@@ -576,41 +576,41 @@ namespace CasADi{
     }
   }
 
-  template<bool ADD>
-  void SetNonzerosVector<ADD>::printPart(std::ostream &stream, int part) const{
+  template<bool Add>
+  void SetNonzerosVector<Add>::printPart(std::ostream &stream, int part) const{
     switch(part){
     case 0: stream << "(";           break;
-    case 1: stream << this->nz_ << (ADD ? " += " : " = ") ; break;
+    case 1: stream << this->nz_ << (Add ? " += " : " = ") ; break;
     case 2: stream << ")";           break;
     }
   }
 
-  template<bool ADD>
-  void SetNonzerosSlice<ADD>::printPart(std::ostream &stream, int part) const{
+  template<bool Add>
+  void SetNonzerosSlice<Add>::printPart(std::ostream &stream, int part) const{
     switch(part){
     case 0: stream << "(";           break;
-    case 1: stream << "[" << s_ << "]" << (ADD ? " += " : " = "); break;
+    case 1: stream << "[" << s_ << "]" << (Add ? " += " : " = "); break;
     case 2: stream << ")";           break;
     }
   }
 
-  template<bool ADD>
-  void SetNonzerosSlice2<ADD>::printPart(std::ostream &stream, int part) const{
+  template<bool Add>
+  void SetNonzerosSlice2<Add>::printPart(std::ostream &stream, int part) const{
     switch(part){
     case 0: stream << "(";           break;
-    case 1: stream << "[" << outer_ << ";" << inner_ << "]" << (ADD ? " += " : " = "); break;
+    case 1: stream << "[" << outer_ << ";" << inner_ << "]" << (Add ? " += " : " = "); break;
     case 2: stream << ")";           break;
     }
   }
   
-  template<bool ADD>
-  Matrix<int> SetNonzeros<ADD>::mapping(int iind) const {
+  template<bool Add>
+  Matrix<int> SetNonzeros<Add>::mapping(int iind) const {
     vector<int> nz = getAll();
     return Matrix<int>(this->sparsity(),nz);
   }
 
-  template<bool ADD>
-  bool SetNonzerosSlice<ADD>::isAssignment() const{
+  template<bool Add>
+  bool SetNonzerosSlice<Add>::isAssignment() const{
     // Check sparsity
     if(!(this->sparsity() == this->dep(1).sparsity()))
       return false;
@@ -624,12 +624,12 @@ namespace CasADi{
     return true;
   }
 
-  template<bool ADD>
-  void SetNonzerosVector<ADD>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  template<bool Add>
+  void SetNonzerosVector<Add>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     // Check if inplace
     bool inplace = arg.at(0).compare(res.front())==0;
 
-    // Copy first argument if not implace
+    // Copy first argument if not inplace
     if(!inplace){      
       stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
     }
@@ -639,11 +639,11 @@ namespace CasADi{
     
     // Perform the operation inplace
     stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.at(1) << "; ii!=s" << ind << "+" << this->nz_.size() << "; ++ii, ++ss)";
-    stream << " if(*ii>=0) rr[*ii] " << (ADD?"+=":"=") << " *ss;" << endl;
+    stream << " if(*ii>=0) rr[*ii] " << (Add?"+=":"=") << " *ss;" << endl;
   }
 
-  template<bool ADD>
-  void SetNonzerosSlice<ADD>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  template<bool Add>
+  void SetNonzerosSlice<Add>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     // Check if inplace
     bool inplace = arg.at(0).compare(res.front())==0;
 
@@ -654,11 +654,11 @@ namespace CasADi{
 
     // Perform the operation inplace
     stream << "  for(rr=" << res.front() << "+" << s_.start_ << ", ss=" << arg.at(1) << "; rr!=" << res.front() << "+" << s_.stop_ << "; rr+=" << s_.step_ << ")";
-    stream << " *rr " << (ADD?"+=":"=") << " *ss++;" << endl;
+    stream << " *rr " << (Add?"+=":"=") << " *ss++;" << endl;
   }
 
-  template<bool ADD>
-  void SetNonzerosSlice2<ADD>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  template<bool Add>
+  void SetNonzerosSlice2<Add>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     // Check if inplace
     bool inplace = arg.at(0).compare(res.front())==0;
 
@@ -670,15 +670,15 @@ namespace CasADi{
     // Perform the operation inplace
     stream << "  for(rr=" << res.front() << "+" << outer_.start_ << ", ss=" << arg.at(1) << "; rr!=" << res.front() << "+" << outer_.stop_ << "; rr+=" << outer_.step_ << ")";
     stream << " for(tt=rr+" << inner_.start_ << "; tt!=rr+" << inner_.stop_ << "; tt+=" << inner_.step_ << ")";
-    stream << " *tt " << (ADD?"+=":"=") << " *ss++;" << endl;
+    stream << " *tt " << (Add?"+=":"=") << " *ss++;" << endl;
   }
 
-  template<bool ADD>
-  void SetNonzerosSlice<ADD>::simplifyMe(MX& ex){
+  template<bool Add>
+  void SetNonzerosSlice<Add>::simplifyMe(MX& ex){
     // Simplify if addition
     if(isAssignment()){
       MX t = this->dep(1);
-      if(ADD){
+      if(Add){
 	ex += t;
       } else {
 	ex = t;
