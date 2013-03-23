@@ -1019,12 +1019,22 @@ void SCPgenInternal::eval_hess(){
     // Hessian of the lagrangian
     hes_fcn_.getOutput(qpH_);
 
-    // Gradient of the objective
+    // Gradient of the lagrangian
     copy(gL_.begin(),gL_.end(),qpG_.begin());
-    for(int i=0; i<qpA_.size1(); ++i){
-      for(int el=qpA_.rowind(i); el<qpA_.rowind(i+1); ++el){
-	int j=qpA_.col(el);
-	qpG_[j] -= qpA_.at(el)*lambda_g_[i];
+
+    // Remove the contribution from the simple bounds multipliers
+    for(int i=0; i<n_; ++i){
+      qpG_[i] -= x_[0].lam[i];
+    }
+
+    // Remove the contribution from the nonlinear multipliers to get the gradient of the objective
+    const vector<double> &qpA_data = qpA_.data();
+    const vector<int> &qpA_rowind = qpA_.rowind();
+    const vector<int> &qpA_col = qpA_.col();
+    for(int i=0; i<m_; ++i){
+      for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
+	int j=qpA_col[el];
+	qpG_[j] -= qpA_data[el]*lambda_g_[i];
       }
     }
   }
