@@ -45,6 +45,7 @@ SCPgenInternal::SCPgenInternal(const FX& F, const FX& G, const FX& H, const FX& 
   addOption("tol_pr",            OT_REAL,       1e-6,             "Stopping criterion for primal infeasibility");
   addOption("tol_du",            OT_REAL,       1e-6,             "Stopping criterion for dual infeasability");
   addOption("tol_reg",           OT_REAL,       1e-11,            "Stopping criterion for regularization");
+  addOption("tol_pr_step",       OT_REAL,       1e-6,             "Stopping criterion for the step size");
   addOption("c1",                OT_REAL,       1E-4,             "Armijo condition, coefficient of decrease in merit");
   addOption("beta",              OT_REAL,       0.8,              "Line-search parameter, restoration factor of stepsize");
   addOption("merit_memory",      OT_INTEGER,      4,              "Size of memory to store history of merit function values");
@@ -84,6 +85,7 @@ void SCPgenInternal::init(){
   codegen_ = getOption("codegen");
   reg_threshold_ = getOption("reg_threshold");
   print_time_ = getOption("print_time");
+  tol_pr_step_ = getOption("tol_pr_step");
 
   // Name the components
   if(hasSetOption("name_x")){
@@ -665,8 +667,6 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     }
   }
   
-  double toldx_ = 1e-9;
-
   // Objective value
   obj_k_ = numeric_limits<double>::quiet_NaN();
 
@@ -718,7 +718,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     printIteration(cout,iter,obj_k_,pr_inf,du_inf,reg_,ls_iter,ls_success);
 
     // Checking convergence criteria
-    bool converged = pr_inf <= tol_pr_ && pr_step_ <= toldx_ && reg_ <= tol_reg_;
+    bool converged = pr_inf <= tol_pr_ && pr_step_ <= tol_pr_step_ && reg_ <= tol_reg_;
     if(gauss_newton_){
       converged = converged && iter!=0;
     } else {

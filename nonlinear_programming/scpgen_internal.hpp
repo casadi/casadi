@@ -91,12 +91,21 @@ public:
 
   /// Memory size of L-BFGS method
   int lbfgs_memory_;
+
   /// Tolerance on primal infeasibility
   double tol_pr_;
+
   /// Tolerance on dual infeasibility
   double tol_du_;
+
   /// Tolerance on regularization
   double tol_reg_;
+
+  /// stopping criterion for the stepsize
+  double tol_pr_step_;
+  
+  /// stopping criterion for the lagrangian gradient
+  double tol_gl_;
 
   /// Linesearch parameters
   //@{
@@ -120,12 +129,6 @@ public:
 
   // Options
   double reg_threshold_;
-
-  /// stopping criterion for the stepsize
-  double toldx_;
-  
-  /// stopping criterion for the lagrangian gradient
-  double tolgl_;
   
   /// Print timers
   bool print_time_;
