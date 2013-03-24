@@ -348,6 +348,8 @@ void NLPSolverInternal::init(){
     if (!G_.isNull()) casadi_assert_message(sp_p == G_->input(G_->getNumInputs()-1).sparsity(),"Parametric NLP has inconsistent parameter dimensions. F has got " << sp_p.dimString() << " as dimensions, while G has got " << G_->input(G_->getNumInputs()-1).dimString());
     if (!H_.isNull()) casadi_assert_message(sp_p == H_->input(H_->getNumInputs()-1).sparsity(),"Parametric NLP has inconsistent parameter dimensions. F has got " << sp_p.dimString() << " as dimensions, while H has got " << H_->input(H_->getNumInputs()-1).dimString());
     if (!J_.isNull()) casadi_assert_message(sp_p == J_->input(J_->getNumInputs()-1).sparsity(),"Parametric NLP has inconsistent parameter dimensions. F has got " << sp_p.dimString() << " as dimensions, while J has got " << J_->input(J_->getNumInputs()-1).dimString());
+  } else {
+    sp_p = sp_dense(0,1);
   }
   
   // Infinity
