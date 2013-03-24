@@ -318,19 +318,20 @@ std::vector<M> nlpsolverIn(const std::string arg_s0="",M arg_m0=M(),const std::s
 /// 
 /// \copydoc scheme_NLPOutput
 template<class M>
-std::vector<M> nlpsolverOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M()){
-  std::vector<M> ret(5);
+std::vector<M> nlpsolverOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M()){
+  std::vector<M> ret(6);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
   if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPOutput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in NLPOutput: '" << it->first << "' is not recognized. Available keywords are: x_opt, cost, lambda_g, lambda_x, g");
+      casadi_error("Keyword error in NLPOutput: '" << it->first << "' is not recognized. Available keywords are: x_opt, cost, lambda_g, lambda_x, lambda_p, g");
     ret[n] = it->second;
   }
   return ret;
