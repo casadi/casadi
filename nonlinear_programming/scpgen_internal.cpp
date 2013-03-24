@@ -186,16 +186,17 @@ void SCPgenInternal::init(){
   vinit_fcn_ = vinit_fcn;
 
   // Extract the expressions
-  vector<MX> x = vdef_fcn.inputExpr();
-  vector<MX> f = vdef_fcn.outputExpr();
+  vector<MX> vdef_in = vdef_fcn.inputExpr();
+  vector<MX> vdef_out = vdef_fcn.outputExpr();
 
   // Get the dimensions
-  x_ = x[0];
-  p_ = x[1];
-  v_.resize(x.size()-2);
+  x_ = vdef_in.at(0);
+  p_ = vdef_in.at(1);
+  v_.resize(vdef_in.size()-2);
   for(int i=0; i<v_.size(); ++i){
-    v_[i].v = x[i+2];
-    v_[i].n = x[i+2].size();
+    v_[i].v = vdef_in.at(i+2);
+    v_[i].v_def = vdef_out.at(i+2);
+    v_[i].n = v_[i].v.size();
   }
 
   // Allocate memory
@@ -239,35 +240,36 @@ void SCPgenInternal::init(){
   // Scalar objective function
   MX obj;
 
-  // Definition of the lifted dual variables
-  vector<MX> lam_con(v_.size()+2);
-
   // Multipliers
-  MX lam_g;
-  vector<MX> lam(v_.size()+2);
+  MX g_lam, x_lam;
+  MX p_lam;
+
+  // Definition of the lifted dual variables
+  MX p_defL, gL_defL;
 
   if(gauss_newton_){    
     // Least square objective
-    obj = inner_prod(f[0],f[0])/2;
-    lam_con[0] = f[0];
-    ngL_ = lam_con[0].size();
+    obj = inner_prod(vdef_out[0],vdef_out[0])/2;
+    gL_defL = vdef_out[0];
+    ngL_ = gL_defL.size();
 
   } else {
     // Scalar objective function
-    obj = f[0];
+    obj = vdef_out[0];
     
     // Lagrange multipliers for the simple bounds on u and Lagrange multipliers corresponding to the definition of the dependent variables
-    lam[0] = msym("lam_u",x[0].sparsity());
-    lam[1] = msym("lam_p",x[1].sparsity());
+    x_lam = msym("x_lam",x_.sparsity());
+    p_lam = msym("p_lam",p_.sparsity());
     stringstream ss;
-    for(int i=0; i<v_.size(); ++i){
+    int i=0;
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       ss.str(string());
-      ss << "lam_x" << i;
-      lam[i+2] = msym(ss.str(),x[i+2].sparsity());
+      ss << "lam_x" << i++;
+      it->v_lam = msym(ss.str(),it->v.sparsity());
     }
-
+    
     // Lagrange multipliers for the nonlinear constraints
-    lam_g = msym("lam_g",ng_);
+    g_lam = msym("g_lam",ng_);
 
     if(verbose_){
       cout << "Allocated intermediate variables." << endl;
@@ -276,30 +278,33 @@ void SCPgenInternal::init(){
     // Adjoint sweep to get the definitions of the lifted dual variables (Equation 3.8 in Albersmeyer2010)
     vector<vector<MX> > fseed,fsens,aseed(1),asens(1);
     aseed[0].push_back(1.0);
-    aseed[0].push_back(lam_g);
-    aseed[0].insert(aseed[0].end(),lam.begin()+2,lam.end());
-    vdef_fcn.eval(x,f,fseed,fsens,aseed,asens,true);
+    aseed[0].push_back(g_lam);
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+      aseed[0].push_back(it->v_lam);
+    }
+    vdef_fcn.eval(vdef_in,vdef_out,fseed,fsens,aseed,asens,true);
+    i=0;
 
-    lam_con[0] = asens[0].at(0);
-    if(lam_con[0].isNull()){
-      lam_con[0] = MX(x[0].sparsity());
+    gL_defL = asens[0].at(i++);
+    if(gL_defL.isNull()){
+      gL_defL = MX(x_.sparsity());
     }
 
-    lam_con[1] = asens[0].at(1);
-    if(lam_con[1].isNull()){
-      lam_con[1] = MX(x[1].sparsity());
+    p_defL = asens[0].at(i++);
+    if(p_defL.isNull()){
+      p_defL = MX(p_.sparsity());
     }
 
-    for(int i=0; i<v_.size(); ++i){
-      lam_con[i+2] = asens[0].at(i+2);
-      if(lam_con[i+2].isNull()){
-	lam_con[i+2] = MX(x[i+2].sparsity());
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+      it->v_defL = asens[0].at(i++);
+      if(it->v_defL.isNull()){
+        it->v_defL = MX(it->v.sparsity());
       }
     }
 
     // Multipliers for the simple bounds
-    lam_con[0] += lam[0];
-    lam_con[1] += lam[1];
+    gL_defL += x_lam;
+    p_defL += p_lam;
 
     ngL_ = nx_;
 
@@ -315,45 +320,45 @@ void SCPgenInternal::init(){
   vector<MX> res_fcn_in;
   int n=0;
   if(!gauss_newton_){
-    res_fcn_in.push_back(lam_g);       res_g_lam_ = n++;
+    res_fcn_in.push_back(g_lam);       res_g_lam_ = n++;
   }
 
-  res_fcn_in.push_back(x[0]);        res_x_ = n++;
+  res_fcn_in.push_back(x_);        res_x_ = n++;
   if(!gauss_newton_){
-    res_fcn_in.push_back(lam[0]);    res_x_lam_ = n++;
+    res_fcn_in.push_back(x_lam);    res_x_lam_ = n++;
   }
 
-  res_fcn_in.push_back(x[1]);        res_p_ = n++;
+  res_fcn_in.push_back(p_);        res_p_ = n++;
   if(!gauss_newton_){
-    res_fcn_in.push_back(lam[1]);    res_p_lam_ = n++;
+    res_fcn_in.push_back(p_lam);    res_p_lam_ = n++;
   }
 
-  for(int i=0; i<v_.size(); ++i){
-    res_fcn_in.push_back(x[i+2]);        v_[i].res_var = n++;
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    res_fcn_in.push_back(it->v);        it->res_var = n++;
     if(!gauss_newton_){
-      res_fcn_in.push_back(lam[i+2]);    v_[i].res_lam = n++;
+      res_fcn_in.push_back(it->v_lam);  it->res_lam = n++;
     }
   }
 
   // Outputs
   vector<MX> res_fcn_out;
   n=0;
-  res_fcn_out.push_back(obj);                         res_obj_ = n++;
-  res_fcn_out.push_back(lam_con[0]);                  res_gl_ = n++;
-  res_fcn_out.push_back(f[1]);                        res_g_ = n++;
+  res_fcn_out.push_back(obj);                            res_obj_ = n++;
+  res_fcn_out.push_back(gL_defL);                        res_gl_ = n++;
+  res_fcn_out.push_back(vdef_out[1]);                    res_g_ = n++;
 
-  res_fcn_out.push_back(-x[1]);                       res_p_d_ = n++;
+  res_fcn_out.push_back(-p_);                            res_p_d_ = n++;
   if(!gauss_newton_){
-    res_fcn_out.push_back(lam_con[1]-lam[1]);         res_p_lam_d_ = n++;
+    res_fcn_out.push_back(p_defL-p_lam);                 res_p_lam_d_ = n++;
   }
 
-  for(int i=0; i<v_.size(); ++i){
-    res_fcn_out.push_back(f[i+2]-x[i+2]);                 v_[i].res_d = n++;
+ for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+   res_fcn_out.push_back(it->v_def - it->v);             it->res_d = n++;
     if(!gauss_newton_){
-      res_fcn_out.push_back(lam_con[i+2]-lam[i+2]);   v_[i].res_lam_d = n++;
+      res_fcn_out.push_back(it->v_defL - it->v_lam);     it->res_lam_d = n++;
     }
-  }
-
+ }
+ 
   // Generate function
   MXFunction res_fcn(res_fcn_in,res_fcn_out);
   res_fcn.setOption("number_of_fwd_dir",0);
@@ -371,55 +376,65 @@ void SCPgenInternal::init(){
   }
 
   // Declare difference vector d and substitute out p and v
-  vector<MX> d;
-  vector<MX> d_def;
+  MX dp = msym("dp",p_.sparsity());
+  MX dp_def = p_-dp;
   stringstream ss;
-
-  MX d_i = msym("dp",x[1].sparsity());
-  d.push_back(d_i);
-  d_def.push_back(x[1]-d_i);
-  for(int i=0; i<v_.size(); ++i){
+  int i=0;
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
     ss.str(string());
-    ss << "d" << i;
-    MX d_i = msym(ss.str(),x[i+2].sparsity());
-    d.push_back(d_i);    
-    d_def.push_back(f[i+2]-d_i);
+    ss << "d" << i++;
+    it->d = msym(ss.str(),it->v.sparsity());
+    it->d_def = it->v_def - it->d;
   }
 
   // Declare difference vector lam_d and substitute out lam
-  vector<MX> lam_d;
-  vector<MX> lam_d_def;
+  MX lam_dp;
+  MX lam_dp_def;
   if(!gauss_newton_){
-    MX lam_d_i = msym("lam_p",x[1].sparsity());
-    lam_d.push_back(lam_d_i);
-    lam_d_def.push_back(lam_con[1]-lam_d_i);
-    for(int i=0; i<v_.size(); ++i){
+    lam_dp = msym("p_lam",p_.sparsity());
+    lam_dp_def = p_defL - lam_dp;
+    int i=0;
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       ss.str(string());
-      ss << "lam_d" << i;
-      MX lam_d_i = msym(ss.str(),x[i+2].sparsity());
-      lam_d.push_back(lam_d_i);
-      lam_d_def.push_back(lam_con[i+2]-lam_d_i);
+      ss << "d_lam" << i++;
+      it->d_lam = msym(ss.str(),it->v.sparsity());
+      it->d_defL = it->v_defL - it->d_lam;
     }
   }
 
   // Variables to be substituted and their definitions
   vector<MX> svar, sdef;
-  svar.insert(svar.end(),x.begin()+1,x.end());
-  sdef.insert(sdef.end(),d_def.begin(),d_def.end());
+  svar.push_back(p_);
+  sdef.push_back(dp_def);
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    svar.push_back(it->v);
+    sdef.push_back(it->d_def);
+  }
   if(!gauss_newton_){
-    svar.insert(svar.end(),lam.rbegin(),lam.rend()-1);
-    sdef.insert(sdef.end(),lam_d_def.rbegin(),lam_d_def.rend());    
+    for(vector<Var>::reverse_iterator it=v_.rbegin(); it!=v_.rend(); ++it){
+      svar.push_back(it->v_lam);
+      sdef.push_back(it->d_defL);
+    }
+    svar.push_back(p_lam);
+    sdef.push_back(lam_dp_def);
   }
 
   vector<MX> ex(3);
   ex[0] = obj;
-  ex[1] = f[1];
-  ex[2] = lam_con[0];
+  ex[1] = vdef_out[1];
+  ex[2] = gL_defL;
 
   substituteInPlace(svar, sdef, ex, false);
-  copy(sdef.begin(),sdef.begin()+d_def.size(),d_def.begin());  
+  i=0;
+  dp_def = sdef[i++];
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    it->d_def = sdef[i++];
+  }
   if(!gauss_newton_){
-    copy(sdef.rbegin(),sdef.rbegin()+lam_d_def.size(),lam_d_def.begin());
+    for(vector<Var>::reverse_iterator it=v_.rbegin(); it!=v_.rend(); ++it){
+      it->d_defL = sdef[i++];
+    }
+    lam_dp_def = sdef[i++];
   }
 
   MX obj_z = ex[0];
@@ -429,11 +444,11 @@ void SCPgenInternal::init(){
   // Modified function inputs
   vector<MX> mfcn_in;
   n=0;
-  mfcn_in.push_back(x[1]);                             mod_p_ = n++;
-  mfcn_in.push_back(x[0]);                             mod_x_ = n++;
-  mfcn_in.push_back(d[0]);                             mod_p_d_ = n++;
+  mfcn_in.push_back(p_);                               mod_p_ = n++;
+  mfcn_in.push_back(x_);                               mod_x_ = n++;
+  mfcn_in.push_back(dp);                             mod_p_d_ = n++;
   for(int i=0; i<v_.size(); ++i){
-    mfcn_in.push_back(d[i+1]);                         v_[i].mod_var = n++;
+    mfcn_in.push_back(v_[i].d);                         v_[i].mod_var = n++;
   }
 
   // Modified function outputs
@@ -460,11 +475,11 @@ void SCPgenInternal::init(){
   // Add multipliers to function inputs
   if(!gauss_newton_){
     n = mfcn_in.size();
-    mfcn_in.push_back(lam_g);                          mod_g_lam_ = n++;
-    mfcn_in.push_back(lam[0]);                         mod_x_lam_ = n++;
-    mfcn_in.push_back(lam_d[0]);                       mod_p_lam_d_ = n++;
-    for(int i=0; i<v_.size(); ++i){
-      mfcn_in.push_back(lam_d[i+1]);                   v_[i].mod_lam = n++;
+    mfcn_in.push_back(g_lam);                          mod_g_lam_ = n++;
+    mfcn_in.push_back(x_lam);                          mod_x_lam_ = n++;
+    mfcn_in.push_back(lam_dp);                         mod_p_lam_d_ = n++;
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+      mfcn_in.push_back(it->d_lam);                    it->mod_lam = n++;
     }
   }
 
@@ -490,14 +505,14 @@ void SCPgenInternal::init(){
 
   // Definition of intermediate variables
   n = mfcn_out.size();
-  mfcn_out.push_back(d_def[0]);              mod_p_def_ = n++;
+  mfcn_out.push_back(dp_def);              mod_p_def_ = n++;
   if(!gauss_newton_){
-    mfcn_out.push_back(lam_d_def[0]);        mod_p_defL_ = n++;
+    mfcn_out.push_back(lam_dp_def);        mod_p_defL_ = n++;
   }
-  for(int i=0; i<v_.size(); ++i){
-    mfcn_out.push_back(d_def[i+1]);          v_[i].mod_def = n++;
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    mfcn_out.push_back(it->d_def);         it->mod_def = n++;
     if(!gauss_newton_){
-      mfcn_out.push_back(lam_d_def[i+1]);    v_[i].mod_defL = n++;
+      mfcn_out.push_back(it->d_defL);      it->mod_defL = n++;
     }
   }
 
@@ -511,14 +526,14 @@ void SCPgenInternal::init(){
 
   // Linearization in the d-direction (see Equation (2.12) in Alberspeyer2010)
   fill(mfcn_fwdSeed[0].begin(),mfcn_fwdSeed[0].end(),MX());
-  mfcn_fwdSeed[0][mod_p_d_] = d[0];
+  mfcn_fwdSeed[0][mod_p_d_] = dp;
   for(int i=0; i<v_.size(); ++i){
-    mfcn_fwdSeed[0][v_[i].mod_var] = d[i+1];
+    mfcn_fwdSeed[0][v_[i].mod_var] = v_[i].d;
   }
   if(!gauss_newton_){
-    mfcn_fwdSeed[0][mod_p_lam_d_] = lam_d[0];
+    mfcn_fwdSeed[0][mod_p_lam_d_] = lam_dp;
     for(int i=0; i<v_.size(); ++i){
-      mfcn_fwdSeed[0][v_[i].mod_lam] = lam_d[i+1];
+      mfcn_fwdSeed[0][v_[i].mod_lam] = v_[i].d_lam;
     }
   }
   mfcn.eval(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens,true);
@@ -568,16 +583,16 @@ void SCPgenInternal::init(){
 
   // Expression a + A*du in Lifted Newton (Section 2.1 in Alberspeyer2010)
   MX du = msym("du",nx_);   // Step in u
-  MX dlam_g;               // Step lambda_g
+  MX g_dlam;               // Step lambda_g
   if(!gauss_newton_){
-    dlam_g = msym("dlam_g",lam_g.sparsity());
+    g_dlam = msym("g_dlam",g_lam.sparsity());
   }
   
   // Interpret the Jacobian-vector multiplication as a forward directional derivative
   fill(mfcn_fwdSeed[0].begin(),mfcn_fwdSeed[0].end(),MX());
   mfcn_fwdSeed[0][mod_x_] = du;
   if(!gauss_newton_){
-    mfcn_fwdSeed[0][mod_g_lam_] = dlam_g;
+    mfcn_fwdSeed[0][mod_g_lam_] = g_dlam;
   }
   mfcn.eval(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens,true);    
   
@@ -585,7 +600,7 @@ void SCPgenInternal::init(){
   n = mfcn_in.size();
   mfcn_in.push_back(du);                                 mod_du_ = n++;
   if(!gauss_newton_){
-    mfcn_in.push_back(dlam_g);                           mod_dlam_g_ = n++;
+    mfcn_in.push_back(g_dlam);                           mod_dlam_g_ = n++;
   }
     
   // Step expansion function outputs
@@ -643,14 +658,14 @@ void SCPgenInternal::init(){
   }
   
   // Residual
-  p_res_.resize(d[0].size(),0);
+  p_res_.resize(dp.size(),0);
   if(!gauss_newton_){
-    p_resL_.resize(lam_d[0].size(),0);
+    p_resL_.resize(lam_dp.size(),0);
   }
   for(int i=0; i<v_.size(); ++i){
-    v_[i].res.resize(d[i+1].size(),0);
+    v_[i].res.resize(v_[i].d.size(),0);
     if(!gauss_newton_){
-      v_[i].resL.resize(lam_d[i+1].size(),0);
+      v_[i].resL.resize(v_[i].d_lam.size(),0);
     }
   }
   

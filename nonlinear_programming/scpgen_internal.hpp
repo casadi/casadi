@@ -185,7 +185,8 @@ public:
 
   struct Var{
     int n;
-    MX v;
+    MX v, v_def, v_lam, v_defL;
+    MX d, d_def, d_lam, d_defL;
 
     // Indices of function inputs and outputs
     int res_var, res_lam, res_d, res_lam_d;
