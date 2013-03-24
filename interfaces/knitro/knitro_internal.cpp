@@ -201,7 +201,7 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
   }
 
   // Type of constraints
-  vector<int> cType(m_,KTR_CONTYPE_GENERAL);
+  vector<int> cType(ng_,KTR_CONTYPE_GENERAL);
   if(hasSetOption("contype")){
     vector<int> contype = getOption("contype");
     casadi_assert(contype.size()==cType.size());
@@ -219,9 +219,9 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
     if(isinf(*it)) *it =  KTR_INFBOUND;
   
   // Initialize KNITRO
-  status = KTR_init_problem(kc_handle_, n_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
+  status = KTR_init_problem(kc_handle_, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
                               &input(NLP_LBX).front(), &input(NLP_UBX).front(),
-                              m_, &cType.front(), &input(NLP_LBG).front(), &input(NLP_UBG).front(),
+                              ng_, &cType.front(), &input(NLP_LBG).front(), &input(NLP_UBG).front(),
                               Jcol.size(), &Jcol.front(), &Jrow.front(),
                               nnzH,
                               getPtr(Hrow),
@@ -243,7 +243,7 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
   }
 
   // Lagrange multipliers
-  vector<double> lambda(n_+m_);
+  vector<double> lambda(nx_+ng_);
 
   // Solve NLP
   status = KTR_solve(kc_handle_,
@@ -261,7 +261,7 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
     
   // Copy lagrange multipliers
   output(NLP_LAMBDA_G).set(getPtr(lambda));
-  output(NLP_LAMBDA_X).set(&lambda[m_]);
+  output(NLP_LAMBDA_X).set(&lambda[ng_]);
 
   // Free memory (move to destructor!)
   KTR_free(&kc_handle_);
