@@ -157,18 +157,18 @@ public:
   // Objective value
   double obj_k_;
 
-  // Simple and nonlinear bounds
-  std::vector<double> lbu_, ubu_, g_, lbg_, ubg_, gL_;
+  // Nonlifted variables with bounds
+  std::vector<double> x_lb_, x_ub_, x_init_, x_opt_, x_step_, x_lam_, x_dlam_;
 
-  /// Multipliers for the nonlinear bounds
-  std::vector<double> lambda_g_, dlambda_g_;
+  // Nonlinear bounds
+  std::vector<double> g_, g_lb_, g_ub_, g_lam_, g_dlam_, gL_;
 
   // Residual function io indices
-  int res_lam_g_;
+  int res_x_, res_x_lam_, res_g_lam_;
   int res_obj_, res_gl_, res_g_;
 
   // Modifier function io indices
-  int mod_p_, mod_lam_g_;
+  int mod_x_, mod_p_, mod_x_lam_, mod_g_lam_;
   int mod_obj_, mod_gl_, mod_g_;
   int mod_du_, mod_dlam_g_;
 
@@ -190,7 +190,8 @@ public:
     
   };
 
-  Var x0_;
+  MX x_;
+  MX p_;
   Var x1_;
   std::vector<Var> v_;
 
