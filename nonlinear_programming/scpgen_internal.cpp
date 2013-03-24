@@ -190,10 +190,14 @@ void SCPgenInternal::init(){
   vector<MX> f = vdef_fcn.outputExpr();
 
   // Get the dimensions
-  x_.resize(x.size());
-  for(int i=0; i<x_.size(); ++i){
-    x_[i].v = x[i];
-    x_[i].n = x[i].size();
+  x0_.v = x[0];
+  x0_.n = x[0].size();
+  x1_.v = x[1];
+  x1_.n = x[1].size();
+  v_.resize(x.size()-2);
+  for(int i=0; i<v_.size(); ++i){
+    v_[i].v = x[i+2];
+    v_[i].n = x[i+2].size();
   }
 
   // Allocate memory
@@ -208,7 +212,23 @@ void SCPgenInternal::init(){
   }
   qpH_times_du_.resize(nx_);
  
-  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+  x0_.init.resize(x0_.n,0);
+  x0_.opt.resize(x0_.n,0);
+  x0_.step.resize(x0_.n,0);
+  if(!gauss_newton_){
+    x0_.lam.resize(x0_.n,0);
+    x0_.dlam.resize(x0_.n,0);
+  }
+
+  x1_.init.resize(x1_.n,0);
+  x1_.opt.resize(x1_.n,0);
+  x1_.step.resize(x1_.n,0);
+  if(!gauss_newton_){
+    x1_.lam.resize(x1_.n,0);
+    x1_.dlam.resize(x1_.n,0);
+  }
+
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
     it->init.resize(it->n,0);
     it->opt.resize(it->n,0);
     it->step.resize(it->n,0);
@@ -222,11 +242,11 @@ void SCPgenInternal::init(){
   MX obj;
 
   // Definition of the lifted dual variables
-  vector<MX> lam_con(x_.size());
+  vector<MX> lam_con(v_.size()+2);
 
   // Multipliers
   MX lam_g;
-  vector<MX> lam(x_.size());
+  vector<MX> lam(v_.size()+2);
 
   if(gauss_newton_){    
     // Least square objective
@@ -239,11 +259,13 @@ void SCPgenInternal::init(){
     obj = f[0];
     
     // Lagrange multipliers for the simple bounds on u and Lagrange multipliers corresponding to the definition of the dependent variables
+    lam[0] = msym("lam_u",x[0].sparsity());
+    lam[1] = msym("lam_p",x[1].sparsity());
     stringstream ss;
-    for(int i=0; i<x_.size(); ++i){
+    for(int i=0; i<v_.size(); ++i){
       ss.str(string());
       ss << "lam_x" << i;
-      lam[i] = msym(ss.str(),x[i].sparsity());
+      lam[i+2] = msym(ss.str(),x[i+2].sparsity());
     }
 
     // Lagrange multipliers for the nonlinear constraints
@@ -259,13 +281,24 @@ void SCPgenInternal::init(){
     aseed[0].push_back(lam_g);
     aseed[0].insert(aseed[0].end(),lam.begin()+2,lam.end());
     vdef_fcn.eval(x,f,fseed,fsens,aseed,asens,true);
-    for(int i=0; i<x_.size(); ++i){
-      lam_con[i] = asens[0].at(i);
-      if(lam_con[i].isNull()){
-	lam_con[i] = MX(x[i].sparsity());
+
+    lam_con[0] = asens[0].at(0);
+    if(lam_con[0].isNull()){
+      lam_con[0] = MX(x[0].sparsity());
+    }
+
+    lam_con[1] = asens[0].at(1);
+    if(lam_con[1].isNull()){
+      lam_con[1] = MX(x[1].sparsity());
+    }
+
+    for(int i=0; i<v_.size(); ++i){
+      lam_con[i+2] = asens[0].at(i+2);
+      if(lam_con[i+2].isNull()){
+	lam_con[i+2] = MX(x[i+2].sparsity());
       }
     }
-    
+
     // Multipliers for the simple bounds
     lam_con[0] += lam[0];
     lam_con[1] += lam[1];
@@ -286,10 +319,21 @@ void SCPgenInternal::init(){
   if(!gauss_newton_){
     res_fcn_in.push_back(lam_g);       res_lam_g_ = n++;
   }
-  for(int i=0; i<x_.size(); ++i){
-    res_fcn_in.push_back(x[i]);        x_[i].res_var = n++;
+
+  res_fcn_in.push_back(x[0]);        x0_.res_var = n++;
+  if(!gauss_newton_){
+    res_fcn_in.push_back(lam[0]);    x0_.res_lam = n++;
+  }
+
+  res_fcn_in.push_back(x[1]);        x1_.res_var = n++;
+  if(!gauss_newton_){
+    res_fcn_in.push_back(lam[1]);    x1_.res_lam = n++;
+  }
+
+  for(int i=0; i<v_.size(); ++i){
+    res_fcn_in.push_back(x[i+2]);        v_[i].res_var = n++;
     if(!gauss_newton_){
-      res_fcn_in.push_back(lam[i]);    x_[i].res_lam = n++;
+      res_fcn_in.push_back(lam[i+2]);    v_[i].res_lam = n++;
     }
   }
 
@@ -299,11 +343,16 @@ void SCPgenInternal::init(){
   res_fcn_out.push_back(obj);                         res_obj_ = n++;
   res_fcn_out.push_back(lam_con[0]);                  res_gl_ = n++;
   res_fcn_out.push_back(f[1]);                        res_g_ = n++;
-  for(int i=1; i<x_.size(); ++i){
-    res_fcn_out.push_back(i==1 ? -x[i] : f[i]-x[i]);  x_[i].res_d = n++;
 
+  res_fcn_out.push_back(-x[1]);                       x1_.res_d = n++;
+  if(!gauss_newton_){
+    res_fcn_out.push_back(lam_con[1]-lam[1]);         x1_.res_lam_d = n++;
+  }
+
+  for(int i=0; i<v_.size(); ++i){
+    res_fcn_out.push_back(f[i+2]-x[i+2]);                 v_[i].res_d = n++;
     if(!gauss_newton_){
-      res_fcn_out.push_back(lam_con[i]-lam[i]);       x_[i].res_lam_d = n++;
+      res_fcn_out.push_back(lam_con[i+2]-lam[i+2]);   v_[i].res_lam_d = n++;
     }
   }
 
@@ -327,24 +376,31 @@ void SCPgenInternal::init(){
   vector<MX> d;
   vector<MX> d_def;
   stringstream ss;
-  for(int i=1; i<x_.size(); ++i){
+
+  MX d_i = msym("dp",x[1].sparsity());
+  d.push_back(d_i);
+  d_def.push_back(x[1]-d_i);
+  for(int i=0; i<v_.size(); ++i){
     ss.str(string());
     ss << "d" << i;
-    MX d_i = msym(ss.str(),x[i].sparsity());
+    MX d_i = msym(ss.str(),x[i+2].sparsity());
     d.push_back(d_i);    
-    d_def.push_back(i==1 ? x[i]-d_i : f[i]-d_i);
+    d_def.push_back(f[i+2]-d_i);
   }
 
   // Declare difference vector lam_d and substitute out lam
   vector<MX> lam_d;
   vector<MX> lam_d_def;
   if(!gauss_newton_){
-    for(int i=1; i<x_.size(); ++i){
+    MX lam_d_i = msym("lam_p",x[1].sparsity());
+    lam_d.push_back(lam_d_i);
+    lam_d_def.push_back(lam_con[1]-lam_d_i);
+    for(int i=0; i<v_.size(); ++i){
       ss.str(string());
       ss << "lam_d" << i;
-      MX lam_d_i = msym(ss.str(),x[i].sparsity());
+      MX lam_d_i = msym(ss.str(),x[i+2].sparsity());
       lam_d.push_back(lam_d_i);
-      lam_d_def.push_back(lam_con[i]-lam_d_i);
+      lam_d_def.push_back(lam_con[i+2]-lam_d_i);
     }
   }
 
@@ -376,8 +432,10 @@ void SCPgenInternal::init(){
   vector<MX> mfcn_in;
   n=0;
   mfcn_in.push_back(x[1]);                             mod_p_ = n++;
-  for(int i=0; i<x_.size(); ++i){
-    mfcn_in.push_back(i==0 ? x[0] :     d[i-1]);       x_[i].mod_var = n++;
+  mfcn_in.push_back(x[0]);                             x0_.mod_var = n++;
+  mfcn_in.push_back(d[0]);                             x1_.mod_var = n++;
+  for(int i=0; i<v_.size(); ++i){
+    mfcn_in.push_back(d[i+1]);                         v_[i].mod_var = n++;
   }
 
   // Modified function outputs
@@ -390,7 +448,7 @@ void SCPgenInternal::init(){
   gfcn.init();
 
   // Jacobian of the constraints
-  MXFunction jac_fcn(mfcn_in,gfcn.jac(x_[0].mod_var,mod_g_));
+  MXFunction jac_fcn(mfcn_in,gfcn.jac(x0_.mod_var,mod_g_));
   jac_fcn.init();
   log("Formed Jacobian of the constraints.");
   
@@ -405,8 +463,10 @@ void SCPgenInternal::init(){
   if(!gauss_newton_){
     n = mfcn_in.size();
     mfcn_in.push_back(lam_g);                          mod_lam_g_ = n++;
-    for(int i=0; i<x_.size(); ++i){
-      mfcn_in.push_back(i==0 ? lam[0] : lam_d[i-1]);   x_[i].mod_lam = n++;
+    mfcn_in.push_back(lam[0]);                         x0_.mod_lam = n++;
+    mfcn_in.push_back(lam_d[0]);                       x1_.mod_lam = n++;
+    for(int i=0; i<v_.size(); ++i){
+      mfcn_in.push_back(lam_d[i+1]);                   v_[i].mod_lam = n++;
     }
   }
 
@@ -420,7 +480,7 @@ void SCPgenInternal::init(){
   lgrad.init();
   
   // Hessian of the Lagrangian
-  MXFunction hes_fcn(mfcn_in,lgrad.jac(x_[0].mod_var,mod_gl_,false,!gauss_newton_));
+  MXFunction hes_fcn(mfcn_in,lgrad.jac(x0_.mod_var,mod_gl_,false,!gauss_newton_));
   hes_fcn.init();
   log("Formed Hessian of the Lagrangian.");
 
@@ -432,10 +492,14 @@ void SCPgenInternal::init(){
 
   // Definition of intermediate variables
   n = mfcn_out.size();
-  for(int i=1; i<x_.size(); ++i){
-    mfcn_out.push_back(d_def[i-1]);            x_[i].mod_def = n++;
+  mfcn_out.push_back(d_def[0]);              x1_.mod_def = n++;
+  if(!gauss_newton_){
+    mfcn_out.push_back(lam_d_def[0]);        x1_.mod_defL = n++;
+  }
+  for(int i=0; i<v_.size(); ++i){
+    mfcn_out.push_back(d_def[i+1]);          v_[i].mod_def = n++;
     if(!gauss_newton_){
-      mfcn_out.push_back(lam_d_def[i-1]);      x_[i].mod_defL = n++;
+      mfcn_out.push_back(lam_d_def[i+1]);    v_[i].mod_defL = n++;
     }
   }
 
@@ -449,12 +513,14 @@ void SCPgenInternal::init(){
 
   // Linearization in the d-direction (see Equation (2.12) in Alberspeyer2010)
   fill(mfcn_fwdSeed[0].begin(),mfcn_fwdSeed[0].end(),MX());
-  for(int i=1; i<x_.size(); ++i){
-    mfcn_fwdSeed[0][x_[i].mod_var] = d[i-1];
+  mfcn_fwdSeed[0][x1_.mod_var] = d[0];
+  for(int i=0; i<v_.size(); ++i){
+    mfcn_fwdSeed[0][v_[i].mod_var] = d[i+1];
   }
   if(!gauss_newton_){
-    for(int i=1; i<x_.size(); ++i){
-      mfcn_fwdSeed[0][x_[i].mod_lam] = lam_d[i-1];
+    mfcn_fwdSeed[0][x1_.mod_lam] = lam_d[0];
+    for(int i=0; i<v_.size(); ++i){
+      mfcn_fwdSeed[0][v_[i].mod_lam] = lam_d[i+1];
     }
   }
   mfcn.eval(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens,true);
@@ -472,12 +538,18 @@ void SCPgenInternal::init(){
   n=0;
   tan_fcn_out.push_back(b_obj);                          tan_b_obj_ = n++;
   tan_fcn_out.push_back(b_g);                            tan_b_g_ = n++;
-   for(int i=1; i<x_.size(); ++i){
-    tan_fcn_out.push_back(mfcn_fwdSens[0][x_[i].mod_def]);    x_[i].tan_lin = n++;
+  
+  tan_fcn_out.push_back(mfcn_fwdSens[0][x1_.mod_def]);    x1_.tan_lin = n++;
+  if(!gauss_newton_){
+    tan_fcn_out.push_back(mfcn_fwdSens[0][x1_.mod_defL]); x1_.tan_linL = n++;
+  }
+  
+  for(int i=0; i<v_.size(); ++i){
+    tan_fcn_out.push_back(mfcn_fwdSens[0][v_[i].mod_def]);    v_[i].tan_lin = n++;
     if(!gauss_newton_){
-      tan_fcn_out.push_back(mfcn_fwdSens[0][x_[i].mod_defL]); x_[i].tan_linL = n++;
+      tan_fcn_out.push_back(mfcn_fwdSens[0][v_[i].mod_defL]); v_[i].tan_linL = n++;
     }
-   }
+  }
   casadi_assert(n==tan_fcn_out.size());
   
   MXFunction tan_fcn(mfcn_in,tan_fcn_out);
@@ -505,7 +577,7 @@ void SCPgenInternal::init(){
   
   // Interpret the Jacobian-vector multiplication as a forward directional derivative
   fill(mfcn_fwdSeed[0].begin(),mfcn_fwdSeed[0].end(),MX());
-  mfcn_fwdSeed[0][x_[0].mod_var] = du;
+  mfcn_fwdSeed[0][x0_.mod_var] = du;
   if(!gauss_newton_){
     mfcn_fwdSeed[0][mod_lam_g_] = dlam_g;
   }
@@ -521,10 +593,14 @@ void SCPgenInternal::init(){
   // Step expansion function outputs
   vector<MX> exp_fcn_out;
   n=0;
-  for(int i=1; i<x_.size(); ++i){
-    exp_fcn_out.push_back(mfcn_fwdSens[0][x_[i].mod_def]);    x_[i].exp_def = n++;
+  exp_fcn_out.push_back(mfcn_fwdSens[0][x1_.mod_def]);    x1_.exp_def = n++;
+  if(!gauss_newton_){
+    exp_fcn_out.push_back(mfcn_fwdSens[0][x1_.mod_defL]); x1_.exp_defL = n++;
+  }
+  for(int i=0; i<v_.size(); ++i){
+    exp_fcn_out.push_back(mfcn_fwdSens[0][v_[i].mod_def]);    v_[i].exp_def = n++;
     if(!gauss_newton_){
-      exp_fcn_out.push_back(mfcn_fwdSens[0][x_[i].mod_defL]); x_[i].exp_defL = n++;
+      exp_fcn_out.push_back(mfcn_fwdSens[0][v_[i].mod_defL]); v_[i].exp_defL = n++;
     }
   }
   
@@ -569,10 +645,14 @@ void SCPgenInternal::init(){
   }
   
   // Residual
-  for(int i=1; i<x_.size(); ++i){
-    x_[i].res.resize(d[i-1].size(),0);
+  x1_.res.resize(d[0].size(),0);
+  if(!gauss_newton_){
+    x1_.resL.resize(lam_d[0].size(),0);
+  }
+  for(int i=0; i<v_.size(); ++i){
+    v_[i].res.resize(d[i+1].size(),0);
     if(!gauss_newton_){
-      x_[i].resL.resize(lam_d[i-1].size(),0);
+      v_[i].resL.resize(lam_d[i+1].size(),0);
     }
   }
   
@@ -592,7 +672,7 @@ void SCPgenInternal::init(){
 
     // Count the total number of variables
     int n_lifted = 0;
-    for(vector<Var>::const_iterator i=x_.begin()+2; i!=x_.end(); ++i){
+    for(vector<Var>::const_iterator i=v_.begin(); i!=v_.end(); ++i){
       n_lifted += i->n;
     }
 
@@ -600,7 +680,7 @@ void SCPgenInternal::init(){
     cout << "Number of reduced variables:               " << setw(9) << nx_ << endl;
     cout << "Number of reduced constraints:             " << setw(9) << ng_ << endl;
     cout << "Number of lifted variables/constraints:    " << setw(9) << n_lifted << endl;
-    cout << "Number of parameters:                      " << setw(9) << x_[1].n << endl;
+    cout << "Number of parameters:                      " << setw(9) << x1_.n << endl;
     cout << "Total number of variables:                 " << setw(9) << (nx_+n_lifted) << endl;
     cout << "Total number of constraints:               " << setw(9) << (ng_+n_lifted) << endl;
     cout << endl;
@@ -634,23 +714,22 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   const vector<double>& ubg = input(NLP_UBG).data();  
   if(parametric_){
     const vector<double>& p = input(NLP_P).data();
-    copy(p.begin(),p.end(),x_[1].init.begin());
+    copy(p.begin(),p.end(),x1_.init.begin());
   }
 
-  copy(x_init.begin(),x_init.end(),x_[0].init.begin());
+  copy(x_init.begin(),x_init.end(),x0_.init.begin());
   copy(lbx.begin(),lbx.end(),lbu_.begin());
   copy(ubx.begin(),ubx.end(),ubu_.begin());
   copy(lbg.begin(),lbg.end(),lbg_.begin());
   copy(ubg.begin(),ubg.end(),ubg_.begin());
   
-  if(x_.size()>2){
+  if(v_.size()>0){
     // Initialize lifted variables using the generated function
-    for(int i=0; i<2; ++i){
-      vinit_fcn_.setInput(x_[i].init,i);
-    }
+    vinit_fcn_.setInput(x0_.init,0);
+    vinit_fcn_.setInput(x1_.init,1);
     vinit_fcn_.evaluate();    
-    for(int i=2; i<x_.size(); ++i){
-      vinit_fcn_.getOutput(x_[i].init,i-2);
+    for(int i=0; i<v_.size(); ++i){
+      vinit_fcn_.getOutput(v_[i].init,i);
     }
   }
   if(verbose_){
@@ -660,8 +739,12 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   // Reset dual guess
   if(!gauss_newton_){
     fill(lambda_g_.begin(),lambda_g_.end(),0);
-    fill(dlambda_g_.begin(),dlambda_g_.end(),0);
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    fill(dlambda_g_.begin(),dlambda_g_.end(),0);    
+    fill(x0_.lam.begin(),x0_.lam.end(),0);
+    fill(x0_.dlam.begin(),x0_.dlam.end(),0);
+    fill(x1_.lam.begin(),x1_.lam.end(),0);
+    fill(x1_.dlam.begin(),x1_.dlam.end(),0);
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       fill(it->lam.begin(),it->lam.end(),0);
       fill(it->dlam.begin(),it->dlam.end(),0);
     }
@@ -674,7 +757,9 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   merit_mem_.clear();
 
   // Current guess for the primal solution
-  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+  copy(x0_.init.begin(),x0_.init.end(),x0_.opt.begin());
+  copy(x1_.init.begin(),x1_.init.end(),x1_.opt.begin());
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
     copy(it->init.begin(),it->init.end(),it->opt.begin());
   }
 
@@ -777,10 +862,11 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
 
   // Save results to outputs
   output(NLP_COST).set(obj_k_);
-  output(NLP_X_OPT).set(x_[0].opt);
+  output(NLP_X_OPT).set(x0_.opt);
   if(!gauss_newton_){
     output(NLP_LAMBDA_G).set(lambda_g_);
-    output(NLP_LAMBDA_X).set(x_[0].lam);
+    output(NLP_LAMBDA_X).set(x0_.lam);
+    output(NLP_LAMBDA_P).set(x1_.lam);
   }
   output(NLP_G).set(g_);
   
@@ -864,18 +950,16 @@ double SCPgenInternal::primalInfeasibility(){
   // L1-norm of the primal infeasibility
   double pr_inf = 0;
   
-  // Variable bounds
-  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    if(it==x_.begin()){
-      
-      // Simple bounds
-      for(int i=0; i<it->n; ++i) pr_inf +=  ::fmax(it->opt[i]-ubu_[i],0.);
-      for(int i=0; i<it->n; ++i) pr_inf +=  ::fmax(lbu_[i]-it->opt[i],0.);
-    } else {
-      
-      // Parameters and other lifted variables
-      for(int i=0; i<it->n; ++i) pr_inf += ::fabs(it->res[i]);
-    }
+  // Simple bounds
+  for(int i=0; i<x0_.n; ++i) pr_inf +=  ::fmax(x0_.opt[i]-ubu_[i],0.);
+  for(int i=0; i<x0_.n; ++i) pr_inf +=  ::fmax(lbu_[i]-x0_.opt[i],0.);
+
+  // Parameters
+  for(int i=0; i<x1_.n; ++i) pr_inf += ::fabs(x1_.res[i]);
+  
+  // Lifted variables
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    for(int i=0; i<it->n; ++i) pr_inf += ::fabs(it->res[i]);
   }
   
   // Nonlinear bounds
@@ -947,7 +1031,7 @@ void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, 
 
   // Print variables
   for(vector<int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i){
-    stream << setw(9) << setprecision(4) << x_[0].opt.at(*i);
+    stream << setw(9) << setprecision(4) << x0_.opt.at(*i);
   }
 
   // Print note
@@ -965,11 +1049,13 @@ void SCPgenInternal::eval_jac(){
   double time1 = clock();
 
   // Pass current parameter guess
-  jac_fcn_.setInput(x_[1].opt,mod_p_);
+  jac_fcn_.setInput(x1_.opt,mod_p_);
 
   // Pass primal step/variables
-  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    jac_fcn_.setInput(it==x_.begin() ? it->opt : it->res, it->mod_var);
+  jac_fcn_.setInput(x0_.opt, x0_.mod_var);
+  jac_fcn_.setInput(x1_.res, x1_.mod_var);  
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    jac_fcn_.setInput(it->res, it->mod_var);
   }
 
   // Evaluate condensed Jacobian
@@ -987,18 +1073,22 @@ void SCPgenInternal::eval_hess(){
   double time1 = clock();
 
   // Pass current parameter guess
-  hes_fcn_.setInput(x_[1].opt,mod_p_);
+  hes_fcn_.setInput(x1_.opt,mod_p_);
 
   // Pass primal step/variables
-  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    hes_fcn_.setInput(it==x_.begin() ? it->opt : it->res, it->mod_var);
+  hes_fcn_.setInput(x0_.opt, x0_.mod_var);
+  hes_fcn_.setInput(x1_.res, x1_.mod_var);
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    hes_fcn_.setInput(it->res, it->mod_var);
   }
 
   // Pass dual steps/variables
   if(!gauss_newton_){
     hes_fcn_.setInput(lambda_g_,mod_lam_g_);
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      hes_fcn_.setInput(it==x_.begin() ? it->lam : it->resL, it->mod_lam);
+    hes_fcn_.setInput(x0_.lam, x0_.mod_lam);
+    hes_fcn_.setInput(x1_.resL, x1_.mod_lam);
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+      hes_fcn_.setInput(it->resL, it->mod_lam);
     }
   }
 
@@ -1024,7 +1114,7 @@ void SCPgenInternal::eval_hess(){
 
     // Remove the contribution from the simple bounds multipliers
     for(int i=0; i<nx_; ++i){
-      qpG_[i] -= x_[0].lam[i];
+      qpG_[i] -= x0_.lam[i];
     }
 
     // Remove the contribution from the nonlinear multipliers to get the gradient of the objective
@@ -1048,14 +1138,18 @@ void SCPgenInternal::eval_res(){
   double time1 = clock();
 
   // Pass primal variables to the residual function for initial evaluation
-  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+  res_fcn_.setInput(x0_.opt,x0_.res_var);
+  res_fcn_.setInput(x1_.opt,x1_.res_var);
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
     res_fcn_.setInput(it->opt,it->res_var);
   }
 
   // Pass dual variables to the residual function for initial evaluation
   if(!gauss_newton_){
     res_fcn_.setInput(lambda_g_,res_lam_g_);
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    res_fcn_.setInput(x0_.lam,x0_.res_lam);
+    res_fcn_.setInput(x1_.lam,x1_.res_lam);
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       res_fcn_.setInput(it->lam,it->res_lam);
     }
   }
@@ -1073,7 +1167,11 @@ void SCPgenInternal::eval_res(){
   res_fcn_.getOutput(g_,res_g_);
 
   // Get residuals
-  for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+  res_fcn_.getOutput(x1_.res,  x1_.res_d);
+  if(!gauss_newton_){
+    res_fcn_.getOutput(x1_.resL, x1_.res_lam_d);
+  }
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
     res_fcn_.getOutput(it->res,  it->res_d);
     if(!gauss_newton_){
       res_fcn_.getOutput(it->resL, it->res_lam_d);
@@ -1083,7 +1181,7 @@ void SCPgenInternal::eval_res(){
   // Embedded parameters
   if(parametric_){
     const vector<double>& p = input(NLP_P).data();
-    transform(x_[1].res.begin(),x_[1].res.end(),p.begin(),x_[1].res.begin(),std::plus<double>());
+    transform(x1_.res.begin(),x1_.res.end(),p.begin(),x1_.res.begin(),std::plus<double>());
   }
 
   double time2 = clock();
@@ -1095,18 +1193,22 @@ void SCPgenInternal::eval_tan(){
   double time1 = clock();
 
   // Pass current parameter guess
-  tan_fcn_.setInput(x_[1].opt,mod_p_);
+  tan_fcn_.setInput(x1_.opt,mod_p_);
 
   // Pass primal step/variables
-  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    tan_fcn_.setInput(it==x_.begin() ? it->opt : it->res, it->mod_var);
+  tan_fcn_.setInput(x0_.opt, x0_.mod_var);
+  tan_fcn_.setInput(x1_.res, x1_.mod_var);
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    tan_fcn_.setInput(it->res, it->mod_var);
   }
 
   // Pass dual steps/variables
   if(!gauss_newton_){
     tan_fcn_.setInput(lambda_g_,mod_lam_g_);
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      tan_fcn_.setInput(it==x_.begin() ? it->lam : it->resL, it->mod_lam);
+    tan_fcn_.setInput(x0_.lam, x0_.mod_lam);
+    tan_fcn_.setInput(x1_.resL, x1_.mod_lam);
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+      tan_fcn_.setInput(it->resL, it->mod_lam);
     }
   }
 
@@ -1118,14 +1220,18 @@ void SCPgenInternal::eval_tan(){
   transform(gL_.begin(),gL_.end(),tan_fcn_.output(tan_b_obj_).begin(),gL_.begin(),std::minus<double>());
   
   // Expanded primal step (first part)
-  for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+  const DMatrix& dv = tan_fcn_.output(x1_.tan_lin);
+  copy(dv.begin(),dv.end(),x1_.step.begin());
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
     const DMatrix& dv = tan_fcn_.output(it->tan_lin);
     copy(dv.begin(),dv.end(),it->step.begin());
   }
   
   // Expanded dual step (first part)
   if(!gauss_newton_){
-    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+    const DMatrix& dlam_v = tan_fcn_.output(x1_.tan_linL);
+    copy(dlam_v.begin(),dlam_v.end(),x1_.dlam.begin());
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       const DMatrix& dlam_v = tan_fcn_.output(it->tan_linL);
       copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
     }
@@ -1136,7 +1242,7 @@ void SCPgenInternal::eval_tan(){
 }
 
 void SCPgenInternal::regularize(){
-  casadi_assert(x_[0].n==2);
+  casadi_assert(x0_.n==2);
   
   // Regularization
   reg_ = 0;
@@ -1173,8 +1279,8 @@ void SCPgenInternal::solve_qp(){
   qp_solver_.setInput(qpH_,QP_H);
   qp_solver_.setInput(qpG_,QP_G);
   qp_solver_.setInput(qpA_,QP_A);
-  std::transform(lbu_.begin(),lbu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
-  std::transform(ubu_.begin(),ubu_.end(), x_[0].opt.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>()); 
+  std::transform(lbu_.begin(),lbu_.end(), x0_.opt.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
+  std::transform(ubu_.begin(),ubu_.end(), x0_.opt.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>()); 
   std::transform(lbg_.begin(),lbg_.end(), qpB_.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
   std::transform(ubg_.begin(),ubg_.end(), qpB_.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
   
@@ -1182,14 +1288,14 @@ void SCPgenInternal::solve_qp(){
   
   // Condensed primal step
   const DMatrix& du = qp_solver_.output(QP_PRIMAL);
-  copy(du.begin(),du.end(),x_[0].step.begin());
+  copy(du.begin(),du.end(),x0_.step.begin());
   
   if(!gauss_newton_){
 
     // Condensed dual step (simple bounds)
     const DMatrix& lam_x_new = qp_solver_.output(QP_LAMBDA_X);
-    copy(lam_x_new.begin(),lam_x_new.end(),x_[0].dlam.begin());
-    std::transform(x_[0].dlam.begin(),x_[0].dlam.end(),x_[0].lam.begin(),x_[0].dlam.begin(),std::minus<double>());
+    copy(lam_x_new.begin(),lam_x_new.end(),x0_.dlam.begin());
+    std::transform(x0_.dlam.begin(),x0_.dlam.end(),x0_.lam.begin(),x0_.dlam.begin(),std::minus<double>());
 
     // Condensed dual step (nonlinear bounds)
     const DMatrix& lam_g_new = qp_solver_.output(QP_LAMBDA_A);
@@ -1205,7 +1311,7 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
   // Make sure that we have a decent direction 
   if(!gauss_newton_){
     // Get the curvature in the step direction
-    double gain = DMatrix::quad_form(qpH_,x_[0].step);
+    double gain = DMatrix::quad_form(qpH_,x0_.step);
     if (gain < 0){
       iteration_note_ = "Hessian indefinite in the search direction";
     }
@@ -1221,7 +1327,7 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
 
   // Right-hand side of Armijo condition
   double F_sens = 0;
-  for(int i=0; i<nx_; ++i) F_sens += x_[0].step[i] * qpG_[i];
+  for(int i=0; i<nx_; ++i) F_sens += x0_.step[i] * qpG_[i];
   double L1dir = F_sens - sigma_ * l1_infeas;
   double L1merit = obj_k_ + sigma_ * l1_infeas;
   
@@ -1249,7 +1355,13 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
   while (true){
     
     // Take the primal step
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+    for(int i=0; i<x0_.n; ++i){
+      x0_.opt[i] += (t-t_prev) * x0_.step[i];
+    }
+    for(int i=0; i<x1_.n; ++i){
+      x1_.opt[i] += (t-t_prev) * x1_.step[i];
+    }
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       for(int i=0; i<it->n; ++i){
 	it->opt[i] += (t-t_prev) * it->step[i];
       }
@@ -1260,7 +1372,16 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
       for(int i=0; i<ng_; ++i){
 	lambda_g_[i] += (t-t_prev) * dlambda_g_[i];
       }
-      for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
+      
+      for(int i=0; i<x0_.n; ++i){
+	x0_.lam[i] += (t-t_prev) * x0_.dlam[i];
+      }
+
+      for(int i=0; i<x1_.n; ++i){
+	x1_.lam[i] += (t-t_prev) * x1_.dlam[i];
+      }
+
+      for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
 	for(int i=0; i<it->n; ++i){
 	  it->lam[i] += (t-t_prev) * it->dlam[i];
 	}
@@ -1298,10 +1419,10 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
 
   // Calculate primal step-size
   pr_step_ = 0;
-  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    for(vector<double>::const_iterator i=it->step.begin(); i!=it->step.end(); ++i){
-      pr_step_ += fabs(*i);
-    }
+  for(vector<double>::const_iterator i=x0_.step.begin(); i!=x0_.step.end(); ++i) pr_step_ += fabs(*i);
+  for(vector<double>::const_iterator i=x1_.step.begin(); i!=x1_.step.end(); ++i) pr_step_ += fabs(*i);
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    for(vector<double>::const_iterator i=it->step.begin(); i!=it->step.end(); ++i) pr_step_ += fabs(*i);
   }
   pr_step_ *= t;
 
@@ -1312,10 +1433,10 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
       du_step_ += fabs(*i);
     }
 
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i){
-	du_step_ += fabs(*i);
-      }
+    for(vector<double>::const_iterator i=x0_.dlam.begin(); i!=x0_.dlam.end(); ++i) du_step_ += fabs(*i);
+    for(vector<double>::const_iterator i=x1_.dlam.begin(); i!=x1_.dlam.end(); ++i) du_step_ += fabs(*i);
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+      for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i) du_step_ += fabs(*i);
     }
     du_step_ *= t;
   }
@@ -1326,43 +1447,44 @@ void SCPgenInternal::eval_exp(){
   double time1 = clock();
 
   // Pass current parameter guess
-  exp_fcn_.setInput(x_[1].opt, mod_p_);
+  exp_fcn_.setInput(x1_.opt, mod_p_);
 
   // Pass primal step/variables
-  exp_fcn_.setInput(x_[0].step, mod_du_);
-  for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-    if(it==x_.begin()){
-      exp_fcn_.setInput(it->opt,it->mod_var);
-    } else {
-      exp_fcn_.setInput(it->res,it->mod_var);
-    }
+  exp_fcn_.setInput(x0_.step, mod_du_);
+  exp_fcn_.setInput(x0_.opt,x0_.mod_var);
+  exp_fcn_.setInput(x1_.res,x1_.mod_var);
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    exp_fcn_.setInput(it->res,it->mod_var);
   }
   
   // Pass dual step/variables
   if(!gauss_newton_){
     exp_fcn_.setInput(dlambda_g_,mod_dlam_g_);
     exp_fcn_.setInput(lambda_g_,mod_lam_g_);
-    for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
-      if(it==x_.begin()){
-	exp_fcn_.setInput(it->lam,it->mod_lam);
-      } else {
-	exp_fcn_.setInput(it->resL,it->mod_lam);
-      }
+    exp_fcn_.setInput(x0_.lam,x0_.mod_lam);
+    exp_fcn_.setInput(x1_.resL,x1_.mod_lam);
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+      exp_fcn_.setInput(it->resL,it->mod_lam);
     }
   }
 
   // Perform the step expansion
   exp_fcn_.evaluate();
 
+  const DMatrix& dv = exp_fcn_.output(x1_.exp_def);
+  transform(dv.begin(),dv.end(),x1_.step.begin(),x1_.step.begin(),std::minus<double>());
+
   // Expanded primal step (second part)
-  for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
     const DMatrix& dv = exp_fcn_.output(it->exp_def);
     transform(dv.begin(),dv.end(),it->step.begin(),it->step.begin(),std::minus<double>());
   }
   
   // Expanded dual step (second part)
   if(!gauss_newton_){
-    for(vector<Var>::iterator it=x_.begin()+1; it!=x_.end(); ++it){
+    const DMatrix& dlam_v = exp_fcn_.output(x1_.exp_defL);
+    transform(dlam_v.begin(),dlam_v.end(),x1_.dlam.begin(),x1_.dlam.begin(),std::minus<double>());
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       const DMatrix& dlam_v = exp_fcn_.output(it->exp_defL);
       transform(dlam_v.begin(),dlam_v.end(),it->dlam.begin(),it->dlam.begin(),std::minus<double>());
     }

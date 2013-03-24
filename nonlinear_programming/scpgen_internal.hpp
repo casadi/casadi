@@ -189,7 +189,10 @@ public:
     std::vector<double> res, resL;
     
   };
-  std::vector<Var> x_;  
+
+  Var x0_;
+  Var x1_;
+  std::vector<Var> v_;
 
   // Penalty parameter of merit function
   double sigma_;
