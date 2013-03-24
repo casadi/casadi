@@ -58,8 +58,9 @@ mycallback = MyCallback()
 #! The sparsities given here as input must match the sparsities of the outputs of our NLP Solver
 nd = 2 # Number of decision variables
 nc = 1 # number of constraints
+np = 0 # number of parameters
 
-c = PyFunction( mycallback, nlpsolverOut(x_opt=sp_dense(nd,1), cost=sp_dense(1,1), lambda_x=sp_dense(nd,1), lambda_g = sp_dense(nc,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
+c = PyFunction( mycallback, nlpsolverOut(x_opt=sp_dense(nd,1), cost=sp_dense(1,1), lambda_x=sp_dense(nd,1), lambda_g = sp_dense(nc,1), lambda_p = sp_dense(np,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
 c.init()
 
 
@@ -123,7 +124,7 @@ mycallback = MyCallback()
 
 #! We create a casadi function out of this callable object.
 #! The sparsities given here as input must match the sparsities of the outputs of our NLP Solver
-c = PyFunction( mycallback, nlpsolverOut(x_opt=sp_dense(nd,1), cost=sp_dense(1,1), lambda_x=sp_dense(nd,1), lambda_g = sp_dense(nc,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
+c = PyFunction( mycallback, nlpsolverOut(x_opt=sp_dense(nd,1), cost=sp_dense(1,1), lambda_x=sp_dense(nd,1), lambda_g = sp_dense(nc,1), lambda_p = sp_dense(np,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
 c.init()
 
 
