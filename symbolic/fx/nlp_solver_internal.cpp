@@ -369,6 +369,7 @@ void NLPSolverInternal::init(){
   output(NLP_COST)       = DMatrix(1,1,0);
   output(NLP_LAMBDA_X)   = DMatrix(n_,1,0);
   output(NLP_LAMBDA_G)   = DMatrix(m_,1,0);
+  output(NLP_LAMBDA_P)   = DMatrix(sp_p,0);
   output(NLP_G)          = DMatrix(m_,1,0);
   
   if (hasSetOption("iteration_callback")) {

@@ -47,33 +47,35 @@ namespace CasADi{
   
 /// Input arguments of an NLP Solver [nlpsolverIn]
 enum NLPInput{
-/// Decision variables initial guess (n x 1)  [x_init]
+/// Decision variables initial guess (nx x 1)  [x_init]
 NLP_X_INIT,
-/// Decision variables lower bound (n x 1), default -inf [lbx]
+/// Decision variables lower bound (nx x 1), default -inf [lbx]
 NLP_LBX,
-/// Decision variables upper bound (n x 1), default +inf [ubx]
+/// Decision variables upper bound (nx x 1), default +inf [ubx]
 NLP_UBX,
-/// Constraints lower bound (m x 1), default -inf [lbg]
+/// Constraints lower bound (ng x 1), default -inf [lbg]
 NLP_LBG,
-/// Constraints upper bound (m x 1), default +inf [ubg]
+/// Constraints upper bound (ng x 1), default +inf [ubg]
 NLP_UBG,
-/// Lagrange multipliers associated with G, initial guess (m x 1) [lambda_init]
+/// Lagrange multipliers associated with G, initial guess (ng x 1) [lambda_init]
 NLP_LAMBDA_INIT,
-/// Only for parametric NLP - static parameters on which the objective and constraints might depend [p]
+/// Parameters on which the objective and constraints might depend (np x 1) [p]
 NLP_P,
 NLP_NUM_IN};
 
 /// Output arguments of an NLP Solver [nlpsolverOut]
 enum NLPOutput{
-/// Decision variables for optimal solution (n x 1) [x_opt]
+/// Decision variables for optimal solution (nx x 1) [x_opt]
 NLP_X_OPT,
 /// Objective/cost function for optimal solution (1 x 1) [cost]
 NLP_COST,
-/// Lagrange multipliers associated with G at the solution (m x 1) [lambda_g]
+/// Lagrange multipliers associated with G at the solution (ng x 1) [lambda_g]
 NLP_LAMBDA_G,
-/// Lagrange multipliers associated with bounds on X at the solution (n x 1) [lambda_x]
+/// Lagrange multipliers associated with bounds on X at the solution (nx x 1) [lambda_x]
 NLP_LAMBDA_X, 
-/// The constraints evaluated at the optimal solution (m x 1) [g]
+/// Lagrange multipliers associated with the parameters (np x 1) [lambda_p]
+NLP_LAMBDA_P, 
+/// The constraints evaluated at the optimal solution (ng x 1) [g]
 NLP_G,
 NLP_NUM_OUT};
 
