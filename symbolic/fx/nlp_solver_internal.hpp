@@ -60,8 +60,14 @@ public:
   /// use parametric NLP formulation
   bool parametric_; 
 
-  /// Number of variables and constraints
-  int n_,m_;
+  /// Number of variables
+  int n_;
+  
+  /// Number of constraints
+  int m_;
+  
+  /// Number of parameters
+  //int np_;
   
   /// The sparsity of the parameters 
   CRSSparsity sp_p;
