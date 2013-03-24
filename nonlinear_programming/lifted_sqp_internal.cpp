@@ -67,7 +67,7 @@ void LiftedSQPInternal::init(){
   // Number of lifted variables
   nv = getOption("num_lifted");
   if(verbose_){
-    cout << "Initializing SQP method with " << n_ << " variables and " << m_ << " constraints." << endl;
+    cout << "Initializing SQP method with " << nx_ << " variables and " << ng_ << " constraints." << endl;
     cout << "Lifting " << nv << " variables." << endl;
     if(gauss_newton_){
       cout << "Gauss-Newton objective with " << F_.input().numel() << " terms." << endl;

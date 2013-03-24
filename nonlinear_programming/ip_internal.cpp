@@ -74,13 +74,13 @@ void IPInternal::init(){
 //  cout << "A = " << A << endl;
   
   // Form the KKT matrix
-  SXMatrix K = vertcat(horzcat(H,trans(A)),horzcat(A,SXMatrix::sparse(m_,m_)));
+  SXMatrix K = vertcat(horzcat(H,trans(A)),horzcat(A,SXMatrix::sparse(ng_,ng_)));
   if(verbose()){
     cout << "K = " << K << endl;
   }
   
   // Form the right hand side of the KKT system
-  SXMatrix k = vertcat(-CasADi::gradient(f_eq,x),SXMatrix::sparse(m_));
+  SXMatrix k = vertcat(-CasADi::gradient(f_eq,x),SXMatrix::sparse(ng_));
   makeDense(k);
   if(verbose()){
     cout << "k = " << k << endl;

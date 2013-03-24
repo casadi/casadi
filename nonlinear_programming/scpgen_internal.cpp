@@ -90,11 +90,11 @@ void SCPgenInternal::init(){
   // Name the components
   if(hasSetOption("name_x")){
     name_x_ = getOption("name_x");
-    casadi_assert(name_x_.size()==n_);
+    casadi_assert(name_x_.size()==nx_);
   } else {
     stringstream ss;
-    name_x_.resize(n_);
-    for(int i=0; i<n_; ++i){
+    name_x_.resize(nx_);
+    for(int i=0; i<nx_; ++i){
       ss.str(string());
       ss << "x" << i;
       name_x_[i] = ss.str();
@@ -197,16 +197,16 @@ void SCPgenInternal::init(){
   }
 
   // Allocate memory
-  lbu_.resize(n_,-numeric_limits<double>::infinity());
-  ubu_.resize(n_, numeric_limits<double>::infinity());
-  lbg_.resize(m_,-numeric_limits<double>::infinity());
-  ubg_.resize(m_, numeric_limits<double>::infinity());
-  g_.resize(m_, numeric_limits<double>::quiet_NaN());
+  lbu_.resize(nx_,-numeric_limits<double>::infinity());
+  ubu_.resize(nx_, numeric_limits<double>::infinity());
+  lbg_.resize(ng_,-numeric_limits<double>::infinity());
+  ubg_.resize(ng_, numeric_limits<double>::infinity());
+  g_.resize(ng_, numeric_limits<double>::quiet_NaN());
   if(!gauss_newton_){
-    lambda_g_.resize(m_,0);
-    dlambda_g_.resize(m_,0);
+    lambda_g_.resize(ng_,0);
+    dlambda_g_.resize(ng_,0);
   }
-  qpH_times_du_.resize(n_);
+  qpH_times_du_.resize(nx_);
  
   for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){
     it->init.resize(it->n,0);
@@ -247,7 +247,7 @@ void SCPgenInternal::init(){
     }
 
     // Lagrange multipliers for the nonlinear constraints
-    lam_g = msym("lam_g",m_);
+    lam_g = msym("lam_g",ng_);
 
     if(verbose_){
       cout << "Allocated intermediate variables." << endl;
@@ -270,7 +270,7 @@ void SCPgenInternal::init(){
     lam_con[0] += lam[0];
     lam_con[1] += lam[1];
 
-    ngL_ = n_;
+    ngL_ = nx_;
 
     if(verbose_){
       cout << "Generated the gradient of the Lagrangian." << endl;
@@ -497,7 +497,7 @@ void SCPgenInternal::init(){
   }
 
   // Expression a + A*du in Lifted Newton (Section 2.1 in Alberspeyer2010)
-  MX du = msym("du",n_);   // Step in u
+  MX du = msym("du",nx_);   // Step in u
   MX dlam_g;               // Step lambda_g
   if(!gauss_newton_){
     dlam_g = msym("dlam_g",lam_g.sparsity());
@@ -549,8 +549,8 @@ void SCPgenInternal::init(){
   CRSSparsity sp_tr_B_obj = hes_fcn_.output().sparsity().transpose();
   qpH_ = DMatrix(sp_tr_B_obj.patternProduct(sp_tr_B_obj));
   qpA_ = jac_fcn_.output();
-  qpG_.resize(n_);
-  qpB_.resize(m_);
+  qpG_.resize(nx_);
+  qpB_.resize(ng_);
 
   // Allocate a QP solver
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
@@ -597,12 +597,12 @@ void SCPgenInternal::init(){
     }
 
     cout << endl;
-    cout << "Number of reduced variables:               " << setw(9) << n_ << endl;
-    cout << "Number of reduced constraints:             " << setw(9) << m_ << endl;
+    cout << "Number of reduced variables:               " << setw(9) << nx_ << endl;
+    cout << "Number of reduced constraints:             " << setw(9) << ng_ << endl;
     cout << "Number of lifted variables/constraints:    " << setw(9) << n_lifted << endl;
     cout << "Number of parameters:                      " << setw(9) << x_[1].n << endl;
-    cout << "Total number of variables:                 " << setw(9) << (n_+n_lifted) << endl;
-    cout << "Total number of constraints:               " << setw(9) << (m_+n_lifted) << endl;
+    cout << "Total number of variables:                 " << setw(9) << (nx_+n_lifted) << endl;
+    cout << "Total number of constraints:               " << setw(9) << (ng_+n_lifted) << endl;
     cout << endl;
     cout << "Iteration options:" << endl;
 
@@ -879,8 +879,8 @@ double SCPgenInternal::primalInfeasibility(){
   }
   
   // Nonlinear bounds
-  for(int i=0; i<m_; ++i) pr_inf += ::fmax(g_[i]-ubg_[i],0.);
-  for(int i=0; i<m_; ++i) pr_inf += ::fmax(lbg_[i]-g_[i],0.);
+  for(int i=0; i<ng_; ++i) pr_inf += ::fmax(g_[i]-ubg_[i],0.);
+  for(int i=0; i<ng_; ++i) pr_inf += ::fmax(lbg_[i]-g_[i],0.);
   
   return pr_inf;
 }  
@@ -1023,7 +1023,7 @@ void SCPgenInternal::eval_hess(){
     copy(gL_.begin(),gL_.end(),qpG_.begin());
 
     // Remove the contribution from the simple bounds multipliers
-    for(int i=0; i<n_; ++i){
+    for(int i=0; i<nx_; ++i){
       qpG_[i] -= x_[0].lam[i];
     }
 
@@ -1031,7 +1031,7 @@ void SCPgenInternal::eval_hess(){
     const vector<double> &qpA_data = qpA_.data();
     const vector<int> &qpA_rowind = qpA_.rowind();
     const vector<int> &qpA_col = qpA_.col();
-    for(int i=0; i<m_; ++i){
+    for(int i=0; i<ng_; ++i){
       for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
 	int j=qpA_col[el];
 	qpG_[j] -= qpA_data[el]*lambda_g_[i];
@@ -1221,7 +1221,7 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
 
   // Right-hand side of Armijo condition
   double F_sens = 0;
-  for(int i=0; i<n_; ++i) F_sens += x_[0].step[i] * qpG_[i];
+  for(int i=0; i<nx_; ++i) F_sens += x_[0].step[i] * qpG_[i];
   double L1dir = F_sens - sigma_ * l1_infeas;
   double L1merit = obj_k_ + sigma_ * l1_infeas;
   
@@ -1257,7 +1257,7 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
     
     // Take the dual step
     if(!gauss_newton_){
-      for(int i=0; i<m_; ++i){
+      for(int i=0; i<ng_; ++i){
 	lambda_g_[i] += (t-t_prev) * dlambda_g_[i];
       }
       for(vector<Var>::iterator it=x_.begin(); it!=x_.end(); ++it){

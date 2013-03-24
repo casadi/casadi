@@ -61,16 +61,13 @@ public:
   bool parametric_; 
 
   /// Number of variables
-  int n_;
+  int nx_;
   
   /// Number of constraints
-  int m_;
+  int ng_;
   
   /// Number of parameters
-  //int np_;
-  
-  /// The sparsity of the parameters 
-  CRSSparsity sp_p;
+  int np_;
   
   /// callback function, executed at each iteration
   FX callback_;

@@ -28,8 +28,8 @@ namespace CasADi{
 
 IpoptUserClass::IpoptUserClass(IpoptInternal* solver){
   this->solver = solver;
-  n_ = solver->n_;
-  m_ = solver->m_;
+  n_ = solver->nx_;
+  m_ = solver->ng_;
   
 #ifdef WITH_IPOPT_CALLBACK 
   x_ = new double[n_];
