@@ -167,8 +167,8 @@ void IpoptInternal::init(){
       casadi_assert_message(GF_.getNumInputs()==1, "Wrong number of input arguments to GF for non-parametric NLP. Must be 1, but got " << GF_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
     }
     casadi_assert_message(GF_.getNumOutputs()>=1, "Wrong number of output arguments to GF");
-    casadi_assert_message(GF_.input().numel()==n_,"Inconsistent dimensions");
-    casadi_assert_message((GF_.output().size1()==n_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==n_),"Inconsistent dimensions");
+    casadi_assert_message(GF_.input().numel()==nx_,"Inconsistent dimensions");
+    casadi_assert_message((GF_.output().size1()==nx_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==nx_),"Inconsistent dimensions");
   }
 
   // Start an IPOPT application
@@ -210,7 +210,7 @@ void IpoptInternal::init(){
   }
   
   if(verbose_){
-    cout << "There are " << n_ << " variables and " << m_ << " constraints." << endl;
+    cout << "There are " << nx_ << " variables and " << ng_ << " constraints." << endl;
     if(exact_hessian_) cout << "Using exact Hessian" << endl;
     else             cout << "Using limited memory Hessian approximation" << endl;
   }
@@ -372,14 +372,14 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
     double time1 = clock();
     if (!callback_.isNull()) {
       if(full_callback) {
-        copy(x,x+n_,callback_.input(NLP_X_OPT).begin());
+        copy(x,x+nx_,callback_.input(NLP_X_OPT).begin());
         
         vector<double>& lambda_x = callback_.input(NLP_LAMBDA_X).data();
         for(int i=0; i<lambda_x.size(); ++i){
           lambda_x[i] = z_U[i]-z_L[i];
         }
-        copy(lambda,lambda+m_,callback_.input(NLP_LAMBDA_G).begin());
-        copy(g,g+m_,callback_.input(NLP_G).begin());
+        copy(lambda,lambda+ng_,callback_.input(NLP_LAMBDA_G).begin());
+        copy(g,g+ng_,callback_.input(NLP_G).begin());
       } else {
          if (iter==0) {
             cerr << "Warning: intermediate_callback is disfunctional in your installation. You will only be able to use getStats(). See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it." << endl;
@@ -416,7 +416,7 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
 void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter_count){
   try {
     // Get primal solution
-    copy(x,x+n_,output(NLP_X_OPT).begin());
+    copy(x,x+nx_,output(NLP_X_OPT).begin());
 
     // Get optimal cost
     output(NLP_COST).at(0) = obj_value;
@@ -428,10 +428,10 @@ void IpoptInternal::finalize_solution(const double* x, const double* z_L, const 
     }
 
     // Get dual solution (nonlinear bounds)
-    copy(lambda,lambda+m_,output(NLP_LAMBDA_G).begin());
+    copy(lambda,lambda+ng_,output(NLP_LAMBDA_G).begin());
     
     // Get the constraints
-    copy(g,g+m_,output(NLP_G).begin());
+    copy(g,g+ng_,output(NLP_G).begin());
     
     // Get statistics
     stats_["iter_count"] = iter_count;
@@ -553,7 +553,7 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
     
     // Log time
     double time1 = clock();
-    casadi_assert(n == n_);
+    casadi_assert(n == nx_);
 
     // Pass the argument to the function
     F_.setInput(x);
@@ -625,7 +625,7 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
   try {
     log("eval_grad_f started");
     double time1 = clock();
-    casadi_assert(n == n_);
+    casadi_assert(n == nx_);
     
     // If no gradient function has been provided, use AD adjoint
     if(GF_.isNull()){
@@ -685,8 +685,8 @@ bool IpoptInternal::get_bounds_info(int n, double* x_l, double* x_u,
                                 int m, double* g_l, double* g_u)
 {
   try {
-    casadi_assert(n == n_);
-    casadi_assert(m == m_);
+    casadi_assert(n == nx_);
+    casadi_assert(m == ng_);
     input(NLP_LBX).getArray(x_l,n);
     input(NLP_UBX).getArray(x_u,n);
     input(NLP_LBG).getArray(g_l,m);
@@ -736,8 +736,8 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
 void IpoptInternal::get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag)
 {
   try {
-    n = n_;               // number of variables
-    m = m_;               // number of constraints
+    n = nx_;               // number of variables
+    m = ng_;               // number of constraints
 
     // Get Jacobian sparsity pattern
     if(G_.isNull())
