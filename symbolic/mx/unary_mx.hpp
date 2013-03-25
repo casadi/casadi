@@ -69,6 +69,9 @@ namespace CasADi{
     /// Get a unary operation
     virtual MX getUnary(int op) const;
 
+    /// Get a binary operation operation
+    virtual MX getBinary(int op, const MX& y) const;
+
     //! \brief operation
     Operation op_;
   };

@@ -437,22 +437,7 @@ namespace CasADi{
   }
 
   MX MX::binary(int op, const MX &x, const MX &y){
-    // Make sure that dimensions match
-    casadi_assert_message((x.scalar() || y.scalar() || (x.size1()==y.size1() && x.size2()==y.size2())),"Dimension mismatch." << "lhs is " << x.dimString() << ", while rhs is " << y.dimString());
-  
-    // Quick return if zero
-    if((operation_checker<F0XChecker>(op) && isZero(x)) || 
-       (operation_checker<FX0Checker>(op) && isZero(y))){
-      return sparse(std::max(x.size1(),y.size1()),std::max(x.size2(),y.size2()));
-    }
-  
-    // Create binary node
-    if(x.scalar())
-      return scalar_matrix(op,x,y);
-    else if(y.scalar())  
-      return matrix_scalar(op,x,y);
-    else
-      return matrix_matrix(op,x,y);
+    return x->getBinary(op,y);
   }
 
   MX MX::unary(int op, const MX &x){
@@ -460,47 +445,15 @@ namespace CasADi{
   }
 
   MX MX::scalar_matrix(int op, const MX &x, const MX &y){
-    // Check if the scalar is sparse (i.e. zero)
-    if(x.size()==0){
-      return scalar_matrix(op,0,y);
-    } else {
-      // Check if it is ok to loop over nonzeros only
-      if(y.dense() || operation_checker<FX0Checker>(op)){
-	// Loop over nonzeros
-	return create(new ScalarNonzerosOp(Operation(op),x,y));
-      } else {
-	// Put a densification node in between
-	return scalar_matrix(op,x,densify(y));
-      }
-    }
+    return x->getScalarMatrix(op,y);
   }
 
   MX MX::matrix_scalar(int op, const MX &x, const MX &y){
-    // Check if the scalar is sparse (i.e. zero)
-    if(y.size()==0){
-      return matrix_scalar(op,x,0);
-    } else {
-      // Check if it is ok to loop over nonzeros only
-      if(x.dense() || operation_checker<F0XChecker>(op)){
-	// Loop over nonzeros
-	return create(new NonzerosScalarOp(Operation(op),x,y));
-      } else {
-	// Put a densification node in between
-	return matrix_scalar(op,densify(x),y);
-      }
-    }
+    return x->getMatrixScalar(op,y);
   }
 
   MX MX::matrix_matrix(int op, const MX &x, const MX &y){
-    // Check if we can carry out the operation only on the nonzeros
-    if((x.dense() && y.dense()) ||
-       (operation_checker<F00Checker>(op) && x.sparsity()==y.sparsity())){
-      // Loop over nonzeros only
-      return create(new NonzerosNonzerosOp(Operation(op),x,y)); 
-    } else {
-      // Sparse matrix-matrix operation necessary
-      return create(new SparseSparseOp(Operation(op),x,y)); 
-    }
+    return x->getMatrixMatrix(op,y);
   }
 
   MXNode* MX::operator->(){
