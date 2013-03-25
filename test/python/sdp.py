@@ -264,7 +264,10 @@ class SDPtests(casadiTestCase):
     self.checkarray(dsp.output(SDP_DUAL),DMatrix([[5.9,-1.375],[-1.375,1]]),digits=5)
     self.checkarray(dsp.output(SDP_PRIMAL_P),DMatrix.zeros(2,2),digits=5)
     
-    V = ssymStruct([("L",C.shape),("x",b.size())])
+    V = struct_ssym([
+          entry("L",shape=C.shape),
+          entry("x",shape=b.size())
+        ])
     L = V["L"]
     x = V["x"] 
 

@@ -190,9 +190,9 @@ legend(('s1 dev', 's2 dev','s3 dev','s1 dev (est.)', 's2 dev (est.)','s3 dev (es
 x0 = vertcat([1,0,0])
 xref_e = vertcat([1,0,0])
 
-states = ssymStruct([
-           ("eAt",ns,ns),
-           ("Wt",ns,ns)
+states = struct_ssym([
+           entry("eAt",shape=(ns,ns)),
+           entry("Wt",shape=(ns,ns))
          ])
          
 eAt = states["eAt"]
@@ -204,11 +204,11 @@ t1 = te
 # Initial conditions
 e = DMatrix.eye(ns)
 makeDense(e)
-states_ = states.zeros()
+states_ = states(0)
 states_["eAt"] = e
 states_["Wt"] = 0
 
-rhs = states.SXMatrix()
+rhs = struct_SX(states)
 rhs["eAt"] = mul(A,eAt)
 rhs["Wt"]  = mul([eAt,B,B.T,eAt.T])
 
@@ -234,22 +234,22 @@ assert(e<1e-7)
 # Simulate with feedforward controls
 # -----------------------------------
 
-states = ssymStruct([
-          ("y",ns),      # The regular states of the LTI system
-          ("eAt",ns,ns)  # The matrix exponential exp(A*(t1-t))
+states = struct_ssym([
+          entry("y",shape=ns),      # The regular states of the LTI system
+          entry("eAt",shape=(ns,ns))  # The matrix exponential exp(A*(t1-t))
          ])
 
 eAt = states["eAt"]
 y   = states["y"]
 
 # Initial conditions
-states_ = states.zeros()
+states_ = states(0)
 states_["y"] = x0
 states_["eAt"] = eAt_
 
 u = mul([B.T,eAt.T,inv(Wt_),xref_e-mul(eAt_,x0)])
 
-rhs = states.SXMatrix()
+rhs = struct_SX(states)
 rhs["y"]   = mul(A,y)+mul(B,u)
 rhs["eAt"] = -mul(A,eAt)
 
@@ -440,30 +440,30 @@ for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-
 x0 = vertcat([1,0,0])
 
 # Now simulate with open-loop controls
-states = ssymStruct([
-           ("y",ns), # The regular states of the LTI system
-           ("yref",ns), # States that constitute a tracking reference for the LTI system
-           ("eAt",ns,ns) # The matrix exponential exp(A*(t1-t))
+states = struct_ssym([
+           entry("y",shape=ns), # The regular states of the LTI system
+           entry("yref",shape=ns), # States that constitute a tracking reference for the LTI system
+           entry("eAt",shape=(ns,ns)) # The matrix exponential exp(A*(t1-t))
          ])
 
 y     = states["y"]
 eAt   = states["eAt"]
 
 # Initial conditions
-states_ = states.zeros()
+states_ = states(0)
 states_["y"]    = 2*x0
 states_["yref"] = x0
 states_["eAt"]  = eAt_
 
 
-param = ssymStruct([("K",nu,ns)])
+param = struct_ssym([entry("K",shape=(nu,ns))])
 
-param_ = param.zeros()
+param_ = param(0)
 
 uref = mul([B.T,eAt.T,inv(Wt_),xref_e-mul(eAt_,x0)])
 u    = uref - mul(param["K"],y-states["yref"])
 
-rhs = states.SXMatrix()
+rhs = struct_SX(states)
 rhs["y"]      =  mul(A,y)+mul(B,u)
 rhs["yref"]   =  mul(A,states["yref"])+mul(B,uref)
 rhs["eAt"]    = -mul(A,eAt)
@@ -537,9 +537,9 @@ u_ = horzcat([controls_,yref_])
 
 x0 = DMatrix([1,0,0])
 
-controls = ssymStruct([
-             ("uref",nu),
-             ("yref",ns)
+controls = struct_ssym([
+             entry("uref",shape=nu),
+             entry("yref",shape=ns)
            ])
 
 yref  = ssym("yref",ns)
