@@ -162,26 +162,22 @@ public:
   MX x_;
 
   // Parameter
-  std::vector<double> p_init_, p_opt_, p_step_, p_lam_, p_dlam_, p_res_, p_resL_;
   MX p_;
 
   // Nonlinear bounds
   std::vector<double> g_, g_lb_, g_ub_, g_lam_, g_dlam_, gL_;
 
   // Residual function io indices
-  int res_x_, res_p_, res_x_lam_, res_g_lam_, res_p_lam_, res_p_d_, res_p_lam_d_;
+  int res_x_, res_p_, res_x_lam_, res_g_lam_, res_p_lam_, res_p_d_;
   int res_obj_, res_gl_, res_g_;
 
   // Modifier function io indices
-  int mod_x_, mod_p_, mod_x_lam_, mod_g_lam_, mod_p_d_, mod_p_lam_d_, mod_p_def_, mod_p_defL_;
+  int mod_x_, mod_p_, mod_x_lam_, mod_g_lam_;
   int mod_obj_, mod_gl_, mod_g_;
   int mod_du_, mod_dlam_g_;
 
   // Tangental function
-  int tan_b_obj_, tan_b_g_, tan_p_lin_, tan_p_linL_;
-
-  // Step expansion
-  int exp_p_def_, exp_p_defL_;
+  int tan_b_obj_, tan_b_g_;
 
   struct Var{
     int n;
