@@ -406,11 +406,8 @@ namespace CasADi{
     // Get the sparsity
     CRSSparsity sp = x.sparsity().diag(mapping);
   
-    // Create a mapping
-    MX ret = MX::create(new Mapping(sp));
-    ret->assign(x,mapping);
-    simplify(ret);
-    return ret;
+    // Create a reference to the nonzeros
+    return x->getGetNonzeros(sp,mapping);
   }
 
   int countNodes(const MX& A){
