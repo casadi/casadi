@@ -152,6 +152,17 @@ namespace CasADi{
     return CasADi::isIdentity(x_);
   }
 
+  MX ConstantMX::getMultiplication(const MX& y) const{
+    if(y.isConstant()){
+      // Constant folding
+      DMatrix xv = getMatrixValue();
+      DMatrix yv = y->getMatrixValue();
+      return mul(xv,yv);
+    } else {
+      return MXNode::getMultiplication(y);
+    }
+  }
+
 
 } // namespace CasADi
 
