@@ -219,7 +219,11 @@ namespace CasADi{
 
     /// Get densification
     virtual MX getDensification(const CRSSparsity& sp) const{
-      return MX::create(new Constant<Value>(sp,v_));
+      if(isZero()){
+	return MX::create(new Constant<Value>(sp,v_));
+      } else {
+	return MXNode::getDensification(sp);
+      }
     }
 
     /// Get the nonzeros of matrix
