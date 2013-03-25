@@ -286,6 +286,9 @@ namespace CasADi{
 
     /// Get densification
     virtual MX getDensification(const CRSSparsity& sp) const;
+    
+    /// Get a unary operation
+    virtual MX getUnary(int op) const;
 
     /** Temporary variables to be used in user algorithms like sorting, 
 	the user is resposible of making sure that use is thread-safe

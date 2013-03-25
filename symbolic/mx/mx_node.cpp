@@ -36,6 +36,8 @@
 #include "setnonzeros.hpp"
 #include "densification.hpp"
 #include "solve.hpp"
+#include "unary_mx.hpp"
+
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -395,6 +397,16 @@ namespace CasADi{
 
   MX MXNode::getSubAssign(const MX& y, const Slice& i, const Slice& j) const{
     return MX::create(new SubAssign(shared_from_this<MX>(),y,i,j));
+  }
+
+  MX MXNode::getUnary(int op) const{
+    if(operation_checker<F0XChecker>(op) && isZero()){
+      // If identically zero
+      return MX::sparse(size1(),size2());
+    } else {
+      // Create a new node
+      return MX::create(new UnaryMX(Operation(op),shared_from_this<MX>()));
+    }
   }
 
 } // namespace CasADi
