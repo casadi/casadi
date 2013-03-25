@@ -111,13 +111,14 @@
 */
 /** \defgroup scheme_NLPOutput
 <table>
-<caption>Output scheme: CasADi::NLPOutput  (NLP_NUM_OUT = 5) </caption>
+<caption>Output scheme: CasADi::NLPOutput  (NLP_NUM_OUT = 6) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NLP_X_OPT</td><td>Decision variables for optimal solution (n x 1) [x_opt].</td></tr>
+<tr><td>NLP_X_OPT</td><td>Decision variables for optimal solution (nx x 1) [x_opt].</td></tr>
 <tr><td>NLP_COST</td><td>Objective/cost function for optimal solution (1 x 1) [cost].</td></tr>
-<tr><td>NLP_LAMBDA_G</td><td>Lagrange multipliers associated with G at the solution (m x 1) [lambda_g].</td></tr>
-<tr><td>NLP_LAMBDA_X</td><td>Lagrange multipliers associated with bounds on X at the solution (n x 1) [lambda_x].</td></tr>
-<tr><td>NLP_G</td><td>The constraints evaluated at the optimal solution (m x 1) [g].</td></tr>
+<tr><td>NLP_LAMBDA_G</td><td>Lagrange multipliers associated with G at the solution (ng x 1) [lambda_g].</td></tr>
+<tr><td>NLP_LAMBDA_X</td><td>Lagrange multipliers associated with bounds on X at the solution (nx x 1) [lambda_x].</td></tr>
+<tr><td>NLP_LAMBDA_P</td><td>Lagrange multipliers associated with the parameters (np x 1) [lambda_p].</td></tr>
+<tr><td>NLP_G</td><td>The constraints evaluated at the optimal solution (ng x 1) [g].</td></tr>
 </table>
 */
 /** \defgroup scheme_DAEInput
@@ -230,13 +231,13 @@
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NLP_X_INIT</td><td>Decision variables initial guess (n x 1) [x_init].</td></tr>
-<tr><td>NLP_LBX</td><td>Decision variables lower bound (n x 1), default -inf [lbx].</td></tr>
-<tr><td>NLP_UBX</td><td>Decision variables upper bound (n x 1), default +inf [ubx].</td></tr>
-<tr><td>NLP_LBG</td><td>Constraints lower bound (m x 1), default -inf [lbg].</td></tr>
-<tr><td>NLP_UBG</td><td>Constraints upper bound (m x 1), default +inf [ubg].</td></tr>
-<tr><td>NLP_LAMBDA_INIT</td><td>Lagrange multipliers associated with G, initial guess (m x 1) [lambda_init].</td></tr>
-<tr><td>NLP_P</td><td>Only for parametric NLP - static parameters on which the objective and constraints might depend [p].</td></tr>
+<tr><td>NLP_X_INIT</td><td>Decision variables initial guess (nx x 1) [x_init].</td></tr>
+<tr><td>NLP_LBX</td><td>Decision variables lower bound (nx x 1), default -inf [lbx].</td></tr>
+<tr><td>NLP_UBX</td><td>Decision variables upper bound (nx x 1), default +inf [ubx].</td></tr>
+<tr><td>NLP_LBG</td><td>Constraints lower bound (ng x 1), default -inf [lbg].</td></tr>
+<tr><td>NLP_UBG</td><td>Constraints upper bound (ng x 1), default +inf [ubg].</td></tr>
+<tr><td>NLP_LAMBDA_INIT</td><td>Lagrange multipliers associated with G, initial guess (ng x 1) [lambda_init].</td></tr>
+<tr><td>NLP_P</td><td>Parameters on which the objective and constraints might depend (np x 1) [p].</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorInput
