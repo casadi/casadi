@@ -240,12 +240,6 @@ MatType GenericMatrix<MatType>::mul_smart(const MatType& y) const {
       return MatType::zeros(x.size1(),y.size2());
   } else if(x.scalar() || y.scalar()){
     return x*y;
-  } else if(x.sparsity().diagonal() && y.size2()==1){
-    return diag(x)*y;
-  } else if(y.sparsity().diagonal() && x.size1()==1){
-    return x*trans(diag(y));
-  } else if(x.sparsity().diagonal() && y.sparsity().diagonal()){
-    return diag(diag(x)*diag(y));
   } else {
     casadi_assert_message(size2()==y.size1(),"Matrix product with incompatible dimensions. Lhs is " << dimString() << " and rhs is " << y.dimString() << ".");
     return x.mul_full(y);
