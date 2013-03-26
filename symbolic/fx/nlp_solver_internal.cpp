@@ -48,8 +48,8 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   addOption("parametric", OT_BOOLEAN, false, "Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.");
   addOption("gauss_newton",      OT_BOOLEAN,  false,           "Use Gauss Newton Hessian approximation");
 
-  n_ = 0;
-  m_ = 0;
+  nx_ = 0;
+  ng_ = 0;
   
   inputScheme = SCHEME_NLPInput;
   outputScheme = SCHEME_NLPOutput;
@@ -77,11 +77,11 @@ void NLPSolverInternal::init(){
   }
 
   // Get dimensions
-  n_ = F_.input(0).numel();
-  m_ = G_.isNull() ? 0 : G_.output(0).numel();
+  nx_ = F_.input(0).numel();
+  ng_ = G_.isNull() ? 0 : G_.output(0).numel();
 
   // Remove G if it has zero dimension
-  if(m_ == 0 && !G_.isNull())
+  if(ng_ == 0 && !G_.isNull())
     G_ = FX();
 
   parametric_ = getOption("parametric");
@@ -120,7 +120,7 @@ void NLPSolverInternal::init(){
       casadi_assert_message(G_.getNumInputs()==1, "Wrong number of input arguments to G for non-parametric NLP. Must be 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
     }
     casadi_assert_message(G_.getNumOutputs()>=1, "Wrong number of output arguments to G");
-    casadi_assert_message(G_.input().numel()==n_, "Inconsistent dimensions");
+    casadi_assert_message(G_.input().numel()==nx_, "Inconsistent dimensions");
     casadi_assert_message(G_.input().sparsity()==F_.input().sparsity(), "F and G input dimension must match. F " << F_.input().dimString() << ". G " << G_.input().dimString());
   }
   
@@ -326,9 +326,9 @@ void NLPSolverInternal::init(){
       casadi_assert_message(H_.getNumInputs()>=1, "Wrong number of input arguments to H for non-parametric NLP. Must be at least 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
     }
     casadi_assert_message(H_.getNumOutputs()>=1, "Wrong number of output arguments to H");
-    casadi_assert_message(H_.input(0).numel()==n_,"Inconsistent dimensions");
-    casadi_assert_message(H_.output().size1()==n_,"Inconsistent dimensions");
-    casadi_assert_message(H_.output().size2()==n_,"Inconsistent dimensions");
+    casadi_assert_message(H_.input(0).numel()==nx_,"Inconsistent dimensions");
+    casadi_assert_message(H_.output().size1()==nx_,"Inconsistent dimensions");
+    casadi_assert_message(H_.output().size2()==nx_,"Inconsistent dimensions");
   }
 
   if(!J_.isNull()){
@@ -338,38 +338,41 @@ void NLPSolverInternal::init(){
       casadi_assert_message(J_.getNumInputs()==1, "Wrong number of input arguments to J for non-parametric NLP. Must be at least 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
     }
     casadi_assert_message(J_.getNumOutputs()>=1, "Wrong number of output arguments to J");
-    casadi_assert_message(J_.input().numel()==n_,"Inconsistent dimensions");
-    casadi_assert_message(J_.output().size2()==n_,"Inconsistent dimensions");
+    casadi_assert_message(J_.input().numel()==nx_,"Inconsistent dimensions");
+    casadi_assert_message(J_.output().size2()==nx_,"Inconsistent dimensions");
   }
 
   if (parametric_) {
-    sp_p = F_->input(1).sparsity();
+    np_ = F_->input(1).size();
     
-    if (!G_.isNull()) casadi_assert_message(sp_p == G_->input(G_->getNumInputs()-1).sparsity(),"Parametric NLP has inconsistent parameter dimensions. F has got " << sp_p.dimString() << " as dimensions, while G has got " << G_->input(G_->getNumInputs()-1).dimString());
-    if (!H_.isNull()) casadi_assert_message(sp_p == H_->input(H_->getNumInputs()-1).sparsity(),"Parametric NLP has inconsistent parameter dimensions. F has got " << sp_p.dimString() << " as dimensions, while H has got " << H_->input(H_->getNumInputs()-1).dimString());
-    if (!J_.isNull()) casadi_assert_message(sp_p == J_->input(J_->getNumInputs()-1).sparsity(),"Parametric NLP has inconsistent parameter dimensions. F has got " << sp_p.dimString() << " as dimensions, while J has got " << J_->input(J_->getNumInputs()-1).dimString());
+    if (!G_.isNull()) casadi_assert_message(np_ == G_->input(G_->getNumInputs()-1).size(),"Parametric NLP has inconsistent parameter dimensions. F has got " << np_ << " parameters, while G has got " << G_->input(G_->getNumInputs()-1).size());
+    if (!H_.isNull()) casadi_assert_message(np_ == H_->input(H_->getNumInputs()-1).size(),"Parametric NLP has inconsistent parameter dimensions. F has got " << np_ << " parameters, while H has got " << H_->input(H_->getNumInputs()-1).size());
+    if (!J_.isNull()) casadi_assert_message(np_ == J_->input(J_->getNumInputs()-1).size(),"Parametric NLP has inconsistent parameter dimensions. F has got " << np_ << " parameters, while J has got " << J_->input(J_->getNumInputs()-1).size());
+  } else {
+    np_ = 0;
   }
   
   // Infinity
   double inf = numeric_limits<double>::infinity();
   
   // Allocate space for inputs
-  input_.resize(NLP_NUM_IN - (parametric_? 0 : 1));
-  input(NLP_X_INIT)      = DMatrix(n_,1,0);
-  input(NLP_LBX)         = DMatrix(n_,1,-inf);
-  input(NLP_UBX)         = DMatrix(n_,1, inf);
-  input(NLP_LBG)         = DMatrix(m_,1,-inf);
-  input(NLP_UBG)         = DMatrix(m_,1, inf);
-  input(NLP_LAMBDA_INIT) = DMatrix(m_,1,0);
-  if (parametric_) input(NLP_P) = DMatrix(sp_p,0);
+  input_.resize(NLP_NUM_IN);
+  input(NLP_X_INIT)      =  DMatrix::zeros(nx_);
+  input(NLP_LBX)         = -DMatrix::inf(nx_);
+  input(NLP_UBX)         =  DMatrix::inf(nx_);
+  input(NLP_LBG)         = -DMatrix::inf(ng_);
+  input(NLP_UBG)         =  DMatrix::inf(ng_);
+  input(NLP_LAMBDA_INIT) =  DMatrix::zeros(ng_);
+  input(NLP_P)           =  DMatrix::zeros(np_);
   
   // Allocate space for outputs
   output_.resize(NLP_NUM_OUT);
-  output(NLP_X_OPT)      = DMatrix(n_,1,0);
-  output(NLP_COST)       = DMatrix(1,1,0);
-  output(NLP_LAMBDA_X)   = DMatrix(n_,1,0);
-  output(NLP_LAMBDA_G)   = DMatrix(m_,1,0);
-  output(NLP_G)          = DMatrix(m_,1,0);
+  output(NLP_X_OPT)      = DMatrix::zeros(nx_);
+  output(NLP_COST)       = DMatrix::zeros(1);
+  output(NLP_LAMBDA_X)   = DMatrix::zeros(nx_);
+  output(NLP_LAMBDA_G)   = DMatrix::zeros(ng_);
+  output(NLP_LAMBDA_P)   = DMatrix::zeros(np_);
+  output(NLP_G)          = DMatrix::zeros(ng_);
   
   if (hasSetOption("iteration_callback")) {
    callback_ = getOption("iteration_callback");

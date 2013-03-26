@@ -91,9 +91,9 @@ void SQPInternal::init(){
   }
   
   // Allocate a QP solver
-  CRSSparsity H_sparsity = hess_mode_==HESS_EXACT ? H_.output().sparsity() : sp_dense(n_,n_);
-  H_sparsity = H_sparsity + DMatrix::eye(n_).sparsity();
-  CRSSparsity A_sparsity = J_.isNull() ? CRSSparsity(0,n_,false) : J_.output().sparsity();
+  CRSSparsity H_sparsity = hess_mode_==HESS_EXACT ? H_.output().sparsity() : sp_dense(nx_,nx_);
+  H_sparsity = H_sparsity + DMatrix::eye(nx_).sparsity();
+  CRSSparsity A_sparsity = J_.isNull() ? CRSSparsity(0,nx_,false) : J_.output().sparsity();
 
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
   qp_solver_ = qp_solver_creator(H_sparsity,A_sparsity);
@@ -106,21 +106,21 @@ void SQPInternal::init(){
   qp_solver_.init();
   
   // Lagrange multipliers of the NLP
-  mu_.resize(m_);
-  mu_x_.resize(n_);
+  mu_.resize(ng_);
+  mu_x_.resize(nx_);
   
   // Lagrange gradient in the next iterate
-  gLag_.resize(n_);
-  gLag_old_.resize(n_);
+  gLag_.resize(nx_);
+  gLag_old_.resize(nx_);
 
   // Current linearization point
-  x_.resize(n_);
-  x_cand_.resize(n_);
-  x_old_.resize(n_);
+  x_.resize(nx_);
+  x_cand_.resize(nx_);
+  x_old_.resize(nx_);
 
   // Constraint function value
-  gk_.resize(m_);
-  gk_cand_.resize(m_);
+  gk_.resize(ng_);
+  gk_cand_.resize(ng_);
   
   // Hessian approximation
   Bk_ = DMatrix(H_sparsity);
@@ -129,18 +129,18 @@ void SQPInternal::init(){
   Jk_ = DMatrix(A_sparsity);
 
   // Bounds of the QP
-  qp_LBA_.resize(m_);
-  qp_UBA_.resize(m_);
-  qp_LBX_.resize(n_);
-  qp_UBX_.resize(n_);
+  qp_LBA_.resize(ng_);
+  qp_UBA_.resize(ng_);
+  qp_LBX_.resize(nx_);
+  qp_UBX_.resize(nx_);
 
   // QP solution
-  dx_.resize(n_);
-  qp_DUAL_X_.resize(n_);
-  qp_DUAL_A_.resize(m_);
+  dx_.resize(nx_);
+  qp_DUAL_X_.resize(nx_);
+  qp_DUAL_A_.resize(ng_);
 
   // Gradient of the objective
-  gf_.resize(n_);
+  gf_.resize(nx_);
 
   // Create Hessian update function
   if(hess_mode_ == HESS_BFGS){
@@ -178,7 +178,7 @@ void SQPInternal::init(){
     bfgs_.init();
     
     // Initial Hessian approximation
-    B_init_ = DMatrix::eye(n_);
+    B_init_ = DMatrix::eye(nx_);
   }
   
   // Header
@@ -194,8 +194,8 @@ void SQPInternal::init(){
         break;
     }
     cout << endl;
-    cout << "Number of variables:                       " << setw(9) << n_ << endl;
-    cout << "Number of constraints:                     " << setw(9) << m_ << endl;
+    cout << "Number of variables:                       " << setw(9) << nx_ << endl;
+    cout << "Number of constraints:                     " << setw(9) << ng_ << endl;
     cout << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.size() << endl;
     cout << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.size() << endl;
     cout << endl;
@@ -246,7 +246,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
   // Evaluate the initial gradient of the Lagrangian
   copy(gf_.begin(),gf_.end(),gLag_.begin());
-  if(m_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_);
+  if(ng_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_);
   // gLag += mu_x_;
   transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>());
 
@@ -365,7 +365,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       
       // Line-search loop
       while (true){
-        for(int i=0; i<n_; ++i) x_cand_[i] = x_[i] + t * dx_[i];
+        for(int i=0; i<nx_; ++i) x_cand_[i] = x_[i] + t * dx_[i];
       
         // Evaluating objective and constraints
         eval_f(x_cand_,fk_cand);
@@ -397,13 +397,13 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
 
     // Candidate accepted, update dual variables
-    for(int i=0; i<m_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
-    for(int i=0; i<n_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
+    for(int i=0; i<ng_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
+    for(int i=0; i<nx_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
     
     if( hess_mode_ == HESS_BFGS){
       // Evaluate the gradient of the Lagrangian with the old x but new mu (for BFGS)
       copy(gf_.begin(),gf_.end(),gLag_old_.begin());
-      if(m_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_old_);
+      if(ng_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_old_);
       // gLag_old += mu_x_;
       transform(gLag_old_.begin(),gLag_old_.end(),mu_x_.begin(),gLag_old_.begin(),plus<double>());
     }
@@ -422,7 +422,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     
     // Evaluate the gradient of the Lagrangian with the new x and new mu
     copy(gf_.begin(),gf_.end(),gLag_.begin());
-    if(m_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_);
+    if(ng_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_);
     // gLag += mu_x_;
     transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>());
 
@@ -606,7 +606,7 @@ void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>
 
 void SQPInternal::eval_g(const std::vector<double>& x, std::vector<double>& g){
   // Quick return if no constraints
-  if(m_==0) return;
+  if(ng_==0) return;
   
   G_.setInput(x);
   G_.evaluate();
@@ -620,7 +620,7 @@ void SQPInternal::eval_g(const std::vector<double>& x, std::vector<double>& g){
 
 void SQPInternal::eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J){
   // Quick return if no constraints
-  if(m_==0) return;
+  if(ng_==0) return;
 
   J_.setInput(x);
   J_.evaluate();
@@ -685,7 +685,7 @@ void SQPInternal::solve_QP(const Matrix<double>& H, const std::vector<double>& g
   qp_solver_.setInput(ubx, QP_UBX);
 
   // Pass linear bounds
-  if(m_>0){
+  if(ng_>0){
     qp_solver_.setInput(A, QP_A);
     qp_solver_.setInput(lbA, QP_LBA);
     qp_solver_.setInput(ubA, QP_UBA);

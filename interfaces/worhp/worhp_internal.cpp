@@ -296,8 +296,8 @@ void WorhpInternal::init(){
       casadi_assert_message(GF_.getNumInputs()==1, "Wrong number of input arguments to GF for non-parametric NLP. Must be 1, but got " << GF_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
     }
     casadi_assert_message(GF_.getNumOutputs()>=1, "Wrong number of output arguments to GF");
-    casadi_assert_message(GF_.input().numel()==n_,"Inconsistent dimensions");
-    casadi_assert_message((GF_.output().size1()==n_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==n_),"Inconsistent dimensions");
+    casadi_assert_message(GF_.input().numel()==nx_,"Inconsistent dimensions");
+    casadi_assert_message((GF_.output().size1()==nx_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==nx_),"Inconsistent dimensions");
   }
   
   
@@ -1155,7 +1155,7 @@ bool WorhpInternal::eval_grad_f(const double* x,double scale , double* grad_f )
     t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
 
     // Check the result for regularity
-    for(int i=0; i<n_; ++i){
+    for(int i=0; i<nx_; ++i){
         if(isnan(grad_f[i]) || isinf(grad_f[i])){
           log("eval_grad_f: result not regular");
           return false;

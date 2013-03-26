@@ -32488,49 +32488,53 @@ Get a weak reference to the object. ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -33245,49 +33249,53 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -34167,49 +34175,53 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -37629,49 +37641,53 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -43036,49 +43052,53 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -43915,49 +43935,53 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -47795,49 +47819,53 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -48796,49 +48824,53 @@ Return a string with a destription (for SWIG) ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -49634,49 +49666,53 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -50384,49 +50420,53 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -61719,49 +61759,53 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -62630,49 +62674,53 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -75189,49 +75237,53 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -76221,49 +76273,53 @@ Return a string with a destription (for SWIG) ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -80739,49 +80795,53 @@ Get a weak reference to the object. ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -81629,49 +81689,53 @@ Attila Kozma, Joel Andersson and Joris Gillis
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -88474,49 +88538,53 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -90162,49 +90230,53 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -93358,27 +93430,27 @@ Helper function for 'NLPInput' Input arguments of an NLP Solver
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+|                                    | (nx x 1) [x_init].                 |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
+| NLP_LBX                            | Decision variables lower bound (nx |
 |                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
+| NLP_UBX                            | Decision variables upper bound (nx |
 |                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
+| NLP_LBG                            | Constraints lower bound (ng x 1),  |
 |                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
+| NLP_UBG                            | Constraints upper bound (ng x 1),  |
 |                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
+|                                    | with G, initial guess (ng x 1)     |
 |                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| NLP_P                              | Parameters on which the objective  |
+|                                    | and constraints might depend (np x |
+|                                    | 1) [p].                            |
 +------------------------------------+------------------------------------+
 ";
 
@@ -93386,26 +93458,30 @@ Helper function for 'NLPInput' Input arguments of an NLP Solver
 
 Helper function for 'NLPOutput' Output arguments of an NLP Solver
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 6)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+|                                    | solution (nx x 1) [x_opt].         |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
 |                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
+|                                    | with G at the solution (ng x 1)    |
 |                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
+|                                    | (nx x 1) [lambda_x].               |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_P                       | Lagrange multipliers associated    |
+|                                    | with the parameters (np x 1)       |
+|                                    | [lambda_p].                        |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+|                                    | optimal solution (ng x 1) [g].     |
 +------------------------------------+------------------------------------+
 ";
 

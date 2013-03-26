@@ -81,7 +81,7 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_IntegratorInput: return "x0, p, rx0, rp";
     case SCHEME_IntegratorOutput: return "xf, qf, rxf, rqf";
     case SCHEME_NLPInput: return "x_init, lbx, ubx, lbg, ubg, lambda_init, p";
-    case SCHEME_NLPOutput: return "x_opt, cost, lambda_g, lambda_x, g";
+    case SCHEME_NLPOutput: return "x_opt, cost, lambda_g, lambda_x, lambda_p, g";
     case SCHEME_MayerInput: return "x, p";
     case SCHEME_OCPInput: return "lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg";
     case SCHEME_OCPOutput: return "x_opt, u_opt, p_opt, cost";
@@ -206,8 +206,9 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==1) return "cost";
       if(i==2) return "lambda_g";
       if(i==3) return "lambda_x";
-      if(i==4) return "g";
-      casadi_error("getSchemeEntryName: supplied number is out of range. NLPOutput has only 5 entries: ('NLPOutput', 'x_opt, cost, lambda_g, lambda_x, g')");
+      if(i==4) return "lambda_p";
+      if(i==5) return "g";
+      casadi_error("getSchemeEntryName: supplied number is out of range. NLPOutput has only 6 entries: ('NLPOutput', 'x_opt, cost, lambda_g, lambda_x, lambda_p, g')");
       break;
     case SCHEME_MayerInput: 
       if(i==0) return "x";
@@ -372,22 +373,23 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       casadi_error("getSchemeEntryDoc: supplied number is out of range. IntegratorOutput has only 4 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf')");
       break;
     case SCHEME_NLPInput: 
-      if(i==0) return "Decision variables initial guess (n x 1) ";
-      if(i==1) return "Decision variables lower bound (n x 1), default -inf";
-      if(i==2) return "Decision variables upper bound (n x 1), default +inf";
-      if(i==3) return "Constraints lower bound (m x 1), default -inf";
-      if(i==4) return "Constraints upper bound (m x 1), default +inf";
-      if(i==5) return "Lagrange multipliers associated with G, initial guess (m x 1)";
-      if(i==6) return "Only for parametric NLP - static parameters on which the objective and constraints might depend";
+      if(i==0) return "Decision variables initial guess (nx x 1) ";
+      if(i==1) return "Decision variables lower bound (nx x 1), default -inf";
+      if(i==2) return "Decision variables upper bound (nx x 1), default +inf";
+      if(i==3) return "Constraints lower bound (ng x 1), default -inf";
+      if(i==4) return "Constraints upper bound (ng x 1), default +inf";
+      if(i==5) return "Lagrange multipliers associated with G, initial guess (ng x 1)";
+      if(i==6) return "Parameters on which the objective and constraints might depend (np x 1)";
       casadi_error("getSchemeEntryDoc: supplied number is out of range. NLPInput has only 7 entries: ('NLPInput', 'x_init, lbx, ubx, lbg, ubg, lambda_init, p')");
       break;
     case SCHEME_NLPOutput: 
-      if(i==0) return "Decision variables for optimal solution (n x 1)";
+      if(i==0) return "Decision variables for optimal solution (nx x 1)";
       if(i==1) return "Objective/cost function for optimal solution (1 x 1)";
-      if(i==2) return "Lagrange multipliers associated with G at the solution (m x 1)";
-      if(i==3) return "Lagrange multipliers associated with bounds on X at the solution (n x 1)";
-      if(i==4) return "The constraints evaluated at the optimal solution (m x 1)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLPOutput has only 5 entries: ('NLPOutput', 'x_opt, cost, lambda_g, lambda_x, g')");
+      if(i==2) return "Lagrange multipliers associated with G at the solution (ng x 1)";
+      if(i==3) return "Lagrange multipliers associated with bounds on X at the solution (nx x 1)";
+      if(i==4) return "Lagrange multipliers associated with the parameters (np x 1)";
+      if(i==5) return "The constraints evaluated at the optimal solution (ng x 1)";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLPOutput has only 6 entries: ('NLPOutput', 'x_opt, cost, lambda_g, lambda_x, lambda_p, g')");
       break;
     case SCHEME_MayerInput: 
       if(i==0) return "States at the end of integration (nx x 1)";
@@ -567,8 +569,9 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==1) return "NLP_COST";
       if(i==2) return "NLP_LAMBDA_G";
       if(i==3) return "NLP_LAMBDA_X";
-      if(i==4) return "NLP_G";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLPOutput has only 5 entries: ('NLPOutput', 'x_opt, cost, lambda_g, lambda_x, g')");
+      if(i==4) return "NLP_LAMBDA_P";
+      if(i==5) return "NLP_G";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLPOutput has only 6 entries: ('NLPOutput', 'x_opt, cost, lambda_g, lambda_x, lambda_p, g')");
       break;
     case SCHEME_MayerInput: 
       if(i==0) return "MAYER_X";
@@ -736,7 +739,8 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="cost") return 1;
       if(name=="lambda_g") return 2;
       if(name=="lambda_x") return 3;
-      if(name=="g") return 4;
+      if(name=="lambda_p") return 4;
+      if(name=="g") return 5;
       break;
     case SCHEME_MayerInput: 
       if(name=="x") return 0;

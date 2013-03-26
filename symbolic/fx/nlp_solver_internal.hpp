@@ -60,11 +60,14 @@ public:
   /// use parametric NLP formulation
   bool parametric_; 
 
-  /// Number of variables and constraints
-  int n_,m_;
+  /// Number of variables
+  int nx_;
   
-  /// The sparsity of the parameters 
-  CRSSparsity sp_p;
+  /// Number of constraints
+  int ng_;
+  
+  /// Number of parameters
+  int np_;
   
   /// callback function, executed at each iteration
   FX callback_;
