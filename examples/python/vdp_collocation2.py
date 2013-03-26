@@ -22,6 +22,7 @@
 # -*- coding: utf-8 -*-
 from casadi import *
 from casadi.tools import *
+
 import numpy as NP
 import matplotlib.pyplot as plt
 
@@ -128,37 +129,36 @@ for j in range(d+1):
     lfcn.evaluate(1,0)
     C[j,r] = lfcn.fwdSens()
 
-# Collection holding NLP variables
-V = Collection()
-X = V.X = [[ msym("X",nx) for j in range(d+1)] for k in range(nk+1)]
-U = V.U = [ msym("U",nu) for k in range(nk)]
-V.setOrder([("X","U")])
-V.freeze()
+# Structure holding NLP variables
+V = msymStruct([
+      (
+       (nk+1,d+1,"X",nx),
+       (nk,      "U",nu)
+      )
+    ])
 
-vars_lb   = V.numbers()
-vars_ub   = V.numbers()
-vars_init = V.numbers()
+vars_lb   = V.zeros()
+vars_ub   = V.zeros()
+vars_init = V.zeros()
 
 # Set states and its bounds
-for k in V.i_X.items():
-  vars_init[k] = x_init
-  vars_lb[k]   = x_min
-  vars_ub[k]   = x_max
+vars_init["X",:,:] = repeat(repeat(x_init))
+vars_lb["X",:,:]   = repeat(repeat(x_min))
+vars_ub["X",:,:]   = repeat(repeat(x_max))
 
 # Set controls and its bounds
-for k in V.i_U.items():
-  vars_init[k] = u_init
-  vars_lb[k] = u_min
-  vars_ub[k] = u_max
-  
+vars_init["U",:] = repeat(u_init)
+vars_lb["U",:]   = repeat(u_min)
+vars_ub["U",:]   = repeat(u_max)
+
 # State at initial time
-vars_lb[V.i_X[0][0]] = xi_min
-vars_ub[V.i_X[0][0]] = xi_max
+vars_lb["X",0,0] = xi_min
+vars_ub["X",0,0] = xi_max
 
 # State at end time
-vars_lb[V.i_X[-1][0]] = xf_min
-vars_ub[V.i_X[-1][0]] = xf_max
-  
+vars_lb["X",-1,0] = xf_min
+vars_ub["X",-1,0] = xf_max
+
 # Constraint function for the NLP
 g = []
 lbg = []
@@ -173,10 +173,10 @@ for k in range(nk):
     # Get an expression for the state derivative at the collocation point
     xp_jk = 0
     for r in range (d+1):
-      xp_jk += C[r,j]*X[k][r]
+      xp_jk += C[r,j]*V["X",k,r]
       
     # Add collocation equations to the NLP
-    [fk] = f.call([T[k][j], X[k][j], U[k]])
+    [fk] = f.call([T[k][j], V["X",k,j], V["U",k]])
     g.append(h*fk - xp_jk)
     lbg.append(NP.zeros(nx)) # equality constraints
     ubg.append(NP.zeros(nx)) # equality constraints
@@ -184,10 +184,10 @@ for k in range(nk):
   # Get an expression for the state at the end of the finite element
   xf_k = 0
   for r in range(d+1):
-    xf_k += D[r]*X[k][r]
+    xf_k += D[r]*V["X",k,r]
 
   # Add continuity equation to NLP
-  g.append(X[k+1][0] - xf_k)
+  g.append(V["X",k+1,0] - xf_k)
   lbg.append(NP.zeros(nx))
   ubg.append(NP.zeros(nx))
   
@@ -195,11 +195,12 @@ for k in range(nk):
 g = vertcat(g)
   
 # Nonlinear constraint function
-gfcn = MXFunction([V[...]],[g])
+gfcn = MXFunction([V],[g])
 
 # Objective function of the NLP
-[f] = m.call([T[nk-1][d],X[nk][0],U[nk-1]])
-ffcn = MXFunction([V[...]], [f])
+[f] = m.call([T[nk-1][d],V["X",nk,0],V["U",nk-1]])
+
+ffcn = MXFunction([V], [f])
   
 ## ----
 ## SOLVE THE NLP
@@ -235,15 +236,15 @@ solver.solve()
 print "optimal cost: ", float(solver.output(NLP_COST))
 
 # Retrieve the solution
-v_opt = DMatrix(solver.output(NLP_X_OPT))
-
+opt = V.DMatrix(solver.output(NLP_X_OPT))
 
 # Get values at the beginning of each finite element
-x0_opt = v_opt[[k[0][0] for k in V.i_X]]
-x1_opt = v_opt[[k[0][1] for k in V.i_X]]
-x2_opt = v_opt[[k[0][2] for k in V.i_X]]
+x0_opt = opt["X",:,0,0]
+x1_opt = opt["X",:,0,1]
+x2_opt = opt["X",:,0,2]
 
-u_opt = v_opt[V.i_U]
+u_opt = opt["U",:,0]
+
 tgrid = NP.linspace(0,tf,nk+1)
 tgrid_u = NP.linspace(0,tf,nk)
 

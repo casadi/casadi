@@ -264,10 +264,12 @@ class SDPtests(casadiTestCase):
     self.checkarray(dsp.output(SDP_DUAL),DMatrix([[5.9,-1.375],[-1.375,1]]),digits=5)
     self.checkarray(dsp.output(SDP_PRIMAL_P),DMatrix.zeros(2,2),digits=5)
     
-    V = Collection()
-    L = V.L = ssym("L",C.shape)
-    x = V.x = ssym("x",b.size())
-    V.freeze()
+    V = struct_ssym([
+          entry("L",shape=C.shape),
+          entry("x",shape=b.size())
+        ])
+    L = V["L"]
+    x = V["x"] 
 
     P = mul(L,L.T)
 
@@ -275,8 +277,8 @@ class SDPtests(casadiTestCase):
     g = []
     g.append(sum([Ai[i]*x[i] for i in range(3)]) - C - P)
 
-    f = SXFunction([V[...]],[mul(b.T,V.x)])
-    g = SXFunction([V[...]],[veccat(g)])
+    f = SXFunction([V],[mul(b.T,x)])
+    g = SXFunction([V],[veccat(g)])
 
     sol = IpoptSolver(f,g)
     sol.init()
@@ -286,9 +288,9 @@ class SDPtests(casadiTestCase):
 
     sol.evaluate()
 
-    print sol.output()[V.i_x]
+    sol_ = V(sol.output())
     
-    self.checkarray(sol.output()[V.i_x],DMatrix([-1.1,-2.7375,-0.55]),digits=5)
+    self.checkarray(sol_["x"],DMatrix([-1.1,-2.7375,-0.55]),digits=5)
     
 
     

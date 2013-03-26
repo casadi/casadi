@@ -414,6 +414,395 @@ class Toolstests(casadiTestCase):
       p_.xother.a=12
 
       self.checkarray(p_.vecNZcat(),DMatrix([4,5,12,0,0,3,3,3,3,3,3,0,0,0,0,0,0,0,0]),"vecNZcat")
+      
+  def test_structure(self):
+  
+  
+    s = struct(['x','y','z'])
+    
+    print s
+  
+    with self.assertRaises(Exception):
+      struct_ssym(['x','x','z'])
+    with self.assertRaises(Exception): 
+      struct_ssym(['x','y','z','y'])
+      
+
+    
+    s = struct_ssym([('x','y'),'z'])
+    self.assertEqual(s.size,3)
+    
+    init = s(0)
+    
+    init['x'] = 5
+    init['y'] = 7
+    init['z'] = 8
+    
+    x,y,z = s[...]
+    
+    self.checkarray(init.cat,DMatrix([5,7,8]))
+    
+    init[...] = [1,2,3]
+    
+    self.checkarray(init.cat,DMatrix([1,2,3]))
+    
+    init = s()
+    init['x'] = 5
+    init['y'] = 7
+    init['z'] = 8
+    
+    self.checkarray(init.cat,DMatrix([5,7,8]))
+    
+    init[{}] = {'x': 12}
+    self.checkarray(init.cat,DMatrix([12,7,8]))
+    
+    init = s(inf)
+    self.checkarray(init.cat,DMatrix([inf,inf,inf]))
+    
+    f = DMatrix.zeros(3,1)
+    init = s(f)
+    f[0] = 5
+    self.checkarray(init.cat,DMatrix([5,0,0]))
+    
+    s = struct_ssym(['x','y','z'],order=['x','y','z'])
+    with self.assertRaises(Exception): 
+      s = struct_ssym([('x','y'),'z'],order=['x','y','z'])
+    
+    s = struct_ssym(['x','y','z'])
+    self.assertEqual(s.size,3)
+    self.assertEqual(s[vertcat,['x','y']].shape[0],2)
+    self.assertTrue(isinstance(s[list,vertcat,['x','y']],list))
+    
+    s = struct_ssym([entry('x',repeat=5),entry('y',repeat=6),entry('z')])
+    self.assertEqual(s.size,12)
+    self.assertEqual(len(s["x"]),5)
+    self.assertEqual(len(s["y"]),6)
+    self.assertTrue(s.cat.at(1).getName().startswith("x"))
+    s = struct_ssym([(entry('x',repeat=5),entry('y',repeat=[6,5])),entry('z')])
+    
+        
+    self.checkarray(s.f["x"],[0,6,12,18,24])
+    self.checkarray(s.f["z"],[35])
+    self.checkarray(s.f["y"],[1,2,3,4,5,7,8,9,10,11,13,14,15,16,17,19,20,21,22,23,25,26,27,28,29,30,31,32,33,34])
+    
+    self.assertEqual(s.size,36)
+    self.assertEqual(len(s["x"]),5)
+    self.assertEqual(len(s["y"]),6)
+    self.assertTrue(s.cat.at(1).getName().startswith("y"))
+    s = struct_ssym([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=sp_dense(3)),entry("w",shape=sp_tril(5))])
+    self.assertEqual(s.size,6+2+3+15)
+    self.assertTrue(s["x"].sparsity()==sp_dense(3,2))
+    self.assertTrue(s["y"].sparsity()==sp_dense(2,1))
+    self.assertTrue(s["z"].sparsity()==sp_dense(3,1))
+    self.assertTrue(s["w"].sparsity()==sp_tril(5))
+    
+    x  = ssym("x",2)
+    x2 = ssym("x2",2)
+    s = struct_ssym([entry('a',sym=x),'y','z'])
+    self.assertTrue(s.cat.at(0).getName().startswith("x"))
+    self.assertEqual(s.size,4)
+    with self.assertRaises(Exception):
+      struct_ssym([entry('a',sym=x+x),'y','z'])
+    with self.assertRaises(Exception):
+      struct_ssym([entry('a',sym=[x+x]),'y','z'])
+    s = struct_ssym([entry('a',sym=vertcat([x,x2])),'y','z'])
+    self.assertEqual(s.size,6)
+    with self.assertRaises(Exception):
+      s = struct_ssym([entry('a',repeat=6,sym=x),'y','z'])
+    
+    s = struct_ssym(['x','y','z'])
+ 
+    S = struct_ssym([entry("X",sym=s)])
+    self.assertTrue(S.cat.at(0).getName()=="x")
+    S = struct_ssym([entry("X",struct=s)])
+    self.assertTrue(S.cat.at(0).getName()=="X_x")
+    S = struct_ssym([entry("X",repeat=[5],struct=s)])
+    self.assertEqual(S.size,15)
+    
+    s0 = struct_ssym(['x','y','z'])
+    s1 = struct_ssym(['x','y'])
+    S0 = struct_ssym([entry("X",struct=s0),entry("Y",repeat=[5],struct=s0),entry("Z",struct=s0)])
+    S1 = struct_ssym([entry("X",struct=s1),entry("Y",repeat=[5],struct=s1)])
+    num0 = S0(0)
+    num1 = S1(1)
+
+    num0[nesteddict] = num1[nesteddict]
+    
+    S = struct_ssym([entry("P",shapestruct=(s0,s0))])
+ 
+    num = S(0)
+    num["P"] = DMatrix([[1,2,3],[4,5,6],[7,8,9]])
+    self.checkarray(num["P",index["x"],index["y"]],DMatrix([2]))
+    self.checkarray(num["P",index["x"],:],DMatrix([1,2,3]).T)
+    self.checkarray(num["P",:,index["y"]],DMatrix([2,5,8]))
+    self.checkarray(num["P",:,:],DMatrix([[1,2,3],[4,5,6],[7,8,9]]))
+    
+    self.checkarray(num["P",indexf[["x","y"]],indexf[["z","x"]]],DMatrix([[3,1],[6,4]]))
+    
+    self.checkarray(num["P",index[list,vertcat,["x","y"]],index[list,vertcat,["z","x"]]],DMatrix([[3,1],[6,4]]))
+    self.checkarray(num["P",index[vertcat,["x","y"]],index[vertcat,["z","x"]]],DMatrix([3,4]))
+    
+    S = struct_ssym([entry("P",shapestruct=s0)])
+    
+    num = S(0)
+    num["P"] = DMatrix([1,2,3])
+    self.checkarray(num["P",index["x"]],DMatrix([1]))
+    self.checkarray(num["P",:],DMatrix([1,2,3]))
+    
+    self.checkarray(num["P",index["x"],0],DMatrix([1]))
+    self.checkarray(num["P",:,0],DMatrix([1,2,3]))
+    
+    with self.assertRaises(Exception):
+      num["P",:,index["x"]]
+    
+    
+    S = struct_ssym([entry("P",shapestruct=(3,s0))])
+ 
+    num = S(0)
+    num["P"] = DMatrix([[1,2,3],[4,5,6],[7,8,9]])
+    with self.assertRaises(Exception):
+      self.checkarray(num["P",index["x"],index["y"]],DMatrix([2]))
+    with self.assertRaises(Exception):
+      self.checkarray(num["P",index["x"],:],DMatrix([1,2,3]).T)
+    self.checkarray(num["P",:,index["y"]],DMatrix([2,5,8]))
+    self.checkarray(num["P",:,:],DMatrix([[1,2,3],[4,5,6],[7,8,9]]))
+    
+    self.checkarray(num["P",:,indexf[["z","x"]]],DMatrix([[3,1],[6,4],[9,7]]))
+    
+    self.checkarray(num["P",:,index[list,vertcat,["z","x"]]],DMatrix([[3,1],[6,4],[9,7]]))
+    self.checkarray(num["P",:,index[vertcat,["z","x"]]],DMatrix([3,1,6,4,9,7]))
+    
+    S = struct_ssym([entry("P",shapestruct=s0)])
+ 
+    
+    
+    s0 = struct_ssym(['x','y',entry('q',shape=4),'z'])
+
+    S = struct_ssym([entry("P",shapestruct=(s0,s0))])
+    
+    num = S(0)
+    num["P",indexf[["x","q"]],indexf[["x","q"]]] = 1
+    
+    self.checkarray(num["P"][[1,6],[1,6]],DMatrix.zeros(2,2))
+    self.checkarray(num["P"][[0,2,3,4,5],[0,2,3,4,5]],DMatrix.ones(5,5))
+
+    num = S(0)
+    num["P",["x","q"],["x","q"]] = 1
+    
+    self.checkarray(num["P"][[1,6],[1,6]],DMatrix.zeros(2,2))
+    self.checkarray(num["P"][[0,2,3,4,5],[0,2,3,4,5]],DMatrix.ones(5,5))
+    
+    num = S(0)
+    num["P",["x","q"],["x","q"]] = DMatrix.ones(5,5)
+    
+    self.checkarray(num["P"][[1,6],[1,6]],DMatrix.zeros(2,2))
+    self.checkarray(num["P"][[0,2,3,4,5],[0,2,3,4,5]],DMatrix.ones(5,5))
+    
+    with self.assertRaises(Exception):
+      struct_msym(['x','x','z'])
+    with self.assertRaises(Exception): 
+      struct_msym(['x','y','z','y'])
+    
+    s = struct_msym([('x','y'),'z'])
+    s = struct_msym(['x','y','z'],order=['x','y','z'])
+    with self.assertRaises(Exception): 
+      s = struct_msym([('x','y'),'z'],order=['x','y','z'])
+    
+    s = struct_msym(['x','y','z'])
+    self.assertEqual(s.size,3)
+    s = struct_msym([entry('x',repeat=5),entry('y',repeat=6),entry('z')])
+    self.assertEqual(s.size,12)
+    self.assertEqual(len(s["x"]),5)
+    self.assertEqual(len(s["y"]),6)
+    s = struct_msym([(entry('x',repeat=5),entry('y',repeat=[6,5])),entry('z')])
+    self.assertEqual(s.size,36)
+    self.assertEqual(len(s["x"]),5)
+    self.assertEqual(len(s["y"]),6)
+   
+    
+    s = struct_msym([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=sp_dense(3)),entry("w",shape=sp_tril(5))])
+    self.assertEqual(s.size,6+2+3+15)
+    self.assertTrue(s["x"].sparsity()==sp_dense(3,2))
+    self.assertTrue(s["y"].sparsity()==sp_dense(2,1))
+    self.assertTrue(s["z"].sparsity()==sp_dense(3,1))
+    self.assertTrue(s["w"].sparsity()==sp_tril(5))
+    
+    x  = msym("x",2)
+    x2 = msym("x2",2)
+    with self.assertRaises(Exception):
+      s = struct_msym([entry('x',sym=x),'y','z'])
+    with self.assertRaises(Exception):
+      struct_msym([entry('x',sym=x+x),'y','z'])
+    with self.assertRaises(Exception):
+      struct_msym([entry('x',sym=[x+x]),'y','z'])
+    with self.assertRaises(Exception):
+      struct_msym([entry('x',sym=vertcat([x,x2])),'y','z'])
+    with self.assertRaises(Exception):
+      s = struct_,msym([(2,'x',[x,x2]),'y','z'])
+    
+    s = struct_msym(['x','y','z'])
+    S = struct_msym([entry("X",struct=s)])
+    S = struct_msym([entry("X",repeat=[5],struct=s)])
+    
+    x = ssym("x",2)
+    y0 = sin(x) 
+    y1 = cos(x)
+    
+    v = struct_SX([
+      entry("x",expr=x),
+      entry("y",expr=[y0,y1]),
+      entry("w",expr=[[x,x**2],[x**3,x**4]])
+    ])
+    
+    
+    x = msym("x",2)
+    m = struct_msym(['a','b'])
+    y0 = sin(x) 
+    y1 = cos(x)
+    
+    V = struct_MX([
+      entry("x",expr=x),
+      (entry("y",expr=[y0,y1],struct=m),
+      entry("w",expr=[[x,x**2],[x**3,x**4]],struct=m)
+      )
+    ])
+    self.assertEqual(V.size,14)
+    
+    self.assertTrue(isinstance(V.cat,MX))
+    
+    self.assertTrue(isEqual(V["x"],x))
+    self.assertTrue(isEqual(V["y",0],y0))
+    self.assertTrue(isEqual(V["y",1],y1))
+    self.assertEqual(V["y",0,'a'].shape,(1,1))
+    
+    with self.assertRaises(Exception):
+      V["y",0] = msym("x",4) # shape mismatch
+    abc = msym("abc",2)
+    V["y",0] = abc
+    self.assertTrue(isEqual(V["y",0],abc))
+
+    states = struct_ssym([
+                entry('x'),
+                entry('y'),
+                entry('z'),
+                entry('u',shape=sp_dense(4)),
+                entry('v',repeat=[4,2]),
+                entry('w',repeat=[6]),
+                entry('p',repeat=[9],shape=sp_dense(6))
+             ],order=['x','y','z','u',('v','w'),'p'])
+             
+    shooting = struct_ssym([entry('X',struct=states,repeat=[4,5]),entry('U',repeat=[3])],order=[('X','U')])
+
+
+    
+    self.assertEqual(shooting.size,1503)
+    s = shooting["X",:,:,{}]
+    self.assertTrue(isinstance(s,list))
+    self.assertEqual(len(s),4)
+    self.assertTrue(isinstance(s[0],list))
+    self.assertEqual(len(s[0]),5)
+    self.assertTrue(isinstance(s[0][0],dict))
+    self.assertTrue('x' in s[0][0])
+    self.assertEqual(len(s[0][0]),7)
+    self.assertTrue(isEqual(s[0][0]["x"],shooting["X",0,0,"x"]))
+    
+    
+    init = shooting(nan)
+    
+    init['X',0,-1,'p',0] = 2
+    self.checkarray(init.cat[shooting.i['X',0,-1,'p',0]],DMatrix.ones(6)*2)
+    self.assertEqual(sum([i!=i for i in init.cat.data()]),1503-6)
+    
+    init['X',0,-1,'p',0] = [3]*6
+    self.checkarray(init.cat[shooting.i['X',0,-1,'p',0]],DMatrix.ones(6)*3)
+    self.assertEqual(sum([i!=i for i in init.cat.data()]),1503-6)
+ 
+    init['X',0,-1,'p',0] = DMatrix([4]*6)
+    self.checkarray(init.cat[shooting.i['X',0,-1,'p',0]],DMatrix.ones(6)*4)
+    self.assertEqual(sum([i!=i for i in init.cat.data()]),1503-6)
+    
+    init['X',0,-1,'p',:] = 7
+    
+    self.checkarray(init.cat[shooting.i['X',0,-1,'p',1]],DMatrix.ones(6)*7)
+    self.assertEqual(sum([i!=i for i in init.cat.data()]),1503-6*9)
+    
+    self.checkarray(init['X',0,-1,'p',horzcat,:],DMatrix.ones(6,9)*7)
+
+    with self.assertRaises(Exception):
+      init['X',0,-1,'p',:] = [1,2,3,4,5,6]
+      
+    init['X',0,-1,'p',:] = repeated([1,2,3,4,5,6])
+    self.checkarray(init['X',0,-1,'p',vertcat,:,2],DMatrix.ones(9)*3)
+    
+    init = shooting(DMatrix(range(shooting.size)))
+
+    self.checkarray(init['X',vertcat,:,horzcat,:],init['X',blockcat,:,:])
+
+    init = shooting(nan)
+
+    init['X',:,:,['x','y']] = repeated(repeated([6,5]))
+
+    print init.cat
+
+    init['X',:,:,{}] = repeated(repeated({'x': 9,'y': 3}))
+
+    print init.cat
+    
+    V = struct_SX(shooting)
+    
+    V['X',:,:,['x','y']] = repeated(repeated([6,5]))
+    
+    print V
+    
+    V = struct_msym(shooting)
+    
+    print V
+    
+    V = struct_MX(shooting)
+    
+    print V
+    
+    
+    init = shooting(nan)
+    
+
+    
+    init['X',0,-1,'p',horzcat,:] = DMatrix.ones(6,9)*2
+    
+    self.assertEqual(sum(init.cat==2),6*9)
+
+    init['X',0,-1,'p',vertcat,:,2] = DMatrix.ones(9)*3
+    
+    self.assertEqual(sum(init.cat==2),6*9-9)
+    self.assertEqual(sum(init.cat==3),9)
+
+    self.checkarray(init['X',0,-1,'p',horzcat,:,[2,3]],vertcat([DMatrix.ones(1,9)*3,DMatrix.ones(1,9)*2]))
+    
+    init['X',:,-1,'p',horzcat,:] = repeated(DMatrix.ones(6,9)*2)
+    
+    self.assertEqual(sum(init.cat==2),4*6*9)
+    
+    init['X',0,0,'v',blockcat] = DMatrix.ones(4,2)*7
+    
+    self.assertEqual(sum(init.cat==7),4*2)
+
+    init['X',:,0,'v',blockcat] = repeated(DMatrix.ones(4,2)*7)
+    
+    self.assertEqual(sum(init.cat==7),4*2*4)
+    
+    init['X',:,:,'v',blockcat] = repeated(DMatrix.ones(4,2)*7)
+    self.assertEqual(sum(init.cat==7),4*2*4*5)
+    
+    init['X',0,0,'p',:] = range(9)
+    
+    
+    print index["a"]
+
+    init = shooting(range(shooting.size))
+    for i in range(shooting.size):
+      ci = shooting.getCanonicalIndex(i)
+      self.assertEqual(i, init.__getitem__(ci))
+      self.assertTrue("_".join(map(str,ci)).startswith(shooting.cat.at(i).getName()))
 
 if __name__ == '__main__':
     unittest.main()

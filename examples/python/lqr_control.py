@@ -22,9 +22,10 @@
 from pylab import *
 from numpy import *
 from casadi import *
-from casadi.tools import Collection
+from casadi.tools import *
 import scipy.linalg
 import numpy as np
+from casadi import flatten
 
 """
 This example how an Linear Quadratic Regulator (LQR) can be designed
@@ -189,10 +190,13 @@ legend(('s1 dev', 's2 dev','s3 dev','s1 dev (est.)', 's2 dev (est.)','s3 dev (es
 x0 = vertcat([1,0,0])
 xref_e = vertcat([1,0,0])
 
-states = Collection()
-eAt = states.eAt = ssym("eAt",ns,ns) # The matrix exponential exp(A*t)
-Wt  = states.Wt = ssym("Wt",ns,ns)   # The Gramian matrix
-states.freeze()
+states = struct_ssym([
+           entry("eAt",shape=(ns,ns)),
+           entry("Wt",shape=(ns,ns))
+         ])
+         
+eAt = states["eAt"]
+Wt  = states["Wt"]
 
 # We will find the control that allow to reach xref_e at t1
 t1 = te
@@ -200,16 +204,15 @@ t1 = te
 # Initial conditions
 e = DMatrix.eye(ns)
 makeDense(e)
-states_ = states.numbers()
-states_[states.i_eAt] = e
-states_[states.i_Wt] = DMatrix.zeros((ns,ns))
+states_ = states(0)
+states_["eAt"] = e
+states_["Wt"] = 0
 
-rhs = Collection()
-rhs.eAt = mul(A,eAt)
-rhs.Wt  = mul([eAt,B,B.T,eAt.T])
-rhs.freeze()
+rhs = struct_SX(states)
+rhs["eAt"] = mul(A,eAt)
+rhs["Wt"]  = mul([eAt,B,B.T,eAt.T])
 
-dae = SXFunction(daeIn(x=states[...]),daeOut(ode=rhs[...]))
+dae = SXFunction(daeIn(x=states),daeOut(ode=rhs))
 dae.init()
 
 integrator = CVodesIntegrator(dae)
@@ -219,8 +222,10 @@ integrator.init()
 integrator.setInput(states_,INTEGRATOR_X0)
 integrator.evaluate()
 
-Wt_  = integrator.output()[states.i_Wt]
-eAt_ = integrator.output()[states.i_eAt]
+out = states(integrator.output())
+
+Wt_  = out["Wt"]
+eAt_ = out["eAt"]
 
 # Check that eAt is indeed the matrix exponential
 e = max(fabs(eAt_-scipy.linalg.expm(A*te)))/max(fabs(eAt_))
@@ -229,28 +234,30 @@ assert(e<1e-7)
 # Simulate with feedforward controls
 # -----------------------------------
 
-states = Collection()
-states.y = y # The regular states of the LTI system
-eAt = states.eAt = ssym("eAt",ns,ns) # The matrix exponential exp(A*(t1-t))
-states.freeze()
+states = struct_ssym([
+          entry("y",shape=ns),      # The regular states of the LTI system
+          entry("eAt",shape=(ns,ns))  # The matrix exponential exp(A*(t1-t))
+         ])
+
+eAt = states["eAt"]
+y   = states["y"]
 
 # Initial conditions
-states_ = states.numbers()
-states_[states.i_y] = x0
-states_[states.i_eAt] = eAt_
+states_ = states(0)
+states_["y"] = x0
+states_["eAt"] = eAt_
 
 u = mul([B.T,eAt.T,inv(Wt_),xref_e-mul(eAt_,x0)])
 
-rhs = Collection()
-rhs.y   = mul(A,y)+mul(B,u)
-rhs.eAt = -mul(A,eAt)
-rhs.freeze()
+rhs = struct_SX(states)
+rhs["y"]   = mul(A,y)+mul(B,u)
+rhs["eAt"] = -mul(A,eAt)
 
-cdae = SXFunction(controldaeIn(x=states[...]),[rhs[...]])
+cdae = SXFunction(controldaeIn(x=states),[rhs])
 cdae.init()
 
 # Output function
-out = SXFunction(controldaeIn(x=states[...]),[states[...],u])
+out = SXFunction(controldaeIn(x=states),[states,u])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -262,7 +269,7 @@ sim.setInput(states_,CONTROLSIMULATOR_X0)
 sim.evaluate()
 sim.output()
 
-e = sim.output()[-1,states.i_y] - xref_e
+e = sim.output()[-1,states.i["y"]] - xref_e
 assert(max(fabs(e))/max(fabs(xref_e))<1e-6)
 
 tf = sim.getMinorT()
@@ -271,7 +278,7 @@ tf = sim.getMinorT()
 figure(4)
 subplot(211)
 title("Feedforward control, states")
-plot(tf,sim.output(0)[:,list(states.i_y)])
+plot(tf,sim.output(0)[:,list(states.i["y"])])
 for i,c in enumerate(['b','g','r']):
   plot(t1,xref_e[i],c+'o')
 subplot(212)
@@ -433,38 +440,39 @@ for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-
 x0 = vertcat([1,0,0])
 
 # Now simulate with open-loop controls
-states = Collection()
-states.y = y  = ssym("y",ns)    # The regular states of the LTI system
-states.yref   = ssym("yref",ns) # States that constitute a tracking reference for the LTI system
-states.eAt = eAt = ssym("eAt",ns,ns) # The matrix exponential exp(A*(t1-t))
-states.freeze()
+states = struct_ssym([
+           entry("y",shape=ns), # The regular states of the LTI system
+           entry("yref",shape=ns), # States that constitute a tracking reference for the LTI system
+           entry("eAt",shape=(ns,ns)) # The matrix exponential exp(A*(t1-t))
+         ])
+
+y     = states["y"]
+eAt   = states["eAt"]
 
 # Initial conditions
-states_ = states.numbers()
-states_[states.i_y]    = 2*x0
-states_[states.i_yref] = x0
-states_[states.i_eAt]  = eAt_
+states_ = states(0)
+states_["y"]    = 2*x0
+states_["yref"] = x0
+states_["eAt"]  = eAt_
 
-param = Collection()
-param.K = ssym("K",nu,ns)
-param.freeze()
 
-param_ = param.numbers()
+param = struct_ssym([entry("K",shape=(nu,ns))])
+
+param_ = param(0)
 
 uref = mul([B.T,eAt.T,inv(Wt_),xref_e-mul(eAt_,x0)])
-u    = uref - mul(param.K,y-states.yref)
+u    = uref - mul(param["K"],y-states["yref"])
 
-rhs = Collection()
-rhs.y      =  mul(A,y)+mul(B,u)
-rhs.yref   =  mul(A,states.yref)+mul(B,uref)
-rhs.eAt    = -mul(A,eAt)
-rhs.freeze()
+rhs = struct_SX(states)
+rhs["y"]      =  mul(A,y)+mul(B,u)
+rhs["yref"]   =  mul(A,states["yref"])+mul(B,uref)
+rhs["eAt"]    = -mul(A,eAt)
 
-cdae = SXFunction(controldaeIn(x=states[...], p=param[...]),[rhs[...]])
+cdae = SXFunction(controldaeIn(x=states, p=param),[rhs])
 cdae.init()
 
 # Output function
-out = SXFunction(controldaeIn(x=states[...], p=param[...]),[states[...],u,uref,states.yref])
+out = SXFunction(controldaeIn(x=states, p=param),[states,u,uref,states["yref"]])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -479,7 +487,7 @@ jacsim.init()
 figure(7)
   
 for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)]):
-  param_[param.i_K] = K_
+  param_["K"] = K_
 
   sim.setInput(states_,CONTROLSIMULATOR_X0)
   sim.setInput(param_,CONTROLSIMULATOR_P)
@@ -491,8 +499,8 @@ for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)
   subplot(2,2,2*k+1)
   title('states (%s)' % caption)
   for i,c in enumerate(['b','g','r']):
-    plot(tf,sim.output()[:,states.i_yref[i]],c+'--')
-    plot(tf,sim.output()[:,states.i_y[i]],c,linewidth=2)
+    plot(tf,sim.output()[:,states.i["yref",i]],c+'--')
+    plot(tf,sim.output()[:,states.i["y",i]],c,linewidth=2)
   subplot(2,2,2*k+2)
   for i,c in enumerate(['b','g']):
     plot(tf,sim.output(1)[:,i],c,linewidth=2)
@@ -503,7 +511,7 @@ for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)
   jacsim.setInput(states_,CONTROLSIMULATOR_X0)
   jacsim.setInput(param_,CONTROLSIMULATOR_P)
   jacsim.evaluate()
-  M = jacsim.output()[-states.shape[0]:,:][list(states.i_y),list(states.i_y)]
+  M = jacsim.output()[-states.size:,:][list(states.i["y"]),list(states.i["y"])]
   
   # Inspect the eigenvalues of M
   [D,V] = linalg.eig(M)
@@ -529,21 +537,21 @@ u_ = horzcat([controls_,yref_])
 
 x0 = DMatrix([1,0,0])
 
-controls = Collection()
-controls.uref = ssym("uref",nu)
-controls.yref = ssym("yref",ns)
-controls.freeze()
+controls = struct_ssym([
+             entry("uref",shape=nu),
+             entry("yref",shape=ns)
+           ])
 
 yref  = ssym("yref",ns)
 y     = ssym("y",ns)
 dy    = ssym("dy",ns)
-u     = controls.uref-mul(param.K,y-controls.yref)
+u     = controls["uref"]-mul(param["K"],y-controls["yref"])
 rhs   = mul(A,y)+mul(B,u)
 
-cdae = SXFunction(controldaeIn(x=y, u=controls[...], p=param[...]),[rhs])
+cdae = SXFunction(controldaeIn(x=y, u=controls, p=param),[rhs])
 
 # Output function
-out = SXFunction(controldaeIn(x=y, u=controls[...], p=param[...]),[y,u,controls.uref,controls.yref])
+out = SXFunction(controldaeIn(x=y, u=controls, p=param),[y,u,controls["uref"],controls["yref"]])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -592,13 +600,13 @@ print max(abs(D))
 
 y0     = ssym("y0",ns)
 
-u     = controls.uref-mul(param.K,y0-controls.yref)
+u     = controls["uref"]-mul(param["K"],y0-controls["yref"])
 rhs   = mul(A,y)+mul(B,u)
 
-cdae = SXFunction(controldaeIn(x=y, x_major=y0, u=controls[...], p=param[...]),[rhs])
+cdae = SXFunction(controldaeIn(x=y, x_major=y0, u=controls, p=param),[rhs])
 
 # Output function
-out = SXFunction(controldaeIn(x=y, x_major=y0, u=controls[...], p=param[...]),[y,u,controls.uref,controls.yref])
+out = SXFunction(controldaeIn(x=y, x_major=y0, u=controls, p=param),[y,u,controls["uref"],controls["yref"]])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
