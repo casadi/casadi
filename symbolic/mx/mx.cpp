@@ -778,14 +778,14 @@ namespace CasADi{
 
   MX MX::__mul__(const MX& y) const{
     const MX& x = *this;
-    bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-    if((samedim || x.scalar()) && isOne(x)){
+    bool samesp = x.sparsity()==y.sparsity();
+    if((samesp || x.scalar()) && isOne(x)){
       return y;
-    } else if((samedim || x.scalar()) && isMinusOne(x)){
+    } else if((samesp || x.scalar()) && isMinusOne(x)){
       return -y;
-    } else if((samedim || y.scalar()) && isOne(y)){
+    } else if((samesp || y.scalar()) && isOne(y)){
       return x;
-    } else if((samedim || y.scalar()) && isMinusOne(y)){
+    } else if((samesp || y.scalar()) && isMinusOne(y)){
       return -x;
     } else {
       return MX::binary(OP_MUL,x,y);
