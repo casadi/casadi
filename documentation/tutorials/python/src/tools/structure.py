@@ -26,7 +26,7 @@
 
 from casadi.tools import *
 #! The struct tools offer a way to structure your symbols and data
-#! It allows you to make abstraction of ordering and indices
+#! It allows you to make abstraction of ordering and indices.
 #! 
 #! Put simply, the goal is to eleminate code with 'magic numbers' numbers such as:
 #!
@@ -143,20 +143,20 @@ init = shooting(0)
 print init.cat
 
 # We can use the powerIndex in the context of indexed assignent, too:
-init["X",-1,0,"y"] = 12
+init["X",0,-1,"y"] = 12
 
 #! The corresponding numerical value has changed now:
 print init.cat
 
 #! The entry that changed is in fact this one:
-print init.f["X",-1,0,"y"]
-print init.cat[73]
+print init.f["X",0,-1,"y"]
+print init.cat[13]
 
-#! One can lookup the meaning of the 73th entry in the cat version as such:
+#! One can lookup the meaning of the 13th entry in the cat version as such:
 #! Note that the canonicalIndex does not contain negative numbers
-print shooting.getCanonicalIndex(73)
+print shooting.getCanonicalIndex(13)
 
-print shooting.labels()[73]
+print shooting.labels()[13]
 
 #! Other datatypes
 #! ----------------
@@ -196,7 +196,7 @@ print V
 #! The catted version is one single MX from which all entries are derived:
 print V.cat
 print V.shape
-print V["X",-1,0,"y"]
+print V["X",0,-1,"y"]
 
 #! Similar to struct_SX, we have struct_MX:
 V = struct_MX([
