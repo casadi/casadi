@@ -149,14 +149,14 @@ vars_ub   = V()
 vars_init = V()
 
 # Set states and its bounds
-vars_init["X",:,:] = repeat(repeat(x_init))
-vars_lb["X",:,:]   = repeat(repeat(x_min))
-vars_ub["X",:,:]   = repeat(repeat(x_max))
+vars_init["X",:,:] = repeated(repeated(x_init))
+vars_lb["X",:,:]   = repeated(repeated(x_min))
+vars_ub["X",:,:]   = repeated(repeated(x_max))
 
 # Set controls and its bounds
-vars_init["U",:] = repeat(u_init)
-vars_lb["U",:]   = repeat(u_min)
-vars_ub["U",:]   = repeat(u_max)
+vars_init["U",:] = repeated(u_init)
+vars_lb["U",:]   = repeated(u_min)
+vars_ub["U",:]   = repeated(u_max)
 
 # State at initial time
 vars_lb["X",0,0] = xi_min
