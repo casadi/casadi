@@ -32,16 +32,23 @@ tf = 10.0  # End time
 # Declare variables (use scalar graph)
 t  = ssym("t")    # time
 u  = ssym("u")    # control
-x  = ssym("x",3)  # state
+
+states = struct_ssym([
+            entry('x',shape=2),    #  vdp oscillator states
+            entry('L')             #  helper state: Langrange integrand
+         ])
+         
+# Create a structure for the right hand side
+rhs = struct_SX(states)
+x = states['x']
+rhs["x"] = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, x[0]])
+rhs["L"] = x[0]*x[0] + x[1]*x[1] + u*u
 
 # ODE right hand side function
-rhs = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
-               x[0], \
-               x[0]*x[0] + x[1]*x[1] + u*u])
-f = SXFunction([t,x,u],[rhs])
+f = SXFunction([t,states,u],[rhs])
 
 # Objective function (meyer term)
-m = SXFunction([t,x,u],[x[2]])
+m = SXFunction([t,states,u],[states["L"]])
 
 # Control bounds
 u_min = -0.75
@@ -130,16 +137,16 @@ for j in range(d+1):
     C[j,r] = lfcn.fwdSens()
 
 # Structure holding NLP variables
-V = msymStruct([
+V = struct_msym([
       (
-       (nk+1,d+1,"X",nx),
-       (nk,      "U",nu)
+       entry("X",repeat=[nk+1,d+1],struct=states),
+       entry("U",repeat=[nk],shape=nu)
       )
     ])
 
-vars_lb   = V.zeros()
-vars_ub   = V.zeros()
-vars_init = V.zeros()
+vars_lb   = V()
+vars_ub   = V()
+vars_init = V()
 
 # Set states and its bounds
 vars_init["X",:,:] = repeat(repeat(x_init))
@@ -236,12 +243,12 @@ solver.solve()
 print "optimal cost: ", float(solver.output(NLP_COST))
 
 # Retrieve the solution
-opt = V.DMatrix(solver.output(NLP_X_OPT))
+opt = V(solver.output(NLP_X_OPT))
 
 # Get values at the beginning of each finite element
-x0_opt = opt["X",:,0,0]
-x1_opt = opt["X",:,0,1]
-x2_opt = opt["X",:,0,2]
+x0_opt = opt["X",:,0,"x",0]
+x1_opt = opt["X",:,0,"x",1]
+x2_opt = opt["X",:,0,"L"]
 
 u_opt = opt["U",:,0]
 
