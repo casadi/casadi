@@ -417,6 +417,11 @@ class Toolstests(casadiTestCase):
       
   def test_structure(self):
   
+  
+    s = struct(['x','y','z'])
+    
+    print s
+  
     with self.assertRaises(Exception):
       struct_ssym(['x','x','z'])
     with self.assertRaises(Exception): 
@@ -663,6 +668,8 @@ class Toolstests(casadiTestCase):
     ])
     self.assertEqual(V.size,14)
     
+    self.assertTrue(isinstance(V.cat,MX))
+    
     self.assertTrue(isEqual(V["x"],x))
     self.assertTrue(isEqual(V["y",0],y0))
     self.assertTrue(isEqual(V["y",1],y1))
@@ -686,6 +693,8 @@ class Toolstests(casadiTestCase):
              
     shooting = struct_ssym([entry('X',struct=states,repeat=[4,5]),entry('U',repeat=[3])],order=[('X','U')])
 
+
+    
     self.assertEqual(shooting.size,1503)
     s = shooting["X",:,:,{}]
     self.assertTrue(isinstance(s,list))
@@ -785,7 +794,15 @@ class Toolstests(casadiTestCase):
     self.assertEqual(sum(init.cat==7),4*2*4*5)
     
     init['X',0,0,'p',:] = range(9)
+    
+    
+    print index["a"]
 
+    init = shooting(range(shooting.size))
+    for i in range(shooting.size):
+      ci = shooting.getCanonicalIndex(i)
+      self.assertEqual(i, init.__getitem__(ci))
+      self.assertTrue("_".join(map(str,ci)).startswith(shooting.cat.at(i).getName()))
 
 if __name__ == '__main__':
     unittest.main()

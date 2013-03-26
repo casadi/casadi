@@ -1,12 +1,12 @@
 from casadi import *
 
 import operator
-#import pdb
 
 # StructIndex :tuple/list of strings
 # canonicalIndex : tuple/list of string or numbers
 # powerIndex: tuple/list of string, numbers, lists, slices, dicts
 
+# flatIndex
 
 # Primitive helpers
 def lpack(L): return [[x] for x in L]
@@ -44,7 +44,6 @@ def intersperseIt(*args):
 def intersperse(*args):
    return list(intersperseIt(*args))
    
-   
 def canonicalIndexAncestors(ind):
   if len(ind)==0: return []
   isstring = lambda x: isinstance(x,str)
@@ -56,21 +55,32 @@ def canonical(ind,s):
   else:
     return ind
     
+def flatten(e):
+  if any(isinstance(i,list) for i in e):
+    return sum(map(flatten,e),[])
+  else:
+    return e
+    
 # Decoraters
 
 def properGetitem(f):
   """
-    This decorator modifies a __getitem__ method such that it will always receive a tuple
+    This decorator modifies a __getitem__/__setitem__ method such that it will always receive a tuple
   """
-  def proper(self,mbt):
+  def proper(self,mbt,*args):
     if not isinstance(mbt,tuple):
       mbt = (mbt,)
-    return f(self,mbt)
+    return f(self,mbt,*args)
   return proper
   
+# Enhanced standard classes
+class SafeDict(dict):
+  def __getitem__(self,k):
+    if k not in self:
+      raise Exception("Unknown keyword '%s'. Available entries: %s" % (k,str(self.keys())))
+    return dict.__getitem__(self,k)
+  
 # Placeholder classes and instances
-
-
 class Repeater:
   def __init__(self,e): self.e = e
 
@@ -83,8 +93,27 @@ def repeated(e):
     
   """
   return Repeater(e)
-    
+  
+class NestedDictLiteral:
+  """
+    NestedDictLiteral will cause all dictionaries to become explicit recursively
+  """
+  
+nesteddict = NestedDictLiteral()
+
 # Casadi-independant Structure framework
+
+def payloadUnpack(payload,i):
+  if isinstance(i,str):
+    raise Exception("Got string %s where number expected."% i)
+  if isinstance(payload,list):
+    if i>=len(payload):
+      raise Exception("Rhs out of range. Got list index %s but rhs list is only of length %s." % (i,len(payload)))
+    return payload[i]
+  elif isinstance(payload,Repeater):
+    return payload.e
+  else:
+    return payload
 
 class StructEntry:
   def __init__(self,name,struct=None,data=None,dims=[]):
@@ -94,15 +123,15 @@ class StructEntry:
 
   def __str__(self,compact=False):
      s=''
-     if len(self.dims)==1:
-       s+= "repeated(%d): " % self.dims[0]
-     if len(self.dims)>1:
+     if len(self.dims)>=1:
        s+= "repeated(%s): " % str(self.dims)
      if self.isPrimitive():
        s+=self.primitiveString()
      else:
        s+=self.struct.__str__(compact=True)
      return s
+  
+  __repr__ = __str__
      
   def primitiveString(self):
     return "*"
@@ -136,7 +165,7 @@ class StructEntry:
                    payload=payload
                  )
         else:
-          return dispatcher(payload,canonicalIndex)
+          return dispatcher(payload,canonicalIndex,entry=self)
           
       if len(dims)==0:
         if self.isPrimitive(): # Pass on remainder of powerIndex to dispatcher
@@ -162,47 +191,25 @@ class StructEntry:
                    payload=payload
                  )
         elif isinstance(p,list):
-          if isinstance(payload,list):
-            newpayloads = payload
-          elif isinstance(payload,Repeater):
-            newpayloads = [payload.e] * s
-          else:
-            newpayloads = [payload] * s
-          for i in p:
-            if isinstance(p,str):
-              raise Exception("Got string %s where number expected."% p)
-            if i>=s:
-              raise Exception("List index out of range. Got list index entry %s but lhs list is only of length %s." % (str(i),str(s)))
-            if i>=len(newpayloads):
-              raise Exception("List index out of range. Got list index entry %s but rhs list is only of length %s." % (str(i),len(newpayloads)))
           return [
                     self.traverseByPowerIndex(
                       powerIndex[1:],
                       dims=dims[1:],
                       canonicalIndex=canonicalIndex+(canonical(i,s),),
                       dispatcher=dispatcher,
-                      payload = newpayloads[i]
+                      payload = payloadUnpack(payload,i)
                     )
                  for i in p]
         elif isinstance(p,dict):
           raise Exception("powerIndex entry {} cannot be used in list context.")
         elif isinstance(p,NestedDictLiteral):
-          if isinstance(payload,list):
-            newpayloads = payload
-          elif isinstance(payload,Repeater):
-            newpayloads = [payload.e] * s
-          else:
-            newpayloads = [payload] * s
-          if s>len(newpayloads):
-            raise Exception("List index out of range. Got list index entry %s but rhs list is only of length %s." % (str(i),len(newpayloads)))
-         
           return [
                     self.traverseByPowerIndex(
                       [p],
                       dims=dims[1:],
                       canonicalIndex=canonicalIndex+(canonical(i,s),),
                       dispatcher=dispatcher,
-                      payload = newpayloads[i]
+                      payload = payloadUnpack(payload,i)
                     )
                  for i in range(s)]
         elif callable(p):
@@ -214,17 +221,10 @@ class StructEntry:
                 payload=payload
               ))
           return dispatcher.callableOuter(payload,canonicalIndex,extraIndex=None,entry=None,inner=r)
-
         else:
           raise Exception("I don't know what to do with this: %s" % str(p))
     except Exception as e:
       raise Exception("Error occured in entry context with powerIndex %s, at canonicalIndex %s:\n%s" % (str(powerIndex),str(canonicalIndex),str(e)))
-  
-class SafeDict(dict):
-  def __getitem__(self,k):
-    if k not in self:
-      raise Exception("Unknown keyword '%s'. Available entries: %s" % (k,str(self.keys())))
-    return dict.__getitem__(self,k)
   
 class Structure:
   def __init__(self,entries,order=None):
@@ -258,7 +258,7 @@ class Structure:
           s+= "  " + k + " = " +  v.__str__(compact=True) + "\n"
      return s
      
-     
+  __repr__ = __str__
         
   def traverseCanonicalIndex(self,limit=1000):
     ret = []
@@ -297,39 +297,20 @@ class Structure:
           """
              Why ellipsis? Because it's all or nothing
           """
-          if isinstance(payload,list):
-            s = len(self.keys())
-            if isinstance(payload,list):
-              newpayloads = payload
-            elif isinstance(payload,Repeater):
-              newpayloads = [payload.e] * s
-            else:
-              newpayloads = [payload] * s
-            if s>len(newpayloads):
-              raise Exception("Ellipsis index out of range. Got list index entry %s but rhs list is only of length %s." % (str(i),len(newpayloads)))
-            return [
+          return [
                      self.dict[k].traverseByPowerIndex(
                        powerIndex[1:],
                        canonicalIndex=canonicalIndex+(k,),
                        dispatcher=dispatcher,
-                       payload=newpayloads[i]
+                       payload=payloadUnpack(payload,i)
                      ) 
-                   for i,k in enumerate(self.keys())]
-          else:
-            return [
-                     self.dict[k].traverseByPowerIndex(
-                       powerIndex[1:],
-                       canonicalIndex=canonicalIndex+(k,),
-                       dispatcher=dispatcher,
-                       payload=payload
-                     )
-                   for k in self.keys()]
-        elif isinstance(p,dict):
+                  for i,k in enumerate(self.keys())]
+        elif isinstance(p,dict) or isinstance(p,NestedDictLiteral):
           if isinstance(payload,dict):
             return dict([
                     ( k,
                       self.dict[k].traverseByPowerIndex(
-                        powerIndex[1:],
+                        powerIndex[1:] if isinstance(p,dict) else [p],
                         canonicalIndex=canonicalIndex+(k,),
                         dispatcher=dispatcher,
                         payload=v
@@ -340,30 +321,7 @@ class Structure:
             return dict([
                     ( k,
                       v.traverseByPowerIndex(
-                        powerIndex[1:],
-                        canonicalIndex=canonicalIndex+(k,),
-                        dispatcher=dispatcher,
-                        payload=payload
-                      )
-                    ) for k,v in self.dict.iteritems()
-                   ])
-        elif isinstance(p,NestedDictLiteral):
-          if isinstance(payload,dict):
-            return dict([
-                    ( k,
-                      self.dict[k].traverseByPowerIndex(
-                        [p],
-                        canonicalIndex=canonicalIndex+(k,),
-                        dispatcher=dispatcher,
-                        payload=v
-                      )
-                    ) for k,v in payload.iteritems()
-                   ])
-          else:
-            return dict([
-                    ( k,
-                      v.traverseByPowerIndex(
-                        [p],
+                        powerIndex[1:] if isinstance(p,dict) else [p],
                         canonicalIndex=canonicalIndex+(k,),
                         dispatcher=dispatcher,
                         payload=payload
@@ -371,53 +329,41 @@ class Structure:
                     ) for k,v in self.dict.iteritems()
                    ])
         elif isinstance(p,list):
-          if isinstance(payload,list):
-            if len(p)>len(payload):
-              raise Exception("List index out of range. Got list enumeration entry %s but rhs list is only of length %s." % (str(i),len(payload)))
-            return [
+          return [
                      self.traverseByPowerIndex(
                        powerIndex[1:],
                        canonicalIndex=canonicalIndex+(s,),
                        dispatcher=dispatcher,
-                       payload=payload[i]
+                       payload=payloadUnpack(payload,i)
                      ) 
-                   for i,s in enumerate(p)]
-          elif isinstance(payload,Repeater):
-            return [
-                     self.traverseByPowerIndex(
-                       powerIndex[1:],
-                       dims[1:0],
-                       canonicalIndex=canonicalIndex+(s,),
-                       dispatcher=dispatcher,
-                       payload=payload.e
-                     )
-                   for s in p]
-          else:
-            return [
-                     self.traverseByPowerIndex(
-                       powerIndex[1:],
-                       canonicalIndex=canonicalIndex+(s,),
-                       dispatcher=dispatcher,
-                       payload=payload
-                     )
-                   for s in p]
+                 for i,s in enumerate(p)]
         elif callable(p):
-          # Solution: after first occurance of a callable, the remainder is assumed to yield an IMatrix.
-          #   a[i] = b with this matrix directly
-          r = self.traverseByPowerIndex(
+          r = p(self.traverseByPowerIndex(
                 powerIndex[1:],
                 canonicalIndex=canonicalIndex,
-                dispatcher=dispatcher,
+                dispatcher=dispatcher.callableInner(),
                 payload=payload
-              )
-          return p(r)
+              ))
+          return dispatcher.callableOuter(payload,canonicalIndex,extraIndex=None,entry=None,inner=r)
         else:
           raise Exception("I don't know what to do with this: %s" % str(p))
       except Exception as e:
         raise Exception("Error occured in struct context with powerIndex %s, at canonicalIndex %s:\n%s" % (str(powerIndex),str(canonicalIndex),str(e)))
       
 # Casadi-dependant Structure framework
+    
+class Dispatcher:
+  def __init__(self,**args):
+    for k,v in args.items():
+      setattr(self,k,v)
       
+  def callableInner(self):
+    return self
+    
+  def callableOuter(self,payload,canonicalIndex,extraIndex=None,entry=None,inner=None):
+    return inner
+    
+#Mixins
 class CasadiStructureDerivable:
 
   def __call__(self,arg=0):
@@ -432,6 +378,51 @@ class CasadiStructureDerivable:
       a = DMatrix.ones(self.size,1)*a
     return DMatrixStruct(self,data=a)
 
+class GetterDispatcher(Dispatcher):
+  def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
+    if canonicalIndex in self.struct.map:
+      i = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
+      try:
+        return self.master[i]
+      except Exception as e:
+        raise Exception("Error in powerIndex slicing for canonicalIndex %s: %s" % (str(canonicalIndex),str(e)))
+    else:
+      raise Exception("Canonical index %s does not exist." % str(canonicalIndex))
+
+class SetterDispatcher(Dispatcher):
+  def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
+    if canonicalIndex in self.struct.map:
+      i = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
+      try:
+        self.master[i] = payload
+      except NotImplementedError:
+        raise CompatibilityException("Error in powerIndex slicing %s for canonicalIndex %s: Incompatible types in a[i]=b with a %s and b %s in " % (str(powerIndex),str(canonicalIndex),str(self.master),str(payload)))
+      except Exception as e:
+        raise Exception("Error in powerIndex slicing for canonicalIndex %s: %s" % (str(canonicalIndex),str(e)))
+    else:
+      raise Exception("Canonical index %s does not exist." % str(canonicalIndex))
+      
+  def callableInner(self):
+    return CasadiStructure.IMatrixDispatcher(struct=self.struct)
+  
+  def callableOuter(self,payload,canonicalIndex,extraIndex=None,entry=None,inner=None):
+    try:
+      self.master[inner] = payload
+    except NotImplementedError:
+      raise CompatibilityException("Error in powerIndex slicing %s for canonicalIndex %s: Incompatible types in a[i]=b with a %s and b %s in " % (str(powerIndex),str(canonicalIndex),str(self.master),str(payload)))
+    except Exception as e:
+      raise Exception("Error in powerIndex slicing for canonicalIndex %s: %s" % (str(canonicalIndex),str(e)))
+      
+class MasterGettable:
+  @properGetitem
+  def __getitem__(self,powerIndex):
+    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=GetterDispatcher(struct=self.struct,master=self.master))
+
+class MasterSettable:
+  @properGetitem
+  def __setitem__(self,powerIndex,value):
+    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=SetterDispatcher(struct=self.struct,master=self.master),payload=value)
+    
 def delegation(extraIndex,entry,i):
   if isinstance(extraIndex,str) or (isinstance(extraIndex,list) and len(extraIndex)>0 and all([isinstance(e,str) for e in extraIndex])):
     extraIndex = FlatIndexDelegater(extraIndex)
@@ -439,7 +430,7 @@ def delegation(extraIndex,entry,i):
     if entry is None: raise Exception("Cannot use delayed index without supplied entry.")
     if entry.shapestruct is None: raise Exception("Cannot use delayed index without supplied shapestruct.")
     if not(isinstance(entry.shapestruct[i],Structure)) : raise Exception("Cannot use delayed index with a integer shapestruct argument.")
-    return extraIndex.perform(entry.shapestruct[i])
+    return extraIndex(entry.shapestruct[i])
   else:
     return extraIndex
     
@@ -461,27 +452,7 @@ def performExtraIndex(i,extraIndex=None,entry=None):
        raise Exception("Powerindex exhausted. Passing on %s to %s, but it doesn't know what to do with it" % (str(extraIndex),str(type(i))))
   else:
     return i
-      
-def flatten(e):
-  if any([isinstance(i,list) for i in e]):
-    return sum(map(flatten,e),[])
-  else:
-    return e
-    
-    
-class Dispatcher:
-  def __init__(self,**args):
-    for k,v in args.items():
-      setattr(self,k,v)
-      
-  def callableInner(self):
-    return self
-    
-  def callableOuter(self,payload,canonicalIndex,extraIndex=None,entry=None,inner=None):
-    return inner
 
-
-        
 class CasadiStructure(Structure,CasadiStructureDerivable):
   """
     size
@@ -506,6 +477,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     Structure.__init__(self,*args,**kwargs)
     
     self.map = {}
+    self.lookuptable = []
     
     hmap = {}
     k = 0 # Global index counter
@@ -516,6 +488,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
       k += sp.size()
       it = tuple(i)
       self.map[it] = m
+      self.lookuptable+=[(it,kk,p) for kk,p in enumerate(zip(sp.col(),sp.getRow()))]
       for a in canonicalIndexAncestors(it)[1:]:
         if a in hmap:
           hmap[a].append(m)
@@ -527,20 +500,16 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     
     self.map.update(hmap)
     
-    class IMatrixGetter:
-
+    class StructureGetter:
       def __init__(self,struct):
         self.struct = struct
-        
+    
+    class IMatrixGetter(StructureGetter):
       @properGetitem
       def __getitem__(self,powerIndex):           
         return self.struct.traverseByPowerIndex(powerIndex,dispatcher=CasadiStructure.IMatrixDispatcher(struct=self.struct))
 
-    class FlatIndexGetter:
-
-      def __init__(self,struct):
-        self.struct = struct
-        
+    class FlatIndexGetter(StructureGetter):
       @properGetitem
       def __getitem__(self,powerIndex):
         return flatten(self.struct.traverseByPowerIndex(powerIndex,dispatcher=CasadiStructure.FlatIndexDispatcher(struct=self.struct)))
@@ -550,10 +519,33 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     self.struct = self
 
   def __str__(self,compact=False):
-    return "Structure with total size %d.\n" % self.size + Structure.__str__(self,compact=compact)
+    return ("" if compact else "Structure with total size %d.\n" % self.size)+ Structure.__str__(self,compact=compact)
     
+  def getCanonicalIndex(self,i,extraMode=1):
+    """
+      Returns the canonicalIndex of the entry with a given flatIndex
+      extraMode influences wether nothing (0), [i] (1) or [i,j] (2) will be returned as extra index
+    """
+    if i<0 or i>=self.size:
+      raise Exception("Lookup index out of range. Got %d, but structure is of size %d" % (i,self.size)) 
+    can,k,p = self.lookuptable[i]     
+    if extraMode==0:
+      return can
+    elif extraMode==1:
+      return can+(k,)
+    else:
+      return can+p
+      
+  def canonicalIndices(self,extraMode=1):
+    return [self.getCanonicalIndex(i,extraMode=extraMode) for i in range(self.size)]
+      
+  def getLabel(self,i,extraMode=1):
+    t = self.getCanonicalIndex(i)
+    return "["+ ",".join(map(str,t)) + "]"
     
-  
+  def labels(self,extraMode=1):
+    return [self.getLabel(i,extraMode=extraMode) for i in range(self.size)]
+    
 class Structured:
   description = "Generic Structured object"
   def __init__(self,structure):
@@ -587,6 +579,11 @@ class CasadiStructured(Structured,CasadiStructureDerivable):
       self.entries = entrylist.entries
       Structured.__init__(self,CasadiStructure(self.entries, order=entrylist.order))
   
+    self.getCanonicalIndex = self.struct.getCanonicalIndex
+    self.canonicalIndices = self.struct.canonicalIndices
+    self.getLabel = self.struct.getLabel
+    self.labels = self.struct.labels
+      
   @property
   def shape(self):
     return (self.size,1)
@@ -594,64 +591,18 @@ class CasadiStructured(Structured,CasadiStructureDerivable):
   def sparsity(self):
     return sp_dense(self.size,1)
     
+  def getCanonicalIndex(self,*args,**kwargs):
+    return self.struct.lookup(*args,**kwargs)
+
 class CompatibilityException(Exception):
   pass
 
-
-
-class MasterGettable:
-  class GetterDispatcher(Dispatcher):
-    def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
-      if canonicalIndex in self.struct.map:
-        i = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
-        try:
-          return self.master[i]
-        except Exception as e:
-          raise Exception("Error in powerIndex slicing for canonicalIndex %s: %s" % (str(canonicalIndex),str(e)))
-      else:
-        raise Exception("Canonical index %s does not exist." % str(canonicalIndex))
-        
-  @properGetitem
-  def __getitem__(self,powerIndex):
-    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=self.GetterDispatcher(struct=self.struct,master=self.master))
-
-class MasterSettable:
-  class SetterDispatcher(Dispatcher):
-    def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
-      if canonicalIndex in self.struct.map:
-        i = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
-        try:
-          self.master[i] = payload
-        except NotImplementedError:
-          raise CompatibilityException("Error in powerIndex slicing %s for canonicalIndex %s: Incompatible types in a[i]=b with a %s and b %s in " % (str(powerIndex),str(canonicalIndex),str(self.master),str(payload)))
-        except Exception as e:
-          raise Exception("Error in powerIndex slicing for canonicalIndex %s: %s" % (str(canonicalIndex),str(e)))
-      else:
-        raise Exception("Canonical index %s does not exist." % str(canonicalIndex))
-        
-    def callableInner(self):
-      return CasadiStructure.IMatrixDispatcher(struct=self.struct)
-    
-    def callableOuter(self,payload,canonicalIndex,extraIndex=None,entry=None,inner=None):
-      try:
-        self.master[inner] = payload
-      except NotImplementedError:
-        raise CompatibilityException("Error in powerIndex slicing %s for canonicalIndex %s: Incompatible types in a[i]=b with a %s and b %s in " % (str(powerIndex),str(canonicalIndex),str(self.master),str(payload)))
-      except Exception as e:
-        raise Exception("Error in powerIndex slicing for canonicalIndex %s: %s" % (str(canonicalIndex),str(e)))
-        
-  def __setitem__(self,powerIndex,value):
-    if not isinstance(powerIndex,tuple):
-      powerIndex = (powerIndex,)    
-        
-    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=self.SetterDispatcher(struct=self.struct,master=self.master),payload=value)
-    
 class ssymStruct(CasadiStructured,MasterGettable):
   description = "ssym"
   def __init__(self,struct,order=None):
     CasadiStructured.__init__(self,struct,order=order)
     
-    if any(map(lambda x: x.expr is not None,self.entries)):
+    if any(e.expr is not None for e in self.entries):
       raise Exception("struct_ssym does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
       
     s = []
@@ -673,9 +624,9 @@ class msymStruct(CasadiStructured,MasterGettable):
   def __init__(self,struct,order=None):
     CasadiStructured.__init__(self,struct,order=order)
 
-    if any(map(lambda x: x.expr is not None,self.entries)):
+    if any(e.expr is not None for e in self.entries):
       raise Exception("struct_msym does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
-    if any(map(lambda x: x.sym is not None,self.entries)):
+    if any(e.sym is not None for e in self.entries):
       raise Exception("struct_msym does not accept entries with an 'sym' argument.")
 
     self.master = msym("V",self.size,1)
@@ -695,7 +646,7 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
   def __init__(self,struct,mtype,data=None,order=None):
     CasadiStructured.__init__(self,struct,order=None)
     
-    if any(map(lambda x: x.expr is None,self.entries)):
+    if any(e.expr is None for e in self.entries):
       raise Exception("struct_SX does only accept entries with an 'expr' argument.")
 
     self.mtype = mtype
@@ -739,7 +690,7 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
   description = "Partially mutable MX"
   def __init__(self,arg,order=None):
     CasadiStructured.__init__(self,arg,order=order)
-    if any(map(lambda x: x.expr is None,self.entries)):
+    if any(e.expr is None for e in self.entries):
       raise Exception("struct_MX does only accept entries with an 'expr' argument.")
 
     self.storage = []
@@ -777,7 +728,7 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
 
   @property
   def master(self):
-    if any(map(lambda x: x is None,self.storage)):
+    if any(e is None for e in self.storage):
       missing = filter(lambda k: self.storage[self.mapping[k]] is None,self.mapping.keys())
       
       raise Exception("Problem in MX veccat structure cat: missing expressions. The following entries are missing: %s" % str(missing))
@@ -793,12 +744,9 @@ struct_msym = msymStruct
 struct_SX = SXMatrixStruct
 struct_MX_mutable = MXStruct
 struct_MX = MXVeccatStruct
+struct = CasadiStructured
 
 
-class NestedDictLiteral:
-  pass
-  
-nesteddict = NestedDictLiteral()
 
 entry = StructEntry
 
@@ -947,7 +895,7 @@ class EntryList:
     for e in arg:
       if isinstance(e,tuple):
         entries = map(entry,e)
-        self.order.append(tuple(map(lambda x : x.name,entries)))
+        self.order.append(tuple(x.name for x in entries))
         self.entries+=entries
       else:
         ee = entry(e)
@@ -956,7 +904,7 @@ class EntryList:
 
     # Override order
     if order is not None:
-      if any(map(lambda x: isinstance(x,tuple),self.order)):
+      if any(isinstance(e,tuple) for e in self.order):
         raise Exception("You supplied an order by using tuple syntax on entries %s, but you overwrite it with the 'order' keyword. Use one or the other, not both.")
       self.order = order
       
@@ -972,29 +920,32 @@ class EntryList:
 class Delegater:
   def __init__(self,arg):
     self.arg = arg
+
+  def __str__(self):
+    return "%s[%s]" % (self.__class__.__name__,str(self.arg))
     
+  __repr__ = __str__
+
+
 class IndexDelegater(Delegater):
-
-  def __str__(self):
-    return "IndexDelegater[%s]" % str(self.arg)
-    
-  def perform(self,struct):
+  def __call__(self,struct):
     return struct.i.__getitem__(self.arg)
-      
-  __repr__ = __str__
 
- 
 class FlatIndexDelegater(Delegater):
-
-  def __str__(self):
-    return "FlatIndexDelegater[%s]" % str(self.arg)
-    
-  def perform(self,struct):
+  def __call__(self,struct):
     return struct.f.__getitem__(self.arg)
-      
-  __repr__ = __str__
+
     
 class DelegaterConstructor:
+  """
+    Creates an object that delegates a slicing operation.
+    
+    Example usage:
+      s = struct_ssym([])
+      x = struct_ssym(entry("x",sp_diag(4)))
+      x["x",0,index[:]]
+    
+  """
   def __init__(self,delegater,prepend=()):
     self.prepend = prepend
     self.delegater = delegater
