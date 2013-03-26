@@ -437,71 +437,23 @@ namespace CasADi{
   }
 
   MX MX::binary(int op, const MX &x, const MX &y){
-    // Make sure that dimensions match
-    casadi_assert_message((x.scalar() || y.scalar() || (x.size1()==y.size1() && x.size2()==y.size2())),"Dimension mismatch." << "lhs is " << x.dimString() << ", while rhs is " << y.dimString());
-  
-    // Quick return if zero
-    if((operation_checker<F0XChecker>(op) && isZero(x)) || 
-       (operation_checker<FX0Checker>(op) && isZero(y))){
-      return sparse(std::max(x.size1(),y.size1()),std::max(x.size2(),y.size2()));
-    }
-  
-    // Create binary node
-    if(x.scalar())
-      return scalar_matrix(op,x,y);
-    else if(y.scalar())  
-      return matrix_scalar(op,x,y);
-    else
-      return matrix_matrix(op,x,y);
+    return x->getBinary(op,y);
   }
 
   MX MX::unary(int op, const MX &x){
-    // TODO: Should result in a switch to enable simplifications
-    return UnaryMX::create(Operation(op),x);
+    return x->getUnary(Operation(op));
   }
 
   MX MX::scalar_matrix(int op, const MX &x, const MX &y){
-    // Check if the scalar is sparse (i.e. zero)
-    if(x.size()==0){
-      return scalar_matrix(op,0,y);
-    } else {
-      // Check if it is ok to loop over nonzeros only
-      if(y.dense() || operation_checker<FX0Checker>(op)){
-	// Loop over nonzeros
-	return create(new ScalarNonzerosOp(Operation(op),x,y));
-      } else {
-	// Put a densification node in between
-	return scalar_matrix(op,x,densify(y));
-      }
-    }
+    return x->getScalarMatrix(op,y);
   }
 
   MX MX::matrix_scalar(int op, const MX &x, const MX &y){
-    // Check if the scalar is sparse (i.e. zero)
-    if(y.size()==0){
-      return matrix_scalar(op,x,0);
-    } else {
-      // Check if it is ok to loop over nonzeros only
-      if(x.dense() || operation_checker<F0XChecker>(op)){
-	// Loop over nonzeros
-	return create(new NonzerosScalarOp(Operation(op),x,y));
-      } else {
-	// Put a densification node in between
-	return matrix_scalar(op,densify(x),y);
-      }
-    }
+    return x->getMatrixScalar(op,y);
   }
 
   MX MX::matrix_matrix(int op, const MX &x, const MX &y){
-    // Check if we can carry out the operation only on the nonzeros
-    if((x.dense() && y.dense()) ||
-       (operation_checker<F00Checker>(op) && x.sparsity()==y.sparsity())){
-      // Loop over nonzeros only
-      return create(new NonzerosNonzerosOp(Operation(op),x,y)); 
-    } else {
-      // Sparse matrix-matrix operation necessary
-      return create(new SparseSparseOp(Operation(op),x,y)); 
-    }
+    return x->getMatrixMatrix(op,y);
   }
 
   MXNode* MX::operator->(){
@@ -592,7 +544,7 @@ namespace CasADi{
     if((*this)->getOp()==OP_NEG){
       return (*this)->dep(0);
     } else {
-      return UnaryMX::create(OP_NEG,*this);
+      return (*this)->getUnary(OP_NEG);
     }
   }
 
@@ -693,11 +645,11 @@ namespace CasADi{
   }
 
   MX MX::exp() const{ 
-    return UnaryMX::create(OP_EXP,*this);
+    return (*this)->getUnary(OP_EXP);
   }
 
   MX MX::log() const{ 
-    return UnaryMX::create(OP_LOG,*this);
+    return (*this)->getUnary(OP_LOG);
   }
 
   MX MX::log10() const{ 
@@ -705,83 +657,83 @@ namespace CasADi{
   }
 
   MX MX::sqrt() const{ 
-    return UnaryMX::create(OP_SQRT,*this);
+    return (*this)->getUnary(OP_SQRT);
   }
 
   MX MX::sin() const{ 
-    return UnaryMX::create(OP_SIN,*this);
+    return (*this)->getUnary(OP_SIN);
   }
 
   MX MX::cos() const{ 
-    return UnaryMX::create(OP_COS,*this);
+    return (*this)->getUnary(OP_COS);
   }
 
   MX MX::tan() const{ 
-    return UnaryMX::create(OP_TAN,*this);
+    return (*this)->getUnary(OP_TAN);
   }
 
   MX MX::arcsin() const{ 
-    return UnaryMX::create(OP_ASIN,*this);
+    return (*this)->getUnary(OP_ASIN);
   }
 
   MX MX::arccos() const{ 
-    return UnaryMX::create(OP_ACOS,*this);
+    return (*this)->getUnary(OP_ACOS);
   }
 
   MX MX::arctan() const{ 
-    return UnaryMX::create(OP_ATAN,*this);
+    return (*this)->getUnary(OP_ATAN);
   }
 
   MX MX::sinh() const{ 
-    return UnaryMX::create(OP_SINH,*this);
+    return (*this)->getUnary(OP_SINH);
   }
 
   MX MX::cosh() const{ 
-    return UnaryMX::create(OP_COSH,*this);
+    return (*this)->getUnary(OP_COSH);
   }
 
   MX MX::tanh() const{ 
-    return UnaryMX::create(OP_TANH,*this);
+    return (*this)->getUnary(OP_TANH);
   }
 
   MX MX::arcsinh() const{ 
-    return UnaryMX::create(OP_ASINH,*this);
+    return (*this)->getUnary(OP_ASINH);
   }
 
   MX MX::arccosh() const{ 
-    return UnaryMX::create(OP_ACOSH,*this);
+    return (*this)->getUnary(OP_ACOSH);
   }
 
   MX MX::arctanh() const{ 
-    return UnaryMX::create(OP_ATANH,*this);
+    return (*this)->getUnary(OP_ATANH);
   }
 
   MX MX::floor() const{ 
-    return UnaryMX::create(OP_FLOOR,*this);
+    return (*this)->getUnary(OP_FLOOR);
   }
 
   MX MX::ceil() const{ 
-    return UnaryMX::create(OP_CEIL,*this);
+    return (*this)->getUnary(OP_CEIL);
   }
 
   MX MX::fabs() const{ 
-    return UnaryMX::create(OP_FABS,*this);
+    return (*this)->getUnary(OP_FABS);
   }
 
   MX MX::sign() const{ 
-    return UnaryMX::create(OP_SIGN,*this);
+    return (*this)->getUnary(OP_SIGN);
   }
 
   MX MX::erfinv() const{ 
-    return UnaryMX::create(OP_ERFINV,*this);
+    return (*this)->getUnary(OP_ERFINV);
   }
 
   MX MX::erf() const{ 
-    return UnaryMX::create(OP_ERF,*this);
+    return (*this)->getUnary(OP_ERF);
   }
 
   MX MX::logic_not() const{ 
-    return UnaryMX::create(OP_NOT,*this);
+    return (*this)->getUnary(OP_NOT);
   }
 
   void MX::lift(const MX& x_guess){ 
@@ -826,14 +778,14 @@ namespace CasADi{
 
   MX MX::__mul__(const MX& y) const{
     const MX& x = *this;
-    bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-    if((samedim || x.scalar()) && isOne(x)){
+    bool samesp = x.sparsity()==y.sparsity();
+    if((samesp || x.scalar()) && isOne(x)){
       return y;
-    } else if((samedim || x.scalar()) && isMinusOne(x)){
+    } else if((samesp || x.scalar()) && isMinusOne(x)){
       return -y;
-    } else if((samedim || y.scalar()) && isOne(y)){
+    } else if((samesp || y.scalar()) && isOne(y)){
       return x;
-    } else if((samedim || y.scalar()) && isMinusOne(y)){
+    } else if((samesp || y.scalar()) && isMinusOne(y)){
       return -x;
     } else {
       return MX::binary(OP_MUL,x,y);

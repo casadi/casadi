@@ -286,6 +286,21 @@ namespace CasADi{
 
     /// Get densification
     virtual MX getDensification(const CRSSparsity& sp) const;
+    
+    /// Get a unary operation
+    virtual MX getUnary(int op) const;
+
+    /// Get a binary operation operation
+    virtual MX getBinary(int op, const MX& y) const;
+
+    /// Get a binary operation operation (matrix-matrix)
+    virtual MX getMatrixMatrix(int op, const MX& y) const;
+
+    /// Get a binary operation operation (scalar-matrix)
+    virtual MX getScalarMatrix(int op, const MX& y) const;
+
+    /// Get a binary operation operation (matrix-scalar)
+    virtual MX getMatrixScalar(int op, const MX& y) const;
 
     /** Temporary variables to be used in user algorithms like sorting, 
 	the user is resposible of making sure that use is thread-safe

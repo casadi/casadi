@@ -78,6 +78,9 @@ namespace CasADi{
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const = 0;
 
+    /// Matrix multiplcation
+    virtual MX getMultiplication(const MX& y) const;
+
     /// Return truth value of an MX
     virtual bool __nonzero__() const;
   };
@@ -158,47 +161,16 @@ namespace CasADi{
     virtual Constant* clone() const{ return new Constant<Value>(*this);}
 
     /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const{
-      stream << "Const<" << v_.value << ">(";
-      if(sparsity().scalar()){
-	stream << "scalar";
-      } else {
-	stream << size1() << "x" << size2() << ": ";
-	if(sparsity().dense()){
-	  stream << "dense";
-	} else if(sparsity().size()==0){
-	  stream << "empty";	  
-	} else if(sparsity().diagonal()){
-	  stream << "diagonal";
-	} else {
-	  stream << double(size())/sparsity().numel() << " %";
-	}	
-      }
-      stream << ")";
-    }
+    virtual void printPart(std::ostream &stream, int part) const;
     
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-      output[0]->set(double(v_.value));
-      ConstantMX::evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
-    }
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-      output[0]->set(SX(v_.value));
-      ConstantMX::evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
-    }
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-      // Copy the constant to the work vector
-      stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
-      stream << res.at(0) << "[i]=";
-      std::ios_base::fmtflags fmtfl = stream.flags(); // get current format flags
-      stream << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1); // full precision NOTE: hex better?
-      stream << v_.value << ";" << std::endl;
-      stream.flags(fmtfl); // reset current format flags
-    }
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const{ return v_.value==0;}
@@ -214,32 +186,109 @@ namespace CasADi{
 
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const{
-      return v_.value;
+      return Matrix<double>(sparsity(),v_.value);
     }
 
     /// Get densification
-    virtual MX getDensification(const CRSSparsity& sp) const{
-      return MX::create(new Constant<Value>(sp,v_));
-    }
+    virtual MX getDensification(const CRSSparsity& sp) const;
 
     /// Get the nonzeros of matrix
-    virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
-      if(v_.value!=0){
-	// Check if any "holes"
-	for(std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k){
-	  if(*k<0){
-	    // Do not simplify
-	    return MXNode::getGetNonzeros(sp,nz);
-	  }
-	}
-      }
-      return MX::create(new Constant<Value>(sp,v_));
-    }
+    virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
+
+    /// Transpose
+    virtual MX getTranspose() const;
+
+    /// Get a binary operation operation
+    virtual MX getScalarMatrix(int op, const MX& y) const;
 
     /** \brief The actual numerical value */
     Value v_;
   };
 
+  template<typename Value>
+  MX Constant<Value>::getTranspose() const{
+    return MX::create(new Constant<Value>(sparsity().transpose(),v_));    
+  }
+
+  template<typename Value>
+  MX Constant<Value>::getScalarMatrix(int op, const MX& y) const{
+    if(v_.value==0){
+      if(op==OP_ADD) return y;
+      if(op==OP_SUB) return -y;
+    } else if(v_.value==1){
+      if(op==OP_MUL) return y;
+      if(op==OP_DIV) return y->getUnary(OP_INV);	
+    }
+
+    // Fallback
+    return MXNode::getScalarMatrix(op,y);
+  }
+
+  template<typename Value>
+  void Constant<Value>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+    output[0]->set(double(v_.value));
+    ConstantMX::evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  }
+
+  template<typename Value>
+  void Constant<Value>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+    output[0]->set(SX(v_.value));
+    ConstantMX::evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  }
+
+  template<typename Value>
+  void Constant<Value>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    // Copy the constant to the work vector
+    stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
+    stream << res.at(0) << "[i]=";
+    std::ios_base::fmtflags fmtfl = stream.flags(); // get current format flags
+    stream << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1); // full precision NOTE: hex better?
+    stream << v_.value << ";" << std::endl;
+    stream.flags(fmtfl); // reset current format flags
+  }
+  
+  template<typename Value>
+  MX Constant<Value>::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
+    if(v_.value!=0){
+      // Check if any "holes"
+      for(std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k){
+	if(*k<0){
+	  // Do not simplify
+	  return MXNode::getGetNonzeros(sp,nz);
+	}
+      }
+    }
+    return MX::create(new Constant<Value>(sp,v_));
+  }  
+
+  template<typename Value>
+  MX Constant<Value>::getDensification(const CRSSparsity& sp) const{
+    if(isZero()){
+      return MX::create(new Constant<Value>(sp,v_));
+    } else {
+      return MXNode::getDensification(sp);
+    }
+  }
+
+  template<typename Value>
+  void Constant<Value>::printPart(std::ostream &stream, int part) const{
+    stream << "Const<" << v_.value << ">(";
+    if(sparsity().scalar()){
+      stream << "scalar";
+    } else {
+      stream << size1() << "x" << size2() << ": ";
+      if(sparsity().dense()){
+	stream << "dense";
+      } else if(sparsity().size()==0){
+	stream << "empty";	  
+      } else if(sparsity().diagonal()){
+	stream << "diagonal";
+      } else {
+	stream << double(size())/sparsity().numel() << " %";
+      }	
+    }
+    stream << ")";
+  }
 
 } // namespace CasADi
 

@@ -161,12 +161,12 @@ void FXInternal::print(ostream &stream) const{
     if (inputScheme==SCHEME_unknown) {
       stream << " Inputs (" << getNumInputs() << "):" << std::endl;
       for (int i=0;i<getNumInputs();i++) {
-        stream << "  " << i+1 << ". " << input(i).dimString() << std::endl;
+        stream << "  " << i << ". " << input(i).dimString() << std::endl;
       }
     } else {
       stream << " Inputs (" << getSchemeName(inputScheme) << ": " << getNumInputs() << "):" << std::endl;
       for (int i=0;i<getNumInputs();i++) {
-        stream << "  " << i+1  << ". (" << getSchemeEntryEnumName(inputScheme,i) << " aka " << getSchemeEntryName(inputScheme,i) << ")   " << input(i).dimString() << std::endl;
+        stream << "  " << i  << ". (" << getSchemeEntryEnumName(inputScheme,i) << " aka " << getSchemeEntryName(inputScheme,i) << ")   " << input(i).dimString() << std::endl;
       }
     }
   }
@@ -176,12 +176,12 @@ void FXInternal::print(ostream &stream) const{
     if (outputScheme==SCHEME_unknown) {
       stream << " Outputs (" << getNumOutputs() << "):" << std::endl;
       for (int i=0;i<getNumOutputs();i++) {
-        stream << "  " << i+1 << ". " << output(i).dimString() << std::endl;
+        stream << "  " << i << ". " << output(i).dimString() << std::endl;
       }
     } else { 
       stream << " Outputs (" << getSchemeName(outputScheme) << ": " << getNumOutputs() << "):" << std::endl;
       for (int i=0;i<getNumOutputs();i++) {
-        stream << "  " << i+1 << ". (" << getSchemeEntryEnumName(outputScheme,i) << " aka " << getSchemeEntryName(outputScheme,i) << ")   " << output(i).dimString() << std::endl;
+        stream << "  " << i << ". (" << getSchemeEntryEnumName(outputScheme,i) << " aka " << getSchemeEntryName(outputScheme,i) << ")   " << output(i).dimString() << std::endl;
       }
     }
   }

@@ -68,6 +68,11 @@ namespace CasADi{
   CRSSparsity sp_sparse(const std::pair<int,int> &nm);
   
   /**
+     \brief Create the sparsity pattern for a unit vector of length n and a nonzero on position el
+  **/
+  CRSSparsity sp_unit(int n, int el);
+
+  /**
      \brief Create a lower triangular square sparsity pattern
      
      \see lowerSparsity
@@ -86,7 +91,7 @@ namespace CasADi{
      * sp_band(n,-1) has a band below the diagonal \n
      * \param p indicate
      **/
-CRSSparsity sp_band(int n, int p);
+  CRSSparsity sp_band(int n, int p);
   
   /**
      \brief Create banded square sparsity pattern

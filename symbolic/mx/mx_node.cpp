@@ -36,6 +36,9 @@
 #include "setnonzeros.hpp"
 #include "densification.hpp"
 #include "solve.hpp"
+#include "unary_mx.hpp"
+#include "binary_mx.hpp"
+
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -395,6 +398,80 @@ namespace CasADi{
 
   MX MXNode::getSubAssign(const MX& y, const Slice& i, const Slice& j) const{
     return MX::create(new SubAssign(shared_from_this<MX>(),y,i,j));
+  }
+
+  MX MXNode::getUnary(int op) const{
+    if(operation_checker<F0XChecker>(op) && isZero()){
+      // If identically zero
+      return MX::sparse(size1(),size2());
+    } else {
+      // Create a new node
+      return MX::create(new UnaryMX(Operation(op),shared_from_this<MX>()));
+    }
+  }
+
+  MX MXNode::getBinary(int op, const MX& y) const{
+    // Make sure that dimensions match
+    casadi_assert_message((sparsity().scalar() || y.scalar() || (sparsity().size1()==y.size1() && size2()==y.size2())),"Dimension mismatch." << "lhs is " << sparsity().dimString() << ", while rhs is " << y.dimString());
+  
+    // Quick return if zero
+    if((operation_checker<F0XChecker>(op) && isZero()) || 
+       (operation_checker<FX0Checker>(op) && y->isZero())){
+      return MX::sparse(std::max(size1(),y.size1()),std::max(size2(),y.size2()));
+    }
+  
+    // Create binary node
+    if(sparsity().scalar())
+      return getScalarMatrix(op,y);
+    else if(y.scalar())  
+      return getMatrixScalar(op,y);
+    else
+      return getMatrixMatrix(op,y);
+  }
+
+  MX MXNode::getMatrixMatrix(int op, const MX& y) const{
+    // Check if we can carry out the operation only on the nonzeros
+    if((sparsity().dense() && y.dense()) ||
+       (operation_checker<F00Checker>(op) && sparsity()==y.sparsity())){
+      // Loop over nonzeros only
+      return MX::create(new NonzerosNonzerosOp(Operation(op),shared_from_this<MX>(),y)); 
+    } else {
+      // Sparse matrix-matrix operation necessary
+      return MX::create(new SparseSparseOp(Operation(op),shared_from_this<MX>(),y)); 
+    }
+  }
+
+  MX MXNode::getScalarMatrix(int op, const MX& y) const{
+    // If the scalar is sparse, then replace with dense
+    if(size()==0){
+      return MX(0)->getScalarMatrix(op,y);
+    } else {
+      // Check if it is ok to loop over nonzeros only
+      if(y.dense() || operation_checker<FX0Checker>(op)){
+	// Loop over nonzeros
+	return MX::create(new ScalarNonzerosOp(Operation(op),shared_from_this<MX>(),y));
+      } else {
+	// Put a densification node in between
+	return getScalarMatrix(op,densify(y));
+      }
+    }
+  }
+
+
+  MX MXNode::getMatrixScalar(int op, const MX& y) const{
+    // Check if the scalar is sparse, then replace with dense
+    if(y.size()==0){
+      return getMatrixScalar(op,0);
+    } else {
+      // Check if it is ok to loop over nonzeros only
+      if(sparsity().dense() || operation_checker<F0XChecker>(op)){
+	// Loop over nonzeros
+	return MX::create(new NonzerosScalarOp(Operation(op),shared_from_this<MX>(),y));
+      } else {
+	// Put a densification node in between
+	return densify(shared_from_this<MX>())->getMatrixScalar(op,y);
+      }
+    }
   }
 
 } // namespace CasADi
