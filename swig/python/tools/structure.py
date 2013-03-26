@@ -540,7 +540,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     return [self.getCanonicalIndex(i,extraMode=extraMode) for i in range(self.size)]
       
   def getLabel(self,i,extraMode=1):
-    t = self.getCanonicalIndex(i)
+    t = self.getCanonicalIndex(i,extraMode=extraMode)
     return "["+ ",".join(map(str,t)) + "]"
     
   def labels(self,extraMode=1):
