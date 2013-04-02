@@ -138,7 +138,7 @@ if(WITH_OPENCL)
   target_link_libraries(test_opencl ${OPENCL_LIBRARIES})
 endif()
 
-if(WITH_DL AND WITH_IPOPT)
+if(WITH_DL AND IPOPT_FOUND)
   add_executable(nlp_codegen nlp_codegen.cpp)
   target_link_libraries(nlp_codegen casadi_ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
 endif()
