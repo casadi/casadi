@@ -65,6 +65,7 @@ add_definitions(-DCASADIVERSION=${PACKAGE_VERSION})
 if(WITH_DL)
   add_definitions(-DWITH_DL)
 endif()
+add_feature_info(dynamic-loading WITH_DL "Compile with support for dynamic loading of generated functions (needed for ExternalFunction)")
 
 if(WITH_PRINTME)
   add_definitions(-DWITH_PRINTME)
