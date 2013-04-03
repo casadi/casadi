@@ -21,7 +21,6 @@
  */
 
 #include "mx_tools.hpp"
-#include "mapping.hpp"
 #include "vertcat.hpp"
 #include "norm.hpp"
 #include "../fx/mx_function.hpp"
@@ -254,12 +253,11 @@ namespace CasADi{
 	throw CasadiException("Pattern intersection not empty");
       }
     }
-  
+
     // Create mapping
-    MX ret = MX::create(new Mapping(sp));
-    ret->assign(A,range(nzA.size()),nzA);
-    ret->assign(B,range(nzB.size()),nzB);
-    simplify(ret);
+    MX ret = MX::zeros(sp);
+    ret = A->getSetNonzeros(ret,nzA);
+    ret = B->getSetNonzeros(ret,nzB);
     return ret;
   }
 
