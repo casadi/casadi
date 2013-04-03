@@ -183,26 +183,24 @@ namespace CasADi{
     vector<unsigned char> mappingc; // Mapping that will be filled by patternunion
   
     sparsity().patternUnion(sp,mappingc,true, false, true);
-    vector<int> inz;
-    vector<int> onz;
-  
-    int k = 0;     // Flat index into non-zeros of this matrix
-    int j = 0;     // Flat index into non-zeros of the resultant matrix
-    for (int i=0;i<mappingc.size();++i) {
-      if (mappingc[i] & 1) { // If the original matrix has a non-zero entry in the union
-	if (!(mappingc[i] & 4)) {
-	  // If this non-zero entry appears in the intersection, add it to the mapping
-	  inz.push_back(k);
-	  onz.push_back(j);
+    vector<int> nz(sp.size(),-1);
+
+    int k_this = 0;     // Non-zero of this matrix
+    int k_sp = 0;       // Non-zero of resulting matrix
+    for (vector<unsigned char>::const_iterator i=mappingc.begin(); i!=mappingc.end(); ++i){
+      // In this matrix
+      if(*i & 1){
+	if(*i & 4){
+	  k_this++;
+	} else {
+	  nz[k_sp++] = k_this++; // In both this matrix and in resulting matrix 
 	}
-	k++;                 // Increment the original matrix' non-zero index counter
+      } else if(*i &2){
+	k_sp++;
       }
-      if (mappingc[i] & 2) j++;
     }
 
-    MX ret = MX::create(new Mapping(sp));
-    ret->assign(*this,inz,onz);
-
+    MX ret = (*this)->getGetNonzeros(sp,nz);
     return ret;
   }
 
