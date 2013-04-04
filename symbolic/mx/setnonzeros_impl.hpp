@@ -604,7 +604,7 @@ namespace CasADi{
   }
   
   template<bool Add>
-  Matrix<int> SetNonzeros<Add>::mapping(int iind) const {
+  Matrix<int> SetNonzeros<Add>::mapping() const {
     vector<int> nz = getAll();
     return Matrix<int>(this->sparsity(),nz);
   }

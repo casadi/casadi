@@ -417,7 +417,7 @@ namespace CasADi{
     }
   }
   
-  Matrix<int> GetNonzeros::mapping(int iind) const {
+  Matrix<int> GetNonzeros::mapping() const {
     vector<int> nz = getAll();
     return Matrix<int>(sparsity(),nz);
   }

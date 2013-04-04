@@ -44,8 +44,8 @@ namespace CasADi{
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
             
-    /// Construct the IMatrix that maps from the iind'th input to the output 
-    Matrix<int> mapping(int iind=0) const;
+    /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
+    virtual Matrix<int> mapping() const;
     
     /// Get all the nonzeros
     virtual std::vector<int> getAll() const = 0;

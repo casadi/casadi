@@ -242,9 +242,6 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   /// Check if constant
   bool isConstant () const;
   
-  /// Check if mapping
-  bool isMapping () const;
-  
   /// Check if densification
   bool isDensification () const;
   
@@ -441,14 +438,9 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   /// Lift an expression
   void lift(const MX& x_guess);
 
-  /** \brief  Returns the IMatrix that represents the mapping of a Mapping node
-  *
-  */
-  Matrix<int> mapping(int iind=0) const;
-  
-  /// Get mapping from the output non-zero index of the dependency index
-  std::vector<int> getDepInd() const;
-  
+  /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
+  Matrix<int> mapping() const;
+    
   /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
   static void setMaxNumCallsInPrint(long num=10000);
 

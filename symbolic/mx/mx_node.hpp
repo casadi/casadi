@@ -257,6 +257,9 @@ namespace CasADi{
     /// Simplify the expression (ex is a reference to the node)
     virtual void simplifyMe(MX& ex){}
 
+    /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
+    virtual Matrix<int> mapping() const;
+
     /// Transpose
     virtual MX getTranspose() const;
 

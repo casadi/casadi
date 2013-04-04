@@ -97,9 +97,6 @@ namespace CasADi{
     // Nonzero assignment
     OP_SETNONZEROS,
 
-    // Nonzero mapping
-    OP_MAPPING,
-  
     // Densify
     OP_DENSIFY,
   

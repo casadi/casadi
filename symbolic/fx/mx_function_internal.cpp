@@ -22,7 +22,6 @@
 
 #include "mx_function_internal.hpp"
 #include "../mx/evaluation_mx.hpp"
-#include "../mx/mapping.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
 

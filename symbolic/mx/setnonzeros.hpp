@@ -55,8 +55,8 @@ namespace CasADi{
     /** \brief Get the operation */
     virtual int getOp() const{ return Add ? OP_ADDNONZEROS : OP_SETNONZEROS;}
 
-    /// Construct the IMatrix that maps from the iind'th input to the output 
-    Matrix<int> mapping(int iind=0) const;
+    /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
+    virtual Matrix<int> mapping() const;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const{ return 1;}

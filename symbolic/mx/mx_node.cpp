@@ -31,7 +31,6 @@
 #include "multiplication.hpp"
 #include "subref.hpp"
 #include "subassign.hpp"
-#include "mapping.hpp"
 #include "getnonzeros.hpp"
 #include "setnonzeros.hpp"
 #include "densification.hpp"
@@ -474,4 +473,9 @@ namespace CasADi{
     }
   }
 
+  Matrix<int> MXNode::mapping() const{
+    throw CasadiException(string("MXNode::mapping not defined for class ") + typeid(*this).name());
+  }
+
 } // namespace CasADi
+

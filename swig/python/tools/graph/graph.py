@@ -140,71 +140,71 @@ class MXSymbolicArtist(DotArtist):
       label+="</TABLE>>"
       graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
     
-class MXMappingArtist(DotArtist):
-  def draw(self):
-    s = self.s
-    graph = self.graph
-    sp = s.sparsity()
-    row = sp.getRow()
+# class MXMappingArtist(DotArtist):
+#   def draw(self):
+#     s = self.s
+#     graph = self.graph
+#     sp = s.sparsity()
+#     row = sp.getRow()
     
     
-    # Note: due to Mapping restructuring, this is no longer efficient code
-    deps = getDeps(s)
+#     # Note: due to Mapping restructuring, this is no longer efficient code
+#     deps = getDeps(s)
     
-    depind = s.getDepInd()
-    nzmap = sum([s.mapping(i) for i in range(len(deps))])
+#     depind = s.getDepInd()
+#     nzmap = sum([s.mapping(i) for i in range(len(deps))])
     
-    for k,d in enumerate(deps):
-      candidates = map(hash,filter(lambda i: i.isMapping(),self.invdep[d]))
-      candidates.sort()
-      if candidates[0] == hash(s):
-        graph.add_edge(pydot.Edge(str(d.__hash__()),"mapinput" + str(d.__hash__())))
+#     for k,d in enumerate(deps):
+#       candidates = map(hash,filter(lambda i: i.isMapping(),self.invdep[d]))
+#       candidates.sort()
+#       if candidates[0] == hash(s):
+#         graph.add_edge(pydot.Edge(str(d.__hash__()),"mapinput" + str(d.__hash__())))
       
-    graph = pydot.Cluster('clustertest' + str(s.__hash__()), rank='max', label='Mapping')
-    self.graph.add_subgraph(graph)
+#     graph = pydot.Cluster('clustertest' + str(s.__hash__()), rank='max', label='Mapping')
+#     self.graph.add_subgraph(graph)
     
 
     
-    colors = ['#eeeecc','#ccccee','#cceeee','#eeeecc','#eeccee','#cceecc']
+#     colors = ['#eeeecc','#ccccee','#cceeee','#eeeecc','#eeccee','#cceecc']
     
-    for k,d in enumerate(deps):
-      spd = d.sparsity()
-      #ipdb.set_trace()
-      # The Matrix grid is represented by a html table with 'ports'
-      candidates = map(hash,filter(lambda i: i.isMapping(),self.invdep[d]))
-      candidates.sort()
-      if candidates[0] == hash(s):
-        label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="#0000aa">'
-        if not(d.numel()==1 and d.numel()==d.size()): 
-          label+="<TR><TD COLSPAN='%d' BGCOLOR='#dddddd'><font>%s</font></TD></TR>" % (d.size2(), d.dimString())
-        for i in range(d.size1()):
-          label+="<TR>"
-          for j in range(d.size2()):
-            kk = spd.getNZ_const(i,j)
-            if kk==-1:
-              label+="<TD>.</TD>"
-            else:
-              label+="<TD PORT='f%d' BGCOLOR='%s'> <font color='#666666'>%d</font> </TD>" % (kk,colors[k],kk)
-          label+="</TR>"
-        label+="</TABLE>>"
-        graph.add_node(pydot.Node("mapinput" + str(d.__hash__()),label=label,shape='plaintext'))
-      graph.add_edge(pydot.Edge("mapinput" + str(d.__hash__()),str(s.__hash__())))
+#     for k,d in enumerate(deps):
+#       spd = d.sparsity()
+#       #ipdb.set_trace()
+#       # The Matrix grid is represented by a html table with 'ports'
+#       candidates = map(hash,filter(lambda i: i.isMapping(),self.invdep[d]))
+#       candidates.sort()
+#       if candidates[0] == hash(s):
+#         label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="#0000aa">'
+#         if not(d.numel()==1 and d.numel()==d.size()): 
+#           label+="<TR><TD COLSPAN='%d' BGCOLOR='#dddddd'><font>%s</font></TD></TR>" % (d.size2(), d.dimString())
+#         for i in range(d.size1()):
+#           label+="<TR>"
+#           for j in range(d.size2()):
+#             kk = spd.getNZ_const(i,j)
+#             if kk==-1:
+#               label+="<TD>.</TD>"
+#             else:
+#               label+="<TD PORT='f%d' BGCOLOR='%s'> <font color='#666666'>%d</font> </TD>" % (kk,colors[k],kk)
+#           label+="</TR>"
+#         label+="</TABLE>>"
+#         graph.add_node(pydot.Node("mapinput" + str(d.__hash__()),label=label,shape='plaintext'))
+#       graph.add_edge(pydot.Edge("mapinput" + str(d.__hash__()),str(s.__hash__())))
       
-    # The Matrix grid is represented by a html table with 'ports'
-    label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
-    if not(s.numel()==1 and s.numel()==s.size()): 
-      label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
-    for i in range(s.size1()):
-      label+="<TR>"
-      for j in range(s.size2()):
-        k = sp.getNZ_const(i,j)
-        if k==-1:
-          label+="<TD>.</TD>"
-        else:
-          label+="<TD PORT='f%d' BGCOLOR='%s'> <font color='#666666'>%d</font> </TD>" % (k,colors[depind[k]],nzmap[k])
-      label+="</TR>"
-    label+="</TABLE>>"
-    graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
+#     # The Matrix grid is represented by a html table with 'ports'
+#     label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
+#     if not(s.numel()==1 and s.numel()==s.size()): 
+#       label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
+#     for i in range(s.size1()):
+#       label+="<TR>"
+#       for j in range(s.size2()):
+#         k = sp.getNZ_const(i,j)
+#         if k==-1:
+#           label+="<TD>.</TD>"
+#         else:
+#           label+="<TD PORT='f%d' BGCOLOR='%s'> <font color='#666666'>%d</font> </TD>" % (k,colors[depind[k]],nzmap[k])
+#       label+="</TR>"
+#     label+="</TABLE>>"
+#     graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
     
    
 class MXEvaluationArtist(DotArtist):
@@ -439,8 +439,8 @@ def createArtist(node,dep={},invdep={},graph=None,artists={}):
       return MXMultiplicationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
     elif node.isConstant():
       return MXConstantArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
-    elif node.isMapping():
-      return MXMappingArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+    #    elif node.isMapping():
+    #      return MXMappingArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
     elif node.isEvaluation():
       return MXEvaluationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
     elif node.isEvaluationOutput():

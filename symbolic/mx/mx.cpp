@@ -25,7 +25,6 @@
 #include "mx_tools.hpp"
 #include "unary_mx.hpp"
 #include "binary_mx.hpp"
-#include "mapping.hpp"
 #include "../fx/sx_function.hpp"
 #include "evaluation_mx.hpp"
 #include "symbolic_mx.hpp"
@@ -854,7 +853,6 @@ namespace CasADi{
 
   bool 	MX::isSymbolic () const { return !isNull() ? (*this)->getOp()==OP_PARAMETER : false; }
   bool 	MX::isConstant () const { return !isNull() ? (*this)->getOp()==OP_CONST : false; }
-  bool 	MX::isMapping () const { return !isNull() ? (*this)->getOp()==OP_MAPPING : false; }
   bool 	MX::isEvaluation () const { return !isNull() ? (*this)->getOp()==OP_CALL : false; }
   bool 	MX::isEvaluationOutput () const { return !isNull() ? (*this)->isOutputNode() : false; }
 
@@ -901,16 +899,8 @@ namespace CasADi{
     return long(get());
   }
 
-  Matrix<int> MX::mapping(int iind) const {
-    const Mapping * m = dynamic_cast<const Mapping*>(get());
-    casadi_assert_message(m!=0, "mapping: argument MX should point to a Mapping node");
-    return m->mapping(iind);
-  }
-
-  std::vector<int> MX::getDepInd() const {
-    const Mapping * m = dynamic_cast<const Mapping*>(get());
-    casadi_assert_message(m!=0, "mapping: argument MX should point to a Mapping node");
-    return m->getDepInd();
+  Matrix<int> MX::mapping() const {
+    return (*this)->mapping();
   }
 
   int MX::getTemp() const{
