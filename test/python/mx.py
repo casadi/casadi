@@ -736,24 +736,6 @@ class MXtests(casadiTestCase):
     self.message("Check if non-symbolic inputs are caught")
     self.assertRaises(RuntimeError, lambda : SXFunction([MX(0)],[MX("x")]))
 
-  def test_inputmapping(self):
-    a = msym("a",2,1)
-    b = msym("b")
-    f = MXFunction([vertcat([a,b])],[a*b])
-    f.init()
-
-    V = msym("V",3)
-    a = V[:2,:]
-    b = V[2:,:]
-    g = MXFunction([V],[a*b])
-    g.init()
-
-    for k in [f,g]:
-      k.input(0).set([0.7,8.1,1.3])
-
-    self.checkfx(f,g,sens_der=False)
-
-
   def test_unite(self):
     self.message("unite operation")
     import numpy
@@ -1941,25 +1923,7 @@ class MXtests(casadiTestCase):
   def test_ticket(self):
     J = [] + msym("x")
     J = msym("x") + []
-    
-  def test_issue556(self):
-    self.message("Regression test #556")
-    V = msym("V",2)
-
-    a = V[0]
-    b = V[1]
-
-
-    f = MXFunction([a,b],[a*b])
-    f.init()
-    
-    f.input(0).set(4)
-    f.input(1).set(3)
-
-    f.evaluate()
-    
-    self.assertAlmostEqual(f.output(),12)
-    
+        
   def test_jacobian_tools(self):
     self.message("jacobian")
     

@@ -43,83 +43,18 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
   setOption("numeric_jacobian", true);
   setOption("numeric_hessian", true);
   
-  // Check if any inputs is a mapping
-  bool has_mapping_inputs = false;
-  for(vector<MX>::const_iterator it = inputv_.begin(); it!=inputv_.end(); ++it){
-    has_mapping_inputs = has_mapping_inputs || it->isMapping();
-  }
-  
-  // If one or more inputs is a mapping, elimination needed before creating function
-  if(has_mapping_inputs){
-    
-    // Name of replaced variable
-    stringstream rep_name;
-    int ind = 0;
-
-    // Temp vectors
-    std::vector<int> inz, onz;
-    
-    // Find new variables and expressions for all inputs that needs to be eliminated
-    std::vector<MX> v, vdef;
-    for(vector<MX>::iterator it = inputv_.begin(); it!=inputv_.end(); ++it, ++ind){
-      if(it->isMapping()){
-        
-        // Get the mapping node
-        Mapping* n = dynamic_cast<Mapping*>(it->get());
-        
-        // Initialize the mapping, i.e. sort by input and output index
-        n->init();
-        
-        // Create a new variable
-        rep_name.str("");
-        rep_name.clear();
-        rep_name << "r_" << ind;
-        MX new_var = msym(rep_name.str(),n->sparsity());
-        
-        // For all dependencies to be replaced
-        for(int iind=0; iind<n->ndep(); ++iind){
-          
-          // Variable to be replaced
-          MX v_dep = n->dep(iind);
-          casadi_assert_message(v_dep.isSymbolic(),"Mapping inputs may only map to symbolic variables.");
-
-          // Check if variable exists already in the list of to-be-replaced-variables
-          bool exists = false;
-          for (int i=0;i<v.size();++i) {
-            if (v[i].get() == v_dep.get()) {
-              exists = true;
-              break;
-            }
-          }
-          if (!exists) {
-            // Save variable to list of variables to be replaced
-            v.push_back(v_dep);
-            vdef.push_back(MX::create(new Mapping(v_dep.sparsity())));
-          }
-          MX &vdef_dep = vdef.back();
-          
-          // Express this variable in terms of the new variable
-          const vector<pair<int,int> >& assigns = n->index_output_sorted_[0][iind];
-          inz.clear();
-          onz.clear();
-          for(vector<pair<int,int> >::const_iterator it_ass=assigns.begin(); it_ass!=assigns.end(); ++it_ass){
-            inz.push_back(it_ass->second);
-            onz.push_back(it_ass->first);
-          }
-          // TODO: error if onz is already taken
-          vdef_dep->assign(new_var,inz,onz);
-
-
-        }
-        // Replace variable
-        *it = new_var;
+  // Check for inputs that are not are symbolic primitives
+  int ind=0;
+  for(vector<MX>::iterator it = inputv_.begin(); it!=inputv_.end(); ++it, ++ind){
+    if(!it->isSymbolic()){
+      if(it->empty()){
+	stringstream ss;
+	ss << "r" << ind;	
+	*it = msym(ss.str(),it->sparsity());
+      } else {
+	casadi_error("Failed to create an MXFunction instance since not all input arguments are symbolic primitives. Support for non-symbolic inputs has been dropped. We refer users to the approach demonstrated in http://casadi.sourceforge.net/tutorials/tools/structure.pdf");
       }
     }
-    
-    casadi_assert(v.size()==vdef.size());
-
-    // Replace expressions
-    outputv_ = substitute(outputv_,v,vdef);
   }
   
   // Check for duplicate entries among the input expressions
