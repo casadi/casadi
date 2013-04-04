@@ -151,4 +151,47 @@ namespace CasADi{
     casadi_assert(nz_offset == size());
   }
 
+  MX Vertcat::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
+    // Get the first nonnegative nz
+    int nz_test = -1;
+    for(vector<int>::const_iterator i=nz.begin(); i!=nz.end(); ++i){
+      if(*i>=0){
+	nz_test = *i;
+	break;
+      }
+    }
+
+    // Quick return if none
+    if(nz_test<0) return MX::zeros(sp);
+    
+    // Find out to which dependency it might depend
+    int begin=0, end=0;
+    int i;
+    for(i=0; i<ndep(); ++i){
+      begin = end;
+      end += dep(i).size();
+      if(nz_test < end) break;
+    }
+    
+    // Check if any nz refer to a different nonzero
+    for(vector<int>::const_iterator i=nz.begin(); i!=nz.end(); ++i){
+      if(*i>=0 && (*i < begin || *i >= end)){
+	
+	// Fallback to the base class
+	return MXNode::getGetNonzeros(sp,nz);
+      }
+    }
+    
+    // All nz refer to the same dependency, update the nonzero indices
+    if(begin==0){
+      return dep(i)->getGetNonzeros(sp,nz);
+    } else {
+      vector<int> nz_new(nz);
+      for(vector<int>::iterator i=nz_new.begin(); i!=nz_new.end(); ++i){
+	if(*i>=0) *i -= begin;
+      }
+      return dep(i)->getGetNonzeros(sp,nz_new);
+    }
+  }
+
 } // namespace CasADi

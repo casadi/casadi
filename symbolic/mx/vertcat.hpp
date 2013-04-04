@@ -69,6 +69,8 @@ namespace CasADi{
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_VERTCAT;}
 
+    /// Get the nonzeros of matrix
+    virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
   };
 
 } // namespace CasADi
