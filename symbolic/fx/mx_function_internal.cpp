@@ -42,54 +42,18 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
   setOption("numeric_jacobian", true);
   setOption("numeric_hessian", true);
   
-  // Check if any inputs is a vertcat
-  bool has_vertcat_inputs = false;
-  for(vector<MX>::const_iterator it = inputv_.begin(); it!=inputv_.end(); ++it){
-    has_vertcat_inputs = has_vertcat_inputs || it->getOp()==OP_VERTCAT;
-  }
-  
-  // If one or more inputs is a vertcat, elimination needed before creating function
-  if(has_vertcat_inputs){
-    
-    // Name of replaced variable
-    stringstream rep_name;
-    int ind = 0;
-
-    // Temp vectors
-    std::vector<int> inz, onz;
-    
-    // Find new variables and expressions for all inputs that needs to be eliminated
-    std::vector<MX> v, vdef;
-    for(vector<MX>::iterator it = inputv_.begin(); it!=inputv_.end(); ++it, ++ind){
-      if(it->getOp()==OP_VERTCAT){
-
-        // Create a new variable
-        rep_name.str(string());
-        rep_name << "r_" << ind;
-        MX new_var = msym(rep_name.str(),it->sparsity());
-        
-	// Get the subvariables
-	vector<MX> sub = (*it)->dep_;
-	v.insert(v.end(),sub.begin(),sub.end());
-
-	// Get the the definition of the subvariables
-	int row_offset = 0;
-	for(int i=0; i<sub.size(); ++i){
-	  int nrow = sub[i].size1();
-	  vdef.push_back(new_var(Slice(row_offset,row_offset+nrow),Slice()));
-	  row_offset += nrow;
-	}
-	casadi_assert(row_offset == new_var.size1());
-	
-        // Replace variable
-        *it = new_var;
+  // Check for inputs that are not are symbolic primitives
+  int ind=0;
+  for(vector<MX>::iterator it = inputv_.begin(); it!=inputv_.end(); ++it, ++ind){
+    if(!it->isSymbolic()){
+      if(it->empty()){
+	stringstream ss;
+	ss << "r" << ind;	
+	*it = msym(ss.str(),it->sparsity());
+      } else {
+	casadi_error("Failed to create an MXFunction instance since not all input arguments are symbolic primitives. Support for non-symbolic inputs has been dropped. We refer users to the approach demonstrated in http://casadi.sourceforge.net/tutorials/tools/structure.pdf");
       }
     }
-    
-    casadi_assert(v.size()==vdef.size());
-
-    // Replace expressions
-    outputv_ = substitute(outputv_,v,vdef);
   }
   
   // Check for duplicate entries among the input expressions
