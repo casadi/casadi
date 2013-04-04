@@ -33,8 +33,8 @@ namespace CasADi{
 QPSolverInternal::QPSolverInternal() {
   //addOption("trans", OT_BOOLEAN, false);
   
-  inputScheme = SCHEME_QPInput;
-  outputScheme = SCHEME_QPOutput;
+  inputScheme_ = SCHEME_QPInput;
+  outputScheme_ = SCHEME_QPOutput;
 }
 
 // Constructor

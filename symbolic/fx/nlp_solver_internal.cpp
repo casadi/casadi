@@ -51,8 +51,8 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   nx_ = 0;
   ng_ = 0;
   
-  inputScheme = SCHEME_NLPInput;
-  outputScheme = SCHEME_NLPOutput;
+  inputScheme_ = SCHEME_NLPInput;
+  outputScheme_ = SCHEME_NLPOutput;
 
 }
 
@@ -384,7 +384,7 @@ void NLPSolverInternal::init(){
      for (int i=0;i<NLP_NUM_OUT;i++) {
        casadi_assert_message(callback_.input(i).sparsity()==output(i).sparsity(),
          "Callback function should have the output scheme of NLPSolver as input scheme. " << 
-         describeInput(inputScheme,i) << " was found to be " << callback_.input(i).dimString() << " instead of expected " << output(i).dimString() << "."
+         describeInput(inputScheme_,i) << " was found to be " << callback_.input(i).dimString() << " instead of expected " << output(i).dimString() << "."
        );
        callback_.input(i).setAll(0);
      }

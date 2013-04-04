@@ -46,7 +46,7 @@ ControlSimulatorInternal::ControlSimulatorInternal(const FX& control_dae, const 
   addOption("control_interpolation",   OT_STRING,     "none", "none|nearest|linear");
   addOption("control_endpoint",        OT_BOOLEAN,       false, "Include a control value at the end of the simulation domain. Used for interpolation.");
   
-  inputScheme = SCHEME_ControlSimulatorInput;
+  inputScheme_ = SCHEME_ControlSimulatorInput;
 }
   
 ControlSimulatorInternal::~ControlSimulatorInternal(){

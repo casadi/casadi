@@ -21,6 +21,7 @@
  */
 
 %{
+#include "symbolic/fx/io_interface.hpp"
 #include "symbolic/fx/fx.hpp"
 #include "symbolic/fx/sx_function.hpp"
 #include "symbolic/fx/mx_function.hpp"

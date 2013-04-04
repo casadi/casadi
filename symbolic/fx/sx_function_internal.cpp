@@ -888,7 +888,7 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
         arg_new[i].set(arg[i]);
       } catch(exception& ex){
         stringstream ss;
-        ss << "SXFunctionInternal::evalSX: Failed to set " << describeInput(inputScheme,i) << ": " << ex.what();
+        ss << "SXFunctionInternal::evalSX: Failed to set " << describeInput(inputScheme_,i) << ": " << ex.what();
         throw CasadiException(ss.str());
       }
     }
@@ -912,7 +912,7 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
           fseed_new[dir][i].set(fseed[dir][i]);
         } catch(exception& ex){
           stringstream ss;
-          ss << "SXFunctionInternal::evalSX: Failed to set forward seed of " << describeInput(inputScheme,i) << ", direction " << dir << ": " << ex.what();
+          ss << "SXFunctionInternal::evalSX: Failed to set forward seed of " << describeInput(inputScheme_,i) << ", direction " << dir << ": " << ex.what();
           throw CasadiException(ss.str());
         }
       }
@@ -937,7 +937,7 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
           aseed_new[dir][i].set(aseed[dir][i]);
         } catch(exception& ex){
           stringstream ss;
-          ss << "SXFunctionInternal::evalSX: Failed to set adjoint seed of " << describeOutput(outputScheme,i) << ", direction " << dir << ": " << ex.what();
+          ss << "SXFunctionInternal::evalSX: Failed to set adjoint seed of " << describeOutput(outputScheme_,i) << ", direction " << dir << ": " << ex.what();
           throw CasadiException(ss.str());
         }
       }

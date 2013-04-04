@@ -60,8 +60,8 @@ FXInternal::FXInternal(){
   monitor_inputs_ = false;
   monitor_outputs_ = false;
   
-  inputScheme  = SCHEME_unknown;
-  outputScheme = SCHEME_unknown;
+  inputScheme_  = SCHEME_unknown;
+  outputScheme_ = SCHEME_unknown;
 }
 
 
@@ -158,30 +158,30 @@ void FXInternal::print(ostream &stream) const{
   if (getNumInputs()==1) {
     stream << " Input: " << input().dimString() << endl;
   } else{
-    if (inputScheme==SCHEME_unknown) {
+    if (inputScheme_==SCHEME_unknown) {
       stream << " Inputs (" << getNumInputs() << "):" << std::endl;
       for (int i=0;i<getNumInputs();i++) {
         stream << "  " << i << ". " << input(i).dimString() << std::endl;
       }
     } else {
-      stream << " Inputs (" << getSchemeName(inputScheme) << ": " << getNumInputs() << "):" << std::endl;
+      stream << " Inputs (" << getSchemeName(inputScheme_) << ": " << getNumInputs() << "):" << std::endl;
       for (int i=0;i<getNumInputs();i++) {
-        stream << "  " << i  << ". (" << getSchemeEntryEnumName(inputScheme,i) << " aka " << getSchemeEntryName(inputScheme,i) << ")   " << input(i).dimString() << std::endl;
+        stream << "  " << i  << ". (" << getSchemeEntryEnumName(inputScheme_,i) << " aka " << getSchemeEntryName(inputScheme_,i) << ")   " << input(i).dimString() << std::endl;
       }
     }
   }
   if (getNumOutputs()==1) {
     stream << " Output: " << output().dimString() << endl;
   } else {
-    if (outputScheme==SCHEME_unknown) {
+    if (outputScheme_==SCHEME_unknown) {
       stream << " Outputs (" << getNumOutputs() << "):" << std::endl;
       for (int i=0;i<getNumOutputs();i++) {
         stream << "  " << i << ". " << output(i).dimString() << std::endl;
       }
     } else { 
-      stream << " Outputs (" << getSchemeName(outputScheme) << ": " << getNumOutputs() << "):" << std::endl;
+      stream << " Outputs (" << getSchemeName(outputScheme_) << ": " << getNumOutputs() << "):" << std::endl;
       for (int i=0;i<getNumOutputs();i++) {
-        stream << "  " << i << ". (" << getSchemeEntryEnumName(outputScheme,i) << " aka " << getSchemeEntryName(outputScheme,i) << ")   " << output(i).dimString() << std::endl;
+        stream << "  " << i << ". (" << getSchemeEntryEnumName(outputScheme_,i) << " aka " << getSchemeEntryName(outputScheme_,i) << ")   " << output(i).dimString() << std::endl;
       }
     }
   }
@@ -235,7 +235,7 @@ FX FXInternal::getHessian(int iind, int oind){
   FX g = gradient(iind,oind);
   g.setOption("numeric_jacobian",getOption("numeric_hessian"));
   g.setOption("verbose",getOption("verbose"));
-  g.setInputScheme(inputScheme);
+  g.setInputScheme(inputScheme_);
   g.init();
   
   // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
@@ -1304,7 +1304,7 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
   ss << "jacobian_" << getOption("name") << "_" << iind << "_" << oind;
   ret.setOption("name",ss.str());
   ret.setOption("verbose",getOption("verbose"));
-  ret.setInputScheme(inputScheme);
+  ret.setInputScheme(inputScheme_);
   return ret;
 }
 
@@ -1399,11 +1399,11 @@ int FXInternal::getNumScalarOutputs() const{
 }
 
 int FXInternal::inputSchemeEntry(const std::string &name) const {
-  return schemeEntry(inputScheme,name);
+  return schemeEntry(inputScheme_,name);
 }
 
 int FXInternal::outputSchemeEntry(const std::string &name) const {
-  return schemeEntry(outputScheme,name);
+  return schemeEntry(outputScheme_,name);
 }
 
 int FXInternal::schemeEntry(InputOutputScheme scheme, const std::string &name) const {
@@ -1438,7 +1438,7 @@ void FXInternal::call(const MXVector& arg, MXVector& res,  const MXVectorVector&
       if(arg[i].isNull() || arg[i].empty() || input(i).isNull() || input(i).empty()) continue;
       casadi_assert_message(arg[i].size1()==input(i).size1() && arg[i].size2()==input(i).size2(),
                             "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
-                            std::endl << describeInput(inputScheme,i) <<  " has shape (" << input(i).size1() << 
+                            std::endl << describeInput(inputScheme_,i) <<  " has shape (" << input(i).size1() << 
                             "," << input(i).size2() << ") while a shape (" << arg[i].size1() << "," << arg[i].size2() << 
                             ") was supplied.");
     }
@@ -1523,15 +1523,15 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
   }
   
   void FXInternal::setInputScheme(InputOutputScheme scheme) {
-    inputScheme = scheme;
+    inputScheme_ = scheme;
   }
 
   void FXInternal::setOutputScheme(InputOutputScheme scheme) {
-    outputScheme = scheme;
+    outputScheme_ = scheme;
   }
   
-  InputOutputScheme FXInternal::getInputScheme() const { return inputScheme; }
-  InputOutputScheme FXInternal::getOutputScheme() const { return outputScheme; }
+  InputOutputScheme FXInternal::getInputScheme() const { return inputScheme_; }
+  InputOutputScheme FXInternal::getOutputScheme() const { return outputScheme_; }
 
 
   void FXInternal::generateCode(const string& src_name){

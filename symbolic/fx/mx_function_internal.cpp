@@ -669,7 +669,7 @@ FX MXFunctionInternal::getNumericJacobian(int iind, int oind, bool compact, bool
   ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
   
   MXFunction ret(inputv_,ret_out);
-  ret.setInputScheme(inputScheme);
+  ret.setInputScheme(inputScheme_);
   // Return function
   return ret;  
 }

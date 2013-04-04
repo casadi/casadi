@@ -41,7 +41,7 @@ namespace CasADi{
       \date 2010
       A regular user should never work with any Node class. Use FX directly.
   */
-  class FXInternal : public OptionsFunctionalityNode{
+  class FXInternal : public OptionsFunctionalityNode, public IOInterface<FXInternal>{
     friend class FX;
 
   protected:
@@ -432,10 +432,10 @@ namespace CasADi{
     bool monitor_inputs_, monitor_outputs_;
     
     /// The name of the input scheme of this function
-    InputOutputScheme inputScheme;
+    InputOutputScheme inputScheme_;
     
     /// The name of the output scheme of this function
-    InputOutputScheme outputScheme;
+    InputOutputScheme outputScheme_;
     
     /// Errors are thrown when NaN is produced
     bool regularity_check_;

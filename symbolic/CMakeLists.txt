@@ -60,7 +60,9 @@ SET(CASADI_SRCS
   mx/densification.hpp       mx/densification.cpp       # Makes a matrix dense
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
   mx/mx_tools.hpp            mx/mx_tools.cpp
+
   # A dynamically created function with AD capabilities
+  fx/io_interface.hpp                                   # Input/output interface for FX and FXInternal
   fx/fx.hpp                  fx/fx.cpp                  fx/fx_internal.hpp                  fx/fx_internal.cpp
   fx/x_function_internal.hpp                            # Base class for SXFunction and MXFunction
   fx/sx_function.hpp         fx/sx_function.cpp         fx/sx_function_internal.hpp         fx/sx_function_internal.cpp

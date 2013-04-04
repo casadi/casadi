@@ -34,8 +34,8 @@ namespace CasADi{
 
 SDPSolverInternal::SDPSolverInternal() {
   
-  inputScheme = SCHEME_SDPInput;
-  outputScheme = SCHEME_SDPOutput;
+  inputScheme_ = SCHEME_SDPInput;
+  outputScheme_ = SCHEME_SDPOutput;
 }
 
 

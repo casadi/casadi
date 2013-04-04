@@ -50,8 +50,8 @@ IntegratorInternal::IntegratorInternal(const FX& f, const FX& g) : f_(f), g_(g){
   // Negative number of parameters for consistancy checking
   np_ = -1;
   
-  inputScheme = SCHEME_IntegratorInput;
-  outputScheme = SCHEME_IntegratorOutput;
+  inputScheme_ = SCHEME_IntegratorInput;
+  outputScheme_ = SCHEME_IntegratorOutput;
 }
 
 IntegratorInternal::~IntegratorInternal(){ 
