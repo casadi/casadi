@@ -219,6 +219,18 @@ namespace CasADi{
       return const_cast<IOInterface<Derived>*>(this)->outputS<check>(i);
     }
 
+    /** \brief Set input scheme */
+    void setInputScheme(InputOutputScheme scheme){ static_cast<Derived*>(this)->inputScheme() = scheme;}
+
+    /** \brief Set output scheme */
+    void setOutputScheme(InputOutputScheme scheme){ static_cast<Derived*>(this)->outputScheme() = scheme;}
+
+    /** \brief Get input scheme */
+    InputOutputScheme getInputScheme() const{ return static_cast<const Derived*>(this)->inputScheme(); }
+
+    /** \brief Get output scheme */
+    InputOutputScheme getOutputScheme() const{ return static_cast<const Derived*>(this)->outputScheme(); }
+
     /** \brief Find the index for a string describing a particular entry of an input scheme
      * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
      */

@@ -263,14 +263,6 @@ bool FXInternal::monitored(const string& mod) const{
   return monitors_.count(mod)>0;
 }
 
-void FXInternal::setNumInputs(int num_in){
-  input_.resize(num_in);
-}
-
-void FXInternal::setNumOutputs(int num_out){
-  output_.resize(num_out);  
-}
-
 const Dictionary & FXInternal::getStats() const {
   return stats_;
 }
@@ -1398,22 +1390,6 @@ int FXInternal::getNumScalarOutputs() const{
   return ret;
 }
 
-int FXInternal::inputSchemeEntry(const std::string &name) const {
-  return schemeEntry(inputScheme_,name);
-}
-
-int FXInternal::outputSchemeEntry(const std::string &name) const {
-  return schemeEntry(outputScheme_,name);
-}
-
-int FXInternal::schemeEntry(InputOutputScheme scheme, const std::string &name) const {
-  if (scheme==SCHEME_unknown) casadi_error("Unable to look up '" <<  name<< "' in input scheme, as the input scheme of this function is unknown. You can only index with integers.");
-  if (name=="") casadi_error("FXInternal::inputSchemeEntry: you supplied an empty string as the name of a entry in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
-  int n = getSchemeEntryEnum(scheme,name);
-  if (n==-1) casadi_error("FXInternal::inputSchemeEntry: could not find entry '" << name << "' in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
-  return n;
-}
-
 void FXInternal::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, MXVectorVector& fsens, 
                       const MXVectorVector& aseed, MXVectorVector& asens, 
                       bool output_given, bool always_inline, bool never_inline){
@@ -1521,19 +1497,7 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
     f.init();
     return f.jacobian(0,0,false,false);
   }
-  
-  void FXInternal::setInputScheme(InputOutputScheme scheme) {
-    inputScheme_ = scheme;
-  }
-
-  void FXInternal::setOutputScheme(InputOutputScheme scheme) {
-    outputScheme_ = scheme;
-  }
-  
-  InputOutputScheme FXInternal::getInputScheme() const { return inputScheme_; }
-  InputOutputScheme FXInternal::getOutputScheme() const { return outputScheme_; }
-
-
+    
   void FXInternal::generateCode(const string& src_name){
     casadi_error("FXInternal::generateCode: generateCode not defined for class " << typeid(*this).name());
   }

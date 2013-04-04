@@ -150,80 +150,13 @@ namespace CasADi{
 
     /** \brief Generate code for the C functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
-      
-    /** \brief  Access an input */
-    FunctionIO& iStruct(int i){
-      try{
-        return input_.at(i);
-      } catch(std::out_of_range&){
-	std::stringstream ss;
-	ss <<  "In function " << getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
-	if (!isInit()) ss << std::endl << "Did you forget to initialize?";
-	throw CasadiException(ss.str());
-      }
-    }
-
-    /** \brief  Const access an input */
-    inline const FunctionIO& iStruct(int i) const{
-      return const_cast<FXInternal*>(this)->iStruct(i);
-    }
-    
-    /** \brief  Access an output*/
-    FunctionIO& oStruct(int i){
-      try{
-        return output_.at(i);
-      } catch(std::out_of_range&){
-	std::stringstream ss;
-	ss <<  "In function " << getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
-	if (!isInit()) ss << std::endl << "Did you forget to initialize?";
-	throw CasadiException(ss.str());
-      }
-    }
-
-    /** \brief  Const access an output*/
-    inline const FunctionIO& oStruct(int i) const{
-      return const_cast<FXInternal*>(this)->oStruct(i);
-    }
-      
+            
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
     
     /** \brief  Print */
     virtual void repr(std::ostream &stream) const;
-    
-    /** \brief Find the index for a string describing a particular entry of an input scheme
-     * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
-     */
-    int inputSchemeEntry(const std::string &name) const;
-
-    /** \brief Find the index for a string describing a particular entry of an output scheme
-     * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
-     */
-    int outputSchemeEntry(const std::string &name) const;
-
-    /** \brief Find the index for a string describing a particular entry of a scheme
-     * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
-     */
-    int schemeEntry(InputOutputScheme scheme,const std::string &name) const;
-    
-    /** \brief Set input scheme */
-    void setInputScheme(InputOutputScheme scheme);
-
-    /** \brief Set output scheme */
-    void setOutputScheme(InputOutputScheme scheme);
-
-    /** \brief Get input scheme */
-    InputOutputScheme getInputScheme() const;
-
-    /** \brief Get output scheme */
-    InputOutputScheme getOutputScheme() const;
-    
-    /** \brief  Inputs of the function */
-    std::vector<FunctionIO> input_;
-
-    /** \brief  Output of the function */
-    std::vector<FunctionIO> output_;
-
+            
     /** \brief Get the unidirectional or bidirectional partition */
     void getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& D2, bool compact, bool symmetric);
 
@@ -232,121 +165,7 @@ namespace CasADi{
     
     /// Is function fcn being monitored
     bool monitored(const std::string& mod) const;
-    
-    //@{
-    /// Access input argument
-    inline Matrix<double>& input(int iind=0){ return iStruct(iind).data;}
-    inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
-    inline Matrix<double>& inputNoCheck(int iind=0){ return input_[iind].data;}
-    inline const Matrix<double>& input(int iind=0) const{ return iStruct(iind).data;}
-    inline const Matrix<double>& input(const std::string &iname) const{  return input(inputSchemeEntry(iname)); }
-    inline const Matrix<double>& inputNoCheck(int iind=0) const{ return input_[iind].data;}
-    //@{
-    
-    //@{
-    /// Access output argument
-    inline Matrix<double>& output(int oind=0){ return oStruct(oind).data;}
-    inline Matrix<double>& outputNoCheck(int oind=0){ return output_[oind].data;}
-    inline const Matrix<double>& output(int oind=0) const{ return oStruct(oind).data;}
-    inline const Matrix<double>& outputNoCheck(int oind=0) const{ return output_[oind].data;}
-    //@{
-
-    //@{
-    /// Access forward seed
-    Matrix<double>& fwdSeed(int iind=0, int dir=0){
-      try{
-        return iStruct(iind).dataF.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(iStruct(iind).dataF.empty()){
-          ss << "No forward directions ";
-        } else {
-          ss << "Forward direction " << dir << " is out of range [0," << iStruct(iind).dataF.size() << ") ";
-        }
-        ss << "for function " << getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0){ return input_[iind].dataF[dir]; }
-    const Matrix<double>& fwdSeed(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSeed(iind,dir); }
-    const Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSeedNoCheck(iind,dir); }
-    //@}
-
-    //@{
-    /// Access forward sensitivity
-    Matrix<double>& fwdSens(int oind=0, int dir=0){
-      try{
-        return oStruct(oind).dataF.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(oStruct(oind).dataF.empty()){
-          ss << "No forward directions ";
-        } else {
-          ss << "Forward direction " << dir << " is out of range [0," << oStruct(oind).dataF.size() << ") ";
-        }
-        ss << "for function " << getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0){ return output_[oind].dataF[dir]; }
-    const Matrix<double>& fwdSens(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSens(oind,dir);}
-    const Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSensNoCheck(oind,dir);}
-    //@}
-
-    //@{
-    /// Access adjoint seed
-    Matrix<double>& adjSeed(int oind=0, int dir=0){
-      try{
-        return oStruct(oind).dataA.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(oStruct(oind).dataA.empty()){
-          ss << "No adjoint directions ";
-        } else {
-          ss << "Adjoint direction " << dir << " is out of range [0," << oStruct(oind).dataA.size() << ") ";
-        }
-        ss << "for function " << getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0){ return output_[oind].dataA[dir];}
-    const Matrix<double>& adjSeed(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSeed(oind,dir);}
-    const Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSeedNoCheck(oind,dir);}
-    //@}
-
-    //@{
-    /// Access forward sensitivity
-    Matrix<double>& adjSens(int iind=0, int dir=0){
-      try{
-        return iStruct(iind).dataA.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(iStruct(iind).dataA.empty()){
-          ss << "No adjoint directions ";
-        } else {
-          ss << "Adjoint direction " << dir << " is out of range [0," << iStruct(iind).dataA.size() << ") ";
-        }
-        ss << "for function " << getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& adjSensNoCheck(int iind=0, int dir=0){ return input_[iind].dataA[dir];}
-    const Matrix<double>& adjSens(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSens(iind,dir);}
-    const Matrix<double>& adjSensNoCheck(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSensNoCheck(iind,dir);}
-    //@}
-
-    /// Set the number of function inputs
-    void setNumInputs(int num_in);
-
-    /// Set the number of function outputs
-    void setNumOutputs(int num_out);
-
-    /// Get the number of function inputs
-    inline int getNumInputs() const{ return input_.size();}
-
-    /// Get the number of function outputs
-    inline int getNumOutputs() const{ return output_.size();}
-    
+        
     /// Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs)
     int getNumScalarInputs() const;
 
@@ -387,18 +206,40 @@ namespace CasADi{
     static void assignIgnore(MX& y, const MX& x, const std::vector<int>& nz);
     static void assignIgnore(SXMatrix& y, const SXMatrix& x, const std::vector<int>& nz);
 
-    /** \brief  Number of forward and adjoint derivatives */
-    int nfdir_, nadir_;
+    //@{
+    /** \brief Access input/output scheme */
+    inline const InputOutputScheme& inputScheme() const{ return inputScheme_;}
+    inline const InputOutputScheme& outputScheme() const{ return outputScheme_;}
+    inline InputOutputScheme& inputScheme(){ return inputScheme_;}
+    inline InputOutputScheme& outputScheme(){ return outputScheme_;}
+    //@}
 
-    /** \brief  Verbose -- for debugging purposes */
-    bool verbose_;
-    
+    //@{
+    /// Input/output structures of the function */
+    inline const std::vector<FunctionIO>& input_struct() const{ return input_;}
+    inline const std::vector<FunctionIO>& output_struct() const{ return output_;}
+    inline std::vector<FunctionIO>& input_struct(){ return input_;}
+    inline std::vector<FunctionIO>& output_struct(){ return output_;}
+    //@}
+
     /** \brief  Log the status of the solver */
     void log(const std::string& msg) const;
 
     /** \brief  Log the status of the solver, function given */
     void log(const std::string& fcn, const std::string& msg) const;
 
+    /** \brief  Inputs of the function */
+    std::vector<FunctionIO> input_;
+
+    /** \brief  Output of the function */
+    std::vector<FunctionIO> output_;
+
+    /** \brief  Number of forward and adjoint derivatives */
+    int nfdir_, nadir_;
+
+    /** \brief  Verbose -- for debugging purposes */
+    bool verbose_;
+    
     /// Set of module names which are extra monitored
     std::set<std::string> monitors_;
     
