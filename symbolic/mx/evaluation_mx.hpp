@@ -28,15 +28,15 @@
 
 namespace CasADi{
 
-/** 
-  \author Joel Andersson 
-  \date 2010-2011
-*/
-class EvaluationMX : public MultipleOutput{
+  /** 
+      \author Joel Andersson 
+      \date 2010-2013
+  */
+  class EvaluationMX : public MultipleOutput{
   public:
 
     /** \brief  Constructor */
-    explicit EvaluationMX(const FX& fcn, const std::vector<MX> &arg);
+    explicit EvaluationMX(const FX& fcn, std::vector<MX> arg);
 
     /** \brief  Creator function, arranges the outputs */
     static void create(const FX& fcn, 
@@ -90,9 +90,12 @@ class EvaluationMX : public MultipleOutput{
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_CALL;}
     
+    /// Get number of temporary variables needed
+    virtual void nTmp(size_t& ni, size_t& nr);
+
     // Function to be evaluated
     FX fcn_;
-};
+  };
 
 } // namespace CasADi
 

@@ -26,21 +26,22 @@
 #include "mx_node.hpp"
 
 namespace CasADi{
-/** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
-  \author Joel Andersson 
-  \date 2010
+  /** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
+      \author Joel Andersson 
+      \date 2010
   */
-class Multiplication : public MXNode{
+  template<bool TrX, bool TrY>
+  class Multiplication : public MXNode{
   public:
     
     /** \brief  Constructor */
-    Multiplication(const MX& x, const MX& y_trans);
+    Multiplication(const MX& z, const MX& x, const MX& y);
 
     /** \brief  Destructor */
     virtual ~Multiplication(){}
 
     /** \brief  Clone function */
-    virtual Multiplication* clone() const;
+    virtual Multiplication* clone() const{ return new Multiplication(*this);}
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -48,10 +49,14 @@ class Multiplication : public MXNode{
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
-    /** \brief  Evaluate the function numerically */
+    /// Evaluate the function (template)
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+
+    /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
-    /** \brief  Evaluate the function symbolically (SX) */
+    /// Evaluate the function symbolically (SX)
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /** \brief  Evaluate the function symbolically (MX) */
@@ -62,7 +67,37 @@ class Multiplication : public MXNode{
     
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_MATMUL;}
-};
+
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    virtual int numInplace() const{ return 1;}
+    
+    /// Helper class
+    template<bool Tr>
+    static MX tr(const MX& x){ return Tr ? trans(x) : x;}
+  };
+
+
+  /** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
+      \author Joel Andersson 
+      \date 2010
+  */
+  template<bool TrX, bool TrY>
+  class DenseMultiplication : public Multiplication<TrX,TrY>{
+  public:
+    
+    /** \brief  Constructor */
+    DenseMultiplication(const MX& z, const MX& x, const MX& y) : Multiplication<TrX,TrY>(z,x,y){}
+
+    /** \brief  Destructor */
+    virtual ~DenseMultiplication(){}
+
+    /** \brief  Clone function */
+    virtual DenseMultiplication* clone() const{ return new DenseMultiplication(*this);}
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+  };
+
 
 } // namespace CasADi
 

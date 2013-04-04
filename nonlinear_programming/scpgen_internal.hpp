@@ -79,9 +79,9 @@ public:
 
   // Evaluate the step expansion
   void eval_exp();
-
-
-
+  
+  // Timings
+  double t_eval_hes_, t_eval_jac_, t_eval_res_, t_eval_tan_, t_eval_exp_, t_solve_qp_, t_mainloop_;
   
   /// QP solver for the subproblems
   QPSolver qp_solver_;
@@ -91,19 +91,31 @@ public:
 
   /// Memory size of L-BFGS method
   int lbfgs_memory_;
+
   /// Tolerance on primal infeasibility
   double tol_pr_;
+
   /// Tolerance on dual infeasibility
   double tol_du_;
+
   /// Tolerance on regularization
   double tol_reg_;
+
+  /// stopping criterion for the stepsize
+  double tol_pr_step_;
+  
+  /// stopping criterion for the lagrangian gradient
+  double tol_gl_;
 
   /// Linesearch parameters
   //@{
   double c1_;
   double beta_;
   int maxiter_ls_;
+  std::vector<double> merit_mem_;
   int merit_memsize_;
+  double merit_start_;
+  int merit_ind_;
   //@}
 
   /// Enable Code generation
@@ -115,18 +127,12 @@ public:
   /// Regularization
   bool regularize_;
 
-  // Storage for merit function
-  std::deque<double> merit_mem_;
-
   // Options
   double reg_threshold_;
+  
+  /// Print timers
+  bool print_time_;
 
-  /// stopping criterion for the stepsize
-  double toldx_;
-  
-  /// stopping criterion for the lagrangian gradient
-  double tolgl_;
-  
   /// Generate initial guess for lifted variables
   FX vinit_fcn_;
 
@@ -151,30 +157,32 @@ public:
   // Objective value
   double obj_k_;
 
-  // Simple and nonlinear bounds
-  std::vector<double> lbu_, ubu_, g_, lbg_, ubg_, gL_;
+  // Nonlifted variables with bound
+  std::vector<double> x_lb_, x_ub_, x_init_, x_opt_, x_step_, x_lam_, x_dlam_;
+  MX x_;
 
-  /// Multipliers for the nonlinear bounds
-  std::vector<double> lambda_g_, dlambda_g_;
+  // Parameter
+  MX p_;
+
+  // Nonlinear bounds
+  std::vector<double> g_, g_lb_, g_ub_, g_lam_, g_dlam_, gL_;
 
   // Residual function io indices
-  int res_lam_g_;
+  int res_x_, res_p_, res_x_lam_, res_g_lam_, res_p_lam_, res_p_d_;
   int res_obj_, res_gl_, res_g_;
 
   // Modifier function io indices
-  int mod_p_, mod_lam_g_;
+  int mod_x_, mod_p_, mod_x_lam_, mod_g_lam_;
   int mod_obj_, mod_gl_, mod_g_;
   int mod_du_, mod_dlam_g_;
 
   // Tangental function
   int tan_b_obj_, tan_b_g_;
 
-  // step expansion function
-  int exp_osens_, exp_curve_;
-
   struct Var{
     int n;
-    MX v;
+    MX v, v_def, v_lam, v_defL;
+    MX d, d_def, d_lam, d_defL;
 
     // Indices of function inputs and outputs
     int res_var, res_lam, res_d, res_lam_d;
@@ -186,7 +194,8 @@ public:
     std::vector<double> res, resL;
     
   };
-  std::vector<Var> x_;  
+
+  std::vector<Var> v_;
 
   // Penalty parameter of merit function
   double sigma_;
@@ -212,6 +221,9 @@ public:
   // QP
   DMatrix qpH_, qpA_;
   std::vector<double> qpG_, qpB_;
+
+  // Hessian times a step
+  std::vector<double> qpH_times_du_;
 };
 
 } // namespace CasADi

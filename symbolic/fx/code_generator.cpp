@@ -23,6 +23,8 @@
 
 #include "code_generator.hpp"
 #include "fx_internal.hpp"
+#include "../matrix/sparsity_tools.hpp"
+#include <iomanip>
 
 using namespace std;
 namespace CasADi{
@@ -35,7 +37,22 @@ namespace CasADi{
     s << "#define d double" << endl << endl;
     
     s << auxiliaries_.str();
-    s << sparsities_.str();
+
+    // Print integer constants
+    stringstream name;
+    for(int i=0; i<integer_constants_.size(); ++i){
+      name.str(string());
+      name << "s" << i;
+      printVector(s,name.str(),integer_constants_[i]);
+    }
+
+    // Print double constants
+    for(int i=0; i<double_constants_.size(); ++i){
+      name.str(string());
+      name << "c" << i;
+      printVector(s,name.str(),double_constants_[i]);
+    }
+
     s << dependencies_.str();
     s << function_.str();
     s << finalization_.str();
@@ -80,6 +97,15 @@ namespace CasADi{
     s << "};" << endl;
   }
 
+  void CodeGenerator::printVector(std::ostream &s, const std::string& name, const vector<double>& v){
+    s << "d " << name << "[] = {";
+    for(int i=0; i<v.size(); ++i){
+      if(i!=0) s << ",";
+      printConstant(s,v[i]);
+    }
+    s << "};" << endl;
+  }
+
   void CodeGenerator::addInclude(const std::string& new_include, bool relative_path){
     // Register the new element
     bool added = added_includes_.insert(new_include).second;
@@ -105,24 +131,15 @@ namespace CasADi{
 
     // Generate it if it does not exist
     if(added_sparsities_.size() > num_patterns_before){
-    // Add at the end
-    ind = num_patterns_before;
-    
-    // Compact version of the sparsity pattern
-    std::vector<int> sp_compact = sp_compress(sp);
-      
-    // Give it a name
-    stringstream name;
-    name << "s" << ind;
-    
-    // Print to file
-    printVector(sparsities_,name.str(),sp_compact);
-    
-    // Separate with an empty line
-    sparsities_ << endl;
-  }
 
-  return ind;
+      // Compact version of the sparsity pattern
+      std::vector<int> sp_compact = sp_compress(sp);
+
+      // Codegen vector
+      ind = getConstant(sp_compact,true);
+    }
+    
+    return ind;
   }
 
   int CodeGenerator::getSparsity(const CRSSparsity& sp) const{
@@ -130,6 +147,70 @@ namespace CasADi{
     PointerMap::const_iterator it=added_sparsities_.find(h);
     casadi_assert(it!=added_sparsities_.end());
     return it->second;  
+  }
+
+  size_t CodeGenerator::hash(const std::vector<double>& v){
+    // Calculate a hash value for the vector
+    std::size_t seed=0;
+    if(!v.empty()){
+      casadi_assert(sizeof(double) % sizeof(size_t)==0);
+      const int int_len = v.size()*(sizeof(double)/sizeof(size_t));
+      const size_t* int_v = reinterpret_cast<const size_t*>(&v.front());
+      for(size_t i=0; i<int_len; ++i){
+	hash_combine(seed,int_v[i]);
+      }
+    }
+    return seed;
+  }  
+
+  size_t CodeGenerator::hash(const std::vector<int>& v){
+    size_t seed=0;
+    hash_combine(seed,v);
+    return seed;
+  }
+
+  int CodeGenerator::getConstant(const std::vector<double>& v, bool allow_adding){
+    // Hash the vector
+    size_t h = hash(v);
+    
+    // Try to locate it in already added constants
+    pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq = added_double_constants_.equal_range(h);
+    for(multimap<size_t,size_t>::iterator i=eq.first; i!=eq.second; ++i){
+      if(equal(v,double_constants_[i->second])) return i->second;
+    }
+    
+    if(allow_adding){
+      // Add to constants
+      int ind = double_constants_.size();
+      double_constants_.push_back(v);
+      added_double_constants_.insert(pair<size_t,size_t>(h,ind));
+      return ind;
+    } else {
+      casadi_error("Constant not found");
+      return -1;
+    }
+  }
+
+  int CodeGenerator::getConstant(const std::vector<int>& v, bool allow_adding){
+    // Hash the vector
+    size_t h = hash(v);
+    
+    // Try to locate it in already added constants
+    pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq = added_integer_constants_.equal_range(h);
+    for(multimap<size_t,size_t>::iterator i=eq.first; i!=eq.second; ++i){
+      if(equal(v,integer_constants_[i->second])) return i->second;
+    }
+    
+    if(allow_adding){
+      // Add to constants
+      int ind = integer_constants_.size();
+      integer_constants_.push_back(v);
+      added_integer_constants_.insert(pair<size_t,size_t>(h,ind));
+      return ind;
+    } else {
+      casadi_error("Constant not found");
+      return -1;
+    }
   }
 
   int CodeGenerator::getDependency(const FX& f) const{
@@ -160,6 +241,7 @@ namespace CasADi{
     case AUX_MM_NT_SPARSE: auxMmNtSparse(); break;
     case AUX_SIGN: auxSign(); break;
     case AUX_COPY_SPARSE: auxCopySparse(); break;
+    case AUX_TRANS: auxTrans(); break;
     }
   }
 
@@ -397,6 +479,56 @@ namespace CasADi{
     s << "  return sqrt(r);" << endl;
     s << "}" << endl;
     s << endl;
+  }
+
+  void CodeGenerator::auxTrans(){
+    stringstream& s = auxiliaries_;
+    s << "void casadi_trans(const d* x, const int* sp_x, d* y, const int* sp_y, int *tmp){" << endl;
+    s << "  int nrow_x = sp_x[0];" << endl;
+    s << "  int nnz_x = sp_x[2 + nrow_x];" << endl;
+    s << "  const int* col_x = sp_x + 2 + nrow_x+1;" << endl;
+    s << "  int nrow_y = sp_y[0];" << endl;
+    s << "  const int* rowind_y = sp_y+2;" << endl;
+    s << "  int k;" << endl;
+    s << "  for(k=0; k<nrow_y; ++k) tmp[k] = rowind_y[k];" << endl;   
+    s << "  for(k=0; k<nnz_x; ++k){" << endl;
+    s << "    y[tmp[col_x[k]]++] = x[k];" << endl;
+    s << "  }" << endl;
+    s << "}" << endl;
+    s << endl;
+  }
+
+  void CodeGenerator::printConstant(std::ostream& s, double v){
+    int v_int(v);
+    if(v_int==v){
+      // Print integer
+      s << v_int << ".0";
+    } else {
+      // Print real
+      s << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1) << v;
+    }
+  }
+
+  void CodeGenerator::copyVector(std::ostream &s, const std::string& arg, std::size_t n, const std::string& res, const std::string& it, bool only_if_exists) const{
+    // Quick return if nothing to do
+    if(n==0) return;
+
+    // Indent
+    s << "  ";
+
+    // Print condition
+    if(only_if_exists){
+      s << "if(" << res << "!=0) ";
+    }
+
+    if(n==1){
+      // Simplify if scalar assignment
+      s << "*" << res << "=*" << arg << ";" << endl;
+    } else {
+      // For loop
+      s << "for(" << it << "=0; " << it << "<" << n << "; ++" << it << ") " << res << "[" << it << "]=" << arg << "[" << it << "];" << endl;
+    }
+    
   }
 
 } // namespace CasADi

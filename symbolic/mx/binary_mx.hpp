@@ -26,11 +26,11 @@
 #include "mx_node.hpp"
 
 namespace CasADi{
-/** \brief Represents any binary operation that involves two matrices 
-  \author Joel Andersson 
-  \date 2010	
-*/
-class BinaryMX : public MXNode{
+  /** \brief Represents any binary operation that involves two matrices 
+      \author Joel Andersson 
+      \date 2010	
+  */
+  class BinaryMX : public MXNode{
   public:
     /** \brief  Constructor */
     BinaryMX(Operation op, const MX& x, const MX& y);
@@ -50,13 +50,20 @@ class BinaryMX : public MXNode{
     /** \brief  Evaluate the function symbolically (SX) */
     //virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    virtual int numInplace() const{ return 2;}
+
+    /** \brief Generate code for the operation (generic) */
+    void generateOperationGen(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen,
+			      bool el0_scalar, bool el1_scalar) const;
+
     //! \brief Operation
     Operation op_;
     
-};
+  };
 
-/// A sparse matrix-matrix binary operation
-class SparseSparseOp : public BinaryMX{
+  /// A sparse matrix-matrix binary operation
+  class SparseSparseOp : public BinaryMX{
   public:
     
     /** \brief  Constructor */
@@ -82,10 +89,10 @@ class SparseSparseOp : public BinaryMX{
 
     //! \brief Which argument for each nonzero
     std::vector<unsigned char> mapping_;
-};
+  };
 
-/// A matrix-scalar binary operation where one loops only over nonzeros of the matrix
-class NonzerosScalarOp : public BinaryMX{
+  /// A matrix-scalar binary operation where one loops only over nonzeros of the matrix
+  class NonzerosScalarOp : public BinaryMX{
   public:
     
     /** \brief  Constructor */
@@ -112,10 +119,10 @@ class NonzerosScalarOp : public BinaryMX{
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-};
+  };
 
-/// A scalar-matrix binary operation where one loops only over nonzeros of the matrix
-class ScalarNonzerosOp : public BinaryMX{
+  /// A scalar-matrix binary operation where one loops only over nonzeros of the matrix
+  class ScalarNonzerosOp : public BinaryMX{
   public:
     
     /** \brief  Constructor */
@@ -142,10 +149,10 @@ class ScalarNonzerosOp : public BinaryMX{
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-};
+  };
 
-/// A matrix-matrix binary operation with matching nonzeros
-class NonzerosNonzerosOp : public BinaryMX{
+  /// A matrix-matrix binary operation with matching nonzeros
+  class NonzerosNonzerosOp : public BinaryMX{
   public:
     
     /** \brief  Constructor */
@@ -172,8 +179,7 @@ class NonzerosNonzerosOp : public BinaryMX{
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-
-};
+  };
 
 
 

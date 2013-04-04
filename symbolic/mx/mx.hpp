@@ -158,7 +158,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
     void indexed_one_based_assignment(int i, int j, const MX &m){ (*this)(i-1,j-1) = m;}
     void indexed_zero_based_assignment(int i, int j, const MX &m){ (*this)(i,j) = m;}
     void indexed_assignment(const IndexList &i, const IndexList &j, const MX &m){
-      setSub(i.getAll(size1()),j.getAll(size2()),m);
+      setSub(m,i.getAll(size1()),j.getAll(size2()));
     }
     
     void indexed_assignment(const Slice &i, const Slice &j, const MX &m){
@@ -230,17 +230,17 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   /// Get the name.
   std::string getName() const;
   
-  /// Get the constant - only valid when isConstant() is true
-  const Matrix<double> & getConstant() const; 
+  /// Get the value (only for scalar constant nodes)
+  double getValue() const;
+    
+  /// Get the value (only for constant nodes)
+  Matrix<double> getMatrixValue() const;
   
   /// Check if symbolic
   bool isSymbolic () const;
   
   /// Check if constant
   bool isConstant () const;
-  
-  /// Check if mapping
-  bool isMapping () const;
   
   /// Check if densification
   bool isDensification () const;
@@ -301,31 +301,35 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   //@}
 
   //@{
-  /** \brief  Sparse matrix of all zeros */  
+  /** \brief  Sparse matrix of all zeros */
   static MX sparse(int nrow, int ncol=1);
   static MX sparse(const std::pair<int, int> &nm);
   //@}
   
   //@{
   /** \brief  Dense matrix of all zeros */
+  static MX zeros(const CRSSparsity& sp);
   static MX zeros(int nrow, int ncol=1); 
   static MX zeros(const std::pair<int, int> &nm);
   //@}
 
   //@{
   /** \brief  Matrix of all ones */  
+  static MX ones(const CRSSparsity& sp);
   static MX ones(int nrow, int ncol=1); 
   static MX ones(const std::pair<int, int> &nm);
   //@}
 
   //@{
   /** \brief  create a matrix with all inf */
+  static MX inf(const CRSSparsity& sp);
   static MX inf(int nrow=1, int ncol=1);
   static MX inf(const std::pair<int,int>& nm);
   //@}
   
   //@{
   /** \brief  create a matrix with all nan */
+  static MX nan(const CRSSparsity& sp);
   static MX nan(int nrow=1, int ncol=1);
   static MX nan(const std::pair<int,int>& nm);
   //@}
@@ -338,35 +342,34 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
 
   /** \brief  Identity matrix */  
   static MX eye(int nrow);
+  
+  const MX sub(int i, int j) const;
+  const MX sub(int i, const std::vector<int>& j) const;
+  const MX sub(const std::vector<int>& i, int j) const;
+  const MX sub(const std::vector<int>& i, const std::vector<int>& j) const;
+  const MX sub(const Matrix<int>& k, int dummy=0) const;
+  const MX sub(const CRSSparsity& sp, int dummy=0) const;
+  const MX sub(const std::vector<int>& i, const Matrix<int>& j) const;
+  const MX sub(const Matrix<int>& k, const std::vector<int>& j) const;
+  const MX sub(const Slice& i, int j) const {return sub(i.getAll(size1()),j);}
+  const MX sub(int i, const Slice& j) const {return sub(i,j.getAll(size2()));}
+  const MX sub(const Slice& i, const Slice& j) const {return sub(i.getAll(size1()),j.getAll(size2()));}
+  const MX sub(const Slice& i, const Matrix<int>& j) const {return sub(i.getAll(size1()),j);}
+  const MX sub(const Matrix<int>& i, const Slice& j) const {return sub(i,j.getAll(size2()));}
+  const MX sub(const Matrix<int>& i, const Matrix<int>& j) const;
 
-  
-  const MX getSub(int i, int j) const;
-  const MX getSub(int i, const std::vector<int>& j) const;
-  const MX getSub(const std::vector<int>& i, int j) const;
-  const MX getSub(const std::vector<int>& i, const std::vector<int>& j) const;
-  const MX getSub(const Matrix<int>& k, int dummy=0) const;
-  const MX getSub(const CRSSparsity& sp, int dummy=0) const;
-  const MX getSub(const std::vector<int>& i, const Matrix<int>& j) const;
-  const MX getSub(const Matrix<int>& k, const std::vector<int>& j) const;
-  const MX getSub(const Slice& i, int j) const {return getSub(i.getAll(size1()),j);}
-  const MX getSub(int i, const Slice& j) const {return getSub(i,j.getAll(size2()));}
-  const MX getSub(const Slice& i, const Slice& j) const {return getSub(i.getAll(size1()),j.getAll(size2()));}
-  const MX getSub(const Slice& i, const Matrix<int>& j) const {return getSub(i.getAll(size1()),j);}
-  const MX getSub(const Matrix<int>& i, const Slice& j) const {return getSub(i,j.getAll(size2()));}
-  const MX getSub(const Matrix<int>& i, const Matrix<int>& j) const;
-      
-  void setSub(int i, int j, const MX& el);
-  void setSub(int i, const std::vector<int>& j, const MX& el);
-  void setSub(const std::vector<int>& i, int j, const MX& el);
-  void setSub(const std::vector<int>& i, const std::vector<int>& j, const MX& el);
-  void setSub(const Matrix<int>& k, const MX& el);
-  
-  void setSub(const std::vector<int>& i, const Matrix<int>& k, const MX& m);
-  void setSub(const Matrix<int>& k, const std::vector<int>& j, const MX& m);
-  //void setSub(const Slice& i, const Matrix<int>& k, const MX& m) {return setSub(i.getAll(size1()),k,m);}
-  //void setSub(const Matrix<int>& k, const Slice& j, const MX& m) {return setSub(k,j.getAll(size2()),m);}
-  void setSub(const Matrix<int>& i, const Matrix<int>& j, const MX& m);
-  void setSub(const CRSSparsity& sp, int dummy, const MX& m);
+  void setSub(const MX& m, int i, int j);
+  void setSub(const MX& m, int i, const std::vector<int>& j);
+  void setSub(const MX& m, const std::vector<int>& i, int j);
+  void setSub(const MX& m, const std::vector<int>& i, const std::vector<int>& j);
+  void setSub(const MX& m, const Matrix<int>& k);
+  void setSub(const MX& m, const std::vector<int>& i, const Matrix<int>& k);
+  void setSub(const MX& m, const Matrix<int>& k, const std::vector<int>& j);
+  void setSub(const MX& m, const Slice& i, const Slice& j);
+  //void setSub(const MX& m, const Slice& i, const Matrix<int>& k) {return setSub(m,i.getAll(size1()),k);}
+  //void setSub(const MX& m, const Matrix<int>& k, const Slice& j) {return setSub(m,k,j.getAll(size2()));}
+  void setSub(const MX& m, const Matrix<int>& i, const Matrix<int>& j);
+  void setSub(const MX& m, const CRSSparsity& sp, int dummy);
     
   MX getNZ(int k) const;
   MX getNZ(const std::vector<int>& k) const;
@@ -435,14 +438,9 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   /// Lift an expression
   void lift(const MX& x_guess);
 
-  /** \brief  Returns the IMatrix that represents the mapping of a Mapping node
-  *
-  */
-  Matrix<int> mapping(int iind=0) const;
-  
-  /// Get mapping from the output non-zero index of the dependency index
-  std::vector<int> getDepInd() const;
-  
+  /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
+  Matrix<int> mapping() const;
+    
   /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
   static void setMaxNumCallsInPrint(long num=10000);
 

@@ -26,29 +26,37 @@
 #include "mx_node.hpp"
 
 namespace CasADi{
-/** \brief An MX atomic for solving a linear system of equations (backslash in Matlab)
-  \author Joel Andersson 
-  \date 2012
+  /** \brief An MX atomic for linear solver solution: x = r\A => x = r\A'
+      \author Joel Andersson 
+      \date 2013
   */
-class Solve : public MXNode{
+  template<bool Tr>
+  class Solve : public MXNode{
   public:
     
     /** \brief  Constructor */
-    Solve(const MX& A, const MX& b);
+    Solve(const MX& r, const MX& A);
 
     /** \brief  Destructor */
     virtual ~Solve(){}
 
     /** \brief  Clone function */
-    virtual Solve* clone() const;
+    virtual Solve* clone() const{ return new Solve(*this);}
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
-    /** \brief  Evaluate the function numerically */
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+
+    /// Evaluate the function (template)
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
+
+    /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
 
-    /** \brief  Evaluate the function symbolically (SX) */
+    /// Evaluate the function symbolically (SX)
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
 
     /** \brief  Evaluate the function symbolically (MX) */
@@ -59,9 +67,13 @@ class Solve : public MXNode{
     
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_SOLVE;}
-};
+
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    virtual int numInplace() const{ return 1;}
+  };
+
 
 } // namespace CasADi
 
 
-#endif // SOLVE_HPP
+#endif // MULTIPLICATION_HPP

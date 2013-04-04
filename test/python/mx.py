@@ -25,6 +25,7 @@ from numpy import *
 import unittest
 from types import *
 from helpers import *
+from copy import deepcopy
 
 scipy_available = True
 try:
@@ -981,89 +982,6 @@ class MXtests(casadiTestCase):
     self.checkarray(f.output(),e,"erase")
     self.message(":sparse")
 
-  def test_mapping(self):
-     self.message("Check mapping")
-     x=MX("X",3,4)
-     import numpy
-     numpy.random.seed(42)
-     xn = numpy.random.random((3,4))
-     r = numpy.zeros((7,8))
-     y=MX("Y",7,8)
-     y[1:4,[2,4,6,7]]=x
-     r[1:4,[2,4,6,7]]=xn
-     fy = MXFunction([x],[y])
-     fy.init()
-     fy.input().set(xn)
-     fy.evaluate()
-     
-     z = mul(y.T,y)
-     zr = numpy.dot(r.T,r)
-     
-     f = MXFunction([x],[z])
-     f.init()
-     f.input().set(xn)
-     f.evaluate()
-     self.checkarray(f.output(),zr,"mul(mapping.T,mapping)")
-     
-     x=MX("X",3,1)
-     numpy.random.seed(42)
-     xn = numpy.random.random((3,1))
-     r = numpy.zeros((7,1))
-     y=MX("Y",7,1)
-     y[1:4,0]=x
-     r[1:4,[0]]=xn
-     fy = MXFunction([x],[y])
-     fy.init()
-     fy.input().set(xn)
-     fy.evaluate()
-     
-     z = mul(y.T,y)
-     zr = numpy.dot(r.T,r)
-     
-     f = MXFunction([x],[z])
-     f.init()
-     f.input().set(xn)
-     f.evaluate()
-     self.checkarray(f.output(),zr,"mul(mapping.T,mapping)")
-     f.jacobian()
-     for mode in ["forward","reverse"]:
-       J.setOption("ad_mode",mode)
-       J.init()
-       J.input().set(xn)
-       J.evaluate()
-       self.checkarray(J.output(),matrix(xn).T*2,"jacobian(mul(mapping.T,mapping))")
-     
-     x=MX("X",3,1)
-     numpy.random.seed(42)
-     xn = numpy.random.random((3,1))
-     r = numpy.zeros((7,1))
-     y=MX("Y",7,1)
-     y[1:4,0]=x
-     r[1:4,[0]]=xn
-     fy = MXFunction([x],[y])
-     fy.init()
-     fy.input().set(xn)
-     fy.evaluate()
-     
-     z = mul(y,y.T)
-     zr = numpy.dot(r,r.T)
-     
-     f = MXFunction([x],[z[1:4,1]])
-     f.init()
-     f.input().set(xn)
-     f.evaluate()
-     
-     J=f.jacobian()
-     J_ = array([[xn[0,0]*2,0,0],[xn[1,0],xn[0,0],0],[xn[2,0],0,xn[0,0]]])
-     for mode in ["forward","reverse"]:
-       self.message(":" + mode)
-       #f.setOption("ad_mode",mode)
-       J.init()
-       J.input().set(xn)
-       J.evaluate()
-       print J.output().toArray()
-       self.checkarray(J.output(),J_,"jacobian(mul(mapping.T,mapping))")
-      
   def test_MXalgebraDense(self):
     self.message("Test some dense algebraic properties of matrices")
     # issue 96
@@ -1553,13 +1471,7 @@ class MXtests(casadiTestCase):
     f.evaluate(0,0) # this should not throw a segfault
     self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
-    
-  def test_mapping(self):
-    self.message("mapping")
-    V = msym("x",5,5)
-    
-    self.checkarray(V[:,1].mapping(),DMatrix([1,6,11,16,21]),"mapping")
-    
+        
   # 2-norms currently not supported
   #def test_Norm2(self):
     #self.message("Norm_2")
@@ -1942,4 +1854,3 @@ class MXtests(casadiTestCase):
     
 if __name__ == '__main__':
     unittest.main()
-

@@ -201,7 +201,7 @@ namespace CasADi{
     * Does bounds checking
     * ii and jj are not required to be monotonous
     */
-    CRSSparsity getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+    CRSSparsity sub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
 
     /// Get the index of an existing non-zero element
     int getNZ(int i, int j) const;
@@ -261,9 +261,9 @@ namespace CasADi{
     void spyMatlab(const std::string& mfile) const;
  private: 
     /// Time complexity: O(ii.size()*jj.size())
-    CRSSparsity getSub1(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+    CRSSparsity sub1(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
     /// Time complexity: O(ii.size()*(nnz per row))
-    CRSSparsity getSub2(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+    CRSSparsity sub2(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
 };
 
 } // namespace CasADi

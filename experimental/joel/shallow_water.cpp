@@ -36,7 +36,7 @@ using namespace std;
 class Tester{
 public:
   // Constructor
-  Tester(int n_boxes, int n_euler, int n_finite_elements, int n_meas) : n_boxes_(n_boxes), n_euler_(n_euler), n_finite_elements_(n_finite_elements), n_meas_(n_meas){}
+  Tester(int n, int n_euler, int n_finite_elements, int n_meas) : n_(n), n_euler_(n_euler), n_finite_elements_(n_finite_elements), n_meas_(n_meas){}
 
   // Perform the modelling
   void model();
@@ -51,7 +51,7 @@ public:
   void optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est);
 
   // Dimensions
-  int n_boxes_;
+  int n_;
   int n_euler_;
   int n_finite_elements_;
   int n_meas_;
@@ -88,21 +88,21 @@ void Tester::model(){
   // Discretization
   int ntimesteps = n_euler_*n_meas_;
   double dt = endtime/ntimesteps;
-  double dx = poolwidth/n_boxes_;
-  double dy = poolwidth/n_boxes_;
-  vector<double> x(n_boxes_), y(n_boxes_);
-  for(int i=0; i<n_boxes_; ++i){
+  double dx = poolwidth/n_;
+  double dy = poolwidth/n_;
+  vector<double> x(n_), y(n_);
+  for(int i=0; i<n_; ++i){
     x[i] = (i+0.5)*dx;
     y[i] = (i+0.5)*dy;
   }
 
   // Initial conditions
-  u0_ = DMatrix::zeros(n_boxes_+1,n_boxes_  );
-  v0_ = DMatrix::zeros(n_boxes_  ,n_boxes_+1);
-  h0_ = DMatrix::zeros(n_boxes_  ,n_boxes_  );
+  u0_ = DMatrix::zeros(n_+1,n_  );
+  v0_ = DMatrix::zeros(n_  ,n_+1);
+  h0_ = DMatrix::zeros(n_  ,n_  );
   bool any_point_in_domain = false;
-  for(int i=0; i<n_boxes_; ++i){
-    for(int j=0; j<n_boxes_; ++j){
+  for(int i=0; i<n_; ++i){
+    for(int j=0; j<n_; ++j){
       double spdist = sqrt(pow((x[i]-0.04),2.) + pow((y[j]-0.04),2.));
       if(spdist<sprad/3.0){
 	h0_.elem(i,j) = spheight_ * cos(3.0*M_PI*spdist/(2.0*sprad));
@@ -113,15 +113,15 @@ void Tester::model(){
 
   // Make sure that there is at least one point with nonzero initial values
   if(!any_point_in_domain){
-    int i_splash = std::min(int(0.04/dx),n_boxes_-1);
-    int j_splash = std::min(int(0.04/dy),n_boxes_-1);
+    int i_splash = std::min(int(0.04/dx),n_-1);
+    int j_splash = std::min(int(0.04/dy),n_-1);
     h0_.elem(i_splash,j_splash) = spheight_;
   }
   
   // Free parameters (nominal values)
-  SX drag_nom("b");
-  SX depth_nom("H");
-  vector<SX> p(2); p[0]=drag_nom; p[1]=depth_nom;
+  MX p = msym("p",2);
+  MX drag_nom = p[0];
+  MX depth_nom = p[1];
   
   // Scaling factors for the parameters
   double drag_scale = 1;
@@ -131,67 +131,65 @@ void Tester::model(){
   p_scale_[1] = depth_scale;
 
   // Real parameter values
-  SX drag = drag_nom*drag_scale;
-  SX depth = depth_nom*depth_scale;
+  MX drag = drag_nom*drag_scale;
+  MX depth = depth_nom*depth_scale;
 
   // The state at a measurement
-  SXMatrix uk = ssym("uk",n_boxes_+1, n_boxes_);
-  SXMatrix vk = ssym("vk",n_boxes_  , n_boxes_+1);
-  SXMatrix hk = ssym("hk",n_boxes_  , n_boxes_);
+  MX uk = msym("uk",n_+1, n_);
+  MX vk = msym("vk",n_  , n_+1);
+  MX hk = msym("hk",n_  , n_);
   
   // Take one step of the integrator
-  SXMatrix u = uk;
-  SXMatrix v = vk;
-  SXMatrix h = hk;
-  
-  // Temporaries
-  SX d1 = -dt*g/dx;
-  SX d2 = dt*drag;
+  MX u = uk;
+  MX v = vk;
+  MX h = hk;
   
   // Update u
-  for(int i=0; i<n_boxes_-1; ++i){
-    for(int j=0; j<n_boxes_; ++j){
-      u.elem(1+i,j) += d1*(h.elem(1+i,j)-h.elem(i,j))- d2*u.elem(1+i,j);
-    }
-  }
+  MX d1 = -dt*g/dx;
+  MX d2 = dt*drag;
+  u(Slice(1,n_),Slice()) += d1*(h(Slice(1,n_),Slice())-h(Slice(0,n_-1),Slice())) - d2*u(Slice(1,n_),Slice());
   
   // Update v
   d1 = -dt*g/dy;
-  for(int i=0; i<n_boxes_; ++i){
-    for(int j=0; j<n_boxes_-1; ++j){
-      v.elem(i,j+1) += d1*(h.elem(i,j+1)-h.elem(i,j))- d2*v.elem(i,j+1);
-    }
-  }
+  v(Slice(),Slice(1,n_)) += d1*(h(Slice(),Slice(1,n_))-h(Slice(),Slice(0,n_-1))) - d2*v(Slice(),Slice(1,n_));
   
   // Update h
   d1 = (-depth*dt)*(1.0/dx);
   d2 = (-depth*dt)*(1.0/dy);
-  for(int i=0; i<n_boxes_; ++i){
-    for(int j=0; j<n_boxes_; ++j){
-      h.elem(i,j) += d1*(u.elem(1+i,j)-u.elem(i,j)) + d2*(v.elem(i,j+1)-v.elem(i,j));
-    }
-  }
+  h += d1*(u(Slice(1,n_+1),Slice())-u(Slice(0,n_),Slice())) + d2*(v(Slice(),Slice(1,n_+1))-v(Slice(),Slice(0,n_)));
   
   // Create an integrator function
-  vector<SXMatrix> f_step_in(4);
+  vector<MX> f_step_in(4);
   f_step_in[0] = p;
   f_step_in[1] = uk;
   f_step_in[2] = vk;
   f_step_in[3] = hk;
-  vector<SXMatrix> f_step_out(3);
+  vector<MX> f_step_out(3);
   f_step_out[0] = u;
   f_step_out[1] = v;
   f_step_out[2] = h;
-  SXFunction f_step(f_step_in,f_step_out);
-  f_step.init();
-  cout << "generated single step dynamics (" << f_step.getAlgorithmSize() << " nodes)" << endl;
+  MXFunction f_step_mx(f_step_in,f_step_out);
+  f_step_mx.init();
+  cout << "generated single step dynamics (" << f_step_mx.getAlgorithmSize() << " nodes)" << endl;
   
+  f_step_mx.generateCode("f_step.c");
+
+
+  // Expand the discrete dynamics?
+  FX f_step = f_step_mx;
+  if(true){
+    SXFunction f_step_sx(f_step_mx);
+    f_step_sx.init();
+    cout << "generated single step dynamics, SX (" << f_step_sx.getAlgorithmSize() << " nodes)" << endl;
+    f_step = f_step_sx;
+  }
+
   // Integrate over one subinterval
   vector<MX> f_in(4);
   MX P = msym("P",2);
-  MX Uk = msym("Uk",n_boxes_+1, n_boxes_);
-  MX Vk = msym("Vk",n_boxes_  , n_boxes_+1);
-  MX Hk = msym("Hk",n_boxes_  , n_boxes_);
+  MX Uk = msym("Uk",n_+1, n_);
+  MX Vk = msym("Vk",n_  , n_+1);
+  MX Hk = msym("Hk",n_  , n_);
   f_in[0] = P;
   f_in[1] = Uk;
   f_in[2] = Vk;
@@ -312,7 +310,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
       // Initialize with initial conditions
       //U.lift(u0_);
       //V.lift(v0_);
-      //H.lift(DMatrix::zeros(n_boxes_  ,n_boxes_));
+      //H.lift(DMatrix::zeros(n_  ,n_));
       
       // Initialize through simulation
       //      U.lift(U);
@@ -356,7 +354,9 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   nlp_solver_.setOption("beta",0.5);
   //nlp_solver_.setOption("merit_memory",1);
   nlp_solver_.setOption("maxiter",100);
-  
+  nlp_solver_.setOption("compiler","clang -fPIC"); // No optimization, fast compilation
+  //nlp_solver_.setOption("compiler","clang -fPIC -O2"); // Optimization
+
   // Name the variables
   vector<string> variable_name;
   variable_name.push_back("drag");
@@ -441,9 +441,9 @@ int main(){
   double reg_threshold = 1e-8;
 
   // Problem size
-  // int  n_boxes = 100, n_euler = 100, n_finite_elements = 1, n_meas = 20;
-  int  n_boxes = 30, n_euler = 10, n_finite_elements = 10, n_meas = 100; // Paper
-  //  int n_boxes = 15, n_euler = 20, n_finite_elements = 1, n_meas = 20;
+  // int  n = 100, n_euler = 100, n_finite_elements = 1, n_meas = 20;
+  int  n = 30, n_euler = 10, n_finite_elements = 10, n_meas = 100; // Paper
+  //  int n = 15, n_euler = 20, n_finite_elements = 1, n_meas = 20;
 
   // Initial guesses
   vector<double> drag_guess, depth_guess;
@@ -479,7 +479,7 @@ int main(){
   vector<double> depth_est_eh(n_tests,-1);
   
   // Create a tester object
-  Tester t(n_boxes,n_euler,n_finite_elements,n_meas);
+  Tester t(n,n_euler,n_finite_elements,n_meas);
     
   // Perform the modelling
   t.model();

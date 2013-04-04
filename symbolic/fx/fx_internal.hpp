@@ -36,13 +36,13 @@
 
 namespace CasADi{
   
-/** \brief Internal class for FX
-  \author Joel Andersson 
-  \date 2010
- A regular user should never work with any Node class. Use FX directly.
-*/
-class FXInternal : public OptionsFunctionalityNode{
-  friend class FX;
+  /** \brief Internal class for FX
+      \author Joel Andersson 
+      \date 2010
+      A regular user should never work with any Node class. Use FX directly.
+  */
+  class FXInternal : public OptionsFunctionalityNode{
+    friend class FX;
 
   protected:
     /** \brief  Default constructor (accessable from the FX class and derived classes) */
@@ -59,8 +59,8 @@ class FXInternal : public OptionsFunctionalityNode{
     void evaluateCompressed(int nfdir, int nadir);
 
     /** \brief Initialize
-      Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
-      If passed to another class (in the constructor), this class should invoke this function when initialized. */
+	Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
+	If passed to another class (in the constructor), this class should invoke this function when initialized. */
     virtual void init();
 
     /** \brief  Update the number of sensitivity directions during or after initialization, 
@@ -130,8 +130,8 @@ class FXInternal : public OptionsFunctionalityNode{
 
     //@{
     /** \brief Return function that calculates forward derivatives 
-    *    This method returns a cached instance if available, and calls FX getDerivative(int nfwd, int nadj) if no cached version is available.
-    */
+     *    This method returns a cached instance if available, and calls FX getDerivative(int nfwd, int nadj) if no cached version is available.
+     */
     FX derivative(int nfwd, int nadj);
 
     /** \brief Constructs and returns a function that calculates forward derivatives */
@@ -156,10 +156,10 @@ class FXInternal : public OptionsFunctionalityNode{
       try{
         return input_.at(i);
       } catch(std::out_of_range&){
-          std::stringstream ss;
-          ss <<  "In function " << getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
-          if (!isInit()) ss << std::endl << "Did you forget to initialize?";
-          throw CasadiException(ss.str());
+	std::stringstream ss;
+	ss <<  "In function " << getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
+	if (!isInit()) ss << std::endl << "Did you forget to initialize?";
+	throw CasadiException(ss.str());
       }
     }
 
@@ -173,10 +173,10 @@ class FXInternal : public OptionsFunctionalityNode{
       try{
         return output_.at(i);
       } catch(std::out_of_range&){
-          std::stringstream ss;
-          ss <<  "In function " << getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
-          if (!isInit()) ss << std::endl << "Did you forget to initialize?";
-          throw CasadiException(ss.str());
+	std::stringstream ss;
+	ss <<  "In function " << getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
+	if (!isInit()) ss << std::endl << "Did you forget to initialize?";
+	throw CasadiException(ss.str());
       }
     }
 
@@ -192,18 +192,18 @@ class FXInternal : public OptionsFunctionalityNode{
     virtual void repr(std::ostream &stream) const;
     
     /** \brief Find the index for a string describing a particular entry of an input scheme
-    * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
-    */
+     * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
+     */
     int inputSchemeEntry(const std::string &name) const;
 
     /** \brief Find the index for a string describing a particular entry of an output scheme
-    * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
-    */
+     * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
+     */
     int outputSchemeEntry(const std::string &name) const;
 
     /** \brief Find the index for a string describing a particular entry of a scheme
-    * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
-    */
+     * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
+     */
     int schemeEntry(InputOutputScheme scheme,const std::string &name) const;
     
     /** \brief Set input scheme */
@@ -234,7 +234,7 @@ class FXInternal : public OptionsFunctionalityNode{
     bool monitored(const std::string& mod) const;
     
     //@{
-      /// Access input argument
+    /// Access input argument
     inline Matrix<double>& input(int iind=0){ return iStruct(iind).data;}
     inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
     inline Matrix<double>& inputNoCheck(int iind=0){ return input_[iind].data;}
@@ -383,6 +383,10 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<SXMatrix> symbolicInputSX() const;
   
+    // Workaround helper functions: assign nonzeros but ignore all -1
+    static void assignIgnore(MX& y, const MX& x, const std::vector<int>& nz);
+    static void assignIgnore(SXMatrix& y, const SXMatrix& x, const std::vector<int>& nz);
+
     /** \brief  Number of forward and adjoint derivatives */
     int nfdir_, nadir_;
 
@@ -436,7 +440,7 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Errors are thrown when NaN is produced
     bool regularity_check_;
     
-};
+  };
 
 
 } // namespace CasADi

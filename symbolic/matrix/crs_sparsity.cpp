@@ -239,8 +239,8 @@ namespace CasADi{
     return (*this)->diagonal();
   }
 
-  CRSSparsity CRSSparsity::getSub(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
-    return (*this)->getSub(ii,jj,mapping);
+  CRSSparsity CRSSparsity::sub(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
+    return (*this)->sub(ii,jj,mapping);
   }
 
   vector<int> CRSSparsity::erase(const vector<int>& ii, const vector<int>& jj){

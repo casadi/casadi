@@ -34,17 +34,17 @@
 
 namespace CasADi{
 
-template<class T>
-struct NonZero {
-  int k; // Non-zero index into matrix
-  int i; // Column into matrix
-  int j; // Row into matrix
-  T el;  // Element
-};
+  template<class T>
+  struct NonZero {
+    int k; // Non-zero index into matrix
+    int i; // Column into matrix
+    int j; // Row into matrix
+    T el;  // Element
+  };
 
-template<class T>
-class NonZeroIterator : public std::iterator< std::forward_iterator_tag, NonZero<T> > {
-public:
+  template<class T>
+  class NonZeroIterator : public std::iterator< std::forward_iterator_tag, NonZero<T> > {
+  public:
     NonZeroIterator(const Matrix<T> & m);
 
 #ifndef SWIG
@@ -57,10 +57,10 @@ public:
     NonZeroIterator<T> end();
     bool operator==(const NonZeroIterator<T>& rhs);
 
-private:
+  private:
     Matrix<T> m_;
     NonZero<T> nz;
-};
+  };
 
     
   //@{
@@ -73,25 +73,25 @@ private:
   //@}
 
   /** \brief General sparse matrix class
-  General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
-  This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n
+      General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
+      This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n
   
-  The syntax tries to stay as close as possible to the ublas syntax  when it comes to vector/matrix operations.\n
+      The syntax tries to stay as close as possible to the ublas syntax  when it comes to vector/matrix operations.\n
 
-  Index starts with 0.\n
-  Index flatten happens as follows: (i,j) -> k = j+i*size2()\n
-  Vectors are considered to be column vectors.\n
+      Index starts with 0.\n
+      Index flatten happens as follows: (i,j) -> k = j+i*size2()\n
+      Vectors are considered to be column vectors.\n
   
-  The storage format is a (modified) compressed row storage (CRS) format. This way, a vector element can always be accessed in constant time.\n
+      The storage format is a (modified) compressed row storage (CRS) format. This way, a vector element can always be accessed in constant time.\n
   
-  Matrix<T> is polymorphic with a std::vector<T> that contain all non-identical-zero elements.\n
-  The sparsity can be accessed with CRSSparsity& sparsity()\n
+      Matrix<T> is polymorphic with a std::vector<T> that contain all non-identical-zero elements.\n
+      The sparsity can be accessed with CRSSparsity& sparsity()\n
   
-  \author Joel Andersson 
-  \date 2010	
-*/
-template<class T>
-class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix<T> >, public PrintableObject{
+      \author Joel Andersson 
+      \date 2010	
+  */
+  template<class T>
+  class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix<T> >, public PrintableObject{
   public:
     
     /** \brief  constructors */
@@ -101,10 +101,10 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     /// Copy constructor
     Matrix(const Matrix<T>& m);
     
-    #ifndef SWIG
+#ifndef SWIG
     /// Assignment (normal)
     Matrix<T>& operator=(const Matrix<T>& m);
-    #endif // SWIG
+#endif // SWIG
     
     /// empty n-by-m matrix constructor
     Matrix(int n, int m);
@@ -125,9 +125,9 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Matrix(const CRSSparsity& sparsity, const std::vector<T>& d);
     
     /** \brief Check if the dimensions and rowind,col vectors are compatible.
-    * \param complete  set to true to also check elementwise
-    * throws an error as possible result
-    */
+     * \param complete  set to true to also check elementwise
+     * throws an error as possible result
+     */
     void sanityCheck(bool complete=false) const;
     
     /// This constructor enables implicit type conversion from a numeric type
@@ -135,9 +135,9 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
 
     /// Construct from a vector
     /**
-    * Thanks to implicit conversion, you can pretend that Matrix(const SX& x); exists.
-    * Note: above remark applies only to C++, not python or octave interfaces
-    */
+     * Thanks to implicit conversion, you can pretend that Matrix(const SX& x); exists.
+     * Note: above remark applies only to C++, not python or octave interfaces
+     */
     Matrix(const std::vector<T>& x);
     
     /// Construct dense matrix from a vector with the elements in column major ordering
@@ -145,7 +145,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
 
     /// Convert to scalar type
     const T toScalar() const;
-//    operator const T() const;
+    //    operator const T() const;
     
     /// Scalar type
     typedef T ScalarType;
@@ -235,7 +235,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     //@}
 
 
-    #ifndef SWIG
+#ifndef SWIG
     /// Get a non-zero element
     inline const T& at(int k) const{
       return const_cast<Matrix<T>*>(this)->at(k);
@@ -252,7 +252,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
         throw CasadiException(ss.str());
       }
     }
-    #else // SWIG
+#else // SWIG
     /// Access a non-zero element
     T at(int k){
       try{
@@ -264,18 +264,18 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
         throw CasadiException(ss.str());
       }
     }
-    #endif // SWIG
+#endif // SWIG
     
-    #ifndef SWIG
+#ifndef SWIG
     /// get an element
     const T& elem(int i, int j=0) const;
     
     /// get a reference to an element
     T& elem(int i, int j=0);
-    #else // SWIG
+#else // SWIG
     /// Access a non-zero element
     T elem(int i, int j=0) { return elem(i,j);}
-    #endif // SWIG
+#endif // SWIG
 
     /// get an element, do not allocate
     const T getElement(int i, int j=0) const{ return elem(i,j);}
@@ -288,38 +288,50 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
 
     //@{
     /// Get a submatrix
-    const Matrix<T> getSub(int i, int j) const;
-    const Matrix<T> getSub(int i, const std::vector<int>& j) const{ return getSub(std::vector<int>(1,i),j);}
-    const Matrix<T> getSub(const std::vector<int>& i, int j) const{ return getSub(i,std::vector<int>(1,j));}
-    const Matrix<T> getSub(const std::vector<int>& i, const std::vector<int>& j) const;
-    const Matrix<T> getSub(const std::vector<int>& i, const Slice& j) const { return getSub(i,j.getAll(size2()));}
-    const Matrix<T> getSub(const Slice& i, const std::vector<int>& j) const { return getSub(i.getAll(size1()),j);}
-    const Matrix<T> getSub(const Slice& i, const Slice& j) const{ return getSub(i.getAll(size1()),j.getAll(size2()));}
-    const Matrix<T> getSub(int i, const Slice& j) const{ return getSub(std::vector<int>(1,i),j.getAll(size2()));}
-    const Matrix<T> getSub(const Slice& i, int j) const{ return getSub(i.getAll(size1()),std::vector<int>(1,j));}
-    const Matrix<T> getSub(const std::vector<int>& i, const Matrix<int>& k) const;
-    const Matrix<T> getSub(const Matrix<int>& k, const std::vector<int>& j) const;
-    const Matrix<T> getSub(const Slice& i, const Matrix<int>& k) const {return getSub(i.getAll(size1()),k);}
-    const Matrix<T> getSub(const Matrix<int>& k, const Slice& j) const {return getSub(k,j.getAll(size2()));}
-    const Matrix<T> getSub(const Matrix<int>& i, const Matrix<int>& j) const;
-    const Matrix<T> getSub(const CRSSparsity& sp, int dummy = 0) const;
+    const Matrix<T> sub(int i, int j) const;
+    const Matrix<T> sub(int i, const std::vector<int>& j) const{ return sub(std::vector<int>(1,i),j);}
+    const Matrix<T> sub(const std::vector<int>& i, int j) const{ return sub(i,std::vector<int>(1,j));}
+    const Matrix<T> sub(const std::vector<int>& i, const std::vector<int>& j) const;
+    const Matrix<T> sub(const std::vector<int>& i, const Slice& j) const { return sub(i,j.getAll(size2()));}
+    const Matrix<T> sub(const Slice& i, const std::vector<int>& j) const { return sub(i.getAll(size1()),j);}
+    const Matrix<T> sub(const Slice& i, const Slice& j) const{ return sub(i.getAll(size1()),j.getAll(size2()));}
+    const Matrix<T> sub(int i, const Slice& j) const{ return sub(std::vector<int>(1,i),j.getAll(size2()));}
+    const Matrix<T> sub(const Slice& i, int j) const{ return sub(i.getAll(size1()),std::vector<int>(1,j));}
+    const Matrix<T> sub(const std::vector<int>& i, const Matrix<int>& k) const;
+    const Matrix<T> sub(const Matrix<int>& k, const std::vector<int>& j) const;
+    const Matrix<T> sub(const Slice& i, const Matrix<int>& k) const {return sub(i.getAll(size1()),k);}
+    const Matrix<T> sub(const Matrix<int>& k, const Slice& j) const {return sub(k,j.getAll(size2()));}
+    const Matrix<T> sub(const Matrix<int>& i, const Matrix<int>& j) const;
+    const Matrix<T> sub(const CRSSparsity& sp, int dummy = 0) const;
     //@}
 
     //@{
     /// Set a submatrix
-    void setSub(int i, int j, const Matrix<T>& m);
-    void setSub(int i, const std::vector<int>& j, const Matrix<T>& m){ setSub(std::vector<int>(1,i),j,m);}
-    void setSub(const std::vector<int>& i, int j, const Matrix<T>& m){ setSub(i,std::vector<int>(1,j),m);}
-    void setSub(const std::vector<int>& i, const std::vector<int>& j, const Matrix<T>& m);
-    void setSub(const std::vector<int>& i, const Slice& j, const Matrix<T>& m) { setSub(i,j.getAll(size2()),m); }
-    void setSub(const Slice& i, const std::vector<int>& j, const Matrix<T>& m){ setSub(i.getAll(size1()),j,m);}
-    void setSub(const Slice& i, const Slice& j, const Matrix<T>& m){ setSub(i.getAll(size1()),j.getAll(size2()),m);}
-    void setSub(const std::vector<int>& i, const Matrix<int>& k, const Matrix<T>& m);
-    void setSub(const Matrix<int>& k, const std::vector<int>& j, const Matrix<T>& m);
-    void setSub(const Slice& i, const Matrix<int>& k, const Matrix<T>& m) {return setSub(i.getAll(size1()),k,m);}
-    void setSub(const Matrix<int>& k, const Slice& j, const Matrix<T>& m) {return setSub(k,j.getAll(size2()),m);}
-    void setSub(const Matrix<int>& i, const Matrix<int>& j, const Matrix<T>& m);
-    void setSub(const CRSSparsity& sp, int dummy, const Matrix<T>& m);
+    void setSub(const Matrix<T>& m, int i, int j);
+    void setSub(const Matrix<T>& m, int i, const std::vector<int>& j){ setSub(m,std::vector<int>(1,i),j);}
+    void setSub(const Matrix<T>& m, const std::vector<int>& i, int j){ setSub(m,i,std::vector<int>(1,j));}
+    void setSub(const Matrix<T>& m, const std::vector<int>& i, const std::vector<int>& j);
+    void setSub(const Matrix<T>& m, const std::vector<int>& i, const Slice& j){ setSub(m,i,j.getAll(size2()));}
+    void setSub(const Matrix<T>& m, const Slice& i, const std::vector<int>& j){ setSub(m,i.getAll(size1()),j);}
+    void setSub(const Matrix<T>& m, const Slice& i, const Slice& j){ setSub(m,i.getAll(size1()),j.getAll(size2()));}
+    void setSub(const Matrix<T>& m, const std::vector<int>& i, const Matrix<int>& j);
+    void setSub(const Matrix<T>& m, const Matrix<int>& i, const std::vector<int>& j);
+    void setSub(const Matrix<T>& m, const Slice& i, const Matrix<int>& j) {return setSub(m,i.getAll(size1()),j);}
+    void setSub(const Matrix<T>& m, const Matrix<int>& i, const Slice& j) {return setSub(m,i,j.getAll(size2()));}
+    void setSub(const Matrix<T>& m, const Matrix<int>& i, const Matrix<int>& j);
+    void setSub(const Matrix<T>& m, const CRSSparsity& sp, int dummy);
+    //@}
+
+    //@{
+    /// Add a submatrix to an existing matrix (TODO: remove memory allocation)
+    template<typename I, typename J>
+    void addSub(const Matrix<T>& m, I i, J j){ setSub(m+sub(i,j),i,j);}
+    //@}
+
+    //@{
+    /// Retrieve a submatrix (TODO: remove memory allocation)
+    template<typename I, typename J>
+    void getSub(Matrix<T>& m, I i, J j){ m = sub(i,j);}
     //@}
 
     //@{
@@ -425,14 +437,14 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Matrix<T> operator+() const;
     Matrix<T> operator-() const;
 
-  //@{
+    //@{
     /** \brief  Create nodes by their ID */
     static Matrix<T> binary(int op, const Matrix<T> &x, const Matrix<T> &y);
     static Matrix<T> unary(int op, const Matrix<T> &x);
     static Matrix<T> scalar_matrix(int op, const Matrix<T> &x, const Matrix<T> &y);
     static Matrix<T> matrix_scalar(int op, const Matrix<T> &x, const Matrix<T> &y);
     static Matrix<T> matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &y);
-  //@}
+    //@}
   
     /// Perform binary operation without memory allocation
     static void binary_no_alloc(void (*fcn)(unsigned char op, const T&, const T&, T&), unsigned char op, const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping);
@@ -476,8 +488,12 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     static void mul_no_alloc_tn(const Matrix<T>& trans_x, const std::vector<T> &y, std::vector<T>& z);
   
     /// Propagate sparsity using 0-1 logic through a matrix product, no memory allocation: z = mul(x,y)
-    static void mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, bool fwd);
-    
+    template<bool Fwd>
+    static void mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z);
+  
+    /// Calculates inner_prod(x,mul(A,x)) without memory allocation
+    static T quad_form(const Matrix<T>& A, const std::vector<T>& x);
+  
     /// Matrix transpose
     Matrix<T> trans() const;
     
@@ -542,15 +558,15 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     void reserve(int nnz, int nrow);
     
     /** \brief Erase a submatrix
-    Erase rows and/or columns of a matrix */
+	Erase rows and/or columns of a matrix */
     void erase(const std::vector<int>& ii, const std::vector<int>& jj);
     
     /** \brief Remove rows or columns
-    Rremove/delete rows and/or columns of a matrix */
+	Rremove/delete rows and/or columns of a matrix */
     void remove(const std::vector<int>& ii, const std::vector<int>& jj);
     
     /** \brief Enlarge matrix
-    Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
+	Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
     void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
     
     /// Access the non-zero elements
@@ -618,10 +634,10 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
 #endif
 
     /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 
-    kl:    The number of subdiagonals in res 
-    ku:    The number of superdiagonals in res 
-    ldres: The leading dimension in res 
-    res:   The number of superdiagonals */
+	kl:    The number of subdiagonals in res 
+	ku:    The number of superdiagonals in res 
+	ldres: The leading dimension in res 
+	res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, T *res) const;
     
     //@{
@@ -631,8 +647,8 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     //@}
     
     /* \brief Construct a sparse matrix from triplet form
-    * Matrix size will be max(row) x max(col)
-    */
+     * Matrix size will be max(row) x max(col)
+     */
     static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d);
     
     //@{
@@ -643,24 +659,28 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     
     //@{
     /** \brief  create a dense matrix with all zeros */
+    static Matrix<T> zeros(const CRSSparsity& sp);
     static Matrix<T> zeros(int nrow, int ncol=1);
     static Matrix<T> zeros(const std::pair<int,int>& nm);
     //@}
 
     //@{
     /** \brief  create a matrix with all ones */
+    static Matrix<T> ones(const CRSSparsity& sp);
     static Matrix<T> ones(int nrow, int ncol=1);
     static Matrix<T> ones(const std::pair<int,int>& nm);
     //@}
 
     //@{
     /** \brief  create a matrix with all inf */
+    static Matrix<T> inf(const CRSSparsity& sp);
     static Matrix<T> inf(int nrow=1, int ncol=1);
     static Matrix<T> inf(const std::pair<int,int>& nm);
     //@}
     
     //@{
     /** \brief  create a matrix with all nan */
+    static Matrix<T> nan(const CRSSparsity& sp);
     static Matrix<T> nan(int nrow=1, int ncol=1);
     static Matrix<T> nan(const std::pair<int,int>& nm);
     //@}
@@ -696,7 +716,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     static int stream_width_;
     static bool stream_scientific_;
     
-};
+  };
 
 } // namespace CasADi
 

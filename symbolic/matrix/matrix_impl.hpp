@@ -25,6 +25,8 @@
 
 // The declaration of the class is in a separate file
 #include "matrix.hpp"
+#include "matrix_tools.hpp"
+#include "sparsity_tools.hpp"
 
 #ifdef WITH_EIGEN3
 #include <Eigen/Dense>
@@ -66,17 +68,17 @@ bool Matrix<T>::__nonzero__() const {
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(int i, int j) const{
+const Matrix<T> Matrix<T>::sub(int i, int j) const{
   return elem(i,j);
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<int>& jj) const{
+const Matrix<T> Matrix<T>::sub(const std::vector<int>& ii, const std::vector<int>& jj) const{
   // Nonzero mapping from submatrix to full
   std::vector<int> mapping;
   
   // Get the sparsity pattern - does bounds checking
-  CRSSparsity sp = sparsity().getSub(ii,jj,mapping);
+  CRSSparsity sp = sparsity().sub(ii,jj,mapping);
 
   // Create return object
   Matrix<T> ret(sp);
@@ -90,7 +92,7 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const Matrix<int>& k) const{
+const Matrix<T> Matrix<T>::sub(const std::vector<int>& ii, const Matrix<int>& k) const{
   std::vector< int > cols = range(size2());
   std::vector< Matrix<T> > temp;
   
@@ -110,7 +112,7 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const Matrix<int>&
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(const Matrix<int>& k, const std::vector<int>& jj) const{
+const Matrix<T> Matrix<T>::sub(const Matrix<int>& k, const std::vector<int>& jj) const{
   std::vector< int > rows = range(size1());
   std::vector< Matrix<T> > temp;
 
@@ -130,8 +132,8 @@ const Matrix<T> Matrix<T>::getSub(const Matrix<int>& k, const std::vector<int>& 
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(const Matrix<int>& i, const Matrix<int>& j) const {
-   casadi_assert_message(i.sparsity()==j.sparsity(),"getSub(Imatrix i, Imatrix j): sparsities must match. Got " << i.dimString() << " and " << j.dimString() << ".");
+const Matrix<T> Matrix<T>::sub(const Matrix<int>& i, const Matrix<int>& j) const {
+   casadi_assert_message(i.sparsity()==j.sparsity(),"sub(Imatrix i, Imatrix j): sparsities must match. Got " << i.dimString() << " and " << j.dimString() << ".");
 
    Matrix<T> ret(i.sparsity());
    for (int k=0;k<i.size();++k) {
@@ -142,8 +144,8 @@ const Matrix<T> Matrix<T>::getSub(const Matrix<int>& i, const Matrix<int>& j) co
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getSub(const CRSSparsity& sp, int dummy) const {
-  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+const Matrix<T> Matrix<T>::sub(const CRSSparsity& sp, int dummy) const {
+  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"sub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
   Matrix<T> ret(sp);
 
   std::vector<unsigned char> mapping; // Mapping that will be filled by patternunion
@@ -164,36 +166,36 @@ const Matrix<T> Matrix<T>::getSub(const CRSSparsity& sp, int dummy) const {
 }
 
 template<class T>
-void Matrix<T>::setSub(int i, int j, const Matrix<T>& el){
-  if(el.dense()){
-    elem(i,j) = el.toScalar();
+void Matrix<T>::setSub(const Matrix<T>& m, int i, int j){
+  if(m.dense()){
+    elem(i,j) = m.toScalar();
   } else {
-    setSub(std::vector<int>(1,i),std::vector<int>(1,j),el);
+    setSub(m,std::vector<int>(1,i),std::vector<int>(1,j));
   }
 }
 
 template<class T>
-void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& el){
-  casadi_assert_message(el.numel()==1 || (ii.size() == el.size1() && jj.size() == el.size2()),"Dimension mismatch." << std::endl << "lhs is " << ii.size() << " x " << jj.size() << ", while rhs is " << el.dimString());
+void Matrix<T>::setSub(const Matrix<T>& m, const std::vector<int>& ii, const std::vector<int>& jj){
+  casadi_assert_message(m.numel()==1 || (ii.size() == m.size1() && jj.size() == m.size2()),"Dimension mismatch." << std::endl << "lhs is " << ii.size() << " x " << jj.size() << ", while rhs is " << m.dimString());
 
   if (!inBounds(ii,size1())) {
-    casadi_error("setSub [ii,jj] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+    casadi_error("setSub [.,ii,jj] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
   }
   if (!inBounds(jj,size2())) {
-    casadi_error("setSub [ii,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+    casadi_error("setSub[.,ii,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
   }
   
   // If m is scalar
-  if(el.numel() != ii.size() * jj.size()){
-    setSub(ii,jj,Matrix<T>(ii.size(),jj.size(),el.toScalar()));
+  if(m.numel() != ii.size() * jj.size()){
+    setSub(Matrix<T>(ii.size(),jj.size(),m.toScalar()),ii,jj);
     return;
   }
 
-  if(dense() && el.dense()){
+  if(dense() && m.dense()){
     // Dense mode
     for(int i=0; i<ii.size(); ++i) {
       for(int j=0; j<jj.size(); ++j) {
-        data()[ii[i]*size2() + jj[j]]=el.data()[i*el.size2()+j];
+        data()[ii[i]*size2() + jj[j]]=m.data()[i*m.size2()+j];
       }
     }
   } else {
@@ -203,7 +205,7 @@ void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, c
     erase(ii,jj);
 
     // Extend el to the same dimension as this
-    Matrix<T> el_ext = el;
+    Matrix<T> el_ext = m;
     el_ext.enlarge(size1(),size2(),ii,jj);
 
     // Unite the sparsity patterns
@@ -212,27 +214,27 @@ void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, c
 }
 
 template<class T>
-void Matrix<T>::setSub(const Matrix<int>& i, const std::vector<int>& jj, const Matrix<T>& el) {
+void Matrix<T>::setSub(const Matrix<T>& m, const Matrix<int>& i, const std::vector<int>& jj) {
   // If el is scalar
-  if(el.scalar() && (jj.size() > 1 || i.size() > 1)){
-    setSub(i,jj,repmat(Matrix<T>(i.sparsity(),el.toScalar()),1,jj.size()));
+  if(m.scalar() && (jj.size() > 1 || i.size() > 1)){
+    setSub(repmat(Matrix<T>(i.sparsity(),m.toScalar()),1,jj.size()),i,jj);
     return;
   }
 
   if (!inBounds(jj,size2())) {
-    casadi_error("setSub[i,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+    casadi_error("setSub[.,i,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
   }
   
   CRSSparsity result_sparsity = repmat(i,1,jj.size()).sparsity();
   
   
-  casadi_assert_message(result_sparsity == el.sparsity(),"setSub(Imatrix" << i.dimString() << ",Ivector(length=" << jj.size() << "),Matrix<T>)::Dimension mismatch. The sparsity of repmat(Imatrix,1," << jj.size() << ") = " << result_sparsity.dimString()  << " must match the sparsity of Matrix<T> = "  << el.dimString() << ".");
+  casadi_assert_message(result_sparsity == m.sparsity(),"setSub(Imatrix" << i.dimString() << ",Ivector(length=" << jj.size() << "),Matrix<T>)::Dimension mismatch. The sparsity of repmat(Imatrix,1," << jj.size() << ") = " << result_sparsity.dimString()  << " must match the sparsity of Matrix<T> = "  << m.dimString() << ".");
   
   
   std::vector<int> slice_i = range(i.size1());
   
   for(int k=0; k<jj.size(); ++k) {
-     Matrix<T> el_k = el(slice_i,range(k*i.size2(),(k+1)*i.size2()));
+     Matrix<T> el_k = m(slice_i,range(k*i.size2(),(k+1)*i.size2()));
      for (int j=0;j<i.size();++j) {
        elem(i.at(j),jj[k])=el_k.at(j);
      }
@@ -241,27 +243,27 @@ void Matrix<T>::setSub(const Matrix<int>& i, const std::vector<int>& jj, const M
 }
 
 template<class T>
-void Matrix<T>::setSub(const std::vector<int>& ii, const Matrix<int>& j, const Matrix<T>& el) {
+void Matrix<T>::setSub(const Matrix<T>& m, const std::vector<int>& ii, const Matrix<int>& j) {
   
   // If el is scalar
-  if(el.scalar() && (ii.size() > 1 || j.size() > 1)){
-    setSub(ii,j,repmat(Matrix<T>(j.sparsity(),el.toScalar()),ii.size(),1));
+  if(m.scalar() && (ii.size() > 1 || j.size() > 1)){
+    setSub(repmat(Matrix<T>(j.sparsity(),m.toScalar()),ii.size(),1),ii,j);
     return;
   }
 
   if (!inBounds(ii,size1())) {
-    casadi_error("setSub[ii,j] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+    casadi_error("setSub[.,ii,j] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
   }
   
   CRSSparsity result_sparsity = repmat(j,ii.size(),1).sparsity();
   
   
-  casadi_assert_message(result_sparsity == el.sparsity(),"setSub(Ivector(length=" << ii.size() << "),Imatrix" << j.dimString() << ",Matrix<T>)::Dimension mismatch. The sparsity of repmat(Imatrix," << ii.size() << ",1) = " << result_sparsity.dimString() << " must match the sparsity of Matrix<T> = " << el.dimString() << ".");
+  casadi_assert_message(result_sparsity == m.sparsity(),"setSub(Ivector(length=" << ii.size() << "),Imatrix" << j.dimString() << ",Matrix<T>)::Dimension mismatch. The sparsity of repmat(Imatrix," << ii.size() << ",1) = " << result_sparsity.dimString() << " must match the sparsity of Matrix<T> = " << m.dimString() << ".");
   
   std::vector<int> slice_j = range(j.size2());
   
   for(int k=0; k<ii.size(); ++k) {
-     Matrix<T> el_k = el(range(k*j.size1(),(k+1)*j.size1()),slice_j);
+     Matrix<T> el_k = m(range(k*j.size1(),(k+1)*j.size1()),slice_j);
      for (int i=0;i<j.size();++i) {
        elem(ii[k],j.at(i))=el_k.at(i);
      }
@@ -271,31 +273,31 @@ void Matrix<T>::setSub(const std::vector<int>& ii, const Matrix<int>& j, const M
 
 
 template<class T>
-void Matrix<T>::setSub(const Matrix<int>& i, const Matrix<int>& j, const Matrix<T>& el) {
-   casadi_assert_message(i.sparsity()==j.sparsity(),"setSub(Imatrix i, Imatrix j, Imatrix el): sparsities must match. Got " << i.dimString() << " for i and " << j.dimString() << " for j.");
+void Matrix<T>::setSub(const Matrix<T>& m, const Matrix<int>& i, const Matrix<int>& j) {
+   casadi_assert_message(i.sparsity()==j.sparsity(),"setSub(., Imatrix i, Imatrix j): sparsities must match. Got " << i.dimString() << " for i and " << j.dimString() << " for j.");
 
-  // If el is scalar
-  if(el.scalar() && i.numel() > 1){
-    setSub(i,j,Matrix<T>(i.sparsity(),el.toScalar()));
+  // If m is scalar
+  if(m.scalar() && i.numel() > 1){
+    setSub(Matrix<T>(i.sparsity(),m.toScalar()),i,j);
     return;
   }
   
-  casadi_assert_message(el.sparsity()==i.sparsity(),"setSub(Imatrix i, Imatrix j, Imatrix el): sparsities must match. Got " << el.dimString() << " for el and " << j.dimString() << " for i and j.");
+  casadi_assert_message(m.sparsity()==i.sparsity(),"setSub(Matrix m, Imatrix i, Imatrix j): sparsities must match. Got " << m.dimString() << " for m and " << j.dimString() << " for i and j.");
   
   for(int k=0; k<i.size(); ++k) {
-     elem(i.at(k),j.at(k)) = el.at(k); 
+     elem(i.at(k),j.at(k)) = m.at(k); 
   }
 }
 
 template<class T>
-void Matrix<T>::setSub(const CRSSparsity& sp, int dummy, const Matrix<T>& el) {
-  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+void Matrix<T>::setSub(const Matrix<T>& m, const CRSSparsity& sp, int dummy) {
+  casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"sub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
   // TODO: optimize this for speed
   Matrix<T> elm;
-  if (el.scalar()) {
-    elm = Matrix<T>(sp,el.at(0));
+  if (m.scalar()) {
+    elm = Matrix<T>(sp,m.at(0));
   } else {
-    elm = el.getSub(sp);
+    elm = m.sub(sp);
   }
 
   for(int i=0; i<sp.rowind().size()-1; ++i){
@@ -1421,7 +1423,8 @@ void Matrix<T>::mul_no_alloc_nt(const Matrix<T> &x, const Matrix<T> &y_trans, Ma
 }
 
 template<class T>
-void Matrix<T>::mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, bool fwd){
+template<bool Fwd>
+void Matrix<T>::mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z){
   // Direct access to the arrays
   const std::vector<int> &z_col = z.col();
   const std::vector<int> &z_rowind = z.rowind();
@@ -1441,13 +1444,12 @@ void Matrix<T>::mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, boo
       int j = z_col[el];
       int el1 = x_rowind[i];
       int el2 = y_colind[j];
-      if(fwd) z_data[el] = 0;
       while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
         int j1 = x_col[el1];
         int i2 = y_row[el2];      
         if(j1==i2){
           // | and not & since we are propagating dependencies
-          if(fwd){
+          if(Fwd){
             z_data[el] |= x_data[el1] | y_trans_data[el2];
           } else {
             x_data[el1] |= z_data[el];
@@ -1463,6 +1465,34 @@ void Matrix<T>::mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, boo
       }
     }
   }
+}
+
+template<class T>
+T Matrix<T>::quad_form(const Matrix<T>& A, const std::vector<T>& x){
+  // Assert dimensions
+  casadi_assert(x.size()==A.size1() && x.size()==A.size2());
+  
+  // Access the internal data of A
+  const std::vector<int> &A_rowind = A.rowind();
+  const std::vector<int> &A_col = A.col();
+  const std::vector<T> &A_data = A.data();
+  
+  // Return value
+  T ret=0;
+
+  // Loop over the rows of A
+  for(int i=0; i<x.size(); ++i){
+    // Loop over the nonzeros of A
+    for(int el=A_rowind[i]; el<A_rowind[i+1]; ++el){
+      // Get column
+      int j = A_col[el];
+      
+      // Add contribution
+      ret += x[i]*A_data[el]*x[j];
+    }
+  }
+  
+  return ret;
 }
 
 template<class T>
@@ -1690,13 +1720,23 @@ Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>&
 }
 
 template<class T>
+Matrix<T> Matrix<T>::zeros(const CRSSparsity& sp){
+  return Matrix<T>(sp,0);
+}
+
+template<class T>
 Matrix<T> Matrix<T>::zeros(const std::pair<int,int> &nm){
   return zeros(nm.first,nm.second);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::zeros(int n, int m){
-  return Matrix<T>(n,m,0);
+  return zeros(sp_dense(n,m));
+}
+
+template<class T>
+Matrix<T> Matrix<T>::ones(const CRSSparsity& sp){
+  return Matrix<T>(sp,1);
 }
 
 template<class T>
@@ -1706,7 +1746,7 @@ Matrix<T> Matrix<T>::ones(const std::pair<int,int> &nm){
 
 template<class T>
 Matrix<T> Matrix<T>::ones(int n, int m){
-  return Matrix<T>(n,m,1);
+  return ones(sp_dense(n,m));
 }
 
 template<class T>
@@ -1733,14 +1773,26 @@ Matrix<T> Matrix<T>::eye(int n){
 }
 
 template<class T>
+Matrix<T> Matrix<T>::inf(const CRSSparsity& sp){
+  casadi_assert_message(std::numeric_limits<T>::has_infinity,"Datatype cannot represent infinity");
+  return Matrix<T>(sp,std::numeric_limits<T>::infinity());
+}
+
+
+template<class T>
 Matrix<T> Matrix<T>::inf(const std::pair<int,int>& nm){
   return inf(nm.first, nm.second);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::inf(int n, int m){
-  casadi_assert_message(std::numeric_limits<T>::has_infinity,"Datatype cannot represent infinity");
-  return Matrix<T>(n,m,std::numeric_limits<T>::infinity());
+  return inf(sp_dense(n,m));
+}
+
+template<class T>
+Matrix<T> Matrix<T>::nan(const CRSSparsity& sp){
+  casadi_assert_message(std::numeric_limits<T>::has_quiet_NaN,"Datatype cannot represent not-a-number");
+  return Matrix<T>(sp,std::numeric_limits<T>::quiet_NaN());
 }
 
 template<class T>
@@ -1750,8 +1802,7 @@ Matrix<T> Matrix<T>::nan(const std::pair<int,int>& nm){
 
 template<class T>
 Matrix<T> Matrix<T>::nan(int n, int m){
-  casadi_assert_message(std::numeric_limits<T>::has_quiet_NaN,"Datatype cannot represent not-a-number");
-  return Matrix<T>(n,m,std::numeric_limits<T>::quiet_NaN());
+  return nan(sp_dense(n,m));
 }
 
 template<class T>

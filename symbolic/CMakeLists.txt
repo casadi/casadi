@@ -27,7 +27,7 @@ SET(CASADI_SRCS
   matrix/slice.hpp            matrix/slice.cpp          # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
   matrix/submatrix.hpp                                  # A reference to a block of the matrix to allow operations such as A(:,3) = ...
   matrix/nonzeros.hpp                                   # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
-  matrix/matrix_tools.hpp     matrix/matrix_tools.cpp   # Set of functions
+  matrix/matrix_tools.hpp                               # Set of functions
   matrix/sparsity_tools.hpp   matrix/sparsity_tools.cpp # Set of functions for sparsity
 
   # Directed, acyclic graph representation with scalar expressions
@@ -40,21 +40,26 @@ SET(CASADI_SRCS
   sx/sx_tools.cpp            sx/sx_tools.hpp            # Set of functions
 
   # More general graph representation with sparse matrix expressions and function evaluations
-  mx/mx.cpp                  mx/mx.hpp                  # Public, smart pointer class, 
-  mx/mx_node.cpp             mx/mx_node.hpp             # Base class for all the MX nodes
-  mx/constant_mx.cpp         mx/constant_mx.hpp         # A constant MX node
-  mx/symbolic_mx.cpp         mx/symbolic_mx.hpp         # A symbolic MX variable
-  mx/unary_mx.cpp            mx/unary_mx.hpp            # Unary operation
-  mx/binary_mx.cpp           mx/binary_mx.hpp           # Binary operation
-  mx/multiplication.cpp      mx/multiplication.hpp      # Matrix multiplication
-  mx/solve.cpp               mx/solve.hpp               # Solve linear system of equations
-  mx/evaluation_mx.cpp       mx/evaluation_mx.hpp       # FX function evaluation
-  mx/norm.cpp                mx/norm.hpp                # 1-norm, 2-norm and infinity-norm
-  mx/transpose.cpp           mx/transpose.hpp           # Transpose
-  mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
-  mx/densification.cpp       mx/densification.hpp       # Makes a matrix dense
-  mx/multiple_output.cpp     mx/multiple_output.hpp     # Base class for nodes with multiple outputs
-  mx/mx_tools.cpp            mx/mx_tools.hpp
+  mx/mx.hpp                  mx/mx.cpp                  # Public, smart pointer class, 
+  mx/mx_node.hpp             mx/mx_node.cpp             # Base class for all the MX nodes
+  mx/constant_mx.hpp         mx/constant_mx.cpp         # A constant MX node
+  mx/symbolic_mx.hpp         mx/symbolic_mx.cpp         # A symbolic MX variable
+  mx/unary_mx.hpp            mx/unary_mx.cpp            # Unary operation
+  mx/binary_mx.hpp           mx/binary_mx.cpp           # Binary operation
+  mx/multiplication.hpp      mx/multiplication_impl.hpp # Matrix multiplication
+  mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
+  mx/evaluation_mx.hpp       mx/evaluation_mx.cpp       # FX function evaluation
+  mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
+  mx/transpose.hpp           mx/transpose.cpp           # Transpose
+  mx/vertcat.hpp             mx/vertcat.cpp             # Vertical concatenation
+  mx/reshape.hpp             mx/reshape.cpp             # Reshape
+  mx/subref.hpp              mx/subref.cpp              # Submatrix reference
+  mx/subassign.hpp           mx/subassign.cpp           # Submatrix assignment
+  mx/getnonzeros.hpp         mx/getnonzeros.cpp         # Get the nonzeros of matrix
+  mx/setnonzeros.hpp         mx/setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
+  mx/densification.hpp       mx/densification.cpp       # Makes a matrix dense
+  mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
+  mx/mx_tools.hpp            mx/mx_tools.cpp
   # A dynamically created function with AD capabilities
   fx/fx.hpp                  fx/fx.cpp                  fx/fx_internal.hpp                  fx/fx_internal.cpp
   fx/x_function_internal.hpp                            # Base class for SXFunction and MXFunction

@@ -42,11 +42,20 @@ namespace CasADi{
     /** \brief Get the index of an existing sparsity pattern */
     int getSparsity(const CRSSparsity& sp) const;
 
+    /** \brief Get or add a constant */
+    int getConstant(const std::vector<double>& v, bool allow_adding=false);
+
+    /** \brief Get or add am integer constant */
+    int getConstant(const std::vector<int>& v, bool allow_adding=false);
+
     /** \brief Add a dependent function */
     int addDependency(const FX& f);
 
     /** \brief Get the index of an existing dependency */
     int getDependency(const FX& f) const;
+    
+    /** \brief Print a constant in a lossless but compact manner */
+    static void printConstant(std::ostream& s, double v);
 
     /** \brief Auxiliary functions */
     enum Auxiliary{
@@ -64,7 +73,8 @@ namespace CasADi{
       // Misc
       AUX_SIGN,
       AUX_MM_NT_SPARSE,
-      AUX_COPY_SPARSE
+      AUX_COPY_SPARSE,
+      AUX_TRANS
     };
     
     /** \brief Add a built-in axiliary function */
@@ -76,8 +86,14 @@ namespace CasADi{
     /** Convert in integer to a string */
     static std::string numToString(int n);
 
-    /** \brief  Print to a c file */
+    /** \brief  Print int vector to a c file */
     static void printVector(std::ostream &s, const std::string& name, const std::vector<int>& v);
+
+    /** \brief  Print real vector to a c file */
+    static void printVector(std::ostream &s, const std::string& name, const std::vector<double>& v);
+
+    /** \brief Copy a vector to another */
+    void copyVector(std::ostream &s, const std::string& arg, std::size_t n, const std::string& res, const std::string& it="i", bool only_if_exists=false) const;
 
   private:
 
@@ -117,13 +133,15 @@ namespace CasADi{
     /// COPY sparse: y <- x
     void auxCopySparse();
 
+    /// TRANS: y <- trans(x)
+    void auxTrans();
+
     //  private:
   public:
     
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes_;
     std::stringstream auxiliaries_;
-    std::stringstream sparsities_;
     std::stringstream dependencies_;
     std::stringstream function_;
     std::stringstream finalization_;
@@ -134,7 +152,26 @@ namespace CasADi{
     std::set<Auxiliary> added_auxiliaries_;
     PointerMap added_sparsities_;
     PointerMap added_dependencies_;
+    std::multimap<size_t,size_t> added_double_constants_;
+    std::multimap<size_t,size_t> added_integer_constants_;
 
+    // Constants
+    std::vector<std::vector<double> > double_constants_;
+    std::vector<std::vector<int> > integer_constants_;
+
+    // Hash a vector
+    static size_t hash(const std::vector<double>& v);
+    static size_t hash(const std::vector<int>& v);
+
+    // Compare two vectors
+    template<typename T>
+    static bool equal(const std::vector<T>& v1, const std::vector<T>& v2){
+      if(v1.size()!=v2.size()) return false;
+      for(int j=0; j<v1.size(); ++j){
+	if(v1[j]!=v2[j]) return false;
+      }
+      return true;
+    }
   };
   
   

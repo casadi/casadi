@@ -161,12 +161,12 @@ void FXInternal::print(ostream &stream) const{
     if (inputScheme==SCHEME_unknown) {
       stream << " Inputs (" << getNumInputs() << "):" << std::endl;
       for (int i=0;i<getNumInputs();i++) {
-        stream << "  " << i+1 << ". " << input(i).dimString() << std::endl;
+        stream << "  " << i << ". " << input(i).dimString() << std::endl;
       }
     } else {
       stream << " Inputs (" << getSchemeName(inputScheme) << ": " << getNumInputs() << "):" << std::endl;
       for (int i=0;i<getNumInputs();i++) {
-        stream << "  " << i+1  << ". (" << getSchemeEntryEnumName(inputScheme,i) << " aka " << getSchemeEntryName(inputScheme,i) << ")   " << input(i).dimString() << std::endl;
+        stream << "  " << i  << ". (" << getSchemeEntryEnumName(inputScheme,i) << " aka " << getSchemeEntryName(inputScheme,i) << ")   " << input(i).dimString() << std::endl;
       }
     }
   }
@@ -176,12 +176,12 @@ void FXInternal::print(ostream &stream) const{
     if (outputScheme==SCHEME_unknown) {
       stream << " Outputs (" << getNumOutputs() << "):" << std::endl;
       for (int i=0;i<getNumOutputs();i++) {
-        stream << "  " << i+1 << ". " << output(i).dimString() << std::endl;
+        stream << "  " << i << ". " << output(i).dimString() << std::endl;
       }
     } else { 
       stream << " Outputs (" << getSchemeName(outputScheme) << ": " << getNumOutputs() << "):" << std::endl;
       for (int i=0;i<getNumOutputs();i++) {
-        stream << "  " << i+1 << ". (" << getSchemeEntryEnumName(outputScheme,i) << " aka " << getSchemeEntryName(outputScheme,i) << ")   " << output(i).dimString() << std::endl;
+        stream << "  " << i << ". (" << getSchemeEntryEnumName(outputScheme,i) << " aka " << getSchemeEntryName(outputScheme,i) << ")   " << output(i).dimString() << std::endl;
       }
     }
   }
@@ -956,8 +956,8 @@ CRSSparsity FXInternal::getJacSparsityHierarchical(int iind, int oind){
 CRSSparsity FXInternal::getJacSparsity(int iind, int oind, bool symmetric){
   // Check if we are able to propagate dependencies through the function
   if(spCanEvaluate(true) || spCanEvaluate(false)){
-    
-    if (input(iind).size()>1 && output(oind).size()>1) {
+
+    if (input(iind).size()>3*bvec_size && output(oind).size()>3*bvec_size) {
       if (symmetric) {
         return getJacSparsityHierarchicalSymm(iind, oind);
       } else {
@@ -1611,6 +1611,22 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
     s << "  return 0;" << endl;
     s << "}" << endl << endl;
   }
+
+  void FXInternal::assignIgnore(MX& y, const MX& x, const std::vector<int>& nz){
+    y[nz] = x;
+  }
+
+  void FXInternal::assignIgnore(SXMatrix& y, const SXMatrix& x, const std::vector<int>& nz){
+    vector<SX>& y_data = y.data();
+    const vector<SX>& x_data = x.data();
+    casadi_assert(nz.size()==x_data.size());
+    for(int k=0; k<nz.size(); ++k){
+      if(nz[k]>=0){
+	y_data.at(nz[k]) = x_data.at(k);
+      }
+    }
+  }
+
 
 
 } // namespace CasADi

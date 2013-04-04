@@ -550,6 +550,14 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   const std::vector<int>& jsp_rowind = jsp.rowind();
   const std::vector<int>& jsp_col = jsp.col();
   
+  // Input sparsity
+  std::vector<int> input_row = input(iind).sparsity().getRow();
+  const std::vector<int>& input_col = input(iind).col();
+
+  // Output sparsity
+  std::vector<int> output_row = output(oind).sparsity().getRow();
+  const std::vector<int>& output_col = output(oind).col();
+
   // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
   if(verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;
   std::vector<int> mapping;
@@ -561,6 +569,9 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   // The nonzeros of the sensitivity matrix
   std::vector<int> nzmap, nzmap2;
   
+  // Additions to the jacobian matrix
+  std::vector<int> adds, adds2;
+
   // A vector used to resolve collitions between directions
   std::vector<int> hits;
   
@@ -575,6 +586,9 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   int nsweep = std::max(nsweep_fwd,nsweep_adj);
   if(verbose())   std::cout << "XFunctionInternal::jac " << nsweep << " sweeps needed for " << nfdir << " forward and " << nadir << " adjoint directions"  << std::endl;
   
+  // Sparsity of the seeds
+  vector<int> seed_row, seed_col;
+
   // Evaluate until everything has been determinated
   for(int s=0; s<nsweep; ++s){
     // Print progress
@@ -594,13 +608,10 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
     // Forward seeds
     fseed.resize(nfdir_batch);
     for(int d=0; d<nfdir_batch; ++d){
-      
-      // initialize to zero
-      fseed[d].resize(getNumInputs());
-      for(int ind=0; ind<fseed[d].size(); ++ind){
-        fseed[d][ind] = MatType(input(ind).sparsity(),0);
-      }
-      
+      // Nonzeros of the seed matrix
+      seed_row.clear();
+      seed_col.clear();
+
       // For all the directions
       for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
         
@@ -608,19 +619,29 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
         int c = D1.col(el);
 
         // Give a seed in the direction
-        fseed[d][iind].at(c) = 1;
+	seed_row.push_back(input_row[c]);
+	seed_col.push_back(input_col[c]);
+      }
+
+      // initialize to zero
+      fseed[d].resize(getNumInputs());
+      for(int ind=0; ind<fseed[d].size(); ++ind){
+	int nrow = input(ind).size1(), ncol = input(ind).size2(); // Input dimensions
+	if(ind==iind){
+	  fseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
+	} else {
+	  fseed[d][ind] = MatType::sparse(nrow,ncol);
+	}
       }
     }
     
     // Adjoint seeds
     aseed.resize(nadir_batch);
     for(int d=0; d<nadir_batch; ++d){
-      //initialize to zero
-      aseed[d].resize(getNumOutputs());
-      for(int ind=0; ind<aseed[d].size(); ++ind){
-        aseed[d][ind] = MatType(output(ind).sparsity(),0);
-      }
-      
+      // Nonzeros of the seed matrix
+      seed_row.clear();
+      seed_col.clear();
+
       // For all the directions
       for(int el = D2.rowind(offset_nadir+d); el<D2.rowind(offset_nadir+d+1); ++el){
         
@@ -628,7 +649,19 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
         int c = D2.col(el);
 
         // Give a seed in the direction
-        aseed[d][oind].at(c) = 1; // NOTE: should be +=, right?
+	seed_row.push_back(output_row[c]);
+	seed_col.push_back(output_col[c]);
+      }
+
+      //initialize to zero
+      aseed[d].resize(getNumOutputs());
+      for(int ind=0; ind<aseed[d].size(); ++ind){
+	int nrow = output(ind).size1(), ncol = output(ind).size2(); // Output dimensions
+	if(ind==oind){
+	  aseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
+	} else {
+	  aseed[d][ind] = MatType::sparse(nrow,ncol);
+	}
       }
     }
 
@@ -687,6 +720,13 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
         fsens[d][oind].sparsity().getNZInplace(nzmap2);
       }
       
+      // Assignments to the Jacobian
+      adds.resize(fsens[d][oind].size());
+      fill(adds.begin(),adds.end(),-1);
+      if(symmetric){
+	adds2.resize(adds.size());
+	fill(adds2.begin(),adds2.end(),-1);
+      }
       
       // For all the input nonzeros treated in the sweep
       for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
@@ -713,14 +753,20 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
           
           if(symmetric){
             if(hits[r_out]==1){
-              ret.at(el_out) = fsens[d][oind].at(f_out);
-              ret.at(elJ) = fsens[d][oind].at(f_out);
+	      adds[f_out] = el_out;
+	      adds2[f_out] = elJ;
             }
           } else {
             // Get the output seed
-            ret.at(elJ) = fsens[d][oind].at(f_out);
+	    adds[f_out] = elJ;
           }
         }
+      }
+
+      // Add contribution to the Jacobian
+      assignIgnore(ret,fsens[d][oind],adds);
+      if(symmetric){
+	assignIgnore(ret,fsens[d][oind],adds2);
       }
     }
         
@@ -1017,18 +1063,17 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   cfile << "}" << std::endl << std::endl;
   
   // Create a main for debugging and profiling: TODO: Cleanup and expose to user, see #617
-  if(false){
+  if(true){
     int n_in = getNumInputs();
     int n_out = getNumOutputs();
 
     cfile << "#include <stdio.h>" << std::endl;
     cfile << "int main(){" << std::endl;
-    cfile << "  int i;" << std::endl;
+    cfile << "  int i,j;" << std::endl;
 
     // Declare input buffers
     for(int i=0; i<n_in; ++i){
       cfile << "  d t_x" << i << "[" << input(i).sparsity().size() << "];" << std::endl;
-      cfile << "  for(i=0; i<" << input(i).sparsity().size() << "; ++i) t_x" << i << "[i] = sin(2.2*i+sqrt(4.3/i));" << std::endl;
     }
 
     // Declare output buffers
@@ -1036,8 +1081,16 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
       cfile << "  d t_r" << i << "[" << output(i).sparsity().size() << "];" << std::endl;
     }
 
+    // Repeat 10 times
+    cfile << "  for(j=0; j<10; ++j){" << std::endl;
+
+    // Dummy input values
+    for(int i=0; i<n_in; ++i){
+      cfile << "    for(i=0; i<" << input(i).sparsity().size() << "; ++i) t_x" << i << "[i] = sin(2.2*i+sqrt(4.3/(j+1)));" << std::endl;
+    }
+
     // Pass inputs
-    cfile << "  evaluate(";
+    cfile << "    evaluate(";
     for(int i=0; i<n_in; ++i){
       cfile << "t_x" << i;
       if(i+1<n_in+n_out)
@@ -1055,10 +1108,15 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
     
     // Dummy printout
     for(int i=0; i<n_out; ++i){
-      if(output(i).sparsity().size()>4){
-	cfile << "  printf(\"%g,%g,%g,%g\\n\",t_r" << i << "[0],t_r" << i << "[1],t_r" << i << "[2],t_r" << i << "[3]);" << std::endl;
+      int n = output(i).sparsity().size();
+      for(int j=0; j<n && j<5; ++j){
+	cfile << "    printf(\"%g \",t_r" << i << "[" << j << "]);" << std::endl;
       }
+      cfile << "    printf(\"\\n\");" << std::endl;
     }
+
+    // End repeat
+    cfile << "  }" << std::endl;
 
     cfile << "  return 0;" << std::endl;
     cfile << "}" << std::endl << std::endl;
@@ -1099,73 +1157,7 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateFunctio
   // Finalize the function
   stream << "}" << std::endl;
   stream << std::endl;
-
-  // Also generate a buffered function
-  stream << "void " << fname << "_buffered(";
-  
-  // Declare inputs with sparsities
-  for(int i=0; i<n_in; ++i){
-    stream << input_type << " x" << i;
-    stream << ", const int* s_x" << i;
-    if(i+1<n_in+n_out)
-      stream << ",";
-  }
-
-  // Declare outputs
-  for(int i=0; i<n_out; ++i){
-    stream << output_type << " r" << i;
-    stream << ", const int* s_r" << i;
-    if(i+1<n_out)
-      stream << ",";
-  }
-  stream << "){ " << std::endl;
-  
-  // Declare input buffers
-  for(int i=0; i<n_in; ++i){
-    stream << "  d t_x" << i << "[" << input(i).sparsity().size() << "];" << std::endl;
-  }
-
-  // Declare output buffers
-  for(int i=0; i<n_out; ++i){
-    stream << "  d t_r" << i << "[" << output(i).sparsity().size() << "];" << std::endl;
-  }
-  
-  // Codegen "copy sparse"
-  gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
-
-  // Copy inputs to buffers
-  for(int i=0; i<n_in; ++i){
-    stream << "  if(x" << i << "!=0) casadi_copy_sparse(x" << i << ",s_x" << i << ",t_x" << i << ",s" << gen.addSparsity(input(i).sparsity()) << ");" << std::endl;
-  }
-
-  // Pass inputs
-  stream << "  " << fname << "(";
-  for(int i=0; i<n_in; ++i){
-    stream << "t_x" << i;
-    if(i+1<n_in+n_out)
-      stream << ",";
-  }
-
-  // Pass output buffers
-  for(int i=0; i<n_out; ++i){
-    stream << "t_r" << i;
-    if(i+1<n_out)
-      stream << ",";
-  }
-  stream << "); " << std::endl;
-
-  // Get result from output buffers
-  for(int i=0; i<n_out; ++i){
-    stream << "  if(r" << i << "!=0) casadi_copy_sparse(t_r" << i << ",s" << gen.addSparsity(output(i).sparsity()) << ",r" << i << ",s_r" << i << ");" << std::endl;
-  }
-
-  // Finalize the function
-  stream << "}" << std::endl;
-  stream << std::endl;
 }
-
-
-
 
 
 

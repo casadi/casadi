@@ -26,18 +26,18 @@
 namespace CasADi{
 
 
-/** SubMatrix class for Matrix 
-  SubMatrix is the return type for operator() of the Matrix class, it allows access to the value as well as changing the parent object
-  \author Joel Andersson 
-  \date 2011
-*/
+  /** SubMatrix class for Matrix 
+      SubMatrix is the return type for operator() of the Matrix class, it allows access to the value as well as changing the parent object
+      \author Joel Andersson 
+      \date 2011
+  */
 
-/// submatrix
-template<typename M, typename I, typename J>
-class SubMatrix : public M{
+  /// submatrix
+  template<typename M, typename I, typename J>
+  class SubMatrix : public M{
   public:
     /// Constructor
-    SubMatrix(M& mat, const I& i, const J& j) : M(mat.getSub(i,j)), mat_(mat), i_(i), j_(j){}
+    SubMatrix(M& mat, const I& i, const J& j) : M(mat.sub(i,j)), mat_(mat), i_(i), j_(j){}
 
     //@{
     /// Methods that modify a part of the parent obejct (A(i,j) = ?, A(i,j) += ?, etc.)
@@ -56,49 +56,49 @@ class SubMatrix : public M{
     /// The element of the matrix that is allowed to be modified
     I i_;
     J j_;
-};
+  };
 
-// Implementation
-template<typename M, typename I, typename J>
-const M& SubMatrix<M,I,J>::operator=(const SubMatrix<M,I,J> &y) { 
-  mat_.setSub(i_,j_,y); 
-  return y;
-}
+  // Implementation
+  template<typename M, typename I, typename J>
+  const M& SubMatrix<M,I,J>::operator=(const SubMatrix<M,I,J> &y) { 
+    mat_.setSub(y,i_,j_); 
+    return y;
+  }
 
-// Implementation
-template<typename M, typename I, typename J>
-const M& SubMatrix<M,I,J>::operator=(const M &y) { 
-  mat_.setSub(i_,j_,y); 
-  return y;
-}
+  // Implementation
+  template<typename M, typename I, typename J>
+  const M& SubMatrix<M,I,J>::operator=(const M &y) { 
+    mat_.setSub(y,i_,j_); 
+    return y;
+  }
 
-template<typename M, typename I, typename J>
-M SubMatrix<M,I,J>::operator+=(const M &y){ 
-  M s = *this+y;
-  mat_.setSub(i_,j_,s); 
-  return s;
-}
+  template<typename M, typename I, typename J>
+  M SubMatrix<M,I,J>::operator+=(const M &y){ 
+    M s = *this+y;
+    mat_.setSub(s,i_,j_); 
+    return s;
+  }
 
-template<typename M, typename I, typename J>
-M SubMatrix<M,I,J>::operator-=(const M &y){ 
-  M s = *this-y;
-  mat_.setSub(i_,j_,s); 
-  return s;
-}
+  template<typename M, typename I, typename J>
+  M SubMatrix<M,I,J>::operator-=(const M &y){ 
+    M s = *this-y;
+    mat_.setSub(s,i_,j_); 
+    return s;
+  }
 
-template<typename M, typename I, typename J>
-M SubMatrix<M,I,J>::operator*=(const M &y){ 
-   M s = *this*y;
-   mat_.setSub(i_,j_,s); 
-   return s;
-}
+  template<typename M, typename I, typename J>
+  M SubMatrix<M,I,J>::operator*=(const M &y){ 
+    M s = *this*y;
+    mat_.setSub(s,i_,j_); 
+    return s;
+  }
 
-template<typename M, typename I, typename J>
-M SubMatrix<M,I,J>::operator/=(const M &y){ 
-   M s = *this/y;
-  mat_.setSub(i_,j_,s); 
-  return s;
-}
+  template<typename M, typename I, typename J>
+  M SubMatrix<M,I,J>::operator/=(const M &y){ 
+    M s = *this/y;
+    mat_.setSub(s,i_,j_); 
+    return s;
+  }
 
 
 } // namespace CasADi
