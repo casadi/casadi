@@ -75,6 +75,9 @@ void FXInternal::init(){
   bool store_jacobians = getOption("store_jacobians");
   casadi_assert_warning(!store_jacobians,"Option \"store_jacobians\" has been deprecated. Jacobians are now always cached.");
   
+  // Warn for functions with too many inputs or outputs
+  casadi_assert_warning(getNumInputs()<10000, "Function " << getOption("name") << " has a large number of inputs. Changing the problem formulation is strongly encouraged.");
+  casadi_assert_warning(getNumOutputs()<10000, "Function " << getOption("name") << " has a large number of outputs. Changing the problem formulation is strongly encouraged.");  
   // Allocate data for sensitivities (only the method in this class)
   FXInternal::updateNumSens(false);
   
