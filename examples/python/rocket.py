@@ -82,19 +82,19 @@ solver.setOption("generate_hessian",True)
 solver.init()
 
 # Bounds on u and initial condition
-solver.setInput(-0.5, NLP_LBX)
-solver.setInput( 0.5, NLP_UBX)
-solver.setInput( 0.4, NLP_X_INIT)
+solver.setInput(-0.5, "lbx")
+solver.setInput( 0.5, "ubx")
+solver.setInput( 0.4, "x_init")
 
 # Bounds on g
-solver.setInput([10,0],NLP_LBG)
-solver.setInput([10,0],NLP_UBG)
+solver.setInput([10,0],"lbg")
+solver.setInput([10,0],"ubg")
 
 # Solve the problem
 solver.solve()
 
 # Get the solution
-plot(solver.output(NLP_X_OPT))
-plot(solver.output(NLP_LAMBDA_X))
+plot(solver.output("x_opt"))
+plot(solver.output("lambda_x"))
 grid()
 show()

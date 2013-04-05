@@ -59,12 +59,12 @@ class OCPtests(casadiTestCase):
     solver.setOption("max_iter",100)
     solver.setOption("print_level",0)
     solver.init()
-    solver.input(NLP_LBX).set([-1000 for i in range(V.size())])
-    solver.input(NLP_UBX).set([1000 for i in range(V.size())])
-    solver.input(NLP_LBG).set([0 for i in range(N+1)])
-    solver.input(NLP_UBG).set([0 for i in range(N+1)])
+    solver.input("lbx").set([-1000 for i in range(V.size())])
+    solver.input("ubx").set([1000 for i in range(V.size())])
+    solver.input("lbg").set([0 for i in range(N+1)])
+    solver.input("ubg").set([0 for i in range(N+1)])
     solver.solve()
-    ocp_sol=solver.output(NLP_COST)[0]
+    ocp_sol=solver.output("cost")[0]
     # solve the ricatti equation exactly
     K = q+0.0
     for i in range(N):
@@ -118,17 +118,17 @@ class OCPtests(casadiTestCase):
     solver.setOption("derivative_test","first-order")
     solver.setOption("print_level",0)
     solver.init()
-    solver.input(NLP_LBX).set([-1, -1])
-    solver.input(NLP_UBX).set([1, 0.2])
+    solver.input("lbx").set([-1, -1])
+    solver.input("ubx").set([1, 0.2])
     solver.solve()
-    self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,8,"X_opt")
-    self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],0.2,8,"X_opt")
+    self.assertAlmostEqual(solver.output("x_opt")[0],1,8,"X_opt")
+    self.assertAlmostEqual(solver.output("x_opt")[1],0.2,8,"X_opt")
     
-    self.assertAlmostEqual(fmax(solver.output(NLP_LAMBDA_X),0)[0],1,8,"Cost should be linear in y0")
-    self.assertAlmostEqual(fmax(solver.output(NLP_LAMBDA_X),0)[1],(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2),8,"Cost should be linear in y0")
-    self.assertAlmostEqual(-solver.output(NLP_COST)[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
-    self.assertAlmostEqual(fmax(-solver.output(NLP_LAMBDA_X),0)[0],0,8,"Constraint is supposed to be unactive")
-    self.assertAlmostEqual(fmax(-solver.output(NLP_LAMBDA_X),0)[1],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(solver.output("lambda_x"),0)[0],1,8,"Cost should be linear in y0")
+    self.assertAlmostEqual(fmax(solver.output("lambda_x"),0)[1],(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2),8,"Cost should be linear in y0")
+    self.assertAlmostEqual(-solver.output("cost")[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
+    self.assertAlmostEqual(fmax(-solver.output("lambda_x"),0)[0],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(-solver.output("lambda_x"),0)[1],0,8,"Constraint is supposed to be unactive")
   
   def test_singleshooting2(self):
     self.message("Single shooting 2")
@@ -179,22 +179,22 @@ class OCPtests(casadiTestCase):
     solver.setOption("derivative_test","first-order")
     #solver.setOption("print_level",0)
     solver.init()
-    solver.input(NLP_LBX).set([-1, -1])
-    solver.input(NLP_UBX).set([1, 0.2])
-    solver.input(NLP_LBG).set([-1])
-    solver.input(NLP_UBG).set([0])
+    solver.input("lbx").set([-1, -1])
+    solver.input("ubx").set([1, 0.2])
+    solver.input("lbg").set([-1])
+    solver.input("ubg").set([0])
     solver.solve()
 
-    self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],0.2,6,"X_opt")
-    self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],0.2,6,"X_opt")
+    self.assertAlmostEqual(solver.output("x_opt")[0],0.2,6,"X_opt")
+    self.assertAlmostEqual(solver.output("x_opt")[1],0.2,6,"X_opt")
     
-    self.assertAlmostEqual(fmax(solver.output(NLP_LAMBDA_X),0)[0],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(solver.output("lambda_x"),0)[0],0,8,"Constraint is supposed to be unactive")
     dfdp0 = (sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2)
-    self.assertAlmostEqual(fmax(solver.output(NLP_LAMBDA_X),0)[1],1+dfdp0,8)
-    self.assertAlmostEqual(solver.output(NLP_LAMBDA_G)[0],1,8)
-    self.assertAlmostEqual(-solver.output(NLP_COST)[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
-    self.assertAlmostEqual(fmax(-solver.output(NLP_LAMBDA_X),0)[0],0,8,"Constraint is supposed to be unactive")
-    self.assertAlmostEqual(fmax(-solver.output(NLP_LAMBDA_X),0)[1],0,8,"Constraint is supposed to be unactive") 
+    self.assertAlmostEqual(fmax(solver.output("lambda_x"),0)[1],1+dfdp0,8)
+    self.assertAlmostEqual(solver.output("lambda_g")[0],1,8)
+    self.assertAlmostEqual(-solver.output("cost")[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
+    self.assertAlmostEqual(fmax(-solver.output("lambda_x"),0)[0],0,8,"Constraint is supposed to be unactive")
+    self.assertAlmostEqual(fmax(-solver.output("lambda_x"),0)[1],0,8,"Constraint is supposed to be unactive") 
     
   def test_XML(self):
     self.message("JModelica XML parsing")
@@ -379,26 +379,26 @@ class OCPtests(casadiTestCase):
     ms.setOption("nlp_solver_options",nlp_solver_options)
     ms.init()
     
-    ms.input(OCP_LBX).setAll(-inf)
-    ms.input(OCP_UBX).setAll(inf)
-    ms.input(OCP_X_INIT).setAll(0)
+    ms.input("lbx").setAll(-inf)
+    ms.input("ubx").setAll(inf)
+    ms.input("x_init").setAll(0)
     
-    ms.input(OCP_LBU).setAll(-1)
-    ms.input(OCP_UBU).setAll(1)
-    ms.input(OCP_U_INIT).setAll(0)
+    ms.input("lbu").setAll(-1)
+    ms.input("ubu").setAll(1)
+    ms.input("u_init").setAll(0)
     
-    ms.input(OCP_LBX)[0,0] = 1
-    ms.input(OCP_UBX)[0,0] = 1
+    ms.input("lbx")[0,0] = 1
+    ms.input("ubx")[0,0] = 1
    
-    ms.input(OCP_LBX)[1,0] = 0
-    ms.input(OCP_UBX)[1,0] = 0
+    ms.input("lbx")[1,0] = 0
+    ms.input("ubx")[1,0] = 0
  
-    ms.input(OCP_LBX)[2,0] = 0
-    ms.input(OCP_UBX)[2,0] = 0
+    ms.input("lbx")[2,0] = 0
+    ms.input("ubx")[2,0] = 0
     
     ms.solve()
     
-    self.checkarray(sign(matrix(ms.output(OCP_X_OPT))[0,:-1]),ms.output(OCP_U_OPT),"solution")
+    self.checkarray(sign(matrix(ms.output("x_opt"))[0,:-1]),ms.output("u_opt"),"solution")
 
 
   def testMSclassSimple2(self):
@@ -455,20 +455,20 @@ class OCPtests(casadiTestCase):
     ms.setOption("nlp_solver_options",nlp_solver_options)
     ms.init()
     
-    ms.input(OCP_LBX).setAll(-inf)
-    ms.input(OCP_UBX).setAll(inf)
-    ms.input(OCP_X_INIT).setAll(0)
+    ms.input("lbx").setAll(-inf)
+    ms.input("ubx").setAll(inf)
+    ms.input("x_init").setAll(0)
     
-    ms.input(OCP_LBU).setAll(-1)
-    ms.input(OCP_UBU).setAll(1)
-    ms.input(OCP_U_INIT).setAll(0)
+    ms.input("lbu").setAll(-1)
+    ms.input("ubu").setAll(1)
+    ms.input("u_init").setAll(0)
     
-    ms.input(OCP_LBP).setAll(-2)
-    ms.input(OCP_UBP).setAll(2)
-    ms.input(OCP_P_INIT).setAll(0)
+    ms.input("lbp").setAll(-2)
+    ms.input("ubp").setAll(2)
+    ms.input("p_init").setAll(0)
     
-    ms.input(OCP_LBX)[0,0] = 0
-    ms.input(OCP_UBX)[0,0] = 0
+    ms.input("lbx")[0,0] = 0
+    ms.input("ubx")[0,0] = 0
    
     ms.solve()
     

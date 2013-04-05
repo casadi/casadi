@@ -156,17 +156,17 @@ solver.setOption("generate_hessian",True)
 solver.init()
 
 # Pass bounds
-solver.setInput(v_min,NLP_LBX) # lower variable bounds
-solver.setInput(v_max,NLP_UBX) # upper variable bounds
-solver.setInput(v_init,NLP_X_INIT) # variable initial guess
-solver.setInput(NP.zeros(g.size()),NLP_LBG) # equality constraints
-solver.setInput(NP.zeros(g.size()),NLP_UBG) # equality constraints
+solver.setInput(v_min,"lbx") # lower variable bounds
+solver.setInput(v_max,"ubx") # upper variable bounds
+solver.setInput(v_init,"x_init") # variable initial guess
+solver.setInput(NP.zeros(g.size()),"lbg") # equality constraints
+solver.setInput(NP.zeros(g.size()),"ubg") # equality constraints
 
 # Solve the NLP
 solver.solve()
 
 # Get the solution
-v_opt = NP.array(solver.output(NLP_X_OPT))
+v_opt = NP.array(solver.output("x_opt"))
 x_opt = zeros(X.shape)
 u_opt = zeros(U.shape)
 z_opt = zeros(Z.shape)

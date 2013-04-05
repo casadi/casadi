@@ -68,10 +68,10 @@ sim.setOption("integrator",CVodesIntegrator)
 #! Each control interval will be subdived in 8
 sim.setOption("nf",8) 
 sim.init()
-sim.input(CONTROLSIMULATOR_X0).set([0,0])
-sim.input(CONTROLSIMULATOR_P).set([1,0.1,1])
+sim.input("x0").set([0,0])
+sim.input("p").set([1,0.1,1])
 #! Our 9 control intervals have the following prescribed values for u:
-sim.input(CONTROLSIMULATOR_U).set([0,-0.2,0,0.5,0,0,0,0.2,-0.8]) 
+sim.input("u").set([0,-0.2,0,0.5,0,0,0,0.2,-0.8]) 
 sim.evaluate()
 
 #! Obtain the fine time grid
@@ -84,7 +84,7 @@ xlabel("t")
 ylabel("x")
 
 #! Plot the controls
-plot(ts[:-1],array(sim.input(CONTROLSIMULATOR_U))[:,0],'o') # Sampled on the coarse grid
+plot(ts[:-1],array(sim.input("u"))[:,0],'o') # Sampled on the coarse grid
 plot(tsf[:-1],array(sim.getMinorU())[:,0],'.')           # Sampled on the fine grid 
 legend(('x','u (coarse)','u (fine)'))
 
@@ -110,10 +110,10 @@ sim.setOption("integrator",CVodesIntegrator)
 #! Each control interval will be subdived in 8
 sim.setOption("nf",8) 
 sim.init()
-sim.input(CONTROLSIMULATOR_X0).set([0,0])
-sim.input(CONTROLSIMULATOR_P).set([1,0.1,1])
+sim.input("x0").set([0,0])
+sim.input("p").set([1,0.1,1])
 #! Our 9 control intervals have the following prescribed values for u:
-sim.input(CONTROLSIMULATOR_U).set([0,-0.2,0,0.5,0,0,0,0.2,-0.8]) 
+sim.input("u").set([0,-0.2,0,0.5,0,0,0,0.2,-0.8]) 
 sim.evaluate()
 
 figure(1)
@@ -158,10 +158,10 @@ sim.setOption("control_interpolation","linear")
 sim.setOption("control_endpoint",True)
 sim.setOption("nf",8) 
 sim.init()
-sim.input(CONTROLSIMULATOR_X0).set([0,0])
-sim.input(CONTROLSIMULATOR_P).set([1,0.1,1])
+sim.input("x0").set([0,0])
+sim.input("p").set([1,0.1,1])
 #! CONTROLSIMULATOR_U is larger, it has a value at the end of the last control interval, such that interpolation can happen
-sim.input(CONTROLSIMULATOR_U).set([0,-0.2,0,0.5,0,0,0,0.2,-0.8,0]) 
+sim.input("u").set([0,-0.2,0,0.5,0,0,0,0.2,-0.8,0]) 
 sim.evaluate()
 
 #! Obtain the fine time grid
@@ -174,7 +174,7 @@ xlabel("t")
 ylabel("x")
 
 #! Plot the controls
-plot(ts,array(sim.input(CONTROLSIMULATOR_U))[:,0],'o') # Sampled on the coarse grid
+plot(ts,array(sim.input("u"))[:,0],'o') # Sampled on the coarse grid
 plot(tsf,sim.output(1),'-')           # Sampled on the fine grid 
 legend(('x','u (coarse)','u (fine)'))
 

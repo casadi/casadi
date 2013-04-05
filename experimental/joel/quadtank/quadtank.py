@@ -95,7 +95,7 @@ ffcn = SXFunction(acado_in,[ffcn_out])
 ffcn.init()
 
 def res2(y,t):
-  ffcn.setInput(y, ACADO_FCN_XD);
+  ffcn.setInput(y, "fcn_xd");
   ffcn.evaluate()
   return list(ffcn.getOutputData())
 
@@ -103,7 +103,7 @@ x_0 = [0.0, 0.01, 0.01, 0.01, 0.01]
 t_sim = NP.linspace(0.,2000.,500)
 
 u_A = [2.,2]
-ffcn.setInput(u_A, ACADO_FCN_U);
+ffcn.setInput(u_A, "fcn_u");
 y_sim = integr.odeint(res2,x_0,t_sim)
 
 # Plot
@@ -114,7 +114,7 @@ plt.plot(t_sim,y_sim[:,1:5])
 plt.grid()
 
 u_B = [2.5,2.5]
-ffcn.setInput(u_B, ACADO_FCN_U);
+ffcn.setInput(u_B, "fcn_u");
 y_sim = integr.odeint(res2,x_0,t_sim)
 
 # Plot
@@ -146,12 +146,12 @@ ocp_solver.init()
 # Set bounds on states
 x_guess = (num_nodes+1) * [0, 0.1, 0.1, 0.1, 0.1]
 u0 = (num_nodes+1) * u_A
-ocp_solver.setInput(x_guess,ACADO_X_GUESS)
-ocp_solver.setInput(u0,ACADO_U_GUESS)
+ocp_solver.setInput(x_guess,"x_guess")
+ocp_solver.setInput(u0,"u_guess")
   
-ocp_solver.setInput([2,2],ACADO_LBU)
-ocp_solver.setInput([10,10],ACADO_UBU)
-ocp_solver.setInput((num_nodes+1)*[5,5],ACADO_U_GUESS)
+ocp_solver.setInput([2,2],"lbu")
+ocp_solver.setInput([10,10],"ubu")
+ocp_solver.setInput((num_nodes+1)*[5,5],"u_guess")
 
 # Solve the optimal control problem
 ocp_solver.solve()

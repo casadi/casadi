@@ -91,8 +91,8 @@ sim.setOption("integrator", CVodesIntegrator)
 sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-12})
 sim.setOption("nf",20)
 sim.init()
-sim.setInput(x0,CONTROLSIMULATOR_X0)
-sim.setInput(u_,CONTROLSIMULATOR_U)
+sim.setInput(x0,"x0")
+sim.setInput(u_,"u")
 sim.evaluate()
 
 tf = sim.getMinorT()
@@ -108,8 +108,8 @@ out = DMatrix(sim.output())
 # -----------------------------------
 
 x0_pert = DMatrix([0,0,1])*1e-4
-sim.setInput(x0+x0_pert,CONTROLSIMULATOR_X0)
-sim.setInput(u_,CONTROLSIMULATOR_U)
+sim.setInput(x0+x0_pert,"x0")
+sim.setInput(u_,"u")
 sim.evaluate()
 
 tf = list(sim.getMinorT())
@@ -120,8 +120,8 @@ plot(tf,sim.output()-out,linewidth=3)
 
 jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
 jacsim.init()
-jacsim.setInput(x0,CONTROLSIMULATOR_X0)
-jacsim.setInput(u_,CONTROLSIMULATOR_U)
+jacsim.setInput(x0,"x0")
+jacsim.setInput(u_,"u")
 
 jacsim.evaluate()
 
@@ -151,8 +151,8 @@ assert(e<1e-6)
 
 u_perturb = DMatrix(u_)
 u_perturb[N/5,0] = 1e-4
-sim.setInput(x0,CONTROLSIMULATOR_X0)
-sim.setInput(u_+u_perturb,CONTROLSIMULATOR_U)
+sim.setInput(x0,"x0")
+sim.setInput(u_+u_perturb,"u")
 sim.evaluate()
 
 figure(3)
@@ -163,8 +163,8 @@ plot(tf,sim.output()-out,linewidth=3)
 
 jacsim = sim.jacobian(CONTROLSIMULATOR_U,0)
 jacsim.init()
-jacsim.setInput(x0,CONTROLSIMULATOR_X0)
-jacsim.setInput(u_,CONTROLSIMULATOR_U)
+jacsim.setInput(x0,"x0")
+jacsim.setInput(u_,"u")
 
 jacsim.evaluate()
 
@@ -219,7 +219,7 @@ integrator = CVodesIntegrator(dae)
 integrator.setOption("tf",t1)
 integrator.setOption("reltol",1e-12)
 integrator.init()
-integrator.setInput(states_,INTEGRATOR_X0)
+integrator.setInput(states_,"x0")
 integrator.evaluate()
 
 out = states(integrator.output())
@@ -265,7 +265,7 @@ sim.setOption("integrator", CVodesIntegrator)
 sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-12})
 sim.setOption("nf",20)
 sim.init()
-sim.setInput(states_,CONTROLSIMULATOR_X0)
+sim.setInput(states_,"x0")
 sim.evaluate()
 sim.output()
 
@@ -309,7 +309,7 @@ integrator.init()
 u = DMatrix.eye(ns)
 makeDense(u)
 integrator.reset(0,0)
-integrator.setInput(flatten(u),INTEGRATOR_X0)
+integrator.setInput(flatten(u),"x0")
 integrator.integrate(0)
 
 # Keep integrating until steady state is reached
@@ -332,7 +332,7 @@ print "(positive definite)"
 
 
 # Check that it does indeed satisfy the ricatti equation
-dae.setInput(integrator.output(),DAE_X)
+dae.setInput(integrator.output(),"x")
 dae.evaluate()
 print max(fabs(dae.output()))
 assert(max(fabs(dae.output()))<1e-8)
@@ -354,8 +354,8 @@ integrator = CVodesIntegrator(dae)
 integrator.setOption("reltol",1e-16)
 integrator.setOption("stop_at_end",False)
 integrator.init()
-integrator.setInput(flatten(P_),INTEGRATOR_X0)
-integrator.input(INTEGRATOR_X0)[0] += 1e-9 # Put a tiny perturbation
+integrator.setInput(flatten(P_),"x0")
+integrator.input("x0")[0] += 1e-9 # Put a tiny perturbation
 integrator.reset(0,0)
 integrator.integrate(0)
 
@@ -414,8 +414,8 @@ for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-
   sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-12})
   sim.setOption("nf",200)
   sim.init()
-  sim.setInput(x0,CONTROLSIMULATOR_X0)
-  #sim.setInput(yref_,CONTROLSIMULATOR_U)
+  sim.setInput(x0,"x0")
+  #sim.setInput(yref_,"u")
   sim.evaluate()
 
   tf = sim.getMinorT()
@@ -489,8 +489,8 @@ figure(7)
 for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)]):
   param_["K"] = K_
 
-  sim.setInput(states_,CONTROLSIMULATOR_X0)
-  sim.setInput(param_,CONTROLSIMULATOR_P)
+  sim.setInput(states_,"x0")
+  sim.setInput(param_,"p")
   sim.evaluate()
   sim.output()
 
@@ -508,8 +508,8 @@ for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)
   title('controls (%s)' % caption)
 
   # Calculate monodromy matrix
-  jacsim.setInput(states_,CONTROLSIMULATOR_X0)
-  jacsim.setInput(param_,CONTROLSIMULATOR_P)
+  jacsim.setInput(states_,"x0")
+  jacsim.setInput(param_,"p")
   jacsim.evaluate()
   M = jacsim.output()[-states.size:,:][list(states.i["y"]),list(states.i["y"])]
   
@@ -559,9 +559,9 @@ sim.setOption("integrator", CVodesIntegrator)
 sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
 sim.setOption("nf",20)
 sim.init()
-sim.setInput(2*x0,CONTROLSIMULATOR_X0)
-sim.setInput(param_,CONTROLSIMULATOR_P)
-sim.setInput(u_,CONTROLSIMULATOR_U)
+sim.setInput(2*x0,"x0")
+sim.setInput(param_,"p")
+sim.setInput(u_,"u")
 sim.evaluate()
 
 tf = sim.getMinorT()
@@ -582,9 +582,9 @@ jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
 jacsim.init()
 
 # Calculate monodromy matrix
-jacsim.setInput(x0,CONTROLSIMULATOR_X0)
-jacsim.setInput(param_,CONTROLSIMULATOR_P)
-jacsim.setInput(u_,CONTROLSIMULATOR_U)
+jacsim.setInput(x0,"x0")
+jacsim.setInput(param_,"p")
+jacsim.setInput(u_,"u")
 jacsim.evaluate()
 M = jacsim.output()[-ns:,:]
 
@@ -614,9 +614,9 @@ sim.setOption("integrator", CVodesIntegrator)
 sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
 sim.setOption("nf",20)
 sim.init()
-sim.setInput(2*x0,CONTROLSIMULATOR_X0)
-sim.setInput(param_,CONTROLSIMULATOR_P)
-sim.setInput(u_,CONTROLSIMULATOR_U)
+sim.setInput(2*x0,"x0")
+sim.setInput(param_,"p")
+sim.setInput(u_,"u")
 sim.evaluate()
 
 tf = sim.getMinorT()
@@ -637,9 +637,9 @@ jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
 jacsim.init()
 
 # Calculate monodromy matrix
-jacsim.setInput(x0,CONTROLSIMULATOR_X0)
-jacsim.setInput(param_,CONTROLSIMULATOR_P)
-jacsim.setInput(u_,CONTROLSIMULATOR_U)
+jacsim.setInput(x0,"x0")
+jacsim.setInput(param_,"p")
+jacsim.setInput(u_,"u")
 jacsim.evaluate()
 M = jacsim.output()[-ns:,:]
 

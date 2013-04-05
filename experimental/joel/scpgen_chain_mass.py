@@ -155,13 +155,13 @@ solver = IpoptSolver(F)
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput(-u_max, NLP_LBX)
-solver.setInput( u_max, NLP_UBX)
-solver.setInput( 0.,    NLP_X_INIT)
+solver.setInput(-u_max, "lbx")
+solver.setInput( u_max, "ubx")
+solver.setInput( 0.,    "x_init")
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the solution
-u_opt = NP.array(solver.output(NLP_X_OPT))
+u_opt = NP.array(solver.output("x_opt"))
 
