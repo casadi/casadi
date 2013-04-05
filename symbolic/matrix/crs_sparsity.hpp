@@ -106,7 +106,7 @@ namespace CasADi{
     CRSSparsity(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind);
 
     /** \brief  Create from node */
-    explicit CRSSparsity(CRSSparsityInternal *node);
+    CRSSparsity(CRSSparsityInternal *node);
 
     /** \brief Check if there is an identical copy of the sparsity pattern in the cache, and if so, make a shallow copy of that one */
     void reCache();

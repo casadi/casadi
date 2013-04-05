@@ -82,8 +82,7 @@ void FXInternal::init(){
   FXInternal::updateNumSens(false);
   
   // Resize the matrix that holds the sparsity of the Jacobian blocks
-  jac_sparsity_compact_.resize(getNumInputs(),vector<CRSSparsity>(getNumOutputs()));
-  jac_sparsity_.resize(getNumInputs(),vector<CRSSparsity>(getNumOutputs()));
+  jac_sparsity_ = jac_sparsity_compact_ = Matrix<CRSSparsity>(getNumInputs(),getNumOutputs());
 
   // Get the Jacobian generator function, if any
   if(hasSetOption("jacobian_generator")){
@@ -971,17 +970,17 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind, bool symmetric){
 
 void FXInternal::setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact){
   if(compact){
-    jac_sparsity_compact_[iind][oind] = sp;
+    jac_sparsity_compact_.elem(iind,oind) = sp;
   } else {
-    jac_sparsity_[iind][oind] = sp;
+    jac_sparsity_.elem(iind,oind) = sp;
   }
 }
 
 CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact, bool symmetric){
   casadi_assert_message(isInit(),"Function not initialized.");
 
-  // Get a reference to the block
-  CRSSparsity& jsp = compact ? jac_sparsity_compact_[iind][oind] : jac_sparsity_[iind][oind];
+  // Get an owning reference to the block
+  CRSSparsity jsp = compact ? jac_sparsity_compact_.elem(iind,oind) : jac_sparsity_.elem(iind,oind);
 
   // Generate, if null
   if(jsp.isNull()){
@@ -991,8 +990,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact, bool symm
         jsp = getJacSparsity(iind,oind,symmetric);
       } else {
         // Create a temporary FX instance
-        FX tmp;
-        tmp.assignNode(this);
+        FX tmp = shared_from_this<FX>();
 
         // Use user-provided routine to determine sparsity
         jsp = spgen_(tmp,iind,oind,user_data_);
@@ -1033,9 +1031,11 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact, bool symm
   if(jsp.isNull()){
     jsp = CRSSparsity(output(oind).size(),input(iind).size());
   }
-  
+
   // Return a reference to the block
-  return jsp;
+  CRSSparsity& jsp_ref = compact ? jac_sparsity_compact_.elem(iind,oind) : jac_sparsity_.elem(iind,oind);
+  jsp_ref = jsp;
+  return jsp_ref;
 }
 
 void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& D2, bool compact, bool symmetric){
