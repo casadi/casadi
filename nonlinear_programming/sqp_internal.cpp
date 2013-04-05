@@ -226,9 +226,9 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   // Set linearization point to initial guess
   copy(x_init.begin(),x_init.end(),x_.begin());
   
-  // Lagrange multipliers of the NLP
-  fill(mu_.begin(),mu_.end(),0);
-  fill(mu_x_.begin(),mu_x_.end(),0);
+  // Initialize Lagrange multipliers of the NLP
+  copy(input(NLP_LAMBDA_INIT).begin(),input(NLP_LAMBDA_INIT).end(),mu_.begin());
+  copy(output(NLP_LAMBDA_X).begin(),output(NLP_LAMBDA_X).end(),mu_x_.begin());
 
   // Initial constraint Jacobian
   eval_jac_g(x_,gk_,Jk_);
