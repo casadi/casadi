@@ -33,8 +33,6 @@ namespace CasADi{
 QPSolverInternal::QPSolverInternal() {
   //addOption("trans", OT_BOOLEAN, false);
   
-  inputScheme_ = SCHEME_QPInput;
-  outputScheme_ = SCHEME_QPOutput;
 }
 
 // Constructor
@@ -78,6 +76,9 @@ QPSolverInternal::QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A){
   output(QP_COST) = 0.0;
   output(QP_LAMBDA_X) = DMatrix(x_sparsity);
   output(QP_LAMBDA_A) = DMatrix(bounds_sparsity);
+  
+  inputScheme_ = SCHEME_QPInput;
+  outputScheme_ = SCHEME_QPOutput;
 }
     
 void QPSolverInternal::init() {
