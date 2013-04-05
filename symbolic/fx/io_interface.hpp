@@ -61,24 +61,35 @@ namespace CasADi{
     
     //@{
     /// Access input argument
-    inline Matrix<double>& input(int iind=0){ return inputS<true>(iind).data;}
-    inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
-    inline Matrix<double>& inputNoCheck(int iind=0){ return inputS<false>(iind).data;}
     inline const Matrix<double>& input(int iind=0) const{ return inputS<true>(iind).data;}
     inline const Matrix<double>& input(const std::string &iname) const{  return input(inputSchemeEntry(iname)); }
     inline const Matrix<double>& inputNoCheck(int iind=0) const{ return inputS<false>(iind).data;}
+#ifdef SWIG
+    %rename(inputRef) input;
+#endif
+    inline Matrix<double>& input(int iind=0){ return inputS<true>(iind).data;}
+    inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
+    inline Matrix<double>& inputNoCheck(int iind=0){ return inputS<false>(iind).data;}
     //@}
     
     //@{
     /// Access output argument
-    inline Matrix<double>& output(int oind=0){ return outputS<true>(oind).data;}
-    inline Matrix<double>& outputNoCheck(int oind=0){ return outputS<false>(oind).data;}
     inline const Matrix<double>& output(int oind=0) const{ return outputS<true>(oind).data;}
     inline const Matrix<double>& outputNoCheck(int oind=0) const{ return outputS<false>(oind).data;}
+#ifdef SWIG
+    %rename(outputRef) output;
+#endif
+    inline Matrix<double>& output(int oind=0){ return outputS<true>(oind).data;}
+    inline Matrix<double>& outputNoCheck(int oind=0){ return outputS<false>(oind).data;}
     //@}
 
     //@{
     /// Access forward seed
+    const Matrix<double>& fwdSeed(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSeed(iind,dir); }
+    const Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSeedNoCheck(iind,dir); }
+#ifdef SWIG
+    %rename(fwdSeedRef) fwdSeed;
+#endif
     Matrix<double>& fwdSeed(int iind=0, int dir=0){
       try{
         return inputS<true>(iind).dataF.at(dir);
@@ -94,12 +105,15 @@ namespace CasADi{
       }
     }
     Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0){ return inputS<false>(iind).dataF[dir]; }
-    const Matrix<double>& fwdSeed(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSeed(iind,dir); }
-    const Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSeedNoCheck(iind,dir); }
     //@}
 
     //@{
     /// Access forward sensitivity
+    const Matrix<double>& fwdSens(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSens(oind,dir);}
+    const Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSensNoCheck(oind,dir);}
+#ifdef SWIG
+    %rename(fwdSensRef) fwdSens;
+#endif
     Matrix<double>& fwdSens(int oind=0, int dir=0){
       try{
         return outputS<true>(oind).dataF.at(dir);
@@ -115,12 +129,15 @@ namespace CasADi{
       }
     }
     Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0){ return outputS<false>(oind).dataF[dir]; }
-    const Matrix<double>& fwdSens(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSens(oind,dir);}
-    const Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSensNoCheck(oind,dir);}
     //@}
 
     //@{
     /// Access adjoint seed
+    const Matrix<double>& adjSeed(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSeed(oind,dir);}
+    const Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSeedNoCheck(oind,dir);}
+#ifdef SWIG
+    %rename(adjSeedRef) adjSeed;
+#endif
     Matrix<double>& adjSeed(int oind=0, int dir=0){
       try{
         return outputS<true>(oind).dataA.at(dir);
@@ -136,12 +153,15 @@ namespace CasADi{
       }
     }
     Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0){ return outputS<false>(oind).dataA[dir];}
-    const Matrix<double>& adjSeed(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSeed(oind,dir);}
-    const Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSeedNoCheck(oind,dir);}
     //@}
 
     //@{
     /// Access forward sensitivity
+    const Matrix<double>& adjSens(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSens(iind,dir);}
+    const Matrix<double>& adjSensNoCheck(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSensNoCheck(iind,dir);}
+#ifdef SWIG
+    %rename(adjSensRef) adjSens;
+#endif
     Matrix<double>& adjSens(int iind=0, int dir=0){
       try{
         return inputS<true>(iind).dataA.at(dir);
@@ -157,8 +177,6 @@ namespace CasADi{
       }
     }
     Matrix<double>& adjSensNoCheck(int iind=0, int dir=0){ return inputS<false>(iind).dataA[dir];}
-    const Matrix<double>& adjSens(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSens(iind,dir);}
-    const Matrix<double>& adjSensNoCheck(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSensNoCheck(iind,dir);}
     //@}
 
     /// Get the number of function inputs
@@ -168,10 +186,10 @@ namespace CasADi{
     inline int getNumOutputs() const{ return static_cast<const Derived*>(this)->output_struct().size();}
 
     /// Set the number of function inputs
-    inline void setNumInputs(int num_in){ static_cast<Derived*>(this)->input_.resize(num_in); }
+    inline void setNumInputs(int num_in){ static_cast<Derived*>(this)->input_struct().resize(num_in); }
     
     /// Set the number of function outputs
-    inline void setNumOutputs(int num_out){ static_cast<Derived*>(this)->output_.resize(num_out); }
+    inline void setNumOutputs(int num_out){ static_cast<Derived*>(this)->output_struct().resize(num_out); }
 
     /** \brief  Access an input */
     template<bool check>
@@ -220,16 +238,16 @@ namespace CasADi{
     }
 
     /** \brief Set input scheme */
-    void setInputScheme(InputOutputScheme scheme){ static_cast<Derived*>(this)->inputScheme() = scheme;}
+    void setInputScheme(CasADi::InputOutputScheme scheme){ static_cast<Derived*>(this)->inputScheme() = scheme;}
 
     /** \brief Set output scheme */
-    void setOutputScheme(InputOutputScheme scheme){ static_cast<Derived*>(this)->outputScheme() = scheme;}
+    void setOutputScheme(CasADi::InputOutputScheme scheme){ static_cast<Derived*>(this)->outputScheme() = scheme;}
 
     /** \brief Get input scheme */
-    InputOutputScheme getInputScheme() const{ return static_cast<const Derived*>(this)->inputScheme(); }
+    CasADi::InputOutputScheme getInputScheme() const{ return static_cast<const Derived*>(this)->inputScheme(); }
 
     /** \brief Get output scheme */
-    InputOutputScheme getOutputScheme() const{ return static_cast<const Derived*>(this)->outputScheme(); }
+    CasADi::InputOutputScheme getOutputScheme() const{ return static_cast<const Derived*>(this)->outputScheme(); }
 
     /** \brief Find the index for a string describing a particular entry of an input scheme
      * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
@@ -244,7 +262,7 @@ namespace CasADi{
     /** \brief Find the index for a string describing a particular entry of a scheme
      * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
      */
-    int schemeEntry(InputOutputScheme scheme,const std::string &name) const{
+    int schemeEntry(CasADi::InputOutputScheme scheme,const std::string &name) const{
       if (scheme==SCHEME_unknown) casadi_error("Unable to look up '" <<  name<< "' in input scheme, as the input scheme of this function is unknown. You can only index with integers.");
       if (name=="") casadi_error("FXInternal::inputSchemeEntry: you supplied an empty string as the name of a entry in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
       int n = getSchemeEntryEnum(scheme,name);
@@ -252,7 +270,130 @@ namespace CasADi{
       return n;
     }
 
-  };  
+#ifdef DOXYGENPROC
+    //// \defgroup setter_getter_T
+    //// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+    /// Assumes a properly allocated val.\n
+
+    /// \name Setters
+    /// Set/get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
+    /// \copydoc setter_getter_T
+    /// 
+    /// @{
+    /** 
+	\brief Reads in the input argument from val.
+	\copydoc setter_getter_T
+    */
+    void setInput(T val, int ind=0) const;
+    /** 
+	\brief Reads in the output argument from val.
+	\copydoc setter_getter_T
+    */
+    void setOutput(T val, int ind=0) const;
+    /** 
+	\brief Reads in the forward seed from val.
+	\copydoc setter_getter_T
+    */
+    void setFwdSeed(T val,  int ind=0, int dir=0) const;
+    /** 
+	\brief Reads in the forward sensitivity from val.
+    */
+    void setFwdSens(T val, int ind=0, int dir=0) const ;
+    /** 
+	\brief Reads in the adjoint seed from val.
+	\copydoc setter_getter_T
+    */
+    void setAdjSeed(T val,  int ind=0, int dir=0) const;
+    /** 
+	\brief Reads in the adjoint sensitivity from val.
+	\copydoc setter_getter_T
+    */
+    void setAdjSens(T val, int ind=0, int dir=0) const ;
+    /// @}
+
+#endif
+
+#define SETTERS(T)							\
+    void setInput(T val, int ind=0)             { static_cast<const Derived*>(this)->assertInit(); input(ind).set(val);  } \
+    void setOutput(T val, int ind=0)            { static_cast<const Derived*>(this)->assertInit(); output(ind).set(val); } \
+    void setFwdSeed(T val, int ind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); fwdSeed(ind,dir).set(val); } \
+    void setFwdSens(T val, int ind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); fwdSens(ind,dir).set(val); } \
+    void setAdjSeed(T val, int ind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); adjSeed(ind,dir).set(val); } \
+    void setAdjSens(T val, int ind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); adjSens(ind,dir).set(val); }
+
+#ifndef DOXYGENPROC
+    SETTERS(double);
+#ifndef SWIG
+    SETTERS(const double*);
+#endif // SWIG
+    SETTERS(const std::vector<double>&);
+    SETTERS(const Matrix<double>&);
+#endif // DOXYGENPROC
+
+#undef SETTERS
+
+#define GETTERS(T)							\
+    void getInput(T val, int ind=0) const             { static_cast<const Derived*>(this)->assertInit(); input(ind).get(val);} \
+    void getOutput(T val, int ind=0) const            { static_cast<const Derived*>(this)->assertInit(); output(ind).get(val);} \
+    void getFwdSeed(T val, int ind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); fwdSeed(ind,dir).get(val);} \
+    void getFwdSens(T val, int ind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); fwdSens(ind,dir).get(val);} \
+    void getAdjSeed(T val, int ind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); adjSeed(ind,dir).get(val);} \
+    void getAdjSens(T val, int ind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); adjSens(ind,dir).get(val);}
+
+#ifndef DOXYGENPROC
+    GETTERS(double&);
+#ifndef SWIG
+    GETTERS(double*);
+#endif // SWIG
+    GETTERS(std::vector<double>&);
+    GETTERS(Matrix<double>&);
+#endif // DOXYGENPROC
+#undef GETTERS
+
+#ifdef DOXYGENPROC
+    /// \name Getters
+    /// A group of accessor for numerical data that operate on preallocated data.\n
+    /// get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
+    /// \copydoc setter_getter_T
+    /// @{
+
+    /** \brief Writes out the input argument into val.
+	\copydoc setter_getter_T
+    */
+    void getInput(T val, int ind=0) const;
+ 
+    /** 
+	\brief Writes out the output argument into val.
+	\copydoc setter_getter_T
+    */
+    void getOutput(T val, int ind=0) const;
+
+    /** 
+	\brief Writes out the forward seed into val.
+	\copydoc setter_getter_T
+    */
+    void getFwdSeed(T val,  int ind=0, int dir=0) const;
+
+    /**  
+	 \brief Writes out the forward sensitivity into val.
+	 \copydoc setter_getter_T
+    */
+    void getFwdSens(T val, int ind=0, int dir=0) const;
+    /** 
+	\brief Writes out the adjoint seed into val.
+	\copydoc setter_getter_T
+    */
+    void getAdjSeed(T val,  int ind=0, int dir=0) const ;
+
+    /** 
+	\brief Writes out the adjoint sensitivity into val.
+	\copydoc setter_getter_T
+    */
+    void getAdjSens(T val, int ind=0, int dir=0) const;
+    /// @}
+#endif
+
+  };
 
 
 } // namespace CasADi

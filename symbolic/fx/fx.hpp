@@ -29,9 +29,9 @@ namespace CasADi{
   
   /** Forward declaration of internal class */
   class FXInternal;
-
+  
   /** \brief General function
-
+      
       A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
       Number of inputs:  nin    getNumInputs()\n
       Number of outputs: nout   getNumOutputs()\n
@@ -81,37 +81,41 @@ namespace CasADi{
       \author Joel Andersson 
       \date 2010
   */
-  class FX : public OptionsFunctionality{
-
+  class FX : public OptionsFunctionality, public IOInterface<FX>{
+    
   public:
     /** \brief  default constructor */
     FX(); 
 
     /** \brief  Destructor */
     ~FX();
-
+    
 #ifndef SWIG
     /** \brief  Create from node */
     static FX create(FXInternal* node);
 #endif // SWIG
-  
-    /** \brief  Get number of inputs */
-    int getNumInputs() const;
+    
+    //@{
+    /** \brief Access input/output scheme */
+    const CasADi::InputOutputScheme& inputScheme() const;
+    const CasADi::InputOutputScheme& outputScheme() const;
+    CasADi::InputOutputScheme& inputScheme();
+    CasADi::InputOutputScheme& outputScheme();
+    //@}
 
-    /** \brief  Get number of outputs */
-    int getNumOutputs() const;
+    //@{
+    /// Input/output structures of the function */
+    const std::vector<FunctionIO>& input_struct() const;
+    const std::vector<FunctionIO>& output_struct() const;
+    std::vector<FunctionIO>& input_struct();
+    std::vector<FunctionIO>& output_struct();
+    //@}
   
     /** \brief  Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs) */
     int getNumScalarInputs() const;
 
     /** \brief  Get total number of scalar outputs (i.e. the number of nonzeros in all of the matrix-valued outputs) */
     int getNumScalarOutputs() const;
-  
-    /** \brief  Set number of inputs (normally invoked internally) */
-    void setNumInputs(int num_in);
-
-    /** \brief  Set number of outputs  (normally invoked internally) */
-    void setNumOutputs(int num_out);
   
     /** \brief Set input scheme */
     void setInputScheme(CasADi::InputOutputScheme scheme);
@@ -335,187 +339,7 @@ namespace CasADi{
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-  
-    /// Const access input argument
-    const Matrix<double>& input(int iind=0) const;
-
-    /// Const access input argument
-    const Matrix<double>& input(const std::string &iname) const;
-
-    /// Const access input argument
-    const Matrix<double>& output(int oind=0) const;
-
-    /// Const access forward seed
-    const Matrix<double>& fwdSeed(int iind=0, int dir=0) const;
-
-    /// Const access forward sensitivity
-    const Matrix<double>& fwdSens(int oind=0, int dir=0) const;
-  
-    /// Const access adjoint seed
-    const Matrix<double>& adjSeed(int oind=0, int dir=0) const;
-
-    /// Const access forward sensitivity
-    const Matrix<double>& adjSens(int iind=0, int dir=0) const;
-
-#ifdef SWIG
-    // Rename the following functions in Python to avoid creating objects which can change the internal data of the FX class by mistake
-    %rename(inputRef) input;
-    %rename(outputRef) output;
-    %rename(fwdSeedRef) fwdSeed;
-    %rename(fwdSensRef) fwdSens;
-    %rename(adjSeedRef) adjSeed;
-    %rename(adjSensRef) adjSens;
-#endif // SWIG
-
-    /// Access input argument
-    Matrix<double>& input(int iind=0);
-
-    /// Access input argument
-    Matrix<double>& input(const std::string &iname);
-  
-    /** \brief Access output argument
-	Note that copies in Python are shallow by default and fx.output() gives a reference/pointer to an internal data structure. So if you want save fx.output(), you need to make a deep copy using for example DMatrix(fx.output()).
-    */
-    Matrix<double>& output(int oind=0);  
-
-    /// Access forward seed
-    Matrix<double>& fwdSeed(int iind=0, int dir=0);
-  
-    /// Access forward sensitivity
-    Matrix<double>& fwdSens(int oind=0, int dir=0);
-
-    /// Access adjoint seed
-    Matrix<double>& adjSeed(int oind=0, int dir=0);
-
-    /// Access forward sensitivity
-    Matrix<double>& adjSens(int iind=0, int dir=0);
-  
-
-  
-  
-#ifdef DOXYGENPROC
-    //// \defgroup setter_getter_T
-    //// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-    /// Assumes a properly allocated val.\n
-
-    /// \name Setters
-    /// Set/get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
-    /// \copydoc setter_getter_T
-    /// 
-    /// @{
-    /** 
-	\brief Reads in the input argument from val.
-	\copydoc setter_getter_T
-    */
-    void setInput(T val, int ind=0) const;
-    /** 
-	\brief Reads in the output argument from val.
-	\copydoc setter_getter_T
-    */
-    void setOutput(T val, int ind=0) const;
-    /** 
-	\brief Reads in the forward seed from val.
-	\copydoc setter_getter_T
-    */
-    void setFwdSeed(T val,  int ind=0, int dir=0) const;
-    /** 
-	\brief Reads in the forward sensitivity from val.
-    */
-    void setFwdSens(T val, int ind=0, int dir=0) const ;
-    /** 
-	\brief Reads in the adjoint seed from val.
-	\copydoc setter_getter_T
-    */
-    void setAdjSeed(T val,  int ind=0, int dir=0) const;
-    /** 
-	\brief Reads in the adjoint sensitivity from val.
-	\copydoc setter_getter_T
-    */
-    void setAdjSens(T val, int ind=0, int dir=0) const ;
-    /// @}
-
-#endif
-
-#define SETTERS(T)							\
-    void setInput(T val, int ind=0)             { assertInit(); input(ind).set(val);  } \
-    void setOutput(T val, int ind=0)            { assertInit(); output(ind).set(val); } \
-    void setFwdSeed(T val, int ind=0, int dir=0){ assertInit(); fwdSeed(ind,dir).set(val); } \
-    void setFwdSens(T val, int ind=0, int dir=0){ assertInit(); fwdSens(ind,dir).set(val); } \
-    void setAdjSeed(T val, int ind=0, int dir=0){ assertInit(); adjSeed(ind,dir).set(val); } \
-    void setAdjSens(T val, int ind=0, int dir=0){ assertInit(); adjSens(ind,dir).set(val); }
-
-#ifndef DOXYGENPROC
-    SETTERS(double);
-#ifndef SWIG
-    SETTERS(const double*);
-#endif // SWIG
-    SETTERS(const std::vector<double>&);
-    SETTERS(const Matrix<double>&);
-#endif // DOXYGENPROC
-
-#undef SETTERS
-
-#define GETTERS(T)							\
-    void getInput(T val, int ind=0) const             { assertInit(); input(ind).get(val);} \
-    void getOutput(T val, int ind=0) const            { assertInit(); output(ind).get(val);} \
-    void getFwdSeed(T val, int ind=0, int dir=0) const{ assertInit(); fwdSeed(ind,dir).get(val);} \
-    void getFwdSens(T val, int ind=0, int dir=0) const{ assertInit(); fwdSens(ind,dir).get(val);} \
-    void getAdjSeed(T val, int ind=0, int dir=0) const{ assertInit(); adjSeed(ind,dir).get(val);} \
-    void getAdjSens(T val, int ind=0, int dir=0) const{ assertInit(); adjSens(ind,dir).get(val);}
-
-#ifndef DOXYGENPROC
-    GETTERS(double&);
-#ifndef SWIG
-    GETTERS(double*);
-#endif // SWIG
-    GETTERS(std::vector<double>&);
-    GETTERS(Matrix<double>&);
-#endif // DOXYGENPROC
-#undef GETTERS
-
-#ifdef DOXYGENPROC
-    /// \name Getters
-    /// A group of accessor for numerical data that operate on preallocated data.\n
-    /// get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
-    /// \copydoc setter_getter_T
-    /// @{
-
-    /** \brief Writes out the input argument into val.
-	\copydoc setter_getter_T
-    */
-    void getInput(T val, int ind=0) const;
- 
-    /** 
-	\brief Writes out the output argument into val.
-	\copydoc setter_getter_T
-    */
-    void getOutput(T val, int ind=0) const;
-
-    /** 
-	\brief Writes out the forward seed into val.
-	\copydoc setter_getter_T
-    */
-    void getFwdSeed(T val,  int ind=0, int dir=0) const;
-
-    /**  
-	 \brief Writes out the forward sensitivity into val.
-	 \copydoc setter_getter_T
-    */
-    void getFwdSens(T val, int ind=0, int dir=0) const;
-    /** 
-	\brief Writes out the adjoint seed into val.
-	\copydoc setter_getter_T
-    */
-    void getAdjSeed(T val,  int ind=0, int dir=0) const ;
-
-    /** 
-	\brief Writes out the adjoint sensitivity into val.
-	\copydoc setter_getter_T
-    */
-    void getAdjSens(T val, int ind=0, int dir=0) const;
-    /// @}
-#endif
-
+    
     /// Get all statistics obtained at the end of the last evaluate call
     const Dictionary& getStats() const;
 

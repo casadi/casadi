@@ -49,7 +49,10 @@
 %rename(__getitem__) indexed_zero_based;
 #endif
 
+%include "symbolic/fx/io_interface.hpp"
+%template(IOInterfaceFX) CasADi::IOInterface<CasADi::FX>;
 %include "symbolic/fx/fx.hpp"
+
 %include "symbolic/fx/sx_function.hpp"
 %include "symbolic/fx/mx_function.hpp"
 %include "symbolic/fx/linear_solver.hpp"
