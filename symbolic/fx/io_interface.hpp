@@ -63,30 +63,25 @@ namespace CasADi{
     /// Access input argument
     inline const Matrix<double>& input(int iind=0) const{ return inputS<true>(iind).data;}
     inline const Matrix<double>& input(const std::string &iname) const{  return input(inputSchemeEntry(iname)); }
-    inline const Matrix<double>& inputNoCheck(int iind=0) const{ return inputS<false>(iind).data;}
 #ifdef SWIG
     %rename(inputRef) input;
 #endif
     inline Matrix<double>& input(int iind=0){ return inputS<true>(iind).data;}
     inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
-    inline Matrix<double>& inputNoCheck(int iind=0){ return inputS<false>(iind).data;}
     //@}
     
     //@{
     /// Access output argument
     inline const Matrix<double>& output(int oind=0) const{ return outputS<true>(oind).data;}
-    inline const Matrix<double>& outputNoCheck(int oind=0) const{ return outputS<false>(oind).data;}
 #ifdef SWIG
     %rename(outputRef) output;
 #endif
     inline Matrix<double>& output(int oind=0){ return outputS<true>(oind).data;}
-    inline Matrix<double>& outputNoCheck(int oind=0){ return outputS<false>(oind).data;}
     //@}
 
     //@{
     /// Access forward seed
     const Matrix<double>& fwdSeed(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSeed(iind,dir); }
-    const Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSeedNoCheck(iind,dir); }
 #ifdef SWIG
     %rename(fwdSeedRef) fwdSeed;
 #endif
@@ -104,13 +99,11 @@ namespace CasADi{
         throw CasadiException(ss.str());
       }
     }
-    Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0){ return inputS<false>(iind).dataF[dir]; }
     //@}
 
     //@{
     /// Access forward sensitivity
     const Matrix<double>& fwdSens(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSens(oind,dir);}
-    const Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSensNoCheck(oind,dir);}
 #ifdef SWIG
     %rename(fwdSensRef) fwdSens;
 #endif
@@ -128,13 +121,11 @@ namespace CasADi{
         throw CasadiException(ss.str());
       }
     }
-    Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0){ return outputS<false>(oind).dataF[dir]; }
     //@}
 
     //@{
     /// Access adjoint seed
     const Matrix<double>& adjSeed(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSeed(oind,dir);}
-    const Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSeedNoCheck(oind,dir);}
 #ifdef SWIG
     %rename(adjSeedRef) adjSeed;
 #endif
@@ -152,13 +143,11 @@ namespace CasADi{
         throw CasadiException(ss.str());
       }
     }
-    Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0){ return outputS<false>(oind).dataA[dir];}
     //@}
 
     //@{
     /// Access forward sensitivity
     const Matrix<double>& adjSens(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSens(iind,dir);}
-    const Matrix<double>& adjSensNoCheck(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSensNoCheck(iind,dir);}
 #ifdef SWIG
     %rename(adjSensRef) adjSens;
 #endif
@@ -176,7 +165,6 @@ namespace CasADi{
         throw CasadiException(ss.str());
       }
     }
-    Matrix<double>& adjSensNoCheck(int iind=0, int dir=0){ return inputS<false>(iind).dataA[dir];}
     //@}
 
     /// Get the number of function inputs

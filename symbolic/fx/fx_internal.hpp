@@ -222,6 +222,23 @@ namespace CasADi{
     inline std::vector<FunctionIO>& output_struct(){ return output_;}
     //@}
 
+    //@{
+    /// Input/output access without checking (faster, but unsafe)
+    inline const Matrix<double>& inputNoCheck(int iind=0) const{ return inputS<false>(iind).data;}
+    inline const Matrix<double>& outputNoCheck(int oind=0) const{ return outputS<false>(oind).data;}
+    inline const Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSeedNoCheck(iind,dir); }
+    inline const Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSensNoCheck(oind,dir);}    
+    inline const Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSeedNoCheck(oind,dir);}
+    inline const Matrix<double>& adjSensNoCheck(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSensNoCheck(iind,dir);}
+
+    inline Matrix<double>& inputNoCheck(int iind=0){ return inputS<false>(iind).data;}
+    inline Matrix<double>& outputNoCheck(int oind=0){ return outputS<false>(oind).data;}
+    inline Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0){ return inputS<false>(iind).dataF[dir]; }
+    inline Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0){ return outputS<false>(oind).dataF[dir]; }
+    inline Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0){ return outputS<false>(oind).dataA[dir];}
+    inline Matrix<double>& adjSensNoCheck(int iind=0, int dir=0){ return inputS<false>(iind).dataA[dir];}
+    //@}
+
     /** \brief  Log the status of the solver */
     void log(const std::string& msg) const;
 
