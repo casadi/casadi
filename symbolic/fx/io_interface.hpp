@@ -284,42 +284,42 @@ namespace CasADi{
 	\brief Reads in the input argument from val.
 	\copydoc setter_getter_T
     */
-    void setInput(T val, int ind=0) const;
+    void setInput(T val, int iind=0) const;
     /** 
 	\brief Reads in the output argument from val.
 	\copydoc setter_getter_T
     */
-    void setOutput(T val, int ind=0) const;
+    void setOutput(T val, int oind=0) const;
     /** 
 	\brief Reads in the forward seed from val.
 	\copydoc setter_getter_T
     */
-    void setFwdSeed(T val,  int ind=0, int dir=0) const;
+    void setFwdSeed(T val,  int iind=0, int dir=0) const;
     /** 
 	\brief Reads in the forward sensitivity from val.
     */
-    void setFwdSens(T val, int ind=0, int dir=0) const ;
+    void setFwdSens(T val, int oind=0, int dir=0) const ;
     /** 
 	\brief Reads in the adjoint seed from val.
 	\copydoc setter_getter_T
     */
-    void setAdjSeed(T val,  int ind=0, int dir=0) const;
+    void setAdjSeed(T val,  int oind=0, int dir=0) const;
     /** 
 	\brief Reads in the adjoint sensitivity from val.
 	\copydoc setter_getter_T
     */
-    void setAdjSens(T val, int ind=0, int dir=0) const ;
+    void setAdjSens(T val, int iind=0, int dir=0) const ;
     /// @}
 
 #endif
 
 #define SETTERS(T)							\
-    void setInput(T val, int ind=0)             { static_cast<const Derived*>(this)->assertInit(); input(ind).set(val);  } \
-    void setOutput(T val, int ind=0)            { static_cast<const Derived*>(this)->assertInit(); output(ind).set(val); } \
-    void setFwdSeed(T val, int ind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); fwdSeed(ind,dir).set(val); } \
-    void setFwdSens(T val, int ind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); fwdSens(ind,dir).set(val); } \
-    void setAdjSeed(T val, int ind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); adjSeed(ind,dir).set(val); } \
-    void setAdjSens(T val, int ind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); adjSens(ind,dir).set(val); }
+    void setInput(T val, int iind=0)             { static_cast<const Derived*>(this)->assertInit(); input(iind).set(val);  } \
+    void setOutput(T val, int oind=0)            { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
+    void setFwdSeed(T val, int iind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); fwdSeed(iind,dir).set(val); } \
+    void setFwdSens(T val, int oind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); fwdSens(oind,dir).set(val); } \
+    void setAdjSeed(T val, int oind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); adjSeed(oind,dir).set(val); } \
+    void setAdjSens(T val, int iind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); adjSens(iind,dir).set(val); }
 
 #ifndef DOXYGENPROC
     SETTERS(double);
@@ -333,12 +333,12 @@ namespace CasADi{
 #undef SETTERS
 
 #define GETTERS(T)							\
-    void getInput(T val, int ind=0) const             { static_cast<const Derived*>(this)->assertInit(); input(ind).get(val);} \
-    void getOutput(T val, int ind=0) const            { static_cast<const Derived*>(this)->assertInit(); output(ind).get(val);} \
-    void getFwdSeed(T val, int ind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); fwdSeed(ind,dir).get(val);} \
-    void getFwdSens(T val, int ind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); fwdSens(ind,dir).get(val);} \
-    void getAdjSeed(T val, int ind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); adjSeed(ind,dir).get(val);} \
-    void getAdjSens(T val, int ind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); adjSens(ind,dir).get(val);}
+    void getInput(T val, int iind=0) const             { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);} \
+    void getOutput(T val, int oind=0) const            { static_cast<const Derived*>(this)->assertInit(); output(oind).get(val);} \
+    void getFwdSeed(T val, int iind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); fwdSeed(iind,dir).get(val);} \
+    void getFwdSens(T val, int oind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); fwdSens(oind,dir).get(val);} \
+    void getAdjSeed(T val, int oind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); adjSeed(oind,dir).get(val);} \
+    void getAdjSens(T val, int iind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); adjSens(iind,dir).get(val);}
 
 #ifndef DOXYGENPROC
     GETTERS(double&);
@@ -360,36 +360,36 @@ namespace CasADi{
     /** \brief Writes out the input argument into val.
 	\copydoc setter_getter_T
     */
-    void getInput(T val, int ind=0) const;
+    void getInput(T val, int iind=0) const;
  
     /** 
 	\brief Writes out the output argument into val.
 	\copydoc setter_getter_T
     */
-    void getOutput(T val, int ind=0) const;
+    void getOutput(T val, int oind=0) const;
 
     /** 
 	\brief Writes out the forward seed into val.
 	\copydoc setter_getter_T
     */
-    void getFwdSeed(T val,  int ind=0, int dir=0) const;
+    void getFwdSeed(T val,  int iind=0, int dir=0) const;
 
     /**  
 	 \brief Writes out the forward sensitivity into val.
 	 \copydoc setter_getter_T
     */
-    void getFwdSens(T val, int ind=0, int dir=0) const;
+    void getFwdSens(T val, int oind=0, int dir=0) const;
     /** 
 	\brief Writes out the adjoint seed into val.
 	\copydoc setter_getter_T
     */
-    void getAdjSeed(T val,  int ind=0, int dir=0) const ;
+    void getAdjSeed(T val,  int oind=0, int dir=0) const ;
 
     /** 
 	\brief Writes out the adjoint sensitivity into val.
 	\copydoc setter_getter_T
     */
-    void getAdjSens(T val, int ind=0, int dir=0) const;
+    void getAdjSens(T val, int iind=0, int dir=0) const;
     /// @}
 #endif
 
