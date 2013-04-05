@@ -45,7 +45,8 @@ namespace CasADi{
     // Standard unary and binary functions
     OP_ADD,  OP_SUB,  OP_MUL,  OP_DIV,
     OP_NEG,  OP_EXP,  OP_LOG,  OP_POW, OP_CONSTPOW,
-    OP_SQRT,  OP_SIN,  OP_COS,  OP_TAN,  
+    OP_SQRT,  OP_SQ,
+    OP_SIN,  OP_COS,  OP_TAN,  
     OP_ASIN,  OP_ACOS,  OP_ATAN,  
     OP_LT, OP_LE, OP_EQ, OP_NE, OP_NOT, OP_AND, OP_OR,
     OP_FLOOR,  OP_CEIL,  OP_FABS, OP_SIGN, OP_IF_ELSE_ZERO,
@@ -304,12 +305,12 @@ namespace CasADi{
 namespace CasADi{
 
   template<typename T>
-  T timesTwo(const T& x){
+  T twice(const T& x){
     return x+x;
   }
   
   template<typename T>
-  T square(const T& x){
+  T sq(const T& x){
     return x*x;
   }
   
@@ -454,6 +455,7 @@ namespace CasADi{
   template<>      struct F0XChecker<OP_DIV>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_NEG>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SQRT>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_SQ>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SIN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_TAN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_ASIN>{ static const bool check=true;};
@@ -608,7 +610,15 @@ namespace CasADi{
   struct UnaryOperation<OP_SQRT>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = sqrt(x);}
-    template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=1/(timesTwo(f));}
+    template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=1/(twice(f));}
+  };
+
+  /// Square
+  template<>
+  struct UnaryOperation<OP_SQ>{
+  public:
+    template<typename T> static inline void fcn(const T& x, T& f){ f = sq(x);}
+    template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=twice(x);}
   };
 
   /// Sine
@@ -632,7 +642,7 @@ namespace CasADi{
   struct UnaryOperation<OP_TAN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = tan(x);}
-    template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1/square(cos(x));}
+    template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1/sq(cos(x));}
   };
 
   /// Arcus sine

@@ -239,6 +239,7 @@ namespace CasADi{
     case AUX_NRM2: auxNrm2(); break;
     case AUX_FILL: auxFill(); break;
     case AUX_MM_NT_SPARSE: auxMmNtSparse(); break;
+    case AUX_SQUARE: auxSquare(); break;
     case AUX_SIGN: auxSign(); break;
     case AUX_COPY_SPARSE: auxCopySparse(); break;
     case AUX_TRANS: auxTrans(); break;
@@ -319,11 +320,12 @@ namespace CasADi{
     s << endl;
   }
 
-  void CodeGenerator::auxSign(){
-    stringstream& s = auxiliaries_;
+  void CodeGenerator::auxSquare(){
+    auxiliaries_ << "inline d square(d x){ return x*x;}" << endl << endl;
+  }
 
-    s << "inline d sign(d x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl;
-    s << endl;
+  void CodeGenerator::auxSign(){
+    auxiliaries_ << "inline d sign(d x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl << endl;
   }
 
   void CodeGenerator::auxScal(){
