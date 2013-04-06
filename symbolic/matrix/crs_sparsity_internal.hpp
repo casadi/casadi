@@ -172,11 +172,11 @@ namespace CasADi{
     
     //@{
     /// Union of two sparsity patterns
-    CRSSparsity patternCombine(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero=true, bool f0x_is_zero=false, bool fx0_is_zero=false) const;
-    CRSSparsity patternCombine(const CRSSparsity& y, bool f00_is_zero=true, bool f0x_is_zero=false, bool fx0_is_zero=false) const;
+    CRSSparsity patternCombine(const CRSSparsity& y, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
+    CRSSparsity patternCombine(const CRSSparsity& y, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const;
 
     template<bool with_mapping>
-    CRSSparsity patternCombineGen1(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const;
+    CRSSparsity patternCombineGen1(const CRSSparsity& y, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
 
     template<bool with_mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero>
     CRSSparsity patternCombineGen(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;

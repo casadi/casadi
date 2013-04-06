@@ -238,7 +238,7 @@ namespace CasADi{
   MX unite(const MX& A, const MX& B){
     // Join the sparsity patterns
     std::vector<unsigned char> mapping;
-    CRSSparsity sp = A.sparsity().patternCombine(B.sparsity(),mapping);
+    CRSSparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
   
     // Split up the mapping
     std::vector<int> nzA,nzB;

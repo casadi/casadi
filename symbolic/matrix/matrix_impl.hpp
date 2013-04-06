@@ -149,8 +149,7 @@ const Matrix<T> Matrix<T>::sub(const CRSSparsity& sp, int dummy) const {
   Matrix<T> ret(sp);
 
   std::vector<unsigned char> mapping; // Mapping that will be filled by patternunion
-
-  sparsity().patternCombine(sp,mapping,true, false, true);
+  sparsity().patternCombine(sp,true, false, true, mapping);
 
   int k = 0;     // Flat index into non-zeros of this matrix
   int j = 0;     // Flat index into non-zeros of the resultant matrix;
@@ -1673,10 +1672,7 @@ Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &
   } else {
     // Get the sparsity pattern
     std::vector<unsigned char> mapping;
-    CRSSparsity ret_sp = x_sp.patternCombine(y_sp,mapping,
-                                           operation_checker<F00Checker>(op),
-                                           operation_checker<F0XChecker>(op),
-                                           operation_checker<FX0Checker>(op));
+    CRSSparsity ret_sp = x_sp.patternCombine(y_sp, operation_checker<F00Checker>(op), operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op), mapping);
     
     // Create return matrix
     Matrix<T> ret(ret_sp);

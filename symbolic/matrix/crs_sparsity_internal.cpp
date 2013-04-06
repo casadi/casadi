@@ -1119,8 +1119,7 @@ namespace CasADi{
     CRSSparsity C;
     if(order == 1 && n == m){
       // C = A+A
-      std::vector<unsigned char> mapping;
-      C = patternCombine(AT,mapping,true,false,false);
+      C = patternCombine(AT,true,false,false);
     } else if(order==2){
     
       // drop dense columns from AT
@@ -2310,15 +2309,15 @@ namespace CasADi{
 
   CRSSparsity CRSSparsityInternal::patternCombine(const CRSSparsity& y, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
     /*static*/ vector<unsigned char> mapping;
-    return patternCombineGen1<false>(y, mapping, f00_is_zero, f0x_is_zero, fx0_is_zero);
+    return patternCombineGen1<false>(y, f00_is_zero, f0x_is_zero, fx0_is_zero, mapping);
   }
 
-  CRSSparsity CRSSparsityInternal::patternCombine(const CRSSparsity& y, vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
-    return patternCombineGen1<true>(y, mapping, f00_is_zero, f0x_is_zero, fx0_is_zero);    
+  CRSSparsity CRSSparsityInternal::patternCombine(const CRSSparsity& y, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero, vector<unsigned char>& mapping) const{
+    return patternCombineGen1<true>(y, f00_is_zero, f0x_is_zero, fx0_is_zero, mapping);    
   }
   
   template<bool with_mapping>
-  CRSSparsity CRSSparsityInternal::patternCombineGen1(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
+  CRSSparsity CRSSparsityInternal::patternCombineGen1(const CRSSparsity& y, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const{
     if(f0x_is_zero){
       if(fx0_is_zero){
 	return patternCombineGen<with_mapping,true,true,true>(y,mapping);

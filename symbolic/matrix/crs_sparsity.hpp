@@ -265,26 +265,36 @@ namespace CasADi{
     /// Check if the sparsity is the transpose of another
     bool isTranspose(const CRSSparsity& y) const;
 
+    /// @{
     /** \brief Combine two sparsity patterns
 	Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
 	The mapping matrix contains the arguments for each nonzero, the first bit indicates if the first argument is nonzero,
 	the second bit indicates if the second argument is nonzero (note that none of, one of or both of the arguments can be nonzero) */
-    CRSSparsity patternCombine(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero=true, bool f0x_is_zero=false, bool fx0_is_zero=false) const;
+    CRSSparsity patternCombine(const CRSSparsity& y, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
+    CRSSparsity patternCombine(const CRSSparsity& y, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const;
+    /// @}
+
+    /// @{
+    /** \brief Union of two sparsity patterns */
+    CRSSparsity patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;
+    CRSSparsity patternUnion(const CRSSparsity& y) const;
+    /// @}
     
+    /// @{
     /** \brief Intersection of two sparsity patterns
 	Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
 	The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if it is from the second and 3 (i.e. 1 | 2) if from both */
     CRSSparsity patternIntersection(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;
+    CRSSparsity patternIntersection(const CRSSparsity& y) const;
+    /// @}
 
+    /// @{
     /** \brief Sparsity pattern for a matrix-matrix product
 	Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
 	The mapping contains a vector of the index pairs that makes up the scalar products for each non-zero */
     CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
-
-    /** \brief Sparsity pattern for a matrix-matrix product
-	No mapping */
     CRSSparsity patternProduct(const CRSSparsity& y_trans) const;
-        
+    /// @}
     
     /** \brief Enlarge matrix
 	Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros 
