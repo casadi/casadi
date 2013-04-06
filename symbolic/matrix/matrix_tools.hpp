@@ -1070,7 +1070,7 @@ template<class T>
 Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B){
   // Join the sparsity patterns
   std::vector<unsigned char> mapping;
-  CRSSparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
+  CRSSparsity sp = A.sparsity().patternCombine(B.sparsity(),mapping);
   
   // Create return matrix
   Matrix<T> ret(sp);

@@ -1120,7 +1120,7 @@ namespace CasADi{
     if(order == 1 && n == m){
       // C = A+A
       std::vector<unsigned char> mapping;
-      C = patternUnion(AT,mapping,true,false,false);
+      C = patternCombine(AT,mapping,true,false,false);
     } else if(order==2){
     
       // drop dense columns from AT
@@ -2308,7 +2308,7 @@ namespace CasADi{
     return ret;
   }
 
-  CRSSparsity CRSSparsityInternal::patternUnion(const CRSSparsity& y, vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
+  CRSSparsity CRSSparsityInternal::patternCombine(const CRSSparsity& y, vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
     // Assert dimensions
     casadi_assert_message(nrow_==y.size1(), "The number of rows does not match");
     casadi_assert_message(ncol_==y.size2(), "The number of columns does not match");

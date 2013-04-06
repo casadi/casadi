@@ -48,7 +48,7 @@ class Sparsitytests(casadiTestCase):
       b.getNZ(i[0],i[1])
       
     w = UCharVector()
-    c=a.patternUnion(b,w)
+    c=a.patternCombine(b,w)
     self.assertEquals(w.size(),len(nza.union(nzb)))
     for k in range(w.size()):
       ind = (c.getRow()[k],c.col(k))
@@ -86,7 +86,7 @@ class Sparsitytests(casadiTestCase):
       b.getNZ(i[0],i[1])
     
     w = UCharVector()
-    c=a.patternUnion(b,w,True,True,True)
+    c=a.patternCombine(b,w,True,True,True)
     for k in range(c.size()):
       ind = (c.getRow()[k],c.col(k))
       self.assertTrue(ind in nza and ind in nzb)

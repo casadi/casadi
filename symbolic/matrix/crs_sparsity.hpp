@@ -265,11 +265,11 @@ namespace CasADi{
     /// Check if the sparsity is the transpose of another
     bool isTranspose(const CRSSparsity& y) const;
 
-    /** \brief Union of two sparsity patterns
+    /** \brief Combine two sparsity patterns
 	Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
 	The mapping matrix contains the arguments for each nonzero, the first bit indicates if the first argument is nonzero,
 	the second bit indicates if the second argument is nonzero (note that none of, one of or both of the arguments can be nonzero) */
-    CRSSparsity patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero=true, bool f0x_is_zero=false, bool fx0_is_zero=false) const;
+    CRSSparsity patternCombine(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero=true, bool f0x_is_zero=false, bool fx0_is_zero=false) const;
     
     /** \brief Intersection of two sparsity patterns
 	Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements

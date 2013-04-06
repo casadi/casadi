@@ -46,7 +46,7 @@ namespace CasADi{
     bool f00_is_zero = operation_checker<F00Checker>(op_);
     bool f0x_is_zero = operation_checker<F0XChecker>(op_);
     bool fx0_is_zero = operation_checker<FX0Checker>(op_);
-    CRSSparsity sp = x->sparsity().patternUnion(y->sparsity(),mapping_,f00_is_zero,f0x_is_zero,fx0_is_zero);
+    CRSSparsity sp = x->sparsity().patternCombine(y->sparsity(),mapping_,f00_is_zero,f0x_is_zero,fx0_is_zero);
     setSparsity(sp);
   }
 
