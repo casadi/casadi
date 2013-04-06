@@ -180,7 +180,7 @@ namespace CasADi{
     casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"sub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
     vector<unsigned char> mappingc; // Mapping that will be filled by patternunion
   
-    sparsity().patternCombine(sp, true, false, true, mappingc);
+    sparsity().patternCombine(sp, false, true, mappingc);
     vector<int> nz(sp.size(),-1);
 
     int k_this = 0;     // Non-zero of this matrix
@@ -915,11 +915,21 @@ namespace CasADi{
     return (*this)->getOutput(oind);
   }
 
-  MX MX::setSparse(const CRSSparsity& sp){
+  MX MX::setSparse(const CRSSparsity& sp) const{
     if(sp==sparsity()){
       return *this;
     } else {
       return (*this)->getSetSparse(sp);
+    }
+  }
+
+ MX MX::makeDense(const MX& val) const{
+    if(dense()){
+      return *this;
+    } else {
+      MX ret(size1(),size2(),val);
+      ret(sparsity()) = *this;
+      return ret;
     }
   }
 	  

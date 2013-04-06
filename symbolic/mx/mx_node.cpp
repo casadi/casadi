@@ -435,7 +435,14 @@ namespace CasADi{
       return MX::create(new NonzerosNonzerosOp(Operation(op),shared_from_this<MX>(),y)); 
     } else {
       // Sparse matrix-matrix operation necessary
-      return MX::create(new SparseSparseOp(Operation(op),shared_from_this<MX>(),y)); 
+      MX ret = MX::create(new SparseSparseOp(Operation(op),shared_from_this<MX>(),y)); 
+      if(ret.dense() || operation_checker<F00Checker>(op)){
+	return ret;
+      } else {
+	double fcn_0;
+	casadi_math<double>::fun(op,double(0),double(0),fcn_0);
+	return ret.makeDense(fcn_0);
+      }
     }
   }
 

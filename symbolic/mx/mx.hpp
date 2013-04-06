@@ -433,7 +433,10 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   MX logic_not() const;
 
   /** \brief Set sparse */
-  MX setSparse(const CRSSparsity& sp);
+  MX setSparse(const CRSSparsity& sp) const;
+
+  /** \brief Make dense */
+  MX makeDense(const MX& val = 0) const;
 
   /// Lift an expression
   void lift(const MX& x_guess);

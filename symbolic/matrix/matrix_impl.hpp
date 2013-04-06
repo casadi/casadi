@@ -149,7 +149,7 @@ const Matrix<T> Matrix<T>::sub(const CRSSparsity& sp, int dummy) const {
   Matrix<T> ret(sp);
 
   std::vector<unsigned char> mapping; // Mapping that will be filled by patternunion
-  sparsity().patternCombine(sp,true, false, true, mapping);
+  sparsity().patternCombine(sp, false, true, mapping);
 
   int k = 0;     // Flat index into non-zeros of this matrix
   int j = 0;     // Flat index into non-zeros of the resultant matrix;
@@ -1672,7 +1672,7 @@ Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &
   } else {
     // Get the sparsity pattern
     std::vector<unsigned char> mapping;
-    CRSSparsity ret_sp = x_sp.patternCombine(y_sp, operation_checker<F00Checker>(op), operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op), mapping);
+    CRSSparsity ret_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op), mapping);
     
     // Create return matrix
     Matrix<T> ret(ret_sp);
@@ -1680,6 +1680,12 @@ Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &
     // Perform the operation
     binary_no_alloc(casadi_math<T>::fun,op,x,y,ret,mapping);
     
+    // Densify if needed
+    if(!ret.dense() && !operation_checker<F00Checker>(op)){
+      T fcn_0;
+      casadi_math<T>::fun(op,casadi_limits<T>::zero,casadi_limits<T>::zero,fcn_0);
+      ret.makeDense(ret.size1(),ret.size2(),fcn_0);
+    }
     return ret;
   }
 }
