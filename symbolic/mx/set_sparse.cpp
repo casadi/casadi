@@ -20,7 +20,7 @@
  *
  */
 
-#include "densification.hpp"
+#include "set_sparse.hpp"
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
@@ -30,16 +30,16 @@ using namespace std;
 
 namespace CasADi{
 
-  Densification::Densification(const MX& x, const CRSSparsity& sp){
+  SetSparse::SetSparse(const MX& x, const CRSSparsity& sp){
     setDependencies(x);
     setSparsity(CRSSparsity(sp));
   }
 
-  Densification* Densification::clone() const{
-    return new Densification(*this);
+  SetSparse* SetSparse::clone() const{
+    return new SetSparse(*this);
   }
 
-  void Densification::printPart(std::ostream &stream, int part) const{
+  void SetSparse::printPart(std::ostream &stream, int part) const{
     if(part==0){
       stream << "dense(";
     } else {
@@ -48,7 +48,7 @@ namespace CasADi{
   }
 
   template<typename T, typename MatV, typename MatVV> 
-  void Densification::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void SetSparse::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
 
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
@@ -68,18 +68,18 @@ namespace CasADi{
     }
   }
 
-  void Densification::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  void SetSparse::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  void Densification::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  void SetSparse::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  void Densification::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void SetSparse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     // Evaluate function
     if(!output_given){
-      *output[0] = (*input[0])->getDensification(sparsity());
+      *output[0] = (*input[0])->getSetSparse(sparsity());
     }
   
     // Propagate forward seeds
@@ -96,7 +96,7 @@ namespace CasADi{
     }
   }
 
-  void Densification::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  void SetSparse::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     bvec_t *inputd = get_bvec_t(input[0]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
     if(fwd){

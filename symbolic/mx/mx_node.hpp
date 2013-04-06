@@ -287,8 +287,8 @@ namespace CasADi{
     /// Get submatrix assignment
     virtual MX getSubAssign(const MX& y, const Slice& i, const Slice& j) const;    
 
-    /// Get densification
-    virtual MX getDensification(const CRSSparsity& sp) const;
+    /// Create set sparse
+    virtual MX getSetSparse(const CRSSparsity& sp) const;
     
     /// Get a unary operation
     virtual MX getUnary(int op) const;

@@ -98,8 +98,8 @@ namespace CasADi{
     // Nonzero assignment
     OP_SETNONZEROS,
 
-    // Densify
-    OP_DENSIFY,
+    // Set sparse
+    OP_SET_SPARSE,
   
     // Norms
     OP_NORM2, OP_NORM1, OP_NORMINF, OP_NORMF,

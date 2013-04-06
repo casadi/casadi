@@ -395,7 +395,7 @@ namespace CasADi{
 	  
 	  // Create a new pattern which includes both the the previous seed and the addition
 	  CRSSparsity sp = asens0.sparsity().patternUnion(dep().sparsity(),tmp1);
-	  asens0 = asens0->getDensification(sp);
+	  asens0 = asens0->getSetSparse(sp);
 
 	  // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
 	  copy(el_input.begin(),el_input.end(),r_nz2.begin());

@@ -32,7 +32,6 @@
 #include "mx_tools.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "densification.hpp"
 #include "norm.hpp"
 #include "../casadi_math.hpp"
 
@@ -864,9 +863,6 @@ namespace CasADi{
 
   bool 	MX::isNorm () const { return !isNull() ? dynamic_cast<const Norm*>(get())!=0 : false; }
 
-  bool 	MX::isDensification () const { return !isNull() ? dynamic_cast<const Densification*>(get())!=0 : false; }
-
-
   FX MX::getFunction () {  return (*this)->getFunction(); }
  	
   double MX::getValue() const{
@@ -918,5 +914,13 @@ namespace CasADi{
   MX MX::getOutput(int oind) const{
     return (*this)->getOutput(oind);
   }
- 	  
+
+  MX MX::setSparse(const CRSSparsity& sp){
+    if(sp==sparsity()){
+      return *this;
+    } else {
+      return (*this)->getSetSparse(sp);
+    }
+  }
+	  
 } // namespace CasADi

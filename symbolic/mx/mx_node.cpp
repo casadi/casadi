@@ -33,7 +33,7 @@
 #include "subassign.hpp"
 #include "getnonzeros.hpp"
 #include "setnonzeros.hpp"
-#include "densification.hpp"
+#include "set_sparse.hpp"
 #include "solve.hpp"
 #include "unary_mx.hpp"
 #include "binary_mx.hpp"
@@ -386,10 +386,9 @@ namespace CasADi{
     }
   }
 
-  MX MXNode::getDensification(const CRSSparsity& sp) const{
-    return MX::create(new Densification(shared_from_this<MX>(),sp));
+  MX MXNode::getSetSparse(const CRSSparsity& sp) const{
+    return MX::create(new SetSparse(shared_from_this<MX>(),sp));
   }
-
   
   MX MXNode::getSubRef(const Slice& i, const Slice& j) const{
     return MX::create(new SubRef(shared_from_this<MX>(),i,j));

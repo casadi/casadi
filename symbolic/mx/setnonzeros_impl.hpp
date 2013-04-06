@@ -152,7 +152,7 @@ namespace CasADi{
 	  
 	  // Create a new pattern which includes both the the previous seed and the addition/assignment
 	  CRSSparsity sp = arg0.sparsity().patternUnion(osp,tmp1);
-	  arg0 = arg0->getDensification(sp);
+	  arg0 = arg0->getSetSparse(sp);
 
 	  // Recalculate the nz locations in the arguments corresponding to the inputs
 	  copy(without_duplicates.begin(),without_duplicates.end(),r_nz2.begin());
