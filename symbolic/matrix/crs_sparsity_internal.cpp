@@ -2308,7 +2308,7 @@ namespace CasADi{
   }
 
   CRSSparsity CRSSparsityInternal::patternCombine(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero) const{
-    /*static*/ vector<unsigned char> mapping;
+    static vector<unsigned char> mapping;
     return patternCombineGen1<false>(y, f0x_is_zero, fx0_is_zero, mapping);
   }
 
@@ -2333,138 +2333,67 @@ namespace CasADi{
   
   template<bool with_mapping, bool f0x_is_zero, bool fx0_is_zero>
   CRSSparsity CRSSparsityInternal::patternCombineGen(const CRSSparsity& y, vector<unsigned char>& mapping) const{
+
     // Assert dimensions
     casadi_assert_message(nrow_==y.size1() && ncol_==y.size2(), "Dimension mismatch");
     
-// #if 0
+    // Sparsity pattern of the argument
+    const vector<int>& y_rowind = y.rowind();
+    const vector<int>& y_col = y.col();
     
-//     // Sparsity pattern of the argument
-//     const vector<int>& y_rowind = y.rowind();
-//     const vector<int>& y_col = y.col();
+    // Sparsity pattern of the result
+    vector<int> ret_rowind(nrow_+1,0);
+    vector<int> ret_col;
     
-//     // Sparsity pattern of the result
-//     vector<int> ret_rowind(nrow_+1,0);
-//     vector<int> ret_col;
-    
-//     // Clear the mapping
-//     if(with_mapping) mapping.clear();
+    // Clear the mapping
+    if(with_mapping) mapping.clear();
 
-//     // Loop over rows of both patterns
-//     for(int i=0; i<nrow_; ++i){
-//       // Non-zero element of the two matrices
-//       int el1 = rowind_[i];
-//       int el2 = y_rowind[i];
+    // Loop over rows of both patterns
+    for(int i=0; i<nrow_; ++i){
+      // Non-zero element of the two matrices
+      int el1 = rowind_[i];
+      int el2 = y_rowind[i];
       
-//       // End of the non-zero elements of the row for the two matrices
-//       int el1_last = rowind_[i+1];
-//       int el2_last = y_rowind[i+1];
+      // End of the non-zero elements of the row for the two matrices
+      int el1_last = rowind_[i+1];
+      int el2_last = y_rowind[i+1];
       
-//       // Loop over the non-zeros of both matrices
-//       while(el1<el1_last || el2<el2_last){
-// 	// Get the columns
-// 	int col1 = el1<el1_last ? col_[el1] : ncol_;
-// 	int col2 = el2<el2_last ? y_col[el2] : ncol_;
+      // Loop over the non-zeros of both matrices
+      while(el1<el1_last || el2<el2_last){
+	// Get the columns
+	int col1 = el1<el1_last ? col_[el1] : ncol_;
+	int col2 = el2<el2_last ? y_col[el2] : ncol_;
 
-// 	// Add to the return matrix
-// 	if(col1==col2){ //  both nonzero
-// 	  ret_col.push_back(col1);
-// 	  if(with_mapping) mapping.push_back( 1 | 2);
-// 	  el1++; el2++;
-// 	} else if(col1<col2){ //  only first argument is nonzero
-// 	  if(!fx0_is_zero){
-// 	    ret_col.push_back(col1);
-// 	    if(with_mapping) mapping.push_back(1);
-// 	  } else {
-// 	    if(with_mapping) mapping.push_back(1 | 4);
-// 	  }
-// 	  el1++;
-// 	} else { //  only second argument is nonzero
-// 	  if(!f0x_is_zero){
-// 	    ret_col.push_back(col2);
-// 	    if(with_mapping) mapping.push_back(2);
-// 	  } else {
-// 	    if(with_mapping) mapping.push_back(2 | 4);
-// 	  }
-// 	  el2++;
-// 	}
-//       }
-      
-//       // Save the index of the last nonzero on the row
-//       res_rowind[i+1] = ret_col.size();
-//     }
-//   }
-  
-// #endif
-  
-    // Return object
-    CRSSparsity ret;
-  
-    // Quick intersection if the patterns are equal
-    if(isEqual(y)){
-      ret.assignNode(const_cast<CRSSparsityInternal*>(this));
-      mapping.resize(size());
-      fill(mapping.begin(),mapping.end(), 1 | 2);
-    } else {
-      
-      // Create return object
-      ret = CRSSparsity(nrow_,ncol_);
-      
-      // Get refences to the sparsity vectors
-      vector<int>& r = ret.rowindRef();
-      vector<int>& c = ret.colRef();
-      
-      // Prepare the assembly of the rowind vector below
-      r.clear();
-      r.push_back(0);
-      
-      // Clear the mapping
-      mapping.clear();
-      
-      // Loop over rows of both patterns
-      for(int i=0; i<nrow_; ++i){
-	// Non-zero element of the two matrices
-	int el1 = rowind_[i];
-	int el2 = y.rowind(i);
-	
-	// End of the non-zero elements of the row for the two matrices
-	int el1_last = rowind_[i+1];
-	int el2_last = y.rowind(i+1);
-	
-	// Loop over the non-zeros of both matrices
-	while(el1<el1_last || el2<el2_last){
-	  // Get the columns
-	  int col1 = el1<el1_last ? col_[el1] : ncol_;
-	  int col2 = el2<el2_last ? y.col(el2) : ncol_;
-	  
-	  // Add to the return matrix
-	  if(col1==col2){ //  both nonzero
-	    c.push_back(col1);
-	    mapping.push_back( 1 | 2);
-	    el1++; el2++;
-	  } else if(col1<col2){ //  only first argument is nonzero
-	    if(!fx0_is_zero){
-	      c.push_back(col1);
-	      mapping.push_back(1);
-	    } else {
-	      mapping.push_back(1 | 4);
-	    }
-	    el1++;
-	  } else { //  only second argument is nonzero
-	    if(!f0x_is_zero){
-	      c.push_back(col2);
-	      mapping.push_back(2);
-	    } else {
-	      mapping.push_back(2 | 4);
-	    }
-	    el2++;
+	// Add to the return matrix
+	if(col1==col2){ //  both nonzero
+	  ret_col.push_back(col1);
+	  if(with_mapping) mapping.push_back( 1 | 2);
+	  el1++; el2++;
+	} else if(col1<col2){ //  only first argument is nonzero
+	  if(!fx0_is_zero){
+	    ret_col.push_back(col1);
+	    if(with_mapping) mapping.push_back(1);
+	  } else {
+	    if(with_mapping) mapping.push_back(1 | 4);
 	  }
+	  el1++;
+	} else { //  only second argument is nonzero
+	  if(!f0x_is_zero){
+	    ret_col.push_back(col2);
+	    if(with_mapping) mapping.push_back(2);
+	  } else {
+	    if(with_mapping) mapping.push_back(2 | 4);
+	  }
+	  el2++;
 	}
-	
-	// Save the index of the last nonzero on the row
-	r.push_back(c.size());
       }
+      
+      // Save the index of the last nonzero on the row
+      ret_rowind[i+1] = ret_col.size();
     }
-    return ret;
+    
+    // Return cached object
+    return CRSSparsity(nrow_, ncol_, ret_col, ret_rowind);
   }
 
   bool CRSSparsityInternal::isEqual(const CRSSparsity& y) const{
