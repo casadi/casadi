@@ -2318,6 +2318,16 @@ namespace CasADi{
   
   template<bool with_mapping>
   CRSSparsity CRSSparsityInternal::patternCombineGen1(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const{
+
+    // Quick return if identical
+    if(isEqual(y)){
+      if(with_mapping){
+	mapping.resize(y.size());
+	fill(mapping.begin(),mapping.end(), 1 | 2);
+      }
+      return y;
+    }
+
     if(f0x_is_zero){
       if(fx0_is_zero){
 	return patternCombineGen<with_mapping,true,true>(y,mapping);

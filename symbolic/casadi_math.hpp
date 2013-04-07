@@ -122,9 +122,33 @@ struct casadi_math<int>{
 
   /** \brief Evaluate a built in function */
   static inline void fun(unsigned char op, const int& x, const int& y, int& f){
-    double f_real(f);
-    casadi_math<double>::fun(op,double(x),double(y),f_real);
-    f = int(f_real);
+    double ff;
+    casadi_math<double>::fun(op,double(x),double(y),ff);
+    f = int(ff);
+  }
+
+  static inline void fun(unsigned char op, const int* x, const int* y, int* f, int n){     
+    for(int i=0; i<n; ++i){
+      double ff;
+      casadi_math<double>::fun(op,double(*x++),double(*y++),ff);
+      *f++ = int(ff);
+    }
+  }
+  
+  static inline void fun(unsigned char op, const int* x, const int& y, int* f, int n){
+    for(int i=0; i<n; ++i){
+      double ff;
+      casadi_math<double>::fun(op,double(*x++),double(y),ff);
+      *f++ = int(ff);
+    }
+  }
+  
+  static inline void fun(unsigned char op, const int& x, const int* y, int* f, int n){
+    for(int i=0; i<n; ++i){
+      double ff;
+      casadi_math<double>::fun(op,double(x),double(*y++),ff);
+      *f++ = int(ff);
+    }
   }
   
   /** \brief Evaluate a built in derivative function */
