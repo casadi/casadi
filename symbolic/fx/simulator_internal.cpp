@@ -69,6 +69,8 @@ void SimulatorInternal::init(){
 
     // Create the output function
     output_fcn_ = SXFunction(arg,out);
+    
+    outputScheme_ = SCHEME_IntegratorOutput;
   }
 
   // Initialize the output function

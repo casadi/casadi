@@ -27,6 +27,7 @@
 #include "../sx/sx.hpp"
 #include "../mx/mx.hpp"
 #include "../options_functionality.hpp"
+#include "../fx/io_scheme_vector.hpp"
 
 namespace CasADi{
   
@@ -50,27 +51,6 @@ namespace CasADi{
     // Constructor
     FunctionIO() : tmp(0){}
   };
-  
-  
-  template<typename T>
-  struct IOSchemeVector {
-    // Data
-    std::vector<T> t_;
-    InputOutputScheme io_scheme_;
-    // Constructor
-    IOSchemeVector(const std::vector<T>& t, InputOutputScheme io_scheme=SCHEME_unknown) : t_(t), io_scheme_(io_scheme){} 
-    
-    #ifndef SWIG
-    // Type conversion
-    operator std::vector<T>() const{ return t_;}
-    #endif // SWIG
-    std::vector<T> vector() const { return t_; }
-    InputOutputScheme io_scheme() const { return io_scheme_; }
-    
-    /** \brief  Print the algorithm */
-    //void print(std::ostream &stream) const { ; }
-  };
-
 
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson

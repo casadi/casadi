@@ -570,7 +570,7 @@ class Integrationtests(casadiTestCase):
 
       if not(intf is IdasIntegrator):
         # (*) IDAS backward sens seems to fail for somewhat small tolerances
-        integrator.adjSeed("x0").set(1)
+        integrator.adjSeed("xf").set(1)
         integrator.input("p").set([t0,tend,p])
         integrator.evaluate(0,1)
 
@@ -828,7 +828,7 @@ class Integrationtests(casadiTestCase):
     J.init()
     J.input("x0").set([num['q0']])
     J.input("p").set([num['p']])
-    J.adjSeed("xf").set([1])
+    J.adjSeed().set([1])
     # Evaluate
     J.evaluate(0,1)
       
@@ -843,7 +843,7 @@ class Integrationtests(casadiTestCase):
     num=self.num
     J=self.integrator.jacobian("p","xf")
     J.init()
-    H=J.jacobian("p","xf")
+    H=J.jacobian("p")
     H.init()
     H.input("x0").set([num['q0']])
     H.input("p").set([num['p']])
