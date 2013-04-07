@@ -43,6 +43,7 @@
 #include "setnonzeros_impl.hpp"
 #include "multiplication_impl.hpp"
 #include "solve_impl.hpp"
+#include "binary_mx_impl.hpp"
 
 using namespace std;
 
@@ -440,7 +441,7 @@ namespace CasADi{
     MX yy = y.setSparse(r_sp);
     
     // Loop over nonzeros only
-    MX rr = MX::create(new MatrixMatrixOp(Operation(op),xx,yy)); 
+    MX rr = MX::create(new BinaryMX<false,false>(Operation(op),xx,yy)); 
 
     // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
     if(!rr.dense() && !operation_checker<F00Checker>(op)){
@@ -461,7 +462,7 @@ namespace CasADi{
       // Check if it is ok to loop over nonzeros only
       if(y.dense() || operation_checker<FX0Checker>(op)){
 	// Loop over nonzeros
-	return MX::create(new ScalarMatrixOp(Operation(op),shared_from_this<MX>(),y));
+	return MX::create(new BinaryMX<true,false>(Operation(op),shared_from_this<MX>(),y));
       } else {
 	// Put a densification node in between
 	return getScalarMatrix(op,densify(y));
@@ -478,7 +479,7 @@ namespace CasADi{
       // Check if it is ok to loop over nonzeros only
       if(sparsity().dense() || operation_checker<F0XChecker>(op)){
 	// Loop over nonzeros
-	return MX::create(new MatrixScalarOp(Operation(op),shared_from_this<MX>(),y));
+	return MX::create(new BinaryMX<false,true>(Operation(op),shared_from_this<MX>(),y));
       } else {
 	// Put a densification node in between
 	return densify(shared_from_this<MX>())->getMatrixScalar(op,y);
