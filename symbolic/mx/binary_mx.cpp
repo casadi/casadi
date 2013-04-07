@@ -41,14 +41,6 @@ namespace CasADi{
   BinaryMX::~BinaryMX(){
   }
 
-  SparseSparseOp::SparseSparseOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
-    // Get the sparsity pattern
-    bool f0x_is_zero = operation_checker<F0XChecker>(op_);
-    bool fx0_is_zero = operation_checker<FX0Checker>(op_);
-    CRSSparsity sp = x->sparsity().patternCombine(y->sparsity(), f0x_is_zero, fx0_is_zero, mapping_);
-    setSparsity(sp);
-  }
-
   void BinaryMX::printPart(std::ostream &stream, int part) const{
     if(part==0){
       casadi_math<double>::printPre(op_,stream);
@@ -58,97 +50,6 @@ namespace CasADi{
       casadi_math<double>::printPost(op_,stream);
     }
   }
-
-  void SparseSparseOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-    if(nfwd==0 && nadj==0){
-      DMatrix::binary_no_alloc(casadi_math<double>::fun,op_,*input[0],*input[1],*output[0],mapping_);
-    } else {
-      vector<double>& output0 = output[0]->data();
-      const vector<double> &input0 = input[0]->data();
-      const vector<double> &input1 = input[1]->data();
-
-      // Argument values
-      double a[2][2] = {{0,0},{0,0}};
-
-      // Nonzero counters
-      int el0=0, el1=0, el=0;
-
-      // Partial derivatives
-      double pd[2][2] = {{0,0},{0,0}};
-    
-      // With sensitivities
-      for(int i=0; i<mapping_.size(); ++i){
-	// Check which elements are nonzero
-	unsigned char m = mapping_[i];
-	bool nz0 = m & 1;
-	bool nz1 = m & 2;
-	bool skip_nz = m & 4;
-      
-	if(!skip_nz){
-      
-	  // Read the next nonzero 
-	  if(nz0) a[0][1] = input0[el0];
-	  if(nz1) a[1][1] = input1[el1];
-        
-	  // Evaluate and get partial derivatives
-	  double f;
-	  casadi_math<double>::fun(op_,a[0][nz0], a[1][nz1],f);
-	  casadi_math<double>::der(op_,a[0][nz0], a[1][nz1],f,pd[1]);
-	  output0[el] = f;
-
-	  // Propagate forward seeds
-	  for(int d=0; d<nfwd; ++d){
-	    double s = 0;
-	    if(nz0) s += pd[nz0][0]*fwdSeed[d][0]->data()[el0];
-	    if(nz1) s += pd[nz1][1]*fwdSeed[d][1]->data()[el1];
-	    fwdSens[d][0]->data()[el] = s;
-	  }
-        
-	  // Propagate adjoint seeds
-	  for(int d=0; d<nadj; ++d){
-	    double s = adjSeed[d][0]->data()[el];
-	    adjSeed[d][0]->data()[el] = 0;
-	    if(nz0) adjSens[d][0]->data()[el0] += s*pd[nz0][0];
-	    if(nz1) adjSens[d][1]->data()[el1] += s*pd[nz1][1];
-	  }
-        
-	  // Next nonzero for the output
-	  el++;
-	}
-      
-	// Go to next nonzero for the arguments
-	el0 += nz0;
-	el1 += nz1;
-      }
-    }
-  }
-
-  void SparseSparseOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    Matrix<SX>::binary_no_alloc(casadi_math<SX>::fun,op_,*input[0],*input[1],*output[0],mapping_);
-  }
-
-  // void BinaryMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-  //   // Evaluate function
-  // //  if(!output_given){
-  //     casadi_math<SXMatrix>::fun(op_,*input[0],*input[1],*output[0]);
-  //  // }
-  // 
-  //   // Number of forward directions
-  //   int nfwd = fwdSens.size();
-  //   int nadj = adjSeed.size();
-  //   if(nfwd>0 || nadj>0){
-  //     // Get partial derivatives
-  //     SXMatrix pd[2];
-  //     casadi_math<SXMatrix>::der(op_,*input[0],*input[1],*output[0],pd);
-  //     
-  //     // Chain rule
-  //     for(int d=0; d<nfwd; ++d){
-  //       *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]) + pd[1]*(*fwdSeed[d][1]);
-  //     }
-  //   }
-  // }
 
   void BinaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     // Evaluate function
@@ -196,12 +97,12 @@ namespace CasADi{
     }
   }
 
-  NonzerosScalarOp::NonzerosScalarOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
+  MatrixScalarOp::MatrixScalarOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
     setSparsity(x.sparsity());
   }
 
   template<typename T, typename MatV, typename MatVV> 
-  void NonzerosScalarOp::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void MatrixScalarOp::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
 
@@ -238,20 +139,20 @@ namespace CasADi{
     }
   }
 
-  void NonzerosScalarOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  void MatrixScalarOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  void NonzerosScalarOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  void MatrixScalarOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  ScalarNonzerosOp::ScalarNonzerosOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
+  ScalarMatrixOp::ScalarMatrixOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
     setSparsity(y.sparsity());
   }
 
   template<typename T, typename MatV, typename MatVV> 
-  void ScalarNonzerosOp::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void ScalarMatrixOp::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
 
@@ -288,21 +189,21 @@ namespace CasADi{
     }
   }
 
-  void ScalarNonzerosOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  void ScalarMatrixOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  void ScalarNonzerosOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  void ScalarMatrixOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
 
-  NonzerosNonzerosOp::NonzerosNonzerosOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
+  MatrixMatrixOp::MatrixMatrixOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
     setSparsity(x.sparsity());
   }
 
   template<typename T, typename MatV, typename MatVV> 
-  void NonzerosNonzerosOp::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void MatrixMatrixOp::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
 
@@ -339,15 +240,15 @@ namespace CasADi{
     }
   }
 
-  void NonzerosNonzerosOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  void MatrixMatrixOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  void NonzerosNonzerosOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  void MatrixMatrixOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  void NonzerosNonzerosOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  void MatrixMatrixOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     bvec_t *input0 = get_bvec_t(input[0]->data());
     bvec_t *input1 = get_bvec_t(input[1]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
@@ -363,7 +264,7 @@ namespace CasADi{
     }
   }
 
-  void NonzerosScalarOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  void MatrixScalarOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     bvec_t *input0 = get_bvec_t(input[0]->data());
     bvec_t *input1 = get_bvec_t(input[1]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
@@ -379,7 +280,7 @@ namespace CasADi{
     }
   }
 
-  void ScalarNonzerosOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  void ScalarMatrixOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     bvec_t *input0 = get_bvec_t(input[0]->data());
     bvec_t *input1 = get_bvec_t(input[1]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
@@ -392,43 +293,6 @@ namespace CasADi{
 	input0[0]  |= s;
 	input1[el] |= s;
       }
-    }
-  }
-
-  void SparseSparseOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-    bvec_t *input0 = get_bvec_t(input[0]->data());
-    bvec_t *input1 = get_bvec_t(input[1]->data());
-    bvec_t *outputd = get_bvec_t(output[0]->data());
-
-    // Argument values
-    bvec_t zero = 0;
-
-    // Nonzero counters
-    int el0=0, el1=0, el=0;
-  
-    // Loop over nonzero elements
-    for(int i=0; i<mapping_.size(); ++i){
-      // Check which elements are nonzero
-      unsigned char m = mapping_[i];
-      bool nz0(m & 1);
-      bool nz1(m & 2);
-      bool skip_nz(m & 4);
-    
-      // Evaluate
-      if(!skip_nz){
-	if(fwd){
-	  outputd[el++] = (nz0 ? input0[el0] : zero) | (nz1 ? input1[el1] : zero);
-	} else {
-	  bvec_t s = outputd[el];
-	  outputd[el++] = zero;
-	  if(nz0) input0[el0] |= s;
-	  if(nz1) input1[el1] |= s;
-	}
-      }
-    
-      // Go to next nonzero
-      el0 += nz0;
-      el1 += nz1;
     }
   }
 
@@ -466,53 +330,16 @@ namespace CasADi{
     stream << ";" << endl;
   }
 
-  void ScalarNonzerosOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void ScalarMatrixOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     generateOperationGen(stream,arg,res,gen,true,false);
   }
 
-  void NonzerosScalarOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void MatrixScalarOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     generateOperationGen(stream,arg,res,gen,false,true);
   }
 
-  void NonzerosNonzerosOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void MatrixMatrixOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     generateOperationGen(stream,arg,res,gen,false,false);
-  }
-
-  void SparseSparseOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    // Nonzero counters
-    int el0=0, el1=0, el=0;
-  
-    // Loop over nonzero elements
-    for(int i=0; i<mapping_.size(); ++i){
-      // Check which elements are nonzero
-      unsigned char m = mapping_[i];
-      bool nz0(m & 1);
-      bool nz1(m & 2);
-      bool skip_nz(m & 4);
-    
-      // Evaluate
-      if(!skip_nz){
-	stream << "  " << res.at(0) << "[" << el++ <<  "]=";
-	casadi_math<double>::printPre(op_,stream);
-	if(nz0){
-	  stream << arg.at(0) << "[" << el0 << "]";
-	} else {
-	  stream << "0";
-	}
-	casadi_math<double>::printSep(op_,stream);
-	if(nz1){
-	  stream << arg.at(1) << "[" << el1 << "]";
-	} else {
-	  stream << "0";
-	}
-	casadi_math<double>::printPost(op_,stream);
-	stream << ";" << endl;
-      }
-    
-      // Go to next nonzero
-      el0 += nz0;
-      el1 += nz1;
-    }
   }
 
 } // namespace CasADi

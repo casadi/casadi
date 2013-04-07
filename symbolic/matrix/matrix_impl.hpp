@@ -1541,37 +1541,6 @@ Matrix<T> Matrix<T>::binary(int op, const Matrix<T> &x, const Matrix<T> &y){
 }
 
 template<class T>
-void Matrix<T>::binary_no_alloc(void (*fcn)(unsigned char op, const T&, const T&, T&), unsigned char op, const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping){
-  std::vector<T>& rd = r.data();
-  const std::vector<T> &xd = x.data();
-  const std::vector<T> &yd = y.data();
-
-  // Argument values
-  T zero = 0;
-
-  // Nonzero counters
-  int el0=0, el1=0, el=0;
-  
-  // Loop over nonzero elements
-  for(int i=0; i<mapping.size(); ++i){
-    // Check which elements are nonzero
-    unsigned char m = mapping[i];
-    bool nz0(m & 1);
-    bool nz1(m & 2);
-    bool skip_nz(m & 4);
-    
-    // Evaluate
-    if(!skip_nz){
-      fcn(op, nz0 ? xd[el0] : zero, nz1 ? yd[el1] : zero, rd[el++]);
-    }
-    
-    // Go to next nonzero
-    el0 += nz0;
-    el1 += nz1;
-  }
-}
-
-template<class T>
 Matrix<T> Matrix<T>::scalar_matrix(int op, const Matrix<T> &x, const Matrix<T> &y){
   // Return value
   Matrix<T> ret(y.sparsity());

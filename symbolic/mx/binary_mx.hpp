@@ -47,9 +47,6 @@ namespace CasADi{
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
-    /** \brief  Evaluate the function symbolically (SX) */
-    //virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
-
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const{ return 2;}
 
@@ -62,47 +59,18 @@ namespace CasADi{
     
   };
 
-  /// A sparse matrix-matrix binary operation
-  class SparseSparseOp : public BinaryMX{
-  public:
-    
-    /** \brief  Constructor */
-    SparseSparseOp(Operation op, const MX& x, const MX& y);
-
-    /** \brief  Destructor */
-    virtual ~SparseSparseOp(){};
-
-    /** \brief  Clone function */
-    virtual SparseSparseOp * clone() const{ return new SparseSparseOp(*this);}
-
-    /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
-
-    /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
-
-    /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
-
-    /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-
-    //! \brief Which argument for each nonzero
-    std::vector<unsigned char> mapping_;
-  };
-
   /// A matrix-scalar binary operation where one loops only over nonzeros of the matrix
-  class NonzerosScalarOp : public BinaryMX{
+  class MatrixScalarOp : public BinaryMX{
   public:
     
     /** \brief  Constructor */
-    NonzerosScalarOp(Operation op, const MX& x, const MX& y);
+    MatrixScalarOp(Operation op, const MX& x, const MX& y);
 
     /** \brief  Destructor */
-    virtual ~NonzerosScalarOp(){};
+    virtual ~MatrixScalarOp(){};
 
     /** \brief  Clone function */
-    virtual NonzerosScalarOp * clone() const{ return new NonzerosScalarOp(*this);}
+    virtual MatrixScalarOp * clone() const{ return new MatrixScalarOp(*this);}
 
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
@@ -122,17 +90,17 @@ namespace CasADi{
   };
 
   /// A scalar-matrix binary operation where one loops only over nonzeros of the matrix
-  class ScalarNonzerosOp : public BinaryMX{
+  class ScalarMatrixOp : public BinaryMX{
   public:
     
     /** \brief  Constructor */
-    ScalarNonzerosOp(Operation op, const MX& x, const MX& y);
+    ScalarMatrixOp(Operation op, const MX& x, const MX& y);
 
     /** \brief  Destructor */
-    virtual ~ScalarNonzerosOp(){};
+    virtual ~ScalarMatrixOp(){};
 
     /** \brief  Clone function */
-    virtual ScalarNonzerosOp * clone() const{ return new ScalarNonzerosOp(*this);}
+    virtual ScalarMatrixOp * clone() const{ return new ScalarMatrixOp(*this);}
 
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
@@ -152,17 +120,17 @@ namespace CasADi{
   };
 
   /// A matrix-matrix binary operation with matching nonzeros
-  class NonzerosNonzerosOp : public BinaryMX{
+  class MatrixMatrixOp : public BinaryMX{
   public:
     
     /** \brief  Constructor */
-    NonzerosNonzerosOp(Operation op, const MX& x, const MX& y);
+    MatrixMatrixOp(Operation op, const MX& x, const MX& y);
 
     /** \brief  Destructor */
-    virtual ~NonzerosNonzerosOp(){};
+    virtual ~MatrixMatrixOp(){};
 
     /** \brief  Clone function */
-    virtual NonzerosNonzerosOp * clone() const{ return new NonzerosNonzerosOp(*this);}
+    virtual MatrixMatrixOp * clone() const{ return new MatrixMatrixOp(*this);}
 
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
