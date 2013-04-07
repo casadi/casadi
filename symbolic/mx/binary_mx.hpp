@@ -30,6 +30,7 @@ namespace CasADi{
       \author Joel Andersson 
       \date 2010	
   */
+  template<bool ScX, bool ScY>
   class BinaryMX : public MXNode{
   public:
     /** \brief  Constructor */
@@ -44,15 +45,21 @@ namespace CasADi{
     /** \brief Get the operation */
     virtual int getOp() const{ return op_;}
     
+    /** \brief Check if binary operation */
+    virtual bool isBinaryOp() const { return true;}
+
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
+
+    /// Evaluate the function (template)
+    template<typename T, typename MatV, typename MatVV> 
+    void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const{ return 2;}
 
     /** \brief Generate code for the operation (generic) */
-    void generateOperationGen(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen,
-			      bool el0_scalar, bool el1_scalar) const;
+    void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     //! \brief Operation
     Operation op_;
@@ -60,7 +67,7 @@ namespace CasADi{
   };
 
   /// A matrix-scalar binary operation where one loops only over nonzeros of the matrix
-  class MatrixScalarOp : public BinaryMX{
+  class MatrixScalarOp : public BinaryMX<false,true>{
   public:
     
     /** \brief  Constructor */
@@ -84,13 +91,10 @@ namespace CasADi{
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
     void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
-
-    /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
   };
 
   /// A scalar-matrix binary operation where one loops only over nonzeros of the matrix
-  class ScalarMatrixOp : public BinaryMX{
+  class ScalarMatrixOp : public BinaryMX<true,false>{
   public:
     
     /** \brief  Constructor */
@@ -114,13 +118,10 @@ namespace CasADi{
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
     void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
-
-    /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
   };
 
   /// A matrix-matrix binary operation with matching nonzeros
-  class MatrixMatrixOp : public BinaryMX{
+  class MatrixMatrixOp : public BinaryMX<false,false>{
   public:
     
     /** \brief  Constructor */
@@ -144,9 +145,6 @@ namespace CasADi{
     /** \brief  Evaluate the function (template) */
     template<typename T, typename MatV, typename MatVV> 
     void evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens);
-
-    /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
   };
 
 

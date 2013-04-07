@@ -23,8 +23,6 @@
 #include "mx.hpp"
 #include "mx_node.hpp"
 #include "mx_tools.hpp"
-#include "unary_mx.hpp"
-#include "binary_mx.hpp"
 #include "../fx/sx_function.hpp"
 #include "evaluation_mx.hpp"
 #include "symbolic_mx.hpp"
@@ -873,9 +871,9 @@ namespace CasADi{
     return (*this)->getMatrixValue();
   }
  	  
-  bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryMX*>(get()) != 0 : false;  }
+  bool MX::isBinary() const { return isNull() ? false : (*this)->isBinaryOp();}
 
-  bool MX::isUnary() const { return !isNull() ? dynamic_cast<const UnaryMX*>(get()) != 0 : false;  }
+  bool MX::isUnary() const { return isNull() ? false : (*this)->isUnaryOp();}
  	
   int MX::getOp() const {
     return (*this)->getOp();

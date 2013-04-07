@@ -101,6 +101,12 @@ namespace CasADi{
     /** \brief Check if identity matrix */
     virtual bool isIdentity() const{ return false;}
 
+    /** \brief Check if unary operation */
+    virtual bool isUnaryOp() const { return false;}
+
+    /** \brief Check if binary operation */
+    virtual bool isBinaryOp() const { return false;}
+
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
     

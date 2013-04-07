@@ -21,6 +21,7 @@
  */
 
 #include "binary_mx.hpp"
+#include "binary_mx_impl.hpp"
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
@@ -34,70 +35,7 @@ using namespace std;
 
 namespace CasADi{
 
-  BinaryMX::BinaryMX(Operation op, const MX& x, const MX& y) : op_(op){
-    setDependencies(x,y);
-  }
-
-  BinaryMX::~BinaryMX(){
-  }
-
-  void BinaryMX::printPart(std::ostream &stream, int part) const{
-    if(part==0){
-      casadi_math<double>::printPre(op_,stream);
-    } else if(part==1){
-      casadi_math<double>::printSep(op_,stream);
-    } else {
-      casadi_math<double>::printPost(op_,stream);
-    }
-  }
-
-  void BinaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-    // Evaluate function
-    MX f; // Function value
-    if(output_given){
-      f = *output[0];
-    } else {
-      casadi_math<MX>::fun(op_,*input[0],*input[1],f);
-    }
-
-    // Number of forward directions
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-    if(nfwd>0 || nadj>0){
-      // Get partial derivatives
-      MX pd[2];
-      casadi_math<MX>::der(op_,*input[0],*input[1],f,pd);
-    
-      // Propagate forward seeds
-      for(int d=0; d<nfwd; ++d){
-	*fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]) + pd[1]*(*fwdSeed[d][1]);
-      }
-    
-      // Propagate adjoint seeds
-      for(int d=0; d<nadj; ++d){
-	MX s = *adjSeed[d][0];
-	*adjSeed[d][0] = MX();
-	for(int c=0; c<2; ++c){
-	  // Get increment of sensitivity c
-	  MX t = pd[c]*s;
-	  
-	  // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
-	  if(!t.scalar() && t.shape() != dep(c).shape()){
-	    t = sumAll(t);
-	  }
-	  
-	  // Propagate the seeds
-	  *adjSens[d][c] += t;
-	}
-      }
-    }
-
-    if(!output_given){
-      *output[0] = f;
-    }
-  }
-
-  MatrixScalarOp::MatrixScalarOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
+  MatrixScalarOp::MatrixScalarOp(Operation op, const MX& x, const MX& y) : BinaryMX<false,true>(op,x,y){
     setSparsity(x.sparsity());
   }
 
@@ -147,7 +85,7 @@ namespace CasADi{
     evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  ScalarMatrixOp::ScalarMatrixOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
+  ScalarMatrixOp::ScalarMatrixOp(Operation op, const MX& x, const MX& y) : BinaryMX<true,false>(op,x,y){
     setSparsity(y.sparsity());
   }
 
@@ -198,7 +136,7 @@ namespace CasADi{
   }
 
 
-  MatrixMatrixOp::MatrixMatrixOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
+  MatrixMatrixOp::MatrixMatrixOp(Operation op, const MX& x, const MX& y) : BinaryMX<false,false>(op,x,y){
     setSparsity(x.sparsity());
   }
 
@@ -294,52 +232,6 @@ namespace CasADi{
 	input1[el] |= s;
       }
     }
-  }
-
-  
-  void BinaryMX::generateOperationGen(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen,
-				      bool el0_scalar, bool el1_scalar) const{
-
-    // Print loop and right hand side
-    stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
-    stream << res.at(0) << "[i]";
-
-    // Check if inplace
-    bool inplace = false;
-    switch(op_){
-    case OP_ADD:
-    case OP_SUB:
-    case OP_MUL:
-    case OP_DIV:
-      inplace = res[0].compare(arg[0]) == 0;
-    }
-    
-    if(inplace){
-      casadi_math<double>::printSep(op_,stream);
-      stream << "=";
-      stream << arg.at(1) << (el1_scalar ? "[0]" : "[i]");
-    } else {
-      stream << "=";
-      casadi_math<double>::printPre(op_,stream);
-      stream << arg.at(0) << (el0_scalar ? "[0]" : "[i]");
-      casadi_math<double>::printSep(op_,stream);
-      stream << arg.at(1) << (el1_scalar ? "[0]" : "[i]");
-      casadi_math<double>::printPost(op_,stream);
-    }
-
-    stream << ";" << endl;
-  }
-
-  void ScalarMatrixOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    generateOperationGen(stream,arg,res,gen,true,false);
-  }
-
-  void MatrixScalarOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    generateOperationGen(stream,arg,res,gen,false,true);
-  }
-
-  void MatrixMatrixOp::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    generateOperationGen(stream,arg,res,gen,false,false);
   }
 
 } // namespace CasADi

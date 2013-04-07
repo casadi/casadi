@@ -45,7 +45,7 @@ SET(CASADI_SRCS
   mx/constant_mx.hpp         mx/constant_mx.cpp         # A constant MX node
   mx/symbolic_mx.hpp         mx/symbolic_mx.cpp         # A symbolic MX variable
   mx/unary_mx.hpp            mx/unary_mx.cpp            # Unary operation
-  mx/binary_mx.hpp           mx/binary_mx.cpp           # Binary operation
+  mx/binary_mx.hpp           mx/binary_mx_impl.hpp        mx/binary_mx.cpp           # Binary operation
   mx/multiplication.hpp      mx/multiplication_impl.hpp # Matrix multiplication
   mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
   mx/evaluation_mx.hpp       mx/evaluation_mx.cpp       # FX function evaluation
