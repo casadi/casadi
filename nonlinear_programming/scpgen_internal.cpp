@@ -510,15 +510,6 @@ void SCPgenInternal::init(){
   n=0;
   tan_fcn_out.push_back(b_obj);                             tan_b_obj_ = n++;
   tan_fcn_out.push_back(b_g);                               tan_b_g_ = n++;  
-  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-    tan_fcn_out.push_back(mfcn_fwdSens[0][it->mod_def]);    it->tan_lin = n++;
-  }
-
-  if(!gauss_newton_){
-    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-      tan_fcn_out.push_back(mfcn_fwdSens[0][it->mod_defL]); it->tan_linL = n++;
-    }
-  }
   casadi_assert(n==tan_fcn_out.size());
   
   MXFunction tan_fcn(mfcn_in,tan_fcn_out);
@@ -547,9 +538,16 @@ void SCPgenInternal::init(){
   // Interpret the Jacobian-vector multiplication as a forward directional derivative
   fill(mfcn_fwdSeed[0].begin(),mfcn_fwdSeed[0].end(),MX());
   mfcn_fwdSeed[0][mod_x_] = du;
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    mfcn_fwdSeed[0][it->mod_var] = -it->d;
+  }
   if(!gauss_newton_){
     mfcn_fwdSeed[0][mod_g_lam_] = g_dlam;
+    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+      mfcn_fwdSeed[0][it->mod_lam] = -it->d_lam;
+    }
   }
+
   mfcn.eval(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens,true);    
   
   // Step expansion function inputs
@@ -1165,20 +1163,6 @@ void SCPgenInternal::eval_tan(){
   transform(g_.begin(),g_.end(),tan_fcn_.output(tan_b_g_).begin(),qpB_.begin(),std::minus<double>());
   transform(gL_.begin(),gL_.end(),tan_fcn_.output(tan_b_obj_).begin(),gL_.begin(),std::minus<double>());
   
-  // Expanded primal step (first part)
-  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-    const DMatrix& dv = tan_fcn_.output(it->tan_lin);
-    copy(dv.begin(),dv.end(),it->step.begin());
-  }
-  
-  // Expanded dual step (first part)
-  if(!gauss_newton_){
-    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-      const DMatrix& dlam_v = tan_fcn_.output(it->tan_linL);
-      copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
-    }
-  }
-
   double time2 = clock();
   t_eval_tan_ += double(time2-time1)/CLOCKS_PER_SEC;
 }
@@ -1388,17 +1372,17 @@ void SCPgenInternal::eval_exp(){
   // Perform the step expansion
   exp_fcn_.evaluate();
 
-  // Expanded primal step (second part)
+  // Expanded primal step
   for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
     const DMatrix& dv = exp_fcn_.output(it->exp_def);
-    transform(dv.begin(),dv.end(),it->step.begin(),it->step.begin(),std::minus<double>());
+    copy(dv.begin(),dv.end(),it->step.begin());
   }
   
-  // Expanded dual step (second part)
+  // Expanded dual step
   if(!gauss_newton_){
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       const DMatrix& dlam_v = exp_fcn_.output(it->exp_defL);
-      transform(dlam_v.begin(),dlam_v.end(),it->dlam.begin(),it->dlam.begin(),std::minus<double>());
+      copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
     }
   }
 

@@ -187,7 +187,6 @@ public:
     // Indices of function inputs and outputs
     int res_var, res_lam, res_d, res_lam_d;
     int mod_var, mod_lam, mod_def, mod_defL;
-    int tan_lin, tan_linL;
     int exp_def, exp_defL;
 
     std::vector<double> step, init, opt, lam, dlam;
