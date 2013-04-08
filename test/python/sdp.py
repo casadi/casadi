@@ -27,9 +27,10 @@ import unittest
 from types import *
 from helpers import *
 
-@requires("SDPSolver")
+
 class SDPtests(casadiTestCase):
 
+  @requires("DSDPSolver")
   def test_memleak1(self):
     self.message("memleak1")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -47,6 +48,7 @@ class SDPtests(casadiTestCase):
 
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
 
+  @requires("DSDPSolver")
   def test_memleak2(self):
     self.message("memleak1")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -64,7 +66,8 @@ class SDPtests(casadiTestCase):
 
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
     dsp.init()
-    
+
+  @requires("DSDPSolver")
   def test_scalar(self):
     self.message("scalar")
     #
@@ -97,7 +100,8 @@ class SDPtests(casadiTestCase):
     self.checkarray(dsp.output("p"),DMatrix(0),digits=5)
     
     self.checkarray(dsp.output("dual"),DMatrix(n1/n3),digits=5)
-    
+
+  @requires("DSDPSolver")
   def test_linear_equality(self):
     self.message("linear equality")
     
@@ -132,6 +136,7 @@ class SDPtests(casadiTestCase):
     
     self.checkarray(dsp.output("dual")[0,0]-dsp.output("dual")[1,1],DMatrix(n1/n3),digits=5)
 
+  @requires("DSDPSolver")
   def test_linear_interpolation1(self):
     self.message("linear interpolation1")
 
@@ -163,6 +168,7 @@ class SDPtests(casadiTestCase):
     
     self.checkarray(dsp.output("dual"),DMatrix([[2,0,0],[0,0,0],[0,0,1]]),digits=5)
 
+  @requires("DSDPSolver")
   def test_linear_interpolation2(self):
     self.message("linear interpolation2")
 
@@ -191,7 +197,8 @@ class SDPtests(casadiTestCase):
     self.checkarray(dsp.output("primal"),DMatrix([0,0]),digits=5)
     self.checkarray(dsp.output("p"),DMatrix([[1,0,0],[0,0,0],[0,0,0]]),digits=5)
     self.checkarray(dsp.output("dual"),DMatrix([[0,0,0],[0,2,0],[0,0,3]]),digits=5)
-    
+
+  @requires("DSDPSolver")
   def test_linear_interpolation(self):
     self.message("linear interpolation")
     
@@ -229,7 +236,8 @@ class SDPtests(casadiTestCase):
     self.checkarray(dsp.output("p"),diag([0,0,1,0]),digits=5)
     
     self.checkarray(dsp.output("dual"),diag([2,0,0,2]),digits=2)
-    
+
+  @requires("DSDPSolver")
   def test_example1(self):
     self.message("Example1")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -293,7 +301,7 @@ class SDPtests(casadiTestCase):
     self.checkarray(sol_["x"],DMatrix([-1.1,-2.7375,-0.55]),digits=5)
     
 
-    
+  @requires("DSDPSolver")
   def test_example2(self):
     self.message("Example2")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -331,6 +339,7 @@ class SDPtests(casadiTestCase):
     self.checkarray(dsp.output("dual"),DMatrix(sp,[2.640261206,0.5605636589,0.5605636589,3.717637107,0.7615505416,-1.513524657,1.139370202,-1.513524657,3.008016978,-2.264413045,1.139370202,-2.264413045,1.704633559,0,0]),digits=5)
     self.checkarray(dsp.output("p"),DMatrix(sp,[0,0,0,0,7.119155551,5.024671489,1.916294752,5.024671489,4.414745792,2.506021978,1.916294752,2.506021978,2.048124139,0.3432465654,4.391169489]),digits=5)
 
+  @requires("DSDPSolver")
   def test_example2_perm(self):
     self.message("Example2_permuted")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
