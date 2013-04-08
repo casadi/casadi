@@ -424,22 +424,6 @@ void SCPgenInternal::init(){
   vector<MX> mfcn_out;  
   mfcn_out.push_back(g_z);                             mod_g_ = n++;
   
-  // Constraint function
-  MXFunction gfcn(mfcn_in,mfcn_out);
-  gfcn.init();
-
-  // Jacobian of the constraints
-  MXFunction jac_fcn(mfcn_in,gfcn.jac(mod_x_,mod_g_));
-  jac_fcn.init();
-  log("Formed Jacobian of the constraints.");
-  
-  // Generate c code and load as DLL
-  if(codegen_){
-    dynamicCompilation(jac_fcn,jac_fcn_,"jac_fcn","Jacobian function");
-  } else {
-    jac_fcn_ = jac_fcn;
-  }
-
   // Add multipliers to function inputs
   if(!gauss_newton_){
     n = mfcn_in.size();
@@ -459,15 +443,27 @@ void SCPgenInternal::init(){
   MXFunction lgrad(mfcn_in,mfcn_out);
   lgrad.init();
   
+  // Jacobian of the constraints
+  MX jac = lgrad.jac(mod_x_,mod_g_);
+  log("Formed Jacobian of the constraints.");
+
   // Hessian of the Lagrangian
-  MXFunction hes_fcn(mfcn_in,lgrad.jac(mod_x_,mod_gl_,false,!gauss_newton_));
-  hes_fcn.init();
+  MX hes = lgrad.jac(mod_x_,mod_gl_,false,!gauss_newton_);
   log("Formed Hessian of the Lagrangian.");
 
+  // Matrices in the reduced QP
+  n=0;
+  vector<MX> mat_out;  
+  mat_out.push_back(jac);                             mat_jac_ = n++;
+  mat_out.push_back(hes);                             mat_hes_ = n++;
+  MXFunction mat_fcn(mfcn_in,mat_out);
+  mat_fcn.init();
+  
+  // Generate c code and load as DLL
   if(codegen_){
-    dynamicCompilation(hes_fcn,hes_fcn_,"hes_fcn","Hessian function");
+    dynamicCompilation(mat_fcn,mat_fcn_,"mat_fcn","Matrices function");
   } else {
-    hes_fcn_ = hes_fcn;
+    mat_fcn_ = mat_fcn;
   }
 
   // Definition of intermediate variables
@@ -588,9 +584,9 @@ void SCPgenInternal::init(){
   }  
   
   // Allocate QP data
-  CRSSparsity sp_tr_B_obj = hes_fcn_.output().sparsity().transpose();
+  CRSSparsity sp_tr_B_obj = mat_fcn_.output(mat_hes_).sparsity().transpose();
   qpH_ = DMatrix(sp_tr_B_obj.patternProduct(sp_tr_B_obj));
-  qpA_ = jac_fcn_.output();
+  qpA_ = mat_fcn_.output(mat_jac_);
   qpG_.resize(nx_);
   qpB_.resize(ng_);
 
@@ -724,7 +720,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
 
   // Get current time and reset timers
   double time1 = clock();
-  t_eval_jac_ = t_eval_hes_ = t_eval_res_ = t_eval_tan_ = t_eval_exp_ = t_solve_qp_ = 0;
+  t_eval_mat_ = t_eval_res_ = t_eval_tan_ = t_eval_exp_ = t_solve_qp_ = 0;
 
   // Initial evaluation of the residual function
   eval_res();
@@ -792,11 +788,8 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     // Form the condensed QP
     eval_tan();
 
-    // Evaluate the constraint Jacobian
-    eval_jac();
-    
-    // Evaluate the condensed Hessian
-    eval_hess();
+    // Evaluate the matrices in the condensed QP
+    eval_mat();
     
     // Regularize the QP
     if(regularize_){
@@ -831,8 +824,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   // Write timers
   if(print_time_){
     cout << endl;
-    cout << "time spent in eval_hes:    " << setw(9) << t_eval_hes_ << " s." << endl;
-    cout << "time spent in eval_jac:    " << setw(9) << t_eval_jac_ << " s." << endl;
+    cout << "time spent in eval_mat:    " << setw(9) << t_eval_mat_ << " s." << endl;
     cout << "time spent in eval_res:    " << setw(9) << t_eval_res_ << " s." << endl;
     cout << "time spent in eval_tan:    " << setw(9) << t_eval_tan_ << " s." << endl;
     cout << "time spent in eval_exp:    " << setw(9) << t_eval_exp_ << " s." << endl;
@@ -999,58 +991,38 @@ void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, 
   stream << endl;
 }
 
-void SCPgenInternal::eval_jac(){
-  // Get current time
-  double time1 = clock();
-
-  // Pass current parameter guess
-  jac_fcn_.setInput(input(NLP_P),mod_p_);
-
-  // Pass primal step/variables
-  jac_fcn_.setInput(x_opt_, mod_x_);
-  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-    jac_fcn_.setInput(it->res, it->mod_var);
-  }
-
-  // Evaluate condensed Jacobian
-  jac_fcn_.evaluate();
-
-  // Get the Jacobian
-  jac_fcn_.getOutput(qpA_);
-
-  double time2 = clock();
-  t_eval_jac_ += double(time2-time1)/CLOCKS_PER_SEC;
-}
-
-void SCPgenInternal::eval_hess(){
+void SCPgenInternal::eval_mat(){
   // Get current time
   double time1 = clock();
 
   // Pass parameters
-  hes_fcn_.setInput(input(NLP_P),mod_p_);
+  mat_fcn_.setInput(input(NLP_P),mod_p_);
 
   // Pass primal step/variables  
-  hes_fcn_.setInput(x_opt_, mod_x_);
+  mat_fcn_.setInput(x_opt_, mod_x_);
   for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-    hes_fcn_.setInput(it->res, it->mod_var);
+    mat_fcn_.setInput(it->res, it->mod_var);
   }
 
   // Pass dual steps/variables
   if(!gauss_newton_){
-    hes_fcn_.setInput(g_lam_,mod_g_lam_);
-    hes_fcn_.setInput(x_lam_, mod_x_lam_);
+    mat_fcn_.setInput(g_lam_,mod_g_lam_);
+    mat_fcn_.setInput(x_lam_, mod_x_lam_);
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-      hes_fcn_.setInput(it->resL, it->mod_lam);
+      mat_fcn_.setInput(it->resL, it->mod_lam);
     }
   }
 
   // Evaluate condensed Hessian
-  hes_fcn_.evaluate();
+  mat_fcn_.evaluate();
+
+  // Get the Jacobian
+  mat_fcn_.getOutput(qpA_,mat_jac_);
 
   // Get the objective function terms in the QP
   if(gauss_newton_){
     // Hessian of the lagrangian
-    const DMatrix& B_obj =  hes_fcn_.output();
+    const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
     fill(qpH_.begin(),qpH_.end(),0);
     DMatrix::mul_no_alloc_tn(B_obj,B_obj,qpH_);
 
@@ -1059,7 +1031,7 @@ void SCPgenInternal::eval_hess(){
     DMatrix::mul_no_alloc_tn(B_obj,gL_,qpG_);
   } else {
     // Hessian of the lagrangian
-    hes_fcn_.getOutput(qpH_);
+    mat_fcn_.getOutput(qpH_,mat_hes_);
 
     // Gradient of the lagrangian
     copy(gL_.begin(),gL_.end(),qpG_.begin());
@@ -1082,7 +1054,7 @@ void SCPgenInternal::eval_hess(){
   }
 
   double time2 = clock();
-  t_eval_hes_ += double(time2-time1)/CLOCKS_PER_SEC;
+  t_eval_mat_ += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 void SCPgenInternal::eval_res(){

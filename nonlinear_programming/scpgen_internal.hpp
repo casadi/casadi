@@ -56,11 +56,8 @@ public:
   void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
                       double reg, int ls_trials, bool ls_success);
 
-  // Evaluate jacobian of the constraints
-  void eval_jac();
-
-  // Evaluate Hessian of the Lagrangian
-  void eval_hess();
+  // Evaluate the matrices in the condensed QP
+  void eval_mat();
 
   // Evaluate the residual function
   void eval_res();
@@ -81,7 +78,7 @@ public:
   void eval_exp();
   
   // Timings
-  double t_eval_hes_, t_eval_jac_, t_eval_res_, t_eval_tan_, t_eval_exp_, t_solve_qp_, t_mainloop_;
+  double t_eval_mat_, t_eval_res_, t_eval_tan_, t_eval_exp_, t_solve_qp_, t_mainloop_;
   
   /// QP solver for the subproblems
   QPSolver qp_solver_;
@@ -139,11 +136,8 @@ public:
   /// Residual function
   FX res_fcn_;
  
-  // Hessian function
-  FX hes_fcn_;
-
-  // Jacobian function
-  FX jac_fcn_;
+  // Function to calculate the matrices in the reduced QP
+  FX mat_fcn_;
 
   /// Quadratic approximation
   FX tan_fcn_;
@@ -178,6 +172,9 @@ public:
 
   // Tangental function
   int tan_b_obj_, tan_b_g_;
+
+  // Matrices function
+  int mat_jac_, mat_hes_;
 
   struct Var{
     int n;
