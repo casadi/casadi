@@ -381,7 +381,7 @@ int main(){
   solver.init();
   
   // Initial condition
-  solver.setInput(vars_sol,NLP_X_INIT);
+  solver.setInput(vars_sol,NLP_SOLVER_X0);
 
   // Bounds on x
   solver.setInput(vars_lb,NLP_LBX);
@@ -396,11 +396,11 @@ int main(){
 
   // Print the optimal cost
   double cost;
-  solver.getOutput(cost,NLP_COST);
+  solver.getOutput(cost,NLP_SOLVER_F);
   cout << "optimal cost: " << cost << endl;
 
   // Get the solution
-  solver.getOutput(vars_sol,NLP_X_OPT);
+  solver.getOutput(vars_sol,NLP_SOLVER_X);
 
   // ----
   // SAVE SOLUTION TO DISK

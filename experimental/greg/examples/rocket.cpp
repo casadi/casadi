@@ -132,7 +132,7 @@ main()
 
 	solver.setInput(    ocp.lb, NLP_LBX);
 	solver.setInput(    ocp.ub, NLP_UBX);
-	solver.setInput( ocp.guess, NLP_X_INIT);
+	solver.setInput( ocp.guess, NLP_SOLVER_X0);
 
 	// Bounds on g
 	solver.setInput( ocp.gMin, NLP_LBG);
@@ -145,12 +145,12 @@ main()
 
 	// Print the optimal cost
 	double cost;
-	solver.getOutput(cost,NLP_COST);
+	solver.getOutput(cost,NLP_SOLVER_F);
 	cout << "optimal time: " << cost << endl;
 
 	// // Print the optimal solution
 	vector<double>xopt(ocp.designVariables.size1());
-	solver.getOutput(xopt,NLP_X_OPT);
+	solver.getOutput(xopt,NLP_SOLVER_X);
 	// cout << "optimal solution: " << xopt << endl;
 
 	ocp.writeOctaveOutput( "rocket_out" );

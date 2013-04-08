@@ -138,7 +138,7 @@ int main(){
   }
   solver.setInput(Umin,NLP_LBX);
   solver.setInput(Umax,NLP_UBX);
-  solver.setInput(Usol,NLP_X_INIT);
+  solver.setInput(Usol,NLP_SOLVER_X0);
 
   // Bounds on g
   vector<double> Gmin(2), Gmax(2);
@@ -151,7 +151,7 @@ int main(){
   solver.solve();
 
   // Get the solution
-  solver.getOutput(Usol,NLP_X_OPT);
+  solver.getOutput(Usol,NLP_SOLVER_X);
   cout << "optimal solution: " << Usol << endl;
 
   }

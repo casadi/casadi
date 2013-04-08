@@ -89,5 +89,5 @@ solver.setInput([-100,-100,-100,-100,-100],NLP_LBG)
 
 
 solver.solve()
-print solver.output(NLP_X_OPT)
+print solver.output(NLP_SOLVER_X)
 #! Nested optimization

@@ -98,8 +98,8 @@ int main(){
   solver.init();
   
   // Pass inputs
-  solver.input(NLP_X_INIT).setAll(0);
-  solver.input(NLP_LAMBDA_INIT).setAll(0);
+  solver.input(NLP_SOLVER_X0).setAll(0);
+  solver.input(NLP_SOLVER_LAM_X0).setAll(0);
   solver.input(NLP_LBX).setAll(-1);
   solver.input(NLP_UBX).setAll(1);
 

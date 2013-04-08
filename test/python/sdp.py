@@ -284,7 +284,7 @@ class SDPtests(casadiTestCase):
     sol.init()
     sol.setInput(0,NLP_LBG)
     sol.setInput(0,NLP_UBG)
-    sol.setInput(1,NLP_X_INIT)
+    sol.setInput(1,NLP_SOLVER_X0)
 
     sol.evaluate()
 

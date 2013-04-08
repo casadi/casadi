@@ -102,8 +102,8 @@ void IPInternal::evaluate(int nfdir, int nadir){
   casadi_assert(nfdir==0 && nadir==0);
 
   // Current value of x
-  DMatrix &x_curr = output(NLP_X_OPT);
-  copy(input(NLP_X_INIT).begin(),input(NLP_X_INIT).end(),x_curr.begin());
+  DMatrix &x_curr = output(NLP_SOLVER_X);
+  copy(input(NLP_SOLVER_X0).begin(),input(NLP_SOLVER_X0).end(),x_curr.begin());
   
   // Step size
   DMatrix dx = DMatrix(x_curr.sparsity(),0);

@@ -68,7 +68,7 @@ solver.init()
 # Set bounds and initial guess
 solver.setInput(-0.75, NLP_LBX)
 solver.setInput( 1.,   NLP_UBX)
-solver.setInput( 0.,   NLP_X_INIT)
+solver.setInput( 0.,   NLP_SOLVER_X0)
 solver.setInput( 0.,   NLP_LBG)
 solver.setInput( 0.,   NLP_UBG)
 
@@ -76,7 +76,7 @@ solver.setInput( 0.,   NLP_UBG)
 solver.solve()
 
 # Retrieve the solution
-u_opt = NP.array(solver.output(NLP_X_OPT))
+u_opt = NP.array(solver.output(NLP_SOLVER_X))
 
 # Time grid
 tgrid_x = NP.linspace(0,10,nk+1)

@@ -123,7 +123,7 @@ solver.init()
 # Set bounds and initial guess
 solver.setInput([   0,   1,-inf,-inf] + (num_nodes-1)*[-inf,-inf,-inf,-inf] + [-inf,-inf,   0,   0], NLP_LBX)
 solver.setInput([   0,   1, inf, inf] + (num_nodes-1)*[ inf, inf, inf, inf] + [ inf, inf,   0,   0], NLP_UBX)
-solver.setInput([   0,   0,   0,   0] + (num_nodes-1)*[   0,   0,   0,   0] + [   0,   0,   0,   0], NLP_X_INIT)
+solver.setInput([   0,   0,   0,   0] + (num_nodes-1)*[   0,   0,   0,   0] + [   0,   0,   0,   0], NLP_SOLVER_X0)
 solver.setInput(num_nodes*[0,0,0,0], NLP_LBG)
 solver.setInput(num_nodes*[0,0,0,0], NLP_UBG)
 
@@ -145,7 +145,7 @@ simulator = Simulator(I, output_fcn, tgrid)
 simulator.init()
 
 # Pass initial conditions to the simulator
-simulator.setInput(solver.output(NLP_X_OPT)[0:4],INTEGRATOR_X0)
+simulator.setInput(solver.output(NLP_SOLVER_X)[0:4],INTEGRATOR_X0)
 
 # Simulate to get the trajectories
 simulator.evaluate()

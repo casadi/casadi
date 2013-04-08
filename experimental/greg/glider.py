@@ -170,7 +170,7 @@ if __name__ == '__main__':
     # Bounds on u and initial condition
     solver.setInput(gliderOcp.lb, C.NLP_LBX)
     solver.setInput(gliderOcp.ub, C.NLP_UBX)
-    solver.setInput(gliderOcp.guess, C.NLP_X_INIT)
+    solver.setInput(gliderOcp.guess, C.NLP_SOLVER_X0)
     
     # Bounds on g
     solver.setInput(gliderOcp.Gmin, C.NLP_LBG)
@@ -180,7 +180,7 @@ if __name__ == '__main__':
     solver.solve()
     
     # Get the solution
-    xopt = solver.output(C.NLP_X_OPT)
+    xopt = solver.output(C.NLP_SOLVER_X)
 
     print ""
     print "optimal time: "+str(xopt[gliderOcp._getIdx('tEnd')])+" seconds"

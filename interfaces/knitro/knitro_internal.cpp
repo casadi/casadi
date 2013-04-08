@@ -226,7 +226,7 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
                               nnzH,
                               getPtr(Hrow),
                               getPtr(Hcol),
-                              &input(NLP_X_INIT).front(),
+                              &input(NLP_SOLVER_X0).front(),
                               0); // initial lambda
   casadi_assert_message(status==0, "KTR_init_problem failed");
   
@@ -247,10 +247,10 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
 
   // Solve NLP
   status = KTR_solve(kc_handle_,
-                   &output(NLP_X_OPT).front(),
+                   &output(NLP_SOLVER_X).front(),
                    getPtr(lambda),
                    0,  // not used
-                   &output(NLP_COST).front(),
+                   &output(NLP_SOLVER_F).front(),
                    0,  // not used
                    0,  // not used
                    0,  // not used
@@ -260,8 +260,8 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
   casadi_assert(status<=0); // make sure the NLP finished solving
     
   // Copy lagrange multipliers
-  output(NLP_LAMBDA_G).set(getPtr(lambda));
-  output(NLP_LAMBDA_X).set(&lambda[ng_]);
+  output(NLP_SOLVER_LAM_G).set(getPtr(lambda));
+  output(NLP_SOLVER_LAM_X).set(&lambda[ng_]);
 
   // Free memory (move to destructor!)
   KTR_free(&kc_handle_);

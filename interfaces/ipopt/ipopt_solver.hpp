@@ -34,9 +34,9 @@ class IpoptInternal;
 * \brief interface to IPOPT NLP solver
 * @copydoc NLPSolver_doc
 *
-* When in warmstart mode, output NLP_LAMBDA_X may be used as input
+* When in warmstart mode, output NLP_SOLVER_LAM_X may be used as input
 *
-* NOTE: Even when max_iter == 0,  it is not guaranteed that input(NLP_X_INIT) == output(NLP_X_OPT). Indeed if bounds on X or constraints are unmet, they will differ.
+* NOTE: Even when max_iter == 0,  it is not guaranteed that input(NLP_SOLVER_X0) == output(NLP_SOLVER_X). Indeed if bounds on X or constraints are unmet, they will differ.
 *       
 *  A good resource about the algorithms in IPOPT is: Wachter and L. T. Biegler, On the Implementation of an Interior-Point Filter Line-Search Algorithm for Large-Scale Nonlinear Programming, Mathematical Programming 106(1), pp. 25-57, 2006 (As Research Report RC 23149, IBM T. J. Watson Research Center, Yorktown, USA
 *

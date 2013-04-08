@@ -242,7 +242,7 @@ for integrator in [integrator_euler, integrator_cvodes]:
   solver.setInput(Umax,NLP_UBX)
 
   Usol = nu * [0.4] # initial guess
-  solver.setInput(Usol,NLP_X_INIT)
+  solver.setInput(Usol,NLP_SOLVER_X0)
 
   # Bounds on g
   Gmin = Gmax = [10, 0]
@@ -253,7 +253,7 @@ for integrator in [integrator_euler, integrator_cvodes]:
   solver.solve()
 
   # Get the solution
-  xopt = solver.output(NLP_X_OPT)
+  xopt = solver.output(NLP_SOLVER_X)
 
   # Plot the optimal trajectory
   plt.figure()

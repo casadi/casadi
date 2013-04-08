@@ -57,7 +57,7 @@ S.solve()
 
 # Visualize the trajectory
 from matplotlib.pylab import *
-u = S.output(NLP_X_OPT)
+u = S.output(NLP_SOLVER_X)
 plot(u)
 x = DMatrix(0.30)
 for k in range(30):

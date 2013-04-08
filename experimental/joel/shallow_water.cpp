@@ -392,7 +392,7 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   vector<double> p_init(2);
   p_init[0] = drag_guess/p_scale_[0];
   p_init[1] = depth_guess/p_scale_[1];
-  nlp_solver_.setInput(p_init,NLP_X_INIT);
+  nlp_solver_.setInput(p_init,NLP_SOLVER_X0);
 
   // Bounds on the variables
   vector<double> lbu(2), ubu(2);  
@@ -414,7 +414,7 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   
   // Solution statistics  
   sol_time = double(time2-time1)/CLOCKS_PER_SEC;
-  const vector<double>& x_opt = nlp_solver_.output(NLP_X_OPT).data();
+  const vector<double>& x_opt = nlp_solver_.output(NLP_SOLVER_X).data();
   drag_est = x_opt.at(0)*p_scale_[0];
   depth_est = x_opt.at(1)*p_scale_[1];
   iter_count = nlp_solver_.getStat("iter_count");

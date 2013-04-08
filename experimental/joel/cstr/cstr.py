@@ -195,7 +195,7 @@ nu = 1
 ## Set bounds and initial guess
 #solver.setInput(ms.V_min_,  NLP_LBX)
 #solver.setInput(ms.V_max_,  NLP_UBX)
-#solver.setInput(ms.V_init_,  NLP_X_INIT)
+#solver.setInput(ms.V_init_,  NLP_SOLVER_X0)
 
 #solver.setInput(ms.G_min_,NLP_LBG)
 #solver.setInput(ms.G_max_,NLP_UBG)

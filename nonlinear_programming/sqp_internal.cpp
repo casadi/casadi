@@ -146,7 +146,7 @@ void SQPInternal::init(){
   if(hess_mode_ == HESS_BFGS){
     // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
     SXMatrix Bk = ssym("Bk",H_sparsity);
-    SXMatrix x = ssym("x",input(NLP_X_INIT).sparsity());
+    SXMatrix x = ssym("x",input(NLP_SOLVER_X0).sparsity());
     SXMatrix x_old = ssym("x",x.sparsity());
     SXMatrix gLag = ssym("gLag",x.sparsity());
     SXMatrix gLag_old = ssym("gLag_old",x.sparsity());
@@ -208,7 +208,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   checkInitialBounds();
   
   // Get problem data
-  const vector<double>& x_init = input(NLP_X_INIT).data();
+  const vector<double>& x_init = input(NLP_SOLVER_X0).data();
   const vector<double>& lbx = input(NLP_LBX).data();
   const vector<double>& ubx = input(NLP_UBX).data();
   const vector<double>& lbg = input(NLP_LBG).data();
@@ -227,8 +227,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   copy(x_init.begin(),x_init.end(),x_.begin());
   
   // Initialize Lagrange multipliers of the NLP
-  copy(input(NLP_LAMBDA_INIT).begin(),input(NLP_LAMBDA_INIT).end(),mu_.begin());
-  copy(output(NLP_LAMBDA_X).begin(),output(NLP_LAMBDA_X).end(),mu_x_.begin());
+  copy(input(NLP_SOLVER_LAM_X0).begin(),input(NLP_SOLVER_LAM_X0).end(),mu_.begin());
+  copy(output(NLP_SOLVER_LAM_X).begin(),output(NLP_SOLVER_LAM_X).end(),mu_x_.begin());
 
   // Initial constraint Jacobian
   eval_jac_g(x_,gk_,Jk_);
@@ -286,10 +286,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     
     // Call callback function if present
     if (!callback_.isNull()) {
-      callback_.input(NLP_COST).set(fk_);
-      callback_.input(NLP_X_OPT).set(x_);
-      callback_.input(NLP_LAMBDA_G).set(mu_);
-      callback_.input(NLP_LAMBDA_X).set(mu_x_);
+      callback_.input(NLP_SOLVER_F).set(fk_);
+      callback_.input(NLP_SOLVER_X).set(x_);
+      callback_.input(NLP_SOLVER_LAM_G).set(mu_);
+      callback_.input(NLP_SOLVER_LAM_X).set(mu_x_);
       callback_.input(NLP_G).set(gk_);
       callback_.evaluate();
       
@@ -462,10 +462,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   }
   
   // Save results to outputs
-  output(NLP_COST).set(fk_);
-  output(NLP_X_OPT).set(x_);
-  output(NLP_LAMBDA_G).set(mu_);
-  output(NLP_LAMBDA_X).set(mu_x_);
+  output(NLP_SOLVER_F).set(fk_);
+  output(NLP_SOLVER_X).set(x_);
+  output(NLP_SOLVER_LAM_G).set(mu_);
+  output(NLP_SOLVER_LAM_X).set(mu_x_);
   output(NLP_G).set(gk_);
   
   // Save statistics

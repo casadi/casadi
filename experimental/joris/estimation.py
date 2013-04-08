@@ -219,11 +219,11 @@ class NLPSolutionInspector:
     if self.i>0:
       self.log[0,self.i] = log10(f.getStats()['inf_pr'])
       self.log[1,self.i] = log10(f.getStats()['inf_du'])
-      self.log[2,self.i] = float(log10(f.input(NLP_COST)))
+      self.log[2,self.i] = float(log10(f.input(NLP_SOLVER_F)))
       self.log[3,self.i] = f.getStats()['ls_trials']
       
     self.i += 1
-    sol = f.input(NLP_X_OPT)
+    sol = f.input(NLP_SOLVER_X)
     X_opt = horzcat([sol[i][states.i_X,:] for i in optvar.i_X])
     q_opt = horzcat([sol[i][states.i_q,:] for i in optvar.i_X])
     R_opt = numSample1D(Rf,q_opt)
@@ -264,7 +264,7 @@ nlp = IpoptSolver(f,g)
 nlp.init()
 
  #! We wrap the logging instance in a PyFunction
-c = PyFunction( iterationInspector, [ nlp.output(NLP_X_OPT).sparsity() ,nlp.output(NLP_COST).sparsity() , nlp.output(NLP_LAMBDA_G).sparsity() , nlp.output(NLP_LAMBDA_X).sparsity() ], [sp_dense(1,1)] )
+c = PyFunction( iterationInspector, [ nlp.output(NLP_SOLVER_X).sparsity() ,nlp.output(NLP_SOLVER_F).sparsity() , nlp.output(NLP_SOLVER_LAM_G).sparsity() , nlp.output(NLP_SOLVER_LAM_X).sparsity() ], [sp_dense(1,1)] )
 c.init()
 nlp.setOption("iteration_callback",c)
 nlp.setOption('tol',1e-8)
@@ -272,7 +272,7 @@ nlp.init()
 
 nlp.solve()
 for i in range(nk):  # intialize with (0,0,0,1) quaternion
-  nlp.input(NLP_X_INIT)[optvar.i_X[i][states.i_q[3],:]] = 1
+  nlp.input(NLP_SOLVER_X0)[optvar.i_X[i][states.i_q[3],:]] = 1
 nlp.input(NLP_P).set(par.veccat_())
 nlp.input(NLP_LBG).setAll(0)
 nlp.input(NLP_UBG).setAll(0)

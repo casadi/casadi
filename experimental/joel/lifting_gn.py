@@ -121,7 +121,7 @@ for (i,x0) in enumerate([0.08]):
   #nlp_solver.setOption("qp_solver_options",{"printLevel":"none"})
   nlp_solver = IpoptSolver(F1,F2)
   nlp_solver.init()
-  nlp_solver.setInput(u_guess,NLP_X_INIT)
+  nlp_solver.setInput(u_guess,NLP_SOLVER_X0)
   nlp_solver.setInput(u_min,NLP_LBX)
   nlp_solver.setInput(u_max,NLP_UBX)
   nlp_solver.setInput(g_min,NLP_LBG)
@@ -389,7 +389,7 @@ for (i,x0) in enumerate([0.08]):
 
   
 print "u_k = ", u_k
-print "nlp_solver.output(NLP_X_OPT) = ", nlp_solver.output(NLP_X_OPT)
+print "nlp_solver.output(NLP_SOLVER_X) = ", nlp_solver.output(NLP_SOLVER_X)
 
 plt.show()
 

@@ -398,7 +398,7 @@ int main(){
   // Bounds on x and initial guess
   solver.setInput(vars_lb,NLP_LBX);
   solver.setInput(vars_ub,NLP_UBX);
-  solver.setInput(vars_sol,NLP_X_INIT);
+  solver.setInput(vars_sol,NLP_SOLVER_X0);
   
   // Bounds on the constraints
   solver.setInput(lbg,NLP_LBG);
@@ -409,7 +409,7 @@ int main(){
 
   // Print the optimal cost
   double cost;
-  solver.getOutput(cost,NLP_COST);
+  solver.getOutput(cost,NLP_SOLVER_F);
   cout << "optimal cost: " << cost << endl;
 
   // ----
@@ -429,7 +429,7 @@ int main(){
   resfile.open ("results_convection_diffusion.txt");
 
   // Get the solution
-  solver.getOutput(vars_sol,NLP_X_OPT);
+  solver.getOutput(vars_sol,NLP_SOLVER_X);
   resfile << "T_opt " << vars_sol << endl;
   
   // Save optimal solution to disk

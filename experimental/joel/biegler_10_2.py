@@ -334,7 +334,7 @@ solver.setOption("max_iter",50)
 solver.init()
   
 # Initial condition
-solver.setInput(vars_init,NLP_X_INIT)
+solver.setInput(vars_init,NLP_SOLVER_X0)
 
 # Bounds on x
 solver.setInput(vars_lb,NLP_LBX)
@@ -348,13 +348,13 @@ solver.setInput(NP.concatenate(ubg),NLP_UBG)
 solver.solve()
 
 # Print the optimal cost
-print "optimal cost: ", solver.output(NLP_COST)[0]
+print "optimal cost: ", solver.output(NLP_SOLVER_F)[0]
 
 # Retrieve the solution
-v_opt = array(solver.output(NLP_X_OPT))
+v_opt = array(solver.output(NLP_SOLVER_X))
 
 # Get the solution
-vars_sol = solver.output(NLP_X_OPT)
+vars_sol = solver.output(NLP_SOLVER_X)
 
 ## ----
 ## SAVE SOLUTION TO DISK

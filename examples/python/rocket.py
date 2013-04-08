@@ -84,7 +84,7 @@ solver.init()
 # Bounds on u and initial condition
 solver.setInput(-0.5, NLP_LBX)
 solver.setInput( 0.5, NLP_UBX)
-solver.setInput( 0.4, NLP_X_INIT)
+solver.setInput( 0.4, NLP_SOLVER_X0)
 
 # Bounds on g
 solver.setInput([10,0],NLP_LBG)
@@ -94,7 +94,7 @@ solver.setInput([10,0],NLP_UBG)
 solver.solve()
 
 # Get the solution
-plot(solver.output(NLP_X_OPT))
-plot(solver.output(NLP_LAMBDA_X))
+plot(solver.output(NLP_SOLVER_X))
+plot(solver.output(NLP_SOLVER_LAM_X))
 grid()
 show()

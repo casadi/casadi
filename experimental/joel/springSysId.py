@@ -268,7 +268,7 @@ def idSystem(makePlots=False):
         guess.append(y[0])
         guess.append(y[1])
     kb_sol = [5, 0.4] + guess # initial guess
-    solver.setInput(kb_sol, C.NLP_X_INIT)
+    solver.setInput(kb_sol, C.NLP_SOLVER_X0)
     
     # Bounds on g
     #Gmin = Gmax = [] #[10, 0]
@@ -279,7 +279,7 @@ def idSystem(makePlots=False):
     solver.solve()
     
     # Get the solution
-    xopt = solver.output(C.NLP_X_OPT)
+    xopt = solver.output(C.NLP_SOLVER_X)
     
     # estimated parameters:
     print ""

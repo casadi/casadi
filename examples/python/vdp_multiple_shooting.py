@@ -121,7 +121,7 @@ solver.init()
 # Set bounds and initial guess
 solver.setInput(VMIN,  NLP_LBX)
 solver.setInput(VMAX,  NLP_UBX)
-solver.setInput(VINIT, NLP_X_INIT)
+solver.setInput(VINIT, NLP_SOLVER_X0)
 solver.setInput(NP.concatenate(g_min),NLP_LBG)
 solver.setInput(NP.concatenate(g_max),NLP_UBG)
 
@@ -129,14 +129,14 @@ solver.setInput(NP.concatenate(g_max),NLP_UBG)
 solver.solve()
 
 # Retrieve the solution
-v_opt = solver.output(NLP_X_OPT)
+v_opt = solver.output(NLP_SOLVER_X)
 u_opt = v_opt[0:nk]
 x0_opt = v_opt[nk+0::3]
 x1_opt = v_opt[nk+1::3]
 x2_opt = v_opt[nk+2::3]
 
 # Retrieve the solution
-v_opt = NP.array(solver.output(NLP_X_OPT))
+v_opt = NP.array(solver.output(NLP_SOLVER_X))
 
 # Get values at the beginning of each finite element
 tgrid_x = NP.linspace(0,10,nk+1)

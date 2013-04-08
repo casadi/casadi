@@ -357,21 +357,21 @@ void NLPSolverInternal::init(){
   
   // Allocate space for inputs
   input_.resize(NLP_NUM_IN);
-  input(NLP_X_INIT)      =  DMatrix::zeros(nx_);
+  input(NLP_SOLVER_X0)      =  DMatrix::zeros(nx_);
   input(NLP_LBX)         = -DMatrix::inf(nx_);
   input(NLP_UBX)         =  DMatrix::inf(nx_);
   input(NLP_LBG)         = -DMatrix::inf(ng_);
   input(NLP_UBG)         =  DMatrix::inf(ng_);
-  input(NLP_LAMBDA_INIT) =  DMatrix::zeros(ng_);
+  input(NLP_SOLVER_LAM_X0) =  DMatrix::zeros(ng_);
   input(NLP_P)           =  DMatrix::zeros(np_);
   
   // Allocate space for outputs
   output_.resize(NLP_NUM_OUT);
-  output(NLP_X_OPT)      = DMatrix::zeros(nx_);
-  output(NLP_COST)       = DMatrix::zeros(1);
-  output(NLP_LAMBDA_X)   = DMatrix::zeros(nx_);
-  output(NLP_LAMBDA_G)   = DMatrix::zeros(ng_);
-  output(NLP_LAMBDA_P)   = DMatrix::zeros(np_);
+  output(NLP_SOLVER_X)      = DMatrix::zeros(nx_);
+  output(NLP_SOLVER_F)       = DMatrix::zeros(1);
+  output(NLP_SOLVER_LAM_X)   = DMatrix::zeros(nx_);
+  output(NLP_SOLVER_LAM_G)   = DMatrix::zeros(ng_);
+  output(NLP_SOLVER_LAM_P)   = DMatrix::zeros(np_);
   output(NLP_G)          = DMatrix::zeros(ng_);
   
   if (hasSetOption("iteration_callback")) {
@@ -400,11 +400,11 @@ void NLPSolverInternal::init(){
 void NLPSolverInternal::checkInitialBounds() { 
   if(bool(getOption("warn_initial_bounds"))){
     bool violated = false;
-    for (int k=0;k<input(NLP_X_INIT).size();++k) {
-      if (input(NLP_X_INIT).at(k)>input(NLP_UBX).at(k)) {
+    for (int k=0;k<input(NLP_SOLVER_X0).size();++k) {
+      if (input(NLP_SOLVER_X0).at(k)>input(NLP_UBX).at(k)) {
         violated = true;
       }
-      if (input(NLP_X_INIT).at(k)<input(NLP_LBX).at(k)) {
+      if (input(NLP_SOLVER_X0).at(k)<input(NLP_LBX).at(k)) {
         violated = true;
       }
     }
@@ -416,7 +416,7 @@ void NLPSolverInternal::checkInitialBounds() {
   void NLPSolverInternal::reportConstraints(std::ostream &stream) { 
   
     stream << "Reporting NLP constraints" << endl;
-    CasADi::reportConstraints(stream,output(NLP_X_OPT),input(NLP_LBX),input(NLP_UBX), "decision bounds");
+    CasADi::reportConstraints(stream,output(NLP_SOLVER_X),input(NLP_LBX),input(NLP_UBX), "decision bounds");
     double tol = 1e-8;
     if (hasOption("constr_viol_tol")) tol = getOption("constr_viol_tol");
     CasADi::reportConstraints(stream,output(NLP_G),input(NLP_LBG),input(NLP_UBG), "constraints",getOption("constr_viol_tol"));

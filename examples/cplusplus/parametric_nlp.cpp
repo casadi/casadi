@@ -101,7 +101,7 @@ int main(){
   solver.init();
   
   // Solve NLP
-  solver.setInput( x0, NLP_X_INIT);
+  solver.setInput( x0, NLP_SOLVER_X0);
   solver.setInput( p0, NLP_P);
   solver.setInput(lbx, NLP_LBX);
   solver.setInput(ubx, NLP_UBX);
@@ -112,10 +112,10 @@ int main(){
   // Print the solution
   cout << "-----" << endl;
   cout << "Optimal solution for p = " << solver.input(NLP_P).getDescription() << ":" << endl;
-  cout << setw(30) << "Objective: " << solver.output(NLP_COST).getDescription() << endl;
-  cout << setw(30) << "Primal solution: " << solver.output(NLP_X_OPT).getDescription() << endl;
-  cout << setw(30) << "Dual solution (x): " << solver.output(NLP_LAMBDA_X).getDescription() << endl;
-  cout << setw(30) << "Dual solution (g): " << solver.output(NLP_LAMBDA_G).getDescription() << endl;
+  cout << setw(30) << "Objective: " << solver.output(NLP_SOLVER_F).getDescription() << endl;
+  cout << setw(30) << "Primal solution: " << solver.output(NLP_SOLVER_X).getDescription() << endl;
+  cout << setw(30) << "Dual solution (x): " << solver.output(NLP_SOLVER_LAM_X).getDescription() << endl;
+  cout << setw(30) << "Dual solution (g): " << solver.output(NLP_SOLVER_LAM_G).getDescription() << endl;
   
   // Change the parameter and resolve
   p0[0] = 4.5;
@@ -125,10 +125,10 @@ int main(){
   // Print the new solution
   cout << "-----" << endl;
   cout << "Optimal solution for p = " << solver.input(NLP_P).getDescription() << ":" << endl;
-  cout << setw(30) << "Objective: " << solver.output(NLP_COST).getDescription() << endl;
-  cout << setw(30) << "Primal solution: " << solver.output(NLP_X_OPT).getDescription() << endl;
-  cout << setw(30) << "Dual solution (x): " << solver.output(NLP_LAMBDA_X).getDescription() << endl;
-  cout << setw(30) << "Dual solution (g): " << solver.output(NLP_LAMBDA_G).getDescription() << endl;
+  cout << setw(30) << "Objective: " << solver.output(NLP_SOLVER_F).getDescription() << endl;
+  cout << setw(30) << "Primal solution: " << solver.output(NLP_SOLVER_X).getDescription() << endl;
+  cout << setw(30) << "Dual solution (x): " << solver.output(NLP_SOLVER_LAM_X).getDescription() << endl;
+  cout << setw(30) << "Dual solution (g): " << solver.output(NLP_SOLVER_LAM_G).getDescription() << endl;
   
   return 0;
 }

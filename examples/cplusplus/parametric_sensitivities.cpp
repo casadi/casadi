@@ -123,7 +123,7 @@ int main(){
   solver.init();
   
   // Solve NLP
-  solver.setInput( x0, NLP_X_INIT);
+  solver.setInput( x0, NLP_SOLVER_X0);
   solver.setInput(lbx, NLP_LBX);
   solver.setInput(ubx, NLP_UBX);
   solver.setInput(lbg, NLP_LBG);
@@ -132,11 +132,11 @@ int main(){
   
   // Print the solution
   cout << "----" << endl;
-  cout << "Minimal cost " << solver.output(NLP_COST) << endl;
+  cout << "Minimal cost " << solver.output(NLP_SOLVER_F) << endl;
   cout << "----" << endl;
 
   cout << "Nominal solution" << endl;
-  cout << "x = " << solver.output(NLP_X_OPT).data() << endl;
+  cout << "x = " << solver.output(NLP_SOLVER_X).data() << endl;
   cout << "----" << endl;
   
   cout << "perturbed solution" << endl;

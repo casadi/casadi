@@ -51,7 +51,7 @@ NLPImplicitInternal::~NLPImplicitInternal(){
 
 void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
   // Obtain initial guess
-  nlp_solver_.input(NLP_X_INIT).set(output(0));
+  nlp_solver_.input(NLP_SOLVER_X0).set(output(0));
   
   // Add other arguments
   int k = 0;
@@ -64,7 +64,7 @@ void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
   nlp_solver_.evaluate();
 
   // Copy the outputs
-  output(0).set(nlp_solver_.output(NLP_X_OPT));
+  output(0).set(nlp_solver_.output(NLP_SOLVER_X));
   
   // Save auxillary outputs
   for(int i=1; i<getNumOutputs(); ++i){

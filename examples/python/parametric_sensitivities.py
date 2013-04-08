@@ -100,7 +100,7 @@ solver.setOption("n_sens_steps", 1)
 solver.init()
   
 # Solve NLP
-solver.setInput( x0, NLP_X_INIT)
+solver.setInput( x0, NLP_SOLVER_X0)
 solver.setInput(lbx, NLP_LBX)
 solver.setInput(ubx, NLP_UBX)
 solver.setInput(lbg, NLP_LBG)
@@ -109,11 +109,11 @@ solver.evaluate()
   
 # Print the solution
 print "----"
-print "Minimal cost " , solver.output(NLP_COST)
+print "Minimal cost " , solver.output(NLP_SOLVER_F)
 print "----"
 
 print "Nominal solution"
-print "x = " , solver.output(NLP_X_OPT).data()
+print "x = " , solver.output(NLP_SOLVER_X).data()
 print "----"
   
 print "perturbed solution"

@@ -59,7 +59,7 @@ nlp_solver.setInput(nlp.x_lb,NLP_LBX)
 nlp_solver.setInput(nlp.x_ub,NLP_UBX)
 nlp_solver.setInput(nlp.g_lb,NLP_LBG)
 nlp_solver.setInput(nlp.g_ub,NLP_UBG)
-nlp_solver.setInput(nlp.x_init,NLP_X_INIT)
+nlp_solver.setInput(nlp.x_init,NLP_SOLVER_X0)
   
 # Solve NLP
 nlp_solver.solve()

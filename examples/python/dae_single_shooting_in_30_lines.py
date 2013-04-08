@@ -78,5 +78,5 @@ solver.setInput(-0.75, NLP_LBX)    # Lower variable bound
 solver.setInput( 1.0,  NLP_UBX)    # Upper variable bound
 solver.setInput( 0.0,  NLP_LBG)    # Lower constraint bound
 solver.setInput( 0.0,  NLP_UBG)    # Upper constraint bound
-solver.setInput( 0.0,  NLP_X_INIT) # Initial guess
+solver.setInput( 0.0,  NLP_SOLVER_X0) # Initial guess
 solver.solve()

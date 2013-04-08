@@ -141,10 +141,10 @@ int main(){
 
   // Print solution
   cout << "-----" << endl;
-  cout << "objective at solution = " << solver.output(NLP_COST) << endl;
-  cout << "primal solution = " << solver.output(NLP_X_OPT) << endl;
-  cout << "dual solution (x) = " << solver.output(NLP_LAMBDA_X) << endl;
-  cout << "dual solution (g) = " << solver.output(NLP_LAMBDA_G) << endl;
+  cout << "objective at solution = " << solver.output(NLP_SOLVER_F) << endl;
+  cout << "primal solution = " << solver.output(NLP_SOLVER_X) << endl;
+  cout << "dual solution (x) = " << solver.output(NLP_SOLVER_LAM_X) << endl;
+  cout << "dual solution (g) = " << solver.output(NLP_SOLVER_LAM_G) << endl;
   
   return 0;
 }
