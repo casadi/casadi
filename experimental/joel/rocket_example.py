@@ -113,7 +113,7 @@ Umax = nu * [10]  # upper bound
 solver.setInput(Umax,"ubx")
 
 Usol = nu * [0.4] # initial guess
-solver.setInput(Usol,"x_init")
+solver.setInput(Usol,"x0")
 
 # Bounds on g
 Gmin = Gmax = [10, 0]
@@ -124,7 +124,7 @@ solver.setInput(Gmax,"ubg")
 solver.solve()
 
 # Get the solution
-uopt = solver.output("x_opt")
+uopt = solver.output("x")
 
 # Plot the optimal trajectory
 tgrid = linspace(0,T,nu+1)

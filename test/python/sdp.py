@@ -292,7 +292,7 @@ class SDPtests(casadiTestCase):
     sol.init()
     sol.setInput(0,"lbg")
     sol.setInput(0,"ubg")
-    sol.setInput(1,"x_init")
+    sol.setInput(1,"x0")
 
     sol.evaluate()
 

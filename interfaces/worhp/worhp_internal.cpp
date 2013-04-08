@@ -802,15 +802,15 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
   
   log("WorhpInternal::copying data");
   
-  input(NLP_X_INIT)[freeX_].getArray(worhp_o.X,worhp_o.n);
+  input(NLP_SOLVER_X0)[freeX_].getArray(worhp_o.X,worhp_o.n);
   lbx.getArray(worhp_o.XL,worhp_o.n);
   ubx.getArray(worhp_o.XU,worhp_o.n);
   
   DMatrix lbg = input(NLP_LBG)[nonfreeG_];
   DMatrix ubg = input(NLP_UBG)[nonfreeG_];
 
-  output(NLP_LAMBDA_X)[freeX_].getArray(worhp_o.Lambda,worhp_o.n);
-  if (worhp_o.m>0) input(NLP_LAMBDA_INIT)[nonfreeG_].getArray(worhp_o.Mu,worhp_o.m);
+  output(NLP_SOLVER_LAM_X)[freeX_].getArray(worhp_o.Lambda,worhp_o.n);
+  if (worhp_o.m>0) input(NLP_SOLVER_LAM_G0)[nonfreeG_].getArray(worhp_o.Mu,worhp_o.m);
 
   if (worhp_o.m>0) lbg.getArray(worhp_o.GL,worhp_o.m);
   if (worhp_o.m>0) ubg.getArray(worhp_o.GU,worhp_o.m);
@@ -825,9 +825,9 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
     casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),"WorhpSolver::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite. You have that case at non-zero " << i << ".");
   }
 
-  output(NLP_X_OPT)[nonfreeX_] = bx;
-  output(NLP_LAMBDA_X)[nonfreeX_] = 0;
-  output(NLP_LAMBDA_G)[freeG_] = 0;
+  output(NLP_SOLVER_X)[nonfreeX_] = bx;
+  output(NLP_SOLVER_LAM_X)[nonfreeX_] = 0;
+  output(NLP_SOLVER_LAM_G)[freeG_] = 0;
   
   
   std::vector<double> tempn(worhp_o.n,0);
@@ -846,11 +846,11 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
       if (!callback_.isNull()) {
         double time1 = clock();
         // Copy outputs
-        copy(worhp_o.X,worhp_o.X+worhp_o.n,tempn.begin());callback_.input(NLP_X_OPT)[freeX_] = tempn;
-        callback_.input(NLP_COST)[0] = worhp_o.F;
+        copy(worhp_o.X,worhp_o.X+worhp_o.n,tempn.begin());callback_.input(NLP_SOLVER_X)[freeX_] = tempn;
+        callback_.input(NLP_SOLVER_F)[0] = worhp_o.F;
         if (worhp_o.m>0) copy(worhp_o.G,worhp_o.G+worhp_o.m,tempm.begin());callback_.input(NLP_G)[nonfreeG_] = tempm;
-        copy(worhp_o.Lambda,worhp_o.Lambda+worhp_o.n,tempn.begin());callback_.input(NLP_LAMBDA_X)[freeX_] = tempn;
-        if (worhp_o.m>0) copy(worhp_o.Mu,worhp_o.Mu+worhp_o.m,tempm.begin());callback_.input(NLP_LAMBDA_G)[nonfreeG_]=tempm;
+        copy(worhp_o.Lambda,worhp_o.Lambda+worhp_o.n,tempn.begin());callback_.input(NLP_SOLVER_LAM_X)[freeX_] = tempn;
+        if (worhp_o.m>0) copy(worhp_o.Mu,worhp_o.Mu+worhp_o.m,tempm.begin());callback_.input(NLP_SOLVER_LAM_G)[nonfreeG_]=tempm;
         double time2 = clock();
         t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
         time1 = clock();
@@ -897,11 +897,11 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
   t_mainloop_ += double(time2-time1)/CLOCKS_PER_SEC;
   
   // Copy outputs
-  copy(worhp_o.X,worhp_o.X+worhp_o.n,tempn.begin());output(NLP_X_OPT)[freeX_] = tempn;   
-  output(NLP_COST)[0] = worhp_o.F;
+  copy(worhp_o.X,worhp_o.X+worhp_o.n,tempn.begin());output(NLP_SOLVER_X)[freeX_] = tempn;   
+  output(NLP_SOLVER_F)[0] = worhp_o.F;
   if (worhp_o.m>0) copy(worhp_o.G,worhp_o.G+worhp_o.m,tempm.begin());output(NLP_G)[nonfreeG_] = tempm;
-  copy(worhp_o.Lambda,worhp_o.Lambda+worhp_o.n,tempn.begin());output(NLP_LAMBDA_X)[freeX_] = tempn;
-  if (worhp_o.m>0) copy(worhp_o.Mu,worhp_o.Mu+worhp_o.m,tempm.begin());output(NLP_LAMBDA_G)[nonfreeG_]=tempm;
+  copy(worhp_o.Lambda,worhp_o.Lambda+worhp_o.n,tempn.begin());output(NLP_SOLVER_LAM_X)[freeX_] = tempn;
+  if (worhp_o.m>0) copy(worhp_o.Mu,worhp_o.Mu+worhp_o.m,tempm.begin());output(NLP_SOLVER_LAM_G)[nonfreeG_]=tempm;
   
   StatusMsg(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
  

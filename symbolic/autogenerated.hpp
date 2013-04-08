@@ -310,7 +310,7 @@ IOSchemeVector<M> nlpsolverIn(const std::string arg_s0="",M arg_m0=M(),const std
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in NLPInput: '" << it->first << "' is not recognized. Available keywords are: x_init, lbx, ubx, lbg, ubg, lambda_init, p");
+      casadi_error("Keyword error in NLPInput: '" << it->first << "' is not recognized. Available keywords are: x0, lbx, ubx, lbg, ubg, lam_g0, p");
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_NLPInput);
@@ -333,7 +333,7 @@ IOSchemeVector<M> nlpsolverOut(const std::string arg_s0="",M arg_m0=M(),const st
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPOutput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in NLPOutput: '" << it->first << "' is not recognized. Available keywords are: x_opt, cost, lambda_g, lambda_x, lambda_p, g");
+      casadi_error("Keyword error in NLPOutput: '" << it->first << "' is not recognized. Available keywords are: x, f, lam_g, lam_x, lam_p, g");
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_NLPOutput);

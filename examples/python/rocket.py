@@ -84,7 +84,7 @@ solver.init()
 # Bounds on u and initial condition
 solver.setInput(-0.5, "lbx")
 solver.setInput( 0.5, "ubx")
-solver.setInput( 0.4, "x_init")
+solver.setInput( 0.4, "x0")
 
 # Bounds on g
 solver.setInput([10,0],"lbg")
@@ -94,7 +94,7 @@ solver.setInput([10,0],"ubg")
 solver.solve()
 
 # Get the solution
-plot(solver.output("x_opt"))
-plot(solver.output("lambda_x"))
+plot(solver.output("x"))
+plot(solver.output("lam_x"))
 grid()
 show()

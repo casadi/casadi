@@ -158,7 +158,7 @@ solver.init()
 # Pass bounds
 solver.setInput(v_min,"lbx") # lower variable bounds
 solver.setInput(v_max,"ubx") # upper variable bounds
-solver.setInput(v_init,"x_init") # variable initial guess
+solver.setInput(v_init,"x0") # variable initial guess
 solver.setInput(NP.zeros(g.size()),"lbg") # equality constraints
 solver.setInput(NP.zeros(g.size()),"ubg") # equality constraints
 
@@ -166,7 +166,7 @@ solver.setInput(NP.zeros(g.size()),"ubg") # equality constraints
 solver.solve()
 
 # Get the solution
-v_opt = NP.array(solver.output("x_opt"))
+v_opt = NP.array(solver.output("x"))
 x_opt = zeros(X.shape)
 u_opt = zeros(U.shape)
 z_opt = zeros(Z.shape)

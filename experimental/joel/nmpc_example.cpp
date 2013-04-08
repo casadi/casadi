@@ -142,7 +142,7 @@ int main(){
   solver.setInput(ubg,NLP_UBG);
   solver.solve();
 
-  cout << "u_opt = " << solver.output(NLP_X_OPT).data() << endl;
+  cout << "u_opt = " << solver.output(NLP_SOLVER_X).data() << endl;
 
     
   return 0;

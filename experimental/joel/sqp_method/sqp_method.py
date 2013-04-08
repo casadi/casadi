@@ -93,7 +93,7 @@ solver.init()
 # Set bounds and initial guess
 solver.setInput(umin,     "lbx")
 solver.setInput(umax,     "ubx")
-solver.setInput(u0,       "x_init")
+solver.setInput(u0,       "x0")
 solver.setInput(zeros(2), "lbg")
 solver.setInput(zeros(2), "ubg")
 
@@ -101,7 +101,7 @@ solver.setInput(zeros(2), "ubg")
 solver.solve()
 
 # Retrieve the solution
-u_opt = array(solver.output("x_opt"))
+u_opt = array(solver.output("x"))
 
 # Get values at the beginning of each finite element
 tgrid = linspace(0,10,10)
@@ -122,13 +122,13 @@ sqp_solver.setOption("qp_solver_options",{"printLevel" : "low"})
 sqp_solver.init()
 sqp_solver.setInput(umin,     "lbx")
 sqp_solver.setInput(umax,     "ubx")
-sqp_solver.setInput(u0,       "x_init")
+sqp_solver.setInput(u0,       "x0")
 sqp_solver.setInput(zeros(2), "lbg")
 sqp_solver.setInput(zeros(2), "ubg")
 sqp_solver.evaluate()
 
 # Retrieve the solution
-u_opt2 = array(sqp_solver.output("x_opt"))
+u_opt2 = array(sqp_solver.output("x"))
 
 # Plot the results
 plt.figure(1)

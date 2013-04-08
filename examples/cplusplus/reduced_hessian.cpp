@@ -88,7 +88,7 @@ int main(){
   solver.init();
 
   // Solve NLP
-  solver.setInput( x0, "x_init");
+  solver.setInput( x0, "x0");
   solver.setInput(lbx, "lbx");
   solver.setInput(ubx, "ubx");
   solver.setInput(lbg, "lbg");
@@ -97,11 +97,11 @@ int main(){
 
   // Print the solution
   cout << "----" << endl;
-  cout << "Minimal cost " << solver.output("cost") << endl;
+  cout << "Minimal cost " << solver.output("f") << endl;
   cout << "----" << endl;
 
   cout << "Solution" << endl;
-  cout << "x = " << solver.output("x_opt").data() << endl;
+  cout << "x = " << solver.output("x").data() << endl;
   cout << "----" << endl;
   
   // Get the reduced Hessian

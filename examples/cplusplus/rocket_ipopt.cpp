@@ -98,7 +98,7 @@ int main(){
   }
   solver.setInput(umin,"lbx");
   solver.setInput(umax,"ubx");
-  solver.setInput(uinit,"x_init");
+  solver.setInput(uinit,"x0");
   
   // Bounds on g
   vector<double> gmin(2), gmax(2);
@@ -115,12 +115,12 @@ int main(){
   
   // Print the optimal cost
   double cost;
-  solver.getOutput(cost,"cost");
+  solver.getOutput(cost,"f");
   cout << "optimal cost: " << cost << endl;
 
   // Print the optimal solution
   vector<double> uopt(nu);
-  solver.getOutput(uopt,"x_opt");
+  solver.getOutput(uopt,"x");
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory

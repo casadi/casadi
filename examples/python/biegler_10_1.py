@@ -142,7 +142,7 @@ for N in range(1,11):
 
   # Initial condition
   xinit = x.size() * [0]
-  solver.setInput(xinit,"x_init")
+  solver.setInput(xinit,"x0")
 
   # Bounds on x
   lbx = x.size()*[-100]
@@ -168,10 +168,10 @@ for N in range(1,11):
   print "time points: ", t_opt
 
   # Print the optimal cost
-  print "optimal cost: ", float(solver.output("cost"))
+  print "optimal cost: ", float(solver.output("f"))
 
   # Print the optimal solution
-  xopt = solver.output("x_opt").data()
+  xopt = solver.output("x").data()
   print "optimal solution: ", xopt
  
   # plot to screen

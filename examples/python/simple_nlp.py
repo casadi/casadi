@@ -51,7 +51,7 @@ solver.evaluate()
 
 # Print solution
 print "-----"
-print "objective at solution = ", solver.output("cost")
-print "primal solution = ", solver.output("x_opt")
-print "dual solution (x) = ", solver.output("lambda_x")
-print "dual solution (g) = ", solver.output("lambda_g")
+print "objective at solution = ", solver.output("f")
+print "primal solution = ", solver.output("x")
+print "dual solution (x) = ", solver.output("lam_x")
+print "dual solution (g) = ", solver.output("lam_g")

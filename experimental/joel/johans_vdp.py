@@ -171,7 +171,7 @@ solver.init()
 
 # Initial condition
 x_initial_guess = len(xx) * [0]
-solver.setInput(x_initial_guess,casadi.NLP_X_INIT)
+solver.setInput(x_initial_guess,casadi.NLP_SOLVER_X0)
 
 # Bounds on x
 xx_lb = len(xx)*[-100]
@@ -187,7 +187,7 @@ solver.setInput(lubg,casadi.NLP_UBG)
 # Solve the problem
 solver.solve()
 
-xx_opt = solver.output(casadi.NLP_X_OPT)
+xx_opt = solver.output(casadi.NLP_SOLVER_X)
 
 # Retrieve output
 

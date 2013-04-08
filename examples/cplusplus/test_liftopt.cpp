@@ -98,8 +98,8 @@ int main(){
   solver.init();
   
   // Pass inputs
-  solver.input("x_init").setAll(0);
-  solver.input("lambda_init").setAll(0);
+  solver.input("x0").setAll(0);
+  solver.input("lam_x0").setAll(0);
   solver.input("lbx").setAll(-1);
   solver.input("ubx").setAll(1);
 

@@ -157,11 +157,11 @@ solver.init()
 # Set bounds and initial guess
 solver.setInput(-u_max, "lbx")
 solver.setInput( u_max, "ubx")
-solver.setInput( 0.,    "x_init")
+solver.setInput( 0.,    "x0")
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the solution
-u_opt = NP.array(solver.output("x_opt"))
+u_opt = NP.array(solver.output("x"))
 

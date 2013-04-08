@@ -47,8 +47,8 @@ namespace CasADi{
   
 /// Input arguments of an NLP Solver [nlpsolverIn]
 enum NLPInput{
-/// Decision variables initial guess (nx x 1)  [x_init]
-NLP_X_INIT,
+/// Decision variables initial guess (nx x 1)  [x0]
+NLP_SOLVER_X0,
 /// Decision variables lower bound (nx x 1), default -inf [lbx]
 NLP_LBX,
 /// Decision variables upper bound (nx x 1), default +inf [ubx]
@@ -57,24 +57,24 @@ NLP_UBX,
 NLP_LBG,
 /// Constraints upper bound (ng x 1), default +inf [ubg]
 NLP_UBG,
-/// Lagrange multipliers associated with G, initial guess (ng x 1) [lambda_init]
-NLP_LAMBDA_INIT,
+/// Lagrange multipliers associated with G, initial guess (ng x 1) [lam_g0]
+NLP_SOLVER_LAM_G0,
 /// Parameters on which the objective and constraints might depend (np x 1) [p]
 NLP_P,
 NLP_NUM_IN};
 
 /// Output arguments of an NLP Solver [nlpsolverOut]
 enum NLPOutput{
-/// Decision variables for optimal solution (nx x 1) [x_opt]
-NLP_X_OPT,
-/// Objective/cost function for optimal solution (1 x 1) [cost]
-NLP_COST,
-/// Lagrange multipliers associated with G at the solution (ng x 1) [lambda_g]
-NLP_LAMBDA_G,
-/// Lagrange multipliers associated with bounds on X at the solution (nx x 1) [lambda_x]
-NLP_LAMBDA_X, 
-/// Lagrange multipliers associated with the parameters (np x 1) [lambda_p]
-NLP_LAMBDA_P, 
+/// Decision variables for optimal solution (nx x 1) [x]
+NLP_SOLVER_X,
+/// Objective/cost function for optimal solution (1 x 1) [f]
+NLP_SOLVER_F,
+/// Lagrange multipliers associated with G at the solution (ng x 1) [lam_g]
+NLP_SOLVER_LAM_G,
+/// Lagrange multipliers associated with bounds on X at the solution (nx x 1) [lam_x]
+NLP_SOLVER_LAM_X, 
+/// Lagrange multipliers associated with the parameters (np x 1) [lam_p]
+NLP_SOLVER_LAM_P, 
 /// The constraints evaluated at the optimal solution (ng x 1) [g]
 NLP_G,
 NLP_NUM_OUT};

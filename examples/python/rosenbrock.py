@@ -69,7 +69,7 @@ if nlp_solver == SQPMethod:
 solv.init()
 
 # Solve the rosenbrock problem
-solv.setInput([2.5,3.0,0.75],"x_init")
+solv.setInput([2.5,3.0,0.75],"x0")
 solv.setInput(0,"ubg")
 solv.setInput(0,"lbg")
 solv.evaluate()
@@ -77,8 +77,8 @@ solv.evaluate()
 # Print solution
 print
 print 
-print "%50s " % "Optimal cost:", solv.output("cost")
-print "%50s " % "Primal solution:", solv.output("x_opt")
-print "%50s " % "Dual solution (simple bounds):", solv.output("lambda_x")
-print "%50s " % "Dual solution (nonlinear bounds):", solv.output("lambda_g")
+print "%50s " % "Optimal cost:", solv.output("f")
+print "%50s " % "Primal solution:", solv.output("x")
+print "%50s " % "Dual solution (simple bounds):", solv.output("lam_x")
+print "%50s " % "Dual solution (nonlinear bounds):", solv.output("lam_g")
 

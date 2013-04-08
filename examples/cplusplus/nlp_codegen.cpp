@@ -141,10 +141,10 @@ int main(){
 
   // Print solution
   cout << "-----" << endl;
-  cout << "objective at solution = " << solver.output("cost") << endl;
-  cout << "primal solution = " << solver.output("x_opt") << endl;
-  cout << "dual solution (x) = " << solver.output("lambda_x") << endl;
-  cout << "dual solution (g) = " << solver.output("lambda_g") << endl;
+  cout << "objective at solution = " << solver.output("f") << endl;
+  cout << "primal solution = " << solver.output("x") << endl;
+  cout << "dual solution (x) = " << solver.output("lam_x") << endl;
+  cout << "dual solution (g) = " << solver.output("lam_g") << endl;
   
   return 0;
 }

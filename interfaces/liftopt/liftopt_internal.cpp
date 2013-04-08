@@ -59,10 +59,10 @@ void LiftoptInternal::init(){
   // Call the init function for the base class
   NLPSolverInternal::init();
   
-  uInit_ = liftopt::DVec(getPtr(input(NLP_X_INIT)),n_,1);
+  uInit_ = liftopt::DVec(getPtr(input(NLP_SOLVER_X0)),n_,1);
   loCtrlBounds_ = liftopt::DVec(getPtr(input(NLP_LBX)),n_,1);
   upCtrlBounds_ = liftopt::DVec(getPtr(input(NLP_UBX)),n_,1);
-  lambdaInit_ = liftopt::DVec(getPtr(input(NLP_LAMBDA_INIT)),m_,1);
+  lambdaInit_ = liftopt::DVec(getPtr(input(NLP_SOLVER_LAM_G0)),m_,1);
   nodeInit_ = liftopt::DVec(getPtr(nodeInit),nodeInit.size(),1);
   problem_ = new CasadiLifter(this);
   

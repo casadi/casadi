@@ -417,7 +417,7 @@ solver.setOption("tol",1e-4)
 solver.init()
   
 # Initial condition
-solver.setInput(vars_init,"x_init")
+solver.setInput(vars_init,"x0")
 
 # Bounds on x
 solver.setInput(vars_lb,"lbx")
@@ -431,10 +431,10 @@ solver.setInput(np.concatenate(ubg),"ubg")
 solver.solve()
 
 # Print the optimal cost
-print "optimal cost: ", float(solver.output("cost"))
+print "optimal cost: ", float(solver.output("f"))
 
 # Retrieve the solution
-v_opt = np.array(solver.output("x_opt"))
+v_opt = np.array(solver.output("x"))
     
 
 ## ----

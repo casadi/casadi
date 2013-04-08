@@ -110,19 +110,19 @@ int main(){
 
   solver.setInput(vmin,NLP_LBX);
   solver.setInput(vmax,NLP_UBX);
-  solver.setInput(vinit,NLP_X_INIT);
+  solver.setInput(vinit,NLP_SOLVER_X0);
 
   // Solve the problem
   solver.solve();
 
   // Print the optimal cost
   double cost;
-  solver.getOutput(cost,NLP_COST);
+  solver.getOutput(cost,NLP_SOLVER_F);
   cout << "optimal cost: " << cost << endl;
 
   // Print the optimal solution
   vector<double> varopt(nu+nx), uopt(nu), xopt(nx);
-  solver.getOutput(varopt,NLP_X_OPT);
+  solver.getOutput(varopt,NLP_SOLVER_X);
   
   for(int i=0; i<nu; ++i)
   	uopt[i]=varopt[i];

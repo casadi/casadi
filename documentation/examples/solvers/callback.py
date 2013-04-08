@@ -45,7 +45,7 @@ class MyCallback:
     self.iter = 0 
   def __call__(self,f,*args):
     print "====Hey, I'm an iteration===="
-    print "X_OPT = ", f.input("x_opt")
+    print "X_OPT = ", f.input("x")
     print f.getStats()
     self.iter = self.iter + 1
     if self.iter > 5:
@@ -107,7 +107,7 @@ class MyCallback:
     self.y_sols = []
     
   def __call__(self,f,*args):
-    sol = f.input("x_opt")
+    sol = f.input("x")
     self.x_sols.append(float(sol[0]))
     self.y_sols.append(float(sol[1]))
     subplot(111)

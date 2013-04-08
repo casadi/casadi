@@ -242,7 +242,7 @@ solver.init()
 # Set bounds and initial guess
 solver.setInput(VMIN,  "lbx")
 solver.setInput(VMAX,  "ubx")
-solver.setInput(VINIT, "x_init")
+solver.setInput(VINIT, "x0")
 solver.setInput(NP.concatenate(g_min),"lbg")
 solver.setInput(NP.concatenate(g_max),"ubg")
 
@@ -250,7 +250,7 @@ solver.setInput(NP.concatenate(g_max),"ubg")
 solver.solve()
 
 # Retrieve the solution
-v_opt = NP.array(solver.output("x_opt"))
+v_opt = NP.array(solver.output("x"))
 
 # Get values at the beginning of each finite element
 tgrid_u = NP.linspace(0,tf,nk)

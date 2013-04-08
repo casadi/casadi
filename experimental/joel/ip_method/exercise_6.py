@@ -52,7 +52,7 @@ for solver in ['ipopt','ip_method']:
   nlp_solver.init()
   
   # Solve the NLP
-  nlp_solver.setInput(x0,"x_init")
+  nlp_solver.setInput(x0,"x0")
   nlp_solver.input("ubx").setAll(N.inf)
   nlp_solver.input("lbx").setZero()
   nlp_solver.setInput(b,"lbg")

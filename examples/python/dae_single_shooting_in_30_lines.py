@@ -78,5 +78,5 @@ solver.setInput(-0.75, "lbx")    # Lower variable bound
 solver.setInput( 1.0,  "ubx")    # Upper variable bound
 solver.setInput( 0.0,  "lbg")    # Lower constraint bound
 solver.setInput( 0.0,  "ubg")    # Upper constraint bound
-solver.setInput( 0.0,  "x_init") # Initial guess
+solver.setInput( 0.0,  "x0")     # Initial guess
 solver.solve()

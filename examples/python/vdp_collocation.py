@@ -236,7 +236,7 @@ solver.setOption("generate_hessian",True)
 solver.init()
   
 # Initial condition
-solver.setInput(vars_init,"x_init")
+solver.setInput(vars_init,"x0")
 
 # Bounds on x
 solver.setInput(vars_lb,"lbx")
@@ -250,10 +250,10 @@ solver.setInput(NP.concatenate(ubg),"ubg")
 solver.solve()
 
 # Print the optimal cost
-print "optimal cost: ", float(solver.output("cost"))
+print "optimal cost: ", float(solver.output("f"))
 
 # Retrieve the solution
-v_opt = NP.array(solver.output("x_opt"))
+v_opt = NP.array(solver.output("x"))
 
 # Get values at the beginning of each finite element
 x0_opt = v_opt[0::(d+1)*nx+nu]

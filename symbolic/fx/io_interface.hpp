@@ -249,17 +249,17 @@ namespace CasADi{
     CasADi::InputOutputScheme getOutputScheme() const{ return static_cast<const Derived*>(this)->outputScheme(); }
 
     /** \brief Find the index for a string describing a particular entry of an input scheme
-     * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FXInternal adheres to SCHEME_NLPINput 
      */
     int inputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->inputScheme(),name,true);}
 
     /** \brief Find the index for a string describing a particular entry of an output scheme
-     * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FXInternal adheres to SCHEME_NLPINput 
      */
     int outputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->outputScheme(),name,false);}
 
     /** \brief Find the index for a string describing a particular entry of a scheme
-     * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FXInternal adheres to SCHEME_NLPINput 
      */
     int schemeEntry(CasADi::InputOutputScheme scheme,const std::string &name,bool input) const{
       if (scheme==SCHEME_unknown) casadi_error("Unable to look up '" <<  name<< "' in " << (input? "input": "output") << "scheme, as the " <<  (input? "input": "output") << " scheme of this function is unknown. You can only index with integers.");

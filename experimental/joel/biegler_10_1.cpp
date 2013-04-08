@@ -178,7 +178,7 @@ int main(){
 
   // Initial condition
   vector<double> xinit(x.numel(),0);
-  solver.setInput(xinit,NLP_X_INIT);
+  solver.setInput(xinit,NLP_SOLVER_X0);
 
   // Bounds on x
   vector<double> lbx(x.numel(),-100);
@@ -206,11 +206,11 @@ int main(){
   resfile << t_opt << endl;
   
   // Print the optimal cost
-  cout << "optimal cost: " << solver.output(NLP_COST) << endl;
+  cout << "optimal cost: " << solver.output(NLP_SOLVER_F) << endl;
 
   // Print the optimal solution
   vector<double> xopt(x.numel());
-  solver.getOutput(xopt,NLP_X_OPT);
+  solver.getOutput(xopt,NLP_SOLVER_X);
   cout << "optimal solution: " << xopt << endl;
   resfile << xopt << endl;
   

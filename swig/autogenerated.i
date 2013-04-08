@@ -558,18 +558,18 @@ def nlpsolverIn(*dummy,**kwargs):
   Input arguments of an NLP Solver
   
   Keyword arguments:
-    x_init      -- Decision variables initial guess (nx x 1)  [NLP_X_INIT]
-    lbx         -- Decision variables lower bound (nx x 1), default -inf [NLP_LBX]
-    ubx         -- Decision variables upper bound (nx x 1), default +inf [NLP_UBX]
-    lbg         -- Constraints lower bound (ng x 1), default -inf [NLP_LBG]
-    ubg         -- Constraints upper bound (ng x 1), default +inf [NLP_UBG]
-    lambda_init -- Lagrange multipliers associated with G, initial guess (ng x 1) [NLP_LAMBDA_INIT]
-    p           -- Parameters on which the objective and constraints might depend (np x 1) [NLP_P]
+    x0     -- Decision variables initial guess (nx x 1)  [NLP_SOLVER_X0]
+    lbx    -- Decision variables lower bound (nx x 1), default -inf [NLP_LBX]
+    ubx    -- Decision variables upper bound (nx x 1), default +inf [NLP_UBX]
+    lbg    -- Constraints lower bound (ng x 1), default -inf [NLP_LBG]
+    ubg    -- Constraints upper bound (ng x 1), default +inf [NLP_UBG]
+    lam_g0 -- Lagrange multipliers associated with G, initial guess (ng x 1) [NLP_SOLVER_LAM_G0]
+    p      -- Parameters on which the objective and constraints might depend (np x 1) [NLP_P]
   """
-  if(len(dummy)>0): raise Exception("Error in nlpsolverIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n nlpsolverIn(my_x_init, my_lbx, my_ubx, my_lbg, my_ubg, my_lambda_init, my_p)\nmust be written\n nlpsolverIn(x_init=my_x_init, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lambda_init=my_lambda_init, p=my_p)\nwhere any keyword is optional.")
-  x_init = []
-  if 'x_init' in kwargs:
-    x_init = kwargs['x_init']
+  if(len(dummy)>0): raise Exception("Error in nlpsolverIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n nlpsolverIn(my_x0, my_lbx, my_ubx, my_lbg, my_ubg, my_lam_g0, my_p)\nmust be written\n nlpsolverIn(x0=my_x0, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_g0=my_lam_g0, p=my_p)\nwhere any keyword is optional.")
+  x0 = []
+  if 'x0' in kwargs:
+    x0 = kwargs['x0']
   lbx = []
   if 'lbx' in kwargs:
     lbx = kwargs['lbx']
@@ -582,16 +582,16 @@ def nlpsolverIn(*dummy,**kwargs):
   ubg = []
   if 'ubg' in kwargs:
     ubg = kwargs['ubg']
-  lambda_init = []
-  if 'lambda_init' in kwargs:
-    lambda_init = kwargs['lambda_init']
+  lam_g0 = []
+  if 'lam_g0' in kwargs:
+    lam_g0 = kwargs['lam_g0']
   p = []
   if 'p' in kwargs:
     p = kwargs['p']
   for k in kwargs.keys():
-    if not(k in ['x_init','lbx','ubx','lbg','ubg','lambda_init','p']):
-      raise Exception("Keyword error in nlpsolverIn: '%s' is not recognized. Available keywords are: x_init, lbx, ubx, lbg, ubg, lambda_init, p" % k )
-  return IOSchemeVector([x_init,lbx,ubx,lbg,ubg,lambda_init,p], SCHEME_NLPInput)
+    if not(k in ['x0','lbx','ubx','lbg','ubg','lam_g0','p']):
+      raise Exception("Keyword error in nlpsolverIn: '%s' is not recognized. Available keywords are: x0, lbx, ubx, lbg, ubg, lam_g0, p" % k )
+  return IOSchemeVector([x0,lbx,ubx,lbg,ubg,lam_g0,p], SCHEME_NLPInput)
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -609,36 +609,36 @@ def nlpsolverOut(*dummy,**kwargs):
   Output arguments of an NLP Solver
   
   Keyword arguments:
-    x_opt    -- Decision variables for optimal solution (nx x 1) [NLP_X_OPT]
-    cost     -- Objective/cost function for optimal solution (1 x 1) [NLP_COST]
-    lambda_g -- Lagrange multipliers associated with G at the solution (ng x 1) [NLP_LAMBDA_G]
-    lambda_x -- Lagrange multipliers associated with bounds on X at the solution (nx x 1) [NLP_LAMBDA_X]
-    lambda_p -- Lagrange multipliers associated with the parameters (np x 1) [NLP_LAMBDA_P]
-    g        -- The constraints evaluated at the optimal solution (ng x 1) [NLP_G]
+    x     -- Decision variables for optimal solution (nx x 1) [NLP_SOLVER_X]
+    f     -- Objective/cost function for optimal solution (1 x 1) [NLP_SOLVER_F]
+    lam_g -- Lagrange multipliers associated with G at the solution (ng x 1) [NLP_SOLVER_LAM_G]
+    lam_x -- Lagrange multipliers associated with bounds on X at the solution (nx x 1) [NLP_SOLVER_LAM_X]
+    lam_p -- Lagrange multipliers associated with the parameters (np x 1) [NLP_SOLVER_LAM_P]
+    g     -- The constraints evaluated at the optimal solution (ng x 1) [NLP_G]
   """
-  if(len(dummy)>0): raise Exception("Error in nlpsolverOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n nlpsolverOut(my_x_opt, my_cost, my_lambda_g, my_lambda_x, my_lambda_p, my_g)\nmust be written\n nlpsolverOut(x_opt=my_x_opt, cost=my_cost, lambda_g=my_lambda_g, lambda_x=my_lambda_x, lambda_p=my_lambda_p, g=my_g)\nwhere any keyword is optional.")
-  x_opt = []
-  if 'x_opt' in kwargs:
-    x_opt = kwargs['x_opt']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  lambda_g = []
-  if 'lambda_g' in kwargs:
-    lambda_g = kwargs['lambda_g']
-  lambda_x = []
-  if 'lambda_x' in kwargs:
-    lambda_x = kwargs['lambda_x']
-  lambda_p = []
-  if 'lambda_p' in kwargs:
-    lambda_p = kwargs['lambda_p']
+  if(len(dummy)>0): raise Exception("Error in nlpsolverOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n nlpsolverOut(my_x, my_f, my_lam_g, my_lam_x, my_lam_p, my_g)\nmust be written\n nlpsolverOut(x=my_x, f=my_f, lam_g=my_lam_g, lam_x=my_lam_x, lam_p=my_lam_p, g=my_g)\nwhere any keyword is optional.")
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
+  f = []
+  if 'f' in kwargs:
+    f = kwargs['f']
+  lam_g = []
+  if 'lam_g' in kwargs:
+    lam_g = kwargs['lam_g']
+  lam_x = []
+  if 'lam_x' in kwargs:
+    lam_x = kwargs['lam_x']
+  lam_p = []
+  if 'lam_p' in kwargs:
+    lam_p = kwargs['lam_p']
   g = []
   if 'g' in kwargs:
     g = kwargs['g']
   for k in kwargs.keys():
-    if not(k in ['x_opt','cost','lambda_g','lambda_x','lambda_p','g']):
-      raise Exception("Keyword error in nlpsolverOut: '%s' is not recognized. Available keywords are: x_opt, cost, lambda_g, lambda_x, lambda_p, g" % k )
-  return IOSchemeVector([x_opt,cost,lambda_g,lambda_x,lambda_p,g], SCHEME_NLPOutput)
+    if not(k in ['x','f','lam_g','lam_x','lam_p','g']):
+      raise Exception("Keyword error in nlpsolverOut: '%s' is not recognized. Available keywords are: x, f, lam_g, lam_x, lam_p, g" % k )
+  return IOSchemeVector([x,f,lam_g,lam_x,lam_p,g], SCHEME_NLPOutput)
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON

@@ -112,7 +112,7 @@ solver.init()
 # Set bounds and initial guess
 solver.setInput([-inf,-inf], "lbx")
 solver.setInput([ inf, inf], "ubx")
-solver.setInput([   0,   0], "x_init")
+solver.setInput([   0,   0], "x0")
 solver.setInput([   0,   0], "lbg")
 solver.setInput([   0,   0], "ubg")
 
@@ -120,7 +120,7 @@ solver.setInput([   0,   0], "ubg")
 solver.solve()
 
 # Retrieve the optimal solution
-l_init_opt = NP.array(solver.output("x_opt").data())
+l_init_opt = NP.array(solver.output("x").data())
 
 # Time grid for visualization
 tgrid = NP.linspace(0,10,100)

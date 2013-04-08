@@ -177,7 +177,7 @@ int main(){
   nlp_solver.init();
     
   // Initial guess and bounds on variables
-  nlp_solver.setInput(v_init,"x_init");
+  nlp_solver.setInput(v_init,"x0");
   nlp_solver.setInput(v_min,"lbx");
   nlp_solver.setInput(v_max,"ubx");
   
@@ -189,7 +189,7 @@ int main(){
   nlp_solver.solve();
 
   // Optimal solution of the NLP
-  const Matrix<double>& V_opt = nlp_solver.output("x_opt");
+  const Matrix<double>& V_opt = nlp_solver.output("x");
   
   // Get the optimal state trajectory
   vector<double> r_opt(ns+1), s_opt(ns+1);

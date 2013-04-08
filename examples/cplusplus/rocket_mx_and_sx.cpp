@@ -138,7 +138,7 @@ int main(){
   }
   solver.setInput(Umin,"lbx");
   solver.setInput(Umax,"ubx");
-  solver.setInput(Usol,"x_init");
+  solver.setInput(Usol,"x0");
 
   // Bounds on g
   vector<double> Gmin(2), Gmax(2);
@@ -151,7 +151,7 @@ int main(){
   solver.solve();
 
   // Get the solution
-  solver.getOutput(Usol,"x_opt");
+  solver.getOutput(Usol,"x");
   cout << "optimal solution: " << Usol << endl;
 
   }

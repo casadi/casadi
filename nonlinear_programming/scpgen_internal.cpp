@@ -661,7 +661,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   checkInitialBounds();
   
   // Get problem data
-  const vector<double>& x_init = input(NLP_X_INIT).data();
+  const vector<double>& x_init = input(NLP_SOLVER_X0).data();
   const vector<double>& lbx = input(NLP_LBX).data();
   const vector<double>& ubx = input(NLP_UBX).data();
   const vector<double>& lbg = input(NLP_LBG).data();
@@ -802,10 +802,10 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   cout << "optimal cost = " << f_ << endl;
 
   // Save results to outputs
-  output(NLP_COST).set(f_);
-  output(NLP_X_OPT).set(x_opt_);
-  output(NLP_LAMBDA_G).set(g_lam_);
-  output(NLP_LAMBDA_X).set(x_lam_);
+  output(NLP_SOLVER_F).set(f_);
+  output(NLP_SOLVER_X).set(x_opt_);
+  output(NLP_SOLVER_LAM_G).set(g_lam_);
+  output(NLP_SOLVER_LAM_X).set(x_lam_);
   output(NLP_G).set(g_);
   
   // Write timers
@@ -1070,7 +1070,7 @@ void SCPgenInternal::eval_res(){
   }
   
   // Parameter sensitivities
-  res_fcn_.getOutput(output(NLP_LAMBDA_P),res_p_d_);
+  res_fcn_.getOutput(output(NLP_SOLVER_LAM_P),res_p_d_);
 
   double time2 = clock();
   t_eval_res_ += double(time2-time1)/CLOCKS_PER_SEC;
