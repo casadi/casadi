@@ -439,7 +439,11 @@ void SCPgenInternal::init(){
 
   // Hessian of the Lagrangian
   MX hes = lgrad.jac(mod_x_,mod_gl_,false,!gauss_newton_);
-  log("Formed Hessian of the Lagrangian.");
+  if(gauss_newton_){
+    log("Formed square root of Gauss-Newton Hessian.");
+  } else {
+    log("Formed Hessian of the Lagrangian.");
+  }
 
   // Matrices in the reduced QP
   n=0;
@@ -754,11 +758,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
 
     // Checking convergence criteria
     bool converged = pr_inf <= tol_pr_ && pr_step_ <= tol_pr_step_ && reg_ <= tol_reg_;
-    if(gauss_newton_){
-      converged = converged && iter!=0;
-    } else {
-      converged = converged && du_inf <= tol_du_;
-    }
+    converged = converged && du_inf <= tol_du_;
     if(converged){
       cout << endl;
       cout << "CasADi::SCPgen: Convergence achieved after " << iter << " iterations." << endl;
