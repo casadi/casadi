@@ -87,8 +87,8 @@ int main(){
   vector<double> xEq(nx,0.);
   	
   	
-  solver.setInput(xEq,NLP_LBG);
-  solver.setInput(xEq,NLP_UBG);
+  solver.setInput(xEq,"lbg");
+  solver.setInput(xEq,"ubg");
   
   // Bounds on u and u, and initial guess
   vector<double> vmin(nu+nx), vmax(nu+nx), vinit(nu+nx);
@@ -108,21 +108,21 @@ int main(){
   }
 
 
-  solver.setInput(vmin,NLP_LBX);
-  solver.setInput(vmax,NLP_UBX);
-  solver.setInput(vinit,NLP_X_INIT);
+  solver.setInput(vmin,"lbx");
+  solver.setInput(vmax,"ubx");
+  solver.setInput(vinit,"x_init");
 
   // Solve the problem
   solver.solve();
 
   // Print the optimal cost
   double cost;
-  solver.getOutput(cost,NLP_COST);
+  solver.getOutput(cost,"cost");
   cout << "optimal cost: " << cost << endl;
 
   // Print the optimal solution
   vector<double> varopt(nu+nx), uopt(nu), xopt(nx);
-  solver.getOutput(varopt,NLP_X_OPT);
+  solver.getOutput(varopt,"x_opt");
   
   for(int i=0; i<nu; ++i)
   	uopt[i]=varopt[i];

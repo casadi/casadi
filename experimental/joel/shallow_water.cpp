@@ -391,21 +391,21 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   vector<double> p_init(2);
   p_init[0] = drag_guess/p_scale_[0];
   p_init[1] = depth_guess/p_scale_[1];
-  nlp_solver_.setInput(p_init,NLP_X_INIT);
+  nlp_solver_.setInput(p_init,"x_init");
 
   // Bounds on the variables
   vector<double> lbu(2), ubu(2);  
   lbu.at(0) = 1.0e-1 / p_scale_[0]; // drag positive
   lbu.at(1) = 5.0e-4 / p_scale_[1]; // depth positive
-  nlp_solver_.setInput(lbu,NLP_LBX);
+  nlp_solver_.setInput(lbu,"lbx");
 
   ubu.at(0) = 50.0 / p_scale_[0]; // max drag
   ubu.at(1) =  0.05 / p_scale_[1]; // max depth
-  nlp_solver_.setInput(ubu,NLP_UBX);
+  nlp_solver_.setInput(ubu,"ubx");
 
   // Constraint bounds
-  nlp_solver_.setInput(-spheight_, NLP_LBG);
-  nlp_solver_.setInput( spheight_, NLP_UBG);
+  nlp_solver_.setInput(-spheight_, "lbg");
+  nlp_solver_.setInput( spheight_, "ubg");
 
   clock_t time1 = clock();
   nlp_solver_.solve();

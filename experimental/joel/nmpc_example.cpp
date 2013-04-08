@@ -136,10 +136,10 @@ int main(){
   solver.init();
     
   // Pass bounds and solve
-  solver.setInput(lbu,NLP_LBX);
-  solver.setInput(ubu,NLP_UBX);
-  solver.setInput(lbg,NLP_LBG);
-  solver.setInput(ubg,NLP_UBG);
+  solver.setInput(lbu,"lbx");
+  solver.setInput(ubu,"ubx");
+  solver.setInput(lbg,"lbg");
+  solver.setInput(ubg,"ubg");
   solver.solve();
 
   cout << "u_opt = " << solver.output(NLP_X_OPT).data() << endl;

@@ -178,19 +178,19 @@ int main(){
 
   // Initial condition
   vector<double> xinit(x.numel(),0);
-  solver.setInput(xinit,NLP_X_INIT);
+  solver.setInput(xinit,"x_init");
 
   // Bounds on x
   vector<double> lbx(x.numel(),-100);
   vector<double> ubx(x.numel(), 100);
   lbx[0] = ubx[0] = z0;
-  solver.setInput(lbx,NLP_LBX);
-  solver.setInput(ubx,NLP_UBX);
+  solver.setInput(lbx,"lbx");
+  solver.setInput(ubx,"ubx");
   
   // Bounds on the constraints
   vector<double> lubg(g.numel(),0);
-  solver.setInput(lubg,NLP_LBG);
-  solver.setInput(lubg,NLP_UBG);
+  solver.setInput(lubg,"lbg");
+  solver.setInput(lubg,"ubg");
   
   // Solve the problem
   solver.solve();
@@ -210,7 +210,7 @@ int main(){
 
   // Print the optimal solution
   vector<double> xopt(x.numel());
-  solver.getOutput(xopt,NLP_X_OPT);
+  solver.getOutput(xopt,"x_opt");
   cout << "optimal solution: " << xopt << endl;
   resfile << xopt << endl;
   
