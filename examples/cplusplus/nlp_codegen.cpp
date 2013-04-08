@@ -134,17 +134,17 @@ int main(){
   solver.init();
 
   // Set constraint bounds
-  solver.setInput(0.,NLP_LBG);
+  solver.setInput(0.,"lbg");
 
   // Solve the NLP
   solver.evaluate();
 
   // Print solution
   cout << "-----" << endl;
-  cout << "objective at solution = " << solver.output(NLP_COST) << endl;
-  cout << "primal solution = " << solver.output(NLP_X_OPT) << endl;
-  cout << "dual solution (x) = " << solver.output(NLP_LAMBDA_X) << endl;
-  cout << "dual solution (g) = " << solver.output(NLP_LAMBDA_G) << endl;
+  cout << "objective at solution = " << solver.output("cost") << endl;
+  cout << "primal solution = " << solver.output("x_opt") << endl;
+  cout << "dual solution (x) = " << solver.output("lambda_x") << endl;
+  cout << "dual solution (g) = " << solver.output("lambda_g") << endl;
   
   return 0;
 }

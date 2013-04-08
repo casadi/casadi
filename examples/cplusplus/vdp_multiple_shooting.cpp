@@ -87,29 +87,29 @@ int main(){
   double u_init[] = {0.0};
   
   for(int k=0; k<ns; ++k){
-    copy(u_min,u_min+nu,ms.input(OCP_LBU).begin()+k*nu);
-    copy(u_max,u_max+nu,ms.input(OCP_UBU).begin()+k*nu);
-    copy(u_init,u_init+nu,ms.input(OCP_U_INIT).begin()+k*nu);
+    copy(u_min,u_min+nu,ms.input("lbu").begin()+k*nu);
+    copy(u_max,u_max+nu,ms.input("ubu").begin()+k*nu);
+    copy(u_init,u_init+nu,ms.input("u_init").begin()+k*nu);
   }
   
-  ms.input(OCP_LBX).setAll(-inf);
-  ms.input(OCP_UBX).setAll(inf);
-  ms.input(OCP_X_INIT).setAll(0);
+  ms.input("lbx").setAll(-inf);
+  ms.input("ubx").setAll(inf);
+  ms.input("x_init").setAll(0);
 
   // Initial condition
-  ms.input(OCP_LBX)(0,0) = ms.input(OCP_UBX)(0,0) = 0;
-  ms.input(OCP_LBX)(1,0) = ms.input(OCP_UBX)(1,0) = 1;
-  ms.input(OCP_LBX)(2,0) = ms.input(OCP_UBX)(2,0) = 0;
+  ms.input("lbx")(0,0) = ms.input("ubx")(0,0) = 0;
+  ms.input("lbx")(1,0) = ms.input("ubx")(1,0) = 1;
+  ms.input("lbx")(2,0) = ms.input("ubx")(2,0) = 0;
 
   // Final condition
-  ms.input(OCP_LBX)(0,ns) = ms.input(OCP_UBX)(0,ns) = 0; 
-  ms.input(OCP_LBX)(1,ns) = ms.input(OCP_UBX)(1,ns) = 0; 
+  ms.input("lbx")(0,ns) = ms.input("ubx")(0,ns) = 0; 
+  ms.input("lbx")(1,ns) = ms.input("ubx")(1,ns) = 0; 
   
   // Solve the problem
   ms.solve();
 
-  cout << ms.output(OCP_X_OPT) << endl;
-  cout << ms.output(OCP_U_OPT) << endl;
+  cout << ms.output("x_opt") << endl;
+  cout << ms.output("u_opt") << endl;
   
   return 0;
 }

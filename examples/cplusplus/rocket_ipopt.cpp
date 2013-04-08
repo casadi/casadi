@@ -96,9 +96,9 @@ int main(){
     umax[i] =  10;
     uinit[i] = 0.4;
   }
-  solver.setInput(umin,NLP_LBX);
-  solver.setInput(umax,NLP_UBX);
-  solver.setInput(uinit,NLP_X_INIT);
+  solver.setInput(umin,"lbx");
+  solver.setInput(umax,"ubx");
+  solver.setInput(uinit,"x_init");
   
   // Bounds on g
   vector<double> gmin(2), gmax(2);
@@ -107,20 +107,20 @@ int main(){
   gmin.resize(2+nu, -numeric_limits<double>::infinity());
   gmax.resize(2+nu, 1.1);
   
-  solver.setInput(gmin,NLP_LBG);
-  solver.setInput(gmax,NLP_UBG);
+  solver.setInput(gmin,"lbg");
+  solver.setInput(gmax,"ubg");
 
   // Solve the problem
   solver.solve();
   
   // Print the optimal cost
   double cost;
-  solver.getOutput(cost,NLP_COST);
+  solver.getOutput(cost,"cost");
   cout << "optimal cost: " << cost << endl;
 
   // Print the optimal solution
   vector<double> uopt(nu);
-  solver.getOutput(uopt,NLP_X_OPT);
+  solver.getOutput(uopt,"x_opt");
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory

@@ -136,22 +136,22 @@ int main(){
     Umax[i] =  10;
     Usol[i] = 0.4;
   }
-  solver.setInput(Umin,NLP_LBX);
-  solver.setInput(Umax,NLP_UBX);
-  solver.setInput(Usol,NLP_X_INIT);
+  solver.setInput(Umin,"lbx");
+  solver.setInput(Umax,"ubx");
+  solver.setInput(Usol,"x_init");
 
   // Bounds on g
   vector<double> Gmin(2), Gmax(2);
   Gmin[0] = Gmax[0] = 10;
   Gmin[1] = Gmax[1] =  0;
-  solver.setInput(Gmin,NLP_LBG);
-  solver.setInput(Gmax,NLP_UBG);
+  solver.setInput(Gmin,"lbg");
+  solver.setInput(Gmax,"ubg");
 
   // Solve the problem
   solver.solve();
 
   // Get the solution
-  solver.getOutput(Usol,NLP_X_OPT);
+  solver.getOutput(Usol,"x_opt");
   cout << "optimal solution: " << Usol << endl;
 
   }
