@@ -39,6 +39,8 @@ def IOSchemeVector(arg,io_scheme):
   except:
     pass
 %}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
 %pythoncode %{
 def acadoIn(*dummy,**kwargs):
   """
