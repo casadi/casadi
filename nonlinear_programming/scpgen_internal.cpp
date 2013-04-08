@@ -785,11 +785,11 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     // Start a new iteration
     iter++;
     
-    // Evaluate the vectors in the condensed QP
-    eval_vec();
-
     // Evaluate the matrices in the condensed QP
     eval_mat();
+
+    // Evaluate the vectors in the condensed QP
+    eval_vec();
     
     // Regularize the QP
     if(regularize_){
@@ -1019,38 +1019,13 @@ void SCPgenInternal::eval_mat(){
   // Get the Jacobian
   mat_fcn_.getOutput(qpA_,mat_jac_);
 
-  // Get the objective function terms in the QP
+  // Get the Hessian
   if(gauss_newton_){
-    // Hessian of the lagrangian
     const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
     fill(qpH_.begin(),qpH_.end(),0);
     DMatrix::mul_no_alloc_tn(B_obj,B_obj,qpH_);
-
-    // Gradient of the objective
-    fill(qpG_.begin(),qpG_.end(),0);
-    DMatrix::mul_no_alloc_tn(B_obj,gL_,qpG_);
   } else {
-    // Hessian of the lagrangian
     mat_fcn_.getOutput(qpH_,mat_hes_);
-
-    // Gradient of the lagrangian
-    copy(gL_.begin(),gL_.end(),qpG_.begin());
-
-    // Remove the contribution from the simple bounds multipliers
-    for(int i=0; i<nx_; ++i){
-      qpG_[i] -= x_lam_[i];
-    }
-
-    // Remove the contribution from the nonlinear multipliers to get the gradient of the objective
-    const vector<double> &qpA_data = qpA_.data();
-    const vector<int> &qpA_rowind = qpA_.rowind();
-    const vector<int> &qpA_col = qpA_.col();
-    for(int i=0; i<ng_; ++i){
-      for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
-	int j=qpA_col[el];
-	qpG_[j] -= qpA_data[el]*g_lam_[i];
-      }
-    }
   }
 
   double time2 = clock();
@@ -1134,6 +1109,33 @@ void SCPgenInternal::eval_vec(){
   // Get condensed vectors
   transform(g_.begin(),g_.end(),vec_fcn_.output(vec_b_g_).begin(),qpB_.begin(),std::minus<double>());
   transform(gL_.begin(),gL_.end(),vec_fcn_.output(vec_b_obj_).begin(),gL_.begin(),std::minus<double>());
+
+  // Get the objective function terms in the QP
+  if(gauss_newton_){
+    // Gradient of the objective
+    const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
+    fill(qpG_.begin(),qpG_.end(),0);
+    DMatrix::mul_no_alloc_tn(B_obj,gL_,qpG_);
+  } else {
+    // Gradient of the lagrangian
+    copy(gL_.begin(),gL_.end(),qpG_.begin());
+
+    // Remove the contribution from the simple bounds multipliers
+    for(int i=0; i<nx_; ++i){
+      qpG_[i] -= x_lam_[i];
+    }
+
+    // Remove the contribution from the nonlinear multipliers to get the gradient of the objective
+    const vector<double> &qpA_data = qpA_.data();
+    const vector<int> &qpA_rowind = qpA_.rowind();
+    const vector<int> &qpA_col = qpA_.col();
+    for(int i=0; i<ng_; ++i){
+      for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
+	int j=qpA_col[el];
+	qpG_[j] -= qpA_data[el]*g_lam_[i];
+      }
+    }
+  }
   
   double time2 = clock();
   t_eval_vec_ += double(time2-time1)/CLOCKS_PER_SEC;
