@@ -751,8 +751,8 @@ class typemaptests(casadiTestCase):
     integr.setOption("tf",2.3)
     integr.init()
 
-    integr.input(INTEGRATOR_X0).set(7.1)
-    integr.input(INTEGRATOR_P).set(2)
+    integr.input("x0").set(7.1)
+    integr.input("p").set(2)
 
     integr.evaluate(1,1)
 
@@ -766,8 +766,8 @@ class typemaptests(casadiTestCase):
     integr.setOption("tf",2.3)
     integr.init()
 
-    integr.input(INTEGRATOR_X0).set(7.1)
-    integr.input(INTEGRATOR_P).set(2)
+    integr.input("x0").set(7.1)
+    integr.input("p").set(2)
 
     integr.evaluate(1,1)
 
@@ -782,8 +782,8 @@ class typemaptests(casadiTestCase):
     integr.setOption("tf",2.3)
     integr.init()
 
-    integr.input(INTEGRATOR_X0).set(7.1)
-    integr.input(INTEGRATOR_P).set(2)
+    integr.input("x0").set(7.1)
+    integr.input("p").set(2)
 
     integr.evaluate(1,1)
 
@@ -798,8 +798,8 @@ class typemaptests(casadiTestCase):
     integr.setOption("tf",2.3)
     integr.init()
 
-    integr.input(INTEGRATOR_X0).set(7.1)
-    integr.input(INTEGRATOR_P).set(2)
+    integr.input("x0").set(7.1)
+    integr.input("p").set(2)
 
     integr.evaluate(1,1)
 

@@ -47,7 +47,7 @@ for tol in tolerances:
 
   sim=Simulator(integrator,ts)
   sim.init()
-  sim.input(INTEGRATOR_X0).set([1,0])
+  sim.input("x0").set([1,0])
   sim.evaluate()
 
   plot(ts,array(sim.output())[:,0],label="tol = 1e%d" % tol)
@@ -67,7 +67,7 @@ for tol in tolerances:
   integrator.setOption("abstol",tol)
   integrator.setOption("tf",tend)
   integrator.init()
-  integrator.input(INTEGRATOR_X0).set([1,0])
+  integrator.input("x0").set([1,0])
   integrator.evaluate()
   endresult.append(integrator.output()[0])
   

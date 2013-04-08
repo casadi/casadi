@@ -177,7 +177,7 @@ void Tester::model(){
 
   // Expand the discrete dynamics?
   FX f_step = f_step_mx;
-  if(true){
+  if(false){
     SXFunction f_step_sx(f_step_mx);
     f_step_sx.init();
     cout << "generated single step dynamics, SX (" << f_step_sx.getAlgorithmSize() << " nodes)" << endl;
@@ -354,8 +354,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   nlp_solver_.setOption("beta",0.5);
   //nlp_solver_.setOption("merit_memory",1);
   nlp_solver_.setOption("maxiter",100);
-  nlp_solver_.setOption("compiler","clang -fPIC"); // No optimization, fast compilation
-  //nlp_solver_.setOption("compiler","clang -fPIC -O2"); // Optimization
+  nlp_solver_.setOption("compiler","clang -fPIC -O2"); // Optimization
 
   // Name the variables
   vector<string> variable_name;
@@ -432,7 +431,7 @@ int main(){
   bool gauss_newton = true;
 
   // Codegen the Lifted Newton functions
-  bool codegen = false;
+  bool codegen = true;
   
   // Regularize the QP
   bool regularize = true;

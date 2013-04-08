@@ -329,12 +329,22 @@ namespace CasADi{
      */
     FX derivative(int nfwd, int nadj);
 
+    //@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
     CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-
+    CRSSparsity& jacSparsity(const std::string &iname, int oind=0, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iname),oind,compact,symmetric); }
+    CRSSparsity& jacSparsity(int iind, const std::string &oname, bool compact=false, bool symmetric=false) { return jacSparsity(iind,outputSchemeEntry(oname),compact,symmetric); }
+    CRSSparsity& jacSparsity(const std::string &iname, const std::string &oname, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
+    //@}
+    
+    //@{
     /// Generate the sparsity of a Jacobian block
     void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact=false);
-
+    void setJacSparsity(const CRSSparsity& sp, const std::string &iname, int oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iname),oind,compact); }
+    void setJacSparsity(const CRSSparsity& sp, int iind, const std::string &oname, bool compact=false) { setJacSparsity(sp,iind,outputSchemeEntry(oname),compact); }
+    void setJacSparsity(const CRSSparsity& sp, const std::string &iname, const std::string &oname, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iname),outputSchemeEntry(oname),compact); }
+    //@}
+    
     /** \brief Export / Generate C code for the function */
     void generateCode(const std::string& filename);
   

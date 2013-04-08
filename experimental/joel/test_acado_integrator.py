@@ -60,29 +60,29 @@ integrator.init()
 # Initial conditions
 xz0 = array([1.0, 1.000000])
 pq0 = array([1.0, 1.0])
-integrator.setInput(xz0, INTEGRATOR_X0)
-integrator.setInput(pq0, INTEGRATOR_P)
+integrator.setInput(xz0, "x0")
+integrator.setInput(pq0, "p")
 
 # Seeds
-integrator.setFwdSeed([0.,0.], INTEGRATOR_X0)
-integrator.setFwdSeed([1.,0.], INTEGRATOR_P)
-integrator.setAdjSeed([1.,0.], INTEGRATOR_XF)
+integrator.setFwdSeed([0.,0.], "x0")
+integrator.setFwdSeed([1.,0.], "p")
+integrator.setAdjSeed([1.,0.], "xf")
 
 # Integrate with forward and adjoint sensitivities
 integrator.evaluate(1,0)
 #integrator.evaluate(1,1) # NOTE ACADO does not support adjoint mode AD using interfaced functions
 
 # Result
-print "final state =           ", integrator.output(INTEGRATOR_XF).data(), " (XF)"
-print "forward sensitivities = ", integrator.fwdSens(INTEGRATOR_XF).data(), " (XF)"
-#print "adjoint sensitivities = ", integrator.adjSens(INTEGRATOR_X0).data(), " (X0), ", integrator.adjSens(INTEGRATOR_P).data(), " (P)"
+print "final state =           ", integrator.output("xf").data(), " (XF)"
+print "forward sensitivities = ", integrator.fwdSens("xf").data(), " (XF)"
+#print "adjoint sensitivities = ", integrator.adjSens("x0").data(), " (X0), ", integrator.adjSens("p").data(), " (P)"
 
 # Create a simulator
 tgrid = numpy.linspace(0,tf,100)
 simulator = Simulator(integrator,tgrid)
 simulator.init()
-simulator.setInput(xz0, INTEGRATOR_X0)
-simulator.setInput(pq0, INTEGRATOR_P)
+simulator.setInput(xz0, "x0")
+simulator.setInput(pq0, "p")
 simulator.evaluate()
 
 plt.clf()

@@ -66,17 +66,17 @@ solver = IpoptSolver(F,G)
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput(-0.75, NLP_LBX)
-solver.setInput( 1.,   NLP_UBX)
-solver.setInput( 0.,   NLP_X_INIT)
-solver.setInput( 0.,   NLP_LBG)
-solver.setInput( 0.,   NLP_UBG)
+solver.setInput(-0.75, "lbx")
+solver.setInput( 1.,   "ubx")
+solver.setInput( 0.,   "x_init")
+solver.setInput( 0.,   "lbg")
+solver.setInput( 0.,   "ubg")
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the solution
-u_opt = NP.array(solver.output(NLP_X_OPT))
+u_opt = NP.array(solver.output("x_opt"))
 
 # Time grid
 tgrid_x = NP.linspace(0,10,nk+1)

@@ -240,17 +240,17 @@ solver = IpoptSolver(F,G)
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput(VMIN,  NLP_LBX)
-solver.setInput(VMAX,  NLP_UBX)
-solver.setInput(VINIT, NLP_X_INIT)
-solver.setInput(NP.concatenate(g_min),NLP_LBG)
-solver.setInput(NP.concatenate(g_max),NLP_UBG)
+solver.setInput(VMIN,  "lbx")
+solver.setInput(VMAX,  "ubx")
+solver.setInput(VINIT, "x_init")
+solver.setInput(NP.concatenate(g_min),"lbg")
+solver.setInput(NP.concatenate(g_max),"ubg")
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the solution
-v_opt = NP.array(solver.output(NLP_X_OPT))
+v_opt = NP.array(solver.output("x_opt"))
 
 # Get values at the beginning of each finite element
 tgrid_u = NP.linspace(0,tf,nk)

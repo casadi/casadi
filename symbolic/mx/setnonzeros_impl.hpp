@@ -99,9 +99,6 @@ namespace CasADi{
     vector<int> without_duplicates;
     osp.getElements(without_duplicates,false);
     
-    // Temporary for sparsity pattern unions
-    vector<unsigned char> tmp1;
-
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_rowind, r_col, r_nz;
 
@@ -151,8 +148,8 @@ namespace CasADi{
 	if(*k>=0 && nz[*k]>=0 && r_nz2[nz[*k]]<0){
 	  
 	  // Create a new pattern which includes both the the previous seed and the addition/assignment
-	  CRSSparsity sp = arg0.sparsity().patternUnion(osp,tmp1);
-	  arg0 = arg0->getDensification(sp);
+	  CRSSparsity sp = arg0.sparsity().patternUnion(osp);
+	  arg0 = arg0->getSetSparse(sp);
 
 	  // Recalculate the nz locations in the arguments corresponding to the inputs
 	  copy(without_duplicates.begin(),without_duplicates.end(),r_nz2.begin());

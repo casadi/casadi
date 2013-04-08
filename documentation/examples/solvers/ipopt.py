@@ -38,8 +38,8 @@ f=SXFunction([x],[(x-1)**2])
 
 solver = IpoptSolver(f)
 solver.init()
-solver.input(NLP_LBX).set([-10])
-solver.input(NLP_UBX).set([10])
+solver.input("lbx").set([-10])
+solver.input("ubx").set([10])
 solver.solve()
 
 #! The solution is obviously 1:
@@ -64,11 +64,11 @@ g=SXFunction([x],[vertcat([x[1]+x[2],x[0]])])
 
 solver = IpoptSolver(f,g)
 solver.init()
-solver.input(NLP_LBX).set([-10]*n)
-solver.input(NLP_UBX).set([10]*n)
+solver.input("lbx").set([-10]*n)
+solver.input("ubx").set([10]*n)
 #$  $ 2 \le x_0 \le 2$ is not really as bad it looks. Ipopt will recognise this situation as an equality constraint. 
-solver.input(NLP_LBG).set([0,2])
-solver.input(NLP_UBG).set([1,2])
+solver.input("lbg").set([0,2])
+solver.input("ubg").set([1,2])
 solver.solve()
 
 #! The solution is obviously [2,0.5,0.5,1,1]:
@@ -92,9 +92,9 @@ f=SXFunction([x,a],[(x-a)**2])
 solver = IpoptSolver(f)
 solver.setOption("parametric",True)
 solver.init()
-solver.input(NLP_LBX).set([-10])
-solver.input(NLP_UBX).set([10])
-solver.input(NLP_P).set([a_])
+solver.input("lbx").set([-10])
+solver.input("ubx").set([10])
+solver.input("p").set([a_])
 solver.solve()
 
 #! The solution is obviously a:
@@ -102,7 +102,7 @@ print solver.output()
 assert(abs(solver.output()[0]-a_)<1e-9)
 
 #! The parameter can change inbetween two solve calls:
-solver.input(NLP_P).set([2*a_])
+solver.input("p").set([2*a_])
 solver.solve()
 
 #! The solution is obviously 2*a:

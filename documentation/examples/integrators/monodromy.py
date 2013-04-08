@@ -71,12 +71,12 @@ sim.init()
 w0_ = 5.278
 params_ = [ w0_, -1.402*w0_**2,  0.271*w0_**2,0,0,0 ]
 
-sim.input(INTEGRATOR_P).set(params_)
+sim.input("p").set(params_)
 
 x2_0 = 0
 figure(1)
 for x1_0 in [-3.5,-3.1,-3,-2,-1,0]:
-  sim.input(INTEGRATOR_X0).set([x1_0,x2_0])
+  sim.input("x0").set([x1_0,x2_0])
   sim.evaluate()
   plot(sim.output()[:,0],sim.output()[:,1],'k')
 
@@ -91,11 +91,11 @@ x0 = DMatrix([-3.1,0])
 #! Monodromy matrix at tf - Jacobian of integrator
 #! ===============================================
 #! First argument is input index, second argument is output index
-jac = integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
+jac = integrator.jacobian("x0","xf")
 jac.init()
 
-jac.input(INTEGRATOR_X0).set(x0)
-jac.input(INTEGRATOR_P).set(params_)
+jac.input("x0").set(x0)
+jac.input("p").set(params_)
 jac.evaluate()
 
 Ji = jac.output()
@@ -108,8 +108,8 @@ print Ji
 jacsim = sim.jacobian(INTEGRATOR_X0,0)
 jacsim.init()
 
-jacsim.input(INTEGRATOR_X0).set(x0)
-jacsim.input(INTEGRATOR_P).set(params_)
+jacsim.input("x0").set(x0)
+jacsim.input("p").set(params_)
 jacsim.evaluate()
 
 #! For each of the 500 intervals, we have a 2-by-2 matrix as output
@@ -137,9 +137,9 @@ csim.init()
 
 jaccsim = csim.jacobian(CONTROLSIMULATOR_X0,0)
 jaccsim.init()
-jaccsim.input(CONTROLSIMULATOR_P).set(params_[:-1])
-jaccsim.input(CONTROLSIMULATOR_X0).set(x0)
-jaccsim.input(CONTROLSIMULATOR_U).setAll(0)
+jaccsim.input("p").set(params_[:-1])
+jaccsim.input("x0").set(x0)
+jaccsim.input("u").setAll(0)
 jaccsim.evaluate()
 
 #! For each of the 500 intervals, we have a 2-by-2 matrix as output
@@ -157,8 +157,8 @@ assert(e < 1e-5)
 #! Intuitive interpretation
 #! ========================
 
-sim.input(INTEGRATOR_X0).set(x0)
-sim.input(INTEGRATOR_P).set(params_)
+sim.input("x0").set(x0)
+sim.input("p").set(params_)
 sim.evaluate()
 unperturbed_output = DMatrix(sim.output())
 
@@ -184,14 +184,14 @@ for t in range(0,N/5,2):
 show()
 #! Consider the case of perturbation simulation with a slightly perturbed initial condition
 
-sim.input(INTEGRATOR_X0).set(x0)
-sim.input(INTEGRATOR_P).set(params_)
+sim.input("x0").set(x0)
+sim.input("p").set(params_)
 sim.evaluate()
 unperturbed_output = DMatrix(sim.output())
 
 perturb = DMatrix([1e-2,0])
-sim.input(INTEGRATOR_X0).set(x0+perturb)
-sim.input(INTEGRATOR_P).set(params_)
+sim.input("x0").set(x0+perturb)
+sim.input("p").set(params_)
 sim.evaluate()
 perturbed_output = DMatrix(sim.output())
 

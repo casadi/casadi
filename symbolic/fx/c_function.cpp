@@ -37,6 +37,22 @@ CFunction::CFunction(CFunctionWrapper c_fcn,const vector<CRSSparsity> &inputsche
   assignNode(new CFunctionInternal(c_fcn,inputscheme,outputscheme));
 }
 
+CFunction::CFunction(CFunctionWrapper c_fcn,const IOSchemeVector< CRSSparsity > &inputscheme,const  vector<CRSSparsity> &outputscheme) {
+  assignNode(new CFunctionInternal(c_fcn,inputscheme,outputscheme));
+  setInputScheme(inputscheme.io_scheme());
+}
+
+CFunction::CFunction(CFunctionWrapper c_fcn,const vector<CRSSparsity> &inputscheme,const  IOSchemeVector< CRSSparsity > &outputscheme) {
+  assignNode(new CFunctionInternal(c_fcn,inputscheme,outputscheme));
+  setOutputScheme(outputscheme.io_scheme());
+}
+
+CFunction::CFunction(CFunctionWrapper c_fcn,const IOSchemeVector< CRSSparsity > &inputscheme,const  IOSchemeVector< CRSSparsity > &outputscheme) {
+  assignNode(new CFunctionInternal(c_fcn,inputscheme,outputscheme));
+  setInputScheme(inputscheme.io_scheme());
+  setOutputScheme(outputscheme.io_scheme());
+}
+
 CFunction::CFunction(CFunctionWrapper c_fcn) {
   assignNode(new CFunctionInternal(c_fcn,vector<CRSSparsity>(),vector<CRSSparsity>()));
 }

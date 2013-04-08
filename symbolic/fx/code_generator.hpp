@@ -71,6 +71,7 @@ namespace CasADi{
       AUX_ASUM,
 
       // Misc
+      AUX_SQUARE,
       AUX_SIGN,
       AUX_MM_NT_SPARSE,
       AUX_COPY_SPARSE,
@@ -126,6 +127,9 @@ namespace CasADi{
     
     // Sparse matrix-matrix multiplication, the second argument is transposed: z <- z + x*y'
     void auxMmNtSparse();
+
+    /// SQUARE
+    void auxSquare();
 
     /// SIGN
     void auxSign();

@@ -192,18 +192,18 @@ ocp_solver.init()
 
 lbx0 = [-inf, -inf, -inf, -inf, -inf, -inf, 0, -inf, -inf, 0]
 ubx0 = [ inf,  inf,  inf,  inf,  inf,  inf, 0,  inf,  inf, 0]
-ocp_solver.setInput(lbx0, ACADO_LBX0)
-ocp_solver.setInput(ubx0, ACADO_UBX0)
+ocp_solver.setInput(lbx0, "lbx0")
+ocp_solver.setInput(ubx0, "ubx0")
 
 lbx = [-inf, -0.34, 0.85, -40.0, -inf, -inf, -0.7, -0.29, 0.1, -inf]
 ubx = [ inf,  0.34, 1.45,  10.0,  inf,  inf,  0.9,  0.29, 1.5,  inf]
-ocp_solver.setInput(lbx, ACADO_LBX)
-ocp_solver.setInput(ubx, ACADO_UBX)
+ocp_solver.setInput(lbx, "lbx")
+ocp_solver.setInput(ubx, "ubx")
   
 lbc = [-25.0, -0.065, -3.5]
 ubc = [ 25.0,  0.065,  3.5]
-ocp_solver.setInput(lbc, ACADO_LBC)
-ocp_solver.setInput(ubc, ACADO_UBC)
+ocp_solver.setInput(lbc, "lbc")
+ocp_solver.setInput(ubc, "ubc")
 
 # Solve
 ocp_solver.solve()

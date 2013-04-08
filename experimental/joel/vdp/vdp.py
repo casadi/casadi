@@ -183,12 +183,12 @@ ocp_solver.init()
 cfcn_lb = []
 for i in ocp.cfcn_lb:
   cfcn_lb.append(float(i))
-ocp_solver.setInput(cfcn_lb,ACADO_LBC)
+ocp_solver.setInput(cfcn_lb,"lbc")
   
 cfcn_ub = []
 for i in ocp.cfcn_ub:
   cfcn_ub.append(float(i))
-ocp_solver.setInput(cfcn_ub,ACADO_UBC)
+ocp_solver.setInput(cfcn_ub,"ubc")
   
 # Solve the optimal control problem
 ocp_solver.solve()

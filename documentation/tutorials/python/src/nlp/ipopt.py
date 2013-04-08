@@ -79,15 +79,15 @@ solver.init()
 
 #! The default lower an upper bound on the optimizations variables is zero.
 #! Change them to unbouded as follows:
-solver.setInput([-100,-100,-100,-100,-100],NLP_LBX)
-solver.setInput([100, 100, 100, 100, 100],NLP_UBX)
+solver.setInput([-100,-100,-100,-100,-100],"lbx")
+solver.setInput([100, 100, 100, 100, 100],"ubx")
 
 #! Inequality constraints.
 #! The lower bound is also necessary, although Ipopt itself does not seem to require it
-solver.setInput(b,NLP_UBG)
-solver.setInput([-100,-100,-100,-100,-100],NLP_LBG)
+solver.setInput(b,"ubg")
+solver.setInput([-100,-100,-100,-100,-100],"lbg")
 
 
 solver.solve()
-print solver.output(NLP_X_OPT)
+print solver.output("x_opt")
 #! Nested optimization

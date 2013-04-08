@@ -57,6 +57,9 @@ namespace CasADi{
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
+    /** \brief Check if unary operation */
+    virtual bool isUnaryOp() const { return true;}
+
     /** \brief Get the operation */
     virtual int getOp() const{ return op_;}
     

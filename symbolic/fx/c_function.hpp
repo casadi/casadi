@@ -53,9 +53,17 @@ public:
 /** \brief  default constructor */
   CFunction();
 
+  //@{
   /** \brief  Create a function with input/output schemes given */
   explicit CFunction(CFunctionWrapper c_fcn, const std::vector<CRSSparsity> &inputscheme, const std::vector<CRSSparsity> &outputscheme);
-
+  
+  explicit CFunction(CFunctionWrapper c_fcn, const IOSchemeVector< CRSSparsity > &inputscheme, const std::vector<CRSSparsity> &outputscheme);
+  
+  explicit CFunction(CFunctionWrapper c_fcn, const std::vector<CRSSparsity> &inputscheme, const IOSchemeVector< CRSSparsity > &outputscheme);
+  
+  explicit CFunction(CFunctionWrapper c_fcn, const IOSchemeVector< CRSSparsity > &inputscheme, const IOSchemeVector< CRSSparsity > &outputscheme);
+  //@}
+  
   /** \brief  Create a function, user sets inputs outputs manually */
   explicit CFunction(CFunctionWrapper c_fcn);
 

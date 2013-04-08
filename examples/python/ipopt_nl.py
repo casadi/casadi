@@ -55,11 +55,11 @@ nlp_solver.setOption("generate_hessian",True)
 nlp_solver.init()
   
 # Pass the bounds and initial guess
-nlp_solver.setInput(nlp.x_lb,NLP_LBX)
-nlp_solver.setInput(nlp.x_ub,NLP_UBX)
-nlp_solver.setInput(nlp.g_lb,NLP_LBG)
-nlp_solver.setInput(nlp.g_ub,NLP_UBG)
-nlp_solver.setInput(nlp.x_init,NLP_X_INIT)
+nlp_solver.setInput(nlp.x_lb,"lbx")
+nlp_solver.setInput(nlp.x_ub,"ubx")
+nlp_solver.setInput(nlp.g_lb,"lbg")
+nlp_solver.setInput(nlp.g_ub,"ubg")
+nlp_solver.setInput(nlp.x_init,"x_init")
   
 # Solve NLP
 nlp_solver.solve()

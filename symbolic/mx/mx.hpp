@@ -242,9 +242,6 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   /// Check if constant
   bool isConstant () const;
   
-  /// Check if densification
-  bool isDensification () const;
-  
   /// Check if evaluation
   bool isEvaluation () const;
   
@@ -434,6 +431,12 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   MX arccosh() const;
   MX arctanh() const;
   MX logic_not() const;
+
+  /** \brief Set sparse */
+  MX setSparse(const CRSSparsity& sp) const;
+
+  /** \brief Make dense */
+  MX makeDense(const MX& val = 0) const;
 
   /// Lift an expression
   void lift(const MX& x_guess);

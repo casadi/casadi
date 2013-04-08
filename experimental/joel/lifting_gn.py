@@ -121,11 +121,11 @@ for (i,x0) in enumerate([0.08]):
   #nlp_solver.setOption("qp_solver_options",{"printLevel":"none"})
   nlp_solver = IpoptSolver(F1,F2)
   nlp_solver.init()
-  nlp_solver.setInput(u_guess,NLP_X_INIT)
-  nlp_solver.setInput(u_min,NLP_LBX)
-  nlp_solver.setInput(u_max,NLP_UBX)
-  nlp_solver.setInput(g_min,NLP_LBG)
-  nlp_solver.setInput(g_max,NLP_UBG)
+  nlp_solver.setInput(u_guess,"x_init")
+  nlp_solver.setInput(u_min,"lbx")
+  nlp_solver.setInput(u_max,"ubx")
+  nlp_solver.setInput(g_min,"lbg")
+  nlp_solver.setInput(g_max,"ubg")
   nlp_solver.solve()
 
   #raise Exception("a")
@@ -299,24 +299,24 @@ for (i,x0) in enumerate([0.08]):
       qp_solver.init()
 
     # Formulate the QP
-    qp_solver.setInput(H,QP_H)
-    qp_solver.setInput(g,QP_G)
-    qp_solver.setInput(A,QP_A)
-    qp_solver.setInput(u_min-u_k,QP_LBX)
-    qp_solver.setInput(u_max-u_k,QP_UBX)
-    qp_solver.setInput(g_min-a,QP_LBA)
-    qp_solver.setInput(g_max-a,QP_UBA)
+    qp_solver.setInput(H,"h")
+    qp_solver.setInput(g,"g")
+    qp_solver.setInput(A,"a")
+    qp_solver.setInput(u_min-u_k,"lbx")
+    qp_solver.setInput(u_max-u_k,"ubx")
+    qp_solver.setInput(g_min-a,"lba")
+    qp_solver.setInput(g_max-a,"uba")
 
     # Solve the QP
     qp_solver.evaluate()
 
     # Get the primal solution
-    du_k = qp_solver.output(QP_PRIMAL)
+    du_k = qp_solver.output("primal")
     
     # Get the dual solution
     if not gauss_newton:
-      qp_solver.getOutput(dmux_k,QP_LAMBDA_X)
-      qp_solver.getOutput(dmug_k,QP_LAMBDA_A)
+      qp_solver.getOutput(dmux_k,"lambda_x")
+      qp_solver.getOutput(dmug_k,"lambda_a")
       dmux_k = -dmux_k
       dmug_k = -dmug_k
     
@@ -389,7 +389,7 @@ for (i,x0) in enumerate([0.08]):
 
   
 print "u_k = ", u_k
-print "nlp_solver.output(NLP_X_OPT) = ", nlp_solver.output(NLP_X_OPT)
+print "nlp_solver.output("x_opt") = ", nlp_solver.output("x_opt")
 
 plt.show()
 

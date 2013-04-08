@@ -369,20 +369,6 @@
 <br/>
 @copydoc scheme_QPOutput
 */
-/** \class CasADi::CollocationIntegratorInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::CollocationIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
 /** \class CasADi::IPInternal
 \n
 \par
@@ -391,6 +377,20 @@
 @copydoc scheme_NLPOutput
 */
 /** \class CasADi::IPMethod
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
+/** \class CasADi::WorhpInternal
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
+/** \class CasADi::WorhpSolver
 \n
 \par
 @copydoc scheme_NLPInput
@@ -589,6 +589,20 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
+/** \class CasADi::CollocationIntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::CollocationIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
 /** \class CasADi::IntegratorInternal
 \n
 \par
@@ -710,18 +724,4 @@
 @copydoc scheme_OCPInput
 <br/>
 @copydoc scheme_OCPOutput
-*/
-/** \class CasADi::WorhpInternal
-\n
-\par
-@copydoc scheme_NLPInput
-<br/>
-@copydoc scheme_NLPOutput
-*/
-/** \class CasADi::WorhpSolver
-\n
-\par
-@copydoc scheme_NLPInput
-<br/>
-@copydoc scheme_NLPOutput
 */

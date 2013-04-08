@@ -174,9 +174,6 @@ namespace CasADi{
     /** \brief Check if the node is the sum of two equal expressions */
     bool isDoubled() const;
     
-    /** \brief Check if the node is an even square */
-    bool isSquared() const;
-    
     /** \brief Get the number of dependencies of a binary SX */
     int getNdeps() const;
     
@@ -213,6 +210,7 @@ namespace CasADi{
     SX exp() const;
     SX log() const;
     SX sqrt() const;
+    SX sq() const;
     SX sin() const;
     SX cos() const;
     SX tan() const;

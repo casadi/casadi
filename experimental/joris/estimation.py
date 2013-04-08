@@ -104,15 +104,15 @@ sim.init()
 states.X_ = states.V_ = [0,0,0]  # Initial state to generate the dummy measurements
 states.q_ = [0,0,0,1]            
 
-sim.input(CONTROLSIMULATOR_X0).set(states.veccat_())
-sim.input(CONTROLSIMULATOR_V)[:,imu.i_a.T] = DMatrix([sin(tsm),cos(3*tsm),sin(2*tsm)]).T
-sim.input(CONTROLSIMULATOR_V)[:,imu.i_w.T] = DMatrix([cos(3*tsm),sin(7*tsm),sin(11*tsm)]).T
+sim.input("x0").set(states.veccat_())
+sim.input("v")[:,imu.i_a.T] = DMatrix([sin(tsm),cos(3*tsm),sin(2*tsm)]).T
+sim.input("v")[:,imu.i_w.T] = DMatrix([cos(3*tsm),sin(7*tsm),sin(11*tsm)]).T
 
 sim.evaluate()
 
 tsf = sim.getGrid()  # The fine time grid of the controlsimulator
 
-reference_imu = sim.input(CONTROLSIMULATOR_V)
+reference_imu = sim.input("v")
 reference_Xf   = sim.output()[:,states.i_X.T]
 
 reference_X   = reference_Xf[sim.getCoarseIndex(),:]
@@ -219,11 +219,11 @@ class NLPSolutionInspector:
     if self.i>0:
       self.log[0,self.i] = log10(f.getStats()['inf_pr'])
       self.log[1,self.i] = log10(f.getStats()['inf_du'])
-      self.log[2,self.i] = float(log10(f.input(NLP_COST)))
+      self.log[2,self.i] = float(log10(f.input("cost")))
       self.log[3,self.i] = f.getStats()['ls_trials']
       
     self.i += 1
-    sol = f.input(NLP_X_OPT)
+    sol = f.input("x_opt")
     X_opt = horzcat([sol[i][states.i_X,:] for i in optvar.i_X])
     q_opt = horzcat([sol[i][states.i_q,:] for i in optvar.i_X])
     R_opt = numSample1D(Rf,q_opt)
@@ -264,7 +264,7 @@ nlp = IpoptSolver(f,g)
 nlp.init()
 
  #! We wrap the logging instance in a PyFunction
-c = PyFunction( iterationInspector, [ nlp.output(NLP_X_OPT).sparsity() ,nlp.output(NLP_COST).sparsity() , nlp.output(NLP_LAMBDA_G).sparsity() , nlp.output(NLP_LAMBDA_X).sparsity() ], [sp_dense(1,1)] )
+c = PyFunction( iterationInspector, [ nlp.output("x_opt").sparsity() ,nlp.output("cost").sparsity() , nlp.output("lambda_g").sparsity() , nlp.output("lambda_x").sparsity() ], [sp_dense(1,1)] )
 c.init()
 nlp.setOption("iteration_callback",c)
 nlp.setOption('tol',1e-8)
@@ -272,10 +272,10 @@ nlp.init()
 
 nlp.solve()
 for i in range(nk):  # intialize with (0,0,0,1) quaternion
-  nlp.input(NLP_X_INIT)[optvar.i_X[i][states.i_q[3],:]] = 1
-nlp.input(NLP_P).set(par.veccat_())
-nlp.input(NLP_LBG).setAll(0)
-nlp.input(NLP_UBG).setAll(0)
+  nlp.input("x_init")[optvar.i_X[i][states.i_q[3],:]] = 1
+nlp.input("p").set(par.veccat_())
+nlp.input("lbg").setAll(0)
+nlp.input("ubg").setAll(0)
 nlp.solve()
 
 sol = nlp.output()

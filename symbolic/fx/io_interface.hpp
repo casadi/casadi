@@ -27,6 +27,7 @@
 #include "../sx/sx.hpp"
 #include "../mx/mx.hpp"
 #include "../options_functionality.hpp"
+#include "../fx/io_scheme_vector.hpp"
 
 namespace CasADi{
   
@@ -50,27 +51,6 @@ namespace CasADi{
     // Constructor
     FunctionIO() : tmp(0){}
   };
-  
-  
-  template<typename T>
-  struct IOSchemeVector {
-    // Data
-    std::vector<T> t_;
-    InputOutputScheme io_scheme_;
-    // Constructor
-    IOSchemeVector(const std::vector<T>& t, InputOutputScheme io_scheme=SCHEME_unknown) : t_(t), io_scheme_(io_scheme){} 
-    
-    #ifndef SWIG
-    // Type conversion
-    operator std::vector<T>() const{ return t_;}
-    #endif // SWIG
-    std::vector<T> vector() const { return t_; }
-    InputOutputScheme io_scheme() const { return io_scheme_; }
-    
-    /** \brief  Print the algorithm */
-    //void print(std::ostream &stream) const { ; }
-  };
-
 
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
@@ -271,21 +251,21 @@ namespace CasADi{
     /** \brief Find the index for a string describing a particular entry of an input scheme
      * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
      */
-    int inputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->inputScheme(),name);}
+    int inputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->inputScheme(),name,true);}
 
     /** \brief Find the index for a string describing a particular entry of an output scheme
      * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
      */
-    int outputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->outputScheme(),name);}
+    int outputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->outputScheme(),name,false);}
 
     /** \brief Find the index for a string describing a particular entry of a scheme
      * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
      */
-    int schemeEntry(CasADi::InputOutputScheme scheme,const std::string &name) const{
-      if (scheme==SCHEME_unknown) casadi_error("Unable to look up '" <<  name<< "' in input scheme, as the input scheme of this function is unknown. You can only index with integers.");
-      if (name=="") casadi_error("FXInternal::inputSchemeEntry: you supplied an empty string as the name of a entry in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
+    int schemeEntry(CasADi::InputOutputScheme scheme,const std::string &name,bool input) const{
+      if (scheme==SCHEME_unknown) casadi_error("Unable to look up '" <<  name<< "' in " << (input? "input": "output") << "scheme, as the " <<  (input? "input": "output") << " scheme of this function is unknown. You can only index with integers.");
+      if (name=="") casadi_error("FXInternal::schemeEntry: you supplied an empty string as the name of a entry in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
       int n = getSchemeEntryEnum(scheme,name);
-      if (n==-1) casadi_error("FXInternal::inputSchemeEntry: could not find entry '" << name << "' in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
+      if (n==-1) casadi_error("FXInternal::schemeEntry: could not find entry '" << name << "' in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
       return n;
     }
 

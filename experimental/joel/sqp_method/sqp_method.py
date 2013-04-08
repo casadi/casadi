@@ -91,17 +91,17 @@ solver.setOption("hessian_approximation", "limited-memory")
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput(umin,     NLP_LBX)
-solver.setInput(umax,     NLP_UBX)
-solver.setInput(u0,       NLP_X_INIT)
-solver.setInput(zeros(2), NLP_LBG)
-solver.setInput(zeros(2), NLP_UBG)
+solver.setInput(umin,     "lbx")
+solver.setInput(umax,     "ubx")
+solver.setInput(u0,       "x_init")
+solver.setInput(zeros(2), "lbg")
+solver.setInput(zeros(2), "ubg")
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the solution
-u_opt = array(solver.output(NLP_X_OPT))
+u_opt = array(solver.output("x_opt"))
 
 # Get values at the beginning of each finite element
 tgrid = linspace(0,10,10)
@@ -120,15 +120,15 @@ sqp_solver.setOption("qp_solver_options",{"printLevel" : "low"})
 #sqp_solver.setOption("qp_solver",OOQPSolver)
 
 sqp_solver.init()
-sqp_solver.setInput(umin,     NLP_LBX)
-sqp_solver.setInput(umax,     NLP_UBX)
-sqp_solver.setInput(u0,       NLP_X_INIT)
-sqp_solver.setInput(zeros(2), NLP_LBG)
-sqp_solver.setInput(zeros(2), NLP_UBG)
+sqp_solver.setInput(umin,     "lbx")
+sqp_solver.setInput(umax,     "ubx")
+sqp_solver.setInput(u0,       "x_init")
+sqp_solver.setInput(zeros(2), "lbg")
+sqp_solver.setInput(zeros(2), "ubg")
 sqp_solver.evaluate()
 
 # Retrieve the solution
-u_opt2 = array(sqp_solver.output(NLP_X_OPT))
+u_opt2 = array(sqp_solver.output("x_opt"))
 
 # Plot the results
 plt.figure(1)
@@ -189,8 +189,8 @@ qp_solver.setOption("printLevel","low")
 qp_solver.init()
 
 # No bounds on the control
-qp_solver.input(QP_LBX).setAll(-inf)
-qp_solver.input(QP_UBX).setAll( inf)
+qp_solver.input("lbx").setAll(-inf)
+qp_solver.input("ubx").setAll( inf)
 
 # Header
 print ' k  nls | dx         gradL      eq viol    ineq viol'
@@ -215,23 +215,23 @@ while True:
   gfk = DMatrix(ffcn.adjSens())
   
   # Pass data to QP solver
-  qp_solver.setInput(Bk,QP_H)
-  qp_solver.setInput(Jgk,QP_A)
-  qp_solver.setInput(gfk,QP_G)
-  qp_solver.setInput(-gk,QP_LBA)
-  qp_solver.setInput(-gk,QP_UBA)
+  qp_solver.setInput(Bk,"h")
+  qp_solver.setInput(Jgk,"a")
+  qp_solver.setInput(gfk,"g")
+  qp_solver.setInput(-gk,"lba")
+  qp_solver.setInput(-gk,"uba")
 
   # Solve the QP subproblem
   qp_solver.evaluate()
 
   # Get the optimal solution
-  p = qp_solver.output(QP_PRIMAL)
+  p = qp_solver.output("primal")
   
   # Get the dual solution for the inequalities
-  lambda_hat = -qp_solver.output(QP_LAMBDA_A)
+  lambda_hat = -qp_solver.output("lambda_a")
   
   # Get the dual solution for the bounds
-  lambda_x_hat = -qp_solver.output(QP_LAMBDA_X)
+  lambda_x_hat = -qp_solver.output("lambda_x")
   
   # Get the gradient of the Lagrangian
   gradL = ffcn.adjSens() - dot(trans(Jgk),lambda_hat) - lambda_x_hat

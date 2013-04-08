@@ -45,7 +45,7 @@ SET(CASADI_SRCS
   mx/constant_mx.hpp         mx/constant_mx.cpp         # A constant MX node
   mx/symbolic_mx.hpp         mx/symbolic_mx.cpp         # A symbolic MX variable
   mx/unary_mx.hpp            mx/unary_mx.cpp            # Unary operation
-  mx/binary_mx.hpp           mx/binary_mx.cpp           # Binary operation
+  mx/binary_mx.hpp           mx/binary_mx_impl.hpp      # Binary operation
   mx/multiplication.hpp      mx/multiplication_impl.hpp # Matrix multiplication
   mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
   mx/evaluation_mx.hpp       mx/evaluation_mx.cpp       # FX function evaluation
@@ -57,7 +57,7 @@ SET(CASADI_SRCS
   mx/subassign.hpp           mx/subassign.cpp           # Submatrix assignment
   mx/getnonzeros.hpp         mx/getnonzeros.cpp         # Get the nonzeros of matrix
   mx/setnonzeros.hpp         mx/setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
-  mx/densification.hpp       mx/densification.cpp       # Makes a matrix dense
+  mx/set_sparse.hpp          mx/set_sparse.cpp          # Sparse copy
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
   mx/mx_tools.hpp            mx/mx_tools.cpp
 
