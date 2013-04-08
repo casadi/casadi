@@ -345,7 +345,7 @@ namespace CasADi{
     if(x.dense()) return;
   
     // Densify
-    x = x->getDensification(sp_dense(x.size1(),x.size2()));
+    x = x.setSparse(sp_dense(x.size1(),x.size2()));
   }
 
   MX createParent(std::vector<MX> &deps) {

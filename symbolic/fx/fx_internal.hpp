@@ -273,7 +273,7 @@ namespace CasADi{
     WeakRef full_jacobian_;
 
     /// Cache for sparsities of the Jacobian blocks
-    std::vector<std::vector<CRSSparsity> > jac_sparsity_, jac_sparsity_compact_;
+    Matrix<CRSSparsity> jac_sparsity_, jac_sparsity_compact_;
 
     /// Which derivative directions are currently being compressed
     std::vector<bool> compressed_fwd_, compressed_adj_;

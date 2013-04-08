@@ -352,9 +352,6 @@ namespace CasADi{
     // Get all input elements (this time without duplicates)
     isp.getElements(el_input,false);
     
-    // Temporary for sparsity pattern unions
-    vector<unsigned char> tmp1;
-
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
 
@@ -394,8 +391,8 @@ namespace CasADi{
 	if(*k>=0 && r_nz2[nz[*k]]<0){
 	  
 	  // Create a new pattern which includes both the the previous seed and the addition
-	  CRSSparsity sp = asens0.sparsity().patternUnion(dep().sparsity(),tmp1);
-	  asens0 = asens0->getDensification(sp);
+	  CRSSparsity sp = asens0.sparsity().patternUnion(dep().sparsity());
+	  asens0 = asens0->getSetSparse(sp);
 
 	  // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
 	  copy(el_input.begin(),el_input.end(),r_nz2.begin());

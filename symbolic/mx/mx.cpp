@@ -23,8 +23,6 @@
 #include "mx.hpp"
 #include "mx_node.hpp"
 #include "mx_tools.hpp"
-#include "unary_mx.hpp"
-#include "binary_mx.hpp"
 #include "../fx/sx_function.hpp"
 #include "evaluation_mx.hpp"
 #include "symbolic_mx.hpp"
@@ -32,7 +30,6 @@
 #include "mx_tools.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "densification.hpp"
 #include "norm.hpp"
 #include "../casadi_math.hpp"
 
@@ -181,7 +178,7 @@ namespace CasADi{
     casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"sub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
     vector<unsigned char> mappingc; // Mapping that will be filled by patternunion
   
-    sparsity().patternUnion(sp,mappingc,true, false, true);
+    sparsity().patternCombine(sp, false, true, mappingc);
     vector<int> nz(sp.size(),-1);
 
     int k_this = 0;     // Non-zero of this matrix
@@ -864,9 +861,6 @@ namespace CasADi{
 
   bool 	MX::isNorm () const { return !isNull() ? dynamic_cast<const Norm*>(get())!=0 : false; }
 
-  bool 	MX::isDensification () const { return !isNull() ? dynamic_cast<const Densification*>(get())!=0 : false; }
-
-
   FX MX::getFunction () {  return (*this)->getFunction(); }
  	
   double MX::getValue() const{
@@ -877,9 +871,9 @@ namespace CasADi{
     return (*this)->getMatrixValue();
   }
  	  
-  bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryMX*>(get()) != 0 : false;  }
+  bool MX::isBinary() const { return isNull() ? false : (*this)->isBinaryOp();}
 
-  bool MX::isUnary() const { return !isNull() ? dynamic_cast<const UnaryMX*>(get()) != 0 : false;  }
+  bool MX::isUnary() const { return isNull() ? false : (*this)->isUnaryOp();}
  	
   int MX::getOp() const {
     return (*this)->getOp();
@@ -918,5 +912,23 @@ namespace CasADi{
   MX MX::getOutput(int oind) const{
     return (*this)->getOutput(oind);
   }
- 	  
+
+  MX MX::setSparse(const CRSSparsity& sp) const{
+    if(sp==sparsity()){
+      return *this;
+    } else {
+      return (*this)->getSetSparse(sp);
+    }
+  }
+
+ MX MX::makeDense(const MX& val) const{
+    if(dense()){
+      return *this;
+    } else {
+      MX ret(size1(),size2(),val);
+      ret(sparsity()) = *this;
+      return ret;
+    }
+  }
+	  
 } // namespace CasADi

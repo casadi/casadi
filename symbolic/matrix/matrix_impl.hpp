@@ -149,8 +149,7 @@ const Matrix<T> Matrix<T>::sub(const CRSSparsity& sp, int dummy) const {
   Matrix<T> ret(sp);
 
   std::vector<unsigned char> mapping; // Mapping that will be filled by patternunion
-
-  sparsity().patternUnion(sp,mapping,true, false, true);
+  sparsity().patternCombine(sp, false, true, mapping);
 
   int k = 0;     // Flat index into non-zeros of this matrix
   int j = 0;     // Flat index into non-zeros of the resultant matrix;
@@ -1542,37 +1541,6 @@ Matrix<T> Matrix<T>::binary(int op, const Matrix<T> &x, const Matrix<T> &y){
 }
 
 template<class T>
-void Matrix<T>::binary_no_alloc(void (*fcn)(unsigned char op, const T&, const T&, T&), unsigned char op, const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping){
-  std::vector<T>& rd = r.data();
-  const std::vector<T> &xd = x.data();
-  const std::vector<T> &yd = y.data();
-
-  // Argument values
-  T zero = 0;
-
-  // Nonzero counters
-  int el0=0, el1=0, el=0;
-  
-  // Loop over nonzero elements
-  for(int i=0; i<mapping.size(); ++i){
-    // Check which elements are nonzero
-    unsigned char m = mapping[i];
-    bool nz0(m & 1);
-    bool nz1(m & 2);
-    bool skip_nz(m & 4);
-    
-    // Evaluate
-    if(!skip_nz){
-      fcn(op, nz0 ? xd[el0] : zero, nz1 ? yd[el1] : zero, rd[el++]);
-    }
-    
-    // Go to next nonzero
-    el0 += nz0;
-    el1 += nz1;
-  }
-}
-
-template<class T>
 Matrix<T> Matrix<T>::scalar_matrix(int op, const Matrix<T> &x, const Matrix<T> &y){
   // Return value
   Matrix<T> ret(y.sparsity());
@@ -1640,52 +1608,42 @@ Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &
     ); 
   }
 
-  // Nonzeros
-  const std::vector<T>& x_data = x.data();
-  const std::vector<T>& y_data = y.data();
-
-  // Sparsity patterns
+  // Get the sparsity pattern of the result (ignoring structural zeros giving rise to nonzero result)
   const CRSSparsity& x_sp = x.sparsity();
   const CRSSparsity& y_sp = y.sparsity();
-  
-  // Simpler algorithm if sparsity patterns are identical
-  if(x_sp==y_sp){
-    
-    // Return value
-    Matrix<T> ret(x_sp);
-    std::vector<T>& ret_data = ret.data();
+  CRSSparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op));
 
-    // Do the operation on all non-zero elements
-    for(int el=0; el<x.size(); ++el){
-      casadi_math<T>::fun(op,x_data[el],y_data[el],ret_data[el]);
-    }
-    
-    // Check the value of the structural zero-entries, if there are any
-    if(!x.dense() && !operation_checker<F00Checker>(op)){
-      // Get the value for the structural zeros
-      T fcn_0;
-      casadi_math<T>::fun(op,casadi_limits<T>::zero,casadi_limits<T>::zero,fcn_0);
-      ret.makeDense(ret.size1(),ret.size2(),fcn_0);
-    }
-    
-    return ret;
-    
+  // Return value
+  Matrix<T> r(r_sp);
+  
+  // Perform the operations elementwise
+  if(x_sp==y_sp){
+    // Matching sparsities
+    casadi_math<T>::fun(op,getPtr(x.data()),getPtr(y.data()),getPtr(r.data()),r_sp.size());
+  } else if(y_sp==r_sp){
+    // Project first argument
+    Matrix<T> x_mod = x(r_sp);
+    casadi_math<T>::fun(op,getPtr(x_mod.data()),getPtr(y.data()),getPtr(r.data()),r_sp.size());
+  } else if(x_sp==r_sp){
+    // Project second argument
+    Matrix<T> y_mod = y(r_sp);
+    casadi_math<T>::fun(op,getPtr(x.data()),getPtr(y_mod.data()),getPtr(r.data()),r_sp.size());
   } else {
-    // Get the sparsity pattern
-    std::vector<unsigned char> mapping;
-    CRSSparsity ret_sp = x_sp.patternUnion(y_sp,mapping,
-                                           operation_checker<F00Checker>(op),
-                                           operation_checker<F0XChecker>(op),
-                                           operation_checker<FX0Checker>(op));
-    
-    // Create return matrix
-    Matrix<T> ret(ret_sp);
-    
-    // Perform the operation
-    binary_no_alloc(casadi_math<T>::fun,op,x,y,ret,mapping);
-    
-    return ret;
+    // Project both arguments
+    Matrix<T> x_mod = x(r_sp);
+    Matrix<T> y_mod = y(r_sp);
+    casadi_math<T>::fun(op,getPtr(x_mod.data()),getPtr(y_mod.data()),getPtr(r.data()),r_sp.size());
   }
+
+  // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
+  if(!r.dense() && !operation_checker<F00Checker>(op)){
+    // Get the value for the structural zeros
+    T fcn_0;
+    casadi_math<T>::fun(op,casadi_limits<T>::zero,casadi_limits<T>::zero,fcn_0);
+    r.makeDense(r.size1(),r.size2(),fcn_0);
+  }
+  
+  return r;
 }
 
 template<class T>

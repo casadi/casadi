@@ -284,12 +284,28 @@ namespace CasADi{
     return (*this)->transpose();
   }
 
-  CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
-    return (*this)->patternUnion(y, mapping, f00_is_zero, f0x_is_zero, fx0_is_zero);
+  CRSSparsity CRSSparsity::patternCombine(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero, vector<unsigned char>& mapping) const{
+    return (*this)->patternCombine(y, f0x_is_zero, fx0_is_zero, mapping);
+  }
+
+  CRSSparsity CRSSparsity::patternCombine(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero) const{
+    return (*this)->patternCombine(y, f0x_is_zero, fx0_is_zero);
+  }
+
+  CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y, vector<unsigned char>& mapping) const{
+    return (*this)->patternCombine(y, false, false, mapping);
+  }
+
+  CRSSparsity CRSSparsity::patternUnion(const CRSSparsity& y) const{
+    return (*this)->patternCombine(y, false, false);
   }
 
   CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y, vector<unsigned char>& mapping) const{
-    return (*this)->patternUnion(y, mapping, true, true, true);
+    return (*this)->patternCombine(y, true, true, mapping);
+  }
+
+  CRSSparsity CRSSparsity::patternIntersection(const CRSSparsity& y) const{
+    return (*this)->patternCombine(y, true, true);
   }
 
   CRSSparsity CRSSparsity::patternProduct(const CRSSparsity& y_trans) const{

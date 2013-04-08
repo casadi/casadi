@@ -135,7 +135,7 @@ namespace CasADi{
     CRSSparsity reshape(int n, int m) const;
 
     /// Pattern union
-    //CRSSparsity patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const;
+    //CRSSparsity patternCombine(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const;
 
     /// Number of structural non-zeros
     int size() const;
@@ -164,14 +164,23 @@ namespace CasADi{
     /// Get the dimension as a string
     std::string dimString() const;
 
-     /// Sparsity pattern for a matrix-matrix product (details in public class)
+    //@{
+    /// Sparsity pattern for a matrix-matrix product (details in public class)
     CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
-
-     /// Sparsity pattern for a matrix-matrix product (details in public class)
     CRSSparsity patternProduct(const CRSSparsity& y_trans) const;
-
+    //@}
+    
+    //@{
     /// Union of two sparsity patterns
-    CRSSparsity patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero=true, bool f0x_is_zero=false, bool fx0_is_zero=false) const;
+    CRSSparsity patternCombine(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
+    CRSSparsity patternCombine(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
+
+    template<bool with_mapping>
+    CRSSparsity patternCombineGen1(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
+
+    template<bool with_mapping, bool f0x_is_zero, bool fx0_is_zero>
+    CRSSparsity patternCombineGen(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;
+    //@}
 
     /// Check if two sparsity patterns are the same
     bool isEqual(const CRSSparsity& y) const;

@@ -344,6 +344,7 @@ void SXFunctionInternal::print(ostream &stream) const{
 
   void SXFunctionInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const{
     // Add auxiliaries. TODO: Only add the auxiliaries that are actually used
+    gen.addAuxiliary(CodeGenerator::AUX_SQUARE);
     gen.addAuxiliary(CodeGenerator::AUX_SIGN);
     
     // Call the base class

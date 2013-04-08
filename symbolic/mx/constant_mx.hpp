@@ -190,7 +190,7 @@ namespace CasADi{
     }
 
     /// Get densification
-    virtual MX getDensification(const CRSSparsity& sp) const;
+    virtual MX getSetSparse(const CRSSparsity& sp) const;
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
@@ -262,11 +262,11 @@ namespace CasADi{
   }  
 
   template<typename Value>
-  MX Constant<Value>::getDensification(const CRSSparsity& sp) const{
+  MX Constant<Value>::getSetSparse(const CRSSparsity& sp) const{
     if(isZero()){
       return MX::create(new Constant<Value>(sp,v_));
     } else {
-      return MXNode::getDensification(sp);
+      return MXNode::getSetSparse(sp);
     }
   }
 

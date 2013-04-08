@@ -101,6 +101,12 @@ namespace CasADi{
     /** \brief Check if identity matrix */
     virtual bool isIdentity() const{ return false;}
 
+    /** \brief Check if unary operation */
+    virtual bool isUnaryOp() const { return false;}
+
+    /** \brief Check if binary operation */
+    virtual bool isBinaryOp() const { return false;}
+
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
     
@@ -287,8 +293,8 @@ namespace CasADi{
     /// Get submatrix assignment
     virtual MX getSubAssign(const MX& y, const Slice& i, const Slice& j) const;    
 
-    /// Get densification
-    virtual MX getDensification(const CRSSparsity& sp) const;
+    /// Create set sparse
+    virtual MX getSetSparse(const CRSSparsity& sp) const;
     
     /// Get a unary operation
     virtual MX getUnary(int op) const;

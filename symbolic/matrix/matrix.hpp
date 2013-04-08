@@ -446,9 +446,6 @@ namespace CasADi{
     static Matrix<T> matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &y);
     //@}
   
-    /// Perform binary operation without memory allocation
-    static void binary_no_alloc(void (*fcn)(unsigned char op, const T&, const T&, T&), unsigned char op, const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& r, const std::vector<unsigned char>& mapping);
-
     //@{
     /// Elementwise operations -- Octave/Python naming
     Matrix<T> __add__(const Matrix<T> &y) const;

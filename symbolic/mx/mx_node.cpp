@@ -33,7 +33,7 @@
 #include "subassign.hpp"
 #include "getnonzeros.hpp"
 #include "setnonzeros.hpp"
-#include "densification.hpp"
+#include "set_sparse.hpp"
 #include "solve.hpp"
 #include "unary_mx.hpp"
 #include "binary_mx.hpp"
@@ -43,6 +43,7 @@
 #include "setnonzeros_impl.hpp"
 #include "multiplication_impl.hpp"
 #include "solve_impl.hpp"
+#include "binary_mx_impl.hpp"
 
 using namespace std;
 
@@ -386,10 +387,9 @@ namespace CasADi{
     }
   }
 
-  MX MXNode::getDensification(const CRSSparsity& sp) const{
-    return MX::create(new Densification(shared_from_this<MX>(),sp));
+  MX MXNode::getSetSparse(const CRSSparsity& sp) const{
+    return MX::create(new SetSparse(shared_from_this<MX>(),sp));
   }
-
   
   MX MXNode::getSubRef(const Slice& i, const Slice& j) const{
     return MX::create(new SubRef(shared_from_this<MX>(),i,j));
@@ -428,16 +428,30 @@ namespace CasADi{
       return getMatrixMatrix(op,y);
   }
 
-  MX MXNode::getMatrixMatrix(int op, const MX& y) const{
-    // Check if we can carry out the operation only on the nonzeros
-    if((sparsity().dense() && y.dense()) ||
-       (operation_checker<F00Checker>(op) && sparsity()==y.sparsity())){
-      // Loop over nonzeros only
-      return MX::create(new NonzerosNonzerosOp(Operation(op),shared_from_this<MX>(),y)); 
-    } else {
-      // Sparse matrix-matrix operation necessary
-      return MX::create(new SparseSparseOp(Operation(op),shared_from_this<MX>(),y)); 
+  MX MXNode::getMatrixMatrix(int op, const MX& y) const{    
+    casadi_assert_message(sparsity().shape() == y.sparsity().shape(), "Dimension mismatch.");
+    
+    // Get the sparsity pattern of the result (ignoring structural zeros giving rise to nonzero result)
+    const CRSSparsity& x_sp = sparsity();
+    const CRSSparsity& y_sp = y.sparsity();
+    CRSSparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op));
+    
+    // Project sparsities
+    MX xx = shared_from_this<MX>().setSparse(r_sp);
+    MX yy = y.setSparse(r_sp);
+    
+    // Loop over nonzeros only
+    MX rr = MX::create(new BinaryMX<false,false>(Operation(op),xx,yy)); 
+
+    // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
+    if(!rr.dense() && !operation_checker<F00Checker>(op)){
+      // Get the value for the structural zeros
+      double fcn_0;
+      casadi_math<double>::fun(op,0,0,fcn_0);
+      rr = rr.makeDense(fcn_0);
     }
+    
+    return rr;
   }
 
   MX MXNode::getScalarMatrix(int op, const MX& y) const{
@@ -448,7 +462,7 @@ namespace CasADi{
       // Check if it is ok to loop over nonzeros only
       if(y.dense() || operation_checker<FX0Checker>(op)){
 	// Loop over nonzeros
-	return MX::create(new ScalarNonzerosOp(Operation(op),shared_from_this<MX>(),y));
+	return MX::create(new BinaryMX<true,false>(Operation(op),shared_from_this<MX>(),y));
       } else {
 	// Put a densification node in between
 	return getScalarMatrix(op,densify(y));
@@ -465,7 +479,7 @@ namespace CasADi{
       // Check if it is ok to loop over nonzeros only
       if(sparsity().dense() || operation_checker<F0XChecker>(op)){
 	// Loop over nonzeros
-	return MX::create(new NonzerosScalarOp(Operation(op),shared_from_this<MX>(),y));
+	return MX::create(new BinaryMX<false,true>(Operation(op),shared_from_this<MX>(),y));
       } else {
 	// Put a densification node in between
 	return densify(shared_from_this<MX>())->getMatrixScalar(op,y);
