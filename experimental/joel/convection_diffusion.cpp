@@ -199,10 +199,10 @@ int main(){
   simulator.init();
   
   // Initial condition
-  simulator.setInput(ocp.x_init,INTEGRATOR_X0);
+  simulator.setInput(ocp.x_init,"x0");
 
   // Pass parameters
-  simulator.setInput(ocp.u_init,INTEGRATOR_P);
+  simulator.setInput(ocp.u_init,"p");
   
   // Simulate
   simulator.evaluate();
@@ -396,20 +396,20 @@ int main(){
   solver.init();
 
   // Bounds on x and initial guess
-  solver.setInput(vars_lb,NLP_LBX);
-  solver.setInput(vars_ub,NLP_UBX);
-  solver.setInput(vars_sol,NLP_X_INIT);
+  solver.setInput(vars_lb,"lbx");
+  solver.setInput(vars_ub,"ubx");
+  solver.setInput(vars_sol,"x_init");
   
   // Bounds on the constraints
-  solver.setInput(lbg,NLP_LBG);
-  solver.setInput(ubg,NLP_UBG);
+  solver.setInput(lbg,"lbg");
+  solver.setInput(ubg,"ubg");
   
   // Solve the problem
   solver.solve();
 
   // Print the optimal cost
   double cost;
-  solver.getOutput(cost,NLP_COST);
+  solver.getOutput(cost,"cost");
   cout << "optimal cost: " << cost << endl;
 
   // ----
@@ -429,7 +429,7 @@ int main(){
   resfile.open ("results_convection_diffusion.txt");
 
   // Get the solution
-  solver.getOutput(vars_sol,NLP_X_OPT);
+  solver.getOutput(vars_sol,"x_opt");
   resfile << "T_opt " << vars_sol << endl;
   
   // Save optimal solution to disk

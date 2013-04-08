@@ -209,11 +209,11 @@ int main(){
       nlp_solver.init();
 
       // Initial guess and bounds
-      nlp_solver.setInput(u_min,NLP_LBX);
-      nlp_solver.setInput(u_max,NLP_UBX);
-      nlp_solver.setInput(u_init,NLP_X_INIT);
-      nlp_solver.setInput(g_min,NLP_LBG);
-      nlp_solver.setInput(g_max,NLP_UBG);
+      nlp_solver.setInput(u_min,"lbx");
+      nlp_solver.setInput(u_max,"ubx");
+      nlp_solver.setInput(u_init,"x_init");
+      nlp_solver.setInput(g_min,"lbg");
+      nlp_solver.setInput(g_max,"ubg");
 
       // Solve the problem
       nlp_solver.solve();
