@@ -210,7 +210,7 @@ public:
   
   // QP
   DMatrix qpH_, qpA_;
-  std::vector<double> qpG_, qpB_;
+  std::vector<double> qpB_;
 
   // Hessian times a step
   std::vector<double> qpH_times_du_;

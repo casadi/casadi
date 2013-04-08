@@ -207,19 +207,15 @@ void SCPgenInternal::init(){
   g_lb_.resize(ng_,-numeric_limits<double>::infinity());
   g_ub_.resize(ng_, numeric_limits<double>::infinity());
   g_.resize(ng_, numeric_limits<double>::quiet_NaN());
-  if(!gauss_newton_){
-    g_lam_.resize(ng_,0);
-    g_dlam_.resize(ng_,0);
-  }
+  g_lam_.resize(ng_,0);
+  g_dlam_.resize(ng_,0);
   qpH_times_du_.resize(nx_);
  
   x_init_.resize(nx_,0);
   x_opt_.resize(nx_,0);
   x_step_.resize(nx_,0);
-  if(!gauss_newton_){
-    x_lam_.resize(nx_,0);
-    x_dlam_.resize(nx_,0);
-  }
+  x_lam_.resize(nx_,0);
+  x_dlam_.resize(nx_,0);
 
   for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
     it->init.resize(it->n,0);
@@ -581,7 +577,6 @@ void SCPgenInternal::init(){
   CRSSparsity sp_tr_B_obj = mat_fcn_.output(mat_hes_).sparsity().transpose();
   qpH_ = DMatrix(sp_tr_B_obj.patternProduct(sp_tr_B_obj));
   qpA_ = mat_fcn_.output(mat_jac_);
-  qpG_.resize(nx_);
   qpB_.resize(ng_);
 
   // Allocate a QP solver
@@ -688,11 +683,11 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   }
 
   // Reset dual guess
+  fill(g_lam_.begin(),g_lam_.end(),0);
+  fill(g_dlam_.begin(),g_dlam_.end(),0);    
+  fill(x_lam_.begin(),x_lam_.end(),0);
+  fill(x_dlam_.begin(),x_dlam_.end(),0);
   if(!gauss_newton_){
-    fill(g_lam_.begin(),g_lam_.end(),0);
-    fill(g_dlam_.begin(),g_dlam_.end(),0);    
-    fill(x_lam_.begin(),x_lam_.end(),0);
-    fill(x_dlam_.begin(),x_dlam_.end(),0);
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       fill(it->lam.begin(),it->lam.end(),0);
       fill(it->dlam.begin(),it->dlam.end(),0);
@@ -738,7 +733,10 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
 
   // MAIN OPTIMZATION LOOP
   while(true){
-    
+
+    // Evaluate the vectors in the condensed QP
+    eval_vec();
+
     // Evaluate the matrices in the condensed QP
     eval_mat();
 
@@ -781,10 +779,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     
     // Start a new iteration
     iter++;
-    
-    // Evaluate the vectors in the condensed QP
-    eval_vec();
-    
+        
     // Regularize the QP
     if(regularize_){
       regularize();
@@ -809,10 +804,8 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   // Save results to outputs
   output(NLP_COST).set(f_);
   output(NLP_X_OPT).set(x_opt_);
-  if(!gauss_newton_){
-    output(NLP_LAMBDA_G).set(g_lam_);
-    output(NLP_LAMBDA_X).set(x_lam_);
-  }
+  output(NLP_LAMBDA_G).set(g_lam_);
+  output(NLP_LAMBDA_X).set(x_lam_);
   output(NLP_G).set(g_);
   
   // Write timers
@@ -911,8 +904,6 @@ double SCPgenInternal::primalInfeasibility(){
 }  
 
 double SCPgenInternal::dualInfeasibility(){
-  // Not implemented for Gauss-Newton
-  if(gauss_newton_) return 0;
 
   // L1-norm of the dual infeasibility
   double du_inf = 0;
@@ -949,18 +940,10 @@ void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, 
   stream << setw(14) << setprecision(6) << obj;
   stream << setw(11) << setprecision(2) << pr_inf;
   stream << setw(11);
-  if(gauss_newton_){
-    stream << "-";
-  } else {
-    stream << setprecision(2) << du_inf;
-  }
+  stream << setprecision(2) << du_inf;
   stream << setw(11) << setprecision(2) << pr_step_;
   stream << setw(11);
-  if(gauss_newton_){
-    stream << "-";
-  } else {
-    stream << setprecision(2) << du_step_;
-  }
+  stream << setprecision(2) << du_step_;
   stream << fixed;
   if(rg>0){
     stream << setw(8) << setprecision(2) << log10(rg);
@@ -1012,23 +995,28 @@ void SCPgenInternal::eval_mat(){
   // Get the Jacobian
   mat_fcn_.getOutput(qpA_,mat_jac_);
 
-  // Get the Hessian
   if(gauss_newton_){
+    // Gauss-Newton Hessian
     const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
     fill(qpH_.begin(),qpH_.end(),0);
     DMatrix::mul_no_alloc_tn(B_obj,B_obj,qpH_);
-  } else {
-    mat_fcn_.getOutput(qpH_,mat_hes_);
 
-    // Calculate the gradient of the lagrangian
-    const vector<double> &qpA_data = qpA_.data();
-    const vector<int> &qpA_rowind = qpA_.rowind();
-    const vector<int> &qpA_col = qpA_.col();
-    for(int i=0; i<nx_; ++i)  gL_[i] = gf_[i] + x_lam_[i];
-    for(int i=0; i<ng_; ++i){
-      for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
-	gL_[qpA_col[el]] += qpA_data[el]*g_lam_[i];
-      }
+    // Gradient of the objective in Gauss-Newton
+    fill(gf_.begin(),gf_.end(),0);
+    DMatrix::mul_no_alloc_tn(B_obj,b_gn_,gf_);
+  } else {
+    // Exact Hessian
+    mat_fcn_.getOutput(qpH_,mat_hes_);
+  }
+
+  // Calculate the gradient of the lagrangian
+  const vector<double> &qpA_data = qpA_.data();
+  const vector<int> &qpA_rowind = qpA_.rowind();
+  const vector<int> &qpA_col = qpA_.col();
+  for(int i=0; i<nx_; ++i)  gL_[i] = gf_[i] + x_lam_[i];
+  for(int i=0; i<ng_; ++i){
+    for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
+      gL_[qpA_col[el]] += qpA_data[el]*g_lam_[i];
     }
   }
 
@@ -1118,12 +1106,8 @@ void SCPgenInternal::eval_vec(){
   // Gradient of the objective in the reduced QP
   if(gauss_newton_){
     transform(b_gn_.begin(),b_gn_.end(),vec_fcn_.output(vec_gf_).begin(),b_gn_.begin(),std::minus<double>());
-    const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
-    fill(qpG_.begin(),qpG_.end(),0);
-    DMatrix::mul_no_alloc_tn(B_obj,b_gn_,qpG_);
   } else {
     transform(gf_.begin(),gf_.end(),vec_fcn_.output(vec_gf_).begin(),gf_.begin(),std::minus<double>());
-    copy(gf_.begin(),gf_.end(),qpG_.begin());
   }
   
   double time2 = clock();
@@ -1166,7 +1150,7 @@ void SCPgenInternal::solve_qp(){
 
   // Solve the QP
   qp_solver_.setInput(qpH_,QP_H);
-  qp_solver_.setInput(qpG_,QP_G);
+  qp_solver_.setInput(gf_,QP_G);
   qp_solver_.setInput(qpA_,QP_A);
   std::transform(x_lb_.begin(),x_lb_.end(), x_opt_.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
   std::transform(x_ub_.begin(),x_ub_.end(), x_opt_.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>()); 
@@ -1179,18 +1163,15 @@ void SCPgenInternal::solve_qp(){
   const DMatrix& du = qp_solver_.output(QP_PRIMAL);
   copy(du.begin(),du.end(),x_step_.begin());
   
-  if(!gauss_newton_){
+  // Condensed dual step (simple bounds)
+  const DMatrix& lam_x_new = qp_solver_.output(QP_LAMBDA_X);
+  copy(lam_x_new.begin(),lam_x_new.end(),x_dlam_.begin());
+  std::transform(x_dlam_.begin(),x_dlam_.end(),x_lam_.begin(),x_dlam_.begin(),std::minus<double>());
 
-    // Condensed dual step (simple bounds)
-    const DMatrix& lam_x_new = qp_solver_.output(QP_LAMBDA_X);
-    copy(lam_x_new.begin(),lam_x_new.end(),x_dlam_.begin());
-    std::transform(x_dlam_.begin(),x_dlam_.end(),x_lam_.begin(),x_dlam_.begin(),std::minus<double>());
-
-    // Condensed dual step (nonlinear bounds)
-    const DMatrix& lam_g_new = qp_solver_.output(QP_LAMBDA_A);
-    copy(lam_g_new.begin(),lam_g_new.end(),g_dlam_.begin());
-    std::transform(g_dlam_.begin(),g_dlam_.end(),g_lam_.begin(),g_dlam_.begin(),std::minus<double>());
-  }
+  // Condensed dual step (nonlinear bounds)
+  const DMatrix& lam_g_new = qp_solver_.output(QP_LAMBDA_A);
+  copy(lam_g_new.begin(),lam_g_new.end(),g_dlam_.begin());
+  std::transform(g_dlam_.begin(),g_dlam_.end(),g_lam_.begin(),g_dlam_.begin(),std::minus<double>());
 
   double time2 = clock();
   t_solve_qp_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -1216,7 +1197,7 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
 
   // Right-hand side of Armijo condition
   double F_sens = 0;
-  for(int i=0; i<nx_; ++i) F_sens += x_step_[i] * qpG_[i];
+  for(int i=0; i<nx_; ++i) F_sens += x_step_[i] * gf_[i];
   double L1dir = F_sens - sigma_ * l1_infeas;
   double L1merit = f_ + sigma_ * l1_infeas;
   
@@ -1248,9 +1229,9 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
     }
     
     // Take the dual step
+    for(int i=0; i<ng_; ++i) 	g_lam_[i] += (t-t_prev) * g_dlam_[i];
+    for(int i=0; i<nx_; ++i)  x_lam_[i] += (t-t_prev) * x_dlam_[i];
     if(!gauss_newton_){
-      for(int i=0; i<ng_; ++i) 	g_lam_[i] += (t-t_prev) * g_dlam_[i];
-      for(int i=0; i<nx_; ++i)  x_lam_[i] += (t-t_prev) * x_dlam_[i];
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
 	for(int i=0; i<it->n; ++i) it->lam[i] += (t-t_prev) * it->dlam[i];
       }
@@ -1294,18 +1275,16 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
   pr_step_ *= t;
 
   // Calculate the dual step-size
-  if(!gauss_newton_){
-    du_step_ = 0;
-    for(vector<double>::const_iterator i=g_dlam_.begin(); i!=g_dlam_.end(); ++i){
-      du_step_ += fabs(*i);
-    }
-
-    for(vector<double>::const_iterator i=x_dlam_.begin(); i!=x_dlam_.end(); ++i) du_step_ += fabs(*i);
-    for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-      for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i) du_step_ += fabs(*i);
-    }
-    du_step_ *= t;
+  du_step_ = 0;
+  for(vector<double>::const_iterator i=g_dlam_.begin(); i!=g_dlam_.end(); ++i){
+    du_step_ += fabs(*i);
   }
+  
+  for(vector<double>::const_iterator i=x_dlam_.begin(); i!=x_dlam_.end(); ++i) du_step_ += fabs(*i);
+  for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+    for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i) du_step_ += fabs(*i);
+  }
+  du_step_ *= t;
 }
 
 void SCPgenInternal::eval_exp(){
