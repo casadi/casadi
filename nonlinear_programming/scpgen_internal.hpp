@@ -142,7 +142,7 @@ public:
 
   /// Quadratic approximation
   FX vec_fcn_;
-  int vec_b_obj_, vec_b_g_;
+  int vec_gf_, vec_g_;
 
   /// Step expansion
   FX exp_fcn_;
@@ -151,7 +151,8 @@ public:
   int ngL_;
 
   // Objective value
-  double obj_k_;
+  double f_;
+  std::vector<double> gf_;
 
   // Nonlifted variables with bound
   std::vector<double> x_lb_, x_ub_, x_init_, x_opt_, x_step_, x_lam_, x_dlam_;
@@ -165,11 +166,11 @@ public:
 
   // Residual function io indices
   int res_x_, res_p_, res_x_lam_, res_g_lam_, res_p_lam_, res_p_d_;
-  int res_obj_, res_gl_, res_g_;
+  int res_f_, res_gl_, res_g_;
 
   // Modifier function io indices
   int mod_x_, mod_p_, mod_x_lam_, mod_g_lam_;
-  int mod_obj_, mod_gl_, mod_g_;
+  int mod_f_, mod_gl_, mod_g_;
   int mod_du_, mod_dlam_g_;
 
   struct Var{

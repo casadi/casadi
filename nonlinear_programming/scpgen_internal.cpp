@@ -235,7 +235,7 @@ void SCPgenInternal::init(){
   merit_mem_.resize(merit_memsize_);
 
   // Scalar objective function
-  MX obj;
+  MX f;
 
   // Multipliers
   MX g_lam, x_lam;
@@ -245,13 +245,13 @@ void SCPgenInternal::init(){
 
   if(gauss_newton_){    
     // Least square objective
-    obj = inner_prod(vdef_out[0],vdef_out[0])/2;
+    f = inner_prod(vdef_out[0],vdef_out[0])/2;
     gL_defL = vdef_out[0];
     ngL_ = gL_defL.size();
 
   } else {
     // Scalar objective function
-    obj = vdef_out[0];
+    f = vdef_out[0];
     
     // Lagrange multipliers for the simple bounds on u and Lagrange multipliers corresponding to the definition of the dependent variables
     x_lam = msym("x_lam",x_.sparsity());
@@ -302,6 +302,7 @@ void SCPgenInternal::init(){
     }
   }
   gL_.resize(ngL_, numeric_limits<double>::quiet_NaN());
+  gf_.resize(nx_, numeric_limits<double>::quiet_NaN());
 
   // Residual function
 
@@ -324,7 +325,7 @@ void SCPgenInternal::init(){
   // Outputs
   vector<MX> res_fcn_out;
   n=0;
-  res_fcn_out.push_back(obj);                            res_obj_ = n++;
+  res_fcn_out.push_back(f);                              res_f_ = n++;
   res_fcn_out.push_back(gL_defL);                        res_gl_ = n++;
   res_fcn_out.push_back(vdef_out[1]);                    res_g_ = n++;
   res_fcn_out.push_back(p_defL);                         res_p_d_ = n++;
@@ -389,7 +390,7 @@ void SCPgenInternal::init(){
   }
 
   vector<MX> ex(4);
-  ex[0] = obj;
+  ex[0] = f;
   ex[1] = vdef_out[1];
   ex[2] = gL_defL;
   ex[3] = p_defL;
@@ -405,7 +406,7 @@ void SCPgenInternal::init(){
     }
   }
 
-  MX obj_z = ex[0];
+  MX f_z = ex[0];
   MX g_z = ex[1];
   MX gL_z = ex[2];
   MX p_z = ex[3];
@@ -436,7 +437,7 @@ void SCPgenInternal::init(){
 
   // Add gradient of the Lagrangian
   n = mfcn_out.size();
-  mfcn_out.push_back(obj_z);                           mod_obj_ = n++;
+  mfcn_out.push_back(f_z);                             mod_f_ = n++;
   mfcn_out.push_back(gL_z);                            mod_gl_ = n++;  
   
   // Lagrangian gradient function
@@ -494,18 +495,18 @@ void SCPgenInternal::init(){
   mfcn.eval(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens,true);
   
   // Vector(s) b in Lifted Newton
-  MX b_obj = mfcn_fwdSens[0][mod_gl_];
+  MX b_gf = mfcn_fwdSens[0][mod_gl_];
   MX b_g = mfcn_fwdSens[0][mod_g_];
   
   // Make sure that the vectors are dense
-  makeDense(b_obj);
+  makeDense(b_gf);
   makeDense(b_g);
   
   // Tangent function
   vector<MX> vec_fcn_out;
   n=0;
-  vec_fcn_out.push_back(b_obj);                             vec_b_obj_ = n++;
-  vec_fcn_out.push_back(b_g);                               vec_b_g_ = n++;  
+  vec_fcn_out.push_back(b_gf);                              vec_gf_ = n++;
+  vec_fcn_out.push_back(b_g);                               vec_g_ = n++;  
   casadi_assert(n==vec_fcn_out.size());
   
   MXFunction vec_fcn(mfcn_in,vec_fcn_out);
@@ -706,7 +707,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   }
   
   // Objective value
-  obj_k_ = numeric_limits<double>::quiet_NaN();
+  f_ = numeric_limits<double>::quiet_NaN();
 
   // Reset line-search
   fill(merit_mem_.begin(),merit_mem_.end(),0.0);
@@ -745,6 +746,9 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   // MAIN OPTIMZATION LOOP
   while(true){
     
+    // Evaluate the matrices in the condensed QP
+    eval_mat();
+
     // 1-norm of the primal infeasibility
     double pr_inf = primalInfeasibility();
     
@@ -755,7 +759,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     if(iter % 10 == 0) printIteration(cout);
     
     // Printing information about the actual iterate
-    printIteration(cout,iter,obj_k_,pr_inf,du_inf,reg_,ls_iter,ls_success);
+    printIteration(cout,iter,f_,pr_inf,du_inf,reg_,ls_iter,ls_success);
 
     // Checking convergence criteria
     bool converged = pr_inf <= tol_pr_ && pr_step_ <= tol_pr_step_ && reg_ <= tol_reg_;
@@ -777,7 +781,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     }
 
     // Check if not-a-number
-    if(obj_k_!=obj_k_ || pr_step_ != pr_step_ || pr_inf != pr_inf){
+    if(f_!=f_ || pr_step_ != pr_step_ || pr_inf != pr_inf){
       cout << "CasADi::SCPgen: Aborted, nan detected" << endl;
       break;
     }
@@ -785,9 +789,6 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     // Start a new iteration
     iter++;
     
-    // Evaluate the matrices in the condensed QP
-    eval_mat();
-
     // Evaluate the vectors in the condensed QP
     eval_vec();
     
@@ -810,10 +811,10 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   t_mainloop_ = double(time2-time1)/CLOCKS_PER_SEC;
   
   // Store optimal value
-  cout << "optimal cost = " << obj_k_ << endl;
+  cout << "optimal cost = " << f_ << endl;
 
   // Save results to outputs
-  output(NLP_COST).set(obj_k_);
+  output(NLP_COST).set(f_);
   output(NLP_X_OPT).set(x_opt_);
   if(!gauss_newton_){
     output(NLP_LAMBDA_G).set(g_lam_);
@@ -1058,7 +1059,7 @@ void SCPgenInternal::eval_res(){
   res_fcn_.evaluate();
 
   // Get objective
-  obj_k_ = res_fcn_.output(res_obj_).toScalar();
+  f_ = res_fcn_.output(res_f_).toScalar();
 
   // Get objective gradient
   res_fcn_.getOutput(gL_,res_gl_);
@@ -1107,8 +1108,8 @@ void SCPgenInternal::eval_vec(){
   vec_fcn_.evaluate();
 
   // Get condensed vectors
-  transform(g_.begin(),g_.end(),vec_fcn_.output(vec_b_g_).begin(),qpB_.begin(),std::minus<double>());
-  transform(gL_.begin(),gL_.end(),vec_fcn_.output(vec_b_obj_).begin(),gL_.begin(),std::minus<double>());
+  transform(g_.begin(),g_.end(),vec_fcn_.output(vec_g_).begin(),qpB_.begin(),std::minus<double>());
+  transform(gL_.begin(),gL_.end(),vec_fcn_.output(vec_gf_).begin(),gL_.begin(),std::minus<double>());
 
   // Get the objective function terms in the QP
   if(gauss_newton_){
@@ -1229,7 +1230,7 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
   double F_sens = 0;
   for(int i=0; i<nx_; ++i) F_sens += x_step_[i] * qpG_[i];
   double L1dir = F_sens - sigma_ * l1_infeas;
-  double L1merit = obj_k_ + sigma_ * l1_infeas;
+  double L1merit = f_ + sigma_ * l1_infeas;
   
   // Storing the actual merit function value in a list
   merit_mem_[merit_ind_] = L1merit;
@@ -1273,7 +1274,7 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
     
     // Calculating merit-function in candidate
     l1_infeas = primalInfeasibility();
-    L1merit_cand = obj_k_ + sigma_ * l1_infeas;
+    L1merit_cand = f_ + sigma_ * l1_infeas;
     
     // Calculating maximal merit function value so far
     double meritmax = *max_element(merit_mem_.begin(), merit_mem_.end());
