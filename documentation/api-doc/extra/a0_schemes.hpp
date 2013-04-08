@@ -383,6 +383,20 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
+/** \class CasADi::WorhpInternal
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
+/** \class CasADi::WorhpSolver
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
 /** \class CasADi::SimulatorInternal
 \n
 \par
@@ -710,18 +724,4 @@
 @copydoc scheme_OCPInput
 <br/>
 @copydoc scheme_OCPOutput
-*/
-/** \class CasADi::WorhpInternal
-\n
-\par
-@copydoc scheme_NLPInput
-<br/>
-@copydoc scheme_NLPOutput
-*/
-/** \class CasADi::WorhpSolver
-\n
-\par
-@copydoc scheme_NLPInput
-<br/>
-@copydoc scheme_NLPOutput
 */
