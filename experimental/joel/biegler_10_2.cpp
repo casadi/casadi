@@ -381,26 +381,26 @@ int main(){
   solver.init();
   
   // Initial condition
-  solver.setInput(vars_sol,NLP_X_INIT);
+  solver.setInput(vars_sol,"x_init");
 
   // Bounds on x
-  solver.setInput(vars_lb,NLP_LBX);
-  solver.setInput(vars_ub,NLP_UBX);
+  solver.setInput(vars_lb,"lbx");
+  solver.setInput(vars_ub,"ubx");
 
   // Bounds on g
-  solver.setInput(lbg,NLP_LBG);
-  solver.setInput(ubg,NLP_UBG);
+  solver.setInput(lbg,"lbg");
+  solver.setInput(ubg,"ubg");
 
   // Solve the problem
   solver.solve();
 
   // Print the optimal cost
   double cost;
-  solver.getOutput(cost,NLP_COST);
+  solver.getOutput(cost,"cost");
   cout << "optimal cost: " << cost << endl;
 
   // Get the solution
-  solver.getOutput(vars_sol,NLP_X_OPT);
+  solver.getOutput(vars_sol,"x_opt");
 
   // ----
   // SAVE SOLUTION TO DISK

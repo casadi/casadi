@@ -282,9 +282,9 @@ void GslInternal::rhs(double t, const double y[], double f[]) {
   // Get time
   time1 = clock();
   
-  f_.setInput(t,DAE_T);
-  f_.setInput(y,DAE_Y);
-  f_.setInput(f_.input(DAE_P),DAE_P);
+  f_.setInput(t,"t");
+  f_.setInput(y,"y");
+  f_.setInput(f_.input(DAE_P),"p");
   
   f_.evaluate();
   
@@ -314,14 +314,14 @@ void GslInternal::jac(double t, const double y[], double *dfdy, double dfdt[]){
   time1 = clock();
 
   // Pass inputs to the jacobian function
-  jac_f_.setInput(t,DAE_T);
-  jac_f_.setInput(y,DAE_Y);
-  jac_f_.setInput(f_.input(DAE_P),DAE_P);
+  jac_f_.setInput(t,"t");
+  jac_f_.setInput(y,"y");
+  jac_f_.setInput(f_.input(DAE_P),"p");
 
   // Pass inputs to the jacobian function
-  dt_f_.setInput(t,DAE_T);
-  dt_f_.setInput(y,DAE_Y);
-  dt_f_.setInput(f_.input(DAE_P),DAE_P);
+  dt_f_.setInput(t,"t");
+  dt_f_.setInput(y,"y");
+  dt_f_.setInput(f_.input(DAE_P),"p");
   
   // Evaluate
   jac_f_.evaluate();
