@@ -121,34 +121,35 @@ for Integrators in (ODE_integrators,DAE_integrators):
     I.init()
 
     # Integrate to get results
-    I.setInput(x0,INTEGRATOR_X0)
-    I.setInput(u0,INTEGRATOR_P)
+    I.setInput(x0,"x0")
+    I.setInput(u0,"p")
     I.evaluate()
-    xf = deepcopy(I.output(INTEGRATOR_XF))
-    qf = deepcopy(I.output(INTEGRATOR_QF))
+    xf = deepcopy(I.output("xf"))
+    qf = deepcopy(I.output("qf"))
     print "%50s" % "Unperturbed solution:", "xf  = ", xf, ", qf  = ", qf
 
     # Perturb solution to get a finite difference approximation
     h = 0.001
-    I.setInput(u0+h,INTEGRATOR_P)
+    I.setInput(u0+h,"p")
     I.evaluate()
-    xf_pert = deepcopy(I.output(INTEGRATOR_XF))
-    qf_pert = deepcopy(I.output(INTEGRATOR_QF))
+    xf_pert = deepcopy(I.output("xf"))
+    qf_pert = deepcopy(I.output("qf"))
     print "%50s" % "Finite difference approximation:", "d(xf)/d(p) = ", (xf_pert-xf)/h, ", d(qf)/d(p) = ", (qf_pert-qf)/h
 
     # Operator overloading approach
-    I.setInput(x0,INTEGRATOR_X0)
-    I.setInput(u0,INTEGRATOR_P)
-    I.setFwdSeed(DMatrix.zeros(x.shape),INTEGRATOR_X0)
-    I.setFwdSeed(1.0,INTEGRATOR_P)
+    I.setInput(x0,"x0")
+    I.setInput(u0,"p")
+    I.setFwdSeed(DMatrix.zeros(x.shape),"x0")
+    I.setFwdSeed(1.0,"p")
     I.reset(1,0,0)
     I.integrate(tf)
-    oo_xf = deepcopy(I.fwdSens(INTEGRATOR_XF))
-    oo_qf = deepcopy(I.fwdSens(INTEGRATOR_QF))
+    oo_xf = deepcopy(I.fwdSens("xf"))
+    oo_qf = deepcopy(I.fwdSens("qf"))
     print "%50s" % "Forward sensitivities via OO:", "d(xf)/d(p) = ", oo_xf, ", d(qf)/d(p) = ", oo_qf
 
     # Calculate once, forward
     I_fwd = I.derivative(1,0)
+    
     I_fwd.setInput(x0,INTEGRATOR_X0)
     I_fwd.setInput(u0,INTEGRATOR_P)
     I_fwd.setInput(DMatrix.zeros(x.shape),INTEGRATOR_NUM_IN+INTEGRATOR_X0)

@@ -34,8 +34,6 @@ namespace CasADi{
 
 SDPSolverInternal::SDPSolverInternal() {
   
-  inputScheme_ = SCHEME_SDPInput;
-  outputScheme_ = SCHEME_SDPOutput;
 }
 
 
@@ -65,6 +63,9 @@ SDPSolverInternal::SDPSolverInternal(const CRSSparsity &C, const CRSSparsity &A)
     CRSSparsity s = input(SDP_A)(range(i*n_,(i+1)*n_),ALL).sparsity();
     casadi_assert_message(s==s.transpose(),"SDPSolverInternal: Each supplied Ai must be symmetric. But got " << s.dimString() <<  " for i = " << i << ".");
   }
+  
+  inputScheme_ = SCHEME_SDPInput;
+  outputScheme_ = SCHEME_SDPOutput;
 
 }
     

@@ -162,9 +162,9 @@ dx_ = [0,0,0,0,0]
 
 J = SXFunction
 
-dae.input(DAE_Y).set(x_)
-dae.input(DAE_YDOT).set(dx_)
-dae.input(DAE_P).set(p_)
+dae.input("y").set(x_)
+dae.input("ydot").set(dx_)
+dae.input("p").set(p_)
 
 dae.evaluate()
 print "res @ inital consitions: ", dae.output()
@@ -172,9 +172,9 @@ print "res @ inital consitions: ", dae.output()
 integr = IdasIntegrator(dae)
 #integr.setOption('is_differential',[1]*4 + [0])
 integr.init()
-integr.input(INTEGRATOR_X0).set(x_)
-integr.input(INTEGRATOR_P).set(p_)
-integr.input(INTEGRATOR_XP0).set(dx_)
+integr.input("x0").set(x_)
+integr.input("p").set(p_)
+integr.input("xp0").set(dx_)
 integr.evaluate()
 
 print integr.output()

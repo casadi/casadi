@@ -85,6 +85,15 @@ public:
   /** \brief  Multiple input, multiple output*/
   MXFunction(const std::vector<MX>& input, const std::vector<MX>& output);
 
+  /** \brief  Multiple input, multiple output*/
+  MXFunction(const std::vector<MX>& input, const IOSchemeVector< MX >& output);
+
+  /** \brief  Multiple input, multiple output*/
+  MXFunction(const IOSchemeVector< MX >& input, const std::vector<MX>& output);
+  
+  /** \brief  Multiple input, multiple output*/
+  MXFunction(const IOSchemeVector< MX >& input, const IOSchemeVector< MX >& output);
+  
   /** \brief  Access functions of the node */
   MXFunctionInternal* operator->();
 
@@ -93,9 +102,11 @@ public:
 
   /** \brief Get function input */
   const MX& inputExpr(int ind) const;
+  const MX& inputExpr(const std::string & iname) const { return inputExpr(inputSchemeEntry(iname)); }
   
   /** \brief Get function output */
   const MX& outputExpr(int ind) const;
+  const MX& outputExpr(const std::string & oname) const { return outputExpr(outputSchemeEntry(oname)); }
   
   /** \brief Get all function inputs */
   const std::vector<MX>& inputExpr() const;
@@ -120,11 +131,21 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
+  //@{
   /** \brief Jacobian via source code transformation */
   MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-
+  MX jac(const std::string & iname, int oind=0, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),oind,compact,symmetric); }
+  MX jac(int iind, const std::string & oname, bool compact=false, bool symmetric=false) { return jac(iind,outputSchemeEntry(oname),compact,symmetric); }
+  MX jac(const std::string & iname, const std::string & oname, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
+  //@}
+  
+  //@{
   /** \brief Gradient via source code transformation */
   MX grad(int iind=0, int oind=0);
+  MX grad(const std::string & iname, int oind=0) { return grad(inputSchemeEntry(iname),oind); }
+  MX grad(int iind, const std::string & oname) { return grad(iind,outputSchemeEntry(oname)); }
+  MX grad(const std::string & iname, const std::string & oname) { return grad(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+  //@}
   
   /** \brief Expand the matrix valued graph into a scalar valued graph */
   SXFunction expand(const std::vector<SXMatrix>& inputv = std::vector<SXMatrix>());

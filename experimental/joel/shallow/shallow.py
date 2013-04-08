@@ -212,10 +212,10 @@ nlp_solver.setOption("derivative_test","first-order")
 nlp_solver.init()
 
 # Set initial condition and bounds
-nlp_solver.setInput([drag0,depth0],NLP_X_INIT)
-#nlp_solver.setInput([2.0,0.01],NLP_X_INIT)
-#nlp_solver.setInput([0.5,0.01],NLP_X_INIT)
-nlp_solver.setInput([0,0],NLP_LBX)
+nlp_solver.setInput([drag0,depth0],"x_init")
+#nlp_solver.setInput([2.0,0.01],"x_init")
+#nlp_solver.setInput([0.5,0.01],"x_init")
+nlp_solver.setInput([0,0],"lbx")
 
 # Solve single shooting problem
 nlp_solver.evaluate()

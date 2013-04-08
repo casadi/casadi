@@ -28,7 +28,9 @@
 #include <utility>
 #include <map>
 #include "casadi_exception.hpp"
-namespace CasADi{
+namespace CasADi{ 
+template <class T>
+class IOSchemeVector;
 enum InputOutputScheme { SCHEME_ACADO_Input, SCHEME_ACADO_Output, SCHEME_ACADO_FCN_Input, SCHEME_ControlledDAEInput, SCHEME_ControlSimulatorInput, SCHEME_DAEInput, SCHEME_DAEOutput, SCHEME_RDAEInput, SCHEME_RDAEOutput, SCHEME_IntegratorInput, SCHEME_IntegratorOutput, SCHEME_NLPInput, SCHEME_NLPOutput, SCHEME_MayerInput, SCHEME_OCPInput, SCHEME_OCPOutput, SCHEME_QPInput, SCHEME_QPOutput, SCHEME_SDPInput, SCHEME_SDPOutput , SCHEME_unknown};
 std::string getSchemeEntryName(InputOutputScheme scheme, int i);
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);
@@ -43,7 +45,7 @@ std::string describeOutput(InputOutputScheme scheme, int i);
 /// 
 /// \copydoc scheme_ACADO_Input
 template<class M>
-std::vector<M> acadoIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M(),const std::string arg_s12="",M arg_m12=M(),const std::string arg_s13="",M arg_m13=M(),const std::string arg_s14="",M arg_m14=M(),const std::string arg_s15="",M arg_m15=M(),const std::string arg_s16="",M arg_m16=M()){
+IOSchemeVector<M> acadoIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M(),const std::string arg_s12="",M arg_m12=M(),const std::string arg_s13="",M arg_m13=M(),const std::string arg_s14="",M arg_m14=M(),const std::string arg_s15="",M arg_m15=M(),const std::string arg_s16="",M arg_m16=M()){
   std::vector<M> ret(17);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -70,14 +72,14 @@ std::vector<M> acadoIn(const std::string arg_s0="",M arg_m0=M(),const std::strin
       casadi_error("Keyword error in ACADO_Input: '" << it->first << "' is not recognized. Available keywords are: x_guess, u_guess, p_guess, lbx, ubx, lbx0, ubx0, lbxf, ubxf, lbu, ubu, lbp, ubp, lbc, ubc, lbr, ubr");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_ACADO_Input);
 }
 /// Helper function for 'ACADO_Output'
 /// Output arguments of an ACADO OCP solver
 /// 
 /// \copydoc scheme_ACADO_Output
 template<class M>
-std::vector<M> acadoOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+IOSchemeVector<M> acadoOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -91,14 +93,14 @@ std::vector<M> acadoOut(const std::string arg_s0="",M arg_m0=M(),const std::stri
       casadi_error("Keyword error in ACADO_Output: '" << it->first << "' is not recognized. Available keywords are: x_opt, u_opt, p_opt, cost");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_ACADO_Output);
 }
 /// Helper function for 'ACADO_FCN_Input'
 /// Input arguments of an ACADO function
 /// 
 /// \copydoc scheme_ACADO_FCN_Input
 template<class M>
-std::vector<M> acadofcnIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M()){
+IOSchemeVector<M> acadofcnIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M()){
   std::vector<M> ret(6);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -114,14 +116,14 @@ std::vector<M> acadofcnIn(const std::string arg_s0="",M arg_m0=M(),const std::st
       casadi_error("Keyword error in ACADO_FCN_Input: '" << it->first << "' is not recognized. Available keywords are: t, xd, xa, u, p, xdot");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_ACADO_FCN_Input);
 }
 /// Helper function for 'ControlledDAEInput'
 /// Input arguments of an ODE/DAE function
 /// 
 /// \copydoc scheme_ControlledDAEInput
 template<class M>
-std::vector<M> controldaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M()){
+IOSchemeVector<M> controldaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M()){
   std::vector<M> ret(9);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -140,14 +142,14 @@ std::vector<M> controldaeIn(const std::string arg_s0="",M arg_m0=M(),const std::
       casadi_error("Keyword error in ControlledDAEInput: '" << it->first << "' is not recognized. Available keywords are: t, x, z, p, u, u_interp, x_major, t0, tf");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_ControlledDAEInput);
 }
 /// Helper function for 'ControlSimulatorInput'
 /// Input arguments of a control simulator
 /// 
 /// \copydoc scheme_ControlSimulatorInput
 template<class M>
-std::vector<M> controlsimulatorIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+IOSchemeVector<M> controlsimulatorIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
   std::vector<M> ret(3);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -160,14 +162,14 @@ std::vector<M> controlsimulatorIn(const std::string arg_s0="",M arg_m0=M(),const
       casadi_error("Keyword error in ControlSimulatorInput: '" << it->first << "' is not recognized. Available keywords are: x0, p, u");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_ControlSimulatorInput);
 }
 /// Helper function for 'DAEInput'
 /// Input arguments of an ODE/DAE function
 /// 
 /// \copydoc scheme_DAEInput
 template<class M>
-std::vector<M> daeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+IOSchemeVector<M> daeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -181,14 +183,14 @@ std::vector<M> daeIn(const std::string arg_s0="",M arg_m0=M(),const std::string 
       casadi_error("Keyword error in DAEInput: '" << it->first << "' is not recognized. Available keywords are: x, z, p, t");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_DAEInput);
 }
 /// Helper function for 'DAEOutput'
 /// Output arguments of an DAE function
 /// 
 /// \copydoc scheme_DAEOutput
 template<class M>
-std::vector<M> daeOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+IOSchemeVector<M> daeOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
   std::vector<M> ret(3);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -201,14 +203,14 @@ std::vector<M> daeOut(const std::string arg_s0="",M arg_m0=M(),const std::string
       casadi_error("Keyword error in DAEOutput: '" << it->first << "' is not recognized. Available keywords are: ode, alg, quad");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_DAEOutput);
 }
 /// Helper function for 'RDAEInput'
 /// Input arguments of an ODE/DAE backward integration function
 /// 
 /// \copydoc scheme_RDAEInput
 template<class M>
-std::vector<M> rdaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M()){
+IOSchemeVector<M> rdaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M()){
   std::vector<M> ret(7);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -225,14 +227,14 @@ std::vector<M> rdaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string
       casadi_error("Keyword error in RDAEInput: '" << it->first << "' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_RDAEInput);
 }
 /// Helper function for 'RDAEOutput'
 /// Output arguments of an ODE/DAE backward integration function
 /// 
 /// \copydoc scheme_RDAEOutput
 template<class M>
-std::vector<M> rdaeOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+IOSchemeVector<M> rdaeOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
   std::vector<M> ret(3);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -245,14 +247,14 @@ std::vector<M> rdaeOut(const std::string arg_s0="",M arg_m0=M(),const std::strin
       casadi_error("Keyword error in RDAEOutput: '" << it->first << "' is not recognized. Available keywords are: ode, alg, quad");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_RDAEOutput);
 }
 /// Helper function for 'IntegratorInput'
 /// Input arguments of an integrator
 /// 
 /// \copydoc scheme_IntegratorInput
 template<class M>
-std::vector<M> integratorIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+IOSchemeVector<M> integratorIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -266,14 +268,14 @@ std::vector<M> integratorIn(const std::string arg_s0="",M arg_m0=M(),const std::
       casadi_error("Keyword error in IntegratorInput: '" << it->first << "' is not recognized. Available keywords are: x0, p, rx0, rp");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_IntegratorInput);
 }
 /// Helper function for 'IntegratorOutput'
 /// Output arguments of an integrator
 /// 
 /// \copydoc scheme_IntegratorOutput
 template<class M>
-std::vector<M> integratorOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+IOSchemeVector<M> integratorOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -287,14 +289,14 @@ std::vector<M> integratorOut(const std::string arg_s0="",M arg_m0=M(),const std:
       casadi_error("Keyword error in IntegratorOutput: '" << it->first << "' is not recognized. Available keywords are: xf, qf, rxf, rqf");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_IntegratorOutput);
 }
 /// Helper function for 'NLPInput'
 /// Input arguments of an NLP Solver
 /// 
 /// \copydoc scheme_NLPInput
 template<class M>
-std::vector<M> nlpsolverIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M()){
+IOSchemeVector<M> nlpsolverIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M()){
   std::vector<M> ret(7);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -311,14 +313,14 @@ std::vector<M> nlpsolverIn(const std::string arg_s0="",M arg_m0=M(),const std::s
       casadi_error("Keyword error in NLPInput: '" << it->first << "' is not recognized. Available keywords are: x_init, lbx, ubx, lbg, ubg, lambda_init, p");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_NLPInput);
 }
 /// Helper function for 'NLPOutput'
 /// Output arguments of an NLP Solver
 /// 
 /// \copydoc scheme_NLPOutput
 template<class M>
-std::vector<M> nlpsolverOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M()){
+IOSchemeVector<M> nlpsolverOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M()){
   std::vector<M> ret(6);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -334,7 +336,7 @@ std::vector<M> nlpsolverOut(const std::string arg_s0="",M arg_m0=M(),const std::
       casadi_error("Keyword error in NLPOutput: '" << it->first << "' is not recognized. Available keywords are: x_opt, cost, lambda_g, lambda_x, lambda_p, g");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_NLPOutput);
 }
 /// Helper function for 'MayerInput'
 /// Input arguments of a Mayer Term \n
@@ -343,7 +345,7 @@ std::vector<M> nlpsolverOut(const std::string arg_s0="",M arg_m0=M(),const std::
 /// 
 /// \copydoc scheme_MayerInput
 template<class M>
-std::vector<M> mayerIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+IOSchemeVector<M> mayerIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
   std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -355,7 +357,7 @@ std::vector<M> mayerIn(const std::string arg_s0="",M arg_m0=M(),const std::strin
       casadi_error("Keyword error in MayerInput: '" << it->first << "' is not recognized. Available keywords are: x, p");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_MayerInput);
 }
 /// Helper function for 'OCPInput'
 /// Input arguments of an OCP Solver \n
@@ -368,7 +370,7 @@ std::vector<M> mayerIn(const std::string arg_s0="",M arg_m0=M(),const std::strin
 /// 
 /// \copydoc scheme_OCPInput
 template<class M>
-std::vector<M> ocpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M(),const std::string arg_s12="",M arg_m12=M()){
+IOSchemeVector<M> ocpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M(),const std::string arg_s12="",M arg_m12=M()){
   std::vector<M> ret(13);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -391,14 +393,14 @@ std::vector<M> ocpIn(const std::string arg_s0="",M arg_m0=M(),const std::string 
       casadi_error("Keyword error in OCPInput: '" << it->first << "' is not recognized. Available keywords are: lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_OCPInput);
 }
 /// Helper function for 'OCPOutput'
 /// Output arguments of an OCP Solver
 /// 
 /// \copydoc scheme_OCPOutput
 template<class M>
-std::vector<M> ocpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+IOSchemeVector<M> ocpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -412,14 +414,14 @@ std::vector<M> ocpOut(const std::string arg_s0="",M arg_m0=M(),const std::string
       casadi_error("Keyword error in OCPOutput: '" << it->first << "' is not recognized. Available keywords are: x_opt, u_opt, p_opt, cost");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_OCPOutput);
 }
 /// Helper function for 'QPInput'
 /// Input arguments of a QP problem
 /// 
 /// \copydoc scheme_QPInput
 template<class M>
-std::vector<M> qpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M()){
+IOSchemeVector<M> qpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M()){
   std::vector<M> ret(9);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -438,14 +440,14 @@ std::vector<M> qpIn(const std::string arg_s0="",M arg_m0=M(),const std::string a
       casadi_error("Keyword error in QPInput: '" << it->first << "' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x_init, lambda_init");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_QPInput);
 }
 /// Helper function for 'QPOutput'
 /// Output arguments of an QP Solver
 /// 
 /// \copydoc scheme_QPOutput
 template<class M>
-std::vector<M> qpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+IOSchemeVector<M> qpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -459,14 +461,14 @@ std::vector<M> qpOut(const std::string arg_s0="",M arg_m0=M(),const std::string 
       casadi_error("Keyword error in QPOutput: '" << it->first << "' is not recognized. Available keywords are: primal, cost, lambda_a, lambda_x");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_QPOutput);
 }
 /// Helper function for 'SDPInput'
 /// Input arguments of a SDP problem
 /// 
 /// \copydoc scheme_SDPInput
 template<class M>
-std::vector<M> sdpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+IOSchemeVector<M> sdpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
   std::vector<M> ret(3);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -479,14 +481,14 @@ std::vector<M> sdpIn(const std::string arg_s0="",M arg_m0=M(),const std::string 
       casadi_error("Keyword error in SDPInput: '" << it->first << "' is not recognized. Available keywords are: a, b, c");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_SDPInput);
 }
 /// Helper function for 'SDPOutput'
 /// Output arguments of an SDP Solver
 /// 
 /// \copydoc scheme_SDPOutput
 template<class M>
-std::vector<M> sdpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M()){
+IOSchemeVector<M> sdpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M()){
   std::vector<M> ret(5);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -501,7 +503,7 @@ std::vector<M> sdpOut(const std::string arg_s0="",M arg_m0=M(),const std::string
       casadi_error("Keyword error in SDPOutput: '" << it->first << "' is not recognized. Available keywords are: primal, p, dual, primal_cost, dual_cost");
     ret[n] = it->second;
   }
-  return ret;
+  return IOSchemeVector<M>(ret,SCHEME_SDPOutput);
 }
 }
 #endif //AUTOGENERATED_HPP

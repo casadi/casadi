@@ -30,7 +30,7 @@ f.init()
 I = GslIntegrator(f)
 I.setOption('tf',0.1)
 I.init()
-I.input(INTEGRATOR_X0).set([1,0])
+I.input("x0").set([1,0])
 I.evaluate()
 
 print I.output()

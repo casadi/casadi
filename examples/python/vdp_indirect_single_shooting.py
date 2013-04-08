@@ -110,17 +110,17 @@ solver = IpoptSolver(F,G)
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput([-inf,-inf], NLP_LBX)
-solver.setInput([ inf, inf], NLP_UBX)
-solver.setInput([   0,   0], NLP_X_INIT)
-solver.setInput([   0,   0], NLP_LBG)
-solver.setInput([   0,   0], NLP_UBG)
+solver.setInput([-inf,-inf], "lbx")
+solver.setInput([ inf, inf], "ubx")
+solver.setInput([   0,   0], "x_init")
+solver.setInput([   0,   0], "lbg")
+solver.setInput([   0,   0], "ubg")
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the optimal solution
-l_init_opt = NP.array(solver.output(NLP_X_OPT).data())
+l_init_opt = NP.array(solver.output("x_opt").data())
 
 # Time grid for visualization
 tgrid = NP.linspace(0,10,100)
@@ -133,7 +133,7 @@ simulator = Simulator(I, output_fcn, tgrid)
 simulator.init()
 
 # Pass initial conditions to the simulator
-simulator.setInput(NP.concatenate((x_init,l_init_opt)),INTEGRATOR_X0)
+simulator.setInput(NP.concatenate((x_init,l_init_opt)),"x0")
 
 # Simulate to get the trajectories
 simulator.evaluate()

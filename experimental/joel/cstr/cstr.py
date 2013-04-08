@@ -193,12 +193,12 @@ nu = 1
 #solver.init()
 
 ## Set bounds and initial guess
-#solver.setInput(ms.V_min_,  NLP_LBX)
-#solver.setInput(ms.V_max_,  NLP_UBX)
-#solver.setInput(ms.V_init_,  NLP_X_INIT)
+#solver.setInput(ms.V_min_,  "lbx")
+#solver.setInput(ms.V_max_,  "ubx")
+#solver.setInput(ms.V_init_,  "x_init")
 
-#solver.setInput(ms.G_min_,NLP_LBG)
-#solver.setInput(ms.G_max_,NLP_UBG)
+#solver.setInput(ms.G_min_,"lbg")
+#solver.setInput(ms.G_max_,"ubg")
 
 # Solve the problem
 #solver.solve()
@@ -245,10 +245,10 @@ ocp_solver.setOption("integrator_tolerance",1e-8)
 ocp_solver.init()
 
 # Pass bounds and initial guess
-ocp_solver.setInput(cfcn_lb,ACADO_LBC)
-ocp_solver.setInput(cfcn_ub,ACADO_UBC)
-ocp_solver.setInput((num_nodes+1)*list(x0),ACADO_X_GUESS)
-ocp_solver.setInput((num_nodes+1)*list(u0),ACADO_U_GUESS)
+ocp_solver.setInput(cfcn_lb,"lbc")
+ocp_solver.setInput(cfcn_ub,"ubc")
+ocp_solver.setInput((num_nodes+1)*list(x0),"x_guess")
+ocp_solver.setInput((num_nodes+1)*list(u0),"u_guess")
 
 # Solve the optimal control problem
 t1 = time.time()
@@ -258,23 +258,23 @@ t2 = time.time()
 print 'Optimization took %0.3f ms' % ((t2-t1)*1000.0)
 
 # Print optimal cost
-cost = ocp_solver.output(ACADO_COST)[0]
+cost = ocp_solver.output("cost")[0]
 print "optimal cost = ", cost
 
 # Print optimal parameters
-popt = ocp_solver.output(ACADO_P_OPT)
+popt = ocp_solver.output("p_opt")
 print "optimal parameter values = ", popt
 
 # Time grid
 t_opt = NP.linspace(0,ocp.tf,num_nodes+1)
 
 # Plot optimal control
-u_opt = ocp_solver.output(ACADO_U_OPT)
+u_opt = ocp_solver.output("u_opt")
 plt.figure(1)
 plt.plot(t_opt,trans(u_opt))
 
 # Plot optimal state trajectory
-x_opt = ocp_solver.output(ACADO_X_OPT)
+x_opt = ocp_solver.output("x_opt")
 x_opt = array(x_opt) # create numpy array
 x_opt = x_opt.reshape(num_nodes+1, 3)
 plt.figure(2)

@@ -45,7 +45,7 @@ class MyCallback:
     self.iter = 0 
   def __call__(self,f,*args):
     print "====Hey, I'm an iteration===="
-    print "X_OPT = ", f.input(NLP_X_OPT)
+    print "X_OPT = ", f.input("x_opt")
     print f.getStats()
     self.iter = self.iter + 1
     if self.iter > 5:
@@ -69,10 +69,10 @@ solver.setOption("iteration_callback",c)
 solver.setOption("tol",1e-8)
 solver.setOption("max_iter",20)
 solver.init()
-solver.input(NLP_LBX).set([-10]*2)
-solver.input(NLP_UBX).set([10]*2)
-solver.input(NLP_LBG).set([-10])
-solver.input(NLP_UBG).set([10])
+solver.input("lbx").set([-10]*2)
+solver.input("ubx").set([10]*2)
+solver.input("lbg").set([-10])
+solver.input("ubg").set([10])
 solver.solve()
 
 #! Matplotlib callback
@@ -107,7 +107,7 @@ class MyCallback:
     self.y_sols = []
     
   def __call__(self,f,*args):
-    sol = f.input(NLP_X_OPT)
+    sol = f.input("x_opt")
     self.x_sols.append(float(sol[0]))
     self.y_sols.append(float(sol[1]))
     subplot(111)
@@ -133,10 +133,10 @@ solver.setOption("iteration_callback",c)
 solver.setOption("tol",1e-8)
 solver.setOption("max_iter",50)
 solver.init()
-solver.input(NLP_LBX).set([-10]*2)
-solver.input(NLP_UBX).set([10]*2)
-solver.input(NLP_LBG).set([-10])
-solver.input(NLP_UBG).set([10])
+solver.input("lbx").set([-10]*2)
+solver.input("ubx").set([10]*2)
+solver.input("lbg").set([-10])
+solver.input("ubg").set([10])
 solver.solve()
 
 #! By setting matplotlib interactivity off, we can inspect the figure at ease

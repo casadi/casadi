@@ -223,7 +223,8 @@ void ControlSimulatorInternal::init(){
 
     // Create the output function
     output_fcn_ = SXFunction(arg,out);
-    output_fcn_.setOption("name","output ");
+    output_fcn_.setOption("name","output");
+    outputScheme_ = SCHEME_IntegratorOutput;
   } else {
     output_fcn_ = orig_output_fcn_;
   }

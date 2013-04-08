@@ -85,18 +85,18 @@ class SDPtests(casadiTestCase):
     C = DMatrix(n2)
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
     dsp.init()
-    dsp.input(SDP_C).set(C)
-    dsp.input(SDP_B).set(b)
-    dsp.input(SDP_A).set(A)
+    dsp.input("c").set(C)
+    dsp.input("b").set(b)
+    dsp.input("a").set(A)
 
     dsp.evaluate()
     
-    self.checkarray(dsp.output(SDP_PRIMAL_COST),DMatrix(n1*n2/n3),digits=5)
-    self.checkarray(dsp.output(SDP_DUAL_COST),DMatrix(n1*n2/n3),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL),DMatrix(n2/n3),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL_P),DMatrix(0),digits=5)
+    self.checkarray(dsp.output("primal_cost"),DMatrix(n1*n2/n3),digits=5)
+    self.checkarray(dsp.output("dual_cost"),DMatrix(n1*n2/n3),digits=5)
+    self.checkarray(dsp.output("primal"),DMatrix(n2/n3),digits=5)
+    self.checkarray(dsp.output("p"),DMatrix(0),digits=5)
     
-    self.checkarray(dsp.output(SDP_DUAL),DMatrix(n1/n3),digits=5)
+    self.checkarray(dsp.output("dual"),DMatrix(n1/n3),digits=5)
     
   def test_linear_equality(self):
     self.message("linear equality")
@@ -119,18 +119,18 @@ class SDPtests(casadiTestCase):
     
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
     dsp.init()
-    dsp.input(SDP_C).set(C)
-    dsp.input(SDP_B).set(b)
-    dsp.input(SDP_A).set(A)
+    dsp.input("c").set(C)
+    dsp.input("b").set(b)
+    dsp.input("a").set(A)
 
     dsp.evaluate()
     
-    self.checkarray(dsp.output(SDP_PRIMAL_COST),DMatrix(n1*n2/n3),digits=5)
-    self.checkarray(dsp.output(SDP_DUAL_COST),DMatrix(n1*n2/n3),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL),DMatrix(n2/n3),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL_P),DMatrix.zeros(2,2),digits=5)
+    self.checkarray(dsp.output("primal_cost"),DMatrix(n1*n2/n3),digits=5)
+    self.checkarray(dsp.output("dual_cost"),DMatrix(n1*n2/n3),digits=5)
+    self.checkarray(dsp.output("primal"),DMatrix(n2/n3),digits=5)
+    self.checkarray(dsp.output("p"),DMatrix.zeros(2,2),digits=5)
     
-    self.checkarray(dsp.output(SDP_DUAL)[0,0]-dsp.output(SDP_DUAL)[1,1],DMatrix(n1/n3),digits=5)
+    self.checkarray(dsp.output("dual")[0,0]-dsp.output("dual")[1,1],DMatrix(n1/n3),digits=5)
 
   def test_linear_interpolation1(self):
     self.message("linear interpolation1")
@@ -150,18 +150,18 @@ class SDPtests(casadiTestCase):
     
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
     dsp.init()
-    dsp.input(SDP_C).set(C)
-    dsp.input(SDP_B).set(b)
-    dsp.input(SDP_A).set(A)
+    dsp.input("c").set(C)
+    dsp.input("b").set(b)
+    dsp.input("a").set(A)
 
     dsp.evaluate()
     
-    self.checkarray(dsp.output(SDP_PRIMAL_COST),DMatrix(2),digits=5)
-    self.checkarray(dsp.output(SDP_DUAL_COST),DMatrix(2),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL),DMatrix([1,0]),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL_P),DMatrix([[0,0,0],[0,1,0],[0,0,0]]),digits=5)
+    self.checkarray(dsp.output("primal_cost"),DMatrix(2),digits=5)
+    self.checkarray(dsp.output("dual_cost"),DMatrix(2),digits=5)
+    self.checkarray(dsp.output("primal"),DMatrix([1,0]),digits=5)
+    self.checkarray(dsp.output("p"),DMatrix([[0,0,0],[0,1,0],[0,0,0]]),digits=5)
     
-    self.checkarray(dsp.output(SDP_DUAL),DMatrix([[2,0,0],[0,0,0],[0,0,1]]),digits=5)
+    self.checkarray(dsp.output("dual"),DMatrix([[2,0,0],[0,0,0],[0,0,1]]),digits=5)
 
   def test_linear_interpolation2(self):
     self.message("linear interpolation2")
@@ -180,17 +180,17 @@ class SDPtests(casadiTestCase):
     
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
     dsp.init()
-    dsp.input(SDP_C).set(C)
-    dsp.input(SDP_B).set(b)
-    dsp.input(SDP_A).set(A)
+    dsp.input("c").set(C)
+    dsp.input("b").set(b)
+    dsp.input("a").set(A)
 
     dsp.evaluate()
     
-    self.checkarray(dsp.output(SDP_PRIMAL_COST),DMatrix(0),digits=5)
-    self.checkarray(dsp.output(SDP_DUAL_COST),DMatrix(0),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL),DMatrix([0,0]),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL_P),DMatrix([[1,0,0],[0,0,0],[0,0,0]]),digits=5)
-    self.checkarray(dsp.output(SDP_DUAL),DMatrix([[0,0,0],[0,2,0],[0,0,3]]),digits=5)
+    self.checkarray(dsp.output("primal_cost"),DMatrix(0),digits=5)
+    self.checkarray(dsp.output("dual_cost"),DMatrix(0),digits=5)
+    self.checkarray(dsp.output("primal"),DMatrix([0,0]),digits=5)
+    self.checkarray(dsp.output("p"),DMatrix([[1,0,0],[0,0,0],[0,0,0]]),digits=5)
+    self.checkarray(dsp.output("dual"),DMatrix([[0,0,0],[0,2,0],[0,0,3]]),digits=5)
     
   def test_linear_interpolation(self):
     self.message("linear interpolation")
@@ -217,18 +217,18 @@ class SDPtests(casadiTestCase):
     
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
     dsp.init()
-    dsp.input(SDP_C).set(C)
-    dsp.input(SDP_B).set(b)
-    dsp.input(SDP_A).set(A)
+    dsp.input("c").set(C)
+    dsp.input("b").set(b)
+    dsp.input("a").set(A)
 
     dsp.evaluate()
     
-    self.checkarray(dsp.output(SDP_PRIMAL_COST),DMatrix(2),digits=5)
-    self.checkarray(dsp.output(SDP_DUAL_COST),DMatrix(2),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL),DMatrix([1,0]),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL_P),diag([0,0,1,0]),digits=5)
+    self.checkarray(dsp.output("primal_cost"),DMatrix(2),digits=5)
+    self.checkarray(dsp.output("dual_cost"),DMatrix(2),digits=5)
+    self.checkarray(dsp.output("primal"),DMatrix([1,0]),digits=5)
+    self.checkarray(dsp.output("p"),diag([0,0,1,0]),digits=5)
     
-    self.checkarray(dsp.output(SDP_DUAL),diag([2,0,0,2]),digits=2)
+    self.checkarray(dsp.output("dual"),diag([2,0,0,2]),digits=2)
     
   def test_example1(self):
     self.message("Example1")
@@ -251,18 +251,18 @@ class SDPtests(casadiTestCase):
 
     dsp.init()
 
-    dsp.input(SDP_C).set(C)
-    dsp.input(SDP_B).set(b)
-    dsp.input(SDP_A).set(A)
+    dsp.input("c").set(C)
+    dsp.input("b").set(b)
+    dsp.input("a").set(A)
 
     dsp.evaluate()
     
-    self.checkarray(dsp.output(SDP_PRIMAL_COST),DMatrix(-41.9),digits=5)
-    self.checkarray(dsp.output(SDP_DUAL_COST),DMatrix(-41.9),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL),DMatrix([-1.1,-2.7375,-0.55]),digits=5)
+    self.checkarray(dsp.output("primal_cost"),DMatrix(-41.9),digits=5)
+    self.checkarray(dsp.output("dual_cost"),DMatrix(-41.9),digits=5)
+    self.checkarray(dsp.output("primal"),DMatrix([-1.1,-2.7375,-0.55]),digits=5)
     
-    self.checkarray(dsp.output(SDP_DUAL),DMatrix([[5.9,-1.375],[-1.375,1]]),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL_P),DMatrix.zeros(2,2),digits=5)
+    self.checkarray(dsp.output("dual"),DMatrix([[5.9,-1.375],[-1.375,1]]),digits=5)
+    self.checkarray(dsp.output("p"),DMatrix.zeros(2,2),digits=5)
     
     V = struct_ssym([
           entry("L",shape=C.shape),
@@ -282,9 +282,9 @@ class SDPtests(casadiTestCase):
 
     sol = IpoptSolver(f,g)
     sol.init()
-    sol.setInput(0,NLP_LBG)
-    sol.setInput(0,NLP_UBG)
-    sol.setInput(1,NLP_X_INIT)
+    sol.setInput(0,"lbg")
+    sol.setInput(0,"ubg")
+    sol.setInput(1,"x_init")
 
     sol.evaluate()
 
@@ -318,18 +318,18 @@ class SDPtests(casadiTestCase):
 
     dsp.init()
 
-    dsp.input(SDP_C).set(C)
-    dsp.input(SDP_B).set(b)
-    dsp.input(SDP_A).set(A)
+    dsp.input("c").set(C)
+    dsp.input("b").set(b)
+    dsp.input("a").set(A)
 
     dsp.evaluate()
     DMatrix.setPrecision(10)
-    self.checkarray(dsp.output(SDP_PRIMAL_COST),DMatrix(3.20626934048e1),digits=5)
-    self.checkarray(dsp.output(SDP_DUAL_COST),DMatrix(3.20626923535e1),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL),DMatrix([1.551644595,0.6709672545,0.9814916693,1.406569511,0.9421687787]),digits=5)
+    self.checkarray(dsp.output("primal_cost"),DMatrix(3.20626934048e1),digits=5)
+    self.checkarray(dsp.output("dual_cost"),DMatrix(3.20626923535e1),digits=5)
+    self.checkarray(dsp.output("primal"),DMatrix([1.551644595,0.6709672545,0.9814916693,1.406569511,0.9421687787]),digits=5)
     
-    self.checkarray(dsp.output(SDP_DUAL),DMatrix(sp,[2.640261206,0.5605636589,0.5605636589,3.717637107,0.7615505416,-1.513524657,1.139370202,-1.513524657,3.008016978,-2.264413045,1.139370202,-2.264413045,1.704633559,0,0]),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL_P),DMatrix(sp,[0,0,0,0,7.119155551,5.024671489,1.916294752,5.024671489,4.414745792,2.506021978,1.916294752,2.506021978,2.048124139,0.3432465654,4.391169489]),digits=5)
+    self.checkarray(dsp.output("dual"),DMatrix(sp,[2.640261206,0.5605636589,0.5605636589,3.717637107,0.7615505416,-1.513524657,1.139370202,-1.513524657,3.008016978,-2.264413045,1.139370202,-2.264413045,1.704633559,0,0]),digits=5)
+    self.checkarray(dsp.output("p"),DMatrix(sp,[0,0,0,0,7.119155551,5.024671489,1.916294752,5.024671489,4.414745792,2.506021978,1.916294752,2.506021978,2.048124139,0.3432465654,4.391169489]),digits=5)
 
   def test_example2_perm(self):
     self.message("Example2_permuted")
@@ -357,18 +357,18 @@ class SDPtests(casadiTestCase):
 
     dsp.init()
 
-    dsp.input(SDP_C).set(C)
-    dsp.input(SDP_B).set(b)
-    dsp.input(SDP_A).set(A)
+    dsp.input("c").set(C)
+    dsp.input("b").set(b)
+    dsp.input("a").set(A)
 
     dsp.evaluate()
     DMatrix.setPrecision(10)
-    self.checkarray(dsp.output(SDP_PRIMAL_COST),DMatrix(3.20626934048e1),digits=5)
-    self.checkarray(dsp.output(SDP_DUAL_COST),DMatrix(3.20626923535e1),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL),DMatrix([1.551644595,0.6709672545,0.9814916693,1.406569511,0.9421687787]),digits=5)
+    self.checkarray(dsp.output("primal_cost"),DMatrix(3.20626934048e1),digits=5)
+    self.checkarray(dsp.output("dual_cost"),DMatrix(3.20626923535e1),digits=5)
+    self.checkarray(dsp.output("primal"),DMatrix([1.551644595,0.6709672545,0.9814916693,1.406569511,0.9421687787]),digits=5)
     
-    self.checkarray(dsp.output(SDP_DUAL)[permi,permi],DMatrix(sp,[2.640261206,0.5605636589,0.5605636589,3.717637107,0.7615505416,-1.513524657,1.139370202,-1.513524657,3.008016978,-2.264413045,1.139370202,-2.264413045,1.704633559,0,0]),digits=5)
-    self.checkarray(dsp.output(SDP_PRIMAL_P)[permi,permi],DMatrix(sp,[0,0,0,0,7.119155551,5.024671489,1.916294752,5.024671489,4.414745792,2.506021978,1.916294752,2.506021978,2.048124139,0.3432465654,4.391169489]),digits=5)
+    self.checkarray(dsp.output("dual")[permi,permi],DMatrix(sp,[2.640261206,0.5605636589,0.5605636589,3.717637107,0.7615505416,-1.513524657,1.139370202,-1.513524657,3.008016978,-2.264413045,1.139370202,-2.264413045,1.704633559,0,0]),digits=5)
+    self.checkarray(dsp.output("p")[permi,permi],DMatrix(sp,[0,0,0,0,7.119155551,5.024671489,1.916294752,5.024671489,4.414745792,2.506021978,1.916294752,2.506021978,2.048124139,0.3432465654,4.391169489]),digits=5)
     
     
 if __name__ == '__main__':

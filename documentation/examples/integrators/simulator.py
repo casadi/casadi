@@ -55,8 +55,8 @@ ts = linspace(0,50,1000)
 
 sim=Simulator(integrator,ts)
 sim.init()
-sim.setInput([1,0],INTEGRATOR_X0)
-sim.setInput([0.1,0.1,0.1,0.3,0.1],INTEGRATOR_P)
+sim.setInput([1,0],"x0")
+sim.setInput([0.1,0.1,0.1,0.3,0.1],"p")
 sim.evaluate()
 
 #! Plot the solution

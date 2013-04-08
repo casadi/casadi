@@ -142,19 +142,19 @@ for N in range(1,11):
 
   # Initial condition
   xinit = x.size() * [0]
-  solver.setInput(xinit,NLP_X_INIT)
+  solver.setInput(xinit,"x_init")
 
   # Bounds on x
   lbx = x.size()*[-100]
   ubx = x.size()*[100]
   lbx[0] = ubx[0] = z0
-  solver.setInput(lbx,NLP_LBX)
-  solver.setInput(ubx,NLP_UBX)
+  solver.setInput(lbx,"lbx")
+  solver.setInput(ubx,"ubx")
   
   # Bounds on the constraints
   lubg = g.size()*[0]
-  solver.setInput(lubg,NLP_LBG)
-  solver.setInput(lubg,NLP_UBG)
+  solver.setInput(lubg,"lbg")
+  solver.setInput(lubg,"ubg")
   
   # Solve the problem
   solver.solve()
@@ -168,10 +168,10 @@ for N in range(1,11):
   print "time points: ", t_opt
 
   # Print the optimal cost
-  print "optimal cost: ", float(solver.output(NLP_COST))
+  print "optimal cost: ", float(solver.output("cost"))
 
   # Print the optimal solution
-  xopt = solver.output(NLP_X_OPT).data()
+  xopt = solver.output("x_opt").data()
   print "optimal solution: ", xopt
  
   # plot to screen

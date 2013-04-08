@@ -87,8 +87,8 @@ ocp_solver.init()
 # Pass bounds
 lbx0 = [1.0, 0.0, -NP.inf]
 ubx0 = [1.0, 0.0, NP.inf]
-ocp_solver.setInput(lbx0,ACADO_LBX0)
-ocp_solver.setInput(ubx0,ACADO_UBX0)
+ocp_solver.setInput(lbx0,"lbx0")
+ocp_solver.setInput(ubx0,"ubx0")
 
 # Solve
 ocp_solver.solve()
@@ -97,12 +97,12 @@ ocp_solver.solve()
 t_opt = NP.linspace(t0,tf,num_nodes+1)
 
 # Plot optimal state trajectory
-x_opt = ocp_solver.output(ACADO_X_OPT)
+x_opt = ocp_solver.output("x_opt")
 x_opt = array(x_opt) # create numpy array
 x_opt = x_opt.reshape(num_nodes+1, 3)
 
 # Plot optimal control
-u_opt = ocp_solver.output(ACADO_U_OPT)
+u_opt = ocp_solver.output("u_opt")
 
 # State derivatives
 xdot = ssym("xdot")
@@ -146,16 +146,16 @@ for i in range(num_nodes):
   
   # Set the control
   ui = u_opt[i]
-  integrator.setInput(ui,INTEGRATOR_P)
+  integrator.setInput(ui,"p")
 
   # Pass the state
-  integrator.setInput(xi,INTEGRATOR_X0)
+  integrator.setInput(xi,"x0")
   
   # Integrate
   integrator.evaluate()
   
   # Get the state
-  xi = integrator.output(INTEGRATOR_XF)
+  xi = integrator.output("xf")
   x_opt2[i+1] = xi.data()
 
 plt.figure(1)

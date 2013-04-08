@@ -44,14 +44,14 @@ if MySolver==SQPMethod:
 solver.init()
 
 # Set constraint bounds
-solver.setInput(0.,NLP_LBG)
+solver.setInput(0.,"lbg")
 
 # Solve the NLP
 solver.evaluate()
 
 # Print solution
 print "-----"
-print "objective at solution = ", solver.output(NLP_COST)
-print "primal solution = ", solver.output(NLP_X_OPT)
-print "dual solution (x) = ", solver.output(NLP_LAMBDA_X)
-print "dual solution (g) = ", solver.output(NLP_LAMBDA_G)
+print "objective at solution = ", solver.output("cost")
+print "primal solution = ", solver.output("x_opt")
+print "dual solution (x) = ", solver.output("lambda_x")
+print "dual solution (g) = ", solver.output("lambda_g")

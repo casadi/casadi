@@ -78,17 +78,17 @@ solver.setOption("monitor",["eval_f"])
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput(-0.75*NP.ones(nk), NLP_LBX)
-solver.setInput(1.0*NP.ones(nk), NLP_UBX)
-solver.setInput(NP.zeros(nk),NLP_X_INIT)
-solver.setInput(NP.zeros(2),NLP_LBG)
-solver.setInput(NP.zeros(2),NLP_UBG)
+solver.setInput(-0.75*NP.ones(nk), "lbx")
+solver.setInput(1.0*NP.ones(nk), "ubx")
+solver.setInput(NP.zeros(nk),"x_init")
+solver.setInput(NP.zeros(2),"lbg")
+solver.setInput(NP.zeros(2),"ubg")
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the solution
-u_opt = NP.array(solver.output(NLP_X_OPT))
+u_opt = NP.array(solver.output("x_opt"))
 
 # Time grid
 tgrid_x = NP.linspace(0,10,nk+1)

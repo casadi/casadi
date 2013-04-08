@@ -77,6 +77,15 @@ public:
   /// Multiple (matrix valued) input, multiple (matrix valued) output 
   SXFunction(const std::vector< SXMatrix>& arg, const std::vector<SXMatrix>& res);
 
+  /// Multiple (matrix valued) input, multiple (matrix valued) output 
+  SXFunction(const std::vector< SXMatrix>& arg, const IOSchemeVector< SXMatrix >& res);
+
+  /// Multiple (matrix valued) input, multiple (matrix valued) output 
+  SXFunction(const IOSchemeVector< SXMatrix >& arg, const std::vector< SXMatrix>& res);
+  
+  /// Multiple (matrix valued) input, multiple (matrix valued) output 
+  SXFunction(const IOSchemeVector< SXMatrix >& arg, const IOSchemeVector< SXMatrix >& res);
+  
 #ifndef SWIG
 
   /// Multiple (vector valued) input, multiple (vector valued) output 
@@ -104,26 +113,43 @@ public:
   /// Const access functions of the node 
   const SXFunctionInternal* operator->() const;
 
+  //@{
   /** \brief Jacobian via source code transformation
   *
   * \see CasADi::Jacobian for an AD approach
   */
   SXMatrix jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-
+  SXMatrix jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),oind,compact,symmetric); } 
+  SXMatrix jac(int iind, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(iind,outputSchemeEntry(oname),compact,symmetric); } 
+  SXMatrix jac(const std::string& iname, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); } 
+   //@}
+   
+  //@{
   /// Gradient via source code transformation
   SXMatrix grad(int iind=0, int oind=0);
+  SXMatrix grad(const std::string& iname, int oind=0) { return grad(inputSchemeEntry(iname),oind); }
+  SXMatrix grad(int iind, const std::string& oname) { return grad(iind,outputSchemeEntry(oname)); }
+  SXMatrix grad(const std::string& iname, const std::string& oname) { return grad(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+  //@}
   
+  //@{
   /// Hessian (forward over adjoint) via source code transformation
   SXMatrix hess(int iind=0, int oind=0);
+  SXMatrix hess(const std::string& iname, int oind=0) { return hess(inputSchemeEntry(iname),oind); }
+  SXMatrix hess(int iind, const std::string& oname) { return hess(iind,outputSchemeEntry(oname)); }
+  SXMatrix hess(const std::string& iname, const std::string& oname) { return hess(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+  //@}
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
     
   /** \brief Get function input */
-  const SXMatrix& inputExpr(int ind) const;
+  const SXMatrix& inputExpr(int iind) const;
+  const SXMatrix& inputExpr(const std::string& iname) const { return inputExpr(inputSchemeEntry(iname)); }
   
   /** \brief Get function output */
-  const SXMatrix& outputExpr(int ind) const;
+  const SXMatrix& outputExpr(int oind) const;
+  const SXMatrix& outputExpr(const std::string& oname) const { return outputExpr(outputSchemeEntry(oname)); }
   
   /** \brief Get all function inputs */
   const std::vector<SXMatrix>& inputExpr() const;

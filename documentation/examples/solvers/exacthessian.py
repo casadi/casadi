@@ -50,10 +50,10 @@ h=SXFunction([xy,lambd,sigma],[sigma*hessian(obj,xy)+lambd*hessian(constr,xy)])
 #! We solve the problem with an exact hessian
 solver = IpoptSolver(f,g,h)
 solver.init()
-solver.input(NLP_LBX).set([-10]*2)
-solver.input(NLP_UBX).set([10]*2)
-solver.input(NLP_LBG).set([0])
-solver.input(NLP_UBG).set([1])
+solver.input("lbx").set([-10]*2)
+solver.input("ubx").set([10]*2)
+solver.input("lbg").set([0])
+solver.input("ubg").set([1])
 solver.solve()
 
 for sol in array(solver.output()):
@@ -62,10 +62,10 @@ for sol in array(solver.output()):
 #! To compare the behaviour of convergence, we solve the same problem without exact hessian
 solver = IpoptSolver(f,g)
 solver.init()
-solver.input(NLP_LBX).set([-10]*2)
-solver.input(NLP_UBX).set([10]*2)
-solver.input(NLP_LBG).set([0])
-solver.input(NLP_UBG).set([1])
+solver.input("lbx").set([-10]*2)
+solver.input("ubx").set([10]*2)
+solver.input("lbg").set([0])
+solver.input("ubg").set([1])
 solver.solve()
 
 for sol in array(solver.output()):

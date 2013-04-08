@@ -101,7 +101,7 @@ simulator.init()
 
 # Pass initial conditions
 x0 = getStart(ocp.x)
-simulator.setInput(x0,INTEGRATOR_X0)
+simulator.setInput(x0,"x0")
 
 # Simulate
 simulator.evaluate()
@@ -164,7 +164,7 @@ simulator.init()
 
 # Pass initial conditions
 x0 = getStart(ocp.x)
-simulator.setInput(x0,INTEGRATOR_X0)
+simulator.setInput(x0,"x0")
 
 # Simulate
 simulator.evaluate()
@@ -222,7 +222,7 @@ simulator.init()
 
 # Pass initial conditions
 x0 = getStart(ocp.x)
-simulator.setInput(x0,INTEGRATOR_X0)
+simulator.setInput(x0,"x0")
 
 # Simulate
 simulator.evaluate()

@@ -157,6 +157,7 @@ namespace CasADi{
     /// the same as evaluate(0,0)
     void solve();
     
+    //@{
     /** \brief Generate a Jacobian function of output oind with respect to input iind
      * \param iind The index of the input
      * \param oind The index of the output
@@ -170,7 +171,12 @@ namespace CasADi{
      * 
      */
     FX jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-  
+    FX jacobian(const std::string& iname,  int oind=0, bool compact=false, bool symmetric=false) { return jacobian(inputSchemeEntry(iname),oind,compact,symmetric); }
+    FX jacobian(int iind, const std::string& oname, bool compact=false, bool symmetric=false) { return jacobian(iind,outputSchemeEntry(oname),compact,symmetric); }
+    FX jacobian(const std::string& iname, const std::string& oname, bool compact=false, bool symmetric=false) { return jacobian(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
+    //@}
+    
+    //@{
     /** \brief Generate a gradient function of output oind with respect to input iind
      * \param iind The index of the input
      * \param oind The index of the output
@@ -180,7 +186,12 @@ namespace CasADi{
      * 
      */
     FX gradient(int iind=0, int oind=0);
-  
+    FX gradient(const std::string& iname, int oind=0) { return gradient(inputSchemeEntry(iname),oind); }
+    FX gradient(int iind, const std::string& oname) { return gradient(iind,outputSchemeEntry(oname)); }
+    FX gradient(const std::string& iname, const std::string& oname) { return gradient(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    //@}
+    
+    //@{
     /** \brief Generate a Hessian function of output oind with respect to input iind 
      * \param iind The index of the input
      * \param oind The index of the output
@@ -190,6 +201,10 @@ namespace CasADi{
      * 
      */
     FX hessian(int iind=0, int oind=0);
+    FX hessian(const std::string& iname, int oind=0) { return hessian(inputSchemeEntry(iname),oind); }
+    FX hessian(int iind, const std::string& oname) { return hessian(iind,outputSchemeEntry(oname)); }
+    FX hessian(const std::string& iname, const std::string& oname) { return hessian(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    //@}
 
     /** \brief Generate a Jacobian function of all the inputs nonzeros (getNumScalarInputs()) with respect to all the output nonzeros (getNumScalarOutputs()).
      */
@@ -314,12 +329,22 @@ namespace CasADi{
      */
     FX derivative(int nfwd, int nadj);
 
+    //@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
     CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-
+    CRSSparsity& jacSparsity(const std::string &iname, int oind=0, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iname),oind,compact,symmetric); }
+    CRSSparsity& jacSparsity(int iind, const std::string &oname, bool compact=false, bool symmetric=false) { return jacSparsity(iind,outputSchemeEntry(oname),compact,symmetric); }
+    CRSSparsity& jacSparsity(const std::string &iname, const std::string &oname, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
+    //@}
+    
+    //@{
     /// Generate the sparsity of a Jacobian block
     void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact=false);
-
+    void setJacSparsity(const CRSSparsity& sp, const std::string &iname, int oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iname),oind,compact); }
+    void setJacSparsity(const CRSSparsity& sp, int iind, const std::string &oname, bool compact=false) { setJacSparsity(sp,iind,outputSchemeEntry(oname),compact); }
+    void setJacSparsity(const CRSSparsity& sp, const std::string &iname, const std::string &oname, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iname),outputSchemeEntry(oname),compact); }
+    //@}
+    
     /** \brief Export / Generate C code for the function */
     void generateCode(const std::string& filename);
   

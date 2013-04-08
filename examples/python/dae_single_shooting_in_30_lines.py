@@ -74,9 +74,9 @@ solver.setOption("generate_hessian",True)
 solver.init()
 
 # Pass bounds, initial guess and solve NLP
-solver.setInput(-0.75, NLP_LBX)    # Lower variable bound
-solver.setInput( 1.0,  NLP_UBX)    # Upper variable bound
-solver.setInput( 0.0,  NLP_LBG)    # Lower constraint bound
-solver.setInput( 0.0,  NLP_UBG)    # Upper constraint bound
-solver.setInput( 0.0,  NLP_X_INIT) # Initial guess
+solver.setInput(-0.75, "lbx")    # Lower variable bound
+solver.setInput( 1.0,  "ubx")    # Upper variable bound
+solver.setInput( 0.0,  "lbg")    # Lower constraint bound
+solver.setInput( 0.0,  "ubg")    # Upper constraint bound
+solver.setInput( 0.0,  "x_init") # Initial guess
 solver.solve()

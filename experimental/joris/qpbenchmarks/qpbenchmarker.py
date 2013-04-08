@@ -67,22 +67,22 @@ for qpsolver in qpsolvers:
 
   solver = qpsolver(qp.H.sparsity(),qp.A.sparsity())
   solver.init()
-  solver.setInput(qp.H,QP_H)
-  solver.setInput(qp.A,QP_A)
+  solver.setInput(qp.H,"h")
+  solver.setInput(qp.A,"a")
   for i in range(qp.g.shape[1]):
-    solver.setInput(qp.lbA[i,:].T,QP_LBA)
-    solver.setInput(qp.ubA[i,:].T,QP_UBA)
-    solver.setInput(qp.lb[i,:].T,QP_LBX)
-    solver.setInput(qp.ub[i,:].T,QP_UBX)
-    solver.setInput(qp.g[i,:].T,QP_G)
+    solver.setInput(qp.lbA[i,:].T,"lba")
+    solver.setInput(qp.ubA[i,:].T,"uba")
+    solver.setInput(qp.lb[i,:].T,"lbx")
+    solver.setInput(qp.ub[i,:].T,"ubx")
+    solver.setInput(qp.g[i,:].T,"g")
 
     solver.solve()
 
-    print solver.output(QP_PRIMAL)
+    print solver.output("primal")
     print qp.x_opt[i,:].T
     print qp.y_opt[i,:].T
     print qp.obj_opt[i]
-    print solver.output(QP_COST)
-    print fabs(solver.output(QP_PRIMAL)-qp.x_opt[i,:].T)
-    assert(all(fabs(solver.output(QP_PRIMAL)-qp.x_opt[i,:].T)<1e-4))
-    assert(fabs(qp.obj_opt[i]-solver.output(QP_COST))<1e-5)
+    print solver.output("cost")
+    print fabs(solver.output("primal")-qp.x_opt[i,:].T)
+    assert(all(fabs(solver.output("primal")-qp.x_opt[i,:].T)<1e-4))
+    assert(fabs(qp.obj_opt[i]-solver.output("cost"))<1e-5)

@@ -51,6 +51,28 @@
 
 %include "symbolic/fx/io_interface.hpp"
 %template(IOInterfaceFX) CasADi::IOInterface<CasADi::FX>;
+%include "symbolic/fx/io_scheme_vector.hpp"
+%template(IOSchemeVectorMX) CasADi::IOSchemeVector< CasADi::MX >;
+%template(IOSchemeVectorSXMatrix) CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SX> >;
+%template(IOSchemeVectorCRSSparsity) CasADi::IOSchemeVector< CasADi::CRSSparsity >;
+%extend CasADi::IOSchemeVector< CasADi::MX > {
+%pythoncode %{
+  def __iter__(self):
+    return self.data().__iter__()
+%}
+}
+%extend CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SX> > {
+%pythoncode %{
+  def __iter__(self):
+    return self.data().__iter__()
+%}
+}
+%extend CasADi::IOSchemeVector< CasADi::CRSSparsity > {
+%pythoncode %{
+  def __iter__(self):
+    return self.data().__iter__()
+%}
+}
 %include "symbolic/fx/fx.hpp"
 
 %include "symbolic/fx/sx_function.hpp"

@@ -107,24 +107,24 @@ solver.init()
 
 # Bounds on u and initial condition
 Umin = nu * [-10] # lower bound
-solver.setInput(Umin,NLP_LBX)
+solver.setInput(Umin,"lbx")
 
 Umax = nu * [10]  # upper bound
-solver.setInput(Umax,NLP_UBX)
+solver.setInput(Umax,"ubx")
 
 Usol = nu * [0.4] # initial guess
-solver.setInput(Usol,NLP_X_INIT)
+solver.setInput(Usol,"x_init")
 
 # Bounds on g
 Gmin = Gmax = [10, 0]
-solver.setInput(Gmin,NLP_LBG)
-solver.setInput(Gmax,NLP_UBG)
+solver.setInput(Gmin,"lbg")
+solver.setInput(Gmax,"ubg")
 
 # Solve the problem
 solver.solve()
 
 # Get the solution
-uopt = solver.output(NLP_X_OPT)
+uopt = solver.output("x_opt")
 
 # Plot the optimal trajectory
 tgrid = linspace(0,T,nu+1)
@@ -140,10 +140,10 @@ sopt = [x[0]]
 vopt = [x[1]]
 mopt = [x[2]]
 for k in range(nu):
-  integrator.setInput(k*DT,INTEGRATOR_T0)
-  integrator.setInput((k+1)*DT,INTEGRATOR_TF)
-  integrator.setInput(uopt[k],INTEGRATOR_P)
-  integrator.setInput(x,INTEGRATOR_X0)
+  integrator.setInput(k*DT,"t0")
+  integrator.setInput((k+1)*DT,"tf")
+  integrator.setInput(uopt[k],"p")
+  integrator.setInput(x,"x0")
   integrator.evaluate()
   x = integrator.output()
   sopt.append(x[0])
