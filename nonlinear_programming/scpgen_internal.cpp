@@ -502,26 +502,26 @@ void SCPgenInternal::init(){
   makeDense(b_g);
   
   // Tangent function
-  vector<MX> tan_fcn_out;
+  vector<MX> vec_fcn_out;
   n=0;
-  tan_fcn_out.push_back(b_obj);                             tan_b_obj_ = n++;
-  tan_fcn_out.push_back(b_g);                               tan_b_g_ = n++;  
-  casadi_assert(n==tan_fcn_out.size());
+  vec_fcn_out.push_back(b_obj);                             vec_b_obj_ = n++;
+  vec_fcn_out.push_back(b_g);                               vec_b_g_ = n++;  
+  casadi_assert(n==vec_fcn_out.size());
   
-  MXFunction tan_fcn(mfcn_in,tan_fcn_out);
-  tan_fcn.setOption("name","tan_fcn");
-  tan_fcn.setOption("number_of_fwd_dir",0);
-  tan_fcn.setOption("number_of_adj_dir",0);
-  tan_fcn.init();
+  MXFunction vec_fcn(mfcn_in,vec_fcn_out);
+  vec_fcn.setOption("name","vec_fcn");
+  vec_fcn.setOption("number_of_fwd_dir",0);
+  vec_fcn.setOption("number_of_adj_dir",0);
+  vec_fcn.init();
   if(verbose_){
-    cout << "Generated linearization function ( " << tan_fcn.getAlgorithmSize() << " nodes)." << endl;
+    cout << "Generated linearization function ( " << vec_fcn.getAlgorithmSize() << " nodes)." << endl;
   }
   
   // Generate c code and load as DLL
   if(codegen_){
-    dynamicCompilation(tan_fcn,tan_fcn_,"tan_fcn","linearization function");
+    dynamicCompilation(vec_fcn,vec_fcn_,"vec_fcn","linearization function");
   } else {
-    tan_fcn_ = tan_fcn;
+    vec_fcn_ = vec_fcn;
   }
 
   // Expression a + A*du in Lifted Newton (Section 2.1 in Alberspeyer2010)
@@ -720,7 +720,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
 
   // Get current time and reset timers
   double time1 = clock();
-  t_eval_mat_ = t_eval_res_ = t_eval_tan_ = t_eval_exp_ = t_solve_qp_ = 0;
+  t_eval_mat_ = t_eval_res_ = t_eval_vec_ = t_eval_exp_ = t_solve_qp_ = 0;
 
   // Initial evaluation of the residual function
   eval_res();
@@ -785,8 +785,8 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     // Start a new iteration
     iter++;
     
-    // Form the condensed QP
-    eval_tan();
+    // Evaluate the vectors in the condensed QP
+    eval_vec();
 
     // Evaluate the matrices in the condensed QP
     eval_mat();
@@ -826,7 +826,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
     cout << endl;
     cout << "time spent in eval_mat:    " << setw(9) << t_eval_mat_ << " s." << endl;
     cout << "time spent in eval_res:    " << setw(9) << t_eval_res_ << " s." << endl;
-    cout << "time spent in eval_tan:    " << setw(9) << t_eval_tan_ << " s." << endl;
+    cout << "time spent in eval_vec:    " << setw(9) << t_eval_vec_ << " s." << endl;
     cout << "time spent in eval_exp:    " << setw(9) << t_eval_exp_ << " s." << endl;
     cout << "time spent in solve_qp:    " << setw(9) << t_solve_qp_ << " s." << endl;
     cout << "time spent in main loop:   " << setw(9) << t_mainloop_ << " s." << endl;
@@ -1106,37 +1106,37 @@ void SCPgenInternal::eval_res(){
   t_eval_res_ += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
-void SCPgenInternal::eval_tan(){
+void SCPgenInternal::eval_vec(){
   // Get current time
   double time1 = clock();
 
   // Pass current parameter guess
-  tan_fcn_.setInput(input(NLP_P),mod_p_);
+  vec_fcn_.setInput(input(NLP_P),mod_p_);
 
   // Pass primal step/variables
-  tan_fcn_.setInput(x_opt_, mod_x_);
+  vec_fcn_.setInput(x_opt_, mod_x_);
   for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-    tan_fcn_.setInput(it->res, it->mod_var);
+    vec_fcn_.setInput(it->res, it->mod_var);
   }
 
   // Pass dual steps/variables
   if(!gauss_newton_){
-    tan_fcn_.setInput(g_lam_,mod_g_lam_);
-    tan_fcn_.setInput(x_lam_, mod_x_lam_);
+    vec_fcn_.setInput(g_lam_,mod_g_lam_);
+    vec_fcn_.setInput(x_lam_, mod_x_lam_);
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-      tan_fcn_.setInput(it->resL, it->mod_lam);
+      vec_fcn_.setInput(it->resL, it->mod_lam);
     }
   }
 
   // Evaluate to get QP
-  tan_fcn_.evaluate();
+  vec_fcn_.evaluate();
 
   // Get condensed vectors
-  transform(g_.begin(),g_.end(),tan_fcn_.output(tan_b_g_).begin(),qpB_.begin(),std::minus<double>());
-  transform(gL_.begin(),gL_.end(),tan_fcn_.output(tan_b_obj_).begin(),gL_.begin(),std::minus<double>());
+  transform(g_.begin(),g_.end(),vec_fcn_.output(vec_b_g_).begin(),qpB_.begin(),std::minus<double>());
+  transform(gL_.begin(),gL_.end(),vec_fcn_.output(vec_b_obj_).begin(),gL_.begin(),std::minus<double>());
   
   double time2 = clock();
-  t_eval_tan_ += double(time2-time1)/CLOCKS_PER_SEC;
+  t_eval_vec_ += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
 void SCPgenInternal::regularize(){

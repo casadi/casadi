@@ -59,11 +59,11 @@ public:
   // Evaluate the matrices in the condensed QP
   void eval_mat();
 
+  // Evaluate the vectors in the condensed QP
+  void eval_vec();
+
   // Evaluate the residual function
   void eval_res();
-
-  // Form the condensed QP
-  void eval_tan();
 
   // Regularize the condensed QP
   void regularize();
@@ -78,7 +78,7 @@ public:
   void eval_exp();
   
   // Timings
-  double t_eval_mat_, t_eval_res_, t_eval_tan_, t_eval_exp_, t_solve_qp_, t_mainloop_;
+  double t_eval_mat_, t_eval_res_, t_eval_vec_, t_eval_exp_, t_solve_qp_, t_mainloop_;
   
   /// QP solver for the subproblems
   QPSolver qp_solver_;
@@ -138,9 +138,11 @@ public:
  
   // Function to calculate the matrices in the reduced QP
   FX mat_fcn_;
+  int mat_jac_, mat_hes_;
 
   /// Quadratic approximation
-  FX tan_fcn_;
+  FX vec_fcn_;
+  int vec_b_obj_, vec_b_g_;
 
   /// Step expansion
   FX exp_fcn_;
@@ -169,12 +171,6 @@ public:
   int mod_x_, mod_p_, mod_x_lam_, mod_g_lam_;
   int mod_obj_, mod_gl_, mod_g_;
   int mod_du_, mod_dlam_g_;
-
-  // Tangental function
-  int tan_b_obj_, tan_b_g_;
-
-  // Matrices function
-  int mat_jac_, mat_hes_;
 
   struct Var{
     int n;
