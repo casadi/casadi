@@ -238,7 +238,7 @@ void SCPgenInternal::init(){
   MX f;
 
   // Multipliers
-  MX g_lam, x_lam;
+  MX g_lam;
 
   // Definition of the lifted dual variables
   MX p_defL, gL_defL;
@@ -253,8 +253,7 @@ void SCPgenInternal::init(){
     // Scalar objective function
     f = vdef_out[0];
     
-    // Lagrange multipliers for the simple bounds on u and Lagrange multipliers corresponding to the definition of the dependent variables
-    x_lam = msym("x_lam",x_.sparsity());
+    // Lagrange multipliers corresponding to the definition of the dependent variables
     stringstream ss;
     int i=0;
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
@@ -293,9 +292,6 @@ void SCPgenInternal::init(){
       }
     }
 
-    // Multipliers for the simple bounds
-    gL_defL += x_lam;
-
     if(verbose_){
       cout << "Generated the gradient of the Lagrangian." << endl;
     }
@@ -315,7 +311,6 @@ void SCPgenInternal::init(){
   }
   if(!gauss_newton_){
     res_fcn_in.push_back(g_lam);        res_g_lam_ = n++;
-    res_fcn_in.push_back(x_lam);        res_x_lam_ = n++;
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       res_fcn_in.push_back(it->v_lam);  it->res_lam = n++;
     }
@@ -428,7 +423,6 @@ void SCPgenInternal::init(){
   if(!gauss_newton_){
     n = mfcn_in.size();
     mfcn_in.push_back(g_lam);                          mod_g_lam_ = n++;
-    mfcn_in.push_back(x_lam);                          mod_x_lam_ = n++;
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       mfcn_in.push_back(it->d_lam);                    it->mod_lam = n++;
     }
@@ -1007,7 +1001,6 @@ void SCPgenInternal::eval_mat(){
   // Pass dual steps/variables
   if(!gauss_newton_){
     mat_fcn_.setInput(g_lam_,mod_g_lam_);
-    mat_fcn_.setInput(x_lam_, mod_x_lam_);
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       mat_fcn_.setInput(it->resL, it->mod_lam);
     }
@@ -1027,14 +1020,14 @@ void SCPgenInternal::eval_mat(){
   } else {
     mat_fcn_.getOutput(qpH_,mat_hes_);
 
-    // Remove the contribution from the simple bounds multipliers
+    // Calculate the gradient of the lagrangian
     const vector<double> &qpA_data = qpA_.data();
     const vector<int> &qpA_rowind = qpA_.rowind();
     const vector<int> &qpA_col = qpA_.col();
-    for(int i=0; i<nx_; ++i)  gL_[i] = gf_[i]; // + x_lam_[i];
+    for(int i=0; i<nx_; ++i)  gL_[i] = gf_[i] + x_lam_[i];
     for(int i=0; i<ng_; ++i){
       for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
-	//gL_[qpA_col[el]] += qpA_data[el]*g_lam_[i];
+	gL_[qpA_col[el]] += qpA_data[el]*g_lam_[i];
       }
     }
   }
@@ -1058,8 +1051,7 @@ void SCPgenInternal::eval_res(){
 
   // Pass dual variables to the residual function for initial evaluation
   if(!gauss_newton_){
-    res_fcn_.setInput(g_lam_,res_g_lam_);
-    res_fcn_.setInput(x_lam_,res_x_lam_);
+    res_fcn_.setInput(0.0,res_g_lam_);
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       res_fcn_.setInput(it->lam,it->res_lam);
     }
@@ -1111,8 +1103,7 @@ void SCPgenInternal::eval_vec(){
 
   // Pass dual steps/variables
   if(!gauss_newton_){
-    vec_fcn_.setInput(g_lam_,mod_g_lam_);
-    vec_fcn_.setInput(x_lam_, mod_x_lam_);
+    vec_fcn_.setInput(0.0,mod_g_lam_);
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       vec_fcn_.setInput(it->resL, it->mod_lam);
     }
@@ -1121,32 +1112,18 @@ void SCPgenInternal::eval_vec(){
   // Evaluate to get QP
   vec_fcn_.evaluate();
 
-  // Get condensed vectors
+  // Linear offset in the reduced QP
   transform(g_.begin(),g_.end(),vec_fcn_.output(vec_g_).begin(),qpB_.begin(),std::minus<double>());
 
-  // Get the objective function terms in the QP
+  // Gradient of the objective in the reduced QP
   if(gauss_newton_){
-    // Gradient of the objective
     transform(b_gn_.begin(),b_gn_.end(),vec_fcn_.output(vec_gf_).begin(),b_gn_.begin(),std::minus<double>());
     const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
     fill(qpG_.begin(),qpG_.end(),0);
     DMatrix::mul_no_alloc_tn(B_obj,b_gn_,qpG_);
   } else {
-
-    // Gradient of the lagrangian
-    transform(gL_.begin(),gL_.end(),vec_fcn_.output(vec_gf_).begin(),gL_.begin(),std::minus<double>());
-    copy(gL_.begin(),gL_.end(),qpG_.begin());
-
-    // Remove the contribution from the simple bounds multipliers
-    const vector<double> &qpA_data = qpA_.data();
-    const vector<int> &qpA_rowind = qpA_.rowind();
-    const vector<int> &qpA_col = qpA_.col();
-    for(int i=0; i<nx_; ++i)  qpG_[i] -= x_lam_[i];
-    for(int i=0; i<ng_; ++i){
-      for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
-	qpG_[qpA_col[el]] -= qpA_data[el]*g_lam_[i];
-      }
-    }
+    transform(gf_.begin(),gf_.end(),vec_fcn_.output(vec_gf_).begin(),gf_.begin(),std::minus<double>());
+    copy(gf_.begin(),gf_.end(),qpG_.begin());
   }
   
   double time2 = clock();
@@ -1349,7 +1326,6 @@ void SCPgenInternal::eval_exp(){
   if(!gauss_newton_){
     exp_fcn_.setInput(g_dlam_,mod_dlam_g_);
     exp_fcn_.setInput(g_lam_,mod_g_lam_);
-    exp_fcn_.setInput(x_lam_,mod_x_lam_);
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       exp_fcn_.setInput(it->resL,it->mod_lam);
     }

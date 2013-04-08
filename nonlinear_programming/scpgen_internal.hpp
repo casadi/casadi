@@ -162,11 +162,11 @@ public:
   std::vector<double> g_, g_lb_, g_ub_, g_lam_, g_dlam_;
 
   // Residual function io indices
-  int res_x_, res_p_, res_x_lam_, res_g_lam_, res_p_lam_, res_p_d_;
+  int res_x_, res_p_, res_g_lam_, res_p_lam_, res_p_d_;
   int res_f_, res_gl_, res_g_;
 
   // Modifier function io indices
-  int mod_x_, mod_p_, mod_x_lam_, mod_g_lam_;
+  int mod_x_, mod_p_, mod_g_lam_;
   int mod_f_, mod_gl_, mod_g_;
   int mod_du_, mod_dlam_g_;
 
