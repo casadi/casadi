@@ -147,12 +147,9 @@ public:
   /// Step expansion
   FX exp_fcn_;
   
-  /// Dimensions
-  int ngL_;
-
   // Objective value
   double f_;
-  std::vector<double> gf_;
+  std::vector<double> gf_, gL_, b_gn_;
 
   // Nonlifted variables with bound
   std::vector<double> x_lb_, x_ub_, x_init_, x_opt_, x_step_, x_lam_, x_dlam_;
@@ -162,7 +159,7 @@ public:
   MX p_;
 
   // Nonlinear bounds
-  std::vector<double> g_, g_lb_, g_ub_, g_lam_, g_dlam_, gL_;
+  std::vector<double> g_, g_lb_, g_ub_, g_lam_, g_dlam_;
 
   // Residual function io indices
   int res_x_, res_p_, res_x_lam_, res_g_lam_, res_p_lam_, res_p_d_;

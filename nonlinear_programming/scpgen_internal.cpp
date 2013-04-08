@@ -247,7 +247,7 @@ void SCPgenInternal::init(){
     // Least square objective
     f = inner_prod(vdef_out[0],vdef_out[0])/2;
     gL_defL = vdef_out[0];
-    ngL_ = gL_defL.size();
+    b_gn_.resize(gL_defL.size(),numeric_limits<double>::quiet_NaN());
 
   } else {
     // Scalar objective function
@@ -295,13 +295,12 @@ void SCPgenInternal::init(){
 
     // Multipliers for the simple bounds
     gL_defL += x_lam;
-    ngL_ = nx_;
 
     if(verbose_){
       cout << "Generated the gradient of the Lagrangian." << endl;
     }
   }
-  gL_.resize(ngL_, numeric_limits<double>::quiet_NaN());
+  gL_.resize(nx_, numeric_limits<double>::quiet_NaN());
   gf_.resize(nx_, numeric_limits<double>::quiet_NaN());
 
   // Residual function
@@ -925,7 +924,7 @@ double SCPgenInternal::dualInfeasibility(){
   double du_inf = 0;
   
   // Lifted variables
-  for(int i=0; i<ngL_; ++i) du_inf += ::fabs(gL_[i]);
+  for(int i=0; i<nx_; ++i) du_inf += ::fabs(gL_[i]);
 
   return du_inf;
 }
@@ -1027,6 +1026,17 @@ void SCPgenInternal::eval_mat(){
     DMatrix::mul_no_alloc_tn(B_obj,B_obj,qpH_);
   } else {
     mat_fcn_.getOutput(qpH_,mat_hes_);
+
+    // Remove the contribution from the simple bounds multipliers
+    const vector<double> &qpA_data = qpA_.data();
+    const vector<int> &qpA_rowind = qpA_.rowind();
+    const vector<int> &qpA_col = qpA_.col();
+    for(int i=0; i<nx_; ++i)  gL_[i] = gf_[i]; // + x_lam_[i];
+    for(int i=0; i<ng_; ++i){
+      for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
+	//gL_[qpA_col[el]] += qpA_data[el]*g_lam_[i];
+      }
+    }
   }
 
   double time2 = clock();
@@ -1062,7 +1072,11 @@ void SCPgenInternal::eval_res(){
   f_ = res_fcn_.output(res_f_).toScalar();
 
   // Get objective gradient
-  res_fcn_.getOutput(gL_,res_gl_);
+  if(gauss_newton_){
+    res_fcn_.getOutput(b_gn_,res_gl_);
+  } else {
+    res_fcn_.getOutput(gf_,res_gl_);
+  }
 
   // Get constraints
   res_fcn_.getOutput(g_,res_g_);
@@ -1109,31 +1123,28 @@ void SCPgenInternal::eval_vec(){
 
   // Get condensed vectors
   transform(g_.begin(),g_.end(),vec_fcn_.output(vec_g_).begin(),qpB_.begin(),std::minus<double>());
-  transform(gL_.begin(),gL_.end(),vec_fcn_.output(vec_gf_).begin(),gL_.begin(),std::minus<double>());
 
   // Get the objective function terms in the QP
   if(gauss_newton_){
     // Gradient of the objective
+    transform(b_gn_.begin(),b_gn_.end(),vec_fcn_.output(vec_gf_).begin(),b_gn_.begin(),std::minus<double>());
     const DMatrix& B_obj =  mat_fcn_.output(mat_hes_);
     fill(qpG_.begin(),qpG_.end(),0);
-    DMatrix::mul_no_alloc_tn(B_obj,gL_,qpG_);
+    DMatrix::mul_no_alloc_tn(B_obj,b_gn_,qpG_);
   } else {
+
     // Gradient of the lagrangian
+    transform(gL_.begin(),gL_.end(),vec_fcn_.output(vec_gf_).begin(),gL_.begin(),std::minus<double>());
     copy(gL_.begin(),gL_.end(),qpG_.begin());
 
     // Remove the contribution from the simple bounds multipliers
-    for(int i=0; i<nx_; ++i){
-      qpG_[i] -= x_lam_[i];
-    }
-
-    // Remove the contribution from the nonlinear multipliers to get the gradient of the objective
     const vector<double> &qpA_data = qpA_.data();
     const vector<int> &qpA_rowind = qpA_.rowind();
     const vector<int> &qpA_col = qpA_.col();
+    for(int i=0; i<nx_; ++i)  qpG_[i] -= x_lam_[i];
     for(int i=0; i<ng_; ++i){
       for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
-	int j=qpA_col[el];
-	qpG_[j] -= qpA_data[el]*g_lam_[i];
+	qpG_[qpA_col[el]] -= qpA_data[el]*g_lam_[i];
       }
     }
   }
