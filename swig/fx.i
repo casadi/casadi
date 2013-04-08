@@ -55,6 +55,7 @@
 %template(IOSchemeVectorMX) CasADi::IOSchemeVector< CasADi::MX >;
 %template(IOSchemeVectorSXMatrix) CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SX> >;
 %template(IOSchemeVectorCRSSparsity) CasADi::IOSchemeVector< CasADi::CRSSparsity >;
+#ifdef SWIGPYTHON
 %extend CasADi::IOSchemeVector< CasADi::MX > {
 %pythoncode %{
   def __iter__(self):
@@ -73,6 +74,7 @@
     return self.data().__iter__()
 %}
 }
+#endif
 %include "symbolic/fx/fx.hpp"
 
 %include "symbolic/fx/sx_function.hpp"
