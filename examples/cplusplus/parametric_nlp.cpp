@@ -126,7 +126,7 @@ int main(){
   cout << "-----" << endl;
   cout << "Optimal solution for p = " << solver.input("p").getDescription() << ":" << endl;
   cout << setw(30) << "Objective: " << solver.output("f").getDescription() << endl;
-  cout << setw(30) << "Primal solution: " << solver.output("x_opt").getDescription() << endl;
+  cout << setw(30) << "Primal solution: " << solver.output("x").getDescription() << endl;
   cout << setw(30) << "Dual solution (x): " << solver.output("lam_x").getDescription() << endl;
   cout << setw(30) << "Dual solution (g): " << solver.output("lam_g").getDescription() << endl;
   
