@@ -150,25 +150,25 @@ main()
 	// initialize the solver
 	solver.init();
 
-	solver.setInput(    ocp.lb, NLP_LBX);
-	solver.setInput(    ocp.ub, NLP_UBX);
-	solver.setInput( ocp.guess, NLP_SOLVER_X0);
+	solver.setInput(    ocp.lb, "lbx");
+	solver.setInput(    ocp.ub, "ubx");
+	solver.setInput( ocp.guess, "x0");
 
 	// Bounds on g
-	solver.setInput( ocp.gMin, NLP_LBG);
-	solver.setInput( ocp.gMax, NLP_UBG);
+	solver.setInput( ocp.gMin, "lbg");
+	solver.setInput( ocp.gMax, "ubg");
 
 	// Solve the problem
 	solver.solve();
 
 	// Print the optimal cost
 	double cost;
-	solver.getOutput(cost,NLP_SOLVER_F);
+	solver.getOutput(cost,"f");
 	cout << "optimal time: " << cost << endl;
 
 	// Print the optimal solution
 	vector<double>xopt(ocp.designVariables.size1());
-	solver.getOutput(xopt,NLP_SOLVER_X);
+	solver.getOutput(xopt,"x");
 	cout << "optimal solution: " << xopt << endl;
 
 	ocp.writeOctaveOutput( "glider_out" );

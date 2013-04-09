@@ -99,27 +99,27 @@ int main(){
     umax[i] =  1;
     uinit[i] = -0.2;
   }
-  solver.setInput(umin,NLP_LBX);
-  solver.setInput(umax,NLP_UBX);
-  solver.setInput(uinit,NLP_SOLVER_X0);
+  solver.setInput(umin,"lbx");
+  solver.setInput(umax,"ubx");
+  solver.setInput(uinit,"x0");
   
   // Bounds on the state (xmin < g < xmax)
   vector<double> xmin(nu,-1.), xmax(nu,1.);
   
-  solver.setInput(xmin,NLP_LBG);
-  solver.setInput(xmax,NLP_UBG);
+  solver.setInput(xmin,"lbg");
+  solver.setInput(xmax,"ubg");
 
   // Solve the problem
   solver.solve();
 
   // Print the optimal cost
   double cost;
-  solver.getOutput(cost,NLP_SOLVER_F);
+  solver.getOutput(cost,"f");
   cout << "optimal cost: " << cost << endl;
 
   // Print the optimal solution
   vector<double> uopt(nu);
-  solver.getOutput(uopt,NLP_SOLVER_X);
+  solver.getOutput(uopt,"x");
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory
