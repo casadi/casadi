@@ -52,6 +52,8 @@ option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOAS
 option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
+option(WITH_KNITRO "Compile the interface to KNITRO" ON)
+option(WITH_CPLEX "Compile the interface to CPLEX" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
 
 # For code optimization
@@ -218,13 +220,17 @@ if(WITH_ACADO)
   find_package(ACADO)
 endif()
 
-find_package(KNITRO)
+if(WITH_KNITRO)
+  find_package(KNITRO)
+endif(WITH_KNITRO)
 add_feature_info(knitro-interface KNITRO_FOUND "Interface to the NLP solver KNITRO.")
 
 find_package(LIFTOPT)
 add_feature_info(liftopt-interface LIFTOPT_FOUND "Interface to the Lifted Newton implementation LiftOpt.")
 
-find_package(CPLEX)
+if(WITH_CPLEX)
+  find_package(CPLEX)
+endif(WITH_CPLEX)
 add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX.")
 
 # if(WITH_GSL)
