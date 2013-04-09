@@ -356,23 +356,23 @@ void NLPSolverInternal::init(){
   double inf = numeric_limits<double>::infinity();
   
   // Allocate space for inputs
-  input_.resize(NLP_NUM_IN);
+  input_.resize(NLP_SOLVER_NUM_IN);
   input(NLP_SOLVER_X0)      =  DMatrix::zeros(nx_);
-  input(NLP_LBX)         = -DMatrix::inf(nx_);
-  input(NLP_UBX)         =  DMatrix::inf(nx_);
-  input(NLP_LBG)         = -DMatrix::inf(ng_);
-  input(NLP_UBG)         =  DMatrix::inf(ng_);
+  input(NLP_SOLVER_LBX)         = -DMatrix::inf(nx_);
+  input(NLP_SOLVER_UBX)         =  DMatrix::inf(nx_);
+  input(NLP_SOLVER_LBG)         = -DMatrix::inf(ng_);
+  input(NLP_SOLVER_UBG)         =  DMatrix::inf(ng_);
   input(NLP_SOLVER_LAM_G0) =  DMatrix::zeros(ng_);
-  input(NLP_P)           =  DMatrix::zeros(np_);
+  input(NLP_SOLVER_P)           =  DMatrix::zeros(np_);
   
   // Allocate space for outputs
-  output_.resize(NLP_NUM_OUT);
+  output_.resize(NLP_SOLVER_NUM_OUT);
   output(NLP_SOLVER_X)      = DMatrix::zeros(nx_);
   output(NLP_SOLVER_F)       = DMatrix::zeros(1);
   output(NLP_SOLVER_LAM_X)   = DMatrix::zeros(nx_);
   output(NLP_SOLVER_LAM_G)   = DMatrix::zeros(ng_);
   output(NLP_SOLVER_LAM_P)   = DMatrix::zeros(np_);
-  output(NLP_G)          = DMatrix::zeros(ng_);
+  output(NLP_SOLVER_G)          = DMatrix::zeros(ng_);
   
   if (hasSetOption("iteration_callback")) {
    callback_ = getOption("iteration_callback");
@@ -380,8 +380,8 @@ void NLPSolverInternal::init(){
      if (!callback_.isInit()) callback_.init();
      casadi_assert_message(callback_.getNumOutputs()==1, "Callback function should have one output, a scalar that indicates wether to break. 0 = continue");
      casadi_assert_message(callback_.output(0).size()==1, "Callback function should have one output, a scalar that indicates wether to break. 0 = continue");
-     casadi_assert_message(callback_.getNumInputs()==NLP_NUM_OUT, "Callback function should have the output scheme of NLPSolver as input scheme. i.e. " <<NLP_NUM_OUT << " inputs instead of the " << callback_.getNumInputs() << " you provided." );
-     for (int i=0;i<NLP_NUM_OUT;i++) {
+     casadi_assert_message(callback_.getNumInputs()==NLP_SOLVER_NUM_OUT, "Callback function should have the output scheme of NLPSolver as input scheme. i.e. " <<NLP_SOLVER_NUM_OUT << " inputs instead of the " << callback_.getNumInputs() << " you provided." );
+     for (int i=0;i<NLP_SOLVER_NUM_OUT;i++) {
        casadi_assert_message(callback_.input(i).sparsity()==output(i).sparsity(),
          "Callback function should have the output scheme of NLPSolver as input scheme. " << 
          describeInput(inputScheme_,i) << " was found to be " << callback_.input(i).dimString() << " instead of expected " << output(i).dimString() << "."
@@ -401,10 +401,10 @@ void NLPSolverInternal::checkInitialBounds() {
   if(bool(getOption("warn_initial_bounds"))){
     bool violated = false;
     for (int k=0;k<input(NLP_SOLVER_X0).size();++k) {
-      if (input(NLP_SOLVER_X0).at(k)>input(NLP_UBX).at(k)) {
+      if (input(NLP_SOLVER_X0).at(k)>input(NLP_SOLVER_UBX).at(k)) {
         violated = true;
       }
-      if (input(NLP_SOLVER_X0).at(k)<input(NLP_LBX).at(k)) {
+      if (input(NLP_SOLVER_X0).at(k)<input(NLP_SOLVER_LBX).at(k)) {
         violated = true;
       }
     }
@@ -416,10 +416,10 @@ void NLPSolverInternal::checkInitialBounds() {
   void NLPSolverInternal::reportConstraints(std::ostream &stream) { 
   
     stream << "Reporting NLP constraints" << endl;
-    CasADi::reportConstraints(stream,output(NLP_SOLVER_X),input(NLP_LBX),input(NLP_UBX), "decision bounds");
+    CasADi::reportConstraints(stream,output(NLP_SOLVER_X),input(NLP_SOLVER_LBX),input(NLP_SOLVER_UBX), "decision bounds");
     double tol = 1e-8;
     if (hasOption("constr_viol_tol")) tol = getOption("constr_viol_tol");
-    CasADi::reportConstraints(stream,output(NLP_G),input(NLP_LBG),input(NLP_UBG), "constraints",getOption("constr_viol_tol"));
+    CasADi::reportConstraints(stream,output(NLP_SOLVER_G),input(NLP_SOLVER_LBG),input(NLP_SOLVER_UBG), "constraints",getOption("constr_viol_tol"));
   }
 
 

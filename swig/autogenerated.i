@@ -559,12 +559,12 @@ def nlpsolverIn(*dummy,**kwargs):
   
   Keyword arguments:
     x0     -- Decision variables initial guess (nx x 1)  [NLP_SOLVER_X0]
-    lbx    -- Decision variables lower bound (nx x 1), default -inf [NLP_LBX]
-    ubx    -- Decision variables upper bound (nx x 1), default +inf [NLP_UBX]
-    lbg    -- Constraints lower bound (ng x 1), default -inf [NLP_LBG]
-    ubg    -- Constraints upper bound (ng x 1), default +inf [NLP_UBG]
+    lbx    -- Decision variables lower bound (nx x 1), default -inf [NLP_SOLVER_LBX]
+    ubx    -- Decision variables upper bound (nx x 1), default +inf [NLP_SOLVER_UBX]
+    lbg    -- Constraints lower bound (ng x 1), default -inf [NLP_SOLVER_LBG]
+    ubg    -- Constraints upper bound (ng x 1), default +inf [NLP_SOLVER_UBG]
     lam_g0 -- Lagrange multipliers associated with G, initial guess (ng x 1) [NLP_SOLVER_LAM_G0]
-    p      -- Parameters on which the objective and constraints might depend (np x 1) [NLP_P]
+    p      -- Parameters on which the objective and constraints might depend (np x 1) [NLP_SOLVER_P]
   """
   if(len(dummy)>0): raise Exception("Error in nlpsolverIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n nlpsolverIn(my_x0, my_lbx, my_ubx, my_lbg, my_ubg, my_lam_g0, my_p)\nmust be written\n nlpsolverIn(x0=my_x0, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_g0=my_lam_g0, p=my_p)\nwhere any keyword is optional.")
   x0 = []
@@ -614,7 +614,7 @@ def nlpsolverOut(*dummy,**kwargs):
     lam_g -- Lagrange multipliers associated with G at the solution (ng x 1) [NLP_SOLVER_LAM_G]
     lam_x -- Lagrange multipliers associated with bounds on X at the solution (nx x 1) [NLP_SOLVER_LAM_X]
     lam_p -- Lagrange multipliers associated with the parameters (np x 1) [NLP_SOLVER_LAM_P]
-    g     -- The constraints evaluated at the optimal solution (ng x 1) [NLP_G]
+    g     -- The constraints evaluated at the optimal solution (ng x 1) [NLP_SOLVER_G]
   """
   if(len(dummy)>0): raise Exception("Error in nlpsolverOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n nlpsolverOut(my_x, my_f, my_lam_g, my_lam_x, my_lam_p, my_g)\nmust be written\n nlpsolverOut(x=my_x, f=my_f, lam_g=my_lam_g, lam_x=my_lam_x, lam_p=my_lam_p, g=my_g)\nwhere any keyword is optional.")
   x = []

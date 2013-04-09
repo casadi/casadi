@@ -50,18 +50,18 @@ enum NLPInput{
 /// Decision variables initial guess (nx x 1)  [x0]
 NLP_SOLVER_X0,
 /// Decision variables lower bound (nx x 1), default -inf [lbx]
-NLP_LBX,
+NLP_SOLVER_LBX,
 /// Decision variables upper bound (nx x 1), default +inf [ubx]
-NLP_UBX,
+NLP_SOLVER_UBX,
 /// Constraints lower bound (ng x 1), default -inf [lbg]
-NLP_LBG,
+NLP_SOLVER_LBG,
 /// Constraints upper bound (ng x 1), default +inf [ubg]
-NLP_UBG,
+NLP_SOLVER_UBG,
 /// Lagrange multipliers associated with G, initial guess (ng x 1) [lam_g0]
 NLP_SOLVER_LAM_G0,
 /// Parameters on which the objective and constraints might depend (np x 1) [p]
-NLP_P,
-NLP_NUM_IN};
+NLP_SOLVER_P,
+NLP_SOLVER_NUM_IN};
 
 /// Output arguments of an NLP Solver [nlpsolverOut]
 enum NLPOutput{
@@ -76,8 +76,8 @@ NLP_SOLVER_LAM_X,
 /// Lagrange multipliers associated with the parameters (np x 1) [lam_p]
 NLP_SOLVER_LAM_P, 
 /// The constraints evaluated at the optimal solution (ng x 1) [g]
-NLP_G,
-NLP_NUM_OUT};
+NLP_SOLVER_G,
+NLP_SOLVER_NUM_OUT};
 
 class NLPSolverInternal;
 

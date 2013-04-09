@@ -556,12 +556,12 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_NLPInput: 
       if(i==0) return "NLP_SOLVER_X0";
-      if(i==1) return "NLP_LBX";
-      if(i==2) return "NLP_UBX";
-      if(i==3) return "NLP_LBG";
-      if(i==4) return "NLP_UBG";
+      if(i==1) return "NLP_SOLVER_LBX";
+      if(i==2) return "NLP_SOLVER_UBX";
+      if(i==3) return "NLP_SOLVER_LBG";
+      if(i==4) return "NLP_SOLVER_UBG";
       if(i==5) return "NLP_SOLVER_LAM_G0";
-      if(i==6) return "NLP_P";
+      if(i==6) return "NLP_SOLVER_P";
       casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLPInput has only 7 entries: ('NLPInput', 'x0, lbx, ubx, lbg, ubg, lam_g0, p')");
       break;
     case SCHEME_NLPOutput: 
@@ -570,7 +570,7 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==2) return "NLP_SOLVER_LAM_G";
       if(i==3) return "NLP_SOLVER_LAM_X";
       if(i==4) return "NLP_SOLVER_LAM_P";
-      if(i==5) return "NLP_G";
+      if(i==5) return "NLP_SOLVER_G";
       casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLPOutput has only 6 entries: ('NLPOutput', 'x, f, lam_g, lam_x, lam_p, g')");
       break;
     case SCHEME_MayerInput: 

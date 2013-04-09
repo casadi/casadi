@@ -209,19 +209,19 @@ void KnitroInternal::evaluate(int nfdir, int nadir){
   }
   
   // "Correct" upper and lower bounds
-  for(vector<double>::iterator it=input(NLP_LBX).begin(); it!=input(NLP_LBX).end(); ++it)
+  for(vector<double>::iterator it=input(NLP_SOLVER_LBX).begin(); it!=input(NLP_SOLVER_LBX).end(); ++it)
     if(isinf(*it)) *it = -KTR_INFBOUND;
-  for(vector<double>::iterator it=input(NLP_UBX).begin(); it!=input(NLP_UBX).end(); ++it)
+  for(vector<double>::iterator it=input(NLP_SOLVER_UBX).begin(); it!=input(NLP_SOLVER_UBX).end(); ++it)
     if(isinf(*it)) *it =  KTR_INFBOUND;
-  for(vector<double>::iterator it=input(NLP_LBG).begin(); it!=input(NLP_LBG).end(); ++it)
+  for(vector<double>::iterator it=input(NLP_SOLVER_LBG).begin(); it!=input(NLP_SOLVER_LBG).end(); ++it)
     if(isinf(*it)) *it = -KTR_INFBOUND;
-  for(vector<double>::iterator it=input(NLP_UBG).begin(); it!=input(NLP_UBG).end(); ++it)
+  for(vector<double>::iterator it=input(NLP_SOLVER_UBG).begin(); it!=input(NLP_SOLVER_UBG).end(); ++it)
     if(isinf(*it)) *it =  KTR_INFBOUND;
   
   // Initialize KNITRO
   status = KTR_init_problem(kc_handle_, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
-                              &input(NLP_LBX).front(), &input(NLP_UBX).front(),
-                              ng_, &cType.front(), &input(NLP_LBG).front(), &input(NLP_UBG).front(),
+                              &input(NLP_SOLVER_LBX).front(), &input(NLP_SOLVER_UBX).front(),
+                              ng_, &cType.front(), &input(NLP_SOLVER_LBG).front(), &input(NLP_SOLVER_UBG).front(),
                               Jcol.size(), &Jcol.front(), &Jrow.front(),
                               nnzH,
                               getPtr(Hrow),

@@ -392,10 +392,10 @@ void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt 
 void DirectCollocationInternal::evaluate(int nfdir, int nadir){
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_SOLVER_X0).data());
-  getVariableBounds(nlp_solver_.input(NLP_LBX).data(),nlp_solver_.input(NLP_UBX).data());
+  getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),nlp_solver_.input(NLP_SOLVER_UBX).data());
        
   // get NLP constraint bounds
-  getConstraintBounds(nlp_solver_.input(NLP_LBG).data(), nlp_solver_.input(NLP_UBG).data());
+  getConstraintBounds(nlp_solver_.input(NLP_SOLVER_LBG).data(), nlp_solver_.input(NLP_SOLVER_UBG).data());
        
   //Solve the problem
   nlp_solver_.solve();

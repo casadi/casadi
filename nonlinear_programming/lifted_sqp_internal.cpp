@@ -381,11 +381,11 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
   DMatrix &lam_g_k = output(NLP_SOLVER_LAM_G);
 
   // Bounds
-  const DMatrix &x_min = input(NLP_LBX);
-  const DMatrix &x_max = input(NLP_UBX);
+  const DMatrix &x_min = input(NLP_SOLVER_LBX);
+  const DMatrix &x_max = input(NLP_SOLVER_UBX);
   
-  const DMatrix &g_min = input(NLP_LBG);
-  const DMatrix &g_max = input(NLP_UBG);
+  const DMatrix &g_min = input(NLP_SOLVER_LBG);
+  const DMatrix &g_max = input(NLP_SOLVER_UBG);
   int k=0;
   
   // Does G depend on the multipliers?

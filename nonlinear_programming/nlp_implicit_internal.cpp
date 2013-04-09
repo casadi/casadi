@@ -57,7 +57,7 @@ void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
   int k = 0;
   
   for (int i=1;i<f_.getNumInputs();++i) {
-    std::copy(input(i-1).data().begin(),input(i-1).data().end(),nlp_solver_.input(NLP_P).data().begin()+k); k+= input(i-1).size();
+    std::copy(input(i-1).data().begin(),input(i-1).data().end(),nlp_solver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(i-1).size();
   }
   
   // Solve NLP
@@ -123,8 +123,8 @@ void NLPImplicitInternal::init(){
   nlp_solver_.init();
   
   
-  nlp_solver_.input(NLP_LBG).setAll(0);
-  nlp_solver_.input(NLP_UBG).setAll(0);
+  nlp_solver_.input(NLP_SOLVER_LBG).setAll(0);
+  nlp_solver_.input(NLP_SOLVER_UBG).setAll(0);
   
 }
 

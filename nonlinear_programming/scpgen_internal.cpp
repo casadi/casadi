@@ -662,10 +662,10 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   
   // Get problem data
   const vector<double>& x_init = input(NLP_SOLVER_X0).data();
-  const vector<double>& lbx = input(NLP_LBX).data();
-  const vector<double>& ubx = input(NLP_UBX).data();
-  const vector<double>& lbg = input(NLP_LBG).data();
-  const vector<double>& ubg = input(NLP_UBG).data();  
+  const vector<double>& lbx = input(NLP_SOLVER_LBX).data();
+  const vector<double>& ubx = input(NLP_SOLVER_UBX).data();
+  const vector<double>& lbg = input(NLP_SOLVER_LBG).data();
+  const vector<double>& ubg = input(NLP_SOLVER_UBG).data();  
   
   copy(x_init.begin(),x_init.end(),x_init_.begin());
   copy(lbx.begin(),lbx.end(),x_lb_.begin());
@@ -676,7 +676,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   if(v_.size()>0){
     // Initialize lifted variables using the generated function
     vinit_fcn_.setInput(x_init_,0);
-    vinit_fcn_.setInput(input(NLP_P),1);
+    vinit_fcn_.setInput(input(NLP_SOLVER_P),1);
     vinit_fcn_.evaluate();    
     for(int i=0; i<v_.size(); ++i){
       vinit_fcn_.getOutput(v_[i].init,i);
@@ -806,7 +806,7 @@ void SCPgenInternal::evaluate(int nfdir, int nadir){
   output(NLP_SOLVER_X).set(x_opt_);
   output(NLP_SOLVER_LAM_G).set(g_lam_);
   output(NLP_SOLVER_LAM_X).set(x_lam_);
-  output(NLP_G).set(g_);
+  output(NLP_SOLVER_G).set(g_);
   
   // Write timers
   if(print_time_){
@@ -973,7 +973,7 @@ void SCPgenInternal::eval_mat(){
   double time1 = clock();
 
   // Pass parameters
-  mat_fcn_.setInput(input(NLP_P),mod_p_);
+  mat_fcn_.setInput(input(NLP_SOLVER_P),mod_p_);
 
   // Pass primal step/variables  
   mat_fcn_.setInput(x_opt_, mod_x_);
@@ -1029,7 +1029,7 @@ void SCPgenInternal::eval_res(){
   double time1 = clock();
 
   // Pass parameters
-  res_fcn_.setInput(input(NLP_P),res_p_);
+  res_fcn_.setInput(input(NLP_SOLVER_P),res_p_);
 
   // Pass primal variables to the residual function for initial evaluation
   res_fcn_.setInput(x_opt_,res_x_);
@@ -1081,7 +1081,7 @@ void SCPgenInternal::eval_vec(){
   double time1 = clock();
 
   // Pass current parameter guess
-  vec_fcn_.setInput(input(NLP_P),mod_p_);
+  vec_fcn_.setInput(input(NLP_SOLVER_P),mod_p_);
 
   // Pass primal step/variables
   vec_fcn_.setInput(x_opt_, mod_x_);
@@ -1292,7 +1292,7 @@ void SCPgenInternal::eval_exp(){
   double time1 = clock();
 
   // Pass current parameter guess
-  exp_fcn_.setInput(input(NLP_P), mod_p_);
+  exp_fcn_.setInput(input(NLP_SOLVER_P), mod_p_);
 
   // Pass primal step/variables
   exp_fcn_.setInput(x_step_, mod_du_);

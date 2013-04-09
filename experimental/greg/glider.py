@@ -168,13 +168,13 @@ if __name__ == '__main__':
     solver.init()
     
     # Bounds on u and initial condition
-    solver.setInput(gliderOcp.lb, C.NLP_LBX)
-    solver.setInput(gliderOcp.ub, C.NLP_UBX)
+    solver.setInput(gliderOcp.lb, C.NLP_SOLVER_LBX)
+    solver.setInput(gliderOcp.ub, C.NLP_SOLVER_UBX)
     solver.setInput(gliderOcp.guess, C.NLP_SOLVER_X0)
     
     # Bounds on g
-    solver.setInput(gliderOcp.Gmin, C.NLP_LBG)
-    solver.setInput(gliderOcp.Gmax, C.NLP_UBG)
+    solver.setInput(gliderOcp.Gmin, C.NLP_SOLVER_LBG)
+    solver.setInput(gliderOcp.Gmax, C.NLP_SOLVER_UBG)
     
     # Solve the problem
     solver.solve()

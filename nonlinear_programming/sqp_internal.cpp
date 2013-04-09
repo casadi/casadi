@@ -209,14 +209,14 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   
   // Get problem data
   const vector<double>& x_init = input(NLP_SOLVER_X0).data();
-  const vector<double>& lbx = input(NLP_LBX).data();
-  const vector<double>& ubx = input(NLP_UBX).data();
-  const vector<double>& lbg = input(NLP_LBG).data();
-  const vector<double>& ubg = input(NLP_UBG).data();
+  const vector<double>& lbx = input(NLP_SOLVER_LBX).data();
+  const vector<double>& ubx = input(NLP_SOLVER_UBX).data();
+  const vector<double>& lbg = input(NLP_SOLVER_LBG).data();
+  const vector<double>& ubg = input(NLP_SOLVER_UBG).data();
   
   // Set the static parameter
   if (parametric_) {
-    const vector<double>& p = input(NLP_P).data();
+    const vector<double>& p = input(NLP_SOLVER_P).data();
     if (!F_.isNull()) F_.setInput(p,F_.getNumInputs()-1);
     if (!G_.isNull()) G_.setInput(p,G_.getNumInputs()-1);
     if (!H_.isNull()) H_.setInput(p,H_.getNumInputs()-1);
@@ -290,7 +290,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       callback_.input(NLP_SOLVER_X).set(x_);
       callback_.input(NLP_SOLVER_LAM_G).set(mu_);
       callback_.input(NLP_SOLVER_LAM_X).set(mu_x_);
-      callback_.input(NLP_G).set(gk_);
+      callback_.input(NLP_SOLVER_G).set(gk_);
       callback_.evaluate();
       
       if (callback_.output(0).at(0)) {
@@ -466,7 +466,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   output(NLP_SOLVER_X).set(x_);
   output(NLP_SOLVER_LAM_G).set(mu_);
   output(NLP_SOLVER_LAM_X).set(mu_x_);
-  output(NLP_G).set(gk_);
+  output(NLP_SOLVER_G).set(gk_);
   
   // Save statistics
   stats_["iter_count"] = iter;
