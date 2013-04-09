@@ -267,7 +267,7 @@ class NLPtests(casadiTestCase):
     solver.input("ubx").set([10]*2)
     solver.input("lbg").set([0])
     solver.input("ubg").set([1])
-    solver.input("x0").set(oldsolver.output("x_opt"))
+    solver.input("x0").set(oldsolver.output("x"))
     solver.input("lam_g0").set(oldsolver.output("lam_g"))
     solver.output("lam_x").set(oldsolver.output("lam_x"))
     
@@ -307,7 +307,7 @@ class NLPtests(casadiTestCase):
       
       digits = 5
       
-      self.assertAlmostEqual(solver.output("f")[0],c_r,digits,str(Solver) + str(solver.output("cost")[0]) + ":" + str(c_r))
+      self.assertAlmostEqual(solver.output("f")[0],c_r,digits,str(Solver) + str(solver.output("f")[0]) + ":" + str(c_r))
       self.assertAlmostEqual(solver.output("x")[0],x_r[0],digits,str(Solver))
       self.assertAlmostEqual(solver.output("x")[1],x_r[1],digits,str(Solver))
       self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
