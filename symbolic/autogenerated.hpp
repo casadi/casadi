@@ -296,8 +296,8 @@ IOSchemeVector<M> integratorOut(const std::string arg_s0="",M arg_m0=M(),const s
 /// 
 /// \copydoc scheme_NLPInput
 template<class M>
-IOSchemeVector<M> nlpsolverIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M()){
-  std::vector<M> ret(7);
+IOSchemeVector<M> nlpsolverIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M()){
+  std::vector<M> ret(8);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
@@ -306,11 +306,12 @@ IOSchemeVector<M> nlpsolverIn(const std::string arg_s0="",M arg_m0=M(),const std
   if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
   if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
   if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
+  if (arg_s7!="") arg.insert(make_pair(arg_s7,arg_m7));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in NLPInput: '" << it->first << "' is not recognized. Available keywords are: x0, lbx, ubx, lbg, ubg, lam_g0, p");
+      casadi_error("Keyword error in NLPInput: '" << it->first << "' is not recognized. Available keywords are: x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0");
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_NLPInput);
@@ -333,7 +334,7 @@ IOSchemeVector<M> nlpsolverOut(const std::string arg_s0="",M arg_m0=M(),const st
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPOutput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in NLPOutput: '" << it->first << "' is not recognized. Available keywords are: x, f, lam_g, lam_x, lam_p, g");
+      casadi_error("Keyword error in NLPOutput: '" << it->first << "' is not recognized. Available keywords are: x, f, g, lam_x, lam_g, lam_p");
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_NLPOutput);

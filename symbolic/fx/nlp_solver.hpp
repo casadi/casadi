@@ -47,8 +47,10 @@ namespace CasADi{
   
 /// Input arguments of an NLP Solver [nlpsolverIn]
 enum NLPInput{
-/// Decision variables initial guess (nx x 1)  [x0]
+/// Decision variables, initial guess (nx x 1)  [x0]
 NLP_SOLVER_X0,
+/// Value of fixed parameters (np x 1) [p]
+NLP_SOLVER_P,
 /// Decision variables lower bound (nx x 1), default -inf [lbx]
 NLP_SOLVER_LBX,
 /// Decision variables upper bound (nx x 1), default +inf [ubx]
@@ -57,26 +59,26 @@ NLP_SOLVER_UBX,
 NLP_SOLVER_LBG,
 /// Constraints upper bound (ng x 1), default +inf [ubg]
 NLP_SOLVER_UBG,
-/// Lagrange multipliers associated with G, initial guess (ng x 1) [lam_g0]
+/// Lagrange multipliers for bounds on X, initial guess (nx x 1) [lam_x0]
+NLP_SOLVER_LAM_X0,
+/// Lagrange multipliers for bounds on G, initial guess (ng x 1) [lam_g0]
 NLP_SOLVER_LAM_G0,
-/// Parameters on which the objective and constraints might depend (np x 1) [p]
-NLP_SOLVER_P,
 NLP_SOLVER_NUM_IN};
 
 /// Output arguments of an NLP Solver [nlpsolverOut]
 enum NLPOutput{
-/// Decision variables for optimal solution (nx x 1) [x]
+/// Decision variables at the optimal solution (nx x 1) [x]
 NLP_SOLVER_X,
-/// Objective/cost function for optimal solution (1 x 1) [f]
+/// Cost function value at the optimal solution (1 x 1) [f]
 NLP_SOLVER_F,
-/// Lagrange multipliers associated with G at the solution (ng x 1) [lam_g]
-NLP_SOLVER_LAM_G,
-/// Lagrange multipliers associated with bounds on X at the solution (nx x 1) [lam_x]
-NLP_SOLVER_LAM_X, 
-/// Lagrange multipliers associated with the parameters (np x 1) [lam_p]
-NLP_SOLVER_LAM_P, 
-/// The constraints evaluated at the optimal solution (ng x 1) [g]
+/// Constraints function at the optimal solution (ng x 1) [g]
 NLP_SOLVER_G,
+/// Lagrange multipliers for bounds on X at the solution (nx x 1) [lam_x]
+NLP_SOLVER_LAM_X, 
+/// Lagrange multipliers for bounds on G at the solution (ng x 1) [lam_g]
+NLP_SOLVER_LAM_G,
+/// Lagrange multipliers for bounds on P at the solution (np x 1) [lam_p]
+NLP_SOLVER_LAM_P, 
 NLP_SOLVER_NUM_OUT};
 
 class NLPSolverInternal;
