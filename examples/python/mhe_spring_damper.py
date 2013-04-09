@@ -175,7 +175,7 @@ nlp_solver.setInput(initialisation_state,"x0")
 
 nlp_solver.solve()
 # Get the solution
-solution = shooting(nlp_solver.output("x_opt"))
+solution = shooting(nlp_solver.output("x"))
 estimated_X[:,0:N] = solution["X",horzcat]
 estimated_W[:,0:N-1] = solution["W",horzcat]
 
@@ -222,7 +222,7 @@ for i in range(1,Nsimulation-N+1):
   nlp_solver.setInput(initialisation_state,"x0")
   nlp_solver.solve()
   # Now get the state estimate. Note that we are only interested in the last node of the horizon
-  solution = shooting(nlp_solver.output("x_opt"))
+  solution = shooting(nlp_solver.output("x"))
   estimated_X[:,N-1+i] = solution["X",N-1]
   estimated_W[:,N-2+i] = solution["W",N-2]
 # Plot the results
