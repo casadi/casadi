@@ -2,6 +2,9 @@ cmake_minimum_required (VERSION 2.0)
 set(PACKAGE_NAME "CasADi")
 set(PACKAGE_VERSION "1.4.1")
 
+# NOTE: you are not allowd to generate header files with configure_file in this module.
+# See https://github.com/casadi/casadi/issues/646
+
 # Enforce cmake2.4+ style behaviour for mixed filename/full path linker directives
 if(COMMAND cmake_policy)
 cmake_policy(SET CMP0003 NEW)
