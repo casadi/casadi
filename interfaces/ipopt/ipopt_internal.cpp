@@ -704,11 +704,11 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
                                    double* lambda)
 {
   try {
-    //bool warmstart = hasSetOption("warm_start_init_point") && getOption("warm_start_init_point")=="yes";
-    casadi_assert_warning(init_x,"Not initializing x");
+    bool warmstart = hasSetOption("warm_start_init_point") && getOption("warm_start_init_point")=="yes";
+    //casadi_assert_warning(init_x,"Not initializing x");
     if (warmstart) {
-      casadi_assert_warning(init_lambda,"Not initializing lambda");
-      casadi_assert_warning(init_z,"Not initializing z");
+      //casadi_assert_warning(init_lambda,"Not initializing lambda");
+      //casadi_assert_warning(init_z,"Not initializing z");
     }
       
     if(init_x) 
