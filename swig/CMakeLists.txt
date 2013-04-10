@@ -1,6 +1,4 @@
 cmake_minimum_required (VERSION 2.0)
-set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "1.4.1")
 
 # Enforce cmake2.4+ style behaviour for mixed filename/full path linker directives
 if(COMMAND cmake_policy)
