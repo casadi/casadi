@@ -59,27 +59,27 @@ class Deprecate(object):
         return output
 
 deprecated = {}
-for oldenum, newenum, string in [
-  ("NLP_X_INIT","NLP_SOLVER_X0","x0"),
-  ("NLP_LBX","NLP_SOLVER_LBX","lbx"),
-  ("NLP_UBX","NLP_SOLVER_UBX","ubx"),
-  ("NLP_LBG","NLP_SOLVER_LBG","lbg"),
-  ("NLP_UBG","NLP_SOLVER_UBG","ubg"),
-  ("NLP_LAMBDA_INIT","NLP_SOLVER_LAMB_G0","lam_g0"),
-  ("NLP_P","NLP_SOLVER_P","p"),
-  ("NLP_X_OPT","NLP_SOLVER_X","x"),
-  ("NLP_COST","NLP_SOLVER_F","f"),
-  ("NLP_LAMBDA_G","NLP_SOLVER_LAM_G","lam_g"),
-  ("NLP_LAMBDA_X","NLP_SOLVER_LAM_X","lam_x"),
-  ("NLP_G","NLP_SOLVER_G","g"),
+for oldenum, newenum, string , io in [
+  ("NLP_X_INIT","NLP_SOLVER_X0","x0","input"),
+  ("NLP_LBX","NLP_SOLVER_LBX","lbx","input"),
+  ("NLP_UBX","NLP_SOLVER_UBX","ubx","input"),
+  ("NLP_LBG","NLP_SOLVER_LBG","lbg","input"),
+  ("NLP_UBG","NLP_SOLVER_UBG","ubg","input"),
+  ("NLP_LAMBDA_INIT","NLP_SOLVER_LAMB_G0","lam_g0","input"),
+  ("NLP_P","NLP_SOLVER_P","p","input"),
+  ("NLP_X_OPT","NLP_SOLVER_X","x","output"),
+  ("NLP_COST","NLP_SOLVER_F","f","output"),
+  ("NLP_LAMBDA_G","NLP_SOLVER_LAM_G","lam_g","output"),
+  ("NLP_LAMBDA_X","NLP_SOLVER_LAM_X","lam_x","output"),
+  ("NLP_G","NLP_SOLVER_G","g","output"),
   ]:
-    deprecated[oldenum] = Deprecate(0,"""%s is dropped. Use %s instead.\nYou can in fact avoid using either of them alltogether:\n  solver.input(%s)\n     becomes\n  solver.input("%s")\nreference: https://github.com/casadi/casadi/issues/566""" % (oldenum,newenum,oldenum,string),error=True)
+    deprecated[oldenum] = Deprecate(-1,"""%s is dropped. Use %s instead.\nYou can in fact avoid using either of them alltogether:\n  solver.%s(%s)\n     becomes\n  solver.%s("%s")\nreference: https://github.com/casadi/casadi/issues/566""" % (oldenum,newenum,io,oldenum,io,string),error=True)
           
 for oldenum, newenum in [
     ("NLP_NUM_IN","NLP_SOLVER_NUM_IN"),
     ("NLP_NUM_OUT","NLP_SOLVER_NUM_OUT"),
   ]:
-    deprecated[oldenum] = Deprecate(0,"""%s is dropped. Use %s instead.\nreference: https://github.com/casadi/casadi/issues/566""" % (oldenum,newenum),error=True)
+    deprecated[oldenum] = Deprecate(-1,"""%s is dropped. Use %s instead.\nreference: https://github.com/casadi/casadi/issues/566""" % (oldenum,newenum),error=True)
 
 NLP_X_INIT = deprecated["NLP_X_INIT"]
 NLP_LBX = deprecated["NLP_LBX"]
