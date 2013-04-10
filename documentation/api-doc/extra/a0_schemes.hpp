@@ -113,12 +113,12 @@
 <table>
 <caption>Output scheme: CasADi::NLPOutput  (NLP_SOLVER_NUM_OUT = 6) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NLP_SOLVER_X</td><td>Decision variables for optimal solution (nx x 1) [x].</td></tr>
-<tr><td>NLP_SOLVER_F</td><td>Objective/cost function for optimal solution (1 x 1) [f].</td></tr>
-<tr><td>NLP_SOLVER_LAM_G</td><td>Lagrange multipliers associated with G at the solution (ng x 1) [lam_g].</td></tr>
-<tr><td>NLP_SOLVER_LAM_X</td><td>Lagrange multipliers associated with bounds on X at the solution (nx x 1) [lam_x].</td></tr>
-<tr><td>NLP_SOLVER_LAM_P</td><td>Lagrange multipliers associated with the parameters (np x 1) [lam_p].</td></tr>
-<tr><td>NLP_SOLVER_G</td><td>The constraints evaluated at the optimal solution (ng x 1) [g].</td></tr>
+<tr><td>NLP_SOLVER_X</td><td>Decision variables at the optimal solution (nx x 1) [x].</td></tr>
+<tr><td>NLP_SOLVER_F</td><td>Cost function value at the optimal solution (1 x 1) [f].</td></tr>
+<tr><td>NLP_SOLVER_G</td><td>Constraints function at the optimal solution (ng x 1) [g].</td></tr>
+<tr><td>NLP_SOLVER_LAM_X</td><td>Lagrange multipliers for bounds on X at the solution (nx x 1) [lam_x].</td></tr>
+<tr><td>NLP_SOLVER_LAM_G</td><td>Lagrange multipliers for bounds on G at the solution (ng x 1) [lam_g].</td></tr>
+<tr><td>NLP_SOLVER_LAM_P</td><td>Lagrange multipliers for bounds on P at the solution (np x 1) [lam_p].</td></tr>
 </table>
 */
 /** \defgroup scheme_DAEInput
@@ -229,15 +229,16 @@
 */
 /** \defgroup scheme_NLPInput
 <table>
-<caption>Input scheme: CasADi::NLPInput  (NLP_SOLVER_NUM_IN = 7) </caption>
+<caption>Input scheme: CasADi::NLPInput  (NLP_SOLVER_NUM_IN = 8) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NLP_SOLVER_X0</td><td>Decision variables initial guess (nx x 1) [x0].</td></tr>
+<tr><td>NLP_SOLVER_X0</td><td>Decision variables, initial guess (nx x 1) [x0].</td></tr>
+<tr><td>NLP_SOLVER_P</td><td>Value of fixed parameters (np x 1) [p].</td></tr>
 <tr><td>NLP_SOLVER_LBX</td><td>Decision variables lower bound (nx x 1), default -inf [lbx].</td></tr>
 <tr><td>NLP_SOLVER_UBX</td><td>Decision variables upper bound (nx x 1), default +inf [ubx].</td></tr>
 <tr><td>NLP_SOLVER_LBG</td><td>Constraints lower bound (ng x 1), default -inf [lbg].</td></tr>
 <tr><td>NLP_SOLVER_UBG</td><td>Constraints upper bound (ng x 1), default +inf [ubg].</td></tr>
-<tr><td>NLP_SOLVER_LAM_G0</td><td>Lagrange multipliers associated with G, initial guess (ng x 1) [lam_g0].</td></tr>
-<tr><td>NLP_SOLVER_P</td><td>Parameters on which the objective and constraints might depend (np x 1) [p].</td></tr>
+<tr><td>NLP_SOLVER_LAM_X0</td><td>Lagrange multipliers for bounds on X, initial guess (nx x 1) [lam_x0].</td></tr>
+<tr><td>NLP_SOLVER_LAM_G0</td><td>Lagrange multipliers for bounds on G, initial guess (ng x 1) [lam_g0].</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorInput
