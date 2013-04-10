@@ -54,6 +54,7 @@ option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSpar
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
 option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
+option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
 
 # For code optimization
@@ -209,7 +210,10 @@ add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
 find_package(LibXml2) 
-find_package(LAPACK)
+if(WITH_LAPACK)
+  find_package(LAPACK)
+endif()
+add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
 
 if(WITH_IPOPT)
   find_package(IPOPT)
