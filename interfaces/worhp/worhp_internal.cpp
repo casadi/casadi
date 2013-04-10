@@ -846,11 +846,15 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
       if (!callback_.isNull()) {
         double time1 = clock();
         // Copy outputs
-        copy(worhp_o.X,worhp_o.X+worhp_o.n,tempn.begin());callback_.input(NLP_SOLVER_X)[freeX_] = tempn;
+        copy(worhp_o.X,worhp_o.X+worhp_o.n,tempn.begin());
+        if (!callback_.input(NLP_SOLVER_X).empty()) callback_.input(NLP_SOLVER_X)[freeX_] = tempn;
         callback_.input(NLP_SOLVER_F)[0] = worhp_o.F;
-        if (worhp_o.m>0) copy(worhp_o.G,worhp_o.G+worhp_o.m,tempm.begin());callback_.input(NLP_SOLVER_G)[nonfreeG_] = tempm;
-        copy(worhp_o.Lambda,worhp_o.Lambda+worhp_o.n,tempn.begin());callback_.input(NLP_SOLVER_LAM_X)[freeX_] = tempn;
-        if (worhp_o.m>0) copy(worhp_o.Mu,worhp_o.Mu+worhp_o.m,tempm.begin());callback_.input(NLP_SOLVER_LAM_G)[nonfreeG_]=tempm;
+        if (worhp_o.m>0) copy(worhp_o.G,worhp_o.G+worhp_o.m,tempm.begin());
+        if (!callback_.input(NLP_SOLVER_G).empty()) callback_.input(NLP_SOLVER_G)[nonfreeG_] = tempm;
+        copy(worhp_o.Lambda,worhp_o.Lambda+worhp_o.n,tempn.begin());
+        if (!callback_.input(NLP_SOLVER_LAM_X).empty()) callback_.input(NLP_SOLVER_LAM_X)[freeX_] = tempn;
+        if (worhp_o.m>0) copy(worhp_o.Mu,worhp_o.Mu+worhp_o.m,tempm.begin());
+        if (!callback_.input(NLP_SOLVER_LAM_G).empty()) callback_.input(NLP_SOLVER_LAM_G)[nonfreeG_]=tempm;
         double time2 = clock();
         t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
         time1 = clock();

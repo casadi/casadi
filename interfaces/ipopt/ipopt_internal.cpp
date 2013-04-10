@@ -372,14 +372,14 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
     double time1 = clock();
     if (!callback_.isNull()) {
       if(full_callback) {
-        copy(x,x+nx_,callback_.input(NLP_SOLVER_X).begin());
+        if (!callback_.input(NLP_SOLVER_X).empty()) copy(x,x+nx_,callback_.input(NLP_SOLVER_X).begin());
         
         vector<double>& lambda_x = callback_.input(NLP_SOLVER_LAM_X).data();
         for(int i=0; i<lambda_x.size(); ++i){
           lambda_x[i] = z_U[i]-z_L[i];
         }
-        copy(lambda,lambda+ng_,callback_.input(NLP_SOLVER_LAM_G).begin());
-        copy(g,g+ng_,callback_.input(NLP_SOLVER_G).begin());
+        if (!callback_.input(NLP_SOLVER_LAM_G).empty()) copy(lambda,lambda+ng_,callback_.input(NLP_SOLVER_LAM_G).begin());
+        if (!callback_.input(NLP_SOLVER_G).empty()) copy(g,g+ng_,callback_.input(NLP_SOLVER_G).begin());
       } else {
          if (iter==0) {
             cerr << "Warning: intermediate_callback is disfunctional in your installation. You will only be able to use getStats(). See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it." << endl;

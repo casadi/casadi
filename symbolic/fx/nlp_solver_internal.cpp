@@ -382,10 +382,12 @@ void NLPSolverInternal::init(){
      casadi_assert_message(callback_.output(0).size()==1, "Callback function should have one output, a scalar that indicates wether to break. 0 = continue");
      casadi_assert_message(callback_.getNumInputs()==NLP_SOLVER_NUM_OUT, "Callback function should have the output scheme of NLPSolver as input scheme. i.e. " <<NLP_SOLVER_NUM_OUT << " inputs instead of the " << callback_.getNumInputs() << " you provided." );
      for (int i=0;i<NLP_SOLVER_NUM_OUT;i++) {
-       casadi_assert_message(callback_.input(i).sparsity()==output(i).sparsity(),
-         "Callback function should have the output scheme of NLPSolver as input scheme. " << 
-         describeInput(inputScheme_,i) << " was found to be " << callback_.input(i).dimString() << " instead of expected " << output(i).dimString() << "."
-       );
+       if (!callback_.input(i).empty()) {
+         casadi_assert_message(callback_.input(i).sparsity()==output(i).sparsity(),
+           "Callback function should have the output scheme of NLPSolver as input scheme. " << 
+           describeInput(inputScheme_,i) << " was found to be " << callback_.input(i).dimString() << " instead of expected " << output(i).dimString() << "."
+         );
+       }
        callback_.input(i).setAll(0);
      }
    }

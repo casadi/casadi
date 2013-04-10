@@ -255,15 +255,16 @@ autogenpy.write("%pythoncode %{\n")
 autogenpy.write("""
 def IOSchemeVector(arg,io_scheme):
   try:
-    return IOSchemeVectorCRSSparsity(arg,io_scheme)
-  except:
-    pass
-  try:
     return IOSchemeVectorSXMatrix(arg,io_scheme)
   except:
     pass
   try:
     return IOSchemeVectorMX(arg,io_scheme)
+  except:
+    pass
+  try:
+    arg = map(lambda x: sp_dense(0,0) if isinstance(x,list) and len(x)==0 else x,arg)
+    return IOSchemeVectorCRSSparsity(arg,io_scheme)
   except:
     pass
 """)

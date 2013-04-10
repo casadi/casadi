@@ -286,11 +286,11 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     
     // Call callback function if present
     if (!callback_.isNull()) {
-      callback_.input(NLP_SOLVER_F).set(fk_);
-      callback_.input(NLP_SOLVER_X).set(x_);
-      callback_.input(NLP_SOLVER_LAM_G).set(mu_);
-      callback_.input(NLP_SOLVER_LAM_X).set(mu_x_);
-      callback_.input(NLP_SOLVER_G).set(gk_);
+      if (!callback_.input(NLP_SOLVER_F).empty()) callback_.input(NLP_SOLVER_F).set(fk_);
+      if (!callback_.input(NLP_SOLVER_X).empty()) callback_.input(NLP_SOLVER_X).set(x_);
+      if (!callback_.input(NLP_SOLVER_LAM_G).empty()) callback_.input(NLP_SOLVER_LAM_G).set(mu_);
+      if (!callback_.input(NLP_SOLVER_LAM_X).empty()) callback_.input(NLP_SOLVER_LAM_X).set(mu_x_);
+      if (!callback_.input(NLP_SOLVER_G).empty()) callback_.input(NLP_SOLVER_G).set(gk_);
       callback_.evaluate();
       
       if (callback_.output(0).at(0)) {
