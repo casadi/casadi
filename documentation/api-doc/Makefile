@@ -9,6 +9,9 @@ options:
 tutorials:
 	cd ../tutorials/python && make
 
+documents:
+	cd ../documents && make
+
 examples:
 	cd ../examples && make
 	python extra/fetch_examples_pdf.py
@@ -28,6 +31,7 @@ swig:
 
 full: doxpublish
 	cd ../examples && make
+	cd ../documents && make
 	cd ../tutorials/python && python make_tutorials.py
 	#cd ../tutorials/cpp && make
 	cd ../users_guide && make

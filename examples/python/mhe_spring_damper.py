@@ -20,6 +20,8 @@
 # 
 # 
 
+# For documentation about this examples, check http://casadi.sourceforge.net/documents/mhe_spring_damper.pdf
+
 from casadi import *
 import numpy as NP
 import matplotlib.pyplot as plt
@@ -88,7 +90,7 @@ k1 = f.eval([states,controls,disturbances])[0]
 k2 = f.eval([states+dt/2.0*k1,controls,disturbances])[0]
 k3 = f.eval([states+dt/2.0*k2,controls,disturbances])[0]
 k4 = f.eval([states+dt*k3,controls,disturbances])[0]
-states_1 = states()
+
 states_1 = states+dt/6.0*(k1+2*k2+2*k3+k4)
 phi = SXFunction([states,controls,disturbances],[states_1])
 phi.init()
@@ -147,7 +149,7 @@ P = sigma_x0**2*DMatrix.eye(Nstates)
 x0 = simulated_X[:,0] + sigma_x0*NP.random.randn(Nstates,1)
 # Create the solver
 nlp_solver = IpoptSolver(f_obj,G)
-
+nlp_solver.setOption({"print_level":0, "print_time": False})
 nlp_solver.setOption("generate_hessian",True)
 nlp_solver.setOption('linear_solver','MA57')
 nlp_solver.setOption('max_iter',100)
@@ -182,6 +184,7 @@ estimated_W[:,0:N-1] = solution["W",horzcat]
 # Now make a loop for the rest of the simulation
 for i in range(1,Nsimulation-N+1):
   # Update the arrival cost, using linearisations around the estimate of MHE at the beginning of the horizon (according to the 'Smoothed EKF Update'): first update the state and covariance with the measurement that will be deleted, and next propagate the state and covariance because of the shifting of the horizon
+  print "step %d/%d (%s)" % (i, Nsimulation-N , nlp_solver.getStat("return_status"))
   H.input(0).set(solution["X",0])
   H.evaluate()
   H0 = H.output(0)
@@ -222,7 +225,6 @@ for i in range(1,Nsimulation-N+1):
   nlp_solver.setInput(initialisation_state,"x0")
   nlp_solver.solve()
   # Now get the state estimate. Note that we are only interested in the last node of the horizon
-  solution = shooting(nlp_solver.output("x"))
   estimated_X[:,N-1+i] = solution["X",N-1]
   estimated_W[:,N-2+i] = solution["W",N-2]
 # Plot the results
