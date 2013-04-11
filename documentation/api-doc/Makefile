@@ -9,6 +9,9 @@ options:
 tutorials:
 	cd ../tutorials/python && make
 
+example_pack:
+	cd ../example_pack && make
+
 documents:
 	cd ../documents && make
 
@@ -42,6 +45,7 @@ full: doxpublish
 	patch -u Doxyfile.in publish.patch -o -  | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(REVISION)/' | doxygen -
 	find -name *-example.html | xargs perl -n -i~ -w -e 'print unless /<div class="line"><span class="comment">#[^\!].*?\/span>\n?/;'
 	find -name *-example.html | xargs perl -p -i~ -w -e 's/<span class="comment">#[^\!].*?\/span>\n?//g;'
+	cd ../example_pack && make
 
 publish: 
 	./publish.sh

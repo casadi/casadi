@@ -14,3 +14,6 @@ rsync -avP -e ssh ../cheatsheet/*.pdf "$username,casadi@web.sourceforge.net:/hom
 #rsync -avP -e ssh sphinx/_build/html "$username,casadi@web.sourceforge.net:/home/groups/c/ca/casadi/htdocs/api/python/"
 rsync -avP -e ssh ../users_guide/*.pdf "$username,casadi@web.sourceforge.net:/home/groups/c/ca/casadi/htdocs/users_guide"
 rsync -avP -e ssh ../users_guide/casadi-users_guide/* "$username,casadi@web.sourceforge.net:/home/groups/c/ca/casadi/htdocs/users_guide/html"
+
+
+echo -e "cd tested\nput ../example_pack/example_pack.zip" | sftp -- casaditestbot,casadi@web.sourceforge.net:/home/pfs/project/c/ca/casadi/CasADi
