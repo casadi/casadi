@@ -1,3 +1,8 @@
+# Add IPOPT link directories
+if(IPOPT_FOUND)
+  link_directories(${IPOPT_LIBRARY_DIRS})
+endif()
+
 # Exaple 10.1 from Biegler
 if(IPOPT_FOUND)
   add_executable(biegler_10_1 biegler_10_1.cpp)
