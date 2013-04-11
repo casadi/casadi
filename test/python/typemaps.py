@@ -929,6 +929,10 @@ class typemaptests(casadiTestCase):
         
     self.assertRaises(NotImplementedError,lambda :MXFunction([x],[Foo()]))
     
+  def test_OUTPUT(self):
+    self.message("OUTPUT typemap")
+    a = ssym("A",3,3)
+    self.assertTrue(isinstance(qr(a),list))
     
 if __name__ == '__main__':
     unittest.main()

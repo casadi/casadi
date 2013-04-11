@@ -175,6 +175,16 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_IMatrixVectorVector,std::vector< std::vector< CasADi::Matrix<int> > >);
 #endif // SWIGPYTHON
 
+%define %my_value_output_typemaps(Type,...)
+%value_output_typemap(%arg(swig::from), %arg(SWIG_Traits_frag(Type)), %arg(Type));
+%enddef
+
+// These make OUTPUT behave like expected for non std container types
+%my_value_output_typemaps(CasADi::Matrix< CasADi::SX >);
+%my_value_output_typemaps(CasADi::Matrix< double >);
+%my_value_output_typemaps(CasADi::Matrix< int >);
+%my_value_output_typemaps(CasADi::MX);
+%my_value_output_typemaps(CasADi::CRSSparsity);
 
 #ifdef SWIGPYTHON
 %outputRefOwn(CasADi::CRSSparsity)
