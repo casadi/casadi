@@ -54,13 +54,7 @@ public:
   
   protected:
     NLPSolver nlpsolver_;
-    
-    // an MX that represents H, but dependant on a common MX.
-    MX H_;
-    // an MX that represents G, but dependant on a common MX.
-    MX G_;
-    // an MX that represents A, but dependant on a common MX.
-    MX A_;
+
 };
 
 } // namespace CasADi

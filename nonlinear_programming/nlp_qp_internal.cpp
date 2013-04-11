@@ -22,8 +22,8 @@
 
 #include "nlp_qp_internal.hpp"
 
-#include "symbolic/mx/mx_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/sx/sx_tools.hpp"
+#include "symbolic/fx/sx_function.hpp"
 
 using namespace std;
 namespace CasADi {
@@ -79,56 +79,47 @@ void NLPQPInternal::init(){
   
   QPSolverInternal::init();
 
-  // Create an MX for the decision variables
-  MX X("X",nx_,1);
-    
-  // Put H, G, A sparsities in a vector...
-  std::vector< CRSSparsity > sps;
-  sps.push_back(input(QP_H).sparsity());
-  sps.push_back(input(QP_G).sparsity());
-  sps.push_back(input(QP_A).sparsity());
-   
-  // So that we can pass it on to createParent
-  std::pair< MX, std::vector< MX > > mypair = createParent(sps);
-  
-  // V groups all parameters in an MX
-  MX V(mypair.first);
-  std::vector< MX > variables(mypair.second);
-  
-  // H_, G_, A_ depend on V
-  H_=variables[0];
-  G_=variables[1];
-  A_=variables[2];
+  // Create a symbolic matrix for the decision variables
+  SXMatrix X = ssym("X",nx_,1);
+
+  // Parameters to the problem
+  SXMatrix H = ssym("H",input(QP_H).sparsity());
+  SXMatrix G = ssym("G",input(QP_G).sparsity());
+  SXMatrix A = ssym("A",input(QP_A).sparsity());
+
+  // Put parameters in a vector
+  std::vector< SXMatrix > par;
+  par.push_back(H.data());
+  par.push_back(G.data());
+  par.push_back(A.data());
 
   // We're going to use two-argument objective and constraints to allow the use of parameters
-  std::vector< MX > args;
+  std::vector< SXMatrix > args;
   args.push_back(X);
-  args.push_back(V);
-
+  args.push_back(vertcat(par));
+  
   // The objective function looks exactly like a mathematical description of the NLP
-  MXFunction QP_f(args, mul(trans(G_),X) + 0.5*mul(mul(trans(X),H_),X));
+  SXFunction QP_f(args, mul(trans(G),X) + 0.5*mul(mul(trans(X),H),X));
   QP_f.init();
 
   // So does the constraint function
-  MXFunction QP_g(args, mul(A_,X));
+  SXFunction QP_g(args, mul(A,X));
 
   // Jacobian of the constraints
-  MXFunction QP_j(args,A_);
+  SXFunction QP_j(args,A);
   
-/*  std:cout << (G_+mul(trans(H_),X)).dimString() << std::endl;*/
   // Gradient of the objective
-  MXFunction QP_gf(args,G_+mul(H_,X));
+  SXFunction QP_gf(args,G+mul(H,X));
   
 
-  MX sigma("sigma");
-
-  MX lambda("lambda",nc_,1);
+  SX sigma("sigma");
+  SXMatrix lambda = ssym("lambda",nc_,1);
 
   args.insert(args.begin()+1, lambda);
   args.insert(args.begin()+2, sigma);
   
   // Hessian of the Lagrangian
-  MXFunction QP_h(args,H_*sigma);
+  SXFunction QP_h(args,H*sigma);
   
   // Create an nlpsolver instance
   NLPSolverCreator nlpsolver_creator = getOption("nlp_solver");
