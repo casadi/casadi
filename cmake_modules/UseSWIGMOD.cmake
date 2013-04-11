@@ -82,7 +82,7 @@ MACRO(SWIG_GET_WRAPPER_DEPENDENCIES swigFile genWrapper language DEST_VARIABLE)
     ERROR_VARIABLE swig_getdeps_error
     OUTPUT_STRIP_TRAILING_WHITESPACE)
   IF(NOT ${swig_getdeps_error} EQUAL 0)
-    MESSAGE(SEND_ERROR "Command \"${SWIG_EXECUTABLE} -M -MF ${swig_getdeps_depsfile} ${swig_getdeps_extra_flags} ${CMAKE_SWIG_FLAGS} -${language} -o ${genWrapper} ${swig_getdeps_include_dirs} ${swigFile}\" failed with output:\n${swig_getdeps_error}")
+#    MESSAGE(SEND_ERROR "Command \"${SWIG_EXECUTABLE} -M -MF ${swig_getdeps_depsfile} ${swig_getdeps_extra_flags} ${CMAKE_SWIG_FLAGS} -${language} -o ${genWrapper} ${swig_getdeps_include_dirs} ${swigFile}\" failed with output:\n${swig_getdeps_error}")
     SET(swig_getdeps_dependencies "")
   ELSE(NOT ${swig_getdeps_error} EQUAL 0)
     FILE(READ ${swig_getdeps_depsfile} ${DEST_VARIABLE})
