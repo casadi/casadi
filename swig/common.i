@@ -25,7 +25,7 @@
 #pragma SWIG nowarn=509,303
 
 // Incude cmath early on, see #622
-%begin %{
+%runtime %{
 #include <cmath>
 %}
 
