@@ -27,6 +27,12 @@
 // Incude cmath early on, see #622
 %runtime %{
 #include <cmath>
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
 %}
 
 #ifdef SWIGPYTHON
