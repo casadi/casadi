@@ -61,7 +61,15 @@ class IOSchemeVector : public PrintableObject {
     
     #ifndef SWIG
     /// Print a destription of the object
-    virtual void print(std::ostream &stream=std::cout) const { stream << "IOSchemeVector(" << t_ << "," << getSchemeName(io_scheme_) <<  ")"; }
+    virtual void print(std::ostream &stream=std::cout) const { 
+      stream << "IOSchemeVector(" ;
+      for (int i=0;i<t_.size();++i) {
+        stream << getSchemeEntryName(io_scheme_,i) << "=" << t_[i];
+        if (i<t_.size()-1) stream << ",";
+      }
+      
+      stream << ";" << getSchemeName(io_scheme_) <<  ")";
+    }
 
     /// Print a representation of the object
     virtual void repr(std::ostream &stream=std::cout) const { print(stream); }
