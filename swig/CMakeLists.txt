@@ -221,8 +221,6 @@ add_custom_command(
   ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py ${PROJECT_BINARY_DIR}/python/casadi/__init__.py
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/python/tools ${PROJECT_BINARY_DIR}/python/casadi/tools
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
 )
 
 if(WITH_SWIG_SPLIT)
@@ -232,6 +230,18 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy ${PROJECT_BINARY_DIR}/${my_module}.py ${PROJECT_BINARY_DIR}/python/casadi/${my_module}.py
 )
+endforeach()
+add_custom_command(
+  TARGET python
+  COMMAND ${CMAKE_COMMAND}
+  ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
+)
+else(WITH_SWIG_SPLIT)
+add_custom_command(
+  TARGET python
+  COMMAND ${CMAKE_COMMAND}
+  ARGS -E copy ${PROJECT_BINARY_DIR}/swig/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
+) 
 endif(WITH_SWIG_SPLIT)
 
 # workaround for Visual Studio! The default way is not general enough and should be changed!
