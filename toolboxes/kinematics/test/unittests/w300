@@ -1,4 +1,0 @@
-
-matrix([(cos(a)*sin(c)+sin(a)*sin(b)*cos(c))*(cos(a)*sin(b)*sin(c)*dc+sin(a)*cos(c)*dc-cos(a)*cos(b)*cos(c)*db+cos(a)*sin(c)*da+sin(a)*sin(b)*cos(c)*da)+(cos(a)*cos(c)-sin(a)*sin(b)*sin(c))*(-sin(a)*sin(c)*dc+cos(a)*sin(b)*cos(c)*dc+cos(a)*cos(b)*sin(c)*db-sin(a)*sin(b)*sin(c)*da+cos(a)*cos(c)*da)-sin(a)*cos(b)*(-cos(a)*sin(b)*db-sin(a)*cos(b)*da)],[(sin(a)*sin(c)-cos(a)*sin(b)*cos(c))*(-cos(b)*sin(c)*dc-sin(b)*cos(c)*db)+(cos(a)*sin(b)*sin(c)+sin(a)*cos(c))*(sin(b)*sin(c)*db-cos(b)*cos(c)*dc)+cos(a)*cos(b)^2*db],[cos(b)*cos(c)*(-sin(a)*sin(b)*sin(c)*dc+cos(a)*cos(c)*dc+sin(a)*cos(b)*cos(c)*db-sin(a)*sin(c)*da+cos(a)*sin(b)*cos(c)*da)-cos(b)*sin(c)*(-cos(a)*sin(c)*dc-sin(a)*sin(b)*cos(c)*dc-sin(a)*cos(b)*sin(c)*db-cos(a)*sin(b)*sin(c)*da-sin(a)*cos(c)*da)+sin(b)*(sin(a)*sin(b)*db-cos(a)*cos(b)*da)],[0]);
-
-matrix([.6102791224938551],[.2144558311783865],[.7770847403916934],[0]);

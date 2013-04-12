@@ -1,4 +1,0 @@
-
-matrix([sin(a)*sin(b)*(sin(a)*sin(b)*db*z-cos(a)*cos(b)*da*z-sin(a)*da*y-sin(a)*cos(b)*dz+cos(a)*dy)-cos(a)*sin(b)*(-cos(a)*sin(b)*db*z-sin(a)*cos(b)*da*z+cos(a)*da*y+cos(a)*cos(b)*dz+sin(a)*dy)+cos(b)*(cos(b)*db*z+sin(b)*dz+dx)],[cos(a)*(sin(a)*sin(b)*db*z-cos(a)*cos(b)*da*z-sin(a)*da*y-sin(a)*cos(b)*dz+cos(a)*dy)+sin(a)*(-cos(a)*sin(b)*db*z-sin(a)*cos(b)*da*z+cos(a)*da*y+cos(a)*cos(b)*dz+sin(a)*dy)],[-sin(a)*cos(b)*(sin(a)*sin(b)*db*z-cos(a)*cos(b)*da*z-sin(a)*da*y-sin(a)*cos(b)*dz+cos(a)*dy)+cos(a)*cos(b)*(-cos(a)*sin(b)*db*z-sin(a)*cos(b)*da*z+cos(a)*da*y+cos(a)*cos(b)*dz+sin(a)*dy)+sin(b)*(cos(b)*db*z+sin(b)*dz+dx)],[0]);
-
-matrix([.4651447164455981],[-.3726667770570314],[.3421493668020378],[0]);

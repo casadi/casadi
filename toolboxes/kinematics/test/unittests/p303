@@ -1,4 +1,0 @@
-
-matrix([(cos(a)*sin(c)+sin(a)*sin(b)*cos(c))*(cos(a)*y-sin(a)*cos(b)*z)+(-cos(a)*sin(c)-sin(a)*sin(b)*cos(c))*(cos(a)*y-sin(a)*cos(b)*z)+(sin(a)*sin(c)-cos(a)*sin(b)*cos(c))*(cos(a)*cos(b)*z+sin(a)*y)+(cos(a)*sin(b)*cos(c)-sin(a)*sin(c))*(cos(a)*cos(b)*z+sin(a)*y)],[(sin(a)*sin(b)*sin(c)-cos(a)*cos(c))*(cos(a)*y-sin(a)*cos(b)*z)+(cos(a)*cos(c)-sin(a)*sin(b)*sin(c))*(cos(a)*y-sin(a)*cos(b)*z)+(cos(a)*sin(b)*sin(c)+sin(a)*cos(c))*(cos(a)*cos(b)*z+sin(a)*y)+(-cos(a)*sin(b)*sin(c)-sin(a)*cos(c))*(cos(a)*cos(b)*z+sin(a)*y)],[0],[1]);
-
-matrix([0.0],[0.0],[0],[1]);
