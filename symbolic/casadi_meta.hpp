@@ -37,7 +37,10 @@ namespace CasADi {
       /// No instances are allowed
       CasadiMeta();
     public:
+#ifndef SWIG
       static const std::string version;
+#endif //SWIG
+    static std::string getVersion() { return version; }
   };
 
 }

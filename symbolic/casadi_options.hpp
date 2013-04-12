@@ -50,8 +50,9 @@ namespace CasADi {
       *
       *  Default: true
       */
+#ifndef SWIG
       static bool catch_errors_python;
-      
+#endif //SWIG
       // Setter and getter for catch_errors_python
       static void setCatchErrorsPython(bool flag) { catch_errors_python = flag; }
       static bool getCatchErrorsPython() { return catch_errors_python; }

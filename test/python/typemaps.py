@@ -933,6 +933,12 @@ class typemaptests(casadiTestCase):
     self.message("OUTPUT typemap")
     a = ssym("A",3,3)
     self.assertTrue(isinstance(qr(a),list))
-    
+
+  def test_cvar(self):
+    self.message("We must not have cvar, to avoid bug #652")
+    # Wrap all static global things in #ifdef SWIG 
+    with self.assertRaises(Exception):
+      cvar
+
 if __name__ == '__main__':
     unittest.main()

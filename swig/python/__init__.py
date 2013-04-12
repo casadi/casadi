@@ -96,4 +96,4 @@ NLP_G = deprecated["NLP_G"]
 NLP_NUM_IN = deprecated["NLP_NUM_IN"]
 NLP_NUM_OUT = deprecated["NLP_NUM_OUT"]
 
-__version__ = CasadiMeta.version
+__version__ = CasadiMeta.getVersion()

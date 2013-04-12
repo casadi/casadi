@@ -343,7 +343,8 @@ namespace CasADi{
 
     /// Remove duplicate entries: The same indices will be removed from the mapping vector, which must have the same length as the number of nonzeros
     void removeDuplicates(std::vector<int>& mapping);
-
+    
+#ifndef SWIG
     /// (Dense) scalar
     static CRSSparsity scalarSparsity;
 
@@ -352,6 +353,7 @@ namespace CasADi{
     
     /// Empty zero-by-zero
     static CRSSparsity emptySparsity;
+#endif //SWIG
     
     /** \brief Calculate the elimination tree
         See Direct Methods for Sparse Linear Systems by Davis (2006).

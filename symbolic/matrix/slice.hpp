@@ -73,7 +73,10 @@ namespace CasADi{
     int stop_; 
     int step_;
   };
+  
+#ifndef SWIG
   static Slice ALL;
+#endif // SWIG
   
   /** Class representing a set of indices of arbitrary order */
   class IndexSet{
