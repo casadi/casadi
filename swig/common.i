@@ -25,7 +25,7 @@
 #pragma SWIG nowarn=509,303
 
 // Incude cmath early on, see #622
-%runtime %{
+%begin %{
 #include <cmath>
 #ifdef _XOPEN_SOURCE
 #undef _XOPEN_SOURCE
