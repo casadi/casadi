@@ -114,7 +114,3 @@ if(WITH_QPOASES AND WITH_IPOPT)
   target_link_libraries(nmpc_example casadi_qpoases_interface casadi_nonlinear_programming casadi_ipopt_interface casadi ${QPOASES_LIBRARIES} ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
 endif()
 
-add_executable(alt_codegen alt_codegen.cpp)
-target_link_libraries(alt_codegen )
-
-
