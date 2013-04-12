@@ -18,6 +18,11 @@ if(COMMAND cmake_policy)
 cmake_policy(SET CMP0011 OLD)
 endif()
 
+# cmake_policy avoid escaping in add_definitions
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0005 OLD)
+endif()
+
 # We use the FeatureSummary module to get a more readable CMake output
 include(FeatureSummary)
 if (NOT COMMAND add_feature_info)
