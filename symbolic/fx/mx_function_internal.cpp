@@ -51,7 +51,7 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
 	ss << "r" << ind;	
 	*it = msym(ss.str(),it->sparsity());
       } else {
-	casadi_error("Failed to create an MXFunction instance since not all input arguments are symbolic primitives. Support for non-symbolic inputs has been dropped. We refer users to the approach demonstrated in http://casadi.sourceforge.net/tutorials/tools/structure.pdf");
+	casadi_error("Failed to create an MXFunction instance since not all input arguments are symbolic primitives. Support for non-symbolic inputs has been dropped. We refer users to the approach demonstrated in http://docs.casadi.org/tutorials/tools/structure.pdf");
       }
     }
   }

@@ -9,9 +9,9 @@ zf = zipfile.ZipFile('example_pack.zip', mode='w')
 
 
 if "+" in release:
-  releasedocurl = "http://casadi.sourceforge.net/api/html/annotated.html"
+  releasedocurl = "http://docs.casadi.org/api/html/annotated.html"
 else:
-  releasedocurl = "http://casadi.sourceforge.net/v%s/api/html/annotated.html" % release
+  releasedocurl = "http://docs.casadi.org/v%s/api/html/annotated.html" % release
 
 zf.writestr('README.txt',"""
 

@@ -20,7 +20,7 @@
 # 
 # 
 
-# For documentation about this examples, check http://casadi.sourceforge.net/documents/mhe_spring_damper.pdf
+# For documentation about this examples, check http://docs.casadi.org/documents/mhe_spring_damper.pdf
 
 from casadi import *
 import numpy as NP
