@@ -814,5 +814,11 @@ class typemaptests(casadiTestCase):
     print casadi.ssym('x') + longint
     print longint + casadi.ssym('x')
 
+  def test_cvar(self):
+    self.message("We must not have cvar, to avoid bug #652")
+    # Wrap all static global things in #ifdef SWIG 
+    with self.assertRaises(Exception):
+      cvar
+
 if __name__ == '__main__':
     unittest.main()

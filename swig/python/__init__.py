@@ -24,4 +24,4 @@
 from casadi import *
 import casadi
 
-__version__ = CasadiMeta.version
+__version__ = CasadiMeta.getVersion()
