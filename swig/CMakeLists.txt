@@ -147,7 +147,6 @@ set(CASADI_SWIG_SEPARATE_MODULES casadi_main casadi_primitive casadi_primitive_t
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
 
-
 if(WITH_SWIG_SPLIT)
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SWIG_SPLIT")
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=${CASADI_SWIG_MAIN_MODULE}")
@@ -209,52 +208,29 @@ make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 # adding some extra commands to the target _casadi which is declared automatically when constructing a swig-python interface
 
 if(WITH_SWIG_SPLIT)
+  add_custom_target(python DEPENDS _casadi_main _casadi_primitive _casadi_primitive_tools _casadi_noncore) # the python interface is created with the command "make python"
+  add_custom_target(octave DEPENDS casadi_main_octave casadi_primitive_octave casadi_primitive_tools_octave casadi_noncore_octave) # the octave interface is created with the command "make octave"
+else(WITH_SWIG_SPLIT)
+  add_custom_target(python DEPENDS _casadi ) # the python interface is created with the command "make python"
+  add_custom_target(octave DEPENDS casadi_octave ) # the octave interface is created with the command "make octave"
+endif(WITH_SWIG_SPLIT)
+  
 add_custom_command(
-  TARGET _${CASADI_SWIG_MAIN_MODULE}
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
+  TARGET python
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py ${PROJECT_BINARY_DIR}/python/casadi/__init__.py
-)
-add_custom_command(
-  TARGET _${CASADI_SWIG_MAIN_MODULE}
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py
+  COMMAND ${CMAKE_COMMAND}
+  ARGS -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/python/tools ${PROJECT_BINARY_DIR}/python/casadi/tools
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
 )
-add_custom_command(
-  TARGET _${CASADI_SWIG_MAIN_MODULE}
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/python/tools ${PROJECT_BINARY_DIR}/python/casadi/tools
-)
-else(WITH_SWIG_SPLIT)
-add_custom_command(
-  TARGET _casadi
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py ${PROJECT_BINARY_DIR}/python/casadi/__init__.py
-)
-add_custom_command(
-  TARGET _casadi
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/python/tools ${PROJECT_BINARY_DIR}/python/casadi/tools
-)
-endif(WITH_SWIG_SPLIT)
 
 if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 add_custom_command(
-  TARGET _${my_module}
+  TARGET python
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy ${PROJECT_BINARY_DIR}/${my_module}.py ${PROJECT_BINARY_DIR}/python/casadi/${my_module}.py
-)
-endforeach()
-else(WITH_SWIG_SPLIT)
-add_custom_command(
-  TARGET _casadi
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PROJECT_BINARY_DIR}/swig/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
 )
 endif(WITH_SWIG_SPLIT)
 
