@@ -74,6 +74,29 @@ IOSchemeVector<M> acadoIn(const std::string arg_s0="",M arg_m0=M(),const std::st
   }
   return IOSchemeVector<M>(ret,SCHEME_ACADO_Input);
 }
+template<class M>
+std::vector<M> acadoIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8="",const std::string arg_s9="",const std::string arg_s10="",const std::string arg_s11="",const std::string arg_s12="",const std::string arg_s13="",const std::string arg_s14="",const std::string arg_s15="",const std::string arg_s16=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s7)));
+  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s8)));
+  if (arg_s9!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s9)));
+  if (arg_s10!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s10)));
+  if (arg_s11!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s11)));
+  if (arg_s12!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s12)));
+  if (arg_s13!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s13)));
+  if (arg_s14!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s14)));
+  if (arg_s15!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s15)));
+  if (arg_s16!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s16)));
+  return ret;
+
+}
 /// Helper function for 'ACADO_Output'
 /// Output arguments of an ACADO OCP solver
 /// 
@@ -94,6 +117,16 @@ IOSchemeVector<M> acadoOut(const std::string arg_s0="",M arg_m0=M(),const std::s
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_ACADO_Output);
+}
+template<class M>
+std::vector<M> acadoOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Output,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Output,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Output,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Output,arg_s3)));
+  return ret;
+
 }
 /// Helper function for 'ACADO_FCN_Input'
 /// Input arguments of an ACADO function
@@ -117,6 +150,18 @@ IOSchemeVector<M> acadofcnIn(const std::string arg_s0="",M arg_m0=M(),const std:
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_ACADO_FCN_Input);
+}
+template<class M>
+std::vector<M> acadofcnIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s5)));
+  return ret;
+
 }
 /// Helper function for 'ControlledDAEInput'
 /// Input arguments of an ODE/DAE function
@@ -144,6 +189,21 @@ IOSchemeVector<M> controldaeIn(const std::string arg_s0="",M arg_m0=M(),const st
   }
   return IOSchemeVector<M>(ret,SCHEME_ControlledDAEInput);
 }
+template<class M>
+std::vector<M> controldaeIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput,arg_s7)));
+  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput,arg_s8)));
+  return ret;
+
+}
 /// Helper function for 'ControlSimulatorInput'
 /// Input arguments of a control simulator
 /// 
@@ -163,6 +223,15 @@ IOSchemeVector<M> controlsimulatorIn(const std::string arg_s0="",M arg_m0=M(),co
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_ControlSimulatorInput);
+}
+template<class M>
+std::vector<M> controlsimulatorIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput,arg_s2)));
+  return ret;
+
 }
 /// Helper function for 'DAEInput'
 /// Input arguments of an ODE/DAE function
@@ -185,6 +254,16 @@ IOSchemeVector<M> daeIn(const std::string arg_s0="",M arg_m0=M(),const std::stri
   }
   return IOSchemeVector<M>(ret,SCHEME_DAEInput);
 }
+template<class M>
+std::vector<M> daeIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput,arg_s3)));
+  return ret;
+
+}
 /// Helper function for 'DAEOutput'
 /// Output arguments of an DAE function
 /// 
@@ -204,6 +283,15 @@ IOSchemeVector<M> daeOut(const std::string arg_s0="",M arg_m0=M(),const std::str
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_DAEOutput);
+}
+template<class M>
+std::vector<M> daeOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput,arg_s2)));
+  return ret;
+
 }
 /// Helper function for 'RDAEInput'
 /// Input arguments of an ODE/DAE backward integration function
@@ -229,6 +317,19 @@ IOSchemeVector<M> rdaeIn(const std::string arg_s0="",M arg_m0=M(),const std::str
   }
   return IOSchemeVector<M>(ret,SCHEME_RDAEInput);
 }
+template<class M>
+std::vector<M> rdaeIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput,arg_s6)));
+  return ret;
+
+}
 /// Helper function for 'RDAEOutput'
 /// Output arguments of an ODE/DAE backward integration function
 /// 
@@ -248,6 +349,15 @@ IOSchemeVector<M> rdaeOut(const std::string arg_s0="",M arg_m0=M(),const std::st
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_RDAEOutput);
+}
+template<class M>
+std::vector<M> rdaeOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput,arg_s2)));
+  return ret;
+
 }
 /// Helper function for 'IntegratorInput'
 /// Input arguments of an integrator
@@ -270,6 +380,16 @@ IOSchemeVector<M> integratorIn(const std::string arg_s0="",M arg_m0=M(),const st
   }
   return IOSchemeVector<M>(ret,SCHEME_IntegratorInput);
 }
+template<class M>
+std::vector<M> integratorIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s3)));
+  return ret;
+
+}
 /// Helper function for 'IntegratorOutput'
 /// Output arguments of an integrator
 /// 
@@ -290,6 +410,16 @@ IOSchemeVector<M> integratorOut(const std::string arg_s0="",M arg_m0=M(),const s
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_IntegratorOutput);
+}
+template<class M>
+std::vector<M> integratorOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s3)));
+  return ret;
+
 }
 /// Helper function for 'NLPInput'
 /// Input arguments of an NLP Solver
@@ -316,6 +446,20 @@ IOSchemeVector<M> nlpsolverIn(const std::string arg_s0="",M arg_m0=M(),const std
   }
   return IOSchemeVector<M>(ret,SCHEME_NLPInput);
 }
+template<class M>
+std::vector<M> nlpsolverIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s7)));
+  return ret;
+
+}
 /// Helper function for 'NLPOutput'
 /// Output arguments of an NLP Solver
 /// 
@@ -339,6 +483,18 @@ IOSchemeVector<M> nlpsolverOut(const std::string arg_s0="",M arg_m0=M(),const st
   }
   return IOSchemeVector<M>(ret,SCHEME_NLPOutput);
 }
+template<class M>
+std::vector<M> nlpsolverOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput,arg_s5)));
+  return ret;
+
+}
 /// Helper function for 'MayerInput'
 /// Input arguments of a Mayer Term \n
 /// nx: Number of states: from ffcn.input(INTEGRATOR_X0).size() \n
@@ -359,6 +515,14 @@ IOSchemeVector<M> mayerIn(const std::string arg_s0="",M arg_m0=M(),const std::st
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_MayerInput);
+}
+template<class M>
+std::vector<M> mayerIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_MayerInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_MayerInput,arg_s1)));
+  return ret;
+
 }
 /// Helper function for 'OCPInput'
 /// Input arguments of an OCP Solver \n
@@ -396,6 +560,25 @@ IOSchemeVector<M> ocpIn(const std::string arg_s0="",M arg_m0=M(),const std::stri
   }
   return IOSchemeVector<M>(ret,SCHEME_OCPInput);
 }
+template<class M>
+std::vector<M> ocpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8="",const std::string arg_s9="",const std::string arg_s10="",const std::string arg_s11="",const std::string arg_s12=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s7)));
+  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s8)));
+  if (arg_s9!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s9)));
+  if (arg_s10!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s10)));
+  if (arg_s11!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s11)));
+  if (arg_s12!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s12)));
+  return ret;
+
+}
 /// Helper function for 'OCPOutput'
 /// Output arguments of an OCP Solver
 /// 
@@ -416,6 +599,16 @@ IOSchemeVector<M> ocpOut(const std::string arg_s0="",M arg_m0=M(),const std::str
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_OCPOutput);
+}
+template<class M>
+std::vector<M> ocpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput,arg_s3)));
+  return ret;
+
 }
 /// Helper function for 'QPInput'
 /// Input arguments of a QP problem
@@ -443,6 +636,21 @@ IOSchemeVector<M> qpIn(const std::string arg_s0="",M arg_m0=M(),const std::strin
   }
   return IOSchemeVector<M>(ret,SCHEME_QPInput);
 }
+template<class M>
+std::vector<M> qpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s7)));
+  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s8)));
+  return ret;
+
+}
 /// Helper function for 'QPOutput'
 /// Output arguments of an QP Solver
 /// 
@@ -464,6 +672,16 @@ IOSchemeVector<M> qpOut(const std::string arg_s0="",M arg_m0=M(),const std::stri
   }
   return IOSchemeVector<M>(ret,SCHEME_QPOutput);
 }
+template<class M>
+std::vector<M> qpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPOutput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPOutput,arg_s3)));
+  return ret;
+
+}
 /// Helper function for 'SDPInput'
 /// Input arguments of a SDP problem
 /// 
@@ -483,6 +701,15 @@ IOSchemeVector<M> sdpIn(const std::string arg_s0="",M arg_m0=M(),const std::stri
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_SDPInput);
+}
+template<class M>
+std::vector<M> sdpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s2)));
+  return ret;
+
 }
 /// Helper function for 'SDPOutput'
 /// Output arguments of an SDP Solver
@@ -505,6 +732,17 @@ IOSchemeVector<M> sdpOut(const std::string arg_s0="",M arg_m0=M(),const std::str
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_SDPOutput);
+}
+template<class M>
+std::vector<M> sdpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s4)));
+  return ret;
+
 }
 }
 #endif //AUTOGENERATED_HPP

@@ -123,6 +123,16 @@ class Enum:
 """  % (self.enum,self.enum,", ".join([name for name, doc, enum in self.entries]))
     s+= "  return IOSchemeVector<M>(ret,SCHEME_%s);" % self.enum
     s+="\n}\n"
+    s+= "template<class M>" + "\n"
+    s+= "std::vector<M> " + self.name + "(const std::vector<M>& args,"
+    for i, (name, doc, enum) in enumerate(self.entries):
+      s+='const std::string arg_s%d=""' % i + ","
+    s=s[:-1] + "){" + "\n"
+    s+= "  std::vector<M> ret;\n"
+    for i,_ in enumerate(self.entries):
+      s+="""  if (arg_s%d!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_%s,arg_s%d)));\n""" % (i,self.enum,i)
+    s+= "  return ret;\n"
+    s+="\n}\n"
 
     return s
 
@@ -141,13 +151,19 @@ class Enum:
     s="def " + self.name + "(*dummy,**kwargs):\n"
     s+='  """\n'
     s+= "  Helper function for '" + self.enum + "'\n\n"
+    s+= "  Two use cases:\n"
+    s+= "     a) arg = %s(%s) \n" % (self.name , ", ".join(["%s=my_%s" % (name,name) for name, doc, enum in self.entries]))
+    s+= "          all arguments optional\n"
+    s+= "     b) %s = %s(arg,%s) \n" % ( ", ".join([name for name, doc, enum in self.entries]), self.name , ", ".join(['"' + name+'"' for name, doc, enum in self.entries]))
+    s+= "          all arguments after the first optional\n"
     s+= "\n".join(map(lambda x: "  " + x.rstrip(),self.getDoc().split("\n"))) + "\n"
     s+= "  Keyword arguments:\n"
     maxlenname = max([len(name) for name, doc, enum in self.entries])
     for name, doc, enum in self.entries:
       s+="    " + name + (" "*(maxlenname-len(name))) +  " -- " +  doc + " [" + enum + "]\n"
     s+='  """\n'
-    s+="""  if(len(dummy)>0): raise Exception("Error in %s: syntax has become more strict. You must use keyword arguments now, for your own safety.\\n %s(%s)\\nmust be written\\n %s(%s)\\nwhere any keyword is optional.")\n""" % (self.name,self.name,", ".join(["my_%s" % name for name, doc, enum in self.entries]),self.name,", ".join(["%s=my_%s" % (name,name) for name, doc, enum in self.entries]))
+    s+="""  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of %s. Either use keywords or non-keywords ")\n""" % self.name
+    s+="""  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_%s,n)] for n in dummy[1:]]\n""" % self.enum
     for name, doc, enum in self.entries:
       s+="  %s = []\n  if '%s' in kwargs:\n    %s = kwargs['%s']\n" % (name,name,name,name)
     s+="""  for k in kwargs.keys():\n    if not(k in [%s]):\n      raise Exception("Keyword error in %s: '%%s' is not recognized. Available keywords are: %s" %% k )\n""" % (",".join(["'%s'" % name for name, doc, enum in self.entries]),self.name,", ".join([name for name, doc, enum in self.entries]))

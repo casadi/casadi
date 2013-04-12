@@ -47,6 +47,11 @@ def acadoIn(*dummy,**kwargs):
   """
   Helper function for 'ACADO_Input'
 
+  Two use cases:
+     a) arg = acadoIn(x_guess=my_x_guess, u_guess=my_u_guess, p_guess=my_p_guess, lbx=my_lbx, ubx=my_ubx, lbx0=my_lbx0, ubx0=my_ubx0, lbxf=my_lbxf, ubxf=my_ubxf, lbu=my_lbu, ubu=my_ubu, lbp=my_lbp, ubp=my_ubp, lbc=my_lbc, ubc=my_ubc, lbr=my_lbr, ubr=my_ubr) 
+          all arguments optional
+     b) x_guess, u_guess, p_guess, lbx, ubx, lbx0, ubx0, lbxf, ubxf, lbu, ubu, lbp, ubp, lbc, ubc, lbr, ubr = acadoIn(arg,"x_guess", "u_guess", "p_guess", "lbx", "ubx", "lbx0", "ubx0", "lbxf", "ubxf", "lbu", "ubu", "lbp", "ubp", "lbc", "ubc", "lbr", "ubr") 
+          all arguments after the first optional
   Input arguments of an ACADO OCP solver
   
   Keyword arguments:
@@ -68,7 +73,8 @@ def acadoIn(*dummy,**kwargs):
     lbr     -- Lower bound on the initial constraint function (default:  0) [ACADO_LBR]
     ubr     -- Upper bound on the initial constraint function (default:  0) [ACADO_UBR]
   """
-  if(len(dummy)>0): raise Exception("Error in acadoIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n acadoIn(my_x_guess, my_u_guess, my_p_guess, my_lbx, my_ubx, my_lbx0, my_ubx0, my_lbxf, my_ubxf, my_lbu, my_ubu, my_lbp, my_ubp, my_lbc, my_ubc, my_lbr, my_ubr)\nmust be written\n acadoIn(x_guess=my_x_guess, u_guess=my_u_guess, p_guess=my_p_guess, lbx=my_lbx, ubx=my_ubx, lbx0=my_lbx0, ubx0=my_ubx0, lbxf=my_lbxf, ubxf=my_ubxf, lbu=my_lbu, ubu=my_ubu, lbp=my_lbp, ubp=my_ubp, lbc=my_lbc, ubc=my_ubc, lbr=my_lbr, ubr=my_ubr)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of acadoIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ACADO_Input,n)] for n in dummy[1:]]
   x_guess = []
   if 'x_guess' in kwargs:
     x_guess = kwargs['x_guess']
@@ -138,6 +144,11 @@ def acadoOut(*dummy,**kwargs):
   """
   Helper function for 'ACADO_Output'
 
+  Two use cases:
+     a) arg = acadoOut(x_opt=my_x_opt, u_opt=my_u_opt, p_opt=my_p_opt, cost=my_cost) 
+          all arguments optional
+     b) x_opt, u_opt, p_opt, cost = acadoOut(arg,"x_opt", "u_opt", "p_opt", "cost") 
+          all arguments after the first optional
   Output arguments of an ACADO OCP solver
   
   Keyword arguments:
@@ -146,7 +157,8 @@ def acadoOut(*dummy,**kwargs):
     p_opt -- Optimal parameters [ACADO_P_OPT]
     cost  -- Optimal cost [ACADO_COST]
   """
-  if(len(dummy)>0): raise Exception("Error in acadoOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n acadoOut(my_x_opt, my_u_opt, my_p_opt, my_cost)\nmust be written\n acadoOut(x_opt=my_x_opt, u_opt=my_u_opt, p_opt=my_p_opt, cost=my_cost)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of acadoOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ACADO_Output,n)] for n in dummy[1:]]
   x_opt = []
   if 'x_opt' in kwargs:
     x_opt = kwargs['x_opt']
@@ -177,6 +189,11 @@ def acadofcnIn(*dummy,**kwargs):
   """
   Helper function for 'ACADO_FCN_Input'
 
+  Two use cases:
+     a) arg = acadofcnIn(t=my_t, xd=my_xd, xa=my_xa, u=my_u, p=my_p, xdot=my_xdot) 
+          all arguments optional
+     b) t, xd, xa, u, p, xdot = acadofcnIn(arg,"t", "xd", "xa", "u", "p", "xdot") 
+          all arguments after the first optional
   Input arguments of an ACADO function
   
   Keyword arguments:
@@ -187,7 +204,8 @@ def acadofcnIn(*dummy,**kwargs):
     p    -- Parameter [ACADO_FCN_P]
     xdot -- Differential state derivative [ACADO_FCN_XDOT]
   """
-  if(len(dummy)>0): raise Exception("Error in acadofcnIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n acadofcnIn(my_t, my_xd, my_xa, my_u, my_p, my_xdot)\nmust be written\n acadofcnIn(t=my_t, xd=my_xd, xa=my_xa, u=my_u, p=my_p, xdot=my_xdot)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of acadofcnIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,n)] for n in dummy[1:]]
   t = []
   if 't' in kwargs:
     t = kwargs['t']
@@ -224,6 +242,11 @@ def controldaeIn(*dummy,**kwargs):
   """
   Helper function for 'ControlledDAEInput'
 
+  Two use cases:
+     a) arg = controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, x_major=my_x_major, t0=my_t0, tf=my_tf) 
+          all arguments optional
+     b) t, x, z, p, u, u_interp, x_major, t0, tf = controldaeIn(arg,"t", "x", "z", "p", "u", "u_interp", "x_major", "t0", "tf") 
+          all arguments after the first optional
   Input arguments of an ODE/DAE function
   
   Keyword arguments:
@@ -237,7 +260,8 @@ def controldaeIn(*dummy,**kwargs):
     t0       -- Time at start of control interval (1-by-1) [CONTROL_DAE_T0]
     tf       -- Time at end of control interval (1-by-1) [CONTROL_DAE_TF]
   """
-  if(len(dummy)>0): raise Exception("Error in controldaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n controldaeIn(my_t, my_x, my_z, my_p, my_u, my_u_interp, my_x_major, my_t0, my_tf)\nmust be written\n controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, x_major=my_x_major, t0=my_t0, tf=my_tf)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of controldaeIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ControlledDAEInput,n)] for n in dummy[1:]]
   t = []
   if 't' in kwargs:
     t = kwargs['t']
@@ -283,6 +307,11 @@ def controlsimulatorIn(*dummy,**kwargs):
   """
   Helper function for 'ControlSimulatorInput'
 
+  Two use cases:
+     a) arg = controlsimulatorIn(x0=my_x0, p=my_p, u=my_u) 
+          all arguments optional
+     b) x0, p, u = controlsimulatorIn(arg,"x0", "p", "u") 
+          all arguments after the first optional
   Input arguments of a control simulator
   
   Keyword arguments:
@@ -290,7 +319,8 @@ def controlsimulatorIn(*dummy,**kwargs):
     p  -- Parameters that are fixed over the entire horizon  (dimension np-by-1) [CONTROLSIMULATOR_P]
     u  -- Parameters that change over the integration intervals (dimension (ns-1)-by-nu) [CONTROLSIMULATOR_U]
   """
-  if(len(dummy)>0): raise Exception("Error in controlsimulatorIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n controlsimulatorIn(my_x0, my_p, my_u)\nmust be written\n controlsimulatorIn(x0=my_x0, p=my_p, u=my_u)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of controlsimulatorIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ControlSimulatorInput,n)] for n in dummy[1:]]
   x0 = []
   if 'x0' in kwargs:
     x0 = kwargs['x0']
@@ -318,6 +348,11 @@ def daeIn(*dummy,**kwargs):
   """
   Helper function for 'DAEInput'
 
+  Two use cases:
+     a) arg = daeIn(x=my_x, z=my_z, p=my_p, t=my_t) 
+          all arguments optional
+     b) x, z, p, t = daeIn(arg,"x", "z", "p", "t") 
+          all arguments after the first optional
   Input arguments of an ODE/DAE function
   
   Keyword arguments:
@@ -326,7 +361,8 @@ def daeIn(*dummy,**kwargs):
     p -- Parameter [DAE_P]
     t -- Explicit time dependence [DAE_T]
   """
-  if(len(dummy)>0): raise Exception("Error in daeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n daeIn(my_x, my_z, my_p, my_t)\nmust be written\n daeIn(x=my_x, z=my_z, p=my_p, t=my_t)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of daeIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DAEInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -357,6 +393,11 @@ def daeOut(*dummy,**kwargs):
   """
   Helper function for 'DAEOutput'
 
+  Two use cases:
+     a) arg = daeOut(ode=my_ode, alg=my_alg, quad=my_quad) 
+          all arguments optional
+     b) ode, alg, quad = daeOut(arg,"ode", "alg", "quad") 
+          all arguments after the first optional
   Output arguments of an DAE function
   
   Keyword arguments:
@@ -364,7 +405,8 @@ def daeOut(*dummy,**kwargs):
     alg  -- Right hand side of algebraic equations [DAE_ALG]
     quad -- Right hand side of quadratures equations [DAE_QUAD]
   """
-  if(len(dummy)>0): raise Exception("Error in daeOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n daeOut(my_ode, my_alg, my_quad)\nmust be written\n daeOut(ode=my_ode, alg=my_alg, quad=my_quad)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of daeOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DAEOutput,n)] for n in dummy[1:]]
   ode = []
   if 'ode' in kwargs:
     ode = kwargs['ode']
@@ -392,6 +434,11 @@ def rdaeIn(*dummy,**kwargs):
   """
   Helper function for 'RDAEInput'
 
+  Two use cases:
+     a) arg = rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t) 
+          all arguments optional
+     b) rx, rz, rp, x, z, p, t = rdaeIn(arg,"rx", "rz", "rp", "x", "z", "p", "t") 
+          all arguments after the first optional
   Input arguments of an ODE/DAE backward integration function
   
   Keyword arguments:
@@ -403,7 +450,8 @@ def rdaeIn(*dummy,**kwargs):
     p  -- Parameter vector [RDAE_P]
     t  -- Explicit time dependence [RDAE_T]
   """
-  if(len(dummy)>0): raise Exception("Error in rdaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n rdaeIn(my_rx, my_rz, my_rp, my_x, my_z, my_p, my_t)\nmust be written\n rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of rdaeIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_RDAEInput,n)] for n in dummy[1:]]
   rx = []
   if 'rx' in kwargs:
     rx = kwargs['rx']
@@ -443,6 +491,11 @@ def rdaeOut(*dummy,**kwargs):
   """
   Helper function for 'RDAEOutput'
 
+  Two use cases:
+     a) arg = rdaeOut(ode=my_ode, alg=my_alg, quad=my_quad) 
+          all arguments optional
+     b) ode, alg, quad = rdaeOut(arg,"ode", "alg", "quad") 
+          all arguments after the first optional
   Output arguments of an ODE/DAE backward integration function
   
   Keyword arguments:
@@ -450,7 +503,8 @@ def rdaeOut(*dummy,**kwargs):
     alg  -- Right hand side of algebraic equations. [RDAE_ALG]
     quad -- Right hand side of quadratures. [RDAE_QUAD]
   """
-  if(len(dummy)>0): raise Exception("Error in rdaeOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n rdaeOut(my_ode, my_alg, my_quad)\nmust be written\n rdaeOut(ode=my_ode, alg=my_alg, quad=my_quad)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of rdaeOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_RDAEOutput,n)] for n in dummy[1:]]
   ode = []
   if 'ode' in kwargs:
     ode = kwargs['ode']
@@ -478,6 +532,11 @@ def integratorIn(*dummy,**kwargs):
   """
   Helper function for 'IntegratorInput'
 
+  Two use cases:
+     a) arg = integratorIn(x0=my_x0, p=my_p, rx0=my_rx0, rp=my_rp) 
+          all arguments optional
+     b) x0, p, rx0, rp = integratorIn(arg,"x0", "p", "rx0", "rp") 
+          all arguments after the first optional
   Input arguments of an integrator
   
   Keyword arguments:
@@ -486,7 +545,8 @@ def integratorIn(*dummy,**kwargs):
     rx0 -- Backward differential state at the final time [INTEGRATOR_RX0]
     rp  -- Backward parameter vector [INTEGRATOR_RP]
   """
-  if(len(dummy)>0): raise Exception("Error in integratorIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n integratorIn(my_x0, my_p, my_rx0, my_rp)\nmust be written\n integratorIn(x0=my_x0, p=my_p, rx0=my_rx0, rp=my_rp)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorInput,n)] for n in dummy[1:]]
   x0 = []
   if 'x0' in kwargs:
     x0 = kwargs['x0']
@@ -517,6 +577,11 @@ def integratorOut(*dummy,**kwargs):
   """
   Helper function for 'IntegratorOutput'
 
+  Two use cases:
+     a) arg = integratorOut(xf=my_xf, qf=my_qf, rxf=my_rxf, rqf=my_rqf) 
+          all arguments optional
+     b) xf, qf, rxf, rqf = integratorOut(arg,"xf", "qf", "rxf", "rqf") 
+          all arguments after the first optional
   Output arguments of an integrator
   
   Keyword arguments:
@@ -525,7 +590,8 @@ def integratorOut(*dummy,**kwargs):
     rxf -- Backward differential state at the initial time [INTEGRATOR_RXF]
     rqf -- Backward quadrature state at the initial time [INTEGRATOR_RQF]
   """
-  if(len(dummy)>0): raise Exception("Error in integratorOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n integratorOut(my_xf, my_qf, my_rxf, my_rqf)\nmust be written\n integratorOut(xf=my_xf, qf=my_qf, rxf=my_rxf, rqf=my_rqf)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorOutput,n)] for n in dummy[1:]]
   xf = []
   if 'xf' in kwargs:
     xf = kwargs['xf']
@@ -556,6 +622,11 @@ def nlpsolverIn(*dummy,**kwargs):
   """
   Helper function for 'NLPInput'
 
+  Two use cases:
+     a) arg = nlpsolverIn(x0=my_x0, p=my_p, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_x0=my_lam_x0, lam_g0=my_lam_g0) 
+          all arguments optional
+     b) x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0 = nlpsolverIn(arg,"x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0") 
+          all arguments after the first optional
   Input arguments of an NLP Solver
   
   Keyword arguments:
@@ -568,7 +639,8 @@ def nlpsolverIn(*dummy,**kwargs):
     lam_x0 -- Lagrange multipliers for bounds on X, initial guess (nx x 1) [NLP_SOLVER_LAM_X0]
     lam_g0 -- Lagrange multipliers for bounds on G, initial guess (ng x 1) [NLP_SOLVER_LAM_G0]
   """
-  if(len(dummy)>0): raise Exception("Error in nlpsolverIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n nlpsolverIn(my_x0, my_p, my_lbx, my_ubx, my_lbg, my_ubg, my_lam_x0, my_lam_g0)\nmust be written\n nlpsolverIn(x0=my_x0, p=my_p, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_x0=my_lam_x0, lam_g0=my_lam_g0)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpsolverIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPInput,n)] for n in dummy[1:]]
   x0 = []
   if 'x0' in kwargs:
     x0 = kwargs['x0']
@@ -611,6 +683,11 @@ def nlpsolverOut(*dummy,**kwargs):
   """
   Helper function for 'NLPOutput'
 
+  Two use cases:
+     a) arg = nlpsolverOut(x=my_x, f=my_f, g=my_g, lam_x=my_lam_x, lam_g=my_lam_g, lam_p=my_lam_p) 
+          all arguments optional
+     b) x, f, g, lam_x, lam_g, lam_p = nlpsolverOut(arg,"x", "f", "g", "lam_x", "lam_g", "lam_p") 
+          all arguments after the first optional
   Output arguments of an NLP Solver
   
   Keyword arguments:
@@ -621,7 +698,8 @@ def nlpsolverOut(*dummy,**kwargs):
     lam_g -- Lagrange multipliers for bounds on G at the solution (ng x 1) [NLP_SOLVER_LAM_G]
     lam_p -- Lagrange multipliers for bounds on P at the solution (np x 1) [NLP_SOLVER_LAM_P]
   """
-  if(len(dummy)>0): raise Exception("Error in nlpsolverOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n nlpsolverOut(my_x, my_f, my_g, my_lam_x, my_lam_g, my_lam_p)\nmust be written\n nlpsolverOut(x=my_x, f=my_f, g=my_g, lam_x=my_lam_x, lam_g=my_lam_g, lam_p=my_lam_p)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpsolverOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -658,6 +736,11 @@ def mayerIn(*dummy,**kwargs):
   """
   Helper function for 'MayerInput'
 
+  Two use cases:
+     a) arg = mayerIn(x=my_x, p=my_p) 
+          all arguments optional
+     b) x, p = mayerIn(arg,"x", "p") 
+          all arguments after the first optional
   Input arguments of a Mayer Term
   nx: Number of states: from ffcn.input(INTEGRATOR_X0).size()
   np: Number of parameters: from option number_of_parameters
@@ -666,7 +749,8 @@ def mayerIn(*dummy,**kwargs):
     x -- States at the end of integration (nx x 1) [MAYER_X]
     p -- Problem parameters (np x 1) [MAYER_P]
   """
-  if(len(dummy)>0): raise Exception("Error in mayerIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n mayerIn(my_x, my_p)\nmust be written\n mayerIn(x=my_x, p=my_p)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of mayerIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_MayerInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -691,6 +775,11 @@ def ocpIn(*dummy,**kwargs):
   """
   Helper function for 'OCPInput'
 
+  Two use cases:
+     a) arg = ocpIn(lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lbu=my_lbu, ubu=my_ubu, u_init=my_u_init, lbp=my_lbp, ubp=my_ubp, p_init=my_p_init, lbh=my_lbh, ubh=my_ubh, lbg=my_lbg, ubg=my_ubg) 
+          all arguments optional
+     b) lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg = ocpIn(arg,"lbx", "ubx", "x_init", "lbu", "ubu", "u_init", "lbp", "ubp", "p_init", "lbh", "ubh", "lbg", "ubg") 
+          all arguments after the first optional
   Input arguments of an OCP Solver
   ns: Number of shooting nodes: from option number_of_grid_points
   nx: Number of states: from ffcn.input(INTEGRATOR_X0).size()
@@ -714,7 +803,8 @@ def ocpIn(*dummy,**kwargs):
     lbg    -- Lower bound for the coupling constraints [OCP_LBG]
     ubg    -- Upper bound for the coupling constraints [OCP_UBG]
   """
-  if(len(dummy)>0): raise Exception("Error in ocpIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpIn(my_lbx, my_ubx, my_x_init, my_lbu, my_ubu, my_u_init, my_lbp, my_ubp, my_p_init, my_lbh, my_ubh, my_lbg, my_ubg)\nmust be written\n ocpIn(lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lbu=my_lbu, ubu=my_ubu, u_init=my_u_init, lbp=my_lbp, ubp=my_ubp, p_init=my_p_init, lbh=my_lbh, ubh=my_ubh, lbg=my_lbg, ubg=my_ubg)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of ocpIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_OCPInput,n)] for n in dummy[1:]]
   lbx = []
   if 'lbx' in kwargs:
     lbx = kwargs['lbx']
@@ -772,6 +862,11 @@ def ocpOut(*dummy,**kwargs):
   """
   Helper function for 'OCPOutput'
 
+  Two use cases:
+     a) arg = ocpOut(x_opt=my_x_opt, u_opt=my_u_opt, p_opt=my_p_opt, cost=my_cost) 
+          all arguments optional
+     b) x_opt, u_opt, p_opt, cost = ocpOut(arg,"x_opt", "u_opt", "p_opt", "cost") 
+          all arguments after the first optional
   Output arguments of an OCP Solver
   
   Keyword arguments:
@@ -780,7 +875,8 @@ def ocpOut(*dummy,**kwargs):
     p_opt -- Optimal parameters [OCP_P_OPT]
     cost  -- Objective/cost function for optimal solution (1 x 1) [OCP_COST]
   """
-  if(len(dummy)>0): raise Exception("Error in ocpOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpOut(my_x_opt, my_u_opt, my_p_opt, my_cost)\nmust be written\n ocpOut(x_opt=my_x_opt, u_opt=my_u_opt, p_opt=my_p_opt, cost=my_cost)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of ocpOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_OCPOutput,n)] for n in dummy[1:]]
   x_opt = []
   if 'x_opt' in kwargs:
     x_opt = kwargs['x_opt']
@@ -811,6 +907,11 @@ def qpIn(*dummy,**kwargs):
   """
   Helper function for 'QPInput'
 
+  Two use cases:
+     a) arg = qpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lambda_init=my_lambda_init) 
+          all arguments optional
+     b) h, g, a, lba, uba, lbx, ubx, x_init, lambda_init = qpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x_init", "lambda_init") 
+          all arguments after the first optional
   Input arguments of a QP problem
   
   Keyword arguments:
@@ -824,7 +925,8 @@ def qpIn(*dummy,**kwargs):
     x_init      -- dense, (nx x 1) [QP_X_INIT]
     lambda_init -- dense [QP_LAMBDA_INIT]
   """
-  if(len(dummy)>0): raise Exception("Error in qpIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n qpIn(my_h, my_g, my_a, my_lba, my_uba, my_lbx, my_ubx, my_x_init, my_lambda_init)\nmust be written\n qpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lambda_init=my_lambda_init)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
     h = kwargs['h']
@@ -870,6 +972,11 @@ def qpOut(*dummy,**kwargs):
   """
   Helper function for 'QPOutput'
 
+  Two use cases:
+     a) arg = qpOut(primal=my_primal, cost=my_cost, lambda_a=my_lambda_a, lambda_x=my_lambda_x) 
+          all arguments optional
+     b) primal, cost, lambda_a, lambda_x = qpOut(arg,"primal", "cost", "lambda_a", "lambda_x") 
+          all arguments after the first optional
   Output arguments of an QP Solver
   
   Keyword arguments:
@@ -878,7 +985,8 @@ def qpOut(*dummy,**kwargs):
     lambda_a -- The dual solution corresponding to linear bounds [QP_LAMBDA_A]
     lambda_x -- The dual solution corresponding to simple bounds [QP_LAMBDA_X]
   """
-  if(len(dummy)>0): raise Exception("Error in qpOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n qpOut(my_primal, my_cost, my_lambda_a, my_lambda_x)\nmust be written\n qpOut(primal=my_primal, cost=my_cost, lambda_a=my_lambda_a, lambda_x=my_lambda_x)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPOutput,n)] for n in dummy[1:]]
   primal = []
   if 'primal' in kwargs:
     primal = kwargs['primal']
@@ -909,6 +1017,11 @@ def sdpIn(*dummy,**kwargs):
   """
   Helper function for 'SDPInput'
 
+  Two use cases:
+     a) arg = sdpIn(a=my_a, b=my_b, c=my_c) 
+          all arguments optional
+     b) a, b, c = sdpIn(arg,"a", "b", "c") 
+          all arguments after the first optional
   Input arguments of a SDP problem
   
   Keyword arguments:
@@ -916,7 +1029,8 @@ def sdpIn(*dummy,**kwargs):
     b -- The vector b: ( m x 1) [SDP_B]
     c -- The matrix C: ( n x n) [SDP_C]
   """
-  if(len(dummy)>0): raise Exception("Error in sdpIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n sdpIn(my_a, my_b, my_c)\nmust be written\n sdpIn(a=my_a, b=my_b, c=my_c)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPInput,n)] for n in dummy[1:]]
   a = []
   if 'a' in kwargs:
     a = kwargs['a']
@@ -944,6 +1058,11 @@ def sdpOut(*dummy,**kwargs):
   """
   Helper function for 'SDPOutput'
 
+  Two use cases:
+     a) arg = sdpOut(primal=my_primal, p=my_p, dual=my_dual, primal_cost=my_primal_cost, dual_cost=my_dual_cost) 
+          all arguments optional
+     b) primal, p, dual, primal_cost, dual_cost = sdpOut(arg,"primal", "p", "dual", "primal_cost", "dual_cost") 
+          all arguments after the first optional
   Output arguments of an SDP Solver
   
   Keyword arguments:
@@ -953,7 +1072,8 @@ def sdpOut(*dummy,**kwargs):
     primal_cost -- The primal optimal cost (1 x 1) [SDP_PRIMAL_COST]
     dual_cost   -- The dual optimal cost (1 x 1) [SDP_DUAL_COST]
   """
-  if(len(dummy)>0): raise Exception("Error in sdpOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n sdpOut(my_primal, my_p, my_dual, my_primal_cost, my_dual_cost)\nmust be written\n sdpOut(primal=my_primal, p=my_p, dual=my_dual, primal_cost=my_primal_cost, dual_cost=my_dual_cost)\nwhere any keyword is optional.")
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPOutput,n)] for n in dummy[1:]]
   primal = []
   if 'primal' in kwargs:
     primal = kwargs['primal']

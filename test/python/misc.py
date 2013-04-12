@@ -316,7 +316,19 @@ class Misctests(casadiTestCase):
     with self.assertRaises(Exception):
       s[100]
     s[-1]
-
+    
+  def test_IOscheme_output(self):
+    x = ssym("x")
+    p = ssym("p")
+    s = daeIn(x=x,p=p)
+    
+    pp, = daeIn(s,"p")
+    self.assertTrue(isEqual(pp,p))
+    
+    xx,pp = daeIn(s,"x","p")
+    self.assertTrue(isEqual(pp,p))
+    self.assertTrue(isEqual(xx,x))
+    
 if __name__ == '__main__':
     unittest.main()
     
