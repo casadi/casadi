@@ -465,7 +465,6 @@ class Prefixer:
   __repr__ = __str__
   
   def __call__(self):
-    print "class", self.struct.__class__
     return self.struct.__getitem__(self.prefix)
   
   @properGetitem
