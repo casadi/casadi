@@ -1,5 +1,9 @@
 /*!
  \mainpage <a href="http://casadi.org">CasADi</a> reference and tutorial
+
+NOTE: the following is out-of-date.
+Please consult the User Guide at http://casadi.org/users_guide
+
  CasADi is a minimalistic computer algebra system implementing automatic differentiation in forward and adjoint modes by means of a hybrid symbolic/numeric approach. It is designed to be a low-level tool for quick, yet highly efficient implementation of algorithms for numerical optimization. Of particular interest is dynamic optimization, using either a collocation approach, or a shooting-based approach using embedded ODE/DAE-integrators. In either case, CasADi relieves the user from the work of efficiently calculating the relevant derivative or ODE/DAE sensitivity information to an arbitrary degree, as needed by the NLP solver. This together with a full-featured Python front end, and back ends to state-of-the-art codes such as Sundials (CVODES, IDAS and KINSOL), IPOPT and KNITRO, drastically reduces the effort of implementing the methods compared to a pure C/C++/Fortran approach. More experimental interfaces include the NLP solver LiftOpt (CasADi provides automatic lifting) and the optimal control framework ACADO Toolkit.
 
  <b>C++ tutorial</b>
