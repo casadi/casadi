@@ -286,3 +286,33 @@ print V["P",0,indexf["q",:],indexf["q",:]]
 #! Of course, in this basic example, also the following would be allowed
 print V["P",0,"q","q"] 
 
+#! Prefixing
+#! -----------
+
+#! The prefix attribute allows you to create shorthands for long powerIndices
+
+states = struct(["x","y","z"])
+V = struct_ssym([
+      entry("X",repeat=[4,5],struct=states)
+])
+
+num = V()
+
+#! Consider the following statements:
+
+num["X",0,0,"x"] = 1
+num["X",0,0,"y"] = 2
+num["X",0,0,"z"] = 3
+
+#! Note the common part ["X",0,0].
+#! We can pull this apart with prefix:
+
+initial = num.prefix["X",0,0]
+
+initial["x"] = 1
+initial["y"] = 2
+initial["z"] = 3
+
+#! This is equivalent to the longer statements above
+
+

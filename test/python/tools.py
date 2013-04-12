@@ -803,7 +803,30 @@ class Toolstests(casadiTestCase):
       ci = shooting.getCanonicalIndex(i)
       self.assertEqual(i, init.__getitem__(ci))
       self.assertTrue("_".join(map(str,ci)).startswith(shooting.cat.at(i).getName()))
+      
+  def test_structure_prefix(self):
+    s = struct(["x","y","z"])
 
+    S = struct_ssym([entry("X",repeat=12,struct=s)])
+
+    print S.__class__
+    print S.prefix
+
+    a = S.prefix["X"]
+
+    num = S()
+
+    init = num.prefix["X",-1]
+
+    init["x"] = 12
+    
+    self.assertEqual(num["X",-1,"x"],init["x"])
+
+    self.checkarray(num.cat,DMatrix([0]*(S.size-3) + [12,0,0]))
+
+
+    
+    
 if __name__ == '__main__':
     unittest.main()
 

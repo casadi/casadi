@@ -453,6 +453,43 @@ def performExtraIndex(i,extraIndex=None,entry=None):
   else:
     return i
 
+
+class Prefixer:
+  def __init__(self,struct,prefix):
+    self.struct = struct
+    self.prefix = prefix
+    
+  def __str__(self):
+    return "prefix( " + str(self.prefix) + "," + self.struct.__str__(compact=True) + ")"
+    
+  __repr__ = __str__
+  
+  def __call__(self):
+    print "class", self.struct.__class__
+    return self.struct.__getitem__(self.prefix)
+  
+  @properGetitem
+  def __getitem__(self,powerIndex):
+    return self.struct.__getitem__(self.prefix + powerIndex)
+    
+  @properGetitem
+  def __setitem__(self,powerIndex,data):
+    return self.struct.__setitem__(self.prefix + powerIndex,data)
+    
+class PrefixConstructor:
+
+  def __str__(self):
+    return "prefixConstructor(" + self.struct.__str__(compact=True) + ")"
+    
+  __repr__ = __str__
+  
+  def __init__(self,struct):
+    self.struct = struct
+  
+  @properGetitem
+  def __getitem__(self,prefix):
+    return Prefixer(self.struct,prefix)
+    
 class CasadiStructure(Structure,CasadiStructureDerivable):
   """
     size
@@ -513,7 +550,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
       @properGetitem
       def __getitem__(self,powerIndex):
         return flatten(self.struct.traverseByPowerIndex(powerIndex,dispatcher=CasadiStructure.FlatIndexDispatcher(struct=self.struct)))
-        
+            
     self.i = IMatrixGetter(self)
     self.f = FlatIndexGetter(self)
     self.struct = self
@@ -552,6 +589,7 @@ class Structured:
     self.struct = structure.struct
     self.i = self.struct.i
     self.f = self.struct.f
+    self.prefix = PrefixConstructor(self)
        
   @property
   def size(self):
@@ -561,8 +599,11 @@ class Structured:
   def cat(self):
     return self.master
     
-  def __str__(self):
-    return self.description + " with following structure:\n" + self.struct.__str__()
+  def __str__(self,compact=False):
+    if compact is False:
+      return self.description + " with following structure:\n" + self.struct.__str__()
+    else:
+      return self.description + " (" + self.struct.__str__(compact=True) + ")"
     
   def keys(self):
     return self.struct.keys()
