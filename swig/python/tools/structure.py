@@ -387,7 +387,7 @@ class CasadiStructureDerivable:
       except:
         raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
     if not(a.shape[1] == self.size):
-       raise Exception("Expecting n x %d DMatrix." % self.size)
+       raise Exception("Expecting n x %d DMatrix. Got %s" % (self.size,a.dimString()))
     s = struct([entry("t",struct=self,repeat=a.shape[0])])
     numbers = DMatrixStruct(s,data=a,dataVectorCheck=False)
     return numbers.prefix["t"]
