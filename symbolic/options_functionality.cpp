@@ -35,40 +35,39 @@ using namespace std;
 namespace CasADi {
 
 
-
 double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::string &b) {
   /// Levenshtein edit distance
+  if (a == b) return 0;
+  int na = a.size();
+  int nb = b.size();
+  if (na == 0) return nb;
+  if (nb == 0) return na;
+
+  vector<int> v0(nb+1,0);
+  vector<int> v1(nb+1,0);
   
-  int m = a.size();
-  int n = b.size();
-  
-  Matrix<int> d(m+1,n+1,0);
-  
-  for (int i=0;i<m+1;++i)
-    d.elem(i,0) = i; // the distance of any first string to an empty second string
-  
-  for (int j=0;j<n+1;++j)
-    d.elem(0,j) = j; // the distance of any second string to an empty first string
+  for (int i=0;i<nb+1;++i)
+    v0[i] = i;
     
   char s;
   char t;
-  
-  for (int j=1;j<n+1;j++) {
-    for (int i=1;i<m+1;i++) {
+  for (int i=0;i<na;i++) {
+    v1[0] = i + 1;
+    for (int j=0; j<nb; j++) {
       s = a[i];tolower(s);
-      t = b[i];tolower(t);
-      if (s==t) {
-        d.elem(i,j) = d.elem(i-1,j-1);     // no operation required
-      } else {
-        d.elem(i,j) = min(min(
-                   d.elem(i-1,j)+1,    // a deletion
-                   d.elem(i,j-1)+0),   // an insertion
-                   d.elem(i-1,j-1)+5); // a substitution
-      }
+      t = b[j];tolower(t);
+      int cost = 0;
+      if (s != t)
+	cost = 1;
+	
+      v1[j+1] = min(min( v1[j] + 1, v0[j+1] + 1), v0[j] + cost);
     }
+
+    for (int j=0; j<nb+1; j++)
+      v0[j] = v1[j];
   }
 
-  return d.elem(m,n);
+  return v1[nb];
 }
 
 /// A helper class to use stl::sort in OptionsFunctionalityNode::getBestMatches
