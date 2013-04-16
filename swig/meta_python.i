@@ -40,6 +40,8 @@ int meta< int >::as(PyObject * p, int &m) {
     m = PyLong_AsLong(r);
     Py_DECREF(r);
     return true;
+  } else {
+    return false;
   }
 }
 
@@ -162,6 +164,8 @@ int meta< double >::as(PyObject * p, double &m) {
     m = PyFloat_AsDouble(r);
     Py_DECREF(r);
     return true;
+  } else {
+    return false;
   }
 }
    
