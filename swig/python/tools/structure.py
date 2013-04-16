@@ -377,6 +377,20 @@ class CasadiStructureDerivable:
     if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
       a = DMatrix.ones(self.size,1)*a
     return DMatrixStruct(self,data=a)
+    
+  def repeated(self,arg=0):
+    if isinstance(arg,DMatrix):
+      a = arg
+    else:
+      try:
+        a = DMatrix(arg)
+      except:
+        raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
+    if not(a.shape[1] == self.size):
+       raise Exception("Expecting n x %d DMatrix." % self.size)
+    s = struct([entry("t",struct=self,repeat=a.shape[0])])
+    numbers = DMatrixStruct(s,data=a,dataVectorCheck=False)
+    return numbers.prefix["t"]
 
 class GetterDispatcher(Dispatcher):
   def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
@@ -683,7 +697,7 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
   def description(self):
     return "Mutable " + self.mtype.__name__
     
-  def __init__(self,struct,mtype,data=None,order=None):
+  def __init__(self,struct,mtype,data=None,order=None,dataVectorCheck=True):
     CasadiStructured.__init__(self,struct,order=None)
     
     if any(e.expr is None for e in self.entries):
@@ -697,17 +711,20 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
     else:
       self.master = mtype(data)
       
-    if self.master.shape[0]!=self.size:
-      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dimString()))
-    if self.master.shape[1]!=1:
-      raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dimString()))
-      
+    if dataVectorCheck:
+      if self.master.shape[0]!=self.size:
+        raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dimString()))
+      if self.master.shape[1]!=1:
+        raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dimString()))
+    else:
+      if self.master.size()!=self.size:
+        raise Exception("MatrixStruct: dimension error. Expecting %d entries, but got %s" % (self.size,self.master.dimString()))
     for e in self.entries:
       self[e.name] = e.expr
       
 class DMatrixStruct(MatrixStruct):
-  def __init__(self,struct,data=None):
-    MatrixStruct.__init__(self,struct,DMatrix,data=data)
+  def __init__(self,struct,data=None,dataVectorCheck=True):
+    MatrixStruct.__init__(self,struct,DMatrix,data=data,dataVectorCheck=dataVectorCheck)
     
   def __DMatrix__(self):
     return self.cat
