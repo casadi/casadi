@@ -124,7 +124,7 @@ class meta {
         if (!it) return false;
         PyObject *pe;
         int i=0;
-        while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+        while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
           if (!meta< T >::couldbe(pe)) {
             Py_DECREF(pe);Py_DECREF(it);return false;
           }
@@ -159,7 +159,7 @@ class meta {
       PyObject *pe;
       m.resize(PySequence_Size(p));
       int i=0;
-      while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+      while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
         bool result=meta< T >::as(pe,m[i++]);
         if (!result) {
           Py_DECREF(pe);Py_DECREF(it);
