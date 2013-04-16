@@ -103,13 +103,12 @@ SET(${MYPATH} ${MYPATH_NEW} PARENT_SCOPE)
 endfunction() 
 
 # Check if the compiler supports C++11
-foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x" "-std=c++11 --DUSE_TR1_HASHMAP" "-std=c++0x -DUSE_TR1_HASHMAP")
+foreach(CXX11FLAG_TEST "" "-std=gnu++11" "-std=c++11" "-std=gnu++0x" "-std=c++0x" "-std=c++11 --DUSE_TR1_HASHMAP" "-std=c++0x -DUSE_TR1_HASHMAP")
   if(NOT USE_CXX11)
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11
-      ${CMAKE_BINARY_DIR}/check_cxx11 
-      ${CMAKE_SOURCE_DIR}/cmake_modules/check_cxx11
-      check_cxx11
+      ${CMAKE_BINARY_DIR} 
+      ${CMAKE_SOURCE_DIR}/cmake_modules/check_cxx11.cpp
       CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG_TEST}
       OUTPUT_VARIABLE OUTPUT)
     

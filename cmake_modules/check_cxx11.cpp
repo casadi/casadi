@@ -20,8 +20,26 @@
  *
  */
 
-#include <stdio.h>
+#ifdef USE_TR1_HASHMAP
+#include <tr1/unordered_map>
+#define MYMAP std::tr1::unordered_map
+#else
+#include <unordered_map>
+#define MYMAP std::unordered_map
+#endif
 
-void mymodule(){
-  printf("%d",5);
+#include <vector>
+/** Check if selected C++11 (formerly C++0x) features are available
+ */
+
+int main(){
+  // Check unordered maps (hash maps)
+  MYMAP<double,int> m;
+  m[2.4] = 4;
+
+  // Check initializer lists
+  //std::vector<double> v = {1,2,3};
+  
+  return 0;
+  
 }
