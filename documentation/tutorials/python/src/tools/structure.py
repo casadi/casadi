@@ -315,4 +315,29 @@ initial["z"] = 3
 
 #! This is equivalent to the longer statements above
 
+#! Helper constructors
+#! -------------------
+
+#! If you work with Simulator, ControlSimulator, you typically end up
+#! with wanting to index a DMatrix that is N x n
+#! with n the size of a statespace and N an arbitrary integer
+
+states = struct(["x","y","z"])
+
+#! We artificially construct here a DMAtrix that could be a Simulator output.
+output = DMatrix.zeros(8,states.size)
+
+#! The helper construct is 'repeated' here. Instead of "states(output)", we have
+outputs = states.repeated(output)
+
+#! Know we have an object that supports powerIndexing:
+outputs[-1] = DMatrix([1,2,3])
+outputs[:,"x"] = range(8) 
+
+print output
+print outputs[5,{}]
+
+
+
+
 

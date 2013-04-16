@@ -805,6 +805,7 @@ class Toolstests(casadiTestCase):
       self.assertTrue("_".join(map(str,ci)).startswith(shooting.cat.at(i).getName()))
       
   def test_structure_prefix(self):
+    self.message("structure prefix")
     s = struct(["x","y","z"])
 
     S = struct_ssym([entry("X",repeat=12,struct=s)])
@@ -824,9 +825,17 @@ class Toolstests(casadiTestCase):
 
     self.checkarray(num.cat,DMatrix([0]*(S.size-3) + [12,0,0]))
 
+  def test_structure_repeated_dmatrix(self):
+    self.message("repeated dmatrix")
+    s = struct(["x","y","z"])
+    d = DMatrix.zeros(12,s.size)
+    a = s.repeated(d)
+    
+    a[:,"x"] = range(12)
+    
+    self.checkarray(a[4,"x"],DMatrix([4]))
+    self.checkarray(d,horzcat([range(12),DMatrix.zeros(12),DMatrix.zeros(12)]))
 
-    
-    
 if __name__ == '__main__':
     unittest.main()
 
