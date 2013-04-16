@@ -581,7 +581,6 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = ../../symbolic \
-                         ../../toolboxes \
                          ../../interfaces \
                          ../../optimal_control \
                          ../../integration \
