@@ -117,13 +117,15 @@ namespace CasADi{
     stream << res.at(0) << "[i]";
 
     // Check if inplace
-    bool inplace = false;
+    bool inplace;
     switch(op_){
     case OP_ADD:
     case OP_SUB:
     case OP_MUL:
     case OP_DIV:
       inplace = res[0].compare(arg[0]) == 0;
+    default:
+      inplace = false;
     }
     
     if(inplace){

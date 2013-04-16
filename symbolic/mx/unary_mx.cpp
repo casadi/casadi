@@ -166,6 +166,7 @@ namespace CasADi{
     case OP_NEG:
       if(op==OP_NEG) return dep();
       break;
+    default: break; // no rule
     }
 
     // Fallback to default implementation
@@ -177,6 +178,7 @@ namespace CasADi{
     case OP_NEG:
       if(op==OP_ADD) return y-dep();
       break;
+    default: break; // no rule
     }
 
     // Fallback to default implementation
