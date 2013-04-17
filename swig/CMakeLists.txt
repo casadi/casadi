@@ -165,11 +165,11 @@ set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
 if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 SWIG_ADD_MODULE (${my_module} python ${my_module}.i)
-set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess")
+set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-delete-non-virtual-dtor -Wno-self-assign")
 endforeach()
 else(WITH_SWIG_SPLIT)
 SWIG_ADD_MODULE (casadi python casadi.i) #the target corresponding this module is called "_casadi"
-set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess")
+set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-delete-non-virtual-dtor -Wno-self-assign")
 endif(WITH_SWIG_SPLIT)
 
 if(WITH_SWIG_SPLIT)

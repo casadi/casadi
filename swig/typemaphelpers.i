@@ -123,7 +123,6 @@ class meta {
         PyObject *it = PyObject_GetIter(p);
         if (!it) return false;
         PyObject *pe;
-        int i=0;
         while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
           if (!meta< T >::couldbe(pe)) {
             Py_DECREF(pe);Py_DECREF(it);return false;
