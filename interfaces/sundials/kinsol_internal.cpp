@@ -54,7 +54,6 @@ namespace CasADi{
   }
 
   KinsolInternal* KinsolInternal::clone() const{
-    // Return a deep copy
     KinsolInternal* node = new KinsolInternal(f_,jac_,linsol_);
     node->setOption(dictionary());
     return node;
@@ -585,22 +584,6 @@ namespace CasADi{
     // Log time duration
     time2_ = clock();
     t_lsolve_ += double(time2_-time1_)/CLOCKS_PER_SEC;
-  }
-
-  FX KinsolInternal::getJacobian(){
-    return jac_;
-  }
-
-  LinearSolver KinsolInternal::getLinearSolver(){
-    return linsol_;
-  }
-
-  void KinsolInternal::setJacobian(const FX& jac){
-    jac_ = jac;
-  }
-
-  void KinsolInternal::setLinearSolver(const LinearSolver& linsol){
-    linsol_ = linsol;
   }
 
   int KinsolInternal::lsetup_wrapper(KINMem kin_mem){

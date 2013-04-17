@@ -30,6 +30,9 @@ namespace CasADi{
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(), "Options to be passed to the linear solver.");
   }
 
+  ImplicitFunctionInternal::~ImplicitFunctionInternal(){
+  }
+
   void ImplicitFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     FXInternal::deepCopyMembers(already_copied);
     f_ = deepcopy(f_,already_copied);
@@ -209,14 +212,6 @@ namespace CasADi{
       }
     }
   }
-
-  ImplicitFunctionInternal::~ImplicitFunctionInternal(){
-  }
-
-  void ImplicitFunctionInternal::setJacobian(FX &J) {
-    jac_ = J;
-  }
- 
  
 } // namespace CasADi
 

@@ -45,29 +45,6 @@ namespace CasADi{
     return dynamic_cast<const KinsolInternal*>(get());
   }
 
-  void KinsolSolver::setLinearSolver(const LinearSolver& linsol){
-    casadi_warning(
-		   "Depreciated function \"KinsolSolver::setLinearSolver\",\n"
-		   "use setOption(\"linear solver_creator\",SolverName::creator) in C++ \n"
-		   "or setOption(\"linear solver_creator\",SolverName) in Python/Octave instead.\n"
-		   "Options to the linear solver are passed with setOption(\"linear solver_options\",...)\n"
-		   "This function will be removed in the next release"
-		   );
-    (*this)->setLinearSolver(linsol);
-  }
-
-  void KinsolSolver::setJacobian(const FX& jac){
-    (*this)->setJacobian(jac);
-  }
-
-  FX KinsolSolver::getJacobian(){
-    return (*this)->getJacobian();  
-  }
-  
-  LinearSolver KinsolSolver::getLinearSolver(){
-    return (*this)->getLinearSolver();  
-  }
-
 } // namespace CasADi
 
 

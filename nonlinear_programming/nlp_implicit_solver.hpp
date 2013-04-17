@@ -54,6 +54,9 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
+  /// Access NLP solver
+  NLPSolver& getNLPSolver();
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");

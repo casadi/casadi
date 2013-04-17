@@ -25,28 +25,32 @@
 using namespace std;
 namespace CasADi{
 
-ImplicitFunctionInternal* ImplicitFunction::operator->(){
-  return static_cast<ImplicitFunctionInternal*>(FX::operator->());
-}
+  ImplicitFunctionInternal* ImplicitFunction::operator->(){
+    return static_cast<ImplicitFunctionInternal*>(FX::operator->());
+  }
 
-const ImplicitFunctionInternal* ImplicitFunction::operator->() const{
+  const ImplicitFunctionInternal* ImplicitFunction::operator->() const{
     return static_cast<const ImplicitFunctionInternal*>(FX::operator->());
-}
+  }
  
-bool ImplicitFunction::checkNode() const{
-  return dynamic_cast<const ImplicitFunctionInternal*>(get())!=0;
-}
+  bool ImplicitFunction::checkNode() const{
+    return dynamic_cast<const ImplicitFunctionInternal*>(get())!=0;
+  }
 
-FX ImplicitFunction::getF() const {
-  casadi_assert(checkNode());
-  return (*this)->f_;
-}
+  FX& ImplicitFunction::getF(){
+    casadi_assert(checkNode());
+    return (*this)->f_;
+  }
 
-void ImplicitFunction::setJacobian(FX &J) {
-  casadi_assert(checkNode());
-  (*this)->setJacobian(J);
-}
-  
+  FX& ImplicitFunction::getJac(){
+    casadi_assert(checkNode());
+    return (*this)->jac_;
+  }
+
+  LinearSolver& ImplicitFunction::getLinsol(){
+    casadi_assert(checkNode());
+    return (*this)->linsol_;
+  }
 
 
 } // namespace CasADi

@@ -72,18 +72,6 @@ namespace CasADi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
   
-    /** \brief  Set linear solver */
-    void setLinearSolver(const LinearSolver& linsol);
-
-    /** \brief  Get linear solver */
-    LinearSolver getLinearSolver();
-  
-    /** \brief  Set Jacobian */
-    void setJacobian(const FX& jac);
-  
-    /** \brief  Get Jacobian */
-    FX getJacobian();
-
     /// Static creator function
 #ifdef SWIG
     %callback("%s_cb");

@@ -61,9 +61,6 @@ namespace CasADi{
 
     /// Solve the system of equations
     virtual void evaluate(int nfdir, int nadir) = 0;
-               
-    /// Set the jacobian of F
-    void setJacobian(FX &J);
  
     /// Number of equations
     int n_;

@@ -45,4 +45,9 @@ namespace CasADi{
     return dynamic_cast<const NLPImplicitInternal*>(get());
   }
 
+  NLPSolver& NLPImplicitSolver::getNLPSolver(){
+    casadi_assert(checkNode());
+    return (*this)->nlp_solver_;
+  }
+
 } // namespace CasADi

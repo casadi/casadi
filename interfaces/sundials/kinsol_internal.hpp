@@ -61,18 +61,6 @@ namespace CasADi{
   
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir);
-
-    /** \brief  Set Jacobian */
-    virtual void setJacobian(const FX& jac);
-  
-    /** \brief  Get Jacobian */
-    virtual FX getJacobian();
- 
-    /** \brief  Set linear solver */
-    virtual void setLinearSolver(const LinearSolver& linsol);
-  
-    /** \brief  Get linear solver */
-    virtual LinearSolver getLinearSolver();
   
     /** \brief Residual */
     void func(N_Vector u, N_Vector fval);
