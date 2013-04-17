@@ -25,6 +25,11 @@
 
 #include "symbolic/fx/nlp_solver_internal.hpp"
 
+// GCC_VERSION is defined in worhp.h
+#ifdef GCC_VERSION
+#undef GCC_VERSION
+#endif
+
 #include "worhp.h"
 
 namespace CasADi{

@@ -1586,6 +1586,7 @@ std::vector<Variable>& SymbolicOCP::variableByType(SymbolicOCPVariables type){
     case VAR_PF: return pf;
     case VAR_Y: return y;
     case VAR_U: return u;
+    case NUM_VAR: casadi_error("SymbolicOCPVariable " << type << " out of range."); return x; // avoid -Wreturn-type
   }
 }
     

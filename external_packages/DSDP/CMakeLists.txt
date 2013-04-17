@@ -21,3 +21,4 @@ install(DIRECTORY include
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
 )
+set_target_properties(casadi_dsdp PROPERTIES COMPILE_FLAGS "-Wno-unused-value")

@@ -139,3 +139,5 @@ install(TARGETS casadi_sundials
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+
+set_target_properties(casadi_sundials PROPERTIES COMPILE_FLAGS "-Wno-format-security")

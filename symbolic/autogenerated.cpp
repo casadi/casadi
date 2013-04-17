@@ -272,6 +272,7 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==4) return "dual_cost";
       casadi_error("getSchemeEntryName: supplied number is out of range. SDPOutput has only 5 entries: ('SDPOutput', 'primal, p, dual, primal_cost, dual_cost')");
       break;
+    case SCHEME_unknown: return "none";
 }
 }
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
@@ -800,6 +801,7 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="primal_cost") return 3;
       if(name=="dual_cost") return 4;
       break;
+    case SCHEME_unknown: return -1;
 }
 return -1;}
 }
