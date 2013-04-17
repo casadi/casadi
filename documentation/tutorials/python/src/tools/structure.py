@@ -337,7 +337,34 @@ outputs[:,"x"] = range(8)
 print output
 print outputs[5,{}]
 
+#! Next we represent the 'squared' helper construct
+#! Imagine we somehow obtain a matrix that represents covariance
+P0 = DMatrix.zeros(states.size,states.size)
 
+#! We can conveniently access it as follows:
+P = states.squared(P0)
+P["x","y"] = 2
+P["y","x"] = 3
 
+print P0
 
+#! P itself is a rather queer object
+print P
+
+#! You can access its concents with a call:
+print P()
+
+#! But often, it will behave like a DMatrix transparently:
+P0.set(P)
+
+#! Next we represent the 'squared_repeated' helper construct
+#! Imagine we somehow obtain a matrix that represents a vertical concatenation of covariance
+P0 = vertcat([DMatrix.zeros(states.size,states.size),DMatrix.ones(states.size,states.size)])
+
+#! We can conveniently access it as follows:
+P = states.squared_repeated(P0)
+P[0,"x","y"] = 2
+P[:,"y","x"] = 3
+
+print P0
 

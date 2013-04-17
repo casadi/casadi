@@ -836,6 +836,29 @@ class Toolstests(casadiTestCase):
     self.checkarray(a[4,"x"],DMatrix([4]))
     self.checkarray(d,horzcat([range(12),DMatrix.zeros(12),DMatrix.zeros(12)]))
 
+  def test_structure_squared_dmatrix(self):
+    self.message("squared dmatrix")
+    s = struct(["x","y","z"])
+    d = DMatrix.zeros(3,3)
+    a = s.squared(d)
+    
+    a["x","y"] = 2
+    a["y","x"] = 1
+    
+    self.checkarray(d,DMatrix([[0,2,0],[1,0,0],[0,0,0]]))
+
+  def test_structure_squared_repeated_dmatrix(self):
+    self.message("squared repeated dmatrix")
+    s = struct(["x","y","z"])
+    d = DMatrix.zeros(9,3)
+    a = s.squared_repeated(d)
+    
+    a[0,"x","y"] = 2
+    a[0,"y","x"] = 1
+    a[-1,"x","y"] = 2
+    a[-1,"y","x"] = 1
+    self.checkarray(d,DMatrix([[0,2,0],[1,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,2,0],[1,0,0],[0,0,0]]))
+    
 if __name__ == '__main__':
     unittest.main()
 
