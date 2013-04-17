@@ -44,6 +44,15 @@ namespace CasADi{
     /// Destructor
     virtual ~ImplicitFunctionInternal() = 0;
     
+    /** \brief  Clone */
+    virtual ImplicitFunctionInternal* clone() const=0;
+    
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    
+    /** \brief  Create a new ImplicitFunctionInternal */
+    virtual ImplicitFunctionInternal* create(const FX& f, const FX& J, const LinearSolver& linsol) const = 0;    
+
     /// Initialize
     virtual void init();
     
@@ -52,10 +61,7 @@ namespace CasADi{
 
     /// Solve the system of equations
     virtual void evaluate(int nfdir, int nadir) = 0;
-        
-    /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const FX& f, const FX& J, const LinearSolver& linsol) const = 0;
-       
+               
     /// Set the jacobian of F
     void setJacobian(FX &J);
  

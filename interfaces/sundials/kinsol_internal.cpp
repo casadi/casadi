@@ -55,14 +55,8 @@ namespace CasADi{
 
   KinsolInternal* KinsolInternal::clone() const{
     // Return a deep copy
-    FX f = shared_cast<FX>(f_.clone());
-    KinsolInternal* node = new KinsolInternal(f,FX(),LinearSolver());
+    KinsolInternal* node = new KinsolInternal(f_,J_,linsol_);
     node->setOption(dictionary());
-    node->setJacobian(shared_cast<FX>(J_.clone()));
-    node->setLinearSolver(shared_cast<LinearSolver>(linsol_.clone()));
-  
-    if(isInit())
-      node->init();
     return node;
   }
 

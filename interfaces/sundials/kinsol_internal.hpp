@@ -47,11 +47,14 @@ namespace CasADi{
     /** \brief  Constructor */
     explicit KinsolInternal(const FX& f, const FX& J, const LinearSolver& linsol);
 
+    /** \brief  Destructor */
+    virtual ~KinsolInternal();
+
     /** \brief  Clone */
     virtual KinsolInternal* clone() const;
 
-    /** \brief  Destructor */
-    virtual ~KinsolInternal();
+    /** \brief  Create a new ImplicitFunctionInternal */
+    virtual ImplicitFunctionInternal* create(const FX& f, const FX& J, const LinearSolver& linsol) const { return new KinsolInternal(f,J,linsol);}
 
     /** \brief  Initialize stage */
     virtual void init();
@@ -127,9 +130,6 @@ namespace CasADi{
  
     // Raise an error specific to KinSol
     void kinsol_error(const std::string& module, int flag, bool fatal=true);
-
-    /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const FX& f, const FX& J, const LinearSolver& linsol) const { return new KinsolInternal(f,J,linsol);}
   
   };
 

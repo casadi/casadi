@@ -29,19 +29,6 @@
 using namespace std;
 namespace CasADi {
 
-  NewtonImplicitInternal* NewtonImplicitInternal::clone() const{
-    // Return a deep copy
-    FX f = shared_cast<FX>(f_.clone());
-    NewtonImplicitInternal* node = new NewtonImplicitInternal(f,FX(),LinearSolver());
-    node->setOption(dictionary());
-    node->J_ = shared_cast<FX>(J_.clone());
-    node->linsol_ = shared_cast<LinearSolver>(linsol_.clone());
-  
-    if(isInit())
-      node->init();
-    return node;
-  }
-  
   NewtonImplicitInternal::NewtonImplicitInternal(const FX& f, const FX& J, const LinearSolver& linsol) : ImplicitFunctionInternal(f,J,linsol) {
     addOption("abstol",                      OT_REAL,1e-12,"Stopping criterion tolerance on max(|F|)");
     addOption("abstolStep",                  OT_REAL,1e-12,"Stopping criterion tolerance on step size");

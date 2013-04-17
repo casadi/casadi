@@ -30,6 +30,13 @@ namespace CasADi{
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(), "Options to be passed to the linear solver.");
   }
 
+  void ImplicitFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+    FXInternal::deepCopyMembers(already_copied);
+    f_ = deepcopy(f_,already_copied);
+    J_ = deepcopy(J_,already_copied);
+    linsol_ = deepcopy(linsol_,already_copied);
+  }
+
   void ImplicitFunctionInternal::init(){
     // Initialize the residual function
     if(!f_.isInit()) f_.init();

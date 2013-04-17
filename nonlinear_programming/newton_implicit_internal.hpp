@@ -40,19 +40,20 @@ namespace CasADi{
     /** \brief  Constructor */
     explicit NewtonImplicitInternal(const FX& f, const FX& J, const LinearSolver& linsol);
 
-    /** \brief  Clone */
-    virtual NewtonImplicitInternal* clone() const;
-  
     /** \brief  Destructor */
     virtual ~NewtonImplicitInternal();
 
-    /** \brief  Initialize */
-    virtual void init();
+    /** \brief  Clone */
+    virtual NewtonImplicitInternal* clone() const{ return new NewtonImplicitInternal(*this);}
   
-    virtual void evaluate(int nfdir, int nadir);
-
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const FX& f, const FX& J, const LinearSolver& linsol) const { return new NewtonImplicitInternal(f,J,linsol);}
+
+    /** \brief  Initialize */
+    virtual void init();
+
+    /** \brief  Solve the nonlinear system of equations */ 
+    virtual void evaluate(int nfdir, int nadir);
   
   protected:
     /// Maximum number of Newton iterations
