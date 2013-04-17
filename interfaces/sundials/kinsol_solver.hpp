@@ -58,10 +58,10 @@ public:
   
   /** \brief  Create an KINSOL instance
    *  
-   * \param f SXFunction mapping from (n+1) inputs to 1 output
+   * \param f FX mapping from (n+1) inputs to 1 output
    *
    */
-  explicit KinsolSolver(const FX& f);
+  explicit KinsolSolver(const FX& f, const FX& J=FX(), const LinearSolver& linsol=LinearSolver());
   
   /** \brief  Access functions of the node */
   KinsolInternal* operator->();

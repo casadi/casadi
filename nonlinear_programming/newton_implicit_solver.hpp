@@ -41,10 +41,11 @@ class NewtonImplicitInternal;
 class NewtonImplicitSolver : public ImplicitFunction {
 public:
 
-  /** \brief  Default constructor */
+  /** \brief Default constructor */
   NewtonImplicitSolver();
   
-  explicit NewtonImplicitSolver(const FX& f);
+  /** \brief Create a solver instance */
+  explicit NewtonImplicitSolver(const FX& f, const FX& J=FX(), const LinearSolver& linsol=LinearSolver());
   
   /** \brief  Access functions of the node */
   NewtonImplicitInternal* operator->();

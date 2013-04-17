@@ -29,17 +29,17 @@
 
 namespace CasADi{
   
-// Forward declaration of internal class
-class ImplicitFunctionInternal;
+  // Forward declaration of internal class
+  class ImplicitFunctionInternal;
 
-/// Internal class
-class ImplicitFunctionInternal : public FXInternal{
+  /// Internal class
+  class ImplicitFunctionInternal : public FXInternal{
   public:
     /** \brief Constructor
-    *
-    * \param f   FX mapping from (n+1) inputs to 1 output.
-    */
-    ImplicitFunctionInternal(const FX& f);
+     *
+     * \param f   FX mapping from (n+1) inputs to 1 output.
+     */
+    ImplicitFunctionInternal(const FX& f, const FX& J, const LinearSolver& linsol);
         
     /// Destructor
     virtual ~ImplicitFunctionInternal() = 0;
@@ -54,7 +54,7 @@ class ImplicitFunctionInternal : public FXInternal{
     virtual void evaluate(int nfdir, int nadir) = 0;
         
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const FX& f) const = 0;
+    virtual ImplicitFunctionInternal* create(const FX& f, const FX& J, const LinearSolver& linsol) const = 0;
        
     /// Set the jacobian of F
     void setJacobian(FX &J);
@@ -74,10 +74,10 @@ class ImplicitFunctionInternal : public FXInternal{
   protected:
   
     /** Calculate sensitivities of implicit solver
-    * \param linsol_prepared may specify that the linear solver is already prepared with the Jacobian
-    */
+     * \param linsol_prepared may specify that the linear solver is already prepared with the Jacobian
+     */
     void evaluate_sens(int nfdir, int nadir, bool linsol_prepared=false);
-};
+  };
 
 
 

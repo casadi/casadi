@@ -24,6 +24,7 @@
 #define IMPLICIT_FUNCTION_HPP
 
 #include "fx.hpp"
+#include "linear_solver.hpp"
 
 namespace CasADi{
 // Forward declaration of internal class

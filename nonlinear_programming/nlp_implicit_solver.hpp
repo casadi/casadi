@@ -43,8 +43,9 @@ public:
 
   /** \brief  Default constructor */
   NLPImplicitSolver();
-  
-  explicit NLPImplicitSolver(const FX& f);
+
+  /** \brief Create a new solver instance */  
+  explicit NLPImplicitSolver(const FX& f, const FX& J=FX(), const LinearSolver& linsol=LinearSolver());
   
   /** \brief  Access functions of the node */
   NLPImplicitInternal* operator->();

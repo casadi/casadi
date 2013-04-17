@@ -43,8 +43,8 @@ public:
   /** \brief  Clone */
   virtual NewtonImplicitInternal* clone() const;
   
-  /** \brief  Create a new Solver */
-  explicit NewtonImplicitInternal(const FX& f);
+  /** \brief  Create a new solver instance */
+  explicit NewtonImplicitInternal(const FX& f, const FX& J, const LinearSolver& linsol);
 
   /** \brief  Destructor */
   virtual ~NewtonImplicitInternal();
@@ -55,7 +55,7 @@ public:
   virtual void evaluate(int nfdir, int nadir);
 
   /** \brief  Create a new ImplicitFunctionInternal */
-  virtual ImplicitFunctionInternal* create(const FX& f) const { return new NewtonImplicitInternal(f);}
+  virtual ImplicitFunctionInternal* create(const FX& f, const FX& J, const LinearSolver& linsol) const { return new NewtonImplicitInternal(f,J,linsol);}
   
   protected:
     /// Maximum number of Newton iterations
