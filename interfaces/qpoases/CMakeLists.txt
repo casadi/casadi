@@ -23,3 +23,5 @@ install(DIRECTORY ./
    FILES_MATCHING PATTERN "*.hpp"
    PATTERN ".svn" EXCLUDE
 )
+set_target_properties(casadi_qpoases_interface PROPERTIES COMPILE_FLAGS "-Wno-overloaded-virtual")
+

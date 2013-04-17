@@ -268,7 +268,7 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   }
   // Retrieving solution
   int solstat; 
-  int objval;
+  
   std::vector<double> slack;
   slack.resize(NUMROWS_);
   status = CPXsolution (env_, lp_, &solstat,
@@ -374,7 +374,7 @@ void CplexInternal::freeCplex(){
 void CplexInternal::toCplexSparsity(const CRSSparsity& sp_trans, vector<int> &matbeg, vector<int>& matcnt, vector<int>& matind){
   // Get sparsity
   int ncol = sp_trans.size1();
-  int nrow = sp_trans.size2();
+  //int nrow = sp_trans.size2();
   const std::vector<int>& colind = sp_trans.rowind();
   const std::vector<int>& row = sp_trans.col();
 

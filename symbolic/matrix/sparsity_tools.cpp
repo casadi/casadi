@@ -431,7 +431,7 @@ namespace CasADi{
     // Check consistency
     casadi_assert(v.size() >= 2);
     int nrow = v[0];
-    int ncol = v[1];
+    //int ncol = v[1];
     casadi_assert(v.size() >= 2 + nrow+1);
     int nnz = v[2 + nrow];
     casadi_assert(v.size() == 2 + nrow+1 + nnz);

@@ -22,3 +22,5 @@ install(TARGETS casadi_qpoases
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+set_target_properties(casadi_qpoases PROPERTIES COMPILE_FLAGS "-Wno-overloaded-virtual")
+

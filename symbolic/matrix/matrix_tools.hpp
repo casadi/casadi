@@ -1027,8 +1027,6 @@ Matrix<T> blkdiag(const std::vector< Matrix<T> > &A) {
   int n = 0;
   int m = 0;
   
-  int row_offset = 0;
-  int col_offset = 0;
   std::vector<int> rowind(1,0);
   std::vector<int> col;
   std::vector<T> data;

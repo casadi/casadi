@@ -732,7 +732,6 @@ void WorhpInternal::checkinit() {
 
   if (exact_hessian_) {
     log("generate_hessian sparsity");
-    int nz=0;
     if (worhp_w.HM.NeedStructure) {
       vector<int> row,col;
       trans(lowerSparsity(Hmod_.output().sparsity(),false)).getSparsity(col,row);

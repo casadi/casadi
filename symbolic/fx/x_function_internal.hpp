@@ -1044,7 +1044,6 @@ void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::generateCode(co
   // Number of inputs/outputs
   int n_i = input_.size();
   int n_o = output_.size();
-  int n_io = n_i + n_o;
 
   // Pass inputs
   for(int i=0; i<n_i; ++i){

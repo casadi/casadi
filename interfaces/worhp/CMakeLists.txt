@@ -25,4 +25,6 @@ install(DIRECTORY ./
    FILES_MATCHING PATTERN "*.hpp"
    PATTERN ".svn" EXCLUDE
 )
+set_target_properties(casadi_worhp_interface PROPERTIES COMPILE_FLAGS "-Wno-unused-function")
+
 

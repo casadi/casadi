@@ -124,7 +124,7 @@ namespace CasADi{
     // We can now get the beginning, end and step
     int start = v[0];
     int step = v[1]-v[0];
-    int stop = start + step*v.size();
+    //int stop = start + step*v.size();
     
     // Consistency check
     for(int i=2; i<v.size(); ++i){

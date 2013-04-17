@@ -188,7 +188,7 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   std::copy(temp_.begin(),temp_.begin()+nx_,output(QP_PRIMAL).begin());
 
   // Get multipliers for the bounds
-  vector<double> &lambda_x = output(QP_LAMBDA_X).data();
+//  vector<double> &lambda_x = output(QP_LAMBDA_X).data();
   
   // Set multipliers to zero
   output(QP_LAMBDA_X).setAll(0);

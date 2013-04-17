@@ -54,7 +54,7 @@ namespace CasADi{
   void Transpose::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens, std::vector<int>& itmp, std::vector<T>& rtmp){
 
     // Get sparsity patterns
-    const vector<int>& x_rowind = input[0]->rowind();
+    //const vector<int>& x_rowind = input[0]->rowind();
     const vector<int>& x_col = input[0]->col();
     const vector<int>& xT_rowind = output[0]->rowind();
     
@@ -127,7 +127,7 @@ namespace CasADi{
   void Transpose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd){
     // Access the input
     bvec_t *x = get_bvec_t(input[0]->data());
-    const vector<int>& x_rowind = input[0]->rowind();
+    //const vector<int>& x_rowind = input[0]->rowind();
     const vector<int>& x_col = input[0]->col();
 
     // Access the output

@@ -352,9 +352,6 @@ void NLPSolverInternal::init(){
     np_ = 0;
   }
   
-  // Infinity
-  double inf = numeric_limits<double>::infinity();
-  
   // Allocate space for inputs
   input_.resize(NLP_SOLVER_NUM_IN);
   input(NLP_SOLVER_X0)      =  DMatrix::zeros(nx_);

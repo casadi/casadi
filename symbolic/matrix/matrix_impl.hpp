@@ -666,7 +666,7 @@ void Matrix<T>::clear(){
 }
 
 template<class T>
-Matrix<T>::Matrix(double val) : data_(std::vector<T>(1,val)), sparsity_(CRSSparsity(1,1,true)){
+Matrix<T>::Matrix(double val) : sparsity_(CRSSparsity(1,1,true)), data_(std::vector<T>(1,val)) {
 }
 
 template<class T>

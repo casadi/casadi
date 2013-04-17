@@ -1207,7 +1207,6 @@ void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
 
   // Stepsize
   double t = 1.0, t_prev = 0.0;
-  double fk_cand;
   
   // Merit function value in candidate
   double L1merit_cand = 0;
