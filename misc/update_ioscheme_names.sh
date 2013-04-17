@@ -10,8 +10,8 @@ function findreplace {
   done;
 }
            
-findreplace "*.py" "s/(?<method>\.(s|g)et(Input|Output|FwdSeed|AdjSeed|FwdSens|AdjSens)\s*)\((?<bulk>.*)?,(?<white>\s*)(DAE|INTEGRATOR|NLP|QP|RDAE|ACADO|MAYER|OCP|MUSCOD|CONTROL_DAE|CONTROLSIMULATOR|SDP)_(?<scheme>[A-Z_0]*\s*)\)/qq|\$+{method}(\$+{bulk},\$+{white}\"|.lc(\$+{scheme}).qq|\")|/ge"
+findreplace "*.py" "s/(?<method>\.(s|g)et(Input|Output|FwdSeed|AdjSeed|FwdSens|AdjSens)\s*)\((?<bulk>.*)?,(?<white>\s*)(DAE|INTEGRATOR|NLP_SOLVER|QP|RDAE|ACADO|MAYER|OCP|MUSCOD|CONTROL_DAE|CONTROLSIMULATOR|SDP)_(?<scheme>[A-Z_0]*\s*)\)/qq|\$+{method}(\$+{bulk},\$+{white}\"|.lc(\$+{scheme}).qq|\")|/ge"
 
-findreplace "*.py" "s/(?<method>\.(input|output|fwdSeed|adjSeed|fwdSens|adjSens)\s*)\((?<white>\s*)(DAE|INTEGRATOR|NLP|QP|RDAE|ACADO|MAYER|OCP|MUSCOD|CONTROL_DAE|CONTROLSIMULATOR|SDP)_(?<scheme>[A-Z_0]*\s*)\)/qq|\$+{method}(\$+{white}\"|.lc(\$+{scheme}).qq|\")|/ge"
+findreplace "*.py" "s/(?<method>\.(input|output|fwdSeed|adjSeed|fwdSens|adjSens)\s*)\((?<white>\s*)(DAE|INTEGRATOR|NLP_SOLVER|QP|RDAE|ACADO|MAYER|OCP|MUSCOD|CONTROL_DAE|CONTROLSIMULATOR|SDP)_(?<scheme>[A-Z_0]*\s*)\)/qq|\$+{method}(\$+{white}\"|.lc(\$+{scheme}).qq|\")|/ge"
 
-findreplace "*.py" "s/(?<method>\.(jacobian|hessian|gradient|jac|hess|grad)\s*)\((?<white>\s*)(DAE|INTEGRATOR|NLP|QP|RDAE|ACADO|MAYER|OCP|MUSCOD|CONTROL_DAE|CONTROLSIMULATOR|SDP)_(?<scheme>[A-Z_0]*\s*),(?<white2>\s*)(DAE|INTEGRATOR|NLP|QP|RDAE|ACADO|MAYER|OCP|MUSCOD|CONTROL_DAE|CONTROLSIMULATOR|SDP)_(?<scheme2>[A-Z_0]*\s*)\)/qq|\$+{method}(\$+{white}\"|.lc(\$+{scheme}).qq|\",\$+{white2}\"| .lc(\$+{scheme2}) . qq|\")|/ge"
+findreplace "*.py" "s/(?<method>\.(jacobian|hessian|gradient|jac|hess|grad)\s*)\((?<white>\s*)(DAE|INTEGRATOR|NLP_SOLVER|QP|RDAE|ACADO|MAYER|OCP|MUSCOD|CONTROL_DAE|CONTROLSIMULATOR|SDP)_(?<scheme>[A-Z_0]*\s*),(?<white2>\s*)(DAE|INTEGRATOR|NLP_SOLVER|QP|RDAE|ACADO|MAYER|OCP|MUSCOD|CONTROL_DAE|CONTROLSIMULATOR|SDP)_(?<scheme2>[A-Z_0]*\s*)\)/qq|\$+{method}(\$+{white}\"|.lc(\$+{scheme}).qq|\",\$+{white2}\"| .lc(\$+{scheme2}) . qq|\")|/ge"
