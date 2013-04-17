@@ -58,15 +58,17 @@ namespace CasADi{
     FXInternal::init();
 
     // Number of equations
-    N_ = output().size();
+    casadi_assert_message(f_.output().dense() && f_.output().size2()==1, "Residual must be a dense vector");
+    casadi_assert_message(f_.input().dense() && f_.input().size2()==1, "Unknown must be a dense vector");
+    n_ = f_.output().size();
+    casadi_assert_message(n_ == f_.input().size(), "Dimension mismatch");
 
     // Generate Jacobian if not provided
     if(jac_.isNull()) jac_ = f_.jacobian(0,0);
     jac_.init();
   
-    casadi_assert_message(jac_.output().size1()==jac_.output().size2(),"ImplicitFunctionInternal::init: the jacobian must be square but got " << jac_.output().dimString());
-  
-    casadi_assert_message(!isSingular(jac_.output().sparsity()),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (in stead of "<< jac_.output().size1() << ")");
+    // Check for structural singularity in the Jacobian
+    casadi_assert_message(!isSingular(jac_.output().sparsity()),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
   
     // Get the linear solver creator function
     if(linsol_.isNull() && hasSetOption("linear_solver")){

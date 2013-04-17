@@ -66,7 +66,7 @@ namespace CasADi{
     void setJacobian(FX &J);
  
     /// Number of equations
-    int N_;
+    int n_;
 
     /// The function f(z, x1, x2, ..., xn) == 0
     FX f_;

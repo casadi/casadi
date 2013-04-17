@@ -88,9 +88,9 @@ namespace CasADi{
     if(u_) N_VDestroy_Serial(u_);
     if(u_scale_) N_VDestroy_Serial(u_scale_);
     if(f_scale_) N_VDestroy_Serial(f_scale_);
-    u_ = N_VNew_Serial(N_);
-    u_scale_ = N_VNew_Serial(N_);
-    f_scale_ = N_VNew_Serial(N_);
+    u_ = N_VNew_Serial(n_);
+    u_scale_ = N_VNew_Serial(n_);
+    f_scale_ = N_VNew_Serial(n_);
   
     // Set scaling factors on variables
     if(hasSetOption("u_scale")){
@@ -137,10 +137,10 @@ namespace CasADi{
     if(hasSetOption("constraints")){
       // Get the user-set constraints
       const vector<int>& u_c = getOption("constraints");
-      casadi_assert(u_c.size()==N_);
+      casadi_assert(u_c.size()==n_);
     
       // Copy to a temporary N_Vector
-      N_Vector constraints = N_VNew_Serial(N_);
+      N_Vector constraints = N_VNew_Serial(n_);
       copy(u_c.begin(),u_c.end(),NV_DATA_S(constraints));
     
       // Pass to KINSOL
@@ -154,7 +154,7 @@ namespace CasADi{
     // attach a linear solver
     if(getOption("linear_solver_type")=="dense"){
       // Dense jacobian
-      flag = KINDense(mem_, N_);
+      flag = KINDense(mem_, n_);
       casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
     
       if(exact_jacobian){
@@ -164,7 +164,7 @@ namespace CasADi{
     
     } else if(getOption("linear_solver_type")=="banded") {
       // Banded jacobian
-      flag = KINBand(mem_, N_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
+      flag = KINBand(mem_, n_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
       casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
     
       if(exact_jacobian){
