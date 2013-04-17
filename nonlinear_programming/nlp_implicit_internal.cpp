@@ -31,7 +31,7 @@ namespace CasADi {
 NLPImplicitInternal* NLPImplicitInternal::clone() const{
   // Return a deep copy
   FX f = shared_cast<FX>(f_.clone());
-  NLPImplicitInternal* node = new NLPImplicitInternal(f,nrhs_);
+  NLPImplicitInternal* node = new NLPImplicitInternal(f);
   node->setOption(dictionary());
   node->J_= shared_cast<FX>(J_.clone());
   node->linsol_ =shared_cast<LinearSolver>(linsol_.clone());
@@ -41,8 +41,8 @@ NLPImplicitInternal* NLPImplicitInternal::clone() const{
   return node;
 }
   
-NLPImplicitInternal::NLPImplicitInternal(const FX& f, int nrhs) : ImplicitFunctionInternal(f,nrhs) {
-  addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSolver used to solve the implicit system.");
+NLPImplicitInternal::NLPImplicitInternal(const FX& f) : ImplicitFunctionInternal(f) {
+  addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "The NLPSolver used to solve the implicit system.");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSolver");
 }
 

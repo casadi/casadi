@@ -44,7 +44,7 @@ public:
   /** \brief  Default constructor */
   NLPImplicitSolver();
   
-  explicit NLPImplicitSolver(const FX& f, int nrhs=1);
+  explicit NLPImplicitSolver(const FX& f);
   
   /** \brief  Access functions of the node */
   NLPImplicitInternal* operator->();

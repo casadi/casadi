@@ -29,7 +29,7 @@
 using namespace std;
 namespace CasADi{
 
-KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal(f,nrhs){
+KinsolInternal::KinsolInternal(const FX& f) : ImplicitFunctionInternal(f){
   addOption("abstol",                      OT_REAL,1e-6,"Stopping criterion tolerance");
   addOption("linear_solver_type",       OT_STRING, "dense","dense|banded|iterative|user_defined");
   addOption("upper_bandwidth",          OT_INTEGER);
@@ -56,7 +56,7 @@ KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal
 KinsolInternal* KinsolInternal::clone() const{
   // Return a deep copy
   FX f = shared_cast<FX>(f_.clone());
-  KinsolInternal* node = new KinsolInternal(f,nrhs_);
+  KinsolInternal* node = new KinsolInternal(f);
   node->setOption(dictionary());
   node->setJacobian(shared_cast<FX>(J_.clone()));
   node->setLinearSolver(shared_cast<LinearSolver>(linsol_.clone()));

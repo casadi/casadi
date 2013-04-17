@@ -44,7 +44,7 @@ public:
   /** \brief  Default constructor */
   NewtonImplicitSolver();
   
-  explicit NewtonImplicitSolver(const FX& f, int nrhs=1);
+  explicit NewtonImplicitSolver(const FX& f);
   
   /** \brief  Access functions of the node */
   NewtonImplicitInternal* operator->();

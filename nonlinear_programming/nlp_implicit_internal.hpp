@@ -44,7 +44,7 @@ public:
   virtual NLPImplicitInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit NLPImplicitInternal(const FX& f, int nrhs=1);
+  explicit NLPImplicitInternal(const FX& f);
 
   /** \brief  Destructor */
   virtual ~NLPImplicitInternal();
@@ -55,7 +55,7 @@ public:
   virtual void evaluate(int nfdir, int nadir);
 
   /** \brief  Create a new ImplicitFunctionInternal */
-  virtual ImplicitFunctionInternal* create(const FX& f, int nrhs=1) const { return new NLPImplicitInternal(f,nrhs);}
+  virtual ImplicitFunctionInternal* create(const FX& f) const { return new NLPImplicitInternal(f);}
   
   protected:
     NLPSolver nlp_solver_; 

@@ -29,8 +29,8 @@ namespace CasADi{
 NewtonImplicitSolver::NewtonImplicitSolver(){ 
 }
 
-NewtonImplicitSolver::NewtonImplicitSolver(const FX& f, int nrhs)  {
-  assignNode(new NewtonImplicitInternal(f,nrhs));
+NewtonImplicitSolver::NewtonImplicitSolver(const FX& f)  {
+  assignNode(new NewtonImplicitInternal(f));
 }
 
 NewtonImplicitInternal* NewtonImplicitSolver::operator->(){

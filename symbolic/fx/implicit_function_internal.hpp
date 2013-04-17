@@ -39,7 +39,7 @@ class ImplicitFunctionInternal : public FXInternal{
     *
     * \param f   FX mapping from (n+1) inputs to 1 output.
     */
-    ImplicitFunctionInternal(const FX& f, int nrhs);
+    ImplicitFunctionInternal(const FX& f);
         
     /// Destructor
     virtual ~ImplicitFunctionInternal() = 0;
@@ -53,11 +53,8 @@ class ImplicitFunctionInternal : public FXInternal{
     /// Solve the system of equations
     virtual void evaluate(int nfdir, int nadir) = 0;
         
-    /// Number of right hand sides
-    int nrhs_;
-    
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const FX& f, int nrhs=1) const = 0;
+    virtual ImplicitFunctionInternal* create(const FX& f) const = 0;
        
     /// Set the jacobian of F
     void setJacobian(FX &J);

@@ -29,8 +29,8 @@ namespace CasADi{
 NLPImplicitSolver::NLPImplicitSolver(){ 
 }
 
-NLPImplicitSolver::NLPImplicitSolver(const FX& f, int nrhs)  {
-  assignNode(new NLPImplicitInternal(f,nrhs));
+NLPImplicitSolver::NLPImplicitSolver(const FX& f)  {
+  assignNode(new NLPImplicitInternal(f));
 }
 
 NLPImplicitInternal* NLPImplicitSolver::operator->(){

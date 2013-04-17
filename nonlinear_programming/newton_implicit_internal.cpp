@@ -32,7 +32,7 @@ namespace CasADi {
 NewtonImplicitInternal* NewtonImplicitInternal::clone() const{
   // Return a deep copy
   FX f = shared_cast<FX>(f_.clone());
-  NewtonImplicitInternal* node = new NewtonImplicitInternal(f,nrhs_);
+  NewtonImplicitInternal* node = new NewtonImplicitInternal(f);
   node->setOption(dictionary());
   node->J_ = shared_cast<FX>(J_.clone());
   node->linsol_ = shared_cast<LinearSolver>(linsol_.clone());
@@ -42,7 +42,7 @@ NewtonImplicitInternal* NewtonImplicitInternal::clone() const{
   return node;
 }
   
-NewtonImplicitInternal::NewtonImplicitInternal(const FX& f, int nrhs) : ImplicitFunctionInternal(f,nrhs) {
+NewtonImplicitInternal::NewtonImplicitInternal(const FX& f) : ImplicitFunctionInternal(f) {
   addOption("abstol",                      OT_REAL,1e-12,"Stopping criterion tolerance on max(|F|)");
   addOption("abstolStep",                  OT_REAL,1e-12,"Stopping criterion tolerance on step size");
   addOption("max_iter",  OT_INTEGER, 1000, "Maximum number of Newton iterations to perform before returning.");

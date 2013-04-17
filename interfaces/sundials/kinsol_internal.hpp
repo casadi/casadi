@@ -45,7 +45,7 @@ class KinsolInternal : public ImplicitFunctionInternal{
   friend class KinsolSolver;
 public:
   /** \brief  Constructor */
-  explicit KinsolInternal(const FX& f, int nrhs);
+  explicit KinsolInternal(const FX& f);
 
   /** \brief  Clone */
   virtual KinsolInternal* clone() const;
@@ -129,7 +129,7 @@ public:
   void kinsol_error(const std::string& module, int flag, bool fatal=true);
 
   /** \brief  Create a new ImplicitFunctionInternal */
-  virtual ImplicitFunctionInternal* create(const FX& f, int nrhs=1) const { return new KinsolInternal(f,nrhs);}
+  virtual ImplicitFunctionInternal* create(const FX& f) const { return new KinsolInternal(f);}
   
 };
 

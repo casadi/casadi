@@ -61,7 +61,7 @@ public:
    * \param f SXFunction mapping from (n+1) inputs to 1 output
    *
    */
-  explicit KinsolSolver(const FX& f, int nrhs=1);
+  explicit KinsolSolver(const FX& f);
   
   /** \brief  Access functions of the node */
   KinsolInternal* operator->();

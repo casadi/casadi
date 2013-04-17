@@ -25,7 +25,7 @@
 using namespace std;
 namespace CasADi{
 
-  ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f, int nrhs) : f_(f), nrhs_(nrhs){
+  ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f) : f_(f){
     addOption("linear_solver",            OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(), "Options to be passed to the linear solver.");
   }
