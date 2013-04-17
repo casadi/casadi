@@ -391,7 +391,37 @@ class CasadiStructureDerivable:
     s = struct([entry("t",struct=self,repeat=a.shape[0])])
     numbers = DMatrixStruct(s,data=a,dataVectorCheck=False)
     return numbers.prefix["t"]
+    
+  def squared(self,arg=0):
+    if isinstance(arg,DMatrix):
+      a = arg
+    else:
+      try:
+        a = DMatrix(arg)
+      except:
+        raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
+    if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
+       a = DMatrix.ones(self.size,self.size)*a
+    if not(a.shape[1] == a.shape[0] and a.shape[0]==self.size):
+       raise Exception("Expecting square DMatrix of size %s. Got %s" % (self.size,a.dimString()))
+    s = struct([entry("t",shapestruct=(self,self))])
+    numbers = DMatrixStruct(s,data=a,dataVectorCheck=False)
+    return numbers.prefix["t"]
 
+  def squared_repeated(self,arg=0):
+    if isinstance(arg,DMatrix):
+      a = arg
+    else:
+      try:
+        a = DMatrix(arg)
+      except:
+        raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
+    if not(a.shape[1]==self.size and a.shape[0] % self.size == 0):
+       raise Exception("Expecting N x square DMatrix. Got %s" % (self.size,a.dimString()))
+    s = struct([entry("t",shapestruct=(self,self),repeat=a.shape[0] / self.size)])
+    numbers = DMatrixStruct(s,data=a,dataVectorCheck=False)
+    return numbers.prefix["t"]
+    
 class GetterDispatcher(Dispatcher):
   def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
     if canonicalIndex in self.struct.map:
@@ -472,6 +502,11 @@ class Prefixer:
   def __init__(self,struct,prefix):
     self.struct = struct
     self.prefix = prefix
+    
+    methods = [ "__DMatrix__", "__SXMatrix__","__MX__"]
+    for m in methods:
+      if hasattr(self.struct,m):
+        setattr(self,m,self.__call__)
     
   def __str__(self):
     return "prefix( " + str(self.prefix) + "," + self.struct.__str__(compact=True) + ")"
