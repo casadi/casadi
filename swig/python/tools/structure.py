@@ -507,7 +507,15 @@ class Prefixer:
     for m in methods:
       if hasattr(self.struct,m):
         setattr(self,m,self.__call__)
-    
+          
+ 
+  def __getattr__(self,name):
+    # When attributes are not found, delegate to self()
+    # This allows for e.g. sin(x) and x+1 to work
+    t = self()
+    if not(isinstance(t,list) or isinstance(t,dict) or isinstance(t,tuple)):
+      return getattr(t,name)
+        
   def __str__(self):
     return "prefix( " + str(self.prefix) + "," + self.struct.__str__(compact=True) + ")"
     

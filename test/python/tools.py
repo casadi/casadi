@@ -859,6 +859,15 @@ class Toolstests(casadiTestCase):
     a[-1,"y","x"] = 1
     self.checkarray(d,DMatrix([[0,2,0],[1,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,2,0],[1,0,0],[0,0,0]]))
     
+  def test_typemaps(self):
+    self.message("typemaps")
+    s = struct(["x","y","z"])
+    d = DMatrix.zeros(3,3)
+    a = s.squared(d)
+    
+    print sin(a)
+    print a+1
+    
 if __name__ == '__main__':
     unittest.main()
 

@@ -354,7 +354,7 @@ print P
 #! You can access its concents with a call:
 print P()
 
-#! But often, it will behave like a DMatrix transparently:
+#! But often, it will behave like a DMatrix transparantly:
 P0.set(P)
 
 #! Next we represent the 'squared_repeated' helper construct
