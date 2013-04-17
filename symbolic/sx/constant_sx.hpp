@@ -93,7 +93,8 @@ class RealtypeSX : public ConstantSX{
     
     /// Destructor
     virtual ~RealtypeSX(){
-      assert(cached_constants_.erase(value)==1);
+      size_t num_erased = cached_constants_.erase(value); 
+      assert(num_erased==1);
     }
     
     /// Static creator function (use instead of constructor)
@@ -144,7 +145,8 @@ class IntegerSX : public ConstantSX{
 
     /// Destructor
     virtual ~IntegerSX(){
-      assert(cached_constants_.erase(value)==1);
+      size_t num_erased = cached_constants_.erase(value); 
+      assert(num_erased==1);
     }
     
     /// Static creator function (use instead of constructor)
