@@ -61,7 +61,7 @@ public:
    * \param f FX mapping from (n+1) inputs to 1 output
    *
    */
-  explicit KinsolSolver(const FX& f, const FX& J=FX(), const LinearSolver& linsol=LinearSolver());
+  explicit KinsolSolver(const FX& f, const FX& jac=FX(), const LinearSolver& linsol=LinearSolver());
   
   /** \brief  Access functions of the node */
   KinsolInternal* operator->();

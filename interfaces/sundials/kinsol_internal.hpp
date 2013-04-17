@@ -45,7 +45,7 @@ namespace CasADi{
     friend class KinsolSolver;
   public:
     /** \brief  Constructor */
-    explicit KinsolInternal(const FX& f, const FX& J, const LinearSolver& linsol);
+    explicit KinsolInternal(const FX& f, const FX& jac, const LinearSolver& linsol);
 
     /** \brief  Destructor */
     virtual ~KinsolInternal();
@@ -54,7 +54,7 @@ namespace CasADi{
     virtual KinsolInternal* clone() const;
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const FX& f, const FX& J, const LinearSolver& linsol) const { return new KinsolInternal(f,J,linsol);}
+    virtual ImplicitFunctionInternal* create(const FX& f, const FX& jac, const LinearSolver& linsol) const { return new KinsolInternal(f,jac,linsol);}
 
     /** \brief  Initialize stage */
     virtual void init();

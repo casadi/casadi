@@ -38,7 +38,7 @@ namespace CasADi{
     friend class NLPImplicitSolver;
   public:
     /** \brief  Constructor */
-    explicit NLPImplicitInternal(const FX& f, const FX& J, const LinearSolver& linsol);
+    explicit NLPImplicitInternal(const FX& f, const FX& jac, const LinearSolver& linsol);
 
     /** \brief  Destructor */
     virtual ~NLPImplicitInternal();
@@ -50,7 +50,7 @@ namespace CasADi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual NLPImplicitInternal* create(const FX& f, const FX& J, const LinearSolver& linsol) const { return new NLPImplicitInternal(f,J,linsol);}
+    virtual NLPImplicitInternal* create(const FX& f, const FX& jac, const LinearSolver& linsol) const { return new NLPImplicitInternal(f,jac,linsol);}
 
     /** \brief  Initialize */
     virtual void init();

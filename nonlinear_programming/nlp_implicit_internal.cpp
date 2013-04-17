@@ -28,7 +28,7 @@
 using namespace std;
 namespace CasADi {
   
-  NLPImplicitInternal::NLPImplicitInternal(const FX& f, const FX& J, const LinearSolver& linsol) : ImplicitFunctionInternal(f,J,linsol) {
+  NLPImplicitInternal::NLPImplicitInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
     addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "The NLPSolver used to solve the implicit system.");
     addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSolver");
   }

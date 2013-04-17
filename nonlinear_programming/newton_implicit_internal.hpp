@@ -38,7 +38,7 @@ namespace CasADi{
     friend class NewtonImplicitSolver;
   public:
     /** \brief  Constructor */
-    explicit NewtonImplicitInternal(const FX& f, const FX& J, const LinearSolver& linsol);
+    explicit NewtonImplicitInternal(const FX& f, const FX& jac, const LinearSolver& linsol);
 
     /** \brief  Destructor */
     virtual ~NewtonImplicitInternal();
@@ -47,7 +47,7 @@ namespace CasADi{
     virtual NewtonImplicitInternal* clone() const{ return new NewtonImplicitInternal(*this);}
   
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const FX& f, const FX& J, const LinearSolver& linsol) const { return new NewtonImplicitInternal(f,J,linsol);}
+    virtual ImplicitFunctionInternal* create(const FX& f, const FX& jac, const LinearSolver& linsol) const { return new NewtonImplicitInternal(f,jac,linsol);}
 
     /** \brief  Initialize */
     virtual void init();

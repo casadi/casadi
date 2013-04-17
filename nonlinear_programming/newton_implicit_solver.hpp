@@ -45,7 +45,7 @@ public:
   NewtonImplicitSolver();
   
   /** \brief Create a solver instance */
-  explicit NewtonImplicitSolver(const FX& f, const FX& J=FX(), const LinearSolver& linsol=LinearSolver());
+  explicit NewtonImplicitSolver(const FX& f, const FX& jac=FX(), const LinearSolver& linsol=LinearSolver());
   
   /** \brief  Access functions of the node */
   NewtonImplicitInternal* operator->();

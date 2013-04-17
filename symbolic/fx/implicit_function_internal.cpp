@@ -25,7 +25,7 @@
 using namespace std;
 namespace CasADi{
 
-  ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f, const FX& J, const LinearSolver& linsol) : f_(f), J_(J), linsol_(linsol){
+  ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : f_(f), jac_(jac), linsol_(linsol){
     addOption("linear_solver",            OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(), "Options to be passed to the linear solver.");
   }
@@ -33,7 +33,7 @@ namespace CasADi{
   void ImplicitFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     FXInternal::deepCopyMembers(already_copied);
     f_ = deepcopy(f_,already_copied);
-    J_ = deepcopy(J_,already_copied);
+    jac_ = deepcopy(jac_,already_copied);
     linsol_ = deepcopy(linsol_,already_copied);
   }
 
@@ -61,12 +61,12 @@ namespace CasADi{
     N_ = output().size();
 
     // Generate Jacobian if not provided
-    if(J_.isNull()) J_ = f_.jacobian(0,0);
-    J_.init();
+    if(jac_.isNull()) jac_ = f_.jacobian(0,0);
+    jac_.init();
   
-    casadi_assert_message(J_.output().size1()==J_.output().size2(),"ImplicitFunctionInternal::init: the jacobian must be square but got " << J_.output().dimString());
+    casadi_assert_message(jac_.output().size1()==jac_.output().size2(),"ImplicitFunctionInternal::init: the jacobian must be square but got " << jac_.output().dimString());
   
-    casadi_assert_message(!isSingular(J_.output().sparsity()),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(J_.output()) << " (in stead of "<< J_.output().size1() << ")");
+    casadi_assert_message(!isSingular(jac_.output().sparsity()),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (in stead of "<< jac_.output().size1() << ")");
   
     // Get the linear solver creator function
     if(linsol_.isNull() && hasSetOption("linear_solver")){
@@ -84,7 +84,7 @@ namespace CasADi{
   
     // Initialize the linear solver, if provided
     if(!linsol_.isNull()){
-      linsol_.setSparsity(J_.output().sparsity());
+      linsol_.setSparsity(jac_.output().sparsity());
       linsol_.init();
     }
     
@@ -104,7 +104,7 @@ namespace CasADi{
   void ImplicitFunctionInternal::evaluate_sens(int nfdir, int nadir, bool linsol_prepared) {
     // Make sure that a linear solver has been provided
     casadi_assert_message(!linsol_.isNull(),"Sensitivities of an implicit function requires a provided linear solver");
-    casadi_assert_message(!J_.isNull(),"Sensitivities of an implicit function requires an exact Jacobian");
+    casadi_assert_message(!jac_.isNull(),"Sensitivities of an implicit function requires an exact Jacobian");
   
   
     // General scheme:  f(z,x_i) = 0
@@ -121,15 +121,15 @@ namespace CasADi{
 
     if (!linsol_prepared) {
       // Pass inputs
-      J_.setInput(output(),0);
+      jac_.setInput(output(),0);
       for(int i=0; i<getNumInputs(); ++i)
-	J_.setInput(input(i),i+1);
+	jac_.setInput(input(i),i+1);
 
       // Evaluate jacobian
-      J_.evaluate();
+      jac_.evaluate();
 
       // Pass non-zero elements, scaled by -gamma, to the linear solver
-      linsol_.setInput(J_.output(),0);
+      linsol_.setInput(jac_.output(),0);
 
       // Prepare the solution of the linear system (e.g. factorize)
       linsol_.prepare();
@@ -212,7 +212,7 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::setJacobian(FX &J) {
-    J_ = J;
+    jac_ = J;
   }
  
  

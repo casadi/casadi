@@ -29,7 +29,7 @@
 using namespace std;
 namespace CasADi{
 
-  KinsolInternal::KinsolInternal(const FX& f, const FX& J, const LinearSolver& linsol) : ImplicitFunctionInternal(f,J,linsol){
+  KinsolInternal::KinsolInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol){
     addOption("abstol",                      OT_REAL,1e-6,"Stopping criterion tolerance");
     addOption("linear_solver_type",       OT_STRING, "dense","dense|banded|iterative|user_defined");
     addOption("upper_bandwidth",          OT_INTEGER);
@@ -55,7 +55,7 @@ namespace CasADi{
 
   KinsolInternal* KinsolInternal::clone() const{
     // Return a deep copy
-    KinsolInternal* node = new KinsolInternal(f_,J_,linsol_);
+    KinsolInternal* node = new KinsolInternal(f_,jac_,linsol_);
     node->setOption(dictionary());
     return node;
   }
@@ -200,7 +200,7 @@ namespace CasADi{
       // Add a preconditioner
       if(bool(getOption("use_preconditioner"))){
 	// Make sure that a Jacobian has been provided
-	casadi_assert_message(!J_.isNull(),"No Jacobian has been provided");
+	casadi_assert_message(!jac_.isNull(),"No Jacobian has been provided");
 
 	// Make sure that a linear solver has been providided
 	casadi_assert_message(!linsol_.isNull(), "No linear solver has been provided.");
@@ -212,7 +212,7 @@ namespace CasADi{
     
     } else if(getOption("linear_solver_type")=="user_defined") {
       // Make sure that a Jacobian has been provided
-      casadi_assert(!J_.isNull());
+      casadi_assert(!jac_.isNull());
 
       // Make sure that a linear solver has been providided
       casadi_assert(!linsol_.isNull());
@@ -358,21 +358,21 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass inputs to the jacobian function
-    J_.setInput(NV_DATA_S(u),0);
+    jac_.setInput(NV_DATA_S(u),0);
     for(int i=0; i<getNumInputs(); ++i)
-      J_.setInput(input(i),i+1);
+      jac_.setInput(input(i),i+1);
 
     // Evaluate
-    J_.evaluate();
+    jac_.evaluate();
 
     if(monitored("eval_djac")){
-      cout << "djac = " << J_.output() << endl;
+      cout << "djac = " << jac_.output() << endl;
     }
   
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = J_.output().rowind();
-    const vector<int>& col = J_.output().col();
-    const vector<double>& val = J_.output().data();
+    const vector<int>& rowind = jac_.output().rowind();
+    const vector<int>& col = jac_.output().col();
+    const vector<double>& val = jac_.output().data();
 
     // Loop over rows
     for(int i=0; i<rowind.size()-1; ++i){
@@ -413,17 +413,17 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass inputs to the jacobian function
-    J_.setInput(NV_DATA_S(u),0);
+    jac_.setInput(NV_DATA_S(u),0);
     for(int i=0; i<getNumInputs(); ++i)
-      J_.setInput(input(i),i+1);
+      jac_.setInput(input(i),i+1);
 
     // Evaluate
-    J_.evaluate();
+    jac_.evaluate();
   
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = J_.output().rowind();
-    const vector<int>& col = J_.output().col();
-    const vector<double>& val = J_.output().data();
+    const vector<int>& rowind = jac_.output().rowind();
+    const vector<int>& col = jac_.output().col();
+    const vector<double>& val = jac_.output().data();
 
     // Loop over rows
     for(int i=0; i<rowind.size()-1; ++i){
@@ -497,15 +497,15 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass inputs
-    J_.setInput(NV_DATA_S(u),0);
+    jac_.setInput(NV_DATA_S(u),0);
     for(int i=0; i<getNumInputs(); ++i)
-      J_.setInput(input(i),i+1);
+      jac_.setInput(input(i),i+1);
 
     // Evaluate jacobian
-    J_.evaluate();
+    jac_.evaluate();
 
     // Get a referebce to the nonzeros of Jacobian
-    const vector<double>& Jdata = J_.output().data();
+    const vector<double>& Jdata = jac_.output().data();
   
     // Make sure that all entries of the linear system are valid
     for(int k=0; k<Jdata.size(); ++k){
@@ -519,13 +519,13 @@ namespace CasADi{
 	if(verbose()){
 	  
 	  // Print inputs
-	  ss << "Input vector is " << J_.input().data() << endl;
+	  ss << "Input vector is " << jac_.input().data() << endl;
 		
 	  // Get the row
-	  int Jrow = J_.output().sparsity().getRow().at(k);
+	  int Jrow = jac_.output().sparsity().getRow().at(k);
 
 	  // Get the column
-	  int Jcol = J_.output().sparsity().col(k);
+	  int Jcol = jac_.output().sparsity().col(k);
 		
 	  // Which equation
 	  ss << "This corresponds to the derivative of equation " << Jrow << " with respect to the variable " << Jcol << "." << endl;
@@ -538,9 +538,9 @@ namespace CasADi{
 	  }
 		
 	  // Print the expression for J[k] if J is an SXFunction instance
-	  SXFunction J_sx = shared_cast<SXFunction>(J_);
-	  if(!J_sx.isNull()){
-	    ss << "J[" << Jrow << "," << Jcol << "] = " << J_sx.outputExpr(0).at(k) << endl;
+	  SXFunction jac_sx = shared_cast<SXFunction>(jac_);
+	  if(!jac_sx.isNull()){
+	    ss << "J[" << Jrow << "," << Jcol << "] = " << jac_sx.outputExpr(0).at(k) << endl;
 	  }
 	}
 
@@ -553,7 +553,7 @@ namespace CasADi{
     t_lsetup_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
 
     // Pass non-zero elements, scaled by -gamma, to the linear solver
-    linsol_.setInput(J_.output(),0);
+    linsol_.setInput(jac_.output(),0);
 
     // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
     linsol_.prepare();
@@ -588,7 +588,7 @@ namespace CasADi{
   }
 
   FX KinsolInternal::getJacobian(){
-    return J_;
+    return jac_;
   }
 
   LinearSolver KinsolInternal::getLinearSolver(){
@@ -596,7 +596,7 @@ namespace CasADi{
   }
 
   void KinsolInternal::setJacobian(const FX& jac){
-    J_ = jac;
+    jac_ = jac;
   }
 
   void KinsolInternal::setLinearSolver(const LinearSolver& linsol){

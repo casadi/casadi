@@ -29,7 +29,7 @@
 using namespace std;
 namespace CasADi {
 
-  NewtonImplicitInternal::NewtonImplicitInternal(const FX& f, const FX& J, const LinearSolver& linsol) : ImplicitFunctionInternal(f,J,linsol) {
+  NewtonImplicitInternal::NewtonImplicitInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
     addOption("abstol",                      OT_REAL,1e-12,"Stopping criterion tolerance on max(|F|)");
     addOption("abstolStep",                  OT_REAL,1e-12,"Stopping criterion tolerance on step size");
     addOption("max_iter",  OT_INTEGER, 1000, "Maximum number of Newton iterations to perform before returning.");
@@ -44,14 +44,14 @@ namespace CasADi {
   void NewtonImplicitInternal::evaluate(int nfdir, int nadir) {
     casadi_log("NewtonImplicitInternal::evaluate(" << nfdir << ", " << nadir<< "):begin");
     // Pass the inputs to J
-    for (int i=1;i<J_.getNumInputs();++i) {
-      std::copy(input(i-1).data().begin(),input(i-1).data().end(),J_.input(i).data().begin());
+    for (int i=1;i<jac_.getNumInputs();++i) {
+      std::copy(input(i-1).data().begin(),input(i-1).data().end(),jac_.input(i).data().begin());
     }
 
     // Aliases
     DMatrix &Xk = output(0);
-    DMatrix &J = J_.output(0);
-    DMatrix &F = J_.output(1);
+    DMatrix &J = jac_.output(0);
+    DMatrix &F = jac_.output(1);
   
     int i=0;
     for (;true;++i) {
@@ -68,8 +68,8 @@ namespace CasADi {
       }
     
       // Use Xk to evaluate J
-      std::copy(Xk.data().begin(),Xk.data().end(),J_.input().data().begin());
-      J_.evaluate();
+      std::copy(Xk.data().begin(),Xk.data().end(),jac_.input().data().begin());
+      jac_.evaluate();
     
       if (monitored("F")) std::cout << "  F = " << F << std::endl;
       if (monitored("normF")) std::cout << "  F (min, max, 1-norm, 2-norm) = " << (*std::min_element(F.data().begin(),F.data().end())) << ", " << (*std::max_element(F.data().begin(),F.data().end())) << ", " << sumAll(fabs(F)) << ", " << sqrt(sumAll(F*F)) << std::endl;
@@ -114,8 +114,8 @@ namespace CasADi {
     if (gather_stats_) stats_["iter"] = Niter; 
   
     // Pass the remainder of outputs
-    for (int i=2;i<J_.getNumOutputs();++i) {
-      std::copy(J_.output(i).data().begin(),J_.output(i).data().end(),output(i-1).data().begin());
+    for (int i=2;i<jac_.getNumOutputs();++i) {
+      std::copy(jac_.output(i).data().begin(),jac_.output(i).data().end(),output(i-1).data().begin());
     }
   
     // Delegate calculation of sensitivities to base class

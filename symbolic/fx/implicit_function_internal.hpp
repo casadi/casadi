@@ -51,7 +51,7 @@ namespace CasADi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
     
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const FX& f, const FX& J, const LinearSolver& linsol) const = 0;    
+    virtual ImplicitFunctionInternal* create(const FX& f, const FX& jac, const LinearSolver& linsol) const = 0;    
 
     /// Initialize
     virtual void init();
@@ -72,7 +72,7 @@ namespace CasADi{
     FX f_;
        
     /// Jacobian of f with respect to z
-    FX J_;
+    FX jac_;
     
     /// Linear solver
     LinearSolver linsol_;

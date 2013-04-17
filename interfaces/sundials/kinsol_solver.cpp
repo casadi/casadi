@@ -29,8 +29,8 @@ namespace CasADi{
   KinsolSolver::KinsolSolver(){ 
   }
 
-  KinsolSolver::KinsolSolver(const FX& f, const FX& J, const LinearSolver& linsol){
-    assignNode(new KinsolInternal(f,J,linsol));
+  KinsolSolver::KinsolSolver(const FX& f, const FX& jac, const LinearSolver& linsol){
+    assignNode(new KinsolInternal(f,jac,linsol));
   }
 
   KinsolInternal* KinsolSolver::operator->(){
