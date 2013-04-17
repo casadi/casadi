@@ -38,9 +38,6 @@ class NLPImplicitInternal : public ImplicitFunctionInternal {
   friend class NLPImplicitSolver;
 public:
   /** \brief  Constructor */
-  explicit NLPImplicitInternal();
-
-  /** \brief  Create a solver instance */
   explicit NLPImplicitInternal(const FX& f, const FX& J, const LinearSolver& linsol);
 
   /** \brief  Clone */
