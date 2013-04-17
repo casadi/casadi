@@ -117,7 +117,7 @@ namespace CasADi{
     std::string toString() const;
     
     /** \brief  Get a pointer to the node */
-    SXNode* const get() const; // note: constant pointer, not pointer to constant object! (to allow access to the counter)
+    SXNode* get() const; // note: constant pointer, not pointer to constant object! (to allow access to the counter)
 
     /** \brief  Access functions of the node */
     const SXNode* operator->() const;

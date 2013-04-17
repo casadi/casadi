@@ -347,7 +347,7 @@ namespace CasADi{
       return BinarySX::create(OP_NE,*this,y);
   }
 
-  SXNode* const SX::get() const{
+  SXNode* SX::get() const{
     return node;
   }
 
