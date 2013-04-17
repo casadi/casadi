@@ -119,7 +119,7 @@ class meta {
     
     #ifdef SWIGPYTHON
     static bool couldbe_sequence(PyObject * p) {
-      if(PySequence_Check(p) && !meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p)) {
+      if(PySequence_Check(p) && !meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SXMatrix__") && !PyObject_HasAttrString(p,"__MX__")) {
         PyObject *it = PyObject_GetIter(p);
         if (!it) return false;
         PyObject *pe;
