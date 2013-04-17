@@ -52,33 +52,28 @@ class ImplicitFunctionInternal : public FXInternal{
 
     /// Solve the system of equations
     virtual void evaluate(int nfdir, int nadir) = 0;
-    
-    /// The function F(z, x1, x2, ..., xn) == 0
-    FX f_;
-    
-    /// Number of equations
-    int N_;
-    
+        
     /// Number of right hand sides
     int nrhs_;
     
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const FX& f, int nrhs=1) const = 0;
-    
-    /** \brief Generate a linear solver for the sensitivity equations */
-    ImplicitFunction jac(int iind, int oind=0);
-    
-    /** \brief Generate a linear solver for the sensitivity equations */
-    ImplicitFunction jac(const std::vector<int> iind, int oind=0);
-    
+       
     /// Set the jacobian of F
     void setJacobian(FX &J);
-    
-    /// Jacobian
+ 
+    /// Number of equations
+    int N_;
+
+    /// The function f(z, x1, x2, ..., xn) == 0
+    FX f_;
+       
+    /// Jacobian of f with respect to z
     FX J_;
     
     /// Linear solver
-    LinearSolver linsol_; 
+    LinearSolver linsol_;
+
   protected:
   
     /** Calculate sensitivities of implicit solver
