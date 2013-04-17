@@ -21,4 +21,6 @@ install(DIRECTORY include
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
 )
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 set_target_properties(casadi_dsdp PROPERTIES COMPILE_FLAGS "-Wno-unused-value")
+endif()
