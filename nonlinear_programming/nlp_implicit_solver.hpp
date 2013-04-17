@@ -58,7 +58,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static ImplicitFunction creator(const FX& f){ return NLPImplicitSolver(f);}
+  static ImplicitFunction creator(const FX& f, const FX& jac, const LinearSolver& linsol){ return NLPImplicitSolver(f,jac,linsol);}
   #ifdef SWIG
   %nocallback;
   #endif

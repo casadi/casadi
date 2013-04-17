@@ -366,7 +366,7 @@ void CollocationIntegratorInternal::init(){
   implicitFunctionCreator implicit_function_creator = getOption("implicit_solver");
   
   // Allocate an NLP solver
-  implicit_solver_ = implicit_function_creator(gfcn);
+  implicit_solver_ = implicit_function_creator(gfcn,FX(),LinearSolver());
   
   // Pass options
   if(hasSetOption("implicit_solver_options")){

@@ -55,7 +55,7 @@ namespace CasADi{
   typedef QPSolver (*QPSolverCreator)(const CRSSparsity& H, const CRSSparsity& A);
 
   /// Function pointer to an implicit function creator
-  typedef ImplicitFunction (*implicitFunctionCreator)(const FX& f);
+  typedef ImplicitFunction (*implicitFunctionCreator)(const FX& f, const FX& jac, const LinearSolver& linsol);
   
   /// Function pointer to a Jacobian generator function
   typedef FX (*JacobianGenerator)(FX& fcn, int iind, int oind, void* user_data);
