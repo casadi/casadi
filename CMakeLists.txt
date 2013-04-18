@@ -150,14 +150,6 @@ if(WITH_SUNDIALS)
 endif()
 add_feature_info(sundials-interface WITH_SUNDIALS "Interface to the ODE/DAE integrator suite SUNDIALS.")
 
-# Use the included qpOASES
-if(WITH_QPOASES)
-  set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
-  set(QPOASES_LIBRARIES casadi_qpoases)
-  set(QPOASES_FOUND true)
-endif()
-add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP solver qpOASES.")
-
 # Use the included csparse
 if(WITH_CSPARSE)
   set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse/Include)
@@ -245,6 +237,14 @@ add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX."
 # if(WITH_GSL)
 #   find_package (GSL)
 # endif()
+
+# Use the included qpOASES
+if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
+  set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
+  set(QPOASES_LIBRARIES casadi_qpoases)
+  set(QPOASES_FOUND true)
+endif()
+add_feature_info(qpoases-interface QPOASES_FOUND "Interface to the active-set QP solver qpOASES.")
 
 if(WITH_OOQP AND BLAS_FOUND)
   find_package (OOQP)

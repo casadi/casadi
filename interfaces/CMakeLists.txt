@@ -14,7 +14,7 @@ if(ACADO_FOUND)
   add_subdirectory(acado)
 endif(ACADO_FOUND)
 
-if(WITH_QPOASES)
+if(QPOASES_FOUND)
   add_subdirectory(qpoases)
 endif()
 
