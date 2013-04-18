@@ -59,9 +59,12 @@ namespace CasADi{
     /** \brief  Update the number of sensitivity directions during or after initialization */
     virtual void updateNumSens(bool recursive);
 
-    /// Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir) = 0;
+    /// Solve the system of equations and calculate derivatives
+    virtual void evaluate(int nfdir, int nadir);
  
+    /// Solve the nonlinear system of equations
+    virtual void solveNonLinear() = 0;
+
     /// Number of equations
     int n_;
 
@@ -74,12 +77,8 @@ namespace CasADi{
     /// Linear solver
     LinearSolver linsol_;
 
-  protected:
-  
-    /** Calculate sensitivities of implicit solver
-     * \param linsol_prepared may specify that the linear solver is already prepared with the Jacobian
-     */
-    void evaluate_sens(int nfdir, int nadir, bool linsol_prepared=false);
+    /// Factorization up-to-date?
+    bool fact_up_to_date_;
   };
 
 

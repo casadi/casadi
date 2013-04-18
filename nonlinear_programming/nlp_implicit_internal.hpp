@@ -56,7 +56,7 @@ namespace CasADi{
     virtual void init();
     
     /** \brief  Solve the nonlinear system of equations */
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void solveNonLinear();
   
     // NLP solver instance
     NLPSolver nlp_solver_; 

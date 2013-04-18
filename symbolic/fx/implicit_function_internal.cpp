@@ -95,7 +95,9 @@ namespace CasADi{
     
     // Allocate memory for directional derivatives
     ImplicitFunctionInternal::updateNumSens(false);
-
+    
+    // No factorization yet;
+    fact_up_to_date_ = false;
   }
 
   void ImplicitFunctionInternal::updateNumSens(bool recursive){
@@ -106,7 +108,16 @@ namespace CasADi{
     f_.requestNumSens(nfdir_,nadir_);
   }
 
-  void ImplicitFunctionInternal::evaluate_sens(int nfdir, int nadir, bool linsol_prepared) {
+  void ImplicitFunctionInternal::evaluate(int nfdir, int nadir){
+    // Mark factorization as out-of-date. TODO: make this conditional
+    fact_up_to_date_ = false;
+
+    // Solve the nonlinear system of equations
+    solveNonLinear();
+
+    // Quick return if no sensitivities
+    if(nfdir==0 && nadir==0) return;
+
     // Make sure that a linear solver has been provided
     casadi_assert_message(!linsol_.isNull(),"Sensitivities of an implicit function requires a provided linear solver");
     casadi_assert_message(!jac_.isNull(),"Sensitivities of an implicit function requires an exact Jacobian");
@@ -124,7 +135,7 @@ namespace CasADi{
     //
     //  Adjoint sensitivitites:
 
-    if (!linsol_prepared) {
+    if (!fact_up_to_date_) {
       // Pass inputs
       jac_.setInput(output(),0);
       for(int i=0; i<getNumInputs(); ++i)
@@ -138,6 +149,7 @@ namespace CasADi{
 
       // Prepare the solution of the linear system (e.g. factorize)
       linsol_.prepare();
+      fact_up_to_date_ = true;
     }
   
     // Pass inputs to function

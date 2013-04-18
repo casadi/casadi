@@ -41,8 +41,8 @@ namespace CasADi {
 
   double Xk_update (double Xk, double step) { return Xk-step; }
 
-  void NewtonImplicitInternal::evaluate(int nfdir, int nadir) {
-    casadi_log("NewtonImplicitInternal::evaluate(" << nfdir << ", " << nadir<< "):begin");
+  void NewtonImplicitInternal::solveNonLinear() {
+    casadi_log("NewtonImplicitInternal::solveNonLinear:begin");
     // Pass the inputs to J
     for (int i=1;i<jac_.getNumInputs();++i) {
       std::copy(input(i-1).data().begin(),input(i-1).data().end(),jac_.input(i).data().begin());
@@ -117,12 +117,11 @@ namespace CasADi {
     for (int i=2;i<jac_.getNumOutputs();++i) {
       std::copy(jac_.output(i).data().begin(),jac_.output(i).data().end(),output(i-1).data().begin());
     }
-  
-    // Delegate calculation of sensitivities to base class
-    if(nfdir!=0 || nadir!=0)
-      evaluate_sens(nfdir,nadir,true);
-  
-    casadi_log("NewtonImplicitInternal::evaluate(" << nfdir << ", " << nadir<< "):end after " << Niter << " steps");
+
+    // Factorization up-to-date
+    fact_up_to_date_ = true;
+    
+    casadi_log("NewtonImplicitInternal::solveNonLinear():end after " << Niter << " steps");
   }
 
   void NewtonImplicitInternal::init(){

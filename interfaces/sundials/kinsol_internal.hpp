@@ -59,8 +59,8 @@ namespace CasADi{
     /** \brief  Initialize stage */
     virtual void init();
   
-    /** \brief  Evaluate */
-    virtual void evaluate(int nfdir, int nadir);
+    /** \brief  Solve the nonlinear system of equations */ 
+    virtual void solveNonLinear();
   
     /** \brief Residual */
     void func(N_Vector u, N_Vector fval);
