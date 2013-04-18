@@ -258,11 +258,6 @@ namespace CasADi{
     // Save the solution
     output(0).set(NV_DATA_S(u_));
 
-    // Save auxillary outputs
-    for(int i=1; i<getNumOutputs(); ++i){
-      output(i).set(f_.output(i));
-    }
-  
     // Print solution
     if(verbose()){
       cout << "KinsolInternal::solveNonLinear: solution = " << output(0).data() << endl;

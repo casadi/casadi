@@ -120,11 +120,6 @@ namespace CasADi {
     // Store the iteration count
     if (gather_stats_) stats_["iter"] = iter; 
   
-    // Pass the remainder of outputs
-    for (int i=2;i<jac_.getNumOutputs();++i) {
-      std::copy(jac_.output(i).data().begin(),jac_.output(i).data().end(),output(i-1).data().begin());
-    }
-
     // Factorization up-to-date
     fact_up_to_date_ = true;
     

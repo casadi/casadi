@@ -37,7 +37,7 @@ class NLPtests(casadiTestCase):
                            ]:
       self.message(Solver.__name__)
       x=SX("x")
-      f=SXFunction([x],[sin(x),2*x])
+      f=SXFunction([x],[sin(x)])
       f.init()
       solver=Solver(f)
       solver.setOption(options)
@@ -45,7 +45,7 @@ class NLPtests(casadiTestCase):
       solver.output().set(6)
       solver.solve()
       
-      refsol = SXFunction([],[2*pi,4*pi])
+      refsol = SXFunction([],[2*pi])
       refsol.init()
       self.checkfx(solver,refsol,digits=5,gradient=False,hessian=False,sens_der=False)         
       
@@ -60,7 +60,7 @@ class NLPtests(casadiTestCase):
       x=SX("x")
       y=SX("y")
       n=0.2
-      f=SXFunction([y,x],[x-arcsin(y),sqrt(x)]) # ,y**2])
+      f=SXFunction([y,x],[x-arcsin(y)])
       f.init()
       solver=Solver(f)
       solver.setOption(options)
@@ -70,7 +70,7 @@ class NLPtests(casadiTestCase):
       solver.input().set(n)
       solver.evaluate(1,1)
       
-      refsol = SXFunction([x],[sin(x),sqrt(x)]) # ,sin(x)**2])
+      refsol = SXFunction([x],[sin(x)])
       refsol.init()
       refsol.input().set(n)
       self.checkfx(solver,refsol,digits=6,gradient=False,hessian=False,sens_der=False,failmessage=message)

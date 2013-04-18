@@ -57,11 +57,6 @@ namespace CasADi {
 
     // Copy the outputs
     output(0).set(nlp_solver_.output(NLP_SOLVER_X));
-  
-    // Save auxillary outputs
-    for(int i=1; i<getNumOutputs(); ++i){
-      output(i).set(f_.output(i));
-    }
   }
 
   void NLPImplicitInternal::init(){
