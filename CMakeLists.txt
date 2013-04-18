@@ -262,7 +262,7 @@ if(WITH_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
   set(DSDP_LIBRARIES casadi_dsdp)
   set(DSDP_FOUND true)
 endif()
-add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP solver DSDP (requires BLAS and LAPACK).")
+add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP (requires BLAS and LAPACK).")
 
 add_subdirectory(symbolic)
 add_subdirectory(optimal_control)
