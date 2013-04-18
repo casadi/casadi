@@ -56,7 +56,7 @@ T& Matrix<T>::elem(int i, int j){
   int oldsize = sparsity().size();
   int ind = sparsityRef().getNZ(i,j);
   if(oldsize != sparsity().size())
-    data().insert(begin()+ind,0);
+    data().insert(begin()+ind,T());
   return at(ind);
 }
 
