@@ -81,7 +81,7 @@ SXMatrix pw_const(const SXMatrix &t, const SXMatrix &tval, const SXMatrix &val){
   casadi_assert_message(isScalar(t),"t must be a scalar");
   casadi_assert_message(tval.numel() == n-1, "dimensions do not match");
 
-  SXMatrix ret = val(0);  
+  SXMatrix ret = val.at(0);  
   for(int i=0; i<n-1; ++i){
     ret += (val(i+1)-val(i)) * (t>=tval(i));
   }
@@ -456,7 +456,7 @@ void getIntValue(const SXMatrix& ex, int *res) {
 
 const string& getName(const SXMatrix& ex) {
   casadi_assert_message(isScalar(ex),"the expression must be scalar");
-  return ex(0).toScalar()->getName();
+  return ex.at(0)->getName();
 }
 
 void expand(const SXMatrix& ex2, SXMatrix &ww, SXMatrix& tt){
