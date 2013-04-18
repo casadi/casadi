@@ -888,8 +888,8 @@ double SCPgenInternal::primalInfeasibility(){
   double pr_inf = 0;
   
   // Simple bounds
-  for(int i=0; i<nx_; ++i) pr_inf +=  ::fmax(x_opt_[i]-x_ub_[i],0.);
-  for(int i=0; i<nx_; ++i) pr_inf +=  ::fmax(x_lb_[i]-x_opt_[i],0.);
+  for(int i=0; i<nx_; ++i) pr_inf +=  std::max(x_opt_[i]-x_ub_[i],0.);
+  for(int i=0; i<nx_; ++i) pr_inf +=  std::max(x_lb_[i]-x_opt_[i],0.);
 
   // Lifted variables
   for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
@@ -897,8 +897,8 @@ double SCPgenInternal::primalInfeasibility(){
   }
   
   // Nonlinear bounds
-  for(int i=0; i<ng_; ++i) pr_inf += ::fmax(g_[i]-g_ub_[i],0.);
-  for(int i=0; i<ng_; ++i) pr_inf += ::fmax(g_lb_[i]-g_[i],0.);
+  for(int i=0; i<ng_; ++i) pr_inf += std::max(g_[i]-g_ub_[i],0.);
+  for(int i=0; i<ng_; ++i) pr_inf += std::max(g_lb_[i]-g_[i],0.);
   
   return pr_inf;
 }  
