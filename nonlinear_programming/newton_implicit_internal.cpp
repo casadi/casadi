@@ -53,14 +53,21 @@ namespace CasADi {
     DMatrix &J = jac_.output(0);
     DMatrix &F = jac_.output(1);
   
-    int i=0;
-    for (;true;++i) {
-      if (i>=max_iter_) {
+    // Perform the Newton iterations
+    int iter=0;
+    while(true){
+      // Break if maximum number of iterations already reached
+      if (iter >= max_iter_) {
 	log("evaluate","Max. iterations reached.");
 	break;
       }
+
+      // Start a new iteration
+      iter++;
+
+      // Print progress
       if (monitored("step") || monitored("stepsize")) {
-	std::cout << "Step " << i << "." << std::endl; 
+	std::cout << "Step " << iter << "." << std::endl; 
       }
     
       if (monitored("step")) {
@@ -110,8 +117,8 @@ namespace CasADi {
   
     }
   
-    int Niter = i+1;
-    if (gather_stats_) stats_["iter"] = Niter; 
+    // Store the iteration count
+    if (gather_stats_) stats_["iter"] = iter; 
   
     // Pass the remainder of outputs
     for (int i=2;i<jac_.getNumOutputs();++i) {
@@ -121,7 +128,7 @@ namespace CasADi {
     // Factorization up-to-date
     fact_up_to_date_ = true;
     
-    casadi_log("NewtonImplicitInternal::solveNonLinear():end after " << Niter << " steps");
+    casadi_log("NewtonImplicitInternal::solveNonLinear():end after " << iter << " steps");
   }
 
   void NewtonImplicitInternal::init(){
