@@ -939,6 +939,11 @@ class typemaptests(casadiTestCase):
     # Wrap all static global things in #ifdef SWIG 
     with self.assertRaises(Exception):
       cvar
-
+      
+  def test_ufuncsum(self):
+    self.message("ufunc.add")
+    
+    self.checkarray(DMatrix(sum(DMatrix([1,2,3]))),DMatrix(6))
+    
 if __name__ == '__main__':
     unittest.main()

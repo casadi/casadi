@@ -130,10 +130,10 @@ def dot(self,*args):
      
   def __array__(self,*args,**kwargs):
     import numpy as n
-    if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc):
+    if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc) and isinstance(args[1][0],n.ufunc) and len(args[1])>1 and args[1][0].nin==len(args[1][1]):
       if len(args[1][1])==3:
         raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b'. This is not supported when 'a' is a numpy type, and cannot be supported without changing numpy itself. Either upgrade a to a CasADi type first, or use 'a = a + b'. " % args[1][0].__name__)
-      return n.array([1])
+      return n.array([n.nan])
     else:
       if hasattr(self,'__array_custom__'):
         return self.__array_custom__(*args,**kwargs)
