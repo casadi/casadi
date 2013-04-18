@@ -55,7 +55,7 @@ class casadi_limits{
 };
 
 template<class T>
-const T casadi_limits<T>::zero = 0;
+const T casadi_limits<T>::zero = T(0);
 
 template<class T>
 const T casadi_limits<T>::one = 1;

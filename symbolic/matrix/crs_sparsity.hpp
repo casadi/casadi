@@ -97,7 +97,7 @@ namespace CasADi{
   public:
   
     /// Default constructor
-    CRSSparsity(int dummy=0);
+    explicit CRSSparsity(int dummy=0);
     
     /// Construct a sparsity pattern (sparse/dense)
     CRSSparsity(int nrow, int ncol, bool dense=false);
@@ -105,8 +105,10 @@ namespace CasADi{
     /// Construct a sparsity pattern from vectors
     CRSSparsity(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind);
 
+#ifndef SWIG
     /** \brief  Create from node */
-    explicit CRSSparsity(CRSSparsityInternal *node);
+    static CRSSparsity create(CRSSparsityInternal *node);
+#endif
 
     /** \brief Check if there is an identical copy of the sparsity pattern in the cache, and if so, make a shallow copy of that one */
     void reCache();
