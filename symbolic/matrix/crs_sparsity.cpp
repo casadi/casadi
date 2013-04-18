@@ -30,7 +30,8 @@ using namespace std;
 
 namespace CasADi{
 
-  CRSSparsity::CRSSparsity(){
+  CRSSparsity::CRSSparsity(int dummy){
+    casadi_assert(dummy==0);
   }
   
   CRSSparsity::CRSSparsity(CRSSparsityInternal *node){
