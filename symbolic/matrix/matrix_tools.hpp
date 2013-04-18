@@ -163,20 +163,6 @@ template<class T>
 /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
 Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp);
 
-#ifndef SWIG
-/**
-Apply a function f to each element in a vector
-*/
-template<class T>
-std::vector< Matrix<T> > applymap(Matrix<T> (*f)(const Matrix<T>& ),const std::vector< Matrix<T> >&);
-
-/**
-Apply a function f to each element in a vector
-*/
-template<class T>
-void applymap(void (*f)(Matrix<T>&), std::vector< Matrix<T> >&);
-#endif // SWIG
-
 /** \brief Inner product of two vectors
         Equals
         \code
@@ -685,25 +671,6 @@ template<class T>
 Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp) {
   return vertcat(applymap(vecNZ,comp));
 }
-
-#ifndef SWIG
-template<class T>
-std::vector< Matrix<T> > applymap(Matrix<T> (*f)(const Matrix<T>&) ,const std::vector< Matrix<T> >& comp) {
-  std::vector< Matrix<T> > ret(comp.size());
-  for (int k=0;k<comp.size();k++) {
-    ret[k] = f(comp[k]);
-  }
-  return ret;
-}
-
-template<class T>
-void applymap(void (*f)(Matrix<T> &), std::vector< Matrix<T> >& comp) {
-  for (int k=0;k<comp.size();k++) {
-    f(comp[k]);
-  }
-}
-#endif //SWIG
-
 
 template<class T>
 Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y){

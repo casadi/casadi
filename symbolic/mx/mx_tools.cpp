@@ -95,20 +95,6 @@ namespace CasADi{
     return vertcat(applymap(vecNZ,comp));
   }
 
-  vector<MX> applymap(MX (*f)(const MX&) ,const vector<MX>& comp) {
-    vector<MX> ret(comp.size());
-    for (int k=0;k<comp.size();k++) {
-      ret[k] = f(comp[k]);
-    }
-    return ret;
-  }
-
-  void applymap(void (*f)(MX&), vector<MX>& comp) {
-    for (int k=0;k<comp.size();k++) {
-      f(comp[k]);
-    }
-  }
-
   MX norm_2(const MX &x){
     return MX::create(new Norm2(x));
   }

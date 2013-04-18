@@ -50,18 +50,6 @@ namespace CasADi{
   MX horzcat(const MX& a, const MX& b);
 #endif // SWIG
 
-#ifndef SWIG
-  /**
-     Apply a function f to each element in a vector
-  */
-  std::vector<MX> applymap(MX (*f)(const MX& ),const std::vector<MX>&);
-
-  /**
-     Apply a function f to each element in a vector
-  */
-  void applymap(void (*f)(MX&), std::vector<MX>&);
-#endif // SWIG
-
   /** \brief  Take the 2-norm of a MX
       Internally represented by Norm2
   */
