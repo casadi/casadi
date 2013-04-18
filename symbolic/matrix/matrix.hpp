@@ -418,7 +418,9 @@ namespace CasADi{
       (*this)(i,j) = m;
     } 
     void indexed_assignment(const CRSSparsity &sp,const Matrix<T>& m){
-      (*this)(sp) = m;
+      // (*this)(sp) = m;   // VC2010 compiler errors
+	  SubMatrix<Matrix<T>,CRSSparsity,int> temp(*this,sp,0);
+	  temp = m;
     }
     //@}
     

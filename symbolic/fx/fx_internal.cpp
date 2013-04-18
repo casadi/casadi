@@ -611,7 +611,8 @@ CRSSparsity FXInternal::getJacSparsityHierarchicalSymm(int iind, int oind){
               std::reverse(lookup_value.begin(),lookup_value.end());
               IMatrix duplicates = IMatrix::sparse(lookup_row,lookup_col,lookup_value,coarse.size(),bvec_size) - lookup;
               makeSparse(duplicates);
-              lookup(duplicates.sparsity()) = -bvec_size;
+              SubMatrix<Matrix<int>,CRSSparsity,int> temp(lookup,duplicates.sparsity(),0);
+			  temp = -bvec_size;
               
               // Propagate the dependencies
               spEvaluate(true);
