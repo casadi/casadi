@@ -32,9 +32,9 @@ f = SXFunction([x],[x[0]**2 + x[1]**2])
 g = SXFunction([x],[x[0]+x[1]-10])
 
 # Pick an NLP solver
-#MySolver = IpoptSolver
+MySolver = IpoptSolver
 #MySolver = WorhpSolver
-MySolver = SQPMethod
+#MySolver = SQPMethod
 
 # Allocate a solver
 solver = MySolver(f,g)

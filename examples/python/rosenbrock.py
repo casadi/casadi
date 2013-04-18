@@ -34,23 +34,20 @@ f = SXFunction([v],[x**2 + 100*z**2])
 g = SXFunction([v],[z + (1-x)**2 - y])
 
 # Choose NLP solver
-#nlp_solver = IpoptSolver
+nlp_solver = IpoptSolver
 #nlp_solver = WorhpSolver
-nlp_solver = SQPMethod
+#nlp_solver = SQPMethod
 #nlp_solver = LiftedSQP
 
 # Choose a qp solver (for CasADi NLP methods)
-qp_solver = QPOasesSolver
-#qp_solver = NLPQPSolver
-#qp_solver = OOQPSolver
+#qp_solver = QPOasesSolver
+#qp_solver_options = {"printLevel" : "none"}
 
-# QP solver options
-if qp_solver == QPOasesSolver:
-  qp_solver_options = {"printLevel" : "none"}
-elif qp_solver ==  NLPQPSolver:
-  qp_solver_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
-else:
-  qp_solver_options = {}
+#qp_solver = NLPQPSolver
+#qp_solver_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
+
+#qp_solver = OOQPSolver
+#qp_solver_options = {}
 
 # Create solver
 solv = nlp_solver(f,g)
