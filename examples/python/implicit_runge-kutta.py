@@ -21,7 +21,7 @@
 # 
 # -*- coding: utf-8 -*-
 from casadi import *
-import numpy as NP
+import numpy as N
 import matplotlib.pyplot as plt
 
 """
@@ -29,26 +29,29 @@ Demonstration on how to construct a fixed-step implicit Runge-Kutta integrator
 @author: Joel Andersson, K.U. Leuven 2013
 """
 
-tf = 10.0  # End time
-ni = 100     # Number of finite elements
-
-# Size of the finite elements
-h = tf/ni
+# End time
+tf = 10.0  
 
 # Dimensions
 nx = 3
-nu = 1
+np = 1
 
 # Declare variables
 x  = ssym("x",nx)  # state
-u  = ssym("u",nu)  # control
+p  = ssym("u",np)  # control
 
 # ODE right hand side function
-rhs = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
+ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + p, \
                x[0], \
-               x[0]*x[0] + x[1]*x[1] + u*u])
-f = SXFunction(daeIn(x=x,p=u),daeOut(ode=rhs))
+               x[0]*x[0] + x[1]*x[1] + p*p])
+f = SXFunction(daeIn(x=x,p=p),daeOut(ode=ode))
 f.init()
+
+# Number of finite elements
+n = 100     
+
+# Size of the finite elements
+h = tf/n
 
 # Legendre collocation points
 legendre_points1 = [0,0.500000]
@@ -71,10 +74,10 @@ tau_root = legendre_points4
 d = len(tau_root)-1
 
 # Coefficients of the collocation equation
-C = NP.zeros((d+1,d+1))
+C = N.zeros((d+1,d+1))
 
 # Coefficients of the continuity equation
-D = NP.zeros(d+1)
+D = N.zeros(d+1)
 
 # Dimensionless time inside one control interval
 tau = ssym("tau")
@@ -102,57 +105,54 @@ for j in range(d+1):
     C[j,r] = lfcn.fwdSens()
 
 # Total number of variables for one finite element
-x0_elem = MX("x0_elem",nx) # given
-u_elem = MX("u_elem",nu)  # given
-x_elem = MX("x_elem",d*nx) # sought
+X0 = msym("X0",nx)
+P  = msym("P",np)
+V = msym("V",d*nx)
 
 # Get the state at each collocation point
-x_elem_split = [x0_elem if r==0 else x_elem[(r-1)*nx:r*nx] for r in range(d+1)]
+X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
 
-# Constraint function for the NLP
-g_elem = []
-
-# For all collocation points
+# Get the collocation quations (that define V)
+V_eq = []
 for j in range(1,d+1):
-        
-  # Get an expression for the state derivative at the collocation point
+  # Expression for the state derivative at the collocation point
   xp_j = 0
   for r in range (d+1):
-    xp_j += C[r,j]*x_elem_split[r]
+    xp_j += C[r,j]*X[r]
       
-  # Add collocation equations to the NLP
-  [f_j] = daeOut(f.call(daeIn(x=x_elem_split[j],p=u_elem)),"ode")
-  g_elem.append(h*f_j - xp_j)
+  # Append collocation equations
+  [f_j] = daeOut(f.call(daeIn(x=X[j],p=P)),"ode")
+  V_eq.append(h*f_j - xp_j)
 
 # Concatenate constraints
-g_elem = vertcat(g_elem)
+V_eq = vertcat(V_eq)
 
-# Create the nonlinear system of equations
-gfcn_elem = MXFunction([x_elem,x0_elem,u_elem],[g_elem])
+# Root-finding function, implicitly defines V as a function of X0 and P
+vfcn = MXFunction([V,X0,P],[V_eq])
 
-# Get an expression for the solution of the system of equations
-ifcn_elem = NewtonImplicitSolver(gfcn_elem)
-ifcn_elem.setOption("linear_solver",CSparse)
-ifcn_elem.init()
+# Create a implicit function instance to solve the system of equations
+ifcn = NewtonImplicitSolver(vfcn)
+ifcn.setOption("linear_solver",CSparse)
+ifcn.init()
+[V] = ifcn.call([X0,P])
+X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
 
-# Get an expression for the state at the end of the finite element
-[x_elem] = ifcn_elem.call([x0_elem,u_elem])
-x_elem_split = [x0_elem if r==0 else x_elem[(r-1)*nx:r*nx] for r in range(d+1)]
-xf_elem = 0
+# Get an expression for the state at the end of the finie element
+XF = 0
 for r in range(d+1):
-  xf_elem += D[r]*x_elem_split[r]
+  XF += D[r]*X[r]
   
 # Get the discrete time dynamics
-ffcn_elem = MXFunction([x0_elem,u_elem],[xf_elem])
-ffcn_elem.init()
+F = MXFunction([X0,P],[XF])
+F.init()
 
-# Integrate over one control interval
-x_shot = x0_elem
-for i in range(ni):
-  [x_shot] = ffcn_elem.call([x_shot,u_elem])
+# Do this iteratively for all finite elements
+X = X0
+for i in range(n):
+  [X] = F.call([X,P])
 
 # Fixed-step integrator
-irk_integrator = MXFunction(integratorIn(x0=x0_elem,p=u_elem),integratorOut(xf=x_shot))
+irk_integrator = MXFunction(integratorIn(x0=X0,p=P),integratorOut(xf=X))
 irk_integrator.setOption("name","irk_integrator")
 irk_integrator.init()
 
@@ -163,8 +163,8 @@ ref_integrator.setOption("tf",tf)
 ref_integrator.init()
 
 # Test values
-x0_val  = NP.array([0,1,0])
-u_val = 0.2
+x0_val  = N.array([0,1,0])
+p_val = 0.2
 
 # Make sure that both integrators give consistent results
 for integrator in (irk_integrator,ref_integrator):
@@ -172,7 +172,7 @@ for integrator in (irk_integrator,ref_integrator):
 
   # Pass arguments
   integrator.setInput(x0_val,"x0")
-  integrator.setInput(u_val,"p")
+  integrator.setInput(p_val,"p")
   
   # Integrate
   integrator.evaluate()
