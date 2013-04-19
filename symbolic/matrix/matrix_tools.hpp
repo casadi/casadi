@@ -664,12 +664,14 @@ Matrix<T> horzcat(const Matrix<T> &x, const Matrix<T> &y){
 
 template<class T>
 Matrix<T> veccat(const std::vector< Matrix<T> >& comp) {
-  return vertcat(applymap(vec,comp));
+  Matrix<T> (&f)(const Matrix<T>&) = vec;
+  return vertcat(applymap(f,comp));
 }
 
 template<class T>
 Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp) {
-  return vertcat(applymap(vecNZ,comp));
+  Matrix<T> (&f)(const Matrix<T>&) = vecNZ;
+  return vertcat(applymap(f,comp));
 }
 
 template<class T>
