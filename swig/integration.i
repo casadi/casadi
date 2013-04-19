@@ -22,7 +22,8 @@
 
 %{
 #include "integration/collocation_integrator.hpp"
+#include "integration/integration_tools.hpp"
 %}
 
 %include "integration/collocation_integrator.hpp"
-
+%include "integration/integration_tools.hpp"

@@ -1313,6 +1313,27 @@ class Integrationtests(casadiTestCase):
     integrator.fwdSeed(0).set([1])
     integrator.evaluate(1,0) # fail
     
+  def test_collocationPoints(self):
+    self.message("collocation points")
+    with self.assertRaises(Exception):
+      collocationPoints(0,"radau")
+    with self.assertRaises(Exception): 
+      collocationPoints(10,"radau")
+    with self.assertRaises(Exception):
+      collocationPoints(0,"legendre")
+    with self.assertRaises(Exception): 
+      collocationPoints(10,"legendre")
+    with self.assertRaises(Exception):
+      collocationPoints(1,"foo")
+      
+    for k in range(1,10):
+      r = collocationPoints(k,"radau")
+      self.assertEqual(len(r),k+1)
+      self.checkarray(DMatrix(r[-1]),DMatrix([1]))
+    for k in range(1,10):
+      r = collocationPoints(k,"legendre")
+      self.assertEqual(len(r),k+1) 
+      
 if __name__ == '__main__':
     unittest.main()
 

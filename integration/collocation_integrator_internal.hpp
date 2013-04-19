@@ -27,6 +27,7 @@
 #include "symbolic/fx/integrator_internal.hpp"
 #include "symbolic/fx/mx_function.hpp"
 #include "symbolic/fx/implicit_function.hpp"
+#include "integration_tools.hpp"
 
 namespace CasADi{
     

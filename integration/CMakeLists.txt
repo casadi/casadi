@@ -8,6 +8,8 @@ SET(INTEGRATION_SRCS
   rk_integrator.cpp
   rk_integrator_internal.hpp
   rk_integrator_internal.cpp
+  integration_tools.cpp
+  integration_tools.hpp
 )
 
 if(ENABLE_STATIC)

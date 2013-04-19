@@ -49,37 +49,11 @@ void DirectCollocationInternal::init(){
   // Free parameters currently not supported
   casadi_assert_message(np_==0, "Not implemented");
 
-  // Legendre collocation points
-  double legendre_points[][6] = {
-    {0},
-    {0,0.500000},
-    {0,0.211325,0.788675},
-    {0,0.112702,0.500000,0.887298},
-    {0,0.069432,0.330009,0.669991,0.930568},
-    {0,0.046910,0.230765,0.500000,0.769235,0.953090}};
-
-  // Radau collocation points
-  double radau_points[][6] = {
-    {0},
-    {0,1.000000},
-    {0,0.333333,1.000000},
-    {0,0.155051,0.644949,1.000000},
-    {0,0.088588,0.409467,0.787659,1.000000},
-    {0,0.057104,0.276843,0.583590,0.860240,1.000000}};
-
-  // Read options
-  bool use_radau;
-  if(getOption("collocation_scheme")=="radau"){
-    use_radau = true;
-  } else if(getOption("collocation_scheme")=="legendre"){
-    use_radau = false;
-  }
-
   // Interpolation order
   deg_ = getOption("interpolation_order");
 
   // All collocation time points
-  double* tau_root = use_radau ? radau_points[deg_] : legendre_points[deg_];
+  std::vector<double> tau_root = collocationPoints(deg_,getOption("collocation_scheme"));
 
   // Size of the finite elements
   double h = tf_/nk_;
