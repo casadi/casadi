@@ -154,11 +154,13 @@ for i in range(n):
 # Fixed-step integrator
 irk_integrator = MXFunction(integratorIn(x0=X0,p=P),integratorOut(xf=X))
 irk_integrator.setOption("name","irk_integrator")
+irk_integrator.setOption("number_of_fwd_dir",2)
 irk_integrator.init()
 
 # Create a convensional integrator for reference
 ref_integrator = CVodesIntegrator(f)
 ref_integrator.setOption("name","ref_integrator")
+ref_integrator.setOption("number_of_fwd_dir",2)
 ref_integrator.setOption("tf",tf)
 ref_integrator.init()
 
@@ -168,20 +170,36 @@ p_val = 0.2
 
 # Make sure that both integrators give consistent results
 for integrator in (irk_integrator,ref_integrator):
-  print "Testing ", repr(integrator)
+  print "-------"
+  print "Testing ", integrator.getOption("name")
+  print "-------"
 
   # Pass arguments
   integrator.setInput(x0_val,"x0")
   integrator.setInput(p_val,"p")
   
+  # Forward sensitivity analysis, first direction: seed p
+  integrator.setFwdSeed(0.0,"x0",0)
+  integrator.setFwdSeed(1.0,"p",0)
+  
+  # Forward sensitivity analysis, second direction: seed x0[0]
+  integrator.setFwdSeed([1,0,0],"x0",1)
+  integrator.setFwdSeed(0.0,"p",1)
+  
+  # Adjoint sensitivity analysis, seed xf[2]
+  integrator.setAdjSeed([0,0,1],"xf")
+
   # Integrate
-  integrator.evaluate()
+  integrator.evaluate(2,1)
 
-  # Get the results
-  print "xf = ", integrator.output("xf")
+  # Get the nondifferentiated results
+  print "%15s = " % "xf", integrator.output("xf")
 
-# Print stats for CVodes
-print "------------------"
-print "CVodes statistics:"
-ref_integrator.printStats()
+  # Get the forward sensitivities
+  print "%15s = " % "d(xf)/d(p)", integrator.fwdSens("xf",0)
+  print "%15s = " % "d(xf)/d(x0[0])", integrator.fwdSens("xf",1)
+
+  # Get the adjoint sensitivities
+  print "%15s = " % "d(xf[2])/d(x0)", integrator.adjSens("x0")
+  print "%15s = " % "d(xf[2])/d(p)", integrator.adjSens("p")
 
