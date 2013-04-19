@@ -34,7 +34,7 @@ if(WITH_CSPARSE)
   add_subdirectory(csparse)
 endif()
 
-if(WITH_DSDP)
+if(DSDP_FOUND)
   add_subdirectory(dsdp)
 endif()
 
