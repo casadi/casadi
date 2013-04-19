@@ -527,6 +527,7 @@ class typemaptests(casadiTestCase):
     
     self.assertTrue(is_differential_gentype.isIntVector())
 
+  @requires("IpoptSolver")
   def testGenericTypeBoolean(self):
     x=SX("x")
 

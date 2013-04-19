@@ -50,7 +50,10 @@ solvers.append(SQPMethod)
 print "Will test SQPMethod"
 
 qpsolver = NLPQPSolver
-qpsolver_options = {"nlp_solver": IpoptSolver, "nlp_solver_options": {"tol": 1e-12} }
+try:
+  qpsolver_options = {"nlp_solver": IpoptSolver, "nlp_solver_options": {"tol": 1e-12} }
+except:
+  qpsolver_options = {}
 #qpsolver = QPOasesSolver
 
 class NLPtests(casadiTestCase):

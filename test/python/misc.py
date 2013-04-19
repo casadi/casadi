@@ -81,9 +81,12 @@ class Misctests(casadiTestCase):
     
     x = SX("x")
     f = SXFunction([x],[x])
-    
-    print "IpoptSolver"
-    g = IpoptSolver(f)
+
+    try:
+        print "IpoptSolver"
+        g = IpoptSolver(f)
+    except:
+        return
     
     self.assertRaises(RuntimeError,lambda : g.setOption("monitor",["abc"]))
     g.setOption("monitor",["eval_f"])
@@ -215,7 +218,8 @@ class Misctests(casadiTestCase):
 
     self.assertEqual(g.input(0),2)
     self.assertEqual(g.output(),0)
-    
+
+  @requires("IpoptSolver")
   def test_options_introspection(self):
     self.message("options introspection")
     x=SX("x")
