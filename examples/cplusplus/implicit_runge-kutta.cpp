@@ -134,9 +134,13 @@ int main(){
   vfcn_in.push_back(X0);
   vfcn_in.push_back(P);
   MXFunction vfcn(vfcn_in,V_eq);
+  vfcn.init();
+  
+  // Convert to SXFunction to decrease overhead
+  SXFunction vfcn_sx(vfcn);
 
   // Create a implicit function instance to solve the system of equations
-  NewtonImplicitSolver ifcn(vfcn);
+  NewtonImplicitSolver ifcn(vfcn_sx);
   ifcn.setOption("linear_solver",CSparse::creator);
   ifcn.init();
   vector<MX> ifcn_arg;
