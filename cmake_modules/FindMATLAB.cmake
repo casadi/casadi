@@ -17,8 +17,6 @@ libeng.so
 HINTS $ENV{MATLAB}/bin/*
 )
 
-MESSAGE(STATUS "********************** ${MATLAB_LIBS_DIR} $ENV{MATLAB}/bin")
-
 # libraries
 SET(MATLAB_LIBS_LIST
 	eng
