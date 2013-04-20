@@ -124,8 +124,8 @@ namespace CasADi{
     /// Print the pointer to the internal class
     void printPtr(std::ostream &stream=std::cout) const;
 
-    /// Initialize the object: more documentation in the node class (SharedObjectNode and derived classes)
-    void init();
+    /// Initialize or re-initialize the object: more documentation in the node class (SharedObjectNode and derived classes)
+    void init(bool allow_reinit=true);
 
     /// Is initialized?
     bool isInit() const;

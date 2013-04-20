@@ -42,7 +42,7 @@ namespace CasADi{
 
   void ImplicitFunctionInternal::init(){
     // Initialize the residual function
-    if(!f_.isInit()) f_.init();
+    f_.init(false);
   
     // Get the number of equations and check consistency
     casadi_assert_message(f_.output().dense() && f_.output().size2()==1, "Residual must be a dense vector");
@@ -66,7 +66,7 @@ namespace CasADi{
 
     // Generate Jacobian if not provided
     if(jac_.isNull()) jac_ = f_.jacobian(0,0);
-    if(!jac_.isInit()) jac_.init();
+    jac_.init(false);
   
     // Check for structural singularity in the Jacobian
     casadi_assert_message(!isSingular(jac_.output().sparsity()),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
@@ -90,7 +90,7 @@ namespace CasADi{
       }
     } else {
       // Initialize the linear solver, if provided
-      if(!linsol_.isInit()) linsol_.init();
+      linsol_.init(false);
       casadi_assert(linsol_.input().sparsity()==jac_.output().sparsity());
     }
     

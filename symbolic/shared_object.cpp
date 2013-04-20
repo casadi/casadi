@@ -125,8 +125,10 @@ SharedObjectNode::~SharedObjectNode(){
    }
 }
 
-void SharedObject::init(){
-  (*this)->init();
+void SharedObject::init(bool allow_reinit){
+  if(allow_reinit || !isInit()){
+    (*this)->init();
+  }
 }
 
 void SharedObjectNode::init(){
