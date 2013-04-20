@@ -31,6 +31,10 @@
 #include "../matrix/sparsity_tools.hpp"
 #include "external_function.hpp"
 
+#ifdef WITH_DL 
+#include <cstdlib>
+#endif // WITH_DL 
+
 using namespace std;
 
 namespace CasADi{
@@ -1606,6 +1610,10 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
     string dlflag = " -shared";
 #endif // __APPLE__
 
+    // Check if f is initialized
+    bool f_is_init = f.isInit();
+    if(!f_is_init) f.init();
+
     // Filenames
     string cname = fname + ".c";
     string dlname = fname + ".so";
@@ -1641,9 +1649,13 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
     f_gen.setOption("number_of_fwd_dir",0);
     f_gen.setOption("number_of_adj_dir",0);
     f_gen.setOption("name",fname + "_gen");
-    f_gen.init();
-    if(verbose_){
-      cout << "Dynamically loaded " << fdescr << " (" << dlname << ")" << endl;
+
+    // Initialize it if f was initialized
+    if(f_is_init){
+      f_gen.init();
+      if(verbose_){
+	cout << "Dynamically loaded " << fdescr << " (" << dlname << ")" << endl;
+      }
     }
     return f_gen;
 #else // WITH_DL 
