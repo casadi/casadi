@@ -36,8 +36,14 @@ namespace CasADi{
     // Destructor
     virtual ~SymbolicQRInternal();
     
-    // Clone
+    /** \brief  Clone */
     virtual SymbolicQRInternal* clone() const{ return new SymbolicQRInternal(*this);}
+
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+
+    /** \brief  Create a new integrator */
+    virtual SymbolicQRInternal* create(const CRSSparsity& sparsity) const{ return new SymbolicQRInternal(sparsity);}
 
     // Initialize
     virtual void init();
@@ -47,7 +53,15 @@ namespace CasADi{
 
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
-       
+
+    // Factorization function
+    FX fact_fcn_;
+
+    // Solve function
+    FX solv_fcn_, solvT_fcn_;
+
+    // Storage for QR factorization
+    DMatrix Q_, R_;
   };  
 
 } // namespace CasADi
