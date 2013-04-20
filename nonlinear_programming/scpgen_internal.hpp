@@ -40,9 +40,6 @@ public:
   virtual void init();
   virtual void evaluate(int nfdir, int nadir);
 
-  // Codegen function
-  void dynamicCompilation(FX& f, FX& f_gen, std::string fname, std::string fdescr);
-
   // Calculate the L1-norm of the primal infeasibility
   double primalInfeasibility();
 

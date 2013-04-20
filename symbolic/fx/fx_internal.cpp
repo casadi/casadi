@@ -29,6 +29,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
+#include "external_function.hpp"
 
 using namespace std;
 
@@ -1595,6 +1596,60 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
     }
   }
 
+  FX FXInternal::dynamicCompilation(FX f, std::string fname, std::string fdescr, std::string compiler){
+#ifdef WITH_DL 
+
+    // Flag to get a DLL
+#ifdef __APPLE__
+    string dlflag = " -dynamiclib";
+#else // __APPLE__
+    string dlflag = " -shared";
+#endif // __APPLE__
+
+    // Filenames
+    string cname = fname + ".c";
+    string dlname = fname + ".so";
+  
+    // Remove existing files, if any
+    string rm_command = "rm -rf " + cname + " " + dlname;
+    int flag = system(rm_command.c_str());
+    casadi_assert_message(flag==0, "Failed to remove old source");
+
+    // Codegen it
+    f.generateCode(cname);
+    if(verbose_){
+      cout << "Generated c-code for " << fdescr << " (" << cname << ")" << endl;
+    }
+  
+    // Compile it
+    string compile_command = compiler + " " + dlflag + " " + cname + " -o " + dlname;
+    if(verbose_){
+      cout << "Compiling " << fdescr <<  " using \"" << compile_command << "\"" << endl;
+    }
+
+    time_t time1 = time(0);
+    flag = system(compile_command.c_str());
+    time_t time2 = time(0);
+    double comp_time = difftime(time2,time1);
+    casadi_assert_message(flag==0, "Compilation failed");
+    if(verbose_){
+      cout << "Compiled " << fdescr << " (" << dlname << ") in " << comp_time << " s."  << endl;
+    }
+
+    // Load it
+    ExternalFunction f_gen("./" + dlname);
+    f_gen.setOption("number_of_fwd_dir",0);
+    f_gen.setOption("number_of_adj_dir",0);
+    f_gen.setOption("name",fname + "_gen");
+    f_gen.init();
+    if(verbose_){
+      cout << "Dynamically loaded " << fdescr << " (" << dlname << ")" << endl;
+    }
+    return f_gen;
+#else // WITH_DL 
+    casadi_error("Codegen in SCPgen requires CasADi to be compiled with option \"WITH_DL\" enabled");
+#endif // WITH_DL 
+  }
 
 
 } // namespace CasADi

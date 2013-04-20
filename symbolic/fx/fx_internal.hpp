@@ -245,6 +245,9 @@ namespace CasADi{
     /** \brief  Log the status of the solver, function given */
     void log(const std::string& fcn, const std::string& msg) const;
 
+    // Codegen function
+    FX dynamicCompilation(FX f, std::string fname, std::string fdescr, std::string compiler);
+
     /** \brief  Inputs of the function */
     std::vector<FunctionIO> input_;
 
