@@ -71,7 +71,7 @@ namespace CasADi{
       AUX_ASUM,
 
       // Misc
-      AUX_SQUARE,
+      AUX_SQ,
       AUX_SIGN,
       AUX_MM_NT_SPARSE,
       AUX_COPY_SPARSE,
@@ -129,7 +129,7 @@ namespace CasADi{
     void auxMmNtSparse();
 
     /// SQUARE
-    void auxSquare();
+    void auxSq();
 
     /// SIGN
     void auxSign();
