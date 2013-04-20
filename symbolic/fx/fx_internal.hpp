@@ -148,9 +148,15 @@ namespace CasADi{
     /** \brief Generate code for function inputs and outputs */
     void generateIO(CodeGenerator& gen);
 
-    /** \brief Generate code for the C functon */
+    /** \brief Generate code the functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
-            
+    
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+
+    /** \brief Generate code for the function body */
+    virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
     
