@@ -53,9 +53,6 @@ namespace CasADi{
     /// Const access functions of the node
     const LinearSolverInternal* operator->() const;
 
-    /// Set sparsity (before initialization)
-    void setSparsity(const CRSSparsity& sparsity);
-  
     /// Factorize the matrix
     void prepare();
 
