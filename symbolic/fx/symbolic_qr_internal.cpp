@@ -20,43 +20,31 @@
  *
  */
 
-#include "linear_solver_internal.hpp"
+#include "symbolic_qr_internal.hpp"
 
 using namespace std;
 namespace CasADi{
 
-  LinearSolverInternal* LinearSolver::operator->(){
-    return static_cast<LinearSolverInternal*>(FX::operator->());
+  SymbolicQRInternal::SymbolicQRInternal(const CRSSparsity& sparsity) : LinearSolverInternal(sparsity){
+    casadi_error("Not ready, see #666");
   }
 
-  const LinearSolverInternal* LinearSolver::operator->() const{
-    return static_cast<const LinearSolverInternal*>(FX::operator->());
+  SymbolicQRInternal::~SymbolicQRInternal(){
   }
 
-  void LinearSolver::setSparsity(const CRSSparsity& sparsity){
-    (*this)->sparsity_ = sparsity;
-  }
- 
-  void LinearSolver::prepare(){
-    (*this)->prepare();
+  void SymbolicQRInternal::init(){
+    // Call the base class initializer
+    LinearSolverInternal::init();
   }
 
-  void LinearSolver::solve(double* x, int nrhs, bool transpose){
-    (*this)->solve(x,nrhs,transpose);
-  }
- 
-  void LinearSolver::solve(){
-    (*this)->solve();
-  }
- 
-  bool LinearSolver::prepared() const{
-    return (*this)->prepared_;
-  }
- 
-  bool LinearSolver::checkNode() const{
-    return dynamic_cast<const LinearSolverInternal*>(get())!=0;
+  void SymbolicQRInternal::prepare(){
+    
   }
 
+  void SymbolicQRInternal::solve(double* x, int nrhs, bool transpose){
+    
+  }
+  
 } // namespace CasADi
 
   

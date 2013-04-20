@@ -20,59 +20,51 @@
  *
  */
 
-#ifndef LINEAR_SOLVER_HPP
-#define LINEAR_SOLVER_HPP
+#ifndef SYMBOLIC_QR_HPP
+#define SYMBOLIC_QR_HPP
 
-#include "fx.hpp"
-
-/** \defgroup LinearSolver_doc 
- * 
- * Solves the linear system A.x = b for x
- *  with A square and non-singular
- *
- *  If A is structurally singular, an error will be thrown during init.
- *  If A is numerically singular, the prepare step will fail.
- */
+#include "linear_solver.hpp"
 
 namespace CasADi{
   
   // Forward declaration of internal class
-  class LinearSolverInternal;
+  class SymbolicQRInternal;
 
-  /** Abstract base class for the linear solver classes
-   *  @copydoc LinearSolver_doc
-   \author Joel Andersson
-   \date 2010
+  /** \brief  LinearSolver based on QR factorization with sparsity pattern based reordering  _without_ partial pivoting
+      @copydoc LinearSolver_doc
+      \author Joel Andersson 
+      \date 2013
   */
-  class LinearSolver : public FX{
+  class SymbolicQR : public LinearSolver{
   public:
   
+    /// Default (empty) constructor
+    SymbolicQR();
+  
+    /// Create a linear solver given a sparsity pattern
+    SymbolicQR(const CRSSparsity& sp);
+
     /// Access functions of the node
-    LinearSolverInternal* operator->();
+    SymbolicQRInternal* operator->();
 
     /// Const access functions of the node
-    const LinearSolverInternal* operator->() const;
-
-    /// Set sparsity (before initialization)
-    void setSparsity(const CRSSparsity& sparsity);
-  
-    /// Factorize the matrix
-    void prepare();
-
-    /// Solve the system of equations, internal vector
-    void solve();
-
-    /// Solve the factorized system of equations
-    void solve(double* x, int nrhs=1, bool transpose=false);
-
-    /// Check if prepared
-    bool prepared() const;
+    const SymbolicQRInternal* operator->() const;
   
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
+
+    /// Static creator function
+#ifdef SWIG
+    %callback("%s_cb");
+#endif
+    static LinearSolver creator(const CRSSparsity& sp){ return SymbolicQR(sp);}
+#ifdef SWIG
+    %nocallback;
+#endif
+
   };
 
 } // namespace CasADi
 
-#endif //LINEAR_SOLVER_HPP
+#endif //SYMBOLIC_QR_HPP
 

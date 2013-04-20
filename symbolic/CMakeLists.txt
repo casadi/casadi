@@ -71,6 +71,7 @@ SET(CASADI_SRCS
   fx/external_function.hpp   fx/external_function.cpp   fx/external_function_internal.hpp   fx/external_function_internal.cpp
   fx/derivative.hpp          fx/derivative.cpp          fx/derivative_internal.hpp          fx/derivative_internal.cpp
   fx/linear_solver.hpp       fx/linear_solver.cpp       fx/linear_solver_internal.hpp       fx/linear_solver_internal.cpp
+  fx/symbolic_qr.hpp         fx/symbolic_qr.cpp         fx/symbolic_qr_internal.hpp         fx/symbolic_qr_internal.cpp
   fx/implicit_function.hpp   fx/implicit_function.cpp   fx/implicit_function_internal.hpp   fx/implicit_function_internal.cpp
   fx/integrator.hpp          fx/integrator.cpp          fx/integrator_internal.hpp          fx/integrator_internal.cpp
   fx/nlp_solver.hpp          fx/nlp_solver.cpp          fx/nlp_solver_internal.hpp          fx/nlp_solver_internal.cpp
