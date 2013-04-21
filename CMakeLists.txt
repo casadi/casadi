@@ -299,15 +299,14 @@ find_package(SWIG)
     add_custom_target(octave DEPENDS _octave_modules )
 endif(SWIG_FOUND)
 
-add_subdirectory(documentation/tutorials EXCLUDE_FROM_ALL)
-add_custom_target(tutor)
-
 if(WITH_DOC)
   set(DOXYFILE_LATEX "NO")
   set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/documentation/api-doc)
   set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/documentation/api-doc)
   set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/symbolic)
   include(UseDoxygen OPTIONAL)
+  add_subdirectory(documentation/tutorials EXCLUDE_FROM_ALL)
+  add_custom_target(tutor)
 endif()
 
 add_subdirectory(documentation/examples/ctemplate)
