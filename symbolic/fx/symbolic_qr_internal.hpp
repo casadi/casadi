@@ -54,6 +54,12 @@ namespace CasADi{
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
 
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+
+    /** \brief Generate code for the body of the C function */
+    virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+
     // Factorization function
     FX fact_fcn_;
 

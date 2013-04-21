@@ -226,6 +226,44 @@ namespace CasADi{
     }
   }
   
+  void SymbolicQRInternal::generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
+
+    // Generate code for the embedded functions
+    gen.addDependency(fact_fcn_);
+    if(transpose_){
+      gen.addDependency(solvT_fcn_);
+    } else {
+      gen.addDependency(solv_fcn_);
+    }
+  }
+
+  void SymbolicQRInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
+    
+    // Data structures to hold A, Q and R
+    stream << "  static int prepared = 0;" << endl;
+    stream << "  static d A[" << sparsity_.size() << "];" << endl;
+    stream << "  static d Q[" << Q_.size() << "];" << endl;
+    stream << "  static d R[" << R_.size() << "];" << endl;
+
+    // Store matrix to be factorized and check if up-to-date
+    stream << "  int i;" << endl;
+    stream << "  for(i=0; i<" << sparsity_.size() << "; ++i){" << endl;
+    stream << "    prepared = prepared && A[i] == x0[i];" << endl;
+    stream << "    A[i] = x0[i];" << endl;
+    stream << "  }" << endl;
+
+    // Factorize if needed
+    int fact_ind = gen.getDependency(fact_fcn_);
+    stream << "  if(!prepared){" << endl;
+    stream << "    f" << fact_ind << "(A,Q,R);" << endl;
+    stream << "    prepared = 1;" << endl;
+    stream << "  }" << endl;
+
+    // Solve
+    int solv_ind = transpose_ ? gen.getDependency(solvT_fcn_) : gen.getDependency(solv_fcn_);
+    stream << "  f" << solv_ind << "(Q,R,x1,r0);" << endl;    
+  }
+
 } // namespace CasADi
 
   
