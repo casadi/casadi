@@ -115,9 +115,13 @@ V_eq = vertcat(V_eq)
 
 # Root-finding function, implicitly defines V as a function of X0 and P
 vfcn = MXFunction([V,X0,P],[V_eq])
+vfcn.init()
+  
+# Convert to SXFunction to decrease overhead
+vfcn_sx = SXFunction(vfcn)
 
 # Create a implicit function instance to solve the system of equations
-ifcn = NewtonImplicitSolver(vfcn)
+ifcn = NewtonImplicitSolver(vfcn_sx)
 ifcn.setOption("linear_solver",CSparse)
 ifcn.init()
 [V] = ifcn.call([X0,P])

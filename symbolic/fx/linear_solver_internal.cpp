@@ -27,6 +27,7 @@ using namespace std;
 namespace CasADi{
 
 LinearSolverInternal::LinearSolverInternal(const CRSSparsity& sparsity) : sparsity_(sparsity){
+  casadi_assert(!sparsity.isNull());
   addOption("trans", OT_BOOLEAN, false);
 }
 

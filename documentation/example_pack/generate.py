@@ -15,7 +15,7 @@ else:
 
 zf.writestr('README.txt',"""
 
-This is a collection of python exmaples for CasADi %s.
+This is a collection of python examples for CasADi %s.
 Consult the documentation online at %s.
 
 To run an example vdp_single_shooting.py, you have several options:

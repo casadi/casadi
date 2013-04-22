@@ -147,3 +147,13 @@ if(WITH_DL)
   add_executable(codegen_usage codegen_usage.cpp)
   target_link_libraries(codegen_usage casadi ${CASADI_DEPENDENCIES})
 endif()
+
+# Implicit Runge-Kutta integrator from scratch
+if(WITH_SUNDIALS AND WITH_CSPARSE)
+  add_executable(implicit_runge-kutta implicit_runge-kutta.cpp)
+  target_link_libraries(implicit_runge-kutta
+    casadi_nonlinear_programming casadi_integration casadi_sundials_interface casadi_csparse_interface casadi
+    ${SUNDIALS_LIBRARIES} ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+endif()
+

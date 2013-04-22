@@ -57,6 +57,7 @@ option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOAS
 option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
+option(WITH_BUILD_IPOPT "Download and compile IPOPT" OFF)
 option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
@@ -212,6 +213,22 @@ if(WITH_LAPACK)
 endif()
 add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
 
+# download and build ipopt
+if(WITH_BUILD_IPOPT)
+  include(ExternalProject)
+  ExternalProject_Add(
+    build_ipopt
+    SVN_REPOSITORY https://projects.coin-or.org/svn/Ipopt/stable/3.10
+    UPDATE_COMMAND "" # svn update unneccesary
+    PREFIX ${CMAKE_BINARY_DIR}/CoinIpopt
+    CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/CoinIpopt/src/build_ipopt/configure #--prefix=${CMAKE_CURRENT_SOURCE_DIR}/lib/libbuildipopt
+    BUILD_COMMAND make -j4
+  )
+  set(BUILD_IPOPT_LIB_DIR ${CMAKE_BINARY_DIR}/CoinIpopt/src/build_ipopt-build)
+  message(STATUS "BUILD_IPOPT_LIB_DIR: "${BUILD_IPOPT_LIB_DIR})
+endif(WITH_BUILD_IPOPT)
+add_feature_info(get-ipopt WITH_BUILD_IPOPT "Download and build Ipopt.")
+
 if(WITH_IPOPT)
   find_package(IPOPT)
 endif()
@@ -282,19 +299,17 @@ find_package(SWIG)
     add_custom_target(octave DEPENDS _octave_modules )
 endif(SWIG_FOUND)
 
-add_subdirectory(documentation/tutorials EXCLUDE_FROM_ALL)
-add_custom_target(tutor)
-
 if(WITH_DOC)
   set(DOXYFILE_LATEX "NO")
   set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/documentation/api-doc)
   set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/documentation/api-doc)
   set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/symbolic)
   include(UseDoxygen OPTIONAL)
+  add_subdirectory(documentation/tutorials EXCLUDE_FROM_ALL)
+  add_custom_target(tutor)
 endif()
 
 add_subdirectory(documentation/examples/ctemplate)
 
 # Print a summary
 feature_summary(WHAT ALL)
-

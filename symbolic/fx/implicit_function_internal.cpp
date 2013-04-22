@@ -42,7 +42,7 @@ namespace CasADi{
 
   void ImplicitFunctionInternal::init(){
     // Initialize the residual function
-    if(!f_.isInit()) f_.init();
+    f_.init(false);
   
     // Get the number of equations and check consistency
     casadi_assert_message(f_.output().dense() && f_.output().size2()==1, "Residual must be a dense vector");
@@ -66,29 +66,32 @@ namespace CasADi{
 
     // Generate Jacobian if not provided
     if(jac_.isNull()) jac_ = f_.jacobian(0,0);
-    jac_.init();
+    jac_.init(false);
   
     // Check for structural singularity in the Jacobian
     casadi_assert_message(!isSingular(jac_.output().sparsity()),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
   
     // Get the linear solver creator function
-    if(linsol_.isNull() && hasSetOption("linear_solver")){
-      linearSolverCreator linear_solver_creator = getOption("linear_solver");
-  
-      // Allocate an NLP solver
-      linsol_ = linear_solver_creator(CRSSparsity());
-  
-      // Pass options
-      if(hasSetOption("linear_solver_options")){
-	const Dictionary& linear_solver_options = getOption("linear_solver_options");
-	linsol_.setOption(linear_solver_options);
+    if(linsol_.isNull()){
+      if(hasSetOption("linear_solver")){
+	linearSolverCreator linear_solver_creator = getOption("linear_solver");
+	
+	// Allocate an NLP solver
+	linsol_ = linear_solver_creator(jac_.output().sparsity());
+	
+	// Pass options
+	if(hasSetOption("linear_solver_options")){
+	  const Dictionary& linear_solver_options = getOption("linear_solver_options");
+	  linsol_.setOption(linear_solver_options);
+	}
+	
+	// Initialize
+	linsol_.init();
       }
-    }
-  
-    // Initialize the linear solver, if provided
-    if(!linsol_.isNull()){
-      linsol_.setSparsity(jac_.output().sparsity());
-      linsol_.init();
+    } else {
+      // Initialize the linear solver, if provided
+      linsol_.init(false);
+      casadi_assert(linsol_.input().sparsity()==jac_.output().sparsity());
     }
     
     // Allocate memory for directional derivatives
