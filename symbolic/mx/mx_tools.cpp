@@ -137,7 +137,7 @@ namespace CasADi{
   }
 
   bool isMinusOne(const MX& ex){
-    return !ex.isNull() && ex->isMinusOne();
+    return !ex.isNull() && ex->isValue(-1);
   }
 
   bool isIdentity(const MX& ex){

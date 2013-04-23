@@ -95,8 +95,8 @@ namespace CasADi{
     /** \brief Check if identically one */
     virtual bool isOne() const{ return false;}
 
-    /** \brief Check if identically minus one */
-    virtual bool isMinusOne() const{ return false;}
+    /** \brief Check if a certain value */
+    virtual bool isValue(double val) const{ return false;}
 
     /** \brief Check if identity matrix */
     virtual bool isIdentity() const{ return false;}

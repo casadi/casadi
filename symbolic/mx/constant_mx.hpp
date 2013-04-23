@@ -175,9 +175,9 @@ namespace CasADi{
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const{ return v_.value==0;}
     virtual bool isOne() const{ return v_.value==1;}
-    virtual bool isMinusOne() const{ return v_.value==-1;}
     virtual bool isIdentity() const{ return v_.value==1 && sparsity().diagonal();}
-    
+    virtual bool isValue(double val) const{ return v_.value==val;}
+
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const{
       casadi_assert(sparsity().scalar());
@@ -212,17 +212,15 @@ namespace CasADi{
 
   template<typename Value>
   MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
-    if(ScX && !ScY){
-      if(v_.value==0){
-	if(op==OP_ADD) return y;
-	if(op==OP_SUB) return -y;
-      } else if(v_.value==1){
-	if(op==OP_MUL) return y;
-	if(op==OP_DIV) return y->getUnary(OP_INV);	
-      } else if(v_.value==-1){
-	if(op==OP_MUL) return -y;
-	if(op==OP_DIV) return -y->getUnary(OP_INV);
-      }
+    if(v_.value==0){
+      if(op==OP_ADD) return y;
+      if(op==OP_SUB) return -y;
+    } else if(v_.value==1){
+      if(op==OP_MUL) return y;
+      if(op==OP_DIV) return y->getUnary(OP_INV);	
+    } else if(v_.value==-1){
+      if(op==OP_MUL) return -y;
+      if(op==OP_DIV) return -y->getUnary(OP_INV);
     }
 
     // Fallback

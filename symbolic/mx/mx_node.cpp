@@ -422,15 +422,15 @@ namespace CasADi{
     // Create binary node
     if(sparsity().scalar()){
       if(size()==0){
-	return MX(0)->getBinary(op,y,true,false);
+	return toMatrix(MX(0)->getBinary(op,y,true,false),y.sparsity());
       } else {
-	return getBinary(op,y,true,false);
+	return toMatrix(getBinary(op,y,true,false),y.sparsity());
       }
     } else if(y.scalar()){
       if(y.size()==0){
-	return getBinary(op,MX(0),false,true);
+	return toMatrix(getBinary(op,MX(0),false,true),sparsity());
       } else {
-	return getBinary(op,y,false,true);
+	return toMatrix(getBinary(op,y,false,true),sparsity());
       }
     } else {
       casadi_assert_message(sparsity().shape() == y.sparsity().shape(), "Dimension mismatch.");
@@ -452,6 +452,15 @@ namespace CasADi{
   }
 
   MX MXNode::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
+    // Handle special cases for the second argument
+    if(y.isConstant()){
+      // Make the constant the first argument, if possible
+      if(getOp()!=OP_CONST && operation_checker<CommChecker>(op))
+	return y->getBinary(op,shared_from_this<MX>(),ScY,ScX);
+      else if(op==OP_CONSTPOW && y->isValue(2))
+	return getUnary(OP_SQ);
+    }
+
     if(ScX){
       // Check if it is ok to loop over nonzeros only
       if(y.dense() || operation_checker<FX0Checker>(op)){
