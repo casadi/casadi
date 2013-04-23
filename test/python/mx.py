@@ -1902,49 +1902,7 @@ class MXtests(casadiTestCase):
     
     self.checkarray(i,J.output())
     
-  def test_vertcat(self):
-    self.message("vertcat")
-    X = msym("X",10)
 
-    T = vertcat([X[4],X[2]])
-
-    f = MXFunction([X],[T**2])
-    f.init()
-    f.setInput(range(10))
-    f.evaluate()
-    
-    self.checkarray(IMatrix([16,4]),f.output())
-
-    Y = msym("Y",10)
-
-    ff = MXFunction([Y],f.evalMX([Y]))
-    ff.init()
-    ff.setInput(range(10))
-    ff.evaluate()
-
-    self.checkarray(IMatrix([16,4]),ff.output())
-    
-    J = MXFunction([X],[f.jac()])
-    J.init()
-    J.setInput(range(10))
-    J.evaluate()
-    
-    i = IMatrix.zeros(2,10)
-    i[0,4] = 8
-    i[1,2] = 4
-    
-    self.checkarray(i,J.output())
-    
-    f = MXFunction([X],[vecNZ(T)**2])
-    f.setOption("ad_mode","reverse")
-    f.init()
-    
-    J = MXFunction([X],[f.jac()])
-    J.init()
-    J.setInput(range(10))
-    J.evaluate()
-    
-    self.checkarray(i,J.output())
     
 if __name__ == '__main__':
     unittest.main()
