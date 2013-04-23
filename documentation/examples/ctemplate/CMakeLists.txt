@@ -16,5 +16,6 @@ target_link_libraries(ctemplate
   ${CSPARSE_LIBRARIES}
   ${BLAS_LIBRARIES}
   ${EXTRA_LIBS}
+  ${CASADI_DEPENDENCIES}
 )
 endif()
