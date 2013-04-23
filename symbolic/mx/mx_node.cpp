@@ -418,30 +418,42 @@ namespace CasADi{
        (operation_checker<FX0Checker>(op) && y->isZero())){
       return MX::sparse(std::max(size1(),y.size1()),std::max(size2(),y.size2()));
     }
-  
+    
     // Create binary node
-    if(sparsity().scalar())
-      return getScalarMatrix(op,y);
-    else if(y.scalar())  
-      return getMatrixScalar(op,y);
-    else
-      return getMatrixMatrix(op,y);
+    if(sparsity().scalar()){
+      if(size()==0){
+	return MX(0)->getScalarMatrix(op,y);
+      } else {
+	return getScalarMatrix(op,y);
+      }
+    } else if(y.scalar()){
+      if(y.size()==0){
+	return getMatrixScalar(op,MX(0));
+      } else {
+	return getMatrixScalar(op,y);
+      }
+    } else {
+      casadi_assert_message(sparsity().shape() == y.sparsity().shape(), "Dimension mismatch.");
+      if(sparsity()==y.sparsity()){
+	// Matching sparsities
+	return getMatrixMatrix(op,y);
+      } else {
+	// Get the sparsity pattern of the result (ignoring structural zeros giving rise to nonzero result)
+	const CRSSparsity& x_sp = sparsity();
+	const CRSSparsity& y_sp = y.sparsity();
+	CRSSparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op));
+
+	// Project the arguments to this sparsity
+	MX xx = shared_from_this<MX>().setSparse(r_sp);
+	MX yy = y.setSparse(r_sp);
+	return xx->getMatrixMatrix(op,yy);
+      }
+    }
   }
 
-  MX MXNode::getMatrixMatrix(int op, const MX& y) const{    
-    casadi_assert_message(sparsity().shape() == y.sparsity().shape(), "Dimension mismatch.");
-    
-    // Get the sparsity pattern of the result (ignoring structural zeros giving rise to nonzero result)
-    const CRSSparsity& x_sp = sparsity();
-    const CRSSparsity& y_sp = y.sparsity();
-    CRSSparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op));
-    
-    // Project sparsities
-    MX xx = shared_from_this<MX>().setSparse(r_sp);
-    MX yy = y.setSparse(r_sp);
-    
+  MX MXNode::getMatrixMatrix(int op, const MX& y) const{
     // Loop over nonzeros only
-    MX rr = MX::create(new BinaryMX<false,false>(Operation(op),xx,yy)); 
+    MX rr = MX::create(new BinaryMX<false,false>(Operation(op),shared_from_this<MX>(),y)); 
 
     // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
     if(!rr.dense() && !operation_checker<F00Checker>(op)){
@@ -455,35 +467,25 @@ namespace CasADi{
   }
 
   MX MXNode::getScalarMatrix(int op, const MX& y) const{
-    // If the scalar is sparse, then replace with dense
-    if(size()==0){
-      return MX(0)->getScalarMatrix(op,y);
+    // Check if it is ok to loop over nonzeros only
+    if(y.dense() || operation_checker<FX0Checker>(op)){
+      // Loop over nonzeros
+      return MX::create(new BinaryMX<true,false>(Operation(op),shared_from_this<MX>(),y));
     } else {
-      // Check if it is ok to loop over nonzeros only
-      if(y.dense() || operation_checker<FX0Checker>(op)){
-	// Loop over nonzeros
-	return MX::create(new BinaryMX<true,false>(Operation(op),shared_from_this<MX>(),y));
-      } else {
-	// Put a densification node in between
-	return getScalarMatrix(op,densify(y));
-      }
+      // Put a densification node in between
+      return getScalarMatrix(op,densify(y));
     }
   }
 
 
   MX MXNode::getMatrixScalar(int op, const MX& y) const{
-    // Check if the scalar is sparse, then replace with dense
-    if(y.size()==0){
-      return getMatrixScalar(op,0);
+    // Check if it is ok to loop over nonzeros only
+    if(sparsity().dense() || operation_checker<F0XChecker>(op)){
+      // Loop over nonzeros
+      return MX::create(new BinaryMX<false,true>(Operation(op),shared_from_this<MX>(),y));
     } else {
-      // Check if it is ok to loop over nonzeros only
-      if(sparsity().dense() || operation_checker<F0XChecker>(op)){
-	// Loop over nonzeros
-	return MX::create(new BinaryMX<false,true>(Operation(op),shared_from_this<MX>(),y));
-      } else {
-	// Put a densification node in between
-	return densify(shared_from_this<MX>())->getMatrixScalar(op,y);
-      }
+      // Put a densification node in between
+      return densify(shared_from_this<MX>())->getMatrixScalar(op,y);
     }
   }
 
