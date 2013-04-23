@@ -173,16 +173,16 @@ namespace CasADi{
     return MXNode::getUnary(op);
   }
 
-  MX UnaryMX::getBinarySwitch(int op, const MX& y) const{
+  MX UnaryMX::getBinary(int op, const MX& y, bool scX, bool scY) const{
     switch(op_){
     case OP_NEG:
-      if(op==OP_ADD) return y-dep();
+      if(op==OP_ADD) return y->getBinary(OP_SUB,dep(),scY,scX);
       break;
     default: break; // no rule
     }
-
+    
     // Fallback to default implementation
-    return MXNode::getBinarySwitch(op,y);    
+    return MXNode::getBinary(op,y,scX,scY);    
   }
 
 } // namespace CasADi

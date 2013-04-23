@@ -451,17 +451,37 @@ namespace CasADi{
     }
   }
 
-  MX MXNode::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
+  MX MXNode::getBinary(int op, const MX& y, bool scX, bool scY) const{
     // Handle special cases for the second argument
-    if(y.isConstant()){
+    switch(y->getOp()){
+    case OP_CONST:
       // Make the constant the first argument, if possible
-      if(getOp()!=OP_CONST && operation_checker<CommChecker>(op))
-	return y->getBinary(op,shared_from_this<MX>(),ScY,ScX);
-      else if(op==OP_CONSTPOW && y->isValue(2))
+      if(getOp()!=OP_CONST && operation_checker<CommChecker>(op)){
+	return y->getBinary(op,shared_from_this<MX>(),scY,scX);
+      } else if(op==OP_CONSTPOW && y->isValue(2)){
 	return getUnary(OP_SQ);
+      } else if(((op==OP_ADD || op==OP_SUB) && y->isZero()) || ((op==OP_MUL || op==OP_DIV) && y->isValue(1))){
+	return shared_from_this<MX>();
+      }
+      break;
+    case OP_NEG:
+      if(op==OP_ADD){
+	return getBinary(OP_SUB,y->dep(),scX,scY);
+      } else if(op==OP_SUB){
+	return getBinary(OP_ADD,y->dep(),scX,scY);
+      }
+      break;
+    case OP_INV:
+      if(op==OP_MUL){
+	return getBinary(OP_DIV,y->dep(),scX,scY);
+      } else if(op==OP_DIV){
+	return getBinary(OP_MUL,y->dep(),scX,scY);
+      }
+      break;
+    default: break; // no rule
     }
 
-    if(ScX){
+    if(scX){
       // Check if it is ok to loop over nonzeros only
       if(y.dense() || operation_checker<FX0Checker>(op)){
 	// Loop over nonzeros
@@ -470,7 +490,7 @@ namespace CasADi{
 	// Put a densification node in between
 	return getBinary(op,densify(y),true,false);
       }
-    } else if(ScY){
+    } else if(scY){
       // Check if it is ok to loop over nonzeros only
       if(sparsity().dense() || operation_checker<F0XChecker>(op)){
 	// Loop over nonzeros

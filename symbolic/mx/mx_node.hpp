@@ -309,10 +309,10 @@ namespace CasADi{
     virtual MX getUnary(int op) const;
 
     /// Get a binary operation operation
-    virtual MX getBinarySwitch(int op, const MX& y) const;
+    MX getBinarySwitch(int op, const MX& y) const;
 
     /// Get a binary operation operation (matrix-matrix)
-    virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
+    virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
 
     /** Temporary variables to be used in user algorithms like sorting, 
 	the user is resposible of making sure that use is thread-safe
