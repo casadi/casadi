@@ -218,6 +218,9 @@ namespace CasADi{
     } else if(v_.value==1){
       if(op==OP_MUL) return y;
       if(op==OP_DIV) return y->getUnary(OP_INV);	
+    } else if(v_.value==-1){
+      if(op==OP_MUL) return -y;
+      if(op==OP_DIV) return -y->getUnary(OP_INV);
     }
 
     // Fallback
