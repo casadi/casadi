@@ -382,7 +382,7 @@ class Toolstests(casadiTestCase):
       x = msym("a",2,3)
       
       p = Variables()
-      p.a = x**2
+      p.a = x**2.2 # Was x**2 which simplifies to the _unary_ operation sq(x)
       p.b = [ x**3, sqrt(x)]
       p.c = [1/x]
       p.freeze(False)
