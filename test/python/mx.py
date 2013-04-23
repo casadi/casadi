@@ -1851,58 +1851,6 @@ class MXtests(casadiTestCase):
     
     self.assertAlmostEqual(f.output(),4.6)
     
-  def test_reshape(self):
-    self.message("reshape")
-    X = msym("X",10)
-
-    i = IMatrix(sp_tril(3),range(6))
-
-    i.printDense()
-    print vecNZ(i)
-
-    T = X[i]
-
-    f = MXFunction([X],[vecNZ(T)**2])
-    f.init()
-    f.setInput(range(10))
-    f.evaluate()
-    
-    self.checkarray(IMatrix([0,1,9,4,16,25]),f.output())
-
-    Y = msym("Y",10)
-
-    ff = MXFunction([Y],f.evalMX([Y]))
-    ff.init()
-    ff.setInput(range(10))
-    ff.evaluate()
-
-    self.checkarray(IMatrix([0,1,9,4,16,25]),ff.output())
-    
-    J = MXFunction([X],[f.jac()])
-    J.init()
-    J.setInput(range(10))
-    J.evaluate()
-    
-    i = horzcat([diag([0,2,4,6,8,10]),IMatrix.zeros(6,4)])
-    i[[2,3],:] = i[[3,2],:]
-    
-    self.checkarray(i,J.output())
-    
-    f = MXFunction([X],[vecNZ(T)**2])
-    f.setOption("ad_mode","reverse")
-    f.init()
-    
-    J = MXFunction([X],[f.jac()])
-    J.init()
-    J.setInput(range(10))
-    J.evaluate()
-    
-    i = horzcat([diag([0,2,4,6,8,10]),IMatrix.zeros(6,4)])
-    i[[2,3],:] = i[[3,2],:]
-    
-    self.checkarray(i,J.output())
-    
-
     
 if __name__ == '__main__':
     unittest.main()
