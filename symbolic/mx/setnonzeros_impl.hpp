@@ -68,7 +68,7 @@ namespace CasADi{
     // Start by counting the number of output nonzeros corresponding to each input nonzero
     vector<int> onz_count(ocol.size()+1,0);
     for(vector<int>::const_iterator it=nz.begin(); it!=nz.end(); ++it){
-      casadi_assert_message(*it>=0,"Not implemented");
+      casadi_assert_message(*it>=0,"Not implemented due to lack of a test case. Contact the developers if you have a simple that exposes this feature.");
       onz_count[*it+1]++;
     }
     
