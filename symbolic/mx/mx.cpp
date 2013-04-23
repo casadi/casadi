@@ -431,23 +431,11 @@ namespace CasADi{
   }
 
   MX MX::binary(int op, const MX &x, const MX &y){
-    return x->getBinary(op,y);
+    return x->getBinarySwitch(op,y);
   }
 
   MX MX::unary(int op, const MX &x){
     return x->getUnary(Operation(op));
-  }
-
-  MX MX::scalar_matrix(int op, const MX &x, const MX &y){
-    return x->getScalarMatrix(op,y);
-  }
-
-  MX MX::matrix_scalar(int op, const MX &x, const MX &y){
-    return x->getMatrixScalar(op,y);
-  }
-
-  MX MX::matrix_matrix(int op, const MX &x, const MX &y){
-    return x->getMatrixMatrix(op,y);
   }
 
   MXNode* MX::operator->(){

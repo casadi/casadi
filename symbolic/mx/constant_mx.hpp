@@ -199,7 +199,7 @@ namespace CasADi{
     virtual MX getTranspose() const;
 
     /// Get a binary operation operation
-    virtual MX getScalarMatrix(int op, const MX& y) const;
+    virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
 
     /** \brief The actual numerical value */
     Value v_;
@@ -211,20 +211,22 @@ namespace CasADi{
   }
 
   template<typename Value>
-  MX Constant<Value>::getScalarMatrix(int op, const MX& y) const{
-    if(v_.value==0){
-      if(op==OP_ADD) return y;
-      if(op==OP_SUB) return -y;
-    } else if(v_.value==1){
-      if(op==OP_MUL) return y;
-      if(op==OP_DIV) return y->getUnary(OP_INV);	
-    } else if(v_.value==-1){
-      if(op==OP_MUL) return -y;
-      if(op==OP_DIV) return -y->getUnary(OP_INV);
+  MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
+    if(ScX && !ScY){
+      if(v_.value==0){
+	if(op==OP_ADD) return y;
+	if(op==OP_SUB) return -y;
+      } else if(v_.value==1){
+	if(op==OP_MUL) return y;
+	if(op==OP_DIV) return y->getUnary(OP_INV);	
+      } else if(v_.value==-1){
+	if(op==OP_MUL) return -y;
+	if(op==OP_DIV) return -y->getUnary(OP_INV);
+      }
     }
 
     // Fallback
-    return MXNode::getScalarMatrix(op,y);
+    return MXNode::getBinary(op,y,ScX,ScY);
   }
 
   template<typename Value>

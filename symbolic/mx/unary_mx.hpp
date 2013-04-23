@@ -73,7 +73,7 @@ namespace CasADi{
     virtual MX getUnary(int op) const;
 
     /// Get a binary operation operation
-    virtual MX getBinary(int op, const MX& y) const;
+    virtual MX getBinarySwitch(int op, const MX& y) const;
 
     //! \brief operation
     Operation op_;

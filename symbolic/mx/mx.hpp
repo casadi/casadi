@@ -292,9 +292,6 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
     /** \brief  Create nodes by their ID */
     static MX binary(int op, const MX &x, const MX &y);
     static MX unary(int op, const MX &x);
-    static MX scalar_matrix(int op, const MX &x, const MX &y);
-    static MX matrix_scalar(int op, const MX &x, const MX &y);
-    static MX matrix_matrix(int op, const MX &x, const MX &y);
   //@}
 
   //@{

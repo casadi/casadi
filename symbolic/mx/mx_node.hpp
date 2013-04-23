@@ -243,6 +243,15 @@ namespace CasADi{
     /// Get size
     int size2() const;
 
+    /// Convert scalar to matrix
+    inline static MX toMatrix(const MX& x, const CRSSparsity& sp){
+      if(x.shape()==sp.shape()){
+	return x;
+      } else {
+	return MX(sp,x);
+      }
+    }
+
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const;
     
@@ -300,16 +309,10 @@ namespace CasADi{
     virtual MX getUnary(int op) const;
 
     /// Get a binary operation operation
-    virtual MX getBinary(int op, const MX& y) const;
+    virtual MX getBinarySwitch(int op, const MX& y) const;
 
     /// Get a binary operation operation (matrix-matrix)
-    virtual MX getMatrixMatrix(int op, const MX& y) const;
-
-    /// Get a binary operation operation (scalar-matrix)
-    virtual MX getScalarMatrix(int op, const MX& y) const;
-
-    /// Get a binary operation operation (matrix-scalar)
-    virtual MX getMatrixScalar(int op, const MX& y) const;
+    virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
 
     /** Temporary variables to be used in user algorithms like sorting, 
 	the user is resposible of making sure that use is thread-safe

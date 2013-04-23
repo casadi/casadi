@@ -191,10 +191,10 @@ namespace CasADi{
   **/
   //MX clip(const MX& A, const CRSSparsity& sp);
 
-  /** \brief  Make the matrix dense */
+  /** \brief  Make the matrix dense if not already*/
   void makeDense(MX& x);
 
-  /** \brief  Make the matrix dense */
+  /** \brief  Make the matrix dense if not already */
   MX densify(const MX& x);
 
   /** \brief  Create a parent MX on which all given MX's will depend.
