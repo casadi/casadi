@@ -518,5 +518,15 @@ namespace CasADi{
     throw CasadiException(string("MXNode::mapping not defined for class ") + typeid(*this).name());
   }
 
+  bool MXNode::sameOpAndDeps(const MXNode* node, int depth) const{
+    if(getOp()!=node->getOp() || ndep()!=node->ndep())
+      return false;
+    for(int i=0; i<ndep(); ++i){
+      if(!dep(i).isEqual(node->dep(i),depth-1))
+	return false;
+    }
+    return true;
+  }
+
 } // namespace CasADi
 

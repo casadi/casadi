@@ -179,6 +179,12 @@ namespace CasADi{
     /** \brief Get the operation */
     virtual int getOp() const = 0;
 
+    /** \brief Check if two nodes are equivalent up to a given depth */
+    virtual bool isEqual(const MXNode* node, int depth) const{ return false;}
+
+    /** \brief Checks if two nodes have the same operation and have equivalent dependencies up to a given depth */
+    bool sameOpAndDeps(const MXNode* node, int depth) const;
+
     /** \brief  dependencies - functions that have to be evaluated before this one */
     const MX& dep(int ind=0) const;
     MX& dep(int ind=0);

@@ -854,6 +854,15 @@ namespace CasADi{
   int MX::getOp() const {
     return (*this)->getOp();
   }
+
+  bool MX::isEqual(const MX& y, int depth) const{
+    if(get()==y.get())
+      return true;
+    else if(depth>0)
+      return (*this)->isEqual(static_cast<const MXNode*>(y.get()),depth);
+    else
+      return false;
+  }
  	
   bool MX::isCommutative() const {
     if (isUnary()) return true;
