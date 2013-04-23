@@ -26,15 +26,20 @@ import unittest
 import sys
 from math import isnan, isinf
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--known_bugs', help='Run with known bugs', action='store_true')
+parser.add_argument('--ignore_memory_heavy', help='Skip those tests that have a high memory footprint', action='store_true')
+parser.add_argument('--ignore_memory_light', help='Skip those tests that have a lightweight memory footprint', action='store_true')
+parser.add_argument('unittest_args', nargs='*')
+
+args = parser.parse_args()
+
 import sys
-
-memcheck = "memcheck-memcheck" in sys.argv
-
-if memcheck: del sys.argv[sys.argv.index("memcheck-memcheck")]
-if "memcheck" in sys.argv: del sys.argv[sys.argv.index("memcheck")]
+sys.argv[1:] = ['-v'] + args.unittest_args
 
 from StringIO import StringIO
-import sys
 
 class TeeString(StringIO):
   def __init__(self,stream):
@@ -79,6 +84,21 @@ class FunctionPool:
     self.names.append(name)
 
 class casadiTestCase(unittest.TestCase):
+
+  def __init__(self,*margs,**kwargs):
+    fun = getattr(getattr(self,margs[0]),'im_func')
+    if not hasattr(fun,'tag_memory_heavy'):
+      fun.tag_memory_heavy = False
+    
+    
+    if args.ignore_memory_heavy and fun.tag_memory_heavy:
+      fun.__unittest_skip__ = True
+      fun.__unittest_skip_why__ = "Ignoring memory_heavy tests (--ignore_memory_heavy)"
+    if args.ignore_memory_light and not(fun.tag_memory_heavy):
+      fun.__unittest_skip__ = True
+      fun.__unittest_skip_why__ = "Ignoring memory_light tests (--ignore_memory_light)"
+      
+    unittest.TestCase.__init__(self,*margs,**kwargs)
 
   def randDMatrix(self,n,m=1,sparsity=1,valuegenerator=lambda : random.normal(0,1),symm=False ):
     if sparsity < 1:
@@ -426,7 +446,20 @@ class skip(object):
         delattr(c,i)
       return c
     else:
-      def n(self):
-        print "Skipping %s" % (str(c.__name__))
-      return n
+      print self.skiptext(c.__name__)
+      return None
+   
+  def skiptext(self,name):
+    return "Skipping test '%s'" % name
+
+def known_bug():
+  return unittest.skipIf(not(args.known_bugs),"known bug (run with --known_bugs to include it)")
     
+class memory_heavy(object):
+  def __init__(self):
+    pass
+    
+  def __call__(self, c):
+    print c
+    c.tag_memory_heavy = True
+    return c

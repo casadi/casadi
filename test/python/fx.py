@@ -313,7 +313,7 @@ class FXtests(casadiTestCase):
     self.checkfx(f,F,sens_der=False)
     
   
-  @skip(memcheck)
+  @memory_heavy()
   def test_jacobians(self):
   
     x = ssym("x")
@@ -409,7 +409,7 @@ class FXtests(casadiTestCase):
         
         test(d.sparsity())
         
-  @skip(memcheck)
+  @memory_heavy()
   def test_hessians(self):
     def test(sp):
       x = ssym("x",sp.size2())

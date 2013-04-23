@@ -57,7 +57,7 @@ for cl, t, options in integrators:
   
 class Integrationtests(casadiTestCase):
 
-  @skip(memcheck)
+  @memory_heavy()
   def test_jac(self):
     self.message("Test exact jacobian #536")
     # This test is not automized, but works by inspection only.
@@ -185,7 +185,7 @@ class Integrationtests(casadiTestCase):
                 self.assertTrue(stats["nlinsetups"]<100)
                 self.assertTrue(stats["nlinsetupsB"]<250)
 
-  @skip(memcheck)
+  @memory_heavy()
   def test_lsolvers(self):
     self.message("Test different linear solvers")
 
@@ -286,7 +286,7 @@ class Integrationtests(casadiTestCase):
               
 
 
-  @skip(memcheck)
+  @memory_heavy()
   def test_X(self):
     self.message("Extensive integrator tests")
     

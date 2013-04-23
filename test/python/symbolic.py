@@ -5,7 +5,7 @@ from helpers import *
 
 class Symbolictests(casadiTestCase):
 
-  @skip(memcheck)
+  @memory_heavy()
   def test_in_place_simplification(self):
     print "In place simplification"
 
