@@ -452,10 +452,15 @@ namespace CasADi{
   }
 
   MX MXNode::getMatrixMatrix(int op, const MX& y) const{
+    // Reorder if second argument is a constant and the operation is commutative
+    if(y.isConstant() && operation_checker<CommChecker>(op)){
+      return y->getMatrixMatrix(op,shared_from_this<MX>());
+    }
+
     // Loop over nonzeros only
     MX rr = MX::create(new BinaryMX<false,false>(Operation(op),shared_from_this<MX>(),y)); 
 
-    // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
+    // Handle structural zeros giving rise to nonzero result
     if(!rr.dense() && !operation_checker<F00Checker>(op)){
       // Get the value for the structural zeros
       double fcn_0;
@@ -467,26 +472,44 @@ namespace CasADi{
   }
 
   MX MXNode::getScalarMatrix(int op, const MX& y) const{
-    // Check if it is ok to loop over nonzeros only
-    if(y.dense() || operation_checker<FX0Checker>(op)){
-      // Loop over nonzeros
-      return MX::create(new BinaryMX<true,false>(Operation(op),shared_from_this<MX>(),y));
-    } else {
-      // Put a densification node in between
-      return getScalarMatrix(op,densify(y));
+    // Reorder if second argument is a constant and the operation is commutative
+    if(y.isConstant() && operation_checker<CommChecker>(op)){
+      return y->getMatrixScalar(op,shared_from_this<MX>());
     }
+
+    // Perform elementwise
+    MX rr = MX::create(new BinaryMX<true,false>(Operation(op),shared_from_this<MX>(),y));
+
+    // Handle structural zeros giving rise to nonzero result
+    if(!rr.dense() && !operation_checker<FX0Checker>(op)){
+      // Get the value for the structural zeros
+      MX fcn_0;
+      casadi_math<MX>::fun(op,shared_from_this<MX>(),0,fcn_0);
+      rr = rr.makeDense(fcn_0);
+    }
+    
+    return rr;
   }
 
 
   MX MXNode::getMatrixScalar(int op, const MX& y) const{
-    // Check if it is ok to loop over nonzeros only
-    if(sparsity().dense() || operation_checker<F0XChecker>(op)){
-      // Loop over nonzeros
-      return MX::create(new BinaryMX<false,true>(Operation(op),shared_from_this<MX>(),y));
-    } else {
-      // Put a densification node in between
-      return densify(shared_from_this<MX>())->getMatrixScalar(op,y);
+    // Reorder if second argument is a constant and the operation is commutative
+    if(y.isConstant() && operation_checker<CommChecker>(op)){
+      return y->getScalarMatrix(op,shared_from_this<MX>());
     }
+
+    // Perform elementwise
+    MX rr = MX::create(new BinaryMX<false,true>(Operation(op),shared_from_this<MX>(),y));
+
+    // Handle structural zeros giving rise to nonzero result
+    if(!rr.dense() && !operation_checker<F0XChecker>(op)){
+      // Get the value for the structural zeros
+      MX fcn_0;
+      casadi_math<MX>::fun(op,0,y,fcn_0);
+      rr = rr.makeDense(fcn_0);
+    }
+
+    return rr;
   }
 
   Matrix<int> MXNode::mapping() const{
