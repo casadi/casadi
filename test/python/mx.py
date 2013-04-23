@@ -1935,7 +1935,7 @@ class MXtests(casadiTestCase):
     
     self.checkarray(i,J.output())
     
-    f = MXFunction([X],[vecNZ(T)**2])
+    f = MXFunction([X],[T**2])
     f.setOption("ad_mode","reverse")
     f.init()
     
