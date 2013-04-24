@@ -69,7 +69,7 @@ class Symbolictests(casadiTestCase):
              except ZeroDivisionError:
                num = None
              if num is None:
-               self.assertTrue(r.size()==0 or numpy.isnan(r.at(0)) or numpy.isinf(r.at(0)))
+               self.assertTrue(numpy.isnan(r.at(0)) or numpy.isinf(r.at(0)))
                continue
              if (abs(num-r)>1e-10):
                print i , op3, " -> ", e
