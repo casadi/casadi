@@ -657,7 +657,7 @@ SXMatrix ssym(const std::string& name, const CRSSparsity& sp){
       if(!iss.fail())
         retv.push_back(SX(varname));
     }
-  } else if(sp.scalar()){
+  } else if(sp.scalar(true)){
     retv.push_back(SX(name));
   } else {
     // Scalar
@@ -670,7 +670,7 @@ SXMatrix ssym(const std::string& name, const CRSSparsity& sp){
   }
 
   // Determine dimensions automatically if empty
-  if(sp.scalar()){
+  if(sp.scalar(true)){
     return SXMatrix(retv);
   } else {
     return SXMatrix(sp,retv);

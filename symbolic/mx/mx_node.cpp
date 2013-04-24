@@ -411,10 +411,11 @@ namespace CasADi{
 
   MX MXNode::getBinarySwitch(int op, const MX& y) const{
     // Make sure that dimensions match
-    casadi_assert_message((sparsity().scalar() || y.scalar() || (sparsity().size1()==y.size1() && size2()==y.size2())),"Dimension mismatch." << "lhs is " << sparsity().dimString() << ", while rhs is " << y.dimString());
+    casadi_assert_message((sparsity().scalar(false) || y.scalar() || (sparsity().size1()==y.size1() && size2()==y.size2())),
+			  "Dimension mismatch." << "lhs is " << sparsity().dimString() << ", while rhs is " << y.dimString());
       
     // Create binary node
-    if(sparsity().scalar()){
+    if(sparsity().scalar(false)){
       if(size()==0){
 	return toMatrix(MX(0)->getBinary(op,y,true,false),y.sparsity());
       } else {

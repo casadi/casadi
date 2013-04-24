@@ -230,8 +230,8 @@ namespace CasADi{
     return (*this)->getNZ(ii,jj);
   }
 
-  bool CRSSparsity::scalar() const{
-    return (*this)->scalar();
+  bool CRSSparsity::scalar(bool scalar_and_dense) const{
+    return (*this)->scalar(scalar_and_dense);
   }
 
   bool CRSSparsity::dense() const{

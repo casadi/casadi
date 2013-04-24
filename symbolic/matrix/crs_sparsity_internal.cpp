@@ -1983,8 +1983,8 @@ namespace CasADi{
     return ret;
   }
 
-  bool CRSSparsityInternal::scalar() const{
-    return nrow_==1 && ncol_==1 && size()==1;
+  bool CRSSparsityInternal::scalar(bool scalar_and_dense) const{
+    return nrow_==1 && ncol_==1 && (!scalar_and_dense || size()==1);
   }
 
   bool CRSSparsityInternal::dense() const{

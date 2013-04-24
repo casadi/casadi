@@ -183,7 +183,7 @@ namespace CasADi{
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const{
-      casadi_assert(sparsity().scalar());
+      casadi_assert(sparsity().scalar(true));
       return v_.value;
     }
 
@@ -279,7 +279,7 @@ namespace CasADi{
   template<typename Value>
   void Constant<Value>::printPart(std::ostream &stream, int part) const{
     stream << "Const<" << v_.value << ">(";
-    if(sparsity().scalar()){
+    if(sparsity().scalar(true)){
       stream << "scalar";
     } else {
       stream << size1() << "x" << size2() << ": ";
