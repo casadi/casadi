@@ -719,7 +719,8 @@ namespace CasADi{
   }
 
   void MX::lift(const MX& x_guess){ 
-    *this = MX::binary(OP_LIFT,*this,x_guess);
+    casadi_assert(sparsity()==x_guess.sparsity());
+    *this = (*this)->getBinary(OP_LIFT,x_guess,false,false);
   }
 
   MX MX::__add__(const MX& y) const{

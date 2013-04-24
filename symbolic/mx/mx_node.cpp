@@ -457,12 +457,12 @@ namespace CasADi{
     case OP_SUB:
     case OP_NE:
     case OP_LT:
-      if(y.isEqual(this,maxDepth())) return 0;
+      if(y.isEqual(this,maxDepth())) return MX::zeros(sparsity());
       break;
     case OP_DIV:
     case OP_EQ:
     case OP_LE:
-      if(y.isEqual(this,maxDepth())) return 1;
+      if(y.isEqual(this,maxDepth())) return MX::ones(sparsity());
       break;
     case OP_MUL:
       if(y.isEqual(this,maxDepth())) return getUnary(OP_SQ);
@@ -475,25 +475,25 @@ namespace CasADi{
     case OP_CONST:
       // Make the constant the first argument, if possible
       if(getOp()!=OP_CONST && operation_checker<CommChecker>(op)){
-	return y->getBinary(op,shared_from_this<MX>(),scY,scX);
+    	return y->getBinary(op,shared_from_this<MX>(),scY,scX);
       } else if(op==OP_CONSTPOW && y->isValue(2)){
-	return getUnary(OP_SQ);
+    	return getUnary(OP_SQ);
       } else if(((op==OP_ADD || op==OP_SUB) && y->isZero()) || ((op==OP_MUL || op==OP_DIV) && y->isValue(1))){
-	return shared_from_this<MX>();
+    	return shared_from_this<MX>();
       }
       break;
     case OP_NEG:
       if(op==OP_ADD){
-	return getBinary(OP_SUB,y->dep(),scX,scY);
+    	return getBinary(OP_SUB,y->dep(),scX,scY);
       } else if(op==OP_SUB){
-	return getBinary(OP_ADD,y->dep(),scX,scY);
+    	return getBinary(OP_ADD,y->dep(),scX,scY);
       }
       break;
     case OP_INV:
       if(op==OP_MUL){
-	return getBinary(OP_DIV,y->dep(),scX,scY);
+    	return getBinary(OP_DIV,y->dep(),scX,scY);
       } else if(op==OP_DIV){
-	return getBinary(OP_MUL,y->dep(),scX,scY);
+    	return getBinary(OP_MUL,y->dep(),scX,scY);
       }
       break;
     default: break; // no rule

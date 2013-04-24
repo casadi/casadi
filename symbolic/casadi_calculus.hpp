@@ -494,14 +494,13 @@ namespace CasADi{
 
   //@{
   /// Is commutative
-  template<int I> struct CommChecker{ static const bool check=true;};
-  template<>      struct CommChecker<OP_SUB>{ static const bool check=false;};
-  template<>      struct CommChecker<OP_DIV>{ static const bool check=false;};
-  template<>      struct CommChecker<OP_POW>{ static const bool check=false;};
-  template<>      struct CommChecker<OP_CONSTPOW>{ static const bool check=false;};
-  template<>      struct CommChecker<OP_PRINTME>{ static const bool check=false;};
-  template<>      struct CommChecker<OP_ATAN2>{ static const bool check=false;};
-  template<>      struct CommChecker<OP_IF_ELSE_ZERO>{ static const bool check=false;};
+  template<int I> struct CommChecker{ static const bool check=false;};
+  template<>      struct CommChecker<OP_ADD>{ static const bool check=true;};
+  template<>      struct CommChecker<OP_MUL>{ static const bool check=true;};
+  template<>      struct CommChecker<OP_EQ>{ static const bool check=true;};
+  template<>      struct CommChecker<OP_NE>{ static const bool check=true;};
+  template<>      struct CommChecker<OP_AND>{ static const bool check=true;};
+  template<>      struct CommChecker<OP_OR>{ static const bool check=true;};
   //@}
 
   //@{
