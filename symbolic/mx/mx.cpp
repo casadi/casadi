@@ -723,39 +723,11 @@ namespace CasADi{
   }
 
   MX MX::__add__(const MX& y) const{
-    const MX& x = *this;
-    bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-    if((samedim || x.scalar()) && isZero(x)){
-      return y;
-    } else if((samedim || y.scalar()) && isZero(y)){
-      return x;
-    } else if(y->getOp()==OP_NEG){
-      return x - y->dep(0);
-    } else if(x->getOp()==OP_NEG){
-      return y - x->dep(0);
-    } else if(x->getOp()==OP_SUB && y.get()==x->dep(1).get()){
-      return x->dep(0);
-    } else if(y->getOp()==OP_SUB && x.get()==y->dep(1).get()){
-      return y->dep(0);
-    } else {
-      return MX::binary(OP_ADD,x,y);
-    }
+    return MX::binary(OP_ADD,*this,y);
   }
 
   MX MX::__sub__(const MX& y) const{
-    const MX& x = *this;
-    bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-    if((samedim || x.scalar()) && isZero(x)){
-      return -y;
-    } else if((samedim || y.scalar()) && isZero(y)){
-      return x;
-    } else if(y->getOp()==OP_NEG){
-      return x+y->dep(0);
-    } else if(y.get()==x.get()){
-      return MX::sparse(x.size1(),x.size2());
-    } else {
-      return MX::binary(OP_SUB,x,y);
-    }
+    return MX::binary(OP_SUB,*this,y);
   }
 
   MX MX::__mul__(const MX& y) const{
@@ -763,13 +735,7 @@ namespace CasADi{
   }
 
   MX MX::__div__(const MX& y) const{
-    const MX& x = *this;
-    bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-    if((samedim || y.scalar()) && isOne(y)){
-      return x;
-    } else {
-      return MX::binary(OP_DIV,x,y);
-    }
+    return MX::binary(OP_DIV,*this,y);
   }
 
   MX MX::__lt__(const MX& y) const{
