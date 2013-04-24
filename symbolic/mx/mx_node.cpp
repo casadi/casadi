@@ -402,7 +402,7 @@ namespace CasADi{
   MX MXNode::getUnary(int op) const{
     if(operation_checker<F0XChecker>(op) && isZero()){
       // If identically zero
-      return MX::sparse(size1(),size2());
+      return MX::zeros(sparsity());
     } else {
       // Create a new node
       return MX::create(new UnaryMX(Operation(op),shared_from_this<MX>()));
@@ -412,13 +412,7 @@ namespace CasADi{
   MX MXNode::getBinarySwitch(int op, const MX& y) const{
     // Make sure that dimensions match
     casadi_assert_message((sparsity().scalar() || y.scalar() || (sparsity().size1()==y.size1() && size2()==y.size2())),"Dimension mismatch." << "lhs is " << sparsity().dimString() << ", while rhs is " << y.dimString());
-  
-    // Quick return if zero
-    if((operation_checker<F0XChecker>(op) && isZero()) || 
-       (operation_checker<FX0Checker>(op) && y->isZero())){
-      return MX::sparse(std::max(size1(),y.size1()),std::max(size2(),y.size2()));
-    }
-    
+      
     // Create binary node
     if(sparsity().scalar()){
       if(size()==0){
@@ -452,6 +446,11 @@ namespace CasADi{
   }
 
   MX MXNode::getBinary(int op, const MX& y, bool scX, bool scY) const{
+    // If identically zero due to one argumebt being zero
+    if((operation_checker<F0XChecker>(op) && isZero()) ||(operation_checker<FX0Checker>(op) && y->isZero())){
+      return MX::zeros(sparsity());
+    }
+
     // Handle special operations (independent of type)
     switch(op){
     case OP_SUB:
