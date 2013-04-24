@@ -476,10 +476,24 @@ namespace CasADi{
       // Make the constant the first argument, if possible
       if(getOp()!=OP_CONST && operation_checker<CommChecker>(op)){
     	return y->getBinary(op,shared_from_this<MX>(),scY,scX);
-      } else if(op==OP_CONSTPOW && y->isValue(2)){
-    	return getUnary(OP_SQ);
-      } else if(((op==OP_ADD || op==OP_SUB) && y->isZero()) || ((op==OP_MUL || op==OP_DIV) && y->isValue(1))){
-    	return shared_from_this<MX>();
+      } else {
+	switch(op) {
+	case OP_CONSTPOW: 
+	  if(y->isValue(-1)) return getUnary(OP_INV);
+	  if(y->isValue(0)) return MX::ones(sparsity());
+	  if(y->isValue(1)) return shared_from_this<MX>();
+	  if(y->isValue(2)) return getUnary(OP_SQ);
+	  break;	
+	case OP_ADD:
+	case OP_SUB:
+	  if(y->isZero()) return shared_from_this<MX>();
+	  break;
+	case OP_MUL:
+	case OP_DIV:
+	  if(y->isValue(1)) return shared_from_this<MX>();
+	  break;
+	default: break; // no rule
+	}
       }
       break;
     case OP_NEG:
