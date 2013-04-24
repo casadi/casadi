@@ -181,6 +181,9 @@ namespace CasADi{
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const{ return false;}
+    
+    /** \brief Get equality checking depth */
+    inline static bool maxDepth(){ return MX::getEqualityCheckingDepth();}
 
     /** \brief Checks if two nodes have the same operation and have equivalent dependencies up to a given depth */
     bool sameOpAndDeps(const MXNode* node, int depth) const;

@@ -856,14 +856,18 @@ namespace CasADi{
   }
 
   bool MX::isEqual(const MX& y, int depth) const{
-    if(get()==y.get())
+    return isEqual(static_cast<const MXNode*>(y.get()),depth);
+  }
+
+  bool MX::isEqual(const MXNode* y, int depth) const{
+    if(get()==y)
       return true;
     else if(depth>0)
-      return (*this)->isEqual(static_cast<const MXNode*>(y.get()),depth);
+      return (*this)->isEqual(y,depth);
     else
       return false;
   }
- 	
+
   bool MX::isCommutative() const {
     if (isUnary()) return true;
     casadi_assert_message(isBinary() || isUnary(),"MX::isCommutative: must be binary or unary operation");
@@ -915,5 +919,16 @@ namespace CasADi{
       return ret;
     }
   }
+
+  int MX::eq_depth_ = 1;
+
+  void MX::setEqualityCheckingDepth(int eq_depth){
+    eq_depth_ = eq_depth;
+  }
+
+  int MX::getEqualityCheckingDepth(){
+    return eq_depth_;
+  }
+
 	  
 } // namespace CasADi

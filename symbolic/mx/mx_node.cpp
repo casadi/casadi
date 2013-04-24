@@ -452,6 +452,24 @@ namespace CasADi{
   }
 
   MX MXNode::getBinary(int op, const MX& y, bool scX, bool scY) const{
+    // Handle special operations (independent of type)
+    switch(op){
+    case OP_SUB:
+    case OP_NE:
+    case OP_LT:
+      if(y.isEqual(this,maxDepth())) return 0;
+      break;
+    case OP_DIV:
+    case OP_EQ:
+    case OP_LE:
+      if(y.isEqual(this,maxDepth())) return 1;
+      break;
+    case OP_MUL:
+      if(y.isEqual(this,maxDepth())) return getUnary(OP_SQ);
+      break;
+    default: break; // no rule
+    }
+
     // Handle special cases for the second argument
     switch(y->getOp()){
     case OP_CONST:
