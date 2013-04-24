@@ -201,6 +201,9 @@ namespace CasADi{
     /// Transpose
     virtual MX getTranspose() const;
 
+    /// Get a unary operation
+    virtual MX getUnary(int op) const;
+
     /// Get a binary operation operation
     virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
 
@@ -214,6 +217,14 @@ namespace CasADi{
   }
 
   template<typename Value>
+  MX Constant<Value>::getUnary(int op) const{
+    // Constant folding
+    double ret;
+    casadi_math<double>::fun(op,v_.value,0.0,ret);
+    return ret;
+  }
+
+  template<typename Value>
   MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
     if(v_.value==0){
       if(op==OP_ADD) return y;
@@ -224,6 +235,14 @@ namespace CasADi{
     } else if(v_.value==-1){
       if(op==OP_MUL) return -y;
       if(op==OP_DIV) return -y->getUnary(OP_INV);
+    }
+
+    // Constant folding
+    if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0){ // NOTE: ugly, should use a function instead of a cast
+      double y_value = y->getValue();
+      double ret;
+      casadi_math<double>::fun(op,v_.value,y_value,ret);
+      return ret;
     }
 
     // Fallback
