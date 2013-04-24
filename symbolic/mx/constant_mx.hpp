@@ -226,15 +226,22 @@ namespace CasADi{
 
   template<typename Value>
   MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
-    if(v_.value==0){
-      if(op==OP_ADD) return y;
-      if(op==OP_SUB) return -y;
-    } else if(v_.value==1){
-      if(op==OP_MUL) return y;
-      if(op==OP_DIV) return y->getUnary(OP_INV);	
-    } else if(v_.value==-1){
-      if(op==OP_MUL) return -y;
-      if(op==OP_DIV) return -y->getUnary(OP_INV);
+    switch(op){
+    case OP_ADD:
+      if(v_.value==0) return y;
+      break;
+    case OP_SUB:
+      if(v_.value==0) return -y;      
+      break;
+    case OP_MUL:
+      if(v_.value==1) return y;
+      if(v_.value==-1) return -y;
+      break;
+    case OP_DIV:
+      if(v_.value==1) return y->getUnary(OP_INV);	
+      if(v_.value==-1) return -y->getUnary(OP_INV);
+      break;
+    default: break; //no rule
     }
 
     // Constant folding
