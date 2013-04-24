@@ -1,5 +1,27 @@
 #!/bin/bash
 
+function fileupdate {
+myfile=$1
+
+TMP="/tmp/FC.tmp"
+
+cat > $TMP
+
+DIFF=`diff -q $TMP $myfile`
+
+if [ ! "$DIFF" = "" ]; then
+  if [ -s $TMP ]; then
+	  if [ "$2" = "" ]; then
+		  mv $myfile  $myfile~
+	  elif [ ! "$2" = "none" ]; then
+		  mv $myfile  $myfile$2
+	  fi
+	  mv $TMP $myfile
+	  echo "Changed $1";
+	fi
+fi
+}
+
 function findreplace {
   echo "This is findrep"
   echo "perl regex: ${FGRED}$3${NORMAL}"
