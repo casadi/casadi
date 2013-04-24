@@ -129,6 +129,9 @@ namespace CasADi{
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const{ return x_;}
 
+    /** \brief Check if two nodes are equivalent up to a given depth */
+    virtual bool isEqual(const MXNode* node, int depth) const;
+
     /** \brief  data member */
     Matrix<double> x_;
   };

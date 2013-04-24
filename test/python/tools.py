@@ -668,8 +668,7 @@ class Toolstests(casadiTestCase):
     ])
     self.assertEqual(V.size,14)
     
-    self.assertTrue(isinstance(V.cat,MX))
-    
+    self.assertTrue(isinstance(V.cat,MX))    
     self.assertTrue(isEqual(V["x"],x))
     self.assertTrue(isEqual(V["y",0],y0))
     self.assertTrue(isEqual(V["y",1],y1))

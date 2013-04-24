@@ -62,6 +62,12 @@ namespace CasADi{
     /// Get a vector of indices (nested slice)
     std::vector<int> getAll(const Slice& outer, int len) const;
 
+    /// Check equality
+    bool operator==(const Slice& other) const{ return start_==other.start_ && stop_==other.stop_ && step_==other.step_;}
+
+    /// Check inequality
+    bool operator!=(const Slice& other) const{ return !(*this == other);}
+
 #ifndef SWIG
     /// Print a representation of the object to a stream
     virtual void print(std::ostream& stream=std::cout) const;

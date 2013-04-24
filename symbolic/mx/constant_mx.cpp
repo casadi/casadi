@@ -163,6 +163,19 @@ namespace CasADi{
     }
   }
 
+  bool ConstantDMatrix::isEqual(const MXNode* node, int depth) const{
+    // Check if same node
+    const ConstantDMatrix* n = dynamic_cast<const ConstantDMatrix*>(node);
+    if(n==0) return false;
+    
+    // Check sparsity
+    if(this->sparsity()!=node->sparsity()) return false;
+    
+    // Check indices
+    if(!std::equal(x_.begin(),x_.end(),n->x_.begin())) return false;
+    
+    return true;
+  }
 
 } // namespace CasADi
 

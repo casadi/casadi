@@ -472,4 +472,57 @@ namespace CasADi{
     stream << "*rr++ = *tt;" << endl;
   }
 
+  bool GetNonzerosVector::isEqual(const MXNode* node, int depth) const{ 
+    // Check dependencies
+    if(!sameOpAndDeps(node,depth)) return false;
+
+    // Check if same node
+    const GetNonzerosVector* n = dynamic_cast<const GetNonzerosVector*>(node);
+    if(n==0) return false;
+
+    // Check sparsity
+    if(this->sparsity()!=node->sparsity()) return false;
+
+    // Check indices
+    if(this->nz_.size()!=n->nz_.size()) return false;
+    if(!std::equal(this->nz_.begin(),this->nz_.end(),n->nz_.begin())) return false;
+
+    return true;
+  }
+
+  bool GetNonzerosSlice::isEqual(const MXNode* node, int depth) const{ 
+    // Check dependencies
+    if(!sameOpAndDeps(node,depth)) return false;
+
+    // Check if same node
+    const GetNonzerosSlice* n = dynamic_cast<const GetNonzerosSlice*>(node);
+    if(n==0) return false;
+
+    // Check sparsity
+    if(this->sparsity()!=node->sparsity()) return false;
+
+    // Check indices
+    if(this->s_ != n->s_) return false;
+
+    return true;
+  }
+
+  bool GetNonzerosSlice2::isEqual(const MXNode* node, int depth) const{ 
+    // Check dependencies
+    if(!sameOpAndDeps(node,depth)) return false;
+
+    // Check if same node
+    const GetNonzerosSlice2* n = dynamic_cast<const GetNonzerosSlice2*>(node);
+    if(n==0) return false;
+
+    // Check sparsity
+    if(this->sparsity()!=node->sparsity()) return false;
+
+    // Check indices
+    if(this->inner_ != n->inner_ || this->outer_!=n->outer_) return false;
+
+    return true;
+  }
+
+
 } // namespace CasADi

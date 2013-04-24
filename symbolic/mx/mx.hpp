@@ -50,6 +50,7 @@ class FX;
   \date 2010-2011
 */
 class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public SharedObject{
+  
   public:
   
     /** \brief  Default constructor */
@@ -272,11 +273,22 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   /// Is unary operation
   bool isUnary() const;
   
-  #ifndef SWIG
   /// Get operation type
   int getOp() const;
-  #endif // SWIG
 
+  /** \brief Check if two nodes are equivalent up to a given depth. 
+   *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
+   * 
+   *  a = x*x
+   *  b = x*x
+   *
+   *  a.isEqual(b,0)  will return false, but a.isEqual(b,1) will return true
+   */
+  bool isEqual(const MX& y, int depth=0) const;
+#ifndef SWIG
+  bool isEqual(const MXNode* y, int depth=0) const;
+#endif // SWIG
+  
   /** \brief Returns a number that is unique for a given MXNode. 
   * If the MX does not point to any node, 0 is returned.
   */
@@ -447,11 +459,20 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   /** \brief Get the maximum number of calls to the printing function when printing an expression */
   static long getMaxNumCallsInPrint();
 
+  /** \brief Set or reset the depth to which equalities are being checked for simplifications */
+  static void setEqualityCheckingDepth(int eq_depth=1);
+
+  /** \brief Get the depth to which equalities are being checked for simplifications */
+  static int getEqualityCheckingDepth();
+
   #ifndef SWIG
   private:
     // Maximum number of calls
     static long max_num_calls_in_print_;
-    
+  
+    // Depth when checking equalities
+    static int eq_depth_;
+  
   #endif // SWIG
 };
 

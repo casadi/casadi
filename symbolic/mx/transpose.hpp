@@ -77,6 +77,9 @@ namespace CasADi{
 
     /// Solve for square linear system
     virtual MX getSolve(const MX& r, bool tr) const{ return dep()->getSolve(r,!tr);}
+
+    /** \brief Check if two nodes are equivalent up to a given depth */
+    virtual bool isEqual(const MXNode* node, int depth) const{ return sameOpAndDeps(node,depth);}
   };
 
   /** \brief Matrix transpose (dense)

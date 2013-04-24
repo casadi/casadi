@@ -607,6 +607,61 @@ namespace CasADi{
   }
 
   template<bool Add>
+  bool SetNonzerosVector<Add>::isEqual(const MXNode* node, int depth) const{ 
+    // Check dependencies
+    if(!this->sameOpAndDeps(node,depth)) return false;
+
+    // Check if same node
+    const SetNonzerosVector<Add>* n = dynamic_cast<const SetNonzerosVector<Add>*>(node);
+    if(n==0) return false;
+
+    // Check sparsity
+    if(this->sparsity()!=node->sparsity()) return false;
+
+    // Check indices
+    if(this->nz_.size()!=n->nz_.size()) return false;
+    if(!std::equal(this->nz_.begin(),this->nz_.end(),n->nz_.begin())) return false;
+
+    return true;
+  }
+
+  template<bool Add>
+  bool SetNonzerosSlice<Add>::isEqual(const MXNode* node, int depth) const{ 
+    // Check dependencies
+    if(!this->sameOpAndDeps(node,depth)) return false;
+
+    // Check if same node
+    const SetNonzerosSlice<Add>* n = dynamic_cast<const SetNonzerosSlice<Add>*>(node);
+    if(n==0) return false;
+
+    // Check sparsity
+    if(this->sparsity()!=node->sparsity()) return false;
+
+    // Check indices
+    if(this->s_ != n->s_) return false;
+
+    return true;
+  }
+
+  template<bool Add>
+  bool SetNonzerosSlice2<Add>::isEqual(const MXNode* node, int depth) const{ 
+    // Check dependencies
+    if(!this->sameOpAndDeps(node,depth)) return false;
+
+    // Check if same node
+    const SetNonzerosSlice2<Add>* n = dynamic_cast<const SetNonzerosSlice2<Add>*>(node);
+    if(n==0) return false;
+
+    // Check sparsity
+    if(this->sparsity()!=node->sparsity()) return false;
+
+    // Check indices
+    if(this->inner_ != n->inner_ || this->outer_!=n->outer_) return false;
+
+    return true;
+  }
+
+  template<bool Add>
   bool SetNonzerosSlice<Add>::isAssignment() const{
     // Check sparsity
     if(!(this->sparsity() == this->dep(1).sparsity()))

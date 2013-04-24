@@ -217,6 +217,26 @@ namespace CasADi{
     }
   }
 
+  template<bool ScX, bool ScY>
+  MX BinaryMX<ScX,ScY>::getUnary(int op) const{
+    switch(op_){
+    default: break; // no rule
+    }
+
+    // Fallback to default implementation
+    return MXNode::getUnary(op);
+  }
+
+  template<bool ScX, bool ScY>
+  MX BinaryMX<ScX,ScY>::getBinary(int op, const MX& y, bool scX, bool scY) const{
+    switch(op_){
+    default: break; // no rule
+    }
+
+    // Fallback to default implementation
+    return MXNode::getBinary(op,y,scX,scY);    
+  }
+
 
 } // namespace CasADi
 

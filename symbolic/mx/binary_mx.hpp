@@ -73,6 +73,15 @@ namespace CasADi{
     /** \brief Generate code for the operation (generic) */
     void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
+    /// Get a unary operation
+    virtual MX getUnary(int op) const;
+
+    /// Get a binary operation operation
+    virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
+
+    /** \brief Check if two nodes are equivalent up to a given depth */
+    virtual bool isEqual(const MXNode* node, int depth) const{ return sameOpAndDeps(node,depth);}
+
     //! \brief Operation
     Operation op_;
     

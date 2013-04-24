@@ -71,6 +71,9 @@ namespace CasADi{
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const{ return 1;}
     
+    /** \brief Check if two nodes are equivalent up to a given depth */
+    virtual bool isEqual(const MXNode* node, int depth) const{ return sameOpAndDeps(node,depth) && dynamic_cast<const Multiplication<TrX,TrY>*>(node)!=0;}
+
     /// Helper class
     template<bool Tr>
     static MX tr(const MX& x){ return Tr ? trans(x) : x;}

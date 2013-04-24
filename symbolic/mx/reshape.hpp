@@ -74,6 +74,9 @@ namespace CasADi{
     
     /// Reshape
     virtual MX getReshape(const CRSSparsity& sp) const;
+
+    /** \brief Check if two nodes are equivalent up to a given depth */
+    virtual bool isEqual(const MXNode* node, int depth) const{ return sameOpAndDeps(node,depth) && sparsity()==node->sparsity();}
   };
 
 } // namespace CasADi
