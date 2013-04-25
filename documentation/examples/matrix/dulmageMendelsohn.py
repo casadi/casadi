@@ -20,10 +20,20 @@
 # 
 # 
 from casadi import *
+import numpy
 
 # Let's construct a block diagonal structure
 A = blkdiag([1,DMatrix([[2,3],[4,5]]),DMatrix([[6,7,8],[9,10,11],[12,13,14]]),15])
+
+print "original: "
 A.printMatrix()
+
+# Ruin the nice structure
+numpy.random.seed(0)
+randperm1 = numpy.random.permutation(A.size1())
+randperm2 = numpy.random.permutation(A.size1())
+
+Ar = A[randperm1,randperm2]
 
 rowperm = IVector()
 colperm = IVector()
@@ -32,27 +42,16 @@ colblock = IVector()
 coarse_rowblock = IVector()
 coarse_colblock = IVector()
 
-A.sparsity().dulmageMendelsohn 	( rowperm, colperm, rowblock,	colblock,	coarse_rowblock, coarse_colblock)
+print "randomly permuted: "
+Ar.printMatrix()
+Ar.sparsity().dulmageMendelsohn 	( rowperm, colperm, rowblock,	colblock,	coarse_rowblock, coarse_colblock)
 
 print "rowperm: ", rowperm
 print "colperm: ", colperm
+print "restored:"
+Ar[rowperm,colperm].printMatrix()
 print "rowblock: ", rowblock
 print "colblock: ", colblock
 print "coarse_rowblock: ", coarse_rowblock
 print "coarse_colblock: ", coarse_colblock
 
-# Ruin the nice structure
-
-A[0,-1] = 666
-A[0,-2] = 666
-A.printMatrix()
-A.sparsity().dulmageMendelsohn 	( rowperm, colperm, rowblock,	colblock,	coarse_rowblock, coarse_colblock)
-
-print "rowperm: ", rowperm
-print "colperm: ", colperm
-print "permuted:"
-A[rowperm,colperm].printMatrix()
-print "rowblock: ", rowblock
-print "colblock: ", colblock
-print "coarse_rowblock: ", coarse_rowblock
-print "coarse_colblock: ", coarse_colblock

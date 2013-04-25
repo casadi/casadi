@@ -78,10 +78,12 @@ class FunctionPool:
     self.numpyoperators=[]
     self.casadioperators=[]
     self.names=[]
-  def append(self,cas,num,name=""):
+    self.flags=[]
+  def append(self,cas,num,name="",flags=set()):
     self.casadioperators.append(cas)
     self.numpyoperators.append(num)
     self.names.append(name)
+    self.flags.append(flags)
 
 class casadiTestCase(unittest.TestCase):
 
@@ -240,9 +242,11 @@ class casadiTestCase(unittest.TestCase):
     self.evaluationCheck([fx],frx,x,x0,name,failmessage,fmod=fmod,setx0=setx0)
 
   
-  def numpyEvaluationCheckPool(self,pool,x,x0,name="",fmod=None,setx0=None):
+  def numpyEvaluationCheckPool(self,pool,x,x0,name="",fmod=None,setx0=None,excludeflags=set()):
     """ Performs a numpyEvaluationCheck for all members of a function pool"""
     for i in range(len(pool.numpyoperators)):
+      if len(excludeflags.intersection(pool.flags[i]))>0:
+        continue
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 
   def checkfx(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True):

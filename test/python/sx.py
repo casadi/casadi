@@ -47,9 +47,9 @@ class SXtests(casadiTestCase):
     self.pool.append(lambda x: arccos(x[0]),arccos,"arccos")
     self.pool.append(lambda x: exp(x[0]),exp,"exp")
     self.pool.append(lambda x: log(x[0]),log,"log")
-#    self.pool.append(lambda x: x[0]**0,lambda x : x**0,"x^0") # ill-posed
+    self.pool.append(lambda x: x[0]**0,lambda x : x**0,"x^0",flags={'nozero'})
     self.pool.append(lambda x: x[0]**1,lambda x : x**1,"^1")
-#    self.pool.append(lambda x: x[0]**(-2),lambda x : x**(-2),"^-2") # ill-posed
+    self.pool.append(lambda x: x[0]**(-2),lambda x : x**(-2),"^-2",flags={'nozero'})
     self.pool.append(lambda x: x[0]**(0.3),lambda x : x**(0.3),"^0.3")
     self.pool.append(lambda x: floor(x[0]),floor,"floor")
     self.pool.append(lambda x: ceil(x[0]),ceil,"ceil")
@@ -214,7 +214,7 @@ class SXtests(casadiTestCase):
       if scipy_available:
         x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toCsr_matrix()
       
-        self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="SXMatrix",setx0=x0)
+        self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="SXMatrix",setx0=x0,excludeflags={'nozero'})
       else:
         x0=DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99]).toArray()
       
