@@ -506,6 +506,21 @@ namespace CasADi{
   //@}
 
   //@{
+  /// Always non-negative (false by default)
+  template<int I> struct NonnegativeChecker{ static const bool check=false;};
+  template<>      struct NonnegativeChecker<OP_SQRT>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_SQ>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_EXP>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_LT>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_LE>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_EQ>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_NE>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_NOT>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_AND>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_OR>{ static const bool check=true;};
+  //@}
+
+  //@{
   /// Is the operation binary as opposed to unary
   template<int I> struct BinaryChecker{ static const bool check=false;};
   template<>      struct BinaryChecker<OP_ADD>{ static const bool check=true;};
