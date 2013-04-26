@@ -863,6 +863,30 @@ namespace CasADi{
 				  bool output_given){
     if(verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
 
+    // Check if output is given (see #696)
+    if(!output_given){
+      const int checking_depth = 2;
+      bool output_given_new = true;
+      for(int i=0; i<arg.size() && output_given_new; ++i){
+	for(int j=0; j<arg[i].size() && output_given_new; ++j){
+	  if(!arg[i].at(j).isEqual(inputv_[i].at(j),checking_depth)){	  
+	    output_given_new = false;
+	  }
+	}
+      }
+      
+      // Call again with output_given (temporary solution, see #696)
+      if(output_given_new){
+	evalSXsparse(inputv_,outputv_,fseed,fsens,aseed,asens,true);
+
+	// Return the known output
+	for(int i=0; i<res.size(); ++i){
+	  copy(outputv_[i].begin(),outputv_[i].end(),res[i].begin()); 
+	}
+	return;
+      }
+    }
+
     // Number of forward seeds
     int nfdir = fsens.size();
   
