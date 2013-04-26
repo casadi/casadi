@@ -22,27 +22,31 @@
 from casadi import *
 import numpy
 
-# Let's construct a block diagonal structure
-A = blkdiag([1,DMatrix([[2,3],[4,5]]),DMatrix([[6,7,8],[9,10,11],[12,13,14]]),15])
+#! Let's construct a block diagonal structure
+b1 = DMatrix([[2,3],[4,5]])
+b2 = DMatrix([[6,7,8],[9,10,11],[12,13,14]])
+A = blkdiag([1,b1,b2,15])
 
 print "original: "
 A.printMatrix()
 
-# Ruin the nice structure
+#! Ruin the nice structure
 numpy.random.seed(0)
-randperm1 = numpy.random.permutation(A.size1())
-randperm2 = numpy.random.permutation(A.size1())
+p1 = numpy.random.permutation(A.size1())
+p2 = numpy.random.permutation(A.size2())
 
-Ar = A[randperm1,randperm2]
+S = A[p1,:]
+#S = A[p1,p2]
 
 print "randomly permuted: "
-Ar.printMatrix()
-ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = Ar.sparsity().dulmageMendelsohn()
+S.printMatrix()
+nb, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = S.sparsity().dulmageMendelsohn()
 
+print "number of blocks: ", nb
 print "rowperm: ", rowperm
 print "colperm: ", colperm
 print "restored:"
-Ar[rowperm,colperm].printMatrix()
+S[rowperm,colperm].printMatrix()
 print "rowblock: ", rowblock
 print "colblock: ", colblock
 print "coarse_rowblock: ", coarse_rowblock
