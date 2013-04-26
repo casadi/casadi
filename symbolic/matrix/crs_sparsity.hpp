@@ -130,7 +130,11 @@ namespace CasADi{
 	When the input is square, the diagonal elements are returned.
 	If the input is vector-like, a diagonal matrix is constructed with it.
     */
+#ifndef SWIG
     CRSSparsity diag(std::vector<int>& mapping) const;
+#else // SWIG
+    CRSSparsity diag(std::vector<int>& OUTPUT) const;
+#endif // SWIG
     
     /// Access a member function or object
     CRSSparsityInternal* operator->();
@@ -243,14 +247,26 @@ namespace CasADi{
     void getNZInplace(std::vector<int>& indices) const;
 
     /// Get the sparsity in CRS format
+#ifndef SWIG
     void getSparsityCRS(std::vector<int>& rowind, std::vector<int>& col) const;
+#else // SWIG
+    void getSparsityCRS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
+#endif // SWIG
 
     /// Get the sparsity in CCS format
+#ifndef SWIG
     void getSparsityCCS(std::vector<int>& row, std::vector<int>& colind) const;
-    
+#else // SWIG
+    void getSparsityCCS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
+#endif // SWIG
+
     /// Get the sparsity in sparse triplet format
+#ifndef SWIG
     void getSparsity(std::vector<int>& row, std::vector<int>& col) const;
-    
+#else // SWIG
+    void getSparsity(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
+#endif // SWIG
+
     /** \brief Get a submatrix
      *
      * Returns the sparsity of the submatrix, with a mapping such that
