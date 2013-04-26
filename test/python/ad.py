@@ -335,7 +335,7 @@ class ADtests(casadiTestCase):
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
-            fe = MXFunction([y],res)
+            fe = SXFunction([y],res)
             fe.init()
             
             fe.input().set(n)
@@ -344,18 +344,19 @@ class ADtests(casadiTestCase):
             self.checkarray(r,fe.output())
             
             for sens,seed in zip(fwdsens,fseeds):
-              fe = MXFunction([y],[sens])
+              fe = SXFunction([y],[sens])
               fe.input().set(n)
               fe.init()
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J,c.flatten(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
-              fe = MXFunction([y],[sens])
+              fe = SXFunction([y],[sens])
               fe.input().set(n)
               fe.init()
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J.T,c.flatten(seed)),"AD")
+
   @known_bug()  # pending fix #964
   def test_MXevalSX_reduced(self):
     n=array([1.2,2.3,7,1.4])
