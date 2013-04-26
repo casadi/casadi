@@ -1945,6 +1945,17 @@ class MXtests(casadiTestCase):
     J.evaluate()
     
     self.checkarray(i,J.output())
+  
+  def test_blockcat(self):
+    x = msym("x")
+    
+    y = blockcat([[x,2*x],[3*x,4*x]])
+    f = MXFunction([x],[y])
+    f.init()
+    f.setInput(3)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([[3,6],[9,12]]))
+    
     
 if __name__ == '__main__':
     unittest.main()

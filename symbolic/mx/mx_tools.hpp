@@ -35,6 +35,9 @@ namespace CasADi{
 
   /** \brief  concatenate horizontally */
   MX horzcat(const std::vector<MX>& comp);
+  
+  /** \brief Construct a matrix from a list of list of blocks.*/
+  MX blockcat(const std::vector< std::vector<MX > > &v);
 
   /** \brief  concatenate vertically while vectorizing all arguments with vec */
   MX veccat(const std::vector<MX>& comp);

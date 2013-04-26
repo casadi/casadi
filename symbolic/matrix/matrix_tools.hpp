@@ -137,13 +137,20 @@ Matrix<T> flatten(const Matrix<T>& a);
 template<class T>
 Matrix<T> vecNZ(const Matrix<T>& a);
 
-
+/** \brief Construct a matrix from a list of list of blocks.
+*/
 template<class T>
 Matrix<T> blockcat(const std::vector< std::vector<Matrix<T> > > &v);
 
+/** \brief Concatenate a list of matrices vertically
+* Alternative terminology: vertical stack, vstack, vertical append, [a;b]
+*/
 template<class T>
 Matrix<T> vertcat(const std::vector<Matrix<T> > &v);
 
+/** \brief Concatenate a list of matrices horizontally
+* Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
+*/
 template<class T>
 Matrix<T> horzcat(const std::vector<Matrix<T> > &v);
 

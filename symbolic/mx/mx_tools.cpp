@@ -772,5 +772,13 @@ namespace CasADi{
     return trans(jacobian(ex,arg));
   }
 
+  MX blockcat(const std::vector< std::vector<MX > > &v) {
+    std::vector< MX > ret;
+    for(int i=0; i<v.size(); ++i)
+      ret.push_back(horzcat(v[i]));
+    return vertcat(ret);
+  }
+
+
 } // namespace CasADi
 
