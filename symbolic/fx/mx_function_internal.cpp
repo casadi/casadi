@@ -683,6 +683,25 @@ namespace CasADi{
     casadi_assert_message(arg.size()==getNumInputs(),"Wrong number of input arguments");
     if(output_given){
       casadi_assert_message(res.size()==getNumOutputs(),"Wrong number of output arguments");
+    } else {
+      // Check if output is given (see #696)
+      const int checking_depth = 2;
+      bool output_given_new = inputv_.size()==arg.size(); // replaces the output_given function argument (see #696)
+      for(int i=0; i<arg.size() && output_given_new; ++i){
+	if(!arg[i].isEqual(inputv_[i],checking_depth)){
+	  output_given_new = false;
+	}
+      }
+      
+      // Call again with output_given (temporary solution, see #696)
+      if(output_given_new){
+	evalMX(inputv_,outputv_,fseed,fsens,aseed,asens,true);
+
+	// Return the known output
+	res.resize(outputv_.size());
+	copy(outputv_.begin(),outputv_.end(),res.begin());
+	return;
+      }
     }
 
     // Skip forward sensitivities if no nonempty seeds
