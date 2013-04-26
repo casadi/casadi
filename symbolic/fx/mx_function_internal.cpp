@@ -674,35 +674,34 @@ namespace CasADi{
     return ret;  
   }
 
-  void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
+  void MXFunctionInternal::evalMX(const std::vector<MX>& arg1, std::vector<MX>& res1, 
 				  const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
 				  const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-				  bool output_given){
+				  bool output_given_remove){
     log("MXFunctionInternal::evalMX begin");
     assertInit();
-    casadi_assert_message(arg.size()==getNumInputs(),"Wrong number of input arguments");
-    if(output_given){
-      casadi_assert_message(res.size()==getNumOutputs(),"Wrong number of output arguments");
-    } else {
-      // Check if output is given (see #696)
-      const int checking_depth = 2;
-      bool output_given_new = inputv_.size()==arg.size(); // replaces the output_given function argument (see #696)
-      for(int i=0; i<arg.size() && output_given_new; ++i){
-	if(!arg[i].isEqual(inputv_[i],checking_depth)){
-	  output_given_new = false;
-	}
-      }
-      
-      // Call again with output_given (temporary solution, see #696)
-      if(output_given_new){
-	evalMX(inputv_,outputv_,fseed,fsens,aseed,asens,true);
+    casadi_assert_message(arg1.size()==getNumInputs(),"Wrong number of input arguments");
+    
+    // Resize the number of outputs
+    res1.resize(outputv_.size());
 
-	// Return the known output
-	res.resize(outputv_.size());
-	copy(outputv_.begin(),outputv_.end(),res.begin());
-	return;
+    // Check if arguments matches the input expressions, in which case the output is known to be the output expressions
+    const int checking_depth = 2;
+    bool output_given = true;
+    for(int i=0; i<arg1.size() && output_given; ++i){
+      if(!arg1[i].isEqual(inputv_[i],checking_depth)){
+	output_given = false;
       }
     }
+      
+    // Copy output if known
+    if(output_given){
+      copy(outputv_.begin(),outputv_.end(),res1.begin());
+    }
+
+    // Use the function arguments if possible to avoid problems involving equivalent but different expressions
+    const vector<MX>& arg = output_given ? inputv_ : arg1;
+    vector<MX>& res = output_given ? outputv_ : res1;
 
     // Skip forward sensitivities if no nonempty seeds
     bool skip_fwd = true;
