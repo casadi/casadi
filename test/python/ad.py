@@ -356,6 +356,33 @@ class ADtests(casadiTestCase):
               fe.init()
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J.T,c.flatten(seed)),"AD")
+  @known_bug()  # pending fix #964
+  def test_MXevalSX_reduced(self):
+    n=array([1.2,2.3,7,1.4])
+    for inputshape in ["column","row","matrix"]:
+      for outputshape in ["column","row","matrix"]:
+        for inputtype in ["dense","sparse"]:
+          for outputtype in ["dense","sparse"]:
+            self.message("evalMX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
+            f.init()
+            f.input().set(n)
+            f.evaluate()
+            r = DMatrix(f.output())
+  
+            y = ssym("y",f.input().sparsity())
+            
+      
+            res,fwdsens,adjsens = f.evalSX([y],[],[])
+            
+            fe = SXFunction([y],res)
+            fe.init()
+            
+            fe.input().set(n)
+            fe.evaluate()
+            
+            self.checkarray(r,fe.output())
+                
   def test_Jacobian(self):
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column","row","matrix"]:
