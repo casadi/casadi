@@ -985,6 +985,8 @@ namespace CasADi{
     // Allocate outputs
     if(!output_given){
       output_s.resize(outputv_.size());
+      for(int i=0; i<output_s.size(); ++i)
+        output_s[i] = SXMatrix(outputv_[i].sparsity());
     }
     
     // Create a work array
