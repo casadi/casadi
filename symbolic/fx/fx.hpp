@@ -260,10 +260,17 @@ namespace CasADi{
      * The boolean argument allows the second argument to the functions to be used as an input instead of output,
      * assuming it is already known.
      */
+#ifndef SWIG
     void evalSX(const SXMatrixVector& arg, SXMatrixVector& res, 
 		const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
 		const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens,
 		bool output_given=false);
+#else // SWIG
+    void evalSX(const SXMatrixVector& arg, SXMatrixVector& OUTPUT, 
+		const SXMatrixVectorVector& fseed, SXMatrixVectorVector& OUTPUT, 
+		const SXMatrixVectorVector& aseed, SXMatrixVectorVector& OUTPUT,
+		bool output_given=false);
+#endif // SWIG
 
     /** \brief Evaluate symbolically with with directional derivatives, MX type
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
@@ -274,11 +281,18 @@ namespace CasADi{
      * The boolean argument allows the second argument to the functions to be used as an input instead of output,
      * assuming it is already known.
      */
+#ifndef SWIG
     void evalMX(const MXVector& arg, MXVector& res, 
 		const MXVectorVector& fseed, MXVectorVector& fsens, 
 		const MXVectorVector& aseed, MXVectorVector& asens,
 		bool output_given=false);
-                        
+#else // SWIG
+    void evalMX(const MXVector& arg, MXVector& OUTPUT, 
+		const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
+		const MXVectorVector& aseed, MXVectorVector& OUTPUT,
+		bool output_given=false);
+#endif // SWIG  
+              
     /** \brief Evaluate symbolically with with directional derivatives, SX type, overloaded
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
      * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
@@ -288,11 +302,17 @@ namespace CasADi{
      * The boolean argument allows the second argument to the functions to be used as an input instead of output,
      * assuming it is already known.
      */
+#ifndef SWIG
     void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& res, 
 	      const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
 	      const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens,
 	      bool output_given=false);
-
+#else // SWIG
+    void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& OUTPUT, 
+	      const SXMatrixVectorVector& fseed, SXMatrixVectorVector& OUTPUT, 
+	      const SXMatrixVectorVector& aseed, SXMatrixVectorVector& OUTPUT,
+	      bool output_given=false);
+#endif // SWIG 
     /** \brief Evaluate symbolically with with directional derivatives, MX type, overloaded
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
      * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
@@ -302,11 +322,18 @@ namespace CasADi{
      * The boolean argument allows the second argument to the functions to be used as an input instead of output,
      * assuming it is already known.
      */
+#ifndef SWIG
     void eval(const MXVector& arg, MXVector& res, 
 	      const MXVectorVector& fseed, MXVectorVector& fsens, 
 	      const MXVectorVector& aseed, MXVectorVector& asens,
 	      bool output_given=false);
-  
+#else // SWIG
+    void eval(const MXVector& arg, MXVector& OUTPUT, 
+	      const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
+	      const MXVectorVector& aseed, MXVectorVector& OUTPUT,
+	      bool output_given=false);
+#endif // SWIG 
+
 #ifndef SWIG
     /// evaluate symbolically, single input, single output 
     SXMatrix eval(const SXMatrix& arg){ return eval(std::vector<SXMatrix>(1,arg)).at(0);}
