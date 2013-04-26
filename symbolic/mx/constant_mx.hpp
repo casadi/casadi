@@ -183,7 +183,7 @@ namespace CasADi{
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const{
-      casadi_assert(sparsity().scalar(true));
+      casadi_assert(sparsity().scalar());
       return v_.value;
     }
 
@@ -254,7 +254,7 @@ namespace CasADi{
       double y_value = y->getValue();
       double ret;
       casadi_math<double>::fun(op,v_.value,y_value,ret);
-      return ret;
+      return MX(y.sparsity(),ret);
     }
 
     // Fallback

@@ -348,7 +348,7 @@ namespace CasADi{
     void reserve(int nnz, int nrow);
 
     /// Is scalar?
-    bool scalar(bool scalar_and_dense) const;
+    bool scalar(bool scalar_and_dense=false) const;
     
     /// Is dense?
     bool dense() const;
