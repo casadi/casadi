@@ -460,33 +460,19 @@ namespace CasADi{
   }
 
   std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args) {
-    //if (!x.isBinary()) throw CasadiException("getOperatorRepresentation: SX must be binary operator");
-    if (x.isNorm()) {
-      std::stringstream s;
-      if (dynamic_cast<const Norm2*>(x.get())!=0) {
-	dynamic_cast<const Norm2*>(x.get())->printPart(s,0);
-	s << args[0];
-	dynamic_cast<const Norm2*>(x.get())->printPart(s,1);
-      } else  if (dynamic_cast<const NormF*>(x.get())!=0) {
-	dynamic_cast<const NormF*>(x.get())->printPart(s,0);
-	s << args[0];
-	dynamic_cast<const NormF*>(x.get())->printPart(s,1);
-      } else if (dynamic_cast<const Norm1*>(x.get())!=0) {
-	dynamic_cast<const Norm1*>(x.get())->printPart(s,0);
-	s << args[0];
-	dynamic_cast<const Norm1*>(x.get())->printPart(s,1);
-      } else if (dynamic_cast<const NormInf*>(x.get())!=0) {
-	dynamic_cast<const NormInf*>(x.get())->printPart(s,0);
-	s << args[0];
-	dynamic_cast<const NormInf*>(x.get())->printPart(s,1);
-      }
-      return s.str();
-    }
-
-  
-    if (args.size() == 0 || (casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2)) throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
     std::stringstream s;
-    casadi_math<double>::print(x.getOp(),s,args[0],args[1]);
+    const MXNode* node = dynamic_cast<const MXNode*>(x.get());
+    node->printPart(s,0);
+    if (x.isUnary()) {
+      s << args[0];
+      node->printPart(s,1);
+    } else {
+      for (int i=0;i<args.size();++i) {
+        s << args[i];
+        node->printPart(s,1+i);
+      }
+    }
+    
     return s.str();
   }
 
