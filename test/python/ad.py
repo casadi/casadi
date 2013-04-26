@@ -176,6 +176,53 @@ class ADtests(casadiTestCase):
               seed = array(f.adjSeed()).ravel()
               sens = array(f.adjSens()).ravel()
               self.checkarray(sens,dot(J.T,seed),"AD")
+              
+  @known_bug()  # suffers from #695
+  def test_SXevalSX(self):
+    n=array([1.2,2.3,7,1.4])
+    for inputshape in ["column","row","matrix"]:
+      for outputshape in ["column","row","matrix"]:
+        for inputtype in ["dense","sparse"]:
+          for outputtype in ["dense","sparse"]:
+            self.message("evalSX on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
+            f.init()
+            f.input().set(n)
+            f.evaluate()
+            r = DMatrix(f.output())
+            J = self.jacobians[inputtype][outputtype](*n)
+            
+            seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
+            
+            y = ssym("y",f.input().sparsity())
+            
+            fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
+            aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
+            res,fwdsens,adjsens = f.evalSX([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds))
+            fwdsens = map(lambda x: x[0],fwdsens)
+            adjsens = map(lambda x: x[0],adjsens)
+            
+            fe = SXFunction([y],res)
+            fe.init()
+            
+            fe.input().set(n)
+            fe.evaluate()
+            
+            self.checkarray(r,fe.output())
+            
+            for sens,seed in zip(fwdsens,fseeds):
+              fe = SXFunction([y],[sens])
+              fe.input().set(n)
+              fe.init()
+              fe.evaluate()
+              self.checkarray(c.flatten(fe.output()),mul(J,c.flatten(seed)),"AD") 
+
+            for sens,seed in zip(adjsens,aseeds):
+              fe = SXFunction([y],[sens])
+              fe.input().set(n)
+              fe.init()
+              fe.evaluate()
+              self.checkarray(c.flatten(fe.output()),mul(J.T,c.flatten(seed)),"AD") 
 
   def test_fwdMX(self):
     n=array([1.2,2.3,7,1.4])
