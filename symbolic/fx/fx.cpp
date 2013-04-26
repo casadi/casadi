@@ -263,29 +263,25 @@ namespace CasADi{
 
   void FX::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
 		  const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-		  const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-		  bool output_given){
+		  const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
     (*this)->evalSX(arg,res,fseed,fsens,aseed,asens);
   }
 
   void FX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
 		  const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
-		  const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-		  bool output_given){
+		  const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){
     (*this)->evalMX(arg,res,fseed,fsens,aseed,asens);
   }
                         
   void FX::eval(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
 		const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-		const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-		bool output_given){
+		const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
     (*this)->evalSX(arg,res,fseed,fsens,aseed,asens);
   }
 
   void FX::eval(const std::vector<MX>& arg, std::vector<MX>& res, 
 		const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
-		const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-		bool output_given){
+		const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){
     (*this)->evalMX(arg,res,fseed,fsens,aseed,asens);
   }
 

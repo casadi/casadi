@@ -995,7 +995,7 @@ SXMatrix jacobianTimesVector(const SXMatrix &ex, const SXMatrix &arg, const SXMa
   }
   
   // Evaluate with directional derivatives, output is the same as the funciton inputs
-  f.evalSX(argv,resv,fseed,fsens,aseed,asens,true);
+  f.evalSX(argv,resv,fseed,fsens,aseed,asens);
   
   // Get the results
   vector<SXMatrix> dirder(v2);

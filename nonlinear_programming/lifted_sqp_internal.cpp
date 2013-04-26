@@ -269,7 +269,7 @@ void LiftedSQPInternal::init(){
     Z_fwdSeed[1][Z_LAM_X].setZero();
     Z_fwdSeed[1][Z_LAM_F2] = dlam_f2;
     
-    zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
+    zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens);
     
     b1 += Z_fwdSens[0][Z_F12](Slice(0,nf1));
     b2 += Z_fwdSens[0][Z_F12](Slice(nf1,B.size1()));
