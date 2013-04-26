@@ -79,17 +79,23 @@ namespace CasADi{
     /** \brief  Reset the sparsity propagation */
     virtual void spInit(bool fwd){}
     
-    /** \brief  Evaluate symbolically, SX type */
+    /** \brief  Evaluate symbolically, SX type, possibly nonmatching sparsity patterns */
     virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                        const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                        const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-                        bool output_given);
+			const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+			const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
+			bool output_given);
 
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
                         const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
                         const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
                         bool output_given);
+
+    /** \brief  Evaluate symbolically, SX type, matching sparsity patterns */
+    virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+			      const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+			      const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
+			      bool output_given);
     
     /** \brief Call a function, MX type (overloaded) */
     void call(const MXVector& arg, MXVector& res, 
@@ -102,7 +108,7 @@ namespace CasADi{
               const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
               const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
               bool output_given, bool always_inline, bool never_inline);
-    
+        
     //@{
     /** \brief Return Hessian function */
     FX hessian(int iind, int oind);

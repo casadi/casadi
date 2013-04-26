@@ -248,32 +248,9 @@ namespace CasADi{
   }
 
   vector<SXMatrix> FX::evalSX(const vector<SXMatrix>& arg){
-    casadi_assert_message(isInit(),"Function has not been initialized");
-  
-    // Copy the arguments into a new vector with the right sparsity
-    casadi_assert_message(arg.size()<=getNumInputs(), "FX::evalSX: number of passed-in dependencies (" << arg.size() << ") should not exceed the number of inputs of the function (" << getNumInputs() << ").");
-    vector<SXMatrix> arg2 = arg;
-    arg2.resize(getNumInputs());
-    for(int iind=0; iind<arg.size(); ++iind){
-      // If sparsities do not match, we need to map the nonzeros onto the new pattern
-      if(!(arg2[iind].sparsity()==input(iind).sparsity())){
-	arg2[iind] = project(arg2[iind],input(iind).sparsity());
-      }
-    }
-
-    // Create result vector with correct sparsity for the result
-    vector<SXMatrix> res(getNumOutputs());
-    for(int i=0; i<res.size(); ++i){
-      res[i] = SXMatrix(output(i).sparsity());
-    }
-  
-    // No sensitivities
+    vector<SXMatrix> res;
     vector<vector<SXMatrix> > dummy;
-  
-    // Evaluate the algorithm
-    (*this)->evalSX(arg2,res,dummy,dummy,dummy,dummy,false);
-  
-    // Return the result
+    (*this)->evalSX(arg,res,dummy,dummy,dummy,dummy,false);
     return res;
   }
 

@@ -994,20 +994,13 @@ namespace CasADi{
     log("MXFunctionInternal::evalMX end");
   }
 
-  void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
+  void MXFunctionInternal::evalSXsparse(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
 				  const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
 				  const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
 				  bool output_given){
     casadi_assert_message(fwdSens.empty(),"Not implemented");
     casadi_assert_message(adjSeed.empty(),"Not implemented");
-  
-    // Allocate outputs
-    if(!output_given){
-      output_s.resize(outputv_.size());
-      for(int i=0; i<output_s.size(); ++i)
-        output_s[i] = SXMatrix(outputv_[i].sparsity());
-    }
-    
+      
     // Create a work array
     vector<SXMatrix> swork(work_.size());
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){

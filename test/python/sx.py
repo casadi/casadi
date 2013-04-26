@@ -670,8 +670,8 @@ class SXtests(casadiTestCase):
     r = f.eval([x,SXMatrix(1,0)])
     self.assertTrue(r[1].empty())
     
-    self.assertRaises(Exception,lambda : f.eval([x,x]))
-    self.assertRaises(Exception,lambda : f.eval([[],[]]))
+    #self.assertRaises(Exception,lambda : f.eval([x,x]))
+    #self.assertRaises(Exception,lambda : f.eval([[],[]]))
     
   def test_mtaylor(self):
     self.message("multivariate taylor expansions")

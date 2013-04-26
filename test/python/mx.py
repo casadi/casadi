@@ -1599,7 +1599,7 @@ class MXtests(casadiTestCase):
     self.assertTrue(r[1].isNull())
     
     #self.assertRaises(Exception,lambda : f.eval([x,x]))
-    self.assertRaises(Exception,lambda : f.eval([[],[]]))
+    #self.assertRaises(Exception,lambda : f.eval([[],[]]))
     
   def test_issue184(self):
     self.message("Regression test issue #184")

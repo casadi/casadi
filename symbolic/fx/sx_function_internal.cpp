@@ -857,129 +857,17 @@ namespace CasADi{
     if(recursive) XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>::updateNumSens(recursive);
   }
 
-  void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& res, 
+  void SXFunctionInternal::evalSXsparse(const vector<SXMatrix>& arg, vector<SXMatrix>& res, 
 				  const vector<vector<SXMatrix> >& fseed, vector<vector<SXMatrix> >& fsens, 
 				  const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens,
 				  bool output_given){
+    if(verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
 
-    if(verbose()) cout << "SXFunctionInternal::evalSX begin" << endl;
-  
-    // Assert number of inputs
-    casadi_assert_message(inputv_.size() == arg.size(),"Wrong number of inputs. Expecting " << inputv_.size() << ", got " << arg.size());
-
-    // Assert number of forward seeds
+    // Number of forward seeds
     int nfdir = fsens.size();
-    for(int dir=0; dir<nfdir; ++dir){
-      casadi_assert_message(inputv_.size() == fseed[dir].size(),"Wrong number of forward seeds in direction " << dir << ". Expecting " << inputv_.size() << ", got " << fseed[dir].size());
-    }
   
-    // Assert number of adjoint seeds
+    // number of adjoint seeds
     int nadir = aseed.size();
-    for(int dir=0; dir<nadir; ++dir){
-      casadi_assert_message(outputv_.size() == aseed[dir].size(),"Wrong number of adjoint seeds in direction " << dir << ". Expecting " << outputv_.size() << ", got " << aseed[dir].size());
-    }
-  
-    // Check if input sparsity pattern match (quick if sparsity matches)
-    bool sparsity_matches = true;
-    for(int i=0; i<inputv_.size() && sparsity_matches; ++i){
-      sparsity_matches = arg[i].sparsity()==inputv_[i].sparsity();
-    }
-    if(!sparsity_matches){
-      casadi_assert_message(!output_given,"Inconsistent arguments.");
-      vector<SXMatrix> arg_new(arg.size());
-      for(int i=0; i<arg.size(); ++i){
-	try{
-	  arg_new[i] = SXMatrix(inputv_[i].sparsity());
-	  arg_new[i].set(arg[i]);
-	} catch(exception& ex){
-	  stringstream ss;
-	  ss << "SXFunctionInternal::evalSX: Failed to set " << describeInput(inputScheme_,i) << ": " << ex.what();
-	  throw CasadiException(ss.str());
-	}
-      }
-      evalSX(arg_new,res,fseed,fsens,aseed,asens,output_given);
-      return;
-    }
-  
-    // Check if forward seed sparsity pattern match (quick if sparsity matches)
-    for(int dir=0; dir<nfdir && sparsity_matches; ++dir){
-      for(int i=0; i<inputv_.size() && sparsity_matches; ++i){
-	sparsity_matches = fseed[dir][i].sparsity()==inputv_[i].sparsity();
-      }
-    }
-    if(!sparsity_matches){
-      vector<vector<SXMatrix> > fseed_new(nfdir);
-      for(int dir=0; dir<nfdir; ++dir){
-	fseed_new[dir].resize(inputv_.size());
-	for(int i=0; i<inputv_.size(); ++i){
-	  try{
-	    fseed_new[dir][i] = SXMatrix(inputv_[i].sparsity());
-	    fseed_new[dir][i].set(fseed[dir][i]);
-	  } catch(exception& ex){
-	    stringstream ss;
-	    ss << "SXFunctionInternal::evalSX: Failed to set forward seed of " << describeInput(inputScheme_,i) << ", direction " << dir << ": " << ex.what();
-	    throw CasadiException(ss.str());
-	  }
-	}
-      }
-      evalSX(arg,res,fseed_new,fsens,aseed,asens,output_given);
-      return;
-    }
-  
-    // Check if adjoint seed sparsity pattern match (quick if sparsity matches)
-    for(int dir=0; dir<nadir && sparsity_matches; ++dir){
-      for(int i=0; i<outputv_.size() && sparsity_matches; ++i){
-	sparsity_matches = aseed[dir][i].sparsity()==outputv_[i].sparsity();
-      }
-    }
-    if(!sparsity_matches){
-      vector<vector<SXMatrix> > aseed_new(nadir);
-      for(int dir=0; dir<nadir; ++dir){
-	aseed_new[dir].resize(outputv_.size());
-	for(int i=0; i<outputv_.size(); ++i){
-	  try{
-	    aseed_new[dir][i] = SXMatrix(outputv_[i].sparsity());
-	    aseed_new[dir][i].set(aseed[dir][i]);
-	  } catch(exception& ex){
-	    stringstream ss;
-	    ss << "SXFunctionInternal::evalSX: Failed to set adjoint seed of " << describeOutput(outputScheme_,i) << ", direction " << dir << ": " << ex.what();
-	    throw CasadiException(ss.str());
-	  }
-	}
-      }
-      evalSX(arg,res,fseed,fsens,aseed_new,asens,output_given);
-      return;
-    }
-    
-    // Resize (if needed) the number of outputs and make sure that the sparsity pattern is correct (cheap if already ok)
-    res.resize(outputv_.size());
-    for(int i=0; i<outputv_.size(); ++i){
-      if(res[i].sparsity()!=outputv_[i].sparsity()){
-	res[i] = SXMatrix(outputv_[i].sparsity());
-      }
-    }
-  
-    // Resize (if needed) the number of forward sensitivities and make sure that the sparsity pattern is correct (cheap if already ok)
-    fsens.resize(nfdir);
-    for(int dir=0; dir<nfdir; ++dir){
-      fsens[dir].resize(outputv_.size());
-      for(int i=0; i<outputv_.size(); ++i){
-	if(fsens[dir][i].sparsity()!=outputv_[i].sparsity()){
-	  fsens[dir][i] = SXMatrix(outputv_[i].sparsity());
-	}
-      }
-    }
-  
-    // Resize (if needed) the number of adjoint sensitivities and make sure that the sparsity pattern is correct (cheap if already ok)
-    asens.resize(nadir);
-    for(int dir=0; dir<nadir; ++dir){
-      asens[dir].resize(inputv_.size());
-      for(int i=0; i<inputv_.size(); ++i){
-	if(asens[dir][i].sparsity()!=inputv_[i].sparsity()){
-	  asens[dir][i] = SXMatrix(inputv_[i].sparsity());
-	}
-      }
-    }
 
     // Do we need taping?
     bool taping = nfdir>0 || nadir>0;
@@ -1002,7 +890,7 @@ namespace CasADi{
     }
 
     // Evaluate algorithm
-    if(verbose()) cout << "SXFunctionInternal::evalSX evaluating algorithm forward" << endl;
+    if(verbose()) cout << "SXFunctionInternal::evalSXsparse evaluating algorithm forward" << endl;
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       switch(it->op){
       case OP_INPUT:
@@ -1048,7 +936,7 @@ namespace CasADi{
     if(!taping) return;
 
     // Calculate forward sensitivities
-    if(verbose()) cout << "SXFunctionInternal::evalSX calculating forward derivatives" << endl;
+    if(verbose()) cout << "SXFunctionInternal::evalSXsparse calculating forward derivatives" << endl;
     for(int dir=0; dir<nfdir; ++dir){
       vector<TapeEl<SX> >::const_iterator it2 = s_pdwork.begin();
       for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
@@ -1070,7 +958,7 @@ namespace CasADi{
     }
 
     // Calculate adjoint sensitivities
-    if(verbose()) cout << "SXFunctionInternal::evalSX calculating adjoint derivatives" << endl;
+    if(verbose()) cout << "SXFunctionInternal::evalSXsparse calculating adjoint derivatives" << endl;
     if(nadir>0) fill(s_work_.begin(),s_work_.end(),0);
     for(int dir=0; dir<nadir; ++dir){
       vector<TapeEl<SX> >::const_reverse_iterator it2 = s_pdwork.rbegin();
@@ -1103,7 +991,7 @@ namespace CasADi{
 	}
       }
     }
-    if(verbose()) cout << "SXFunctionInternal::evalSX end" << endl;
+    if(verbose()) cout << "SXFunctionInternal::evalSXsparse end" << endl;
   }
 
   SXFunctionInternal* SXFunctionInternal::clone() const{

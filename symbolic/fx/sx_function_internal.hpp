@@ -115,7 +115,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   void evaluateGen(T1 nfdir_c, T2 nadir_c);
   
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+  virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                       const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
                       const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
                       bool output_given);
