@@ -504,7 +504,8 @@ namespace CasADi{
     }
   
     // Calculate with adjoint mode AD
-    call(inputv_,outputv_,fseed,fsens,aseed,asens,true,true,false);
+    std::vector<MatType> res(outputv_);
+    call(inputv_,res,fseed,fsens,aseed,asens,true,false);
   
     // Return adjoint directional derivative
     return asens[0].at(iind);
@@ -538,6 +539,9 @@ namespace CasADi{
 
     // Current forward and adjoint direction
     int offset_nfdir = 0, offset_nadir = 0;
+
+    // Evaluation result (known)
+    std::vector<MatType> res(outputv_);
 
     // Forward and adjoint seeds and sensitivities
     std::vector<std::vector<MatType> > fseed, aseed, fsens, asens;
@@ -684,7 +688,7 @@ namespace CasADi{
     
       // Evaluate symbolically
       if(verbose()) std::cout << "XFunctionInternal::jac making function call" << std::endl;
-      call(inputv_,outputv_,fseed,fsens,aseed,asens,true,always_inline,never_inline);
+      call(inputv_,res,fseed,fsens,aseed,asens,always_inline,never_inline);
     
       // Carry out the forward sweeps
       for(int d=0; d<nfdir_batch; ++d){
@@ -882,8 +886,9 @@ namespace CasADi{
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadir);
   
     // Evaluate symbolically
+    std::vector<MatType> res(outputv_);
     std::vector<std::vector<MatType> > fsens(nfdir,outputv_), asens(nadir,inputv_);
-    call(inputv_,outputv_,fseed,fsens,aseed,asens,true,true,false);
+    call(inputv_,res,fseed,fsens,aseed,asens,true,false);
 
     // All inputs of the return function
     std::vector<MatType> ret_in;

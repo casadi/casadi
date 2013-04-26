@@ -65,8 +65,8 @@ namespace CasADi{
   }
 
   void FX::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, MXVectorVector& fsens, 
-		const MXVectorVector& aseed, MXVectorVector& asens, bool output_given){
-    (*this)->call(arg,res,fseed,fsens,aseed,asens,output_given,false,true);
+		const MXVectorVector& aseed, MXVectorVector& asens){
+    (*this)->call(arg,res,fseed,fsens,aseed,asens,false,true);
   }
 
   vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& paropt){

@@ -224,13 +224,11 @@ namespace CasADi{
 #ifndef SWIG
     void call(const MXVector& arg, MXVector& res, 
 	      const MXVectorVector& fseed, MXVectorVector& fsens, 
-	      const MXVectorVector& aseed, MXVectorVector& asens,
-	      bool output_given=false);
+	      const MXVectorVector& aseed, MXVectorVector& asens);
 #else // SWIG
     void call(const MXVector& arg, MXVector& OUTPUT, 
 	      const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
-	      const MXVectorVector& aseed, MXVectorVector& OUTPUT,
-	      bool output_given=false);
+	      const MXVectorVector& aseed, MXVectorVector& OUTPUT);
 #endif // SWIG
   
     /** \brief  Evaluate symbolically in parallel (matrix graph)

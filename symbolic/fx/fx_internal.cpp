@@ -1525,7 +1525,7 @@ namespace CasADi{
 
   void FXInternal::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, MXVectorVector& fsens, 
 			const MXVectorVector& aseed, MXVectorVector& asens, 
-			bool output_given, bool always_inline, bool never_inline){
+			bool always_inline, bool never_inline){
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
   
     // Lo logic for inlining yet
@@ -1551,14 +1551,14 @@ namespace CasADi{
 			      "," << input(i).size2() << ") while a shape (" << arg[i].size1() << "," << arg[i].size2() << 
 			      ") was supplied.");
       }
-      EvaluationMX::create(shared_from_this<FX>(),arg,res,fseed,fsens,aseed,asens,output_given);
+      EvaluationMX::create(shared_from_this<FX>(),arg,res,fseed,fsens,aseed,asens,false);
     }
   }
 
   void FXInternal::call(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
 			const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
 			const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-			bool output_given, bool always_inline, bool never_inline){
+			bool always_inline, bool never_inline){
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!never_inline, "SX expressions do not support call-nodes");
     evalSX(arg,res,fseed,fsens,aseed,asens);

@@ -98,13 +98,13 @@ namespace CasADi{
     void call(const MXVector& arg, MXVector& res, 
               const MXVectorVector& fseed, MXVectorVector& fsens, 
               const MXVectorVector& aseed, MXVectorVector& asens,
-              bool output_given, bool always_inline, bool never_inline);
+              bool always_inline, bool never_inline);
     
     /** \brief Call a function, SX type (overloaded) */
     void call(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
               const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
               const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-              bool output_given, bool always_inline, bool never_inline);
+              bool always_inline, bool never_inline);
         
     //@{
     /** \brief Return Hessian function */
