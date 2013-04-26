@@ -133,12 +133,12 @@ namespace CasADi{
     void updateNumSens();
   
     /** \brief Request a number of forward/adjoint derivative directions 
-	This function tries to increase the number of directional derivatives allocated for the function
-	so that the the number at least amounts to "nfwd" and "nadj" for forward and adjoint mode derivatives
-	respectively. The allocated number is never decreased and never increased beyond the number set by 
-	the option "max_number_of_fwd_dir" and "max_number_of_adj_dir".
+        This function tries to increase the number of directional derivatives allocated for the function
+        so that the the number at least amounts to "nfwd" and "nadj" for forward and adjoint mode derivatives
+        respectively. The allocated number is never decreased and never increased beyond the number set by 
+        the option "max_number_of_fwd_dir" and "max_number_of_adj_dir".
       
-	If the number was changed during the call, updateNumSens() is automatically invoked.
+        If the number was changed during the call, updateNumSens() is automatically invoked.
     */
     void requestNumSens(int nfwd, int nadj);
   
@@ -223,16 +223,16 @@ namespace CasADi{
      */
 #ifndef SWIG
     void call(const MXVector& arg, MXVector& res, 
-	      const MXVectorVector& fseed, MXVectorVector& fsens, 
-	      const MXVectorVector& aseed, MXVectorVector& asens);
+              const MXVectorVector& fseed, MXVectorVector& fsens, 
+              const MXVectorVector& aseed, MXVectorVector& asens);
 #else // SWIG
     void call(const MXVector& arg, MXVector& OUTPUT, 
-	      const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
-	      const MXVectorVector& aseed, MXVectorVector& OUTPUT);
+              const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
+              const MXVectorVector& aseed, MXVectorVector& OUTPUT);
 #endif // SWIG
   
     /** \brief  Evaluate symbolically in parallel (matrix graph)
-	paropt: Set of options to be passed to the Parallelizer
+        paropt: Set of options to be passed to the Parallelizer
     */
     std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
 
@@ -258,12 +258,12 @@ namespace CasADi{
      */
 #ifndef SWIG
     void evalSX(const SXMatrixVector& arg, SXMatrixVector& res, 
-		const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
-		const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens);
+                const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
+                const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens);
 #else // SWIG
     void evalSX(const SXMatrixVector& arg, SXMatrixVector& OUTPUT, 
-		const SXMatrixVectorVector& fseed, SXMatrixVectorVector& OUTPUT, 
-		const SXMatrixVectorVector& aseed, SXMatrixVectorVector& OUTPUT);
+                const SXMatrixVectorVector& fseed, SXMatrixVectorVector& OUTPUT, 
+                const SXMatrixVectorVector& aseed, SXMatrixVectorVector& OUTPUT);
 #endif // SWIG
 
     /** \brief Evaluate symbolically with with directional derivatives, MX type
@@ -275,12 +275,12 @@ namespace CasADi{
      */
 #ifndef SWIG
     void evalMX(const MXVector& arg, MXVector& res, 
-		const MXVectorVector& fseed, MXVectorVector& fsens, 
-		const MXVectorVector& aseed, MXVectorVector& asens);
+                const MXVectorVector& fseed, MXVectorVector& fsens, 
+                const MXVectorVector& aseed, MXVectorVector& asens);
 #else // SWIG
     void evalMX(const MXVector& arg, MXVector& OUTPUT, 
-		const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
-		const MXVectorVector& aseed, MXVectorVector& OUTPUT);
+                const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
+                const MXVectorVector& aseed, MXVectorVector& OUTPUT);
 #endif // SWIG  
               
     /** \brief Evaluate symbolically with with directional derivatives, SX type, overloaded
@@ -292,12 +292,12 @@ namespace CasADi{
      */
 #ifndef SWIG
     void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& res, 
-	      const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
-	      const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens);
+              const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
+              const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens);
 #else // SWIG
     void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& OUTPUT, 
-	      const SXMatrixVectorVector& fseed, SXMatrixVectorVector& OUTPUT, 
-	      const SXMatrixVectorVector& aseed, SXMatrixVectorVector& OUTPUT);
+              const SXMatrixVectorVector& fseed, SXMatrixVectorVector& OUTPUT, 
+              const SXMatrixVectorVector& aseed, SXMatrixVectorVector& OUTPUT);
 #endif // SWIG 
     /** \brief Evaluate symbolically with with directional derivatives, MX type, overloaded
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
@@ -308,12 +308,12 @@ namespace CasADi{
      */
 #ifndef SWIG
     void eval(const MXVector& arg, MXVector& res, 
-	      const MXVectorVector& fseed, MXVectorVector& fsens, 
-	      const MXVectorVector& aseed, MXVectorVector& asens);
+              const MXVectorVector& fseed, MXVectorVector& fsens, 
+              const MXVectorVector& aseed, MXVectorVector& asens);
 #else // SWIG
     void eval(const MXVector& arg, MXVector& OUTPUT, 
-	      const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
-	      const MXVectorVector& aseed, MXVectorVector& OUTPUT);
+              const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
+              const MXVectorVector& aseed, MXVectorVector& OUTPUT);
 #endif // SWIG 
 
 #ifndef SWIG
@@ -322,19 +322,19 @@ namespace CasADi{
 #endif // SWIG
   
     /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
-     * 	Returns a function with (1+nfwd)*n_in+nadj*n_out inputs
-     * 	and (1+nfwd)*n_out + nadj*n_in outputs.
-     * 	The first n_in inputs corresponds to nondifferentiated inputs. The next nfwd*n_in inputs
-     * 	corresponds to forward seeds, one direction at a time and the last nadj*n_out inputs
-     * 	corresponds to adjoint seeds, one direction at a time.
-     * 	The first n_out outputs corresponds to nondifferentiated outputs. The next nfwd*n_out outputs
-     * 	corresponds to forward sensitivities, one direction at a time and the last nadj*n_in outputs
-     * 	corresponds to  adjoint sensitivties, one direction at a time.
+     *         Returns a function with (1+nfwd)*n_in+nadj*n_out inputs
+     *         and (1+nfwd)*n_out + nadj*n_in outputs.
+     *         The first n_in inputs corresponds to nondifferentiated inputs. The next nfwd*n_in inputs
+     *         corresponds to forward seeds, one direction at a time and the last nadj*n_out inputs
+     *         corresponds to adjoint seeds, one direction at a time.
+     *         The first n_out outputs corresponds to nondifferentiated outputs. The next nfwd*n_out outputs
+     *         corresponds to forward sensitivities, one direction at a time and the last nadj*n_in outputs
+     *         corresponds to  adjoint sensitivties, one direction at a time.
      *
-     * 	(n_in = getNumInputs(), n_out = getNumOutputs())
+     *         (n_in = getNumInputs(), n_out = getNumOutputs())
      *
-     *	The functions returned are cached, meaning that if called multiple timed with the same value,
-     *	then multiple references to the same function will be returned.
+     *        The functions returned are cached, meaning that if called multiple timed with the same value,
+     *        then multiple references to the same function will be returned.
      */
     FX derivative(int nfwd, int nadj);
 

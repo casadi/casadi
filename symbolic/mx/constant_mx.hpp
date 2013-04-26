@@ -30,12 +30,12 @@
 namespace CasADi{
 
 /** \brief Represents an MX that is only composed of a constant.
-	\author Joel Andersson 
-	\date 2010-2013
+        \author Joel Andersson 
+        \date 2010-2013
 
-	A regular user is not supposed to work with this Node class.
-	This user can call MX(double) directly, or even rely on implicit typecasting.
-	\sa zeros , ones
+        A regular user is not supposed to work with this Node class.
+        This user can call MX(double) directly, or even rely on implicit typecasting.
+        \sa zeros , ones
 */
   class ConstantMX : public MXNode{
   public:
@@ -289,10 +289,10 @@ namespace CasADi{
     if(v_.value!=0){
       // Check if any "holes"
       for(std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k){
-	if(*k<0){
-	  // Do not simplify
-	  return MXNode::getGetNonzeros(sp,nz);
-	}
+        if(*k<0){
+          // Do not simplify
+          return MXNode::getGetNonzeros(sp,nz);
+        }
       }
     }
     return MX::create(new Constant<Value>(sp,v_));
@@ -315,14 +315,14 @@ namespace CasADi{
     } else {
       stream << size1() << "x" << size2() << ": ";
       if(sparsity().dense()){
-	stream << "dense";
+        stream << "dense";
       } else if(sparsity().size()==0){
-	stream << "empty";	  
+        stream << "empty";          
       } else if(sparsity().diagonal()){
-	stream << "diagonal";
+        stream << "diagonal";
       } else {
-	stream << double(size())/sparsity().numel() << " %";
-      }	
+        stream << double(size())/sparsity().numel() << " %";
+      }        
     }
     stream << ")";
   }

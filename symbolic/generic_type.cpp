@@ -66,15 +66,15 @@ GenericType GenericType::from_type(opt_type type) {
   switch(type)
     {
       case OT_INTEGERVECTOR:
-	      return std::vector<int>();
+              return std::vector<int>();
       case OT_BOOLVECTOR:
-	      return std::vector<bool>();
+              return std::vector<bool>();
       case OT_REALVECTOR:
-	      return std::vector<double>();
+              return std::vector<double>();
       case OT_STRINGVECTOR:
-	      return std::vector<std::string>();
+              return std::vector<std::string>();
       default:
-	      casadi_error("empty_from_type. Unsupported type " << type);
+              casadi_error("empty_from_type. Unsupported type " << type);
     }
 }
 
@@ -82,44 +82,44 @@ std::string GenericType::get_type_description(const opt_type &type) {
   switch(type)
     {
       case OT_BOOLEAN:
-	      return "OT_BOOLEAN";
+              return "OT_BOOLEAN";
       case OT_INTEGER:
-	      return "OT_INTEGER";
+              return "OT_INTEGER";
       case OT_REAL:
-	      return "OT_REAL";
+              return "OT_REAL";
       case OT_STRING:
-	      return "OT_STRING";
+              return "OT_STRING";
       case OT_INTEGERVECTOR:
-	      return "OT_INTEGERVECTOR";
+              return "OT_INTEGERVECTOR";
       case OT_BOOLVECTOR:
-	      return "OT_BOOLVECTOR";
+              return "OT_BOOLVECTOR";
       case OT_REALVECTOR:
-	      return "OT_REALVECTOR";
+              return "OT_REALVECTOR";
       case OT_STRINGVECTOR:
-	      return "OT_STRINGVECTOR";
+              return "OT_STRINGVECTOR";
       case OT_DICTIONARY:
-	      return "OT_DICTIONARY";
+              return "OT_DICTIONARY";
       case OT_NLPSOLVER:
-	      return "OT_NLPSOLVER";
+              return "OT_NLPSOLVER";
       case OT_LINEARSOLVER:
-	      return "OT_LINEARSOLVER";
+              return "OT_LINEARSOLVER";
       case OT_INTEGRATOR:
-	      return "OT_INTEGRATOR";
+              return "OT_INTEGRATOR";
       case OT_QPSOLVER:
-	      return "OT_QPSOLVER";
+              return "OT_QPSOLVER";
       case OT_IMPLICITFUNCTION:
-	      return "OT_IMPLICITFUNCTION";
+              return "OT_IMPLICITFUNCTION";
       case OT_JACOBIANGENERATOR:
-	      return "OT_JACOBIANGENERATOR";
+              return "OT_JACOBIANGENERATOR";
       case OT_SPARSITYGENERATOR:
-	      return "OT_SPARSITYGENERATOR";
+              return "OT_SPARSITYGENERATOR";
       case OT_FX:
-	      return "OT_FX";
+              return "OT_FX";
       case OT_VOIDPTR:
-	      return "OT_VOIDPTR";
+              return "OT_VOIDPTR";
       default:
-	      return "OT_UNKNOWN";
-	      
+              return "OT_UNKNOWN";
+              
     }
 };
     

@@ -129,7 +129,7 @@ namespace CasADi{
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 
                            const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
                            const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, 
-			   std::vector<int>& itmp, std::vector<double>& rtmp){evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);}
+                           std::vector<int>& itmp, std::vector<double>& rtmp){evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);}
 
     /** \brief  Evaluate the function, no derivatives*/
     void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
@@ -138,11 +138,11 @@ namespace CasADi{
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
                             const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
                             const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens, 
-			    std::vector<int>& itmp, std::vector<SX>& rtmp){ evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);}
+                            std::vector<int>& itmp, std::vector<SX>& rtmp){ evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);}
 
     /** \brief  Evaluate symbolically (SX), no derivatives */
     void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
-		    std::vector<int>& itmp, std::vector<SX>& rtmp);
+                    std::vector<int>& itmp, std::vector<SX>& rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, 
@@ -255,9 +255,9 @@ namespace CasADi{
     /// Convert scalar to matrix
     inline static MX toMatrix(const MX& x, const CRSSparsity& sp){
       if(x.shape()==sp.shape()){
-	return x;
+        return x;
       } else {
-	return MX(sp,x);
+        return MX(sp,x);
       }
     }
 
@@ -324,8 +324,8 @@ namespace CasADi{
     virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
 
     /** Temporary variables to be used in user algorithms like sorting, 
-	the user is resposible of making sure that use is thread-safe
-	The variable is initialized to zero
+        the user is resposible of making sure that use is thread-safe
+        The variable is initialized to zero
     */
     int temp;
     
@@ -362,7 +362,7 @@ namespace CasADi{
     std::vector<T> ret(v.size());
     for(int i=0; i<v.size(); i++){
       if(v[i]!=0){
-	ret[i] = *v[i];
+        ret[i] = *v[i];
       }
     }
     return ret;
@@ -381,9 +381,9 @@ namespace CasADi{
   void MXNode::clearVector(const std::vector<std::vector<T*> > v){
     for(int i=0; i<v.size(); ++i){
       for(int j=0; j<v[i].size(); ++j){
-	if(v[i][j]!= 0){
-	  v[i][j]->setZero();
-	}
+        if(v[i][j]!= 0){
+          v[i][j]->setZero();
+        }
       }
     }
   }

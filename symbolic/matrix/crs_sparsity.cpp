@@ -46,10 +46,10 @@ namespace CasADi{
       col.resize(nrow*ncol);
       rowind.resize(nrow+1);
       for(int i=0; i<nrow+1; ++i)
-	rowind[i] = i*ncol;
+        rowind[i] = i*ncol;
       for(int i=0; i<nrow; ++i)
-	for(int j=0; j<ncol; ++j)
-	  col[j+i*ncol] = j;
+        for(int j=0; j<ncol; ++j)
+          col[j+i*ncol] = j;
     }
  
     assignCached(nrow, ncol, col, rowind);
@@ -151,7 +151,7 @@ namespace CasADi{
       vector<int>& rowindv = rowindRef();
       colv.push_back(j);
       for(int ii=i; ii<size1(); ++ii){
-	rowindv[ii+1]++;
+        rowindv[ii+1]++;
       }
       return colv.size()-1;
     }
@@ -160,9 +160,9 @@ namespace CasADi{
     int ind;
     for(ind=rowind(i); ind<rowind(i+1); ++ind){ // better: loop from the back to the front
       if(col(ind) == j){
-	return ind; // element exists
+        return ind; // element exists
       } else if(col(ind) > j)
-	break;                // break at the place where the element should be added
+        break;                // break at the place where the element should be added
     }
   
     // Make sure that there no other objects are affected
@@ -396,7 +396,7 @@ namespace CasADi{
     return (*this)->makeDense(mapping);
   }
 
-  std::string CRSSparsity::dimString() 	const { 
+  std::string CRSSparsity::dimString()         const { 
     return (*this)->dimString();
   }
 
@@ -470,7 +470,7 @@ namespace CasADi{
   void CRSSparsity::spy(std::ostream &stream) const {
     for (int i=0;i<size1();++i) {
       for (int j=0;j<size2();++j) {
-	stream << (getNZ(i,j)==-1? "." : "*");
+        stream << (getNZ(i,j)==-1? "." : "*");
       }
       stream << std::endl;
     }
@@ -510,70 +510,70 @@ namespace CasADi{
       // Loop over maching patterns
       for(CachingMap::iterator i=eq.first; i!=eq.second; ++i){
       
-	// Get a weak reference to the cached sparsity pattern
-	WeakRef& wref = i->second;
+        // Get a weak reference to the cached sparsity pattern
+        WeakRef& wref = i->second;
       
-	// Check if the pattern still exists
-	if(wref.alive()){
-	
-	  // Get an owning reference to the cached pattern
-	  CRSSparsity ref = shared_cast<CRSSparsity>(wref.shared());
-	
-	  // Check if the pattern matches
-	  if(ref.isEqual(nrow,ncol,col,rowind)){
-	  
-	    // Found match!
-	    assignNode(ref.get());
-	    return;
+        // Check if the pattern still exists
+        if(wref.alive()){
+        
+          // Get an owning reference to the cached pattern
+          CRSSparsity ref = shared_cast<CRSSparsity>(wref.shared());
+        
+          // Check if the pattern matches
+          if(ref.isEqual(nrow,ncol,col,rowind)){
+          
+            // Found match!
+            assignNode(ref.get());
+            return;
 
-	  } else {
-	    // There are two options, either the pattern has changed or there is a hash collision, so let's rehash the pattern
-	    std::size_t h_ref = ref.hash();
-	  
-	    if(h_ref!=h){ // The sparsity pattern has changed (the most likely event)
+          } else {
+            // There are two options, either the pattern has changed or there is a hash collision, so let's rehash the pattern
+            std::size_t h_ref = ref.hash();
+          
+            if(h_ref!=h){ // The sparsity pattern has changed (the most likely event)
 
-	      // Create a new pattern
-	      assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+              // Create a new pattern
+              assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
 
-	      // Cache this pattern instead of the old one
-	      wref = *this;
+              // Cache this pattern instead of the old one
+              wref = *this;
 
-	      // Recache the old sparsity pattern 
-	      // TODO: recache "ref"
-	      return;
+              // Recache the old sparsity pattern 
+              // TODO: recache "ref"
+              return;
 
-	    } else { // There is a hash colision (unlikely, but possible)
-	      // Leave the pattern alone, continue to the next matching pattern
-	      continue; 
-	    }
-	  }
-	} else {
-	  // Check if one of the other cache entries indeed has a matching sparsity
-	  CachingMap::iterator j=i;
-	  j++; // Start at the next matching key
-	  for(; j!=eq.second; ++j){
-	    if(j->second.alive()){
-	    
-	      // Recover cached sparsity
-	      CRSSparsity ref = shared_cast<CRSSparsity>(j->second.shared());
-	    
-	      // Match found if sparsity matches
-	      if(ref.isEqual(nrow,ncol,col,rowind)){
-		assignNode(ref.get());
-		return;
-	      }
-	    }
-	  }
+            } else { // There is a hash colision (unlikely, but possible)
+              // Leave the pattern alone, continue to the next matching pattern
+              continue; 
+            }
+          }
+        } else {
+          // Check if one of the other cache entries indeed has a matching sparsity
+          CachingMap::iterator j=i;
+          j++; // Start at the next matching key
+          for(; j!=eq.second; ++j){
+            if(j->second.alive()){
+            
+              // Recover cached sparsity
+              CRSSparsity ref = shared_cast<CRSSparsity>(j->second.shared());
+            
+              // Match found if sparsity matches
+              if(ref.isEqual(nrow,ncol,col,rowind)){
+                assignNode(ref.get());
+                return;
+              }
+            }
+          }
 
-	  // The cached entry has been deleted, create a new one
-	  assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
-	
-	  // Cache this pattern
-	  wref = *this;
+          // The cached entry has been deleted, create a new one
+          assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
+        
+          // Cache this pattern
+          wref = *this;
 
-	  // Return
-	  return;
-	}
+          // Return
+          return;
+        }
       }
 
       // END WORKAROUND
@@ -596,11 +596,11 @@ namespace CasADi{
     if(bucket_count_before!=bucket_count_after){
       CachingMap::const_iterator i=cached_.begin();
       while(i!=cached_.end()){
-	if(!i->second.alive()){
-	  i = cached_.erase(i);
-	} else {
-	  i++;
-	}
+        if(!i->second.alive()){
+          i = cached_.erase(i);
+        } else {
+          i++;
+        }
       }
     }
 #endif // USE_CXX11    

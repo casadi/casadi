@@ -228,8 +228,8 @@ namespace CasADi{
     double z = sx*x;
     double t = 1.0/(1.0+0.5*z);
     return 1.-sx*(t*exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+
-								       t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+
-														      t*(-0.82215223+t*0.17087277))))))))));
+                                                                       t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+
+                                                                                                                      t*(-0.82215223+t*0.17087277))))))))));
   }
 #endif // HAS ERF
   
@@ -383,14 +383,14 @@ namespace CasADi{
     /// Function evaluation
     template<typename T> static inline void fcn(const T* x, const T* y, T* f, int n){ 
       for(int i=0; i<n; ++i){
-	BinaryOperation<I>::fcn(*x++,*y++,*f++);
+        BinaryOperation<I>::fcn(*x++,*y++,*f++);
       }
     }
   
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T* x, const T* y, const T* f, T* d, int n){ 
       for(int i=0; i<n; ++i, d+=2){
-	BinaryOperation<I>::der(*x++,*y++,*f++,d);
+        BinaryOperation<I>::der(*x++,*y++,*f++,d);
       }
     }
   };
@@ -401,14 +401,14 @@ namespace CasADi{
     /// Function evaluation
     template<typename T> static inline void fcn(const T* x, const T& y, T* f, int n){ 
       for(int i=0; i<n; ++i){
-	BinaryOperation<I>::fcn(*x++,y,*f++);
+        BinaryOperation<I>::fcn(*x++,y,*f++);
       }
     }
   
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T* x, const T& y, const T* f, T* d, int n){ 
       for(int i=0; i<n; ++i, d+=2){
-	BinaryOperation<I>::der(*x++,y,*f++,d);
+        BinaryOperation<I>::der(*x++,y,*f++,d);
       }
     }
   };
@@ -419,14 +419,14 @@ namespace CasADi{
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, const T* y, T* f, int n){ 
       for(int i=0; i<n; ++i){
-	BinaryOperation<I>::fcn(x,*y++,*f++);
+        BinaryOperation<I>::fcn(x,*y++,*f++);
       }
     }
   
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T& x, const T* y, const T* f, T* d, int n){ 
       for(int i=0; i<n; ++i, d+=2){
-	BinaryOperation<I>::der(x,*y++,*f++,d);
+        BinaryOperation<I>::der(x,*y++,*f++,d);
       }
     }
   };

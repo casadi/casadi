@@ -115,8 +115,8 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
       
       // Skip to the next variable if its an alias
       if(alias.compare("alias") == 0 || alias.compare("negatedAlias") == 0)
-	continue;
-	  
+        continue;
+          
       // Get the name
       const XMLNode& nn = vnode["QualifiedName"];
       string qn = qualifiedName(nn);
@@ -126,45 +126,45 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
       
       // Add variable, if not already added
       if(it == varmap_.end()){
-	
-	// Create variable
-	Variable var(name);
-	
-	// Value reference
-	var.setValueReference(valueReference);
-	
-	// Variability
-	if(variability.compare("constant")==0)
-	  var.setVariability(CONSTANT);
-	else if(variability.compare("parameter")==0)
-	  var.setVariability(PARAMETER);
-	else if(variability.compare("discrete")==0)
-	  var.setVariability(DISCRETE);
-	else if(variability.compare("continuous")==0)
-	  var.setVariability(CONTINUOUS);
-	else throw CasadiException("Unknown variability");
+        
+        // Create variable
+        Variable var(name);
+        
+        // Value reference
+        var.setValueReference(valueReference);
+        
+        // Variability
+        if(variability.compare("constant")==0)
+          var.setVariability(CONSTANT);
+        else if(variability.compare("parameter")==0)
+          var.setVariability(PARAMETER);
+        else if(variability.compare("discrete")==0)
+          var.setVariability(DISCRETE);
+        else if(variability.compare("continuous")==0)
+          var.setVariability(CONTINUOUS);
+        else throw CasadiException("Unknown variability");
     
-	// Causality
-	if(causality.compare("input")==0)
-	  var.setCausality(INPUT);
-	else if(causality.compare("output")==0)
-	  var.setCausality(OUTPUT);
-	else if(causality.compare("internal")==0)
-	  var.setCausality(INTERNAL);
-	else throw CasadiException("Unknown causality");
-	
-	// Alias
-	if(alias.compare("noAlias")==0)
-	  var.setAlias(NO_ALIAS);
-	else if(alias.compare("alias")==0)
-	  var.setAlias(ALIAS);
-	else if(alias.compare("negatedAlias")==0)
-	  var.setAlias(NEGATED_ALIAS);
-	else throw CasadiException("Unknown alias");
-	
-	// Other properties
-	if(vnode.hasChild("Real")){
-	  const XMLNode& props = vnode["Real"];
+        // Causality
+        if(causality.compare("input")==0)
+          var.setCausality(INPUT);
+        else if(causality.compare("output")==0)
+          var.setCausality(OUTPUT);
+        else if(causality.compare("internal")==0)
+          var.setCausality(INTERNAL);
+        else throw CasadiException("Unknown causality");
+        
+        // Alias
+        if(alias.compare("noAlias")==0)
+          var.setAlias(NO_ALIAS);
+        else if(alias.compare("alias")==0)
+          var.setAlias(ALIAS);
+        else if(alias.compare("negatedAlias")==0)
+          var.setAlias(NEGATED_ALIAS);
+        else throw CasadiException("Unknown alias");
+        
+        // Other properties
+        if(vnode.hasChild("Real")){
+          const XMLNode& props = vnode["Real"];
           props.readAttribute("unit",var.unit(),false);
           props.readAttribute("displayUnit",var.displayUnit(),false);
           props.readAttribute("min",var.min(),false);
@@ -173,30 +173,30 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
           props.readAttribute("nominal",var.nominal(),false);
           props.readAttribute("free",var.free(),false);
           props.readAttribute("initialGuess",var.initialGuess(),false);
-	}
-	
-	// Variable category
-	if(vnode.hasChild("VariableCategory")){
-	  string cat = vnode["VariableCategory"].getText();
-	  if(cat.compare("derivative")==0)
-	    var.setCategory(CAT_DERIVATIVE);
-	  else if(cat.compare("state")==0)
-	    var.setCategory(CAT_STATE);
-	  else if(cat.compare("dependentConstant")==0)
-	    var.setCategory(CAT_DEPENDENT_CONSTANT);
-	  else if(cat.compare("independentConstant")==0)
-	    var.setCategory(CAT_INDEPENDENT_CONSTANT);
-	  else if(cat.compare("dependentParameter")==0)
-	    var.setCategory(CAT_DEPENDENT_PARAMETER);
-	  else if(cat.compare("independentParameter")==0)
-	    var.setCategory(CAT_INDEPENDENT_PARAMETER);
-	  else if(cat.compare("algebraic")==0)
-	    var.setCategory(CAT_ALGEBRAIC);
-	  else throw CasadiException("Unknown variable category: " + cat);
-	}
-	
-	// Add to list of variables
-	addVariable(qn,var);
+        }
+        
+        // Variable category
+        if(vnode.hasChild("VariableCategory")){
+          string cat = vnode["VariableCategory"].getText();
+          if(cat.compare("derivative")==0)
+            var.setCategory(CAT_DERIVATIVE);
+          else if(cat.compare("state")==0)
+            var.setCategory(CAT_STATE);
+          else if(cat.compare("dependentConstant")==0)
+            var.setCategory(CAT_DEPENDENT_CONSTANT);
+          else if(cat.compare("independentConstant")==0)
+            var.setCategory(CAT_INDEPENDENT_CONSTANT);
+          else if(cat.compare("dependentParameter")==0)
+            var.setCategory(CAT_DEPENDENT_PARAMETER);
+          else if(cat.compare("independentParameter")==0)
+            var.setCategory(CAT_INDEPENDENT_PARAMETER);
+          else if(cat.compare("algebraic")==0)
+            var.setCategory(CAT_ALGEBRAIC);
+          else throw CasadiException("Unknown variable category: " + cat);
+        }
+        
+        // Add to list of variables
+        addVariable(qn,var);
       }
     }
   }
@@ -265,7 +265,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
       // Add the differential equations
       for(int i=0; i<inode.size(); ++i){
         bool has_der = false;
-	initial.append(readExpr(inode[i],has_der,eliminate_dependent));
+        initial.append(readExpr(inode[i],has_der,eliminate_dependent));
       }
     }
   }
@@ -321,10 +321,10 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
 
       // Get the type
       if(onode.checkName("opt:ObjectiveFunction")){ // mayer term
-	try{
-	  // Add components
-	  for(int i=0; i<onode.size(); ++i){
-	    const XMLNode& var = onode[i];
+        try{
+          // Add components
+          for(int i=0; i<onode.size(); ++i){
+            const XMLNode& var = onode[i];
             
             // If string literal, ignore
             if(var.checkName("exp:StringLiteral"))
@@ -332,19 +332,19 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
             
             // Read expression
             bool has_der = false;
-	    SX v = readExpr(var,has_der,eliminate_dependent);
+            SX v = readExpr(var,has_der,eliminate_dependent);
             casadi_assert(!has_der);
-	    mterm.append(v);
-	  }
-	} catch(exception& ex){
-	  if(verbose){
+            mterm.append(v);
+          }
+        } catch(exception& ex){
+          if(verbose){
             throw CasadiException(std::string("addObjectiveFunction failed: ") + ex.what());
-	  }
-	}
+          }
+        }
       } else if(onode.checkName("opt:IntegrandObjectiveFunction")){
-	try{
-	  for(int i=0; i<onode.size(); ++i){
-	    const XMLNode& var = onode[i];
+        try{
+          for(int i=0; i<onode.size(); ++i){
+            const XMLNode& var = onode[i];
 
             // If string literal, ignore
             if(var.checkName("exp:StringLiteral"))
@@ -353,13 +353,13 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
             // Read expression
             bool has_der = false;
             SX v = readExpr(var,has_der,eliminate_dependent);
-	    lterm.append(v);
-	  }
-	} catch(exception& ex){
+            lterm.append(v);
+          }
+        } catch(exception& ex){
           throw CasadiException(std::string("addIntegrandObjectiveFunction failed: ") + ex.what());
-	}
+        }
       } else if(onode.checkName("opt:IntervalStartTime")) {
-	// Ignore, treated above
+        // Ignore, treated above
       } else if(onode.checkName("opt:IntervalFinalTime")) {
         // Ignore, treated above
       } else if(onode.checkName("opt:TimePoints")) {
@@ -394,34 +394,34 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
         }
         
       } else if(onode.checkName("opt:Constraints") || onode.checkName("opt:PathConstraints")) {
-	
+        
         bool has_der = false; // Should we check that this remains false, i.e. should state derivatives be allowed in constraints?
-	for(int i=0; i<onode.size(); ++i){
-	  const XMLNode& constr_i = onode[i];
-	  if(constr_i.checkName("opt:ConstraintLeq")){
-	    SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-	    SX ub = readExpr(constr_i[1],has_der,eliminate_dependent);
-	    path.append(ex-ub);
-	    path_min.append(-numeric_limits<double>::infinity());
-	    path_max.append(0.);
-	  } else if(constr_i.checkName("opt:ConstraintGeq")){
-	    SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-	    SX lb = readExpr(constr_i[1],has_der,eliminate_dependent);
-	    path.append(ex-lb);
-	    path_min.append(0.);
-	    path_max.append(numeric_limits<double>::infinity());
-	  } else if(constr_i.checkName("opt:ConstraintEq")){
-	    SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-	    SX eq = readExpr(constr_i[1],has_der,eliminate_dependent);
-	    path.append(ex-eq);
-	    path_min.append(0.);
-	    path_max.append(0.);
-	  } else {
-	    cerr << "unknown constraint type" << constr_i.getName() << endl;
-	    throw CasadiException("SymbolicOCP::addConstraints");
-	  }
-	}
-	
+        for(int i=0; i<onode.size(); ++i){
+          const XMLNode& constr_i = onode[i];
+          if(constr_i.checkName("opt:ConstraintLeq")){
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX ub = readExpr(constr_i[1],has_der,eliminate_dependent);
+            path.append(ex-ub);
+            path_min.append(-numeric_limits<double>::infinity());
+            path_max.append(0.);
+          } else if(constr_i.checkName("opt:ConstraintGeq")){
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX lb = readExpr(constr_i[1],has_der,eliminate_dependent);
+            path.append(ex-lb);
+            path_min.append(0.);
+            path_max.append(numeric_limits<double>::infinity());
+          } else if(constr_i.checkName("opt:ConstraintEq")){
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX eq = readExpr(constr_i[1],has_der,eliminate_dependent);
+            path.append(ex-eq);
+            path_min.append(0.);
+            path_max.append(0.);
+          } else {
+            cerr << "unknown constraint type" << constr_i.getName() << endl;
+            throw CasadiException("SymbolicOCP::addConstraints");
+          }
+        }
+        
       } else throw CasadiException(string("SymbolicOCP::addOptimization: Unknown node ")+onode.getName());
     }
   }

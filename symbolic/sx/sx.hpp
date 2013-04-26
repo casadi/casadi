@@ -63,26 +63,26 @@ namespace CasADi{
     /// Constructors
     /** \brief Default constructor (not-a-number)
 
-	Object is initialised as not-a-number.
+        Object is initialised as not-a-number.
     */
     SX();
     /** \brief Numerical constant constructor
-	\param val Numerical value
+        \param val Numerical value
     */
     SX(double val);
     
     /** \brief Symbolic constructor
- 	\param name Name of the symbol
+         \param name Name of the symbol
 
-	This is the name that wil be used by the "operator<<" and "toSTring" methods.
-	The name is not used as identifier; you may construct distinct SX objects with non-unique names.
+        This is the name that wil be used by the "operator<<" and "toSTring" methods.
+        The name is not used as identifier; you may construct distinct SX objects with non-unique names.
     */
     explicit SX(const std::string& name); // variable (must be explicit, otherwise 0/NULL would be ambigous)
     /** \brief Symbolic constructor
- 	\param Name of the symbol
+         \param Name of the symbol
 
-	This is the name that wil be used by the "operator<<" and "toSTring" methods.
-	The name is not used as identifier; you may construct distinct SX objects with non-unique names.
+        This is the name that wil be used by the "operator<<" and "toSTring" methods.
+        The name is not used as identifier; you may construct distinct SX objects with non-unique names.
     */
 #ifndef SWIG
 

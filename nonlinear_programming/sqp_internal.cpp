@@ -380,14 +380,14 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         double meritmax = *max_element(merit_mem_.begin(), merit_mem_.end());
         if (L1merit_cand <= meritmax + t * c1_ * L1dir){
           // Accepting candidate
-	  log("Line-search completed, candidate accepted");
+          log("Line-search completed, candidate accepted");
           break;
         }
       
         // Line-search not successful, but we accept it.
         if(ls_iter == maxiter_ls_){
           ls_success = false;
-	  log("Line-search completed, maximum number of iterations");
+          log("Line-search completed, maximum number of iterations");
           break;
         }
       
@@ -666,9 +666,9 @@ void SQPInternal::eval_f(const std::vector<double>& x, double& f){
 }
   
 void SQPInternal::solve_QP(const Matrix<double>& H, const std::vector<double>& g,
-			   const std::vector<double>& lbx, const std::vector<double>& ubx,
-			   const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
-			   std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt){
+                           const std::vector<double>& lbx, const std::vector<double>& ubx,
+                           const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
+                           std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt){
 
   // Pass data to QP solver
   qp_solver_.setInput(H, QP_H);

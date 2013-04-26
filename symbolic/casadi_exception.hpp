@@ -32,20 +32,20 @@
 namespace CasADi{
 
 /** \brief  Casadi exception class
-	\author Joel Andersson 
-	\date 2010
-	Example for simple exception throwing:
-	\code
-		throw CasadiException("This is a nasty error");
-	\endcode
-	Example for exception chaining:
-	\code
-		try {
-			throw CasadiException("This is a nasty error");
-		catch (CasadiException &e) {
-			throw CasadiException("Serious error.") << e;
-		}
-	\endcode
+        \author Joel Andersson 
+        \date 2010
+        Example for simple exception throwing:
+        \code
+                throw CasadiException("This is a nasty error");
+        \endcode
+        Example for exception chaining:
+        \code
+                try {
+                        throw CasadiException("This is a nasty error");
+                catch (CasadiException &e) {
+                        throw CasadiException("Serious error.") << e;
+                }
+        \endcode
 */
 class CasadiException : public std::exception{
   public:

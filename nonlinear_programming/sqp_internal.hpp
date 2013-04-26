@@ -150,9 +150,9 @@ public:
   
   // Solve the QP subproblem
   virtual void solve_QP(const Matrix<double>& H, const std::vector<double>& g,
-			const std::vector<double>& lbx, const std::vector<double>& ubx,
-			const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
-			std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt);
+                        const std::vector<double>& lbx, const std::vector<double>& ubx,
+                        const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
+                        std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt);
   
   // Calculate the L1-norm of the primal infeasibility
   double primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,

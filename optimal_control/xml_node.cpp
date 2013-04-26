@@ -107,18 +107,18 @@ void XMLNode::addNode(TiXmlNode* n){
       int childtype = child->Type();  
 
       if(childtype == TiXmlNode::ELEMENT){
-	XMLNode newnode;
-	newnode.addNode(child);
+        XMLNode newnode;
+        newnode.addNode(child);
         children_.push_back(newnode);
         child_indices_[newnode.getName()] = ch;
       } else if(childtype == TiXmlNode::COMMENT){
-	comment_ = child->Value();
+        comment_ = child->Value();
       } else if(childtype == TiXmlNode::TEXT){
-	text_ = child->ToText()->Value();
+        text_ = child->ToText()->Value();
       } else if (childtype == TiXmlNode::DECLARATION){
-	cout << "Warning: Skipped TiXmlNode::DECLARATION" << endl;
+        cout << "Warning: Skipped TiXmlNode::DECLARATION" << endl;
       } else {
-	throw CasadiException("Error in XMLNode::addNode: Unknown node type");
+        throw CasadiException("Error in XMLNode::addNode: Unknown node type");
       }
   }
 }

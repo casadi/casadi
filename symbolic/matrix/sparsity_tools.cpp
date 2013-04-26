@@ -52,16 +52,16 @@ namespace CasADi{
 
     int c=0;
     int t=0;
-    std::vector< int >  	col((n*(n+1))/2,0);
+    std::vector< int >          col((n*(n+1))/2,0);
     for (int i=0;i<(n*(n+1))/2;i++) {
       col[i]=t++;
       if (t>c) {
-	t=0;
-	c++;
+        t=0;
+        c++;
       }
     }
 
-    std::vector< int >  	rowind(n+1,0);
+    std::vector< int >          rowind(n+1,0);
     c=0;
     for (int i=1;i<n+1;i++)
       rowind[i]=rowind[i-1]+1+(c++);
@@ -91,14 +91,14 @@ namespace CasADi{
   
     int nc = n-(p<0? -p : p);
   
-    std::vector< int >  	col(nc);
+    std::vector< int >          col(nc);
   
     int offset = max(p,0);
     for (int i=0;i<nc;i++) {
       col[i]=i+offset;
     }
   
-    std::vector< int >  	rowind(n+1);
+    std::vector< int >          rowind(n+1);
   
     offset = min(p,0);
     for (int i=0;i<n+1;i++) {
@@ -129,21 +129,21 @@ namespace CasADi{
     int k=0;
     try {
       for (k=0; k < row.size(); k++) {
-	// resulting rowind: fill up rowind entries with copies
-	while (z<row[k])
-	  rowind.at(++z)=cnt;
+        // resulting rowind: fill up rowind entries with copies
+        while (z<row[k])
+          rowind.at(++z)=cnt;
         
-	// resulting rowind: add col.size() at each row[k]
-	rowind.at(row[k]+1)=(cnt+=col.size());
+        // resulting rowind: add col.size() at each row[k]
+        rowind.at(row[k]+1)=(cnt+=col.size());
       }
       while (z<nrow)
-	rowind.at(++z)=cnt;                 
+        rowind.at(++z)=cnt;                 
     }
     catch (out_of_range& oor) {
       casadi_error(
-		   "sp_rowcol: out-of-range error." << endl <<
-		   "The " << k << "th entry of row (" << row[k] << ") was bigger or equal to the specified total number of rows (" << nrow << ")"
-		   );
+                   "sp_rowcol: out-of-range error." << endl <<
+                   "The " << k << "th entry of row (" << row[k] << ") was bigger or equal to the specified total number of rows (" << nrow << ")"
+                   );
     }
     return CRSSparsity(nrow, ncol, col_new, rowind);
   }
@@ -161,10 +161,10 @@ namespace CasADi{
 
   CRSSparsity reshape(const CRSSparsity& a, int n, int m){
     casadi_assert_message(a.numel() == n*m,
-			  "reshape: number of elements must remain the same." << endl <<
-			  "Input argument has shape " << a.size1() << " x " << a.size2() << " =  " << a.numel() << ", while you request a reshape to " <<
-			  n << " x " << m << " =  " << n*m
-			  );
+                          "reshape: number of elements must remain the same." << endl <<
+                          "Input argument has shape " << a.size1() << " x " << a.size2() << " =  " << a.numel() << ", while you request a reshape to " <<
+                          n << " x " << m << " =  " << n*m
+                          );
 
     // our strategy is: (col,rowind) -> (col,row) -> modulus calculus -> (col_new, row_new) -> sp_NZ
     std::vector<int> row = a.getRow();
@@ -214,9 +214,9 @@ namespace CasADi{
     int cnt=0;
     for (int k=0;k<row.size();k++) {
       if (row[k] + offset > col[k]) {
-	new_col[cnt]=col[k];
-	new_row[cnt]=row[k];
-	cnt++;
+        new_col[cnt]=col[k];
+        new_row[cnt]=row[k];
+        cnt++;
       }
     }
     return sp_triplet(a.size1(), a.size2(), new_row, new_col);
@@ -277,14 +277,14 @@ namespace CasADi{
       // Find offset index
       int el=0;
       for(int i=0; i<nrow; ++i){
-	while(el<row.size() && row[el]==i) el++; 
-	r_rowind[i+1] = el;
+        while(el<row.size() && row[el]==i) el++; 
+        r_rowind[i+1] = el;
       }
     
       // Identity mapping
       mapping.resize(col.size());
       for(int k=0; k<col.size(); ++k)
-	mapping[k] = k;
+        mapping[k] = k;
     
       // Quick return
       return ret;
@@ -350,28 +350,28 @@ namespace CasADi{
       // Loop over nonzero elements of the row
       while(it!=mapping1.end() && row[*it]==i){
 
-	// Get the element
-	int el = *it;
-	it++;
+        // Get the element
+        int el = *it;
+        it++;
 
-	// Get the column
-	int j = col[el];
+        // Get the column
+        int j = col[el];
       
-	// If not a duplicate, save to return matrix
-	if(j!=j_prev)
-	  r_col[r_el++] = j;
+        // If not a duplicate, save to return matrix
+        if(j!=j_prev)
+          r_col[r_el++] = j;
       
-	if(invert_mapping){
-	  // Save to the inverse mapping
-	  mapping2[el] = r_el-1;        
-	} else {
-	  // If not a duplicate, save to the mapping vector
-	  if(j!=j_prev)
-	    mapping1[r_el-1] = el;
-	}
+        if(invert_mapping){
+          // Save to the inverse mapping
+          mapping2[el] = r_el-1;        
+        } else {
+          // If not a duplicate, save to the mapping vector
+          if(j!=j_prev)
+            mapping1[r_el-1] = el;
+        }
       
-	// Save column
-	j_prev = j;
+        // Save column
+        j_prev = j;
       }
     
       // Update row offset

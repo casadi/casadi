@@ -107,7 +107,7 @@ namespace CasADi{
     if(hasSetOption("monitor")){
       const std::vector<std::string>& monitors = getOption("monitor");
       for (std::vector<std::string>::const_iterator it=monitors.begin();it!=monitors.end();it++) {
-	monitors_.insert(*it);
+        monitors_.insert(*it);
       }
     }
   
@@ -166,30 +166,30 @@ namespace CasADi{
       stream << " Input: " << input().dimString() << endl;
     } else{
       if (inputScheme_==SCHEME_unknown) {
-	stream << " Inputs (" << getNumInputs() << "):" << std::endl;
-	for (int i=0;i<getNumInputs();i++) {
-	  stream << "  " << i << ". " << input(i).dimString() << std::endl;
-	}
+        stream << " Inputs (" << getNumInputs() << "):" << std::endl;
+        for (int i=0;i<getNumInputs();i++) {
+          stream << "  " << i << ". " << input(i).dimString() << std::endl;
+        }
       } else {
-	stream << " Inputs (" << getSchemeName(inputScheme_) << ": " << getNumInputs() << "):" << std::endl;
-	for (int i=0;i<getNumInputs();i++) {
-	  stream << "  " << i  << ". (" << getSchemeEntryEnumName(inputScheme_,i) << " aka " << getSchemeEntryName(inputScheme_,i) << ")   " << input(i).dimString() << std::endl;
-	}
+        stream << " Inputs (" << getSchemeName(inputScheme_) << ": " << getNumInputs() << "):" << std::endl;
+        for (int i=0;i<getNumInputs();i++) {
+          stream << "  " << i  << ". (" << getSchemeEntryEnumName(inputScheme_,i) << " aka " << getSchemeEntryName(inputScheme_,i) << ")   " << input(i).dimString() << std::endl;
+        }
       }
     }
     if (getNumOutputs()==1) {
       stream << " Output: " << output().dimString() << endl;
     } else {
       if (outputScheme_==SCHEME_unknown) {
-	stream << " Outputs (" << getNumOutputs() << "):" << std::endl;
-	for (int i=0;i<getNumOutputs();i++) {
-	  stream << "  " << i << ". " << output(i).dimString() << std::endl;
-	}
+        stream << " Outputs (" << getNumOutputs() << "):" << std::endl;
+        for (int i=0;i<getNumOutputs();i++) {
+          stream << "  " << i << ". " << output(i).dimString() << std::endl;
+        }
       } else { 
-	stream << " Outputs (" << getSchemeName(outputScheme_) << ": " << getNumOutputs() << "):" << std::endl;
-	for (int i=0;i<getNumOutputs();i++) {
-	  stream << "  " << i << ". (" << getSchemeEntryEnumName(outputScheme_,i) << " aka " << getSchemeEntryName(outputScheme_,i) << ")   " << output(i).dimString() << std::endl;
-	}
+        stream << " Outputs (" << getSchemeName(outputScheme_) << ": " << getNumOutputs() << "):" << std::endl;
+        for (int i=0;i<getNumOutputs();i++) {
+          stream << "  " << i << ". (" << getSchemeEntryEnumName(outputScheme_,i) << " aka " << getSchemeEntryName(outputScheme_,i) << ")   " << output(i).dimString() << std::endl;
+        }
       }
     }
   }
@@ -555,118 +555,118 @@ namespace CasADi{
       
       // Loop over all coarse seed directions from the coloring
       for(int csd=0; csd<D.size1(); ++csd) {
-	// The maximum number of fine blocks contained in one coarse block
-	int n_fine_blocks_max = fine_lookup[coarse[1]]-fine_lookup[coarse[0]];
+        // The maximum number of fine blocks contained in one coarse block
+        int n_fine_blocks_max = fine_lookup[coarse[1]]-fine_lookup[coarse[0]];
          
-	int fci_offset = 0;
-	int fci_cap = bvec_size-bvec_i;
+        int fci_offset = 0;
+        int fci_cap = bvec_size-bvec_i;
          
-	// Flag to indicate if all fine blocks have been handled
-	bool f_finished = false;
+        // Flag to indicate if all fine blocks have been handled
+        bool f_finished = false;
          
-	// Loop while not finished
-	while(!f_finished) {
+        // Loop while not finished
+        while(!f_finished) {
     
-	  // Loop over all coarse columns that are found in the coloring for this coarse seed direction
-	  for(int k=D.rowind()[csd]; k<D.rowind()[csd+1]; ++k){
-	    int cci = D.col()[k];
+          // Loop over all coarse columns that are found in the coloring for this coarse seed direction
+          for(int k=D.rowind()[csd]; k<D.rowind()[csd+1]; ++k){
+            int cci = D.col()[k];
              
-	    // The first and last columns of the fine block
-	    int fci_start = fine_lookup[coarse[cci]];
-	    int fci_end   = fine_lookup[coarse[cci+1]];
+            // The first and last columns of the fine block
+            int fci_start = fine_lookup[coarse[cci]];
+            int fci_end   = fine_lookup[coarse[cci+1]];
              
-	    // Local counter that modifies index into bvec
-	    int bvec_i_mod = 0;
+            // Local counter that modifies index into bvec
+            int bvec_i_mod = 0;
              
-	    int value = -bvec_i + fci_offset + fci_start;
+            int value = -bvec_i + fci_offset + fci_start;
              
-	    //casadi_assert(value>=0);
+            //casadi_assert(value>=0);
              
-	    // Loop over the columns of the fine block
-	    for (int fci = fci_offset;fci<min(fci_end-fci_start,fci_cap);++fci) {
+            // Loop over the columns of the fine block
+            for (int fci = fci_offset;fci<min(fci_end-fci_start,fci_cap);++fci) {
              
-	      // Loop over the coarse block rows that appear in the coloring for the current coarse seed direction
-	      for (int cri=r.rowind()[cci];cri<r.rowind()[cci+1];++cri) {
-		lookup_row.push_back(r.col()[cri]);
-		lookup_col.push_back(bvec_i+bvec_i_mod);
-		lookup_value.push_back(value);
-	      }
+              // Loop over the coarse block rows that appear in the coloring for the current coarse seed direction
+              for (int cri=r.rowind()[cci];cri<r.rowind()[cci+1];++cri) {
+                lookup_row.push_back(r.col()[cri]);
+                lookup_col.push_back(bvec_i+bvec_i_mod);
+                lookup_value.push_back(value);
+              }
 
-	      // Toggle on seeds
-	      bvec_toggle(seed_v,fine[fci+fci_start],fine[fci+fci_start+1],bvec_i+bvec_i_mod);
-	      bvec_i_mod++;
-	    }
-	  }
+              // Toggle on seeds
+              bvec_toggle(seed_v,fine[fci+fci_start],fine[fci+fci_start+1],bvec_i+bvec_i_mod);
+              bvec_i_mod++;
+            }
+          }
            
-	  // Bump bvec_i for next major coarse direction
-	  bvec_i+= min(n_fine_blocks_max,fci_cap);
+          // Bump bvec_i for next major coarse direction
+          bvec_i+= min(n_fine_blocks_max,fci_cap);
            
-	  // Check if bvec buffer is full
-	  if (bvec_i==bvec_size || csd==D.size1()-1) {
-	    // Calculate sparsity for bvec_size directions at once
+          // Check if bvec buffer is full
+          if (bvec_i==bvec_size || csd==D.size1()-1) {
+            // Calculate sparsity for bvec_size directions at once
               
-	    // Statistics
-	    nsweeps+=1;
+            // Statistics
+            nsweeps+=1;
               
-	    // Construct lookup table
-	    IMatrix lookup = IMatrix::sparse(lookup_row,lookup_col,lookup_value,coarse.size(),bvec_size);
+            // Construct lookup table
+            IMatrix lookup = IMatrix::sparse(lookup_row,lookup_col,lookup_value,coarse.size(),bvec_size);
 
-	    std::reverse(lookup_row.begin(),lookup_row.end());
-	    std::reverse(lookup_col.begin(),lookup_col.end());
-	    std::reverse(lookup_value.begin(),lookup_value.end());
-	    IMatrix duplicates = IMatrix::sparse(lookup_row,lookup_col,lookup_value,coarse.size(),bvec_size) - lookup;
-	    makeSparse(duplicates);
-	    SubMatrix<Matrix<int>,CRSSparsity,int> temp(lookup,duplicates.sparsity(),0);
-	    temp = -bvec_size;
+            std::reverse(lookup_row.begin(),lookup_row.end());
+            std::reverse(lookup_col.begin(),lookup_col.end());
+            std::reverse(lookup_value.begin(),lookup_value.end());
+            IMatrix duplicates = IMatrix::sparse(lookup_row,lookup_col,lookup_value,coarse.size(),bvec_size) - lookup;
+            makeSparse(duplicates);
+            SubMatrix<Matrix<int>,CRSSparsity,int> temp(lookup,duplicates.sparsity(),0);
+            temp = -bvec_size;
               
-	    // Propagate the dependencies
-	    spEvaluate(true);
+            // Propagate the dependencies
+            spEvaluate(true);
               
-	    // Temporary bit work vector
-	    bvec_t spsens;
+            // Temporary bit work vector
+            bvec_t spsens;
               
-	    // Loop over the rows of coarse blocks
-	    for (int cri=0;cri<coarse.size()-1;++cri) {
+            // Loop over the rows of coarse blocks
+            for (int cri=0;cri<coarse.size()-1;++cri) {
 
-	      // Loop over the rows of fine blocks within the current coarse block
-	      for (int fri=fine_lookup[coarse[cri]];fri<fine_lookup[coarse[cri+1]];++fri) {
-		// Lump individual sensitivities together into fine block
-		bvec_or(sens_v,spsens,fine[fri],fine[fri+1]);
+              // Loop over the rows of fine blocks within the current coarse block
+              for (int fri=fine_lookup[coarse[cri]];fri<fine_lookup[coarse[cri+1]];++fri) {
+                // Lump individual sensitivities together into fine block
+                bvec_or(sens_v,spsens,fine[fri],fine[fri+1]);
   
-		// Loop over all bvec_bits
-		for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
-		  if (spsens & (bvec_t(1) << bvec_i)) {
-		    // if dependency is found, add it to the new sparsity pattern
-		    int lk = lookup.elem(cri,bvec_i);
-		    if (lk>-bvec_size) {
-		      jcol.push_back(bvec_i+lk);
-		      jrow.push_back(fri);
-		      jcol.push_back(fri);
-		      jrow.push_back(bvec_i+lk);
-		    }
-		  }
-		}
-	      }
-	    }
+                // Loop over all bvec_bits
+                for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
+                  if (spsens & (bvec_t(1) << bvec_i)) {
+                    // if dependency is found, add it to the new sparsity pattern
+                    int lk = lookup.elem(cri,bvec_i);
+                    if (lk>-bvec_size) {
+                      jcol.push_back(bvec_i+lk);
+                      jrow.push_back(fri);
+                      jcol.push_back(fri);
+                      jrow.push_back(bvec_i+lk);
+                    }
+                  }
+                }
+              }
+            }
               
-	    // Clean seed vector, ready for next bvec sweep
-	    for(int i=0; i<nz; ++i) seed_v[i]=0;
+            // Clean seed vector, ready for next bvec sweep
+            for(int i=0; i<nz; ++i) seed_v[i]=0;
               
-	    // Clean lookup table
-	    lookup_row.clear();
-	    lookup_col.clear();
-	    lookup_value.clear();
-	  }
+            // Clean lookup table
+            lookup_row.clear();
+            lookup_col.clear();
+            lookup_value.clear();
+          }
            
-	  if (n_fine_blocks_max>fci_cap) {
-	    fci_offset += min(n_fine_blocks_max,fci_cap);
-	    bvec_i = 0;
-	    fci_cap = bvec_size;
-	  } else {
-	    f_finished = true;
-	  }
+          if (n_fine_blocks_max>fci_cap) {
+            fci_offset += min(n_fine_blocks_max,fci_cap);
+            bvec_i = 0;
+            fci_cap = bvec_size;
+          } else {
+            f_finished = true;
+          }
          
-	}
+        }
          
       }
 
@@ -834,117 +834,117 @@ namespace CasADi{
       // Loop over all coarse seed directions from the coloring
       for(int csd=0; csd<D.size1(); ++csd) {
       
-	// The maximum number of fine blocks contained in one coarse block
-	int n_fine_blocks_max = fine_col_lookup[coarse_col[1]]-fine_col_lookup[coarse_col[0]];
+        // The maximum number of fine blocks contained in one coarse block
+        int n_fine_blocks_max = fine_col_lookup[coarse_col[1]]-fine_col_lookup[coarse_col[0]];
          
-	int fci_offset = 0;
-	int fci_cap = bvec_size-bvec_i;
+        int fci_offset = 0;
+        int fci_cap = bvec_size-bvec_i;
          
-	// Flag to indicate if all fine blocks have been handled
-	bool f_finished = false;
+        // Flag to indicate if all fine blocks have been handled
+        bool f_finished = false;
          
-	// Loop while not finished
-	while(!f_finished) {
+        // Loop while not finished
+        while(!f_finished) {
     
-	  // Loop over all coarse columns that are found in the coloring for this coarse seed direction
-	  for(int k=D.rowind()[csd]; k<D.rowind()[csd+1]; ++k){
-	    int cci = D.col()[k];
+          // Loop over all coarse columns that are found in the coloring for this coarse seed direction
+          for(int k=D.rowind()[csd]; k<D.rowind()[csd+1]; ++k){
+            int cci = D.col()[k];
 
-	    // The first and last columns of the fine block
-	    int fci_start = fine_col_lookup[coarse_col[cci]];
-	    int fci_end   = fine_col_lookup[coarse_col[cci+1]];
+            // The first and last columns of the fine block
+            int fci_start = fine_col_lookup[coarse_col[cci]];
+            int fci_end   = fine_col_lookup[coarse_col[cci+1]];
              
-	    // Local counter that modifies index into bvec
-	    int bvec_i_mod = 0;
+            // Local counter that modifies index into bvec
+            int bvec_i_mod = 0;
              
-	    int value = -bvec_i + fci_offset + fci_start;
+            int value = -bvec_i + fci_offset + fci_start;
              
-	    // Loop over the columns of the fine block
-	    for (int fci = fci_offset;fci<min(fci_end-fci_start,fci_cap);++fci) {
+            // Loop over the columns of the fine block
+            for (int fci = fci_offset;fci<min(fci_end-fci_start,fci_cap);++fci) {
              
-	      // Loop over the coarse block rows that appear in the coloring for the current coarse seed direction
-	      for (int cri=rT.rowind()[cci];cri<rT.rowind()[cci+1];++cri) {
-		lookup_row.push_back(rT.col()[cri]);
-		lookup_col.push_back(bvec_i+bvec_i_mod);
-		lookup_value.push_back(value);
-	      }
+              // Loop over the coarse block rows that appear in the coloring for the current coarse seed direction
+              for (int cri=rT.rowind()[cci];cri<rT.rowind()[cci+1];++cri) {
+                lookup_row.push_back(rT.col()[cri]);
+                lookup_col.push_back(bvec_i+bvec_i_mod);
+                lookup_value.push_back(value);
+              }
 
-	      // Toggle on seeds
-	      bvec_toggle(seed_v,fine_col[fci+fci_start],fine_col[fci+fci_start+1],bvec_i+bvec_i_mod);
-	      bvec_i_mod++;
-	    }
-	  }
+              // Toggle on seeds
+              bvec_toggle(seed_v,fine_col[fci+fci_start],fine_col[fci+fci_start+1],bvec_i+bvec_i_mod);
+              bvec_i_mod++;
+            }
+          }
            
-	  // Bump bvec_i for next major coarse direction
-	  bvec_i+= min(n_fine_blocks_max,fci_cap);
+          // Bump bvec_i for next major coarse direction
+          bvec_i+= min(n_fine_blocks_max,fci_cap);
            
-	  // Check if bvec buffer is full
-	  if (bvec_i==bvec_size || csd==D.size1()-1) {
-	    // Calculate sparsity for bvec_size directions at once
+          // Check if bvec buffer is full
+          if (bvec_i==bvec_size || csd==D.size1()-1) {
+            // Calculate sparsity for bvec_size directions at once
               
-	    // Statistics
-	    nsweeps+=1; 
+            // Statistics
+            nsweeps+=1; 
               
-	    // Construct lookup table
-	    IMatrix lookup = IMatrix::sparse(lookup_row,lookup_col,lookup_value,coarse_row.size(),bvec_size);
+            // Construct lookup table
+            IMatrix lookup = IMatrix::sparse(lookup_row,lookup_col,lookup_value,coarse_row.size(),bvec_size);
 
-	    // Propagate the dependencies
-	    spEvaluate(use_fwd);
+            // Propagate the dependencies
+            spEvaluate(use_fwd);
               
-	    // Temporary bit work vector
-	    bvec_t spsens;
+            // Temporary bit work vector
+            bvec_t spsens;
               
-	    // Loop over the rows of coarse blocks
-	    for (int cri=0;cri<coarse_row.size()-1;++cri) {
+            // Loop over the rows of coarse blocks
+            for (int cri=0;cri<coarse_row.size()-1;++cri) {
 
-	      // Loop over the rows of fine blocks within the current coarse block
-	      for (int fri=fine_row_lookup[coarse_row[cri]];fri<fine_row_lookup[coarse_row[cri+1]];++fri) {
-		// Lump individual sensitivities together into fine block
-		bvec_or(sens_v,spsens,fine_row[fri],fine_row[fri+1]);
+              // Loop over the rows of fine blocks within the current coarse block
+              for (int fri=fine_row_lookup[coarse_row[cri]];fri<fine_row_lookup[coarse_row[cri+1]];++fri) {
+                // Lump individual sensitivities together into fine block
+                bvec_or(sens_v,spsens,fine_row[fri],fine_row[fri+1]);
   
-		// Loop over all bvec_bits
-		for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
-		  if (spsens & (bvec_t(1) << bvec_i)) {
-		    // if dependency is found, add it to the new sparsity pattern
-		    jcol.push_back(bvec_i+lookup.elem(cri,bvec_i));
-		    jrow.push_back(fri);
-		  }
-		}
-	      }
-	    }
+                // Loop over all bvec_bits
+                for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
+                  if (spsens & (bvec_t(1) << bvec_i)) {
+                    // if dependency is found, add it to the new sparsity pattern
+                    jcol.push_back(bvec_i+lookup.elem(cri,bvec_i));
+                    jrow.push_back(fri);
+                  }
+                }
+              }
+            }
               
-	    // Clean seed vector, ready for next bvec sweep
-	    for(int i=0; i<nz_seed; ++i) seed_v[i]=0;
+            // Clean seed vector, ready for next bvec sweep
+            for(int i=0; i<nz_seed; ++i) seed_v[i]=0;
               
-	    // Clean lookup table
-	    lookup_row.clear();
-	    lookup_col.clear();
-	    lookup_value.clear();
-	  }
+            // Clean lookup table
+            lookup_row.clear();
+            lookup_col.clear();
+            lookup_value.clear();
+          }
            
-	  if (n_fine_blocks_max>fci_cap) {
-	    fci_offset += min(n_fine_blocks_max,fci_cap);
-	    bvec_i = 0;
-	    fci_cap = bvec_size;
-	  } else {
-	    f_finished = true;
-	  }
+          if (n_fine_blocks_max>fci_cap) {
+            fci_offset += min(n_fine_blocks_max,fci_cap);
+            bvec_i = 0;
+            fci_cap = bvec_size;
+          } else {
+            f_finished = true;
+          }
          
-	}
+        }
          
       }
 
       // Swap results if adjoint mode was used
       if (use_fwd) {
-	// Construct fine sparsity pattern
-	r = sp_triplet(fine_row.size()-1, fine_col.size()-1, jrow, jcol);
-	coarse_row = fine_row;
-	coarse_col = fine_col;
+        // Construct fine sparsity pattern
+        r = sp_triplet(fine_row.size()-1, fine_col.size()-1, jrow, jcol);
+        coarse_row = fine_row;
+        coarse_col = fine_col;
       } else {
-	// Construct fine sparsity pattern
-	r = sp_triplet( fine_col.size()-1,fine_row.size()-1, jcol, jrow);
-	coarse_row = fine_col;
-	coarse_col = fine_row;
+        // Construct fine sparsity pattern
+        r = sp_triplet( fine_col.size()-1,fine_row.size()-1, jcol, jrow);
+        coarse_row = fine_col;
+        coarse_col = fine_row;
       }
       hasrun = true;
     }
@@ -958,13 +958,13 @@ namespace CasADi{
     if(spCanEvaluate(true) || spCanEvaluate(false)){
 
       if (input(iind).size()>3*bvec_size && output(oind).size()>3*bvec_size) {
-	if (symmetric) {
-	  return getJacSparsityHierarchicalSymm(iind, oind);
-	} else {
-	  return getJacSparsityHierarchical(iind, oind);
-	}
+        if (symmetric) {
+          return getJacSparsityHierarchicalSymm(iind, oind);
+        } else {
+          return getJacSparsityHierarchical(iind, oind);
+        }
       } else {
-	return getJacSparsityPlain(iind, oind);
+        return getJacSparsityPlain(iind, oind);
       }
 
 
@@ -991,45 +991,45 @@ namespace CasADi{
     // Generate, if null
     if(jsp.isNull()){
       if(compact){
-	if(spgen_==0){
-	  // Use internal routine to determine sparsity
-	  jsp = getJacSparsity(iind,oind,symmetric);
-	} else {
-	  // Create a temporary FX instance
-	  FX tmp = shared_from_this<FX>();
+        if(spgen_==0){
+          // Use internal routine to determine sparsity
+          jsp = getJacSparsity(iind,oind,symmetric);
+        } else {
+          // Create a temporary FX instance
+          FX tmp = shared_from_this<FX>();
 
-	  // Use user-provided routine to determine sparsity
-	  jsp = spgen_(tmp,iind,oind,user_data_);
-	}
+          // Use user-provided routine to determine sparsity
+          jsp = spgen_(tmp,iind,oind,user_data_);
+        }
       } else {
       
-	// Get the compact sparsity pattern
-	CRSSparsity sp = jacSparsity(iind,oind,true,symmetric);
+        // Get the compact sparsity pattern
+        CRSSparsity sp = jacSparsity(iind,oind,true,symmetric);
 
-	// Enlarge if sparse output 
-	if(output(oind).numel()!=sp.size1()){
-	  casadi_assert(sp.size1()==output(oind).size());
+        // Enlarge if sparse output 
+        if(output(oind).numel()!=sp.size1()){
+          casadi_assert(sp.size1()==output(oind).size());
         
-	  // New row for each old row 
-	  vector<int> row_map = output(oind).sparsity().getElements();
+          // New row for each old row 
+          vector<int> row_map = output(oind).sparsity().getElements();
     
-	  // Insert rows 
-	  sp.enlargeRows(output(oind).numel(),row_map);
-	}
+          // Insert rows 
+          sp.enlargeRows(output(oind).numel(),row_map);
+        }
   
-	// Enlarge if sparse input 
-	if(input(iind).numel()!=sp.size2()){
-	  casadi_assert(sp.size2()==input(iind).size());
+        // Enlarge if sparse input 
+        if(input(iind).numel()!=sp.size2()){
+          casadi_assert(sp.size2()==input(iind).size());
         
-	  // New column for each old column
-	  vector<int> col_map = input(iind).sparsity().getElements();
+          // New column for each old column
+          vector<int> col_map = input(iind).sparsity().getElements();
         
-	  // Insert columns
-	  sp.enlargeColumns(input(iind).numel(),col_map);
-	}
+          // Insert columns
+          sp.enlargeColumns(input(iind).numel(),col_map);
+        }
       
-	// Save
-	jsp = sp;
+        // Save
+        jsp = sp;
       }
     }
   
@@ -1070,7 +1070,7 @@ namespace CasADi{
       log("FXInternal::getPartition starColoring");
       D1 = A.starColoring();
       if(verbose()){
-	cout << "Star coloring completed: " << D1.size1() << " directional derivatives needed (" << A.size2() << " without coloring)." << endl;
+        cout << "Star coloring completed: " << D1.size1() << " directional derivatives needed (" << A.size2() << " without coloring)." << endl;
       }
     
     } else {
@@ -1087,36 +1087,36 @@ namespace CasADi{
 
       // Test both coloring modes
       for(int mode=0; mode<2; ++mode){
-	// Is this the forward mode?
-	bool fwd = mode==mode_fwd;
+        // Is this the forward mode?
+        bool fwd = mode==mode_fwd;
       
-	// Skip?
-	if(!test_ad_fwd && fwd) continue;
-	if(!test_ad_adj && !fwd) continue;
+        // Skip?
+        if(!test_ad_fwd && fwd) continue;
+        if(!test_ad_adj && !fwd) continue;
 
-	// Perform the coloring
-	if(fwd){
-	  log("FXInternal::getPartition unidirectional coloring (forward mode)");
-	  D1 = AT.unidirectionalColoring(A,best_coloring);
-	  if(D1.isNull()){
-	    if(verbose()) cout << "Forward mode coloring interrupted (more than " << best_coloring << " needed)." << endl; 
-	  } else {
-	    if(verbose()) cout << "Forward mode coloring completed: " << D1.size1() << " directional derivatives needed (" << A.size2() << " without coloring)." << endl;
-	    D2 = CRSSparsity();
-	    best_coloring = D1.size1();
-	  }
-	} else {
-	  log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
-	  int max_colorings_to_test = best_coloring/adj_penalty;
-	  D2 = A.unidirectionalColoring(AT,max_colorings_to_test);	
-	  if(D2.isNull()){
-	    if(verbose()) cout << "Adjoint mode coloring interrupted (more than " << max_colorings_to_test << " needed)." << endl; 
-	  } else {
-	    if(verbose()) cout << "Adjoint mode coloring completed: " << D2.size1() << " directional derivatives needed (" << A.size1() << " without coloring)." << endl;
-	    D1 = CRSSparsity();
-	    best_coloring = D2.size1();
-	  }
-	}
+        // Perform the coloring
+        if(fwd){
+          log("FXInternal::getPartition unidirectional coloring (forward mode)");
+          D1 = AT.unidirectionalColoring(A,best_coloring);
+          if(D1.isNull()){
+            if(verbose()) cout << "Forward mode coloring interrupted (more than " << best_coloring << " needed)." << endl; 
+          } else {
+            if(verbose()) cout << "Forward mode coloring completed: " << D1.size1() << " directional derivatives needed (" << A.size2() << " without coloring)." << endl;
+            D2 = CRSSparsity();
+            best_coloring = D1.size1();
+          }
+        } else {
+          log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
+          int max_colorings_to_test = best_coloring/adj_penalty;
+          D2 = A.unidirectionalColoring(AT,max_colorings_to_test);        
+          if(D2.isNull()){
+            if(verbose()) cout << "Adjoint mode coloring interrupted (more than " << max_colorings_to_test << " needed)." << endl; 
+          } else {
+            if(verbose()) cout << "Adjoint mode coloring completed: " << D2.size1() << " directional derivatives needed (" << A.size1() << " without coloring)." << endl;
+            D1 = CRSSparsity();
+            best_coloring = D2.size1();
+          }
+        }
       }
 
       log("FXInternal::getPartition end");
@@ -1135,10 +1135,10 @@ namespace CasADi{
 
       // Look out for nonzeros
       for(int ind=0; compressed_fwd_[dir] && ind<getNumInputs(); ++ind){
-	const vector<double>& v = fwdSeedNoCheck(ind,dir).data();
-	for(vector<double>::const_iterator it=v.begin(); compressed_fwd_[dir] && it!=v.end(); ++it){
-	  if(*it!=0) compressed_fwd_[dir]=false;
-	}
+        const vector<double>& v = fwdSeedNoCheck(ind,dir).data();
+        for(vector<double>::const_iterator it=v.begin(); compressed_fwd_[dir] && it!=v.end(); ++it){
+          if(*it!=0) compressed_fwd_[dir]=false;
+        }
       }
 
       // Skip if we can indeed compress
@@ -1146,11 +1146,11 @@ namespace CasADi{
     
       // Move the direction to a previous direction if different
       if(dir!=nfdir_compressed){
-	for(int ind=0; ind<getNumInputs(); ++ind){
-	  const vector<double>& v_old = fwdSeedNoCheck(ind,dir).data();
-	  vector<double>& v_new = fwdSeedNoCheck(ind,nfdir_compressed).data();
-	  copy(v_old.begin(),v_old.end(),v_new.begin());
-	}
+        for(int ind=0; ind<getNumInputs(); ++ind){
+          const vector<double>& v_old = fwdSeedNoCheck(ind,dir).data();
+          vector<double>& v_new = fwdSeedNoCheck(ind,nfdir_compressed).data();
+          copy(v_old.begin(),v_old.end(),v_new.begin());
+        }
       }
     
       // Increase direction counter
@@ -1168,10 +1168,10 @@ namespace CasADi{
 
       // Look out for nonzeros
       for(int ind=0; compressed_adj_[dir] && ind<getNumOutputs(); ++ind){
-	const vector<double>& v = adjSeedNoCheck(ind,dir).data();
-	for(vector<double>::const_iterator it=v.begin(); compressed_adj_[dir] && it!=v.end(); ++it){
-	  if(*it!=0) compressed_adj_[dir]=false;
-	}
+        const vector<double>& v = adjSeedNoCheck(ind,dir).data();
+        for(vector<double>::const_iterator it=v.begin(); compressed_adj_[dir] && it!=v.end(); ++it){
+          if(*it!=0) compressed_adj_[dir]=false;
+        }
       }
 
       // Skip if we can indeed compress
@@ -1179,11 +1179,11 @@ namespace CasADi{
     
       // Move the direction to a previous direction if different
       if(dir!=nadir_compressed){
-	for(int ind=0; ind<getNumOutputs(); ++ind){
-	  const vector<double>& v_old = adjSeedNoCheck(ind,dir).data();
-	  vector<double>& v_new = adjSeedNoCheck(ind,nadir_compressed).data();
-	  copy(v_old.begin(),v_old.end(),v_new.begin());
-	}
+        for(int ind=0; ind<getNumOutputs(); ++ind){
+          const vector<double>& v_old = adjSeedNoCheck(ind,dir).data();
+          vector<double>& v_new = adjSeedNoCheck(ind,nadir_compressed).data();
+          copy(v_old.begin(),v_old.end(),v_new.begin());
+        }
       }
     
       // Increase direction counter
@@ -1196,37 +1196,37 @@ namespace CasADi{
     // Decompress forward directions in reverse order
     for(int dir=nfdir-1; dir>=0; --dir){
       if(compressed_fwd_[dir]){
-	for(int ind=0; ind<getNumOutputs(); ++ind){
-	  fwdSensNoCheck(ind,dir).setZero();
-	}
+        for(int ind=0; ind<getNumOutputs(); ++ind){
+          fwdSensNoCheck(ind,dir).setZero();
+        }
       } else if(--nfdir_compressed != dir){
-	for(int ind=0; ind<getNumOutputs(); ++ind){
-	  const vector<double>& v_old = fwdSensNoCheck(ind,nfdir_compressed).data();
-	  vector<double>& v_new = fwdSensNoCheck(ind,dir).data();
-	  copy(v_old.begin(),v_old.end(),v_new.begin());
-	}
+        for(int ind=0; ind<getNumOutputs(); ++ind){
+          const vector<double>& v_old = fwdSensNoCheck(ind,nfdir_compressed).data();
+          vector<double>& v_new = fwdSensNoCheck(ind,dir).data();
+          copy(v_old.begin(),v_old.end(),v_new.begin());
+        }
       }
     }
 
     // Decompress adjoint directions in reverse order
     for(int dir=nadir-1; dir>=0; --dir){
       if(compressed_adj_[dir]){
-	for(int ind=0; ind<getNumInputs(); ++ind){
-	  adjSensNoCheck(ind,dir).setZero();
-	}
+        for(int ind=0; ind<getNumInputs(); ++ind){
+          adjSensNoCheck(ind,dir).setZero();
+        }
       } else if(--nadir_compressed != dir){
-	for(int ind=0; ind<getNumInputs(); ++ind){
-	  const vector<double>& v_old = adjSensNoCheck(ind,nadir_compressed).data();
-	  vector<double>& v_new = adjSensNoCheck(ind,dir).data();
-	  copy(v_old.begin(),v_old.end(),v_new.begin());
-	}
+        for(int ind=0; ind<getNumInputs(); ++ind){
+          const vector<double>& v_old = adjSensNoCheck(ind,nadir_compressed).data();
+          vector<double>& v_new = adjSensNoCheck(ind,dir).data();
+          copy(v_old.begin(),v_old.end(),v_new.begin());
+        }
       }
     }
   }
 
   void FXInternal::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-			  const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-			  const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
+                          const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+                          const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
     // Make sure initialized
     assertInit();
     
@@ -1253,14 +1253,14 @@ namespace CasADi{
     if(!sparsity_matches){
       vector<SXMatrix> arg_new(arg.size());
       for(int i=0; i<arg.size(); ++i){
-	try{
-	  arg_new[i] = SXMatrix(input(i).sparsity());
-	  arg_new[i].set(arg[i]);
-	} catch(exception& ex){
-	  stringstream ss;
-	  ss << "SXFunctionInternal::evalSX: Failed to set " << describeInput(inputScheme_,i) << ": " << ex.what();
-	  throw CasadiException(ss.str());
-	}
+        try{
+          arg_new[i] = SXMatrix(input(i).sparsity());
+          arg_new[i].set(arg[i]);
+        } catch(exception& ex){
+          stringstream ss;
+          ss << "SXFunctionInternal::evalSX: Failed to set " << describeInput(inputScheme_,i) << ": " << ex.what();
+          throw CasadiException(ss.str());
+        }
       }
       evalSX(arg_new,res,fseed,fsens,aseed,asens);
       return;
@@ -1269,23 +1269,23 @@ namespace CasADi{
     // Check if forward seed sparsity pattern match (quick if sparsity matches)
     for(int dir=0; dir<nfdir && sparsity_matches; ++dir){
       for(int i=0; i<getNumInputs() && sparsity_matches; ++i){
-	sparsity_matches = fseed[dir][i].sparsity()==input(i).sparsity();
+        sparsity_matches = fseed[dir][i].sparsity()==input(i).sparsity();
       }
     }
     if(!sparsity_matches){
       vector<vector<SXMatrix> > fseed_new(nfdir);
       for(int dir=0; dir<nfdir; ++dir){
-	fseed_new[dir].resize(getNumInputs());
-	for(int i=0; i<getNumInputs(); ++i){
-	  try{
-	    fseed_new[dir][i] = SXMatrix(input(i).sparsity());
-	    fseed_new[dir][i].set(fseed[dir][i]);
-	  } catch(exception& ex){
-	    stringstream ss;
-	    ss << "SXFunctionInternal::evalSX: Failed to set forward seed of " << describeInput(inputScheme_,i) << ", direction " << dir << ": " << ex.what();
-	    throw CasadiException(ss.str());
-	  }
-	}
+        fseed_new[dir].resize(getNumInputs());
+        for(int i=0; i<getNumInputs(); ++i){
+          try{
+            fseed_new[dir][i] = SXMatrix(input(i).sparsity());
+            fseed_new[dir][i].set(fseed[dir][i]);
+          } catch(exception& ex){
+            stringstream ss;
+            ss << "SXFunctionInternal::evalSX: Failed to set forward seed of " << describeInput(inputScheme_,i) << ", direction " << dir << ": " << ex.what();
+            throw CasadiException(ss.str());
+          }
+        }
       }
       evalSX(arg,res,fseed_new,fsens,aseed,asens);
       return;
@@ -1294,23 +1294,23 @@ namespace CasADi{
     // Check if adjoint seed sparsity pattern match (quick if sparsity matches)
     for(int dir=0; dir<nadir && sparsity_matches; ++dir){
       for(int i=0; i<getNumOutputs() && sparsity_matches; ++i){
-	sparsity_matches = aseed[dir][i].sparsity()==output(i).sparsity();
+        sparsity_matches = aseed[dir][i].sparsity()==output(i).sparsity();
       }
     }
     if(!sparsity_matches){
       vector<vector<SXMatrix> > aseed_new(nadir);
       for(int dir=0; dir<nadir; ++dir){
-	aseed_new[dir].resize(getNumOutputs());
-	for(int i=0; i<getNumOutputs(); ++i){
-	  try{
-	    aseed_new[dir][i] = SXMatrix(output(i).sparsity());
-	    aseed_new[dir][i].set(aseed[dir][i]);
-	  } catch(exception& ex){
-	    stringstream ss;
-	    ss << "SXFunctionInternal::evalSX: Failed to set adjoint seed of " << describeOutput(outputScheme_,i) << ", direction " << dir << ": " << ex.what();
-	    throw CasadiException(ss.str());
-	  }
-	}
+        aseed_new[dir].resize(getNumOutputs());
+        for(int i=0; i<getNumOutputs(); ++i){
+          try{
+            aseed_new[dir][i] = SXMatrix(output(i).sparsity());
+            aseed_new[dir][i].set(aseed[dir][i]);
+          } catch(exception& ex){
+            stringstream ss;
+            ss << "SXFunctionInternal::evalSX: Failed to set adjoint seed of " << describeOutput(outputScheme_,i) << ", direction " << dir << ": " << ex.what();
+            throw CasadiException(ss.str());
+          }
+        }
       }
       evalSX(arg,res,fseed,fsens,aseed_new,asens);
       return;
@@ -1320,7 +1320,7 @@ namespace CasADi{
     res.resize(getNumOutputs());
     for(int i=0; i<getNumOutputs(); ++i){
       if(res[i].sparsity()!=output(i).sparsity()){
-	res[i] = SXMatrix(output(i).sparsity());
+        res[i] = SXMatrix(output(i).sparsity());
       }
     }
   
@@ -1329,9 +1329,9 @@ namespace CasADi{
     for(int dir=0; dir<nfdir; ++dir){
       fsens[dir].resize(getNumOutputs());
       for(int i=0; i<getNumOutputs(); ++i){
-	if(fsens[dir][i].sparsity()!=output(i).sparsity()){
-	  fsens[dir][i] = SXMatrix(output(i).sparsity());
-	}
+        if(fsens[dir][i].sparsity()!=output(i).sparsity()){
+          fsens[dir][i] = SXMatrix(output(i).sparsity());
+        }
       }
     }
   
@@ -1340,9 +1340,9 @@ namespace CasADi{
     for(int dir=0; dir<nadir; ++dir){
       asens[dir].resize(getNumInputs());
       for(int i=0; i<getNumInputs(); ++i){
-	if(asens[dir][i].sparsity()!=input(i).sparsity()){
-	  asens[dir][i] = SXMatrix(input(i).sparsity());
-	}
+        if(asens[dir][i].sparsity()!=input(i).sparsity()){
+          asens[dir][i] = SXMatrix(input(i).sparsity());
+        }
       }
     }
   
@@ -1351,14 +1351,14 @@ namespace CasADi{
   }
 
   void FXInternal::evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-				const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-				const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
+                                const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+                                const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
     casadi_error("FXInternal::evalSXsparse not defined for class " << typeid(*this).name());
   }
 
   void FXInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
-			  const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
-			  const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){
+                          const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
+                          const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){
     casadi_error("FXInternal::evalMX not defined for class " << typeid(*this).name());
   }
 
@@ -1370,40 +1370,40 @@ namespace CasADi{
     if(fwd){
       // Get dependency on all inputs
       for(int iind=0; iind<getNumInputs(); ++iind){
-	const DMatrix& m = inputNoCheck(iind);
-	const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
-	for(int i=0; i<m.size(); ++i){
-	  all_depend |= v[i];
-	}
+        const DMatrix& m = inputNoCheck(iind);
+        const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
+        for(int i=0; i<m.size(); ++i){
+          all_depend |= v[i];
+        }
       }
     
       // Propagate to all outputs
       for(int oind=0; oind<getNumOutputs(); ++oind){
-	DMatrix& m = outputNoCheck(oind);
-	bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
-	for(int i=0; i<m.size(); ++i){
-	  v[i] = all_depend;
-	}
+        DMatrix& m = outputNoCheck(oind);
+        bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
+        for(int i=0; i<m.size(); ++i){
+          v[i] = all_depend;
+        }
       }
     
     } else {
     
       // Get dependency on all outputs
       for(int oind=0; oind<getNumOutputs(); ++oind){
-	const DMatrix& m = outputNoCheck(oind);
-	const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
-	for(int i=0; i<m.size(); ++i){
-	  all_depend |= v[i];
-	}
+        const DMatrix& m = outputNoCheck(oind);
+        const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
+        for(int i=0; i<m.size(); ++i){
+          all_depend |= v[i];
+        }
       }
     
       // Propagate to all inputs
       for(int iind=0; iind<getNumInputs(); ++iind){
-	DMatrix& m = inputNoCheck(iind);
-	bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
-	for(int i=0; i<m.size(); ++i){
-	  v[i] |= all_depend;
-	}
+        DMatrix& m = inputNoCheck(iind);
+        bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
+        for(int i=0; i<m.size(); ++i){
+          v[i] |= all_depend;
+        }
       }
     }
   }
@@ -1472,12 +1472,12 @@ namespace CasADi{
     
       // Check if it is cheaper to calculate the full Jacobian and then multiply
       if(2*full_jac_cost < der_dir_cost){
-	// Generate the Jacobian and then multiply to get the derivative
-	//ret = getDerivativeViaJac(nfwd,nadj); // NOTE: Uncomment this line (and remove the next line) to enable this feature
-	ret = getDerivative(nfwd,nadj);    
+        // Generate the Jacobian and then multiply to get the derivative
+        //ret = getDerivativeViaJac(nfwd,nadj); // NOTE: Uncomment this line (and remove the next line) to enable this feature
+        ret = getDerivative(nfwd,nadj);    
       } else {
-	// Generate a new function
-	ret = getDerivative(nfwd,nadj);    
+        // Generate a new function
+        ret = getDerivative(nfwd,nadj);    
       }
     
       // Give it a suitable name
@@ -1524,8 +1524,8 @@ namespace CasADi{
   }
 
   void FXInternal::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, MXVectorVector& fsens, 
-			const MXVectorVector& aseed, MXVectorVector& asens, 
-			bool always_inline, bool never_inline){
+                        const MXVectorVector& aseed, MXVectorVector& asens, 
+                        bool always_inline, bool never_inline){
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
   
     // Lo logic for inlining yet
@@ -1544,21 +1544,21 @@ namespace CasADi{
 
       // Assumes initialised
       for(int i=0; i<arg.size(); ++i){
-	if(arg[i].isNull() || arg[i].empty() || input(i).isNull() || input(i).empty()) continue;
-	casadi_assert_message(arg[i].size1()==input(i).size1() && arg[i].size2()==input(i).size2(),
-			      "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
-			      std::endl << describeInput(inputScheme_,i) <<  " has shape (" << input(i).size1() << 
-			      "," << input(i).size2() << ") while a shape (" << arg[i].size1() << "," << arg[i].size2() << 
-			      ") was supplied.");
+        if(arg[i].isNull() || arg[i].empty() || input(i).isNull() || input(i).empty()) continue;
+        casadi_assert_message(arg[i].size1()==input(i).size1() && arg[i].size2()==input(i).size2(),
+                              "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
+                              std::endl << describeInput(inputScheme_,i) <<  " has shape (" << input(i).size1() << 
+                              "," << input(i).size2() << ") while a shape (" << arg[i].size1() << "," << arg[i].size2() << 
+                              ") was supplied.");
       }
       EvaluationMX::create(shared_from_this<FX>(),arg,res,fseed,fsens,aseed,asens,false);
     }
   }
 
   void FXInternal::call(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-			const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-			const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-			bool always_inline, bool never_inline){
+                        const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+                        const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
+                        bool always_inline, bool never_inline){
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!never_inline, "SX expressions do not support call-nodes");
     evalSX(arg,res,fseed,fsens,aseed,asens);
@@ -1582,9 +1582,9 @@ namespace CasADi{
       // Generate a new Jacobian
       FX ret;
       if(getNumInputs()==1 && getNumOutputs()==1){
-	ret = jacobian(0,0,true,false);
+        ret = jacobian(0,0,true,false);
       } else {
-	getFullJacobian();
+        getFullJacobian();
       }
 
       // Return and cache it for reuse
@@ -1617,7 +1617,7 @@ namespace CasADi{
     // Get the nonzeros of each output
     for(int ind=0; ind<resv.size(); ++ind){
       if(resv[ind].size2()!=1 || !resv[ind].dense()){
-	resv[ind] = resv[ind][Slice()];
+        resv[ind] = resv[ind][Slice()];
       }
     }
 
@@ -1693,12 +1693,12 @@ namespace CasADi{
 
       // Declare input buffers
       for(int i=0; i<n_in; ++i){
-	cfile << "  d t_x" << i << "[" << input(i).sparsity().size() << "];" << std::endl;
+        cfile << "  d t_x" << i << "[" << input(i).sparsity().size() << "];" << std::endl;
       }
 
       // Declare output buffers
       for(int i=0; i<n_out; ++i){
-	cfile << "  d t_r" << i << "[" << output(i).sparsity().size() << "];" << std::endl;
+        cfile << "  d t_r" << i << "[" << output(i).sparsity().size() << "];" << std::endl;
       }
 
       // Repeat 10 times
@@ -1706,33 +1706,33 @@ namespace CasADi{
 
       // Dummy input values
       for(int i=0; i<n_in; ++i){
-	cfile << "    for(i=0; i<" << input(i).sparsity().size() << "; ++i) t_x" << i << "[i] = sin(2.2*i+sqrt(4.3/(j+1)));" << std::endl;
+        cfile << "    for(i=0; i<" << input(i).sparsity().size() << "; ++i) t_x" << i << "[i] = sin(2.2*i+sqrt(4.3/(j+1)));" << std::endl;
       }
 
       // Pass inputs
       cfile << "    evaluate(";
       for(int i=0; i<n_in; ++i){
-	cfile << "t_x" << i;
-	if(i+1<n_in+n_out)
-	  cfile << ",";
+        cfile << "t_x" << i;
+        if(i+1<n_in+n_out)
+          cfile << ",";
       }
 
       // Pass output buffers
       for(int i=0; i<n_out; ++i){
-	cfile << "t_r" << i;
-	if(i+1<n_out)
-	  cfile << ",";
+        cfile << "t_r" << i;
+        if(i+1<n_out)
+          cfile << ",";
       }
       cfile << "); " << std::endl;
 
     
       // Dummy printout
       for(int i=0; i<n_out; ++i){
-	int n = output(i).sparsity().size();
-	for(int j=0; j<n && j<5; ++j){
-	  cfile << "    printf(\"%g \",t_r" << i << "[" << j << "]);" << std::endl;
-	}
-	cfile << "    printf(\"\\n\");" << std::endl;
+        int n = output(i).sparsity().size();
+        for(int j=0; j<n && j<5; ++j){
+          cfile << "    printf(\"%g \",t_r" << i << "[" << j << "]);" << std::endl;
+        }
+        cfile << "    printf(\"\\n\");" << std::endl;
       }
 
       // End repeat
@@ -1763,14 +1763,14 @@ namespace CasADi{
     for(int i=0; i<n_in; ++i){
       stream << input_type << " x" << i;
       if(i+1<n_in+n_out)
-	stream << ",";
+        stream << ",";
     }
 
     // Declare outputs
     for(int i=0; i<n_out; ++i){
       stream << output_type << " r" << i;
       if(i+1<n_out)
-	stream << ",";
+        stream << ",";
     }
     stream << "){ " << std::endl;
   
@@ -1839,7 +1839,7 @@ namespace CasADi{
       
       // Print the cases covered
       for(it_type it=r.first; it!=r.second; ++it){
-	s << "    case " << it->second << ":" << endl;
+        s << "    case " << it->second << ":" << endl;
       }
       
       // Map to sparsity
@@ -1870,7 +1870,7 @@ namespace CasADi{
     casadi_assert(nz.size()==x_data.size());
     for(int k=0; k<nz.size(); ++k){
       if(nz[k]>=0){
-	y_data.at(nz[k]) = x_data.at(k);
+        y_data.at(nz[k]) = x_data.at(k);
       }
     }
   }
@@ -1929,7 +1929,7 @@ namespace CasADi{
     if(f_is_init){
       f_gen.init();
       if(verbose_){
-	cout << "Dynamically loaded " << fdescr << " (" << dlname << ")" << endl;
+        cout << "Dynamically loaded " << fdescr << " (" << dlname << ")" << endl;
       }
     }
     return f_gen;

@@ -62,28 +62,28 @@ namespace CasADi{
     if(nfwd==0 && nadj==0){
       // No sensitivities
       for(int i=0; i<size(); ++i)
-	casadi_math<double>::fun(op_,inputd[i],nan,outputd[i]);
+        casadi_math<double>::fun(op_,inputd[i],nan,outputd[i]);
     
     } else {
       // Sensitivities
       double f, tmp[2];  // temporary variable to hold value and partial derivatives of the function
       for(int i=0; i<size(); ++i){
-	// Evaluate and get partial derivatives
-	casadi_math<double>::fun(op_,inputd[i],nan,f);
-	casadi_math<double>::der(op_,inputd[i],nan,f,tmp);
-	outputd[i] = f;
+        // Evaluate and get partial derivatives
+        casadi_math<double>::fun(op_,inputd[i],nan,f);
+        casadi_math<double>::der(op_,inputd[i],nan,f,tmp);
+        outputd[i] = f;
 
-	// Propagate forward seeds
-	for(int d=0; d<nfwd; ++d){
-	  fwdSens[d][0]->data()[i] = tmp[0]*fwdSeed[d][0]->data()[i];
-	}
+        // Propagate forward seeds
+        for(int d=0; d<nfwd; ++d){
+          fwdSens[d][0]->data()[i] = tmp[0]*fwdSeed[d][0]->data()[i];
+        }
 
-	// Propagate adjoint seeds
-	for(int d=0; d<nadj; ++d){
-	  double s = adjSeed[d][0]->data()[i];
-	  adjSeed[d][0]->data()[i] = 0;
-	  adjSens[d][0]->data()[i] += s*tmp[0];
-	}
+        // Propagate adjoint seeds
+        for(int d=0; d<nadj; ++d){
+          double s = adjSeed[d][0]->data()[i];
+          adjSeed[d][0]->data()[i] = 0;
+          adjSens[d][0]->data()[i] += s*tmp[0];
+        }
       }
     }
   }
@@ -117,14 +117,14 @@ namespace CasADi{
     
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
-	*fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]);
+        *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]);
       }
     
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
-	MX s = *adjSeed[d][0];
-	*adjSeed[d][0] = MX();
-	*adjSens[d][0] += pd[0]*s;
+        MX s = *adjSeed[d][0];
+        *adjSeed[d][0] = MX();
+        *adjSens[d][0] += pd[0]*s;
       }
     }
  
@@ -145,9 +145,9 @@ namespace CasADi{
     } else {
       int nz = input[0]->data().size();
       for(int el=0; el<nz; ++el){
-	bvec_t s = outputd[el];
-	outputd[el] = bvec_t(0);
-	inputd[el] |= s;
+        bvec_t s = outputd[el];
+        outputd[el] = bvec_t(0);
+        inputd[el] |= s;
       }
     }
   }

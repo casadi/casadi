@@ -88,7 +88,7 @@ namespace CasADi{
       The sparsity can be accessed with CRSSparsity& sparsity()\n
   
       \author Joel Andersson 
-      \date 2010	
+      \date 2010        
   */
   template<class T>
   class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix<T> >, public PrintableObject{
@@ -419,8 +419,8 @@ namespace CasADi{
     } 
     void indexed_assignment(const CRSSparsity &sp,const Matrix<T>& m){
       // (*this)(sp) = m;   // VC2010 compiler errors
-	  SubMatrix<Matrix<T>,CRSSparsity,int> temp(*this,sp,0);
-	  temp = m;
+          SubMatrix<Matrix<T>,CRSSparsity,int> temp(*this,sp,0);
+          temp = m;
     }
     //@}
     
@@ -557,15 +557,15 @@ namespace CasADi{
     void reserve(int nnz, int nrow);
     
     /** \brief Erase a submatrix
-	Erase rows and/or columns of a matrix */
+        Erase rows and/or columns of a matrix */
     void erase(const std::vector<int>& ii, const std::vector<int>& jj);
     
     /** \brief Remove rows or columns
-	Rremove/delete rows and/or columns of a matrix */
+        Rremove/delete rows and/or columns of a matrix */
     void remove(const std::vector<int>& ii, const std::vector<int>& jj);
     
     /** \brief Enlarge matrix
-	Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
+        Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
     void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
     
     /// Access the non-zero elements
@@ -633,10 +633,10 @@ namespace CasADi{
 #endif
 
     /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 
-	kl:    The number of subdiagonals in res 
-	ku:    The number of superdiagonals in res 
-	ldres: The leading dimension in res 
-	res:   The number of superdiagonals */
+        kl:    The number of subdiagonals in res 
+        ku:    The number of superdiagonals in res 
+        ldres: The leading dimension in res 
+        res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, T *res) const;
     
     //@{

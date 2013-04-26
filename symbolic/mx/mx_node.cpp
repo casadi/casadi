@@ -63,51 +63,51 @@ namespace CasADi{
       // Check if there are other "owners" of the node
       if(cc->getCount()!= 1){
       
-	// Replace with a null pointer
-	*cc = MX();
+        // Replace with a null pointer
+        *cc = MX();
       
       } else {
-	// Stack of experssions to be deleted
-	std::stack<MX> deletion_stack;
+        // Stack of experssions to be deleted
+        std::stack<MX> deletion_stack;
         
-	// Move the child to the deletion stack
-	deletion_stack.push(*cc);
-	*cc = MX();
+        // Move the child to the deletion stack
+        deletion_stack.push(*cc);
+        *cc = MX();
       
-	// Process stack
-	while(!deletion_stack.empty()){
+        // Process stack
+        while(!deletion_stack.empty()){
         
-	  // Top element
-	  MX t = deletion_stack.top();
+          // Top element
+          MX t = deletion_stack.top();
           
-	  // Check if the top element has dependencies with dependencies
-	  bool found_dep = false;
+          // Check if the top element has dependencies with dependencies
+          bool found_dep = false;
         
-	  // Start destruction method if any of the dependencies has dependencies
-	  for(vector<MX>::iterator ii=t->dep_.begin(); ii!=t->dep_.end(); ++ii){
+          // Start destruction method if any of the dependencies has dependencies
+          for(vector<MX>::iterator ii=t->dep_.begin(); ii!=t->dep_.end(); ++ii){
           
-	    // Skip if null
-	    if(ii->isNull()) continue;
+            // Skip if null
+            if(ii->isNull()) continue;
           
-	    // Check if this is the only reference to the element
-	    if(ii->getCount()==1){
+            // Check if this is the only reference to the element
+            if(ii->getCount()==1){
             
-	      // Remove and add to stack
-	      deletion_stack.push(*ii);
-	      *ii = MX();
-	      found_dep = true;
-	      break;
-	    } else {
-	      // Replace with an element without dependencies
-	      *ii = MX();
-	    }
-	  }
+              // Remove and add to stack
+              deletion_stack.push(*ii);
+              *ii = MX();
+              found_dep = true;
+              break;
+            } else {
+              // Replace with an element without dependencies
+              *ii = MX();
+            }
+          }
         
-	  // Pop from stack if no dependencies found
-	  if(!found_dep){
-	    deletion_stack.pop();
-	  }
-	}
+          // Pop from stack if no dependencies found
+          if(!found_dep){
+            deletion_stack.pop();
+          }
+        }
       }
     }
   }
@@ -213,12 +213,12 @@ namespace CasADi{
       remaining_calls--;
       printPart(stream,0);
       for(int i=0; i<ndep(); ++i){
-	if (dep(i).isNull()) {
-	  stream << "MX()";
-	} else {
-	  dep(i)->print(stream,remaining_calls);
-	}
-	printPart(stream,i+1);
+        if (dep(i).isNull()) {
+          stream << "MX()";
+        } else {
+          dep(i)->print(stream,remaining_calls);
+        }
+        printPart(stream,i+1);
       }
     } else {
       stream << "...";
@@ -250,8 +250,8 @@ namespace CasADi{
   }
   
   void MXNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 
-			 const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
-			 const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+                         const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
+                         const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     throw CasadiException(string("MXNode::evaluateD not defined for class ") + typeid(*this).name());
   }
 
@@ -261,8 +261,8 @@ namespace CasADi{
   }
   
   void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
-			  const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
-			  const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+                          const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
+                          const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     throw CasadiException(string("MXNode::evaluateSX not defined for class ") + typeid(*this).name());
   }
 
@@ -335,13 +335,13 @@ namespace CasADi{
     } else {
       MX ret;
       if(Slice::isSlice(nz)){
-	ret = MX::create(new GetNonzerosSlice(sp,shared_from_this<MX>(),Slice(nz)));
+        ret = MX::create(new GetNonzerosSlice(sp,shared_from_this<MX>(),Slice(nz)));
       } else if(Slice::isSlice2(nz)){
-	Slice outer;
-	Slice inner(nz,outer);
-	ret = MX::create(new GetNonzerosSlice2(sp,shared_from_this<MX>(),inner,outer));
+        Slice outer;
+        Slice inner(nz,outer);
+        ret = MX::create(new GetNonzerosSlice2(sp,shared_from_this<MX>(),inner,outer));
       } else {
-	ret = MX::create(new GetNonzerosVector(sp,shared_from_this<MX>(),nz));
+        ret = MX::create(new GetNonzerosVector(sp,shared_from_this<MX>(),nz));
       }
       simplify(ret);
       return ret;
@@ -354,13 +354,13 @@ namespace CasADi{
     } else {
       MX ret;
       if(Slice::isSlice(nz)){
-	ret = MX::create(new SetNonzerosSlice<false>(y,shared_from_this<MX>(),Slice(nz)));
+        ret = MX::create(new SetNonzerosSlice<false>(y,shared_from_this<MX>(),Slice(nz)));
       } else if(Slice::isSlice2(nz)){
-	Slice outer;
-	Slice inner(nz,outer);
-	ret = MX::create(new SetNonzerosSlice2<false>(y,shared_from_this<MX>(),inner,outer));
+        Slice outer;
+        Slice inner(nz,outer);
+        ret = MX::create(new SetNonzerosSlice2<false>(y,shared_from_this<MX>(),inner,outer));
       } else {
-	ret = MX::create(new SetNonzerosVector<false>(y,shared_from_this<MX>(),nz));
+        ret = MX::create(new SetNonzerosVector<false>(y,shared_from_this<MX>(),nz));
       }
       simplify(ret);
       return ret;
@@ -374,13 +374,13 @@ namespace CasADi{
     } else {
       MX ret;
       if(Slice::isSlice(nz)){
-	ret = MX::create(new SetNonzerosSlice<true>(y,shared_from_this<MX>(),Slice(nz)));
+        ret = MX::create(new SetNonzerosSlice<true>(y,shared_from_this<MX>(),Slice(nz)));
       } else if(Slice::isSlice2(nz)){
-	Slice outer;
-	Slice inner(nz,outer);
-	ret = MX::create(new SetNonzerosSlice2<true>(y,shared_from_this<MX>(),inner,outer));
+        Slice outer;
+        Slice inner(nz,outer);
+        ret = MX::create(new SetNonzerosSlice2<true>(y,shared_from_this<MX>(),inner,outer));
       } else {
-	ret = MX::create(new SetNonzerosVector<true>(y,shared_from_this<MX>(),nz));
+        ret = MX::create(new SetNonzerosVector<true>(y,shared_from_this<MX>(),nz));
       }
       simplify(ret);
       return ret;
@@ -412,36 +412,36 @@ namespace CasADi{
   MX MXNode::getBinarySwitch(int op, const MX& y) const{
     // Make sure that dimensions match
     casadi_assert_message((sparsity().scalar(false) || y.scalar() || (sparsity().size1()==y.size1() && size2()==y.size2())),
-			  "Dimension mismatch." << "lhs is " << sparsity().dimString() << ", while rhs is " << y.dimString());
+                          "Dimension mismatch." << "lhs is " << sparsity().dimString() << ", while rhs is " << y.dimString());
       
     // Create binary node
     if(sparsity().scalar(false)){
       if(size()==0){
-	return toMatrix(MX(0)->getBinary(op,y,true,false),y.sparsity());
+        return toMatrix(MX(0)->getBinary(op,y,true,false),y.sparsity());
       } else {
-	return toMatrix(getBinary(op,y,true,false),y.sparsity());
+        return toMatrix(getBinary(op,y,true,false),y.sparsity());
       }
     } else if(y.scalar()){
       if(y.size()==0){
-	return toMatrix(getBinary(op,MX(0),false,true),sparsity());
+        return toMatrix(getBinary(op,MX(0),false,true),sparsity());
       } else {
-	return toMatrix(getBinary(op,y,false,true),sparsity());
+        return toMatrix(getBinary(op,y,false,true),sparsity());
       }
     } else {
       casadi_assert_message(sparsity().shape() == y.sparsity().shape(), "Dimension mismatch.");
       if(sparsity()==y.sparsity()){
-	// Matching sparsities
-	return getBinary(op,y,false,false);
+        // Matching sparsities
+        return getBinary(op,y,false,false);
       } else {
-	// Get the sparsity pattern of the result (ignoring structural zeros giving rise to nonzero result)
-	const CRSSparsity& x_sp = sparsity();
-	const CRSSparsity& y_sp = y.sparsity();
-	CRSSparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op));
+        // Get the sparsity pattern of the result (ignoring structural zeros giving rise to nonzero result)
+        const CRSSparsity& x_sp = sparsity();
+        const CRSSparsity& y_sp = y.sparsity();
+        CRSSparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op));
 
-	// Project the arguments to this sparsity
-	MX xx = shared_from_this<MX>().setSparse(r_sp);
-	MX yy = y.setSparse(r_sp);
-	return xx->getBinary(op,yy,false,false);
+        // Project the arguments to this sparsity
+        MX xx = shared_from_this<MX>().setSparse(r_sp);
+        MX yy = y.setSparse(r_sp);
+        return xx->getBinary(op,yy,false,false);
       }
     }
   }
@@ -475,39 +475,39 @@ namespace CasADi{
     case OP_CONST:
       // Make the constant the first argument, if possible
       if(getOp()!=OP_CONST && operation_checker<CommChecker>(op)){
-    	return y->getBinary(op,shared_from_this<MX>(),scY,scX);
+            return y->getBinary(op,shared_from_this<MX>(),scY,scX);
       } else {
-	switch(op) {
-	case OP_CONSTPOW: 
-	  if(y->isValue(-1)) return getUnary(OP_INV);
-	  if(y->isValue(0)) return MX::ones(sparsity());
-	  if(y->isValue(1)) return shared_from_this<MX>();
-	  if(y->isValue(2)) return getUnary(OP_SQ);
-	  break;	
-	case OP_ADD:
-	case OP_SUB:
-	  if(y->isZero()) return shared_from_this<MX>();
-	  break;
-	case OP_MUL:
-	case OP_DIV:
-	  if(y->isValue(1)) return shared_from_this<MX>();
-	  break;
-	default: break; // no rule
-	}
+        switch(op) {
+        case OP_CONSTPOW: 
+          if(y->isValue(-1)) return getUnary(OP_INV);
+          if(y->isValue(0)) return MX::ones(sparsity());
+          if(y->isValue(1)) return shared_from_this<MX>();
+          if(y->isValue(2)) return getUnary(OP_SQ);
+          break;        
+        case OP_ADD:
+        case OP_SUB:
+          if(y->isZero()) return shared_from_this<MX>();
+          break;
+        case OP_MUL:
+        case OP_DIV:
+          if(y->isValue(1)) return shared_from_this<MX>();
+          break;
+        default: break; // no rule
+        }
       }
       break;
     case OP_NEG:
       if(op==OP_ADD){
-    	return getBinary(OP_SUB,y->dep(),scX,scY);
+            return getBinary(OP_SUB,y->dep(),scX,scY);
       } else if(op==OP_SUB){
-    	return getBinary(OP_ADD,y->dep(),scX,scY);
+            return getBinary(OP_ADD,y->dep(),scX,scY);
       }
       break;
     case OP_INV:
       if(op==OP_MUL){
-    	return getBinary(OP_DIV,y->dep(),scX,scY);
+            return getBinary(OP_DIV,y->dep(),scX,scY);
       } else if(op==OP_DIV){
-    	return getBinary(OP_MUL,y->dep(),scX,scY);
+            return getBinary(OP_MUL,y->dep(),scX,scY);
       }
       break;
     default: break; // no rule
@@ -516,20 +516,20 @@ namespace CasADi{
     if(scX){
       // Check if it is ok to loop over nonzeros only
       if(y.dense() || operation_checker<FX0Checker>(op)){
-	// Loop over nonzeros
-	return MX::create(new BinaryMX<true,false>(Operation(op),shared_from_this<MX>(),y));
+        // Loop over nonzeros
+        return MX::create(new BinaryMX<true,false>(Operation(op),shared_from_this<MX>(),y));
       } else {
-	// Put a densification node in between
-	return getBinary(op,densify(y),true,false);
+        // Put a densification node in between
+        return getBinary(op,densify(y),true,false);
       }
     } else if(scY){
       // Check if it is ok to loop over nonzeros only
       if(sparsity().dense() || operation_checker<F0XChecker>(op)){
-	// Loop over nonzeros
-	return MX::create(new BinaryMX<false,true>(Operation(op),shared_from_this<MX>(),y));
+        // Loop over nonzeros
+        return MX::create(new BinaryMX<false,true>(Operation(op),shared_from_this<MX>(),y));
       } else {
-	// Put a densification node in between
-	return densify(shared_from_this<MX>())->getBinary(op,y,false,true);
+        // Put a densification node in between
+        return densify(shared_from_this<MX>())->getBinary(op,y,false,true);
       }
     } else {
       // Loop over nonzeros only
@@ -537,10 +537,10 @@ namespace CasADi{
       
       // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
       if(!rr.dense() && !operation_checker<F00Checker>(op)){
-	// Get the value for the structural zeros
-	double fcn_0;
-	casadi_math<double>::fun(op,0,0,fcn_0);
-	rr = rr.makeDense(fcn_0);
+        // Get the value for the structural zeros
+        double fcn_0;
+        casadi_math<double>::fun(op,0,0,fcn_0);
+        rr = rr.makeDense(fcn_0);
       }
       return rr;
     }
@@ -555,7 +555,7 @@ namespace CasADi{
       return false;
     for(int i=0; i<ndep(); ++i){
       if(!dep(i).isEqual(node->dep(i),depth-1))
-	return false;
+        return false;
     }
     return true;
   }

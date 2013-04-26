@@ -43,15 +43,15 @@ class BinarySX : public SXNode{
     /** \brief  Create a binary expression */
     inline static SX create(unsigned char op, const SX& dep0, const SX& dep1){
       if(dep0.isConstant() && dep1.isConstant()){
-	// Evaluate constant
-	double dep0_val = dep0.getValue();
-	double dep1_val = dep1.getValue();
-	double ret_val;
-	casadi_math<double>::fun(op,dep0_val,dep1_val,ret_val);
-	return ret_val;
+        // Evaluate constant
+        double dep0_val = dep0.getValue();
+        double dep1_val = dep1.getValue();
+        double ret_val;
+        casadi_math<double>::fun(op,dep0_val,dep1_val,ret_val);
+        return ret_val;
       } else {
-	// Expression containing free variables
-	return SX::create(new BinarySX(op,dep0,dep1));
+        // Expression containing free variables
+        return SX::create(new BinarySX(op,dep0,dep1));
       }
     }
     

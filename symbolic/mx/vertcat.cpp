@@ -40,7 +40,7 @@ namespace CasADi{
       casadi_assert(!x.empty());
       sp = x.front().sparsity();
       for(vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
-	sp.append(i->sparsity());
+        sp.append(i->sparsity());
       }
     }
 
@@ -69,9 +69,9 @@ namespace CasADi{
     for(int d=-1; d<nfwd; ++d){
       typename vector<T>::iterator res_it = d==-1 ? output[0]->data().begin() : fwdSens[d][0]->data().begin();
       for(int i=0; i<input.size(); ++i){
-	const vector<T>& arg_i = d==-1 ? input[i]->data() : fwdSeed[d][i]->data();
-	copy(arg_i.begin(),arg_i.end(),res_it);
-	res_it += arg_i.size();
+        const vector<T>& arg_i = d==-1 ? input[i]->data() : fwdSeed[d][i]->data();
+        copy(arg_i.begin(),arg_i.end(),res_it);
+        res_it += arg_i.size();
       }
     }
     
@@ -79,10 +79,10 @@ namespace CasADi{
     for(int d=0; d<nadj; ++d){
       typename vector<T>::iterator arg_it = adjSeed[d][0]->data().begin();
       for(int i=0; i<input.size(); ++i){
-	vector<T>& res_i = adjSens[d][i]->data();
-	transform(res_i.begin(),res_i.end(),arg_it,res_i.begin(),std::plus<T>());
-	fill_n(arg_it, res_i.size(), 0);
-	arg_it += res_i.size();
+        vector<T>& res_i = adjSens[d][i]->data();
+        transform(res_i.begin(),res_i.end(),arg_it,res_i.begin(),std::plus<T>());
+        fill_n(arg_it, res_i.size(), 0);
+        arg_it += res_i.size();
       }
     }
   }
@@ -93,13 +93,13 @@ namespace CasADi{
       vector<double>& arg_i = input[i]->data();
       bvec_t *arg_i_ptr = get_bvec_t(arg_i);
       if(fwd){
-	copy(arg_i_ptr, arg_i_ptr+arg_i.size(), res_ptr);
-	res_ptr += arg_i.size();
+        copy(arg_i_ptr, arg_i_ptr+arg_i.size(), res_ptr);
+        res_ptr += arg_i.size();
       } else {
-	for(int k=0; k<arg_i.size(); ++k){
-	  *arg_i_ptr++ |= *res_ptr;
-	  *res_ptr++ = 0;
-	}
+        for(int k=0; k<arg_i.size(); ++k){
+          *arg_i_ptr++ |= *res_ptr;
+          *res_ptr++ = 0;
+        }
       }
     }
   }
@@ -131,10 +131,10 @@ namespace CasADi{
       int row_offset = 0;
       MX& aseed = *adjSeed[d][0];
       for(int i=0; i<input.size(); ++i){
-	MX& asens = *adjSens[d][i];
-	int nrow = asens.size1();
-	asens += aseed(Slice(row_offset,row_offset+nrow),Slice());
-	row_offset += nrow;
+        MX& asens = *adjSens[d][i];
+        int nrow = asens.size1();
+        asens += aseed(Slice(row_offset,row_offset+nrow),Slice());
+        row_offset += nrow;
       }
       casadi_assert(row_offset == aseed.size1());
       aseed = MX();
@@ -156,8 +156,8 @@ namespace CasADi{
     int nz_test = -1;
     for(vector<int>::const_iterator i=nz.begin(); i!=nz.end(); ++i){
       if(*i>=0){
-	nz_test = *i;
-	break;
+        nz_test = *i;
+        break;
       }
     }
 
@@ -176,9 +176,9 @@ namespace CasADi{
     // Check if any nz refer to a different nonzero
     for(vector<int>::const_iterator i=nz.begin(); i!=nz.end(); ++i){
       if(*i>=0 && (*i < begin || *i >= end)){
-	
-	// Fallback to the base class
-	return MXNode::getGetNonzeros(sp,nz);
+        
+        // Fallback to the base class
+        return MXNode::getGetNonzeros(sp,nz);
       }
     }
     
@@ -188,7 +188,7 @@ namespace CasADi{
     } else {
       vector<int> nz_new(nz);
       for(vector<int>::iterator i=nz_new.begin(); i!=nz_new.end(); ++i){
-	if(*i>=0) *i -= begin;
+        if(*i>=0) *i -= begin;
       }
       return dep(i)->getGetNonzeros(sp,nz_new);
     }
