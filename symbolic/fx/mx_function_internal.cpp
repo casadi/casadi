@@ -982,6 +982,13 @@ namespace CasADi{
     casadi_assert_message(fwdSens.empty(),"Not implemented");
     casadi_assert_message(adjSeed.empty(),"Not implemented");
   
+    // Allocate outputs
+    if(!output_given){
+      output_s.resize(outputv_.size());
+      for(int i=0; i<output_s.size(); ++i)
+        output_s[i] = SXMatrix(outputv_[i].sparsity());
+    }
+    
     // Create a work array
     vector<SXMatrix> swork(work_.size());
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
