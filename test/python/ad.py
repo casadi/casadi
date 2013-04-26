@@ -177,7 +177,6 @@ class ADtests(casadiTestCase):
               sens = array(f.adjSens()).ravel()
               self.checkarray(sens,dot(J.T,seed),"AD")
               
-  @known_bug()  # suffers from #695
   def test_SXevalSX(self):
     n=array([1.2,2.3,7,1.4])
     for inputshape in ["column","row","matrix"]:
