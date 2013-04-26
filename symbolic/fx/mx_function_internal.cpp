@@ -1072,7 +1072,7 @@ namespace CasADi{
     vector<vector<SXMatrix> > dummy;
   
     // Evaluate symbolically
-    evalSX(arg,res,dummy,dummy,dummy,dummy,false);
+    evalSX(arg,res,dummy,dummy,dummy,dummy);
   
     // Create function
     SXFunction f(arg,res);

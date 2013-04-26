@@ -1226,8 +1226,7 @@ namespace CasADi{
 
   void FXInternal::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
 			  const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-			  const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-			  bool output_given){
+			  const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
     // Make sure initialized
     assertInit();
     
@@ -1252,7 +1251,6 @@ namespace CasADi{
       sparsity_matches = arg[i].sparsity()==input(i).sparsity();
     }
     if(!sparsity_matches){
-      casadi_assert_message(!output_given,"Inconsistent arguments.");
       vector<SXMatrix> arg_new(arg.size());
       for(int i=0; i<arg.size(); ++i){
 	try{
@@ -1264,7 +1262,7 @@ namespace CasADi{
 	  throw CasadiException(ss.str());
 	}
       }
-      evalSX(arg_new,res,fseed,fsens,aseed,asens,output_given);
+      evalSX(arg_new,res,fseed,fsens,aseed,asens);
       return;
     }
   
@@ -1289,7 +1287,7 @@ namespace CasADi{
 	  }
 	}
       }
-      evalSX(arg,res,fseed_new,fsens,aseed,asens,output_given);
+      evalSX(arg,res,fseed_new,fsens,aseed,asens);
       return;
     }
   
@@ -1314,7 +1312,7 @@ namespace CasADi{
 	  }
 	}
       }
-      evalSX(arg,res,fseed,fsens,aseed_new,asens,output_given);
+      evalSX(arg,res,fseed,fsens,aseed_new,asens);
       return;
     }
     
@@ -1563,7 +1561,7 @@ namespace CasADi{
 			bool output_given, bool always_inline, bool never_inline){
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!never_inline, "SX expressions do not support call-nodes");
-    evalSX(arg,res,fseed,fsens,aseed,asens,output_given);
+    evalSX(arg,res,fseed,fsens,aseed,asens);
   }
 
   FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric){
