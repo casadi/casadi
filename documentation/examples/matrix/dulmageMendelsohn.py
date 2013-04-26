@@ -35,16 +35,9 @@ randperm2 = numpy.random.permutation(A.size1())
 
 Ar = A[randperm1,randperm2]
 
-rowperm = IVector()
-colperm = IVector()
-rowblock = IVector()
-colblock = IVector()
-coarse_rowblock = IVector()
-coarse_colblock = IVector()
-
 print "randomly permuted: "
 Ar.printMatrix()
-Ar.sparsity().dulmageMendelsohn 	( rowperm, colperm, rowblock,	colblock,	coarse_rowblock, coarse_colblock)
+ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = Ar.sparsity().dulmageMendelsohn()
 
 print "rowperm: ", rowperm
 print "colperm: ", colperm

@@ -411,7 +411,7 @@ class Sparsitytests(casadiTestCase):
       coarse_rowblock = IVector()
       coarse_colblock = IVector()
 
-      AP.sparsity().dulmageMendelsohn 	( rowperm, colperm, rowblock,	colblock,	coarse_rowblock, coarse_colblock)
+      ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = AP.sparsity().dulmageMendelsohn()
 
       Ar = AP[rowperm,colperm]
       

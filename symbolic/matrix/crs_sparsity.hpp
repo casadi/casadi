@@ -402,8 +402,11 @@ namespace CasADi{
 	\sa stronglyConnectedComponents
 
     */
+#ifndef SWIG
     int dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed=0) const;
-
+#else // SWIG
+    int dulmageMendelsohn(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, int seed=0) const;
+#endif // SWIG
     /// Get the location of all nonzero elements
     std::vector<int> getElements(bool row_major=true) const;
     
