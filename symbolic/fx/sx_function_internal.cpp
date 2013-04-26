@@ -857,35 +857,33 @@ namespace CasADi{
     if(recursive) XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>::updateNumSens(recursive);
   }
 
-  void SXFunctionInternal::evalSXsparse(const vector<SXMatrix>& arg, vector<SXMatrix>& res, 
+  void SXFunctionInternal::evalSXsparse(const vector<SXMatrix>& arg1, vector<SXMatrix>& res1, 
 				  const vector<vector<SXMatrix> >& fseed, vector<vector<SXMatrix> >& fsens, 
 				  const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens,
-				  bool output_given){
+				  bool output_given_remove){
     if(verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
 
-    // Check if output is given (see #696)
-    if(!output_given){
-      const int checking_depth = 2;
-      bool output_given_new = true;
-      for(int i=0; i<arg.size() && output_given_new; ++i){
-	for(int j=0; j<arg[i].size() && output_given_new; ++j){
-	  if(!arg[i].at(j).isEqual(inputv_[i].at(j),checking_depth)){	  
-	    output_given_new = false;
-	  }
+    // Check if arguments matches the input expressions, in which case the output is known to be the output expressions
+    const int checking_depth = 2;
+    bool output_given = true;
+    for(int i=0; i<arg1.size() && output_given; ++i){
+      for(int j=0; j<arg1[i].size() && output_given; ++j){
+	if(!arg1[i].at(j).isEqual(inputv_[i].at(j),checking_depth)){	  
+	  output_given = false;
 	}
-      }
-      
-      // Call again with output_given (temporary solution, see #696)
-      if(output_given_new){
-	evalSXsparse(inputv_,outputv_,fseed,fsens,aseed,asens,true);
-
-	// Return the known output
-	for(int i=0; i<res.size(); ++i){
-	  copy(outputv_[i].begin(),outputv_[i].end(),res[i].begin()); 
-	}
-	return;
       }
     }
+    
+    // Copy output if known
+    if(output_given){
+      for(int i=0; i<res1.size(); ++i){
+	copy(outputv_[i].begin(),outputv_[i].end(),res1[i].begin()); 
+      }
+    }
+    
+    // Use the function arguments if possible to avoid problems involving equivalent but different expressions
+    const vector<SXMatrix>& arg = output_given ? inputv_ : arg1;
+    vector<SXMatrix>& res = output_given ? outputv_ : res1;
 
     // Number of forward seeds
     int nfdir = fsens.size();
