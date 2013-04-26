@@ -114,23 +114,23 @@ namespace CasADi{
       // Entries in arg0 with elements zero'ed out
       if(!Add){
 
-	// Get the nz locations in arg0 corresponding to the output sparsity pattern
-	r_nz.resize(with_duplicates.size());
-	copy(with_duplicates.begin(),with_duplicates.end(),r_nz.begin());
-	arg0.sparsity().getNZInplace(r_nz);
+        // Get the nz locations in arg0 corresponding to the output sparsity pattern
+        r_nz.resize(with_duplicates.size());
+        copy(with_duplicates.begin(),with_duplicates.end(),r_nz.begin());
+        arg0.sparsity().getNZInplace(r_nz);
 
-	// Ignore duplicates (needed?)
-	int last = -1;
-	for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
-	  if(*k==last){
-	    *k = -1;
-	  } else {
-	    last = *k;
-	  }
-	}
-	
-	// Zero out the corresponding entries
-	arg0 = MX::zeros(isp)->getSetNonzeros(arg0,r_nz);
+        // Ignore duplicates (needed?)
+        int last = -1;
+        for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
+          if(*k==last){
+            *k = -1;
+          } else {
+            last = *k;
+          }
+        }
+        
+        // Zero out the corresponding entries
+        arg0 = MX::zeros(isp)->getSetNonzeros(arg0,r_nz);
       }
 
       // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
@@ -145,39 +145,39 @@ namespace CasADi{
       
       // Enlarge the sparsity pattern of the arguments if not all assignments fit
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
-	if(*k>=0 && nz[*k]>=0 && r_nz2[nz[*k]]<0){
-	  
-	  // Create a new pattern which includes both the the previous seed and the addition/assignment
-	  CRSSparsity sp = arg0.sparsity().patternUnion(osp);
-	  arg0 = arg0->getSetSparse(sp);
+        if(*k>=0 && nz[*k]>=0 && r_nz2[nz[*k]]<0){
+          
+          // Create a new pattern which includes both the the previous seed and the addition/assignment
+          CRSSparsity sp = arg0.sparsity().patternUnion(osp);
+          arg0 = arg0->getSetSparse(sp);
 
-	  // Recalculate the nz locations in the arguments corresponding to the inputs
-	  copy(without_duplicates.begin(),without_duplicates.end(),r_nz2.begin());
-	  arg0.sparsity().getNZInplace(r_nz2);
+          // Recalculate the nz locations in the arguments corresponding to the inputs
+          copy(without_duplicates.begin(),without_duplicates.end(),r_nz2.begin());
+          arg0.sparsity().getNZInplace(r_nz2);
 
-	  break;
-	}
+          break;
+        }
       }
 
       // Have r_nz point to locations in the result instead of the output and check if there is anything to add at all
       bool elements_to_add = false;
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
-	if(*k>=0){
-	  int k2 = nz[*k];
-	  if(k2>=0){
-	    *k = r_nz2[k2];
-	    elements_to_add = true;
-	  } else {
-	    *k = -1;
-	  }
-	}
+        if(*k>=0){
+          int k2 = nz[*k];
+          if(k2>=0){
+            *k = r_nz2[k2];
+            elements_to_add = true;
+          } else {
+            *k = -1;
+          }
+        }
       }
 
       // Add to the element to the sensitivity, if any
       if(elements_to_add){
-	res = arg->getAddNonzeros(arg0,r_nz);
-      } else {	
-	res = arg0;
+        res = arg->getAddNonzeros(arg0,r_nz);
+      } else {        
+        res = arg0;
       }
     }
 
@@ -201,36 +201,36 @@ namespace CasADi{
       r_rowind.resize(isp.size1()+1); // Row count
       fill(r_rowind.begin(),r_rowind.end(),0);
       for(int k=0; k<nz.size(); ++k){
-	if(r_nz[k]!=-1){
-	  r_nz[n++] = r_nz[k];
-	  int i=irow[nz_order[k]];
-	  int j=icol[nz_order[k]];
-	  if(i!=last_i || j!=last_j){ // Ignore duplicates
-	    r_col.push_back(j);
-	    r_rowind[1+i]++;
-	    last_i = i;
-	    last_j = j;
-	  }
-	}
+        if(r_nz[k]!=-1){
+          r_nz[n++] = r_nz[k];
+          int i=irow[nz_order[k]];
+          int j=icol[nz_order[k]];
+          if(i!=last_i || j!=last_j){ // Ignore duplicates
+            r_col.push_back(j);
+            r_rowind[1+i]++;
+            last_i = i;
+            last_j = j;
+          }
+        }
       }
       r_nz.resize(n);
       for(int i=1; i<r_rowind.size(); ++i) r_rowind[i] += r_rowind[i-1]; // row count -> row offset
 
       if(r_nz.size()==0){
-	// Nothing to set/add
-	asens0 = aseed;
+        // Nothing to set/add
+        asens0 = aseed;
       } else {
-	// Create a sparsity pattern from vectors
-	CRSSparsity f_sp(isp.size1(),isp.size2(),r_col,r_rowind);
-	asens += aseed->getGetNonzeros(f_sp,r_nz);
+        // Create a sparsity pattern from vectors
+        CRSSparsity f_sp(isp.size1(),isp.size2(),r_col,r_rowind);
+        asens += aseed->getGetNonzeros(f_sp,r_nz);
 
-	if(Add){
-	  // The corresponding nonzeros remain in the seed
-	  asens0 = aseed;
-	} else {
-	  // The corresponding nonzeros disappear from the seed
-	  asens0 = MX::zeros(f_sp)->getSetNonzeros(aseed,r_nz);
-	}
+        if(Add){
+          // The corresponding nonzeros remain in the seed
+          asens0 = aseed;
+        } else {
+          // The corresponding nonzeros disappear from the seed
+          asens0 = MX::zeros(f_sp)->getSetNonzeros(aseed,r_nz);
+        }
       }
     }
   }
@@ -262,9 +262,9 @@ namespace CasADi{
     }
     for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++idata_it){
       if(Add){
-	if(*k>=0) odata[*k] += *idata_it;
+        if(*k>=0) odata[*k] += *idata_it;
       } else {
-	if(*k>=0) odata[*k] = *idata_it;
+        if(*k>=0) odata[*k] = *idata_it;
       }
     }
     
@@ -274,14 +274,14 @@ namespace CasADi{
       typename vector<T>::const_iterator fseed_it = fwdSeed[d][1]->begin();
       vector<T>& fsens = fwdSens[d][0]->data();
       if(&fseed0 != &fsens){
-	copy(fseed0.begin(),fseed0.end(),fsens.begin());
+        copy(fseed0.begin(),fseed0.end(),fsens.begin());
       }
       for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++fseed_it){
-	if(Add){
-	  if(*k>=0) fsens[*k] += *fseed_it;
-	} else {
-	  if(*k>=0) fsens[*k] = *fseed_it;
-	}
+        if(Add){
+          if(*k>=0) fsens[*k] += *fseed_it;
+        } else {
+          if(*k>=0) fsens[*k] = *fseed_it;
+        }
       }
     }
       
@@ -291,14 +291,14 @@ namespace CasADi{
       vector<T>& asens0 = adjSens[d][0]->data();
       typename vector<T>::iterator asens_it = adjSens[d][1]->begin();
       for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++asens_it){
-	if(*k>=0){
-	  *asens_it += aseed[*k];
-	  if(!Add) aseed[*k] = 0;	      
-	}
+        if(*k>=0){
+          *asens_it += aseed[*k];
+          if(!Add) aseed[*k] = 0;              
+        }
       }
       if(&aseed != &asens0){
-	transform(aseed.begin(),aseed.end(),asens0.begin(),asens0.begin(),std::plus<T>());
-	fill(aseed.begin(),aseed.end(),0);
+        transform(aseed.begin(),aseed.end(),asens0.begin(),asens0.begin(),std::plus<T>());
+        fill(aseed.begin(),aseed.end(),0);
       }
     }
   }
@@ -333,9 +333,9 @@ namespace CasADi{
     T* odata_stop = getPtr(odata) + s_.stop_;
     for(; odata_ptr != odata_stop; odata_ptr += s_.step_){
       if(Add){
-	*odata_ptr += *idata_ptr++;
+        *odata_ptr += *idata_ptr++;
       } else {
-	*odata_ptr = *idata_ptr++;
+        *odata_ptr = *idata_ptr++;
       }
     }
     
@@ -344,18 +344,18 @@ namespace CasADi{
       const vector<T>& fseed0 = fwdSeed[d][0]->data();
       vector<T>& fsens = fwdSens[d][0]->data();
       if(&fseed0 != &fsens){
-	copy(fseed0.begin(),fseed0.end(),fsens.begin());
+        copy(fseed0.begin(),fseed0.end(),fsens.begin());
       }
       const vector<T>& fseed = fwdSeed[d][1]->data();
       const T* fseed_ptr = getPtr(fseed);
       T* fsens_ptr = getPtr(fsens) + s_.start_;
       T* fsens_stop = getPtr(fsens) + s_.stop_;
       for(; fsens_ptr != fsens_stop; fsens_ptr += s_.step_){
-	if(Add){
-	  *fsens_ptr += *fseed_ptr++;
-	} else {
-	  *fsens_ptr = *fseed_ptr++;
-	}
+        if(Add){
+          *fsens_ptr += *fseed_ptr++;
+        } else {
+          *fsens_ptr = *fseed_ptr++;
+        }
       }
     }
     
@@ -367,13 +367,13 @@ namespace CasADi{
       T* aseed_ptr = getPtr(aseed) + s_.start_;
       T* aseed_stop = getPtr(aseed) + s_.stop_;
       for(; aseed_ptr != aseed_stop; aseed_ptr += s_.step_){
-	*asens_ptr++ += *aseed_ptr;
-	if(!Add) *aseed_ptr = 0;
+        *asens_ptr++ += *aseed_ptr;
+        if(!Add) *aseed_ptr = 0;
       }
       vector<T>& asens0 = adjSens[d][0]->data();
       if(&aseed != &asens0){
-	transform(aseed.begin(),aseed.end(),asens0.begin(),asens0.begin(),std::plus<T>());
-	fill(aseed.begin(),aseed.end(),0);
+        transform(aseed.begin(),aseed.end(),asens0.begin(),asens0.begin(),std::plus<T>());
+        fill(aseed.begin(),aseed.end(),0);
       }
     }
   }
@@ -408,11 +408,11 @@ namespace CasADi{
     T* outer_stop = getPtr(odata) + outer_.stop_;
     for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
       for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
-	if(Add){
-	  *inner_ptr += *idata_ptr++;
-	} else {
-	  *inner_ptr = *idata_ptr++;
-	}
+        if(Add){
+          *inner_ptr += *idata_ptr++;
+        } else {
+          *inner_ptr = *idata_ptr++;
+        }
       }
     }
     
@@ -421,20 +421,20 @@ namespace CasADi{
       const vector<T>& fseed0 = fwdSeed[d][0]->data();
       vector<T>& fsens = fwdSens[d][0]->data();
       if(&fseed0 != &fsens){
-	copy(fseed0.begin(),fseed0.end(),fsens.begin());
+        copy(fseed0.begin(),fseed0.end(),fsens.begin());
       }
       const vector<T>& fseed = fwdSeed[d][1]->data();
       const T* fseed_ptr = getPtr(fseed);
       T* outer_ptr = getPtr(fsens) + outer_.start_;
       T* outer_stop = getPtr(fsens) + outer_.stop_;
       for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
-	for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
-	  if(Add){
-	    *inner_ptr += *fseed_ptr++;
-	  } else {
-	    *inner_ptr = *fseed_ptr++;
-	  }
-	}
+        for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+          if(Add){
+            *inner_ptr += *fseed_ptr++;
+          } else {
+            *inner_ptr = *fseed_ptr++;
+          }
+        }
       }
     }
     
@@ -446,15 +446,15 @@ namespace CasADi{
       T* outer_ptr = getPtr(aseed) + outer_.start_;
       T* outer_stop = getPtr(aseed) + outer_.stop_;
       for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
-	for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
-	  *asens_ptr++ += *inner_ptr;
-	  if(!Add) *inner_ptr = 0;
-	}
+        for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+          *asens_ptr++ += *inner_ptr;
+          if(!Add) *inner_ptr = 0;
+        }
       }
       vector<T>& asens0 = adjSens[d][0]->data();
       if(&aseed != &asens0){
-	transform(aseed.begin(),aseed.end(),asens0.begin(),asens0.begin(),std::plus<T>());
-	fill(aseed.begin(),aseed.end(),0);
+        transform(aseed.begin(),aseed.end(),asens0.begin(),asens0.begin(),std::plus<T>());
+        fill(aseed.begin(),aseed.end(),0);
       }
     }
   }
@@ -469,30 +469,30 @@ namespace CasADi{
     // Propate sparsity
     if(fwd){
       if(outputd != inputd0){
-	copy(inputd0,inputd0+input[0]->size(),outputd);
+        copy(inputd0,inputd0+input[0]->size(),outputd);
       }
       for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++inputd){
-	if(Add){
-	  if(*k>=0) outputd[*k] |= *inputd;
-	} else {
-	  if(*k>=0) outputd[*k] = *inputd;
-	}
+        if(Add){
+          if(*k>=0) outputd[*k] |= *inputd;
+        } else {
+          if(*k>=0) outputd[*k] = *inputd;
+        }
       }
     } else {
       for(vector<int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++inputd){
-	if(*k>=0){
-	  *inputd |= outputd[*k];
-	  if(!Add){
-	    outputd[*k] = 0;
-	  }
-	}
+        if(*k>=0){
+          *inputd |= outputd[*k];
+          if(!Add){
+            outputd[*k] = 0;
+          }
+        }
       }
       if(outputd != inputd0){
-	int n = input[0]->size();
-	for(int k=0; k<n; ++k){
-	  inputd0[k] |= outputd[k];
-	  outputd[k] = 0;
-	}
+        int n = input[0]->size();
+        for(int k=0; k<n; ++k){
+          inputd0[k] |= outputd[k];
+          outputd[k] = 0;
+        }
       }
     }
   }
@@ -507,28 +507,28 @@ namespace CasADi{
     // Propate sparsity
     if(fwd){
       if(outputd != inputd0){
-	copy(inputd0,inputd0+input[0]->size(),outputd);
+        copy(inputd0,inputd0+input[0]->size(),outputd);
       }
       for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
-	if(Add){
-	  outputd[k] |= *inputd++;
-	} else {
-	  outputd[k] = *inputd++;
-	}
+        if(Add){
+          outputd[k] |= *inputd++;
+        } else {
+          outputd[k] = *inputd++;
+        }
       }
     } else {
       for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
-	*inputd++ |= outputd[k];
-	if(!Add){
-	  outputd[k] = 0;
-	}
+        *inputd++ |= outputd[k];
+        if(!Add){
+          outputd[k] = 0;
+        }
       }
       if(outputd != inputd0){
-	int n = input[0]->size();
-	for(int k=0; k<n; ++k){
-	  inputd0[k] |= outputd[k];
-	  outputd[k] = 0;
-	}
+        int n = input[0]->size();
+        for(int k=0; k<n; ++k){
+          inputd0[k] |= outputd[k];
+          outputd[k] = 0;
+        }
       }
     }
   }
@@ -543,32 +543,32 @@ namespace CasADi{
     // Propate sparsity
     if(fwd){
       if(outputd != inputd0){
-	copy(inputd0,inputd0+input[0]->size(),outputd);
+        copy(inputd0,inputd0+input[0]->size(),outputd);
       }
       for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
-	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
-	  if(Add){
-	    outputd[k2] |= *inputd++;
-	  } else {
-	    outputd[k2] = *inputd++;
-	  }
-	}
+        for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
+          if(Add){
+            outputd[k2] |= *inputd++;
+          } else {
+            outputd[k2] = *inputd++;
+          }
+        }
       }
     } else {
       for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
-	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
-	  *inputd++ |= outputd[k2];
-	  if(!Add){
-	    outputd[k2] = 0;
-	  }
-	}
+        for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
+          *inputd++ |= outputd[k2];
+          if(!Add){
+            outputd[k2] = 0;
+          }
+        }
       }
       if(outputd != inputd0){
-	int n = input[0]->size();
-	for(int k=0; k<n; ++k){
-	  inputd0[k] |= outputd[k];
-	  outputd[k] = 0;
-	}
+        int n = input[0]->size();
+        for(int k=0; k<n; ++k){
+          inputd0[k] |= outputd[k];
+          outputd[k] = 0;
+        }
       }
     }
   }
@@ -731,9 +731,9 @@ namespace CasADi{
     if(isAssignment()){
       MX t = this->dep(1);
       if(Add){
-	ex += t;
+        ex += t;
       } else {
-	ex = t;
+        ex = t;
       }
     }
   }

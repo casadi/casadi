@@ -64,7 +64,7 @@ namespace CasADi{
       A failed shared_cast will result in a null pointer (cf. dynamic_cast)
 
       \author Joel Andersson 
-      \date 2010	
+      \date 2010        
   */
   class SharedObject : public PrintableObject{
 #ifndef SWIG

@@ -174,19 +174,19 @@ void ControlSimulatorInternal::init(){
   
   // Populate the fine-grained grid_
   if (nf_==1) { 
- 	  // The default case: don't change the grid 
- 	  grid_ = gridc_; 
- 	} else { 
- 	  // Interpolate the grid. 
- 	  grid_.resize((gridc_.size()-1)*nf_+1); 	     	 
- 	  for (int k=0;k<gridc_.size()-1;++k) { 
+           // The default case: don't change the grid 
+           grid_ = gridc_; 
+         } else { 
+           // Interpolate the grid. 
+           grid_.resize((gridc_.size()-1)*nf_+1);                       
+           for (int k=0;k<gridc_.size()-1;++k) { 
       for (int i=0;i<gridlocal_.size()-1;++i) {
         grid_[k*nf_+i] = gridc_[k] + gridlocal_[i]*(gridc_[k+1]-gridc_[k]);
       }
- 	  } 
+           } 
          
- 	  grid_[grid_.size()-1] = gridc_[gridc_.size()-1]; 
- 	} 
+           grid_[grid_.size()-1] = gridc_[gridc_.size()-1]; 
+         } 
   
   // Let the integration time start from the np_first point of the time grid.
   if (!gridc_.empty()) integrator_.setOption("t0",gridc_[0]);
@@ -422,13 +422,13 @@ void ControlSimulatorInternal::evaluate(int nfdir, int nadir){
 }
 
 Matrix<double> ControlSimulatorInternal::getVFine() const {
- 	  Matrix<double> ret(grid_.size()-1,nu_,0);
- 	  for (int i=0;i<ns_-1;++i) {
- 	    for (int k=0;k<nf_;++k) {
- 	      copy(input(CONTROLSIMULATOR_U).data().begin()+i*nu_,input(CONTROLSIMULATOR_U).data().begin()+(i+1)*nu_,ret.begin()+i*nu_*nf_+k*nu_);
- 	    }
- 	  }
- 	  return ret;
+           Matrix<double> ret(grid_.size()-1,nu_,0);
+           for (int i=0;i<ns_-1;++i) {
+             for (int k=0;k<nf_;++k) {
+               copy(input(CONTROLSIMULATOR_U).data().begin()+i*nu_,input(CONTROLSIMULATOR_U).data().begin()+(i+1)*nu_,ret.begin()+i*nu_*nf_+k*nu_);
+             }
+           }
+           return ret;
 }
 
 std::vector< int > ControlSimulatorInternal::getCoarseIndex() const {
@@ -462,7 +462,7 @@ void ControlSimulatorInternal::updateNumSens(bool recursive){
   
 }
 
- 	
+         
 
 } // namespace CasADi
 

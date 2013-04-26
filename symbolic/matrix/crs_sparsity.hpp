@@ -127,8 +127,8 @@ namespace CasADi{
     static CRSSparsity createDiagonal(int n, int m);
     
     /** Get the diagonal of the matrix/create a diagonal matrix (mapping will contain the nonzero mapping)
-	When the input is square, the diagonal elements are returned.
-	If the input is vector-like, a diagonal matrix is constructed with it.
+        When the input is square, the diagonal elements are returned.
+        If the input is vector-like, a diagonal matrix is constructed with it.
     */
 #ifndef SWIG
     CRSSparsity diag(std::vector<int>& mapping) const;
@@ -212,8 +212,8 @@ namespace CasADi{
     std::vector<int>& rowindRef();
     
     /** \brief Get the row for each non-zero entry
-	Together with the col-vector, this vector gives the sparsity of the matrix in
-	sparse triplet format, i.e. the row and column for each non-zero elements  */
+        Together with the col-vector, this vector gives the sparsity of the matrix in
+        sparse triplet format, i.e. the row and column for each non-zero elements  */
     std::vector<int> getRow() const;
     
     /// Resize
@@ -223,26 +223,26 @@ namespace CasADi{
     CRSSparsity reshape(int n, int m) const;
     
     /** \brief Get the index of a non-zero element
-	Add the element if it does not exist and copy object if it's not unique */
+        Add the element if it does not exist and copy object if it's not unique */
     int getNZ(int i, int j);
     
     /** \brief Get the index of an existing non-zero element
-	return -1 if the element does not exists */
+        return -1 if the element does not exists */
     int getNZ(int i, int j) const;
 
     /// Returns true if the pattern has a non-zero at location i,j
     bool hasNZ(int i, int j) const;
 
     /** \brief Get a set of non-zero element
-	return -1 if the element does not exists */
+        return -1 if the element does not exists */
     std::vector<int> getNZ(const std::vector<int>& ii, const std::vector<int>& jj) const;
     //    std::vector<int> getNZNew(std::vector<int> i, std::vector<int> j);
     //    std::vector<int> getNZNew(std::vector<int> i, std::vector<int> j) const;
 
     /** \brief Get the nonzero index for a set of elements
-	The index vector is used both for input and outputs and must be sorted by increasing
-	nonzero index, i.e. row-wise.
-	Elements not found in the sparsity pattern are set to -1.
+        The index vector is used both for input and outputs and must be sorted by increasing
+        nonzero index, i.e. row-wise.
+        Elements not found in the sparsity pattern are set to -1.
     */
     void getNZInplace(std::vector<int>& indices) const;
 
@@ -285,9 +285,9 @@ namespace CasADi{
 
     /// @{
     /** \brief Combine two sparsity patterns
-	Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
-	The mapping matrix contains the arguments for each nonzero, the first bit indicates if the first argument is nonzero,
-	the second bit indicates if the second argument is nonzero (note that none of, one of or both of the arguments can be nonzero) */
+        Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
+        The mapping matrix contains the arguments for each nonzero, the first bit indicates if the first argument is nonzero,
+        the second bit indicates if the second argument is nonzero (note that none of, one of or both of the arguments can be nonzero) */
     CRSSparsity patternCombine(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
     CRSSparsity patternCombine(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
     /// @}
@@ -300,31 +300,31 @@ namespace CasADi{
     
     /// @{
     /** \brief Intersection of two sparsity patterns
-	Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
-	The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if it is from the second and 3 (i.e. 1 | 2) if from both */
+        Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
+        The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if it is from the second and 3 (i.e. 1 | 2) if from both */
     CRSSparsity patternIntersection(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;
     CRSSparsity patternIntersection(const CRSSparsity& y) const;
     /// @}
 
     /// @{
     /** \brief Sparsity pattern for a matrix-matrix product
-	Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
-	The mapping contains a vector of the index pairs that makes up the scalar products for each non-zero */
+        Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
+        The mapping contains a vector of the index pairs that makes up the scalar products for each non-zero */
     CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
     CRSSparsity patternProduct(const CRSSparsity& y_trans) const;
     /// @}
     
     /** \brief Enlarge matrix
-	Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros 
+        Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros 
     
-	For the matrices A to B
-	A(m,n)
-	length(ii)=m , length(jj)=n
-	B(nrow,ncol)
+        For the matrices A to B
+        A(m,n)
+        length(ii)=m , length(jj)=n
+        B(nrow,ncol)
     
-	A=enlarge(m,n,ii,jj) makes sure that
+        A=enlarge(m,n,ii,jj) makes sure that
     
-	B[ii,jj] == A 
+        B[ii,jj] == A 
     */
     void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
 
@@ -338,7 +338,7 @@ namespace CasADi{
     CRSSparsity makeDense(std::vector<int>& mapping) const;
 
     /** \brief Erase rows and columns
-	Erase rows and/or columns of a matrix */
+        Erase rows and/or columns of a matrix */
     std::vector<int> erase(const std::vector<int>& ii, const std::vector<int>& jj);
 
     /// Append another sparsity patten vertically
@@ -386,18 +386,18 @@ namespace CasADi{
     int depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const;
     
     /** \brief Find the strongly connected components of the bigraph defined by the sparsity pattern of a square matrix
-	See Direct Methods for Sparse Linear Systems by Davis (2006).
-	Returns:
-	- Number of components
-	- Offset for each components (length: 1 + number of components) 
-	- Indices for each components, component i has indices index[offset[i]], ..., index[offset[i+1]]
+        See Direct Methods for Sparse Linear Systems by Davis (2006).
+        Returns:
+        - Number of components
+        - Offset for each components (length: 1 + number of components) 
+        - Indices for each components, component i has indices index[offset[i]], ..., index[offset[i+1]]
       
-	In the case that the matrix is symmetric, the result has a particular interpretation:
-	Given a symmetric matrix A and
-	n = A.stronglyConnectedComponents(p,r)
+        In the case that the matrix is symmetric, the result has a particular interpretation:
+        Given a symmetric matrix A and
+        n = A.stronglyConnectedComponents(p,r)
        
-	=> A[p,p] will appear block-diagonal with n blocks and
-	with the indices of the block boundaries to be found in r. 
+        => A[p,p] will appear block-diagonal with n blocks and
+        with the indices of the block boundaries to be found in r. 
       
     */
 #ifndef SWIG
@@ -407,15 +407,15 @@ namespace CasADi{
 #endif // SWIG
     
     /** \brief Compute the Dulmage-Mendelsohn decomposition 
-	See Direct Methods for Sparse Linear Systems by Davis (2006).
+        See Direct Methods for Sparse Linear Systems by Davis (2006).
        
-	Dulmage-Mendelsohn will try to bring your matrix into lower block-triangular (LBT) form.
-	It will not care about the distance of off-diagonal elements to the diagonal:
-	there is no guarantee you will get a block-diagonal matrix if you supply a randomly permuted block-diagonal matrix.
+        Dulmage-Mendelsohn will try to bring your matrix into lower block-triangular (LBT) form.
+        It will not care about the distance of off-diagonal elements to the diagonal:
+        there is no guarantee you will get a block-diagonal matrix if you supply a randomly permuted block-diagonal matrix.
       
-	If your matrix is symmetrical, this method is of limited use; permutation can make it non-symmetric.
+        If your matrix is symmetrical, this method is of limited use; permutation can make it non-symmetric.
       
-	\sa stronglyConnectedComponents
+        \sa stronglyConnectedComponents
 
     */
 #ifndef SWIG
@@ -433,8 +433,8 @@ namespace CasADi{
     CRSSparsity unidirectionalColoring(const CRSSparsity& AT=CRSSparsity(), int cutoff = std::numeric_limits<int>::max()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
-	A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) 
-	Ordering options: None (0), largest first (1)
+        A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) 
+        Ordering options: None (0), largest first (1)
     */
     CRSSparsity starColoring(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
     
@@ -442,14 +442,14 @@ namespace CasADi{
     std::vector<int> largestFirstOrdering() const;
     
     /** \brief Permute rows and/or columns
-	Multiply the sparsity with a permutation matrix from the left and/or from the right
-	P * A * trans(P), A * trans(P) or A * trans(P) with P defined by an index vector 
-	containing the column for each row. As an alternative, P can be transposed (inverted).
+        Multiply the sparsity with a permutation matrix from the left and/or from the right
+        P * A * trans(P), A * trans(P) or A * trans(P) with P defined by an index vector 
+        containing the column for each row. As an alternative, P can be transposed (inverted).
     */
     CRSSparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_columns=true, bool invert_permutation=false) const;
       
     /// Get the dimension as a string
-    std::string dimString() 	const;
+    std::string dimString()         const;
     
     /** \brief Print a textual representation of sparsity
      */
@@ -526,35 +526,35 @@ namespace CasADi{
       // For all rows
       for(int i=0; i<sz1; ++i){
       
-	// Nonzero of the assigning matrix
-	int v_el = v_rind[i];
+        // Nonzero of the assigning matrix
+        int v_el = v_rind[i];
       
-	// First nonzero of the following row
-	int v_el_end = v_rind[i+1];
+        // First nonzero of the following row
+        int v_el_end = v_rind[i+1];
       
-	// Next column of the assigning matrix
-	int v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+        // Next column of the assigning matrix
+        int v_j = v_el<v_el_end ? v_c[v_el] : sz2;
       
-	// Assign all nonzeros
-	for(int el=rind[i]; el!=rind[i+1]; ++el){
-	
-	  //  Get column
-	  int j=c[el];
-	
-	  // Forward the assigning nonzero
-	  while(v_j<j){
-	    v_el++;
-	    v_j = v_el<v_el_end ? v_c[v_el] : sz2;
-	  }
+        // Assign all nonzeros
+        for(int el=rind[i]; el!=rind[i+1]; ++el){
+        
+          //  Get column
+          int j=c[el];
+        
+          // Forward the assigning nonzero
+          while(v_j<j){
+            v_el++;
+            v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+          }
 
-	  // Assign nonzero
-	  if(v_j==j){
-	    data[el] = val_data[v_el++];
-	    v_j = v_el<v_el_end ? v_c[v_el] : sz2;
-	  } else {
-	    data[el] = 0;
-	  }
-	}
+          // Assign nonzero
+          if(v_j==j){
+            data[el] = val_data[v_el++];
+            v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+          } else {
+            data[el] = 0;
+          }
+        }
       }
     }
   }
@@ -576,7 +576,7 @@ namespace CasADi{
     // Check if sparsity matches
     if(val_sp==*this){
       for(int k=0; k<sz; ++k){
-	data[k] += val_data[k];
+        data[k] += val_data[k];
       }
     } else if (this->empty()) {
       // Quick return
@@ -586,9 +586,9 @@ namespace CasADi{
       return;
     }  else if(val_nel==1){ // if scalar
       if(val_sz!=0){
-	for(int k=0; k<sz; ++k){
-	  data[k] += val_data[0];
-	}
+        for(int k=0; k<sz; ++k){
+          data[k] += val_data[0];
+        }
       }
     } else {
       // Quick return if empty
@@ -606,33 +606,33 @@ namespace CasADi{
       // For all rows
       for(int i=0; i<sz1; ++i){
       
-	// Nonzero of the assigning matrix
-	int v_el = v_rind[i];
+        // Nonzero of the assigning matrix
+        int v_el = v_rind[i];
       
-	// First nonzero of the following row
-	int v_el_end = v_rind[i+1];
+        // First nonzero of the following row
+        int v_el_end = v_rind[i+1];
       
-	// Next column of the assigning matrix
-	int v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+        // Next column of the assigning matrix
+        int v_j = v_el<v_el_end ? v_c[v_el] : sz2;
       
-	// Assign all nonzeros
-	for(int el=rind[i]; el!=rind[i+1]; ++el){
-	
-	  //  Get column
-	  int j=c[el];
-	
-	  // Forward the assigning nonzero
-	  while(v_j<j){
-	    v_el++;
-	    v_j = v_el<v_el_end ? v_c[v_el] : sz2;
-	  }
+        // Assign all nonzeros
+        for(int el=rind[i]; el!=rind[i+1]; ++el){
+        
+          //  Get column
+          int j=c[el];
+        
+          // Forward the assigning nonzero
+          while(v_j<j){
+            v_el++;
+            v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+          }
 
-	  // Assign nonzero
-	  if(v_j==j){
-	    data[el] += val_data[v_el++];
-	    v_j = v_el<v_el_end ? v_c[v_el] : sz2;
-	  }
-	}
+          // Assign nonzero
+          if(v_j==j){
+            data[el] += val_data[v_el++];
+            v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+          }
+        }
       }
     }
   }
@@ -654,7 +654,7 @@ namespace CasADi{
     // Check if sparsity matches
     if(val_sp==*this){
       for(int k=0; k<sz; ++k){
-	data[k] |= val_data[k];
+        data[k] |= val_data[k];
       }
     } else if (this->empty()) {
       // Quick return
@@ -664,9 +664,9 @@ namespace CasADi{
       return;
     }  else if(val_nel==1){ // if scalar
       if(val_sz!=0){
-	for(int k=0; k<sz; ++k){
-	  data[k] |= val_data[0];
-	}
+        for(int k=0; k<sz; ++k){
+          data[k] |= val_data[0];
+        }
       }
     } else {
       // Quick return if empty
@@ -684,33 +684,33 @@ namespace CasADi{
       // For all rows
       for(int i=0; i<sz1; ++i){
       
-	// Nonzero of the assigning matrix
-	int v_el = v_rind[i];
+        // Nonzero of the assigning matrix
+        int v_el = v_rind[i];
       
-	// First nonzero of the following row
-	int v_el_end = v_rind[i+1];
+        // First nonzero of the following row
+        int v_el_end = v_rind[i+1];
       
-	// Next column of the assigning matrix
-	int v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+        // Next column of the assigning matrix
+        int v_j = v_el<v_el_end ? v_c[v_el] : sz2;
       
-	// Assign all nonzeros
-	for(int el=rind[i]; el!=rind[i+1]; ++el){
+        // Assign all nonzeros
+        for(int el=rind[i]; el!=rind[i+1]; ++el){
         
-	  //  Get column
-	  int j=c[el];
+          //  Get column
+          int j=c[el];
         
-	  // Forward the assigning nonzero
-	  while(v_j<j){
-	    v_el++;
-	    v_j = v_el<v_el_end ? v_c[v_el] : sz2;
-	  }
+          // Forward the assigning nonzero
+          while(v_j<j){
+            v_el++;
+            v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+          }
 
-	  // Assign nonzero
-	  if(v_j==j){
-	    data[el] |= val_data[v_el++];
-	    v_j = v_el<v_el_end ? v_c[v_el] : sz2;
-	  }
-	}
+          // Assign nonzero
+          if(v_j==j){
+            data[el] |= val_data[v_el++];
+            v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+          }
+        }
       }
     }
   }

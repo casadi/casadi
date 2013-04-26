@@ -172,7 +172,7 @@ namespace CasADi{
     static bool equal(const std::vector<T>& v1, const std::vector<T>& v2){
       if(v1.size()!=v2.size()) return false;
       for(int j=0; j<v1.size(); ++j){
-	if(v1[j]!=v2[j]) return false;
+        if(v1[j]!=v2[j]) return false;
       }
       return true;
     }

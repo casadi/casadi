@@ -59,8 +59,8 @@ namespace CasADi{
     void evaluateCompressed(int nfdir, int nadir);
 
     /** \brief Initialize
-	Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
-	If passed to another class (in the constructor), this class should invoke this function when initialized. */
+        Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
+        If passed to another class (in the constructor), this class should invoke this function when initialized. */
     virtual void init();
 
     /** \brief  Update the number of sensitivity directions during or after initialization, 
@@ -81,8 +81,8 @@ namespace CasADi{
     
     /** \brief  Evaluate symbolically, SX type, possibly nonmatching sparsity patterns */
     virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-			const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-			const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
+                        const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+                        const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
 
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
@@ -91,8 +91,8 @@ namespace CasADi{
 
     /** \brief  Evaluate symbolically, SX type, matching sparsity patterns */
     virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-			      const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-			      const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
+                              const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+                              const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
     
     /** \brief Call a function, MX type (overloaded) */
     void call(const MXVector& arg, MXVector& res, 

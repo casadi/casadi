@@ -32,8 +32,8 @@ using namespace std;
 namespace CasADi{
     
 DirectCollocationInternal::DirectCollocationInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
-  addOption("nlp_solver",               	OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
-  addOption("nlp_solver_options",       	OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
+  addOption("nlp_solver",                       OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
+  addOption("nlp_solver_options",               OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   addOption("interpolation_order",          OT_INTEGER,  3,  "Order of the interpolating polynomials");
   addOption("collocation_scheme",           OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
   casadi_warning("CasADi::DirectCollocation is still experimental");
@@ -108,17 +108,17 @@ void DirectCollocationInternal::init(){
   // All collocation time points
   vector<vector<double> > T(nk_);
   for(int k=0; k<nk_; ++k){
-	  T[k].resize(deg_+1);
-	  for(int j=0; j<=deg_; ++j){
-		  T[k][j] = h*(k + tau_root[j]);
-	  }
+          T[k].resize(deg_+1);
+          for(int j=0; j<=deg_; ++j){
+                  T[k][j] = h*(k + tau_root[j]);
+          }
   }
 
   // Total number of variables
   int nlp_nx = 0;
   nlp_nx += nk_*(deg_+1)*nx_;   // Collocated states
   nlp_nx += nk_*nu_;            // Parametrized controls
-  nlp_nx += nx_;               	// Final state
+  nlp_nx += nx_;                       // Final state
 
   // NLP variable vector
   MX nlp_x = msym("x",nlp_nx);
@@ -129,7 +129,7 @@ void DirectCollocationInternal::init(){
   vector<MX> U(nk_);
   for(int k=0; k<nk_; ++k){
     // Collocated states
-	X[k].resize(deg_+1);
+        X[k].resize(deg_+1);
     for(int j=0; j<=deg_; ++j){
         // Get the expression for the state vector
         X[k][j] = nlp_x[Slice(offset,offset+nx_)];
@@ -186,8 +186,8 @@ void DirectCollocationInternal::init(){
     }
 
     // Add integral objective function term
-	//    [Jk] = lfcn.call([X[k+1,0], U[k]])
-	//    nlp_j += Jk
+        //    [Jk] = lfcn.call([X[k+1,0], U[k]])
+        //    nlp_j += Jk
   }
 
   // Add end cost
@@ -281,8 +281,8 @@ void DirectCollocationInternal::getVariableBounds(vector<double>& V_min, vector<
     // Pass bounds on collocation points
     for(int j=0; j<deg_; ++j){
       for(int i=0; i<nx_; ++i){
-	V_min[min_el++] = std::min(x_min.elem(i,k),x_min.elem(i,k+1));
-	V_max[max_el++] = std::max(x_max.elem(i,k),x_max.elem(i,k+1));
+        V_min[min_el++] = std::min(x_min.elem(i,k),x_min.elem(i,k+1));
+        V_max[max_el++] = std::max(x_max.elem(i,k),x_max.elem(i,k+1));
       }
     }
 
@@ -311,7 +311,7 @@ void DirectCollocationInternal::getConstraintBounds(vector<double>& G_min, vecto
   int min_el=0, max_el=0;
   
   for(int k=0; k<nk_; ++k){
-	for(int j=0; j<=deg_; ++j){
+        for(int j=0; j<=deg_; ++j){
       for(int i=0; i<nx_; ++i){
         G_min[min_el++] = 0.;
         G_max[max_el++] = 0.;

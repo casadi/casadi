@@ -840,7 +840,7 @@ void Matrix<T>::getBand(int kl, int ku, int ldres, T *res) const{
 
 template<class T>
 void Matrix<T>::set(T val, Sparsity sp){
-	std::fill(data().begin(),data().end(),val);
+        std::fill(data().begin(),data().end(),val);
 }
     
 template<class T>

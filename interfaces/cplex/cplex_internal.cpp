@@ -366,7 +366,7 @@ void CplexInternal::freeCplex(){
     status = CPXcloseCPLEX(&env_);
     if(status!=0){
       std::cerr << "CPXcloseCPLEX failed, error code " << status << ".\n";
-    }	
+    }        
     env_ = 0;
   }
 }

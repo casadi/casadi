@@ -64,7 +64,7 @@ namespace CasADi{
       const vector<T>& fseed = fwdSeed[d][0]->data();
       typename vector<T>::iterator fsens_it = fwdSens[d][0]->begin();
       for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
-     	*fsens_it++ = *k>=0 ? fseed[*k] : 0;
+             *fsens_it++ = *k>=0 ? fseed[*k] : 0;
       }
     }
       
@@ -73,8 +73,8 @@ namespace CasADi{
       typename vector<T>::iterator aseed_it = adjSeed[d][0]->begin();
       vector<T>& asens = adjSens[d][0]->data();
       for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
-	if(*k>=0) asens[*k] += *aseed_it;
-	*aseed_it++ = 0;
+        if(*k>=0) asens[*k] += *aseed_it;
+        *aseed_it++ = 0;
       }
     }
   }
@@ -110,7 +110,7 @@ namespace CasADi{
       const T* fseed_stop = getPtr(fseed) + s_.stop_;
       T* fsens_ptr = getPtr(fwdSens[d][0]->data());
       for(; fseed_ptr != fseed_stop; fseed_ptr += s_.step_){
-     	*fsens_ptr++ = *fseed_ptr;
+             *fsens_ptr++ = *fseed_ptr;
       }
     }
       
@@ -121,8 +121,8 @@ namespace CasADi{
       T* asens_stop = getPtr(asens) + s_.stop_;
       T* aseed_ptr = getPtr(adjSeed[d][0]->data());
       for(; asens_ptr != asens_stop; asens_ptr += s_.step_){
-	*asens_ptr += *aseed_ptr;
-	*aseed_ptr++ = 0;
+        *asens_ptr += *aseed_ptr;
+        *aseed_ptr++ = 0;
       }
     }
   }
@@ -149,7 +149,7 @@ namespace CasADi{
     T* odata_ptr = getPtr(output[0]->data());
     for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
       for(const T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
-	*odata_ptr++ = *inner_ptr;
+        *odata_ptr++ = *inner_ptr;
       }
     }
     
@@ -160,9 +160,9 @@ namespace CasADi{
       const T* outer_stop = getPtr(fseed) + outer_.stop_;
       T* fsens_ptr = getPtr(fwdSens[d][0]->data());
       for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
-	for(const T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
-	  *fsens_ptr++ = *inner_ptr;
-	}
+        for(const T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+          *fsens_ptr++ = *inner_ptr;
+        }
       }
     }
       
@@ -173,10 +173,10 @@ namespace CasADi{
       T* outer_stop = getPtr(asens) + outer_.stop_;
       T* aseed_ptr = getPtr(adjSeed[d][0]->data());
       for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
-	for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
-	  *inner_ptr += *aseed_ptr;
-	  *aseed_ptr++ = 0;
-	}
+        for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+          *inner_ptr += *aseed_ptr;
+          *aseed_ptr++ = 0;
+        }
       }
     }
   }
@@ -189,12 +189,12 @@ namespace CasADi{
     // Propate sparsity
     if(fwd){
       for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
-	*outputd++ = *k>=0 ? inputd[*k] : 0;
+        *outputd++ = *k>=0 ? inputd[*k] : 0;
       }
     } else {
       for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
-	if(*k>=0) inputd[*k] |= *outputd;
-	*outputd++ = 0;
+        if(*k>=0) inputd[*k] |= *outputd;
+        *outputd++ = 0;
       }
     }
   }
@@ -207,12 +207,12 @@ namespace CasADi{
     // Propate sparsity
     if(fwd){
       for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
-	*outputd++ = inputd[k];
+        *outputd++ = inputd[k];
       }
     } else {
       for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
-	inputd[k] |= *outputd;
-	*outputd++ = 0;
+        inputd[k] |= *outputd;
+        *outputd++ = 0;
       }
     }
   }
@@ -225,16 +225,16 @@ namespace CasADi{
     // Propate sparsity
     if(fwd){
       for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
-	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
-	  *outputd++ = inputd[k2];
-	}
+        for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
+          *outputd++ = inputd[k2];
+        }
       }
     } else {
       for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
-	for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
-	  inputd[k2] |= *outputd;
-	  *outputd++ = 0;
-	}
+        for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){
+          inputd[k2] |= *outputd;
+          *outputd++ = 0;
+        }
       }
     }
   }
@@ -328,11 +328,11 @@ namespace CasADi{
       r_rowind.resize(osp.size1()+1); // Row count
       fill(r_rowind.begin(),r_rowind.end(),0);
       for(int k=0; k<nz.size(); ++k){
-	if(r_nz[k]!=-1){
-	  r_nz[n++] = r_nz[k];
-	  r_col.push_back(ocol[nz_order[k]]);
-	  r_rowind[1+orow[nz_order[k]]]++;
-	}
+        if(r_nz[k]!=-1){
+          r_nz[n++] = r_nz[k];
+          r_col.push_back(ocol[nz_order[k]]);
+          r_rowind[1+orow[nz_order[k]]]++;
+        }
       }
       r_nz.resize(n);
       for(int i=1; i<r_rowind.size(); ++i) r_rowind[i] += r_rowind[i-1]; // row count -> row offset
@@ -340,9 +340,9 @@ namespace CasADi{
       // Create a sparsity pattern from vectors
       CRSSparsity f_sp(osp.size1(),osp.size2(),r_col,r_rowind);
       if(r_nz.size()==0){
-	res = MX::zeros(f_sp);
+        res = MX::zeros(f_sp);
       } else {
-	res = arg->getGetNonzeros(f_sp,r_nz);
+        res = arg->getGetNonzeros(f_sp,r_nz);
       }
     }
 
@@ -368,13 +368,13 @@ namespace CasADi{
       // Filter out ignored entries and check if there is anything to add at all
       bool elements_to_add = false;
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
-	if(*k>=0){
-	  if(nz[*k]>=0){
-	    elements_to_add = true;
-	  } else {
-	    *k = -1;
-	  }
-	}
+        if(*k>=0){
+          if(nz[*k]>=0){
+            elements_to_add = true;
+          } else {
+            *k = -1;
+          }
+        }
       }
 
       // Quick continue of no elements to add
@@ -388,25 +388,25 @@ namespace CasADi{
       
       // Enlarge the sparsity pattern of the sensitivity if not all additions fit
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
-	if(*k>=0 && r_nz2[nz[*k]]<0){
-	  
-	  // Create a new pattern which includes both the the previous seed and the addition
-	  CRSSparsity sp = asens0.sparsity().patternUnion(dep().sparsity());
-	  asens0 = asens0->getSetSparse(sp);
+        if(*k>=0 && r_nz2[nz[*k]]<0){
+          
+          // Create a new pattern which includes both the the previous seed and the addition
+          CRSSparsity sp = asens0.sparsity().patternUnion(dep().sparsity());
+          asens0 = asens0->getSetSparse(sp);
 
-	  // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
-	  copy(el_input.begin(),el_input.end(),r_nz2.begin());
-	  asens0.sparsity().getNZInplace(r_nz2);
+          // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
+          copy(el_input.begin(),el_input.end(),r_nz2.begin());
+          asens0.sparsity().getNZInplace(r_nz2);
 
-	  break;
-	}
+          break;
+        }
       }
 
       // Have r_nz point to locations in the sensitivity instead of the output
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
-	if(*k>=0){
-	  *k = r_nz2[nz[*k]];
-	}
+        if(*k>=0){
+          *k = r_nz2[nz[*k]];
+        }
       }
 
       // Add to the element to the sensitivity

@@ -74,19 +74,19 @@ namespace CasADi{
     // Get the linear solver creator function
     if(linsol_.isNull()){
       if(hasSetOption("linear_solver")){
-	linearSolverCreator linear_solver_creator = getOption("linear_solver");
-	
-	// Allocate an NLP solver
-	linsol_ = linear_solver_creator(jac_.output().sparsity());
-	
-	// Pass options
-	if(hasSetOption("linear_solver_options")){
-	  const Dictionary& linear_solver_options = getOption("linear_solver_options");
-	  linsol_.setOption(linear_solver_options);
-	}
-	
-	// Initialize
-	linsol_.init();
+        linearSolverCreator linear_solver_creator = getOption("linear_solver");
+        
+        // Allocate an NLP solver
+        linsol_ = linear_solver_creator(jac_.output().sparsity());
+        
+        // Pass options
+        if(hasSetOption("linear_solver_options")){
+          const Dictionary& linear_solver_options = getOption("linear_solver_options");
+          linsol_.setOption(linear_solver_options);
+        }
+        
+        // Initialize
+        linsol_.init();
       }
     } else {
       // Initialize the linear solver, if provided
@@ -128,7 +128,7 @@ namespace CasADi{
       // Pass inputs
       jac_.setInput(output(),0);
       for(int i=0; i<getNumInputs(); ++i)
-	jac_.setInput(input(i),i+1);
+        jac_.setInput(input(i),i+1);
 
       // Evaluate jacobian
       jac_.evaluate();
@@ -164,7 +164,7 @@ namespace CasADi{
     for(int dir=0; dir<nfdir; ++dir){
       f_.fwdSeed(0,dir).setZero();
       for(int i=0; i<getNumInputs(); ++i){
-	f_.fwdSeed(i+1,dir).set(fwdSeed(i,dir));
+        f_.fwdSeed(i+1,dir).set(fwdSeed(i,dir));
       }
     }
   
@@ -174,7 +174,7 @@ namespace CasADi{
       Matrix<double>& faseed = f_.adjSeed(0,dir);
       faseed.set(adjSeed(0,dir));
       for(vector<double>::iterator it=faseed.begin(); it!=faseed.end(); ++it){
-	*it = -*it;
+        *it = -*it;
       }
     
       // Solve the transposed linear system
@@ -190,7 +190,7 @@ namespace CasADi{
       Matrix<double>& fsens = fwdSens(0,dir);
       fsens.set(f_.fwdSens(0,dir));
       for(vector<double>::iterator it=fsens.begin(); it!=fsens.end(); ++it){
-	*it = -*it;
+        *it = -*it;
       }
     
       // Solve the linear system
@@ -200,7 +200,7 @@ namespace CasADi{
     // Get the adjoint sensitivities
     for(int dir=0; dir<nadir; ++dir){
       for(int i=0; i<getNumInputs(); ++i){
-	f_.adjSens(i+1,dir).get(adjSens(i,dir));
+        f_.adjSens(i+1,dir).get(adjSens(i,dir));
       }
     }
   }

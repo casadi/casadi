@@ -98,9 +98,9 @@ namespace CasADi{
       stringstream ss;
       name_x_.resize(nx_);
       for(int i=0; i<nx_; ++i){
-	ss.str(string());
-	ss << "x" << i;
-	name_x_[i] = ss.str();
+        ss.str(string());
+        ss << "x" << i;
+        name_x_[i] = ss.str();
       }
     }
 
@@ -141,22 +141,22 @@ namespace CasADi{
       nlp_x = G.inputExpr(0);
       nlp_g = G.outputExpr(0);
       if(G.getNumInputs()>1){
-	nlp_p = G.inputExpr(1);
+        nlp_p = G.inputExpr(1);
       }
     } else {
       // Minimization problem
       nlp_x = F.inputExpr(0);
       nlp_f = F.outputExpr(0);
       if(F.getNumInputs()>1){
-	nlp_p = F.inputExpr(1);
+        nlp_p = F.inputExpr(1);
       }
       if(G.isNull()){
-	nlp_g = MX::sparse(0,1);
+        nlp_g = MX::sparse(0,1);
       } else {
-	nlp_g = G.outputExpr(0);
-	if(G.getNumInputs()>F.getNumInputs()){
-	  nlp_p = G.inputExpr(1);
-	}
+        nlp_g = G.outputExpr(0);
+        if(G.getNumInputs()>F.getNumInputs()){
+          nlp_p = G.inputExpr(1);
+        }
       }
     }
   
@@ -223,8 +223,8 @@ namespace CasADi{
       it->opt.resize(it->n,0);
       it->step.resize(it->n,0);
       if(!gauss_newton_){
-	it->lam.resize(it->n,0);
-	it->dlam.resize(it->n,0);
+        it->lam.resize(it->n,0);
+        it->dlam.resize(it->n,0);
       }
     }
 
@@ -254,16 +254,16 @@ namespace CasADi{
       stringstream ss;
       int i=0;
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	ss.str(string());
-	ss << "lam_x" << i++;
-	it->v_lam = msym(ss.str(),it->v.sparsity());
+        ss.str(string());
+        ss << "lam_x" << i++;
+        it->v_lam = msym(ss.str(),it->v.sparsity());
       }
     
       // Lagrange multipliers for the nonlinear constraints
       g_lam = msym("g_lam",ng_);
 
       if(verbose_){
-	cout << "Allocated intermediate variables." << endl;
+        cout << "Allocated intermediate variables." << endl;
       }
    
       // Adjoint sweep to get the definitions of the lifted dual variables (Equation 3.8 in Albersmeyer2010)
@@ -271,7 +271,7 @@ namespace CasADi{
       aseed[0].push_back(1.0);
       aseed[0].push_back(g_lam);
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	aseed[0].push_back(it->v_lam);
+        aseed[0].push_back(it->v_lam);
       }
       vdef_fcn.eval(vdef_in,vdef_out,fseed,fsens,aseed,asens);
       i=0;
@@ -283,14 +283,14 @@ namespace CasADi{
       if(p_defL.isNull()) p_defL = MX(p_.sparsity()); // Needed?
 
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	it->v_defL = asens[0].at(i++);
-	if(it->v_defL.isNull()){
-	  it->v_defL = MX(it->v.sparsity());
-	}
+        it->v_defL = asens[0].at(i++);
+        if(it->v_defL.isNull()){
+          it->v_defL = MX(it->v.sparsity());
+        }
       }
 
       if(verbose_){
-	cout << "Generated the gradient of the Lagrangian." << endl;
+        cout << "Generated the gradient of the Lagrangian." << endl;
       }
     }
     gL_.resize(nx_, numeric_limits<double>::quiet_NaN());
@@ -309,7 +309,7 @@ namespace CasADi{
     if(!gauss_newton_){
       res_fcn_in.push_back(g_lam);        res_g_lam_ = n++;
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	res_fcn_in.push_back(it->v_lam);  it->res_lam = n++;
+        res_fcn_in.push_back(it->v_lam);  it->res_lam = n++;
       }
     }
 
@@ -326,7 +326,7 @@ namespace CasADi{
     
     if(!gauss_newton_){
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	res_fcn_out.push_back(it->v_defL - it->v_lam);     it->res_lam_d = n++;
+        res_fcn_out.push_back(it->v_defL - it->v_lam);     it->res_lam_d = n++;
       }
     }
  
@@ -360,10 +360,10 @@ namespace CasADi{
     if(!gauss_newton_){
       int i=0;
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	ss.str(string());
-	ss << "d_lam" << i++;
-	it->d_lam = msym(ss.str(),it->v.sparsity());
-	it->d_defL = it->v_defL - it->d_lam;
+        ss.str(string());
+        ss << "d_lam" << i++;
+        it->d_lam = msym(ss.str(),it->v.sparsity());
+        it->d_defL = it->v_defL - it->d_lam;
       }
     }
 
@@ -375,8 +375,8 @@ namespace CasADi{
     }
     if(!gauss_newton_){
       for(vector<Var>::reverse_iterator it=v_.rbegin(); it!=v_.rend(); ++it){
-	svar.push_back(it->v_lam);
-	sdef.push_back(it->d_defL);
+        svar.push_back(it->v_lam);
+        sdef.push_back(it->d_defL);
       }
     }
 
@@ -393,7 +393,7 @@ namespace CasADi{
     }
     if(!gauss_newton_){
       for(vector<Var>::reverse_iterator it=v_.rbegin(); it!=v_.rend(); ++it){
-	it->d_defL = sdef[i++];
+        it->d_defL = sdef[i++];
       }
     }
 
@@ -421,7 +421,7 @@ namespace CasADi{
       n = mfcn_in.size();
       mfcn_in.push_back(g_lam);                          mod_g_lam_ = n++;
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	mfcn_in.push_back(it->d_lam);                    it->mod_lam = n++;
+        mfcn_in.push_back(it->d_lam);                    it->mod_lam = n++;
       }
     }
 
@@ -466,7 +466,7 @@ namespace CasADi{
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       mfcn_out.push_back(it->d_def);         it->mod_def = n++;
       if(!gauss_newton_){
-	mfcn_out.push_back(it->d_defL);      it->mod_defL = n++;
+        mfcn_out.push_back(it->d_defL);      it->mod_defL = n++;
       }
     }
 
@@ -483,7 +483,7 @@ namespace CasADi{
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       mfcn_fwdSeed[0][it->mod_var] = it->d;
       if(!gauss_newton_){
-	mfcn_fwdSeed[0][it->mod_lam] = it->d_lam;
+        mfcn_fwdSeed[0][it->mod_lam] = it->d_lam;
       }
     }
     mfcn.eval(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens);
@@ -535,7 +535,7 @@ namespace CasADi{
     if(!gauss_newton_){
       mfcn_fwdSeed[0][mod_g_lam_] = g_dlam;
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	mfcn_fwdSeed[0][it->mod_lam] = -it->d_lam;
+        mfcn_fwdSeed[0][it->mod_lam] = -it->d_lam;
       }
     }
 
@@ -557,7 +557,7 @@ namespace CasADi{
 
     if(!gauss_newton_){
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	exp_fcn_out.push_back(mfcn_fwdSens[0][it->mod_defL]); it->exp_defL = n++;
+        exp_fcn_out.push_back(mfcn_fwdSens[0][it->mod_defL]); it->exp_defL = n++;
       }
     }
   
@@ -607,7 +607,7 @@ namespace CasADi{
 
     if(!gauss_newton_){
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	it->resL.resize(it->d_lam.size(),0);
+        it->resL.resize(it->d_lam.size(),0);
       }
     }
   
@@ -620,15 +620,15 @@ namespace CasADi{
       cout << "-------------------------------------------" << endl;
       cout << "This is CasADi::SCPgen." << endl;
       if(gauss_newton_) {
-	cout << "Using Gauss-Newton Hessian" << endl;
+        cout << "Using Gauss-Newton Hessian" << endl;
       } else {
-	cout << "Using exact Hessian" << endl;
+        cout << "Using exact Hessian" << endl;
       }
 
       // Count the total number of variables
       int n_lifted = 0;
       for(vector<Var>::const_iterator i=v_.begin(); i!=v_.end(); ++i){
-	n_lifted += i->n;
+        n_lifted += i->n;
       }
 
       cout << endl;
@@ -680,7 +680,7 @@ namespace CasADi{
       vinit_fcn_.setInput(input(NLP_SOLVER_P),1);
       vinit_fcn_.evaluate();    
       for(int i=0; i<v_.size(); ++i){
-	vinit_fcn_.getOutput(v_[i].init,i);
+        vinit_fcn_.getOutput(v_[i].init,i);
       }
     }
     if(verbose_){
@@ -694,8 +694,8 @@ namespace CasADi{
     fill(x_dlam_.begin(),x_dlam_.end(),0);
     if(!gauss_newton_){
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	fill(it->lam.begin(),it->lam.end(),0);
-	fill(it->dlam.begin(),it->dlam.end(),0);
+        fill(it->lam.begin(),it->lam.end(),0);
+        fill(it->dlam.begin(),it->dlam.end(),0);
       }
     }
   
@@ -761,21 +761,21 @@ namespace CasADi{
       bool converged = pr_inf <= tol_pr_ && pr_step_ <= tol_pr_step_ && reg_ <= tol_reg_;
       converged = converged && du_inf <= tol_du_;
       if(converged){
-	cout << endl;
-	cout << "CasADi::SCPgen: Convergence achieved after " << iter << " iterations." << endl;
-	break;
+        cout << endl;
+        cout << "CasADi::SCPgen: Convergence achieved after " << iter << " iterations." << endl;
+        break;
       }
     
       if (iter >= maxiter_){
-	cout << endl;
-	cout << "CasADi::SCPgen: Maximum number of iterations reached." << endl;
-	break;
+        cout << endl;
+        cout << "CasADi::SCPgen: Maximum number of iterations reached." << endl;
+        break;
       }
 
       // Check if not-a-number
       if(f_!=f_ || pr_step_ != pr_step_ || pr_inf != pr_inf){
-	cout << "CasADi::SCPgen: Aborted, nan detected" << endl;
-	break;
+        cout << "CasADi::SCPgen: Aborted, nan detected" << endl;
+        break;
       }
     
       // Start a new iteration
@@ -783,7 +783,7 @@ namespace CasADi{
         
       // Regularize the QP
       if(regularize_){
-	regularize();
+        regularize();
       }
 
       // Solve the condensed QP
@@ -928,7 +928,7 @@ namespace CasADi{
     if(!gauss_newton_){
       mat_fcn_.setInput(g_lam_,mod_g_lam_);
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	mat_fcn_.setInput(it->resL, it->mod_lam);
+        mat_fcn_.setInput(it->resL, it->mod_lam);
       }
     }
 
@@ -959,7 +959,7 @@ namespace CasADi{
     for(int i=0; i<nx_; ++i)  gL_[i] = gf_[i] + x_lam_[i];
     for(int i=0; i<ng_; ++i){
       for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
-	gL_[qpA_col[el]] += qpA_data[el]*g_lam_[i];
+        gL_[qpA_col[el]] += qpA_data[el]*g_lam_[i];
       }
     }
 
@@ -984,7 +984,7 @@ namespace CasADi{
     if(!gauss_newton_){
       res_fcn_.setInput(0.0,res_g_lam_);
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	res_fcn_.setInput(it->lam,it->res_lam);
+        res_fcn_.setInput(it->lam,it->res_lam);
       }
     }
   
@@ -1008,7 +1008,7 @@ namespace CasADi{
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       res_fcn_.getOutput(it->res,  it->res_d);
       if(!gauss_newton_){
-	res_fcn_.getOutput(it->resL, it->res_lam_d);
+        res_fcn_.getOutput(it->resL, it->res_lam_d);
       }
     }
   
@@ -1036,7 +1036,7 @@ namespace CasADi{
     if(!gauss_newton_){
       vec_fcn_.setInput(0.0,mod_g_lam_);
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	vec_fcn_.setInput(it->resL, it->mod_lam);
+        vec_fcn_.setInput(it->resL, it->mod_lam);
       }
     }
 
@@ -1126,7 +1126,7 @@ namespace CasADi{
       // Get the curvature in the step direction
       double gain = DMatrix::quad_form(qpH_,x_step_);
       if (gain < 0){
-	iteration_note_ = "Hessian indefinite in the search direction";
+        iteration_note_ = "Hessian indefinite in the search direction";
       }
     }
 
@@ -1167,16 +1167,16 @@ namespace CasADi{
       // Take the primal step
       for(int i=0; i<nx_; ++i) x_opt_[i] += (t-t_prev) * x_step_[i];
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	for(int i=0; i<it->n; ++i) it->opt[i] += (t-t_prev) * it->step[i];
+        for(int i=0; i<it->n; ++i) it->opt[i] += (t-t_prev) * it->step[i];
       }
     
       // Take the dual step
-      for(int i=0; i<ng_; ++i) 	g_lam_[i] += (t-t_prev) * g_dlam_[i];
+      for(int i=0; i<ng_; ++i)         g_lam_[i] += (t-t_prev) * g_dlam_[i];
       for(int i=0; i<nx_; ++i)  x_lam_[i] += (t-t_prev) * x_dlam_[i];
       if(!gauss_newton_){
-	for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	  for(int i=0; i<it->n; ++i) it->lam[i] += (t-t_prev) * it->dlam[i];
-	}
+        for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
+          for(int i=0; i<it->n; ++i) it->lam[i] += (t-t_prev) * it->dlam[i];
+        }
       }
     
       // Evaluate residual function to get objective and constraints (and residuals for the next iteration)
@@ -1191,16 +1191,16 @@ namespace CasADi{
       double meritmax = *max_element(merit_mem_.begin(), merit_mem_.end());
       if (L1merit_cand <= meritmax + t * c1_ * L1dir){
       
-	// Accepting candidate
-	ls_success = true;
-	//log("Line-search completed, candidate accepted");
-	break;
+        // Accepting candidate
+        ls_success = true;
+        //log("Line-search completed, candidate accepted");
+        break;
       }
     
       // Line-search not successful, but we accept it.
       if(ls_iter == maxiter_ls_){
-	//log("Line-search completed, maximum number of iterations");
-	break;
+        //log("Line-search completed, maximum number of iterations");
+        break;
       }
     
       // Backtracking
@@ -1248,7 +1248,7 @@ namespace CasADi{
       exp_fcn_.setInput(g_dlam_,mod_dlam_g_);
       exp_fcn_.setInput(g_lam_,mod_g_lam_);
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	exp_fcn_.setInput(it->resL,it->mod_lam);
+        exp_fcn_.setInput(it->resL,it->mod_lam);
       }
     }
 
@@ -1264,8 +1264,8 @@ namespace CasADi{
     // Expanded dual step
     if(!gauss_newton_){
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-	const DMatrix& dlam_v = exp_fcn_.output(it->exp_defL);
-	copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
+        const DMatrix& dlam_v = exp_fcn_.output(it->exp_defL);
+        copy(dlam_v.begin(),dlam_v.end(),it->dlam.begin());
       }
     }
 

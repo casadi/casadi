@@ -155,9 +155,9 @@ namespace CasADi{
     for(int i=2; i<v.size(); ++i){
       int predicted_v = start_inner+i*step_inner;
       if(v[i]!=predicted_v){
-	stop_inner = predicted_v;
-	step_outer = v[i] - start_inner;
-	break;
+        stop_inner = predicted_v;
+        step_outer = v[i] - start_inner;
+        break;
       }
     }
     casadi_assert(stop_inner>=0);
@@ -173,11 +173,11 @@ namespace CasADi{
     std::vector<int>::const_iterator it=v.begin();
     for(int i=start_outer; i!=stop_outer; i+=step_outer){
       for(int j=i+start_inner; j!=i+stop_inner; j+=step_inner){
-	// False if we've reached the end
-	if(it==v.end()) return false;
-	
-	// Check if value matches
-	if(*it++ != j) return false;
+        // False if we've reached the end
+        if(it==v.end()) return false;
+        
+        // Check if value matches
+        if(*it++ != j) return false;
       }
     }
     
@@ -205,9 +205,9 @@ namespace CasADi{
     for(int i=2; i<v.size(); ++i){
       int predicted_v = start_+i*step_;
       if(v[i]!=predicted_v){
-	stop_ = predicted_v;
-	outer.step_ = v[i] - start_;
-	break;
+        stop_ = predicted_v;
+        outer.step_ = v[i] - start_;
+        break;
       }
     }
 
@@ -223,7 +223,7 @@ namespace CasADi{
     std::vector<int> ret;
     for(int i=outer.start_; i!=outer.stop_; i+=outer.step_){
       for(int j=i+start_; j!=i+stop_; j+=step_){
-	ret.push_back(j);
+        ret.push_back(j);
       }
     }
     return ret;

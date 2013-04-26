@@ -66,26 +66,26 @@ namespace CasADi{
     bool has_duplicates = false;
     for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
       for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
-	bool is_duplicate = itc->getTemp()!=0;
-	if(is_duplicate){
-	  cerr << "Duplicate expression: " << *itc << endl;
-	}
-	has_duplicates = has_duplicates || is_duplicate;
-	itc->setTemp(1);
+        bool is_duplicate = itc->getTemp()!=0;
+        if(is_duplicate){
+          cerr << "Duplicate expression: " << *itc << endl;
+        }
+        has_duplicates = has_duplicates || is_duplicate;
+        itc->setTemp(1);
       }
     }
   
     // Reset temporaries
     for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
       for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
-	itc->setTemp(0);
+        itc->setTemp(0);
       }
     }
   
     if(has_duplicates){
       cout << "Input expressions:" << endl;
       for(int iind=0; iind<inputv_.size(); ++iind){
-	cout << iind << ": " << inputv_[iind] << endl;
+        cout << iind << ": " << inputv_[iind] << endl;
       }
       casadi_error("The input expressions are not independent (or were not reset properly).");
     }
@@ -177,36 +177,36 @@ namespace CasADi{
     // Evaluate the algorithm
     if(!taping){
       for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-	switch(it->op){
-	  // Start by adding all of the built operations
-	  CASADI_MATH_FUN_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res])
+        switch(it->op){
+          // Start by adding all of the built operations
+          CASADI_MATH_FUN_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res])
         
-	    // Constant
+            // Constant
         case OP_CONST: work_[it->res] = it->arg.d; break;
         
-	  // Load function input to work vector
+          // Load function input to work vector
         case OP_INPUT: work_[it->res] = inputNoCheck(it->arg.i[0]).data()[it->arg.i[1]]; break;
         
-	  // Get function output from work vector
+          // Get function output from work vector
         case OP_OUTPUT: outputNoCheck(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
-	}
+        }
       }
     } else {
       vector<TapeEl<double> >::iterator it1 = pdwork_.begin();
       for(vector<AlgEl>::iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-	switch(it->op){
-	  // Start by adding all of the built operations
-	  CASADI_MATH_DERF_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res],it1++->d)
+        switch(it->op){
+          // Start by adding all of the built operations
+          CASADI_MATH_DERF_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res],it1++->d)
 
-	    // Constant
+            // Constant
         case OP_CONST: work_[it->res] = it->arg.d; break;
 
-	  // Load function input to work vector
+          // Load function input to work vector
         case OP_INPUT: work_[it->res] = inputNoCheck(it->arg.i[0]).data()[it->arg.i[1]]; break;
         
-	  // Get function output from work vector
+          // Get function output from work vector
         case OP_OUTPUT: outputNoCheck(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
-	}
+        }
       }
     }
   
@@ -217,7 +217,7 @@ namespace CasADi{
     for(int dir=0; dir<nfdir; ++dir){
       vector<TapeEl<double> >::const_iterator it2 = pdwork_.begin();
       for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-	switch(it->op){
+        switch(it->op){
         case OP_CONST:
           work_[it->res] = 0; break;
         case OP_INPUT: 
@@ -226,7 +226,7 @@ namespace CasADi{
           fwdSensNoCheck(it->res,dir).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
         default: // Unary or binary operation
           work_[it->res] = it2->d[0] * work_[it->arg.i[0]] + it2->d[1] * work_[it->arg.i[1]]; ++it2; break;
-	}
+        }
       }
     }
     
@@ -235,8 +235,8 @@ namespace CasADi{
     for(int dir=0; dir<nadir; ++dir){
       vector<TapeEl<double> >::const_reverse_iterator it2 = pdwork_.rbegin();
       for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
-	double seed;
-	switch(it->op){
+        double seed;
+        switch(it->op){
         case OP_CONST:
           work_[it->res] = 0;
           break;
@@ -253,7 +253,7 @@ namespace CasADi{
           work_[it->arg.i[0]] += it2->d[0] * seed;
           work_[it->arg.i[1]] += it2->d[1] * seed;
           ++it2;
-	}
+        }
       }
     }
   }
@@ -288,7 +288,7 @@ namespace CasADi{
     // Go through all nodes and check if any node is non-smooth
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       if(!operation_checker<SmoothChecker>(it->op)){
-	return false;
+        return false;
       }
     }
     return true;
@@ -317,26 +317,26 @@ namespace CasADi{
     // Normal, interpreted output
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       if(it->op==OP_OUTPUT){
-	stream << "output[" << it->res << "][" << it->arg.i[1] << "] = @" << it->arg.i[0];
+        stream << "output[" << it->res << "][" << it->arg.i[1] << "] = @" << it->arg.i[0];
       } else {
-	stream << "@" << it->res << " = ";
-	if(it->op==OP_INPUT){
-	  stream << "input[" << it->arg.i[0] << "][" << it->arg.i[1] << "]";
-	} else {
-	  if(it->op==OP_CONST){
-	    stream << it->arg.d;
-	  } else if(it->op==OP_PARAMETER){
-	    stream << *p_it++;
-	  } else {
-	    int ndep = casadi_math<double>::ndeps(it->op);
-	    casadi_math<double>::printPre(it->op,stream);
-	    for(int c=0; c<ndep; ++c){
-	      if(c==1) casadi_math<double>::printSep(it->op,stream);
-	      stream << "@" << it->arg.i[c];
-	    }
-	    casadi_math<double>::printPost(it->op,stream);
-	  }
-	}
+        stream << "@" << it->res << " = ";
+        if(it->op==OP_INPUT){
+          stream << "input[" << it->arg.i[0] << "][" << it->arg.i[1] << "]";
+        } else {
+          if(it->op==OP_CONST){
+            stream << it->arg.d;
+          } else if(it->op==OP_PARAMETER){
+            stream << *p_it++;
+          } else {
+            int ndep = casadi_math<double>::ndeps(it->op);
+            casadi_math<double>::printPre(it->op,stream);
+            for(int c=0; c<ndep; ++c){
+              if(c==1) casadi_math<double>::printSep(it->op,stream);
+              stream << "@" << it->arg.i[c];
+            }
+            casadi_math<double>::printPost(it->op,stream);
+          }
+        }
       }
       stream << ";" << endl;
     }
@@ -365,31 +365,31 @@ namespace CasADi{
       stream << "  ";
 
       if(it->op==OP_OUTPUT){
-	stream << "if(r" << it->res << "!=0) r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
+        stream << "if(r" << it->res << "!=0) r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
       } else {
-	// Declare result if not already declared
-	if(!declared[it->res]){
-	  stream << type << " ";
-	  declared[it->res]=true;
-	}
+        // Declare result if not already declared
+        if(!declared[it->res]){
+          stream << type << " ";
+          declared[it->res]=true;
+        }
       
-	// Where to store the result
-	stream << "a" << it->res << "=";
+        // Where to store the result
+        stream << "a" << it->res << "=";
       
-	// What to store
-	if(it->op==OP_CONST){
-	  gen.printConstant(stream,it->arg.d);
-	} else if(it->op==OP_INPUT){
-	  stream << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
-	} else {
-	  int ndep = casadi_math<double>::ndeps(it->op);
-	  casadi_math<double>::printPre(it->op,stream);
-	  for(int c=0; c<ndep; ++c){
-	    if(c==1) casadi_math<double>::printSep(it->op,stream);
-	    stream << "a" << it->arg.i[c];
-	  }
-	  casadi_math<double>::printPost(it->op,stream);
-	}
+        // What to store
+        if(it->op==OP_CONST){
+          gen.printConstant(stream,it->arg.d);
+        } else if(it->op==OP_INPUT){
+          stream << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
+        } else {
+          int ndep = casadi_math<double>::ndeps(it->op);
+          casadi_math<double>::printPre(it->op,stream);
+          for(int c=0; c<ndep; ++c){
+            if(c==1) casadi_math<double>::printSep(it->op,stream);
+            stream << "a" << it->arg.i[c];
+          }
+          casadi_math<double>::printPost(it->op,stream);
+        }
       }
       stream  << ";" << endl;
     }
@@ -411,28 +411,28 @@ namespace CasADi{
     for(vector<SXMatrix >::iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
       int nz=0;
       for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc, ++nz){
-	// Add outputs to the list
-	s.push(itc->get());
-	sort_depth_first(s,nodes);
+        // Add outputs to the list
+        s.push(itc->get());
+        sort_depth_first(s,nodes);
       
-	// A null pointer means an output instruction
-	nodes.push_back(static_cast<SXNode*>(0));
+        // A null pointer means an output instruction
+        nodes.push_back(static_cast<SXNode*>(0));
       }
     }
   
     // Make sure that all inputs have been added also // TODO REMOVE THIS
     for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
       for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
-	if(!itc->getTemp()){
-	  nodes.push_back(itc->get());
-	}
+        if(!itc->getTemp()){
+          nodes.push_back(itc->get());
+        }
       }
     }
 
     // Set the temporary variables to be the corresponding place in the sorted graph
     for(int i=0; i<nodes.size(); ++i){
       if(nodes[i]){
-	nodes[i]->temp = i;
+        nodes[i]->temp = i;
       }
     }
     
@@ -442,10 +442,10 @@ namespace CasADi{
     for(vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it){
       SXNode* t = *it;
       if(t){
-	if(t->isConstant())
-	  constants_.push_back(SX::create(t));
-	else if(!t->isSymbolic())
-	  operations_.push_back(SX::create(t));
+        if(t->isConstant())
+          constants_.push_back(SX::create(t));
+        else if(!t->isSymbolic())
+          operations_.push_back(SX::create(t));
       }
     }
   
@@ -459,7 +459,7 @@ namespace CasADi{
     int curr_oind, curr_nz=0;
     for(curr_oind=0; curr_oind<outputv_.size(); ++curr_oind){
       if(outputv_[curr_oind].size()!=0){
-	break;
+        break;
       }
     }
   
@@ -517,7 +517,7 @@ namespace CasADi{
     
       // Increase count of dependencies
       for(int c=0; c<ndeps; ++c)
-	refcount[ae.arg.i[c]]++;
+        refcount[ae.arg.i[c]]++;
     
       // Add to algorithm
       algorithm_.push_back(ae);
@@ -540,39 +540,39 @@ namespace CasADi{
   
       // decrease reference count of children
       for(int c=ndeps-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
-	int ch_ind = it->arg.i[c];
-	int remaining = --refcount[ch_ind];
-	if(remaining==0) unused.push(place[ch_ind]);
+        int ch_ind = it->arg.i[c];
+        int remaining = --refcount[ch_ind];
+        if(remaining==0) unused.push(place[ch_ind]);
       }
     
       // Find a place to store the variable
       if(it->op!=OP_OUTPUT){
-	if(live_variables && !unused.empty()){
-	  // Try to reuse a variable from the stack if possible (last in, first out)
-	  it->res = place[it->res] = unused.top();
-	  unused.pop();
-	} else {
-	  // Allocate a new variable
-	  it->res = place[it->res] = worksize++;
-	}
+        if(live_variables && !unused.empty()){
+          // Try to reuse a variable from the stack if possible (last in, first out)
+          it->res = place[it->res] = unused.top();
+          unused.pop();
+        } else {
+          // Allocate a new variable
+          it->res = place[it->res] = worksize++;
+        }
       }
     
       // Save the location of the children
       for(int c=0; c<ndeps; ++c){
-	it->arg.i[c] = place[it->arg.i[c]];
+        it->arg.i[c] = place[it->arg.i[c]];
       }
     
       // If binary, make sure that the second argument is the same as the first one (in order to treat all operations as binary) NOTE: ugly
       if(ndeps==1 && it->op!=OP_OUTPUT){
-	it->arg.i[1] = it->arg.i[0];
+        it->arg.i[1] = it->arg.i[0];
       }
     }
   
     if(verbose()){
       if(live_variables){
-	cout << "Using live variables: work array is " <<  worksize << " instead of " << nodes.size() << endl;
+        cout << "Using live variables: work array is " <<  worksize << " instead of " << nodes.size() << endl;
       } else {
-	cout << "Live variables disabled." << endl;
+        cout << "Live variables disabled." << endl;
       }
     }
   
@@ -586,7 +586,7 @@ namespace CasADi{
     // Reset the temporary variables
     for(int i=0; i<nodes.size(); ++i){
       if(nodes[i]){
-	nodes[i]->temp = 0;
+        nodes[i]->temp = 0;
       }
     }
   
@@ -599,18 +599,18 @@ namespace CasADi{
     for(int ind=0; ind<inputv_.size(); ++ind){
       int nz=0;
       for(vector<SX>::iterator itc = inputv_[ind].begin(); itc != inputv_[ind].end(); ++itc, ++nz){
-	int i = itc->getTemp()-1;
-	if(i>=0){
-	  // Mark as input
-	  algorithm_[i].op = OP_INPUT;
+        int i = itc->getTemp()-1;
+        if(i>=0){
+          // Mark as input
+          algorithm_[i].op = OP_INPUT;
         
-	  // Location of the input
-	  algorithm_[i].arg.i[0] = ind;
-	  algorithm_[i].arg.i[1] = nz;
+          // Location of the input
+          algorithm_[i].arg.i[0] = ind;
+          algorithm_[i].arg.i[1] = nz;
         
-	  // Mark input as read
-	  itc->setTemp(0);
-	}
+          // Mark input as read
+          itc->setTemp(0);
+        }
       }
     }
   
@@ -618,11 +618,11 @@ namespace CasADi{
     free_vars_.clear();
     for(vector<pair<int,SXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it){
       if(it->second->temp!=0){
-	// Save to list of free parameters
-	free_vars_.push_back(SX::create(it->second));
+        // Save to list of free parameters
+        free_vars_.push_back(SX::create(it->second));
       
-	// Remove marker
-	it->second->temp=0;
+        // Remove marker
+        it->second->temp=0;
       }
     }
   
@@ -635,9 +635,9 @@ namespace CasADi{
     
       // Make sure that there are no parameters
       if (!free_vars_.empty()) {
-	std::stringstream ss;
-	repr(ss);
-	casadi_error("Cannot just-in-time compile \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
+        std::stringstream ss;
+        repr(ss);
+        casadi_error("Cannot just-in-time compile \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
       }
     
 #ifdef WITH_LLVM
@@ -747,36 +747,36 @@ namespace CasADi{
       // Input vectors
       vector<llvm::Value*> input_v(getNumInputs());
       for(int ind=0; ind<input_v.size(); ++ind){
-	llvm::Value *ind_v = llvm::ConstantInt::get(int32Ty, ind);
-	input_v[ind] = builder.CreateLoad(builder.CreateGEP(x_ptr,ind_v));
+        llvm::Value *ind_v = llvm::ConstantInt::get(int32Ty, ind);
+        input_v[ind] = builder.CreateLoad(builder.CreateGEP(x_ptr,ind_v));
       }
     
       // Output vectors
       vector<llvm::Value*> output_v(getNumOutputs());
       for(int ind=0; ind<output_v.size(); ++ind){
-	llvm::Value *ind_v = llvm::ConstantInt::get(int32Ty, ind);
-	output_v[ind] = builder.CreateLoad(builder.CreateGEP(r_ptr,ind_v));
+        llvm::Value *ind_v = llvm::ConstantInt::get(int32Ty, ind);
+        output_v[ind] = builder.CreateLoad(builder.CreateGEP(r_ptr,ind_v));
       }
         
       // Build up the LLVM expression graphs
       for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-	// Argument of the operation
-	vector<llvm::Value*> oarg(casadi_math<double>::ndeps(it->op));
-	for(int d=0; d<oarg.size(); ++d){
-	  oarg[d] = jwork[it->arg.i[d]];
-	}
+        // Argument of the operation
+        vector<llvm::Value*> oarg(casadi_math<double>::ndeps(it->op));
+        for(int d=0; d<oarg.size(); ++d){
+          oarg[d] = jwork[it->arg.i[d]];
+        }
       
-	if(it->op==OP_INPUT){
-	  llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, it->arg.i[1]);
-	  jwork[it->res] = builder.CreateLoad(builder.CreateGEP(input_v[it->arg.i[0]],k_v));
-	} else if(it->op==OP_OUTPUT){
-	  llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, it->arg.i[1]);
-	  builder.CreateStore(oarg[0],builder.CreateGEP(output_v[it->res],k_v));
-	} else {
-	  // Result
-	  llvm::Value* res = 0;
+        if(it->op==OP_INPUT){
+          llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, it->arg.i[1]);
+          jwork[it->res] = builder.CreateLoad(builder.CreateGEP(input_v[it->arg.i[0]],k_v));
+        } else if(it->op==OP_OUTPUT){
+          llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, it->arg.i[1]);
+          builder.CreateStore(oarg[0],builder.CreateGEP(output_v[it->res],k_v));
+        } else {
+          // Result
+          llvm::Value* res = 0;
         
-	  switch(it->op){
+          switch(it->op){
           case OP_ADD:         res = builder.CreateFAdd(oarg[0],oarg[1]); break;
           case OP_SUB:         res = builder.CreateFSub(oarg[0],oarg[1]); break;
           case OP_MUL:         res = builder.CreateFMul(oarg[0],oarg[1]); break;
@@ -788,11 +788,11 @@ namespace CasADi{
           default:
             casadi_assert_message(builtins[it->op]!=0, "No way to treat: " << it->op);
             res = builder.CreateCall(builtins[it->op], oarg);
-	  }
+          }
         
-	  // Save to work vector
-	  jwork[it->res] = res;
-	}
+          // Save to work vector
+          jwork[it->res] = res;
+        }
       }
     
       // Finish off the function.
@@ -810,13 +810,13 @@ namespace CasADi{
       // Allocate references to input nonzeros
       input_ref_.resize(getNumInputs());
       for(int ind=0; ind<input_ref_.size(); ++ind){
-	input_ref_[ind] = getPtr(input(ind).data());
+        input_ref_[ind] = getPtr(input(ind).data());
       }
         
       // Allocate references to output nonzeros
       output_ref_.resize(getNumOutputs());
       for(int ind=0; ind<output_ref_.size(); ++ind){
-	output_ref_[ind] = getPtr(output(ind).data());
+        output_ref_[ind] = getPtr(output(ind).data());
       }
     
 #else // WITH_LLVM
@@ -858,8 +858,8 @@ namespace CasADi{
   }
 
   void SXFunctionInternal::evalSXsparse(const vector<SXMatrix>& arg1, vector<SXMatrix>& res1, 
-				  const vector<vector<SXMatrix> >& fseed, vector<vector<SXMatrix> >& fsens, 
-				  const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens){
+                                  const vector<vector<SXMatrix> >& fseed, vector<vector<SXMatrix> >& fsens, 
+                                  const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens){
     if(verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
 
     // Check if arguments matches the input expressions, in which case the output is known to be the output expressions
@@ -867,16 +867,16 @@ namespace CasADi{
     bool output_given = true;
     for(int i=0; i<arg1.size() && output_given; ++i){
       for(int j=0; j<arg1[i].size() && output_given; ++j){
-	if(!arg1[i].at(j).isEqual(inputv_[i].at(j),checking_depth)){	  
-	  output_given = false;
-	}
+        if(!arg1[i].at(j).isEqual(inputv_[i].at(j),checking_depth)){          
+          output_given = false;
+        }
       }
     }
     
     // Copy output if known
     if(output_given){
       for(int i=0; i<res1.size(); ++i){
-	copy(outputv_[i].begin(),outputv_[i].end(),res1[i].begin()); 
+        copy(outputv_[i].begin(),outputv_[i].end(),res1[i].begin()); 
       }
     }
     
@@ -925,31 +925,31 @@ namespace CasADi{
       case OP_PARAMETER:
         s_work_[it->res] = *p_it++; break;
       default:
-	{
-	  // Evaluate the function to a temporary value (as it might overwrite the children in the work vector)
-	  SX f;
-	  if(output_given){
-	    f = *b_it++;
-	  } else {
-	    switch(it->op){
-	      CASADI_MATH_FUN_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f)
-		}
+        {
+          // Evaluate the function to a temporary value (as it might overwrite the children in the work vector)
+          SX f;
+          if(output_given){
+            f = *b_it++;
+          } else {
+            switch(it->op){
+              CASADI_MATH_FUN_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f)
+                }
           
-	    // If this new expression is identical to the expression used to define the algorithm, then reuse
-	    const int depth = 2; // NOTE: a higher depth could possibly give more savings
-	    f.assignIfDuplicate(*b_it++,depth);
-	  }
+            // If this new expression is identical to the expression used to define the algorithm, then reuse
+            const int depth = 2; // NOTE: a higher depth could possibly give more savings
+            f.assignIfDuplicate(*b_it++,depth);
+          }
         
-	  // Get the partial derivatives, if requested
-	  if(taping){
-	    switch(it->op){
-	      CASADI_MATH_DER_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f,it1++->d)
-		}
-	  }
+          // Get the partial derivatives, if requested
+          if(taping){
+            switch(it->op){
+              CASADI_MATH_DER_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f,it1++->d)
+                }
+          }
         
-	  // Finally save the function value
-	  s_work_[it->res] = f;
-	}
+          // Finally save the function value
+          s_work_[it->res] = f;
+        }
       }
     }
   
@@ -961,7 +961,7 @@ namespace CasADi{
     for(int dir=0; dir<nfdir; ++dir){
       vector<TapeEl<SX> >::const_iterator it2 = s_pdwork.begin();
       for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-	switch(it->op){
+        switch(it->op){
         case OP_INPUT:
           s_work_[it->res] = fseed[dir][it->arg.i[0]].data()[it->arg.i[1]]; break;
         case OP_OUTPUT:
@@ -970,11 +970,11 @@ namespace CasADi{
         case OP_PARAMETER:
           s_work_[it->res] = 0;
           break;
-	  CASADI_MATH_BINARY_BUILTIN // Binary operation
-	    s_work_[it->res] = it2->d[0] * s_work_[it->arg.i[0]] + it2->d[1] * s_work_[it->arg.i[1]]; it2++; break;
+          CASADI_MATH_BINARY_BUILTIN // Binary operation
+            s_work_[it->res] = it2->d[0] * s_work_[it->arg.i[0]] + it2->d[1] * s_work_[it->arg.i[1]]; it2++; break;
         default: // Unary operation
           s_work_[it->res] = it2->d[0] * s_work_[it->arg.i[0]]; it2++; 
-	}
+        }
       }
     }
 
@@ -984,8 +984,8 @@ namespace CasADi{
     for(int dir=0; dir<nadir; ++dir){
       vector<TapeEl<SX> >::const_reverse_iterator it2 = s_pdwork.rbegin();
       for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
-	SX seed;
-	switch(it->op){
+        SX seed;
+        switch(it->op){
         case OP_INPUT:
           asens[dir][it->arg.i[0]].data()[it->arg.i[1]] = s_work_[it->res];
           s_work_[it->res] = 0;
@@ -997,8 +997,8 @@ namespace CasADi{
         case OP_PARAMETER:
           s_work_[it->res] = 0;
           break;
-	  CASADI_MATH_BINARY_BUILTIN // Binary operation
-	    seed = s_work_[it->res];
+          CASADI_MATH_BINARY_BUILTIN // Binary operation
+            seed = s_work_[it->res];
           s_work_[it->res] = 0;
           s_work_[it->arg.i[0]] += it2->d[0] * seed;
           s_work_[it->arg.i[1]] += it2->d[1] * seed;
@@ -1009,7 +1009,7 @@ namespace CasADi{
           s_work_[it->res] = 0;
           s_work_[it->arg.i[0]] += it2->d[0] * seed;
           it2++; 
-	}
+        }
       }
     }
     if(verbose()) cout << "SXFunctionInternal::evalSXsparse end" << endl;
@@ -1055,7 +1055,7 @@ namespace CasADi{
     if(fwd){
       // Propagate sparsity forward
       for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-	switch(it->op){
+        switch(it->op){
         case OP_CONST:
         case OP_PARAMETER:
           iwork[it->res] = bvec_t(0); break;
@@ -1065,18 +1065,18 @@ namespace CasADi{
           reinterpret_cast<bvec_t*>(&outputNoCheck(it->res).front())[it->arg.i[1]] = iwork[it->arg.i[0]]; break;
         default: // Unary or binary operation
           iwork[it->res] = iwork[it->arg.i[0]] | iwork[it->arg.i[1]]; break;
-	}
+        }
       }
         
     } else { // Backward propagation
 
       // Propagate sparsity backward
       for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
-	// Temp seed
-	bvec_t seed;
+        // Temp seed
+        bvec_t seed;
       
-	// Propagate seeds
-	switch(it->op){
+        // Propagate seeds
+        switch(it->op){
         case OP_CONST:
         case OP_PARAMETER:
           iwork[it->res] = 0;
@@ -1093,7 +1093,7 @@ namespace CasADi{
           iwork[it->res] = 0;
           iwork[it->arg.i[0]] |= seed;
           iwork[it->arg.i[1]] |= seed; 
-	}
+        }
       }
     }
   }
@@ -1103,7 +1103,7 @@ namespace CasADi{
     vector<SXMatrix> argv = inputv_;
     for(int ind=0; ind<argv.size(); ++ind){
       if(argv[ind].size2()!=1 || !argv[ind].dense()){
-	argv[ind] = argv[ind][Slice()];
+        argv[ind] = argv[ind][Slice()];
       }
     }
 
@@ -1115,7 +1115,7 @@ namespace CasADi{
     vector<SXMatrix> resv = outputv_;
     for(int ind=0; ind<resv.size(); ++ind){
       if(resv[ind].size2()!=1 || !resv[ind].dense()){
-	resv[ind] = resv[ind][Slice()];
+        resv[ind] = resv[ind][Slice()];
       }
     }
 
@@ -1178,82 +1178,82 @@ namespace CasADi{
       ss << "__kernel void " << fcn_name[kernel] << "(";
       bool first=true;
       for(int i=0; i<getNumInputs(); ++i){
-	if(first) first=false;
-	else      ss << ", ";
-	ss << "__global unsigned long *x" << i;
+        if(first) first=false;
+        else      ss << ", ";
+        ss << "__global unsigned long *x" << i;
       }
       for(int i=0; i<getNumOutputs(); ++i){
-	if(first) first=false;
-	else      ss << ", ";
-	ss << "__global unsigned long *r" << i;
+        if(first) first=false;
+        else      ss << ", ";
+        ss << "__global unsigned long *r" << i;
       }
       ss << "){ " << endl;
     
       if(use_fwd){
-	// Which variables have been declared
-	vector<bool> declared(work_.size(),false);    
+        // Which variables have been declared
+        vector<bool> declared(work_.size(),false);    
 
-	// Propagate sparsity forward
-	for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-	  if(it->op==OP_OUTPUT){
-	    ss << "if(r" << it->res << "!=0) r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
-	  } else {
-	    // Declare result if not already declared
-	    if(!declared[it->res]){
-	      ss << "ulong ";
-	      declared[it->res]=true;
-	    }
-	  
-	    // Where to store the result
-	    ss << "a" << it->res << "=";
-	  
-	    // What to store
-	    if(it->op==OP_CONST || it->op==OP_PARAMETER){
-	      ss << "0";
-	    } else if(it->op==OP_INPUT){
-	      ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
-	    } else {
-	      int ndep = casadi_math<double>::ndeps(it->op);
-	      for(int c=0; c<ndep; ++c){
-		if(c==1) ss << "|";
-		ss << "a" << it->arg.i[c];
-	      }
-	    }
-	  }
-	  ss  << ";" << endl;
-	}
+        // Propagate sparsity forward
+        for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+          if(it->op==OP_OUTPUT){
+            ss << "if(r" << it->res << "!=0) r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
+          } else {
+            // Declare result if not already declared
+            if(!declared[it->res]){
+              ss << "ulong ";
+              declared[it->res]=true;
+            }
+          
+            // Where to store the result
+            ss << "a" << it->res << "=";
+          
+            // What to store
+            if(it->op==OP_CONST || it->op==OP_PARAMETER){
+              ss << "0";
+            } else if(it->op==OP_INPUT){
+              ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
+            } else {
+              int ndep = casadi_math<double>::ndeps(it->op);
+              for(int c=0; c<ndep; ++c){
+                if(c==1) ss << "|";
+                ss << "a" << it->arg.i[c];
+              }
+            }
+          }
+          ss  << ";" << endl;
+        }
       
       } else { // Backward propagation
-	// Temporary variable
-	ss << "ulong t;" << endl;
+        // Temporary variable
+        ss << "ulong t;" << endl;
 
-	// Declare and initialize work vector
-	for(int i=0; i<work_.size(); ++i){
-	  ss << "ulong a" << i << "=0;"<< endl;
-	}
+        // Declare and initialize work vector
+        for(int i=0; i<work_.size(); ++i){
+          ss << "ulong a" << i << "=0;"<< endl;
+        }
       
-	// Propagate sparsity backward
-	for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
-	  if(it->op==OP_OUTPUT){
-	    ss << "if(r" << it->res << "!=0) a" << it->arg.i[0] << "|=r" << it->res << "[" << it->arg.i[1] << "];" << endl;
-	  } else {
-	    if(it->op==OP_INPUT){
-	      ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]=a" << it->res << "; ";
-	      ss << "a" << it->res << "=0;" << endl;
-	    } else if(it->op==OP_CONST || it->op==OP_PARAMETER){
-	      ss << "a" << it->res << "=0;" << endl;
-	    } else {
-	      int ndep = casadi_math<double>::ndeps(it->op);
-	      ss << "t=a" << it->res << "; ";
-	      ss << "a" << it->res << "=0; ";
-	      ss << "a" << it->arg.i[0] << "|=" << "t" << "; ";
-	      if(ndep>1){
-		ss << "a" << it->arg.i[1] << "|=" << "t" << "; ";
-	      }
-	      ss << endl;
-	    }
-	  }
-	}
+        // Propagate sparsity backward
+        for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
+          if(it->op==OP_OUTPUT){
+            ss << "if(r" << it->res << "!=0) a" << it->arg.i[0] << "|=r" << it->res << "[" << it->arg.i[1] << "];" << endl;
+          } else {
+            if(it->op==OP_INPUT){
+              ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]=a" << it->res << "; ";
+              ss << "a" << it->res << "=0;" << endl;
+            } else if(it->op==OP_CONST || it->op==OP_PARAMETER){
+              ss << "a" << it->res << "=0;" << endl;
+            } else {
+              int ndep = casadi_math<double>::ndeps(it->op);
+              ss << "t=a" << it->res << "; ";
+              ss << "a" << it->res << "=0; ";
+              ss << "a" << it->arg.i[0] << "|=" << "t" << "; ";
+              if(ndep>1){
+                ss << "a" << it->arg.i[1] << "|=" << "t" << "; ";
+              }
+              ss << endl;
+            }
+          }
+        }
       }
       ss << "}" << endl << endl;
     }
@@ -1288,9 +1288,9 @@ namespace CasADi{
     sp_input_memobj_.resize(getNumInputs(),static_cast<cl_mem>(0));
     for(int i=0; i<sp_input_memobj_.size(); ++i){
       sp_input_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
-					   CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
-					   inputNoCheck(i).size() * sizeof(cl_ulong),     
-					   reinterpret_cast<void*>(inputNoCheck(i).ptr()), &ret);
+                                           CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
+                                           inputNoCheck(i).size() * sizeof(cl_ulong),     
+                                           reinterpret_cast<void*>(inputNoCheck(i).ptr()), &ret);
       casadi_assert(ret == CL_SUCCESS);
     }
   
@@ -1298,9 +1298,9 @@ namespace CasADi{
     sp_output_memobj_.resize(getNumOutputs(),static_cast<cl_mem>(0));
     for(int i=0; i<sp_output_memobj_.size(); ++i){
       sp_output_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
-					    CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
-					    outputNoCheck(i).size() * sizeof(cl_ulong),     
-					    reinterpret_cast<void*>(outputNoCheck(i).ptr()), &ret);
+                                            CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
+                                            outputNoCheck(i).size() * sizeof(cl_ulong),     
+                                            reinterpret_cast<void*>(outputNoCheck(i).ptr()), &ret);
       casadi_assert(ret == CL_SUCCESS);
     }
   }
@@ -1333,14 +1333,14 @@ namespace CasADi{
     // Get inputs
     for(int i=0; i<sp_input_memobj_.size(); ++i){
       ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, sp_input_memobj_[i], CL_TRUE, 0,
-				inputNoCheck(i).size() * sizeof(cl_ulong), reinterpret_cast<void*>(inputNoCheck(i).ptr()), 0, NULL, NULL);
+                                inputNoCheck(i).size() * sizeof(cl_ulong), reinterpret_cast<void*>(inputNoCheck(i).ptr()), 0, NULL, NULL);
       casadi_assert(ret == CL_SUCCESS);
     }
 
     // Get outputs
     for(int i=0; i<sp_output_memobj_.size(); ++i){
       ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, sp_output_memobj_[i], CL_TRUE, 0,
-				outputNoCheck(i).size() * sizeof(cl_ulong), reinterpret_cast<void*>(outputNoCheck(i).ptr()), 0, NULL, NULL);
+                                outputNoCheck(i).size() * sizeof(cl_ulong), reinterpret_cast<void*>(outputNoCheck(i).ptr()), 0, NULL, NULL);
       casadi_assert(ret == CL_SUCCESS);
     }
   }
@@ -1352,8 +1352,8 @@ namespace CasADi{
     // Clean up memory for input buffers
     for(vector<cl_mem>::iterator i=sp_input_memobj_.begin(); i!=sp_input_memobj_.end(); ++i){
       if(*i != 0){
-	ret = clReleaseMemObject(*i);
-	casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+        ret = clReleaseMemObject(*i);
+        casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
       }
     }
     sp_input_memobj_.clear();
@@ -1361,8 +1361,8 @@ namespace CasADi{
     // Clean up memory for output buffers
     for(vector<cl_mem>::iterator i=sp_output_memobj_.begin(); i!=sp_output_memobj_.end(); ++i){
       if(*i != 0){
-	ret = clReleaseMemObject(*i);
-	casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+        ret = clReleaseMemObject(*i);
+        casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
       }
     }
     sp_output_memobj_.clear();
@@ -1429,9 +1429,9 @@ namespace CasADi{
     input_memobj_.resize(getNumInputs(),static_cast<cl_mem>(0));
     for(int i=0; i<input_memobj_.size(); ++i){
       input_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
-					CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
-					inputNoCheck(i).size() * sizeof(cl_double),     
-					static_cast<void*>(inputNoCheck(i).ptr()), &ret);
+                                        CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
+                                        inputNoCheck(i).size() * sizeof(cl_double),     
+                                        static_cast<void*>(inputNoCheck(i).ptr()), &ret);
       casadi_assert(ret == CL_SUCCESS);
     }
   
@@ -1439,9 +1439,9 @@ namespace CasADi{
     output_memobj_.resize(getNumOutputs(),static_cast<cl_mem>(0));
     for(int i=0; i<output_memobj_.size(); ++i){
       output_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
-					 CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR,
-					 outputNoCheck(i).size() * sizeof(cl_double),     
-					 static_cast<void*>(outputNoCheck(i).ptr()), &ret);
+                                         CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR,
+                                         outputNoCheck(i).size() * sizeof(cl_double),     
+                                         static_cast<void*>(outputNoCheck(i).ptr()), &ret);
       casadi_assert(ret == CL_SUCCESS);
     }
   
@@ -1473,7 +1473,7 @@ namespace CasADi{
     // Get outputs
     for(int i=0; i<output_memobj_.size(); ++i){
       ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, output_memobj_[i], CL_TRUE, 0,
-				outputNoCheck(i).size() * sizeof(cl_double), reinterpret_cast<void*>(outputNoCheck(i).ptr()), 0, NULL, NULL);
+                                outputNoCheck(i).size() * sizeof(cl_double), reinterpret_cast<void*>(outputNoCheck(i).ptr()), 0, NULL, NULL);
       casadi_assert(ret == CL_SUCCESS);
     }
   }
@@ -1485,8 +1485,8 @@ namespace CasADi{
     // Clean up memory for input buffers
     for(vector<cl_mem>::iterator i=input_memobj_.begin(); i!=input_memobj_.end(); ++i){
       if(*i != 0){
-	ret = clReleaseMemObject(*i);
-	casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+        ret = clReleaseMemObject(*i);
+        casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
       }
     }
     input_memobj_.clear();
@@ -1494,8 +1494,8 @@ namespace CasADi{
     // Clean up memory for output buffers
     for(vector<cl_mem>::iterator i=output_memobj_.begin(); i!=output_memobj_.end(); ++i){
       if(*i != 0){
-	ret = clReleaseMemObject(*i);
-	casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
+        ret = clReleaseMemObject(*i);
+        casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
       }
     }
     output_memobj_.clear();
@@ -1531,19 +1531,19 @@ namespace CasADi{
       case CL_INVALID_OPERATION: msg = "(1) The build of a program executable for any of the devices listed in device_list by a previous call to clBuildProgram for program has not completed. (2) There are kernel objects attached to program. "; break;
       case CL_COMPILER_NOT_AVAILABLE: msg = "Program is created with clCreateProgramWithSource and a compiler is not available i.e. CL_DEVICE_COMPILER_AVAILABLE specified in table 4.3 is set to CL_FALSE."; break;
       case CL_BUILD_PROGRAM_FAILURE:{
-	msg = "There is a failure to build the program executable. This error will be returned if clBuildProgram does not return until the build has completed. "; 
+        msg = "There is a failure to build the program executable. This error will be returned if clBuildProgram does not return until the build has completed. "; 
       
-	// Determine the size of the log
-	size_t log_size;
-	clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+        // Determine the size of the log
+        size_t log_size;
+        clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
       
-	// Allocate memory for the log
-	char log[log_size];
+        // Allocate memory for the log
+        char log[log_size];
       
-	// Print the log
-	clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
-	cerr << log << endl;
-	break;
+        // Print the log
+        clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
+        cerr << log << endl;
+        break;
       }
       case CL_OUT_OF_RESOURCES: msg = "There is a failure to allocate resources required by the OpenCL implementation on the device."; break;
       case CL_OUT_OF_HOST_MEMORY: msg = "There is a failure to allocate resources required by the OpenCL implementation on the host."; break;

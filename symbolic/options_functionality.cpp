@@ -58,8 +58,8 @@ double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::st
       t = b[j];tolower(t);
       int cost = 0;
       if (s != t)
-	cost = 1;
-	
+        cost = 1;
+        
       v1[j+1] = min(min( v1[j] + 1, v0[j+1] + 1), v0[j] + cost);
     }
 

@@ -60,11 +60,11 @@ void CSparseInternal::init(){
 
 void CSparseInternal::prepare(){
   if(!called_once_){
-	if(verbose()){
-	  cout << "CSparseInternal::prepare: symbolic factorization" << endl;
-	}
-	
-	// ordering and symbolic analysis 
+        if(verbose()){
+          cout << "CSparseInternal::prepare: symbolic factorization" << endl;
+        }
+        
+        // ordering and symbolic analysis 
     int order = 0; // ordering?
     if(S_) cs_sfree(S_);
     S_ = cs_sqr (order, &AT_, 0) ;              
@@ -78,14 +78,14 @@ void CSparseInternal::prepare(){
   
   // Make sure that all entries of the linear system are valid
   for(int k=0; k<linsys_nz.size(); ++k){
-	casadi_assert_message(!isnan(linsys_nz[k]),"Nonzero " << k << " is not-a-number");
-	casadi_assert_message(!isinf(linsys_nz[k]),"Nonzero " << k << " is infinite");
+        casadi_assert_message(!isnan(linsys_nz[k]),"Nonzero " << k << " is not-a-number");
+        casadi_assert_message(!isinf(linsys_nz[k]),"Nonzero " << k << " is infinite");
   }
   
   if(verbose()){
-	cout << "CSparseInternal::prepare: numeric factorization" << endl;
-	cout << "linear system to be factorized = " << endl;
-	input(0).printSparse();
+        cout << "CSparseInternal::prepare: numeric factorization" << endl;
+        cout << "linear system to be factorized = " << endl;
+        input(0).printSparse();
   }
 
   double tol = 1e-8;
@@ -96,20 +96,20 @@ void CSparseInternal::prepare(){
     DMatrix temp = input();
     makeSparse(temp);
     if (isSingular(temp.sparsity())) {
-    	stringstream ss;
-	    ss << "CSparseInternal::prepare: factorization failed due to matrix being singular. Matrix contains numerical zeros which are structurally non-zero. Promoting these zeros to be structural zeros, the matrix was found to be structurally rank deficient. sprank: " << rank(temp.sparsity()) << " <-> " << temp.size1() << endl;
-	    if(verbose()){
-	      ss << "Sparsity of the linear system: " << endl;
-	      sparsity_.print(ss); // print detailed
-	    }
+            stringstream ss;
+            ss << "CSparseInternal::prepare: factorization failed due to matrix being singular. Matrix contains numerical zeros which are structurally non-zero. Promoting these zeros to be structural zeros, the matrix was found to be structurally rank deficient. sprank: " << rank(temp.sparsity()) << " <-> " << temp.size1() << endl;
+            if(verbose()){
+              ss << "Sparsity of the linear system: " << endl;
+              sparsity_.print(ss); // print detailed
+            }
       throw CasadiException(ss.str());
     } else {
-    	stringstream ss;
-	    ss << "CSparseInternal::prepare: factorization failed, check if Jacobian is singular" << endl;
-	    if(verbose()){
-	      ss << "Sparsity of the linear system: " << endl;
-	      sparsity_.print(ss); // print detailed
-	    }
+            stringstream ss;
+            ss << "CSparseInternal::prepare: factorization failed, check if Jacobian is singular" << endl;
+            if(verbose()){
+              ss << "Sparsity of the linear system: " << endl;
+              sparsity_.print(ss); // print detailed
+            }
       throw CasadiException(ss.str());
     }
   }

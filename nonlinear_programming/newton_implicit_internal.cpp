@@ -58,8 +58,8 @@ namespace CasADi {
     while(true){
       // Break if maximum number of iterations already reached
       if (iter >= max_iter_) {
-	log("evaluate","Max. iterations reached.");
-	break;
+        log("evaluate","Max. iterations reached.");
+        break;
       }
 
       // Start a new iteration
@@ -67,11 +67,11 @@ namespace CasADi {
 
       // Print progress
       if (monitored("step") || monitored("stepsize")) {
-	std::cout << "Step " << iter << "." << std::endl; 
+        std::cout << "Step " << iter << "." << std::endl; 
       }
     
       if (monitored("step")) {
-	std::cout << "  Xk = " << Xk << std::endl;
+        std::cout << "  Xk = " << Xk << std::endl;
       }
     
       // Use Xk to evaluate J
@@ -83,11 +83,11 @@ namespace CasADi {
       if (monitored("J")) std::cout << "  J = " << J << std::endl;
 
       if ( numeric_limits<double>::infinity() != abstol_ ) {
-	double maxF = std::max((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
-	if (maxF <= abstol_) {
-	  casadi_log("Converged to acceptable tolerance - abstol: " << abstol_);
-	  break;
-	}
+        double maxF = std::max((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
+        if (maxF <= abstol_) {
+          casadi_log("Converged to acceptable tolerance - abstol: " << abstol_);
+          break;
+        }
       } 
     
       // Prepare the linear solver with J
@@ -98,18 +98,18 @@ namespace CasADi {
       linsol_.solve(&F.front(),1,false);
 
       if (monitored("step")) {
-	std::cout << "  step = " << F << std::endl;
+        std::cout << "  step = " << F << std::endl;
       }
     
       if ( numeric_limits<double>::infinity() != abstolStep_ ) {
-	double maxF = std::max((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
-	if (monitored("stepsize")) {
-	  std::cout << "  stepsize = " << maxF << std::endl;
-	}
-	if (maxF <= abstolStep_) {
-	  casadi_log("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
-	  break;
-	}
+        double maxF = std::max((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
+        if (monitored("stepsize")) {
+          std::cout << "  stepsize = " << maxF << std::endl;
+        }
+        if (maxF <= abstolStep_) {
+          casadi_log("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
+          break;
+        }
       } 
     
       // Update Xk+1 = Xk - J^(-1) F

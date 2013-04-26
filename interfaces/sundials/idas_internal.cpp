@@ -255,9 +255,9 @@ void IdasInternal::init(){
       for(int i=0; i<nfdir_; ++i){
         xzF_[i] = N_VNew_Serial(nx_+nz_);
         xzdotF_[i] = N_VNew_Serial(nx_+nz_);
-	if(nq_>0){
-	  qF_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_QF,i).front());
-	}
+        if(nq_>0){
+          qF_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_QF,i).front());
+        }
       }
       
     // Get the sensitivity method

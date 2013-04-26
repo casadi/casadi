@@ -83,7 +83,7 @@ int main(){
     SXMatrix L = 1;
     for(int r=0; r<d+1; ++r){
       if(r!=j){
-	L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r]);
+        L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r]);
       }
     }
     SXFunction lfcn(tau,L);

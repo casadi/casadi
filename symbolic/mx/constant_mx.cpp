@@ -54,7 +54,7 @@ namespace CasADi{
     // Evaluate nondifferentiated
     if(!output_given){
       if(output[0]){
-	*output[0] = shared_from_this<MX>();
+        *output[0] = shared_from_this<MX>();
       }
     }
   
@@ -62,16 +62,16 @@ namespace CasADi{
     if(!fwdSens.empty()){
       MX zero_sens = MX::sparse(size1(),size2());
       for(int d=0; d<fwdSens.size(); ++d){
-	if(fwdSens[d][0]!=0){
-	  *fwdSens[d][0] = zero_sens;
-	}
+        if(fwdSens[d][0]!=0){
+          *fwdSens[d][0] = zero_sens;
+        }
       }
     }
     
     // Clear adjoint seeds
     for(int d=0; d<adjSeed.size(); ++d){
       if(adjSeed[d][0]!=0){
-	*adjSeed[d][0] = MX();
+        *adjSeed[d][0] = MX();
       }      
     }
   }
@@ -102,7 +102,7 @@ namespace CasADi{
     case 0: return new Constant<CompiletimeConst<0> >(sp);
     case 1: return new Constant<CompiletimeConst<1> >(sp);
     case -1: return new Constant<CompiletimeConst<(-1)> >(sp);
-    default: return new Constant<RuntimeConst<int> >(sp,val);	
+    default: return new Constant<RuntimeConst<int> >(sp,val);        
     }
   }
 
@@ -125,10 +125,10 @@ namespace CasADi{
       const vector<double> vdata = val.data();
       double v = vdata[0];
       for(vector<double>::const_iterator i=vdata.begin(); i!=vdata.end(); ++i){
-	if(*i!=v){
-	  // Values not all the same
-	  return new ConstantDMatrix(val);
-	}
+        if(*i!=v){
+          // Values not all the same
+          return new ConstantDMatrix(val);
+        }
       }
 
       // All values identical if reached this point

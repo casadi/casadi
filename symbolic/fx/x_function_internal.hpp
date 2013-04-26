@@ -113,18 +113,18 @@ namespace CasADi{
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::XFunctionInternal(
-										const std::vector<MatType>& inputv, const std::vector<MatType>& outputv) : inputv_(inputv),  outputv_(outputv){
+                                                                                const std::vector<MatType>& inputv, const std::vector<MatType>& outputv) : inputv_(inputv),  outputv_(outputv){
     addOption("topological_sorting",OT_STRING,"depth-first","Topological sorting algorithm","depth-first|breadth-first");
     addOption("live_variables",OT_BOOLEAN,true,"Reuse variables in the work vector");
   
     // Make sure that inputs are symbolic
     for(int i=0; i<inputv.size(); ++i){
       if (inputv[i].isNull()) {
-	inputv_[i] = MatType::sym("empty",0,0);
+        inputv_[i] = MatType::sym("empty",0,0);
       } else if (inputv[i].empty()) {
-	// That's okay
+        // That's okay
       } else if(!isSymbolicSparse(inputv[i])){
-	casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
+        casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
       }
     }
       
@@ -136,7 +136,7 @@ namespace CasADi{
     // Null output arguments become empty
     for(int i=0; i<outputv_.size(); ++i) {
       if (outputv_[i].isNull()) {
-	outputv_[i] = MatType(0,0);
+        outputv_[i] = MatType(0,0);
       }
     }
 
@@ -211,15 +211,15 @@ namespace CasADi{
     std::vector<int> level(algnodes.size());
     for(int i=0; i<nlevels; ++i)
       for(int j=lind[i]; j<lind[i+1]; ++j)
-	level[j] = i;
+        level[j] = i;
 
     // Count the number of times each node is referenced inside the algorithm
     std::vector<int> numref(algnodes.size(),0);
     for(int i=0; i<algnodes.size(); ++i){
       for(int c=0; c<algnodes[i]->ndep(); ++c){ // for both children
-	NodeType* child = static_cast<NodeType*>(algnodes[i]->dep(c).get());
-	if(child && child->hasDep())
-	  numref[child->temp]++;
+        NodeType* child = static_cast<NodeType*>(algnodes[i]->dep(c).get());
+        if(child && child->hasDep())
+          numref[child->temp]++;
       }
     }
 
@@ -237,42 +237,42 @@ namespace CasADi{
 
       // Loop over the nodes of the level
       for(int j=lind[i]; j<lind[i+1]; ++j){
-	// element to be treated
-	int el = j;
+        // element to be treated
+        int el = j;
 
-	// elements in the stack have priority
-	if(!extra_this.empty()){
-	  // Replace the element with one from the stack
-	  el = extra_this.top();
-	  extra_this.pop();
-	  --j; // redo the loop
-	}
+        // elements in the stack have priority
+        if(!extra_this.empty()){
+          // Replace the element with one from the stack
+          el = extra_this.top();
+          extra_this.pop();
+          --j; // redo the loop
+        }
 
-	// Skip the element if belongs to a higher level (i.e. was already treated)
-	if(level[el] > i) continue;
+        // Skip the element if belongs to a higher level (i.e. was already treated)
+        if(level[el] > i) continue;
 
-	// for both children
-	for(int c=0; c<algnodes[el]->ndep(); ++c){
+        // for both children
+        for(int c=0; c<algnodes[el]->ndep(); ++c){
 
-	  NodeType* child = static_cast<NodeType*>(algnodes[el]->dep(c).get());
+          NodeType* child = static_cast<NodeType*>(algnodes[el]->dep(c).get());
 
-	  if(child && child->hasDep()){
-	    // Decrease the reference count of the children
-	    numref[child->temp]--;
+          if(child && child->hasDep()){
+            // Decrease the reference count of the children
+            numref[child->temp]--;
 
-	    // If this was the last time the child was referenced ...
-	    // ... and it is not the previous level...
-	    if(numref[child->temp]==0 && level[child->temp] != i-1){
+            // If this was the last time the child was referenced ...
+            // ... and it is not the previous level...
+            if(numref[child->temp]==0 && level[child->temp] != i-1){
 
-	      // ... then assign a new level ...
-	      level[child->temp] = i-1;
+              // ... then assign a new level ...
+              level[child->temp] = i-1;
 
-	      // ... and add to stack
-	      extra_prev.push(child->temp);
+              // ... and add to stack
+              extra_prev.push(child->temp);
 
-	    } // if no more references
-	  } // if binary
-	} // for c = ...
+            } // if no more references
+          } // if binary
+        } // for c = ...
       } // for j
     } // for i
 
@@ -314,9 +314,9 @@ namespace CasADi{
       // maximum level of any of the children
       int maxlevel = -1;
       for(int c=0; c<(*it)->ndep(); ++c){    // Loop over the children
-	NodeType* child = static_cast<NodeType*>((*it)->dep(c).get());
-	if(child->hasDep() && child->temp > maxlevel)
-	  maxlevel = child->temp;
+        NodeType* child = static_cast<NodeType*>((*it)->dep(c).get());
+        if(child->hasDep() && child->temp > maxlevel)
+          maxlevel = child->temp;
       }
 
       // Save the level of this element
@@ -324,7 +324,7 @@ namespace CasADi{
 
       // Save if new maximum reached
       if(1 + maxlevel > nlevels)
-	nlevels = 1 + maxlevel;
+        nlevels = 1 + maxlevel;
     }
     nlevels++;
 
@@ -378,25 +378,25 @@ namespace CasADi{
 
       for(int j=lind[i]; j<lind[i+1]; ++j){
 
-	std::vector<NodeType*>::const_iterator it = algnodes.begin() + j;
+        std::vector<NodeType*>::const_iterator it = algnodes.begin() + j;
 
-	std::cout << "  "<< ii++ << ": ";
+        std::cout << "  "<< ii++ << ": ";
 
-	int op = (*it)->op;
-	stringstream s,s0,s1;
-	s << "i_" << (*it)->temp;
+        int op = (*it)->op;
+        stringstream s,s0,s1;
+        s << "i_" << (*it)->temp;
 
-	int i0 = (*it)->child[0].get()->temp;
-	int i1 = (*it)->child[1].get()->temp;
+        int i0 = (*it)->child[0].get()->temp;
+        int i1 = (*it)->child[1].get()->temp;
 
-	if((*it)->child[0]->hasDep())  s0 << "i_" << i0;
-	else                             s0 << (*it)->child[0];
-	if((*it)->child[1]->hasDep())  s1 << "i_" << i1;
-	else                             s1 << (*it)->child[1];
+        if((*it)->child[0]->hasDep())  s0 << "i_" << i0;
+        else                             s0 << (*it)->child[0];
+        if((*it)->child[1]->hasDep())  s1 << "i_" << i1;
+        else                             s1 << (*it)->child[1];
 
-	std::cout << s.str() << " = ";
-	print_c[op](std::cout,s0.str(),s1.str());
-	std::cout << ";" << std::endl;
+        std::cout << s.str() << " = ";
+        print_c[op](std::cout,s0.str(),s1.str());
+        std::cout << ";" << std::endl;
 
 
 
@@ -437,25 +437,25 @@ namespace CasADi{
 
       for(int j=lind[i]; j<lind[i+1]; ++j){
 
-	std::vector<NodeType*>::const_iterator it = algnodes.begin() + j;
+        std::vector<NodeType*>::const_iterator it = algnodes.begin() + j;
 
-	std::cout << "  "<< ii++ << ": ";
+        std::cout << "  "<< ii++ << ": ";
 
-	int op = (*it)->op;
-	stringstream s,s0,s1;
-	s << "i_" << (*it)->temp;
+        int op = (*it)->op;
+        stringstream s,s0,s1;
+        s << "i_" << (*it)->temp;
 
-	int i0 = (*it)->child[0].get()->temp;
-	int i1 = (*it)->child[1].get()->temp;
+        int i0 = (*it)->child[0].get()->temp;
+        int i1 = (*it)->child[1].get()->temp;
 
-	if((*it)->child[0]->hasDep())  s0 << "i_" << i0;
-	else                             s0 << (*it)->child[0];
-	if((*it)->child[1]->hasDep())  s1 << "i_" << i1;
-	else                             s1 << (*it)->child[1];
+        if((*it)->child[0]->hasDep())  s0 << "i_" << i0;
+        else                             s0 << (*it)->child[0];
+        if((*it)->child[1]->hasDep())  s1 << "i_" << i1;
+        else                             s1 << (*it)->child[1];
 
-	std::cout << s.str() << " = ";
-	print_c[op](std::cout,s0.str(),s1.str());
-	std::cout << ";" << std::endl;
+        std::cout << s.str() << " = ";
+        print_c[op](std::cout,s0.str(),s1.str());
+        std::cout << ";" << std::endl;
 
 
 
@@ -594,12 +594,12 @@ namespace CasADi{
     for(int s=0; s<nsweep; ++s){
       // Print progress
       if(verbose()){
-	int progress_new = (s*100)/nsweep;
-	// Print when entering a new decade
-	if(progress_new / 10 > progress / 10){
-	  progress = progress_new;
-	  std::cout << progress << " %"  << std::endl;
-	}
+        int progress_new = (s*100)/nsweep;
+        // Print when entering a new decade
+        if(progress_new / 10 > progress / 10){
+          progress = progress_new;
+          std::cout << progress << " %"  << std::endl;
+        }
       }
     
       // Number of forward and adjoint directions in the current "batch"
@@ -609,81 +609,81 @@ namespace CasADi{
       // Forward seeds
       fseed.resize(nfdir_batch);
       for(int d=0; d<nfdir_batch; ++d){
-	// Nonzeros of the seed matrix
-	seed_row.clear();
-	seed_col.clear();
+        // Nonzeros of the seed matrix
+        seed_row.clear();
+        seed_col.clear();
 
-	// For all the directions
-	for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
+        // For all the directions
+        for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
         
-	  // Get the direction
-	  int c = D1.col(el);
+          // Get the direction
+          int c = D1.col(el);
 
-	  // Give a seed in the direction
-	  seed_row.push_back(input_row[c]);
-	  seed_col.push_back(input_col[c]);
-	}
+          // Give a seed in the direction
+          seed_row.push_back(input_row[c]);
+          seed_col.push_back(input_col[c]);
+        }
 
-	// initialize to zero
-	fseed[d].resize(getNumInputs());
-	for(int ind=0; ind<fseed[d].size(); ++ind){
-	  int nrow = input(ind).size1(), ncol = input(ind).size2(); // Input dimensions
-	  if(ind==iind){
-	    fseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
-	  } else {
-	    fseed[d][ind] = MatType::sparse(nrow,ncol);
-	  }
-	}
+        // initialize to zero
+        fseed[d].resize(getNumInputs());
+        for(int ind=0; ind<fseed[d].size(); ++ind){
+          int nrow = input(ind).size1(), ncol = input(ind).size2(); // Input dimensions
+          if(ind==iind){
+            fseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
+          } else {
+            fseed[d][ind] = MatType::sparse(nrow,ncol);
+          }
+        }
       }
     
       // Adjoint seeds
       aseed.resize(nadir_batch);
       for(int d=0; d<nadir_batch; ++d){
-	// Nonzeros of the seed matrix
-	seed_row.clear();
-	seed_col.clear();
+        // Nonzeros of the seed matrix
+        seed_row.clear();
+        seed_col.clear();
 
-	// For all the directions
-	for(int el = D2.rowind(offset_nadir+d); el<D2.rowind(offset_nadir+d+1); ++el){
+        // For all the directions
+        for(int el = D2.rowind(offset_nadir+d); el<D2.rowind(offset_nadir+d+1); ++el){
         
-	  // Get the direction
-	  int c = D2.col(el);
+          // Get the direction
+          int c = D2.col(el);
 
-	  // Give a seed in the direction
-	  seed_row.push_back(output_row[c]);
-	  seed_col.push_back(output_col[c]);
-	}
+          // Give a seed in the direction
+          seed_row.push_back(output_row[c]);
+          seed_col.push_back(output_col[c]);
+        }
 
-	//initialize to zero
-	aseed[d].resize(getNumOutputs());
-	for(int ind=0; ind<aseed[d].size(); ++ind){
-	  int nrow = output(ind).size1(), ncol = output(ind).size2(); // Output dimensions
-	  if(ind==oind){
-	    aseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
-	  } else {
-	    aseed[d][ind] = MatType::sparse(nrow,ncol);
-	  }
-	}
+        //initialize to zero
+        aseed[d].resize(getNumOutputs());
+        for(int ind=0; ind<aseed[d].size(); ++ind){
+          int nrow = output(ind).size1(), ncol = output(ind).size2(); // Output dimensions
+          if(ind==oind){
+            aseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
+          } else {
+            aseed[d][ind] = MatType::sparse(nrow,ncol);
+          }
+        }
       }
 
       // Forward sensitivities
       fsens.resize(nfdir_batch);
       for(int d=0; d<nfdir_batch; ++d){
-	// initialize to zero
-	fsens[d].resize(getNumOutputs());
-	for(int oind=0; oind<fsens[d].size(); ++oind){
-	  fsens[d][oind] = MatType(output(oind).sparsity(),0);
-	}
+        // initialize to zero
+        fsens[d].resize(getNumOutputs());
+        for(int oind=0; oind<fsens[d].size(); ++oind){
+          fsens[d][oind] = MatType(output(oind).sparsity(),0);
+        }
       }
 
       // Adjoint sensitivities
       asens.resize(nadir_batch);
       for(int d=0; d<nadir_batch; ++d){
-	// initialize to zero
-	asens[d].resize(getNumInputs());
-	for(int ind=0; ind<asens[d].size(); ++ind){
-	  asens[d][ind] = MatType(input(ind).sparsity(),0);
-	}
+        // initialize to zero
+        asens[d].resize(getNumInputs());
+        for(int ind=0; ind<asens[d].size(); ++ind){
+          asens[d][ind] = MatType(input(ind).sparsity(),0);
+        }
       }
     
       // Evaluate symbolically
@@ -693,111 +693,111 @@ namespace CasADi{
       // Carry out the forward sweeps
       for(int d=0; d<nfdir_batch; ++d){
       
-	// If symmetric, see how many times each output appears
-	if(symmetric){
-	  // Initialize to zero
-	  hits.resize(output(oind).sparsity().size());
-	  fill(hits.begin(),hits.end(),0);
+        // If symmetric, see how many times each output appears
+        if(symmetric){
+          // Initialize to zero
+          hits.resize(output(oind).sparsity().size());
+          fill(hits.begin(),hits.end(),0);
 
-	  // "Multiply" Jacobian sparsity by seed vector
-	  for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
+          // "Multiply" Jacobian sparsity by seed vector
+          for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
           
-	    // Get the input nonzero
-	    int c = D1.col(el);
+            // Get the input nonzero
+            int c = D1.col(el);
           
-	    // Propagate dependencies
-	    for(int el_jsp=jsp_rowind[c]; el_jsp<jsp_rowind[c+1]; ++el_jsp){
-	      hits[jsp_col[el_jsp]]++;
-	    }
-	  }
-	}
+            // Propagate dependencies
+            for(int el_jsp=jsp_rowind[c]; el_jsp<jsp_rowind[c+1]; ++el_jsp){
+              hits[jsp_col[el_jsp]]++;
+            }
+          }
+        }
 
-	// Locate the nonzeros of the forward sensitivity matrix
-	output(oind).sparsity().getElements(nzmap,false);
-	fsens[d][oind].sparsity().getNZInplace(nzmap);
+        // Locate the nonzeros of the forward sensitivity matrix
+        output(oind).sparsity().getElements(nzmap,false);
+        fsens[d][oind].sparsity().getNZInplace(nzmap);
 
-	if(symmetric){
-	  input(iind).sparsity().getElements(nzmap2,false);
-	  fsens[d][oind].sparsity().getNZInplace(nzmap2);
-	}
+        if(symmetric){
+          input(iind).sparsity().getElements(nzmap2,false);
+          fsens[d][oind].sparsity().getNZInplace(nzmap2);
+        }
       
-	// Assignments to the Jacobian
-	adds.resize(fsens[d][oind].size());
-	fill(adds.begin(),adds.end(),-1);
-	if(symmetric){
-	  adds2.resize(adds.size());
-	  fill(adds2.begin(),adds2.end(),-1);
-	}
+        // Assignments to the Jacobian
+        adds.resize(fsens[d][oind].size());
+        fill(adds.begin(),adds.end(),-1);
+        if(symmetric){
+          adds2.resize(adds.size());
+          fill(adds2.begin(),adds2.end(),-1);
+        }
       
-	// For all the input nonzeros treated in the sweep
-	for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
+        // For all the input nonzeros treated in the sweep
+        for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
 
-	  // Get the input nonzero
-	  int c = D1.col(el);
-	  int f2_out;
-	  if(symmetric){
-	    f2_out = nzmap2[c];
-	  }
+          // Get the input nonzero
+          int c = D1.col(el);
+          int f2_out;
+          if(symmetric){
+            f2_out = nzmap2[c];
+          }
         
-	  // Loop over the output nonzeros corresponding to this input nonzero
-	  for(int el_out = jsp_trans.rowind(c); el_out<jsp_trans.rowind(c+1); ++el_out){
+          // Loop over the output nonzeros corresponding to this input nonzero
+          for(int el_out = jsp_trans.rowind(c); el_out<jsp_trans.rowind(c+1); ++el_out){
           
-	    // Get the output nonzero
-	    int r_out = jsp_trans.col(el_out);
+            // Get the output nonzero
+            int r_out = jsp_trans.col(el_out);
           
-	    // Get the forward sensitivity nonzero
-	    int f_out = nzmap[r_out];
-	    if(f_out<0) continue; // Skip if structurally zero
+            // Get the forward sensitivity nonzero
+            int f_out = nzmap[r_out];
+            if(f_out<0) continue; // Skip if structurally zero
           
-	    // The nonzero of the Jacobian now treated
-	    int elJ = mapping[el_out];
+            // The nonzero of the Jacobian now treated
+            int elJ = mapping[el_out];
           
-	    if(symmetric){
-	      if(hits[r_out]==1){
-		adds[f_out] = el_out;
-		adds2[f_out] = elJ;
-	      }
-	    } else {
-	      // Get the output seed
-	      adds[f_out] = elJ;
-	    }
-	  }
-	}
+            if(symmetric){
+              if(hits[r_out]==1){
+                adds[f_out] = el_out;
+                adds2[f_out] = elJ;
+              }
+            } else {
+              // Get the output seed
+              adds[f_out] = elJ;
+            }
+          }
+        }
 
-	// Add contribution to the Jacobian
-	assignIgnore(ret,fsens[d][oind],adds);
-	if(symmetric){
-	  assignIgnore(ret,fsens[d][oind],adds2);
-	}
+        // Add contribution to the Jacobian
+        assignIgnore(ret,fsens[d][oind],adds);
+        if(symmetric){
+          assignIgnore(ret,fsens[d][oind],adds2);
+        }
       }
         
       // Add elements to the Jacobian matrix
       for(int d=0; d<nadir_batch; ++d){
       
-	// Locate the nonzeros of the adjoint sensitivity matrix
-	input(iind).sparsity().getElements(nzmap,false);
-	asens[d][iind].sparsity().getNZInplace(nzmap);
+        // Locate the nonzeros of the adjoint sensitivity matrix
+        input(iind).sparsity().getElements(nzmap,false);
+        asens[d][iind].sparsity().getNZInplace(nzmap);
       
-	// For all the output nonzeros treated in the sweep
-	for(int el = D2.rowind(offset_nadir+d); el<D2.rowind(offset_nadir+d+1); ++el){
+        // For all the output nonzeros treated in the sweep
+        for(int el = D2.rowind(offset_nadir+d); el<D2.rowind(offset_nadir+d+1); ++el){
 
-	  // Get the output nonzero
-	  int r = D2.col(el);
+          // Get the output nonzero
+          int r = D2.col(el);
 
-	  // Loop over the input nonzeros that influences this output nonzero
-	  for(int elJ = jsp.rowind(r); elJ<jsp.rowind(r+1); ++elJ){
+          // Loop over the input nonzeros that influences this output nonzero
+          for(int elJ = jsp.rowind(r); elJ<jsp.rowind(r+1); ++elJ){
           
-	    // Get the input nonzero
-	    int inz = jsp.col(elJ);
+            // Get the input nonzero
+            int inz = jsp.col(elJ);
           
-	    // Get the corresponding adjoint sensitivity nonzero
-	    int anz = nzmap[inz];
-	    if(anz<0) continue;
+            // Get the corresponding adjoint sensitivity nonzero
+            int anz = nzmap[inz];
+            if(anz<0) continue;
           
-	    // Get the input seed
-	    ret.at(elJ) = asens[d][iind].at(anz);
-	  }
-	}
+            // Get the input seed
+            ret.at(elJ) = asens[d][iind].at(anz);
+          }
+        }
       }
     
       // Update direction offsets
@@ -841,15 +841,15 @@ namespace CasADi{
       // Replace symbolic inputs
       int iind=0;
       for(typename std::vector<MatType>::iterator i=fseed[dir].begin(); i!=fseed[dir].end(); ++i, ++iind){
-	// Name of the forward seed
-	std::stringstream ss;
-	ss << "f";
-	if(nfdir>1) ss << dir;
-	ss << "_";
-	ss << iind;
+        // Name of the forward seed
+        std::stringstream ss;
+        ss << "f";
+        if(nfdir>1) ss << dir;
+        ss << "_";
+        ss << iind;
       
-	// Save to matrix
-	*i = MatType::sym(ss.str(),i->sparsity());
+        // Save to matrix
+        *i = MatType::sym(ss.str(),i->sparsity());
       
       }
     }
@@ -863,14 +863,14 @@ namespace CasADi{
       // Replace symbolic inputs
       int oind=0;
       for(typename std::vector<MatType>::iterator i=aseed[dir].begin(); i!=aseed[dir].end(); ++i, ++oind){
-	// Name of the adjoint seed
-	std::stringstream ss;
-	ss << "a";
-	if(nadir>1) ss << dir << "_";
-	ss << oind;
+        // Name of the adjoint seed
+        std::stringstream ss;
+        ss << "a";
+        if(nadir>1) ss << dir << "_";
+        ss << oind;
 
-	// Save to matrix
-	*i = MatType::sym(ss.str(),i->sparsity());
+        // Save to matrix
+        *i = MatType::sym(ss.str(),i->sparsity());
       
       }
     }
