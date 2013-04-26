@@ -99,9 +99,9 @@ namespace CasADi{
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
       SXMatrix L = 1;
       for(int j2=0; j2<deg+1; ++j2){
-	if(j2 != j){
-	  L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
-	}
+        if(j2 != j){
+          L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
+        }
       }
     
       SXFunction lfcn(tau,L);
@@ -115,11 +115,11 @@ namespace CasADi{
 
       // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
       for(int j2=0; j2<deg+1; ++j2){
-	lfcn.setInput(tau_root[j2]);
-	lfcn.setFwdSeed(1.0);
-	lfcn.evaluate(1,0);
-	C[j][j2] = lfcn.fwdSens();
-	C_num(j,j2) = lfcn.fwdSens();
+        lfcn.setInput(tau_root[j2]);
+        lfcn.setFwdSeed(1.0);
+        lfcn.evaluate(1,0);
+        C[j][j2] = lfcn.fwdSens();
+        C_num(j,j2) = lfcn.fwdSens();
       }
     }
 
@@ -170,28 +170,28 @@ namespace CasADi{
 
       // Allocate algebraic variable expressions at the collocation points
       if(k!=nk){
-	Z[k].resize(nj-1);
-	RZ[k].resize(nj-1);
+        Z[k].resize(nj-1);
+        RZ[k].resize(nj-1);
       }
 
       // For all time points
       for(int j=0; j<nj; ++j){
-	// Get expressions for the differential state
-	X[k][j] = V[range(offset,offset+nx_)];
-	offset += nx_;
-	RX[k][j] = V[range(offset,offset+nrx_)];
-	offset += nrx_;
+        // Get expressions for the differential state
+        X[k][j] = V[range(offset,offset+nx_)];
+        offset += nx_;
+        RX[k][j] = V[range(offset,offset+nrx_)];
+        offset += nrx_;
       
-	// Get the local time
-	coll_time_[k][j] = t0_ + h*(k + tau_root[j]);
+        // Get the local time
+        coll_time_[k][j] = t0_ + h*(k + tau_root[j]);
       
-	// Get expressions for the algebraic variables
-	if(j>0){
-	  Z[k][j-1] = V[range(offset,offset+nz_)];
-	  offset += nz_;
-	  RZ[k][j-1] = V[range(offset,offset+nrz_)];
-	  offset += nrz_;
-	}
+        // Get expressions for the algebraic variables
+        if(j>0){
+          Z[k][j-1] = V[range(offset,offset+nz_)];
+          offset += nz_;
+          RZ[k][j-1] = V[range(offset,offset+nrz_)];
+          offset += nrz_;
+        }
       }
     }
   
@@ -217,89 +217,89 @@ namespace CasADi{
   
       // For all collocation points
       for(int j=1; j<deg+1; ++j, ++jk){
-	// Get the time
-	MX tkj = coll_time_[k][j];
+        // Get the time
+        MX tkj = coll_time_[k][j];
       
-	// Get an expression for the state derivative at the collocation point
-	MX xp_jk = 0;
-	for(int j2=0; j2<deg+1; ++j2){
-	  xp_jk += C[j2][j]*X[k][j2];
-	}
+        // Get an expression for the state derivative at the collocation point
+        MX xp_jk = 0;
+        for(int j2=0; j2<deg+1; ++j2){
+          xp_jk += C[j2][j]*X[k][j2];
+        }
       
-	// Add collocation equations to the NLP
-	vector<MX> f_in(DAE_NUM_IN);
-	f_in[DAE_T] = tkj;
-	f_in[DAE_P] = P;
-	f_in[DAE_X] = X[k][j];
-	f_in[DAE_Z] = Z[k][j-1];
+        // Add collocation equations to the NLP
+        vector<MX> f_in(DAE_NUM_IN);
+        f_in[DAE_T] = tkj;
+        f_in[DAE_P] = P;
+        f_in[DAE_X] = X[k][j];
+        f_in[DAE_Z] = Z[k][j-1];
       
-	vector<MX> f_out;
-	f_out = f_.call(f_in);
-	g.push_back(h_mx*f_out[DAE_ODE] - xp_jk);
+        vector<MX> f_out;
+        f_out = f_.call(f_in);
+        g.push_back(h_mx*f_out[DAE_ODE] - xp_jk);
       
-	// Add the algebraic conditions
-	if(nz_>0){
-	  g.push_back(f_out[DAE_ALG]);
-	}
+        // Add the algebraic conditions
+        if(nz_>0){
+          g.push_back(f_out[DAE_ALG]);
+        }
       
-	// Add the quadrature
-	if(nq_>0){
-	  QF += Q[j]*h_mx*f_out[DAE_QUAD];
-	}
+        // Add the quadrature
+        if(nq_>0){
+          QF += Q[j]*h_mx*f_out[DAE_QUAD];
+        }
       
-	// Now for the backward problem
-	if(nrx_>0){
+        // Now for the backward problem
+        if(nrx_>0){
         
-	  // Get an expression for the state derivative at the collocation point
-	  MX rxp_jk = 0;
-	  for(int j2=0; j2<deg+1; ++j2){
-	    rxp_jk += C[j2][j]*RX[k][j2];
-	  }
+          // Get an expression for the state derivative at the collocation point
+          MX rxp_jk = 0;
+          for(int j2=0; j2<deg+1; ++j2){
+            rxp_jk += C[j2][j]*RX[k][j2];
+          }
         
-	  // Add collocation equations to the NLP
-	  vector<MX> g_in(RDAE_NUM_IN);
-	  g_in[RDAE_T] = tkj;
-	  g_in[RDAE_X] = X[k][j];
-	  g_in[RDAE_Z] = Z[k][j-1];
-	  g_in[RDAE_P] = P;
-	  g_in[RDAE_RP] = RP;
-	  g_in[RDAE_RX] = RX[k][j];
-	  g_in[RDAE_RZ] = RZ[k][j-1];
+          // Add collocation equations to the NLP
+          vector<MX> g_in(RDAE_NUM_IN);
+          g_in[RDAE_T] = tkj;
+          g_in[RDAE_X] = X[k][j];
+          g_in[RDAE_Z] = Z[k][j-1];
+          g_in[RDAE_P] = P;
+          g_in[RDAE_RP] = RP;
+          g_in[RDAE_RX] = RX[k][j];
+          g_in[RDAE_RZ] = RZ[k][j-1];
         
-	  vector<MX> g_out;
-	  g_out = g_.call(g_in);
-	  g.push_back(h_mx*g_out[RDAE_ODE] + rxp_jk);
+          vector<MX> g_out;
+          g_out = g_.call(g_in);
+          g.push_back(h_mx*g_out[RDAE_ODE] + rxp_jk);
         
-	  // Add the algebraic conditions
-	  if(nrz_>0){
-	    g.push_back(g_out[RDAE_ALG]);
-	  }
+          // Add the algebraic conditions
+          if(nrz_>0){
+            g.push_back(g_out[RDAE_ALG]);
+          }
         
-	  // Add the backward quadrature
-	  if(nrq_>0){
-	    RQF += Q[j]*h_mx*g_out[RDAE_QUAD];
-	  }
-	}
+          // Add the backward quadrature
+          if(nrq_>0){
+            RQF += Q[j]*h_mx*g_out[RDAE_QUAD];
+          }
+        }
       }
     
       // Get an expression for the state at the end of the finite element
       MX xf_k = 0;
       for(int j=0; j<deg+1; ++j){
-	xf_k += D[j]*X[k][j];
+        xf_k += D[j]*X[k][j];
       }
 
       // Add continuity equation to NLP
       g.push_back(X[k+1][0] - xf_k);
     
       if(nrx_>0){
-	// Get an expression for the state at the end of the finite element
-	MX rxf_k = 0;
-	for(int j=0; j<deg+1; ++j){
-	  rxf_k += D[j]*RX[k][j];
-	}
+        // Get an expression for the state at the end of the finite element
+        MX rxf_k = 0;
+        for(int j=0; j<deg+1; ++j){
+          rxf_k += D[j]*RX[k][j];
+        }
 
-	// Add continuity equation to NLP
-	g.push_back(RX[k+1][0] - rxf_k);
+        // Add continuity equation to NLP
+        g.push_back(RX[k+1][0] - rxf_k);
       }
     }
   
@@ -381,8 +381,8 @@ namespace CasADi{
       startup_integrator_.setOption("t0",coll_time_.front().front());
       startup_integrator_.setOption("tf",coll_time_.back().back());
       if(hasSetOption("startup_integrator_options")){
-	const Dictionary& startup_integrator_options = getOption("startup_integrator_options");
-	startup_integrator_.setOption(startup_integrator_options);
+        const Dictionary& startup_integrator_options = getOption("startup_integrator_options");
+        startup_integrator_.setOption(startup_integrator_options);
       }
     
       // Initialize the startup integrator
@@ -408,7 +408,7 @@ namespace CasADi{
     // Pass the forward seeds
     for(int dir=0; dir<nsens; ++dir){
       for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
-	explicit_fcn_.fwdSeed(iind,dir).set(fwdSeed(iind,dir));
+        explicit_fcn_.fwdSeed(iind,dir).set(fwdSeed(iind,dir));
       }
     }
 
@@ -421,59 +421,59 @@ namespace CasADi{
     
       // Use supplied integrator, if any
       if(has_startup_integrator){
-	for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
-	  startup_integrator_.input(iind).set(input(iind));
-	}
+        for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
+          startup_integrator_.input(iind).set(input(iind));
+        }
       
-	// Reset the integrator
-	startup_integrator_.reset();
+        // Reset the integrator
+        startup_integrator_.reset();
       }
       
       // Integrate, stopping at all time points
       int offs=0;
       for(int k=0; k<coll_time_.size(); ++k){
-	for(int j=0; j<coll_time_[k].size(); ++j){
+        for(int j=0; j<coll_time_[k].size(); ++j){
         
-	  if(has_startup_integrator){
-	    // Integrate to the time point
-	    startup_integrator_.integrate(coll_time_[k][j]);
-	  }
+          if(has_startup_integrator){
+            // Integrate to the time point
+            startup_integrator_.integrate(coll_time_[k][j]);
+          }
           
-	  // Save the differential states
-	  const DMatrix& x = has_startup_integrator ? startup_integrator_.output(INTEGRATOR_XF) : input(INTEGRATOR_X0);
-	  for(int i=0; i<nx_; ++i){
-	    v.at(offs++) = x.at(i);
-	  }
+          // Save the differential states
+          const DMatrix& x = has_startup_integrator ? startup_integrator_.output(INTEGRATOR_XF) : input(INTEGRATOR_X0);
+          for(int i=0; i<nx_; ++i){
+            v.at(offs++) = x.at(i);
+          }
 
-	  // Skip algebraic variables (for now) // FIXME
-	  if(j>0){
-	    if (has_startup_integrator && startup_integrator_.hasOption("init_z")) {
-	      std::vector<double> init_z = startup_integrator_.getOption("init_z");
-	      for(int i=0; i<nz_; ++i){
-		v.at(offs++) = init_z.at(i);
-	      }
-	    } else {
-	      offs += nz_;
-	    }
-	  }
+          // Skip algebraic variables (for now) // FIXME
+          if(j>0){
+            if (has_startup_integrator && startup_integrator_.hasOption("init_z")) {
+              std::vector<double> init_z = startup_integrator_.getOption("init_z");
+              for(int i=0; i<nz_; ++i){
+                v.at(offs++) = init_z.at(i);
+              }
+            } else {
+              offs += nz_;
+            }
+          }
         
-	  // Skip backward states // FIXME
-	  const DMatrix& rx = input(INTEGRATOR_RX0);
-	  for(int i=0; i<nrx_; ++i){
-	    v.at(offs++) = rx.at(i);
-	  }
+          // Skip backward states // FIXME
+          const DMatrix& rx = input(INTEGRATOR_RX0);
+          for(int i=0; i<nrx_; ++i){
+            v.at(offs++) = rx.at(i);
+          }
         
-	  // Skip backward algebraic variables // FIXME
-	  if(j>0){
-	    offs += nrz_;
-	  }
-	}
+          // Skip backward algebraic variables // FIXME
+          if(j>0){
+            offs += nrz_;
+          }
+        }
       }
       
       // Print
       if(has_startup_integrator && verbose()){
-	cout << "startup trajectory generated, statistics:" << endl;
-	startup_integrator_.printStats();
+        cout << "startup trajectory generated, statistics:" << endl;
+        startup_integrator_.printStats();
       }
     }
     
@@ -491,7 +491,7 @@ namespace CasADi{
     for(int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind){
       output(oind).set(explicit_fcn_.output(1+oind));
       for(int dir=0; dir<nsens_; ++dir){
-	fwdSens(oind,dir).set(explicit_fcn_.fwdSens(1+oind,dir));
+        fwdSens(oind,dir).set(explicit_fcn_.fwdSens(1+oind,dir));
       }
     }
   }

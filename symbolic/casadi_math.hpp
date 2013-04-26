@@ -184,7 +184,7 @@ struct casadi_math<int>{
 template<typename T>
 inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
 // NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
-#define CASADI_MATH_FUN_BUILTIN_GEN(CNAME,X,Y,F,N)				\
+#define CASADI_MATH_FUN_BUILTIN_GEN(CNAME,X,Y,F,N)                                \
     case OP_ASSIGN:    CNAME<OP_ASSIGN>::fcn(X,Y,F,N);        break;\
     case OP_ADD:       CNAME<OP_ADD>::fcn(X,Y,F,N);           break;\
     case OP_SUB:       CNAME<OP_SUB>::fcn(X,Y,F,N);           break;\

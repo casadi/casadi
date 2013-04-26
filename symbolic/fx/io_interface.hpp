@@ -194,16 +194,16 @@ namespace CasADi{
     template<bool check>
     FunctionIO& inputS(int i){
       if(check){
-	try{
-	  return static_cast<Derived*>(this)->input_struct().at(i);
-	} catch(std::out_of_range&){
-	  std::stringstream ss;
-	  ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
-	  if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl << "Did you forget to initialize?";
-	  throw CasadiException(ss.str());
-	}
+        try{
+          return static_cast<Derived*>(this)->input_struct().at(i);
+        } catch(std::out_of_range&){
+          std::stringstream ss;
+          ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
+          if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl << "Did you forget to initialize?";
+          throw CasadiException(ss.str());
+        }
       } else {
-	return static_cast<Derived*>(this)->input_struct()[i];	
+        return static_cast<Derived*>(this)->input_struct()[i];        
       }
     }
 
@@ -217,16 +217,16 @@ namespace CasADi{
     template<bool check>
     FunctionIO& outputS(int i){
       if(check){
-	try{
-	  return static_cast<Derived*>(this)->output_struct().at(i);
-	} catch(std::out_of_range&){
-	  std::stringstream ss;
-	  ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
-	  if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl << "Did you forget to initialize?";
-	  throw CasadiException(ss.str());
-	}
+        try{
+          return static_cast<Derived*>(this)->output_struct().at(i);
+        } catch(std::out_of_range&){
+          std::stringstream ss;
+          ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
+          if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl << "Did you forget to initialize?";
+          throw CasadiException(ss.str());
+        }
       } else {
-	return static_cast<Derived*>(this)->output_struct()[i];	
+        return static_cast<Derived*>(this)->output_struct()[i];        
       }
     }
 
@@ -280,39 +280,39 @@ namespace CasADi{
     /// 
     /// @{
     /** 
-	\brief Reads in the input argument from val.
-	\copydoc setter_getter_T
+        \brief Reads in the input argument from val.
+        \copydoc setter_getter_T
     */
     void setInput(T val, int iind=0) const;
     /** 
-	\brief Reads in the output argument from val.
-	\copydoc setter_getter_T
+        \brief Reads in the output argument from val.
+        \copydoc setter_getter_T
     */
     void setOutput(T val, int oind=0) const;
     /** 
-	\brief Reads in the forward seed from val.
-	\copydoc setter_getter_T
+        \brief Reads in the forward seed from val.
+        \copydoc setter_getter_T
     */
     void setFwdSeed(T val,  int iind=0, int dir=0) const;
     /** 
-	\brief Reads in the forward sensitivity from val.
+        \brief Reads in the forward sensitivity from val.
     */
     void setFwdSens(T val, int oind=0, int dir=0) const ;
     /** 
-	\brief Reads in the adjoint seed from val.
-	\copydoc setter_getter_T
+        \brief Reads in the adjoint seed from val.
+        \copydoc setter_getter_T
     */
     void setAdjSeed(T val,  int oind=0, int dir=0) const;
     /** 
-	\brief Reads in the adjoint sensitivity from val.
-	\copydoc setter_getter_T
+        \brief Reads in the adjoint sensitivity from val.
+        \copydoc setter_getter_T
     */
     void setAdjSens(T val, int iind=0, int dir=0) const ;
     /// @}
 
 #endif
 
-#define SETTERS(T)							\
+#define SETTERS(T)                                                        \
     void setInput(T val, int iind=0)             { static_cast<const Derived*>(this)->assertInit(); input(iind).set(val);  } \
     void setOutput(T val, int oind=0)            { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
     void setFwdSeed(T val, int iind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); fwdSeed(iind,dir).set(val); } \
@@ -337,7 +337,7 @@ namespace CasADi{
 
 #undef SETTERS
 
-#define GETTERS(T)							\
+#define GETTERS(T)                                                        \
     void getInput(T val, int iind=0) const             { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);} \
     void getOutput(T val, int oind=0) const            { static_cast<const Derived*>(this)->assertInit(); output(oind).get(val);} \
     void getFwdSeed(T val, int iind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); fwdSeed(iind,dir).get(val);} \
@@ -369,36 +369,36 @@ namespace CasADi{
     /// @{
 
     /** \brief Writes out the input argument into val.
-	\copydoc setter_getter_T
+        \copydoc setter_getter_T
     */
     void getInput(T val, int iind=0) const;
  
     /** 
-	\brief Writes out the output argument into val.
-	\copydoc setter_getter_T
+        \brief Writes out the output argument into val.
+        \copydoc setter_getter_T
     */
     void getOutput(T val, int oind=0) const;
 
     /** 
-	\brief Writes out the forward seed into val.
-	\copydoc setter_getter_T
+        \brief Writes out the forward seed into val.
+        \copydoc setter_getter_T
     */
     void getFwdSeed(T val,  int iind=0, int dir=0) const;
 
     /**  
-	 \brief Writes out the forward sensitivity into val.
-	 \copydoc setter_getter_T
+         \brief Writes out the forward sensitivity into val.
+         \copydoc setter_getter_T
     */
     void getFwdSens(T val, int oind=0, int dir=0) const;
     /** 
-	\brief Writes out the adjoint seed into val.
-	\copydoc setter_getter_T
+        \brief Writes out the adjoint seed into val.
+        \copydoc setter_getter_T
     */
     void getAdjSeed(T val,  int oind=0, int dir=0) const ;
 
     /** 
-	\brief Writes out the adjoint sensitivity into val.
-	\copydoc setter_getter_T
+        \brief Writes out the adjoint sensitivity into val.
+        \copydoc setter_getter_T
     */
     void getAdjSens(T val, int iind=0, int dir=0) const;
     /// @}

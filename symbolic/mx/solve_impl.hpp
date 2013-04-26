@@ -76,7 +76,7 @@ namespace CasADi{
     // Forward sensitivities
     for(int d=0; d<nfwd; ++d){
       if(fwdSeed[d][0]!=fwdSens[d][0]){
-	copy(fwdSeed[d][0]->begin(),fwdSeed[d][0]->end(),fwdSens[d][0]->begin());
+        copy(fwdSeed[d][0]->begin(),fwdSeed[d][0]->end(),fwdSens[d][0]->begin());
       }
       casadi_error("not implemented");
     }
@@ -85,8 +85,8 @@ namespace CasADi{
     for(int d=0; d<nadj; ++d){
       casadi_error("not implemented");
       if(adjSeed[d][0]!=adjSens[d][0]){
-	transform(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),adjSens[d][0]->begin(),adjSens[d][0]->begin(),std::plus<T>());
-	adjSeed[d][0]->setZero();
+        transform(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),adjSens[d][0]->begin(),adjSens[d][0]->begin(),std::plus<T>());
+        adjSeed[d][0]->setZero();
       }
     }
   }

@@ -157,8 +157,8 @@ namespace CasADi{
       casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
     
       if(exact_jacobian){
-	flag = KINDlsSetDenseJacFn(mem_, djac_wrapper);
-	casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
+        flag = KINDlsSetDenseJacFn(mem_, djac_wrapper);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
       }
     
     } else if(getOption("linear_solver_type")=="banded") {
@@ -167,8 +167,8 @@ namespace CasADi{
       casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
     
       if(exact_jacobian){
-	flag = KINDlsSetBandJacFn(mem_, bjac_wrapper);
-	casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
+        flag = KINDlsSetBandJacFn(mem_, bjac_wrapper);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
       }
     
     } else if(getOption("linear_solver_type")=="iterative") {
@@ -178,35 +178,35 @@ namespace CasADi{
 
       // Attach the sparse solver  
       if(getOption("iterative_solver")=="gmres"){
-	flag = KINSpgmr(mem_, maxl);
-	casadi_assert_message(flag==KIN_SUCCESS, "KINSpgmr");
+        flag = KINSpgmr(mem_, maxl);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSpgmr");
       } else if(getOption("iterative_solver")=="bcgstab") {
-	flag = KINSpbcg(mem_, maxl);
-	casadi_assert_message(flag==KIN_SUCCESS, "KINSpbcg");
+        flag = KINSpbcg(mem_, maxl);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSpbcg");
       } else if(getOption("iterative_solver")=="tfqmr") {
-	flag = KINSptfqmr(mem_, maxl);
-	casadi_assert_message(flag==KIN_SUCCESS, "KINSptfqmr");
+        flag = KINSptfqmr(mem_, maxl);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSptfqmr");
       } else {
-	throw CasadiException("KINSOL: Unknown sparse solver");
+        throw CasadiException("KINSOL: Unknown sparse solver");
       }
     
       // Attach functions for jacobian information
       if(exact_jacobian){
-	flag = KINSpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
-	casadi_assert_message(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
+        flag = KINSpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
+        casadi_assert_message(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
       }
     
       // Add a preconditioner
       if(bool(getOption("use_preconditioner"))){
-	// Make sure that a Jacobian has been provided
-	casadi_assert_message(!jac_.isNull(),"No Jacobian has been provided");
+        // Make sure that a Jacobian has been provided
+        casadi_assert_message(!jac_.isNull(),"No Jacobian has been provided");
 
-	// Make sure that a linear solver has been providided
-	casadi_assert_message(!linsol_.isNull(), "No linear solver has been provided.");
+        // Make sure that a linear solver has been providided
+        casadi_assert_message(!linsol_.isNull(), "No linear solver has been provided.");
 
-	// Pass to IDA
-	flag = KINSpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
-	casadi_assert(flag==KIN_SUCCESS);
+        // Pass to IDA
+        flag = KINSpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
+        casadi_assert(flag==KIN_SUCCESS);
       }
     
     } else if(getOption("linear_solver_type")=="user_defined") {
@@ -290,24 +290,24 @@ namespace CasADi{
     // Make sure that all entries of the linear system are valid
     for(int k=0; k<fdata.size(); ++k){
       try{
-	casadi_assert_message(!isnan(fdata[k]),"Nonzero " << k << " is not-a-number");
-	casadi_assert_message(!isinf(fdata[k]),"Nonzero " << k << " is infinite");
+        casadi_assert_message(!isnan(fdata[k]),"Nonzero " << k << " is not-a-number");
+        casadi_assert_message(!isinf(fdata[k]),"Nonzero " << k << " is infinite");
       } catch(exception& ex){
-	stringstream ss;
-	ss << ex.what() << endl;
-	if(verbose()){
-	  ss << "u = " << f_.input() << endl;
-		
-	  // Print the expression for f[Jrow] if f is an SXFunction instance
-	  SXFunction f_sx = shared_cast<SXFunction>(f_);
-	  if(!f_sx.isNull()){
-	    f_sx.print(ss);
-	    ss << f_sx->work_ << endl;
-	    ss << "Equation " << k << " = " << f_sx.outputExpr(0).at(k) << endl;
-	  }
-	}
+        stringstream ss;
+        ss << ex.what() << endl;
+        if(verbose()){
+          ss << "u = " << f_.input() << endl;
+                
+          // Print the expression for f[Jrow] if f is an SXFunction instance
+          SXFunction f_sx = shared_cast<SXFunction>(f_);
+          if(!f_sx.isNull()){
+            f_sx.print(ss);
+            ss << f_sx->work_ << endl;
+            ss << "Equation " << k << " = " << f_sx.outputExpr(0).at(k) << endl;
+          }
+        }
 
-	throw CasadiException(ss.str());
+        throw CasadiException(ss.str());
       }
     }
   
@@ -365,11 +365,11 @@ namespace CasADi{
     for(int i=0; i<rowind.size()-1; ++i){
       // Loop over non-zero entries
       for(int el=rowind[i]; el<rowind[i+1]; ++el){
-	// Get column
-	int j = col[el];
+        // Get column
+        int j = col[el];
       
-	// Set the element
-	DENSE_ELEM(J,i,j) = val[el];
+        // Set the element
+        DENSE_ELEM(J,i,j) = val[el];
       }
     }
   
@@ -416,12 +416,12 @@ namespace CasADi{
     for(int i=0; i<rowind.size()-1; ++i){
       // Loop over non-zero entries
       for(int el=rowind[i]; el<rowind[i+1]; ++el){
-	// Get column
-	int j = col[el];
+        // Get column
+        int j = col[el];
       
-	// Set the element
-	if(i-j>=-mupper && i-j<=mlower)
-	  BAND_ELEM(J,i,j) = val[el];
+        // Set the element
+        if(i-j>=-mupper && i-j<=mlower)
+          BAND_ELEM(J,i,j) = val[el];
       }
     }
   
@@ -497,41 +497,41 @@ namespace CasADi{
     // Make sure that all entries of the linear system are valid
     for(int k=0; k<Jdata.size(); ++k){
       try{
-	casadi_assert_message(!isnan(Jdata[k]),"Nonzero " << k << " is not-a-number");
-	casadi_assert_message(!isinf(Jdata[k]),"Nonzero " << k << " is infinite");
+        casadi_assert_message(!isnan(Jdata[k]),"Nonzero " << k << " is not-a-number");
+        casadi_assert_message(!isinf(Jdata[k]),"Nonzero " << k << " is infinite");
       } catch(exception& ex){
-	stringstream ss;
-	ss << ex.what() << endl;
-	  
-	if(verbose()){
-	  
-	  // Print inputs
-	  ss << "Input vector is " << jac_.input().data() << endl;
-		
-	  // Get the row
-	  int Jrow = jac_.output().sparsity().getRow().at(k);
+        stringstream ss;
+        ss << ex.what() << endl;
+          
+        if(verbose()){
+          
+          // Print inputs
+          ss << "Input vector is " << jac_.input().data() << endl;
+                
+          // Get the row
+          int Jrow = jac_.output().sparsity().getRow().at(k);
 
-	  // Get the column
-	  int Jcol = jac_.output().sparsity().col(k);
-		
-	  // Which equation
-	  ss << "This corresponds to the derivative of equation " << Jrow << " with respect to the variable " << Jcol << "." << endl;
-		
-	  // Print the expression for f[Jrow] if f is an SXFunction instance
-	  SXFunction f_sx = shared_cast<SXFunction>(f_);
-	  if(!f_sx.isNull()){
-	    ss << "Variable " << Jcol << " = " << f_sx.inputExpr(0).at(Jcol) << endl;
-	    ss << "Equation " << Jrow << " = " << f_sx.outputExpr(0).at(Jrow) << endl;
-	  }
-		
-	  // Print the expression for J[k] if J is an SXFunction instance
-	  SXFunction jac_sx = shared_cast<SXFunction>(jac_);
-	  if(!jac_sx.isNull()){
-	    ss << "J[" << Jrow << "," << Jcol << "] = " << jac_sx.outputExpr(0).at(k) << endl;
-	  }
-	}
+          // Get the column
+          int Jcol = jac_.output().sparsity().col(k);
+                
+          // Which equation
+          ss << "This corresponds to the derivative of equation " << Jrow << " with respect to the variable " << Jcol << "." << endl;
+                
+          // Print the expression for f[Jrow] if f is an SXFunction instance
+          SXFunction f_sx = shared_cast<SXFunction>(f_);
+          if(!f_sx.isNull()){
+            ss << "Variable " << Jcol << " = " << f_sx.inputExpr(0).at(Jcol) << endl;
+            ss << "Equation " << Jrow << " = " << f_sx.outputExpr(0).at(Jrow) << endl;
+          }
+                
+          // Print the expression for J[k] if J is an SXFunction instance
+          SXFunction jac_sx = shared_cast<SXFunction>(jac_);
+          if(!jac_sx.isNull()){
+            ss << "J[" << Jrow << "," << Jcol << "] = " << jac_sx.outputExpr(0).at(k) << endl;
+          }
+        }
 
-	throw CasadiException(ss.str());
+        throw CasadiException(ss.str());
       }
     }
   
@@ -663,7 +663,7 @@ namespace CasADi{
     ss << "Consult KINSOL documentation for more information.";
     if (fatal) {
       casadi_error(ss.str())
-	} else {
+        } else {
       casadi_warning(ss.str());
     }
   }

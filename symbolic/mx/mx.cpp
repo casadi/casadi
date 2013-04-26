@@ -138,7 +138,7 @@ namespace CasADi{
     for (int i=0;i<ii.size();++i) {
       MX m(k.sparsity(),MX(0));
       for (int j=0;j<m.size();++j) {
-	m[j] = sub(ii.at(i),k.at(j));
+        m[j] = sub(ii.at(i),k.at(j));
       }
       temp.push_back(m);
     }
@@ -154,7 +154,7 @@ namespace CasADi{
     for (int j=0;j<jj.size();++j) {
       MX m(k.sparsity(),MX(0));
       for (int i=0;i<m.size();++i) {
-	m[i] = sub(k.at(i),jj.at(j));
+        m[i] = sub(k.at(i),jj.at(j));
       }
       temp.push_back(m);
     }
@@ -186,13 +186,13 @@ namespace CasADi{
     for (vector<unsigned char>::const_iterator i=mappingc.begin(); i!=mappingc.end(); ++i){
       // In this matrix
       if(*i & 1){
-	if(*i & 4){
-	  k_this++;
-	} else {
-	  nz[k_sp++] = k_this++; // In both this matrix and in resulting matrix 
-	}
+        if(*i & 4){
+          k_this++;
+        } else {
+          nz[k_sp++] = k_this++; // In both this matrix and in resulting matrix 
+        }
       } else if(*i &2){
-	k_sp++;
+        k_sp++;
       }
     }
 
@@ -216,8 +216,8 @@ namespace CasADi{
     // Allow m to be a 1x1
     if (m.dense() && m.scalar()) {
       if (k.numel()>1) {
-	setSub(MX(k.sparsity(),m),k);
-	return;
+        setSub(MX(k.sparsity(),m),k);
+        return;
       }
     }
   
@@ -235,8 +235,8 @@ namespace CasADi{
     // Allow m to be a 1x1
     if (m.dense() && m.scalar()) {
       if (ii.size()>1 || jj.size()>1) {
-	setSub(MX(ii.size(),jj.size(),m),ii,jj);
-	return;
+        setSub(MX(ii.size(),jj.size(),m),ii,jj);
+        return;
       }
     }
   
@@ -248,10 +248,10 @@ namespace CasADi{
       int ld = size2(), ld_el = m.size2(); // leading dimensions
       vector<int> kk1, kk2;
       for(int i=0; i<ii.size(); ++i) {
-	for(int j=0; j<jj.size(); ++j) {
-	  kk1.push_back(ii[i]*ld + jj[j]);
-	  kk2.push_back(i*ld_el+j);
-	}
+        for(int j=0; j<jj.size(); ++j) {
+          kk1.push_back(ii[i]*ld + jj[j]);
+          kk2.push_back(i*ld_el+j);
+        }
       }
       (*this)[kk1]=m[kk2];
     } else {
@@ -290,7 +290,7 @@ namespace CasADi{
     for(int k=0; k<jj.size(); ++k) {
       MX el_k = m(slice_i,range(k*i.size2(),(k+1)*i.size2()));
       for (int j=0;j<i.size();++j) {
-	(*this)(i.at(j),jj[k])=el_k[j];
+        (*this)(i.at(j),jj[k])=el_k[j];
       }
     }
   
@@ -319,7 +319,7 @@ namespace CasADi{
     for(int k=0; k<ii.size(); ++k) {
       MX el_k = m(range(k*j.size1(),(k+1)*j.size1()),slice_j);
       for (int i=0;i<j.size();++i) {
-	(*this)(ii[k],j.at(i))=el_k[i];
+        (*this)(ii[k],j.at(i))=el_k[i];
       }
     }
   
@@ -378,9 +378,9 @@ namespace CasADi{
 
   void MX::setNZ(const vector<int>& k, const MX& el){
     casadi_assert_message(k.size()==el.size() || el.size()==1,
-			  "MX::setNZ: length of non-zero indices (" << k.size() << ") " <<
-			  "must match size of rhs (" << el.size() << ")."
-			  );
+                          "MX::setNZ: length of non-zero indices (" << k.size() << ") " <<
+                          "must match size of rhs (" << el.size() << ")."
+                          );
   
     // Call recursively if points both objects point to the same node
     if(this==&el){
@@ -791,21 +791,21 @@ namespace CasADi{
   
   std::string MX::getName() const { return !isNull() ? (*this)->getName() : "null"; }
 
-  bool 	MX::isSymbolic () const { return !isNull() ? (*this)->getOp()==OP_PARAMETER : false; }
-  bool 	MX::isConstant () const { return !isNull() ? (*this)->getOp()==OP_CONST : false; }
-  bool 	MX::isEvaluation () const { return !isNull() ? (*this)->getOp()==OP_CALL : false; }
-  bool 	MX::isEvaluationOutput () const { return !isNull() ? (*this)->isOutputNode() : false; }
+  bool         MX::isSymbolic () const { return !isNull() ? (*this)->getOp()==OP_PARAMETER : false; }
+  bool         MX::isConstant () const { return !isNull() ? (*this)->getOp()==OP_CONST : false; }
+  bool         MX::isEvaluation () const { return !isNull() ? (*this)->getOp()==OP_CALL : false; }
+  bool         MX::isEvaluationOutput () const { return !isNull() ? (*this)->isOutputNode() : false; }
 
-  int 	MX::getEvaluationOutput () const { return !isNull() ? (*this)->getFunctionOutput() : -1; }
+  int         MX::getEvaluationOutput () const { return !isNull() ? (*this)->getFunctionOutput() : -1; }
 
     
-  bool 	MX::isOperation (int op) const { return !isNull() ? (*this)->getOp()==op : false; }
-  bool 	MX::isMultiplication () const { return !isNull() ? (*this)->getOp()==OP_MATMUL : false; }
+  bool         MX::isOperation (int op) const { return !isNull() ? (*this)->getOp()==op : false; }
+  bool         MX::isMultiplication () const { return !isNull() ? (*this)->getOp()==OP_MATMUL : false; }
 
-  bool 	MX::isNorm () const { return !isNull() ? dynamic_cast<const Norm*>(get())!=0 : false; }
+  bool         MX::isNorm () const { return !isNull() ? dynamic_cast<const Norm*>(get())!=0 : false; }
 
   FX MX::getFunction () {  return (*this)->getFunction(); }
- 	
+         
   double MX::getValue() const{
     return (*this)->getValue();
   }
@@ -813,11 +813,11 @@ namespace CasADi{
   Matrix<double> MX::getMatrixValue() const{
     return (*this)->getMatrixValue();
   }
- 	  
+           
   bool MX::isBinary() const { return isNull() ? false : (*this)->isBinaryOp();}
 
   bool MX::isUnary() const { return isNull() ? false : (*this)->isUnaryOp();}
- 	
+         
   int MX::getOp() const {
     return (*this)->getOp();
   }
@@ -897,5 +897,5 @@ namespace CasADi{
     return eq_depth_;
   }
 
-	  
+          
 } // namespace CasADi

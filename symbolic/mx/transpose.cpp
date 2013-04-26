@@ -70,7 +70,7 @@ namespace CasADi{
       // Transpose
       copy(xT_rowind.begin(),xT_rowind.end(),itmp.begin());
       for(int el=0; el<x_col.size(); ++el){
-	xT[itmp[x_col[el]]++] = x[el];
+        xT[itmp[x_col[el]]++] = x[el];
       }
     }
     
@@ -82,9 +82,9 @@ namespace CasADi{
       // Transpose
       copy(xT_rowind.begin(),xT_rowind.end(),itmp.begin());
       for(int el=0; el<x_col.size(); ++el){
-	int elT = itmp[x_col[el]]++;
-	x[el] += xT[elT];
-	xT[elT] = 0;
+        int elT = itmp[x_col[el]]++;
+        x[el] += xT[elT];
+        xT[elT] = 0;
       }
     }
   }
@@ -105,9 +105,9 @@ namespace CasADi{
       const vector<T>& x = d==-1 ? input[0]->data() : fwdSeed[d][0]->data();
       vector<T>& xT = d==-1 ? output[0]->data() : fwdSens[d][0]->data();
       for(int i=0; i<x_nrow; ++i){
-	for(int j=0; j<x_ncol; ++j){
-	  xT[i+j*x_nrow] = x[j+i*x_ncol];
-	}
+        for(int j=0; j<x_ncol; ++j){
+          xT[i+j*x_nrow] = x[j+i*x_ncol];
+        }
       }
     }
     
@@ -116,10 +116,10 @@ namespace CasADi{
       vector<T>& x = adjSens[d][0]->data();
       vector<T>& xT = adjSeed[d][0]->data();
       for(int i=0; i<x_nrow; ++i){
-	for(int j=0; j<x_ncol; ++j){
-	  x[j+i*x_ncol] += xT[i+j*x_nrow];
-	  xT[i+j*x_nrow] = 0;	  
-	}
+        for(int j=0; j<x_ncol; ++j){
+          x[j+i*x_ncol] += xT[i+j*x_nrow];
+          xT[i+j*x_nrow] = 0;          
+        }
       }
     }
   }
@@ -145,11 +145,11 @@ namespace CasADi{
 
       // Copy nonzero
       if(fwd){
-	xT[itmp[j]++] = x[el];
+        xT[itmp[j]++] = x[el];
       } else {
-	int elT = itmp[j]++;
-	x[el] |= xT[elT];
-	xT[elT] = 0;
+        int elT = itmp[j]++;
+        x[el] |= xT[elT];
+        xT[elT] = 0;
       }
     }    
   }
@@ -166,14 +166,14 @@ namespace CasADi{
     // Loop over the elements
     for(int i=0; i<x_nrow; ++i){
       for(int j=0; j<x_ncol; ++j){
-	int el = j+i*x_ncol;
-	int elT = i+j*x_nrow;
-	if(fwd){
-	  xT[elT] = x[el];
-	} else {
-	  x[el] |= xT[elT];
-	  xT[elT] = 0;
-	}
+        int el = j+i*x_ncol;
+        int elT = i+j*x_nrow;
+        if(fwd){
+          xT[elT] = x[el];
+        } else {
+          x[el] |= xT[elT];
+          xT[elT] = 0;
+        }
       }
     }
   }

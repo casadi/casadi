@@ -151,14 +151,14 @@ int usage_c_unknown_signature(){
     int i,j,el;
     for(i=0; i<nrow; ++i){ /* loop over rows */
       for(el=rowind[i]; el<rowind[i+1]; ++el){ /* loop over nonzeros */
-	/* Separate the entries */
-	if(el!=0) printf(", ");
+        /* Separate the entries */
+        if(el!=0) printf(", ");
 
-	/* Get the column */
-	j = col[el]; 
-	
-	/* Print the nonzero */
-	printf("{%d,%d}",i,j);
+        /* Get the column */
+        j = col[el]; 
+        
+        /* Print the nonzero */
+        printf("{%d,%d}",i,j);
       }
     }
 

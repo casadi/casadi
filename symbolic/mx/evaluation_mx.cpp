@@ -64,8 +64,8 @@ namespace CasADi {
   }
 
   void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
-			       const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens,
-			       const DMatrixPtrVV& aseed, DMatrixPtrVV& asens) {
+                               const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens,
+                               const DMatrixPtrVV& aseed, DMatrixPtrVV& asens) {
   
     // Number of inputs and outputs
     int num_in = fcn_.getNumInputs();
@@ -89,9 +89,9 @@ namespace CasADi {
     for (int i = 0; i < num_in; ++i) {
       DMatrix *a = arg[i];
       if(a != 0){
-	fcn_.setInput(*a, i);
+        fcn_.setInput(*a, i);
       } else {
-	fcn_.setInput(0., i);
+        fcn_.setInput(0., i);
       }
     }
   
@@ -104,26 +104,26 @@ namespace CasADi {
 
       // Pass the forward seeds to the function
       for(int d = 0; d < nfdir_f_batch; ++d){
-	for(int i = 0; i < num_in; ++i){
-	  DMatrix *a = fseed[offset_nfdir + d][i];
-	  if(a != 0){
-	    fcn_.setFwdSeed(*a, i, d);
-	  } else {
-	    fcn_.setFwdSeed(0., i, d);
-	  }
-	}
+        for(int i = 0; i < num_in; ++i){
+          DMatrix *a = fseed[offset_nfdir + d][i];
+          if(a != 0){
+            fcn_.setFwdSeed(*a, i, d);
+          } else {
+            fcn_.setFwdSeed(0., i, d);
+          }
+        }
       }
 
       // Pass the adjoint seed to the function
       for(int d = 0; d < nadir_f_batch; ++d){
-	for(int i = 0; i < num_out; ++i) {
-	  DMatrix *a = aseed[offset_nadir + d][i];
-	  if(a != 0){
-	    fcn_.setAdjSeed(*a, i, d);
-	  } else {
-	    fcn_.setAdjSeed(0., i, d);
-	  }
-	}
+        for(int i = 0; i < num_out; ++i) {
+          DMatrix *a = aseed[offset_nadir + d][i];
+          if(a != 0){
+            fcn_.setAdjSeed(*a, i, d);
+          } else {
+            fcn_.setAdjSeed(0., i, d);
+          }
+        }
       }
 
       // Evaluate
@@ -131,9 +131,9 @@ namespace CasADi {
     
       // Get the outputs if first evaluation
       if(!fcn_evaluated){
-	for(int i = 0; i < num_out; ++i) {
-	  if(res[i] != 0) fcn_.getOutput(*res[i], i);
-	}
+        for(int i = 0; i < num_out; ++i) {
+          if(res[i] != 0) fcn_.getOutput(*res[i], i);
+        }
       }
 
       // Marked as evaluated
@@ -141,20 +141,20 @@ namespace CasADi {
 
       // Get the forward sensitivities
       for(int d = 0; d < nfdir_f_batch; ++d){
-	for(int i = 0; i < num_out; ++i) {
-	  DMatrix *a = fsens[offset_nfdir + d][i];
-	  if(a != 0) fcn_.getFwdSens(*a, i, d);
-	}
+        for(int i = 0; i < num_out; ++i) {
+          DMatrix *a = fsens[offset_nfdir + d][i];
+          if(a != 0) fcn_.getFwdSens(*a, i, d);
+        }
       }
 
       // Get the adjoint sensitivities
       for (int d = 0; d < nadir_f_batch; ++d) {
-	for (int i = 0; i < num_in; ++i) {
-	  DMatrix *a = asens[offset_nadir + d][i];
-	  if(a != 0){
-	    a->sparsity().add(a->ptr(),fcn_.adjSens(i,d).ptr(),fcn_.adjSens(i,d).sparsity());
-	  }
-	}
+        for (int i = 0; i < num_in; ++i) {
+          DMatrix *a = asens[offset_nadir + d][i];
+          if(a != 0){
+            a->sparsity().add(a->ptr(),fcn_.adjSens(i,d).ptr(),fcn_.adjSens(i,d).sparsity());
+          }
+        }
       }
 
       // Update direction offsets
@@ -179,15 +179,15 @@ namespace CasADi {
   }
 
   void EvaluationMX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
-				const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens,
-				const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens) {
+                                const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens,
+                                const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens) {
   
     // Create input arguments
     vector<SXMatrix> argv(arg.size());
     for(int i=0; i<arg.size(); ++i){
       argv[i] = SXMatrix(fcn_.input(i).sparsity(),0.);
       if(arg[i] != 0)
-	argv[i].set(*arg[i]);
+        argv[i].set(*arg[i]);
     }
 
     // Evaluate symbolically
@@ -196,7 +196,7 @@ namespace CasADi {
     // Collect the result
     for (int i = 0; i < res.size(); ++i) {
       if (res[i] != 0)
-	*res[i] = resv[i];
+        *res[i] = resv[i];
     }
   }
 
@@ -229,7 +229,7 @@ namespace CasADi {
       tmp = getVector(*i);
       d_arg.insert(d_arg.end(), tmp.begin(), tmp.end());
       for (MXPtrV::const_iterator j = i->begin(); j != i->end(); ++j){
-	if(*j!=0) **j = MX();
+        if(*j!=0) **j = MX();
       }
     }
 
@@ -245,16 +245,16 @@ namespace CasADi {
     // Collect the forward sensitivities
     for (MXPtrVV::iterator j = fsens.begin(); j != fsens.end(); ++j) {
       for (MXPtrV::iterator i = j->begin(); i != j->end(); ++i, ++d_res_it) {
-	if (*i) **i = *d_res_it;
+        if (*i) **i = *d_res_it;
       }
     }
 
     // Collect the adjoint sensitivities
     for (MXPtrVV::iterator j = asens.begin(); j != asens.end(); ++j) {
       for (MXPtrV::iterator i = j->begin(); i != j->end(); ++i, ++d_res_it) {
-	if(*i && !d_res_it->isNull()){
-	  **i += *d_res_it;
-	}
+        if(*i && !d_res_it->isNull()){
+          **i += *d_res_it;
+        }
       }
     }
 
@@ -263,7 +263,7 @@ namespace CasADi {
   }
 
   void EvaluationMX::deepCopyMembers(
-				     std::map<SharedObjectNode*, SharedObject>& already_copied) {
+                                     std::map<SharedObjectNode*, SharedObject>& already_copied) {
     MXNode::deepCopyMembers(already_copied);
     fcn_ = deepcopy(fcn_, already_copied);
   }
@@ -274,39 +274,39 @@ namespace CasADi {
     
       // Pass/clear forward seeds/adjoint sensitivities
       for (int iind = 0; iind < fcn_.getNumInputs(); ++iind) {
-	// Input vector
-	vector<double> &v = fcn_.input(iind).data();
-	if (v.empty()) continue; // FIXME: remove?
+        // Input vector
+        vector<double> &v = fcn_.input(iind).data();
+        if (v.empty()) continue; // FIXME: remove?
 
-	if (arg[iind] == 0) {
-	  // Set to zero if not used
-	  fill_n(get_bvec_t(v), v.size(), bvec_t(0));
-	} else {
-	  // Copy output
-	  fcn_.input(iind).sparsity().set(
-					  get_bvec_t(fcn_.input(iind).data()),
-					  get_bvec_t(arg[iind]->data()),
-					  arg[iind]->sparsity());
-	}
+        if (arg[iind] == 0) {
+          // Set to zero if not used
+          fill_n(get_bvec_t(v), v.size(), bvec_t(0));
+        } else {
+          // Copy output
+          fcn_.input(iind).sparsity().set(
+                                          get_bvec_t(fcn_.input(iind).data()),
+                                          get_bvec_t(arg[iind]->data()),
+                                          arg[iind]->sparsity());
+        }
       }
 
       // Pass/clear adjoint seeds/forward sensitivities
       for (int oind = 0; oind < fcn_.getNumOutputs(); ++oind) {
-	// Output vector
-	vector<double> &v = fcn_.output(oind).data();
-	if (v.empty()) continue; // FIXME: remove?
+        // Output vector
+        vector<double> &v = fcn_.output(oind).data();
+        if (v.empty()) continue; // FIXME: remove?
 
-	if (res[oind] == 0) {
-	  // Set to zero if not used
-	  fill_n(get_bvec_t(v), v.size(), bvec_t(0));
-	} else {
-	  // Copy output
-	  fcn_.output(oind).sparsity().set(
-					   get_bvec_t(fcn_.output(oind).data()),
-					   get_bvec_t(res[oind]->data()),
-					   res[oind]->sparsity());
-	  if(!use_fwd) fill_n(get_bvec_t(res[oind]->data()),res[oind]->size(),bvec_t(0));
-	}
+        if (res[oind] == 0) {
+          // Set to zero if not used
+          fill_n(get_bvec_t(v), v.size(), bvec_t(0));
+        } else {
+          // Copy output
+          fcn_.output(oind).sparsity().set(
+                                           get_bvec_t(fcn_.output(oind).data()),
+                                           get_bvec_t(res[oind]->data()),
+                                           res[oind]->sparsity());
+          if(!use_fwd) fill_n(get_bvec_t(res[oind]->data()),res[oind]->size(),bvec_t(0));
+        }
       }
 
       // Propagate seedsfcn_.
@@ -315,119 +315,119 @@ namespace CasADi {
 
       // Get the sensitivities
       if (use_fwd) {
-	for (int oind = 0; oind < res.size(); ++oind) {
-	  if (res[oind] != 0) {
-	    res[oind]->sparsity().set(
-				      get_bvec_t(res[oind]->data()),
-				      get_bvec_t(fcn_.output(oind).data()),
-				      fcn_.output(oind).sparsity());
-	  }
-	}
+        for (int oind = 0; oind < res.size(); ++oind) {
+          if (res[oind] != 0) {
+            res[oind]->sparsity().set(
+                                      get_bvec_t(res[oind]->data()),
+                                      get_bvec_t(fcn_.output(oind).data()),
+                                      fcn_.output(oind).sparsity());
+          }
+        }
       } else {
-	for (int iind = 0; iind < arg.size(); ++iind) {
-	  if (arg[iind] != 0) {
-	    arg[iind]->sparsity().bor(
-				      get_bvec_t(arg[iind]->data()),
-				      get_bvec_t(fcn_.input(iind).data()),
-				      fcn_.input(iind).sparsity());
-	  }
-	}
+        for (int iind = 0; iind < arg.size(); ++iind) {
+          if (arg[iind] != 0) {
+            arg[iind]->sparsity().bor(
+                                      get_bvec_t(arg[iind]->data()),
+                                      get_bvec_t(fcn_.input(iind).data()),
+                                      fcn_.input(iind).sparsity());
+          }
+        }
       }
 
       // Clear seeds and sensitivities
       for (int iind = 0; iind < arg.size(); ++iind) {
-	vector<double> &v = fcn_.input(iind).data();
-	fill(v.begin(), v.end(), 0);
+        vector<double> &v = fcn_.input(iind).data();
+        fill(v.begin(), v.end(), 0);
       }
       for (int oind = 0; oind < res.size(); ++oind) {
-	vector<double> &v = fcn_.output(oind).data();
-	fill(v.begin(), v.end(), 0);
+        vector<double> &v = fcn_.output(oind).data();
+        fill(v.begin(), v.end(), 0);
       }
 
     } else {
       // Propagating sparsity pattern not supported
 
       if (use_fwd) {
-	// Clear the outputs
-	for (int oind = 0; oind < res.size(); ++oind) {
-	  // Skip of not used
-	  if (res[oind] == 0)
-	    continue;
+        // Clear the outputs
+        for (int oind = 0; oind < res.size(); ++oind) {
+          // Skip of not used
+          if (res[oind] == 0)
+            continue;
 
-	  // Get data array for output and clear it
-	  bvec_t *outputd = get_bvec_t(res[oind]->data());
-	  fill_n(outputd, res[oind]->size(), 0);
-	}
+          // Get data array for output and clear it
+          bvec_t *outputd = get_bvec_t(res[oind]->data());
+          fill_n(outputd, res[oind]->size(), 0);
+        }
       }
 
       // Loop over inputs
       for (int iind = 0; iind < arg.size(); ++iind) {
-	// Skip of not used
-	if (arg[iind] == 0)
-	  continue;
+        // Skip of not used
+        if (arg[iind] == 0)
+          continue;
 
-	// Skip if no seeds
-	if (use_fwd && arg[iind]->empty())
-	  continue;
+        // Skip if no seeds
+        if (use_fwd && arg[iind]->empty())
+          continue;
 
-	// Get data array for input
-	bvec_t *inputd = get_bvec_t(arg[iind]->data());
+        // Get data array for input
+        bvec_t *inputd = get_bvec_t(arg[iind]->data());
 
-	// Loop over outputs
-	for (int oind = 0; oind < res.size(); ++oind) {
+        // Loop over outputs
+        for (int oind = 0; oind < res.size(); ++oind) {
 
-	  // Skip of not used
-	  if (res[oind] == 0)
-	    continue;
+          // Skip of not used
+          if (res[oind] == 0)
+            continue;
 
-	  // Skip if no seeds
-	  if (!use_fwd && res[oind]->empty())
-	    continue;
+          // Skip if no seeds
+          if (!use_fwd && res[oind]->empty())
+            continue;
 
-	  // Get the sparsity of the Jacobian block
-	  CRSSparsity& sp = fcn_.jacSparsity(iind, oind, true);
-	  if (sp.isNull() || sp.size() == 0)
-	    continue; // Skip if zero
-	  const int d1 = sp.size1();
-	  //const int d2 = sp.size2();
-	  const vector<int>& rowind = sp.rowind();
-	  const vector<int>& col = sp.col();
+          // Get the sparsity of the Jacobian block
+          CRSSparsity& sp = fcn_.jacSparsity(iind, oind, true);
+          if (sp.isNull() || sp.size() == 0)
+            continue; // Skip if zero
+          const int d1 = sp.size1();
+          //const int d2 = sp.size2();
+          const vector<int>& rowind = sp.rowind();
+          const vector<int>& col = sp.col();
 
-	  // Get data array for output
-	  bvec_t *outputd = get_bvec_t(res[oind]->data());
+          // Get data array for output
+          bvec_t *outputd = get_bvec_t(res[oind]->data());
 
-	  // Carry out the sparse matrix-vector multiplication
-	  for (int i = 0; i < d1; ++i) {
-	    for (int el = rowind[i]; el < rowind[i + 1]; ++el) {
-	      // Get column
-	      int j = col[el];
+          // Carry out the sparse matrix-vector multiplication
+          for (int i = 0; i < d1; ++i) {
+            for (int el = rowind[i]; el < rowind[i + 1]; ++el) {
+              // Get column
+              int j = col[el];
 
-	      // Propagate dependencies
-	      if (use_fwd) {
-		outputd[i] |= inputd[j];
-	      } else {
-		inputd[j] |= outputd[i];
-	      }
-	    }
-	  }
-	}
+              // Propagate dependencies
+              if (use_fwd) {
+                outputd[i] |= inputd[j];
+              } else {
+                inputd[j] |= outputd[i];
+              }
+            }
+          }
+        }
       }
       if(!use_fwd){
-	for(int oind=0; oind<res.size(); ++oind){
-	  if(res[oind]!=0){
-	    vector<double> &w = res[oind]->data();
-	    fill_n(get_bvec_t(w),w.size(),bvec_t(0));
-	  }
-	}
+        for(int oind=0; oind<res.size(); ++oind){
+          if(res[oind]!=0){
+            vector<double> &w = res[oind]->data();
+            fill_n(get_bvec_t(w),w.size(),bvec_t(0));
+          }
+        }
       }
     }
   }
 
   void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
-			    std::vector<MX> &res, const std::vector<std::vector<MX> > &fseed,
-			    std::vector<std::vector<MX> > &fsens,
-			    const std::vector<std::vector<MX> > &aseed,
-			    std::vector<std::vector<MX> > &asens, bool output_given) {
+                            std::vector<MX> &res, const std::vector<std::vector<MX> > &fseed,
+                            std::vector<std::vector<MX> > &fsens,
+                            const std::vector<std::vector<MX> > &aseed,
+                            std::vector<std::vector<MX> > &asens, bool output_given) {
 
     // Number inputs and outputs
     int num_in = fcn.getNumInputs();
@@ -455,12 +455,12 @@ namespace CasADi {
     
       // Forward seeds
       for(int dir=0; dir<nfdir; ++dir){
-	darg.insert(darg.end(),fseed[dir].begin(),fseed[dir].end());
+        darg.insert(darg.end(),fseed[dir].begin(),fseed[dir].end());
       }
     
       // Adjoint seeds
       for(int dir=0; dir<nadir; ++dir){
-	darg.insert(darg.end(),aseed[dir].begin(),aseed[dir].end());
+        darg.insert(darg.end(),aseed[dir].begin(),aseed[dir].end());
       }
     
       ev.assignNode(new EvaluationMX(dfcn, darg));
@@ -475,11 +475,11 @@ namespace CasADi {
     res.resize(num_out);
     for (int i = 0; i < num_out; ++i, ++ind) {
       if(!output_given){
-	if(!fcn.output(i).empty()){
-	  res[i].assignNode(new OutputNode(ev, ind));
-	} else {
-	  res[i] = MX();
-	}
+        if(!fcn.output(i).empty()){
+          res[i].assignNode(new OutputNode(ev, ind));
+        } else {
+          res[i] = MX();
+        }
       }
     }
 
@@ -488,11 +488,11 @@ namespace CasADi {
     for(int dir = 0; dir < nfdir; ++dir){
       fsens[dir].resize(num_out);
       for (int i = 0; i < num_out; ++i, ++ind) {
-	if (!fcn.output(i).empty()){
-	  fsens[dir][i].assignNode(new OutputNode(ev, ind));
-	} else {
-	  fsens[dir][i] = MX();
-	}
+        if (!fcn.output(i).empty()){
+          fsens[dir][i].assignNode(new OutputNode(ev, ind));
+        } else {
+          fsens[dir][i] = MX();
+        }
       }
     }
 
@@ -501,11 +501,11 @@ namespace CasADi {
     for (int dir = 0; dir < nadir; ++dir) {
       asens[dir].resize(num_in);
       for (int i = 0; i < num_in; ++i, ++ind) {
-	if (!fcn.input(i).empty()) {
-	  asens[dir][i].assignNode(new OutputNode(ev, ind));
-	} else {
-	  asens[dir][i] = MX();
-	}
+        if (!fcn.input(i).empty()) {
+          asens[dir][i].assignNode(new OutputNode(ev, ind));
+        } else {
+          asens[dir][i] = MX();
+        }
       }
     }
   }
@@ -519,15 +519,15 @@ namespace CasADi {
     vector<string> arg_mod = arg;
     for(int i=0; i<fcn_.getNumInputs(); ++i){
       if(dep(i).sparsity()!=fcn_.input(i).sparsity()){
-	arg_mod[i] = "rrr+" + CodeGenerator::numToString(nr);
-	nr += fcn_.input(i).size();
-	
-	// Codegen "copy sparse"
-	gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
-	
-	int sp_arg = gen.getSparsity(dep(i).sparsity());
-	int sp_input = gen.addSparsity(fcn_.input(i).sparsity());
-	stream << "  casadi_copy_sparse(" << arg[i] << ",s" << sp_arg << "," << arg_mod[i] << ",s" << sp_input << ");" << std::endl;
+        arg_mod[i] = "rrr+" + CodeGenerator::numToString(nr);
+        nr += fcn_.input(i).size();
+        
+        // Codegen "copy sparse"
+        gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
+        
+        int sp_arg = gen.getSparsity(dep(i).sparsity());
+        int sp_input = gen.addSparsity(fcn_.input(i).sparsity());
+        stream << "  casadi_copy_sparse(" << arg[i] << ",s" << sp_arg << "," << arg_mod[i] << ",s" << sp_input << ");" << std::endl;
       }
     }
 
@@ -562,7 +562,7 @@ namespace CasADi {
     // Add memory for all inputs with nonmatching sparsity
     for(int i=0; i<fcn_.getNumInputs(); ++i){
       if(dep(i).isNull() || dep(i).sparsity()!=fcn_.input(i).sparsity()){
-	nr += fcn_.input(i).size();
+        nr += fcn_.input(i).size();
       }
     }
   }

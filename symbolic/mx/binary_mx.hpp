@@ -28,7 +28,7 @@
 namespace CasADi{
   /** \brief Represents any binary operation that involves two matrices 
       \author Joel Andersson 
-      \date 2010	
+      \date 2010        
   */
   template<bool ScX, bool ScY>
   class BinaryMX : public MXNode{

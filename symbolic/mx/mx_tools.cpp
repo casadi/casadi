@@ -38,7 +38,7 @@ namespace CasADi{
     c.reserve(comp.size());
     for(vector<MX>::const_iterator it=comp.begin(); it!=comp.end(); ++it)
       if(!it->isNull() && !it->empty())
-	c.push_back(*it);
+        c.push_back(*it);
   
     if(c.empty()){
       return MX();
@@ -48,18 +48,18 @@ namespace CasADi{
       // Construct the sparsity pattern
       CRSSparsity sp = c[0].sparsity();
       for(int i=1; i<c.size(); ++i){
-	sp.append(c[i].sparsity());
+        sp.append(c[i].sparsity());
       }
 
       // Split up existing vertcats
       vector<MX> c_split;
       c_split.reserve(c.size());
       for(vector<MX>::const_iterator i=c.begin(); i!=c.end(); ++i){
-	if(i->getOp()==OP_VERTCAT){	
-	  c_split.insert(c_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
-	} else {
-	  c_split.push_back(*i);
-	}
+        if(i->getOp()==OP_VERTCAT){        
+          c_split.insert(c_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
+        } else {
+          c_split.push_back(*i);
+        }
       }
 
       return MX::create(new Vertcat(c_split,sp));
@@ -88,7 +88,7 @@ namespace CasADi{
   }
 
   MX veccat(const vector<MX>& comp) {
-	MX (&f)(const MX&) = vec;
+        MX (&f)(const MX&) = vec;
     return vertcat(applymap(f,comp));
   }
 
@@ -238,11 +238,11 @@ namespace CasADi{
     // Copy sparsity
     for(int k=0; k<mapping.size(); ++k){
       if(mapping[k]==1){
-	nzA.push_back(k);
+        nzA.push_back(k);
       } else if(mapping[k]==2){
-	nzB.push_back(k);
+        nzB.push_back(k);
       } else {
-	throw CasadiException("Pattern intersection not empty");
+        throw CasadiException("Pattern intersection not empty");
       }
     }
 
@@ -265,9 +265,9 @@ namespace CasADi{
     } else if(ex.getOp()==OP_VERTCAT){
       // Check if the expression is a vertcat where all components are symbolic primitives
       for(int d=0; d<ex->ndep(); ++d){
-	if(!ex->dep(d).isSymbolic()){
-	  return false;
-	}
+        if(!ex->dep(d).isSymbolic()){
+          return false;
+        }
       }
       return true;
     } else {
@@ -513,35 +513,35 @@ namespace CasADi{
     for(vector<MXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
       switch(it->op){
       case OP_INPUT:
-	work.at(it->res.front()) = vdef.at(it->arg.front());
-	break;
+        work.at(it->res.front()) = vdef.at(it->arg.front());
+        break;
       case OP_PARAMETER:
       case OP_CONST:
-	work.at(it->res.front()) = it->data;
-	break;
+        work.at(it->res.front()) = it->data;
+        break;
       case OP_OUTPUT:
-	if(it->res.front()<vdef.size()){
-	  vdef.at(it->res.front()) = work.at(it->arg.front());
-	} else {
-	  ex.at(it->res.front()-vdef.size()) = work.at(it->arg.front());
-	}
-	break;
+        if(it->res.front()<vdef.size()){
+          vdef.at(it->res.front()) = work.at(it->arg.front());
+        } else {
+          ex.at(it->res.front()-vdef.size()) = work.at(it->arg.front());
+        }
+        break;
       default:
-	{
-	  input_p.resize(it->arg.size());
-	  for(int i=0; i<input_p.size(); ++i){
-	    int el = it->arg[i];
-	    input_p[i] = el<0 ? 0 : &work.at(el);
-	  }
-	
-	  output_p.resize(it->res.size());
-	  for(int i=0; i<output_p.size(); ++i){
-	    int el = it->res[i];
-	    output_p[i] = el<0 ? 0 : &work.at(el);
-	  }
-	
-	  it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
-	}
+        {
+          input_p.resize(it->arg.size());
+          for(int i=0; i<input_p.size(); ++i){
+            int el = it->arg[i];
+            input_p[i] = el<0 ? 0 : &work.at(el);
+          }
+        
+          output_p.resize(it->res.size());
+          for(int i=0; i<output_p.size(); ++i){
+            int el = it->res[i];
+            output_p[i] = el<0 ? 0 : &work.at(el);
+          }
+        
+          it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
+        }
       }
     }  
   }
@@ -586,8 +586,8 @@ namespace CasADi{
     bool all_equal = true;
     for(int k=0; k<v.size(); ++k){
       if(!isEqual(v[k],vdef[k])){
-	all_equal = false;
-	break;
+        all_equal = false;
+        break;
       }
     }
     if(all_equal) return ex;
@@ -684,44 +684,44 @@ namespace CasADi{
       case OP_CONST:
       case OP_PARAMETER:  work[it->res.front()] = it->data; break;
       default:
-	{
-	  // Pointers to the arguments of the evaluation
-	  input_p.resize(it->arg.size());
-	  for(int i=0; i<input_p.size(); ++i){
-	    int el = it->arg[i]; // index of the argument
-	    input_p[i] = el<0 ? 0 : &work[el];
-	  }
+        {
+          // Pointers to the arguments of the evaluation
+          input_p.resize(it->arg.size());
+          for(int i=0; i<input_p.size(); ++i){
+            int el = it->arg[i]; // index of the argument
+            input_p[i] = el<0 ? 0 : &work[el];
+          }
         
-	  // Pointers to the result of the evaluation
-	  output_p.resize(it->res.size());
-	  for(int i=0; i<output_p.size(); ++i){
-	    int el = it->res[i]; // index of the output
-	    output_p[i] = el<0 ? 0 : &work[el];
-	  }
+          // Pointers to the result of the evaluation
+          output_p.resize(it->res.size());
+          for(int i=0; i<output_p.size(); ++i){
+            int el = it->res[i]; // index of the output
+            output_p[i] = el<0 ? 0 : &work[el];
+          }
         
-	  // Evaluate atomic operation
-	  const_cast<MX&>(it->data)->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
+          // Evaluate atomic operation
+          const_cast<MX&>(it->data)->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
         
-	  // Possibly replace results with new variables
-	  for(int c=0; c<it->res.size(); ++c){
-	    int ind = it->res[c];
-	    if(ind>=0 && replace_it->first==k && replace_it->second==c){
-	      // Store the result
-	      vdef.push_back(work[ind]);
+          // Possibly replace results with new variables
+          for(int c=0; c<it->res.size(); ++c){
+            int ind = it->res[c];
+            if(ind>=0 && replace_it->first==k && replace_it->second==c){
+              // Store the result
+              vdef.push_back(work[ind]);
             
-	      // Create a new variable
-	      v_name.str(string());
-	      v_name << v_prefix << v.size() << v_suffix;
-	      v.push_back(MX(v_name.str()));
+              // Create a new variable
+              v_name.str(string());
+              v_name << v_prefix << v.size() << v_suffix;
+              v.push_back(MX(v_name.str()));
             
-	      // Use in calculations
-	      work[ind] = v.back();
+              // Use in calculations
+              work[ind] = v.back();
             
-	      // Go to the next element to be replaced
-	      replace_it++;
-	    }
-	  }
-	}
+              // Go to the next element to be replaced
+              replace_it++;
+            }
+          }
+        }
       }
     }
   }
@@ -739,7 +739,7 @@ namespace CasADi{
     if(!v.empty()){
       stream << endl << "where:" << endl;
       for(int i=0; i<v.size(); ++i){
-	stream << v[i] << " := " << vdef[i] << endl;
+        stream << v[i] << " := " << vdef[i] << endl;
       }
     }
   }

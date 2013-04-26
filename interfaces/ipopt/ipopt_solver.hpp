@@ -59,7 +59,7 @@ class IpoptSolver : public NLPSolver {
                          const FX& GF = FX()  /**< Gradient of the objective function (default: adjoint mode AD on F): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^n]\f$ */
                         );
 
-    FX getGF()	const;
+    FX getGF()        const;
     
     /** \brief Get the reduced Hessian. 
      * Requires a patched sIPOPT installation, see CasADi documentation. */

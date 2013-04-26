@@ -86,7 +86,7 @@ namespace CasADi{
     // quick return if the old and new pointers point to the same object
     if(node == scalar.node) return *this;
 
-    // decrease the counter and delete if this was the last pointer	
+    // decrease the counter and delete if this was the last pointer        
     if(--node->count == 0) delete node;
 
     // save the new pointer
@@ -177,16 +177,16 @@ namespace CasADi{
     else if(hasDep() && getOp()==OP_NEG) // (-x) + y -> y - x
       return y.__sub__(getDep());
     else if(hasDep() && getOp()==OP_MUL && 
-	    y.hasDep() && y.getOp()==OP_MUL && 
-	    getDep(0).isConstant() && getDep(0).getValue()==0.5 && 
-	    y.getDep(0).isConstant() && y.getDep(0).getValue()==0.5 &&
-	    y.getDep(1).isEqual(getDep(1),eq_depth_)) // 0.5x+0.5x = x
+            y.hasDep() && y.getOp()==OP_MUL && 
+            getDep(0).isConstant() && getDep(0).getValue()==0.5 && 
+            y.getDep(0).isConstant() && y.getDep(0).getValue()==0.5 &&
+            y.getDep(1).isEqual(getDep(1),eq_depth_)) // 0.5x+0.5x = x
       return getDep(1);
     else if(hasDep() && getOp()==OP_DIV && 
-	    y.hasDep() && y.getOp()==OP_DIV && 
-	    getDep(1).isConstant() && getDep(1).getValue()==2 && 
-	    y.getDep(1).isConstant() && y.getDep(1).getValue()==2 &&
-	    y.getDep(0).isEqual(getDep(0),eq_depth_)) // x/2+x/2 = x
+            y.hasDep() && y.getOp()==OP_DIV && 
+            getDep(1).isConstant() && getDep(1).getValue()==2 && 
+            y.getDep(1).isConstant() && y.getDep(1).getValue()==2 &&
+            y.getDep(0).isEqual(getDep(0),eq_depth_)) // x/2+x/2 = x
       return getDep(0);
     else if(hasDep() && getOp()==OP_SUB && getDep(1).isEqual(y,eq_depth_))
       return getDep(0);
@@ -663,23 +663,23 @@ namespace CasADi{
   SX SX::__pow__(const SX& n) const{
     if(n->isConstant()) {
       if (n->isInteger()){
-	int nn = n->getIntValue();
-	if(nn == 0)
-	  return 1;
-	else if(nn>100 || nn<-100) // maximum depth
-	  return BinarySX::create(OP_CONSTPOW,*this,nn);
-	else if(nn<0) // negative power
-	  return 1/pow(*this,-nn);
-	else if(nn%2 == 1) // odd power
-	  return *this*pow(*this,nn-1);
-	else{ // even power
-	  SX rt = pow(*this,nn/2);
-	  return rt*rt;
-	}
+        int nn = n->getIntValue();
+        if(nn == 0)
+          return 1;
+        else if(nn>100 || nn<-100) // maximum depth
+          return BinarySX::create(OP_CONSTPOW,*this,nn);
+        else if(nn<0) // negative power
+          return 1/pow(*this,-nn);
+        else if(nn%2 == 1) // odd power
+          return *this*pow(*this,nn-1);
+        else{ // even power
+          SX rt = pow(*this,nn/2);
+          return rt*rt;
+        }
       } else if(n->getValue()==0.5){
-	return sqrt();
+        return sqrt();
       } else {
-	return BinarySX::create(OP_CONSTPOW,*this,n);
+        return BinarySX::create(OP_CONSTPOW,*this,n);
       }
     } else {
       return BinarySX::create(OP_POW,*this,n);

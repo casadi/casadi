@@ -45,7 +45,7 @@ bool IpoptSolver::checkNode() const{
   return dynamic_cast<const IpoptInternal*>(get());
 }
 
-FX IpoptSolver::getGF()	const {
+FX IpoptSolver::getGF()        const {
   return isNull()? FX() : dynamic_cast<const IpoptInternal*>(get())->getGF();
 }
 

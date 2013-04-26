@@ -82,7 +82,7 @@ namespace CasADi{
     // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
     for(int d=0; d<nfwd; ++d){
       if(fwdSeed[d][0]!=fwdSens[d][0]){
-	copy(fwdSeed[d][0]->begin(),fwdSeed[d][0]->end(),fwdSens[d][0]->begin());
+        copy(fwdSeed[d][0]->begin(),fwdSeed[d][0]->end(),fwdSens[d][0]->begin());
       }
       Matrix<T>::mul_no_alloc_nt(*fwdSeed[d][1],*input[2],*fwdSens[d][0]);
       Matrix<T>::mul_no_alloc_nt(*input[1],*fwdSeed[d][2],*fwdSens[d][0]);
@@ -93,8 +93,8 @@ namespace CasADi{
       Matrix<T>::mul_no_alloc_nn(*adjSeed[d][0],*input[2],*adjSens[d][1]);
       Matrix<T>::mul_no_alloc_tn(*adjSeed[d][0],*input[1],*adjSens[d][2]);
       if(adjSeed[d][0]!=adjSens[d][0]){
-	transform(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),adjSens[d][0]->begin(),adjSens[d][0]->begin(),std::plus<T>());
-	adjSeed[d][0]->setZero();
+        transform(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),adjSens[d][0]->begin(),adjSens[d][0]->begin(),std::plus<T>());
+        adjSeed[d][0]->setZero();
       }
     }
   }
@@ -116,8 +116,8 @@ namespace CasADi{
       *adjSens[d][1] += tr<TrX>(mul(*adjSeed[d][0],tr<!TrY>(*input[2])));
       *adjSens[d][2] += tr<TrY>(mul(tr<!TrX>(*input[1]),*adjSeed[d][0]));
       if(adjSeed[d][0]!=adjSens[d][0]){
-	*adjSens[d][0] += *adjSeed[d][0];
-	*adjSeed[d][0] = MX();
+        *adjSens[d][0] += *adjSeed[d][0];
+        *adjSeed[d][0] = MX();
       }
     }
   }
@@ -133,10 +133,10 @@ namespace CasADi{
     } else {
       DMatrix::mul_sparsity<false>(*input[1],*input[2],*output[0]);
       if(zd!=rd){
-	for(int i=0; i<n; ++i){
-	  zd[i] |= rd[i];
-	  rd[i] = bvec_t(0);
-	}
+        for(int i=0; i<n; ++i){
+          zd[i] |= rd[i];
+          rd[i] = bvec_t(0);
+        }
       }
     }
   }

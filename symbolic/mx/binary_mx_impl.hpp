@@ -82,25 +82,25 @@ namespace CasADi{
     
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
-	*fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]) + pd[1]*(*fwdSeed[d][1]);
+        *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]) + pd[1]*(*fwdSeed[d][1]);
       }
     
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
-	MX s = *adjSeed[d][0];
-	*adjSeed[d][0] = MX();
-	for(int c=0; c<2; ++c){
-	  // Get increment of sensitivity c
-	  MX t = pd[c]*s;
-	  
-	  // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
-	  if(!t.scalar() && t.shape() != dep(c).shape()){
-	    t = sumAll(t);
-	  }
-	  
-	  // Propagate the seeds
-	  *adjSens[d][c] += t;
-	}
+        MX s = *adjSeed[d][0];
+        *adjSeed[d][0] = MX();
+        for(int c=0; c<2; ++c){
+          // Get increment of sensitivity c
+          MX t = pd[c]*s;
+          
+          // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
+          if(!t.scalar() && t.shape() != dep(c).shape()){
+            t = sumAll(t);
+          }
+          
+          // Propagate the seeds
+          *adjSens[d][c] += t;
+        }
       }
     }
 
@@ -167,11 +167,11 @@ namespace CasADi{
   
     if(nfwd==0 && nadj==0){
       if(!ScX && !ScY){
-	casadi_math<T>::fun(op_, getPtr(input0), getPtr(input1), getPtr(output0), output0.size());
+        casadi_math<T>::fun(op_, getPtr(input0), getPtr(input1), getPtr(output0), output0.size());
       } else if(ScX){
-	casadi_math<T>::fun(op_, input0[0],      getPtr(input1), getPtr(output0), output0.size());
+        casadi_math<T>::fun(op_, input0[0],      getPtr(input1), getPtr(output0), output0.size());
       } else {
-	casadi_math<T>::fun(op_, getPtr(input0), input1[0],      getPtr(output0), output0.size());
+        casadi_math<T>::fun(op_, getPtr(input0), input1[0],      getPtr(output0), output0.size());
       }
 
     } else {
@@ -180,22 +180,22 @@ namespace CasADi{
       T f,pd[2];
 
       for(int el=0; el<output0.size(); ++el){
-	casadi_math<T>::fun(op_,input0[ScX ? 0 : el],input1[ScY ? 0 : el],f);
-	casadi_math<T>::der(op_,input0[ScX ? 0 : el],input1[ScY ? 0 : el],f,pd);
-	output0[el] = f;
+        casadi_math<T>::fun(op_,input0[ScX ? 0 : el],input1[ScY ? 0 : el],f);
+        casadi_math<T>::der(op_,input0[ScX ? 0 : el],input1[ScY ? 0 : el],f,pd);
+        output0[el] = f;
 
-	// Propagate forward seeds
-	for(int d=0; d<nfwd; ++d){
-	  fwdSens[d][0]->data()[el] = pd[0]*fwdSeed[d][0]->data()[ScX ? 0 : el] + pd[1]*fwdSeed[d][1]->data()[ScY ? 0 : el];
-	}
+        // Propagate forward seeds
+        for(int d=0; d<nfwd; ++d){
+          fwdSens[d][0]->data()[el] = pd[0]*fwdSeed[d][0]->data()[ScX ? 0 : el] + pd[1]*fwdSeed[d][1]->data()[ScY ? 0 : el];
+        }
     
-	// Propagate adjoint seeds
-	for(int d=0; d<nadj; ++d){
-	  T s = adjSeed[d][0]->data()[el];
-	  adjSeed[d][0]->data()[el] = 0;
-	  adjSens[d][0]->data()[ScX ? 0 : el] += s*pd[0];
-	  adjSens[d][1]->data()[ScY ? 0 : el] += s*pd[1];
-	}
+        // Propagate adjoint seeds
+        for(int d=0; d<nadj; ++d){
+          T s = adjSeed[d][0]->data()[el];
+          adjSeed[d][0]->data()[el] = 0;
+          adjSens[d][0]->data()[ScX ? 0 : el] += s*pd[0];
+          adjSens[d][1]->data()[ScY ? 0 : el] += s*pd[1];
+        }
       }
     }
   }
@@ -207,12 +207,12 @@ namespace CasADi{
     bvec_t *outputd = get_bvec_t(output[0]->data());
     for(int el=0; el<output[0]->size(); ++el){
       if(fwd){
-	outputd[el] = input0[ScX ? 0 : el] | input1[ScY ? 0 : el];
+        outputd[el] = input0[ScX ? 0 : el] | input1[ScY ? 0 : el];
       } else {
-	bvec_t s = outputd[el];
-	outputd[el] = bvec_t(0);
-	input0[ScX ? 0 : el] |= s;
-	input1[ScY ? 0 : el] |= s;
+        bvec_t s = outputd[el];
+        outputd[el] = bvec_t(0);
+        input0[ScX ? 0 : el] |= s;
+        input1[ScY ? 0 : el] |= s;
       }
     }
   }

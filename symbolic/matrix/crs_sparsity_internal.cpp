@@ -55,34 +55,34 @@ namespace CasADi{
     if (complete) {
   
       if (rowind_.size()>0) {
-	for (int k=1;k<rowind_.size();k++) {
-	  casadi_assert_message(rowind_[k]>=rowind_[k-1], "CRSSparsityInternal:Compressed Row Storage is not sane. rowind must be monotone. Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind).");
-	}
+        for (int k=1;k<rowind_.size();k++) {
+          casadi_assert_message(rowind_[k]>=rowind_[k-1], "CRSSparsityInternal:Compressed Row Storage is not sane. rowind must be monotone. Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind).");
+        }
       
-	casadi_assert_message(rowind_[0]==0, "CRSSparsityInternal:Compressed Row Storage is not sane. First element of rowind must be zero. Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind).");
-	if (rowind_[(rowind_.size()-1)]!=col_.size()) {
-	  std::stringstream s;
-	  s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
-	  s << "  rowind[lastElement] = col.size(), but got   rowind[lastElement] = " << rowind_[(rowind_.size()-1)] << "   and   col.size() = "  << col_.size() << std::endl;
-	  s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
-	  casadi_error(s.str());
-	}
-	if (col_.size()>nrow_*ncol_) {
-	  std::stringstream s;
-	  s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
-	  s << "  col.size() <= nrow * ncol, but got   col.size()  = " << col_.size() << "   and   nrow * ncol = "  << nrow_*ncol_ << std::endl;
-	  s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
-	  casadi_error(s.str());
-	}
+        casadi_assert_message(rowind_[0]==0, "CRSSparsityInternal:Compressed Row Storage is not sane. First element of rowind must be zero. Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind).");
+        if (rowind_[(rowind_.size()-1)]!=col_.size()) {
+          std::stringstream s;
+          s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
+          s << "  rowind[lastElement] = col.size(), but got   rowind[lastElement] = " << rowind_[(rowind_.size()-1)] << "   and   col.size() = "  << col_.size() << std::endl;
+          s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
+          casadi_error(s.str());
+        }
+        if (col_.size()>nrow_*ncol_) {
+          std::stringstream s;
+          s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
+          s << "  col.size() <= nrow * ncol, but got   col.size()  = " << col_.size() << "   and   nrow * ncol = "  << nrow_*ncol_ << std::endl;
+          s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
+          casadi_error(s.str());
+        }
       }
       for (int k=0;k<col_.size();k++) {
-	if (col_[k]>=ncol_ || col_[k] < 0) {
-	  std::stringstream s;
-	  s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
-	  s << "  0 <= col[i] < ncol for each i, but got   col[i] = " << col_[k] << "   and   ncol = "  << ncol_ << std::endl;
-	  s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
-	  casadi_error(s.str());
-	}
+        if (col_[k]>=ncol_ || col_[k] < 0) {
+          std::stringstream s;
+          s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
+          s << "  0 <= col[i] < ncol for each i, but got   col[i] = " << col_[k] << "   and   ncol = "  << ncol_ << std::endl;
+          s << "  Note that the signature is as follows: CRSSparsity (nrow, ncol, col, rowind)." << std::endl;
+          casadi_error(s.str());
+        }
       }
   
     }
@@ -140,30 +140,30 @@ namespace CasADi{
       // Loop over nonzeros
       for(int p=rowind_[k]; p<rowind_[k+1]; ++p){
       
-	// What is this?
-	int i=ata ? (prev[col_[p]]) : (col_[p]);
+        // What is this?
+        int i=ata ? (prev[col_[p]]) : (col_[p]);
       
-	// Transverse from i to k
-	while(i!=-1 && i<k){
+        // Transverse from i to k
+        while(i!=-1 && i<k){
         
-	  // Next i is the ancestor of i
-	  int inext = ancestor[i];
+          // Next i is the ancestor of i
+          int inext = ancestor[i];
 
-	  // Path compression
-	  ancestor[i] = k;
+          // Path compression
+          ancestor[i] = k;
         
-	  // No ancestor, parent is k
-	  if(inext==-1) 
-	    parent[i] = k;
+          // No ancestor, parent is k
+          if(inext==-1) 
+            parent[i] = k;
         
-	  // Update i
-	  i=inext;
-	}
+          // Update i
+          i=inext;
+        }
       
-	// What is this?
-	if(ata){
-	  prev[col_[p]] = k;
-	}
+        // What is this?
+        if(ata){
+          prev[col_[p]] = k;
+        }
       }
     }
   
@@ -183,9 +183,9 @@ namespace CasADi{
       int jnew = !pinv.empty() ? (pinv[j]) : j;
       if (!marked[j]){
       
-	// mark node j as visited
-	marked[j]=true;
-	pstack[head] = (jnew < 0) ? 0 : rowind_[jnew];
+        // mark node j as visited
+        marked[j]=true;
+        pstack[head] = (jnew < 0) ? 0 : rowind_[jnew];
       }
     
       // node j done if no unvisited neighbors
@@ -195,32 +195,32 @@ namespace CasADi{
       // examine all neighbors of j
       for(int p = pstack[head]; p< p2; ++p){
 
-	// consider neighbor node i
-	int i = col_[p];
+        // consider neighbor node i
+        int i = col_[p];
       
-	// skip visited node i
-	if (marked[i]) continue ;
+        // skip visited node i
+        if (marked[i]) continue ;
       
-	// pause depth-first search of node j
-	pstack[head] = p;
+        // pause depth-first search of node j
+        pstack[head] = p;
       
-	// start dfs at node i
-	xi[++head] = i;
+        // start dfs at node i
+        xi[++head] = i;
       
-	// node j is not done
-	done = 0;
+        // node j is not done
+        done = 0;
       
-	// break, to start dfs (i)
-	break;
+        // break, to start dfs (i)
+        break;
       }
     
       //depth-first search at node j is done
       if(done){
-	// remove j from the recursion stack
-	head--;
+        // remove j from the recursion stack
+        head--;
       
-	// and place in the output stack
-	xi[--top] = j ;
+        // and place in the output stack
+        xi[--top] = j ;
       }
     }
     return (top) ;
@@ -247,7 +247,7 @@ namespace CasADi{
     //first dfs(A) to find finish times (xi)
     for(int i = 0; i<nrow_; ++i){
       if(!marked[i]){
-	top = depthFirstSearch(i, top, xi, pstack, tmp, marked);
+        top = depthFirstSearch(i, top, xi, pstack, tmp, marked);
       }
     }
 
@@ -281,7 +281,7 @@ namespace CasADi{
     // sort each block in natural order
     for(int b = 0 ; b < nb ; b++){
       for (int k = r[b]; k<r[b+1] ; ++k) 
-	Blk[p[k]] = b ;
+        Blk[p[k]] = b ;
     }
   
     // Get p; shift r down (side effect)
@@ -333,25 +333,25 @@ namespace CasADi{
       // get the head of the queue
       j = queue[head++];
       for(p = C->rowind_[j] ; p < C->rowind_[j+1] ; p++){
-	i = C->col_[p] ;
+        i = C->col_[p] ;
       
-	// skip if i is marked
-	if (wi [i] >= 0) continue;
+        // skip if i is marked
+        if (wi [i] >= 0) continue;
       
-	// i in set R1 (C3 if transpose)
-	wi [i] = mark;
+        // i in set R1 (C3 if transpose)
+        wi [i] = mark;
       
-	// traverse alternating path to j2
-	j2 = jmatch [i];
+        // traverse alternating path to j2
+        j2 = jmatch [i];
       
-	// skip j2 if it is marked
-	if(wj [j2] >= 0) continue;
+        // skip j2 if it is marked
+        if(wj [j2] >= 0) continue;
       
-	// j2 in set C1 (R3 if transpose)
-	wj[j2] = mark;
+        // j2 in set C1 (R3 if transpose)
+        wj[j2] = mark;
       
-	// add j2 to queue
-	queue [tail++] = j2;
+        // add j2 to queue
+        queue [tail++] = j2;
       }
     }
   }
@@ -377,7 +377,7 @@ namespace CasADi{
     int i, kr = rr[set] ;
     for (i=0; i<m; i++) 
       if (wi[i] == 0) 
-	p[kr++] = i;
+        p[kr++] = i;
     
     rr[set+1] = kr;
   }
@@ -405,45 +405,45 @@ namespace CasADi{
       // 1st time j visited for kth path
       if (w [j] != k){
       
-	// mark j as visited for kth path 
-	w[j] = k;
-	for(p = cheap [j] ; p < rowind_[j+1] && !found; ++p){
-	  i = col_[p] ;            /* try a cheap assignment (i,j) */
-	  found = (jmatch [i] == -1) ;
-	}
+        // mark j as visited for kth path 
+        w[j] = k;
+        for(p = cheap [j] ; p < rowind_[j+1] && !found; ++p){
+          i = col_[p] ;            /* try a cheap assignment (i,j) */
+          found = (jmatch [i] == -1) ;
+        }
       
-	// start here next time j is traversed
-	cheap[j] = p;
-	if(found){
-	  // column j matched with row i
-	  is[head] = i;
+        // start here next time j is traversed
+        cheap[j] = p;
+        if(found){
+          // column j matched with row i
+          is[head] = i;
         
-	  // end of augmenting path
-	  break;
-	}
+          // end of augmenting path
+          break;
+        }
       
-	// no cheap match: start dfs for j
-	ps[head] = rowind_[j];
+        // no cheap match: start dfs for j
+        ps[head] = rowind_[j];
       }
     
       // --- Depth-first-search of neighbors of j -------------------------
       for(p = ps[head]; p<rowind_[j+1]; ++p){
       
-	// consider row i
-	i = col_[p];
+        // consider row i
+        i = col_[p];
       
-	// skip jmatch [i] if marked
-	if(w[jmatch[i]] == k) continue;
+        // skip jmatch [i] if marked
+        if(w[jmatch[i]] == k) continue;
       
-	// pause dfs of node j
-	ps[head] = p + 1;
+        // pause dfs of node j
+        ps[head] = p + 1;
       
-	// i will be matched with j if found
-	is[head] = i;
+        // i will be matched with j if found
+        is[head] = i;
       
-	// start dfs at column jmatch [i]
-	js[++head] = jmatch [i];
-	break ;
+        // start dfs at column jmatch [i]
+        js[++head] = jmatch [i];
+        break ;
       }
     
       // node j is done; pop from stack
@@ -452,7 +452,7 @@ namespace CasADi{
   
     if(found)
       for(p = head; p>=0; --p)
-	jmatch[is[p]] = js[p];
+        jmatch[is[p]] = js[p];
   }
 
   void CRSSparsityInternal::maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch, CRSSparsity& trans, int seed) const{
@@ -470,10 +470,10 @@ namespace CasADi{
     for(int j=0; j<nrow_; ++j){
       n2 += (rowind_[j] < rowind_[j+1]);
       for(int p=rowind_[j]; p < rowind_[j+1]; ++p){
-	w[col_[p]] = 1;
+        w[col_[p]] = 1;
       
-	// count entries already on diagonal
-	k += (j == col_[p]);
+        // count entries already on diagonal
+        k += (j == col_[p]);
       }
     }
   
@@ -534,7 +534,7 @@ namespace CasADi{
   
     for(int i = 0; i<C->ncol_; ++i)
       if(Cjmatch [i] >= 0)
-	Cimatch[Cjmatch[i]] = i;
+        Cimatch[Cjmatch[i]] = i;
   }
 
   int CRSSparsityInternal::dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed) const{
@@ -615,9 +615,9 @@ namespace CasADi{
     int nc = coarse_rowblock[3] - coarse_rowblock[2];
     if(coarse_rowblock[2] > 0){
       for(int j = coarse_rowblock[2]; j <= coarse_rowblock[3]; ++j)
-	rowind_C[j-coarse_rowblock[2]] = rowind_C[j];
+        rowind_C[j-coarse_rowblock[2]] = rowind_C[j];
       for(int j=1; j < coarse_rowblock[3]-coarse_rowblock[2]; ++j)
-	rowind_C[j] -= rowind_C[0];
+        rowind_C[j] -= rowind_C[0];
       rowind_C[0] = 0;
     }
     C->nrow_ = nc;
@@ -630,8 +630,8 @@ namespace CasADi{
       int cnz = rowind_C[nc];
       vector<int>& col_C = C->col_;
       if(coarse_colblock[1] > 0)
-	for(int k=0; k<cnz; ++k)
-	  col_C[k] -= coarse_colblock[1];
+        for(int k=0; k<cnz; ++k)
+          col_C[k] -= coarse_colblock[1];
     }
     C->ncol_ = nc ;
 
@@ -759,7 +759,7 @@ namespace CasADi{
       int j = !q.empty() ? (q[k]) : k;
     
       for(int t = rowind_[j]; t<rowind_[j+1]; ++t){
-	col_C[nz++] = !pinv.empty() ? (pinv[col_[t]]) : col_[t] ;
+        col_C[nz++] = !pinv.empty() ? (pinv[col_[t]]) : col_[t] ;
       }
     }
   
@@ -778,10 +778,10 @@ namespace CasADi{
       // record new location of col j
       rowind_[j] = nz;
       for ( ; p < rowind_[j+1] ; ++p){
-	if (fkeep(col_[p], j, 1, other)){
-	  // keep A(i,j)
-	  col_[nz++] = col_[p] ;
-	}
+        if (fkeep(col_[p], j, 1, other)){
+          // keep A(i,j)
+          col_[nz++] = col_[p] ;
+        }
       }
     }
   
@@ -803,8 +803,8 @@ namespace CasADi{
     for (q = jprev ; q != ancestor [q] ; q = ancestor [q]) ;
     for (s = jprev ; s != q ; s = sparent)
       {
-	sparent = ancestor [s] ;    /* path compression */
-	ancestor [s] = q ;
+        sparent = ancestor [s] ;    /* path compression */
+        ancestor [s] = q ;
       }
     return (q) ;                    /* q = least common ancester (jprev,j) */
   }
@@ -845,8 +845,8 @@ namespace CasADi{
   
     for(k=n-1; k>=0; --k){
       for(p=Ap[k]; p<Ap[k+1]; ++p){
-	// leftmost[i] = min(find(A(i,:)))
-	leftmost[Ai[p]] = k;
+        // leftmost[i] = min(find(A(i,:)))
+        leftmost[Ai[p]] = k;
       }
     }
   
@@ -861,7 +861,7 @@ namespace CasADi{
     
       // first row in queue k
       if(nque[k]++ == 0)
-	tail[k] = i;
+        tail[k] = i;
     
       // put i at head of queue k 
       next[i] = head[k];
@@ -880,7 +880,7 @@ namespace CasADi{
     
       // add a fictitious row
       if(i < 0)
-	i = S_m2++;
+        i = S_m2++;
     
       // associate row i with V(:,k)
       pinv[i] = k;
@@ -893,17 +893,17 @@ namespace CasADi{
     
       // move all rows to parent of k
       if((pa = parent[k]) != -1){
-	if(nque[pa] == 0)
-	  tail[pa] = tail[k];
+        if(nque[pa] == 0)
+          tail[pa] = tail[k];
       
-	next[tail[k]] = head[pa] ;
-	head[pa] = next[i] ;
-	nque[pa] += nque[k] ;
+        next[tail[k]] = head[pa] ;
+        head[pa] = next[i] ;
+        nque[pa] += nque[k] ;
       }
     }
     for(i=0; i<m ; ++i)
       if(pinv[i] < 0)
-	pinv[i] = k++;
+        pinv[i] = k++;
     
     pinv.resize(m);
     return 1;
@@ -961,17 +961,17 @@ namespace CasADi{
       // i = youngest child of p 
       i = head[p];
       if (i == -1){
-	// p has no unordered children left
-	top--;
+        // p has no unordered children left
+        top--;
       
-	// node p is the kth postordered node
-	post[k++] = p;
+        // node p is the kth postordered node
+        post[k++] = p;
       } else {
-	// remove i from children of p
-	head[p] = next[i];
+        // remove i from children of p
+        head[p] = next[i];
       
-	// start dfs on child node i
-	stack[++top] = i;
+        // start dfs on child node i
+        stack[++top] = i;
       }
     }
   
@@ -990,7 +990,7 @@ namespace CasADi{
   
     for(i=0; i<m; ++i){
       for(k=n, p=ATp[i]; p<ATp[i+1]; ++p)
-	k = std::min(k, w[ATi[p]]);
+        k = std::min(k, w[ATi[p]]);
     
       // place row i in linked list k
       (*next)[i] = (*head)[k];
@@ -1034,7 +1034,7 @@ namespace CasADi{
       delta[j] = (first[j] == -1) ? 1 : 0;
 
       for (; j!=-1 && first [j] == -1; j=parent[j])
-	first[j] = k;
+        first[j] = k;
     }
 
     const int* ATp = &AT.rowind().front();
@@ -1051,31 +1051,31 @@ namespace CasADi{
     
       // j is not a root
       if (parent [j] != -1)
-	delta[parent [j]]--;
+        delta[parent [j]]--;
       
       // J=j for LL'=A case
       for(J=HEAD(k,j); J != -1; J=NEXT(J)){
-	for(p = ATp[J]; p<ATp[J+1]; ++p){
-	  i = ATi [p] ;
-	  q = leaf(i, j, first, maxfirst, prevleaf, ancestor, &jleaf);
+        for(p = ATp[J]; p<ATp[J+1]; ++p){
+          i = ATi [p] ;
+          q = leaf(i, j, first, maxfirst, prevleaf, ancestor, &jleaf);
 
-	  // A(i,j) is in skeleton
-	  if(jleaf >= 1)
-	    delta[j]++ ;
+          // A(i,j) is in skeleton
+          if(jleaf >= 1)
+            delta[j]++ ;
         
-	  // account for overlap in q
-	  if(jleaf == 2)
-	    delta [q]-- ;
-	}
+          // account for overlap in q
+          if(jleaf == 2)
+            delta [q]-- ;
+        }
       }
       if(parent[j] != -1)
-	ancestor[j] = parent[j] ;
+        ancestor[j] = parent[j] ;
     }
   
     // sum up delta's of each child
     for(j = 0 ; j < n ; ++j){
       if (parent[j] != -1)
-	colcount[parent [j]] += colcount[j] ;
+        colcount[parent [j]] += colcount[j] ;
     }
   
     // success
@@ -1127,18 +1127,18 @@ namespace CasADi{
       vector<int>& AT_col = AT.colRef();
       for(p2=0, j=0; j<m; ++j){
       
-	// column j of AT starts here
-	p = AT_rowind[j];
+        // column j of AT starts here
+        p = AT_rowind[j];
       
-	// new column j starts here
-	AT_rowind[j] = p2;
+        // new column j starts here
+        AT_rowind[j] = p2;
       
-	// skip dense col j
-	if(AT_rowind[j+1] - p > dense)
-	  continue ;
+        // skip dense col j
+        if(AT_rowind[j+1] - p > dense)
+          continue ;
       
-	for ( ; p < AT_rowind[j+1] ; p++)
-	  AT_col[p2++] = AT_col[p];
+        for ( ; p < AT_rowind[j+1] ; p++)
+          AT_col[p2++] = AT_col[p];
       }
     
       // finalize AT
@@ -1233,29 +1233,29 @@ namespace CasADi{
     
       // node i is empty
       if(d == 0){
-	// element i is dead
-	elen [i] = -2;
-	nel++;
+        // element i is dead
+        elen [i] = -2;
+        nel++;
       
-	// i is a root of assembly tree 
-	Cp[i] = -1;
-	w[i] = 0;
+        // i is a root of assembly tree 
+        Cp[i] = -1;
+        w[i] = 0;
       } else if (d > dense) { // node i is dense
-	// absorb i into element n
-	nv[i] = 0;
+        // absorb i into element n
+        nv[i] = 0;
       
-	// node i is dead
-	elen [i] = -1;
-	nel++;
-	Cp[i] = CS_FLIP (n) ;
-	nv[n]++ ;
+        // node i is dead
+        elen [i] = -1;
+        nel++;
+        Cp[i] = CS_FLIP (n) ;
+        nv[n]++ ;
       } else {
-	if(head[d] != -1)
-	  last[head[d]] = i;
+        if(head[d] != -1)
+          last[head[d]] = i;
       
-	// put node i in degree list d
-	next[i] = head[d];
-	head[d] = i;
+        // put node i in degree list d
+        next[i] = head[d];
+        head[d] = i;
       }
     }
   
@@ -1280,33 +1280,33 @@ namespace CasADi{
     
       // --- Garbage collection -------------------------------------------
       if(elenk > 0 && cnz + mindeg >= nzmax){
-	for(j=0; j<n; ++j){
-	  // j is a live node or element
-	  if((p = Cp [j]) >= 0){
-	    // save first entry of object
-	    Cp[j] = Ci[p];
+        for(j=0; j<n; ++j){
+          // j is a live node or element
+          if((p = Cp [j]) >= 0){
+            // save first entry of object
+            Cp[j] = Ci[p];
           
-	    // first entry is now CS_FLIP(j)
-	    Ci[p] = CS_FLIP(j);
-	  }
-	}
+            // first entry is now CS_FLIP(j)
+            Ci[p] = CS_FLIP(j);
+          }
+        }
       
-	// scan all of memory
-	for (q = 0, p = 0 ; p < cnz ; ){
-	  // found object j
-	  if ((j = CS_FLIP (Ci [p++])) >= 0){
-	    // restore first entry of object 
-	    Ci [q] = Cp[j];
+        // scan all of memory
+        for (q = 0, p = 0 ; p < cnz ; ){
+          // found object j
+          if ((j = CS_FLIP (Ci [p++])) >= 0){
+            // restore first entry of object 
+            Ci [q] = Cp[j];
           
-	    // new pointer to object j
-	    Cp [j] = q++;
-	    for (k3 = 0 ; k3 < len [j]-1 ; k3++)
-	      Ci [q++] = Ci [p++] ;
-	  }
-	}
+            // new pointer to object j
+            Cp [j] = q++;
+            for (k3 = 0 ; k3 < len [j]-1 ; k3++)
+              Ci [q++] = Ci [p++] ;
+          }
+        }
       
-	// Ci [cnz...nzmax-1] now free
-	cnz = q;
+        // Ci [cnz...nzmax-1] now free
+        cnz = q;
       }
     
       // --- Construct new element ----------------------------------------
@@ -1320,62 +1320,62 @@ namespace CasADi{
       pk1 = (elenk == 0) ? p : cnz;
       pk2 = pk1 ;
       for (k1 = 1 ; k1 <= elenk + 1 ; k1++){
-	if (k1 > elenk){
-	  // search the nodes in k
-	  e = k;
+        if (k1 > elenk){
+          // search the nodes in k
+          e = k;
         
-	  // list of nodes starts at Ci[pj]
-	  pj = p;
+          // list of nodes starts at Ci[pj]
+          pj = p;
         
-	  // length of list of nodes in k
-	  ln = len [k] - elenk;
-	} else {
-	  // search the nodes in e
-	  e = Ci [p++];
-	  pj = Cp [e] ;
+          // length of list of nodes in k
+          ln = len [k] - elenk;
+        } else {
+          // search the nodes in e
+          e = Ci [p++];
+          pj = Cp [e] ;
         
-	  // length of list of nodes in e
-	  ln = len [e];
-	}
+          // length of list of nodes in e
+          ln = len [e];
+        }
       
-	for (k2=1; k2<=ln ; ++k2){
-	  i = Ci [pj++] ;
+        for (k2=1; k2<=ln ; ++k2){
+          i = Ci [pj++] ;
         
-	  // node i dead, or seen
-	  if ((nvi = nv [i]) <= 0) continue;
+          // node i dead, or seen
+          if ((nvi = nv [i]) <= 0) continue;
         
-	  // degree[Lk] += size of node i
-	  dk += nvi;
+          // degree[Lk] += size of node i
+          dk += nvi;
         
-	  // negate nv[i] to denote i in Lk
-	  nv [i] = -nvi;
+          // negate nv[i] to denote i in Lk
+          nv [i] = -nvi;
         
-	  // place i in Lk
-	  Ci [pk2++] = i;
+          // place i in Lk
+          Ci [pk2++] = i;
         
-	  if(next[i] != -1)
-	    last[next[i]] = last[i];
+          if(next[i] != -1)
+            last[next[i]] = last[i];
         
-	  // remove i from degree list 
-	  if (last[i] != -1){
-	    next[last[i]] = next[i] ;
-	  } else {
-	    head[degree[i]] = next[i] ;
-	  }
-	}
+          // remove i from degree list 
+          if (last[i] != -1){
+            next[last[i]] = next[i] ;
+          } else {
+            head[degree[i]] = next[i] ;
+          }
+        }
       
-	if(e != k){
-	  // absorb e into k
-	  Cp [e] = CS_FLIP (k);
+        if(e != k){
+          // absorb e into k
+          Cp [e] = CS_FLIP (k);
         
-	  // e is now a dead element
-	  w [e] = 0;
-	}
+          // e is now a dead element
+          w [e] = 0;
+        }
       }
     
       // Ci [cnz...nzmax] is free
       if(elenk != 0)
-	cnz = pk2;
+        cnz = pk2;
     
       // external degree of k - |Lk\i|
       degree [k] = dk;
@@ -1394,131 +1394,131 @@ namespace CasADi{
     
       // scan 1: find |Le\Lk|
       for(pk = pk1 ; pk < pk2 ; ++pk){
-	i = Ci[pk] ;
+        i = Ci[pk] ;
       
-	// skip if elen[i] empty 
-	if ((eln = elen [i]) <= 0)
-	  continue;
+        // skip if elen[i] empty 
+        if ((eln = elen [i]) <= 0)
+          continue;
       
-	// nv [i] was negated
-	nvi = -nv [i];
+        // nv [i] was negated
+        nvi = -nv [i];
       
-	wnvi = mark - nvi ;
+        wnvi = mark - nvi ;
       
-	// scan Ei
-	for(p = Cp [i] ; p <= Cp [i] + eln - 1 ; ++p){
-	  e = Ci[p];
-	  if (w[e] >= mark){
-	    // decrement |Le\Lk|
-	    w [e] -= nvi;
-	  } else if(w [e] != 0){        /* ensure e is a live element */
-	    w [e] = degree [e] + wnvi ; /* 1st time e seen in scan 1 */
-	  }
-	}
+        // scan Ei
+        for(p = Cp [i] ; p <= Cp [i] + eln - 1 ; ++p){
+          e = Ci[p];
+          if (w[e] >= mark){
+            // decrement |Le\Lk|
+            w [e] -= nvi;
+          } else if(w [e] != 0){        /* ensure e is a live element */
+            w [e] = degree [e] + wnvi ; /* 1st time e seen in scan 1 */
+          }
+        }
       }
     
       // --- Degree update ------------------------------------------------
       // scan2: degree update
       for(pk = pk1 ; pk < pk2 ; ++pk){
-	// consider node i in Lk
-	i = Ci [pk];
-	p1 = Cp [i] ;
-	p2 = p1 + elen [i] - 1 ;
-	pn = p1 ;
+        // consider node i in Lk
+        i = Ci [pk];
+        p1 = Cp [i] ;
+        p2 = p1 + elen [i] - 1 ;
+        pn = p1 ;
       
-	// scan Ei
-	for (h = 0, d = 0, p = p1 ; p <= p2 ; p++){
-	  e = Ci [p] ;
+        // scan Ei
+        for (h = 0, d = 0, p = p1 ; p <= p2 ; p++){
+          e = Ci [p] ;
         
-	  // e is an unabsorbed element
-	  if (w [e] != 0){
-	    // dext = |Le\Lk|
-	    dext = w [e] - mark;
-	    if (dext > 0){
-	      // sum up the set differences
-	      d += dext;
+          // e is an unabsorbed element
+          if (w [e] != 0){
+            // dext = |Le\Lk|
+            dext = w [e] - mark;
+            if (dext > 0){
+              // sum up the set differences
+              d += dext;
             
-	      // keep e in Ei 
-	      Ci[pn++] = e;
+              // keep e in Ei 
+              Ci[pn++] = e;
             
-	      // compute the hash of node i
-	      h += e;
+              // compute the hash of node i
+              h += e;
             
-	    } else {
-	      // aggressive absorb. e->k
-	      Cp [e] = CS_FLIP (k);
+            } else {
+              // aggressive absorb. e->k
+              Cp [e] = CS_FLIP (k);
             
-	      // e is a dead element
-	      w [e] = 0;
-	    }
-	  }
-	}
+              // e is a dead element
+              w [e] = 0;
+            }
+          }
+        }
       
-	// elen[i] = |Ei|
-	elen [i] = pn - p1 + 1;
-	p3 = pn ;
-	p4 = p1 + len [i] ;
+        // elen[i] = |Ei|
+        elen [i] = pn - p1 + 1;
+        p3 = pn ;
+        p4 = p1 + len [i] ;
       
-	// prune edges in Ai
-	for (p = p2 + 1 ; p < p4 ; p++){
-	  j = Ci [p] ;
+        // prune edges in Ai
+        for (p = p2 + 1 ; p < p4 ; p++){
+          j = Ci [p] ;
         
-	  // node j dead or in Lk
-	  if ((nvj = nv [j]) <= 0)
-	    continue;
+          // node j dead or in Lk
+          if ((nvj = nv [j]) <= 0)
+            continue;
         
-	  // degree(i) += |j|
-	  d += nvj;
+          // degree(i) += |j|
+          d += nvj;
         
-	  // place j in node list of i
-	  Ci[pn++] = j;
+          // place j in node list of i
+          Ci[pn++] = j;
         
-	  // compute hash for node i
-	  h += j;
-	}
+          // compute hash for node i
+          h += j;
+        }
       
-	// check for mass elimination
-	if (d == 0){
-	  // absorb i into k 
-	  Cp[i] = CS_FLIP(k);
-	  nvi = -nv [i];
+        // check for mass elimination
+        if (d == 0){
+          // absorb i into k 
+          Cp[i] = CS_FLIP(k);
+          nvi = -nv [i];
         
-	  // |Lk| -= |i|
-	  dk -= nvi;
+          // |Lk| -= |i|
+          dk -= nvi;
         
-	  // |k| += nv[i]
-	  nvk += nvi;
-	  nel += nvi;
-	  nv[i] = 0 ;
+          // |k| += nv[i]
+          nvk += nvi;
+          nel += nvi;
+          nv[i] = 0 ;
         
-	  // node i is dead
-	  elen [i] = -1;
-	} else {
-	  // update degree(i)
-	  degree [i] = std::min(degree [i], d);
+          // node i is dead
+          elen [i] = -1;
+        } else {
+          // update degree(i)
+          degree [i] = std::min(degree [i], d);
         
-	  // move first node to end
-	  Ci[pn] = Ci[p3];
+          // move first node to end
+          Ci[pn] = Ci[p3];
         
-	  // move 1st el. to end of Ei
-	  Ci[p3] = Ci [p1];
+          // move 1st el. to end of Ei
+          Ci[p3] = Ci [p1];
         
-	  // add k as 1st element in of Ei
-	  Ci[p1] = k;
+          // add k as 1st element in of Ei
+          Ci[p1] = k;
         
-	  // new len of adj. list of node i
-	  len[i] = pn - p1 + 1;
+          // new len of adj. list of node i
+          len[i] = pn - p1 + 1;
         
-	  // finalize hash of i
-	  h %= n;
+          // finalize hash of i
+          h %= n;
         
-	  // place i in hash bucket
-	  next[i] = hhead [h];
-	  hhead [h] = i ;
+          // place i in hash bucket
+          next[i] = hhead [h];
+          hhead [h] = i ;
         
-	  // save hash of i in last[i]
-	  last[i] = h;
-	}
+          // save hash of i in last[i]
+          last[i] = h;
+        }
       } // scan2 is done
     
       // finalize |Lk|
@@ -1530,84 +1530,84 @@ namespace CasADi{
     
       // --- Supernode detection ------------------------------------------
       for(pk = pk1 ; pk < pk2 ; pk++){
-	i = Ci[pk] ;
+        i = Ci[pk] ;
       
-	// skip if i is dead 
-	if (nv [i] >= 0)
-	  continue;
+        // skip if i is dead 
+        if (nv [i] >= 0)
+          continue;
       
-	// scan hash bucket of node i
-	h = last [i];
-	i = hhead [h];
+        // scan hash bucket of node i
+        h = last [i];
+        i = hhead [h];
       
-	// hash bucket will be empty
-	hhead [h] = -1;
-	for ( ; i != -1 && next [i] != -1 ; i = next [i], mark++){
-	  ln = len [i] ;
-	  eln = elen [i] ;
-	  for (p = Cp [i]+1 ; p <= Cp [i] + ln-1 ; p++)
-	    w [Ci [p]] = mark;
+        // hash bucket will be empty
+        hhead [h] = -1;
+        for ( ; i != -1 && next [i] != -1 ; i = next [i], mark++){
+          ln = len [i] ;
+          eln = elen [i] ;
+          for (p = Cp [i]+1 ; p <= Cp [i] + ln-1 ; p++)
+            w [Ci [p]] = mark;
         
-	  jlast = i;
+          jlast = i;
         
-	  // compare i with all j
-	  for (j = next [i] ; j != -1 ; ){
-	    ok = (len [j] == ln) && (elen [j] == eln) ;
-	    for (p = Cp [j] + 1 ; ok && p <= Cp [j] + ln - 1 ; p++){
-	      if (w [Ci [p]] != mark) ok = 0 ;    /* compare i and j*/
-	    }
+          // compare i with all j
+          for (j = next [i] ; j != -1 ; ){
+            ok = (len [j] == ln) && (elen [j] == eln) ;
+            for (p = Cp [j] + 1 ; ok && p <= Cp [j] + ln - 1 ; p++){
+              if (w [Ci [p]] != mark) ok = 0 ;    /* compare i and j*/
+            }
           
-	    // i and j are identical
-	    if (ok){
-	      // absorb j into i
-	      Cp [j] = CS_FLIP (i);
-	      nv [i] += nv [j] ;
-	      nv [j] = 0;
+            // i and j are identical
+            if (ok){
+              // absorb j into i
+              Cp [j] = CS_FLIP (i);
+              nv [i] += nv [j] ;
+              nv [j] = 0;
             
-	      // node j is dead
-	      elen [j] = -1;
+              // node j is dead
+              elen [j] = -1;
             
-	      // delete j from hash bucket
-	      j = next [j];
-	      next [jlast] = j ;
-	    } else {
-	      // j and i are different
-	      jlast = j;
-	      j = next [j] ;
-	    }
-	  }
-	}
+              // delete j from hash bucket
+              j = next [j];
+              next [jlast] = j ;
+            } else {
+              // j and i are different
+              jlast = j;
+              j = next [j] ;
+            }
+          }
+        }
       }
     
       //  --- Finalize new element------------------------------------------
       // finalize Lk
       for (p = pk1, pk = pk1 ; pk < pk2 ; pk++){
-	i = Ci [pk] ;
+        i = Ci [pk] ;
       
-	// skip if i is dead
-	if ((nvi = -nv [i]) <= 0)
-	  continue;
+        // skip if i is dead
+        if ((nvi = -nv [i]) <= 0)
+          continue;
       
-	// restore nv[i]
-	nv [i] = nvi;
+        // restore nv[i]
+        nv [i] = nvi;
       
-	// compute external degree(i)
-	d = degree [i] + dk - nvi ;
-	d = std::min(d, n - nel - nvi);
-	if(head [d] != -1)
-	  last[head[d]] = i;
+        // compute external degree(i)
+        d = degree [i] + dk - nvi ;
+        d = std::min(d, n - nel - nvi);
+        if(head [d] != -1)
+          last[head[d]] = i;
       
-	// put i back in degree list
-	next [i] = head [d];
-	last [i] = -1 ;
-	head [d] = i ;
+        // put i back in degree list
+        next [i] = head [d];
+        last [i] = -1 ;
+        head [d] = i ;
       
-	// find new minimum degree 
-	mindeg = std::min(mindeg, d);
-	degree [i] = d ;
+        // find new minimum degree 
+        mindeg = std::min(mindeg, d);
+        degree [i] = d ;
       
-	// place i in Lk
-	Ci[p++] = i;
+        // place i in Lk
+        Ci[p++] = i;
       }
     
       // # nodes absorbed into k
@@ -1615,16 +1615,16 @@ namespace CasADi{
     
       // length of adj list of element k
       if ((len [k] = p-pk1) == 0){
-	// k is a root of the tree
-	Cp [k] = -1;
+        // k is a root of the tree
+        Cp [k] = -1;
       
-	// k is now a dead element
-	w[k] = 0;
+        // k is now a dead element
+        w[k] = 0;
       }
     
       // free unused space in Lk
       if (elenk != 0)
-	cnz = p;
+        cnz = p;
     }
   
     // --- Postordering -----------------------------------------------------
@@ -1651,16 +1651,16 @@ namespace CasADi{
       // skip unless e is an element
       if (nv[e] <= 0) continue;
       if (Cp[e] != -1){
-	// place e in list of its parent
-	next[e] = head[Cp [e]];
-	head[Cp[e]] = e ;
+        // place e in list of its parent
+        next[e] = head[Cp [e]];
+        head[Cp[e]] = e ;
       }
     }
   
     // postorder the assembly tree
     for(k = 0, i = 0 ; i <= n ; i++){
       if (Cp[i] == -1)
-	k = depthFirstSearchAndPostorder(i, k, head, next, &P.front(), w) ;
+        k = depthFirstSearchAndPostorder(i, k, head, next, &P.front(), w) ;
     }
   
     return P;
@@ -1677,11 +1677,11 @@ namespace CasADi{
       i = Ai [p];
     
       if (w[i] < mark){
-	// i is new entry in column j
-	w[i] = mark;
+        // i is new entry in column j
+        w[i] = mark;
       
-	// add i to pattern of C(:,j)
-	Ci[nz++] = i;
+        // add i to pattern of C(:,j)
+        Ci[nz++] = i;
       }
     }
     return nz;
@@ -1707,13 +1707,13 @@ namespace CasADi{
     int* Cp = &C.rowindRef().front();
     for(int j=0; j<n; ++j){
       if(nz+m > C.size()){
-	C.colRef().resize(2*(C.size())+m);
+        C.colRef().resize(2*(C.size())+m);
       }
     
       // column j of C starts here
       Cp[j] = nz;
       for(int p = Bp[j] ; p<Bp[j+1] ; ++p){
-	nz = scatter(Bi[p], w, j+1, C, nz);
+        nz = scatter(Bi[p], w, j+1, C, nz);
       }
     }
   
@@ -1739,10 +1739,10 @@ namespace CasADi{
     if (qr){
       CRSSparsity C;
       if(order!=0){
-	std::vector<int> pinv_tmp;
-	C = permute(pinv_tmp, S_q, 0);
+        std::vector<int> pinv_tmp;
+        C = permute(pinv_tmp, S_q, 0);
       } else {
-	C = shared_from_this<CRSSparsity>();
+        C = shared_from_this<CRSSparsity>();
       }
     
       // etree of C'*C, where C=A(:,q)
@@ -1756,7 +1756,7 @@ namespace CasADi{
     
       C->vcount(S_pinv, S_parent, S_leftmost, S_m2, S_lnz);
       for(S_unz = 0, k = 0; k<n; k++)
-	S_unz += S_cp[k];
+        S_unz += S_cp[k];
       
       // int overflow guard
       casadi_assert(S_lnz >= 0);
@@ -1782,22 +1782,22 @@ namespace CasADi{
       // Loop over nonzero
       for(int i=0; i<nrow_; ++i){
       
-	// Enlarge the return matrix
-	ret.resize(i+1,1);
+        // Enlarge the return matrix
+        ret.resize(i+1,1);
     
-	// Get to the right nonzero of the row
-	int el = rowind_[i];
-	while(el<rowind_[i+1] && col_[el]<i){
-	  el++;
-	}
+        // Get to the right nonzero of the row
+        int el = rowind_[i];
+        while(el<rowind_[i+1] && col_[el]<i){
+          el++;
+        }
       
-	if (el>=size()) return ret;
+        if (el>=size()) return ret;
       
-	// Add element if nonzero on diagonal
-	if(col_[el]==i){
-	  ret.getNZ(i,0);
-	  mapping.push_back(el);
-	}
+        // Add element if nonzero on diagonal
+        if(col_[el]==i){
+          ret.getNZ(i,0);
+          mapping.push_back(el);
+        }
       }
     
       return ret;
@@ -1808,10 +1808,10 @@ namespace CasADi{
     
       // Have a row vector
       if(nrow_ == 1){
-	sp = this;
+        sp = this;
       } else {
-	trans = transpose();
-	sp = static_cast<const CRSSparsityInternal *>(trans.get());
+        trans = transpose();
+        sp = static_cast<const CRSSparsityInternal *>(trans.get());
       }
     
       // Return object
@@ -1825,12 +1825,12 @@ namespace CasADi{
         
       // Loop over nonzero
       for(int k=0;k<size();k++) {
-	mapping[k]=k; // mapping will just be a range(size())
+        mapping[k]=k; // mapping will just be a range(size())
      
-	int i = sp->col_[k];
-	std::fill(rowind.begin()+i_prev+1,rowind.begin()+i+1,k);
-	col[k]=i;
-	i_prev = i;
+        int i = sp->col_[k];
+        std::fill(rowind.begin()+i_prev+1,rowind.begin()+i+1,k);
+        col[k]=i;
+        i_prev = i;
       }
       std::fill(rowind.begin()+i_prev+1,rowind.end(),size());
     
@@ -1898,40 +1898,40 @@ namespace CasADi{
       fill(in_x_row.begin(),in_x_row.end(),0); // NOTE: expensive?
       int_t b=1;
       for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
-	for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
-	  in_x_row[x_col[el1]] |= b;
-	}
-	b <<= 1;
+        for(int el1=x_rowind[i]; el1<x_rowind[i+1]; ++el1){
+          in_x_row[x_col[el1]] |= b;
+        }
+        b <<= 1;
       }
 
       // Get the sparsity pattern for the set of rows
       fill(in_res_col.begin(),in_res_col.end(),0); // NOTE: expensive?
       for(int j=0; j<y_ncol; ++j){
       
-	// Loop over the nonzeros of the column of the second factor
-	for(int el2=y_colind[j]; el2<y_colind[j+1]; ++el2){
+        // Loop over the nonzeros of the column of the second factor
+        for(int el2=y_colind[j]; el2<y_colind[j+1]; ++el2){
         
-	  // Get the row
-	  int i_y = y_row[el2];
+          // Get the row
+          int i_y = y_row[el2];
         
-	  // Add nonzero if the element matches an element in the x row
-	  in_res_col[j] |= in_x_row[i_y];
-	}
+          // Add nonzero if the element matches an element in the x row
+          in_res_col[j] |= in_x_row[i_y];
+        }
       }
 
       b = 1;
       for(int i=rr*nr; i<rr*nr+nr && i<x_nrow; ++i){
       
-	// loop over the columns of the resulting matrix
-	for(int j=0; j<y_ncol; ++j){
+        // loop over the columns of the resulting matrix
+        for(int j=0; j<y_ncol; ++j){
         
-	  // Save nonzero, if any
-	  if(in_res_col[j] & b){
-	    c.push_back(j);
-	  }
-	}
-	r[i+1] = c.size();
-	b <<=1;
+          // Save nonzero, if any
+          if(in_res_col[j] & b){
+            c.push_back(j);
+          }
+        }
+        r[i+1] = c.size();
+        b <<=1;
       }
     }
     return ret;
@@ -1961,22 +1961,22 @@ namespace CasADi{
     for(int i=0; i<nrow_; ++i){
       // Loop over nonzeros
       for(int el=r[i]; el<r[i+1]; ++el){
-	int j = c[el];
-	int el1 = x_rowind[i];
-	int el2 = y_colind[j];
-	d.clear();
-	while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
-	  int j1 = x_col[el1];
-	  int i2 = y_row[el2];      
-	  if(j1==i2){
-	    d.push_back(pair<int,int>(el1++,el2++));
-	  } else if(j1<i2) {
-	    el1++;
-	  } else {
-	    el2++;
-	  }
-	}
-	mapping[el] = d;
+        int j = c[el];
+        int el1 = x_rowind[i];
+        int el2 = y_colind[j];
+        d.clear();
+        while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
+          int j1 = x_col[el1];
+          int i2 = y_row[el2];      
+          if(j1==i2){
+            d.push_back(pair<int,int>(el1++,el2++));
+          } else if(j1<i2) {
+            el1++;
+          } else {
+            el2++;
+          }
+        }
+        mapping[el] = d;
       }
     }
   
@@ -2001,13 +2001,13 @@ namespace CasADi{
     // Check that the column indices are correct
     for(int i=0; i<size(); ++i){
       if(col_[i]!=i)
-	return false;
+        return false;
     }
    
     // Make sure that the row indices are correct
     for(int i=0; i<nrow_; ++i){
       if(rowind_[i]!=i)
-	return false;
+        return false;
     }
   
     // Diagonal if reached this point
@@ -2018,7 +2018,7 @@ namespace CasADi{
     int nnz = 0;
     for(int r=0; r<nrow_; ++r){
       for(int el = rowind_[r]; el < rowind_[r+1]; ++el){
-	nnz += col_[el]>=r;
+        nnz += col_[el]>=r;
       }
     }
     return nnz;
@@ -2028,7 +2028,7 @@ namespace CasADi{
     int nnz = 0;
     for(int r=0; r<nrow_; ++r){
       for(int el = rowind_[r]; el < rowind_[r+1] && col_[el]<=r; ++el){
-	nnz ++;
+        nnz ++;
       }
     }
     return nnz;
@@ -2074,43 +2074,43 @@ namespace CasADi{
       // Is it a row that can be deleted
       bool deletable_row = ie!=ii.end() && *ie==i;
       if(deletable_row){
-	ie++;
+        ie++;
       
-	// Columns to be erased
-	vector<int>::const_iterator je = jj.begin();
+        // Columns to be erased
+        vector<int>::const_iterator je = jj.begin();
 
-	// Loop over nonzero elements of the row
-	for(int el=el_first; el<el_last; ++el){
-	  // Column
-	  int j=col_[el];
+        // Loop over nonzero elements of the row
+        for(int el=el_first; el<el_last; ++el){
+          // Column
+          int j=col_[el];
         
-	  // Continue to the next column to skip
-	  for(; je!=jj.end() && *je<j; ++je);
+          // Continue to the next column to skip
+          for(; je!=jj.end() && *je<j; ++je);
         
-	  // Remove column if necessary
-	  if(je!=jj.end() && *je==j){
-	    je++;
-	    continue;
-	  }
+          // Remove column if necessary
+          if(je!=jj.end() && *je==j){
+            je++;
+            continue;
+          }
         
-	  // Save old nonzero for each new nonzero
-	  mapping.push_back(el);
+          // Save old nonzero for each new nonzero
+          mapping.push_back(el);
         
-	  // Update column and increase nonzero counter
-	  col_[nz++] = j;
-	}
+          // Update column and increase nonzero counter
+          col_[nz++] = j;
+        }
       } else {
-	// Loop over nonzero elements of the row
-	for(int el=el_first; el<el_last; ++el){
-	  // Column
-	  int j=col_[el];
+        // Loop over nonzero elements of the row
+        for(int el=el_first; el<el_last; ++el){
+          // Column
+          int j=col_[el];
       
-	  // Save old nonzero for each new nonzero
-	  mapping.push_back(el);
+          // Save old nonzero for each new nonzero
+          mapping.push_back(el);
       
-	  // Update column and increase nonzero counter
-	  col_[nz++] = j;
-	}
+          // Update column and increase nonzero counter
+          col_[nz++] = j;
+        }
       }
     
       // Register last nonzero of the row
@@ -2144,15 +2144,15 @@ namespace CasADi{
       int it = ii[i];
       int el=rowind_[it];
       for(int j=0;j<jj_sorted.size();++j){
-	int jt=jj_sorted[j];
-	// Continue to the non-zero element
-	for(; el<rowind_[it+1] && col_[el]<jt; ++el){}
-	// Add the non-zero element, if there was an element in the location exists
-	if(el<rowind_[it+1] && col_[el]== jt) {
-	  ret[i*stride+jj_sorted_index[j]] = el;
-	}
-	else
-	  ret[i*stride+jj_sorted_index[j]] = -1;
+        int jt=jj_sorted[j];
+        // Continue to the non-zero element
+        for(; el<rowind_[it+1] && col_[el]<jt; ++el){}
+        // Add the non-zero element, if there was an element in the location exists
+        if(el<rowind_[it+1] && col_[el]== jt) {
+          ret[i*stride+jj_sorted_index[j]] = el;
+        }
+        else
+          ret[i*stride+jj_sorted_index[j]] = -1;
       }
     }
     return ret;
@@ -2199,12 +2199,12 @@ namespace CasADi{
     for(int i=0;i<ii.size();++i){
       int it = ii_sorted[i];
       for(int el=rowind_[it]; el<rowind_[it+1]; ++el){ // loop over the non-zeros of the matrix
-	int j = col_[el];
-	int ji = jjlookup[j];
-	if (ji!=-1) {
-	  int jv = jj_sorted[ji];
-	  while (ji>=0 && jv == jj_sorted[ji--]) nnz++; 
-	}
+        int j = col_[el];
+        int ji = jjlookup[j];
+        if (ji!=-1) {
+          int jv = jj_sorted[ji];
+          while (ji>=0 && jv == jj_sorted[ji--]) nnz++; 
+        }
       }
     }
   
@@ -2218,18 +2218,18 @@ namespace CasADi{
     for(int i=0;i<ii.size();++i){
       int it = ii_sorted[i];
       for(int el=rowind_[it]; el<rowind_[it+1]; ++el){ // loop over the non-zeros of the matrix
-	int jt = col_[el];
-	int ji = jjlookup[jt];
-	if (ji!=-1) {
-	  int jv = jj_sorted[ji];
-	  while (ji>=0 && jv == jj_sorted[ji]) {
-	    cols[k] = jj_sorted_index[ji];
-	    rows[k] = ii_sorted_index[i];
-	    mapping[k] = el;
-	    k++;
-	    ji--;
-	  }
-	}
+        int jt = col_[el];
+        int ji = jjlookup[jt];
+        if (ji!=-1) {
+          int jv = jj_sorted[ji];
+          while (ji>=0 && jv == jj_sorted[ji]) {
+            cols[k] = jj_sorted_index[ji];
+            rows[k] = ii_sorted_index[i];
+            mapping[k] = el;
+            k++;
+            ji--;
+          }
+        }
       }
     }
   
@@ -2262,13 +2262,13 @@ namespace CasADi{
       int it = ii_sorted[i];
       int el=rowind_[it];
       for(int j=0;j<jj_sorted.size();++j){
-	int jt=jj_sorted[j];
-	// Continue to the non-zero element
-	for(; el<rowind_[it+1] && col_[el]<jt; ++el){}
-	// Add the non-zero element, if there was an element in the location exists
-	if(el<rowind_[it+1] && col_[el]== jt) {
-	  nnz++;
-	}
+        int jt=jj_sorted[j];
+        // Continue to the non-zero element
+        for(; el<rowind_[it+1] && col_[el]<jt; ++el){}
+        // Add the non-zero element, if there was an element in the location exists
+        if(el<rowind_[it+1] && col_[el]== jt) {
+          nnz++;
+        }
       }
     }
   
@@ -2283,16 +2283,16 @@ namespace CasADi{
       int it = ii_sorted[i];
       int K = rowind_[it];
       for(int j=0;j<jj_sorted.size();++j){
-	int jt=jj_sorted[j];
-	// Continue to the non-zero element
-	for(; K<rowind_[it+1] && col_[K]<jt; ++K){}
-	// Add the non-zero element, if there was an element in the location exists
-	if(K<rowind_[it+1] && col_[K]== jt) {
-	  cols[k] = jj_sorted_index[j];
-	  rows[k] = ii_sorted_index[i];
-	  mapping[k] = K;
-	  k++;
-	}
+        int jt=jj_sorted[j];
+        // Continue to the non-zero element
+        for(; K<rowind_[it+1] && col_[K]<jt; ++K){}
+        // Add the non-zero element, if there was an element in the location exists
+        if(K<rowind_[it+1] && col_[K]== jt) {
+          cols[k] = jj_sorted_index[j];
+          rows[k] = ii_sorted_index[i];
+          mapping[k] = K;
+          k++;
+        }
       }
     }
   
@@ -2322,17 +2322,17 @@ namespace CasADi{
     // Quick return if identical
     if(isEqual(y)){
       if(with_mapping){
-	mapping.resize(y.size());
-	fill(mapping.begin(),mapping.end(), 1 | 2);
+        mapping.resize(y.size());
+        fill(mapping.begin(),mapping.end(), 1 | 2);
       }
       return y;
     }
 
     if(f0x_is_zero){
       if(fx0_is_zero){
-	return patternCombineGen<with_mapping,true,true>(y,mapping);
+        return patternCombineGen<with_mapping,true,true>(y,mapping);
       } else {
-	return patternCombineGen<with_mapping,true,false>(y,mapping);
+        return patternCombineGen<with_mapping,true,false>(y,mapping);
       }      
     } else if(fx0_is_zero){
       return patternCombineGen<with_mapping,false,true>(y,mapping);
@@ -2370,32 +2370,32 @@ namespace CasADi{
       
       // Loop over the non-zeros of both matrices
       while(el1<el1_last || el2<el2_last){
-	// Get the columns
-	int col1 = el1<el1_last ? col_[el1] : ncol_;
-	int col2 = el2<el2_last ? y_col[el2] : ncol_;
+        // Get the columns
+        int col1 = el1<el1_last ? col_[el1] : ncol_;
+        int col2 = el2<el2_last ? y_col[el2] : ncol_;
 
-	// Add to the return matrix
-	if(col1==col2){ //  both nonzero
-	  ret_col.push_back(col1);
-	  if(with_mapping) mapping.push_back( 1 | 2);
-	  el1++; el2++;
-	} else if(col1<col2){ //  only first argument is nonzero
-	  if(!fx0_is_zero){
-	    ret_col.push_back(col1);
-	    if(with_mapping) mapping.push_back(1);
-	  } else {
-	    if(with_mapping) mapping.push_back(1 | 4);
-	  }
-	  el1++;
-	} else { //  only second argument is nonzero
-	  if(!f0x_is_zero){
-	    ret_col.push_back(col2);
-	    if(with_mapping) mapping.push_back(2);
-	  } else {
-	    if(with_mapping) mapping.push_back(2 | 4);
-	  }
-	  el2++;
-	}
+        // Add to the return matrix
+        if(col1==col2){ //  both nonzero
+          ret_col.push_back(col1);
+          if(with_mapping) mapping.push_back( 1 | 2);
+          el1++; el2++;
+        } else if(col1<col2){ //  only first argument is nonzero
+          if(!fx0_is_zero){
+            ret_col.push_back(col1);
+            if(with_mapping) mapping.push_back(1);
+          } else {
+            if(with_mapping) mapping.push_back(1 | 4);
+          }
+          el1++;
+        } else { //  only second argument is nonzero
+          if(!f0x_is_zero){
+            ret_col.push_back(col2);
+            if(with_mapping) mapping.push_back(2);
+          } else {
+            if(with_mapping) mapping.push_back(2 | 4);
+          }
+          el2++;
+        }
       }
       
       // Save the index of the last nonzero on the row
@@ -2479,7 +2479,7 @@ namespace CasADi{
     for(int i=ii.size()-1; i>=0; --i){
       // Update rowindex for new rows
       for(; ik>ii[i]; --ik){
-	rowind_[ik] = nz;
+        rowind_[ik] = nz;
       }
     
       // Update non-zero counter
@@ -2512,8 +2512,8 @@ namespace CasADi{
     mapping.resize(size());
     for(int i=0; i<nrow_; ++i){
       for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
-	int j = col_[el];
-	mapping[el] = j + i*ncol_;
+        int j = col_[el];
+        mapping[el] = j + i*ncol_;
       }
     }
   
@@ -2539,10 +2539,10 @@ namespace CasADi{
     // Find sparse element
     for(int ind=rowind_[i]; ind<rowind_[i+1]; ++ind){
       if(col_[ind] == j){
-	return ind;     // element exists
+        return ind;     // element exists
       }
       else if(col_[ind] > j)
-	break;                // break at the place where the element should be added
+        break;                // break at the place where the element should be added
     }
     return -1;
   }
@@ -2556,16 +2556,16 @@ namespace CasADi{
     std::vector<int> col(size());
     for(int i=0; i<nrow_; ++i){
       for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
-	int j = col_[el];
+        int j = col_[el];
       
-	// Element number
-	int k_ret = j+i*ncol_;
+        // Element number
+        int k_ret = j+i*ncol_;
       
-	// Row and column in the new matrix
-	int i_ret = k_ret/m;
-	int j_ret = k_ret%m;
-	row[el] = i_ret;
-	col[el] = j_ret;
+        // Row and column in the new matrix
+        int i_ret = k_ret/m;
+        int j_ret = k_ret%m;
+        row[el] = i_ret;
+        col[el] = j_ret;
       }
     }
     return sp_triplet(n,m,row,col);
@@ -2574,37 +2574,37 @@ namespace CasADi{
   void CRSSparsityInternal::resize(int nrow, int ncol){
     if(nrow != nrow_ || ncol != ncol_){
       if(nrow < nrow_ || ncol < ncol_){
-	// Row and column index of the new
-	vector<int> col_new, rowind_new(nrow+1,0);
+        // Row and column index of the new
+        vector<int> col_new, rowind_new(nrow+1,0);
 
-	// Loop over the rows which may contain nonzeros
-	int i;
-	for(i=0; i<nrow_ && i<nrow; ++i){
-	  // First nonzero element of the row
-	  rowind_new[i] = col_new.size();
+        // Loop over the rows which may contain nonzeros
+        int i;
+        for(i=0; i<nrow_ && i<nrow; ++i){
+          // First nonzero element of the row
+          rowind_new[i] = col_new.size();
         
-	  // Record columns of the nonzeros
-	  for(int el=rowind_[i]; el<rowind_[i+1] && col_[el]<ncol; ++el){
-	    col_new.push_back(col_[el]);
-	  }
-	}
+          // Record columns of the nonzeros
+          for(int el=rowind_[i]; el<rowind_[i+1] && col_[el]<ncol; ++el){
+            col_new.push_back(col_[el]);
+          }
+        }
       
-	// Save row-indices for the rest of the rows
-	for(; i<nrow+1; ++i){
-	  rowind_new[i] = col_new.size();
-	}
+        // Save row-indices for the rest of the rows
+        for(; i<nrow+1; ++i){
+          rowind_new[i] = col_new.size();
+        }
         
-	// Save the sparsity
-	nrow_ = nrow;
-	ncol_ = ncol;
-	col_.swap(col_new);
-	rowind_.swap(rowind_new);
+        // Save the sparsity
+        nrow_ = nrow;
+        ncol_ = ncol;
+        col_.swap(col_new);
+        rowind_.swap(rowind_new);
       
       } else {
-	// Make larger: Very cheap operation
-	nrow_ = nrow;
-	ncol_ = ncol;
-	rowind_.resize(nrow_+1,size());
+        // Make larger: Very cheap operation
+        nrow_ = nrow;
+        ncol_ = ncol;
+        rowind_.resize(nrow_+1,size());
       }
     }
   }
@@ -2614,16 +2614,16 @@ namespace CasADi{
       int lastcol = -1;
       for(int k=rowind_[i]; k<rowind_[i+1]; ++k){
       
-	// check if not in sequence
-	if(col_[k] < lastcol)
-	  return false;
+        // check if not in sequence
+        if(col_[k] < lastcol)
+          return false;
 
-	// Check if duplicate
-	if(strictly && col_[k] == lastcol)
-	  return false;
+        // Check if duplicate
+        if(strictly && col_[k] == lastcol)
+          return false;
 
-	// update last column of the row
-	lastcol = col_[k]; 
+        // update last column of the row
+        lastcol = col_[k]; 
       }
     }
   
@@ -2649,24 +2649,24 @@ namespace CasADi{
       // Loop over nonzeros (including duplicates)
       for(int k=rowind_[i]; k<rowind_[i+1]; ++k){
       
-	// Make sure that the columns appear sequentially
-	casadi_assert_message(col_[k] >= lastcol, "columns are not sequential");
+        // Make sure that the columns appear sequentially
+        casadi_assert_message(col_[k] >= lastcol, "columns are not sequential");
 
-	// Skip if duplicate
-	if(col_[k] == lastcol)
-	  continue;
+        // Skip if duplicate
+        if(col_[k] == lastcol)
+          continue;
 
-	// update last column encounterd on the row
-	lastcol = col_[k]; 
+        // update last column encounterd on the row
+        lastcol = col_[k]; 
 
-	// Update mapping
-	mapping[k_strict] = mapping[k];
+        // Update mapping
+        mapping[k_strict] = mapping[k];
       
-	// Update column index
-	col_[k_strict] = col_[k];
+        // Update column index
+        col_[k_strict] = col_[k];
       
-	// Increase the strict nonzero counter
-	k_strict++;
+        // Increase the strict nonzero counter
+        k_strict++;
       }
     
       // Update row offset
@@ -2690,15 +2690,15 @@ namespace CasADi{
       // Loop over the nonzeros
       for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
         
-	// Get column
-	int j = col_[el];
+        // Get column
+        int j = col_[el];
         
-	// Get the element
-	if(row_major){
-	  loc[el] = j+i*ncol_;
-	} else {
-	  loc[el] = i+j*nrow_;
-	}
+        // Get the element
+        if(row_major){
+          loc[el] = j+i*ncol_;
+        } else {
+          loc[el] = i+j*nrow_;
+        }
       }
     }
   }
@@ -2720,35 +2720,35 @@ namespace CasADi{
       // Loop over the nonzeros
       for(int el=rowind_[i]; el<rowind_[i+1] && el_row<=i; ++el){
         
-	// Get column
-	int j = col_[el];
+        // Get column
+        int j = col_[el];
       
-	// Add leading elements not in pattern
-	while(i>el_row || (i==el_row && j>el_col)){
-	  // Mark as not found
-	  *it = -1;
+        // Add leading elements not in pattern
+        while(i>el_row || (i==el_row && j>el_col)){
+          // Mark as not found
+          *it = -1;
         
-	  // Increase index and terminate if end of vector reached
-	  if(++it==indices.end()) return;
+          // Increase index and terminate if end of vector reached
+          if(++it==indices.end()) return;
         
-	  // Next element sought
-	  el_row = *it % nrow_;
-	  el_col = *it / nrow_;
-	}
+          // Next element sought
+          el_row = *it % nrow_;
+          el_col = *it / nrow_;
+        }
 
-	// Add elements in pattern
-	while(i==el_row && j==el_col){
-	  // Save element index
-	  *it = el;
+        // Add elements in pattern
+        while(i==el_row && j==el_col){
+          // Save element index
+          *it = el;
 
-	  // Increase index and terminate if end of vector reached
-	  if(++it==indices.end()) return;
+          // Increase index and terminate if end of vector reached
+          if(++it==indices.end()) return;
 
-	  // Next element sought
-	  el_row = *it % nrow_;
-	  el_col = *it / nrow_;
+          // Next element sought
+          el_row = *it % nrow_;
+          el_col = *it / nrow_;
         
-	}
+        }
       }
     }
   
@@ -2773,43 +2773,43 @@ namespace CasADi{
       // Loop over nonzero elements
       for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
       
-	// Get column
-	int c = col_[el];
+        // Get column
+        int c = col_[el];
         
-	// Loop over previous rows that have an element in column c
-	for(int el_prev=AT_rowind[c]; el_prev<AT_rowind[c+1]; ++el_prev){
+        // Loop over previous rows that have an element in column c
+        for(int el_prev=AT_rowind[c]; el_prev<AT_rowind[c+1]; ++el_prev){
         
-	  // Get the row
-	  int i_prev = AT_col[el_prev];
+          // Get the row
+          int i_prev = AT_col[el_prev];
         
-	  // Escape loop if we have arrived at the current row
-	  if(i_prev>=i)
-	    break;
+          // Escape loop if we have arrived at the current row
+          if(i_prev>=i)
+            break;
         
-	  // Get the color of the row
-	  int color_prev = color[i_prev];
+          // Get the color of the row
+          int color_prev = color[i_prev];
         
-	  // Mark the color as forbidden for the current row
-	  forbiddenColors[color_prev] = i;
-	}
+          // Mark the color as forbidden for the current row
+          forbiddenColors[color_prev] = i;
+        }
       }
     
       // Get the first nonforbidden color
       int color_i;
       for(color_i=0; color_i<forbiddenColors.size(); ++color_i){
-	// Break if color is ok
-	if(forbiddenColors[color_i]!=i) break;
+        // Break if color is ok
+        if(forbiddenColors[color_i]!=i) break;
       }
       color[i] = color_i;
     
       // Add color if reached end
       if(color_i==forbiddenColors.size()){
-	forbiddenColors.push_back(0);
-	
-	// Cutoff if too many colors
-	if(forbiddenColors.size()>cutoff){
-	  return CRSSparsity();
-	}
+        forbiddenColors.push_back(0);
+        
+        // Cutoff if too many colors
+        if(forbiddenColors.size()>cutoff){
+          return CRSSparsity();
+        }
       }
     }
   
@@ -2872,73 +2872,73 @@ namespace CasADi{
         
       // 5: for each w \in N1 (vi ) do
       for(int w_el=rowind_[i]; w_el<rowind_[i+1]; ++w_el){
-	int w = col_[w_el];
+        int w = col_[w_el];
               
-	// 6: if w is colored then
-	if(color[w]!=-1){
+        // 6: if w is colored then
+        if(color[w]!=-1){
         
-	  // 7: forbiddenColors[color[w]] <- v
-	  forbiddenColors[color[w]] = i;
+          // 7: forbiddenColors[color[w]] <- v
+          forbiddenColors[color[w]] = i;
         
-	} // 8: end if
+        } // 8: end if
 
-	// 9: for each colored vertex x \in N1 (w) do
-	for(int x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
-	  int x = col_[x_el];
-	  if(color[x]==-1) continue;
+        // 9: for each colored vertex x \in N1 (w) do
+        for(int x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
+          int x = col_[x_el];
+          if(color[x]==-1) continue;
         
-	  // 10: if w is not colored then
-	  if(color[w]==-1){
+          // 10: if w is not colored then
+          if(color[w]==-1){
           
-	    //11: forbiddenColors[color[x]] <- vi
-	    forbiddenColors[color[x]] = i;
+            //11: forbiddenColors[color[x]] <- vi
+            forbiddenColors[color[x]] = i;
           
-	  } else { // 12: else
+          } else { // 12: else
           
-	    // 13: for each colored vertex y \in N1 (x), y != w do
-	    for(int y_el=rowind_[x]; y_el<rowind_[x+1]; ++y_el){
-	      int y = col_[y_el];
-	      if(color[y]==-1 || y==w) continue;
+            // 13: for each colored vertex y \in N1 (x), y != w do
+            for(int y_el=rowind_[x]; y_el<rowind_[x+1]; ++y_el){
+              int y = col_[y_el];
+              if(color[y]==-1 || y==w) continue;
             
-	      // 14: if color[y] = color[w] then
-	      if(color[y]==color[w]){
+              // 14: if color[y] = color[w] then
+              if(color[y]==color[w]){
               
-		// 15: forbiddenColors[color[x]] <- vi
-		forbiddenColors[color[x]] = i;
+                // 15: forbiddenColors[color[x]] <- vi
+                forbiddenColors[color[x]] = i;
               
-		// 16: break
-		break;
+                // 16: break
+                break;
               
-	      } // 17: end if
+              } // 17: end if
             
-	    } // 18: end for
+            } // 18: end for
           
-	  } // 19: end if
+          } // 19: end if
 
-	} // 20 end for
+        } // 20 end for
       
       } // 21 end for
     
       // 22: color[v] <- min{c > 0 : forbiddenColors[c] = v}
       bool new_color = true;
       for(int color_i=0; color_i<forbiddenColors.size(); ++color_i){
-	// Break if color is ok
-	if(forbiddenColors[color_i]!=i){
-	  color[i] = color_i;
-	  new_color = false;
-	  break;
-	}
+        // Break if color is ok
+        if(forbiddenColors[color_i]!=i){
+          color[i] = color_i;
+          new_color = false;
+          break;
+        }
       }
     
       // New color if reached end
       if(new_color){
-	color[i] = forbiddenColors.size();
-	forbiddenColors.push_back(-1);
+        color[i] = forbiddenColors.size();
+        forbiddenColors.push_back(-1);
 
-	// Cutoff if too many colors
-	if(forbiddenColors.size()>cutoff){
-	  return CRSSparsity();
-	}
+        // Cutoff if too many colors
+        if(forbiddenColors.size()>cutoff){
+          return CRSSparsity();
+        }
       }
   
     } // 23 end for
@@ -2991,7 +2991,7 @@ namespace CasADi{
     if(invert_permutation){
       p_inv.resize(p.size());
       for(int k=0; k<p.size(); ++k){
-	p_inv[p[k]] = k;
+        p_inv[p[k]] = k;
       }
     }
     const vector<int>& pp = invert_permutation ? p_inv : p;
@@ -3009,7 +3009,7 @@ namespace CasADi{
     
       // Permute
       for(int k=0; k<row.size(); ++k){
-	new_row[k] = pp[row[k]];
+        new_row[k] = pp[row[k]];
       }
     
     } else {
@@ -3024,7 +3024,7 @@ namespace CasADi{
     
       // Permute
       for(int k=0; k<col_.size(); ++k){
-	new_col[k] = pp[col_[k]];
+        new_col[k] = pp[col_[k]];
       }
     
     } else {
@@ -3057,20 +3057,20 @@ namespace CasADi{
       // Loop over the nonzeros
       for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
      
-	// Get the column
-	int j=col_[el];
+        // Get the column
+        int j=col_[el];
       
-	// Get the element of the possible transpose
-	int el_y = y.rowind_[j] + y_row_count[j]++;
+        // Get the element of the possible transpose
+        int el_y = y.rowind_[j] + y_row_count[j]++;
       
-	// Quick return if element doesn't exist
-	if(el_y>=y.rowind_[j+1]) return false;
+        // Quick return if element doesn't exist
+        if(el_y>=y.rowind_[j+1]) return false;
       
-	// Get the column of the possible transpose
-	int j_y = y.col_[el_y];
+        // Get the column of the possible transpose
+        int j_y = y.col_[el_y];
       
-	// Quick return if mismatch
-	if(j_y != i) return false;
+        // Quick return if mismatch
+        if(j_y != i) return false;
       }
     }
   
@@ -3098,9 +3098,9 @@ namespace CasADi{
     bool first = true;
     for(int i=0; i<nrow_; ++i){
       for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
-	if(!first) mfile << ",";
-	mfile << (i+index_offset);
-	first = false;
+        if(!first) mfile << ",";
+        mfile << (i+index_offset);
+        first = false;
       }
     }
     mfile << "];" << endl;
