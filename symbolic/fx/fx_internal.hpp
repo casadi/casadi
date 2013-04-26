@@ -88,8 +88,7 @@ namespace CasADi{
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
                         const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
-                        const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-                        bool output_given);
+                        const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens);
 
     /** \brief  Evaluate symbolically, SX type, matching sparsity patterns */
     virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 

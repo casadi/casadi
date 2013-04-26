@@ -676,8 +676,7 @@ namespace CasADi{
 
   void MXFunctionInternal::evalMX(const std::vector<MX>& arg1, std::vector<MX>& res1, 
 				  const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
-				  const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-				  bool output_given_remove){
+				  const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){
     log("MXFunctionInternal::evalMX begin");
     assertInit();
     casadi_assert_message(arg1.size()==getNumInputs(),"Wrong number of input arguments");

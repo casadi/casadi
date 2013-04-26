@@ -1360,8 +1360,7 @@ namespace CasADi{
 
   void FXInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
 			  const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
-			  const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-			  bool output_given){
+			  const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){
     casadi_error("FXInternal::evalMX not defined for class " << typeid(*this).name());
   }
 
@@ -1536,7 +1535,7 @@ namespace CasADi{
   
     if(inline_function){
       // Evaluate the function symbolically
-      evalMX(arg,res,fseed,fsens,aseed,asens,output_given);
+      evalMX(arg,res,fseed,fsens,aseed,asens);
     
     } else {
       // Create a call-node

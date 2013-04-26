@@ -108,8 +108,7 @@ namespace CasADi{
     /** \brief Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
                         const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
-                        const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
-                        bool output_given);
+                        const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens);
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     SXFunction expand(const std::vector<SXMatrix>& inputv );

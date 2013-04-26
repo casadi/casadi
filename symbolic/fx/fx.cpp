@@ -257,7 +257,7 @@ namespace CasADi{
   vector<MX> FX::evalMX(const vector<MX>& arg){
     vector<MX> res;
     vector<vector<MX> > dummy;
-    (*this)->evalMX(arg,res,dummy,dummy,dummy,dummy,false);
+    (*this)->evalMX(arg,res,dummy,dummy,dummy,dummy);
     return res;
   }
 
@@ -272,7 +272,7 @@ namespace CasADi{
 		  const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
 		  const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
 		  bool output_given){
-    (*this)->evalMX(arg,res,fseed,fsens,aseed,asens,output_given);
+    (*this)->evalMX(arg,res,fseed,fsens,aseed,asens);
   }
                         
   void FX::eval(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
@@ -286,7 +286,7 @@ namespace CasADi{
 		const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
 		const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
 		bool output_given){
-    (*this)->evalMX(arg,res,fseed,fsens,aseed,asens,output_given);
+    (*this)->evalMX(arg,res,fseed,fsens,aseed,asens);
   }
 
   void FX::spEvaluate(bool fwd){
