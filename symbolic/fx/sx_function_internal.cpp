@@ -859,8 +859,7 @@ namespace CasADi{
 
   void SXFunctionInternal::evalSXsparse(const vector<SXMatrix>& arg1, vector<SXMatrix>& res1, 
 				  const vector<vector<SXMatrix> >& fseed, vector<vector<SXMatrix> >& fsens, 
-				  const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens,
-				  bool output_given_remove){
+				  const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens){
     if(verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
 
     // Check if arguments matches the input expressions, in which case the output is known to be the output expressions

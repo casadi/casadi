@@ -1349,13 +1349,12 @@ namespace CasADi{
     }
   
     // Call the sparse version
-    evalSXsparse(arg,res,fseed,fsens,aseed,asens,output_given);
+    evalSXsparse(arg,res,fseed,fsens,aseed,asens);
   }
 
   void FXInternal::evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
 				const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-				const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-				bool output_given){
+				const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
     casadi_error("FXInternal::evalSXsparse not defined for class " << typeid(*this).name());
   }
 

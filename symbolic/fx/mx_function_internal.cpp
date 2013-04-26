@@ -995,8 +995,7 @@ namespace CasADi{
 
   void MXFunctionInternal::evalSXsparse(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
 				  const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-				  const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-				  bool output_given){
+				  const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens){
     casadi_assert_message(fwdSens.empty(),"Not implemented");
     casadi_assert_message(adjSeed.empty(),"Not implemented");
       
