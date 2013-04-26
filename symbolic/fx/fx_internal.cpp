@@ -1235,7 +1235,7 @@ namespace CasADi{
     casadi_assert_message(getNumInputs() == arg.size(),"Wrong number of inputs. Expecting " << getNumInputs() << ", got " << arg.size());
 
     // Assert number of forward seeds
-    int nfdir = fsens.size();
+    int nfdir = fseed.size();
     for(int dir=0; dir<nfdir; ++dir){
       casadi_assert_message(getNumInputs() == fseed[dir].size(),"Wrong number of forward seeds in direction " << dir << ". Expecting " << getNumInputs() << ", got " << fseed[dir].size());
     }
