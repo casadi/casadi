@@ -180,9 +180,10 @@ class meta {
       if (nrow!=1 && ncol!=1) return false;
       m.resize(p.length());
       
+      Cell c = p.cell_value();
       for(int i=0; i<p.length(); ++i){
         // Get the octave object
-        const octave_value& obj_i = p.cell_value()(i);
+        const octave_value& obj_i = c(i);
         
         if (!(obj_i.is_real_matrix() && obj_i.is_empty())) {
           bool ret = meta< T >::as(obj_i,m[i]);
