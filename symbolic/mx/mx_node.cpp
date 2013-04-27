@@ -498,16 +498,20 @@ namespace CasADi{
       break;
     case OP_NEG:
       if(op==OP_ADD){
-            return getBinary(OP_SUB,y->dep(),scX,scY);
+        return getBinary(OP_SUB,y->dep(),scX,scY);
       } else if(op==OP_SUB){
-            return getBinary(OP_ADD,y->dep(),scX,scY);
+        return getBinary(OP_ADD,y->dep(),scX,scY);
+      } else if(op==OP_MUL){
+        return -getBinary(OP_MUL,y->dep(),scX,scY);
+      } else if(op==OP_DIV){
+        return -getBinary(OP_DIV,y->dep(),scX,scY);
       }
       break;
     case OP_INV:
       if(op==OP_MUL){
-            return getBinary(OP_DIV,y->dep(),scX,scY);
+        return getBinary(OP_DIV,y->dep(),scX,scY);
       } else if(op==OP_DIV){
-            return getBinary(OP_MUL,y->dep(),scX,scY);
+        return getBinary(OP_MUL,y->dep(),scX,scY);
       }
       break;
     default: break; // no rule
