@@ -187,6 +187,7 @@ namespace CasADi{
     case OP_FABS:
       if(op==OP_FABS) return shared_from_this<MX>();
       else if(op==OP_SQ) return dep()->getUnary(OP_SQ);
+      else if(op==OP_COS) return dep()->getUnary(OP_COS);
       break;
     case OP_INV:
       if(op==OP_INV) return dep();
