@@ -167,6 +167,7 @@ namespace CasADi{
       if(op==OP_NEG) return dep();
       else if(op==OP_SQ) return dep()->getUnary(OP_SQ);
       else if(op==OP_FABS) return dep()->getUnary(OP_FABS);
+      else if(op==OP_COS) return dep()->getUnary(OP_COS);
       break;
     case OP_SQRT:
       if(op==OP_SQ) return dep();
