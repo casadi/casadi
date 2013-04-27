@@ -45,7 +45,7 @@ namespace CasADi{
     // Standard unary and binary functions
     OP_ADD,  OP_SUB,  OP_MUL,  OP_DIV,
     OP_NEG,  OP_EXP,  OP_LOG,  OP_POW, OP_CONSTPOW,
-    OP_SQRT,  OP_SQ,
+    OP_SQRT,  OP_SQ,  OP_TWICE,
     OP_SIN,  OP_COS,  OP_TAN,  
     OP_ASIN,  OP_ACOS,  OP_ATAN,  
     OP_LT, OP_LE, OP_EQ, OP_NE, OP_NOT, OP_AND, OP_OR,
@@ -458,6 +458,7 @@ namespace CasADi{
   template<>      struct F0XChecker<OP_CONSTPOW>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SQRT>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SQ>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_TWICE>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SIN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_TAN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_ASIN>{ static const bool check=true;};
@@ -635,6 +636,13 @@ namespace CasADi{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = sq(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=twice(x);}
+  };
+
+  /// Times two
+  template<>
+  struct UnaryOperation<OP_TWICE>{
+    template<typename T> static inline void fcn(const T& x, T& f){ f = 2.*x;}
+    template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 2; }
   };
 
   /// Sine

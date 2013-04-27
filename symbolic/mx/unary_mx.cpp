@@ -206,6 +206,9 @@ namespace CasADi{
       else if(op==OP_MUL) return -y->getBinary(OP_MUL,dep(),scY,scX);
       else if(op==OP_DIV) return -y->getBinary(OP_DIV,dep(),scY,scX);
       break;
+    case OP_TWICE:
+      if(op==OP_SUB && y.isEqual(dep(),maxDepth())) return dep();
+      break;
     default: break; // no rule
     }
     

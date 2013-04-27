@@ -40,7 +40,8 @@ bool operation_checker(unsigned int op){
     case OP_POW:           return F<OP_POW>::check;
     case OP_CONSTPOW:      return F<OP_CONSTPOW>::check;
     case OP_SQRT:          return F<OP_SQRT>::check;
-    case OP_SQ:        return F<OP_SQ>::check;
+    case OP_SQ:            return F<OP_SQ>::check;
+    case OP_TWICE:         return F<OP_TWICE>::check;
     case OP_SIN:           return F<OP_SIN>::check;
     case OP_COS:           return F<OP_COS>::check;
     case OP_TAN:           return F<OP_TAN>::check;
@@ -196,7 +197,8 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
     case OP_POW:       CNAME<OP_POW>::fcn(X,Y,F,N);           break;\
     case OP_CONSTPOW:  CNAME<OP_CONSTPOW>::fcn(X,Y,F,N);      break;\
     case OP_SQRT:      CNAME<OP_SQRT>::fcn(X,Y,F,N);          break;\
-    case OP_SQ:    CNAME<OP_SQ>::fcn(X,Y,F,N);        break;\
+    case OP_SQ:        CNAME<OP_SQ>::fcn(X,Y,F,N);            break;\
+    case OP_TWICE:     CNAME<OP_TWICE>::fcn(X,Y,F,N);         break;\
     case OP_SIN:       CNAME<OP_SIN>::fcn(X,Y,F,N);           break;\
     case OP_COS:       CNAME<OP_COS>::fcn(X,Y,F,N);           break;\
     case OP_TAN:       CNAME<OP_TAN>::fcn(X,Y,F,N);           break;\
@@ -274,7 +276,8 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case OP_POW:       BinaryOperation<OP_POW>::der(X,Y,F,D);        break;\
     case OP_CONSTPOW:  BinaryOperation<OP_CONSTPOW>::der(X,Y,F,D);   break;\
     case OP_SQRT:      BinaryOperation<OP_SQRT>::der(X,Y,F,D);       break;\
-    case OP_SQ:    BinaryOperation<OP_SQ>::der(X,Y,F,D);     break;\
+    case OP_SQ:        BinaryOperation<OP_SQ>::der(X,Y,F,D);         break;\
+    case OP_TWICE:     BinaryOperation<OP_TWICE>::der(X,Y,F,D);      break;\
     case OP_SIN:       BinaryOperation<OP_SIN>::der(X,Y,F,D);        break;\
     case OP_COS:       BinaryOperation<OP_COS>::der(X,Y,F,D);        break;\
     case OP_TAN:       BinaryOperation<OP_TAN>::der(X,Y,F,D);        break;\
@@ -329,7 +332,8 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case OP_POW:       DerBinaryOpertion<OP_POW>::derf(X,Y,F,D);        break;\
     case OP_CONSTPOW:  DerBinaryOpertion<OP_CONSTPOW>::derf(X,Y,F,D);   break;\
     case OP_SQRT:      DerBinaryOpertion<OP_SQRT>::derf(X,Y,F,D);       break;\
-    case OP_SQ:    DerBinaryOpertion<OP_SQ>::derf(X,Y,F,D);     break;\
+    case OP_SQ:        DerBinaryOpertion<OP_SQ>::derf(X,Y,F,D);         break;\
+    case OP_TWICE:     DerBinaryOpertion<OP_TWICE>::derf(X,Y,F,D);      break;\
     case OP_SIN:       DerBinaryOpertion<OP_SIN>::derf(X,Y,F,D);        break;\
     case OP_COS:       DerBinaryOpertion<OP_COS>::derf(X,Y,F,D);        break;\
     case OP_TAN:       DerBinaryOpertion<OP_TAN>::derf(X,Y,F,D);        break;\
@@ -432,6 +436,7 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
     case OP_CONSTPOW:  stream << "pow(";     break;
     case OP_SQRT:      stream << "sqrt(";    break;
     case OP_SQ:        stream << "sq(";      break;
+    case OP_TWICE:     stream << "(2.*";     break;
     case OP_SIN:       stream << "sin(";     break;
     case OP_COS:       stream << "cos(";     break;
     case OP_TAN:       stream << "tan(";     break;

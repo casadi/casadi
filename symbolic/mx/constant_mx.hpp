@@ -231,11 +231,12 @@ namespace CasADi{
       if(v_.value==0) return y;
       break;
     case OP_SUB:
-      if(v_.value==0) return -y;      
+      if(v_.value==0) return -y;
       break;
     case OP_MUL:
       if(v_.value==1) return y;
       if(v_.value==-1) return -y;
+      if(v_.value==2) return y->getUnary(OP_TWICE);
       break;
     case OP_DIV:
       if(v_.value==1) return y->getUnary(OP_INV);
