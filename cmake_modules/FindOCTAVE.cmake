@@ -3,8 +3,10 @@ FIND_PROGRAM(OCTAVE_EXECUTABLE octave
 PATHS "C:/Octave/*/bin"
 )
 
-FILE(GLOB OCTAVE_INCLUDE_PATHS "/usr/include/octave-*/")
-
+FILE(GLOB OCTAVE_INCLUDE_PATHS 
+  "/usr/include/octave-*/"
+  "/opt/local/include/octave-*/"
+)
 
 FIND_PATH(OCTAVE_INCLUDE_DIR octave/oct.h
 HINTS ${OCTAVE_INCLUDE_PATH} ${OCTAVE_INCLUDE_PATHS}
