@@ -97,3 +97,5 @@ NLP_NUM_IN = deprecated["NLP_NUM_IN"]
 NLP_NUM_OUT = deprecated["NLP_NUM_OUT"]
 
 __version__ = CasadiMeta.getVersion()
+if '+' in __version__ and CasadiMeta.getGitDescribe()!='':
+  __version__  = CasadiMeta.getGitDescribe()
