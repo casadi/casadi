@@ -174,7 +174,7 @@ namespace CasADi{
     }
     
     // Check if any nz refer to a different nonzero
-    for(vector<int>::const_iterator j=nz.begin(); j!=nz.end(); ++i){
+    for(vector<int>::const_iterator j=nz.begin(); j!=nz.end(); ++j){
       if(*j>=0 && (*j < begin || *j >= end)){
         
         // Fallback to the base class
