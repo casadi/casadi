@@ -47,8 +47,5 @@ full: doxpublish
 	find -name *-example.html | xargs perl -p -i~ -w -e 's/<span class="comment">#[^\!].*?\/span>\n?//g;'
 	cd ../example_pack && make
 
-publish: 
-	./publish.sh
-	
 clean: 
 	rm -rf XML/ html/ 
