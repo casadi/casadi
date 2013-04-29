@@ -329,6 +329,8 @@ feature_summary(WHAT ALL)
 feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
 
 STRING(REGEX REPLACE "\n" "\\\\n" feature_list ${feature_list})
+STRING(REPLACE "+-" "+" git_describe ${git_describe})
+STRING(REPLACE "-g" "~" git_describe ${git_describe})
 
 # Pass meta information
 CONFIGURE_FILE(
