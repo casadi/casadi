@@ -174,8 +174,8 @@ namespace CasADi{
     }
     
     // Check if any nz refer to a different nonzero
-    for(vector<int>::const_iterator i=nz.begin(); i!=nz.end(); ++i){
-      if(*i>=0 && (*i < begin || *i >= end)){
+    for(vector<int>::const_iterator j=nz.begin(); j!=nz.end(); ++i){
+      if(*j>=0 && (*j < begin || *j >= end)){
         
         // Fallback to the base class
         return MXNode::getGetNonzeros(sp,nz);
@@ -187,8 +187,8 @@ namespace CasADi{
       return dep(i)->getGetNonzeros(sp,nz);
     } else {
       vector<int> nz_new(nz);
-      for(vector<int>::iterator i=nz_new.begin(); i!=nz_new.end(); ++i){
-        if(*i>=0) *i -= begin;
+      for(vector<int>::iterator j=nz_new.begin(); j!=nz_new.end(); ++j){
+        if(*j>=0) *j -= begin;
       }
       return dep(i)->getGetNonzeros(sp,nz_new);
     }
