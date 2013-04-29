@@ -463,6 +463,8 @@ namespace CasADi{
       if(y.isEqual(this,maxDepth())) return MX::zeros(sparsity());
       break;
     case OP_DIV:
+      if(y->isZero()) return MX::nan(sparsity());
+      // fall-through
     case OP_EQ:
     case OP_LE:
       if(y.isEqual(this,maxDepth())) return MX::ones(sparsity());
