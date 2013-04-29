@@ -6,11 +6,13 @@ set(PACKAGE_VERSION "1.6.0+")
 # For systems with git insatlled, find out revsion and description.
 execute_process(COMMAND git rev-parse HEAD
 OUTPUT_VARIABLE git_revision
+OUTPUT_STRIP_TRAILING_WHITESPACE
 ERROR_QUIET
 )
 
 execute_process(COMMAND git describe HEAD
 OUTPUT_VARIABLE git_describe
+OUTPUT_STRIP_TRAILING_WHITESPACE
 ERROR_QUIET
 )
 
@@ -80,11 +82,11 @@ else(CMAKE_BUILD_TYPE)
  set(CMAKE_BUILD_TYPE Release)
  # set(CMAKE_BUILD_TYPE Debug)
 endif(CMAKE_BUILD_TYPE)
+string (TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
 
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-add_definitions(-DCASADIVERSION=${PACKAGE_VERSION})
 
 if(WITH_DL)
   add_definitions(-DWITH_DL)
@@ -324,3 +326,13 @@ add_subdirectory(documentation/examples/ctemplate)
 
 # Print a summary
 feature_summary(WHAT ALL)
+feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
+
+STRING(REGEX REPLACE "\n" "\\\\n" feature_list ${feature_list})
+
+# Pass meta information
+CONFIGURE_FILE(
+  ${CMAKE_SOURCE_DIR}/symbolic/casadi_meta.cpp.cmake
+  ${CMAKE_SOURCE_DIR}/symbolic/casadi_meta.cpp
+  ESCAPE_QUOTES
+)

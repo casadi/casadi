@@ -41,11 +41,16 @@ namespace CasADi {
       static const std::string version;
       static const std::string git_revision;
       static const std::string git_describe;
+      static const std::string feature_list;
+      static const std::string build_type;
+      static const std::string compiler_id;
+      static const std::string compiler;
+      static const std::string compiler_flags;
 #endif //SWIG
     /** \brief Obtain the version number of CasADi
-    *  The format is x.y.z or x.y.z +
+    *  The format is x.y.z or x.y.z+
     *
-    *  The variant without + indicates that the verion is an official release  
+    *  The variant without + indicates that the version is an official release  
     *
     *  The variant with + indicates that the version is more recent than x.y.z,
     *     and might be more recent than x.y.w  with w>z.
@@ -61,6 +66,22 @@ namespace CasADi {
     *      (only available if built from a git repo )
     */
     static std::string getGitDescribe() { return git_describe; }
+    /** \brief Obtain list of features that were compiled into this build
+    */
+    static std::string getFeatureList() { return feature_list; }
+    /** \brief Obtain build type: RELEASE/Debug
+    */
+    static std::string getBuildType() { return build_type; }
+    /** \brief Obtain compiler identification
+    * Provided by http://www.cmake.org/cmake/help/v2.8.10/cmake.html#variable:CMAKE_LANG_COMPILER_ID
+    */
+    static std::string getCompilerId() { return compiler_id; }
+    /** \brief Obtain compiler 
+    */
+    static std::string getCompiler() { return compiler; }
+    /** \brief Obtain compiler flags
+    */
+    static std::string getCompilerFlags() { return compiler_flags; }
   };
 
 }

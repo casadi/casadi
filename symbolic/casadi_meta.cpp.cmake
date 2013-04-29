@@ -19,15 +19,16 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-
+ 
 #include "casadi_meta.hpp"
 
-#define STRINGIFY1(x) #x
-#define STRINGIFY(x) STRINGIFY1(x)
-
 namespace CasADi {
-
-  const std::string CasadiMeta::version = STRINGIFY(CASADIVERSION);
-  const std::string CasadiMeta::git_revision = STRINGIFY(GITREVISION);
-  const std::string CasadiMeta::git_describe = STRINGIFY(GITDESCRIBE);
+  const std::string CasadiMeta::version = "${PACKAGE_VERSION}";
+  const std::string CasadiMeta::git_revision = "${git_revision}";
+  const std::string CasadiMeta::git_describe = "${git_describe}";
+  const std::string CasadiMeta::feature_list = "${feature_list}";
+  const std::string CasadiMeta::build_type = "${CMAKE_BUILD_TYPE}";
+  const std::string CasadiMeta::compiler_id = "${CMAKE_CXX_COMPILER_ID}";
+  const std::string CasadiMeta::compiler = "${CMAKE_CXX_COMPILER}";
+  const std::string CasadiMeta::compiler_flags ="${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPER_CMAKE_BUILD_TYPE}}";
 }
