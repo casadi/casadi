@@ -225,7 +225,18 @@ _object = _copyableObject
   }
 }
 
-
+// See https://github.com/casadi/casadi/issues/701
+// Recent numpys will only catch TypeError or ValueError in printing logic
+%exception __nonzero__ {
+ try {
+    $action
+    // foobar
+  } catch (const std::exception& e) { \
+  SWIG_exception(SWIG_TypeError, e.what()); \
+  } catch (const char* e) { \
+    SWIG_exception(SWIG_TypeError, e); \
+  }
+}
 
 #ifdef SWIGPYTHON
 #ifndef WITH_NUMPY
