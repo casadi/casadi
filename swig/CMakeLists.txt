@@ -248,6 +248,18 @@ add_custom_command(
 ) 
 endif(WITH_SWIG_SPLIT)
 
+# Workaround bug in cmake 2.8.3 and lower. See #704.
+add_custom_command(
+  TARGET _python_modules
+  COMMAND ${CMAKE_COMMAND}
+  ARGS -E touch ${PROJECT_BINARY_DIR}/_python_modules
+)
+add_custom_command(
+  TARGET _octave_modules
+  COMMAND ${CMAKE_COMMAND}
+  ARGS -E touch ${PROJECT_BINARY_DIR}/_octave_modules
+)
+
 # workaround for Visual Studio! The default way is not general enough and should be changed!
 if(MSVC)
   if(WITH_SWIG_SPLIT)
