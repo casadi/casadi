@@ -28,5 +28,6 @@
 namespace CasADi {
 
   const std::string CasadiMeta::version = STRINGIFY(CASADIVERSION);
-
+  const std::string CasadiMeta::git_revision = STRINGIFY(GITREVISION);
+  const std::string CasadiMeta::git_describe = STRINGIFY(GITDESCRIBE);
 }

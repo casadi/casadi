@@ -39,8 +39,28 @@ namespace CasADi {
     public:
 #ifndef SWIG
       static const std::string version;
+      static const std::string git_revision;
+      static const std::string git_describe;
 #endif //SWIG
+    /** \brief Obtain the version number of CasADi
+    *  The format is x.y.z or x.y.z +
+    *
+    *  The variant without + indicates that the verion is an official release  
+    *
+    *  The variant with + indicates that the version is more recent than x.y.z,
+    *     and might be more recent than x.y.w  with w>z.
+    *     
+    *  \see getGitRevision getGitDescribe
+    */
     static std::string getVersion() { return version; }
+    /** \brief Obtain the git hash of this build
+    *      (only available if built from a git repo )
+    */
+    static std::string getGitRevision() { return git_revision; }
+    /** \brief Obtain the git description of this build
+    *      (only available if built from a git repo )
+    */
+    static std::string getGitDescribe() { return git_describe; }
   };
 
 }

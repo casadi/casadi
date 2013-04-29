@@ -3,6 +3,17 @@ project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
 set(PACKAGE_VERSION "1.6.0+")
 
+# For systems with git insatlled, find out revsion and description.
+execute_process(COMMAND git rev-parse HEAD
+OUTPUT_VARIABLE git_revision
+ERROR_QUIET
+)
+
+execute_process(COMMAND git describe HEAD
+OUTPUT_VARIABLE git_describe
+ERROR_QUIET
+)
+
 # find the macports python libs if they exist
 if(APPLE)
   set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
