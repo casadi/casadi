@@ -76,6 +76,7 @@ int main(){
     switch(mode){
     case AUT_INIT: x.lift(x); break;
     case ZERO_INIT: x.lift(0.); break;
+    case UNLIFTED: break;
     }
 
     // Objective function terms
