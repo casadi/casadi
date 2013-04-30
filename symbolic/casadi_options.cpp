@@ -25,5 +25,6 @@
 namespace CasADi {
 
   bool CasadiOptions::catch_errors_python = true;
+  bool CasadiOptions::simplification_on_the_fly = true;
 
 }
