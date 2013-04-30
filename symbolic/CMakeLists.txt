@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.0)
 
+add_subdirectory(runtime)
+
 SET(CASADI_SRCS
   # MISC
   casadi_limits.hpp

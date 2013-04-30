@@ -1,0 +1,1 @@
+const char * ${FILE_BASENAME}_str = "${FILE_CONTENTS}";
