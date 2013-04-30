@@ -111,24 +111,38 @@ namespace CasADi{
       print_x_.resize(0);
     }
 
-    //  if(getOption("hessian_approximation")=="exact")
-    //    hess_mode_ = HESS_EXACT;
-    //  else if(getOption("hessian_approximation")=="limited-memory")
-    //    hess_mode_ = HESS_BFGS;
-   
-    //  if (hess_mode_== HESS_EXACT && H_.isNull()) {
-    //    if (!getOption("generate_hessian")){
-    //      casadi_error("SCPgenInternal::evaluate: you set option 'hessian_approximation' to 'exact', but no hessian was supplied. Try with option \"generate_hessian\".");
-    //   }
-    //  }
-  
-    //  // If the Hessian is generated, we use exact approximation by default
-    //  if (bool(getOption("generate_hessian"))){
-    //    setOption("hessian_approximation", "exact");
-    //  }
+    // Wrap non-MX in MX
+    if((!F_.isNull() && !is_a<MXFunction>(F_)) || (!G_.isNull() && !is_a<MXFunction>(G_))){
+      // Create variables for X and P
+      MX X = msym("X",input(NLP_SOLVER_X0).sparsity());
+      MX P = msym("P",input(NLP_SOLVER_P).sparsity());
+
+      // Wrap F if needed
+      if(!F_.isNull() && !is_a<MXFunction>(F_)){
+        vector<MX> F_in;
+        F_in.push_back(X);
+        if(F_.getNumInputs()==2){
+          F_in.push_back(P);
+        }
+        vector<MX> F_out = F_.call(F_in);
+        F_ = MXFunction(F_in,F_out);
+        F_.init();
+      }
+
+      // Wrap G if needed
+      if(!G_.isNull() && !is_a<MXFunction>(G_)){
+        vector<MX> G_in;
+        G_in.push_back(X);
+        if(G_.getNumInputs()==2){
+          G_in.push_back(P);
+        }
+        vector<MX> G_out = G_.call(G_in);
+        G_ = MXFunction(G_in,G_out);
+        G_.init();
+      }
+    }
 
     // Form a function that calculates noth the objective and constraints
-    casadi_assert(!F_.isNull() || !G_.isNull());
     casadi_assert(F_.isNull() || is_a<MXFunction>(F_));
     casadi_assert(G_.isNull() || is_a<MXFunction>(G_));
     MXFunction F = shared_cast<MXFunction>(F_);

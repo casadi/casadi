@@ -37,11 +37,11 @@ g = SXFunction([v],[z + (1-x)**2 - y])
 nlp_solver = IpoptSolver
 #nlp_solver = WorhpSolver
 #nlp_solver = SQPMethod
-#nlp_solver = LiftedSQP
+#nlp_solver = SCPgen
 
 # Choose a qp solver (for CasADi NLP methods)
-#qp_solver = QPOasesSolver
-#qp_solver_options = {"printLevel" : "none"}
+qp_solver = QPOasesSolver
+qp_solver_options = {"printLevel" : "none"}
 
 #qp_solver = NLPQPSolver
 #qp_solver_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
@@ -54,7 +54,7 @@ solv = nlp_solver(f,g)
 
 # NLP solver options
 solv.setOption("generate_hessian",True)
-if nlp_solver in (SQPMethod, LiftedSQP):
+if nlp_solver in (SQPMethod, SCPgen):
   solv.setOption("qp_solver",qp_solver)
   solv.setOption("qp_solver_options",qp_solver_options)
   solv.setOption("maxiter",5)
