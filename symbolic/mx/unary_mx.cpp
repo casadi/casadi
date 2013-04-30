@@ -203,8 +203,8 @@ namespace CasADi{
     switch(op_){
     case OP_NEG:
       if(op==OP_ADD) return y->getBinary(OP_SUB,dep(),scY,scX);
-      else if(op==OP_MUL) return -dep()->getBinary(OP_MUL,y,scY,scX);
-      else if(op==OP_DIV) return -dep()->getBinary(OP_DIV,y,scY,scX);
+      else if(op==OP_MUL) return -dep()->getBinary(OP_MUL,y,scX,scY);
+      else if(op==OP_DIV) return -dep()->getBinary(OP_DIV,y,scX,scY);
       break;
     case OP_TWICE:
       if(op==OP_SUB && y.isEqual(dep(),maxDepth())) return dep();
