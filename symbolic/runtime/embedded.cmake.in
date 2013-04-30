@@ -1,0 +1,7 @@
+file(READ "@file@" FILE_CONTENTS)
+string(REPLACE "\n" "\\n" FILE_CONTENTS "${FILE_CONTENTS}")
+  
+configure_file(@CMAKE_CURRENT_SOURCE_DIR@/embedded.cpp.in
+  @CMAKE_CURRENT_BINARY_DIR@/${FILE_BASENAME}_embedded.cpp ESCAPE_QUOTES)
+configure_file(@CMAKE_CURRENT_SOURCE_DIR@/embedded.hpp.in
+  @CMAKE_CURRENT_BINARY_DIR@/${FILE_BASENAME}_embedded.hpp ESCAPE_QUOTES)
