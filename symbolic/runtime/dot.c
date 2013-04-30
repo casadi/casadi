@@ -19,6 +19,9 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+ 
+#include "runtime.h"
+
 
 d casadi_dot(int n, const d* x, int inc_x, d* y, int inc_y){
   d r = 0;

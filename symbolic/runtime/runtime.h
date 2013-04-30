@@ -22,28 +22,30 @@
 
 #ifndef CASADI_RUNTIME_H
 #define CASADI_RUNTIME_H
+
+#define d double
 /// COPY: y <-x
-void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y)
+void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y);
 /// SWAP: x <-> y
-void casadi_swap(int n, d* x, int inc_x, d* y, int inc_y)
+void casadi_swap(int n, d* x, int inc_x, d* y, int inc_y);
 /// COPY sparse: y <- x
-void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y)
+void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y);
 /// SCAL: x <- alpha*x
-void casadi_scal(int n, d alpha, d* x, int inc_x)
+void casadi_scal(int n, d alpha, d* x, int inc_x);
 /// AXPY: y <- a*x + y
-void casadi_axpy(int n, d alpha, const d* x, int inc_x, d* y, int inc_y)
+void casadi_axpy(int n, d alpha, const d* x, int inc_x, d* y, int inc_y);
 /// DOT: inner_prod(x,y) -> return
-d casadi_dot(int n, const d* x, int inc_x, d* y, int inc_y)
+d casadi_dot(int n, const d* x, int inc_x, d* y, int inc_y);
 /// ASUM: ||x||_1 -> return
-d casadi_asum(int n, const d* x, int inc_x)
+d casadi_asum(int n, const d* x, int inc_x);
 /// IAMAX: index corresponding to the entry with the largest absolute value 
-int casadi_iamax(int n, const d* x, int inc_x)
+int casadi_iamax(int n, const d* x, int inc_x);
 /// FILL: x <- alpha
-void casadi_fill(int n, d alpha, d* x, int inc_x)
+void casadi_fill(int n, d alpha, d* x, int inc_x);
 /// Sparse matrix-matrix multiplication, the second argument is transposed: z <- z + x*y'
-void casadi_mm_nt_sparse(const d* x, const int* sp_x, const d* trans_y, const int* sp_trans_y, d* z, const int* sp_z)
+void casadi_mm_nt_sparse(const d* x, const int* sp_x, const d* trans_y, const int* sp_trans_y, d* z, const int* sp_z);
 /// NRM2: ||x||_2 -> return
-d casadi_nrm2(int n, const d* x, int inc_x)
+d casadi_nrm2(int n, const d* x, int inc_x);
 /// TRANS: y <- trans(x)
-void casadi_trans(const d* x, const int* sp_x, d* y, const int* sp_y, int *tmp)
+void casadi_trans(const d* x, const int* sp_x, d* y, const int* sp_y, int *tmp);
 #endif // CASADI_RUNTIME_H

@@ -19,6 +19,8 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+ 
+#include "runtime.h"
 
 d casadi_asum(int n, const d* x, int inc_x){
   d r = 0;

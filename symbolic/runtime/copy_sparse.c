@@ -19,6 +19,8 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+ 
+#include "runtime.h"
 
 void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y){
   int nrow_x = sp_x[0];

@@ -20,6 +20,8 @@
  *
  */
 
+#include "runtime.h"
+
 void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y){
   int i;
   for(i=0; i<n; ++i){

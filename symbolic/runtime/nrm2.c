@@ -20,6 +20,8 @@
  *
  */
 
+#include "runtime.h"
+
 d casadi_nrm2(int n, const d* x, int inc_x){
   d r = 0;
   int i;

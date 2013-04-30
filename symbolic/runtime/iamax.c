@@ -20,6 +20,8 @@
  *
  */
 
+#include "runtime.h"
+
 int casadi_iamax(int n, const d* x, int inc_x){
   d t;
   d largest_value = -1.0;

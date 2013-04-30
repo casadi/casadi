@@ -20,6 +20,8 @@
  *
  */
 
+#include "runtime.h"
+
 void casadi_swap(int n, d* x, int inc_x, d* y, int inc_y){
   d t;
   int i;

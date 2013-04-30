@@ -20,6 +20,8 @@
  *
  */
 
+#include "runtime.h"
+
 void casadi_scal(int n, d alpha, d* x, int inc_x){
   int i;
   for(i=0; i<n; ++i){

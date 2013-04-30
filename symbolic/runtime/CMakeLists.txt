@@ -21,11 +21,17 @@ foreach(file ${SRC})
 endforeach()
 
 if(ENABLE_STATIC)
-add_library(casadi_cruntime STATIC ${EMBEDDED_SRC})
+add_library(casadi_cruntime_embedded STATIC ${EMBEDDED_SRC})
+add_library(casadi_cruntime STATIC ${SRC})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(casadi_cruntime SHARED ${EMBEDDED_SRC})
+add_library(casadi_cruntime_embedded SHARED ${EMBEDDED_SRC})
+add_library(casadi_cruntime SHARED "runtime_h" ${SRC})
 endif(ENABLE_SHARED)
+install(TARGETS casadi_cruntime_embedded
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
 install(TARGETS casadi_cruntime
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
@@ -33,6 +39,6 @@ install(TARGETS casadi_cruntime
 
 install(DIRECTORY ./                                                                                                                                                                                          
    DESTINATION include/casadi/symbolic/cruntime                                                                                                                                                                          
-   FILES_MATCHING PATTERN "*.hpp"                                                                                                                                                                             
+   FILES_MATCHING PATTERN "*.h"                                                                                                                                                                             
    PATTERN ".svn" EXCLUDE                                                                                                                                                                                     
 )

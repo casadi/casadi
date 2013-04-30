@@ -19,6 +19,8 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+ 
+#include "runtime.h"
 
 void casadi_axpy(int n, d alpha, const d* x, int inc_x, d* y, int inc_y){
   int i;

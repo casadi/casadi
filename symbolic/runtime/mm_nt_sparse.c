@@ -20,6 +20,8 @@
  *
  */
 
+#include "runtime.h"
+
 void casadi_mm_nt_sparse(const d* x, const int* sp_x, const d* trans_y, const int* sp_trans_y, d* z, const int* sp_z){
 
   int nrow_x = sp_x[0];
