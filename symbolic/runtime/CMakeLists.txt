@@ -8,7 +8,7 @@ foreach(file ${SRC})
   string(REGEX REPLACE ".c$" "_embedded.cpp" FILE_NEWNAME "${FILENAME}")
   configure_file(embedded.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/${FILE_BASENAME}_embedded.cmake @ONLY)
   add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${FILE_BASENAME}_embedded.cpp"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${FILE_BASENAME}_embedded.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${FILE_BASENAME}_embedded.hpp"
     COMMAND ${CMAKE_COMMAND} -D "FILE_BASENAME=${FILE_BASENAME}" -P ${CMAKE_CURRENT_BINARY_DIR}/${FILE_BASENAME}_embedded.cmake 
     DEPENDS
       ${CMAKE_CURRENT_BINARY_DIR}/${FILE_BASENAME}_embedded.cmake
@@ -17,6 +17,7 @@ foreach(file ${SRC})
     VERBATIM
   )
   set(EMBEDDED_SRC ${EMBEDDED_SRC} "${CMAKE_CURRENT_BINARY_DIR}/${FILE_BASENAME}_embedded.cpp")
+  set(EMBEDDED_SRC ${EMBEDDED_SRC} "${CMAKE_CURRENT_BINARY_DIR}/${FILE_BASENAME}_embedded.hpp")
 endforeach()
 
 if(ENABLE_STATIC)

@@ -218,6 +218,8 @@ if(WITH_OPENCL)
 endif(WITH_OPENCL)
 add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to CPUs and GPUs with OpenCL.")
 
+set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} casadi_cruntime)
+
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
 find_package(LibXml2) 

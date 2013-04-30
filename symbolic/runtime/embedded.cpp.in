@@ -1,1 +1,3 @@
-const char * ${FILE_BASENAME}_str = "${FILE_CONTENTS}";
+namespace CasADi {
+  const char * codegen_str_${FILE_BASENAME} = "${FILE_CONTENTS}";
+}
