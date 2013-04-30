@@ -34,7 +34,7 @@ using namespace std;
 namespace CasADi{
 
 LiftedSQPInternal::LiftedSQPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : NLPSolverInternal(F,G,H,J){
-  casadi_warning("The lifted SQP method is under development");
+  casadi_warning("CasADi::LiftedSQP has been replaced by CasADi::SCPgen. This class will be deleted.");
   addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver to be used by the SQP method");
   addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver");
   addOption("maxiter",           OT_INTEGER,    100,           "Maximum number of SQP iterations");
