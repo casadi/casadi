@@ -21,8 +21,11 @@
  */
 
 #include "runtime.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void casadi_mm_nt_sparse(const d* x, const int* sp_x, const d* trans_y, const int* sp_trans_y, d* z, const int* sp_z){
+void casadi_mm_nt_sparse(const real_t* x, const int* sp_x, const real_t* trans_y, const int* sp_trans_y, real_t* z, const int* sp_z){
 
   int nrow_x = sp_x[0];
   int ncol_x = sp_x[1];
@@ -63,3 +66,6 @@ void casadi_mm_nt_sparse(const d* x, const int* sp_x, const d* trans_y, const in
     }
   }
 }
+#ifdef __cplusplus
+} // extern "C"
+#endif

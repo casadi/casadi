@@ -21,11 +21,17 @@
  */
 
 #include "runtime.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void casadi_scal(int n, d alpha, d* x, int inc_x){
+void casadi_scal(int n, real_t alpha, real_t* x, int inc_x){
   int i;
   for(i=0; i<n; ++i){
     *x *= alpha;
     x += inc_x;
   }
 }
+#ifdef __cplusplus
+} // extern "C"
+#endif

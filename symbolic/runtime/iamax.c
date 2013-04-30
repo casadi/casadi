@@ -21,10 +21,13 @@
  */
 
 #include "runtime.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-int casadi_iamax(int n, const d* x, int inc_x){
-  d t;
-  d largest_value = -1.0;
+int casadi_iamax(int n, const real_t* x, int inc_x){
+  real_t t;
+  real_t largest_value = -1.0;
   int largest_index = -1;
   int i;
   for(i=0; i<n; ++i){
@@ -37,3 +40,7 @@ int casadi_iamax(int n, const d* x, int inc_x){
   }
   return largest_index;
 }
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

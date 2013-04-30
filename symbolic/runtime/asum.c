@@ -21,9 +21,12 @@
  */
  
 #include "runtime.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-d casadi_asum(int n, const d* x, int inc_x){
-  d r = 0;
+real_t casadi_asum(int n, const real_t* x, int inc_x){
+  real_t r = 0;
   int i;
   for(i=0; i<n; ++i){
     r += fabs(*x);
@@ -31,3 +34,7 @@ d casadi_asum(int n, const d* x, int inc_x){
   }
   return r;
 }
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

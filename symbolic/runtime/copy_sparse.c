@@ -21,8 +21,11 @@
  */
  
 #include "runtime.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y){
+void casadi_copy_sparse(const real_t* x, const int* sp_x, real_t* y, const int* sp_y){
   int nrow_x = sp_x[0];
   int ncol_x = sp_x[1];
   const int* rowind_x = sp_x+2;
@@ -58,3 +61,6 @@ void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y){
     }
   }
 }
+#ifdef __cplusplus
+} // extern "C"
+#endif

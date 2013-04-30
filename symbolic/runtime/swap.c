@@ -21,9 +21,12 @@
  */
 
 #include "runtime.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void casadi_swap(int n, d* x, int inc_x, d* y, int inc_y){
-  d t;
+void casadi_swap(int n, real_t* x, int inc_x, real_t* y, int inc_y){
+  real_t t;
   int i;
   for(i=0; i<n; ++i){
     t = *x;
@@ -33,3 +36,7 @@ void casadi_swap(int n, d* x, int inc_x, d* y, int inc_y){
     y += inc_y;
   }
 }
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

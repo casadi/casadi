@@ -21,8 +21,11 @@
  */
 
 #include "runtime.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y){
+void casadi_copy(int n, const real_t* x, int inc_x, real_t* y, int inc_y){
   int i;
   for(i=0; i<n; ++i){
     *y = *x;
@@ -30,3 +33,7 @@ void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y){
     y += inc_y;
   }
 }
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

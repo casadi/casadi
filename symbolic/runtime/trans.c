@@ -21,8 +21,11 @@
  */
  
 #include "runtime.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void casadi_trans(const d* x, const int* sp_x, d* y, const int* sp_y, int *tmp){
+void casadi_trans(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, int *tmp){
   int nrow_x = sp_x[0];
   int nnz_x = sp_x[2 + nrow_x];
   const int* col_x = sp_x + 2 + nrow_x+1;
@@ -34,3 +37,6 @@ void casadi_trans(const d* x, const int* sp_x, d* y, const int* sp_y, int *tmp){
     y[tmp[col_x[k]]++] = x[k];
   }
 }
+#ifdef __cplusplus
+} // extern "C"
+#endif
