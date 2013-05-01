@@ -20,13 +20,3 @@
  *
  */
 
-#ifndef CASADI_EMBEDDED_HPP
-#define CASADI_EMBEDDED_HPP
-
-#include "../code_generator.hpp"
-
-namespace CasADi{
-
-} // namespace CasADi
-#endif // CASADI_EMBEDDED_HPP
-
