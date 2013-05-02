@@ -80,6 +80,17 @@ namespace CasADi {
 
 // Implementations
 
+
+// Note: due to restrictions of cmake IO processing, make sure that
+//      1)   semicolons (;) are never immediately preceded by whitespace
+//      2)   line continuation slashes (\) are always immediately preceded by whitespace
+#define CASADI_GEMM_NT(M,N,K,A,LDA,B,LDB,C,LDC) \
+  for(i=0, rr=C; i<M; ++i) \
+    for(j=0; j<N; ++j, ++rr) \
+      for(k=0, ss=A+i*LDA, tt=B+j*LDB; k<K; ++k) \
+        *rr += *ss++**tt++;
+
+
 namespace CasADi {
 
   template<typename real_t>
