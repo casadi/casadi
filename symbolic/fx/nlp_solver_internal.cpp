@@ -33,13 +33,14 @@ OUTPUTSCHEME(NLPOutput)
 using namespace std;
 namespace CasADi{
 
-NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J) : F_(F), G_(G), H_(H), J_(J){
+  NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : F_(F), G_(G), H_(H), J_(J), GF_(GF){
   // set default options
   setOption("name",            "unnamed NLP solver"); // name of the function
   addOption("expand_f",         OT_BOOLEAN,     false,         "Expand the objective function in terms of scalar operations, i.e. MX->SX");
   addOption("expand_g",         OT_BOOLEAN,     false,         "Expand the constraint function in terms of scalar operations, i.e. MX->SX");
   addOption("generate_hessian", OT_BOOLEAN,     false,         "Generate an exact Hessian of the Lagrangian if not supplied");
   addOption("generate_jacobian", OT_BOOLEAN,     true,         "Generate an exact Jacobian of the constraints if not supplied");
+  addOption("generate_gradient", OT_BOOLEAN,     false,         "Generate a function for calculating the gradient of the objective");
   addOption("iteration_callback", OT_FX,     FX(),            "A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.");
   addOption("iteration_callback_step", OT_INTEGER,     1,       "Only call the callback function every few iterations.");
   addOption("iteration_callback_ignore_errors", OT_BOOLEAN,     false,      "If set to true, errors thrown by iteration_callback will be ignored.");
@@ -173,6 +174,23 @@ void NLPSolverInternal::init(){
     }
   }
   
+  // Gradient of the objective function
+  bool generate_gradient = getOption("generate_gradient");
+  if(generate_gradient && GF_.isNull()){
+    GF_ = F_.gradient();
+  }
+  if(!GF_.isNull()) {
+    GF_.init(false);
+    if (parametric_) {
+      casadi_assert_message(GF_.getNumInputs()==2, "Wrong number of input arguments to GF for parametric NLP. Must be 2, but got " << GF_.getNumInputs());
+    } else {
+      casadi_assert_message(GF_.getNumInputs()==1, "Wrong number of input arguments to GF for non-parametric NLP. Must be 1, but got " << GF_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+    }
+    casadi_assert_message(GF_.getNumOutputs()>=1, "Wrong number of output arguments to GF");
+    casadi_assert_message(GF_.input().numel()==nx_,"Inconsistent dimensions");
+    casadi_assert_message((GF_.output().size1()==nx_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==nx_),"Inconsistent dimensions");
+  }
+
   // Find out if we are to expand the constraint function in terms of scalar operations
   bool generate_hessian = getOption("generate_hessian");
   if(generate_hessian && H_.isNull()){

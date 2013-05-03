@@ -176,7 +176,10 @@ void DirectMultipleShootingInternal::init(){
   // Allocate an NLP solver
   nlp_solver_ = nlp_solver_creator(F_,G_,FX(),FX());
   
-  // Pass options
+  // Symbolically calculate the gradient
+  //nlp_solver_.setOption("generate_gradient",true);
+
+  // Pass user options
   if(hasSetOption("nlp_solver_options")){
     const Dictionary& nlp_solver_options = getOption("nlp_solver_options");
     nlp_solver_.setOption(nlp_solver_options);

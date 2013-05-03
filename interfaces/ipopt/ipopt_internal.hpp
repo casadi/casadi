@@ -69,9 +69,6 @@ protected:
   /// All IPOPT options
   std::map<std::string,opt_type> ops_;
 
-  /// Gradient of the objective function
-  FX GF_; 
-
   // Ipopt callback functions
   bool eval_f(int n, const double* x, bool new_x, double& obj_value);
   bool eval_grad_f(int n, const double* x, bool new_x, double* grad_f);

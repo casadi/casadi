@@ -39,7 +39,7 @@ using namespace std;
 
 namespace CasADi{
 
-IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J), GF_(GF){
+IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J,GF){
   addOption("pass_nonlinear_variables", OT_BOOLEAN, true);
   addOption("print_time",               OT_BOOLEAN, true, "print information about execution time");
   
@@ -158,19 +158,6 @@ void IpoptInternal::init(){
   }
   #endif // WITH_SIPOPT
   
-  // Gradient of the objective function, remove?
-  if(!GF_.isNull()) GF_.init();
-  if(!GF_.isNull()) {
-    if (parametric_) {
-      casadi_assert_message(GF_.getNumInputs()==2, "Wrong number of input arguments to GF for parametric NLP. Must be 2, but got " << GF_.getNumInputs());
-    } else {
-      casadi_assert_message(GF_.getNumInputs()==1, "Wrong number of input arguments to GF for non-parametric NLP. Must be 1, but got " << GF_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
-    }
-    casadi_assert_message(GF_.getNumOutputs()>=1, "Wrong number of output arguments to GF");
-    casadi_assert_message(GF_.input().numel()==nx_,"Inconsistent dimensions");
-    casadi_assert_message((GF_.output().size1()==nx_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==nx_),"Inconsistent dimensions");
-  }
-
   // Start an IPOPT application
   Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = new Ipopt::SmartPtr<Ipopt::IpoptApplication>();
   app_ = static_cast<void*>(app);
