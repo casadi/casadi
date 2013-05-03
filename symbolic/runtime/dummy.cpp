@@ -20,21 +20,3 @@
  *
  */
 
-#include "runtime.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-real_t casadi_nrm2(int n, const real_t* x, int inc_x){
-  real_t r = 0;
-  int i;
-  for(i=0; i<n; ++i){
-    r += *x**x;
-    x += inc_x;
-  }
-  return sqrt(r);
-}
-
-#ifdef __cplusplus
-} // extern "C"
-#endif

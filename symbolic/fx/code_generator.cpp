@@ -25,6 +25,7 @@
 #include "fx_internal.hpp"
 #include "../matrix/sparsity_tools.hpp"
 #include <iomanip>
+#include "symbolic/runtime/runtime_embedded.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -229,95 +230,21 @@ namespace CasADi{
 
     // Add the appropriate function
     switch(f){
-    case AUX_COPY: auxCopy(); break;
-    case AUX_SWAP: auxSwap(); break;
-    case AUX_SCAL: auxScal(); break;
-    case AUX_AXPY: auxAxpy(); break;
-    case AUX_DOT: auxDot(); break;
-    case AUX_ASUM: auxAsum(); break;
-    case AUX_IAMAX: auxIamax(); break;
-    case AUX_NRM2: auxNrm2(); break;
-    case AUX_FILL: auxFill(); break;
-    case AUX_MM_NT_SPARSE: auxMmNtSparse(); break;
+    case AUX_COPY: auxiliaries_ << codegen_str_copy << endl; break;
+    case AUX_SWAP: auxiliaries_ << codegen_str_swap << endl; break;
+    case AUX_SCAL: auxiliaries_ << codegen_str_scal << endl; break;
+    case AUX_AXPY: auxiliaries_ << codegen_str_axpy << endl; break;
+    case AUX_DOT: auxiliaries_ << codegen_str_dot << endl; break;
+    case AUX_ASUM: auxiliaries_ << codegen_str_asum << endl; break;
+    case AUX_IAMAX: auxiliaries_ << codegen_str_iamax << endl; break;
+    case AUX_NRM2: auxiliaries_ << codegen_str_nrm2 << endl; break;
+    case AUX_FILL: auxiliaries_ << codegen_str_fill << endl; break;
+    case AUX_MM_NT_SPARSE: auxiliaries_ << codegen_str_mm_nt_sparse << endl; break;
     case AUX_SQ: auxSq(); break;
     case AUX_SIGN: auxSign(); break;
-    case AUX_COPY_SPARSE: auxCopySparse(); break;
-    case AUX_TRANS: auxTrans(); break;
+    case AUX_COPY_SPARSE: auxiliaries_ << codegen_str_copy_sparse << endl; break;
+    case AUX_TRANS: auxiliaries_ << codegen_str_trans << endl; break;
     }
-  }
-
-  void CodeGenerator::auxCopy(){
-    stringstream& s = auxiliaries_;
-
-    s << "void casadi_copy(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
-    s << "  int i;" << endl;
-    s << "  for(i=0; i<n; ++i){" << endl;
-    s << "    *y = *x;" << endl;
-    s << "    x += inc_x;" << endl;
-    s << "    y += inc_y;" << endl;
-    s << "  }" << endl;
-    s << "}" << endl;
-    s << endl;
-  }
-
-  void CodeGenerator::auxSwap(){
-    stringstream& s = auxiliaries_;
-
-    s << "void casadi_swap(int n, d* x, int inc_x, d* y, int inc_y){" << endl;
-    s << "  d t;" << endl;
-    s << "  int i;" << endl;
-    s << "  for(i=0; i<n; ++i){" << endl;
-    s << "    t = *x;" << endl;
-    s << "    *x = *y;" << endl;
-    s << "    *y = t;" << endl;
-    s << "    x += inc_x;" << endl;
-    s << "    y += inc_y;" << endl;
-    s << "  }" << endl;
-    s << "}" << endl;
-    s << endl;
-  }
-
-  void CodeGenerator::auxCopySparse(){
-    addAuxiliary(AUX_COPY);
-    stringstream& s = auxiliaries_;
-
-    s << "void casadi_copy_sparse(const d* x, const int* sp_x, d* y, const int* sp_y){" << endl;
-    s << "  int nrow_x = sp_x[0];" << endl;
-    s << "  int ncol_x = sp_x[1];" << endl;
-    s << "  const int* rowind_x = sp_x+2;" << endl;
-    s << "  const int* col_x = sp_x + 2 + nrow_x+1;" << endl;
-    s << "  int nnz_x = rowind_x[nrow_x];" << endl;
-    s << "  int nrow_y = sp_y[0];" << endl;
-    s << "  int ncol_y = sp_y[1];" << endl;
-    s << "  const int* rowind_y = sp_y+2;" << endl;
-    s << "  const int* col_y = sp_y + 2 + nrow_y+1;" << endl;
-    s << "  int nnz_y = rowind_y[nrow_y];" << endl;
-    s << "  if(sp_x==sp_y){" << endl;
-    s << "    casadi_copy(nnz_x,x,1,y,1);" << endl;
-    s << "  } else {" << endl;
-    s << "    int i;" << endl;
-    s << "    for(i=0; i<nrow_x; ++i){" << endl;
-    s << "      int el_x = rowind_x[i];" << endl;
-    s << "      int el_x_end = rowind_x[i+1];" << endl;
-    s << "      int j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
-    s << "      int el_y;" << endl;
-    s << "      for(el_y=rowind_y[i]; el_y!=rowind_y[i+1]; ++el_y){" << endl;
-    s << "        int j=col_y[el_y];" << endl;
-    s << "        while(j_x<j){" << endl;
-    s << "          el_x++;" << endl;
-    s << "          j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
-    s << "        }" << endl;
-    s << "        if(j_x==j){" << endl;
-    s << "          y[el_y] = x[el_x++];" << endl;
-    s << "          j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;" << endl;
-    s << "        } else {" << endl;
-    s << "          y[el_y] = 0;" << endl;
-    s << "        }" << endl;
-    s << "      }" << endl;
-    s << "    }" << endl;
-    s << "  }" << endl;
-    s << "}" << endl;
-    s << endl;
   }
 
   void CodeGenerator::auxSq(){
@@ -326,178 +253,6 @@ namespace CasADi{
 
   void CodeGenerator::auxSign(){
     auxiliaries_ << "inline d sign(d x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl << endl;
-  }
-
-  void CodeGenerator::auxScal(){
-    stringstream& s = auxiliaries_;
-    
-    s << "void casadi_scal(int n, d alpha, d* x, int inc_x){" << endl;
-    s << "  int i;" << endl;
-    s << "  for(i=0; i<n; ++i){" << endl;
-    s << "    *x *= alpha;" << endl;
-    s << "    x += inc_x;" << endl;
-    s << "  }" << endl;
-    s << "}" << endl;
-    s << endl;
-  }
-
-  void CodeGenerator::auxAxpy(){
-    stringstream& s = auxiliaries_;
-
-    s << "void casadi_axpy(int n, d alpha, const d* x, int inc_x, d* y, int inc_y){" << endl;
-    s << "  int i;" << endl;
-    s << "  for(i=0; i<n; ++i){" << endl;
-    s << "    *y += alpha**x;" << endl;
-    s << "    x += inc_x;" << endl;
-    s << "    y += inc_y;" << endl;
-    s << "  }" << endl;
-    s << "}" << endl;
-    s << endl;
-  }
-
-  void CodeGenerator::auxDot(){
-    stringstream& s = auxiliaries_;
-
-    s << "d casadi_dot(int n, const d* x, int inc_x, d* y, int inc_y){" << endl;
-    s << "  d r = 0;" << endl;
-    s << "  int i;" << endl;
-    s << "  for(i=0; i<n; ++i){" << endl;
-    s << "    r += *x**y;" << endl;
-    s << "    x += inc_x;" << endl;
-    s << "    y += inc_y;" << endl;
-    s << "  }" << endl;
-    s << "  return r;" << endl;
-    s << "}" << endl;
-    s << endl;
-  }
-
-  void CodeGenerator::auxAsum(){
-    stringstream& s = auxiliaries_;
-
-    s << "d casadi_asum(int n, const d* x, int inc_x){" << endl;
-    s << "  d r = 0;" << endl;
-    s << "  int i;" << endl;
-    s << "  for(i=0; i<n; ++i){" << endl;
-    s << "    r += fabs(*x);" << endl;
-    s << "    x += inc_x;" << endl;
-    s << "  }" << endl;
-    s << "  return r;" << endl;
-    s << "}" << endl;
-    s << endl;
-  }
-
-  void CodeGenerator::auxIamax(){
-    stringstream& s = auxiliaries_;
-    
-    s << "int casadi_iamax(int n, const d* x, int inc_x){" << endl;
-    s << "  d t;" << endl;
-    s << "  d largest_value = -1.0;" << endl;
-    s << "  int largest_index = -1;" << endl;
-    s << "  int i;" << endl;
-    s << "  for(i=0; i<n; ++i){" << endl;
-    s << "    t = fabs(*x);" << endl;
-    s << "    x += inc_x;" << endl;
-    s << "    if(t>largest_value){" << endl;
-    s << "      largest_value = t;" << endl;
-    s << "      largest_index = i;" << endl;
-    s << "    }" << endl;
-    s << "  }" << endl;
-    s << "  return largest_index;" << endl;
-    s << "}" << endl;
-    s << endl;
-  }
-
-  void CodeGenerator::auxFill(){
-    stringstream& s = auxiliaries_;
-
-    s << "void casadi_fill(int n, d alpha, d* x, int inc_x){" << endl;
-    s << "  int i;" << endl;
-    s << "  for(i=0; i<n; ++i){" << endl;
-    s << "    *x = alpha;" << endl;
-    s << "    x += inc_x;" << endl;
-    s << "  }" << endl;
-    s << "}" << endl;
-    s << endl;
-  }
-
-  void CodeGenerator::auxMmNtSparse(){
-    stringstream& s = auxiliaries_;
-
-    s << "void casadi_mm_nt_sparse(const d* x, const int* sp_x, const d* trans_y, const int* sp_trans_y, d* z, const int* sp_z){" << std::endl;
-    
-    s << "  int nrow_x = sp_x[0];" << endl;
-    s << "  int ncol_x = sp_x[1];" << endl;
-    s << "  const int* rowind_x = sp_x+2;" << endl;
-    s << "  const int* col_x = sp_x + 2 + nrow_x+1;" << endl;
-    //  s << "  int nnz_x = rowind_x[nrow_x];" << endl;
-    
-    s << "  int ncol_y = sp_trans_y[0];" << endl;
-    s << "  int nrow_y = sp_trans_y[1];" << endl;
-    s << "  const int* colind_y = sp_trans_y+2;" << endl;
-    s << "  const int* row_y = sp_trans_y + 2 + ncol_y+1;" << endl;
-    //  s << "  int nnz_y = colind_y[ncol_y];" << endl;
-    
-    s << "  int nrow_z = sp_z[0];" << endl;
-    s << "  int ncol_z = sp_z[1];" << endl;
-    s << "  const int* rowind_z = sp_z+2;" << endl;
-    s << "  const int* col_z = sp_z + 2 + nrow_z+1;" << endl;
-    //  s << "  int nnz_z = rowind_z[nrow_z];" << endl;
-    
-    s << "  int i;" << endl;
-    s << "  for(i=0; i<nrow_z; ++i){" << endl;
-    s << "    int el;" << endl;
-    s << "    for(el=rowind_z[i]; el<rowind_z[i+1]; ++el){" << endl;
-    s << "      int j = col_z[el];" << endl;
-    s << "      int el1 = rowind_x[i];" << endl;
-    s << "      int el2 = colind_y[j];" << endl;
-    s << "      while(el1 < rowind_x[i+1] && el2 < colind_y[j+1]){ " << endl;
-    s << "        int j1 = col_x[el1];" << endl;
-    s << "        int i2 = row_y[el2];" << endl;
-    s << "        if(j1==i2){" << endl;
-    s << "          z[el] += x[el1++] * trans_y[el2++];" << endl;
-    s << "        } else if(j1<i2) {" << endl;
-    s << "          el1++;" << endl;
-    s << "        } else {" << endl;
-    s << "          el2++;" << endl;
-    s << "        }" << endl;
-    s << "      }" << endl;
-    s << "    }" << endl;
-    s << "  }" << endl;
-    s << "}" << endl;
-    s << endl;
-  }    
-
-
-  void CodeGenerator::auxNrm2(){
-    stringstream& s = auxiliaries_;
-
-    s << "d casadi_nrm2(int n, const d* x, int inc_x){" << endl;
-    s << "  d r = 0;" << endl;
-    s << "  int i;" << endl;
-    s << "  for(i=0; i<n; ++i){" << endl;
-    s << "    r += *x**x;" << endl;
-    s << "    x += inc_x;" << endl;
-    s << "  }" << endl;
-    s << "  return sqrt(r);" << endl;
-    s << "}" << endl;
-    s << endl;
-  }
-
-  void CodeGenerator::auxTrans(){
-    stringstream& s = auxiliaries_;
-    s << "void casadi_trans(const d* x, const int* sp_x, d* y, const int* sp_y, int *tmp){" << endl;
-    s << "  int nrow_x = sp_x[0];" << endl;
-    s << "  int nnz_x = sp_x[2 + nrow_x];" << endl;
-    s << "  const int* col_x = sp_x + 2 + nrow_x+1;" << endl;
-    s << "  int nrow_y = sp_y[0];" << endl;
-    s << "  const int* rowind_y = sp_y+2;" << endl;
-    s << "  int k;" << endl;
-    s << "  for(k=0; k<nrow_y; ++k) tmp[k] = rowind_y[k];" << endl;   
-    s << "  for(k=0; k<nnz_x; ++k){" << endl;
-    s << "    y[tmp[col_x[k]]++] = x[k];" << endl;
-    s << "  }" << endl;
-    s << "}" << endl;
-    s << endl;
   }
 
   void CodeGenerator::printConstant(std::ostream& s, double v){
