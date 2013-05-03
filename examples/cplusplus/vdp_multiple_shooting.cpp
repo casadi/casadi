@@ -22,21 +22,25 @@ int main(){
   double inf = numeric_limits<double>::infinity();
 
   // Declare variables (use simple, efficient DAG)
-  SX t("t"); //time
-  SX x("x"), y("y"), u("u"), L("cost");
+  SXMatrix x = ssym("x");
+  SXMatrix y = ssym("y");
+  SXMatrix u = ssym("u");
+  SXMatrix L = ssym("cost");
   
   // All states
-  vector<SX> xx(3);  xx[0] = x;  xx[1] = y;  xx[2] = L;
+  SXMatrix states = SXMatrix::zeros(3);
+  states(0) = x;
+  states(1) = y;
+  states(2) = L;
 
   //ODE right hand side
-  vector<SX> f(3);
-  f[0] = (1 - y*y)*x - y + u;
-  f[1] = x;
-  f[2] = x*x + y*y + u*u;
+  SXMatrix f = SXMatrix::zeros(3);
+  f(0) = (1 - y*y)*x - y + u;
+  f(1) = x;
+  f(2) = x*x + y*y + u*u;
   
   // DAE residual
-  vector<SXMatrix> res_in = daeIn<SXMatrix>("x",xx, "p",u, "t",t);
-  SXFunction res(res_in,daeOut<SXMatrix>("ode",f));
+  SXFunction res(daeIn("x",states, "p",u),daeOut("ode",f));
   
   Dictionary integrator_options;
   integrator_options["abstol"]=1e-8; //abs. tolerance
