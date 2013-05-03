@@ -25,7 +25,7 @@
 #include "fx_internal.hpp"
 #include "../matrix/sparsity_tools.hpp"
 #include <iomanip>
-#include "runtime/runtime_embedded.hpp"
+#include "symbolic/runtime/runtime_embedded.hpp"
 
 using namespace std;
 namespace CasADi{
