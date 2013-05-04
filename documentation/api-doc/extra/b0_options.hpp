@@ -9,6 +9,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
@@ -47,6 +48,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
@@ -85,6 +87,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
@@ -121,6 +124,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
@@ -511,6 +515,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
@@ -549,6 +554,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
@@ -774,6 +780,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
@@ -970,6 +977,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
@@ -1468,6 +1476,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"BFGS"</td><td>BFGS|exact</td><td>CasADi::LiftedSQPInternal</td></tr>
@@ -1517,6 +1526,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"BFGS"</td><td>BFGS|exact</td><td>CasADi::LiftedSQPInternal</td></tr>
@@ -1569,6 +1579,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"limited-memory"</td><td>limited-memory|exact</td><td>CasADi::SCPgenInternal</td></tr>
@@ -1627,6 +1638,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"limited-memory"</td><td>limited-memory|exact</td><td>CasADi::SCPgenInternal</td></tr>
@@ -1866,6 +1878,7 @@
 <tr><td>gamma_tilde</td><td>OT_REAL</td><td>4.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>False</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>False</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>False</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>False</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>True</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>exact</td><td>Indicates what Hessian information is to be used. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -2184,6 +2197,7 @@
 <tr><td>gamma_tilde</td><td>OT_REAL</td><td>4.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>False</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>False</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>False</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>False</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>True</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>exact</td><td>Indicates what Hessian information is to be used. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -3055,6 +3069,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
@@ -3119,6 +3134,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
@@ -3305,6 +3321,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"limited-memory"</td><td>limited-memory|exact</td><td>CasADi::SQPInternal</td></tr>
@@ -3354,6 +3371,7 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>false</td><td>Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>false</td><td>Generate a function for calculating the gradient of the objective</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Generate an exact Jacobian of the constraints if not supplied</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>"limited-memory"</td><td>limited-memory|exact</td><td>CasADi::SQPInternal</td></tr>
