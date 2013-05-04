@@ -40,8 +40,8 @@ nlp_solver = IpoptSolver
 #nlp_solver = SCPgen
 
 # Choose a qp solver (for CasADi NLP methods)
-qp_solver = QPOasesSolver
-qp_solver_options = {"printLevel" : "none"}
+#qp_solver = QPOasesSolver
+#qp_solver_options = {"printLevel" : "none"}
 
 #qp_solver = NLPQPSolver
 #qp_solver_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
