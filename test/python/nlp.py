@@ -231,7 +231,8 @@ class NLPtests(casadiTestCase):
     print h.output()
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g,h)
+      solver = Solver(f,g)
+      solver.setOption("hes_lag",h)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":1,"derivative_test":"second-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -255,7 +256,8 @@ class NLPtests(casadiTestCase):
       
     self.message(":warmstart")
     oldsolver=solver
-    solver = IpoptSolver(f,g,h)
+    solver = IpoptSolver(f,g)
+    solver.setOption("hes_lag",h)
     solver.setOption("tol",1e-10)
     solver.setOption("max_iter",100)
     solver.setOption("hessian_approximation", "exact")
@@ -336,7 +338,8 @@ class NLPtests(casadiTestCase):
 
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g,h)
+      solver = Solver(f,g)
+      solver.setOption("hes_lag",h)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":1,"derivative_test":"second-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -415,7 +418,8 @@ class NLPtests(casadiTestCase):
     h=SXFunction([vertcat([x,y]),[],sigma],[sigma*hessian(obj,vertcat([x,y]))])
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,FX(),h)
+      solver = Solver(f,FX())
+      solver.setOption("hes_lag",h)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -500,7 +504,8 @@ class NLPtests(casadiTestCase):
     h=SXFunction([vertcat([x,y]),[],sigma,p],[sigma*hessian(obj,vertcat([x,y]))])
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,FX(),h)
+      solver = Solver(f,FX())
+      solver.setOption("hes_lag",h)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)

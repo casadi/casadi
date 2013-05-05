@@ -32,7 +32,7 @@ namespace CasADi{
 class LiftedSQPInternal : public NLPSolverInternal{
 
 public:
-  explicit LiftedSQPInternal(const FX& F, const FX& G, const FX& H, const FX& J);
+  explicit LiftedSQPInternal(const FX& F, const FX& G);
   virtual ~LiftedSQPInternal();
   virtual LiftedSQPInternal* clone() const{ return new LiftedSQPInternal(*this);}
   

@@ -29,8 +29,8 @@ namespace CasADi{
 KnitroSolver::KnitroSolver(){
 }
   
-KnitroSolver::KnitroSolver(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF){
-  assignNode(new KnitroInternal(F,G,H,J,GF));
+KnitroSolver::KnitroSolver(const FX& F, const FX& G){
+  assignNode(new KnitroInternal(F,G));
 }
 
 KnitroInternal* KnitroSolver::operator->(){

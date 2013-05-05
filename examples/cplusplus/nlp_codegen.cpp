@@ -130,7 +130,10 @@ int main(){
   ExternalFunction hess_lfcn_e("./hess_lfcn.so");
 
   // Create an NLP solver passing derivative information
-  IpoptSolver solver(ffcn_e, gfcn_e, hess_lfcn_e, jac_gfcn_e, grad_ffcn_e);
+  IpoptSolver solver(ffcn_e, gfcn_e);
+  solver.setOption("hes_lag",hess_lfcn_e);
+  solver.setOption("jac_g",jac_gfcn_e);
+  solver.setOption("grad_f",grad_ffcn_e);
   solver.init();
 
   // Set constraint bounds

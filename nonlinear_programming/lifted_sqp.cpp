@@ -29,8 +29,8 @@ namespace CasADi{
 LiftedSQP::LiftedSQP(){
 }
   
-LiftedSQP::LiftedSQP(const FX& F, const FX& G, const FX& H, const FX& J){
-  assignNode(new LiftedSQPInternal(F,G,H,J));
+LiftedSQP::LiftedSQP(const FX& F, const FX& G){
+  assignNode(new LiftedSQPInternal(F,G));
 }
 
 LiftedSQPInternal* LiftedSQP::operator->(){

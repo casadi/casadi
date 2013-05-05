@@ -35,7 +35,7 @@ class IpoptInternal : public NLPSolverInternal{
 friend class IpoptUserClass;
 
 public:
-  explicit IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
+  explicit IpoptInternal(const FX& F, const FX& G);
   virtual ~IpoptInternal();
   virtual IpoptInternal* clone() const{ return new IpoptInternal(*this);}
   

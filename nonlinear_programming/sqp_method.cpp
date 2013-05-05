@@ -29,8 +29,8 @@ namespace CasADi{
 SQPMethod::SQPMethod(){
 }
   
-SQPMethod::SQPMethod(const FX& F, const FX& G, const FX& H, const FX& J){
-  assignNode(new SQPInternal(F,G,H,J));
+SQPMethod::SQPMethod(const FX& F, const FX& G){
+  assignNode(new SQPInternal(F,G));
 }
 
 SQPInternal* SQPMethod::operator->(){

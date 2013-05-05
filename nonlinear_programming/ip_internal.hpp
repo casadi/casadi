@@ -32,7 +32,7 @@ namespace CasADi{
 class IPInternal : public NLPSolverInternal{
 
 public:
-  explicit IPInternal(const FX& F, const FX& G, const FX& H, const FX& J);
+  explicit IPInternal(const FX& F, const FX& G);
   virtual ~IPInternal();
   virtual IPInternal* clone() const{ return new IPInternal(*this);}
   
