@@ -53,7 +53,7 @@ class IpoptSolver : public NLPSolver {
 
     /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
     explicit IpoptSolver(const FX& F,         /**< F objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
-                         const FX& G = FX()  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
+                         const FX& G  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
                         );
 
     FX getGF()        const;

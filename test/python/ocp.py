@@ -113,7 +113,7 @@ class OCPtests(casadiTestCase):
     f.init()
     fc = MXFunction([var],[-f.call([var,parc])[0]])
     fc.init()
-    solver = IpoptSolver(fc)
+    solver = IpoptSolver(fc,FX())
     solver.setOption("tol",1e-12)
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",10)

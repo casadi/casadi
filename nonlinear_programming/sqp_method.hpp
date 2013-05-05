@@ -63,7 +63,7 @@ class SQPMethod : public NLPSolver {
 
     /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
     explicit SQPMethod(const FX& F,         /**< F objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
-                       const FX& G = FX()  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
+                       const FX& G  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
                        );
 
     /// Access functions of the node
