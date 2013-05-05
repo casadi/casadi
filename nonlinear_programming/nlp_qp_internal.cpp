@@ -123,7 +123,10 @@ void NLPQPInternal::init(){
   
   // Create an nlpsolver instance
   NLPSolverCreator nlpsolver_creator = getOption("nlp_solver");
-  nlpsolver_ = nlpsolver_creator(QP_f,QP_g,QP_h,QP_j); // What to do with QP_gf?
+  nlpsolver_ = nlpsolver_creator(QP_f,QP_g,1); // What to do with QP_gf?
+  nlpsolver_.setOption("hes_lag",QP_h);
+  nlpsolver_.setOption("jac_g",QP_j);
+
   nlpsolver_.setQPOptions();
   if(hasSetOption("nlp_solver_options")){
     nlpsolver_.setOption(getOption("nlp_solver_options"));

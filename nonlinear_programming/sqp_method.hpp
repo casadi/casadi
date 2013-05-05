@@ -79,7 +79,7 @@ class SQPMethod : public NLPSolver {
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static NLPSolver creator(const FX& F, const FX& G, const FX& H, const FX& J){ return SQPMethod(F,G,H,J);}
+    static NLPSolver creator(const FX& F, const FX& G, int dummy){ return SQPMethod(F,G);}
     #ifdef SWIG
     %nocallback;
     #endif

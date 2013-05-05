@@ -57,7 +57,7 @@ class LiftedSQP : public NLPSolver {
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static NLPSolver creator(const FX& F, const FX& G, const FX& H, const FX& J){ return LiftedSQP(F,G,H,J);}
+    static NLPSolver creator(const FX& F, const FX& G, int dummy){ return LiftedSQP(F,G);}
     #ifdef SWIG
     %nocallback;
     #endif

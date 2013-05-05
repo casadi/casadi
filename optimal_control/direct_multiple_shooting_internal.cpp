@@ -173,7 +173,7 @@ void DirectMultipleShootingInternal::init(){
   NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");
   
   // Allocate an NLP solver
-  nlp_solver_ = nlp_solver_creator(F_,G_,FX(),FX());
+  nlp_solver_ = nlp_solver_creator(F_,G_,1);
   
   // Symbolically calculate the gradient
   //nlp_solver_.setOption("generate_gradient",true);
