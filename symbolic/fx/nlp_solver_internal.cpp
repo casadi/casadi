@@ -27,8 +27,8 @@
 #include "../mx/mx_tools.hpp"
 #include "../fx/fx_tools.hpp"
 
-INPUTSCHEME(NLPInput)
-OUTPUTSCHEME(NLPOutput)
+INPUTSCHEME(NLPSolverInput)
+OUTPUTSCHEME(NLPSolverOutput)
 
 using namespace std;
 namespace CasADi{
@@ -62,8 +62,8 @@ namespace CasADi{
     nx_ = 0;
     ng_ = 0;
   
-    inputScheme_ = SCHEME_NLPInput;
-    outputScheme_ = SCHEME_NLPOutput;
+    inputScheme_ = SCHEME_NLPSolverInput;
+    outputScheme_ = SCHEME_NLPSolverOutput;
 
   }
 
