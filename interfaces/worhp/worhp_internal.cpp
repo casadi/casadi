@@ -32,7 +32,7 @@ using namespace std;
 
 namespace CasADi{
 
-WorhpInternal::WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J), GF_(GF){
+WorhpInternal::WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(FX(),F,G,H,J,GF){
 
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);

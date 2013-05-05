@@ -51,11 +51,7 @@ public:
   static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ, const int nnzH, const double * const x,
                       const double * const lambda,double * const obj, double * const c, double * const objGrad,
                       double * const jac, double * const hessian, double * const hessVector, void *userParams);
-  
-                      
-  /// Gradient of the objective function
-  FX GF_; 
-                      
+                        
   // KNITRO context pointer
   KTR_context_ptr kc_handle_;
   

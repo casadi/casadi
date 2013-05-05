@@ -68,8 +68,6 @@ void *userclass;
 std::map<std::string,opt_type> ops_;
 
   // The NLP functions
-  /// Gradient of the objective function
-  FX GF_; 
 
   /// objective function
   FX Fmod_;

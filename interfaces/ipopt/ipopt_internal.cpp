@@ -39,7 +39,7 @@ using namespace std;
 
 namespace CasADi{
 
-IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J,GF){
+IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(FX(),F,G,H,J,GF){
   addOption("pass_nonlinear_variables", OT_BOOLEAN, true);
   addOption("print_time",               OT_BOOLEAN, true, "print information about execution time");
   

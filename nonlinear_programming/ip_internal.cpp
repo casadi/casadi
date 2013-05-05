@@ -33,7 +33,7 @@
 using namespace std;
 namespace CasADi{
 
-IPInternal::IPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : NLPSolverInternal(F,G,H,J){
+IPInternal::IPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : NLPSolverInternal(FX(),F,G,H,J,FX()){
   casadi_warning("The IP method is experimental and incomplete. Can be used as the basis of an IP solver in CasADi.");
   addOption("linear_solver",         OT_LINEARSOLVER,   GenericType(), "The linear solver to be used by the IP method");
   addOption("linear_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");
