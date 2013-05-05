@@ -84,7 +84,7 @@ class Misctests(casadiTestCase):
 
     try:
         print "IpoptSolver"
-        g = IpoptSolver(f)
+        g = IpoptSolver(f,FX())
     except:
         return
     
@@ -225,7 +225,7 @@ class Misctests(casadiTestCase):
     x=SX("x")
     f = SXFunction([x],[x**2])
     f.init()
-    i = IpoptSolver(f)
+    i = IpoptSolver(f,FX())
     
     opts = i.getOptionNames()
     self.assertTrue(isinstance(opts,tuple))
