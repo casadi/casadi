@@ -55,8 +55,10 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_RDAEOutput: return "RDAEOutput";
     case SCHEME_IntegratorInput: return "IntegratorInput";
     case SCHEME_IntegratorOutput: return "IntegratorOutput";
-    case SCHEME_NLPInput: return "NLPInput";
-    case SCHEME_NLPOutput: return "NLPOutput";
+    case SCHEME_NLInput: return "NLInput";
+    case SCHEME_NLOutput: return "NLOutput";
+    case SCHEME_NLPSolverInput: return "NLPSolverInput";
+    case SCHEME_NLPSolverOutput: return "NLPSolverOutput";
     case SCHEME_MayerInput: return "MayerInput";
     case SCHEME_OCPInput: return "OCPInput";
     case SCHEME_OCPOutput: return "OCPOutput";
@@ -80,8 +82,10 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_RDAEOutput: return "ode, alg, quad";
     case SCHEME_IntegratorInput: return "x0, p, rx0, rp";
     case SCHEME_IntegratorOutput: return "xf, qf, rxf, rqf";
-    case SCHEME_NLPInput: return "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0";
-    case SCHEME_NLPOutput: return "x, f, g, lam_x, lam_g, lam_p";
+    case SCHEME_NLInput: return "x, p";
+    case SCHEME_NLOutput: return "f, g";
+    case SCHEME_NLPSolverInput: return "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0";
+    case SCHEME_NLPSolverOutput: return "x, f, g, lam_x, lam_g, lam_p";
     case SCHEME_MayerInput: return "x, p";
     case SCHEME_OCPInput: return "lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg";
     case SCHEME_OCPOutput: return "x_opt, u_opt, p_opt, cost";
@@ -191,7 +195,17 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==3) return "rqf";
       casadi_error("getSchemeEntryName: supplied number is out of range. IntegratorOutput has only 4 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf')");
       break;
-    case SCHEME_NLPInput: 
+    case SCHEME_NLInput: 
+      if(i==0) return "x";
+      if(i==1) return "p";
+      casadi_error("getSchemeEntryName: supplied number is out of range. NLInput has only 2 entries: ('NLInput', 'x, p')");
+      break;
+    case SCHEME_NLOutput: 
+      if(i==0) return "f";
+      if(i==1) return "g";
+      casadi_error("getSchemeEntryName: supplied number is out of range. NLOutput has only 2 entries: ('NLOutput', 'f, g')");
+      break;
+    case SCHEME_NLPSolverInput: 
       if(i==0) return "x0";
       if(i==1) return "p";
       if(i==2) return "lbx";
@@ -200,16 +214,16 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==5) return "ubg";
       if(i==6) return "lam_x0";
       if(i==7) return "lam_g0";
-      casadi_error("getSchemeEntryName: supplied number is out of range. NLPInput has only 8 entries: ('NLPInput', 'x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0')");
+      casadi_error("getSchemeEntryName: supplied number is out of range. NLPSolverInput has only 8 entries: ('NLPSolverInput', 'x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0')");
       break;
-    case SCHEME_NLPOutput: 
+    case SCHEME_NLPSolverOutput: 
       if(i==0) return "x";
       if(i==1) return "f";
       if(i==2) return "g";
       if(i==3) return "lam_x";
       if(i==4) return "lam_g";
       if(i==5) return "lam_p";
-      casadi_error("getSchemeEntryName: supplied number is out of range. NLPOutput has only 6 entries: ('NLPOutput', 'x, f, g, lam_x, lam_g, lam_p')");
+      casadi_error("getSchemeEntryName: supplied number is out of range. NLPSolverOutput has only 6 entries: ('NLPSolverOutput', 'x, f, g, lam_x, lam_g, lam_p')");
       break;
     case SCHEME_MayerInput: 
       if(i==0) return "x";
@@ -374,7 +388,17 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==3) return "Backward quadrature state at the initial time";
       casadi_error("getSchemeEntryDoc: supplied number is out of range. IntegratorOutput has only 4 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf')");
       break;
-    case SCHEME_NLPInput: 
+    case SCHEME_NLInput: 
+      if(i==0) return "Decision variable";
+      if(i==1) return "Fixed parameter";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLInput has only 2 entries: ('NLInput', 'x, p')");
+      break;
+    case SCHEME_NLOutput: 
+      if(i==0) return "Objective function";
+      if(i==1) return "Constraint function";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLOutput has only 2 entries: ('NLOutput', 'f, g')");
+      break;
+    case SCHEME_NLPSolverInput: 
       if(i==0) return "Decision variables, initial guess (nx x 1) ";
       if(i==1) return "Value of fixed parameters (np x 1)";
       if(i==2) return "Decision variables lower bound (nx x 1), default -inf";
@@ -383,16 +407,16 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==5) return "Constraints upper bound (ng x 1), default +inf";
       if(i==6) return "Lagrange multipliers for bounds on X, initial guess (nx x 1)";
       if(i==7) return "Lagrange multipliers for bounds on G, initial guess (ng x 1)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLPInput has only 8 entries: ('NLPInput', 'x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0')");
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLPSolverInput has only 8 entries: ('NLPSolverInput', 'x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0')");
       break;
-    case SCHEME_NLPOutput: 
+    case SCHEME_NLPSolverOutput: 
       if(i==0) return "Decision variables at the optimal solution (nx x 1)";
       if(i==1) return "Cost function value at the optimal solution (1 x 1)";
       if(i==2) return "Constraints function at the optimal solution (ng x 1)";
       if(i==3) return "Lagrange multipliers for bounds on X at the solution (nx x 1)";
       if(i==4) return "Lagrange multipliers for bounds on G at the solution (ng x 1)";
       if(i==5) return "Lagrange multipliers for bounds on P at the solution (np x 1)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLPOutput has only 6 entries: ('NLPOutput', 'x, f, g, lam_x, lam_g, lam_p')");
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLPSolverOutput has only 6 entries: ('NLPSolverOutput', 'x, f, g, lam_x, lam_g, lam_p')");
       break;
     case SCHEME_MayerInput: 
       if(i==0) return "States at the end of integration (nx x 1)";
@@ -557,7 +581,17 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==3) return "INTEGRATOR_RQF";
       casadi_error("getSchemeEntryEnumName: supplied number is out of range. IntegratorOutput has only 4 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf')");
       break;
-    case SCHEME_NLPInput: 
+    case SCHEME_NLInput: 
+      if(i==0) return "NL_X";
+      if(i==1) return "NL_P";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLInput has only 2 entries: ('NLInput', 'x, p')");
+      break;
+    case SCHEME_NLOutput: 
+      if(i==0) return "NL_F";
+      if(i==1) return "NL_G";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLOutput has only 2 entries: ('NLOutput', 'f, g')");
+      break;
+    case SCHEME_NLPSolverInput: 
       if(i==0) return "NLP_SOLVER_X0";
       if(i==1) return "NLP_SOLVER_P";
       if(i==2) return "NLP_SOLVER_LBX";
@@ -566,16 +600,16 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==5) return "NLP_SOLVER_UBG";
       if(i==6) return "NLP_SOLVER_LAM_X0";
       if(i==7) return "NLP_SOLVER_LAM_G0";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLPInput has only 8 entries: ('NLPInput', 'x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0')");
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLPSolverInput has only 8 entries: ('NLPSolverInput', 'x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0')");
       break;
-    case SCHEME_NLPOutput: 
+    case SCHEME_NLPSolverOutput: 
       if(i==0) return "NLP_SOLVER_X";
       if(i==1) return "NLP_SOLVER_F";
       if(i==2) return "NLP_SOLVER_G";
       if(i==3) return "NLP_SOLVER_LAM_X";
       if(i==4) return "NLP_SOLVER_LAM_G";
       if(i==5) return "NLP_SOLVER_LAM_P";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLPOutput has only 6 entries: ('NLPOutput', 'x, f, g, lam_x, lam_g, lam_p')");
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLPSolverOutput has only 6 entries: ('NLPSolverOutput', 'x, f, g, lam_x, lam_g, lam_p')");
       break;
     case SCHEME_MayerInput: 
       if(i==0) return "MAYER_X";
@@ -729,7 +763,15 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="rxf") return 2;
       if(name=="rqf") return 3;
       break;
-    case SCHEME_NLPInput: 
+    case SCHEME_NLInput: 
+      if(name=="x") return 0;
+      if(name=="p") return 1;
+      break;
+    case SCHEME_NLOutput: 
+      if(name=="f") return 0;
+      if(name=="g") return 1;
+      break;
+    case SCHEME_NLPSolverInput: 
       if(name=="x0") return 0;
       if(name=="p") return 1;
       if(name=="lbx") return 2;
@@ -739,7 +781,7 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="lam_x0") return 6;
       if(name=="lam_g0") return 7;
       break;
-    case SCHEME_NLPOutput: 
+    case SCHEME_NLPSolverOutput: 
       if(name=="x") return 0;
       if(name=="f") return 1;
       if(name=="g") return 2;
