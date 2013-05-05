@@ -27,24 +27,28 @@
 
 namespace CasADi{
   
-class SCPgenInternal;
+  class SCPgenInternal;
   
-/**
-  \brief A structure-exploiting sequential quadratic programming (to be come sequential convex programming)
-  method for nonlinear programming.
+  /**
+     \brief A structure-exploiting sequential quadratic programming (to be come sequential convex programming)
+     method for nonlinear programming.
   
-  \author Joel Andersson, Attila Kozma and Joris Gillis
-  \date 2013
-*/
-class SCPgen : public NLPSolver {
+     \author Joel Andersson, Attila Kozma and Joris Gillis
+     \date 2013
+  */
+  class SCPgen : public NLPSolver {
   public:
     /// Default constructor
     SCPgen();
 
     /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
-    explicit SCPgen(const FX& F,         /**< F objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
-                       const FX& G  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
-                       );
+    explicit SCPgen(const FX& F, /**< objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
+                    const FX& G  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
+                    );
+
+    /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
+    explicit SCPgen(const FX& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+                    );
 
     /// Access functions of the node
     SCPgenInternal* operator->();
@@ -54,18 +58,18 @@ class SCPgen : public NLPSolver {
     virtual bool checkNode() const;
 
     /// Static creator function 
-    #ifdef SWIG
+#ifdef SWIG
     %callback("%s_cb");
-    #endif
+#endif
     static NLPSolver creator(const FX& F, const FX& G, int dummy){ return SCPgen(F,G);}
-    #ifdef SWIG
+#ifdef SWIG
     %nocallback;
-    #endif
+#endif
 
     /// Access the QPSolver used internally
     const QPSolver getQPSolver() const;
     
-};
+  };
 
 } // namespace CasADi
 

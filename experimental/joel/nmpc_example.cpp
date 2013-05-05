@@ -104,12 +104,10 @@ int main(){
   }
 
   // Form the NLP
-  MXFunction ffcn(u,f);
-  MXFunction gfcn(u,g);
-  SCPgen solver(ffcn,gfcn);
+  MXFunction nlp(nlIn("x",u),nlOut("f",f,"g",g));
+  SCPgen solver(nlp);
 
   //solver.setOption("verbose",true);
-  solver.setOption("gauss_newton",gauss_newton);
   solver.setOption("regularize",false);
   solver.setOption("codegen",false);
   solver.setOption("maxiter_ls",1);
