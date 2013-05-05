@@ -333,20 +333,13 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   if(!gauss_newton){
     nlp_f = inner_prod(nlp_f,nlp_f)/2;
   }
- 
-  // Objective function
-  MXFunction ffcn(P,nlp_f);
 
-  // Constraints
-  MXFunction gfcn(P,nlp_g);
-
+  MXFunction nlp(nlIn("x",P),nlOut("f",nlp_f,"g",nlp_g));
   cout << "Generated single-shooting NLP" << endl;
   
   // NLP Solver
-  nlp_solver_ = SCPgen(ffcn,gfcn);
-
+  nlp_solver_ = SCPgen(nlp);
   nlp_solver_.setOption("verbose",true);
-  nlp_solver_.setOption("gauss_newton",gauss_newton);
   nlp_solver_.setOption("regularize",regularize);
   nlp_solver_.setOption("codegen",codegen);
   nlp_solver_.setOption("reg_threshold",reg_threshold);

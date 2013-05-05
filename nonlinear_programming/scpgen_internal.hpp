@@ -33,7 +33,7 @@ namespace CasADi{
 class SCPgenInternal : public NLPSolverInternal{
 
 public:
-  explicit SCPgenInternal(const FX& F, const FX& G);
+  explicit SCPgenInternal(const FX& nlp);
   virtual ~SCPgenInternal();
   virtual SCPgenInternal* clone() const{ return new SCPgenInternal(*this);}
   

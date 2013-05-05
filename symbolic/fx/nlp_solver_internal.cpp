@@ -80,23 +80,24 @@ namespace CasADi{
 
     if(!legacy_syntax_){
       // Deprecation warnings
-      casadi_assert_warning(hasSetOption("expand_f"),"Option \"expand_f\" ignored (deprecated). Use \"expand\" instead.");
-      casadi_assert_warning(hasSetOption("expand_g"),"Option \"expand_g\" ignored (deprecated). Use \"expand\" instead.");
-      casadi_assert_warning(hasSetOption("generate_hessian"),"Option \"generate_hessian\" ignored (deprecated).");
-      casadi_assert_warning(hasSetOption("generate_jacobian"),"Option \"generate_jacobian\" ignored (deprecated).");
-      casadi_assert_warning(hasSetOption("generate_gradient"),"Option \"generate_gradient\" ignored (deprecated).");
-      casadi_assert_warning(hasSetOption("parametric"),"Option \"parametric\" ignored (deprecated).");
-      casadi_assert_warning(hasSetOption("gauss_newton"),"Option \"gauss_newton\" ignored (deprecated).");
+      casadi_assert_warning(!hasSetOption("expand_f"),"Option \"expand_f\" ignored (deprecated). Use \"expand\" instead.");
+      casadi_assert_warning(!hasSetOption("expand_g"),"Option \"expand_g\" ignored (deprecated). Use \"expand\" instead.");
+      casadi_assert_warning(!hasSetOption("generate_hessian"),"Option \"generate_hessian\" ignored (deprecated).");
+      casadi_assert_warning(!hasSetOption("generate_jacobian"),"Option \"generate_jacobian\" ignored (deprecated).");
+      casadi_assert_warning(!hasSetOption("generate_gradient"),"Option \"generate_gradient\" ignored (deprecated).");
+      casadi_assert_warning(!hasSetOption("parametric"),"Option \"parametric\" ignored (deprecated).");
+      casadi_assert_warning(!hasSetOption("gauss_newton"),"Option \"gauss_newton\" ignored (deprecated).");
       
       // Initialize the NLP
       nlp_.init(false);
-      casadi_assert(nlp_.getNumInputs()==NL_NUM_IN);
-      casadi_assert(nlp_.getNumOutputs()==NL_NUM_OUT);
+      casadi_assert_message(nlp_.getNumInputs()==NL_NUM_IN, "The NLP function must have exactly two input");
+      casadi_assert_message(nlp_.getNumOutputs()==NL_NUM_OUT, "The NLP function must have exactly two outputs");
       
       // Get dimensions
       nx_ = nlp_.input(NL_X).size();
       np_ = nlp_.input(NL_P).size();
       ng_ = nlp_.output(NL_G).size();
+      gauss_newton_ = nlp_.output(NL_F).size()>1;
 
       // Find out if we are to expand the NLP in terms of scalar operations
       bool expand = getOption("expand");
