@@ -144,7 +144,9 @@ namespace CasADi{
   
     /// Access the jacobian of the constraint function J
     FX getJ() const;
-    
+
+    /// Join F and G in old signature style to a common NLP function
+    static FX joinFG(FX F, FX G);
   };
 
 } // namespace CasADi
