@@ -620,9 +620,83 @@ namespace CasADi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
+def nlIn(*dummy,**kwargs):
+  """
+  Helper function for 'NLInput'
+
+  Two use cases:
+     a) arg = nlIn(x=my_x, p=my_p) 
+          all arguments optional
+     b) x, p = nlIn(arg,"x", "p") 
+          all arguments after the first optional
+  Input arguments of an NLP function
+  
+  Keyword arguments:
+    x -- Decision variable [NL_X]
+    p -- Fixed parameter [NL_P]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLInput,n)] for n in dummy[1:]]
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
+  p = []
+  if 'p' in kwargs:
+    p = kwargs['p']
+  for k in kwargs.keys():
+    if not(k in ['x','p']):
+      raise Exception("Keyword error in nlIn: '%s' is not recognized. Available keywords are: x, p" % k )
+  return IOSchemeVector([x,p], SCHEME_NLInput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(nlIn) nlIn<SXMatrix>;
+%template(nlIn) nlIn<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def nlOut(*dummy,**kwargs):
+  """
+  Helper function for 'NLOutput'
+
+  Two use cases:
+     a) arg = nlOut(f=my_f, g=my_g) 
+          all arguments optional
+     b) f, g = nlOut(arg,"f", "g") 
+          all arguments after the first optional
+  Output arguments of an NLP function
+  
+  Keyword arguments:
+    f -- Objective function [NL_F]
+    g -- Constraint function [NL_G]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLOutput,n)] for n in dummy[1:]]
+  f = []
+  if 'f' in kwargs:
+    f = kwargs['f']
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  for k in kwargs.keys():
+    if not(k in ['f','g']):
+      raise Exception("Keyword error in nlOut: '%s' is not recognized. Available keywords are: f, g" % k )
+  return IOSchemeVector([f,g], SCHEME_NLOutput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(nlOut) nlOut<SXMatrix>;
+%template(nlOut) nlOut<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
 def nlpsolverIn(*dummy,**kwargs):
   """
-  Helper function for 'NLPInput'
+  Helper function for 'NLPSolverInput'
 
   Two use cases:
      a) arg = nlpsolverIn(x0=my_x0, p=my_p, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_x0=my_lam_x0, lam_g0=my_lam_g0) 
@@ -642,7 +716,7 @@ def nlpsolverIn(*dummy,**kwargs):
     lam_g0 -- Lagrange multipliers for bounds on G, initial guess (ng x 1) [NLP_SOLVER_LAM_G0]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpsolverIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPInput,n)] for n in dummy[1:]]
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPSolverInput,n)] for n in dummy[1:]]
   x0 = []
   if 'x0' in kwargs:
     x0 = kwargs['x0']
@@ -670,7 +744,7 @@ def nlpsolverIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x0','p','lbx','ubx','lbg','ubg','lam_x0','lam_g0']):
       raise Exception("Keyword error in nlpsolverIn: '%s' is not recognized. Available keywords are: x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0" % k )
-  return IOSchemeVector([x0,p,lbx,ubx,lbg,ubg,lam_x0,lam_g0], SCHEME_NLPInput)
+  return IOSchemeVector([x0,p,lbx,ubx,lbg,ubg,lam_x0,lam_g0], SCHEME_NLPSolverInput)
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -683,7 +757,7 @@ namespace CasADi {
 %pythoncode %{
 def nlpsolverOut(*dummy,**kwargs):
   """
-  Helper function for 'NLPOutput'
+  Helper function for 'NLPSolverOutput'
 
   Two use cases:
      a) arg = nlpsolverOut(x=my_x, f=my_f, g=my_g, lam_x=my_lam_x, lam_g=my_lam_g, lam_p=my_lam_p) 
@@ -701,7 +775,7 @@ def nlpsolverOut(*dummy,**kwargs):
     lam_p -- Lagrange multipliers for bounds on P at the solution (np x 1) [NLP_SOLVER_LAM_P]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpsolverOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPOutput,n)] for n in dummy[1:]]
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPSolverOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -723,7 +797,7 @@ def nlpsolverOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','f','g','lam_x','lam_g','lam_p']):
       raise Exception("Keyword error in nlpsolverOut: '%s' is not recognized. Available keywords are: x, f, g, lam_x, lam_g, lam_p" % k )
-  return IOSchemeVector([x,f,g,lam_x,lam_g,lam_p], SCHEME_NLPOutput)
+  return IOSchemeVector([x,f,g,lam_x,lam_g,lam_p], SCHEME_NLPSolverOutput)
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
