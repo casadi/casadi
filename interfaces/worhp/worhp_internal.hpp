@@ -40,7 +40,7 @@ namespace CasADi{
 class WorhpInternal : public NLPSolverInternal{
 
 public:
-  explicit WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
+  explicit WorhpInternal(const FX& F, const FX& G);
   virtual ~WorhpInternal();
   virtual WorhpInternal* clone() const{ return new WorhpInternal(*this);}
   

@@ -30,8 +30,8 @@ namespace CasADi{
 WorhpSolver::WorhpSolver(){
 }
   
-WorhpSolver::WorhpSolver(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF){
-  assignNode(new WorhpInternal(F,G,H,J,GF));
+WorhpSolver::WorhpSolver(const FX& F, const FX& G){
+  assignNode(new WorhpInternal(F,G));
 }
 
 WorhpInternal* WorhpSolver::operator->(){

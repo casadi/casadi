@@ -38,7 +38,7 @@ class NLPSolverInternal : public FXInternal{
 
 public:
   /// Constructor
-  NLPSolverInternal(const FX& nlp, const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
+  NLPSolverInternal(const FX& nlp, const FX& F, const FX& G);
 
   /// Destructor
   virtual ~NLPSolverInternal() = 0;

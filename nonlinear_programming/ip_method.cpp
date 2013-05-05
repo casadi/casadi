@@ -29,8 +29,8 @@ namespace CasADi{
 IPMethod::IPMethod(){
 }
   
-IPMethod::IPMethod(const FX& F, const FX& G, const FX& H, const FX& J){
-  assignNode(new IPInternal(F,G,H,J));
+IPMethod::IPMethod(const FX& F, const FX& G){
+  assignNode(new IPInternal(F,G));
 }
 
 IPInternal* IPMethod::operator->(){

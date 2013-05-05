@@ -39,10 +39,7 @@ class KnitroSolver : public NLPSolver {
     
     /// Constuct an NLP with non-linear constraints and provided hessian approximation
     explicit KnitroSolver(const FX& F,         /**< F objective function */
-                         const FX& G = FX(),  /**< constraint function (default only bound constraints) */
-                         const FX& H = FX(),  /**< Hessian of the lagrangian function (default: limited memory) */
-                         const FX& J = FX(),  /**< Jacobian of G (default -> differentiate) */
-                         const FX& GF = FX()  /**< Gradient of the objective function (default: adjoint mode AD on F) */
+                         const FX& G = FX()  /**< constraint function (default only bound constraints) */
                         );
 
     /// Access functions of the node

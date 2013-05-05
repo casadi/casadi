@@ -33,8 +33,7 @@ OUTPUTSCHEME(NLPSolverOutput)
 using namespace std;
 namespace CasADi{
 
-  NLPSolverInternal::NLPSolverInternal(const FX& nlp, const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) :
-    nlp_(nlp), F_(F), G_(G), H_(H), J_(J), GF_(GF){
+  NLPSolverInternal::NLPSolverInternal(const FX& nlp, const FX& F, const FX& G) : nlp_(nlp), F_(F), G_(G){
 
     // set default options
     setOption("name",            "unnamed NLP solver"); // name of the function

@@ -29,8 +29,8 @@ namespace CasADi{
 SCPgen::SCPgen(){
 }
   
-SCPgen::SCPgen(const FX& F, const FX& G, const FX& H, const FX& J){
-  assignNode(new SCPgenInternal(F,G,H,J));
+SCPgen::SCPgen(const FX& F, const FX& G){
+  assignNode(new SCPgenInternal(F,G));
 }
 
 SCPgenInternal* SCPgen::operator->(){
