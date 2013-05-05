@@ -35,24 +35,29 @@ namespace CasADi{
 
   NLPSolverInternal::NLPSolverInternal(const FX& nlp, const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) :
     nlp_(nlp), F_(F), G_(G), H_(H), J_(J), GF_(GF){
-    
-    // Use legacy syntax?
-    legacy_syntax_ = nlp_.isNull();
 
     // set default options
     setOption("name",            "unnamed NLP solver"); // name of the function
-    addOption("expand_f",         OT_BOOLEAN,     false,         "Expand the objective function in terms of scalar operations, i.e. MX->SX");
-    addOption("expand_g",         OT_BOOLEAN,     false,         "Expand the constraint function in terms of scalar operations, i.e. MX->SX");
-    addOption("generate_hessian", OT_BOOLEAN,     false,         "Generate an exact Hessian of the Lagrangian if not supplied");
-    addOption("generate_jacobian", OT_BOOLEAN,     true,         "Generate an exact Jacobian of the constraints if not supplied");
-    addOption("generate_gradient", OT_BOOLEAN,     false,         "Generate a function for calculating the gradient of the objective");
+    
+    // Use legacy syntax? Cf. #566
+    legacy_syntax_ = nlp_.isNull();
+
+    // Legacy options, will go away. See #566.
+    addOption("expand_f",          OT_BOOLEAN,  GenericType(),  "Expand the objective function in terms of scalar operations, i.e. MX->SX");
+    addOption("expand_g",          OT_BOOLEAN,  GenericType(),  "Expand the constraint function in terms of scalar operations, i.e. MX->SX");
+    addOption("generate_hessian",  OT_BOOLEAN,  GenericType(),  "Generate an exact Hessian of the Lagrangian if not supplied");
+    addOption("generate_jacobian", OT_BOOLEAN,  GenericType(),  "Generate an exact Jacobian of the constraints if not supplied");
+    addOption("generate_gradient", OT_BOOLEAN,  GenericType(),  "Generate a function for calculating the gradient of the objective");
+    addOption("parametric",        OT_BOOLEAN,  GenericType(),  "Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.");
+    addOption("gauss_newton",      OT_BOOLEAN,  GenericType(),  "Use Gauss Newton Hessian approximation");      
+
+    // Other options
+    addOption("expand",            OT_BOOLEAN,  false,           "Expand the NLP function in terms of scalar operations, i.e. MX->SX");
     addOption("iteration_callback", OT_FX,     FX(),            "A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.");
     addOption("iteration_callback_step", OT_INTEGER,     1,       "Only call the callback function every few iterations.");
     addOption("iteration_callback_ignore_errors", OT_BOOLEAN,     false,      "If set to true, errors thrown by iteration_callback will be ignored.");
     addOption("ignore_check_vec", OT_BOOLEAN,     false,            "If set to true, the input shape of F will not be checked.");
     addOption("warn_initial_bounds", OT_BOOLEAN,     false,       "Warn if the initial guess does not satisfy LBX and UBX");
-    addOption("parametric", OT_BOOLEAN, false, "Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.");
-    addOption("gauss_newton",      OT_BOOLEAN,  false,           "Use Gauss Newton Hessian approximation");
 
     nx_ = 0;
     ng_ = 0;
@@ -68,311 +73,360 @@ namespace CasADi{
   void NLPSolverInternal::init(){
     // Read options
     verbose_ = getOption("verbose");
-    gauss_newton_ = getOption("gauss_newton");
-  
-    // Initialize the functions
-    casadi_assert_message(!F_.isNull(),"No objective function");
-    if(!F_.isInit()){
-      F_.init();
-      log("Objective function initialized");
-    }
-    if(!G_.isNull() && !G_.isInit()){
-      G_.setOption("verbose",getOption("verbose"));
-      G_.init();
-      log("Constraint function initialized");
-    }
 
-    // Get dimensions
-    nx_ = F_.input(0).numel();
-    ng_ = G_.isNull() ? 0 : G_.output(0).numel();
-
-    // Remove G if it has zero dimension
-    if(ng_ == 0 && !G_.isNull())
-      G_ = FX();
-
-    parametric_ = getOption("parametric");
-  
-    if (parametric_) {
-      casadi_assert_message(F_.getNumInputs()==2, "Wrong number of input arguments to F for parametric NLP. Must be 2, but got " << F_.getNumInputs());
-    } else {
-      casadi_assert_message(F_.getNumInputs()==1, "Wrong number of input arguments to F for non-parametric NLP. Must be 1, but got " << F_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
-    }
-
-    // Basic sanity checks
-    casadi_assert_message(F_.getNumInputs()==1 || F_.getNumInputs()==2, "Wrong number of input arguments to F. Must be 1 or 2");
-  
-    if (F_.getNumInputs()==2) parametric_=true;
-    casadi_assert_message(getOption("ignore_check_vec") || gauss_newton_ || F_.input().size2()==1,
-                          "To avoid confusion, the input argument to F must be vector. You supplied " << F_.input().dimString() << endl <<
-                          " We suggest you make the following changes:" << endl <<
-                          "   -  F is an SXFunction:  SXFunction([X],[rhs]) -> SXFunction([vec(X)],[rhs])" << endl <<
-                          "             or            F -                   ->  F = vec(F) " << 
-                          "   -  F is an MXFunction:  MXFunction([X],[rhs]) -> " <<  endl <<
-                          "                                     X_vec = MX(\"X\",vec(X.sparsity())) " << endl <<
-                          "                                     F_vec = MXFunction([X_flat],[F.call([X_flat.reshape(X.sparsity())])[0]]) " << endl <<
-                          "             or            F -                   ->  F = vec(F) " << 
-                          " You may ignore this warning by setting the 'ignore_check_vec' option to true." << endl
-                          );
-  
-    casadi_assert_message(F_.getNumOutputs()>=1, "Wrong number of output arguments to F");
-    casadi_assert_message(gauss_newton_  || F_.output().scalar(), "Output argument of F not scalar.");
-    casadi_assert_message(F_.output().dense(), "Output argument of F not dense.");
-    casadi_assert_message(F_.input().dense(), "Input argument of F must be dense. You supplied " << F_.input().dimString());
-  
-    if(!G_.isNull()) {
-      if (parametric_) {
-        casadi_assert_message(G_.getNumInputs()==2, "Wrong number of input arguments to G for parametric NLP. Must be 2, but got " << G_.getNumInputs());
-      } else {
-        casadi_assert_message(G_.getNumInputs()==1, "Wrong number of input arguments to G for non-parametric NLP. Must be 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
-      }
-      casadi_assert_message(G_.getNumOutputs()>=1, "Wrong number of output arguments to G");
-      casadi_assert_message(G_.input().numel()==nx_, "Inconsistent dimensions");
-      casadi_assert_message(G_.input().sparsity()==F_.input().sparsity(), "F and G input dimension must match. F " << F_.input().dimString() << ". G " << G_.input().dimString());
-    }
-  
-    // Find out if we are to expand the objective function in terms of scalar operations
-    bool expand_f = getOption("expand_f");
-    if(expand_f){
-      log("Expanding objective function");
-    
-      // Cast to MXFunction
-      MXFunction F_mx = shared_cast<MXFunction>(F_);
-      if(F_mx.isNull()){
-        casadi_warning("Cannot expand objective function as it is not an MXFunction");
-      } else {
-        // Take use the input scheme of G if possible (it might be an SXFunction)
-        vector<SXMatrix> inputv;
-        if(!G_.isNull() && F_.getNumInputs()==G_.getNumInputs()){
-          inputv = G_.symbolicInputSX();
-        } else {
-          inputv = F_.symbolicInputSX();
-        }
+    if(!legacy_syntax_){
+      // Deprecation warnings
+      casadi_assert_warning(hasSetOption("expand_f"),"Option \"expand_f\" ignored (deprecated). Use \"expand\" instead.");
+      casadi_assert_warning(hasSetOption("expand_g"),"Option \"expand_g\" ignored (deprecated). Use \"expand\" instead.");
+      casadi_assert_warning(hasSetOption("generate_hessian"),"Option \"generate_hessian\" ignored (deprecated).");
+      casadi_assert_warning(hasSetOption("generate_jacobian"),"Option \"generate_jacobian\" ignored (deprecated).");
+      casadi_assert_warning(hasSetOption("generate_gradient"),"Option \"generate_gradient\" ignored (deprecated).");
+      casadi_assert_warning(hasSetOption("parametric"),"Option \"parametric\" ignored (deprecated).");
+      casadi_assert_warning(hasSetOption("gauss_newton"),"Option \"gauss_newton\" ignored (deprecated).");
       
-        // Try to expand the MXFunction
-        F_ = F_mx.expand(inputv);
+      // Initialize the NLP
+      nlp_.init(false);
+      casadi_assert(nlp_.getNumInputs()==NL_NUM_IN);
+      casadi_assert(nlp_.getNumOutputs()==NL_NUM_OUT);
+      
+      // Get dimensions
+      nx_ = nlp_.input(NL_X).size();
+      np_ = nlp_.input(NL_P).size();
+      ng_ = nlp_.output(NL_G).size();
+
+      // Find out if we are to expand the NLP in terms of scalar operations
+      bool expand = getOption("expand");
+      if(expand){
+        log("Expanding NLP in scalar operations");
+    
+        // Cast to MXFunction
+        MXFunction nlp_mx = shared_cast<MXFunction>(nlp_);
+        if(nlp_mx.isNull()){
+          casadi_warning("Cannot expand NLP as it is not an MXFunction");
+        } else {
+          nlp_ = SXFunction(nlp_mx);
+          nlp_.init();
+        }
+      }
+
+      
+    } else {
+      
+      // Set default options for deprecated options
+      if(!hasSetOption("expand_f")) setOption("expand_f",false);
+      if(!hasSetOption("expand_g")) setOption("expand_g",false);
+      if(!hasSetOption("generate_hessian")) setOption("generate_hessian",false);
+      if(!hasSetOption("generate_jacobian")) setOption("generate_jacobian",true);
+      if(!hasSetOption("generate_gradient")) setOption("generate_gradient",false);
+      if(!hasSetOption("parametric")) setOption("parametric",false);
+      if(!hasSetOption("gauss_newton")) setOption("gauss_newton",false);
+
+      gauss_newton_ = getOption("gauss_newton");
+      
+      // Initialize the functions
+      casadi_assert_message(!F_.isNull(),"No objective function");
+      if(!F_.isInit()){
         F_.init();
+        log("Objective function initialized");
       }
-    }
-  
-  
-    // Find out if we are to expand the constraint function in terms of scalar operations
-    bool expand_g = getOption("expand_g");
-    if(expand_g){
-      log("Expanding constraint function");
-    
-      // Cast to MXFunction
-      MXFunction G_mx = shared_cast<MXFunction>(G_);
-      if(G_mx.isNull()){
-        casadi_warning("Cannot expand constraint function as it is not an MXFunction");
-      } else {
-        // Take use the input scheme of F if possible (it might be an SXFunction)
-        vector<SXMatrix> inputv;
-        if(F_.getNumInputs()==G_.getNumInputs()){
-          inputv = F_.symbolicInputSX();
-        } else {
-          inputv = G_.symbolicInputSX();
-        }
-      
-        // Try to expand the MXFunction
-        G_ = G_mx.expand(inputv);
+      if(!G_.isNull() && !G_.isInit()){
+        G_.setOption("verbose",getOption("verbose"));
         G_.init();
+        log("Constraint function initialized");
       }
-    }
+
+      // Get dimensions
+      nx_ = F_.input(0).numel();
+      ng_ = G_.isNull() ? 0 : G_.output(0).numel();
+
+      // Remove G if it has zero dimension
+      if(ng_ == 0 && !G_.isNull())
+        G_ = FX();
+
+      parametric_ = getOption("parametric");
   
-    // Gradient of the objective function
-    bool generate_gradient = getOption("generate_gradient");
-    if(generate_gradient && GF_.isNull()){
-      GF_ = F_.gradient();
-    }
-    if(!GF_.isNull()) {
-      GF_.init(false);
       if (parametric_) {
-        casadi_assert_message(GF_.getNumInputs()==2, "Wrong number of input arguments to GF for parametric NLP. Must be 2, but got " << GF_.getNumInputs());
+        casadi_assert_message(F_.getNumInputs()==2, "Wrong number of input arguments to F for parametric NLP. Must be 2, but got " << F_.getNumInputs());
       } else {
-        casadi_assert_message(GF_.getNumInputs()==1, "Wrong number of input arguments to GF for non-parametric NLP. Must be 1, but got " << GF_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+        casadi_assert_message(F_.getNumInputs()==1, "Wrong number of input arguments to F for non-parametric NLP. Must be 1, but got " << F_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
       }
-      casadi_assert_message(GF_.getNumOutputs()>=1, "Wrong number of output arguments to GF");
-      casadi_assert_message(GF_.input().numel()==nx_,"Inconsistent dimensions");
-      casadi_assert_message((GF_.output().size1()==nx_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==nx_),"Inconsistent dimensions");
-    }
 
-    // Find out if we are to expand the constraint function in terms of scalar operations
-    bool generate_hessian = getOption("generate_hessian");
-    if(generate_hessian && H_.isNull()){
-      casadi_assert_message(!gauss_newton_,"Automatic generation of Gauss-Newton Hessian not yet supported");
-      log("generating hessian");
+      // Basic sanity checks
+      casadi_assert_message(F_.getNumInputs()==1 || F_.getNumInputs()==2, "Wrong number of input arguments to F. Must be 1 or 2");
+  
+      if (F_.getNumInputs()==2) parametric_=true;
+      casadi_assert_message(getOption("ignore_check_vec") || gauss_newton_ || F_.input().size2()==1,
+                            "To avoid confusion, the input argument to F must be vector. You supplied " << F_.input().dimString() << endl <<
+                            " We suggest you make the following changes:" << endl <<
+                            "   -  F is an SXFunction:  SXFunction([X],[rhs]) -> SXFunction([vec(X)],[rhs])" << endl <<
+                            "             or            F -                   ->  F = vec(F) " << 
+                            "   -  F is an MXFunction:  MXFunction([X],[rhs]) -> " <<  endl <<
+                            "                                     X_vec = MX(\"X\",vec(X.sparsity())) " << endl <<
+                            "                                     F_vec = MXFunction([X_flat],[F.call([X_flat.reshape(X.sparsity())])[0]]) " << endl <<
+                            "             or            F -                   ->  F = vec(F) " << 
+                            " You may ignore this warning by setting the 'ignore_check_vec' option to true." << endl
+                            );
+  
+      casadi_assert_message(F_.getNumOutputs()>=1, "Wrong number of output arguments to F");
+      casadi_assert_message(gauss_newton_  || F_.output().scalar(), "Output argument of F not scalar.");
+      casadi_assert_message(F_.output().dense(), "Output argument of F not dense.");
+      casadi_assert_message(F_.input().dense(), "Input argument of F must be dense. You supplied " << F_.input().dimString());
+  
+      if(!G_.isNull()) {
+        if (parametric_) {
+          casadi_assert_message(G_.getNumInputs()==2, "Wrong number of input arguments to G for parametric NLP. Must be 2, but got " << G_.getNumInputs());
+        } else {
+          casadi_assert_message(G_.getNumInputs()==1, "Wrong number of input arguments to G for non-parametric NLP. Must be 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+        }
+        casadi_assert_message(G_.getNumOutputs()>=1, "Wrong number of output arguments to G");
+        casadi_assert_message(G_.input().numel()==nx_, "Inconsistent dimensions");
+        casadi_assert_message(G_.input().sparsity()==F_.input().sparsity(), "F and G input dimension must match. F " << F_.input().dimString() << ". G " << G_.input().dimString());
+      }
+  
+      // Find out if we are to expand the objective function in terms of scalar operations
+      bool expand_f = getOption("expand_f");
+      if(expand_f){
+        log("Expanding objective function");
     
-      if(G_.isNull()){ // unconstrained
-        // Calculate Hessian and wrap to get required syntax
-        FX HF = F_.hessian();
-        HF.init();
-      
-        // Symbolic inputs of HF
-        vector<MX> HF_in = F_.symbolicInput();
-      
-        // Lagrange multipliers
-        MX lam("lam",0);
-      
-        // Objective function scaling
-        MX sigma("sigma");
-      
-        // Inputs of the Hessian function
-        vector<MX> H_in = HF_in;
-        H_in.insert(H_in.begin()+1, lam);
-        H_in.insert(H_in.begin()+2, sigma);
-
-        // Get an expression for the Hessian of F
-        MX hf = HF.call(HF_in).at(0);
-      
-        // Create the scaled Hessian function
-        H_ = MXFunction(H_in, sigma*hf);
-        H_.setOption("name","nlp_hessian");
-        log("Unconstrained Hessian function generated");
-      
-      } else { // Constrained
-      
-        // SXFunction if both functions are SXFunction
-        if(is_a<SXFunction>(F_) && is_a<SXFunction>(G_)){
-          SXFunction F = shared_cast<SXFunction>(F_);
-          SXFunction G = shared_cast<SXFunction>(G_);
-        
-          // Expression for f and g
-          SXMatrix g = G.outputExpr(0);
-          SXMatrix f = substitute(F.outputExpr(),F.inputExpr(),G.inputExpr()).front();
-        
-          // Lagrange multipliers
-          SXMatrix lam = ssym("lambda",g.size1());
-
-          // Objective function scaling
-          SXMatrix sigma = ssym("sigma");        
-        
-          // Lagrangian function
-          vector<SXMatrix> lfcn_in(parametric_? 4: 3);
-          lfcn_in[0] = G.inputExpr(0);
-          lfcn_in[1] = lam;
-          lfcn_in[2] = sigma;
-          if (parametric_) lfcn_in[3] = G.inputExpr(1);
-          SXFunction lfcn(lfcn_in, sigma*f + inner_prod(lam,g));
-          lfcn.setOption("verbose",verbose());
-          lfcn.setOption("name","nlp_lagrangian");
-          lfcn.init();
-          if(verbose()) 
-            cout << "SX Lagrangian function generated: algorithm size " << lfcn.getAlgorithmSize() << ", work size = " << lfcn.getWorkSize() << endl;
-        
-          // Hessian of the Lagrangian
-          H_ = lfcn.hessian();
-          H_.setOption("name","nlp_hessian");
-          log("SX Hessian function generated");
-        
-        } else { // MXFunction otherwise
-
-          // Try to cast into MXFunction
-          MXFunction F = shared_cast<MXFunction>(F_);
-          MXFunction G = shared_cast<MXFunction>(G_);
-
-          // Expressions in F and G
-          vector<MX> FG_in;
-          MX f, g;
-        
-          // Convert to MX if cast failed and make sure that they use the same expressions if cast was successful
-          if(!G.isNull()){
-            FG_in = G.inputExpr();
-            g = G.outputExpr(0);
-            if(!F.isNull()){ // Both are MXFunction, make sure they use the same variables
-              f = substitute(F.outputExpr(),F.inputExpr(),FG_in).front();
-            } else { // G_ but not F_ MXFunction
-              f = F_.call(FG_in).front();
-            }
+        // Cast to MXFunction
+        MXFunction F_mx = shared_cast<MXFunction>(F_);
+        if(F_mx.isNull()){
+          casadi_warning("Cannot expand objective function as it is not an MXFunction");
+        } else {
+          // Take use the input scheme of G if possible (it might be an SXFunction)
+          vector<SXMatrix> inputv;
+          if(!G_.isNull() && F_.getNumInputs()==G_.getNumInputs()){
+            inputv = G_.symbolicInputSX();
           } else {
-            if(!F.isNull()){ // F_ but not G_ MXFunction
-              FG_in = F.inputExpr();
-              f = F.outputExpr(0);
-              g = G_.call(FG_in).front();
-            } else { // None of them MXFunction
-              FG_in = G_.symbolicInput();
-              g = G_.call(FG_in).front();
-              f = F_.call(FG_in).front();
-            }
+            inputv = F_.symbolicInputSX();
           }
-         
+      
+          // Try to expand the MXFunction
+          F_ = F_mx.expand(inputv);
+          F_.init();
+        }
+      }
+  
+  
+      // Find out if we are to expand the constraint function in terms of scalar operations
+      bool expand_g = getOption("expand_g");
+      if(expand_g){
+        log("Expanding constraint function");
+    
+        // Cast to MXFunction
+        MXFunction G_mx = shared_cast<MXFunction>(G_);
+        if(G_mx.isNull()){
+          casadi_warning("Cannot expand constraint function as it is not an MXFunction");
+        } else {
+          // Take use the input scheme of F if possible (it might be an SXFunction)
+          vector<SXMatrix> inputv;
+          if(F_.getNumInputs()==G_.getNumInputs()){
+            inputv = F_.symbolicInputSX();
+          } else {
+            inputv = G_.symbolicInputSX();
+          }
+      
+          // Try to expand the MXFunction
+          G_ = G_mx.expand(inputv);
+          G_.init();
+        }
+      }
+  
+      // Gradient of the objective function
+      bool generate_gradient = getOption("generate_gradient");
+      if(generate_gradient && GF_.isNull()){
+        GF_ = F_.gradient();
+      }
+      if(!GF_.isNull()) {
+        GF_.init(false);
+        if (parametric_) {
+          casadi_assert_message(GF_.getNumInputs()==2, "Wrong number of input arguments to GF for parametric NLP. Must be 2, but got " << GF_.getNumInputs());
+        } else {
+          casadi_assert_message(GF_.getNumInputs()==1, "Wrong number of input arguments to GF for non-parametric NLP. Must be 1, but got " << GF_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+        }
+        casadi_assert_message(GF_.getNumOutputs()>=1, "Wrong number of output arguments to GF");
+        casadi_assert_message(GF_.input().numel()==nx_,"Inconsistent dimensions");
+        casadi_assert_message((GF_.output().size1()==nx_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==nx_),"Inconsistent dimensions");
+      }
+
+      // Find out if we are to expand the constraint function in terms of scalar operations
+      bool generate_hessian = getOption("generate_hessian");
+      if(generate_hessian && H_.isNull()){
+        casadi_assert_message(!gauss_newton_,"Automatic generation of Gauss-Newton Hessian not yet supported");
+        log("generating hessian");
+    
+        if(G_.isNull()){ // unconstrained
+          // Calculate Hessian and wrap to get required syntax
+          FX HF = F_.hessian();
+          HF.init();
+      
+          // Symbolic inputs of HF
+          vector<MX> HF_in = F_.symbolicInput();
+      
           // Lagrange multipliers
-          MX lam = msym("lam",g.size1());
+          MX lam("lam",0);
       
           // Objective function scaling
-          MX sigma = msym("sigma");
+          MX sigma("sigma");
+      
+          // Inputs of the Hessian function
+          vector<MX> H_in = HF_in;
+          H_in.insert(H_in.begin()+1, lam);
+          H_in.insert(H_in.begin()+2, sigma);
 
-          // Lagrangian function
-          vector<MX> lfcn_in(parametric_? 4: 3);
-          lfcn_in[0] = FG_in.at(0);
-          lfcn_in[1] = lam;
-          lfcn_in[2] = sigma;
-          if (parametric_) lfcn_in[3] = FG_in.at(1);
-          MXFunction lfcn(lfcn_in,sigma*f + inner_prod(lam,g));
-          lfcn.setOption("verbose",verbose());
-          lfcn.setOption("name","nlp_lagrangian");
-          lfcn.init();
-          if(verbose())
-            cout << "MX Lagrangian function generated: algorithm size " << lfcn.getAlgorithmSize() << ", work size = " << lfcn.getWorkSize() << endl;
-          
-          // Hessian of the Lagrangian
-          H_ = lfcn.hessian();
+          // Get an expression for the Hessian of F
+          MX hf = HF.call(HF_in).at(0);
+      
+          // Create the scaled Hessian function
+          H_ = MXFunction(H_in, sigma*hf);
           H_.setOption("name","nlp_hessian");
-          log("MX Lagrangian Hessian function generated");
-          
-        } // SXFunction/MXFunction
-      } // constrained/unconstrained
-    } // generate_hessian && H_.isNull()
-    if(!H_.isNull() && !H_.isInit()) {
-      H_.init();
-      log("Hessian function initialized");
-    }
+          log("Unconstrained Hessian function generated");
+      
+        } else { // Constrained
+      
+          // SXFunction if both functions are SXFunction
+          if(is_a<SXFunction>(F_) && is_a<SXFunction>(G_)){
+            SXFunction F = shared_cast<SXFunction>(F_);
+            SXFunction G = shared_cast<SXFunction>(G_);
+        
+            // Expression for f and g
+            SXMatrix g = G.outputExpr(0);
+            SXMatrix f = substitute(F.outputExpr(),F.inputExpr(),G.inputExpr()).front();
+        
+            // Lagrange multipliers
+            SXMatrix lam = ssym("lambda",g.size1());
 
-    // Create a Jacobian if it does not already exists
-    bool generate_jacobian = getOption("generate_jacobian");
-    if(generate_jacobian && !G_.isNull() && J_.isNull()){
-      log("Generating Jacobian");
-      J_ = G_.jacobian();
-      J_.setOption("name","nlp_jacobian");
-      log("Jacobian function generated");
-    }
+            // Objective function scaling
+            SXMatrix sigma = ssym("sigma");        
+        
+            // Lagrangian function
+            vector<SXMatrix> lfcn_in(parametric_? 4: 3);
+            lfcn_in[0] = G.inputExpr(0);
+            lfcn_in[1] = lam;
+            lfcn_in[2] = sigma;
+            if (parametric_) lfcn_in[3] = G.inputExpr(1);
+            SXFunction lfcn(lfcn_in, sigma*f + inner_prod(lam,g));
+            lfcn.setOption("verbose",verbose());
+            lfcn.setOption("name","nlp_lagrangian");
+            lfcn.init();
+            if(verbose()) 
+              cout << "SX Lagrangian function generated: algorithm size " << lfcn.getAlgorithmSize() << ", work size = " << lfcn.getWorkSize() << endl;
+        
+            // Hessian of the Lagrangian
+            H_ = lfcn.hessian();
+            H_.setOption("name","nlp_hessian");
+            log("SX Hessian function generated");
+        
+          } else { // MXFunction otherwise
+
+            // Try to cast into MXFunction
+            MXFunction F = shared_cast<MXFunction>(F_);
+            MXFunction G = shared_cast<MXFunction>(G_);
+
+            // Expressions in F and G
+            vector<MX> FG_in;
+            MX f, g;
+        
+            // Convert to MX if cast failed and make sure that they use the same expressions if cast was successful
+            if(!G.isNull()){
+              FG_in = G.inputExpr();
+              g = G.outputExpr(0);
+              if(!F.isNull()){ // Both are MXFunction, make sure they use the same variables
+                f = substitute(F.outputExpr(),F.inputExpr(),FG_in).front();
+              } else { // G_ but not F_ MXFunction
+                f = F_.call(FG_in).front();
+              }
+            } else {
+              if(!F.isNull()){ // F_ but not G_ MXFunction
+                FG_in = F.inputExpr();
+                f = F.outputExpr(0);
+                g = G_.call(FG_in).front();
+              } else { // None of them MXFunction
+                FG_in = G_.symbolicInput();
+                g = G_.call(FG_in).front();
+                f = F_.call(FG_in).front();
+              }
+            }
+         
+            // Lagrange multipliers
+            MX lam = msym("lam",g.size1());
+      
+            // Objective function scaling
+            MX sigma = msym("sigma");
+
+            // Lagrangian function
+            vector<MX> lfcn_in(parametric_? 4: 3);
+            lfcn_in[0] = FG_in.at(0);
+            lfcn_in[1] = lam;
+            lfcn_in[2] = sigma;
+            if (parametric_) lfcn_in[3] = FG_in.at(1);
+            MXFunction lfcn(lfcn_in,sigma*f + inner_prod(lam,g));
+            lfcn.setOption("verbose",verbose());
+            lfcn.setOption("name","nlp_lagrangian");
+            lfcn.init();
+            if(verbose())
+              cout << "MX Lagrangian function generated: algorithm size " << lfcn.getAlgorithmSize() << ", work size = " << lfcn.getWorkSize() << endl;
+          
+            // Hessian of the Lagrangian
+            H_ = lfcn.hessian();
+            H_.setOption("name","nlp_hessian");
+            log("MX Lagrangian Hessian function generated");
+          
+          } // SXFunction/MXFunction
+        } // constrained/unconstrained
+      } // generate_hessian && H_.isNull()
+      if(!H_.isNull() && !H_.isInit()) {
+        H_.init();
+        log("Hessian function initialized");
+      }
+
+      // Create a Jacobian if it does not already exists
+      bool generate_jacobian = getOption("generate_jacobian");
+      if(generate_jacobian && !G_.isNull() && J_.isNull()){
+        log("Generating Jacobian");
+        J_ = G_.jacobian();
+        J_.setOption("name","nlp_jacobian");
+        log("Jacobian function generated");
+      }
     
-    if(!J_.isNull() && !J_.isInit()){
-      J_.init();
-      log("Jacobian function initialized");
-    }
+      if(!J_.isNull() && !J_.isInit()){
+        J_.init();
+        log("Jacobian function initialized");
+      }
 
   
-    if(!H_.isNull()) {
-      if (parametric_) {
-        casadi_assert_message(H_.getNumInputs()>=2, "Wrong number of input arguments to H for parametric NLP. Must be at least 2, but got " << G_.getNumInputs());
-      } else {
-        casadi_assert_message(H_.getNumInputs()>=1, "Wrong number of input arguments to H for non-parametric NLP. Must be at least 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+      if(!H_.isNull()) {
+        if (parametric_) {
+          casadi_assert_message(H_.getNumInputs()>=2, "Wrong number of input arguments to H for parametric NLP. Must be at least 2, but got " << G_.getNumInputs());
+        } else {
+          casadi_assert_message(H_.getNumInputs()>=1, "Wrong number of input arguments to H for non-parametric NLP. Must be at least 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+        }
+        casadi_assert_message(H_.getNumOutputs()>=1, "Wrong number of output arguments to H");
+        casadi_assert_message(H_.input(0).numel()==nx_,"Inconsistent dimensions");
+        casadi_assert_message(H_.output().size1()==nx_,"Inconsistent dimensions");
+        casadi_assert_message(H_.output().size2()==nx_,"Inconsistent dimensions");
       }
-      casadi_assert_message(H_.getNumOutputs()>=1, "Wrong number of output arguments to H");
-      casadi_assert_message(H_.input(0).numel()==nx_,"Inconsistent dimensions");
-      casadi_assert_message(H_.output().size1()==nx_,"Inconsistent dimensions");
-      casadi_assert_message(H_.output().size2()==nx_,"Inconsistent dimensions");
-    }
 
-    if(!J_.isNull()){
-      if (parametric_) {
-        casadi_assert_message(J_.getNumInputs()==2, "Wrong number of input arguments to J for parametric NLP. Must be at least 2, but got " << G_.getNumInputs());
-      } else {
-        casadi_assert_message(J_.getNumInputs()==1, "Wrong number of input arguments to J for non-parametric NLP. Must be at least 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+      if(!J_.isNull()){
+        if (parametric_) {
+          casadi_assert_message(J_.getNumInputs()==2, "Wrong number of input arguments to J for parametric NLP. Must be at least 2, but got " << G_.getNumInputs());
+        } else {
+          casadi_assert_message(J_.getNumInputs()==1, "Wrong number of input arguments to J for non-parametric NLP. Must be at least 1, but got " << G_.getNumInputs() << " instead. Do you perhaps intend to use fixed parameters? Then use the 'parametric' option.");
+        }
+        casadi_assert_message(J_.getNumOutputs()>=1, "Wrong number of output arguments to J");
+        casadi_assert_message(J_.input().numel()==nx_,"Inconsistent dimensions");
+        casadi_assert_message(J_.output().size2()==nx_,"Inconsistent dimensions");
       }
-      casadi_assert_message(J_.getNumOutputs()>=1, "Wrong number of output arguments to J");
-      casadi_assert_message(J_.input().numel()==nx_,"Inconsistent dimensions");
-      casadi_assert_message(J_.output().size2()==nx_,"Inconsistent dimensions");
-    }
 
-    if (parametric_) {
-      np_ = F_->input(1).size();
+      if (parametric_) {
+        np_ = F_->input(1).size();
     
-      if (!G_.isNull()) casadi_assert_message(np_ == G_->input(G_->getNumInputs()-1).size(),"Parametric NLP has inconsistent parameter dimensions. F has got " << np_ << " parameters, while G has got " << G_->input(G_->getNumInputs()-1).size());
-      if (!H_.isNull()) casadi_assert_message(np_ == H_->input(H_->getNumInputs()-1).size(),"Parametric NLP has inconsistent parameter dimensions. F has got " << np_ << " parameters, while H has got " << H_->input(H_->getNumInputs()-1).size());
-      if (!J_.isNull()) casadi_assert_message(np_ == J_->input(J_->getNumInputs()-1).size(),"Parametric NLP has inconsistent parameter dimensions. F has got " << np_ << " parameters, while J has got " << J_->input(J_->getNumInputs()-1).size());
-    } else {
-      np_ = 0;
+        if (!G_.isNull()) casadi_assert_message(np_ == G_->input(G_->getNumInputs()-1).size(),"Parametric NLP has inconsistent parameter dimensions. F has got " << np_ << " parameters, while G has got " << G_->input(G_->getNumInputs()-1).size());
+        if (!H_.isNull()) casadi_assert_message(np_ == H_->input(H_->getNumInputs()-1).size(),"Parametric NLP has inconsistent parameter dimensions. F has got " << np_ << " parameters, while H has got " << H_->input(H_->getNumInputs()-1).size());
+        if (!J_.isNull()) casadi_assert_message(np_ == J_->input(J_->getNumInputs()-1).size(),"Parametric NLP has inconsistent parameter dimensions. F has got " << np_ << " parameters, while J has got " << J_->input(J_->getNumInputs()-1).size());
+      } else {
+        np_ = 0;
+      }
     }
   
     // Allocate space for inputs

@@ -58,30 +58,6 @@ public:
   /// The NLP
   FX nlp_;
 
-  /// Use legacy syntax, #566
-  bool legacy_syntax_;
-
-  /// objective function
-  FX F_;
-  /// Gradient of the objective function
-  FX GF_;
-  /// constraint function
-  FX G_;
-  /// Hessian of the Lagrangian function
-  FX H_;
-  /// Jacobian of the constraint function
-  FX J_; 
-
-
-  /// use exact hessian
-  bool exact_hessian_; 
-  
-  /// use Gauss-Newton Hessian
-  bool gauss_newton_; 
-  
-  /// use parametric NLP formulation
-  bool parametric_; 
-
   /// Number of variables
   int nx_;
   
@@ -96,7 +72,29 @@ public:
   
   /// Execute the callback function only after this amount of iterations
   int callback_step_;
-      
+
+  /// --- From here on legacy syntax, #566
+  bool legacy_syntax_;
+
+  /// objective function
+  FX F_;
+  /// Gradient of the objective function
+  FX GF_;
+  /// constraint function
+  FX G_;
+  /// Hessian of the Lagrangian function
+  FX H_;
+  /// Jacobian of the constraint function
+  FX J_; 
+
+  /// use exact hessian
+  bool exact_hessian_; 
+  
+  /// use Gauss-Newton Hessian
+  bool gauss_newton_; 
+  
+  /// use parametric NLP formulation
+  bool parametric_;       
 };
 
 } // namespace CasADi
