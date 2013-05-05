@@ -93,7 +93,7 @@ namespace CasADi {
   
     // Create an nlpsolver instance
     NLPSolverCreator nlp_solvercreator = getOption("nlp_solver");
-    nlp_solver_ = nlp_solvercreator(NLP_f,NLP_g,FX(),FX());
+    nlp_solver_ = nlp_solvercreator(NLP_f,NLP_g,1);
     if(hasSetOption("nlp_solver_options")){
       nlp_solver_.setOption(getOption("nlp_solver_options"));
     }

@@ -63,7 +63,7 @@ class WorhpSolver : public NLPSolver {
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static NLPSolver creator(const FX& F, const FX& G, const FX& H, const FX& J){ return WorhpSolver(F,G,H,J);}
+    static NLPSolver creator(const FX& F, const FX& G, int dummy){ return WorhpSolver(F,G);}
     #ifdef SWIG
     %nocallback;
     #endif

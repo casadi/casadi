@@ -139,7 +139,7 @@ void DirectSingleShootingInternal::init(){
   NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");
   
   // Allocate an NLP solver
-  nlp_solver_ = nlp_solver_creator(F_,G_,FX(),FX());
+  nlp_solver_ = nlp_solver_creator(F_,G_,1);
   
   // Pass options
   if(hasSetOption("nlp_solver_options")){
