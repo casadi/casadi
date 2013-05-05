@@ -230,20 +230,49 @@ namespace CasADi{
 
     // Add the appropriate function
     switch(f){
-    case AUX_COPY: auxiliaries_ << codegen_str_copy << endl; break;
-    case AUX_SWAP: auxiliaries_ << codegen_str_swap << endl; break;
-    case AUX_SCAL: auxiliaries_ << codegen_str_scal << endl; break;
-    case AUX_AXPY: auxiliaries_ << codegen_str_axpy << endl; break;
-    case AUX_DOT: auxiliaries_ << codegen_str_dot << endl; break;
-    case AUX_ASUM: auxiliaries_ << codegen_str_asum << endl; break;
-    case AUX_IAMAX: auxiliaries_ << codegen_str_iamax << endl; break;
-    case AUX_NRM2: auxiliaries_ << codegen_str_nrm2 << endl; break;
-    case AUX_FILL: auxiliaries_ << codegen_str_fill << endl; break;
-    case AUX_MM_NT_SPARSE: auxiliaries_ << codegen_str_mm_nt_sparse << endl; break;
-    case AUX_SQ: auxSq(); break;
-    case AUX_SIGN: auxSign(); break;
-    case AUX_COPY_SPARSE: auxiliaries_ << codegen_str_copy_sparse << endl; break;
-    case AUX_TRANS: auxiliaries_ << codegen_str_trans << endl; break;
+    case AUX_COPY: 
+      auxiliaries_ << codegen_str_copy << endl; 
+      break;
+    case AUX_SWAP: 
+      auxiliaries_ << codegen_str_swap << endl; 
+      break;
+    case AUX_SCAL: 
+      auxiliaries_ << codegen_str_scal << endl; 
+      break;
+    case AUX_AXPY: 
+      auxiliaries_ << codegen_str_axpy << endl; 
+      break;
+    case AUX_DOT: 
+      auxiliaries_ << codegen_str_dot << endl; 
+      break;
+    case AUX_ASUM: 
+      auxiliaries_ << codegen_str_asum << endl; 
+      break;
+    case AUX_IAMAX: 
+      auxiliaries_ << codegen_str_iamax << endl; 
+      break;
+    case AUX_NRM2: 
+      auxiliaries_ << codegen_str_nrm2 << endl; 
+      break;
+    case AUX_FILL: 
+      auxiliaries_ << codegen_str_fill << endl; 
+      break;
+    case AUX_MM_NT_SPARSE: 
+      auxiliaries_ << codegen_str_mm_nt_sparse << endl; 
+      break;
+    case AUX_SQ: 
+      auxSq(); 
+      break;
+    case AUX_SIGN:
+      auxSign(); 
+      break;
+    case AUX_COPY_SPARSE:
+      addAuxiliary(AUX_COPY);
+      auxiliaries_ << codegen_str_copy_sparse << endl; 
+      break;
+    case AUX_TRANS: 
+      auxiliaries_ << codegen_str_trans << endl; 
+      break;
     }
   }
 
