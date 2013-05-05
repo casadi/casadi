@@ -256,9 +256,6 @@ if(WITH_KNITRO)
 endif(WITH_KNITRO)
 add_feature_info(knitro-interface KNITRO_FOUND "Interface to the NLP solver KNITRO.")
 
-find_package(LIFTOPT)
-add_feature_info(liftopt-interface LIFTOPT_FOUND "Interface to the Lifted Newton implementation LiftOpt.")
-
 if(WITH_CPLEX)
   find_package(CPLEX)
 endif(WITH_CPLEX)

@@ -22,10 +22,6 @@ if(KNITRO_FOUND)
   add_subdirectory(knitro)
 endif()
 
-if(LIFTOPT_FOUND)
-  add_subdirectory(liftopt)
-endif()
-
 if(CPLEX_FOUND)
   add_subdirectory(cplex)
 endif()
