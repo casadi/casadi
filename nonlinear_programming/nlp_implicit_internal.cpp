@@ -77,27 +77,25 @@ namespace CasADi {
     // V groups all parameters in an MX
     MX P(mypair.first);
     std::vector< MX > inputs(mypair.second);
-  
-    // We're going to use two-argument objective and constraints to allow the use of parameters
-    std::vector< MX > args;
-    args.push_back(V);
-    args.push_back(P);
     
-    MXFunction NLP_f(args,0); NLP_f.init();
-  
+    // Dummy objective
+    MX nlp_F = 0;
+
+    // Constraints
     std::vector< MX > args_call;
     args_call.push_back(V);
     args_call.insert(args_call.end(),mypair.second.begin(),mypair.second.end());
+    MX nlp_G = f_.call(args_call).front();
 
-    MXFunction NLP_g(args,f_.call(args_call)); NLP_g.init();
+    // We're going to use two-argument objective and constraints to allow the use of parameters
+    MXFunction nlp(nlIn("x",V,"p",P),nlOut("f",nlp_F,"g",nlp_G));
   
     // Create an nlpsolver instance
     NLPSolverCreator nlp_solvercreator = getOption("nlp_solver");
-    nlp_solver_ = nlp_solvercreator(NLP_f,NLP_g,1);
+    nlp_solver_ = nlp_solvercreator(nlp);
     if(hasSetOption("nlp_solver_options")){
       nlp_solver_.setOption(getOption("nlp_solver_options"));
     }
-    nlp_solver_.setOption("parametric",true);
   
     // Initialize the NLP solver
     nlp_solver_.init();
