@@ -100,38 +100,18 @@ void NLPQPInternal::init(){
   
   // The objective function looks exactly like a mathematical description of the NLP
   SXFunction QP_f(args, mul(trans(G),X) + 0.5*mul(mul(trans(X),H),X));
-  QP_f.init();
 
   // So does the constraint function
   SXFunction QP_g(args, mul(A,X));
 
-  // Jacobian of the constraints
-  SXFunction QP_j(args,A);
-  
-  // Gradient of the objective
-  SXFunction QP_gf(args,G+mul(H,X));
-  
-
-  SX sigma("sigma");
-  SXMatrix lambda = ssym("lambda",nc_,1);
-
-  args.insert(args.begin()+1, lambda);
-  args.insert(args.begin()+2, sigma);
-  
-  // Hessian of the Lagrangian
-  SXFunction QP_h(args,H*sigma);
-  
   // Create an nlpsolver instance
   NLPSolverCreator nlpsolver_creator = getOption("nlp_solver");
-  nlpsolver_ = nlpsolver_creator(QP_f,QP_g,1); // What to do with QP_gf?
-  nlpsolver_.setOption("hes_lag",QP_h);
-  nlpsolver_.setOption("jac_g",QP_j);
+  nlpsolver_ = nlpsolver_creator(QP_f,QP_g,1);
 
   nlpsolver_.setQPOptions();
   if(hasSetOption("nlp_solver_options")){
     nlpsolver_.setOption(getOption("nlp_solver_options"));
   }
-  nlpsolver_.setOption("parametric",true);
   
   // Initialize the NLP solver
   nlpsolver_.init();
