@@ -138,18 +138,6 @@ namespace CasADi{
     /// Access the NLP
     FX getNLP() const;
 
-    /// Access the objective function F
-    FX getF() const;
-  
-    /// Access the objective function G
-    FX getG() const;
-
-    /// Access the hessian of the Lagrangian function H
-    FX getH() const;
-  
-    /// Access the jacobian of the constraint function J
-    FX getJ() const;
-
     /// Join F and G in old signature style to a common NLP function
     static FX joinFG(FX F, FX G);
   };

@@ -32,7 +32,7 @@ using namespace std;
 
 namespace CasADi{
 
-  WorhpInternal::WorhpInternal(const FX& nlp) : NLPSolverInternal(nlp,FX(),FX()){
+  WorhpInternal::WorhpInternal(const FX& nlp) : NLPSolverInternal(nlp){
 
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
@@ -332,9 +332,8 @@ namespace CasADi{
       std::copy(ares.begin(),ares.begin()+NAres,worhp_p.Ares);
     }
   
-    exact_hessian_ = hess_mode_ = HESS_EXACT;  
     if(hasSetOption("UserHM")){
-      setOption("UserHM",exact_hessian_);
+      setOption("UserHM",hess_mode_ = HESS_EXACT);
     }
   
     /**
@@ -588,12 +587,12 @@ namespace CasADi{
       std::vector< MX > Hmod_in = hesLag_.symbolicInput();
       std::vector< MX > H_in = Hmod_in;
     
-      Hmod_in.at(0) = freeX;
-      if (Hmod_in.size() > (parametric_? 2 : 1) && !Hmod_in.at(1).isNull()) Hmod_in.at(1) = nonfreeG;
+      Hmod_in.at(NL_X) = freeX;
+      Hmod_in.at(NL_NUM_IN+NL_G) = nonfreeG;
       Hmod_in.push_back(nonfreeX);
-      H_in.at(0) = MX(H_in.at(0).sparsity(),0);
-      H_in.at(0)[nonfreeX_] = nonfreeX;
-      H_in.at(0)[freeX_] =  freeX;
+      H_in.at(NL_X) = MX(H_in.at(NL_X).sparsity(),0);
+      H_in.at(NL_X)[nonfreeX_] = nonfreeX;
+      H_in.at(NL_X)[freeX_] =  freeX;
       H_in.at(NL_NUM_IN+NL_G) = MX(H_in.at(NL_NUM_IN+NL_G).sparsity(),0);
       H_in.at(NL_NUM_IN+NL_G)[nonfreeG_] = nonfreeG;
       H_in.at(NL_NUM_IN+NL_G)[freeG_] = 0;
@@ -645,7 +644,7 @@ namespace CasADi{
       worhp_w.DG.nnz = 0;
     }
 
-    if (exact_hessian_) {
+    if (hess_mode_==HESS_EXACT) {
       std::vector< MX > input = Hmod_.symbolicInput();
       MX H = Hmod_.call(input).at(0);
       H = vertcat(vec(H(lowerSparsity(H.sparsity(),false))),vec(H(sp_diag(worhp_o.n))));
@@ -700,7 +699,7 @@ namespace CasADi{
   
     
 
-    if (exact_hessian_) {
+    if (hess_mode_==HESS_EXACT) {
       log("generate_hessian sparsity");
       if (worhp_w.HM.NeedStructure) {
 	vector<int> row,col;
@@ -895,29 +894,18 @@ namespace CasADi{
     try{
       log("eval_h started");
       double time1 = clock();
-      // Number of inputs to the hessian
-      int n_hess_in = H_tril_.getNumInputs() - (parametric_ ? 2 : 1);
-    
+
       // Pass input
-      H_tril_.setInput(x);
-      if(n_hess_in>1){
-	H_tril_.setInput(lambda, 1);
-	H_tril_.setInput(obj_factor, 2);
-      }
+      H_tril_.setInput(x,NL_X);
+      H_tril_.setInput(input(NLP_SOLVER_P),NL_P);
+      H_tril_.setInput(obj_factor,NL_NUM_IN+NL_F);
+      H_tril_.setInput(lambda,NL_NUM_IN+NL_G);
 
       // Evaluate
       H_tril_.evaluate();
 
-      // Scale objective
-      if(n_hess_in==1 && obj_factor!=1.0){
-	for(vector<double>::iterator it=H_tril_.output().begin(); it!=H_tril_.output().end(); ++it){
-	  *it *= obj_factor;
-	}
-      }
-
       // Get results
       H_tril_.output().get(values);
-
 
       if(monitored("eval_h")){
 	std::cout << "x = " <<  H_tril_.input() << std::endl;
@@ -933,12 +921,6 @@ namespace CasADi{
 	// Evaluate
 	Hmod_.evaluate();
 
-	// Scale objective
-	if(n_hess_in==1 && obj_factor!=1.0){
-	  for(vector<double>::iterator it=Hmod_.output().begin(); it!=Hmod_.output().end(); ++it){
-	    *it *= obj_factor;
-	  }
-	}
 	std::cout << "H = " << Hmod_.output() << std::endl;
 
       }
