@@ -148,14 +148,14 @@ namespace CasADi{
     // Get/generate required functions
     gradF_ = getGradF();
     jacG_ = getJacG();
-    switch(hessian_mode_){
-    case HES_EXACT:
+    switch(hess_mode_){
+    case HESS_EXACT:
       hesLag_ = getHesLag();
       break;
-    case HES_DEFAULT:
-    case HES_BFGS:
+    case HESS_DEFAULT:
+    case HESS_BFGS:
       break;
-    case HES_GAUSS_NEWTON:
+    case HESS_GAUSS_NEWTON:
       casadi_error("Gauss-Newton mode not supported");
     }
 

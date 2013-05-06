@@ -92,16 +92,16 @@ namespace CasADi{
       // Get Hessian mode
       if(hasSetOption("hessian_mode")){
         if(getOption("hessian_mode")=="exact"){
-          hessian_mode_ = HES_EXACT;
+          hess_mode_ = HESS_EXACT;
         } else if(getOption("hessian_mode")=="bfgs"){
-          hessian_mode_ = HES_BFGS;
+          hess_mode_ = HESS_BFGS;
         } else if(getOption("hessian_mode")=="gauss_newton"){
-          hessian_mode_ = HES_GAUSS_NEWTON;
+          hess_mode_ = HESS_GAUSS_NEWTON;
         } else {
           casadi_error("Unknown Hessian mode");
         }
       } else {
-        hessian_mode_ = HES_DEFAULT;
+        hess_mode_ = HESS_DEFAULT;
       }
 
       // Initialize the NLP
