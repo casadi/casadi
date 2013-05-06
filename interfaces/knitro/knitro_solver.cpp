@@ -26,36 +26,44 @@ using namespace std;
 
 namespace CasADi{
 
-KnitroSolver::KnitroSolver(){
-}
+  KnitroSolver::KnitroSolver(){
+  }
   
-KnitroSolver::KnitroSolver(const FX& F, const FX& G){
-  assignNode(new KnitroInternal(F,G));
-}
+  KnitroSolver::KnitroSolver(const FX& F, const FX& G){
+    assignNode(new KnitroInternal(joinFG(F,G)));
+  }
 
-KnitroInternal* KnitroSolver::operator->(){
-  return (KnitroInternal*)(NLPSolver::operator->());
-}
+  KnitroSolver::KnitroSolver(const FX& nlp){
+    assignNode(new KnitroInternal(nlp));
+  }
 
-const KnitroInternal* KnitroSolver::operator->() const{
-  return (const KnitroInternal*)(NLPSolver::operator->());
-}
+  KnitroInternal* KnitroSolver::operator->(){
+    return static_cast<KnitroInternal*>(NLPSolver::operator->());
+  }
+
+  const KnitroInternal* KnitroSolver::operator->() const{
+    return static_cast<const KnitroInternal*>(NLPSolver::operator->());
+  }
     
-bool KnitroSolver::checkNode() const{
-  return dynamic_cast<const KnitroInternal*>(get());
-}
+  bool KnitroSolver::checkNode() const{
+    return dynamic_cast<const KnitroInternal*>(get());
+  }
 
-void KnitroSolver::setIntParam(const std::string& name, int val){
-  (*this)->int_param_[name] = val;
-}
+  void KnitroSolver::setIntParam(const std::string& name, int val){
+    (*this)->int_param_[name] = val;
+  }
     
-void KnitroSolver::setDoubleParam(const std::string& name, double val){
-  (*this)->double_param_[name] = val;
-}
+  void KnitroSolver::setDoubleParam(const std::string& name, double val){
+    (*this)->double_param_[name] = val;
+  }
 
-void KnitroSolver::setStringParam(const std::string& name, const std::string& val){
-  (*this)->string_param_[name] = val;
-}
+  void KnitroSolver::setStringParam(const std::string& name, const std::string& val){
+    (*this)->string_param_[name] = val;
+  }
+
+  FX KnitroSolver::getGradF() const {  return (*this)->gradF_;}
+  FX KnitroSolver::getJacG() const {  return (*this)->jacG_;}
+  FX KnitroSolver::getHesLag() const {  return (*this)->hesLag_;}
 
 
 } // namespace CasADi

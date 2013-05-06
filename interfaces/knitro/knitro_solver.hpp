@@ -37,10 +37,24 @@ class KnitroSolver : public NLPSolver {
     /// Default constructor
     KnitroSolver();
     
-    /// Constuct an NLP with non-linear constraints and provided hessian approximation
-    explicit KnitroSolver(const FX& F,         /**< F objective function */
-                         const FX& G  /**< constraint function (default only bound constraints) */
-                        );
+    /// \brief Create an NLP solver instance (legacy syntax)
+    explicit KnitroSolver(const FX& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
+                         const FX& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
+                         );
+
+    /// \brief Create an NLP solver instance
+    explicit KnitroSolver(const FX& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+                         );
+
+
+    // Access the objective gradient function
+    FX getGradF() const;
+
+    /// Access the Jacobian of the constraint function
+    FX getJacG() const;
+
+    /// Access the Hessian of the Lagrangian function
+    FX getHesLag() const;
 
     /// Access functions of the node
     KnitroInternal* operator->();
