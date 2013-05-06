@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 
 SET(OPTIMAL_CONTROL
   variable.hpp                   variable.cpp            variable_internal.hpp             variable_internal.cpp

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 SET(NONLINEAR_PROGRAMMING_SRCS
   symbolic_nlp.hpp         symbolic_nlp.cpp
   sqp_method.hpp          sqp_method.cpp          sqp_internal.hpp          sqp_internal.cpp

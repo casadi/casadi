@@ -20,6 +20,7 @@
  *
  */
 
+
 #include "ipopt_internal.hpp"
 #include "ipopt_nlp.hpp"
 #include "symbolic/stl_vector_tools.hpp"

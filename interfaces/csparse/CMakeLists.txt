@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 include_directories(${CSPARSE_INCLUDE_DIR})
 
 set(CSPARSE_INTERFACE_SRCS

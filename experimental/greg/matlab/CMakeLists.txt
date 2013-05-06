@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 
 find_package(MATLAB REQUIRED)
 include_directories(${MATLAB_INCLUDE_DIRS})

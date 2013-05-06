@@ -3,7 +3,7 @@
 # K.U. Leuven 2012
 
 
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 
 PROJECT(qpOASES CXX)
 

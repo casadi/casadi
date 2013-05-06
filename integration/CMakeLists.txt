@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 SET(INTEGRATION_SRCS
   collocation_integrator.hpp
   collocation_integrator.cpp

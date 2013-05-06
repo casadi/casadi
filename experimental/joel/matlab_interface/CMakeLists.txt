@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 project(casadi_matlab_interface C CXX)
 
 include_directories(/usr/local/matlab/extern/include)
