@@ -28,17 +28,19 @@
 
 /** \defgroup NLPSolver_doc
 
-  Solves the following nonlinear optimization problem:
+  Solves the following parametric nonlinear program (NLP):
   \verbatim
   min          F(x,p)
    x
   
   subject to
+              LBX <=   x    <= UBX
               LBG <= G(x,p) <= UBG
-              LBX <= x    <= UBX
+                         p  == P
               
-      n: number of decision variables (x)
-      m: number of constraints (A)
+      nx: number of decision variables
+      ng: number of constraints
+      np: number of parameters
   \endverbatim
 
 */
