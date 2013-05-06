@@ -112,7 +112,19 @@ function(canonicalize_paths MYPATH)
 set(MYPATH_NEW "") 
  
 foreach(arg ${${MYPATH}}) 
-  get_filename_component(CANONICAL_PATH ${arg} REALPATH) 
+  # get_filename_component(CANONICAL_PATH ${arg} REALPATH) 
+  #  REALPATH is not defined in cmake 2.6.0
+  # 
+  # The following is a workaround:
+  set(CANONICAL_PATH "${arg}")
+  foreach(i RANGE 10)
+    string(REGEX REPLACE "/([^/]*)/\\.\\./" "/" CANONICAL_PATH "${CANONICAL_PATH}")
+  endforeach()
+  string(REGEX REPLACE "/([^/]*)/\\.\\.$" "" CANONICAL_PATH "${CANONICAL_PATH}")
+  foreach(i RANGE 10)
+    string(REGEX REPLACE "\\\\([^\\\\]*)\\\\\\.\\.\\\\" "\\\\" CANONICAL_PATH "${CANONICAL_PATH}")
+  endforeach()
+  string(REGEX REPLACE "\\\\([^\\\\]*)\\\\\\.\\.$" ""  CANONICAL_PATH "${CANONICAL_PATH}")
   SET(MYPATH_NEW ${MYPATH_NEW} "${CANONICAL_PATH}") 
 endforeach() 
 SET(${MYPATH} ${MYPATH_NEW} PARENT_SCOPE) 
