@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project(casadi C CXX)
+enable_language(Fortran OPTIONAL)
 set(PACKAGE_NAME "CasADi")
 set(PACKAGE_VERSION "1.6.0+")
 
