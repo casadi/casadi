@@ -72,8 +72,43 @@ namespace CasADi{
   }
 
   void NLPSolverInternal::init(){
-    // Read options
-    verbose_ = getOption("verbose");
+    // Initialize the NLP
+    nlp_.init(false);
+    casadi_assert_message(nlp_.getNumInputs()==NL_NUM_IN, "The NLP function must have exactly two input");
+    casadi_assert_message(nlp_.getNumOutputs()==NL_NUM_OUT, "The NLP function must have exactly two outputs");
+    
+    // Sparsity patterns
+    const CRSSparsity& x_sparsity = nlp_.input(NL_X).sparsity();
+    const CRSSparsity& p_sparsity = nlp_.input(NL_P).sparsity();
+    const CRSSparsity& g_sparsity = nlp_.output(NL_G).sparsity();
+
+    // Get dimensions
+    nx_ = x_sparsity.size();
+    np_ = p_sparsity.size();
+    ng_ = g_sparsity.size();
+    gauss_newton_ = nlp_.output(NL_F).size()>1;
+    
+    // Allocate space for inputs
+    input_.resize(NLP_SOLVER_NUM_IN);
+    input(NLP_SOLVER_X0)       =  DMatrix::zeros(x_sparsity);
+    input(NLP_SOLVER_LBX)      = -DMatrix::inf(x_sparsity);
+    input(NLP_SOLVER_UBX)      =  DMatrix::inf(x_sparsity);
+    input(NLP_SOLVER_LBG)      = -DMatrix::inf(g_sparsity);
+    input(NLP_SOLVER_UBG)      =  DMatrix::inf(g_sparsity);
+    input(NLP_SOLVER_LAM_G0)   =  DMatrix::zeros(g_sparsity);
+    input(NLP_SOLVER_P)        =  DMatrix::zeros(p_sparsity);
+  
+    // Allocate space for outputs
+    output_.resize(NLP_SOLVER_NUM_OUT);
+    output(NLP_SOLVER_X)       = DMatrix::zeros(x_sparsity);
+    output(NLP_SOLVER_F)       = DMatrix::zeros(1);
+    output(NLP_SOLVER_LAM_X)   = DMatrix::zeros(x_sparsity);
+    output(NLP_SOLVER_LAM_G)   = DMatrix::zeros(g_sparsity);
+    output(NLP_SOLVER_LAM_P)   = DMatrix::zeros(p_sparsity);
+    output(NLP_SOLVER_G)       = DMatrix::zeros(g_sparsity);
+  
+    // Call the initialization method of the base class
+    FXInternal::init();
     
     // Deprecation warnings
     casadi_assert_warning(!hasSetOption("expand_f"),"Option \"expand_f\" ignored (deprecated). Use \"expand\" instead.");
@@ -83,7 +118,7 @@ namespace CasADi{
     casadi_assert_warning(!hasSetOption("generate_gradient"),"Option \"generate_gradient\" ignored (deprecated).");
     casadi_assert_warning(!hasSetOption("parametric"),"Option \"parametric\" ignored (deprecated).");
     casadi_assert_warning(!hasSetOption("gauss_newton"),"Option \"gauss_newton\" ignored (deprecated).");
-    
+
     // Get Hessian mode
     if(hasSetOption("hessian_mode")){
       if(getOption("hessian_mode")=="exact"){
@@ -105,17 +140,6 @@ namespace CasADi{
       }
     }
     
-    // Initialize the NLP
-    nlp_.init(false);
-    casadi_assert_message(nlp_.getNumInputs()==NL_NUM_IN, "The NLP function must have exactly two input");
-    casadi_assert_message(nlp_.getNumOutputs()==NL_NUM_OUT, "The NLP function must have exactly two outputs");
-    
-    // Get dimensions
-    nx_ = nlp_.input(NL_X).size();
-    np_ = nlp_.input(NL_P).size();
-    ng_ = nlp_.output(NL_G).size();
-    gauss_newton_ = nlp_.output(NL_F).size()>1;
-    
     // Find out if we are to expand the NLP in terms of scalar operations
     bool expand = getOption("expand");
     if(expand){
@@ -130,25 +154,6 @@ namespace CasADi{
 	nlp_.init();
       }
     }
-  
-    // Allocate space for inputs
-    input_.resize(NLP_SOLVER_NUM_IN);
-    input(NLP_SOLVER_X0)      =  DMatrix::zeros(nx_);
-    input(NLP_SOLVER_LBX)         = -DMatrix::inf(nx_);
-    input(NLP_SOLVER_UBX)         =  DMatrix::inf(nx_);
-    input(NLP_SOLVER_LBG)         = -DMatrix::inf(ng_);
-    input(NLP_SOLVER_UBG)         =  DMatrix::inf(ng_);
-    input(NLP_SOLVER_LAM_G0) =  DMatrix::zeros(ng_);
-    input(NLP_SOLVER_P)           =  DMatrix::zeros(np_);
-  
-    // Allocate space for outputs
-    output_.resize(NLP_SOLVER_NUM_OUT);
-    output(NLP_SOLVER_X)      = DMatrix::zeros(nx_);
-    output(NLP_SOLVER_F)       = DMatrix::zeros(1);
-    output(NLP_SOLVER_LAM_X)   = DMatrix::zeros(nx_);
-    output(NLP_SOLVER_LAM_G)   = DMatrix::zeros(ng_);
-    output(NLP_SOLVER_LAM_P)   = DMatrix::zeros(np_);
-    output(NLP_SOLVER_G)          = DMatrix::zeros(ng_);
   
     if (hasSetOption("iteration_callback")) {
       callback_ = getOption("iteration_callback");
@@ -170,9 +175,6 @@ namespace CasADi{
     }
   
     callback_step_ = getOption("iteration_callback_step");
-
-    // Call the initialization method of the base class
-    FXInternal::init();
   }
 
   void NLPSolverInternal::checkInitialBounds() { 
