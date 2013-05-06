@@ -38,9 +38,7 @@ public:
   explicit IpoptInternal(const FX& nlp);
   virtual ~IpoptInternal();
   virtual IpoptInternal* clone() const{ return new IpoptInternal(*this);}
-  
-  FX getGF() const { return GF_; }
-  
+    
   // Free Ipopt related memory
   void freeIpopt();
   
@@ -51,9 +49,7 @@ public:
 
   // Get reduced Hessian
   DMatrix getReducedHessian();
-  
-protected:
-  
+    
   /** NOTE:
    * To allow this header file to be free of IPOPT types (that are sometimes declared outside their scope!) and after 
    * experiencing problems with working with IPOPT classes without IPOPT smart pointers, we work with dynamically
