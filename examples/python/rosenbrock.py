@@ -30,8 +30,7 @@ z = ssym("z")
 v = vertcat([x,y,z])
 
 # Form NLP functions
-f = SXFunction([v],[x**2 + 100*z**2])
-g = SXFunction([v],[z + (1-x)**2 - y])
+nlp = SXFunction(nlIn(x=v),nlOut(f=x**2 + 100*z**2, g=z + (1-x)**2 - y))
 
 # Choose NLP solver
 nlp_solver = IpoptSolver
@@ -50,7 +49,7 @@ nlp_solver = IpoptSolver
 #qp_solver_options = {}
 
 # Create solver
-solv = nlp_solver(f,g)
+solv = nlp_solver(nlp)
 
 # NLP solver options
 solv.setOption("generate_hessian",True)
