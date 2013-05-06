@@ -197,18 +197,11 @@ namespace CasADi{
     *userclass = new IpoptUserClass(this);
   
     // read options
-    exact_hessian_ = !hesLag_.isNull();
-    if(hasSetOption("hessian_approximation")){
-      if(getOption("hessian_approximation")=="limited-memory"){
-        exact_hessian_ = false;
-      } else {
-        exact_hessian_ = true;
-        casadi_assert_message(!hesLag_.isNull(), "No hessian has been provided");
-      }
+    exact_hessian_ = hess_mode_ == HESS_EXACT;
+    if(exact_hessian_){
+      setOption("hessian_approximation","exact");
     } else {
-      if(!exact_hessian_){
-        setOption("hessian_approximation","limited-memory");
-      }
+      setOption("hessian_approximation","limited-memory");
     }
   
     if(verbose_){
