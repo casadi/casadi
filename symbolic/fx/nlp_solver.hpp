@@ -133,6 +133,9 @@ namespace CasADi{
     /// Set options that make the NLP solver more suitable for solving QPs
     void setQPOptions();
   
+    /// Access the NLP
+    FX getNLP() const;
+
     /// Access the objective function F
     FX getF() const;
   
