@@ -49,7 +49,9 @@ namespace CasADi{
     return dynamic_cast<const IpoptInternal*>(get());
   }
 
-  FX IpoptSolver::getGF() const {  return (*this)->GF_;}
+  FX IpoptSolver::getGradF() const {  return (*this)->gradF_;}
+  FX IpoptSolver::getJacG() const {  return (*this)->jacG_;}
+  FX IpoptSolver::getHesLag() const {  return (*this)->hesLag_;}
 
   DMatrix IpoptSolver::getReducedHessian(){
     return (*this)->getReducedHessian();
