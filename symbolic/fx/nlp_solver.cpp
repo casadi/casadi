@@ -54,14 +54,6 @@ namespace CasADi{
 
   FX NLPSolver::getNLP() const { return (*this)->nlp_;}
 
-  FX NLPSolver::getF() const {  return (*this)->F_;}
-  
-  FX NLPSolver::getG() const { return (*this)->G_;}
-
-  FX NLPSolver::getH() const { return (*this)->H_;}
-  
-  FX NLPSolver::getJ() const { return (*this)->J_;}
-
   FX NLPSolver::joinFG(FX F, FX G){    
     if(G.isNull()){
       // unconstrained

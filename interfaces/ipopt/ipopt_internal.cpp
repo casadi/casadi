@@ -40,7 +40,7 @@ using namespace std;
 
 namespace CasADi{
 
-  IpoptInternal::IpoptInternal(const FX& nlp) : NLPSolverInternal(nlp,FX(),FX()){
+  IpoptInternal::IpoptInternal(const FX& nlp) : NLPSolverInternal(nlp){
     addOption("pass_nonlinear_variables", OT_BOOLEAN, true);
     addOption("print_time",               OT_BOOLEAN, true, "print information about execution time");
   
@@ -196,8 +196,8 @@ namespace CasADi{
     *userclass = new IpoptUserClass(this);
   
     // read options
-    exact_hessian_ = hess_mode_ == HESS_EXACT;
-    if(exact_hessian_){
+    bool exact_hessian = hess_mode_ == HESS_EXACT;
+    if(exact_hessian){
       setOption("hessian_approximation","exact");
     } else {
       setOption("hessian_approximation","limited-memory");
@@ -205,7 +205,7 @@ namespace CasADi{
   
     if(verbose_){
       cout << "There are " << nx_ << " variables and " << ng_ << " constraints." << endl;
-      if(exact_hessian_) cout << "Using exact Hessian" << endl;
+      if(exact_hessian) cout << "Using exact Hessian" << endl;
       else             cout << "Using limited memory Hessian approximation" << endl;
     }
  
@@ -698,7 +698,7 @@ namespace CasADi{
         nnz_jac_g = jacG_.output().size();
 
       // Get Hessian sparsity pattern
-      if(exact_hessian_)
+      if(hess_mode_==HESS_EXACT)
         nnz_h_lag = hesLag_.output().sparsity().sizeL();
       else
         nnz_h_lag = 0;
