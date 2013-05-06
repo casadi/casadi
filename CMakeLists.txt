@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 project(casadi C CXX)
+enable_language(Fortran OPTIONAL)
 set(PACKAGE_NAME "CasADi")
 set(PACKAGE_VERSION "1.6.0+")
 
-# For systems with git insatlled, find out revsion and description.
+# For systems with git installed, find out revsion and description.
 execute_process(COMMAND git rev-parse HEAD
 OUTPUT_VARIABLE git_revision
 OUTPUT_STRIP_TRAILING_WHITESPACE
