@@ -98,47 +98,11 @@ namespace CasADi{
 
   private:
 
-    /// COPY: y <-x
-    void auxCopy();
-
-    /// SWAP: x <-> y
-    void auxSwap();
-    
-    // SCAL: x <- alpha*x
-    void auxScal();
-
-    // AXPY: y <- a*x + y
-    void auxAxpy();
-
-    // DOT: inner_prod(x,y) -> return
-    void auxDot();
-
-    // ASUM: ||x||_1 -> return
-    void auxAsum();
-
-    // IAMAX: index corresponding to the entry with the largest absolute value 
-    void auxIamax();
-
-    // NRM2: ||x||_2 -> return
-    void auxNrm2();
-
-    // FILL: x <- alpha
-    void auxFill();
-    
-    // Sparse matrix-matrix multiplication, the second argument is transposed: z <- z + x*y'
-    void auxMmNtSparse();
-
     /// SQUARE
     void auxSq();
 
     /// SIGN
     void auxSign();
-
-    /// COPY sparse: y <- x
-    void auxCopySparse();
-
-    /// TRANS: y <- trans(x)
-    void auxTrans();
 
     //  private:
   public:
