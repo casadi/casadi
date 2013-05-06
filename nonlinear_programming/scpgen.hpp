@@ -41,12 +41,12 @@ namespace CasADi{
     /// Default constructor
     SCPgen();
 
-    /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
-    explicit SCPgen(const FX& F, /**< objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
-                    const FX& G  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
+    /// \brief Create an NLP solver instance (legacy syntax)
+    explicit SCPgen(const FX& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
+                    const FX& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
                     );
 
-    /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
+    /// \brief Create an NLP solver instance
     explicit SCPgen(const FX& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
                     );
 

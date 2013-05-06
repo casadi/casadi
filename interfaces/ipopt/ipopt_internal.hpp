@@ -35,7 +35,7 @@ class IpoptInternal : public NLPSolverInternal{
 friend class IpoptUserClass;
 
 public:
-  explicit IpoptInternal(const FX& F, const FX& G);
+  explicit IpoptInternal(const FX& nlp);
   virtual ~IpoptInternal();
   virtual IpoptInternal* clone() const{ return new IpoptInternal(*this);}
   
@@ -99,7 +99,16 @@ protected:
                           const std::map<std::string,std::vector<std::string> >& con_string_md,
                           const std::map<std::string,std::vector<int> >& con_integer_md,
                           const std::map<std::string,std::vector<double> >& con_numeric_md);
+
+  // Gradient of the objective
+  FX gradF_;
   
+  // Jacobian of the constraints
+  FX jacG_;
+
+  // Hessian of the Lagrangian
+  FX hesLag_;
+
   // Accummulated time since last reset:
   double t_eval_f_; // time spent in eval_f
   double t_eval_grad_f_; // time spent in eval_grad_f
