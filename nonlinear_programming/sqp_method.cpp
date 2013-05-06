@@ -26,28 +26,35 @@ using namespace std;
 
 namespace CasADi{
 
-SQPMethod::SQPMethod(){
-}
+  SQPMethod::SQPMethod(){
+  }
   
-SQPMethod::SQPMethod(const FX& F, const FX& G){
-  assignNode(new SQPInternal(F,G));
-}
+  SQPMethod::SQPMethod(const FX& F, const FX& G){
+    assignNode(new SQPInternal(joinFG(F,G)));
+  }
 
-SQPInternal* SQPMethod::operator->(){
-  return static_cast<SQPInternal*>(NLPSolver::operator->());
-}
+  SQPMethod::SQPMethod(const FX& nlp){
+    assignNode(new SQPInternal(nlp));
+  }
 
-const SQPInternal* SQPMethod::operator->() const{
-  return static_cast<const SQPInternal*>(NLPSolver::operator->());
-}
+  SQPInternal* SQPMethod::operator->(){
+    return static_cast<SQPInternal*>(NLPSolver::operator->());
+  }
+
+  const SQPInternal* SQPMethod::operator->() const{
+    return static_cast<const SQPInternal*>(NLPSolver::operator->());
+  }
     
-bool SQPMethod::checkNode() const{
-  return dynamic_cast<const SQPInternal*>(get())!=0;
-}
+  bool SQPMethod::checkNode() const{
+    return dynamic_cast<const SQPInternal*>(get())!=0;
+  }
 
-const QPSolver SQPMethod::getQPSolver() const {
-  return (*this)->getQPSolver();
-}
-    
+  const QPSolver SQPMethod::getQPSolver() const {
+    return (*this)->getQPSolver();
+  }
+
+  FX SQPMethod::getGradF() const {  return (*this)->gradF_;}
+  FX SQPMethod::getJacG() const {  return (*this)->jacG_;}
+  FX SQPMethod::getHesLag() const {  return (*this)->hesLag_;}
 
 } // namespace CasADi

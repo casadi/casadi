@@ -33,13 +33,22 @@ namespace CasADi{
 class SQPInternal : public NLPSolverInternal{
 
 public:
-  explicit SQPInternal(const FX& F, const FX& G);
+  explicit SQPInternal(const FX& nlp);
   virtual ~SQPInternal();
   virtual SQPInternal* clone() const{ return new SQPInternal(*this);}
   
   virtual void init();
   virtual void evaluate(int nfdir, int nadir);
   
+  // Gradient of the objective
+  FX gradF_;
+  
+  // Jacobian of the constraints
+  FX jacG_;
+
+  // Hessian of the Lagrangian
+  FX hesLag_;
+
   /// QP solver for the subproblems
   QPSolver qp_solver_;
 
@@ -90,12 +99,6 @@ public:
   enum BFGSMdoe{ BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN}; 
   FX bfgs_;
   
-  /// Supported Hessian modes
-  enum HessMode{ HESS_EXACT, HESS_BFGS};
-
-  /// Hessian mode
-  HessMode hess_mode_;
-
   /// Initial Hessian approximation (BFGS)
   DMatrix B_init_;
   
