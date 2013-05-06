@@ -43,7 +43,7 @@ namespace CasADi{
   class ImplicitFunction;
   
   /// Function pointer to a nonlinear solver creator function
-  typedef NLPSolver (*NLPSolverCreator)(const FX& F, const FX& G, int dummy);
+  typedef NLPSolver (*NLPSolverCreator)(const FX& nlp);
 
   /// Function pointer to a linear solver creator function
   typedef LinearSolver (*linearSolverCreator)(const CRSSparsity& sparsity);

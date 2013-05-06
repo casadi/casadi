@@ -76,7 +76,7 @@ class KnitroSolver : public NLPSolver {
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static NLPSolver creator(const FX& F, const FX& G, int dummy){ return KnitroSolver(F,G);}
+    static NLPSolver creator(const FX& nlp){ return KnitroSolver(nlp);}
     #ifdef SWIG
     %nocallback;
     #endif

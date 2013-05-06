@@ -90,7 +90,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static NLPSolver creator(const FX& F, const FX& G, int dummy){ return SQPMethod(F,G);}
+    static NLPSolver creator(const FX& nlp){ return SQPMethod(nlp);}
 #ifdef SWIG
     %nocallback;
 #endif

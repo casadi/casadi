@@ -124,22 +124,20 @@ void DirectSingleShootingInternal::init(){
     }
   }
 
-  // Terminal constraints
-  G_ = MXFunction(V,vertcat(nlp_g));
-  G_.setOption("name","nlp_g");
-  G_.init();
-  
-  // Objective function
+  // Terminal cost
   MX jk = mfcn_.call(mayerIn("x",X,"p",P)).at(0);
   nlp_j += jk;
-  F_ = MXFunction(V,nlp_j);
-  F_.setOption("name","nlp_j");
-  
+
+  // NLP
+  nlp_ = MXFunction(nlIn("x",V),nlOut("f",nlp_j,"g",vertcat(nlp_g)));
+  nlp_.setOption("name","nlp");
+  nlp_.init();
+    
   // Get the NLP creator function
   NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");
   
   // Allocate an NLP solver
-  nlp_solver_ = nlp_solver_creator(F_,G_,1);
+  nlp_solver_ = nlp_solver_creator(nlp_);
   
   // Pass options
   if(hasSetOption("nlp_solver_options")){
@@ -267,10 +265,8 @@ void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_op
   }
   casadi_assert(el==V_opt.size());
 
-  // Evaluate the constraint function to get the rest of the state trajectory
-  G_.setInput(V_opt);
-  G_.evaluate();
-  const vector<double>& g_opt = G_.output().data();
+  // Get the rest of the state trajectory
+  const vector<double>& g_opt = nlp_solver_.output("g").data();
 
   // Loop over the constraints
   el = 0;

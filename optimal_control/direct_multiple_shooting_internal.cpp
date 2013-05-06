@@ -153,28 +153,29 @@ void DirectMultipleShootingInternal::init(){
 
   // Terminal constraints
   MX g = vertcat(gg);
-  G_ = MXFunction(V,g);
-  G_.setOption("numeric_jacobian",false);
-  G_.setOption("ad_mode","forward");
-  G_.init();
-  
-  vector<MX> f;
+
   // Objective function
+  MX f;
   if (mfcn_.getNumInputs()==1) {
-    f = mfcn_.call(X.back());
+    f = mfcn_.call(X.back()).front();
   } else {
     vector<MX> mfcn_argin(MAYER_NUM_IN); 
     mfcn_argin[MAYER_X] = X.back();
     mfcn_argin[MAYER_P] = P;
-    f = mfcn_.call(mfcn_argin);
+    f = mfcn_.call(mfcn_argin).front();
   }
-  F_ = MXFunction(V,f);
+
+  // NLP
+  nlp_ = MXFunction(nlIn("x",V),nlOut("f",f,"g",g));
+  nlp_.setOption("numeric_jacobian",false);
+  nlp_.setOption("ad_mode","forward");
+  nlp_.init();
   
   // Get the NLP creator function
   NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");
   
   // Allocate an NLP solver
-  nlp_solver_ = nlp_solver_creator(F_,G_,1);
+  nlp_solver_ = nlp_solver_creator(nlp_);
   
   // Symbolically calculate the gradient
   //nlp_solver_.setOption("generate_gradient",true);
