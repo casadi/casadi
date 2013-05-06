@@ -65,7 +65,7 @@ public:
   FX getHesLag();
 
   /// Hessian modes
-  enum HessMode{HESS_DEFAULT, HESS_EXACT, HESS_BFGS, HESS_GAUSS_NEWTON};
+  enum HessMode{HESS_EXACT, HESS_BFGS, HESS_GAUSS_NEWTON};
   HessMode hess_mode_;
 
   /// The NLP

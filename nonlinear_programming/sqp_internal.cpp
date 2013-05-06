@@ -82,7 +82,6 @@ namespace CasADi{
     case HESS_EXACT:
       hesLag_ = getHesLag();
       break;
-    case HESS_DEFAULT:
     case HESS_BFGS:
       break;
     case HESS_GAUSS_NEWTON:
@@ -583,7 +582,7 @@ namespace CasADi{
       hesLag_.evaluate();
       
       // Get results
-      hesLag_.output().get(H);
+      hesLag_.getOutput(H);
       
       if (monitored("eval_h")) {
         cout << "x = " << x << endl;

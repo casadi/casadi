@@ -152,7 +152,6 @@ namespace CasADi{
     case HESS_EXACT:
       hesLag_ = getHesLag();
       break;
-    case HESS_DEFAULT:
     case HESS_BFGS:
       break;
     case HESS_GAUSS_NEWTON:
