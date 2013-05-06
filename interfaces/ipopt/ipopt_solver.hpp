@@ -51,13 +51,14 @@ namespace CasADi{
     /// Default constructor
     IpoptSolver();
 
-    /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
-    explicit IpoptSolver(const FX& F,         /**< F objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
-                         const FX& G  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
+    /// \brief Create an NLP solver instance (legacy syntax)
+    explicit IpoptSolver(const FX& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
+                         const FX& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
                          );
 
-    
-
+    /// \brief Create an NLP solver instance
+    explicit IpoptSolver(const FX& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+                         );
     // Access the objective gradient function
     FX getGF() const;
     

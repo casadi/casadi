@@ -55,6 +55,19 @@ public:
   /// Set options that make the NLP solver more suitable for solving QPs
   virtual void setQPOptions() { };
 
+  /// Get or generate a function to calculate the gradient of the objective function
+  FX getGradF();
+  
+  /// Get or generate a function to calculate the Jacobian of the constraint function
+  FX getJacG();
+
+  /// Get or generate a function to calculate the Hessian of the Lagrangian function
+  FX getHesLag();
+
+  /// Hessian modes
+  enum HessianMode{HES_DEFAULT, HES_EXACT, HES_BFGS, HES_GAUSS_NEWTON};
+  HessianMode hessian_mode_;
+
   /// The NLP
   FX nlp_;
 
