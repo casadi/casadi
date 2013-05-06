@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.0)
-project(casadi C CXX)
+project(casadi C Fortran CXX)
 set(PACKAGE_NAME "CasADi")
 set(PACKAGE_VERSION "1.6.0+")
 
@@ -28,7 +28,9 @@ endif()
 
 # cmake_policy propagation rules
 if(COMMAND cmake_policy)
+if(POLICY CMP0011)
 cmake_policy(SET CMP0011 OLD)
+endif()
 endif()
 
 # cmake_policy avoid escaping in add_definitions
