@@ -33,11 +33,11 @@ namespace CasADi{
   }
 
   NLPSolverInternal* NLPSolver::operator->(){
-    return (NLPSolverInternal*)(FX::operator->());
+    return static_cast<NLPSolverInternal*>(FX::operator->());
   }
 
   const NLPSolverInternal* NLPSolver::operator->() const{
-    return (const NLPSolverInternal*)(FX::operator->());
+    return static_cast<const NLPSolverInternal*>(FX::operator->());
   }
     
   bool NLPSolver::checkNode() const{
@@ -52,13 +52,15 @@ namespace CasADi{
     (*this)->setQPOptions();
   }
 
-  FX NLPSolver::getF() const { return isNull()? FX() : dynamic_cast<const NLPSolverInternal*>(get())->F_; }
-  
-  FX NLPSolver::getG() const { return isNull()? FX() : dynamic_cast<const NLPSolverInternal*>(get())->G_; }
+  FX NLPSolver::getNLP() const { return (*this)->nlp_;}
 
-  FX NLPSolver::getH() const { return isNull()? FX() : dynamic_cast<const NLPSolverInternal*>(get())->H_; }
+  FX NLPSolver::getF() const {  return (*this)->F_;}
   
-  FX NLPSolver::getJ() const { return isNull()? FX() : dynamic_cast<const NLPSolverInternal*>(get())->J_; }
+  FX NLPSolver::getG() const { return (*this)->G_;}
+
+  FX NLPSolver::getH() const { return (*this)->H_;}
+  
+  FX NLPSolver::getJ() const { return (*this)->J_;}
 
   FX NLPSolver::joinFG(FX F, FX G){    
     if(G.isNull()){

@@ -26,31 +26,29 @@
 using namespace std;
 namespace CasADi{
 
-IpoptSolver::IpoptSolver(){
-}
+  IpoptSolver::IpoptSolver(){
+  }
   
-IpoptSolver::IpoptSolver(const FX& F, const FX& G){
-  assignNode(new IpoptInternal(F,G));
-}
+  IpoptSolver::IpoptSolver(const FX& F, const FX& G){
+    assignNode(new IpoptInternal(F,G));
+  }
 
-IpoptInternal* IpoptSolver::operator->(){
-  return (IpoptInternal*)(NLPSolver::operator->());
-}
+  IpoptInternal* IpoptSolver::operator->(){
+    return static_cast<IpoptInternal*>(NLPSolver::operator->());
+  }
 
-const IpoptInternal* IpoptSolver::operator->() const{
-  return (const IpoptInternal*)(NLPSolver::operator->());
-}
+  const IpoptInternal* IpoptSolver::operator->() const{
+    return static_cast<const IpoptInternal*>(NLPSolver::operator->());
+  }
     
-bool IpoptSolver::checkNode() const{
-  return dynamic_cast<const IpoptInternal*>(get());
-}
+  bool IpoptSolver::checkNode() const{
+    return dynamic_cast<const IpoptInternal*>(get());
+  }
 
-FX IpoptSolver::getGF()        const {
-  return isNull()? FX() : dynamic_cast<const IpoptInternal*>(get())->getGF();
-}
+  FX IpoptSolver::getGF() const {  return (*this)->GF_;}
 
-DMatrix IpoptSolver::getReducedHessian(){
-  return (*this)->getReducedHessian();
-}
+  DMatrix IpoptSolver::getReducedHessian(){
+    return (*this)->getReducedHessian();
+  }
 
 } // namespace CasADi
