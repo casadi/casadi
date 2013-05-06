@@ -27,24 +27,37 @@
 
 namespace CasADi{
   
-class WorhpInternal;
+  class WorhpInternal;
   
-// List from worhp_internal.cpp
-/**
-*
-* \brief interface to WORHP NLP solver
-* @copydoc NLPSolver_doc
+  // List from worhp_internal.cpp
+  /**
+   *
+   * \brief interface to WORHP NLP solver
+   * @copydoc NLPSolver_doc
 
-*/
-class WorhpSolver : public NLPSolver {
+   */
+  class WorhpSolver : public NLPSolver {
   public:
     /// Default constructor
     WorhpSolver();
 
-    /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
-    explicit WorhpSolver(const FX& F,         /**< F objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
-                         const FX& G  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
-                        );
+    /// \brief Create an NLP solver instance (legacy syntax)
+    explicit WorhpSolver(const FX& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
+                         const FX& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
+                         );
+
+    /// \brief Create an NLP solver instance
+    explicit WorhpSolver(const FX& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+                         );
+
+    // Access the objective gradient function
+    FX getGradF() const;
+
+    /// Access the Jacobian of the constraint function
+    FX getJacG() const;
+
+    /// Access the Hessian of the Lagrangian function
+    FX getHesLag() const;
 
     /// Access functions of the node
     WorhpInternal* operator->();
@@ -57,14 +70,14 @@ class WorhpSolver : public NLPSolver {
     virtual bool checkNode() const;
 
     /// Static creator function 
-    #ifdef SWIG
+#ifdef SWIG
     %callback("%s_cb");
-    #endif
+#endif
     static NLPSolver creator(const FX& F, const FX& G, int dummy){ return WorhpSolver(F,G);}
-    #ifdef SWIG
+#ifdef SWIG
     %nocallback;
-    #endif
-};
+#endif
+  };
 
 } // namespace CasADi
 

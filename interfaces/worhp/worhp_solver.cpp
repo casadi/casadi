@@ -27,28 +27,36 @@ using namespace std;
 
 namespace CasADi{
 
-WorhpSolver::WorhpSolver(){
-}
+  WorhpSolver::WorhpSolver(){
+  }
   
-WorhpSolver::WorhpSolver(const FX& F, const FX& G){
-  assignNode(new WorhpInternal(F,G));
-}
+  WorhpSolver::WorhpSolver(const FX& F, const FX& G){
+    assignNode(new WorhpInternal(joinFG(F,G)));
+  }
 
-WorhpInternal* WorhpSolver::operator->(){
-  return (WorhpInternal*)(NLPSolver::operator->());
-}
+  WorhpSolver::WorhpSolver(const FX& nlp){
+    assignNode(new WorhpInternal(nlp));
+  }
 
-const WorhpInternal* WorhpSolver::operator->() const{
-  return (const WorhpInternal*)(NLPSolver::operator->());
-}
+  WorhpInternal* WorhpSolver::operator->(){
+    return static_cast<WorhpInternal*>(NLPSolver::operator->());
+  }
+
+  const WorhpInternal* WorhpSolver::operator->() const{
+    return static_cast<const WorhpInternal*>(NLPSolver::operator->());
+  }
     
-bool WorhpSolver::checkNode() const{
-  return dynamic_cast<const WorhpInternal*>(get());
-}
+  bool WorhpSolver::checkNode() const{
+    return dynamic_cast<const WorhpInternal*>(get());
+  }
   
-void WorhpSolver::setOptionsFromFile(const std::string & file) {
-  dynamic_cast<WorhpInternal*>(get())->setOptionsFromFile(file);
-}
+  void WorhpSolver::setOptionsFromFile(const std::string & file) {
+    dynamic_cast<WorhpInternal*>(get())->setOptionsFromFile(file);
+  }
+
+  FX WorhpSolver::getGradF() const {  return (*this)->gradF_;}
+  FX WorhpSolver::getJacG() const {  return (*this)->jacG_;}
+  FX WorhpSolver::getHesLag() const {  return (*this)->hesLag_;}
 
 
 } // namespace CasADi
