@@ -85,6 +85,9 @@ class ParallelizerInternal : public FXInternal{
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+
+    /** \brief  Update the number of sensitivity directions during or after initialization */
+    virtual void updateNumSens(bool recursive);
     
     /// Functions
     std::vector<FX> funcs_;
