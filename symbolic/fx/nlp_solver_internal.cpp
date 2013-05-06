@@ -78,31 +78,32 @@ namespace CasADi{
     // Read options
     verbose_ = getOption("verbose");
     
-    // Get Hessian mode
-    if(hasSetOption("hessian_mode")){
-      if(getOption("hessian_mode")=="exact"){
-        hessian_mode_ = HES_EXACT;
-      } else if(getOption("hessian_mode")=="bfgs"){
-        hessian_mode_ = HES_BFGS;
-      } else if(getOption("hessian_mode")=="gauss_newton"){
-        hessian_mode_ = HES_GAUSS_NEWTON;
-      } else {
-        casadi_error("Unknown Hessian mode");
-      }
-    } else {
-      hessian_mode_ = HES_DEFAULT;
-    }
-
     if(!legacy_syntax_){
       // Deprecation warnings
       casadi_assert_warning(!hasSetOption("expand_f"),"Option \"expand_f\" ignored (deprecated). Use \"expand\" instead.");
       casadi_assert_warning(!hasSetOption("expand_g"),"Option \"expand_g\" ignored (deprecated). Use \"expand\" instead.");
       casadi_assert_warning(!hasSetOption("generate_hessian"),"Option \"generate_hessian\" ignored (deprecated). Use setOption(\"hessian_mode\",\"exact\") instead.");
+      if(!hasSetOption("hessian_mode") && hasSetOption("generate_hessian") && bool(getOption("generate_hessian"))) setOption("hessian_mode","exact");
       casadi_assert_warning(!hasSetOption("generate_jacobian"),"Option \"generate_jacobian\" ignored (deprecated).");
       casadi_assert_warning(!hasSetOption("generate_gradient"),"Option \"generate_gradient\" ignored (deprecated).");
       casadi_assert_warning(!hasSetOption("parametric"),"Option \"parametric\" ignored (deprecated).");
       casadi_assert_warning(!hasSetOption("gauss_newton"),"Option \"gauss_newton\" ignored (deprecated).");
       
+      // Get Hessian mode
+      if(hasSetOption("hessian_mode")){
+        if(getOption("hessian_mode")=="exact"){
+          hessian_mode_ = HES_EXACT;
+        } else if(getOption("hessian_mode")=="bfgs"){
+          hessian_mode_ = HES_BFGS;
+        } else if(getOption("hessian_mode")=="gauss_newton"){
+          hessian_mode_ = HES_GAUSS_NEWTON;
+        } else {
+          casadi_error("Unknown Hessian mode");
+        }
+      } else {
+        hessian_mode_ = HES_DEFAULT;
+      }
+
       // Initialize the NLP
       nlp_.init(false);
       casadi_assert_message(nlp_.getNumInputs()==NL_NUM_IN, "The NLP function must have exactly two input");
