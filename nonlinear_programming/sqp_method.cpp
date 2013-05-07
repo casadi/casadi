@@ -55,6 +55,6 @@ namespace CasADi{
 
   FX SQPMethod::getGradF() const {  return (*this)->gradF_;}
   FX SQPMethod::getJacG() const {  return (*this)->jacG_;}
-  FX SQPMethod::getHesLag() const {  return (*this)->hesLag_;}
+  FX SQPMethod::getHessLag() const {  return (*this)->hessLag_;}
 
 } // namespace CasADi

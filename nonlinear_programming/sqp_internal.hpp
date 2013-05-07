@@ -47,7 +47,7 @@ public:
   FX jacG_;
 
   // Hessian of the Lagrangian
-  FX hesLag_;
+  FX hessLag_;
 
   /// QP solver for the subproblems
   QPSolver qp_solver_;

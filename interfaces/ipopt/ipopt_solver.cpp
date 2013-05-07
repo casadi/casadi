@@ -51,7 +51,7 @@ namespace CasADi{
 
   FX IpoptSolver::getGradF() const {  return (*this)->gradF_;}
   FX IpoptSolver::getJacG() const {  return (*this)->jacG_;}
-  FX IpoptSolver::getHesLag() const {  return (*this)->hesLag_;}
+  FX IpoptSolver::getHessLag() const {  return (*this)->hessLag_;}
 
   DMatrix IpoptSolver::getReducedHessian(){
     return (*this)->getReducedHessian();

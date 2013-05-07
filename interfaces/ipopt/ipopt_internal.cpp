@@ -150,7 +150,7 @@ namespace CasADi{
     jacG_ = getJacG();
     switch(hess_mode_){
     case HESS_EXACT:
-      hesLag_ = getHesLag();
+      hessLag_ = getHessLag();
       break;
     case HESS_BFGS:
       break;
@@ -433,7 +433,7 @@ namespace CasADi{
       if (values == NULL) {
         int nz=0;
         vector<int> rowind,col;
-        hesLag_.output().sparsity().getSparsityCRS(rowind,col);
+        hessLag_.output().sparsity().getSparsityCRS(rowind,col);
         for(int r=0; r<rowind.size()-1; ++r)
           for(int el=rowind[r]; el<rowind[r+1]; ++el){
             if(col[el]<=r){
@@ -444,18 +444,18 @@ namespace CasADi{
           }
       } else {
         // Pass the argument to the function
-        hesLag_.setInput(x,NL_X);
-        hesLag_.setInput(input(NLP_SOLVER_P),NL_P);
-        hesLag_.setInput(obj_factor,NL_NUM_IN+NL_F);
-        hesLag_.setInput(lambda,NL_NUM_IN+NL_G);
+        hessLag_.setInput(x,NL_X);
+        hessLag_.setInput(input(NLP_SOLVER_P),NL_P);
+        hessLag_.setInput(obj_factor,NL_NUM_IN+NL_F);
+        hessLag_.setInput(lambda,NL_NUM_IN+NL_G);
         
         // Evaluate
-        hesLag_.evaluate();
+        hessLag_.evaluate();
 
         // Get results
-        hesLag_.output().get(values,SPARSESYM);
+        hessLag_.output().get(values,SPARSESYM);
       
-        if (regularity_check_ && !isRegular(hesLag_.output().data())) casadi_error("IpoptInternal::h: NaN or Inf detected.");
+        if (regularity_check_ && !isRegular(hessLag_.output().data())) casadi_error("IpoptInternal::h: NaN or Inf detected.");
       
       }
       double time2 = clock();
@@ -699,7 +699,7 @@ namespace CasADi{
 
       // Get Hessian sparsity pattern
       if(hess_mode_==HESS_EXACT)
-        nnz_h_lag = hesLag_.output().sparsity().sizeL();
+        nnz_h_lag = hessLag_.output().sparsity().sizeL();
       else
         nnz_h_lag = 0;
     } catch (exception& ex){
@@ -709,7 +709,7 @@ namespace CasADi{
 
   int IpoptInternal::get_number_of_nonlinear_variables() const{
     try {
-      if(hesLag_.isNull() || !bool(getOption("pass_nonlinear_variables"))){
+      if(hessLag_.isNull() || !bool(getOption("pass_nonlinear_variables"))){
         // No Hessian has been interfaced
         return -1;
       } else {
@@ -717,9 +717,9 @@ namespace CasADi{
         int nv = 0;
       
         // Loop over the rows
-        for(int i=0; i<hesLag_.output().size1(); ++i){
+        for(int i=0; i<hessLag_.output().size1(); ++i){
           // If the row contains any non-zeros, the corresponding variable appears nonlinearily
-          if(hesLag_.output().rowind(i)!=hesLag_.output().rowind(i+1))
+          if(hessLag_.output().rowind(i)!=hessLag_.output().rowind(i+1))
             nv++;
         }
       
@@ -738,9 +738,9 @@ namespace CasADi{
       int el = 0;
     
       // Loop over the rows
-      for(int i=0; i<hesLag_.output().size1(); ++i){
+      for(int i=0; i<hessLag_.output().size1(); ++i){
         // If the row contains any non-zeros, the corresponding variable appears nonlinearily
-        if(hesLag_.output().rowind(i)!=hesLag_.output().rowind(i+1)){
+        if(hessLag_.output().rowind(i)!=hessLag_.output().rowind(i+1)){
           pos_nonlin_vars[el++] = i;
         }
       }

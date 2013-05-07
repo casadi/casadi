@@ -67,7 +67,7 @@ namespace CasADi{
     FX getJacG() const;
 
     /// Access the Hessian of the Lagrangian function
-    FX getHesLag() const;
+    FX getHessLag() const;
       
     /** \brief Get the reduced Hessian. 
      * Requires a patched sIPOPT installation, see CasADi documentation. */

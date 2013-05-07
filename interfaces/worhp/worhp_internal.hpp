@@ -72,7 +72,7 @@ namespace CasADi{
     FX jacG_;
     
     // Hessian of the Lagrangian
-    FX hesLag_;
+    FX hessLag_;
    
 
     FX nlpmod_;
