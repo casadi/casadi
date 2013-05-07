@@ -57,10 +57,12 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_IntegratorOutput: return "IntegratorOutput";
     case SCHEME_NLInput: return "NLInput";
     case SCHEME_NLOutput: return "NLOutput";
-    case SCHEME_NLJacGInput: return "NLJacGInput";
-    case SCHEME_NLHessOutput: return "NLHessOutput";
-    case SCHEME_NLHessLInput: return "NLHessLInput";
-    case SCHEME_NLHessLOutput: return "NLHessLOutput";
+    case SCHEME_GradFInput: return "GradFInput";
+    case SCHEME_GradFOutput: return "GradFOutput";
+    case SCHEME_JacGInput: return "JacGInput";
+    case SCHEME_JacGOutput: return "JacGOutput";
+    case SCHEME_HessLagInput: return "HessLagInput";
+    case SCHEME_HessLagOutput: return "HessLagOutput";
     case SCHEME_NLPSolverInput: return "NLPSolverInput";
     case SCHEME_NLPSolverOutput: return "NLPSolverOutput";
     case SCHEME_MayerInput: return "MayerInput";
@@ -88,10 +90,12 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_IntegratorOutput: return "xf, qf, rxf, rqf";
     case SCHEME_NLInput: return "x, p";
     case SCHEME_NLOutput: return "f, g";
-    case SCHEME_NLJacGInput: return "x, p";
-    case SCHEME_NLHessOutput: return "jac, f, g";
-    case SCHEME_NLHessLInput: return "x, p, lam_f, lam_g";
-    case SCHEME_NLHessLOutput: return "hess, grad, f, g";
+    case SCHEME_GradFInput: return "x, p";
+    case SCHEME_GradFOutput: return "grad, f, g";
+    case SCHEME_JacGInput: return "x, p";
+    case SCHEME_JacGOutput: return "jac, f, g";
+    case SCHEME_HessLagInput: return "x, p, lam_f, lam_g";
+    case SCHEME_HessLagOutput: return "hess, grad, f, g";
     case SCHEME_NLPSolverInput: return "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0";
     case SCHEME_NLPSolverOutput: return "x, f, g, lam_x, lam_g, lam_p";
     case SCHEME_MayerInput: return "x, p";
@@ -213,30 +217,41 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==1) return "g";
       casadi_error("getSchemeEntryName: supplied number is out of range. NLOutput has only 2 entries: ('NLOutput', 'f, g')");
       break;
-    case SCHEME_NLJacGInput: 
+    case SCHEME_GradFInput: 
       if(i==0) return "x";
       if(i==1) return "p";
-      casadi_error("getSchemeEntryName: supplied number is out of range. NLJacGInput has only 2 entries: ('NLJacGInput', 'x, p')");
+      casadi_error("getSchemeEntryName: supplied number is out of range. GradFInput has only 2 entries: ('GradFInput', 'x, p')");
       break;
-    case SCHEME_NLHessOutput: 
+    case SCHEME_GradFOutput: 
+      if(i==0) return "grad";
+      if(i==1) return "f";
+      if(i==2) return "g";
+      casadi_error("getSchemeEntryName: supplied number is out of range. GradFOutput has only 3 entries: ('GradFOutput', 'grad, f, g')");
+      break;
+    case SCHEME_JacGInput: 
+      if(i==0) return "x";
+      if(i==1) return "p";
+      casadi_error("getSchemeEntryName: supplied number is out of range. JacGInput has only 2 entries: ('JacGInput', 'x, p')");
+      break;
+    case SCHEME_JacGOutput: 
       if(i==0) return "jac";
       if(i==1) return "f";
       if(i==2) return "g";
-      casadi_error("getSchemeEntryName: supplied number is out of range. NLHessOutput has only 3 entries: ('NLHessOutput', 'jac, f, g')");
+      casadi_error("getSchemeEntryName: supplied number is out of range. JacGOutput has only 3 entries: ('JacGOutput', 'jac, f, g')");
       break;
-    case SCHEME_NLHessLInput: 
+    case SCHEME_HessLagInput: 
       if(i==0) return "x";
       if(i==1) return "p";
       if(i==2) return "lam_f";
       if(i==3) return "lam_g";
-      casadi_error("getSchemeEntryName: supplied number is out of range. NLHessLInput has only 4 entries: ('NLHessLInput', 'x, p, lam_f, lam_g')");
+      casadi_error("getSchemeEntryName: supplied number is out of range. HessLagInput has only 4 entries: ('HessLagInput', 'x, p, lam_f, lam_g')");
       break;
-    case SCHEME_NLHessLOutput: 
+    case SCHEME_HessLagOutput: 
       if(i==0) return "hess";
       if(i==1) return "grad";
       if(i==2) return "f";
       if(i==3) return "g";
-      casadi_error("getSchemeEntryName: supplied number is out of range. NLHessLOutput has only 4 entries: ('NLHessLOutput', 'hess, grad, f, g')");
+      casadi_error("getSchemeEntryName: supplied number is out of range. HessLagOutput has only 4 entries: ('HessLagOutput', 'hess, grad, f, g')");
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "x0";
@@ -431,30 +446,41 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==1) return "Constraint function";
       casadi_error("getSchemeEntryDoc: supplied number is out of range. NLOutput has only 2 entries: ('NLOutput', 'f, g')");
       break;
-    case SCHEME_NLJacGInput: 
+    case SCHEME_GradFInput: 
       if(i==0) return "Decision variable";
       if(i==1) return "Fixed parameter";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLJacGInput has only 2 entries: ('NLJacGInput', 'x, p')");
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. GradFInput has only 2 entries: ('GradFInput', 'x, p')");
       break;
-    case SCHEME_NLHessOutput: 
+    case SCHEME_GradFOutput: 
       if(i==0) return "Jacobian of the constraints";
       if(i==1) return "Objective function";
       if(i==2) return "Constraint function";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLHessOutput has only 3 entries: ('NLHessOutput', 'jac, f, g')");
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. GradFOutput has only 3 entries: ('GradFOutput', 'grad, f, g')");
       break;
-    case SCHEME_NLHessLInput: 
+    case SCHEME_JacGInput: 
+      if(i==0) return "Decision variable";
+      if(i==1) return "Fixed parameter";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. JacGInput has only 2 entries: ('JacGInput', 'x, p')");
+      break;
+    case SCHEME_JacGOutput: 
+      if(i==0) return "Jacobian of the constraints";
+      if(i==1) return "Objective function";
+      if(i==2) return "Constraint function";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. JacGOutput has only 3 entries: ('JacGOutput', 'jac, f, g')");
+      break;
+    case SCHEME_HessLagInput: 
       if(i==0) return "Decision variable";
       if(i==1) return "Fixed parameter";
       if(i==2) return "Multiplier for f";
       if(i==3) return "Multiplier for g";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLHessLInput has only 4 entries: ('NLHessLInput', 'x, p, lam_f, lam_g')");
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. HessLagInput has only 4 entries: ('HessLagInput', 'x, p, lam_f, lam_g')");
       break;
-    case SCHEME_NLHessLOutput: 
+    case SCHEME_HessLagOutput: 
       if(i==0) return "Hessian of the Lagrangian";
       if(i==1) return "Gradient of the Lagrangian";
       if(i==2) return "Objective function";
       if(i==3) return "Constraint function";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLHessLOutput has only 4 entries: ('NLHessLOutput', 'hess, grad, f, g')");
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. HessLagOutput has only 4 entries: ('HessLagOutput', 'hess, grad, f, g')");
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "Decision variables, initial guess (nx x 1) ";
@@ -649,30 +675,41 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==1) return "NL_G";
       casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLOutput has only 2 entries: ('NLOutput', 'f, g')");
       break;
-    case SCHEME_NLJacGInput: 
-      if(i==0) return "NL_JACG_X";
-      if(i==1) return "NL_JACG_P";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLJacGInput has only 2 entries: ('NLJacGInput', 'x, p')");
+    case SCHEME_GradFInput: 
+      if(i==0) return "GRADF_X";
+      if(i==1) return "GRADF_P";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. GradFInput has only 2 entries: ('GradFInput', 'x, p')");
       break;
-    case SCHEME_NLHessOutput: 
-      if(i==0) return "NL_JACG_JAC";
-      if(i==1) return "NL_JACG_F";
-      if(i==2) return "NL_JACG_G";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLHessOutput has only 3 entries: ('NLHessOutput', 'jac, f, g')");
+    case SCHEME_GradFOutput: 
+      if(i==0) return "GRADF_GRAD";
+      if(i==1) return "GRADF_F";
+      if(i==2) return "GRADF_G";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. GradFOutput has only 3 entries: ('GradFOutput', 'grad, f, g')");
       break;
-    case SCHEME_NLHessLInput: 
-      if(i==0) return "NL_HESSL_X";
-      if(i==1) return "NL_HESSL_P";
-      if(i==2) return "NL_HESSL_LAM_F";
-      if(i==3) return "NL_HESSL_LAM_G";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLHessLInput has only 4 entries: ('NLHessLInput', 'x, p, lam_f, lam_g')");
+    case SCHEME_JacGInput: 
+      if(i==0) return "JACG_X";
+      if(i==1) return "JACG_P";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. JacGInput has only 2 entries: ('JacGInput', 'x, p')");
       break;
-    case SCHEME_NLHessLOutput: 
-      if(i==0) return "NL_HESSL_HESS";
-      if(i==1) return "NL_HESSL_GRAD";
-      if(i==2) return "NL_HESSL_F";
-      if(i==3) return "NL_HESSL_G";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLHessLOutput has only 4 entries: ('NLHessLOutput', 'hess, grad, f, g')");
+    case SCHEME_JacGOutput: 
+      if(i==0) return "JACG_JAC";
+      if(i==1) return "JACG_F";
+      if(i==2) return "JACG_G";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. JacGOutput has only 3 entries: ('JacGOutput', 'jac, f, g')");
+      break;
+    case SCHEME_HessLagInput: 
+      if(i==0) return "HESSLAG_X";
+      if(i==1) return "HESSLAG_P";
+      if(i==2) return "HESSLAG_LAM_F";
+      if(i==3) return "HESSLAG_LAM_G";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. HessLagInput has only 4 entries: ('HessLagInput', 'x, p, lam_f, lam_g')");
+      break;
+    case SCHEME_HessLagOutput: 
+      if(i==0) return "HESSLAG_HESS";
+      if(i==1) return "HESSLAG_GRAD";
+      if(i==2) return "HESSLAG_F";
+      if(i==3) return "HESSLAG_G";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. HessLagOutput has only 4 entries: ('HessLagOutput', 'hess, grad, f, g')");
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "NLP_SOLVER_X0";
@@ -854,22 +891,31 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="f") return 0;
       if(name=="g") return 1;
       break;
-    case SCHEME_NLJacGInput: 
+    case SCHEME_GradFInput: 
       if(name=="x") return 0;
       if(name=="p") return 1;
       break;
-    case SCHEME_NLHessOutput: 
+    case SCHEME_GradFOutput: 
+      if(name=="grad") return 0;
+      if(name=="f") return 1;
+      if(name=="g") return 2;
+      break;
+    case SCHEME_JacGInput: 
+      if(name=="x") return 0;
+      if(name=="p") return 1;
+      break;
+    case SCHEME_JacGOutput: 
       if(name=="jac") return 0;
       if(name=="f") return 1;
       if(name=="g") return 2;
       break;
-    case SCHEME_NLHessLInput: 
+    case SCHEME_HessLagInput: 
       if(name=="x") return 0;
       if(name=="p") return 1;
       if(name=="lam_f") return 2;
       if(name=="lam_g") return 3;
       break;
-    case SCHEME_NLHessLOutput: 
+    case SCHEME_HessLagOutput: 
       if(name=="hess") return 0;
       if(name=="grad") return 1;
       if(name=="f") return 2;

@@ -67,54 +67,76 @@ namespace CasADi{
     NL_NUM_OUT
   };
 
-  /// Input arguments of an NLP Jacobian function [nlJacGIn]
-  enum NLJacGInput{
+  /// Input arguments of an NLP objective gradient function [gradFIn]
+  enum GradFInput{
     /// Decision variable [x]
-    NL_JACG_X,
+    GRADF_X,
     /// Fixed parameter [p]
-    NL_JACG_P, 
+    GRADF_P, 
     /// Number of inputs
-    NL_JACG_NUM_IN
+    GRADF_NUM_IN
   };
 
-  /// Output arguments of an NLP Jacobian function [nlJacGOut]
-  enum NLHessOutput{ 
+  /// Output arguments of an NLP objective gradient function [gradFOut]
+  enum GradFOutput{ 
+    /// Jacobian of the constraints [grad]
+    GRADF_GRAD,
+    /// Objective function [f]
+    GRADF_F,
+    /// Constraint function [g]
+    GRADF_G,
+    /// Number of outputs
+    GRADF_NUM_OUT
+  };
+
+  /// Input arguments of an NLP Jacobian function [jacGIn]
+  enum JacGInput{
+    /// Decision variable [x]
+    JACG_X,
+    /// Fixed parameter [p]
+    JACG_P, 
+    /// Number of inputs
+    JACG_NUM_IN
+  };
+
+  /// Output arguments of an NLP Jacobian function [jacGOut]
+  enum JacGOutput{ 
     /// Jacobian of the constraints [jac]
-    NL_JACG_JAC,
+    JACG_JAC,
     /// Objective function [f]
-    NL_JACG_F,
+    JACG_F,
     /// Constraint function [g]
-    NL_JACG_G,
+    JACG_G,
     /// Number of outputs
-    NL_JACG_NUM_OUT
+    JACG_NUM_OUT
   };
 
-  /// Input arguments of an NLP Hessian function [nlHessLIn]
-  enum NLHessLInput{
+  /// Input arguments of an NLP Hessian function [hessLagIn]
+  enum HessLagInput{
     /// Decision variable [x]
-    NL_HESSL_X,
+    HESSLAG_X,
     /// Fixed parameter [p]
-    NL_HESSL_P, 
+    HESSLAG_P, 
     /// Multiplier for f [lam_f]
-    NL_HESSL_LAM_F,
+    HESSLAG_LAM_F,
     /// Multiplier for g [lam_g]
-    NL_HESSL_LAM_G,
+    HESSLAG_LAM_G,
     /// Number of inputs
-    NL_HESSL_NUM_IN
+    HESSLAG_NUM_IN
   };
 
-  /// Output arguments of an NLP Hessian function [nlHessLOut]
-  enum NLHessLOutput{ 
+  /// Output arguments of an NLP Hessian function [hessLagOut]
+  enum HessLagOutput{ 
     /// Hessian of the Lagrangian [hess]
-    NL_HESSL_HESS,
+    HESSLAG_HESS,
     /// Gradient of the Lagrangian [grad]
-    NL_HESSL_GRAD,
+    HESSLAG_GRAD,
     /// Objective function [f]
-    NL_HESSL_F,
+    HESSLAG_F,
     /// Constraint function [g]
-    NL_HESSL_G,
+    HESSLAG_G,
     /// Number of outputs
-    NL_HESSL_NUM_OUT
+    HESSLAG_NUM_OUT
   };
   
   /// Input arguments of an NLP Solver [nlpsolverIn]
