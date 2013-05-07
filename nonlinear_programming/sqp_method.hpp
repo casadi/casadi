@@ -77,15 +77,6 @@ namespace CasADi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    // Access the objective gradient function
-    FX getGradF() const;
-
-    /// Access the Jacobian of the constraint function
-    FX getJacG() const;
-
-    /// Access the Hessian of the Lagrangian function
-    FX getHessLag() const;
-
     /// Static creator function 
 #ifdef SWIG
     %callback("%s_cb");

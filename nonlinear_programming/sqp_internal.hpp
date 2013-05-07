@@ -40,15 +40,6 @@ public:
   virtual void init();
   virtual void evaluate(int nfdir, int nadir);
   
-  // Gradient of the objective
-  FX gradF_;
-  
-  // Jacobian of the constraints
-  FX jacG_;
-
-  // Hessian of the Lagrangian
-  FX hessLag_;
-
   /// QP solver for the subproblems
   QPSolver qp_solver_;
 

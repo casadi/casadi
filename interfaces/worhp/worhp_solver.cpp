@@ -54,9 +54,4 @@ namespace CasADi{
     dynamic_cast<WorhpInternal*>(get())->setOptionsFromFile(file);
   }
 
-  FX WorhpSolver::getGradF() const {  return (*this)->gradF_;}
-  FX WorhpSolver::getJacG() const {  return (*this)->jacG_;}
-  FX WorhpSolver::getHessLag() const {  return (*this)->hessLag_;}
-
-
 } // namespace CasADi

@@ -63,16 +63,6 @@ namespace CasADi{
   
     // KNITRO string parameter
     std::map<std::string, std::string> string_param_;
-  
-    // Gradient of the objective
-    FX gradF_;
-  
-    // Jacobian of the constraints
-    FX jacG_;
-
-    // Hessian of the Lagrangian
-    FX hessLag_;
-
   };
 
 } // namespace CasADi

@@ -208,7 +208,16 @@ namespace CasADi{
     void setQPOptions();
   
     /// Access the NLP
-    FX getNLP() const;
+    FX nlp();
+
+    // Access the objective gradient function
+    FX gradF();
+
+    /// Access the Jacobian of the constraint function
+    FX jacG();
+
+    /// Access the Hessian of the Lagrangian function
+    FX hessLag();
 
     /// Join F and G in old signature style to a common NLP function
     static FX joinFG(FX F, FX G);

@@ -65,16 +65,6 @@ namespace CasADi{
     void *userclass;
     std::map<std::string,opt_type> ops_;
 
-    // Gradient of the objective
-    FX gradF_;
-    
-    // Jacobian of the constraints
-    FX jacG_;
-    
-    // Hessian of the Lagrangian
-    FX hessLag_;
-   
-
     FX nlpmod_;
     FX GFmod_; 
     FX Hmod_;

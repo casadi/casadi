@@ -61,9 +61,4 @@ namespace CasADi{
     (*this)->string_param_[name] = val;
   }
 
-  FX KnitroSolver::getGradF() const {  return (*this)->gradF_;}
-  FX KnitroSolver::getJacG() const {  return (*this)->jacG_;}
-  FX KnitroSolver::getHessLag() const {  return (*this)->hessLag_;}
-
-
 } // namespace CasADi
