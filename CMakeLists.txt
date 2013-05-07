@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
 project(casadi C CXX)
-enable_language(Fortran OPTIONAL)
 set(PACKAGE_NAME "CasADi")
 set(PACKAGE_VERSION "1.6.0+")
 
@@ -16,6 +15,16 @@ OUTPUT_VARIABLE git_describe
 OUTPUT_STRIP_TRAILING_WHITESPACE
 ERROR_QUIET
 )
+
+#begin workaround for http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
+SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
+include(language_support)
+workaround_9220(Fortran Fortran_language_works)
+set(Fortran_language_works "")
+if(Fortran_language_works)
+  enable_language(Fortran OPTIONAL)
+endif()
+#end workaround
 
 # find the macports python libs if they exist
 if(APPLE)
@@ -199,7 +208,6 @@ if(WITH_OPENMP)
 endif()
 
 #SET(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
