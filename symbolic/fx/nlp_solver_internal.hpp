@@ -56,22 +56,34 @@ namespace CasADi{
     virtual void setQPOptions() { };
 
     /// Get or generate a function to calculate the gradient of the objective function
-    FX getGradF();
+    virtual FX getGradF();
   
     /// Get or generate a function to calculate the Jacobian of the constraint function
-    FX getJacG();
+    virtual FX getJacG();
+
+    /// Get or generate a function to calculate the gradient of the Lagrangian function
+    virtual FX getGradLag();
 
     /// Get or generate a function to calculate the Hessian of the Lagrangian function
-    FX getHessLag();
+    virtual FX getHessLag();
 
+    /// Get or generate the sparsity pattern of the Hessian of the Lagrangian
+    virtual CRSSparsity getHessLagSparsity();
+    
     // Access the objective gradient function
-    virtual FX& gradF();
+    FX& gradF();
 
     /// Access the Jacobian of the constraint function
-    virtual FX& jacG();
+    FX& jacG();
 
     /// Access the Hessian of the Lagrangian function
-    virtual FX& hessLag();
+    FX& hessLag();
+
+    /// Access the gradient of the Lagrangian function
+    FX& gradLag();
+
+    /// Get the sparsity pattern of the Hessian of the Lagrangian
+    CRSSparsity& hessLagSparsity();
 
     /// Hessian modes
     enum HessMode{HESS_EXACT, HESS_BFGS, HESS_GAUSS_NEWTON};
@@ -106,6 +118,12 @@ namespace CasADi{
     
     // Hessian of the Lagrangian
     FX hessLag_;
+
+    // Gradient of the Lagrangian
+    FX gradLag_;
+
+    // Sparsity pattern of the Hessian of the Lagrangian
+    CRSSparsity hessLagSparsity_;
   };
 
 } // namespace CasADi

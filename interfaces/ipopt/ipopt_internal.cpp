@@ -41,7 +41,7 @@ using namespace std;
 namespace CasADi{
 
   IpoptInternal::IpoptInternal(const FX& nlp) : NLPSolverInternal(nlp){
-    addOption("pass_nonlinear_variables", OT_BOOLEAN, true);
+    addOption("pass_nonlinear_variables", OT_BOOLEAN, false);
     addOption("print_time",               OT_BOOLEAN, true, "print information about execution time");
   
     // Monitors
@@ -708,9 +708,9 @@ namespace CasADi{
     }
   }
 
-  int IpoptInternal::get_number_of_nonlinear_variables() const{
+  int IpoptInternal::get_number_of_nonlinear_variables(){
     try {
-      if(hessLag_.isNull() || !bool(getOption("pass_nonlinear_variables"))){
+      if(!bool(getOption("pass_nonlinear_variables"))){
         // No Hessian has been interfaced
         return -1;
       } else {
@@ -718,9 +718,11 @@ namespace CasADi{
         int nv = 0;
       
         // Loop over the rows
-        for(int i=0; i<hessLag_.output().size1(); ++i){
+        const CRSSparsity& hessLagSparsity = this->hessLagSparsity();
+        const vector<int>& rowind = hessLagSparsity.rowind();
+        for(int i=0; i<rowind.size()-1; ++i){
           // If the row contains any non-zeros, the corresponding variable appears nonlinearily
-          if(hessLag_.output().rowind(i)!=hessLag_.output().rowind(i+1))
+          if(rowind[i]!=rowind[i+1])
             nv++;
         }
       
@@ -733,15 +735,17 @@ namespace CasADi{
     }
   }
 
-  bool IpoptInternal::get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const{
+  bool IpoptInternal::get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars){
     try {
       // Running index
       int el = 0;
     
       // Loop over the rows
-      for(int i=0; i<hessLag_.output().size1(); ++i){
+      const CRSSparsity& hessLagSparsity = this->hessLagSparsity();
+      const vector<int>& rowind = hessLagSparsity.rowind();
+      for(int i=0; i<rowind.size()-1; ++i){
         // If the row contains any non-zeros, the corresponding variable appears nonlinearily
-        if(hessLag_.output().rowind(i)!=hessLag_.output().rowind(i+1)){
+        if(rowind[i]!=rowind[i+1]){
           pos_nonlin_vars[el++] = i;
         }
       }
