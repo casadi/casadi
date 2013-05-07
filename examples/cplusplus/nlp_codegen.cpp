@@ -131,7 +131,7 @@ int main(){
 
   // Create an NLP solver passing derivative information
   IpoptSolver solver(ffcn_e, gfcn_e);
-  solver.setOption("hes_lag",hess_lfcn_e);
+  solver.setOption("hess_lag",hess_lfcn_e);
   solver.setOption("jac_g",jac_gfcn_e);
   solver.setOption("grad_f",grad_ffcn_e);
   solver.init();

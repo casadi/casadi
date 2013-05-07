@@ -80,7 +80,7 @@ namespace CasADi{
     jacG_ = getJacG();
     switch(hess_mode_){
     case HESS_EXACT:
-      hesLag_ = getHesLag();
+      hessLag_ = getHessLag();
       break;
     case HESS_BFGS:
       break;
@@ -89,7 +89,7 @@ namespace CasADi{
     }
   
     // Allocate a QP solver
-    CRSSparsity H_sparsity = hess_mode_==HESS_EXACT ? hesLag_.output().sparsity() : sp_dense(nx_,nx_);
+    CRSSparsity H_sparsity = hess_mode_==HESS_EXACT ? hessLag_.output().sparsity() : sp_dense(nx_,nx_);
     H_sparsity = H_sparsity + DMatrix::eye(nx_).sparsity();
     CRSSparsity A_sparsity = jacG_.isNull() ? CRSSparsity(0,nx_,false) : jacG_.output().sparsity();
 
@@ -573,16 +573,16 @@ namespace CasADi{
   void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H){
     try{
       // Pass the argument to the function
-      hesLag_.setInput(x,NL_X);
-      hesLag_.setInput(input(NLP_SOLVER_P),NL_P);
-      hesLag_.setInput(sigma,NL_NUM_IN+NL_F);
-      hesLag_.setInput(lambda,NL_NUM_IN+NL_G);
+      hessLag_.setInput(x,NL_X);
+      hessLag_.setInput(input(NLP_SOLVER_P),NL_P);
+      hessLag_.setInput(sigma,NL_NUM_IN+NL_F);
+      hessLag_.setInput(lambda,NL_NUM_IN+NL_G);
       
       // Evaluate
-      hesLag_.evaluate();
+      hessLag_.evaluate();
       
       // Get results
-      hesLag_.getOutput(H);
+      hessLag_.getOutput(H);
       
       if (monitored("eval_h")) {
         cout << "x = " << x << endl;

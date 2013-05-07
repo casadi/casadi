@@ -63,7 +63,7 @@ namespace CasADi{
 
   FX KnitroSolver::getGradF() const {  return (*this)->gradF_;}
   FX KnitroSolver::getJacG() const {  return (*this)->jacG_;}
-  FX KnitroSolver::getHesLag() const {  return (*this)->hesLag_;}
+  FX KnitroSolver::getHessLag() const {  return (*this)->hessLag_;}
 
 
 } // namespace CasADi

@@ -54,7 +54,7 @@ class KnitroSolver : public NLPSolver {
     FX getJacG() const;
 
     /// Access the Hessian of the Lagrangian function
-    FX getHesLag() const;
+    FX getHessLag() const;
 
     /// Access functions of the node
     KnitroInternal* operator->();

@@ -104,7 +104,7 @@ namespace CasADi{
     jacG_ = getJacG();
     switch(hess_mode_){
     case HESS_EXACT:
-      hesLag_ = getHesLag();
+      hessLag_ = getHessLag();
       break;
     case HESS_BFGS:
       break;
@@ -167,11 +167,11 @@ namespace CasADi{
     vector<int> Jrow = jacG_.output().sparsity().getRow();
 
     // Hessian sparsity
-    int nnzH = hesLag_.isNull() ? 0 : hesLag_.output().sizeL();
+    int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().sizeL();
     vector<int> Hcol(nnzH), Hrow(nnzH);
     if(nnzH>0){
-      const vector<int> &rowind = hesLag_.output().rowind();
-      const vector<int> &col = hesLag_.output().col();
+      const vector<int> &rowind = hessLag_.output().rowind();
+      const vector<int> &col = hessLag_.output().col();
       int nz=0;
       for(int r=0; r<rowind.size()-1; ++r){
 	for(int el=rowind[r]; el<rowind[r+1] && col[el]<=r; ++el){
@@ -362,24 +362,24 @@ namespace CasADi{
 
   void KnitroInternal::evalh(const double* x, const double* lambda, double* hessian){
     // Pass the argument to the function
-    hesLag_.setInput(x,NL_X);
-    hesLag_.setInput(input(NLP_SOLVER_P),NL_P);
-    hesLag_.setInput(1.0,NL_NUM_IN+NL_F);
-    hesLag_.setInput(lambda,NL_NUM_IN+NL_G);
+    hessLag_.setInput(x,NL_X);
+    hessLag_.setInput(input(NLP_SOLVER_P),NL_P);
+    hessLag_.setInput(1.0,NL_NUM_IN+NL_F);
+    hessLag_.setInput(lambda,NL_NUM_IN+NL_G);
     
     // Evaluate
-    hesLag_.evaluate();
+    hessLag_.evaluate();
     
     // Get results
-    hesLag_.output().get(hessian,SPARSESYM);
+    hessLag_.output().get(hessian,SPARSESYM);
   
     // Printing
     if(monitored("eval_h")){
       cout << "eval_h" << endl;
-      cout << "x = " << hesLag_.input(0) << endl;
-      cout << "lambda = " << hesLag_.input(1) << endl;
-      cout << "scale = " << hesLag_.input(2) << endl;
-      cout << "H = " << hesLag_ << endl;
+      cout << "x = " << hessLag_.input(0) << endl;
+      cout << "lambda = " << hessLag_.input(1) << endl;
+      cout << "scale = " << hessLag_.input(2) << endl;
+      cout << "H = " << hessLag_ << endl;
     }      
   }
 

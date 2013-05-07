@@ -103,7 +103,7 @@ public:
   FX jacG_;
 
   // Hessian of the Lagrangian
-  FX hesLag_;
+  FX hessLag_;
 
   // Accummulated time since last reset:
   double t_eval_f_; // time spent in eval_f

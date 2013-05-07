@@ -56,7 +56,7 @@ namespace CasADi{
 
   FX WorhpSolver::getGradF() const {  return (*this)->gradF_;}
   FX WorhpSolver::getJacG() const {  return (*this)->jacG_;}
-  FX WorhpSolver::getHesLag() const {  return (*this)->hesLag_;}
+  FX WorhpSolver::getHessLag() const {  return (*this)->hessLag_;}
 
 
 } // namespace CasADi

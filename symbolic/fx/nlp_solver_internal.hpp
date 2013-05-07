@@ -62,7 +62,7 @@ namespace CasADi{
     FX getJacG();
 
     /// Get or generate a function to calculate the Hessian of the Lagrangian function
-    FX getHesLag();
+    FX getHessLag();
 
     /// Hessian modes
     enum HessMode{HESS_EXACT, HESS_BFGS, HESS_GAUSS_NEWTON};

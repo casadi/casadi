@@ -255,7 +255,7 @@ namespace CasADi{
     jacG_ = getJacG();
     switch(hess_mode_){
     case HESS_EXACT:
-      hesLag_ = getHesLag();
+      hessLag_ = getHessLag();
       break;
     case HESS_BFGS:
       break;
@@ -583,8 +583,8 @@ namespace CasADi{
     nlpmod_.init(); 
   
     // Create modified H that does not contain the non-free X
-    if (!hesLag_.isNull()) {
-      std::vector< MX > Hmod_in = hesLag_.symbolicInput();
+    if (!hessLag_.isNull()) {
+      std::vector< MX > Hmod_in = hessLag_.symbolicInput();
       std::vector< MX > H_in = Hmod_in;
     
       Hmod_in.at(NL_X) = freeX;
@@ -597,7 +597,7 @@ namespace CasADi{
       H_in.at(NL_NUM_IN+NL_G)[nonfreeG_] = nonfreeG;
       H_in.at(NL_NUM_IN+NL_G)[freeG_] = 0;
     
-      Hmod_ = MXFunction(Hmod_in,hesLag_.call(H_in).at(0)(freeX_,freeX_));
+      Hmod_ = MXFunction(Hmod_in,hessLag_.call(H_in).at(0)(freeX_,freeX_));
       Hmod_.init(); 
     }
   
