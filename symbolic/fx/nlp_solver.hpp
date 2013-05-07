@@ -66,6 +66,56 @@ namespace CasADi{
     /// Number of NLP outputs
     NL_NUM_OUT
   };
+
+  /// Input arguments of an NLP Jacobian function [nlJacGIn]
+  enum NLJacGInput{
+    /// Decision variable [x]
+    NL_JACG_X,
+    /// Fixed parameter [p]
+    NL_JACG_P, 
+    /// Number of inputs
+    NL_JACG_NUM_IN
+  };
+
+  /// Output arguments of an NLP Jacobian function [nlJacGOut]
+  enum NLHessOutput{ 
+    /// Jacobian of the constraints [jac]
+    NL_JACG_JAC,
+    /// Objective function [f]
+    NL_JACG_F,
+    /// Constraint function [g]
+    NL_JACG_G,
+    /// Number of outputs
+    NL_JACG_NUM_OUT
+  };
+
+  /// Input arguments of an NLP Hessian function [nlHessLIn]
+  enum NLHessLInput{
+    /// Decision variable [x]
+    NL_HESSL_X,
+    /// Fixed parameter [p]
+    NL_HESSL_P, 
+    /// Multiplier for f [lam_f]
+    NL_HESSL_LAM_F,
+    /// Multiplier for g [lam_g]
+    NL_HESSL_LAM_G,
+    /// Number of inputs
+    NL_HESSL_NUM_IN
+  };
+
+  /// Output arguments of an NLP Hessian function [nlHessLOut]
+  enum NLHessLOutput{ 
+    /// Hessian of the Lagrangian [hess]
+    NL_HESSL_HESS,
+    /// Gradient of the Lagrangian [grad]
+    NL_HESSL_GRAD,
+    /// Objective function [f]
+    NL_HESSL_F,
+    /// Constraint function [g]
+    NL_HESSL_G,
+    /// Number of outputs
+    NL_HESSL_NUM_OUT
+  };
   
   /// Input arguments of an NLP Solver [nlpsolverIn]
   enum NLPSolverInput{
