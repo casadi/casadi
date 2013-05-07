@@ -316,6 +316,10 @@ Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
 template<class T>
 void makeDense(Matrix<T>& A);
 
+/** \brief  Make a matrix dense */
+template<class T>
+Matrix<T> densify(const Matrix<T>& A);
+
 /** \brief  Make a matrix sparse by removing numerical */
 template<class T>
 void makeSparse(Matrix<T>& A);
@@ -1073,6 +1077,13 @@ void makeDense(Matrix<T>& A){
 }
 
 template<class T>
+Matrix<T> densify(const Matrix<T>& A){
+  Matrix<T> ret(A);
+  makeDense(ret);
+  return ret;
+}
+
+template<class T>
 void makeSparse(Matrix<T>& A){
   // Quick return if there are no structurally zero entries
   if(!hasNonStructuralZeros(A))
@@ -1270,6 +1281,7 @@ MTT_INST(T,sumRows) \
 MTT_INST(T,sumAll) \
 MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
+MTT_INST(T,densify) \
 MTT_INST(T,makeSparse) \
 MTT_INST(T,hasNonStructuralZeros) \
 MTT_INST(T,diag) \
