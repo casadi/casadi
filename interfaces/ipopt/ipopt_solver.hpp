@@ -59,15 +59,6 @@ namespace CasADi{
     /// \brief Create an NLP solver instance
     explicit IpoptSolver(const FX& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
                          );
-
-    // Access the objective gradient function
-    FX getGradF() const;
-
-    /// Access the Jacobian of the constraint function
-    FX getJacG() const;
-
-    /// Access the Hessian of the Lagrangian function
-    FX getHessLag() const;
       
     /** \brief Get the reduced Hessian. 
      * Requires a patched sIPOPT installation, see CasADi documentation. */

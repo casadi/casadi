@@ -76,11 +76,11 @@ namespace CasADi{
     regularize_ = getOption("regularize");
   
     // Get/generate required functions
-    gradF_ = getGradF();
-    jacG_ = getJacG();
+    gradF();
+    jacG();
     switch(hess_mode_){
     case HESS_EXACT:
-      hessLag_ = getHessLag();
+      hessLag();
       break;
     case HESS_BFGS:
       break;
@@ -89,9 +89,9 @@ namespace CasADi{
     }
   
     // Allocate a QP solver
-    CRSSparsity H_sparsity = hess_mode_==HESS_EXACT ? hessLag_.output().sparsity() : sp_dense(nx_,nx_);
+    CRSSparsity H_sparsity = hess_mode_==HESS_EXACT ? hessLag().output().sparsity() : sp_dense(nx_,nx_);
     H_sparsity = H_sparsity + DMatrix::eye(nx_).sparsity();
-    CRSSparsity A_sparsity = jacG_.isNull() ? CRSSparsity(0,nx_,false) : jacG_.output().sparsity();
+    CRSSparsity A_sparsity = jacG().isNull() ? CRSSparsity(0,nx_,false) : jacG().output().sparsity();
 
     QPSolverCreator qp_solver_creator = getOption("qp_solver");
     qp_solver_ = qp_solver_creator(H_sparsity,A_sparsity);
@@ -572,17 +572,20 @@ namespace CasADi{
   
   void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H){
     try{
+      // Get function
+      FX& hessLag = this->hessLag();
+
       // Pass the argument to the function
-      hessLag_.setInput(x,NL_X);
-      hessLag_.setInput(input(NLP_SOLVER_P),NL_P);
-      hessLag_.setInput(sigma,NL_NUM_IN+NL_F);
-      hessLag_.setInput(lambda,NL_NUM_IN+NL_G);
+      hessLag.setInput(x,HESSLAG_X);
+      hessLag.setInput(input(NLP_SOLVER_P),HESSLAG_P);
+      hessLag.setInput(sigma,HESSLAG_LAM_F);
+      hessLag.setInput(lambda,HESSLAG_LAM_G);
       
       // Evaluate
-      hessLag_.evaluate();
+      hessLag.evaluate();
       
       // Get results
-      hessLag_.getOutput(H);
+      hessLag.getOutput(H);
       
       if (monitored("eval_h")) {
         cout << "x = " << x << endl;
@@ -636,16 +639,19 @@ namespace CasADi{
       // Quich finish if no constraints
       if(ng_==0) return;
     
+      // Get function
+      FX& jacG = this->jacG();
+
       // Pass the argument to the function
-      jacG_.setInput(x,NL_X);
-      jacG_.setInput(input(NLP_SOLVER_P),NL_P);
+      jacG.setInput(x,NL_X);
+      jacG.setInput(input(NLP_SOLVER_P),NL_P);
       
       // Evaluate the function
-      jacG_.evaluate();
+      jacG.evaluate();
       
       // Get the output
-      jacG_.output(1+NL_G).get(g,DENSE);
-      jacG_.output().get(J);
+      jacG.output(1+NL_G).get(g,DENSE);
+      jacG.output().get(J);
 
       if (monitored("eval_jac_g")) {
         cout << "x = " << x << endl;
@@ -661,16 +667,19 @@ namespace CasADi{
 
   void SQPInternal::eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f){
     try {
+      // Get function
+      FX& gradF = this->gradF();
+
       // Pass the argument to the function
-      gradF_.setInput(x,NL_X);
-      gradF_.setInput(input(NLP_SOLVER_P),NL_P);
+      gradF.setInput(x,NL_X);
+      gradF.setInput(input(NLP_SOLVER_P),NL_P);
       
       // Evaluate, adjoint mode
-      gradF_.evaluate();
+      gradF.evaluate();
       
       // Get the result
-      gradF_.output().get(grad_f,DENSE);
-      gradF_.output(1+NL_X).get(f);
+      gradF.output().get(grad_f,DENSE);
+      gradF.output(1+NL_X).get(f);
       
       // Printing
       if (monitored("eval_f")){

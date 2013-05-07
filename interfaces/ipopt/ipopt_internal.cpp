@@ -145,11 +145,11 @@ namespace CasADi{
     NLPSolverInternal::init();
     
     // Get/generate required functions
-    gradF_ = getGradF();
-    jacG_ = getJacG();
+    gradF();
+    jacG();
     switch(hess_mode_){
     case HESS_EXACT:
-      hessLag_ = getHessLag();
+      hessLag();
       break;
     case HESS_BFGS:
       break;
@@ -476,37 +476,38 @@ namespace CasADi{
         log("eval_jac_g quick return (m==0)");
         return true;
       }
+      
+      // Get function
+      FX& jacG = this->jacG();
     
       double time1 = clock();
       if (values == NULL) {
         int nz=0;
         vector<int> rowind,col;
-        jacG_.output().sparsity().getSparsityCRS(rowind,col);
+        jacG.output().sparsity().getSparsityCRS(rowind,col);
         for(int r=0; r<rowind.size()-1; ++r)
           for(int el=rowind[r]; el<rowind[r+1]; ++el){
-            //        if(col[el]>=r){
             iRow[nz] = r;
             jCol[nz] = col[el];
             nz++;
-            //      }
           }
       } else {
         // Pass the argument to the function
-        jacG_.setInput(x,NL_X);
-        jacG_.setInput(input(NLP_SOLVER_P),NL_P);
+        jacG.setInput(x,NL_X);
+        jacG.setInput(input(NLP_SOLVER_P),NL_P);
       
         // Evaluate the function
-        jacG_.evaluate();
+        jacG.evaluate();
 
         // Get the output
-        jacG_.getOutput(values);
+        jacG.getOutput(values);
       
         if(monitored("eval_jac_g")){
-          cout << "x = " << jacG_.input(NL_X).data() << endl;
+          cout << "x = " << jacG.input(NL_X).data() << endl;
           cout << "J = " << endl;
-          jacG_.output().printSparse();
+          jacG.output().printSparse();
         }
-        if (regularity_check_ && !isRegular(jacG_.output().data())) casadi_error("IpoptInternal::jac_g: NaN or Inf detected.");
+        if (regularity_check_ && !isRegular(jacG.output().data())) casadi_error("IpoptInternal::jac_g: NaN or Inf detected.");
       }
     
       double time2 = clock();
@@ -694,11 +695,11 @@ namespace CasADi{
       if(nlp_.output(NL_G).size()==0)
         nnz_jac_g = 0;
       else
-        nnz_jac_g = jacG_.output().size();
+        nnz_jac_g = jacG().output().size();
 
       // Get Hessian sparsity pattern
       if(hess_mode_==HESS_EXACT)
-        nnz_h_lag = hessLag_.output().sparsity().sizeL();
+        nnz_h_lag = hessLag().output().sparsity().sizeL();
       else
         nnz_h_lag = 0;
     } catch (exception& ex){

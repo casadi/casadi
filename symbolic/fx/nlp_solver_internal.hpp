@@ -64,12 +64,18 @@ namespace CasADi{
     /// Get or generate a function to calculate the Hessian of the Lagrangian function
     FX getHessLag();
 
+    // Access the objective gradient function
+    virtual FX& gradF();
+
+    /// Access the Jacobian of the constraint function
+    virtual FX& jacG();
+
+    /// Access the Hessian of the Lagrangian function
+    virtual FX& hessLag();
+
     /// Hessian modes
     enum HessMode{HESS_EXACT, HESS_BFGS, HESS_GAUSS_NEWTON};
     HessMode hess_mode_;
-
-    /// The NLP
-    FX nlp_;
 
     /// Number of variables
     int nx_;
@@ -88,6 +94,18 @@ namespace CasADi{
   
     /// use Gauss-Newton Hessian
     bool gauss_newton_; 
+
+    /// The NLP
+    FX nlp_;
+
+    // Gradient of the objective
+    FX gradF_;
+    
+    // Jacobian of the constraints
+    FX jacG_;
+    
+    // Hessian of the Lagrangian
+    FX hessLag_;
   };
 
 } // namespace CasADi

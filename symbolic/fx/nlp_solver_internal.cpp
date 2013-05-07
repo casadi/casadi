@@ -251,4 +251,25 @@ namespace CasADi{
     return gradF;
   }
 
+  FX& NLPSolverInternal::gradF(){
+    if(gradF_.isNull()){
+      gradF_ = getGradF();
+    }
+    return gradF_;
+  }
+  
+  FX& NLPSolverInternal::jacG(){
+    if(jacG_.isNull()){
+      jacG_ = getJacG();
+    }
+    return jacG_;
+  }
+
+  FX& NLPSolverInternal::hessLag(){
+    if(hessLag_.isNull()){
+      hessLag_ = getHessLag();
+    }
+    return hessLag_;
+  }
+
 } // namespace CasADi

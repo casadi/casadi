@@ -52,7 +52,21 @@ namespace CasADi{
     (*this)->setQPOptions();
   }
 
-  FX NLPSolver::getNLP() const { return (*this)->nlp_;}
+  FX NLPSolver::nlp(){ 
+    return (*this)->nlp_;
+  }
+
+  FX NLPSolver::gradF(){ 
+    return (*this)->gradF();
+  }
+  
+  FX NLPSolver::jacG(){ 
+    return (*this)->jacG();
+  }
+
+  FX NLPSolver::hessLag(){  
+    return (*this)->hessLag();
+  }
 
   FX NLPSolver::joinFG(FX F, FX G){    
     if(G.isNull()){
