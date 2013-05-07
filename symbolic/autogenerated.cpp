@@ -95,7 +95,7 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_JacGInput: return "x, p";
     case SCHEME_JacGOutput: return "jac, f, g";
     case SCHEME_HessLagInput: return "x, p, lam_f, lam_g";
-    case SCHEME_HessLagOutput: return "hess, grad, f, g";
+    case SCHEME_HessLagOutput: return "hess, f, g, grad_x, grad_p";
     case SCHEME_NLPSolverInput: return "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0";
     case SCHEME_NLPSolverOutput: return "x, f, g, lam_x, lam_g, lam_p";
     case SCHEME_MayerInput: return "x, p";
@@ -248,10 +248,11 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_HessLagOutput: 
       if(i==0) return "hess";
-      if(i==1) return "grad";
-      if(i==2) return "f";
-      if(i==3) return "g";
-      casadi_error("getSchemeEntryName: supplied number is out of range. HessLagOutput has only 4 entries: ('HessLagOutput', 'hess, grad, f, g')");
+      if(i==1) return "f";
+      if(i==2) return "g";
+      if(i==3) return "grad_x";
+      if(i==4) return "grad_p";
+      casadi_error("getSchemeEntryName: supplied number is out of range. HessLagOutput has only 5 entries: ('HessLagOutput', 'hess, f, g, grad_x, grad_p')");
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "x0";
@@ -477,10 +478,11 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_HessLagOutput: 
       if(i==0) return "Hessian of the Lagrangian";
-      if(i==1) return "Gradient of the Lagrangian";
-      if(i==2) return "Objective function";
-      if(i==3) return "Constraint function";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. HessLagOutput has only 4 entries: ('HessLagOutput', 'hess, grad, f, g')");
+      if(i==1) return "Objective function";
+      if(i==2) return "Constraint function";
+      if(i==3) return "Gradient of the Lagrangian with respect to x";
+      if(i==4) return "Gradient of the Lagrangian with respect to p";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. HessLagOutput has only 5 entries: ('HessLagOutput', 'hess, f, g, grad_x, grad_p')");
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "Decision variables, initial guess (nx x 1) ";
@@ -706,10 +708,11 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_HessLagOutput: 
       if(i==0) return "HESSLAG_HESS";
-      if(i==1) return "HESSLAG_GRAD";
-      if(i==2) return "HESSLAG_F";
-      if(i==3) return "HESSLAG_G";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. HessLagOutput has only 4 entries: ('HessLagOutput', 'hess, grad, f, g')");
+      if(i==1) return "HESSLAG_F";
+      if(i==2) return "HESSLAG_G";
+      if(i==3) return "HESSLAG_GRAD_X";
+      if(i==4) return "HESSLAG_GRAD_P";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. HessLagOutput has only 5 entries: ('HessLagOutput', 'hess, f, g, grad_x, grad_p')");
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "NLP_SOLVER_X0";
@@ -917,9 +920,10 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       break;
     case SCHEME_HessLagOutput: 
       if(name=="hess") return 0;
-      if(name=="grad") return 1;
-      if(name=="f") return 2;
-      if(name=="g") return 3;
+      if(name=="f") return 1;
+      if(name=="g") return 2;
+      if(name=="grad_x") return 3;
+      if(name=="grad_p") return 4;
       break;
     case SCHEME_NLPSolverInput: 
       if(name=="x0") return 0;

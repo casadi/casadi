@@ -129,12 +129,14 @@ namespace CasADi{
   enum HessLagOutput{ 
     /// Hessian of the Lagrangian [hess]
     HESSLAG_HESS,
-    /// Gradient of the Lagrangian [grad]
-    HESSLAG_GRAD,
     /// Objective function [f]
     HESSLAG_F,
     /// Constraint function [g]
     HESSLAG_G,
+    /// Gradient of the Lagrangian with respect to x [grad_x]
+    HESSLAG_GRAD_X,
+    /// Gradient of the Lagrangian with respect to p [grad_p]
+    HESSLAG_GRAD_P,
     /// Number of outputs
     HESSLAG_NUM_OUT
   };
