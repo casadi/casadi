@@ -43,6 +43,13 @@ if(IPOPT_FOUND)
     casadi_ipopt_interface casadi_nonlinear_programming casadi 
     ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
+
+  add_executable(sqpmethod_nl sqpmethod_nl.cpp)
+  target_link_libraries(sqpmethod_nl 
+    casadi_ipopt_interface casadi_nonlinear_programming casadi 
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+
 endif()
 
 # rocket example using sundials and ipopt
