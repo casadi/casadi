@@ -41,5 +41,5 @@ $(LOG): %.log : %.run
 $(OCTLOG): %.out : %.m
 	octave --no-init-file -p $(OCTAVE_PATH) -q $< 2>&1 > $@ 
 	
-ctemplate/compiler.sh ctemplate/linker.sh: $(BUILDDIR)/documentation/examples/ctemplate/CMakeFiles/ctemplate.dir/link.txt  $(BUILDDIR)/documentation/examples/ctemplate/CMakeFiles/ctemplate.dir/flags.make
+ctemplate/compiler.sh ctemplate/linker.sh: $(BUILDDIR)/documentation/examples/ctemplate/CMakeFiles/ctemplate.dir/link.txt  $(BUILDDIR)/documentation/examples/ctemplate/CMakeFiles/ctemplate.dir/flags.make ctemplate/ctemplate.py
 	cd ctemplate && python ctemplate.py && chmod +x compiler.sh linker.sh && cd ..
