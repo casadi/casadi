@@ -694,6 +694,174 @@ namespace CasADi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
+def nlJacGIn(*dummy,**kwargs):
+  """
+  Helper function for 'NLJacGInput'
+
+  Two use cases:
+     a) arg = nlJacGIn(x=my_x, p=my_p) 
+          all arguments optional
+     b) x, p = nlJacGIn(arg,"x", "p") 
+          all arguments after the first optional
+  Input arguments of an NLP Jacobian function
+  
+  Keyword arguments:
+    x -- Decision variable [NL_JACG_X]
+    p -- Fixed parameter [NL_JACG_P]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlJacGIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLJacGInput,n)] for n in dummy[1:]]
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
+  p = []
+  if 'p' in kwargs:
+    p = kwargs['p']
+  for k in kwargs.keys():
+    if not(k in ['x','p']):
+      raise Exception("Keyword error in nlJacGIn: '%s' is not recognized. Available keywords are: x, p" % k )
+  return IOSchemeVector([x,p], SCHEME_NLJacGInput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(nlJacGIn) nlJacGIn<SXMatrix>;
+%template(nlJacGIn) nlJacGIn<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def nlJacGOut(*dummy,**kwargs):
+  """
+  Helper function for 'NLHessOutput'
+
+  Two use cases:
+     a) arg = nlJacGOut(jac=my_jac, f=my_f, g=my_g) 
+          all arguments optional
+     b) jac, f, g = nlJacGOut(arg,"jac", "f", "g") 
+          all arguments after the first optional
+  Output arguments of an NLP Jacobian function
+  
+  Keyword arguments:
+    jac -- Jacobian of the constraints [NL_JACG_JAC]
+    f   -- Objective function [NL_JACG_F]
+    g   -- Constraint function [NL_JACG_G]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlJacGOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLHessOutput,n)] for n in dummy[1:]]
+  jac = []
+  if 'jac' in kwargs:
+    jac = kwargs['jac']
+  f = []
+  if 'f' in kwargs:
+    f = kwargs['f']
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  for k in kwargs.keys():
+    if not(k in ['jac','f','g']):
+      raise Exception("Keyword error in nlJacGOut: '%s' is not recognized. Available keywords are: jac, f, g" % k )
+  return IOSchemeVector([jac,f,g], SCHEME_NLHessOutput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(nlJacGOut) nlJacGOut<SXMatrix>;
+%template(nlJacGOut) nlJacGOut<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def nlHessLIn(*dummy,**kwargs):
+  """
+  Helper function for 'NLHessLInput'
+
+  Two use cases:
+     a) arg = nlHessLIn(x=my_x, p=my_p, lam_f=my_lam_f, lam_g=my_lam_g) 
+          all arguments optional
+     b) x, p, lam_f, lam_g = nlHessLIn(arg,"x", "p", "lam_f", "lam_g") 
+          all arguments after the first optional
+  Input arguments of an NLP Hessian function
+  
+  Keyword arguments:
+    x     -- Decision variable [NL_HESSL_X]
+    p     -- Fixed parameter [NL_HESSL_P]
+    lam_f -- Multiplier for f [NL_HESSL_LAM_F]
+    lam_g -- Multiplier for g [NL_HESSL_LAM_G]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlHessLIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLHessLInput,n)] for n in dummy[1:]]
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
+  p = []
+  if 'p' in kwargs:
+    p = kwargs['p']
+  lam_f = []
+  if 'lam_f' in kwargs:
+    lam_f = kwargs['lam_f']
+  lam_g = []
+  if 'lam_g' in kwargs:
+    lam_g = kwargs['lam_g']
+  for k in kwargs.keys():
+    if not(k in ['x','p','lam_f','lam_g']):
+      raise Exception("Keyword error in nlHessLIn: '%s' is not recognized. Available keywords are: x, p, lam_f, lam_g" % k )
+  return IOSchemeVector([x,p,lam_f,lam_g], SCHEME_NLHessLInput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(nlHessLIn) nlHessLIn<SXMatrix>;
+%template(nlHessLIn) nlHessLIn<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def nlHessLOut(*dummy,**kwargs):
+  """
+  Helper function for 'NLHessLOutput'
+
+  Two use cases:
+     a) arg = nlHessLOut(hess=my_hess, grad=my_grad, f=my_f, g=my_g) 
+          all arguments optional
+     b) hess, grad, f, g = nlHessLOut(arg,"hess", "grad", "f", "g") 
+          all arguments after the first optional
+  Output arguments of an NLP Hessian function
+  
+  Keyword arguments:
+    hess -- Hessian of the Lagrangian [NL_HESSL_HESS]
+    grad -- Gradient of the Lagrangian [NL_HESSL_GRAD]
+    f    -- Objective function [NL_HESSL_F]
+    g    -- Constraint function [NL_HESSL_G]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlHessLOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLHessLOutput,n)] for n in dummy[1:]]
+  hess = []
+  if 'hess' in kwargs:
+    hess = kwargs['hess']
+  grad = []
+  if 'grad' in kwargs:
+    grad = kwargs['grad']
+  f = []
+  if 'f' in kwargs:
+    f = kwargs['f']
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  for k in kwargs.keys():
+    if not(k in ['hess','grad','f','g']):
+      raise Exception("Keyword error in nlHessLOut: '%s' is not recognized. Available keywords are: hess, grad, f, g" % k )
+  return IOSchemeVector([hess,grad,f,g], SCHEME_NLHessLOutput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(nlHessLOut) nlHessLOut<SXMatrix>;
+%template(nlHessLOut) nlHessLOut<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
 def nlpsolverIn(*dummy,**kwargs):
   """
   Helper function for 'NLPSolverInput'
