@@ -900,36 +900,40 @@ def hessLagOut(*dummy,**kwargs):
   Helper function for 'HessLagOutput'
 
   Two use cases:
-     a) arg = hessLagOut(hess=my_hess, grad=my_grad, f=my_f, g=my_g) 
+     a) arg = hessLagOut(hess=my_hess, f=my_f, g=my_g, grad_x=my_grad_x, grad_p=my_grad_p) 
           all arguments optional
-     b) hess, grad, f, g = hessLagOut(arg,"hess", "grad", "f", "g") 
+     b) hess, f, g, grad_x, grad_p = hessLagOut(arg,"hess", "f", "g", "grad_x", "grad_p") 
           all arguments after the first optional
   Output arguments of an NLP Hessian function
   
   Keyword arguments:
-    hess -- Hessian of the Lagrangian [HESSLAG_HESS]
-    grad -- Gradient of the Lagrangian [HESSLAG_GRAD]
-    f    -- Objective function [HESSLAG_F]
-    g    -- Constraint function [HESSLAG_G]
+    hess   -- Hessian of the Lagrangian [HESSLAG_HESS]
+    f      -- Objective function [HESSLAG_F]
+    g      -- Constraint function [HESSLAG_G]
+    grad_x -- Gradient of the Lagrangian with respect to x [HESSLAG_GRAD_X]
+    grad_p -- Gradient of the Lagrangian with respect to p [HESSLAG_GRAD_P]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_HessLagOutput,n)] for n in dummy[1:]]
   hess = []
   if 'hess' in kwargs:
     hess = kwargs['hess']
-  grad = []
-  if 'grad' in kwargs:
-    grad = kwargs['grad']
   f = []
   if 'f' in kwargs:
     f = kwargs['f']
   g = []
   if 'g' in kwargs:
     g = kwargs['g']
+  grad_x = []
+  if 'grad_x' in kwargs:
+    grad_x = kwargs['grad_x']
+  grad_p = []
+  if 'grad_p' in kwargs:
+    grad_p = kwargs['grad_p']
   for k in kwargs.keys():
-    if not(k in ['hess','grad','f','g']):
-      raise Exception("Keyword error in hessLagOut: '%s' is not recognized. Available keywords are: hess, grad, f, g" % k )
-  return IOSchemeVector([hess,grad,f,g], SCHEME_HessLagOutput)
+    if not(k in ['hess','f','g','grad_x','grad_p']):
+      raise Exception("Keyword error in hessLagOut: '%s' is not recognized. Available keywords are: hess, f, g, grad_x, grad_p" % k )
+  return IOSchemeVector([hess,f,g,grad_x,grad_p], SCHEME_HessLagOutput)
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
