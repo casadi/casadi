@@ -199,6 +199,23 @@ namespace CasADi{
     CasADi::reportConstraints(stream,output(NLP_SOLVER_G),input(NLP_SOLVER_LBG),input(NLP_SOLVER_UBG), "constraints",getOption("constr_viol_tol"));
   }
 
+  FX NLPSolverInternal::getGradF(){
+    FX gradF;
+    if(hasSetOption("grad_f")){
+      gradF = getOption("grad_f");
+    } else {
+      log("Generating objective gradient");
+      gradF = nlp_.gradient(NL_X,NL_F);
+      log("Gradient function generated");
+    }
+    gradF.setOption("name","grad_f");
+    gradF.init(false);
+    casadi_assert_message(gradF.getNumInputs()==GRADF_NUM_IN, "Wrong number of inputs to the gradient function. Note: The gradient signature was changed in #544");
+    casadi_assert_message(gradF.getNumOutputs()==GRADF_NUM_OUT, "Wrong number of outputs to the gradient function. Note: The gradient signature was changed in #544");
+    log("Objective gradient function initialized");
+    return gradF;
+  }
+
   FX NLPSolverInternal::getJacG(){
     FX jacG;
     
@@ -214,6 +231,8 @@ namespace CasADi{
     }
     jacG.setOption("name","jac_g");
     jacG.init(false);
+    casadi_assert_message(jacG.getNumInputs()==JACG_NUM_IN, "Wrong number of inputs to the Jacobian function. Note: The Jacobian signature was changed in #544");
+    casadi_assert_message(jacG.getNumOutputs()==JACG_NUM_OUT, "Wrong number of outputs to the Jacobian function. Note: The Jacobian signature was changed in #544");
     log("Jacobian function initialized");
     return jacG;
   }
@@ -224,31 +243,18 @@ namespace CasADi{
       hessLag = getOption("hess_lag");
     } else {
       log("Generating/retrieving Lagrangian function");
-      FX lag_fcn = nlp_.derivative(0,1); // The gradient w.r.t. NL_X is output NUM_OUT+NL_X
+      FX gradLag = nlp_.derivative(0,1); // The gradient w.r.t. NL_X is output NUM_OUT+NL_X
       
       log("Generating Hessian of the Lagrangian");
-      hessLag = lag_fcn.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
+      hessLag = gradLag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
       log("Hessian function generated");
     }
     hessLag.setOption("name","hess_lag");
     hessLag.init(false);
+    casadi_assert_message(hessLag.getNumInputs()==HESSLAG_NUM_IN, "Wrong number of inputs to the Hessian function. Note: The Lagrangian Hessian signature was changed in #544");
+    casadi_assert_message(hessLag.getNumOutputs()==HESSLAG_NUM_OUT, "Wrong number of outputs to the Hessian function. Note: The Lagrangian Hessian signature was changed in #544");
     log("Hessian function initialized");
     return hessLag;
-  }
-
-  FX NLPSolverInternal::getGradF(){
-    FX gradF;
-    if(hasSetOption("grad_f")){
-      gradF = getOption("grad_f");
-    } else {
-      log("Generating objective gradient");
-      gradF = nlp_.gradient(NL_X,NL_F);
-      log("Gradient function generated");
-    }
-    gradF.setOption("name","grad_f");
-    gradF.init(false);
-    log("Objective gradient function initialized");
-    return gradF;
   }
 
   FX& NLPSolverInternal::gradF(){
