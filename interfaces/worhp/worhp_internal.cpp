@@ -495,6 +495,12 @@ namespace CasADi{
   }
 
   void WorhpInternal::prepare() {
+    // Number of (free) variables
+    worhp_o_.n = 0;
+
+    // Number of constraints
+    worhp_o_.m = 0;
+
     // Check what variables are equality constrained
     vector<double>::const_iterator lbx = input(NLP_SOLVER_LBX).begin();
     vector<double>::const_iterator ubx = input(NLP_SOLVER_UBX).begin();
@@ -502,6 +508,7 @@ namespace CasADi{
       bool i_is_eq = *lbx++ == *ubx++;
       reinit_needed_ = reinit_needed_ || *i != i_is_eq;
       *i = i_is_eq;
+      /*if(!i_is_eq)*/ worhp_o_.n++;
     }
 
     // Check what constraints are equality constrained
@@ -511,153 +518,34 @@ namespace CasADi{
       bool i_is_eq = *lbg++ == *ubg++;
       reinit_needed_ = reinit_needed_ || *i != i_is_eq;
       *i = i_is_eq;
+      /*if(!i_is_eq)*/ worhp_o_.m++;
     }
 
-
-  }
-
-  void WorhpInternal::checkinit() {
-    // Must Worhp be re-initialised? This is happens when freeX or freeG changes
-    bool dirty = false;
-  
-    // Collect the new freeX in a temporary variable
-    std::vector<int> freeXi;
-    nonfreeX_.clear();
-  
-    // Populate temporary freeX
-    for (int i=0;i<input(NLP_SOLVER_LBX).size();++i) {
-      //if (input(NLP_SOLVER_LBX).at(i)!=input(NLP_SOLVER_UBX).at(i)) {freeXi.push_back(i);} else {nonfreeX_.push_back(i);}
-      if (true) {freeXi.push_back(i);} else {nonfreeX_.push_back(i);}
-    }
-  
-    // Check if temprary freeX equals previous freeX and set dirty if so
-    if (freeXi.size() == freeX_.size()) {
-      dirty = dirty || !std::equal(freeXi.begin(), freeXi.end(), freeX_.begin());
-    } else {
-      dirty = true;
-    }
-    double inf = numeric_limits<double>::infinity();
-  
-    // Collect the new freeG in a temporary variable
-    std::vector<int> freeGi;
-    nonfreeG_.clear();
-  
-    // Populate temporary freeG
-    for (int i=0;i<input(NLP_SOLVER_LBG).size();++i) {
-      if (input(NLP_SOLVER_LBG).at(i)==-inf && input(NLP_SOLVER_UBG).at(i) == inf) {freeGi.push_back(i);} else {nonfreeG_.push_back(i);}
-    }
-
-    // Check if temporary freeG equals previous freeG and set dirty if so
-    if (freeGi.size() == freeG_.size()) {
-      dirty = dirty || !std::equal(freeGi.begin(), freeGi.end(), freeG_.begin());
-    } else {
-      dirty = true;
-    }
+    // Quick return?
+    //if(!reinit_needed_) return;
 
     bool p_init_backup = worhp_p_.initialised;
     worhp_p_.initialised = false;
-    if (worhp_o_.initialised || worhp_w_.initialised || worhp_c_.initialised)
+    if (worhp_o_.initialised || worhp_w_.initialised || worhp_c_.initialised){
       WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
+    }
     worhp_p_.initialised = p_init_backup;
   
     /// Control data structure needs to be reset every time
     worhp_c_.initialised = false;
     worhp_w_.initialised = false;
     worhp_o_.initialised = false;
-  
-    // Fast return if not dirty
-    //if (!dirty) return;
     
-    // Save temporary freeX
-    freeX_ = freeXi;
-  
-    // Save temporary freeG
-    freeG_ = freeGi;
-  
-    casadi_log("WorhpInternal::checkinit - # decision vars: " << input(NLP_SOLVER_LBX).size() << " (" << freeX_.size() << " free - "  <<  nonfreeX_.size() << " nonfree).");
-    casadi_log("WorhpInternal::checkinit - # constraints:   " << input(NLP_SOLVER_UBX).size() << " (" << freeG_.size() << " free - "  <<  nonfreeG_.size() << " nonfree).");
-  
-    // Helper matrices for free and non-free X
-    MX nonfreeX = MX("nonfreeX",nonfreeX_.size());
-    MX freeX = MX("free",freeX_.size());
-  
-    MX nonfreeG = MX("nonfreeG",nonfreeG_.size());
-  
-    // Create modified nlp that does not contain the non-free X
-    std::vector< MX > nlpmod_in = nlp_.symbolicInput();
-    std::vector< MX > nlp_in = nlpmod_in;
-    nlpmod_in[0] = freeX;
-    nlpmod_in.push_back(nonfreeX);
-    nlp_in.at(0) = MX(nlp_in.at(0).sparsity(),0);
-    nlp_in.at(0)[nonfreeX_] = nonfreeX;
-    nlp_in.at(0)[freeX_] = freeX;
-    nlpmod_ = MXFunction(nlpmod_in,nlp_.call(nlp_in));
-    nlpmod_.init(); 
-  
-    // Create modified H that does not contain the non-free X
-    if (!hessLag_.isNull()) {
-      std::vector< MX > Hmod_in = hessLag_.symbolicInput();
-      std::vector< MX > H_in = Hmod_in;
-    
-      Hmod_in.at(NL_X) = freeX;
-      Hmod_in.at(NL_NUM_IN+NL_G) = nonfreeG;
-      Hmod_in.push_back(nonfreeX);
-      H_in.at(NL_X) = MX(H_in.at(NL_X).sparsity(),0);
-      H_in.at(NL_X)[nonfreeX_] = nonfreeX;
-      H_in.at(NL_X)[freeX_] =  freeX;
-      H_in.at(NL_NUM_IN+NL_G) = MX(H_in.at(NL_NUM_IN+NL_G).sparsity(),0);
-      H_in.at(NL_NUM_IN+NL_G)[nonfreeG_] = nonfreeG;
-      H_in.at(NL_NUM_IN+NL_G)[freeG_] = 0;
-    
-      Hmod_ = MXFunction(Hmod_in,hessLag_.call(H_in).at(0)(freeX_,freeX_));
-      Hmod_.init(); 
-    }
-  
-    // Create modified J that does not contain the non-free X, nor the free G
-    if (!jacG_.isNull()) {
-      std::vector< MX > Jmod_in = jacG_.symbolicInput();
-      std::vector< MX > J_in = Jmod_in;
-      Jmod_in.at(0) = freeX;
-      Jmod_in.push_back(nonfreeX);
-      J_in.at(0) = MX(J_in.at(0).sparsity(),0);
-      J_in.at(0)[nonfreeX_] = nonfreeX;
-      J_in.at(0)[freeX_] = freeX;
-      MX J_call = jacG_.call(J_in).at(0);
-      if (J_call.isNull()) {
-	Jmod_ = MXFunction(Jmod_in,MX());
-      } else {
-	Jmod_ = MXFunction(Jmod_in,J_call(nonfreeG_,freeX_));
-      }
-      Jmod_.init(); 
-    }
-  
-    // Create modified GF that does not contain the non-free X
-    if (!gradF_.isNull()) {
-      std::vector< MX > GFmod_in = gradF_.symbolicInput();
-      std::vector< MX > GF_in = GFmod_in;
-      GFmod_in.at(0) = freeX;
-      GFmod_in.push_back(nonfreeX);
-      GF_in.at(0) = MX(GF_in.at(0).sparsity(),0);
-      GF_in.at(0)[nonfreeX_] = nonfreeX;
-      GF_in.at(0)[freeX_] = freeX;
-      GFmod_ = MXFunction(GFmod_in,gradF_.call(GF_in).at(0)(freeX_));
-      GFmod_.init(); 
-    }
-  
-    worhp_o_.n = freeX_.size();  // Number of variables
-    worhp_o_.m = nonfreeG_.size();  // Number of constraints
-  
-    // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.
-  
-    worhp_w_.DF.nnz = GFmod_.output().size(); // Gradient of f
+    // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.  
+    worhp_w_.DF.nnz = nx_;
     if (worhp_o_.m>0) {
-      worhp_w_.DG.nnz = Jmod_.output().size();  // Jacobian of G
+      worhp_w_.DG.nnz = jacG_.output().size();  // Jacobian of G
     } else {
       worhp_w_.DG.nnz = 0;
     }
 
     if (exact_hessian_){
-      worhp_w_.HM.nnz = Hmod_.output().sizeL();
+      worhp_w_.HM.nnz = hessLag_.output().sizeL();
       std::stringstream ss;
       ss << "Allocating space for " << worhp_w_.HM.nnz << " hessian entries" << std::endl;
       log(ss.str());
@@ -671,24 +559,21 @@ namespace CasADi{
       casadi_error("Main: Initialisation failed. Status: " << formatStatus(worhp_c_.status));
     }
 
-    if (worhp_w_.DF.NeedStructure) {
-      vector<int> row,col;
-      GFmod_.output().sparsity().getSparsity(col,row); // transpose
+    if (worhp_w_.DF.NeedStructure){
+      casadi_error("Disabled for now - to enable, calculate jacobian of F instead of gradient.");
+      //vector<int> row,col;
+      //jacF_.output().sparsity().getSparsity(col,row); // transpose    
+      //casadi_assert(row.size()==worhp_w_.DF.nnz);
+      //casadi_assert(worhp_w_.DF.nnz<=worhp_w_.DF.dim_row);
     
-      casadi_assert(row.size()==worhp_w_.DF.nnz);
-      casadi_assert(worhp_w_.DF.nnz<=worhp_w_.DF.dim_row);
-    
-      for (int i=0;i<row.size();++i) worhp_w_.DF.row[i] = row[i] + 1; // Index-1 based
+      //for (int i=0;i<row.size();++i) worhp_w_.DF.row[i] = row[i] + 1; // Index-1 based
     
     }
   
-    if (worhp_o_.m>0 && worhp_w_.DG.NeedStructure) {
-
-    
+    if (worhp_o_.m>0 && worhp_w_.DG.NeedStructure) {    
       vector<int> row,col;
-      trans(Jmod_.output()).sparsity().getSparsity(col,row);
-      std::vector< MX > J = Jmod_.symbolicInput();
-      
+      jacG_.output().sparsity().transpose().getSparsity(col,row);
+
       casadi_assert(col.size()==worhp_w_.DG.nnz);
       casadi_assert(row.size()==worhp_w_.DG.nnz);
     
@@ -697,22 +582,19 @@ namespace CasADi{
     
       for (int i=0;i<col.size();++i) worhp_w_.DG.col[i] = col[i] + 1;
       for (int i=0;i<row.size();++i) worhp_w_.DG.row[i] = row[i] + 1;
-    
-    }
-  
-    
+    }    
 
     if (exact_hessian_){
       log("generate_hessian sparsity");
       if (worhp_w_.HM.NeedStructure) {
 	vector<int> row,col;
-	trans(lowerSparsity(Hmod_.output().sparsity(),false)).getSparsity(col,row);
+	trans(lowerSparsity(hessLag_.output().sparsity(),false)).getSparsity(col,row);
 
 	for (int i=0;i<col.size();++i) worhp_w_.HM.col[i] = col[i] + 1;
 	for (int i=0;i<row.size();++i) worhp_w_.HM.row[i] = row[i] + 1;
       
 	vector<int> rowd,cold;
-	Hmod_.output()(sp_diag(worhp_o_.n)).sparsity().getSparsity(rowd,cold);
+	hessLag_.output()(sp_diag(worhp_o_.n)).sparsity().getSparsity(rowd,cold);
       
 	casadi_assert(worhp_w_.HM.nnz<=worhp_w_.HM.dim_row);
 	casadi_assert(worhp_w_.HM.nnz<=worhp_w_.HM.dim_col);
@@ -723,10 +605,8 @@ namespace CasADi{
 	for (int i=0;i<cold.size();++i) worhp_w_.HM.col[i+col.size()] = cold[i] + 1;
 	for (int i=0;i<rowd.size();++i) worhp_w_.HM.row[i+row.size()] = rowd[i] + 1;
 
-
       }
-    }
-  
+    }  
   }
 
 
@@ -743,35 +623,28 @@ namespace CasADi{
   void WorhpInternal::evaluate(int nfdir, int nadir){
     log("WorhpInternal::evaluate");
     casadi_assert(nfdir==0 && nadir==0);
-
-    checkinit();
-  
+    
+    // Prepare the solver
+    prepare();
     checkInitialBounds();
   
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
   
-    DMatrix bx = input(NLP_SOLVER_LBX)[nonfreeX_];
-    DMatrix lbx = input(NLP_SOLVER_LBX)[freeX_];
-    DMatrix ubx = input(NLP_SOLVER_UBX)[freeX_];
-  
-    if (!nlpmod_.isNull()) nlpmod_.setInput(bx,nlpmod_.getNumInputs()-1);
-    if (!Hmod_.isNull()) Hmod_.setInput(bx,Hmod_.getNumInputs()-1);
-    if (!Jmod_.isNull()) Jmod_.setInput(bx,Jmod_.getNumInputs()-1);
-    if (!GFmod_.isNull()) GFmod_.setInput(bx,GFmod_.getNumInputs()-1);
-  
-    log("WorhpInternal::copying data");
-  
-    input(NLP_SOLVER_X0)[freeX_].getArray(worhp_o_.X,worhp_o_.n);
+    // Get inputs
+    const DMatrix& x0 = input(NLP_SOLVER_X0);    
+    const DMatrix& lam_x0 = input(NLP_SOLVER_LAM_X0);
+    const DMatrix& lam_g0 = input(NLP_SOLVER_LAM_G0);
+    const DMatrix& lbx = input(NLP_SOLVER_LBX);
+    const DMatrix& ubx = input(NLP_SOLVER_UBX);
+    const DMatrix& lbg = input(NLP_SOLVER_LBG);
+    const DMatrix& ubg = input(NLP_SOLVER_UBG);
+    
+    x0.getArray(worhp_o_.X,worhp_o_.n);
     lbx.getArray(worhp_o_.XL,worhp_o_.n);
     ubx.getArray(worhp_o_.XU,worhp_o_.n);
-  
-    DMatrix lbg = input(NLP_SOLVER_LBG)[nonfreeG_];
-    DMatrix ubg = input(NLP_SOLVER_UBG)[nonfreeG_];
-
-    output(NLP_SOLVER_LAM_X)[freeX_].getArray(worhp_o_.Lambda,worhp_o_.n);
-    if (worhp_o_.m>0) input(NLP_SOLVER_LAM_G0)[nonfreeG_].getArray(worhp_o_.Mu,worhp_o_.m);
-
+    lam_x0.getArray(worhp_o_.Lambda,worhp_o_.n);
+    if (worhp_o_.m>0) lam_g0.getArray(worhp_o_.Mu,worhp_o_.m);
     if (worhp_o_.m>0) lbg.getArray(worhp_o_.GL,worhp_o_.m);
     if (worhp_o_.m>0) ubg.getArray(worhp_o_.GU,worhp_o_.m);
   
@@ -785,11 +658,6 @@ namespace CasADi{
       casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),"WorhpSolver::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite. You have that case at non-zero " << i << ".");
     }
 
-    output(NLP_SOLVER_X)[nonfreeX_] = bx;
-    output(NLP_SOLVER_LAM_X)[nonfreeX_] = 0;
-    output(NLP_SOLVER_LAM_G)[freeG_] = 0;
-  
-  
     std::vector<double> tempn(worhp_o_.n,0);
     std::vector<double> tempm(worhp_o_.m,0);
   
@@ -806,15 +674,17 @@ namespace CasADi{
 	if (!callback_.isNull()) {
 	  double time1 = clock();
 	  // Copy outputs
-	  copy(worhp_o_.X,worhp_o_.X+worhp_o_.n,tempn.begin());
-	  if (!callback_.input(NLP_SOLVER_X).empty()) callback_.input(NLP_SOLVER_X)[freeX_] = tempn;
-	  callback_.input(NLP_SOLVER_F)[0] = worhp_o_.F;
-	  if (worhp_o_.m>0) copy(worhp_o_.G,worhp_o_.G+worhp_o_.m,tempm.begin());
-	  if (!callback_.input(NLP_SOLVER_G).empty()) callback_.input(NLP_SOLVER_G)[nonfreeG_] = tempm;
-	  copy(worhp_o_.Lambda,worhp_o_.Lambda+worhp_o_.n,tempn.begin());
-	  if (!callback_.input(NLP_SOLVER_LAM_X).empty()) callback_.input(NLP_SOLVER_LAM_X)[freeX_] = tempn;
-	  if (worhp_o_.m>0) copy(worhp_o_.Mu,worhp_o_.Mu+worhp_o_.m,tempm.begin());
-	  if (!callback_.input(NLP_SOLVER_LAM_G).empty()) callback_.input(NLP_SOLVER_LAM_G)[nonfreeG_]=tempm;
+	  if (!callback_.input(NLP_SOLVER_X).empty())
+	    callback_.input(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n);
+	  if (!callback_.input(NLP_SOLVER_F).empty())
+	    callback_.input(NLP_SOLVER_F).set(worhp_o_.F);
+	  if (!callback_.input(NLP_SOLVER_G).empty())
+	    callback_.input(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
+	  if (!callback_.input(NLP_SOLVER_LAM_X).empty()) 
+	    callback_.input(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
+	  if (!callback_.input(NLP_SOLVER_LAM_G).empty())
+	    callback_.input(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
+
 	  double time2 = clock();
 	  t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
 	  time1 = clock();
@@ -855,17 +725,17 @@ namespace CasADi{
       if (GetUserAction(&worhp_c_, fidif)) {
 	WorhpFidif(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
       }
-
     }
+
     double time2 = clock();
     t_mainloop_ += double(time2-time1)/CLOCKS_PER_SEC;
   
     // Copy outputs
-    copy(worhp_o_.X,worhp_o_.X+worhp_o_.n,tempn.begin());output(NLP_SOLVER_X)[freeX_] = tempn;   
-    output(NLP_SOLVER_F)[0] = worhp_o_.F;
-    if (worhp_o_.m>0) copy(worhp_o_.G,worhp_o_.G+worhp_o_.m,tempm.begin());output(NLP_SOLVER_G)[nonfreeG_] = tempm;
-    copy(worhp_o_.Lambda,worhp_o_.Lambda+worhp_o_.n,tempn.begin());output(NLP_SOLVER_LAM_X)[freeX_] = tempn;
-    if (worhp_o_.m>0) copy(worhp_o_.Mu,worhp_o_.Mu+worhp_o_.m,tempm.begin());output(NLP_SOLVER_LAM_G)[nonfreeG_]=tempm;
+    output(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n,DENSE);
+    output(NLP_SOLVER_F).set(worhp_o_.F);
+    output(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m,DENSE);
+    output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
+    output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m,DENSE);
   
     StatusMsg(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
  
@@ -898,25 +768,25 @@ namespace CasADi{
       double time1 = clock();
 
       // Pass input
-      Hmod_.setInput(x,HESSLAG_X);
-      Hmod_.setInput(input(NLP_SOLVER_P),HESSLAG_P);
-      Hmod_.setInput(obj_factor,HESSLAG_LAM_F);
-      Hmod_.setInput(lambda,HESSLAG_LAM_G);
+      hessLag_.setInput(x,HESSLAG_X);
+      hessLag_.setInput(input(NLP_SOLVER_P),HESSLAG_P);
+      hessLag_.setInput(obj_factor,HESSLAG_LAM_F);
+      hessLag_.setInput(lambda,HESSLAG_LAM_G);
 
       // Evaluate
-      Hmod_.evaluate();
+      hessLag_.evaluate();
 
       // Get results
-      Hmod_.output().get(values,SPARSESYM);
+      hessLag_.output().get(values,SPARSESYM);
 
       if(monitored("eval_h")){
-	std::cout << "x = " <<  Hmod_.input() << std::endl;
+	std::cout << "x = " <<  hessLag_.input() << std::endl;
 	std::cout << "obj_factor= " << obj_factor << std::endl;
-	std::cout << "lambda = " << Hmod_.input(HESSLAG_LAM_G) << std::endl;
-	std::cout << "H = " << Hmod_.output() << std::endl;
+	std::cout << "lambda = " << hessLag_.input(HESSLAG_LAM_G) << std::endl;
+	std::cout << "H = " << hessLag_.output() << std::endl;
       }
 
-      if (regularity_check_ && !isRegular(Hmod_.output().data())) casadi_error("WorhpInternal::eval_h: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(hessLag_.output().data())) casadi_error("WorhpInternal::eval_h: NaN or Inf detected.");
       
       double time2 = clock();
       t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -941,19 +811,19 @@ namespace CasADi{
       double time1 = clock();
 
       // Pass the argument to the function
-      Jmod_.setInput(x,NL_X);
-      Jmod_.setInput(input(NLP_SOLVER_P),NL_P);
+      jacG_.setInput(x,NL_X);
+      jacG_.setInput(input(NLP_SOLVER_P),NL_P);
     
       // Evaluate the function
-      Jmod_.evaluate();
+      jacG_.evaluate();
 
       // Get the output
-      trans(Jmod_.output()).get(values);
+      trans(jacG_.output()).get(values); // inefficient!
     
       if(monitored("eval_jac_g")){
-	cout << "x = " << Jmod_.input().data() << endl;
+	cout << "x = " << jacG_.input().data() << endl;
 	cout << "J = " << endl;
-	Jmod_.output().printSparse();
+	jacG_.output().printSparse();
       }
     
       double time2 = clock();
@@ -967,8 +837,7 @@ namespace CasADi{
     }
   }
 
-  bool WorhpInternal::eval_f(const double* x, double scale, double& obj_value)
-  {
+  bool WorhpInternal::eval_f(const double* x, double scale, double& obj_value){
     try {
       log("eval_f started");
     
@@ -976,23 +845,23 @@ namespace CasADi{
       double time1 = clock();
 
       // Pass the argument to the function
-      nlpmod_.setInput(x);
-      nlpmod_.setInput(input(NLP_SOLVER_P),NL_P);
+      nlp_.setInput(x, NL_X);
+      nlp_.setInput(input(NLP_SOLVER_P),NL_P);
       
       // Evaluate the function
-      nlpmod_.evaluate();
+      nlp_.evaluate();
 
       // Get the result
-      nlpmod_.getOutput(obj_value,NL_F);
+      nlp_.getOutput(obj_value,NL_F);
 
       // Printing
       if(monitored("eval_f")){
-	cout << "x = " << nlpmod_.input(NL_X) << endl;
+	cout << "x = " << nlp_.input(NL_X) << endl;
 	cout << "obj_value = " << obj_value << endl;
       }
       obj_value *= scale;
 
-      if (regularity_check_ && !isRegular(nlpmod_.output().data())) casadi_error("WorhpInternal::eval_f: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(nlp_.output().data())) casadi_error("WorhpInternal::eval_f: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -1013,23 +882,23 @@ namespace CasADi{
 
       if(worhp_o_.m>0){
 	// Pass the argument to the function
-	nlpmod_.setInput(x,NL_X);
-	nlpmod_.setInput(input(NLP_SOLVER_P),NL_P);
+	nlp_.setInput(x,NL_X);
+	nlp_.setInput(input(NLP_SOLVER_P),NL_P);
 
 	// Evaluate the function and tape
-	nlpmod_.evaluate();
+	nlp_.evaluate();
 
 	// Ge the result
-	nlpmod_.getOutput(g,NL_G);
+	nlp_.getOutput(g,NL_G);
 
 	// Printing
 	if(monitored("eval_g")){
-	  cout << "x = " << nlpmod_.input(NL_X) << endl;
-	  cout << "g = " << nlpmod_.output(NL_G) << endl;
+	  cout << "x = " << nlp_.input(NL_X) << endl;
+	  cout << "g = " << nlp_.output(NL_G) << endl;
 	}
       }
 
-      if (regularity_check_ && !isRegular(nlpmod_.output(NL_G).data())) casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(nlp_.output(NL_G).data())) casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
     
       double time2 = clock();
       t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -1049,14 +918,14 @@ namespace CasADi{
       double time1 = clock();
     
       // Pass the argument to the function
-      GFmod_.setInput(x,NL_X);
-      GFmod_.setInput(input(NLP_SOLVER_P),NL_P);
+      gradF_.setInput(x,NL_X);
+      gradF_.setInput(input(NLP_SOLVER_P),NL_P);
       
       // Evaluate, adjoint mode
-      GFmod_.evaluate();
+      gradF_.evaluate();
       
       // Get the result
-      GFmod_.output().get(grad_f,DENSE);
+      gradF_.output().get(grad_f,DENSE);
 
       // Scale
       for(int i=0; i<nx_; ++i){
@@ -1065,10 +934,10 @@ namespace CasADi{
       
       // Printing
       if(monitored("eval_grad_f")){
-	cout << "grad_f = " << GFmod_.output() << endl;
+	cout << "grad_f = " << gradF_.output() << endl;
       }
       
-      if (regularity_check_ && !isRegular(GFmod_.output().data())) casadi_error("WorhpInternal::eval_grad_f: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(gradF_.output().data())) casadi_error("WorhpInternal::eval_grad_f: NaN or Inf detected.");
     
       double time2 = clock();
       t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;

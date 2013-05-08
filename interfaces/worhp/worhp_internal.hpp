@@ -62,11 +62,6 @@ namespace CasADi{
     std::map<int,std::string> status_;
     std::map<std::string,opt_type> ops_;
 
-    FX nlpmod_;
-    FX GFmod_; 
-    FX Hmod_;
-    FX Jmod_; 
-  
     // Worhp callback functions
     bool eval_f(const double* x, double scale, double& obj_value);
     bool eval_grad_f(const double* x, double scale , double* grad_f);
@@ -91,28 +86,12 @@ namespace CasADi{
 
     // Is a re-initialization needed?
     bool reinit_needed_;
-
-    // Lists the indices into the decision variables for which LBX!=LBU
-    std::vector< int > freeX_; 
-  
-    // The complement of freeX_
-    std::vector< int > nonfreeX_;
-  
-    // Lists the indices into the constraints for which LBG or UBG is different from infinity
-    std::vector< int > freeG_; 
-  
-    // The complement of freeX_
-    std::vector< int > nonfreeG_;
   
     /// Prepare the solver once bounds are known
     void prepare();
 
-    /// Will do inspections on bounds and do a reinitialisation if needed
-    void checkinit();
-  
     /// Pass the supplied options to  Wprhp
     void passOptions();
-
   
   };
 
