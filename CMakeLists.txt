@@ -20,7 +20,6 @@ ERROR_QUIET
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
 include(language_support)
 workaround_9220(Fortran Fortran_language_works)
-set(Fortran_language_works "")
 if(Fortran_language_works)
   enable_language(Fortran OPTIONAL)
 endif()
