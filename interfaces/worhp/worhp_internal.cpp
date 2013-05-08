@@ -657,22 +657,13 @@ namespace CasADi{
     }
 
     if (exact_hessian_){
-      std::vector< MX > input = Hmod_.symbolicInput();
-      MX H = Hmod_.call(input).at(0);
-      H = vertcat(vec(H(lowerSparsity(H.sparsity(),false))),vec(H(sp_diag(worhp_o_.n))));
-    
-      H_tril_ = MXFunction(input,H);
-      H_tril_.init();
-    
-      worhp_w_.HM.nnz = H_tril_.output().size();
-    
+      worhp_w_.HM.nnz = Hmod_.output().sizeL();
       std::stringstream ss;
       ss << "Allocating space for " << worhp_w_.HM.nnz << " hessian entries" << std::endl;
       log(ss.str());
     } else {
       worhp_w_.HM.nnz = 0;
     }
-
   
     /* Data structure initialisation. */
     WorhpInit(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
@@ -766,7 +757,6 @@ namespace CasADi{
   
     if (!nlpmod_.isNull()) nlpmod_.setInput(bx,nlpmod_.getNumInputs()-1);
     if (!Hmod_.isNull()) Hmod_.setInput(bx,Hmod_.getNumInputs()-1);
-    if (!H_tril_.isNull()) H_tril_.setInput(bx,H_tril_.getNumInputs()-1);
     if (!Jmod_.isNull()) Jmod_.setInput(bx,Jmod_.getNumInputs()-1);
     if (!GFmod_.isNull()) GFmod_.setInput(bx,GFmod_.getNumInputs()-1);
   
@@ -908,33 +898,22 @@ namespace CasADi{
       double time1 = clock();
 
       // Pass input
-      H_tril_.setInput(x,NL_X);
-      H_tril_.setInput(input(NLP_SOLVER_P),NL_P);
-      H_tril_.setInput(obj_factor,NL_NUM_IN+NL_F);
-      H_tril_.setInput(lambda,NL_NUM_IN+NL_G);
+      Hmod_.setInput(x,HESSLAG_X);
+      Hmod_.setInput(input(NLP_SOLVER_P),HESSLAG_P);
+      Hmod_.setInput(obj_factor,HESSLAG_LAM_F);
+      Hmod_.setInput(lambda,HESSLAG_LAM_G);
 
       // Evaluate
-      H_tril_.evaluate();
+      Hmod_.evaluate();
 
       // Get results
-      H_tril_.output().get(values);
+      Hmod_.output().get(values,SPARSESYM);
 
       if(monitored("eval_h")){
-	std::cout << "x = " <<  H_tril_.input() << std::endl;
+	std::cout << "x = " <<  Hmod_.input() << std::endl;
 	std::cout << "obj_factor= " << obj_factor << std::endl;
-	std::cout << "lambda = " << H_tril_.input(1) << std::endl;
-
-	// Pass input
-	Hmod_.setInput(x,NL_X);
-	Hmod_.setInput(input(NLP_SOLVER_P),NL_P);
-        Hmod_.setInput(obj_factor,NL_NUM_IN+NL_F);
-        Hmod_.setInput(lambda,NL_NUM_IN+NL_G);
-
-	// Evaluate
-	Hmod_.evaluate();
-
+	std::cout << "lambda = " << Hmod_.input(HESSLAG_LAM_G) << std::endl;
 	std::cout << "H = " << Hmod_.output() << std::endl;
-
       }
 
       if (regularity_check_ && !isRegular(Hmod_.output().data())) casadi_error("WorhpInternal::eval_h: NaN or Inf detected.");

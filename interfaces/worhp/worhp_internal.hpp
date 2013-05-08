@@ -54,9 +54,6 @@ namespace CasADi{
     /// Exact Hessian?
     bool exact_hessian_;
 
-    /// H_ transformed such that only lower triangular elements + diagonals are retained
-    FX H_tril_;
-
     OptVar    worhp_o_;
     Workspace worhp_w_;
     Params    worhp_p_;
