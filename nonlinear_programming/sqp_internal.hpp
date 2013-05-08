@@ -43,6 +43,9 @@ public:
   /// QP solver for the subproblems
   QPSolver qp_solver_;
 
+  /// Exact Hessian?
+  bool exact_hessian_;
+
   /// maximum number of sqp iterations
   int maxiter_; 
 

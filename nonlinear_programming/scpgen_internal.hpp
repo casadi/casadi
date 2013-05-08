@@ -80,6 +80,9 @@ public:
   /// QP solver for the subproblems
   QPSolver qp_solver_;
 
+  /// use Gauss-Newton Hessian
+  bool gauss_newton_; 
+
   /// maximum number of sqp iterations
   int maxiter_; 
 

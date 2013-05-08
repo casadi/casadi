@@ -250,19 +250,29 @@ namespace CasADi{
     // Call the init method of the base class
     NLPSolverInternal::init();
 
+    // Read options
+    passOptions();
+  
     // Get/generate required functions
-    gradF_ = getGradF();
-    jacG_ = getJacG();
-    switch(hess_mode_){
-    case HESS_EXACT:
-      hessLag_ = getHessLag();
-      break;
-    case HESS_BFGS:
-      break;
-    case HESS_GAUSS_NEWTON:
-      casadi_error("Gauss-Newton mode not supported");
+    getGradF();
+    getJacG();
+    if(exact_hessian_){
+      hessLag();
     }
   
+    if (gradF_.output().size()==0) {
+      /// Known issue in WORHP: Worhp cannot handle the degenerate case of constant objective value.
+      // You "fake" an objective by returning a constant value + at least one
+      // gradient entry, which just happens to be 0 all the time.
+    
+      MX fake(gradF_.output().size1(),gradF_.output().size2());
+      fake(0,0) = 0;
+    
+      gradF_ = MXFunction(gradF_.symbolicInput(),fake);
+      gradF_.init();
+    }
+
+    // Update status?
     status_[TerminateSuccess]="TerminateSuccess";
     status_[OptimalSolution]="OptimalSolution";
     status_[SearchDirectionZero]="SearchDirectionZero";
@@ -297,28 +307,10 @@ namespace CasADi{
     status_[FunctionErrorDG]="FunctionErrorDG";
     status_[FunctionErrorHM]="FunctionErrorHM";
   
-    if (gradF_.output().size()==0) {
-      /// Known issue in WORHP: Worhp cannot handle the degenerate case of constant objective value.
-      // You "fake" an objective by returning a constant value + at least one
-      // gradient entry, which just happens to be 0 all the time.
-    
-      MX fake(gradF_.output().size1(),gradF_.output().size2());
-      fake(0,0) = 0;
-    
-      gradF_ = MXFunction(gradF_.symbolicInput(),fake);
-      gradF_.init();
-    }
-
-  
     worhp_o.initialised = false;
     worhp_w.initialised = false;
     worhp_p.initialised = false;
-    worhp_c.initialised = false;
-
-  
-    passOptions();
-
-  
+    worhp_c.initialised = false;  
   }
 
   void WorhpInternal::setQPOptions() {
@@ -333,7 +325,9 @@ namespace CasADi{
     }
   
     if(hasSetOption("UserHM")){
-      setOption("UserHM",hess_mode_ = HESS_EXACT);
+      exact_hessian_ = getOption("UserHM");
+    } else {
+      exact_hessian_ = false;
     }
   
     /**
@@ -644,7 +638,7 @@ namespace CasADi{
       worhp_w.DG.nnz = 0;
     }
 
-    if (hess_mode_==HESS_EXACT) {
+    if (exact_hessian_){
       std::vector< MX > input = Hmod_.symbolicInput();
       MX H = Hmod_.call(input).at(0);
       H = vertcat(vec(H(lowerSparsity(H.sparsity(),false))),vec(H(sp_diag(worhp_o.n))));
@@ -699,7 +693,7 @@ namespace CasADi{
   
     
 
-    if (hess_mode_==HESS_EXACT) {
+    if (exact_hessian_){
       log("generate_hessian sparsity");
       if (worhp_w.HM.NeedStructure) {
 	vector<int> row,col;

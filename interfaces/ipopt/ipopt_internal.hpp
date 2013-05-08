@@ -49,6 +49,9 @@ public:
 
   // Get reduced Hessian
   DMatrix getReducedHessian();
+
+  /// Exact Hessian?
+  bool exact_hessian_;
     
   /** NOTE:
    * To allow this header file to be free of IPOPT types (that are sometimes declared outside their scope!) and after 

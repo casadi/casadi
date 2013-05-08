@@ -85,10 +85,6 @@ namespace CasADi{
     /// Get the sparsity pattern of the Hessian of the Lagrangian
     CRSSparsity& hessLagSparsity();
 
-    /// Hessian modes
-    enum HessMode{HESS_EXACT, HESS_BFGS, HESS_GAUSS_NEWTON};
-    HessMode hess_mode_;
-
     /// Number of variables
     int nx_;
   
@@ -104,9 +100,6 @@ namespace CasADi{
     /// Execute the callback function only after this amount of iterations
     int callback_step_;
   
-    /// use Gauss-Newton Hessian
-    bool gauss_newton_; 
-
     /// The NLP
     FX nlp_;
 

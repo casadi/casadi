@@ -40,7 +40,7 @@ namespace CasADi{
     casadi_warning("The SQP method is under development");
     addOption("qp_solver",         OT_QPSOLVER,   GenericType(),    "The QP solver to be used by the SQP method");
     addOption("qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the QP solver");
-    addOption("hessian_approximation", OT_STRING, "limited-memory", "limited-memory|exact");
+    addOption("hessian_approximation", OT_STRING, "exact",          "limited-memory|exact");
     addOption("maxiter",           OT_INTEGER,      50,             "Maximum number of SQP iterations");
     addOption("maxiter_ls",        OT_INTEGER,       3,             "Maximum number of linesearch iterations");
     addOption("tol_pr",            OT_REAL,       1e-6,             "Stopping criterion for primal infeasibility");
@@ -74,22 +74,17 @@ namespace CasADi{
     tol_pr_ = getOption("tol_pr");
     tol_du_ = getOption("tol_du");
     regularize_ = getOption("regularize");
+    exact_hessian_ = getOption("hessian_approximation")=="exact";
   
     // Get/generate required functions
     gradF();
     jacG();
-    switch(hess_mode_){
-    case HESS_EXACT:
+    if(exact_hessian_){
       hessLag();
-      break;
-    case HESS_BFGS:
-      break;
-    case HESS_GAUSS_NEWTON:
-      casadi_error("Gauss-Newton mode not supported");
     }
-  
+
     // Allocate a QP solver
-    CRSSparsity H_sparsity = hess_mode_==HESS_EXACT ? hessLag().output().sparsity() : sp_dense(nx_,nx_);
+    CRSSparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity() : sp_dense(nx_,nx_);
     H_sparsity = H_sparsity + DMatrix::eye(nx_).sparsity();
     CRSSparsity A_sparsity = jacG().isNull() ? CRSSparsity(0,nx_,false) : jacG().output().sparsity();
 
@@ -141,7 +136,7 @@ namespace CasADi{
     gf_.resize(nx_);
 
     // Create Hessian update function
-    if(hess_mode_ == HESS_BFGS){
+    if(!exact_hessian_){
       // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
       SXMatrix Bk = ssym("Bk",H_sparsity);
       SXMatrix x = ssym("x",input(NLP_SOLVER_X0).sparsity());
@@ -183,15 +178,10 @@ namespace CasADi{
     if(bool(getOption("print_header"))){
       cout << "-------------------------------------------" << endl;
       cout << "This is CasADi::SQPMethod." << endl;
-      switch (hess_mode_) {
-      case HESS_EXACT:
+      if(exact_hessian_){
         cout << "Using exact Hessian" << endl;
-        break;
-      case HESS_BFGS:
+      } else {
         cout << "Using limited memory BFGS Hessian approximation" << endl;
-        break;
-      default:
-        break;
       }
       cout << endl;
       cout << "Number of variables:                       " << setw(9) << nx_ << endl;
@@ -229,10 +219,10 @@ namespace CasADi{
   
     // Initialize or reset the Hessian or Hessian approximation
     reg_ = 0;
-    if( hess_mode_ == HESS_BFGS){
-      reset_h();
-    } else {
+    if(exact_hessian_){
       eval_h(x_,mu_,1.0,Bk_);
+    } else {
+      reset_h();
     }
 
     // Evaluate the initial gradient of the Lagrangian
@@ -391,7 +381,7 @@ namespace CasADi{
       for(int i=0; i<ng_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
       for(int i=0; i<nx_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
     
-      if( hess_mode_ == HESS_BFGS){
+      if(!exact_hessian_){
         // Evaluate the gradient of the Lagrangian with the old x but new mu (for BFGS)
         copy(gf_.begin(),gf_.end(),gLag_old_.begin());
         if(ng_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_old_);
@@ -418,7 +408,7 @@ namespace CasADi{
       transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>());
 
       // Updating Lagrange Hessian
-      if( hess_mode_ == HESS_BFGS){
+      if( !exact_hessian_){
         log("Updating Hessian (BFGS)");
         // BFGS with careful updates and restarts
         if (iter % lbfgs_memory_ == 0){
@@ -523,7 +513,7 @@ namespace CasADi{
 
   void SQPInternal::reset_h(){
     // Initial Hessian approximation of BFGS
-    if ( hess_mode_ == HESS_BFGS){
+    if ( !exact_hessian_){
       Bk_.set(B_init_);
     }
 

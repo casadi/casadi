@@ -48,10 +48,12 @@ namespace CasADi{
     virtual void evaluate(int nfdir, int nadir);
     virtual void setQPOptions();
 
-  
     /// Read options from worhp parameter xml
     void setOptionsFromFile(const std::string & file);
   
+    /// Exact Hessian?
+    bool exact_hessian_;
+
     /// H_ transformed such that only lower triangular elements + diagonals are retained
     FX H_tril_;
 

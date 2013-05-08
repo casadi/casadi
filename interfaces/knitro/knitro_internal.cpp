@@ -99,19 +99,6 @@ namespace CasADi{
     // Call the init method of the base class
     NLPSolverInternal::init();
 
-    // Get/generate required functions
-    gradF_ = getGradF();
-    jacG_ = getJacG();
-    switch(hess_mode_){
-    case HESS_EXACT:
-      hessLag_ = getHessLag();
-      break;
-    case HESS_BFGS:
-      break;
-    case HESS_GAUSS_NEWTON:
-      casadi_error("Gauss-Newton mode not supported");
-    }
-
     //if (hasSetOption("Alg")) int_param_["alg"] = getOption("Alg");
     if (hasSetOption("BarRule")) int_param_["barrule"] = getOption("BarRule");
     if (hasSetOption("NewPoint")) int_param_["newpoint"] = getOption("NewPoint");
@@ -145,6 +132,12 @@ namespace CasADi{
     if (hasSetOption("OutLev")) int_param_["outlev"] = getOption("OutLev");
     if (hasSetOption("Debug")) int_param_["debug"] = getOption("Debug");
 
+    // Get/generate required functions
+    gradF();
+    jacG();
+    if(true){ // NOTE: should be only if HessOpt
+      hessLag();
+    }
 
     // Commented out since I have not found out how to change the bounds
     // Allocate KNITRO memory block

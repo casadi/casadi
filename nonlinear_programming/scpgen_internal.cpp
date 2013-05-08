@@ -39,7 +39,7 @@ namespace CasADi{
     casadi_warning("SCPgen is under development");
     addOption("qp_solver",         OT_QPSOLVER,   GenericType(),    "The QP solver to be used by the SQP method");
     addOption("qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the QP solver");
-    addOption("hessian_approximation", OT_STRING, "limited-memory", "limited-memory|exact");
+    addOption("hessian_approximation", OT_STRING, "exact",          "gauss-newton|exact");
     addOption("maxiter",           OT_INTEGER,      50,             "Maximum number of SQP iterations");
     addOption("maxiter_ls",        OT_INTEGER,       1,             "Maximum number of linesearch iterations");
     addOption("tol_pr",            OT_REAL,       1e-6,             "Stopping criterion for primal infeasibility");
@@ -89,6 +89,12 @@ namespace CasADi{
     merit_memsize_ = getOption("merit_memsize");
     merit_start_ = getOption("merit_start");
     string compiler = getOption("compiler");
+    gauss_newton_ = getOption("hessian_approximation") == "gauss-newton";
+    if(gauss_newton_){
+      casadi_assert(nlp_.output(NL_F).size()>1);
+    } else {
+      casadi_assert(nlp_.output(NL_F).size()==1);
+    }
 
     // Name the components
     if(hasSetOption("name_x")){
