@@ -93,7 +93,6 @@ class NLPtests(casadiTestCase):
       for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver, "qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
-      solver.setOption("parametric",True)
       solver.init()
       solver.input("lbx").set([-10])
       solver.input("ubx").set([10])
@@ -222,7 +221,8 @@ class NLPtests(casadiTestCase):
     
     sigma=SX("sigma")
     lambd=SX("lambd")
-    h=SXFunction([vertcat([x,y]),[],sigma,lambd],[sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputExpr(0),vertcat([x,y]))])
+    h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd),
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputExpr(0),vertcat([x,y]))))
     h.init()
     h.input().set([0.5,0.5])
     h.input(1).set(-40)
@@ -301,7 +301,6 @@ class NLPtests(casadiTestCase):
         if solver.hasOption(k):
           solver.setOption(k,v)
           
-      solver.setOption("hessian_approximation","exact")
       solver.init()
       solver.input("x0").set([0.5,0.5])
       solver.input("lbx").set([-10]*2)
@@ -334,7 +333,8 @@ class NLPtests(casadiTestCase):
     
     sigma=SX("sigma")
     lambd=SX("lambd")
-    h=SXFunction([vertcat([x,y]),[],sigma,lambd],[sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputExpr(0),vertcat([x,y]))])
+    h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd),
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputExpr(0),vertcat([x,y]))))
 
     for Solver in solvers:
       self.message(str(Solver))
@@ -343,7 +343,6 @@ class NLPtests(casadiTestCase):
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":1,"derivative_test":"second-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
-      solver.setOption("parametric",True)
       solver.init()
       solver.input("x0").set([0.5,0.5])
       solver.input("lbx").set([-10]*2)
@@ -413,7 +412,8 @@ class NLPtests(casadiTestCase):
     
     sigma=SX("sigma")
     
-    h=SXFunction([vertcat([x,y]),[],sigma,[]],[sigma*hessian(obj,vertcat([x,y]))])
+    h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma),
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))))
     for Solver in solvers:
       self.message(str(Solver))
       solver = Solver(f,FX())
@@ -497,7 +497,8 @@ class NLPtests(casadiTestCase):
     
     sigma=SX("sigma")
     
-    h=SXFunction([vertcat([x,y]),p,sigma,[]],[sigma*hessian(obj,vertcat([x,y]))])
+    h=SXFunction(hessLagIn(x=vertcat([x,y]),p=p,lam_f=sigma),
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))))
     for Solver in solvers:
       self.message(str(Solver))
       solver = Solver(f,FX())

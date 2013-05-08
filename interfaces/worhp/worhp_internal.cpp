@@ -315,7 +315,8 @@ namespace CasADi{
     if(hasSetOption("UserHM")){
       exact_hessian_ = getOption("UserHM");
     } else {
-      exact_hessian_ = false;
+      exact_hessian_ = true;
+      setOption("UserHM",true);
     }
   
     /**

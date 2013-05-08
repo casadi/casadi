@@ -146,7 +146,7 @@ namespace CasADi{
     NLPSolverInternal::init();
     
     // Read user options
-    exact_hessian_ = getOption("hessian_approximation")=="exact";
+    exact_hessian_ = !hasSetOption("hessian_approximation") || getOption("hessian_approximation")=="exact";
 #ifdef WITH_SIPOPT
     if(hasSetOption("run_sens")){
       run_sens_ = getOption("run_sens")=="yes";
@@ -189,14 +189,7 @@ namespace CasADi{
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass = new Ipopt::SmartPtr<Ipopt::TNLP>();
     userclass_ = static_cast<void*>(userclass);
     *userclass = new IpoptUserClass(this);
-  
-    // read options
-    if(exact_hessian_){
-      setOption("hessian_approximation","exact");
-    } else {
-      setOption("hessian_approximation","limited-memory");
-    }
-  
+    
     if(verbose_){
       cout << "There are " << nx_ << " variables and " << ng_ << " constraints." << endl;
       if(exact_hessian_) cout << "Using exact Hessian" << endl;
