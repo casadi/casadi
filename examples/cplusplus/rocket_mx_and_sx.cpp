@@ -126,6 +126,8 @@ int main(){
   
   // Set options
   solver.setOption("tol",1e-10);
+  solver.setOption("hessian_approximation","limited-memory");
+
   // initialize the solver
   solver.init();
 

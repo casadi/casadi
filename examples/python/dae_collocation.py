@@ -387,9 +387,7 @@ ofcn = MXFunction([V], [Obj])
 solver = IpoptSolver(ofcn,gfcn)
 
 # Set options
-solver.setOption("expand_f",True)
-solver.setOption("expand_g",True)
-solver.setOption("generate_hessian",True)
+solver.setOption("expand",True)
 solver.setOption("max_iter",1000)
 solver.setOption("tol",1e-4)
 

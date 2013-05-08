@@ -32,34 +32,32 @@ Joel Andersson
 """
 
 # Create an NLP instance
-nlp = SymbolicNLP()
+nl = SymbolicNLP()
 
 # Parse an NL-file
-nlp.parseNL("../nl_files/hs107.nl",{"verbose":False})
+nl.parseNL("../nl_files/hs107.nl",{"verbose":False})
 
-# NLP functions
-ffcn = SXFunction([nlp.x],[nlp.f])
-gfcn = SXFunction([nlp.x],[nlp.g])
+# NLP function
+nlp = SXFunction(nlIn(x=nl.x),nlOut(f=nl.f,g=nl.g))
   
 # NLP solver
-nlp_solver = IpoptSolver(ffcn,gfcn)
+nlp_solver = IpoptSolver(nlp)
   
 # Set options
 # nlp_solver.setOption("max_iter",10)
 #nlp_solver.setOption("verbose",True)
 # nlp_solver.setOption("linear_solver","ma57")
-nlp_solver.setOption("generate_hessian",True)
 # nlp_solver.setOption("hessian_approximation","limited-memory")
   
 # Initialize NLP solver
 nlp_solver.init()
   
 # Pass the bounds and initial guess
-nlp_solver.setInput(nlp.x_lb,"lbx")
-nlp_solver.setInput(nlp.x_ub,"ubx")
-nlp_solver.setInput(nlp.g_lb,"lbg")
-nlp_solver.setInput(nlp.g_ub,"ubg")
-nlp_solver.setInput(nlp.x_init,"x0")
+nlp_solver.setInput(nl.x_lb,"lbx")
+nlp_solver.setInput(nl.x_ub,"ubx")
+nlp_solver.setInput(nl.g_lb,"lbg")
+nlp_solver.setInput(nl.g_ub,"ubg")
+nlp_solver.setInput(nl.x_init,"x0")
   
 # Solve NLP
 nlp_solver.solve()

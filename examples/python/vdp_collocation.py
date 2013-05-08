@@ -197,25 +197,22 @@ for k in range(nk):
   
 # Concatenate constraints
 g = vertcat(g)
-  
-# Nonlinear constraint function
-gfcn = MXFunction([V],[g])
 
-# Objective function of the NLP
+# Objective function
 [f] = m.call([T[nk-1,d],X[nk,0],U[nk-1]])
-ffcn = MXFunction([V], [f])
+  
+# NLP
+nlp = MXFunction(nlIn(x=V),nlOut(f=f,g=g))
   
 ## ----
 ## SOLVE THE NLP
 ## ----
   
 # Allocate an NLP solver
-solver = IpoptSolver(ffcn,gfcn)
+solver = IpoptSolver(nlp)
 
 # Set options
-solver.setOption("expand_f",True)
-solver.setOption("expand_g",True)
-solver.setOption("generate_hessian",True)
+solver.setOption("expand",True)
 #solver.setOption("max_iter",4)
 
 # initialize the solver

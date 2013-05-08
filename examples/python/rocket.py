@@ -67,18 +67,17 @@ X=X0
 for k in range(nu):
   [X] = F.call([X,U[k]])
 
-# Objective function
-J = MXFunction([ U ],[ mul(U.T,U) ]) # u'*u in Matlab
+# Objective function and constraints
+J = mul(U.T,U) # u'*u in Matlab
+G = X[0:2]     # x(1:2) in Matlab
 
-# Terminal constraints
-G = MXFunction([ U ],[ X[0:2] ]) # x(1:2) in Matlab
+# NLP
+nlp = MXFunction(nlIn(x=U),nlOut(f=J,g=G))
   
 # Allocate an NLP solver
-solver = IpoptSolver(J,G)
+solver = IpoptSolver(nlp)
 solver.setOption("tol",1e-10)
-solver.setOption("expand_f",True)
-solver.setOption("expand_g",True)
-solver.setOption("generate_hessian",True)
+solver.setOption("expand",True)
 solver.init()
 
 # Bounds on u and initial condition

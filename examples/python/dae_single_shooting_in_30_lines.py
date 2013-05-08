@@ -65,12 +65,10 @@ for k in range(20):
   J += Q                           # Sum up quadratures
   
 # NLP callback functions
-jfcn = MXFunction([U],[J]) # Objective 
-gfcn = MXFunction([U],[X]) # Constraint
+nlp = MXFunction(nlIn(x=U),nlOut(f=J,g=X))
 
 # Allocate an NLP solver
-solver = IpoptSolver(jfcn,gfcn)
-solver.setOption("generate_hessian",True)
+solver = IpoptSolver(nlp)
 solver.init()
 
 # Pass bounds, initial guess and solve NLP

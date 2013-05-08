@@ -150,10 +150,8 @@ x0 = simulated_X[:,0] + sigma_x0*NP.random.randn(Nstates,1)
 # Create the solver
 nlp_solver = IpoptSolver(f_obj,G)
 nlp_solver.setOption({"print_level":0, "print_time": False})
-nlp_solver.setOption("generate_hessian",True)
 nlp_solver.setOption('linear_solver','MA57')
 nlp_solver.setOption('max_iter',100)
-nlp_solver.setOption('parametric',True)
 nlp_solver.init()
 
 # Set the bounds for the constraints: we only have the multiple shooting constraints, so all constraints have upper and lower bound of zero

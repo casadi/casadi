@@ -83,9 +83,6 @@ int main(){
   // Allocate an NLP solver
   IpoptSolver solver(ffcn,gfcn);
 
-  // Set options
-  solver.setOption("generate_hessian",true);
-
   // initialize the solver
   solver.init();
 
