@@ -57,14 +57,12 @@ namespace CasADi{
     /// H_ transformed such that only lower triangular elements + diagonals are retained
     FX H_tril_;
 
-    OptVar    worhp_o;
-    Workspace worhp_w;
-    Params    worhp_p;
-    Control   worhp_c;
+    OptVar    worhp_o_;
+    Workspace worhp_w_;
+    Params    worhp_p_;
+    Control   worhp_c_;
   
     std::map<int,std::string> status_;
-  
-    void *userclass;
     std::map<std::string,opt_type> ops_;
 
     FX nlpmod_;
