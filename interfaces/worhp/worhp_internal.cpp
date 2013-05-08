@@ -260,18 +260,6 @@ namespace CasADi{
       hessLag();
     }
   
-    if (gradF_.output().size()==0) {
-      /// Known issue in WORHP: Worhp cannot handle the degenerate case of constant objective value.
-      // You "fake" an objective by returning a constant value + at least one
-      // gradient entry, which just happens to be 0 all the time.
-    
-      MX fake(gradF_.output().size1(),gradF_.output().size2());
-      fake(0,0) = 0;
-    
-      gradF_ = MXFunction(gradF_.symbolicInput(),fake);
-      gradF_.init();
-    }
-
     // Update status?
     status_[TerminateSuccess]="TerminateSuccess";
     status_[OptimalSolution]="OptimalSolution";
