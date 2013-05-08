@@ -351,6 +351,9 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   //nlp_solver_.setOption("merit_memory",1);
   nlp_solver_.setOption("maxiter",100);
   nlp_solver_.setOption("compiler","clang -fPIC -O2"); // Optimization
+  if(gauss_newton){
+    nlp_solver_.setOption("hessian_approximation","gauss-newton");
+  }
 
   // Name the variables
   vector<string> variable_name;

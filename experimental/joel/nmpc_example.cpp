@@ -112,6 +112,9 @@ int main(){
   solver.setOption("codegen",false);
   solver.setOption("maxiter_ls",1);
   solver.setOption("maxiter",100);
+  if(gauss_newton){
+    solver.setOption("hessian_approximation","gauss-newton");
+  }
   
   // Print the variables
   solver.setOption("print_x",range(0,n,5));
