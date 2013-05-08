@@ -89,6 +89,12 @@ namespace CasADi{
   
     std::string formatStatus(int status) const;
   
+    // What constraints are equality constraints
+    std::vector<bool> is_equality_x_, is_equality_g_;
+
+    // Is a re-initialization needed?
+    bool reinit_needed_;
+
     // Lists the indices into the decision variables for which LBX!=LBU
     std::vector< int > freeX_; 
   
@@ -101,6 +107,9 @@ namespace CasADi{
     // The complement of freeX_
     std::vector< int > nonfreeG_;
   
+    /// Prepare the solver once bounds are known
+    void prepare();
+
     /// Will do inspections on bounds and do a reinitialisation if needed
     void checkinit();
   
