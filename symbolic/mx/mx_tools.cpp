@@ -755,10 +755,9 @@ namespace CasADi{
   }
 
   MX gradient(const MX& ex, const MX &arg) {
-    return trans(jacobian(ex,arg));
-    //MXFunction temp(arg,ex); // make a runtime
-    //temp.init();
-    //return temp.grad();
+    MXFunction temp(arg,ex); // make a runtime
+    temp.init();
+    return temp.grad();
   }
 
   MX blockcat(const std::vector< std::vector<MX > > &v) {

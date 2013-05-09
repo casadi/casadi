@@ -413,7 +413,9 @@ bool isSymbolicSparse(const SXMatrix& ex) {
 }
 
 SXMatrix gradient(const SXMatrix& ex, const SXMatrix &arg) {
-  return trans(jacobian(ex,arg));
+  SXFunction temp(arg,ex); // make a runtime
+  temp.init();
+  return temp.grad();
 }
   
 SXMatrix jacobian(const SXMatrix& ex, const SXMatrix &arg) {
