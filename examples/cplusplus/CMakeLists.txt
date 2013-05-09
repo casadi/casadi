@@ -56,8 +56,17 @@ endif()
 if(WORHP_FOUND AND IPOPT_FOUND)
   add_executable(worhp_nl worhp_nl.cpp)
   target_link_libraries(worhp_nl 
-    casadi_worhp_interface casadi_nonlinear_programming casadi 
+    casadi_worhp_interface casadi casadi_nonlinear_programming
     ${WORHP_LIBRARIES} ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES} # NOTE!!! ADDED IPOPT due to missing symbols
+  )
+endif()
+
+# Parse AMPL models and solve with KNITRO
+if(KNITRO_FOUND)
+  add_executable(knitro_nl knitro_nl.cpp)
+  target_link_libraries(knitro_nl 
+    casadi_knitro_interface casadi casadi_nonlinear_programming
+    ${KNITRO_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
 

@@ -20,19 +20,18 @@
 *
 */
 #include <symbolic/casadi.hpp>
-#include <interfaces/worhp/worhp_solver.hpp>
+#include <interfaces/knitro/knitro_solver.hpp>
 #include <nonlinear_programming/symbolic_nlp.hpp>
  
 /**
-* This example demonstrates how NL-files, which can be generated
-* by AMPl or Pyomo, can be imported in CasADi and solved using
-* e.g. the interface to AMPL
+ * This example demonstrates how NL-files, which can be generated
+ * by AMPl or Pyomo, can be imported in CasADi and solved using
+ * e.g. the interface to AMPL
  
  \author Joel Andersson, Vyacheslav Kungurtsev
  \date 2013
 */
- 
- 
+  
 using namespace CasADi;
  
 int main(int argc, char **argv){
@@ -48,7 +47,7 @@ int main(int argc, char **argv){
   SXFunction nlp(nlIn("x",nl.x),nlOut("f",nl.f,"g",nl.g));
  
   // Allocate NLP solver
-  WorhpSolver nlp_solver(nlp);
+  KnitroSolver nlp_solver(nlp);
 
   // Set options
   // nlp_solver.setOption("verbose",true);
