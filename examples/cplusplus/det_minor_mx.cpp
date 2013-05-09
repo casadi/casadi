@@ -40,7 +40,7 @@ MX adj(const MX& a);
 vector<FX> detFuncs;
 const int N_EXPAND_LIMIT = 9;
 
-MX det(const MX& a){
+MX my_det(const MX& a){
   int n = a.size1(); // Dimension
   if(n==1) return a;
 
@@ -79,7 +79,7 @@ MX getMinor(const MX &x, int i, int j){
   if(detFuncs[n-1].isNull()){
     // Argument
     MX A("A",(n-1)*(n-1));
-    MX dA = det(reshape(A,n-1,n-1));
+    MX dA = my_det(reshape(A,n-1,n-1));
     MXFunction detFun(A,dA);
     detFun.init();
     
@@ -128,7 +128,7 @@ int main() {
   detFuncs.resize(n+1);
   
   MX A("A",n*n);
-  MX dA = det(reshape(A,n,n));
+  MX dA = my_det(reshape(A,n,n));
   cout << "constructed"<< endl;
   
   MXFunction detFun(A,dA);
@@ -152,7 +152,7 @@ int main() {
   
   cout << detFun.output() << endl;
   
-/*  double det_num = det(reshape(A0,n,n));
+/*  double det_num = my_det(reshape(A0,n,n));
   cout << det_num << endl;
   cout << "evaluated numerically "<< endl;*/
   
@@ -167,3 +167,4 @@ int main() {
   
   return 0;
 }
+

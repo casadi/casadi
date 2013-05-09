@@ -326,6 +326,12 @@ namespace CasADi{
   MX gradient(const MX &ex, const MX &arg);
   //@}
 
+  /** \brief Matrix determinant (experimental) */
+  MX det(const MX& A);
+
+  /** \brief Matrix inverse (experimental) */
+  MX inv(const MX& A);
+
 } // namespace CasADi
 
 #ifdef SWIG

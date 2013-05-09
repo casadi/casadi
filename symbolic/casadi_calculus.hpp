@@ -77,6 +77,12 @@ namespace CasADi{
     // Matrix transpose
     OP_TRANSPOSE,
 
+    // Matrix determinant
+    OP_DETERMINANT,
+
+    // Matrix inverse
+    OP_INVERSE,
+
     // Vertical concatenation
     OP_VERTCAT,
 

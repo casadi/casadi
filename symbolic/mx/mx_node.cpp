@@ -37,7 +37,8 @@
 #include "solve.hpp"
 #include "unary_mx.hpp"
 #include "binary_mx.hpp"
-
+#include "determinant.hpp"
+#include "inverse.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -272,7 +273,49 @@ namespace CasADi{
   }
 
   void MXNode::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-    throw CasadiException(string("MXNode::propagateSparsity not defined for class ") + typeid(*this).name());
+    // By default, everything depends on everything    
+    bvec_t all_depend(0);
+  
+    if(fwd){
+    
+      // Get dependencies of all inputs
+      for(DMatrixPtrV::const_iterator i=input.begin(); i!=input.end(); ++i){
+        const DMatrix& m = **i;
+        const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
+        for(int i=0; i<m.size(); ++i){
+          all_depend |= v[i];
+        }
+      }
+
+      // Propagate to all outputs
+      for(DMatrixPtrV::iterator i=output.begin(); i!=output.end(); ++i){
+        DMatrix& m = **i;
+        bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
+        for(int i=0; i<m.size(); ++i){
+          v[i] = all_depend;
+        }
+      }
+    } else {
+    
+      // Get dependencies of all outputs
+      for(DMatrixPtrV::iterator i=output.begin(); i!=output.end(); ++i){
+        DMatrix& m = **i;
+        bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
+        for(int i=0; i<m.size(); ++i){
+          all_depend |= v[i];
+          v[i] = 0;
+        }
+      }
+
+      // Propagate to all inputs
+      for(DMatrixPtrV::iterator i=input.begin(); i!=input.end(); ++i){
+        DMatrix& m = **i;
+        bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
+        for(int i=0; i<m.size(); ++i){
+          v[i] |= all_depend;
+        }
+      }
+    }
   }
 
   void MXNode::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
@@ -570,6 +613,14 @@ namespace CasADi{
         return false;
     }
     return true;
+  }
+
+  MX MXNode::getDeterminant() const{
+    return MX::create(new Determinant(shared_from_this<MX>()));
+  }
+
+  MX MXNode::getInverse() const{
+    return MX::create(new Inverse(shared_from_this<MX>()));
   }
 
 } // namespace CasADi

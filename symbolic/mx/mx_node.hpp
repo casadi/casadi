@@ -323,6 +323,12 @@ namespace CasADi{
     /// Get a binary operation operation (matrix-matrix)
     virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
 
+    /// Determinant
+    virtual MX getDeterminant() const;
+
+    /// Inverse
+    virtual MX getInverse() const;
+
     /** Temporary variables to be used in user algorithms like sorting, 
         the user is resposible of making sure that use is thread-safe
         The variable is initialized to zero
