@@ -52,6 +52,15 @@ if(IPOPT_FOUND)
 
 endif()
 
+# Parse AMPL models and solve with Worhp
+if(WORHP_FOUND AND IPOPT_FOUND)
+  add_executable(worhp_nl worhp_nl.cpp)
+  target_link_libraries(worhp_nl 
+    casadi_worhp_interface casadi_nonlinear_programming casadi 
+    ${WORHP_LIBRARIES} ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES} # NOTE!!! ADDED IPOPT due to missing symbols
+  )
+endif()
+
 # rocket example using sundials and ipopt
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(rocket_single_shooting rocket_single_shooting.cpp)

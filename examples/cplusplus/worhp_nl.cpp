@@ -20,15 +20,15 @@
 *
 */
 #include <symbolic/casadi.hpp>
-#include <interfaces/ipopt/ipopt_solver.hpp>
+#include <interfaces/worhp/worhp_solver.hpp>
 #include <nonlinear_programming/sqp_method.hpp>
 #include <nonlinear_programming/nlp_qp_solver.hpp>
 #include <nonlinear_programming/symbolic_nlp.hpp>
  
 /**
- * This example demonstrates how NL-files, which can be generated
- * by AMPl or Pyomo, can be imported in CasADi and solved using
- * e.g. the interface to AMPL
+* This example demonstrates how NL-files, which can be generated
+* by AMPl or Pyomo, can be imported in CasADi and solved using
+* e.g. the interface to AMPL
  
  \author Joel Andersson, Vyacheslav Kungurtsev
  \date 2013
@@ -50,24 +50,10 @@ int main(int argc, char **argv){
   SXFunction nlp(nlIn("x",nl.x),nlOut("f",nl.f,"g",nl.g));
  
   // Allocate NLP solver
-  SQPMethod nlp_solver(nlp);
+  WorhpSolver nlp_solver(nlp);
 
   // Set options
-  // nlp_solver.setOption("max_iter",10);
   // nlp_solver.setOption("verbose",true);
-  // nlp_solver.setOption("linear_solver","ma57");
-  nlp_solver.setOption("hessian_approximation","exact");
-  // nlp_solver.setOption("derivative_test","second-order");
-
-  // Specify QP solver
-  nlp_solver.setOption("qp_solver",NLPQPSolver::creator);
-  Dictionary qp_solver_options;
-  qp_solver_options["nlp_solver"] = IpoptSolver::creator; 
-  Dictionary nlp_solver_options;
-  nlp_solver_options["print_level"] = 0;
-  nlp_solver_options["print_time"] = 0;
-  qp_solver_options["nlp_solver_options"] = nlp_solver_options;
-  nlp_solver.setOption("qp_solver_options",qp_solver_options);
  
   // Initialize NLP solver
   nlp_solver.init();
