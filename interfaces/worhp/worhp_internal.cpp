@@ -252,20 +252,16 @@ namespace CasADi{
       std::copy(ares.begin(),ares.begin()+NAres,worhp_p_.Ares);
     }
   
-    if(hasSetOption("UserHM")){
-      exact_hessian_ = getOption("UserHM");
-    } else {
-      exact_hessian_ = true;
-      setOption("UserHM",true);
-    }
-
     // Read options
     passOptions();
   
+    // Exact Hessian?
+    exact_hessian_ = getOption("UserHM");
+
     // Get/generate required functions
     gradF();
     jacG();
-    if(exact_hessian_){
+    if(exact_hessian_){ // does not appear to work
       hessLag();
     }
 
@@ -541,20 +537,23 @@ namespace CasADi{
       worhp_w_.DG.nnz = 0;
     }
 
-    if (exact_hessian_){
+    if (true /*worhp_w_.HM.NeedStructure*/) { // not initialized
+
+      // Get the sparsity pattern of the Hessian
+      const CRSSparsity& hessLagSparsity = this->hessLagSparsity();
+      const vector<int>& rowind = hessLagSparsity.rowind();
+      const vector<int>& col = hessLagSparsity.col();
+
       // Get number of nonzeros in the lower triangular part of the Hessian including full diagonal
       worhp_w_.HM.nnz = nx_; // diagonal entries
-      const DMatrix& H = hessLag_.output();
-      const vector<int>& rowind = H.rowind();
-      const vector<int>& col = H.col();
       for(int r=0; r<nx_; ++r){
-	for(int el=rowind[r]; el<rowind[r+1] && col[el]<r; ++el){
-	  worhp_w_.HM.nnz++; // strictly lower triangular part
-	}
+        for(int el=rowind[r]; el<rowind[r+1] && col[el]<r; ++el){
+          worhp_w_.HM.nnz++; // strictly lower triangular part
+        }
       }
       
       if(verbose()){
-	cout << "Allocating space for " << worhp_w_.HM.nnz << " hessian entries" << std::endl;
+        cout << "Allocating space for " << worhp_w_.HM.nnz << " hessian entries" << std::endl;
       }
     } else {
       worhp_w_.HM.nnz = 0;
@@ -568,7 +567,7 @@ namespace CasADi{
 
     if (worhp_w_.DF.NeedStructure){
       for(int i=0; i<nx_; ++i){
-	worhp_w_.DF.row[i] = i + 1; // Index-1 based    
+        worhp_w_.DF.row[i] = i + 1; // Index-1 based    
       }
     }
   
@@ -578,12 +577,12 @@ namespace CasADi{
       // const vector<int>& rowind = J.rowind();
       // const vector<int>& col = J.col();
       // for(int r=0; r<nx_; ++r){
-      // 	for(int el=rowind[r]; el<rowind[r+1]; ++el){
-      // 	  int c = col[el];
-      // 	  worhp_w_.DG.col[nz] = c + 1;
-      // 	  worhp_w_.DG.row[nz] = r + 1;
-      // 	  nz++;
-      // 	}
+      //         for(int el=rowind[r]; el<rowind[r+1]; ++el){
+      //           int c = col[el];
+      //           worhp_w_.DG.col[nz] = c + 1;
+      //           worhp_w_.DG.row[nz] = r + 1;
+      //           nz++;
+      //         }
       // }
 
       vector<int> row,col;
@@ -599,33 +598,32 @@ namespace CasADi{
       for (int i=0;i<row.size();++i) worhp_w_.DG.row[i] = row[i] + 1;
     }    
 
-    if (exact_hessian_){
-      log("generate_hessian sparsity");
-      if (worhp_w_.HM.NeedStructure) {
-        int nz=0;
-        const vector<int>& rowind = hessLag_.output().sparsity().rowind();
-        const vector<int>& col = hessLag_.output().sparsity().col();
-        for(int r=0; r<nx_; ++r){
-	  // Current column
-	  int c = -1;
+    if (worhp_w_.HM.NeedStructure) {
+      // Get the sparsity pattern of the Hessian
+      const CRSSparsity& hessLagSparsity = this->hessLagSparsity();
+      const vector<int>& rowind = hessLagSparsity.rowind();
+      const vector<int>& col = hessLagSparsity.col();
 
-	  for(int el=rowind[r]; el<rowind[r+1] && col[el]<=r; ++el){
-	    // Lower triangular part of the Hessian
-	    c = col[el];
-	    worhp_w_.HM.row[nz] = r + 1;
-	    worhp_w_.HM.col[nz] = c + 1;
-	    nz++;
-	  }
-	  
-	  if(c!=r){
-	    // Diagonal always included
-	    worhp_w_.HM.row[nz] = r + 1;
-	    worhp_w_.HM.col[nz] = r + 1;
-	    nz++;
-	  }
-	}
+      int nz=0;
+      
+      // Upper triangular part of the Hessian (note CCS -> CRS format change)
+      for(int r=0; r<nx_; ++r){
+        for(int el=rowind[r]; el<rowind[r+1]; ++el){
+          if(col[el]>r){
+            worhp_w_.HM.row[nz] = col[el] + 1;
+            worhp_w_.HM.col[nz] = r + 1;
+            nz++;
+          }
+        }
       }
-    }  
+      
+      // Diagonal always included
+      for(int r=0; r<nx_; ++r){
+        worhp_w_.HM.row[nz] = r + 1;
+        worhp_w_.HM.col[nz] = r + 1;
+        nz++;
+      }
+    }
   }
 
   std::string WorhpInternal::formatStatus(int status) const {
@@ -685,63 +683,63 @@ namespace CasADi{
     // Reverse Communication loop
     while(worhp_c_.status < TerminateSuccess &&  worhp_c_.status > TerminateError) {
       if (GetUserAction(&worhp_c_, callWorhp)) {
-	Worhp(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
+        Worhp(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
       }
 
       if (GetUserAction(&worhp_c_, iterOutput)) {
-	if (!callback_.isNull()) {
-	  double time1 = clock();
-	  // Copy outputs
-	  if (!callback_.input(NLP_SOLVER_X).empty())
-	    callback_.input(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n);
-	  if (!callback_.input(NLP_SOLVER_F).empty())
-	    callback_.input(NLP_SOLVER_F).set(worhp_o_.F);
-	  if (!callback_.input(NLP_SOLVER_G).empty())
-	    callback_.input(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
-	  if (!callback_.input(NLP_SOLVER_LAM_X).empty()) 
-	    callback_.input(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
-	  if (!callback_.input(NLP_SOLVER_LAM_G).empty())
-	    callback_.input(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
+        if (!callback_.isNull()) {
+          double time1 = clock();
+          // Copy outputs
+          if (!callback_.input(NLP_SOLVER_X).empty())
+            callback_.input(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n);
+          if (!callback_.input(NLP_SOLVER_F).empty())
+            callback_.input(NLP_SOLVER_F).set(worhp_o_.F);
+          if (!callback_.input(NLP_SOLVER_G).empty())
+            callback_.input(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
+          if (!callback_.input(NLP_SOLVER_LAM_X).empty()) 
+            callback_.input(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
+          if (!callback_.input(NLP_SOLVER_LAM_G).empty())
+            callback_.input(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
 
-	  double time2 = clock();
-	  t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
-	  time1 = clock();
-	  callback_.evaluate();
-	  time2 = clock();
-	  t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
-	}
+          double time2 = clock();
+          t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
+          time1 = clock();
+          callback_.evaluate();
+          time2 = clock();
+          t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
+        }
     
-	IterationOutput(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
-	DoneUserAction(&worhp_c_, iterOutput);
+        IterationOutput(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
+        DoneUserAction(&worhp_c_, iterOutput);
       }
 
       if (GetUserAction(&worhp_c_, evalF)) {
-	eval_f(worhp_o_.X, worhp_w_.ScaleObj, worhp_o_.F);
-	DoneUserAction(&worhp_c_, evalF);
+        eval_f(worhp_o_.X, worhp_w_.ScaleObj, worhp_o_.F);
+        DoneUserAction(&worhp_c_, evalF);
       }
 
       if (GetUserAction(&worhp_c_, evalG)) {
-	eval_g(worhp_o_.X, worhp_o_.G);
-	DoneUserAction(&worhp_c_, evalG);
+        eval_g(worhp_o_.X, worhp_o_.G);
+        DoneUserAction(&worhp_c_, evalG);
       }
 
       if (GetUserAction(&worhp_c_, evalDF)) {
-	eval_grad_f(worhp_o_.X, worhp_w_.ScaleObj, worhp_w_.DF.val);
-	DoneUserAction(&worhp_c_, evalDF);
+        eval_grad_f(worhp_o_.X, worhp_w_.ScaleObj, worhp_w_.DF.val);
+        DoneUserAction(&worhp_c_, evalDF);
       }
 
       if (GetUserAction(&worhp_c_, evalDG)) {
-	eval_jac_g(worhp_o_.X,worhp_w_.DG.val);
-	DoneUserAction(&worhp_c_, evalDG);
+        eval_jac_g(worhp_o_.X,worhp_w_.DG.val);
+        DoneUserAction(&worhp_c_, evalDG);
       }
 
       if (GetUserAction(&worhp_c_, evalHM)) {
-	eval_h(worhp_o_.X, worhp_w_.ScaleObj, worhp_o_.Mu, worhp_w_.HM.val);
-	DoneUserAction(&worhp_c_, evalHM);
+        eval_h(worhp_o_.X, worhp_w_.ScaleObj, worhp_o_.Mu, worhp_w_.HM.val);
+        DoneUserAction(&worhp_c_, evalHM);
       }
     
       if (GetUserAction(&worhp_c_, fidif)) {
-	WorhpFidif(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
+        WorhpFidif(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
       }
     }
 
@@ -785,44 +783,57 @@ namespace CasADi{
       log("eval_h started");
       double time1 = clock();
 
+      // Make sure generated
+      casadi_assert_warning(!hessLag_.isNull(),"Hessian function not pregenerated");
+
+      // Get Hessian 
+      FX& hessLag = this->hessLag();
+
       // Pass input
-      hessLag_.setInput(x,HESSLAG_X);
-      hessLag_.setInput(input(NLP_SOLVER_P),HESSLAG_P);
-      hessLag_.setInput(obj_factor,HESSLAG_LAM_F);
-      hessLag_.setInput(lambda,HESSLAG_LAM_G);
+      hessLag.setInput(x,HESSLAG_X);
+      hessLag.setInput(input(NLP_SOLVER_P),HESSLAG_P);
+      hessLag.setInput(obj_factor,HESSLAG_LAM_F);
+      hessLag.setInput(lambda,HESSLAG_LAM_G);
 
       // Evaluate
-      hessLag_.evaluate();
+      hessLag.evaluate();
 
       // Get results
-      const DMatrix& H = hessLag_.output();
+      const DMatrix& H = hessLag.output();
       const vector<int>& rowind = H.rowind();
       const vector<int>& col = H.col();
       const vector<double>& data = H.data();
+
+      // The Hessian values are divided into strictly upper (in WORHP lower) triangular and diagonal
+      double* values_upper = values;
+      double* values_diagonal = values + (worhp_w_.HM.nnz-nx_);
+
+      // Initialize diagonal to zero
       for(int r=0; r<nx_; ++r){
-	// Current column
-	int c = -1;
-
-	for(int el=rowind[r]; el<rowind[r+1] && col[el]<=r; ++el){
-	  // Lower triangular part of the Hessian
-	  *values++ = data[el];
-	  c = col[el];
-	}
-	
-	if(c!=r){
-	  // Diagonal always included
-	  *values++ = 0.0;
-	}
+        values_diagonal[r] = 0.;
       }
 
+      // Upper triangular part of the Hessian (note CCS -> CRS format change)
+      for(int r=0; r<nx_; ++r){
+        for(int el=rowind[r]; el<rowind[r+1]; ++el){
+          if(col[el]>r){
+            // Strictly upper triangular
+            *values_upper++ = data[el];
+          } else if(col[el]==r){
+            // Diagonal separartely
+            values_diagonal[r] = data[el];
+          }
+        }
+      }
+      
       if(monitored("eval_h")){
-	std::cout << "x = " <<  hessLag_.input() << std::endl;
-	std::cout << "obj_factor= " << obj_factor << std::endl;
-	std::cout << "lambda = " << hessLag_.input(HESSLAG_LAM_G) << std::endl;
-	std::cout << "H = " << hessLag_.output() << std::endl;
+        std::cout << "x = " <<  hessLag.input(HESSLAG_X) << std::endl;
+        std::cout << "obj_factor= " << obj_factor << std::endl;
+        std::cout << "lambda = " << hessLag.input(HESSLAG_LAM_G) << std::endl;
+        std::cout << "H = " << hessLag.output(HESSLAG_HESS) << std::endl;
       }
 
-      if (regularity_check_ && !isRegular(hessLag_.output().data())) casadi_error("WorhpInternal::eval_h: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(hessLag.output(HESSLAG_HESS).data())) casadi_error("WorhpInternal::eval_h: NaN or Inf detected.");
       
       double time2 = clock();
       t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -840,10 +851,13 @@ namespace CasADi{
     
       // Quich finish if no constraints
       if(worhp_o_.m==0){
-	log("eval_jac_g quick return (m==0)");
-	return true;
+        log("eval_jac_g quick return (m==0)");
+        return true;
       }
-    
+   
+      // Make sure generated
+      casadi_assert(!jacG_.isNull());
+ 
       double time1 = clock();
 
       // Pass the argument to the function
@@ -857,9 +871,9 @@ namespace CasADi{
       trans(jacG_.output()).get(values); // inefficient!
     
       if(monitored("eval_jac_g")){
-	cout << "x = " << jacG_.input().data() << endl;
-	cout << "J = " << endl;
-	jacG_.output().printSparse();
+        cout << "x = " << jacG_.input().data() << endl;
+        cout << "J = " << endl;
+        jacG_.output().printSparse();
       }
     
       double time2 = clock();
@@ -892,8 +906,8 @@ namespace CasADi{
 
       // Printing
       if(monitored("eval_f")){
-	cout << "x = " << nlp_.input(NL_X) << endl;
-	cout << "obj_value = " << obj_value << endl;
+        cout << "x = " << nlp_.input(NL_X) << endl;
+        cout << "obj_value = " << obj_value << endl;
       }
       obj_value *= scale;
 
@@ -917,21 +931,21 @@ namespace CasADi{
       double time1 = clock();
 
       if(worhp_o_.m>0){
-	// Pass the argument to the function
-	nlp_.setInput(x,NL_X);
-	nlp_.setInput(input(NLP_SOLVER_P),NL_P);
+        // Pass the argument to the function
+        nlp_.setInput(x,NL_X);
+        nlp_.setInput(input(NLP_SOLVER_P),NL_P);
 
-	// Evaluate the function and tape
-	nlp_.evaluate();
+        // Evaluate the function and tape
+        nlp_.evaluate();
 
-	// Ge the result
-	nlp_.getOutput(g,NL_G);
+        // Ge the result
+        nlp_.getOutput(g,NL_G);
 
-	// Printing
-	if(monitored("eval_g")){
-	  cout << "x = " << nlp_.input(NL_X) << endl;
-	  cout << "g = " << nlp_.output(NL_G) << endl;
-	}
+        // Printing
+        if(monitored("eval_g")){
+          cout << "x = " << nlp_.input(NL_X) << endl;
+          cout << "g = " << nlp_.output(NL_G) << endl;
+        }
       }
 
       if (regularity_check_ && !isRegular(nlp_.output(NL_G).data())) casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
@@ -965,12 +979,12 @@ namespace CasADi{
 
       // Scale
       for(int i=0; i<nx_; ++i){
-	grad_f[i] *= scale;
+        grad_f[i] *= scale;
       }
       
       // Printing
       if(monitored("eval_grad_f")){
-	cout << "grad_f = " << gradF_.output() << endl;
+        cout << "grad_f = " << gradF_.output() << endl;
       }
       
       if (regularity_check_ && !isRegular(gradF_.output().data())) casadi_error("WorhpInternal::eval_grad_f: NaN or Inf detected.");
@@ -983,7 +997,7 @@ namespace CasADi{
         if(isnan(grad_f[i]) || isinf(grad_f[i])){
           log("eval_grad_f: result not regular");
           return false;
-	}
+        }
       }
 
       log("eval_grad_f ok");
@@ -1167,3 +1181,4 @@ namespace CasADi{
 
 
 } // namespace CasADi
+
