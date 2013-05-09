@@ -90,6 +90,7 @@ namespace CasADi{
     input(NLP_SOLVER_UBX)      =  DMatrix::inf(x_sparsity);
     input(NLP_SOLVER_LBG)      = -DMatrix::inf(g_sparsity);
     input(NLP_SOLVER_UBG)      =  DMatrix::inf(g_sparsity);
+    input(NLP_SOLVER_LAM_X0)   =  DMatrix::zeros(x_sparsity);
     input(NLP_SOLVER_LAM_G0)   =  DMatrix::zeros(g_sparsity);
     input(NLP_SOLVER_P)        =  DMatrix::zeros(p_sparsity);
   
