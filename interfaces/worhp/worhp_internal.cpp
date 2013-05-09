@@ -265,6 +265,10 @@ namespace CasADi{
       hessLag();
     }
 
+    /// Sparsity pattern for the transpose of the Jacobian of the constraints
+    spJacG_T_ = jacG().output(JACG_JAC).sparsity().transpose();
+    jacG_T_tmp_.resize(spJacG_T_.rowind().size());
+
     // What variables/constraints are equality constrained?
     is_equality_x_.resize(nx_,false);
     is_equality_g_.resize(ng_,false);
@@ -540,9 +544,9 @@ namespace CasADi{
     if (true /*worhp_w_.HM.NeedStructure*/) { // not initialized
 
       // Get the sparsity pattern of the Hessian
-      const CRSSparsity& hessLagSparsity = this->hessLagSparsity();
-      const vector<int>& rowind = hessLagSparsity.rowind();
-      const vector<int>& col = hessLagSparsity.col();
+      const CRSSparsity& spHessLag = this->spHessLag();
+      const vector<int>& rowind = spHessLag.rowind();
+      const vector<int>& col = spHessLag.col();
 
       // Get number of nonzeros in the lower triangular part of the Hessian including full diagonal
       worhp_w_.HM.nnz = nx_; // diagonal entries
@@ -572,37 +576,25 @@ namespace CasADi{
     }
   
     if (worhp_o_.m>0 && worhp_w_.DG.NeedStructure) {    
-      // int nz=0;
-      // const DMatrix& J = jacG_.output();
-      // const vector<int>& rowind = J.rowind();
-      // const vector<int>& col = J.col();
-      // for(int r=0; r<nx_; ++r){
-      //         for(int el=rowind[r]; el<rowind[r+1]; ++el){
-      //           int c = col[el];
-      //           worhp_w_.DG.col[nz] = c + 1;
-      //           worhp_w_.DG.row[nz] = r + 1;
-      //           nz++;
-      //         }
-      // }
-
-      vector<int> row,col;
-      jacG_.output().sparsity().transpose().getSparsity(col,row);
-
-      casadi_assert(col.size()==worhp_w_.DG.nnz);
-      casadi_assert(row.size()==worhp_w_.DG.nnz);
-    
-      casadi_assert(worhp_w_.DG.nnz<=worhp_w_.DG.dim_row);
-      casadi_assert(worhp_w_.DG.nnz<=worhp_w_.DG.dim_col);
-    
-      for (int i=0;i<col.size();++i) worhp_w_.DG.col[i] = col[i] + 1;
-      for (int i=0;i<row.size();++i) worhp_w_.DG.row[i] = row[i] + 1;
+      // Get sparsity pattern of the transpose since WORHP is column major
+      int nz=0;
+      const vector<int>& rowind = spJacG_T_.rowind();
+      const vector<int>& col = spJacG_T_.col();
+      for(int r=0; r<nx_; ++r){
+        for(int el=rowind[r]; el<rowind[r+1]; ++el){
+          int c = col[el];
+          worhp_w_.DG.col[nz] = r + 1; // Index-1 based
+          worhp_w_.DG.row[nz] = c + 1;
+          nz++;
+        }
+      }
     }    
 
     if (worhp_w_.HM.NeedStructure) {
       // Get the sparsity pattern of the Hessian
-      const CRSSparsity& hessLagSparsity = this->hessLagSparsity();
-      const vector<int>& rowind = hessLagSparsity.rowind();
-      const vector<int>& col = hessLagSparsity.col();
+      const CRSSparsity& spHessLag = this->spHessLag();
+      const vector<int>& rowind = spHessLag.rowind();
+      const vector<int>& col = spHessLag.col();
 
       int nz=0;
       
@@ -858,17 +850,27 @@ namespace CasADi{
       // Make sure generated
       casadi_assert(!jacG_.isNull());
  
+      // Get Jacobian
+      FX& jacG = this->jacG();
+
       double time1 = clock();
 
       // Pass the argument to the function
-      jacG_.setInput(x,NL_X);
-      jacG_.setInput(input(NLP_SOLVER_P),NL_P);
+      jacG.setInput(x,JACG_X);
+      jacG.setInput(input(NLP_SOLVER_P),JACG_P);
     
       // Evaluate the function
-      jacG_.evaluate();
+      jacG.evaluate();
 
-      // Get the output
-      trans(jacG_.output()).get(values); // inefficient!
+      // Transpose the result
+      const DMatrix& J = jacG.output(JACG_JAC);
+      const vector<int>& J_col = J.col();
+      const vector<double>& J_data = J.data();
+      const vector<int>& JT_rowind = spJacG_T_.rowind();
+      copy(JT_rowind.begin(),JT_rowind.end(),jacG_T_tmp_.begin());
+      for(int el=0; el<J_col.size(); ++el){
+        values[jacG_T_tmp_[J_col[el]]++] = J_data[el];
+      }
     
       if(monitored("eval_jac_g")){
         cout << "x = " << jacG_.input().data() << endl;

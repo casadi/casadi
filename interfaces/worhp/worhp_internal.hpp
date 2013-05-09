@@ -54,6 +54,10 @@ namespace CasADi{
     /// Exact Hessian?
     bool exact_hessian_;
 
+    // Sparsity pattern of the transpose of jacG
+    CRSSparsity spJacG_T_;
+    std::vector<int> jacG_T_tmp_;
+
     OptVar    worhp_o_;
     Workspace worhp_w_;
     Params    worhp_p_;

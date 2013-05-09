@@ -276,24 +276,24 @@ namespace CasADi{
     return hessLag;
   }
 
-  CRSSparsity& NLPSolverInternal::hessLagSparsity(){
-    if(hessLagSparsity_.isNull()){
-      hessLagSparsity_ = getHessLagSparsity();
+  CRSSparsity& NLPSolverInternal::spHessLag(){
+    if(spHessLag_.isNull()){
+      spHessLag_ = getSpHessLag();
     }
-    return hessLagSparsity_;
+    return spHessLag_;
   }
 
-  CRSSparsity NLPSolverInternal::getHessLagSparsity(){
-    CRSSparsity hessLagSparsity;
+  CRSSparsity NLPSolverInternal::getSpHessLag(){
+    CRSSparsity spHessLag;
     if(false /*hasSetOption("hess_lag_sparsity")*/){ // NOTE: No such option yet, need support for GenericType(CRSSparsity)
-      //hessLagSparsity = getOption("hess_lag_sparsity");
+      //spHessLag = getOption("hess_lag_sparsity");
     } else {
       FX& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian sparsity pattern");
-      hessLagSparsity = gradLag.jacSparsity(NL_X,NL_NUM_OUT+NL_X,false,true);
+      spHessLag = gradLag.jacSparsity(NL_X,NL_NUM_OUT+NL_X,false,true);
       log("Hessian sparsity pattern generated");
     }
-    return hessLagSparsity;
+    return spHessLag;
   }
 
 } // namespace CasADi
