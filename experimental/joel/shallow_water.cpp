@@ -288,8 +288,9 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   // Variables in the lifted NLP
   stringstream ss;
   
-  // Least-squares objective function
+  // Objective function
   MX nlp_f;
+  if(!gauss_newton) nlp_f = 0;
   
   // Constraint function
   MX nlp_g = MX::sparse(0,1);
@@ -319,19 +320,21 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     }
     
     // Objective function term
-    nlp_f.append(H-H_meas_[k]);
+    MX H_dev = H-H_meas_[k];
+    if(gauss_newton){
+      nlp_f.append(H_dev);
+    } else {
+      nlp_f += inner_prod(H_dev,H_dev)/2;
+    }
 
     // Add to the constraints
     nlp_g.append(H);
   }
 
-  // Reshape to vectors
-  nlp_f = flatten(nlp_f);
+  // Reshape to vectors (should not be needed)
   nlp_g = flatten(nlp_g);
-
-  // Form scalar objective function if not Gauss-Newton
-  if(!gauss_newton){
-    nlp_f = inner_prod(nlp_f,nlp_f)/2;
+  if(gauss_newton){
+    nlp_f = flatten(nlp_f);
   }
  
   // Objective function
