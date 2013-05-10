@@ -95,7 +95,7 @@ namespace CasADi{
           
           // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
           if(!t.scalar() && t.shape() != dep(c).shape()){
-            t = sumAll(t);
+            t = inner_prod(pd[c],s);
           }
           
           // Propagate the seeds
