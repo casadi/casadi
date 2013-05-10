@@ -53,24 +53,19 @@ namespace CasADi{
   MX horzcat(const MX& a, const MX& b);
 #endif // SWIG
 
-  /** \brief  Take the 2-norm of a MX
-      Internally represented by Norm2
-  */
+  /** \brief  Frobenius norm  */
+  MX norm_F(const MX &x);
+
+  /** \brief  2-norm  */
   MX norm_2(const MX &x);
 
-  /** \brief  Take the 1-norm of a MX
-      Internally represented by Norm1
-  */
+  /** \brief 1-norm  */
   MX norm_1(const MX &x);
 
-  /** \brief  Take the infinity-norm of a MX
-      Internally represented by NormInf
-  */
+  /** \brief Infinity-norm */
   MX norm_inf(const MX &x);
 
-  /** \brief  Take the transpose of a MX 
-      Internally represented by Transpose
-  */
+  /** \brief Transpose an expression */
   MX trans(const MX &x);
 
   /** \brief  Take the matrix product of 2 MX objects */

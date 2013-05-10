@@ -147,7 +147,7 @@ namespace CasADi{
     /** \brief  Evaluate symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, 
                             const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, 
-                            const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given)=0;
+                            const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
     /** \brief  Evaluate symbolically (MX), no derivatives */
     void evaluateMX(const MXPtrV& input, MXPtrV& output);
@@ -331,6 +331,18 @@ namespace CasADi{
 
     /// Inner product
     virtual MX getInnerProd(const MX& y) const;
+
+    /// Frobenius norm
+    virtual MX getNormF() const;
+
+    /// Spectran norm
+    virtual MX getNorm2() const;
+
+    /// Infinity norm
+    virtual MX getNormInf() const;
+
+    /// 1-norm
+    virtual MX getNorm1() const;
 
     /** Temporary variables to be used in user algorithms like sorting, 
         the user is resposible of making sure that use is thread-safe

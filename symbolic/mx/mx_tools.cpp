@@ -22,7 +22,6 @@
 
 #include "mx_tools.hpp"
 #include "vertcat.hpp"
-#include "norm.hpp"
 #include "../fx/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
@@ -98,15 +97,19 @@ namespace CasADi{
   }
 
   MX norm_2(const MX &x){
-    return MX::create(new Norm2(x));
+    return x->getNorm2();
+  }
+
+  MX norm_F(const MX &x){
+    return x->getNormF();
   }
 
   MX norm_1(const MX &x){
-    return MX::create(new Norm1(x));
+    return x->getNorm1();
   }
 
   MX norm_inf(const MX &x){
-    return MX::create(new NormInf(x));
+    return x->getNormInf();
   }
 
   MX mul(const MX &x, const MX &y){

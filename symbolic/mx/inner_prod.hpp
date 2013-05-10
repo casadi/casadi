@@ -62,6 +62,7 @@ namespace CasADi{
 
     /** \brief Generate code for the operation */
     void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
             
