@@ -43,21 +43,30 @@ namespace CasADi{
   }
 
   void Determinant::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+    int nfwd = fwdSens.size();    
+    int nadj = adjSeed.size();
+
+    // Non-differentiated output
+    const MX& X = *input[0];
+    MX& det_X = *output[0];
     if(!output_given){
-      *output[0] = det(*input[0]);
+      det_X = det(X);
     }
+    
+    // Quick return
+    if(nfwd==0 && nadj==0) return;
+    
+    // Create only once
+    MX trans_inv_X = trans(inv(X));
 
     // Forward sensitivities
-    int nfwd = fwdSens.size();
     for(int d=0; d<nfwd; ++d){
-      casadi_error("not implemented");
-      //      *fwdSens[d][0] = trans(*fwdSeed[d][0]);
+      *fwdSens[d][0] = det_X * inner_prod(trans_inv_X, *fwdSeed[d][0]);
     }
 
     // Adjoint sensitivities
-    int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] +=  (*adjSeed[d][0]**output[0]) * trans(inv(*input[0]));
+      *adjSens[d][0] +=  (*adjSeed[d][0]*det_X) * trans_inv_X;
       *adjSeed[d][0] = MX();
     }
   }
