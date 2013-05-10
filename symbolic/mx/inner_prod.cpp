@@ -46,23 +46,21 @@ namespace CasADi{
 
   void InnerProd::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     if(!output_given){
-      casadi_error("not implemented");
-      //*output[0] = det(*input[0]);
+      *output[0] = (*input[0])->getInnerProd(*input[1]);
     }
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for(int d=0; d<nfwd; ++d){
-      casadi_error("not implemented");
-      //      *fwdSens[d][0] = trans(*fwdSeed[d][0]);
+      *fwdSens[d][0] = (*input[0])->getInnerProd(*fwdSeed[d][1]) + (*fwdSeed[d][0])->getInnerProd(*input[1]);
     }
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      casadi_error("not implemented");
-      //      *adjSens[d][0] +=  (*adjSeed[d][0]**output[0]) * trans(inv(*input[0]));
-      //      *adjSeed[d][0] = MX();
+      *adjSens[d][0] += *adjSeed[d][0] * *input[1];
+      *adjSens[d][1] += *adjSeed[d][0] * *input[0];
+      *adjSeed[d][0] = MX();
     }
   }
 
