@@ -50,7 +50,7 @@ namespace CasADi {
   
   /// DOT: inner_prod(x,y) -> return
   template<typename real_t>
-  real_t casadi_dot(int n, const real_t* x, int inc_x, real_t* y, int inc_y);
+  real_t casadi_dot(int n, const real_t* x, int inc_x, const real_t* y, int inc_y);
   
   /// ASUM: ||x||_1 -> return
   template<typename real_t>
@@ -174,7 +174,7 @@ namespace CasADi {
   }
   
   template<typename real_t>
-  real_t casadi_dot(int n, const real_t* x, int inc_x, real_t* y, int inc_y){
+  real_t casadi_dot(int n, const real_t* x, int inc_x, const real_t* y, int inc_y){
     real_t r = 0;
     int i;
     for(i=0; i<n; ++i){
