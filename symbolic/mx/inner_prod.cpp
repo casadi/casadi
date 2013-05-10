@@ -106,5 +106,27 @@ namespace CasADi{
     }
   }
 
+  void InnerProd::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+    bvec_t& res = *get_bvec_t(output[0]->data());
+    bvec_t* arg0 = get_bvec_t(input[0]->data());
+    bvec_t* arg1 = get_bvec_t(input[1]->data());
+    const int n = input[0]->size();
+    if(fwd){
+      res = 0;
+      for(int i=0; i<n; ++i){
+        res |= *arg0++ & *arg1++;
+      }
+    } else {
+      for(int i=0; i<n; ++i){
+        *arg0++ |= res;
+        *arg1++ |= res;
+      }
+      res = 0;
+    }
+  }
+
+  void InnerProd::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    stream << "  *" << res.front() << " = " << gen.casadi_dot(sparsity().size(),arg.at(0),1,arg.at(1),1) << ";" << endl;
+  }
 
 } // namespace CasADi

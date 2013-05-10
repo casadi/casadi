@@ -313,8 +313,14 @@ namespace CasADi{
     } else {
       // For loop
       s << "for(" << it << "=0; " << it << "<" << n << "; ++" << it << ") " << res << "[" << it << "]=" << arg << "[" << it << "];" << endl;
-    }
-    
+    }    
+  }
+
+  std::string CodeGenerator::casadi_dot(int n, const std::string& x, int inc_x, const std::string& y, int inc_y){
+    addAuxiliary(AUX_DOT);
+    stringstream ss;
+    ss << "casadi_dot(" << n << "," << x << "," << inc_x << "," << y << "," << inc_y << ")";
+    return ss.str();
   }
 
 } // namespace CasADi

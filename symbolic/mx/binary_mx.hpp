@@ -70,7 +70,7 @@ namespace CasADi{
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const{ return 2;}
 
-    /** \brief Generate code for the operation (generic) */
+    /** \brief Generate code for the operation */
     void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /// Get a unary operation
