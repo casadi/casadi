@@ -587,11 +587,7 @@ namespace CasADi{
   }
 
   MX MX::inner_prod(const MX& y) const{
-    const MX& x = *this;
-    casadi_assert_message(x.size2()==1,"inner_prod: first factor not a vector");
-    casadi_assert_message(y.size2()==1, "inner_prod: second factor not a vector");
-    casadi_assert_message(x.size1()==y.size1(),"inner_prod: dimension mismatch");
-    return CasADi::mul(trans(x),y);
+    return (*this)->getInnerProd(y);
   }
 
   MX MX::outer_prod(const MX& y) const{

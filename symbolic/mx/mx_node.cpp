@@ -626,7 +626,21 @@ namespace CasADi{
 
 
   MX MXNode::getInnerProd(const MX& y) const{
-    return MX::create(new InnerProd(shared_from_this<MX>(),y));
+    if(sparsity()==y.sparsity()){
+      if(sparsity().size()==0){
+        return 0;
+      } else if(sparsity().scalar()){
+        return getBinarySwitch(OP_MUL, y);
+      } else {
+        return MX::create(new InnerProd(shared_from_this<MX>(),y));
+      }
+    } else {
+      // Project to pattern intersection
+      CRSSparsity sp = sparsity().patternIntersection(y.sparsity());
+      MX xx = shared_from_this<MX>().setSparse(sp);
+      MX yy = y.setSparse(sp);
+      return xx->getInnerProd(yy);
+    }
   }
 
 } // namespace CasADi

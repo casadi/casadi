@@ -126,7 +126,7 @@ namespace CasADi{
   }
 
   void InnerProd::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    stream << "  *" << res.front() << " = " << gen.casadi_dot(sparsity().size(),arg.at(0),1,arg.at(1),1) << ";" << endl;
+    stream << "  *" << res.front() << " = " << gen.casadi_dot(dep().size(),arg.at(0),1,arg.at(1),1) << ";" << endl;
   }
 
 } // namespace CasADi
