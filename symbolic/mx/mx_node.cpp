@@ -39,6 +39,7 @@
 #include "binary_mx.hpp"
 #include "determinant.hpp"
 #include "inverse.hpp"
+#include "inner_prod.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -621,6 +622,11 @@ namespace CasADi{
 
   MX MXNode::getInverse() const{
     return MX::create(new Inverse(shared_from_this<MX>()));
+  }
+
+
+  MX MXNode::getInnerProd(const MX& y) const{
+    return MX::create(new InnerProd(shared_from_this<MX>(),y));
   }
 
 } // namespace CasADi

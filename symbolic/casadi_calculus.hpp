@@ -83,6 +83,9 @@ namespace CasADi{
     // Matrix inverse
     OP_INVERSE,
 
+    // Inner product
+    OP_INNER_PROD,
+
     // Vertical concatenation
     OP_VERTCAT,
 

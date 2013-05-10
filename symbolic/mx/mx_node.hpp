@@ -329,6 +329,9 @@ namespace CasADi{
     /// Inverse
     virtual MX getInverse() const;
 
+    /// Inner product
+    virtual MX getInnerProd(const MX& y) const;
+
     /** Temporary variables to be used in user algorithms like sorting, 
         the user is resposible of making sure that use is thread-safe
         The variable is initialized to zero
