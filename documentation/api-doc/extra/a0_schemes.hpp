@@ -423,20 +423,6 @@
 <br/>
 @copydoc scheme_QPOutput
 */
-/** \class CasADi::DSDPInternal
-\n
-\par
-@copydoc scheme_SDPInput
-<br/>
-@copydoc scheme_SDPOutput
-*/
-/** \class CasADi::DSDPSolver
-\n
-\par
-@copydoc scheme_SDPInput
-<br/>
-@copydoc scheme_SDPOutput
-*/
 /** \class CasADi::DirectSingleShootingInternal
 \n
 \par
@@ -506,6 +492,20 @@
 @copydoc scheme_NLPSolverInput
 <br/>
 @copydoc scheme_NLPSolverOutput
+*/
+/** \class CasADi::DSDPInternal
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
+*/
+/** \class CasADi::DSDPSolver
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
 */
 /** \class CasADi::SDPSolverInternal
 \n
