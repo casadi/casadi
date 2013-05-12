@@ -132,7 +132,7 @@ const std::vector<SXMatrix> & SXFunction::outputExpr() const{
   return (*this)->outputv_;
 }
 
-const vector<SXAlgEl>& SXFunction::algorithm() const{
+const vector<ScalarAtomic>& SXFunction::algorithm() const{
   return (*this)->algorithm_;
 }
 

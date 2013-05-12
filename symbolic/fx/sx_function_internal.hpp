@@ -131,7 +131,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /** \brief  DATA MEMBERS */
   
   /** \brief  An elemenent of the algorithm, namely a binary operation */
-  typedef SXAlgEl AlgEl;
+  typedef ScalarAtomic AlgEl;
   
   /** \brief  An elemenent of the tape */
   template<typename T>

@@ -179,16 +179,16 @@ namespace CasADi{
       for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
         switch(it->op){
           // Start by adding all of the built operations
-          CASADI_MATH_FUN_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res])
+          CASADI_MATH_FUN_BUILTIN(work_[it->i1],work_[it->i2],work_[it->i0])
         
             // Constant
-        case OP_CONST: work_[it->res] = it->arg.d; break;
+        case OP_CONST: work_[it->i0] = it->d; break;
         
           // Load function input to work vector
-        case OP_INPUT: work_[it->res] = inputNoCheck(it->arg.i[0]).data()[it->arg.i[1]]; break;
+        case OP_INPUT: work_[it->i0] = inputNoCheck(it->i1).data()[it->i2]; break;
         
           // Get function output from work vector
-        case OP_OUTPUT: outputNoCheck(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
+        case OP_OUTPUT: outputNoCheck(it->i0).data()[it->i2] = work_[it->i1]; break;
         }
       }
     } else {
@@ -196,16 +196,16 @@ namespace CasADi{
       for(vector<AlgEl>::iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
         switch(it->op){
           // Start by adding all of the built operations
-          CASADI_MATH_DERF_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res],it1++->d)
+          CASADI_MATH_DERF_BUILTIN(work_[it->i1],work_[it->i2],work_[it->i0],it1++->d)
 
             // Constant
-        case OP_CONST: work_[it->res] = it->arg.d; break;
+        case OP_CONST: work_[it->i0] = it->d; break;
 
           // Load function input to work vector
-        case OP_INPUT: work_[it->res] = inputNoCheck(it->arg.i[0]).data()[it->arg.i[1]]; break;
+        case OP_INPUT: work_[it->i0] = inputNoCheck(it->i1).data()[it->i2]; break;
         
           // Get function output from work vector
-        case OP_OUTPUT: outputNoCheck(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
+        case OP_OUTPUT: outputNoCheck(it->i0).data()[it->i2] = work_[it->i1]; break;
         }
       }
     }
@@ -219,13 +219,13 @@ namespace CasADi{
       for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
         switch(it->op){
         case OP_CONST:
-          work_[it->res] = 0; break;
+          work_[it->i0] = 0; break;
         case OP_INPUT: 
-          work_[it->res] = fwdSeedNoCheck(it->arg.i[0],dir).data()[it->arg.i[1]]; break;
+          work_[it->i0] = fwdSeedNoCheck(it->i1,dir).data()[it->i2]; break;
         case OP_OUTPUT: 
-          fwdSensNoCheck(it->res,dir).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
+          fwdSensNoCheck(it->i0,dir).data()[it->i2] = work_[it->i1]; break;
         default: // Unary or binary operation
-          work_[it->res] = it2->d[0] * work_[it->arg.i[0]] + it2->d[1] * work_[it->arg.i[1]]; ++it2; break;
+          work_[it->i0] = it2->d[0] * work_[it->i1] + it2->d[1] * work_[it->i2]; ++it2; break;
         }
       }
     }
@@ -238,20 +238,20 @@ namespace CasADi{
         double seed;
         switch(it->op){
         case OP_CONST:
-          work_[it->res] = 0;
+          work_[it->i0] = 0;
           break;
         case OP_INPUT:
-          adjSensNoCheck(it->arg.i[0],dir).data()[it->arg.i[1]] = work_[it->res];
-          work_[it->res] = 0;
+          adjSensNoCheck(it->i1,dir).data()[it->i2] = work_[it->i0];
+          work_[it->i0] = 0;
           break;
         case OP_OUTPUT:
-          work_[it->arg.i[0]] += adjSeedNoCheck(it->res,dir).data()[it->arg.i[1]];
+          work_[it->i1] += adjSeedNoCheck(it->i0,dir).data()[it->i2];
           break;
         default: // Unary or binary operation
-          seed = work_[it->res];
-          work_[it->res] = 0;
-          work_[it->arg.i[0]] += it2->d[0] * seed;
-          work_[it->arg.i[1]] += it2->d[1] * seed;
+          seed = work_[it->i0];
+          work_[it->i0] = 0;
+          work_[it->i1] += it2->d[0] * seed;
+          work_[it->i2] += it2->d[1] * seed;
           ++it2;
         }
       }
@@ -317,22 +317,27 @@ namespace CasADi{
     // Normal, interpreted output
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       if(it->op==OP_OUTPUT){
-        stream << "output[" << it->res << "][" << it->arg.i[1] << "] = @" << it->arg.i[0];
+        stream << "output[" << it->i0 << "][" << it->i2 << "] = @" << it->i1;
       } else {
-        stream << "@" << it->res << " = ";
+        stream << "@" << it->i0 << " = ";
         if(it->op==OP_INPUT){
-          stream << "input[" << it->arg.i[0] << "][" << it->arg.i[1] << "]";
+          stream << "input[" << it->i1 << "][" << it->i2 << "]";
         } else {
           if(it->op==OP_CONST){
-            stream << it->arg.d;
+            stream << it->d;
           } else if(it->op==OP_PARAMETER){
             stream << *p_it++;
           } else {
             int ndep = casadi_math<double>::ndeps(it->op);
             casadi_math<double>::printPre(it->op,stream);
             for(int c=0; c<ndep; ++c){
-              if(c==1) casadi_math<double>::printSep(it->op,stream);
-              stream << "@" << it->arg.i[c];
+              if(c==0){
+                stream << "@" << it->i1;
+              } else {
+                casadi_math<double>::printSep(it->op,stream);
+                stream << "@" << it->i2;
+              }
+
             }
             casadi_math<double>::printPost(it->op,stream);
           }
@@ -365,28 +370,32 @@ namespace CasADi{
       stream << "  ";
 
       if(it->op==OP_OUTPUT){
-        stream << "if(r" << it->res << "!=0) r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
+        stream << "if(r" << it->i0 << "!=0) r" << it->i0 << "[" << it->i2 << "]=" << "a" << it->i1;
       } else {
         // Declare result if not already declared
-        if(!declared[it->res]){
+        if(!declared[it->i0]){
           stream << type << " ";
-          declared[it->res]=true;
+          declared[it->i0]=true;
         }
       
         // Where to store the result
-        stream << "a" << it->res << "=";
+        stream << "a" << it->i0 << "=";
       
         // What to store
         if(it->op==OP_CONST){
-          gen.printConstant(stream,it->arg.d);
+          gen.printConstant(stream,it->d);
         } else if(it->op==OP_INPUT){
-          stream << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
+          stream << "x" << it->i1 << "[" << it->i2 << "]";
         } else {
           int ndep = casadi_math<double>::ndeps(it->op);
           casadi_math<double>::printPre(it->op,stream);
           for(int c=0; c<ndep; ++c){
-            if(c==1) casadi_math<double>::printSep(it->op,stream);
-            stream << "a" << it->arg.i[c];
+            if(c==0){
+              stream << "a" << it->i1;
+            } else {
+              casadi_math<double>::printSep(it->op,stream);
+              stream << "a" << it->i2;
+            }
           }
           casadi_math<double>::printPost(it->op,stream);
         }
@@ -482,17 +491,17 @@ namespace CasADi{
       // Get instruction
       switch(ae.op){
       case OP_CONST: // constant
-        ae.arg.d = n->getValue();
-        ae.res = n->temp;
+        ae.d = n->getValue();
+        ae.i0 = n->temp;
         break;
       case OP_PARAMETER: // a parameter or input
         symb_loc.push_back(make_pair(algorithm_.size(),n));
-        ae.res = n->temp;
+        ae.i0 = n->temp;
         break;
       case OP_OUTPUT: // output instruction
-        ae.res = curr_oind;
-        ae.arg.i[0] = outputv_[curr_oind].at(curr_nz)->temp;
-        ae.arg.i[1] = curr_nz;
+        ae.i0 = curr_oind;
+        ae.i1 = outputv_[curr_oind].at(curr_nz)->temp;
+        ae.i2 = curr_nz;
         
         // Go to the next nonzero
         curr_nz++;
@@ -507,9 +516,9 @@ namespace CasADi{
         }
         break;
       default:       // Unary or binary operation
-        ae.res = n->temp;
-        ae.arg.i[0] = n->dep(0).get()->temp;
-        ae.arg.i[1] = n->dep(1).get()->temp;
+        ae.i0 = n->temp;
+        ae.i1 = n->dep(0).get()->temp;
+        ae.i2 = n->dep(1).get()->temp;
       }
     
       // Number of dependencies
@@ -517,7 +526,7 @@ namespace CasADi{
     
       // Increase count of dependencies
       for(int c=0; c<ndeps; ++c)
-        refcount[ae.arg.i[c]]++;
+        refcount[c==0 ? ae.i1 : ae.i2]++;
     
       // Add to algorithm
       algorithm_.push_back(ae);
@@ -540,7 +549,7 @@ namespace CasADi{
   
       // decrease reference count of children
       for(int c=ndeps-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
-        int ch_ind = it->arg.i[c];
+        int ch_ind = c==0 ? it->i1 : it->i2;
         int remaining = --refcount[ch_ind];
         if(remaining==0) unused.push(place[ch_ind]);
       }
@@ -549,22 +558,26 @@ namespace CasADi{
       if(it->op!=OP_OUTPUT){
         if(live_variables && !unused.empty()){
           // Try to reuse a variable from the stack if possible (last in, first out)
-          it->res = place[it->res] = unused.top();
+          it->i0 = place[it->i0] = unused.top();
           unused.pop();
         } else {
           // Allocate a new variable
-          it->res = place[it->res] = worksize++;
+          it->i0 = place[it->i0] = worksize++;
         }
       }
     
       // Save the location of the children
       for(int c=0; c<ndeps; ++c){
-        it->arg.i[c] = place[it->arg.i[c]];
+        if(c==0){
+          it->i1 = place[it->i1];
+        } else {
+          it->i2 = place[it->i2];
+        }
       }
     
       // If binary, make sure that the second argument is the same as the first one (in order to treat all operations as binary) NOTE: ugly
       if(ndeps==1 && it->op!=OP_OUTPUT){
-        it->arg.i[1] = it->arg.i[0];
+        it->i2 = it->i1;
       }
     }
   
@@ -605,8 +618,8 @@ namespace CasADi{
           algorithm_[i].op = OP_INPUT;
         
           // Location of the input
-          algorithm_[i].arg.i[0] = ind;
-          algorithm_[i].arg.i[1] = nz;
+          algorithm_[i].i1 = ind;
+          algorithm_[i].i2 = nz;
         
           // Mark input as read
           itc->setTemp(0);
@@ -763,15 +776,15 @@ namespace CasADi{
         // Argument of the operation
         vector<llvm::Value*> oarg(casadi_math<double>::ndeps(it->op));
         for(int d=0; d<oarg.size(); ++d){
-          oarg[d] = jwork[it->arg.i[d]];
+          oarg[d] = jwork[d==0 ? it->i1 : it->i2];
         }
       
         if(it->op==OP_INPUT){
-          llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, it->arg.i[1]);
-          jwork[it->res] = builder.CreateLoad(builder.CreateGEP(input_v[it->arg.i[0]],k_v));
+          llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, it->i2);
+          jwork[it->i0] = builder.CreateLoad(builder.CreateGEP(input_v[it->i1],k_v));
         } else if(it->op==OP_OUTPUT){
-          llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, it->arg.i[1]);
-          builder.CreateStore(oarg[0],builder.CreateGEP(output_v[it->res],k_v));
+          llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, it->i2);
+          builder.CreateStore(oarg[0],builder.CreateGEP(output_v[it->i0],k_v));
         } else {
           // Result
           llvm::Value* res = 0;
@@ -783,7 +796,7 @@ namespace CasADi{
           case OP_DIV:         res = builder.CreateFDiv(oarg[0],oarg[1]); break;
           case OP_NEG:         res = builder.CreateFNeg(oarg[0]);         break;
           case OP_CONST:
-            res = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(it->arg.d));
+            res = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(it->d));
             break;
           default:
             casadi_assert_message(builtins[it->op]!=0, "No way to treat: " << it->op);
@@ -791,7 +804,7 @@ namespace CasADi{
           }
         
           // Save to work vector
-          jwork[it->res] = res;
+          jwork[it->i0] = res;
         }
       }
     
@@ -915,15 +928,15 @@ namespace CasADi{
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       switch(it->op){
       case OP_INPUT:
-        s_work_[it->res] = arg[it->arg.i[0]].data()[it->arg.i[1]]; break;
+        s_work_[it->i0] = arg[it->i1].data()[it->i2]; break;
       case OP_OUTPUT:
-        res[it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; 
+        res[it->i0].data()[it->i2] = s_work_[it->i1]; 
         break;
       case OP_CONST:
-        s_work_[it->res] = *c_it++; 
+        s_work_[it->i0] = *c_it++; 
         break;
       case OP_PARAMETER:
-        s_work_[it->res] = *p_it++; break;
+        s_work_[it->i0] = *p_it++; break;
       default:
         {
           // Evaluate the function to a temporary value (as it might overwrite the children in the work vector)
@@ -932,7 +945,7 @@ namespace CasADi{
             f = *b_it++;
           } else {
             switch(it->op){
-              CASADI_MATH_FUN_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f)
+              CASADI_MATH_FUN_BUILTIN(s_work_[it->i1],s_work_[it->i2],f)
                 }
           
             // If this new expression is identical to the expression used to define the algorithm, then reuse
@@ -943,12 +956,12 @@ namespace CasADi{
           // Get the partial derivatives, if requested
           if(taping){
             switch(it->op){
-              CASADI_MATH_DER_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f,it1++->d)
+              CASADI_MATH_DER_BUILTIN(s_work_[it->i1],s_work_[it->i2],f,it1++->d)
                 }
           }
         
           // Finally save the function value
-          s_work_[it->res] = f;
+          s_work_[it->i0] = f;
         }
       }
     }
@@ -963,17 +976,17 @@ namespace CasADi{
       for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
         switch(it->op){
         case OP_INPUT:
-          s_work_[it->res] = fseed[dir][it->arg.i[0]].data()[it->arg.i[1]]; break;
+          s_work_[it->i0] = fseed[dir][it->i1].data()[it->i2]; break;
         case OP_OUTPUT:
-          fsens[dir][it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; break;
+          fsens[dir][it->i0].data()[it->i2] = s_work_[it->i1]; break;
         case OP_CONST:
         case OP_PARAMETER:
-          s_work_[it->res] = 0;
+          s_work_[it->i0] = 0;
           break;
           CASADI_MATH_BINARY_BUILTIN // Binary operation
-            s_work_[it->res] = it2->d[0] * s_work_[it->arg.i[0]] + it2->d[1] * s_work_[it->arg.i[1]]; it2++; break;
+            s_work_[it->i0] = it2->d[0] * s_work_[it->i1] + it2->d[1] * s_work_[it->i2]; it2++; break;
         default: // Unary operation
-          s_work_[it->res] = it2->d[0] * s_work_[it->arg.i[0]]; it2++; 
+          s_work_[it->i0] = it2->d[0] * s_work_[it->i1]; it2++; 
         }
       }
     }
@@ -987,27 +1000,27 @@ namespace CasADi{
         SX seed;
         switch(it->op){
         case OP_INPUT:
-          asens[dir][it->arg.i[0]].data()[it->arg.i[1]] = s_work_[it->res];
-          s_work_[it->res] = 0;
+          asens[dir][it->i1].data()[it->i2] = s_work_[it->i0];
+          s_work_[it->i0] = 0;
           break;
         case OP_OUTPUT:
-          s_work_[it->arg.i[0]] += aseed[dir][it->res].data()[it->arg.i[1]];
+          s_work_[it->i1] += aseed[dir][it->i0].data()[it->i2];
           break;
         case OP_CONST:
         case OP_PARAMETER:
-          s_work_[it->res] = 0;
+          s_work_[it->i0] = 0;
           break;
           CASADI_MATH_BINARY_BUILTIN // Binary operation
-            seed = s_work_[it->res];
-          s_work_[it->res] = 0;
-          s_work_[it->arg.i[0]] += it2->d[0] * seed;
-          s_work_[it->arg.i[1]] += it2->d[1] * seed;
+            seed = s_work_[it->i0];
+          s_work_[it->i0] = 0;
+          s_work_[it->i1] += it2->d[0] * seed;
+          s_work_[it->i2] += it2->d[1] * seed;
           it2++;
           break;
         default: // Unary operation
-          seed = s_work_[it->res];
-          s_work_[it->res] = 0;
-          s_work_[it->arg.i[0]] += it2->d[0] * seed;
+          seed = s_work_[it->i0];
+          s_work_[it->i0] = 0;
+          s_work_[it->i1] += it2->d[0] * seed;
           it2++; 
         }
       }
@@ -1058,13 +1071,13 @@ namespace CasADi{
         switch(it->op){
         case OP_CONST:
         case OP_PARAMETER:
-          iwork[it->res] = bvec_t(0); break;
+          iwork[it->i0] = bvec_t(0); break;
         case OP_INPUT:
-          iwork[it->res] = reinterpret_cast<bvec_t*>(&inputNoCheck(it->arg.i[0]).front())[it->arg.i[1]]; break;
+          iwork[it->i0] = reinterpret_cast<bvec_t*>(&inputNoCheck(it->i1).front())[it->i2]; break;
         case OP_OUTPUT:
-          reinterpret_cast<bvec_t*>(&outputNoCheck(it->res).front())[it->arg.i[1]] = iwork[it->arg.i[0]]; break;
+          reinterpret_cast<bvec_t*>(&outputNoCheck(it->i0).front())[it->i2] = iwork[it->i1]; break;
         default: // Unary or binary operation
-          iwork[it->res] = iwork[it->arg.i[0]] | iwork[it->arg.i[1]]; break;
+          iwork[it->i0] = iwork[it->i1] | iwork[it->i2]; break;
         }
       }
         
@@ -1079,20 +1092,20 @@ namespace CasADi{
         switch(it->op){
         case OP_CONST:
         case OP_PARAMETER:
-          iwork[it->res] = 0;
+          iwork[it->i0] = 0;
           break;
         case OP_INPUT:
-          reinterpret_cast<bvec_t*>(&inputNoCheck(it->arg.i[0]).front())[it->arg.i[1]] = iwork[it->res];
-          iwork[it->res] = 0;
+          reinterpret_cast<bvec_t*>(&inputNoCheck(it->i1).front())[it->i2] = iwork[it->i0];
+          iwork[it->i0] = 0;
           break;
         case OP_OUTPUT:
-          iwork[it->arg.i[0]] |= reinterpret_cast<bvec_t*>(&outputNoCheck(it->res).front())[it->arg.i[1]];
+          iwork[it->i1] |= reinterpret_cast<bvec_t*>(&outputNoCheck(it->i0).front())[it->i2];
           break;
         default: // Unary or binary operation
-          seed = iwork[it->res];
-          iwork[it->res] = 0;
-          iwork[it->arg.i[0]] |= seed;
-          iwork[it->arg.i[1]] |= seed; 
+          seed = iwork[it->i0];
+          iwork[it->i0] = 0;
+          iwork[it->i1] |= seed;
+          iwork[it->i2] |= seed; 
         }
       }
     }
@@ -1196,27 +1209,31 @@ namespace CasADi{
         // Propagate sparsity forward
         for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
           if(it->op==OP_OUTPUT){
-            ss << "if(r" << it->res << "!=0) r" << it->res << "[" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
+            ss << "if(r" << it->i0 << "!=0) r" << it->i0 << "[" << it->i2 << "]=" << "a" << it->i1;
           } else {
             // Declare result if not already declared
-            if(!declared[it->res]){
+            if(!declared[it->i0]){
               ss << "ulong ";
-              declared[it->res]=true;
+              declared[it->i0]=true;
             }
           
             // Where to store the result
-            ss << "a" << it->res << "=";
+            ss << "a" << it->i0 << "=";
           
             // What to store
             if(it->op==OP_CONST || it->op==OP_PARAMETER){
               ss << "0";
             } else if(it->op==OP_INPUT){
-              ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]";
+              ss << "x" << it->i1 << "[" << it->i2 << "]";
             } else {
               int ndep = casadi_math<double>::ndeps(it->op);
               for(int c=0; c<ndep; ++c){
-                if(c==1) ss << "|";
-                ss << "a" << it->arg.i[c];
+                if(c==0){
+                  ss << "a" << it->i1;
+                } else {
+                  ss << "|";
+                  ss << "a" << it->i2;
+                }
               }
             }
           }
@@ -1235,20 +1252,20 @@ namespace CasADi{
         // Propagate sparsity backward
         for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
           if(it->op==OP_OUTPUT){
-            ss << "if(r" << it->res << "!=0) a" << it->arg.i[0] << "|=r" << it->res << "[" << it->arg.i[1] << "];" << endl;
+            ss << "if(r" << it->i0 << "!=0) a" << it->i1 << "|=r" << it->i0 << "[" << it->i2 << "];" << endl;
           } else {
             if(it->op==OP_INPUT){
-              ss << "x" << it->arg.i[0] << "[" << it->arg.i[1] << "]=a" << it->res << "; ";
-              ss << "a" << it->res << "=0;" << endl;
+              ss << "x" << it->i1 << "[" << it->i2 << "]=a" << it->i0 << "; ";
+              ss << "a" << it->i0 << "=0;" << endl;
             } else if(it->op==OP_CONST || it->op==OP_PARAMETER){
-              ss << "a" << it->res << "=0;" << endl;
+              ss << "a" << it->i0 << "=0;" << endl;
             } else {
               int ndep = casadi_math<double>::ndeps(it->op);
-              ss << "t=a" << it->res << "; ";
-              ss << "a" << it->res << "=0; ";
-              ss << "a" << it->arg.i[0] << "|=" << "t" << "; ";
+              ss << "t=a" << it->i0 << "; ";
+              ss << "a" << it->i0 << "=0; ";
+              ss << "a" << it->i1 << "|=" << "t" << "; ";
               if(ndep>1){
-                ss << "a" << it->arg.i[1] << "|=" << "t" << "; ";
+                ss << "a" << it->i2 << "|=" << "t" << "; ";
               }
               ss << endl;
             }

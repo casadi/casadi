@@ -224,7 +224,7 @@ void substituteInPlace(const SXMatrix &v, SXMatrix &vdef, std::vector<SXMatrix>&
   f.init();
   
   // Get references to the internal data structures
-  const vector<SXAlgEl>& algorithm = f.algorithm();
+  const vector<ScalarAtomic>& algorithm = f.algorithm();
   vector<SX> work(f.getWorkSize());
   
   // Iterator to the binary operations
@@ -237,35 +237,35 @@ void substituteInPlace(const SXMatrix &v, SXMatrix &vdef, std::vector<SXMatrix>&
   vector<SX>::const_iterator p_it = f->free_vars_.begin();
   
   // Evaluate the algorithm
-  for(vector<SXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
+  for(vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
     switch(it->op){
       case OP_INPUT:
         // reverse is false, substitute out
-        work[it->res] = vdef.at(it->arg.i[1]);  
+        work[it->i0] = vdef.at(it->i2);  
         break;
       case OP_OUTPUT:
-        if(it->res==0){
-          vdef.at(it->arg.i[1]) = work[it->arg.i[0]];
+        if(it->i0==0){
+          vdef.at(it->i2) = work[it->i1];
           if(reverse){
             // Use the new variable henceforth, substitute in
-            work[it->arg.i[0]] = v.at(it->arg.i[1]);
+            work[it->i1] = v.at(it->i2);
           }
         } else {
           // Auxillary output
-          ex[it->res-1].at(it->arg.i[1]) = work[it->arg.i[0]];   
+          ex[it->i0-1].at(it->i2) = work[it->i1];   
         }
         break;
-      case OP_CONST:      work[it->res] = *c_it++; break;
-      case OP_PARAMETER:  work[it->res] = *p_it++; break;
+      case OP_CONST:      work[it->i0] = *c_it++; break;
+      case OP_PARAMETER:  work[it->i0] = *p_it++; break;
       default:
       {
         switch(it->op){
-          CASADI_MATH_FUN_BUILTIN(work[it->arg.i[0]],work[it->arg.i[1]],work[it->res])
+          CASADI_MATH_FUN_BUILTIN(work[it->i1],work[it->i2],work[it->i0])
         }
         
         // Avoid creating duplicates
         const int depth = 2; // NOTE: a higher depth could possibly give more savings
-        work[it->res].assignIfDuplicate(*b_it++,depth);
+        work[it->i0].assignIfDuplicate(*b_it++,depth);
       }
     }
   }
@@ -1020,7 +1020,7 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
   f.init();
 
   // Get references to the internal data structures
-  const vector<SXAlgEl>& algorithm = f.algorithm();
+  const vector<ScalarAtomic>& algorithm = f.algorithm();
   vector<SX> work(f.getWorkSize());
   vector<SX> work2 = work;
   
@@ -1041,28 +1041,28 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
   vdef.clear();
   
   // Evaluate the algorithm
-  for(vector<SXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
+  for(vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
     // Increase usage counters
     switch(it->op){
       case OP_CONST:
       case OP_PARAMETER:
         break;
       CASADI_MATH_BINARY_BUILTIN // Binary operation
-        if(usecount[it->arg.i[1]]==0){
-          usecount[it->arg.i[1]]=1;
-        } else if(usecount[it->arg.i[1]]==1){
+        if(usecount[it->i2]==0){
+          usecount[it->i2]=1;
+        } else if(usecount[it->i2]==1){
           // Get a suitable name
-          vdef.push_back(work[it->arg.i[1]]);
-          usecount[it->arg.i[1]]=-1; // Extracted, do not extract again
+          vdef.push_back(work[it->i2]);
+          usecount[it->i2]=-1; // Extracted, do not extract again
         }
         // fall-through
       case OP_OUTPUT: 
       default: // Unary operation, binary operation or output
-        if(usecount[it->arg.i[0]]==0){
-          usecount[it->arg.i[0]]=1;
-        } else if(usecount[it->arg.i[0]]==1){
-          vdef.push_back(work[it->arg.i[0]]);
-          usecount[it->arg.i[0]]=-1; // Extracted, do not extract again
+        if(usecount[it->i1]==0){
+          usecount[it->i1]=1;
+        } else if(usecount[it->i1]==1){
+          vdef.push_back(work[it->i1]);
+          usecount[it->i1]=-1; // Extracted, do not extract again
         }
     }
     
@@ -1072,11 +1072,11 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
         break;
       case OP_CONST:
       case OP_PARAMETER:
-        usecount[it->res] = -1; // Never extract since it is a primitive type
+        usecount[it->i0] = -1; // Never extract since it is a primitive type
         break;
       default:
-        work[it->res] = *b_it++; 
-        usecount[it->res] = 0; // Not (yet) extracted
+        work[it->i0] = *b_it++; 
+        usecount[it->i0] = 0; // Not (yet) extracted
         break;
     }
   }
@@ -1098,23 +1098,23 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
   b_it=f->operations_.begin();
   
   // Evaluate the algorithm
-  for(vector<SXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
+  for(vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
     switch(it->op){
-      case OP_OUTPUT:     ex[it->arg.i[1]] = work[it->arg.i[0]];      break;
-      case OP_CONST:      work2[it->res] = work[it->res] = *c_it++; break;
-      case OP_PARAMETER:  work2[it->res] = work[it->res] = *p_it++; break;
+      case OP_OUTPUT:     ex[it->i2] = work[it->i1];      break;
+      case OP_CONST:      work2[it->i0] = work[it->i0] = *c_it++; break;
+      case OP_PARAMETER:  work2[it->i0] = work[it->i0] = *p_it++; break;
       default:
       {
         switch(it->op){
-          CASADI_MATH_FUN_BUILTIN(work[it->arg.i[0]],work[it->arg.i[1]],work[it->res])
+          CASADI_MATH_FUN_BUILTIN(work[it->i1],work[it->i2],work[it->i0])
         }
-        work2[it->res] = *b_it++; 
+        work2[it->i0] = *b_it++; 
         
         // Replace with intermediate variables
-        int ind = work2[it->res].getTemp()-1;
+        int ind = work2[it->i0].getTemp()-1;
         if(ind>=0){
-          vdef.at(ind) = work[it->res];
-          work[it->res] = v.at(ind);
+          vdef.at(ind) = work[it->i0];
+          work[it->i0] = v.at(ind);
         }
       }
     }
