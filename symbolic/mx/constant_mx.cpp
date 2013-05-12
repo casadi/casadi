@@ -163,6 +163,17 @@ namespace CasADi{
     }
   }
 
+  MX ConstantMX::getInnerProd(const MX& y) const{
+    if(y.isConstant()){
+      // Constant folding
+      DMatrix xv = getMatrixValue();
+      DMatrix yv = y->getMatrixValue();
+      return inner_prod(xv,yv);
+    } else {
+      return MXNode::getInnerProd(y);
+    }
+  }
+
   bool ConstantDMatrix::isEqual(const MXNode* node, int depth) const{
     // Check if same node
     const ConstantDMatrix* n = dynamic_cast<const ConstantDMatrix*>(node);

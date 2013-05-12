@@ -81,6 +81,9 @@ namespace CasADi{
     /// Matrix multiplcation
     virtual MX getMultiplication(const MX& y) const;
 
+    /// Inner product
+    virtual MX getInnerProd(const MX& y) const;
+
     /// Return truth value of an MX
     virtual bool __nonzero__() const;
   };

@@ -176,12 +176,12 @@ template<class T>
 /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
 Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp);
 
-/** \brief Inner product of two vectors
+/** \brief Inner product of two matrices
         Equals
         \code
-        trans(x)*y
+        sumAll(x*y)
         \endcode
-        with x and y vectors
+        with x and y matrices of the same dimension
 */
 template<class T>
 Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y); // inner product
@@ -693,8 +693,8 @@ Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp) {
 
 template<class T>
 Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y){
-  casadi_assert_message(x.vector() && y.vector(), "inner_prod: arguments must be vectors");
-  return mul(trans(x),y);
+  casadi_assert_message(x.shape()==y.shape(), "inner_prod: Dimension mismatch");
+  return Matrix<T>(sumAll(x*y));
 }
 
 template<class T>
