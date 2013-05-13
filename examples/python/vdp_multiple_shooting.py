@@ -99,7 +99,7 @@ for k in range(nk):
   Xk_next = vertcat((X0[k+1],X1[k+1],X2[k+1]))
   
   # Call the integrator
-  Xk_end,_,_,_ = f_d.call(integratorIn(x0=Xk,p=U[k]))
+  Xk_end, = integratorOut(f_d.call(integratorIn(x0=Xk,p=U[k])),"xf")
   
   # append continuity constraints
   g.append(Xk_next - Xk_end)

@@ -36,6 +36,7 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i);
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);
 int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name);
+int getSchemeSize(InputOutputScheme scheme);
 std::string getSchemeName(InputOutputScheme scheme);
 std::string getSchemeEntryNames(InputOutputScheme scheme);
 std::string describeInput(InputOutputScheme scheme, int i);

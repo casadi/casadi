@@ -105,7 +105,7 @@ for k in range(num_nodes+1):
 # Formulate the root finding problem
 G = []
 for k in range(num_nodes):
-  XF,_,_,_ = I.call(integratorIn(x0=X[k]))
+  XF, = integratorOut(I.call(integratorIn(x0=X[k])),"xf")
   G.append(XF-X[k+1])
 
 # Terminal constraints: lam = 0

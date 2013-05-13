@@ -67,7 +67,7 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_SDPInput: return "SDPInput";
     case SCHEME_SDPOutput: return "SDPOutput";
     case SCHEME_unknown: return "unknown";
-}
+  }
 }
 std::string getSchemeEntryNames(InputOutputScheme scheme) {
   switch (scheme) {
@@ -94,7 +94,7 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_SDPInput: return "a, b, c";
     case SCHEME_SDPOutput: return "primal, p, dual, primal_cost, dual_cost";
     case SCHEME_unknown: return "not available";
-}
+  }
 }
 std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
   switch (scheme) {
@@ -116,14 +116,12 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==14) return "ubc";
       if(i==15) return "lbr";
       if(i==16) return "ubr";
-      casadi_error("getSchemeEntryName: supplied number is out of range. ACADO_Input has only 17 entries: ('ACADO_Input', 'x_guess, u_guess, p_guess, lbx, ubx, lbx0, ubx0, lbxf, ubxf, lbu, ubu, lbp, ubp, lbc, ubc, lbr, ubr')");
       break;
     case SCHEME_ACADO_Output: 
       if(i==0) return "x_opt";
       if(i==1) return "u_opt";
       if(i==2) return "p_opt";
       if(i==3) return "cost";
-      casadi_error("getSchemeEntryName: supplied number is out of range. ACADO_Output has only 4 entries: ('ACADO_Output', 'x_opt, u_opt, p_opt, cost')");
       break;
     case SCHEME_ACADO_FCN_Input: 
       if(i==0) return "t";
@@ -132,7 +130,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==3) return "u";
       if(i==4) return "p";
       if(i==5) return "xdot";
-      casadi_error("getSchemeEntryName: supplied number is out of range. ACADO_FCN_Input has only 6 entries: ('ACADO_FCN_Input', 't, xd, xa, u, p, xdot')");
       break;
     case SCHEME_ControlledDAEInput: 
       if(i==0) return "t";
@@ -144,26 +141,22 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==6) return "x_major";
       if(i==7) return "t0";
       if(i==8) return "tf";
-      casadi_error("getSchemeEntryName: supplied number is out of range. ControlledDAEInput has only 9 entries: ('ControlledDAEInput', 't, x, z, p, u, u_interp, x_major, t0, tf')");
       break;
     case SCHEME_ControlSimulatorInput: 
       if(i==0) return "x0";
       if(i==1) return "p";
       if(i==2) return "u";
-      casadi_error("getSchemeEntryName: supplied number is out of range. ControlSimulatorInput has only 3 entries: ('ControlSimulatorInput', 'x0, p, u')");
       break;
     case SCHEME_DAEInput: 
       if(i==0) return "x";
       if(i==1) return "z";
       if(i==2) return "p";
       if(i==3) return "t";
-      casadi_error("getSchemeEntryName: supplied number is out of range. DAEInput has only 4 entries: ('DAEInput', 'x, z, p, t')");
       break;
     case SCHEME_DAEOutput: 
       if(i==0) return "ode";
       if(i==1) return "alg";
       if(i==2) return "quad";
-      casadi_error("getSchemeEntryName: supplied number is out of range. DAEOutput has only 3 entries: ('DAEOutput', 'ode, alg, quad')");
       break;
     case SCHEME_RDAEInput: 
       if(i==0) return "rx";
@@ -173,37 +166,31 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==4) return "z";
       if(i==5) return "p";
       if(i==6) return "t";
-      casadi_error("getSchemeEntryName: supplied number is out of range. RDAEInput has only 7 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t')");
       break;
     case SCHEME_RDAEOutput: 
       if(i==0) return "ode";
       if(i==1) return "alg";
       if(i==2) return "quad";
-      casadi_error("getSchemeEntryName: supplied number is out of range. RDAEOutput has only 3 entries: ('RDAEOutput', 'ode, alg, quad')");
       break;
     case SCHEME_IntegratorInput: 
       if(i==0) return "x0";
       if(i==1) return "p";
       if(i==2) return "rx0";
       if(i==3) return "rp";
-      casadi_error("getSchemeEntryName: supplied number is out of range. IntegratorInput has only 4 entries: ('IntegratorInput', 'x0, p, rx0, rp')");
       break;
     case SCHEME_IntegratorOutput: 
       if(i==0) return "xf";
       if(i==1) return "qf";
       if(i==2) return "rxf";
       if(i==3) return "rqf";
-      casadi_error("getSchemeEntryName: supplied number is out of range. IntegratorOutput has only 4 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf')");
       break;
     case SCHEME_NLInput: 
       if(i==0) return "x";
       if(i==1) return "p";
-      casadi_error("getSchemeEntryName: supplied number is out of range. NLInput has only 2 entries: ('NLInput', 'x, p')");
       break;
     case SCHEME_NLOutput: 
       if(i==0) return "f";
       if(i==1) return "g";
-      casadi_error("getSchemeEntryName: supplied number is out of range. NLOutput has only 2 entries: ('NLOutput', 'f, g')");
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "x0";
@@ -214,7 +201,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==5) return "ubg";
       if(i==6) return "lam_x0";
       if(i==7) return "lam_g0";
-      casadi_error("getSchemeEntryName: supplied number is out of range. NLPSolverInput has only 8 entries: ('NLPSolverInput', 'x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0')");
       break;
     case SCHEME_NLPSolverOutput: 
       if(i==0) return "x";
@@ -223,12 +209,10 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==3) return "lam_x";
       if(i==4) return "lam_g";
       if(i==5) return "lam_p";
-      casadi_error("getSchemeEntryName: supplied number is out of range. NLPSolverOutput has only 6 entries: ('NLPSolverOutput', 'x, f, g, lam_x, lam_g, lam_p')");
       break;
     case SCHEME_MayerInput: 
       if(i==0) return "x";
       if(i==1) return "p";
-      casadi_error("getSchemeEntryName: supplied number is out of range. MayerInput has only 2 entries: ('MayerInput', 'x, p')");
       break;
     case SCHEME_OCPInput: 
       if(i==0) return "lbx";
@@ -244,14 +228,12 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==10) return "ubh";
       if(i==11) return "lbg";
       if(i==12) return "ubg";
-      casadi_error("getSchemeEntryName: supplied number is out of range. OCPInput has only 13 entries: ('OCPInput', 'lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg')");
       break;
     case SCHEME_OCPOutput: 
       if(i==0) return "x_opt";
       if(i==1) return "u_opt";
       if(i==2) return "p_opt";
       if(i==3) return "cost";
-      casadi_error("getSchemeEntryName: supplied number is out of range. OCPOutput has only 4 entries: ('OCPOutput', 'x_opt, u_opt, p_opt, cost')");
       break;
     case SCHEME_QPInput: 
       if(i==0) return "h";
@@ -263,20 +245,17 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==6) return "ubx";
       if(i==7) return "x_init";
       if(i==8) return "lambda_init";
-      casadi_error("getSchemeEntryName: supplied number is out of range. QPInput has only 9 entries: ('QPInput', 'h, g, a, lba, uba, lbx, ubx, x_init, lambda_init')");
       break;
     case SCHEME_QPOutput: 
       if(i==0) return "primal";
       if(i==1) return "cost";
       if(i==2) return "lambda_a";
       if(i==3) return "lambda_x";
-      casadi_error("getSchemeEntryName: supplied number is out of range. QPOutput has only 4 entries: ('QPOutput', 'primal, cost, lambda_a, lambda_x')");
       break;
     case SCHEME_SDPInput: 
       if(i==0) return "a";
       if(i==1) return "b";
       if(i==2) return "c";
-      casadi_error("getSchemeEntryName: supplied number is out of range. SDPInput has only 3 entries: ('SDPInput', 'a, b, c')");
       break;
     case SCHEME_SDPOutput: 
       if(i==0) return "primal";
@@ -284,10 +263,10 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==2) return "dual";
       if(i==3) return "primal_cost";
       if(i==4) return "dual_cost";
-      casadi_error("getSchemeEntryName: supplied number is out of range. SDPOutput has only 5 entries: ('SDPOutput', 'primal, p, dual, primal_cost, dual_cost')");
       break;
     case SCHEME_unknown: return "none";
-}
+  }
+  casadi_error("getSchemeEntryName: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");
 }
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
   switch (scheme) {
@@ -309,14 +288,12 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==14) return "Upper bound on the path constraint function (default:  infinity)";
       if(i==15) return "Lower bound on the initial constraint function (default:  0)";
       if(i==16) return "Upper bound on the initial constraint function (default:  0)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. ACADO_Input has only 17 entries: ('ACADO_Input', 'x_guess, u_guess, p_guess, lbx, ubx, lbx0, ubx0, lbxf, ubxf, lbu, ubu, lbp, ubp, lbc, ubc, lbr, ubr')");
       break;
     case SCHEME_ACADO_Output: 
       if(i==0) return "Optimal states";
       if(i==1) return "Optimal control inputs";
       if(i==2) return "Optimal parameters";
       if(i==3) return "Optimal cost";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. ACADO_Output has only 4 entries: ('ACADO_Output', 'x_opt, u_opt, p_opt, cost')");
       break;
     case SCHEME_ACADO_FCN_Input: 
       if(i==0) return "Time";
@@ -325,7 +302,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==3) return "Control input";
       if(i==4) return "Parameter";
       if(i==5) return "Differential state derivative";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. ACADO_FCN_Input has only 6 entries: ('ACADO_FCN_Input', 't, xd, xa, u, p, xdot')");
       break;
     case SCHEME_ControlledDAEInput: 
       if(i==0) return "Global physical time. (1-by-1)";
@@ -337,26 +313,22 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==6) return "State vector (dimension nx-by-1) at the last major time-step";
       if(i==7) return "Time at start of control interval (1-by-1)";
       if(i==8) return "Time at end of control interval (1-by-1)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. ControlledDAEInput has only 9 entries: ('ControlledDAEInput', 't, x, z, p, u, u_interp, x_major, t0, tf')");
       break;
     case SCHEME_ControlSimulatorInput: 
       if(i==0) return "Differential or algebraic state at t0  (dimension nx-by-1)";
       if(i==1) return "Parameters that are fixed over the entire horizon  (dimension np-by-1)";
       if(i==2) return "Parameters that change over the integration intervals (dimension (ns-1)-by-nu)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. ControlSimulatorInput has only 3 entries: ('ControlSimulatorInput', 'x0, p, u')");
       break;
     case SCHEME_DAEInput: 
       if(i==0) return "Differential state";
       if(i==1) return "Algebraic state";
       if(i==2) return "Parameter";
       if(i==3) return "Explicit time dependence";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. DAEInput has only 4 entries: ('DAEInput', 'x, z, p, t')");
       break;
     case SCHEME_DAEOutput: 
       if(i==0) return "Right hand side of the implicit ODE";
       if(i==1) return "Right hand side of algebraic equations";
       if(i==2) return "Right hand side of quadratures equations";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. DAEOutput has only 3 entries: ('DAEOutput', 'ode, alg, quad')");
       break;
     case SCHEME_RDAEInput: 
       if(i==0) return "Backward differential state";
@@ -366,37 +338,31 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==4) return "Forward algebraic state";
       if(i==5) return "Parameter vector";
       if(i==6) return "Explicit time dependence";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. RDAEInput has only 7 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t')");
       break;
     case SCHEME_RDAEOutput: 
       if(i==0) return "Right hand side of ODE.";
       if(i==1) return "Right hand side of algebraic equations.";
       if(i==2) return "Right hand side of quadratures.";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. RDAEOutput has only 3 entries: ('RDAEOutput', 'ode, alg, quad')");
       break;
     case SCHEME_IntegratorInput: 
       if(i==0) return "Differential state at the initial time";
       if(i==1) return "Parameters";
       if(i==2) return "Backward differential state at the final time";
       if(i==3) return "Backward parameter vector";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. IntegratorInput has only 4 entries: ('IntegratorInput', 'x0, p, rx0, rp')");
       break;
     case SCHEME_IntegratorOutput: 
       if(i==0) return "Differential state at the final time";
       if(i==1) return "Quadrature state at the final time";
       if(i==2) return "Backward differential state at the initial time";
       if(i==3) return "Backward quadrature state at the initial time";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. IntegratorOutput has only 4 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf')");
       break;
     case SCHEME_NLInput: 
       if(i==0) return "Decision variable";
       if(i==1) return "Fixed parameter";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLInput has only 2 entries: ('NLInput', 'x, p')");
       break;
     case SCHEME_NLOutput: 
       if(i==0) return "Objective function";
       if(i==1) return "Constraint function";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLOutput has only 2 entries: ('NLOutput', 'f, g')");
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "Decision variables, initial guess (nx x 1) ";
@@ -407,7 +373,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==5) return "Constraints upper bound (ng x 1), default +inf";
       if(i==6) return "Lagrange multipliers for bounds on X, initial guess (nx x 1)";
       if(i==7) return "Lagrange multipliers for bounds on G, initial guess (ng x 1)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLPSolverInput has only 8 entries: ('NLPSolverInput', 'x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0')");
       break;
     case SCHEME_NLPSolverOutput: 
       if(i==0) return "Decision variables at the optimal solution (nx x 1)";
@@ -416,12 +381,10 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==3) return "Lagrange multipliers for bounds on X at the solution (nx x 1)";
       if(i==4) return "Lagrange multipliers for bounds on G at the solution (ng x 1)";
       if(i==5) return "Lagrange multipliers for bounds on P at the solution (np x 1)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. NLPSolverOutput has only 6 entries: ('NLPSolverOutput', 'x, f, g, lam_x, lam_g, lam_p')");
       break;
     case SCHEME_MayerInput: 
       if(i==0) return "States at the end of integration (nx x 1)";
       if(i==1) return "Problem parameters (np x 1)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. MayerInput has only 2 entries: ('MayerInput', 'x, p')");
       break;
     case SCHEME_OCPInput: 
       if(i==0) return "States lower bounds (nx x (ns+1))";
@@ -437,14 +400,12 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==10) return "Point constraint upper bound (nh x (ns+1))";
       if(i==11) return "Lower bound for the coupling constraints";
       if(i==12) return "Upper bound for the coupling constraints";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. OCPInput has only 13 entries: ('OCPInput', 'lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg')");
       break;
     case SCHEME_OCPOutput: 
       if(i==0) return "Optimal state trajectory";
       if(i==1) return "Optimal control trajectory";
       if(i==2) return "Optimal parameters";
       if(i==3) return "Objective/cost function for optimal solution (1 x 1)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. OCPOutput has only 4 entries: ('OCPOutput', 'x_opt, u_opt, p_opt, cost')");
       break;
     case SCHEME_QPInput: 
       if(i==0) return "The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
@@ -456,20 +417,17 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==6) return "dense, (nx x 1)";
       if(i==7) return "dense, (nx x 1)";
       if(i==8) return "dense";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. QPInput has only 9 entries: ('QPInput', 'h, g, a, lba, uba, lbx, ubx, x_init, lambda_init')");
       break;
     case SCHEME_QPOutput: 
       if(i==0) return "The primal solution";
       if(i==1) return "The optimal cost";
       if(i==2) return "The dual solution corresponding to linear bounds";
       if(i==3) return "The dual solution corresponding to simple bounds";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. QPOutput has only 4 entries: ('QPOutput', 'primal, cost, lambda_a, lambda_x')");
       break;
     case SCHEME_SDPInput: 
       if(i==0) return "The vertical stack of all matrices A_i: ( nm x n)";
       if(i==1) return "The vector b: ( m x 1)";
       if(i==2) return "The matrix C: ( n x n)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. SDPInput has only 3 entries: ('SDPInput', 'a, b, c')");
       break;
     case SCHEME_SDPOutput: 
       if(i==0) return "The primal solution (m x 1) - may be used as initial guess";
@@ -477,10 +435,10 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==2) return "The dual solution (n x n) - may be used as initial guess";
       if(i==3) return "The primal optimal cost (1 x 1)";
       if(i==4) return "The dual optimal cost (1 x 1)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. SDPOutput has only 5 entries: ('SDPOutput', 'primal, p, dual, primal_cost, dual_cost')");
       break;
     case SCHEME_unknown: return "none";
-}
+  }
+  casadi_error("getSchemeEntryDoc: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");
 }
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
   switch (scheme) {
@@ -502,14 +460,12 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==14) return "ACADO_UBC";
       if(i==15) return "ACADO_LBR";
       if(i==16) return "ACADO_UBR";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. ACADO_Input has only 17 entries: ('ACADO_Input', 'x_guess, u_guess, p_guess, lbx, ubx, lbx0, ubx0, lbxf, ubxf, lbu, ubu, lbp, ubp, lbc, ubc, lbr, ubr')");
       break;
     case SCHEME_ACADO_Output: 
       if(i==0) return "ACADO_X_OPT";
       if(i==1) return "ACADO_U_OPT";
       if(i==2) return "ACADO_P_OPT";
       if(i==3) return "ACADO_COST";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. ACADO_Output has only 4 entries: ('ACADO_Output', 'x_opt, u_opt, p_opt, cost')");
       break;
     case SCHEME_ACADO_FCN_Input: 
       if(i==0) return "ACADO_FCN_T";
@@ -518,7 +474,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==3) return "ACADO_FCN_U";
       if(i==4) return "ACADO_FCN_P";
       if(i==5) return "ACADO_FCN_XDOT";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. ACADO_FCN_Input has only 6 entries: ('ACADO_FCN_Input', 't, xd, xa, u, p, xdot')");
       break;
     case SCHEME_ControlledDAEInput: 
       if(i==0) return "CONTROL_DAE_T";
@@ -530,26 +485,22 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==6) return "CONTROL_DAE_X_MAJOR";
       if(i==7) return "CONTROL_DAE_T0";
       if(i==8) return "CONTROL_DAE_TF";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. ControlledDAEInput has only 9 entries: ('ControlledDAEInput', 't, x, z, p, u, u_interp, x_major, t0, tf')");
       break;
     case SCHEME_ControlSimulatorInput: 
       if(i==0) return "CONTROLSIMULATOR_X0";
       if(i==1) return "CONTROLSIMULATOR_P";
       if(i==2) return "CONTROLSIMULATOR_U";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. ControlSimulatorInput has only 3 entries: ('ControlSimulatorInput', 'x0, p, u')");
       break;
     case SCHEME_DAEInput: 
       if(i==0) return "DAE_X";
       if(i==1) return "DAE_Z";
       if(i==2) return "DAE_P";
       if(i==3) return "DAE_T";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. DAEInput has only 4 entries: ('DAEInput', 'x, z, p, t')");
       break;
     case SCHEME_DAEOutput: 
       if(i==0) return "DAE_ODE";
       if(i==1) return "DAE_ALG";
       if(i==2) return "DAE_QUAD";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. DAEOutput has only 3 entries: ('DAEOutput', 'ode, alg, quad')");
       break;
     case SCHEME_RDAEInput: 
       if(i==0) return "RDAE_RX";
@@ -559,37 +510,31 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==4) return "RDAE_Z";
       if(i==5) return "RDAE_P";
       if(i==6) return "RDAE_T";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. RDAEInput has only 7 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t')");
       break;
     case SCHEME_RDAEOutput: 
       if(i==0) return "RDAE_ODE";
       if(i==1) return "RDAE_ALG";
       if(i==2) return "RDAE_QUAD";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. RDAEOutput has only 3 entries: ('RDAEOutput', 'ode, alg, quad')");
       break;
     case SCHEME_IntegratorInput: 
       if(i==0) return "INTEGRATOR_X0";
       if(i==1) return "INTEGRATOR_P";
       if(i==2) return "INTEGRATOR_RX0";
       if(i==3) return "INTEGRATOR_RP";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. IntegratorInput has only 4 entries: ('IntegratorInput', 'x0, p, rx0, rp')");
       break;
     case SCHEME_IntegratorOutput: 
       if(i==0) return "INTEGRATOR_XF";
       if(i==1) return "INTEGRATOR_QF";
       if(i==2) return "INTEGRATOR_RXF";
       if(i==3) return "INTEGRATOR_RQF";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. IntegratorOutput has only 4 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf')");
       break;
     case SCHEME_NLInput: 
       if(i==0) return "NL_X";
       if(i==1) return "NL_P";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLInput has only 2 entries: ('NLInput', 'x, p')");
       break;
     case SCHEME_NLOutput: 
       if(i==0) return "NL_F";
       if(i==1) return "NL_G";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLOutput has only 2 entries: ('NLOutput', 'f, g')");
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "NLP_SOLVER_X0";
@@ -600,7 +545,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==5) return "NLP_SOLVER_UBG";
       if(i==6) return "NLP_SOLVER_LAM_X0";
       if(i==7) return "NLP_SOLVER_LAM_G0";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLPSolverInput has only 8 entries: ('NLPSolverInput', 'x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0')");
       break;
     case SCHEME_NLPSolverOutput: 
       if(i==0) return "NLP_SOLVER_X";
@@ -609,12 +553,10 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==3) return "NLP_SOLVER_LAM_X";
       if(i==4) return "NLP_SOLVER_LAM_G";
       if(i==5) return "NLP_SOLVER_LAM_P";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. NLPSolverOutput has only 6 entries: ('NLPSolverOutput', 'x, f, g, lam_x, lam_g, lam_p')");
       break;
     case SCHEME_MayerInput: 
       if(i==0) return "MAYER_X";
       if(i==1) return "MAYER_P";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. MayerInput has only 2 entries: ('MayerInput', 'x, p')");
       break;
     case SCHEME_OCPInput: 
       if(i==0) return "OCP_LBX";
@@ -630,14 +572,12 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==10) return "OCP_UBH";
       if(i==11) return "OCP_LBG";
       if(i==12) return "OCP_UBG";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. OCPInput has only 13 entries: ('OCPInput', 'lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg')");
       break;
     case SCHEME_OCPOutput: 
       if(i==0) return "OCP_X_OPT";
       if(i==1) return "OCP_U_OPT";
       if(i==2) return "OCP_P_OPT";
       if(i==3) return "OCP_COST";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. OCPOutput has only 4 entries: ('OCPOutput', 'x_opt, u_opt, p_opt, cost')");
       break;
     case SCHEME_QPInput: 
       if(i==0) return "QP_H";
@@ -649,20 +589,17 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==6) return "QP_UBX";
       if(i==7) return "QP_X_INIT";
       if(i==8) return "QP_LAMBDA_INIT";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. QPInput has only 9 entries: ('QPInput', 'h, g, a, lba, uba, lbx, ubx, x_init, lambda_init')");
       break;
     case SCHEME_QPOutput: 
       if(i==0) return "QP_PRIMAL";
       if(i==1) return "QP_COST";
       if(i==2) return "QP_LAMBDA_A";
       if(i==3) return "QP_LAMBDA_X";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. QPOutput has only 4 entries: ('QPOutput', 'primal, cost, lambda_a, lambda_x')");
       break;
     case SCHEME_SDPInput: 
       if(i==0) return "SDP_A";
       if(i==1) return "SDP_B";
       if(i==2) return "SDP_C";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. SDPInput has only 3 entries: ('SDPInput', 'a, b, c')");
       break;
     case SCHEME_SDPOutput: 
       if(i==0) return "SDP_PRIMAL";
@@ -670,10 +607,81 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==2) return "SDP_DUAL";
       if(i==3) return "SDP_PRIMAL_COST";
       if(i==4) return "SDP_DUAL_COST";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. SDPOutput has only 5 entries: ('SDPOutput', 'primal, p, dual, primal_cost, dual_cost')");
       break;
     case SCHEME_unknown: return "none";
+  }
+  casadi_error("getSchemeEntryEnumName: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");
 }
+int getSchemeSize(InputOutputScheme scheme) {
+  switch (scheme) {
+    case SCHEME_ACADO_Input: 
+      return 17;
+      break;
+    case SCHEME_ACADO_Output: 
+      return 4;
+      break;
+    case SCHEME_ACADO_FCN_Input: 
+      return 6;
+      break;
+    case SCHEME_ControlledDAEInput: 
+      return 9;
+      break;
+    case SCHEME_ControlSimulatorInput: 
+      return 3;
+      break;
+    case SCHEME_DAEInput: 
+      return 4;
+      break;
+    case SCHEME_DAEOutput: 
+      return 3;
+      break;
+    case SCHEME_RDAEInput: 
+      return 7;
+      break;
+    case SCHEME_RDAEOutput: 
+      return 3;
+      break;
+    case SCHEME_IntegratorInput: 
+      return 4;
+      break;
+    case SCHEME_IntegratorOutput: 
+      return 4;
+      break;
+    case SCHEME_NLInput: 
+      return 2;
+      break;
+    case SCHEME_NLOutput: 
+      return 2;
+      break;
+    case SCHEME_NLPSolverInput: 
+      return 8;
+      break;
+    case SCHEME_NLPSolverOutput: 
+      return 6;
+      break;
+    case SCHEME_MayerInput: 
+      return 2;
+      break;
+    case SCHEME_OCPInput: 
+      return 13;
+      break;
+    case SCHEME_OCPOutput: 
+      return 4;
+      break;
+    case SCHEME_QPInput: 
+      return 9;
+      break;
+    case SCHEME_QPOutput: 
+      return 4;
+      break;
+    case SCHEME_SDPInput: 
+      return 3;
+      break;
+    case SCHEME_SDPOutput: 
+      return 5;
+      break;
+    case SCHEME_unknown: casadi_error("getSchemeSize: Unknown scheme has no known size."); return -1;
+  }
 }
 int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
   switch (scheme) {
@@ -843,8 +851,9 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="primal_cost") return 3;
       if(name=="dual_cost") return 4;
       break;
-    case SCHEME_unknown: return -1;
+    case SCHEME_unknown: casadi_error("Unknown scheme"); return -1;
+  }
+  casadi_error("getSchemeEntryEnum: Scheme '" << getSchemeName(scheme) <<  "' has no entry named '" << name <<  "'. Available entries are: " << getSchemeEntryNames(scheme) << ".");
 }
-return -1;}
 }
 

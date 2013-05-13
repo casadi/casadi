@@ -244,7 +244,7 @@ autogenhpp.write("std::string getSchemeEntryName(InputOutputScheme scheme, int i
 autogenhpp.write("std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);\n")
 autogenhpp.write("std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);\n")
 autogenhpp.write("int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name);\n")
-    
+autogenhpp.write("int getSchemeSize(InputOutputScheme scheme);\n")
 autogenhpp.write("std::string getSchemeName(InputOutputScheme scheme);\n")
 autogenhpp.write("std::string getSchemeEntryNames(InputOutputScheme scheme);\n")
 autogenhpp.write("std::string describeInput(InputOutputScheme scheme, int i);\n")
@@ -305,43 +305,55 @@ autogencpp.write("std::string getSchemeName(InputOutputScheme scheme) {\n  switc
 for p in schemes:
   autogencpp.write("""    case SCHEME_%s: return "%s";\n""" % (p.enum,p.enum))
 autogencpp.write("""    case SCHEME_unknown: return "unknown";\n""")
-autogencpp.write("}\n}\n")
+autogencpp.write("  }\n}\n")
 
 autogencpp.write("std::string getSchemeEntryNames(InputOutputScheme scheme) {\n  switch (scheme) {\n")
 for p in schemes:
   autogencpp.write("""    case SCHEME_%s: return "%s";\n""" % (p.enum,", ".join([name for name, doc, enum in p.entries])))
 autogencpp.write("""    case SCHEME_unknown: return "not available";\n""")
-autogencpp.write("}\n}\n")
+autogencpp.write("  }\n}\n")
 
 autogencpp.write("std::string getSchemeEntryName(InputOutputScheme scheme, int i) {\n  switch (scheme) {\n")
 for p in schemes:
   autogencpp.write("    case SCHEME_%s: \n" % p.enum)
   for i, (name, doc, enum) in enumerate(p.entries):
     autogencpp.write("""      if(i==%d) return "%s";\n""" % (i,name))
-  autogencpp.write("""      casadi_error("getSchemeEntryName: supplied number is out of range. %s has only %d entries: %s");\n""" % (p.enum,len(p.entries),(p.enum,", ".join([name for name, doc, enum in p.entries]))))
   autogencpp.write("      break;\n")
 autogencpp.write("""    case SCHEME_unknown: return "none";\n""")
-autogencpp.write("}\n}\n")
+autogencpp.write("  }\n")
+autogencpp.write("""  casadi_error("getSchemeEntryName: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");\n""")
+autogencpp.write("}\n")
 
 autogencpp.write("std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {\n  switch (scheme) {\n")
 for p in schemes:
   autogencpp.write("    case SCHEME_%s: \n" % p.enum)
   for i, (name, doc, enum) in enumerate(p.entries):
     autogencpp.write("""      if(i==%d) return "%s";\n""" % (i,doc))
-  autogencpp.write("""      casadi_error("getSchemeEntryDoc: supplied number is out of range. %s has only %d entries: %s");\n""" % (p.enum,len(p.entries),(p.enum,", ".join([name for name, doc, enum in p.entries]))))
   autogencpp.write("      break;\n")
 autogencpp.write("""    case SCHEME_unknown: return "none";\n""")
-autogencpp.write("}\n}\n")
+autogencpp.write("  }\n")
+autogencpp.write("""  casadi_error("getSchemeEntryDoc: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");\n""")
+autogencpp.write("}\n")
 
 autogencpp.write("std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {\n  switch (scheme) {\n")
 for p in schemes:
   autogencpp.write("    case SCHEME_%s: \n" % p.enum)
   for i, (name, doc, enum) in enumerate(p.entries):
     autogencpp.write("""      if(i==%d) return "%s";\n""" % (i,enum))
-  autogencpp.write("""      casadi_error("getSchemeEntryEnumName: supplied number is out of range. %s has only %d entries: %s");\n""" % (p.enum,len(p.entries),(p.enum,", ".join([name for name, doc, enum in p.entries]))))
   autogencpp.write("      break;\n")
 autogencpp.write("""    case SCHEME_unknown: return "none";\n""")
-autogencpp.write("}\n}\n")
+autogencpp.write("  }\n")
+autogencpp.write("""  casadi_error("getSchemeEntryEnumName: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");\n""")
+autogencpp.write("}\n")
+
+autogencpp.write("int getSchemeSize(InputOutputScheme scheme) {\n  switch (scheme) {\n")
+for p in schemes:
+  autogencpp.write("    case SCHEME_%s: \n" % p.enum)
+  autogencpp.write("""      return %d;\n""" % len(p.entries))
+  autogencpp.write("      break;\n")
+autogencpp.write("""    case SCHEME_unknown: casadi_error("getSchemeSize: Unknown scheme has no known size."); return -1;\n""")
+autogencpp.write("  }\n")
+autogencpp.write("}\n")
 
 autogencpp.write("int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {\n  switch (scheme) {\n")
 for p in schemes:
@@ -349,8 +361,10 @@ for p in schemes:
   for i, (name, doc, enum) in enumerate(p.entries):
     autogencpp.write("""      if(name=="%s") return %d;\n""" % (name,i))
   autogencpp.write("      break;\n")
-autogencpp.write("""    case SCHEME_unknown: return -1;\n""")
-autogencpp.write("}\nreturn -1;}\n")
+autogencpp.write("""    case SCHEME_unknown: casadi_error("Unknown scheme"); return -1;\n""")
+autogencpp.write("  }\n")
+autogencpp.write("""  casadi_error("getSchemeEntryEnum: Scheme '" << getSchemeName(scheme) <<  "' has no entry named '" << name <<  "'. Available entries are: " << getSchemeEntryNames(scheme) << ".");\n""")
+autogencpp.write("}\n")
 autogenhpp.write("}\n#endif //AUTOGENERATED_HPP")
 autogencpp.write("}")
 
