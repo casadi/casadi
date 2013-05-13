@@ -860,12 +860,12 @@ A \texttt{Simulator} can be used just like an integrator, and its input scheme i
 
 % \section{Integration of implicit ODEs}
 \chapter{Nonlinear Programming}
-The NLP solvers interfaced with CasADi solves NLP:s of the following form:
+The NLP solvers interfaced with CasADi solves parametric NLPs of the following form:
 \begin{equation}
 \begin{array}{cc}
 \begin{array}{c}
 \text{minimize:} \\
-x \in \mathbb{R}^n
+x \in \mathbb{R}^{nx}, p \in \mathbb{R}^{np}
 \end{array}
 &
 f(x)
@@ -876,20 +876,17 @@ f(x)
 &
 \begin{array}{c}
 x_{\min} \le x \le x_{\max} \\
-g_{\min} \le g(x) \le g_{\max}
+g_{\min} \le g(x,p) \le g_{\max}
 \end{array}
 \end{array}
 \end{equation}
 
-With the functions $f$ and $g$ formulated as the CasADi functions \texttt{f} and \texttt{g}, an NLP solver instance can be allocated by:
+With a function \texttt{nlp}, which given $x$ and $p$, gives $f$ and $g$, an NLP solver instance can be allocated by:
 \begin{verbatim}
- nlp_solver = IpoptSolver(f,g)
+ nlp_solver = IpoptSolver(nlp)
 \end{verbatim}
 
-The interface will then automatically generate the information that it might need to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$. The interface will generate this kind of information automatically and provide to the solver. For the IPOPT interface, if the user wants to use a particular Hessian approximation (for example a Gauss-Newton Hessian), this is possble by simply prividing a third argument to the constructor:
-\begin{verbatim}
- nlp_solver = IpoptSolver(f,g,h)
-\end{verbatim}
+The interface will then automatically generate the information that it might need to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$. The interface will generate this kind of information automatically and provide to the solver.
 
 NLP solvers, like ODE/DAE integrators are functions in CasADi (though taking derivatives of them is currently not supported). You will find the input and output schemes in the CasADi API documentation on the website or by using the question mark in Python.
 

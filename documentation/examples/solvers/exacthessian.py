@@ -26,29 +26,30 @@ from numpy import *
 import casadi as c
 
 #! We will investigate the use of an exact Hessian with the help of the Rosenbrock function
-x=SX("x")
-y=SX("y")
+x=ssym("x")
+y=ssym("y")
     
 obj = (1-x)**2+100*(y-x**2)**2
 #! We choose to add a single constraint
 constr = x**2+y**2
 
-f=SXFunction([vertcat([x,y])],[obj])
-g=SXFunction([vertcat([x,y])],[constr])
-solver = IpoptSolver(f,g)
+nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=obj,g=constr))
+solver = IpoptSolver(nlp)
     
 #! We need the hessian of the lagrangian.
 #! A problem with n decision variables and m constraints gives us a hessian of size n x n
   
-sigma=SX("sigma")  # A scalar factor
-lambd=SX("lambd")  # Multipier of the problem, shape m x 1.
+sigma=ssym("sigma")  # A scalar factor
+lambd=ssym("lambd")  # Multipier of the problem, shape m x 1.
 
 xy = vertcat([x,y])
 
-h=SXFunction([xy,lambd,sigma],[sigma*hessian(obj,xy)+lambd*hessian(constr,xy)])
+h=SXFunction(hessLagIn(x=xy,lam_g=lambd,lam_f=sigma),
+             hessLagOut(hess=sigma*hessian(obj,xy)+lambd*hessian(constr,xy)))
    
 #! We solve the problem with an exact hessian
-solver = IpoptSolver(f,g,h)
+solver = IpoptSolver(nlp)
+solver.setOption("hess_lag",h)
 solver.init()
 solver.input("lbx").set([-10]*2)
 solver.input("ubx").set([10]*2)
@@ -60,7 +61,7 @@ for sol in array(solver.output()):
   print "%.15f" % sol
 
 #! To compare the behaviour of convergence, we solve the same problem without exact hessian
-solver = IpoptSolver(f,g)
+solver = IpoptSolver(nlp)
 solver.init()
 solver.input("lbx").set([-10]*2)
 solver.input("ubx").set([10]*2)

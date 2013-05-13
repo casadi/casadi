@@ -33,10 +33,10 @@ from numpy import *
 #$
 #$ with x scalar
 
-x=SX("x")
-f=SXFunction([x],[(x-1)**2])
+x=ssym("x")
+nlp=SXFunction(nlIn(x=x),nlOut(f=(x-1)**2))
 
-solver = IpoptSolver(f)
+solver = IpoptSolver(nlp)
 solver.init()
 solver.input("lbx").set([-10])
 solver.input("ubx").set([10])
@@ -59,10 +59,9 @@ n = 5
 
 x=ssym("x",n)
 #! Note how we do not distinguish between equalities and inequalities here
-f=SXFunction([x],[mul((x-1).T,x-1)])
-g=SXFunction([x],[vertcat([x[1]+x[2],x[0]])])
+nlp=SXFunction(nlIn(x=x),nlOut(f=mul((x-1).T,x-1),g=vertcat([x[1]+x[2],x[0]])))
 
-solver = IpoptSolver(f,g)
+solver = IpoptSolver(nlp)
 solver.init()
 solver.input("lbx").set([-10]*n)
 solver.input("ubx").set([10]*n)
@@ -84,13 +83,12 @@ for (i,e) in zip(range(n),[2,0.5,0.5,1,1]):
 #$
 #$ with x scalar
 
-x=SX("x")
-a=SX("a")
+x=ssym("x")
+a=ssym("a")
 a_ = 2
-f=SXFunction([x,a],[(x-a)**2])
+nlp=SXFunction(nlIn(x=x,p=a),nlOut(f=(x-a)**2))
 
-solver = IpoptSolver(f)
-solver.setOption("parametric",True)
+solver = IpoptSolver(nlp)
 solver.init()
 solver.input("lbx").set([-10])
 solver.input("ubx").set([10])

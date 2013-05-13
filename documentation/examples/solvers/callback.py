@@ -31,8 +31,7 @@ from numpy import *
 x=SX("x")
 y=SX("y")
 
-f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
-g=SXFunction([vertcat([x,y])],[x+y])
+nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     
 #! Simple callback
 #! ===============
@@ -64,7 +63,7 @@ c = PyFunction( mycallback, nlpsolverOut(x=sp_dense(nd,1), f=sp_dense(1,1), lam_
 c.init()
 
 
-solver = IpoptSolver(f,g)
+solver = IpoptSolver(nlp)
 solver.setOption("iteration_callback",c)
 solver.setOption("tol",1e-8)
 solver.setOption("max_iter",20)
@@ -95,9 +94,9 @@ class MyCallback:
     
     for i in range(x_.shape[0]):
       for j in range(x_.shape[1]):
-        f.input().set([x_[i,j],y_[i,j]])
-        f.evaluate()
-        z_[i,j] = float(f.output())
+        nlp.input("x").set([x_[i,j],y_[i,j]])
+        nlp.evaluate()
+        z_[i,j] = float(nlp.output("f"))
     contourf(x_,y_,z_)
     colorbar()
     title('Iterations of Rosenbrock')
@@ -128,7 +127,7 @@ c = PyFunction( mycallback, nlpsolverOut(x=sp_dense(nd,1), f=sp_dense(1,1), lam_
 c.init()
 
 
-solver = IpoptSolver(f,g)
+solver = IpoptSolver(nlp)
 solver.setOption("iteration_callback",c)
 solver.setOption("tol",1e-8)
 solver.setOption("max_iter",50)
