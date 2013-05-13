@@ -604,19 +604,19 @@ namespace CasADi{
       if(ng_==0) return;
       
       // Pass the argument to the function
-      nlp_.setInput(x,NL_X);
-      nlp_.setInput(input(NLP_SOLVER_P),NL_P);
+      nlp_.setInput(x,NLP_X);
+      nlp_.setInput(input(NLP_SOLVER_P),NLP_P);
       
       // Evaluate the function and tape
       nlp_.evaluate();
       
       // Ge the result
-      nlp_.output(NL_G).get(g,DENSE);
+      nlp_.output(NLP_G).get(g,DENSE);
       
       // Printing
       if(monitored("eval_g")){
-        cout << "x = " << nlp_.input(NL_X) << endl;
-        cout << "g = " << nlp_.output(NL_G) << endl;
+        cout << "x = " << nlp_.input(NLP_X) << endl;
+        cout << "g = " << nlp_.output(NLP_G) << endl;
       }
     } catch (exception& ex){
       cerr << "eval_g failed: " << ex.what() << endl;
@@ -633,14 +633,14 @@ namespace CasADi{
       FX& jacG = this->jacG();
 
       // Pass the argument to the function
-      jacG.setInput(x,NL_X);
-      jacG.setInput(input(NLP_SOLVER_P),NL_P);
+      jacG.setInput(x,NLP_X);
+      jacG.setInput(input(NLP_SOLVER_P),NLP_P);
       
       // Evaluate the function
       jacG.evaluate();
       
       // Get the output
-      jacG.output(1+NL_G).get(g,DENSE);
+      jacG.output(1+NLP_G).get(g,DENSE);
       jacG.output().get(J);
 
       if (monitored("eval_jac_g")) {
@@ -661,15 +661,15 @@ namespace CasADi{
       FX& gradF = this->gradF();
 
       // Pass the argument to the function
-      gradF.setInput(x,NL_X);
-      gradF.setInput(input(NLP_SOLVER_P),NL_P);
+      gradF.setInput(x,NLP_X);
+      gradF.setInput(input(NLP_SOLVER_P),NLP_P);
       
       // Evaluate, adjoint mode
       gradF.evaluate();
       
       // Get the result
       gradF.output().get(grad_f,DENSE);
-      gradF.output(1+NL_X).get(f);
+      gradF.output(1+NLP_X).get(f);
       
       // Printing
       if (monitored("eval_f")){
@@ -690,18 +690,18 @@ namespace CasADi{
   void SQPInternal::eval_f(const std::vector<double>& x, double& f){
     try {
       // Pass the argument to the function
-      nlp_.setInput(x,NL_X);
-      nlp_.setInput(input(NLP_SOLVER_P),NL_P);
+      nlp_.setInput(x,NLP_X);
+      nlp_.setInput(input(NLP_SOLVER_P),NLP_P);
       
       // Evaluate the function
       nlp_.evaluate();
 
       // Get the result
-      nlp_.getOutput(f,NL_F);
+      nlp_.getOutput(f,NLP_F);
 
       // Printing
       if(monitored("eval_f")){
-        cout << "x = " << nlp_.input(NL_X) << endl;
+        cout << "x = " << nlp_.input(NLP_X) << endl;
         cout << "f = " << f << endl;
       }
     } catch (exception& ex){

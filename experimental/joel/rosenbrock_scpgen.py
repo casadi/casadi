@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 x = msym("x",3)
 
 # Form NLP functions
-nlp = MXFunction(nlIn(x=x),nlOut(f=x[0]**2 + 100*x[2]**2, g=x[2] + (1-x[0])**2 - x[1]))
+nlp = MXFunction(nlpIn(x=x),nlpOut(f=x[0]**2 + 100*x[2]**2, g=x[2] + (1-x[0])**2 - x[1]))
 
 # Choose NLP solver
 #nlp_solver = IpoptSolver

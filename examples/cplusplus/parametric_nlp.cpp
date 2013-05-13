@@ -87,7 +87,7 @@ int main(){
   vector<double> p0(p0_,p0_+2);
 
   // NLP
-  SXFunction nlp(nlIn("x",x,"p",p),nlOut("f",f,"g",g));
+  SXFunction nlp(nlpIn("x",x,"p",p),nlpOut("f",f,"g",g));
 
   // Create NLP solver
   IpoptSolver solver(nlp);

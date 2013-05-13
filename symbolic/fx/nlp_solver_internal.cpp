@@ -70,13 +70,13 @@ namespace CasADi{
   void NLPSolverInternal::init(){
     // Initialize the NLP
     nlp_.init(false);
-    casadi_assert_message(nlp_.getNumInputs()==NL_NUM_IN, "The NLP function must have exactly two input");
-    casadi_assert_message(nlp_.getNumOutputs()==NL_NUM_OUT, "The NLP function must have exactly two outputs");
+    casadi_assert_message(nlp_.getNumInputs()==NLP_NUM_IN, "The NLP function must have exactly two input");
+    casadi_assert_message(nlp_.getNumOutputs()==NLP_NUM_OUT, "The NLP function must have exactly two outputs");
     
     // Sparsity patterns
-    const CRSSparsity& x_sparsity = nlp_.input(NL_X).sparsity();
-    const CRSSparsity& p_sparsity = nlp_.input(NL_P).sparsity();
-    const CRSSparsity& g_sparsity = nlp_.output(NL_G).sparsity();
+    const CRSSparsity& x_sparsity = nlp_.input(NLP_X).sparsity();
+    const CRSSparsity& p_sparsity = nlp_.input(NLP_P).sparsity();
+    const CRSSparsity& g_sparsity = nlp_.output(NLP_G).sparsity();
 
     // Get dimensions
     nx_ = x_sparsity.size();
@@ -190,7 +190,7 @@ namespace CasADi{
       gradF = getOption("grad_f");
     } else {
       log("Generating objective gradient");
-      gradF = nlp_.gradient(NL_X,NL_F);
+      gradF = nlp_.gradient(NLP_X,NLP_F);
       log("Gradient function generated");
     }
     gradF.setOption("name","grad_f");
@@ -218,7 +218,7 @@ namespace CasADi{
       jacG = getOption("jac_g");
     } else {
       log("Generating constraint Jacobian");
-      jacG = nlp_.jacobian(NL_X,NL_G);
+      jacG = nlp_.jacobian(NLP_X,NLP_G);
       log("Jacobian function generated");
     }
     jacG.setOption("name","jac_g");
@@ -265,7 +265,7 @@ namespace CasADi{
     } else {
       FX& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian");
-      hessLag = gradLag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
+      hessLag = gradLag.jacobian(NLP_X,NLP_NUM_OUT+NLP_X,false,true);
       log("Hessian function generated");
     }
     hessLag.setOption("name","hess_lag");
@@ -290,7 +290,7 @@ namespace CasADi{
     } else {
       FX& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian sparsity pattern");
-      spHessLag = gradLag.jacSparsity(NL_X,NL_NUM_OUT+NL_X,false,true);
+      spHessLag = gradLag.jacSparsity(NLP_X,NLP_NUM_OUT+NLP_X,false,true);
       log("Hessian sparsity pattern generated");
     }
     return spHessLag;

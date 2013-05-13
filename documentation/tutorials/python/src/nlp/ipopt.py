@@ -65,7 +65,7 @@ F = 0.5*mul(mul(trans(X),P),X) + mul(trans(q),X)
 G = X+X
 
 #! NLP
-nlp = MXFunction(nlIn(x=X),nlOut(f=F,g=G))
+nlp = MXFunction(nlpIn(x=X),nlpOut(f=F,g=G))
 nlp.init()
 nlp.setInput([1,1,1,1,1],"x")
 nlp.evaluate()

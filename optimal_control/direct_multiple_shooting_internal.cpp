@@ -165,7 +165,7 @@ void DirectMultipleShootingInternal::init(){
   }
 
   // NLP
-  nlp_ = MXFunction(nlIn("x",V),nlOut("f",f,"g",g));
+  nlp_ = MXFunction(nlpIn("x",V),nlpOut("f",f,"g",g));
   nlp_.setOption("numeric_jacobian",false);
   nlp_.setOption("ad_mode","forward");
   nlp_.init();

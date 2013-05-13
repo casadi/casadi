@@ -88,7 +88,7 @@ namespace CasADi {
     MX nlp_G = f_.call(args_call).front();
 
     // We're going to use two-argument objective and constraints to allow the use of parameters
-    MXFunction nlp(nlIn("x",V,"p",P),nlOut("f",nlp_F,"g",nlp_G));
+    MXFunction nlp(nlpIn("x",V,"p",P),nlpOut("f",nlp_F,"g",nlp_G));
   
     // Create an nlpsolver instance
     NLPSolverCreator nlp_solvercreator = getOption("nlp_solver");

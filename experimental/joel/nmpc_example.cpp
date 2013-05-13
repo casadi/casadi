@@ -104,7 +104,7 @@ int main(){
   }
 
   // Form the NLP
-  MXFunction nlp(nlIn("x",u),nlOut("f",f,"g",g));
+  MXFunction nlp(nlpIn("x",u),nlpOut("f",f,"g",g));
   SCPgen solver(nlp);
 
   //solver.setOption("verbose",true);

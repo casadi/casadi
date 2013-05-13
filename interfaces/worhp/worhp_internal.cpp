@@ -897,18 +897,18 @@ namespace CasADi{
       double time1 = clock();
 
       // Pass the argument to the function
-      nlp_.setInput(x, NL_X);
-      nlp_.setInput(input(NLP_SOLVER_P),NL_P);
+      nlp_.setInput(x, NLP_X);
+      nlp_.setInput(input(NLP_SOLVER_P),NLP_P);
       
       // Evaluate the function
       nlp_.evaluate();
 
       // Get the result
-      nlp_.getOutput(obj_value,NL_F);
+      nlp_.getOutput(obj_value,NLP_F);
 
       // Printing
       if(monitored("eval_f")){
-        cout << "x = " << nlp_.input(NL_X) << endl;
+        cout << "x = " << nlp_.input(NLP_X) << endl;
         cout << "obj_value = " << obj_value << endl;
       }
       obj_value *= scale;
@@ -934,23 +934,23 @@ namespace CasADi{
 
       if(worhp_o_.m>0){
         // Pass the argument to the function
-        nlp_.setInput(x,NL_X);
-        nlp_.setInput(input(NLP_SOLVER_P),NL_P);
+        nlp_.setInput(x,NLP_X);
+        nlp_.setInput(input(NLP_SOLVER_P),NLP_P);
 
         // Evaluate the function and tape
         nlp_.evaluate();
 
         // Ge the result
-        nlp_.getOutput(g,NL_G);
+        nlp_.getOutput(g,NLP_G);
 
         // Printing
         if(monitored("eval_g")){
-          cout << "x = " << nlp_.input(NL_X) << endl;
-          cout << "g = " << nlp_.output(NL_G) << endl;
+          cout << "x = " << nlp_.input(NLP_X) << endl;
+          cout << "g = " << nlp_.output(NLP_G) << endl;
         }
       }
 
-      if (regularity_check_ && !isRegular(nlp_.output(NL_G).data())) casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(nlp_.output(NLP_G).data())) casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
     
       double time2 = clock();
       t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -970,8 +970,8 @@ namespace CasADi{
       double time1 = clock();
     
       // Pass the argument to the function
-      gradF_.setInput(x,NL_X);
-      gradF_.setInput(input(NLP_SOLVER_P),NL_P);
+      gradF_.setInput(x,NLP_X);
+      gradF_.setInput(input(NLP_SOLVER_P),NLP_P);
       
       // Evaluate, adjoint mode
       gradF_.evaluate();

@@ -50,7 +50,7 @@ class OCPtests(casadiTestCase):
       cost = cost + s*X[i]**2+r*U[i]**2
     cost = cost + q*X[N]**2
     
-    nlp = SXFunction(nlIn(x=V),nlOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
+    nlp = SXFunction(nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
     
     solver = IpoptSolver(nlp)
     solver.setOption("tol",1e-5)
@@ -109,7 +109,7 @@ class OCPtests(casadiTestCase):
     
     f = MXFunction([var,parMX],[qend[0]])
     f.init()
-    nlp = MXFunction(nlIn(x=var),nlOut(f=-f.call([var,parc])[0]))
+    nlp = MXFunction(nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0]))
     nlp.init()
     solver = IpoptSolver(nlp)
     solver.setOption("tol",1e-12)
@@ -167,7 +167,7 @@ class OCPtests(casadiTestCase):
     
     f = MXFunction([var,par],[qend[0]])
     f.init()
-    nlp = MXFunction(nlIn(x=var),nlOut(f=-f.call([var,parc])[0],g=var[0]-var[1]))
+    nlp = MXFunction(nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0],g=var[0]-var[1]))
     nlp.init()
     
     solver = IpoptSolver(nlp)

@@ -72,7 +72,7 @@ J = mul(U.T,U) # u'*u in Matlab
 G = X[0:2]     # x(1:2) in Matlab
 
 # NLP
-nlp = MXFunction(nlIn(x=U),nlOut(f=J,g=G))
+nlp = MXFunction(nlpIn(x=U),nlpOut(f=J,g=G))
   
 # Allocate an NLP solver
 solver = IpoptSolver(nlp)

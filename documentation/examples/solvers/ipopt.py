@@ -34,7 +34,7 @@ from numpy import *
 #$ with x scalar
 
 x=ssym("x")
-nlp=SXFunction(nlIn(x=x),nlOut(f=(x-1)**2))
+nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2))
 
 solver = IpoptSolver(nlp)
 solver.init()
@@ -59,7 +59,7 @@ n = 5
 
 x=ssym("x",n)
 #! Note how we do not distinguish between equalities and inequalities here
-nlp=SXFunction(nlIn(x=x),nlOut(f=mul((x-1).T,x-1),g=vertcat([x[1]+x[2],x[0]])))
+nlp=SXFunction(nlpIn(x=x),nlpOut(f=mul((x-1).T,x-1),g=vertcat([x[1]+x[2],x[0]])))
 
 solver = IpoptSolver(nlp)
 solver.init()
@@ -86,7 +86,7 @@ for (i,e) in zip(range(n),[2,0.5,0.5,1,1]):
 x=ssym("x")
 a=ssym("a")
 a_ = 2
-nlp=SXFunction(nlIn(x=x,p=a),nlOut(f=(x-a)**2))
+nlp=SXFunction(nlpIn(x=x,p=a),nlpOut(f=(x-a)**2))
 
 solver = IpoptSolver(nlp)
 solver.init()

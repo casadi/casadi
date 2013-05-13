@@ -47,24 +47,24 @@
 
 namespace CasADi{
 
-  /// Input arguments of an NLP function [nlIn]
-  enum NLInput{
+  /// Input arguments of an NLP function [nlpIn]
+  enum NLPInput{
     /// Decision variable [x]
-    NL_X,
+    NLP_X,
     /// Fixed parameter [p]
-    NL_P, 
+    NLP_P, 
     /// Number of NLP inputs
-    NL_NUM_IN
+    NLP_NUM_IN
   };
 
-  /// Output arguments of an NLP function [nlOut]
-  enum NLOutput{ 
+  /// Output arguments of an NLP function [nlpOut]
+  enum NLPOutput{ 
     /// Objective function [f]
-    NL_F,
+    NLP_F,
     /// Constraint function [g]
-    NL_G,
+    NLP_G,
     /// Number of NLP outputs
-    NL_NUM_OUT
+    NLP_NUM_OUT
   };
 
   /// Input arguments of an NLP objective gradient function [gradFIn]
@@ -141,7 +141,7 @@ namespace CasADi{
     HESSLAG_NUM_OUT
   };
   
-  /// Input arguments of an NLP Solver [nlpsolverIn]
+  /// Input arguments of an NLP Solver [nlpSolverIn]
   enum NLPSolverInput{
     /// Decision variables, initial guess (nx x 1)  [x0]
     NLP_SOLVER_X0,
@@ -162,7 +162,7 @@ namespace CasADi{
     NLP_SOLVER_NUM_IN
   };
 
-  /// Output arguments of an NLP Solver [nlpsolverOut]
+  /// Output arguments of an NLP Solver [nlpSolverOut]
   enum NLPSolverOutput{
     /// Decision variables at the optimal solution (nx x 1) [x]
     NLP_SOLVER_X,

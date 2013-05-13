@@ -531,7 +531,7 @@ class typemaptests(casadiTestCase):
   def testGenericTypeBoolean(self):
     x=SX("x")
 
-    nlp = SXFunction(nlIn(x=x),nlOut(f=x**2))
+    nlp = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
     nlp.init()
 
     nlp_solver = IpoptSolver(nlp)

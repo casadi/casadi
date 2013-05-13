@@ -129,7 +129,7 @@ void DirectSingleShootingInternal::init(){
   nlp_j += jk;
 
   // NLP
-  nlp_ = MXFunction(nlIn("x",V),nlOut("f",nlp_j,"g",vertcat(nlp_g)));
+  nlp_ = MXFunction(nlpIn("x",V),nlpOut("f",nlp_j,"g",vertcat(nlp_g)));
   nlp_.setOption("name","nlp");
   nlp_.init();
     

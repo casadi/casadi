@@ -45,7 +45,7 @@ int main(int argc, char **argv){
   nl.parseNL(problem);
 
   // NLP
-  SXFunction nlp(nlIn("x",nl.x),nlOut("f",nl.f,"g",nl.g));
+  SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
  
   // Allocate NLP solver
   WorhpSolver nlp_solver(nlp);

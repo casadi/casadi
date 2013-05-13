@@ -33,7 +33,7 @@ obj = (1-x)**2+100*(y-x**2)**2
 #! We choose to add a single constraint
 constr = x**2+y**2
 
-nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=obj,g=constr))
+nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=constr))
 solver = IpoptSolver(nlp)
     
 #! We need the hessian of the lagrangian.

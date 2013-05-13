@@ -337,7 +337,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     nlp_f = flatten(nlp_f);
   }
 
-  MXFunction nlp(nlIn("x",P),nlOut("f",nlp_f,"g",nlp_g));
+  MXFunction nlp(nlpIn("x",P),nlpOut("f",nlp_f,"g",nlp_g));
   cout << "Generated single-shooting NLP" << endl;
   
   // NLP Solver

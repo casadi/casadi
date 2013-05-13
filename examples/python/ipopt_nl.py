@@ -38,7 +38,7 @@ nl = SymbolicNLP()
 nl.parseNL("../nl_files/hs107.nl",{"verbose":False})
 
 # NLP function
-nlp = SXFunction(nlIn(x=nl.x),nlOut(f=nl.f,g=nl.g))
+nlp = SXFunction(nlpIn(x=nl.x),nlpOut(f=nl.f,g=nl.g))
   
 # NLP solver
 nlp_solver = IpoptSolver(nlp)

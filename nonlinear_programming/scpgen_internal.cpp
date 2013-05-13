@@ -91,9 +91,9 @@ namespace CasADi{
     string compiler = getOption("compiler");
     gauss_newton_ = getOption("hessian_approximation") == "gauss-newton";
     if(gauss_newton_){
-      casadi_assert(nlp_.output(NL_F).size()>1);
+      casadi_assert(nlp_.output(NLP_F).size()>1);
     } else {
-      casadi_assert(nlp_.output(NL_F).size()==1);
+      casadi_assert(nlp_.output(NLP_F).size()==1);
     }
 
     // Name the components

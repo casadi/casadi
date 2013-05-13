@@ -195,7 +195,7 @@ void DirectCollocationInternal::init(){
   nlp_j += Jk;
 
   // Objective function of the NLP
-  nlp_ = MXFunction(nlIn("x",nlp_x), nlOut("f",nlp_j,"g",vertcat(nlp_g)));
+  nlp_ = MXFunction(nlpIn("x",nlp_x), nlpOut("f",nlp_j,"g",vertcat(nlp_g)));
 
   // Get the NLP creator function
   NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");

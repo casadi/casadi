@@ -83,7 +83,7 @@ int main(){
   bool expand = true;
 
   // NLP function
-  FX nlp = MXFunction(nlIn("x",x),nlOut("f",f,"g",g));
+  FX nlp = MXFunction(nlpIn("x",x),nlpOut("f",f,"g",g));
   nlp.setOption("numeric_jacobian",false);
   nlp.init();
 
@@ -98,7 +98,7 @@ int main(){
   // Hessian of the lagrangian
   FX grad_lag = nlp.derivative(0,1);
   grad_lag.setOption("numeric_jacobian",false);
-  FX hess_lag = grad_lag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
+  FX hess_lag = grad_lag.jacobian(NLP_X,NLP_NUM_OUT+NLP_X,false,true);
   hess_lag.init();
 
   // Codegen and compile

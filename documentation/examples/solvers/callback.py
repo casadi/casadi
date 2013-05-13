@@ -31,7 +31,7 @@ from numpy import *
 x=SX("x")
 y=SX("y")
 
-nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
+nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     
 #! Simple callback
 #! ===============
@@ -59,7 +59,7 @@ nd = 2 # Number of decision variables
 nc = 1 # number of constraints
 np = 0 # number of parameters
 
-c = PyFunction( mycallback, nlpsolverOut(x=sp_dense(nd,1), f=sp_dense(1,1), lam_x=sp_dense(nd,1), lam_g = sp_dense(nc,1), lam_p = sp_dense(np,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
+c = PyFunction( mycallback, nlpSolverOut(x=sp_dense(nd,1), f=sp_dense(1,1), lam_x=sp_dense(nd,1), lam_g = sp_dense(nc,1), lam_p = sp_dense(np,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
 c.init()
 
 
@@ -123,7 +123,7 @@ mycallback = MyCallback()
 
 #! We create a casadi function out of this callable object.
 #! The sparsities given here as input must match the sparsities of the outputs of our NLP Solver
-c = PyFunction( mycallback, nlpsolverOut(x=sp_dense(nd,1), f=sp_dense(1,1), lam_x=sp_dense(nd,1), lam_g = sp_dense(nc,1), lam_p = sp_dense(np,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
+c = PyFunction( mycallback, nlpSolverOut(x=sp_dense(nd,1), f=sp_dense(1,1), lam_x=sp_dense(nd,1), lam_g = sp_dense(nc,1), lam_p = sp_dense(np,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
 c.init()
 
 

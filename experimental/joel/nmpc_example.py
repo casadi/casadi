@@ -36,7 +36,7 @@ for k in range(N):
   gmax.append( 1 if k<N-1 else 0)
 
 # Allocate NLP solver
-h = MXFunction(nlIn(x=u,p=p),nlOut(f=f,g=g));
+h = MXFunction(nlpIn(x=u,p=p),nlpOut(f=f,g=g));
 S = SCPgen(h)
 S.setOption("qp_solver",QPOasesSolver)
 S.setOption("qp_solver_options",{"printLevel":"none"}) # Should be automatic

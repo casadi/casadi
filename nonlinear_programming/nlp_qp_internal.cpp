@@ -94,8 +94,8 @@ void NLPQPInternal::init(){
   par.push_back(A.data());
 
   // The nlp looks exactly like a mathematical description of the NLP
-  SXFunction QP_nlp(nlIn("x",X,"p",vertcat(par)),
-		    nlOut("f",mul(trans(G),X) + 0.5*mul(mul(trans(X),H),X),
+  SXFunction QP_nlp(nlpIn("x",X,"p",vertcat(par)),
+		    nlpOut("f",mul(trans(G),X) + 0.5*mul(mul(trans(X),H),X),
 			   "g",mul(A,X)));
 
   // Create an nlpsolver instance

@@ -109,7 +109,7 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction nlp(nlIn("x",U),nlOut("f",F,"g",G));
+  MXFunction nlp(nlpIn("x",U),nlpOut("f",F,"g",G));
 
   // Allocate an NLP solver
   IpoptSolver solver(nlp);
