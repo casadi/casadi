@@ -71,9 +71,8 @@ int main(){
   vector<double> ubg(ubg_,ubg_+1);
 
   // Create NLP solver
-  SXFunction ffcn(x,f);
-  SXFunction gfcn(x,g);
-  IpoptSolver solver(ffcn,gfcn);
+  SXFunction nlp(nlIn("x",x),nlOut("f",f,"g",g));
+  IpoptSolver solver(nlp);
 
   // Mark the parameters amongst the variables (see sIPOPT documentation)
   Dictionary var_integer_md;

@@ -21,15 +21,9 @@
  */
 
 #include <iostream>
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/fx/mx_function.hpp>
-#include <symbolic/mx/mx_tools.hpp>
 #include <symbolic/fx/external_function.hpp>
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
-
-#include <symbolic/mx/mx_node.hpp>
 
 using namespace CasADi;
 using namespace std;
@@ -74,8 +68,6 @@ FX create_integrator(int nj, int nu){
   SXFunction integrator(input,output);
   integrator.init();
 
-//  integrator->generateCode("rocket.c");
-
   return integrator;
 }
 
@@ -117,12 +109,10 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction ffcn(U,F); // objective function
-  MXFunction gfcn(U,G); // constraint function
+  MXFunction nlp(nlIn("x",U),nlOut("f",F,"g",G));
 
   // Allocate an NLP solver
-//  LiftedNewtonSolver solver(ffcn,gfcn);
-  IpoptSolver solver(ffcn,gfcn);
+  IpoptSolver solver(nlp);
   
   // Set options
   solver.setOption("tol",1e-10);

@@ -146,13 +146,12 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction ffcn(U,F); // objective function
-  MXFunction gfcn(U,G); // constraint function
+  MXFunction nlp(nlIn("x",U),nlOut("f",F,"g",G));
 
   // Allocate an NLP solver
   NLPSolver solver;
   if(lifted_newton){
-    solver = SCPgen(ffcn,gfcn);
+    solver = SCPgen(nlp);
 
     solver.setOption("verbose",true);
     solver.setOption("regularize",false);
@@ -170,7 +169,7 @@ int main(){
     qp_solver_options["nlp_solver_options"] = ipopt_options;
     solver.setOption("qp_solver_options",qp_solver_options);
   } else {
-    solver = IpoptSolver(ffcn,gfcn);
+    solver = IpoptSolver(nlp);
     
     // Set options
     solver.setOption("tol",1e-10);

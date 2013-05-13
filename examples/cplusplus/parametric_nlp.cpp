@@ -86,18 +86,13 @@ int main(){
   double p0_[]  = {5.00,1.00};
   vector<double> p0(p0_,p0_+2);
 
-  // Input arguments for f(x,p) and g(x,p)
-  vector<SXMatrix> x_and_p(2);
-  x_and_p[0] = x;
-  x_and_p[1] = p;
-  
-  // Creaate NLP solver
-  SXFunction ffcn(x_and_p,f);
-  SXFunction gfcn(x_and_p,g);
-  IpoptSolver solver(ffcn,gfcn);
+  // NLP
+  SXFunction nlp(nlIn("x",x,"p",p),nlOut("f",f,"g",g));
+
+  // Create NLP solver
+  IpoptSolver solver(nlp);
   
   // Set options and initialize solver
-  solver.setOption("parametric",true);
   solver.init();
   
   // Solve NLP

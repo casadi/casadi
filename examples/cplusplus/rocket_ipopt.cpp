@@ -39,21 +39,23 @@ int main(){
   int nj = 100; // Number of integration steps per control segment
 
   // optimization variable
-  vector<SX> u = ssym("u",nu).data(); // control
+  SXMatrix u = ssym("u",nu); // control
 
-  SX s_0 = 0; // initial position
-  SX v_0 = 0; // initial speed
-  SX m_0 = 1; // initial mass
+  SXMatrix s_0 = 0; // initial position
+  SXMatrix v_0 = 0; // initial speed
+  SXMatrix m_0 = 1; // initial mass
   
-  SX dt = 10.0/(nj*nu); // time step
-  SX alpha = 0.05; // friction
-  SX beta = 0.1; // fuel consumption rate
+  SXMatrix dt = 10.0/(nj*nu); // time step
+  SXMatrix alpha = 0.05; // friction
+  SXMatrix beta = 0.1; // fuel consumption rate
 
   // Trajectory
-  vector<SX> s_traj(nu), v_traj(nu), m_traj(nu);
+  SXMatrix s_traj = SXMatrix::zeros(nu);
+  SXMatrix v_traj = SXMatrix::zeros(nu);
+  SXMatrix m_traj = SXMatrix::zeros(nu);
 
   // Integrate over the interval with Euler forward
-  SX s = s_0, v = v_0, m = m_0;
+  SXMatrix s = s_0, v = v_0, m = m_0;
   for(int k=0; k<nu; ++k){
     for(int j=0; j<nj; ++j){
       s += dt*v;
@@ -66,22 +68,19 @@ int main(){
   }
 
   // Objective function
-  SX f = 0;
-  for(int i=0; i<u.size(); ++i)
-    f += u[i]*u[i];
+  SXMatrix f = inner_prod(u,u);
     
   // Terminal constraints
-  vector<SX> g(2);
-  g[0] = s;
-  g[1] = v;
-  g.insert(g.end(),v_traj.begin(),v_traj.end());
+  SXMatrix g;
+  g.append(s);
+  g.append(v);
+  g.append(v_traj);
   
   // Create the NLP
-  SXFunction ffcn(u,f); // objective function
-  SXFunction gfcn(u,g); // constraint
+  SXFunction nlp(nlIn("x",u),nlOut("f",f,"g",g));
   
   // Allocate an NLP solver
-  IpoptSolver solver(ffcn,gfcn);
+  IpoptSolver solver(nlp);
 
   // initialize the solver
   solver.init();

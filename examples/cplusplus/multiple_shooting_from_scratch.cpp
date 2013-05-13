@@ -162,16 +162,12 @@ int main(){
     J += I_out[INTEGRATOR_QF];
   }
   
-  // NLP objective function
-  MXFunction jfcn(V,J);
-
-  // NLP constraint function
-  MXFunction gfcn(V,vertcat(g));
+  // NLP 
+  MXFunction nlp(nlIn("x",V),nlOut("f",J,"g",vertcat(g)));
   
   // Create an NLP solver instance
-  IpoptSolver nlp_solver(jfcn,gfcn);
+  IpoptSolver nlp_solver(nlp);
   nlp_solver.setOption("tol",1e-5);
-  nlp_solver.setOption("hessian_approximation", "exact");
   nlp_solver.setOption("max_iter",100);
   nlp_solver.setOption("linear_solver","ma57");
   nlp_solver.init();
