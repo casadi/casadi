@@ -107,7 +107,6 @@ int main(){
   Dictionary nlp_solver_dict;
   nlp_solver_dict["tol"] = 1e-5;
   nlp_solver_dict["hessian_approximation"] = "limited-memory"; // For BFGS
-  //nlp_solver_dict["generate_hessian"] = true; // For exact Hessian
   nlp_solver_dict["max_iter"] = 100;
   nlp_solver_dict["linear_solver"] = "ma57";
   //  nlp_solver_dict["derivative_test"] = "first-order";
