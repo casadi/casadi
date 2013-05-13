@@ -118,7 +118,7 @@ void ParallelizerInternal::init(){
 
 void ParallelizerInternal::evaluate(int nfdir, int nadir){
   // Let the first call (which may contain memory allocations) be serial when using OpenMP
-  if(mode_== SERIAL || (first_call_ && mode_ == OPENMP)){
+  if(mode_== SERIAL){
     for(int task=0; task<funcs_.size(); ++task){
       evaluateTask(task,nfdir,nadir);
     }
