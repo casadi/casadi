@@ -531,13 +531,13 @@ class typemaptests(casadiTestCase):
   def testGenericTypeBoolean(self):
     x=SX("x")
 
-    f = SXFunction([x],[x**2])
-    f.init()
+    nlp = SXFunction(nlIn(x=x),nlOut(f=x**2))
+    nlp.init()
 
-    nlp = IpoptSolver(f,FX())
+    nlp_solver = IpoptSolver(nlp)
     
-    self.assertRaises(RuntimeError,lambda : nlp.setOption('acceptable_tol',SX("x")))
-    nlp.setOption('acceptable_tol',DMatrix(1))
+    self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SX("x")))
+    nlp_solver.setOption('acceptable_tol',DMatrix(1))
 	    
   def test_operators(self):
     self.message("Test operators on mixed numpy.array/Matrix")

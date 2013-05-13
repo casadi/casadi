@@ -285,10 +285,9 @@ class SDPtests(casadiTestCase):
     g = []
     g.append(sum([Ai[i]*x[i] for i in range(3)]) - C - P)
 
-    f = SXFunction([V],[mul(b.T,x)])
-    g = SXFunction([V],[veccat(g)])
+    nlp = SXFunction(nlIn(x=V),nlOut(f=mul(b.T,x),g=veccat(g)))
 
-    sol = IpoptSolver(f,g)
+    sol = IpoptSolver(nlp)
     sol.init()
     sol.setInput(0,"lbg")
     sol.setInput(0,"ubg")

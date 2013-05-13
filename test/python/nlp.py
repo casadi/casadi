@@ -59,12 +59,11 @@ except:
 class NLPtests(casadiTestCase):
   def testIPOPT(self):
     x=SX("x")
-    f=SXFunction([x],[(x-1)**2])
-    g=SXFunction([x],[x])
+    nlp=SXFunction(nlIn(x=x),nlOut(f=(x-1)**2,g=x))
     
     for Solver in solvers:
       self.message("trivial " + str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver, "qp_solver_options" : qpsolver_options }).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -84,12 +83,11 @@ class NLPtests(casadiTestCase):
   def testIPOPT_par(self):
     x=SX("x")
     p=SX("p")
-    f=SXFunction([x,p],[(x-p)**2])
-    g=SXFunction([x,p],[x])
+    nlp=SXFunction(nlIn(x=x,p=p),nlOut(f=(x-p)**2,g=x))
     
     for Solver in solvers:
       self.message("trivial " + str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver, "qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -108,12 +106,11 @@ class NLPtests(casadiTestCase):
   def testIPOPTinf(self):
     self.message("trivial IPOPT, infinity bounds")
     x=SX("x")
-    f=SXFunction([x],[(x-1)**2])
-    g=SXFunction([x],[x])
+    nlp=SXFunction(nlIn(x=x),nlOut(f=(x-1)**2,g=x))
     
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver, "qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -133,11 +130,11 @@ class NLPtests(casadiTestCase):
     x=SX("x")
     y=SX("y")
     
-    f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=(1-x)**2+100*(y-x**2)**2))
     
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,FX())
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-9,"TolOpti":1e-14,"hessian_approximation":"limited-memory","maxiter":100,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -156,11 +153,10 @@ class NLPtests(casadiTestCase):
     x=SX("x")
     y=SX("y")
     
-    f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
-    g=SXFunction([vertcat([x,y])],[x+y])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-20,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "maxiter": 1000}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -185,11 +181,10 @@ class NLPtests(casadiTestCase):
     x=SX("x")
     y=SX("y")
     
-    f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
-    g=SXFunction([vertcat([x,y])],[x+y])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-20,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -213,8 +208,7 @@ class NLPtests(casadiTestCase):
     y=SX("y")
     
     obj = (1-x)**2+100*(y-x**2)**2
-    f=SXFunction([vertcat([x,y])],[obj])
-    g=SXFunction([vertcat([x,y])],[x**2+y**2])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=obj,g=x**2+y**2))
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -222,7 +216,7 @@ class NLPtests(casadiTestCase):
     sigma=SX("sigma")
     lambd=SX("lambd")
     h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputExpr(0),vertcat([x,y]))))
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(nlp.outputExpr("g"),vertcat([x,y]))))
     h.init()
     h.input().set([0.5,0.5])
     h.input(1).set(-40)
@@ -231,7 +225,7 @@ class NLPtests(casadiTestCase):
     print h.output()
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       solver.setOption("hess_lag",h)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"derivative_test":"second-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
@@ -256,7 +250,7 @@ class NLPtests(casadiTestCase):
       
     self.message(":warmstart")
     oldsolver=solver
-    solver = IpoptSolver(f,g)
+    solver = IpoptSolver(nlp)
     solver.setOption("hess_lag",h)
     solver.setOption("tol",1e-10)
     solver.setOption("max_iter",100)
@@ -285,8 +279,7 @@ class NLPtests(casadiTestCase):
     y=SX("y")
     
     obj = (1-x)**2+100*(y-x**2)**2
-    f=SXFunction([vertcat([x,y])],[obj])
-    g=SXFunction([vertcat([x,y])],[x**2+y**2])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=obj,g=x**2+y**2))
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -296,7 +289,7 @@ class NLPtests(casadiTestCase):
   
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-12,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":1,"derivative_test":"second-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "toldx": 1e-15, "tolgl": 1e-15, "maxiter" : 200}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -325,8 +318,7 @@ class NLPtests(casadiTestCase):
     p=SX("p")
     
     obj = (p-x)**2+100*(y-x**2)**2
-    f=SXFunction([vertcat([x,y]),p],[obj])
-    g=SXFunction([vertcat([x,y]),p],[x**2+y**2])
+    nlp=SXFunction(nlIn(x=vertcat([x,y]),p=p),nlOut(f=obj,g=x**2+y**2))
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -334,11 +326,11 @@ class NLPtests(casadiTestCase):
     sigma=SX("sigma")
     lambd=SX("lambd")
     h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd),
-                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputExpr(0),vertcat([x,y]))))
+                 hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(nlp.outputExpr("g"),vertcat([x,y]))))
 
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       solver.setOption("hess_lag",h)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":1,"derivative_test":"second-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
@@ -368,8 +360,7 @@ class NLPtests(casadiTestCase):
     p=SX("p")
     
     obj = (p-x)**2+100*(y-x**2)**2
-    f=SXFunction([vertcat([x,y]),p],[obj])
-    g=SXFunction([vertcat([x,y]),p],[x**2+y**2])
+    nlp=SXFunction(nlIn(x=vertcat([x,y]),p=p),nlOut(f=obj,g=x**2+y**2))
     
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
@@ -379,7 +370,7 @@ class NLPtests(casadiTestCase):
   
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":1,"derivative_test":"second-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -408,7 +399,7 @@ class NLPtests(casadiTestCase):
     y=SX("y")
     
     obj=(1-x)**2+100*(y-x**2)**2
-    f=SXFunction([vertcat([x,y])],[obj])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=obj))
     
     sigma=SX("sigma")
     
@@ -416,7 +407,7 @@ class NLPtests(casadiTestCase):
                  hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,FX())
+      solver = Solver(nlp)
       solver.setOption("hess_lag",h)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
@@ -438,13 +429,13 @@ class NLPtests(casadiTestCase):
     y=SX("y")
     
     obj=(1-x)**2+100*(y-x**2)**2
-    f=SXFunction([vertcat([x,y])],[obj])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=obj))
     
     sigma=SX("sigma")
     
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,FX())
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -465,13 +456,13 @@ class NLPtests(casadiTestCase):
     y=SX("y")
     
     obj=(1-x)**2+100*(y-x**2)**2
-    f=SXFunction([vertcat([x,y])],[obj])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=obj))
     
     sigma=SX("sigma")
     
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,FX())
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -493,7 +484,7 @@ class NLPtests(casadiTestCase):
     
     p=SX("p")
     obj=(p-x)**2+100*(y-x**2)**2
-    f=SXFunction([vertcat([x,y]),p],[obj])
+    nlp=SXFunction(nlIn(x=vertcat([x,y]),p=p),nlOut(f=obj))
     
     sigma=SX("sigma")
     
@@ -501,7 +492,7 @@ class NLPtests(casadiTestCase):
                  hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,FX())
+      solver = Solver(nlp)
       solver.setOption("hess_lag",h)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
@@ -525,13 +516,13 @@ class NLPtests(casadiTestCase):
     
     p=SX("p")
     obj=(p-x)**2+100*(y-x**2)**2
-    f=SXFunction([vertcat([x,y]),p],[obj])
+    nlp=SXFunction(nlIn(x=vertcat([x,y]),p=p),nlOut(f=obj))
     
     sigma=SX("sigma")
     
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,FX())
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -553,11 +544,10 @@ class NLPtests(casadiTestCase):
     x=msym("x",N)
     x0=linspace(0,1,N)
     X0=MX(x0)
-    f=MXFunction([x],[norm_2(x-X0)])
-    g=MXFunction([x],[2*x])
+    nlp=MXFunction(nlIn(x=x),nlOut(f=norm_2(x-X0),g=2*x))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"max_iter":103, "MaxIter": 103,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -578,14 +568,14 @@ class NLPtests(casadiTestCase):
     self.message("trivial IPOPT, no constraints")
     """ There is an assertion error thrown, but still it works"""
     x=ssym("x")
-    f=SXFunction([x],[(x-1)**2])
+    nlp=SXFunction(nlIn(x=x),nlOut(f=(x-1)**2))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,FX())
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-10,"max_iter":103, "MaxIter": 103,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
-      solver = IpoptSolver(f,FX())
+      solver = IpoptSolver(nlp)
       solver.init()
       solver.input("lbx").set([-10])
       solver.input("ubx").set([10])
@@ -596,12 +586,11 @@ class NLPtests(casadiTestCase):
   def testIPOPTmx(self):
     self.message("trivial IPOPT, using MX")
     x=MX("x")
-    f=MXFunction([x],[(x-1)**2])
-    g=MXFunction([x],[2*x])
+    nlp=MXFunction(nlIn(x=x),nlOut(f=(x-1)**2,g=2*x))
     
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-10,"max_iter":103, "MaxIter": 103,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver, "qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -617,12 +606,11 @@ class NLPtests(casadiTestCase):
   def testIPOPTc(self):
     self.message("trivial, overconstrained")
     x=SX("x")
-    f=SXFunction([x],[(x-1)**2])
-    g=SXFunction([x],[vertcat([x,x,x])])
+    nlp=SXFunction(nlIn(x=x),nlOut(f=(x-1)**2,g=vertcat([x,x,x])))
     
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-5,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver, "qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -638,12 +626,11 @@ class NLPtests(casadiTestCase):
   def testIPOPTc2(self):
     self.message("trivial2, overconstrained")
     x=SX("x")
-    f=SXFunction([x],[(x-1)**2])
-    g=SXFunction([x],[vertcat([x,x,x+x])])
+    nlp=SXFunction(nlIn(x=x),nlOut(f=(x-1)**2,g=vertcat([x,x,x+x])))
     
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-10,"max_iter":100, "hessian_approximation": "limited-memory", "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver, "qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -659,12 +646,11 @@ class NLPtests(casadiTestCase):
   def testIPOPTcmx(self):
     self.message("trivial , overconstrained, using MX")
     x=MX("x")
-    f=MXFunction([x],[(x-1)**2])
-    g=MXFunction([x],[vertcat([2*x,3*x,4*x])])
+    nlp=MXFunction(nlIn(x=x),nlOut(f=(x-1)**2,g=vertcat([2*x,3*x,4*x])))
     
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-10,"max_iter":100, "hessian_approximation": "limited-memory", "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver, "qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -681,12 +667,10 @@ class NLPtests(casadiTestCase):
     self.message("degenerate optimization IPOPT")
     x=SX("x")
     y=SX("y")
-    f=SXFunction([vertcat([x,y])],[0])
-    g=SXFunction([vertcat([x,y])],[vertcat([x-y,x])])
-    
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=0,g=vertcat([x-y,x])))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-5,"max_iter":100, "hessian_approximation": "limited-memory", "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -702,12 +686,11 @@ class NLPtests(casadiTestCase):
     self.message("degenerate optimization IPOPT, overconstrained")
     x=SX("x")
     y=SX("y")
-    f=SXFunction([vertcat([x,y])],[0])
-    g=SXFunction([vertcat([x,y])],[vertcat([x-y,x,x+y])])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=0,g=vertcat([x-y,x,x+y])))
     
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-5,"max_iter":100, "hessian_approximation": "limited-memory", "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -726,11 +709,10 @@ class NLPtests(casadiTestCase):
     x=SX("x")
     y=SX("y")
     
-    f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
-    g=SXFunction([vertcat([x,y])],[x+y])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-20,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -756,11 +738,10 @@ class NLPtests(casadiTestCase):
     x=SX("x")
     y=SX("y")
     
-    f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
-    g=SXFunction([vertcat([x,y])],[x+y])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-20,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "hessian_approximation": "exact", "UserHM": True}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -783,11 +764,10 @@ class NLPtests(casadiTestCase):
     x=SX("x")
     y=SX("y")
     
-    f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
-    g=SXFunction([vertcat([x,y])],[x+y])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-20,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "hessian_approximation": "exact", "UserHM": True }).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -810,11 +790,10 @@ class NLPtests(casadiTestCase):
     x=SX("x")
     y=SX("y")
     
-    f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
-    g=SXFunction([vertcat([x,y])],[x+y])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-20,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "hessian_approximation": "exact", "UserHM": True}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -837,11 +816,10 @@ class NLPtests(casadiTestCase):
     x=SX("x")
     y=SX("y")
     
-    f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
-    g=SXFunction([vertcat([x,y])],[x+y])
+    nlp=SXFunction(nlIn(x=vertcat([x,y])),nlOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-20,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "hessian_approximation": "exact", "UserHM": True}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -869,10 +847,10 @@ class NLPtests(casadiTestCase):
     H = diag(range(1,N+1))
     obj = 0.5*mul([(x-x0).T,H,(x-x0)])
 
-    f = SXFunction([x],[obj])
+    nlp = SXFunction(nlIn(x=x),nlOut(f=obj))
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,FX())
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"tol_pr":1e-10,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100,"maxiter":100, "MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -899,12 +877,11 @@ class NLPtests(casadiTestCase):
     UBX = DMatrix([0.5,inf])
 
     x=ssym("x",2)
-    f=SXFunction([x],[0.5*mul([x.T,H,x])+mul(G.T,x)])
-    g=SXFunction([x],[mul(A,x)])
+    nlp=SXFunction(nlIn(x=x),nlOut(f=0.5*mul([x.T,H,x])+mul(G.T,x),g=mul(A,x)))
 
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"tol_pr":1e-10,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100, "maxiter": 100,"MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -939,12 +916,11 @@ class NLPtests(casadiTestCase):
     UBX = DMatrix([0.5,inf])
 
     x=ssym("x",2)
-    f=SXFunction([x],[0.5*mul([x.T,H,x])+mul(G.T,x)])
-    g=SXFunction([x],[mul(A,x)])
+    nlp=SXFunction(nlIn(x=x),nlOut(f=0.5*mul([x.T,H,x])+mul(G.T,x),g=mul(A,x)))
 
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100, "maxiter": 100,"MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -967,7 +943,7 @@ class NLPtests(casadiTestCase):
       
       self.assertAlmostEqual(solver.output("f")[0],-7.4375,6,str(qpsolver))
       
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "maxiter": 100,"MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -1002,12 +978,11 @@ class NLPtests(casadiTestCase):
     UBX = DMatrix([inf]*2)
 
     x=ssym("x",2)
-    f=SXFunction([x],[0.5*mul([x.T,H,x])+mul(G.T,x)])
-    g=SXFunction([x],[mul(A,x)])
+    nlp=SXFunction(nlIn(x=x),nlOut(f=0.5*mul([x.T,H,x])+mul(G.T,x),g=mul(A,x)))
 
     for Solver in solvers:
       self.message(str(Solver))
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100, "maxiter": 100,"MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -1030,7 +1005,7 @@ class NLPtests(casadiTestCase):
       
       self.assertAlmostEqual(solver.output("f")[0],-10-16.0/9,6,str(qpsolver))
 
-      solver = Solver(f,g)
+      solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "maxiter": 100,"MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
