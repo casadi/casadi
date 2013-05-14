@@ -74,6 +74,15 @@ namespace CasADi{
   FXInternal::~FXInternal(){
   }
 
+  void FXInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+    OptionsFunctionalityNode::deepCopyMembers(already_copied);
+    for(vector<vector<FX> >::iterator i=derivative_fcn_.begin(); i!=derivative_fcn_.end(); ++i){
+      for(vector<FX>::iterator j=i->begin(); j!=i->end(); ++j){
+        *j = deepcopy(*j,already_copied);        
+      }
+    }
+  }
+
   void FXInternal::init(){
     verbose_ = getOption("verbose");
     regularity_check_ = getOption("regularity_check");

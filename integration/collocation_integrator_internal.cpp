@@ -48,6 +48,10 @@ namespace CasADi{
   }
 
   void CollocationIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+    IntegratorInternal::deepCopyMembers(already_copied);
+    startup_integrator_ = deepcopy(startup_integrator_,already_copied);
+    implicit_solver_ = deepcopy(implicit_solver_,already_copied);
+    explicit_fcn_ = deepcopy(explicit_fcn_,already_copied);
   }
 
   CollocationIntegratorInternal::~CollocationIntegratorInternal(){

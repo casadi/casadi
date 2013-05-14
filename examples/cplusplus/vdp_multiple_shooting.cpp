@@ -1,14 +1,40 @@
-#include <symbolic/fx/fx_tools.hpp>
-#include <symbolic/mx/mx_tools.hpp>
-#include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/matrix/matrix_tools.hpp>
-#include <symbolic/stl_vector_tools.hpp>
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
 
+#include <symbolic/casadi.hpp>
+                                   
+// Solvers
+#include <integration/collocation_integrator.hpp>
+#include <nonlinear_programming/newton_implicit_solver.hpp>
+#include <optimal_control/direct_multiple_shooting.hpp>
+
+// 3rd party interfaces
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/idas_integrator.hpp>
+#include <interfaces/sundials/kinsol_solver.hpp>
+#include <interfaces/csparse/csparse.hpp>
 
-#include <optimal_control/direct_multiple_shooting.hpp>
+bool use_collocation_integrator = false;
 
 using namespace CasADi;
 using namespace std;
@@ -43,12 +69,18 @@ int main(){
   SXFunction res(daeIn("x",states, "p",u),daeOut("ode",f));
   
   Dictionary integrator_options;
-  integrator_options["abstol"]=1e-8; //abs. tolerance
-  integrator_options["reltol"]=1e-8; //rel. tolerance
-  integrator_options["steps_per_checkpoint"]=500;
-  integrator_options["stop_at_end"]=true;
-//  integrator_options["calc_ic"]=true;
-//  integrator_options["numeric_jacobian"]=true;
+  if(use_collocation_integrator){
+    // integrator_options["implicit_solver"] = KinsolSolver::creator;    
+    integrator_options["implicit_solver"] = NewtonImplicitSolver::creator;
+    Dictionary implicit_solver_options;
+    implicit_solver_options["linear_solver"] = CSparse::creator;
+    integrator_options["implicit_solver_options"] = implicit_solver_options;
+  } else {
+    integrator_options["abstol"]=1e-8; //abs. tolerance
+    integrator_options["reltol"]=1e-8; //rel. tolerance
+    integrator_options["steps_per_checkpoint"]=500;
+    integrator_options["stop_at_end"]=true;
+  }
   
   //Numboer of shooting nodes
   int ns = 50;
@@ -65,8 +97,12 @@ int main(){
 
   // Create a multiple shooting discretization
   DirectMultipleShooting ms(res,mterm);
-  ms.setOption("integrator",CVodesIntegrator::creator);
-  //ms.setOption("integrator",IdasIntegrator::creator);
+  if(use_collocation_integrator){
+    ms.setOption("integrator",CollocationIntegrator::creator);
+  } else {
+    ms.setOption("integrator",CVodesIntegrator::creator);
+    //ms.setOption("integrator",IdasIntegrator::creator);
+  }
   ms.setOption("integrator_options",integrator_options);
   ms.setOption("number_of_grid_points",ns);
   ms.setOption("final_time",tf);

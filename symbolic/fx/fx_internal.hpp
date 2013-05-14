@@ -52,6 +52,9 @@ namespace CasADi{
     /** \brief  Destructor */
     virtual ~FXInternal() = 0;
 
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir) = 0;
   
