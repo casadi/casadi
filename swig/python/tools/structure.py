@@ -941,7 +941,7 @@ class CasadiStructEntry(StructEntry):
     self.sym = None
     if 'sym' in kwargs:
       sym = kwargs["sym"]
-      if isinstance(sym,SXMatrix) and isSymbolic(sym):
+      if isinstance(sym,SXMatrix) and isSymbolicSparse(sym):
         self.sym = sym
       elif isinstance(sym,Structured): 
         self.struct = sym.struct
