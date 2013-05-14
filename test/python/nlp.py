@@ -562,7 +562,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
       self.checkarray(array(solver.output("x")).squeeze(),x0,str(Solver),digits=8)
       self.checkarray(solver.output("lam_x"),DMatrix([0]*10),8,str(Solver),digits=8)
-      self.assertAlmostEqual(solver.output("lam_g")[1],0,8,str(Solver),digits=8)
+      self.assertAlmostEqual(solver.output("lam_g")[1],0,8,str(Solver))
       
   def testIPOPTnoc(self):
     self.message("trivial IPOPT, no constraints")
