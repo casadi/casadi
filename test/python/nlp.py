@@ -560,9 +560,9 @@ class NLPtests(casadiTestCase):
       print "residuals"
       print array(solver.output("x")).squeeze()-x0
       self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.checkarray(array(solver.output("x")).squeeze(),x0,str(Solver))
+      self.checkarray(array(solver.output("x")).squeeze(),x0,str(Solver),digits=8)
       self.checkarray(solver.output("lam_x"),DMatrix([0]*10),8,str(Solver),digits=8)
-      self.assertAlmostEqual(solver.output("lam_g")[1],0,8,str(Solver))
+      self.assertAlmostEqual(solver.output("lam_g")[1],0,8,str(Solver),digits=8)
       
   def testIPOPTnoc(self):
     self.message("trivial IPOPT, no constraints")
@@ -621,7 +621,7 @@ class NLPtests(casadiTestCase):
       solver.input("ubg").set([10, 10, 10])
       solver.solve()
       self.assertAlmostEqual(solver.output("f")[0],0,9,str(Solver) )
-      self.assertAlmostEqual(solver.output("x")[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.output("x")[0],1,5,str(Solver))
     
   def testIPOPTc2(self):
     self.message("trivial2, overconstrained")
