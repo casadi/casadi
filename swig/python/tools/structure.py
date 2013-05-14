@@ -440,7 +440,7 @@ class SetterDispatcher(Dispatcher):
       try:
         self.master[i] = payload
       except NotImplementedError:
-        raise CompatibilityException("Error in powerIndex slicing %s for canonicalIndex %s: Incompatible types in a[i]=b with a %s and b %s in " % (str(powerIndex),str(canonicalIndex),str(self.master),str(payload)))
+        raise CompatibilityException("Error in canonicalIndex slicing for %s: Incompatible types in a[i]=b with a %s and b %s." % (str(canonicalIndex),str(self.master),str(payload)))
       except Exception as e:
         raise Exception("Error in powerIndex slicing for canonicalIndex %s: %s" % (str(canonicalIndex),str(e)))
     else:
@@ -453,7 +453,7 @@ class SetterDispatcher(Dispatcher):
     try:
       self.master[inner] = payload
     except NotImplementedError:
-      raise CompatibilityException("Error in powerIndex slicing %s for canonicalIndex %s: Incompatible types in a[i]=b with a %s and b %s in " % (str(powerIndex),str(canonicalIndex),str(self.master),str(payload)))
+      raise CompatibilityException("Error in canonicalIndex slicing for %s: Incompatible types in a[i]=b with a %s and b %s." % (str(canonicalIndex),str(self.master),str(payload)))
     except Exception as e:
       raise Exception("Error in powerIndex slicing for canonicalIndex %s: %s" % (str(canonicalIndex),str(e)))
       
