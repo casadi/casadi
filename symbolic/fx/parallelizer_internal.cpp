@@ -33,12 +33,10 @@ namespace CasADi{
   
   ParallelizerInternal::ParallelizerInternal(const std::vector<FX>& funcs) : funcs_(funcs){
     addOption("parallelization", OT_STRING, "serial","","serial|openmp|mpi"); 
-    addOption("save_corrected_input", OT_BOOLEAN, false);
   }
 
   ParallelizerInternal::~ParallelizerInternal(){
   }
-
 
   void ParallelizerInternal::init(){
     // Get mode
@@ -59,8 +57,7 @@ namespace CasADi{
       mode_ = SERIAL;
     }
 #endif // WITH_OPENMP
-  
-  
+    
     // Check if a node is a copy of another
     copy_of_.resize(funcs_.size(),-1);
     map<void*,int> is_copy_of;
@@ -110,17 +107,11 @@ namespace CasADi{
 
     // Allocate memory for directional derivatives
     ParallelizerInternal::updateNumSens(false);
-  
-    // Should corrected input values be saved after evaluation?
-    save_corrected_input_ = getOption("save_corrected_input");
-  
-    // Mark the subsequent call as the "first"
-    first_call_ = true;
   }
 
   void ParallelizerInternal::evaluate(int nfdir, int nadir){
     // Let the first call (which may contain memory allocations) be serial when using OpenMP
-    if(mode_== SERIAL || (first_call_ && mode_ == OPENMP)){
+    if(mode_== SERIAL){
       for(int task=0; task<funcs_.size(); ++task){
         evaluateTask(task,nfdir,nadir);
       }
@@ -173,7 +164,6 @@ namespace CasADi{
     } else if(mode_ == MPI){
       casadi_error("ParallelizerInternal::evaluate: MPI not implemented");
     }
-    first_call_ = false;
   }
 
   void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){
@@ -224,13 +214,6 @@ namespace CasADi{
     for(int dir=0; dir<nadir; ++dir){
       for(int j=inind_[task]; j<inind_[task+1]; ++j){
         fcn.adjSens(j-inind_[task],dir).get(adjSens(j,dir));
-      }
-    }
-  
-    // Save corrected input values // TODO: REMOVE!
-    if(save_corrected_input_){
-      for(int j=inind_[task]; j<inind_[task+1]; ++j){
-        fcn.getInput(input(j),j-inind_[task]);
       }
     }
   }

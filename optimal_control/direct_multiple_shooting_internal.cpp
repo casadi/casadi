@@ -124,7 +124,6 @@ void DirectMultipleShootingInternal::init(){
 
   // Options for the parallelizer
   Dictionary paropt;
-  paropt["save_corrected_input"] = true;
   
   // Transmit parallelization mode
   if(hasSetOption("parallelization"))

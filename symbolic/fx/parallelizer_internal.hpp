@@ -106,13 +106,6 @@ class ParallelizerInternal : public FXInternal{
     
     /// Mode
     Mode mode_;
-    
-    /// Save corrected input values after evaluation
-    bool save_corrected_input_;
-    
-    /// Is this the first call to the function
-    bool first_call_;
-    
 };
 
 
