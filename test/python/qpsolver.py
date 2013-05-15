@@ -251,6 +251,10 @@ class QPSolverTests(casadiTestCase):
       solver.input("ubx").set(UBX)
       solver.input("lba").set(LBA)
       solver.input("uba").set(UBA)
+      if 'Worhp' in str(qp_options):
+        with self.assertRaises(Exception):
+          solver.solve()
+        return
 
       solver.solve()
 
