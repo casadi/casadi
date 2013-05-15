@@ -268,7 +268,7 @@ namespace CasADi{
     /// Sparsity pattern for the transpose of the Jacobian of the constraints
     if(ng_>0){
       spJacG_T_ = jacG().output(JACG_JAC).sparsity().transpose();
-      jacG_T_tmp_.resize(spJacG_T_.rowind().size());
+      jacG_tmp_.resize(ng_+1);
     }
 
     // Update status?
@@ -832,12 +832,12 @@ namespace CasADi{
 
       // Transpose the result
       const DMatrix& J = jacG.output(JACG_JAC);
-      const vector<int>& J_col = J.col();
       const vector<double>& J_data = J.data();
-      const vector<int>& JT_rowind = spJacG_T_.rowind();
-      copy(JT_rowind.begin(),JT_rowind.end(),jacG_T_tmp_.begin());
-      for(int el=0; el<J_col.size(); ++el){
-        values[jacG_T_tmp_[J_col[el]]++] = J_data[el];
+      const vector<int>& J_rowind = J.rowind();
+      const vector<int>& JT_col = spJacG_T_.col();
+      copy(J_rowind.begin(),J_rowind.end(),jacG_tmp_.begin());
+      for(vector<int>::const_iterator i=JT_col.begin(); i!=JT_col.end(); ++i){
+        *values++ = J_data[jacG_tmp_[*i]++];
       }
     
       if(monitored("eval_jac_g")){

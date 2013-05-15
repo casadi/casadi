@@ -56,7 +56,7 @@ namespace CasADi{
 
     // Sparsity pattern of the transpose of jacG
     CRSSparsity spJacG_T_;
-    std::vector<int> jacG_T_tmp_;
+    std::vector<int> jacG_tmp_;
 
     OptVar    worhp_o_;
     Workspace worhp_w_;
