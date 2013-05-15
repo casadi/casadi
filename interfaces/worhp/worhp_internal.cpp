@@ -617,6 +617,17 @@ namespace CasADi{
     const DMatrix& ubg = input(NLP_SOLVER_UBG);
     const DMatrix& lam_g0 = input(NLP_SOLVER_LAM_G0);
 
+    double inf = numeric_limits<double>::infinity();  
+
+    for (int i=0;i<nx_;++i) {
+      casadi_assert_message(lbx.at(i)!=ubx.at(i),"WorhpSolver::evaluate: Worhp cannot handle the case when LBX == UBX. You have that case at non-zero " << i << " , which has value " << ubx.at(i) << ". Reformulate your problem by using a parameter for the corresponding variable.");
+    }
+  
+    for (int i=0;i<lbg.size();++i) {
+      casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),"WorhpSolver::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite. You have that case at non-zero " << i << ". Reformulate your problem eliminating the corresponding constraint.");
+    }
+
+    // Pass inputs to WORHP data structures
     x0.getArray(worhp_o_.X,worhp_o_.n);
     lbx.getArray(worhp_o_.XL,worhp_o_.n);
     ubx.getArray(worhp_o_.XU,worhp_o_.n);
@@ -626,15 +637,12 @@ namespace CasADi{
       lbg.getArray(worhp_o_.GL,worhp_o_.m);
       ubg.getArray(worhp_o_.GU,worhp_o_.m);
     }
-  
-    for (int i=0;i<nx_;++i) {
-      casadi_assert_message(lbx.at(i)!=ubx.at(i),"WorhpSolver::evaluate: Worhp cannot handle the case when LBX == UBX. You have that case at non-zero " << i << " , which has value " << ubx.at(i) << ". Reformulate your problem by using a parameter for the corresponding variable.");
-    }
-  
-    double inf = numeric_limits<double>::infinity();  
-    for (int i=0;i<lbg.size();++i) {
-      casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),"WorhpSolver::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite. You have that case at non-zero " << i << ". Reformulate your problem eliminating the corresponding constraint.");
-    }
+
+    // Replace infinite bounds with worhp_p_.Infty
+    for(int i=0; i<nx_; ++i) if(worhp_o_.XL[i]==-inf) worhp_o_.XL[i] = -worhp_p_.Infty;
+    for(int i=0; i<nx_; ++i) if(worhp_o_.XU[i]== inf) worhp_o_.XU[i] =  worhp_p_.Infty;
+    for(int i=0; i<ng_; ++i) if(worhp_o_.GL[i]==-inf) worhp_o_.GL[i] = -worhp_p_.Infty;
+    for(int i=0; i<ng_; ++i) if(worhp_o_.GU[i]== inf) worhp_o_.GU[i] =  worhp_p_.Infty;
   
     log("WorhpInternal::starting iteration");
 
