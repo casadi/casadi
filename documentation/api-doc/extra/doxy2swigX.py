@@ -44,6 +44,38 @@ def astext(node,whitespace=False,escape=True):
 
 class Doxy2SWIG_X(Doxy2SWIG):
 
+  def __init__(self, *args, **kwargs):
+    Doxy2SWIG.__init__(self,*args, **kwargs)
+    self.docstringmap = {}
+    self.active_docstring = None
+    self.add_text_counter = 0
+
+
+  def generic_parse(self, node, pad=0):
+        """A Generic parser for arbitrary tags in a node.
+
+        Parameters:
+
+         - node:  A node in the DOM.
+         - pad: `int` (default: 0)
+
+           If 0 the node data is not padded with newlines.  If 1 it
+           appends a newline after parsing the childNodes.  If 2 it
+           pads before and after the nodes are processed.  Defaults to
+           0.
+
+        """
+        npiece = 0
+        if pad:
+            npiece = self.add_text_counter
+            if pad == 2:
+                self.add_text('\n')                
+        for n in node.childNodes:
+            self.parse(n)
+        if pad:
+            if self.add_text_counter > npiece:
+                self.add_text('\n')
+                
   def clean_pieces(self, pieces):
       """Cleans the list of strings given as `pieces`.  It replaces
       multiple newlines by a maximum of 2 and returns a new list.
@@ -136,7 +168,121 @@ class Doxy2SWIG_X(Doxy2SWIG):
     #  self.add_text(col[:-1]+"\n")
     #self.generic_parse(node, pad=1)
 
+  def do_compoundname(self, node):
+      self.add_text('\n\n')
+      data = node.firstChild.data
+      self.start_docstring(data)
 
+  def do_compounddef(self, node):
+      kind = node.attributes['kind'].value
+      if kind in ('class', 'struct'):
+          prot = node.attributes['prot'].value
+          if prot <> 'public':
+              return
+          names = ('compoundname', 'briefdescription',
+                   'detaileddescription', 'includes')
+          first = self.get_specific_nodes(node, names)
+          for n in names:
+              if first.has_key(n):
+                  self.parse(first[n])
+          self.end_docstring()
+          for n in node.childNodes:
+              if n not in first.values():
+                  self.parse(n)
+      elif kind in ('file', 'namespace'):
+          nodes = node.getElementsByTagName('sectiondef')
+          for n in nodes:
+              self.parse(n)
+      
+  def do_memberdef(self, node):
+      prot = node.attributes['prot'].value
+      id = node.attributes['id'].value
+      kind = node.attributes['kind'].value
+      tmp = node.parentNode.parentNode.parentNode
+      compdef = tmp.getElementsByTagName('compounddef')[0]
+      cdef_kind = compdef.attributes['kind'].value
+      
+      if prot == 'public':
+          first = self.get_specific_nodes(node, ('definition', 'name','argsstring'))
+          name = first['name'].firstChild.data
+          if name[:8] == 'operator': # Don't handle operators yet.
+              return
+
+          if not first.has_key('definition') or \
+                 kind in ['variable', 'typedef']:
+              return
+
+          defn = first['definition'].firstChild.data + first['argsstring'].firstChild.data
+
+          target = ""
+          anc = node.parentNode.parentNode
+          if cdef_kind in ('file', 'namespace'):
+              ns_node = anc.getElementsByTagName('innernamespace')
+              if not ns_node and cdef_kind == 'namespace':
+                  ns_node = anc.getElementsByTagName('compoundname')
+              if ns_node:
+                  ns = ns_node[0].firstChild.data
+                  target = '%s::%s'%(ns, name)
+              else:
+                  target = '%s '%(name)
+          elif cdef_kind in ('class', 'struct'):
+              # Get the full function name.
+              anc_node = anc.getElementsByTagName('compoundname')
+              cname = anc_node[0].firstChild.data
+              target = '%s::%s'%(cname, name)
+
+          self.start_docstring(target,defn)
+          for n in node.childNodes:
+              if n not in first.values():
+                  self.parse(n)
+          self.end_docstring()
+
+  def start_docstring(self,target,origin="huma kavula"):
+    self.active_docstring = (target,origin)
+    if target in self.docstringmap:
+      self.docstringmap[target].append((origin,[]))
+    else:
+      self.docstringmap[target]= [(origin,[])]
+    
+  def end_docstring(self):
+    self.active_docstring = None
+  
+  def add_text(self,value):
+    self.add_text_counter += 1
+    if self.active_docstring is None:
+      self.add_text_original(value)
+    else:
+      #print self.active_docstring, self.docstringmap[self.active_docstring[0]], value
+      if type(value) in (types.ListType, types.TupleType):
+          self.docstringmap[self.active_docstring[0]][-1][1].extend(value)
+      else:
+          self.docstringmap[self.active_docstring[0]][-1][1].append(value)
+    
+  def add_text_original(self, value):
+      Doxy2SWIG.add_text(self,value)
+      
+  def generate(self):
+      Doxy2SWIG.generate(self)
+      for k, v in self.docstringmap.iteritems():
+        # Group together
+        grouped_list = []
+        grouped_dict = {}
+        for (origin,pieces) in v:
+          total = u"".join(pieces)
+          if total in grouped_dict:
+             grouped_dict[total][0].append(origin)
+          else:
+             grouped_dict[total] = ([origin],pieces)
+             grouped_list.append(grouped_dict[total])
+        if len(grouped_list)==1:
+          self.add_text_original(["%feature(\"docstring\") ", k, " \"\n"]+grouped_list[0][1]+["\";\n","\n"])
+        else:
+          self.add_text_original(["%feature(\"docstring\") ",k , " \"\n"])
+          for (origin,pieces) in grouped_list:
+            if len(u"".join(pieces).rstrip())>0:
+              self.add_text_original(["\n"]+["\n>  " + o + '\n'  for o in origin] + ["-"*(80-4) + "\n"] + pieces + ["\n"])
+          self.add_text_original(["\";\n","\n"])
+      
 def convert(input, output, include_function_definition=True, quiet=False):
     p = Doxy2SWIG_X(input, include_function_definition, quiet)
     p.generate()
