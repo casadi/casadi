@@ -269,10 +269,6 @@ namespace CasADi{
     spJacG_T_ = jacG().output(JACG_JAC).sparsity().transpose();
     jacG_T_tmp_.resize(spJacG_T_.rowind().size());
 
-    // What variables/constraints are equality constrained?
-    is_equality_x_.resize(nx_,false);
-    is_equality_g_.resize(ng_,false);
-  
     // Update status?
     status_[TerminateSuccess]="TerminateSuccess";
     status_[OptimalSolution]="OptimalSolution";
@@ -313,9 +309,107 @@ namespace CasADi{
     worhp_p_.initialised = false;
     worhp_c_.initialised = false;  
   
-    // Prepare the solver
-    reinit_needed_ = true;
-    prepare();
+    // Number of (free) variables
+    worhp_o_.n = nx_;
+
+    // Number of constraints
+    worhp_o_.m = ng_;
+
+    bool p_init_backup = worhp_p_.initialised;
+    worhp_p_.initialised = false;
+    if (worhp_o_.initialised || worhp_w_.initialised || worhp_c_.initialised){
+      WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
+    }
+    worhp_p_.initialised = p_init_backup;
+  
+    /// Control data structure needs to be reset every time
+    worhp_c_.initialised = false;
+    worhp_w_.initialised = false;
+    worhp_o_.initialised = false;
+    
+    // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.  
+    worhp_w_.DF.nnz = nx_;
+    if (worhp_o_.m>0) {
+      worhp_w_.DG.nnz = jacG_.output().size();  // Jacobian of G
+    } else {
+      worhp_w_.DG.nnz = 0;
+    }
+
+    if (true /*worhp_w_.HM.NeedStructure*/) { // not initialized
+
+      // Get the sparsity pattern of the Hessian
+      const CRSSparsity& spHessLag = this->spHessLag();
+      const vector<int>& rowind = spHessLag.rowind();
+      const vector<int>& col = spHessLag.col();
+
+      // Get number of nonzeros in the lower triangular part of the Hessian including full diagonal
+      worhp_w_.HM.nnz = nx_; // diagonal entries
+      for(int r=0; r<nx_; ++r){
+        for(int el=rowind[r]; el<rowind[r+1] && col[el]<r; ++el){
+          worhp_w_.HM.nnz++; // strictly lower triangular part
+        }
+      }
+      
+      if(verbose()){
+        cout << "Allocating space for " << worhp_w_.HM.nnz << " hessian entries" << std::endl;
+      }
+    } else {
+      worhp_w_.HM.nnz = 0;
+    }
+  
+    /* Data structure initialisation. */
+    WorhpInit(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
+    if (worhp_c_.status != FirstCall) {
+      casadi_error("Main: Initialisation failed. Status: " << formatStatus(worhp_c_.status));
+    }
+
+    if (worhp_w_.DF.NeedStructure){
+      for(int i=0; i<nx_; ++i){
+        worhp_w_.DF.row[i] = i + 1; // Index-1 based    
+      }
+    }
+  
+    if (worhp_o_.m>0 && worhp_w_.DG.NeedStructure) {    
+      // Get sparsity pattern of the transpose since WORHP is column major
+      int nz=0;
+      const vector<int>& rowind = spJacG_T_.rowind();
+      const vector<int>& col = spJacG_T_.col();
+      for(int r=0; r<nx_; ++r){
+        for(int el=rowind[r]; el<rowind[r+1]; ++el){
+          int c = col[el];
+          worhp_w_.DG.col[nz] = r + 1; // Index-1 based
+          worhp_w_.DG.row[nz] = c + 1;
+          nz++;
+        }
+      }
+    }    
+
+    if (worhp_w_.HM.NeedStructure) {
+      // Get the sparsity pattern of the Hessian
+      const CRSSparsity& spHessLag = this->spHessLag();
+      const vector<int>& rowind = spHessLag.rowind();
+      const vector<int>& col = spHessLag.col();
+
+      int nz=0;
+      
+      // Upper triangular part of the Hessian (note CCS -> CRS format change)
+      for(int r=0; r<nx_; ++r){
+        for(int el=rowind[r]; el<rowind[r+1]; ++el){
+          if(col[el]>r){
+            worhp_w_.HM.row[nz] = col[el] + 1;
+            worhp_w_.HM.col[nz] = r + 1;
+            nz++;
+          }
+        }
+      }
+      
+      // Diagonal always included
+      for(int r=0; r<nx_; ++r){
+        worhp_w_.HM.row[nz] = r + 1;
+        worhp_w_.HM.col[nz] = r + 1;
+        nz++;
+      }
+    }
   }
 
   void WorhpInternal::setQPOptions() {
@@ -491,133 +585,6 @@ namespace CasADi{
     if (hasSetOption("qp_strict")) worhp_p_.qp.strict = getOption("qp_strict");  
   }
 
-  void WorhpInternal::prepare() {
-    // Number of (free) variables
-    worhp_o_.n = 0;
-
-    // Number of constraints
-    worhp_o_.m = 0;
-
-    // Check what variables are equality constrained
-    vector<double>::const_iterator lbx = input(NLP_SOLVER_LBX).begin();
-    vector<double>::const_iterator ubx = input(NLP_SOLVER_UBX).begin();
-    for(vector<bool>::iterator i=is_equality_x_.begin(); i!=is_equality_x_.end(); ++i){
-      bool i_is_eq = *lbx++ == *ubx++;
-      reinit_needed_ = reinit_needed_ || *i != i_is_eq;
-      *i = i_is_eq;
-      /*if(!i_is_eq)*/ worhp_o_.n++;
-    }
-
-    // Check what constraints are equality constrained
-    vector<double>::const_iterator lbg = input(NLP_SOLVER_LBG).begin();
-    vector<double>::const_iterator ubg = input(NLP_SOLVER_UBG).begin();
-    for(vector<bool>::iterator i=is_equality_g_.begin(); i!=is_equality_g_.end(); ++i){
-      bool i_is_eq = *lbg++ == *ubg++;
-      reinit_needed_ = reinit_needed_ || *i != i_is_eq;
-      *i = i_is_eq;
-      /*if(!i_is_eq)*/ worhp_o_.m++;
-    }
-
-    // Quick return?
-    //if(!reinit_needed_) return;
-
-    bool p_init_backup = worhp_p_.initialised;
-    worhp_p_.initialised = false;
-    if (worhp_o_.initialised || worhp_w_.initialised || worhp_c_.initialised){
-      WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
-    }
-    worhp_p_.initialised = p_init_backup;
-  
-    /// Control data structure needs to be reset every time
-    worhp_c_.initialised = false;
-    worhp_w_.initialised = false;
-    worhp_o_.initialised = false;
-    
-    // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.  
-    worhp_w_.DF.nnz = nx_;
-    if (worhp_o_.m>0) {
-      worhp_w_.DG.nnz = jacG_.output().size();  // Jacobian of G
-    } else {
-      worhp_w_.DG.nnz = 0;
-    }
-
-    if (true /*worhp_w_.HM.NeedStructure*/) { // not initialized
-
-      // Get the sparsity pattern of the Hessian
-      const CRSSparsity& spHessLag = this->spHessLag();
-      const vector<int>& rowind = spHessLag.rowind();
-      const vector<int>& col = spHessLag.col();
-
-      // Get number of nonzeros in the lower triangular part of the Hessian including full diagonal
-      worhp_w_.HM.nnz = nx_; // diagonal entries
-      for(int r=0; r<nx_; ++r){
-        for(int el=rowind[r]; el<rowind[r+1] && col[el]<r; ++el){
-          worhp_w_.HM.nnz++; // strictly lower triangular part
-        }
-      }
-      
-      if(verbose()){
-        cout << "Allocating space for " << worhp_w_.HM.nnz << " hessian entries" << std::endl;
-      }
-    } else {
-      worhp_w_.HM.nnz = 0;
-    }
-  
-    /* Data structure initialisation. */
-    WorhpInit(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
-    if (worhp_c_.status != FirstCall) {
-      casadi_error("Main: Initialisation failed. Status: " << formatStatus(worhp_c_.status));
-    }
-
-    if (worhp_w_.DF.NeedStructure){
-      for(int i=0; i<nx_; ++i){
-        worhp_w_.DF.row[i] = i + 1; // Index-1 based    
-      }
-    }
-  
-    if (worhp_o_.m>0 && worhp_w_.DG.NeedStructure) {    
-      // Get sparsity pattern of the transpose since WORHP is column major
-      int nz=0;
-      const vector<int>& rowind = spJacG_T_.rowind();
-      const vector<int>& col = spJacG_T_.col();
-      for(int r=0; r<nx_; ++r){
-        for(int el=rowind[r]; el<rowind[r+1]; ++el){
-          int c = col[el];
-          worhp_w_.DG.col[nz] = r + 1; // Index-1 based
-          worhp_w_.DG.row[nz] = c + 1;
-          nz++;
-        }
-      }
-    }    
-
-    if (worhp_w_.HM.NeedStructure) {
-      // Get the sparsity pattern of the Hessian
-      const CRSSparsity& spHessLag = this->spHessLag();
-      const vector<int>& rowind = spHessLag.rowind();
-      const vector<int>& col = spHessLag.col();
-
-      int nz=0;
-      
-      // Upper triangular part of the Hessian (note CCS -> CRS format change)
-      for(int r=0; r<nx_; ++r){
-        for(int el=rowind[r]; el<rowind[r+1]; ++el){
-          if(col[el]>r){
-            worhp_w_.HM.row[nz] = col[el] + 1;
-            worhp_w_.HM.col[nz] = r + 1;
-            nz++;
-          }
-        }
-      }
-      
-      // Diagonal always included
-      for(int r=0; r<nx_; ++r){
-        worhp_w_.HM.row[nz] = r + 1;
-        worhp_w_.HM.col[nz] = r + 1;
-        nz++;
-      }
-    }
-  }
-
   std::string WorhpInternal::formatStatus(int status) const {
     if (status_.find(status)==status_.end()) {
       std::stringstream ss;
@@ -633,7 +600,6 @@ namespace CasADi{
     casadi_assert(nfdir==0 && nadir==0);
     
     // Prepare the solver
-    prepare();
     checkInitialBounds();
   
     // Reset the counters
@@ -659,13 +625,13 @@ namespace CasADi{
       ubg.getArray(worhp_o_.GU,worhp_o_.m);
     }
   
-    //for (int i=0;i<lbx.size();++i) {
-    //  casadi_assert_message(lbx.at(i)!=ubx.at(i),"WorhpSolver::evaluate: Worhp cannot handle the case when LBX == UBX. You have that case at non-zero " << i << " , which has value " << ubx.at(i) << ".");
-    //}
+    for (int i=0;i<nx_;++i) {
+      casadi_assert_message(lbx.at(i)!=ubx.at(i),"WorhpSolver::evaluate: Worhp cannot handle the case when LBX == UBX. You have that case at non-zero " << i << " , which has value " << ubx.at(i) << ". Reformulate your problem by using a parameter for the corresponding variable.");
+    }
   
     double inf = numeric_limits<double>::infinity();  
     for (int i=0;i<lbg.size();++i) {
-      casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),"WorhpSolver::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite. You have that case at non-zero " << i << ".");
+      casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),"WorhpSolver::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite. You have that case at non-zero " << i << ". Reformulate your problem eliminating the corresponding constraint.");
     }
   
     log("WorhpInternal::starting iteration");

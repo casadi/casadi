@@ -85,16 +85,7 @@ namespace CasADi{
   
     std::string formatStatus(int status) const;
   
-    // What constraints are equality constraints
-    std::vector<bool> is_equality_x_, is_equality_g_;
-
-    // Is a re-initialization needed?
-    bool reinit_needed_;
-  
-    /// Prepare the solver once bounds are known
-    void prepare();
-
-    /// Pass the supplied options to  Wprhp
+    /// Pass the supplied options to Worhp
     void passOptions();
   
   };
