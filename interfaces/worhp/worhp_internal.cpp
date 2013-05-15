@@ -225,16 +225,11 @@ namespace CasADi{
     worhp_p_.initialised = false;
     worhp_c_.initialised = false;
   
-    // The default value for ScaleConIter (False) makes IPOPT fail for decision variable bounds where lbx==ubx
-    setOption("ScaleConIter",true);
-  
-    // qpsolver unittests fail for ScaledObj == True
+    // WORKAROUND: Bug in scaling, set to false by default // FIXME
     setOption("ScaledObj",false);
-  
-    //setOption("ScaledKKT",false);
-    //setOption("ScaledFD",false);
-    //setOption("ScaledQP",false);
-  
+
+    // WORKAROUND: Why is this needed? // FIXME
+    setOption("ScaleConIter",true);
   }
 
   WorhpInternal::~WorhpInternal(){
@@ -305,12 +300,7 @@ namespace CasADi{
     status_[FunctionErrorDF]="FunctionErrorDF";
     status_[FunctionErrorDG]="FunctionErrorDG";
     status_[FunctionErrorHM]="FunctionErrorHM";
-  
-    worhp_o_.initialised = false;
-    worhp_w_.initialised = false;
-    worhp_p_.initialised = false;
-    worhp_c_.initialised = false;  
-  
+    
     // Number of (free) variables
     worhp_o_.n = nx_;
 
@@ -337,7 +327,7 @@ namespace CasADi{
       worhp_w_.DG.nnz = 0;
     }
 
-    if (true /*worhp_w_.HM.NeedStructure*/) { // not initialized
+    if (exact_hessian_ /*worhp_w_.HM.NeedStructure*/) { // not initialized
 
       // Get the sparsity pattern of the Hessian
       const CRSSparsity& spHessLag = this->spHessLag();
@@ -358,7 +348,7 @@ namespace CasADi{
     } else {
       worhp_w_.HM.nnz = 0;
     }
-  
+
     /* Data structure initialisation. */
     WorhpInit(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
     if (worhp_c_.status != FirstCall) {
@@ -585,6 +575,9 @@ namespace CasADi{
     if (hasSetOption("qp_printLevel")) worhp_p_.qp.printLevel = getOptionEnumValue("qp_printLevel");
     if (hasSetOption("qp_scaleIntern")) worhp_p_.qp.scaleIntern = getOption("qp_scaleIntern");
     if (hasSetOption("qp_strict")) worhp_p_.qp.strict = getOption("qp_strict");  
+
+    // Mark the parameters as set
+    worhp_p_.initialised = true;
   }
 
   std::string WorhpInternal::formatStatus(int status) const {
