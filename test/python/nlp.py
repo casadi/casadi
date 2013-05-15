@@ -930,6 +930,10 @@ class NLPtests(casadiTestCase):
       solver.input("ubx").set(UBX)
       solver.input("lbg").set(LBA)
       solver.input("ubg").set(UBA)
+      if 'Worhp' in str(Solver):
+        with self.assertRaises(Exception):
+          solver.solve()
+        return
 
       solver.solve()
 
