@@ -266,8 +266,10 @@ namespace CasADi{
     }
 
     /// Sparsity pattern for the transpose of the Jacobian of the constraints
-    spJacG_T_ = jacG().output(JACG_JAC).sparsity().transpose();
-    jacG_T_tmp_.resize(spJacG_T_.rowind().size());
+    if(ng_>0){
+      spJacG_T_ = jacG().output(JACG_JAC).sparsity().transpose();
+      jacG_T_tmp_.resize(spJacG_T_.rowind().size());
+    }
 
     // Update status?
     status_[TerminateSuccess]="TerminateSuccess";
