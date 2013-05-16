@@ -890,7 +890,7 @@ class CasadiStructEntry(StructEntry):
       self.repeat = kwargs["repeat"] if isinstance(kwargs["repeat"],list) else [kwargs["repeat"]]
     
     if not all(map(lambda x: isinstance(x,int),self.repeat)):
-      raise Exception("The 'repeat' argument, if present, must be a list of integers, but got " % str(self.repeat))
+      raise Exception("The 'repeat' argument, if present, must be a list of integers, but got %s" % str(self.repeat))
 
       
     self.struct = None
