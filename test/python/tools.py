@@ -867,6 +867,13 @@ class Toolstests(casadiTestCase):
     print sin(a)
     print a+1
     
+  def test_sparse(self):
+    a = struct_ssym([entry("a",shape=sp_diag(5))])
+    b = struct_msym([(entry("b",struct=a))])
+
+    self.checkarray(b["b"].shape,(5,1))
+    self.checkarray(b["b","a"].shape,(5,5))
+    
 if __name__ == '__main__':
     unittest.main()
 

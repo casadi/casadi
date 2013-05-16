@@ -589,7 +589,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
           hmap[a] = [m]
     self.size = k
     for k,v in hmap.iteritems():
-      hmap[k] = veccat(v)
+      hmap[k] = vecNZcat(v)
     
     self.map.update(hmap)
     
@@ -707,7 +707,7 @@ class ssymStruct(CasadiStructured,MasterGettable):
       e = self.struct.getStructEntryByCanonicalIndex(i)
       s.append(ssym("_".join(map(str,i)),e.sparsity.size()))
         
-    self.master = veccat(s)
+    self.master = vecNZcat(s)
 
     for e in self.entries:
       if e.sym is not None:
@@ -831,10 +831,10 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
     if any(e is None for e in self.storage):
       missing = filter(lambda k: self.storage[self.mapping[k]] is None,self.mapping.keys())
       
-      raise Exception("Problem in MX veccat structure cat: missing expressions. The following entries are missing: %s" % str(missing))
+      raise Exception("Problem in MX vecNZcat structure cat: missing expressions. The following entries are missing: %s" % str(missing))
       
     if self.dirty:
-      self.master_cached = veccat(self.storage)
+      self.master_cached = vecNZcat(self.storage)
 
     return self.master_cached
     
