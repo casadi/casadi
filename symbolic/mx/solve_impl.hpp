@@ -45,7 +45,7 @@ namespace CasADi{
     if(part==0){
       stream << "(";
     } else if(part==1){
-      stream << "\\";
+      stream << "/";
     } else {
       if(Tr) stream << "'";
       stream << ")";
@@ -93,27 +93,59 @@ namespace CasADi{
 
   template<bool Tr>
   void Solve<Tr>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+    const MX& r = *input[0];
+    const MX& A = *input[1];
+    MX& x = *output[0];
     if(!output_given){
-      casadi_error("not implemented");
+      x = A->getSolve(r,Tr);
     }
 
-    // Forward sensitivities
+    // Forward sensitivities, collect the right hand sides
     int nfwd = fwdSens.size();
+    vector<MX> rhs;
+    vector<int> row_offset(1,0);
     for(int d=0; d<nfwd; ++d){
-      casadi_error("not implemented");
+      const MX& r_dot = *fwdSeed[d][0];
+      const MX& A_dot = *fwdSeed[d][1];
+      rhs.push_back(r_dot - mul(x,Tr ? trans(A_dot) : A_dot));
+      row_offset.push_back(row_offset.back()+r_dot.size1());
+    }
+
+    // Solve for all directions at once
+    MX lhs = A->getSolve(vertcat(rhs),Tr);
+    
+    // Slit up the sensitivities
+    for(int d=0; d<nfwd; ++d){
+      MX& x_dot = *fwdSens[d][0];
+      x_dot = lhs(Slice(row_offset[d],row_offset[d+1]),Slice());
+      x_dot = MX();
     }
   
-    // Adjoint sensitivities
+    // Adjoint sensitivities, collect right hand sides
     int nadj = adjSeed.size();
+    rhs.resize(0);
+    row_offset.resize(1);
     for(int d=0; d<nadj; ++d){
-      casadi_error("not implemented");      
+      const MX& x_dot = *adjSeed[d][0];      
+      rhs.push_back(x_dot);
+      row_offset.push_back(row_offset.back()+x_dot.size1());
+    }
+
+    // Solve for all directions at once
+    lhs = A->getSolve(vertcat(rhs),!Tr);
+    
+    // Split up the sensitivities
+    for(int d=0; d<nadj; ++d){
+      MX r_bar = lhs(Slice(row_offset[d],row_offset[d+1]),Slice());      
+      *adjSens[d][0] += r_bar;
+      *adjSens[d][1] -= mul(trans(x),r_bar);
     }
   }
   
-  template<bool Tr>
-  void Solve<Tr>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-    casadi_error("not implemented");
-  }
+  //  template<bool Tr>
+  //  void Solve<Tr>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  //    casadi_error("not implemented");
+  //  }
 
   template<bool Tr>
   void Solve<Tr>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{

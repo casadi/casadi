@@ -26,8 +26,16 @@
 #include "mx_node.hpp"
 
 namespace CasADi{
-  /** \brief An MX atomic for linear solver solution: x = r\A => x = r\A'
-      \author Joel Andersson 
+  /** \brief An MX atomic for linear solver solution: x = r * A^-1 or x = r * A^-T
+      
+      Forward derivatives:
+      x_dot = (r_dot - x * A_dot) * A^-1
+
+      Adjoint derivatives:
+      r_bar = x_bar * A^-T
+      A_bar = -x^T * r_bar
+
+      \author Joel Andersson
       \date 2013
   */
   template<bool Tr>
@@ -62,8 +70,8 @@ namespace CasADi{
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
-    /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
+    //    /** \brief  Propagate sparsity */
+    //    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
     
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_SOLVE;}
