@@ -220,7 +220,7 @@ namespace CasADi{
 
   MX vecNZ(const MX& x) {
     if(x.dense()){
-      return flatten(trans(x));
+      return vec(x);
     } else {
       return trans(x)->getGetNonzeros(sp_dense(x.size()),range(x.size()));
     }
