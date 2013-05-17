@@ -183,7 +183,6 @@ namespace CasADi{
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const{
-      casadi_assert(sparsity().scalar());
       return v_.value;
     }
 
@@ -251,7 +250,7 @@ namespace CasADi{
     }
 
     // Constant folding
-    if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0 && y->numel()==1){ // NOTE: ugly, should use a function instead of a cast
+    if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0){ // NOTE: ugly, should use a function instead of a cast
       double y_value = y->getValue();
       double ret;
       casadi_math<double>::fun(op,v_.value,y_value,ret);
