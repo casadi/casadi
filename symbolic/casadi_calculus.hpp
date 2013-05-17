@@ -74,6 +74,9 @@ namespace CasADi{
     // Solve linear system of equations
     OP_SOLVE,
   
+    // Solve nonlinear system of equations
+    OP_NONLINEAR_SOLVE,
+  
     // Matrix transpose
     OP_TRANSPOSE,
 

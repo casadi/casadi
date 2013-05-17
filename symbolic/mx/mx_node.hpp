@@ -294,8 +294,11 @@ namespace CasADi{
     /// Matrix multiplcation
     virtual MX getMultiplication(const MX& y) const;
 
-    /// Solve for square linear system
+    /// Solve a system of linear equations
     virtual MX getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const;
+
+    /// Solve a system of nonlinear equations
+    static MX getNonLinearSolve(const std::vector<MX>& x, const ImplicitFunction& implicit_function);
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;

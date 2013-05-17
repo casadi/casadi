@@ -35,6 +35,7 @@
 #include "setnonzeros.hpp"
 #include "set_sparse.hpp"
 #include "solve.hpp"
+#include "nonlinear_solve.hpp"
 #include "unary_mx.hpp"
 #include "binary_mx.hpp"
 #include "determinant.hpp"
@@ -378,6 +379,10 @@ namespace CasADi{
     } else {
       return MX::create(new Solve<false>(r,shared_from_this<MX>(),linear_solver));
     }
+  }
+
+  MX MXNode::getNonLinearSolve(const std::vector<MX>& x, const ImplicitFunction& implicit_function){
+    return MX::create(new NonlinearSolve(x,implicit_function));
   }
 
   MX MXNode::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{

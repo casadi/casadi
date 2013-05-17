@@ -368,8 +368,13 @@ namespace CasADi{
 
     // Request more derivative from the embedded functions
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-      if(it->op==OP_CALL){
+      switch(it->op){
+      case OP_CALL:
+      case OP_NONLINEAR_SOLVE:
         it->data->getFunction().requestNumSens(nfdir_,nadir_);
+        break;
+      default:
+        break;
       }
     }
   }
@@ -590,6 +595,7 @@ namespace CasADi{
       switch(it->op){
       case OP_CALL:
       case OP_SOLVE:
+      case OP_NONLINEAR_SOLVE:
         it->data.makeUnique(already_copied,false);
         it->data->getFunction() = deepcopy(it->data->getFunction(),already_copied);
         break;
@@ -1153,6 +1159,7 @@ namespace CasADi{
       switch(it->op){
       case OP_CALL:
       case OP_SOLVE:
+      case OP_NONLINEAR_SOLVE:
         gen.addDependency(it->data->getFunction());
         break;
       default:
