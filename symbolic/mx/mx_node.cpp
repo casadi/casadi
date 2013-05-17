@@ -382,7 +382,7 @@ namespace CasADi{
     }
   }
 
-  MX MXNode::getNonLinearSolve(const std::vector<MX>& x, const ImplicitFunction& implicit_function){
+  MX MXNode::getNonlinearSolve(const std::vector<MX>& x, const ImplicitFunction& implicit_function){
     return MX::create(new NonlinearSolve(x,implicit_function));
   }
 

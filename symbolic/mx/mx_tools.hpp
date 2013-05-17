@@ -27,6 +27,7 @@
 
 #include "../matrix/generic_matrix_tools.hpp"
 #include "../matrix/generic_expression_tools.hpp"
+#include "../fx/linear_solver.hpp"
 
 namespace CasADi{
 
@@ -313,7 +314,11 @@ namespace CasADi{
    * The solve routine works similar to Matlab's backslash when A is square and nonsingular.
    * This algorithm is under development.
    */
-  MX solve(const MX& A, const MX& b);
+  MX solve(const MX& A, const MX& b, const LinearSolver& linear_solver=LinearSolver());
+
+  /** \brief  Solve a nonlinear system of equations: f(z,x0,x1,...) = 0 <=> z = ff(x0,x1,...) 
+   */
+  MX nl_solve(const std::vector<MX>& x, const ImplicitFunction& implicit_function);
 
   //@{
   /** \brief Calculate jacobian via source code transformation

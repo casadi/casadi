@@ -716,8 +716,12 @@ namespace CasADi{
     }
   }
 
-  MX solve(const MX& A, const MX& r){
-    return trans(A->getSolve(trans(r),true,LinearSolver()));
+  MX solve(const MX& A, const MX& r, const LinearSolver& linear_solver){
+    return trans(A->getSolve(trans(r),true,linear_solver));
+  }
+
+  MX nl_solve(const std::vector<MX>& x, const ImplicitFunction& implicit_function){
+    return MXNode::getNonlinearSolve(x,implicit_function);
   }
 
   MX jacobian(const MX& ex, const MX &arg) {

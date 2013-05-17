@@ -51,7 +51,21 @@ namespace CasADi{
   }
 
   void NonlinearSolve::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-    casadi_error("not implemented");
+    if(!output_given){
+      *output[0] = getNonlinearSolve(getVector(input),implicit_function_);
+    }
+
+    // Forward sensitivities
+    int nfwd = fwdSens.size();
+    for(int d=0; d<nfwd; ++d){
+      casadi_error("not implemented");
+    }
+
+    // Adjoint sensitivities
+    int nadj = adjSeed.size();
+    for(int d=0; d<nadj; ++d){
+      casadi_error("not implemented");
+    }
   }
   
   //  void NonlinearSolve::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
