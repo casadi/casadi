@@ -1962,5 +1962,8 @@ class MXtests(casadiTestCase):
     self.assertTrue(hash(vec(x))==hash(x))
     self.assertTrue(hash(vecNZ(x))==hash(x))
     
+  def test_constmxmul(self):
+    0.1*MX.ones(2)
+    
 if __name__ == '__main__':
     unittest.main()

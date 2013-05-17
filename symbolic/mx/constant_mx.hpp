@@ -251,7 +251,7 @@ namespace CasADi{
     }
 
     // Constant folding
-    if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0){ // NOTE: ugly, should use a function instead of a cast
+    if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0 && y->numel()==1){ // NOTE: ugly, should use a function instead of a cast
       double y_value = y->getValue();
       double ret;
       casadi_math<double>::fun(op,v_.value,y_value,ret);
