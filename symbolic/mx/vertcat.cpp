@@ -32,16 +32,14 @@ using namespace std;
 
 namespace CasADi{
 
-  Vertcat::Vertcat(const vector<MX>& x, CRSSparsity sp){
+  Vertcat::Vertcat(const vector<MX>& x){
     setDependencies(x);
-
-    if(sp.isNull()){
-      // Construct the sparsity
-      casadi_assert(!x.empty());
-      sp = x.front().sparsity();
-      for(vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
-        sp.append(i->sparsity());
-      }
+    
+    // Construct the sparsity
+    casadi_assert(!x.empty());
+    CRSSparsity sp = x.front().sparsity();
+    for(vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
+      sp.append(i->sparsity());
     }
 
     setSparsity(sp);

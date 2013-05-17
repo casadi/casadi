@@ -285,6 +285,9 @@ namespace CasADi{
     /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
 
+    /// Solve a system of nonlinear equations
+    static MX getVertcat(const std::vector<MX>& x);
+
     /// Transpose
     virtual MX getTranspose() const;
 

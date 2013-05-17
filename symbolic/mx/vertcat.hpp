@@ -36,7 +36,7 @@ namespace CasADi{
   public:
 
     /// Constructor
-    Vertcat(const std::vector<MX>& x, CRSSparsity sp = CRSSparsity());
+    Vertcat(const std::vector<MX>& x);
 
     /// Clone function
     virtual Vertcat* clone() const;

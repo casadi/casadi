@@ -21,7 +21,6 @@
  */
 
 #include "mx_tools.hpp"
-#include "vertcat.hpp"
 #include "../fx/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
@@ -32,37 +31,7 @@ using namespace std;
 namespace CasADi{
 
   MX vertcat(const vector<MX>& comp){
-    // Remove nulls and empty matrices
-    vector<MX> c;
-    c.reserve(comp.size());
-    for(vector<MX>::const_iterator it=comp.begin(); it!=comp.end(); ++it)
-      if(!it->isNull() && !it->empty())
-        c.push_back(*it);
-  
-    if(c.empty()){
-      return MX();
-    } else if(c.size()==1){
-      return c[0];
-    } else {
-      // Construct the sparsity pattern
-      CRSSparsity sp = c[0].sparsity();
-      for(int i=1; i<c.size(); ++i){
-        sp.append(c[i].sparsity());
-      }
-
-      // Split up existing vertcats
-      vector<MX> c_split;
-      c_split.reserve(c.size());
-      for(vector<MX>::const_iterator i=c.begin(); i!=c.end(); ++i){
-        if(i->getOp()==OP_VERTCAT){        
-          c_split.insert(c_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
-        } else {
-          c_split.push_back(*i);
-        }
-      }
-
-      return MX::create(new Vertcat(c_split,sp));
-    }
+    return MXNode::getVertcat(comp);
   }
 
   MX horzcat(const vector<MX>& comp){
