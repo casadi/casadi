@@ -55,17 +55,71 @@ namespace CasADi{
       *output[0] = getNonlinearSolve(getVector(input),implicit_function_);
     }
 
-    // Forward sensitivities
+    // Quick return if no derivatives
     int nfwd = fwdSens.size();
-    for(int d=0; d<nfwd; ++d){
-      casadi_error("not implemented");
+    int nadj = adjSeed.size();
+    if(nfwd==0 && nadj==0) return;
+
+    // Nonlinear function
+    FX& f = implicit_function_.getF();
+
+    // Arguments when calling f
+    vector<MX> arg = getVector(input);
+    arg.insert(arg.begin(),*output[0]);    
+
+    // Get an expression for the Jacobian
+    FX& J_fcn = implicit_function_.getJac();
+    MX J = J_fcn.call(arg).front();
+
+    // Get the linear solver
+    LinearSolver& linsol = implicit_function_.getLinsol();
+
+    // Directional derivatives of f
+    FX der = f.derivative(nfwd,nadj);
+
+    // Forward sensitivities, collect arguments for calling der
+    if(nfwd>0){
+      MX z_seed = MX::zeros(sparsity());
+      for(int d=0; d<nfwd; ++d){
+        arg.push_back(z_seed);
+        vector<MX> x_seed = getVector(fwdSeed[d]);
+        arg.insert(arg.end(),x_seed.begin(),x_seed.end());
+      }
     }
 
-    // Adjoint sensitivities
-    int nadj = adjSeed.size();
-    for(int d=0; d<nadj; ++d){
-      casadi_error("not implemented");
+    // Adjoint sensitivities, collect arguments for calling der
+    if(nadj>0){
+      // collect the right hand sides
+      for(int d=0; d<nadj; ++d){
+        casadi_error("not implemented");
+      }
+
+      // Solve transposed ...
+
+      // Save to arg
     }
+      
+    // Propagate through the implicit function
+    vector<MX> res = der.call(arg);
+
+    if(nfwd>0){
+      // collect the right hand sides ..
+      for(int d=0; d<nfwd; ++d){
+      }
+
+      // Solve ...
+
+      // Save to fwdSens
+      for(int d=0; d<nfwd; ++d){
+      }
+    }
+
+    for(int d=0; d<nadj; ++d){
+      // Save to adjSens
+    }
+
+    // ... To be continued      
+    casadi_error("not implemented");
   }
   
   //  void NonlinearSolve::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
