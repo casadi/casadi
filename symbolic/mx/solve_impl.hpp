@@ -34,7 +34,7 @@ using namespace std;
 namespace CasADi{
 
   template<bool Tr>
-  Solve<Tr>::Solve(const MX& r, const MX& A){
+  Solve<Tr>::Solve(const MX& r, const MX& A, const LinearSolver& linear_solver) : linear_solver_(linear_solver){
     casadi_assert_message(r.size2() == A.size1(),"Solve::Solve: dimension mismatch.");
     setDependencies(r,A);
     setSparsity(r.sparsity());
@@ -97,7 +97,7 @@ namespace CasADi{
     const MX& A = *input[1];
     MX& x = *output[0];
     if(!output_given){
-      x = A->getSolve(r,Tr);
+      x = A->getSolve(r,Tr,linear_solver_);
     }
 
     // Forward sensitivities, collect the right hand sides
@@ -112,7 +112,7 @@ namespace CasADi{
     }
 
     // Solve for all directions at once
-    MX lhs = A->getSolve(vertcat(rhs),Tr);
+    MX lhs = A->getSolve(vertcat(rhs),Tr,linear_solver_);
     
     // Slit up the sensitivities
     for(int d=0; d<nfwd; ++d){
@@ -132,7 +132,7 @@ namespace CasADi{
     }
 
     // Solve for all directions at once
-    lhs = A->getSolve(vertcat(rhs),!Tr);
+    lhs = A->getSolve(vertcat(rhs),!Tr,linear_solver_);
     
     // Split up the sensitivities
     for(int d=0; d<nadj; ++d){
@@ -158,6 +158,12 @@ namespace CasADi{
     }
 
     casadi_error("not implemented");
+  }
+
+  template<bool Tr>
+  void Solve<Tr>::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
+    MXNode::deepCopyMembers(already_copied);
+    linear_solver_ = deepcopy(linear_solver_, already_copied);
   }
 
 } // namespace CasADi

@@ -587,9 +587,14 @@ namespace CasADi{
   void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>::deepCopyMembers(already_copied);
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-      if(it->op==OP_CALL){
+      switch(it->op){
+      case OP_CALL:
+      case OP_SOLVE:
         it->data.makeUnique(already_copied,false);
         it->data->getFunction() = deepcopy(it->data->getFunction(),already_copied);
+        break;
+      default:
+        break;
       }
     }
   }
@@ -1145,8 +1150,13 @@ namespace CasADi{
     
     // Generate code for the embedded functions
     for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-      if(it->op==OP_CALL){
+      switch(it->op){
+      case OP_CALL:
+      case OP_SOLVE:
         gen.addDependency(it->data->getFunction());
+        break;
+      default:
+        break;
       }
     }
   }

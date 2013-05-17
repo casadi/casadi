@@ -27,6 +27,7 @@
 #include "../sx/sx.hpp"
 #include "../casadi_math.hpp"
 #include "../fx/code_generator.hpp"
+#include "../fx/linear_solver.hpp"
 #include <vector>
 #include <stack>
 
@@ -294,7 +295,7 @@ namespace CasADi{
     virtual MX getMultiplication(const MX& y) const;
 
     /// Solve for square linear system
-    virtual MX getSolve(const MX& r, bool tr) const;
+    virtual MX getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const;
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;

@@ -262,8 +262,7 @@ namespace CasADi {
     casadi_assert(d_res_it==d_res.end());
   }
 
-  void EvaluationMX::deepCopyMembers(
-                                     std::map<SharedObjectNode*, SharedObject>& already_copied) {
+  void EvaluationMX::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
     MXNode::deepCopyMembers(already_copied);
     fcn_ = deepcopy(fcn_, already_copied);
   }

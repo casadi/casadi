@@ -748,7 +748,7 @@ namespace CasADi{
   }
 
   MX solve(const MX& A, const MX& r){
-    return trans(A->getSolve(trans(r),true));
+    return trans(A->getSolve(trans(r),true,LinearSolver()));
   }
 
   MX jacobian(const MX& ex, const MX &arg) {

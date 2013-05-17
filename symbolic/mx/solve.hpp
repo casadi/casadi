@@ -24,6 +24,7 @@
 #define SOLVE_HPP
 
 #include "mx_node.hpp"
+#include "../fx/linear_solver.hpp"
 
 namespace CasADi{
   /** \brief An MX atomic for linear solver solution: x = r * A^-1 or x = r * A^-T
@@ -43,7 +44,7 @@ namespace CasADi{
   public:
     
     /** \brief  Constructor */
-    Solve(const MX& r, const MX& A);
+    Solve(const MX& r, const MX& A, const LinearSolver& linear_solver);
 
     /** \brief  Destructor */
     virtual ~Solve(){}
@@ -78,10 +79,19 @@ namespace CasADi{
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const{ return 1;}
+
+    /** \brief  Get function reference */
+    virtual FX& getFunction(){ return linear_solver_;}
+
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+
+    /// Linear Solver (may be shared between multiple nodes)
+    LinearSolver linear_solver_;
   };
 
 
 } // namespace CasADi
 
 
-#endif // MULTIPLICATION_HPP
+#endif // SOLVE_HPP
