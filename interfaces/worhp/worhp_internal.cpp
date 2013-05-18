@@ -300,19 +300,23 @@ namespace CasADi{
     status_[FunctionErrorDF]="FunctionErrorDF";
     status_[FunctionErrorDG]="FunctionErrorDG";
     status_[FunctionErrorHM]="FunctionErrorHM";
-    
+  }
+
+  void WorhpInternal::reset(){
+
     // Number of (free) variables
     worhp_o_.n = nx_;
 
     // Number of constraints
     worhp_o_.m = ng_;
 
-    bool p_init_backup = worhp_p_.initialised;
-    worhp_p_.initialised = false;
+    // Free existing Worhp memory (except parameters)
+    bool p_init_backup = worhp_p_.initialised; 
+    worhp_p_.initialised = false; // Avoid freeing the memory for parameters
     if (worhp_o_.initialised || worhp_w_.initialised || worhp_c_.initialised){
       WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
     }
-    worhp_p_.initialised = p_init_backup;
+    worhp_p_.initialised = p_init_backup; 
   
     /// Control data structure needs to be reset every time
     worhp_c_.initialised = false;
@@ -340,10 +344,6 @@ namespace CasADi{
         for(int el=rowind[r]; el<rowind[r+1] && col[el]<r; ++el){
           worhp_w_.HM.nnz++; // strictly lower triangular part
         }
-      }
-      
-      if(verbose()){
-        cout << "Allocating space for " << worhp_w_.HM.nnz << " hessian entries" << std::endl;
       }
     } else {
       worhp_w_.HM.nnz = 0;
@@ -595,6 +595,7 @@ namespace CasADi{
     casadi_assert(nfdir==0 && nadir==0);
     
     // Prepare the solver
+    reset();
     checkInitialBounds();
   
     // Reset the counters
