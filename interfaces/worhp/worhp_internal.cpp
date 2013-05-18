@@ -237,6 +237,19 @@ namespace CasADi{
       WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
   }
 
+  WorhpInternal* WorhpInternal::clone() const{ 
+    // Use default copy routine
+    WorhpInternal* node = new WorhpInternal(*this);
+    
+    // Mark Worhp datastructures not initialized to avoid double freeing
+    node->worhp_o_.initialised = false;
+    node->worhp_w_.initialised = false;
+    node->worhp_p_.initialised = false;
+    node->worhp_c_.initialised = false;    
+    
+    return node;
+  }
+
   void WorhpInternal::init(){
 
     // Call the init method of the base class

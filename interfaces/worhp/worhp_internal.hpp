@@ -47,7 +47,7 @@ namespace CasADi{
     virtual ~WorhpInternal();
 
     // Clone function
-    virtual WorhpInternal* clone() const{ return new WorhpInternal(*this);}
+    virtual WorhpInternal* clone() const;
 
     // Reset solver
     void reset();
