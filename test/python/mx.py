@@ -1964,6 +1964,12 @@ class MXtests(casadiTestCase):
     
   def test_constmxmul(self):
     0.1*MX.ones(2)
+
+  def test_isRegular(self):
+    self.assertTrue(isRegular(MX(DMatrix([0,1]))))
+    self.assertFalse(isRegular(MX(DMatrix([0,Inf]))))
+    with self.assertRaises(Exception):
+      self.assertFalse(isRegular(msym("x",2)))
     
 if __name__ == '__main__':
     unittest.main()

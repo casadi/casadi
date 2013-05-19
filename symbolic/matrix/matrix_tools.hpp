@@ -56,6 +56,12 @@ bool isInteger(const Matrix<T>& ex);
 template<class T>
 bool isScalar(const Matrix<T>& ex);
 
+//{@
+/// Checks if vector does not contain NaN or Inf
+bool isRegular(const Matrix<int>& ex);
+bool isRegular(const Matrix<double>& ex);
+//@}
+
 template<class T>
 bool isVector(const Matrix<T>& ex);
 
@@ -1221,8 +1227,7 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
   int sprank(const Matrix<T>& A) {
     return rank(A.sparsity());
   }
-
-
+  
 } // namespace CasADi
 
 

@@ -804,6 +804,11 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(crossc(DMatrix([[1.1,1.3,1.7],[1,0,0],[0,0,1],[4,5,6]]).T,DMatrix([[2,3,13],[0,1,0],[0,0,1],[1,0,1]]).T,1),DMatrix([[11.8,-10.9,0.7],[0,0,1],[0,0,0],[5,2,-5]]).T)
     
+  def test_isRegular(self):
+    self.assertTrue(isRegular(DMatrix([1,2])))
+    self.assertFalse(isRegular(DMatrix([1,Inf])))
+    self.assertFalse(isRegular(DMatrix.nan(2)))
+    
 if __name__ == '__main__':
     unittest.main()
 

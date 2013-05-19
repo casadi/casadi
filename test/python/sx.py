@@ -1000,6 +1000,21 @@ class SXtests(casadiTestCase):
     f.init()
     h = f.hessian()
 
+
+  def test_isRegular(self):
+    x = ssym("x")
+    
+    self.assertTrue(isRegular(SX(0)))
+    self.assertFalse(isRegular(SX(Inf)))
+    with self.assertRaises(Exception):
+      self.assertTrue(x.at(0))
+      
+    self.assertTrue(isRegular(SXMatrix(DMatrix([0,1]))))
+    self.assertFalse(isRegular(SXMatrix(DMatrix([0,Inf]))))
+    self.assertFalse(isRegular(vertcat([x,Inf])))
+    with self.assertRaises(Exception):
+      self.assertFalse(isRegular(vertcat([x,x])))
+    
 if __name__ == '__main__':
     unittest.main()
 

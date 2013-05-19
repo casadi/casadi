@@ -178,6 +178,9 @@ namespace CasADi{
 
   /** \brief  check if vector */
   bool isDense(const MX& ex);
+  
+  /// Checks if expression does not contain NaN or Inf
+  bool isRegular(const MX& ex);
 
   MX trace(const MX& A);
 

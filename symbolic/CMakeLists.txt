@@ -31,7 +31,7 @@ SET(CASADI_SRCS
   matrix/slice.hpp            matrix/slice.cpp          # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
   matrix/submatrix.hpp                                  # A reference to a block of the matrix to allow operations such as A(:,3) = ...
   matrix/nonzeros.hpp                                   # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
-  matrix/matrix_tools.hpp                               # Set of functions
+  matrix/matrix_tools.hpp     matrix/matrix_tools.cpp   # Set of functions
   matrix/sparsity_tools.hpp   matrix/sparsity_tools.cpp # Set of functions for sparsity
 
   # Directed, acyclic graph representation with scalar expressions

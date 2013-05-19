@@ -198,6 +198,12 @@ Matrix<double> evalf(const SXMatrix &ex, const SXMatrix &v, const Matrix<double>
 /** \brief  Substitute derivatives with variables */
 /** \brief void replaceDerivatives(SXMatrix &ex, const SXMatrix &var, const SXMatrix &dvar); */
 
+//{@
+/// Checks if expression does not contain NaN or Inf
+bool isRegular(const SX& ex);
+bool isRegular(const SXMatrix& ex);
+//@}
+
 #ifndef SWIG
 // "operator?:" can not be overloaded
 template<typename T>

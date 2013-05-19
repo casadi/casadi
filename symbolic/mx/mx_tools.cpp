@@ -777,6 +777,14 @@ namespace CasADi{
   MX inv(const MX& A){
     return A->getInverse();
   }
+  
+  bool isRegular(const MX& ex) {
+    if (ex.isConstant()) {
+      return isRegular(ex.getMatrixValue());
+    } else {
+      casadi_error("Cannot check regularity for symbolic MX");
+    }
+  }
 
 } // namespace CasADi
 
