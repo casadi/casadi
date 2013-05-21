@@ -172,7 +172,7 @@ void CVodesInternal::init(){
     // Should the quadrature errors be used for step size control?
     if(getOption("quad_err_con").toInt()){
       flag = CVodeSetQuadErrCon(mem_, true);
-      if(flag != CV_SUCCESS) cvodes_error("IDASetQuadErrCon",flag);
+      if(flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrCon",flag);
       
       // Quadrature error tolerances
       flag = CVodeQuadSStolerances(mem_, reltol_, abstol_); // TODO: vector absolute tolerances
@@ -1002,7 +1002,7 @@ int CVodesInternal::jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vecto
 }
 
 void CVodesInternal::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, N_Vector tmp){
-  log("IdasInternal::jtimes","begin");
+  log("CVodesInternal::jtimes","begin");
   // Get time
   time1 = clock();
 
@@ -1026,11 +1026,11 @@ void CVodesInternal::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vec
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
   
-  log("IdasInternal::jtimes","end");
+  log("CVodesInternal::jtimes","end");
 }
 
 void CVodesInternal::jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector tmpB) {
-  log("IdasInternal::jtimesB","begin");
+  log("CVodesInternal::jtimesB","begin");
   // Get time
   time1 = clock();
 
@@ -1057,7 +1057,7 @@ void CVodesInternal::jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_
   // Log time duration
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
-  log("IdasInternal::jtimesB","end");
+  log("CVodesInternal::jtimesB","end");
 }
 
 int CVodesInternal::djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
@@ -1085,7 +1085,7 @@ int CVodesInternal::djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector xB, 
 }
 
 void CVodesInternal::djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
-  log("IdasInternal::djac","begin");
+  log("CVodesInternal::djac","begin");
   
   // Get time
   time1 = clock();
@@ -1134,11 +1134,11 @@ void CVodesInternal::djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Ja
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
   
-  log("IdasInternal::djac","end");
+  log("CVodesInternal::djac","end");
 }
 
 void CVodesInternal::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
-  log("IdasInternal::djacB","begin");
+  log("CVodesInternal::djacB","begin");
   // Get time
   time1 = clock();
 
@@ -1189,7 +1189,7 @@ void CVodesInternal::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vecto
   // Log time duration
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
-  log("IdasInternal::djacB","end");
+  log("CVodesInternal::djacB","end");
 }
 
 int CVodesInternal::bjac_wrapper(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,     
@@ -1218,7 +1218,7 @@ int CVodesInternal::bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double 
 }
 
 void CVodesInternal::bjac(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
-  log("IdasInternal::bjac","begin");
+  log("CVodesInternal::bjac","begin");
 
   // Get time
   time1 = clock();
@@ -1255,11 +1255,11 @@ void CVodesInternal::bjac(long N, long mupper, long mlower, double t, N_Vector x
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
   
-  log("IdasInternal::bjac","end");
+  log("CVodesInternal::bjac","end");
 }
 
 void CVodesInternal::bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
-  log("IdasInternal::bjacB","begin");
+  log("CVodesInternal::bjacB","begin");
   
   // Get time
   time1 = clock();
@@ -1312,7 +1312,7 @@ void CVodesInternal::bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Ve
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
   
-  log("IdasInternal::bjacB","end");
+  log("CVodesInternal::bjacB","end");
 }
 
 void CVodesInternal::setStopTime(double tf){
@@ -1406,7 +1406,7 @@ void CVodesInternal::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
 }
 
 void CVodesInternal::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr, double gamma, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
-  log("IdasInternal::psetup","begin");
+  log("CVodesInternal::psetup","begin");
   // Get time
   time1 = clock();
 
@@ -1434,11 +1434,11 @@ void CVodesInternal::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
   time1 = clock();
   t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
   
-  log("IdasInternal::psetup","end");
+  log("CVodesInternal::psetup","end");
 }
 
 void CVodesInternal::psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, booleantype jokB, booleantype *jcurPtrB, double gammaB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
-  log("IdasInternal::psetupB","begin");
+  log("CVodesInternal::psetupB","begin");
   // Get time
   time1 = clock();
 
@@ -1480,7 +1480,7 @@ void CVodesInternal::psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
   // Log time duration
   time1 = clock();
   t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
-  log("IdasInternal::psetupB","end");
+  log("CVodesInternal::psetupB","end");
 }
 
 void CVodesInternal::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
@@ -1542,7 +1542,7 @@ int CVodesInternal::lsetupB_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N
 }
 
 void CVodesInternal::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot){
-  log("IdasInternal::lsolve","begin");
+  log("CVodesInternal::lsolve","begin");
   
   // Current time
   double t = cv_mem->cv_tn;
@@ -1559,11 +1559,11 @@ void CVodesInternal::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vect
   // Call the preconditioner solve function (which solves the linear system)
   psolve(t, x, xdot, b, b, gamma, delta, lr, 0);
   
-  log("IdasInternal::lsolve","end");
+  log("CVodesInternal::lsolve","end");
 }
 
 void CVodesInternal::lsolveB(double t, double gamma, N_Vector b, N_Vector weight, N_Vector x, N_Vector xB, N_Vector xdotB) {
-  log("IdasInternal::lsolveB","begin");
+  log("CVodesInternal::lsolveB","begin");
   // Accuracy
   double delta = 0.0;
   
@@ -1573,7 +1573,7 @@ void CVodesInternal::lsolveB(double t, double gamma, N_Vector b, N_Vector weight
   // Call the preconditioner solve function (which solves the linear system)
   psolveB(t, x, xB, xdotB, b, b, gamma, delta, lr, 0);
   
-  log("IdasInternal::lsolveB","end");
+  log("CVodesInternal::lsolveB","end");
 }
 
 int CVodesInternal::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot){
