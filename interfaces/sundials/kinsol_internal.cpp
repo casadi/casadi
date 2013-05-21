@@ -30,6 +30,7 @@ using namespace std;
 namespace CasADi{
 
   KinsolInternal::KinsolInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol){
+    addOption("max_iter",                 OT_INTEGER, 0, "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
     addOption("abstol",                      OT_REAL,1e-6,"Stopping criterion tolerance");
     addOption("linear_solver_type",       OT_STRING, "dense","dense|banded|iterative|user_defined");
     addOption("upper_bandwidth",          OT_INTEGER);
@@ -130,6 +131,10 @@ namespace CasADi{
   
     // Initialize KINSOL
     flag = KINInit(mem_,func_wrapper, u_);
+    casadi_assert(flag==KIN_SUCCESS);
+
+    // Setting maximum number of Newton iterations
+    flag = KINSetMaxNewtonStep(mem_, getOption("max_iter"));
     casadi_assert(flag==KIN_SUCCESS);
 
     // Set constraints
