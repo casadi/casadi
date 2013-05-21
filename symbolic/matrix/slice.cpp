@@ -36,11 +36,20 @@ namespace CasADi{
   }
 
   std::vector<int> Slice::getAll(int len) const{
-    int start = start_;
-    int stop  = stop_;
-    if (start<0) start+=len;
-    if (stop<0) stop+=len;
-    if (stop==std::numeric_limits<int>::max()) stop = len;
+    int start;
+    int stop;
+    if (start_==std::numeric_limits<int>::min()) {
+      start = (step_ < 0) ? len - 1 : 0;
+    } else {
+      start = start_;
+      if (start<0) start+=len;
+    }
+    if (stop_==std::numeric_limits<int>::max()) {
+      stop = (step_ < 0) ? -1 : len;
+    } else {
+      stop = stop_;
+      if (stop<0) stop+=len;
+    }
 
     casadi_assert_message(stop<=len,"Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") out of bounds with supplied length of " << len);
     casadi_assert_message(start>=0, "Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") out of bounds with start<0.");

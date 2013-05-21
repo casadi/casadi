@@ -384,7 +384,7 @@ int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
     return true;
   } else if (PySlice_Check(p)) {
     PySliceObject *r = (PySliceObject*)(p);
-    if(r->start!=Py_None) m.start_ = PyInt_AsLong(r->start);
+    m.start_ = (r->start == Py_None) ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
     m.stop_  = (r->stop ==Py_None) ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop) ;
     if(r->step !=Py_None) m.step_  = PyInt_AsLong(r->step);
     return true;

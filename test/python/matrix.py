@@ -137,6 +137,12 @@ class Matrixtests(casadiTestCase):
     self.checkarray(a2[4:1:-2,0],DMatrix(a1[4:1:-2])) # gives [5, 4, 3, 2]
     self.checkarray(a2[0:3:-2,0],DMatrix(a1[0:3:-2])) # gives empty set
     self.checkarray(a2[3:0:-2,0],DMatrix(a1[3:0:-2])) # gives [5, 4, 3, 2]
+    self.checkarray(a2[::-1,0],DMatrix(a1[::-1])) # gives [5, 4, 3, 2, 1]
+    self.checkarray(a2[::1,0],DMatrix(a1[::1])) # gives [1,2,3,4,5]
+    self.checkarray(a2[2::-1,0],DMatrix(a1[2::-1])) # gives [3,2,1]
+    self.checkarray(a2[:2:-1,0],DMatrix(a1[:2:-1])) # gives [5,4]
+    self.checkarray(a2[-1::-1,0],DMatrix(a1[-1::-1])) # gives [5,4,3,2,1]
+    self.checkarray(a2[:-1:-1,0],DMatrix(a1[:-1:-1])) # gives []
     
   def test_indexingOutOfBounds(self):
     self.message("Indexing out of bounds")
