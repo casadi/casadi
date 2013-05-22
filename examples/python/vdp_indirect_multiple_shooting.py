@@ -98,11 +98,11 @@ for k in range(num_nodes+1):
 
 # Formulate the root finding problem
 G = []
-G.append(X[0][:2] - [0,1]) # states fixed, costates free at initial time
+G.append(X[0][:2] - NP.array([0,1])) # states fixed, costates free at initial time
 for k in range(num_nodes):
   XF, = integratorOut(I.call(integratorIn(x0=X[k])),"xf")
   G.append(XF-X[k+1])
-G.append(X[num_nodes][2:] - [0,0]) # costates fixed, states free at final time
+G.append(X[num_nodes][2:] - NP.array([0,0])) # costates fixed, states free at final time
 
 # Terminal constraints: lam = 0
 rfp = MXFunction([V],[vertcat(G)])
