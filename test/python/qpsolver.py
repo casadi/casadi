@@ -83,10 +83,6 @@ class QPSolverTests(casadiTestCase):
       solver.input("lba").set(LBA)
       solver.input("uba").set(UBA)
 
-      if "Worhp" in str(qp_options):
-        with self.assertRaises(Exception):
-          solver.solve()
-        return
       solver.solve()
 
       self.assertAlmostEqual(solver.output()[0],2.0/3,6,str(qpsolver))
@@ -128,7 +124,12 @@ class QPSolverTests(casadiTestCase):
 
       solver.input("ubx").setAll(5)
 
+      if "Worhp" in str(qp_options):
+        with self.assertRaises(Exception):
+          solver.evaluate()
+        return
       solver.evaluate()
+      
       self.assertAlmostEqual(solver.output()[0],5,6,str(qpsolver))
       self.assertAlmostEqual(solver.output()[1],5,6,str(qpsolver))
       self.assertAlmostEqual(solver.output("cost"),-40,5,str(qpsolver))
