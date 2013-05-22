@@ -44,17 +44,15 @@ lam = ssym("lam",2)
 
 # Hamiltonian function
 H = inner_prod(lam,xdot) + L
-Hfcn = SXFunction([x,lam,u,t],[H])
-Hfcn.init()
 
 # Costate equations
-ldot = -Hfcn.grad(0,0)
+ldot = -gradient(H,x)
 
 ## The control must minimize the Hamiltonian, which is:
 print "Hamiltonian: ", H
 
-# H is of a convect quadratic form in u: H = u*u + p*u + q, let's get the coefficient p
-p = Hfcn.grad(2,0)    # this gives us 2*u + p
+# H is of a convex quadratic form in u: H = u*u + p*u + q, let's get the coefficient p
+p = gradient(H,u)    # this gives us 2*u + p
 p = substitute(p,u,0) # replace u with zero: gives us p
 
 # H's unconstrained minimizer is: u = -p/2
@@ -94,17 +92,15 @@ X = vertcat((x_init,l_init))
 # Call the integrator
 X, = integratorOut(I.call(integratorIn(x0=X)),"xf")
 
-# Costate at the final time
+# Costate at the final time should be zero (cf. Bryson and Ho)
 lam_f = X[2:4]
+g = lam_f
 
-# Terminal constraints: lam = 0
-G = MXFunction([l_init],[lam_f])
-
-# Dummy objective function (there are no degrees of freedom)
-F = MXFunction([l_init],[inner_prod(l_init,l_init)])
+# Formulate this root-finding problem as an NLP with dummy objective
+nlp = MXFunction(nlpIn(x=l_init),nlpOut(f=0,g=g))
 
 # Allocate NLP solver
-solver = IpoptSolver(F,G)
+solver = IpoptSolver(nlp)
 
 # Initialize the NLP solver
 solver.init()
