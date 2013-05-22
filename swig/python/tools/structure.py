@@ -280,6 +280,15 @@ class Structure:
   def getStructEntryByCanonicalIndex(self,indices):
     return self.getStructEntryByStructIndex(filter(lambda x: isinstance(x,str),indices))
 
+  def getStruct(self,name):
+    if name not in self.struct.dict:
+      raise Exception("Cannot find entry with key '%s'. Candidates: " % (str(name),str(name.keys())))
+    ret = self.struct.dict[name].struct
+    if ret is None:
+      raise Exception("Entry '%s' has no structure." % (name))  
+    else:
+      return ret
+        
   def traverseByPowerIndex(self,powerIndex,canonicalIndex=(),dispatcher=None,payload=None):
       try:
         if len(powerIndex)==0: return dispatcher(payload,canonicalIndex)
@@ -645,6 +654,7 @@ class Structured:
     self.struct = structure.struct
     self.i = self.struct.i
     self.f = self.struct.f
+    self.getStruct = self.struct.getStruct
     self.prefix = PrefixConstructor(self)
        
   @property
