@@ -54,7 +54,7 @@ solv.setOption("generate_hessian",True)
 if nlp_solver in (SQPMethod, LiftedSQP, SCPgen):
   solv.setOption("qp_solver",qp_solver)
   solv.setOption("qp_solver_options",qp_solver_options)
-  solv.setOption("maxiter",5)
+  solv.setOption("max_iter",5)
 if nlp_solver == SQPMethod:
   #solv.setOption("monitor",['qp'])
   solv.setOption("hessian_approximation","exact")

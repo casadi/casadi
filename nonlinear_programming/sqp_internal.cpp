@@ -41,8 +41,8 @@ namespace CasADi{
     addOption("qp_solver",         OT_QPSOLVER,   GenericType(),    "The QP solver to be used by the SQP method");
     addOption("qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",          "limited-memory|exact");
-    addOption("maxiter",           OT_INTEGER,      50,             "Maximum number of SQP iterations");
-    addOption("maxiter_ls",        OT_INTEGER,       3,             "Maximum number of linesearch iterations");
+    addOption("max_iter",           OT_INTEGER,      50,            "Maximum number of SQP iterations");
+    addOption("max_iter_ls",        OT_INTEGER,       3,            "Maximum number of linesearch iterations");
     addOption("tol_pr",            OT_REAL,       1e-6,             "Stopping criterion for primal infeasibility");
     addOption("tol_du",            OT_REAL,       1e-6,             "Stopping criterion for dual infeasability");
     addOption("c1",                OT_REAL,       1E-4,             "Armijo condition, coefficient of decrease in merit");
@@ -65,8 +65,8 @@ namespace CasADi{
     NLPSolverInternal::init();
     
     // Read options
-    maxiter_ = getOption("maxiter");
-    maxiter_ls_ = getOption("maxiter_ls");
+    max_iter_ = getOption("max_iter");
+    max_iter_ls_ = getOption("max_iter_ls");
     c1_ = getOption("c1");
     beta_ = getOption("beta");
     merit_memsize_ = getOption("merit_memory");
@@ -288,7 +288,7 @@ namespace CasADi{
         break;
       }
     
-      if (iter >= maxiter_){
+      if (iter >= max_iter_){
         cout << endl;
         cout << "CasADi::SQPMethod: Maximum number of iterations reached." << endl;
         break;
@@ -342,7 +342,7 @@ namespace CasADi{
 
       // Line-search
       log("Starting line-search");
-      if(maxiter_ls_>0){ // maxiter_ls_== 0 disables line-search
+      if(max_iter_ls_>0){ // max_iter_ls_== 0 disables line-search
       
         // Line-search loop
         while (true){
@@ -366,7 +366,7 @@ namespace CasADi{
           }
       
           // Line-search not successful, but we accept it.
-          if(ls_iter == maxiter_ls_){
+          if(ls_iter == max_iter_ls_){
             ls_success = false;
             log("Line-search completed, maximum number of iterations");
             break;

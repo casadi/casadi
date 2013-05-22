@@ -149,7 +149,7 @@ plt.grid()
 
 
 # Parameters in the algorithm
-maxiter = 100 # maximum number of sqp iterations
+max_iter = 100 # maximum number of sqp iterations
 toldx = 1e-12 # stopping criterion for the stepsize
 tolgL = 1e-12 # stopping criterion for the lagrangian gradient
 merit_mu = 0.  # current 'mu' in the T1 merit function
@@ -250,7 +250,7 @@ while True:
   mu_safety = 1.1 # safety factor for mu (see below)
   eta = 0.0001 # text to Noc 3.4
   tau = 0.2
-  maxiter = 100
+  max_iter = 100
 
   # 1-norm of the feasability violations
   feasviol = sumRows(fabs(gk))
@@ -295,7 +295,7 @@ while True:
     
     # Go to next iteration
     lsiter = lsiter+1
-    if lsiter >= maxiter:
+    if lsiter >= max_iter:
       raise Exception("linesearch failed!")
 
   # Step size
@@ -342,7 +342,7 @@ while True:
   gfk = ffcn.adjSens()
 
   # Check if maximum number of iterations reached
-  if k >= maxiter:
+  if k >= max_iter:
     print "Maximum number of SQP iterations reached!"
     break
 

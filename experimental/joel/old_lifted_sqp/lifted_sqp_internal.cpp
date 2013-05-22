@@ -37,8 +37,8 @@ LiftedSQPInternal::LiftedSQPInternal(const FX& F, const FX& G) : NLPSolverIntern
   casadi_warning("CasADi::LiftedSQP has been replaced by CasADi::SCPgen. This class will be deleted.");
   addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver to be used by the SQP method");
   addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver");
-  addOption("maxiter",           OT_INTEGER,    100,           "Maximum number of SQP iterations");
-  addOption("maxiter_ls",        OT_INTEGER,    100,           "Maximum number of linesearch iterations");
+  addOption("max_iter",           OT_INTEGER,    100,           "Maximum number of SQP iterations");
+  addOption("max_iter_ls",        OT_INTEGER,    100,           "Maximum number of linesearch iterations");
   addOption("toldx",             OT_REAL   ,    1e-12,         "Stopping criterion for the stepsize");
   addOption("tolgl",             OT_REAL   ,    1e-12,         "Stopping criterion for the Lagrangian gradient");
   addOption("sigma",             OT_REAL   ,    1.0,           "Linesearch parameter");
@@ -75,8 +75,8 @@ void LiftedSQPInternal::init(){
   }
   
   // Read options
-  maxiter_ = getOption("maxiter");
-  maxiter_ls_ = getOption("maxiter_ls");
+  max_iter_ = getOption("max_iter");
+  max_iter_ls_ = getOption("max_iter_ls");
   toldx_ = getOption("toldx");
   tolgl_ = getOption("tolgl");
   sigma_ = getOption("sigma");
@@ -519,8 +519,8 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     k = k+1;
     
     // Check if number of iterations have been reached
-    if(k >= maxiter_){
-      cout << "Maximum number of iterations (" << maxiter_ << ") reached" << endl;
+    if(k >= max_iter_){
+      cout << "Maximum number of iterations (" << max_iter_ << ") reached" << endl;
       break;
     }
   }

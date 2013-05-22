@@ -55,7 +55,7 @@ solv = nlp_solver(nlp)
 if nlp_solver in (SQPMethod, SCPgen):
   solv.setOption("qp_solver",qp_solver)
   solv.setOption("qp_solver_options",qp_solver_options)
-  solv.setOption("maxiter",5)
+  solv.setOption("max_iter",5)
   
 # Init solver  
 solv.init()

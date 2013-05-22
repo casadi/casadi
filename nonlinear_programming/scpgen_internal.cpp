@@ -40,8 +40,8 @@ namespace CasADi{
     addOption("qp_solver",         OT_QPSOLVER,   GenericType(),    "The QP solver to be used by the SQP method");
     addOption("qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",          "gauss-newton|exact");
-    addOption("maxiter",           OT_INTEGER,      50,             "Maximum number of SQP iterations");
-    addOption("maxiter_ls",        OT_INTEGER,       1,             "Maximum number of linesearch iterations");
+    addOption("max_iter",          OT_INTEGER,      50,             "Maximum number of SQP iterations");
+    addOption("max_iter_ls",       OT_INTEGER,       1,             "Maximum number of linesearch iterations");
     addOption("tol_pr",            OT_REAL,       1e-6,             "Stopping criterion for primal infeasibility");
     addOption("tol_du",            OT_REAL,       1e-6,             "Stopping criterion for dual infeasability");
     addOption("tol_reg",           OT_REAL,       1e-11,            "Stopping criterion for regularization");
@@ -73,8 +73,8 @@ namespace CasADi{
     NLPSolverInternal::init();
     
     // Read options
-    maxiter_ = getOption("maxiter");
-    maxiter_ls_ = getOption("maxiter_ls");
+    max_iter_ = getOption("max_iter");
+    max_iter_ls_ = getOption("max_iter_ls");
     c1_ = getOption("c1");
     beta_ = getOption("beta");
     lbfgs_memory_ = getOption("lbfgs_memory");
@@ -595,8 +595,8 @@ namespace CasADi{
       cout << endl;
       cout << "Iteration options:" << endl;
 
-      cout << "{ \"maxiter\":" << maxiter_ << ", ";
-      cout << "\"maxiter_ls\":" << maxiter_ls_ << ", ";
+      cout << "{ \"max_iter\":" << max_iter_ << ", ";
+      cout << "\"max_iter_ls\":" << max_iter_ls_ << ", ";
       cout << "\"c1\":" << c1_ << ", ";
       cout << "\"beta\":" << beta_ << ", ";
       cout << "\"merit_memsize\":" << merit_memsize_ << ", ";
@@ -720,7 +720,7 @@ namespace CasADi{
         break;
       }
     
-      if (iter >= maxiter_){
+      if (iter >= max_iter_){
         cout << endl;
         cout << "CasADi::SCPgen: Maximum number of iterations reached." << endl;
         break;
@@ -1152,7 +1152,7 @@ namespace CasADi{
       }
     
       // Line-search not successful, but we accept it.
-      if(ls_iter == maxiter_ls_){
+      if(ls_iter == max_iter_ls_){
         //log("Line-search completed, maximum number of iterations");
         break;
       }

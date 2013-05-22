@@ -43,7 +43,7 @@ public:
   QPSolver qp_solver_;
 
   /// maximum number of sqp iterations
-  int maxiter_; 
+  int max_iter_; 
 
   /// stopping criterion for the stepsize
   double toldx_;
@@ -58,7 +58,7 @@ public:
   double mu_safety_;
   double eta_;
   double tau_;
-  int maxiter_ls_;
+  int max_iter_ls_;
   //@}
   
    /// Residual

@@ -155,8 +155,8 @@ int main(){
 
     solver.setOption("verbose",true);
     solver.setOption("regularize",false);
-    solver.setOption("maxiter_ls",1);
-    solver.setOption("maxiter",100);
+    solver.setOption("max_iter_ls",1);
+    solver.setOption("max_iter",100);
     
     // Use IPOPT as QP solver
     solver.setOption("qp_solver",NLPQPSolver::creator);
