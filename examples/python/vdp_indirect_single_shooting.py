@@ -105,6 +105,7 @@ Solver = NLPImplicitSolver
 solver = Solver(rfp)
 if Solver==NLPImplicitSolver:
     solver.setOption("nlp_solver",IpoptSolver)
+    solver.setOption("nlp_solver_options",{"hessian_approximation":"limited-memory"})
 elif Solver==NewtonImplicitSolver:
     solver.setOption("linear_solver",CSparse)
 elif Solver==KinsolSolver:
