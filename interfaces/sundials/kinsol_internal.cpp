@@ -30,22 +30,22 @@ using namespace std;
 namespace CasADi{
 
   KinsolInternal::KinsolInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol){
-    addOption("maxiter",                    OT_INTEGER, GenericType(), "Maximum number of Newton iterations.");
-    addOption("abstol",                     OT_REAL,    1e-6,"Stopping criterion tolerance");
-    addOption("linear_solver_type",         OT_STRING,  "dense","dense|banded|iterative|user_defined");
-    addOption("upper_bandwidth",            OT_INTEGER);
-    addOption("lower_bandwidth",            OT_INTEGER);
-    addOption("max_krylov",                 OT_INTEGER,  0);
-    addOption("exact_jacobian",             OT_BOOLEAN,  true);
-    addOption("iterative_solver",           OT_STRING,   "gmres","gmres|bcgstab|tfqmr");
-    addOption("f_scale",                    OT_REALVECTOR);
-    addOption("u_scale",                    OT_REALVECTOR);
-    addOption("pretype",                    OT_STRING,    "none","","none|left|right|both");
-    addOption("use_preconditioner",         OT_BOOLEAN,   false); // precondition an iterative solver
-    addOption("constraints",                OT_INTEGERVECTOR);
-    addOption("strategy",                   OT_STRING,    "none", "Globalization strateg","none|linesearch");
-    addOption("disable_internal_warnings",  OT_BOOLEAN,    false, "Disable KINSOL internal warning messages");
-    addOption("monitor",                    OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_djac", true);
+    addOption("max_iter",                 OT_INTEGER, 0, "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
+    addOption("abstol",                      OT_REAL,1e-6,"Stopping criterion tolerance");
+    addOption("linear_solver_type",       OT_STRING, "dense","dense|banded|iterative|user_defined");
+    addOption("upper_bandwidth",          OT_INTEGER);
+    addOption("lower_bandwidth",          OT_INTEGER);
+    addOption("max_krylov",               OT_INTEGER, 0);
+    addOption("exact_jacobian",           OT_BOOLEAN, true);
+    addOption("iterative_solver",         OT_STRING,"gmres","gmres|bcgstab|tfqmr");
+    addOption("f_scale",                  OT_REALVECTOR);
+    addOption("u_scale",                  OT_REALVECTOR);
+    addOption("pretype",                  OT_STRING, "none","","none|left|right|both");
+    addOption("use_preconditioner",       OT_BOOLEAN, false); // precondition an iterative solver
+    addOption("constraints",              OT_INTEGERVECTOR);
+    addOption("strategy",                 OT_STRING, "none", "Globalization strateg","none|linesearch");
+    addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable KINSOL internal warning messages");
+    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_djac", true);
     
     mem_ = 0;
     u_ = 0;
@@ -134,10 +134,8 @@ namespace CasADi{
     casadi_assert(flag==KIN_SUCCESS);
 
     // Setting maximum number of Newton iterations
-    if(hasSetOption("maxiter")){
-      flag = KINSetMaxNewtonStep(mem_, getOption("maxiter"));
-      casadi_assert(flag==KIN_SUCCESS);
-    }
+    flag = KINSetMaxNewtonStep(mem_, getOption("max_iter"));
+    casadi_assert(flag==KIN_SUCCESS);
 
     // Set constraints
     if(hasSetOption("constraints")){
