@@ -108,9 +108,9 @@ G.append(X[num_nodes][2:] - [0,0]) # costates fixed, states free at final time
 rfp = MXFunction([V],[vertcat(G)])
 
 # Select a solver for the root-finding problem
-#Solver = NLPImplicitSolver
+Solver = NLPImplicitSolver
 #Solver = NewtonImplicitSolver
-Solver = KinsolSolver
+#Solver = KinsolSolver
 
 # Allocate an implict solver
 solver = Solver(rfp)
