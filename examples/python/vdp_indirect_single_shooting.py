@@ -99,6 +99,7 @@ rfp = MXFunction([l_init],[g])
 # Select a solver for the root-finding problem
 Solver = NLPImplicitSolver
 #Solver = NewtonImplicitSolver
+#Solver = KinsolSolver
 
 # Allocate an implict solver
 solver = Solver(rfp)
@@ -106,6 +107,9 @@ if Solver==NLPImplicitSolver:
     solver.setOption("nlp_solver",IpoptSolver)
 elif Solver==NewtonImplicitSolver:
     solver.setOption("linear_solver",CSparse)
+elif Solver==KinsolSolver:
+    solver.setOption("linear_solver_type","user_defined")
+    solver.setOption("linear_solver",CSparse)    
 
 # Initialize the NLP solver
 solver.init()
