@@ -176,11 +176,6 @@ namespace CasADi{
       fcn.input(j-inind_[task]).set(input(j));
     }
   
-    // Copy outputs to functions (outputs are sometimes used for initialization)
-    for(int j=outind_[task]; j<outind_[task+1]; ++j){
-      fcn.output(j-outind_[task]).set(output(j));
-    }
-  
     // Copy forward seeds
     for(int dir=0; dir<nfdir; ++dir){
       for(int j=inind_[task]; j<inind_[task+1]; ++j){
@@ -334,7 +329,11 @@ namespace CasADi{
     // Generate derivative expressions
     vector<FX> der_funcs(funcs_.size());
     for(int i=0; i<funcs_.size(); ++i){
-      der_funcs[i] = funcs_[i].derivative(nfwd,nadj);
+      if(copy_of_[i]>=0){
+        der_funcs[i] = der_funcs[copy_of_[i]];
+      } else {
+        der_funcs[i] = funcs_[i].derivative(nfwd,nadj);
+      }
     }
   
     // Create a new parallelizer for the derivatives
