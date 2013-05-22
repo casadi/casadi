@@ -55,8 +55,14 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_RDAEOutput: return "RDAEOutput";
     case SCHEME_IntegratorInput: return "IntegratorInput";
     case SCHEME_IntegratorOutput: return "IntegratorOutput";
-    case SCHEME_NLInput: return "NLInput";
-    case SCHEME_NLOutput: return "NLOutput";
+    case SCHEME_NLPInput: return "NLPInput";
+    case SCHEME_NLPOutput: return "NLPOutput";
+    case SCHEME_GradFInput: return "GradFInput";
+    case SCHEME_GradFOutput: return "GradFOutput";
+    case SCHEME_JacGInput: return "JacGInput";
+    case SCHEME_JacGOutput: return "JacGOutput";
+    case SCHEME_HessLagInput: return "HessLagInput";
+    case SCHEME_HessLagOutput: return "HessLagOutput";
     case SCHEME_NLPSolverInput: return "NLPSolverInput";
     case SCHEME_NLPSolverOutput: return "NLPSolverOutput";
     case SCHEME_MayerInput: return "MayerInput";
@@ -82,8 +88,14 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_RDAEOutput: return "ode, alg, quad";
     case SCHEME_IntegratorInput: return "x0, p, rx0, rp";
     case SCHEME_IntegratorOutput: return "xf, qf, rxf, rqf";
-    case SCHEME_NLInput: return "x, p";
-    case SCHEME_NLOutput: return "f, g";
+    case SCHEME_NLPInput: return "x, p";
+    case SCHEME_NLPOutput: return "f, g";
+    case SCHEME_GradFInput: return "x, p";
+    case SCHEME_GradFOutput: return "grad, f, g";
+    case SCHEME_JacGInput: return "x, p";
+    case SCHEME_JacGOutput: return "jac, f, g";
+    case SCHEME_HessLagInput: return "x, p, lam_f, lam_g";
+    case SCHEME_HessLagOutput: return "hess, f, g, grad_x, grad_p";
     case SCHEME_NLPSolverInput: return "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0";
     case SCHEME_NLPSolverOutput: return "x, f, g, lam_x, lam_g, lam_p";
     case SCHEME_MayerInput: return "x, p";
@@ -184,13 +196,44 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==2) return "rxf";
       if(i==3) return "rqf";
       break;
-    case SCHEME_NLInput: 
+    case SCHEME_NLPInput: 
       if(i==0) return "x";
       if(i==1) return "p";
       break;
-    case SCHEME_NLOutput: 
+    case SCHEME_NLPOutput: 
       if(i==0) return "f";
       if(i==1) return "g";
+      break;
+    case SCHEME_GradFInput: 
+      if(i==0) return "x";
+      if(i==1) return "p";
+      break;
+    case SCHEME_GradFOutput: 
+      if(i==0) return "grad";
+      if(i==1) return "f";
+      if(i==2) return "g";
+      break;
+    case SCHEME_JacGInput: 
+      if(i==0) return "x";
+      if(i==1) return "p";
+      break;
+    case SCHEME_JacGOutput: 
+      if(i==0) return "jac";
+      if(i==1) return "f";
+      if(i==2) return "g";
+      break;
+    case SCHEME_HessLagInput: 
+      if(i==0) return "x";
+      if(i==1) return "p";
+      if(i==2) return "lam_f";
+      if(i==3) return "lam_g";
+      break;
+    case SCHEME_HessLagOutput: 
+      if(i==0) return "hess";
+      if(i==1) return "f";
+      if(i==2) return "g";
+      if(i==3) return "grad_x";
+      if(i==4) return "grad_p";
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "x0";
@@ -356,13 +399,44 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==2) return "Backward differential state at the initial time";
       if(i==3) return "Backward quadrature state at the initial time";
       break;
-    case SCHEME_NLInput: 
+    case SCHEME_NLPInput: 
       if(i==0) return "Decision variable";
       if(i==1) return "Fixed parameter";
       break;
-    case SCHEME_NLOutput: 
+    case SCHEME_NLPOutput: 
       if(i==0) return "Objective function";
       if(i==1) return "Constraint function";
+      break;
+    case SCHEME_GradFInput: 
+      if(i==0) return "Decision variable";
+      if(i==1) return "Fixed parameter";
+      break;
+    case SCHEME_GradFOutput: 
+      if(i==0) return "Jacobian of the constraints";
+      if(i==1) return "Objective function";
+      if(i==2) return "Constraint function";
+      break;
+    case SCHEME_JacGInput: 
+      if(i==0) return "Decision variable";
+      if(i==1) return "Fixed parameter";
+      break;
+    case SCHEME_JacGOutput: 
+      if(i==0) return "Jacobian of the constraints";
+      if(i==1) return "Objective function";
+      if(i==2) return "Constraint function";
+      break;
+    case SCHEME_HessLagInput: 
+      if(i==0) return "Decision variable";
+      if(i==1) return "Fixed parameter";
+      if(i==2) return "Multiplier for f";
+      if(i==3) return "Multiplier for g";
+      break;
+    case SCHEME_HessLagOutput: 
+      if(i==0) return "Hessian of the Lagrangian";
+      if(i==1) return "Objective function";
+      if(i==2) return "Constraint function";
+      if(i==3) return "Gradient of the Lagrangian with respect to x";
+      if(i==4) return "Gradient of the Lagrangian with respect to p";
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "Decision variables, initial guess (nx x 1) ";
@@ -528,13 +602,44 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==2) return "INTEGRATOR_RXF";
       if(i==3) return "INTEGRATOR_RQF";
       break;
-    case SCHEME_NLInput: 
-      if(i==0) return "NL_X";
-      if(i==1) return "NL_P";
+    case SCHEME_NLPInput: 
+      if(i==0) return "NLP_X";
+      if(i==1) return "NLP_P";
       break;
-    case SCHEME_NLOutput: 
-      if(i==0) return "NL_F";
-      if(i==1) return "NL_G";
+    case SCHEME_NLPOutput: 
+      if(i==0) return "NLP_F";
+      if(i==1) return "NLP_G";
+      break;
+    case SCHEME_GradFInput: 
+      if(i==0) return "GRADF_X";
+      if(i==1) return "GRADF_P";
+      break;
+    case SCHEME_GradFOutput: 
+      if(i==0) return "GRADF_GRAD";
+      if(i==1) return "GRADF_F";
+      if(i==2) return "GRADF_G";
+      break;
+    case SCHEME_JacGInput: 
+      if(i==0) return "JACG_X";
+      if(i==1) return "JACG_P";
+      break;
+    case SCHEME_JacGOutput: 
+      if(i==0) return "JACG_JAC";
+      if(i==1) return "JACG_F";
+      if(i==2) return "JACG_G";
+      break;
+    case SCHEME_HessLagInput: 
+      if(i==0) return "HESSLAG_X";
+      if(i==1) return "HESSLAG_P";
+      if(i==2) return "HESSLAG_LAM_F";
+      if(i==3) return "HESSLAG_LAM_G";
+      break;
+    case SCHEME_HessLagOutput: 
+      if(i==0) return "HESSLAG_HESS";
+      if(i==1) return "HESSLAG_F";
+      if(i==2) return "HESSLAG_G";
+      if(i==3) return "HESSLAG_GRAD_X";
+      if(i==4) return "HESSLAG_GRAD_P";
       break;
     case SCHEME_NLPSolverInput: 
       if(i==0) return "NLP_SOLVER_X0";
@@ -647,11 +752,29 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_IntegratorOutput: 
       return 4;
       break;
-    case SCHEME_NLInput: 
+    case SCHEME_NLPInput: 
       return 2;
       break;
-    case SCHEME_NLOutput: 
+    case SCHEME_NLPOutput: 
       return 2;
+      break;
+    case SCHEME_GradFInput: 
+      return 2;
+      break;
+    case SCHEME_GradFOutput: 
+      return 3;
+      break;
+    case SCHEME_JacGInput: 
+      return 2;
+      break;
+    case SCHEME_JacGOutput: 
+      return 3;
+      break;
+    case SCHEME_HessLagInput: 
+      return 4;
+      break;
+    case SCHEME_HessLagOutput: 
+      return 5;
       break;
     case SCHEME_NLPSolverInput: 
       return 8;
@@ -771,13 +894,44 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="rxf") return 2;
       if(name=="rqf") return 3;
       break;
-    case SCHEME_NLInput: 
+    case SCHEME_NLPInput: 
       if(name=="x") return 0;
       if(name=="p") return 1;
       break;
-    case SCHEME_NLOutput: 
+    case SCHEME_NLPOutput: 
       if(name=="f") return 0;
       if(name=="g") return 1;
+      break;
+    case SCHEME_GradFInput: 
+      if(name=="x") return 0;
+      if(name=="p") return 1;
+      break;
+    case SCHEME_GradFOutput: 
+      if(name=="grad") return 0;
+      if(name=="f") return 1;
+      if(name=="g") return 2;
+      break;
+    case SCHEME_JacGInput: 
+      if(name=="x") return 0;
+      if(name=="p") return 1;
+      break;
+    case SCHEME_JacGOutput: 
+      if(name=="jac") return 0;
+      if(name=="f") return 1;
+      if(name=="g") return 2;
+      break;
+    case SCHEME_HessLagInput: 
+      if(name=="x") return 0;
+      if(name=="p") return 1;
+      if(name=="lam_f") return 2;
+      if(name=="lam_g") return 3;
+      break;
+    case SCHEME_HessLagOutput: 
+      if(name=="hess") return 0;
+      if(name=="f") return 1;
+      if(name=="g") return 2;
+      if(name=="grad_x") return 3;
+      if(name=="grad_p") return 4;
       break;
     case SCHEME_NLPSolverInput: 
       if(name=="x0") return 0;

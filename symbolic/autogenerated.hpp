@@ -31,7 +31,7 @@
 namespace CasADi{ 
 template <class T>
 class IOSchemeVector;
-enum InputOutputScheme { SCHEME_ACADO_Input, SCHEME_ACADO_Output, SCHEME_ACADO_FCN_Input, SCHEME_ControlledDAEInput, SCHEME_ControlSimulatorInput, SCHEME_DAEInput, SCHEME_DAEOutput, SCHEME_RDAEInput, SCHEME_RDAEOutput, SCHEME_IntegratorInput, SCHEME_IntegratorOutput, SCHEME_NLInput, SCHEME_NLOutput, SCHEME_NLPSolverInput, SCHEME_NLPSolverOutput, SCHEME_MayerInput, SCHEME_OCPInput, SCHEME_OCPOutput, SCHEME_QPInput, SCHEME_QPOutput, SCHEME_SDPInput, SCHEME_SDPOutput , SCHEME_unknown};
+enum InputOutputScheme { SCHEME_ACADO_Input, SCHEME_ACADO_Output, SCHEME_ACADO_FCN_Input, SCHEME_ControlledDAEInput, SCHEME_ControlSimulatorInput, SCHEME_DAEInput, SCHEME_DAEOutput, SCHEME_RDAEInput, SCHEME_RDAEOutput, SCHEME_IntegratorInput, SCHEME_IntegratorOutput, SCHEME_NLPInput, SCHEME_NLPOutput, SCHEME_GradFInput, SCHEME_GradFOutput, SCHEME_JacGInput, SCHEME_JacGOutput, SCHEME_HessLagInput, SCHEME_HessLagOutput, SCHEME_NLPSolverInput, SCHEME_NLPSolverOutput, SCHEME_MayerInput, SCHEME_OCPInput, SCHEME_OCPOutput, SCHEME_QPInput, SCHEME_QPOutput, SCHEME_SDPInput, SCHEME_SDPOutput , SCHEME_unknown};
 std::string getSchemeEntryName(InputOutputScheme scheme, int i);
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);
@@ -422,57 +422,233 @@ std::vector<M> integratorOut(const std::vector<M>& args,const std::string arg_s0
   return ret;
 
 }
-/// Helper function for 'NLInput'
+/// Helper function for 'NLPInput'
 /// Input arguments of an NLP function
 /// 
-/// \copydoc scheme_NLInput
+/// \copydoc scheme_NLPInput
 template<class M>
-IOSchemeVector<M> nlIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+IOSchemeVector<M> nlpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
   std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_NLInput,it->first);
+    int n = getSchemeEntryEnum(SCHEME_NLPInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in NLInput: '" << it->first << "' is not recognized. Available keywords are: x, p");
+      casadi_error("Keyword error in NLPInput: '" << it->first << "' is not recognized. Available keywords are: x, p");
     ret[n] = it->second;
   }
-  return IOSchemeVector<M>(ret,SCHEME_NLInput);
+  return IOSchemeVector<M>(ret,SCHEME_NLPInput);
 }
 template<class M>
-std::vector<M> nlIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+std::vector<M> nlpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLInput,arg_s0)));
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLInput,arg_s1)));
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s1)));
   return ret;
 
 }
-/// Helper function for 'NLOutput'
+/// Helper function for 'NLPOutput'
 /// Output arguments of an NLP function
 /// 
-/// \copydoc scheme_NLOutput
+/// \copydoc scheme_NLPOutput
 template<class M>
-IOSchemeVector<M> nlOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+IOSchemeVector<M> nlpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
   std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_NLOutput,it->first);
+    int n = getSchemeEntryEnum(SCHEME_NLPOutput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in NLOutput: '" << it->first << "' is not recognized. Available keywords are: f, g");
+      casadi_error("Keyword error in NLPOutput: '" << it->first << "' is not recognized. Available keywords are: f, g");
     ret[n] = it->second;
   }
-  return IOSchemeVector<M>(ret,SCHEME_NLOutput);
+  return IOSchemeVector<M>(ret,SCHEME_NLPOutput);
 }
 template<class M>
-std::vector<M> nlOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+std::vector<M> nlpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLOutput,arg_s0)));
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLOutput,arg_s1)));
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput,arg_s1)));
+  return ret;
+
+}
+/// Helper function for 'GradFInput'
+/// Input arguments of an NLP objective gradient function
+/// 
+/// \copydoc scheme_GradFInput
+template<class M>
+IOSchemeVector<M> gradFIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+  std::vector<M> ret(2);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_GradFInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in GradFInput: '" << it->first << "' is not recognized. Available keywords are: x, p");
+    ret[n] = it->second;
+  }
+  return IOSchemeVector<M>(ret,SCHEME_GradFInput);
+}
+template<class M>
+std::vector<M> gradFIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput,arg_s1)));
+  return ret;
+
+}
+/// Helper function for 'GradFOutput'
+/// Output arguments of an NLP objective gradient function
+/// 
+/// \copydoc scheme_GradFOutput
+template<class M>
+IOSchemeVector<M> gradFOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+  std::vector<M> ret(3);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_GradFOutput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in GradFOutput: '" << it->first << "' is not recognized. Available keywords are: grad, f, g");
+    ret[n] = it->second;
+  }
+  return IOSchemeVector<M>(ret,SCHEME_GradFOutput);
+}
+template<class M>
+std::vector<M> gradFOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput,arg_s2)));
+  return ret;
+
+}
+/// Helper function for 'JacGInput'
+/// Input arguments of an NLP Jacobian function
+/// 
+/// \copydoc scheme_JacGInput
+template<class M>
+IOSchemeVector<M> jacGIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+  std::vector<M> ret(2);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_JacGInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in JacGInput: '" << it->first << "' is not recognized. Available keywords are: x, p");
+    ret[n] = it->second;
+  }
+  return IOSchemeVector<M>(ret,SCHEME_JacGInput);
+}
+template<class M>
+std::vector<M> jacGIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput,arg_s1)));
+  return ret;
+
+}
+/// Helper function for 'JacGOutput'
+/// Output arguments of an NLP Jacobian function
+/// 
+/// \copydoc scheme_JacGOutput
+template<class M>
+IOSchemeVector<M> jacGOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+  std::vector<M> ret(3);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_JacGOutput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in JacGOutput: '" << it->first << "' is not recognized. Available keywords are: jac, f, g");
+    ret[n] = it->second;
+  }
+  return IOSchemeVector<M>(ret,SCHEME_JacGOutput);
+}
+template<class M>
+std::vector<M> jacGOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput,arg_s2)));
+  return ret;
+
+}
+/// Helper function for 'HessLagInput'
+/// Input arguments of an NLP Hessian function
+/// 
+/// \copydoc scheme_HessLagInput
+template<class M>
+IOSchemeVector<M> hessLagIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+  std::vector<M> ret(4);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_HessLagInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in HessLagInput: '" << it->first << "' is not recognized. Available keywords are: x, p, lam_f, lam_g");
+    ret[n] = it->second;
+  }
+  return IOSchemeVector<M>(ret,SCHEME_HessLagInput);
+}
+template<class M>
+std::vector<M> hessLagIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput,arg_s3)));
+  return ret;
+
+}
+/// Helper function for 'HessLagOutput'
+/// Output arguments of an NLP Hessian function
+/// 
+/// \copydoc scheme_HessLagOutput
+template<class M>
+IOSchemeVector<M> hessLagOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M()){
+  std::vector<M> ret(5);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_HessLagOutput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in HessLagOutput: '" << it->first << "' is not recognized. Available keywords are: hess, f, g, grad_x, grad_p");
+    ret[n] = it->second;
+  }
+  return IOSchemeVector<M>(ret,SCHEME_HessLagOutput);
+}
+template<class M>
+std::vector<M> hessLagOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput,arg_s4)));
   return ret;
 
 }
@@ -481,7 +657,7 @@ std::vector<M> nlOut(const std::vector<M>& args,const std::string arg_s0="",cons
 /// 
 /// \copydoc scheme_NLPSolverInput
 template<class M>
-IOSchemeVector<M> nlpsolverIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M()){
+IOSchemeVector<M> nlpSolverIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M()){
   std::vector<M> ret(8);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -502,7 +678,7 @@ IOSchemeVector<M> nlpsolverIn(const std::string arg_s0="",M arg_m0=M(),const std
   return IOSchemeVector<M>(ret,SCHEME_NLPSolverInput);
 }
 template<class M>
-std::vector<M> nlpsolverIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7=""){
+std::vector<M> nlpSolverIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput,arg_s1)));
@@ -520,7 +696,7 @@ std::vector<M> nlpsolverIn(const std::vector<M>& args,const std::string arg_s0="
 /// 
 /// \copydoc scheme_NLPSolverOutput
 template<class M>
-IOSchemeVector<M> nlpsolverOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M()){
+IOSchemeVector<M> nlpSolverOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M()){
   std::vector<M> ret(6);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -539,7 +715,7 @@ IOSchemeVector<M> nlpsolverOut(const std::string arg_s0="",M arg_m0=M(),const st
   return IOSchemeVector<M>(ret,SCHEME_NLPSolverOutput);
 }
 template<class M>
-std::vector<M> nlpsolverOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5=""){
+std::vector<M> nlpSolverOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput,arg_s1)));
