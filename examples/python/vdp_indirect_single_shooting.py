@@ -23,8 +23,6 @@ from casadi import *
 import numpy as NP
 import matplotlib.pyplot as plt
 
-# time
-t = ssym("t")
 
 # Declare variables (use simple, efficient DAG)
 x0=ssym("x0"); x1=ssym("x1")
@@ -63,13 +61,12 @@ u_opt = min(u_opt,1.0)
 u_opt = max(u_opt,-0.75)
 print "optimal control: ", u_opt
 
-# Augment f with lam_dot and subtitute in the value for the optimal control
+# Augment f with lam_dot and substitute in the value for the optimal control
 f = vertcat((xdot,ldot))
 f = substitute(f,u,u_opt)
 
 # Create the right hand side function
-rhs_in = list(daeIn(x=vertcat((x,lam))))
-rhs_in[DAE_T] = t
+rhs_in = daeIn(x=vertcat((x,lam)))
 rhs = SXFunction(rhs_in,daeOut(ode=f))
 
 # Create an integrator (CVodes)
@@ -96,27 +93,31 @@ X, = integratorOut(I.call(integratorIn(x0=X)),"xf")
 lam_f = X[2:4]
 g = lam_f
 
-# Formulate this root-finding problem as an NLP with dummy objective
-nlp = MXFunction(nlpIn(x=l_init),nlpOut(f=0,g=g))
+# Formulate root-finding problem
+rfp = MXFunction([l_init],[g])
 
-# Allocate NLP solver
-solver = IpoptSolver(nlp)
+# Select a solver for the root-finding problem
+Solver = NLPImplicitSolver
+#Solver = NewtonImplicitSolver
+
+# Allocate an implict solver
+solver = Solver(rfp)
+if Solver==NLPImplicitSolver:
+    solver.setOption("nlp_solver",IpoptSolver)
+elif Solver==NewtonImplicitSolver:
+    solver.setOption("linear_solver",CSparse)
 
 # Initialize the NLP solver
 solver.init()
 
-# Set bounds and initial guess
-solver.setInput([-inf,-inf], "lbx")
-solver.setInput([ inf, inf], "ubx")
-solver.setInput([   0,   0], "x0")
-solver.setInput([   0,   0], "lbg")
-solver.setInput([   0,   0], "ubg")
+# Pass initial guess
+#solver.setInput([   0,   0], "x0")
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the optimal solution
-l_init_opt = NP.array(solver.output("x").data())
+l_init_opt = NP.array(solver.output().data())
 
 # Time grid for visualization
 tgrid = NP.linspace(0,10,100)
