@@ -109,9 +109,10 @@ elif Solver==NewtonImplicitSolver:
     solver.setOption("linear_solver",CSparse)
 elif Solver==KinsolSolver:
     solver.setOption("linear_solver_type","user_defined")
-    solver.setOption("linear_solver",CSparse)    
+    solver.setOption("linear_solver",CSparse)
+    solver.setOption("max_iter",1000)
 
-# Initialize the NLP solver
+# Initialize the solver
 solver.init()
 
 # Pass initial guess

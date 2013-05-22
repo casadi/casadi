@@ -23,9 +23,6 @@ from casadi import *
 import numpy as NP
 import matplotlib.pyplot as plt
 
-# time
-t = ssym("t")
-
 # Declare variables (use simple, efficient DAG)
 x0=ssym("x0"); x1=ssym("x1")
 x = vertcat((x0,x1))
@@ -44,17 +41,15 @@ lam = ssym("lam",2)
 
 # Hamiltonian function
 H = inner_prod(lam,xdot) + L
-Hfcn = SXFunction([x,lam,u,t],[H])
-Hfcn.init()
 
 # Costate equations
-ldot = -Hfcn.grad(0,0)
+ldot = -gradient(H,x)
 
 ## The control must minimize the Hamiltonian, which is:
 print "Hamiltonian: ", H
 
-# H is of a convect quadratic form in u: H = u*u + p*u + q, let's get the coefficient p
-p = Hfcn.grad(2,0)    # this gives us 2*u + p
+# H is of a convex quadratic form in u: H = u*u + p*u + q, let's get the coefficient p
+p = gradient(H,u)     # this gives us 2*u + p
 p = substitute(p,u,0) # replace u with zero: gives us p
 
 # H's unconstrained minimizer is: u = -p/2
@@ -70,8 +65,7 @@ f = vertcat((xdot,ldot))
 f = substitute(f,u,u_opt)
 
 # Create the right hand side function
-rhs_in = list(daeIn(x=vertcat((x,lam))))
-rhs_in[DAE_T] = t
+rhs_in = daeIn(x=vertcat((x,lam)))
 rhs = SXFunction(rhs_in,daeOut(ode=f))
 
 # Augmented DAE state dimension
@@ -104,28 +98,36 @@ for k in range(num_nodes+1):
 
 # Formulate the root finding problem
 G = []
+G.append(X[0][:2] - [0,1]) # states fixed, costates free at initial time
 for k in range(num_nodes):
   XF, = integratorOut(I.call(integratorIn(x0=X[k])),"xf")
   G.append(XF-X[k+1])
+G.append(X[num_nodes][2:] - [0,0]) # costates fixed, states free at final time
 
 # Terminal constraints: lam = 0
-G = MXFunction([V],[vertcat(G)])
+rfp = MXFunction([V],[vertcat(G)])
 
-# Dummy objective function (there are no degrees of freedom)
-F = MXFunction([V],[0])
+# Select a solver for the root-finding problem
+#Solver = NLPImplicitSolver
+#Solver = NewtonImplicitSolver
+Solver = KinsolSolver
 
-# Allocate NLP solver
-solver = IpoptSolver(F,G)
+# Allocate an implict solver
+solver = Solver(rfp)
+if Solver==NLPImplicitSolver:
+    solver.setOption("nlp_solver",IpoptSolver)
+elif Solver==NewtonImplicitSolver:
+    solver.setOption("linear_solver",CSparse)
+elif Solver==KinsolSolver:
+    solver.setOption("linear_solver_type","user_defined")
+    solver.setOption("linear_solver",CSparse)
+    solver.setOption("max_iter",1000)
 
-# Initialize the NLP solver
+# Initialize the solver
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput([   0,   1,-inf,-inf] + (num_nodes-1)*[-inf,-inf,-inf,-inf] + [-inf,-inf,   0,   0], "lbx")
-solver.setInput([   0,   1, inf, inf] + (num_nodes-1)*[ inf, inf, inf, inf] + [ inf, inf,   0,   0], "ubx")
-solver.setInput([   0,   0,   0,   0] + (num_nodes-1)*[   0,   0,   0,   0] + [   0,   0,   0,   0], "x0")
-solver.setInput(num_nodes*[0,0,0,0], "lbg")
-solver.setInput(num_nodes*[0,0,0,0], "ubg")
+#solver.setInput([   0,   0,   0,   0] + (num_nodes-1)*[   0,   0,   0,   0] + [   0,   0,   0,   0], "x0")
 
 # Solve the problem
 solver.solve()
@@ -145,7 +147,7 @@ simulator = Simulator(I, output_fcn, tgrid)
 simulator.init()
 
 # Pass initial conditions to the simulator
-simulator.setInput(solver.output("x")[0:4],"x0")
+simulator.setInput(solver.output()[0:4],"x0")
 
 # Simulate to get the trajectories
 simulator.evaluate()
@@ -166,10 +168,4 @@ plt.xlabel('time')
 plt.legend(['x trajectory','y trajectory','u trajectory'])
 plt.grid()
 plt.show()
-
-
-
-
-
-
 
