@@ -504,20 +504,6 @@
 <br/>
 @copydoc scheme_NLPSolverOutput
 */
-/** \class CasADi::OOQPInternal
-\n
-\par
-@copydoc scheme_QPInput
-<br/>
-@copydoc scheme_QPOutput
-*/
-/** \class CasADi::OOQPSolver
-\n
-\par
-@copydoc scheme_QPInput
-<br/>
-@copydoc scheme_QPOutput
-*/
 /** \class CasADi::IpoptInternal
 \n
 \par
@@ -713,6 +699,20 @@
 @copydoc scheme_OCPInput
 <br/>
 @copydoc scheme_OCPOutput
+*/
+/** \class CasADi::OOQPInternal
+\n
+\par
+@copydoc scheme_QPInput
+<br/>
+@copydoc scheme_QPOutput
+*/
+/** \class CasADi::OOQPSolver
+\n
+\par
+@copydoc scheme_QPInput
+<br/>
+@copydoc scheme_QPOutput
 */
 /** \class CasADi::SundialsInternal
 \n
