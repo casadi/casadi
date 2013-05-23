@@ -56,24 +56,6 @@
 <tr><td>nstepsB</td><td>CasADi::CVodesInternal</td></tr>
 </table>
 */
-/** \class CasADi::LiftedSQPInternal
-\n
-\par
-<table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>iter_count</td><td>CasADi::LiftedSQPInternal</td></tr>
-</table>
-*/
-/** \class CasADi::LiftedSQP
-\n
-\par
-<table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>iter_count</td><td>CasADi::LiftedSQPInternal</td></tr>
-</table>
-*/
 /** \class CasADi::SCPgenInternal
 \n
 \par

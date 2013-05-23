@@ -19,6 +19,17 @@
 <tr><td>SDP_DUAL_COST</td><td>The dual optimal cost (1 x 1) [dual_cost].</td></tr>
 </table>
 */
+/** \defgroup scheme_HessLagOutput
+<table>
+<caption>Output scheme: CasADi::HessLagOutput  (HESSLAG_NUM_OUT = 5) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>HESSLAG_HESS</td><td>Hessian of the Lagrangian [hess].</td></tr>
+<tr><td>HESSLAG_F</td><td>Objective function [f].</td></tr>
+<tr><td>HESSLAG_G</td><td>Constraint function [g].</td></tr>
+<tr><td>HESSLAG_GRAD_X</td><td>Gradient of the Lagrangian with respect to x [grad_x].</td></tr>
+<tr><td>HESSLAG_GRAD_P</td><td>Gradient of the Lagrangian with respect to p [grad_p].</td></tr>
+</table>
+*/
 /** \defgroup scheme_QPInput
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
@@ -121,13 +132,12 @@
 <tr><td>QP_LAMBDA_X</td><td>The dual solution corresponding to simple bounds [lambda_x].</td></tr>
 </table>
 */
-/** \defgroup scheme_DAEOutput
+/** \defgroup scheme_NLPOutput
 <table>
-<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 3) </caption>
+<caption>Output scheme: CasADi::NLPOutput  (NLP_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_ODE</td><td>Right hand side of the implicit ODE [ode].</td></tr>
-<tr><td>DAE_ALG</td><td>Right hand side of algebraic equations [alg].</td></tr>
-<tr><td>DAE_QUAD</td><td>Right hand side of quadratures equations [quad].</td></tr>
+<tr><td>NLP_F</td><td>Objective function [f].</td></tr>
+<tr><td>NLP_G</td><td>Constraint function [g].</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPSolverInput
@@ -144,12 +154,14 @@
 <tr><td>NLP_SOLVER_LAM_G0</td><td>Lagrange multipliers for bounds on G, initial guess (ng x 1) [lam_g0].</td></tr>
 </table>
 */
-/** \defgroup scheme_NLInput
+/** \defgroup scheme_DAEInput
 <table>
-<caption>Input scheme: CasADi::NLInput  (NL_NUM_IN = 2) </caption>
+<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NL_X</td><td>Decision variable [x].</td></tr>
-<tr><td>NL_P</td><td>Fixed parameter [p].</td></tr>
+<tr><td>DAE_X</td><td>Differential state [x].</td></tr>
+<tr><td>DAE_Z</td><td>Algebraic state [z].</td></tr>
+<tr><td>DAE_P</td><td>Parameter [p].</td></tr>
+<tr><td>DAE_T</td><td>Explicit time dependence [t].</td></tr>
 </table>
 */
 /** \defgroup scheme_ACADO_Output
@@ -162,17 +174,18 @@
 <tr><td>ACADO_COST</td><td>Optimal cost [cost].</td></tr>
 </table>
 */
-/** \defgroup scheme_NLOutput
+/** \defgroup scheme_DAEOutput
 <table>
-<caption>Output scheme: CasADi::NLOutput  (NL_NUM_OUT = 2) </caption>
+<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NL_F</td><td>Objective function [f].</td></tr>
-<tr><td>NL_G</td><td>Constraint function [g].</td></tr>
+<tr><td>DAE_ODE</td><td>Right hand side of the implicit ODE [ode].</td></tr>
+<tr><td>DAE_ALG</td><td>Right hand side of algebraic equations [alg].</td></tr>
+<tr><td>DAE_QUAD</td><td>Right hand side of quadratures equations [quad].</td></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
 <table>
-<caption>Input scheme: CasADi::InputOutputScheme  ( = 22) </caption>
+<caption>Input scheme: CasADi::InputOutputScheme  ( = 28) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -185,8 +198,14 @@
 <tr><td>SCHEME_RDAEOutput</td><td></td></tr>
 <tr><td>SCHEME_IntegratorInput</td><td></td></tr>
 <tr><td>SCHEME_IntegratorOutput</td><td></td></tr>
-<tr><td>SCHEME_NLInput</td><td></td></tr>
-<tr><td>SCHEME_NLOutput</td><td></td></tr>
+<tr><td>SCHEME_NLPInput</td><td></td></tr>
+<tr><td>SCHEME_NLPOutput</td><td></td></tr>
+<tr><td>SCHEME_GradFInput</td><td></td></tr>
+<tr><td>SCHEME_GradFOutput</td><td></td></tr>
+<tr><td>SCHEME_JacGInput</td><td></td></tr>
+<tr><td>SCHEME_JacGOutput</td><td></td></tr>
+<tr><td>SCHEME_HessLagInput</td><td></td></tr>
+<tr><td>SCHEME_HessLagOutput</td><td></td></tr>
 <tr><td>SCHEME_NLPSolverInput</td><td></td></tr>
 <tr><td>SCHEME_NLPSolverOutput</td><td></td></tr>
 <tr><td>SCHEME_MayerInput</td><td></td></tr>
@@ -201,7 +220,7 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <table>
-<caption>Output scheme: CasADi::InputOutputScheme  ( = 22) </caption>
+<caption>Output scheme: CasADi::InputOutputScheme  ( = 28) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -214,8 +233,14 @@
 <tr><td>SCHEME_RDAEOutput</td><td></td></tr>
 <tr><td>SCHEME_IntegratorInput</td><td></td></tr>
 <tr><td>SCHEME_IntegratorOutput</td><td></td></tr>
-<tr><td>SCHEME_NLInput</td><td></td></tr>
-<tr><td>SCHEME_NLOutput</td><td></td></tr>
+<tr><td>SCHEME_NLPInput</td><td></td></tr>
+<tr><td>SCHEME_NLPOutput</td><td></td></tr>
+<tr><td>SCHEME_GradFInput</td><td></td></tr>
+<tr><td>SCHEME_GradFOutput</td><td></td></tr>
+<tr><td>SCHEME_JacGInput</td><td></td></tr>
+<tr><td>SCHEME_JacGOutput</td><td></td></tr>
+<tr><td>SCHEME_HessLagInput</td><td></td></tr>
+<tr><td>SCHEME_HessLagOutput</td><td></td></tr>
 <tr><td>SCHEME_NLPSolverInput</td><td></td></tr>
 <tr><td>SCHEME_NLPSolverOutput</td><td></td></tr>
 <tr><td>SCHEME_MayerInput</td><td></td></tr>
@@ -226,6 +251,23 @@
 <tr><td>SCHEME_SDPInput</td><td></td></tr>
 <tr><td>SCHEME_SDPOutput</td><td></td></tr>
 <tr><td>SCHEME_unknown</td><td></td></tr>
+</table>
+*/
+/** \defgroup scheme_GradFInput
+<table>
+<caption>Input scheme: CasADi::GradFInput  (GRADF_NUM_IN = 2) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>GRADF_X</td><td>Decision variable [x].</td></tr>
+<tr><td>GRADF_P</td><td>Fixed parameter [p].</td></tr>
+</table>
+*/
+/** \defgroup scheme_GradFOutput
+<table>
+<caption>Output scheme: CasADi::GradFOutput  (GRADF_NUM_OUT = 3) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>GRADF_GRAD</td><td>Jacobian of the constraints [grad].</td></tr>
+<tr><td>GRADF_F</td><td>Objective function [f].</td></tr>
+<tr><td>GRADF_G</td><td>Constraint function [g].</td></tr>
 </table>
 */
 /** \defgroup scheme_MayerInput
@@ -251,14 +293,12 @@
 <tr><td>CONTROL_DAE_TF</td><td>Time at end of control interval (1-by-1) [tf].</td></tr>
 </table>
 */
-/** \defgroup scheme_DAEInput
+/** \defgroup scheme_NLPInput
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_X</td><td>Differential state [x].</td></tr>
-<tr><td>DAE_Z</td><td>Algebraic state [z].</td></tr>
-<tr><td>DAE_P</td><td>Parameter [p].</td></tr>
-<tr><td>DAE_T</td><td>Explicit time dependence [t].</td></tr>
+<tr><td>NLP_X</td><td>Decision variable [x].</td></tr>
+<tr><td>NLP_P</td><td>Fixed parameter [p].</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorInput
@@ -290,6 +330,15 @@
 <tr><td>RDAE_QUAD</td><td>Right hand side of quadratures. [quad].</td></tr>
 </table>
 */
+/** \defgroup scheme_JacGOutput
+<table>
+<caption>Output scheme: CasADi::JacGOutput  (JACG_NUM_OUT = 3) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>JACG_JAC</td><td>Jacobian of the constraints [jac].</td></tr>
+<tr><td>JACG_F</td><td>Objective function [f].</td></tr>
+<tr><td>JACG_G</td><td>Constraint function [g].</td></tr>
+</table>
+*/
 /** \defgroup scheme_OCPInput
 <table>
 <caption>Input scheme: CasADi::OCPInput  (OCP_NUM_IN = 13) </caption>
@@ -316,6 +365,24 @@
 <tr><td>CONTROLSIMULATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1) [x0].</td></tr>
 <tr><td>CONTROLSIMULATOR_P</td><td>Parameters that are fixed over the entire horizon (dimension np-by-1) [p].</td></tr>
 <tr><td>CONTROLSIMULATOR_U</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nu) [u].</td></tr>
+</table>
+*/
+/** \defgroup scheme_JacGInput
+<table>
+<caption>Input scheme: CasADi::JacGInput  (JACG_NUM_IN = 2) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>JACG_X</td><td>Decision variable [x].</td></tr>
+<tr><td>JACG_P</td><td>Fixed parameter [p].</td></tr>
+</table>
+*/
+/** \defgroup scheme_HessLagInput
+<table>
+<caption>Input scheme: CasADi::HessLagInput  (HESSLAG_NUM_IN = 4) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>HESSLAG_X</td><td>Decision variable [x].</td></tr>
+<tr><td>HESSLAG_P</td><td>Fixed parameter [p].</td></tr>
+<tr><td>HESSLAG_LAM_F</td><td>Multiplier for f [lam_f].</td></tr>
+<tr><td>HESSLAG_LAM_G</td><td>Multiplier for g [lam_g].</td></tr>
 </table>
 */
 /** \defgroup scheme_MUSCOD_FCN_Input
@@ -356,20 +423,6 @@
 @copydoc scheme_QPInput
 <br/>
 @copydoc scheme_QPOutput
-*/
-/** \class CasADi::IPInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/** \class CasADi::IPMethod
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
 */
 /** \class CasADi::WorhpInternal
 \n
@@ -436,20 +489,6 @@
 @copydoc scheme_OCPInput
 <br/>
 @copydoc scheme_OCPOutput
-*/
-/** \class CasADi::LiftedSQPInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/** \class CasADi::LiftedSQP
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
 */
 /** \class CasADi::SCPgenInternal
 \n

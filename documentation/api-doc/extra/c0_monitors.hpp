@@ -108,38 +108,6 @@
 <tr><td>reset</td><td>CasADi::CVodesInternal</td></tr>
 </table>
 */
-/** \class CasADi::LiftedSQPInternal
-\n
-\par
-<table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>CasADi::LiftedSQPInternal</td></tr>
-<tr><td>eval_g</td><td>CasADi::LiftedSQPInternal</td></tr>
-<tr><td>eval_grad_f</td><td>CasADi::LiftedSQPInternal</td></tr>
-<tr><td>eval_h</td><td>CasADi::LiftedSQPInternal</td></tr>
-<tr><td>eval_jac_g</td><td>CasADi::LiftedSQPInternal</td></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>qp</td><td>CasADi::LiftedSQPInternal</td></tr>
-</table>
-*/
-/** \class CasADi::LiftedSQP
-\n
-\par
-<table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>CasADi::LiftedSQPInternal</td></tr>
-<tr><td>eval_g</td><td>CasADi::LiftedSQPInternal</td></tr>
-<tr><td>eval_grad_f</td><td>CasADi::LiftedSQPInternal</td></tr>
-<tr><td>eval_h</td><td>CasADi::LiftedSQPInternal</td></tr>
-<tr><td>eval_jac_g</td><td>CasADi::LiftedSQPInternal</td></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>qp</td><td>CasADi::LiftedSQPInternal</td></tr>
-</table>
-*/
 /** \class CasADi::SCPgenInternal
 \n
 \par
