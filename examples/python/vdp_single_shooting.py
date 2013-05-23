@@ -36,14 +36,14 @@ xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, \
                 x[0]*x[0] + x[1]*x[1] + u*u] )
 
 # DAE residual function
-f = SXFunction(daeIn(x=x,p=u),daeOut(ode=xdot))
+dae = SXFunction(daeIn(x=x,p=u),daeOut(ode=xdot))
 
 # Create an integrator
-f_d = CVodesIntegrator(f)
-f_d.setOption("abstol",1e-8) # tolerance
-f_d.setOption("reltol",1e-8) # tolerance
-f_d.setOption("tf",tf/nk) # final time
-f_d.init()
+integrator = CVodesIntegrator(dae)
+integrator.setOption("abstol",1e-8) # tolerance
+integrator.setOption("reltol",1e-8) # tolerance
+integrator.setOption("tf",tf/nk) # final time
+integrator.init()
 
 # All controls (use matrix graph)
 U = msym("U",nk) # nk-by-1 symbolic variable
@@ -53,16 +53,17 @@ X  = msym([0,1,0])
 
 # Build a graph of integrator calls
 for k in range(nk):
-  X, = integratorOut(f_d.call(integratorIn(x0=X,p=U[k])),"xf")
+  X, = integratorOut(integrator.call(integratorIn(x0=X,p=U[k])),"xf")
   
 # Objective function: x_2(T)
-F = MXFunction([U],[X[2]])
+f=X[2]
 
 # Terminal constraints: x_0(T)=x_1(T)=0
-G = MXFunction([U],[X[:2]]) # first two components of X
+g = X[:2]
 
 # Allocate an NLP solver
-solver = IpoptSolver(F,G)
+nlp = MXFunction(nlpIn(x=U),nlpOut(f=f,g=g))
+solver = IpoptSolver(nlp)
 solver.init()
 
 # Set bounds and initial guess
@@ -91,3 +92,4 @@ plt.xlabel('time')
 plt.legend(['u trajectory'])
 plt.grid()
 plt.show()
+

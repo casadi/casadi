@@ -36,26 +36,26 @@ x  = ssym("x",3)  # state
 ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
        x[0], \
        x[0]*x[0] + x[1]*x[1] + u*u])
-f = SXFunction(daeIn(x=x,p=u,t=t),daeOut(ode=ode))
+dae = SXFunction(daeIn(x=x,p=u,t=t),daeOut(ode=ode))
 
 # Create an integrator
 if coll:
-  f_d = CollocationIntegrator(f)
-  f_d.setOption("number_of_finite_elements",5)
-  f_d.setOption("interpolation_order",5)
-  f_d.setOption("collocation_scheme","legendre")
-  f_d.setOption("implicit_solver",KinsolSolver)
-  f_d.setOption("implicit_solver_options",\
+  integrator = CollocationIntegrator(dae)
+  integrator.setOption("number_of_finite_elements",5)
+  integrator.setOption("interpolation_order",5)
+  integrator.setOption("collocation_scheme","legendre")
+  integrator.setOption("implicit_solver",KinsolSolver)
+  integrator.setOption("implicit_solver_options",\
     {'linear_solver' : CSparse})
-  f_d.setOption("expand_f",True)
+  integrator.setOption("expand_f",True)
 else:
-  f_d = CVodesIntegrator(f)
-  f_d.setOption("abstol",1e-8) # tolerance
-  f_d.setOption("reltol",1e-8) # tolerance
-  f_d.setOption("steps_per_checkpoint",1000)
+  integrator = CVodesIntegrator(dae)
+  integrator.setOption("abstol",1e-8) # tolerance
+  integrator.setOption("reltol",1e-8) # tolerance
+  integrator.setOption("steps_per_checkpoint",1000)
 
-f_d.setOption("tf",tf/nk) # final time
-f_d.init()
+integrator.setOption("tf",tf/nk) # final time
+integrator.init()
 
 # Total number of variables
 nv = 1*nk + 3*(nk+1)
@@ -99,7 +99,7 @@ for k in range(nk):
   Xk_next = vertcat((X0[k+1],X1[k+1],X2[k+1]))
   
   # Call the integrator
-  Xk_end, = integratorOut(f_d.call(integratorIn(x0=Xk,p=U[k])),"xf")
+  Xk_end, = integratorOut(integrator.call(integratorIn(x0=Xk,p=U[k])),"xf")
   
   # append continuity constraints
   g.append(Xk_next - Xk_end)
@@ -107,13 +107,14 @@ for k in range(nk):
   g_max.append(NP.zeros(Xk.size()))
 
 # Objective function: L(T)
-F = MXFunction([V],[X2[nk]])
+f = X2[nk]
 
 # Continuity constraints: 0<= x(T(k+1)) - X(T(k)) <=0
-G = MXFunction([V],[vertcat(g)])
+g = vertcat(g)
 
 # Create NLP solver instance
-solver = IpoptSolver(F,G)
+nlp = MXFunction(nlpIn(x=V),nlpOut(f=f,g=g))
+solver = IpoptSolver(nlp)
 
 #solver.setOption("verbose",True)
 solver.init()
