@@ -113,14 +113,14 @@ for i in range(N):
 for i in range(N-1):
   obj += mul([shooting["W",i].T,Q,shooting["W",i]])
 
-f_obj = SXFunction([shooting,parameters],[obj])
-f_obj.init()
 # Build the multiple shooting constraints
 g = []
 for i in range(N-1):
   g.append( shooting["X",i+1] - phi.eval([shooting["X",i],parameters["U",i],shooting["W",i]])[0] )
-G = SXFunction([shooting,parameters],[vertcat(g)])
-G.init()
+
+# Formulate the NLP
+nlp = SXFunction(nlpIn(x=shooting,p=parameters),nlpOut(f=obj,g=vertcat(g)))
+
 # Make a simulation to create the data for the problem
 simulated_X = DMatrix.zeros(Nstates,Nsimulation)
 simulated_X[:,0] = DMatrix([1,0]) # Initial state
@@ -148,7 +148,7 @@ sigma_x0 = 0.01
 P = sigma_x0**2*DMatrix.eye(Nstates)
 x0 = simulated_X[:,0] + sigma_x0*NP.random.randn(Nstates,1)
 # Create the solver
-nlp_solver = IpoptSolver(f_obj,G)
+nlp_solver = IpoptSolver(nlp)
 nlp_solver.setOption({"print_level":0, "print_time": False})
 nlp_solver.setOption('linear_solver','MA57')
 nlp_solver.setOption('max_iter',100)

@@ -120,19 +120,16 @@ for N in range(1,11):
       g.append(Z[i+1,0] - rhs)
 
   print "g = ", g
-  
-  # Constraint function
-  gfcn = SXFunction([x],[g])
 
-  # Dummy objective function
-  obj = SXFunction([x], [x[0]*x[0]])
-  
+  # NLP
+  nlp = SXFunction(nlpIn(x=x),nlpOut(f=x[0]**2,g=g))
+
   ## ----
   ## SOLVE THE NLP
   ## ----
   
   # Allocate an NLP solver
-  solver = IpoptSolver(obj,gfcn)
+  solver = IpoptSolver(nlp)
 
   # Set options
   solver.setOption("tol",1e-10)

@@ -79,12 +79,12 @@ class Misctests(casadiTestCase):
     
     self.assertRaises(RuntimeError,lambda : f.setOption("ad_mode","foo"))
     
-    x = SX("x")
-    f = SXFunction([x],[x])
+    x = ssym("x")
+    nlp = SXFunction(nlpIn(x=x),nlpOut(f=x))
 
     try:
         print "IpoptSolver"
-        g = IpoptSolver(f,FX())
+        g = IpoptSolver(nlp)
     except:
         return
     
@@ -222,10 +222,9 @@ class Misctests(casadiTestCase):
   @requires("IpoptSolver")
   def test_options_introspection(self):
     self.message("options introspection")
-    x=SX("x")
-    f = SXFunction([x],[x**2])
-    f.init()
-    i = IpoptSolver(f,FX())
+    x=ssym("x")
+    nlp = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
+    i = IpoptSolver(nlp)
     
     opts = i.getOptionNames()
     self.assertTrue(isinstance(opts,tuple))

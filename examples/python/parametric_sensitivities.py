@@ -73,9 +73,8 @@ lbg = [0.00, 0.00, p_a[0], p_a[1]]
 ubg = [0.00, 0.00, p_a[0], p_a[1]]
     
 # Create NLP solver
-ffcn = SXFunction([x],[f])
-gfcn = SXFunction([x],[g])
-solver = IpoptSolver(ffcn,gfcn)
+nlp = SXFunction(nlpIn(x=x),nlpOut(f=f,g=g))
+solver = IpoptSolver(nlp)
   
 # Mark the parameters amongst the constraints (see sIPOPT documentation)
 con_integer_md = {}
