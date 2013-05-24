@@ -551,6 +551,170 @@ class ADtests(casadiTestCase):
     print f.input().shape
     J=f.jacobian(0,0)
     
+    
+  def test_MX(self):
+    x = msym("x",2)
+    y = msym("y",2,2)
+    
+    f1 = MXFunction([x,y],[x+y[0],mul(y,x)])
+    f1.init()
+    
+    ndir = 1 
+    
+    in1 = [x,y]
+    v1 = [DMatrix([1.1,1.3]),DMatrix([[0.7,1.5],[2.1,0.9]])]
+    
+    w=x[:]
+    w[1]*=2
+    
+    yy=y[:,:]
+    
+    yy[:,0] = x
+    
+    for inputs,values,out, jac, h in [
+          (in1,v1,x,DMatrix.eye(2),0),
+          (in1,v1,x.T,DMatrix.eye(2),0),
+          (in1,v1,c.reshape(x,(1,2)),DMatrix.eye(2),0),
+          (in1,v1,x+y[0],DMatrix.eye(2),0),
+          (in1,v1,x*y[0],DMatrix.eye(2)*y[0],0),
+          (in1,v1,x[0],DMatrix.eye(2)[0,:],0),
+          (in1,v1,vertcat([x[1],x[0]]),sparse(DMatrix([[0,1],[1,0]])),0),
+          (in1,v1,horzcat([x[1],x[0]]).T,sparse(DMatrix([[0,1],[1,0]])),0),
+          #(in1,v1,x[[1,0]],sparse(DMatrix([[0,1],[1,0]])),0),  knownbug #746
+          (in1,v1,w,sparse(DMatrix([[1,0],[0,2]])),0),
+          (in1,v1,yy[:,0],DMatrix.eye(2),0),
+          (in1,v1,mul(y,x),y,0),
+          (in1,v1,sin(x),c.diag(cos(x)),0),
+          (in1,v1,x*y[:,0],c.diag(y[:,0]),0),
+          (in1,v1,inner_prod(x,x),(2*x).T,0),
+          #(in1,v1,c.det(horzcat([x,DMatrix([1,2])])),DMatrix([-1,2]),0), not implemented
+          (in1,v1,f1.call(in1)[1],y,0),
+     ]:
+      print out
+      fun = MXFunction(inputs,[out,jac])
+      fun.init()
+      
+      funsx = fun.expand()
+      funsx.init()
+      
+      for i,v in enumerate(values):
+        fun.input(i).set(v)
+        funsx.input(i).set(v)
+        
+      fun.evaluate()
+      funsx.evaluate()
+      self.checkarray(fun.output(0),funsx.output(0))
+      self.checkarray(fun.output(1),funsx.output(1))
+      
+      J_ = DMatrix(fun.output(1))
+
+      for f in [fun,fun.expand()]:
+        f.setOption("number_of_adj_dir",ndir)
+        f.setOption("number_of_fwd_dir",ndir)
+        f.init()
+
+        # Fwd and Adjoint AD
+        for i,v in enumerate(values):
+          f.input(i).set(v)
+        
+        random.seed(0)
+        for d in range(ndir):
+          f.fwdSeed(0,d).set(DMatrix(inputs[0].sparsity(),random.random(inputs[0].size())))
+          f.adjSeed(0,d).set(DMatrix(out.sparsity(),random.random(out.size())))
+          f.fwdSeed(1,d).set(0)
+          f.adjSeed(1,d).set(0)
+          
+        f.evaluate(ndir,ndir)
+        for d in range(ndir):
+          seed = array(f.fwdSeed(0,d)).ravel()
+          sens = array(f.fwdSens(0,d)).ravel()
+          self.checkarray(sens,mul(J_,seed),"Fwd %d" %d)
+
+          seed = array(f.adjSeed(0,d)).ravel()
+          sens = array(f.adjSens(0,d)).ravel()
+          self.checkarray(sens,mul(J_.T,seed),"Adj %d" %d)
+          
+        # evalThings
+        for sym, Function in [(msym,MXFunction),(ssym,SXFunction)]:
+          if isinstance(f, MXFunction) and Function is SXFunction: continue
+          if isinstance(f, SXFunction) and Function is MXFunction: continue
+          fseeds = [[sym("fseed",f.input(i).sparsity()) for i in range(f.getNumInputs())]  for d in range(ndir)]
+          aseeds = [[sym("aseed",f.output(i).sparsity())  for i in range(f.getNumOutputs())] for d in range(ndir)]
+          inputss = [sym("input",f.input(i).sparsity()) for i in range(f.getNumInputs())]
+      
+          res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
+          
+          for d in range(ndir):
+            fseed = DMatrix(inputs[0].sparsity(),random.random(inputs[0].size()))
+            aseed = DMatrix(out.sparsity(),random.random(out.size()))
+            vf = Function(inputss+fseeds[d]+aseeds[d],list(fwdsens[d])+list(adjsens[d]))
+            vf.init()
+            for i,v in enumerate(values):
+              vf.input(i).set(v)
+            offset = len(values)
+            
+            vf.input(offset+0).set(fseed)
+            for i in range(len(values)-1):
+              vf.input(offset+i+1).set(0)
+              
+            offset += len(values)
+
+            vf.input(offset+0).set(aseed)
+            vf.input(offset+1).set(0)
+            
+            vf.evaluate()
+            
+            seed = array(fseed).ravel()
+            sens = array(vf.output(0)).ravel()
+            self.checkarray(sens,mul(J_,seed),"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
+
+            seed = array(aseed).ravel()
+            sens = array(vf.output(len(values))).ravel()
+            
+            self.checkarray(sens,mul(J_.T,seed),"eval Adj %d %s" % (d,str([vf.output(i) for i in range(vf.getNumOutputs())])))
+            
+        #  jacobian()
+        for mode in ["forward","reverse"]:
+          for numeric in [True,False]:
+            f.setOption("ad_mode",mode)
+            f.setOption("numeric_jacobian",numeric)
+            f.init()
+            Jf=f.jacobian(0,0)
+            Jf.init()
+            for i,v in enumerate(values):
+              Jf.input(i).set(v)
+            Jf.evaluate()
+            self.checkarray(Jf.output(),J_)
+            self.checkarray(DMatrix(Jf.output().sparsity(),1),DMatrix(J_.sparsity(),1))
+            self.checkarray(DMatrix(f.jacSparsity(),1),DMatrix(J_.sparsity(),1))
+            
+      # Scalarized
+      fun = MXFunction(inputs,[out[0],jac[0,:].T])
+      fun.init()
+      
+      for i,v in enumerate(values):
+        fun.input(i).set(v)
+        
+        
+      fun.evaluate()
+      J_ = DMatrix(fun.output(1))
+      
+      for f in [fun,fun.expand()]:
+        #  gradient()
+        for mode in ["forward","reverse"]:
+          for numeric in [True,False]:
+            f.setOption("ad_mode",mode)
+            f.setOption("numeric_jacobian",numeric)
+            f.init()
+            Gf=f.gradient(0,0)
+            Gf.init()
+            for i,v in enumerate(values):
+              Gf.input(i).set(v)
+            Gf.evaluate()
+            self.checkarray(Gf.output(),J_)
+            #self.checkarray(DMatrix(Gf.output().sparsity(),1),DMatrix(J_.sparsity(),1),str(mode)+str(numeric)+str(out)+str(type(fun)))
+    
+    
 if __name__ == '__main__':
     unittest.main()
 
