@@ -567,25 +567,48 @@ class ADtests(casadiTestCase):
     w=x[:]
     w[1]*=2
     
+    ww=x[:]
+    ww[[0,1]]*=x
+
+    wwf=x[:]
+    wwf[[1,0]]*=x
+    
+    wwr=x[:]
+    wwr[[0,0,1,1]]*=2
+    
     yy=y[:,:]
     
     yy[:,0] = x
+
+    yyy=y[:,:]
+    
+    yyy[[1,0],0] = x
+    
     
     for inputs,values,out, jac, h in [
           (in1,v1,x,DMatrix.eye(2),0),
           (in1,v1,x.T,DMatrix.eye(2),0),
+          (in1,v1,x**2,2*c.diag(x),0),
           (in1,v1,c.reshape(x,(1,2)),DMatrix.eye(2),0),
           (in1,v1,x+y[0],DMatrix.eye(2),0),
           (in1,v1,x*y[0],DMatrix.eye(2)*y[0],0),
           (in1,v1,x[0],DMatrix.eye(2)[0,:],0),
           (in1,v1,vertcat([x[1],x[0]]),sparse(DMatrix([[0,1],[1,0]])),0),
           (in1,v1,horzcat([x[1],x[0]]).T,sparse(DMatrix([[0,1],[1,0]])),0),
-          #(in1,v1,x[[1,0]],sparse(DMatrix([[0,1],[1,0]])),0),  knownbug #746
+          (in1,v1,x[[0,1]],sparse(DMatrix([[1,0],[0,1]])),0),
+          (in1,v1,x[[0,0,1,1]],sparse(DMatrix([[1,0],[1,0],[0,1],[0,1]])),0),
+          #(in1,v1,wwr,sparse(DMatrix([[2,0],[0,2]])),0), # knownbug #748
+          #(in1,v1,x[[1,0]],sparse(DMatrix([[0,1],[1,0]])),0), #  knownbug #746
+          #(in1,v1,x[[1,0],0],sparse(DMatrix([[0,1],[1,0]])),0),
           (in1,v1,w,sparse(DMatrix([[1,0],[0,2]])),0),
+          (in1,v1,ww,2*c.diag(x),0),
+          #(in1,v1,wwf,2*c.diag(x[[1,0]]),0),
           (in1,v1,yy[:,0],DMatrix.eye(2),0),
+          #(in1,v1,yyy[:,0],sparse(DMatrix([[0,1],[1,0]])),0),
           (in1,v1,mul(y,x),y,0),
           (in1,v1,sin(x),c.diag(cos(x)),0),
           (in1,v1,x*y[:,0],c.diag(y[:,0]),0),
+          #(in1,v1,x*y[[1,0],0],c.diag(y[[1,0],0]),0),
           (in1,v1,inner_prod(x,x),(2*x).T,0),
           #(in1,v1,c.det(horzcat([x,DMatrix([1,2])])),DMatrix([-1,2]),0), not implemented
           (in1,v1,f1.call(in1)[1],y,0),
@@ -628,7 +651,7 @@ class ADtests(casadiTestCase):
         for d in range(ndir):
           seed = array(f.fwdSeed(0,d)).ravel()
           sens = array(f.fwdSens(0,d)).ravel()
-          self.checkarray(sens,mul(J_,seed),"Fwd %d" %d)
+          self.checkarray(sens,mul(J_,seed),"Fwd %d %s" % (d,str(type(f))))
 
           seed = array(f.adjSeed(0,d)).ravel()
           sens = array(f.adjSens(0,d)).ravel()
