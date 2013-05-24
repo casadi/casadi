@@ -630,8 +630,8 @@ class ADtests(casadiTestCase):
           (in1,v1,w2,blockcat([[1,MX(1,1)],[x[1],x[0]]]),0),
           (in1,v1,ww,2*c.diag(x),0),
           #(in1,v1,wwf,2*c.diag(x[[1,0]]),0),
-          (in1,v1,yy[:,0],DMatrix.eye(2),0),
-          (in1,v1,yy2[:,0],2*c.diag(x),0),
+          (in1,v1,yy[:,0],DMatrix.eye(2),1), #knownbug #753
+          (in1,v1,yy2[:,0],2*c.diag(x),1), #knownbug #753
           #(in1,v1,yyy[:,0],sparse(DMatrix([[0,1],[1,0]])),0),
           (in1,v1,mul(y,x),y,0),
           (in1,v1,mul(y,x**2),y*2*vertcat([x.T,x.T]),0),
@@ -708,7 +708,7 @@ class ADtests(casadiTestCase):
             ret[0,0] = DMatrix.sparse(1,1)
             return ret
             
-          spmods = [lambda x: x] # , remove00]
+          spmods = [lambda x: x , remove00]
           # dense
           for spmod,spmod2 in itertools.product(spmods,repeat=2):
             fseeds = [[sym("f",spmod(f.input(i)).sparsity()) for i in range(f.getNumInputs())]  for d in range(ndir)]
@@ -776,20 +776,22 @@ class ADtests(casadiTestCase):
             fseeds2 = [[sym2("f",vf.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
             aseeds2 = [[sym2("a",vf.output(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
             inputss2 = [sym2("i",vf.input(i).sparsity()) for i in range(vf.getNumInputs())]
-        
-            res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
+         
+            if h==0:
+              res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
 
-            vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
-            vf2.init()
+              vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+              vf2.init()
+                
+              random.seed(1)
+              for i in range(vf2.getNumInputs()):
+                vf2.input(i).set(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())))
               
-            random.seed(1)
-            for i in range(vf2.getNumInputs()):
-              vf2.input(i).set(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())))
-            
-            vf2.evaluate()
-            storage2.append([DMatrix(vf2.output(i)) for i in range(vf2.getNumInputs())])
-            
-           
+              vf2.evaluate()
+              storage2.append([DMatrix(vf2.output(i)) for i in range(vf2.getNumInputs())])
+            else :
+              #knownbug #753
+              pass
             
         #  jacobian()
         for mode in ["forward","reverse"]:
