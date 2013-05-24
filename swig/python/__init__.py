@@ -65,7 +65,7 @@ for oldenum, newenum, string , io in [
   ("NLP_UBX","NLP_SOLVER_UBX","ubx","input"),
   ("NLP_LBG","NLP_SOLVER_LBG","lbg","input"),
   ("NLP_UBG","NLP_SOLVER_UBG","ubg","input"),
-  ("NLP_LAMBDA_INIT","NLP_SOLVER_LAMB_G0","lam_g0","input"),
+  ("NLP_LAMBDA_INIT","NLP_SOLVER_LAM_G0","lam_g0","input"),
   ("NLP_P","NLP_SOLVER_P","p","input"),
   ("NLP_X_OPT","NLP_SOLVER_X","x","output"),
   ("NLP_COST","NLP_SOLVER_F","f","output"),
