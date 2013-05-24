@@ -27,7 +27,6 @@ from types import *
 from helpers import *
 import itertools
 
-@run_only(["MX"])
 class ADtests(casadiTestCase):
 
   def setUp(self):
@@ -597,6 +596,13 @@ class ADtests(casadiTestCase):
     
     yyy2[[1,0],0] = x**2
     
+
+    def remove00(x):
+      ret = DMatrix(x)
+      ret[0,0] = DMatrix.sparse(1,1)
+      return ret
+      
+    spmods = [lambda x: x , remove00]
     
     # TODO: sparse seeding
     
@@ -670,7 +676,7 @@ class ADtests(casadiTestCase):
         return ret
 
       storage2 = []
-      storage = []
+      storage = {}
       for f in [fun.expand(),fun]:
         f.setOption("number_of_adj_dir",ndir)
         f.setOption("number_of_fwd_dir",ndir)
@@ -703,12 +709,7 @@ class ADtests(casadiTestCase):
           if isinstance(f, SXFunction) and Function is MXFunction: continue
           
           
-          def remove00(x):
-            ret = DMatrix(x)
-            ret[0,0] = DMatrix.sparse(1,1)
-            return ret
-            
-          spmods = [lambda x: x , remove00]
+
           # dense
           for spmod,spmod2 in itertools.product(spmods,repeat=2):
             fseeds = [[sym("f",spmod(f.input(i)).sparsity()) for i in range(f.getNumInputs())]  for d in range(ndir)]
@@ -756,43 +757,45 @@ class ADtests(casadiTestCase):
               self.checkarray(sens,mul(J_.T,seed),"eval Adj %d %s" % (d,str([vf.output(i) for i in range(vf.getNumOutputs())])))
           
           
+            assert(offset==vf.getNumOutputs())
+          
+            # Complete dense random seeding
+            random.seed(1)
+            for i in range(vf.getNumInputs()):
+              vf.input(i).set(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).size())))
             
-          assert(offset==vf.getNumOutputs())
-          
-          # Complete dense random seeding
-          random.seed(1)
-          for i in range(vf.getNumInputs()):
-            vf.input(i).set(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).size())))
-          
-          vf.evaluate()
-          storage.append([DMatrix(vf.output(i)) for i in range(vf.getNumInputs())])
-          
+            vf.evaluate()
+            storagekey = (spmod,spmod2)
+            if not(storagekey in storage):
+              storage[storagekey] = []
+            storage[storagekey].append([DMatrix(vf.output(i)) for i in range(vf.getNumInputs())])
+            
           # Second order sensitivities
           for sym2, Function2 in [(msym,MXFunction),(ssym,SXFunction)]:
           
             if isinstance(vf, MXFunction) and Function2 is SXFunction: continue
             if isinstance(vf, SXFunction) and Function2 is MXFunction: continue
+            for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
+              fseeds2 = [[sym2("f",vf.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
+              aseeds2 = [[sym2("a",vf.output(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
+              inputss2 = [sym2("i",vf.input(i).sparsity()) for i in range(vf.getNumInputs())]
+           
+              if h==0:
+                res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
 
-            fseeds2 = [[sym2("f",vf.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
-            aseeds2 = [[sym2("a",vf.output(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
-            inputss2 = [sym2("i",vf.input(i).sparsity()) for i in range(vf.getNumInputs())]
-         
-            if h==0:
-              res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
-
-              vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
-              vf2.init()
+                vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+                vf2.init()
+                  
+                random.seed(1)
+                for i in range(vf2.getNumInputs()):
+                  vf2.input(i).set(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())))
                 
-              random.seed(1)
-              for i in range(vf2.getNumInputs()):
-                vf2.input(i).set(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())))
-              
-              vf2.evaluate()
-              storage2.append([DMatrix(vf2.output(i)) for i in range(vf2.getNumInputs())])
-            else :
-              #knownbug #753
-              pass
-            
+                vf2.evaluate()
+                storage2.append([DMatrix(vf2.output(i)) for i in range(vf2.getNumInputs())])
+              else :
+                #knownbug #753
+                pass
+          
         #  jacobian()
         for mode in ["forward","reverse"]:
           for numeric in [True,False]:
@@ -809,14 +812,15 @@ class ADtests(casadiTestCase):
             self.checkarray(DMatrix(f.jacSparsity(),1),DMatrix(J_.sparsity(),1))
       
       # Remainder of second-order testing
-      for st,order in [(storage,"first-order"),(storage2,"second-order")]:
+      for store,order in [(storage,"first-order"),(storage2,"second-order")]:
         if order=="second-order": continue # knownbug #752
         if order=="first-order" and out is w2: continue #  knownbug #751
-        for i in range(len(st)-1):
-          for k,(a,b) in enumerate(zip(st[0],st[i+1])):
-            if b.numel()==0 and sparse(a).size()==0: continue
-            if a.numel()==0 and sparse(b).size()==0: continue
-            self.checkarray(sparse(a),sparse(b),("%s, output(%d)" % (order,k))+str(vf2.input(0)))
+        for stk,st in store.items():
+          for i in range(len(st)-1):
+            for k,(a,b) in enumerate(zip(st[0],st[i+1])):
+              if b.numel()==0 and sparse(a).size()==0: continue
+              if a.numel()==0 and sparse(b).size()==0: continue
+              self.checkarray(sparse(a),sparse(b),("%s, output(%d)" % (order,k))+str(vf2.input(0)))
       
             
       # Scalarized
