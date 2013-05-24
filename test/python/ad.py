@@ -25,7 +25,9 @@ from numpy import *
 import unittest
 from types import *
 from helpers import *
+import itertools
 
+@run_only(["MX"])
 class ADtests(casadiTestCase):
 
   def setUp(self):
@@ -559,13 +561,16 @@ class ADtests(casadiTestCase):
     f1 = MXFunction([x,y],[x+y[0],mul(y,x)])
     f1.init()
     
-    ndir = 1 
+    ndir = 2 # TODO: set back to 2 
     
     in1 = [x,y]
     v1 = [DMatrix([1.1,1.3]),DMatrix([[0.7,1.5],[2.1,0.9]])]
     
     w=x[:]
     w[1]*=2
+
+    w2=x[:]
+    w2[1]*=x[0]
     
     ww=x[:]
     ww[[0,1]]*=x
@@ -580,39 +585,65 @@ class ADtests(casadiTestCase):
     
     yy[:,0] = x
 
+    yy2=y[:,:]
+    
+    yy2[:,0] = x**2
+    
     yyy=y[:,:]
     
     yyy[[1,0],0] = x
+
+    yyy2=y[:,:]
     
+    yyy2[[1,0],0] = x**2
+    
+    
+    # TODO: sparse seeding
     
     for inputs,values,out, jac, h in [
           (in1,v1,x,DMatrix.eye(2),0),
           (in1,v1,x.T,DMatrix.eye(2),0),
           (in1,v1,x**2,2*c.diag(x),0),
+          (in1,v1,(x**2).T,2*c.diag(x),0),
           (in1,v1,c.reshape(x,(1,2)),DMatrix.eye(2),0),
+          (in1,v1,c.reshape(x**2,(1,2)),2*c.diag(x),0),
           (in1,v1,x+y[0],DMatrix.eye(2),0),
+          (in1,v1,x+x,2*DMatrix.eye(2),0),
+          (in1,v1,x**2+x,2*c.diag(x)+DMatrix.eye(2),0),
+          (in1,v1,x*x,2*c.diag(x),0),
           (in1,v1,x*y[0],DMatrix.eye(2)*y[0],0),
           (in1,v1,x[0],DMatrix.eye(2)[0,:],0),
+          (in1,v1,(x**2)[0],horzcat([2*x[0],MX(1,1)]),0),
           #(in1,v1,x[0]+x[1],DMatrix.ones(1,2),0),  # knownbug #750
           (in1,v1,vertcat([x[1],x[0]]),sparse(DMatrix([[0,1],[1,0]])),0),
+          (in1,v1,vertcat([x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]]),0),
           (in1,v1,horzcat([x[1],x[0]]).T,sparse(DMatrix([[0,1],[1,0]])),0),
+          (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]]),0),
           (in1,v1,x[[0,1]],sparse(DMatrix([[1,0],[0,1]])),0),
+          (in1,v1,(x**2)[[0,1]],2*c.diag(x),0),
           (in1,v1,x[[0,0,1,1]],sparse(DMatrix([[1,0],[1,0],[0,1],[0,1]])),0),
+          (in1,v1,(x**2)[[0,0,1,1]],blockcat([[2*x[0],MX(1,1)],[2*x[0],MX(1,1)],[MX(1,1),2*x[1]],[MX(1,1),2*x[1]]]),0),
           #(in1,v1,wwr,sparse(DMatrix([[2,0],[0,2]])),0), # knownbug #748
           #(in1,v1,x[[1,0]],sparse(DMatrix([[0,1],[1,0]])),0), #  knownbug #746
           #(in1,v1,x[[1,0],0],sparse(DMatrix([[0,1],[1,0]])),0),
           (in1,v1,w,sparse(DMatrix([[1,0],[0,2]])),0),
+          (in1,v1,w2,blockcat([[1,MX(1,1)],[x[1],x[0]]]),0),
           (in1,v1,ww,2*c.diag(x),0),
           #(in1,v1,wwf,2*c.diag(x[[1,0]]),0),
           (in1,v1,yy[:,0],DMatrix.eye(2),0),
+          (in1,v1,yy2[:,0],2*c.diag(x),0),
           #(in1,v1,yyy[:,0],sparse(DMatrix([[0,1],[1,0]])),0),
           (in1,v1,mul(y,x),y,0),
+          (in1,v1,mul(y,x**2),y*2*vertcat([x.T,x.T]),0),
           (in1,v1,sin(x),c.diag(cos(x)),0),
+          (in1,v1,sin(x**2),c.diag(cos(x**2)*2*x),0),
           (in1,v1,x*y[:,0],c.diag(y[:,0]),0),
           #(in1,v1,x*y[[1,0],0],c.diag(y[[1,0],0]),0),
           (in1,v1,inner_prod(x,x),(2*x).T,0),
+          (in1,v1,inner_prod(x**2,x),(3*x**2).T,0),
           #(in1,v1,c.det(horzcat([x,DMatrix([1,2])])),DMatrix([-1,2]),0), not implemented
           (in1,v1,f1.call(in1)[1],y,0),
+          (in1,v1,f1.call([x**2,y])[1],y*2*vertcat([x.T,x.T]),0),
      ]:
       print out
       fun = MXFunction(inputs,[out,jac])
@@ -631,8 +662,16 @@ class ADtests(casadiTestCase):
       self.checkarray(fun.output(1),funsx.output(1))
       
       J_ = DMatrix(fun.output(1))
+      
+      def flatten(l):
+        ret = []
+        for i in l:
+          ret.extend(i)
+        return ret
 
-      for f in [fun,fun.expand()]:
+      storage2 = []
+      storage = []
+      for f in [fun.expand(),fun]:
         f.setOption("number_of_adj_dir",ndir)
         f.setOption("number_of_fwd_dir",ndir)
         f.init()
@@ -641,7 +680,7 @@ class ADtests(casadiTestCase):
         for i,v in enumerate(values):
           f.input(i).set(v)
         
-        random.seed(0)
+        
         for d in range(ndir):
           f.fwdSeed(0,d).set(DMatrix(inputs[0].sparsity(),random.random(inputs[0].size())))
           f.adjSeed(0,d).set(DMatrix(out.sparsity(),random.random(out.size())))
@@ -662,40 +701,95 @@ class ADtests(casadiTestCase):
         for sym, Function in [(msym,MXFunction),(ssym,SXFunction)]:
           if isinstance(f, MXFunction) and Function is SXFunction: continue
           if isinstance(f, SXFunction) and Function is MXFunction: continue
-          fseeds = [[sym("fseed",f.input(i).sparsity()) for i in range(f.getNumInputs())]  for d in range(ndir)]
-          aseeds = [[sym("aseed",f.output(i).sparsity())  for i in range(f.getNumOutputs())] for d in range(ndir)]
-          inputss = [sym("input",f.input(i).sparsity()) for i in range(f.getNumInputs())]
-      
-          res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
           
-          for d in range(ndir):
-            fseed = DMatrix(inputs[0].sparsity(),random.random(inputs[0].size()))
-            aseed = DMatrix(out.sparsity(),random.random(out.size()))
-            vf = Function(inputss+fseeds[d]+aseeds[d],list(fwdsens[d])+list(adjsens[d]))
+          
+          def remove00(x):
+            ret = DMatrix(x)
+            ret[0,0] = DMatrix.sparse(1,1)
+            return ret
+            
+          spmods = [lambda x: x] # , remove00]
+          # dense
+          for spmod,spmod2 in itertools.product(spmods,repeat=2):
+            fseeds = [[sym("f",spmod(f.input(i)).sparsity()) for i in range(f.getNumInputs())]  for d in range(ndir)]
+            aseeds = [[sym("a",spmod2(f.output(i)).sparsity())  for i in range(f.getNumOutputs())] for d in range(ndir)]
+            inputss = [sym("i",f.input(i).sparsity()) for i in range(f.getNumInputs())]
+        
+            res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
+            
+            fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].size())) for d in range(ndir) ]
+            aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].size())) for d in range(ndir) ]
+            vf = Function(inputss+flatten([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + flatten([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
+            
             vf.init()
+            
             for i,v in enumerate(values):
               vf.input(i).set(v)
-            offset = len(values)
-            
-            vf.input(offset+0).set(fseed)
-            for i in range(len(values)-1):
-              vf.input(offset+i+1).set(0)
+            offset = len(inputss)
               
-            offset += len(values)
+            for d in range(ndir):
+              vf.input(offset+0).set(fseed[d])
+              for i in range(len(values)-1):
+                vf.input(offset+i+1).set(0)
+                
+              offset += len(inputss)
 
-            vf.input(offset+0).set(aseed)
-            vf.input(offset+1).set(0)
+              vf.input(offset+0).set(aseed[d])
+              vf.input(offset+1).set(0)
+              offset+=2
+              
+            assert(offset==vf.getNumInputs())
             
             vf.evaluate()
-            
-            seed = array(fseed).ravel()
-            sens = array(vf.output(0)).ravel()
-            self.checkarray(sens,mul(J_,seed),"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
+              
+            offset = len(res)
+            for d in range(ndir):
+              seed = array(fseed[d]).ravel()
+              sens = array(vf.output(offset+0)).ravel()
+              offset+=len(inputss)
+              self.checkarray(sens,mul(J_,seed),"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
 
-            seed = array(aseed).ravel()
-            sens = array(vf.output(len(values))).ravel()
+              seed = array(aseed[d]).ravel()
+              sens = array(vf.output(offset+0)).ravel()
+              offset+=len(inputss)
+              
+              self.checkarray(sens,mul(J_.T,seed),"eval Adj %d %s" % (d,str([vf.output(i) for i in range(vf.getNumOutputs())])))
+          
+          
             
-            self.checkarray(sens,mul(J_.T,seed),"eval Adj %d %s" % (d,str([vf.output(i) for i in range(vf.getNumOutputs())])))
+          assert(offset==vf.getNumOutputs())
+          
+          # Complete dense random seeding
+          random.seed(1)
+          for i in range(vf.getNumInputs()):
+            vf.input(i).set(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).size())))
+          
+          vf.evaluate()
+          storage.append([DMatrix(vf.output(i)) for i in range(vf.getNumInputs())])
+          
+          # Second order sensitivities
+          for sym2, Function2 in [(msym,MXFunction),(ssym,SXFunction)]:
+          
+            if isinstance(vf, MXFunction) and Function2 is SXFunction: continue
+            if isinstance(vf, SXFunction) and Function2 is MXFunction: continue
+
+            fseeds2 = [[sym2("f",vf.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
+            aseeds2 = [[sym2("a",vf.output(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
+            inputss2 = [sym2("i",vf.input(i).sparsity()) for i in range(vf.getNumInputs())]
+        
+            res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
+
+            vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+            vf2.init()
+              
+            random.seed(1)
+            for i in range(vf2.getNumInputs()):
+              vf2.input(i).set(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())))
+            
+            vf2.evaluate()
+            storage2.append([DMatrix(vf2.output(i)) for i in range(vf2.getNumInputs())])
+            
+           
             
         #  jacobian()
         for mode in ["forward","reverse"]:
@@ -709,8 +803,19 @@ class ADtests(casadiTestCase):
               Jf.input(i).set(v)
             Jf.evaluate()
             self.checkarray(Jf.output(),J_)
-            self.checkarray(DMatrix(Jf.output().sparsity(),1),DMatrix(J_.sparsity(),1))
+            self.checkarray(DMatrix(Jf.output().sparsity(),1),DMatrix(J_.sparsity(),1),str(out)+str(mode)+str(numeric))
             self.checkarray(DMatrix(f.jacSparsity(),1),DMatrix(J_.sparsity(),1))
+      
+      # Remainder of second-order testing
+      for st,order in [(storage,"first-order"),(storage2,"second-order")]:
+        if order=="second-order": continue # knownbug #752
+        if order=="first-order" and out is w2: continue #  knownbug #751
+        for i in range(len(st)-1):
+          for k,(a,b) in enumerate(zip(st[0],st[i+1])):
+            if b.numel()==0 and sparse(a).size()==0: continue
+            if a.numel()==0 and sparse(b).size()==0: continue
+            self.checkarray(sparse(a),sparse(b),("%s, output(%d)" % (order,k))+str(vf2.input(0)))
+      
             
       # Scalarized
       fun = MXFunction(inputs,[out[0],jac[0,:].T])
@@ -737,6 +842,7 @@ class ADtests(casadiTestCase):
             Gf.evaluate()
             self.checkarray(Gf.output(),J_)
             #self.checkarray(DMatrix(Gf.output().sparsity(),1),DMatrix(J_.sparsity(),1),str(mode)+str(numeric)+str(out)+str(type(fun)))
+        
     
     
 if __name__ == '__main__':
