@@ -2707,6 +2707,16 @@ namespace CasADi{
     // Quick return if no elements
     if(indices.empty()) return;
 
+    // Make a sanity check
+    int last=0;
+    for(vector<int>::iterator it=indices.begin(); it!=indices.end(); ++it){
+      int el_row = *it % nrow_;
+      int el_col = *it / nrow_;
+      int el = ncol_*el_row + el_col;
+      casadi_assert_message(el>=last,"Elements must be sorted row-wise in non-decreasing order");
+      last = el;
+    }
+
     // Iterator to input/output
     vector<int>::iterator it=indices.begin();
 
