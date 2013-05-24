@@ -326,9 +326,17 @@ void makeDense(Matrix<T>& A);
 template<class T>
 Matrix<T> densify(const Matrix<T>& A);
 
+/** \brief  Make a matrix dense */
+template<class T>
+Matrix<T> full(const Matrix<T>& A);
+
 /** \brief  Make a matrix sparse by removing numerical */
 template<class T>
 void makeSparse(Matrix<T>& A);
+
+/** \brief  Make a matrix sparse by removing numerical */
+template<class T>
+Matrix<T> sparse(const Matrix<T>& A);
 
 /** \brief  Check if the matrix has any zero entries which are not structural zeros */
 template<class T>
@@ -1090,6 +1098,11 @@ Matrix<T> densify(const Matrix<T>& A){
 }
 
 template<class T>
+Matrix<T> full(const Matrix<T>& A){
+  return densify(A);
+}
+
+template<class T>
 void makeSparse(Matrix<T>& A){
   // Quick return if there are no structurally zero entries
   if(!hasNonStructuralZeros(A))
@@ -1120,6 +1133,13 @@ void makeSparse(Matrix<T>& A){
   
   // Save to A
   A = Asp;
+}
+
+template<class T>
+Matrix<T> sparse(const Matrix<T>& A){
+  Matrix<T> ret(A);
+  makeSparse(ret);
+  return ret;
 }
 
 template<class T>
@@ -1287,6 +1307,8 @@ MTT_INST(T,sumAll) \
 MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
 MTT_INST(T,densify) \
+MTT_INST(T,sparse) \
+MTT_INST(T,full) \
 MTT_INST(T,makeSparse) \
 MTT_INST(T,hasNonStructuralZeros) \
 MTT_INST(T,diag) \
