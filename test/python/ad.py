@@ -593,6 +593,7 @@ class ADtests(casadiTestCase):
           (in1,v1,x+y[0],DMatrix.eye(2),0),
           (in1,v1,x*y[0],DMatrix.eye(2)*y[0],0),
           (in1,v1,x[0],DMatrix.eye(2)[0,:],0),
+          #(in1,v1,x[0]+x[1],DMatrix.ones(1,2),0),  # knownbug #750
           (in1,v1,vertcat([x[1],x[0]]),sparse(DMatrix([[0,1],[1,0]])),0),
           (in1,v1,horzcat([x[1],x[0]]).T,sparse(DMatrix([[0,1],[1,0]])),0),
           (in1,v1,x[[0,1]],sparse(DMatrix([[1,0],[0,1]])),0),
