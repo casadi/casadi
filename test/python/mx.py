@@ -1970,6 +1970,17 @@ class MXtests(casadiTestCase):
     self.assertFalse(isRegular(MX(DMatrix([0,Inf]))))
     with self.assertRaises(Exception):
       self.assertFalse(isRegular(msym("x",2)))
+
+  def test_blkdiag(self):
+    C = blkdiag([MX(DMatrix(([[-1.4,-3.2],[-3.2,-28]]))),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
+    self.assertTrue(isinstance(C,MX))
+    r = DMatrix([[-1.4,-3.2,0,0,0,0,0],[-3.2,-28,0,0,0,0,0],[0,0,15,-12,2.1,0,0],[0,0,-12,16,-3.8,0,0],[0,0,2.1,-3.8,15,0,0],[0,0,0,0,0,1.8,0],[0,0,0,0,0,0,-4]])
+    makeSparse(r)
+    f = MXFunction([],[C])
+    f.init()
+    f.evaluate()
+    
+    self.checkarray(f.output(),r)
     
 if __name__ == '__main__':
     unittest.main()

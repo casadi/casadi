@@ -371,6 +371,29 @@ namespace CasADi{
     // Create a reference to the nonzeros
     return x->getGetNonzeros(sp,mapping);
   }
+  
+  MX blkdiag(const std::vector<MX> &A) {
+    // This implementation does not pretend to be efficient
+    int row=0;
+    int col=0;
+    for (int i=0;i<A.size();++i) {
+      row+=A[i].size1();
+      col+=A[i].size2();
+    }
+    
+    MX ret = MX(row,col);
+    
+    row = 0;
+    col = 0;
+    
+    for (int i=0;i<A.size();++i) {
+      ret(range(row,row+A[i].size1()),range(col,col+A[i].size2())) = A[i];
+      row+=A[i].size1();
+      col+=A[i].size2();
+    }
+    
+    return ret;
+  }
 
   int countNodes(const MX& A){
     MXFunction f(vector<MX>(),A);
