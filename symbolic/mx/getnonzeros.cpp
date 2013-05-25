@@ -324,19 +324,26 @@ namespace CasADi{
       r_nz.resize(el_input.size());
       copy(el_input.begin(),el_input.end(),r_nz.begin());
       arg.sparsity().getNZInplace(r_nz);
-      
+     
       // Add to sparsity pattern
-      int n=0;
+      int n=0, last_i=-1, last_j=-1;
       r_col.clear();
       r_rowind.resize(osp.size1()+1); // Row count
       fill(r_rowind.begin(),r_rowind.end(),0);
       for(int k=0; k<nz.size(); ++k){
         if(r_nz[k]!=-1){
           r_nz[n++] = r_nz[k];
-          r_col.push_back(ocol[nz_order[k]]);
-          r_rowind[1+orow[nz_order[k]]]++;
+          int i=orow[nz_order[k]];
+          int j=ocol[nz_order[k]];
+          if(i!=last_i || j!=last_j){ // Ignore duplicates
+            r_col.push_back(j);
+            r_rowind[1+i]++;
+            last_i = i;
+            last_j = j;
+          }
         }
       }
+
       r_nz.resize(n);
       for(int i=1; i<r_rowind.size(); ++i) r_rowind[i] += r_rowind[i-1]; // row count -> row offset
 
