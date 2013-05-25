@@ -83,14 +83,13 @@ namespace CasADi{
           
     // We next need to resort the assignment vector by outputs instead of inputs
     // Start by counting the number of output nonzeros corresponding to each input nonzero
-    vector<int> onz_count(ocol.size()+1,0);
+    vector<int> onz_count(ocol.size()+2,0);
     for(vector<int>::const_iterator it=nz.begin(); it!=nz.end(); ++it){
-      casadi_assert_message(*it>=0,"Not implemented due to lack of a test case. Contact the developers if you have a simple that exposes this feature.");
-      onz_count[*it+1]++;
+      onz_count[*it+2]++;
     }
-    
+
     // Cumsum to get index offset for output nonzero
-    for(int i=0; i<ocol.size(); ++i){
+    for(int i=0; i<onz_count.size()-1; ++i){
       onz_count[i+1] += onz_count[i];
     }
     
@@ -98,7 +97,7 @@ namespace CasADi{
     vector<int> nz_order(nz.size());
     for(int k=0; k<nz.size(); ++k){
       // Save the new index
-      nz_order[onz_count[nz[k]]++] = k;
+      nz_order[onz_count[1+nz[k]]++] = k;
     }
 
     // Find out which elements are being set
@@ -109,7 +108,11 @@ namespace CasADi{
       int onz_k = nz[nz_order[k]];
       
       // Get element (note: may contain duplicates)
-      with_duplicates[k] = orow[onz_k] + ocol[onz_k]*osp.size1();
+      if(onz_k>=0){
+        with_duplicates[k] = orow[onz_k] + ocol[onz_k]*osp.size1();
+      } else {
+        with_duplicates[k] = -1;
+      }
     }
 
     // Get all output elements (this time without duplicates)
@@ -124,30 +127,23 @@ namespace CasADi{
     for(int d=first_d; d<nfwd; ++d){
 
       // Get references to arguments and results
-      MX& arg = d<0 ? *input[1] : *fwdSeed[d][1];
-      MX arg0 = d<0 ? *input[0] : *fwdSeed[d][0];
+      const MX& arg = d<0 ? *input[1] : *fwdSeed[d][1];
+      const MX& arg0 = d<0 ? *input[0] : *fwdSeed[d][0];
       MX& res = d<0 ? *output[0] : *fwdSens[d][0];
+      if(&arg0 != &res){
+        res = arg0;
+      }
 
-      // Entries in arg0 with elements zero'ed out
+      // Entries in res with elements zero'ed out
       if(!Add){
 
-        // Get the nz locations in arg0 corresponding to the output sparsity pattern
+        // Get the nz locations in res corresponding to the output sparsity pattern
         r_nz.resize(with_duplicates.size());
         copy(with_duplicates.begin(),with_duplicates.end(),r_nz.begin());
-        arg0.sparsity().getNZInplace(r_nz);
-
-        // Ignore duplicates (needed?)
-        int last = -1;
-        for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
-          if(*k==last){
-            *k = -1;
-          } else {
-            last = *k;
-          }
-        }
+        res.sparsity().getNZInplace(r_nz);
         
         // Zero out the corresponding entries
-        arg0 = MX::zeros(isp)->getSetNonzeros(arg0,r_nz);
+        res = MX::zeros(isp)->getSetNonzeros(res,r_nz);
       }
 
       // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
@@ -158,19 +154,19 @@ namespace CasADi{
       vector<int> &r_nz2 = r_col; // Reuse memory
       r_nz2.resize(without_duplicates.size());
       copy(without_duplicates.begin(),without_duplicates.end(),r_nz2.begin());
-      arg0.sparsity().getNZInplace(r_nz2);
+      res.sparsity().getNZInplace(r_nz2);
       
       // Enlarge the sparsity pattern of the arguments if not all assignments fit
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
         if(*k>=0 && nz[*k]>=0 && r_nz2[nz[*k]]<0){
           
           // Create a new pattern which includes both the the previous seed and the addition/assignment
-          CRSSparsity sp = arg0.sparsity().patternUnion(osp);
-          arg0 = arg0->getSetSparse(sp);
+          CRSSparsity sp = res.sparsity().patternUnion(osp);
+          res = res->getSetSparse(sp);
 
           // Recalculate the nz locations in the arguments corresponding to the inputs
           copy(without_duplicates.begin(),without_duplicates.end(),r_nz2.begin());
-          arg0.sparsity().getNZInplace(r_nz2);
+          res.sparsity().getNZInplace(r_nz2);
 
           break;
         }
@@ -192,9 +188,7 @@ namespace CasADi{
 
       // Add to the element to the sensitivity, if any
       if(elements_to_add){
-        res = arg->getAddNonzeros(arg0,r_nz);
-      } else {        
-        res = arg0;
+        res = arg->getAddNonzeros(res,r_nz);
       }
     }
 

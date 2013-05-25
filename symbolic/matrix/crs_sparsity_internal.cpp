@@ -2708,17 +2708,23 @@ namespace CasADi{
     if(indices.empty()) return;
 
     // Make a sanity check
-    int last=0;
+    int last=-1;
     for(vector<int>::iterator it=indices.begin(); it!=indices.end(); ++it){
-      int el_row = *it % nrow_;
-      int el_col = *it / nrow_;
-      int el = ncol_*el_row + el_col;
-      casadi_assert_message(el>=last,"Elements must be sorted row-wise in non-decreasing order");
-      last = el;
+      if(*it>=0){
+        int el_row = *it % nrow_;
+        int el_col = *it / nrow_;
+        int el = ncol_*el_row + el_col;
+        casadi_assert_message(el>=last,"Elements must be sorted row-wise in non-decreasing order");
+        last = el;
+      }
     }
+
+    // Quick return if no elements
+    if(last<0) return;
 
     // Iterator to input/output
     vector<int>::iterator it=indices.begin();
+    while(*it<0) it++; // first non-ignored
 
     // Current element sought
     int el_row = *it % nrow_;
@@ -2752,7 +2758,9 @@ namespace CasADi{
           *it = el;
 
           // Increase index and terminate if end of vector reached
-          if(++it==indices.end()) return;
+          do{
+            if(++it==indices.end()) return;
+          } while(*it<0);
 
           // Next element sought
           el_row = *it % nrow_;
