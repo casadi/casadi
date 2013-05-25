@@ -64,7 +64,7 @@ namespace CasADi{
       const vector<T>& fseed = fwdSeed[d][0]->data();
       typename vector<T>::iterator fsens_it = fwdSens[d][0]->begin();
       for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
-             *fsens_it++ = *k>=0 ? fseed[*k] : 0;
+        *fsens_it++ = *k>=0 ? fseed[*k] : 0;
       }
     }
       
@@ -110,7 +110,7 @@ namespace CasADi{
       const T* fseed_stop = getPtr(fseed) + s_.stop_;
       T* fsens_ptr = getPtr(fwdSens[d][0]->data());
       for(; fseed_ptr != fseed_stop; fseed_ptr += s_.step_){
-             *fsens_ptr++ = *fseed_ptr;
+        *fsens_ptr++ = *fseed_ptr;
       }
     }
       
@@ -277,14 +277,13 @@ namespace CasADi{
       
     // We next need to resort the assignment vector by inputs instead of outputs
     // Start by counting the number of input nonzeros corresponding to each output nonzero
-    vector<int> inz_count(icol.size()+1,0);
+    vector<int> inz_count(icol.size()+2,0);
     for(vector<int>::const_iterator it=nz.begin(); it!=nz.end(); ++it){
-      casadi_assert_message(*it>=0,"Not implemented");
-      inz_count[*it+1]++;
+      inz_count[*it+2]++;
     }
     
     // Cumsum to get index offset for input nonzero
-    for(int i=0; i<icol.size(); ++i){
+    for(int i=0; i<inz_count.size()-1; ++i){
       inz_count[i+1] += inz_count[i];
     }
     
@@ -292,7 +291,7 @@ namespace CasADi{
     vector<int> nz_order(nz.size());
     for(int k=0; k<nz.size(); ++k){
       // Save the new index
-      nz_order[inz_count[nz[k]]++] = k;
+      nz_order[inz_count[1+nz[k]]++] = k;
     }
     
     // Find out which elements are given
@@ -303,7 +302,11 @@ namespace CasADi{
       int inz_k = nz[nz_order[k]];
       
       // Get element (note: may contain duplicates)
-      el_input[k] = irow[inz_k] + icol[inz_k]*isp.size1();
+      if(inz_k>=0){
+        el_input[k] = irow[inz_k] + icol[inz_k]*isp.size1();
+      } else {
+        el_input[k] = -1;
+      }
     }
     
     // Sparsity pattern being formed and corresponding nonzero mapping
@@ -314,7 +317,7 @@ namespace CasADi{
     for(int d=first_d; d<nfwd; ++d){
 
       // Get references to arguments and results
-      MX& arg = d<0 ? *input[0] : *fwdSeed[d][0];
+      const MX& arg = d<0 ? *input[0] : *fwdSeed[d][0];
       MX& res = d<0 ? *output[0] : *fwdSens[d][0];      
       
       // Get the matching nonzeros
