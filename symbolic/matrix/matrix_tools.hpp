@@ -326,17 +326,21 @@ void makeDense(Matrix<T>& A);
 template<class T>
 Matrix<T> densify(const Matrix<T>& A);
 
+#ifndef SWIGOCTAVE
 /** \brief  Make a matrix dense */
 template<class T>
 Matrix<T> full(const Matrix<T>& A);
+#endif // SWIGOCTAVE
 
 /** \brief  Make a matrix sparse by removing numerical */
 template<class T>
 void makeSparse(Matrix<T>& A);
 
+#ifndef SWIGOCTAVE
 /** \brief  Make a matrix sparse by removing numerical */
 template<class T>
 Matrix<T> sparse(const Matrix<T>& A);
+#endif // SWIGOCTAVE
 
 /** \brief  Check if the matrix has any zero entries which are not structural zeros */
 template<class T>
@@ -1263,7 +1267,7 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
 %template(function_name) CasADi::function_name < T >;
 
 // Define template instanciations
-#define MATRIX_TOOLS_TEMPLATES(T) \
+#define MATRIX_TOOLS_TEMPLATES_COMMON(T) \
 MTT_INST(T,trans) \
 MTT_INST(T,mul) \
 MTT_INST(T,isConstant) \
@@ -1307,8 +1311,6 @@ MTT_INST(T,sumAll) \
 MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
 MTT_INST(T,densify) \
-MTT_INST(T,sparse) \
-MTT_INST(T,full) \
 MTT_INST(T,makeSparse) \
 MTT_INST(T,hasNonStructuralZeros) \
 MTT_INST(T,diag) \
@@ -1320,5 +1322,14 @@ MTT_INST(T,vecNZcat) \
 MTT_INST(T,project) \
 MTT_INST(T,sprank) 
 #endif //SWIG
+
+#ifndef SWIGOCTAVE
+#define MATRIX_TOOLS_TEMPLATES(T) MATRIX_TOOLS_TEMPLATES_COMMON(T)
+#else
+#define MATRIX_TOOLS_TEMPLATES(T) \
+MATRIX_TOOLS_TEMPLATES_COMMON(T) \
+MTT_INST(T,sparse) \
+MTT_INST(T,full)
+#endif //SWIGOCTAVE
 
 #endif // MATRIX_TOOLS_HPP
