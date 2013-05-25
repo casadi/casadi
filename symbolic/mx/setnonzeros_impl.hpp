@@ -42,6 +42,23 @@ namespace CasADi{
   }
 
   template<bool Add>
+  SetNonzerosVector<Add>::SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz) : SetNonzeros<Add>(y,x), nz_(nz){
+    // Ignore duplicate assignments
+    if(!Add){
+      vector<bool> already_set(this->size(),false);
+      for(vector<int>::reverse_iterator i=nz_.rbegin(); i!=nz_.rend(); ++i){
+        if(*i>=0){
+          if(already_set[*i]){
+            *i = -1;
+          } else {
+            already_set[*i] = true;
+          }
+        }
+      }
+    }
+  }
+
+  template<bool Add>
   SetNonzeros<Add>:: ~SetNonzeros(){
   }
 

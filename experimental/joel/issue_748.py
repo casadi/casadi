@@ -1,13 +1,14 @@
 
 from casadi import *
+from copy import copy
 
 x = msym("x",2)
 
 
-w = x[:]
+w = copy(x)
 w[[0,0,1,1]]+=2
 
-wr = x[:]
+wr = copy(x)
 wr[[0,1]]+=2
 
 f1 = MXFunction([x],[w])
@@ -32,11 +33,9 @@ print f1.fwdSens(), f2.fwdSens()
 
 inputs = [msym("x",2)]
 fseeds = [[msym("fseed",2)]]
-aseeds = [[msym("aseed",2)]]
-
 
 for f in f1,f2:
-  res,fwdsens,adjsens = f.eval(inputs,fseeds,aseeds)
+  res,fwdsens,_ = f.eval(inputs,fseeds,[])
   fs = MXFunction(inputs+fseeds[0],fwdsens[0])
   fs.init()
 

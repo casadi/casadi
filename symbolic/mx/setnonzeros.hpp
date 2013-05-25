@@ -72,7 +72,7 @@ namespace CasADi{
   public:
 
     /// Constructor
-    SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz) : SetNonzeros<Add>(y,x), nz_(nz){}
+    SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz);
 
     /// Clone function
     virtual SetNonzerosVector* clone() const{ return new SetNonzerosVector(*this);}
