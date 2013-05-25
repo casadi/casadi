@@ -1,1 +1,3 @@
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/3048371fc8fb8a61361f4536456f535c "githalytics.com")](http://githalytics.com/casadi/casadi)
+
 Learn all about CasADi at the [homepage](http://casadi.org)...
