@@ -185,8 +185,7 @@ namespace CasADi{
     for(int d=0; d<nadj; ++d){
 
       // Get an owning references to the seeds and sensitivities and clear the seeds for the next run
-      MX aseed = *adjSeed[d][0];      
-      *adjSeed[d][0] = MX();
+      MX& aseed = *adjSeed[d][0];      
       MX& asens0 = *adjSens[d][0];
       MX& asens = *adjSens[d][1];
       
@@ -216,21 +215,18 @@ namespace CasADi{
       r_nz.resize(n);
       for(int i=1; i<r_rowind.size(); ++i) r_rowind[i] += r_rowind[i-1]; // row count -> row offset
 
-      if(r_nz.size()==0){
-        // Nothing to set/add
-        asens0 = aseed;
-      } else {
+      if(r_nz.size()>0){
         // Create a sparsity pattern from vectors
         CRSSparsity f_sp(isp.size1(),isp.size2(),r_col,r_rowind);
         asens += aseed->getGetNonzeros(f_sp,r_nz);
-
-        if(Add){
-          // The corresponding nonzeros remain in the seed
-          asens0 = aseed;
-        } else {
-          // The corresponding nonzeros disappear from the seed
-          asens0 = MX::zeros(f_sp)->getSetNonzeros(aseed,r_nz);
+        if(!Add){
+          aseed = MX::zeros(f_sp)->getSetNonzeros(aseed,r_nz);
         }
+      }
+
+      if(&aseed != &asens0){
+        asens0 += aseed;
+        aseed = MX();
       }
     }
   }
