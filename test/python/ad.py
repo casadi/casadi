@@ -677,7 +677,7 @@ class ADtests(casadiTestCase):
           ret.extend(i)
         return ret
 
-      storage2 = []
+      storage2 = {}
       storage = {}
       for f in [fun.expand(),fun]:
         f.setOption("number_of_adj_dir",ndir)
@@ -761,7 +761,7 @@ class ADtests(casadiTestCase):
           
             assert(offset==vf.getNumOutputs())
           
-            # Complete dense random seeding
+            # Complete random seeding
             random.seed(1)
             for i in range(vf.getNumInputs()):
               vf.input(i).set(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).size())))
@@ -793,11 +793,25 @@ class ADtests(casadiTestCase):
                   vf2.input(i).set(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())))
                 
                 vf2.evaluate()
-                storage2.append([DMatrix(vf2.output(i)) for i in range(vf2.getNumInputs())])
+                storagekey = (spmod,spmod2)
+                if not(storagekey in storage2):
+                  storage2[storagekey] = []
+                storage2[storagekey].append([DMatrix(vf2.output(i)) for i in range(vf2.getNumInputs())])
               else :
                 #knownbug #753
                 pass
-          
+
+      # Remainder of eval testing
+      for store,order in [(storage,"first-order"),(storage2,"second-order")]:
+        if order=="second-order" : continue # knownbug #752
+        for stk,st in store.items():
+          for i in range(len(st)-1):
+            for k,(a,b) in enumerate(zip(st[0],st[i+1])):
+              if b.numel()==0 and sparse(a).size()==0: continue
+              if a.numel()==0 and sparse(b).size()==0: continue
+              self.checkarray(sparse(a),sparse(b),("%s, output(%d)" % (order,k))+str(vf2.input(0)))
+              
+      for f in [fun.expand(),fun]:
         #  jacobian()
         for mode in ["forward","reverse"]:
           for numeric in [True,False]:
@@ -812,19 +826,7 @@ class ADtests(casadiTestCase):
             self.checkarray(Jf.output(),J_)
             self.checkarray(DMatrix(Jf.output().sparsity(),1),DMatrix(J_.sparsity(),1),str(out)+str(mode)+str(numeric))
             self.checkarray(DMatrix(f.jacSparsity(),1),DMatrix(J_.sparsity(),1))
-      
-      # Remainder of second-order testing
-      for store,order in [(storage,"first-order"),(storage2,"second-order")]:
-        if order=="second-order": continue # knownbug #752
-        #if order=="first-order" and out is w2: continue #  knownbug #751
-        for stk,st in store.items():
-          for i in range(len(st)-1):
-            for k,(a,b) in enumerate(zip(st[0],st[i+1])):
-              if b.numel()==0 and sparse(a).size()==0: continue
-              if a.numel()==0 and sparse(b).size()==0: continue
-              self.checkarray(sparse(a),sparse(b),("%s, output(%d)" % (order,k))+str(vf2.input(0)))
-      
-            
+                
       # Scalarized
       fun = MXFunction(inputs,[out[0],jac[0,:].T])
       fun.init()
