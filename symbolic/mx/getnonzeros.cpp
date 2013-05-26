@@ -266,12 +266,12 @@ namespace CasADi{
     int nadj = adjSeed.size();
 
     // Output sparsity
-    const CRSSparsity &osp = sparsity();
+    const CRSSparsity& osp = sparsity();
     const vector<int>& ocol = osp.col();
     vector<int> orow = osp.getRow();
     
     // Input sparsity
-    const CRSSparsity &isp = dep().sparsity();
+    const CRSSparsity& isp = dep().sparsity();
     const vector<int>& icol = isp.col();
     vector<int> irow = isp.getRow();
       
@@ -293,7 +293,7 @@ namespace CasADi{
       // Save the new index
       nz_order[inz_count[1+nz[k]]++] = k;
     }
-    
+
     // Find out which elements are given
     vector<int>& el_input = inz_count; // Reuse memory
     el_input.resize(nz.size());
@@ -321,31 +321,42 @@ namespace CasADi{
       MX& res = d<0 ? *output[0] : *fwdSens[d][0];      
       
       // Get the matching nonzeros
-      r_nz.resize(el_input.size());
-      copy(el_input.begin(),el_input.end(),r_nz.begin());
-      arg.sparsity().getNZInplace(r_nz);
+      r_col.resize(el_input.size());
+      copy(el_input.begin(),el_input.end(),r_col.begin());
+      arg.sparsity().getNZInplace(r_col);
      
+      // Assignments
+      r_nz.resize(nz.size());
+      fill(r_nz.begin(),r_nz.end(),-1);
+
       // Add to sparsity pattern
       int n=0, last_i=-1, last_j=-1;
-      r_col.clear();
       r_rowind.resize(osp.size1()+1); // Row count
       fill(r_rowind.begin(),r_rowind.end(),0);
       for(int k=0; k<nz.size(); ++k){
-        if(r_nz[k]!=-1){
-          r_nz[n++] = r_nz[k];
+        if(r_col[k]!=-1){
+          r_nz[nz_order[k]] = r_col[k];
           int i=orow[nz_order[k]];
           int j=ocol[nz_order[k]];
           if(i!=last_i || j!=last_j){ // Ignore duplicates
-            r_col.push_back(j);
+            r_col[n++] = j;
             r_rowind[1+i]++;
             last_i = i;
             last_j = j;
           }
         }
       }
+      r_col.resize(n);
 
+      // row count -> row offset
+      for(int i=1; i<r_rowind.size(); ++i) r_rowind[i] += r_rowind[i-1]; 
+      
+      // Remove ignored entries
+      n=0;
+      for(vector<int>::iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
+        if(*i>=0) r_nz[n++] = *i;
+      }
       r_nz.resize(n);
-      for(int i=1; i<r_rowind.size(); ++i) r_rowind[i] += r_rowind[i-1]; // row count -> row offset
 
       // Create a sparsity pattern from vectors
       CRSSparsity f_sp(osp.size1(),osp.size2(),r_col,r_rowind);
