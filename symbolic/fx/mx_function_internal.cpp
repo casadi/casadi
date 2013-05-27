@@ -1087,6 +1087,8 @@ namespace CasADi{
   
     // Create function
     SXFunction f(arg,res);
+    f.setInputScheme(getInputScheme());
+    f.setOutputScheme(getOutputScheme());
     return f;
   }
 
