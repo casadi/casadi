@@ -1982,5 +1982,39 @@ class MXtests(casadiTestCase):
     
     self.checkarray(f.output(),r)
     
+    
+  def test_sparsity_indexing(self):
+    self.message("sparsity")
+
+    B_ = DMatrix([[1,2,3,4,5],[6,7,8,9,10]])
+    B = msym("B",2,5)
+    
+    A = IMatrix([[1,1,0,0,0],[0,0,1,0,0]])
+    makeSparse(A)
+    sp = A.sparsity()
+    import copy
+    
+    def meval(m):
+      f = MXFunction([B],[m])
+      f.init()
+      f.setInput(B_)
+      f.evaluate()
+      return f.output() 
+    
+    self.checkarray(meval(B[sp]),DMatrix([[1,2,0,0,0],[0,0,8,0,0]]),"sparsity indexing")
+
+    Bmod = copy.copy(B)
+    Bmod[sp] = -4
+    
+    self.checkarray(meval(Bmod),DMatrix([[-4,-4,3,4,5],[6,7,-4,9,10]]),"sparsity indexing assignement")
+
+    Bmod = copy.copy(B)
+    Bmod[sp] = 2*B
+    
+    self.checkarray(meval(Bmod),DMatrix([[2,4,3,4,5],[6,7,16,9,10]]),"Imatrix indexing assignement")
+    
+    self.assertRaises(Exception, lambda : B[sp_dense(4,4)])
+  
+    
 if __name__ == '__main__':
     unittest.main()
