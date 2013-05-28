@@ -259,6 +259,9 @@ namespace CasADi{
     return (*this)->sizeL();
   }
 
+  int CRSSparsity::sizeD() const{
+    return (*this)->sizeD();
+  }
 
   std::vector<int> CRSSparsity::getRow() const{
     return (*this)->getRow();

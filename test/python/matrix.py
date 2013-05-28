@@ -815,6 +815,18 @@ class Matrixtests(casadiTestCase):
     self.assertFalse(isRegular(DMatrix([1,Inf])))
     self.assertFalse(isRegular(DMatrix.nan(2)))
     
+  def test_sizes(self):
+    self.assertEqual(sp_diag(10).sizeD(),10)
+    self.assertEqual(sp_diag(10).sizeU(),10)
+    self.assertEqual(sp_diag(10).sizeL(),10)
+    self.assertEqual(sp_dense(10,10).sizeL(),10*11/2)
+    self.assertEqual(sp_dense(10,10).sizeU(),10*11/2)
+    self.assertEqual(sp_dense(10,10).sizeD(),10)
+    
+    self.assertEqual(sparse(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeD(),1)
+    self.assertEqual(sparse(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeL(),2)
+    self.assertEqual(sparse(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeU(),3)
+    
 if __name__ == '__main__':
     unittest.main()
 

@@ -149,6 +149,9 @@ namespace CasADi{
     /// Number of non-zeros in the lower triangular half
     int sizeL() const;
 
+    /// Number of non-zeros on the diagonal
+    int sizeD() const;
+    
     /// Shape
     std::pair<int,int> shape() const;
     

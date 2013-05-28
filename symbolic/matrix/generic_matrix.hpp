@@ -68,6 +68,9 @@ class GenericMatrix{
     /** \brief Get get the number of non-zeros in the upper triangular half */
     int sizeU() const;
 
+    /** \brief Get get the number of non-zeros on the diagonal */
+    int sizeD() const;
+    
     /** \brief Get the number of elements */
     int numel() const;
 
@@ -179,6 +182,11 @@ int GenericMatrix<MatType>::sizeU() const{
 template<typename MatType>
 int GenericMatrix<MatType>::sizeL() const{
   return sparsity().sizeL();
+}
+
+template<typename MatType>
+int GenericMatrix<MatType>::sizeD() const{
+  return sparsity().sizeD();
 }
 
 template<typename MatType>
