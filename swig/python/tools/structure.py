@@ -1,6 +1,7 @@
 from casadi import *
 
 import operator
+import sys
 
 # StructIndex :tuple/list of strings
 # canonicalIndex : tuple/list of string or numbers
@@ -224,7 +225,9 @@ class StructEntry:
         else:
           raise Exception("I don't know what to do with this: %s" % str(p))
     except Exception as e:
-      raise Exception("Error occured in entry context with powerIndex %s, at canonicalIndex %s:\n%s" % (str(powerIndex),str(canonicalIndex),str(e)))
+      exc_class, exc, tb = sys.exc_info()
+      new_exc = Exception("Error occured in entry context with powerIndex %s, at canonicalIndex %s:\n%s" % (str(powerIndex),str(canonicalIndex),str(e)))
+      raise new_exc.__class__, new_exc, tb
   
 class Structure:
   def __init__(self,entries,order=None):
@@ -357,7 +360,9 @@ class Structure:
         else:
           raise Exception("I don't know what to do with this: %s" % str(p))
       except Exception as e:
-        raise Exception("Error occured in struct context with powerIndex %s, at canonicalIndex %s:\n%s" % (str(powerIndex),str(canonicalIndex),str(e)))
+        exc_class, exc, tb = sys.exc_info()
+        new_exc = Exception("Error occured in struct context with powerIndex %s, at canonicalIndex %s:\n%s" % (str(powerIndex),str(canonicalIndex),str(e)))
+        raise new_exc.__class__, new_exc, tb
       
 # Casadi-dependant Structure framework
     
@@ -438,7 +443,9 @@ class GetterDispatcher(Dispatcher):
       try:
         return self.master[i]
       except Exception as e:
-        raise Exception("Error in powerIndex slicing for canonicalIndex %s: %s" % (str(canonicalIndex),str(e)))
+        exc_class, exc, tb = sys.exc_info()
+        new_exc = Exception("Error in powerIndex slicing for canonicalIndex %s:\n%s" % (str(canonicalIndex),str(e)))
+        raise new_exc.__class__, new_exc, tb
     else:
       raise Exception("Canonical index %s does not exist." % str(canonicalIndex))
 
@@ -451,7 +458,9 @@ class SetterDispatcher(Dispatcher):
       except NotImplementedError:
         raise CompatibilityException("Error in canonicalIndex slicing for %s: Incompatible types in a[i]=b with a %s and b %s." % (str(canonicalIndex),str(self.master),str(payload)))
       except Exception as e:
-        raise Exception("Error in powerIndex slicing for canonicalIndex %s: %s" % (str(canonicalIndex),str(e)))
+        exc_class, exc, tb = sys.exc_info()
+        new_exc = Exception("Error in powerIndex slicing for canonicalIndex %s:\n%s" % (str(canonicalIndex),str(e)))
+        raise new_exc.__class__, new_exc, tb
     else:
       raise Exception("Canonical index %s does not exist." % str(canonicalIndex))
       
@@ -464,7 +473,9 @@ class SetterDispatcher(Dispatcher):
     except NotImplementedError:
       raise CompatibilityException("Error in canonicalIndex slicing for %s: Incompatible types in a[i]=b with a %s and b %s." % (str(canonicalIndex),str(self.master),str(payload)))
     except Exception as e:
-      raise Exception("Error in powerIndex slicing for canonicalIndex %s: %s" % (str(canonicalIndex),str(e)))
+      exc_class, exc, tb = sys.exc_info()
+      new_exc = Exception("Error in powerIndex slicing for canonicalIndex %s:\n %s" % (str(canonicalIndex),str(e)))
+      raise new_exc.__class__, new_exc, tb
       
 class MasterGettable:
   @properGetitem
