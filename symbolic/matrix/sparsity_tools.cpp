@@ -110,9 +110,13 @@ namespace CasADi{
   }
 
   CRSSparsity sp_banded(int n, int p) {
-    throw CasadiException("sp_banded: Not implemented yet");
+    // This is not an efficient implementation
+    CRSSparsity ret(n,n);
+    for (int i=-p;i<=p;++i) {
+      ret = ret + sp_band(n,i);
+    }
+    return ret;
   }
-
 
   CRSSparsity sp_rowcol(const std::vector<int>& row, const std::vector<int>& col, int nrow, int ncol) {
     std::vector<int> rowind(nrow+1);
