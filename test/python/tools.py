@@ -874,6 +874,72 @@ class Toolstests(casadiTestCase):
     self.checkarray(b["b"].shape,(5,1))
     self.checkarray(b["b","a"].shape,(5,5))
     
+  def test_symm(self):
+    a = struct_ssym([entry("P",shape=(3,3),type='symm')])
+    
+    b = a()
+    b["P"] = DMatrix([[0,1,2],[3,4,5],[6,7,8]])
+    
+    self.assertEqual(a.size,6)
+    self.checkarray(a["P"].shape,(3,3))
+    
+    f = SXFunction([a],[a["P"]])
+    f.init()
+    f.setInput(range(6))
+    f.evaluate()
+    
+    self.checkarray(f.output(),DMatrix([[0,1,3],[1,2,4],[3,4,5]]))
+    self.checkarray(b["P"],DMatrix([[0,3,6],[3,4,7],[6,7,8]]))
+    self.checkarray(b.cat,DMatrix([0,3,4,6,7,8]))
+    
+    states = struct_ssym(["x","y","z"])
+
+    a = struct_ssym([entry("P",shapestruct=(states,states),type='symm')])
+
+    b = a()
+    b["P"] = DMatrix([[0,1,2],[3,4,5],[6,7,8]])
+
+    self.checkarray(b["P",["x","z"],["x","z"]] ,DMatrix([[0,6],[6,8]]))
+
+    b["P","y","x"] = 66
+    self.checkarray(b["P"],DMatrix([[0,66,6],[66,4,7],[6,7,8]]))
+
+    
+    b["P","x","y"] = 666
+    
+    self.checkarray(b["P"],DMatrix([[0,666,6],[666,4,7],[6,7,8]]))
+
+    b["P",["x"],["y","z"]] = DMatrix([1,12]).T
+    self.checkarray(b["P"],DMatrix([[0,1,12],[1,4,7],[12,7,8]]))
+    
+    b["P",["x","z"],["x","z"]] = DMatrix([[11,0],[0,11]])
+    self.checkarray(b["P"],DMatrix([[11,1,0],[1,4,7],[0,7,11]]))
+    
+    a = struct_ssym([entry("P",shape=sp_banded(3,1),type='symm')])
+
+    b = a()
+    with self.assertRaises(Exception):
+      b["P"] = DMatrix([[11,1,2],[1,4,5],[2,5,8]])
+      
+    with self.assertRaises(Exception):
+      b["P"] = sparse(DMatrix([[11,0,1],[1,4,5],[0,5,8]]))
+    
+    b["P"] = sparse(DMatrix([[11,1,0],[1,4,5],[0,5,8]]))
+    
+    self.checkarray(b["P"],DMatrix([[11,1,0],[1,4,5],[0,5,8]]))
+    
+    with self.assertRaises(Exception):
+      b["P",:,0] = DMatrix([1,2,3])
+    
+    with self.assertRaises(Exception):
+      b["P",0,:] = DMatrix([1,2,3]).T
+      
+    b["P",:,0] = sparse(DMatrix([1,2,0]))
+    self.checkarray(b["P"],DMatrix([[1,2,0],[2,4,5],[0,5,8]]))
+
+    b["P",0,:] = sparse(DMatrix([11,12,0])).T
+    self.checkarray(b["P"],DMatrix([[11,12,0],[12,4,5],[0,5,8]]))
+    
 if __name__ == '__main__':
     unittest.main()
 

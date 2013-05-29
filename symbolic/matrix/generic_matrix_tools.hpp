@@ -43,6 +43,10 @@ T linspace(const GenericMatrix<T> &a, const GenericMatrix<T> &b, int nsteps);
 template<typename T>
 T cross(const GenericMatrix<T> &a, const GenericMatrix<T> &b, int dim = -1);
 
+/** \brief Convert a lower triangular matrix to a symmetric one
+*/
+template<typename T>
+T tril2symm(const GenericMatrix<T> &a);
 
 #ifndef SWIG
 template<typename T>
@@ -93,6 +97,16 @@ T cross(const GenericMatrix<T> &a, const GenericMatrix<T> &b, int dim) {
   return t ? vertcat(ret) : horzcat(ret);
   
 }
+
+template<typename T> 
+T tril2symm(const GenericMatrix<T> &a_) {
+  const T& a = static_cast<const T&>(a_);
+  casadi_assert_message(a.size1()==a.size2(),"Shape error in tril2symm. Expecting square shape but got " << a.dimString());
+  casadi_assert_message(a.sizeU()-a.sizeD()==0,"Sparsity error in tril2symm. Found above-diagonal entries in argument: " << a.dimString());
+  T ret = a + trans(a);
+  ret(sp_diag(a.size1()))/=2;
+  return ret;
+}
 #endif // SWIG
 
 
@@ -107,7 +121,8 @@ T cross(const GenericMatrix<T> &a, const GenericMatrix<T> &b, int dim) {
 // Define template instanciations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES(T) \
 GMTT_INST(T,linspace) \
-GMTT_INST(T,cross)
+GMTT_INST(T,cross) \
+GMTT_INST(T,tril2symm) \
 
 #endif //SWIG
 

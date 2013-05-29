@@ -1982,6 +1982,13 @@ class MXtests(casadiTestCase):
     
     self.checkarray(f.output(),r)
     
+  def test_tril2symm(self):
+    x = msym("x",sp_tril(3))
+    f = MXFunction([x],[tril2symm(x)])
+    f.init()
+    f.setInput(range(6))
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([[0,1,3],[1,2,4],[3,4,5]]))
     
   def test_sparsity_indexing(self):
     self.message("sparsity")
