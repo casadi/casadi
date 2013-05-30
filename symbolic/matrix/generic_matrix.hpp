@@ -133,8 +133,7 @@ class GenericMatrix{
     SubMatrix<MatType,I,int> operator()(const I& i){ return SubMatrix<MatType,I,int>(static_cast<MatType&>(*this),i,0); }
 
     /** \brief  Access Sparsity slice */
-    template<typename I>
-    SubMatrix<MatType,I,int> operator()(const CRSSparsity& sp){ return SubMatrix<MatType,I,int>(static_cast<MatType&>(*this),sp,0); }
+    SubMatrix<MatType,CRSSparsity,int> operator()(const CRSSparsity& sp){ return SubMatrix<MatType,CRSSparsity,int>(static_cast<MatType&>(*this),sp,0); }
       
     /** \brief  Access Matrix element or slice */
     template<typename I, typename J>
