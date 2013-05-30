@@ -961,15 +961,15 @@ class NLPtests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],0.5,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output()[1],1.25,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[0],0.5,6,str(Solver))
+      self.assertAlmostEqual(solver.output()[1],1.25,6,str(Solver))
     
-      self.assertAlmostEqual(solver.output("lam_x")[0],4.75,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output("lam_x")[0],4.75,6,str(Solver))
+      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(Solver))
 
-      self.checkarray(solver.output("lam_g"),DMatrix([0,2,0]),str(qpsolver),digits=6)
+      self.checkarray(solver.output("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
       
-      self.assertAlmostEqual(solver.output("f")[0],-7.4375,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output("f")[0],-7.4375,6,str(Solver))
       
   def test_QP2(self):
     H = DMatrix([[1,-1],[-1,2]])
@@ -1005,15 +1005,15 @@ class NLPtests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],0.5,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output()[1],1.25,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[0],0.5,6,str(Solver))
+      self.assertAlmostEqual(solver.output()[1],1.25,6,str(Solver))
     
-      self.assertAlmostEqual(solver.output("lam_x")[0],4.75,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output("lam_x")[0],4.75,6,str(Solver))
+      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(Solver))
 
-      self.checkarray(solver.output("lam_g"),DMatrix([0,2,0]),str(qpsolver),digits=6)
+      self.checkarray(solver.output("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
       
-      self.assertAlmostEqual(solver.output("f")[0],-7.4375,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output("f")[0],-7.4375,6,str(Solver))
       
       solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"exact","UserHM":True,"max_iter":100,"MaxIter": 100,"print_level":0, "fixed_variable_treatment": "make_constraint"}).iteritems():
@@ -1028,15 +1028,15 @@ class NLPtests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],0.5,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output()[1],1.25,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[0],0.5,6,str(Solver))
+      self.assertAlmostEqual(solver.output()[1],1.25,6,str(Solver))
     
-      self.assertAlmostEqual(solver.output("lam_x")[0],4.75,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output("lam_x")[0],4.75,6,str(Solver))
+      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(Solver))
 
-      self.checkarray(solver.output("lam_g"),DMatrix([0,2,0]),str(qpsolver),digits=6)
+      self.checkarray(solver.output("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
       
-      self.assertAlmostEqual(solver.output("f")[0],-7.4375,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output("f")[0],-7.4375,6,str(Solver))
 
   def test_QP2_unconvex(self):
     H = DMatrix([[1,-1],[-1,-2]])
