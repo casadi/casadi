@@ -240,7 +240,13 @@ namespace CasADi{
   }
   
   FX FXInternal::getGradient(int iind, int oind){
-    casadi_error("FXInternal::getGradient: getGradient not defined for class " << typeid(*this).name());
+    // Wrap in an MXFunction
+    vector<MX> arg = symbolicInput();
+    vector<MX> res = shared_from_this<FX>().call(arg);
+    FX f = MXFunction(arg,res);
+    f.setInputScheme(getInputScheme());
+    f.init();
+    return f.gradient(iind,oind);
   }
   
   FX FXInternal::getHessian(int iind, int oind){
