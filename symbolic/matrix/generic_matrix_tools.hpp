@@ -104,9 +104,7 @@ T tril2symm(const GenericMatrix<T> &a_) {
   casadi_assert_message(a.size1()==a.size2(),"Shape error in tril2symm. Expecting square shape but got " << a.dimString());
   casadi_assert_message(a.sizeU()-a.sizeD()==0,"Sparsity error in tril2symm. Found above-diagonal entries in argument: " << a.dimString());
   T ret = a + trans(a);
-  SubMatrix<T,CRSSparsity,int> temp = ret(sp_diag(a.size1()));
-  temp/=2;
-  //ret(sp_diag(a.size1()))/=2;
+  ret(sp_diag(a.size1()))/=2;
   return ret;
 }
 #endif // SWIG
