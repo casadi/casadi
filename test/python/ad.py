@@ -212,15 +212,15 @@ class ADtests(casadiTestCase):
             
             for sens,seed in zip(fwdsens,fseeds):
               fe = SXFunction([y],[sens])
-              fe.setInput(n)
               fe.init()
+              fe.setInput(n)
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J,c.flatten(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = SXFunction([y],[sens])
-              fe.setInput(n)
               fe.init()
+              fe.setInput(n)
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J.T,c.flatten(seed)),"AD") 
 
@@ -298,15 +298,15 @@ class ADtests(casadiTestCase):
             
             for sens,seed in zip(fwdsens,fseeds):
               fe = MXFunction([y],[sens])
-              fe.setInput(n)
               fe.init()
+              fe.setInput(n)
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J,c.flatten(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = MXFunction([y],[sens])
-              fe.setInput(n)
               fe.init()
+              fe.setInput(n)
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J.T,c.flatten(seed)),"AD") 
 
@@ -345,15 +345,15 @@ class ADtests(casadiTestCase):
             
             for sens,seed in zip(fwdsens,fseeds):
               fe = SXFunction([y],[sens])
-              fe.setInput(n)
               fe.init()
+              fe.setInput(n)
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J,c.flatten(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = SXFunction([y],[sens])
-              fe.setInput(n)
               fe.init()
+              fe.setInput(n)
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J.T,c.flatten(seed)),"AD")
 
