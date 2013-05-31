@@ -42,7 +42,7 @@ class Log:
     self.iter = self.iter + 1
     if self.iter > 5:
       print "This is quite enough."
-      f.output(0).set(1)
+      f.setOutput(1,0)
 
 log = Log()
 

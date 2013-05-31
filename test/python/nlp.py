@@ -297,7 +297,7 @@ class NLPtests(casadiTestCase):
     solver.setInput([1],"ubg")
     solver.setInput(oldsolver.output("x"),"x0")
     solver.setInput(oldsolver.output("lam_g"),"lam_g0")
-    solver.output("lam_x").set(oldsolver.output("lam_x"))
+    solver.setOutput(oldsolver.output("lam_x"),"lam_x")
     
     
     solver.solve()

@@ -69,7 +69,7 @@ s.init()
 s.setInput(params_)
 
 #$ Initialize [$a$,$\gamma$] with a guess and solve
-s.output().set([1,-1])
+s.setOutput([1,-1])
 s.solve()
 
 #! Our output is:

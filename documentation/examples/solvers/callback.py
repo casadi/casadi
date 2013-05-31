@@ -49,7 +49,7 @@ class MyCallback:
     self.iter = self.iter + 1
     if self.iter > 5:
       print "5 Iterations, that is quite enough!"
-      f.output(0).set(1) # With this statement you can halt the iterations
+      f.setOutput(1,0) # With this statement you can halt the iterations
 
 mycallback = MyCallback()
 

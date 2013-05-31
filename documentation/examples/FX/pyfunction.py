@@ -32,7 +32,7 @@ def fac(f,nfwd,nadj,userdata):
   y = 1
   for i in range(x):
     y*=(i+1)
-  f.output().set(y)
+  f.setOutput(y)
 
 
 #! Construct a PyFunction from it
@@ -93,18 +93,18 @@ def squares(f,nfwd,nadj,userdata):
   x = f.input(0)[0]
   y = f.input(0)[1]
 
-  f.output(0).set(f.input(0)**2)
-  f.output(0).set(f.input(0)**2)
+  f.setOutput(f.input(0)**2,0)
+  f.setOutput(f.input(0)**2,0)
   
   for i in range(nfwd):
     xdot = f.fwdSeed(0,i)[0]
     ydot = f.fwdSeed(0,i)[1]
-    f.fwdSens(0,i).set([2*x*xdot+ydot,y*xdot+x*ydot])
+    f.setFwdSens([2*x*xdot+ydot,y*xdot+x*ydot],0,i)
     
   for i in range(nadj):
     xb = f.adjSeed(0,i)[0]
     yb = f.adjSeed(0,i)[1]
-    f.adjSens(0,i).set([2*x*xb+y*yb,xb+x*yb])
+    f.setAdjSens([2*x*xb+y*yb,xb+x*yb],0,i)
     
 c = PyFunction( squares, [sp_dense(2,1)], [sp_dense(2,1)] )
 c.init()
