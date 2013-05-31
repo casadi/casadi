@@ -19,13 +19,13 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 # 
-#! KinsolSolver
+#! NLPImplicitSolver
 #! =====================
 from casadi import *
 from numpy import *
 from pylab import *
 
-#! We will investigate the working of KinsolSolver with the help of the parametrically exited Duffing equation.
+#! We will investigate the working of NLPImplicitSolver with the help of the parametrically exited Duffing equation.
 #!
 #$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$. \\
 #$
@@ -57,14 +57,11 @@ alpha_ = 0.1
 k_     = 0.2
 params_ = [0.1,0.1,alpha_,k_,sigma_]
 
-#! We create a KinsolSolver instance
+#! We create a NLPImplicitSolver instance
 f=SXFunction([vertcat([a,gamma]),vertcat(params)],[vertcat([res0,res1])])
-s=KinsolSolver(f)
-s.setOption("strategy","linesearch")
-s.setOption("abstol",1e-14)
-
-#$ Require $a > 0$ and $\gamma < 0$
-s.setOption("constraints",[2,-2])
+s=NLPImplicitSolver(f)
+s.setOption("nlp_solver",IpoptSolver)
+s.setOption("nlp_solver_options",{"tol":1e-14})
 s.init()
 s.setInput(params_)
 

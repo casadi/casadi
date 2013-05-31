@@ -54,6 +54,8 @@ namespace CasADi {
   
     // Solve NLP
     nlp_solver_.evaluate();
+    
+    stats_["nlp_solver_stats"] = nlp_solver_.getStats();
 
     // Copy the outputs
     output(0).set(nlp_solver_.output(NLP_SOLVER_X));
