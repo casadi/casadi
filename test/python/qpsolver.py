@@ -75,13 +75,13 @@ class QPSolverTests(casadiTestCase):
       solver.setOption(qp_options)
       solver.init()
 
-      solver.input("h").set(H)
-      solver.input("g").set(G)
-      solver.input("a").set(A)
-      solver.input("lbx").set(LBX)
-      solver.input("ubx").set(UBX)
-      solver.input("lba").set(LBA)
-      solver.input("uba").set(UBA)
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
 
       solver.solve()
 
@@ -95,7 +95,7 @@ class QPSolverTests(casadiTestCase):
       
       self.assertAlmostEqual(solver.output("cost")[0],-8-2.0/9,6,str(qpsolver))
       
-      solver.input("h").set(H*4)
+      solver.setInput(H*4,"h")
 
       solver.evaluate()
       self.assertAlmostEqual(solver.output()[0],1,3,str(qpsolver))
@@ -107,7 +107,7 @@ class QPSolverTests(casadiTestCase):
 
       self.checkarray(solver.output("lambda_a"),DMatrix([2,0,0]),str(qpsolver),digits=2)
       
-      solver.input("h").set(0)
+      solver.setInput(0,"h")
 
       solver.evaluate()
       self.assertAlmostEqual(solver.output()[0],2.0/3,6,str(qpsolver))
@@ -119,8 +119,8 @@ class QPSolverTests(casadiTestCase):
 
       self.checkarray(solver.output("lambda_a"),DMatrix([10.0/3,4.0/3,0]),str(qpsolver),digits=4)
 
-      solver.input("lba").set([-inf]*3) #  Upper _and_ lower 
-      solver.input("uba").set([inf]*3)  #  bounds infinite?
+      solver.setInput([-inf]*3,"lba") #  Upper _and_ lower 
+      solver.setInput([inf]*3,"uba")  #  bounds infinite?
 
       solver.input("ubx").setAll(5)
 
@@ -168,13 +168,13 @@ class QPSolverTests(casadiTestCase):
       solver.setOption(qp_options)
       solver.init()
 
-      solver.input("h").set(H)
-      solver.input("g").set(G)
-      solver.input("a").set(A)
-      solver.input("lbx").set(LBX)
-      solver.input("ubx").set(UBX)
-      solver.input("lba").set(LBA)
-      solver.input("uba").set(UBA)
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
 
       solver.solve()
       
@@ -212,13 +212,13 @@ class QPSolverTests(casadiTestCase):
       solver.setOption(qp_options)
       solver.init()
 
-      solver.input("h").set(H)
-      solver.input("g").set(G)
-      solver.input("a").set(A)
-      solver.input("lbx").set(LBX)
-      solver.input("ubx").set(UBX)
-      solver.input("lba").set(LBA)
-      solver.input("uba").set(UBA)
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
 
       self.assertRaises(Exception,lambda : solver.solve())
 
@@ -249,13 +249,13 @@ class QPSolverTests(casadiTestCase):
       LBX = DMatrix([0.5,0])
       UBX = DMatrix([0.5,inf])
 
-      solver.input("h").set(H)
-      solver.input("g").set(G)
-      solver.input("a").set(A)
-      solver.input("lbx").set(LBX)
-      solver.input("ubx").set(UBX)
-      solver.input("lba").set(LBA)
-      solver.input("uba").set(UBA)
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
       if 'Worhp' in str(qp_options):
         with self.assertRaises(Exception):
           solver.solve()
@@ -281,13 +281,13 @@ class QPSolverTests(casadiTestCase):
       UBX = DMatrix([inf]*2)
 
 
-      solver.input("h").set(H)
-      solver.input("g").set(G)
-      solver.input("a").set(A)
-      solver.input("lbx").set(LBX)
-      solver.input("ubx").set(UBX)
-      solver.input("lba").set(LBA)
-      solver.input("uba").set(UBA)
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
 
       solver.solve()
 
@@ -330,13 +330,13 @@ class QPSolverTests(casadiTestCase):
       solver.setOption(qp_options)
       solver.init()
         
-      solver.input("h").set(H)
-      solver.input("g").set(G)
-      solver.input("a").set(A)
-      solver.input("lbx").set(LBX)
-      solver.input("ubx").set(UBX)
-      solver.input("lba").set(LBA)
-      solver.input("uba").set(UBA)
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
 
       solver.solve()
 
@@ -378,13 +378,13 @@ class QPSolverTests(casadiTestCase):
       
 
 
-      solver.input("h").set(H)
-      solver.input("g").set(G)
-      solver.input("a").set(A)
-      solver.input("lbx").set(LBX)
-      solver.input("ubx").set(UBX)
-      solver.input("lba").set(LBA)
-      solver.input("uba").set(UBA)
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
 
       solver.solve()
 
@@ -427,13 +427,13 @@ class QPSolverTests(casadiTestCase):
       
 
 
-      solver.input("h").set(H)
-      solver.input("g").set(G)
-      solver.input("a").set(A)
-      solver.input("lbx").set(LBX)
-      solver.input("ubx").set(UBX)
-      solver.input("lba").set(LBA)
-      solver.input("uba").set(UBA)
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
 
       solver.solve()
 
@@ -476,11 +476,11 @@ class QPSolverTests(casadiTestCase):
       solver.setOption(qp_options)
       solver.init()
 
-      solver.input("h").set(H)
-      solver.input("g").set(G)
-      solver.input("a").set(A)
-      solver.input("lbx").set(LBX)
-      solver.input("ubx").set(UBX)
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
 
       solver.solve()
 
@@ -516,13 +516,13 @@ class QPSolverTests(casadiTestCase):
         solver.setOption(qp_options)
         solver.init()
         
-        solver.input("h").set(H)
-        solver.input("g").set(G)
-        solver.input("a").set(A)
-        solver.input("lbx").set(LBX)
-        solver.input("ubx").set(UBX)
-        solver.input("lba").set(LBA)
-        solver.input("uba").set(UBA)
+        solver.setInput(H,"h")
+        solver.setInput(G,"g")
+        solver.setInput(A,"a")
+        solver.setInput(LBX,"lbx")
+        solver.setInput(UBX,"ubx")
+        solver.setInput(LBA,"lba")
+        solver.setInput(UBA,"uba")
         solver.solve()
         
         self.checkarray(solver.output(),DMatrix([-0.19230768069,1.6846153915,0.692307690769276]),str(qpsolver),digits=6)

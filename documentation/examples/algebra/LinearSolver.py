@@ -41,12 +41,12 @@ s = CSparse(A.sparsity())
 s.init()
 
 #! Give it the matrix A
-s.input(0).set(A)
+s.setInput(A,0)
 #! Do the LU factorization
 s.prepare()
 
 #! Give it the matrix b
-s.input(1).set(b)
+s.setInput(b,1)
 
 #! And we are off to find x...
 s.solve()
@@ -62,14 +62,14 @@ for name, solver in [("LapackLUDense",LapackLUDense),("LapackQRDense",LapackQRDe
   s = solver(A.sparsity()) # We create a solver
   s.init()
 
-  s.input(0).set(A) # Give it the matrix A
+  s.setInput(A,0) # Give it the matrix A
   
   t0 = time.time()
   for i in range(100):
     s.prepare()        # Do the LU factorization
   pt = (time.time()-t0)/100
 
-  s.input(1).set(b)  # Give it the matrix b
+  s.setInput(b,1)  # Give it the matrix b
 
   t0 = time.time()
   for i in range(100):

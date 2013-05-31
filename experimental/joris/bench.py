@@ -47,7 +47,7 @@ t = time()
 f = MXFunction([X],[c.mul(X.T,X)])
 f.init()
 print "CasADi MX wrapped init overhead = %.4f s" % (time()-t)
-f.input().set(x)
+f.setInput(x)
 
 t = time()
 f.evaluate()

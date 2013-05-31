@@ -68,10 +68,10 @@ solver.setOption("iteration_callback",c)
 solver.setOption("tol",1e-8)
 solver.setOption("max_iter",20)
 solver.init()
-solver.input("lbx").set([-10]*2)
-solver.input("ubx").set([10]*2)
-solver.input("lbg").set([-10])
-solver.input("ubg").set([10])
+solver.setInput([-10]*2,"lbx")
+solver.setInput([10]*2,"ubx")
+solver.setInput([-10],"lbg")
+solver.setInput([10],"ubg")
 solver.solve()
 
 #! Matplotlib callback
@@ -94,7 +94,7 @@ class MyCallback:
     
     for i in range(x_.shape[0]):
       for j in range(x_.shape[1]):
-        nlp.input("x").set([x_[i,j],y_[i,j]])
+        nlp.setInput([x_[i,j],y_[i,j]],"x")
         nlp.evaluate()
         z_[i,j] = float(nlp.output("f"))
     contourf(x_,y_,z_)
@@ -132,10 +132,10 @@ solver.setOption("iteration_callback",c)
 solver.setOption("tol",1e-8)
 solver.setOption("max_iter",50)
 solver.init()
-solver.input("lbx").set([-10]*2)
-solver.input("ubx").set([10]*2)
-solver.input("lbg").set([-10])
-solver.input("ubg").set([10])
+solver.setInput([-10]*2,"lbx")
+solver.setInput([10]*2,"ubx")
+solver.setInput([-10],"lbg")
+solver.setInput([10],"ubg")
 solver.solve()
 
 #! By setting matplotlib interactivity off, we can inspect the figure at ease

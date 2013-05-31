@@ -40,8 +40,8 @@ print d
 
 f = SXFunction([a,b],[d])
 f.init()
-f.input(0).set(4)
-f.input(1).set(3)
+f.setInput(4,0)
+f.setInput(3,1)
 
 #! When the graph is evaluated, a printout of c will occur (if you have set WITH_PRINTME to ON in CMakeCache.txt)
 #! Printout reads '|> 13: 7'
@@ -52,8 +52,8 @@ J = f.jacobian(0,0)
 J.init()
 
 J.init()
-J.input(0).set(2)
-J.input(1).set(9)
+J.setInput(2,0)
+J.setInput(9,1)
 
 #! The first derivative still depends on c
 #! Printout reads '|> 13: 11'
@@ -64,7 +64,7 @@ J = J.jacobian(0,0)
 J.init()
 
 J.init()
-J.input(0).set(2)
-J.input(1).set(9)
+J.setInput(2,0)
+J.setInput(9,1)
 #! second derivative doesn't, so we don't get a printout
 J.evaluate()

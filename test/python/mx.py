@@ -142,24 +142,24 @@ class MXtests(casadiTestCase):
     self.message(":simple indirection")
     g=MXFunction([x,y,z],f.call([x,y,z]))
     g.init()
-    g.input(0).set(xn)
-    g.input(1).set(yn)
-    g.input(2).set(zn)
-    g.fwdSeed(0).set(xn) # okay, I'm just lazy comming up with more numbers
-    g.fwdSeed(1).set(yn)
-    g.fwdSeed(2).set(zn)
+    g.setInput(xn,0)
+    g.setInput(yn,1)
+    g.setInput(zn,2)
+    g.setFwdSeed(xn,0) # okay, I'm just lazy comming up with more numbers
+    g.setFwdSeed(yn,1)
+    g.setFwdSeed(zn,2)
     g.evaluate(1,0)
     self.checkarray(g.output(),xn+2*yn+3*zn,"MXFunction indirection");
     self.checkarray(g.fwdSens(),array([52.9,32.7]),"MXFunction indirection");
     
     g=MXFunction([x,y,z],f.call([vertcat([x[0],x[1]]),y,z]))
     g.init()
-    g.input(0).set(xn)
-    g.input(1).set(yn)
-    g.input(2).set(zn)
-    g.fwdSeed(0).set(xn)
-    g.fwdSeed(1).set(yn)
-    g.fwdSeed(2).set(zn)
+    g.setInput(xn,0)
+    g.setInput(yn,1)
+    g.setInput(zn,2)
+    g.setFwdSeed(xn,0)
+    g.setFwdSeed(yn,1)
+    g.setFwdSeed(zn,2)
     g.evaluate(1,0)
 
     self.checkarray(g.output(),xn+2*yn+3*zn,"MXFunction indirection");
@@ -171,12 +171,12 @@ class MXtests(casadiTestCase):
     h=MXFunction([x,y,z],h.call([vertcat([y[0],x[1]]),vertcat([x[0],y[1]]),z]))
     # h should be identical to g now
     h.init()
-    h.input(0).set(xn)
-    h.input(1).set(yn)
-    h.input(2).set(zn)
-    h.fwdSeed(0).set(xn)
-    h.fwdSeed(1).set(yn)
-    h.fwdSeed(2).set(zn)
+    h.setInput(xn,0)
+    h.setInput(yn,1)
+    h.setInput(zn,2)
+    h.setFwdSeed(xn,0)
+    h.setFwdSeed(yn,1)
+    h.setFwdSeed(zn,2)
     h.evaluate(1,0)
     self.checkarray(h.output(),xn+2*yn+3*zn,"MXFunction indirection");
     self.checkarray(h.fwdSens(),array([52.9,32.7]),"MXFunction indirection");
@@ -186,12 +186,12 @@ class MXtests(casadiTestCase):
     h.init()
     h=MXFunction([x,y,z],h.call([y,x,z]))
     h.init()
-    h.input(0).set(xn)
-    h.input(1).set(yn)
-    h.input(2).set(zn)
-    h.fwdSeed(0).set(xn)
-    h.fwdSeed(1).set(yn)
-    h.fwdSeed(2).set(zn)
+    h.setInput(xn,0)
+    h.setInput(yn,1)
+    h.setInput(zn,2)
+    h.setFwdSeed(xn,0)
+    h.setFwdSeed(yn,1)
+    h.setFwdSeed(zn,2)
     h.evaluate(1,0)
     self.checkarray(h.output(),xn+2*yn+3*zn,"MXFunction indirection");
     self.checkarray(h.fwdSens(),array([52.9,32.7]),"MXFunction indirection");
@@ -202,12 +202,12 @@ class MXtests(casadiTestCase):
     h.init()
     h=MXFunction([x,y,z],h.call([x,z]))
     h.init()
-    h.input(0).set(xn)
-    h.input(1).set(yn)
-    h.input(2).set(zn)
-    h.fwdSeed(0).set(xn)
-    h.fwdSeed(1).set(yn)
-    h.fwdSeed(2).set(zn)
+    h.setInput(xn,0)
+    h.setInput(yn,1)
+    h.setInput(zn,2)
+    h.setFwdSeed(xn,0)
+    h.setFwdSeed(yn,1)
+    h.setFwdSeed(zn,2)
     h.evaluate(1,0)
     self.checkarray(h.output(),xn+2*yn+3*zn,"MXFunction indirection");
     self.checkarray(h.fwdSens(),array([52.9,32.7]),"MXFunction indirection");
@@ -390,7 +390,7 @@ class MXtests(casadiTestCase):
 
     g = MXFunction([y],[fc])
     g.init()
-    g.input().set([7])
+    g.setInput([7])
     g.evaluate()
 
     self.assertAlmostEqual(g.output()[0],10,10,"issue #83")
@@ -399,7 +399,7 @@ class MXtests(casadiTestCase):
 
     g = MXFunction([x],[fc])
     g.init()
-    g.input().set([3])
+    g.setInput([3])
     g.evaluate()
 
     self.assertAlmostEqual(g.output()[0],10,10,"issue #83")
@@ -478,7 +478,7 @@ class MXtests(casadiTestCase):
 
     f = MXFunction([U],[vec(U)])
     f.init()
-    f.input().set(u)
+    f.setInput(u)
     f.evaluate()
     
     self.checkarray(vec(u),f.output(),"vec")
@@ -496,7 +496,7 @@ class MXtests(casadiTestCase):
 
     f = MXFunction([U],[vecNZ(U)])
     f.init()
-    f.input().set(u)
+    f.setInput(u)
     f.evaluate()
     
     self.checkarray(vecNZ(u),f.output(),"vec")
@@ -747,7 +747,7 @@ class MXtests(casadiTestCase):
     z=unite(x,y)
     f = MXFunction([y],[z])
     f.init()
-    f.input().set(xn)
+    f.setInput(xn)
     f.evaluate()
     self.checkarray(f.output(),xn,"unite dense")
  
@@ -769,8 +769,8 @@ class MXtests(casadiTestCase):
 
     f = MXFunction([x,y],[z])
     f.init()
-    f.input(0).set(nx)
-    f.input(1).set(ny)
+    f.setInput(nx,0)
+    f.setInput(ny,1)
     f.evaluate()
     self.checkarray(f.output(),nxn+nyn,"unite sparse")
      
@@ -781,7 +781,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([X],[Y])
     f.init()
-    f.input().set([1,2,3,4])
+    f.setInput([1,2,3,4])
     f.evaluate()
     
     self.checkarray(f.output(),array([[1,3],[2,2],[4,4]]),"IMatrix indexing")
@@ -791,7 +791,7 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([X],[Y])
     f.init()
-    f.input().set([1,2,3,4])
+    f.setInput([1,2,3,4])
     f.evaluate()
     
     self.checkarray(f.output(),array([[9,2],[8,4]]),"IMatrix indexing assignment")
@@ -911,7 +911,7 @@ class MXtests(casadiTestCase):
      r[1:4,[2,4,6,7]]=xn
      fy = MXFunction([x],[y])
      fy.init()
-     fy.input().set(xn)
+     fy.setInput(xn)
      fy.evaluate()
      
      self.checkarray(fy.output(),r,"subscripted assigment")
@@ -921,7 +921,7 @@ class MXtests(casadiTestCase):
      r[1:4,[2,4,6,7]]=xn
      fy = MXFunction([x],[y])
      fy.init()
-     fy.input().set(xn)
+     fy.setInput(xn)
      fy.evaluate()
      self.checkarray(fy.output(),r,"subscripted assigment")
      
@@ -935,7 +935,7 @@ class MXtests(casadiTestCase):
      y[kl]=MX(1)
      fy = MXFunction([x],[y])
      fy.init()
-     fy.input().set(xn)
+     fy.setInput(xn)
      fy.evaluate()
      self.checkarray(fy.output(),r,"subscripted assigment")
      
@@ -948,7 +948,7 @@ class MXtests(casadiTestCase):
        cnt+=1
      fy = MXFunction([x],[y])
      fy.init()
-     fy.input().set(xn)
+     fy.setInput(xn)
      fy.evaluate()
      self.checkarray(fy.output(),r,"subscripted assigment")
      
@@ -960,8 +960,8 @@ class MXtests(casadiTestCase):
      y[1]=x[0]**4
      fy = MXFunction([x],[y])
      fy.init()
-     fy.input().set(xn)
-     fy.fwdSeed().set([1,0,0])
+     fy.setInput(xn)
+     fy.setFwdSeed([1,0,0])
      fy.evaluate(1,0)
      self.checkarray(fy.output(),matrix([xn[0,0]**3,xn[0,0]**4,xn[2,0]**3]).T,"subscripted assigment")
      self.checkarray(fy.fwdSens(),matrix([3*xn[0,0]**2,4*xn[0,0]**3,0]).T,"subscripted assigment")
@@ -977,7 +977,7 @@ class MXtests(casadiTestCase):
     z.erase([1,2,3],[2,4,6,7])
     f = MXFunction([y],[z])
     f.init()
-    f.input().set([1]*56)
+    f.setInput([1]*56)
     e = f.output()
     self.checkarray(f.output(),e,"erase")
     self.message(":sparse")
@@ -1008,12 +1008,12 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([x,A,b,C,D,e],[a])
     f.init()
-    f.input(0).set(x_)
-    f.input(1).set(A_)
-    f.input(2).set(b_)
-    f.input(3).set(C_)
-    f.input(4).set(D_)
-    f.input(5).set(e_)
+    f.setInput(x_,0)
+    f.setInput(A_,1)
+    f.setInput(b_,2)
+    f.setInput(C_,3)
+    f.setInput(D_,4)
+    f.setInput(e_,5)
     f.evaluate()
     
     f_ = dot(dot((dot(A_,x_)+b_).T,C_),(dot(D_,x_)+e_))
@@ -1028,12 +1028,12 @@ class MXtests(casadiTestCase):
       f.init()
       J = f.jacobian()
       J.init()
-      J.input(0).set(x_)
-      J.input(1).set(A_)
-      J.input(2).set(b_)
-      J.input(3).set(C_)
-      J.input(4).set(D_)
-      J.input(5).set(e_)
+      J.setInput(x_,0)
+      J.setInput(A_,1)
+      J.setInput(b_,2)
+      J.setInput(C_,3)
+      J.setInput(D_,4)
+      J.setInput(e_,5)
       J.evaluate()
       
       self.checkarray(J.output(),J_,"evaluation")
@@ -1076,12 +1076,12 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([x,A,b,C,D,e],[a])
     f.init()
-    f.input(0).set(x_)
-    f.input(1).set(A_)
-    f.input(2).set(b_)
-    f.input(3).set(C_)
-    f.input(4).set(D_)
-    f.input(5).set(e_)
+    f.setInput(x_,0)
+    f.setInput(A_,1)
+    f.setInput(b_,2)
+    f.setInput(C_,3)
+    f.setInput(D_,4)
+    f.setInput(e_,5)
     f.evaluate()
 
 
@@ -1100,12 +1100,12 @@ class MXtests(casadiTestCase):
       f.init()
       J = f.jacobian()
       J.init()
-      J.input(0).set(x_)
-      J.input(1).set(A_)
-      J.input(2).set(b_)
-      J.input(3).set(C_)
-      J.input(4).set(D_)
-      J.input(5).set(e_)
+      J.setInput(x_,0)
+      J.setInput(A_,1)
+      J.setInput(b_,2)
+      J.setInput(C_,3)
+      J.setInput(D_,4)
+      J.setInput(e_,5)
       J.evaluate()
       
       self.checkarray(J.output(),J_,"evaluation")
@@ -1152,12 +1152,12 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([x,A,b,C,D,e],[a])
     f.init()
-    f.input(0).set(x_)
-    f.input(1).set(A_)
-    f.input(2).set(b_)
-    f.input(3).set(C_)
-    f.input(4).set(D_)
-    f.input(5).set(e_)
+    f.setInput(x_,0)
+    f.setInput(A_,1)
+    f.setInput(b_,2)
+    f.setInput(C_,3)
+    f.setInput(D_,4)
+    f.setInput(e_,5)
     f.evaluate()
 
 
@@ -1176,12 +1176,12 @@ class MXtests(casadiTestCase):
       f.init()
       J = f.jacobian()
       J.init()
-      J.input(0).set(x_)
-      J.input(1).set(A_)
-      J.input(2).set(b_)
-      J.input(3).set(C_)
-      J.input(4).set(D_)
-      J.input(5).set(e_)
+      J.setInput(x_,0)
+      J.setInput(A_,1)
+      J.setInput(b_,2)
+      J.setInput(C_,3)
+      J.setInput(D_,4)
+      J.setInput(e_,5)
       J.evaluate()
       
       self.checkarray(J.output(),J_,"evaluation")
@@ -1202,9 +1202,9 @@ class MXtests(casadiTestCase):
     
     
     x_=1.7
-    F.input().set([x_])
-    F.fwdSeed().set(1)
-    F.adjSeed().set(1)
+    F.setInput([x_])
+    F.setFwdSeed(1)
+    F.setAdjSeed(1)
     F.evaluate(1,1)
     self.checkarray(F.output(),3*x_**2,"Chaining eval")
     self.checkarray(F.fwdSens(),6*x_,"Chaining fwd")
@@ -1218,17 +1218,17 @@ class MXtests(casadiTestCase):
 
     f = MXFunction([x],[F])
     f.init()
-    f.input().set([-1])
-    f.fwdSeed().set([1])
-    f.adjSeed().set([1])
+    f.setInput([-1])
+    f.setFwdSeed([1])
+    f.setAdjSeed([1])
     f.evaluate(1,1)
     self.checkarray(f.fwdSens(),-2,"regression")
     self.checkarray(f.adjSens(),-2,"regression")
 
     f.init()
-    f.input().set([0])
-    f.fwdSeed().set([1])
-    f.adjSeed().set([1])
+    f.setInput([0])
+    f.setFwdSeed([1])
+    f.setAdjSeed([1])
     f.evaluate(1,1)
     self.checkarray(f.fwdSens(),0,"regression")
     self.checkarray(f.adjSens(),0,"regression")
@@ -1238,18 +1238,18 @@ class MXtests(casadiTestCase):
     F = x**2
     f = MXFunction([x],[F])
     f.init()
-    f.input().set([-1,-1])
-    f.fwdSeed().set([1,0])
-    f.adjSeed().set([1,0])
+    f.setInput([-1,-1])
+    f.setFwdSeed([1,0])
+    f.setAdjSeed([1,0])
     f.evaluate(1,1)
     print f.fwdSens()
     self.checkarray(f.fwdSens(),matrix([-2,0]).T,"regression")
     self.checkarray(f.adjSens(),matrix([-2,0]).T,"regression")
 
     f.init()
-    f.input().set([0,0])
-    f.fwdSeed().set([1,0])
-    f.adjSeed().set([1,0])
+    f.setInput([0,0])
+    f.setFwdSeed([1,0])
+    f.setAdjSeed([1,0])
     f.evaluate(1,1)
     self.checkarray(f.fwdSens(),matrix([0,0]).T,"regression")
     self.checkarray(f.adjSens(),matrix([0,0]).T,"regression")
@@ -1261,10 +1261,10 @@ class MXtests(casadiTestCase):
 
     f = MXFunction([x,y],[F])
     f.init()
-    f.input(0).set([-1])
-    f.input(1).set([2])
-    f.fwdSeed().set([1])
-    f.adjSeed().set([1])
+    f.setInput([-1],0)
+    f.setInput([2],1)
+    f.setFwdSeed([1])
+    f.setAdjSeed([1])
     f.evaluate(1,1)
     self.assertTrue(isnan(f.fwdSens()[0]))
     self.assertTrue(isnan(f.adjSens(1)[0]))
@@ -1273,10 +1273,10 @@ class MXtests(casadiTestCase):
 
     f = MXFunction([x,y],[F])
     f.init()
-    f.input(0).set([-1])
-    f.input(1).set([2])
-    f.fwdSeed().set([1])
-    f.adjSeed().set([1])
+    f.setInput([-1],0)
+    f.setInput([2],1)
+    f.setFwdSeed([1])
+    f.setAdjSeed([1])
     f.evaluate(1,1)
     self.checkarray(f.fwdSens(),-2,"regression")
     self.checkarray(f.adjSens(),-2,"regression")
@@ -1421,12 +1421,12 @@ class MXtests(casadiTestCase):
       f = MXFunction(ins,[symbol])
       f.init()
       for i in range(len(ins_)):
-        f.input(i).set(ins_[i])
+        f.setInput(ins_[i],i)
       f.evaluate()
       g = MXFunction(ins,[solution])
       g.init()
       for i in range(len(ins_)):
-        g.input(i).set(ins_[i])
+        g.setInput(ins_[i],i)
       g.evaluate()
       self.checkarray(f.output(),g.output(),"#%d" % cnt )
       cnt+=1
@@ -1441,14 +1441,14 @@ class MXtests(casadiTestCase):
 
     f = MXFunction([x],[x+y])
     f.init()
-    f.input(0).set(x_)
+    f.setInput(x_,0)
     f.evaluate(0,0) # this should not throw a segfault
     self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
 
     f = MXFunction([x],[y+x])
     f.init()
-    f.input(0).set(x_)
+    f.setInput(x_,0)
     f.evaluate(0,0) # this should not throw a segfault
     self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
@@ -1460,14 +1460,14 @@ class MXtests(casadiTestCase):
     
     f = MXFunction([x],[x+y])
     f.init()
-    f.input(0).set(x_)
+    f.setInput(x_,0)
     f.evaluate(0,0) # this should not throw a segfault
     self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
     
     f = MXFunction([x],[y+x])
     f.init()
-    f.input(0).set(x_)
+    f.setInput(x_,0)
     f.evaluate(0,0) # this should not throw a segfault
     self.checkarray(f.output(),x_,"issue 134")
     f.evaluate(1,1) # this should not throw a segfault
@@ -1484,7 +1484,7 @@ class MXtests(casadiTestCase):
     #J = F.jacobian(0,0)
     #J.init()
 
-    #J.input().set(nums)
+    #J.setInput(nums)
     #J.evaluate()
     #self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
 
@@ -1492,7 +1492,7 @@ class MXtests(casadiTestCase):
     #J.setOption("ad_mode","reverse")
     #J.init()
 
-    #J.input().set(nums)
+    #J.setInput(nums)
     #J.evaluate()
     
     #self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
@@ -1501,7 +1501,7 @@ class MXtests(casadiTestCase):
     #J = MXFunction([X],[F.jac(0)[0]])
     #J.init()
 
-    #J.input().set(nums)
+    #J.setInput(nums)
     #J.evaluate()
     
     #self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
@@ -1519,7 +1519,7 @@ class MXtests(casadiTestCase):
     #J.setOption("ad_mode","forward")
     #J.init()
 
-    #J.input().set(nums)
+    #J.setInput(nums)
     #J.evaluate()
     #self.checkarray(J.output(),2*nums.T,"Norm_22 fwd")
 
@@ -1527,7 +1527,7 @@ class MXtests(casadiTestCase):
     #J.setOption("ad_mode","reverse")
     #J.init()
 
-    #J.input().set(nums)
+    #J.setInput(nums)
     #J.evaluate()
     
     #self.checkarray(J.output(),2*nums.T,"Norm_22 adj")
@@ -1535,7 +1535,7 @@ class MXtests(casadiTestCase):
     #J = MXFunction([X],[F.jac(0)[0]])
     #J.init()
 
-    #J.input().set(nums)
+    #J.setInput(nums)
     #J.evaluate()
     
     #self.checkarray(J.output(),2*nums.T,"Norm_22 jac")
@@ -1553,7 +1553,7 @@ class MXtests(casadiTestCase):
     #J.setOption("ad_mode","forward")
     #J.init()
 
-    #J.input().set(nums)
+    #J.setInput(nums)
     #J.evaluate()
     #self.checkarray(J.output(),matrix([1,-1,nan]),"Norm_1")
 
@@ -1561,7 +1561,7 @@ class MXtests(casadiTestCase):
     #J.setOption("ad_mode","reverse")
     #J.init()
 
-    #J.input().set(nums)
+    #J.setInput(nums)
     #J.evaluate()
     
     #self.checkarray(J.output(),matrix([1,-1,nan]),"Norm_1")
@@ -1727,7 +1727,7 @@ class MXtests(casadiTestCase):
       for t2 in [0,1]:
         T1 = t1!=0
         T2 = t2!=0
-        f.input().set([t1,t2])
+        f.setInput([t1,t2])
         f.evaluate()
         self.checkarray(f.output(),DMatrix([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f.output())))
 
@@ -1747,7 +1747,7 @@ class MXtests(casadiTestCase):
       for t2 in [-10,0.1,0,1,10]:
         T1 = t1
         T2 = t2
-        f.input().set([t1,t2])
+        f.setInput([t1,t2])
         f.evaluate()
         self.checkarray(f.output(),DMatrix([T1 < T2,T1 <= T2, T1 >= T2, T1 == T2, T1 != T2]),"ineq(%d,%d)" % (t1,t2))
 
@@ -1756,10 +1756,10 @@ class MXtests(casadiTestCase):
     y = if_else(x,5,0)
     f = MXFunction([x],[y])
     f.init()
-    f.input().set(1)
+    f.setInput(1)
     f.evaluate()
     self.assertTrue(f.output()==5,"if_else_zero %s " % str(f.output()))
-    f.input().set(0)
+    f.setInput(0)
     f.evaluate()
     self.assertTrue(f.output()==0,"if_else_zero")
     
@@ -1769,10 +1769,10 @@ class MXtests(casadiTestCase):
     y = if_else(x,1,2)
     f = MXFunction([x],[y])
     f.init()
-    f.input().set(1)
+    f.setInput(1)
     f.evaluate()
     self.assertTrue(f.output()==1,"if_else")
-    f.input().set(0)
+    f.setInput(0)
     f.evaluate()
     self.assertTrue(f.output()==2,"if_else")
     
@@ -1783,9 +1783,9 @@ class MXtests(casadiTestCase):
     y = if_else(x>1,x**2,x**3)
     f = MXFunction([x],[y])
     f.init()
-    f.input().set(x0)
-    f.fwdSeed().set(dx)
-    f.adjSeed().set(dx)
+    f.setInput(x0)
+    f.setFwdSeed(dx)
+    f.setAdjSeed(dx)
     f.evaluate(1,1)
     self.checkarray(f.output(),x0**2,"if_else sens")
     self.checkarray(f.fwdSens(),2*x0*dx,"if_else sens")
@@ -1794,9 +1794,9 @@ class MXtests(casadiTestCase):
     x0 = -2.1
     dx = 0.3
     
-    f.input().set(x0)
-    f.fwdSeed().set(dx)
-    f.adjSeed().set(dx)
+    f.setInput(x0)
+    f.setFwdSeed(dx)
+    f.setAdjSeed(dx)
     f.evaluate(1,1)
     self.checkarray(f.output(),x0**3,"if_else sens")
     self.checkarray(f.fwdSens(),3*(-x0)**2*dx,"if_else sens")
@@ -1846,7 +1846,7 @@ class MXtests(casadiTestCase):
     f = MXFunction([X],[Y])
     f.init()
     
-    f.input().set(2.3)
+    f.setInput(2.3)
     f.evaluate()
     
     self.assertAlmostEqual(f.output(),4.6)

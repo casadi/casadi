@@ -271,12 +271,12 @@ class Sparsitytests(casadiTestCase):
 
     F = MXFunction([X],[X**2])
     F.init()
-    F.input(0).set(q)
+    F.setInput(q,0)
     F.evaluate()
     F_ = vec(F.output(0))
 
     G = vec(F)
-    G.input(0).set(vec(q))
+    G.setInput(vec(q),0)
     G.evaluate()
     G_ = G.output()
 
@@ -290,12 +290,12 @@ class Sparsitytests(casadiTestCase):
 
     F = SXFunction([X],[X**2])
     F.init()
-    F.input(0).set(q)
+    F.setInput(q,0)
     F.evaluate()
     F_ = vec(F.output(0))
 
     G = vec(F)
-    G.input(0).set(vec(q))
+    G.setInput(vec(q),0)
     G.evaluate()
     G_ = G.output()
 
@@ -327,7 +327,7 @@ class Sparsitytests(casadiTestCase):
     
     f = SXFunction([b],[c])
     f.init()
-    f.input().set(range(1,len(nza)+1))
+    f.setInput(range(1,len(nza)+1))
     f.evaluate()
     
     self.checkarray(DMatrix(f.output().data()),DMatrix([1,0,0,7,0]),"sparsity index")
@@ -360,7 +360,7 @@ class Sparsitytests(casadiTestCase):
     
     f = MXFunction([b],[c])
     f.init()
-    f.input().set(range(1,len(nza)+1))
+    f.setInput(range(1,len(nza)+1))
     f.evaluate()
     
     self.checkarray(DMatrix(f.output().data()),DMatrix([1,0,0,7,0]),"sparsity index")
