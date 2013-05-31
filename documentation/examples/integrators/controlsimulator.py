@@ -68,10 +68,10 @@ sim.setOption("integrator",CVodesIntegrator)
 #! Each control interval will be subdived in 8
 sim.setOption("nf",8) 
 sim.init()
-sim.input("x0").set([0,0])
-sim.input("p").set([1,0.1,1])
+sim.setInput([0,0],"x0")
+sim.setInput([1,0.1,1],"p")
 #! Our 9 control intervals have the following prescribed values for u:
-sim.input("u").set([0,-0.2,0,0.5,0,0,0,0.2,-0.8]) 
+sim.setInput([0,-0.2,0,0.5,0,0,0,0.2,-0.8],"u") 
 sim.evaluate()
 
 #! Obtain the fine time grid
@@ -110,10 +110,10 @@ sim.setOption("integrator",CVodesIntegrator)
 #! Each control interval will be subdived in 8
 sim.setOption("nf",8) 
 sim.init()
-sim.input("x0").set([0,0])
-sim.input("p").set([1,0.1,1])
+sim.setInput([0,0],"x0")
+sim.setInput([1,0.1,1],"p")
 #! Our 9 control intervals have the following prescribed values for u:
-sim.input("u").set([0,-0.2,0,0.5,0,0,0,0.2,-0.8]) 
+sim.setInput([0,-0.2,0,0.5,0,0,0,0.2,-0.8],"u") 
 sim.evaluate()
 
 figure(1)
@@ -158,10 +158,10 @@ sim.setOption("control_interpolation","linear")
 sim.setOption("control_endpoint",True)
 sim.setOption("nf",8) 
 sim.init()
-sim.input("x0").set([0,0])
-sim.input("p").set([1,0.1,1])
+sim.setInput([0,0],"x0")
+sim.setInput([1,0.1,1],"p")
 #! CONTROLSIMULATOR_U is larger, it has a value at the end of the last control interval, such that interpolation can happen
-sim.input("u").set([0,-0.2,0,0.5,0,0,0,0.2,-0.8,0]) 
+sim.setInput([0,-0.2,0,0.5,0,0,0,0.2,-0.8,0],"u") 
 sim.evaluate()
 
 #! Obtain the fine time grid

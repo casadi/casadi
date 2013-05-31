@@ -126,7 +126,7 @@ class Misctests(casadiTestCase):
     f.input(0).setAll(2)
     g = SXFunction(f)
 
-    f.input(0).set(5)
+    f.setInput(5,0)
     f.evaluate()
 
     self.assertEqual(g.input(0),5)
@@ -170,7 +170,7 @@ class Misctests(casadiTestCase):
     f.input(0).setAll(2)
     g = copy.copy(f)
 
-    f.input(0).set(5)
+    f.setInput(5,0)
     f.evaluate()
 
     self.assertEqual(g.input(0),5)
@@ -213,7 +213,7 @@ class Misctests(casadiTestCase):
     f.input(0).setAll(2)
     g = copy.deepcopy(f)
 
-    f.input(0).set(5)
+    f.setInput(5,0)
     f.evaluate()
 
     self.assertEqual(g.input(0),2)

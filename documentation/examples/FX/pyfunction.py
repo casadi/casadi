@@ -41,7 +41,7 @@ c.init()
 
 
 #! Set the input
-c.input().set(4)
+c.setInput(4)
 
 #! Evaluate
 c.evaluate(0,0)
@@ -58,7 +58,7 @@ f = MXFunction([x],[y])
 f.init()
 
 
-c.input().set(5)
+c.setInput(5)
 c.evaluate(0,0)
 
 print "5! = ", c.output().toScalar()

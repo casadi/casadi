@@ -21,8 +21,8 @@ num = DMatrix([1.1,1.3])
 fseed_ = [1,0]
 
 for f in f1,f2:
-  f.input().set(num)
-  f.fwdSeed().set(fseed_)
+  f.setInput(num)
+  f.setFwdSeed(fseed_)
   f.evaluate(1,0)
 
 print "These should be the same: "
@@ -39,8 +39,8 @@ for f in f1,f2:
   fs = MXFunction(inputs+fseeds[0],fwdsens[0])
   fs.init()
 
-  fs.input(0).set(num)
-  fs.input(1).set(fseed_)
+  fs.setInput(num,0)
+  fs.setInput(fseed_,1)
 
   fs.evaluate()
 

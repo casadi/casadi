@@ -40,7 +40,7 @@ for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
   vf.init()
 
   for i in range(vf.getNumInputs()):
-    vf.input(i).set(DMatrix(vf.input(i).sparsity(),range(vf.input(i).size())))
+    vf.setInput(DMatrix(vf.input(i).sparsity(),range(vf.input(i).size())),i)
 
   vf.evaluate()
 
@@ -56,7 +56,7 @@ for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
 
   offset = 0
   for i in range(vf2.getNumInputs()):
-    vf2.input(i).set(DMatrix(vf2.input(i).sparsity(),range(offset,offset+vf2.input(i).size())))
+    vf2.setInput(DMatrix(vf2.input(i).sparsity(),range(offset,offset+vf2.input(i).size())),i)
     offset+=vf2.input(i).size()
 
   vf2.evaluate()

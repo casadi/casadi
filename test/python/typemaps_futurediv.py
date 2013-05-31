@@ -149,12 +149,12 @@ class typemaptests(casadiTestCase):
 
         f=function([z],[r])
         f.init()
-        f.input().set(dummy[0:f.input().size()])
+        f.setInput(dummy[0:f.input().size()])
         f.evaluate()
         
         f_=function([z],[z])
         f_.init()
-        f_.input().set(dummy[0:f.input().size()])
+        f_.setInput(dummy[0:f.input().size()])
         f_.evaluate()
         
 
@@ -165,14 +165,14 @@ class typemaptests(casadiTestCase):
         
         f=function([z,s],[r])
         f.init()
-        f.input(0).set(dummy[0:f.input(0).size()])
-        f.input(1).set(dummy2[0:f.input(1).size()])
+        f.setInput(dummy[0:f.input(0).size()],0)
+        f.setInput(dummy2[0:f.input(1).size()],1)
         f.evaluate()
         
         f_=function([z,s],[z,s])
         f_.init()
-        f_.input(0).set(dummy[0:f.input(0).size()])
-        f_.input(1).set(dummy2[0:f.input(1).size()])
+        f_.setInput(dummy[0:f.input(0).size()],0)
+        f_.setInput(dummy2[0:f.input(1).size()],1)
         f_.evaluate()
 
         self.checkarray(fun(f_.output(0),f_.output(1)),f.output(),"operation")

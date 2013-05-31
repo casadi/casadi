@@ -147,12 +147,12 @@ class ADtests(casadiTestCase):
             self.message("fwd AD on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             f.init()
-            f.input().set(n)
+            f.setInput(n)
             self.assertEqual(f.fwdSeed().shape,f.input().shape,"fwdSeed shape")
             self.assertEqual(f.fwdSeed().size(),f.input().size(),"fwdSeed shape")
             J = self.jacobians[inputtype][outputtype](*n)
             for d in [array([1,0,0,0]),array([0,2,0,0]),array([1.2,4.8,7.9,4.6])]:
-              f.fwdSeed().set(d)
+              f.setFwdSeed(d)
               f.evaluate(1,0)
               seed = array(f.fwdSeed()).ravel()
               sens = array(f.fwdSens()).ravel()
@@ -167,12 +167,12 @@ class ADtests(casadiTestCase):
             self.message("adj AD on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             f.init()
-            f.input().set(n)
+            f.setInput(n)
             self.assertEqual(f.adjSeed().shape,f.output().shape,"adjSeed shape")
             self.assertEqual(f.adjSeed().size(),f.output().size(),"adjSeed shape")
             J = self.jacobians[inputtype][outputtype](*n)
             for d in [array([1,0,0,0]),array([0,2,0,0]),array([1.2,4.8,7.9,4.7])]:
-              f.adjSeed().set(d)
+              f.setAdjSeed(d)
               f.evaluate(0,1)
               seed = array(f.adjSeed()).ravel()
               sens = array(f.adjSens()).ravel()
@@ -187,7 +187,7 @@ class ADtests(casadiTestCase):
             self.message("evalSX on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             f.init()
-            f.input().set(n)
+            f.setInput(n)
             f.evaluate()
             r = DMatrix(f.output())
             J = self.jacobians[inputtype][outputtype](*n)
@@ -205,21 +205,21 @@ class ADtests(casadiTestCase):
             fe = SXFunction([y],res)
             fe.init()
             
-            fe.input().set(n)
+            fe.setInput(n)
             fe.evaluate()
             
             self.checkarray(r,fe.output())
             
             for sens,seed in zip(fwdsens,fseeds):
               fe = SXFunction([y],[sens])
-              fe.input().set(n)
+              fe.setInput(n)
               fe.init()
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J,c.flatten(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = SXFunction([y],[sens])
-              fe.input().set(n)
+              fe.setInput(n)
               fe.init()
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J.T,c.flatten(seed)),"AD") 
@@ -233,12 +233,12 @@ class ADtests(casadiTestCase):
             self.message("fwd AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f.init()
-            f.input().set(n)
+            f.setInput(n)
             self.assertEqual(f.fwdSeed().shape,f.input().shape,"fwdSeed shape")
             self.assertEqual(f.fwdSeed().size(),f.input().size(),"fwdSeed shape")
             J = self.jacobians[inputtype][outputtype](*n)
             for d in [array([1,0,0,0]),array([0,2,0,0]),array([1.2,4.8,7.9,4.6])]:
-              f.fwdSeed().set(d)
+              f.setFwdSeed(d)
               f.evaluate(1,0)
               seed = array(f.fwdSeed()).ravel()
               sens = array(f.fwdSens()).ravel()
@@ -253,12 +253,12 @@ class ADtests(casadiTestCase):
             self.message("adj AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f.init()
-            f.input().set(n)
+            f.setInput(n)
             self.assertEqual(f.adjSeed().shape,f.output().shape,"adjSeed shape")
             self.assertEqual(f.adjSeed().size(),f.output().size(),"adjSeed shape")
             J = self.jacobians[inputtype][outputtype](*n)
             for d in [array([1,0,0,0]),array([0,2,0,0]),array([1.2,4.8,7.9,4.3])]:
-              f.adjSeed().set(d)
+              f.setAdjSeed(d)
               f.evaluate(0,1)
               seed = array(f.adjSeed()).ravel()
               sens = array(f.adjSens()).ravel()
@@ -273,7 +273,7 @@ class ADtests(casadiTestCase):
             self.message("evalMX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f.init()
-            f.input().set(n)
+            f.setInput(n)
             f.evaluate()
             r = DMatrix(f.output())
             J = self.jacobians[inputtype][outputtype](*n)
@@ -291,21 +291,21 @@ class ADtests(casadiTestCase):
             fe = MXFunction([y],res)
             fe.init()
             
-            fe.input().set(n)
+            fe.setInput(n)
             fe.evaluate()
             
             self.checkarray(r,fe.output())
             
             for sens,seed in zip(fwdsens,fseeds):
               fe = MXFunction([y],[sens])
-              fe.input().set(n)
+              fe.setInput(n)
               fe.init()
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J,c.flatten(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = MXFunction([y],[sens])
-              fe.input().set(n)
+              fe.setInput(n)
               fe.init()
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J.T,c.flatten(seed)),"AD") 
@@ -320,7 +320,7 @@ class ADtests(casadiTestCase):
             self.message("evalSX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f.init()
-            f.input().set(n)
+            f.setInput(n)
             f.evaluate()
             r = DMatrix(f.output())
             J = self.jacobians[inputtype][outputtype](*n)
@@ -338,21 +338,21 @@ class ADtests(casadiTestCase):
             fe = SXFunction([y],res)
             fe.init()
             
-            fe.input().set(n)
+            fe.setInput(n)
             fe.evaluate()
             
             self.checkarray(r,fe.output())
             
             for sens,seed in zip(fwdsens,fseeds):
               fe = SXFunction([y],[sens])
-              fe.input().set(n)
+              fe.setInput(n)
               fe.init()
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J,c.flatten(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = SXFunction([y],[sens])
-              fe.input().set(n)
+              fe.setInput(n)
               fe.init()
               fe.evaluate()
               self.checkarray(c.flatten(fe.output()),mul(J.T,c.flatten(seed)),"AD")
@@ -366,7 +366,7 @@ class ADtests(casadiTestCase):
             self.message("evalSX on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
             f.init()
-            f.input().set(n)
+            f.setInput(n)
             f.evaluate()
             r = DMatrix(f.output())
   
@@ -378,7 +378,7 @@ class ADtests(casadiTestCase):
             fe = SXFunction([y],res)
             fe.init()
             
-            fe.input().set(n)
+            fe.setInput(n)
             fe.evaluate()
             
             self.checkarray(r,fe.output())
@@ -398,7 +398,7 @@ class ADtests(casadiTestCase):
                 f.init()
                 Jf=f.jacobian(0,0)
                 Jf.init()
-                Jf.input().set(n)
+                Jf.setInput(n)
                 Jf.evaluate()
                 J = self.jacobians[inputtype][outputtype](*n)
                 self.checkarray(array(Jf.output()),J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s\n Numeric: %s"% (mode, inputshape, inputtype, outputshape, outputtype, numeric))
@@ -420,7 +420,7 @@ class ADtests(casadiTestCase):
               ]
             )
             Jf.init()
-            Jf.input().set(n)
+            Jf.setInput(n)
             Jf.evaluate()
             J = self.jacobians[inputtype][outputtype](*n)
             self.checkarray(array(Jf.output()),J,"jacobian")
@@ -453,7 +453,7 @@ class ADtests(casadiTestCase):
                 f.init()
                 Jf=f.jacobian(0,0)
                 Jf.init()
-                Jf.input().set(n)
+                Jf.setInput(n)
                 Jf.evaluate()
                 J = self.jacobians[inputtype][outputtype](*n)
                 self.checkarray(Jf.output(),J,"Jacobian\n Mode: %s\n Input: %s %s\n Output: %s %s\n Numeric: %s"% (mode, inputshape, inputtype, outputshape, outputtype, numeric))
@@ -471,7 +471,7 @@ class ADtests(casadiTestCase):
               f.init()
               Jf=f.jacobian(0,0)
               Jf.init()
-              Jf.input().set(n)
+              Jf.setInput(n)
               Jf.evaluate()
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(Jf.output()),J,"jacobian")
@@ -496,11 +496,11 @@ class ADtests(casadiTestCase):
     JT = MXFunction([m],[JT.T])
     #JT.setOption("ad_mode","reverse")
     JT.init()
-    JT.input().set(n)
+    JT.setInput(n)
     JT.evaluate()
     H = JT.jacobian(0,0)
     H.init()
-    H.input().set(n)
+    H.setInput(n)
     #H.evaluate()
     
     #print array(JT.output())
@@ -521,7 +521,7 @@ class ADtests(casadiTestCase):
     f.init()
     J=f.jacobian(0,0)
     J.init()
-    J.input().set([2,7])
+    J.setInput([2,7])
     J.evaluate()
 
     self.assertEqual(f.output().size1(),3,"Jacobian shape bug")
@@ -543,7 +543,7 @@ class ADtests(casadiTestCase):
     f.init()
     J=f.jacobian(0,0)
     J.init()
-    J.input().set([2,7])
+    J.setInput([2,7])
     J.evaluate()
 
     f=SXFunction([inp],[vertcat([x+y,x,y])])
@@ -661,8 +661,8 @@ class ADtests(casadiTestCase):
       funsx.init()
       
       for i,v in enumerate(values):
-        fun.input(i).set(v)
-        funsx.input(i).set(v)
+        fun.setInput(v,i)
+        funsx.setInput(v,i)
         
       fun.evaluate()
       funsx.evaluate()
@@ -686,14 +686,14 @@ class ADtests(casadiTestCase):
 
         # Fwd and Adjoint AD
         for i,v in enumerate(values):
-          f.input(i).set(v)
+          f.setInput(v,i)
         
         
         for d in range(ndir):
-          f.fwdSeed(0,d).set(DMatrix(inputs[0].sparsity(),random.random(inputs[0].size())))
-          f.adjSeed(0,d).set(DMatrix(out.sparsity(),random.random(out.size())))
-          f.fwdSeed(1,d).set(0)
-          f.adjSeed(1,d).set(0)
+          f.setFwdSeed(DMatrix(inputs[0].sparsity(),random.random(inputs[0].size())),0,d)
+          f.setAdjSeed(DMatrix(out.sparsity(),random.random(out.size())),0,d)
+          f.setFwdSeed(0,1,d)
+          f.setAdjSeed(0,1,d)
           
         f.evaluate(ndir,ndir)
         for d in range(ndir):
@@ -727,18 +727,18 @@ class ADtests(casadiTestCase):
             vf.init()
             
             for i,v in enumerate(values):
-              vf.input(i).set(v)
+              vf.setInput(v,i)
             offset = len(inputss)
               
             for d in range(ndir):
-              vf.input(offset+0).set(fseed[d])
+              vf.setInput(fseed[d],offset+0)
               for i in range(len(values)-1):
-                vf.input(offset+i+1).set(0)
+                vf.setInput(0,offset+i+1)
                 
               offset += len(inputss)
 
-              vf.input(offset+0).set(aseed[d])
-              vf.input(offset+1).set(0)
+              vf.setInput(aseed[d],offset+0)
+              vf.setInput(0,offset+1)
               offset+=2
               
             assert(offset==vf.getNumInputs())
@@ -764,7 +764,7 @@ class ADtests(casadiTestCase):
             # Complete random seeding
             random.seed(1)
             for i in range(vf.getNumInputs()):
-              vf.input(i).set(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).size())))
+              vf.setInput(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).size())),i)
             
             vf.evaluate()
             storagekey = (spmod,spmod2)
@@ -790,7 +790,7 @@ class ADtests(casadiTestCase):
                   
                 random.seed(1)
                 for i in range(vf2.getNumInputs()):
-                  vf2.input(i).set(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())))
+                  vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())),i)
                 
                 vf2.evaluate()
                 storagekey = (spmod,spmod2)
@@ -821,7 +821,7 @@ class ADtests(casadiTestCase):
             Jf=f.jacobian(0,0)
             Jf.init()
             for i,v in enumerate(values):
-              Jf.input(i).set(v)
+              Jf.setInput(v,i)
             Jf.evaluate()
             self.checkarray(Jf.output(),J_)
             self.checkarray(DMatrix(Jf.output().sparsity(),1),DMatrix(J_.sparsity(),1),str(out)+str(mode)+str(numeric))
@@ -832,7 +832,7 @@ class ADtests(casadiTestCase):
       fun.init()
       
       for i,v in enumerate(values):
-        fun.input(i).set(v)
+        fun.setInput(v,i)
         
         
       fun.evaluate()
@@ -848,7 +848,7 @@ class ADtests(casadiTestCase):
             Gf=f.gradient(0,0)
             Gf.init()
             for i,v in enumerate(values):
-              Gf.input(i).set(v)
+              Gf.setInput(v,i)
             Gf.evaluate()
             self.checkarray(Gf.output(),J_)
             #self.checkarray(DMatrix(Gf.output().sparsity(),1),DMatrix(J_.sparsity(),1),str(mode)+str(numeric)+str(out)+str(type(fun)))

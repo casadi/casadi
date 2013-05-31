@@ -90,8 +90,8 @@ class Simulatortests(casadiTestCase):
     integrator.init()
     sim = Simulator(integrator,out,tc)
     sim.init()
-    sim.input(0).set([num['q0']])
-    sim.input(1).set([num['p']])
+    sim.setInput([num['q0']],0)
+    sim.setInput([num['p']],1)
     sim.evaluate()
 
     self.checkarray(sim.output(),num['q0']*exp(tc**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
@@ -110,8 +110,8 @@ class Simulatortests(casadiTestCase):
     integrator.init()
     sim = Simulator(integrator,out,tc)
     sim.init()
-    sim.input(0).set([num['q0']])
-    sim.input(1).set([num['p']])
+    sim.setInput([num['q0']],0)
+    sim.setInput([num['p']],1)
     sim.evaluate()
 
     self.checkarray(sim.output(),num['q0']*exp(tc**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
@@ -133,7 +133,7 @@ class Simulatortests(casadiTestCase):
     integrator.init()
     sim = Simulator(integrator,out,tc)
     sim.init()
-    sim.input(0).set([num['q0']])
+    sim.setInput([num['q0']],0)
     sim.evaluate()
 
     self.checkarray(sim.output(),num['q0']*exp(tc**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
@@ -151,7 +151,7 @@ class Simulatortests(casadiTestCase):
     integrator.init()
     sim = Simulator(integrator,out,tc)
     sim.init()
-    sim.input(0).set([num['q0']])
+    sim.setInput([num['q0']],0)
     sim.evaluate()
 
     self.checkarray(sim.output(),num['q0']*exp(-tc),"Evaluation output mismatch",digits=9)
@@ -167,8 +167,8 @@ class Simulatortests(casadiTestCase):
     t = n.linspace(0,num['tend'],100)
     sim = Simulator(self.integrator,t)
     sim.init()
-    sim.input(0).set([num['q0']])
-    sim.input(1).set([num['p']])
+    sim.setInput([num['q0']],0)
+    sim.setInput([num['p']],1)
     sim.evaluate()
 
     self.checkarray(sim.output(),DMatrix(q0*exp(t**3/(3*p))),"Evaluation output mismatch",digits=9)
@@ -179,8 +179,8 @@ class Simulatortests(casadiTestCase):
     out.init()
     sim = Simulator(self.integrator,out,t)
     sim.init()
-    sim.input(0).set([num['q0']])
-    sim.input(1).set([num['p']])
+    sim.setInput([num['q0']],0)
+    sim.setInput([num['p']],1)
     sim.evaluate()
 
     self.checkarray(sim.output(),t,"Evaluation output mismatch")
@@ -191,8 +191,8 @@ class Simulatortests(casadiTestCase):
     out.init()
     sim = Simulator(self.integrator,out,t)
     sim.init()
-    sim.input(0).set([num['q0']])
-    sim.input(1).set([num['p']])
+    sim.setInput([num['q0']],0)
+    sim.setInput([num['p']],1)
     sim.evaluate()
 
     
@@ -204,8 +204,8 @@ class Simulatortests(casadiTestCase):
     #out.init()
     #sim = Simulator(self.integrator,out,t)
     #sim.init()
-    #sim.input(0).set([num['q0']])
-    #sim.input(1).set([num['p']])
+    #sim.setInput([num['q0']],0)
+    #sim.setInput([num['p']],1)
     #sim.evaluate()
 
     #self.checkarray(sim.output(),DMatrix.zeros(sim.output().shape),"INTEGRATOR_XPF unsupported",digits=9)
@@ -234,8 +234,8 @@ class Simulatortests(casadiTestCase):
     sim.setOption('integrator',CVodesIntegrator)
     sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
     sim.init()
-    sim.input("x0").set([num['q0']])
-    sim.input("p").set([num['p']])
+    sim.setInput([num['q0']],"x0")
+    sim.setInput([num['p']],"p")
     self.assertTrue(sim.input("u").empty())
     sim.evaluate()
     
@@ -258,8 +258,8 @@ class Simulatortests(casadiTestCase):
     sim.setOption('integrator',CVodesIntegrator)
     sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
     sim.init()
-    sim.input("x0").set([num['q0']])
-    sim.input("p").set([num['p']])
+    sim.setInput([num['q0']],"x0")
+    sim.setInput([num['p']],"p")
     sim.evaluate()
     
     tf = DMatrix(sim.getMinorT())
@@ -281,7 +281,7 @@ class Simulatortests(casadiTestCase):
     sim.setOption('integrator',CVodesIntegrator)
     sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
     sim.init()
-    sim.input("x0").set([num['q0']])
+    sim.setInput([num['q0']],"x0")
     sim.evaluate()
 
     self.checkarray(sim.output(),num['q0']*exp(tf**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
@@ -297,7 +297,7 @@ class Simulatortests(casadiTestCase):
     sim.setOption('integrator',CVodesIntegrator)
     sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
     sim.init()
-    sim.input("x0").set([num['q0']])
+    sim.setInput([num['q0']],"x0")
     sim.evaluate()
 
 
@@ -353,8 +353,8 @@ class Simulatortests(casadiTestCase):
     sim.setOption('integrator',CVodesIntegrator)
     sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
     sim.init()
-    sim.input("x0").set([2.3])
-    sim.input("u").set(U)
+    sim.setInput([2.3],"x0")
+    sim.setInput(U,"u")
     sim.evaluate()
 
     tf = DMatrix(sim.getMinorT())
@@ -374,8 +374,8 @@ class Simulatortests(casadiTestCase):
     sim.setOption('integrator',CVodesIntegrator)
     sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
     sim.init()
-    sim.input("x0").set([2.3])
-    sim.input("u").set(vertcat([U,0]))
+    sim.setInput([2.3],"x0")
+    sim.setInput(vertcat([U,0]),"u")
     sim.evaluate()
 
     tf = DMatrix(sim.getMinorT())
@@ -398,8 +398,8 @@ class Simulatortests(casadiTestCase):
     sim.setOption('integrator',CVodesIntegrator)
     sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
     sim.init()
-    sim.input(0).set([num['q0']])
-    sim.input(1).set([num['p']])
+    sim.setInput([num['q0']],0)
+    sim.setInput([num['p']],1)
     sim.evaluate()
     
     tf = DMatrix(sim.getMinorT())
@@ -413,8 +413,8 @@ class Simulatortests(casadiTestCase):
     t = n.linspace(0.7,num['tend'],100)
     sim = Simulator(self.integrator,t)
     sim.init()
-    sim.input(0).set([num['q0']])
-    sim.input(1).set([num['p']])
+    sim.setInput([num['q0']],0)
+    sim.setInput([num['p']],1)
     sim.evaluate()
 
     tend=num['tend']
@@ -457,9 +457,9 @@ class Simulatortests(casadiTestCase):
     sole = exp(-(b*t)/2)*((sin((sqrt(4*k-b**2)*t)/2)*(2*(dx0+x0*b)-x0*b))/sqrt(4*k-b**2)+x0*cos((sqrt(4*k-b**2)*t)/2))
     sol = SXFunction([t,vertcat([x0,dx0]),vertcat([b,k])],[vertcat([sole,jacobian(sole,t)])])
     sol.init()
-    sol.input(0).set(50)
-    sol.input(1).set(X0)
-    sol.input(2).set(p_)
+    sol.setInput(50,0)
+    sol.setInput(X0,1)
+    sol.setInput(p_,2)
 
 
     for Integrator in [CVodesIntegrator, IdasIntegrator]:
@@ -472,10 +472,10 @@ class Simulatortests(casadiTestCase):
       integrator.setOption("tf",50)
       integrator.init()
 
-      integrator.input("x0").set(X0)
-      integrator.input("p").set(p_)
-      integrator.fwdSeed("x0").set([1,0])
-      integrator.fwdSeed("p").set([0,0])
+      integrator.setInput(X0,"x0")
+      integrator.setInput(p_,"p")
+      integrator.setFwdSeed([1,0],"x0")
+      integrator.setFwdSeed([0,0],"p")
       integrator.evaluate(1,0)
       
       fwdSens_int = DMatrix(integrator.fwdSens("xf"))
@@ -484,10 +484,10 @@ class Simulatortests(casadiTestCase):
 
       sim=Simulator(integrator,ts)
       sim.init()
-      sim.input("x0").set(X0)
-      sim.input("p").set(p_)
-      sim.fwdSeed("x0").set([1,0])
-      sim.fwdSeed("p").set([0,0])
+      sim.setInput(X0,"x0")
+      sim.setInput(p_,"p")
+      sim.setFwdSeed([1,0],"x0")
+      sim.setFwdSeed([0,0],"p")
       sim.evaluate(1,0)
 
       fwdSens_sim = DMatrix(sim.fwdSens("xf")[-1,:])
@@ -496,15 +496,15 @@ class Simulatortests(casadiTestCase):
       csim.setOption("integrator",Integrator)
       csim.setOption("integrator_options",{"fsens_abstol": 1e-12, "fsens_reltol": 1e-12, "fsens_err_con": True})
       csim.init()
-      csim.input("x0").set(X0)
-      csim.input("p").set(p_)
-      csim.fwdSeed("x0").set([1,0])
-      csim.fwdSeed("p").set([0,0])
+      csim.setInput(X0,"x0")
+      csim.setInput(p_,"p")
+      csim.setFwdSeed([1,0],"x0")
+      csim.setFwdSeed([0,0],"p")
       csim.evaluate(1,0)
       fwdSens_csim = DMatrix(csim.fwdSens("xf")[-1,:])
       
-      sol.fwdSeed(1).set([1,0])
-      sol.fwdSeed(2).set([0,0])
+      sol.setFwdSeed([1,0],1)
+      sol.setFwdSeed([0,0],2)
       sol.evaluate(1,0)
       fwdSens_exact = sol.fwdSens()
       
@@ -519,25 +519,25 @@ class Simulatortests(casadiTestCase):
       self.assertAlmostEqual(fwdSens_csim[0],fwdSens_exact[0],digits,"Forward sensitivity")
       self.assertAlmostEqual(fwdSens_csim[1],fwdSens_exact[1],digits,"Forward sensitivity")
       
-      integrator.fwdSeed("x0").set([0,0])
-      integrator.fwdSeed("p").set([1,0])
+      integrator.setFwdSeed([0,0],"x0")
+      integrator.setFwdSeed([1,0],"p")
       integrator.evaluate(1,0)
       
       fwdSens_int = DMatrix(integrator.fwdSens("xf"))
       
-      sim.fwdSeed("x0").set([0,0])
-      sim.fwdSeed("p").set([1,0])
+      sim.setFwdSeed([0,0],"x0")
+      sim.setFwdSeed([1,0],"p")
       sim.evaluate(1,0)
 
       fwdSens_sim = DMatrix(sim.fwdSens("xf")[-1,:])
 
-      csim.fwdSeed("x0").set([0,0])
-      csim.fwdSeed("p").set([1,0])
+      csim.setFwdSeed([0,0],"x0")
+      csim.setFwdSeed([1,0],"p")
       csim.evaluate(1,0)
       fwdSens_csim = DMatrix(sim.fwdSens("xf")[-1,:])
       
-      sol.fwdSeed(1).set([0,0])
-      sol.fwdSeed(2).set([1,0])
+      sol.setFwdSeed([0,0],1)
+      sol.setFwdSeed([1,0],2)
       sol.evaluate(1,0)
       fwdSens_exact = sol.fwdSens()
       
@@ -591,9 +591,9 @@ class Simulatortests(casadiTestCase):
     sole = exp(-(b*t)/2)*((sin((sqrt(4*k-b**2)*t)/2)*(2*(dx0+x0*b)-x0*b))/sqrt(4*k-b**2)+x0*cos((sqrt(4*k-b**2)*t)/2))
     sol = SXFunction([[t],[x0,dx0],[b,k]],[vertcat([sole,jacobian(sole,t)])])
     sol.init()
-    sol.input(0).set(Te)
-    sol.input(1).set(X0)
-    sol.input(2).set(p_)
+    sol.setInput(Te,0)
+    sol.setInput(X0,1)
+    sol.setInput(p_,2)
 
     Integrator = CVodesIntegrator
   
@@ -606,9 +606,9 @@ class Simulatortests(casadiTestCase):
     integrator.setOption("tf",Te)
     integrator.init()
 
-    integrator.input("x0").set(X0)
-    integrator.input("p").set(p_)
-    integrator.adjSeed("xf").set([1,0])
+    integrator.setInput(X0,"x0")
+    integrator.setInput(p_,"p")
+    integrator.setAdjSeed([1,0],"xf")
     integrator.evaluate(0,1)
     
     adjSens_X0_int = DMatrix(integrator.adjSens("x0"))
@@ -619,9 +619,9 @@ class Simulatortests(casadiTestCase):
 
     sim=Simulator(integrator,ts)
     sim.init()
-    sim.input("x0").set(X0)
-    sim.input("p").set(p_)
-    sim.adjSeed(0).set([0,0]*(N-1) + [1,0])
+    sim.setInput(X0,"x0")
+    sim.setInput(p_,"p")
+    sim.setAdjSeed([0,0]*(N-1) + [1,0],0)
     sim.evaluate(0,1)
 
     adjSens_X0_sim = DMatrix(sim.adjSens("x0"))
@@ -632,14 +632,14 @@ class Simulatortests(casadiTestCase):
     csim.setOption("integrator",Integrator)
     csim.setOption("integrator_options",{"abstolB": 1e-12, "reltolB": 1e-12, "fsens_err_con": True, "steps_per_checkpoint":1000})
     csim.init()
-    csim.input("x0").set(X0)
-    csim.input("p").set(p_)
-    csim.adjSeed(0).set([0,0]*(N-1) + [1,0])
+    csim.setInput(X0,"x0")
+    csim.setInput(p_,"p")
+    csim.setAdjSeed([0,0]*(N-1) + [1,0],0)
     csim.evaluate(0,1)
     adjSens_X0_csim = DMatrix(sim.adjSens("x0"))
     adjSens_P_csim = DMatrix(sim.adjSens("p"))
     
-    sol.adjSeed().set([1,0])
+    sol.setAdjSeed([1,0])
     sol.evaluate(0,1)
     adjSens_X0_exact = sol.adjSens(1)
     adjSens_P_exact = sol.adjSens(2)
