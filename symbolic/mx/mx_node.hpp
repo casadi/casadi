@@ -306,7 +306,12 @@ namespace CasADi{
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
 
-    /// Assign the nonzeros of a matrix to another matrix
+    /**\brief Assign the nonzeros of a matrix to another matrix
+    *
+    *  Preconditions:
+    *    nz.size()==size()  
+    *
+    */
     virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
 
     /// Add the nonzeros of a matrix to another matrix
