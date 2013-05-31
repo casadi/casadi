@@ -26,3 +26,9 @@ from variables import Variables, Numbers
 from collection import Collection 
 from bounds import *
 from structure import repeated, entry, struct_ssym, struct_msym, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct
+
+def print_subclasses(myclass, depth=0):
+  print ("  " * depth) + " - " + myclass.__name__
+  for s in myclass.__subclasses__():
+    print_subclasses(s,depth=depth+1)
+

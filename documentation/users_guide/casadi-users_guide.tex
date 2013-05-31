@@ -213,16 +213,30 @@ The backbone of CasADi is centered around some fundamental classes:
  \item \texttt{MX} -- \emph{matrix symbolic type}
 \end{itemize}
 
+\begin{pytexTemplate}{main}
+from casadi import *
+\end{pytexTemplate}
+
+\begin{pytexTemplate}{maintools}
+from casadi import *
+from casadi.tools import *
+\end{pytexTemplate}
+
+\pytexStart{empty}
+
+The following is a listing of available subclasses of FX:
+\begin{pytex}
+import casadi
+import casadi.tools
+casadi.tools.print_subclasses(casadi.FX)
+\end{pytex}
+
 \section{\texttt{SX} and \texttt{SXMatrix}}
 The \texttt{SX} type is used to represent symbolic expressions made up by a sequence of unary and binary operations. It uses a syntax similar to a numeric type such as \texttt{float} in Python or a \texttt{double} in C/C++, but instead of calculating the expressions numerically, the \texttt{SX} will build up an expression. The type overloads most common operations and can also be used instead of container classes such as \texttt{numpy.array} in Python or \texttt{std::vector<>} in C++'s Standard Template Library (STL).
 
 Though it is possible and somtimes benificial, we shall not work with the \texttt{SX} type directly in this tutorial. Instead we shall work with a \emph{sparse matrix type} called \texttt{SXMatrix}, whose elements are \texttt{SX} instances. \texttt{SXMatrix} uses an everything-is-a-matrix type syntax that should be familiar to Matlab users, which means that scalars can be represented as 1-by-1 matrices and vectors as $n$-by-1 matrices. To store its element, it uses a general sparse matrix format comparible to that used for sparse matrices in Matlab\footnote{To be more precise, the storage format used is \emph{compressed row storage}}.
 
 To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) and import CasADi using the command:\footnote{In C++, include the core header files through ''\texttt{\#include "symbolic/casadi.hpp"}''. Classes and functions are defined in the namespace \texttt{CasADi}. In Octave, the CasADi module is imported by simply invoking \texttt{casadi}}
-
-\begin{pytexTemplate}{main}
-from casadi import *
-\end{pytexTemplate}
 
 \pytexStart{empty}
 
