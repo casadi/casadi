@@ -210,7 +210,7 @@ class casadiTestCase(unittest.TestCase):
       
     for i in range(len(x0)):
       try:
-        f.setInput(setx0[i],i)
+        f.input(i).set(setx0[i])
       except Exception as e:
          print f.input(i).shape
          raise e
