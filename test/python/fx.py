@@ -256,8 +256,6 @@ class FXtests(casadiTestCase):
 
     f = SXFunction([x],[x])
     f.init()
-    A = DMatrix(1,1,4)
-    f.getFwdSeed(A,0)
     A = DMatrix(1,1)
     #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
     B = DMatrix(1,2,2)
@@ -497,7 +495,35 @@ class FXtests(casadiTestCase):
       d = vertcat(v)
       
       test(d.sparsity())
-        
+      
+  def test_getOutput(self):
+    x = ssym("x",2)
+    
+    f = SXFunction(daeIn(x=x),daeOut(ode=x))
+    f.init()
+    f.setInput([1,2])
+    f.evaluate()
+    a = f.getOutput()
+    b = f.getOutput(0)
+    c = f.getOutput("ode")
+    ar = f.output()
+    br = f.output(0)
+    cr = f.output("ode")
+    self.checkarray(a,DMatrix([1,2]))
+    self.checkarray(b,DMatrix([1,2]))
+    self.checkarray(c,DMatrix([1,2]))
+    self.checkarray(ar,DMatrix([1,2]))
+    self.checkarray(br,DMatrix([1,2]))
+    self.checkarray(cr,DMatrix([1,2]))
+    f.setInput([3,4])
+    f.evaluate()
+    self.checkarray(a,DMatrix([1,2]))
+    self.checkarray(b,DMatrix([1,2]))
+    self.checkarray(c,DMatrix([1,2]))
+    self.checkarray(ar,DMatrix([3,4]))
+    self.checkarray(br,DMatrix([3,4]))
+    self.checkarray(cr,DMatrix([3,4]))
+    
 if __name__ == '__main__':
     unittest.main()
 

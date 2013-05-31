@@ -189,7 +189,7 @@ class ADtests(casadiTestCase):
             f.init()
             f.setInput(n)
             f.evaluate()
-            r = DMatrix(f.output())
+            r = f.getOutput()
             J = self.jacobians[inputtype][outputtype](*n)
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
@@ -275,7 +275,7 @@ class ADtests(casadiTestCase):
             f.init()
             f.setInput(n)
             f.evaluate()
-            r = DMatrix(f.output())
+            r = f.getOutput()
             J = self.jacobians[inputtype][outputtype](*n)
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
@@ -322,7 +322,7 @@ class ADtests(casadiTestCase):
             f.init()
             f.setInput(n)
             f.evaluate()
-            r = DMatrix(f.output())
+            r = f.getOutput()
             J = self.jacobians[inputtype][outputtype](*n)
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
@@ -368,7 +368,7 @@ class ADtests(casadiTestCase):
             f.init()
             f.setInput(n)
             f.evaluate()
-            r = DMatrix(f.output())
+            r = f.getOutput()
   
             y = ssym("y",f.input().sparsity())
             
@@ -669,7 +669,7 @@ class ADtests(casadiTestCase):
       self.checkarray(fun.output(0),funsx.output(0))
       self.checkarray(fun.output(1),funsx.output(1))
       
-      J_ = DMatrix(fun.output(1))
+      J_ = fun.getOutput(1)
       
       def flatten(l):
         ret = []
@@ -770,7 +770,7 @@ class ADtests(casadiTestCase):
             storagekey = (spmod,spmod2)
             if not(storagekey in storage):
               storage[storagekey] = []
-            storage[storagekey].append([DMatrix(vf.output(i)) for i in range(vf.getNumInputs())])
+            storage[storagekey].append([vf.getOutput(i) for i in range(vf.getNumInputs())])
             
           # Second order sensitivities
           for sym2, Function2 in [(msym,MXFunction),(ssym,SXFunction)]:
@@ -796,7 +796,7 @@ class ADtests(casadiTestCase):
                 storagekey = (spmod,spmod2)
                 if not(storagekey in storage2):
                   storage2[storagekey] = []
-                storage2[storagekey].append([DMatrix(vf2.output(i)) for i in range(vf2.getNumInputs())])
+                storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.getNumInputs())])
               else :
                 #knownbug #753
                 pass
@@ -836,7 +836,7 @@ class ADtests(casadiTestCase):
         
         
       fun.evaluate()
-      J_ = DMatrix(fun.output(1))
+      J_ = fun.getOutput(1)
       
       for f in [fun,fun.expand()]:
         #  gradient()

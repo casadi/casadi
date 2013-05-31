@@ -101,7 +101,7 @@ figure(1)
 plot(tf,sim.output())
 legend(('s1', 's2','s3'))
 title('reference simulation, open-loop, zero controls')
-out = DMatrix(sim.output())
+out = sim.getOutput()
 
 # Simulation of the open-loop system
 #   sensitivity for initial conditions
@@ -314,9 +314,9 @@ integrator.integrate(0)
 
 # Keep integrating until steady state is reached
 for i in range(1,40):
-  x0 = DMatrix(integrator.output())
+  x0 = integrator.getOutput()
   integrator.integrate(1*i)
-  xe = DMatrix(integrator.output())
+  xe = integrator.getOutput()
   e = max(fabs(xe-x0))
   print "it. %02d - deviation from steady state: %.2e" % (i, e)
   if e < 1e-11:
@@ -360,9 +360,9 @@ integrator.reset(0,0)
 integrator.integrate(0)
 
 for i in range(1,10):
-  x0 = DMatrix(integrator.output())
+  x0 = integrator.getOutput()
   integrator.integrate(0.4*i)
-  xe = DMatrix(integrator.output())
+  xe = integrator.getOutput()
   e = max(fabs(xe-x0))
   print "Forward riccati simulation %d; error: %.2e" % (i, e)
 
