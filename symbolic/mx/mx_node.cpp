@@ -409,7 +409,6 @@ namespace CasADi{
     if(nz.size()==0){
       return y;
     } else {
-      casadi_assert_message(nz.size()==size(),"getSetNonzeros: argument error. Got " << nz.size() << " nonzeros instead of expected " << size() << ".");
       MX ret;
       if(Slice::isSlice(nz)){
         ret = MX::create(new SetNonzerosSlice<false>(y,shared_from_this<MX>(),Slice(nz)));
