@@ -1,3 +1,21 @@
+/** \class CasADi::NLPImplicitInternal
+\n
+\par
+<table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>nlp_solver_stats</td><td>CasADi::NLPImplicitInternal</td></tr>
+</table>
+*/
+/** \class CasADi::NLPImplicitSolver
+\n
+\par
+<table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>nlp_solver_stats</td><td>CasADi::NLPImplicitInternal</td></tr>
+</table>
+*/
 /** \class CasADi::WorhpInternal
 \n
 \par
@@ -173,6 +191,7 @@
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>iter</td><td>CasADi::NewtonImplicitInternal</td></tr>
+<tr><td>return_status</td><td>CasADi::NewtonImplicitInternal</td></tr>
 </table>
 */
 /** \class CasADi::NewtonImplicitSolver
@@ -182,6 +201,7 @@
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>iter</td><td>CasADi::NewtonImplicitInternal</td></tr>
+<tr><td>return_status</td><td>CasADi::NewtonImplicitInternal</td></tr>
 </table>
 */
 /** \class CasADi::IntegratorInternal
