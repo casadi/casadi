@@ -25,6 +25,17 @@ import sys
 
 import ipdb
 import texttable
+import re
+
+aliases = {}
+for line in file('../Doxyfile.in','r'):
+  if line.startswith('ALIASES'):
+    m = re.search('\+=\s*(\w+)\s*=\s*"(.*?)"',line) 
+    if m:
+      aliases[m.group(1)]=m.group(2)
+
+print aliases
+
 
 def astext(node,whitespace=False,escape=True):
   r = []
