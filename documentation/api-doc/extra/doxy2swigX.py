@@ -280,6 +280,10 @@ class Doxy2SWIG_X(Doxy2SWIG):
         grouped_dict = {}
         for (origin,pieces) in v:
           total = u"".join(pieces)
+          totalnowrap = total.replace("\n"," ")
+          if (aliases["noswig"] in totalnowrap) or (aliases["nopython"] in totalnowrap):
+             print "skipping", origin
+             continue
           if total in grouped_dict:
              grouped_dict[total][0].append(origin)
           else:
