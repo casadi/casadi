@@ -290,7 +290,7 @@ for name,meta in metadata.items():
     targets+=meta['InternalFor']
   for t in targets:
     f.write("/** \class %s\n\\n\n\\par\n" % t)
-    f.write("<table>\n")
+    f.write("<a name='options'></a><table>\n")
     f.write("<caption>List of available options</caption>\n")
     f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>\n")
     for k in myoptionskeys :
@@ -326,7 +326,7 @@ for name,meta in metadata.items():
     targets+=meta['InternalFor']
   for t in targets:
     f.write("/** \class %s\n\\n\n\\par\n" % t)
-    f.write("<table>\n")
+    f.write("<a name='stats'></a><table>\n")
     f.write("<caption>List of available stats</caption>\n")
     f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
     for k in mystatskeys :
@@ -359,7 +359,7 @@ for name,meta in metadata.items():
     targets+=meta['InternalFor']
   for t in targets:
     f.write("/** \class %s\n\\n\n\\par\n" % t)
-    f.write("<table>\n")
+    f.write("<a name='monitors'></a><table>\n")
     f.write("<caption>List of available monitors</caption>\n")
     f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
     for k in mymonitorskeys :
@@ -374,7 +374,7 @@ f = file(out+'a0_schemes.hpp','w')
 def enumsashtml(n,title):
   s=""
   if (n in enums):
-    s+= "<table>\n"
+    s+= "<a name='schemes'></a><table>\n"
     
     num = ""
     for i in range(len(enums[n])):
