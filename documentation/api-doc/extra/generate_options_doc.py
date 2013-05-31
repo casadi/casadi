@@ -262,6 +262,8 @@ def update_overwrite(orig,new):
         orig[k] = copy.copy(v)
         
 f = file(out+'b0_options.hpp','w')
+fdiagram = file(out+'e0_diagram.hpp','w')
+
 
 # Print out doxygen information - options
 for name,meta in metadata.items():
@@ -295,6 +297,10 @@ for name,meta in metadata.items():
       f.write(optionsashtml(alloptions[k])+"\n")
     f.write( "</table>\n")
     f.write( "*/\n")
+    
+    fdiagram.write("/** \class %s\n" % t)
+    fdiagram.write("""<a name="diagram" id="diagram"></a><h2>Diagrams</h2>""")
+    fdiagram.write( "*/\n")
 
 f.close()
 
