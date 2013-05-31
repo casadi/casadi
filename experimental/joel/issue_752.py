@@ -38,7 +38,7 @@ for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
 
   vf.evaluate()
 
-  storage.append([DMatrix(vf.output(i)) for i in range(vf.getNumOutputs())])
+  storage.append([vf.getOutput(i) for i in range(vf.getNumOutputs())])
 
   inputss2 = [sym("i",vf.input(i).sparsity()) for i in range(vf.getNumInputs()) ]
   fseeds2 = [[ sym("f",vf.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
@@ -55,7 +55,7 @@ for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
 
   vf2.evaluate()
 
-  storage2.append([DMatrix(vf2.output(i)) for i in range(vf2.getNumOutputs())])
+  storage2.append([vf2.getOutput(i) for i in range(vf2.getNumOutputs())])
 
   #print vf2.output(24)
 

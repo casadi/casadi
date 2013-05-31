@@ -160,7 +160,7 @@ assert(e < 1e-5)
 sim.input("x0").set(x0)
 sim.input("p").set(params_)
 sim.evaluate()
-unperturbed_output = DMatrix(sim.output())
+unperturbed_output = sim.getOutput()
 
 circle = array([[sin(x),cos(x)] for x in numpy.linspace(-pi/2,3/2.0*pi,100)]).T
 circle = hstack((circle,circle[:,50:51]))
@@ -187,13 +187,13 @@ show()
 sim.input("x0").set(x0)
 sim.input("p").set(params_)
 sim.evaluate()
-unperturbed_output = DMatrix(sim.output())
+unperturbed_output = sim.getOutput()
 
 perturb = DMatrix([1e-2,0])
 sim.input("x0").set(x0+perturb)
 sim.input("p").set(params_)
 sim.evaluate()
-perturbed_output = DMatrix(sim.output())
+perturbed_output = sim.getOutput()
 
 figure(2)
 

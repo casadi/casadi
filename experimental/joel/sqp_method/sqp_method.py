@@ -200,18 +200,18 @@ while True:
   # Evaluate the constraint function
   gfcn.setInput(x)
   gfcn.evaluate()
-  gk = DMatrix(gfcn.output())
+  gk = gfcn.getOutput()
   
   # Evaluate the Jacobian
   jfcn.setInput(x)
   jfcn.evaluate()
-  Jgk = DMatrix(jfcn.output())
+  Jgk = jfcn.getOutput()
   
   # Evaluate the gradient of the objective function
   ffcn.setInput(x)
   ffcn.setAdjSeed(1.0)
   ffcn.evaluate(0,1)
-  fk = DMatrix(ffcn.output())
+  fk = ffcn.getOutput()
   gfk = DMatrix(ffcn.adjSens())
   
   # Pass data to QP solver
@@ -275,7 +275,7 @@ while True:
     x_new = x+alpha*p
     ffcn.setInput(x_new)
     ffcn.evaluate()
-    fk_new = DMatrix(ffcn.output())
+    fk_new = ffcn.getOutput()
 
     # Evaluate gk, hk and get 1-norm of the feasability violations
     gfcn.setInput(x_new)
@@ -338,7 +338,7 @@ while True:
   ffcn.setInput(x)
   ffcn.setAdjSeed(1.0)
   ffcn.evaluate(0,1)
-  fk = DMatrix(ffcn.output())
+  fk = ffcn.getOutput()
   gfk = ffcn.adjSens()
 
   # Check if maximum number of iterations reached

@@ -1268,7 +1268,7 @@ class Integrationtests(casadiTestCase):
     H.input(1).set(vec(A_))
     H.evaluate()
 
-    H1 = DMatrix(H.output())
+    H1 = H.getOutput()
     
     ## Joel: Only Hessians of scalar functions allowed
     #H = qe.hessian(1)
@@ -1276,7 +1276,7 @@ class Integrationtests(casadiTestCase):
     #H.input(0).set(x0_)
     #H.input(1).set(vec(A_))
     #H.evaluate()
-    #H2 = DMatrix(H.output())
+    #H2 = H.getOutput()
     
     #self.checkarray(H1,H2,"hessian")
     
