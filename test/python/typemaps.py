@@ -248,12 +248,12 @@ class typemaptests(casadiTestCase):
 
         f=function([z],[r])
         f.init()
-        f.input().set(dummy[0:f.input().size()])
+        f.setInput(dummy[0:f.input().size()])
         f.evaluate()
         
         f_=function([z],[z])
         f_.init()
-        f_.input().set(dummy[0:f.input().size()])
+        f_.setInput(dummy[0:f.input().size()])
         f_.evaluate()
         
 
@@ -264,14 +264,14 @@ class typemaptests(casadiTestCase):
         
         f=function([z,s],[r])
         f.init()
-        f.input(0).set(dummy[0:f.input(0).size()])
-        f.input(1).set(dummy2[0:f.input(1).size()])
+        f.setInput(dummy[0:f.input(0).size()],0)
+        f.setInput(dummy2[0:f.input(1).size()],1)
         f.evaluate()
         
         f_=function([z,s],[z,s])
         f_.init()
-        f_.input(0).set(dummy[0:f.input(0).size()])
-        f_.input(1).set(dummy2[0:f.input(1).size()])
+        f_.setInput(dummy[0:f.input(0).size()],0)
+        f_.setInput(dummy2[0:f.input(1).size()],1)
         f_.evaluate()
 
         self.checkarray(fun(f_.output(0),f_.output(1)),f.output(),"operation")
@@ -553,13 +553,13 @@ class typemaptests(casadiTestCase):
     
     f=SXFunction([vertcat([x,y])],[C+N])
     f.init()
-    f.input().set([7,13])
+    f.setInput([7,13])
     f.evaluate()
     self.checkarray(f.output(),matrix([14,26]).T,"addition")
     
     f=SXFunction([vertcat([x,y])],[N+C])
     f.init()
-    f.input().set([7,13])
+    f.setInput([7,13])
     f.evaluate()
     self.checkarray(f.output(),matrix([14,26]).T,"addition")
     
@@ -579,13 +579,13 @@ class typemaptests(casadiTestCase):
       
     f=SXFunction([vertcat([x,y])],[C+D])
     f.init()
-    f.input().set([1,4])
+    f.setInput([1,4])
     f.evaluate()
     self.checkarray(f.output(),matrix([8,17]).T,"addition")
     
     f=SXFunction([vertcat([x,y])],[D+C])
     f.init()
-    f.input().set([1,4])
+    f.setInput([1,4])
     f.evaluate()
     self.checkarray(f.output(),matrix([8,17]).T,"addition")
 
@@ -752,8 +752,8 @@ class typemaptests(casadiTestCase):
     integr.setOption("tf",2.3)
     integr.init()
 
-    integr.input("x0").set(7.1)
-    integr.input("p").set(2)
+    integr.setInput(7.1,"x0")
+    integr.setInput(2,"p")
 
     integr.evaluate(1,1)
 
@@ -767,8 +767,8 @@ class typemaptests(casadiTestCase):
     integr.setOption("tf",2.3)
     integr.init()
 
-    integr.input("x0").set(7.1)
-    integr.input("p").set(2)
+    integr.setInput(7.1,"x0")
+    integr.setInput(2,"p")
 
     integr.evaluate(1,1)
 
@@ -783,8 +783,8 @@ class typemaptests(casadiTestCase):
     integr.setOption("tf",2.3)
     integr.init()
 
-    integr.input("x0").set(7.1)
-    integr.input("p").set(2)
+    integr.setInput(7.1,"x0")
+    integr.setInput(2,"p")
 
     integr.evaluate(1,1)
 
@@ -799,8 +799,8 @@ class typemaptests(casadiTestCase):
     integr.setOption("tf",2.3)
     integr.init()
 
-    integr.input("x0").set(7.1)
-    integr.input("p").set(2)
+    integr.setInput(7.1,"x0")
+    integr.setInput(2,"p")
 
     integr.evaluate(1,1)
 

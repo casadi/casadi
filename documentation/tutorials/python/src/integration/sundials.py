@@ -97,8 +97,8 @@ print "%d -> %d" % (integrator.getNumInputs(),integrator.getNumOutputs())
 #! We demonstrate first method A:
 ts=numpy.linspace(0,tend,100)
 x0 = 0;y0 = 1
-integrator.input("x0").set([x0,y0])
-integrator.input("p").set(0)
+integrator.setInput([x0,y0],"x0")
+integrator.setInput(0,"p")
 integrator.evaluate()
 integrator.reset(0)
 	
@@ -120,8 +120,8 @@ show()
 #! We demonstrate method B:
 sim=Simulator(integrator,ts)
 sim.init()
-sim.input("x0").set([x0,y0])
-sim.input("p").set(0)
+sim.setInput([x0,y0],"x0")
+sim.setInput(0,"p")
 sim.evaluate()
 
 sol2 = sim.output().toArray()
@@ -135,7 +135,7 @@ print linalg.norm(sol-sol2)
 #$ We plot the map $\delta x_0 \mapsto \delta x(tend) $
 
 def out(dx0):
-	integrator.input("x0").set([x0+dx0,y0])
+	integrator.setInput([x0+dx0,y0],"x0")
 	integrator.evaluate()
 	return integrator.output().toArray()
 dx0=numpy.linspace(-2,2,100)
@@ -154,8 +154,8 @@ show()
 #$ By definition, this mapping goes through the origin. In the limit of $dx0 \to 0$, this map is purely linear. The slope at the origin is exactly what we call 'sensitivity'
 #
 
-integrator.input("x0").set([x0,y0])
-integrator.fwdSeed("x0").set([1,0])
+integrator.setInput([x0,y0],"x0")
+integrator.setFwdSeed([1,0],"x0")
 integrator.evaluate(1,0)
 A = integrator.fwdSens()[0]
 plot(dx0,A*dx0)
@@ -166,10 +166,10 @@ show()
 #! The interpetation is that a small initial circular patch of phase space evolves into ellipsoid patches at later stages.
 
 def out(t):
-	integrator.fwdSeed("x0").set([1,0])
+	integrator.setFwdSeed([1,0],"x0")
         integrator.evaluate(1,0)
 	A=integrator.fwdSens().toArray()
-	integrator.fwdSeed("x0").set([0,1])
+	integrator.setFwdSeed([0,1],"x0")
 	integrator.evaluate(1,0)
 	B=integrator.fwdSens().toArray()
 	return array([A,B]).squeeze().T
@@ -191,10 +191,10 @@ show()
 #print J
 #print type(J)
 #J.init()
-#J.input("t0").set(0)
-#J.input("tf").set(tend)
-#J.input("x0").set([x0,y0])
-#J.input("p").set(0)
+#J.setInput(0,"t0")
+#J.setInput(tend,"tf")
+#J.setInput([x0,y0],"x0")
+#J.setInput(0,"p")
 #J.evaluate()
 #print J.output().toArray()
 

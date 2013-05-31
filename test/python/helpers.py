@@ -210,7 +210,7 @@ class casadiTestCase(unittest.TestCase):
       
     for i in range(len(x0)):
       try:
-        f.input(i).set(setx0[i])
+        f.setInput(setx0[i],i)
       except Exception as e:
          print f.input(i).shape
          raise e
@@ -364,12 +364,12 @@ class casadiTestCase(unittest.TestCase):
           trialjac.init()
           self.assertEqual(trialjac.getNumInputs(),trial.getNumInputs())
           self.assertEqual(trialjac.getNumOutputs(),trial.getNumOutputs()+1)
-          for k in range(trial.getNumInputs()): trialjac.input(k).set(trial_inputs[k])
+          for k in range(trial.getNumInputs()): trialjac.setInput(trial_inputs[k],k)
           solutionjac = solution.jacobian(i,j)
           solutionjac.init()
           self.assertEqual(solutionjac.getNumInputs(),solution.getNumInputs())
           self.assertEqual(solutionjac.getNumOutputs(),solution.getNumOutputs()+1)
-          for k in range(solution.getNumInputs()): solutionjac.input(k).set(solution_inputs[k])
+          for k in range(solution.getNumInputs()): solutionjac.setInput(solution_inputs[k],k)
           
           self.checkfx(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
 
@@ -382,12 +382,12 @@ class casadiTestCase(unittest.TestCase):
             trialgrad.init()
             self.assertEqual(trialgrad.getNumInputs(),trial.getNumInputs())
             self.assertEqual(trialgrad.getNumOutputs(),trial.getNumOutputs()+1)
-            for k in range(trial.getNumInputs()): trialgrad.input(k).set(trial_inputs[k])
+            for k in range(trial.getNumInputs()): trialgrad.setInput(trial_inputs[k],k)
             solutiongrad = solution.gradient(i,j)
             solutiongrad.init()
             self.assertEqual(solutiongrad.getNumInputs(),solution.getNumInputs())
             self.assertEqual(solutiongrad.getNumOutputs(),solution.getNumOutputs()+1)
-            for k in range(solution.getNumInputs()): solutiongrad.input(k).set(solution_inputs[k])
+            for k in range(solution.getNumInputs()): solutiongrad.setInput(solution_inputs[k],k)
             self.checkfx(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
 
     if hessian:
@@ -399,17 +399,17 @@ class casadiTestCase(unittest.TestCase):
             trialhess.init()
             self.assertEqual(trialhess.getNumInputs(),trial.getNumInputs())
             self.assertEqual(trialhess.getNumOutputs(),trial.getNumOutputs()+2)
-            for k in range(trial.getNumInputs()): trialhess.input(k).set(trial_inputs[k])
+            for k in range(trial.getNumInputs()): trialhess.setInput(trial_inputs[k],k)
             solutionhess = solution.hessian(i,j)
             solutionhess.init()
             self.assertEqual(solutionhess.getNumInputs(),solution.getNumInputs())
             self.assertEqual(solutionhess.getNumOutputs(),solution.getNumOutputs()+2)
-            for k in range(solution.getNumInputs()): solutionhess.input(k).set(solution_inputs[k])
+            for k in range(solution.getNumInputs()): solutionhess.setInput(solution_inputs[k],k)
             self.checkfx(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
 
     for k in range(trial.getNumInputs()):
-      trial.input(k).set(trial_inputs[k])
-      solution.input(k).set(solution_inputs[k])
+      trial.setInput(trial_inputs[k],k)
+      solution.setInput(solution_inputs[k],k)
 
 class run_only(object):
   def __init__(self, args):

@@ -88,9 +88,9 @@ class SDPtests(casadiTestCase):
     C = DMatrix(n2)
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
     dsp.init()
-    dsp.input("c").set(C)
-    dsp.input("b").set(b)
-    dsp.input("a").set(A)
+    dsp.setInput(C,"c")
+    dsp.setInput(b,"b")
+    dsp.setInput(A,"a")
 
     dsp.evaluate()
     
@@ -123,9 +123,9 @@ class SDPtests(casadiTestCase):
     
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
     dsp.init()
-    dsp.input("c").set(C)
-    dsp.input("b").set(b)
-    dsp.input("a").set(A)
+    dsp.setInput(C,"c")
+    dsp.setInput(b,"b")
+    dsp.setInput(A,"a")
 
     dsp.evaluate()
     
@@ -155,9 +155,9 @@ class SDPtests(casadiTestCase):
     
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
     dsp.init()
-    dsp.input("c").set(C)
-    dsp.input("b").set(b)
-    dsp.input("a").set(A)
+    dsp.setInput(C,"c")
+    dsp.setInput(b,"b")
+    dsp.setInput(A,"a")
 
     dsp.evaluate()
     
@@ -186,9 +186,9 @@ class SDPtests(casadiTestCase):
     
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
     dsp.init()
-    dsp.input("c").set(C)
-    dsp.input("b").set(b)
-    dsp.input("a").set(A)
+    dsp.setInput(C,"c")
+    dsp.setInput(b,"b")
+    dsp.setInput(A,"a")
 
     dsp.evaluate()
     
@@ -224,9 +224,9 @@ class SDPtests(casadiTestCase):
     
     dsp = DSDPSolver(C.sparsity(),A.sparsity())
     dsp.init()
-    dsp.input("c").set(C)
-    dsp.input("b").set(b)
-    dsp.input("a").set(A)
+    dsp.setInput(C,"c")
+    dsp.setInput(b,"b")
+    dsp.setInput(A,"a")
 
     dsp.evaluate()
     
@@ -259,9 +259,9 @@ class SDPtests(casadiTestCase):
 
     dsp.init()
 
-    dsp.input("c").set(C)
-    dsp.input("b").set(b)
-    dsp.input("a").set(A)
+    dsp.setInput(C,"c")
+    dsp.setInput(b,"b")
+    dsp.setInput(A,"a")
 
     dsp.evaluate()
     
@@ -325,9 +325,9 @@ class SDPtests(casadiTestCase):
 
     dsp.init()
 
-    dsp.input("c").set(C)
-    dsp.input("b").set(b)
-    dsp.input("a").set(A)
+    dsp.setInput(C,"c")
+    dsp.setInput(b,"b")
+    dsp.setInput(A,"a")
 
     dsp.evaluate()
     DMatrix.setPrecision(10)
@@ -365,9 +365,9 @@ class SDPtests(casadiTestCase):
 
     dsp.init()
 
-    dsp.input("c").set(C)
-    dsp.input("b").set(b)
-    dsp.input("a").set(A)
+    dsp.setInput(C,"c")
+    dsp.setInput(b,"b")
+    dsp.setInput(A,"a")
 
     dsp.evaluate()
     DMatrix.setPrecision(10)

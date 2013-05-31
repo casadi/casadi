@@ -76,7 +76,7 @@ print MX([1,2,3])
 Y = MX("Y")
 f = MXFunction([Y],[X])
 f.init()
-f.input().set([2])
+f.setInput([2])
 f.evaluate()
 print f.output()
 
