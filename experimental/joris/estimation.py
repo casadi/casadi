@@ -150,7 +150,7 @@ taus = DMatrix(numpy.linspace(0,1,500)).T
     
 L.setInput(1)
 L.evaluate()
-Lend = DMatrix(L.output())  # Le at the end of the control interval
+Lend = L.getOutput()  # Le at the end of the control interval
 
 dLm = numSample1D(dL,DMatrix(tau_root).T)  # d-by-d
 

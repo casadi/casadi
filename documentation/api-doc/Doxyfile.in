@@ -180,6 +180,10 @@ TAB_SIZE               = 4
 # You can put \n's in the value part of an alias to insert newlines.
 
 ALIASES                += pythonexample{1}="View <a href='\1.pdf'>output (PDF)</a> | <a href='\1.py'>source (python)</a>\n\example \1.py"
+ALIASES                += nocpp="(not available in cpp)"
+ALIASES                += noswig="(not available in python/octave)"
+ALIASES                += nopython="(not available in python)"
+ALIASES                += nooctave="(not available in octave)"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 

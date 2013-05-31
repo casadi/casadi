@@ -333,7 +333,7 @@ f.setInput(value,input_index)
 f.evaluate()
 
 # Get outputs, forward and adjoint derivative sensitivities
-f.getOutput(value,output_index)
+f.getOutput(output_index)
 \end{verbatim}
 
 In Section \ref{sec:ad_numeric}, we extend this skeleton to also includes derivatives.
@@ -343,7 +343,7 @@ As an alternative to calling \texttt{getOutput} etc., you can also directly acce
 print "output is ", f.output()
 \end{verbatim}
 
-Evaluating \texttt{f} again, will change the output matrix internal to f and hence the reference \texttt{f.output()}. If you wish to retain the old matrix, make a deep copy first.
+Evaluating \texttt{f} again, will change the output matrix internal to f and hence the reference \texttt{f.output()}. If you wish to retain the old matrix, make a deep copy first. In fact, \texttt{f.getOutput()} behaves as \texttt{DMatrix(f.output())}.
 \begin{verbatim}
 a = f.output()
 b = DMatrix(a)  # make deepcopy
@@ -792,9 +792,9 @@ f.setAdjSeed(value,output_index)
 f.evaluate(num_fwd_sensitivities, num_adj_sensitivities)
 
 # Get outputs, forward and adjoint derivative sensitivities
-f.getOutput(value,output_index)
-f.getFwdSens(value,output_index)
-f.getAdjSens(value,input_index)
+f.getOutput(output_index)
+f.getFwdSens(output_index)
+f.getAdjSens(input_index)
 \end{verbatim}
 
 Forward and adjoint seeds are set hence together with the function inputs and forward and adjoint sensitivities are collected together with the the function outputs. Multiple forward and/or adjoint derivative directions can be handled simultaneously, that is you can simultaneously multiply the Jacobian from the left or right with multiple vectors.
