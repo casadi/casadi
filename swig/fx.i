@@ -1,5 +1,5 @@
 /*
- *    This file is part of CasADi.
+ *    $self file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
  *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
@@ -75,6 +75,24 @@
     return self.data().__iter__()
 %}
 }
+
+%extend CasADi::IOInterface<CasADi::FX> {
+
+  CasADi::Matrix<double> getInput(int iind=0) const             { static_cast<const CasADi::FX*>($self)->assertInit(); return $self->input(iind);}
+  CasADi::Matrix<double> getInput(const std::string &iname) const             { return $self->input($self->inputSchemeEntry(iname)); }
+  CasADi::Matrix<double> getOutput(int oind=0) const            { static_cast<const CasADi::FX*>($self)->assertInit(); return $self->output(oind);}
+  CasADi::Matrix<double> getOutput(const std::string &oname) const            { return $self->output($self->outputSchemeEntry(oname)); }
+  CasADi::Matrix<double> getFwdSeed(int iind=0, int dir=0) const{ static_cast<const CasADi::FX*>($self)->assertInit(); return $self->fwdSeed(iind,dir);}
+  CasADi::Matrix<double> getFwdSeed(const std::string &iname, int dir=0) const{ return $self->fwdSeed($self->inputSchemeEntry(iname),dir); }
+  CasADi::Matrix<double> getFwdSens(int oind=0, int dir=0) const{ static_cast<const CasADi::FX*>($self)->assertInit(); return $self->fwdSens(oind,dir);}
+  CasADi::Matrix<double> getFwdSens(const std::string &oname, int dir=0) const{ return $self->fwdSens($self->outputSchemeEntry(oname),dir); }
+  CasADi::Matrix<double> getAdjSeed(int oind=0, int dir=0) const{ static_cast<const CasADi::FX*>($self)->assertInit(); return $self->adjSeed(oind,dir);}
+  CasADi::Matrix<double> getAdjSeed(const std::string &oname, int dir=0) const{ return $self->adjSeed($self->outputSchemeEntry(oname),dir); }
+  CasADi::Matrix<double> getAdjSens(int iind=0, int dir=0) const{ static_cast<const CasADi::FX*>($self)->assertInit(); return $self->adjSens(iind,dir);}
+  CasADi::Matrix<double> getAdjSens(const std::string &iname, int dir=0) const{ return $self->adjSens($self->inputSchemeEntry(iname),dir); }
+
+}
+
 #endif
 %include "symbolic/fx/fx.hpp"
 

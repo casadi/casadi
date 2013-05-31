@@ -256,8 +256,6 @@ class FXtests(casadiTestCase):
 
     f = SXFunction([x],[x])
     f.init()
-    A = DMatrix(1,1,4)
-    f.getFwdSeed(A,0)
     A = DMatrix(1,1)
     #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
     B = DMatrix(1,2,2)

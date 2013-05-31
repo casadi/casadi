@@ -270,28 +270,28 @@ namespace CasADi{
     }
 
 #ifdef DOXYGENPROC
-    //// \defgroup setter_getter_T
-    //// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-    /// Assumes a properly allocated val.\n
-
     /// \name Setters
     /// Set/get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
-    /// \copydoc setter_getter_T
+    /// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+    /// Assumes a properly allocated val.\n
     /// 
     /// @{
     /** 
         \brief Reads in the input argument from val.
-        \copydoc setter_getter_T
+        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+        Assumes a properly allocated val.\n
     */
     void setInput(T val, int iind=0) const;
     /** 
         \brief Reads in the output argument from val.
-        \copydoc setter_getter_T
+        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+        Assumes a properly allocated val.\n
     */
     void setOutput(T val, int oind=0) const;
     /** 
         \brief Reads in the forward seed from val.
-        \copydoc setter_getter_T
+        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+        Assumes a properly allocated val.\n
     */
     void setFwdSeed(T val,  int iind=0, int dir=0) const;
     /** 
@@ -300,12 +300,14 @@ namespace CasADi{
     void setFwdSens(T val, int oind=0, int dir=0) const ;
     /** 
         \brief Reads in the adjoint seed from val.
-        \copydoc setter_getter_T
+        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+        Assumes a properly allocated val.\n
     */
     void setAdjSeed(T val,  int oind=0, int dir=0) const;
     /** 
         \brief Reads in the adjoint sensitivity from val.
-        \copydoc setter_getter_T
+        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+        Assumes a properly allocated val.\n
     */
     void setAdjSens(T val, int iind=0, int dir=0) const ;
     /// @}
@@ -336,19 +338,6 @@ namespace CasADi{
 #endif // DOXYGENPROC
 
 #undef SETTERS
-
-Matrix<double> getInput(int iind=0) const             { static_cast<const Derived*>(this)->assertInit(); return input(iind);} \
-Matrix<double> getOutput(int oind=0) const            { static_cast<const Derived*>(this)->assertInit(); return output(oind);} \
-Matrix<double> getFwdSeed(int iind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); return fwdSeed(iind,dir);} \
-Matrix<double> getFwdSens(int oind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); return fwdSens(oind,dir);} \
-Matrix<double> getAdjSeed(int oind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); return adjSeed(oind,dir);} \
-Matrix<double> getAdjSens(int iind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); return adjSens(iind,dir);} \
-Matrix<double> getInput(const std::string &iname) const             { return getInput(inputSchemeEntry(iname)); } \
-Matrix<double> getOutput(const std::string &oname) const            { return getOutput(outputSchemeEntry(oname)); } \
-Matrix<double> getFwdSeed(const std::string &iname, int dir=0) const{ return getFwdSeed(inputSchemeEntry(iname),dir); } \
-Matrix<double> getFwdSens(const std::string &oname, int dir=0) const{ return getFwdSens(outputSchemeEntry(oname),dir); } \
-Matrix<double> getAdjSeed(const std::string &oname, int dir=0) const{ return getAdjSeed(outputSchemeEntry(oname),dir); } \
-Matrix<double> getAdjSens(const std::string &iname, int dir=0) const{ return getAdjSens(inputSchemeEntry(iname),dir); }
     
 #define GETTERS(T)                                                        \
     void getInput(T val, int iind=0) const             { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);} \
@@ -365,12 +354,12 @@ Matrix<double> getAdjSens(const std::string &iname, int dir=0) const{ return get
     void getAdjSens(T val, const std::string &iname, int dir=0) const{ getAdjSens(val,inputSchemeEntry(iname),dir); }
     
 #ifndef DOXYGENPROC
-    GETTERS(double&);
 #ifndef SWIG
-    GETTERS(double*);
+GETTERS(double&);
+GETTERS(double*);
+GETTERS(std::vector<double>&);
+GETTERS(Matrix<double>&);
 #endif // SWIG
-    GETTERS(std::vector<double>&);
-    GETTERS(Matrix<double>&);
 #endif // DOXYGENPROC
 #undef GETTERS
 
@@ -378,43 +367,78 @@ Matrix<double> getAdjSens(const std::string &iname, int dir=0) const{ return get
     /// \name Getters
     /// A group of accessor for numerical data that operate on preallocated data.\n
     /// get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
-    /// \copydoc setter_getter_T
+    //    T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+    //    Assumes a properly allocated val.\n
     /// @{
 
-    /** \brief Writes out the input argument into val.
-        \copydoc setter_getter_T
+    /** \brief Writes out the input argument into val. \noswig
+        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+        Assumes a properly allocated val.\n
     */
     void getInput(T val, int iind=0) const;
  
     /** 
-        \brief Writes out the output argument into val.
-        \copydoc setter_getter_T
+        \brief Writes out the output argument into val. \noswig
+        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+        Assumes a properly allocated val.\n
     */
     void getOutput(T val, int oind=0) const;
 
     /** 
-        \brief Writes out the forward seed into val.
-        \copydoc setter_getter_T
+        \brief Writes out the forward seed into val. \noswig
+        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+        Assumes a properly allocated val.\n
     */
     void getFwdSeed(T val,  int iind=0, int dir=0) const;
 
     /**  
-         \brief Writes out the forward sensitivity into val.
-         \copydoc setter_getter_T
+         \brief Writes out the forward sensitivity into val. \noswig
+         T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+        Assumes a properly allocated val.\n
     */
     void getFwdSens(T val, int oind=0, int dir=0) const;
     /** 
-        \brief Writes out the adjoint seed into val.
-        \copydoc setter_getter_T
+        \brief Writes out the adjoint seed into val. \noswig
+        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+        Assumes a properly allocated val.\n
     */
     void getAdjSeed(T val,  int oind=0, int dir=0) const ;
 
     /** 
-        \brief Writes out the adjoint sensitivity into val.
-        \copydoc setter_getter_T
+        \brief Writes out the adjoint sensitivity into val. \noswig
+        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+        Assumes a properly allocated val.\n
     */
     void getAdjSens(T val, int iind=0, int dir=0) const;
     /// @}
+    
+ 
+  ///@{
+  /// Get the input as a new Matrix \nocpp
+  Matrix<double> getInput(int iind=0) const;
+  /// Get the input as a new Matrix \nocpp
+  Matrix<double> getInput(const std::string &iname) const ;
+  /// Get the output as a new Matrix \nocpp
+  Matrix<double> getOutput(int oind=0) const ;
+  /// Get the output as a new Matrix \nocpp
+  Matrix<double> getOutput(const std::string &oname) const ;
+  /// Get the forward seed as a new Matrix \nocpp
+  Matrix<double> getFwdSeed(int iind=0, int dir=0) const;
+  /// Get the forward seed as a new Matrix \nocpp
+  Matrix<double> getFwdSeed(const std::string &iname, int dir=0) const;
+  /// Get the forward sensitivity as a new Matrix \nocpp
+  Matrix<double> getFwdSens(int oind=0, int dir=0) const;
+  /// Get the forward sensitivity as a new Matrix \nocpp
+  Matrix<double> getFwdSens(const std::string &oname, int dir=0) const;
+  /// Get the adjoint seed as a new Matrix \nocpp
+  Matrix<double> getAdjSeed(int oind=0, int dir=0) const;
+  /// Get the adjoint seed as a new Matrix \nocpp
+  Matrix<double> getAdjSeed(const std::string &oname, int dir=0) const;
+  /// Get the adjoint sensitivity as a new Matrix \nocpp
+  Matrix<double> getAdjSens(int iind=0, int dir=0) const;
+  /// Get the adjoint sensitivity as a new Matrix \nocpp
+  Matrix<double> getAdjSens(const std::string &iname, int dir=0) const;
+  ///@}
 #endif
 
   };
