@@ -337,6 +337,19 @@ namespace CasADi{
 
 #undef SETTERS
 
+Matrix<double> getInput(int iind=0) const             { static_cast<const Derived*>(this)->assertInit(); return input(iind);} \
+Matrix<double> getOutput(int oind=0) const            { static_cast<const Derived*>(this)->assertInit(); return output(oind);} \
+Matrix<double> getFwdSeed(int iind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); return fwdSeed(iind,dir);} \
+Matrix<double> getFwdSens(int oind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); return fwdSens(oind,dir);} \
+Matrix<double> getAdjSeed(int oind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); return adjSeed(oind,dir);} \
+Matrix<double> getAdjSens(int iind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); return adjSens(iind,dir);} \
+Matrix<double> getInput(const std::string &iname) const             { return getInput(inputSchemeEntry(iname)); } \
+Matrix<double> getOutput(const std::string &oname) const            { return getOutput(outputSchemeEntry(oname)); } \
+Matrix<double> getFwdSeed(const std::string &iname, int dir=0) const{ return getFwdSeed(inputSchemeEntry(iname),dir); } \
+Matrix<double> getFwdSens(const std::string &oname, int dir=0) const{ return getFwdSens(outputSchemeEntry(oname),dir); } \
+Matrix<double> getAdjSeed(const std::string &oname, int dir=0) const{ return getAdjSeed(outputSchemeEntry(oname),dir); } \
+Matrix<double> getAdjSens(const std::string &iname, int dir=0) const{ return getAdjSens(inputSchemeEntry(iname),dir); }
+    
 #define GETTERS(T)                                                        \
     void getInput(T val, int iind=0) const             { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);} \
     void getOutput(T val, int oind=0) const            { static_cast<const Derived*>(this)->assertInit(); output(oind).get(val);} \
