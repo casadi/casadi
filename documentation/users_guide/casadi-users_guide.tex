@@ -802,7 +802,14 @@ You can generate a new function for calculating the Jacobian by calling the \tex
 \end{verbatim}
 This will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) Jacobian as well as all the original function outputs as outputs.
 
-Similarily, Hessians of a scalar output can be called by calling the \texttt{FX::hessian} member function:
+Similarily, the gradient of a scalar output can be called by calling the \texttt{FX::gradient} member function:
+\begin{verbatim}
+ G = f.gradient(iind,oind) # function corresponding to the gradient
+                          # of the oind-th output w.r.t. the iind-th input
+\end{verbatim}
+which will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) gradient and all the original function outputs as outputs.
+
+Lastly, Hessians of a scalar output can be called by calling the \texttt{FX::hessian} member function:
 \begin{verbatim}
  H = f.hessian(iind,oind) # function corresponding to the Hessian
                           # of the oind-th output w.r.t. the iind-th input
