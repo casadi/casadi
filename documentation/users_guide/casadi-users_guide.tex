@@ -329,6 +329,15 @@ As an alternative to calling \texttt{getOutput} etc., you can also directly acce
 print "output is ", f.output()
 \end{verbatim}
 
+Evaluating \texttt{f} again, will change the output matrix internal to f and hence the reference \texttt{f.output()}. If you wish to retain the old matrix, make a deep copy first.
+\begin{verbatim}
+a = f.output()
+b = DMatrix(a)  # make deepcopy
+f.evaluate()
+# a has changed
+# b has not changed
+\end{verbatim}
+
 Note that all functions are multiple (sparse, matrix-valued) input, multiple (sparse, matrix-valued) output.
 
 One of the \texttt{FX} derived classes is \texttt{SXFunction}, which defines a function given a symbolic expression. Its constructor is:
@@ -777,6 +786,13 @@ f.getAdjSens(value,input_index)
 Forward and adjoint seeds are set hence together with the function inputs and forward and adjoint sensitivities are collected together with the the function outputs. Multiple forward and/or adjoint derivative directions can be handled simultaneously, that is you can simultaneously multiply the Jacobian from the left or right with multiple vectors.
 
 The number of directional derivatives that be calculated simultaneously is controlled by setting the options \verb|number_of_fwd_dir| and \verb|number_of_adj_dir| (default is 1). If the function is passed as input to another CasADi function (e.g. an ODE integrator or an NLP solver), the number of directional derivatives is allowed to the value set by the options \verb|max_number_of_fwd_dir| and \verb|max_number_of_adj_dir| respectively (default is 64).
+
+As mentioned before, there are ways to access the internal matrices directly:
+\begin{verbatim}
+print f.output(output_index)
+print f.fwdSens(output_index)
+print f.adjSens(input_index)
+\end{verbatim}
 
 \section{Calculating complete Jacobians and Hessians numerically}
 You can generate a new function for calculating the Jacobian by calling the \texttt{FX::jacobian} member function:
