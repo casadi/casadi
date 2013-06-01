@@ -1,5 +1,5 @@
 /** \defgroup scheme_IntegratorOutput
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_XF</td><td>Differential state at the final time [xf].</td></tr>
@@ -9,7 +9,7 @@
 </table>
 */
 /** \defgroup scheme_SDPOutput
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::SDPOutput  (SDP_NUM_OUT = 5) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SDP_PRIMAL</td><td>The primal solution (m x 1) - may be used as initial guess [primal].</td></tr>
@@ -20,7 +20,7 @@
 </table>
 */
 /** \defgroup scheme_HessLagOutput
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::HessLagOutput  (HESSLAG_NUM_OUT = 5) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>HESSLAG_HESS</td><td>Hessian of the Lagrangian [hess].</td></tr>
@@ -31,7 +31,7 @@
 </table>
 */
 /** \defgroup scheme_QPInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>QP_H</td><td>The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h].</td></tr>
@@ -46,7 +46,7 @@
 </table>
 */
 /** \defgroup scheme_ACADO_Input
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::ACADO_Input  (ACADO_NUM_IN = 17) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>ACADO_X_GUESS</td><td>Initial guess for x (default: 0) [x_guess].</td></tr>
@@ -69,7 +69,7 @@
 </table>
 */
 /** \defgroup scheme_SDPInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::SDPInput  (SDP_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SDP_A</td><td>The vertical stack of all matrices A_i: ( nm x n) [a].</td></tr>
@@ -78,7 +78,7 @@
 </table>
 */
 /** \defgroup scheme_ACADO_FCN_Input
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::ACADO_FCN_Input  (ACADO_FCN_NUM_IN = 6) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>ACADO_FCN_T</td><td>Time [t].</td></tr>
@@ -90,7 +90,7 @@
 </table>
 */
 /** \defgroup scheme_RDAEInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>RDAE_RX</td><td>Backward differential state [rx].</td></tr>
@@ -103,7 +103,7 @@
 </table>
 */
 /** \defgroup scheme_MUSCOD_FCN_Output
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>MUSCOD_FCN_RHS</td><td></td></tr>
@@ -111,7 +111,7 @@
 </table>
 */
 /** \defgroup scheme_NLPSolverOutput
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::NLPSolverOutput  (NLP_SOLVER_NUM_OUT = 6) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>NLP_SOLVER_X</td><td>Decision variables at the optimal solution (nx x 1) [x].</td></tr>
@@ -123,7 +123,7 @@
 </table>
 */
 /** \defgroup scheme_QPOutput
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>QP_PRIMAL</td><td>The primal solution [primal].</td></tr>
@@ -133,7 +133,7 @@
 </table>
 */
 /** \defgroup scheme_NLPOutput
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::NLPOutput  (NLP_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>NLP_F</td><td>Objective function [f].</td></tr>
@@ -141,7 +141,7 @@
 </table>
 */
 /** \defgroup scheme_NLPSolverInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::NLPSolverInput  (NLP_SOLVER_NUM_IN = 8) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>NLP_SOLVER_X0</td><td>Decision variables, initial guess (nx x 1) [x0].</td></tr>
@@ -155,7 +155,7 @@
 </table>
 */
 /** \defgroup scheme_DAEInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>DAE_X</td><td>Differential state [x].</td></tr>
@@ -165,7 +165,7 @@
 </table>
 */
 /** \defgroup scheme_ACADO_Output
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::ACADO_Output  (ACADO_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>ACADO_X_OPT</td><td>Optimal states [x_opt].</td></tr>
@@ -175,7 +175,7 @@
 </table>
 */
 /** \defgroup scheme_DAEOutput
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>DAE_ODE</td><td>Right hand side of the implicit ODE [ode].</td></tr>
@@ -184,7 +184,7 @@
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::InputOutputScheme  ( = 28) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
@@ -219,7 +219,7 @@
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::InputOutputScheme  ( = 28) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
@@ -254,7 +254,7 @@
 </table>
 */
 /** \defgroup scheme_GradFInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::GradFInput  (GRADF_NUM_IN = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>GRADF_X</td><td>Decision variable [x].</td></tr>
@@ -262,7 +262,7 @@
 </table>
 */
 /** \defgroup scheme_GradFOutput
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::GradFOutput  (GRADF_NUM_OUT = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>GRADF_GRAD</td><td>Jacobian of the constraints [grad].</td></tr>
@@ -271,7 +271,7 @@
 </table>
 */
 /** \defgroup scheme_MayerInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::MayerInput  (MAYER_NUM_IN = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>MAYER_X</td><td>States at the end of integration (nx x 1) [x].</td></tr>
@@ -279,7 +279,7 @@
 </table>
 */
 /** \defgroup scheme_ControlledDAEInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>CONTROL_DAE_T</td><td>Global physical time. (1-by-1) [t].</td></tr>
@@ -294,7 +294,7 @@
 </table>
 */
 /** \defgroup scheme_NLPInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>NLP_X</td><td>Decision variable [x].</td></tr>
@@ -302,7 +302,7 @@
 </table>
 */
 /** \defgroup scheme_IntegratorInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential state at the initial time [x0].</td></tr>
@@ -312,7 +312,7 @@
 </table>
 */
 /** \defgroup scheme_OCPOutput
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::OCPOutput  (OCP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>OCP_X_OPT</td><td>Optimal state trajectory [x_opt].</td></tr>
@@ -322,7 +322,7 @@
 </table>
 */
 /** \defgroup scheme_RDAEOutput
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::RDAEOutput  (RDAE_NUM_OUT = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>RDAE_ODE</td><td>Right hand side of ODE. [ode].</td></tr>
@@ -331,7 +331,7 @@
 </table>
 */
 /** \defgroup scheme_JacGOutput
-<table>
+<a name='schemes'></a><table>
 <caption>Output scheme: CasADi::JacGOutput  (JACG_NUM_OUT = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>JACG_JAC</td><td>Jacobian of the constraints [jac].</td></tr>
@@ -340,7 +340,7 @@
 </table>
 */
 /** \defgroup scheme_OCPInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::OCPInput  (OCP_NUM_IN = 13) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>OCP_LBX</td><td>States lower bounds (nx x (ns+1)) [lbx].</td></tr>
@@ -359,7 +359,7 @@
 </table>
 */
 /** \defgroup scheme_ControlSimulatorInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::ControlSimulatorInput  (CONTROLSIMULATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>CONTROLSIMULATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1) [x0].</td></tr>
@@ -368,7 +368,7 @@
 </table>
 */
 /** \defgroup scheme_JacGInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::JacGInput  (JACG_NUM_IN = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>JACG_X</td><td>Decision variable [x].</td></tr>
@@ -376,7 +376,7 @@
 </table>
 */
 /** \defgroup scheme_HessLagInput
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::HessLagInput  (HESSLAG_NUM_IN = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>HESSLAG_X</td><td>Decision variable [x].</td></tr>
@@ -386,7 +386,7 @@
 </table>
 */
 /** \defgroup scheme_MUSCOD_FCN_Input
-<table>
+<a name='schemes'></a><table>
 <caption>Input scheme: CasADi::MUSCOD_FCN_Input  (MUSCOD_FCN_NUM_IN = 5) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>MUSCOD_FCN_T</td><td></td></tr>
