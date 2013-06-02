@@ -53,11 +53,9 @@ csim.init()
 x0 = states(0)
 
 # Create input profile
-control_ = controls.repeated(csim.input("u"))
-control_[0,"u"] = 1     # Kick the system with u=1 at the start
-control_[N/2,"v"] = 2   # Kick the system with v=2 at half the simulation time
-
-controls_ = DMatrix(csim.input("u"))
+controls_ = controls.repeated(csim.getInput("u"))
+controls_[0,"u"] = 1     # Kick the system with u=1 at the start
+controls_[N/2,"v"] = 2   # Kick the system with v=2 at half the simulation time
 
 # Pure simulation
 csim.setInput(x0,"x0")
@@ -65,7 +63,7 @@ csim.setInput(parameters_,"p")
 csim.setInput(controls_,"u")
 csim.evaluate()
 
-output = states.repeated(csim.output())
+output = states.repeated(csim.getOutput())
 
 # Plot all states
 for k in states.keys():
@@ -75,7 +73,7 @@ legend(tuple(states.keys()))
 
 print "xf=", output[-1]
 
-# The remainder of this file deals with methods to calculate the state covariance matrix as it propagates throug hthe system dynamics
+# The remainder of this file deals with methods to calculate the state covariance matrix as it propagates through the system dynamics
 
 # === Method 1: integrator sensitivity ===
 # PF = d(I)/d(x0) P0 [d(I)/d(x0)]^T
@@ -91,7 +89,7 @@ J.setInput(parameters_,"p")
 J.setInput(controls_,"u")
 J.evaluate()
 
-Jk = states.squared_repeated(J.output())
+Jk = states.squared_repeated(J.getOutput())
 F = Jk[-1]
 
 PF_method1 = mul([F,P0,F.T])
@@ -125,7 +123,7 @@ csim_aug.setInput(parameters_,"p")
 csim_aug.setInput(controls_,"u")
 csim_aug.evaluate()
 
-output = states_aug.repeated(csim_aug.output())
+output = states_aug.repeated(csim_aug.getOutput())
 
 PF_method2 = output[-1,"P"]
 
@@ -149,7 +147,7 @@ simulated_x = [] # This can be parallelised
 for x0_ in sample_x:
   csim.setInput(x0_,"x0")
   csim.evaluate()
-  simulated_x.append(csim.output()[-1,:])
+  simulated_x.append(csim.getOutput()[-1,:])
   
 simulated_x = vertcat(simulated_x).T
 

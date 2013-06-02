@@ -101,7 +101,7 @@ solver.setInput(zeros(2), "ubg")
 solver.solve()
 
 # Retrieve the solution
-u_opt = array(solver.output("x"))
+u_opt = array(solver.getOutput("x"))
 
 # Get values at the beginning of each finite element
 tgrid = linspace(0,10,10)
@@ -128,7 +128,7 @@ sqp_solver.setInput(zeros(2), "ubg")
 sqp_solver.evaluate()
 
 # Retrieve the solution
-u_opt2 = array(sqp_solver.output("x"))
+u_opt2 = array(sqp_solver.getOutput("x"))
 
 # Plot the results
 plt.figure(1)
@@ -189,8 +189,8 @@ qp_solver.setOption("printLevel","low")
 qp_solver.init()
 
 # No bounds on the control
-qp_solver.input("lbx").setAll(-inf)
-qp_solver.input("ubx").setAll( inf)
+qp_solver.setInput(-inf,"lbx")
+qp_solver.setInput( inf,"ubx")
 
 # Header
 print ' k  nls | dx         gradL      eq viol    ineq viol'
@@ -212,7 +212,7 @@ while True:
   ffcn.setAdjSeed(1.0)
   ffcn.evaluate(0,1)
   fk = ffcn.getOutput()
-  gfk = DMatrix(ffcn.adjSens())
+  gfk = DMatrix(ffcn.getAdjSens())
   
   # Pass data to QP solver
   qp_solver.setInput(Bk,"h")
@@ -225,16 +225,16 @@ while True:
   qp_solver.evaluate()
 
   # Get the optimal solution
-  p = qp_solver.output("primal")
+  p = qp_solver.getOutput("primal")
   
   # Get the dual solution for the inequalities
-  lambda_hat = -qp_solver.output("lambda_a")
+  lambda_hat = -qp_solver.getOutput("lambda_a")
   
   # Get the dual solution for the bounds
-  lambda_x_hat = -qp_solver.output("lambda_x")
+  lambda_x_hat = -qp_solver.getOutput("lambda_x")
   
   # Get the gradient of the Lagrangian
-  gradL = ffcn.adjSens() - dot(trans(Jgk),lambda_hat) - lambda_x_hat
+  gradL = ffcn.getAdjSens() - dot(trans(Jgk),lambda_hat) - lambda_x_hat
   
   ## Pass adjoint seeds to g
   #gfcn.setAdjSeed(lambda_hat)
@@ -280,7 +280,7 @@ while True:
     # Evaluate gk, hk and get 1-norm of the feasability violations
     gfcn.setInput(x_new)
     gfcn.evaluate()
-    gk_new = gfcn.output()
+    gk_new = gfcn.getOutput()
     feasviol_new = sumRows(fabs(gk_new))
 
     # New T1 function
@@ -327,19 +327,19 @@ while True:
   # Evaluate the constraint function
   gfcn.setInput(x)
   gfcn.evaluate()
-  gk = gfcn.output()
+  gk = gfcn.getOutput()
   
   # Evaluate the Jacobian
   jfcn.setInput(x)
   jfcn.evaluate()
-  Jgk = jfcn.output()
+  Jgk = jfcn.getOutput()
     
   # Evaluate the gradient of the objective function
   ffcn.setInput(x)
   ffcn.setAdjSeed(1.0)
   ffcn.evaluate(0,1)
   fk = ffcn.getOutput()
-  gfk = ffcn.adjSens()
+  gfk = ffcn.getAdjSens()
 
   # Check if maximum number of iterations reached
   if k >= max_iter:

@@ -57,7 +57,7 @@ for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
 
   storage2.append([vf2.getOutput(i) for i in range(vf2.getNumOutputs())])
 
-  #print vf2.output(24)
+  #print vf2.getOutput(24)
 
 print "first-order"
 for k,(a,b) in enumerate(zip(storage[0],storage[1])):

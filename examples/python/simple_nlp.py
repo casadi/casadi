@@ -51,7 +51,7 @@ solver.evaluate()
 
 # Print solution
 print "-----"
-print "objective at solution = ", solver.output("f")
-print "primal solution = ", solver.output("x")
-print "dual solution (x) = ", solver.output("lam_x")
-print "dual solution (g) = ", solver.output("lam_g")
+print "objective at solution = ", solver.getOutput("f")
+print "primal solution = ", solver.getOutput("x")
+print "dual solution (x) = ", solver.getOutput("lam_x")
+print "dual solution (g) = ", solver.getOutput("lam_g")

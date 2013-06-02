@@ -187,7 +187,7 @@ solver.setInput(lubg,casadi.NLP_SOLVER_UBG)
 # Solve the problem
 solver.solve()
 
-xx_opt = solver.output(casadi.NLP_SOLVER_X)
+xx_opt = solver.getOutput(casadi.NLP_SOLVER_X)
 
 # Retrieve output
 

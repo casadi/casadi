@@ -34,7 +34,7 @@ F.setAdjSeed([1,0,0],1)
 f.evaluate(1,1)
 F.evaluate(1,1)
 
-print f.adjSens(1),F.adjSens(1) 
-print f.fwdSens(1),F.fwdSens(1) 
+print f.getAdjSens(1),F.getAdjSens(1) 
+print f.getFwdSens(1),F.getFwdSens(1) 
 
 

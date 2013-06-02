@@ -14,6 +14,6 @@ J.init()
 
 J.setInput(0.738)
 J.evaluate()
-print "J.output(0) = ", J.output(0)
-print "J.output(1) = ", J.output(1)
+print "J.getOutput(0) = ", J.getOutput(0)
+print "J.getOutput(1) = ", J.getOutput(1)
 

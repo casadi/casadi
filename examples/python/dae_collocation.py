@@ -80,13 +80,13 @@ for j in range(deg+1):
     # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
     lfcn.setInput(1.0)
     lfcn.evaluate()
-    D[j] = lfcn.output()
+    D[j] = lfcn.getOutput()
     # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
     for j2 in range(deg+1):
         lfcn.setInput(tau_root[j2])
         lfcn.setFwdSeed(1.0)
         lfcn.evaluate(1,0)
-        C[j][j2] = lfcn.fwdSens()
+        C[j][j2] = lfcn.getFwdSens()
 
 
 
@@ -402,10 +402,10 @@ solver.setInput(np.concatenate(ubg),"ubg")
 solver.solve()
 
 # Print the optimal cost
-print "optimal cost: ", float(solver.output("f"))
+print "optimal cost: ", float(solver.getOutput("f"))
 
 # Retrieve the solution
-v_opt = np.array(solver.output("x"))
+v_opt = np.array(solver.getOutput("x"))
     
 
 ## ----
@@ -454,7 +454,7 @@ for j in range(1,deg+1):
     lafcn.init()
     lafcn.setInput(tau_root[0])
     lafcn.evaluate()
-    Da[j-1] = lafcn.output()
+    Da[j-1] = lafcn.getOutput()
 
 xA_plt = np.resize(np.array([],dtype=MX),(nalg,(deg+1)*nicp*(nk)+1))
 offset4=0

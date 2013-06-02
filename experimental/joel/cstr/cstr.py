@@ -258,23 +258,23 @@ t2 = time.time()
 print 'Optimization took %0.3f ms' % ((t2-t1)*1000.0)
 
 # Print optimal cost
-cost = ocp_solver.output("cost")[0]
+cost = ocp_solver.getOutput("cost")[0]
 print "optimal cost = ", cost
 
 # Print optimal parameters
-popt = ocp_solver.output("p_opt")
+popt = ocp_solver.getOutput("p_opt")
 print "optimal parameter values = ", popt
 
 # Time grid
 t_opt = NP.linspace(0,ocp.tf,num_nodes+1)
 
 # Plot optimal control
-u_opt = ocp_solver.output("u_opt")
+u_opt = ocp_solver.getOutput("u_opt")
 plt.figure(1)
 plt.plot(t_opt,trans(u_opt))
 
 # Plot optimal state trajectory
-x_opt = ocp_solver.output("x_opt")
+x_opt = ocp_solver.getOutput("x_opt")
 x_opt = array(x_opt) # create numpy array
 x_opt = x_opt.reshape(num_nodes+1, 3)
 plt.figure(2)

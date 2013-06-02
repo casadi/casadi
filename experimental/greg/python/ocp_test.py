@@ -160,14 +160,14 @@ solver.setInput(NP.concatenate(g_max),"ubg")
 solver.solve()
 
 # Retrieve the solution
-v_opt = solver.output("x")
+v_opt = solver.getOutput("x")
 u0_opt = [v_opt[actionIdx(0,k)] for k in range(nk)]
 x0_opt = [v_opt[stateIdx(0,k)] for k in range(nk+1)]
 x1_opt = [v_opt[stateIdx(1,k)] for k in range(nk+1)]
 x2_opt = [v_opt[stateIdx(2,k)] for k in range(nk+1)]
 
 # Retrieve the solution
-v_opt = NP.array(solver.output("x"))
+v_opt = NP.array(solver.getOutput("x"))
 
 # Get values at the beginning of each finite element
 tgrid_u = NP.linspace(0,tf,nk)

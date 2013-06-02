@@ -93,7 +93,7 @@ solver.setInput([10,0],"ubg")
 solver.solve()
 
 # Get the solution
-plot(solver.output("x"))
-plot(solver.output("lam_x"))
+plot(solver.getOutput("x"))
+plot(solver.getOutput("lam_x"))
 grid()
 show()

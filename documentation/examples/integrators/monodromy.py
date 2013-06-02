@@ -78,7 +78,7 @@ figure(1)
 for x1_0 in [-3.5,-3.1,-3,-2,-1,0]:
   sim.setInput([x1_0,x2_0],"x0")
   sim.evaluate()
-  plot(sim.output()[:,0],sim.output()[:,1],'k')
+  plot(sim.getOutput()[:,0],sim.getOutput()[:,1],'k')
 
 title('phase portrait for mu_1 = 0, mu_2 = 0')
 xlabel('x_1')
@@ -98,7 +98,7 @@ jac.setInput(x0,"x0")
 jac.setInput(params_,"p")
 jac.evaluate()
 
-Ji = jac.output()
+Ji = jac.getOutput()
 
 print Ji
 
@@ -116,9 +116,9 @@ jacsim.evaluate()
 print "jacsim.output().shape = ", jacsim.output().shape
 
 #! Show only the last 3 intervals.
-print jacsim.output()[-3*2:,:]
+print jacsim.getOutput()[-3*2:,:]
 
-Js = jacsim.output()[-2:,:]
+Js = jacsim.getOutput()[-2:,:]
 
 
 e = max(fabs(Js - Ji))/max(fabs(Js))
@@ -139,15 +139,15 @@ jaccsim = csim.jacobian(CONTROLSIMULATOR_X0,0)
 jaccsim.init()
 jaccsim.setInput(params_[:-1],"p")
 jaccsim.setInput(x0,"x0")
-jaccsim.input("u").setAll(0)
+jaccsim.setInput(0,"u")
 jaccsim.evaluate()
 
 #! For each of the 500 intervals, we have a 2-by-2 matrix as output
 print "jaccsim.output().shape = ", jaccsim.output().shape
 
 #! Show only the last 3 intervals.
-print jaccsim.output()[-3*2:,:]
-Jcs = jaccsim.output()[-2:,:]
+print jaccsim.getOutput()[-3*2:,:]
+Jcs = jaccsim.getOutput()[-2:,:]
 
 e = max(fabs(Jcs - Js))/max(fabs(Js))
 
@@ -168,14 +168,14 @@ circle = hstack((circle,circle[:,50:51]))
 
 
 for t in range(0,N/5,2):
-  J = jacsim.output()[t*2:(t+1)*2,:]
+  J = jacsim.getOutput()[t*2:(t+1)*2,:]
   if t < 10:
     scale = 0.1
   else:
     scale = 0.01
   e=scale*mul(J,circle).T
-  e[:,0] += sim.output()[t,0]
-  e[:,1] += sim.output()[t,1]
+  e[:,0] += sim.getOutput()[t,0]
+  e[:,1] += sim.getOutput()[t,1]
   if t < 10 :
     plot(e[:,0],e[:,1],color='red')
   else:
@@ -203,7 +203,7 @@ plot(ts,perturbed_output-unperturbed_output)
 effects = DMatrix.zeros(N,2)
 
 for t in range(N):
-  effects[t,:] = mul(jacsim.output()[t*2:(t+1)*2,:],perturb).T
+  effects[t,:] = mul(jacsim.getOutput()[t*2:(t+1)*2,:],perturb).T
   
 plot(ts,effects)
 
@@ -213,7 +213,7 @@ xlabel('t')
 show()
 
 figure(3)
-linear_perturbed = unperturbed_output.reshape((2*N,1)) + mul(jacsim.output(),perturb)
+linear_perturbed = unperturbed_output.reshape((2*N,1)) + mul(jacsim.getOutput(),perturb)
 
 title('phase portrait perturbation')
 plot(unperturbed_output[:,0],unperturbed_output[:,1])

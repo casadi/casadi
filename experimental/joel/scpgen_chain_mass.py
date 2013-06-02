@@ -163,5 +163,5 @@ solver.setInput( 0.,    "x0")
 solver.solve()
 
 # Retrieve the solution
-u_opt = NP.array(solver.output("x"))
+u_opt = NP.array(solver.getOutput("x"))
 

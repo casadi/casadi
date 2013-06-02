@@ -40,12 +40,12 @@ f.setInput(6,1)
 f.evaluate()
 
 #! max(4,6)=6
-assert f.output(0)[0]==6
-print f.output(0)[0]
+assert f.getOutput(0)[0]==6
+print f.getOutput(0)[0]
 
 #! min(4,6)=4
-assert f.output(1)[0]==4
-print f.output(1)[0]
+assert f.getOutput(1)[0]==4
+print f.getOutput(1)[0]
 
 #! Symbolic differentiation
 #! ------------------------
@@ -62,13 +62,13 @@ J.setInput(6,1)
 J.evaluate()
 
 #! fmax is not sensitive to the first argument (smallest)
-assert J.output(0)[0]==0
+assert J.getOutput(0)[0]==0
 
 #! fmax is not sensitive to the first argument (biggest)
 J.setInput(6,0)
 J.setInput(4,1)
 J.evaluate()
-assert J.output(0)[0]==1
+assert J.getOutput(0)[0]==1
 
 
 #! We get a heaviside when taking the derivative of fmin
@@ -82,13 +82,13 @@ J.setInput(6,1)
 J.evaluate()
 
 #! fmax is not sensitive to the first argument (smallest)
-assert J.output(0)[0]==1
+assert J.getOutput(0)[0]==1
 
 #! fmax is not sensitive to the first argument (biggest)
 J.setInput(6,0)
 J.setInput(4,1)
 J.evaluate()
-assert J.output(0)[0]==0
+assert J.getOutput(0)[0]==0
 
 
 #! AD forward on fmin, fmax
@@ -99,20 +99,20 @@ f.setFwdSeed(0,1)
 f.evaluate(1,0)
 
 #! fmax is not sensitive to the first argument (smallest)
-assert f.fwdSens(0)[0]==0
+assert f.getFwdSens(0)[0]==0
 
 #! fmin is only sensitive to the first argument (smallest)
-assert f.fwdSens(1)[0]==1
+assert f.getFwdSens(1)[0]==1
 
 f.setFwdSeed(0,0)
 f.setFwdSeed(1,1)
 f.evaluate(1,0)
 
 #! fmax is only sensitive to the second argument (largest)
-assert f.fwdSens(0)[0]==1
+assert f.getFwdSens(0)[0]==1
 
 #! fmin is not sensitive to the second argument (largest)
-assert f.fwdSens(1)[0]==0
+assert f.getFwdSens(1)[0]==0
 
 #! AD adjoint on fmin, fmax
 #! ------------------------
@@ -122,20 +122,20 @@ f.setAdjSeed(0,1)
 f.evaluate(0,1)
 
 #! The first argument (smallest) is not influenced by fmax
-assert f.adjSens(0)[0]==0
+assert f.getAdjSens(0)[0]==0
 
 #! The first argument (smallest) is only influenced by fmin
-assert f.adjSens(1)[0]==1
+assert f.getAdjSens(1)[0]==1
 
 f.setAdjSeed(0,0)
 f.setAdjSeed(1,1)
 f.evaluate(0,1)
 
 #! The second argument (largest) is only influenced by fmax
-assert f.adjSens(0)[0]==1
+assert f.getAdjSens(0)[0]==1
 
 #! The first argument (largest) is not influenced by fmin
-assert f.adjSens(1)[0]==0
+assert f.getAdjSens(1)[0]==0
 
 
 
@@ -150,38 +150,38 @@ f.setFwdSeed(0,1)
 f.evaluate(1,0)
 
 #! fmax sensitivity to the first argument:
-print f.fwdSens(0)[0]
+print f.getFwdSens(0)[0]
 
 #! fmin sensitivity to the first argument:
-print f.fwdSens(1)[0]
+print f.getFwdSens(1)[0]
 
 f.setFwdSeed(0,0)
 f.setFwdSeed(1,1)
 f.evaluate(1,0)
 
 #! fmax sensitivity to the second argument:
-print f.fwdSens(0)[0]
+print f.getFwdSens(0)[0]
 
 #! fmin sensitivity to the second argument:
-print f.fwdSens(1)[0]
+print f.getFwdSens(1)[0]
 
 f.setAdjSeed(1,0)
 f.setAdjSeed(0,1)
 f.evaluate(0,1)
 
 #! first argument sensitivity to fmax:
-print f.adjSens(0)[0]
+print f.getAdjSens(0)[0]
 
 #! first argument sensitivity to fmin:
-print f.adjSens(1)[0]
+print f.getAdjSens(1)[0]
 
 f.setAdjSeed(0,0)
 f.setAdjSeed(1,1)
 f.evaluate(0,1)
 
 #! second argument sensitivity to fmax:
-print f.adjSens(0)[0]
+print f.getAdjSens(0)[0]
 
 #! second argument sensitivity to fmin:
-print f.adjSens(1)[0]
+print f.getAdjSens(1)[0]
 

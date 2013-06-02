@@ -6,9 +6,9 @@ s.init()
 s.setInput([1.,    -10.],"lbx")
 s.setInput([1.,     10.],"ubx")
 s.evaluate()
-print s.output("lam_x") # [0,0] # wrong!!!
+print s.getOutput("lam_x") # [0,0] # wrong!!!
 
 # Change upper bound from an equality to an inequality constraint
 s.setInput([1.001,  10.],"ubx")
 s.evaluate()
-print s.output("lam_x") # [-3,0] # correct!!!
+print s.getOutput("lam_x") # [-3,0] # correct!!!

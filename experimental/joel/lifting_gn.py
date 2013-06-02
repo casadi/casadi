@@ -257,9 +257,9 @@ for (i,x0) in enumerate([0.08]):
     AB.setInput(mux_k,2)
     AB.setInput(mug_k,3)
     AB.evaluate()
-    A_k = AB.output(0)
-    B1_k = AB.output(1) # NOTE: # mux dissappears (constant term)
-    B2_k = AB.output(2)
+    A_k = AB.getOutput(0)
+    B1_k = AB.getOutput(1) # NOTE: # mux dissappears (constant term)
+    B2_k = AB.getOutput(2)
     
     # Get a_k and b_k
     Z.setInput(u_k,0)
@@ -275,9 +275,9 @@ for (i,x0) in enumerate([0.08]):
     #Z.getOutput(x_k,0)
     Z.getOutput(f1_k,1)
     Z.getOutput(f2_k,2)
-    a_k = -Z.fwdSens(0)
-    b1_k = f1_k-Z.fwdSens(1) # mux disappears from Z (constant term)
-    b2_k = f2_k-Z.fwdSens(2)
+    a_k = -Z.getFwdSens(0)
+    b1_k = f1_k-Z.getFwdSens(1) # mux disappears from Z (constant term)
+    b2_k = f2_k-Z.getFwdSens(2)
 
     if gauss_newton:
       # Gauss-Newton Hessian
@@ -311,7 +311,7 @@ for (i,x0) in enumerate([0.08]):
     qp_solver.evaluate()
 
     # Get the primal solution
-    du_k = qp_solver.output("primal")
+    du_k = qp_solver.getOutput("primal")
     
     # Get the dual solution
     if not gauss_newton:
@@ -326,7 +326,7 @@ for (i,x0) in enumerate([0.08]):
     Z.setFwdSeed(dmux_k,2)
     Z.setFwdSeed(dmug_k,3)
     Z.evaluate(1,0)
-    dx_k = Z.fwdSens(0)
+    dx_k = Z.getFwdSens(0)
         
     # Take a full step
     u_k =     u_k +   du_k
@@ -390,9 +390,9 @@ for (i,x0) in enumerate([0.08]):
   
 print "u_k = ", u_k
 <<<<<<< HEAD
-print "nlp_solver.output("x_opt") = ", nlp_solver.output("x_opt")
+print "nlp_solver.getOutput("x_opt") = ", nlp_solver.getOutput("x_opt")
 =======
-print "nlp_solver.output(NLP_SOLVER_X) = ", nlp_solver.output(NLP_SOLVER_X)
+print "nlp_solver.getOutput(NLP_SOLVER_X) = ", nlp_solver.getOutput(NLP_SOLVER_X)
 >>>>>>> issue_566
 
 plt.show()

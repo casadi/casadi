@@ -174,9 +174,9 @@ class Integrationtests(casadiTestCase):
 
                 integrator.evaluate(0,0)
                 fs.evaluate(0,0)
-                print "res=",integrator.output("xf")-fs.output("xf"), fs.output("xf")
-                print "Rres=",integrator.output("rxf")-fs.output("rxf"), fs.output("rxf")
-                # self.checkarray(integrator.output("rxf"),fs.output("rxf"),digits=4)
+                print "res=",integrator.getOutput("xf")-fs.getOutput("xf"), fs.getOutput("xf")
+                print "Rres=",integrator.getOutput("rxf")-fs.getOutput("rxf"), fs.getOutput("rxf")
+                # self.checkarray(integrator.getOutput("rxf"),fs.getOutput("rxf"),digits=4)
                 stats = integrator.getStats()
                 
                 print stats
@@ -529,7 +529,7 @@ class Integrationtests(casadiTestCase):
       
       integrator.evaluate()
       
-      self.assertAlmostEqual(integrator.output()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
+      self.assertAlmostEqual(integrator.getOutput()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
     
       # Integrate with time offset
       integrator.setInput([t0,tend,p],"p")
@@ -537,28 +537,28 @@ class Integrationtests(casadiTestCase):
       
       integrator.evaluate()
       
-      self.assertAlmostEqual(integrator.output()[0],q0*exp((tend**3-t0**3)/(3*p)),9,"Evaluation output mismatch")
+      self.assertAlmostEqual(integrator.getOutput()[0],q0*exp((tend**3-t0**3)/(3*p)),9,"Evaluation output mismatch")
       
       # Forward sensitivity to q0
       integrator.setInput([q0],"x0")
       integrator.setFwdSeed(1,"x0")
       integrator.evaluate(1,0)
       
-      self.assertAlmostEqual(integrator.fwdSens()[0],exp((tend**3-t0**3)/(3*p)),9,"Evaluation output mismatch")
+      self.assertAlmostEqual(integrator.getFwdSens()[0],exp((tend**3-t0**3)/(3*p)),9,"Evaluation output mismatch")
       
       # Forward sensitivity to p
       integrator.setFwdSeed(0,"x0")
       integrator.setFwdSeed([0,0,1],"p")
       integrator.evaluate(1,0)
       
-      self.assertAlmostEqual(integrator.fwdSens()[0],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2),9,"Evaluation output mismatch")
+      self.assertAlmostEqual(integrator.getFwdSens()[0],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2),9,"Evaluation output mismatch")
       
       # Forward sensitivity to tf
       integrator.setFwdSeed(0,"x0")
       integrator.setFwdSeed([0,1,0],"p")
       integrator.evaluate(1,0)
       
-      self.assertAlmostEqual(integrator.fwdSens()[0],(q0*tend**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
+      self.assertAlmostEqual(integrator.getFwdSens()[0],(q0*tend**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
       
       # Forward sensitivity to t0
       integrator.setFwdSeed(0,"x0")
@@ -566,7 +566,7 @@ class Integrationtests(casadiTestCase):
       integrator.setInput([t0,tend,p],"p")
       integrator.evaluate(1,0)
       
-      self.assertAlmostEqual(integrator.fwdSens()[0],-(q0*t0**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
+      self.assertAlmostEqual(integrator.getFwdSens()[0],-(q0*t0**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
 
       if not(intf is IdasIntegrator):
         # (*) IDAS backward sens seems to fail for somewhat small tolerances
@@ -574,10 +574,10 @@ class Integrationtests(casadiTestCase):
         integrator.setInput([t0,tend,p],"p")
         integrator.evaluate(0,1)
 
-        self.assertAlmostEqual(integrator.adjSens("x0")[0],exp((tend**3-t0**3)/(3*p)),9,"Evaluation output mismatch")
-        self.assertAlmostEqual(integrator.adjSens("p")[2],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2),9,"Evaluation output mismatch")
-        self.assertAlmostEqual(integrator.adjSens("p")[1],(q0*tend**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
-        self.assertAlmostEqual(integrator.adjSens("p")[0],-(q0*t0**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.getAdjSens("x0")[0],exp((tend**3-t0**3)/(3*p)),9,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.getAdjSens("p")[2],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2),9,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.getAdjSens("p")[1],(q0*tend**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.getAdjSens("p")[0],-(q0*t0**2*exp((tend**3-t0**3)/(3*p)))/p,7,"Evaluation output mismatch")
     
       # (*) Try IDAS again with very low tolerances
       if 0:
@@ -593,11 +593,11 @@ class Integrationtests(casadiTestCase):
         integrator.setInput([q0],"x0")
         integrator.setInput([t0,tend,p],"p")
         integrator.evaluate(0,1)
-        self.assertAlmostEqual(integrator.adjSens("x0")[0],exp((tend**3-t0**3)/(3*p)),2,"Evaluation output mismatch")
-        print integrator.adjSens("p")[2],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2)
-        self.assertAlmostEqual(integrator.adjSens("p")[2],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2),2,"Evaluation output mismatch")
-        self.assertAlmostEqual(integrator.adjSens("p")[1],(q0*tend**2*exp((tend**3-t0**3)/(3*p)))/p,2,"Evaluation output mismatch")
-        self.assertAlmostEqual(integrator.adjSens("p")[0],-(q0*t0**2*exp((tend**3-t0**3)/(3*p)))/p,2,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.getAdjSens("x0")[0],exp((tend**3-t0**3)/(3*p)),2,"Evaluation output mismatch")
+        print integrator.getAdjSens("p")[2],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2)
+        self.assertAlmostEqual(integrator.getAdjSens("p")[2],-(q0*(tend**3-t0**3)*exp((tend**3-t0**3)/(3*p)))/(3*p**2),2,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.getAdjSens("p")[1],(q0*tend**2*exp((tend**3-t0**3)/(3*p)))/p,2,"Evaluation output mismatch")
+        self.assertAlmostEqual(integrator.getAdjSens("p")[0],-(q0*t0**2*exp((tend**3-t0**3)/(3*p)))/p,2,"Evaluation output mismatch")
       
     
   def test_eval2(self):
@@ -618,7 +618,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    self.assertAlmostEqual(f.output()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(f.getOutput()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
   
   def test_issue92c(self):
     self.message("regression check for issue 92")
@@ -636,8 +636,8 @@ class Integrationtests(casadiTestCase):
     # Evaluate with adjoint mode AD
     f.evaluate(0,1)
     # print result
-    print f.output()
-    print f.adjSens("x")
+    print f.getOutput()
+    print f.getAdjSens("x")
   
   def test_issue92b(self):
     self.message("regression check for issue 92")
@@ -657,8 +657,8 @@ class Integrationtests(casadiTestCase):
     ## Integrate and calculate sensitivities
     integrator.evaluate(0,1)
     # print result
-    print integrator.output("xf")
-    print integrator.adjSens("x0")
+    print integrator.getOutput("xf")
+    print integrator.getAdjSens("x0")
     
   def test_issue92(self):
     self.message("regression check for issue 92")
@@ -688,8 +688,8 @@ class Integrationtests(casadiTestCase):
     J.init()
     J.setInput([1,0])
     J.evaluate()
-    print "jac=",J.output()[0]-exp(1)
-    self.assertAlmostEqual(J.output()[0],exp(1),5,"Evaluation output mismatch")
+    print "jac=",J.getOutput()[0]-exp(1)
+    self.assertAlmostEqual(J.getOutput()[0],exp(1),5,"Evaluation output mismatch")
     
   def test_eval(self):
     self.message('CVodes integration: evaluation')
@@ -702,7 +702,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    self.assertAlmostEqual(qe.output()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(qe.getOutput()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
     
   def test_eval_time_offset(self):
     self.message('CVodes integration: evaluation time offset')
@@ -720,7 +720,7 @@ class Integrationtests(casadiTestCase):
     q0=num['q0']
     p=num['p']
 
-    self.assertAlmostEqual(integrator.output()[0],q0*exp((tend**3-0.7**3)/(3*p)),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(integrator.getOutput()[0],q0*exp((tend**3-0.7**3)/(3*p)),9,"Evaluation output mismatch")
     
     
   def test_jac1(self):
@@ -734,7 +734,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    self.assertAlmostEqual(J.output()[0],exp(tend**3/(3*p)),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(J.getOutput()[0],exp(tend**3/(3*p)),9,"Evaluation output mismatch")
     
   def test_jac2(self):
     self.message('CVodes integration: jacobian to p')
@@ -747,7 +747,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    self.assertAlmostEqual(J.output()[0],-(q0*tend**3*exp(tend**3/(3*p)))/(3*p**2),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(J.getOutput()[0],-(q0*tend**3*exp(tend**3/(3*p)))/(3*p**2),9,"Evaluation output mismatch")
     
   def test_bug_repeat(self):
     num={'tend':2.3,'q0':[0,7.1,7.1],'p':2}
@@ -836,7 +836,7 @@ class Integrationtests(casadiTestCase):
     q0=num['q0']
     p=num['p']
 
-    self.assertAlmostEqual(J.adjSens("p")[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),7,"Evaluation output mismatch")
+    self.assertAlmostEqual(J.getAdjSens("p")[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),7,"Evaluation output mismatch")
 
   def test_hess3(self):
     self.message('CVodes integration: hessian to p: Jacobian of integrator.jacobian')
@@ -852,7 +852,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    self.assertAlmostEqual(H.output()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(H.getOutput()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
 
   def test_hess4(self):
     self.message('CVodes integration: hessian to p: Jacobian of integrator.jacobian indirect')
@@ -874,7 +874,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    self.assertAlmostEqual(H.output()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(H.getOutput()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
 
   def test_hess5(self):
     self.message('CVodes integration: hessian to p in an MX tree')
@@ -889,7 +889,7 @@ class Integrationtests(casadiTestCase):
     JT.setInput([num['q0']],0)
     JT.setInput([num['p']],1)
     JT.evaluate(1,0)
-    print JT.output()
+    print JT.getOutput()
 
     H  = JT.jacobian(1)
     H.init()
@@ -899,7 +899,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    self.assertAlmostEqual(H.output()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(H.getOutput()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
     
   def test_hess6(self):
     self.message('CVodes integration: hessian to p in an MX tree')
@@ -918,7 +918,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    self.assertAlmostEqual(H.output()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(H.getOutput()[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
  
   def test_issue87(self):
     return # see issue 87
@@ -937,9 +937,9 @@ class Integrationtests(casadiTestCase):
     q0=num['q0']
     p=num['p']
     print (q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3)
-    print J.adjSens()
-    print J.fwdSens()
-    self.assertAlmostEqual(J.adjSens(1)[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
+    print J.getAdjSens()
+    print J.getFwdSens()
+    self.assertAlmostEqual(J.getAdjSens(1)[0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),9,"Evaluation output mismatch")
     
     
   def test_glibcbug(self):
@@ -1023,11 +1023,11 @@ class Integrationtests(casadiTestCase):
     qe.setInput(A,0)
     qe.setInput(B.ravel(),1)
     qe.evaluate()
-    self.checkarray(dot(Be,A)/1e3,qe.output()/1e3,"jacobian(INTEGRATOR_X0,INTEGRATOR_XF)")
+    self.checkarray(dot(Be,A)/1e3,qe.getOutput()/1e3,"jacobian(INTEGRATOR_X0,INTEGRATOR_XF)")
     qeJ.setInput(A,0)
     qeJ.setInput(B.ravel(),1)
     qeJ.evaluate()
-    self.checkarray(qeJ.output()/1e3,Be/1e3,"jacobian(INTEGRATOR_X0,INTEGRATOR_XF)")
+    self.checkarray(qeJ.getOutput()/1e3,Be/1e3,"jacobian(INTEGRATOR_X0,INTEGRATOR_XF)")
     
     
     qeJ2.setInput(A,0)
@@ -1041,7 +1041,7 @@ class Integrationtests(casadiTestCase):
     H.setInput(A,0)
     H.setInput(B.ravel(),1)
     H.evaluate()
-    print array(H.output())
+    print array(H.getOutput())
     
     
   def test_mathieu_system(self):
@@ -1082,7 +1082,7 @@ class Integrationtests(casadiTestCase):
     qe.setInput(A,0)
     qe.setInput(B,1)
     qe.evaluate()
-    print array(qe.output())
+    print array(qe.getOutput())
 
   def test_nl_system(self):
     """
@@ -1135,18 +1135,18 @@ class Integrationtests(casadiTestCase):
     qe.setInput(p0,1)
     qe.evaluate()
 
-    print qe.output()[0]
-    print qe.output()[1]
+    print qe.getOutput()[0]
+    print qe.getOutput()[1]
     
-    self.assertAlmostEqual(qe.output()[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),11,"Nonlin ODE")
-    self.assertAlmostEqual(qe.output()[1],sqrt(p0)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te),11,"Nonlin ODE")
+    self.assertAlmostEqual(qe.getOutput()[0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),11,"Nonlin ODE")
+    self.assertAlmostEqual(qe.getOutput()[1],sqrt(p0)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te),11,"Nonlin ODE")
     
     qeJ.setInput(A,0)
     qeJ.setInput(p0,1)
     qeJ.evaluate()
     
     Jr = array([[1,(sqrt(p0)*tan(sqrt(p0)*te+arctan(dy0/sqrt(p0)))-dy0)/(dy0**2+p0)],[0,(p0*tan(sqrt(p0)*te+arctan(dy0/sqrt(p0)))**2+p0)/(dy0**2+p0)]])
-    self.checkarray(qeJ.output(),Jr,"jacobian of Nonlin ODE")
+    self.checkarray(qeJ.getOutput(),Jr,"jacobian of Nonlin ODE")
     
     #qe.setOption("ad_mode","reverse")
     #qe.init()
@@ -1155,7 +1155,7 @@ class Integrationtests(casadiTestCase):
     Jf.setInput(A,0)
     Jf.setInput(p0,1)
     Jf.evaluate()
-    self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
+    self.checkarray(Jf.getOutput(),Jr,"Jacobian of Nonlin ODE")
     
     #qe.setOption("ad_mode","forward")
     #qe.init();
@@ -1164,7 +1164,7 @@ class Integrationtests(casadiTestCase):
     Jf.setInput(A,0)
     Jf.setInput(p0,1)
     Jf.evaluate()
-    self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
+    self.checkarray(Jf.getOutput(),Jr,"Jacobian of Nonlin ODE")
     
     # Joel: This is no longer supported: might be a good idea to support again, though
     #qeJ=integrator.jac("x0","xf")
@@ -1172,8 +1172,8 @@ class Integrationtests(casadiTestCase):
     #qeJ.setInput(list(A)+[0,1,0,0],"x0")
     #qeJ.setAdjSeed([0,0]+[0,1,0,0],"xf")
     #qeJ.evaluate(0,1)
-    #print qeJ.output()
-    #print qeJ.adjSens("x0")
+    #print qeJ.getOutput()
+    #print qeJ.getAdjSens("x0")
     
     Jr = matrix([[(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2)],[(sqrt(p0)*((te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)**2+te*yc0**2-yc0+p0*te)+(yc0**2+p0)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te))/(sqrt(p0)*(2*yc0**2+2*p0))]])  
     
@@ -1184,7 +1184,7 @@ class Integrationtests(casadiTestCase):
     Jf.setInput(A,0)
     Jf.setInput(p0,1)
     Jf.evaluate()
-    self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
+    self.checkarray(Jf.getOutput(),Jr,"Jacobian of Nonlin ODE")
     
     #qe.setOption("ad_mode","forward")
     #qe.init()
@@ -1193,7 +1193,7 @@ class Integrationtests(casadiTestCase):
     Jf.setInput(A,0)
     Jf.setInput(p0,1)
     Jf.evaluate()
-    self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
+    self.checkarray(Jf.getOutput(),Jr,"Jacobian of Nonlin ODE")
     
     qendJ=integrator.jacobian("p","xf")
     qendJ.init()
@@ -1205,7 +1205,7 @@ class Integrationtests(casadiTestCase):
     qeJ.setInput(p0,1)
     qeJ.evaluate()
     
-    self.checkarray(qeJ.output(),Jr,"jacobian of Nonlin ODE")
+    self.checkarray(qeJ.getOutput(),Jr,"jacobian of Nonlin ODE")
     
     
     
@@ -1222,7 +1222,7 @@ class Integrationtests(casadiTestCase):
     def sec(x):
       return 1.0/cos(x)
     Hr = array([[0,0],[0,-(2*yc0*tan(arctan(yc0)+te))/(yc0**4+2*yc0**2+1)+sec(arctan(yc0)+te)**2/(yc0**4+2*yc0**2+1)+(2*yc0**2)/(yc0**4+2*yc0**2+1)-1/(yc0**2+1)],[0,0],[0,-(2*yc0*tan(arctan(yc0)+te)**2)/(yc0**4+2*yc0**2+1)+(2*sec(arctan(yc0)+te)**2*tan(arctan(yc0)+te))/(yc0**4+2*yc0**2+1)-(2*yc0)/(yc0**4+2*yc0**2+1)]])
-    print array(H.output())
+    print array(H.getOutput())
     print Hr
     
     # Joel: As above, this is no longer supported
@@ -1231,8 +1231,8 @@ class Integrationtests(casadiTestCase):
     #qeJ.setInput(list(A)+[0,1,0,0],"x0")
     #qeJ.setAdjSeed([0,0]+[0,1,0,0],"xf")
     #qeJ.evaluate(0,1)
-    #print qeJ.output()
-    #print qeJ.adjSens("x0")
+    #print qeJ.getOutput()
+    #print qeJ.getAdjSens("x0")
     
 
   def test_hessian2D(self):

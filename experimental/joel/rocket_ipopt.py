@@ -253,7 +253,7 @@ for integrator in [integrator_euler, integrator_cvodes]:
   solver.solve()
 
   # Get the solution
-  xopt = solver.output("x")
+  xopt = solver.getOutput("x")
 
   # Plot the optimal trajectory
   plt.figure()

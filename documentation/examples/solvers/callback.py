@@ -44,7 +44,7 @@ class MyCallback:
     self.iter = 0 
   def __call__(self,f,*args):
     print "====Hey, I'm an iteration===="
-    print "X_OPT = ", f.input("x")
+    print "X_OPT = ", f.getInput("x")
     print f.getStats()
     self.iter = self.iter + 1
     if self.iter > 5:
@@ -96,7 +96,7 @@ class MyCallback:
       for j in range(x_.shape[1]):
         nlp.setInput([x_[i,j],y_[i,j]],"x")
         nlp.evaluate()
-        z_[i,j] = float(nlp.output("f"))
+        z_[i,j] = float(nlp.getOutput("f"))
     contourf(x_,y_,z_)
     colorbar()
     title('Iterations of Rosenbrock')
@@ -106,7 +106,7 @@ class MyCallback:
     self.y_sols = []
     
   def __call__(self,f,*args):
-    sol = f.input("x")
+    sol = f.getInput("x")
     self.x_sols.append(float(sol[0]))
     self.y_sols.append(float(sol[1]))
     subplot(111)

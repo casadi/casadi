@@ -51,7 +51,7 @@ s.setInput(b,1)
 #! And we are off to find x...
 s.solve()
 
-x_ = s.output()
+x_ = s.getOutput()
 
 #! By looking at the residuals between the x we knew in advance and the computed x, we see that the CSparse solver works
 print "Sum of residuals = %.2e" % sumAll(fabs(x-x_))
@@ -76,7 +76,7 @@ for name, solver in [("LapackLUDense",LapackLUDense),("LapackQRDense",LapackQRDe
     s.solve()
   st = (time.time()-t0)/100
   
-  x_ = s.output()
+  x_ = s.getOutput()
 
   print ""
   print name

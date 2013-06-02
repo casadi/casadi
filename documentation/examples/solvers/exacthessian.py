@@ -57,7 +57,7 @@ solver.setInput([0],"lbg")
 solver.setInput([1],"ubg")
 solver.solve()
 
-for sol in array(solver.output()):
+for sol in array(solver.getOutput()):
   print "%.15f" % sol
 
 #! To compare the behaviour of convergence, we solve the same problem without exact hessian
@@ -69,6 +69,6 @@ solver.setInput([0],"lbg")
 solver.setInput([1],"ubg")
 solver.solve()
 
-for sol in array(solver.output()):
+for sol in array(solver.getOutput()):
   print "%.15f" % sol
 

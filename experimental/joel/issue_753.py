@@ -31,7 +31,7 @@ for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
   f.init()
   print Function
   inputss = [sym("i",f.input(i).sparsity()) for i in range(f.getNumInputs()) ]
-  fseeds = [[ sym("f",remove00(f.input(i)).sparsity()) for i in range(f.getNumInputs())] for d in range(ndir)]
+  fseeds = [[ sym("f",remove00(f.getInput(i)).sparsity()) for i in range(f.getNumInputs())] for d in range(ndir)]
   aseeds = [[ sym("a",f.output(i).sparsity()) for i in range(f.getNumOutputs()) ] for d in range(ndir)]
 
   res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
@@ -63,7 +63,7 @@ for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
 
   storage2.append([vf2.getOutput(i) for i in range(vf2.getNumOutputs())])
 
-  #print vf2.output(24)
+  #print vf2.getOutput(24)
 
 print "first-order"
 for k,(a,b) in enumerate(zip(storage[0],storage[1])):

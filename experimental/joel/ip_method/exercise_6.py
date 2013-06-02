@@ -53,17 +53,17 @@ for solver in ['ipopt','ip_method']:
   
   # Solve the NLP
   nlp_solver.setInput(x0,"x0")
-  nlp_solver.input("ubx").setAll(N.inf)
+  nlp_solver.setInput(N.inf,"ubx")
   nlp_solver.input("lbx").setZero()
   nlp_solver.setInput(b,"lbg")
   nlp_solver.setInput(b,"ubg")  
   nlp_solver.solve()
   
   # Print the solution
-  print "Solution for ", solver, ": ", nlp_solver.output("x_opt")
+  print "Solution for ", solver, ": ", nlp_solver.getOutput("x_opt")
   
   # Check if feasible
-  print "Residual = ", mul(A,nlp_solver.output("x_opt"))-b
+  print "Residual = ", mul(A,nlp_solver.getOutput("x_opt"))-b
 
 
 

@@ -104,14 +104,14 @@ for j in range(d+1):
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
   lfcn.setInput(1.0)
   lfcn.evaluate()
-  D[j] = lfcn.output()
+  D[j] = lfcn.getOutput()
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   for r in range(d+1):
     lfcn.setInput(tau_root[r])
     lfcn.setFwdSeed(1.0)
     lfcn.evaluate(1,0)
-    C[j,r] = lfcn.fwdSens()
+    C[j,r] = lfcn.getFwdSens()
 
 # Total number of variables
 NX = nk*(d+1)*nx      # Collocated states
@@ -233,10 +233,10 @@ solver.setInput(NP.concatenate(ubg),"ubg")
 solver.solve()
 
 # Print the optimal cost
-print "optimal cost: ", float(solver.output("f"))
+print "optimal cost: ", float(solver.getOutput("f"))
 
 # Retrieve the solution
-v_opt = NP.array(solver.output("x"))
+v_opt = NP.array(solver.getOutput("x"))
 
 # Get values at the beginning of each finite element
 x0_opt = v_opt[0::(d+1)*nx+nu]

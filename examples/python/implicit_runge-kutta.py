@@ -81,14 +81,14 @@ for j in range(d+1):
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
   lfcn.setInput(1.0)
   lfcn.evaluate()
-  D[j] = lfcn.output()
+  D[j] = lfcn.getOutput()
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   for r in range(d+1):
     lfcn.setInput(tau_root[r])
     lfcn.setFwdSeed(1.0)
     lfcn.evaluate(1,0)
-    C[j,r] = lfcn.fwdSens()
+    C[j,r] = lfcn.getFwdSens()
 
 # Total number of variables for one finite element
 X0 = msym("X0",nx)
@@ -183,13 +183,13 @@ for integrator in (irk_integrator,ref_integrator):
   integrator.evaluate(2,1)
 
   # Get the nondifferentiated results
-  print "%15s = " % "xf", integrator.output("xf")
+  print "%15s = " % "xf", integrator.getOutput("xf")
 
   # Get the forward sensitivities
-  print "%15s = " % "d(xf)/d(p)", integrator.fwdSens("xf",0)
-  print "%15s = " % "d(xf)/d(x0[0])", integrator.fwdSens("xf",1)
+  print "%15s = " % "d(xf)/d(p)", integrator.getFwdSens("xf",0)
+  print "%15s = " % "d(xf)/d(x0[0])", integrator.getFwdSens("xf",1)
 
   # Get the adjoint sensitivities
-  print "%15s = " % "d(xf[2])/d(x0)", integrator.adjSens("x0")
-  print "%15s = " % "d(xf[2])/d(p)", integrator.adjSens("p")
+  print "%15s = " % "d(xf[2])/d(x0)", integrator.getAdjSens("x0")
+  print "%15s = " % "d(xf[2])/d(p)", integrator.getAdjSens("p")
 

@@ -88,7 +88,7 @@ solver.setInput(NP.zeros(2),"ubg")
 solver.solve()
 
 # Retrieve the solution
-u_opt = NP.array(solver.output("x"))
+u_opt = NP.array(solver.getOutput("x"))
 
 # Time grid
 tgrid_x = NP.linspace(0,10,nk+1)

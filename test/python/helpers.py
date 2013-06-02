@@ -257,11 +257,11 @@ class casadiTestCase(unittest.TestCase):
     for i in range(trial.getNumInputs()):
       if (allow_empty and (trial.input(i).empty() or solution.input(i).empty() )): continue
       message = "input(%d)" % i
-      if verbose: print message + ": " + str(trial.input(i))
-      self.checkarray(trial.input(i),solution.input(i),"",digits=digits,failmessage=failmessage+": "+ message)
+      if verbose: print message + ": " + str(trial.getInput(i))
+      self.checkarray(trial.getInput(i),solution.getInput(i),"",digits=digits,failmessage=failmessage+": "+ message)
 
-    trial_inputs    = [ DMatrix(trial.input(k)) for k in range(trial.getNumInputs())]
-    solution_inputs = [ DMatrix(solution.input(k)) for k in range(solution.getNumInputs())] 
+    trial_inputs    = [ DMatrix(trial.getInput(k)) for k in range(trial.getNumInputs())]
+    solution_inputs = [ DMatrix(solution.getInput(k)) for k in range(solution.getNumInputs())] 
 
     try:
       trial.evaluate(0,0)
@@ -271,17 +271,17 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.getNumInputs()):
       message = "input(%d) modified by evaluate" % i
-      self.checkarray(trial.input(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
-      self.checkarray(solution.input(i),solution_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
+      self.checkarray(trial.getInput(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
+      self.checkarray(solution.getInput(i),solution_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
 
     self.assertEqual(trial.getNumOutputs(),solution.getNumOutputs(),failmessage+": trial has %d outputs while solution has %d." % (trial.getNumOutputs(),solution.getNumOutputs()) )
     self.assertEqual(trial.getNumInputs(),solution.getNumInputs(),failmessage+": trial has %d inputs while solution has %d." % (trial.getNumInputs(),solution.getNumInputs()) )
 
     for i in range(trial.getNumOutputs()):
       message = "output(%d)" % i
-      if verbose: print message + ": " + str(trial.output(i))
+      if verbose: print message + ": " + str(trial.getOutput(i))
       if (allow_empty and (trial.output(i).empty() or solution.output(i).empty() )): continue
-      self.checkarray(trial.output(i),solution.output(i),"",digits=digits,failmessage=failmessage+": "+message)
+      self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
       
     try:
       trial.evaluate(0,0)
@@ -291,24 +291,24 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.getNumInputs()):
       message = "input(%d) modified by repeated evaluate" % i
-      self.checkarray(trial.input(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
-      self.checkarray(solution.input(i),solution_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
+      self.checkarray(trial.getInput(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
+      self.checkarray(solution.getInput(i),solution_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
 
     self.assertEqual(trial.getNumOutputs(),solution.getNumOutputs(),failmessage+": trial has %d outputs while solution has %d." % (trial.getNumOutputs(),solution.getNumOutputs()) )
     self.assertEqual(trial.getNumInputs(),solution.getNumInputs(),failmessage+": trial has %d inputs while solution has %d." % (trial.getNumInputs(),solution.getNumInputs()) )
 
     for i in range(trial.getNumOutputs()):
       message = "output(%d)" % i
-      if verbose: print message + ": " + str(trial.output(i))
+      if verbose: print message + ": " + str(trial.getOutput(i))
       if (allow_empty and (trial.output(i).empty() or solution.output(i).empty() )): continue
-      self.checkarray(trial.output(i),solution.output(i),"",digits=digits,failmessage=failmessage+": "+message)
+      self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
     
     if fwd:
       fsm = 1.7
       for i in range(trial.getNumInputs()):
         for j in range(min(trial.input(i).size(),solution.input(i).size())):
-          trial.fwdSeed(i).setAll(0)
-          solution.fwdSeed(i).setAll(0)
+          trial.setFwdSeed(0,i)
+          solution.setFwdSeed(0,i)
           trial.fwdSeed(i)[j]=fsm
           solution.fwdSeed(i)[j]=fsm
           
@@ -321,18 +321,18 @@ class casadiTestCase(unittest.TestCase):
           for k in range(trial.getNumOutputs()):
             if (allow_empty and (trial.output(k).empty() or solution.output(k).empty() )): continue
             message="fwdSeed(%d)[%d]=1 => fwdSens(%d)" % (i,j,k)
-            if verbose: print message + ": " + str(trial.fwdSens(k))
-            self.checkarray(trial.fwdSens(k),solution.fwdSens(k),"",digits=digits_sens,failmessage=failmessage+": "+message)
+            if verbose: print message + ": " + str(trial.getFwdSens(k))
+            self.checkarray(trial.getFwdSens(k),solution.getFwdSens(k),"",digits=digits_sens,failmessage=failmessage+": "+message)
             
-          trial.fwdSeed(i).setAll(0)
-          solution.fwdSeed(i).setAll(0)
+          trial.setFwdSeed(0,i)
+          solution.setFwdSeed(0,i)
         
     if adj:
       asm = 1.7
       for i in range(trial.getNumOutputs()):
         for j in range(min(trial.output(i).size(),solution.output(i).size())):
-          trial.adjSeed(i).setAll(0)
-          solution.adjSeed(i).setAll(0)
+          trial.setAdjSeed(0,i)
+          solution.setAdjSeed(0,i)
           trial.adjSeed(i)[j]=asm
           solution.adjSeed(i)[j]=asm
           
@@ -345,16 +345,16 @@ class casadiTestCase(unittest.TestCase):
           for k in range(trial.getNumInputs()):
             if (allow_empty and (trial.input(k).empty() or solution.input(k).empty() )): continue
             message="adjSeed(%d)[%d]=1 => adjSens(%d)" % (i,j,k)
-            if verbose: print message + ": " + str(trial.adjSens(k))
-            self.checkarray(trial.adjSens(k),solution.adjSens(k),"",digits=digits_sens,failmessage=failmessage+": "+message)
+            if verbose: print message + ": " + str(trial.getAdjSens(k))
+            self.checkarray(trial.getAdjSens(k),solution.getAdjSens(k),"",digits=digits_sens,failmessage=failmessage+": "+message)
             
-          trial.adjSeed(i).setAll(0)
-          solution.adjSeed(i).setAll(0)
+          trial.setAdjSeed(0,i)
+          solution.setAdjSeed(0,i)
 
     for i in range(trial.getNumInputs()):
       message = "input(%d) modified by evaluate" % i
-      self.checkarray(trial.input(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
-      self.checkarray(solution.input(i),solution_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
+      self.checkarray(trial.getInput(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
+      self.checkarray(solution.getInput(i),solution_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
     
     if jacobian:
       for i in range(trial.getNumInputs()):

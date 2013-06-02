@@ -326,7 +326,7 @@ class SXtests(casadiTestCase):
     J.setInput(L)
     J.evaluate()
     Jr=matrix([[1,1],[3,2],[4,27]])
-    self.checkarray(J.output(0),Jr,"SXfunction jacobian evaluates incorrectly")
+    self.checkarray(J.getOutput(0),Jr,"SXfunction jacobian evaluates incorrectly")
           
   def test_SX2(self):
     self.message("SXFunction evalution + forward and adjoint seeds")
@@ -444,7 +444,7 @@ class SXtests(casadiTestCase):
         T2 = t2!=0
         f.setInput([t1,t2])
         f.evaluate()
-        self.checkarray(f.output(),DMatrix([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f.output())))
+        self.checkarray(f.getOutput(),DMatrix([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f.getOutput())))
 
   def test_SXineq(self):
     self.message("SX ineq")
@@ -462,7 +462,7 @@ class SXtests(casadiTestCase):
         T2 = t2
         f.setInput([t1,t2])
         f.evaluate()
-        self.checkarray(f.output(),DMatrix([T1 < T2,T1 <= T2, T1 >= T2, T1 == T2, T1 != T2]),"ineq(%d,%d)" % (t1,t2))
+        self.checkarray(f.getOutput(),DMatrix([T1 < T2,T1 <= T2, T1 >= T2, T1 == T2, T1 != T2]),"ineq(%d,%d)" % (t1,t2))
 
     
     
@@ -596,7 +596,7 @@ class SXtests(casadiTestCase):
       for n,r in zip(nums,reference):
         f.setInput(n)
         f.evaluate()
-        self.assertEqual(f.output()[0],r)
+        self.assertEqual(f.getOutput()[0],r)
     
     test(casadi.sign,"sign",nums,[-1,-1,-1,-1,-1,0,1,1,1,1,1])
     test(casadi.heaviside,"heaviside",nums,[0,0,0,0,0,0.5,1,1,1,1,1])
@@ -621,7 +621,7 @@ class SXtests(casadiTestCase):
       f.setInput(x_,0)
       f.setInput(a_,1)
       f.evaluate()
-      self.assertAlmostEqual(f.output()[0],r,10)
+      self.assertAlmostEqual(f.getOutput()[0],r,10)
     
     test(taylor(sin(x),x,a,0),sin(a_))
     test(taylor(sin(x),x,a,1),sin(a_)+cos(a_)*(x_-a_))
@@ -635,7 +635,7 @@ class SXtests(casadiTestCase):
     f.setInput(x_,0)
     f.setInput(a_,1)
     f.evaluate()
-    self.checkarray(f.output(),matrix([[x_*a_,a_],[1+a_*x_,0],[1,0]]),"taylor on dense matrices")
+    self.checkarray(f.getOutput(),matrix([[x_*a_,a_],[1+a_*x_,0],[1,0]]),"taylor on dense matrices")
     
   def test_null(self):
     self.message("SXFunction null")
@@ -692,7 +692,7 @@ class SXtests(casadiTestCase):
       f.setInput([x_,y_],0)
       f.setInput([a_,b_],1)
       f.evaluate()
-      self.assertAlmostEqual(f.output()[0],r,10)
+      self.assertAlmostEqual(f.getOutput()[0],r,10)
     
     test(mtaylor(sin(x+y),vertcat([x,y]),vertcat([a,b]),0),sin(a_+b_))
     test(mtaylor(sin(x+y),vertcat([x,y]),vertcat([a,b]),1),sin(a_+b_)+(cos(b_+a_)*(x_-a_)+cos(b_+a_)*(y_-b_)))
@@ -726,8 +726,8 @@ class SXtests(casadiTestCase):
     f.setFwdSeed([1])
     f.setAdjSeed([1])
     f.evaluate(1,1)
-    self.checkarray(f.fwdSens(),-2,"regression")
-    self.checkarray(f.adjSens(),-2,"regression")
+    self.checkarray(f.getFwdSens(),-2,"regression")
+    self.checkarray(f.getAdjSens(),-2,"regression")
     
     
     y=SX("y")
@@ -740,8 +740,8 @@ class SXtests(casadiTestCase):
     f.setAdjSeed([1])
     f.evaluate(1,1)
 
-    self.assertTrue(isnan(f.fwdSens()[0]))
-    self.assertTrue(isnan(f.adjSens()[1]))
+    self.assertTrue(isnan(f.getFwdSens()[0]))
+    self.assertTrue(isnan(f.getAdjSens()[1]))
 
     y=SX("y")
     
@@ -752,8 +752,8 @@ class SXtests(casadiTestCase):
     f.setFwdSeed([1,0])
     f.setAdjSeed([1])
     f.evaluate(1,1)
-    self.checkarray(f.fwdSens(),-2,"regression")
-    self.checkarray(f.adjSens()[0],-2,"regression")
+    self.checkarray(f.getFwdSens(),-2,"regression")
+    self.checkarray(f.getAdjSens()[0],-2,"regression")
 
   def test_issue107(self):
     self.message("Regression test for issue 107: +=")
@@ -915,7 +915,7 @@ class SXtests(casadiTestCase):
       f.init()
       f.setInput(0.3)
       f.evaluate()
-      self.checkarray(f.output(),array(op(0.3)),"simplifications")
+      self.checkarray(f.getOutput(),array(op(0.3)),"simplifications")
       self.assertEqual(str(y),"x")
       
       y = op(-x)
@@ -923,7 +923,7 @@ class SXtests(casadiTestCase):
       f.init()
       f.setInput(0.3)
       f.evaluate()
-      self.checkarray(f.output(),array(op(-0.3)),"simplifications")
+      self.checkarray(f.getOutput(),array(op(-0.3)),"simplifications")
       self.assertEqual(str(y),"(-x)")
 
   def test_evalf(self):
@@ -963,10 +963,10 @@ class SXtests(casadiTestCase):
     f.init()
     f.setInput(1)
     f.evaluate()
-    self.assertTrue(f.output()==1,"if_else")
+    self.assertTrue(f.getOutput()==1,"if_else")
     f.setInput(0)
     f.evaluate()
-    self.assertTrue(f.output()==2,"if_else")
+    self.assertTrue(f.getOutput()==2,"if_else")
     
     # Check sensitivities
     
@@ -979,9 +979,9 @@ class SXtests(casadiTestCase):
     f.setFwdSeed(dx)
     f.setAdjSeed(dx)
     f.evaluate(1,1)
-    self.checkarray(f.output(),x0**2,"if_else sens")
-    self.checkarray(f.fwdSens(),2*x0*dx,"if_else sens")
-    self.checkarray(f.adjSens(),2*x0*dx,"if_else sens")
+    self.checkarray(f.getOutput(),x0**2,"if_else sens")
+    self.checkarray(f.getFwdSens(),2*x0*dx,"if_else sens")
+    self.checkarray(f.getAdjSens(),2*x0*dx,"if_else sens")
     
     x0 = -2.1
     dx = 0.3
@@ -990,9 +990,9 @@ class SXtests(casadiTestCase):
     f.setFwdSeed(dx)
     f.setAdjSeed(dx)
     f.evaluate(1,1)
-    self.checkarray(f.output(),x0**3,"if_else sens")
-    self.checkarray(f.fwdSens(),3*(-x0)**2*dx,"if_else sens")
-    self.checkarray(f.adjSens(),3*(-x0)**2*dx,"if_else sens")
+    self.checkarray(f.getOutput(),x0**3,"if_else sens")
+    self.checkarray(f.getFwdSens(),3*(-x0)**2*dx,"if_else sens")
+    self.checkarray(f.getAdjSens(),3*(-x0)**2*dx,"if_else sens")
     
   def test_issue548(self):
     x = ssym('x',100)

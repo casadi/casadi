@@ -73,8 +73,8 @@ f.setInput(P_,"p")
 f.setInput(X_,"x")
 f.setInput(Z_,"z")
 f.evaluate()
-print f.output("ode") # This should be same as XDOT_
-print f.output("alg") # This should be all zeros
+print f.getOutput("ode") # This should be same as XDOT_
+print f.getOutput("alg") # This should be all zeros
 
 
 #! Let's check our jacobian $\frac{dg}{dy}$:
@@ -123,8 +123,8 @@ f.setInput(P_,"p")
 f.setInput(X_,"x")
 f.setInput(Z_,"z")
 f.evaluate()
-print f.output("ode") # This should be the same as XDOT_
-print f.output("alg") # This should be all zeros
+print f.getOutput("ode") # This should be the same as XDOT_
+print f.getOutput("alg") # This should be all zeros
 
 #! Let's check our jacobian:
 j = f.jacobian("z","alg")
@@ -134,7 +134,7 @@ j.setInput(P_,"p")
 j.setInput(X_,"x")
 j.setInput(Z_,"z")
 j.evaluate()
-print array(j.output())
+print array(j.getOutput())
 #! $\frac{dg}{dy}$ is invertible this time.
 
 #! We create a DAE system solver
@@ -150,7 +150,7 @@ I.setInput(P_,"p")
 I.setInput(X_,"x0")
 I.evaluate()
 
-print I.output("xf")
+print I.getOutput("xf")
 
 
 #! Possible problems

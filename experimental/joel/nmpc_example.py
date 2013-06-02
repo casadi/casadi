@@ -52,7 +52,7 @@ S.solve()
 
 # Visualize the trajectory
 from matplotlib.pylab import *
-u = S.output("x")
+u = S.getOutput("x")
 plot(u)
 x = DMatrix(0.30)
 for k in range(30):

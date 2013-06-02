@@ -250,7 +250,7 @@ solver.setInput(NP.concatenate(g_max),"ubg")
 solver.solve()
 
 # Retrieve the solution
-v_opt = NP.array(solver.output("x"))
+v_opt = NP.array(solver.getOutput("x"))
 
 # Get values at the beginning of each finite element
 tgrid_u = NP.linspace(0,tf,nk)

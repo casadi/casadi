@@ -123,14 +123,14 @@ class Misctests(casadiTestCase):
 
     f = SXFunction([x],[2*x])
     f.init()
-    f.input(0).setAll(2)
+    f.setInput(2,0)
     g = SXFunction(f)
 
     f.setInput(5,0)
     f.evaluate()
 
-    self.assertEqual(g.input(0),5)
-    self.assertEqual(g.output(),10)
+    self.assertEqual(g.getInput(0),5)
+    self.assertEqual(g.getOutput(),10)
 
     
   def test_copy_norefcount(self):
@@ -167,14 +167,14 @@ class Misctests(casadiTestCase):
 
     f = SXFunction([x],[2*x])
     f.init()
-    f.input(0).setAll(2)
+    f.setInput(2,0)
     g = copy.copy(f)
 
     f.setInput(5,0)
     f.evaluate()
 
-    self.assertEqual(g.input(0),5)
-    self.assertEqual(g.output(),10)
+    self.assertEqual(g.getInput(0),5)
+    self.assertEqual(g.getOutput(),10)
     
   def test_deepcopy_norefcount(self):
     self.message("Deep copy for non-refcounted classes")
@@ -210,14 +210,14 @@ class Misctests(casadiTestCase):
 
     f = SXFunction([x],[2*x])
     f.init()
-    f.input(0).setAll(2)
+    f.setInput(2,0)
     g = copy.deepcopy(f)
 
     f.setInput(5,0)
     f.evaluate()
 
-    self.assertEqual(g.input(0),2)
-    self.assertEqual(g.output(),0)
+    self.assertEqual(g.getInput(0),2)
+    self.assertEqual(g.getOutput(),0)
 
   @requires("IpoptSolver")
   def test_options_introspection(self):

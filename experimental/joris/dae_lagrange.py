@@ -167,7 +167,7 @@ dae.setInput(dx_,"ydot")
 dae.setInput(p_,"p")
 
 dae.evaluate()
-print "res @ inital consitions: ", dae.output()
+print "res @ inital consitions: ", dae.getOutput()
 
 integr = IdasIntegrator(dae)
 #integr.setOption('is_differential',[1]*4 + [0])
@@ -177,5 +177,5 @@ integr.setInput(p_,"p")
 integr.setInput(dx_,"xp0")
 integr.evaluate()
 
-print integr.output()
+print integr.getOutput()
 

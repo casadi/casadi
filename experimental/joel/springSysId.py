@@ -177,9 +177,9 @@ def idSystem(makePlots=False):
         integrator.setInput(     xNext, C.INTEGRATOR_X0 )
         integrator.evaluate()
     
-        xNext = list(integrator.output())
-        x     = list(integrator.output())
-        y     = list(integrator.output())
+        xNext = list(integrator.getOutput())
+        x     = list(integrator.getOutput())
+        y     = list(integrator.getOutput())
     
         # state record
         w = N.random.multivariate_normal([0,0], Q)
@@ -279,7 +279,7 @@ def idSystem(makePlots=False):
     solver.solve()
     
     # Get the solution
-    xopt = solver.output(C.NLP_SOLVER_X)
+    xopt = solver.getOutput(C.NLP_SOLVER_X)
     
     # estimated parameters:
     print ""

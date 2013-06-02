@@ -67,12 +67,12 @@ print f.outputExpr(), type(f.outputExpr())
 f.init()
 f.setInput(2)
 f.evaluate()
-print f.output()
-print type(f.output())
+print f.getOutput()
+print type(f.getOutput())
 #! Reevaluation does not require the init call.
 f.setInput(3)
 f.evaluate()
-print f.output()
+print f.getOutput()
 #! We can evaluate symbolically, too:
 print f.eval([y])
 #! Since numbers get cast to SXConstant object, you can also write the following non-efficient code:
@@ -91,7 +91,7 @@ f.setInput(2,0)
 f.setInput(3,1)
 f.evaluate()
 
-print [f.output(i) for i in range(2)]
+print [f.getOutput(i) for i in range(2)]
 print [[f.grad(i,j) for i in range(2)] for j in range(2)]
 
 #! Symbolic function manipulation
@@ -126,7 +126,7 @@ print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
 f.init()
 f.setInput([2,3])
 f.evaluate()
-print f.output()
+print f.getOutput()
 G=f.jac().T
 print G
 
@@ -137,7 +137,7 @@ f.init()
 f.setInput([2,3])
 f.setFwdSeed([7,6]) # p
 f.evaluate(1,0) # evaluate(int fsens_order=0, int asens_order=0)
-print f.fwdSens() # v
+print f.getFwdSens() # v
 #! Functions with matrix valued input
 #! ----------------------------------
 x = ssym("x",2,2)
@@ -151,7 +151,7 @@ f.init()
 f.setInput([1,2,3,4],0); # instead of f.setInput([[1,2],[3,4]],0);
 f.setInput([4,5,6,7],1);
 f.evaluate()
-print f.output()
+print f.getOutput()
 print f.jac(0).T
 print f.jac(1).T
 

@@ -86,7 +86,7 @@ simulator.setInput(pq0, "p")
 simulator.evaluate()
 
 plt.clf()
-plt.plot(tgrid,simulator.output())
+plt.plot(tgrid,simulator.getOutput())
 plt.legend(('differential state', 'algebraic state'))
 plt.grid(True)
 plt.show()

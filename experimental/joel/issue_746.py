@@ -17,10 +17,10 @@ for f in f1,f2:
   f.evaluate(1,0)
 
 print "These should be the same: "
-print f1.output(), f2.output()
+print f1.getOutput(), f2.getOutput()
 
 print "These should be the same: "
-print f1.fwdSens(), f2.fwdSens()
+print f1.getFwdSens(), f2.getFwdSens()
 
 inputs = [msym("x",2)]
 fseeds = [[msym("fseed",2)]]
@@ -38,4 +38,4 @@ for f in f1,f2:
 
   fs.evaluate()
 
-  print fs.output()
+  print fs.getOutput()

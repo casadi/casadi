@@ -888,7 +888,7 @@ class Toolstests(casadiTestCase):
     f.setInput(range(6))
     f.evaluate()
     
-    self.checkarray(f.output(),DMatrix([[0,1,3],[1,2,4],[3,4,5]]))
+    self.checkarray(f.getOutput(),DMatrix([[0,1,3],[1,2,4],[3,4,5]]))
     self.checkarray(b["P"],DMatrix([[0,3,6],[3,4,7],[6,7,8]]))
     self.checkarray(b.cat,DMatrix([0,3,4,6,7,8]))
     

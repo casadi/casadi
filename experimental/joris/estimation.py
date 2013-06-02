@@ -112,14 +112,14 @@ sim.evaluate()
 
 tsf = sim.getGrid()  # The fine time grid of the controlsimulator
 
-reference_imu = sim.input("v")
-reference_Xf   = sim.output()[:,states.i_X.T]
+reference_imu = sim.getInput("v")
+reference_Xf   = sim.getOutput()[:,states.i_X.T]
 
 reference_X   = reference_Xf[sim.getCoarseIndex(),:]
 
 Rf = SXFunction([states.q],[vec(R)])
 Rf.init()
-reference_Rf = numSample1D(Rf,sim.output()[:,states.i_q.T].T).T
+reference_Rf = numSample1D(Rf,sim.getOutput()[:,states.i_q.T].T).T
 reference_R   = reference_Rf[sim.getCoarseIndex(),:]
 # End of generating dummy excitations
 
@@ -219,11 +219,11 @@ class NLPSolutionInspector:
     if self.i>0:
       self.log[0,self.i] = log10(f.getStats()['inf_pr'])
       self.log[1,self.i] = log10(f.getStats()['inf_du'])
-      self.log[2,self.i] = float(log10(f.input("f")))
+      self.log[2,self.i] = float(log10(f.getInput("f")))
       self.log[3,self.i] = f.getStats()['ls_trials']
       
     self.i += 1
-    sol = f.input("x")
+    sol = f.getInput("x")
     X_opt = horzcat([sol[i][states.i_X,:] for i in optvar.i_X])
     q_opt = horzcat([sol[i][states.i_q,:] for i in optvar.i_X])
     R_opt = numSample1D(Rf,q_opt)
@@ -274,11 +274,11 @@ nlp.solve()
 for i in range(nk):  # intialize with (0,0,0,1) quaternion
   nlp.input("x0")[optvar.i_X[i][states.i_q[3],:]] = 1
 nlp.setInput(par.veccat_(),"p")
-nlp.input("lbg").setAll(0)
-nlp.input("ubg").setAll(0)
+nlp.setInput(0,"lbg")
+nlp.setInput(0,"ubg")
 nlp.solve()
 
-sol = nlp.output()
+sol = nlp.getOutput()
 
 X_opt = horzcat([sol[i][states.i_X,:] for i in optvar.i_X])
 

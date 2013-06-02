@@ -28,7 +28,7 @@ from casadi import *
 #! We start with a python function with CFunctionWrapper-like arguments
 #! The function calculates the factorial of its input
 def fac(f,nfwd,nadj,userdata):
-  x = f.input()[0,0]
+  x = f.getInput()[0,0]
   y = 1
   for i in range(x):
     y*=(i+1)
@@ -70,7 +70,7 @@ print "5! = ", c.output().toScalar()
 def dummy(f,nfwd,nadj,userdata):
   print "userdata: " , userdata
   if nfwd>0:
-    print f.fwdSeed()
+    print f.getFwdSeed()
   
 c = PyFunction(dummy, [sp_dense(3,1)], [sp_dense(3,1)] )
 c.init()
@@ -79,7 +79,7 @@ c.setUserData(12345)
 c.evaluate(0,0)
 
 #! Of course, since we don't alter f.output, the result is meaningless
-print c.output()
+print c.getOutput()
 
 
 #! Providing sensitivities
@@ -90,20 +90,20 @@ print c.output()
 #! Our function must accomodate this.
 def squares(f,nfwd,nadj,userdata):
   print "Called squares with :", (nfwd,nadj)
-  x = f.input(0)[0]
-  y = f.input(0)[1]
+  x = f.getInput(0)[0]
+  y = f.getInput(0)[1]
 
-  f.setOutput(f.input(0)**2,0)
-  f.setOutput(f.input(0)**2,0)
+  f.setOutput(f.getInput(0)**2,0)
+  f.setOutput(f.getInput(0)**2,0)
   
   for i in range(nfwd):
-    xdot = f.fwdSeed(0,i)[0]
-    ydot = f.fwdSeed(0,i)[1]
+    xdot = f.getFwdSeed(0,i)[0]
+    ydot = f.getFwdSeed(0,i)[1]
     f.setFwdSens([2*x*xdot+ydot,y*xdot+x*ydot],0,i)
     
   for i in range(nadj):
-    xb = f.adjSeed(0,i)[0]
-    yb = f.adjSeed(0,i)[1]
+    xb = f.getAdjSeed(0,i)[0]
+    yb = f.getAdjSeed(0,i)[1]
     f.setAdjSens([2*x*xb+y*yb,xb+x*yb],0,i)
     
 c = PyFunction( squares, [sp_dense(2,1)], [sp_dense(2,1)] )
@@ -116,7 +116,7 @@ J.init()
 J.setInput([3,5])
 J.evaluate()
 
-print J.output()
+print J.getOutput()
 
 #! Forcing ad_mode is currently non-functional. See https://github.com/casadi/casadi/issues/614
 c.setOption("ad_mode","reverse")
@@ -126,7 +126,7 @@ J.init()
 J.setInput([3,5])
 J.evaluate()
 
-print J.output()
+print J.getOutput()
 
 
 

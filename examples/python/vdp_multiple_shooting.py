@@ -130,14 +130,14 @@ solver.setInput(NP.concatenate(g_max),"ubg")
 solver.solve()
 
 # Retrieve the solution
-v_opt = solver.output("x")
+v_opt = solver.getOutput("x")
 u_opt = v_opt[0:nk]
 x0_opt = v_opt[nk+0::3]
 x1_opt = v_opt[nk+1::3]
 x2_opt = v_opt[nk+2::3]
 
 # Retrieve the solution
-v_opt = NP.array(solver.output("x"))
+v_opt = NP.array(solver.getOutput("x"))
 
 # Get values at the beginning of each finite element
 tgrid_x = NP.linspace(0,10,nk+1)

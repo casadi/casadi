@@ -32,12 +32,12 @@ from casadi.tools import *
 #!
 #!    f = MXFunction([V],[ V[214] ])  # time
 #!    ...
-#!    x_opt = solver.output()[::5]    # Obtain all optimized x's
+#!    x_opt = solver.getOutput()[::5]    # Obtain all optimized x's
 #!
 #!  and replace it with
 #!    f = MXFunction([V],[ V["T"] ])
 #!    ...
-#!    shooting(solver.output())["x",:]
+#!    shooting(solver.getOutput())["x",:]
 #!
 #! Introduction
 #! --------------------

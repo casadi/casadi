@@ -94,9 +94,9 @@ class Simulatortests(casadiTestCase):
     sim.setInput([num['p']],1)
     sim.evaluate()
 
-    self.checkarray(sim.output(),num['q0']*exp(tc**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
-    self.checkarray(sim.output(1),tc,"Evaluation output mismatch")
-    self.checkarray(sim.output(2),DMatrix.ones(tc.shape)*num['p'],"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(),num['q0']*exp(tc**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(1),tc,"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(2),DMatrix.ones(tc.shape)*num['p'],"Evaluation output mismatch")
     
     f=SXFunction(daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
     f.init()
@@ -114,9 +114,9 @@ class Simulatortests(casadiTestCase):
     sim.setInput([num['p']],1)
     sim.evaluate()
 
-    self.checkarray(sim.output(),num['q0']*exp(tc**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
-    self.checkarray(sim.output(1),tc,"Evaluation output mismatch")
-    self.checkarray(sim.output(2),DMatrix.ones(tc.shape)*num['p'],"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(),num['q0']*exp(tc**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(1),tc,"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(2),DMatrix.ones(tc.shape)*num['p'],"Evaluation output mismatch")
     
     out = SXFunction(daeIn(t=t, x=q),[q,t])
     out.init()
@@ -136,8 +136,8 @@ class Simulatortests(casadiTestCase):
     sim.setInput([num['q0']],0)
     sim.evaluate()
 
-    self.checkarray(sim.output(),num['q0']*exp(tc**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
-    self.checkarray(sim.output(1),tc,"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(),num['q0']*exp(tc**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(1),tc,"Evaluation output mismatch")
     
     f=SXFunction(daeIn(x=q),daeOut(ode=-q))
     f.init()
@@ -154,8 +154,8 @@ class Simulatortests(casadiTestCase):
     sim.setInput([num['q0']],0)
     sim.evaluate()
 
-    self.checkarray(sim.output(),num['q0']*exp(-tc),"Evaluation output mismatch",digits=9)
-    self.checkarray(sim.output(1),tc,"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(),num['q0']*exp(-tc),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(1),tc,"Evaluation output mismatch",digits=9)
     self.assertTrue(sim.output().sparsity()==sim.output(1).sparsity())
     
   def test_sim_outputs(self):
@@ -171,7 +171,7 @@ class Simulatortests(casadiTestCase):
     sim.setInput([num['p']],1)
     sim.evaluate()
 
-    self.checkarray(sim.output(),DMatrix(q0*exp(t**3/(3*p))),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(),DMatrix(q0*exp(t**3/(3*p))),"Evaluation output mismatch",digits=9)
 
     tv = SX("t")
     out = SXFunction(daeIn(t=tv),[tv])
@@ -183,7 +183,7 @@ class Simulatortests(casadiTestCase):
     sim.setInput([num['p']],1)
     sim.evaluate()
 
-    self.checkarray(sim.output(),t,"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(),t,"Evaluation output mismatch")
 
     pv = SX("p")
     out = SXFunction(daeIn(p=pv),[pv])
@@ -196,7 +196,7 @@ class Simulatortests(casadiTestCase):
     sim.evaluate()
 
     
-    self.checkarray(sim.output(),DMatrix.ones(sim.output().shape)*p,"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(),DMatrix.ones(sim.output().shape)*p,"Evaluation output mismatch")
 
     #yv = SX("y")
     #out = SXFunction(daeIn(),[yv])
@@ -208,8 +208,8 @@ class Simulatortests(casadiTestCase):
     #sim.setInput([num['p']],1)
     #sim.evaluate()
 
-    #self.checkarray(sim.output(),DMatrix.zeros(sim.output().shape),"INTEGRATOR_XPF unsupported",digits=9)
-    #self.checkarray(sim.output(),DMatrix((q0*t**2*exp(t**3/(3*p)))/p),"Evaluation output mismatch",digits=9)
+    #self.checkarray(sim.getOutput(),DMatrix.zeros(sim.output().shape),"INTEGRATOR_XPF unsupported",digits=9)
+    #self.checkarray(sim.getOutput(),DMatrix((q0*t**2*exp(t**3/(3*p)))/p),"Evaluation output mismatch",digits=9)
 
   def test_controlsim_inputs(self):
     self.message("ControlSimulator: inputs")
@@ -242,12 +242,12 @@ class Simulatortests(casadiTestCase):
     tf = DMatrix(sim.getMinorT())
 
 
-    self.checkarray(sim.output(),num['q0']*exp(tf**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
-    self.checkarray(sim.output(1),tf,"Evaluation output mismatch")
-    self.checkarray(sim.output(2),DMatrix.ones(tf.shape)*num['p'],"Evaluation output mismatch")
-    self.checkarray(sim.output(3),DMatrix([0,0,0,0,0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.24]),"Evaluation output mismatch")
-    self.checkarray(sim.output(4),DMatrix([0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.32,0.32,0.32,0.32,0.32]),"Evaluation output mismatch")
-    self.checkarray(sim.output(5),num['q0']*exp(sim.output(3)**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(),num['q0']*exp(tf**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(1),tf,"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(2),DMatrix.ones(tf.shape)*num['p'],"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(3),DMatrix([0,0,0,0,0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.24]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(4),DMatrix([0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.32,0.32,0.32,0.32,0.32]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(5),num['q0']*exp(sim.getOutput(3)**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
     
     
     #CasadiOptions.setCatchErrorsPython(False)
@@ -264,12 +264,12 @@ class Simulatortests(casadiTestCase):
     
     tf = DMatrix(sim.getMinorT())
 
-    self.checkarray(sim.output(),num['q0']*exp(tf**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
-    self.checkarray(sim.output(1),tf,"Evaluation output mismatch")
-    self.checkarray(sim.output(2),DMatrix.ones(tf.shape)*num['p'],"Evaluation output mismatch")
-    self.checkarray(sim.output(3),DMatrix([0,0,0,0,0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.24]),"Evaluation output mismatch")
-    self.checkarray(sim.output(4),DMatrix([0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.32,0.32,0.32,0.32,0.32]),"Evaluation output mismatch")
-    self.checkarray(sim.output(5),num['q0']*exp(sim.output(3)**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(),num['q0']*exp(tf**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(1),tf,"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(2),DMatrix.ones(tf.shape)*num['p'],"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(3),DMatrix([0,0,0,0,0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.24]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(4),DMatrix([0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.32,0.32,0.32,0.32,0.32]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(5),num['q0']*exp(sim.getOutput(3)**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
     
     out = SXFunction(controldaeIn(t=t, x=q, t0=t0, tf=tf_, x_major=qm),[q,t,t0,tf_,qm])
     out.init()
@@ -284,11 +284,11 @@ class Simulatortests(casadiTestCase):
     sim.setInput([num['q0']],"x0")
     sim.evaluate()
 
-    self.checkarray(sim.output(),num['q0']*exp(tf**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
-    self.checkarray(sim.output(1),tf,"Evaluation output mismatch")
-    self.checkarray(sim.output(2),DMatrix([0,0,0,0,0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.24]),"Evaluation output mismatch")
-    self.checkarray(sim.output(3),DMatrix([0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.32,0.32,0.32,0.32,0.32]),"Evaluation output mismatch")
-    self.checkarray(sim.output(4),num['q0']*exp(sim.output(2)**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(),num['q0']*exp(tf**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(1),tf,"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(2),DMatrix([0,0,0,0,0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.24]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(3),DMatrix([0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.32,0.32,0.32,0.32,0.32]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(4),num['q0']*exp(sim.getOutput(2)**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
     
     f=SXFunction(controldaeIn(x=q, x_major=qm),[-q])
     f.init()
@@ -301,11 +301,11 @@ class Simulatortests(casadiTestCase):
     sim.evaluate()
 
 
-    self.checkarray(sim.output(),num['q0']*exp(-tf),"Evaluation output mismatch",digits=9)
-    self.checkarray(sim.output(1),tf,"Evaluation output mismatch")
-    self.checkarray(sim.output(2),DMatrix([0,0,0,0,0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.24]),"Evaluation output mismatch")
-    self.checkarray(sim.output(3),DMatrix([0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.32,0.32,0.32,0.32,0.32]),"Evaluation output mismatch")
-    self.checkarray(sim.output(4),num['q0']*exp(-sim.output(2)),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(),num['q0']*exp(-tf),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(1),tf,"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(2),DMatrix([0,0,0,0,0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.24]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(3),DMatrix([0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.32,0.32,0.32,0.32,0.32]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(4),num['q0']*exp(-sim.getOutput(2)),"Evaluation output mismatch",digits=9)
 
   def test_controlsim_interpolation(self):
     q  = ssym("q")
@@ -359,9 +359,9 @@ class Simulatortests(casadiTestCase):
 
     tf = DMatrix(sim.getMinorT())
     
-    self.checkarray(sim.output(),q0*exp(-tf),"Evaluation output mismatch",digits=9)
-    self.checkarray(sim.output(1),DMatrix([0,0,0,0,0.1,0.1,0.1,0.1,0,0,0,0,0.2,0.2,0.2,0.2,0.2]),"Evaluation output mismatch")
-    self.checkarray(sim.output(2),DMatrix([0,0.025,0.05,0.075,0.1,0.075,0.05,0.025,0,0.05,0.1,0.15,0.2,0.2,0.2,0.2,0.2]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(),q0*exp(-tf),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(1),DMatrix([0,0,0,0,0.1,0.1,0.1,0.1,0,0,0,0,0.2,0.2,0.2,0.2,0.2]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(2),DMatrix([0,0.025,0.05,0.075,0.1,0.075,0.05,0.025,0,0.05,0.1,0.15,0.2,0.2,0.2,0.2,0.2]),"Evaluation output mismatch")
 
     out = SXFunction(controldaeIn(x=q, u=u, u_interp=ui),[q,u,ui])
     out.init()
@@ -380,9 +380,9 @@ class Simulatortests(casadiTestCase):
 
     tf = DMatrix(sim.getMinorT())
     
-    self.checkarray(sim.output(),q0*exp(-tf),"Evaluation output mismatch",digits=9)
-    self.checkarray(sim.output(1),DMatrix([0,0,0,0,0.1,0.1,0.1,0.1,0,0,0,0,0.2,0.2,0.2,0.2,0.2]),"Evaluation output mismatch")
-    self.checkarray(sim.output(2),DMatrix([0,0.025,0.05,0.075,0.1,0.075,0.05,0.025,0,0.05,0.1,0.15,0.2,0.15,0.1,0.05,0]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(),q0*exp(-tf),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(1),DMatrix([0,0,0,0,0.1,0.1,0.1,0.1,0,0,0,0,0.2,0.2,0.2,0.2,0.2]),"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(2),DMatrix([0,0.025,0.05,0.075,0.1,0.075,0.05,0.025,0,0.05,0.1,0.15,0.2,0.15,0.1,0.05,0]),"Evaluation output mismatch")
 
   def test_controlsim_outputs(self):
     self.message("CVodes integration: outputs")
@@ -404,7 +404,7 @@ class Simulatortests(casadiTestCase):
     
     tf = DMatrix(sim.getMinorT())
 
-    self.checkarray(sim.output(),num['q0']*exp(tf**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
+    self.checkarray(sim.getOutput(),num['q0']*exp(tf**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
 
 
   def test_simulator_time_offset(self):
@@ -421,7 +421,7 @@ class Simulatortests(casadiTestCase):
     q0=num['q0']
     p=num['p']
 
-    self.assertAlmostEqual(sim.output()[-1],q0*exp((tend**3-0.7**3)/(3*p)),9,"Evaluation output mismatch")
+    self.assertAlmostEqual(sim.getOutput()[-1],q0*exp((tend**3-0.7**3)/(3*p)),9,"Evaluation output mismatch")
     
     
   def test_simulator_sensitivities(self):
@@ -478,7 +478,7 @@ class Simulatortests(casadiTestCase):
       integrator.setFwdSeed([0,0],"p")
       integrator.evaluate(1,0)
       
-      fwdSens_int = DMatrix(integrator.fwdSens("xf"))
+      fwdSens_int = DMatrix(integrator.getFwdSens("xf"))
 
       ts = linspace(0,50,100)
 
@@ -490,7 +490,7 @@ class Simulatortests(casadiTestCase):
       sim.setFwdSeed([0,0],"p")
       sim.evaluate(1,0)
 
-      fwdSens_sim = DMatrix(sim.fwdSens("xf")[-1,:])
+      fwdSens_sim = DMatrix(sim.getFwdSens("xf")[-1,:])
       
       csim = ControlSimulator(cf,ts)
       csim.setOption("integrator",Integrator)
@@ -501,12 +501,12 @@ class Simulatortests(casadiTestCase):
       csim.setFwdSeed([1,0],"x0")
       csim.setFwdSeed([0,0],"p")
       csim.evaluate(1,0)
-      fwdSens_csim = DMatrix(csim.fwdSens("xf")[-1,:])
+      fwdSens_csim = DMatrix(csim.getFwdSens("xf")[-1,:])
       
       sol.setFwdSeed([1,0],1)
       sol.setFwdSeed([0,0],2)
       sol.evaluate(1,0)
-      fwdSens_exact = sol.fwdSens()
+      fwdSens_exact = sol.getFwdSens()
       
       #digits = 6
       #if (Integrator is IdasIntegrator):
@@ -523,23 +523,23 @@ class Simulatortests(casadiTestCase):
       integrator.setFwdSeed([1,0],"p")
       integrator.evaluate(1,0)
       
-      fwdSens_int = DMatrix(integrator.fwdSens("xf"))
+      fwdSens_int = DMatrix(integrator.getFwdSens("xf"))
       
       sim.setFwdSeed([0,0],"x0")
       sim.setFwdSeed([1,0],"p")
       sim.evaluate(1,0)
 
-      fwdSens_sim = DMatrix(sim.fwdSens("xf")[-1,:])
+      fwdSens_sim = DMatrix(sim.getFwdSens("xf")[-1,:])
 
       csim.setFwdSeed([0,0],"x0")
       csim.setFwdSeed([1,0],"p")
       csim.evaluate(1,0)
-      fwdSens_csim = DMatrix(sim.fwdSens("xf")[-1,:])
+      fwdSens_csim = DMatrix(sim.getFwdSens("xf")[-1,:])
       
       sol.setFwdSeed([0,0],1)
       sol.setFwdSeed([1,0],2)
       sol.evaluate(1,0)
-      fwdSens_exact = sol.fwdSens()
+      fwdSens_exact = sol.getFwdSens()
       
       #digits = 6
       #if (Integrator is IdasIntegrator):
@@ -611,8 +611,8 @@ class Simulatortests(casadiTestCase):
     integrator.setAdjSeed([1,0],"xf")
     integrator.evaluate(0,1)
     
-    adjSens_X0_int = DMatrix(integrator.adjSens("x0"))
-    adjSens_P_int = DMatrix(integrator.adjSens("p"))
+    adjSens_X0_int = DMatrix(integrator.getAdjSens("x0"))
+    adjSens_P_int = DMatrix(integrator.getAdjSens("p"))
 
     N = 100
     ts = linspace(0,Te,N)
@@ -624,8 +624,8 @@ class Simulatortests(casadiTestCase):
     sim.setAdjSeed([0,0]*(N-1) + [1,0],0)
     sim.evaluate(0,1)
 
-    adjSens_X0_sim = DMatrix(sim.adjSens("x0"))
-    adjSens_P_sim = DMatrix(sim.adjSens("p"))
+    adjSens_X0_sim = DMatrix(sim.getAdjSens("x0"))
+    adjSens_P_sim = DMatrix(sim.getAdjSens("p"))
 
     
     csim = ControlSimulator(cf,ts)
@@ -636,13 +636,13 @@ class Simulatortests(casadiTestCase):
     csim.setInput(p_,"p")
     csim.setAdjSeed([0,0]*(N-1) + [1,0],0)
     csim.evaluate(0,1)
-    adjSens_X0_csim = DMatrix(sim.adjSens("x0"))
-    adjSens_P_csim = DMatrix(sim.adjSens("p"))
+    adjSens_X0_csim = DMatrix(sim.getAdjSens("x0"))
+    adjSens_P_csim = DMatrix(sim.getAdjSens("p"))
     
     sol.setAdjSeed([1,0])
     sol.evaluate(0,1)
-    adjSens_X0_exact = sol.adjSens(1)
-    adjSens_P_exact = sol.adjSens(2)
+    adjSens_X0_exact = sol.getAdjSens(1)
+    adjSens_P_exact = sol.getAdjSens(2)
     
     digits = 3
 

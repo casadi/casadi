@@ -43,8 +43,8 @@ solver.setInput([10],"ubx")
 solver.solve()
 
 #! The solution is obviously 1:
-print solver.output()
-assert(abs(solver.output()[0]-1)<1e-9)
+print solver.getOutput()
+assert(abs(solver.getOutput()[0]-1)<1e-9)
 
 #! Constrained problem
 #! ============================
@@ -71,9 +71,9 @@ solver.setInput([1,2],"ubg")
 solver.solve()
 
 #! The solution is obviously [2,0.5,0.5,1,1]:
-print solver.output()
+print solver.getOutput()
 for (i,e) in zip(range(n),[2,0.5,0.5,1,1]):
-  assert(abs(solver.output()[i]-e)<1e-7)
+  assert(abs(solver.getOutput()[i]-e)<1e-7)
 
 
 #! Problem with parameters
@@ -96,14 +96,14 @@ solver.setInput([a_],"p")
 solver.solve()
 
 #! The solution is obviously a:
-print solver.output()
-assert(abs(solver.output()[0]-a_)<1e-9)
+print solver.getOutput()
+assert(abs(solver.getOutput()[0]-a_)<1e-9)
 
 #! The parameter can change inbetween two solve calls:
 solver.setInput([2*a_],"p")
 solver.solve()
 
 #! The solution is obviously 2*a:
-print solver.output()
-assert(abs(solver.output()[0]-2*a_)<1e-9)
+print solver.getOutput()
+assert(abs(solver.getOutput()[0]-2*a_)<1e-9)
 

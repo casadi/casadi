@@ -180,7 +180,7 @@ if __name__ == '__main__':
     solver.solve()
     
     # Get the solution
-    xopt = solver.output(C.NLP_SOLVER_X)
+    xopt = solver.getOutput(C.NLP_SOLVER_X)
 
     print ""
     print "optimal time: "+str(xopt[gliderOcp._getIdx('tEnd')])+" seconds"

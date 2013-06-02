@@ -273,12 +273,12 @@ class Sparsitytests(casadiTestCase):
     F.init()
     F.setInput(q,0)
     F.evaluate()
-    F_ = vec(F.output(0))
+    F_ = vec(F.getOutput(0))
 
     G = vec(F)
     G.setInput(vec(q),0)
     G.evaluate()
-    G_ = G.output()
+    G_ = G.getOutput()
 
     self.checkarray(F_,G_,"vec MX")
     
@@ -292,12 +292,12 @@ class Sparsitytests(casadiTestCase):
     F.init()
     F.setInput(q,0)
     F.evaluate()
-    F_ = vec(F.output(0))
+    F_ = vec(F.getOutput(0))
 
     G = vec(F)
     G.setInput(vec(q),0)
     G.evaluate()
-    G_ = G.output()
+    G_ = G.getOutput()
 
     self.checkarray(F_,G_,"vec SX")
     

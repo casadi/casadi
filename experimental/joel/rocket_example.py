@@ -124,7 +124,7 @@ solver.setInput(Gmax,"ubg")
 solver.solve()
 
 # Get the solution
-uopt = solver.output("x")
+uopt = solver.getOutput("x")
 
 # Plot the optimal trajectory
 tgrid = linspace(0,T,nu+1)
@@ -145,7 +145,7 @@ for k in range(nu):
   integrator.setInput(uopt[k],"p")
   integrator.setInput(x,"x0")
   integrator.evaluate()
-  x = integrator.output()
+  x = integrator.getOutput()
   sopt.append(x[0])
   vopt.append(x[1])
   mopt.append(x[2])

@@ -33,4 +33,4 @@ I.init()
 I.setInput([1,0],"x0")
 I.evaluate()
 
-print I.output()
+print I.getOutput()

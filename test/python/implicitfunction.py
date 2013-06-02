@@ -117,7 +117,7 @@ class NLPtests(casadiTestCase):
     solver.init()
     solver.setOutput(-6)
     solver.solve()
-    self.assertAlmostEqual(solver.output()[0],-2*pi,5)
+    self.assertAlmostEqual(solver.getOutput()[0],-2*pi,5)
     
 if __name__ == '__main__':
     unittest.main()

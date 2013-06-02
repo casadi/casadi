@@ -52,7 +52,7 @@ J1.setInput(x0)
 J1.evaluate()
 print "J1.output().size() = ", J1.output().size()
 print "J1.output().numel() = ", J1.output().numel()
-print "J1(x0)", array(J1.output())
+print "J1(x0)", array(J1.getOutput())
 
 # create the jacobian using compression techniques
 J2 = Jacobian(fcn,iind,oind) # create a "Jacobian" function instance explicitly
@@ -62,9 +62,9 @@ J2.setInput(x0)
 J2.evaluate()
 print "J2.output().size() = ", J2.output().size()
 print "J2.output().numel() = ", J2.output().numel()
-print "J2(x0)", array(J2.output())
+print "J2(x0)", array(J2.getOutput())
 
 # Print difference
-print "Difference: ", J2.output()-J1.output()
-assert isEqual(J1.output(),J2.output())
+print "Difference: ", J2.getOutput()-J1.getOutput()
+assert isEqual(J1.getOutput(),J2.getOutput())
 

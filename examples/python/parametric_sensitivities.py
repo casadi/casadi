@@ -108,7 +108,7 @@ solver.evaluate()
   
 # Print the solution
 print "----"
-print "Minimal cost " , solver.output("f")
+print "Minimal cost " , solver.getOutput("f")
 print "----"
 
 print "Nominal solution"

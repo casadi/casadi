@@ -98,7 +98,7 @@ sim.evaluate()
 tf = sim.getMinorT()
 
 figure(1)
-plot(tf,sim.output())
+plot(tf,sim.getOutput())
 legend(('s1', 's2','s3'))
 title('reference simulation, open-loop, zero controls')
 out = sim.getOutput()
@@ -116,7 +116,7 @@ tf = list(sim.getMinorT())
 
 figure(2)
 title('Deviation from reference simulation, with perturbed initial condition')
-plot(tf,sim.output()-out,linewidth=3)
+plot(tf,sim.getOutput()-out,linewidth=3)
 
 jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
 jacsim.init()
@@ -127,14 +127,14 @@ jacsim.evaluate()
 
 dev_est = []
 for i in range(len(tf)):
-  dev_est.append(mul(jacsim.output()[i*ns:(i+1)*ns,:],x0_pert))
+  dev_est.append(mul(jacsim.getOutput()[i*ns:(i+1)*ns,:],x0_pert))
 
 dev_est = horzcat(dev_est).T
 plot(tf,dev_est,'+k')
 legend(('s1 dev', 's2 dev','s3 dev','s1 dev (est.)', 's2 dev (est.)','s3 dev (est.)'),loc='upper left')
 
 
-M = jacsim.output()[-ns:,:]
+M = jacsim.getOutput()[-ns:,:]
 # In the case of zero input, we could also use the matrix exponential to obtain sensitivity
 Mref = scipy.linalg.expm(A*te)
 
@@ -157,7 +157,7 @@ sim.evaluate()
 
 figure(3)
 title('Deviation from reference simulation, with perturbed controls')
-plot(tf,sim.output()-out,linewidth=3)
+plot(tf,sim.getOutput()-out,linewidth=3)
 
 
 
@@ -170,7 +170,7 @@ jacsim.evaluate()
 
 dev_est = []
 for i in range(len(tf)):
-  dev_est.append(mul(jacsim.output()[i*ns:(i+1)*ns,:],flatten(u_perturb)))
+  dev_est.append(mul(jacsim.getOutput()[i*ns:(i+1)*ns,:],flatten(u_perturb)))
 
 dev_est = horzcat(dev_est).T
 plot(tf,dev_est,'+k')
@@ -222,7 +222,7 @@ integrator.init()
 integrator.setInput(states_,"x0")
 integrator.evaluate()
 
-out = states(integrator.output())
+out = states(integrator.getOutput())
 
 Wt_  = out["Wt"]
 eAt_ = out["eAt"]
@@ -267,9 +267,9 @@ sim.setOption("nf",20)
 sim.init()
 sim.setInput(states_,"x0")
 sim.evaluate()
-sim.output()
+sim.getOutput()
 
-e = sim.output()[-1,states.i["y"]] - xref_e
+e = sim.getOutput()[-1,states.i["y"]] - xref_e
 assert(max(fabs(e))/max(fabs(xref_e))<1e-6)
 
 tf = sim.getMinorT()
@@ -278,12 +278,12 @@ tf = sim.getMinorT()
 figure(4)
 subplot(211)
 title("Feedforward control, states")
-plot(tf,sim.output(0)[:,list(states.i["y"])])
+plot(tf,sim.getOutput(0)[:,list(states.i["y"])])
 for i,c in enumerate(['b','g','r']):
   plot(t1,xref_e[i],c+'o')
 subplot(212)
 title("Control action")
-plot(tf,sim.output(1))
+plot(tf,sim.getOutput(1))
 
 # Design an infinite horizon LQR
 # -----------------------------------
@@ -332,10 +332,10 @@ print "(positive definite)"
 
 
 # Check that it does indeed satisfy the ricatti equation
-dae.setInput(integrator.output(),"x")
+dae.setInput(integrator.getOutput(),"x")
 dae.evaluate()
-print max(fabs(dae.output()))
-assert(max(fabs(dae.output()))<1e-8)
+print max(fabs(dae.getOutput()))
+assert(max(fabs(dae.getOutput()))<1e-8)
 
 # From P, obtain a feedback matrix K
 K = mul([inv(R),B.T,P_])
@@ -372,7 +372,7 @@ stabric.init()
 stabric.setInput(P_)
 stabric.evaluate()
 
-S = stabric.output()
+S = stabric.getOutput()
 
 [D,V] = linalg.eig(S)
 
@@ -421,14 +421,14 @@ for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-
   tf = sim.getMinorT()
 
   subplot(3,3,1+k*3)
-  plot(tf,sim.output(0))
+  plot(tf,sim.getOutput(0))
   subplot(3,3,2+k*3)
   title('ref ' + str(yref))
   for i,c in enumerate(['b','g']):
-    plot(tf,sim.output(1)[:,i],c,linewidth=2)
-    plot(tf,sim.output(3)[:,i],c+'-')
+    plot(tf,sim.getOutput(1)[:,i],c,linewidth=2)
+    plot(tf,sim.getOutput(3)[:,i],c+'-')
   subplot(3,3,3+k*3)
-  plot(tf,sim.output(2))
+  plot(tf,sim.getOutput(2))
 
 
 # Simulation of the closed-loop system:
@@ -492,26 +492,26 @@ for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)
   sim.setInput(states_,"x0")
   sim.setInput(param_,"p")
   sim.evaluate()
-  sim.output()
+  sim.getOutput()
 
   tf = sim.getMinorT()
   
   subplot(2,2,2*k+1)
   title('states (%s)' % caption)
   for i,c in enumerate(['b','g','r']):
-    plot(tf,sim.output()[:,states.i["yref",i]],c+'--')
-    plot(tf,sim.output()[:,states.i["y",i]],c,linewidth=2)
+    plot(tf,sim.getOutput()[:,states.i["yref",i]],c+'--')
+    plot(tf,sim.getOutput()[:,states.i["y",i]],c,linewidth=2)
   subplot(2,2,2*k+2)
   for i,c in enumerate(['b','g']):
-    plot(tf,sim.output(1)[:,i],c,linewidth=2)
-    plot(tf,sim.output(2)[:,i],c+'--')
+    plot(tf,sim.getOutput(1)[:,i],c,linewidth=2)
+    plot(tf,sim.getOutput(2)[:,i],c+'--')
   title('controls (%s)' % caption)
 
   # Calculate monodromy matrix
   jacsim.setInput(states_,"x0")
   jacsim.setInput(param_,"p")
   jacsim.evaluate()
-  M = jacsim.output()[-states.size:,:][list(states.i["y"]),list(states.i["y"])]
+  M = jacsim.getOutput()[-states.size:,:][list(states.i["y"]),list(states.i["y"])]
   
   # Inspect the eigenvalues of M
   [D,V] = linalg.eig(M)
@@ -530,8 +530,8 @@ print max(abs(D))
 
 # Get discrete reference from previous simulation
 mi = sim.getMajorIndex()
-controls_ = sim.output(2)[mi[:-1],:]
-yref_     = sim.output(3)[mi[:-1],:]
+controls_ = sim.getOutput(2)[mi[:-1],:]
+yref_     = sim.getOutput(3)[mi[:-1],:]
 
 u_ = horzcat([controls_,yref_])
 
@@ -570,12 +570,12 @@ figure(8)
 subplot(2,1,1)
 title('states (%s)' % caption)
 for i,c in enumerate(['b','g','r']):
-  plot(tf,sim.output(3)[:,i],c+'--')
-  plot(tf,sim.output()[:,i],c,linewidth=2)
+  plot(tf,sim.getOutput(3)[:,i],c+'--')
+  plot(tf,sim.getOutput()[:,i],c,linewidth=2)
 subplot(2,1,2)
 for i,c in enumerate(['b','g']):
-  plot(tf,sim.output(1)[:,i],c,linewidth=2)
-  plot(tf,sim.output(2)[:,i],c+'--')
+  plot(tf,sim.getOutput(1)[:,i],c,linewidth=2)
+  plot(tf,sim.getOutput(2)[:,i],c+'--')
 title('controls (%s)' % caption)
   
 jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
@@ -586,7 +586,7 @@ jacsim.setInput(x0,"x0")
 jacsim.setInput(param_,"p")
 jacsim.setInput(u_,"u")
 jacsim.evaluate()
-M = jacsim.output()[-ns:,:]
+M = jacsim.getOutput()[-ns:,:]
 
 # Inspect the eigenvalues of M
 [D,V] = linalg.eig(M)
@@ -625,12 +625,12 @@ figure(9)
 subplot(2,1,1)
 title('states (%s)' % caption)
 for i,c in enumerate(['b','g','r']):
-  plot(tf,sim.output(3)[:,i],c+'--')
-  plot(tf,sim.output()[:,i],c,linewidth=2)
+  plot(tf,sim.getOutput(3)[:,i],c+'--')
+  plot(tf,sim.getOutput()[:,i],c,linewidth=2)
 subplot(2,1,2)
 for i,c in enumerate(['b','g']):
-  plot(tf,sim.output(1)[:,i],c,linewidth=2)
-  plot(tf,sim.output(2)[:,i],c+'--')
+  plot(tf,sim.getOutput(1)[:,i],c,linewidth=2)
+  plot(tf,sim.getOutput(2)[:,i],c+'--')
 title('controls (%s)' % caption)
 
 jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
@@ -641,7 +641,7 @@ jacsim.setInput(x0,"x0")
 jacsim.setInput(param_,"p")
 jacsim.setInput(u_,"u")
 jacsim.evaluate()
-M = jacsim.output()[-ns:,:]
+M = jacsim.getOutput()[-ns:,:]
 
 # Inspect the eigenvalues of M
 [D,V] = linalg.eig(M)

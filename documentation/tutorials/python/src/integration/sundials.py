@@ -157,7 +157,7 @@ show()
 integrator.setInput([x0,y0],"x0")
 integrator.setFwdSeed([1,0],"x0")
 integrator.evaluate(1,0)
-A = integrator.fwdSens()[0]
+A = integrator.getFwdSens()[0]
 plot(dx0,A*dx0)
 legend(('True sensitivity','Linearised sensitivity'))
 plot(0,0,'o')

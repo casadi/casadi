@@ -257,7 +257,7 @@ class typemaptests(casadiTestCase):
         f_.evaluate()
         
 
-        self.checkarray(fun(f_.output(),DMatrix(s)),f.output(),"operation")
+        self.checkarray(fun(f_.getOutput(),DMatrix(s)),f.getOutput(),"operation")
       else:
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
@@ -274,7 +274,7 @@ class typemaptests(casadiTestCase):
         f_.setInput(dummy2[0:f.input(1).size()],1)
         f_.evaluate()
 
-        self.checkarray(fun(f_.output(0),f_.output(1)),f.output(),"operation")
+        self.checkarray(fun(f_.getOutput(0),f_.getOutput(1)),f.getOutput(),"operation")
     
     
     def tests(z,s):
@@ -555,13 +555,13 @@ class typemaptests(casadiTestCase):
     f.init()
     f.setInput([7,13])
     f.evaluate()
-    self.checkarray(f.output(),matrix([14,26]).T,"addition")
+    self.checkarray(f.getOutput(),matrix([14,26]).T,"addition")
     
     f=SXFunction([vertcat([x,y])],[N+C])
     f.init()
     f.setInput([7,13])
     f.evaluate()
-    self.checkarray(f.output(),matrix([14,26]).T,"addition")
+    self.checkarray(f.getOutput(),matrix([14,26]).T,"addition")
     
     self.message(":DMatrix")
     D=DMatrix([7,13])
@@ -581,13 +581,13 @@ class typemaptests(casadiTestCase):
     f.init()
     f.setInput([1,4])
     f.evaluate()
-    self.checkarray(f.output(),matrix([8,17]).T,"addition")
+    self.checkarray(f.getOutput(),matrix([8,17]).T,"addition")
     
     f=SXFunction([vertcat([x,y])],[D+C])
     f.init()
     f.setInput([1,4])
     f.evaluate()
-    self.checkarray(f.output(),matrix([8,17]).T,"addition")
+    self.checkarray(f.getOutput(),matrix([8,17]).T,"addition")
 
   def test_DMatrixSXMatrixcast(self):
     self.message("Casting DMatrix to SXMatrix")
@@ -826,7 +826,7 @@ class typemaptests(casadiTestCase):
         return DMatrix([4])
         
     f.setInput(Foo())
-    self.assertEqual(f.input(),4)
+    self.assertEqual(f.getInput(),4)
 
     class Foo:
       def __DMatrix__(self):

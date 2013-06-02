@@ -148,15 +148,15 @@ simulator = Simulator(I, output_fcn, tgrid)
 simulator.init()
 
 # Pass initial conditions to the simulator
-simulator.setInput(solver.output()[0:4],"x0")
+simulator.setInput(solver.getOutput()[0:4],"x0")
 
 # Simulate to get the trajectories
 simulator.evaluate()
 
 # Get optimal control
-x_opt = simulator.output(0)
-y_opt = simulator.output(1)
-u_opt = simulator.output(2)
+x_opt = simulator.getOutput(0)
+y_opt = simulator.getOutput(1)
+u_opt = simulator.getOutput(2)
 
 # Plot the results
 plt.figure(1)

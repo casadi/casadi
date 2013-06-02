@@ -46,6 +46,6 @@ F.evaluate()
 print F
 
 # Print results
-print F.output(0)
-print F.output(1)
+print F.getOutput(0)
+print F.getOutput(1)
 

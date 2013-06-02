@@ -78,11 +78,11 @@ for qpsolver in qpsolvers:
 
     solver.solve()
 
-    print solver.output("primal")
+    print solver.getOutput("primal")
     print qp.x_opt[i,:].T
     print qp.y_opt[i,:].T
     print qp.obj_opt[i]
-    print solver.output("cost")
-    print fabs(solver.output("primal")-qp.x_opt[i,:].T)
-    assert(all(fabs(solver.output("primal")-qp.x_opt[i,:].T)<1e-4))
-    assert(fabs(qp.obj_opt[i]-solver.output("cost"))<1e-5)
+    print solver.getOutput("cost")
+    print fabs(solver.getOutput("primal")-qp.x_opt[i,:].T)
+    assert(all(fabs(solver.getOutput("primal")-qp.x_opt[i,:].T)<1e-4))
+    assert(fabs(qp.obj_opt[i]-solver.getOutput("cost"))<1e-5)

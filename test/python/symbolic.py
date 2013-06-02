@@ -63,7 +63,7 @@ class Symbolictests(casadiTestCase):
              f.setInput(numbers[0],0)
              f.setInput(numbers[1],1)
              f.evaluate()
-             r = f.output()
+             r = f.getOutput()
              try:
                num = eval(op3,{"a": numbers[0], "b":  numbers[1]})
              except ZeroDivisionError:

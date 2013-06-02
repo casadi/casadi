@@ -73,11 +73,11 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output("g")[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,9,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("g")[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,9,str(Solver))
       
   def testIPOPT_par(self):
     x=SX("x")
@@ -98,10 +98,10 @@ class NLPtests(casadiTestCase):
       solver.setInput([10],"ubg")
       solver.setInput(1,"p")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,9,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,9,str(Solver))
       
   def testIPOPTinf(self):
     self.message("trivial IPOPT, infinity bounds")
@@ -130,10 +130,10 @@ class NLPtests(casadiTestCase):
 
 
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,7,str(Solver) + str(solver.output("x")[0]-1))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,9,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,7,str(Solver) + str(solver.getOutput("x")[0]-1))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,9,str(Solver))
       
   def testIPOPTrb(self):
     self.message("rosenbrock, limited-memory hessian approx")
@@ -153,11 +153,11 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,7,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],1,7,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,9,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,7,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1,7,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,9,str(Solver))
     
   def testIPOPTrb2(self):
     self.message("rosenbrock, limited-memory hessian approx")
@@ -181,12 +181,12 @@ class NLPtests(casadiTestCase):
       
       digits = 6
 
-      self.assertAlmostEqual(solver.output("f")[0],0,digits,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,digits,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],1,digits,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,9,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,9,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1,digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,9,str(Solver))
       
   def testIPOPTrbf(self):
     self.message("rosenbrock fixed, limited-memory hessian approx")
@@ -217,12 +217,12 @@ class NLPtests(casadiTestCase):
 
 
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,7,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],1,7,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,6,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],0,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,7,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1,7,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,6,str(Solver))
       
   def testIPOPTrhb2(self):
     self.message("rosenbrock, exact hessian, constrained")
@@ -244,7 +244,7 @@ class NLPtests(casadiTestCase):
     h.setInput(-40,1)
     h.setInput(1,2)
     h.evaluate()
-    print h.output()
+    print h.getOutput()
     
     solver = None
     for Solver, solver_options in solvers:
@@ -266,12 +266,12 @@ class NLPtests(casadiTestCase):
       
       digits = 5
         
-      self.assertAlmostEqual(solver.output("f")[0],c_r,digits,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],x_r[0],digits,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],x_r[1],digits,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],0.12149655447670,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],c_r,digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],x_r[0],digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],x_r[1],digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
       
     self.message(":warmstart")
     oldsolver=solver
@@ -295,9 +295,9 @@ class NLPtests(casadiTestCase):
     solver.setInput([10]*2,"ubx")
     solver.setInput([0],"lbg")
     solver.setInput([1],"ubg")
-    solver.setInput(oldsolver.output("x"),"x0")
-    solver.setInput(oldsolver.output("lam_g"),"lam_g0")
-    solver.setOutput(oldsolver.output("lam_x"),"lam_x")
+    solver.setInput(oldsolver.getOutput("x"),"x0")
+    solver.setInput(oldsolver.getOutput("lam_g"),"lam_g0")
+    solver.setOutput(oldsolver.getOutput("lam_x"),"lam_x")
     
     
     solver.solve()
@@ -334,12 +334,12 @@ class NLPtests(casadiTestCase):
       
       digits = 5
       
-      self.assertAlmostEqual(solver.output("f")[0],c_r,digits,str(Solver) + str(solver.output("f")[0]) + ":" + str(c_r))
-      self.assertAlmostEqual(solver.output("x")[0],x_r[0],digits,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],x_r[1],digits,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],0.12149655447670,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],c_r,digits,str(Solver) + str(solver.getOutput("f")[0]) + ":" + str(c_r))
+      self.assertAlmostEqual(solver.getOutput("x")[0],x_r[0],digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],x_r[1],digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
       
   def testIPOPTrhb2_par(self):
     self.message("rosenbrock, exact hessian, constrained, ")
@@ -377,12 +377,12 @@ class NLPtests(casadiTestCase):
       
       digits = 5
         
-      self.assertAlmostEqual(solver.output("f")[0],c_r,digits,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],x_r[0],digits,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],x_r[1],digits,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],0.12149655447670,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],c_r,digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],x_r[0],digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],x_r[1],digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
 
   def testIPOPTrhb2_gen_par(self):
     self.message("rosenbrock, exact hessian generated, constrained, parametric")
@@ -418,12 +418,12 @@ class NLPtests(casadiTestCase):
       
       digits = 5
 
-      self.assertAlmostEqual(solver.output("f")[0],c_r,digits,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],x_r[0],digits,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],x_r[1],digits,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],0.12149655447670,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],c_r,digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],x_r[0],digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],x_r[1],digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
       
   def testIPOPTrhb(self):
     self.message("rosenbrock, exact hessian")
@@ -450,11 +450,11 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
 
   def testIPOPTrhb_gen(self):
     self.message("rosenbrock, exact hessian generated")
@@ -478,11 +478,11 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
 
   def testIPOPTrhb_gen_xnonfree(self):
     self.message("rosenbrock, exact hessian generated, non-free x")
@@ -514,11 +514,11 @@ class NLPtests(casadiTestCase):
 
 
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],1,6,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,6,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
       
   def testIPOPTrhb_par(self):
     self.message("rosenbrock, exact hessian, parametric")
@@ -547,11 +547,11 @@ class NLPtests(casadiTestCase):
       solver.setInput([10]*2,"ubx")
       solver.setInput(1,"p")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
 
   def testIPOPTrhb_gen_par(self):
     self.message("rosenbrock, exact hessian generated, parametric")
@@ -577,9 +577,9 @@ class NLPtests(casadiTestCase):
       solver.setInput([10]*2,"ubx")
       solver.setInput(1,"p")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1,9,str(Solver))
       
   def testIPOPTnorm(self):
     self.message("IPOPT min ||x||^2_2")
@@ -604,11 +604,11 @@ class NLPtests(casadiTestCase):
       solver.setInput([10]*N,"ubg")
       solver.solve()
       print "residuals"
-      print array(solver.output("x")).squeeze()-x0
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.checkarray(array(solver.output("x")).squeeze(),x0,str(Solver),digits=8)
-      self.checkarray(solver.output("lam_x"),DMatrix([0]*10),8,str(Solver),digits=8)
-      self.assertAlmostEqual(solver.output("lam_g")[1],0,8,str(Solver))
+      print array(solver.getOutput("x")).squeeze()-x0
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.checkarray(array(solver.getOutput("x")).squeeze(),x0,str(Solver),digits=8)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0]*10),8,str(Solver),digits=8)
+      self.assertAlmostEqual(solver.getOutput("lam_g")[1],0,8,str(Solver))
       
   def testIPOPTnoc(self):
     self.message("trivial IPOPT, no constraints")
@@ -627,8 +627,8 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10],"lbx")
       solver.setInput([10],"ubx")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
     
   def testIPOPTmx(self):
     self.message("trivial IPOPT, using MX")
@@ -648,8 +648,8 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
     
   def testIPOPTc(self):
     self.message("trivial, overconstrained")
@@ -669,8 +669,8 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10, -10, -10],"lbg")
       solver.setInput([10, 10, 10],"ubg")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,9,str(Solver) )
-      self.assertAlmostEqual(solver.output("x")[0],1,5,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,9,str(Solver) )
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,5,str(Solver))
     
   def testIPOPTc2(self):
     self.message("trivial2, overconstrained")
@@ -690,8 +690,8 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10, -10, -10],"lbg")
       solver.setInput([10, 10, 10],"ubg")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,8,str(Solver))
     
   def testIPOPTcmx(self):
     self.message("trivial , overconstrained, using MX")
@@ -711,8 +711,8 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10,-10,-10],"lbg")
       solver.setInput([10,10,10],"ubg")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],0,9,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,8,str(Solver))
 
   def testIPOPTdeg(self):
     self.message("degenerate optimization IPOPT")
@@ -732,7 +732,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([0, 3],"lbg")
       solver.setInput([0, 3],"ubg")
       solver.solve()
-      self.assertAlmostEqual(solver.output("x")[0],solver.output("x")[1],10,"IPOPT")
+      self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],10,"IPOPT")
 
   def testIPOPTdegc(self):
     self.message("degenerate optimization IPOPT, overconstrained")
@@ -755,7 +755,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([0, 3, 10],"ubg")
       solver.solve()
       # todo: catch error when set([0, 3 , 5]) two times
-      self.assertAlmostEqual(solver.output("x")[0],solver.output("x")[1],10,"IPOPT")
+      self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],10,"IPOPT")
       
   def testXfreeChange(self):
     self.message("Change in X settings")
@@ -790,9 +790,9 @@ class NLPtests(casadiTestCase):
 
       solver.solve()
       
-      self.assertAlmostEqual(solver.output("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1,7,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],1,7,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,7,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1,7,str(Solver))
 
   def testactiveLBX(self):
     self.message("active LBX")
@@ -814,12 +814,12 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],9.0908263002590e-3,6,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1.0952466252248,6,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],1.2,5,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],-8.6963632695079e-2,4,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],9.0908263002590e-3,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1.0952466252248,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1.2,5,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],-8.6963632695079e-2,4,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,8,str(Solver))
 
   def testactiveLBG(self):
     self.message("active LBG")
@@ -841,12 +841,12 @@ class NLPtests(casadiTestCase):
       solver.setInput([2.2],"lbg")
       solver.setInput([10],"ubg")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],4.252906468284e-3,6,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],1.065181061847138,6,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],1.1348189166291160,6,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,4,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],-4.1644422845712e-2,3,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],4.252906468284e-3,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1.065181061847138,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1.1348189166291160,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,4,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],-4.1644422845712e-2,3,str(Solver))
 
   def testactiveUBG(self):
     self.message("active UBG")
@@ -868,12 +868,12 @@ class NLPtests(casadiTestCase):
       solver.setInput([0],"lbg")
       solver.setInput([1.8],"ubg")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],4.64801220074552e-3,6,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],9.318651964592811e-1,5,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],8.68134821123689e-1,5,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,4,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],4.75846495145007e-2,5,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],4.64801220074552e-3,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],9.318651964592811e-1,5,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],8.68134821123689e-1,5,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,4,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],4.75846495145007e-2,5,str(Solver))
       
   def testactiveUBX(self):
     self.message("active UBX")
@@ -895,12 +895,12 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
       solver.solve()
-      self.assertAlmostEqual(solver.output("f")[0],2.626109721583e-3,6,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[0],9.4882542279172277e-01,6,str(Solver))
-      self.assertAlmostEqual(solver.output("x")[1],0.9,6,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],5.39346608659e-2,4,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_g")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],2.626109721583e-3,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],9.4882542279172277e-01,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],0.9,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],5.39346608659e-2,4,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,8,str(Solver))
       
   def test_QP(self):
     self.message("QP")
@@ -921,12 +921,12 @@ class NLPtests(casadiTestCase):
         if solver.hasOption(k):
           solver.setOption(k,v)
       solver.init()
-      solver.input("lbx").setAll(-1000)
-      solver.input("ubx").setAll(1000)
+      solver.setInput(-1000,"lbx")
+      solver.setInput(1000,"ubx")
       solver.solve()
-      self.checkarray(solver.output("x"),x0,str(Solver),digits=2)
-      self.assertAlmostEqual(solver.output("f")[0],0,3,str(Solver))
-      self.checkarray(solver.output("lam_x"),DMatrix.zeros(N,1),str(Solver),digits=4)
+      self.checkarray(solver.getOutput("x"),x0,str(Solver),digits=2)
+      self.assertAlmostEqual(solver.getOutput("f")[0],0,3,str(Solver))
+      self.checkarray(solver.getOutput("lam_x"),DMatrix.zeros(N,1),str(Solver),digits=4)
       
       
   def test_tol_pr(self):
@@ -961,15 +961,15 @@ class NLPtests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],0.5,6,str(Solver))
-      self.assertAlmostEqual(solver.output()[1],1.25,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput()[0],0.5,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput()[1],1.25,6,str(Solver))
     
-      self.assertAlmostEqual(solver.output("lam_x")[0],4.75,6,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
 
-      self.checkarray(solver.output("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
+      self.checkarray(solver.getOutput("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
       
-      self.assertAlmostEqual(solver.output("f")[0],-7.4375,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],-7.4375,6,str(Solver))
       
   def test_QP2(self):
     H = DMatrix([[1,-1],[-1,2]])
@@ -1005,15 +1005,15 @@ class NLPtests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],0.5,6,str(Solver))
-      self.assertAlmostEqual(solver.output()[1],1.25,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput()[0],0.5,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput()[1],1.25,6,str(Solver))
     
-      self.assertAlmostEqual(solver.output("lam_x")[0],4.75,6,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
 
-      self.checkarray(solver.output("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
+      self.checkarray(solver.getOutput("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
       
-      self.assertAlmostEqual(solver.output("f")[0],-7.4375,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],-7.4375,6,str(Solver))
       
       solver = Solver(nlp)
       for k,v in ({"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"exact","UserHM":True,"max_iter":100,"MaxIter": 100,"print_level":0, "fixed_variable_treatment": "make_constraint"}).iteritems():
@@ -1028,15 +1028,15 @@ class NLPtests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],0.5,6,str(Solver))
-      self.assertAlmostEqual(solver.output()[1],1.25,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput()[0],0.5,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput()[1],1.25,6,str(Solver))
     
-      self.assertAlmostEqual(solver.output("lam_x")[0],4.75,6,str(Solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
 
-      self.checkarray(solver.output("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
+      self.checkarray(solver.getOutput("lam_g"),DMatrix([0,2,0]),str(Solver),digits=6)
       
-      self.assertAlmostEqual(solver.output("f")[0],-7.4375,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],-7.4375,6,str(Solver))
 
   def test_QP2_unconvex(self):
     H = DMatrix([[1,-1],[-1,-2]])
@@ -1068,15 +1068,15 @@ class NLPtests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],2.0/3,6,str(solver))
-      self.assertAlmostEqual(solver.output()[1],4.0/3,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput()[0],2.0/3,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput()[1],4.0/3,6,str(solver))
     
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,6,str(solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(solver))
 
-      self.checkarray(solver.output("lam_g"),DMatrix([4+8.0/9,20.0/9,0]),str(solver),digits=6)
+      self.checkarray(solver.getOutput("lam_g"),DMatrix([4+8.0/9,20.0/9,0]),str(solver),digits=6)
       
-      self.assertAlmostEqual(solver.output("f")[0],-10-16.0/9,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],-10-16.0/9,6,str(solver))
 
       solver = Solver(nlp)
       solver.setOption(solver_options)
@@ -1092,15 +1092,15 @@ class NLPtests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],2.0/3,6,str(solver))
-      self.assertAlmostEqual(solver.output()[1],4.0/3,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput()[0],2.0/3,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput()[1],4.0/3,6,str(solver))
     
-      self.assertAlmostEqual(solver.output("lam_x")[0],0,6,str(solver))
-      self.assertAlmostEqual(solver.output("lam_x")[1],0,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(solver))
 
-      self.checkarray(solver.output("lam_g"),DMatrix([4+8.0/9,20.0/9,0]),str(solver),digits=6)
+      self.checkarray(solver.getOutput("lam_g"),DMatrix([4+8.0/9,20.0/9,0]),str(solver),digits=6)
       
-      self.assertAlmostEqual(solver.output("f")[0],-10-16.0/9,6,str(solver))
+      self.assertAlmostEqual(solver.getOutput("f")[0],-10-16.0/9,6,str(solver))
       
 if __name__ == '__main__':
     unittest.main()
