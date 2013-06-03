@@ -25,6 +25,7 @@
 #include <vector>
 #include <sstream>
 #include "../stl_vector_tools.hpp"
+#include "../casadi_options.hpp"
 
 using namespace std;
 
@@ -162,6 +163,8 @@ namespace CasADi{
   }
 
   MX UnaryMX::getUnary(int op) const{
+    if (!CasadiOptions::simplification_on_the_fly) return MXNode::getUnary(op);
+    
     switch(op_){
     case OP_NEG:
       if(op==OP_NEG) return dep();

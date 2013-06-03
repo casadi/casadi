@@ -504,82 +504,87 @@ namespace CasADi{
   }
 
   MX MXNode::getBinary(int op, const MX& y, bool scX, bool scY) const{
-    // If identically zero due to one argumebt being zero
-    if((operation_checker<F0XChecker>(op) && isZero()) ||(operation_checker<FX0Checker>(op) && y->isZero())){
-      return MX::zeros(sparsity());
-    }
+  
+    if (CasadiOptions::simplification_on_the_fly) {
+    
+      // If identically zero due to one argumebt being zero
+      if((operation_checker<F0XChecker>(op) && isZero()) ||(operation_checker<FX0Checker>(op) && y->isZero())){
+        return MX::zeros(sparsity());
+      }
 
-    // Handle special operations (independent of type)
-    switch(op){
-    case OP_ADD:
-      if(y.isEqual(this,maxDepth())) return getUnary(OP_TWICE);
-      break;
-    case OP_SUB:
-    case OP_NE:
-    case OP_LT:
-      if(y.isEqual(this,maxDepth())) return MX::zeros(sparsity());
-      break;
-    case OP_DIV:
-      if(y->isZero()) return MX::nan(sparsity());
-      // fall-through
-    case OP_EQ:
-    case OP_LE:
-      if(y.isEqual(this,maxDepth())) return MX::ones(sparsity());
-      break;
-    case OP_MUL:
-      if(y.isEqual(this,maxDepth())) return getUnary(OP_SQ);
-      break;
-    default: break; // no rule
-    }
+      // Handle special operations (independent of type)
+      switch(op){
+      case OP_ADD:
+        if(y.isEqual(this,maxDepth())) return getUnary(OP_TWICE);
+        break;
+      case OP_SUB:
+      case OP_NE:
+      case OP_LT:
+        if(y.isEqual(this,maxDepth())) return MX::zeros(sparsity());
+        break;
+      case OP_DIV:
+        if(y->isZero()) return MX::nan(sparsity());
+        // fall-through
+      case OP_EQ:
+      case OP_LE:
+        if(y.isEqual(this,maxDepth())) return MX::ones(sparsity());
+        break;
+      case OP_MUL:
+        if(y.isEqual(this,maxDepth())) return getUnary(OP_SQ);
+        break;
+      default: break; // no rule
+      }
 
-    // Handle special cases for the second argument
-    switch(y->getOp()){
-    case OP_CONST:
-      // Make the constant the first argument, if possible
-      if(getOp()!=OP_CONST && operation_checker<CommChecker>(op)){
-            return y->getBinary(op,shared_from_this<MX>(),scY,scX);
-      } else {
-        switch(op) {
-        case OP_CONSTPOW: 
-          if(y->isValue(-1)) return getUnary(OP_INV);
-          else if(y->isValue(0)) return MX::ones(sparsity());
-          else if(y->isValue(1)) return shared_from_this<MX>();
-          else if(y->isValue(2)) return getUnary(OP_SQ);
-          break;
-        case OP_ADD:
-        case OP_SUB:
-          if(y->isZero()) return shared_from_this<MX>();
-          break;
-        case OP_MUL:
-          if(y->isValue(1)) return shared_from_this<MX>();
-          break;
-        case OP_DIV:
-          if(y->isValue(1)) return shared_from_this<MX>();
-          else if(y->isValue(0.5)) return getUnary(OP_TWICE);
-          break;
-        default: break; // no rule
+      // Handle special cases for the second argument
+      switch(y->getOp()){
+      case OP_CONST:
+        // Make the constant the first argument, if possible
+        if(getOp()!=OP_CONST && operation_checker<CommChecker>(op)){
+              return y->getBinary(op,shared_from_this<MX>(),scY,scX);
+        } else {
+          switch(op) {
+          case OP_CONSTPOW: 
+            if(y->isValue(-1)) return getUnary(OP_INV);
+            else if(y->isValue(0)) return MX::ones(sparsity());
+            else if(y->isValue(1)) return shared_from_this<MX>();
+            else if(y->isValue(2)) return getUnary(OP_SQ);
+            break;
+          case OP_ADD:
+          case OP_SUB:
+            if(y->isZero()) return shared_from_this<MX>();
+            break;
+          case OP_MUL:
+            if(y->isValue(1)) return shared_from_this<MX>();
+            break;
+          case OP_DIV:
+            if(y->isValue(1)) return shared_from_this<MX>();
+            else if(y->isValue(0.5)) return getUnary(OP_TWICE);
+            break;
+          default: break; // no rule
+          }
         }
+        break;
+      case OP_NEG:
+        if(op==OP_ADD){
+          return getBinary(OP_SUB,y->dep(),scX,scY);
+        } else if(op==OP_SUB){
+          return getBinary(OP_ADD,y->dep(),scX,scY);
+        } else if(op==OP_MUL){
+          return -getBinary(OP_MUL,y->dep(),scX,scY);
+        } else if(op==OP_DIV){
+          return -getBinary(OP_DIV,y->dep(),scX,scY);
+        }
+        break;
+      case OP_INV:
+        if(op==OP_MUL){
+          return getBinary(OP_DIV,y->dep(),scX,scY);
+        } else if(op==OP_DIV){
+          return getBinary(OP_MUL,y->dep(),scX,scY);
+        }
+        break;
+      default: break; // no rule
       }
-      break;
-    case OP_NEG:
-      if(op==OP_ADD){
-        return getBinary(OP_SUB,y->dep(),scX,scY);
-      } else if(op==OP_SUB){
-        return getBinary(OP_ADD,y->dep(),scX,scY);
-      } else if(op==OP_MUL){
-        return -getBinary(OP_MUL,y->dep(),scX,scY);
-      } else if(op==OP_DIV){
-        return -getBinary(OP_DIV,y->dep(),scX,scY);
-      }
-      break;
-    case OP_INV:
-      if(op==OP_MUL){
-        return getBinary(OP_DIV,y->dep(),scX,scY);
-      } else if(op==OP_DIV){
-        return getBinary(OP_MUL,y->dep(),scX,scY);
-      }
-      break;
-    default: break; // no rule
+    
     }
 
     if(scX){

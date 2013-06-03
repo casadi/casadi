@@ -30,6 +30,7 @@
 #include "symbolic_sx.hpp"
 #include "unary_sx.hpp"
 #include "binary_sx.hpp"
+#include "../casadi_options.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -168,6 +169,8 @@ namespace CasADi{
   SX SX::__add__(const SX& y) const{
     // NOTE: Only simplifications that do not result in extra nodes area allowed
     
+    if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_ADD,*this, y);
+    
     if(node->isZero())
       return y;
     else if(y->isZero()) // term2 is zero
@@ -199,6 +202,8 @@ namespace CasADi{
   SX SX::__sub__(const SX& y) const{
     // Only simplifications that do not result in extra nodes area allowed
     
+    if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_SUB,*this,y);
+    
     if(y->isZero()) // term2 is zero
       return *this;
     if(node->isZero()) // term1 is zero
@@ -220,6 +225,9 @@ namespace CasADi{
   }
 
   SX SX::__mul__(const SX& y) const{
+  
+    if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_MUL,*this,y);
+    
     // Only simplifications that do not result in extra nodes area allowed
     if(y.isEqual(*this,eq_depth_))
       return sq();
@@ -258,6 +266,8 @@ namespace CasADi{
     
   SX SX::__div__(const SX& y) const{
     // Only simplifications that do not result in extra nodes area allowed
+    
+    if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_DIV,*this,y);
 
     if(y->isZero()) // term2 is zero
       return casadi_limits<SX>::nan;

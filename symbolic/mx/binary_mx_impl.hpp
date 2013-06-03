@@ -32,6 +32,7 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../stl_vector_tools.hpp"
+#include "../casadi_options.hpp"
 
 using namespace std;
 
@@ -230,6 +231,8 @@ namespace CasADi{
 
   template<bool ScX, bool ScY>
   MX BinaryMX<ScX,ScY>::getBinary(int op, const MX& y, bool scX, bool scY) const{
+    if (!CasadiOptions::simplification_on_the_fly) return MXNode::getBinary(op,y,scX,scY);
+    
     switch(op_){
     case OP_ADD:
       if(op==OP_SUB && y.isEqual(dep(0),maxDepth())) return dep(1);
