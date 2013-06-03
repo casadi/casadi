@@ -781,6 +781,12 @@ namespace CasADi{
       casadi_error("Cannot check regularity for symbolic MX");
     }
   }
+  
+  std::vector<MX> getSymbols(const MX& e) {
+    MXFunction f(std::vector<MX>(),e);
+    f.init();
+    return f.getFree();
+  }
 
 } // namespace CasADi
 

@@ -1208,6 +1208,12 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     }
     return true;
   }
+ 
+  std::vector<SX> getSymbols(const SXMatrix& e) {
+    SXFunction f(std::vector<SXMatrix>(),e);
+    f.init();
+    return f.getFree();
+  }
   
 } // namespace CasADi
 

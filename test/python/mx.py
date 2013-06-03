@@ -2021,7 +2021,17 @@ class MXtests(casadiTestCase):
     self.checkarray(meval(Bmod),DMatrix([[2,4,3,4,5],[6,7,16,9,10]]),"Imatrix indexing assignement")
     
     self.assertRaises(Exception, lambda : B[sp_dense(4,4)])
-  
+
+  def test_getSymbols(self):
+    a = msym("a")
+    b = msym("b")
+    c = msym("c")
+    e = cos(a*b) + c
+    w = getSymbols(e)
+    self.assertEqual(len(w),3)
+    self.assertTrue(isEqual(w[0],a))
+    self.assertTrue(isEqual(w[1],b))
+    self.assertTrue(isEqual(w[2],c))
     
 if __name__ == '__main__':
     unittest.main()

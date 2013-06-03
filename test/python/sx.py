@@ -1014,6 +1014,17 @@ class SXtests(casadiTestCase):
     self.assertFalse(isRegular(vertcat([x,Inf])))
     with self.assertRaises(Exception):
       self.assertFalse(isRegular(vertcat([x,x])))
+      
+  def test_getSymbols(self):
+    a = ssym("a")
+    b = ssym("b")
+    c = ssym("c")
+    e = cos(a*b) + c
+    w = getSymbols(e)
+    self.assertEqual(len(w),3)
+    self.assertTrue(isEqual(w[0],a))
+    self.assertTrue(isEqual(w[1],b))
+    self.assertTrue(isEqual(w[2],c))
     
 if __name__ == '__main__':
     unittest.main()

@@ -337,6 +337,12 @@ namespace CasADi{
   /** \brief Matrix inverse (experimental) */
   MX inv(const MX& A);
 
+  /** \brief Get all symbols contained in the supplied expression
+  * Get all symbols on which the supplied expression depends
+  * \see MXFunction::getFree()
+  */
+  std::vector<MX> getSymbols(const MX& e);
+
 } // namespace CasADi
 
 #ifdef SWIG
