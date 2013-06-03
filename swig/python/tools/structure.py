@@ -404,7 +404,9 @@ class CasadiStructureDerivable:
        raise Exception("Expecting n x %d DMatrix. Got %s" % (self.size,a.dimString()))
     s = struct([entry("t",struct=self,repeat=a.shape[0])])
     numbers = DMatrixStruct(s,data=a,dataVectorCheck=False)
-    return numbers.prefix["t"]
+    p = numbers.prefix["t"]
+    p.castmaster = True
+    return p  
     
   def squared(self,arg=0):
     if isinstance(arg,DMatrix):
@@ -420,7 +422,9 @@ class CasadiStructureDerivable:
        raise Exception("Expecting square DMatrix of size %s. Got %s" % (self.size,a.dimString()))
     s = struct([entry("t",shapestruct=(self,self))])
     numbers = DMatrixStruct(s,data=a,dataVectorCheck=False)
-    return numbers.prefix["t"]
+    p = numbers.prefix["t"]
+    p.castmaster = True
+    return p  
 
   def squared_repeated(self,arg=0):
     if isinstance(arg,DMatrix):
@@ -434,7 +438,9 @@ class CasadiStructureDerivable:
        raise Exception("Expecting N x square DMatrix. Got %s" % (self.size,a.dimString()))
     s = struct([entry("t",shapestruct=(self,self),repeat=a.shape[0] / self.size)])
     numbers = DMatrixStruct(s,data=a,dataVectorCheck=False)
-    return numbers.prefix["t"]
+    p = numbers.prefix["t"]
+    p.castmaster = True
+    return p  
     
 class GetterDispatcher(Dispatcher):
   def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
@@ -540,22 +546,28 @@ def performExtraIndex(i,extraIndex=None,entry=None,flip=False):
 
 
 class Prefixer:
-  def __init__(self,struct,prefix):
+  def __init__(self,struct,prefix,castmaster=False):
     self.struct = struct
     self.prefix = prefix
+    self.castmaster = castmaster
     
     methods = [ "__DMatrix__", "__SXMatrix__","__MX__"]
     for m in methods:
       if hasattr(self.struct,m):
-        setattr(self,m,self.__call__)
-          
- 
+        setattr(self,m,self.cast)
+
   def __getattr__(self,name):
     # When attributes are not found, delegate to self()
     # This allows for e.g. sin(x) and x+1 to work
-    t = self()
+    t = self.struct.master
     if not(isinstance(t,list) or isinstance(t,dict) or isinstance(t,tuple)):
       return getattr(t,name)
+      
+  def cast(self):
+    if self.castmaster:
+      return self.struct.master
+    else:
+      return self()
         
   def __str__(self):
     return "prefix( " + str(self.prefix) + "," + self.struct.__str__(compact=True) + ")"
@@ -580,12 +592,13 @@ class PrefixConstructor:
     
   __repr__ = __str__
   
-  def __init__(self,struct):
+  def __init__(self,struct,castmaster=False):
     self.struct = struct
+    self.castmaster=castmaster
   
   @properGetitem
   def __getitem__(self,prefix):
-    return Prefixer(self.struct,prefix)
+    return Prefixer(self.struct,prefix,castmaster=self.castmaster)
     
 class CasadiStructure(Structure,CasadiStructureDerivable):
   """
