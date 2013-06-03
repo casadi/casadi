@@ -355,7 +355,7 @@ class NLPtests(casadiTestCase):
     
     sigma=SX("sigma")
     lambd=SX("lambd")
-    h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd),
+    h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd,p=p),
                  hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(nlp.outputExpr("g"),vertcat([x,y]))))
 
     for Solver, solver_options in solvers:
