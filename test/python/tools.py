@@ -44,9 +44,10 @@ class Toolstests(casadiTestCase):
       self.assertEqual(p[...].shape[0],16)
       self.assertEqual(p[...].shape[1],1)
 
-      self.assertTrue(isEqual(p.x,p["x"]))
-      self.assertTrue(isEqual(p.y,p["y"]))
-      self.assertTrue(isEqual(p.z,p["z"]))
+      if CasadiOptions.getSimplificationOnTheFly():
+        self.assertTrue(isEqual(p.x,p["x"]))
+        self.assertTrue(isEqual(p.y,p["y"]))
+        self.assertTrue(isEqual(p.z,p["z"]))
 
       self.checkarray(p.i_x,IMatrix([0,1]),"")
       self.checkarray(p.i_z,IMatrix([[2,4,6,8],[3,5,7,9]]),"")
@@ -64,10 +65,11 @@ class Toolstests(casadiTestCase):
       self.assertTrue(isinstance(p[...],SXMatrix))
       self.assertEqual(p.size,9)
 
-      self.assertTrue(all(map(isEqual,p.x,p["x"])))
-      self.assertTrue(all(map(isEqual,p.z,p["z"])))
-      self.assertTrue(all(map(lambda a,b: all(map(isEqual,a,b)),p.y,p["y"])))
-      self.checkarray(p[...],vertcat([p.x[0],p.y[0][0],p.y[0][1],p.y[1][0],p.y[1][1],p.y[2][0],p.y[2][1],p.z[0],p.z[1]]),"")
+      if CasadiOptions.getSimplificationOnTheFly():
+        self.assertTrue(all(map(isEqual,p.x,p["x"])))
+        self.assertTrue(all(map(isEqual,p.z,p["z"])))
+        self.assertTrue(all(map(lambda a,b: all(map(isEqual,a,b)),p.y,p["y"])))
+        self.checkarray(p[...],vertcat([p.x[0],p.y[0][0],p.y[0][1],p.y[1][0],p.y[1][1],p.y[2][0],p.y[2][1],p.z[0],p.z[1]]),"")
 
       self.checkarray(p.i_x[0],0,"")
       self.checkarray(p.i_z[0],7,"")
@@ -99,13 +101,14 @@ class Toolstests(casadiTestCase):
       self.assertTrue(isinstance(p[...],SXMatrix))
       self.assertEqual(p.size,9)
 
-      self.assertTrue(all(map(isEqual,p.x,p["x"])))
-      self.assertTrue(all(map(isEqual,p.z,p["z"])))
-      self.assertTrue(all(map(lambda a,b: all(map(isEqual,a,b)),p.y,p["y"])))
-      self.checkarray(p[...],vertcat([p.x[0],p.y[0][0],p.y[0][1],p.z[0],p.y[1][0],p.y[1][1],p.z[1],p.y[2][0],p.y[2][1]]),"")
+      if CasadiOptions.getSimplificationOnTheFly():
+        self.assertTrue(all(map(isEqual,p.x,p["x"])))
+        self.assertTrue(all(map(isEqual,p.z,p["z"])))
+        self.assertTrue(all(map(lambda a,b: all(map(isEqual,a,b)),p.y,p["y"])))
+        self.checkarray(p[...],vertcat([p.x[0],p.y[0][0],p.y[0][1],p.z[0],p.y[1][0],p.y[1][1],p.z[1],p.y[2][0],p.y[2][1]]),"")
 
-      self.checkarray(p.z[...],vertcat([p.z[0],p.z[1]]),"")
-      self.checkarray(p.y[...],vertcat([p.y[0][0],p.y[0][1],p.y[1][0],p.y[1][1],p.y[2][0],p.y[2][1]]),"")
+        self.checkarray(p.z[...],vertcat([p.z[0],p.z[1]]),"")
+        self.checkarray(p.y[...],vertcat([p.y[0][0],p.y[0][1],p.y[1][0],p.y[1][1],p.y[2][0],p.y[2][1]]),"")
       
       self.checkarray(p.i_x[0],0,"")
       self.checkarray(p.i_z[0],3,"")
@@ -128,10 +131,12 @@ class Toolstests(casadiTestCase):
       g.freeze()
        
       self.assertEqual(g.size,4)
-      self.checkarray(g[...],vertcat([g.c,p.a,p.b,g.e]),"")
+      if CasadiOptions.getSimplificationOnTheFly():
+        self.checkarray(g[...],vertcat([g.c,p.a,p.b,g.e]),"")
 
       self.assertEqual(p.size,2)
-      self.checkarray(p[...],vertcat([p.a,p.b]),"")
+      if CasadiOptions.getSimplificationOnTheFly():
+        self.checkarray(p[...],vertcat([p.a,p.b]),"")
       
       self.checkarray(p.i_a,0)
       self.checkarray(p.i_b,1)
@@ -141,7 +146,8 @@ class Toolstests(casadiTestCase):
       self.checkarray(g.i_d["b"],2)
       self.checkarray(g.i_e,3)
       
-      self.checkarray(g.d[...],vertcat([p.a,p.b]),"")
+      if CasadiOptions.getSimplificationOnTheFly():
+        self.checkarray(g.d[...],vertcat([p.a,p.b]),"")
       
 
   def test_variables(self):
@@ -668,17 +674,19 @@ class Toolstests(casadiTestCase):
     ])
     self.assertEqual(V.size,14)
     
-    self.assertTrue(isinstance(V.cat,MX))    
-    self.assertTrue(isEqual(V["x"],x))
-    self.assertTrue(isEqual(V["y",0],y0))
-    self.assertTrue(isEqual(V["y",1],y1))
+    self.assertTrue(isinstance(V.cat,MX)) 
+    if CasadiOptions.getSimplificationOnTheFly():   
+      self.assertTrue(isEqual(V["x"],x))
+      self.assertTrue(isEqual(V["y",0],y0))
+      self.assertTrue(isEqual(V["y",1],y1))
     self.assertEqual(V["y",0,'a'].shape,(1,1))
     
     with self.assertRaises(Exception):
       V["y",0] = msym("x",4) # shape mismatch
     abc = msym("abc",2)
     V["y",0] = abc
-    self.assertTrue(isEqual(V["y",0],abc))
+    if CasadiOptions.getSimplificationOnTheFly():
+      self.assertTrue(isEqual(V["y",0],abc))
 
     states = struct_ssym([
                 entry('x'),
@@ -703,7 +711,8 @@ class Toolstests(casadiTestCase):
     self.assertTrue(isinstance(s[0][0],dict))
     self.assertTrue('x' in s[0][0])
     self.assertEqual(len(s[0][0]),7)
-    self.assertTrue(isEqual(s[0][0]["x"],shooting["X",0,0,"x"]))
+    if CasadiOptions.getSimplificationOnTheFly():
+      self.assertTrue(isEqual(s[0][0]["x"],shooting["X",0,0,"x"]))
     
     
     init = shooting(nan)

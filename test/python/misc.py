@@ -309,11 +309,10 @@ class Misctests(casadiTestCase):
     
   def test_IOscheme_indexing(self):
     self.message("IOscheme indexing")
-    x = ssym("x")
-    s = daeIn(x=x)
+    s = daeIn(x=2)
     
-    self.assertTrue(isEqual(s[0],x))
-    self.assertTrue(isEqual(s["x"],x))
+    self.assertEqual(s[0],2)
+    self.assertEqual(s["x"],2)
     with self.assertRaises(Exception):
       s["xfgfd"]
     with self.assertRaises(Exception):
@@ -321,16 +320,16 @@ class Misctests(casadiTestCase):
     s[-1]
     
   def test_IOscheme_output(self):
-    x = ssym("x")
-    p = ssym("p")
+    x = 2
+    p = 3
     s = daeIn(x=x,p=p)
     
     pp, = daeIn(s,"p")
-    self.assertTrue(isEqual(pp,p))
+    self.assertEqual(pp,p)
     
     xx,pp = daeIn(s,"x","p")
-    self.assertTrue(isEqual(pp,p))
-    self.assertTrue(isEqual(xx,x))
+    self.assertEqual(pp,p)
+    self.assertEqual(xx,x)
     
 if __name__ == '__main__':
     unittest.main()

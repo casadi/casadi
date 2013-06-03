@@ -272,7 +272,12 @@ namespace CasADi{
 
   //@}
 
-  /** \brief  Check if two expressions are equal */
+  /** \brief  Check if two expressions are equal
+  *
+  *  Might very well give false negatives
+  *
+  *   Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
+   */
   bool isEqual(const MX& ex1,const MX &ex2);
 
   /** \brief Get a string representation for a binary MX, using custom arguments */

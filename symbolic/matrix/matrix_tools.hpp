@@ -249,6 +249,12 @@ int nnz(const Matrix<T>& ex);
 template<class T>
 int nnz_sym(const Matrix<T>& ex);
 
+/** \brief Check if two expressions are equal
+*
+*  Might very well give false negatives
+*
+*   Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
+*/
 template<class T>
 bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2);
 

@@ -337,7 +337,10 @@ class SXtests(casadiTestCase):
 
     # Create function
     f = fun(x,y)
-    self.assertEqual(str(f),'[((3-sin(sq(x)))-y), (sqrt(y)*x)]','SX representation is wrong')
+    if CasadiOptions.getSimplificationOnTheFly():
+      self.assertEqual(str(f),'[((3-sin(sq(x)))-y), (sqrt(y)*x)]','SX representation is wrong')
+    else:
+      self.assertEqual(str(f),'[((3-sin((x*x)))-y), (sqrt(y)*x)]','SX representation is wrong'+str(f))
     fcn = SXFunction([vertcat([x,y])],[vertcat(f)])
 
     # Set some options
@@ -561,6 +564,7 @@ class SXtests(casadiTestCase):
       cnt+=1
     self.checkarray(y,z,"nonzero range assignment")
     
+  @skip(not CasadiOptions.getSimplificationOnTheFly())
   def test_substitute(self):
     self.message("Basic symbolic algebra: substitute")
     x=SX("x")
@@ -609,7 +613,9 @@ class SXtests(casadiTestCase):
     self.message("univariate taylor expansion")
     x=SX("x")
     
-    self.assertTrue(isEqual(taylor(sin(x),x),x))
+    if CasadiOptions.getSimplificationOnTheFly():
+      self.assertTrue(isEqual(taylor(sin(x),x),x))
+      
     a_=0.13
     x_=0.15
 
@@ -829,6 +835,7 @@ class SXtests(casadiTestCase):
     b = x*x
     self.assertTrue(a.isEqual(b,1))
     
+  @skip(not CasadiOptions.getSimplificationOnTheFly())
   def test_SXsimplifications(self):
     self.message("simplifications")
     x = SX("x")
@@ -1015,6 +1022,7 @@ class SXtests(casadiTestCase):
     with self.assertRaises(Exception):
       self.assertFalse(isRegular(vertcat([x,x])))
       
+      
   def test_getSymbols(self):
     a = ssym("a")
     b = ssym("b")
@@ -1022,9 +1030,10 @@ class SXtests(casadiTestCase):
     e = cos(a*b) + c
     w = getSymbols(e)
     self.assertEqual(len(w),3)
-    self.assertTrue(isEqual(w[0],a))
-    self.assertTrue(isEqual(w[1],b))
-    self.assertTrue(isEqual(w[2],c))
+    if CasadiOptions.getSimplificationOnTheFly():
+      self.assertTrue(isEqual(w[0],a))
+      self.assertTrue(isEqual(w[1],b))
+      self.assertTrue(isEqual(w[2],c))
     
 if __name__ == '__main__':
     unittest.main()
