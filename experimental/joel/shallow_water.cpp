@@ -348,6 +348,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   nlp_solver_.setOption("reg_threshold",reg_threshold);
   nlp_solver_.setOption("max_iter_ls",3);
   nlp_solver_.setOption("beta",0.5);
+  nlp_solver_.setOption("merit_start",1e-3);
   //nlp_solver_.setOption("merit_memory",1);
   nlp_solver_.setOption("max_iter",100);
   nlp_solver_.setOption("compiler","clang -fPIC -O2"); // Optimization
@@ -398,8 +399,8 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
   lbu.at(1) = 5.0e-4 / p_scale_[1]; // depth positive
   nlp_solver_.setInput(lbu,"lbx");
 
-  ubu.at(0) = 50.0 / p_scale_[0]; // max drag
-  ubu.at(1) =  0.05 / p_scale_[1]; // max depth
+  ubu.at(0) = 100.0 / p_scale_[0]; // max drag
+  ubu.at(1) =  0.10 / p_scale_[1]; // max depth
   nlp_solver_.setInput(ubu,"ubx");
 
   // Constraint bounds
@@ -439,8 +440,8 @@ int main(){
   double reg_threshold = 1e-8;
 
   // Problem size
-  // int  n = 100, n_euler = 100, n_finite_elements = 1, n_meas = 20;
-  int  n = 30, n_euler = 10, n_finite_elements = 10, n_meas = 100; // Paper
+  //  int  n = 100, n_euler = 100, n_finite_elements = 1, n_meas = 100;
+  int  n = 30, n_euler = 100, n_finite_elements = 1, n_meas = 100; // Paper
   //  int n = 15, n_euler = 20, n_finite_elements = 1, n_meas = 20;
 
   // Initial guesses

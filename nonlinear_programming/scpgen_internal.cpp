@@ -600,6 +600,7 @@ namespace CasADi{
       cout << "\"c1\":" << c1_ << ", ";
       cout << "\"beta\":" << beta_ << ", ";
       cout << "\"merit_memsize\":" << merit_memsize_ << ", ";
+      cout << "\"merit_start\":" << merit_start_ << ", ";
       cout << "\"regularize\":" << regularize_ << ", ";
       cout << endl << "  ";
       cout << "\"tol_pr\":" << tol_pr_ << ", ";
@@ -1085,7 +1086,7 @@ namespace CasADi{
     }
 
     // Calculate penalty parameter of merit function
-    sigma_ = 0;
+    sigma_ = merit_start_;
     sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_X).data()));
     sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_A).data()));
   
