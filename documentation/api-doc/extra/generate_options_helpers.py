@@ -21,15 +21,23 @@
 # 
 from casadi import *
 
+def optionDocumented(name,cl,metadata):
+  acl = [cl]
+  if 'hierarchy' in metadata[cl]:
+    acl += metadata[cl]['hierarchy']
+  for c in acl:
+    if 'options' in metadata[c] and name in metadata[c]['options']: return True
+  return False
+
 def addExtra(metadata):
 
   x=SX("x")
   f = SXFunction([x],[x**2])
   f.init()
   i = IpoptSolver(f)
-
+  
   for name in i.getOptionNames():
-    if name in metadata["CasADi::IpoptInternal"]["options"]:
+    if optionDocumented(name,"CasADi::IpoptInternal",metadata):
       continue
     meta = metadata["CasADi::IpoptInternal"]["options"][name] = dict()
     meta['name'] = name
@@ -55,6 +63,7 @@ def addExtra(metadata):
     return
     
   for name in i.getOptionNames():
+    if optionDocumented(name,"CasADi::WorhpInternal",metadata): continue
     meta = metadata["CasADi::WorhpInternal"]["options"][name] = dict()
     meta['name'] = name
     meta['type'] = i.getOptionTypeName(name)
@@ -75,6 +84,7 @@ def addExtra(metadata):
     return
     
   for name in i.getOptionNames():
+    if optionDocumented(name,"CasADi::QPOasesInternal",metadata): continue
     meta = metadata["CasADi::QPOasesInternal"]["options"][name] = dict()
     meta['name'] = name
     meta['type'] = i.getOptionTypeName(name)
