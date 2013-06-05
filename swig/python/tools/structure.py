@@ -812,7 +812,7 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
     if dataVectorCheck:
       if self.master.shape[0]!=self.size:
         raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dimString()))
-      if self.master.shape[1]!=1:
+      if self.master.shape[1]!=1 and self.master.shape[0]>0:
         raise Exception("MatrixStruct: dimension error. Expecting %d-by-1, but got %s" % (self.size,self.master.dimString()))
     else:
       if self.master.size()!=self.size:
