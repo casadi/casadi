@@ -61,7 +61,7 @@ QPSolverInternal::QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A){
   
   // Input arguments
   setNumInputs(QP_NUM_IN);
-  input(QP_X_INIT) = DMatrix(x_sparsity,0);
+  input(QP_X0) = DMatrix(x_sparsity,0);
   input(QP_H) = DMatrix(H);
   input(QP_G) = DMatrix(x_sparsity);
   input(QP_A) = DMatrix(A);
@@ -72,10 +72,10 @@ QPSolverInternal::QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A){
   
   // Output arguments
   setNumOutputs(QP_NUM_OUT);
-  output(QP_PRIMAL) = DMatrix(x_sparsity);
+  output(QP_X) = DMatrix(x_sparsity);
   output(QP_COST) = 0.0;
-  output(QP_LAMBDA_X) = DMatrix(x_sparsity);
-  output(QP_LAMBDA_A) = DMatrix(bounds_sparsity);
+  output(QP_LAM_X) = DMatrix(x_sparsity);
+  output(QP_LAM_A) = DMatrix(bounds_sparsity);
   
   inputScheme_ = SCHEME_QPInput;
   outputScheme_ = SCHEME_QPOutput;

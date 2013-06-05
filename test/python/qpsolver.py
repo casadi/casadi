@@ -88,9 +88,9 @@ class QPSolverTests(casadiTestCase):
 
       self.assertAlmostEqual(solver.getOutput()[0],-1,6,str(qpsolver))
     
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(qpsolver))
 
-      self.checkarray(solver.getOutput("lambda_a"),DMatrix([0]),str(qpsolver),digits=6)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([0]),str(qpsolver),digits=6)
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5,6,str(qpsolver))
 
@@ -131,10 +131,10 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput()[0],2.0/3,6,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput()[1],4.0/3,6,str(qpsolver))
     
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[0],0,6,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[1],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(qpsolver))
 
-      self.checkarray(solver.getOutput("lambda_a"),DMatrix([3+1.0/9,4.0/9,0]),str(qpsolver),digits=6)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([3+1.0/9,4.0/9,0]),str(qpsolver),digits=6)
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],-8-2.0/9,6,str(qpsolver))
       
@@ -145,10 +145,10 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput()[1],1,3,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput("cost"),-6,6,str(qpsolver))
       
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[0],0,6,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[1],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(qpsolver))
 
-      self.checkarray(solver.getOutput("lambda_a"),DMatrix([2,0,0]),str(qpsolver),digits=2)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([2,0,0]),str(qpsolver),digits=2)
       
       solver.setInput(0,"h")
 
@@ -157,10 +157,10 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput()[1],4.0/3,6,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput("cost"),-9-1.0/3,6,str(qpsolver))
       
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[0],0,6,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[1],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(qpsolver))
 
-      self.checkarray(solver.getOutput("lambda_a"),DMatrix([10.0/3,4.0/3,0]),str(qpsolver),digits=4)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([10.0/3,4.0/3,0]),str(qpsolver),digits=4)
 
       solver.setInput([-inf]*3,"lba") #  Upper _and_ lower 
       solver.setInput([inf]*3,"uba")  #  bounds infinite?
@@ -177,10 +177,10 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput()[1],5,6,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput("cost"),-40,5,str(qpsolver))
       
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[0],2,6,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[1],6,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],2,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],6,6,str(qpsolver))
 
-      self.checkarray(solver.getOutput("lambda_a"),DMatrix([0,0,0]),str(qpsolver),digits=4)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([0,0,0]),str(qpsolver),digits=4)
 
   def test_general_convex_sparse(self):
     self.message("Convex sparse QP with solvers: " + str([qpsolver for qpsolver,options in qpsolvers]))
@@ -223,9 +223,9 @@ class QPSolverTests(casadiTestCase):
       
       self.checkarray(solver.getOutput(),DMatrix([0.873908,0.95630465,0,0,0]),str(qpsolver),digits=6)
       
-      self.checkarray(solver.getOutput("lambda_x"),DMatrix([0,0,-0.339076,-10.0873907,-0.252185]),6,str(qpsolver),digits=6)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0,-0.339076,-10.0873907,-0.252185]),6,str(qpsolver),digits=6)
 
-      self.checkarray(solver.getOutput("lambda_a"),DMatrix([0,2.52184767]),str(qpsolver),digits=6)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([0,2.52184767]),str(qpsolver),digits=6)
 
       self.assertAlmostEqual(solver.getOutput("cost")[0],-6.264669320767,6,str(qpsolver))
 
@@ -309,10 +309,10 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput()[0],0.5,6,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput()[1],1.25,6,str(qpsolver))
     
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[0],4.75,6,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[1],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],4.75,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(qpsolver))
 
-      self.checkarray(solver.getOutput("lambda_a"),DMatrix([0,2,0]),str(qpsolver),digits=6)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([0,2,0]),str(qpsolver),digits=6)
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],-7.4375,6,str(qpsolver))
     
@@ -337,10 +337,10 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput()[0],0.4,4,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput()[1],1.6,4,str(qpsolver))
     
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[0],0,5,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[1],0,5,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,5,str(qpsolver))
 
-      self.checkarray(solver.getOutput("lambda_a"),DMatrix([3.2,0,0]),str(qpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.2,0,0]),str(qpsolver),digits=5)
        
       self.assertAlmostEqual(solver.getOutput("cost")[0],-8.4,5,str(qpsolver))
 
@@ -385,9 +385,9 @@ class QPSolverTests(casadiTestCase):
 
       self.checkarray(solver.getOutput(),DMatrix([5.5,5,-10]),str(qpsolver),digits=4) 
       
-      self.checkarray(solver.getOutput("lambda_x"),DMatrix([0,0,-2.5]),str(qpsolver),digits=4)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0,-2.5]),str(qpsolver),digits=4)
 
-      self.checkarray(solver.getOutput("lambda_a"),DMatrix([1.5]),str(qpsolver),digits=4)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([1.5]),str(qpsolver),digits=4)
        
       self.assertAlmostEqual(solver.getOutput("cost")[0],-38.375,5,str(qpsolver))
         
@@ -434,11 +434,11 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput()[0],-0.5,6,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput()[1],1,6,str(qpsolver))
     
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[0],0,6,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[1],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(qpsolver))
 
 
-      self.checkarray(solver.getOutput("lambda_a"),DMatrix([3.5]),str(qpsolver),digits=6)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.5]),str(qpsolver),digits=6)
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],-3.375,6,str(qpsolver))
 
@@ -483,11 +483,11 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput()[0],10,3,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput()[1],8,3,str(qpsolver))
     
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[0],0,5,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lambda_x")[1],0,5,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5,str(qpsolver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,5,str(qpsolver))
 
 
-      self.checkarray(solver.getOutput("lambda_a"),DMatrix([]),str(qpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qpsolver),digits=5)
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],-34,5,str(qpsolver))
       
@@ -529,7 +529,7 @@ class QPSolverTests(casadiTestCase):
 
       self.checkarray(solver.getOutput(),x0,str(qpsolver)+str(qp_options),digits=2)
       self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5*mul([x0.T,H,x0]),3,str(qpsolver))
-      self.checkarray(solver.getOutput("lambda_x"),DMatrix.zeros(N,1),str(qpsolver),digits=4)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix.zeros(N,1),str(qpsolver),digits=4)
       
   def test_redundant(self):
     self.message("Redundant constraints")
@@ -570,8 +570,8 @@ class QPSolverTests(casadiTestCase):
         
         self.checkarray(solver.getOutput(),DMatrix([-0.19230768069,1.6846153915,0.692307690769276]),str(qpsolver),digits=6)
         self.assertAlmostEqual(solver.getOutput("cost")[0],-5.850384678537,5,str(qpsolver))
-        self.checkarray(solver.getOutput("lambda_x"),DMatrix([0,0,0]),str(qpsolver),digits=6)
-        self.checkarray(mul(A.T,solver.getOutput("lambda_a")),DMatrix([3.876923073076,2.4384615365384965,-1]),str(qpsolver),digits=6)
+        self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0,0]),str(qpsolver),digits=6)
+        self.checkarray(mul(A.T,solver.getOutput("lam_a")),DMatrix([3.876923073076,2.4384615365384965,-1]),str(qpsolver),digits=6)
       
 if __name__ == '__main__':
     unittest.main()

@@ -234,14 +234,14 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
   output(QP_COST).set(qp_->getObjVal());
 
   // Get the primal solution
-  qp_->getPrimalSolution(&output(QP_PRIMAL).front());
+  qp_->getPrimalSolution(&output(QP_X).front());
   
   // Get the dual solution
   qp_->getDualSolution(&dual_.front());
   
   // Split up the dual solution in multipliers for the simple bounds and the linear bounds
-  transform(dual_.begin(),   dual_.begin()+nx_,output(QP_LAMBDA_X).begin(),negate<double>());
-  transform(dual_.begin()+nx_,dual_.end(),     output(QP_LAMBDA_A).begin(),negate<double>());
+  transform(dual_.begin(),   dual_.begin()+nx_,output(QP_LAM_X).begin(),negate<double>());
+  transform(dual_.begin()+nx_,dual_.end(),     output(QP_LAM_A).begin(),negate<double>());
 }
 
 std::string QPOasesInternal::getErrorMessage(int flag){

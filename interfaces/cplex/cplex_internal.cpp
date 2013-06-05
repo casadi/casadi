@@ -254,10 +254,10 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   // Warm-starting if possible
   if (qp_method_ != 0 && qp_method_ != 4 && is_warm_){
     // TODO: Initialize slacks and dual variables of bound constraints
-    CPXcopystart(env_, lp_, cstat_.data(), rstat_.data(), input(QP_X_INIT).ptr(), NULL, NULL, input(QP_LAMBDA_INIT).ptr());
+    CPXcopystart(env_, lp_, cstat_.data(), rstat_.data(), input(QP_X0).ptr(), NULL, NULL, input(QP_LAM_X0).ptr());
   }
   else{
-    status = CPXcopystart(env_, lp_, NULL, NULL, input(QP_X_INIT).ptr(), NULL, NULL, input(QP_LAMBDA_INIT).ptr());
+    status = CPXcopystart(env_, lp_, NULL, NULL, input(QP_X0).ptr(), NULL, NULL, input(QP_LAM_X0).ptr());
   }
 
   // Optimize...
@@ -273,10 +273,10 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   slack.resize(NUMROWS_);
   status = CPXsolution (env_, lp_, &solstat,
    output(QP_COST).ptr(), 
-   output(QP_PRIMAL).ptr(), 
-   output(QP_LAMBDA_A).ptr(),
+   output(QP_X).ptr(), 
+   output(QP_LAM_A).ptr(),
    slack.data(),
-   output(QP_LAMBDA_X).ptr()
+   output(QP_LAM_X).ptr()
   ); 
   
   if(status){
@@ -288,8 +288,8 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   }
 
   // Flip the sign of the multipliers
-  for (int k=0;k<output(QP_LAMBDA_A).size();++k) output(QP_LAMBDA_A).data()[k]= - output(QP_LAMBDA_A).data()[k];
-  for (int k=0;k<output(QP_LAMBDA_X).size();++k) output(QP_LAMBDA_X).data()[k]= - output(QP_LAMBDA_X).data()[k];
+  for (int k=0;k<output(QP_LAM_A).size();++k) output(QP_LAM_A).data()[k]= - output(QP_LAM_A).data()[k];
+  for (int k=0;k<output(QP_LAM_X).size();++k) output(QP_LAM_X).data()[k]= - output(QP_LAM_X).data()[k];
   
   int solnstat = CPXgetstat (env_, lp_);
   stringstream errormsg; // NOTE: Why not print directly to cout and cerr?

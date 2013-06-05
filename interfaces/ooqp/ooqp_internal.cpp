@@ -185,31 +185,31 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
     
   // Get primal solution
   vars_->x->copyIntoArray(getPtr(temp_));
-  std::copy(temp_.begin(),temp_.begin()+nx_,output(QP_PRIMAL).begin());
+  std::copy(temp_.begin(),temp_.begin()+nx_,output(QP_X).begin());
 
   // Get multipliers for the bounds
-//  vector<double> &lambda_x = output(QP_LAMBDA_X).data();
+//  vector<double> &lam_x = output(QP_LAM_X).data();
   
   // Set multipliers to zero
-  output(QP_LAMBDA_X).setAll(0);
-  output(QP_LAMBDA_A).setAll(0);
+  output(QP_LAM_X).setAll(0);
+  output(QP_LAM_A).setAll(0);
   
   // Lower bounds
   if (vars_->gamma->length() > 0) {
     vars_->gamma->copyIntoArray(getPtr(temp_));
     for (int k=0;k<nx_;++k) 
-      output(QP_LAMBDA_X).data()[k] = -temp_[k];
+      output(QP_LAM_X).data()[k] = -temp_[k];
     for (int k=0;k<nc_;++k) 
-      output(QP_LAMBDA_A).data()[k] = -temp_[nx_+k];
+      output(QP_LAM_A).data()[k] = -temp_[nx_+k];
   }
 
   // Upper bounds
   if (vars_->phi->length() > 0) {
     vars_->phi->copyIntoArray(getPtr(temp_));
     for (int k=0;k<nx_;++k)
-      output(QP_LAMBDA_X).data()[k] += temp_[k];
+      output(QP_LAM_X).data()[k] += temp_[k];
     for (int k=0;k<nc_;++k) 
-      output(QP_LAMBDA_A).data()[k] += temp_[nx_+k];
+      output(QP_LAM_A).data()[k] += temp_[nx_+k];
   }
   
   if(flag!=SUCCESSFUL_TERMINATION) ooqp_error("Solve",flag);

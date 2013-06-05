@@ -720,7 +720,7 @@ namespace CasADi{
     qp_solver_.setInput(g,QP_G);
 
     // Hot-starting if possible
-    qp_solver_.setInput(x_opt, QP_X_INIT);
+    qp_solver_.setInput(x_opt, QP_X0);
   
     //TODO: Fix hot-starting of dual variables
     //qp_solver_.setInput(lambda_A_opt, QP_LAMBDA_INIT);
@@ -752,9 +752,9 @@ namespace CasADi{
     qp_solver_.evaluate();
   
     // Get the optimal solution
-    qp_solver_.getOutput(x_opt,QP_PRIMAL);
-    qp_solver_.getOutput(lambda_x_opt,QP_LAMBDA_X);
-    qp_solver_.getOutput(lambda_A_opt,QP_LAMBDA_A);
+    qp_solver_.getOutput(x_opt,QP_X);
+    qp_solver_.getOutput(lambda_x_opt,QP_LAM_X);
+    qp_solver_.getOutput(lambda_A_opt,QP_LAM_A);
     if (monitored("dx")){
       cout << "dx = " << x_opt << endl;
     }

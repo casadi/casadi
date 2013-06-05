@@ -40,7 +40,7 @@
               
       with H positive definite
               
-      nx: number of decision variables (x)
+      n: number of decision variables (x)
       nc: number of constraints (A)
       
   \endverbatim
@@ -53,36 +53,36 @@ namespace CasADi{
   
 /// Input arguments of a QP problem [qpIn]
 enum QPInput{
-  /// The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
+  /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
   QP_H,
-  /// The vector g: dense,  (nx x 1) [g]
+  /// The vector g: dense,  (n x 1) [g]
   QP_G,
-  /// The matrix A: sparse, (nc x nx) - product with x must be dense. [a]
+  /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
   QP_A,
   /// dense, (nc x 1) [lba]
   QP_LBA,
   /// dense, (nc x 1) [uba]
   QP_UBA,
-  /// dense, (nx x 1) [lbx]
+  /// dense, (n x 1) [lbx]
   QP_LBX,
-  /// dense, (nx x 1) [ubx]
+  /// dense, (n x 1) [ubx]
   QP_UBX,
-  /// dense, (nx x 1) [x_init]
-  QP_X_INIT,
-  /// dense [lambda_init]
-  QP_LAMBDA_INIT,
+  /// dense, (n x 1) [x0]
+  QP_X0,
+  /// dense [lam_x0]
+  QP_LAM_X0,
   QP_NUM_IN};
 
 /// Output arguments of an QP Solver [qpOut]
 enum QPOutput{
-  /// The primal solution [primal]
-  QP_PRIMAL,
+  /// The primal solution [x]
+  QP_X,
   /// The optimal cost [cost]
   QP_COST,
-  /// The dual solution corresponding to linear bounds [lambda_a]
-  QP_LAMBDA_A,
-  /// The dual solution corresponding to simple bounds [lambda_x]
-  QP_LAMBDA_X,
+  /// The dual solution corresponding to linear bounds [lam_a]
+  QP_LAM_A,
+  /// The dual solution corresponding to simple bounds [lam_x]
+  QP_LAM_X,
   QP_NUM_OUT};
 
 // Forward declaration of internal class

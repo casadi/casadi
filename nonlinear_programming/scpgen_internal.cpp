@@ -1058,16 +1058,16 @@ namespace CasADi{
     qp_solver_.evaluate();
   
     // Condensed primal step
-    const DMatrix& du = qp_solver_.output(QP_PRIMAL);
+    const DMatrix& du = qp_solver_.output(QP_X);
     copy(du.begin(),du.end(),x_step_.begin());
   
     // Condensed dual step (simple bounds)
-    const DMatrix& lam_x_new = qp_solver_.output(QP_LAMBDA_X);
+    const DMatrix& lam_x_new = qp_solver_.output(QP_LAM_X);
     copy(lam_x_new.begin(),lam_x_new.end(),x_dlam_.begin());
     std::transform(x_dlam_.begin(),x_dlam_.end(),x_lam_.begin(),x_dlam_.begin(),std::minus<double>());
 
     // Condensed dual step (nonlinear bounds)
-    const DMatrix& lam_g_new = qp_solver_.output(QP_LAMBDA_A);
+    const DMatrix& lam_g_new = qp_solver_.output(QP_LAM_A);
     copy(lam_g_new.begin(),lam_g_new.end(),g_dlam_.begin());
     std::transform(g_dlam_.begin(),g_dlam_.end(),g_lam_.begin(),g_dlam_.begin(),std::minus<double>());
 
@@ -1087,8 +1087,8 @@ namespace CasADi{
 
     // Calculate penalty parameter of merit function
     sigma_ = merit_start_;
-    sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_X).data()));
-    sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_A).data()));
+    sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAM_X).data()));
+    sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAM_A).data()));
   
     // Calculate L1-merit function in the actual iterate
     double l1_infeas = primalInfeasibility();

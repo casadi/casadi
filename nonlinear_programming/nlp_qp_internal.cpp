@@ -68,10 +68,10 @@ void NLPQPInternal::evaluate(int nfdir, int nadir) {
   nlpsolver_.evaluate();
   
   // Read the outputs from Ipopt
-  output(QP_PRIMAL).set(nlpsolver_.output(NLP_SOLVER_X));
+  output(QP_X).set(nlpsolver_.output(NLP_SOLVER_X));
   output(QP_COST).set(nlpsolver_.output(NLP_SOLVER_F));
-  output(QP_LAMBDA_A).set(nlpsolver_.output(NLP_SOLVER_LAM_G));
-  output(QP_LAMBDA_X).set(nlpsolver_.output(NLP_SOLVER_LAM_X));
+  output(QP_LAM_A).set(nlpsolver_.output(NLP_SOLVER_LAM_G));
+  output(QP_LAM_X).set(nlpsolver_.output(NLP_SOLVER_LAM_X));
 }
 
 void NLPQPInternal::init(){
