@@ -40,11 +40,18 @@
                 P = Sum_i^m F_i x_i - G 
                 P positive semidefinite                   
               
+              LBA <= A x <= UBA
+              LBX <= x   <= UBX
+              
       with x ( n x 1)
            c ( n x 1 )
            G, F_i  sparse symmetric (m x m)
            X dense symmetric ( m x m )
-      
+           X dense symmetric ( m x m )
+           A sparse matrix ( nc x m)
+           LBA, UBA dense vector (nx x 1)
+           LBX, UBX dense vector (n x 1)
+
   \endverbatim
   
   This formulation is chosen as primal, because it does not call for a large decision variable space.
@@ -114,6 +121,14 @@ enum SDPInput{
   SDP_G,
   /// The matrix A: ( nc x n) [a]
   SDP_A,
+  /// Lower bounds on Ax ( nc x 1) [lba]
+  SDP_LBA,
+  /// Upper bounds on Ax  ( nc x 1) [uba]
+  SDP_UBA,
+  /// Lower bounds on x ( n x 1 ) [lbx]
+  SDP_LBX,
+  /// Upper bounds on x ( n x 1 ) [ubx]
+  SDP_UBX,
   SDP_NUM_IN};
 
 /// Output arguments of an SDP Solver [sdpOut]
@@ -128,6 +143,10 @@ enum SDPOutput{
   SDP_PRIMAL_COST,
   /// The dual optimal cost (1 x 1) [dual_cost]
   SDP_DUAL_COST,
+  /// The dual solution corresponding to the linear constraints  (nc x 1) [lambda_a]
+  SDP_LAMBDA_A,
+  /// The dual solution corresponding to simple bounds  (n x 1) [lambda_x]
+  SDP_LAMBDA_X,
   SDP_NUM_OUT};
 
 // Forward declaration of internal class

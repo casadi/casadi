@@ -47,6 +47,8 @@ SDPSolverInternal::SDPSolverInternal(const CRSSparsity &A, const CRSSparsity &G,
   
   m_ = G.size1();
   
+  nc_ = A.size1();
+  
   casadi_assert_message(F.size2()==m_,"SDPSolverInternal: Supplied F sparsity: number of columns (" << F.size2() <<  ")  must match m (" << m_ << ")");
   
   casadi_assert_message(F.size1()%m_==0,"SDPSolverInternal: Supplied F sparsity: number of rows (" << F.size2() <<  ")  must be an integer multiple of m (" << m_ << "), but got remainder " << F.size1()%m_);
@@ -59,6 +61,10 @@ SDPSolverInternal::SDPSolverInternal(const CRSSparsity &A, const CRSSparsity &G,
   input(SDP_F) = DMatrix(F,0);
   input(SDP_A) = DMatrix(A,0);
   input(SDP_C) = DMatrix::zeros(n_);
+  input(SDP_LBX) = -DMatrix::inf(n_);
+  input(SDP_UBX) = DMatrix::inf(n_);
+  input(SDP_LBA) = -DMatrix::inf(nc_);
+  input(SDP_UBA) = DMatrix::inf(nc_);
 
   for (int i=0;i<n_;i++) {
     CRSSparsity s = input(SDP_F)(range(i*m_,(i+1)*m_),ALL).sparsity();
@@ -131,6 +137,8 @@ void SDPSolverInternal::init() {
   output(SDP_DUAL) = calc_dual_? DMatrix(Pmapper_.output().sparsity(),0) : DMatrix();
   output(SDP_PRIMAL_COST) = 0.0;
   output(SDP_DUAL_COST) = 0.0;
+  output(SDP_LAMBDA_X) = DMatrix::zeros(n_,1);
+  output(SDP_LAMBDA_A) = DMatrix::zeros(nc_,1);
   
 }
 

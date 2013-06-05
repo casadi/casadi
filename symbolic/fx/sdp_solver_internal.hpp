@@ -60,6 +60,9 @@ class SDPSolverInternal : public FXInternal{
     /// Number of identified blocks
     int nb_;
     
+    /// Number of linear constraints
+    int nc_;
+    
     /// Block decomposition details
     std::vector<int> block_boundaries_;
     std::vector<int> block_sizes_;
