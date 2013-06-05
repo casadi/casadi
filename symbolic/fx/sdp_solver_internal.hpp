@@ -35,7 +35,7 @@ class SDPSolverInternal : public FXInternal{
     SDPSolverInternal();
         
     // Constructor
-    SDPSolverInternal( const CRSSparsity &C, const CRSSparsity &A);
+    SDPSolverInternal( const CRSSparsity &G, const CRSSparsity &F);
     
     // Destructor
     virtual ~SDPSolverInternal() = 0;
@@ -64,11 +64,11 @@ class SDPSolverInternal : public FXInternal{
     std::vector<int> block_boundaries_;
     std::vector<int> block_sizes_;
     
-    /** A mapping from (C,A) -> (C[p,p]_j,A_i[p,p]j)
-    *  input(0) = C
-    *  input(1) = A
-    *  output(j) = Cj
-    *  output((1+i)*nb_+j) = Aj
+    /** A mapping from (G,F) -> (G[p,p]_j,F_i[p,p]j)
+    *  input(0) = G
+    *  input(1) = F
+    *  output(j) = Gj
+    *  output((1+i)*nb_+j) = Fj
     */
     FX mapping_;
     

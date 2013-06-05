@@ -34,37 +34,37 @@ class SDPtests(casadiTestCase):
   def test_memleak1(self):
     self.message("memleak1")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
-    b = DMatrix([48,-8,20])
+    c = DMatrix([48,-8,20])
 
-    A = vertcat([DMatrix([[10,4],[4,0]]),DMatrix([[0,0],[0,-8]]),DMatrix([[0,-8],[-8,-2]])])
+    F = vertcat([DMatrix([[10,4],[4,0]]),DMatrix([[0,0],[0,-8]]),DMatrix([[0,-8],[-8,-2]])])
 
-    makeSparse(A)
+    makeSparse(F)
 
-    A.printMatrix()
+    F.printMatrix()
 
-    C = DMatrix([[-11,0],[0,23]])
+    G = DMatrix([[-11,0],[0,23]])
 
-    makeSparse(C)
+    makeSparse(G)
 
-    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+    dsp = DSDPSolver(G.sparsity(),F.sparsity())
 
   @requires("DSDPSolver")
   def test_memleak2(self):
     self.message("memleak1")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
-    b = DMatrix([48,-8,20])
+    c = DMatrix([48,-8,20])
 
-    A = vertcat([DMatrix([[10,4],[4,0]]),DMatrix([[0,0],[0,-8]]),DMatrix([[0,-8],[-8,-2]])])
+    F = vertcat([DMatrix([[10,4],[4,0]]),DMatrix([[0,0],[0,-8]]),DMatrix([[0,-8],[-8,-2]])])
 
-    makeSparse(A)
+    makeSparse(F)
 
-    A.printMatrix()
+    F.printMatrix()
 
-    C = DMatrix([[-11,0],[0,23]])
+    G = DMatrix([[-11,0],[0,23]])
 
-    makeSparse(C)
+    makeSparse(G)
 
-    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+    dsp = DSDPSolver(G.sparsity(),F.sparsity())
     dsp.init()
 
   @requires("DSDPSolver")
@@ -81,16 +81,16 @@ class SDPtests(casadiTestCase):
     n1 = 3.1
     n2 = 2.3
     n3 = 4.7
-    b = DMatrix(n1)
-    Ai = [DMatrix(n3)]
-    A = vertcat(Ai)
-    makeSparse(A)
-    C = DMatrix(n2)
-    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+    c = DMatrix(n1)
+    Fi = [DMatrix(n3)]
+    F = vertcat(Fi)
+    makeSparse(F)
+    G = DMatrix(n2)
+    dsp = DSDPSolver(G.sparsity(),F.sparsity())
     dsp.init()
-    dsp.setInput(C,"c")
-    dsp.setInput(b,"b")
-    dsp.setInput(A,"a")
+    dsp.setInput(G,"g")
+    dsp.setInput(c,"c")
+    dsp.setInput(F,"f")
 
     dsp.evaluate()
     
@@ -116,16 +116,16 @@ class SDPtests(casadiTestCase):
     n3 = 1.7
     n1 = 2.1
     n2 = 1.3
-    b = DMatrix([n1])
-    Ai = [ blkdiag([n3,-n3])]
-    C = blkdiag([n2,-n2])
-    A = vertcat(Ai)
+    c = DMatrix([n1])
+    Fi = [ blkdiag([n3,-n3])]
+    G = blkdiag([n2,-n2])
+    F = vertcat(Fi)
     
-    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+    dsp = DSDPSolver(G.sparsity(),F.sparsity())
     dsp.init()
-    dsp.setInput(C,"c")
-    dsp.setInput(b,"b")
-    dsp.setInput(A,"a")
+    dsp.setInput(G,"g")
+    dsp.setInput(c,"c")
+    dsp.setInput(F,"f")
 
     dsp.evaluate()
     
@@ -148,16 +148,16 @@ class SDPtests(casadiTestCase):
     #                 
     #  solution: x0=1, x1=0
     
-    b = DMatrix([2,3])
-    Ai = [ blkdiag([1,1,0]), blkdiag([1,0,1])]
-    C = blkdiag([1,0,0])
-    A = vertcat(Ai)
+    c = DMatrix([2,3])
+    Fi = [ blkdiag([1,1,0]), blkdiag([1,0,1])]
+    G = blkdiag([1,0,0])
+    F = vertcat(Fi)
     
-    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+    dsp = DSDPSolver(G.sparsity(),F.sparsity())
     dsp.init()
-    dsp.setInput(C,"c")
-    dsp.setInput(b,"b")
-    dsp.setInput(A,"a")
+    dsp.setInput(G,"g")
+    dsp.setInput(c,"c")
+    dsp.setInput(F,"f")
 
     dsp.evaluate()
     
@@ -179,16 +179,16 @@ class SDPtests(casadiTestCase):
     #                 x1 >=0
     #
     # solution:  x0=0 , x1=0
-    b = DMatrix([2,3])
-    Ai = [ blkdiag([-1,1,0]), blkdiag([-1,0,1])]
-    C = blkdiag([-1,0,0])
-    A = vertcat(Ai)
+    c = DMatrix([2,3])
+    Fi = [ blkdiag([-1,1,0]), blkdiag([-1,0,1])]
+    G = blkdiag([-1,0,0])
+    F = vertcat(Fi)
     
-    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+    dsp = DSDPSolver(G.sparsity(),F.sparsity())
     dsp.init()
-    dsp.setInput(C,"c")
-    dsp.setInput(b,"b")
-    dsp.setInput(A,"a")
+    dsp.setInput(G,"g")
+    dsp.setInput(c,"c")
+    dsp.setInput(F,"f")
 
     dsp.evaluate()
     
@@ -216,17 +216,17 @@ class SDPtests(casadiTestCase):
     #                x0     >= 0    
     #                x1     >= 0
     
-    b = DMatrix([2,4])
-    Ai = [ blkdiag([1,-1,1,0]), blkdiag([1,-1,0,1])]
+    c = DMatrix([2,4])
+    Fi = [ blkdiag([1,-1,1,0]), blkdiag([1,-1,0,1])]
     e = 1e-6
-    C = blkdiag([1,-(1+e),0,0])
-    A = vertcat(Ai)
+    G = blkdiag([1,-(1+e),0,0])
+    F = vertcat(Fi)
     
-    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+    dsp = DSDPSolver(G.sparsity(),F.sparsity())
     dsp.init()
-    dsp.setInput(C,"c")
-    dsp.setInput(b,"b")
-    dsp.setInput(A,"a")
+    dsp.setInput(G,"g")
+    dsp.setInput(c,"c")
+    dsp.setInput(F,"f")
 
     dsp.evaluate()
     
@@ -241,27 +241,27 @@ class SDPtests(casadiTestCase):
   def test_example1(self):
     self.message("Example1")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
-    b = DMatrix([48,-8,20])
+    c = DMatrix([48,-8,20])
     
-    Ai = [DMatrix([[10,4],[4,0]]),DMatrix([[0,0],[0,-8]]),DMatrix([[0,-8],[-8,-2]])]
+    Fi = [DMatrix([[10,4],[4,0]]),DMatrix([[0,0],[0,-8]]),DMatrix([[0,-8],[-8,-2]])]
 
-    A = vertcat(Ai)
+    F = vertcat(Fi)
 
-    makeSparse(A)
+    makeSparse(F)
 
-    A.printMatrix()
+    F.printMatrix()
 
-    C = DMatrix([[-11,0],[0,23]])
+    G = DMatrix([[-11,0],[0,23]])
 
-    makeSparse(C)
+    makeSparse(G)
 
-    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+    dsp = DSDPSolver(G.sparsity(),F.sparsity())
 
     dsp.init()
 
-    dsp.setInput(C,"c")
-    dsp.setInput(b,"b")
-    dsp.setInput(A,"a")
+    dsp.setInput(G,"g")
+    dsp.setInput(c,"c")
+    dsp.setInput(F,"f")
 
     dsp.evaluate()
     
@@ -273,8 +273,8 @@ class SDPtests(casadiTestCase):
     self.checkarray(dsp.getOutput("p"),DMatrix.zeros(2,2),digits=5)
     
     V = struct_ssym([
-          entry("L",shape=C.shape),
-          entry("x",shape=b.size())
+          entry("L",shape=G.shape),
+          entry("x",shape=c.size())
         ])
     L = V["L"]
     x = V["x"] 
@@ -283,9 +283,9 @@ class SDPtests(casadiTestCase):
 
 
     g = []
-    g.append(sum([Ai[i]*x[i] for i in range(3)]) - C - P)
+    g.append(sum([Fi[i]*x[i] for i in range(3)]) - G - P)
 
-    nlp = SXFunction(nlpIn(x=V),nlpOut(f=mul(b.T,x),g=veccat(g)))
+    nlp = SXFunction(nlpIn(x=V),nlpOut(f=mul(c.T,x),g=veccat(g)))
 
     sol = IpoptSolver(nlp)
     sol.init()
@@ -304,12 +304,12 @@ class SDPtests(casadiTestCase):
   def test_example2(self):
     self.message("Example2")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
-    b = DMatrix([1.1, -10, 6.6 , 19 , 4.1])
+    c = DMatrix([1.1, -10, 6.6 , 19 , 4.1])
 
 
-    C = blkdiag([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0]);
+    G = blkdiag([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0]);
     
-    sp = C.sparsity()
+    sp = G.sparsity()
     
     flatdata = [[0.5,5.2,5.2,-5.3,7.8,-2.4,6.0,-2.4,4.2,6.5,6.0,6.5,2.1,-4.5,-3.5],
     [1.7,7.0,7.0,-9.3,-1.9,-0.9,-1.3,-0.9,-0.8,-2.1,-1.3,-2.1,4.0,-0.2,-3.7],
@@ -317,17 +317,17 @@ class SDPtests(casadiTestCase):
   [-2.4,-2.5,-2.5,-2.9,3.4,-3.2,-4.5,-3.2,3.0,-4.8,-4.5,-4.8,3.6,4.8,9.7],
   [-6.5,-5.4,-5.4,-6.6,6.7,-7.2,-3.6,-7.2,7.3,-3.0,-3.6,-3.0,-1.4,6.1,-1.5]]
 
-    A = vertcat([DMatrix(sp,data) for data in flatdata])
-    makeSparse(A)
+    F = vertcat([DMatrix(sp,data) for data in flatdata])
+    makeSparse(F)
 
 
-    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+    dsp = DSDPSolver(G.sparsity(),F.sparsity())
 
     dsp.init()
 
-    dsp.setInput(C,"c")
-    dsp.setInput(b,"b")
-    dsp.setInput(A,"a")
+    dsp.setInput(G,"g")
+    dsp.setInput(c,"c")
+    dsp.setInput(F,"f")
 
     dsp.evaluate()
     DMatrix.setPrecision(10)
@@ -342,14 +342,14 @@ class SDPtests(casadiTestCase):
   def test_example2_perm(self):
     self.message("Example2_permuted")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
-    b = DMatrix([1.1, -10, 6.6 , 19 , 4.1])
+    c = DMatrix([1.1, -10, 6.6 , 19 , 4.1])
 
     perm = [5,2,1,0,6,3,4]
     permi = lookupvector(perm,len(perm))
     
-    C = blkdiag([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0]);
+    G = blkdiag([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0]);
 
-    sp = C.sparsity()
+    sp = G.sparsity()
     
     flatdata = [[0.5,5.2,5.2,-5.3,7.8,-2.4,6.0,-2.4,4.2,6.5,6.0,6.5,2.1,-4.5,-3.5],
     [1.7,7.0,7.0,-9.3,-1.9,-0.9,-1.3,-0.9,-0.8,-2.1,-1.3,-2.1,4.0,-0.2,-3.7],
@@ -357,17 +357,17 @@ class SDPtests(casadiTestCase):
   [-2.4,-2.5,-2.5,-2.9,3.4,-3.2,-4.5,-3.2,3.0,-4.8,-4.5,-4.8,3.6,4.8,9.7],
   [-6.5,-5.4,-5.4,-6.6,6.7,-7.2,-3.6,-7.2,7.3,-3.0,-3.6,-3.0,-1.4,6.1,-1.5]]
 
-    A = vertcat([DMatrix(sp,data)[perm,perm] for data in flatdata])
-    makeSparse(A)
+    F = vertcat([DMatrix(sp,data)[perm,perm] for data in flatdata])
+    makeSparse(F)
     
-    C = C[perm,perm]
-    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+    G = G[perm,perm]
+    dsp = DSDPSolver(G.sparsity(),F.sparsity())
 
     dsp.init()
 
-    dsp.setInput(C,"c")
-    dsp.setInput(b,"b")
-    dsp.setInput(A,"a")
+    dsp.setInput(G,"g")
+    dsp.setInput(c,"c")
+    dsp.setInput(F,"f")
 
     dsp.evaluate()
     DMatrix.setPrecision(10)

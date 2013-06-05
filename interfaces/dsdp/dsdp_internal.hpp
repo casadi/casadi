@@ -43,7 +43,7 @@ public:
   virtual DSDPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit DSDPInternal(const CRSSparsity &C, const CRSSparsity &A);
+  explicit DSDPInternal(const CRSSparsity &G, const CRSSparsity &F);
 
   /** \brief  Destructor */
   virtual ~DSDPInternal();

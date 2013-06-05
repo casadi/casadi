@@ -39,29 +39,29 @@ SDPSolverInternal::SDPSolverInternal() {
 
 
 // Constructor
-SDPSolverInternal::SDPSolverInternal(const CRSSparsity &C, const CRSSparsity &A) {
+SDPSolverInternal::SDPSolverInternal(const CRSSparsity &G, const CRSSparsity &F) {
   addOption("calc_p",OT_BOOLEAN, true, "Indicate if the P-part of primal solution should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (n x n).");
   addOption("calc_dual",OT_BOOLEAN, true, "Indicate if dual should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (n x n).");
   
-  casadi_assert_message(C==C.transpose(),"SDPSolverInternal: Supplied C sparsity must symmetric but got " << C.dimString());
+  casadi_assert_message(G==G.transpose(),"SDPSolverInternal: Supplied G sparsity must symmetric but got " << G.dimString());
   
-  n_ = C.size1();
+  n_ = G.size1();
   
-  casadi_assert_message(A.size2()==n_,"SDPSolverInternal: Supplied A sparsity: number of columns (" << A.size2() <<  ")  must match n (" << n_ << ")");
+  casadi_assert_message(F.size2()==n_,"SDPSolverInternal: Supplied F sparsity: number of columns (" << F.size2() <<  ")  must match n (" << n_ << ")");
   
-  casadi_assert_message(A.size1()%n_==0,"SDPSolverInternal: Supplied A sparsity: number of rows (" << A.size2() <<  ")  must be an integer multiple of n (" << n_ << "), but got remainder " << A.size1()%n_);
+  casadi_assert_message(F.size1()%n_==0,"SDPSolverInternal: Supplied F sparsity: number of rows (" << F.size2() <<  ")  must be an integer multiple of n (" << n_ << "), but got remainder " << F.size1()%n_);
   
-  m_ = A.size1()/n_;
+  m_ = F.size1()/n_;
   
   // Input arguments
   setNumInputs(SDP_NUM_IN);
-  input(SDP_C) = DMatrix(C,0);
-  input(SDP_A) = DMatrix(A,0);
-  input(SDP_B) = DMatrix::zeros(m_);
+  input(SDP_G) = DMatrix(G,0);
+  input(SDP_F) = DMatrix(F,0);
+  input(SDP_C) = DMatrix::zeros(m_);
 
   for (int i=0;i<m_;i++) {
-    CRSSparsity s = input(SDP_A)(range(i*n_,(i+1)*n_),ALL).sparsity();
-    casadi_assert_message(s==s.transpose(),"SDPSolverInternal: Each supplied Ai must be symmetric. But got " << s.dimString() <<  " for i = " << i << ".");
+    CRSSparsity s = input(SDP_F)(range(i*n_,(i+1)*n_),ALL).sparsity();
+    casadi_assert_message(s==s.transpose(),"SDPSolverInternal: Each supplied Fi must be symmetric. But got " << s.dimString() <<  " for i = " << i << ".");
   }
   
   inputScheme_ = SCHEME_SDPInput;
@@ -77,9 +77,9 @@ void SDPSolverInternal::init() {
   calc_dual_ = getOption("calc_dual");
 
   // Find aggregate sparsity pattern
-  CRSSparsity aggregate = input(SDP_C).sparsity();
+  CRSSparsity aggregate = input(SDP_G).sparsity();
   for (int i=0;i<m_;++i) {
-    aggregate = aggregate + input(SDP_A)(range(i*n_,(i+1)*n_),ALL).sparsity();
+    aggregate = aggregate + input(SDP_F)(range(i*n_,(i+1)*n_),ALL).sparsity();
   }
   
   // Detect block diagonal structure in this sparsity pattern
@@ -103,21 +103,21 @@ void SDPSolverInternal::init() {
   Pmapper_ = SXFunction(full_blocks,blkdiag(full_blocks)(lookupvector(p,p.size()),lookupvector(p,p.size())));
   Pmapper_.init();
   
-  // Make a mapping function from (C,A) -> (C[p,p]_j,A_i[p,p]j)
-  SXMatrix C = ssym("C",input(SDP_C).sparsity());
-  SXMatrix A = ssym("A",input(SDP_A).sparsity());
+  // Make a mapping function from (G,F) -> (G[p,p]_j,F_i[p,p]j)
+  SXMatrix G = ssym("G",input(SDP_G).sparsity());
+  SXMatrix F = ssym("F",input(SDP_F).sparsity());
 
   std::vector<SXMatrix> in;
-  in.push_back(C);
-  in.push_back(A);
+  in.push_back(G);
+  in.push_back(F);
   std::vector<SXMatrix> out((m_+1)*nb_);
   for (int j=0;j<nb_;++j) {
-    out[j] = C(p,p)(range(r[j],r[j+1]),range(r[j],r[j+1]));
+    out[j] = G(p,p)(range(r[j],r[j+1]),range(r[j],r[j+1]));
   }
   for (int i=0;i<m_;++i) {
-    SXMatrix Ai = A(range(i*n_,(i+1)*n_),ALL)(p,p);
+    SXMatrix Fi = F(range(i*n_,(i+1)*n_),ALL)(p,p);
     for (int j=0;j<nb_;++j) {
-      out[(i+1)*nb_+j] = Ai(range(r[j],r[j+1]),range(r[j],r[j+1]));
+      out[(i+1)*nb_+j] = Fi(range(r[j],r[j+1]),range(r[j],r[j+1]));
     }
   }
   mapping_ = SXFunction(in,out);

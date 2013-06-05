@@ -34,15 +34,15 @@
   Primal:
 
   \verbatim
-  min          b' x 
+  min          c' x 
    x 
   subject to
-                P = Sum_m A_i x_i - C 
-                P positive semidefinite   
+                P = Sum_i^m F_i x_i - G 
+                P positive semidefinite                   
               
       with x ( m x 1)
-           b ( m x 1 )
-           C, A_i  sparse symmetric (n x n)
+           c ( m x 1 )
+           G, F_i  sparse symmetric (n x n)
            X dense symmetric ( n x n )
       
   \endverbatim
@@ -52,11 +52,11 @@
   Dual:
   
   \verbatim
-  max          trace(C Y)
+  max          trace(G Y)
    Y 
   
   subject to
-              trace(A_i Y) = b_i
+              trace(F_i Y) = c_i
               Y positive semidefinite
               
       with Y dense symmetric ( n x n)
@@ -68,26 +68,26 @@
   Primal:
   
   \verbatim
-  min          b' x 
+  min          c' x 
    x 
   subject to
-                Pj = Sum_m A_ij x_i - Cj   for all j
+                Pj = Sum_m F_ij x_i - gj   for all j
                 Pj positive semidefinite   for all j
               
       with x ( m x 1)
-           b ( m x 1 )
-           C, A_i  sparse symmetric (n x n)
+           c ( m x 1 )
+           G, F_i  sparse symmetric (n x n)
            X dense symmetric ( n x n )
       
   \endverbatim
   
   Dual:
   \verbatim
-  max          Sum_j trace(Cj Yj)
+  max          Sum_j trace(Gj Yj)
    Yj 
   
   subject to
-              Sum_j trace(A_ij Yj) = b_i   for all j
+              Sum_j trace(F_ij Yj) = c_i   for all j
               Yj positive semidefinite     for all j
               
       with Y dense symmetric ( n x n)
@@ -95,8 +95,8 @@
   \endverbatim
   
   You can cast this into the standard form with:
-    C  = blkdiag(Cj for all j)
-    Ai = blkdiag(A_ij for all j)
+    G  = blkdiag(Gj for all j)
+    Fi = blkdiag(F_ij for all j)
     
   Implementations of SDPSolver are encouraged to exploit this block structure.
   
@@ -106,12 +106,12 @@ namespace CasADi{
   
 /// Input arguments of a SDP problem [sdpIn]
 enum SDPInput{
-  /// The vertical stack of all matrices A_i: ( nm x n) [a]
-  SDP_A,
-  /// The vector b: ( m x 1) [b]
-  SDP_B,
-  /// The matrix C: ( n x n) [c]
+  /// The vertical stack of all matrices F_i: ( nm x n) [f]
+  SDP_F,
+  /// The vector c: ( m x 1) [c]
   SDP_C,
+  /// The matrix G: ( n x n) [g]
+  SDP_G,
   SDP_NUM_IN};
 
 /// Output arguments of an SDP Solver [sdpOut]

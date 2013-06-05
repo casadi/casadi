@@ -36,13 +36,13 @@ namespace CasADi {
 
 DSDPInternal* DSDPInternal::clone() const{
   // Return a deep copy
-  DSDPInternal* node = new DSDPInternal(input(SDP_C).sparsity(),input(SDP_A).sparsity());
+  DSDPInternal* node = new DSDPInternal(input(SDP_G).sparsity(),input(SDP_F).sparsity());
   if(!node->is_init_)
     node->init();
   return node;
 }
   
-DSDPInternal::DSDPInternal(const CRSSparsity &C, const CRSSparsity &A) : SDPSolverInternal(C,A){
+DSDPInternal::DSDPInternal(const CRSSparsity &G, const CRSSparsity &F) : SDPSolverInternal(G,F){
  
   casadi_assert_message(double(n_)*(double(n_)+1)/2 < std::numeric_limits<int>::max(),"Your problem size n is too large to be handled by DSDP.");
 
@@ -152,12 +152,12 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   
   // Copy b vector
   for (int i=0;i<m_;++i) {
-    info = DSDPSetDualObjective(dsdp_, i+1, -input(SDP_B).at(i));
+    info = DSDPSetDualObjective(dsdp_, i+1, -input(SDP_C).at(i));
   }
   
   // Get Ai from supplied A
-  mapping_.setInput(input(SDP_C),0);
-  mapping_.setInput(input(SDP_A),1);
+  mapping_.setInput(input(SDP_G),0);
+  mapping_.setInput(input(SDP_F),1);
   // Negate because the standard form in PSDP is different
   std::transform(mapping_.input(0).begin(), mapping_.input(0).end(), mapping_.input(0).begin(), std::negate<double>());
   std::transform(mapping_.input(1).begin(), mapping_.input(1).end(), mapping_.input(1).begin(), std::negate<double>());
