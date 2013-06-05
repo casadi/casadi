@@ -158,9 +158,6 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   // Get Ai from supplied A
   mapping_.setInput(input(SDP_G),0);
   mapping_.setInput(input(SDP_F),1);
-  // Negate because the standard form in PSDP is different
-  std::transform(mapping_.input(0).begin(), mapping_.input(0).end(), mapping_.input(0).begin(), std::negate<double>());
-  std::transform(mapping_.input(1).begin(), mapping_.input(1).end(), mapping_.input(1).begin(), std::negate<double>());
   mapping_.evaluate();
 
   for (int i=0;i<n_+1;++i) {

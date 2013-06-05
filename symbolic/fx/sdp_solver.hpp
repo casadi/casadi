@@ -38,7 +38,7 @@
    x 
   subject to
                 P = Sum_i^m F_i x_i - G 
-                P positive semidefinite                   
+                P negative semidefinite                   
               
               LBA <= A x <= UBA
               LBX <= x   <= UBX
@@ -46,7 +46,6 @@
       with x ( n x 1)
            c ( n x 1 )
            G, F_i  sparse symmetric (m x m)
-           X dense symmetric ( m x m )
            X dense symmetric ( m x m )
            A sparse matrix ( nc x m)
            LBA, UBA dense vector (nx x 1)
@@ -79,7 +78,7 @@
    x 
   subject to
                 Pj = Sum_i^m F_ij x_i - gj   for all j
-                Pj positive semidefinite   for all j
+                Pj negative semidefinite   for all j
               
       with x ( n x 1)
            c ( n x 1 )
