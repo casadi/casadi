@@ -20,7 +20,7 @@ print "sol = ", x.sol, y.sol
 x = var()
 y = var()
 
-print "cost = ", minimize((1-x)**2+100*(y-x**2)**2,[x+y==0, sin(x)>=0])
+print "cost = ", minimize((1-x)**2+100*(y-x**2)**2,[x**2+y**2<=1, x+y>=0])
 print "sol = ", x.sol, y.sol
 
 # Matrix symbols

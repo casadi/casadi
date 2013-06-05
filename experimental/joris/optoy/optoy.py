@@ -1,28 +1,76 @@
 from casadi import *
 from casadi.tools import *
 
-class OptimizationVariable(MX):
+class OptimizationObject(MX):
+  def create(self,shape,name):
+    if not isinstance(shape,tuple): shape = (shape,) 
+    MX.__init__(self,name,sp_dense(*shape))
+    self.mapping[hash(self)] = self
+    
+  def __iter__(self):
+    while True:
+      yield 123
+    
+class OptimizationVariable(OptimizationObject):
   mapping = {}
  
   def __init__(self,shape=1,lb=-inf,ub=inf,name="x",init=0):
+    """
+      Create a decision variable
+      
+      Parameters
+      -------------------
+      
+      shape: integer or (integer,integer)
+        Matrix shape of the symbol
+      
+      name: string
+        A name for the symbol to be used in printing.
+        Not required to be unique
+   
+      lb: number
+        Lower bound on the decision variable
+        May also be set after initialization as 'x.lb = number'
+
+      ub: number
+        Upper bound on the decision variable
+        May also be set after initialization as 'x.ub = number'
+        
+      init: number
+        Initial guess for the optimization solver
+        May also be set after initialization as 'x.init = number'
+        
+    """
     self.lb = lb
     self.ub = ub
-    if not isinstance(shape,tuple): shape = (shape,) 
-    self._sparsity = sp_dense(*shape)
+    self.create(shape,name)
     self.init = init
     self.sol = None
-    MX.__init__(self,name,self._sparsity)
-    OptimizationVariable.mapping[hash(self)] = self 
-
-class OptimizationParameter(MX):
+    
+class OptimizationParameter(OptimizationObject):
   mapping = {}
 
   def __init__(self,shape=1,value=0,name="p"):
+    """
+      Create a parameter, ie a thing that is fixed during optimization
+      
+      Parameters
+      -------------------
+      
+      shape: integer or (integer,integer)
+        Matrix shape of the symbol
+      
+      name: string
+        A name for the symbol to be used in printing.
+        Not required to be unique
+   
+      value: number or matrix
+        Value that the parameter should take during optimization
+        May also be set after initialization as 'x.value = number'
+
+    """
     self.value = value
-    if not isinstance(shape,tuple): shape = (shape,) 
-    self._sparsity = sp_dense(*shape)
-    MX.__init__(self,name,self._sparsity)
-    OptimizationParameter.mapping[hash(self)] = self
+    self.create(shape,name)
     
 var = OptimizationVariable
 par = OptimizationParameter
@@ -31,8 +79,44 @@ def maximize(f,**kwargs):
   return - minimize(-f,**kwargs)
 
 def minimize(f,gl=[],verbose=False):
+  """
+   
+   Miminimizes an objective function subject to a list of constraints
+   
+   Parameters
+   -------------------
+   
+    f:    symbolic expression
+       objective function
+       
+    gl:   list of constraints
+       each constraint should have one of these form:
+             * lhs<=rhs
+             * lhs>=rhs
+             * lhs==rhs
+             
+             where lhs and rhs are expression
+             
+    Returns
+    -------------------
+    
+    If numerical solution was succesful,
+    returns cost at the optimal solution.
+    Otherwise raises an exception.
+    
+    Example
+    -------------------
+    
+    x = var()
+    y = var()
+
+    cost = minimize((1-x)**2+100*(y-x**2)**2)
+    print "cost = ", cost
+    print "sol = ", x.sol, y.sol
   
-  # Determine nature of constraints
+  """
+  
+  # Determine nature of constraints, either g(x)<=0 or g(x)==0
   gl_pure = []
   gl_equality = []
   for g in gl:
@@ -45,8 +129,11 @@ def minimize(f,gl=[],verbose=False):
     else:
       raise Exception("Constrained type unknown. Use ==, >= or <= .")
       
+  # Get an exhausive list of all casadi symbols that make up f and gl
   vars = getSymbols(veccat([f]+gl_pure))
   
+  # Find out which OptimizationParameter and 
+  # OptimizationVariable objects correspond to those casadi symbols
   x = []
   p = []
   for v in vars:
@@ -57,16 +144,19 @@ def minimize(f,gl=[],verbose=False):
     else:
       raise Exception("Cannot happen")
   
+  # Create structures
   X = struct_msym([entry(str(hash(i)),shape=i.sparsity()) for i in x])
   P = struct_msym([entry(str(hash(i)),shape=i.sparsity()) for i in p])
   G = struct_MX([entry(str(i),expr=g) for i,g in enumerate(gl_pure)])
 
+  # Subsitute the casadi symbols for the structured variants
   original = MXFunction(x+p,nlpOut(f=f,g=G))
   original.init()
   
   nlp = MXFunction(nlpIn(x=X,p=P),original.evalMX(X[...]+P[...]))
   nlp.init()
   
+  # Allocate an ipopt solver
   solver = IpoptSolver(nlp)
   if not verbose:
     solver.setOption("print_time",False)
@@ -75,22 +165,25 @@ def minimize(f,gl=[],verbose=False):
   solver.setOption("expand",True)
   solver.init()
 
+  # Set bounds on variables, set initial value
   x0 = X(solver.input("x0"))
   lbx = X(solver.input("lbx"))
   ubx = X(solver.input("ubx"))
-  
-  par = P(solver.input("p"))
-  
+
   for i in x:
     h = str(hash(i))
     lbx[h] = i.lb
     ubx[h] = i.ub
     x0[h] = i.init
+    
+  # Set parameter values
+  par = P(solver.input("p"))
   
   for i in p:
     h = str(hash(i))
     par[h] = i.value
 
+  # Set constraint bounds
   lbg = G(solver.input("lbg"))
   ubg = G(solver.input("ubg"))
   
@@ -101,12 +194,17 @@ def minimize(f,gl=[],verbose=False):
       lbg[str(i)] = -Inf
       ubg[str(i)] = 0
   
+  # Solve the problem numerically
   solver.solve()
   
+  # Raise an exception if not converged
   if solver.getStat('return_status')!="Solve_Succeeded":
     raise Exception("Problem failed to solve. Add verbose=True to see what happened.")
+    
+  # Add the solution to the OptimizationObjects
   opt = X(solver.output("x"))
   for i in x:
     i.sol = opt[str(hash(i))]
     
-  return solver.output("f")
+  # Return optimal cost
+  return float(solver.getOutput("f"))
