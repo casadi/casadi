@@ -40,28 +40,28 @@ SDPSolverInternal::SDPSolverInternal() {
 
 // Constructor
 SDPSolverInternal::SDPSolverInternal(const CRSSparsity &A, const CRSSparsity &G, const CRSSparsity &F) {
-  addOption("calc_p",OT_BOOLEAN, true, "Indicate if the P-part of primal solution should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (n x n).");
-  addOption("calc_dual",OT_BOOLEAN, true, "Indicate if dual should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (n x n).");
+  addOption("calc_p",OT_BOOLEAN, true, "Indicate if the P-part of primal solution should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (m x m).");
+  addOption("calc_dual",OT_BOOLEAN, true, "Indicate if dual should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (m x m).");
   
   casadi_assert_message(G==G.transpose(),"SDPSolverInternal: Supplied G sparsity must symmetric but got " << G.dimString());
   
-  n_ = G.size1();
+  m_ = G.size1();
   
-  casadi_assert_message(F.size2()==n_,"SDPSolverInternal: Supplied F sparsity: number of columns (" << F.size2() <<  ")  must match n (" << n_ << ")");
+  casadi_assert_message(F.size2()==m_,"SDPSolverInternal: Supplied F sparsity: number of columns (" << F.size2() <<  ")  must match m (" << m_ << ")");
   
-  casadi_assert_message(F.size1()%n_==0,"SDPSolverInternal: Supplied F sparsity: number of rows (" << F.size2() <<  ")  must be an integer multiple of n (" << n_ << "), but got remainder " << F.size1()%n_);
+  casadi_assert_message(F.size1()%m_==0,"SDPSolverInternal: Supplied F sparsity: number of rows (" << F.size2() <<  ")  must be an integer multiple of m (" << m_ << "), but got remainder " << F.size1()%m_);
   
-  m_ = F.size1()/n_;
+  n_ = F.size1()/m_;
   
   // Input arguments
   setNumInputs(SDP_NUM_IN);
   input(SDP_G) = DMatrix(G,0);
   input(SDP_F) = DMatrix(F,0);
   input(SDP_A) = DMatrix(A,0);
-  input(SDP_C) = DMatrix::zeros(m_);
+  input(SDP_C) = DMatrix::zeros(n_);
 
-  for (int i=0;i<m_;i++) {
-    CRSSparsity s = input(SDP_F)(range(i*n_,(i+1)*n_),ALL).sparsity();
+  for (int i=0;i<n_;i++) {
+    CRSSparsity s = input(SDP_F)(range(i*m_,(i+1)*m_),ALL).sparsity();
     casadi_assert_message(s==s.transpose(),"SDPSolverInternal: Each supplied Fi must be symmetric. But got " << s.dimString() <<  " for i = " << i << ".");
   }
   
@@ -79,8 +79,8 @@ void SDPSolverInternal::init() {
 
   // Find aggregate sparsity pattern
   CRSSparsity aggregate = input(SDP_G).sparsity();
-  for (int i=0;i<m_;++i) {
-    aggregate = aggregate + input(SDP_F)(range(i*n_,(i+1)*n_),ALL).sparsity();
+  for (int i=0;i<n_;++i) {
+    aggregate = aggregate + input(SDP_F)(range(i*m_,(i+1)*m_),ALL).sparsity();
   }
   
   // Detect block diagonal structure in this sparsity pattern
@@ -111,12 +111,12 @@ void SDPSolverInternal::init() {
   std::vector<SXMatrix> in;
   in.push_back(G);
   in.push_back(F);
-  std::vector<SXMatrix> out((m_+1)*nb_);
+  std::vector<SXMatrix> out((n_+1)*nb_);
   for (int j=0;j<nb_;++j) {
     out[j] = G(p,p)(range(r[j],r[j+1]),range(r[j],r[j+1]));
   }
-  for (int i=0;i<m_;++i) {
-    SXMatrix Fi = F(range(i*n_,(i+1)*n_),ALL)(p,p);
+  for (int i=0;i<n_;++i) {
+    SXMatrix Fi = F(range(i*m_,(i+1)*m_),ALL)(p,p);
     for (int j=0;j<nb_;++j) {
       out[(i+1)*nb_+j] = Fi(range(r[j],r[j+1]),range(r[j],r[j+1]));
     }
@@ -126,7 +126,7 @@ void SDPSolverInternal::init() {
 
   // Output arguments
   setNumOutputs(SDP_NUM_OUT);
-  output(SDP_PRIMAL) = DMatrix::zeros(m_,1);
+  output(SDP_PRIMAL) = DMatrix::zeros(n_,1);
   output(SDP_PRIMAL_P) = calc_p_? DMatrix(Pmapper_.output().sparsity(),0) : DMatrix();
   output(SDP_DUAL) = calc_dual_? DMatrix(Pmapper_.output().sparsity(),0) : DMatrix();
   output(SDP_PRIMAL_COST) = 0.0;

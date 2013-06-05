@@ -51,10 +51,10 @@ class SDPSolverInternal : public FXInternal{
     
   protected:
     
-    /// Size of decision variable matrix
+    /// Size of decision variable vector
     int n_;
     
-    /// The number of matrix constraints
+    /// The number of matrices F
     int m_;
     
     /// Number of identified blocks

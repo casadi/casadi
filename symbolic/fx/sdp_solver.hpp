@@ -40,10 +40,10 @@
                 P = Sum_i^m F_i x_i - G 
                 P positive semidefinite                   
               
-      with x ( m x 1)
-           c ( m x 1 )
-           G, F_i  sparse symmetric (n x n)
-           X dense symmetric ( n x n )
+      with x ( n x 1)
+           c ( n x 1 )
+           G, F_i  sparse symmetric (m x m)
+           X dense symmetric ( m x m )
       
   \endverbatim
   
@@ -59,7 +59,7 @@
               trace(F_i Y) = c_i
               Y positive semidefinite
               
-      with Y dense symmetric ( n x n)
+      with Y dense symmetric ( m x m)
 
   \endverbatim
   
@@ -71,13 +71,13 @@
   min          c' x 
    x 
   subject to
-                Pj = Sum_m F_ij x_i - gj   for all j
+                Pj = Sum_i^m F_ij x_i - gj   for all j
                 Pj positive semidefinite   for all j
               
-      with x ( m x 1)
-           c ( m x 1 )
-           G, F_i  sparse symmetric (n x n)
-           X dense symmetric ( n x n )
+      with x ( n x 1)
+           c ( n x 1 )
+           G, F_i  sparse symmetric (m x m)
+           X dense symmetric ( m x m )
       
   \endverbatim
   
@@ -90,7 +90,7 @@
               Sum_j trace(F_ij Yj) = c_i   for all j
               Yj positive semidefinite     for all j
               
-      with Y dense symmetric ( n x n)
+      with Y dense symmetric ( m x m)
 
   \endverbatim
   
@@ -106,11 +106,11 @@ namespace CasADi{
   
 /// Input arguments of a SDP problem [sdpIn]
 enum SDPInput{
-  /// The vertical stack of all matrices F_i: ( nm x n) [f]
+  /// The vertical stack of all matrices F_i: ( nm x m) [f]
   SDP_F,
-  /// The vector c: ( m x 1) [c]
+  /// The vector c: ( n x 1) [c]
   SDP_C,
-  /// The matrix G: ( n x n) [g]
+  /// The matrix G: ( m x m) [g]
   SDP_G,
   /// The matrix A: ( nc x n) [a]
   SDP_A,
@@ -118,11 +118,11 @@ enum SDPInput{
 
 /// Output arguments of an SDP Solver [sdpOut]
 enum SDPOutput{
-  /// The primal solution (m x 1) - may be used as initial guess [primal]
+  /// The primal solution (n x 1) - may be used as initial guess [primal]
   SDP_PRIMAL,
-  /// The solution P (n x n) - may be used as initial guess [p]
+  /// The solution P (m x m) - may be used as initial guess [p]
   SDP_PRIMAL_P,
-  /// The dual solution (n x n) - may be used as initial guess [dual]
+  /// The dual solution (m x m) - may be used as initial guess [dual]
   SDP_DUAL,
   /// The primal optimal cost (1 x 1) [primal_cost]
   SDP_PRIMAL_COST,

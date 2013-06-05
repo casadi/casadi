@@ -44,7 +44,7 @@ DSDPInternal* DSDPInternal::clone() const{
   
 DSDPInternal::DSDPInternal(const CRSSparsity &A, const CRSSparsity &G, const CRSSparsity &F) : SDPSolverInternal(A,G,F){
  
-  casadi_assert_message(double(n_)*(double(n_)+1)/2 < std::numeric_limits<int>::max(),"Your problem size n is too large to be handled by DSDP.");
+  casadi_assert_message(double(m_)*(double(m_)+1)/2 < std::numeric_limits<int>::max(),"Your problem size m is too large to be handled by DSDP.");
 
   addOption("gapTol",OT_REAL,1e-8,"Convergence criterion based on distance between primal and dual objective");
   addOption("maxIter",OT_INTEGER,500,"Maximum number of iterations");
@@ -93,7 +93,7 @@ void DSDPInternal::init(){
   }
 
   // Allocate DSDP solver memory
-  info = DSDPCreate(m_, &dsdp_);
+  info = DSDPCreate(n_, &dsdp_);
   DSDPSetStandardMonitor(dsdp_, 1);
   DSDPSetGapTolerance(dsdp_, getOption("gapTol"));
   DSDPSetMaxIts(dsdp_, getOption("maxIter"));
@@ -109,10 +109,10 @@ void DSDPInternal::init(){
   
 
   // Fill the data structures that hold DSDP-style sparse symmetric matrix
-  pattern_.resize(m_+1);
-  values_.resize(m_+1);
+  pattern_.resize(n_+1);
+  values_.resize(n_+1);
   
-  for (int i=0;i<m_+1;++i) {
+  for (int i=0;i<n_+1;++i) {
     pattern_[i].resize(nb_);
     values_[i].resize(nb_);
     for (int j=0;j<nb_;++j) {
@@ -151,7 +151,7 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   int info;
   
   // Copy b vector
-  for (int i=0;i<m_;++i) {
+  for (int i=0;i<n_;++i) {
     info = DSDPSetDualObjective(dsdp_, i+1, -input(SDP_C).at(i));
   }
   
@@ -163,7 +163,7 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   std::transform(mapping_.input(1).begin(), mapping_.input(1).end(), mapping_.input(1).begin(), std::negate<double>());
   mapping_.evaluate();
 
-  for (int i=0;i<m_+1;++i) {
+  for (int i=0;i<n_+1;++i) {
     for (int j=0;j<nb_;++j) {
       mapping_.output(i*nb_+j).get(values_[i][j],SPARSESYM);
       info = SDPConeSetASparseVecMat(sdpcone_, j, i, block_sizes_[j], 1, 0, &pattern_[i][j][0], &values_[i][j][0], pattern_[i][j].size() );
@@ -184,7 +184,7 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   DSDPGetSolutionType(dsdp_,&pdfeasible);
   std::cout << "Solution type: " << (*solutionType_.find(pdfeasible)).second << std::endl;
   
-  info = DSDPGetY(dsdp_,&output(SDP_PRIMAL).at(0),m_);
+  info = DSDPGetY(dsdp_,&output(SDP_PRIMAL).at(0),n_);
   
   double temp;
   DSDPGetDDObjective(dsdp_, &temp);
@@ -203,7 +203,7 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   
   if (calc_p_) {
     for (int j=0;j<nb_;++j) {
-      info = SDPConeComputeS(sdpcone_, j, 1.0,  &output(SDP_PRIMAL).at(0), m_, 0, block_sizes_[j] , &store_P_[j][0], store_P_[j].size());
+      info = SDPConeComputeS(sdpcone_, j, 1.0,  &output(SDP_PRIMAL).at(0), n_, 0, block_sizes_[j] , &store_P_[j][0], store_P_[j].size());
       Pmapper_.input(j).set(store_P_[j],SPARSESYM);
     }
     Pmapper_.evaluate();
