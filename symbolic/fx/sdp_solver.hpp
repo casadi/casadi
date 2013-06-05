@@ -112,6 +112,8 @@ enum SDPInput{
   SDP_C,
   /// The matrix G: ( n x n) [g]
   SDP_G,
+  /// The matrix A: ( nc x n) [a]
+  SDP_A,
   SDP_NUM_IN};
 
 /// Output arguments of an SDP Solver [sdpOut]

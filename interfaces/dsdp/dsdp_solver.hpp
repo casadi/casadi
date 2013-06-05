@@ -58,7 +58,7 @@ public:
   /** \brief  Default constructor */
   DSDPSolver();
   
-  explicit DSDPSolver(const CRSSparsity &G, const CRSSparsity &F);
+  explicit DSDPSolver(const CRSSparsity &A, const CRSSparsity &G, const CRSSparsity &F);
   
   /** \brief  Access functions of the node */
   DSDPInternal* operator->();
@@ -71,7 +71,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static SDPSolver creator(const CRSSparsity &G, const CRSSparsity &F){ return DSDPSolver(G,F);}
+  static SDPSolver creator(const CRSSparsity &A, const CRSSparsity &G, const CRSSparsity &F){ return DSDPSolver(A,G,F);}
   #ifdef SWIG
   %nocallback;
   #endif

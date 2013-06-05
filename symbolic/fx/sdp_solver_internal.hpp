@@ -35,7 +35,7 @@ class SDPSolverInternal : public FXInternal{
     SDPSolverInternal();
         
     // Constructor
-    SDPSolverInternal( const CRSSparsity &G, const CRSSparsity &F);
+    SDPSolverInternal(const CRSSparsity &A, const CRSSparsity &G, const CRSSparsity &F);
     
     // Destructor
     virtual ~SDPSolverInternal() = 0;

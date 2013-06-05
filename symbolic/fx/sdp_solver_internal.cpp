@@ -39,7 +39,7 @@ SDPSolverInternal::SDPSolverInternal() {
 
 
 // Constructor
-SDPSolverInternal::SDPSolverInternal(const CRSSparsity &G, const CRSSparsity &F) {
+SDPSolverInternal::SDPSolverInternal(const CRSSparsity &A, const CRSSparsity &G, const CRSSparsity &F) {
   addOption("calc_p",OT_BOOLEAN, true, "Indicate if the P-part of primal solution should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (n x n).");
   addOption("calc_dual",OT_BOOLEAN, true, "Indicate if dual should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (n x n).");
   
@@ -57,6 +57,7 @@ SDPSolverInternal::SDPSolverInternal(const CRSSparsity &G, const CRSSparsity &F)
   setNumInputs(SDP_NUM_IN);
   input(SDP_G) = DMatrix(G,0);
   input(SDP_F) = DMatrix(F,0);
+  input(SDP_A) = DMatrix(A,0);
   input(SDP_C) = DMatrix::zeros(m_);
 
   for (int i=0;i<m_;i++) {
