@@ -2034,5 +2034,8 @@ class MXtests(casadiTestCase):
       self.assertTrue(isEqual(w[1],b))
       self.assertTrue(isEqual(w[2],c))
     
+  def test_iter(self):
+    self.assertEqual(len(list(msym("x",2))),2)
+    
 if __name__ == '__main__':
     unittest.main()
