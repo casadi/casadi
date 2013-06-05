@@ -31,7 +31,7 @@
   Solves the following strictly convex problem:
   
   \verbatim
-  min          x'.H.x + G'.x 
+  min          1/2 x'.H.x + G'.x 
    x
   
   subject to

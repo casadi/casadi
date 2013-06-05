@@ -51,6 +51,49 @@ except:
 
 class QPSolverTests(casadiTestCase):
 
+  def test_scalar(self):
+    # 1/2 x H x + G' x
+    H = DMatrix([1])
+    G = DMatrix([1])
+
+    A =  DMatrix(2)
+
+    LBA = DMatrix(-10)
+    UBA = DMatrix(10)
+
+    LBX = DMatrix([-10])
+    UBX = DMatrix([10])
+    
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      self.message("general_convex: " + str(qpsolver))
+
+      solver = qpsolver(H.sparsity(),A.sparsity())
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
+
+      solver.solve()
+
+      self.assertAlmostEqual(solver.getOutput()[0],-1,6,str(qpsolver))
+    
+      self.assertAlmostEqual(solver.getOutput("lambda_x")[0],0,6,str(qpsolver))
+
+      self.checkarray(solver.getOutput("lambda_a"),DMatrix([0]),str(qpsolver),digits=6)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5,6,str(qpsolver))
+
   def test_general_convex_dense(self):
     self.message("Convex dense QP with solvers: " + str([qpsolver for qpsolver,options in qpsolvers]))
     H = DMatrix([[1,-1],[-1,2]])
