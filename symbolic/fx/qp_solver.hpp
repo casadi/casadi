@@ -31,11 +31,11 @@
   Solves the following strictly convex problem:
   
   \verbatim
-  min          1/2 x'.H.x + G'.x 
+  min          1/2 x' H x + g' x 
    x
   
   subject to
-              LBA <= A.x <= UBA
+              LBA <= A x <= UBA
               LBX <= x   <= UBX
               
       with H positive definite
@@ -55,7 +55,7 @@ namespace CasADi{
 enum QPInput{
   /// The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
   QP_H,
-  /// The vector G: dense,  (nx x 1) [g]
+  /// The vector g: dense,  (nx x 1) [g]
   QP_G,
   /// The matrix A: sparse, (nc x nx) - product with x must be dense. [a]
   QP_A,
