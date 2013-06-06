@@ -41,6 +41,10 @@ bool QPSolver::checkNode() const{
   return dynamic_cast<const QPSolverInternal*>(get())!=0;
 }
 
+void QPSolver::setLPOptions() {
+  (*this)->setLPOptions();
+}
+
 } // namespace CasADi
 
   

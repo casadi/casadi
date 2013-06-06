@@ -40,6 +40,7 @@ namespace CasADi{
   class LinearSolver;
   class Integrator;
   class QPSolver;
+  class LPSolver;
   class ImplicitFunction;
   
   /// Function pointer to a nonlinear solver creator function
@@ -47,6 +48,10 @@ namespace CasADi{
 
   /// Function pointer to a linear solver creator function
   typedef LinearSolver (*linearSolverCreator)(const CRSSparsity& sparsity);
+  
+  // TODO: fix ambiguity
+  /// Function pointer to a LP solver creator function
+  typedef LPSolver (*LPSolverCreator)(const CRSSparsity& A);
 
   /// Function pointer to an integrator creator function
   typedef Integrator (*integratorCreator)(const FX& f, const FX& g);

@@ -51,7 +51,7 @@ DSDPInternal::DSDPInternal(const CRSSparsity &A, const CRSSparsity &G, const CRS
   addOption("dualTol",OT_REAL,1e-4,"Tolerance for dual infeasibility (translates to primal infeasibility in dsdp terms)");
   addOption("primalTol",OT_REAL,1e-4,"Tolerance for primal infeasibility (translates to dual infeasibility in dsdp terms)");
   addOption("stepTol",OT_REAL,5e-2,"Terminate the solver if the step length in the primal is below this tolerance. ");
-  
+
   // Set DSDP memory blocks to null
   dsdp_ = 0;
   sdpcone_ = 0;
@@ -107,6 +107,10 @@ void DSDPInternal::init(){
     info = SDPConeSetSparsity(sdpcone_, j, block_sizes_[j]);
   }
   
+  //info = DSDPCreateLPCone( dsdp_, &lpcone_);
+
+  info = DSDPCreateBCone( dsdp_, &bcone_);
+  info = BConeAllocateBounds( bcone_, n_);
 
   // Fill the data structures that hold DSDP-style sparse symmetric matrix
   pattern_.resize(n_+1);
@@ -150,6 +154,21 @@ void DSDPInternal::init(){
 void DSDPInternal::evaluate(int nfdir, int nadir) {
   int info;
   
+  // Copy bounds
+  for (int i=0;i<n_;++i) {
+    if(input(SDP_LBX).at(i)==-std::numeric_limits< double >::infinity()) {
+      info = BConeSetUnboundedLower(bcone_,i+1);   
+    } else {
+      info = BConeSetLowerBound(bcone_,i+1,input(SDP_LBX).at(i));
+    }
+    if(input(SDP_UBX).at(i)==std::numeric_limits< double >::infinity()) {
+      info = BConeSetUnboundedUpper(bcone_,i+1);   
+      std::cout << "hey" << std::endl;
+    } else {
+      info = BConeSetUpperBound(bcone_,i+1,input(SDP_UBX).at(i));
+    }
+  }
+  
   // Copy b vector
   for (int i=0;i<n_;++i) {
     info = DSDPSetDualObjective(dsdp_, i+1, -input(SDP_C).at(i));
@@ -181,11 +200,11 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   DSDPGetSolutionType(dsdp_,&pdfeasible);
   std::cout << "Solution type: " << (*solutionType_.find(pdfeasible)).second << std::endl;
   
-  info = DSDPGetY(dsdp_,&output(SDP_PRIMAL).at(0),n_);
+  info = DSDPGetY(dsdp_,&output(SDP_X).at(0),n_);
   
   double temp;
   DSDPGetDDObjective(dsdp_, &temp);
-  output(SDP_PRIMAL_COST).set(-temp);
+  output(SDP_COST).set(-temp);
   DSDPGetPPObjective(dsdp_, &temp);
   output(SDP_DUAL_COST).set(-temp);
   
@@ -200,15 +219,17 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   
   if (calc_p_) {
     for (int j=0;j<nb_;++j) {
-      info = SDPConeComputeS(sdpcone_, j, 1.0,  &output(SDP_PRIMAL).at(0), n_, 0, block_sizes_[j] , &store_P_[j][0], store_P_[j].size());
+      info = SDPConeComputeS(sdpcone_, j, 1.0,  &output(SDP_X).at(0), n_, 0, block_sizes_[j] , &store_P_[j][0], store_P_[j].size());
       Pmapper_.input(j).set(store_P_[j],SPARSESYM);
     }
     Pmapper_.evaluate();
-    std::copy(Pmapper_.output().data().begin(),Pmapper_.output().data().end(),output(SDP_PRIMAL_P).data().begin());
+    std::copy(Pmapper_.output().data().begin(),Pmapper_.output().data().end(),output(SDP_P).data().begin());
   }
+      
+  DSDPComputeX(dsdp_);    
   
+  info = BConeCopyXSingle( bcone_, &output(SDP_LAMBDA_X).at(0), n_);
 
-  
 }
 
 } // namespace CasADi

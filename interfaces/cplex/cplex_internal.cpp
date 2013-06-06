@@ -158,28 +158,28 @@ void CplexInternal::init(){
   rstat_.resize(NUMROWS_);
 
   // Matrix A (Cplex reqests its transpose)
-  CRSSparsity AT_sparsity = input(QP_A).sparsity().transpose(AT_nonzero_mapping_);
+  CRSSparsity AT_sparsity = input(QP_SOLVER_A).sparsity().transpose(AT_nonzero_mapping_);
   toCplexSparsity(AT_sparsity,matbeg_,matcnt_,matind_);
-  matval_.resize(input(QP_A).size());
+  matval_.resize(input(QP_SOLVER_A).size());
   
   // Matrix H
-  toCplexSparsity(input(QP_H).sparsity(),qmatbeg_,qmatcnt_,qmatind_);
+  toCplexSparsity(input(QP_SOLVER_H).sparsity(),qmatbeg_,qmatcnt_,qmatind_);
   
   // Linear term
-  if (!isDense(input(QP_G))){
-    casadi_error("input(QP_G) must be dense.");
+  if (!isDense(input(QP_SOLVER_G))){
+    casadi_error("input(QP_SOLVER_G) must be dense.");
   }
-  if (!isDense(input(QP_LBA))){
-    casadi_error("input(QP_LBA) must be dense.");
+  if (!isDense(input(QP_SOLVER_LBA))){
+    casadi_error("input(QP_SOLVER_LBA) must be dense.");
   }
-  if (!isDense(input(QP_UBA))){
-    casadi_error("input(QP_UBA) must be dense.");
+  if (!isDense(input(QP_SOLVER_UBA))){
+    casadi_error("input(QP_SOLVER_UBA) must be dense.");
   }
-  if (!isDense(input(QP_LBX))){
-    casadi_error("input(QP_LBX) must be dense.");
+  if (!isDense(input(QP_SOLVER_LBX))){
+    casadi_error("input(QP_SOLVER_LBX) must be dense.");
   }
-  if (!isDense(input(QP_UBX))){
-    casadi_error("input(QP_UBX) must be dense.");
+  if (!isDense(input(QP_SOLVER_UBX))){
+    casadi_error("input(QP_SOLVER_UBX) must be dense.");
   }
   
   casadi_assert(lp_==0);
@@ -197,43 +197,43 @@ void CplexInternal::evaluate(int nfdir, int nadir){
     status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, 1);
   }
 
-  obj_ = input(QP_G).ptr();
-  lb_ = input(QP_LBX).ptr();
-  ub_ = input(QP_UBX).ptr();
+  obj_ = input(QP_SOLVER_G).ptr();
+  lb_ = input(QP_SOLVER_LBX).ptr();
+  ub_ = input(QP_SOLVER_UBX).ptr();
 
   // Looping over constraints
   for(int i = 0; i < NUMROWS_; ++i){
     // CPX_INFBOUND
   
     // Equality
-    if (input(QP_UBA).elem(i) - input(QP_LBA).elem(i) < 1E-20){
+    if (input(QP_SOLVER_UBA).elem(i) - input(QP_SOLVER_LBA).elem(i) < 1E-20){
       sense_[i] = 'E';
-      rhs_[i] = input(QP_LBA).elem(i);
+      rhs_[i] = input(QP_SOLVER_LBA).elem(i);
       rngval_[i] = 0.;
     }
     // Ineq - no lower bound
-    else if (input(QP_LBA).elem(i) < -CPX_INFBOUND){
+    else if (input(QP_SOLVER_LBA).elem(i) < -CPX_INFBOUND){
       sense_[i] = 'L';
-      rhs_[i] = input(QP_UBA).elem(i);
-      //rngval_[i] = input(QP_UBA).elem(i) - input(QP_LBA).elem(i);
+      rhs_[i] = input(QP_SOLVER_UBA).elem(i);
+      //rngval_[i] = input(QP_SOLVER_UBA).elem(i) - input(QP_SOLVER_LBA).elem(i);
       rngval_[i] = 0.;
     }
     // Ineq - no upper bound
-    else if (input(QP_UBA).elem(i) > CPX_INFBOUND){
+    else if (input(QP_SOLVER_UBA).elem(i) > CPX_INFBOUND){
       sense_[i] = 'G';
-      rhs_[i] = input(QP_LBA).elem(i);
+      rhs_[i] = input(QP_SOLVER_LBA).elem(i);
       rngval_[i] = 0.;
     }
     // Inew both upper and lower bounds
     else{
       sense_[i] = 'R';
-      rhs_[i] = input(QP_LBA).elem(i);
-      rngval_[i] = input(QP_UBA).elem(i) - input(QP_LBA).elem(i);
+      rhs_[i] = input(QP_SOLVER_LBA).elem(i);
+      rngval_[i] = input(QP_SOLVER_UBA).elem(i) - input(QP_SOLVER_LBA).elem(i);
     }
   }
 
   // Map the nonzeros of A to its transpose
-  const vector<double>& A_data = input(QP_A).data();
+  const vector<double>& A_data = input(QP_SOLVER_A).data();
   for(int k=0; k<A_data.size(); ++k){
     matval_[k] = A_data[AT_nonzero_mapping_[k]];
   }
@@ -243,7 +243,7 @@ void CplexInternal::evaluate(int nfdir, int nadir){
        sense_.data(), matbeg_.data(), matcnt_.data(), matind_.data(), matval_.data(), lb_, ub_, rngval_.data()); 
 
   // Preparing coefficient matrix Q
-  const double* qmatval = input(QP_H).ptr();
+  const double* qmatval = input(QP_SOLVER_H).ptr();
   status = CPXcopyquad(env_, lp_, qmatbeg_.data(), qmatcnt_.data(), qmatind_.data(), qmatval);
 
   if (dump_to_file_){
@@ -254,10 +254,10 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   // Warm-starting if possible
   if (qp_method_ != 0 && qp_method_ != 4 && is_warm_){
     // TODO: Initialize slacks and dual variables of bound constraints
-    CPXcopystart(env_, lp_, cstat_.data(), rstat_.data(), input(QP_X0).ptr(), NULL, NULL, input(QP_LAM_X0).ptr());
+    CPXcopystart(env_, lp_, cstat_.data(), rstat_.data(), input(QP_SOLVER_X0).ptr(), NULL, NULL, input(QP_SOLVER_LAM_X0).ptr());
   }
   else{
-    status = CPXcopystart(env_, lp_, NULL, NULL, input(QP_X0).ptr(), NULL, NULL, input(QP_LAM_X0).ptr());
+    status = CPXcopystart(env_, lp_, NULL, NULL, input(QP_SOLVER_X0).ptr(), NULL, NULL, input(QP_SOLVER_LAM_X0).ptr());
   }
 
   // Optimize...
@@ -272,11 +272,11 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   std::vector<double> slack;
   slack.resize(NUMROWS_);
   status = CPXsolution (env_, lp_, &solstat,
-   output(QP_COST).ptr(), 
-   output(QP_X).ptr(), 
-   output(QP_LAM_A).ptr(),
+   output(QP_SOLVER_COST).ptr(), 
+   output(QP_SOLVER_X).ptr(), 
+   output(QP_SOLVER_LAM_A).ptr(),
    slack.data(),
-   output(QP_LAM_X).ptr()
+   output(QP_SOLVER_LAM_X).ptr()
   ); 
   
   if(status){
@@ -288,8 +288,8 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   }
 
   // Flip the sign of the multipliers
-  for (int k=0;k<output(QP_LAM_A).size();++k) output(QP_LAM_A).data()[k]= - output(QP_LAM_A).data()[k];
-  for (int k=0;k<output(QP_LAM_X).size();++k) output(QP_LAM_X).data()[k]= - output(QP_LAM_X).data()[k];
+  for (int k=0;k<output(QP_SOLVER_LAM_A).size();++k) output(QP_SOLVER_LAM_A).data()[k]= - output(QP_SOLVER_LAM_A).data()[k];
+  for (int k=0;k<output(QP_SOLVER_LAM_X).size();++k) output(QP_SOLVER_LAM_X).data()[k]= - output(QP_SOLVER_LAM_X).data()[k];
   
   int solnstat = CPXgetstat (env_, lp_);
   stringstream errormsg; // NOTE: Why not print directly to cout and cerr?
@@ -338,7 +338,7 @@ void CplexInternal::evaluate(int nfdir, int nadir){
 
 CplexInternal* CplexInternal::clone() const{
   // Return a deepcopy
-  CplexInternal* node = new CplexInternal(input(QP_H).sparsity(), input(QP_A).sparsity());
+  CplexInternal* node = new CplexInternal(input(QP_SOLVER_H).sparsity(), input(QP_SOLVER_A).sparsity());
   if(!node->is_init_)
     node->init();
   return node;

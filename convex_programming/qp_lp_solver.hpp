@@ -20,49 +20,52 @@
  *
  */
 
-#ifndef QP_SOLVER_INTERNAL_HPP
-#define QP_SOLVER_INTERNAL_HPP
+#ifndef QP_LP_SOLVER_HPP
+#define QP_LP_SOLVER_HPP
 
-#include "qp_solver.hpp"
-#include "fx_internal.hpp"
+#include "symbolic/fx/lp_solver.hpp"
 
-namespace CasADi{
+namespace CasADi {
+  
+  
+// Forward declaration of internal class 
+class QPLPInternal;
 
-/// Internal class
-class QPSolverInternal : public FXInternal{
-  public:
-    // Constructor
-    QPSolverInternal();
-        
-    // Constructor
-    QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A);
-    
-    // Destructor
-    virtual ~QPSolverInternal() = 0;
-    
-    // Initialize
-    virtual void init();
-    
-    // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
-    
-    // Solve the system of equations
-    virtual void solve();
-    
-    /// Set options that make the QP solver more suitable for solving LPs
-    virtual void setLPOptions() { };
-    
-  protected:
-    
-    /// Number of decision variables
-    int nx_;
-    
-    /// The number of constraints (counting both equality and inequality) == A.size1()
-    int nc_; 
+  /** \brief IPOPT QP Solver for quadratic programming
+
+   @copydoc LPSolver_doc
+      
+   \author Joris Gillis
+   \date 2013
+  */
+class QPLPSolver : public LPSolver {
+public:
+
+  /** \brief  Default constructor */
+  QPLPSolver();
+  
+  explicit QPLPSolver(const CRSSparsity & A);
+  
+  /** \brief  Access functions of the node */
+  QPLPInternal* operator->();
+  const QPLPInternal* operator->() const;
+
+  /// Check if the node is pointing to the right type of object
+  virtual bool checkNode() const;
+  
+  /// Static creator function
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static LPSolver creator(const CRSSparsity& A){ return QPLPSolver(A);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
+
 };
 
 
 } // namespace CasADi
 
-#endif //QP_SOLVER_INTERNAL_HPP
+#endif //QP_LP_SOLVER_HPP
 

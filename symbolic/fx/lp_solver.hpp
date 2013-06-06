@@ -20,102 +20,94 @@
  *
  */
 
-#ifndef QP_SOLVER_HPP
-#define QP_SOLVER_HPP
+#ifndef LP_SOLVER_HPP
+#define LP_SOLVER_HPP
 
 #include "fx.hpp"
 
 
-/** \defgroup QPSolver_doc
+/** \defgroup LPSolver_doc
 
-  Solves the following strictly convex problem:
+  Solves the following linear problem:
   
   \verbatim
-  min          1/2 x' H x + g' x 
+  min          c' x 
    x
   
   subject to
               LBA <= A x <= UBA
               LBX <= x   <= UBX
               
-      with :
-        H sparse (n x n) positive definite
-        g dense  (n x 1)
+      with x ( n x 1)
+           c ( n x 1 )
+           A sparse matrix ( nc x n)
+           LBA, UBA dense vector (nc x 1)
+           LBX, UBX dense vector (n x 1)
               
       n: number of decision variables (x)
       nc: number of constraints (A)
       
   \endverbatim
   
-  If H is not positive-definite, the solver should throw an error.
-  
+
 */
       
 namespace CasADi{
   
-/// Input arguments of a QP problem [qpIn]
-enum QPSolverInput{
-  /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
-  QP_SOLVER_H,
-  /// The vector g: dense,  (n x 1) [g]
-  QP_SOLVER_G,
+/// Input arguments of a LP problem [lpIn]
+enum LPSolverInput{
+  /// The vector c: dense (n x 1) [c]
+  LP_SOLVER_C,
   /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
-  QP_SOLVER_A,
+  LP_SOLVER_A,
   /// dense, (nc x 1) [lba]
-  QP_SOLVER_LBA,
+  LP_SOLVER_LBA,
   /// dense, (nc x 1) [uba]
-  QP_SOLVER_UBA,
+  LP_SOLVER_UBA,
   /// dense, (n x 1) [lbx]
-  QP_SOLVER_LBX,
+  LP_SOLVER_LBX,
   /// dense, (n x 1) [ubx]
-  QP_SOLVER_UBX,
-  /// dense, (n x 1) [x0]
-  QP_SOLVER_X0,
-  /// dense [lam_x0]
-  QP_SOLVER_LAM_X0,
-  QP_SOLVER_NUM_IN};
+  LP_SOLVER_UBX,
+  LP_SOLVER_NUM_IN};
 
-/// Output arguments of an QP Solver [qpOut]
-enum QPSolverOutput{
+/// Output arguments of an LP Solver [lpOut]
+enum LPSolverOutput{
   /// The primal solution [x]
-  QP_SOLVER_X,
+  LP_SOLVER_X,
   /// The optimal cost [cost]
-  QP_SOLVER_COST,
+  LP_SOLVER_COST,
   /// The dual solution corresponding to linear bounds [lam_a]
-  QP_SOLVER_LAM_A,
+  LP_SOLVER_LAM_A,
   /// The dual solution corresponding to simple bounds [lam_x]
-  QP_SOLVER_LAM_X,
-  QP_SOLVER_NUM_OUT};
+  LP_SOLVER_LAM_X,
+  LP_SOLVER_NUM_OUT};
 
 // Forward declaration of internal class
-class QPSolverInternal;
+class LPSolverInternal;
 
-/** \brief QPSolver
+/** \brief LPSolver
 
 
-@copydoc QPSolver_doc
+@copydoc LPSolver_doc
 
-  \author Joel Andersson 
-  \date 2010
+  \author Joris Gillis 
+  \date 2013
 */
-class QPSolver : public FX{
+class LPSolver : public FX{
   public:
 
   /// Default constructor
-  QPSolver();
+  LPSolver();
   
   /// Access functions of the node
-  QPSolverInternal* operator->();
-  const QPSolverInternal* operator->() const;
+  LPSolverInternal* operator->();
+  const LPSolverInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
-  /// Set options that make the QP solver more suitable for solving LPs
-  void setLPOptions();
 };
 
 } // namespace CasADi
 
-#endif // QP_SOLVER_HPP
+#endif // LP_SOLVER_HPP
 

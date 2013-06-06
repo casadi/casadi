@@ -620,6 +620,104 @@ namespace CasADi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
+def lpIn(*dummy,**kwargs):
+  """
+  Helper function for 'LPSolverInput'
+
+  Two use cases:
+     a) arg = lpIn(c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx) 
+          all arguments optional
+     b) c, a, lba, uba, lbx, ubx = lpIn(arg,"c", "a", "lba", "uba", "lbx", "ubx") 
+          all arguments after the first optional
+  Input arguments of a LP problem
+  
+  Keyword arguments:
+    c   -- The vector c: dense (n x 1) [LP_SOLVER_C]
+    a   -- The matrix A: sparse, (nc x n) - product with x must be dense. [LP_SOLVER_A]
+    lba -- dense, (nc x 1) [LP_SOLVER_LBA]
+    uba -- dense, (nc x 1) [LP_SOLVER_UBA]
+    lbx -- dense, (n x 1) [LP_SOLVER_LBX]
+    ubx -- dense, (n x 1) [LP_SOLVER_UBX]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LPSolverInput,n)] for n in dummy[1:]]
+  c = []
+  if 'c' in kwargs:
+    c = kwargs['c']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  lba = []
+  if 'lba' in kwargs:
+    lba = kwargs['lba']
+  uba = []
+  if 'uba' in kwargs:
+    uba = kwargs['uba']
+  lbx = []
+  if 'lbx' in kwargs:
+    lbx = kwargs['lbx']
+  ubx = []
+  if 'ubx' in kwargs:
+    ubx = kwargs['ubx']
+  for k in kwargs.keys():
+    if not(k in ['c','a','lba','uba','lbx','ubx']):
+      raise Exception("Keyword error in lpIn: '%s' is not recognized. Available keywords are: c, a, lba, uba, lbx, ubx" % k )
+  return IOSchemeVector([c,a,lba,uba,lbx,ubx], SCHEME_LPSolverInput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(lpIn) lpIn<SXMatrix>;
+%template(lpIn) lpIn<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def lpOut(*dummy,**kwargs):
+  """
+  Helper function for 'LPSolverOutput'
+
+  Two use cases:
+     a) arg = lpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
+          all arguments optional
+     b) x, cost, lam_a, lam_x = lpOut(arg,"x", "cost", "lam_a", "lam_x") 
+          all arguments after the first optional
+  Output arguments of an LP Solver
+  
+  Keyword arguments:
+    x     -- The primal solution [LP_SOLVER_X]
+    cost  -- The optimal cost [LP_SOLVER_COST]
+    lam_a -- The dual solution corresponding to linear bounds [LP_SOLVER_LAM_A]
+    lam_x -- The dual solution corresponding to simple bounds [LP_SOLVER_LAM_X]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LPSolverOutput,n)] for n in dummy[1:]]
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
+  cost = []
+  if 'cost' in kwargs:
+    cost = kwargs['cost']
+  lam_a = []
+  if 'lam_a' in kwargs:
+    lam_a = kwargs['lam_a']
+  lam_x = []
+  if 'lam_x' in kwargs:
+    lam_x = kwargs['lam_x']
+  for k in kwargs.keys():
+    if not(k in ['x','cost','lam_a','lam_x']):
+      raise Exception("Keyword error in lpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
+  return IOSchemeVector([x,cost,lam_a,lam_x], SCHEME_LPSolverOutput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(lpOut) lpOut<SXMatrix>;
+%template(lpOut) lpOut<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
 def nlpIn(*dummy,**kwargs):
   """
   Helper function for 'NLPInput'
@@ -1229,30 +1327,152 @@ namespace CasADi {
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qpIn(*dummy,**kwargs):
+def qcqpIn(*dummy,**kwargs):
   """
-  Helper function for 'QPInput'
+  Helper function for 'QCQPSolverInput'
 
   Two use cases:
-     a) arg = qpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lambda_init=my_lambda_init) 
+     a) arg = qcqpIn(h=my_h, g=my_g, a=my_a, p=my_p, q=my_q, r=my_r, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0) 
           all arguments optional
-     b) h, g, a, lba, uba, lbx, ubx, x_init, lambda_init = qpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x_init", "lambda_init") 
+     b) h, g, a, p, q, r, lba, uba, lbx, ubx, x0, lam_x0 = qcqpIn(arg,"h", "g", "a", "p", "q", "r", "lba", "uba", "lbx", "ubx", "x0", "lam_x0") 
           all arguments after the first optional
   Input arguments of a QP problem
   
   Keyword arguments:
-    h           -- The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QP_H]
-    g           -- The vector G: dense,  (nx x 1) [QP_G]
-    a           -- The matrix A: sparse, (nc x nx) - product with x must be dense. [QP_A]
-    lba         -- dense, (nc x 1) [QP_LBA]
-    uba         -- dense, (nc x 1) [QP_UBA]
-    lbx         -- dense, (nx x 1) [QP_LBX]
-    ubx         -- dense, (nx x 1) [QP_UBX]
-    x_init      -- dense, (nx x 1) [QP_X_INIT]
-    lambda_init -- dense [QP_LAMBDA_INIT]
+    h      -- The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QCPQP_SOLVER_H]
+    g      -- The vector g: dense,  (n x 1) [QCPQP_SOLVER_G]
+    a      -- The matrix A: sparse, (nc x n) - product with x must be dense. [QCPQP_SOLVER_A]
+    p      -- The vertical stack of all Pi ( nm x n) [QCPQP_SOLVER_P]
+    q      -- The vertical stack of all qi: dense,  (nm x 1) [QCPQP_SOLVER_Q]
+    r      -- The vertical stack of all ri: dense,  (m x 1) [QCPQP_SOLVER_R]
+    lba    -- dense, (nc x 1) [QCPQP_SOLVER_LBA]
+    uba    -- dense, (nc x 1) [QCPQP_SOLVER_UBA]
+    lbx    -- dense, (n x 1) [QCPQP_SOLVER_LBX]
+    ubx    -- dense, (n x 1) [QCPQP_SOLVER_UBX]
+    x0     -- dense, (n x 1) [QCPQP_SOLVER_X0]
+    lam_x0 -- dense [QCPQP_SOLVER_LAM_X0]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QCQPSolverInput,n)] for n in dummy[1:]]
+  h = []
+  if 'h' in kwargs:
+    h = kwargs['h']
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  p = []
+  if 'p' in kwargs:
+    p = kwargs['p']
+  q = []
+  if 'q' in kwargs:
+    q = kwargs['q']
+  r = []
+  if 'r' in kwargs:
+    r = kwargs['r']
+  lba = []
+  if 'lba' in kwargs:
+    lba = kwargs['lba']
+  uba = []
+  if 'uba' in kwargs:
+    uba = kwargs['uba']
+  lbx = []
+  if 'lbx' in kwargs:
+    lbx = kwargs['lbx']
+  ubx = []
+  if 'ubx' in kwargs:
+    ubx = kwargs['ubx']
+  x0 = []
+  if 'x0' in kwargs:
+    x0 = kwargs['x0']
+  lam_x0 = []
+  if 'lam_x0' in kwargs:
+    lam_x0 = kwargs['lam_x0']
+  for k in kwargs.keys():
+    if not(k in ['h','g','a','p','q','r','lba','uba','lbx','ubx','x0','lam_x0']):
+      raise Exception("Keyword error in qcqpIn: '%s' is not recognized. Available keywords are: h, g, a, p, q, r, lba, uba, lbx, ubx, x0, lam_x0" % k )
+  return IOSchemeVector([h,g,a,p,q,r,lba,uba,lbx,ubx,x0,lam_x0], SCHEME_QCQPSolverInput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(qcqpIn) qcqpIn<SXMatrix>;
+%template(qcqpIn) qcqpIn<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def qcqpOut(*dummy,**kwargs):
+  """
+  Helper function for 'QCQPSolverOutput'
+
+  Two use cases:
+     a) arg = qcqpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
+          all arguments optional
+     b) x, cost, lam_a, lam_x = qcqpOut(arg,"x", "cost", "lam_a", "lam_x") 
+          all arguments after the first optional
+  Output arguments of an QP Solver
+  
+  Keyword arguments:
+    x     -- The primal solution [QCPQP_SOLVER_X]
+    cost  -- The optimal cost [QCPQP_SOLVER_COST]
+    lam_a -- The dual solution corresponding to linear bounds [QCPQP_SOLVER_LAM_A]
+    lam_x -- The dual solution corresponding to simple bounds [QCPQP_SOLVER_LAM_X]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QCQPSolverOutput,n)] for n in dummy[1:]]
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
+  cost = []
+  if 'cost' in kwargs:
+    cost = kwargs['cost']
+  lam_a = []
+  if 'lam_a' in kwargs:
+    lam_a = kwargs['lam_a']
+  lam_x = []
+  if 'lam_x' in kwargs:
+    lam_x = kwargs['lam_x']
+  for k in kwargs.keys():
+    if not(k in ['x','cost','lam_a','lam_x']):
+      raise Exception("Keyword error in qcqpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
+  return IOSchemeVector([x,cost,lam_a,lam_x], SCHEME_QCQPSolverOutput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(qcqpOut) qcqpOut<SXMatrix>;
+%template(qcqpOut) qcqpOut<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def qpIn(*dummy,**kwargs):
+  """
+  Helper function for 'QPSolverInput'
+
+  Two use cases:
+     a) arg = qpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0) 
+          all arguments optional
+     b) h, g, a, lba, uba, lbx, ubx, x0, lam_x0 = qpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0") 
+          all arguments after the first optional
+  Input arguments of a QP problem
+  
+  Keyword arguments:
+    h      -- The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QP_SOLVER_H]
+    g      -- The vector g: dense,  (n x 1) [QP_SOLVER_G]
+    a      -- The matrix A: sparse, (nc x n) - product with x must be dense. [QP_SOLVER_A]
+    lba    -- dense, (nc x 1) [QP_SOLVER_LBA]
+    uba    -- dense, (nc x 1) [QP_SOLVER_UBA]
+    lbx    -- dense, (n x 1) [QP_SOLVER_LBX]
+    ubx    -- dense, (n x 1) [QP_SOLVER_UBX]
+    x0     -- dense, (n x 1) [QP_SOLVER_X0]
+    lam_x0 -- dense [QP_SOLVER_LAM_X0]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPInput,n)] for n in dummy[1:]]
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPSolverInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
     h = kwargs['h']
@@ -1274,16 +1494,16 @@ def qpIn(*dummy,**kwargs):
   ubx = []
   if 'ubx' in kwargs:
     ubx = kwargs['ubx']
-  x_init = []
-  if 'x_init' in kwargs:
-    x_init = kwargs['x_init']
-  lambda_init = []
-  if 'lambda_init' in kwargs:
-    lambda_init = kwargs['lambda_init']
+  x0 = []
+  if 'x0' in kwargs:
+    x0 = kwargs['x0']
+  lam_x0 = []
+  if 'lam_x0' in kwargs:
+    lam_x0 = kwargs['lam_x0']
   for k in kwargs.keys():
-    if not(k in ['h','g','a','lba','uba','lbx','ubx','x_init','lambda_init']):
-      raise Exception("Keyword error in qpIn: '%s' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x_init, lambda_init" % k )
-  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x_init,lambda_init], SCHEME_QPInput)
+    if not(k in ['h','g','a','lba','uba','lbx','ubx','x0','lam_x0']):
+      raise Exception("Keyword error in qpIn: '%s' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0" % k )
+  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0], SCHEME_QPSolverInput)
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1296,39 +1516,39 @@ namespace CasADi {
 %pythoncode %{
 def qpOut(*dummy,**kwargs):
   """
-  Helper function for 'QPOutput'
+  Helper function for 'QPSolverOutput'
 
   Two use cases:
-     a) arg = qpOut(primal=my_primal, cost=my_cost, lambda_a=my_lambda_a, lambda_x=my_lambda_x) 
+     a) arg = qpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
           all arguments optional
-     b) primal, cost, lambda_a, lambda_x = qpOut(arg,"primal", "cost", "lambda_a", "lambda_x") 
+     b) x, cost, lam_a, lam_x = qpOut(arg,"x", "cost", "lam_a", "lam_x") 
           all arguments after the first optional
   Output arguments of an QP Solver
   
   Keyword arguments:
-    primal   -- The primal solution [QP_PRIMAL]
-    cost     -- The optimal cost [QP_COST]
-    lambda_a -- The dual solution corresponding to linear bounds [QP_LAMBDA_A]
-    lambda_x -- The dual solution corresponding to simple bounds [QP_LAMBDA_X]
+    x     -- The primal solution [QP_SOLVER_X]
+    cost  -- The optimal cost [QP_SOLVER_COST]
+    lam_a -- The dual solution corresponding to linear bounds [QP_SOLVER_LAM_A]
+    lam_x -- The dual solution corresponding to simple bounds [QP_SOLVER_LAM_X]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPOutput,n)] for n in dummy[1:]]
-  primal = []
-  if 'primal' in kwargs:
-    primal = kwargs['primal']
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPSolverOutput,n)] for n in dummy[1:]]
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
   cost = []
   if 'cost' in kwargs:
     cost = kwargs['cost']
-  lambda_a = []
-  if 'lambda_a' in kwargs:
-    lambda_a = kwargs['lambda_a']
-  lambda_x = []
-  if 'lambda_x' in kwargs:
-    lambda_x = kwargs['lambda_x']
+  lam_a = []
+  if 'lam_a' in kwargs:
+    lam_a = kwargs['lam_a']
+  lam_x = []
+  if 'lam_x' in kwargs:
+    lam_x = kwargs['lam_x']
   for k in kwargs.keys():
-    if not(k in ['primal','cost','lambda_a','lambda_x']):
-      raise Exception("Keyword error in qpOut: '%s' is not recognized. Available keywords are: primal, cost, lambda_a, lambda_x" % k )
-  return IOSchemeVector([primal,cost,lambda_a,lambda_x], SCHEME_QPOutput)
+    if not(k in ['x','cost','lam_a','lam_x']):
+      raise Exception("Keyword error in qpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
+  return IOSchemeVector([x,cost,lam_a,lam_x], SCHEME_QPSolverOutput)
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1344,32 +1564,52 @@ def sdpIn(*dummy,**kwargs):
   Helper function for 'SDPInput'
 
   Two use cases:
-     a) arg = sdpIn(a=my_a, b=my_b, c=my_c) 
+     a) arg = sdpIn(f=my_f, c=my_c, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx) 
           all arguments optional
-     b) a, b, c = sdpIn(arg,"a", "b", "c") 
+     b) f, c, g, a, lba, uba, lbx, ubx = sdpIn(arg,"f", "c", "g", "a", "lba", "uba", "lbx", "ubx") 
           all arguments after the first optional
   Input arguments of a SDP problem
   
   Keyword arguments:
-    a -- The vertical stack of all matrices A_i: ( nm x n) [SDP_A]
-    b -- The vector b: ( m x 1) [SDP_B]
-    c -- The matrix C: ( n x n) [SDP_C]
+    f   -- The vertical stack of all matrices F_i: ( nm x m) [SDP_F]
+    c   -- The vector c: ( n x 1) [SDP_C]
+    g   -- The matrix G: ( m x m) [SDP_G]
+    a   -- The matrix A: ( nc x n) [SDP_A]
+    lba -- Lower bounds on Ax ( nc x 1) [SDP_LBA]
+    uba -- Upper bounds on Ax  ( nc x 1) [SDP_UBA]
+    lbx -- Lower bounds on x ( n x 1 ) [SDP_LBX]
+    ubx -- Upper bounds on x ( n x 1 ) [SDP_UBX]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPInput,n)] for n in dummy[1:]]
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  b = []
-  if 'b' in kwargs:
-    b = kwargs['b']
+  f = []
+  if 'f' in kwargs:
+    f = kwargs['f']
   c = []
   if 'c' in kwargs:
     c = kwargs['c']
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  lba = []
+  if 'lba' in kwargs:
+    lba = kwargs['lba']
+  uba = []
+  if 'uba' in kwargs:
+    uba = kwargs['uba']
+  lbx = []
+  if 'lbx' in kwargs:
+    lbx = kwargs['lbx']
+  ubx = []
+  if 'ubx' in kwargs:
+    ubx = kwargs['ubx']
   for k in kwargs.keys():
-    if not(k in ['a','b','c']):
-      raise Exception("Keyword error in sdpIn: '%s' is not recognized. Available keywords are: a, b, c" % k )
-  return IOSchemeVector([a,b,c], SCHEME_SDPInput)
+    if not(k in ['f','c','g','a','lba','uba','lbx','ubx']):
+      raise Exception("Keyword error in sdpIn: '%s' is not recognized. Available keywords are: f, c, g, a, lba, uba, lbx, ubx" % k )
+  return IOSchemeVector([f,c,g,a,lba,uba,lbx,ubx], SCHEME_SDPInput)
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1385,40 +1625,48 @@ def sdpOut(*dummy,**kwargs):
   Helper function for 'SDPOutput'
 
   Two use cases:
-     a) arg = sdpOut(primal=my_primal, p=my_p, dual=my_dual, primal_cost=my_primal_cost, dual_cost=my_dual_cost) 
+     a) arg = sdpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
           all arguments optional
-     b) primal, p, dual, primal_cost, dual_cost = sdpOut(arg,"primal", "p", "dual", "primal_cost", "dual_cost") 
+     b) x, p, dual, cost, dual_cost, lam_a, lam_x = sdpOut(arg,"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x") 
           all arguments after the first optional
   Output arguments of an SDP Solver
   
   Keyword arguments:
-    primal      -- The primal solution (m x 1) - may be used as initial guess [SDP_PRIMAL]
-    p           -- The solution P (n x n) - may be used as initial guess [SDP_PRIMAL_P]
-    dual        -- The dual solution (n x n) - may be used as initial guess [SDP_DUAL]
-    primal_cost -- The primal optimal cost (1 x 1) [SDP_PRIMAL_COST]
-    dual_cost   -- The dual optimal cost (1 x 1) [SDP_DUAL_COST]
+    x         -- The primal solution (n x 1) - may be used as initial guess [SDP_X]
+    p         -- The solution P (m x m) - may be used as initial guess [SDP_P]
+    dual      -- The dual solution (m x m) - may be used as initial guess [SDP_DUAL]
+    cost      -- The primal optimal cost (1 x 1) [SDP_COST]
+    dual_cost -- The dual optimal cost (1 x 1) [SDP_DUAL_COST]
+    lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDP_LAMBDA_A]
+    lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDP_LAMBDA_X]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPOutput,n)] for n in dummy[1:]]
-  primal = []
-  if 'primal' in kwargs:
-    primal = kwargs['primal']
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
   p = []
   if 'p' in kwargs:
     p = kwargs['p']
   dual = []
   if 'dual' in kwargs:
     dual = kwargs['dual']
-  primal_cost = []
-  if 'primal_cost' in kwargs:
-    primal_cost = kwargs['primal_cost']
+  cost = []
+  if 'cost' in kwargs:
+    cost = kwargs['cost']
   dual_cost = []
   if 'dual_cost' in kwargs:
     dual_cost = kwargs['dual_cost']
+  lam_a = []
+  if 'lam_a' in kwargs:
+    lam_a = kwargs['lam_a']
+  lam_x = []
+  if 'lam_x' in kwargs:
+    lam_x = kwargs['lam_x']
   for k in kwargs.keys():
-    if not(k in ['primal','p','dual','primal_cost','dual_cost']):
-      raise Exception("Keyword error in sdpOut: '%s' is not recognized. Available keywords are: primal, p, dual, primal_cost, dual_cost" % k )
-  return IOSchemeVector([primal,p,dual,primal_cost,dual_cost], SCHEME_SDPOutput)
+    if not(k in ['x','p','dual','cost','dual_cost','lam_a','lam_x']):
+      raise Exception("Keyword error in sdpOut: '%s' is not recognized. Available keywords are: x, p, dual, cost, dual_cost, lam_a, lam_x" % k )
+  return IOSchemeVector([x,p,dual,cost,dual_cost,lam_a,lam_x], SCHEME_SDPOutput)
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON

@@ -31,7 +31,7 @@
 namespace CasADi{ 
 template <class T>
 class IOSchemeVector;
-enum InputOutputScheme { SCHEME_ACADO_Input, SCHEME_ACADO_Output, SCHEME_ACADO_FCN_Input, SCHEME_ControlledDAEInput, SCHEME_ControlSimulatorInput, SCHEME_DAEInput, SCHEME_DAEOutput, SCHEME_RDAEInput, SCHEME_RDAEOutput, SCHEME_IntegratorInput, SCHEME_IntegratorOutput, SCHEME_NLPInput, SCHEME_NLPOutput, SCHEME_GradFInput, SCHEME_GradFOutput, SCHEME_JacGInput, SCHEME_JacGOutput, SCHEME_HessLagInput, SCHEME_HessLagOutput, SCHEME_NLPSolverInput, SCHEME_NLPSolverOutput, SCHEME_MayerInput, SCHEME_OCPInput, SCHEME_OCPOutput, SCHEME_QPInput, SCHEME_QPOutput, SCHEME_SDPInput, SCHEME_SDPOutput , SCHEME_unknown};
+enum InputOutputScheme { SCHEME_ACADO_Input, SCHEME_ACADO_Output, SCHEME_ACADO_FCN_Input, SCHEME_ControlledDAEInput, SCHEME_ControlSimulatorInput, SCHEME_DAEInput, SCHEME_DAEOutput, SCHEME_RDAEInput, SCHEME_RDAEOutput, SCHEME_IntegratorInput, SCHEME_IntegratorOutput, SCHEME_LPSolverInput, SCHEME_LPSolverOutput, SCHEME_NLPInput, SCHEME_NLPOutput, SCHEME_GradFInput, SCHEME_GradFOutput, SCHEME_JacGInput, SCHEME_JacGOutput, SCHEME_HessLagInput, SCHEME_HessLagOutput, SCHEME_NLPSolverInput, SCHEME_NLPSolverOutput, SCHEME_MayerInput, SCHEME_OCPInput, SCHEME_OCPOutput, SCHEME_QCQPSolverInput, SCHEME_QCQPSolverOutput, SCHEME_QPSolverInput, SCHEME_QPSolverOutput, SCHEME_SDPInput, SCHEME_SDPOutput , SCHEME_unknown};
 std::string getSchemeEntryName(InputOutputScheme scheme, int i);
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);
@@ -419,6 +419,72 @@ std::vector<M> integratorOut(const std::vector<M>& args,const std::string arg_s0
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s1)));
   if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s2)));
   if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s3)));
+  return ret;
+
+}
+/// Helper function for 'LPSolverInput'
+/// Input arguments of a LP problem
+/// 
+/// \copydoc scheme_LPSolverInput
+template<class M>
+IOSchemeVector<M> lpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M()){
+  std::vector<M> ret(6);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_LPSolverInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in LPSolverInput: '" << it->first << "' is not recognized. Available keywords are: c, a, lba, uba, lbx, ubx");
+    ret[n] = it->second;
+  }
+  return IOSchemeVector<M>(ret,SCHEME_LPSolverInput);
+}
+template<class M>
+std::vector<M> lpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput,arg_s5)));
+  return ret;
+
+}
+/// Helper function for 'LPSolverOutput'
+/// Output arguments of an LP Solver
+/// 
+/// \copydoc scheme_LPSolverOutput
+template<class M>
+IOSchemeVector<M> lpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+  std::vector<M> ret(4);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_LPSolverOutput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in LPSolverOutput: '" << it->first << "' is not recognized. Available keywords are: x, cost, lam_a, lam_x");
+    ret[n] = it->second;
+  }
+  return IOSchemeVector<M>(ret,SCHEME_LPSolverOutput);
+}
+template<class M>
+std::vector<M> lpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput,arg_s3)));
   return ret;
 
 }
@@ -841,10 +907,88 @@ std::vector<M> ocpOut(const std::vector<M>& args,const std::string arg_s0="",con
   return ret;
 
 }
-/// Helper function for 'QPInput'
+/// Helper function for 'QCQPSolverInput'
 /// Input arguments of a QP problem
 /// 
-/// \copydoc scheme_QPInput
+/// \copydoc scheme_QCQPSolverInput
+template<class M>
+IOSchemeVector<M> qcqpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M()){
+  std::vector<M> ret(12);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
+  if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
+  if (arg_s7!="") arg.insert(make_pair(arg_s7,arg_m7));
+  if (arg_s8!="") arg.insert(make_pair(arg_s8,arg_m8));
+  if (arg_s9!="") arg.insert(make_pair(arg_s9,arg_m9));
+  if (arg_s10!="") arg.insert(make_pair(arg_s10,arg_m10));
+  if (arg_s11!="") arg.insert(make_pair(arg_s11,arg_m11));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_QCQPSolverInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in QCQPSolverInput: '" << it->first << "' is not recognized. Available keywords are: h, g, a, p, q, r, lba, uba, lbx, ubx, x0, lam_x0");
+    ret[n] = it->second;
+  }
+  return IOSchemeVector<M>(ret,SCHEME_QCQPSolverInput);
+}
+template<class M>
+std::vector<M> qcqpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8="",const std::string arg_s9="",const std::string arg_s10="",const std::string arg_s11=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s7)));
+  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s8)));
+  if (arg_s9!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s9)));
+  if (arg_s10!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s10)));
+  if (arg_s11!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s11)));
+  return ret;
+
+}
+/// Helper function for 'QCQPSolverOutput'
+/// Output arguments of an QP Solver
+/// 
+/// \copydoc scheme_QCQPSolverOutput
+template<class M>
+IOSchemeVector<M> qcqpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+  std::vector<M> ret(4);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_QCQPSolverOutput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in QCQPSolverOutput: '" << it->first << "' is not recognized. Available keywords are: x, cost, lam_a, lam_x");
+    ret[n] = it->second;
+  }
+  return IOSchemeVector<M>(ret,SCHEME_QCQPSolverOutput);
+}
+template<class M>
+std::vector<M> qcqpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput,arg_s3)));
+  return ret;
+
+}
+/// Helper function for 'QPSolverInput'
+/// Input arguments of a QP problem
+/// 
+/// \copydoc scheme_QPSolverInput
 template<class M>
 IOSchemeVector<M> qpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M()){
   std::vector<M> ret(9);
@@ -860,32 +1004,32 @@ IOSchemeVector<M> qpIn(const std::string arg_s0="",M arg_m0=M(),const std::strin
   if (arg_s8!="") arg.insert(make_pair(arg_s8,arg_m8));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QPInput,it->first);
+    int n = getSchemeEntryEnum(SCHEME_QPSolverInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in QPInput: '" << it->first << "' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x_init, lambda_init");
+      casadi_error("Keyword error in QPSolverInput: '" << it->first << "' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0");
     ret[n] = it->second;
   }
-  return IOSchemeVector<M>(ret,SCHEME_QPInput);
+  return IOSchemeVector<M>(ret,SCHEME_QPSolverInput);
 }
 template<class M>
 std::vector<M> qpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8=""){
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s0)));
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s1)));
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s2)));
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s3)));
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s4)));
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s5)));
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s6)));
-  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s7)));
-  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPInput,arg_s8)));
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput,arg_s7)));
+  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput,arg_s8)));
   return ret;
 
 }
-/// Helper function for 'QPOutput'
+/// Helper function for 'QPSolverOutput'
 /// Output arguments of an QP Solver
 /// 
-/// \copydoc scheme_QPOutput
+/// \copydoc scheme_QPSolverOutput
 template<class M>
 IOSchemeVector<M> qpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
   std::vector<M> ret(4);
@@ -896,20 +1040,20 @@ IOSchemeVector<M> qpOut(const std::string arg_s0="",M arg_m0=M(),const std::stri
   if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_QPOutput,it->first);
+    int n = getSchemeEntryEnum(SCHEME_QPSolverOutput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in QPOutput: '" << it->first << "' is not recognized. Available keywords are: primal, cost, lambda_a, lambda_x");
+      casadi_error("Keyword error in QPSolverOutput: '" << it->first << "' is not recognized. Available keywords are: x, cost, lam_a, lam_x");
     ret[n] = it->second;
   }
-  return IOSchemeVector<M>(ret,SCHEME_QPOutput);
+  return IOSchemeVector<M>(ret,SCHEME_QPSolverOutput);
 }
 template<class M>
 std::vector<M> qpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPOutput,arg_s0)));
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPOutput,arg_s1)));
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPOutput,arg_s2)));
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPOutput,arg_s3)));
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput,arg_s3)));
   return ret;
 
 }
@@ -918,27 +1062,37 @@ std::vector<M> qpOut(const std::vector<M>& args,const std::string arg_s0="",cons
 /// 
 /// \copydoc scheme_SDPInput
 template<class M>
-IOSchemeVector<M> sdpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
-  std::vector<M> ret(3);
+IOSchemeVector<M> sdpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M()){
+  std::vector<M> ret(8);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
+  if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
+  if (arg_s7!="") arg.insert(make_pair(arg_s7,arg_m7));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDPInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in SDPInput: '" << it->first << "' is not recognized. Available keywords are: a, b, c");
+      casadi_error("Keyword error in SDPInput: '" << it->first << "' is not recognized. Available keywords are: f, c, g, a, lba, uba, lbx, ubx");
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_SDPInput);
 }
 template<class M>
-std::vector<M> sdpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+std::vector<M> sdpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s1)));
   if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s7)));
   return ret;
 
 }
@@ -947,31 +1101,35 @@ std::vector<M> sdpIn(const std::vector<M>& args,const std::string arg_s0="",cons
 /// 
 /// \copydoc scheme_SDPOutput
 template<class M>
-IOSchemeVector<M> sdpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M()){
-  std::vector<M> ret(5);
+IOSchemeVector<M> sdpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M()){
+  std::vector<M> ret(7);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
   if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
+  if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDPOutput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in SDPOutput: '" << it->first << "' is not recognized. Available keywords are: primal, p, dual, primal_cost, dual_cost");
+      casadi_error("Keyword error in SDPOutput: '" << it->first << "' is not recognized. Available keywords are: x, p, dual, cost, dual_cost, lam_a, lam_x");
     ret[n] = it->second;
   }
   return IOSchemeVector<M>(ret,SCHEME_SDPOutput);
 }
 template<class M>
-std::vector<M> sdpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4=""){
+std::vector<M> sdpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s1)));
   if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s2)));
   if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s3)));
   if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s6)));
   return ret;
 
 }

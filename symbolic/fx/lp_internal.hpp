@@ -20,25 +20,25 @@
  *
  */
 
-#ifndef QP_SOLVER_INTERNAL_HPP
-#define QP_SOLVER_INTERNAL_HPP
+#ifndef LP_INTERNAL_HPP
+#define LP_INTERNAL_HPP
 
-#include "qp_solver.hpp"
+#include "lp_solver.hpp"
 #include "fx_internal.hpp"
 
 namespace CasADi{
 
 /// Internal class
-class QPSolverInternal : public FXInternal{
+class LPSolverInternal : public FXInternal{
   public:
     // Constructor
-    QPSolverInternal();
+    LPSolverInternal();
         
     // Constructor
-    QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A);
+    LPSolverInternal(const CRSSparsity &A);
     
     // Destructor
-    virtual ~QPSolverInternal() = 0;
+    virtual ~LPSolverInternal() = 0;
     
     // Initialize
     virtual void init();
@@ -49,13 +49,10 @@ class QPSolverInternal : public FXInternal{
     // Solve the system of equations
     virtual void solve();
     
-    /// Set options that make the QP solver more suitable for solving LPs
-    virtual void setLPOptions() { };
-    
   protected:
     
     /// Number of decision variables
-    int nx_;
+    int n_;
     
     /// The number of constraints (counting both equality and inequality) == A.size1()
     int nc_; 
@@ -64,5 +61,5 @@ class QPSolverInternal : public FXInternal{
 
 } // namespace CasADi
 
-#endif //QP_SOLVER_INTERNAL_HPP
+#endif //LP_INTERNAL_HPP
 

@@ -716,24 +716,24 @@ namespace CasADi{
                              std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt){
 
     // Pass data to QP solver
-    qp_solver_.setInput(H, QP_H);
-    qp_solver_.setInput(g,QP_G);
+    qp_solver_.setInput(H, QP_SOLVER_H);
+    qp_solver_.setInput(g,QP_SOLVER_G);
 
     // Hot-starting if possible
-    qp_solver_.setInput(x_opt, QP_X0);
+    qp_solver_.setInput(x_opt, QP_SOLVER_X0);
   
     //TODO: Fix hot-starting of dual variables
-    //qp_solver_.setInput(lambda_A_opt, QP_LAMBDA_INIT);
+    //qp_solver_.setInput(lambda_A_opt, QP_SOLVER_LAMBDA_INIT);
   
     // Pass simple bounds
-    qp_solver_.setInput(lbx, QP_LBX);
-    qp_solver_.setInput(ubx, QP_UBX);
+    qp_solver_.setInput(lbx, QP_SOLVER_LBX);
+    qp_solver_.setInput(ubx, QP_SOLVER_UBX);
 
     // Pass linear bounds
     if(ng_>0){
-      qp_solver_.setInput(A, QP_A);
-      qp_solver_.setInput(lbA, QP_LBA);
-      qp_solver_.setInput(ubA, QP_UBA);
+      qp_solver_.setInput(A, QP_SOLVER_A);
+      qp_solver_.setInput(lbA, QP_SOLVER_LBA);
+      qp_solver_.setInput(ubA, QP_SOLVER_UBA);
     }
   
     if (monitored("qp")) {
@@ -752,9 +752,9 @@ namespace CasADi{
     qp_solver_.evaluate();
   
     // Get the optimal solution
-    qp_solver_.getOutput(x_opt,QP_X);
-    qp_solver_.getOutput(lambda_x_opt,QP_LAM_X);
-    qp_solver_.getOutput(lambda_A_opt,QP_LAM_A);
+    qp_solver_.getOutput(x_opt,QP_SOLVER_X);
+    qp_solver_.getOutput(lambda_x_opt,QP_SOLVER_LAM_X);
+    qp_solver_.getOutput(lambda_A_opt,QP_SOLVER_LAM_A);
     if (monitored("dx")){
       cout << "dx = " << x_opt << endl;
     }

@@ -316,6 +316,7 @@ add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP 
 add_subdirectory(symbolic)
 add_subdirectory(optimal_control)
 add_subdirectory(nonlinear_programming)
+add_subdirectory(convex_programming)
 add_subdirectory(integration)
 add_subdirectory(examples)
 add_subdirectory(external_packages)

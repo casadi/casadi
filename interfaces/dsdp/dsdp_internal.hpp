@@ -57,6 +57,8 @@ public:
     DSDP dsdp_;
     
     SDPCone sdpcone_;
+    LPCone lpcone_;
+    BCone bcone_;
     
     std::map<int,std::string> terminationReason_;
     std::map<int,std::string> solutionType_;

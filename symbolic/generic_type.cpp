@@ -103,6 +103,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_NLPSOLVER";
       case OT_LINEARSOLVER:
               return "OT_LINEARSOLVER";
+      case OT_LPSOLVER:
+              return "OT_LPSOLVER";
       case OT_INTEGRATOR:
               return "OT_INTEGRATOR";
       case OT_QPSOLVER:
@@ -356,6 +358,10 @@ GenericType::GenericType(integratorCreator ptr) : type_(OT_INTEGRATOR) {
 GenericType::GenericType(QPSolverCreator ptr) : type_(OT_QPSOLVER) {
   assignNode(new GenericTypeInternal<QPSolverCreator>(ptr));
 }
+
+//GenericType::GenericType(LPSolverCreator ptr) : type_(OT_LPSOLVER) {
+//  assignNode(new GenericTypeInternal<LPSolverCreator>(ptr));
+//}
 
 GenericType::GenericType(implicitFunctionCreator ptr) : type_(OT_IMPLICITFUNCTION) {
   assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));

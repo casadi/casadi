@@ -20,49 +20,44 @@
  *
  */
 
-#ifndef QP_SOLVER_INTERNAL_HPP
-#define QP_SOLVER_INTERNAL_HPP
+#ifndef QP_LP_INTERNAL_HPP
+#define QP_LP_INTERNAL_HPP
 
-#include "qp_solver.hpp"
-#include "fx_internal.hpp"
+#include "symbolic/fx/lp_internal.hpp"
+#include "symbolic/fx/qp_solver.hpp"
 
 namespace CasADi{
 
-/// Internal class
-class QPSolverInternal : public FXInternal{
-  public:
-    // Constructor
-    QPSolverInternal();
-        
-    // Constructor
-    QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A);
-    
-    // Destructor
-    virtual ~QPSolverInternal() = 0;
-    
-    // Initialize
-    virtual void init();
-    
-    // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
-    
-    // Solve the system of equations
-    virtual void solve();
-    
-    /// Set options that make the QP solver more suitable for solving LPs
-    virtual void setLPOptions() { };
-    
-  protected:
-    
-    /// Number of decision variables
-    int nx_;
-    
-    /// The number of constraints (counting both equality and inequality) == A.size1()
-    int nc_; 
-};
+  /** \brief Internal class for QPLPInternal
+   * 
+      @copydoc LPSolver_doc
+   * */
+class QPLPInternal : public LPSolverInternal {
+  friend class QPLPSolver;
+public:
+  /** \brief  Constructor */
+  explicit QPLPInternal();
 
+  /** \brief  Clone */
+  virtual QPLPInternal* clone() const;
+  
+  /** \brief  Create a new Solver */
+  explicit QPLPInternal(const CRSSparsity &A);
+
+  /** \brief  Destructor */
+  virtual ~QPLPInternal();
+
+  /** \brief  Initialize */
+  virtual void init();
+  
+  virtual void evaluate(int nfdir, int nadir);
+  
+  protected:
+    QPSolver qpsolver_;
+
+};
 
 } // namespace CasADi
 
-#endif //QP_SOLVER_INTERNAL_HPP
+#endif //QP_LP_INTERNAL_HPP
 

@@ -20,49 +20,31 @@
  *
  */
 
-#ifndef QP_SOLVER_INTERNAL_HPP
-#define QP_SOLVER_INTERNAL_HPP
+#include "qp_lp_internal.hpp"
+#include "qp_lp_solver.hpp"
 
-#include "qp_solver.hpp"
-#include "fx_internal.hpp"
-
+using namespace std;
 namespace CasADi{
 
-/// Internal class
-class QPSolverInternal : public FXInternal{
-  public:
-    // Constructor
-    QPSolverInternal();
-        
-    // Constructor
-    QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A);
-    
-    // Destructor
-    virtual ~QPSolverInternal() = 0;
-    
-    // Initialize
-    virtual void init();
-    
-    // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
-    
-    // Solve the system of equations
-    virtual void solve();
-    
-    /// Set options that make the QP solver more suitable for solving LPs
-    virtual void setLPOptions() { };
-    
-  protected:
-    
-    /// Number of decision variables
-    int nx_;
-    
-    /// The number of constraints (counting both equality and inequality) == A.size1()
-    int nc_; 
-};
+QPLPSolver::QPLPSolver(){ 
+}
 
+
+QPLPSolver::QPLPSolver(const CRSSparsity & A)  {
+  assignNode(new QPLPInternal(A));
+}
+
+QPLPInternal* QPLPSolver::operator->(){
+  return (QPLPInternal*)(FX::operator->());
+}
+
+const QPLPInternal* QPLPSolver::operator->() const{
+  return (const QPLPInternal*)(FX::operator->());
+
+}
+
+bool QPLPSolver::checkNode() const{
+  return dynamic_cast<const QPLPInternal*>(get());
+}
 
 } // namespace CasADi
-
-#endif //QP_SOLVER_INTERNAL_HPP
-

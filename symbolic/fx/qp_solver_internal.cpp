@@ -24,8 +24,8 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
-INPUTSCHEME(QPInput)
-OUTPUTSCHEME(QPOutput)
+INPUTSCHEME(QPSolverInput)
+OUTPUTSCHEME(QPSolverOutput)
 
 using namespace std;
 namespace CasADi{
@@ -60,25 +60,25 @@ QPSolverInternal::QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A){
   CRSSparsity bounds_sparsity = sp_dense(nc_,1);
   
   // Input arguments
-  setNumInputs(QP_NUM_IN);
-  input(QP_X0) = DMatrix(x_sparsity,0);
-  input(QP_H) = DMatrix(H);
-  input(QP_G) = DMatrix(x_sparsity);
-  input(QP_A) = DMatrix(A);
-  input(QP_LBA) = DMatrix(bounds_sparsity, -std::numeric_limits<double>::infinity());
-  input(QP_UBA) = DMatrix(bounds_sparsity,  std::numeric_limits<double>::infinity());
-  input(QP_LBX) = DMatrix(x_sparsity,      -std::numeric_limits<double>::infinity());
-  input(QP_UBX) = DMatrix(x_sparsity,       std::numeric_limits<double>::infinity());
+  setNumInputs(QP_SOLVER_NUM_IN);
+  input(QP_SOLVER_X0) = DMatrix(x_sparsity,0);
+  input(QP_SOLVER_H) = DMatrix(H);
+  input(QP_SOLVER_G) = DMatrix(x_sparsity);
+  input(QP_SOLVER_A) = DMatrix(A);
+  input(QP_SOLVER_LBA) = DMatrix(bounds_sparsity, -std::numeric_limits<double>::infinity());
+  input(QP_SOLVER_UBA) = DMatrix(bounds_sparsity,  std::numeric_limits<double>::infinity());
+  input(QP_SOLVER_LBX) = DMatrix(x_sparsity,      -std::numeric_limits<double>::infinity());
+  input(QP_SOLVER_UBX) = DMatrix(x_sparsity,       std::numeric_limits<double>::infinity());
   
   // Output arguments
-  setNumOutputs(QP_NUM_OUT);
-  output(QP_X) = DMatrix(x_sparsity);
-  output(QP_COST) = 0.0;
-  output(QP_LAM_X) = DMatrix(x_sparsity);
-  output(QP_LAM_A) = DMatrix(bounds_sparsity);
+  setNumOutputs(QP_SOLVER_NUM_OUT);
+  output(QP_SOLVER_X) = DMatrix(x_sparsity);
+  output(QP_SOLVER_COST) = 0.0;
+  output(QP_SOLVER_LAM_X) = DMatrix(x_sparsity);
+  output(QP_SOLVER_LAM_A) = DMatrix(bounds_sparsity);
   
-  inputScheme_ = SCHEME_QPInput;
-  outputScheme_ = SCHEME_QPOutput;
+  inputScheme_ = SCHEME_QPSolverInput;
+  outputScheme_ = SCHEME_QPSolverOutput;
 }
     
 void QPSolverInternal::init() {
