@@ -433,7 +433,7 @@ namespace CasADi{
         // Pass the argument to the function
         hessLag_.setInput(x,NLP_X);
         hessLag_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
-        hessLag_.setInput(obj_factor,NLP_NUM_IN_NEW+NLP_F);
+        hessLag_.setInput(obj_factor,NLP_NUM_IN_NEW+NLP_F_NEW);
         hessLag_.setInput(lambda,NLP_NUM_IN_NEW+NLP_G_NEW);
         
         // Evaluate
@@ -526,7 +526,7 @@ namespace CasADi{
       nlp_.evaluate();
 
       // Get the result
-      nlp_.getOutput(obj_value,NLP_F);
+      nlp_.getOutput(obj_value,NLP_F_NEW);
 
       // Printing
       if(monitored("eval_f")){
@@ -534,7 +534,7 @@ namespace CasADi{
         cout << "obj_value = " << obj_value << endl;
       }
 
-      if (regularity_check_ && !isRegular(nlp_.output(NLP_F).data())) casadi_error("IpoptInternal::f: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(nlp_.output(NLP_F_NEW).data())) casadi_error("IpoptInternal::f: NaN or Inf detected.");
     
       double time2 = clock();
       t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;

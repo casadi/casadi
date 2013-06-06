@@ -190,7 +190,7 @@ namespace CasADi{
       gradF = getOption("grad_f");
     } else {
       log("Generating objective gradient");
-      gradF = nlp_.gradient(NLP_X,NLP_F);
+      gradF = nlp_.gradient(NLP_X,NLP_F_NEW);
       log("Gradient function generated");
     }
     gradF.setOption("name","grad_f");

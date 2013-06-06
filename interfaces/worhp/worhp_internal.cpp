@@ -887,7 +887,7 @@ namespace CasADi{
       nlp_.evaluate();
 
       // Get the result
-      nlp_.getOutput(obj_value,NLP_F);
+      nlp_.getOutput(obj_value,NLP_F_NEW);
 
       // Printing
       if(monitored("eval_f")){

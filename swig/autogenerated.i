@@ -669,7 +669,7 @@ def nlpOut(*dummy,**kwargs):
   Output arguments of an NLP function
   
   Keyword arguments:
-    f -- Objective function [NLP_F]
+    f -- Objective function [NLP_F_NEW]
     g -- Constraint function [NLP_G_NEW]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpOut. Either use keywords or non-keywords ")

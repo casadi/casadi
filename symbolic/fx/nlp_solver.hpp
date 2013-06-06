@@ -60,7 +60,7 @@ namespace CasADi{
   /// Output arguments of an NLP function [nlpOut]
   enum NLPOutput{ 
     /// Objective function [f]
-    NLP_F,
+    NLP_F_NEW,
     /// Constraint function [g]
     NLP_G_NEW,
     /// Number of NLP outputs
