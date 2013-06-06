@@ -47,8 +47,8 @@
            c ( n x 1 )
            G, F_i  sparse symmetric (m x m)
            X dense symmetric ( m x m )
-           A sparse matrix ( nc x m)
-           LBA, UBA dense vector (nx x 1)
+           A sparse matrix ( nc x n)
+           LBA, UBA dense vector (nc x 1)
            LBX, UBX dense vector (n x 1)
 
   \endverbatim
@@ -132,19 +132,19 @@ enum SDPInput{
 
 /// Output arguments of an SDP Solver [sdpOut]
 enum SDPOutput{
-  /// The primal solution (n x 1) - may be used as initial guess [primal]
-  SDP_PRIMAL,
+  /// The primal solution (n x 1) - may be used as initial guess [x]
+  SDP_X,
   /// The solution P (m x m) - may be used as initial guess [p]
-  SDP_PRIMAL_P,
+  SDP_P,
   /// The dual solution (m x m) - may be used as initial guess [dual]
   SDP_DUAL,
-  /// The primal optimal cost (1 x 1) [primal_cost]
-  SDP_PRIMAL_COST,
+  /// The primal optimal cost (1 x 1) [cost]
+  SDP_COST,
   /// The dual optimal cost (1 x 1) [dual_cost]
   SDP_DUAL_COST,
-  /// The dual solution corresponding to the linear constraints  (nc x 1) [lambda_a]
+  /// The dual solution corresponding to the linear constraints  (nc x 1) [lam_a]
   SDP_LAMBDA_A,
-  /// The dual solution corresponding to simple bounds  (n x 1) [lambda_x]
+  /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
   SDP_LAMBDA_X,
   SDP_NUM_OUT};
 

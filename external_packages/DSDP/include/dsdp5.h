@@ -44,11 +44,14 @@ extern int DSDPCreateBCone(DSDP, BCone*);
 extern int BConeAllocateBounds(BCone,int);
 extern int BConeSetLowerBound(BCone,int, double);
 extern int BConeSetUpperBound(BCone,int, double);
+extern int BConeSetUnboundedLower(BCone,int);
+extern int BConeSetUnboundedUpper(BCone,int);
 extern int BConeSetPSlackVariable(BCone,int);
 extern int BConeSetPSurplusVariable(BCone,int);
 extern int BConeScaleBarrier(BCone,double);
 extern int BConeView(BCone);
 extern int BConeSetXArray(BCone,double[], int);
+extern int BConeCopyXSingle(BCone,double [], int m);
 extern int BConeCopyX(BCone,double[],double[],int);
 
 extern int DSDPBoundDualVariables(DSDP,double, double);

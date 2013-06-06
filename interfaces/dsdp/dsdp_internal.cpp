@@ -24,7 +24,10 @@
 
 #include "../../symbolic/stl_vector_tools.hpp"
 #include "../../symbolic/matrix/matrix_tools.hpp"
-
+//#include "../../symbolic/sx/sx_tools.hpp"
+#include "../../symbolic/mx/mx_tools.hpp"
+//#include "../../symbolic/fx/sx_function.hpp"
+#include "../../symbolic/fx/mx_function.hpp"
 /**
 Some implementation details
 
@@ -51,7 +54,13 @@ DSDPInternal::DSDPInternal(const CRSSparsity &A, const CRSSparsity &G, const CRS
   addOption("dualTol",OT_REAL,1e-4,"Tolerance for dual infeasibility (translates to primal infeasibility in dsdp terms)");
   addOption("primalTol",OT_REAL,1e-4,"Tolerance for primal infeasibility (translates to dual infeasibility in dsdp terms)");
   addOption("stepTol",OT_REAL,5e-2,"Terminate the solver if the step length in the primal is below this tolerance. ");
-
+  addOption("infinity",OT_REAL,1e30,"Treat numbers higher than this as infinity");
+  addOption("_use_penalty", OT_BOOLEAN, true, "Modifies the algorithm to use a penality gamma on r.");
+  addOption("_penalty", OT_REAL, 1e5, "Penality parameter lambda. Must exceed the trace of Y. This parameter heavily influences the ability of DSDP to treat linear equalities. The DSDP standard default (1e8) will make a problem with linear equality return unusable solutions.");
+  addOption("_rho", OT_REAL,4.0,"Potential parameter. Must be >=1");
+  addOption("_zbar", OT_REAL,1e10,"Initial upper bound on the objective of the dual problem.");
+  addOption("_reuse",OT_INTEGER,4,"Maximum on the number of times the Schur complement matrix is reused");
+  
   // Set DSDP memory blocks to null
   dsdp_ = 0;
   sdpcone_ = 0;
@@ -107,8 +116,8 @@ void DSDPInternal::init(){
     info = SDPConeSetSparsity(sdpcone_, j, block_sizes_[j]);
   }
   
-  //info = DSDPCreateLPCone( dsdp_, &lpcone_);
-
+  info = DSDPCreateLPCone( dsdp_, &lpcone_);
+  
   info = DSDPCreateBCone( dsdp_, &bcone_);
   info = BConeAllocateBounds( bcone_, n_);
 
@@ -137,6 +146,28 @@ void DSDPInternal::init(){
     }
   }
   
+  // Fill in the linear program structure
+  MX A = msym("A",input(SDP_A).sparsity());
+  MX LBA = msym("LBA",input(SDP_LBA).sparsity());
+  MX UBA = msym("UBA",input(SDP_LBA).sparsity());
+  
+  std::vector< MX >  syms;
+  syms.push_back(A);
+  syms.push_back(LBA);
+  syms.push_back(UBA);
+  
+  // DSDP has no infinities -- replace by a big number
+  // There is a way to deal with this properly, but requires modifying the dsdp source
+  // We already did this for the variable bounds
+  std::vector< MX >  out;
+  out.push_back(-trans(horzcat(fmax(fmin(LBA,getOption("infinity")),-(double)getOption("infinity")),A)));
+  out.push_back(trans(horzcat(fmax(fmin(UBA,getOption("infinity")),-(double)getOption("infinity")),A)));
+
+  mappingA_ = MXFunction(syms,horzcat(out));
+  mappingA_.init();
+  
+  info = LPConeSetData(lpcone_, nc_*2, &mappingA_.output(0).rowind()[0], &mappingA_.output(0).col()[0], &mappingA_.output(0).data()[0]);
+  
   if (calc_dual_) {
     store_X_.resize(nb_);
     for (int j=0;j<nb_;++j) {
@@ -149,6 +180,13 @@ void DSDPInternal::init(){
       store_P_[j].resize(block_sizes_[j]*(block_sizes_[j]+1)/2);
     }
   }
+  
+  info = DSDPUsePenalty(dsdp_,getOption("_use_penalty") ? 1: 0);
+  info = DSDPSetPenaltyParameter(dsdp_, getOption("_penalty") );
+  info = DSDPSetPotentialParameter(dsdp_, getOption("_rho"));
+  info = DSDPSetZBar(dsdp_, getOption("_zbar"));
+  info = DSDPReuseMatrix(dsdp_,getOption("_reuse") ? 1: 0);
+
 }
 
 void DSDPInternal::evaluate(int nfdir, int nadir) {
@@ -163,26 +201,38 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
     }
     if(input(SDP_UBX).at(i)==std::numeric_limits< double >::infinity()) {
       info = BConeSetUnboundedUpper(bcone_,i+1);   
-      std::cout << "hey" << std::endl;
     } else {
       info = BConeSetUpperBound(bcone_,i+1,input(SDP_UBX).at(i));
     }
   }
   
+  // Copy linear constraints
+  mappingA_.setInput(input(SDP_A),0);
+  mappingA_.setInput(input(SDP_LBA),1);
+  mappingA_.setInput(input(SDP_UBA),2);
+  mappingA_.evaluate();
+  
+  // TODO: this can be made non-allocating bu hacking into DSDP source code
+  info = LPConeSetData(lpcone_, nc_*2, &mappingA_.output(0).rowind()[0], &mappingA_.output(0).col()[0], &mappingA_.output(0).data()[0]);
+  
+  LPConeView(lpcone_);
+
   // Copy b vector
   for (int i=0;i<n_;++i) {
     info = DSDPSetDualObjective(dsdp_, i+1, -input(SDP_C).at(i));
   }
   
-  // Get Ai from supplied A
-  mapping_.setInput(input(SDP_G),0);
-  mapping_.setInput(input(SDP_F),1);
-  mapping_.evaluate();
+  if (nb_>0) {
+    // Get Ai from supplied A
+    mapping_.setInput(input(SDP_G),0);
+    mapping_.setInput(input(SDP_F),1);
+    mapping_.evaluate();
 
-  for (int i=0;i<n_+1;++i) {
-    for (int j=0;j<nb_;++j) {
-      mapping_.output(i*nb_+j).get(values_[i][j],SPARSESYM);
-      info = SDPConeSetASparseVecMat(sdpcone_, j, i, block_sizes_[j], 1, 0, &pattern_[i][j][0], &values_[i][j][0], pattern_[i][j].size() );
+    for (int i=0;i<n_+1;++i) {
+      for (int j=0;j<nb_;++j) {
+        mapping_.output(i*nb_+j).get(values_[i][j],SPARSESYM);
+        info = SDPConeSetASparseVecMat(sdpcone_, j, i, block_sizes_[j], 1, 0, &pattern_[i][j][0], &values_[i][j][0], pattern_[i][j].size() );
+      }
     }
   }
   
@@ -226,10 +276,17 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
     std::copy(Pmapper_.output().data().begin(),Pmapper_.output().data().end(),output(SDP_P).data().begin());
   }
       
-  DSDPComputeX(dsdp_);    
+  DSDPComputeX(dsdp_); 
   
   info = BConeCopyXSingle( bcone_, &output(SDP_LAMBDA_X).at(0), n_);
-
+  
+  int dummy;
+  double *lam;
+ 
+  info = LPConeGetXArray(lpcone_, &lam, &dummy);
+  std::transform (lam + nc_, lam + 2*nc_, lam, &output(SDP_LAMBDA_A).at(0), std::minus<double>());
+  
+  
 }
 
 } // namespace CasADi

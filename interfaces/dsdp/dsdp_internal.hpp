@@ -69,6 +69,10 @@ public:
     /// Temporary work vector of size n*(n+1)/2
     std::vector< std::vector<double> > store_X_;
     std::vector< std::vector<double> > store_P_;
+    
+    /// Mapping to get [A LBA]'
+    FX mappingA_;
+
 };
 
 } // namespace CasADi

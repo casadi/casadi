@@ -28,24 +28,37 @@ from helpers import *
 
 lpsolvers = []
 try:
-  lpsolvers.append((QPLPSolver,{"qp_solver":OOQPSolver,"qp_solver_options": {"mutol": 1e-12, "artol": 1e-12} }))
+  lpsolvers.append((QPLPSolver,{"qp_solver": CplexSolver },False))
 except:
   pass
   
-print lpsolvers
+def SDPLPSolver(A):
+  return DSDPSolver(A,sp_sparse(0,0),sp_sparse(0,0))
+  
+lpsolvers.append((SDPLPSolver,{},True))
 
 class LPSolverTests(casadiTestCase):
 
   def test_all(self):
+    #  min  2 x + y
+    #   x,y
+    #   
+    #   s.t.
+    #              -x+y  <= 1
+    #         2 <=  x+y
+    #               x-2y <= 4  
+    #
+    #         0 <=     y       
+    #
 
-    A = DMatrix([ [-1,1],[1,1],[1,-2]])
+    A = DMatrix([[-1,1],[1,1],[1,-2]])
     LBA = DMatrix([ -inf, 2, -inf ])
     UBA = DMatrix([ 1, inf, 4 ])
     LBX = DMatrix([ -inf, 0 ])
     UBX = DMatrix([ inf, inf ])
     c = DMatrix([ 2.0, 1.0 ])
     
-    for lpsolver, lp_options in lpsolvers:
+    for lpsolver, lp_options, re_init in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
       solver = lpsolver(A.sparsity())
@@ -68,6 +81,11 @@ class LPSolverTests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],2.5,5,str(lpsolver))
       
+      if re_init:
+        solver = lpsolver(A.sparsity())
+        solver.setOption(lp_options)
+        solver.init()
+      
       # Make a LBX active
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -84,7 +102,12 @@ class LPSolverTests(casadiTestCase):
       self.checkarray(solver.getOutput("lam_a"),DMatrix([2,0,0]),str(lpsolver),digits=5)
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],4,5,str(lpsolver))
-      
+
+      if re_init:
+        solver = lpsolver(A.sparsity())
+        solver.setOption(lp_options)
+        solver.init()
+        
       # Make a UBX active
       solver.setInput(c,"c")
       solver.setInput(A,"a")
@@ -101,6 +124,48 @@ class LPSolverTests(casadiTestCase):
       self.checkarray(solver.getOutput("lam_a"),DMatrix([0,-2,0]),str(lpsolver),digits=5)
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],3,5,str(lpsolver))
+
+      if re_init:
+        solver = lpsolver(A.sparsity())
+        solver.setOption(lp_options)
+        solver.init()
+      # Make both LBX and UBX active
+      solver.setInput(c,"c")
+      solver.setInput(A,"a")
+      solver.setInput([-inf,3],"lbx")
+      solver.setInput([inf,3],"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
+
+      solver.solve()
+
+      self.checkarray(solver.getOutput(),DMatrix([2,3]),str(lpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,-3]),str(lpsolver),digits=5)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([2,0,0]),str(lpsolver),digits=5)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],7,5,str(lpsolver))
+
+      if re_init:
+        solver = lpsolver(A.sparsity())
+        solver.setOption(lp_options)
+        solver.init()
+      # Linear equality constraint
+      solver.setInput(c,"c")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput([1, 2, -inf ],"lba")
+      solver.setInput([1,inf,4],"uba")
+
+      solver.solve()
+
+      self.checkarray(solver.getOutput(),DMatrix([0.5,1.5]),str(lpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(lpsolver),digits=5)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([0.5,-1.5,0]),str(lpsolver),digits=5)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],2.5,5,str(lpsolver))
       
 if __name__ == '__main__':
     unittest.main()

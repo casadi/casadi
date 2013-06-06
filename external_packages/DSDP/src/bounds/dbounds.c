@@ -534,6 +534,39 @@ int BConeCopyX(BCone bcone,double xl[], double xu[], int m){
   }
   DSDPFunctionReturn(0); 
 }
+
+#undef __FUNCT__
+#define __FUNCT__ "BConeCopyXSingle"
+/*!
+\fn int BConeCopyXSingle(BCone bcone,double lambda[], int m);
+\brief Copy the variables into arrays
+\param bcone Bounds
+\param lambda array
+\param m length of the arrays
+\ingroup Bounds
+\sa DSDPComputeX()
+
+This routine will set the values of this array to the value of the
+corresponding variable.  When no bound is present, the variable will
+equal zero.
+
+*/
+int BConeCopyXSingle(BCone bcone,double lambda[], int m){
+  int i,ii,*ib,nn;
+  double *xx,*au;
+  DSDPFunctionBegin;
+  BConeValid(bcone);
+  if (m!=bcone->m){ DSDPSETERR1(6,"Invalid Array Length.\n",bcone->m);}
+  xx=bcone->ux; au=bcone->au; nn=bcone->nn; ib=bcone->ib;
+  for (i=0;i<m;i++){
+    lambda[i]=0;
+  }
+  for (i=0;i<nn;i++){
+    ii=ib[i]-1;
+    lambda[ii] += ((au[i]<0) ? -1: 1) * xx[i];
+  }
+  DSDPFunctionReturn(0); 
+}
 #undef __FUNCT__
 #define __FUNCT__ "BConeSetBound"
 int BConeSetBound(BCone bcone,int vari, double ai, double bound){
@@ -584,6 +617,39 @@ int BConeSetUpperBound(BCone bcone,int vari, double ubound){
   int info;
   DSDPFunctionBegin;
   info=BConeSetBound(bcone,vari,1.0,ubound);DSDPCHKERR(info);
+  DSDPFunctionReturn(0); 
+}
+
+#undef __FUNCT__
+#define __FUNCT__ "BConeSetUnboundedLower"
+/*!
+\fn int BConeSetUnboundedLower(BCone bcone,int vari);
+\brief Set a lower bound on a variable y. 
+\ingroup Bounds
+\param bcone bounds
+\param vari y variable number
+\param lbound lower bound
+*/
+int BConeSetUnboundedLower(BCone bcone,int vari){
+  int info;
+  DSDPFunctionBegin;
+  info=BConeSetBound(bcone,vari,0.0,1.0);DSDPCHKERR(info);
+  DSDPFunctionReturn(0); 
+}
+
+#undef __FUNCT__
+#define __FUNCT__ "BConeSetUnboundedUpper"
+/*!
+\fn int BConeSetUnboundedUpper(BCone bcone,int vari);
+\brief Set an upper bound on a variable y. 
+\ingroup Bounds
+\param bcone bounds
+\param vari y variable number
+*/
+int BConeSetUnboundedUpper(BCone bcone,int vari){
+  int info;
+  DSDPFunctionBegin;
+  info=BConeSetBound(bcone,vari,0.0,1.0);DSDPCHKERR(info);
   DSDPFunctionReturn(0); 
 }
 

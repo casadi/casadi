@@ -48,12 +48,11 @@ SDPSolverInternal::SDPSolverInternal(const CRSSparsity &A, const CRSSparsity &G,
   m_ = G.size1();
   
   nc_ = A.size1();
+  n_ = A.size2();
   
   casadi_assert_message(F.size2()==m_,"SDPSolverInternal: Supplied F sparsity: number of columns (" << F.size2() <<  ")  must match m (" << m_ << ")");
   
-  casadi_assert_message(F.size1()%m_==0,"SDPSolverInternal: Supplied F sparsity: number of rows (" << F.size2() <<  ")  must be an integer multiple of m (" << m_ << "), but got remainder " << F.size1()%m_);
-  
-  n_ = F.size1()/m_;
+  casadi_assert_message(F.size1()%n_==0,"SDPSolverInternal: Supplied F sparsity: number of rows (" << F.size2() <<  ")  must be an integer multiple of n (" << n_ << "), but got remainder " << F.size1()%n_);
   
   // Input arguments
   setNumInputs(SDP_NUM_IN);
@@ -110,32 +109,34 @@ void SDPSolverInternal::init() {
   Pmapper_ = SXFunction(full_blocks,blkdiag(full_blocks)(lookupvector(p,p.size()),lookupvector(p,p.size())));
   Pmapper_.init();
   
-  // Make a mapping function from (G,F) -> (G[p,p]_j,F_i[p,p]j)
-  SXMatrix G = ssym("G",input(SDP_G).sparsity());
-  SXMatrix F = ssym("F",input(SDP_F).sparsity());
+  if (nb_>0) {
+    // Make a mapping function from (G,F) -> (G[p,p]_j,F_i[p,p]j)
+    SXMatrix G = ssym("G",input(SDP_G).sparsity());
+    SXMatrix F = ssym("F",input(SDP_F).sparsity());
 
-  std::vector<SXMatrix> in;
-  in.push_back(G);
-  in.push_back(F);
-  std::vector<SXMatrix> out((n_+1)*nb_);
-  for (int j=0;j<nb_;++j) {
-    out[j] = G(p,p)(range(r[j],r[j+1]),range(r[j],r[j+1]));
-  }
-  for (int i=0;i<n_;++i) {
-    SXMatrix Fi = F(range(i*m_,(i+1)*m_),ALL)(p,p);
+    std::vector<SXMatrix> in;
+    in.push_back(G);
+    in.push_back(F);
+    std::vector<SXMatrix> out((n_+1)*nb_);
     for (int j=0;j<nb_;++j) {
-      out[(i+1)*nb_+j] = Fi(range(r[j],r[j+1]),range(r[j],r[j+1]));
+      out[j] = G(p,p)(range(r[j],r[j+1]),range(r[j],r[j+1]));
     }
+    for (int i=0;i<n_;++i) {
+      SXMatrix Fi = F(range(i*m_,(i+1)*m_),ALL)(p,p);
+      for (int j=0;j<nb_;++j) {
+        out[(i+1)*nb_+j] = Fi(range(r[j],r[j+1]),range(r[j],r[j+1]));
+      }
+    }
+    mapping_ = SXFunction(in,out);
+    mapping_.init();
   }
-  mapping_ = SXFunction(in,out);
-  mapping_.init();
 
   // Output arguments
   setNumOutputs(SDP_NUM_OUT);
-  output(SDP_PRIMAL) = DMatrix::zeros(n_,1);
-  output(SDP_PRIMAL_P) = calc_p_? DMatrix(Pmapper_.output().sparsity(),0) : DMatrix();
+  output(SDP_X) = DMatrix::zeros(n_,1);
+  output(SDP_P) = calc_p_? DMatrix(Pmapper_.output().sparsity(),0) : DMatrix();
   output(SDP_DUAL) = calc_dual_? DMatrix(Pmapper_.output().sparsity(),0) : DMatrix();
-  output(SDP_PRIMAL_COST) = 0.0;
+  output(SDP_COST) = 0.0;
   output(SDP_DUAL_COST) = 0.0;
   output(SDP_LAMBDA_X) = DMatrix::zeros(n_,1);
   output(SDP_LAMBDA_A) = DMatrix::zeros(nc_,1);
