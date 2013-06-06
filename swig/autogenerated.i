@@ -632,8 +632,8 @@ def nlpIn(*dummy,**kwargs):
   Input arguments of an NLP function
   
   Keyword arguments:
-    x -- Decision variable [NLP_X_NEW]
-    p -- Fixed parameter [NLP_P_NEW]
+    x -- Decision variable [NL_X]
+    p -- Fixed parameter [NL_P]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPInput,n)] for n in dummy[1:]]
@@ -669,8 +669,8 @@ def nlpOut(*dummy,**kwargs):
   Output arguments of an NLP function
   
   Keyword arguments:
-    f -- Objective function [NLP_F_NEW]
-    g -- Constraint function [NLP_G_NEW]
+    f -- Objective function [NL_F]
+    g -- Constraint function [NL_G]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPOutput,n)] for n in dummy[1:]]

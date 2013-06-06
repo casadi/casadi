@@ -50,21 +50,21 @@ namespace CasADi{
   /// Input arguments of an NLP function [nlpIn]
   enum NLPInput{
     /// Decision variable [x]
-    NLP_X_NEW,
+    NL_X,
     /// Fixed parameter [p]
-    NLP_P_NEW, 
+    NL_P, 
     /// Number of NLP inputs
-    NLP_NUM_IN_NEW
+    NL_NUM_IN
   };
 
   /// Output arguments of an NLP function [nlpOut]
   enum NLPOutput{ 
     /// Objective function [f]
-    NLP_F_NEW,
+    NL_F,
     /// Constraint function [g]
-    NLP_G_NEW,
+    NL_G,
     /// Number of NLP outputs
-    NLP_NUM_OUT_NEW
+    NL_NUM_OUT
   };
 
   /// Input arguments of an NLP objective gradient function [gradFIn]

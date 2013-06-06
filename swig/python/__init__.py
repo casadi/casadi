@@ -92,7 +92,7 @@ NLP_COST = deprecated["NLP_COST"]
 NLP_LAMBDA_G = deprecated["NLP_LAMBDA_G"]
 NLP_LAMBDA_X = deprecated["NLP_LAMBDA_X"]
 
-# The following has new implementations, currently named NLP_P_NEW, etc. Remove in next release.
+# The following has new implementations, currently named NL_P, etc. Remove in next release.
 NLP_P = deprecated["NLP_P"]
 NLP_G = deprecated["NLP_G"]
 NLP_NUM_IN = deprecated["NLP_NUM_IN"]

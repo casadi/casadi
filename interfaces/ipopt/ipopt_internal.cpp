@@ -431,10 +431,10 @@ namespace CasADi{
           }
       } else {
         // Pass the argument to the function
-        hessLag_.setInput(x,NLP_X_NEW);
-        hessLag_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
-        hessLag_.setInput(obj_factor,NLP_NUM_IN_NEW+NLP_F_NEW);
-        hessLag_.setInput(lambda,NLP_NUM_IN_NEW+NLP_G_NEW);
+        hessLag_.setInput(x,NL_X);
+        hessLag_.setInput(input(NLP_SOLVER_P),NL_P);
+        hessLag_.setInput(obj_factor,NL_NUM_IN+NL_F);
+        hessLag_.setInput(lambda,NL_NUM_IN+NL_G);
         
         // Evaluate
         hessLag_.evaluate();
@@ -481,8 +481,8 @@ namespace CasADi{
           }
       } else {
         // Pass the argument to the function
-        jacG.setInput(x,NLP_X_NEW);
-        jacG.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
+        jacG.setInput(x,NL_X);
+        jacG.setInput(input(NLP_SOLVER_P),NL_P);
       
         // Evaluate the function
         jacG.evaluate();
@@ -491,7 +491,7 @@ namespace CasADi{
         jacG.getOutput(values);
       
         if(monitored("eval_jac_g")){
-          cout << "x = " << jacG.input(NLP_X_NEW).data() << endl;
+          cout << "x = " << jacG.input(NL_X).data() << endl;
           cout << "J = " << endl;
           jacG.output().printSparse();
         }
@@ -519,22 +519,22 @@ namespace CasADi{
       casadi_assert(n == nx_);
 
       // Pass the argument to the function
-      nlp_.setInput(x,NLP_X_NEW);
-      nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
+      nlp_.setInput(x,NL_X);
+      nlp_.setInput(input(NLP_SOLVER_P),NL_P);
       
       // Evaluate the function
       nlp_.evaluate();
 
       // Get the result
-      nlp_.getOutput(obj_value,NLP_F_NEW);
+      nlp_.getOutput(obj_value,NL_F);
 
       // Printing
       if(monitored("eval_f")){
-        cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
+        cout << "x = " << nlp_.input(NL_X) << endl;
         cout << "obj_value = " << obj_value << endl;
       }
 
-      if (regularity_check_ && !isRegular(nlp_.output(NLP_F_NEW).data())) casadi_error("IpoptInternal::f: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(nlp_.output(NL_F).data())) casadi_error("IpoptInternal::f: NaN or Inf detected.");
     
       double time2 = clock();
       t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -556,23 +556,23 @@ namespace CasADi{
 
       if(m>0){
         // Pass the argument to the function
-        nlp_.setInput(x,NLP_X_NEW);
-        nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
+        nlp_.setInput(x,NL_X);
+        nlp_.setInput(input(NLP_SOLVER_P),NL_P);
 
         // Evaluate the function and tape
         nlp_.evaluate();
 
         // Ge the result
-        nlp_.getOutput(g,NLP_G_NEW);
+        nlp_.getOutput(g,NL_G);
 
         // Printing
         if(monitored("eval_g")){
-          cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
-          cout << "g = " << nlp_.output(NLP_G_NEW) << endl;
+          cout << "x = " << nlp_.input(NL_X) << endl;
+          cout << "g = " << nlp_.output(NL_G) << endl;
         }
       }
     
-      if (regularity_check_ && !isRegular(nlp_.output(NLP_G_NEW).data())) casadi_error("IpoptInternal::g: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(nlp_.output(NL_G).data())) casadi_error("IpoptInternal::g: NaN or Inf detected.");
           
       double time2 = clock();
       t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -593,8 +593,8 @@ namespace CasADi{
       casadi_assert(n == nx_);
     
       // Pass the argument to the function
-      gradF_.setInput(x,NLP_X_NEW);
-      gradF_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
+      gradF_.setInput(x,NL_X);
+      gradF_.setInput(input(NLP_SOLVER_P),NL_P);
       
       // Evaluate, adjoint mode
       gradF_.evaluate();
@@ -604,7 +604,7 @@ namespace CasADi{
       
       // Printing
       if(monitored("eval_grad_f")){
-        cout << "x = " << gradF_.input(NLP_X_NEW) << endl;
+        cout << "x = " << gradF_.input(NL_X) << endl;
         cout << "grad_f = " << gradF_.output() << endl;
       }
 
@@ -680,7 +680,7 @@ namespace CasADi{
       m = ng_;               // number of constraints
 
       // Get Jacobian sparsity pattern
-      if(nlp_.output(NLP_G_NEW).size()==0)
+      if(nlp_.output(NL_G).size()==0)
         nnz_jac_g = 0;
       else
         nnz_jac_g = jacG().output().size();

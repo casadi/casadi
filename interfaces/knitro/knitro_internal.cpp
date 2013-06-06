@@ -298,31 +298,31 @@ namespace CasADi{
 
   void KnitroInternal::evalfc(const double* x, double& obj, double *c){
     // Pass the argument to the function
-    nlp_.setInput(x,NLP_X_NEW);
-    nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
+    nlp_.setInput(x,NL_X);
+    nlp_.setInput(input(NLP_SOLVER_P),NL_P);
 
     // Evaluate the function
     nlp_.evaluate();
 
     // Get the result
-    nlp_.output(NLP_F_NEW).get(obj);
-    nlp_.output(NLP_G_NEW).get(c,DENSE);
+    nlp_.output(NL_F).get(obj);
+    nlp_.output(NL_G).get(c,DENSE);
     
     // Printing
     if(monitored("eval_f")){
-      cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
-      cout << "f = " << nlp_.output(NLP_F_NEW) << endl;
+      cout << "x = " << nlp_.input(NL_X) << endl;
+      cout << "f = " << nlp_.output(NL_F) << endl;
     }
     if(monitored("eval_g")){
-      cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
-      cout << "g = " << nlp_.output(NLP_G_NEW) << endl;
+      cout << "x = " << nlp_.input(NL_X) << endl;
+      cout << "g = " << nlp_.output(NL_G) << endl;
     }
   }
 
   void KnitroInternal::evalga(const double* x, double* objGrad, double* jac){
     // Pass the argument to the function
-    gradF_.setInput(x,NLP_X_NEW);
-    gradF_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
+    gradF_.setInput(x,NL_X);
+    gradF_.setInput(input(NLP_SOLVER_P),NL_P);
 
     // Evaluate the function using adjoint mode AD
     gradF_.evaluate();
@@ -332,13 +332,13 @@ namespace CasADi{
 
     // Printing
     if(monitored("eval_grad_f")){
-      cout << "x = " << gradF_.input(NLP_X_NEW) << endl;
+      cout << "x = " << gradF_.input(NL_X) << endl;
       cout << "grad_f = " << gradF_.output() << endl;
     }
     
     // Pass the argument to the Jacobian function
-    jacG_.setInput(x,NLP_X_NEW);
-    jacG_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
+    jacG_.setInput(x,NL_X);
+    jacG_.setInput(input(NLP_SOLVER_P),NL_P);
   
     // Evaluate the Jacobian function
     jacG_.evaluate();
@@ -348,17 +348,17 @@ namespace CasADi{
   
     // Printing
     if(monitored("eval_jac_g")){
-      cout << "x = " << jacG_.input(NLP_X_NEW) << endl;
+      cout << "x = " << jacG_.input(NL_X) << endl;
       cout << "jac_g = " << jacG_.output() << endl;
     }
   }
 
   void KnitroInternal::evalh(const double* x, const double* lambda, double* hessian){
     // Pass the argument to the function
-    hessLag_.setInput(x,NLP_X_NEW);
-    hessLag_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
-    hessLag_.setInput(1.0,NLP_NUM_IN_NEW+NLP_F_NEW);
-    hessLag_.setInput(lambda,NLP_NUM_IN_NEW+NLP_G_NEW);
+    hessLag_.setInput(x,NL_X);
+    hessLag_.setInput(input(NLP_SOLVER_P),NL_P);
+    hessLag_.setInput(1.0,NL_NUM_IN+NL_F);
+    hessLag_.setInput(lambda,NL_NUM_IN+NL_G);
     
     // Evaluate
     hessLag_.evaluate();
