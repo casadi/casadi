@@ -74,7 +74,7 @@ namespace CasADi{
     casadi_assert_message(nlp_.getNumOutputs()==NLP_NUM_OUT_NEW, "The NLP function must have exactly two outputs");
     
     // Sparsity patterns
-    const CRSSparsity& x_sparsity = nlp_.input(NLP_X).sparsity();
+    const CRSSparsity& x_sparsity = nlp_.input(NLP_X_NEW).sparsity();
     const CRSSparsity& p_sparsity = nlp_.input(NLP_P_NEW).sparsity();
     const CRSSparsity& g_sparsity = nlp_.output(NLP_G_NEW).sparsity();
 
@@ -190,7 +190,7 @@ namespace CasADi{
       gradF = getOption("grad_f");
     } else {
       log("Generating objective gradient");
-      gradF = nlp_.gradient(NLP_X,NLP_F_NEW);
+      gradF = nlp_.gradient(NLP_X_NEW,NLP_F_NEW);
       log("Gradient function generated");
     }
     gradF.setOption("name","grad_f");
@@ -218,7 +218,7 @@ namespace CasADi{
       jacG = getOption("jac_g");
     } else {
       log("Generating constraint Jacobian");
-      jacG = nlp_.jacobian(NLP_X,NLP_G_NEW);
+      jacG = nlp_.jacobian(NLP_X_NEW,NLP_G_NEW);
       log("Jacobian function generated");
     }
     jacG.setOption("name","jac_g");
@@ -265,7 +265,7 @@ namespace CasADi{
     } else {
       FX& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian");
-      hessLag = gradLag.jacobian(NLP_X,NLP_NUM_OUT_NEW+NLP_X,false,true);
+      hessLag = gradLag.jacobian(NLP_X_NEW,NLP_NUM_OUT_NEW+NLP_X_NEW,false,true);
       log("Hessian function generated");
     }
     hessLag.setOption("name","hess_lag");
@@ -290,7 +290,7 @@ namespace CasADi{
     } else {
       FX& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian sparsity pattern");
-      spHessLag = gradLag.jacSparsity(NLP_X,NLP_NUM_OUT_NEW+NLP_X,false,true);
+      spHessLag = gradLag.jacSparsity(NLP_X_NEW,NLP_NUM_OUT_NEW+NLP_X_NEW,false,true);
       log("Hessian sparsity pattern generated");
     }
     return spHessLag;

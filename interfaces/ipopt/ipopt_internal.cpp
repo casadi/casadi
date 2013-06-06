@@ -431,7 +431,7 @@ namespace CasADi{
           }
       } else {
         // Pass the argument to the function
-        hessLag_.setInput(x,NLP_X);
+        hessLag_.setInput(x,NLP_X_NEW);
         hessLag_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
         hessLag_.setInput(obj_factor,NLP_NUM_IN_NEW+NLP_F_NEW);
         hessLag_.setInput(lambda,NLP_NUM_IN_NEW+NLP_G_NEW);
@@ -481,7 +481,7 @@ namespace CasADi{
           }
       } else {
         // Pass the argument to the function
-        jacG.setInput(x,NLP_X);
+        jacG.setInput(x,NLP_X_NEW);
         jacG.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
         // Evaluate the function
@@ -491,7 +491,7 @@ namespace CasADi{
         jacG.getOutput(values);
       
         if(monitored("eval_jac_g")){
-          cout << "x = " << jacG.input(NLP_X).data() << endl;
+          cout << "x = " << jacG.input(NLP_X_NEW).data() << endl;
           cout << "J = " << endl;
           jacG.output().printSparse();
         }
@@ -519,7 +519,7 @@ namespace CasADi{
       casadi_assert(n == nx_);
 
       // Pass the argument to the function
-      nlp_.setInput(x,NLP_X);
+      nlp_.setInput(x,NLP_X_NEW);
       nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate the function
@@ -530,7 +530,7 @@ namespace CasADi{
 
       // Printing
       if(monitored("eval_f")){
-        cout << "x = " << nlp_.input(NLP_X) << endl;
+        cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
         cout << "obj_value = " << obj_value << endl;
       }
 
@@ -556,7 +556,7 @@ namespace CasADi{
 
       if(m>0){
         // Pass the argument to the function
-        nlp_.setInput(x,NLP_X);
+        nlp_.setInput(x,NLP_X_NEW);
         nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
 
         // Evaluate the function and tape
@@ -567,7 +567,7 @@ namespace CasADi{
 
         // Printing
         if(monitored("eval_g")){
-          cout << "x = " << nlp_.input(NLP_X) << endl;
+          cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
           cout << "g = " << nlp_.output(NLP_G_NEW) << endl;
         }
       }
@@ -593,7 +593,7 @@ namespace CasADi{
       casadi_assert(n == nx_);
     
       // Pass the argument to the function
-      gradF_.setInput(x,NLP_X);
+      gradF_.setInput(x,NLP_X_NEW);
       gradF_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate, adjoint mode
@@ -604,7 +604,7 @@ namespace CasADi{
       
       // Printing
       if(monitored("eval_grad_f")){
-        cout << "x = " << gradF_.input(NLP_X) << endl;
+        cout << "x = " << gradF_.input(NLP_X_NEW) << endl;
         cout << "grad_f = " << gradF_.output() << endl;
       }
 

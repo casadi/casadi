@@ -603,7 +603,7 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==3) return "INTEGRATOR_RQF";
       break;
     case SCHEME_NLPInput: 
-      if(i==0) return "NLP_X";
+      if(i==0) return "NLP_X_NEW";
       if(i==1) return "NLP_P_NEW";
       break;
     case SCHEME_NLPOutput: 

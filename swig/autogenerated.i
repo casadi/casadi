@@ -632,7 +632,7 @@ def nlpIn(*dummy,**kwargs):
   Input arguments of an NLP function
   
   Keyword arguments:
-    x -- Decision variable [NLP_X]
+    x -- Decision variable [NLP_X_NEW]
     p -- Fixed parameter [NLP_P_NEW]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpIn. Either use keywords or non-keywords ")

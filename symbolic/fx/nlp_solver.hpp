@@ -50,7 +50,7 @@ namespace CasADi{
   /// Input arguments of an NLP function [nlpIn]
   enum NLPInput{
     /// Decision variable [x]
-    NLP_X,
+    NLP_X_NEW,
     /// Fixed parameter [p]
     NLP_P_NEW, 
     /// Number of NLP inputs

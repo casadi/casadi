@@ -880,7 +880,7 @@ namespace CasADi{
       double time1 = clock();
 
       // Pass the argument to the function
-      nlp_.setInput(x, NLP_X);
+      nlp_.setInput(x, NLP_X_NEW);
       nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate the function
@@ -891,7 +891,7 @@ namespace CasADi{
 
       // Printing
       if(monitored("eval_f")){
-        cout << "x = " << nlp_.input(NLP_X) << endl;
+        cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
         cout << "obj_value = " << obj_value << endl;
       }
       obj_value *= scale;
@@ -917,7 +917,7 @@ namespace CasADi{
 
       if(worhp_o_.m>0){
         // Pass the argument to the function
-        nlp_.setInput(x,NLP_X);
+        nlp_.setInput(x,NLP_X_NEW);
         nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
 
         // Evaluate the function and tape
@@ -928,7 +928,7 @@ namespace CasADi{
 
         // Printing
         if(monitored("eval_g")){
-          cout << "x = " << nlp_.input(NLP_X) << endl;
+          cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
           cout << "g = " << nlp_.output(NLP_G_NEW) << endl;
         }
       }
@@ -953,7 +953,7 @@ namespace CasADi{
       double time1 = clock();
     
       // Pass the argument to the function
-      gradF_.setInput(x,NLP_X);
+      gradF_.setInput(x,NLP_X_NEW);
       gradF_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate, adjoint mode

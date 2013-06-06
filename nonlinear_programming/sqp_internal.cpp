@@ -604,7 +604,7 @@ namespace CasADi{
       if(ng_==0) return;
       
       // Pass the argument to the function
-      nlp_.setInput(x,NLP_X);
+      nlp_.setInput(x,NLP_X_NEW);
       nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate the function and tape
@@ -615,7 +615,7 @@ namespace CasADi{
       
       // Printing
       if(monitored("eval_g")){
-        cout << "x = " << nlp_.input(NLP_X) << endl;
+        cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
         cout << "g = " << nlp_.output(NLP_G_NEW) << endl;
       }
     } catch (exception& ex){
@@ -633,7 +633,7 @@ namespace CasADi{
       FX& jacG = this->jacG();
 
       // Pass the argument to the function
-      jacG.setInput(x,NLP_X);
+      jacG.setInput(x,NLP_X_NEW);
       jacG.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate the function
@@ -661,7 +661,7 @@ namespace CasADi{
       FX& gradF = this->gradF();
 
       // Pass the argument to the function
-      gradF.setInput(x,NLP_X);
+      gradF.setInput(x,NLP_X_NEW);
       gradF.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate, adjoint mode
@@ -669,7 +669,7 @@ namespace CasADi{
       
       // Get the result
       gradF.output().get(grad_f,DENSE);
-      gradF.output(1+NLP_X).get(f);
+      gradF.output(1+NLP_X_NEW).get(f);
       
       // Printing
       if (monitored("eval_f")){
@@ -690,7 +690,7 @@ namespace CasADi{
   void SQPInternal::eval_f(const std::vector<double>& x, double& f){
     try {
       // Pass the argument to the function
-      nlp_.setInput(x,NLP_X);
+      nlp_.setInput(x,NLP_X_NEW);
       nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate the function
@@ -701,7 +701,7 @@ namespace CasADi{
 
       // Printing
       if(monitored("eval_f")){
-        cout << "x = " << nlp_.input(NLP_X) << endl;
+        cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
         cout << "f = " << f << endl;
       }
     } catch (exception& ex){

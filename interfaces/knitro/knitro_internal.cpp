@@ -298,7 +298,7 @@ namespace CasADi{
 
   void KnitroInternal::evalfc(const double* x, double& obj, double *c){
     // Pass the argument to the function
-    nlp_.setInput(x,NLP_X);
+    nlp_.setInput(x,NLP_X_NEW);
     nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
 
     // Evaluate the function
@@ -310,18 +310,18 @@ namespace CasADi{
     
     // Printing
     if(monitored("eval_f")){
-      cout << "x = " << nlp_.input(NLP_X) << endl;
+      cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
       cout << "f = " << nlp_.output(NLP_F_NEW) << endl;
     }
     if(monitored("eval_g")){
-      cout << "x = " << nlp_.input(NLP_X) << endl;
+      cout << "x = " << nlp_.input(NLP_X_NEW) << endl;
       cout << "g = " << nlp_.output(NLP_G_NEW) << endl;
     }
   }
 
   void KnitroInternal::evalga(const double* x, double* objGrad, double* jac){
     // Pass the argument to the function
-    gradF_.setInput(x,NLP_X);
+    gradF_.setInput(x,NLP_X_NEW);
     gradF_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
 
     // Evaluate the function using adjoint mode AD
@@ -332,12 +332,12 @@ namespace CasADi{
 
     // Printing
     if(monitored("eval_grad_f")){
-      cout << "x = " << gradF_.input(NLP_X) << endl;
+      cout << "x = " << gradF_.input(NLP_X_NEW) << endl;
       cout << "grad_f = " << gradF_.output() << endl;
     }
     
     // Pass the argument to the Jacobian function
-    jacG_.setInput(x,NLP_X);
+    jacG_.setInput(x,NLP_X_NEW);
     jacG_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
   
     // Evaluate the Jacobian function
@@ -348,14 +348,14 @@ namespace CasADi{
   
     // Printing
     if(monitored("eval_jac_g")){
-      cout << "x = " << jacG_.input(NLP_X) << endl;
+      cout << "x = " << jacG_.input(NLP_X_NEW) << endl;
       cout << "jac_g = " << jacG_.output() << endl;
     }
   }
 
   void KnitroInternal::evalh(const double* x, const double* lambda, double* hessian){
     // Pass the argument to the function
-    hessLag_.setInput(x,NLP_X);
+    hessLag_.setInput(x,NLP_X_NEW);
     hessLag_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
     hessLag_.setInput(1.0,NLP_NUM_IN_NEW+NLP_F_NEW);
     hessLag_.setInput(lambda,NLP_NUM_IN_NEW+NLP_G_NEW);
