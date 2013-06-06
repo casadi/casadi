@@ -433,8 +433,8 @@ namespace CasADi{
         // Pass the argument to the function
         hessLag_.setInput(x,NLP_X);
         hessLag_.setInput(input(NLP_SOLVER_P),NLP_P);
-        hessLag_.setInput(obj_factor,NLP_NUM_IN+NLP_F);
-        hessLag_.setInput(lambda,NLP_NUM_IN+NLP_G);
+        hessLag_.setInput(obj_factor,NLP_NUM_IN_NEW+NLP_F);
+        hessLag_.setInput(lambda,NLP_NUM_IN_NEW+NLP_G);
         
         // Evaluate
         hessLag_.evaluate();

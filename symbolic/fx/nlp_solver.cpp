@@ -74,23 +74,23 @@ namespace CasADi{
       if(is_a<SXFunction>(F)){
         SXFunction F_sx = shared_cast<SXFunction>(F);
         vector<SXMatrix> nlp_in = F_sx.inputExpr();
-        nlp_in.resize(NLP_NUM_IN);
-        vector<SXMatrix> nlp_out(NLP_NUM_OUT);
+        nlp_in.resize(NLP_NUM_IN_NEW);
+        vector<SXMatrix> nlp_out(NLP_NUM_OUT_NEW);
         nlp_out[NLP_F] = F_sx.outputExpr(0);        
         return SXFunction(nlp_in,nlp_out);
       } else if(is_a<MXFunction>(F)){
         MXFunction F_mx = shared_cast<MXFunction>(F);
         vector<MX> nlp_in = F_mx.inputExpr();
-        nlp_in.resize(NLP_NUM_IN);
-        vector<MX> nlp_out(NLP_NUM_OUT);
+        nlp_in.resize(NLP_NUM_IN_NEW);
+        vector<MX> nlp_out(NLP_NUM_OUT_NEW);
         nlp_out[NLP_F] = F_mx.outputExpr(0);        
         return MXFunction(nlp_in,nlp_out);
       } else {
         vector<MX> F_in = F.symbolicInput();
-        vector<MX> nlp_in(NLP_NUM_IN);
+        vector<MX> nlp_in(NLP_NUM_IN_NEW);
         nlp_in[NLP_X] = F_in.at(0);
         if(F_in.size()>1) nlp_in[NLP_P] = F_in.at(1);        
-        vector<MX> nlp_out(NLP_NUM_OUT);
+        vector<MX> nlp_out(NLP_NUM_OUT_NEW);
         nlp_out[NLP_F] = F.call(F_in).front();
         return MXFunction(nlp_in,nlp_out);
       }
@@ -99,24 +99,24 @@ namespace CasADi{
       if(is_a<SXFunction>(G)){
         SXFunction G_sx = shared_cast<SXFunction>(G);
         vector<SXMatrix> nlp_in = G_sx.inputExpr();
-        nlp_in.resize(NLP_NUM_IN);
-        vector<SXMatrix> nlp_out(NLP_NUM_OUT);
+        nlp_in.resize(NLP_NUM_IN_NEW);
+        vector<SXMatrix> nlp_out(NLP_NUM_OUT_NEW);
         nlp_out[NLP_G] = G_sx.outputExpr(0);        
         return SXFunction(nlp_in,nlp_out);
       } else if(is_a<MXFunction>(G)){
         MXFunction G_mx = shared_cast<MXFunction>(F);
         vector<MX> nlp_in = G_mx.inputExpr();
-        nlp_in.resize(NLP_NUM_IN);        
-        vector<MX> nlp_out(NLP_NUM_OUT);
+        nlp_in.resize(NLP_NUM_IN_NEW);        
+        vector<MX> nlp_out(NLP_NUM_OUT_NEW);
         nlp_out[NLP_G] = G_mx.outputExpr(0);        
-        nlp_out.resize(NLP_NUM_OUT);
+        nlp_out.resize(NLP_NUM_OUT_NEW);
         return MXFunction(nlp_in,nlp_out);
       } else {
         vector<MX> G_in = G.symbolicInput();
-        vector<MX> nlp_in(NLP_NUM_IN);
+        vector<MX> nlp_in(NLP_NUM_IN_NEW);
         nlp_in[NLP_X] = G_in.at(0);
         if(G_in.size()>1) nlp_in[NLP_P] = G_in.at(1);        
-        vector<MX> nlp_out(NLP_NUM_OUT);
+        vector<MX> nlp_out(NLP_NUM_OUT_NEW);
         nlp_out[NLP_G] = G.call(G_in).at(0);
         return MXFunction(nlp_in,nlp_out);
       }
@@ -125,7 +125,7 @@ namespace CasADi{
       
       // SXFunction if both functions are SXFunction
       if(is_a<SXFunction>(F) && is_a<SXFunction>(G)){
-        vector<SXMatrix> nlp_in(NLP_NUM_IN), nlp_out(NLP_NUM_OUT);
+        vector<SXMatrix> nlp_in(NLP_NUM_IN_NEW), nlp_out(NLP_NUM_OUT_NEW);
         SXFunction F_sx = shared_cast<SXFunction>(F);
         SXFunction G_sx = shared_cast<SXFunction>(G);        
         nlp_in[NLP_X] = G_sx.inputExpr(0);
@@ -141,7 +141,7 @@ namespace CasADi{
 
         return SXFunction(nlp_in,nlp_out);
       } else { // MXFunction otherwise
-        vector<MX> nlp_in(NLP_NUM_IN), nlp_out(NLP_NUM_OUT);
+        vector<MX> nlp_in(NLP_NUM_IN_NEW), nlp_out(NLP_NUM_OUT_NEW);
 
         // Try to cast into MXFunction
         MXFunction F_mx = shared_cast<MXFunction>(F);

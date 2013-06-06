@@ -70,8 +70,8 @@ namespace CasADi{
   void NLPSolverInternal::init(){
     // Initialize the NLP
     nlp_.init(false);
-    casadi_assert_message(nlp_.getNumInputs()==NLP_NUM_IN, "The NLP function must have exactly two input");
-    casadi_assert_message(nlp_.getNumOutputs()==NLP_NUM_OUT, "The NLP function must have exactly two outputs");
+    casadi_assert_message(nlp_.getNumInputs()==NLP_NUM_IN_NEW, "The NLP function must have exactly two input");
+    casadi_assert_message(nlp_.getNumOutputs()==NLP_NUM_OUT_NEW, "The NLP function must have exactly two outputs");
     
     // Sparsity patterns
     const CRSSparsity& x_sparsity = nlp_.input(NLP_X).sparsity();
@@ -265,7 +265,7 @@ namespace CasADi{
     } else {
       FX& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian");
-      hessLag = gradLag.jacobian(NLP_X,NLP_NUM_OUT+NLP_X,false,true);
+      hessLag = gradLag.jacobian(NLP_X,NLP_NUM_OUT_NEW+NLP_X,false,true);
       log("Hessian function generated");
     }
     hessLag.setOption("name","hess_lag");
@@ -290,7 +290,7 @@ namespace CasADi{
     } else {
       FX& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian sparsity pattern");
-      spHessLag = gradLag.jacSparsity(NLP_X,NLP_NUM_OUT+NLP_X,false,true);
+      spHessLag = gradLag.jacSparsity(NLP_X,NLP_NUM_OUT_NEW+NLP_X,false,true);
       log("Hessian sparsity pattern generated");
     }
     return spHessLag;

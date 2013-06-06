@@ -98,7 +98,7 @@ int main(){
   // Hessian of the lagrangian
   FX grad_lag = nlp.derivative(0,1);
   grad_lag.setOption("numeric_jacobian",false);
-  FX hess_lag = grad_lag.jacobian(NLP_X,NLP_NUM_OUT+NLP_X,false,true);
+  FX hess_lag = grad_lag.jacobian(NLP_X,NLP_NUM_OUT_NEW+NLP_X,false,true);
   hess_lag.init();
 
   // Codegen and compile

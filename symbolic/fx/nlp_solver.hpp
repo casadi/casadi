@@ -54,7 +54,7 @@ namespace CasADi{
     /// Fixed parameter [p]
     NLP_P, 
     /// Number of NLP inputs
-    NLP_NUM_IN
+    NLP_NUM_IN_NEW
   };
 
   /// Output arguments of an NLP function [nlpOut]
@@ -64,7 +64,7 @@ namespace CasADi{
     /// Constraint function [g]
     NLP_G,
     /// Number of NLP outputs
-    NLP_NUM_OUT
+    NLP_NUM_OUT_NEW
   };
 
   /// Input arguments of an NLP objective gradient function [gradFIn]
