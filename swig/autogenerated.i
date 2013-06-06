@@ -670,7 +670,7 @@ def nlpOut(*dummy,**kwargs):
   
   Keyword arguments:
     f -- Objective function [NLP_F]
-    g -- Constraint function [NLP_G]
+    g -- Constraint function [NLP_G_NEW]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPOutput,n)] for n in dummy[1:]]

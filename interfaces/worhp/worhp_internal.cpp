@@ -924,16 +924,16 @@ namespace CasADi{
         nlp_.evaluate();
 
         // Ge the result
-        nlp_.getOutput(g,NLP_G);
+        nlp_.getOutput(g,NLP_G_NEW);
 
         // Printing
         if(monitored("eval_g")){
           cout << "x = " << nlp_.input(NLP_X) << endl;
-          cout << "g = " << nlp_.output(NLP_G) << endl;
+          cout << "g = " << nlp_.output(NLP_G_NEW) << endl;
         }
       }
 
-      if (regularity_check_ && !isRegular(nlp_.output(NLP_G).data())) casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(nlp_.output(NLP_G_NEW).data())) casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
     
       double time2 = clock();
       t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;

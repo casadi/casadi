@@ -306,7 +306,7 @@ namespace CasADi{
 
     // Get the result
     nlp_.output(NLP_F).get(obj);
-    nlp_.output(NLP_G).get(c,DENSE);
+    nlp_.output(NLP_G_NEW).get(c,DENSE);
     
     // Printing
     if(monitored("eval_f")){
@@ -315,7 +315,7 @@ namespace CasADi{
     }
     if(monitored("eval_g")){
       cout << "x = " << nlp_.input(NLP_X) << endl;
-      cout << "g = " << nlp_.output(NLP_G) << endl;
+      cout << "g = " << nlp_.output(NLP_G_NEW) << endl;
     }
   }
 
@@ -358,7 +358,7 @@ namespace CasADi{
     hessLag_.setInput(x,NLP_X);
     hessLag_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
     hessLag_.setInput(1.0,NLP_NUM_IN_NEW+NLP_F);
-    hessLag_.setInput(lambda,NLP_NUM_IN_NEW+NLP_G);
+    hessLag_.setInput(lambda,NLP_NUM_IN_NEW+NLP_G_NEW);
     
     // Evaluate
     hessLag_.evaluate();

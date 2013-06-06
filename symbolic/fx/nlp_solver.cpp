@@ -101,14 +101,14 @@ namespace CasADi{
         vector<SXMatrix> nlp_in = G_sx.inputExpr();
         nlp_in.resize(NLP_NUM_IN_NEW);
         vector<SXMatrix> nlp_out(NLP_NUM_OUT_NEW);
-        nlp_out[NLP_G] = G_sx.outputExpr(0);        
+        nlp_out[NLP_G_NEW] = G_sx.outputExpr(0);        
         return SXFunction(nlp_in,nlp_out);
       } else if(is_a<MXFunction>(G)){
         MXFunction G_mx = shared_cast<MXFunction>(F);
         vector<MX> nlp_in = G_mx.inputExpr();
         nlp_in.resize(NLP_NUM_IN_NEW);        
         vector<MX> nlp_out(NLP_NUM_OUT_NEW);
-        nlp_out[NLP_G] = G_mx.outputExpr(0);        
+        nlp_out[NLP_G_NEW] = G_mx.outputExpr(0);        
         nlp_out.resize(NLP_NUM_OUT_NEW);
         return MXFunction(nlp_in,nlp_out);
       } else {
@@ -117,7 +117,7 @@ namespace CasADi{
         nlp_in[NLP_X] = G_in.at(0);
         if(G_in.size()>1) nlp_in[NLP_P_NEW] = G_in.at(1);        
         vector<MX> nlp_out(NLP_NUM_OUT_NEW);
-        nlp_out[NLP_G] = G.call(G_in).at(0);
+        nlp_out[NLP_G_NEW] = G.call(G_in).at(0);
         return MXFunction(nlp_in,nlp_out);
       }
     } else {
@@ -136,7 +136,7 @@ namespace CasADi{
         }
 
         // Expression for f and g
-        nlp_out[NLP_G] = G_sx.outputExpr(0);
+        nlp_out[NLP_G_NEW] = G_sx.outputExpr(0);
         nlp_out[NLP_F] = substitute(F_sx.outputExpr(),F_sx.inputExpr(),G_sx.inputExpr()).front();
 
         return SXFunction(nlp_in,nlp_out);
@@ -155,7 +155,7 @@ namespace CasADi{
           } else {
             nlp_in[NLP_P_NEW] = msym("p",0,1);
           }
-          nlp_out[NLP_G] = G_mx.outputExpr(0);
+          nlp_out[NLP_G_NEW] = G_mx.outputExpr(0);
           if(!F_mx.isNull()){ // Both are MXFunction, make sure they use the same variables
             nlp_out[NLP_F] = substitute(F_mx.outputExpr(),F_mx.inputExpr(),G_mx.inputExpr()).front();
           } else { // G_ but not F_ MXFunction
@@ -170,12 +170,12 @@ namespace CasADi{
               nlp_in[NLP_P_NEW] = msym("p",0,1);              
             }
             nlp_out[NLP_F] = F_mx.outputExpr(0);
-            nlp_out[NLP_G] = G.call(F_mx.inputExpr()).front();
+            nlp_out[NLP_G_NEW] = G.call(F_mx.inputExpr()).front();
           } else { // None of them MXFunction
             vector<MX> FG_in = G.symbolicInput();
             nlp_in[NLP_X] = FG_in.at(0);
             if(FG_in.size()>1) nlp_in[NLP_P_NEW] = FG_in.at(1);
-            nlp_out[NLP_G] = G.call(FG_in).front();
+            nlp_out[NLP_G_NEW] = G.call(FG_in).front();
             nlp_out[NLP_F] = F.call(FG_in).front();
           }
         }

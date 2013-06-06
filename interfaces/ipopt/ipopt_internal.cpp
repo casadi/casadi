@@ -434,7 +434,7 @@ namespace CasADi{
         hessLag_.setInput(x,NLP_X);
         hessLag_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
         hessLag_.setInput(obj_factor,NLP_NUM_IN_NEW+NLP_F);
-        hessLag_.setInput(lambda,NLP_NUM_IN_NEW+NLP_G);
+        hessLag_.setInput(lambda,NLP_NUM_IN_NEW+NLP_G_NEW);
         
         // Evaluate
         hessLag_.evaluate();
@@ -563,16 +563,16 @@ namespace CasADi{
         nlp_.evaluate();
 
         // Ge the result
-        nlp_.getOutput(g,NLP_G);
+        nlp_.getOutput(g,NLP_G_NEW);
 
         // Printing
         if(monitored("eval_g")){
           cout << "x = " << nlp_.input(NLP_X) << endl;
-          cout << "g = " << nlp_.output(NLP_G) << endl;
+          cout << "g = " << nlp_.output(NLP_G_NEW) << endl;
         }
       }
     
-      if (regularity_check_ && !isRegular(nlp_.output(NLP_G).data())) casadi_error("IpoptInternal::g: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(nlp_.output(NLP_G_NEW).data())) casadi_error("IpoptInternal::g: NaN or Inf detected.");
           
       double time2 = clock();
       t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -680,7 +680,7 @@ namespace CasADi{
       m = ng_;               // number of constraints
 
       // Get Jacobian sparsity pattern
-      if(nlp_.output(NLP_G).size()==0)
+      if(nlp_.output(NLP_G_NEW).size()==0)
         nnz_jac_g = 0;
       else
         nnz_jac_g = jacG().output().size();

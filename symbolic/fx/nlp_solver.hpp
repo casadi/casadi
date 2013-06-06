@@ -62,7 +62,7 @@ namespace CasADi{
     /// Objective function [f]
     NLP_F,
     /// Constraint function [g]
-    NLP_G,
+    NLP_G_NEW,
     /// Number of NLP outputs
     NLP_NUM_OUT_NEW
   };

@@ -76,7 +76,7 @@ namespace CasADi{
     // Sparsity patterns
     const CRSSparsity& x_sparsity = nlp_.input(NLP_X).sparsity();
     const CRSSparsity& p_sparsity = nlp_.input(NLP_P_NEW).sparsity();
-    const CRSSparsity& g_sparsity = nlp_.output(NLP_G).sparsity();
+    const CRSSparsity& g_sparsity = nlp_.output(NLP_G_NEW).sparsity();
 
     // Get dimensions
     nx_ = x_sparsity.size();
@@ -218,7 +218,7 @@ namespace CasADi{
       jacG = getOption("jac_g");
     } else {
       log("Generating constraint Jacobian");
-      jacG = nlp_.jacobian(NLP_X,NLP_G);
+      jacG = nlp_.jacobian(NLP_X,NLP_G_NEW);
       log("Jacobian function generated");
     }
     jacG.setOption("name","jac_g");
