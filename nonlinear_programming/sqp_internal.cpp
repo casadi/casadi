@@ -605,18 +605,18 @@ namespace CasADi{
       
       // Pass the argument to the function
       nlp_.setInput(x,NLP_X);
-      nlp_.setInput(input(NLP_SOLVER_P),NLP_P);
+      nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate the function and tape
       nlp_.evaluate();
       
       // Ge the result
-      nlp_.output(NLP_G).get(g,DENSE);
+      nlp_.output(NLP_G_NEW).get(g,DENSE);
       
       // Printing
       if(monitored("eval_g")){
         cout << "x = " << nlp_.input(NLP_X) << endl;
-        cout << "g = " << nlp_.output(NLP_G) << endl;
+        cout << "g = " << nlp_.output(NLP_G_NEW) << endl;
       }
     } catch (exception& ex){
       cerr << "eval_g failed: " << ex.what() << endl;
@@ -634,13 +634,13 @@ namespace CasADi{
 
       // Pass the argument to the function
       jacG.setInput(x,NLP_X);
-      jacG.setInput(input(NLP_SOLVER_P),NLP_P);
+      jacG.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate the function
       jacG.evaluate();
       
       // Get the output
-      jacG.output(1+NLP_G).get(g,DENSE);
+      jacG.output(1+NLP_G_NEW).get(g,DENSE);
       jacG.output().get(J);
 
       if (monitored("eval_jac_g")) {
@@ -662,7 +662,7 @@ namespace CasADi{
 
       // Pass the argument to the function
       gradF.setInput(x,NLP_X);
-      gradF.setInput(input(NLP_SOLVER_P),NLP_P);
+      gradF.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate, adjoint mode
       gradF.evaluate();
@@ -691,7 +691,7 @@ namespace CasADi{
     try {
       // Pass the argument to the function
       nlp_.setInput(x,NLP_X);
-      nlp_.setInput(input(NLP_SOLVER_P),NLP_P);
+      nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate the function
       nlp_.evaluate();
