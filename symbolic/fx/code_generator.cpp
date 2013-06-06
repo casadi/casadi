@@ -277,11 +277,11 @@ namespace CasADi{
   }
 
   void CodeGenerator::auxSq(){
-    auxiliaries_ << "inline d sq(d x){ return x*x;}" << endl << endl;
+    auxiliaries_ << "d sq(d x){ return x*x;}" << endl << endl;
   }
 
   void CodeGenerator::auxSign(){
-    auxiliaries_ << "inline d sign(d x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl << endl;
+    auxiliaries_ << "d sign(d x){ return x<0 ? -1 : x>0 ? 1 : x;}" << endl << endl;
   }
 
   void CodeGenerator::printConstant(std::ostream& s, double v){
