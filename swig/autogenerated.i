@@ -633,7 +633,7 @@ def nlpIn(*dummy,**kwargs):
   
   Keyword arguments:
     x -- Decision variable [NLP_X]
-    p -- Fixed parameter [NLP_P]
+    p -- Fixed parameter [NLP_P_NEW]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPInput,n)] for n in dummy[1:]]

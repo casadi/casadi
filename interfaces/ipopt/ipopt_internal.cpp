@@ -432,7 +432,7 @@ namespace CasADi{
       } else {
         // Pass the argument to the function
         hessLag_.setInput(x,NLP_X);
-        hessLag_.setInput(input(NLP_SOLVER_P),NLP_P);
+        hessLag_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
         hessLag_.setInput(obj_factor,NLP_NUM_IN_NEW+NLP_F);
         hessLag_.setInput(lambda,NLP_NUM_IN_NEW+NLP_G);
         
@@ -482,7 +482,7 @@ namespace CasADi{
       } else {
         // Pass the argument to the function
         jacG.setInput(x,NLP_X);
-        jacG.setInput(input(NLP_SOLVER_P),NLP_P);
+        jacG.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
         // Evaluate the function
         jacG.evaluate();
@@ -520,7 +520,7 @@ namespace CasADi{
 
       // Pass the argument to the function
       nlp_.setInput(x,NLP_X);
-      nlp_.setInput(input(NLP_SOLVER_P),NLP_P);
+      nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate the function
       nlp_.evaluate();
@@ -557,7 +557,7 @@ namespace CasADi{
       if(m>0){
         // Pass the argument to the function
         nlp_.setInput(x,NLP_X);
-        nlp_.setInput(input(NLP_SOLVER_P),NLP_P);
+        nlp_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
 
         // Evaluate the function and tape
         nlp_.evaluate();
@@ -594,7 +594,7 @@ namespace CasADi{
     
       // Pass the argument to the function
       gradF_.setInput(x,NLP_X);
-      gradF_.setInput(input(NLP_SOLVER_P),NLP_P);
+      gradF_.setInput(input(NLP_SOLVER_P),NLP_P_NEW);
       
       // Evaluate, adjoint mode
       gradF_.evaluate();

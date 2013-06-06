@@ -604,7 +604,7 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_NLPInput: 
       if(i==0) return "NLP_X";
-      if(i==1) return "NLP_P";
+      if(i==1) return "NLP_P_NEW";
       break;
     case SCHEME_NLPOutput: 
       if(i==0) return "NLP_F";

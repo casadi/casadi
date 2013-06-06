@@ -75,7 +75,7 @@ namespace CasADi{
     
     // Sparsity patterns
     const CRSSparsity& x_sparsity = nlp_.input(NLP_X).sparsity();
-    const CRSSparsity& p_sparsity = nlp_.input(NLP_P).sparsity();
+    const CRSSparsity& p_sparsity = nlp_.input(NLP_P_NEW).sparsity();
     const CRSSparsity& g_sparsity = nlp_.output(NLP_G).sparsity();
 
     // Get dimensions

@@ -52,7 +52,7 @@ namespace CasADi{
     /// Decision variable [x]
     NLP_X,
     /// Fixed parameter [p]
-    NLP_P, 
+    NLP_P_NEW, 
     /// Number of NLP inputs
     NLP_NUM_IN_NEW
   };
