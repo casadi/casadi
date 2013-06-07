@@ -134,10 +134,10 @@
 */
 /** \defgroup scheme_NLPOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: CasADi::NLPOutput  (NLP_NUM_OUT = 2) </caption>
+<caption>Output scheme: CasADi::NLPOutput  (NL_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NLP_F</td><td>Objective function [f].</td></tr>
-<tr><td>NLP_G</td><td>Constraint function [g].</td></tr>
+<tr><td>NL_F</td><td>Objective function [f].</td></tr>
+<tr><td>NL_G</td><td>Constraint function [g].</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPSolverInput
@@ -295,10 +295,10 @@
 */
 /** \defgroup scheme_NLPInput
 <a name='schemes'></a><table>
-<caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 2) </caption>
+<caption>Input scheme: CasADi::NLPInput  (NL_NUM_IN = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NLP_X</td><td>Decision variable [x].</td></tr>
-<tr><td>NLP_P</td><td>Fixed parameter [p].</td></tr>
+<tr><td>NL_X</td><td>Decision variable [x].</td></tr>
+<tr><td>NL_P</td><td>Fixed parameter [p].</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorInput
