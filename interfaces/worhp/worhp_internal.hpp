@@ -30,6 +30,9 @@
 #undef GCC_VERSION
 #endif
 
+// Workaround for Clang, but should not be a problem for other compilers, #771
+#define _Bool bool
+
 #include "worhp.h"
 
 namespace CasADi{
