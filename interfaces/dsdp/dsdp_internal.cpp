@@ -115,8 +115,9 @@ void DSDPInternal::init(){
     info = SDPConeSetBlockSize(sdpcone_, j, block_sizes_[j]);
     info = SDPConeSetSparsity(sdpcone_, j, block_sizes_[j]);
   }
-  
-  info = DSDPCreateLPCone( dsdp_, &lpcone_);
+  if (nc_>0) {
+    info = DSDPCreateLPCone( dsdp_, &lpcone_);
+  }
   
   info = DSDPCreateBCone( dsdp_, &bcone_);
   info = BConeAllocateBounds( bcone_, n_);
@@ -146,27 +147,28 @@ void DSDPInternal::init(){
     }
   }
   
-  // Fill in the linear program structure
-  MX A = msym("A",input(SDP_A).sparsity());
-  MX LBA = msym("LBA",input(SDP_LBA).sparsity());
-  MX UBA = msym("UBA",input(SDP_LBA).sparsity());
+  if (nc_>0) {
+    // Fill in the linear program structure
+    MX A = msym("A",input(SDP_A).sparsity());
+    MX LBA = msym("LBA",input(SDP_LBA).sparsity());
+    MX UBA = msym("UBA",input(SDP_UBA).sparsity());
+    
+    std::vector< MX >  syms;
+    syms.push_back(A);
+    syms.push_back(LBA);
+    syms.push_back(UBA);
+    
+    // DSDP has no infinities -- replace by a big number
+    // There is a way to deal with this properly, but requires modifying the dsdp source
+    // We already did this for the variable bounds
+    MX lba = trans(horzcat(fmax(fmin(LBA,getOption("infinity")),-(double)getOption("infinity")),A));
+    MX uba = trans(horzcat(fmax(fmin(UBA,getOption("infinity")),-(double)getOption("infinity")),A));
+    
+    mappingA_ = MXFunction(syms,horzcat(-lba,uba));
+    mappingA_.init();
   
-  std::vector< MX >  syms;
-  syms.push_back(A);
-  syms.push_back(LBA);
-  syms.push_back(UBA);
-  
-  // DSDP has no infinities -- replace by a big number
-  // There is a way to deal with this properly, but requires modifying the dsdp source
-  // We already did this for the variable bounds
-  std::vector< MX >  out;
-  out.push_back(-trans(horzcat(fmax(fmin(LBA,getOption("infinity")),-(double)getOption("infinity")),A)));
-  out.push_back(trans(horzcat(fmax(fmin(UBA,getOption("infinity")),-(double)getOption("infinity")),A)));
-
-  mappingA_ = MXFunction(syms,horzcat(out));
-  mappingA_.init();
-  
-  info = LPConeSetData(lpcone_, nc_*2, &mappingA_.output(0).rowind()[0], &mappingA_.output(0).col()[0], &mappingA_.output(0).data()[0]);
+    info = LPConeSetData(lpcone_, nc_*2, &mappingA_.output(0).rowind()[0], &mappingA_.output(0).col()[0], &mappingA_.output(0).data()[0]);
+  }
   
   if (calc_dual_) {
     store_X_.resize(nb_);
@@ -206,16 +208,19 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
     }
   }
   
-  // Copy linear constraints
-  mappingA_.setInput(input(SDP_A),0);
-  mappingA_.setInput(input(SDP_LBA),1);
-  mappingA_.setInput(input(SDP_UBA),2);
-  mappingA_.evaluate();
-  
-  // TODO: this can be made non-allocating bu hacking into DSDP source code
-  info = LPConeSetData(lpcone_, nc_*2, &mappingA_.output(0).rowind()[0], &mappingA_.output(0).col()[0], &mappingA_.output(0).data()[0]);
-  
-  LPConeView(lpcone_);
+  if (nc_>0) {
+    // Copy linear constraints
+    mappingA_.setInput(input(SDP_A),0);
+    mappingA_.setInput(input(SDP_LBA),1);
+    mappingA_.setInput(input(SDP_UBA),2);
+    mappingA_.evaluate();
+    
+    // TODO: this can be made non-allocating bu hacking into DSDP source code
+    info = LPConeSetData(lpcone_, nc_*2, &mappingA_.output(0).rowind()[0], &mappingA_.output(0).col()[0], &mappingA_.output(0).data()[0]);
+    
+    LPConeView(lpcone_);
+
+  }
 
   // Copy b vector
   for (int i=0;i<n_;++i) {
@@ -280,12 +285,13 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   
   info = BConeCopyXSingle( bcone_, &output(SDP_LAMBDA_X).at(0), n_);
   
-  int dummy;
-  double *lam;
- 
-  info = LPConeGetXArray(lpcone_, &lam, &dummy);
-  std::transform (lam + nc_, lam + 2*nc_, lam, &output(SDP_LAMBDA_A).at(0), std::minus<double>());
-  
+  if (nc_>0) {
+    int dummy;
+    double *lam;
+   
+    info = LPConeGetXArray(lpcone_, &lam, &dummy);
+    std::transform (lam + nc_, lam + 2*nc_, lam, &output(SDP_LAMBDA_A).at(0), std::minus<double>());
+  }
   
 }
 

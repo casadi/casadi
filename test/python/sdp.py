@@ -27,7 +27,6 @@ import unittest
 from types import *
 from helpers import *
 
-#@run_only(['linear_interpolation1_bounds'])
 class SDPtests(casadiTestCase):
 
   @requires("DSDPSolver")
@@ -80,7 +79,7 @@ class SDPtests(casadiTestCase):
 
     n1 = 3.1
     c = DMatrix(n1)
-    dsp = DSDPSolver(sp_dense(0,1),sp_dense(0,0),sp_dense(0,0))
+    dsp = DSDPSolver(sdpStruct(a=sp_dense(0,1),g=sp_dense(0,0),f=sp_dense(0,0)))
     dsp.init()
     dsp.setInput(c,"c")
     dsp.setInput(-1,"lbx")
@@ -224,7 +223,7 @@ class SDPtests(casadiTestCase):
     dsp.setInput(c,"c")
     dsp.setInput(F,"f")
     dsp.setInput([0,0],"lbx")
-    dsp.setInput([10,10],"ubx")
+    dsp.setInput([inf,inf],"ubx")
     
     dsp.evaluate()
     self.checkarray(dsp.getOutput("x"),DMatrix([1,0]),digits=5)
@@ -236,6 +235,37 @@ class SDPtests(casadiTestCase):
     
     self.checkarray(dsp.getOutput("lam_x"),DMatrix([0,-1]),digits=5)
 
+  @requires("DSDPSolver")
+  def test_linear_interpolation1_A(self):
+    self.message("linear interpolation1")
+
+    #  min    2*x0 + x1*3
+    #   x0,x1
+    #          x0+x1 - 1 >=0  -->  x0+x1>=1
+    #            x0  >=0
+    #            x1  >=0
+    #                 
+    #  solution: x0=1, x1=0
+    
+    A = DMatrix([[1,1]])
+    c = DMatrix([2,3])
+    
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=sp_dense(0,0),f=sp_dense(0,0)))
+    dsp.init()
+    dsp.setInput(c,"c")
+    dsp.setInput(A,"a")
+    dsp.setInput([0,0],"lbx")
+    dsp.setInput([inf,inf],"ubx")
+    dsp.setInput([1],"lba")
+    dsp.setInput([inf],"uba")
+    
+    dsp.evaluate()
+    self.checkarray(dsp.getOutput("x"),DMatrix([1,0]),digits=5)
+    self.checkarray(dsp.getOutput("cost"),DMatrix(2),digits=5)
+    self.checkarray(dsp.getOutput("dual_cost"),DMatrix(2),digits=5)
+    self.checkarray(dsp.getOutput("lam_x"),DMatrix([0,-1]),digits=5)
+    self.checkarray(dsp.getOutput("lam_a"),DMatrix([-2]),digits=5)
+    
   @requires("DSDPSolver")
   def test_linear_interpolation2(self):
     self.message("linear interpolation2")
