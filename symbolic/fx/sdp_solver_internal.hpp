@@ -31,11 +31,9 @@ namespace CasADi{
 /// Internal class
 class SDPSolverInternal : public FXInternal{
   public:
+
     // Constructor
-    SDPSolverInternal();
-        
-    // Constructor
-    SDPSolverInternal(const CRSSparsity &A, const CRSSparsity &G, const CRSSparsity &F);
+    SDPSolverInternal(const std::vector<CRSSparsity>& st);
     
     // Destructor
     virtual ~SDPSolverInternal() = 0;
@@ -50,6 +48,9 @@ class SDPSolverInternal : public FXInternal{
     virtual void solve();
     
   protected:
+  
+    /// Problem structure
+    std::vector<CRSSparsity> st_;
     
     /// Size of decision variable vector
     int n_;

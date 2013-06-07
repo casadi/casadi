@@ -44,7 +44,12 @@ public:
   /** \brief  Default constructor */
   QPLPSolver();
   
-  explicit QPLPSolver(const CRSSparsity & A);
+  
+  /** \brief Constructor
+  *  \param st Problem structure
+  *  \copydoc scheme_LPStruct
+  */
+  explicit QPLPSolver(const LPStructure & st);
   
   /** \brief  Access functions of the node */
   QPLPInternal* operator->();
@@ -57,7 +62,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static LPSolver creator(const CRSSparsity& A){ return QPLPSolver(A);}
+  static LPSolver creator(const LPStructure & st){ return QPLPSolver(st);}
   #ifdef SWIG
   %nocallback;
   #endif

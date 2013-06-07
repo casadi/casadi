@@ -36,11 +36,18 @@ namespace CasADi{
   template<class T> class Matrix;
   class FX;
   class CRSSparsity;
+  template<class T> class LPStructIOSchemeVector;
+  typedef LPStructIOSchemeVector<CRSSparsity> LPStructure;
+  template<class T> class QPStructIOSchemeVector;
+  typedef QPStructIOSchemeVector<CRSSparsity> QPStructure;
+  template<class T> class SDPStructIOSchemeVector;
+  typedef SDPStructIOSchemeVector<CRSSparsity> SDPStructure;
   class NLPSolver;
   class LinearSolver;
   class Integrator;
   class QPSolver;
   class LPSolver;
+  class SDPSolver;
   class ImplicitFunction;
   
   /// Function pointer to a nonlinear solver creator function
@@ -49,16 +56,18 @@ namespace CasADi{
   /// Function pointer to a linear solver creator function
   typedef LinearSolver (*linearSolverCreator)(const CRSSparsity& sparsity);
   
-  // TODO: fix ambiguity
   /// Function pointer to a LP solver creator function
-  typedef LPSolver (*LPSolverCreator)(const CRSSparsity& A);
+  typedef LPSolver (*LPSolverCreator)(const LPStructure& st);
 
   /// Function pointer to an integrator creator function
   typedef Integrator (*integratorCreator)(const FX& f, const FX& g);
 
   /// Function pointer to a QP solver creator function
-  typedef QPSolver (*QPSolverCreator)(const CRSSparsity& H, const CRSSparsity& A);
+  typedef QPSolver (*QPSolverCreator)(const QPStructure& st);
 
+  /// Function pointer to a QP solver creator function
+  typedef SDPSolver (*SDPSolverCreator)(const SDPStructure& st);
+  
   /// Function pointer to an implicit function creator
   typedef ImplicitFunction (*implicitFunctionCreator)(const FX& f, const FX& jac, const LinearSolver& linsol);
   

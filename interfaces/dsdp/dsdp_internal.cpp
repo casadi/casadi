@@ -39,13 +39,13 @@ namespace CasADi {
 
 DSDPInternal* DSDPInternal::clone() const{
   // Return a deep copy
-  DSDPInternal* node = new DSDPInternal(input(SDP_A).sparsity(),input(SDP_G).sparsity(),input(SDP_F).sparsity());
+  DSDPInternal* node = new DSDPInternal(st_);
   if(!node->is_init_)
     node->init();
   return node;
 }
   
-DSDPInternal::DSDPInternal(const CRSSparsity &A, const CRSSparsity &G, const CRSSparsity &F) : SDPSolverInternal(A,G,F){
+DSDPInternal::DSDPInternal(const std::vector<CRSSparsity> &st) : SDPSolverInternal(st){
  
   casadi_assert_message(double(m_)*(double(m_)+1)/2 < std::numeric_limits<int>::max(),"Your problem size m is too large to be handled by DSDP.");
 

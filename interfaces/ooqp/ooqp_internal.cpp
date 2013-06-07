@@ -65,13 +65,13 @@ namespace CasADi {
 
 OOQPInternal* OOQPInternal::clone() const{
   // Return a deep copy
-  OOQPInternal* node = new OOQPInternal(input(QP_SOLVER_H).sparsity(),input(QP_SOLVER_A).sparsity());
+  OOQPInternal* node = new OOQPInternal(st_);
   if(!node->is_init_)
     node->init();
   return node;
 }
   
-OOQPInternal::OOQPInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSolverInternal(H,A){
+OOQPInternal::OOQPInternal(const std::vector<CRSSparsity>& st) : QPSolverInternal(st){
   addOption("print_level",OT_INTEGER,0,"Print level. OOQP listens to print_level 0, 10 and 100");
   addOption("mutol",OT_REAL,1e-8,"tolerance as provided with setMuTol to OOQP");
   addOption("artol",OT_REAL,1e-8,"tolerance as provided with setArTol to OOQP");

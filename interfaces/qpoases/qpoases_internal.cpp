@@ -33,13 +33,13 @@ namespace CasADi {
 
 QPOasesInternal* QPOasesInternal::clone() const{
   // Return a deep copy
-  QPOasesInternal* node = new QPOasesInternal(input(QP_SOLVER_H).sparsity(),input(QP_SOLVER_A).sparsity());
+  QPOasesInternal* node = new QPOasesInternal(st_);
   if(!node->is_init_)
     node->init();
   return node;
 }
   
-QPOasesInternal::QPOasesInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSolverInternal(H,A){
+QPOasesInternal::QPOasesInternal(const std::vector<CRSSparsity>& st) : QPSolverInternal(st){
   addOption("nWSR",                   OT_INTEGER,     GenericType(), "The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)");
   addOption("CPUtime",                OT_REAL,        GenericType(), "The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.");
 

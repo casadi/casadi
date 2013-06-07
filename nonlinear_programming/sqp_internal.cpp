@@ -89,7 +89,7 @@ namespace CasADi{
     CRSSparsity A_sparsity = jacG().isNull() ? CRSSparsity(0,nx_,false) : jacG().output().sparsity();
 
     QPSolverCreator qp_solver_creator = getOption("qp_solver");
-    qp_solver_ = qp_solver_creator(H_sparsity,A_sparsity);
+    qp_solver_ = qp_solver_creator(qpStruct("h",H_sparsity,"a",A_sparsity));
 
     // Set options if provided
     if(hasSetOption("qp_solver_options")){

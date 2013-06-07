@@ -31,11 +31,9 @@ namespace CasADi{
 /// Internal class
 class LPSolverInternal : public FXInternal{
   public:
-    // Constructor
-    LPSolverInternal();
         
     // Constructor
-    LPSolverInternal(const CRSSparsity &A);
+    LPSolverInternal(const std::vector<CRSSparsity> &st);
     
     // Destructor
     virtual ~LPSolverInternal() = 0;
@@ -50,6 +48,9 @@ class LPSolverInternal : public FXInternal{
     virtual void solve();
     
   protected:
+  
+    /// Problem structure
+    std::vector<CRSSparsity> st_;
     
     /// Number of decision variables
     int n_;

@@ -35,14 +35,12 @@ namespace CasADi{
 class QPLPInternal : public LPSolverInternal {
   friend class QPLPSolver;
 public:
-  /** \brief  Constructor */
-  explicit QPLPInternal();
 
   /** \brief  Clone */
   virtual QPLPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit QPLPInternal(const CRSSparsity &A);
+  explicit QPLPInternal(const std::vector<CRSSparsity> &st);
 
   /** \brief  Destructor */
   virtual ~QPLPInternal();

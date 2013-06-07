@@ -49,7 +49,7 @@ class SDPtests(casadiTestCase):
 
     makeSparse(G)
 
-    dsp = DSDPSolver(A.sparsity(),G.sparsity(),F.sparsity())
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
 
   @requires("DSDPSolver")
   def test_memleak2(self):
@@ -70,7 +70,7 @@ class SDPtests(casadiTestCase):
 
     makeSparse(G)
 
-    dsp = DSDPSolver(A.sparsity(),G.sparsity(),F.sparsity())
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
     dsp.init()
 
   @requires("DSDPSolver")
@@ -113,7 +113,7 @@ class SDPtests(casadiTestCase):
     F = -vertcat(Fi)
     makeSparse(F)
     G = -DMatrix(n2)
-    dsp = DSDPSolver(A.sparsity(),G.sparsity(),F.sparsity())
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
     dsp.init()
     dsp.setInput(G,"g")
     dsp.setInput(c,"c")
@@ -150,7 +150,7 @@ class SDPtests(casadiTestCase):
     G = -blkdiag([n2,-n2])
     F = -vertcat(Fi)
     
-    dsp = DSDPSolver(A.sparsity(),G.sparsity(),F.sparsity())
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
     dsp.init()
     dsp.setInput(G,"g")
     dsp.setInput(c,"c")
@@ -184,7 +184,7 @@ class SDPtests(casadiTestCase):
     G = -blkdiag([1,0,0])
     F = -vertcat(Fi)
     
-    dsp = DSDPSolver(A.sparsity(),G.sparsity(),F.sparsity())
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
     dsp.init()
     dsp.setInput(G,"g")
     dsp.setInput(c,"c")
@@ -218,7 +218,7 @@ class SDPtests(casadiTestCase):
     G = -blkdiag([1])
     F = -vertcat(Fi)
     
-    dsp = DSDPSolver(A.sparsity(),G.sparsity(),F.sparsity())
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
     dsp.init()
     dsp.setInput(G,"g")
     dsp.setInput(c,"c")
@@ -254,7 +254,7 @@ class SDPtests(casadiTestCase):
     G = -blkdiag([-1,0,0])
     F = -vertcat(Fi)
     
-    dsp = DSDPSolver(A.sparsity(),G.sparsity(),F.sparsity())
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
     dsp.init()
     dsp.setInput(G,"g")
     dsp.setInput(c,"c")
@@ -294,7 +294,7 @@ class SDPtests(casadiTestCase):
     G = -blkdiag([1,-(1+e),0,0])
     F = -vertcat(Fi)
     
-    dsp = DSDPSolver(A.sparsity(),G.sparsity(),F.sparsity())
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
     dsp.init()
     dsp.setInput(G,"g")
     dsp.setInput(c,"c")
@@ -329,7 +329,7 @@ class SDPtests(casadiTestCase):
 
     makeSparse(G)
 
-    dsp = DSDPSolver(A.sparsity(),G.sparsity(),F.sparsity())
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
 
     dsp.init()
 
@@ -396,7 +396,7 @@ class SDPtests(casadiTestCase):
     makeSparse(F)
 
 
-    dsp = DSDPSolver(A.sparsity(),G.sparsity(),F.sparsity())
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
 
     dsp.init()
 
@@ -438,7 +438,7 @@ class SDPtests(casadiTestCase):
     makeSparse(F)
     
     G = G[perm,perm]
-    dsp = DSDPSolver(A.sparsity(),G.sparsity(),F.sparsity())
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
 
     dsp.init()
 

@@ -36,14 +36,12 @@ namespace CasADi{
 class DSDPInternal : public SDPSolverInternal {
   friend class DSDPSolver;
 public:
-  /** \brief  Constructor */
-  explicit DSDPInternal();
-  
+
   /** \brief  Clone */
   virtual DSDPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit DSDPInternal(const CRSSparsity &A, const CRSSparsity &G, const CRSSparsity &F);
+  explicit DSDPInternal(const std::vector<CRSSparsity> &st);
 
   /** \brief  Destructor */
   virtual ~DSDPInternal();

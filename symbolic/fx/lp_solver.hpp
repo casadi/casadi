@@ -81,6 +81,12 @@ enum LPSolverOutput{
   /// The dual solution corresponding to simple bounds [lam_x]
   LP_SOLVER_LAM_X,
   LP_SOLVER_NUM_OUT};
+  
+/// Structure specification of an LP [lpStruct]
+enum LPStruct{
+  /// The matrix A: sparse [a]
+  LP_STRUCT_A,
+  LP_STRUCT_NUM};
 
 // Forward declaration of internal class
 class LPSolverInternal;

@@ -147,7 +147,17 @@ enum SDPOutput{
   /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
   SDP_LAMBDA_X,
   SDP_NUM_OUT};
-
+  
+/// Structure specification of an SDP [sdpStruct]
+enum SDPStruct{
+  /// The vertical stack of all matrices F_i: ( nm x m) [f]
+  SDP_STRUCT_F,
+  /// The matrix G: ( m x m) [g]
+  SDP_STRUCT_G,
+  /// The matrix A: ( nc x n) [a]
+  SDP_STRUCT_A,
+  SDP_STRUCT_NUM};
+  
 // Forward declaration of internal class
 class SDPSolverInternal;
 

@@ -30,8 +30,8 @@ DSDPSolver::DSDPSolver(){
 }
 
 
-DSDPSolver::DSDPSolver(const CRSSparsity &A, const CRSSparsity &G, const CRSSparsity &F)  {
-  assignNode(new DSDPInternal(A,G,F));
+DSDPSolver::DSDPSolver(const SDPStructure &st)  {
+  assignNode(new DSDPInternal(st));
 }
 
 DSDPInternal* DSDPSolver::operator->(){

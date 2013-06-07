@@ -49,7 +49,6 @@ try:
 except:
   pass
 
-@run_only(["linear"])
 class QPSolverTests(casadiTestCase):
 
   def test_scalar(self):
@@ -70,7 +69,7 @@ class QPSolverTests(casadiTestCase):
     for qpsolver, qp_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = qpsolver(H.sparsity(),A.sparsity())
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)
@@ -112,7 +111,7 @@ class QPSolverTests(casadiTestCase):
     for qpsolver, qp_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = qpsolver(H.sparsity(),A.sparsity())
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)
@@ -205,7 +204,7 @@ class QPSolverTests(casadiTestCase):
     for qpsolver, qp_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
-      solver = qpsolver(H.sparsity(),A.sparsity())
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)
@@ -248,7 +247,7 @@ class QPSolverTests(casadiTestCase):
       self.message("general_nonconvex: " + str(qpsolver))
       if not("Cplex" in str(qpsolver)):
         continue
-      solver = qpsolver(H.sparsity(),A.sparsity())
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       
       for key, val in options.iteritems():
         if solver.hasOption(key):
@@ -277,7 +276,7 @@ class QPSolverTests(casadiTestCase):
       self.message("equality: " + str(qpsolver))
       if "OOQP" in str(qpsolver):
         continue
-      solver = qpsolver(H.sparsity(),sp_dense(3,2))
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=sp_dense(3,2)))
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)
@@ -367,7 +366,7 @@ class QPSolverTests(casadiTestCase):
       
     for qpsolver, qp_options in qpsolvers:
       self.message("degenerate hessian: " + str(qpsolver))
-      solver = qpsolver(H.sparsity(),A.sparsity())
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)
@@ -413,7 +412,7 @@ class QPSolverTests(casadiTestCase):
       
     for qpsolver, qp_options in qpsolvers:
       self.message("no inequality: " + str(qpsolver))
-      solver = qpsolver(H.sparsity(),A.sparsity())
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)
@@ -462,7 +461,7 @@ class QPSolverTests(casadiTestCase):
       if "Cplex" in str(qpsolver):
         continue
       self.message("no A: " + str(qpsolver))
-      solver = qpsolver(H.sparsity(),A.sparsity())
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)
@@ -512,7 +511,7 @@ class QPSolverTests(casadiTestCase):
     for qpsolver, qp_options in qpsolvers:
       if 'Cplex' in str(qpsolver):
         continue
-      solver = qpsolver(H.sparsity(),A.sparsity())
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)
@@ -553,7 +552,7 @@ class QPSolverTests(casadiTestCase):
       options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
         
       for qpsolver, qp_options in qpsolvers:
-        solver = qpsolver(H.sparsity(),A.sparsity())
+        solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
         for key, val in options.iteritems():
           if solver.hasOption(key):
              solver.setOption(key,val)
@@ -587,7 +586,7 @@ class QPSolverTests(casadiTestCase):
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
-      solver = qpsolver(H.sparsity(),A.sparsity())
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)

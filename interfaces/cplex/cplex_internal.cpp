@@ -34,7 +34,7 @@ namespace CasADi{
 
 using namespace std;
 
-CplexInternal::CplexInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSolverInternal(H, A){
+CplexInternal::CplexInternal(const std::vector<CRSSparsity>& st) : QPSolverInternal(st){
   // Options available
   addOption("qp_method",    OT_INTEGER, 0, "Determines which CPLEX algorithm to use. \
     0: Automatic, \
@@ -59,6 +59,9 @@ CplexInternal::CplexInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSol
   addOption("barrier_maxiter", OT_INTEGER,       2100000000, "Maximum number of barrier iterations.");
   addOption("warm_start",      OT_BOOLEAN,            false, "Use warm start with simplex methods (affects only the simplex methods).");
   addOption("convex",          OT_BOOLEAN,             true, "Indicates if the QP is convex or not (affects only the barrier method).");
+  
+  const CRSSparsity& A = st_[QP_STRUCT_A];
+  const CRSSparsity& H = st_[QP_STRUCT_H];
   
   // Initializing members
   // Number of vars
@@ -338,7 +341,7 @@ void CplexInternal::evaluate(int nfdir, int nadir){
 
 CplexInternal* CplexInternal::clone() const{
   // Return a deepcopy
-  CplexInternal* node = new CplexInternal(input(QP_SOLVER_H).sparsity(), input(QP_SOLVER_A).sparsity());
+  CplexInternal* node = new CplexInternal(st_);
   if(!node->is_init_)
     node->init();
   return node;

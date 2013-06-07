@@ -31,11 +31,9 @@ namespace CasADi{
 /// Internal class
 class QPSolverInternal : public FXInternal{
   public:
+
     // Constructor
-    QPSolverInternal();
-        
-    // Constructor
-    QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A);
+    QPSolverInternal(const std::vector<CRSSparsity> &st);
     
     // Destructor
     virtual ~QPSolverInternal() = 0;
@@ -53,6 +51,9 @@ class QPSolverInternal : public FXInternal{
     virtual void setLPOptions() { };
     
   protected:
+
+    /// Problem structure
+    std::vector<CRSSparsity> st_;
     
     /// Number of decision variables
     int nx_;

@@ -30,8 +30,8 @@ QPLPSolver::QPLPSolver(){
 }
 
 
-QPLPSolver::QPLPSolver(const CRSSparsity & A)  {
-  assignNode(new QPLPInternal(A));
+QPLPSolver::QPLPSolver(const LPStructure & st)  {
+  assignNode(new QPLPInternal(st));
 }
 
 QPLPInternal* QPLPSolver::operator->(){

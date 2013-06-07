@@ -32,16 +32,16 @@ OUTPUTSCHEME(SDPOutput)
 using namespace std;
 namespace CasADi{
 
-SDPSolverInternal::SDPSolverInternal() {
-  
-}
-
-
-
 // Constructor
-SDPSolverInternal::SDPSolverInternal(const CRSSparsity &A, const CRSSparsity &G, const CRSSparsity &F) {
+SDPSolverInternal::SDPSolverInternal(const std::vector<CRSSparsity> &st) : st_(st) {
   addOption("calc_p",OT_BOOLEAN, true, "Indicate if the P-part of primal solution should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (m x m).");
   addOption("calc_dual",OT_BOOLEAN, true, "Indicate if dual should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (m x m).");
+
+  casadi_assert_message(st_.size()==SDP_STRUCT_NUM,"Problem structure mismatch");
+  
+  const CRSSparsity& A = st_[SDP_STRUCT_A];
+  const CRSSparsity& G = st_[SDP_STRUCT_G];
+  const CRSSparsity& F = st_[SDP_STRUCT_F];
   
   casadi_assert_message(G==G.transpose(),"SDPSolverInternal: Supplied G sparsity must symmetric but got " << G.dimString());
   

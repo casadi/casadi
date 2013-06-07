@@ -30,14 +30,14 @@ OUTPUTSCHEME(QPSolverOutput)
 using namespace std;
 namespace CasADi{
 
-QPSolverInternal::QPSolverInternal() {
-  //addOption("trans", OT_BOOLEAN, false);
-  
-}
-
 // Constructor
-QPSolverInternal::QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A){
+QPSolverInternal::QPSolverInternal(const std::vector<CRSSparsity> &st) : st_(st) {
 
+  casadi_assert_message(st_.size()==QP_STRUCT_NUM,"Problem structure mismatch");
+  
+  const CRSSparsity& A = st_[QP_STRUCT_A];
+  const CRSSparsity& H = st_[QP_STRUCT_H];
+  
   nx_ = H.size2();
   nc_ = A.isNull() ? 0 : A.size1();
   

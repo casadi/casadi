@@ -30,13 +30,13 @@ namespace CasADi {
 
 NLPQPInternal* NLPQPInternal::clone() const{
   // Return a deep copy
-  NLPQPInternal* node = new NLPQPInternal(input(QP_SOLVER_H).sparsity(),input(QP_SOLVER_A).sparsity());
+  NLPQPInternal* node = new NLPQPInternal(st_);
   if(!node->is_init_)
     node->init();
   return node;
 }
   
-NLPQPInternal::NLPQPInternal(const CRSSparsity& H_, const CRSSparsity &A_) : QPSolverInternal(H_,A_) {
+NLPQPInternal::NLPQPInternal(const std::vector<CRSSparsity> &st) : QPSolverInternal(st) {
 
   addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSOlver used to solve the QPs.");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSOlver");

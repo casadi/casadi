@@ -140,6 +140,8 @@ namespace CasADi {
 %template(acadoIn) acadoIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def acadoOut(*dummy,**kwargs):
@@ -185,6 +187,8 @@ namespace CasADi {
 %template(acadoOut) acadoOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def acadofcnIn(*dummy,**kwargs):
@@ -238,6 +242,8 @@ namespace CasADi {
 %template(acadofcnIn) acadofcnIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def controldaeIn(*dummy,**kwargs):
@@ -303,6 +309,8 @@ namespace CasADi {
 %template(controldaeIn) controldaeIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def controlsimulatorIn(*dummy,**kwargs):
@@ -344,6 +352,8 @@ namespace CasADi {
 %template(controlsimulatorIn) controlsimulatorIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def daeIn(*dummy,**kwargs):
@@ -389,6 +399,8 @@ namespace CasADi {
 %template(daeIn) daeIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def daeOut(*dummy,**kwargs):
@@ -430,6 +442,8 @@ namespace CasADi {
 %template(daeOut) daeOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def rdaeIn(*dummy,**kwargs):
@@ -487,6 +501,8 @@ namespace CasADi {
 %template(rdaeIn) rdaeIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def rdaeOut(*dummy,**kwargs):
@@ -528,6 +544,8 @@ namespace CasADi {
 %template(rdaeOut) rdaeOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def integratorIn(*dummy,**kwargs):
@@ -573,6 +591,8 @@ namespace CasADi {
 %template(integratorIn) integratorIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def integratorOut(*dummy,**kwargs):
@@ -618,6 +638,8 @@ namespace CasADi {
 %template(integratorOut) integratorOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def lpIn(*dummy,**kwargs):
@@ -671,6 +693,8 @@ namespace CasADi {
 %template(lpIn) lpIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def lpOut(*dummy,**kwargs):
@@ -716,6 +740,43 @@ namespace CasADi {
 %template(lpOut) lpOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def lpStruct(*dummy,**kwargs):
+  """
+  Helper function for 'LPStruct'
+
+  Two use cases:
+     a) arg = lpStruct(a=my_a) 
+          all arguments optional
+     b) a = lpStruct(arg,"a") 
+          all arguments after the first optional
+  Structure specification of an LP
+  
+  Keyword arguments:
+    a -- The matrix A: sparse [LP_STRUCT_A]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpStruct. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LPStruct,n)] for n in dummy[1:]]
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  for k in kwargs.keys():
+    if not(k in ['a']):
+      raise Exception("Keyword error in lpStruct: '%s' is not recognized. Available keywords are: a" % k )
+  return LPStructure([a])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(lpStruct) lpStruct<CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+%template(LPStructure) LPStructIOSchemeVector<CRSSparsity>;
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def nlpIn(*dummy,**kwargs):
@@ -753,6 +814,8 @@ namespace CasADi {
 %template(nlpIn) nlpIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def nlpOut(*dummy,**kwargs):
@@ -790,6 +853,8 @@ namespace CasADi {
 %template(nlpOut) nlpOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def gradFIn(*dummy,**kwargs):
@@ -827,6 +892,8 @@ namespace CasADi {
 %template(gradFIn) gradFIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def gradFOut(*dummy,**kwargs):
@@ -868,6 +935,8 @@ namespace CasADi {
 %template(gradFOut) gradFOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def jacGIn(*dummy,**kwargs):
@@ -905,6 +974,8 @@ namespace CasADi {
 %template(jacGIn) jacGIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def jacGOut(*dummy,**kwargs):
@@ -946,6 +1017,8 @@ namespace CasADi {
 %template(jacGOut) jacGOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def hessLagIn(*dummy,**kwargs):
@@ -991,6 +1064,8 @@ namespace CasADi {
 %template(hessLagIn) hessLagIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def hessLagOut(*dummy,**kwargs):
@@ -1040,6 +1115,8 @@ namespace CasADi {
 %template(hessLagOut) hessLagOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def nlpSolverIn(*dummy,**kwargs):
@@ -1101,6 +1178,8 @@ namespace CasADi {
 %template(nlpSolverIn) nlpSolverIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def nlpSolverOut(*dummy,**kwargs):
@@ -1154,6 +1233,8 @@ namespace CasADi {
 %template(nlpSolverOut) nlpSolverOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def mayerIn(*dummy,**kwargs):
@@ -1193,6 +1274,8 @@ namespace CasADi {
 %template(mayerIn) mayerIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def ocpIn(*dummy,**kwargs):
@@ -1280,6 +1363,8 @@ namespace CasADi {
 %template(ocpIn) ocpIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def ocpOut(*dummy,**kwargs):
@@ -1325,6 +1410,8 @@ namespace CasADi {
 %template(ocpOut) ocpOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def qcqpIn(*dummy,**kwargs):
@@ -1402,6 +1489,8 @@ namespace CasADi {
 %template(qcqpIn) qcqpIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def qcqpOut(*dummy,**kwargs):
@@ -1447,6 +1536,8 @@ namespace CasADi {
 %template(qcqpOut) qcqpOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def qpIn(*dummy,**kwargs):
@@ -1512,6 +1603,8 @@ namespace CasADi {
 %template(qpIn) qpIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def qpOut(*dummy,**kwargs):
@@ -1557,6 +1650,47 @@ namespace CasADi {
 %template(qpOut) qpOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def qpStruct(*dummy,**kwargs):
+  """
+  Helper function for 'QPStruct'
+
+  Two use cases:
+     a) arg = qpStruct(h=my_h, a=my_a) 
+          all arguments optional
+     b) h, a = qpStruct(arg,"h", "a") 
+          all arguments after the first optional
+  Structure specification of a QP
+  
+  Keyword arguments:
+    h -- The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QP_STRUCT_H]
+    a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QP_STRUCT_A]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpStruct. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPStruct,n)] for n in dummy[1:]]
+  h = []
+  if 'h' in kwargs:
+    h = kwargs['h']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  for k in kwargs.keys():
+    if not(k in ['h','a']):
+      raise Exception("Keyword error in qpStruct: '%s' is not recognized. Available keywords are: h, a" % k )
+  return QPStructure([h,a])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(qpStruct) qpStruct<CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+%template(QPStructure) QPStructIOSchemeVector<CRSSparsity>;
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def sdpIn(*dummy,**kwargs):
@@ -1618,6 +1752,8 @@ namespace CasADi {
 %template(sdpIn) sdpIn<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
 #ifdef SWIGPYTHON
 %pythoncode %{
 def sdpOut(*dummy,**kwargs):
@@ -1675,5 +1811,50 @@ namespace CasADi {
 %template(sdpOut) sdpOut<MX>;
 }
 #endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def sdpStruct(*dummy,**kwargs):
+  """
+  Helper function for 'SDPStruct'
+
+  Two use cases:
+     a) arg = sdpStruct(f=my_f, g=my_g, a=my_a) 
+          all arguments optional
+     b) f, g, a = sdpStruct(arg,"f", "g", "a") 
+          all arguments after the first optional
+  Structure specification of an SDP
+  
+  Keyword arguments:
+    f -- The vertical stack of all matrices F_i: ( nm x m) [SDP_STRUCT_F]
+    g -- The matrix G: ( m x m) [SDP_STRUCT_G]
+    a -- The matrix A: ( nc x n) [SDP_STRUCT_A]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpStruct. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPStruct,n)] for n in dummy[1:]]
+  f = []
+  if 'f' in kwargs:
+    f = kwargs['f']
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  for k in kwargs.keys():
+    if not(k in ['f','g','a']):
+      raise Exception("Keyword error in sdpStruct: '%s' is not recognized. Available keywords are: f, g, a" % k )
+  return SDPStructure([f,g,a])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(sdpStruct) sdpStruct<CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+%template(SDPStructure) SDPStructIOSchemeVector<CRSSparsity>;
+}
 #endif //AUTOGENERATED_I
 

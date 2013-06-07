@@ -42,7 +42,7 @@ public:
   virtual NLPQPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit NLPQPInternal(const CRSSparsity& H, const CRSSparsity &A);
+  explicit NLPQPInternal(const std::vector<CRSSparsity> &st);
 
   /** \brief  Destructor */
   virtual ~NLPQPInternal();

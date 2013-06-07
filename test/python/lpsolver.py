@@ -32,8 +32,8 @@ try:
 except:
   pass
   
-def SDPLPSolver(A):
-  return DSDPSolver(A,sp_sparse(0,0),sp_sparse(0,0))
+def SDPLPSolver(st):
+  return DSDPSolver(sdpStruct(a=st["a"],f=sp_sparse(0,0),g=sp_sparse(0,0)))
   
 lpsolvers.append((SDPLPSolver,{},True))
 
@@ -61,7 +61,7 @@ class LPSolverTests(casadiTestCase):
     for lpsolver, lp_options, re_init in lpsolvers:
       self.message("lpsolver: " + str(lpsolver))
 
-      solver = lpsolver(A.sparsity())
+      solver = lpsolver(lpStruct(a=A.sparsity()))
       solver.setOption(lp_options)
       solver.init()
 
@@ -82,7 +82,7 @@ class LPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("cost")[0],2.5,5,str(lpsolver))
       
       if re_init:
-        solver = lpsolver(A.sparsity())
+        solver = lpsolver(lpStruct(a=A.sparsity()))
         solver.setOption(lp_options)
         solver.init()
       
@@ -104,7 +104,7 @@ class LPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("cost")[0],4,5,str(lpsolver))
 
       if re_init:
-        solver = lpsolver(A.sparsity())
+        solver = lpsolver(lpStruct(a=A.sparsity()))
         solver.setOption(lp_options)
         solver.init()
         
@@ -126,7 +126,7 @@ class LPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("cost")[0],3,5,str(lpsolver))
 
       if re_init:
-        solver = lpsolver(A.sparsity())
+        solver = lpsolver(lpStruct(a=A.sparsity()))
         solver.setOption(lp_options)
         solver.init()
       # Make both LBX and UBX active
@@ -147,7 +147,7 @@ class LPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("cost")[0],7,5,str(lpsolver))
 
       if re_init:
-        solver = lpsolver(A.sparsity())
+        solver = lpsolver(lpStruct(a=A.sparsity()))
         solver.setOption(lp_options)
         solver.init()
       # Linear equality constraint

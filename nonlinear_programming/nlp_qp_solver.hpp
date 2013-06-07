@@ -44,7 +44,11 @@ public:
   /** \brief  Default constructor */
   NLPQPSolver();
   
-  explicit NLPQPSolver(const CRSSparsity & H, const CRSSparsity & A);
+  /** \brief Constructor
+  *  \param st Problem structure
+  *  \copydoc scheme_QPStruct
+  */
+  explicit NLPQPSolver(const QPStructure &st);
   
   /** \brief  Access functions of the node */
   NLPQPInternal* operator->();
@@ -57,7 +61,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static QPSolver creator(const CRSSparsity& H, const CRSSparsity& A){ return NLPQPSolver(H,A);}
+  static QPSolver creator(const QPStructure &st){ return NLPQPSolver(st);}
   #ifdef SWIG
   %nocallback;
   #endif

@@ -540,7 +540,7 @@ namespace CasADi{
 
     // Allocate a QP solver
     QPSolverCreator qp_solver_creator = getOption("qp_solver");
-    qp_solver_ = qp_solver_creator(qpH_.sparsity(),qpA_.sparsity());
+    qp_solver_ = qp_solver_creator(qpStruct("h",qpH_.sparsity(),"a",qpA_.sparsity()));
   
     // Set options if provided
     if(hasSetOption("qp_solver_options")){
