@@ -1705,14 +1705,14 @@ def sdpIn(*dummy,**kwargs):
   Input arguments of a SDP problem
   
   Keyword arguments:
-    f   -- The vertical stack of all matrices F_i: ( nm x m) [SDP_F]
-    c   -- The vector c: ( n x 1) [SDP_C]
-    g   -- The matrix G: ( m x m) [SDP_G]
-    a   -- The matrix A: ( nc x n) [SDP_A]
-    lba -- Lower bounds on Ax ( nc x 1) [SDP_LBA]
-    uba -- Upper bounds on Ax  ( nc x 1) [SDP_UBA]
-    lbx -- Lower bounds on x ( n x 1 ) [SDP_LBX]
-    ubx -- Upper bounds on x ( n x 1 ) [SDP_UBX]
+    f   -- The vertical stack of all matrices F_i: ( nm x m) [SDP_SOLVER_F]
+    c   -- The vector c: ( n x 1) [SDP_SOLVER_C]
+    g   -- The matrix G: ( m x m) [SDP_SOLVER_G]
+    a   -- The matrix A: ( nc x n) [SDP_SOLVER_A]
+    lba -- Lower bounds on Ax ( nc x 1) [SDP_SOLVER_LBA]
+    uba -- Upper bounds on Ax  ( nc x 1) [SDP_SOLVER_UBA]
+    lbx -- Lower bounds on x ( n x 1 ) [SDP_SOLVER_LBX]
+    ubx -- Upper bounds on x ( n x 1 ) [SDP_SOLVER_UBX]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPInput,n)] for n in dummy[1:]]
@@ -1768,13 +1768,13 @@ def sdpOut(*dummy,**kwargs):
   Output arguments of an SDP Solver
   
   Keyword arguments:
-    x         -- The primal solution (n x 1) - may be used as initial guess [SDP_X]
-    p         -- The solution P (m x m) - may be used as initial guess [SDP_P]
-    dual      -- The dual solution (m x m) - may be used as initial guess [SDP_DUAL]
-    cost      -- The primal optimal cost (1 x 1) [SDP_COST]
-    dual_cost -- The dual optimal cost (1 x 1) [SDP_DUAL_COST]
-    lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDP_LAMBDA_A]
-    lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDP_LAMBDA_X]
+    x         -- The primal solution (n x 1) - may be used as initial guess [SDP_SOLVER_X]
+    p         -- The solution P (m x m) - may be used as initial guess [SDP_SOLVER_P]
+    dual      -- The dual solution (m x m) - may be used as initial guess [SDP_SOLVER_DUAL]
+    cost      -- The primal optimal cost (1 x 1) [SDP_SOLVER_COST]
+    dual_cost -- The dual optimal cost (1 x 1) [SDP_SOLVER_DUAL_COST]
+    lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDP_SOLVER_LAM_A]
+    lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDP_SOLVER_LAM_X]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPOutput,n)] for n in dummy[1:]]

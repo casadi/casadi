@@ -149,9 +149,9 @@ void DSDPInternal::init(){
   
   if (nc_>0) {
     // Fill in the linear program structure
-    MX A = msym("A",input(SDP_A).sparsity());
-    MX LBA = msym("LBA",input(SDP_LBA).sparsity());
-    MX UBA = msym("UBA",input(SDP_UBA).sparsity());
+    MX A = msym("A",input(SDP_SOLVER_A).sparsity());
+    MX LBA = msym("LBA",input(SDP_SOLVER_LBA).sparsity());
+    MX UBA = msym("UBA",input(SDP_SOLVER_UBA).sparsity());
     
     std::vector< MX >  syms;
     syms.push_back(A);
@@ -196,23 +196,23 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   
   // Copy bounds
   for (int i=0;i<n_;++i) {
-    if(input(SDP_LBX).at(i)==-std::numeric_limits< double >::infinity()) {
+    if(input(SDP_SOLVER_LBX).at(i)==-std::numeric_limits< double >::infinity()) {
       info = BConeSetUnboundedLower(bcone_,i+1);   
     } else {
-      info = BConeSetLowerBound(bcone_,i+1,input(SDP_LBX).at(i));
+      info = BConeSetLowerBound(bcone_,i+1,input(SDP_SOLVER_LBX).at(i));
     }
-    if(input(SDP_UBX).at(i)==std::numeric_limits< double >::infinity()) {
+    if(input(SDP_SOLVER_UBX).at(i)==std::numeric_limits< double >::infinity()) {
       info = BConeSetUnboundedUpper(bcone_,i+1);   
     } else {
-      info = BConeSetUpperBound(bcone_,i+1,input(SDP_UBX).at(i));
+      info = BConeSetUpperBound(bcone_,i+1,input(SDP_SOLVER_UBX).at(i));
     }
   }
   
   if (nc_>0) {
     // Copy linear constraints
-    mappingA_.setInput(input(SDP_A),0);
-    mappingA_.setInput(input(SDP_LBA),1);
-    mappingA_.setInput(input(SDP_UBA),2);
+    mappingA_.setInput(input(SDP_SOLVER_A),0);
+    mappingA_.setInput(input(SDP_SOLVER_LBA),1);
+    mappingA_.setInput(input(SDP_SOLVER_UBA),2);
     mappingA_.evaluate();
     
     // TODO: this can be made non-allocating bu hacking into DSDP source code
@@ -224,13 +224,13 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
 
   // Copy b vector
   for (int i=0;i<n_;++i) {
-    info = DSDPSetDualObjective(dsdp_, i+1, -input(SDP_C).at(i));
+    info = DSDPSetDualObjective(dsdp_, i+1, -input(SDP_SOLVER_C).at(i));
   }
   
   if (nb_>0) {
     // Get Ai from supplied A
-    mapping_.setInput(input(SDP_G),0);
-    mapping_.setInput(input(SDP_F),1);
+    mapping_.setInput(input(SDP_SOLVER_G),0);
+    mapping_.setInput(input(SDP_SOLVER_F),1);
     mapping_.evaluate();
 
     for (int i=0;i<n_+1;++i) {
@@ -255,13 +255,13 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   DSDPGetSolutionType(dsdp_,&pdfeasible);
   std::cout << "Solution type: " << (*solutionType_.find(pdfeasible)).second << std::endl;
   
-  info = DSDPGetY(dsdp_,&output(SDP_X).at(0),n_);
+  info = DSDPGetY(dsdp_,&output(SDP_SOLVER_X).at(0),n_);
   
   double temp;
   DSDPGetDDObjective(dsdp_, &temp);
-  output(SDP_COST).set(-temp);
+  output(SDP_SOLVER_COST).set(-temp);
   DSDPGetPPObjective(dsdp_, &temp);
-  output(SDP_DUAL_COST).set(-temp);
+  output(SDP_SOLVER_DUAL_COST).set(-temp);
   
   if (calc_dual_) {
     for (int j=0;j<nb_;++j) {
@@ -269,28 +269,28 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
       Pmapper_.input(j).set(store_X_[j],SPARSESYM);
     }
     Pmapper_.evaluate();
-    std::copy(Pmapper_.output().data().begin(),Pmapper_.output().data().end(),output(SDP_DUAL).data().begin());
+    std::copy(Pmapper_.output().data().begin(),Pmapper_.output().data().end(),output(SDP_SOLVER_DUAL).data().begin());
   }
   
   if (calc_p_) {
     for (int j=0;j<nb_;++j) {
-      info = SDPConeComputeS(sdpcone_, j, 1.0,  &output(SDP_X).at(0), n_, 0, block_sizes_[j] , &store_P_[j][0], store_P_[j].size());
+      info = SDPConeComputeS(sdpcone_, j, 1.0,  &output(SDP_SOLVER_X).at(0), n_, 0, block_sizes_[j] , &store_P_[j][0], store_P_[j].size());
       Pmapper_.input(j).set(store_P_[j],SPARSESYM);
     }
     Pmapper_.evaluate();
-    std::copy(Pmapper_.output().data().begin(),Pmapper_.output().data().end(),output(SDP_P).data().begin());
+    std::copy(Pmapper_.output().data().begin(),Pmapper_.output().data().end(),output(SDP_SOLVER_P).data().begin());
   }
       
   DSDPComputeX(dsdp_); 
   
-  info = BConeCopyXSingle( bcone_, &output(SDP_LAMBDA_X).at(0), n_);
+  info = BConeCopyXSingle( bcone_, &output(SDP_SOLVER_LAM_X).at(0), n_);
   
   if (nc_>0) {
     int dummy;
     double *lam;
    
     info = LPConeGetXArray(lpcone_, &lam, &dummy);
-    std::transform (lam + nc_, lam + 2*nc_, lam, &output(SDP_LAMBDA_A).at(0), std::minus<double>());
+    std::transform (lam + nc_, lam + 2*nc_, lam, &output(SDP_SOLVER_LAM_A).at(0), std::minus<double>());
   }
   
 }

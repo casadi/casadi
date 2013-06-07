@@ -55,18 +55,18 @@ SDPSolverInternal::SDPSolverInternal(const std::vector<CRSSparsity> &st) : st_(s
   casadi_assert_message(F.size1()%n_==0,"SDPSolverInternal: Supplied F sparsity: number of rows (" << F.size2() <<  ")  must be an integer multiple of n (" << n_ << "), but got remainder " << F.size1()%n_);
   
   // Input arguments
-  setNumInputs(SDP_NUM_IN);
-  input(SDP_G) = DMatrix(G,0);
-  input(SDP_F) = DMatrix(F,0);
-  input(SDP_A) = DMatrix(A,0);
-  input(SDP_C) = DMatrix::zeros(n_);
-  input(SDP_LBX) = -DMatrix::inf(n_);
-  input(SDP_UBX) = DMatrix::inf(n_);
-  input(SDP_LBA) = -DMatrix::inf(nc_);
-  input(SDP_UBA) = DMatrix::inf(nc_);
+  setNumInputs(SDP_SOLVER_NUM_IN);
+  input(SDP_SOLVER_G) = DMatrix(G,0);
+  input(SDP_SOLVER_F) = DMatrix(F,0);
+  input(SDP_SOLVER_A) = DMatrix(A,0);
+  input(SDP_SOLVER_C) = DMatrix::zeros(n_);
+  input(SDP_SOLVER_LBX) = -DMatrix::inf(n_);
+  input(SDP_SOLVER_UBX) = DMatrix::inf(n_);
+  input(SDP_SOLVER_LBA) = -DMatrix::inf(nc_);
+  input(SDP_SOLVER_UBA) = DMatrix::inf(nc_);
 
   for (int i=0;i<n_;i++) {
-    CRSSparsity s = input(SDP_F)(range(i*m_,(i+1)*m_),ALL).sparsity();
+    CRSSparsity s = input(SDP_SOLVER_F)(range(i*m_,(i+1)*m_),ALL).sparsity();
     casadi_assert_message(s==s.transpose(),"SDPSolverInternal: Each supplied Fi must be symmetric. But got " << s.dimString() <<  " for i = " << i << ".");
   }
   
@@ -83,9 +83,9 @@ void SDPSolverInternal::init() {
   calc_dual_ = getOption("calc_dual");
 
   // Find aggregate sparsity pattern
-  CRSSparsity aggregate = input(SDP_G).sparsity();
+  CRSSparsity aggregate = input(SDP_SOLVER_G).sparsity();
   for (int i=0;i<n_;++i) {
-    aggregate = aggregate + input(SDP_F)(range(i*m_,(i+1)*m_),ALL).sparsity();
+    aggregate = aggregate + input(SDP_SOLVER_F)(range(i*m_,(i+1)*m_),ALL).sparsity();
   }
   
   // Detect block diagonal structure in this sparsity pattern
@@ -111,8 +111,8 @@ void SDPSolverInternal::init() {
   
   if (nb_>0) {
     // Make a mapping function from (G,F) -> (G[p,p]_j,F_i[p,p]j)
-    SXMatrix G = ssym("G",input(SDP_G).sparsity());
-    SXMatrix F = ssym("F",input(SDP_F).sparsity());
+    SXMatrix G = ssym("G",input(SDP_SOLVER_G).sparsity());
+    SXMatrix F = ssym("F",input(SDP_SOLVER_F).sparsity());
 
     std::vector<SXMatrix> in;
     in.push_back(G);
@@ -132,14 +132,14 @@ void SDPSolverInternal::init() {
   }
 
   // Output arguments
-  setNumOutputs(SDP_NUM_OUT);
-  output(SDP_X) = DMatrix::zeros(n_,1);
-  output(SDP_P) = calc_p_? DMatrix(Pmapper_.output().sparsity(),0) : DMatrix();
-  output(SDP_DUAL) = calc_dual_? DMatrix(Pmapper_.output().sparsity(),0) : DMatrix();
-  output(SDP_COST) = 0.0;
-  output(SDP_DUAL_COST) = 0.0;
-  output(SDP_LAMBDA_X) = DMatrix::zeros(n_,1);
-  output(SDP_LAMBDA_A) = DMatrix::zeros(nc_,1);
+  setNumOutputs(SDP_SOLVER_NUM_OUT);
+  output(SDP_SOLVER_X) = DMatrix::zeros(n_,1);
+  output(SDP_SOLVER_P) = calc_p_? DMatrix(Pmapper_.output().sparsity(),0) : DMatrix();
+  output(SDP_SOLVER_DUAL) = calc_dual_? DMatrix(Pmapper_.output().sparsity(),0) : DMatrix();
+  output(SDP_SOLVER_COST) = 0.0;
+  output(SDP_SOLVER_DUAL_COST) = 0.0;
+  output(SDP_SOLVER_LAM_X) = DMatrix::zeros(n_,1);
+  output(SDP_SOLVER_LAM_A) = DMatrix::zeros(nc_,1);
   
 }
 

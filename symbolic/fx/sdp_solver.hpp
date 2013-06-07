@@ -113,40 +113,40 @@ namespace CasADi{
 /// Input arguments of a SDP problem [sdpIn]
 enum SDPInput{
   /// The vertical stack of all matrices F_i: ( nm x m) [f]
-  SDP_F,
+  SDP_SOLVER_F,
   /// The vector c: ( n x 1) [c]
-  SDP_C,
+  SDP_SOLVER_C,
   /// The matrix G: ( m x m) [g]
-  SDP_G,
+  SDP_SOLVER_G,
   /// The matrix A: ( nc x n) [a]
-  SDP_A,
+  SDP_SOLVER_A,
   /// Lower bounds on Ax ( nc x 1) [lba]
-  SDP_LBA,
+  SDP_SOLVER_LBA,
   /// Upper bounds on Ax  ( nc x 1) [uba]
-  SDP_UBA,
+  SDP_SOLVER_UBA,
   /// Lower bounds on x ( n x 1 ) [lbx]
-  SDP_LBX,
+  SDP_SOLVER_LBX,
   /// Upper bounds on x ( n x 1 ) [ubx]
-  SDP_UBX,
-  SDP_NUM_IN};
+  SDP_SOLVER_UBX,
+  SDP_SOLVER_NUM_IN};
 
 /// Output arguments of an SDP Solver [sdpOut]
 enum SDPOutput{
   /// The primal solution (n x 1) - may be used as initial guess [x]
-  SDP_X,
+  SDP_SOLVER_X,
   /// The solution P (m x m) - may be used as initial guess [p]
-  SDP_P,
+  SDP_SOLVER_P,
   /// The dual solution (m x m) - may be used as initial guess [dual]
-  SDP_DUAL,
+  SDP_SOLVER_DUAL,
   /// The primal optimal cost (1 x 1) [cost]
-  SDP_COST,
+  SDP_SOLVER_COST,
   /// The dual optimal cost (1 x 1) [dual_cost]
-  SDP_DUAL_COST,
+  SDP_SOLVER_DUAL_COST,
   /// The dual solution corresponding to the linear constraints  (nc x 1) [lam_a]
-  SDP_LAMBDA_A,
+  SDP_SOLVER_LAM_A,
   /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
-  SDP_LAMBDA_X,
-  SDP_NUM_OUT};
+  SDP_SOLVER_LAM_X,
+  SDP_SOLVER_NUM_OUT};
   
 /// Structure specification of an SDP [sdpStruct]
 enum SDPStruct{

@@ -863,23 +863,23 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==1) return "QP_STRUCT_A";
       break;
     case SCHEME_SDPInput: 
-      if(i==0) return "SDP_F";
-      if(i==1) return "SDP_C";
-      if(i==2) return "SDP_G";
-      if(i==3) return "SDP_A";
-      if(i==4) return "SDP_LBA";
-      if(i==5) return "SDP_UBA";
-      if(i==6) return "SDP_LBX";
-      if(i==7) return "SDP_UBX";
+      if(i==0) return "SDP_SOLVER_F";
+      if(i==1) return "SDP_SOLVER_C";
+      if(i==2) return "SDP_SOLVER_G";
+      if(i==3) return "SDP_SOLVER_A";
+      if(i==4) return "SDP_SOLVER_LBA";
+      if(i==5) return "SDP_SOLVER_UBA";
+      if(i==6) return "SDP_SOLVER_LBX";
+      if(i==7) return "SDP_SOLVER_UBX";
       break;
     case SCHEME_SDPOutput: 
-      if(i==0) return "SDP_X";
-      if(i==1) return "SDP_P";
-      if(i==2) return "SDP_DUAL";
-      if(i==3) return "SDP_COST";
-      if(i==4) return "SDP_DUAL_COST";
-      if(i==5) return "SDP_LAMBDA_A";
-      if(i==6) return "SDP_LAMBDA_X";
+      if(i==0) return "SDP_SOLVER_X";
+      if(i==1) return "SDP_SOLVER_P";
+      if(i==2) return "SDP_SOLVER_DUAL";
+      if(i==3) return "SDP_SOLVER_COST";
+      if(i==4) return "SDP_SOLVER_DUAL_COST";
+      if(i==5) return "SDP_SOLVER_LAM_A";
+      if(i==6) return "SDP_SOLVER_LAM_X";
       break;
     case SCHEME_SDPStruct: 
       if(i==0) return "SDP_STRUCT_F";
