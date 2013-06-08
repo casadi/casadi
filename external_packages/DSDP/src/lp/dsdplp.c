@@ -682,6 +682,15 @@ int LPConeSetData(LPCone lpcone,int n, const int ik[],const int cols[],const dou
   DSDPFunctionReturn(0); 
 }
 
+int LPConeSetDataC(LPCone lpcone,int n, const double vals[]){
+  int i;
+  DSDPFunctionBegin;
+  for (i=0;i<n;i++){
+    lpcone->C.val[i]=vals[i];
+  }
+  DSDPFunctionReturn(0); 
+}
+
 #undef __FUNCT__
 #define __FUNCT__ "LPConeSetData2"
 /*!

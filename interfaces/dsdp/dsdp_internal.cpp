@@ -216,7 +216,7 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
     mappingA_.evaluate();
     
     // TODO: this can be made non-allocating bu hacking into DSDP source code
-    info = LPConeSetData(lpcone_, nc_*2, &mappingA_.output(0).rowind()[0], &mappingA_.output(0).col()[0], &mappingA_.output(0).data()[0]);
+    info = LPConeSetDataC(lpcone_, nc_*2, &mappingA_.output(0).data()[0]);
     
     LPConeView(lpcone_);
 

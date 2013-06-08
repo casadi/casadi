@@ -61,6 +61,7 @@ extern int DSDPGetYBounds(DSDP,double*,double*);
 extern int DSDPCreateLPCone(DSDP,LPCone*);
 extern int LPConeSetData(LPCone,int,const int[],const int[],const double[]);
 extern int LPConeSetData2(LPCone,int,const int[],const int[],const double[]);
+extern int LPConeSetDataC(LPCone lpcone,int n, const double vals[]);
 extern int LPConeGetData(LPCone,int,double[],int);
 extern int LPConeScaleBarrier(LPCone,double);
 extern int LPConeGetXArray(LPCone,double*[], int*);
