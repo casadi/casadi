@@ -158,6 +158,10 @@ class %sIOSchemeVector : public IOSchemeVector<M> {
     else:
       s+="%template(" + self.name + ") " + self.name + "<SXMatrix>;\n"
       s+="%template(" + self.name + ") " + self.name + "<MX>;\n"
+      s+="%template(" + self.name + ") " + self.name + "<CRSSparsity>;\n"
+      s+="%template(" +  "IOSchemeVector" + self.enum + ") " + self.enum + "IOSchemeVector<SXMatrix>;\n"
+      s+="%template(" +  "IOSchemeVector" + self.enum + ") " + self.enum + "IOSchemeVector<MX>;\n"
+      s+="%template(" +  "IOSchemeVector" + self.enum + ") " + self.enum + "IOSchemeVector<CRSSparsity>;\n"
     s+="}\n"
     return s
 
