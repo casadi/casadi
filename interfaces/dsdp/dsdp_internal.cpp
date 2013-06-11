@@ -76,6 +76,7 @@ DSDPInternal::~DSDPInternal(){
 void DSDPInternal::init(){
   // Initialize the base classes
   SDPSolverInternal::init();
+  log("DSDPInternal::init","Enter");
 
   terminationReason_[DSDP_CONVERGED]="DSDP_CONVERGED";
   terminationReason_[DSDP_MAX_IT]="DSDP_MAX_IT";
@@ -112,6 +113,7 @@ void DSDPInternal::init(){
   
   info = DSDPCreateSDPCone(dsdp_,nb_,&sdpcone_);
   for (int j=0;j<nb_;++j) {
+    log("DSDPInternal::init","Setting");
     info = SDPConeSetBlockSize(sdpcone_, j, block_sizes_[j]);
     info = SDPConeSetSparsity(sdpcone_, j, block_sizes_[j]);
   }

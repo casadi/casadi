@@ -24,6 +24,7 @@ from sx import *
 from typemaps import *
 from integration import *
 from ocp import *
+from socpsolver import *
 from nlp import *
 from implicitfunction import *
 from ad import *

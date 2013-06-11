@@ -181,6 +181,9 @@ class SDPSolver : public FX{
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
+  
+  /// Set options that make the SDP solver more suitable for solving SOCPs
+  void setSOCPOptions();
 };
 
 } // namespace CasADi

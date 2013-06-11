@@ -71,14 +71,15 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_MayerInput: return "MayerInput";
     case SCHEME_OCPInput: return "OCPInput";
     case SCHEME_OCPOutput: return "OCPOutput";
-    case SCHEME_QCQPSolverInput: return "QCQPSolverInput";
-    case SCHEME_QCQPSolverOutput: return "QCQPSolverOutput";
     case SCHEME_QPSolverInput: return "QPSolverInput";
     case SCHEME_QPSolverOutput: return "QPSolverOutput";
     case SCHEME_QPStruct: return "QPStruct";
     case SCHEME_SDPInput: return "SDPInput";
     case SCHEME_SDPOutput: return "SDPOutput";
     case SCHEME_SDPStruct: return "SDPStruct";
+    case SCHEME_SOCPInput: return "SOCPInput";
+    case SCHEME_SOCPOutput: return "SOCPOutput";
+    case SCHEME_SOCPStruct: return "SOCPStruct";
     case SCHEME_unknown: return "unknown";
   }
 }
@@ -111,14 +112,15 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_MayerInput: return "x, p";
     case SCHEME_OCPInput: return "lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg";
     case SCHEME_OCPOutput: return "x_opt, u_opt, p_opt, cost";
-    case SCHEME_QCQPSolverInput: return "h, g, a, p, q, r, lba, uba, lbx, ubx, x0, lam_x0";
-    case SCHEME_QCQPSolverOutput: return "x, cost, lam_a, lam_x";
     case SCHEME_QPSolverInput: return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0";
     case SCHEME_QPSolverOutput: return "x, cost, lam_a, lam_x";
     case SCHEME_QPStruct: return "h, a";
     case SCHEME_SDPInput: return "f, c, g, a, lba, uba, lbx, ubx";
     case SCHEME_SDPOutput: return "x, p, dual, cost, dual_cost, lam_a, lam_x";
     case SCHEME_SDPStruct: return "f, g, a";
+    case SCHEME_SOCPInput: return "g, h, e, f, c, a, lba, uba, lbx, ubx";
+    case SCHEME_SOCPOutput: return "x, cost, lam_a, lam_x";
+    case SCHEME_SOCPStruct: return "g, a";
     case SCHEME_unknown: return "not available";
   }
 }
@@ -309,26 +311,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==2) return "p_opt";
       if(i==3) return "cost";
       break;
-    case SCHEME_QCQPSolverInput: 
-      if(i==0) return "h";
-      if(i==1) return "g";
-      if(i==2) return "a";
-      if(i==3) return "p";
-      if(i==4) return "q";
-      if(i==5) return "r";
-      if(i==6) return "lba";
-      if(i==7) return "uba";
-      if(i==8) return "lbx";
-      if(i==9) return "ubx";
-      if(i==10) return "x0";
-      if(i==11) return "lam_x0";
-      break;
-    case SCHEME_QCQPSolverOutput: 
-      if(i==0) return "x";
-      if(i==1) return "cost";
-      if(i==2) return "lam_a";
-      if(i==3) return "lam_x";
-      break;
     case SCHEME_QPSolverInput: 
       if(i==0) return "h";
       if(i==1) return "g";
@@ -373,6 +355,28 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==0) return "f";
       if(i==1) return "g";
       if(i==2) return "a";
+      break;
+    case SCHEME_SOCPInput: 
+      if(i==0) return "g";
+      if(i==1) return "h";
+      if(i==2) return "e";
+      if(i==3) return "f";
+      if(i==4) return "c";
+      if(i==5) return "a";
+      if(i==6) return "lba";
+      if(i==7) return "uba";
+      if(i==8) return "lbx";
+      if(i==9) return "ubx";
+      break;
+    case SCHEME_SOCPOutput: 
+      if(i==0) return "x";
+      if(i==1) return "cost";
+      if(i==2) return "lam_a";
+      if(i==3) return "lam_x";
+      break;
+    case SCHEME_SOCPStruct: 
+      if(i==0) return "g";
+      if(i==1) return "a";
       break;
     case SCHEME_unknown: return "none";
   }
@@ -565,26 +569,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==2) return "Optimal parameters";
       if(i==3) return "Objective/cost function for optimal solution (1 x 1)";
       break;
-    case SCHEME_QCQPSolverInput: 
-      if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
-      if(i==1) return "The vector g: dense,  (n x 1)";
-      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
-      if(i==3) return "The vertical stack of all Pi ( nm x n)";
-      if(i==4) return "The vertical stack of all qi: dense,  (nm x 1)";
-      if(i==5) return "The vertical stack of all ri: dense,  (m x 1)";
-      if(i==6) return "dense, (nc x 1)";
-      if(i==7) return "dense, (nc x 1)";
-      if(i==8) return "dense, (n x 1)";
-      if(i==9) return "dense, (n x 1)";
-      if(i==10) return "dense, (n x 1)";
-      if(i==11) return "dense";
-      break;
-    case SCHEME_QCQPSolverOutput: 
-      if(i==0) return "The primal solution";
-      if(i==1) return "The optimal cost";
-      if(i==2) return "The dual solution corresponding to linear bounds";
-      if(i==3) return "The dual solution corresponding to simple bounds";
-      break;
     case SCHEME_QPSolverInput: 
       if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
       if(i==1) return "The vector g: dense,  (n x 1)";
@@ -629,6 +613,28 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==0) return "The vertical stack of all matrices F_i: ( nm x m)";
       if(i==1) return "The matrix G: ( m x m)";
       if(i==2) return "The matrix A: ( nc x n)";
+      break;
+    case SCHEME_SOCPInput: 
+      if(i==0) return "The vertical stack of all matrices Gi: ( N x n)";
+      if(i==1) return "The vertical stack of all vectors hi: ( N x 1)";
+      if(i==2) return "The vertical stack of all vectors ei: ( nm x 1)";
+      if(i==3) return "The vertical stack of all scalars fi: ( m x 1)";
+      if(i==4) return "The vector c: ( n x 1)";
+      if(i==5) return "The matrix A: ( nc x n)";
+      if(i==6) return "Lower bounds on Ax ( nc x 1)";
+      if(i==7) return "Upper bounds on Ax  ( nc x 1)";
+      if(i==8) return "Lower bounds on x ( n x 1 )";
+      if(i==9) return "Upper bounds on x ( n x 1 )";
+      break;
+    case SCHEME_SOCPOutput: 
+      if(i==0) return "The primal solution (n x 1)";
+      if(i==1) return "The primal optimal cost (1 x 1)";
+      if(i==2) return "The dual solution corresponding to the linear constraints  (nc x 1)";
+      if(i==3) return "The dual solution corresponding to simple bounds  (n x 1)";
+      break;
+    case SCHEME_SOCPStruct: 
+      if(i==0) return "The vertical stack of all matrices Gi: ( N x n)";
+      if(i==1) return "The matrix A: ( nc x n)";
       break;
     case SCHEME_unknown: return "none";
   }
@@ -821,26 +827,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==2) return "OCP_P_OPT";
       if(i==3) return "OCP_COST";
       break;
-    case SCHEME_QCQPSolverInput: 
-      if(i==0) return "QCPQP_SOLVER_H";
-      if(i==1) return "QCPQP_SOLVER_G";
-      if(i==2) return "QCPQP_SOLVER_A";
-      if(i==3) return "QCPQP_SOLVER_P";
-      if(i==4) return "QCPQP_SOLVER_Q";
-      if(i==5) return "QCPQP_SOLVER_R";
-      if(i==6) return "QCPQP_SOLVER_LBA";
-      if(i==7) return "QCPQP_SOLVER_UBA";
-      if(i==8) return "QCPQP_SOLVER_LBX";
-      if(i==9) return "QCPQP_SOLVER_UBX";
-      if(i==10) return "QCPQP_SOLVER_X0";
-      if(i==11) return "QCPQP_SOLVER_LAM_X0";
-      break;
-    case SCHEME_QCQPSolverOutput: 
-      if(i==0) return "QCPQP_SOLVER_X";
-      if(i==1) return "QCPQP_SOLVER_COST";
-      if(i==2) return "QCPQP_SOLVER_LAM_A";
-      if(i==3) return "QCPQP_SOLVER_LAM_X";
-      break;
     case SCHEME_QPSolverInput: 
       if(i==0) return "QP_SOLVER_H";
       if(i==1) return "QP_SOLVER_G";
@@ -885,6 +871,28 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==0) return "SDP_STRUCT_F";
       if(i==1) return "SDP_STRUCT_G";
       if(i==2) return "SDP_STRUCT_A";
+      break;
+    case SCHEME_SOCPInput: 
+      if(i==0) return "SOCP_SOLVER_G";
+      if(i==1) return "SOCP_SOLVER_H";
+      if(i==2) return "SOCP_SOLVER_E";
+      if(i==3) return "SOCP_SOLVER_F";
+      if(i==4) return "SOCP_SOLVER_C";
+      if(i==5) return "SOCP_SOLVER_A";
+      if(i==6) return "SOCP_SOLVER_LBA";
+      if(i==7) return "SOCP_SOLVER_UBA";
+      if(i==8) return "SOCP_SOLVER_LBX";
+      if(i==9) return "SOCP_SOLVER_UBX";
+      break;
+    case SCHEME_SOCPOutput: 
+      if(i==0) return "SOCP_SOLVER_X";
+      if(i==1) return "SOCP_SOLVER_COST";
+      if(i==2) return "SOCP_SOLVER_LAM_A";
+      if(i==3) return "SOCP_SOLVER_LAM_X";
+      break;
+    case SCHEME_SOCPStruct: 
+      if(i==0) return "SOCP_STRUCT_G";
+      if(i==1) return "SOCP_STRUCT_A";
       break;
     case SCHEME_unknown: return "none";
   }
@@ -973,12 +981,6 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_OCPOutput: 
       return 4;
       break;
-    case SCHEME_QCQPSolverInput: 
-      return 12;
-      break;
-    case SCHEME_QCQPSolverOutput: 
-      return 4;
-      break;
     case SCHEME_QPSolverInput: 
       return 9;
       break;
@@ -996,6 +998,15 @@ int getSchemeSize(InputOutputScheme scheme) {
       break;
     case SCHEME_SDPStruct: 
       return 3;
+      break;
+    case SCHEME_SOCPInput: 
+      return 10;
+      break;
+    case SCHEME_SOCPOutput: 
+      return 4;
+      break;
+    case SCHEME_SOCPStruct: 
+      return 2;
       break;
     case SCHEME_unknown: casadi_error("getSchemeSize: Unknown scheme has no known size."); return -1;
   }
@@ -1187,26 +1198,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="p_opt") return 2;
       if(name=="cost") return 3;
       break;
-    case SCHEME_QCQPSolverInput: 
-      if(name=="h") return 0;
-      if(name=="g") return 1;
-      if(name=="a") return 2;
-      if(name=="p") return 3;
-      if(name=="q") return 4;
-      if(name=="r") return 5;
-      if(name=="lba") return 6;
-      if(name=="uba") return 7;
-      if(name=="lbx") return 8;
-      if(name=="ubx") return 9;
-      if(name=="x0") return 10;
-      if(name=="lam_x0") return 11;
-      break;
-    case SCHEME_QCQPSolverOutput: 
-      if(name=="x") return 0;
-      if(name=="cost") return 1;
-      if(name=="lam_a") return 2;
-      if(name=="lam_x") return 3;
-      break;
     case SCHEME_QPSolverInput: 
       if(name=="h") return 0;
       if(name=="g") return 1;
@@ -1251,6 +1242,28 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="f") return 0;
       if(name=="g") return 1;
       if(name=="a") return 2;
+      break;
+    case SCHEME_SOCPInput: 
+      if(name=="g") return 0;
+      if(name=="h") return 1;
+      if(name=="e") return 2;
+      if(name=="f") return 3;
+      if(name=="c") return 4;
+      if(name=="a") return 5;
+      if(name=="lba") return 6;
+      if(name=="uba") return 7;
+      if(name=="lbx") return 8;
+      if(name=="ubx") return 9;
+      break;
+    case SCHEME_SOCPOutput: 
+      if(name=="x") return 0;
+      if(name=="cost") return 1;
+      if(name=="lam_a") return 2;
+      if(name=="lam_x") return 3;
+      break;
+    case SCHEME_SOCPStruct: 
+      if(name=="g") return 0;
+      if(name=="a") return 1;
       break;
     case SCHEME_unknown: casadi_error("Unknown scheme"); return -1;
   }

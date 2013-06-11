@@ -40,6 +40,11 @@ namespace CasADi{
   /** \brief Construct a matrix from a list of list of blocks.*/
   MX blockcat(const std::vector< std::vector<MX > > &v);
 
+#ifndef SWIG
+  /** \brief Construct a matrix from a list of list of blocks.*/
+  MX blockcat(const MX &A,const MX &B,const MX &C,const MX &D);
+#endif // SWIG
+
   /** \brief  concatenate vertically while vectorizing all arguments with vec */
   MX veccat(const std::vector<MX>& comp);
 

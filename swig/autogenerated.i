@@ -1518,140 +1518,6 @@ namespace CasADi {
 }
 #ifdef SWIGPYTHON
 %pythoncode %{
-def qcqpIn(*dummy,**kwargs):
-  """
-  Helper function for 'QCQPSolverInput'
-
-  Two use cases:
-     a) arg = qcqpIn(h=my_h, g=my_g, a=my_a, p=my_p, q=my_q, r=my_r, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0) 
-          all arguments optional
-     b) h, g, a, p, q, r, lba, uba, lbx, ubx, x0, lam_x0 = qcqpIn(arg,"h", "g", "a", "p", "q", "r", "lba", "uba", "lbx", "ubx", "x0", "lam_x0") 
-          all arguments after the first optional
-  Input arguments of a QP problem
-  
-  Keyword arguments:
-    h      -- The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QCPQP_SOLVER_H]
-    g      -- The vector g: dense,  (n x 1) [QCPQP_SOLVER_G]
-    a      -- The matrix A: sparse, (nc x n) - product with x must be dense. [QCPQP_SOLVER_A]
-    p      -- The vertical stack of all Pi ( nm x n) [QCPQP_SOLVER_P]
-    q      -- The vertical stack of all qi: dense,  (nm x 1) [QCPQP_SOLVER_Q]
-    r      -- The vertical stack of all ri: dense,  (m x 1) [QCPQP_SOLVER_R]
-    lba    -- dense, (nc x 1) [QCPQP_SOLVER_LBA]
-    uba    -- dense, (nc x 1) [QCPQP_SOLVER_UBA]
-    lbx    -- dense, (n x 1) [QCPQP_SOLVER_LBX]
-    ubx    -- dense, (n x 1) [QCPQP_SOLVER_UBX]
-    x0     -- dense, (n x 1) [QCPQP_SOLVER_X0]
-    lam_x0 -- dense [QCPQP_SOLVER_LAM_X0]
-  """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QCQPSolverInput,n)] for n in dummy[1:]]
-  h = []
-  if 'h' in kwargs:
-    h = kwargs['h']
-  g = []
-  if 'g' in kwargs:
-    g = kwargs['g']
-  a = []
-  if 'a' in kwargs:
-    a = kwargs['a']
-  p = []
-  if 'p' in kwargs:
-    p = kwargs['p']
-  q = []
-  if 'q' in kwargs:
-    q = kwargs['q']
-  r = []
-  if 'r' in kwargs:
-    r = kwargs['r']
-  lba = []
-  if 'lba' in kwargs:
-    lba = kwargs['lba']
-  uba = []
-  if 'uba' in kwargs:
-    uba = kwargs['uba']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  x0 = []
-  if 'x0' in kwargs:
-    x0 = kwargs['x0']
-  lam_x0 = []
-  if 'lam_x0' in kwargs:
-    lam_x0 = kwargs['lam_x0']
-  for k in kwargs.keys():
-    if not(k in ['h','g','a','p','q','r','lba','uba','lbx','ubx','x0','lam_x0']):
-      raise Exception("Keyword error in qcqpIn: '%s' is not recognized. Available keywords are: h, g, a, p, q, r, lba, uba, lbx, ubx, x0, lam_x0" % k )
-  return IOSchemeVector([h,g,a,p,q,r,lba,uba,lbx,ubx,x0,lam_x0], SCHEME_QCQPSolverInput)
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace CasADi {
-%template(qcqpIn) qcqpIn<SXMatrix>;
-%template(qcqpIn) qcqpIn<MX>;
-%template(qcqpIn) qcqpIn<CRSSparsity>;
-%template(IOSchemeVectorQCQPSolverInput) QCQPSolverInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorQCQPSolverInput) QCQPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorQCQPSolverInput) QCQPSolverInputIOSchemeVector<CRSSparsity>;
-}
-#endif //SWIGPYTHON
-namespace CasADi {
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def qcqpOut(*dummy,**kwargs):
-  """
-  Helper function for 'QCQPSolverOutput'
-
-  Two use cases:
-     a) arg = qcqpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
-          all arguments optional
-     b) x, cost, lam_a, lam_x = qcqpOut(arg,"x", "cost", "lam_a", "lam_x") 
-          all arguments after the first optional
-  Output arguments of an QP Solver
-  
-  Keyword arguments:
-    x     -- The primal solution [QCPQP_SOLVER_X]
-    cost  -- The optimal cost [QCPQP_SOLVER_COST]
-    lam_a -- The dual solution corresponding to linear bounds [QCPQP_SOLVER_LAM_A]
-    lam_x -- The dual solution corresponding to simple bounds [QCPQP_SOLVER_LAM_X]
-  """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QCQPSolverOutput,n)] for n in dummy[1:]]
-  x = []
-  if 'x' in kwargs:
-    x = kwargs['x']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  lam_a = []
-  if 'lam_a' in kwargs:
-    lam_a = kwargs['lam_a']
-  lam_x = []
-  if 'lam_x' in kwargs:
-    lam_x = kwargs['lam_x']
-  for k in kwargs.keys():
-    if not(k in ['x','cost','lam_a','lam_x']):
-      raise Exception("Keyword error in qcqpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], SCHEME_QCQPSolverOutput)
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace CasADi {
-%template(qcqpOut) qcqpOut<SXMatrix>;
-%template(qcqpOut) qcqpOut<MX>;
-%template(qcqpOut) qcqpOut<CRSSparsity>;
-%template(IOSchemeVectorQCQPSolverOutput) QCQPSolverOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorQCQPSolverOutput) QCQPSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorQCQPSolverOutput) QCQPSolverOutputIOSchemeVector<CRSSparsity>;
-}
-#endif //SWIGPYTHON
-namespace CasADi {
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
 def qpIn(*dummy,**kwargs):
   """
   Helper function for 'QPSolverInput'
@@ -1983,6 +1849,171 @@ namespace CasADi {
 #endif //SWIGPYTHON
 namespace CasADi {
 %template(SDPStructure) SDPStructIOSchemeVector<CRSSparsity>;
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def socpIn(*dummy,**kwargs):
+  """
+  Helper function for 'SOCPInput'
+
+  Two use cases:
+     a) arg = socpIn(g=my_g, h=my_h, e=my_e, f=my_f, c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx) 
+          all arguments optional
+     b) g, h, e, f, c, a, lba, uba, lbx, ubx = socpIn(arg,"g", "h", "e", "f", "c", "a", "lba", "uba", "lbx", "ubx") 
+          all arguments after the first optional
+  Input arguments of a SOCP problem
+  
+  Keyword arguments:
+    g   -- The vertical stack of all matrices Gi: ( N x n) [SOCP_SOLVER_G]
+    h   -- The vertical stack of all vectors hi: ( N x 1) [SOCP_SOLVER_H]
+    e   -- The vertical stack of all vectors ei: ( nm x 1) [SOCP_SOLVER_E]
+    f   -- The vertical stack of all scalars fi: ( m x 1) [SOCP_SOLVER_F]
+    c   -- The vector c: ( n x 1) [SOCP_SOLVER_C]
+    a   -- The matrix A: ( nc x n) [SOCP_SOLVER_A]
+    lba -- Lower bounds on Ax ( nc x 1) [SOCP_SOLVER_LBA]
+    uba -- Upper bounds on Ax  ( nc x 1) [SOCP_SOLVER_UBA]
+    lbx -- Lower bounds on x ( n x 1 ) [SOCP_SOLVER_LBX]
+    ubx -- Upper bounds on x ( n x 1 ) [SOCP_SOLVER_UBX]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPInput,n)] for n in dummy[1:]]
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  h = []
+  if 'h' in kwargs:
+    h = kwargs['h']
+  e = []
+  if 'e' in kwargs:
+    e = kwargs['e']
+  f = []
+  if 'f' in kwargs:
+    f = kwargs['f']
+  c = []
+  if 'c' in kwargs:
+    c = kwargs['c']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  lba = []
+  if 'lba' in kwargs:
+    lba = kwargs['lba']
+  uba = []
+  if 'uba' in kwargs:
+    uba = kwargs['uba']
+  lbx = []
+  if 'lbx' in kwargs:
+    lbx = kwargs['lbx']
+  ubx = []
+  if 'ubx' in kwargs:
+    ubx = kwargs['ubx']
+  for k in kwargs.keys():
+    if not(k in ['g','h','e','f','c','a','lba','uba','lbx','ubx']):
+      raise Exception("Keyword error in socpIn: '%s' is not recognized. Available keywords are: g, h, e, f, c, a, lba, uba, lbx, ubx" % k )
+  return IOSchemeVector([g,h,e,f,c,a,lba,uba,lbx,ubx], SCHEME_SOCPInput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(socpIn) socpIn<SXMatrix>;
+%template(socpIn) socpIn<MX>;
+%template(socpIn) socpIn<CRSSparsity>;
+%template(IOSchemeVectorSOCPInput) SOCPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSOCPInput) SOCPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorSOCPInput) SOCPInputIOSchemeVector<CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def socpOut(*dummy,**kwargs):
+  """
+  Helper function for 'SOCPOutput'
+
+  Two use cases:
+     a) arg = socpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
+          all arguments optional
+     b) x, cost, lam_a, lam_x = socpOut(arg,"x", "cost", "lam_a", "lam_x") 
+          all arguments after the first optional
+  Output arguments of an SOCP Solver
+  
+  Keyword arguments:
+    x     -- The primal solution (n x 1) [SOCP_SOLVER_X]
+    cost  -- The primal optimal cost (1 x 1) [SOCP_SOLVER_COST]
+    lam_a -- The dual solution corresponding to the linear constraints  (nc x 1) [SOCP_SOLVER_LAM_A]
+    lam_x -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPOutput,n)] for n in dummy[1:]]
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
+  cost = []
+  if 'cost' in kwargs:
+    cost = kwargs['cost']
+  lam_a = []
+  if 'lam_a' in kwargs:
+    lam_a = kwargs['lam_a']
+  lam_x = []
+  if 'lam_x' in kwargs:
+    lam_x = kwargs['lam_x']
+  for k in kwargs.keys():
+    if not(k in ['x','cost','lam_a','lam_x']):
+      raise Exception("Keyword error in socpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
+  return IOSchemeVector([x,cost,lam_a,lam_x], SCHEME_SOCPOutput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(socpOut) socpOut<SXMatrix>;
+%template(socpOut) socpOut<MX>;
+%template(socpOut) socpOut<CRSSparsity>;
+%template(IOSchemeVectorSOCPOutput) SOCPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSOCPOutput) SOCPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorSOCPOutput) SOCPOutputIOSchemeVector<CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def socpStruct(*dummy,**kwargs):
+  """
+  Helper function for 'SOCPStruct'
+
+  Two use cases:
+     a) arg = socpStruct(g=my_g, a=my_a) 
+          all arguments optional
+     b) g, a = socpStruct(arg,"g", "a") 
+          all arguments after the first optional
+  Structure specification of an SOCP
+  
+  Keyword arguments:
+    g -- The vertical stack of all matrices Gi: ( N x n) [SOCP_STRUCT_G]
+    a -- The matrix A: ( nc x n) [SOCP_STRUCT_A]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpStruct. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPStruct,n)] for n in dummy[1:]]
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  for k in kwargs.keys():
+    if not(k in ['g','a']):
+      raise Exception("Keyword error in socpStruct: '%s' is not recognized. Available keywords are: g, a" % k )
+  return SOCPStructure([g,a])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(socpStruct) socpStruct<CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+%template(SOCPStructure) SOCPStructIOSchemeVector<CRSSparsity>;
 }
 #endif //AUTOGENERATED_I
 

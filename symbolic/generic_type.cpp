@@ -367,6 +367,10 @@ GenericType::GenericType(SDPSolverCreator ptr) : type_(OT_SDPSOLVER) {
   assignNode(new GenericTypeInternal<SDPSolverCreator>(ptr));
 }
 
+GenericType::GenericType(SOCPSolverCreator ptr) : type_(OT_SOCPSOLVER) {
+  assignNode(new GenericTypeInternal<SOCPSolverCreator>(ptr));
+}
+
 GenericType::GenericType(implicitFunctionCreator ptr) : type_(OT_IMPLICITFUNCTION) {
   assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));
 }
@@ -393,6 +397,12 @@ GenericType::operator SDPSolverCreator() const{
   casadi_assert_message(is_a<SDPSolverCreator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<SDPSolverCreator>*>(get())->d_;
 }
+
+GenericType::operator SOCPSolverCreator() const{
+  casadi_assert_message(is_a<SOCPSolverCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<SOCPSolverCreator>*>(get())->d_;
+}
+
 
 GenericType::operator linearSolverCreator() const{
   casadi_assert_message(is_a<linearSolverCreator>(),"type mismatch");

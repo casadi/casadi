@@ -89,7 +89,84 @@ class SDPtests(casadiTestCase):
     self.checkarray(dsp.getOutput("cost"),-n1,digits=5)
     self.checkarray(dsp.getOutput("dual_cost"),-n1,digits=5)
     self.checkarray(dsp.getOutput("x"),-1,digits=5)
+
+  @requires("DSDPSolver")
+  def test_simple_sdp_A(self):
+    self.message("scalar")
     
+    A = DMatrix(0,1)
+     
+    #
+    # min  x
+    #  x
+    #      |-2   x| <=0
+    #      |x   -2|
+    #
+    #
+    #   shur: -2 < 0
+    #         -2 - x^2/(-2) < 0
+    #         4 - x^2 > 0
+    #         x^2 < 4
+    #     ->    -2 <= x <= 2 
+    #  
+    c = DMatrix([1])
+    Fi = [DMatrix([[0,1],[1,0]])]
+    F = vertcat(Fi)
+    G = DMatrix([[2,0],[0,2]])
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+    dsp.init()
+    dsp.setInput(G,"g")
+    dsp.setInput(c,"c")
+    dsp.setInput(F,"f")
+    
+    dsp.evaluate()
+    
+    self.checkarray(dsp.getOutput("x"),DMatrix([-2]),digits=5)
+    self.checkarray(dsp.getOutput("cost"),DMatrix([-2]),digits=5)
+
+
+  @requires("DSDPSolver")
+  def test_simple_sdp(self):
+    self.message("scalar")
+    
+    A = DMatrix(0,2)
+     
+    #
+    # min  2*x+y
+    #  x,y
+    #      |-x   2| <=0
+    #      |2   -y|
+    #   x,y>=0
+    #
+    #
+    #   shur: -x < 0
+    #         -y - 4/(-x) < 0
+    #         xy - 4 > 0
+    #         xy > 4
+    #  
+    #     <=>    border: xy - 4 == 0
+    # Max(Eigenvalues({-x,2},{2,-y}))    
+    #     <=>    xy >= 4
+    #
+    #  [-1 0;0 0] x + [0 0;0 -1] y - [0 -2; -2 0]
+    c = DMatrix([2,1])
+    Fi = [DMatrix([[-1,0],[0,0]]),DMatrix([[0,0],[0,-1]])]
+    F = vertcat(Fi)
+    G = DMatrix([[0,-2],[-2,0]])
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+    dsp.init()
+    dsp.setInput(G,"g")
+    dsp.setInput(c,"c")
+    dsp.setInput(F,"f")
+    dsp.setInput(0,"lbx")
+    dsp.setInput(10,"ubx")
+
+    dsp.evaluate()
+    
+    self.checkarray(dsp.getOutput("x"),DMatrix([sqrt(2),2*sqrt(2)]),digits=5)
+    self.checkarray(dsp.getOutput("cost"),DMatrix([2*sqrt(2)+2*sqrt(2)]),digits=5)
+
+
   @requires("DSDPSolver")
   def test_scalar(self):
     self.message("scalar")

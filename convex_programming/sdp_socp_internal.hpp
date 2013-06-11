@@ -20,10 +20,45 @@
  *
  */
 
-%{
-#include "convex_programming/qp_lp_solver.hpp"
-#include "convex_programming/sdp_socp_solver.hpp"
-%}
+#ifndef SDP_SOCP_INTERNAL_HPP
+#define SDP_SOCP_INTERNAL_HPP
 
-%include "convex_programming/qp_lp_solver.hpp"
-%include "convex_programming/sdp_socp_solver.hpp"
+#include "symbolic/fx/socp_solver_internal.hpp"
+#include "symbolic/fx/sdp_solver.hpp"
+
+namespace CasADi{
+
+  /** \brief Internal class for SDPSOCPInternal
+   * 
+      @copydoc LPSolver_doc
+   * */
+class SDPSOCPInternal : public SOCPSolverInternal {
+  friend class SDPSOCPSolver;
+public:
+
+  /** \brief  Clone */
+  virtual SDPSOCPInternal* clone() const;
+  
+  /** \brief  Create a new Solver */
+  explicit SDPSOCPInternal(const std::vector<CRSSparsity> &st);
+
+  /** \brief  Destructor */
+  virtual ~SDPSOCPInternal();
+
+  /** \brief  Initialize */
+  virtual void init();
+  
+  virtual void evaluate(int nfdir, int nadir);
+  
+  protected:
+    SDPSolver sdpsolver_;
+    
+    /// Mapping from G, H, E, F to P, G
+    FX mapping_;
+
+};
+
+} // namespace CasADi
+
+#endif //SDP_SOCP_INTERNAL_HPP
+

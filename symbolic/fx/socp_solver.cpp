@@ -20,10 +20,29 @@
  *
  */
 
-%{
-#include "convex_programming/qp_lp_solver.hpp"
-#include "convex_programming/sdp_socp_solver.hpp"
-%}
+#include "socp_solver_internal.hpp"
 
-%include "convex_programming/qp_lp_solver.hpp"
-%include "convex_programming/sdp_socp_solver.hpp"
+using namespace std;
+namespace CasADi{
+
+
+SOCPSolver::SOCPSolver() {
+}
+
+SOCPSolverInternal* SOCPSolver::operator->(){
+  return static_cast<SOCPSolverInternal*>(FX::operator->());
+}
+
+const SOCPSolverInternal* SOCPSolver::operator->() const{
+    return static_cast<const SOCPSolverInternal*>(FX::operator->());
+}
+
+bool SOCPSolver::checkNode() const{
+  return dynamic_cast<const SOCPSolverInternal*>(get())!=0;
+}
+
+} // namespace CasADi
+
+  
+
+

@@ -20,33 +20,57 @@
  *
  */
 
-#include "sdp_solver_internal.hpp"
+#ifndef SOCP_SOLVER_INTERNAL_HPP
+#define SOCP_SOLVER_INTERNAL_HPP
 
-using namespace std;
+#include "socp_solver.hpp"
+#include "fx_internal.hpp"
+
 namespace CasADi{
 
+/// Internal class
+class SOCPSolverInternal : public FXInternal{
+  public:
 
-SDPSolver::SDPSolver() {
-}
+    // Constructor
+    SOCPSolverInternal(const std::vector<CRSSparsity>& st);
+    
+    // Destructor
+    virtual ~SOCPSolverInternal() = 0;
+    
+    // Initialize
+    virtual void init();
+    
+    // Solve the system of equations
+    virtual void evaluate(int nfdir, int nadir);
+    
+    // Solve the system of equations
+    virtual void solve();
+    
+  protected:
+  
+    /// Problem structure
+    std::vector<CRSSparsity> st_;
+    
+    /// Sizes of each block
+    std::vector<int> ni_;
+    
+    /// Total size of G
+    int N_;
+    
+    /// Size of decision variable vector
+    int n_;
+    
+    /// The number SOC constraints
+    int m_;
+    
+    /// Number of linear constraints
+    int nc_;
+    
+};
 
-SDPSolverInternal* SDPSolver::operator->(){
-  return static_cast<SDPSolverInternal*>(FX::operator->());
-}
-
-const SDPSolverInternal* SDPSolver::operator->() const{
-    return static_cast<const SDPSolverInternal*>(FX::operator->());
-}
-
-bool SDPSolver::checkNode() const{
-  return dynamic_cast<const SDPSolverInternal*>(get())!=0;
-}
-
-void SDPSolver::setSOCPOptions() {
-  (*this)->setSOCPOptions();
-}
 
 } // namespace CasADi
 
-  
-
+#endif //SOCP_SOLVER_INTERNAL_HPP
 

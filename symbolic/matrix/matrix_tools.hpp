@@ -148,6 +148,13 @@ Matrix<T> vecNZ(const Matrix<T>& a);
 template<class T>
 Matrix<T> blockcat(const std::vector< std::vector<Matrix<T> > > &v);
 
+#ifndef SWIG
+/** \brief Construct a matrix from 4 blocks
+*/
+template<class T>
+Matrix<T> blockcat(const Matrix<T> &A,const Matrix<T> &B,const Matrix<T> &C,const Matrix<T> &D);
+#endif // SWIG
+
 /** \brief Concatenate a list of matrices vertically
 * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
 */
@@ -667,6 +674,11 @@ Matrix<T> blockcat(const std::vector< std::vector<Matrix<T> > > &v) {
   for(int i=0; i<v.size(); ++i)
     ret.push_back(horzcat(v[i]));
   return vertcat(ret);
+}
+
+template<class T>
+Matrix<T> blockcat(const Matrix<T> &A,const Matrix<T> &B,const Matrix<T> &C,const Matrix<T> &D) {
+  return vertcat(horzcat(A,B),horzcat(C,D));
 }
 
 template<class T>

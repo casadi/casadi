@@ -47,6 +47,9 @@ class SDPSolverInternal : public FXInternal{
     // Solve the system of equations
     virtual void solve();
     
+    /// Set options that make the SDP solver more suitable for solving SOCPs
+    virtual void setSOCPOptions() { };
+    
   protected:
   
     /// Problem structure
