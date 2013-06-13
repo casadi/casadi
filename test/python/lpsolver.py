@@ -39,6 +39,127 @@ lpsolvers.append((SDPLPSolver,{},True))
 
 class LPSolverTests(casadiTestCase):
 
+  def test_bounds(self):
+    #  min  2 x +y
+    #   x,y
+    #
+    #  s.t.     bounds on x
+
+    A = DMatrix(0,2)
+    LBX = DMatrix([ -inf, 0 ])
+    UBX = DMatrix([ inf, inf ])
+    c = DMatrix([ 2.0, 1.0 ])
+    
+    for lpsolver, lp_options, re_init in lpsolvers:
+      self.message("lpsolver: " + str(lpsolver))
+
+      solver = lpsolver(lpStruct(a=A.sparsity()))
+      solver.setOption(lp_options)
+      solver.init()
+
+      solver.setInput(c,"c")
+      solver.setInput([0,0],"lbx")
+      solver.setInput([10,10],"ubx")
+
+      solver.solve()
+
+      self.checkarray(solver.getOutput(),DMatrix([0,0]),str(lpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([-2,-1]),str(lpsolver),digits=5)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(lpsolver),digits=5)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],0,5,str(lpsolver))
+      
+      if re_init:
+        solver = lpsolver(lpStruct(a=A.sparsity()))
+        solver.setOption(lp_options)
+        solver.init()
+     
+      solver.setInput(c,"c")
+      solver.setInput([-1,3],"lbx")
+      solver.setInput([10,10],"ubx")
+
+      solver.solve()
+
+      self.checkarray(solver.getOutput(),DMatrix([-1,3]),str(lpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([-2,-1]),str(lpsolver),digits=5)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(lpsolver),digits=5)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],1,5,str(lpsolver))
+      
+      if re_init:
+        solver = lpsolver(lpStruct(a=A.sparsity()))
+        solver.setOption(lp_options)
+        solver.init()
+      
+      solver.setInput(c,"c")
+      solver.setInput([-1,3],"lbx")
+      solver.setInput([inf,inf],"ubx")
+
+      solver.solve()
+
+      self.checkarray(solver.getOutput(),DMatrix([-1,3]),str(lpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([-2,-1]),str(lpsolver),digits=5)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(lpsolver),digits=5)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],1,5,str(lpsolver))
+      
+      if re_init:
+        solver = lpsolver(lpStruct(a=A.sparsity()))
+        solver.setOption(lp_options)
+        solver.init()
+      
+      solver.setInput(-c,"c")
+      solver.setInput([-10,-10],"lbx")
+      solver.setInput([0,0],"ubx")
+
+      solver.solve()
+
+      self.checkarray(solver.getOutput(),DMatrix([0,0]),str(lpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([2,1]),str(lpsolver),digits=5)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(lpsolver),digits=5)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],0,5,str(lpsolver))
+
+      if re_init:
+        solver = lpsolver(lpStruct(a=A.sparsity()))
+        solver.setOption(lp_options)
+        solver.init()
+      
+      solver.setInput(-c,"c")
+      solver.setInput([-10,-10],"lbx")
+      solver.setInput([-1,3],"ubx")
+
+      solver.solve()
+
+      self.checkarray(solver.getOutput(),DMatrix([-1,3]),str(lpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([2,1]),str(lpsolver),digits=5)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(lpsolver),digits=5)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-1,5,str(lpsolver))
+      
+      if re_init:
+        solver = lpsolver(lpStruct(a=A.sparsity()))
+        solver.setOption(lp_options)
+        solver.init()
+      
+      solver.setInput(-c,"c")
+      solver.setInput([-inf,-inf],"lbx")
+      solver.setInput([-1,3],"ubx")
+
+      solver.solve()
+
+      self.checkarray(solver.getOutput(),DMatrix([-1,3]),str(lpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([2,1]),str(lpsolver),digits=5)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(lpsolver),digits=5)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-1,5,str(lpsolver))
+      
   def test_all(self):
     #  min  2 x + y
     #   x,y
