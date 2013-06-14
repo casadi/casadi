@@ -31,11 +31,15 @@ try:
   lpsolvers.append((QPLPSolver,{"qp_solver": CplexSolver },False))
 except:
   pass
-  
-def SDPLPSolver(st):
-  return DSDPSolver(sdpStruct(a=st["a"],f=sp_sparse(0,0),g=sp_sparse(0,0)))
-  
-lpsolvers.append((SDPLPSolver,{},True))
+
+
+try:  
+  DSDPSolver
+  def SDPLPSolver(st):
+    return DSDPSolver(sdpStruct(a=st["a"],f=sp_sparse(0,0),g=sp_sparse(0,0)))
+  lpsolvers.append((SDPLPSolver,{},True))
+except:
+  pass
 
 class LPSolverTests(casadiTestCase):
 

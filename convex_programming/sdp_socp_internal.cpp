@@ -58,9 +58,6 @@ void SDPSOCPInternal::evaluate(int nfdir, int nadir) {
   
   mapping_.evaluate();
   
-  mapping_.output(0).printDense();
-  mapping_.output(1).printDense();
-  
   sdpsolver_.setInput(mapping_.output(0),SDP_SOLVER_F);
   sdpsolver_.setInput(mapping_.output(1),SDP_SOLVER_G);
   sdpsolver_.setInput(input(SOCP_SOLVER_A),SDP_SOLVER_A);
@@ -152,9 +149,6 @@ void SDPSOCPInternal::init(){
   
   mapping_ = MXFunction(syms,out);
   mapping_.init();
-  
-  mapping_.output(0).sparsity().spy();
-  mapping_.output(1).sparsity().spy();
   
   log("SDPSOCPInternal::init","Created mapping function");
   

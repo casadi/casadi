@@ -453,6 +453,11 @@ class SDPtests(casadiTestCase):
     self.checkarray(dsp.getOutput("dual"),DMatrix([[5.9,-1.375],[-1.375,1]]),digits=5)
     self.checkarray(dsp.getOutput("p"),DMatrix.zeros(2,2),digits=5)
     
+    try:
+      IpoptSolver
+    except:
+      return
+      
     V = struct_ssym([
           entry("L",shape=G.shape),
           entry("x",shape=c.size())

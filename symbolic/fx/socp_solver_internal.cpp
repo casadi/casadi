@@ -25,6 +25,7 @@
 #include "../matrix/sparsity_tools.hpp"
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
+#include <numeric>
 
 INPUTSCHEME(SOCPInput)
 OUTPUTSCHEME(SOCPOutput)
