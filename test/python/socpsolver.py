@@ -26,7 +26,6 @@ import unittest
 from types import *
 from helpers import *
 
-CasadiOptions.setCatchErrorsPython(False)
 socpsolvers = []
 try:
   socpsolvers.append((SDPSOCPSolver,{"sdp_solver": DSDPSolver ,"verbose": True, "sdp_solver_options": {"verbose":True}},False))
