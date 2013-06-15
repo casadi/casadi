@@ -706,9 +706,9 @@ namespace CasADi{
     }
   }
 
-  std::vector<MX> MXNode::getVertsplit(const std::vector<MX>& x) const{
-    MX ev =  MX::create(new Vertsplit(x,shared_from_this<MX>()));
-    std::vector<MX> ret(x.size()-1);
+  std::vector<MX> MXNode::getVertsplit(const std::vector<int>& output_offset) const{
+    MX ev =  MX::create(new Vertsplit(shared_from_this<MX>(),output_offset));
+    std::vector<MX> ret(output_offset.size()-1);
     for(int ind=0; ind<ret.size(); ++ind){
       ret[ind] = MX::create(new OutputNode(ev, ind));
     }

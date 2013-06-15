@@ -34,8 +34,13 @@ namespace CasADi{
     return MXNode::getVertcat(comp);
   }
 
-  std::vector<MX> vertsplit(const std::vector<MX>& x, const MX& y){
-    return y->getVertsplit(x);
+  std::vector<MX> vertsplit(const MX& x, const std::vector<int>& output_offset){
+    // Consistency check
+    casadi_assert(output_offset.size()>=2);
+    casadi_assert(output_offset.front()==0);
+    casadi_assert(output_offset.back()==x.sparsity().size1());
+    casadi_assert(isMonotone(output_offset));
+    return x->getVertsplit(output_offset);
   }
 
   MX horzcat(const vector<MX>& comp){

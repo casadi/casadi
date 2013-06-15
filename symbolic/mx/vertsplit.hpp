@@ -28,7 +28,7 @@
 #include <stack>
 
 namespace CasADi{
-  /** \brief Vertical split, x0,x1,...,[y0,y1,...] -> x0+y0, x1+y1,...
+  /** \brief Vertical split, x -> x0, x1,...
       \author Joel Andersson
       \date 2013
   */
@@ -36,13 +36,13 @@ namespace CasADi{
   public:
 
     /// Constructor
-    Vertsplit(const std::vector<MX>& x, const MX& y);
+    Vertsplit(const MX& x, const std::vector<int>& output_offset);
 
     /** \brief  Number of outputs */
-    virtual int getNumOutputs() const{ return ndep()-1; }
+    virtual int getNumOutputs() const{ return output_sparsity_.size(); }
         
     /** \brief  Get the sparsity of output oind */
-    virtual const CRSSparsity& sparsity(int oind) const{ return dep(oind).sparsity();}
+    virtual const CRSSparsity& sparsity(int oind) const{ return output_sparsity_.at(oind);}
 
     /// Clone function
     virtual Vertsplit* clone() const;
@@ -74,9 +74,10 @@ namespace CasADi{
     
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_VERTSPLIT;}
-
-    /// Can the operation be performed inplace (i.e. overwrite the result)
-    //virtual int numInplace() const{ return getNumOutputs();}
+    
+    // Sparsity pattern of the outputs
+    std::vector<int> output_offset_;
+    std::vector<CRSSparsity> output_sparsity_;
   };
 
 } // namespace CasADi

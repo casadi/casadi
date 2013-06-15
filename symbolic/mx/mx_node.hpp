@@ -289,7 +289,7 @@ namespace CasADi{
     static MX getVertcat(const std::vector<MX>& x);
 
     /// Create a vertical split node
-    std::vector<MX> getVertsplit(const std::vector<MX>& x) const;
+    std::vector<MX> getVertsplit(const std::vector<int>& output_offset) const;
 
     /// Transpose
     virtual MX getTranspose() const;

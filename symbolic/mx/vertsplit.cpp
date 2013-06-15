@@ -32,11 +32,39 @@ using namespace std;
 
 namespace CasADi{
 
-  Vertsplit::Vertsplit(const std::vector<MX>& x, const MX& y){
-    std::vector<MX> xy(x);
-    xy.push_back(y);
-    setDependencies(xy);
+  Vertsplit::Vertsplit(const MX& x, const std::vector<int>& output_offset) : output_offset_(output_offset){
+    setDependencies(x);
     setSparsity(CRSSparsity(1, 1, true));
+    
+    // Get the sparsity of the input
+    const vector<int>& rowind_x = x.sparsity().rowind();
+    const vector<int>& col_x = x.sparsity().col();
+    
+    // Sparsity pattern as vectors
+    vector<int> rowind, col;
+    int nrow, ncol = x.size2();
+
+    // Get the sparsity patterns of the outputs
+    int nx = output_offset_.size()-1;
+    output_sparsity_.clear();
+    output_sparsity_.reserve(nx);
+    for(int i=0; i<nx; ++i){
+      int first_row = output_offset_[i];
+      int last_row = output_offset_[i+1];
+      nrow = last_row - first_row;
+
+      // Construct the sparsity pattern
+      rowind.resize(nrow+1);
+      copy(rowind_x.begin()+first_row, rowind_x.begin()+last_row+1, rowind.begin());
+      for(vector<int>::iterator it=rowind.begin()+1; it!=rowind.end(); ++it) *it -= rowind[0];
+      rowind[0] = 0;
+
+      col.resize(rowind.back());
+      copy(col_x.begin()+rowind_x[first_row],col_x.begin()+rowind_x[last_row],col.begin());
+      
+      CRSSparsity sp(nrow,ncol,col,rowind);
+      output_sparsity_.push_back(sp);
+    }
   }
 
   Vertsplit* Vertsplit::clone() const{
@@ -56,61 +84,56 @@ namespace CasADi{
     // Number of derivatives
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
-    int nx = output.size();
+    int nx = output_offset_.size()-1;
+    const vector<int>& x_rowind = dep().sparsity().rowind();
 
     // Nondifferentiated outputs and forward sensitivities
-    for(int d=-1; d<nfwd; ++d){      
+    for(int d=-1; d<nfwd; ++d){
       const MatV& arg = d<0 ? input : fwdSeed[d];
       MatV& res = d<0 ? output : fwdSens[d];
-      typename vector<T>::const_iterator arg_it = arg[nx]->data().begin();
       for(int i=0; i<nx; ++i){
+        int nz_first = x_rowind[output_offset_[i]];
+        int nz_last = x_rowind[output_offset_[i+1]];
         if(res[i]!=0){
-          vector<T>& res_i = res[i]->data();
-          copy(arg[i]->begin(),arg[i]->end(),res_i.begin());
-          transform(res_i.begin(),res_i.end(),arg_it,res_i.begin(),std::plus<T>());
+          copy(arg[0]->begin()+nz_first, arg[0]->begin()+nz_last, res[i]->begin());
         }
-        arg_it += dep(i).size();
       }
     }
     
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      typename vector<T>::iterator asens_it = adjSens[d][nx]->data().begin();
+      typename vector<T>::iterator asens_it = adjSens[d][0]->begin();
       for(int i=0; i<nx; ++i){
+        int nz_first = x_rowind[output_offset_[i]];
+        int nz_last = x_rowind[output_offset_[i+1]];
+
         if(adjSeed[d][i]!=0){
           vector<T>& aseed_i = adjSeed[d][i]->data();
-          vector<T>& asens_i = adjSens[d][i]->data();
-          transform(aseed_i.begin(),aseed_i.end(),asens_i.begin(),asens_i.begin(),std::plus<T>());
-          transform(aseed_i.begin(),aseed_i.end(),asens_it,asens_it,std::plus<T>());
+          transform(aseed_i.begin(),aseed_i.end(),asens_it+nz_first,asens_it+nz_first,std::plus<T>());
           fill(aseed_i.begin(), aseed_i.end(), 0);
         }
-        asens_it += dep(i).size();
       }
     }
   }
 
   void Vertsplit::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-    int nx = output.size();
-    bvec_t *arg_ptr = get_bvec_t(input[nx]->data());
+    int nx = output_offset_.size()-1;
+    const vector<int>& x_rowind = dep().sparsity().rowind();
     for(int i=0; i<nx; ++i){
-      vector<double>& arg_i = input[i]->data();
       if(output[i]!=0){
+        bvec_t *arg_ptr = get_bvec_t(input[0]->data()) + x_rowind[output_offset_[i]];
         vector<double>& res_i = output[i]->data();
-        bvec_t *arg_i_ptr = get_bvec_t(arg_i);
         bvec_t *res_i_ptr = get_bvec_t(res_i);
-        for(int k=0; k<arg_i.size(); ++k){
+        for(int k=0; k<res_i.size(); ++k){
           if(fwd){        
-            *res_i_ptr++ = *arg_i_ptr++ | *arg_ptr++;
+            *res_i_ptr++ = *arg_ptr++;
           } else {
-            *arg_i_ptr++ |= *res_i_ptr;
             *arg_ptr++ |= *res_i_ptr;          
             *res_i_ptr++ = 0;
           }
         }
-      } else {
-        arg_ptr += dep(i).size();
       }
-    }    
+    }
   }
 
   void Vertsplit::printPart(std::ostream &stream, int part) const{
@@ -124,55 +147,53 @@ namespace CasADi{
   void Vertsplit::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
-    int nx = output.size();
+    int nx = output_offset_.size()-1;
     
     // Nondifferentiated function and forward sensitivities
     int first_d = output_given ? 0 : -1;
     for(int d=first_d; d<nfwd; ++d){
       const MXPtrV& arg = d<0 ? input : fwdSeed[d];
       MXPtrV& res = d<0 ? output : fwdSens[d];
-      std::vector<MX> x = getVector(arg);
-      MX y = x.back();
-      x.pop_back();
-      x = y->getVertsplit(x);
+      MX& x = *arg[0];
+      vector<MX> y = x->getVertsplit(output_offset_);
       for(int i=0; i<nx; ++i){
         if(res[i]!=0){
-          *res[i] = x[i];
+          *res[i] = y[i];
         }
       }
     }
         
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      vector<MX> v;
-      for(int i=0; i<nx; ++i){
-        MX* x_i = adjSeed[d][i];          
-        MX* r_i = adjSens[d][i];          
-        if(x_i!=0){
-          v.push_back(*x_i);
-          if(r_i!=0) *r_i += *x_i;
-          *x_i = MX();
-        } else {
-          v.push_back(MX::zeros(dep(i).shape()));
+      if(adjSens[d][0]!=0){
+        vector<MX> v;
+        for(int i=0; i<nx; ++i){
+          MX* x_i = adjSeed[d][i];          
+          if(x_i!=0){
+            v.push_back(*x_i);
+            *x_i = MX();
+          } else {
+            int first_row = output_offset_[i];
+            int last_row = output_offset_[i+1];
+            v.push_back(MX::sparse(last_row-first_row,dep().size2()));
+          }
         }
-      }
-      if(adjSens[d][nx]!=0){
-        *adjSens[d][nx] += getVertcat(v);
+        *adjSens[d][0] += getVertcat(v);
       }
     }
   }
 
   void Vertsplit::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    int nz_offset = 0;
     int nx = res.size();
+    const vector<int>& x_rowind = dep().sparsity().rowind();
     for(int i=0; i<nx; ++i){
-      int nz = dep(i).size();
+      int nz_first = x_rowind[output_offset_[i]];
+      int nz_last = x_rowind[output_offset_[i+1]];
+      int nz = nz_last-nz_first;
       if(res.at(i).compare("0")!=0){
-        stream << "  for(i=0; i<" << nz << "; ++i) " << res.at(i) << "[i] = " << arg.at(i) << "[i] + " << arg.at(nx) << "[i+" << nz_offset << "];" << endl;
+        stream << "  for(i=0; i<" << nz << "; ++i) " << res.at(i) << "[i] = " << arg.at(0) << "[i+" << nz_first << "];" << endl;
       }
-      nz_offset += nz;
     }
   }
-
 
 } // namespace CasADi
