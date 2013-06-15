@@ -29,13 +29,13 @@
 namespace CasADi{
   
 
-/** Internal class
- @copydoc LinearSolver_doc
-*/
-class LinearSolverInternal : public FXInternal{
+  /** Internal class
+      @copydoc LinearSolver_doc
+  */
+  class LinearSolverInternal : public FXInternal{
   public:
     // Constructor
-    LinearSolverInternal(const CRSSparsity& sparsity);
+    LinearSolverInternal(const CRSSparsity& sparsity, int nrhs);
         
     // Destructor
     virtual ~LinearSolverInternal() = 0;
@@ -58,16 +58,13 @@ class LinearSolverInternal : public FXInternal{
     // Is prepared
     bool prepared_;
 
-    // Matrix sparsity
-    CRSSparsity sparsity_;
-
     // Get sparsity pattern
-    int nrow() const{ return sparsity_.size1();}
-    int ncol() const{ return sparsity_.size2();}
-    int nnz() const{ return sparsity_.size();}
-    const std::vector<int>& col() const{ return sparsity_.col();}
-    const std::vector<int>& rowind() const{ return sparsity_.rowind();}    
-};
+    int nrow() const{ return input(LINSOL_A).size1();}
+    int ncol() const{ return input(LINSOL_A).size2();}
+    int nnz() const{ return input(LINSOL_A).size();}
+    const std::vector<int>& col() const{ return input(LINSOL_A).col();}
+    const std::vector<int>& rowind() const{ return input(LINSOL_A).rowind();}    
+  };
 
 
 } // namespace CasADi

@@ -31,7 +31,7 @@
 using namespace std;
 namespace CasADi{
 
-  SymbolicQRInternal::SymbolicQRInternal(const CRSSparsity& sparsity) : LinearSolverInternal(sparsity){
+  SymbolicQRInternal::SymbolicQRInternal(const CRSSparsity& sparsity, int nrhs) : LinearSolverInternal(sparsity,nrhs){
     addOption("codegen",           OT_BOOLEAN,  false,               "C-code generation");
     addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",    "Compiler command to be used for compiling generated code");
   }
@@ -42,7 +42,8 @@ namespace CasADi{
   void SymbolicQRInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     LinearSolverInternal::deepCopyMembers(already_copied);
     fact_fcn_ = deepcopy(fact_fcn_,already_copied);
-    solv_fcn_ = deepcopy(solv_fcn_,already_copied);
+    solv_fcn_N_ = deepcopy(solv_fcn_N_,already_copied);
+    solv_fcn_T_ = deepcopy(solv_fcn_T_,already_copied);
   }
 
   void SymbolicQRInternal::init(){
@@ -146,15 +147,15 @@ namespace CasADi{
     // Optionally generate c code and load as DLL
     if(codegen){
       stringstream ss;
-      ss << "symbolic_qr_solv_fcn_" << this;
-      solv_fcn_ = dynamicCompilation(solv_fcn,ss.str(),"Symbolic QR solve function",compiler);
+      ss << "symbolic_qr_solv_fcn_T_" << this;
+      solv_fcn_T_ = dynamicCompilation(solv_fcn,ss.str(),"Symbolic QR solve function",compiler);
     } else {
-      solv_fcn_ = solv_fcn;
+      solv_fcn_T_ = solv_fcn;
     }
 
     // Initialize solve function
-    solv_fcn_.setOption("name","QR_solv");
-    solv_fcn_.init();
+    solv_fcn_T_.setOption("name","QR_solv_T");
+    solv_fcn_T_.init();
 
     // Solve transposed
     // We have inv(A)' = inv(Pb) * Q *inv(R') * Px
@@ -186,15 +187,15 @@ namespace CasADi{
     // Optionally generate c code and load as DLL
     if(codegen){
       stringstream ss;
-      ss << "symbolic_qr_solvT_fcn_" << this;
-      solvT_fcn_ = dynamicCompilation(solv_fcn,ss.str(),"Symbolic QR solve function (transposed)",compiler);
+      ss << "symbolic_qr_solv_fcn_N_" << this;
+      solv_fcn_N_ = dynamicCompilation(solv_fcn,ss.str(),"QR_solv_N",compiler);
     } else {
-      solvT_fcn_ = solv_fcn;
+      solv_fcn_N_ = solv_fcn;
     }
 
     // Initialize solve function
-    solvT_fcn_.setOption("name","QR_solvT");
-    solvT_fcn_.init();
+    solv_fcn_N_.setOption("name","QR_solvT");
+    solv_fcn_N_.init();
 
     // Allocate storage for QR factorization
     Q_ = DMatrix::zeros(Q.sparsity());
@@ -211,7 +212,7 @@ namespace CasADi{
 
   void SymbolicQRInternal::solve(double* x, int nrhs, bool transpose){
     // Select solve function
-    FX& solv = transpose ? solvT_fcn_ : solv_fcn_;
+    FX& solv = transpose ? solv_fcn_N_ : solv_fcn_T_;
 
     // Pass QR factorization
     solv.setInput(Q_,0);
@@ -230,21 +231,21 @@ namespace CasADi{
 
     // Generate code for the embedded functions
     gen.addDependency(fact_fcn_);
-    gen.addDependency(solvT_fcn_);
-    gen.addDependency(solv_fcn_);
+    gen.addDependency(solv_fcn_N_);
+    gen.addDependency(solv_fcn_T_);
   }
 
   void SymbolicQRInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
     
     // Data structures to hold A, Q and R
     stream << "  static int prepared = 0;" << endl;
-    stream << "  static d A[" << sparsity_.size() << "];" << endl;
+    stream << "  static d A[" << input(LINSOL_A).size() << "];" << endl;
     stream << "  static d Q[" << Q_.size() << "];" << endl;
     stream << "  static d R[" << R_.size() << "];" << endl;
 
     // Store matrix to be factorized and check if up-to-date
     stream << "  int i;" << endl;
-    stream << "  for(i=0; i<" << sparsity_.size() << "; ++i){" << endl;
+    stream << "  for(i=0; i<" << input(LINSOL_A).size() << "; ++i){" << endl;
     stream << "    prepared = prepared && A[i] == x0[i];" << endl;
     stream << "    A[i] = x0[i];" << endl;
     stream << "  }" << endl;
@@ -257,12 +258,12 @@ namespace CasADi{
     stream << "  }" << endl;
 
     // Solve
-    int solv_ind = gen.getDependency(solv_fcn_);
-    int solvT_ind = gen.getDependency(solvT_fcn_);
+    int solv_ind_N = gen.getDependency(solv_fcn_N_);
+    int solv_ind_T = gen.getDependency(solv_fcn_T_);
     stream << "  if(*x2==0){" << endl;
-    stream << "    f" << solv_ind << "(Q,R,x1,r0);" << endl;    
+    stream << "    f" << solv_ind_N << "(Q,R,x1,r0);" << endl;    
     stream << "  } else {" << endl;
-    stream << "    f" << solvT_ind << "(Q,R,x1,r0);" << endl;    
+    stream << "    f" << solv_ind_T << "(Q,R,x1,r0);" << endl;    
     stream << "  }" << endl;
   }
 

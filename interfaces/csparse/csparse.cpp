@@ -25,23 +25,23 @@
 using namespace std;
 namespace CasADi{
 
-CSparse::CSparse(){
-}
+  CSparse::CSparse(){
+  }
 
-CSparse::CSparse(const CRSSparsity& sp){
-  assignNode(new CSparseInternal(sp));
-}
+  CSparse::CSparse(const CRSSparsity& sp, int nrhs){
+    assignNode(new CSparseInternal(sp,nrhs));
+  }
  
-CSparseInternal* CSparse::operator->(){
-  return static_cast<CSparseInternal*>(FX::operator->());
-}
+  CSparseInternal* CSparse::operator->(){
+    return static_cast<CSparseInternal*>(FX::operator->());
+  }
 
-const CSparseInternal* CSparse::operator->() const{
-  return static_cast<const CSparseInternal*>(FX::operator->());
-}
+  const CSparseInternal* CSparse::operator->() const{
+    return static_cast<const CSparseInternal*>(FX::operator->());
+  }
   
-bool CSparse::checkNode() const{
-  return dynamic_cast<const CSparseInternal*>(get())!=0;
-}
+  bool CSparse::checkNode() const{
+    return dynamic_cast<const CSparseInternal*>(get())!=0;
+  }
   
 } // namespace CasADi

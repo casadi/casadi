@@ -178,7 +178,7 @@ namespace CasADi{
       }
     
       // Solve the transposed linear system
-      linsol_.solve(&faseed.front(),1,true);
+      linsol_.solve(&faseed.front(),1,false);
     }
   
     // Evaluate
@@ -194,7 +194,7 @@ namespace CasADi{
       }
     
       // Solve the linear system
-      linsol_.solve(&fsens.front());
+      linsol_.solve(&fsens.front(),1,true);
     }
   
     // Get the adjoint sensitivities

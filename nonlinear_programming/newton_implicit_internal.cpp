@@ -100,7 +100,7 @@ namespace CasADi {
       linsol_.prepare();
     
       // Solve against F
-      linsol_.solve(&F.front(),1,false);
+      linsol_.solve(&F.front(),1,true);
 
       if (monitored("step")) {
         std::cout << "  step = " << F << std::endl;

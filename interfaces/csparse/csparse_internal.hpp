@@ -32,13 +32,14 @@ extern "C"{
 
 namespace CasADi{
 
-/**
- @copydoc LinearSolver_doc
-*/
-class CSparseInternal : public LinearSolverInternal{
+  /**
+     @copydoc LinearSolver_doc
+  */
+  class CSparseInternal : public LinearSolverInternal{
   public:
+    
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseInternal(const CRSSparsity& sp);
+    CSparseInternal(const CRSSparsity& sp, int nrhs);
 
     // Copy constructor
     CSparseInternal(const CSparseInternal& linsol);
@@ -74,7 +75,7 @@ class CSparseInternal : public LinearSolverInternal{
     std::vector<double> temp_;
 
     
-};
+  };
 
 } // namespace CasADi
 

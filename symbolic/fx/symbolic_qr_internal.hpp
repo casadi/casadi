@@ -31,7 +31,7 @@ namespace CasADi{
   class SymbolicQRInternal : public LinearSolverInternal{
   public:
     // Constructor
-    SymbolicQRInternal(const CRSSparsity& sparsity);
+    SymbolicQRInternal(const CRSSparsity& sparsity, int nrhs);
         
     // Destructor
     virtual ~SymbolicQRInternal();
@@ -41,9 +41,6 @@ namespace CasADi{
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
-
-    /** \brief  Create a new integrator */
-    virtual SymbolicQRInternal* create(const CRSSparsity& sparsity) const{ return new SymbolicQRInternal(sparsity);}
 
     // Initialize
     virtual void init();
@@ -64,7 +61,7 @@ namespace CasADi{
     FX fact_fcn_;
 
     // Solve function
-    FX solv_fcn_, solvT_fcn_;
+    FX solv_fcn_N_, solv_fcn_T_;
 
     // Storage for QR factorization
     DMatrix Q_, R_;

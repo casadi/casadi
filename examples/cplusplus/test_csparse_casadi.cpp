@@ -60,16 +60,16 @@ int main(int argc, char *argv[])
   vector<double> val(nnz);
   val[0] = s; val[1] = l; val[2] = l; val[3] = u; val[4] = l; val[5] = l;
   val[6] = u; val[7] = p; val[8] = u; val[9] = e; val[10]= u; val[11]= r;
-  linear_solver.setInput(val,0);
+  linear_solver.setInput(val,LINSOL_A);
   
   // Pass right hand side
   vector<double> rhs(nrow,1.0);
-  linear_solver.setInput(rhs,1);
+  linear_solver.setInput(rhs,LINSOL_B);
   
   // Solve
   linear_solver.evaluate();
   
   // Print the solution
-  cout << "solution = " << linear_solver.output() << endl;
+  cout << "solution = " << linear_solver.output(LINSOL_X) << endl;
   
 }

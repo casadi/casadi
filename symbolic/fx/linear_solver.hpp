@@ -27,8 +27,8 @@
 
 /** \defgroup LinearSolver_doc 
  * 
- * Solves the linear system A.x = b for x
- *  with A square and non-singular
+ * Solves the linear system X*A = B or X*A^T = B for X
+ * with A square and non-singular
  *
  *  If A is structurally singular, an error will be thrown during init.
  *  If A is numerically singular, the prepare step will fail.
