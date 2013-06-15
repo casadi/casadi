@@ -64,10 +64,12 @@ namespace CasADi{
       MatV& res = d<0 ? output : fwdSens[d];
       typename vector<T>::const_iterator arg_it = arg[nx]->data().begin();
       for(int i=0; i<nx; ++i){
-        vector<T>& res_i = res[i]->data();
-        copy(arg[i]->begin(),arg[i]->end(),res_i.begin());
-        transform(res_i.begin(),res_i.end(),arg_it,res_i.begin(),std::plus<T>());
-        arg_it += res_i.size();
+        if(res[i]!=0){
+          vector<T>& res_i = res[i]->data();
+          copy(arg[i]->begin(),arg[i]->end(),res_i.begin());
+          transform(res_i.begin(),res_i.end(),arg_it,res_i.begin(),std::plus<T>());
+        }
+        arg_it += dep(i).size();
       }
     }
     
@@ -75,12 +77,14 @@ namespace CasADi{
     for(int d=0; d<nadj; ++d){
       typename vector<T>::iterator asens_it = adjSens[d][nx]->data().begin();
       for(int i=0; i<nx; ++i){
-        vector<T>& aseed_i = adjSeed[d][i]->data();
-        vector<T>& asens_i = adjSens[d][i]->data();
-        transform(aseed_i.begin(),aseed_i.end(),asens_i.begin(),asens_i.begin(),std::plus<T>());
-        transform(aseed_i.begin(),aseed_i.end(),asens_it,asens_it,std::plus<T>());
-        fill(aseed_i.begin(), aseed_i.end(), 0);
-        asens_it += aseed_i.size();
+        if(adjSeed[d][i]!=0){
+          vector<T>& aseed_i = adjSeed[d][i]->data();
+          vector<T>& asens_i = adjSens[d][i]->data();
+          transform(aseed_i.begin(),aseed_i.end(),asens_i.begin(),asens_i.begin(),std::plus<T>());
+          transform(aseed_i.begin(),aseed_i.end(),asens_it,asens_it,std::plus<T>());
+          fill(aseed_i.begin(), aseed_i.end(), 0);
+        }
+        asens_it += dep(i).size();
       }
     }
   }
@@ -90,17 +94,21 @@ namespace CasADi{
     bvec_t *arg_ptr = get_bvec_t(input[nx]->data());
     for(int i=0; i<nx; ++i){
       vector<double>& arg_i = input[i]->data();
-      vector<double>& res_i = output[i]->data();
-      bvec_t *arg_i_ptr = get_bvec_t(arg_i);
-      bvec_t *res_i_ptr = get_bvec_t(res_i);
-      for(int k=0; k<arg_i.size(); ++k){
-        if(fwd){        
-          *res_i_ptr++ = *arg_i_ptr++ | *arg_ptr++;
-        } else {
-          *arg_i_ptr++ |= *res_i_ptr;
-          *arg_ptr++ |= *res_i_ptr;          
-          *res_i_ptr++ = 0;
+      if(output[i]!=0){
+        vector<double>& res_i = output[i]->data();
+        bvec_t *arg_i_ptr = get_bvec_t(arg_i);
+        bvec_t *res_i_ptr = get_bvec_t(res_i);
+        for(int k=0; k<arg_i.size(); ++k){
+          if(fwd){        
+            *res_i_ptr++ = *arg_i_ptr++ | *arg_ptr++;
+          } else {
+            *arg_i_ptr++ |= *res_i_ptr;
+            *arg_ptr++ |= *res_i_ptr;          
+            *res_i_ptr++ = 0;
+          }
         }
+      } else {
+        arg_ptr += dep(i).size();
       }
     }    
   }
@@ -114,33 +122,57 @@ namespace CasADi{
   }
 
   void Vertsplit::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-    if(!output_given){
-      casadi_error("not implemented");
-      //*output[0] = getVertcat(getVector(input));
-    }
-    
-    // Forward sensitivities
     int nfwd = fwdSens.size();
-    for(int d = 0; d<nfwd; ++d){
-      casadi_error("not implemented");      
-      //*fwdSens[d][0] = getVertcat(getVector(fwdSeed[d]));
-    }
-    
-    // Adjoint sensitivities
     int nadj = adjSeed.size();
-    for(int d=0; d<nadj; ++d){
-      casadi_error("not implemented");
-      int row_offset = 0;
-      MX& aseed = *adjSeed[d][0];
-      for(int i=0; i<input.size(); ++i){
-        MX& asens = *adjSens[d][i];
-        int nrow = asens.size1();
-        asens += aseed(Slice(row_offset,row_offset+nrow),Slice());
-        row_offset += nrow;
+    int nx = output.size();
+    
+    // Nondifferentiated function and forward sensitivities
+    int first_d = output_given ? 0 : -1;
+    for(int d=first_d; d<nfwd; ++d){
+      const MXPtrV& arg = d<0 ? input : fwdSeed[d];
+      MXPtrV& res = d<0 ? output : fwdSens[d];
+      std::vector<MX> x = getVector(arg);
+      MX y = x.back();
+      x.pop_back();
+      x = y->getVertsplit(x);
+      for(int i=0; i<nx; ++i){
+        if(res[i]!=0){
+          *res[i] = x[i];
+        }
       }
-      casadi_assert(row_offset == aseed.size1());
-      aseed = MX();
+    }
+        
+    // Adjoint sensitivities
+    for(int d=0; d<nadj; ++d){
+      vector<MX> v;
+      for(int i=0; i<nx; ++i){
+        MX* x_i = adjSeed[d][i];          
+        MX* r_i = adjSens[d][i];          
+        if(x_i!=0){
+          v.push_back(*x_i);
+          if(r_i!=0) *r_i += *x_i;
+          *x_i = MX();
+        } else {
+          v.push_back(MX::zeros(dep(i).shape()));
+        }
+      }
+      if(adjSens[d][nx]!=0){
+        *adjSens[d][nx] += getVertcat(v);
+      }
     }
   }
+
+  void Vertsplit::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    int nz_offset = 0;
+    int nx = res.size();
+    for(int i=0; i<nx; ++i){
+      int nz = dep(i).size();
+      if(res.at(i).compare("0")!=0){
+        stream << "  for(i=0; i<" << nz << "; ++i) " << res.at(i) << "[i] = " << arg.at(i) << "[i] + " << arg.at(nx) << "[i+" << nz_offset << "];" << endl;
+      }
+      nz_offset += nz;
+    }
+  }
+
 
 } // namespace CasADi
