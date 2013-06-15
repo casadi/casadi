@@ -746,12 +746,12 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==0) return "LP_STRUCT_A";
       break;
     case SCHEME_NLPInput: 
-      if(i==0) return "NLP_X";
-      if(i==1) return "NLP_P";
+      if(i==0) return "NL_X";
+      if(i==1) return "NL_P";
       break;
     case SCHEME_NLPOutput: 
-      if(i==0) return "NLP_F";
-      if(i==1) return "NLP_G";
+      if(i==0) return "NL_F";
+      if(i==1) return "NL_G";
       break;
     case SCHEME_GradFInput: 
       if(i==0) return "GRADF_X";
