@@ -20,7 +20,7 @@
  *
  */
 
-#include "vertcat.hpp"
+#include "vertsplit.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
@@ -32,39 +32,34 @@ using namespace std;
 
 namespace CasADi{
 
-  Vertcat::Vertcat(const vector<MX>& x){
-    setDependencies(x);
-    
-    // Construct the sparsity
-    casadi_assert(!x.empty());
-    CRSSparsity sp = x.front().sparsity();
-    for(vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
-      sp.append(i->sparsity());
-    }
-
-    setSparsity(sp);
+  Vertsplit::Vertsplit(const std::vector<MX>& x, const MX& y){
+    std::vector<MX> xy(x);
+    xy.push_back(y);
+    setDependencies(xy);
+    setSparsity(CRSSparsity(1, 1, true));
   }
 
-  Vertcat* Vertcat::clone() const{
-    return new Vertcat(*this);
+  Vertsplit* Vertsplit::clone() const{
+    return new Vertsplit(*this);
   }
 
-  void Vertcat::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  void Vertsplit::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
-  void Vertcat::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  void Vertsplit::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
     evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void Vertcat::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void Vertsplit::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
     // Number of derivatives
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
 
     // Nondifferentiated outputs and forward sensitivities
     for(int d=-1; d<nfwd; ++d){
+      casadi_error("not implemented");
       typename vector<T>::iterator res_it = d==-1 ? output[0]->data().begin() : fwdSens[d][0]->data().begin();
       for(int i=0; i<input.size(); ++i){
         const vector<T>& arg_i = d==-1 ? input[i]->data() : fwdSeed[d][i]->data();
@@ -75,6 +70,7 @@ namespace CasADi{
     
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
+      casadi_error("not implemented");
       typename vector<T>::iterator arg_it = adjSeed[d][0]->data().begin();
       for(int i=0; i<input.size(); ++i){
         vector<T>& res_i = adjSens[d][i]->data();
@@ -85,7 +81,8 @@ namespace CasADi{
     }
   }
 
-  void Vertcat::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  void Vertsplit::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+    casadi_error("not implemented");
     bvec_t *res_ptr = get_bvec_t(output[0]->data());
     for(int i=0; i<input.size(); ++i){
       vector<double>& arg_i = input[i]->data();
@@ -102,30 +99,31 @@ namespace CasADi{
     }
   }
 
-  void Vertcat::printPart(std::ostream &stream, int part) const{
+  void Vertsplit::printPart(std::ostream &stream, int part) const{
     if(part==0){
-      stream << "vertcat(";
-    } else if(part==ndep()){
-      stream << ")";
+      stream << "vertsplit(";
     } else {
-      stream << ",";
+      stream << ")";
     }
   }
 
-  void Vertcat::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void Vertsplit::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     if(!output_given){
-      *output[0] = getVertcat(getVector(input));
+      casadi_error("not implemented");
+      //*output[0] = getVertcat(getVector(input));
     }
     
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for(int d = 0; d<nfwd; ++d){
-      *fwdSens[d][0] = getVertcat(getVector(fwdSeed[d]));
+      casadi_error("not implemented");      
+      //*fwdSens[d][0] = getVertcat(getVector(fwdSeed[d]));
     }
     
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
+      casadi_error("not implemented");
       int row_offset = 0;
       MX& aseed = *adjSeed[d][0];
       for(int i=0; i<input.size(); ++i){
@@ -136,59 +134,6 @@ namespace CasADi{
       }
       casadi_assert(row_offset == aseed.size1());
       aseed = MX();
-    }
-  }
-
-  void Vertcat::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    int nz_offset = 0;
-    for(int i=0; i<arg.size(); ++i){
-      int nz = dep(i).size();
-      stream << "  for(i=0; i<" << nz << "; ++i) " << res.front() << "[i+" << nz_offset << "] = " << arg.at(i) << "[i];" << endl;
-      nz_offset += nz;
-    }
-    casadi_assert(nz_offset == size());
-  }
-
-  MX Vertcat::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
-    // Get the first nonnegative nz
-    int nz_test = -1;
-    for(vector<int>::const_iterator i=nz.begin(); i!=nz.end(); ++i){
-      if(*i>=0){
-        nz_test = *i;
-        break;
-      }
-    }
-
-    // Quick return if none
-    if(nz_test<0) return MX::zeros(sp);
-    
-    // Find out to which dependency it might depend
-    int begin=0, end=0;
-    int i;
-    for(i=0; i<ndep(); ++i){
-      begin = end;
-      end += dep(i).size();
-      if(nz_test < end) break;
-    }
-    
-    // Check if any nz refer to a different nonzero
-    for(vector<int>::const_iterator j=nz.begin(); j!=nz.end(); ++j){
-      if(*j>=0 && (*j < begin || *j >= end)){
-        
-        // Fallback to the base class
-        return MXNode::getGetNonzeros(sp,nz);
-      }
-    }
-    
-    // All nz refer to the same dependency, update the nonzero indices
-    if(begin==0){
-      return dep(i)->getGetNonzeros(sp,nz);
-    } else {
-      vector<int> nz_new(nz);
-      for(vector<int>::iterator j=nz_new.begin(); j!=nz_new.end(); ++j){
-        if(*j>=0) *j -= begin;
-      }
-      return dep(i)->getGetNonzeros(sp,nz_new);
     }
   }
 

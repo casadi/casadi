@@ -43,6 +43,7 @@
 #include "inner_prod.hpp"
 #include "norm.hpp"
 #include "vertcat.hpp"
+#include "vertsplit.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -703,6 +704,15 @@ namespace CasADi{
       }
       return MX::create(new Vertcat(c_split));
     }
+  }
+
+  std::vector<MX> MXNode::getVertsplit(const std::vector<MX>& x) const{
+    MX ev =  MX::create(new Vertsplit(x,shared_from_this<MX>()));
+    std::vector<MX> ret(x.size()-1);
+    for(int ind=0; ind<ret.size(); ++ind){
+      ret[ind] = MX::create(new OutputNode(ev, ind));
+    }
+    return ret;
   }
 
 } // namespace CasADi

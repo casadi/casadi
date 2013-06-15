@@ -92,6 +92,9 @@ namespace CasADi{
     // Vertical concatenation
     OP_VERTCAT,
 
+    // Vertical split
+    OP_VERTSPLIT,
+
     // Reshape an expression
     OP_RESHAPE,
   

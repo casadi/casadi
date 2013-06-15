@@ -34,6 +34,10 @@ namespace CasADi{
     return MXNode::getVertcat(comp);
   }
 
+  std::vector<MX> vertsplit(const std::vector<MX>& x, const MX& y){
+    return y->getVertsplit(x);
+  }
+
   MX horzcat(const vector<MX>& comp){
     vector<MX> v(comp.size());
     for(int i=0; i<v.size(); ++i)
