@@ -33,13 +33,13 @@ namespace CasADi {
 
 QPOasesInternal* QPOasesInternal::clone() const{
   // Return a deep copy
-  QPOasesInternal* node = new QPOasesInternal(input(QP_H).sparsity(),input(QP_A).sparsity());
+  QPOasesInternal* node = new QPOasesInternal(st_);
   if(!node->is_init_)
     node->init();
   return node;
 }
   
-QPOasesInternal::QPOasesInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSolverInternal(H,A){
+QPOasesInternal::QPOasesInternal(const std::vector<CRSSparsity>& st) : QPSolverInternal(st){
   addOption("nWSR",                   OT_INTEGER,     GenericType(), "The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)");
   addOption("CPUtime",                OT_REAL,        GenericType(), "The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.");
 
@@ -106,10 +106,10 @@ void QPOasesInternal::init(){
   }
   
   // Create data for H if not dense
-  if(!input(QP_H).sparsity().dense()) h_data_.resize(nx_*nx_);
+  if(!input(QP_SOLVER_H).sparsity().dense()) h_data_.resize(nx_*nx_);
   
   // Create data for A if not dense
-  if(!input(QP_A).sparsity().dense()) a_data_.resize(nx_*nc_);
+  if(!input(QP_SOLVER_A).sparsity().dense()) a_data_.resize(nx_*nc_);
   
   // Dual solution vector
   dual_.resize(nx_+nc_);
@@ -167,22 +167,22 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
   if (nfdir!=0 || nadir!=0) throw CasadiException("QPOasesInternal::evaluate() not implemented for forward or backward mode");
 
   if(verbose()){
-//     cout << "X_INIT = " << input(QP_X_INIT) << endl;
-//     cout << "LAMBDA_INIT = " << input(QP_LAMBDA_INIT) << endl;
-    cout << "LBX = " << input(QP_LBX) << endl;
-    cout << "UBX = " << input(QP_UBX) << endl;
-    cout << "LBA = " << input(QP_LBA) << endl;
-    cout << "UBA = " << input(QP_UBA) << endl;
+//     cout << "X_INIT = " << input(QP_SOLVER_X_INIT) << endl;
+//     cout << "LAMBDA_INIT = " << input(QP_SOLVER_LAMBDA_INIT) << endl;
+    cout << "LBX = " << input(QP_SOLVER_LBX) << endl;
+    cout << "UBX = " << input(QP_SOLVER_UBX) << endl;
+    cout << "LBA = " << input(QP_SOLVER_LBA) << endl;
+    cout << "UBA = " << input(QP_SOLVER_UBA) << endl;
   }
   
   // Get pointer to H
   const double* h=0;
   if(h_data_.empty()){
     // No copying needed
-    h = getPtr(input(QP_H));
+    h = getPtr(input(QP_SOLVER_H));
   } else {
     // First copy to dense array
-    input(QP_H).get(h_data_,DENSE);
+    input(QP_SOLVER_H).get(h_data_,DENSE);
     h = getPtr(h_data_);
   }
   
@@ -190,10 +190,10 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
   const double* a=0;
   if(a_data_.empty()){
     // No copying needed
-    a = getPtr(input(QP_A));
+    a = getPtr(input(QP_SOLVER_A));
   } else {
     // First copy to dense array
-    input(QP_A).get(a_data_,DENSE);
+    input(QP_SOLVER_A).get(a_data_,DENSE);
     a = getPtr(a_data_);
   }
   
@@ -203,11 +203,11 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
   double *cputime_ptr = cputime<=0 ? 0 : &cputime;
 
   // Get the arguments to call qpOASES with
-  const double* g = getPtr(input(QP_G));
-  const double* lb = getPtr(input(QP_LBX));
-  const double* ub = getPtr(input(QP_UBX));
-  const double* lbA = getPtr(input(QP_LBA));
-  const double* ubA = getPtr(input(QP_UBA));
+  const double* g = getPtr(input(QP_SOLVER_G));
+  const double* lb = getPtr(input(QP_SOLVER_LBX));
+  const double* ub = getPtr(input(QP_SOLVER_UBX));
+  const double* lbA = getPtr(input(QP_SOLVER_LBA));
+  const double* ubA = getPtr(input(QP_SOLVER_UBA));
 
   int flag;
   if(!called_once_){
@@ -231,17 +231,17 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
   }
 
   // Get optimal cost
-  output(QP_COST).set(qp_->getObjVal());
+  output(QP_SOLVER_COST).set(qp_->getObjVal());
 
   // Get the primal solution
-  qp_->getPrimalSolution(&output(QP_PRIMAL).front());
+  qp_->getPrimalSolution(&output(QP_SOLVER_X).front());
   
   // Get the dual solution
   qp_->getDualSolution(&dual_.front());
   
   // Split up the dual solution in multipliers for the simple bounds and the linear bounds
-  transform(dual_.begin(),   dual_.begin()+nx_,output(QP_LAMBDA_X).begin(),negate<double>());
-  transform(dual_.begin()+nx_,dual_.end(),     output(QP_LAMBDA_A).begin(),negate<double>());
+  transform(dual_.begin(),   dual_.begin()+nx_,output(QP_SOLVER_LAM_X).begin(),negate<double>());
+  transform(dual_.begin()+nx_,dual_.end(),     output(QP_SOLVER_LAM_A).begin(),negate<double>());
 }
 
 std::string QPOasesInternal::getErrorMessage(int flag){

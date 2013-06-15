@@ -589,6 +589,7 @@ INPUT                  = ../../symbolic \
                          ../../optimal_control \
                          ../../integration \
                          ../../nonlinear_programming \
+                         ../../convex_programming \
                          ./doxygen-tutorial \
                          ../examples \
                          extra

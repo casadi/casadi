@@ -45,7 +45,11 @@ public:
   /** \brief  Default constructor */
   OOQPSolver();
   
-  OOQPSolver(const CRSSparsity& H, const CRSSparsity& A);
+  /** \brief Constructor
+  *  \param st Problem structure
+  *  \copydoc scheme_QPStruct
+  */
+  OOQPSolver(const QPStructure &st);
   
   /** \brief  Access functions of the node */
   OOQPInternal* operator->();
@@ -58,7 +62,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static QPSolver creator(const CRSSparsity& H, const CRSSparsity& A){ return OOQPSolver(H,A);}
+  static QPSolver creator(const QPStructure &st){ return OOQPSolver(st);}
   #ifdef SWIG
   %nocallback;
   #endif

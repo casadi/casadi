@@ -540,7 +540,7 @@ namespace CasADi{
 
     // Allocate a QP solver
     QPSolverCreator qp_solver_creator = getOption("qp_solver");
-    qp_solver_ = qp_solver_creator(qpH_.sparsity(),qpA_.sparsity());
+    qp_solver_ = qp_solver_creator(qpStruct("h",qpH_.sparsity(),"a",qpA_.sparsity()));
   
     // Set options if provided
     if(hasSetOption("qp_solver_options")){
@@ -1047,27 +1047,27 @@ namespace CasADi{
     double time1 = clock();
 
     // Solve the QP
-    qp_solver_.setInput(qpH_,QP_H);
-    qp_solver_.setInput(gf_,QP_G);
-    qp_solver_.setInput(qpA_,QP_A);
-    std::transform(x_lb_.begin(),x_lb_.end(), x_opt_.begin(),qp_solver_.input(QP_LBX).begin(),std::minus<double>());
-    std::transform(x_ub_.begin(),x_ub_.end(), x_opt_.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>()); 
-    std::transform(g_lb_.begin(),g_lb_.end(), qpB_.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
-    std::transform(g_ub_.begin(),g_ub_.end(), qpB_.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
+    qp_solver_.setInput(qpH_,QP_SOLVER_H);
+    qp_solver_.setInput(gf_,QP_SOLVER_G);
+    qp_solver_.setInput(qpA_,QP_SOLVER_A);
+    std::transform(x_lb_.begin(),x_lb_.end(), x_opt_.begin(),qp_solver_.input(QP_SOLVER_LBX).begin(),std::minus<double>());
+    std::transform(x_ub_.begin(),x_ub_.end(), x_opt_.begin(),qp_solver_.input(QP_SOLVER_UBX).begin(),std::minus<double>()); 
+    std::transform(g_lb_.begin(),g_lb_.end(), qpB_.begin(),qp_solver_.input(QP_SOLVER_LBA).begin(),std::minus<double>());
+    std::transform(g_ub_.begin(),g_ub_.end(), qpB_.begin(),qp_solver_.input(QP_SOLVER_UBA).begin(),std::minus<double>());
   
     qp_solver_.evaluate();
   
     // Condensed primal step
-    const DMatrix& du = qp_solver_.output(QP_PRIMAL);
+    const DMatrix& du = qp_solver_.output(QP_SOLVER_X);
     copy(du.begin(),du.end(),x_step_.begin());
   
     // Condensed dual step (simple bounds)
-    const DMatrix& lam_x_new = qp_solver_.output(QP_LAMBDA_X);
+    const DMatrix& lam_x_new = qp_solver_.output(QP_SOLVER_LAM_X);
     copy(lam_x_new.begin(),lam_x_new.end(),x_dlam_.begin());
     std::transform(x_dlam_.begin(),x_dlam_.end(),x_lam_.begin(),x_dlam_.begin(),std::minus<double>());
 
     // Condensed dual step (nonlinear bounds)
-    const DMatrix& lam_g_new = qp_solver_.output(QP_LAMBDA_A);
+    const DMatrix& lam_g_new = qp_solver_.output(QP_SOLVER_LAM_A);
     copy(lam_g_new.begin(),lam_g_new.end(),g_dlam_.begin());
     std::transform(g_dlam_.begin(),g_dlam_.end(),g_lam_.begin(),g_dlam_.begin(),std::minus<double>());
 
@@ -1087,8 +1087,8 @@ namespace CasADi{
 
     // Calculate penalty parameter of merit function
     sigma_ = merit_start_;
-    sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_X).data()));
-    sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_LAMBDA_A).data()));
+    sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_SOLVER_LAM_X).data()));
+    sigma_ = std::max(sigma_,1.01*norm_inf(qp_solver_.output(QP_SOLVER_LAM_A).data()));
   
     // Calculate L1-merit function in the actual iterate
     double l1_infeas = primalInfeasibility();

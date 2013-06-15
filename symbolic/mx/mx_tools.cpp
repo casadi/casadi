@@ -765,6 +765,10 @@ namespace CasADi{
       ret.push_back(horzcat(v[i]));
     return vertcat(ret);
   }
+  
+  MX blockcat(const MX &A,const MX &B,const MX &C,const MX &D) {
+    return vertcat(horzcat(A,B),horzcat(C,D));
+  }
 
   MX det(const MX& A){
     return A->getDeterminant();

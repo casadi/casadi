@@ -24,6 +24,7 @@ from sx import *
 from typemaps import *
 from integration import *
 from ocp import *
+from socpsolver import *
 from nlp import *
 from implicitfunction import *
 from ad import *
@@ -33,6 +34,7 @@ from qpsolver import *
 from sdp import *
 from misc import *
 from fx import *
+from lpsolver import *
 from tools import *
 from simulator import *
 from vectortools import *

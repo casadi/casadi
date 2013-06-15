@@ -103,6 +103,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_NLPSOLVER";
       case OT_LINEARSOLVER:
               return "OT_LINEARSOLVER";
+      case OT_LPSOLVER:
+              return "OT_LPSOLVER";
       case OT_INTEGRATOR:
               return "OT_INTEGRATOR";
       case OT_QPSOLVER:
@@ -357,6 +359,18 @@ GenericType::GenericType(QPSolverCreator ptr) : type_(OT_QPSOLVER) {
   assignNode(new GenericTypeInternal<QPSolverCreator>(ptr));
 }
 
+GenericType::GenericType(LPSolverCreator ptr) : type_(OT_LPSOLVER) {
+  assignNode(new GenericTypeInternal<LPSolverCreator>(ptr));
+}
+
+GenericType::GenericType(SDPSolverCreator ptr) : type_(OT_SDPSOLVER) {
+  assignNode(new GenericTypeInternal<SDPSolverCreator>(ptr));
+}
+
+GenericType::GenericType(SOCPSolverCreator ptr) : type_(OT_SOCPSOLVER) {
+  assignNode(new GenericTypeInternal<SOCPSolverCreator>(ptr));
+}
+
 GenericType::GenericType(implicitFunctionCreator ptr) : type_(OT_IMPLICITFUNCTION) {
   assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));
 }
@@ -373,6 +387,22 @@ GenericType::operator NLPSolverCreator() const{
   casadi_assert_message(is_a<NLPSolverCreator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<NLPSolverCreator>*>(get())->d_;
 }
+
+GenericType::operator LPSolverCreator() const{
+  casadi_assert_message(is_a<LPSolverCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<LPSolverCreator>*>(get())->d_;
+}
+
+GenericType::operator SDPSolverCreator() const{
+  casadi_assert_message(is_a<SDPSolverCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<SDPSolverCreator>*>(get())->d_;
+}
+
+GenericType::operator SOCPSolverCreator() const{
+  casadi_assert_message(is_a<SOCPSolverCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<SOCPSolverCreator>*>(get())->d_;
+}
+
 
 GenericType::operator linearSolverCreator() const{
   casadi_assert_message(is_a<linearSolverCreator>(),"type mismatch");

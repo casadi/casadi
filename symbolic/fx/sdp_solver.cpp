@@ -41,6 +41,10 @@ bool SDPSolver::checkNode() const{
   return dynamic_cast<const SDPSolverInternal*>(get())!=0;
 }
 
+void SDPSolver::setSOCPOptions() {
+  (*this)->setSOCPOptions();
+}
+
 } // namespace CasADi
 
   

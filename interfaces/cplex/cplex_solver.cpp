@@ -28,8 +28,8 @@ namespace CasADi{
 
 CplexSolver::CplexSolver(){}
 
-CplexSolver::CplexSolver(const CRSSparsity& H, const CRSSparsity& A){
-  assignNode(new CplexInternal(H, A));
+CplexSolver::CplexSolver(const QPStructure &st){
+  assignNode(new CplexInternal(st));
 }
 
 CplexInternal* CplexSolver::operator->() {

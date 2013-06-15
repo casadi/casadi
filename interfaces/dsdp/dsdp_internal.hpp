@@ -36,14 +36,12 @@ namespace CasADi{
 class DSDPInternal : public SDPSolverInternal {
   friend class DSDPSolver;
 public:
-  /** \brief  Constructor */
-  explicit DSDPInternal();
-  
+
   /** \brief  Clone */
   virtual DSDPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit DSDPInternal(const CRSSparsity &C, const CRSSparsity &A);
+  explicit DSDPInternal(const std::vector<CRSSparsity> &st);
 
   /** \brief  Destructor */
   virtual ~DSDPInternal();
@@ -57,6 +55,8 @@ public:
     DSDP dsdp_;
     
     SDPCone sdpcone_;
+    LPCone lpcone_;
+    BCone bcone_;
     
     std::map<int,std::string> terminationReason_;
     std::map<int,std::string> solutionType_;
@@ -67,6 +67,10 @@ public:
     /// Temporary work vector of size n*(n+1)/2
     std::vector< std::vector<double> > store_X_;
     std::vector< std::vector<double> > store_P_;
+    
+    /// Mapping to get [A LBA]'
+    FX mappingA_;
+
 };
 
 } // namespace CasADi

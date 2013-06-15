@@ -43,7 +43,7 @@ public:
   virtual QPOasesInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit QPOasesInternal(const CRSSparsity& H, const CRSSparsity& A);
+  explicit QPOasesInternal(const std::vector<CRSSparsity>& st);
 
   /** \brief  Destructor */
   virtual ~QPOasesInternal();
