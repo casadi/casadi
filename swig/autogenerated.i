@@ -687,6 +687,88 @@ namespace CasADi {
 }
 #ifdef SWIGPYTHON
 %pythoncode %{
+def linsolIn(*dummy,**kwargs):
+  """
+  Helper function for 'LinsolInput'
+
+  Two use cases:
+     a) arg = linsolIn(A=my_A, B=my_B) 
+          all arguments optional
+     b) A, B = linsolIn(arg,"A", "B") 
+          all arguments after the first optional
+  Input arguments of a linear solver
+  
+  Keyword arguments:
+    A -- The square matrix A: sparse, (n x n). [LINSOL_A]
+    B -- The right-hand-side matrix b: dense,  (n x m) [LINSOL_B]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LinsolInput,n)] for n in dummy[1:]]
+  A = []
+  if 'A' in kwargs:
+    A = kwargs['A']
+  B = []
+  if 'B' in kwargs:
+    B = kwargs['B']
+  for k in kwargs.keys():
+    if not(k in ['A','B']):
+      raise Exception("Keyword error in linsolIn: '%s' is not recognized. Available keywords are: A, B" % k )
+  return IOSchemeVector([A,B], SCHEME_LinsolInput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(linsolIn) linsolIn<SXMatrix>;
+%template(linsolIn) linsolIn<MX>;
+%template(linsolIn) linsolIn<CRSSparsity>;
+%template(IOSchemeVectorLinsolInput) LinsolInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorLinsolInput) LinsolInputIOSchemeVector<MX>;
+%template(IOSchemeVectorLinsolInput) LinsolInputIOSchemeVector<CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def linsolOut(*dummy,**kwargs):
+  """
+  Helper function for 'LinsolOutput'
+
+  Two use cases:
+     a) arg = linsolOut(X=my_X) 
+          all arguments optional
+     b) X = linsolOut(arg,"X") 
+          all arguments after the first optional
+  Output arguments of a linear solver
+  
+  Keyword arguments:
+    X -- Solution to the linear system of equations [LINSOL_X]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LinsolOutput,n)] for n in dummy[1:]]
+  X = []
+  if 'X' in kwargs:
+    X = kwargs['X']
+  for k in kwargs.keys():
+    if not(k in ['X']):
+      raise Exception("Keyword error in linsolOut: '%s' is not recognized. Available keywords are: X" % k )
+  return IOSchemeVector([X], SCHEME_LinsolOutput)
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(linsolOut) linsolOut<SXMatrix>;
+%template(linsolOut) linsolOut<MX>;
+%template(linsolOut) linsolOut<CRSSparsity>;
+%template(IOSchemeVectorLinsolOutput) LinsolOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorLinsolOutput) LinsolOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorLinsolOutput) LinsolOutputIOSchemeVector<CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
 def lpIn(*dummy,**kwargs):
   """
   Helper function for 'LPSolverInput'

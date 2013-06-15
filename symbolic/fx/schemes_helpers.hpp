@@ -477,6 +477,70 @@ std::vector<M> integratorOut(const std::vector<M>& args,const std::string arg_s0
   return ret;
 
 }
+/// Helper function for 'LinsolInput'
+
+template<class M>
+class LinsolInputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit LinsolInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LinsolInput){} 
+};
+/// Input arguments of a linear solver
+/// 
+/// \copydoc scheme_LinsolInput
+template<class M>
+LinsolInputIOSchemeVector<M> linsolIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+  std::vector<M> ret(2);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_LinsolInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in LinsolInput: '" << it->first << "' is not recognized. Available keywords are: A, B");
+    ret[n] = it->second;
+  }
+  return LinsolInputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> linsolIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput,arg_s1)));
+  return ret;
+
+}
+/// Helper function for 'LinsolOutput'
+
+template<class M>
+class LinsolOutputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit LinsolOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LinsolOutput){} 
+};
+/// Output arguments of a linear solver
+/// 
+/// \copydoc scheme_LinsolOutput
+template<class M>
+LinsolOutputIOSchemeVector<M> linsolOut(const std::string arg_s0="",M arg_m0=M()){
+  std::vector<M> ret(1);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_LinsolOutput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in LinsolOutput: '" << it->first << "' is not recognized. Available keywords are: X");
+    ret[n] = it->second;
+  }
+  return LinsolOutputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> linsolOut(const std::vector<M>& args,const std::string arg_s0=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolOutput,arg_s0)));
+  return ret;
+
+}
 /// Helper function for 'LPSolverInput'
 
 template<class M>

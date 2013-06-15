@@ -55,9 +55,8 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_RDAEOutput: return "RDAEOutput";
     case SCHEME_IntegratorInput: return "IntegratorInput";
     case SCHEME_IntegratorOutput: return "IntegratorOutput";
-    case SCHEME_LPSolverInput: return "LPSolverInput";
-    case SCHEME_LPSolverOutput: return "LPSolverOutput";
-    case SCHEME_LPStruct: return "LPStruct";
+    case SCHEME_LinsolInput: return "LinsolInput";
+    case SCHEME_LinsolOutput: return "LinsolOutput";
     case SCHEME_NLPInput: return "NLPInput";
     case SCHEME_NLPOutput: return "NLPOutput";
     case SCHEME_GradFInput: return "GradFInput";
@@ -96,9 +95,8 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_RDAEOutput: return "ode, alg, quad";
     case SCHEME_IntegratorInput: return "x0, p, rx0, rp";
     case SCHEME_IntegratorOutput: return "xf, qf, rxf, rqf";
-    case SCHEME_LPSolverInput: return "c, a, lba, uba, lbx, ubx";
-    case SCHEME_LPSolverOutput: return "x, cost, lam_a, lam_x";
-    case SCHEME_LPStruct: return "a";
+    case SCHEME_LinsolInput: return "A, B";
+    case SCHEME_LinsolOutput: return "X";
     case SCHEME_NLPInput: return "x, p";
     case SCHEME_NLPOutput: return "f, g";
     case SCHEME_GradFInput: return "x, p";
@@ -212,22 +210,12 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==2) return "rxf";
       if(i==3) return "rqf";
       break;
-    case SCHEME_LPSolverInput: 
-      if(i==0) return "c";
-      if(i==1) return "a";
-      if(i==2) return "lba";
-      if(i==3) return "uba";
-      if(i==4) return "lbx";
-      if(i==5) return "ubx";
+    case SCHEME_LinsolInput: 
+      if(i==0) return "A";
+      if(i==1) return "B";
       break;
-    case SCHEME_LPSolverOutput: 
-      if(i==0) return "x";
-      if(i==1) return "cost";
-      if(i==2) return "lam_a";
-      if(i==3) return "lam_x";
-      break;
-    case SCHEME_LPStruct: 
-      if(i==0) return "a";
+    case SCHEME_LinsolOutput: 
+      if(i==0) return "X";
       break;
     case SCHEME_NLPInput: 
       if(i==0) return "x";
@@ -470,22 +458,12 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==2) return "Backward differential state at the initial time";
       if(i==3) return "Backward quadrature state at the initial time";
       break;
-    case SCHEME_LPSolverInput: 
-      if(i==0) return "The vector c: dense (n x 1)";
-      if(i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
-      if(i==2) return "dense, (nc x 1)";
-      if(i==3) return "dense, (nc x 1)";
-      if(i==4) return "dense, (n x 1)";
-      if(i==5) return "dense, (n x 1)";
+    case SCHEME_LinsolInput: 
+      if(i==0) return "The square matrix A: sparse, (n x n).";
+      if(i==1) return "The right-hand-side matrix b: dense,  (n x m)";
       break;
-    case SCHEME_LPSolverOutput: 
-      if(i==0) return "The primal solution";
-      if(i==1) return "The optimal cost";
-      if(i==2) return "The dual solution corresponding to linear bounds";
-      if(i==3) return "The dual solution corresponding to simple bounds";
-      break;
-    case SCHEME_LPStruct: 
-      if(i==0) return "The matrix A: sparse";
+    case SCHEME_LinsolOutput: 
+      if(i==0) return "Solution to the linear system of equations";
       break;
     case SCHEME_NLPInput: 
       if(i==0) return "Decision variable";
@@ -728,22 +706,12 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==2) return "INTEGRATOR_RXF";
       if(i==3) return "INTEGRATOR_RQF";
       break;
-    case SCHEME_LPSolverInput: 
-      if(i==0) return "LP_SOLVER_C";
-      if(i==1) return "LP_SOLVER_A";
-      if(i==2) return "LP_SOLVER_LBA";
-      if(i==3) return "LP_SOLVER_UBA";
-      if(i==4) return "LP_SOLVER_LBX";
-      if(i==5) return "LP_SOLVER_UBX";
+    case SCHEME_LinsolInput: 
+      if(i==0) return "LINSOL_A";
+      if(i==1) return "LINSOL_B";
       break;
-    case SCHEME_LPSolverOutput: 
-      if(i==0) return "LP_SOLVER_X";
-      if(i==1) return "LP_SOLVER_COST";
-      if(i==2) return "LP_SOLVER_LAM_A";
-      if(i==3) return "LP_SOLVER_LAM_X";
-      break;
-    case SCHEME_LPStruct: 
-      if(i==0) return "LP_STRUCT_A";
+    case SCHEME_LinsolOutput: 
+      if(i==0) return "LINSOL_X";
       break;
     case SCHEME_NLPInput: 
       if(i==0) return "NL_X";
@@ -933,13 +901,10 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_IntegratorOutput: 
       return 4;
       break;
-    case SCHEME_LPSolverInput: 
-      return 6;
+    case SCHEME_LinsolInput: 
+      return 2;
       break;
-    case SCHEME_LPSolverOutput: 
-      return 4;
-      break;
-    case SCHEME_LPStruct: 
+    case SCHEME_LinsolOutput: 
       return 1;
       break;
     case SCHEME_NLPInput: 
@@ -1099,22 +1064,12 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="rxf") return 2;
       if(name=="rqf") return 3;
       break;
-    case SCHEME_LPSolverInput: 
-      if(name=="c") return 0;
-      if(name=="a") return 1;
-      if(name=="lba") return 2;
-      if(name=="uba") return 3;
-      if(name=="lbx") return 4;
-      if(name=="ubx") return 5;
+    case SCHEME_LinsolInput: 
+      if(name=="A") return 0;
+      if(name=="B") return 1;
       break;
-    case SCHEME_LPSolverOutput: 
-      if(name=="x") return 0;
-      if(name=="cost") return 1;
-      if(name=="lam_a") return 2;
-      if(name=="lam_x") return 3;
-      break;
-    case SCHEME_LPStruct: 
-      if(name=="a") return 0;
+    case SCHEME_LinsolOutput: 
+      if(name=="X") return 0;
       break;
     case SCHEME_NLPInput: 
       if(name=="x") return 0;

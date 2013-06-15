@@ -40,13 +40,13 @@ void LinearSolverInternal::init(){
   casadi_assert_message(!isSingular(sparsity_),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity_) << " (in stead of "<< sparsity_.size1() << ")");
   
   // Allocate space for inputs
-  input_.resize(2);
-  input(0) = DMatrix(sparsity_);
-  input(1) = DMatrix(sparsity_.size1(),1,0);
+  input_.resize(LINSOL_NUM_IN);
+  input(LINSOL_A) = DMatrix(sparsity_);
+  input(LINSOL_B) = DMatrix(sparsity_.size1(),1,0);
   
   // Allocate space for outputs
-  output_.resize(1);
-  output(0) = input(1);
+  output_.resize(LINSOL_NUM_OUT);
+  output(LINSOL_X) = input(LINSOL_B);
   
   // Not prepared
   prepared_ = false;
@@ -91,8 +91,8 @@ void LinearSolverInternal::evaluate(int nfdir, int nadir){
  
 void LinearSolverInternal::solve(){
   // Get input and output vector
-  const vector<double>& b = input(1).data();
-  vector<double>& x = output().data();
+  const vector<double>& b = input(LINSOL_B).data();
+  vector<double>& x = output(LINSOL_X).data();
   
   // Copy input to output
   copy(b.begin(),b.end(),x.begin());
