@@ -71,6 +71,9 @@ namespace CasADi{
     
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_VERTSPLIT;}
+
+    /// Can the operation be performed inplace (i.e. overwrite the result)
+    //virtual int numInplace() const{ return getNumOutputs();}
   };
 
 } // namespace CasADi

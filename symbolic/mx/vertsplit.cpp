@@ -56,47 +56,53 @@ namespace CasADi{
     // Number of derivatives
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
+    int nx = output.size();
 
     // Nondifferentiated outputs and forward sensitivities
-    for(int d=-1; d<nfwd; ++d){
-      casadi_error("not implemented");
-      typename vector<T>::iterator res_it = d==-1 ? output[0]->data().begin() : fwdSens[d][0]->data().begin();
-      for(int i=0; i<input.size(); ++i){
-        const vector<T>& arg_i = d==-1 ? input[i]->data() : fwdSeed[d][i]->data();
-        copy(arg_i.begin(),arg_i.end(),res_it);
-        res_it += arg_i.size();
+    for(int d=-1; d<nfwd; ++d){      
+      const MatV& arg = d<0 ? input : fwdSeed[d];
+      MatV& res = d<0 ? output : fwdSens[d];
+      typename vector<T>::const_iterator arg_it = arg[nx]->data().begin();
+      for(int i=0; i<nx; ++i){
+        vector<T>& res_i = res[i]->data();
+        copy(arg[i]->begin(),arg[i]->end(),res_i.begin());
+        transform(res_i.begin(),res_i.end(),arg_it,res_i.begin(),std::plus<T>());
+        arg_it += res_i.size();
       }
     }
     
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      casadi_error("not implemented");
-      typename vector<T>::iterator arg_it = adjSeed[d][0]->data().begin();
-      for(int i=0; i<input.size(); ++i){
-        vector<T>& res_i = adjSens[d][i]->data();
-        transform(res_i.begin(),res_i.end(),arg_it,res_i.begin(),std::plus<T>());
-        fill_n(arg_it, res_i.size(), 0);
-        arg_it += res_i.size();
+      typename vector<T>::iterator asens_it = adjSens[d][nx]->data().begin();
+      for(int i=0; i<nx; ++i){
+        vector<T>& aseed_i = adjSeed[d][i]->data();
+        vector<T>& asens_i = adjSens[d][i]->data();
+        transform(aseed_i.begin(),aseed_i.end(),asens_i.begin(),asens_i.begin(),std::plus<T>());
+        transform(aseed_i.begin(),aseed_i.end(),asens_it,asens_it,std::plus<T>());
+        fill(aseed_i.begin(), aseed_i.end(), 0);
+        asens_it += aseed_i.size();
       }
     }
   }
 
   void Vertsplit::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-    casadi_error("not implemented");
-    bvec_t *res_ptr = get_bvec_t(output[0]->data());
-    for(int i=0; i<input.size(); ++i){
+    int nx = output.size();
+    bvec_t *arg_ptr = get_bvec_t(input[nx]->data());
+    for(int i=0; i<nx; ++i){
       vector<double>& arg_i = input[i]->data();
+      vector<double>& res_i = output[i]->data();
       bvec_t *arg_i_ptr = get_bvec_t(arg_i);
-      if(fwd){
-        copy(arg_i_ptr, arg_i_ptr+arg_i.size(), res_ptr);
-        res_ptr += arg_i.size();
-      } else {
-        for(int k=0; k<arg_i.size(); ++k){
-          *arg_i_ptr++ |= *res_ptr;
-          *res_ptr++ = 0;
+      bvec_t *res_i_ptr = get_bvec_t(res_i);
+      for(int k=0; k<arg_i.size(); ++k){
+        if(fwd){        
+          *res_i_ptr++ = *arg_i_ptr++ | *arg_ptr++;
+        } else {
+          *arg_i_ptr++ |= *res_i_ptr;
+          *arg_ptr++ |= *res_i_ptr;          
+          *res_i_ptr++ = 0;
         }
       }
-    }
+    }    
   }
 
   void Vertsplit::printPart(std::ostream &stream, int part) const{
