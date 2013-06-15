@@ -61,16 +61,12 @@ class LinearSolverInternal : public FXInternal{
     // Matrix sparsity
     CRSSparsity sparsity_;
 
-    // Transpose?
-    bool transpose_;
-    
     // Get sparsity pattern
     int nrow() const{ return sparsity_.size1();}
     int ncol() const{ return sparsity_.size2();}
     int nnz() const{ return sparsity_.size();}
     const std::vector<int>& col() const{ return sparsity_.col();}
-    const std::vector<int>& rowind() const{ return sparsity_.rowind();}
-    
+    const std::vector<int>& rowind() const{ return sparsity_.rowind();}    
 };
 
 

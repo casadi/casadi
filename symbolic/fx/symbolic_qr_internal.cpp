@@ -230,11 +230,8 @@ namespace CasADi{
 
     // Generate code for the embedded functions
     gen.addDependency(fact_fcn_);
-    if(transpose_){
-      gen.addDependency(solvT_fcn_);
-    } else {
-      gen.addDependency(solv_fcn_);
-    }
+    gen.addDependency(solvT_fcn_);
+    gen.addDependency(solv_fcn_);
   }
 
   void SymbolicQRInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
@@ -260,8 +257,13 @@ namespace CasADi{
     stream << "  }" << endl;
 
     // Solve
-    int solv_ind = transpose_ ? gen.getDependency(solvT_fcn_) : gen.getDependency(solv_fcn_);
-    stream << "  f" << solv_ind << "(Q,R,x1,r0);" << endl;    
+    int solv_ind = gen.getDependency(solv_fcn_);
+    int solvT_ind = gen.getDependency(solvT_fcn_);
+    stream << "  if(*x2==0){" << endl;
+    stream << "    f" << solv_ind << "(Q,R,x1,r0);" << endl;    
+    stream << "  } else {" << endl;
+    stream << "    f" << solvT_ind << "(Q,R,x1,r0);" << endl;    
+    stream << "  }" << endl;
   }
 
 } // namespace CasADi

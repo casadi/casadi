@@ -42,6 +42,8 @@ enum LinsolInput{
   LINSOL_A,
   /// The right-hand-side matrix b: dense,  (n x m) [B]
   LINSOL_B,
+  /// Transpose A?: dense scalar, value 0 or 1,  (1 x 1) [T]
+  LINSOL_T,
   LINSOL_NUM_IN};
 
 /// Output arguments of a linear solver [linsolOut]

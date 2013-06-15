@@ -98,7 +98,7 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_RDAEOutput: return "ode, alg, quad";
     case SCHEME_IntegratorInput: return "x0, p, rx0, rp";
     case SCHEME_IntegratorOutput: return "xf, qf, rxf, rqf";
-    case SCHEME_LinsolInput: return "A, B";
+    case SCHEME_LinsolInput: return "A, B, T";
     case SCHEME_LinsolOutput: return "X";
     case SCHEME_LPSolverInput: return "c, a, lba, uba, lbx, ubx";
     case SCHEME_LPSolverOutput: return "x, cost, lam_a, lam_x";
@@ -219,6 +219,7 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
     case SCHEME_LinsolInput: 
       if(i==0) return "A";
       if(i==1) return "B";
+      if(i==2) return "T";
       break;
     case SCHEME_LinsolOutput: 
       if(i==0) return "X";
@@ -484,6 +485,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_LinsolInput: 
       if(i==0) return "The square matrix A: sparse, (n x n).";
       if(i==1) return "The right-hand-side matrix b: dense,  (n x m)";
+      if(i==2) return "Transpose A?: dense scalar, value 0 or 1,  (1 x 1)";
       break;
     case SCHEME_LinsolOutput: 
       if(i==0) return "Solution to the linear system of equations";
@@ -749,6 +751,7 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
     case SCHEME_LinsolInput: 
       if(i==0) return "LINSOL_A";
       if(i==1) return "LINSOL_B";
+      if(i==2) return "LINSOL_T";
       break;
     case SCHEME_LinsolOutput: 
       if(i==0) return "LINSOL_X";
@@ -959,7 +962,7 @@ int getSchemeSize(InputOutputScheme scheme) {
       return 4;
       break;
     case SCHEME_LinsolInput: 
-      return 2;
+      return 3;
       break;
     case SCHEME_LinsolOutput: 
       return 1;
@@ -1133,6 +1136,7 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
     case SCHEME_LinsolInput: 
       if(name=="A") return 0;
       if(name=="B") return 1;
+      if(name=="T") return 2;
       break;
     case SCHEME_LinsolOutput: 
       if(name=="X") return 0;

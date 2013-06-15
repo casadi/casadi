@@ -28,13 +28,9 @@ namespace CasADi{
 
 LinearSolverInternal::LinearSolverInternal(const CRSSparsity& sparsity) : sparsity_(sparsity){
   casadi_assert(!sparsity.isNull());
-  addOption("trans", OT_BOOLEAN, false);
 }
 
 void LinearSolverInternal::init(){
-  // Transpose?
-  transpose_ = getOption("trans");
-  
   casadi_assert_message(sparsity_.size1()==sparsity_.size2(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity_.dimString());
   
   casadi_assert_message(!isSingular(sparsity_),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity_) << " (in stead of "<< sparsity_.size1() << ")");
@@ -43,6 +39,7 @@ void LinearSolverInternal::init(){
   input_.resize(LINSOL_NUM_IN);
   input(LINSOL_A) = DMatrix(sparsity_);
   input(LINSOL_B) = DMatrix(sparsity_.size1(),1,0);
+  input(LINSOL_T) = 0.;
   
   // Allocate space for outputs
   output_.resize(LINSOL_NUM_OUT);
@@ -93,12 +90,13 @@ void LinearSolverInternal::solve(){
   // Get input and output vector
   const vector<double>& b = input(LINSOL_B).data();
   vector<double>& x = output(LINSOL_X).data();
-  
+  bool transpose = output(LINSOL_T).toScalar()!=0.;
+
   // Copy input to output
   copy(b.begin(),b.end(),x.begin());
   
   // Solve the factorized system
-  solve(getPtr(x),1,transpose_);
+  solve(getPtr(x),1,transpose);
 }
  
 } // namespace CasADi
