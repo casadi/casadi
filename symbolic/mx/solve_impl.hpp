@@ -61,6 +61,7 @@ namespace CasADi{
     linear_solver_.setInput(*input[1],LINSOL_A);
     linear_solver_.prepare();
     
+    // Solve for nondifferentiated output
     if(input[0]!=output[0]){
       copy(input[0]->begin(),input[0]->end(),output[0]->begin());
     }
@@ -71,15 +72,36 @@ namespace CasADi{
       if(fwdSeed[d][0]!=fwdSens[d][0]){
         copy(fwdSeed[d][0]->begin(),fwdSeed[d][0]->end(),fwdSens[d][0]->begin());
       }
-      casadi_error("not implemented");
+      for_each(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),std::negate<double>());
+      if(Tr){
+        DMatrix::mul_no_alloc_nt(*output[0],*fwdSeed[d][1],*fwdSens[d][0]);
+      } else {
+        DMatrix::mul_no_alloc_nn(*output[0],*fwdSeed[d][1],*fwdSens[d][0]);
+      }
+      for_each(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),std::negate<double>());
+      linear_solver_.solve(getPtr(fwdSens[d][0]->data()),output[0]->size1(),Tr);      
     }
 
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      casadi_error("not implemented");
-      if(adjSeed[d][0]!=adjSens[d][0]){
-        transform(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),adjSens[d][0]->begin(),adjSens[d][0]->begin(),std::plus<double>());
-        adjSeed[d][0]->setZero();
+
+      // Solve transposed
+      for_each(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),std::negate<double>());
+      linear_solver_.solve(getPtr(adjSeed[d][0]->data()),output[0]->size1(),!Tr);
+
+      // Propagate to A
+      if(Tr){
+        DMatrix::mul_no_alloc_tn(*output[0],*adjSeed[d][0],*adjSens[d][1]);
+      } else {
+        DMatrix::mul_no_alloc_tn(*adjSeed[d][0],*output[0],*adjSens[d][1]);
+      }
+
+      // Propagate to B
+      if(adjSeed[d][0]==adjSens[d][0]){
+        for_each(adjSens[d][0]->begin(),adjSens[d][0]->end(),std::negate<double>());
+      } else {
+        transform(adjSens[d][0]->begin(),adjSens[d][0]->end(),adjSeed[d][0]->begin(),adjSens[d][0]->begin(),std::minus<double>());
+        fill(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),0);
       }
     }
   }
