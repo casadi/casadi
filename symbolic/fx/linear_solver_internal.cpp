@@ -30,6 +30,13 @@ using namespace std;
 namespace CasADi{
 
   LinearSolverInternal::LinearSolverInternal(const CRSSparsity& sparsity, int nrhs){
+    // No OO derivatives supported/needed
+    setOption("number_of_fwd_dir",0);
+    setOption("number_of_adj_dir",0);
+    setOption("max_number_of_fwd_dir",0);
+    setOption("max_number_of_adj_dir",0);
+
+    // Make sure arguments are consistent
     casadi_assert(!sparsity.isNull());
     casadi_assert_message(sparsity.size1()==sparsity.size2(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity.dimString());  
     casadi_assert_message(!isSingular(sparsity),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity) << " (in stead of "<< sparsity.size1() << ")");
@@ -60,6 +67,8 @@ namespace CasADi{
   }
  
   void LinearSolverInternal::evaluate(int nfdir, int nadir){
+    casadi_assert_message(nfdir==0 && nadir==0,"Directional derivatives for LinearSolver not supported. Reformulate or wrap in an MXFunction instance.");
+
     /*  Factorization fact;
         if(called_once){
         // Check if any element has changed
