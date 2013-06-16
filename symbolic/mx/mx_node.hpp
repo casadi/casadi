@@ -285,8 +285,11 @@ namespace CasADi{
     /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
 
-    /// Solve a system of nonlinear equations
+    /// Create a vertical concatenation node
     static MX getVertcat(const std::vector<MX>& x);
+
+    /// Create a vertical split node
+    std::vector<MX> getVertsplit(const std::vector<int>& output_offset) const;
 
     /// Transpose
     virtual MX getTranspose() const;

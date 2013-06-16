@@ -89,6 +89,19 @@ namespace CasADi{
     return ret;
   }
 
+  std::vector<MX> MX::createMultipleOutput(MXNode* node){
+    casadi_assert(dynamic_cast<MultipleOutput*>(node)!=0);
+    MX x =  MX::create(node);
+    std::vector<MX> ret(x->getNumOutputs());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = MX::create(new OutputNode(x, i));
+      if(ret[i].size()==0){
+        ret[i] = MX::sparse(ret[i].shape());
+      }
+    }
+    return ret;
+  }
+
   bool MX::__nonzero__() const {
     if (isNull()) {casadi_error("Cannot determine truth value of null MX.");}
     return (operator->())->__nonzero__();

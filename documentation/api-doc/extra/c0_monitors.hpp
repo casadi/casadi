@@ -1,3 +1,27 @@
+/** \class CasADi::SimulatorInternal
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>initial</td><td>CasADi::SimulatorInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>step</td><td>CasADi::SimulatorInternal</td></tr>
+</table>
+*/
+/** \class CasADi::Simulator
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>initial</td><td>CasADi::SimulatorInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>step</td><td>CasADi::SimulatorInternal</td></tr>
+</table>
+*/
 /** \class CasADi::KinsolInternal
 \n
 \par
@@ -50,30 +74,6 @@
 <tr><td>eval_jac_g</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::SimulatorInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>initial</td><td>CasADi::SimulatorInternal</td></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>step</td><td>CasADi::SimulatorInternal</td></tr>
-</table>
-*/
-/** \class CasADi::Simulator
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>initial</td><td>CasADi::SimulatorInternal</td></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>step</td><td>CasADi::SimulatorInternal</td></tr>
 </table>
 */
 /** \class CasADi::CVodesInternal
@@ -270,6 +270,16 @@
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
+/** \class CasADi::XFunctionInternal
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
 /** \class CasADi::SQPInternal
 \n
 \par
@@ -315,16 +325,6 @@
 </table>
 */
 /** \class CasADi::FX
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::XFunctionInternal
 \n
 \par
 <a name='monitors'></a><table>

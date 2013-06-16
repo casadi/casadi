@@ -32,7 +32,10 @@
 namespace CasADi{
 
   /** \brief  concatenate vertically */
-  MX vertcat(const std::vector<MX>& comp);
+  MX vertcat(const std::vector<MX>& x);
+
+  /** \brief  concatenate vertically */
+  std::vector<MX> vertsplit(const MX& x, const std::vector<int>& output_offset);
 
   /** \brief  concatenate horizontally */
   MX horzcat(const std::vector<MX>& comp);

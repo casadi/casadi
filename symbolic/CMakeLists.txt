@@ -57,6 +57,7 @@ SET(CASADI_SRCS
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
   mx/transpose.hpp           mx/transpose.cpp           # Transpose
   mx/vertcat.hpp             mx/vertcat.cpp             # Vertical concatenation
+  mx/vertsplit.hpp           mx/vertsplit.cpp           # Vertical split
   mx/reshape.hpp             mx/reshape.cpp             # Reshape
   mx/subref.hpp              mx/subref.cpp              # Submatrix reference
   mx/subassign.hpp           mx/subassign.cpp           # Submatrix assignment

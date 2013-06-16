@@ -28,7 +28,7 @@ from helpers import *
 
 lpsolvers = []
 try:
-  lpsolvers.append((QPLPSolver,{"qp_solver": CplexSolver },False))
+  lpsolvers.append((QPLPSolver,{"qp_solver": OOQPSolver },False))
 except:
   pass
 

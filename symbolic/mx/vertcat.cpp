@@ -113,29 +113,37 @@ namespace CasADi{
   }
 
   void Vertcat::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+    int nfwd = fwdSens.size();
+    int nadj = adjSeed.size();
+
+    // Non-differentiated output
     if(!output_given){
       *output[0] = vertcat(getVector(input));
     }
     
     // Forward sensitivities
-    int nfwd = fwdSens.size();
     for(int d = 0; d<nfwd; ++d){
       *fwdSens[d][0] = vertcat(getVector(fwdSeed[d]));
     }
     
+    // Quick return?
+    if(nadj==0) return;
+
+    // Get offsets for each row
+    vector<int> row_offset(ndep()+1,0);
+    for(int i=0; i<ndep(); ++i){
+      int nrow = dep(i).sparsity().size1();
+      row_offset[i+1] = row_offset[i] + nrow;
+    }
+
     // Adjoint sensitivities
-    int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      int row_offset = 0;
       MX& aseed = *adjSeed[d][0];
-      for(int i=0; i<input.size(); ++i){
-        MX& asens = *adjSens[d][i];
-        int nrow = asens.size1();
-        asens += aseed(Slice(row_offset,row_offset+nrow),Slice());
-        row_offset += nrow;
-      }
-      casadi_assert(row_offset == aseed.size1());
+      vector<MX> s = vertsplit(aseed,row_offset);
       aseed = MX();
+      for(int i=0; i<ndep(); ++i){
+        *adjSens[d][i] += s[i];
+      }
     }
   }
 
