@@ -95,12 +95,13 @@ namespace CasADi{
     const vector<double>& b = input(LINSOL_B).data();
     vector<double>& x = output(LINSOL_X).data();
     bool transpose = input(LINSOL_T).toScalar()!=0.;
+    int nrhs = x.size()/input(LINSOL_B).size();
 
     // Copy input to output
     copy(b.begin(),b.end(),x.begin());
   
-    // Solve the factorized system
-    solve(getPtr(x),1,transpose);
+    // Solve the factorized system in-place
+    solve(getPtr(x),nrhs,transpose);
   }
  
 } // namespace CasADi
