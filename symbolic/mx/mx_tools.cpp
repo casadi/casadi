@@ -754,10 +754,6 @@ namespace CasADi{
     }
   }
 
-  MX nl_solve(const std::vector<MX>& x, const ImplicitFunction& implicit_function){
-    return MXNode::getNonlinearSolve(x,implicit_function);
-  }
-
   MX jacobian(const MX& ex, const MX &arg) {
     MXFunction temp(arg,ex); // make a runtime
     temp.init();

@@ -21,6 +21,7 @@
  */
 
 #include "implicit_function_internal.hpp"
+#include "../mx/mx_node.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -52,9 +53,9 @@ namespace CasADi{
     return (*this)->linsol_;
   }
 
+  MX ImplicitFunction::solve(const std::vector<MX>& x){
+    return MXNode::getNonlinearSolve(x,*this);
+  }
 
 } // namespace CasADi
-
-  
-
 

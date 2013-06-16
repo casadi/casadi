@@ -74,6 +74,9 @@ namespace CasADi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
   
+    /// Create a solve node
+    MX solve(const std::vector<MX>& x);
+
     /// Access F
     FX& getF();
 
