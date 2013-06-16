@@ -100,8 +100,12 @@ namespace CasADi{
     /** \brief  Create function call node */
     virtual void createCall(const std::vector<MX> &arg, std::vector<MX> &res, 
                             const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
-                            const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens,
-                            bool output_given=false);
+                            const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens);
+
+    /** \brief  Create derivative node */
+    virtual void createDerivative(const std::vector<MX> &arg, std::vector<MX> &res, 
+                                  const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
+                                  const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens);
     
     /** \brief Call a function, MX type (overloaded) */
     void call(const MXVector& arg, MXVector& res, 

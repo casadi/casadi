@@ -1567,7 +1567,7 @@ namespace CasADi{
                               "," << input(i).size2() << ") while a shape (" << arg[i].size1() << "," << arg[i].size2() << 
                               ") was supplied.");
       }
-      createCall(arg,res,fseed,fsens,aseed,asens,false);
+      createCall(arg,res,fseed,fsens,aseed,asens);
     }
   }
 
@@ -1958,72 +1958,70 @@ namespace CasADi{
                           std::vector<MX> &res, const std::vector<std::vector<MX> > &fseed,
                           std::vector<std::vector<MX> > &fsens,
                           const std::vector<std::vector<MX> > &aseed,
-                          std::vector<std::vector<MX> > &asens, bool output_given) {
+                          std::vector<std::vector<MX> > &asens) {
 
-    // Number inputs and outputs
-    int num_in = getNumInputs();
-    int num_out = getNumOutputs();
+    if(fseed.empty() && aseed.empty()){
+      // Create the evaluation node
+      res = MX::createMultipleOutput(new EvaluationMX(shared_from_this<FX>(), arg));
+    } else {
+      // Create derivative node
+      createDerivative(arg,res,fseed,fsens,aseed,asens);
+    }
+  }
+
+  void FXInternal::createDerivative(const std::vector<MX> &arg,
+                          std::vector<MX> &res, const std::vector<std::vector<MX> > &fseed,
+                          std::vector<std::vector<MX> > &fsens,
+                          const std::vector<std::vector<MX> > &aseed,
+                          std::vector<std::vector<MX> > &asens) {
 
     // Number of directional derivatives
     int nfdir = fseed.size();
     int nadir = aseed.size();
 
-    // Create the evaluation node
-    MX ev;
-    if(nfdir>0 || nadir>0){
-      // Create derivative function
-      Derivative dfcn(shared_from_this<FX>(),nfdir,nadir);
-      stringstream ss;
-      ss << "der_" << getOption("name") << "_" << nfdir << "_" << nadir;
-      dfcn.setOption("verbose",getOption("verbose"));
-      dfcn.setOption("name",ss.str());
-      dfcn.init();
-    
-      // All inputs
-      vector<MX> darg;
-      darg.reserve(num_in*(1+nfdir) + num_out*nadir);
-      darg.insert(darg.end(),arg.begin(),arg.end());
-    
-      // Forward seeds
-      for(int dir=0; dir<nfdir; ++dir){
-        darg.insert(darg.end(),fseed[dir].begin(),fseed[dir].end());
-      }
-    
-      // Adjoint seeds
-      for(int dir=0; dir<nadir; ++dir){
-        darg.insert(darg.end(),aseed[dir].begin(),aseed[dir].end());
-      }
-    
-      ev.assignNode(new EvaluationMX(dfcn, darg));
-    } else {
-      ev.assignNode(new EvaluationMX(shared_from_this<FX>(), arg));
-    }
+    // Number inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
 
-    // Output index
-    int ind = 0;
+    // Create derivative function
+    Derivative dfcn(shared_from_this<FX>(),nfdir,nadir);
+    stringstream ss;
+    ss << "der_" << getOption("name") << "_" << nfdir << "_" << nadir;
+    dfcn.setOption("verbose",getOption("verbose"));
+    dfcn.setOption("name",ss.str());
+    dfcn.init();
+    
+    // All inputs
+    vector<MX> darg;
+    darg.reserve(num_in*(1+nfdir) + num_out*nadir);
+    darg.insert(darg.end(),arg.begin(),arg.end());
+    
+    // Forward seeds
+    for(int dir=0; dir<nfdir; ++dir){
+      darg.insert(darg.end(),fseed[dir].begin(),fseed[dir].end());
+    }
+    
+    // Adjoint seeds
+    for(int dir=0; dir<nadir; ++dir){
+      darg.insert(darg.end(),aseed[dir].begin(),aseed[dir].end());
+    }
+    
+    // Create the evaluation node
+    vector<MX> x = MX::createMultipleOutput(new EvaluationMX(dfcn, darg));
+    vector<MX>::iterator x_it = x.begin();
 
     // Create the output nodes corresponding to the nondifferented function
     res.resize(num_out);
-    for (int i = 0; i < num_out; ++i, ++ind) {
-      if(!output_given){
-        if(!output(i).empty()){
-          res[i].assignNode(new OutputNode(ev, ind));
-        } else {
-          res[i] = MX();
-        }
-      }
+    for (int i = 0; i < num_out; ++i) {
+      res[i] = *x_it++;
     }
 
     // Forward sensitivities
     fsens.resize(nfdir);
     for(int dir = 0; dir < nfdir; ++dir){
       fsens[dir].resize(num_out);
-      for (int i = 0; i < num_out; ++i, ++ind) {
-        if (!output(i).empty()){
-          fsens[dir][i].assignNode(new OutputNode(ev, ind));
-        } else {
-          fsens[dir][i] = MX();
-        }
+      for (int i = 0; i < num_out; ++i) {
+        fsens[dir][i] = *x_it++;
       }
     }
 
@@ -2031,12 +2029,8 @@ namespace CasADi{
     asens.resize(nadir);
     for (int dir = 0; dir < nadir; ++dir) {
       asens[dir].resize(num_in);
-      for (int i = 0; i < num_in; ++i, ++ind) {
-        if (!input(i).empty()) {
-          asens[dir][i].assignNode(new OutputNode(ev, ind));
-        } else {
-          asens[dir][i] = MX();
-        }
+      for (int i = 0; i < num_in; ++i) {
+        asens[dir][i] = *x_it++;
       }
     }
   }
