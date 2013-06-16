@@ -160,7 +160,7 @@ namespace CasADi{
       const MXPtrV& arg = d<0 ? input : fwdSeed[d];
       MXPtrV& res = d<0 ? output : fwdSens[d];
       MX& x = *arg[0];
-      vector<MX> y = x->getVertsplit(offset_);
+      vector<MX> y = vertsplit(x,offset_);
       for(int i=0; i<nx; ++i){
         if(res[i]!=0){
           *res[i] = y[i];
@@ -183,7 +183,7 @@ namespace CasADi{
             v.push_back(MX::sparse(last_row-first_row,dep().size2()));
           }
         }
-        *adjSens[d][0] += getVertcat(v);
+        *adjSens[d][0] += vertcat(v);
       }
     }
   }
