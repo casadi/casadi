@@ -54,24 +54,17 @@ namespace CasADi{
 
   template<bool Tr>
   void Solve<Tr>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
-  }
-
-  template<bool Tr>
-  void Solve<Tr>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
-  }
-
-  template<bool Tr>
-  template<typename T, typename MatV, typename MatVV>
-  void Solve<Tr>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
-
+    
+    // Factorize the matrix
+    linear_solver_.setInput(*input[1],LINSOL_A);
+    linear_solver_.prepare();
+    
     if(input[0]!=output[0]){
       copy(input[0]->begin(),input[0]->end(),output[0]->begin());
     }
-    casadi_error("not implemented");
+    linear_solver_.solve(getPtr(output[0]->data()),output[0]->size1(),Tr);
 
     // Forward sensitivities
     for(int d=0; d<nfwd; ++d){
@@ -85,7 +78,7 @@ namespace CasADi{
     for(int d=0; d<nadj; ++d){
       casadi_error("not implemented");
       if(adjSeed[d][0]!=adjSens[d][0]){
-        transform(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),adjSens[d][0]->begin(),adjSens[d][0]->begin(),std::plus<T>());
+        transform(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),adjSens[d][0]->begin(),adjSens[d][0]->begin(),std::plus<double>());
         adjSeed[d][0]->setZero();
       }
     }

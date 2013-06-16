@@ -377,9 +377,9 @@ namespace CasADi{
     
   MX MXNode::getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const{
     if(tr){
-      return MX::create(new Solve<true>(r,shared_from_this<MX>(),linear_solver));
+      return MX::create(new Solve<true>(densify(r),shared_from_this<MX>(),linear_solver));
     } else {
-      return MX::create(new Solve<false>(r,shared_from_this<MX>(),linear_solver));
+      return MX::create(new Solve<false>(densify(r),shared_from_this<MX>(),linear_solver));
     }
   }
 
