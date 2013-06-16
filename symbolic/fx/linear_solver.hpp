@@ -75,8 +75,13 @@ enum LinsolOutput{
     /// Solve the system of equations, internal vector
     void solve();
 
+#ifndef SWIG
     /// Solve the factorized system of equations
     void solve(double* x, int nrhs=1, bool transpose=false);
+#endif // SWIG
+
+    /// Create a solve node
+    MX solve(const MX& A, const MX& B, bool transpose=false);
 
     /// Check if prepared
     bool prepared() const;

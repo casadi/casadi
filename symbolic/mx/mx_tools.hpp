@@ -325,12 +325,6 @@ namespace CasADi{
   /** \brief Print compact, introducing new variables for shared subexpressions */
   void printCompact(const MX& ex, std::ostream &stream=std::cout);
 
-  /** \brief  Solve a system of equations: A*x = b 
-   * The solve routine works similar to Matlab's backslash when A is square and nonsingular.
-   * This algorithm is under development.
-   */
-  MX solve(const MX& A, const MX& b, const LinearSolver& linear_solver=LinearSolver());
-
   /** \brief  Solve a nonlinear system of equations: f(z,x0,x1,...) = 0 <=> z = ff(x0,x1,...) 
    */
   MX nl_solve(const std::vector<MX>& x, const ImplicitFunction& implicit_function);

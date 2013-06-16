@@ -114,7 +114,4 @@ namespace CasADi{
   }
  
 } // namespace CasADi
-
-  
-
-
+ 
