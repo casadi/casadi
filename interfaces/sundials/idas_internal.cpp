@@ -1601,7 +1601,7 @@ void IdasInternal::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_
   
   // Solve the (possibly factorized) system 
   casadi_assert_message(linsol_.output().size() == NV_LENGTH_S(zvec),"Assertion error: " << linsol_.output().size() << " == " << NV_LENGTH_S(zvec));
-  linsol_.solve(NV_DATA_S(zvec),1);
+  linsol_.solve(NV_DATA_S(zvec),1,true);
 
   // Log time duration
   time2 = clock();
@@ -1633,7 +1633,7 @@ void IdasInternal::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, 
     cout << endl;
   }
   
-  linsolB_.solve(NV_DATA_S(zvecB),1);
+  linsolB_.solve(NV_DATA_S(zvecB),1,true);
   
   if (monitored("psolveB")) {
     cout << "zvecB sol = " << std::endl;

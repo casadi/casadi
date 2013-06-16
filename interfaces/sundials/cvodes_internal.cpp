@@ -1380,7 +1380,7 @@ void CVodesInternal::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_V
 
   // Solve the (possibly factorized) system 
   casadi_assert(linsol_.output().size() == NV_LENGTH_S(z));
-  linsol_.solve(NV_DATA_S(z),1);
+  linsol_.solve(NV_DATA_S(z),1,true);
   
   // Log time duration
   time2 = clock();
@@ -1398,7 +1398,7 @@ void CVodesInternal::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
 
   // Solve the (possibly factorized) system 
   casadi_assert(linsolB_.output().size() == NV_LENGTH_S(zvecB));
-  linsolB_.solve(NV_DATA_S(zvecB),1);
+  linsolB_.solve(NV_DATA_S(zvecB),1,true);
   
   // Log time duration
   time2 = clock();

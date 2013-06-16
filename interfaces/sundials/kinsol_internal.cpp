@@ -572,7 +572,7 @@ namespace CasADi{
     time1_ = clock();
 
     // Solve the factorized system 
-    linsol_.solve(NV_DATA_S(v));
+    linsol_.solve(NV_DATA_S(v),1,true);
   
     // Log time duration
     time2_ = clock();
