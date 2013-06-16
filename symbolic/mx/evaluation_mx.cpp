@@ -25,7 +25,6 @@
 #include "../stl_vector_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "../fx/derivative.hpp"
 
 using namespace std;
 
@@ -417,93 +416,6 @@ namespace CasADi {
             vector<double> &w = res[oind]->data();
             fill_n(get_bvec_t(w),w.size(),bvec_t(0));
           }
-        }
-      }
-    }
-  }
-
-  void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
-                            std::vector<MX> &res, const std::vector<std::vector<MX> > &fseed,
-                            std::vector<std::vector<MX> > &fsens,
-                            const std::vector<std::vector<MX> > &aseed,
-                            std::vector<std::vector<MX> > &asens, bool output_given) {
-
-    // Number inputs and outputs
-    int num_in = fcn.getNumInputs();
-    int num_out = fcn.getNumOutputs();
-
-    // Number of directional derivatives
-    int nfdir = fseed.size();
-    int nadir = aseed.size();
-
-    // Create the evaluation node
-    MX ev;
-    if(nfdir>0 || nadir>0){
-      // Create derivative function
-      Derivative dfcn(fcn,nfdir,nadir);
-      stringstream ss;
-      ss << "der_" << fcn.getOption("name") << "_" << nfdir << "_" << nadir;
-      dfcn.setOption("verbose",fcn.getOption("verbose"));
-      dfcn.setOption("name",ss.str());
-      dfcn.init();
-    
-      // All inputs
-      vector<MX> darg;
-      darg.reserve(num_in*(1+nfdir) + num_out*nadir);
-      darg.insert(darg.end(),arg.begin(),arg.end());
-    
-      // Forward seeds
-      for(int dir=0; dir<nfdir; ++dir){
-        darg.insert(darg.end(),fseed[dir].begin(),fseed[dir].end());
-      }
-    
-      // Adjoint seeds
-      for(int dir=0; dir<nadir; ++dir){
-        darg.insert(darg.end(),aseed[dir].begin(),aseed[dir].end());
-      }
-    
-      ev.assignNode(new EvaluationMX(dfcn, darg));
-    } else {
-      ev.assignNode(new EvaluationMX(fcn, arg));
-    }
-
-    // Output index
-    int ind = 0;
-
-    // Create the output nodes corresponding to the nondifferented function
-    res.resize(num_out);
-    for (int i = 0; i < num_out; ++i, ++ind) {
-      if(!output_given){
-        if(!fcn.output(i).empty()){
-          res[i].assignNode(new OutputNode(ev, ind));
-        } else {
-          res[i] = MX();
-        }
-      }
-    }
-
-    // Forward sensitivities
-    fsens.resize(nfdir);
-    for(int dir = 0; dir < nfdir; ++dir){
-      fsens[dir].resize(num_out);
-      for (int i = 0; i < num_out; ++i, ++ind) {
-        if (!fcn.output(i).empty()){
-          fsens[dir][i].assignNode(new OutputNode(ev, ind));
-        } else {
-          fsens[dir][i] = MX();
-        }
-      }
-    }
-
-    // Adjoint sensitivities
-    asens.resize(nadir);
-    for (int dir = 0; dir < nadir; ++dir) {
-      asens[dir].resize(num_in);
-      for (int i = 0; i < num_in; ++i, ++ind) {
-        if (!fcn.input(i).empty()) {
-          asens[dir][i].assignNode(new OutputNode(ev, ind));
-        } else {
-          asens[dir][i] = MX();
         }
       }
     }

@@ -96,6 +96,12 @@ namespace CasADi{
     virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                               const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
                               const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
+
+    /** \brief  Create function call node */
+    virtual void createCall(const std::vector<MX> &arg, std::vector<MX> &res, 
+                            const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
+                            const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens,
+                            bool output_given=false);
     
     /** \brief Call a function, MX type (overloaded) */
     void call(const MXVector& arg, MXVector& res, 
