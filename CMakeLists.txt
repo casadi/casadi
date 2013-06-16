@@ -73,7 +73,7 @@ option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" 
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
-option(WITH_WORHP "Compile the WORHP interface" ON) 
+option(WITH_WORHP "Compile the WORHP interface" OFF) 
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
 option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
