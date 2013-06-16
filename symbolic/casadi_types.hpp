@@ -40,6 +40,8 @@ namespace CasADi{
   typedef LPStructIOSchemeVector<CRSSparsity> LPStructure;
   template<class T> class QPStructIOSchemeVector;
   typedef QPStructIOSchemeVector<CRSSparsity> QPStructure;
+  template<class T> class QCQPStructIOSchemeVector;
+  typedef QCQPStructIOSchemeVector<CRSSparsity> QCQPStructure;
   template<class T> class SDPStructIOSchemeVector;
   typedef SDPStructIOSchemeVector<CRSSparsity> SDPStructure;
   template<class T> class SOCPStructIOSchemeVector;
@@ -48,6 +50,7 @@ namespace CasADi{
   class LinearSolver;
   class Integrator;
   class QPSolver;
+  class QCQPSolver;
   class LPSolver;
   class SDPSolver;
   class SOCPSolver;
@@ -68,10 +71,13 @@ namespace CasADi{
   /// Function pointer to a QP solver creator function
   typedef QPSolver (*QPSolverCreator)(const QPStructure& st);
 
+  /// Function pointer to a QCQP solver creator function
+  typedef QCQPSolver (*QCQPSolverCreator)(const QCQPStructure& st);
+
   /// Function pointer to an SDP solver creator function
   typedef SDPSolver (*SDPSolverCreator)(const SDPStructure& st);
 
-  /// Function pointer to an SDP solver creator function
+  /// Function pointer to an SOCP solver creator function
   typedef SOCPSolver (*SOCPSolverCreator)(const SOCPStructure& st);
   
   /// Function pointer to an implicit function creator

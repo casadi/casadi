@@ -33,6 +33,7 @@ from matrix import *
 from qpsolver import *
 from sdp import *
 from misc import *
+from qcqpsolver import *
 from fx import *
 from lpsolver import *
 from tools import *

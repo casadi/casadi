@@ -71,6 +71,9 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_MayerInput: return "MayerInput";
     case SCHEME_OCPInput: return "OCPInput";
     case SCHEME_OCPOutput: return "OCPOutput";
+    case SCHEME_QCQPSolverInput: return "QCQPSolverInput";
+    case SCHEME_QCQPSolverOutput: return "QCQPSolverOutput";
+    case SCHEME_QCQPStruct: return "QCQPStruct";
     case SCHEME_QPSolverInput: return "QPSolverInput";
     case SCHEME_QPSolverOutput: return "QPSolverOutput";
     case SCHEME_QPStruct: return "QPStruct";
@@ -112,6 +115,9 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_MayerInput: return "x, p";
     case SCHEME_OCPInput: return "lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg";
     case SCHEME_OCPOutput: return "x_opt, u_opt, p_opt, cost";
+    case SCHEME_QCQPSolverInput: return "h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0";
+    case SCHEME_QCQPSolverOutput: return "x, cost, lam_a, lam_x";
+    case SCHEME_QCQPStruct: return "h, p, a";
     case SCHEME_QPSolverInput: return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0";
     case SCHEME_QPSolverOutput: return "x, cost, lam_a, lam_x";
     case SCHEME_QPStruct: return "h, a";
@@ -310,6 +316,31 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==1) return "u_opt";
       if(i==2) return "p_opt";
       if(i==3) return "cost";
+      break;
+    case SCHEME_QCQPSolverInput: 
+      if(i==0) return "h";
+      if(i==1) return "g";
+      if(i==2) return "p";
+      if(i==3) return "q";
+      if(i==4) return "r";
+      if(i==5) return "a";
+      if(i==6) return "lba";
+      if(i==7) return "uba";
+      if(i==8) return "lbx";
+      if(i==9) return "ubx";
+      if(i==10) return "x0";
+      if(i==11) return "lam_x0";
+      break;
+    case SCHEME_QCQPSolverOutput: 
+      if(i==0) return "x";
+      if(i==1) return "cost";
+      if(i==2) return "lam_a";
+      if(i==3) return "lam_x";
+      break;
+    case SCHEME_QCQPStruct: 
+      if(i==0) return "h";
+      if(i==1) return "p";
+      if(i==2) return "a";
       break;
     case SCHEME_QPSolverInput: 
       if(i==0) return "h";
@@ -569,6 +600,31 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==2) return "Optimal parameters";
       if(i==3) return "Objective/cost function for optimal solution (1 x 1)";
       break;
+    case SCHEME_QCQPSolverInput: 
+      if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
+      if(i==1) return "The vector g: dense,  (n x 1)";
+      if(i==2) return "The vertical stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
+      if(i==3) return "The vertical stack of all qi: dense,  (nq n x 1)";
+      if(i==4) return "The vertical stack of all scalars ri (nq x 1) ";
+      if(i==5) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
+      if(i==6) return "dense, (nc x 1)";
+      if(i==7) return "dense, (nc x 1)";
+      if(i==8) return "dense, (n x 1)";
+      if(i==9) return "dense, (n x 1)";
+      if(i==10) return "dense, (n x 1)";
+      if(i==11) return "dense";
+      break;
+    case SCHEME_QCQPSolverOutput: 
+      if(i==0) return "The primal solution";
+      if(i==1) return "The optimal cost";
+      if(i==2) return "The dual solution corresponding to linear bounds";
+      if(i==3) return "The dual solution corresponding to simple bounds";
+      break;
+    case SCHEME_QCQPStruct: 
+      if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
+      if(i==1) return "The vertical stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
+      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
+      break;
     case SCHEME_QPSolverInput: 
       if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
       if(i==1) return "The vector g: dense,  (n x 1)";
@@ -827,6 +883,31 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==2) return "OCP_P_OPT";
       if(i==3) return "OCP_COST";
       break;
+    case SCHEME_QCQPSolverInput: 
+      if(i==0) return "QCQP_SOLVER_H";
+      if(i==1) return "QCQP_SOLVER_G";
+      if(i==2) return "QCQP_SOLVER_P";
+      if(i==3) return "QCQP_SOLVER_Q";
+      if(i==4) return "QCQP_SOLVER_R";
+      if(i==5) return "QCQP_SOLVER_A";
+      if(i==6) return "QCQP_SOLVER_LBA";
+      if(i==7) return "QCQP_SOLVER_UBA";
+      if(i==8) return "QCQP_SOLVER_LBX";
+      if(i==9) return "QCQP_SOLVER_UBX";
+      if(i==10) return "QCQP_SOLVER_X0";
+      if(i==11) return "QCQP_SOLVER_LAM_X0";
+      break;
+    case SCHEME_QCQPSolverOutput: 
+      if(i==0) return "QCQP_SOLVER_X";
+      if(i==1) return "QCQP_SOLVER_COST";
+      if(i==2) return "QCQP_SOLVER_LAM_A";
+      if(i==3) return "QCQP_SOLVER_LAM_X";
+      break;
+    case SCHEME_QCQPStruct: 
+      if(i==0) return "QCQP_STRUCT_H";
+      if(i==1) return "QCQP_STRUCT_P";
+      if(i==2) return "QCQP_STRUCT_A";
+      break;
     case SCHEME_QPSolverInput: 
       if(i==0) return "QP_SOLVER_H";
       if(i==1) return "QP_SOLVER_G";
@@ -980,6 +1061,15 @@ int getSchemeSize(InputOutputScheme scheme) {
       break;
     case SCHEME_OCPOutput: 
       return 4;
+      break;
+    case SCHEME_QCQPSolverInput: 
+      return 12;
+      break;
+    case SCHEME_QCQPSolverOutput: 
+      return 4;
+      break;
+    case SCHEME_QCQPStruct: 
+      return 3;
       break;
     case SCHEME_QPSolverInput: 
       return 9;
@@ -1197,6 +1287,31 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="u_opt") return 1;
       if(name=="p_opt") return 2;
       if(name=="cost") return 3;
+      break;
+    case SCHEME_QCQPSolverInput: 
+      if(name=="h") return 0;
+      if(name=="g") return 1;
+      if(name=="p") return 2;
+      if(name=="q") return 3;
+      if(name=="r") return 4;
+      if(name=="a") return 5;
+      if(name=="lba") return 6;
+      if(name=="uba") return 7;
+      if(name=="lbx") return 8;
+      if(name=="ubx") return 9;
+      if(name=="x0") return 10;
+      if(name=="lam_x0") return 11;
+      break;
+    case SCHEME_QCQPSolverOutput: 
+      if(name=="x") return 0;
+      if(name=="cost") return 1;
+      if(name=="lam_a") return 2;
+      if(name=="lam_x") return 3;
+      break;
+    case SCHEME_QCQPStruct: 
+      if(name=="h") return 0;
+      if(name=="p") return 1;
+      if(name=="a") return 2;
       break;
     case SCHEME_QPSolverInput: 
       if(name=="h") return 0;

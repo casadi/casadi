@@ -102,8 +102,8 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   std::copy(input(QP_SOLVER_UBX).data().begin(),input(QP_SOLVER_UBX).data().end(),ubX_.begin());
   
   // Copy the constraint bounds
-  std::copy(input(QP_SOLVER_LBA).data().begin(),input(QP_SOLVER_LBA).data().end(),lbX_.begin()+nx_);
-  std::copy(input(QP_SOLVER_UBA).data().begin(),input(QP_SOLVER_UBA).data().end(),ubX_.begin()+nx_);
+  std::copy(input(QP_SOLVER_LBA).data().begin(),input(QP_SOLVER_LBA).data().end(),lbX_.begin()+n_);
+  std::copy(input(QP_SOLVER_UBA).data().begin(),input(QP_SOLVER_UBA).data().end(),ubX_.begin()+n_);
   
   // Infinities on LBX & UBX are set to zero (required for OOQp)
   // Set ixlow & ixupp: they have to be zero for infinite bounds and 1 otherwise
@@ -150,7 +150,7 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   }
 
   // Set up a Sparse solver; the decision space is [x,s]; there are no inequalities
-  qp_ = new QpGenSparseMa27( nx_ + nc_, nc_, 0, H_.size() , G_.size(), A_.size() );
+  qp_ = new QpGenSparseMa27( n_ + nc_, nc_, 0, H_.size() , G_.size(), A_.size() );
   
   std::vector<int> rowind_empty_(1,0);
   
@@ -171,7 +171,7 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   resid_ = (QpGenResiduals *) qp_->makeResiduals( prob_ );
   
   // Temporary vector
-  temp_.resize(nx_+nc_,0);
+  temp_.resize(n_+nc_,0);
   
   // Just calling s_->solve repeatedly on a GondzioSolver is a memory leak
   // So we must always allocate a fresh solver
@@ -185,7 +185,7 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
     
   // Get primal solution
   vars_->x->copyIntoArray(getPtr(temp_));
-  std::copy(temp_.begin(),temp_.begin()+nx_,output(QP_SOLVER_X).begin());
+  std::copy(temp_.begin(),temp_.begin()+n_,output(QP_SOLVER_X).begin());
 
   // Get multipliers for the bounds
 //  vector<double> &lam_x = output(QP_SOLVER_LAM_X).data();
@@ -197,19 +197,19 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   // Lower bounds
   if (vars_->gamma->length() > 0) {
     vars_->gamma->copyIntoArray(getPtr(temp_));
-    for (int k=0;k<nx_;++k) 
+    for (int k=0;k<n_;++k) 
       output(QP_SOLVER_LAM_X).data()[k] = -temp_[k];
     for (int k=0;k<nc_;++k) 
-      output(QP_SOLVER_LAM_A).data()[k] = -temp_[nx_+k];
+      output(QP_SOLVER_LAM_A).data()[k] = -temp_[n_+k];
   }
 
   // Upper bounds
   if (vars_->phi->length() > 0) {
     vars_->phi->copyIntoArray(getPtr(temp_));
-    for (int k=0;k<nx_;++k)
+    for (int k=0;k<n_;++k)
       output(QP_SOLVER_LAM_X).data()[k] += temp_[k];
     for (int k=0;k<nc_;++k) 
-      output(QP_SOLVER_LAM_A).data()[k] += temp_[nx_+k];
+      output(QP_SOLVER_LAM_A).data()[k] += temp_[n_+k];
   }
   
   if(flag!=SUCCESSFUL_TERMINATION) ooqp_error("Solve",flag);
@@ -237,25 +237,25 @@ void OOQPInternal::init(){
   // Reformulation of H
   std::vector<DMatrix> H_trans;
   H_trans.push_back(DMatrix(lowerSparsity(input(QP_SOLVER_H).sparsity())));
-  H_trans.push_back(DMatrix(nx_,nc_));
+  H_trans.push_back(DMatrix(n_,nc_));
   
   H_ = horzcat(H_trans);
   H_trans.clear();
   H_trans.push_back(H_);
-  H_trans.push_back(DMatrix(nc_,nx_+nc_));
+  H_trans.push_back(DMatrix(nc_,n_+nc_));
   
   H_ = vertcat(H_trans);
   
   // Allocate vectors to hold indicators of infinite variable bounds
-  ixlow_.resize(nx_+nc_,0);
-  ixupp_.resize(nx_+nc_,0);
+  ixlow_.resize(n_+nc_,0);
+  ixupp_.resize(n_+nc_,0);
   
   // Copy the decision variables bounds
-  lbX_.resize(nx_+nc_,0);
-  ubX_.resize(nx_+nc_,0);
+  lbX_.resize(n_+nc_,0);
+  ubX_.resize(n_+nc_,0);
   
   // The b vector of the transformation matrix is identcially zero
-  b_.resize(nx_+nc_,0);
+  b_.resize(n_+nc_,0);
   
   gOoqpPrintLevel = getOption("print_level");
 }

@@ -20,14 +20,42 @@
  *
  */
 
-%{
-#include "convex_programming/qp_lp_solver.hpp"
-#include "convex_programming/qcqp_qp_solver.hpp"
-#include "convex_programming/socp_qcqp_solver.hpp"
-#include "convex_programming/sdp_socp_solver.hpp"
-%}
+#ifndef SOCP_QCQP_INTERNAL_HPP
+#define SOCP_QCQP_INTERNAL_HPP
 
-%include "convex_programming/qp_lp_solver.hpp"
-%include "convex_programming/qcqp_qp_solver.hpp"
-%include "convex_programming/socp_qcqp_solver.hpp"
-%include "convex_programming/sdp_socp_solver.hpp"
+#include "symbolic/fx/qcqp_solver_internal.hpp"
+#include "symbolic/fx/socp_solver.hpp"
+
+namespace CasADi{
+
+  /** \brief Internal class for SOCPQCQPInternal
+   * 
+      @copydoc QCQPSolver_doc
+   * */
+class SOCPQCQPInternal : public QCQPSolverInternal {
+  friend class SOCPQCQPSolver;
+public:
+
+  /** \brief  Clone */
+  virtual SOCPQCQPInternal* clone() const;
+  
+  /** \brief  Create a new Solver */
+  explicit SOCPQCQPInternal(const std::vector<CRSSparsity> &st);
+
+  /** \brief  Destructor */
+  virtual ~SOCPQCQPInternal();
+
+  /** \brief  Initialize */
+  virtual void init();
+  
+  virtual void evaluate(int nfdir, int nadir);
+  
+  protected:
+    SOCPSolver socpsolver_;
+
+};
+
+} // namespace CasADi
+
+#endif //SOCP_QCQP_INTERNAL_HPP
+

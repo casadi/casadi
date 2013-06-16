@@ -80,7 +80,7 @@ void NLPQPInternal::init(){
   QPSolverInternal::init();
 
   // Create a symbolic matrix for the decision variables
-  SXMatrix X = ssym("X",nx_,1);
+  SXMatrix X = ssym("X",n_,1);
 
   // Parameters to the problem
   SXMatrix H = ssym("H",input(QP_SOLVER_H).sparsity());

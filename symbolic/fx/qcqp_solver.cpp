@@ -20,14 +20,33 @@
  *
  */
 
-%{
-#include "convex_programming/qp_lp_solver.hpp"
-#include "convex_programming/qcqp_qp_solver.hpp"
-#include "convex_programming/socp_qcqp_solver.hpp"
-#include "convex_programming/sdp_socp_solver.hpp"
-%}
+#include "qcqp_solver_internal.hpp"
 
-%include "convex_programming/qp_lp_solver.hpp"
-%include "convex_programming/qcqp_qp_solver.hpp"
-%include "convex_programming/socp_qcqp_solver.hpp"
-%include "convex_programming/sdp_socp_solver.hpp"
+using namespace std;
+namespace CasADi{
+
+
+QCQPSolver::QCQPSolver() {
+}
+
+QCQPSolverInternal* QCQPSolver::operator->(){
+  return static_cast<QCQPSolverInternal*>(FX::operator->());
+}
+
+const QCQPSolverInternal* QCQPSolver::operator->() const{
+    return static_cast<const QCQPSolverInternal*>(FX::operator->());
+}
+
+bool QCQPSolver::checkNode() const{
+  return dynamic_cast<const QCQPSolverInternal*>(get())!=0;
+}
+
+void QCQPSolver::setQPOptions() {
+  (*this)->setQPOptions();
+}
+
+} // namespace CasADi
+
+  
+
+
