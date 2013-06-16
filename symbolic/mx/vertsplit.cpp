@@ -32,10 +32,15 @@ using namespace std;
 
 namespace CasADi{
 
-  Vertsplit::Vertsplit(const MX& x, const std::vector<int>& output_offset) : output_offset_(output_offset){
+  Vertsplit::Vertsplit(const MX& x, const std::vector<int>& offset) : offset_(offset){
     setDependencies(x);
     setSparsity(CRSSparsity(1, 1, true));
     
+    // Add trailing elemement if needed
+    if(offset_.back()!=x.size1()){
+      offset_.push_back(x.size1());
+    }
+
     // Get the sparsity of the input
     const vector<int>& rowind_x = x.sparsity().rowind();
     const vector<int>& col_x = x.sparsity().col();
@@ -45,12 +50,12 @@ namespace CasADi{
     int nrow, ncol = x.size2();
 
     // Get the sparsity patterns of the outputs
-    int nx = output_offset_.size()-1;
+    int nx = offset_.size()-1;
     output_sparsity_.clear();
     output_sparsity_.reserve(nx);
     for(int i=0; i<nx; ++i){
-      int first_row = output_offset_[i];
-      int last_row = output_offset_[i+1];
+      int first_row = offset_[i];
+      int last_row = offset_[i+1];
       nrow = last_row - first_row;
 
       // Construct the sparsity pattern
@@ -84,7 +89,7 @@ namespace CasADi{
     // Number of derivatives
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
-    int nx = output_offset_.size()-1;
+    int nx = offset_.size()-1;
     const vector<int>& x_rowind = dep().sparsity().rowind();
 
     // Nondifferentiated outputs and forward sensitivities
@@ -92,8 +97,8 @@ namespace CasADi{
       const MatV& arg = d<0 ? input : fwdSeed[d];
       MatV& res = d<0 ? output : fwdSens[d];
       for(int i=0; i<nx; ++i){
-        int nz_first = x_rowind[output_offset_[i]];
-        int nz_last = x_rowind[output_offset_[i+1]];
+        int nz_first = x_rowind[offset_[i]];
+        int nz_last = x_rowind[offset_[i+1]];
         if(res[i]!=0){
           copy(arg[0]->begin()+nz_first, arg[0]->begin()+nz_last, res[i]->begin());
         }
@@ -104,8 +109,8 @@ namespace CasADi{
     for(int d=0; d<nadj; ++d){
       typename vector<T>::iterator asens_it = adjSens[d][0]->begin();
       for(int i=0; i<nx; ++i){
-        int nz_first = x_rowind[output_offset_[i]];
-        int nz_last = x_rowind[output_offset_[i+1]];
+        int nz_first = x_rowind[offset_[i]];
+        int nz_last = x_rowind[offset_[i+1]];
 
         if(adjSeed[d][i]!=0){
           vector<T>& aseed_i = adjSeed[d][i]->data();
@@ -117,11 +122,11 @@ namespace CasADi{
   }
 
   void Vertsplit::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-    int nx = output_offset_.size()-1;
+    int nx = offset_.size()-1;
     const vector<int>& x_rowind = dep().sparsity().rowind();
     for(int i=0; i<nx; ++i){
       if(output[i]!=0){
-        bvec_t *arg_ptr = get_bvec_t(input[0]->data()) + x_rowind[output_offset_[i]];
+        bvec_t *arg_ptr = get_bvec_t(input[0]->data()) + x_rowind[offset_[i]];
         vector<double>& res_i = output[i]->data();
         bvec_t *res_i_ptr = get_bvec_t(res_i);
         for(int k=0; k<res_i.size(); ++k){
@@ -147,15 +152,15 @@ namespace CasADi{
   void Vertsplit::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
-    int nx = output_offset_.size()-1;
+    int nx = offset_.size()-1;
     
-    // Nondifferentiated function and forward sensitivities
+    // Non-differentiated output and forward sensitivities
     int first_d = output_given ? 0 : -1;
     for(int d=first_d; d<nfwd; ++d){
       const MXPtrV& arg = d<0 ? input : fwdSeed[d];
       MXPtrV& res = d<0 ? output : fwdSens[d];
       MX& x = *arg[0];
-      vector<MX> y = x->getVertsplit(output_offset_);
+      vector<MX> y = x->getVertsplit(offset_);
       for(int i=0; i<nx; ++i){
         if(res[i]!=0){
           *res[i] = y[i];
@@ -173,8 +178,8 @@ namespace CasADi{
             v.push_back(*x_i);
             *x_i = MX();
           } else {
-            int first_row = output_offset_[i];
-            int last_row = output_offset_[i+1];
+            int first_row = offset_[i];
+            int last_row = offset_[i+1];
             v.push_back(MX::sparse(last_row-first_row,dep().size2()));
           }
         }
@@ -187,8 +192,8 @@ namespace CasADi{
     int nx = res.size();
     const vector<int>& x_rowind = dep().sparsity().rowind();
     for(int i=0; i<nx; ++i){
-      int nz_first = x_rowind[output_offset_[i]];
-      int nz_last = x_rowind[output_offset_[i+1]];
+      int nz_first = x_rowind[offset_[i]];
+      int nz_last = x_rowind[offset_[i+1]];
       int nz = nz_last-nz_first;
       if(res.at(i).compare("0")!=0){
         stream << "  for(i=0; i<" << nz << "; ++i) " << res.at(i) << "[i] = " << arg.at(0) << "[i+" << nz_first << "];" << endl;

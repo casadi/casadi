@@ -36,7 +36,7 @@ namespace CasADi{
   public:
 
     /// Constructor
-    Vertsplit(const MX& x, const std::vector<int>& output_offset);
+    Vertsplit(const MX& x, const std::vector<int>& offset);
 
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const{ return output_sparsity_.size(); }
@@ -76,7 +76,7 @@ namespace CasADi{
     virtual int getOp() const{ return OP_VERTSPLIT;}
     
     // Sparsity pattern of the outputs
-    std::vector<int> output_offset_;
+    std::vector<int> offset_;
     std::vector<CRSSparsity> output_sparsity_;
   };
 
