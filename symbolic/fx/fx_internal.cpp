@@ -1424,6 +1424,68 @@ namespace CasADi{
     }
   }
 
+  void FXInternal::spEvaluateViaJacSparsity(bool fwd){
+    if(fwd) {
+      // Clear the outputs
+      for(int oind = 0; oind < getNumOutputs(); ++oind) {
+        // Get data array for output and clear it
+        bvec_t *outputd = get_bvec_t(output(oind).data());
+        fill_n(outputd, output(oind).size(), 0);
+      }
+    }
+
+    // Loop over inputs
+    for(int iind = 0; iind < getNumInputs(); ++iind) {
+      // Skip if no seeds
+      if(fwd && input(iind).empty())
+        continue;
+      
+      // Get data array for input
+      bvec_t *inputd = get_bvec_t(input(iind).data());
+      
+      // Loop over outputs
+      for (int oind = 0; oind < getNumOutputs(); ++oind) {
+
+        // Skip if no seeds
+        if (!fwd && output(oind).empty())
+          continue;
+        
+        // Get the sparsity of the Jacobian block
+        CRSSparsity& sp = jacSparsity(iind, oind, true, false);
+        if (sp.isNull() || sp.size() == 0)
+          continue; // Skip if zero
+        const int d1 = sp.size1();
+        //const int d2 = sp.size2();
+        const vector<int>& rowind = sp.rowind();
+        const vector<int>& col = sp.col();
+
+        // Get data array for output
+        bvec_t *outputd = get_bvec_t(output(oind).data());
+
+        // Carry out the sparse matrix-vector multiplication
+        for (int i = 0; i < d1; ++i) {
+          for (int el = rowind[i]; el < rowind[i + 1]; ++el) {
+            // Get column
+            int j = col[el];
+            
+            // Propagate dependencies
+            if (fwd) {
+              outputd[i] |= inputd[j];
+            } else {
+              inputd[j] |= outputd[i];
+            }
+          }
+        }
+      }
+    }
+    if(!fwd){
+      for(int oind=0; oind < getNumOutputs(); ++oind){
+        vector<double> &w = output(oind).data();
+        fill_n(get_bvec_t(w),w.size(),bvec_t(0));
+      }
+    }
+  }
+
   FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
     // Return value
     FX ret;
