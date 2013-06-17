@@ -303,9 +303,6 @@ namespace CasADi{
     /// Solve a system of linear equations
     virtual MX getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const;
 
-    /// Solve a system of nonlinear equations
-    static MX getNonlinearSolve(const std::vector<MX>& x, const ImplicitFunction& implicit_function);
-
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
 

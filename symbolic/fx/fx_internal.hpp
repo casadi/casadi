@@ -109,6 +109,9 @@ namespace CasADi{
     virtual void createCallDerivative(const std::vector<MX> &arg, std::vector<MX> &res, 
                                       const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
                                       const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens, bool cached);
+
+    /** \brief  Create a call to this */
+    std::vector<MX> callSelf(const std::vector<MX> &arg);
     
     /** \brief Call a function, MX type (overloaded) */
     void call(const MXVector& arg, MXVector& res, 

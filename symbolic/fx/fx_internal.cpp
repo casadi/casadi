@@ -2030,11 +2030,15 @@ namespace CasADi{
 
     if(fseed.empty() && aseed.empty()){
       // Create the evaluation node
-      res = MX::createMultipleOutput(new CallFX(shared_from_this<FX>(), arg));
+      res = callSelf(arg);
     } else {
       // Create derivative node
       createCallDerivative(arg,res,fseed,fsens,aseed,asens,false);
     }
+  }
+
+  std::vector<MX> FXInternal::callSelf(const std::vector<MX> &arg){
+    return MX::createMultipleOutput(new CallFX(shared_from_this<FX>(), arg));
   }
 
   void FXInternal::createCallDerivative(const std::vector<MX>& arg, std::vector<MX>& res, 

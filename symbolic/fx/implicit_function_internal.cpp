@@ -21,6 +21,7 @@
  */
 
 #include "implicit_function_internal.hpp"
+#include "../mx/mx_node.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -204,6 +205,79 @@ namespace CasADi{
       }
     }
   }
+
+  void ImplicitFunctionInternal::evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given){
+    if(!output_given){
+      *res[0] = callSelf(MXNode::getVector(arg)).front();
+    }
+
+    // Quick return if no derivatives
+    int nfwd = fsens.size();
+    int nadj = aseed.size();
+    if(nfwd==0 && nadj==0) return;
+
+    // Nonlinear function
+    FX& f = f_;
+
+    // Arguments when calling f
+    vector<MX> v = MXNode::getVector(arg);
+    v.insert(v.begin(),*res[0]);    
+
+    // Get an expression for the Jacobian
+    FX& J_fcn = jac_;
+    MX J = J_fcn.call(v).front();
+
+    // Get the linear solver
+    LinearSolver& linsol = linsol_;
+
+    // Directional derivatives of f
+    FX der = f.derivative(nfwd,nadj);
+
+    // Forward sensitivities, collect arguments for calling der
+    if(nfwd>0){
+      MX z_seed = MX::zeros(node->sparsity());
+      for(int d=0; d<nfwd; ++d){
+        v.push_back(z_seed);
+        vector<MX> x_seed = MXNode::getVector(fseed[d]);
+        v.insert(v.end(),x_seed.begin(),x_seed.end());
+      }
+    }
+
+    // Adjoint sensitivities, collect arguments for calling der
+    if(nadj>0){
+      // collect the right hand sides
+      for(int d=0; d<nadj; ++d){
+        casadi_error("not implemented");
+      }
+
+      // Solve transposed ...
+
+      // Save to arg
+    }
+      
+    // Propagate through the implicit function
+    vector<MX> r = der.call(v);
+
+    if(nfwd>0){
+      // collect the right hand sides ..
+      for(int d=0; d<nfwd; ++d){
+      }
+
+      // Solve ...
+
+      // Save to fsens
+      for(int d=0; d<nfwd; ++d){
+      }
+    }
+
+    for(int d=0; d<nadj; ++d){
+      // Save to asens
+    }
+
+    // ... To be continued      
+    casadi_error("not implemented");
+  }
+
  
 } // namespace CasADi
 
