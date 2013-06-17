@@ -22,7 +22,7 @@
 #! Linear solvers
 #! =================
 #!
-#! We demonstrate solving a dense system A.x=b by using different linear solvers.
+#! We demonstrate solving a dense system x.A=b by using different linear solvers.
 #!
 from casadi import *
 from numpy import *
@@ -31,27 +31,30 @@ import time
 n=100
 #$ We generate $A \in \mathbf{R}^{n \times n}$, $x \in \mathbf{R}^{n}$ with $n=100$
 A=DMatrix([[cos(i*j)-sin(i) for i in range(n)] for j in range(n)])
-x=DMatrix([tan(i) for i in range(n)])
+x=DMatrix([tan(i) for i in range(n)]).T
 
 #! We generate the b vector:
-b=mul(A,x)
+b=mul(x,A)
 
 #! We demonstrate the LinearSolver API with CSparse:
 s = CSparse(A.sparsity())
 s.init()
 
 #! Give it the matrix A
-s.setInput(A,0)
+s.setInput(A,"A")
 #! Do the LU factorization
 s.prepare()
 
 #! Give it the matrix b
-s.setInput(b,1)
+s.setInput(b,"B")
+
+#! Transpose A
+s.setInput(False,"T")
 
 #! And we are off to find x...
 s.solve()
 
-x_ = s.getOutput()
+x_ = s.getOutput("X")
 
 #! By looking at the residuals between the x we knew in advance and the computed x, we see that the CSparse solver works
 print "Sum of residuals = %.2e" % sumAll(fabs(x-x_))
@@ -62,21 +65,21 @@ for name, solver in [("LapackLUDense",LapackLUDense),("LapackQRDense",LapackQRDe
   s = solver(A.sparsity()) # We create a solver
   s.init()
 
-  s.setInput(A,0) # Give it the matrix A
+  s.setInput(A,"A") # Give it the matrix A
   
   t0 = time.time()
   for i in range(100):
     s.prepare()        # Do the LU factorization
   pt = (time.time()-t0)/100
 
-  s.setInput(b,1)  # Give it the matrix b
+  s.setInput(b,"B")  # Give it the matrix b
 
   t0 = time.time()
   for i in range(100):
     s.solve()
   st = (time.time()-t0)/100
   
-  x_ = s.getOutput()
+  x_ = s.getOutput("X")
 
   print ""
   print name
