@@ -199,66 +199,46 @@ namespace CasADi {
     }
   }
 
-  void EvaluationMX::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given) {
-  
-    // Number of sensitivity directions
-    int nfdir = fsens.size();
-    casadi_assert(nfdir==0 || fcn_.spCanEvaluate(true));
-    int nadir = aseed.size();
-    casadi_assert(nadir==0 || fcn_.spCanEvaluate(false));
+  void EvaluationMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given) {
+    // Collect inputs and seeds
+    vector<MX> arg = getVector(input);
+    vector<vector<MX> > fseed = getVector(fwdSeed);
+    vector<vector<MX> > aseed = getVector(adjSeed);
 
-    // Get/generate the derivative function
-    FX d = fcn_.derivative(nfdir, nadir);
-
-    // Temporary
-    vector<MX> tmp;
-
-    // Assemble inputs
-    vector<MX> d_arg;
-    d_arg.reserve(d.getNumInputs());
-
-    // Nondifferentiated inputs
-    tmp = getVector(arg);
-    d_arg.insert(d_arg.end(), tmp.begin(), tmp.end());
-    for (MXPtrVV::const_iterator i = fseed.begin(); i != fseed.end(); ++i) {
-      tmp = getVector(*i);
-      d_arg.insert(d_arg.end(), tmp.begin(), tmp.end());
-    }
-    for (MXPtrVV::const_iterator i = aseed.begin(); i != aseed.end(); ++i) {
-      tmp = getVector(*i);
-      d_arg.insert(d_arg.end(), tmp.begin(), tmp.end());
-      for (MXPtrV::const_iterator j = i->begin(); j != i->end(); ++j){
-        if(*j!=0) **j = MX();
-      }
-    }
+    // Free adjoint seeds
+    clearVector(adjSeed);
 
     // Evaluate symbolically
-    vector<MX> d_res = d.call(d_arg);
-    vector<MX>::const_iterator d_res_it = d_res.begin();
+    vector<MX> res;
+    vector<vector<MX> > fsens, asens;
+    fcn_->createCallDerivative(arg,res,fseed,fsens,aseed,asens,true);
 
-    // Collect the nondifferentiated results
-    for (MXPtrV::iterator i = res.begin(); i != res.end(); ++i, ++d_res_it) {
-      if (!output_given && *i) **i = *d_res_it;
-    }
-
-    // Collect the forward sensitivities
-    for (MXPtrVV::iterator j = fsens.begin(); j != fsens.end(); ++j) {
-      for (MXPtrV::iterator i = j->begin(); i != j->end(); ++i, ++d_res_it) {
-        if (*i) **i = *d_res_it;
-      }
-    }
-
-    // Collect the adjoint sensitivities
-    for (MXPtrVV::iterator j = asens.begin(); j != asens.end(); ++j) {
-      for (MXPtrV::iterator i = j->begin(); i != j->end(); ++i, ++d_res_it) {
-        if(*i && !d_res_it->isNull()){
-          **i += *d_res_it;
+    // Store the non-differentiated results
+    if(!output_given){
+      for(int i=0; i<res.size(); ++i){
+        if(output[i]!=0){
+          *output[i] = res[i];
         }
       }
     }
 
-    // Make sure that we've got to the end of the outputs
-    casadi_assert(d_res_it==d_res.end());
+    // Store the forward sensitivities
+    for(int d=0; d<fwdSens.size(); ++d){
+      for(int i=0; i<fwdSens[d].size(); ++i){
+        if(fwdSens[d][i]!=0){
+          *fwdSens[d][i] = fsens[d][i];
+        }
+      }
+    }
+
+    // Store the adjoint sensitivities
+    for(int d=0; d<adjSens.size(); ++d){
+      for(int i=0; i<adjSens[d].size(); ++i){
+        if(adjSens[d][i]!=0 && !asens[d][i].isNull()){
+          *adjSens[d][i] += asens[d][i];
+        }
+      }
+    }
   }
 
   void EvaluationMX::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
