@@ -384,6 +384,9 @@ namespace CasADi{
     /** \brief Free adjoint memory */
     template<typename T> 
     static void clearVector(const std::vector<std::vector<T*> > v);
+
+    /** \brief Free adjoint memory (MX) */
+    static void clearVector(const std::vector<std::vector<MX*> > v);
   };
 
   // Implementations

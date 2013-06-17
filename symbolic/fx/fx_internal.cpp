@@ -1523,6 +1523,12 @@ namespace CasADi{
     return f->getDerivativeViaJac(nfwd,nadj);
   }
 
+  FX FXInternal::getDerivativeViaOO(int nfwd, int nadj){
+    Derivative ret(shared_from_this<FX>(),nfwd,nadj);
+    ret.init();
+    return ret;
+  }
+
   int FXInternal::getNumScalarInputs() const{
     int ret=0;
     for(int iind=0; iind<getNumInputs(); ++iind){
@@ -1965,15 +1971,13 @@ namespace CasADi{
       res = MX::createMultipleOutput(new EvaluationMX(shared_from_this<FX>(), arg));
     } else {
       // Create derivative node
-      createDerivative(arg,res,fseed,fsens,aseed,asens);
+      createCallDerivative(arg,res,fseed,fsens,aseed,asens,false);
     }
   }
 
-  void FXInternal::createDerivative(const std::vector<MX> &arg,
-                          std::vector<MX> &res, const std::vector<std::vector<MX> > &fseed,
-                          std::vector<std::vector<MX> > &fsens,
-                          const std::vector<std::vector<MX> > &aseed,
-                          std::vector<std::vector<MX> > &asens) {
+  void FXInternal::createCallDerivative(const std::vector<MX>& arg, std::vector<MX>& res, 
+                                        const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens,
+                                        const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens, bool cached) {
 
     // Number of directional derivatives
     int nfdir = fseed.size();
@@ -1984,12 +1988,17 @@ namespace CasADi{
     int num_out = getNumOutputs();
 
     // Create derivative function
-    Derivative dfcn(shared_from_this<FX>(),nfdir,nadir);
-    stringstream ss;
-    ss << "der_" << getOption("name") << "_" << nfdir << "_" << nadir;
-    dfcn.setOption("verbose",getOption("verbose"));
-    dfcn.setOption("name",ss.str());
-    dfcn.init();
+    FX dfcn;
+    if(cached){
+      dfcn = derivative(nfdir,nadir);
+    } else {
+      dfcn = getDerivativeViaOO(nfdir,nadir);
+      stringstream ss;
+      ss << "der_" << getOption("name") << "_" << nfdir << "_" << nadir;
+      dfcn.setOption("verbose",getOption("verbose"));
+      dfcn.setOption("name",ss.str());
+      dfcn.init();
+    }
     
     // All inputs
     vector<MX> darg;
