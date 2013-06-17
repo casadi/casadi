@@ -52,7 +52,7 @@ class NLPtests(casadiTestCase):
       solver.setOption(options)
       solver.init()
       solver.setOutput(6)
-      solver.solve()
+      solver.evaluate()
       
       refsol = SXFunction([],[2*pi])
       refsol.init()
@@ -116,7 +116,7 @@ class NLPtests(casadiTestCase):
     print solver.dictionary()
     solver.init()
     solver.setOutput(-6)
-    solver.solve()
+    solver.evaluate()
     self.assertAlmostEqual(solver.getOutput()[0],-2*pi,5)
     
 if __name__ == '__main__':
