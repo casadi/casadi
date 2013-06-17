@@ -20,7 +20,7 @@
  *
  */
 
-#include "evaluation_mx.hpp"
+#include "call_fx.hpp"
 #include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../mx/mx_tools.hpp"
@@ -30,7 +30,7 @@ using namespace std;
 
 namespace CasADi {
 
-  EvaluationMX::EvaluationMX(const FX& fcn, std::vector<MX> arg) : fcn_(fcn) {
+  CallFX::CallFX(const FX& fcn, std::vector<MX> arg) : fcn_(fcn) {
 
     // Number inputs and outputs
     int num_in = fcn.getNumInputs();
@@ -48,56 +48,56 @@ namespace CasADi {
     setSparsity(CRSSparsity(1, 1, true));
   }
 
-  EvaluationMX* EvaluationMX::clone() const {
-    return new EvaluationMX(*this);
+  CallFX* CallFX::clone() const {
+    return new CallFX(*this);
   }
 
-  void EvaluationMX::printPart(std::ostream &stream, int part) const {
+  void CallFX::printPart(std::ostream &stream, int part) const {
     fcn_->printPart(this,stream,part);
   }
 
-  void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
+  void CallFX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
                                const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens,
                                const DMatrixPtrVV& aseed, DMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<double>& rtmp) {
     fcn_->evaluateD(this,arg,res,fseed,fsens,aseed,asens,itmp,rtmp);
   }
 
-  int EvaluationMX::getNumOutputs() const {
+  int CallFX::getNumOutputs() const {
     return fcn_.getNumOutputs();
   }
 
-  const CRSSparsity& EvaluationMX::sparsity(int oind) const{
+  const CRSSparsity& CallFX::sparsity(int oind) const{
     return fcn_.output(oind).sparsity();
   }
 
-  FX& EvaluationMX::getFunction() {
+  FX& CallFX::getFunction() {
     return fcn_;
   }
 
-  void EvaluationMX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
+  void CallFX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
                                 const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens,
                                 const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<SX>& rtmp) {
     fcn_->evaluateSX(this,arg,res,fseed,fsens,aseed,asens,itmp,rtmp);
   }
 
-  void EvaluationMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given) {
+  void CallFX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given) {
     fcn_->evaluateMX(this,input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given);
   }
 
-  void EvaluationMX::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
+  void CallFX::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
     MXNode::deepCopyMembers(already_copied);
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void EvaluationMX::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp, bool use_fwd) {
+  void CallFX::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp, bool use_fwd) {
     fcn_->propagateSparsity(this,arg,res,itmp,rtmp,use_fwd);
   }
 
-  void EvaluationMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void CallFX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     fcn_->generateOperation(this,stream,arg,res,gen);
   }
   
-  void EvaluationMX::nTmp(size_t& ni, size_t& nr){
+  void CallFX::nTmp(size_t& ni, size_t& nr){
     fcn_->nTmp(this,ni,nr);
   }
 

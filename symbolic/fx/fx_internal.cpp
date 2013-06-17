@@ -21,7 +21,7 @@
  */
 
 #include "fx_internal.hpp"
-#include "../mx/evaluation_mx.hpp"
+#include "../mx/call_fx.hpp"
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
 #include "mx_function.hpp"
@@ -2030,7 +2030,7 @@ namespace CasADi{
 
     if(fseed.empty() && aseed.empty()){
       // Create the evaluation node
-      res = MX::createMultipleOutput(new EvaluationMX(shared_from_this<FX>(), arg));
+      res = MX::createMultipleOutput(new CallFX(shared_from_this<FX>(), arg));
     } else {
       // Create derivative node
       createCallDerivative(arg,res,fseed,fsens,aseed,asens,false);
@@ -2078,7 +2078,7 @@ namespace CasADi{
     }
     
     // Create the evaluation node
-    vector<MX> x = MX::createMultipleOutput(new EvaluationMX(dfcn, darg));
+    vector<MX> x = MX::createMultipleOutput(new CallFX(dfcn, darg));
     vector<MX>::iterator x_it = x.begin();
 
     // Create the output nodes corresponding to the nondifferented function

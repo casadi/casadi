@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef EVALUATION_MX_HPP
-#define EVALUATION_MX_HPP
+#ifndef CALL_FX_HPP
+#define CALL_FX_HPP
 
 #include "multiple_output.hpp"
 #include "../fx/fx.hpp"
@@ -32,17 +32,17 @@ namespace CasADi{
       \author Joel Andersson 
       \date 2010-2013
   */
-  class EvaluationMX : public MultipleOutput{
+  class CallFX : public MultipleOutput{
   public:
 
     /** \brief  Constructor */
-    explicit EvaluationMX(const FX& fcn, std::vector<MX> arg);
+    explicit CallFX(const FX& fcn, std::vector<MX> arg);
     
     /** \brief  Destructor */
-    virtual ~EvaluationMX(){}
+    virtual ~CallFX(){}
   
     /** \brief  Clone function */
-    virtual EvaluationMX* clone() const;
+    virtual CallFX* clone() const;
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -92,4 +92,4 @@ namespace CasADi{
 
 } // namespace CasADi
 
-#endif // EVALUATION_MX_HPP
+#endif // CALL_FX_HPP
