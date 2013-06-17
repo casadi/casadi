@@ -276,6 +276,17 @@ namespace CasADi{
     // Codegen function
     FX dynamicCompilation(FX f, std::string fname, std::string fdescr, std::string compiler);
 
+    // The following functions are called internally from EvaluateMX. For documentation, see the MXNode class
+    //@{
+    virtual void evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res, const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens, const DMatrixPtrVV& aseed, DMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res, const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens, const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given);
+    virtual void propagateSparsity(MXNode* node, DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
+    virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);
+    virtual void generateOperation(const MXNode* node, std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void printPart(const MXNode* node, std::ostream &stream, int part) const;
+    //@}
+
     /** \brief  Inputs of the function */
     std::vector<FunctionIO> input_;
 

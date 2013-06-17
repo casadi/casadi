@@ -365,8 +365,6 @@ namespace CasADi{
     
     /** \brief  The sparsity pattern */
     CRSSparsity sparsity_;
-    
-  protected:
 
     /** \brief  Evaluate the function (no work)*/
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 

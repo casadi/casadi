@@ -2106,6 +2106,308 @@ namespace CasADi{
     }
   }
 
+  void FXInternal::evaluateMX(MXNode* node, const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given) {
+    // Collect inputs and seeds
+    vector<MX> arg = MXNode::getVector(input);
+    vector<vector<MX> > fseed = MXNode::getVector(fwdSeed);
+    vector<vector<MX> > aseed = MXNode::getVector(adjSeed);
+
+    // Free adjoint seeds
+    MXNode::clearVector(adjSeed);
+
+    // Evaluate symbolically
+    vector<MX> res;
+    vector<vector<MX> > fsens, asens;
+    createCallDerivative(arg,res,fseed,fsens,aseed,asens,true);
+
+    // Store the non-differentiated results
+    if(!output_given){
+      for(int i=0; i<res.size(); ++i){
+        if(output[i]!=0){
+          *output[i] = res[i];
+        }
+      }
+    }
+
+    // Store the forward sensitivities
+    for(int d=0; d<fwdSens.size(); ++d){
+      for(int i=0; i<fwdSens[d].size(); ++i){
+        if(fwdSens[d][i]!=0){
+          *fwdSens[d][i] = fsens[d][i];
+        }
+      }
+    }
+
+    // Store the adjoint sensitivities
+    for(int d=0; d<adjSens.size(); ++d){
+      for(int i=0; i<adjSens[d].size(); ++i){
+        if(adjSens[d][i]!=0 && !asens[d][i].isNull()){
+          *adjSens[d][i] += asens[d][i];
+        }
+      }
+    }
+  }
+
+  void FXInternal::propagateSparsity(MXNode* node, DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp, bool use_fwd) {
+    // Pass/clear forward seeds/adjoint sensitivities
+    for (int iind = 0; iind < getNumInputs(); ++iind) {
+      // Input vector
+      vector<double> &v = input(iind).data();
+      if (v.empty()) continue; // FIXME: remove?
+      
+      if (arg[iind] == 0) {
+        // Set to zero if not used
+        fill_n(get_bvec_t(v), v.size(), bvec_t(0));
+      } else {
+        // Copy output
+        input(iind).sparsity().set(get_bvec_t(input(iind).data()),get_bvec_t(arg[iind]->data()),arg[iind]->sparsity());
+      }
+    }
+    
+    // Pass/clear adjoint seeds/forward sensitivities
+    for (int oind = 0; oind < getNumOutputs(); ++oind) {
+      // Output vector
+      vector<double> &v = output(oind).data();
+      if (v.empty()) continue; // FIXME: remove?      
+      if (res[oind] == 0) {
+        // Set to zero if not used
+        fill_n(get_bvec_t(v), v.size(), bvec_t(0));
+      } else {
+        // Copy output
+        output(oind).sparsity().set(get_bvec_t(output(oind).data()),get_bvec_t(res[oind]->data()),res[oind]->sparsity());
+        if(!use_fwd) fill_n(get_bvec_t(res[oind]->data()),res[oind]->size(),bvec_t(0));
+      }
+    }
+    
+    // Propagate seeds
+    spInit(use_fwd); // NOTE: should only be done once
+    if(spCanEvaluate(use_fwd)){
+      spEvaluate(use_fwd);
+    } else {
+      spEvaluateViaJacSparsity(use_fwd);
+    }
+    
+    // Get the sensitivities
+    if (use_fwd) {
+      for (int oind = 0; oind < res.size(); ++oind) {
+        if (res[oind] != 0) {
+          res[oind]->sparsity().set(get_bvec_t(res[oind]->data()),get_bvec_t(output(oind).data()),output(oind).sparsity());
+        }
+      }
+    } else {
+      for (int iind = 0; iind < arg.size(); ++iind) {
+        if (arg[iind] != 0) {
+          arg[iind]->sparsity().bor(get_bvec_t(arg[iind]->data()),get_bvec_t(input(iind).data()),input(iind).sparsity());
+        }
+      }
+    }
+
+    // Clear seeds and sensitivities
+    for (int iind = 0; iind < arg.size(); ++iind) {
+      vector<double> &v = input(iind).data();
+      fill(v.begin(), v.end(), 0);
+    }
+    for (int oind = 0; oind < res.size(); ++oind) {
+      vector<double> &v = output(oind).data();
+      fill(v.begin(), v.end(), 0);
+    }
+  }
+
+  void FXInternal::generateOperation(const MXNode* node, std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  
+    // Running index of the temporary used
+    int nr=0;
+
+    // Copy arguments with nonmatching sparsities to the temp vector
+    vector<string> arg_mod = arg;
+    for(int i=0; i<getNumInputs(); ++i){
+      if(node->dep(i).sparsity()!=input(i).sparsity()){
+        arg_mod[i] = "rrr+" + CodeGenerator::numToString(nr);
+        nr += input(i).size();
+        
+        // Codegen "copy sparse"
+        gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
+        
+        int sp_arg = gen.getSparsity(node->dep(i).sparsity());
+        int sp_input = gen.addSparsity(input(i).sparsity());
+        stream << "  casadi_copy_sparse(" << arg[i] << ",s" << sp_arg << "," << arg_mod[i] << ",s" << sp_input << ");" << std::endl;
+      }
+    }
+
+    // Get the index of the function
+    int f = gen.getDependency(shared_from_this<FX>());
+    stream << "  f" << f << "(";
+  
+    // Pass inputs to the function input buffers
+    for(int i=0; i<arg.size(); ++i){
+      stream << arg_mod.at(i);
+      if(i+1<arg.size()+res.size()) stream << ",";
+    }
+
+    // Separate arguments and results with an extra space
+    stream << " ";
+
+    // Pass results to the function input buffers
+    for(int i=0; i<res.size(); ++i){
+      stream << res.at(i);
+      if(i+1<res.size()) stream << ",";
+    }
+  
+    // Finalize the function call
+    stream << ");" << endl;  
+  }
+
+  void FXInternal::nTmp(MXNode* node, size_t& ni, size_t& nr){
+    // Start with no extra memory
+    ni=0;
+    nr=0;
+
+    // Add memory for all inputs with nonmatching sparsity
+    for(int i=0; i<getNumInputs(); ++i){
+      if(node->dep(i).isNull() || node->dep(i).sparsity()!=input(i).sparsity()){
+        nr += input(i).size();
+      }
+    }
+  }
+
+  void FXInternal::evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res,
+                              const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens,
+                              const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<SX>& rtmp) {
+  
+    // Create input arguments
+    vector<SXMatrix> argv(arg.size());
+    for(int i=0; i<arg.size(); ++i){
+      argv[i] = SXMatrix(input(i).sparsity(),0.);
+      if(arg[i] != 0)
+        argv[i].set(*arg[i]);
+    }
+
+    // Evaluate symbolically
+    vector<SXMatrix> resv;
+    vector<vector<SXMatrix> > dummy;
+    evalSX(argv,resv,dummy,dummy,dummy,dummy);
+
+    // Collect the result
+    for (int i = 0; i < res.size(); ++i) {
+      if (res[i] != 0)
+        *res[i] = resv[i];
+    }
+  }
+
+  void FXInternal::evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res,
+                             const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens,
+                             const DMatrixPtrVV& aseed, DMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<double>& rtmp) {
+  
+    // Number of inputs and outputs
+    int num_in = getNumInputs();
+    int num_out = getNumOutputs();
+
+    // Number of derivative directions to calculate
+    int nfdir = fsens.size();
+    int nadir = aseed.size();
+
+    // Number of derivative directions supported by the function
+    int max_nfdir = nfdir_;
+    int max_nadir = nadir_;
+
+    // Current forward and adjoint direction
+    int offset_nfdir = 0, offset_nadir = 0;
+
+    // Has the function been evaluated once
+    bool fcn_evaluated = false;
+
+    // Pass the inputs to the function
+    for (int i = 0; i < num_in; ++i) {
+      DMatrix *a = arg[i];
+      if(a != 0){
+        setInput(*a, i);
+      } else {
+        setInput(0., i);
+      }
+    }
+  
+    // Evaluate until everything has been determinated
+    while (!fcn_evaluated || offset_nfdir < nfdir || offset_nadir < nadir) {
+
+      // Number of forward and adjoint directions in the current "batch"
+      int nfdir_f_batch = std::min(nfdir - offset_nfdir, max_nfdir);
+      int nadir_f_batch = std::min(nadir - offset_nadir, max_nadir);
+
+      // Pass the forward seeds to the function
+      for(int d = 0; d < nfdir_f_batch; ++d){
+        for(int i = 0; i < num_in; ++i){
+          DMatrix *a = fseed[offset_nfdir + d][i];
+          if(a != 0){
+            setFwdSeed(*a, i, d);
+          } else {
+            setFwdSeed(0., i, d);
+          }
+        }
+      }
+
+      // Pass the adjoint seed to the function
+      for(int d = 0; d < nadir_f_batch; ++d){
+        for(int i = 0; i < num_out; ++i) {
+          DMatrix *a = aseed[offset_nadir + d][i];
+          if(a != 0){
+            setAdjSeed(*a, i, d);
+          } else {
+            setAdjSeed(0., i, d);
+          }
+        }
+      }
+
+      // Evaluate
+      evaluate(nfdir_f_batch, nadir_f_batch);
+    
+      // Get the outputs if first evaluation
+      if(!fcn_evaluated){
+        for(int i = 0; i < num_out; ++i) {
+          if(res[i] != 0) getOutput(*res[i], i);
+        }
+      }
+
+      // Marked as evaluated
+      fcn_evaluated = true;
+
+      // Get the forward sensitivities
+      for(int d = 0; d < nfdir_f_batch; ++d){
+        for(int i = 0; i < num_out; ++i) {
+          DMatrix *a = fsens[offset_nfdir + d][i];
+          if(a != 0) getFwdSens(*a, i, d);
+        }
+      }
+
+      // Get the adjoint sensitivities
+      for (int d = 0; d < nadir_f_batch; ++d) {
+        for (int i = 0; i < num_in; ++i) {
+          DMatrix *a = asens[offset_nadir + d][i];
+          if(a != 0){
+            a->sparsity().add(a->ptr(),adjSens(i,d).ptr(),adjSens(i,d).sparsity());
+          }
+        }
+      }
+
+      // Update direction offsets
+      offset_nfdir += nfdir_f_batch;
+      offset_nadir += nadir_f_batch;
+    }
+
+    // Clear adjoint seeds
+    MXNode::clearVector(aseed);
+  }
+
+  void FXInternal::printPart(const MXNode* node, std::ostream &stream, int part) const {
+    if (part == 0) {
+      repr(stream);
+      stream << ".call([";
+    } else if (part == getNumInputs()) {
+      stream << "])";
+    } else {
+      stream << ",";
+    }
+  }
+
 
 } // namespace CasADi
 
