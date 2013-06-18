@@ -155,6 +155,27 @@ namespace CasADi{
    */
   CRSSparsity mul(const  CRSSparsity& a, const  CRSSparsity &b);
   
+  /** \brief Concatenate a list of sparsities vertically
+  * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
+  */
+  CRSSparsity vertcat(const std::vector<CRSSparsity > &v);
+
+  /** \brief Concatenate a list of sparsities horizontally
+  * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
+  */
+  CRSSparsity horzcat(const std::vector<CRSSparsity > &v);
+
+  /** \brief   Construct a Sparsity with given blocks on the diagonal */
+  CRSSparsity blkdiag(const std::vector< CRSSparsity > &v);
+
+  #ifndef SWIG
+  CRSSparsity vertcat(const CRSSparsity &x, const CRSSparsity &y);
+
+  CRSSparsity horzcat(const CRSSparsity &x, const CRSSparsity &y);
+  
+  CRSSparsity blkdiag(const CRSSparsity &x, const CRSSparsity &y);
+  #endif // SWIG
+  
   /** \brief Represent a sparsity pattern as an array of integers, the most compact way of representing a sparsity pattern
       The format:
       * The first two entries are the number of rows (nrow) and columns (ncol)
@@ -181,6 +202,7 @@ namespace CasADi{
   bool isSingular(const CRSSparsity& a);
 
   /// @}
+
 
 }
 
