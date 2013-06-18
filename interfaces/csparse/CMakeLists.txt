@@ -6,6 +6,10 @@ set(CSPARSE_INTERFACE_SRCS
   csparse.cpp
   csparse_internal.hpp
   csparse_internal.cpp
+  csparse_cholesky.hpp
+  csparse_cholesky.cpp
+  csparse_cholesky_internal.hpp
+  csparse_cholesky_internal.cpp
 )
 
 if(ENABLE_STATIC)
