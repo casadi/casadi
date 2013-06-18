@@ -66,6 +66,9 @@ public:
   #ifdef SWIG
   %nocallback;
   #endif
+  
+  /// Access underlying QCQP solver
+  QCQPSolver & getSolver();
 
 };
 

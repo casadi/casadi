@@ -67,6 +67,9 @@ public:
   %nocallback;
   #endif
 
+  /// Access underlying QP solver
+  QPSolver & getSolver();
+  
 };
 
 

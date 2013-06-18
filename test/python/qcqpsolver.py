@@ -36,19 +36,18 @@ except:
 class QCQPSolverTests(casadiTestCase):
 
   def test_bounds(self):
-    #  min  2 x + y
+    #  min  1/2 x' H x + 2 x + y
     #   x,y
     #
     #  s.t.  x^2 + 2y^2 + 2*x + 3*y - 7 <= 0
-    H = DMatrix.zeros(2,2)
+    H = 1e-6*DMatrix([[1,0],[0,1]])
     G = DMatrix([2,1])
     A = DMatrix(0,2)
-    P = DMatrix([[1,0],[0,1]])
+    P = 2*DMatrix([[1,0],[0,2]])
     Q = DMatrix([2,3])
     R = DMatrix([-7])
     LBX = DMatrix([ -inf, -inf ])
     UBX = DMatrix([ inf, inf ])
-    c = DMatrix([ 2.0, 1.0 ])
     
     for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
@@ -67,14 +66,15 @@ class QCQPSolverTests(casadiTestCase):
       solver.setInput(UBX,"ubx")
 
       solver.solve()
-
-      return
+      
+      socp = solver.getSolver()
+        
       self.checkarray(solver.getOutput(),DMatrix([-(sqrt(73)+3)/3,-(sqrt(73)+9)/12]),str(qcqpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qcqpsolver),digits=5)
 
       self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qcqpsolver),digits=5)
       
-      self.assertAlmostEqual(solver.getOutput("cost")[0],0,5,str(qcqpsolver))
+      self.checkarray(solver.getOutput("cost"),mul(G.T,solver.getOutput()),str(qcqpsolver),digits=4)
       
 if __name__ == '__main__':
     unittest.main()

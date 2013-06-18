@@ -47,4 +47,8 @@ bool QCQPQPSolver::checkNode() const{
   return dynamic_cast<const QCQPQPInternal*>(get());
 }
 
+QCQPSolver & QCQPQPSolver::getSolver() {
+  return (*this)->qcqpsolver_;
+}
+
 } // namespace CasADi

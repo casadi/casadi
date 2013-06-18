@@ -47,4 +47,8 @@ bool SDPSOCPSolver::checkNode() const{
   return dynamic_cast<const SDPSOCPInternal*>(get());
 }
 
+SDPSolver & SDPSOCPSolver::getSolver() {
+  return (*this)->sdpsolver_;
+}
+
 } // namespace CasADi

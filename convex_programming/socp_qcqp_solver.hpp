@@ -31,7 +31,31 @@ namespace CasADi {
 // Forward declaration of internal class 
 class SOCPQCQPInternal;
 
-  /** \brief IPOPT QP Solver for quadratic programming
+  /** \brief SOCP QCQP Solver for quadratic programming
+   *
+   *  Note: this implementation relies on Cholesky decomposition.
+   *   This requires Pi, H to be positive definite. Positive semi-definite is not sufficient.
+   *    Notably, H==0  will not work.
+   *
+   *  A better implementation would rely on matrix square root, but we need singular value decomposition to implement that.
+   *
+   *
+   * This implementation makes use of the epigraph reformulation:
+   *   min f(x)
+   *    x
+   * 
+   *   min  t
+   *    x,t  f(x) <= t
+   *
+   *
+   *  This implementation makes use of the following identity:
+   *
+   *  || Gx+h||_2 <= e'x + f
+   *
+   *  x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0
+   *
+   *    where we put e = [0 0 ... 1]  for the qc arising from the epigraph reformulation
+   *    and e==0 for all otyher qc.
 
    @copydoc QCQPSolver_doc
       
@@ -66,6 +90,9 @@ public:
   #ifdef SWIG
   %nocallback;
   #endif
+  
+  /// Access underlying SOCP solver
+  SOCPSolver & getSolver();
 
 };
 

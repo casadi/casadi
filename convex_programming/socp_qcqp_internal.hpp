@@ -25,6 +25,7 @@
 
 #include "symbolic/fx/qcqp_solver_internal.hpp"
 #include "symbolic/fx/socp_solver.hpp"
+#include "interfaces/csparse/csparse_cholesky.hpp"
 
 namespace CasADi{
 
@@ -52,7 +53,7 @@ public:
   
   protected:
     SOCPSolver socpsolver_;
-
+    std::vector<CSparseCholesky> cholesky_;
 };
 
 } // namespace CasADi

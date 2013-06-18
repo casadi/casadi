@@ -47,4 +47,8 @@ bool SOCPQCQPSolver::checkNode() const{
   return dynamic_cast<const SOCPQCQPInternal*>(get());
 }
 
+SOCPSolver & SOCPQCQPSolver::getSolver() {
+  return (*this)->socpsolver_;
+}
+
 } // namespace CasADi
