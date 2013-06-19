@@ -25,37 +25,35 @@
 using namespace std;
 namespace CasADi{
 
-CSparseCholesky::CSparseCholesky(){
-}
+  CSparseCholesky::CSparseCholesky(){
+  }
 
-CSparseCholesky::CSparseCholesky(const CRSSparsity& sp){
-  assignNode(new CSparseCholeskyInternal(sp));
-}
+  CSparseCholesky::CSparseCholesky(const CRSSparsity& sp, int nrhs){
+    assignNode(new CSparseCholeskyInternal(sp,nrhs));
+  }
  
-CSparseCholeskyInternal* CSparseCholesky::operator->(){
-  return static_cast<CSparseCholeskyInternal*>(FX::operator->());
-}
+  CSparseCholeskyInternal* CSparseCholesky::operator->(){
+    return static_cast<CSparseCholeskyInternal*>(FX::operator->());
+  }
 
-const CSparseCholeskyInternal* CSparseCholesky::operator->() const{
-  return static_cast<const CSparseCholeskyInternal*>(FX::operator->());
-}
+  const CSparseCholeskyInternal* CSparseCholesky::operator->() const{
+    return static_cast<const CSparseCholeskyInternal*>(FX::operator->());
+  }
   
-bool CSparseCholesky::checkNode() const{
-  return dynamic_cast<const CSparseCholeskyInternal*>(get())!=0;
-}
+  bool CSparseCholesky::checkNode() const{
+    return dynamic_cast<const CSparseCholeskyInternal*>(get())!=0;
+  }
 
-CRSSparsity CSparseCholesky::getFactorizationSparsity() const {
-  return (*this)->getFactorizationSparsity();
-}
+  CRSSparsity CSparseCholesky::getFactorizationSparsity() const {
+    return (*this)->getFactorizationSparsity();
+  }
   
-DMatrix CSparseCholesky::getFactorization() const {
-  return (*this)->getFactorization();
-}
+  DMatrix CSparseCholesky::getFactorization() const {
+    return (*this)->getFactorization();
+  }
 
-void CSparseCholesky::solveL(double* x, int nrhs, bool transpose) {
-  return (*this)->solveL(x, nrhs, transpose);
-}
-
-
+  void CSparseCholesky::solveL(double* x, int nrhs, bool transpose) {
+    return (*this)->solveL(x, nrhs, transpose);
+  }
 
 } // namespace CasADi

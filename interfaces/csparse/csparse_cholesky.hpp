@@ -60,7 +60,7 @@ public:
   CSparseCholesky();
   
   /// Create a linear solver given a sparsity pattern
-  CSparseCholesky(const CRSSparsity& sp);
+  CSparseCholesky(const CRSSparsity& sp, int nrhs=1);
   
   /** \brief  Access internal functions and data members */
   CSparseCholeskyInternal* operator->();
