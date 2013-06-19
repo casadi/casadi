@@ -23,6 +23,7 @@
 #include "implicit_function_internal.hpp"
 #include "../mx/mx_node.hpp"
 #include "../mx/mx_tools.hpp"
+#include <iterator>
 
 using namespace std;
 namespace CasADi{
@@ -219,6 +220,10 @@ namespace CasADi{
     int nadj = aseed.size();
     if(nfwd==0 && nadj==0) return;
 
+    // Temporaries
+    vector<int> row_offset(1,0);
+    vector<MX> rhs;
+
     // Arguments when calling f/f_der
     vector<MX> v;
     int nf_in = f_.getNumInputs();
@@ -238,16 +243,33 @@ namespace CasADi{
       argv = MXNode::getVector(fseed[d]);
       v.insert(v.end(),argv.begin(),argv.end());
     }
+
+    // Adjoint sensitivities, solve to get arguments for calling f_der
+    if(nadj>0){
+      for(int d=0; d<nadj; ++d){
+        rhs.push_back(trans(*aseed[d][0]));
+        row_offset.push_back(row_offset.back()+1);
+        *aseed[d][0] = MX();
+      }
+      rhs = vertsplit(J->getSolve(vertcat(rhs),false,linsol_),row_offset);
+      for(int d=0; d<nadj; ++d){
+        v.push_back(trans(rhs[d]));
+      }
+      row_offset.resize(1);
+      rhs.clear();
+    }
   
     // Propagate through the implicit function
     v = f_der.call(v);
+    vector<MX>::const_iterator v_it = v.begin();
+
+    // Discard non-differentiated evaluation (change?)
+    v_it++;
 
     // Solve for the forward sensitivities
     if(nfwd>0){
-      vector<int> row_offset(1,0);
-      vector<MX> rhs;
       for(int d=0; d<nfwd; ++d){
-        rhs.push_back(trans(v[1+d]));
+        rhs.push_back(trans(*v_it++));
         row_offset.push_back(row_offset.back()+1);        
       }
       rhs = vertsplit(J->getSolve(vertcat(rhs),true,linsol_),row_offset);
@@ -256,10 +278,22 @@ namespace CasADi{
           *fsens[d][0] = -rhs[d];
         }
       }
+      row_offset.resize(1);
+      rhs.clear();
     }
-      
-    // ... To be continued      
-    //    casadi_error("not implemented");
+
+    // Collect adjoint sensitivities
+    for(int d=0; d<nadj; ++d){
+      // Discard adjoint corresponding to z
+      v_it++;
+
+      for(int i=0; i<asens[d].size(); ++i, ++v_it){
+        if(asens[d][i]!=0){
+          *asens[d][i] = - *v_it;
+        }
+      }
+    }
+    casadi_assert(v_it==v.end());
   }
 
  

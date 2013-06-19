@@ -227,13 +227,14 @@ int main(){
 
     // Via source code transformation
     cout << "SCT:" << endl;
-    FX derivative = integrator.derivative(2,0);
+    FX derivative = integrator.derivative(2,1);
     derivative.setInput(x0_val,INTEGRATOR_X0);
     derivative.setInput(p_val,INTEGRATOR_P);
     derivative.setInput(0.0,1*INTEGRATOR_NUM_IN+INTEGRATOR_X0);
     derivative.setInput(1.0,1*INTEGRATOR_NUM_IN+INTEGRATOR_P);
     derivative.setInput(x0_seed,2*INTEGRATOR_NUM_IN+INTEGRATOR_X0);
     derivative.setInput(0.0,2*INTEGRATOR_NUM_IN+INTEGRATOR_P);
+    derivative.setInput(xf_seed,3*INTEGRATOR_NUM_IN+INTEGRATOR_XF);
 
     derivative.evaluate();
 
@@ -241,10 +242,8 @@ int main(){
     cout << setw(15) << "xf = " << derivative.output(INTEGRATOR_XF) << endl;
     cout << setw(15) << "d(xf)/d(p) = " <<  derivative.output(1*INTEGRATOR_NUM_OUT+INTEGRATOR_XF) << endl;
     cout << setw(15) << "d(xf)/d(x0[0]) = " <<  derivative.output(2*INTEGRATOR_NUM_OUT+INTEGRATOR_XF) << endl;
-    //    cout << setw(15) << "d(xf[2])/d(x0) = " << integrator.adjSens("x0") << endl;
-    //    cout << setw(15) << "d(xf[2])/d(p) = " << integrator.adjSens("p") << endl;
-    
-
+    cout << setw(15) << "d(xf[2])/d(x0) = " << derivative.output(3*INTEGRATOR_NUM_OUT+INTEGRATOR_X0) << endl;
+    cout << setw(15) << "d(xf[2])/d(p) = " << derivative.output(3*INTEGRATOR_NUM_OUT+INTEGRATOR_P) << endl;
   }
   return 0;
 }
