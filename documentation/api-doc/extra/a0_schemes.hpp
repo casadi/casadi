@@ -8,17 +8,22 @@
 <tr><td>INTEGRATOR_RQF</td><td>Backward quadrature state at the initial time [rqf].</td></tr>
 </table>
 */
-/** \defgroup scheme_SDPOutput
+/** \defgroup scheme_QCQPSolverInput
 <a name='schemes'></a><table>
-<caption>Output scheme: CasADi::SDPOutput  (SDP_SOLVER_NUM_OUT = 7) </caption>
+<caption>Input scheme: CasADi::QCQPSolverInput  (QCQP_SOLVER_NUM_IN = 12) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>SDP_SOLVER_X</td><td>The primal solution (n x 1) - may be used as initial guess [x].</td></tr>
-<tr><td>SDP_SOLVER_P</td><td>The solution P (m x m) - may be used as initial guess [p].</td></tr>
-<tr><td>SDP_SOLVER_DUAL</td><td>The dual solution (m x m) - may be used as initial guess [dual].</td></tr>
-<tr><td>SDP_SOLVER_COST</td><td>The primal optimal cost (1 x 1) [cost].</td></tr>
-<tr><td>SDP_SOLVER_DUAL_COST</td><td>The dual optimal cost (1 x 1) [dual_cost].</td></tr>
-<tr><td>SDP_SOLVER_LAM_A</td><td>The dual solution corresponding to the linear constraints (nc x 1) [lam_a].</td></tr>
-<tr><td>SDP_SOLVER_LAM_X</td><td>The dual solution corresponding to simple bounds (n x 1) [lam_x].</td></tr>
+<tr><td>QCQP_SOLVER_H</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h].</td></tr>
+<tr><td>QCQP_SOLVER_G</td><td>The vector g: dense, (n x 1) [g].</td></tr>
+<tr><td>QCQP_SOLVER_P</td><td>The vertical stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [p].</td></tr>
+<tr><td>QCQP_SOLVER_Q</td><td>The vertical stack of all qi: dense, (nq n x 1) [q].</td></tr>
+<tr><td>QCQP_SOLVER_R</td><td>The vertical stack of all scalars ri (nq x 1) [r].</td></tr>
+<tr><td>QCQP_SOLVER_A</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. [a].</td></tr>
+<tr><td>QCQP_SOLVER_LBA</td><td>dense, (nc x 1) [lba]</td></tr>
+<tr><td>QCQP_SOLVER_UBA</td><td>dense, (nc x 1) [uba]</td></tr>
+<tr><td>QCQP_SOLVER_LBX</td><td>dense, (n x 1) [lbx]</td></tr>
+<tr><td>QCQP_SOLVER_UBX</td><td>dense, (n x 1) [ubx]</td></tr>
+<tr><td>QCQP_SOLVER_X0</td><td>dense, (n x 1) [x0]</td></tr>
+<tr><td>QCQP_SOLVER_LAM_X0</td><td>dense [lam_x0]</td></tr>
 </table>
 */
 /** \defgroup scheme_HessLagOutput
@@ -170,6 +175,19 @@
 <tr><td>SOCP_SOLVER_UBX</td><td>Upper bounds on x ( n x 1 ) [ubx].</td></tr>
 </table>
 */
+/** \defgroup scheme_SDPOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: CasADi::SDPOutput  (SDP_SOLVER_NUM_OUT = 7) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>SDP_SOLVER_X</td><td>The primal solution (n x 1) - may be used as initial guess [x].</td></tr>
+<tr><td>SDP_SOLVER_P</td><td>The solution P (m x m) - may be used as initial guess [p].</td></tr>
+<tr><td>SDP_SOLVER_DUAL</td><td>The dual solution (m x m) - may be used as initial guess [dual].</td></tr>
+<tr><td>SDP_SOLVER_COST</td><td>The primal optimal cost (1 x 1) [cost].</td></tr>
+<tr><td>SDP_SOLVER_DUAL_COST</td><td>The dual optimal cost (1 x 1) [dual_cost].</td></tr>
+<tr><td>SDP_SOLVER_LAM_A</td><td>The dual solution corresponding to the linear constraints (nc x 1) [lam_a].</td></tr>
+<tr><td>SDP_SOLVER_LAM_X</td><td>The dual solution corresponding to simple bounds (n x 1) [lam_x].</td></tr>
+</table>
+*/
 /** \defgroup scheme_NLPSolverInput
 <a name='schemes'></a><table>
 <caption>Input scheme: CasADi::NLPSolverInput  (NLP_SOLVER_NUM_IN = 8) </caption>
@@ -215,7 +233,7 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Input scheme: CasADi::InputOutputScheme  ( = 36) </caption>
+<caption>Input scheme: CasADi::InputOutputScheme  ( = 39) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -244,6 +262,9 @@
 <tr><td>SCHEME_MayerInput</td><td></td></tr>
 <tr><td>SCHEME_OCPInput</td><td></td></tr>
 <tr><td>SCHEME_OCPOutput</td><td></td></tr>
+<tr><td>SCHEME_QCQPSolverInput</td><td></td></tr>
+<tr><td>SCHEME_QCQPSolverOutput</td><td></td></tr>
+<tr><td>SCHEME_QCQPStruct</td><td></td></tr>
 <tr><td>SCHEME_QPSolverInput</td><td></td></tr>
 <tr><td>SCHEME_QPSolverOutput</td><td></td></tr>
 <tr><td>SCHEME_QPStruct</td><td></td></tr>
@@ -258,7 +279,7 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Output scheme: CasADi::InputOutputScheme  ( = 36) </caption>
+<caption>Output scheme: CasADi::InputOutputScheme  ( = 39) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -287,6 +308,9 @@
 <tr><td>SCHEME_MayerInput</td><td></td></tr>
 <tr><td>SCHEME_OCPInput</td><td></td></tr>
 <tr><td>SCHEME_OCPOutput</td><td></td></tr>
+<tr><td>SCHEME_QCQPSolverInput</td><td></td></tr>
+<tr><td>SCHEME_QCQPSolverOutput</td><td></td></tr>
+<tr><td>SCHEME_QCQPStruct</td><td></td></tr>
 <tr><td>SCHEME_QPSolverInput</td><td></td></tr>
 <tr><td>SCHEME_QPSolverOutput</td><td></td></tr>
 <tr><td>SCHEME_QPStruct</td><td></td></tr>
@@ -314,6 +338,16 @@
 <tr><td>GRADF_GRAD</td><td>Jacobian of the constraints [grad].</td></tr>
 <tr><td>GRADF_F</td><td>Objective function [f].</td></tr>
 <tr><td>GRADF_G</td><td>Constraint function [g].</td></tr>
+</table>
+*/
+/** \defgroup scheme_QCQPSolverOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: CasADi::QCQPSolverOutput  (QCQP_SOLVER_NUM_OUT = 4) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>QCQP_SOLVER_X</td><td>The primal solution [x].</td></tr>
+<tr><td>QCQP_SOLVER_COST</td><td>The optimal cost [cost].</td></tr>
+<tr><td>QCQP_SOLVER_LAM_A</td><td>The dual solution corresponding to linear bounds [lam_a].</td></tr>
+<tr><td>QCQP_SOLVER_LAM_X</td><td>The dual solution corresponding to simple bounds [lam_x].</td></tr>
 </table>
 */
 /** \defgroup scheme_MayerInput
@@ -505,19 +539,19 @@
 \par
 @copydoc scheme_IntegratorInput
 */
-/** \class CasADi::SOCPSolverInternal
+/** \class CasADi::QCQPQPInternal
 \n
 \par
-@copydoc scheme_SOCPInput
+@copydoc scheme_QPSolverInput
 <br/>
-@copydoc scheme_SOCPOutput
+@copydoc scheme_QPSolverOutput
 */
-/** \class CasADi::SOCPSolver
+/** \class CasADi::QCQPQPSolver
 \n
 \par
-@copydoc scheme_SOCPInput
+@copydoc scheme_QPSolverInput
 <br/>
-@copydoc scheme_SOCPOutput
+@copydoc scheme_QPSolverOutput
 */
 /** \class CasADi::WorhpInternal
 \n
@@ -659,6 +693,20 @@
 <br/>
 @copydoc scheme_IntegratorOutput
 */
+/** \class CasADi::QCQPSolverInternal
+\n
+\par
+@copydoc scheme_QCQPSolverInput
+<br/>
+@copydoc scheme_QCQPSolverOutput
+*/
+/** \class CasADi::QCQPSolver
+\n
+\par
+@copydoc scheme_QCQPSolverInput
+<br/>
+@copydoc scheme_QCQPSolverOutput
+*/
 /** \class CasADi::CplexInternal
 \n
 \par
@@ -743,6 +791,20 @@
 <br/>
 @copydoc scheme_OCPOutput
 */
+/** \class CasADi::SOCPSolverInternal
+\n
+\par
+@copydoc scheme_SOCPInput
+<br/>
+@copydoc scheme_SOCPOutput
+*/
+/** \class CasADi::SOCPSolver
+\n
+\par
+@copydoc scheme_SOCPInput
+<br/>
+@copydoc scheme_SOCPOutput
+*/
 /** \class CasADi::RKIntegratorInternal
 \n
 \par
@@ -770,6 +832,20 @@
 @copydoc scheme_QPSolverInput
 <br/>
 @copydoc scheme_QPSolverOutput
+*/
+/** \class CasADi::SOCPQCQPInternal
+\n
+\par
+@copydoc scheme_QCQPSolverInput
+<br/>
+@copydoc scheme_QCQPSolverOutput
+*/
+/** \class CasADi::SOCPQCQPSolver
+\n
+\par
+@copydoc scheme_QCQPSolverInput
+<br/>
+@copydoc scheme_QCQPSolverOutput
 */
 /** \class CasADi::OCPSolverInternal
 \n

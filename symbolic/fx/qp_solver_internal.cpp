@@ -38,25 +38,25 @@ QPSolverInternal::QPSolverInternal(const std::vector<CRSSparsity> &st) : st_(st)
   const CRSSparsity& A = st_[QP_STRUCT_A];
   const CRSSparsity& H = st_[QP_STRUCT_H];
   
-  nx_ = H.size2();
+  n_ = H.size2();
   nc_ = A.isNull() ? 0 : A.size1();
   
   if (!A.isNull()) {
-    casadi_assert_message(A.size2()==nx_,
+    casadi_assert_message(A.size2()==n_,
       "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :" << std::endl <<
       "H: " << H.dimString() << " - A: " << A.dimString() << std::endl <<
       "We need: H.size2()==A.size2()" << std::endl
     );
   } 
   
-  casadi_assert_message(H.size1()==H.size2(),
+  casadi_assert_message(H==trans(H),
     "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
     "H: " << H.dimString() <<
     "We need H square & symmetric" << std::endl
   );
 
   // Sparsity
-  CRSSparsity x_sparsity = sp_dense(nx_,1);
+  CRSSparsity x_sparsity = sp_dense(n_,1);
   CRSSparsity bounds_sparsity = sp_dense(nc_,1);
   
   // Input arguments

@@ -26,6 +26,8 @@
 #include "matrix.hpp"
 #include <algorithm>
 
+#include "sparsity_tools.hpp"
+
 namespace CasADi{
 
 /// Transpose of a matrix
@@ -1040,30 +1042,15 @@ Matrix<T> diag(const Matrix<T>&A){
 /** \brief   Construct a matrix with given block on the diagonal */
 template<class T>
 Matrix<T> blkdiag(const std::vector< Matrix<T> > &A) {
-  int n = 0;
-  int m = 0;
-  
-  std::vector<int> rowind(1,0);
-  std::vector<int> col;
   std::vector<T> data;
   
-  int nz = 0;
+  std::vector<CRSSparsity> sp;
   for (int i=0;i<A.size();++i) {
     data.insert(data.end(),A[i].data().begin(),A[i].data().end());
-    const std::vector<int> &rowind_ = A[i].rowind();
-    const std::vector<int> &col_ = A[i].col();
-    for (int k=1;k<rowind_.size();++k) {
-      rowind.push_back(rowind_[k]+nz);
-    }
-    for (int k=0;k<col_.size();++k) {
-      col.push_back(col_[k]+m);
-    }
-    n+= A[i].size1();
-    m+= A[i].size2();
-    nz+= A[i].size();
+    sp.push_back(A[i].sparsity());
   }
   
-  return Matrix<T>(n,m,col,rowind,data);
+  return Matrix<T>(blkdiag(sp),data);
   
 }
 

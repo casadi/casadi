@@ -95,7 +95,7 @@ void QPOasesInternal::init(){
     max_nWSR_ = getOption("nWSR");
     casadi_assert(max_nWSR_>=0);
   } else {
-    max_nWSR_ = 5 *(nx_ + nc_);
+    max_nWSR_ = 5 *(n_ + nc_);
   }
 
   if(hasSetOption("CPUtime")){
@@ -106,20 +106,20 @@ void QPOasesInternal::init(){
   }
   
   // Create data for H if not dense
-  if(!input(QP_SOLVER_H).sparsity().dense()) h_data_.resize(nx_*nx_);
+  if(!input(QP_SOLVER_H).sparsity().dense()) h_data_.resize(n_*n_);
   
   // Create data for A if not dense
-  if(!input(QP_SOLVER_A).sparsity().dense()) a_data_.resize(nx_*nc_);
+  if(!input(QP_SOLVER_A).sparsity().dense()) a_data_.resize(n_*nc_);
   
   // Dual solution vector
-  dual_.resize(nx_+nc_);
+  dual_.resize(n_+nc_);
   
   // Create qpOASES instance
   if(qp_) delete qp_;
   if(ALLOW_QPROBLEMB && nc_==0){
-    qp_ = new qpOASES::QProblemB(nx_);
+    qp_ = new qpOASES::QProblemB(n_);
   } else {
-    qp_ = new qpOASES::SQProblem(nx_,nc_);
+    qp_ = new qpOASES::SQProblem(n_,nc_);
   }
   called_once_ = false;
 
@@ -240,8 +240,8 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
   qp_->getDualSolution(&dual_.front());
   
   // Split up the dual solution in multipliers for the simple bounds and the linear bounds
-  transform(dual_.begin(),   dual_.begin()+nx_,output(QP_SOLVER_LAM_X).begin(),negate<double>());
-  transform(dual_.begin()+nx_,dual_.end(),     output(QP_SOLVER_LAM_A).begin(),negate<double>());
+  transform(dual_.begin(),   dual_.begin()+n_,output(QP_SOLVER_LAM_X).begin(),negate<double>());
+  transform(dual_.begin()+n_,dual_.end(),     output(QP_SOLVER_LAM_A).begin(),negate<double>());
 }
 
 std::string QPOasesInternal::getErrorMessage(int flag){

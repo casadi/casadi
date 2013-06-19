@@ -29,10 +29,12 @@ from nlp import *
 from implicitfunction import *
 from ad import *
 from sparsity import *
+from linearsolver import *
 from matrix import *
 from qpsolver import *
 from sdp import *
 from misc import *
+from qcqpsolver import *
 from fx import *
 from lpsolver import *
 from tools import *

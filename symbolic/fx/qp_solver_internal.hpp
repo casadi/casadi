@@ -56,7 +56,7 @@ class QPSolverInternal : public FXInternal{
     std::vector<CRSSparsity> st_;
     
     /// Number of decision variables
-    int nx_;
+    int n_;
     
     /// The number of constraints (counting both equality and inequality) == A.size1()
     int nc_; 
