@@ -22,6 +22,7 @@
 
 #include "implicit_function_internal.hpp"
 #include "../mx/mx_node.hpp"
+#include "../mx/mx_tools.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -207,8 +208,10 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given){
+    // Evaluate non-differentiated
+    vector<MX> argv = MXNode::getVector(arg);
     if(!output_given){
-      *res[0] = callSelf(MXNode::getVector(arg)).front();
+      *res[0] = callSelf(argv).front();
     }
 
     // Quick return if no derivatives
@@ -216,66 +219,47 @@ namespace CasADi{
     int nadj = aseed.size();
     if(nfwd==0 && nadj==0) return;
 
-    // Nonlinear function
-    FX& f = f_;
-
-    // Arguments when calling f
-    vector<MX> v = MXNode::getVector(arg);
-    v.insert(v.begin(),*res[0]);    
+    // Arguments when calling f/f_der
+    vector<MX> v;
+    int nf_in = f_.getNumInputs();
+    v.reserve(nf_in*(1+nfwd) + nadj);
+    v.push_back(*res[0]);
+    v.insert(v.end(),argv.begin(),argv.end());
 
     // Get an expression for the Jacobian
-    FX& J_fcn = jac_;
-    MX J = J_fcn.call(v).front();
-
-    // Get the linear solver
-    LinearSolver& linsol = linsol_;
+    MX J = jac_.call(v).front();
 
     // Directional derivatives of f
-    FX der = f.derivative(nfwd,nadj);
+    FX f_der = f_.derivative(nfwd,nadj);
 
-    // Forward sensitivities, collect arguments for calling der
-    if(nfwd>0){
-      MX z_seed = MX::zeros(node->sparsity());
-      for(int d=0; d<nfwd; ++d){
-        v.push_back(z_seed);
-        vector<MX> x_seed = MXNode::getVector(fseed[d]);
-        v.insert(v.end(),x_seed.begin(),x_seed.end());
-      }
+    // Forward sensitivities, collect arguments for calling f_der
+    for(int d=0; d<nfwd; ++d){
+      v.push_back(MX::sparse(output().shape()));
+      argv = MXNode::getVector(fseed[d]);
+      v.insert(v.end(),argv.begin(),argv.end());
     }
+  
+    // Propagate through the implicit function
+    v = f_der.call(v);
 
-    // Adjoint sensitivities, collect arguments for calling der
-    if(nadj>0){
-      // collect the right hand sides
-      for(int d=0; d<nadj; ++d){
-        casadi_error("not implemented");
+    // Solve for the forward sensitivities
+    if(nfwd>0){
+      vector<int> row_offset(1,0);
+      vector<MX> rhs;
+      for(int d=0; d<nfwd; ++d){
+        rhs.push_back(trans(v[1+d]));
+        row_offset.push_back(row_offset.back()+1);        
       }
-
-      // Solve transposed ...
-
-      // Save to arg
+      rhs = vertsplit(J->getSolve(vertcat(rhs),true,linsol_),row_offset);
+      for(int d=0; d<nfwd; ++d){
+        if(fsens[d][0]!=0){
+          *fsens[d][0] = -rhs[d];
+        }
+      }
     }
       
-    // Propagate through the implicit function
-    vector<MX> r = der.call(v);
-
-    if(nfwd>0){
-      // collect the right hand sides ..
-      for(int d=0; d<nfwd; ++d){
-      }
-
-      // Solve ...
-
-      // Save to fsens
-      for(int d=0; d<nfwd; ++d){
-      }
-    }
-
-    for(int d=0; d<nadj; ++d){
-      // Save to asens
-    }
-
     // ... To be continued      
-    casadi_error("not implemented");
+    //    casadi_error("not implemented");
   }
 
  
