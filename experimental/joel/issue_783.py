@@ -10,24 +10,15 @@ storage = []
 for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
   f.init()
   print Function
-  inputss = [sym("i",f.input(i).sparsity()) for i in range(f.getNumInputs()) ]
-  fseeds = [[ sym("f",f.input(i).sparsity()) for i in range(f.getNumInputs())]]
-  aseeds = [[ sym("a",f.output(i).sparsity()) for i in range(f.getNumOutputs()) ]]
+  r = DMatrix([0,1])
+  q = sym("q",2)
 
-  res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
+  _,[[fwdsens]],_ = f.eval([r],[[q]],[])
 
-  vf = Function(inputss+fseeds[0]+aseeds[0],list(res)+list(fwdsens[0])+list(adjsens[0]))
+  vf = Function([q],[fwdsens])
   vf.init()
-
-  for i in range(vf.getNumInputs()):
-    vf.setInput(DMatrix(vf.input(i).sparsity(),range(vf.input(i).size())),i)
-
+  vf.setInput(r)
   vf.evaluate()
-
-  # Added to make sure that the same seeds are used for SX and MX
-  if Function==MXFunction:
-    vf_mx = vf
-
   storage.append([vf.getOutput(i) for i in range(vf.getNumOutputs())])
 
 print "first-order"
