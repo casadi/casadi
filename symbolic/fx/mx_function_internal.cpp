@@ -39,8 +39,6 @@ namespace CasADi{
     XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>(inputv,outputv) {
   
     setOption("name", "unnamed_mx_function");
-    setOption("numeric_jacobian", true);
-    setOption("numeric_hessian", true);
   
     // Check for inputs that are not are symbolic primitives
     int ind=0;
