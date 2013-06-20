@@ -402,22 +402,30 @@ namespace CasADi{
   }
 
   MX MXNode::getSetNonzeros(const MX& y, const std::vector<int>& nz) const{
-    if(nz.size()==0){
-      return y;
-    } else {
-      MX ret;
-      if(Slice::isSlice(nz)){
-        ret = MX::create(new SetNonzerosSlice<false>(y,shared_from_this<MX>(),Slice(nz)));
-      } else if(Slice::isSlice2(nz)){
-        Slice outer;
-        Slice inner(nz,outer);
-        ret = MX::create(new SetNonzerosSlice2<false>(y,shared_from_this<MX>(),inner,outer));
-      } else {
-        ret = MX::create(new SetNonzerosVector<false>(y,shared_from_this<MX>(),nz));
-      }
-      simplify(ret);
-      return ret;
+    // Check if any element needs to be set at all
+    bool set_any = false;
+    for(vector<int>::const_iterator i=nz.begin(); i!=nz.end() && !set_any; ++i){
+      set_any = *i >= 0;
     }
+
+    // Quick return
+    if(!set_any){
+      return y;
+    }
+
+    // Check if slice
+    MX ret;
+    if(Slice::isSlice(nz)){
+      ret = MX::create(new SetNonzerosSlice<false>(y,shared_from_this<MX>(),Slice(nz)));
+    } else if(Slice::isSlice2(nz)){
+      Slice outer;
+      Slice inner(nz,outer);
+      ret = MX::create(new SetNonzerosSlice2<false>(y,shared_from_this<MX>(),inner,outer));
+    } else {
+      ret = MX::create(new SetNonzerosVector<false>(y,shared_from_this<MX>(),nz));
+    }
+    simplify(ret);
+    return ret;
   }
 
 
