@@ -158,6 +158,9 @@ namespace CasADi{
   /** \brief  Unite two matrices no overlapping sparsity */
   MX unite(const MX& A, const MX& B);
 
+  /** \brief Spill elements that do not belong to a sparsity pattern */
+  MX spill(const MX& x, const CRSSparsity& sp);
+
   /** \brief  check if symbolic */
   bool isSymbolic(const MX& ex);
 

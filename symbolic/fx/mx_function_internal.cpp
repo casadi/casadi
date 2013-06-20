@@ -818,9 +818,10 @@ namespace CasADi{
     
       if(it->op == OP_INPUT){
         // Fetch input
-        swork[it->res.front()] = arg[it->arg.front()];
+        const CRSSparsity& sp_input = input(it->arg.front()).sparsity();
+        swork[it->res.front()] = spill(arg[it->arg.front()],sp_input);
         for(int d=0; d<nfdir; ++d){
-          dwork[it->res.front()][d] = fseed[d][it->arg.front()];
+          dwork[it->res.front()][d] = spill(fseed[d][it->arg.front()],sp_input);
         }
       } else if(it->op==OP_OUTPUT){
         // Collect the results
