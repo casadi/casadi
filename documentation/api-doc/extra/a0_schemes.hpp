@@ -37,14 +37,13 @@
 <tr><td>HESSLAG_GRAD_P</td><td>Gradient of the Lagrangian with respect to p [grad_p].</td></tr>
 </table>
 */
-/** \defgroup scheme_LPSolverOutput
+/** \defgroup scheme_LinsolInput
 <a name='schemes'></a><table>
-<caption>Output scheme: CasADi::LPSolverOutput  (LP_SOLVER_NUM_OUT = 4) </caption>
+<caption>Input scheme: CasADi::LinsolInput  (LINSOL_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>LP_SOLVER_X</td><td>The primal solution [x].</td></tr>
-<tr><td>LP_SOLVER_COST</td><td>The optimal cost [cost].</td></tr>
-<tr><td>LP_SOLVER_LAM_A</td><td>The dual solution corresponding to linear bounds [lam_a].</td></tr>
-<tr><td>LP_SOLVER_LAM_X</td><td>The dual solution corresponding to simple bounds [lam_x].</td></tr>
+<tr><td>LINSOL_A</td><td>The square matrix A: sparse, (n x n). [A].</td></tr>
+<tr><td>LINSOL_B</td><td>The right-hand-side matrix b: dense, (n x m) [B].</td></tr>
+<tr><td>LINSOL_T</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_SOCPOutput
@@ -233,7 +232,7 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Input scheme: CasADi::InputOutputScheme  ( = 39) </caption>
+<caption>Input scheme: CasADi::InputOutputScheme  ( = 41) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -246,6 +245,8 @@
 <tr><td>SCHEME_RDAEOutput</td><td></td></tr>
 <tr><td>SCHEME_IntegratorInput</td><td></td></tr>
 <tr><td>SCHEME_IntegratorOutput</td><td></td></tr>
+<tr><td>SCHEME_LinsolInput</td><td></td></tr>
+<tr><td>SCHEME_LinsolOutput</td><td></td></tr>
 <tr><td>SCHEME_LPSolverInput</td><td></td></tr>
 <tr><td>SCHEME_LPSolverOutput</td><td></td></tr>
 <tr><td>SCHEME_LPStruct</td><td></td></tr>
@@ -279,7 +280,7 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Output scheme: CasADi::InputOutputScheme  ( = 39) </caption>
+<caption>Output scheme: CasADi::InputOutputScheme  ( = 41) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -292,6 +293,8 @@
 <tr><td>SCHEME_RDAEOutput</td><td></td></tr>
 <tr><td>SCHEME_IntegratorInput</td><td></td></tr>
 <tr><td>SCHEME_IntegratorOutput</td><td></td></tr>
+<tr><td>SCHEME_LinsolInput</td><td></td></tr>
+<tr><td>SCHEME_LinsolOutput</td><td></td></tr>
 <tr><td>SCHEME_LPSolverInput</td><td></td></tr>
 <tr><td>SCHEME_LPSolverOutput</td><td></td></tr>
 <tr><td>SCHEME_LPStruct</td><td></td></tr>
@@ -331,6 +334,16 @@
 <tr><td>GRADF_P</td><td>Fixed parameter [p].</td></tr>
 </table>
 */
+/** \defgroup scheme_LPSolverOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: CasADi::LPSolverOutput  (LP_SOLVER_NUM_OUT = 4) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>LP_SOLVER_X</td><td>The primal solution [x].</td></tr>
+<tr><td>LP_SOLVER_COST</td><td>The optimal cost [cost].</td></tr>
+<tr><td>LP_SOLVER_LAM_A</td><td>The dual solution corresponding to linear bounds [lam_a].</td></tr>
+<tr><td>LP_SOLVER_LAM_X</td><td>The dual solution corresponding to simple bounds [lam_x].</td></tr>
+</table>
+*/
 /** \defgroup scheme_GradFOutput
 <a name='schemes'></a><table>
 <caption>Output scheme: CasADi::GradFOutput  (GRADF_NUM_OUT = 3) </caption>
@@ -338,6 +351,25 @@
 <tr><td>GRADF_GRAD</td><td>Jacobian of the constraints [grad].</td></tr>
 <tr><td>GRADF_F</td><td>Objective function [f].</td></tr>
 <tr><td>GRADF_G</td><td>Constraint function [g].</td></tr>
+</table>
+*/
+/** \defgroup scheme_OCPInput
+<a name='schemes'></a><table>
+<caption>Input scheme: CasADi::OCPInput  (OCP_NUM_IN = 13) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>OCP_LBX</td><td>States lower bounds (nx x (ns+1)) [lbx].</td></tr>
+<tr><td>OCP_UBX</td><td>States upper bounds (nx x (ns+1)) [ubx].</td></tr>
+<tr><td>OCP_X_INIT</td><td>States initial guess (nx x (ns+1)) [x_init].</td></tr>
+<tr><td>OCP_LBU</td><td>Controls lower bounds (nu x ns) [lbu].</td></tr>
+<tr><td>OCP_UBU</td><td>Controls upper bounds (nu x ns) [ubu].</td></tr>
+<tr><td>OCP_U_INIT</td><td>Controls initial guess (nu x ns) [u_init].</td></tr>
+<tr><td>OCP_LBP</td><td>Parameters lower bounds (np x 1) [lbp].</td></tr>
+<tr><td>OCP_UBP</td><td>Parameters upper bounds (np x 1) [ubp].</td></tr>
+<tr><td>OCP_P_INIT</td><td>Parameters initial guess (np x 1) [p_init].</td></tr>
+<tr><td>OCP_LBH</td><td>Point constraint lower bound (nh x (ns+1)) [lbh].</td></tr>
+<tr><td>OCP_UBH</td><td>Point constraint upper bound (nh x (ns+1)) [ubh].</td></tr>
+<tr><td>OCP_LBG</td><td>Lower bound for the coupling constraints [lbg].</td></tr>
+<tr><td>OCP_UBG</td><td>Upper bound for the coupling constraints [ubg].</td></tr>
 </table>
 */
 /** \defgroup scheme_QCQPSolverOutput
@@ -434,23 +466,11 @@
 <tr><td>JACG_G</td><td>Constraint function [g].</td></tr>
 </table>
 */
-/** \defgroup scheme_OCPInput
+/** \defgroup scheme_LinsolOutput
 <a name='schemes'></a><table>
-<caption>Input scheme: CasADi::OCPInput  (OCP_NUM_IN = 13) </caption>
+<caption>Output scheme: CasADi::LinsolOutput  (LINSOL_NUM_OUT = 1) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>OCP_LBX</td><td>States lower bounds (nx x (ns+1)) [lbx].</td></tr>
-<tr><td>OCP_UBX</td><td>States upper bounds (nx x (ns+1)) [ubx].</td></tr>
-<tr><td>OCP_X_INIT</td><td>States initial guess (nx x (ns+1)) [x_init].</td></tr>
-<tr><td>OCP_LBU</td><td>Controls lower bounds (nu x ns) [lbu].</td></tr>
-<tr><td>OCP_UBU</td><td>Controls upper bounds (nu x ns) [ubu].</td></tr>
-<tr><td>OCP_U_INIT</td><td>Controls initial guess (nu x ns) [u_init].</td></tr>
-<tr><td>OCP_LBP</td><td>Parameters lower bounds (np x 1) [lbp].</td></tr>
-<tr><td>OCP_UBP</td><td>Parameters upper bounds (np x 1) [ubp].</td></tr>
-<tr><td>OCP_P_INIT</td><td>Parameters initial guess (np x 1) [p_init].</td></tr>
-<tr><td>OCP_LBH</td><td>Point constraint lower bound (nh x (ns+1)) [lbh].</td></tr>
-<tr><td>OCP_UBH</td><td>Point constraint upper bound (nh x (ns+1)) [ubh].</td></tr>
-<tr><td>OCP_LBG</td><td>Lower bound for the coupling constraints [lbg].</td></tr>
-<tr><td>OCP_UBG</td><td>Upper bound for the coupling constraints [ubg].</td></tr>
+<tr><td>LINSOL_X</td><td>Solution to the linear system of equations [X].</td></tr>
 </table>
 */
 /** \defgroup scheme_ControlSimulatorInput
@@ -529,6 +549,20 @@
 <br/>
 @copydoc scheme_QPSolverOutput
 */
+/** \class CasADi::CSparseInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/** \class CasADi::CSparse
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
 /** \class CasADi::SimulatorInternal
 \n
 \par
@@ -566,6 +600,20 @@
 @copydoc scheme_NLPSolverInput
 <br/>
 @copydoc scheme_NLPSolverOutput
+*/
+/** \class CasADi::LapackLUDenseInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/** \class CasADi::LapackLUDense
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
 */
 /** \class CasADi::CVodesInternal
 \n
@@ -707,6 +755,20 @@
 <br/>
 @copydoc scheme_QCQPSolverOutput
 */
+/** \class CasADi::CSparseCholeskyInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/** \class CasADi::CSparseCholesky
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
 /** \class CasADi::CplexInternal
 \n
 \par
@@ -720,6 +782,20 @@
 @copydoc scheme_QPSolverInput
 <br/>
 @copydoc scheme_QPSolverOutput
+*/
+/** \class CasADi::LapackQRDenseInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/** \class CasADi::LapackQRDense
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
 */
 /** \class CasADi::KnitroInternal
 \n
@@ -777,6 +853,20 @@
 <br/>
 @copydoc scheme_NLPSolverOutput
 */
+/** \class CasADi::SOCPQCQPInternal
+\n
+\par
+@copydoc scheme_QCQPSolverInput
+<br/>
+@copydoc scheme_QCQPSolverOutput
+*/
+/** \class CasADi::SOCPQCQPSolver
+\n
+\par
+@copydoc scheme_QCQPSolverInput
+<br/>
+@copydoc scheme_QCQPSolverOutput
+*/
 /** \class CasADi::DirectMultipleShootingInternal
 \n
 \par
@@ -790,6 +880,20 @@
 @copydoc scheme_OCPInput
 <br/>
 @copydoc scheme_OCPOutput
+*/
+/** \class CasADi::SymbolicQRInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/** \class CasADi::SymbolicQR
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
 */
 /** \class CasADi::SOCPSolverInternal
 \n
@@ -832,20 +936,6 @@
 @copydoc scheme_QPSolverInput
 <br/>
 @copydoc scheme_QPSolverOutput
-*/
-/** \class CasADi::SOCPQCQPInternal
-\n
-\par
-@copydoc scheme_QCQPSolverInput
-<br/>
-@copydoc scheme_QCQPSolverOutput
-*/
-/** \class CasADi::SOCPQCQPSolver
-\n
-\par
-@copydoc scheme_QCQPSolverInput
-<br/>
-@copydoc scheme_QCQPSolverOutput
 */
 /** \class CasADi::OCPSolverInternal
 \n
@@ -912,6 +1002,20 @@
 \n
 \par
 @copydoc scheme_ControlSimulatorInput
+*/
+/** \class CasADi::LinearSolverInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/** \class CasADi::LinearSolver
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
 */
 /** \class CasADi::CollocationIntegratorInternal
 \n

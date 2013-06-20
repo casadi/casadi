@@ -270,16 +270,6 @@
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
-/** \class CasADi::XFunctionInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
 /** \class CasADi::SQPInternal
 \n
 \par
@@ -325,6 +315,16 @@
 </table>
 */
 /** \class CasADi::FX
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::XFunctionInternal
 \n
 \par
 <a name='monitors'></a><table>
