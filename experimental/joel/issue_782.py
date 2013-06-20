@@ -21,11 +21,11 @@ for f,sym,Function,X in [(fun,msym,MXFunction,MX),(fun.expand(),ssym,SXFunction,
   f.init()
   print Function
 
-  aseeds = [[ sym("a",2) ]]
+  aseeds = sym("a",2)
 
-  res,_,adjsens = f.eval([X.ones(2)],[],aseeds)
+  _,_,[[adjsens]] = f.eval([X.ones(2)],[],[[aseeds]])
 
-  vf = Function(flatten([aseeds[0]]),list(res)+flatten([list(adjsens[0])]))
+  vf = Function([aseeds],[adjsens])
   vf.init()
 
   for i in range(vf.getNumInputs()):
