@@ -437,7 +437,6 @@ class ADtests(casadiTestCase):
             J = self.jacobians[inputtype][outputtype](*n)
             self.checkarray(DMatrix(f.jacSparsity(),1),array(J!=0,int),"jacsparsity")
               
-  @known_bug()
   def test_JacobianMX(self):
     n=array([1.2,2.3,7,4.6])
     for inputshape in ["column","row","matrix"]:
