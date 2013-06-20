@@ -38,11 +38,15 @@ for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
 
   vf.evaluate()
 
+  # Added to make sure that the same seeds are used for SX and MX
+  if Function==MXFunction:
+    vf_mx = vf
+
   storage.append([vf.getOutput(i) for i in range(vf.getNumOutputs())])
 
-  inputss2 = [sym("i",vf.input(i).sparsity()) for i in range(vf.getNumInputs()) ]
-  fseeds2 = [[ sym("f",vf.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
-  aseeds2 = [[ sym("a",vf.output(i).sparsity()) for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
+  inputss2 = [sym("i",vf_mx.input(i).sparsity()) for i in range(vf.getNumInputs()) ]
+  fseeds2 = [[ sym("f",vf_mx.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
+  aseeds2 = [[ sym("a",vf_mx.output(i).sparsity()) for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
   res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
 
   vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2)+flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
@@ -56,6 +60,7 @@ for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
   vf2.evaluate()
 
   storage2.append([vf2.getOutput(i) for i in range(vf2.getNumOutputs())])
+
 
   #print vf2.getOutput(24)
 
@@ -74,3 +79,4 @@ for k,(a,b) in enumerate(zip(storage2[0],storage2[1])):
   if a.numel()==0 and sparse(b).size()==0: continue
   if not(sparse(a-b).size()==0):
     raise Exception("At output(%d) : %s <-> %s" % (k,str(a),str(b)))
+  
