@@ -913,11 +913,15 @@ namespace CasADi{
     return (*this)->getOutput(oind);
   }
 
-  MX MX::setSparse(const CRSSparsity& sp) const{
-    if(sp==sparsity()){
+  MX MX::setSparse(const CRSSparsity& sp, bool intersect) const{
+    if(isNull() || empty() || (sp==sparsity())){
       return *this;
     } else {
-      return (*this)->getSetSparse(sp);
+      if(intersect){
+        return (*this)->getSetSparse(sp.patternIntersection(sparsity()));
+      } else {
+        return (*this)->getSetSparse(sp);
+      }
     }
   }
 

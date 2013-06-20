@@ -799,24 +799,6 @@ namespace CasADi{
     return f.getFree();
   }
 
-  MX spill(const MX& x, const CRSSparsity& sp){
-    // Quick return if empty
-    if(x.empty() && sp.empty()) return x;
-    
-    // Assert matching dimensions
-    casadi_assert(x.shape()==sp.shape());
-
-    // Elements appearing in both
-    CRSSparsity sp_new = x.sparsity().patternIntersection(sp);
-
-    // Zero out, if any
-    if(sp_new != x.sparsity()){
-      return x * MX::ones(sp_new);
-    } else {
-      return x;
-    }
-  }
-
 
 } // namespace CasADi
 

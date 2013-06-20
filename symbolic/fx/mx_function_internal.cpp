@@ -819,9 +819,9 @@ namespace CasADi{
       if(it->op == OP_INPUT){
         // Fetch input
         const CRSSparsity& sp_input = input(it->arg.front()).sparsity();
-        swork[it->res.front()] = spill(arg[it->arg.front()],sp_input);
+        swork[it->res.front()] = arg[it->arg.front()].setSparse(sp_input,true);
         for(int d=0; d<nfdir; ++d){
-          dwork[it->res.front()][d] = spill(fseed[d][it->arg.front()],sp_input);
+          dwork[it->res.front()][d] = fseed[d][it->arg.front()].setSparse(sp_input,true);
         }
       } else if(it->op==OP_OUTPUT){
         // Collect the results
@@ -932,7 +932,7 @@ namespace CasADi{
         } else if(it->op==OP_OUTPUT){
           // Pass the adjoint seeds
           for(int d=0; d<nadir; ++d){
-            dwork[it->arg.front()][d] += aseed[d][it->res.front()];          
+            dwork[it->arg.front()][d] += aseed[d][it->res.front()].setSparse(output(it->res.front()).sparsity(),true);
           }
         } else if(it->op==OP_PARAMETER){
           // Clear adjoint seeds

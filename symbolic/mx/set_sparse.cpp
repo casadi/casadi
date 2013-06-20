@@ -79,19 +79,19 @@ namespace CasADi{
   void SetSparse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     // Evaluate function
     if(!output_given){
-      *output[0] = (*input[0])->getSetSparse(sparsity());
+      *output[0] = input[0]->setSparse(sparsity());
     }
   
     // Propagate forward seeds
     int nfwd = fwdSens.size();
     for(int d=0; d<nfwd; ++d){
-      *fwdSens[d][0] = *fwdSeed[d][0];
+      *fwdSens[d][0] = fwdSeed[d][0]->setSparse(sparsity(),true);
     }
 
     // Propagate adjoint seeds
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] += *adjSeed[d][0];
+      *adjSens[d][0] += adjSeed[d][0]->setSparse(dep().sparsity(),true);
       *adjSeed[d][0] = MX();
     }
   }
@@ -106,6 +106,17 @@ namespace CasADi{
       fill(outputd,outputd+output[0]->size(),bvec_t(0));
     }
   }
+
+  void SetSparse::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+    // Codegen "copy sparse"
+    gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
+
+    // Codegen the operation
+    int sp_arg = gen.getSparsity(dep(0).sparsity());
+    int sp_res = gen.addSparsity(sparsity());
+    stream << "  casadi_copy_sparse(" << arg.front() << ",s" << sp_arg << "," << res.front() << ",s" << sp_res << ");" << std::endl;
+  }
+
 
 } // namespace CasADi
 

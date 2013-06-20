@@ -445,7 +445,7 @@ namespace CasADi{
     MX logic_not() const;
 
     /** \brief Set sparse */
-    MX setSparse(const CRSSparsity& sp) const;
+    MX setSparse(const CRSSparsity& sp, bool intersect=false) const;
 
     /** \brief Make dense */
     MX makeDense(const MX& val = 0) const;
