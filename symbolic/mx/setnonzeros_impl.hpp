@@ -212,7 +212,7 @@ namespace CasADi{
       fill(r_rowind.begin(),r_rowind.end(),0);
       for(int k=0; k<nz.size(); ++k){
         if(r_nz[k]!=-1){
-          r_nz[n++] = nz[r_nz[k]];
+          r_nz[n++] = r_nz[k];
           int i=irow[nz_order[k]];
           int j=icol[nz_order[k]];
           if(i!=last_i || j!=last_j){ // Ignore duplicates
