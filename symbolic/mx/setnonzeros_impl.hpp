@@ -201,32 +201,45 @@ namespace CasADi{
       MX& asens = *adjSens[d][1];
       
       // Get the matching nonzeros
-      r_nz.resize(with_duplicates.size());
-      copy(with_duplicates.begin(),with_duplicates.end(),r_nz.begin());
-      aseed.sparsity().getNZInplace(r_nz);
+      r_col.resize(with_duplicates.size());
+      copy(with_duplicates.begin(),with_duplicates.end(),r_col.begin());
+      aseed.sparsity().getNZInplace(r_col);
       
+      // Assignments
+      r_nz.resize(nz.size());
+      fill(r_nz.begin(),r_nz.end(),-1);
+
       // Add to sparsity pattern
       int n=0, last_i=-1, last_j=-1;
-      r_col.clear();
       r_rowind.resize(isp.size1()+1); // Row count
       fill(r_rowind.begin(),r_rowind.end(),0);
       for(int k=0; k<nz.size(); ++k){
-        if(r_nz[k]!=-1){
-          r_nz[n++] = r_nz[k];
+        if(r_col[k]!=-1){
+          r_nz[nz_order[k]] = r_col[k];
           int i=irow[nz_order[k]];
           int j=icol[nz_order[k]];
           if(i!=last_i || j!=last_j){ // Ignore duplicates
-            r_col.push_back(j);
+            r_col[n++] = j;
             r_rowind[1+i]++;
             last_i = i;
             last_j = j;
           }
         }
       }
-      r_nz.resize(n);
-      for(int i=1; i<r_rowind.size(); ++i) r_rowind[i] += r_rowind[i-1]; // row count -> row offset
+      r_col.resize(n);
 
-      if(r_nz.size()>0){
+      // row count -> row offset
+      for(int i=1; i<r_rowind.size(); ++i) r_rowind[i] += r_rowind[i-1]; 
+      
+      // Remove ignored entries
+      n=0;
+      for(vector<int>::iterator i=r_nz.begin(); i!=r_nz.end(); ++i){
+        if(*i>=0) r_nz[n++] = *i;
+      }
+      r_nz.resize(n);
+
+      // If anything to set/add
+      if(n>0){
         // Create a sparsity pattern from vectors
         CRSSparsity f_sp(isp.size1(),isp.size2(),r_col,r_rowind);
         asens += aseed->getGetNonzeros(f_sp,r_nz);
