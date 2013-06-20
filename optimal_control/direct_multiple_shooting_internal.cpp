@@ -166,7 +166,6 @@ void DirectMultipleShootingInternal::init(){
 
   // NLP
   nlp_ = MXFunction(nlpIn("x",V),nlpOut("f",f,"g",g));
-  nlp_.setOption("numeric_jacobian",false);
   nlp_.setOption("ad_mode","forward");
   nlp_.init();
   
@@ -176,9 +175,6 @@ void DirectMultipleShootingInternal::init(){
   // Allocate an NLP solver
   nlp_solver_ = nlp_solver_creator(nlp_);
   
-  // Symbolically calculate the gradient
-  //nlp_solver_.setOption("generate_gradient",true);
-
   // Pass user options
   if(hasSetOption("nlp_solver_options")){
     const Dictionary& nlp_solver_options = getOption("nlp_solver_options");
