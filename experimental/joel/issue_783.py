@@ -5,7 +5,7 @@ x = msym("x",2,1)
 fun = MXFunction([x],[diag(x[[1,0]])])
 fun.init()
 
-for f,sym,Function,X in [(fun,msym,MXFunction,MX),(fun.expand(),ssym,SXFunction,SXMatrix)]:
+for f,sym,Function,X in [(fun,msym,MXFunction,MX),]:
   f.init()
   print Function
   
@@ -16,6 +16,12 @@ for f,sym,Function,X in [(fun,msym,MXFunction,MX),(fun.expand(),ssym,SXFunction,
   vf = Function([a],[f1])
   vf.init()
   print vf
+
+  vf.setInput(1.0)
+  vf.setAdjSeed([0,1])
+  vf.evaluate(0,1)
+  vf.getAdjSens().printDense()
+
 
   a2 = sym("a2",2)
   _,_,[[f2]] = vf.eval([X.ones(sp_diag(2))],[],[[a2]])
