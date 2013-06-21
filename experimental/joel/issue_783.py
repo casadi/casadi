@@ -5,23 +5,69 @@ x = msym("x",2,1)
 fun = MXFunction([x],[diag(x[[1,0]])])
 fun.init()
 
-for f,sym,Function in [(fun,msym,MXFunction),]:
+storage = []
+storage2 = []
+
+def flatten(l):
+  ret = []
+  for i in l:
+    ret.extend(i)
+  return ret
+
+ndir = 1
+
+for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
   f.init()
-  print f
-
   print Function
-  r = DMatrix([0,1])
-  q = sym("q",2)
+  inputss = [sym("i",f.input(i).sparsity()) for i in range(f.getNumInputs()) ]
+  fseeds = [[ sym("f",f.input(i).sparsity()) for i in range(f.getNumInputs())] for d in range(ndir)]
+  aseeds = [[ sym("a",f.output(i).sparsity()) for i in range(f.getNumOutputs()) ] for d in range(ndir)]
 
-  f.setInput(r)
-  f.setFwdSeed(r)
-  f.evaluate(1,0)
-  f.getFwdSens().printDense()
+  res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
 
-  _,[[fwdsens]],_ = f.eval([r],[[q]],[])
-  vf = Function([q],[fwdsens])
+  vf = Function(inputss+flatten([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res)+flatten([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
   vf.init()
-  vf.setInput(r)
-  vf.evaluate()
-  vf.getOutput().printDense()
 
+  for i in range(vf.getNumInputs()):
+    vf.setInput(DMatrix(vf.input(i).sparsity(),range(vf.input(i).size())),i)
+
+  vf.evaluate()
+
+  # Added to make sure that the same seeds are used for SX and MX
+  if Function==MXFunction:
+    vf_mx = vf
+
+  storage.append([vf.getOutput(i) for i in range(vf.getNumOutputs())])
+
+  inputss2 = [sym("i",vf_mx.input(i).sparsity()) for i in range(vf.getNumInputs()) ]
+  fseeds2 = [[ sym("f",vf_mx.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
+  aseeds2 = [[ sym("a",vf_mx.output(i).sparsity()) for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
+  res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
+
+  vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2)+flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+  vf2.init()
+
+  offset = 0
+  for i in range(vf2.getNumInputs()):
+    vf2.setInput(DMatrix(vf2.input(i).sparsity(),range(offset,offset+vf2.input(i).size())),i)
+    offset+=vf2.input(i).size()
+
+  vf2.evaluate()
+
+  storage2.append([vf2.getOutput(i) for i in range(vf2.getNumOutputs())])
+
+print "first-order"
+for k,(a,b) in enumerate(zip(storage[0],storage[1])):
+  #print a , " == ", b
+  if b.numel()==0 and sparse(a).size()==0: continue
+  if a.numel()==0 and sparse(b).size()==0: continue
+  if not(sparse(a-b).size()==0):
+    raise Exception("At output(%d) : %s <-> %s" % (k,str(a),str(b)))
+
+print "second-order"
+for k,(a,b) in enumerate(zip(storage2[0],storage2[1])):
+  #print a , " == ", b
+  if b.numel()==0 and sparse(a).size()==0: continue
+  if a.numel()==0 and sparse(b).size()==0: continue
+  if not(sparse(a-b).size()==0):
+    raise Exception("At output(%d) : %s <-> %s" % (k,str(a),str(b)))
