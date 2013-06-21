@@ -17,12 +17,11 @@ for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
   f.init()
   print Function
   inputss = [sym("i",f.input(i).sparsity()) for i in range(f.getNumInputs()) ]
-  fseeds = [[ sym("f",f.input(i).sparsity()) for i in range(f.getNumInputs())]]
   aseeds = [[ sym("a",f.output(i).sparsity()) for i in range(f.getNumOutputs()) ]]
 
-  res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
+  _,_,adjsens = f.eval(inputss,[],aseeds)
 
-  vf = Function(inputss+flatten([fseeds[0]+aseeds[0]]),list(res)+flatten([list(fwdsens[0])+list(adjsens[0])]))
+  vf = Function(inputss+flatten([aseeds[0]]),flatten([list(adjsens[0])]))
   vf.init()
 
   # Added to make sure that the same seeds are used for SX and MX
