@@ -13,16 +13,17 @@ def flatten(l):
     ret.extend(i)
   return ret
 
-for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
+for f,sym,Function,X in [(fun,msym,MXFunction,MX),(fun.expand(),ssym,SXFunction,SXMatrix)]:
   f.init()
   print Function
-  inputss = [sym("i",f.input(i).sparsity()) for i in range(f.getNumInputs()) ]
-  aseeds = [[ sym("a",f.output(i).sparsity()) for i in range(f.getNumOutputs()) ]]
+  
+  a = sym("a",sp_diag(2))
 
-  _,_,adjsens = f.eval(inputss,[],aseeds)
+  _,_,[[f1]] = f.eval([X.ones(2)],[],[[a]])
 
-  vf = Function(inputss+flatten([aseeds[0]]),flatten([list(adjsens[0])]))
+  vf = Function([a],[f1])
   vf.init()
+  print vf
 
   # Added to make sure that the same seeds are used for SX and MX
   if Function==MXFunction:
