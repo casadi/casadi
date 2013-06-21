@@ -29,11 +29,10 @@ for f,sym,Function in [(fun,msym,MXFunction),(fun.expand(),ssym,SXFunction)]:
     vf_mx = vf
 
   inputss2 = [sym("i",vf_mx.input(i).sparsity()) for i in range(vf.getNumInputs()) ]
-  fseeds2 = [[ sym("f",vf_mx.input(i).sparsity()) for i in range(vf.getNumInputs())]]
   aseeds2 = [[ sym("a",vf_mx.output(i).sparsity()) for i in range(vf.getNumOutputs()) ]]
-  res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
+  _,_,adjsens2 = vf.eval(inputss2,[],aseeds2)
 
-  vf2 = Function(inputss2+flatten([fseeds2[0]+aseeds2[0]]),list(res2)+flatten([list(fwdsens2[0])+list(adjsens2[0])]))
+  vf2 = Function(inputss2+flatten([aseeds2[0]]),flatten([list(adjsens2[0])]))
   vf2.init()
 
   offset = 0
