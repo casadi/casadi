@@ -150,6 +150,21 @@ namespace CasADi{
       arg.sparsity().getElements(r_nz,false);
       isp.getNZInplace(r_nz);
 
+      // Filter out ignored entries and check if there is anything to add at all
+      bool elements_to_add = false;
+      for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
+        if(*k>=0){
+          if(nz[*k]>=0){
+            elements_to_add = true;
+          } else {
+            *k = -1;
+          }
+        }
+      }
+
+      // Quick continue of no elements to set/add
+      if(!elements_to_add) continue;
+      
       // Get the nz locations in the argument corresponding to the inputs
       r_ind.resize(el_output.size());
       copy(el_output.begin(),el_output.end(),r_ind.begin());
@@ -171,24 +186,15 @@ namespace CasADi{
         }
       }
 
-      // Have r_nz point to locations in the result instead of the output and check if there is anything to add at all
-      bool elements_to_add = false;
+      // Have r_nz point to locations in the result instead of the output
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
         if(*k>=0){
-          int k2 = nz[*k];
-          if(k2>=0){
-            *k = r_ind[k2];
-            elements_to_add = true;
-          } else {
-            *k = -1;
-          }
+          *k = r_ind[nz[*k]];
         }
       }
 
       // Add to the element to the sensitivity, if any
-      if(elements_to_add){
-        res = arg->getAddNonzeros(res,r_nz);
-      }
+      res = arg->getAddNonzeros(res,r_nz);
     }
 
     // Adjoint sensitivities
