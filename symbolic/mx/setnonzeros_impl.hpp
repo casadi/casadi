@@ -194,11 +194,7 @@ namespace CasADi{
       }
 
       // Add to the element to the sensitivity, if any
-      if(Add){
-        res = arg->getAddNonzeros(res,r_nz);
-      } else {
-        res = arg->getSetNonzeros(res,r_nz);
-      }
+      res = arg->getAddNonzeros(res,r_nz);
     }
 
     // Adjoint sensitivities
