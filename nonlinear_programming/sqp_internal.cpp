@@ -209,7 +209,7 @@ namespace CasADi{
   
     // Initialize Lagrange multipliers of the NLP
     copy(input(NLP_SOLVER_LAM_G0).begin(),input(NLP_SOLVER_LAM_G0).end(),mu_.begin());
-    copy(output(NLP_SOLVER_LAM_X).begin(),output(NLP_SOLVER_LAM_X).end(),mu_x_.begin());
+    copy(input(NLP_SOLVER_LAM_X0).begin(),input(NLP_SOLVER_LAM_X0).end(),mu_x_.begin());
 
     // Initial constraint Jacobian
     eval_jac_g(x_,gk_,Jk_);
