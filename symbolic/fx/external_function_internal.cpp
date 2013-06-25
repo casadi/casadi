@@ -133,12 +133,12 @@ void ExternalFunctionInternal::init(){
   // Get pointers to the inputs
   input_array_.resize(input_.size());
   for(int i=0; i<input_array_.size(); ++i)
-    input_array_[i] = &input(i).front();
+    input_array_[i] = input(i).ptr();
 
   // Get pointers to the outputs
   output_array_.resize(output_.size());
   for(int i=0; i<output_array_.size(); ++i)
-    output_array_[i] = &output(i).front();
+    output_array_[i] = output(i).ptr();
 }
 
 
