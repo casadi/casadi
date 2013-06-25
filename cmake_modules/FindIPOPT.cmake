@@ -2,6 +2,7 @@
 find_package(PkgConfig)
 pkg_search_module(IPOPT ipopt)
 
+include(canonicalize_paths)
 canonicalize_paths(IPOPT_LIBRARY_DIRS)
 
 # add osx frameworks to IPOPT_LIBRARIES
