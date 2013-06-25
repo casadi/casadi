@@ -34,6 +34,7 @@
 
 #ifdef WITH_DL 
 #include <cstdlib>
+#include <ctime>
 #endif // WITH_DL 
 
 using namespace std;
