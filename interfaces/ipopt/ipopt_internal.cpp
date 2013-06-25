@@ -651,20 +651,22 @@ namespace CasADi{
         //casadi_assert_warning(init_z,"Not initializing z");
       }
       
-      if(init_x) 
+      if(init_x){
         input(NLP_SOLVER_X0).getArray(x,n);
+      }
     
       if (init_z) {
         // Get dual solution (simple bounds)
-        vector<double>& lambda_x = output(NLP_SOLVER_LAM_X).data();
+        vector<double>& lambda_x = input(NLP_SOLVER_LAM_X0).data();
         for(int i=0; i<lambda_x.size(); ++i){
           z_L[i] = max(0.,-lambda_x[i]);
           z_U[i] = max(0., lambda_x[i]);
         }
       }
     
-      if (init_lambda)
+      if (init_lambda){
         input(NLP_SOLVER_LAM_G0).getArray(lambda,m);
+      }
     
       return true;
     } catch (exception& ex){
