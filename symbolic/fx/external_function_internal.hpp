@@ -26,6 +26,14 @@
 #include "external_function.hpp"
 #include "fx_internal.hpp"
 
+#ifdef WITH_DL 
+#ifdef _WIN32 // also for 64-bit
+#include <windows.h>
+#else // _WIN32
+#include <dlfcn.h>
+#endif // _WIN32
+#endif // WITH_DL 
+
 namespace CasADi{
   
 class ExternalFunctionInternal : public FXInternal{
@@ -62,8 +70,14 @@ class ExternalFunctionInternal : public FXInternal{
   /** \brief  Function pointers */
   evaluatePtr evaluate_;
     
+#if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
+  typedef HINSTANCE handle_t;
+#else
+  typedef void* handle_t;
+#endif
+
   /** \brief  handle to the dll */
-  void* handle_;
+  handle_t handle_;
   
   /** \brief  Array of pointers to the input */
   std::vector<const double*> input_array_;

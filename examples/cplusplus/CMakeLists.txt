@@ -169,7 +169,7 @@ if(WITH_DL AND IPOPT_FOUND)
   target_link_libraries(nlp_codegen casadi_ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
 endif()
 
-if(WITH_DL)
+if(WITH_DL AND NOT WIN32)
   add_executable(codegen_usage codegen_usage.cpp)
   target_link_libraries(codegen_usage casadi ${CASADI_DEPENDENCIES})
 endif()
