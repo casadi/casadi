@@ -1,0 +1,40 @@
+Example showing how to generate, compile and run code in an embedded environment
+
+The example consists of three parts:
+
+PART1: Generate the NLP functions
+This generates a simple NLP, including first and second order derivative information. This function can be written in Python via CasADi's Python interface
+
+PART2:
+Compile the generated NLP functions. A cmake-file was generated during PART1
+
+PART3:
+Solve the NLP
+
+
+USAGE INSTRUCTIONS
+1. Compile and install CasADi on the target system. For this example, only a CasADi installation with IPOPT is needed. You can specify the installation location by setting CMAKE_INSTALL_PREFIX
+> cd <casadi-source>
+> mkdir build
+> cd build
+> cmake .. -DCMAKE_INSTALL_PREFIX:PATH=<installation path>
+
+2. Compile the code for part1 and part3, you may need to instruct the code where to find IPOPT and CasADi.
+> mkdir build
+> cd build
+> export PKG_CONFIG_PATH=<directory where ipopt.pc is located>
+> export CASADI_PREFIX=<directory where casadi was installed (see above). Not needed if CasADi is in the standard paths
+> cmake ..
+> make
+
+3. Run part1 to generate the NLP functions and the Makefile
+> cd bin
+> ./embedding_part1
+
+4. Compile the generated code using the generated CMakeLists.txt
+> cmake .
+> make
+
+5. Run part3 to solve the NLP
+> ./embedding_part3
+

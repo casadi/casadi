@@ -21,17 +21,19 @@
  */
 
 #include <symbolic/casadi.hpp>
-#include <interfaces/ipopt/ipopt_solver.hpp>
 #include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/fx/nlp_solver.hpp>
+#include <fstream>
 
 using namespace CasADi;
 using namespace std;
 /**
- *  Example program demonstrating NLP solution with Ipopt with callback functions as generated code
+ *  Solve an NLP using codegen  
+ *  Part 1: generation
  *  Joel Andersson, K.U. Leuven 2013
  */
 
-FX generateCodeAndCompile(FX fcn, const std::string& name, bool expand){
+void generateCode(FX fcn, const std::string& name, bool expand, std::ostream& makefile){
   cout << "Generating code for " << name << endl;
 
   // Convert to an SXFunction (may or may not improve efficiency)
@@ -42,17 +44,12 @@ FX generateCodeAndCompile(FX fcn, const std::string& name, bool expand){
 
   // Generate C code
   fcn.generateCode(name + ".c");
-
-  // Compilation command
-  string compile_command = "gcc -fPIC -shared -O3 " + name + ".c -o " + name + ".so";
-
-  // Compile the c-code
-  int flag = system(compile_command.c_str());
-  casadi_assert_message(flag==0, "Compilation failed");
-
-  // Load the generated function for evaluation
-  ExternalFunction fcn_e("./" + name + ".so");
-  return fcn_e;
+  
+  // Generate compilation instructions
+  makefile << "add_library(" << name << " SHARED " << name << ".c)" << endl;
+  makefile << "set_target_properties(" << name << " PROPERTIES PREFIX \"\")" << endl;
+  makefile << "set_target_properties(" << name << " PROPERTIES SUFFIX \".casadi\")" << endl;
+  makefile << endl;
 }
 
 int main(){
@@ -95,32 +92,21 @@ int main(){
   FX hess_lag = grad_lag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
   hess_lag.init();
 
+  // Generate Makefile
+  ofstream makefile;
+  makefile.open("./CMakeLists.txt");
+  makefile << "cmake_minimum_required(VERSION 2.6)" << endl;
+  makefile << "project(nlp-codegen-autogen C)" << endl;
+
   // Codegen and compile
-  nlp = generateCodeAndCompile(nlp,"nlp", expand);
-  grad_f = generateCodeAndCompile(grad_f,"grad_f", expand);
-  jac_g = generateCodeAndCompile(jac_g,"jac_g", expand);
-  hess_lag = generateCodeAndCompile(hess_lag,"hess_lag", expand);
+  generateCode(nlp,"nlp", expand, makefile);
+  generateCode(grad_f,"grad_f", expand, makefile);
+  generateCode(jac_g,"jac_g", expand, makefile);
+  generateCode(hess_lag,"hess_lag", expand, makefile);
 
-  // Create an NLP solver passing derivative information
-  IpoptSolver solver(nlp);
-  solver.setOption("grad_f",grad_f);
-  solver.setOption("jac_g",jac_g);
-  solver.setOption("hess_lag",hess_lag);
-  solver.init();
+  // Finalize makefile
+  makefile.close();
 
-  // Set constraint bounds
-  solver.setInput(0.,"lbg");
-
-  // Solve the NLP
-  solver.evaluate();
-
-  // Print solution
-  cout << "-----" << endl;
-  cout << "objective at solution = " << solver.output("f") << endl;
-  cout << "primal solution = " << solver.output("x") << endl;
-  cout << "dual solution (x) = " << solver.output("lam_x") << endl;
-  cout << "dual solution (g) = " << solver.output("lam_g") << endl;
-  
   return 0;
 }
 
