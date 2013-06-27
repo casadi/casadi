@@ -24,9 +24,7 @@
 
 #include "../../symbolic/stl_vector_tools.hpp"
 #include "../../symbolic/matrix/matrix_tools.hpp"
-//#include "../../symbolic/sx/sx_tools.hpp"
 #include "../../symbolic/mx/mx_tools.hpp"
-//#include "../../symbolic/fx/sx_function.hpp"
 #include "../../symbolic/fx/mx_function.hpp"
 /**
 Some implementation details
@@ -219,8 +217,6 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
     
     // TODO: this can be made non-allocating bu hacking into DSDP source code
     info = LPConeSetDataC(lpcone_, nc_*2, &mappingA_.output(0).data()[0]);
-    
-    LPConeView(lpcone_);
 
   }
 
