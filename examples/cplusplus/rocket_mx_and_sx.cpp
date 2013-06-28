@@ -21,15 +21,9 @@
  */
 
 #include <iostream>
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/fx/mx_function.hpp>
-#include <symbolic/mx/mx_tools.hpp>
 #include <symbolic/fx/external_function.hpp>
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
-
-#include <symbolic/mx/mx_node.hpp>
 
 using namespace CasADi;
 using namespace std;
@@ -74,8 +68,6 @@ FX create_integrator(int nj, int nu){
   SXFunction integrator(input,output);
   integrator.init();
 
-//  integrator->generateCode("rocket.c");
-
   return integrator;
 }
 
@@ -117,15 +109,15 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction ffcn(U,F); // objective function
-  MXFunction gfcn(U,G); // constraint function
+  MXFunction nlp(nlpIn("x",U),nlpOut("f",F,"g",G));
 
   // Allocate an NLP solver
-//  LiftedNewtonSolver solver(ffcn,gfcn);
-  IpoptSolver solver(ffcn,gfcn);
+  IpoptSolver solver(nlp);
   
   // Set options
   solver.setOption("tol",1e-10);
+  solver.setOption("hessian_approximation","limited-memory");
+
   // initialize the solver
   solver.init();
 
@@ -136,22 +128,22 @@ int main(){
     Umax[i] =  10;
     Usol[i] = 0.4;
   }
-  solver.setInput(Umin,NLP_LBX);
-  solver.setInput(Umax,NLP_UBX);
-  solver.setInput(Usol,NLP_X_INIT);
+  solver.setInput(Umin,"lbx");
+  solver.setInput(Umax,"ubx");
+  solver.setInput(Usol,"x0");
 
   // Bounds on g
   vector<double> Gmin(2), Gmax(2);
   Gmin[0] = Gmax[0] = 10;
   Gmin[1] = Gmax[1] =  0;
-  solver.setInput(Gmin,NLP_LBG);
-  solver.setInput(Gmax,NLP_UBG);
+  solver.setInput(Gmin,"lbg");
+  solver.setInput(Gmax,"ubg");
 
   // Solve the problem
   solver.solve();
 
   // Get the solution
-  solver.getOutput(Usol,NLP_X_OPT);
+  solver.getOutput(Usol,"x");
   cout << "optimal solution: " << Usol << endl;
 
   }

@@ -34,13 +34,13 @@ import numpy as n
 from casadi import *
 #! Let's solve a simple scalar non-linear program:
 
-x = SX("x")
+x = ssym("x")
 
-y = SX("y")
+y = ssym("y")
 
 #f  = SXFunction([x,y], tan(x)-1) 
 
-#g=SXFunction([x,y],y)
+#g=SXFunction([x,y],[y])
 
 #print f.eval(x)
 #! Quadractic program
@@ -58,36 +58,36 @@ P = MX(DMatrix(P))
 q = MX(DMatrix(q))
 A = MX(DMatrix(A))
 
-# Objective function
+#! Objective
 F = 0.5*mul(mul(trans(X),P),X) + mul(trans(q),X)
 
-f = MXFunction([X],[F])
-f.init()
-f.setInput([1,1,1,1,1])
-f.evaluate()
+#! Constraint
+G = X+X
+
+#! NLP
+nlp = MXFunction(nlpIn(x=X),nlpOut(f=F,g=G))
+nlp.init()
+nlp.setInput([1,1,1,1,1],"x")
+nlp.evaluate()
 #! Test the objective for some value of x:
-print f.output().toArray()
+print nlp.output("f").toArray()
 
-# constraint function
-g = MXFunction([X],[X+X])
-g.init()
-
-solver = IpoptSolver(f,g)
+solver = IpoptSolver(nlp)
 solver.printOptions()
 
 solver.init()
 
 #! The default lower an upper bound on the optimizations variables is zero.
 #! Change them to unbouded as follows:
-solver.setInput([-100,-100,-100,-100,-100],NLP_LBX)
-solver.setInput([100, 100, 100, 100, 100],NLP_UBX)
+solver.setInput([-100,-100,-100,-100,-100],"lbx")
+solver.setInput([100, 100, 100, 100, 100],"ubx")
 
 #! Inequality constraints.
 #! The lower bound is also necessary, although Ipopt itself does not seem to require it
-solver.setInput(b,NLP_UBG)
-solver.setInput([-100,-100,-100,-100,-100],NLP_LBG)
+solver.setInput(b,"ubg")
+solver.setInput([-100,-100,-100,-100,-100],"lbg")
 
 
 solver.solve()
-print solver.output(NLP_X_OPT)
+print solver.getOutput("x")
 #! Nested optimization

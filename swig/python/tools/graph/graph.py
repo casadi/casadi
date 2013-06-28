@@ -20,6 +20,7 @@
 # 
 # 
 from casadi import SX, SXMatrix, MX, getOperatorRepresentation
+import casadi as C
 
 try:
   import pydot
@@ -84,7 +85,7 @@ class DotArtist:
   def hasPorts(self):
     return False
     
-  def drawSparsity(self,s,id=None,depid=None,graph=None):
+  def drawSparsity(self,s,id=None,depid=None,graph=None,nzlabels=None):
     if id is None:
       id = str(s.__hash__())
     if depid is None:
@@ -93,6 +94,9 @@ class DotArtist:
       graph = self.graph
     sp = s.sparsity()
     deps = getDeps(s)
+    if nzlabels is None:
+      nzlabels = map(str,range(sp.size()))
+    nzlabelcounter = 0
     if s.size()==s.numel():
       graph.add_node(pydot.Node(id,label="%d x %d" % (s.size1(),s.size2()),shape='rectangle',color=self.sparsitycol,style="filled"))
     else:
@@ -105,7 +109,8 @@ class DotArtist:
           if k==-1:
             label+="<TD>.</TD>"
           else:
-            label+="<TD PORT='f%d' BGCOLOR='%s'> </TD>" % (k,self.sparsitycol)
+            label+="<TD PORT='f%d' BGCOLOR='%s'>%s</TD>" % (k,self.sparsitycol,nzlabels[nzlabelcounter])
+            nzlabelcounter +=1
         label+="</TR>"
       label+="</TABLE>>"
       graph.add_node(pydot.Node(id,label=label,shape='plaintext'))
@@ -140,71 +145,71 @@ class MXSymbolicArtist(DotArtist):
       label+="</TABLE>>"
       graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
     
-class MXMappingArtist(DotArtist):
-  def draw(self):
-    s = self.s
-    graph = self.graph
-    sp = s.sparsity()
-    row = sp.getRow()
+# class MXMappingArtist(DotArtist):
+#   def draw(self):
+#     s = self.s
+#     graph = self.graph
+#     sp = s.sparsity()
+#     row = sp.getRow()
     
     
-    # Note: due to Mapping restructuring, this is no longer efficient code
-    deps = getDeps(s)
+#     # Note: due to Mapping restructuring, this is no longer efficient code
+#     deps = getDeps(s)
     
-    depind = s.getDepInd()
-    nzmap = sum([s.mapping(i) for i in range(len(deps))])
+#     depind = s.getDepInd()
+#     nzmap = sum([s.mapping(i) for i in range(len(deps))])
     
-    for k,d in enumerate(deps):
-      candidates = map(hash,filter(lambda i: i.isMapping(),self.invdep[d]))
-      candidates.sort()
-      if candidates[0] == hash(s):
-        graph.add_edge(pydot.Edge(str(d.__hash__()),"mapinput" + str(d.__hash__())))
+#     for k,d in enumerate(deps):
+#       candidates = map(hash,filter(lambda i: i.isMapping(),self.invdep[d]))
+#       candidates.sort()
+#       if candidates[0] == hash(s):
+#         graph.add_edge(pydot.Edge(str(d.__hash__()),"mapinput" + str(d.__hash__())))
       
-    graph = pydot.Cluster('clustertest' + str(s.__hash__()), rank='max', label='Mapping')
-    self.graph.add_subgraph(graph)
+#     graph = pydot.Cluster('clustertest' + str(s.__hash__()), rank='max', label='Mapping')
+#     self.graph.add_subgraph(graph)
     
 
     
-    colors = ['#eeeecc','#ccccee','#cceeee','#eeeecc','#eeccee','#cceecc']
+#     colors = ['#eeeecc','#ccccee','#cceeee','#eeeecc','#eeccee','#cceecc']
     
-    for k,d in enumerate(deps):
-      spd = d.sparsity()
-      #ipdb.set_trace()
-      # The Matrix grid is represented by a html table with 'ports'
-      candidates = map(hash,filter(lambda i: i.isMapping(),self.invdep[d]))
-      candidates.sort()
-      if candidates[0] == hash(s):
-        label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="#0000aa">'
-        if not(d.numel()==1 and d.numel()==d.size()): 
-          label+="<TR><TD COLSPAN='%d' BGCOLOR='#dddddd'><font>%s</font></TD></TR>" % (d.size2(), d.dimString())
-        for i in range(d.size1()):
-          label+="<TR>"
-          for j in range(d.size2()):
-            kk = spd.getNZ_const(i,j)
-            if kk==-1:
-              label+="<TD>.</TD>"
-            else:
-              label+="<TD PORT='f%d' BGCOLOR='%s'> <font color='#666666'>%d</font> </TD>" % (kk,colors[k],kk)
-          label+="</TR>"
-        label+="</TABLE>>"
-        graph.add_node(pydot.Node("mapinput" + str(d.__hash__()),label=label,shape='plaintext'))
-      graph.add_edge(pydot.Edge("mapinput" + str(d.__hash__()),str(s.__hash__())))
+#     for k,d in enumerate(deps):
+#       spd = d.sparsity()
+#       #ipdb.set_trace()
+#       # The Matrix grid is represented by a html table with 'ports'
+#       candidates = map(hash,filter(lambda i: i.isMapping(),self.invdep[d]))
+#       candidates.sort()
+#       if candidates[0] == hash(s):
+#         label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="#0000aa">'
+#         if not(d.numel()==1 and d.numel()==d.size()): 
+#           label+="<TR><TD COLSPAN='%d' BGCOLOR='#dddddd'><font>%s</font></TD></TR>" % (d.size2(), d.dimString())
+#         for i in range(d.size1()):
+#           label+="<TR>"
+#           for j in range(d.size2()):
+#             kk = spd.getNZ_const(i,j)
+#             if kk==-1:
+#               label+="<TD>.</TD>"
+#             else:
+#               label+="<TD PORT='f%d' BGCOLOR='%s'> <font color='#666666'>%d</font> </TD>" % (kk,colors[k],kk)
+#           label+="</TR>"
+#         label+="</TABLE>>"
+#         graph.add_node(pydot.Node("mapinput" + str(d.__hash__()),label=label,shape='plaintext'))
+#       graph.add_edge(pydot.Edge("mapinput" + str(d.__hash__()),str(s.__hash__())))
       
-    # The Matrix grid is represented by a html table with 'ports'
-    label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
-    if not(s.numel()==1 and s.numel()==s.size()): 
-      label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
-    for i in range(s.size1()):
-      label+="<TR>"
-      for j in range(s.size2()):
-        k = sp.getNZ_const(i,j)
-        if k==-1:
-          label+="<TD>.</TD>"
-        else:
-          label+="<TD PORT='f%d' BGCOLOR='%s'> <font color='#666666'>%d</font> </TD>" % (k,colors[depind[k]],nzmap[k])
-      label+="</TR>"
-    label+="</TABLE>>"
-    graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
+#     # The Matrix grid is represented by a html table with 'ports'
+#     label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'
+#     if not(s.numel()==1 and s.numel()==s.size()): 
+#       label+="<TR><TD COLSPAN='%d'><font color='#666666'>%s</font></TD></TR>" % (s.size2(), s.dimString())
+#     for i in range(s.size1()):
+#       label+="<TR>"
+#       for j in range(s.size2()):
+#         k = sp.getNZ_const(i,j)
+#         if k==-1:
+#           label+="<TD>.</TD>"
+#         else:
+#           label+="<TD PORT='f%d' BGCOLOR='%s'> <font color='#666666'>%d</font> </TD>" % (k,colors[depind[k]],nzmap[k])
+#       label+="</TR>"
+#     label+="</TABLE>>"
+#     graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
     
    
 class MXEvaluationArtist(DotArtist):
@@ -240,7 +245,7 @@ class MXConstantArtist(DotArtist):
     graph = self.graph
     sp = s.sparsity()
     row = sp.getRow()
-    M = s.getConstant()
+    M = s.getMatrixValue()
     col = "#009900"
     if s.size() == s.numel() and s.size() == 1:
       graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=M[0,0],shape='rectangle',color=col))
@@ -260,6 +265,155 @@ class MXConstantArtist(DotArtist):
       label+="</TABLE>>"
       graph.add_node(pydot.Node(str(self.s.__hash__()),label=label,shape='plaintext'))
 
+class MXGenericArtist(DotArtist):
+  def draw(self):
+    k = self.s
+    graph = self.graph
+    dep = getDeps(k)
+
+    show_sp = not(all([d.sparsity()==k.sparsity() for d in dep]))
+    
+    if show_sp:
+      op = "op"
+      self.drawSparsity(k,depid=op + str(k.__hash__()))
+    else:
+      op = ""
+    
+    if len(dep)>1:
+      # Non-commutative operators are represented by 'record' shapes.
+      # The dependencies have different 'ports' where arrows should arrive.
+      s = getOperatorRepresentation(self.s,["| <f%d> | " %i for i in range(len(dep))])
+      if s.startswith("(|") and s.endswith("|)"):
+        s=s[2:-2]
+      
+      graph.add_node(pydot.Node(op + str(k.__hash__()),label=s,shape='Mrecord'))
+      for i,n in enumerate(dep):
+        graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())+":f%d" % i))
+    else:
+      s = getOperatorRepresentation(k,["."])
+      self.graph.add_node(pydot.Node(op + str(k.__hash__()),label=s,shape='oval'))
+      for i,n in enumerate(dep):
+        self.graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())))
+
+class MXGetNonzerosArtist(DotArtist):
+  def draw(self):
+    s = self.s
+    graph = self.graph
+    n = getDeps(s)[0]
+    
+    
+    show_sp = not(s.size() == s.numel() and s.size() == 1)
+    
+    if show_sp:
+      op = "op"
+      self.drawSparsity(s,depid=op + str(s.__hash__()))
+    else:
+      op = ""
+      
+    sp = s.sparsity()
+    row = sp.getRow()
+    M = s.mapping()
+    col = "#333333"
+    if s.size() == s.numel() and s.size() == 1:
+      graph.add_node(pydot.Node(op+str(s.__hash__())+":f0",label="[%s]" % str(M[0,0]),shape='rectangle',style="filled",fillcolor='#eeeeff'))
+    else:
+      # The Matrix grid is represented by a html table with 'ports'
+      label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="%s">' % col
+      label+="<TR><TD COLSPAN='%d' PORT='entry'>getNonzeros</TD></TR>" % (s.size2())
+      for i in range(s.size1()):
+        label+="<TR>"
+        for j in range(s.size2()):
+          k = sp.getNZ_const(i,j)
+          if k==-1:
+            label+="<TD>.</TD>"
+          else:
+            label+="<TD PORT='f%d' BGCOLOR='#eeeeff'> %s </TD>" % (k,M[i,j])
+        label+="</TR>"
+      label+="</TABLE>>"
+      graph.add_node(pydot.Node(op+str(s.__hash__()),label=label,shape='plaintext'))
+    self.graph.add_edge(pydot.Edge(str(n.__hash__()),op+str(s.__hash__())))
+
+class MXSetNonzerosArtist(DotArtist):
+  def draw(self):
+    s = self.s
+    graph = self.graph
+    entry = getDeps(s)[0]
+    target = getDeps(s)[1]
+    
+    
+    show_sp = not(all([d.sparsity()==s.sparsity() for d in getDeps(s)]))
+    
+    if show_sp:
+      op = "op"
+      self.drawSparsity(s,depid=op + str(s.__hash__()))
+    else:
+      op = ""
+      
+    sp = target.sparsity()
+    row = sp.getRow()
+    M = list(s.mapping())
+    Mk = 0 
+    col = "#333333"
+
+    # The Matrix grid is represented by a html table with 'ports'
+    label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="%s">' % col
+    label+="<TR><TD COLSPAN='%d' PORT='entry'>setNonzeros</TD></TR>" % (s.size2())
+    for i in range(s.size1()):
+      label+="<TR>"
+      for j in range(s.size2()):
+        k = entry.sparsity().getNZ_const(i,j)
+        if k==-1 or Mk>= len(M) or k != M[Mk]:
+          label+="<TD>.</TD>"
+        else:
+          label+="<TD PORT='f%d' BGCOLOR='#eeeeff'> %s </TD>" % (Mk,Mk)
+          Mk+=1 
+      label+="</TR>"
+    label+="</TABLE>>"
+    graph.add_node(pydot.Node(op+str(s.__hash__()),label=label,shape='plaintext'))
+    self.graph.add_edge(pydot.Edge(str(entry.__hash__()),op+str(s.__hash__())+':entry'))
+    self.graph.add_edge(pydot.Edge(str(target.__hash__()),op+str(s.__hash__())))
+
+
+class MXAddNonzerosArtist(DotArtist):
+  def draw(self):
+    s = self.s
+    graph = self.graph
+    entry = getDeps(s)[0]
+    target = getDeps(s)[1]
+
+    show_sp = not(all([d.sparsity()==s.sparsity() for d in getDeps(s)]))
+    
+    if show_sp:
+      op = "op"
+      self.drawSparsity(s,depid=op + str(s.__hash__()))
+    else:
+      op = ""
+      
+    sp = target.sparsity()
+    row = sp.getRow()
+    M = list(s.mapping())
+    Mk = 0 
+    col = "#333333"
+
+    # The Matrix grid is represented by a html table with 'ports'
+    label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" COLOR="%s">' % col
+    label+="<TR><TD COLSPAN='%d' PORT='entry'>addNonzeros</TD></TR>" % (s.size2())
+    for i in range(s.size1()):
+      label+="<TR>"
+      for j in range(s.size2()):
+        k = sp.getNZ_const(i,j)
+        if k==-1 or Mk>= len(M) or k != M[Mk]:
+          label+="<TD>.</TD>"
+        else:
+          label+="<TD PORT='f%d' BGCOLOR='#eeeeff'> %s </TD>" % (Mk,Mk)
+          Mk+=1 
+      label+="</TR>"
+    label+="</TABLE>>"
+    graph.add_node(pydot.Node(op+str(s.__hash__()),label=label,shape='plaintext'))
+    self.graph.add_edge(pydot.Edge(str(entry.__hash__()),op+str(s.__hash__())+':entry'))
+    self.graph.add_edge(pydot.Edge(str(target.__hash__()),op+str(s.__hash__())))
+      
+      
 class MXOperationArtist(DotArtist):
   def draw(self):
     k = self.s
@@ -435,20 +589,22 @@ def createArtist(node,dep={},invdep={},graph=None,artists={}):
       return MXSymbolicArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
     elif node.isBinary() or node.isUnary():
       return MXOperationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
-    elif node.isMultiplication():
-      return MXMultiplicationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
     elif node.isConstant():
       return MXConstantArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
-    elif node.isMapping():
-      return MXMappingArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
     elif node.isEvaluation():
       return MXEvaluationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
     elif node.isEvaluationOutput():
       return MXEvaluationOutputArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
     elif node.isNorm():
       return MXNormArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
-    elif node.isDensification():
-      return MXDensificationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+    elif node.isOperation(C.OP_GETNONZEROS):
+      return MXGetNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+    elif node.isOperation(C.OP_SETNONZEROS):
+      return MXSetNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+    elif node.isOperation(C.OP_ADDNONZEROS):
+      return MXAddNonzerosArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+    else:
+      return MXGenericArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
   else:
     raise Exception("Cannot create artist for %s" % str(type(s)))
         

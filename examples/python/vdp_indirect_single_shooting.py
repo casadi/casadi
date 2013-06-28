@@ -23,8 +23,6 @@ from casadi import *
 import numpy as NP
 import matplotlib.pyplot as plt
 
-# time
-t = ssym("t")
 
 # Declare variables (use simple, efficient DAG)
 x0=ssym("x0"); x1=ssym("x1")
@@ -44,17 +42,15 @@ lam = ssym("lam",2)
 
 # Hamiltonian function
 H = inner_prod(lam,xdot) + L
-Hfcn = SXFunction([x,lam,u,t],[H])
-Hfcn.init()
 
 # Costate equations
-ldot = -Hfcn.grad(0,0)
+ldot = -gradient(H,x)
 
 ## The control must minimize the Hamiltonian, which is:
 print "Hamiltonian: ", H
 
-# H is of a convect quadratic form in u: H = u*u + p*u + q, let's get the coefficient p
-p = Hfcn.grad(2,0)    # this gives us 2*u + p
+# H is of a convex quadratic form in u: H = u*u + p*u + q, let's get the coefficient p
+p = gradient(H,u)    # this gives us 2*u + p
 p = substitute(p,u,0) # replace u with zero: gives us p
 
 # H's unconstrained minimizer is: u = -p/2
@@ -65,13 +61,12 @@ u_opt = min(u_opt,1.0)
 u_opt = max(u_opt,-0.75)
 print "optimal control: ", u_opt
 
-# Augment f with lam_dot and subtitute in the value for the optimal control
+# Augment f with lam_dot and substitute in the value for the optimal control
 f = vertcat((xdot,ldot))
 f = substitute(f,u,u_opt)
 
 # Create the right hand side function
-rhs_in = list(daeIn(x=vertcat((x,lam))))
-rhs_in[DAE_T] = t
+rhs_in = daeIn(x=vertcat((x,lam)))
 rhs = SXFunction(rhs_in,daeOut(ode=f))
 
 # Create an integrator (CVodes)
@@ -92,35 +87,43 @@ l_init = msym("l_init",2)
 X = vertcat((x_init,l_init))
 
 # Call the integrator
-X,_,_,_ = I.call(integratorIn(x0=X))
+X, = integratorOut(I.call(integratorIn(x0=X)),"xf")
 
-# Costate at the final time
+# Costate at the final time should be zero (cf. Bryson and Ho)
 lam_f = X[2:4]
+g = lam_f
 
-# Terminal constraints: lam = 0
-G = MXFunction([l_init],[lam_f])
+# Formulate root-finding problem
+rfp = MXFunction([l_init],[g])
 
-# Dummy objective function (there are no degrees of freedom)
-F = MXFunction([l_init],[inner_prod(l_init,l_init)])
+# Select a solver for the root-finding problem
+Solver = NLPImplicitSolver
+#Solver = NewtonImplicitSolver
+#Solver = KinsolSolver
 
-# Allocate NLP solver
-solver = IpoptSolver(F,G)
+# Allocate an implict solver
+solver = Solver(rfp)
+if Solver==NLPImplicitSolver:
+    solver.setOption("nlp_solver",IpoptSolver)
+    solver.setOption("nlp_solver_options",{"hessian_approximation":"limited-memory"})
+elif Solver==NewtonImplicitSolver:
+    solver.setOption("linear_solver",CSparse)
+elif Solver==KinsolSolver:
+    solver.setOption("linear_solver_type","user_defined")
+    solver.setOption("linear_solver",CSparse)
+    solver.setOption("max_iter",1000)
 
-# Initialize the NLP solver
+# Initialize the solver
 solver.init()
 
-# Set bounds and initial guess
-solver.setInput([-inf,-inf], NLP_LBX)
-solver.setInput([ inf, inf], NLP_UBX)
-solver.setInput([   0,   0], NLP_X_INIT)
-solver.setInput([   0,   0], NLP_LBG)
-solver.setInput([   0,   0], NLP_UBG)
+# Pass initial guess
+#solver.setInput([   0,   0], "x0")
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the optimal solution
-l_init_opt = NP.array(solver.output(NLP_X_OPT).data())
+l_init_opt = NP.array(solver.output().data())
 
 # Time grid for visualization
 tgrid = NP.linspace(0,10,100)
@@ -133,15 +136,15 @@ simulator = Simulator(I, output_fcn, tgrid)
 simulator.init()
 
 # Pass initial conditions to the simulator
-simulator.setInput(NP.concatenate((x_init,l_init_opt)),INTEGRATOR_X0)
+simulator.setInput(NP.concatenate((x_init,l_init_opt)),"x0")
 
 # Simulate to get the trajectories
 simulator.evaluate()
 
 # Get optimal control
-x_opt = simulator.output(0)
-y_opt = simulator.output(1)
-u_opt = simulator.output(2)
+x_opt = simulator.getOutput(0)
+y_opt = simulator.getOutput(1)
+u_opt = simulator.getOutput(2)
 
 # Plot the results
 plt.figure(1)

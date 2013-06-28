@@ -27,6 +27,7 @@
 #include "symbolic/fx/integrator_internal.hpp"
 #include "symbolic/fx/mx_function.hpp"
 #include "symbolic/fx/implicit_function.hpp"
+#include "integration_tools.hpp"
 
 namespace CasADi{
     
@@ -73,6 +74,9 @@ public:
   // Implicit function solver
   ImplicitFunction implicit_solver_;
   
+  // Explicit function
+  FX explicit_fcn_;
+
   // With hotstart
   bool hotstart_;
   

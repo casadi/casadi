@@ -168,20 +168,20 @@ int main(){
     nlp_solver.init();
 
     // Initial guess and bounds
-    nlp_solver.setInput(xv_min,NLP_LBX);
-    nlp_solver.setInput(xv_max,NLP_UBX);
-    nlp_solver.setInput(xv_init,NLP_X_INIT);
-    nlp_solver.setInput(gv_min,NLP_LBG);
-    nlp_solver.setInput(gv_max,NLP_UBG);
+    nlp_solver.setInput(xv_min,"lbx");
+    nlp_solver.setInput(xv_max,"ubx");
+    nlp_solver.setInput(xv_init,"x0");
+    nlp_solver.setInput(gv_min,"lbg");
+    nlp_solver.setInput(gv_max,"ubg");
 
     // Solve the problem
     nlp_solver.solve();
     
     // Print the optimal solution
-//     cout << "optimal cost:    " << nlp_solver.output(NLP_COST).toScalar() << endl;
-//     cout << "optimal control: " << nlp_solver.output(NLP_X_OPT) << endl;
-//     cout << "multipliers (u): " << nlp_solver.output(NLP_LAMBDA_X) << endl;
-//     cout << "multipliers (gb): " << nlp_solver.output(NLP_LAMBDA_G) << endl;
+//     cout << "optimal cost:    " << nlp_solver.output(NLP_SOLVER_F).toScalar() << endl;
+//     cout << "optimal control: " << nlp_solver.output(NLP_SOLVER_X) << endl;
+//     cout << "multipliers (u): " << nlp_solver.output(NLP_SOLVER_LAM_X) << endl;
+//     cout << "multipliers (gb): " << nlp_solver.output(NLP_SOLVER_LAM_G) << endl;
   }
   
   return 0;

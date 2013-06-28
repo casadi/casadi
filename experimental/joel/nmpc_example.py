@@ -36,28 +36,23 @@ for k in range(N):
   gmax.append( 1 if k<N-1 else 0)
 
 # Allocate NLP solver
-#h = MXFunction([u,p],[f,g]) # New syntax
-#S = SCPgen(h)
-h1 = MXFunction([u,p],[f]) # Old syntax
-h2 = MXFunction([u,p],[g]) # Old syntax
-S = SCPgen(h1,h2)
-S.setOption("qp_solver",\
-             QPOasesSolver)
-S.setOption("parametric",True) # Should be automatic
+h = MXFunction(nlpIn(x=u,p=p),nlpOut(f=f,g=g));
+S = SCPgen(h)
+S.setOption("qp_solver",QPOasesSolver)
 S.setOption("qp_solver_options",{"printLevel":"none"}) # Should be automatic
 S.init()
 
 # Pass bounds and solve
-S.setInput( 0.3,NLP_P)    # S.setInput( 0.3,"p")
-S.setInput(-1.0,NLP_LBX)  # S.setInput(-1.0,"lbx")
-S.setInput( 1.0,NLP_UBX)  # S.setInput( 1.0,"ubx")
-S.setInput(gmin,NLP_LBG)  # S.setInput(gmin,"lbg")
-S.setInput(gmax,NLP_UBG)  # S.setInput(gmax,"ubg")
+S.setInput( 0.3,"p")    # S.setInput( 0.3,"p")
+S.setInput(-1.0,"lbx")  # S.setInput(-1.0,"lbx")
+S.setInput( 1.0,"ubx")  # S.setInput( 1.0,"ubx")
+S.setInput(gmin,"lbg")  # S.setInput(gmin,"lbg")
+S.setInput(gmax,"ubg")  # S.setInput(gmax,"ubg")
 S.solve()
 
 # Visualize the trajectory
 from matplotlib.pylab import *
-u = S.output(NLP_X_OPT)
+u = S.getOutput("x")
 plot(u)
 x = DMatrix(0.30)
 for k in range(30):

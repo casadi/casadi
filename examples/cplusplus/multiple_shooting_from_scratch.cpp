@@ -162,34 +162,30 @@ int main(){
     J += I_out[INTEGRATOR_QF];
   }
   
-  // NLP objective function
-  MXFunction jfcn(V,J);
-
-  // NLP constraint function
-  MXFunction gfcn(V,vertcat(g));
+  // NLP 
+  MXFunction nlp(nlpIn("x",V),nlpOut("f",J,"g",vertcat(g)));
   
   // Create an NLP solver instance
-  IpoptSolver nlp_solver(jfcn,gfcn);
+  IpoptSolver nlp_solver(nlp);
   nlp_solver.setOption("tol",1e-5);
-  nlp_solver.setOption("generate_hessian", true);
   nlp_solver.setOption("max_iter",100);
   nlp_solver.setOption("linear_solver","ma57");
   nlp_solver.init();
     
   // Initial guess and bounds on variables
-  nlp_solver.setInput(v_init,NLP_X_INIT);
-  nlp_solver.setInput(v_min,NLP_LBX);
-  nlp_solver.setInput(v_max,NLP_UBX);
+  nlp_solver.setInput(v_init,"x0");
+  nlp_solver.setInput(v_min,"lbx");
+  nlp_solver.setInput(v_max,"ubx");
   
   // All nonlinear constraints are equality constraints
-  nlp_solver.setInput(0.,NLP_LBG);
-  nlp_solver.setInput(0.,NLP_UBG);
+  nlp_solver.setInput(0.,"lbg");
+  nlp_solver.setInput(0.,"ubg");
   
   // Solve the problem
   nlp_solver.solve();
 
   // Optimal solution of the NLP
-  const Matrix<double>& V_opt = nlp_solver.output(NLP_X_OPT);
+  const Matrix<double>& V_opt = nlp_solver.output("x");
   
   // Get the optimal state trajectory
   vector<double> r_opt(ns+1), s_opt(ns+1);

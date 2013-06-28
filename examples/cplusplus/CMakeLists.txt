@@ -43,6 +43,31 @@ if(IPOPT_FOUND)
     casadi_ipopt_interface casadi_nonlinear_programming casadi 
     ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
+
+  add_executable(sqpmethod_nl sqpmethod_nl.cpp)
+  target_link_libraries(sqpmethod_nl 
+    casadi_ipopt_interface casadi_nonlinear_programming casadi 
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+
+endif()
+
+# Parse AMPL models and solve with Worhp
+if(WORHP_FOUND AND IPOPT_FOUND)
+  add_executable(worhp_nl worhp_nl.cpp)
+  target_link_libraries(worhp_nl 
+    casadi_worhp_interface casadi casadi_nonlinear_programming
+    ${WORHP_LIBRARIES} ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES} # NOTE!!! ADDED IPOPT due to missing symbols
+  )
+endif()
+
+# Parse AMPL models and solve with KNITRO
+if(KNITRO_FOUND)
+  add_executable(knitro_nl knitro_nl.cpp)
+  target_link_libraries(knitro_nl 
+    casadi_knitro_interface casadi casadi_nonlinear_programming
+    ${KNITRO_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
 endif()
 
 # rocket example using sundials and ipopt
@@ -57,8 +82,9 @@ endif()
 # Van der pol with multiple shooting
 if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
-  target_link_libraries(vdp_multiple_shooting
-    casadi_sundials_interface casadi_ipopt_interface casadi_optimal_control casadi_csparse_interface casadi
+  target_link_libraries(vdp_multiple_shooting   
+    casadi_sundials_interface casadi_ipopt_interface  casadi_csparse_interface
+    casadi_optimal_control casadi_integration casadi_nonlinear_programming casadi
     ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${TINYXML_LIBRARIES} ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES} 
   )
 endif()
@@ -75,7 +101,7 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(cstr cstr.cpp)
   target_link_libraries(cstr 
-    casadi_sundials_interface casadi_ipopt_interface casadi_optimal_control casadi_csparse_interface casadi 
+    casadi_sundials_interface casadi_ipopt_interface casadi_optimal_control casadi_integration casadi_csparse_interface casadi 
     ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${TINYXML_LIBRARIES} ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES} 
   )
 endif()
@@ -138,12 +164,22 @@ if(WITH_OPENCL)
   target_link_libraries(test_opencl ${OPENCL_LIBRARIES})
 endif()
 
-if(WITH_DL AND WITH_IPOPT)
+if(WITH_DL AND IPOPT_FOUND)
   add_executable(nlp_codegen nlp_codegen.cpp)
   target_link_libraries(nlp_codegen casadi_ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
 endif()
 
-if(WITH_DL)
+if(WITH_DL AND NOT WIN32)
   add_executable(codegen_usage codegen_usage.cpp)
   target_link_libraries(codegen_usage casadi ${CASADI_DEPENDENCIES})
 endif()
+
+# Implicit Runge-Kutta integrator from scratch
+if(WITH_SUNDIALS AND WITH_CSPARSE)
+  add_executable(implicit_runge-kutta implicit_runge-kutta.cpp)
+  target_link_libraries(implicit_runge-kutta
+    casadi_nonlinear_programming casadi_integration casadi_sundials_interface casadi_csparse_interface casadi
+    ${SUNDIALS_LIBRARIES} ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+endif()
+

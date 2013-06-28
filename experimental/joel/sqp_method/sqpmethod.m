@@ -53,7 +53,7 @@
 % Main function
 function [x] = sqpmethod(ffun,gfun,hfun,x)
 % Parameters in the algorithm
-maxiter = 100; % maximum number of sqp iterations
+max_iter = 100; % maximum number of sqp iterations
 toldx = 1e-12; % stopping criterion for the stepsize
 tolgL = 1e-12; % stopping criterion for the lagrangian gradient
 merit_mu = 0;  % current 'mu' in the T1 merit function
@@ -135,7 +135,7 @@ while true
     [Jhk,hk] = itrick(hfun,x);
     
     % Check if maximum number of iterations reached
-    if k >= maxiter
+    if k >= max_iter
         disp('Maximum number of SQP iterations reached!');
         break;
     end
@@ -175,7 +175,7 @@ rho = 0.5; %
 mu_safety = 1.1; % safety factor for mu (see below)
 eta = 0.0001; % text to Noc 3.4
 tau = 0.2; % 
-maxiter = 100;
+max_iter = 100;
 
 % 1-norm of the feasability violations
 feasviol = sum(abs(gk)) + sum(max(0,-hk));
@@ -232,7 +232,7 @@ while true
 
     % Go to next iteration
     iter = iter+1;
-    if iter >= maxiter
+    if iter >= max_iter
         error('linesearch failed!');
     end
 end

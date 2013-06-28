@@ -30,8 +30,8 @@ QPOasesSolver::QPOasesSolver(){
 }
 
 
-QPOasesSolver::QPOasesSolver(const CRSSparsity& H, const CRSSparsity& A)  {
-  assignNode(new QPOasesInternal(H,A));
+QPOasesSolver::QPOasesSolver(const QPStructure& st)  {
+  assignNode(new QPOasesInternal(st));
 }
 
 QPOasesInternal* QPOasesSolver::operator->(){

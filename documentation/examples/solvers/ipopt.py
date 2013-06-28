@@ -33,18 +33,18 @@ from numpy import *
 #$
 #$ with x scalar
 
-x=SX("x")
-f=SXFunction([x],[(x-1)**2])
+x=ssym("x")
+nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2))
 
-solver = IpoptSolver(f)
+solver = IpoptSolver(nlp)
 solver.init()
-solver.input(NLP_LBX).set([-10])
-solver.input(NLP_UBX).set([10])
+solver.setInput([-10],"lbx")
+solver.setInput([10],"ubx")
 solver.solve()
 
 #! The solution is obviously 1:
-print solver.output()
-assert(abs(solver.output()[0]-1)<1e-9)
+print solver.getOutput()
+assert(abs(solver.getOutput()[0]-1)<1e-9)
 
 #! Constrained problem
 #! ============================
@@ -59,22 +59,21 @@ n = 5
 
 x=ssym("x",n)
 #! Note how we do not distinguish between equalities and inequalities here
-f=SXFunction([x],[mul((x-1).T,x-1)])
-g=SXFunction([x],[vertcat([x[1]+x[2],x[0]])])
+nlp=SXFunction(nlpIn(x=x),nlpOut(f=mul((x-1).T,x-1),g=vertcat([x[1]+x[2],x[0]])))
 
-solver = IpoptSolver(f,g)
+solver = IpoptSolver(nlp)
 solver.init()
-solver.input(NLP_LBX).set([-10]*n)
-solver.input(NLP_UBX).set([10]*n)
+solver.setInput([-10]*n,"lbx")
+solver.setInput([10]*n,"ubx")
 #$  $ 2 \le x_0 \le 2$ is not really as bad it looks. Ipopt will recognise this situation as an equality constraint. 
-solver.input(NLP_LBG).set([0,2])
-solver.input(NLP_UBG).set([1,2])
+solver.setInput([0,2],"lbg")
+solver.setInput([1,2],"ubg")
 solver.solve()
 
 #! The solution is obviously [2,0.5,0.5,1,1]:
-print solver.output()
+print solver.getOutput()
 for (i,e) in zip(range(n),[2,0.5,0.5,1,1]):
-  assert(abs(solver.output()[i]-e)<1e-7)
+  assert(abs(solver.getOutput()[i]-e)<1e-7)
 
 
 #! Problem with parameters
@@ -84,28 +83,27 @@ for (i,e) in zip(range(n),[2,0.5,0.5,1,1]):
 #$
 #$ with x scalar
 
-x=SX("x")
-a=SX("a")
+x=ssym("x")
+a=ssym("a")
 a_ = 2
-f=SXFunction([x,a],[(x-a)**2])
+nlp=SXFunction(nlpIn(x=x,p=a),nlpOut(f=(x-a)**2))
 
-solver = IpoptSolver(f)
-solver.setOption("parametric",True)
+solver = IpoptSolver(nlp)
 solver.init()
-solver.input(NLP_LBX).set([-10])
-solver.input(NLP_UBX).set([10])
-solver.input(NLP_P).set([a_])
+solver.setInput([-10],"lbx")
+solver.setInput([10],"ubx")
+solver.setInput([a_],"p")
 solver.solve()
 
 #! The solution is obviously a:
-print solver.output()
-assert(abs(solver.output()[0]-a_)<1e-9)
+print solver.getOutput()
+assert(abs(solver.getOutput()[0]-a_)<1e-9)
 
 #! The parameter can change inbetween two solve calls:
-solver.input(NLP_P).set([2*a_])
+solver.setInput([2*a_],"p")
 solver.solve()
 
 #! The solution is obviously 2*a:
-print solver.output()
-assert(abs(solver.output()[0]-2*a_)<1e-9)
+print solver.getOutput()
+assert(abs(solver.getOutput()[0]-2*a_)<1e-9)
 

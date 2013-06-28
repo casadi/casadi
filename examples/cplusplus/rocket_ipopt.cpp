@@ -39,21 +39,23 @@ int main(){
   int nj = 100; // Number of integration steps per control segment
 
   // optimization variable
-  vector<SX> u = ssym("u",nu).data(); // control
+  SXMatrix u = ssym("u",nu); // control
 
-  SX s_0 = 0; // initial position
-  SX v_0 = 0; // initial speed
-  SX m_0 = 1; // initial mass
+  SXMatrix s_0 = 0; // initial position
+  SXMatrix v_0 = 0; // initial speed
+  SXMatrix m_0 = 1; // initial mass
   
-  SX dt = 10.0/(nj*nu); // time step
-  SX alpha = 0.05; // friction
-  SX beta = 0.1; // fuel consumption rate
+  SXMatrix dt = 10.0/(nj*nu); // time step
+  SXMatrix alpha = 0.05; // friction
+  SXMatrix beta = 0.1; // fuel consumption rate
 
   // Trajectory
-  vector<SX> s_traj(nu), v_traj(nu), m_traj(nu);
+  SXMatrix s_traj = SXMatrix::zeros(nu);
+  SXMatrix v_traj = SXMatrix::zeros(nu);
+  SXMatrix m_traj = SXMatrix::zeros(nu);
 
   // Integrate over the interval with Euler forward
-  SX s = s_0, v = v_0, m = m_0;
+  SXMatrix s = s_0, v = v_0, m = m_0;
   for(int k=0; k<nu; ++k){
     for(int j=0; j<nj; ++j){
       s += dt*v;
@@ -66,25 +68,19 @@ int main(){
   }
 
   // Objective function
-  SX f = 0;
-  for(int i=0; i<u.size(); ++i)
-    f += u[i]*u[i];
+  SXMatrix f = inner_prod(u,u);
     
   // Terminal constraints
-  vector<SX> g(2);
-  g[0] = s;
-  g[1] = v;
-  g.insert(g.end(),v_traj.begin(),v_traj.end());
+  SXMatrix g;
+  g.append(s);
+  g.append(v);
+  g.append(v_traj);
   
   // Create the NLP
-  SXFunction ffcn(u,f); // objective function
-  SXFunction gfcn(u,g); // constraint
+  SXFunction nlp(nlpIn("x",u),nlpOut("f",f,"g",g));
   
   // Allocate an NLP solver
-  IpoptSolver solver(ffcn,gfcn);
-
-  // Set options
-  solver.setOption("generate_hessian",true);
+  IpoptSolver solver(nlp);
 
   // initialize the solver
   solver.init();
@@ -96,9 +92,9 @@ int main(){
     umax[i] =  10;
     uinit[i] = 0.4;
   }
-  solver.setInput(umin,NLP_LBX);
-  solver.setInput(umax,NLP_UBX);
-  solver.setInput(uinit,NLP_X_INIT);
+  solver.setInput(umin,"lbx");
+  solver.setInput(umax,"ubx");
+  solver.setInput(uinit,"x0");
   
   // Bounds on g
   vector<double> gmin(2), gmax(2);
@@ -107,20 +103,20 @@ int main(){
   gmin.resize(2+nu, -numeric_limits<double>::infinity());
   gmax.resize(2+nu, 1.1);
   
-  solver.setInput(gmin,NLP_LBG);
-  solver.setInput(gmax,NLP_UBG);
+  solver.setInput(gmin,"lbg");
+  solver.setInput(gmax,"ubg");
 
   // Solve the problem
   solver.solve();
   
   // Print the optimal cost
   double cost;
-  solver.getOutput(cost,NLP_COST);
+  solver.getOutput(cost,"f");
   cout << "optimal cost: " << cost << endl;
 
   // Print the optimal solution
   vector<double> uopt(nu);
-  solver.getOutput(uopt,NLP_X_OPT);
+  solver.getOutput(uopt,"x");
   cout << "optimal control: " << uopt << endl;
 
   // Get the state trajectory

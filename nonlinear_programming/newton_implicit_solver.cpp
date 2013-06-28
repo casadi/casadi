@@ -26,24 +26,24 @@
 using namespace std;
 namespace CasADi{
 
-NewtonImplicitSolver::NewtonImplicitSolver(){ 
-}
+  NewtonImplicitSolver::NewtonImplicitSolver(){ 
+  }
 
-NewtonImplicitSolver::NewtonImplicitSolver(const FX& f, int nrhs)  {
-  assignNode(new NewtonImplicitInternal(f,nrhs));
-}
+  NewtonImplicitSolver::NewtonImplicitSolver(const FX& f, const FX& jac, const LinearSolver& linsol)  {
+    assignNode(new NewtonImplicitInternal(f,jac,linsol));
+  }
 
-NewtonImplicitInternal* NewtonImplicitSolver::operator->(){
-  return (NewtonImplicitInternal*)(FX::operator->());
-}
+  NewtonImplicitInternal* NewtonImplicitSolver::operator->(){
+    return (NewtonImplicitInternal*)(FX::operator->());
+  }
 
-const NewtonImplicitInternal* NewtonImplicitSolver::operator->() const{
-  return (const NewtonImplicitInternal*)(FX::operator->());
+  const NewtonImplicitInternal* NewtonImplicitSolver::operator->() const{
+    return (const NewtonImplicitInternal*)(FX::operator->());
 
-}
+  }
 
-bool NewtonImplicitSolver::checkNode() const{
-  return dynamic_cast<const NewtonImplicitInternal*>(get());
-}
+  bool NewtonImplicitSolver::checkNode() const{
+    return dynamic_cast<const NewtonImplicitInternal*>(get());
+  }
 
 } // namespace CasADi

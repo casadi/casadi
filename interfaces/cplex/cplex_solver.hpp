@@ -40,8 +40,12 @@ public:
 
   /** \brief Default constructor  */
   CplexSolver();
-  /** \brief Constructor with sparsity given */
-  CplexSolver(const CRSSparsity& H, const CRSSparsity& A);
+
+  /** \brief Constructor
+  *  \param st Problem structure
+  *  \copydoc scheme_QPStruct
+  */
+  CplexSolver(const QPStructure &st);
   
   CplexInternal* operator->();
   const CplexInternal* operator->() const;
@@ -53,7 +57,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static QPSolver creator(const CRSSparsity& H, const CRSSparsity& A){ return CplexSolver(H,A);}
+  static QPSolver creator(const QPStructure &st){ return CplexSolver(st);}
   #ifdef SWIG
   %nocallback;
   #endif

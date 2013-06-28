@@ -25,6 +25,7 @@
 
 #include "../symbolic/fx/ocp_solver.hpp"
 #include "../symbolic/fx/nlp_solver.hpp"
+#include "integration/integration_tools.hpp"
 
 namespace CasADi{
   class DirectCollocationInternal;

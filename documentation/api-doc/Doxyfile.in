@@ -180,6 +180,10 @@ TAB_SIZE               = 4
 # You can put \n's in the value part of an alias to insert newlines.
 
 ALIASES                += pythonexample{1}="View <a href='\1.pdf'>output (PDF)</a> | <a href='\1.py'>source (python)</a>\n\example \1.py"
+ALIASES                += nocpp="(not available in cpp)"
+ALIASES                += noswig="(not available in python/octave)"
+ALIASES                += nopython="(not available in python)"
+ALIASES                += nooctave="(not available in octave)"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 
@@ -253,7 +257,7 @@ IDL_PROPERTY_SUPPORT   = YES
 # member in the group (if any) for the other members of the group. By default 
 # all members of a group must be documented explicitly.
 
-DISTRIBUTE_GROUP_DOC   = NO
+DISTRIBUTE_GROUP_DOC   = YES
 
 # Set the SUBGROUPING tag to YES (the default) to allow class member groups of 
 # the same type (for instance a group of public functions) to be put as a 
@@ -581,11 +585,11 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = ../../symbolic \
-                         ../../toolboxes \
                          ../../interfaces \
                          ../../optimal_control \
                          ../../integration \
                          ../../nonlinear_programming \
+                         ../../convex_programming \
                          ./doxygen-tutorial \
                          ../examples \
                          extra

@@ -47,22 +47,22 @@ I.init()
 
 # Calculate once, adjoint
 I_adj = I.derivative(0,1)
-I_adj.setInput(x0,INTEGRATOR_X0)
-I_adj.setInput(u0,INTEGRATOR_P)
+I_adj.setInput(x0,"x0")
+I_adj.setInput(u0,"p")
 I_adj.setInput([0,0,0],INTEGRATOR_NUM_IN+INTEGRATOR_XF)
 I_adj.setInput(1.0,INTEGRATOR_NUM_IN+INTEGRATOR_QF)
 I_adj.evaluate()
-adj_x0 = deepcopy(I_adj.output(INTEGRATOR_NUM_OUT+INTEGRATOR_X0))
-adj_p = deepcopy(I_adj.output(INTEGRATOR_NUM_OUT+INTEGRATOR_P))
+adj_x0 = deepcopy(I_adj.getOutput(INTEGRATOR_NUM_OUT+INTEGRATOR_X0))
+adj_p = deepcopy(I_adj.getOutput(INTEGRATOR_NUM_OUT+INTEGRATOR_P))
 print "%50s" % "Adjoint sensitivities:", "d(qf)/d(x0) = ", adj_x0, ", d(qf)/d(p) = ", adj_p
 
 # Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
 h = 0.001
-I_adj.setInput(x0,INTEGRATOR_X0)
-I_adj.setInput(u0+h,INTEGRATOR_P)
+I_adj.setInput(x0,"x0")
+I_adj.setInput(u0+h,"p")
 I_adj.setInput([0,0,0],INTEGRATOR_NUM_IN+INTEGRATOR_XF)
 I_adj.setInput(1.0,INTEGRATOR_NUM_IN+INTEGRATOR_QF)
 I_adj.evaluate()
-adj_x0_pert = deepcopy(I_adj.output(INTEGRATOR_NUM_OUT+INTEGRATOR_X0))
-adj_p_pert = deepcopy(I_adj.output(INTEGRATOR_NUM_OUT+INTEGRATOR_P))
+adj_x0_pert = deepcopy(I_adj.getOutput(INTEGRATOR_NUM_OUT+INTEGRATOR_X0))
+adj_p_pert = deepcopy(I_adj.getOutput(INTEGRATOR_NUM_OUT+INTEGRATOR_P))
 print "%50s" % "FD of adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", (adj_x0_pert-adj_x0)/h, ", d2(qf)/d(p)d(p) = ", (adj_p_pert-adj_p)/h

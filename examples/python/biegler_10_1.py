@@ -83,7 +83,7 @@ for N in range(1,11):
   for j in range(K+1):
     l[j].setInput(1.)
     l[j].evaluate()
-    D[j] = l[j].output()
+    D[j] = l[j].getOutput()
   print "D = ", D
 
   # Get the coefficients of the collocation equation using AD
@@ -93,7 +93,7 @@ for N in range(1,11):
       l[j].setInput(tau_root[k])
       l[j].setFwdSeed(1.0)
       l[j].evaluate(1,0)
-      C[j,k] = l[j].fwdSens()
+      C[j,k] = l[j].getFwdSens()
   print "C = ", C
   
   # Collocated states
@@ -120,19 +120,16 @@ for N in range(1,11):
       g.append(Z[i+1,0] - rhs)
 
   print "g = ", g
-  
-  # Constraint function
-  gfcn = SXFunction([x],[g])
 
-  # Dummy objective function
-  obj = SXFunction([x], [x[0]*x[0]])
-  
+  # NLP
+  nlp = SXFunction(nlpIn(x=x),nlpOut(f=x[0]**2,g=g))
+
   ## ----
   ## SOLVE THE NLP
   ## ----
   
   # Allocate an NLP solver
-  solver = IpoptSolver(obj,gfcn)
+  solver = IpoptSolver(nlp)
 
   # Set options
   solver.setOption("tol",1e-10)
@@ -142,19 +139,19 @@ for N in range(1,11):
 
   # Initial condition
   xinit = x.size() * [0]
-  solver.setInput(xinit,NLP_X_INIT)
+  solver.setInput(xinit,"x0")
 
   # Bounds on x
   lbx = x.size()*[-100]
   ubx = x.size()*[100]
   lbx[0] = ubx[0] = z0
-  solver.setInput(lbx,NLP_LBX)
-  solver.setInput(ubx,NLP_UBX)
+  solver.setInput(lbx,"lbx")
+  solver.setInput(ubx,"ubx")
   
   # Bounds on the constraints
   lubg = g.size()*[0]
-  solver.setInput(lubg,NLP_LBG)
-  solver.setInput(lubg,NLP_UBG)
+  solver.setInput(lubg,"lbg")
+  solver.setInput(lubg,"ubg")
   
   # Solve the problem
   solver.solve()
@@ -168,10 +165,10 @@ for N in range(1,11):
   print "time points: ", t_opt
 
   # Print the optimal cost
-  print "optimal cost: ", float(solver.output(NLP_COST))
+  print "optimal cost: ", float(solver.getOutput("f"))
 
   # Print the optimal solution
-  xopt = solver.output(NLP_X_OPT).data()
+  xopt = solver.output("x").data()
   print "optimal solution: ", xopt
  
   # plot to screen

@@ -71,7 +71,7 @@ if check_sx_oo:
     for _ in range(n_repeats):
       F.evaluate(0,1)
     t2 = time()
-    print n, ": ", (t2-t1)/n_repeats, " s, ", F.adjSens()
+    print n, ": ", (t2-t1)/n_repeats, " s, ", F.getAdjSens()
 
 if check_sx_sct:
   print "SX SCT"
@@ -90,7 +90,7 @@ if check_sx_sct:
     for _ in range(n_repeats):
       F.evaluate(0)
     t2 = time()
-    print n, ": ", (t2-t1)/n_repeats, " s, ", F.output()
+    print n, ": ", (t2-t1)/n_repeats, " s, ", F.getOutput()
 
 # Check matrix representation
 if check_mx_oo:
@@ -110,7 +110,7 @@ if check_mx_oo:
     for _ in range(n_repeats):
       F.evaluate(0,1)
     t2 = time()
-    print n, ": ", (t2-t1)/n_repeats, " s, ", F.adjSens()
+    print n, ": ", (t2-t1)/n_repeats, " s, ", F.getAdjSens()
 
 # Create a function for calculating the determinant of a "small" matrix
 n_small = 5
@@ -154,7 +154,7 @@ if check_mx_sx_oo:
     for _ in range(n_repeats):
       F.evaluate(0,1)
     t2 = time()
-    print n, ": ", (t2-t1)/n_repeats, " s, ", F.adjSens()
+    print n, ": ", (t2-t1)/n_repeats, " s, ", F.getAdjSens()
   
 #X = ssym("X",2,2)
 #print "f(X) = ", f(X)
@@ -201,4 +201,4 @@ if check_mx_sx_sct:
     for _ in range(n_repeats):
       GFE.evaluate()
     t2 = time()
-    print n, ": ", (t2-t1)/n_repeats, " s, ", GFE.output()
+    print n, ": ", (t2-t1)/n_repeats, " s, ", GFE.getOutput()

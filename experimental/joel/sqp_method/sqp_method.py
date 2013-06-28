@@ -91,17 +91,17 @@ solver.setOption("hessian_approximation", "limited-memory")
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput(umin,     NLP_LBX)
-solver.setInput(umax,     NLP_UBX)
-solver.setInput(u0,       NLP_X_INIT)
-solver.setInput(zeros(2), NLP_LBG)
-solver.setInput(zeros(2), NLP_UBG)
+solver.setInput(umin,     "lbx")
+solver.setInput(umax,     "ubx")
+solver.setInput(u0,       "x0")
+solver.setInput(zeros(2), "lbg")
+solver.setInput(zeros(2), "ubg")
 
 # Solve the problem
 solver.solve()
 
 # Retrieve the solution
-u_opt = array(solver.output(NLP_X_OPT))
+u_opt = array(solver.getOutput("x"))
 
 # Get values at the beginning of each finite element
 tgrid = linspace(0,10,10)
@@ -120,15 +120,15 @@ sqp_solver.setOption("qp_solver_options",{"printLevel" : "low"})
 #sqp_solver.setOption("qp_solver",OOQPSolver)
 
 sqp_solver.init()
-sqp_solver.setInput(umin,     NLP_LBX)
-sqp_solver.setInput(umax,     NLP_UBX)
-sqp_solver.setInput(u0,       NLP_X_INIT)
-sqp_solver.setInput(zeros(2), NLP_LBG)
-sqp_solver.setInput(zeros(2), NLP_UBG)
+sqp_solver.setInput(umin,     "lbx")
+sqp_solver.setInput(umax,     "ubx")
+sqp_solver.setInput(u0,       "x0")
+sqp_solver.setInput(zeros(2), "lbg")
+sqp_solver.setInput(zeros(2), "ubg")
 sqp_solver.evaluate()
 
 # Retrieve the solution
-u_opt2 = array(sqp_solver.output(NLP_X_OPT))
+u_opt2 = array(sqp_solver.getOutput("x"))
 
 # Plot the results
 plt.figure(1)
@@ -149,7 +149,7 @@ plt.grid()
 
 
 # Parameters in the algorithm
-maxiter = 100 # maximum number of sqp iterations
+max_iter = 100 # maximum number of sqp iterations
 toldx = 1e-12 # stopping criterion for the stepsize
 tolgL = 1e-12 # stopping criterion for the lagrangian gradient
 merit_mu = 0.  # current 'mu' in the T1 merit function
@@ -189,8 +189,8 @@ qp_solver.setOption("printLevel","low")
 qp_solver.init()
 
 # No bounds on the control
-qp_solver.input(QP_LBX).setAll(-inf)
-qp_solver.input(QP_UBX).setAll( inf)
+qp_solver.setInput(-inf,"lbx")
+qp_solver.setInput( inf,"ubx")
 
 # Header
 print ' k  nls | dx         gradL      eq viol    ineq viol'
@@ -200,41 +200,41 @@ while True:
   # Evaluate the constraint function
   gfcn.setInput(x)
   gfcn.evaluate()
-  gk = DMatrix(gfcn.output())
+  gk = gfcn.getOutput()
   
   # Evaluate the Jacobian
   jfcn.setInput(x)
   jfcn.evaluate()
-  Jgk = DMatrix(jfcn.output())
+  Jgk = jfcn.getOutput()
   
   # Evaluate the gradient of the objective function
   ffcn.setInput(x)
   ffcn.setAdjSeed(1.0)
   ffcn.evaluate(0,1)
-  fk = DMatrix(ffcn.output())
-  gfk = DMatrix(ffcn.adjSens())
+  fk = ffcn.getOutput()
+  gfk = DMatrix(ffcn.getAdjSens())
   
   # Pass data to QP solver
-  qp_solver.setInput(Bk,QP_H)
-  qp_solver.setInput(Jgk,QP_A)
-  qp_solver.setInput(gfk,QP_G)
-  qp_solver.setInput(-gk,QP_LBA)
-  qp_solver.setInput(-gk,QP_UBA)
+  qp_solver.setInput(Bk,"h")
+  qp_solver.setInput(Jgk,"a")
+  qp_solver.setInput(gfk,"g")
+  qp_solver.setInput(-gk,"lba")
+  qp_solver.setInput(-gk,"uba")
 
   # Solve the QP subproblem
   qp_solver.evaluate()
 
   # Get the optimal solution
-  p = qp_solver.output(QP_PRIMAL)
+  p = qp_solver.getOutput("primal")
   
   # Get the dual solution for the inequalities
-  lambda_hat = -qp_solver.output(QP_LAMBDA_A)
+  lambda_hat = -qp_solver.getOutput("lambda_a")
   
   # Get the dual solution for the bounds
-  lambda_x_hat = -qp_solver.output(QP_LAMBDA_X)
+  lambda_x_hat = -qp_solver.getOutput("lambda_x")
   
   # Get the gradient of the Lagrangian
-  gradL = ffcn.adjSens() - dot(trans(Jgk),lambda_hat) - lambda_x_hat
+  gradL = ffcn.getAdjSens() - dot(trans(Jgk),lambda_hat) - lambda_x_hat
   
   ## Pass adjoint seeds to g
   #gfcn.setAdjSeed(lambda_hat)
@@ -250,7 +250,7 @@ while True:
   mu_safety = 1.1 # safety factor for mu (see below)
   eta = 0.0001 # text to Noc 3.4
   tau = 0.2
-  maxiter = 100
+  max_iter = 100
 
   # 1-norm of the feasability violations
   feasviol = sumRows(fabs(gk))
@@ -275,12 +275,12 @@ while True:
     x_new = x+alpha*p
     ffcn.setInput(x_new)
     ffcn.evaluate()
-    fk_new = DMatrix(ffcn.output())
+    fk_new = ffcn.getOutput()
 
     # Evaluate gk, hk and get 1-norm of the feasability violations
     gfcn.setInput(x_new)
     gfcn.evaluate()
-    gk_new = gfcn.output()
+    gk_new = gfcn.getOutput()
     feasviol_new = sumRows(fabs(gk_new))
 
     # New T1 function
@@ -295,7 +295,7 @@ while True:
     
     # Go to next iteration
     lsiter = lsiter+1
-    if lsiter >= maxiter:
+    if lsiter >= max_iter:
       raise Exception("linesearch failed!")
 
   # Step size
@@ -327,22 +327,22 @@ while True:
   # Evaluate the constraint function
   gfcn.setInput(x)
   gfcn.evaluate()
-  gk = gfcn.output()
+  gk = gfcn.getOutput()
   
   # Evaluate the Jacobian
   jfcn.setInput(x)
   jfcn.evaluate()
-  Jgk = jfcn.output()
+  Jgk = jfcn.getOutput()
     
   # Evaluate the gradient of the objective function
   ffcn.setInput(x)
   ffcn.setAdjSeed(1.0)
   ffcn.evaluate(0,1)
-  fk = DMatrix(ffcn.output())
-  gfk = ffcn.adjSens()
+  fk = ffcn.getOutput()
+  gfk = ffcn.getAdjSens()
 
   # Check if maximum number of iterations reached
-  if k >= maxiter:
+  if k >= max_iter:
     print "Maximum number of SQP iterations reached!"
     break
 

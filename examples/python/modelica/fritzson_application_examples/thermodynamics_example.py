@@ -101,7 +101,7 @@ simulator.init()
 
 # Pass initial conditions
 x0 = getStart(ocp.x)
-simulator.setInput(x0,INTEGRATOR_X0)
+simulator.setInput(x0,"x0")
 
 # Simulate
 simulator.evaluate()
@@ -110,13 +110,13 @@ integrator.printStats()
 # Plot
 plt.figure(1)
 plt.subplot(1,2,1)
-plt.plot(grid,simulator.output())
+plt.plot(grid,simulator.getOutput())
 plt.xlabel("t")
 plt.ylabel("m(t)")
 plt.title("c.f. Fritzson figure 15-6 (left)")
 
 plt.subplot(1,2,2)
-plt.plot(grid,simulator.output(1))
+plt.plot(grid,simulator.getOutput(1))
 plt.xlabel("t")
 plt.ylabel("P(t)")
 plt.title("c.f. Fritzson figure 15-6 (right)")
@@ -164,7 +164,7 @@ simulator.init()
 
 # Pass initial conditions
 x0 = getStart(ocp.x)
-simulator.setInput(x0,INTEGRATOR_X0)
+simulator.setInput(x0,"x0")
 
 # Simulate
 simulator.evaluate()
@@ -172,7 +172,7 @@ integrator.printStats()
 
 # Plot
 plt.figure(2)
-plt.plot(grid,simulator.output())
+plt.plot(grid,simulator.getOutput())
 plt.xlabel("t")
 plt.ylabel("T(t)")
 plt.title("c.f. Fritzson figure 15-9")
@@ -222,7 +222,7 @@ simulator.init()
 
 # Pass initial conditions
 x0 = getStart(ocp.x)
-simulator.setInput(x0,INTEGRATOR_X0)
+simulator.setInput(x0,"x0")
 
 # Simulate
 simulator.evaluate()
@@ -230,15 +230,15 @@ integrator.printStats()
 
 # Plot
 plt.figure(3)
-p1, = plt.plot(grid,simulator.output(0))
-p2, = plt.plot(grid,simulator.output(1))
+p1, = plt.plot(grid,simulator.getOutput(0))
+p2, = plt.plot(grid,simulator.getOutput(1))
 plt.xlabel("t")
 plt.ylabel("T(t)")
 plt.legend([p2, p1], ["T", "U"])
 plt.title("c.f. Fritzson figure 15-14")
 
 plt.figure(4)
-plt.plot(grid,simulator.output(2))
+plt.plot(grid,simulator.getOutput(2))
 plt.xlabel("t")
 plt.ylabel("V(t)")
 plt.title("Approximation of V")

@@ -27,6 +27,12 @@
 // Incude cmath early on, see #622
 %begin %{
 #include <cmath>
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
 %}
 
 #ifdef SWIGPYTHON
@@ -219,7 +225,18 @@ _object = _copyableObject
   }
 }
 
-
+// See https://github.com/casadi/casadi/issues/701
+// Recent numpys will only catch TypeError or ValueError in printing logic
+%exception __nonzero__ {
+ try {
+    $action
+    // foobar
+  } catch (const std::exception& e) { \
+  SWIG_exception(SWIG_TypeError, e.what()); \
+  } catch (const char* e) { \
+    SWIG_exception(SWIG_TypeError, e); \
+  }
+}
 
 #ifdef SWIGPYTHON
 #ifndef WITH_NUMPY
@@ -332,6 +349,8 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 // typemap meta implementations
 %include "meta.i"
+
+%include "symbolic/fx/schemes_metadata.hpp"
 
 // common typemaps
 %include "commontypemaps.i"

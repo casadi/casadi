@@ -121,18 +121,18 @@ public:
   /** Get the (minor) time grid
   *  The length is (ns-1)*nf + 1
   */
- 	std::vector<double> getMinorT() const; 
- 	
+         std::vector<double> getMinorT() const; 
+         
   /** \brief Get the controls, sampled on the minor timescale.
   * Number of rows is (ns-1)*nf
   */
- 	Matrix<double> getMinorU() const; 
- 	
- 	
- 	/** \brief Get the index i such that gridminor[i] == gridmajor 
+         Matrix<double> getMinorU() const; 
+         
+         
+         /** \brief Get the index i such that gridminor[i] == gridmajor 
   */
- 	std::vector< int > getMajorIndex() const; 
- 	
+         std::vector< int > getMajorIndex() const; 
+         
 };
   
 } // namespace CasADi

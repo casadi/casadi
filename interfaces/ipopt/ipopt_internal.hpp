@@ -35,12 +35,10 @@ class IpoptInternal : public NLPSolverInternal{
 friend class IpoptUserClass;
 
 public:
-  explicit IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
+  explicit IpoptInternal(const FX& nlp);
   virtual ~IpoptInternal();
   virtual IpoptInternal* clone() const{ return new IpoptInternal(*this);}
-  
-  FX getGF() const { return GF_; }
-  
+    
   // Free Ipopt related memory
   void freeIpopt();
   
@@ -51,9 +49,10 @@ public:
 
   // Get reduced Hessian
   DMatrix getReducedHessian();
-  
-protected:
-  
+
+  /// Exact Hessian?
+  bool exact_hessian_;
+    
   /** NOTE:
    * To allow this header file to be free of IPOPT types (that are sometimes declared outside their scope!) and after 
    * experiencing problems with working with IPOPT classes without IPOPT smart pointers, we work with dynamically
@@ -69,9 +68,6 @@ protected:
   /// All IPOPT options
   std::map<std::string,opt_type> ops_;
 
-  /// Gradient of the objective function
-  FX GF_; 
-
   // Ipopt callback functions
   bool eval_f(int n, const double* x, bool new_x, double& obj_value);
   bool eval_grad_f(int n, const double* x, bool new_x, double* grad_f);
@@ -82,8 +78,8 @@ protected:
   bool get_bounds_info(int n, double* x_l, double* x_u,int m, double* g_l, double* g_u);
   bool get_starting_point(int n, bool init_x, double* x,bool init_z, double* z_L, double* z_U,int m, bool init_lambda,double* lambda);
   void get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag);
-  int get_number_of_nonlinear_variables() const;
-  bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const;
+  int get_number_of_nonlinear_variables();
+  bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars);
   bool intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials,bool full_callback);
   bool get_var_con_metadata(int n,
                             std::map<std::string,std::vector<std::string> >& var_string_md, 
@@ -102,7 +98,7 @@ protected:
                           const std::map<std::string,std::vector<std::string> >& con_string_md,
                           const std::map<std::string,std::vector<int> >& con_integer_md,
                           const std::map<std::string,std::vector<double> >& con_numeric_md);
-  
+
   // Accummulated time since last reset:
   double t_eval_f_; // time spent in eval_f
   double t_eval_grad_f_; // time spent in eval_grad_f

@@ -35,6 +35,9 @@ OCPSolverInternal::OCPSolverInternal(const FX& ffcn, const FX& mfcn, const FX& c
   addOption("number_of_parameters",  OT_INTEGER,                0);
   addOption("number_of_grid_points", OT_INTEGER,               20);
   addOption("final_time",            OT_REAL,                 1.0);
+    
+  inputScheme_ = SCHEME_OCPInput;
+  outputScheme_ = SCHEME_OCPOutput;
 }
 
 OCPSolverInternal::~OCPSolverInternal(){

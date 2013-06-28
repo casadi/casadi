@@ -3,12 +3,12 @@
 # K.U. Leuven 2012
 
 
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 
 PROJECT(qpOASES CXX)
 
 INCLUDE_DIRECTORIES(include)
-
+SET(QPOASES_LIBRARIES ${QPOASES_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} )
 FILE(GLOB SRC src/*.cpp)
 FILE(GLOB EXTRAS_SRC src/extras/*.cpp)
 
@@ -22,3 +22,6 @@ install(TARGETS casadi_qpoases
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+set_target_properties(casadi_qpoases PROPERTIES COMPILE_FLAGS "-Wno-overloaded-virtual")
+endif()

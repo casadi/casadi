@@ -124,7 +124,6 @@ void DirectMultipleShootingInternal::init(){
 
   // Options for the parallelizer
   Dictionary paropt;
-  paropt["save_corrected_input"] = true;
   
   // Transmit parallelization mode
   if(hasSetOption("parallelization"))
@@ -153,30 +152,30 @@ void DirectMultipleShootingInternal::init(){
 
   // Terminal constraints
   MX g = vertcat(gg);
-  G_ = MXFunction(V,g);
-  G_.setOption("numeric_jacobian",false);
-  G_.setOption("ad_mode","forward");
-  G_.init();
-  
-  vector<MX> f;
+
   // Objective function
+  MX f;
   if (mfcn_.getNumInputs()==1) {
-    f = mfcn_.call(X.back());
+    f = mfcn_.call(X.back()).front();
   } else {
     vector<MX> mfcn_argin(MAYER_NUM_IN); 
     mfcn_argin[MAYER_X] = X.back();
     mfcn_argin[MAYER_P] = P;
-    f = mfcn_.call(mfcn_argin);
+    f = mfcn_.call(mfcn_argin).front();
   }
-  F_ = MXFunction(V,f);
+
+  // NLP
+  nlp_ = MXFunction(nlpIn("x",V),nlpOut("f",f,"g",g));
+  nlp_.setOption("ad_mode","forward");
+  nlp_.init();
   
   // Get the NLP creator function
   NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");
   
   // Allocate an NLP solver
-  nlp_solver_ = nlp_solver_creator(F_,G_,FX(),FX());
+  nlp_solver_ = nlp_solver_creator(nlp_);
   
-  // Pass options
+  // Pass user options
   if(hasSetOption("nlp_solver_options")){
     const Dictionary& nlp_solver_options = getOption("nlp_solver_options");
     nlp_solver_.setOption(nlp_solver_options);
@@ -320,20 +319,20 @@ void DirectMultipleShootingInternal::setOptimalSolution(const vector<double> &V_
 
 void DirectMultipleShootingInternal::evaluate(int nfdir, int nadir){
   // get NLP variable bounds and initial guess
-  getGuess(nlp_solver_.input(NLP_X_INIT).data());
-  getVariableBounds(nlp_solver_.input(NLP_LBX).data(),nlp_solver_.input(NLP_UBX).data());
+  getGuess(nlp_solver_.input(NLP_SOLVER_X0).data());
+  getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),nlp_solver_.input(NLP_SOLVER_UBX).data());
        
   // get NLP constraint bounds
-  getConstraintBounds(nlp_solver_.input(NLP_LBG).data(), nlp_solver_.input(NLP_UBG).data());
+  getConstraintBounds(nlp_solver_.input(NLP_SOLVER_LBG).data(), nlp_solver_.input(NLP_SOLVER_UBG).data());
        
   //Solve the problem
   nlp_solver_.solve();
   
   // Save the optimal solution
-  setOptimalSolution(nlp_solver_.output(NLP_X_OPT).data());
+  setOptimalSolution(nlp_solver_.output(NLP_SOLVER_X).data());
 
   // Save the optimal cost
-  output(OCP_COST).set(nlp_solver_.output(NLP_COST));
+  output(OCP_COST).set(nlp_solver_.output(NLP_SOLVER_F));
 }
 
 

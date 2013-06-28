@@ -28,8 +28,8 @@ namespace CasADi{
 
 IpoptUserClass::IpoptUserClass(IpoptInternal* solver){
   this->solver = solver;
-  n_ = solver->n_;
-  m_ = solver->m_;
+  n_ = solver->nx_;
+  m_ = solver->ng_;
   
 #ifdef WITH_IPOPT_CALLBACK 
   x_ = new double[n_];
@@ -120,8 +120,8 @@ void IpoptUserClass::finalize_solution(SolverReturn status,
                                   Index n, const Number* x, const Number* z_L, const Number* z_U,
                                   Index m, const Number* g, const Number* lambda,
                                   Number obj_value,
-				  const IpoptData* ip_data,
-				  IpoptCalculatedQuantities* ip_cq)
+                                  const IpoptData* ip_data,
+                                  IpoptCalculatedQuantities* ip_cq)
 {
   solver->finalize_solution(x,z_L,z_U,g,lambda,obj_value, ip_data->iter_count());
 }

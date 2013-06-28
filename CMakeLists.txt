@@ -1,7 +1,29 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "1.6.0")
+set(PACKAGE_VERSION "1.7.0")
+
+# For systems with git installed, find out revsion and description.
+execute_process(COMMAND git rev-parse HEAD
+OUTPUT_VARIABLE git_revision
+OUTPUT_STRIP_TRAILING_WHITESPACE
+ERROR_QUIET
+)
+
+execute_process(COMMAND git describe HEAD
+OUTPUT_VARIABLE git_describe
+OUTPUT_STRIP_TRAILING_WHITESPACE
+ERROR_QUIET
+)
+
+#begin workaround for http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
+SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
+include(language_support)
+workaround_9220(Fortran Fortran_language_works)
+if(Fortran_language_works)
+  enable_language(Fortran OPTIONAL)
+endif()
+#end workaround
 
 # find the macports python libs if they exist
 if(APPLE)
@@ -15,7 +37,14 @@ endif()
 
 # cmake_policy propagation rules
 if(COMMAND cmake_policy)
+if(POLICY CMP0011)
 cmake_policy(SET CMP0011 OLD)
+endif()
+endif()
+
+# cmake_policy avoid escaping in add_definitions
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0005 OLD)
 endif()
 
 # We use the FeatureSummary module to get a more readable CMake output
@@ -32,7 +61,11 @@ endif()
 option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
 option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
 option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
-option(WITH_DL "Enable dynamic loading of functions" OFF)
+if (WIN32)
+ option(WITH_DL "Enable dynamic loading of functions" OFF)
+else (WIN32)
+ option(WITH_DL "Enable dynamic loading of functions" ON)
+endif (WIN32)
 option(WITH_LLVM "Use LLVM for just-in-time compilation" OFF)
 option(WITH_DOC "Enable documentation generation" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
@@ -40,7 +73,7 @@ option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" 
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
-option(WITH_WORHP "Compile the WORHP interface" ON) 
+option(WITH_WORHP "Compile the WORHP interface" OFF) 
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
 option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
@@ -48,23 +81,28 @@ option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOAS
 option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
+option(WITH_BUILD_IPOPT "Download and compile IPOPT" OFF)
+option(WITH_KNITRO "Compile the interface to KNITRO" ON)
+option(WITH_CPLEX "Compile the interface to CPLEX" ON)
+option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
 else(CMAKE_BUILD_TYPE)
  set(CMAKE_BUILD_TYPE Release)
- # set(CMAKE_BUILD_TYPE Debug)
+ #set(CMAKE_BUILD_TYPE Debug)
 endif(CMAKE_BUILD_TYPE)
+string (TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
 
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-add_definitions(-DCASADIVERSION=${PACKAGE_VERSION})
 
 if(WITH_DL)
   add_definitions(-DWITH_DL)
 endif()
+add_feature_info(dynamic-loading WITH_DL "Compile with support for dynamic loading of generated functions (needed for ExternalFunction)")
 
 if(WITH_PRINTME)
   add_definitions(-DWITH_PRINTME)
@@ -72,25 +110,9 @@ endif()
 
 include_directories(.)
 
-# The following code canonicalizes paths: 
-# e.g.  converts "foo/bar/..;foo/../foo"   to "foo;foo" 
-# When a library is present in "foo" directory, "foo/bar/..;foo/../foo" would make CMake 
-#  complain about this library being present in two different folders,  
-#  which would be a recipe for trouble where it not for 
-#  the fact that these directories are really identical. 
-#  It could be considered a workaround for a bug in CMake. 
-function(canonicalize_paths MYPATH) 
-set(MYPATH_NEW "") 
- 
-foreach(arg ${${MYPATH}}) 
-  get_filename_component(CANONICAL_PATH ${arg} REALPATH) 
-  SET(MYPATH_NEW ${MYPATH_NEW} "${CANONICAL_PATH}") 
-endforeach() 
-SET(${MYPATH} ${MYPATH_NEW} PARENT_SCOPE) 
-endfunction() 
 
 # Check if the compiler supports C++11
-foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x" "-std=c++11 --DUSE_TR1_HASHMAP" "-std=c++0x -DUSE_TR1_HASHMAP")
+foreach(CXX11FLAG_TEST "" "-std=gnu++11" "-std=c++11" "-std=gnu++0x" "-std=c++0x" "-std=c++11 --DUSE_TR1_HASHMAP" "-std=c++0x -DUSE_TR1_HASHMAP")
   if(NOT USE_CXX11)
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11
@@ -137,14 +159,6 @@ if(WITH_SUNDIALS)
 endif()
 add_feature_info(sundials-interface WITH_SUNDIALS "Interface to the ODE/DAE integrator suite SUNDIALS.")
 
-# Use the included qpOASES
-if(WITH_QPOASES)
-  set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
-  set(QPOASES_LIBRARIES casadi_qpoases)
-  set(QPOASES_FOUND true)
-endif()
-add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP solver qpOASES.")
-
 # Use the included csparse
 if(WITH_CSPARSE)
   set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse/Include)
@@ -165,7 +179,6 @@ if(WITH_OPENMP)
 endif()
 
 #SET(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
@@ -202,7 +215,26 @@ add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
 find_package(LibXml2) 
-find_package(LAPACK)
+if(WITH_LAPACK)
+  find_package(LAPACK)
+endif()
+add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
+
+# download and build ipopt
+if(WITH_BUILD_IPOPT)
+  include(ExternalProject)
+  ExternalProject_Add(
+    build_ipopt
+    SVN_REPOSITORY https://projects.coin-or.org/svn/Ipopt/stable/3.10
+    UPDATE_COMMAND "" # svn update unneccesary
+    PREFIX ${CMAKE_BINARY_DIR}/CoinIpopt
+    CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/CoinIpopt/src/build_ipopt/configure #--prefix=${CMAKE_CURRENT_SOURCE_DIR}/lib/libbuildipopt
+    BUILD_COMMAND make -j4
+  )
+  set(BUILD_IPOPT_LIB_DIR ${CMAKE_BINARY_DIR}/CoinIpopt/src/build_ipopt-build)
+  message(STATUS "BUILD_IPOPT_LIB_DIR: "${BUILD_IPOPT_LIB_DIR})
+endif(WITH_BUILD_IPOPT)
+add_feature_info(get-ipopt WITH_BUILD_IPOPT "Download and build Ipopt.")
 
 if(WITH_IPOPT)
   find_package(IPOPT)
@@ -213,18 +245,27 @@ if(WITH_ACADO)
   find_package(ACADO)
 endif()
 
-find_package(KNITRO)
+if(WITH_KNITRO)
+  find_package(KNITRO)
+endif(WITH_KNITRO)
 add_feature_info(knitro-interface KNITRO_FOUND "Interface to the NLP solver KNITRO.")
 
-find_package(LIFTOPT)
-add_feature_info(liftopt-interface LIFTOPT_FOUND "Interface to the Lifted Newton implementation LiftOpt.")
-
-find_package(CPLEX)
+if(WITH_CPLEX)
+  find_package(CPLEX)
+endif(WITH_CPLEX)
 add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX.")
 
 # if(WITH_GSL)
 #   find_package (GSL)
 # endif()
+
+# Use the included qpOASES
+if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
+  set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
+  set(QPOASES_LIBRARIES casadi_qpoases)
+  set(QPOASES_FOUND true)
+endif()
+add_feature_info(qpoases-interface QPOASES_FOUND "Interface to the active-set QP solver qpOASES.")
 
 if(WITH_OOQP AND BLAS_FOUND)
   find_package (OOQP)
@@ -242,13 +283,13 @@ if(WITH_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
   set(DSDP_LIBRARIES casadi_dsdp)
   set(DSDP_FOUND true)
 endif()
-add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP solver DSDP (requires BLAS and LAPACK).")
+add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP (requires BLAS and LAPACK).")
 
 add_subdirectory(symbolic)
 add_subdirectory(optimal_control)
 add_subdirectory(nonlinear_programming)
+add_subdirectory(convex_programming)
 add_subdirectory(integration)
-add_subdirectory(toolboxes)
 add_subdirectory(examples)
 add_subdirectory(external_packages)
 add_subdirectory(interfaces)
@@ -259,17 +300,9 @@ add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
 find_package(SWIG)
   if(SWIG_FOUND)
     add_subdirectory(swig EXCLUDE_FROM_ALL) # the swig interfaces are not compiled when typing "make"
-    if(WITH_SWIG_SPLIT)
-      add_custom_target(python DEPENDS _casadi_main _casadi_primitive _casadi_primitive_tools _casadi_noncore) # the python interface is created with the command "make python"
-      add_custom_target(octave DEPENDS casadi_main_octave casadi_primitive_octave casadi_primitive_tools_octave casadi_noncore_octave) # the octave interface is created with the command "make octave"
-    else(WITH_SWIG_SPLIT)
-      add_custom_target(python DEPENDS _casadi) # the python interface is created with the command "make python"
-      add_custom_target(octave DEPENDS casadi_octave ) # the octave interface is created with the command "make octave"
-  endif(WITH_SWIG_SPLIT)
+    add_custom_target(python DEPENDS _python_modules )
+    add_custom_target(octave DEPENDS _octave_modules )
 endif(SWIG_FOUND)
-
-add_subdirectory(documentation/tutorials EXCLUDE_FROM_ALL)
-add_custom_target(tutor)
 
 if(WITH_DOC)
   set(DOXYFILE_LATEX "NO")
@@ -277,10 +310,23 @@ if(WITH_DOC)
   set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/documentation/api-doc)
   set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/symbolic)
   include(UseDoxygen OPTIONAL)
+  add_subdirectory(documentation/tutorials EXCLUDE_FROM_ALL)
+  add_custom_target(tutor)
 endif()
 
 add_subdirectory(documentation/examples/ctemplate)
 
 # Print a summary
 feature_summary(WHAT ALL)
+feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
 
+STRING(REPLACE "\n" "\\n" feature_list "${feature_list}")
+STRING(REPLACE "+-" "+" git_describe "${git_describe}")
+STRING(REPLACE "-g" "." git_describe "${git_describe}")
+
+# Pass meta information
+CONFIGURE_FILE(
+  ${CMAKE_SOURCE_DIR}/symbolic/casadi_meta.cpp.cmake
+  ${CMAKE_SOURCE_DIR}/symbolic/casadi_meta.cpp
+  ESCAPE_QUOTES
+)

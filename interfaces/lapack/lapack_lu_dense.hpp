@@ -27,74 +27,74 @@
 
 namespace CasADi{
   
-/** \brief  Forward declaration of internal class
+  /** \brief  Forward declaration of internal class
 
- @copydoc LinearSolver_doc
+      @copydoc LinearSolver_doc
   */
-class LapackLUDenseInternal;
+  class LapackLUDenseInternal;
 
-/** \brief  LU LinearSolver with Lapack Interface
-* @copydoc LinearSolver_doc
-*
-* This class solves the linear system A.x=b by making an LU factorization of A: \n
-* A = L.U, with L lower and U upper triangular
-* 
-* LapackLUDense is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
-*
-* The usual procedure to use LapackLUDense is: \n
-*  -# init()
-*  -# set the first input (A)
-*  -# prepare()
-*  -# set the second input (b)
-*  -# solve()
-*  -# Repeat steps 4 and 5 to work with other b vectors.
-*
-* The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
-*
-*/
-class LapackLUDense : public LinearSolver{
-public:
+  /** \brief  LU LinearSolver with Lapack Interface
+   * @copydoc LinearSolver_doc
+   *
+   * This class solves the linear system A.x=b by making an LU factorization of A: \n
+   * A = L.U, with L lower and U upper triangular
+   * 
+   * LapackLUDense is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+   *
+   * The usual procedure to use LapackLUDense is: \n
+   *  -# init()
+   *  -# set the first input (A)
+   *  -# prepare()
+   *  -# set the second input (b)
+   *  -# solve()
+   *  -# Repeat steps 4 and 5 to work with other b vectors.
+   *
+   * The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
+   *
+   */
+  class LapackLUDense : public LinearSolver{
+  public:
 
-  /// Default (empty) constructor
-  LapackLUDense();
+    /// Default (empty) constructor
+    LapackLUDense();
   
-  /// Create a linear solver given a sparsity pattern
-  LapackLUDense(const CRSSparsity& sparsity);
+    /// Create a linear solver given a sparsity pattern
+    LapackLUDense(const CRSSparsity& sparsity, int nrhs=1);
     
-  /// Access functions of the node
-  LapackLUDenseInternal* operator->();
-  const LapackLUDenseInternal* operator->() const;
+    /// Access functions of the node
+    LapackLUDenseInternal* operator->();
+    const LapackLUDenseInternal* operator->() const;
   
-  /// Static creator function
-  #ifdef SWIG
-  %callback("%s_cb");
-  #endif
-  static LinearSolver creator(const CRSSparsity& sp){ return LapackLUDense(sp);}
-  #ifdef SWIG
-  %nocallback;
-  #endif
+    /// Static creator function
+#ifdef SWIG
+    %callback("%s_cb");
+#endif
+    static LinearSolver creator(const CRSSparsity& sp, int nrhs){ return LapackLUDense(sp,nrhs);}
+#ifdef SWIG
+    %nocallback;
+#endif
 
-};
+  };
 
 #ifndef SWIG
 
-/// LU-Factorize dense matrix (lapack)
-extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
+  /// LU-Factorize dense matrix (lapack)
+  extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
 
-/// Solve a system of equation using an LU-factorized matrix (lapack)
-extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info);
+  /// Solve a system of equation using an LU-factorized matrix (lapack)
+  extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info);
 
-/// Calculate row and column scalings
-extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c, double *rowcnd, double *colcnd, double *amax, int *info);
+  /// Calculate row and column scalings
+  extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c, double *rowcnd, double *colcnd, double *amax, int *info);
 
-/// Equilibriate the system
-extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c, double *rowcnd, double *colcnd, double *amax, char *equed );
+  /// Equilibriate the system
+  extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c, double *rowcnd, double *colcnd, double *amax, char *equed );
 
-/// Internal class
-class LapackLUDenseInternal : public LinearSolverInternal{
+  /// Internal class
+  class LapackLUDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackLUDenseInternal(const CRSSparsity& sparsity);
+    LapackLUDenseInternal(const CRSSparsity& sparsity, int nrhs);
 
     // Clone
     virtual LapackLUDenseInternal* clone() const;
@@ -140,7 +140,7 @@ class LapackLUDenseInternal : public LinearSolverInternal{
     // Dimensions
     int nrow_, ncol_;
     
-};
+  };
 
 #endif // SWIG
 

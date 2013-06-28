@@ -194,7 +194,6 @@ void SundialsInternal::init(){
     // Create a linear solver
     linearSolverCreator creator = getOption("linear_solver");
     linsol_ = creator(jac_.output().sparsity());
-    linsol_.setSparsity(jac_.output().sparsity());
     // Pass options
     if(hasSetOption("linear_solver_options")){
       linsol_.setOption(getOption("linear_solver_options"));
@@ -206,7 +205,6 @@ void SundialsInternal::init(){
     // Create a linear solver
     linearSolverCreator creator = hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
     linsolB_ = creator(jacB_.output().sparsity());
-    linsolB_.setSparsity(jacB_.output().sparsity());
     // Pass options
     if(hasSetOption("linear_solver_optionsB")){
       linsolB_.setOption(getOption("linear_solver_optionsB"));

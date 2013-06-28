@@ -27,71 +27,71 @@
 
 namespace CasADi{
   
-/** \brief  Forward declaration of internal class
- @copydoc LinearSolver_doc
- */
-class LapackQRDenseInternal;
+  /** \brief  Forward declaration of internal class
+      @copydoc LinearSolver_doc
+  */
+  class LapackQRDenseInternal;
 
-/** \brief  QR LinearSolver with Lapack Interface
-*
- @copydoc LinearSolver_doc
-*
-* This class solves the linear system A.x=b by making an QR factorization of A: \n
-* A = Q.R, with Q orthogonal and R upper triangular
-* 
-* LapackQRDense is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
-*
-* The usual procedure to use LapackQRDense is: \n
-*  -# init()
-*  -# set the first input (A)
-*  -# prepare()
-*  -# set the second input (b)
-*  -# solve()
-*  -# Repeat steps 4 and 5 to work with other b vectors.
-*
-* The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
-*
-*/
-class LapackQRDense : public LinearSolver{
-public:
+  /** \brief  QR LinearSolver with Lapack Interface
+   *
+   @copydoc LinearSolver_doc
+   *
+   * This class solves the linear system A.x=b by making an QR factorization of A: \n
+   * A = Q.R, with Q orthogonal and R upper triangular
+   * 
+   * LapackQRDense is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+   *
+   * The usual procedure to use LapackQRDense is: \n
+   *  -# init()
+   *  -# set the first input (A)
+   *  -# prepare()
+   *  -# set the second input (b)
+   *  -# solve()
+   *  -# Repeat steps 4 and 5 to work with other b vectors.
+   *
+   * The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
+   *
+   */
+  class LapackQRDense : public LinearSolver{
+  public:
 
-  /// Default (empty) constructor
-  LapackQRDense();
+    /// Default (empty) constructor
+    LapackQRDense();
   
-  /// Create a linear solver given a sparsity pattern
-  LapackQRDense(const CRSSparsity& sparsity);
+    /// Create a linear solver given a sparsity pattern
+    LapackQRDense(const CRSSparsity& sparsity, int nrhs=1);
     
-  /// Access functions of the node
-  LapackQRDenseInternal* operator->();
-  const LapackQRDenseInternal* operator->() const;
+    /// Access functions of the node
+    LapackQRDenseInternal* operator->();
+    const LapackQRDenseInternal* operator->() const;
   
-  /// Static creator function
-  #ifdef SWIG
-  %callback("%s_cb");
-  #endif
-  static LinearSolver creator(const CRSSparsity& sp){ return LapackQRDense(sp);}
-  #ifdef SWIG
-  %nocallback;
-  #endif
+    /// Static creator function
+#ifdef SWIG
+    %callback("%s_cb");
+#endif
+    static LinearSolver creator(const CRSSparsity& sp, int nrhs){ return LapackQRDense(sp, nrhs);}
+#ifdef SWIG
+    %nocallback;
+#endif
 
-};
+  };
 
 #ifndef SWIG
 
-/// QR-factorize dense matrix (lapack)
-extern "C" void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau, double *work, int *lwork, int *info);
+  /// QR-factorize dense matrix (lapack)
+  extern "C" void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau, double *work, int *lwork, int *info);
 
-/// Multiply right hand side with Q-transpose (lapack)
-extern "C" void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double *work, int *lwork, int *info);
+  /// Multiply right hand side with Q-transpose (lapack)
+  extern "C" void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double *work, int *lwork, int *info);
 
-/// Solve upper triangular system (lapack)
-extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb);
+  /// Solve upper triangular system (lapack)
+  extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb);
 
-/// Internal class
-class LapackQRDenseInternal : public LinearSolverInternal{
+  /// Internal class
+  class LapackQRDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQRDenseInternal(const CRSSparsity& sparsity);
+    LapackQRDenseInternal(const CRSSparsity& sparsity, int nrhs);
 
     // Clone
     virtual LapackQRDenseInternal* clone() const;
@@ -122,7 +122,7 @@ class LapackQRDenseInternal : public LinearSolverInternal{
     // Dimensions
     int nrow_, ncol_;
 
-};
+  };
 
 #endif // SWIG
 

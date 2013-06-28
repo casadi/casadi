@@ -139,3 +139,6 @@ install(TARGETS casadi_sundials
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+set_target_properties(casadi_sundials PROPERTIES COMPILE_FLAGS "-Wno-format-security")
+endif()

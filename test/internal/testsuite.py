@@ -38,7 +38,17 @@ def is_exe(root,name):
   return os.path.exists(fpath) and os.access(fpath, os.X_OK)
   
 from os import kill
-from signal import alarm, signal, SIGALRM, SIGKILL
+from signal import signal
+
+
+try:
+    from signal import alarm, SIGALRM, SIGKILL
+    alarm_available = True
+except:
+    def alarm(amount):
+        pass
+    alarm_available = False
+
 from subprocess import PIPE, Popen
 
 # Snippet from http://stackoverflow.com/questions/1191374/subprocess-with-timeout
@@ -53,7 +63,8 @@ def run(args, input=None, cwd = None, shell = False, kill_tree = True, timeout =
         raise Alarm
     p = Popen(args, shell = shell, cwd = cwd, stdout = PIPE, stderr = PIPE, env = env)
     if timeout != -1:
-        signal(SIGALRM, alarm_handler)
+        if alarm_available:
+            signal(SIGALRM, alarm_handler)
         alarm(timeout)
     try:
         stdout, stderr = p.communicate()
@@ -134,7 +145,8 @@ class TestSuite:
      
     
     """
-    signal(SIGALRM, alarm_handler)
+    if alarm_available:
+        signal(SIGALRM, alarm_handler)
 
     # Don't buffer
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)

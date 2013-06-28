@@ -27,11 +27,6 @@
 #include <fstream>
 #include <sstream>
 
-// The following works for Linux, something simular is needed for Windows
-#ifdef WITH_DL 
-#include <dlfcn.h>
-#endif // WITH_DL 
-
 namespace CasADi{
 
 using namespace std;
@@ -40,15 +35,34 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
 #ifdef WITH_DL 
 
   // Load the dll
-  handle_ = 0;
+#ifdef _WIN32
+  handle_ = LoadLibrary(TEXT(bin_name_.c_str()));  
+  casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: " << bin_name_ << ". error code (WIN32): "<< GetLastError());
+
+  initPtr init = (initPtr)GetProcAddress(handle_,TEXT("init"));
+  if(init==0) throw CasadiException("ExternalFunctionInternal: no \"init\" found");
+  getSparsityPtr getSparsity = (getSparsityPtr)GetProcAddress(handle_, TEXT("getSparsity"));
+  if(getSparsity==0) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
+  evaluate_ = (evaluatePtr) GetProcAddress(handle_, TEXT("evaluateWrap"));
+  if(evaluate_==0) throw CasadiException("ExternalFunctionInternal: no \"evaluateWrap\" found");
+
+#else // _WIN32
   handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);  
-  casadi_assert_message(handle_,"ExternalFunctionInternal: Cannot open function: " << bin_name_ << ". error code: "<< dlerror())  ;
+  casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: " << bin_name_ << ". error code: "<< dlerror());
 
-  dlerror(); // reset error
+  // reset error
+  dlerror(); 
 
-  // Initialize and get the number of inputs and outputs
+  // Load symbols
   initPtr init = (initPtr)dlsym(handle_, "init");
   if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"init\" found");
+  getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle_, "getSparsity");
+  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
+  evaluate_ = (evaluatePtr) dlsym(handle_, "evaluateWrap");
+  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"evaluateWrap\" found");
+#endif // _WIN32
+
+  // Initialize and get the number of inputs and outputs
   int n_in=-1, n_out=-1;
   int flag = init(&n_in, &n_out);
   if(flag) throw CasadiException("ExternalFunctionInternal: \"init\" failed");
@@ -58,9 +72,6 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   output_.resize(n_out);
   
   // Get the sparsity pattern
-  getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle_, "getSparsity");
-  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
-
   for(int i=0; i<n_in+n_out; ++i){
     // Get sparsity from file
     int nrow, ncol, *rowind, *col;
@@ -86,11 +97,7 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
       output(i-n_in) = Matrix<double>(sp,0);
     }
   }
-  
-  //
-  evaluate_ = (evaluatePtr) dlsym(handle_, "evaluateWrap");
-  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"evaluateWrap\" found");
-  
+    
 #else // WITH_DL 
   throw CasadiException("WITH_DL  not activated");
 #endif // WITH_DL 
@@ -104,7 +111,11 @@ ExternalFunctionInternal* ExternalFunctionInternal::clone() const{
 ExternalFunctionInternal::~ExternalFunctionInternal(){
 #ifdef WITH_DL 
   // close the dll
+#ifdef _WIN32
+  if(handle_) FreeLibrary(handle_);
+#else // _WIN32
   if(handle_) dlclose(handle_);
+#endif // _WIN32
 #endif // WITH_DL 
 }
 
@@ -122,12 +133,12 @@ void ExternalFunctionInternal::init(){
   // Get pointers to the inputs
   input_array_.resize(input_.size());
   for(int i=0; i<input_array_.size(); ++i)
-    input_array_[i] = &input(i).front();
+    input_array_[i] = input(i).ptr();
 
   // Get pointers to the outputs
   output_array_.resize(output_.size());
   for(int i=0; i<output_array_.size(); ++i)
-    output_array_[i] = &output(i).front();
+    output_array_[i] = output(i).ptr();
 }
 
 

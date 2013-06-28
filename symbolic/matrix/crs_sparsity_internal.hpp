@@ -135,7 +135,7 @@ namespace CasADi{
     CRSSparsity reshape(int n, int m) const;
 
     /// Pattern union
-    //CRSSparsity patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const;
+    //CRSSparsity patternCombine(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const;
 
     /// Number of structural non-zeros
     int size() const;
@@ -149,11 +149,14 @@ namespace CasADi{
     /// Number of non-zeros in the lower triangular half
     int sizeL() const;
 
+    /// Number of non-zeros on the diagonal
+    int sizeD() const;
+    
     /// Shape
     std::pair<int,int> shape() const;
     
     /// Is scalar?
-    bool scalar() const;
+    bool scalar(bool scalar_and_dense) const;
     
     /// Is dense?
     bool dense() const;
@@ -164,14 +167,23 @@ namespace CasADi{
     /// Get the dimension as a string
     std::string dimString() const;
 
-     /// Sparsity pattern for a matrix-matrix product (details in public class)
+    //@{
+    /// Sparsity pattern for a matrix-matrix product (details in public class)
     CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
-
-     /// Sparsity pattern for a matrix-matrix product (details in public class)
     CRSSparsity patternProduct(const CRSSparsity& y_trans) const;
-
+    //@}
+    
+    //@{
     /// Union of two sparsity patterns
-    CRSSparsity patternUnion(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero=true, bool f0x_is_zero=false, bool fx0_is_zero=false) const;
+    CRSSparsity patternCombine(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
+    CRSSparsity patternCombine(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
+
+    template<bool with_mapping>
+    CRSSparsity patternCombineGen1(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
+
+    template<bool with_mapping, bool f0x_is_zero, bool fx0_is_zero>
+    CRSSparsity patternCombineGen(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;
+    //@}
 
     /// Check if two sparsity patterns are the same
     bool isEqual(const CRSSparsity& y) const;
@@ -201,7 +213,7 @@ namespace CasADi{
     * Does bounds checking
     * ii and jj are not required to be monotonous
     */
-    CRSSparsity getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+    CRSSparsity sub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
 
     /// Get the index of an existing non-zero element
     int getNZ(int i, int j) const;
@@ -261,9 +273,9 @@ namespace CasADi{
     void spyMatlab(const std::string& mfile) const;
  private: 
     /// Time complexity: O(ii.size()*jj.size())
-    CRSSparsity getSub1(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+    CRSSparsity sub1(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
     /// Time complexity: O(ii.size()*(nnz per row))
-    CRSSparsity getSub2(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+    CRSSparsity sub2(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
 };
 
 } // namespace CasADi

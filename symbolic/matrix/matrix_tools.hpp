@@ -26,6 +26,8 @@
 #include "matrix.hpp"
 #include <algorithm>
 
+#include "sparsity_tools.hpp"
+
 namespace CasADi{
 
 /// Transpose of a matrix
@@ -55,6 +57,12 @@ bool isInteger(const Matrix<T>& ex);
 
 template<class T>
 bool isScalar(const Matrix<T>& ex);
+
+//{@
+/// Checks if vector does not contain NaN or Inf
+bool isRegular(const Matrix<int>& ex);
+bool isRegular(const Matrix<double>& ex);
+//@}
 
 template<class T>
 bool isVector(const Matrix<T>& ex);
@@ -137,13 +145,27 @@ Matrix<T> flatten(const Matrix<T>& a);
 template<class T>
 Matrix<T> vecNZ(const Matrix<T>& a);
 
-
+/** \brief Construct a matrix from a list of list of blocks.
+*/
 template<class T>
 Matrix<T> blockcat(const std::vector< std::vector<Matrix<T> > > &v);
 
+#ifndef SWIG
+/** \brief Construct a matrix from 4 blocks
+*/
+template<class T>
+Matrix<T> blockcat(const Matrix<T> &A,const Matrix<T> &B,const Matrix<T> &C,const Matrix<T> &D);
+#endif // SWIG
+
+/** \brief Concatenate a list of matrices vertically
+* Alternative terminology: vertical stack, vstack, vertical append, [a;b]
+*/
 template<class T>
 Matrix<T> vertcat(const std::vector<Matrix<T> > &v);
 
+/** \brief Concatenate a list of matrices horizontally
+* Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
+*/
 template<class T>
 Matrix<T> horzcat(const std::vector<Matrix<T> > &v);
 
@@ -163,26 +185,12 @@ template<class T>
 /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
 Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp);
 
-#ifndef SWIG
-/**
-Apply a function f to each element in a vector
-*/
-template<class T>
-std::vector< Matrix<T> > applymap(Matrix<T> (*f)(const Matrix<T>& ),const std::vector< Matrix<T> >&);
-
-/**
-Apply a function f to each element in a vector
-*/
-template<class T>
-void applymap(void (*f)(Matrix<T>&), std::vector< Matrix<T> >&);
-#endif // SWIG
-
-/** \brief Inner product of two vectors
+/** \brief Inner product of two matrices
         Equals
         \code
-        trans(x)*y
+        sumAll(x*y)
         \endcode
-        with x and y vectors
+        with x and y matrices of the same dimension
 */
 template<class T>
 Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y); // inner product
@@ -250,6 +258,12 @@ int nnz(const Matrix<T>& ex);
 template<class T>
 int nnz_sym(const Matrix<T>& ex);
 
+/** \brief Check if two expressions are equal
+*
+*  Might very well give false negatives
+*
+*   Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
+*/
 template<class T>
 bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2);
 
@@ -323,9 +337,25 @@ Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
 template<class T>
 void makeDense(Matrix<T>& A);
 
+/** \brief  Make a matrix dense */
+template<class T>
+Matrix<T> densify(const Matrix<T>& A);
+
+#ifndef SWIGOCTAVE
+/** \brief  Make a matrix dense */
+template<class T>
+Matrix<T> full(const Matrix<T>& A);
+#endif // SWIGOCTAVE
+
 /** \brief  Make a matrix sparse by removing numerical */
 template<class T>
 void makeSparse(Matrix<T>& A);
+
+#ifndef SWIGOCTAVE
+/** \brief  Make a matrix sparse by removing numerical */
+template<class T>
+Matrix<T> sparse(const Matrix<T>& A);
+#endif // SWIGOCTAVE
 
 /** \brief  Check if the matrix has any zero entries which are not structural zeros */
 template<class T>
@@ -649,6 +679,11 @@ Matrix<T> blockcat(const std::vector< std::vector<Matrix<T> > > &v) {
 }
 
 template<class T>
+Matrix<T> blockcat(const Matrix<T> &A,const Matrix<T> &B,const Matrix<T> &C,const Matrix<T> &D) {
+  return vertcat(horzcat(A,B),horzcat(C,D));
+}
+
+template<class T>
 Matrix<T> vertcat(const std::vector<Matrix<T> > &v){
   Matrix<T> ret;
   for(int i=0; i<v.size(); ++i)
@@ -678,37 +713,20 @@ Matrix<T> horzcat(const Matrix<T> &x, const Matrix<T> &y){
 
 template<class T>
 Matrix<T> veccat(const std::vector< Matrix<T> >& comp) {
-  return vertcat(applymap(vec,comp));
+  Matrix<T> (&f)(const Matrix<T>&) = vec;
+  return vertcat(applymap(f,comp));
 }
 
 template<class T>
 Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp) {
-  return vertcat(applymap(vecNZ,comp));
+  Matrix<T> (&f)(const Matrix<T>&) = vecNZ;
+  return vertcat(applymap(f,comp));
 }
-
-#ifndef SWIG
-template<class T>
-std::vector< Matrix<T> > applymap(Matrix<T> (*f)(const Matrix<T>&) ,const std::vector< Matrix<T> >& comp) {
-  std::vector< Matrix<T> > ret(comp.size());
-  for (int k=0;k<comp.size();k++) {
-    ret[k] = f(comp[k]);
-  }
-  return ret;
-}
-
-template<class T>
-void applymap(void (*f)(Matrix<T> &), std::vector< Matrix<T> >& comp) {
-  for (int k=0;k<comp.size();k++) {
-    f(comp[k]);
-  }
-}
-#endif //SWIG
-
 
 template<class T>
 Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y){
-  casadi_assert_message(x.vector() && y.vector(), "inner_prod: arguments must be vectors");
-  return mul(trans(x),y);
+  casadi_assert_message(x.shape()==y.shape(), "inner_prod: Dimension mismatch");
+  return Matrix<T>(sumAll(x*y));
 }
 
 template<class T>
@@ -1024,32 +1042,15 @@ Matrix<T> diag(const Matrix<T>&A){
 /** \brief   Construct a matrix with given block on the diagonal */
 template<class T>
 Matrix<T> blkdiag(const std::vector< Matrix<T> > &A) {
-  int n = 0;
-  int m = 0;
-  
-  int row_offset = 0;
-  int col_offset = 0;
-  std::vector<int> rowind(1,0);
-  std::vector<int> col;
   std::vector<T> data;
   
-  int nz = 0;
+  std::vector<CRSSparsity> sp;
   for (int i=0;i<A.size();++i) {
     data.insert(data.end(),A[i].data().begin(),A[i].data().end());
-    const std::vector<int> &rowind_ = A[i].rowind();
-    const std::vector<int> &col_ = A[i].col();
-    for (int k=1;k<rowind_.size();++k) {
-      rowind.push_back(rowind_[k]+nz);
-    }
-    for (int k=0;k<col_.size();++k) {
-      col.push_back(col_[k]+m);
-    }
-    n+= A[i].size1();
-    m+= A[i].size2();
-    nz+= A[i].size();
+    sp.push_back(A[i].sparsity());
   }
   
-  return Matrix<T>(n,m,col,rowind,data);
+  return Matrix<T>(blkdiag(sp),data);
   
 }
 
@@ -1099,6 +1100,18 @@ void makeDense(Matrix<T>& A){
 }
 
 template<class T>
+Matrix<T> densify(const Matrix<T>& A){
+  Matrix<T> ret(A);
+  makeDense(ret);
+  return ret;
+}
+
+template<class T>
+Matrix<T> full(const Matrix<T>& A){
+  return densify(A);
+}
+
+template<class T>
 void makeSparse(Matrix<T>& A){
   // Quick return if there are no structurally zero entries
   if(!hasNonStructuralZeros(A))
@@ -1129,6 +1142,13 @@ void makeSparse(Matrix<T>& A){
   
   // Save to A
   A = Asp;
+}
+
+template<class T>
+Matrix<T> sparse(const Matrix<T>& A){
+  Matrix<T> ret(A);
+  makeSparse(ret);
+  return ret;
 }
 
 template<class T>
@@ -1208,8 +1228,8 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
     // Check dimensions
     if(!(A.empty() && sparsity.numel()==0)){
       casadi_assert_message(A.size1()==sparsity.size1() && A.size2()==sparsity.size2(),
-			    "Shape mismatch. Expecting " << A.dimString() << ", but got " << 
-			    sparsity.dimString() << " instead.");
+                            "Shape mismatch. Expecting " << A.dimString() << ", but got " << 
+                            sparsity.dimString() << " instead.");
     }
     
     // Return value
@@ -1226,7 +1246,7 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
     std::vector<T>& ret_data = ret.data();
     for(int k=0; k<known_ind.size(); ++k){
       if(known_ind[k]!=-1){
-	ret_data[known_ind[k]] = A_data[k];
+        ret_data[known_ind[k]] = A_data[k];
       }
     }
     return ret;
@@ -1236,8 +1256,7 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
   int sprank(const Matrix<T>& A) {
     return rank(A.sparsity());
   }
-
-
+  
 } // namespace CasADi
 
 
@@ -1253,7 +1272,7 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
 %template(function_name) CasADi::function_name < T >;
 
 // Define template instanciations
-#define MATRIX_TOOLS_TEMPLATES(T) \
+#define MATRIX_TOOLS_TEMPLATES_COMMON(T) \
 MTT_INST(T,trans) \
 MTT_INST(T,mul) \
 MTT_INST(T,isConstant) \
@@ -1296,6 +1315,7 @@ MTT_INST(T,sumRows) \
 MTT_INST(T,sumAll) \
 MTT_INST(T,trace) \
 MTT_INST(T,makeDense) \
+MTT_INST(T,densify) \
 MTT_INST(T,makeSparse) \
 MTT_INST(T,hasNonStructuralZeros) \
 MTT_INST(T,diag) \
@@ -1307,5 +1327,14 @@ MTT_INST(T,vecNZcat) \
 MTT_INST(T,project) \
 MTT_INST(T,sprank) 
 #endif //SWIG
+
+#ifdef SWIGOCTAVE
+#define MATRIX_TOOLS_TEMPLATES(T) MATRIX_TOOLS_TEMPLATES_COMMON(T)
+#else
+#define MATRIX_TOOLS_TEMPLATES(T) \
+MATRIX_TOOLS_TEMPLATES_COMMON(T) \
+MTT_INST(T,sparse) \
+MTT_INST(T,full)
+#endif //SWIGOCTAVE
 
 #endif // MATRIX_TOOLS_HPP

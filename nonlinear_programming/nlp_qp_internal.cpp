@@ -22,21 +22,21 @@
 
 #include "nlp_qp_internal.hpp"
 
-#include "symbolic/mx/mx_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/sx/sx_tools.hpp"
+#include "symbolic/fx/sx_function.hpp"
 
 using namespace std;
 namespace CasADi {
 
 NLPQPInternal* NLPQPInternal::clone() const{
   // Return a deep copy
-  NLPQPInternal* node = new NLPQPInternal(input(QP_H).sparsity(),input(QP_A).sparsity());
+  NLPQPInternal* node = new NLPQPInternal(st_);
   if(!node->is_init_)
     node->init();
   return node;
 }
   
-NLPQPInternal::NLPQPInternal(const CRSSparsity& H_, const CRSSparsity &A_) : QPSolverInternal(H_,A_) {
+NLPQPInternal::NLPQPInternal(const std::vector<CRSSparsity> &st) : QPSolverInternal(st) {
 
   addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSOlver used to solve the QPs.");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSOlver");
@@ -53,25 +53,25 @@ void NLPQPInternal::evaluate(int nfdir, int nadir) {
   
  // Pass inputs of QP to NLP form 
   
-  std::copy(input(QP_H).data().begin(),input(QP_H).data().end(),nlpsolver_.input(NLP_P).data().begin()+k); k+= input(QP_H).size();
-  std::copy(input(QP_G).data().begin(),input(QP_G).data().end(),nlpsolver_.input(NLP_P).data().begin()+k); k+= input(QP_G).size();
-  std::copy(input(QP_A).data().begin(),input(QP_A).data().end(),nlpsolver_.input(NLP_P).data().begin()+k);
+  std::copy(input(QP_SOLVER_H).data().begin(),input(QP_SOLVER_H).data().end(),nlpsolver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_H).size();
+  std::copy(input(QP_SOLVER_G).data().begin(),input(QP_SOLVER_G).data().end(),nlpsolver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_G).size();
+  std::copy(input(QP_SOLVER_A).data().begin(),input(QP_SOLVER_A).data().end(),nlpsolver_.input(NLP_SOLVER_P).data().begin()+k);
   
 
-  nlpsolver_.input(NLP_LBX).set(input(QP_LBX));
-  nlpsolver_.input(NLP_UBX).set(input(QP_UBX));
+  nlpsolver_.input(NLP_SOLVER_LBX).set(input(QP_SOLVER_LBX));
+  nlpsolver_.input(NLP_SOLVER_UBX).set(input(QP_SOLVER_UBX));
   
-  nlpsolver_.input(NLP_LBG).set(input(QP_LBA));
-  nlpsolver_.input(NLP_UBG).set(input(QP_UBA));
+  nlpsolver_.input(NLP_SOLVER_LBG).set(input(QP_SOLVER_LBA));
+  nlpsolver_.input(NLP_SOLVER_UBG).set(input(QP_SOLVER_UBA));
   
   // Delegate computation to NLP Solver
   nlpsolver_.evaluate();
   
   // Read the outputs from Ipopt
-  output(QP_PRIMAL).set(nlpsolver_.output(NLP_X_OPT));
-  output(QP_COST).set(nlpsolver_.output(NLP_COST));
-  output(QP_LAMBDA_A).set(nlpsolver_.output(NLP_LAMBDA_G));
-  output(QP_LAMBDA_X).set(nlpsolver_.output(NLP_LAMBDA_X));
+  output(QP_SOLVER_X).set(nlpsolver_.output(NLP_SOLVER_X));
+  output(QP_SOLVER_COST).set(nlpsolver_.output(NLP_SOLVER_F));
+  output(QP_SOLVER_LAM_A).set(nlpsolver_.output(NLP_SOLVER_LAM_G));
+  output(QP_SOLVER_LAM_X).set(nlpsolver_.output(NLP_SOLVER_LAM_X));
 }
 
 void NLPQPInternal::init(){
@@ -79,65 +79,33 @@ void NLPQPInternal::init(){
   
   QPSolverInternal::init();
 
-  // Create an MX for the decision variables
-  MX X("X",nx_,1);
-    
-  // Put H, G, A sparsities in a vector...
-  std::vector< CRSSparsity > sps;
-  sps.push_back(input(QP_H).sparsity());
-  sps.push_back(input(QP_G).sparsity());
-  sps.push_back(input(QP_A).sparsity());
-   
-  // So that we can pass it on to createParent
-  std::pair< MX, std::vector< MX > > mypair = createParent(sps);
-  
-  // V groups all parameters in an MX
-  MX V(mypair.first);
-  std::vector< MX > variables(mypair.second);
-  
-  // H_, G_, A_ depend on V
-  H_=variables[0];
-  G_=variables[1];
-  A_=variables[2];
+  // Create a symbolic matrix for the decision variables
+  SXMatrix X = ssym("X",n_,1);
 
-  // We're going to use two-argument objective and constraints to allow the use of parameters
-  std::vector< MX > args;
-  args.push_back(X);
-  args.push_back(V);
+  // Parameters to the problem
+  SXMatrix H = ssym("H",input(QP_SOLVER_H).sparsity());
+  SXMatrix G = ssym("G",input(QP_SOLVER_G).sparsity());
+  SXMatrix A = ssym("A",input(QP_SOLVER_A).sparsity());
 
-  // The objective function looks exactly like a mathematical description of the NLP
-  MXFunction QP_f(args, mul(trans(G_),X) + 0.5*mul(mul(trans(X),H_),X));
-  QP_f.init();
+  // Put parameters in a vector
+  std::vector< SXMatrix > par;
+  par.push_back(H.data());
+  par.push_back(G.data());
+  par.push_back(A.data());
 
-  // So does the constraint function
-  MXFunction QP_g(args, mul(A_,X));
+  // The nlp looks exactly like a mathematical description of the NLP
+  SXFunction QP_SOLVER_nlp(nlpIn("x",X,"p",vertcat(par)),
+		    nlpOut("f",mul(trans(G),X) + 0.5*mul(mul(trans(X),H),X),
+			   "g",mul(A,X)));
 
-  // Jacobian of the constraints
-  MXFunction QP_j(args,A_);
-  
-/*  std:cout << (G_+mul(trans(H_),X)).dimString() << std::endl;*/
-  // Gradient of the objective
-  MXFunction QP_gf(args,G_+mul(H_,X));
-  
-
-  MX sigma("sigma");
-
-  MX lambda("lambda",nc_,1);
-
-  args.insert(args.begin()+1, lambda);
-  args.insert(args.begin()+2, sigma);
-  
-  // Hessian of the Lagrangian
-  MXFunction QP_h(args,H_*sigma);
-  
   // Create an nlpsolver instance
   NLPSolverCreator nlpsolver_creator = getOption("nlp_solver");
-  nlpsolver_ = nlpsolver_creator(QP_f,QP_g,QP_h,QP_j); // What to do with QP_gf?
+  nlpsolver_ = nlpsolver_creator(QP_SOLVER_nlp);
+
   nlpsolver_.setQPOptions();
   if(hasSetOption("nlp_solver_options")){
     nlpsolver_.setOption(getOption("nlp_solver_options"));
   }
-  nlpsolver_.setOption("parametric",true);
   
   // Initialize the NLP solver
   nlpsolver_.init();

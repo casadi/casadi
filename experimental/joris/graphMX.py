@@ -32,15 +32,15 @@ z = (x+y)**4+sin(x)
 
 dotsave(z,filename='MX1.pdf')
 
-
 x = MX("x",sp_tril(2))
 
 y = msym("y",2,2)
 
 z = x+y
 
-z = mul(vertcat([x,y]),z)
+z = mul(msym("a",2,2),msym("p",2,2))
 
+print z
 
 dotsave(z,filename='MX2.pdf')
 
@@ -97,3 +97,18 @@ g = x[1:,1:]
 
 z = z +zz
 dotsave(z,filename='MX5.pdf')
+
+
+x = MX("x",3,3)
+y = MX("y")
+w = x[sp_tril(3)]
+w[0,2] = y
+
+g = x[0,0] + x[:,2]
+
+W = g + w[IMatrix([0,2,1])]
+W[0:2,0] += x[1:3,0]
+
+
+dotsave(W,filename='MX6.pdf')
+

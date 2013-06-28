@@ -76,6 +76,7 @@ int main(){
     switch(mode){
     case AUT_INIT: x.lift(x); break;
     case ZERO_INIT: x.lift(0.); break;
+    case UNLIFTED: break;
     }
 
     // Objective function terms
@@ -103,16 +104,17 @@ int main(){
   }
 
   // Form the NLP
-  MXFunction ffcn(u,f);
-  MXFunction gfcn(u,g);
-  SCPgen solver(ffcn,gfcn);
+  MXFunction nlp(nlpIn("x",u),nlpOut("f",f,"g",g));
+  SCPgen solver(nlp);
 
   //solver.setOption("verbose",true);
-  solver.setOption("gauss_newton",gauss_newton);
   solver.setOption("regularize",false);
   solver.setOption("codegen",false);
-  solver.setOption("maxiter_ls",1);
-  solver.setOption("maxiter",100);
+  solver.setOption("max_iter_ls",1);
+  solver.setOption("max_iter",100);
+  if(gauss_newton){
+    solver.setOption("hessian_approximation","gauss-newton");
+  }
   
   // Print the variables
   solver.setOption("print_x",range(0,n,5));
@@ -136,13 +138,13 @@ int main(){
   solver.init();
     
   // Pass bounds and solve
-  solver.setInput(lbu,NLP_LBX);
-  solver.setInput(ubu,NLP_UBX);
-  solver.setInput(lbg,NLP_LBG);
-  solver.setInput(ubg,NLP_UBG);
+  solver.setInput(lbu,"lbx");
+  solver.setInput(ubu,"ubx");
+  solver.setInput(lbg,"lbg");
+  solver.setInput(ubg,"ubg");
   solver.solve();
 
-  cout << "u_opt = " << solver.output(NLP_X_OPT).data() << endl;
+  cout << "u_opt = " << solver.output(NLP_SOLVER_X).data() << endl;
 
     
   return 0;

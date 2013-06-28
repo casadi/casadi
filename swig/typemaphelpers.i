@@ -119,18 +119,18 @@ class meta {
     
     #ifdef SWIGPYTHON
     static bool couldbe_sequence(PyObject * p) {
-      if(PySequence_Check(p) && !meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p)) {
+      if(PySequence_Check(p) && !meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SXMatrix__") && !PyObject_HasAttrString(p,"__MX__")) {
         PyObject *it = PyObject_GetIter(p);
         if (!it) return false;
         PyObject *pe;
-        int i=0;
-        while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+        while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
           if (!meta< T >::couldbe(pe)) {
             Py_DECREF(pe);Py_DECREF(it);return false;
           }
           Py_DECREF(pe);
         }
         Py_DECREF(it);
+        if (PyErr_Occurred()) { PyErr_Clear(); return false; }
         return true;
       } else {
         return false;
@@ -158,7 +158,7 @@ class meta {
       PyObject *pe;
       m.resize(PySequence_Size(p));
       int i=0;
-      while (pe = PyIter_Next(it)) {                                // Iterate over the sequence inside the sequence
+      while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
         bool result=meta< T >::as(pe,m[i++]);
         if (!result) {
           Py_DECREF(pe);Py_DECREF(it);
@@ -180,9 +180,10 @@ class meta {
       if (nrow!=1 && ncol!=1) return false;
       m.resize(p.length());
       
+      Cell c = p.cell_value();
       for(int i=0; i<p.length(); ++i){
         // Get the octave object
-        const octave_value& obj_i = p.cell_value()(i);
+        const octave_value& obj_i = c(i);
         
         if (!(obj_i.is_real_matrix() && obj_i.is_empty())) {
           bool ret = meta< T >::as(obj_i,m[i]);

@@ -54,10 +54,10 @@ f.setInput([1,2,3,4,5,6],0);
 f.setInput([1,3,0,6,0,9],1);
 f.evaluate()
 
-print f.output()
+print f.getOutput()
 #! Note how this result is related to a numpy approach:
-a=matrix(f.input(0)).reshape(3,2)
-b=matrix(f.input(1)).reshape(2,3)
+a=matrix(f.getInput(0)).reshape(3,2)
+b=matrix(f.getInput(1)).reshape(2,3)
 print a.T*b.T
 #! Jacobian
 #! -------------
@@ -76,9 +76,9 @@ print MX([1,2,3])
 Y = MX("Y")
 f = MXFunction([Y],[X])
 f.init()
-f.input().set([2])
+f.setInput([2])
 f.evaluate()
-print f.output()
+print f.getOutput()
 
 #! Element assignement
 #! -------------------

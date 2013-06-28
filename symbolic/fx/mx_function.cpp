@@ -70,6 +70,23 @@ MXFunction::MXFunction(const std::vector<MX>& inputv, const std::vector<MX>& out
   assignNode(new MXFunctionInternal(inputv,outputv));
 }
 
+MXFunction::MXFunction(const std::vector<MX>& inputv, const IOSchemeVector< MX >& outputv){
+  assignNode(new MXFunctionInternal(inputv,outputv));
+  setOutputScheme(outputv.io_scheme());
+}
+
+MXFunction::MXFunction(const IOSchemeVector< MX >& inputv, const std::vector<MX>& outputv){
+  assignNode(new MXFunctionInternal(inputv,outputv));
+  setInputScheme(inputv.io_scheme());
+}
+
+
+MXFunction::MXFunction(const IOSchemeVector< MX >& inputv, const IOSchemeVector< MX >& outputv){
+  assignNode(new MXFunctionInternal(inputv,outputv));
+  setInputScheme(inputv.io_scheme());
+  setOutputScheme(outputv.io_scheme());
+}
+
 const MXFunctionInternal* MXFunction::operator->() const{
   return (const MXFunctionInternal*)FX::operator->();
 }
@@ -101,10 +118,6 @@ const std::vector<MXAlgEl>& MXFunction::algorithm() const{
 int MXFunction::countNodes() const{
   assertInit();
   return algorithm().size();
-}
-
-void MXFunction::setLiftingFunction(LiftingFunction liftfun, void* user_data){
-  (*this)->setLiftingFunction(liftfun,user_data);
 }
 
 MX MXFunction::jac(int iind, int oind, bool compact, bool symmetric){

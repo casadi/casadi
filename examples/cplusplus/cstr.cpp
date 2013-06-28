@@ -107,7 +107,6 @@ int main(){
   Dictionary nlp_solver_dict;
   nlp_solver_dict["tol"] = 1e-5;
   nlp_solver_dict["hessian_approximation"] = "limited-memory"; // For BFGS
-  //nlp_solver_dict["generate_hessian"] = true; // For exact Hessian
   nlp_solver_dict["max_iter"] = 100;
   nlp_solver_dict["linear_solver"] = "ma57";
   //  nlp_solver_dict["derivative_test"] = "first-order";
@@ -117,24 +116,24 @@ int main(){
 
   // Initial condition
   for(int i=0; i<x.size(); ++i){
-    ocp_solver.input(OCP_X_INIT)(i,0) = ocp_solver.input(OCP_LBX)(i,0) = ocp_solver.input(OCP_UBX)(i,0) = x0[i];
+    ocp_solver.input("x_init")(i,0) = ocp_solver.input("lbx")(i,0) = ocp_solver.input("ubx")(i,0) = x0[i];
   }
 
   // State bounds
   for(int k=1; k<=num_nodes; ++k){
     for(int i=0; i<x.size(); ++i){
-      ocp_solver.input(OCP_X_INIT)(i,k) = x0[i];
-      ocp_solver.input(OCP_LBX)(i,k) = xmin[i];
-      ocp_solver.input(OCP_UBX)(i,k) = xmax[i];
+      ocp_solver.input("x_init")(i,k) = x0[i];
+      ocp_solver.input("lbx")(i,k) = xmin[i];
+      ocp_solver.input("ubx")(i,k) = xmax[i];
     }
   }
 
   // Control bounds
   for(int k=0; k<num_nodes; ++k){
     for(int i=0; i<u.size(); ++i){
-      ocp_solver.input(OCP_U_INIT)(i,k) = u0[i];
-      ocp_solver.input(OCP_LBU)(i,k) = umin[i];
-      ocp_solver.input(OCP_UBU)(i,k) = umax[i];
+      ocp_solver.input("u_init")(i,k) = u0[i];
+      ocp_solver.input("lbu")(i,k) = umin[i];
+      ocp_solver.input("ubu")(i,k) = umax[i];
     }
   }
 

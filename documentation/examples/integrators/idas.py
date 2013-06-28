@@ -69,12 +69,12 @@ f = SXFunction(daeIn(x=x_all,z=z_all,p=p_all,t=t),daeOut(ode=ode,alg=alg))
 f.init()
 
 #! Let's check we have consistent initial conditions:
-f.input(DAE_P).set(P_)
-f.input(DAE_X).set(X_)
-f.input(DAE_Z).set(Z_)
+f.setInput(P_,"p")
+f.setInput(X_,"x")
+f.setInput(Z_,"z")
 f.evaluate()
-print f.output(DAE_ODE) # This should be same as XDOT_
-print f.output(DAE_ALG) # This should be all zeros
+print f.getOutput("ode") # This should be same as XDOT_
+print f.getOutput("alg") # This should be all zeros
 
 
 #! Let's check our jacobian $\frac{dg}{dy}$:
@@ -93,8 +93,8 @@ I.setOption("init_xdot",XDOT_)
   
 I.init()
 
-I.input(INTEGRATOR_P).set(P_)
-I.input(INTEGRATOR_X0).set(X_)
+I.setInput(P_,"p")
+I.setInput(X_,"x0")
 
 #! This system is not solvable with idas, because it is of DAE-index 3.
 #! It is impossible obtain lambda from the last element of the residual.
@@ -119,22 +119,22 @@ XDOT_ = [-1.0/3,1147.0/240] # state derivatives
 Z_ = [4,1.0/4,1147.0/720] # algebraic state
 
 #! Let's check we have consistent initial conditions:
-f.input(DAE_P).set(P_)
-f.input(DAE_X).set(X_)
-f.input(DAE_Z).set(Z_)
+f.setInput(P_,"p")
+f.setInput(X_,"x")
+f.setInput(Z_,"z")
 f.evaluate()
-print f.output(DAE_ODE) # This should be the same as XDOT_
-print f.output(DAE_ALG) # This should be all zeros
+print f.getOutput("ode") # This should be the same as XDOT_
+print f.getOutput("alg") # This should be all zeros
 
 #! Let's check our jacobian:
-j = f.jacobian(DAE_Z,DAE_ALG)
+j = f.jacobian("z","alg")
 j.init()
 
-j.input(DAE_P).set(P_)
-j.input(DAE_X).set(X_)
-j.input(DAE_Z).set(Z_)
+j.setInput(P_,"p")
+j.setInput(X_,"x")
+j.setInput(Z_,"z")
 j.evaluate()
-print array(j.output())
+print array(j.getOutput())
 #! $\frac{dg}{dy}$ is invertible this time.
 
 #! We create a DAE system solver
@@ -146,11 +146,11 @@ I.setOption("init_z",Z_)
 I.setOption("init_xdot",XDOT_)
 I.init()
   
-I.input(INTEGRATOR_P).set(P_)
-I.input(INTEGRATOR_X0).set(X_)
+I.setInput(P_,"p")
+I.setInput(X_,"x0")
 I.evaluate()
 
-print I.output(INTEGRATOR_XF)
+print I.getOutput("xf")
 
 
 #! Possible problems
@@ -161,8 +161,8 @@ P_ = [5,10] # parameters
 X_ = [5,0]  # states
 
 #! You will get an error:
-I.input(INTEGRATOR_P).set(P_)
-I.input(INTEGRATOR_X0).set(X_)
+I.setInput(P_,"p")
+I.setInput(X_,"x0")
 try:
   I.evaluate()
 except Exception as e:

@@ -45,31 +45,10 @@ ndstate = 6
 nastate = 1
 ninput = 1
 
-# Legendre collocation points
-legendre_points1 = [0,0.500000]
-legendre_points2 = [0,0.211325,0.788675]
-legendre_points3 = [0,0.112702,0.500000,0.887298]
-legendre_points4 = [0,0.069432,0.330009,0.669991,0.930568]
-legendre_points5 = [0,0.046910,0.230765,0.500000,0.769235,0.953090]
-legendre_points = [0,legendre_points1,legendre_points2,legendre_points3,legendre_points4,legendre_points5]
-
-# Radau collocation points
-radau_points1 = [0,1.000000]
-radau_points2 = [0,0.333333,1.000000]
-radau_points3 = [0,0.155051,0.644949,1.000000]
-radau_points4 = [0,0.088588,0.409467,0.787659,1.000000]
-radau_points5 = [0,0.057104,0.276843,0.583590,0.860240,1.000000]
-radau_points = [0,radau_points1,radau_points2,radau_points3,radau_points4,radau_points5]
-
-# Type of collocation points
-LEGENDRE = 0
-RADAU = 1
-collocation_points = [legendre_points,radau_points]
-
 # Degree of interpolating polynomial
 deg = 4
 # Radau collocation points
-cp = RADAU
+cp = "radau"
 # Size of the finite elements
 h = tf/nk/nicp
  
@@ -82,7 +61,8 @@ D = np.zeros(deg+1)
 tau = ssym("tau")
   
 # All collocation time points
-tau_root = collocation_points[cp][deg]
+tau_root = collocationPoints(deg,cp)
+
 T = np.zeros((nk,deg+1))
 for i in range(nk):
     for j in range(deg+1):
@@ -100,13 +80,13 @@ for j in range(deg+1):
     # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
     lfcn.setInput(1.0)
     lfcn.evaluate()
-    D[j] = lfcn.output()
+    D[j] = lfcn.getOutput()
     # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
     for j2 in range(deg+1):
         lfcn.setInput(tau_root[j2])
         lfcn.setFwdSeed(1.0)
         lfcn.evaluate(1,0)
-        C[j][j2] = lfcn.fwdSens()
+        C[j][j2] = lfcn.getFwdSens()
 
 
 
@@ -366,13 +346,8 @@ g += [fck]
 lbg.append(fc_min)
 ubg.append(fc_max)
 
-
-# Nonlinear constraint function
-gfcn = MXFunction([V],[vertcat(g)])
-
-
 # Objective function of the NLP
-#Implment Mayer term
+#Implement Mayer term
 Obj = 0
 [obj] = MayerTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
 Obj += obj
@@ -394,22 +369,18 @@ for k in range(nk):
 
 Obj += lagrangeTerm        
 
-# objective function
-ofcn = MXFunction([V], [Obj])
-
+# NLP
+nlp = MXFunction(nlpIn(x=V),nlpOut(f=Obj,g=vertcat(g)))
 
 ## ----
 ## SOLVE THE NLP
 ## ----
   
-#assert(1==0)
 # Allocate an NLP solver
-solver = IpoptSolver(ofcn,gfcn)
+solver = IpoptSolver(nlp)
 
 # Set options
-solver.setOption("expand_f",True)
-solver.setOption("expand_g",True)
-solver.setOption("generate_hessian",True)
+solver.setOption("expand",True)
 solver.setOption("max_iter",1000)
 solver.setOption("tol",1e-4)
 
@@ -417,24 +388,24 @@ solver.setOption("tol",1e-4)
 solver.init()
   
 # Initial condition
-solver.setInput(vars_init,NLP_X_INIT)
+solver.setInput(vars_init,"x0")
 
 # Bounds on x
-solver.setInput(vars_lb,NLP_LBX)
-solver.setInput(vars_ub,NLP_UBX)
+solver.setInput(vars_lb,"lbx")
+solver.setInput(vars_ub,"ubx")
 
 # Bounds on g
-solver.setInput(np.concatenate(lbg),NLP_LBG)
-solver.setInput(np.concatenate(ubg),NLP_UBG)
+solver.setInput(np.concatenate(lbg),"lbg")
+solver.setInput(np.concatenate(ubg),"ubg")
 
 # Solve the problem
 solver.solve()
 
 # Print the optimal cost
-print "optimal cost: ", float(solver.output(NLP_COST))
+print "optimal cost: ", float(solver.getOutput("f"))
 
 # Retrieve the solution
-v_opt = np.array(solver.output(NLP_X_OPT))
+v_opt = np.array(solver.getOutput("x"))
     
 
 ## ----
@@ -483,7 +454,7 @@ for j in range(1,deg+1):
     lafcn.init()
     lafcn.setInput(tau_root[0])
     lafcn.evaluate()
-    Da[j-1] = lafcn.output()
+    Da[j-1] = lafcn.getOutput()
 
 xA_plt = np.resize(np.array([],dtype=MX),(nalg,(deg+1)*nicp*(nk)+1))
 offset4=0

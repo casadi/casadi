@@ -47,10 +47,10 @@ for tol in tolerances:
 
   sim=Simulator(integrator,ts)
   sim.init()
-  sim.input(INTEGRATOR_X0).set([1,0])
+  sim.setInput([1,0],"x0")
   sim.evaluate()
 
-  plot(ts,array(sim.output())[:,0],label="tol = 1e%d" % tol)
+  plot(ts,array(sim.getOutput())[:,0],label="tol = 1e%d" % tol)
 
 legend( loc='upper left')
 xlabel("Time [s]")
@@ -67,9 +67,9 @@ for tol in tolerances:
   integrator.setOption("abstol",tol)
   integrator.setOption("tf",tend)
   integrator.init()
-  integrator.input(INTEGRATOR_X0).set([1,0])
+  integrator.setInput([1,0],"x0")
   integrator.evaluate()
-  endresult.append(integrator.output()[0])
+  endresult.append(integrator.getOutput()[0])
   
 figure()
 loglog(tolerances,(array(endresult)-1),'b',label="Positive error")

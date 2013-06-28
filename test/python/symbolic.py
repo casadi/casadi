@@ -5,7 +5,7 @@ from helpers import *
 
 class Symbolictests(casadiTestCase):
 
-  @skip(memcheck)
+  @memory_heavy()
   def test_in_place_simplification(self):
     print "In place simplification"
 
@@ -37,6 +37,10 @@ class Symbolictests(casadiTestCase):
         yield u(a)
         yield u(b)
 
+    def operations_toplevel(a,b):
+      for op in binary_operations: 
+        yield op(a,b)
+        
     def operations_node():
       for b1 in nodes():
         for b2 in nodes():
@@ -45,32 +49,31 @@ class Symbolictests(casadiTestCase):
       for b1 in nodes():
         yield b1
         
-    a_s = SX("a")
-    b_s = SX("b")
-            
-    i=0
-    for op1 in operations_node():
-      for op2 in operations_node():
-         for op3 in operations(op1,op2):
-           i+= 1
-           e = eval("%s" % op3,{"a": a_s, "b": b_s})
-           f = SXFunction([a_s,b_s],[e])
-           #print i , op3, " -> ", e
-           f.init()
-           f.setInput(numbers[0],0)
-           f.setInput(numbers[1],1)
-           f.evaluate()
-           r = f.output()
-           try:
-             num = eval(op3,{"a": numbers[0], "b":  numbers[1]})
-           except ZeroDivisionError:
-             num = None
-           if num is None:
-             self.assertTrue(numpy.isnan(r.at(0)))
-             continue
-           if (abs(num-r)>1e-10):
-             print i , op3, " -> ", e
-             self.assertTrue(False)
+    for a_s, b_s, xfunction in [(SX("a"),SX("b"),SXFunction),(MX("a"),MX("b"),MXFunction)]:
+      print  xfunction
+      i=0
+      for op1 in operations_node():
+        for op2 in operations_node():
+           for op3 in operations_toplevel(op1,op2):
+             i+= 1
+             e = eval(op3,{"a": a_s, "b": b_s})
+             f = xfunction([a_s,b_s],[e])
+             #print i, xfunction, op1, op2, op3, " -> ", e
+             f.init()
+             f.setInput(numbers[0],0)
+             f.setInput(numbers[1],1)
+             f.evaluate()
+             r = f.getOutput()
+             try:
+               num = eval(op3,{"a": numbers[0], "b":  numbers[1]})
+             except ZeroDivisionError:
+               num = None
+             if num is None:
+               self.assertTrue(numpy.isnan(r.at(0)) or numpy.isinf(r.at(0)))
+               continue
+             if (abs(num-r)>1e-10):
+               print i , op3, " -> ", e
+               self.assertTrue(False)
 
 if __name__ == '__main__':
     unittest.main()

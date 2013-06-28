@@ -28,11 +28,11 @@ f.setInput(a_val,0);
 f.setInput(b_val,1);
 f.evaluate()
 
-print f.output()
+print f.getOutput()
 
 ef.setInput(a_val,0);
 ef.setInput(b_val,1);
 ef.evaluate()
 
-print f.output()
+print f.getOutput()
 

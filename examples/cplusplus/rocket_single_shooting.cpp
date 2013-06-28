@@ -146,18 +146,17 @@ int main(){
   MX G = vertcat(X[0],X[1]);
   
   // Create the NLP
-  MXFunction ffcn(U,F); // objective function
-  MXFunction gfcn(U,G); // constraint function
+  MXFunction nlp(nlpIn("x",U),nlpOut("f",F,"g",G));
 
   // Allocate an NLP solver
   NLPSolver solver;
   if(lifted_newton){
-    solver = SCPgen(ffcn,gfcn);
+    solver = SCPgen(nlp);
 
     solver.setOption("verbose",true);
     solver.setOption("regularize",false);
-    solver.setOption("maxiter_ls",1);
-    solver.setOption("maxiter",100);
+    solver.setOption("max_iter_ls",1);
+    solver.setOption("max_iter",100);
     
     // Use IPOPT as QP solver
     solver.setOption("qp_solver",NLPQPSolver::creator);
@@ -170,7 +169,7 @@ int main(){
     qp_solver_options["nlp_solver_options"] = ipopt_options;
     solver.setOption("qp_solver_options",qp_solver_options);
   } else {
-    solver = IpoptSolver(ffcn,gfcn);
+    solver = IpoptSolver(nlp);
     
     // Set options
     solver.setOption("tol",1e-10);
@@ -187,22 +186,22 @@ int main(){
     Umax[i] =  10;
     Usol[i] = 0.4;
   }
-  solver.setInput(Umin,NLP_LBX);
-  solver.setInput(Umax,NLP_UBX);
-  solver.setInput(Usol,NLP_X_INIT);
+  solver.setInput(Umin,"lbx");
+  solver.setInput(Umax,"ubx");
+  solver.setInput(Usol,"x0");
 
   // Bounds on g
   vector<double> Gmin(2), Gmax(2);
   Gmin[0] = Gmax[0] = 10;
   Gmin[1] = Gmax[1] =  0;
-  solver.setInput(Gmin,NLP_LBG);
-  solver.setInput(Gmax,NLP_UBG);
+  solver.setInput(Gmin,"lbg");
+  solver.setInput(Gmax,"ubg");
 
   // Solve the problem
   solver.solve();
 
   // Get the solution
-  solver.getOutput(Usol,NLP_X_OPT);
+  solver.getOutput(Usol,"x");
   cout << "optimal solution: " << Usol << endl;
 
   return 0;

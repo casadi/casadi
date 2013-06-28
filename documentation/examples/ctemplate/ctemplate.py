@@ -34,7 +34,7 @@ absbuilddir = os.path.abspath(topdir+builddir)
 link = file(topdir+builddir+makedir+'link.txt','r')
 linker = link.readline()
 linker = re.sub(' \.\./\.\./\.\.',' '+ absbuilddir,linker)
-linker = re.sub('CMakeFiles/ctemplate.dir/ctemplate.o','"$1.o"',linker)
+linker = re.sub('CMakeFiles/ctemplate.dir/ctemplate(\.cpp)?\.o','"$1.o"',linker)
 linker = re.sub('-o (.*?) ','-o "$1.run" ',linker)
 
 linkerscript = file('linker.sh','w')

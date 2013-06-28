@@ -67,34 +67,33 @@ X=X0
 for k in range(nu):
   [X] = F.call([X,U[k]])
 
-# Objective function
-J = MXFunction([ U ],[ mul(U.T,U) ]) # u'*u in Matlab
+# Objective function and constraints
+J = mul(U.T,U) # u'*u in Matlab
+G = X[0:2]     # x(1:2) in Matlab
 
-# Terminal constraints
-G = MXFunction([ U ],[ X[0:2] ]) # x(1:2) in Matlab
+# NLP
+nlp = MXFunction(nlpIn(x=U),nlpOut(f=J,g=G))
   
 # Allocate an NLP solver
-solver = IpoptSolver(J,G)
+solver = IpoptSolver(nlp)
 solver.setOption("tol",1e-10)
-solver.setOption("expand_f",True)
-solver.setOption("expand_g",True)
-solver.setOption("generate_hessian",True)
+solver.setOption("expand",True)
 solver.init()
 
 # Bounds on u and initial condition
-solver.setInput(-0.5, NLP_LBX)
-solver.setInput( 0.5, NLP_UBX)
-solver.setInput( 0.4, NLP_X_INIT)
+solver.setInput(-0.5, "lbx")
+solver.setInput( 0.5, "ubx")
+solver.setInput( 0.4, "x0")
 
 # Bounds on g
-solver.setInput([10,0],NLP_LBG)
-solver.setInput([10,0],NLP_UBG)
+solver.setInput([10,0],"lbg")
+solver.setInput([10,0],"ubg")
 
 # Solve the problem
 solver.solve()
 
 # Get the solution
-plot(solver.output(NLP_X_OPT))
-plot(solver.output(NLP_LAMBDA_X))
+plot(solver.getOutput("x"))
+plot(solver.getOutput("lam_x"))
 grid()
 show()

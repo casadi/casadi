@@ -26,7 +26,8 @@ from numpy import Inf
 def reportBounds(value,lowerbound,upperbound,labels=None,tol=1e-8,showNonViolating=True):
   if isinstance(labels,Variables):
     labels = labels.getLabels()
-    
+  if hasattr(labels,"labels"):
+    labels = labels.labels()
 
   v = list(value.data())
   lb = list(lowerbound.data())
@@ -58,7 +59,9 @@ def reportBounds(value,lowerbound,upperbound,labels=None,tol=1e-8,showNonViolati
   # Loop over the elements of value
   for i in range(value.size()):
     violated =  (v[i] > (ub[i] + tol) or v[i] < (lb[i] - tol))
-    if not(showNonViolating) and not(violated):
+    nonregular = not isRegular(v[i])
+
+    if not(showNonViolating) and not(violated) and not(nonregular):
       continue
       
     if labels is None:
@@ -96,6 +99,8 @@ def reportBounds(value,lowerbound,upperbound,labels=None,tol=1e-8,showNonViolati
 
     if (v[i] > (ub[i] + tol) or v[i] < (lb[i] - tol)):
       indicator = " VIOLATED "
+    if nonregular:
+      indicator = " !REGULAR "
   
     print "%15s | %*s | %*s" % (identifier, (fieldlength + 6) * 3 , midfield, indicator_length+3, indicator)
   

@@ -84,8 +84,10 @@
 #ifdef WITH_CSPARSE
 %{
 #include "interfaces/csparse/csparse.hpp"
+#include "interfaces/csparse/csparse_cholesky.hpp"
 %}
 %include "interfaces/csparse/csparse.hpp"
+%include "interfaces/csparse/csparse_cholesky.hpp"
 #endif
 
 #ifdef WITH_DSDP

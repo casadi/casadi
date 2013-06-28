@@ -30,55 +30,47 @@ z = ssym("z")
 v = vertcat([x,y,z])
 
 # Form NLP functions
-f = SXFunction([v],[x**2 + 100*z**2])
-g = SXFunction([v],[z + (1-x)**2 - y])
+nlp = SXFunction(nlpIn(x=v),nlpOut(f=x**2 + 100*z**2, g=z + (1-x)**2 - y))
 
 # Choose NLP solver
-#nlp_solver = IpoptSolver
+nlp_solver = IpoptSolver
 #nlp_solver = WorhpSolver
-nlp_solver = SQPMethod
-#nlp_solver = LiftedSQP
+#nlp_solver = SQPMethod
+#nlp_solver = SCPgen
 
 # Choose a qp solver (for CasADi NLP methods)
-qp_solver = QPOasesSolver
-#qp_solver = NLPQPSolver
-#qp_solver = OOQPSolver
+#qp_solver = QPOasesSolver
+#qp_solver_options = {"printLevel" : "none"}
 
-# QP solver options
-if qp_solver == QPOasesSolver:
-  qp_solver_options = {"printLevel" : "none"}
-elif qp_solver ==  NLPQPSolver:
-  qp_solver_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
-else:
-  qp_solver_options = {}
+#qp_solver = NLPQPSolver
+#qp_solver_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
+
+#qp_solver = OOQPSolver
+#qp_solver_options = {}
 
 # Create solver
-solv = nlp_solver(f,g)
+solv = nlp_solver(nlp)
 
 # NLP solver options
-solv.setOption("generate_hessian",True)
-if nlp_solver in (SQPMethod, LiftedSQP):
+if nlp_solver in (SQPMethod, SCPgen):
   solv.setOption("qp_solver",qp_solver)
   solv.setOption("qp_solver_options",qp_solver_options)
-  solv.setOption("maxiter",5)
-if nlp_solver == SQPMethod:
-  #solv.setOption("monitor",['qp'])
-  solv.setOption("hessian_approximation","exact")
+  solv.setOption("max_iter",5)
   
 # Init solver  
 solv.init()
 
 # Solve the rosenbrock problem
-solv.setInput([2.5,3.0,0.75],NLP_X_INIT)
-solv.setInput(0,NLP_UBG)
-solv.setInput(0,NLP_LBG)
+solv.setInput([2.5,3.0,0.75],"x0")
+solv.setInput(0,"ubg")
+solv.setInput(0,"lbg")
 solv.evaluate()
 
 # Print solution
 print
 print 
-print "%50s " % "Optimal cost:", solv.output(NLP_COST)
-print "%50s " % "Primal solution:", solv.output(NLP_X_OPT)
-print "%50s " % "Dual solution (simple bounds):", solv.output(NLP_LAMBDA_X)
-print "%50s " % "Dual solution (nonlinear bounds):", solv.output(NLP_LAMBDA_G)
+print "%50s " % "Optimal cost:", solv.getOutput("f")
+print "%50s " % "Primal solution:", solv.getOutput("x")
+print "%50s " % "Dual solution (simple bounds):", solv.getOutput("lam_x")
+print "%50s " % "Dual solution (nonlinear bounds):", solv.getOutput("lam_g")
 

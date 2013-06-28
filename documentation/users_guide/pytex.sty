@@ -3,6 +3,7 @@
 \RequirePackage{fancyvrb}
 \RequirePackage{listings}
 \RequirePackage{color}
+\RequirePackage{etoolbox}
 
 \newcounter{pytexcount}
 \newcounter{pytexsubcount}
@@ -49,6 +50,8 @@
   \immediate\write\PYTEX@sf{\@nameuse{pytex-#1}}%   write header to file
 }
 
+
+
 \newenvironment{pytex}
 {%
   \addtocounter{pytexsubcount}{1}%                                             pytexsubcount++
@@ -58,15 +61,18 @@
   \let\verbatim@processlinebackup\verbatim@processline%
   \immediate\openout\PYTEX@tempfile=temp_pytex.py\relax%  open file for writing
   \def\verbatim@processline{\immediate\write\PYTEX@sf{\the\verbatim@line}\immediate\write\PYTEX@tempfile{\the\verbatim@line}}%
+  \let\verbatimbackup\@verbatim
+  \def\@verbatim{ \topsep=-17pt \partopsep=0pt \verbatimbackup}
  \verbatim%
 }%
 {\endverbatim%
  \let\verbatim@processline\verbatim@processlinebackup%
+ \let\@verbatim\verbatimbackup%
  \immediate\closeout\PYTEX@tempfile%
   \IfFileExists{pytex_\alph{pytexcount}_\arabic{pytexsubcount}.log}{%
     \lstset{style=python} %
     \lstinputlisting[]{temp_pytex.py}%
-    \lstset{style=text} %
+    \lstset{style=text,aboveskip=0pt} %
     \lstinputlisting[frame=leftline,xleftmargin=5mm]{pytex_\alph{pytexcount}_\arabic{pytexsubcount}.log}%
  }{%
     \lstset{style=python}%
@@ -83,13 +89,16 @@
   \let\verbatim@processlinebackup\verbatim@processline%
   \immediate\openout\PYTEX@tempfile=temp_pytex.py\relax%  open file for writing
   \def\verbatim@processline{\immediate\write\PYTEX@sf{\the\verbatim@line}\immediate\write\PYTEX@tempfile{\the\verbatim@line}}%
+  \let\verbatimbackup\@verbatim
+  \def\@verbatim{ \topsep=-17pt \partopsep=0pt \verbatimbackup}
  \verbatim%
 }%
 {\endverbatim%
  \let\verbatim@processline\verbatim@processlinebackup%
+ \let\@verbatim\verbatimbackup%
  \immediate\closeout\PYTEX@tempfile%
   \IfFileExists{pytex_\alph{pytexcount}_\arabic{pytexsubcount}.log}{%
-    \lstset{style=text} %
+    \lstset{style=text,aboveskip=1ex} %
     \lstinputlisting[frame=leftline,xleftmargin=5mm]{pytex_\alph{pytexcount}_\arabic{pytexsubcount}.log}%
  }{%
  }% 

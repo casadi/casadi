@@ -36,13 +36,13 @@
 
 namespace CasADi{
   
-/** \brief Internal class for FX
-  \author Joel Andersson 
-  \date 2010
- A regular user should never work with any Node class. Use FX directly.
-*/
-class FXInternal : public OptionsFunctionalityNode{
-  friend class FX;
+  /** \brief Internal class for FX
+      \author Joel Andersson 
+      \date 2010
+      A regular user should never work with any Node class. Use FX directly.
+  */
+  class FXInternal : public OptionsFunctionalityNode, public IOInterface<FXInternal>{
+    friend class FX;
 
   protected:
     /** \brief  Default constructor (accessable from the FX class and derived classes) */
@@ -52,6 +52,9 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Destructor */
     virtual ~FXInternal() = 0;
 
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir) = 0;
   
@@ -59,8 +62,8 @@ class FXInternal : public OptionsFunctionalityNode{
     void evaluateCompressed(int nfdir, int nadir);
 
     /** \brief Initialize
-      Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
-      If passed to another class (in the constructor), this class should invoke this function when initialized. */
+        Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
+        If passed to another class (in the constructor), this class should invoke this function when initialized. */
     virtual void init();
 
     /** \brief  Update the number of sensitivity directions during or after initialization, 
@@ -73,36 +76,55 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 
+    /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward, using the sparsity patterns */
+    virtual void spEvaluateViaJacSparsity(bool fwd);
+
     /** \brief  Is the class able to propate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd){ return false;}
 
     /** \brief  Reset the sparsity propagation */
     virtual void spInit(bool fwd){}
     
-    /** \brief  Evaluate symbolically, SX type */
+    /** \brief  Evaluate symbolically, SX type, possibly nonmatching sparsity patterns */
     virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                         const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                        const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-                        bool output_given);
+                        const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
 
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
                         const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
-                        const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-                        bool output_given);
+                        const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens);
+
+    /** \brief  Evaluate symbolically, SX type, matching sparsity patterns */
+    virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+                              const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+                              const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
+
+    /** \brief  Create function call node */
+    virtual void createCall(const std::vector<MX> &arg, std::vector<MX> &res, 
+                            const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
+                            const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens);
+
+    /** \brief  Create derivative node */
+    virtual void createCallDerivative(const std::vector<MX> &arg, std::vector<MX> &res, 
+                                      const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
+                                      const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens, bool cached);
+
+    /** \brief  Create a call to this */
+    std::vector<MX> callSelf(const std::vector<MX> &arg);
     
     /** \brief Call a function, MX type (overloaded) */
     void call(const MXVector& arg, MXVector& res, 
               const MXVectorVector& fseed, MXVectorVector& fsens, 
               const MXVectorVector& aseed, MXVectorVector& asens,
-              bool output_given, bool always_inline, bool never_inline);
+              bool always_inline, bool never_inline);
     
     /** \brief Call a function, SX type (overloaded) */
     void call(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
               const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
               const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-              bool output_given, bool always_inline, bool never_inline);
-    
+              bool always_inline, bool never_inline);
+        
     //@{
     /** \brief Return Hessian function */
     FX hessian(int iind, int oind);
@@ -130,8 +152,8 @@ class FXInternal : public OptionsFunctionalityNode{
 
     //@{
     /** \brief Return function that calculates forward derivatives 
-    *    This method returns a cached instance if available, and calls FX getDerivative(int nfwd, int nadj) if no cached version is available.
-    */
+     *    This method returns a cached instance if available, and calls FX getDerivative(int nfwd, int nadj) if no cached version is available.
+     */
     FX derivative(int nfwd, int nadj);
 
     /** \brief Constructs and returns a function that calculates forward derivatives */
@@ -139,6 +161,9 @@ class FXInternal : public OptionsFunctionalityNode{
 
     /** \brief Constructs and returns a function that calculates forward derivatives by creating the Jacobian then multiplying */
     virtual FX getDerivativeViaJac(int nfwd, int nadj);
+
+    /** \brief Constructs and returns a function for calculating derivatives via operator overloading */
+    virtual FX getDerivativeViaOO(int nfwd, int nadj);
 
     //@}
 
@@ -148,82 +173,21 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief Generate code for function inputs and outputs */
     void generateIO(CodeGenerator& gen);
 
-    /** \brief Generate code for the C functon */
+    /** \brief Generate code the functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
-      
-    /** \brief  Access an input */
-    FunctionIO& iStruct(int i){
-      try{
-        return input_.at(i);
-      } catch(std::out_of_range&){
-          std::stringstream ss;
-          ss <<  "In function " << getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
-          if (!isInit()) ss << std::endl << "Did you forget to initialize?";
-          throw CasadiException(ss.str());
-      }
-    }
-
-    /** \brief  Const access an input */
-    inline const FunctionIO& iStruct(int i) const{
-      return const_cast<FXInternal*>(this)->iStruct(i);
-    }
     
-    /** \brief  Access an output*/
-    FunctionIO& oStruct(int i){
-      try{
-        return output_.at(i);
-      } catch(std::out_of_range&){
-          std::stringstream ss;
-          ss <<  "In function " << getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
-          if (!isInit()) ss << std::endl << "Did you forget to initialize?";
-          throw CasadiException(ss.str());
-      }
-    }
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
 
-    /** \brief  Const access an output*/
-    inline const FunctionIO& oStruct(int i) const{
-      return const_cast<FXInternal*>(this)->oStruct(i);
-    }
-      
+    /** \brief Generate code for the function body */
+    virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
     
     /** \brief  Print */
     virtual void repr(std::ostream &stream) const;
-    
-    /** \brief Find the index for a string describing a particular entry of an input scheme
-    * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
-    */
-    int inputSchemeEntry(const std::string &name) const;
-
-    /** \brief Find the index for a string describing a particular entry of an output scheme
-    * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
-    */
-    int outputSchemeEntry(const std::string &name) const;
-
-    /** \brief Find the index for a string describing a particular entry of a scheme
-    * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
-    */
-    int schemeEntry(InputOutputScheme scheme,const std::string &name) const;
-    
-    /** \brief Set input scheme */
-    void setInputScheme(InputOutputScheme scheme);
-
-    /** \brief Set output scheme */
-    void setOutputScheme(InputOutputScheme scheme);
-
-    /** \brief Get input scheme */
-    InputOutputScheme getInputScheme() const;
-
-    /** \brief Get output scheme */
-    InputOutputScheme getOutputScheme() const;
-    
-    /** \brief  Inputs of the function */
-    std::vector<FunctionIO> input_;
-
-    /** \brief  Output of the function */
-    std::vector<FunctionIO> output_;
-
+            
     /** \brief Get the unidirectional or bidirectional partition */
     void getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& D2, bool compact, bool symmetric);
 
@@ -232,121 +196,7 @@ class FXInternal : public OptionsFunctionalityNode{
     
     /// Is function fcn being monitored
     bool monitored(const std::string& mod) const;
-    
-    //@{
-      /// Access input argument
-    inline Matrix<double>& input(int iind=0){ return iStruct(iind).data;}
-    inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
-    inline Matrix<double>& inputNoCheck(int iind=0){ return input_[iind].data;}
-    inline const Matrix<double>& input(int iind=0) const{ return iStruct(iind).data;}
-    inline const Matrix<double>& input(const std::string &iname) const{  return input(inputSchemeEntry(iname)); }
-    inline const Matrix<double>& inputNoCheck(int iind=0) const{ return input_[iind].data;}
-    //@{
-    
-    //@{
-    /// Access output argument
-    inline Matrix<double>& output(int oind=0){ return oStruct(oind).data;}
-    inline Matrix<double>& outputNoCheck(int oind=0){ return output_[oind].data;}
-    inline const Matrix<double>& output(int oind=0) const{ return oStruct(oind).data;}
-    inline const Matrix<double>& outputNoCheck(int oind=0) const{ return output_[oind].data;}
-    //@{
-
-    //@{
-    /// Access forward seed
-    Matrix<double>& fwdSeed(int iind=0, int dir=0){
-      try{
-        return iStruct(iind).dataF.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(iStruct(iind).dataF.empty()){
-          ss << "No forward directions ";
-        } else {
-          ss << "Forward direction " << dir << " is out of range [0," << iStruct(iind).dataF.size() << ") ";
-        }
-        ss << "for function " << getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0){ return input_[iind].dataF[dir]; }
-    const Matrix<double>& fwdSeed(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSeed(iind,dir); }
-    const Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSeedNoCheck(iind,dir); }
-    //@}
-
-    //@{
-    /// Access forward sensitivity
-    Matrix<double>& fwdSens(int oind=0, int dir=0){
-      try{
-        return oStruct(oind).dataF.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(oStruct(oind).dataF.empty()){
-          ss << "No forward directions ";
-        } else {
-          ss << "Forward direction " << dir << " is out of range [0," << oStruct(oind).dataF.size() << ") ";
-        }
-        ss << "for function " << getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0){ return output_[oind].dataF[dir]; }
-    const Matrix<double>& fwdSens(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSens(oind,dir);}
-    const Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSensNoCheck(oind,dir);}
-    //@}
-
-    //@{
-    /// Access adjoint seed
-    Matrix<double>& adjSeed(int oind=0, int dir=0){
-      try{
-        return oStruct(oind).dataA.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(oStruct(oind).dataA.empty()){
-          ss << "No adjoint directions ";
-        } else {
-          ss << "Adjoint direction " << dir << " is out of range [0," << oStruct(oind).dataA.size() << ") ";
-        }
-        ss << "for function " << getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0){ return output_[oind].dataA[dir];}
-    const Matrix<double>& adjSeed(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSeed(oind,dir);}
-    const Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSeedNoCheck(oind,dir);}
-    //@}
-
-    //@{
-    /// Access forward sensitivity
-    Matrix<double>& adjSens(int iind=0, int dir=0){
-      try{
-        return iStruct(iind).dataA.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(iStruct(iind).dataA.empty()){
-          ss << "No adjoint directions ";
-        } else {
-          ss << "Adjoint direction " << dir << " is out of range [0," << iStruct(iind).dataA.size() << ") ";
-        }
-        ss << "for function " << getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& adjSensNoCheck(int iind=0, int dir=0){ return input_[iind].dataA[dir];}
-    const Matrix<double>& adjSens(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSens(iind,dir);}
-    const Matrix<double>& adjSensNoCheck(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSensNoCheck(iind,dir);}
-    //@}
-
-    /// Set the number of function inputs
-    void setNumInputs(int num_in);
-
-    /// Set the number of function outputs
-    void setNumOutputs(int num_out);
-
-    /// Get the number of function inputs
-    inline int getNumInputs() const{ return input_.size();}
-
-    /// Get the number of function outputs
-    inline int getNumOutputs() const{ return output_.size();}
-    
+        
     /// Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs)
     int getNumScalarInputs() const;
 
@@ -383,18 +233,75 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<SXMatrix> symbolicInputSX() const;
   
-    /** \brief  Number of forward and adjoint derivatives */
-    int nfdir_, nadir_;
+    // Workaround helper functions: assign nonzeros but ignore all -1
+    static void assignIgnore(MX& y, const MX& x, const std::vector<int>& nz);
+    static void assignIgnore(SXMatrix& y, const SXMatrix& x, const std::vector<int>& nz);
 
-    /** \brief  Verbose -- for debugging purposes */
-    bool verbose_;
-    
+    //@{
+    /** \brief Access input/output scheme */
+    inline const InputOutputScheme& inputScheme() const{ return inputScheme_;}
+    inline const InputOutputScheme& outputScheme() const{ return outputScheme_;}
+    inline InputOutputScheme& inputScheme(){ return inputScheme_;}
+    inline InputOutputScheme& outputScheme(){ return outputScheme_;}
+    //@}
+
+    //@{
+    /// Input/output structures of the function */
+    inline const std::vector<FunctionIO>& input_struct() const{ return input_;}
+    inline const std::vector<FunctionIO>& output_struct() const{ return output_;}
+    inline std::vector<FunctionIO>& input_struct(){ return input_;}
+    inline std::vector<FunctionIO>& output_struct(){ return output_;}
+    //@}
+
+    //@{
+    /// Input/output access without checking (faster, but unsafe)
+    inline const Matrix<double>& inputNoCheck(int iind=0) const{ return inputS<false>(iind).data;}
+    inline const Matrix<double>& outputNoCheck(int oind=0) const{ return outputS<false>(oind).data;}
+    inline const Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSeedNoCheck(iind,dir); }
+    inline const Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSensNoCheck(oind,dir);}    
+    inline const Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSeedNoCheck(oind,dir);}
+    inline const Matrix<double>& adjSensNoCheck(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSensNoCheck(iind,dir);}
+
+    inline Matrix<double>& inputNoCheck(int iind=0){ return inputS<false>(iind).data;}
+    inline Matrix<double>& outputNoCheck(int oind=0){ return outputS<false>(oind).data;}
+    inline Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0){ return inputS<false>(iind).dataF[dir]; }
+    inline Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0){ return outputS<false>(oind).dataF[dir]; }
+    inline Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0){ return outputS<false>(oind).dataA[dir];}
+    inline Matrix<double>& adjSensNoCheck(int iind=0, int dir=0){ return inputS<false>(iind).dataA[dir];}
+    //@}
+
     /** \brief  Log the status of the solver */
     void log(const std::string& msg) const;
 
     /** \brief  Log the status of the solver, function given */
     void log(const std::string& fcn, const std::string& msg) const;
 
+    // Codegen function
+    FX dynamicCompilation(FX f, std::string fname, std::string fdescr, std::string compiler);
+
+    // The following functions are called internally from EvaluateMX. For documentation, see the MXNode class
+    //@{
+    virtual void evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res, const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens, const DMatrixPtrVV& aseed, DMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res, const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens, const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given);
+    virtual void propagateSparsity(MXNode* node, DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
+    virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);
+    virtual void generateOperation(const MXNode* node, std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void printPart(const MXNode* node, std::ostream &stream, int part) const;
+    //@}
+
+    /** \brief  Inputs of the function */
+    std::vector<FunctionIO> input_;
+
+    /** \brief  Output of the function */
+    std::vector<FunctionIO> output_;
+
+    /** \brief  Number of forward and adjoint derivatives */
+    int nfdir_, nadir_;
+
+    /** \brief  Verbose -- for debugging purposes */
+    bool verbose_;
+    
     /// Set of module names which are extra monitored
     std::set<std::string> monitors_;
     
@@ -411,7 +318,7 @@ class FXInternal : public OptionsFunctionalityNode{
     WeakRef full_jacobian_;
 
     /// Cache for sparsities of the Jacobian blocks
-    std::vector<std::vector<CRSSparsity> > jac_sparsity_, jac_sparsity_compact_;
+    Matrix<CRSSparsity> jac_sparsity_, jac_sparsity_compact_;
 
     /// Which derivative directions are currently being compressed
     std::vector<bool> compressed_fwd_, compressed_adj_;
@@ -428,15 +335,15 @@ class FXInternal : public OptionsFunctionalityNode{
     bool monitor_inputs_, monitor_outputs_;
     
     /// The name of the input scheme of this function
-    InputOutputScheme inputScheme;
+    InputOutputScheme inputScheme_;
     
     /// The name of the output scheme of this function
-    InputOutputScheme outputScheme;
+    InputOutputScheme outputScheme_;
     
     /// Errors are thrown when NaN is produced
     bool regularity_check_;
     
-};
+  };
 
 
 } // namespace CasADi

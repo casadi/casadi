@@ -171,23 +171,23 @@ solver.init()
 
 # Initial condition
 x_initial_guess = len(xx) * [0]
-solver.setInput(x_initial_guess,casadi.NLP_X_INIT)
+solver.setInput(x_initial_guess,casadi.NLP_SOLVER_X0)
 
 # Bounds on x
 xx_lb = len(xx)*[-100]
 xx_ub = len(xx)*[100]
-solver.setInput(xx_lb,casadi.NLP_LBX)
-solver.setInput(xx_ub,casadi.NLP_UBX)
+solver.setInput(xx_lb,casadi.NLP_SOLVER_LBX)
+solver.setInput(xx_ub,casadi.NLP_SOLVER_UBX)
 
 # Bounds on the constraints
 lubg = len(g)*[0]
-solver.setInput(lubg,casadi.NLP_LBG)
-solver.setInput(lubg,casadi.NLP_UBG)
+solver.setInput(lubg,casadi.NLP_SOLVER_LBG)
+solver.setInput(lubg,casadi.NLP_SOLVER_UBG)
 
 # Solve the problem
 solver.solve()
 
-xx_opt = solver.output(casadi.NLP_X_OPT)
+xx_opt = solver.getOutput(casadi.NLP_SOLVER_X)
 
 # Retrieve output
 

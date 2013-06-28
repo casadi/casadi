@@ -1,14 +1,40 @@
-#include <symbolic/fx/fx_tools.hpp>
-#include <symbolic/mx/mx_tools.hpp>
-#include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/matrix/matrix_tools.hpp>
-#include <symbolic/stl_vector_tools.hpp>
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
 
+#include <symbolic/casadi.hpp>
+                                   
+// Solvers
+#include <integration/collocation_integrator.hpp>
+#include <nonlinear_programming/newton_implicit_solver.hpp>
+#include <optimal_control/direct_multiple_shooting.hpp>
+
+// 3rd party interfaces
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/idas_integrator.hpp>
+#include <interfaces/sundials/kinsol_solver.hpp>
+#include <interfaces/csparse/csparse.hpp>
 
-#include <optimal_control/direct_multiple_shooting.hpp>
+bool use_collocation_integrator = false;
 
 using namespace CasADi;
 using namespace std;
@@ -22,29 +48,39 @@ int main(){
   double inf = numeric_limits<double>::infinity();
 
   // Declare variables (use simple, efficient DAG)
-  SX t("t"); //time
-  SX x("x"), y("y"), u("u"), L("cost");
+  SXMatrix x = ssym("x");
+  SXMatrix y = ssym("y");
+  SXMatrix u = ssym("u");
+  SXMatrix L = ssym("cost");
   
   // All states
-  vector<SX> xx(3);  xx[0] = x;  xx[1] = y;  xx[2] = L;
+  SXMatrix states = SXMatrix::zeros(3);
+  states(0) = x;
+  states(1) = y;
+  states(2) = L;
 
   //ODE right hand side
-  vector<SX> f(3);
-  f[0] = (1 - y*y)*x - y + u;
-  f[1] = x;
-  f[2] = x*x + y*y + u*u;
+  SXMatrix f = SXMatrix::zeros(3);
+  f(0) = (1 - y*y)*x - y + u;
+  f(1) = x;
+  f(2) = x*x + y*y + u*u;
   
   // DAE residual
-  vector<SXMatrix> res_in = daeIn<SXMatrix>("x",xx, "p",u, "t",t);
-  SXFunction res(res_in,daeOut<SXMatrix>("ode",f));
+  SXFunction res(daeIn("x",states, "p",u),daeOut("ode",f));
   
   Dictionary integrator_options;
-  integrator_options["abstol"]=1e-8; //abs. tolerance
-  integrator_options["reltol"]=1e-8; //rel. tolerance
-  integrator_options["steps_per_checkpoint"]=500;
-  integrator_options["stop_at_end"]=true;
-//  integrator_options["calc_ic"]=true;
-//  integrator_options["numeric_jacobian"]=true;
+  if(use_collocation_integrator){
+    // integrator_options["implicit_solver"] = KinsolSolver::creator;    
+    integrator_options["implicit_solver"] = NewtonImplicitSolver::creator;
+    Dictionary implicit_solver_options;
+    implicit_solver_options["linear_solver"] = CSparse::creator;
+    integrator_options["implicit_solver_options"] = implicit_solver_options;
+  } else {
+    integrator_options["abstol"]=1e-8; //abs. tolerance
+    integrator_options["reltol"]=1e-8; //rel. tolerance
+    integrator_options["steps_per_checkpoint"]=500;
+    integrator_options["stop_at_end"]=true;
+  }
   
   //Numboer of shooting nodes
   int ns = 50;
@@ -61,8 +97,12 @@ int main(){
 
   // Create a multiple shooting discretization
   DirectMultipleShooting ms(res,mterm);
-  ms.setOption("integrator",CVodesIntegrator::creator);
-  //ms.setOption("integrator",IdasIntegrator::creator);
+  if(use_collocation_integrator){
+    ms.setOption("integrator",CollocationIntegrator::creator);
+  } else {
+    ms.setOption("integrator",CVodesIntegrator::creator);
+    //ms.setOption("integrator",IdasIntegrator::creator);
+  }
   ms.setOption("integrator_options",integrator_options);
   ms.setOption("number_of_grid_points",ns);
   ms.setOption("final_time",tf);
@@ -87,29 +127,29 @@ int main(){
   double u_init[] = {0.0};
   
   for(int k=0; k<ns; ++k){
-    copy(u_min,u_min+nu,ms.input(OCP_LBU).begin()+k*nu);
-    copy(u_max,u_max+nu,ms.input(OCP_UBU).begin()+k*nu);
-    copy(u_init,u_init+nu,ms.input(OCP_U_INIT).begin()+k*nu);
+    copy(u_min,u_min+nu,ms.input("lbu").begin()+k*nu);
+    copy(u_max,u_max+nu,ms.input("ubu").begin()+k*nu);
+    copy(u_init,u_init+nu,ms.input("u_init").begin()+k*nu);
   }
   
-  ms.input(OCP_LBX).setAll(-inf);
-  ms.input(OCP_UBX).setAll(inf);
-  ms.input(OCP_X_INIT).setAll(0);
+  ms.input("lbx").setAll(-inf);
+  ms.input("ubx").setAll(inf);
+  ms.input("x_init").setAll(0);
 
   // Initial condition
-  ms.input(OCP_LBX)(0,0) = ms.input(OCP_UBX)(0,0) = 0;
-  ms.input(OCP_LBX)(1,0) = ms.input(OCP_UBX)(1,0) = 1;
-  ms.input(OCP_LBX)(2,0) = ms.input(OCP_UBX)(2,0) = 0;
+  ms.input("lbx")(0,0) = ms.input("ubx")(0,0) = 0;
+  ms.input("lbx")(1,0) = ms.input("ubx")(1,0) = 1;
+  ms.input("lbx")(2,0) = ms.input("ubx")(2,0) = 0;
 
   // Final condition
-  ms.input(OCP_LBX)(0,ns) = ms.input(OCP_UBX)(0,ns) = 0; 
-  ms.input(OCP_LBX)(1,ns) = ms.input(OCP_UBX)(1,ns) = 0; 
+  ms.input("lbx")(0,ns) = ms.input("ubx")(0,ns) = 0; 
+  ms.input("lbx")(1,ns) = ms.input("ubx")(1,ns) = 0; 
   
   // Solve the problem
   ms.solve();
 
-  cout << ms.output(OCP_X_OPT) << endl;
-  cout << ms.output(OCP_U_OPT) << endl;
+  cout << ms.output("x_opt") << endl;
+  cout << ms.output("u_opt") << endl;
   
   return 0;
 }

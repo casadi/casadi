@@ -1,0 +1,63 @@
+\documentclass[12pt]{article}
+\usepackage{amsfonts}
+\usepackage{amssymb,amsmath}
+\usepackage{ifthen}
+\newboolean{flagoptimfirst}
+
+\newenvironment{optim}[2]{
+\setboolean{flagoptimfirst}{true}
+\begin{aligned}
+& \underset{#1}{\text{minimize}} & & #2 \\
+& \text{subject to} & & }
+{\end{aligned}}
+
+\newcommand{\sjt}{
+ \ifthenelse{\boolean{flagoptimfirst}}{
+ }{
+ \\ & & & 
+ }
+\setboolean{flagoptimfirst}{false}
+}
+\begin{document}
+
+\section*{Example of MHE in casadi for a mass-spring system}
+
+In the MHE example, we consider a simple mass-spring system. Measurements of the position of the mass are available. We would like to solve the following MHE-problem:
+\begin{equation*}
+\begin{optim}{\textbf{x}(\cdot),\textbf{w}(\cdot)}{ \int_{\tau=t-T}^t \parallel \textbf{w}(\tau) \parallel^2_{Q_\mathrm{c}} + \parallel \textbf{y}(\tau) - h(\textbf{x}) \parallel^2_{R_\mathrm{c}}d\tau + \parallel x(t-T) - \hat{x}(t-T)  \parallel^2_{S}}
+\sjt \dot{\textbf{x}} = f(\textbf{x},\textbf{u},\textbf{w},\tau), \hspace{7mm} \tau \in [t-T,t],
+\end{optim}
+\end{equation*}
+where:
+\begin{itemize}
+ \item $\vec{x}$ is the system state,
+ \item $\vec{y}$ are the measurements,
+ \item $\vec{u}$ is the control input,
+ \item $\vec{w}$ is a noise term introduced to model the model uncertainty (i.e.~the process noise),
+ \item $t$ is the current time,
+ \item $\hat{x}(t-T)$ is an estimate for the state at the beginning of the horizon
+ \item $Q_\mathrm{c}$ and $R_\mathrm{c}$ $S$ are the weighting matrices for the model and measurement noise and for the arrival cost respectively,
+ \item $T$ is the considered time horizon,
+ \item $f$ is a model of the considered system, and
+ \item $h$ is the measurement function that maps the system state to the measurements. 
+\end{itemize}
+
+In the example, this example is discretized using multiple shooting, which results in the following problem:
+\begin{equation*}
+\begin{optim}{\textbf{x}_k,\textbf{w}_k}{ \sum_{k=i-N}^{i-1} \parallel \textbf{w}_k \parallel^2_{Q_{\mathrm{d}_k}} + \sum_{k=i-N}^i \parallel \textbf{y}_k - h(\textbf{x}_k) \parallel^2_{R_{\mathrm{d}_k}} +  \parallel x_{i-N} - \hat{x}_{i-N}  \parallel^2_{S}}
+\sjt \textbf{x}_{k+1} = \phi(\textbf{x}_k,\textbf{u}_k,\textbf{w}_k), \; k = i-N,\ldots,i-1
+\end{optim}
+\end{equation*}
+where
+\begin{itemize}
+ \item $\phi$ integrates our model $f$, given the state $\vec{x}_k$, control input $\vec{u}_k$ and process noise $\vec{w}_k$, over one sampling interval, 
+ \item N is the number of measurements in the considered time horizon, 
+ \item $i$ is the current sampling index, and
+ \item $Q_\mathrm{d}$ and $R_\mathrm{d}$ are the discretized versions of covariance matrices $Q_\mathrm{c}$ and $R_\mathrm{c}$, which might vary over the time horizon.
+\end{itemize}
+
+This is the setup of the MHE that is implemented in this example. Note that in this example, Structures are used. If you are unfamiliar with this, a tutorial can be found here: http://docs.casadi.org/tutorials/tools/structure.pdf
+The arrival cost is updated using the smoothed EKF update.
+
+
+\end{document}

@@ -116,6 +116,21 @@ namespace CasADi{
   *  Duplicates are treated by looking up last occurence
   */
   std::vector<int> lookupvector(const std::vector<int> &v, int size);
+    
+    
+  #ifndef SWIG
+  /**
+  Apply a function f to each element in a vector
+  */
+  template<class T>
+  std::vector< T > applymap(T (*f)(const T& ),const std::vector< T >&);
+
+  /**
+  Apply a function f to each element in a vector
+  */
+  template<class T>
+  void applymap(void (*f)(T&), std::vector< T >&);
+  #endif // SWIG
   
   /// Check if the vector is strictly increasing
   template<typename T>
@@ -337,6 +352,20 @@ namespace CasADi{
       stream << ")";
     }
   }
+  
+  #ifndef SWIG
+  template<class T>
+  std::vector< T > applymap(T (*f)(const T&) ,const std::vector< T >& comp) {
+    std::vector< T > ret(comp.size());
+    std::transform(comp.begin(),comp.end(),ret.begin(),f);
+    return ret;
+  }
+
+  template<class T>
+  void applymap(void (*f)(T &), std::vector< T >& comp) {
+    std::for_each(comp.begin(),comp.end(),f);
+  }
+  #endif //SWIG
   
   template<typename T>
   bool inBounds(const std::vector<T> &v, int upper) {

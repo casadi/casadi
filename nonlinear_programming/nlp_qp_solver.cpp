@@ -30,8 +30,8 @@ NLPQPSolver::NLPQPSolver(){
 }
 
 
-NLPQPSolver::NLPQPSolver(const CRSSparsity & H, const CRSSparsity & A)  {
-  assignNode(new NLPQPInternal(H,A));
+NLPQPSolver::NLPQPSolver(const QPStructure &st)  {
+  assignNode(new NLPQPInternal(st));
 }
 
 NLPQPInternal* NLPQPSolver::operator->(){

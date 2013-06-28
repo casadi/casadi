@@ -21,12 +21,19 @@
  */
 
 #include "matrix_tools.hpp"
+#include "../stl_vector_tools.hpp"
+using namespace std;
 
 namespace CasADi{
+    
+  bool isRegular(const Matrix<double>& ex) {
+    return isRegular(ex.data());
+  }
   
-
-  
-
+  bool isRegular(const Matrix<int>& ex) {
+    return isRegular(ex.data());
+  }
   
 } // namespace CasADi
+
 

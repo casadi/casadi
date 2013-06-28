@@ -137,6 +137,12 @@ class Matrixtests(casadiTestCase):
     self.checkarray(a2[4:1:-2,0],DMatrix(a1[4:1:-2])) # gives [5, 4, 3, 2]
     self.checkarray(a2[0:3:-2,0],DMatrix(a1[0:3:-2])) # gives empty set
     self.checkarray(a2[3:0:-2,0],DMatrix(a1[3:0:-2])) # gives [5, 4, 3, 2]
+    self.checkarray(a2[::-1,0],DMatrix(a1[::-1])) # gives [5, 4, 3, 2, 1]
+    self.checkarray(a2[::1,0],DMatrix(a1[::1])) # gives [1,2,3,4,5]
+    self.checkarray(a2[2::-1,0],DMatrix(a1[2::-1])) # gives [3,2,1]
+    self.checkarray(a2[:2:-1,0],DMatrix(a1[:2:-1])) # gives [5,4]
+    self.checkarray(a2[-1::-1,0],DMatrix(a1[-1::-1])) # gives [5,4,3,2,1]
+    self.checkarray(a2[:-1:-1,0],DMatrix(a1[:-1:-1])) # gives []
     
   def test_indexingOutOfBounds(self):
     self.message("Indexing out of bounds")
@@ -500,7 +506,8 @@ class Matrixtests(casadiTestCase):
       a[i,i] = i+1
 
     self.checkarray(det(a)/npy_det(a),1,"det()")
-    
+   
+  @skip(not CasadiOptions.getSimplificationOnTheFly()) 
   def test_inv_sparsity(self):
     self.message("sparsity pattern of inverse")
 
@@ -803,6 +810,37 @@ class Matrixtests(casadiTestCase):
     self.checkarray(crossc(DMatrix([[1.1,1.3,1.7],[1,0,0],[0,0,1],[4,5,6]]),DMatrix([[2,3,13],[0,1,0],[0,0,1],[1,0,1]]),2),DMatrix([[11.8,-10.9,0.7],[0,0,1],[0,0,0],[5,2,-5]]))
     
     self.checkarray(crossc(DMatrix([[1.1,1.3,1.7],[1,0,0],[0,0,1],[4,5,6]]).T,DMatrix([[2,3,13],[0,1,0],[0,0,1],[1,0,1]]).T,1),DMatrix([[11.8,-10.9,0.7],[0,0,1],[0,0,0],[5,2,-5]]).T)
+    
+  def test_isRegular(self):
+    self.assertTrue(isRegular(DMatrix([1,2])))
+    self.assertFalse(isRegular(DMatrix([1,Inf])))
+    self.assertFalse(isRegular(DMatrix.nan(2)))
+    
+  def test_sizes(self):
+    self.assertEqual(sp_diag(10).sizeD(),10)
+    self.assertEqual(sp_diag(10).sizeU(),10)
+    self.assertEqual(sp_diag(10).sizeL(),10)
+    self.assertEqual(sp_dense(10,10).sizeL(),10*11/2)
+    self.assertEqual(sp_dense(10,10).sizeU(),10*11/2)
+    self.assertEqual(sp_dense(10,10).sizeD(),10)
+    
+    self.assertEqual(sparse(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeD(),1)
+    self.assertEqual(sparse(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeL(),2)
+    self.assertEqual(sparse(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeU(),3)
+    
+  def test_tril2symm(self):
+    a = DMatrix(sp_tril(3),range(sp_tril(3).size()))
+    s = tril2symm(a)
+    self.checkarray(s,DMatrix([[0,1,3],[1,2,4],[3,4,5]]))
+    
+    with self.assertRaises(Exception):
+      tril2symm(DMatrix.ones(5,3))
+    
+    print DMatrix.ones(5,5).sizeU()-DMatrix.ones(5,5).sizeD()
+    
+    with self.assertRaises(Exception):
+      tril2symm(DMatrix.ones(5,5))
+    
     
 if __name__ == '__main__':
     unittest.main()

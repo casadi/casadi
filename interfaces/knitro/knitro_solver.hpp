@@ -37,13 +37,14 @@ class KnitroSolver : public NLPSolver {
     /// Default constructor
     KnitroSolver();
     
-    /// Constuct an NLP with non-linear constraints and provided hessian approximation
-    explicit KnitroSolver(const FX& F,         /**< F objective function */
-                         const FX& G = FX(),  /**< constraint function (default only bound constraints) */
-                         const FX& H = FX(),  /**< Hessian of the lagrangian function (default: limited memory) */
-                         const FX& J = FX(),  /**< Jacobian of G (default -> differentiate) */
-                         const FX& GF = FX()  /**< Gradient of the objective function (default: adjoint mode AD on F) */
-                        );
+    /// \brief Create an NLP solver instance (legacy syntax)
+    explicit KnitroSolver(const FX& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
+                         const FX& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
+                         );
+
+    /// \brief Create an NLP solver instance
+    explicit KnitroSolver(const FX& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+                         );
 
     /// Access functions of the node
     KnitroInternal* operator->();
@@ -65,7 +66,7 @@ class KnitroSolver : public NLPSolver {
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static NLPSolver creator(const FX& F, const FX& G, const FX& H, const FX& J){ return KnitroSolver(F,G,H,J);}
+    static NLPSolver creator(const FX& nlp){ return KnitroSolver(nlp);}
     #ifdef SWIG
     %nocallback;
     #endif

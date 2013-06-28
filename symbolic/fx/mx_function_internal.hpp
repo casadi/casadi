@@ -34,12 +34,12 @@
 
 namespace CasADi{
 
-/** \brief  Internal node class for MXFunction
-  \author Joel Andersson 
-  \date 2010
-*/
-class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>{
-  friend class MXFunction;
+  /** \brief  Internal node class for MXFunction
+      \author Joel Andersson 
+      \date 2010
+  */
+  class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>{
+    friend class MXFunction;
   
   public:
 
@@ -66,15 +66,12 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
 
     /** \brief  Update the number of sensitivity directions during or after initialization */
     virtual void updateNumSens(bool recursive);
-    
-    /** \brief Generate code for the C functon */
-    virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
 
+    /** \brief Generate code for the declarations of the C function */
+    virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+    
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
-
-    /** \brief Set the lifting function */
-    void setLiftingFunction(LiftingFunction liftfun, void* user_data);
 
     /** \brief Extract the residual function G and the modified function Z out of an expression (see Albersmeyer2010 paper) */
     void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
@@ -90,28 +87,28 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
 
     /** \brief  Working vector for numeric calculation */
     std::vector<FunctionIO> work_;
+  
+    /** \brief  Temporary vectors needed for the evaluation (integer) */
+    std::vector<int> itmp_;
     
+    /** \brief  Temporary vectors needed for the evaluation (real) */
+    std::vector<double> rtmp_;
+
     /** \brief  "Tape" with spilled variables */
     std::vector<std::pair<std::pair<int,int>,DMatrix> > tape_;
     
     /// Free variables
     std::vector<MX> free_vars_;
-    
-    // Lifting function
-    LiftingFunction liftfun_;
-    void* liftfun_ud_;
-    
+        
     /** \brief Evaluate symbolically, SX type*/
-    virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+    virtual void evalSXsparse(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
                         const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                        const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                        bool output_given);
+                        const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens);
                         
     /** \brief Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
                         const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
-                        const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
-                        bool output_given);
+                        const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens);
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     SXFunction expand(const std::vector<SXMatrix>& inputv );
@@ -148,7 +145,7 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     /// Allocate tape
     void allocTape();
     
-};
+  };
 
 } // namespace CasADi
 

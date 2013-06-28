@@ -26,51 +26,69 @@
 #include "fx.hpp"
 
 /** \defgroup LinearSolver_doc 
-* 
-* Solves the linear system A.x = b for x
-*  with A square and non-singular
-*
-*  If A is structurally singular, an error will be thrown during init.
-*  If A is numerically singular, the prepare step will fail.
-*/
+ * 
+ * Solves the linear system X*A = B or X*A^T = B for X
+ * with A square and non-singular
+ *
+ *  If A is structurally singular, an error will be thrown during init.
+ *  If A is numerically singular, the prepare step will fail.
+ */
 
 namespace CasADi{
   
-// Forward declaration of internal class
-class LinearSolverInternal;
+/// Input arguments of a linear solver [linsolIn]
+enum LinsolInput{
+  /// The square matrix A: sparse, (n x n). [A]
+  LINSOL_A,
+  /// The right-hand-side matrix b: dense,  (n x m) [B]
+  LINSOL_B,
+  /// Transpose A?: dense scalar, value 0 or 1,  (1 x 1) [T]
+  LINSOL_T,
+  LINSOL_NUM_IN};
 
-/** Abstract base class for the linear solver classes
-*  @copydoc LinearSolver_doc
-\author Joel Andersson
-\date 2010
-*/
-class LinearSolver : public FX{
-public:
+/// Output arguments of a linear solver [linsolOut]
+enum LinsolOutput{
+  /// Solution to the linear system of equations [X]
+  LINSOL_X,
+  LINSOL_NUM_OUT};
+
+  // Forward declaration of internal class
+  class LinearSolverInternal;
+
+  /** Abstract base class for the linear solver classes
+   *  @copydoc LinearSolver_doc
+   \author Joel Andersson
+   \date 2010-2013
+  */
+  class LinearSolver : public FX{
+  public:
   
-  /// Access functions of the node
-  LinearSolverInternal* operator->();
+    /// Access functions of the node
+    LinearSolverInternal* operator->();
 
-  /// Const access functions of the node
-  const LinearSolverInternal* operator->() const;
+    /// Const access functions of the node
+    const LinearSolverInternal* operator->() const;
 
-  /// Set sparsity (before initialization)
-  void setSparsity(const CRSSparsity& sparsity);
+    /// Factorize the matrix
+    void prepare();
+
+    /// Solve the system of equations, internal vector
+    void solve();
+
+#ifndef SWIG
+    /// Solve the factorized system of equations
+    void solve(double* x, int nrhs=1, bool transpose=false);
+#endif // SWIG
+
+    /// Create a solve node
+    MX solve(const MX& A, const MX& B, bool transpose=false);
+
+    /// Check if prepared
+    bool prepared() const;
   
-  /// Factorize the matrix
-  void prepare();
-
-  /// Solve the system of equations, internal vector
-  void solve();
-
-  /// Solve the factorized system of equations
-  void solve(double* x, int nrhs=1, bool transpose=false);
-
-  /// Check if prepared
-  bool prepared() const;
-  
-  /// Check if the node is pointing to the right type of object
-  virtual bool checkNode() const;
-};
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
+  };
 
 } // namespace CasADi
 

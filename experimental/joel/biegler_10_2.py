@@ -209,14 +209,14 @@ for j in range(deg+1):
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
   lfcn.setInput(1.0)
   lfcn.evaluate()
-  D[j] = lfcn.output()
+  D[j] = lfcn.getOutput()
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   for j2 in range(deg+1):
     lfcn.setInput(tau_root[j2])
     lfcn.setFwdSeed(1.0)
     lfcn.evaluate(1,0)
-    C[j][j2] = lfcn.fwdSens()
+    C[j][j2] = lfcn.getFwdSens()
 
 # Total number of variables
 NX = nk*(deg+1)*nx      # Collocated states
@@ -334,27 +334,27 @@ solver.setOption("max_iter",50)
 solver.init()
   
 # Initial condition
-solver.setInput(vars_init,NLP_X_INIT)
+solver.setInput(vars_init,"x0")
 
 # Bounds on x
-solver.setInput(vars_lb,NLP_LBX)
-solver.setInput(vars_ub,NLP_UBX)
+solver.setInput(vars_lb,"lbx")
+solver.setInput(vars_ub,"ubx")
 
 # Bounds on g
-solver.setInput(NP.concatenate(lbg),NLP_LBG)
-solver.setInput(NP.concatenate(ubg),NLP_UBG)
+solver.setInput(NP.concatenate(lbg),"lbg")
+solver.setInput(NP.concatenate(ubg),"ubg")
 
 # Solve the problem
 solver.solve()
 
 # Print the optimal cost
-print "optimal cost: ", solver.output(NLP_COST)[0]
+print "optimal cost: ", solver.getOutput("f")[0]
 
 # Retrieve the solution
-v_opt = array(solver.output(NLP_X_OPT))
+v_opt = array(solver.getOutput("x"))
 
 # Get the solution
-vars_sol = solver.output(NLP_X_OPT)
+vars_sol = solver.getOutput("x")
 
 ## ----
 ## SAVE SOLUTION TO DISK

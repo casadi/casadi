@@ -67,22 +67,8 @@ m.init()
 nx = 3
 nu = 1
 
-# Legendre collocation points
-legendre_points1 = [0,0.500000]
-legendre_points2 = [0,0.211325,0.788675]
-legendre_points3 = [0,0.112702,0.500000,0.887298]
-legendre_points4 = [0,0.069432,0.330009,0.669991,0.930568]
-legendre_points5 = [0,0.046910,0.230765,0.500000,0.769235,0.953090]
-
-# Radau collocation points
-radau_points1 = [0,1.000000]
-radau_points2 = [0,0.333333,1.000000]
-radau_points3 = [0,0.155051,0.644949,1.000000]
-radau_points4 = [0,0.088588,0.409467,0.787659,1.000000]
-radau_points5 = [0,0.057104,0.276843,0.583590,0.860240,1.000000]
-
 # Choose collocation points
-tau_root = radau_points3
+tau_root = collocationPoints(3,"radau")
 
 # Degree of interpolating polynomial
 d = len(tau_root)-1
@@ -118,14 +104,14 @@ for j in range(d+1):
   # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
   lfcn.setInput(1.0)
   lfcn.evaluate()
-  D[j] = lfcn.output()
+  D[j] = lfcn.getOutput()
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
   for r in range(d+1):
     lfcn.setInput(tau_root[r])
     lfcn.setFwdSeed(1.0)
     lfcn.evaluate(1,0)
-    C[j,r] = lfcn.fwdSens()
+    C[j,r] = lfcn.getFwdSens()
 
 # Total number of variables
 NX = nk*(d+1)*nx      # Collocated states
@@ -211,49 +197,46 @@ for k in range(nk):
   
 # Concatenate constraints
 g = vertcat(g)
-  
-# Nonlinear constraint function
-gfcn = MXFunction([V],[g])
 
-# Objective function of the NLP
+# Objective function
 [f] = m.call([T[nk-1,d],X[nk,0],U[nk-1]])
-ffcn = MXFunction([V], [f])
+  
+# NLP
+nlp = MXFunction(nlpIn(x=V),nlpOut(f=f,g=g))
   
 ## ----
 ## SOLVE THE NLP
 ## ----
   
 # Allocate an NLP solver
-solver = IpoptSolver(ffcn,gfcn)
+solver = IpoptSolver(nlp)
 
 # Set options
-solver.setOption("expand_f",True)
-solver.setOption("expand_g",True)
-solver.setOption("generate_hessian",True)
+solver.setOption("expand",True)
 #solver.setOption("max_iter",4)
 
 # initialize the solver
 solver.init()
   
 # Initial condition
-solver.setInput(vars_init,NLP_X_INIT)
+solver.setInput(vars_init,"x0")
 
 # Bounds on x
-solver.setInput(vars_lb,NLP_LBX)
-solver.setInput(vars_ub,NLP_UBX)
+solver.setInput(vars_lb,"lbx")
+solver.setInput(vars_ub,"ubx")
 
 # Bounds on g
-solver.setInput(NP.concatenate(lbg),NLP_LBG)
-solver.setInput(NP.concatenate(ubg),NLP_UBG)
+solver.setInput(NP.concatenate(lbg),"lbg")
+solver.setInput(NP.concatenate(ubg),"ubg")
 
 # Solve the problem
 solver.solve()
 
 # Print the optimal cost
-print "optimal cost: ", float(solver.output(NLP_COST))
+print "optimal cost: ", float(solver.getOutput("f"))
 
 # Retrieve the solution
-v_opt = NP.array(solver.output(NLP_X_OPT))
+v_opt = NP.array(solver.getOutput("x"))
 
 # Get values at the beginning of each finite element
 x0_opt = v_opt[0::(d+1)*nx+nu]

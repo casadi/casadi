@@ -198,6 +198,12 @@ Matrix<double> evalf(const SXMatrix &ex, const SXMatrix &v, const Matrix<double>
 /** \brief  Substitute derivatives with variables */
 /** \brief void replaceDerivatives(SXMatrix &ex, const SXMatrix &var, const SXMatrix &dvar); */
 
+//{@
+/// Checks if expression does not contain NaN or Inf
+bool isRegular(const SX& ex);
+bool isRegular(const SXMatrix& ex);
+//@}
+
 #ifndef SWIG
 // "operator?:" can not be overloaded
 template<typename T>
@@ -255,6 +261,13 @@ SXMatrix GenericMatrix<SXMatrix>::sym(const std::string& name, const CRSSparsity
 
 /// Check dependency: very inefficient algorithm
 bool dependsOn(const SXMatrix& f, const SXMatrix &arg);
+
+
+/** \brief Get all symbols contained in the supplied expression
+* Get all symbols on which the supplied expression depends
+* \see SXFunction::getFree()
+*/
+std::vector<SX> getSymbols(const SXMatrix& e);
 
 /** \brief  check if smooth */
 bool isSmooth(const SXMatrix& ex);

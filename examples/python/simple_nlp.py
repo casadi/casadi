@@ -32,9 +32,9 @@ f = SXFunction([x],[x[0]**2 + x[1]**2])
 g = SXFunction([x],[x[0]+x[1]-10])
 
 # Pick an NLP solver
-#MySolver = IpoptSolver
+MySolver = IpoptSolver
 #MySolver = WorhpSolver
-MySolver = SQPMethod
+#MySolver = SQPMethod
 
 # Allocate a solver
 solver = MySolver(f,g)
@@ -44,14 +44,14 @@ if MySolver==SQPMethod:
 solver.init()
 
 # Set constraint bounds
-solver.setInput(0.,NLP_LBG)
+solver.setInput(0.,"lbg")
 
 # Solve the NLP
 solver.evaluate()
 
 # Print solution
 print "-----"
-print "objective at solution = ", solver.output(NLP_COST)
-print "primal solution = ", solver.output(NLP_X_OPT)
-print "dual solution (x) = ", solver.output(NLP_LAMBDA_X)
-print "dual solution (g) = ", solver.output(NLP_LAMBDA_G)
+print "objective at solution = ", solver.getOutput("f")
+print "primal solution = ", solver.getOutput("x")
+print "dual solution (x) = ", solver.getOutput("lam_x")
+print "dual solution (g) = ", solver.getOutput("lam_g")

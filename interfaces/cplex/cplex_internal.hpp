@@ -42,7 +42,7 @@ public:
   virtual CplexInternal* clone() const;
   
   /// Constructor using sparsity patterns
-  explicit CplexInternal(const CRSSparsity& H, const CRSSparsity& A);
+  explicit CplexInternal(const std::vector<CRSSparsity>& st);
 
   /// Destructor
   virtual ~CplexInternal();

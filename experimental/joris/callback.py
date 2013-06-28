@@ -37,12 +37,12 @@ class Log:
     self.iter = 0 
   def __call__(self,f,*args):
     print "====Hey, I'm an iteration===="
-    print "X_OPT = ", f.input(NLP_X_OPT)
+    print "X_OPT = ", f.getInput("x")
     print f.getStats()
     self.iter = self.iter + 1
     if self.iter > 5:
       print "This is quite enough."
-      f.output(0).set(1)
+      f.setOutput(1,0)
 
 log = Log()
 
@@ -53,10 +53,10 @@ solv.setOption("iteration_callback",c)
 
 solv.init()
 
-solv.setInput([2.5,3.0,0.75],NLP_X_INIT)
-solv.setInput(0,NLP_UBG)
-solv.setInput(0,NLP_LBG)
+solv.setInput([2.5,3.0,0.75],"x0")
+solv.setInput(0,"ubg")
+solv.setInput(0,"lbg")
 solv.solve()
 
-print solv.output(NLP_X_OPT)
+print solv.getOutput("x")
 

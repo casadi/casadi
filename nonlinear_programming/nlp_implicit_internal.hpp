@@ -32,35 +32,36 @@ namespace CasADi{
 
   /** \brief Internal class for NLPImplicitInternal
    * 
-      @copydoc ImplicitFunction_doc
+   @copydoc ImplicitFunction_doc
    * */
-class NLPImplicitInternal : public ImplicitFunctionInternal {
-  friend class NLPImplicitSolver;
-public:
-  /** \brief  Constructor */
-  explicit NLPImplicitInternal();
+  class NLPImplicitInternal : public ImplicitFunctionInternal {
+    friend class NLPImplicitSolver;
+  public:
+    /** \brief  Constructor */
+    explicit NLPImplicitInternal(const FX& f, const FX& jac, const LinearSolver& linsol);
 
-  /** \brief  Clone */
-  virtual NLPImplicitInternal* clone() const;
+    /** \brief  Destructor */
+    virtual ~NLPImplicitInternal();
+
+    /** \brief  Clone */
+    virtual NLPImplicitInternal* clone() const{ return new NLPImplicitInternal(*this);}
   
-  /** \brief  Create a new Solver */
-  explicit NLPImplicitInternal(const FX& f, int nrhs=1);
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
-  /** \brief  Destructor */
-  virtual ~NLPImplicitInternal();
+    /** \brief  Create a new ImplicitFunctionInternal */
+    virtual NLPImplicitInternal* create(const FX& f, const FX& jac, const LinearSolver& linsol) const { return new NLPImplicitInternal(f,jac,linsol);}
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Initialize */
+    virtual void init();
+    
+    /** \brief  Solve the nonlinear system of equations */
+    virtual void solveNonLinear();
   
-  virtual void evaluate(int nfdir, int nadir);
-
-  /** \brief  Create a new ImplicitFunctionInternal */
-  virtual ImplicitFunctionInternal* create(const FX& f, int nrhs=1) const { return new NLPImplicitInternal(f,nrhs);}
-  
-  protected:
+    // NLP solver instance
     NLPSolver nlp_solver_; 
     
-};
+  };
 
 } // namespace CasADi
 

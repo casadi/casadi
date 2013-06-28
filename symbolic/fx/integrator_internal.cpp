@@ -50,8 +50,8 @@ IntegratorInternal::IntegratorInternal(const FX& f, const FX& g) : f_(f), g_(g){
   // Negative number of parameters for consistancy checking
   np_ = -1;
   
-  inputScheme = SCHEME_IntegratorInput;
-  outputScheme = SCHEME_IntegratorOutput;
+  inputScheme_ = SCHEME_IntegratorInput;
+  outputScheme_ = SCHEME_IntegratorOutput;
 }
 
 IntegratorInternal::~IntegratorInternal(){ 
@@ -340,7 +340,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   // Calculate forward and adjoint sensitivities
   vector<vector<Mat> > fsens(fseed.size(),fg_out);
   vector<vector<Mat> > asens(aseed.size(),rdae_in);
-  fg.eval(rdae_in,fg_out,fseed,fsens,aseed,asens,true);
+  fg.eval(rdae_in,fg_out,fseed,fsens,aseed,asens);
   
   // Augment differential state
   x.append(vertcat(fwd_x));

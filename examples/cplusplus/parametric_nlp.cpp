@@ -86,49 +86,44 @@ int main(){
   double p0_[]  = {5.00,1.00};
   vector<double> p0(p0_,p0_+2);
 
-  // Input arguments for f(x,p) and g(x,p)
-  vector<SXMatrix> x_and_p(2);
-  x_and_p[0] = x;
-  x_and_p[1] = p;
-  
-  // Creaate NLP solver
-  SXFunction ffcn(x_and_p,f);
-  SXFunction gfcn(x_and_p,g);
-  IpoptSolver solver(ffcn,gfcn);
+  // NLP
+  SXFunction nlp(nlpIn("x",x,"p",p),nlpOut("f",f,"g",g));
+
+  // Create NLP solver
+  IpoptSolver solver(nlp);
   
   // Set options and initialize solver
-  solver.setOption("parametric",true);
   solver.init();
   
   // Solve NLP
-  solver.setInput( x0, NLP_X_INIT);
-  solver.setInput( p0, NLP_P);
-  solver.setInput(lbx, NLP_LBX);
-  solver.setInput(ubx, NLP_UBX);
-  solver.setInput(lbg, NLP_LBG);
-  solver.setInput(ubg, NLP_UBG);
+  solver.setInput( x0, "x0");
+  solver.setInput( p0, "p");
+  solver.setInput(lbx, "lbx");
+  solver.setInput(ubx, "ubx");
+  solver.setInput(lbg, "lbg");
+  solver.setInput(ubg, "ubg");
   solver.evaluate();
   
   // Print the solution
   cout << "-----" << endl;
-  cout << "Optimal solution for p = " << solver.input(NLP_P).getDescription() << ":" << endl;
-  cout << setw(30) << "Objective: " << solver.output(NLP_COST).getDescription() << endl;
-  cout << setw(30) << "Primal solution: " << solver.output(NLP_X_OPT).getDescription() << endl;
-  cout << setw(30) << "Dual solution (x): " << solver.output(NLP_LAMBDA_X).getDescription() << endl;
-  cout << setw(30) << "Dual solution (g): " << solver.output(NLP_LAMBDA_G).getDescription() << endl;
+  cout << "Optimal solution for p = " << solver.input("p").getDescription() << ":" << endl;
+  cout << setw(30) << "Objective: " << solver.output("f").getDescription() << endl;
+  cout << setw(30) << "Primal solution: " << solver.output("x").getDescription() << endl;
+  cout << setw(30) << "Dual solution (x): " << solver.output("lam_x").getDescription() << endl;
+  cout << setw(30) << "Dual solution (g): " << solver.output("lam_g").getDescription() << endl;
   
   // Change the parameter and resolve
   p0[0] = 4.5;
-  solver.setInput( p0, NLP_P);
+  solver.setInput( p0, "p");
   solver.evaluate();
   
   // Print the new solution
   cout << "-----" << endl;
-  cout << "Optimal solution for p = " << solver.input(NLP_P).getDescription() << ":" << endl;
-  cout << setw(30) << "Objective: " << solver.output(NLP_COST).getDescription() << endl;
-  cout << setw(30) << "Primal solution: " << solver.output(NLP_X_OPT).getDescription() << endl;
-  cout << setw(30) << "Dual solution (x): " << solver.output(NLP_LAMBDA_X).getDescription() << endl;
-  cout << setw(30) << "Dual solution (g): " << solver.output(NLP_LAMBDA_G).getDescription() << endl;
+  cout << "Optimal solution for p = " << solver.input("p").getDescription() << ":" << endl;
+  cout << setw(30) << "Objective: " << solver.output("f").getDescription() << endl;
+  cout << setw(30) << "Primal solution: " << solver.output("x").getDescription() << endl;
+  cout << setw(30) << "Dual solution (x): " << solver.output("lam_x").getDescription() << endl;
+  cout << setw(30) << "Dual solution (g): " << solver.output("lam_g").getDescription() << endl;
   
   return 0;
 }

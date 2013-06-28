@@ -47,11 +47,6 @@
 \end{verbatim}
 %   a,b,c = msym("[a,b,c]")
 
-\paragraph{Calculus}
-\begin{verbatim}
-  jacobian([sin(a)*b + c],[a,b,c])
-\end{verbatim}
-
 \paragraph{Transpose}
 \begin{verbatim}
   B = A.T
@@ -60,6 +55,7 @@
 \paragraph{Products}
 \begin{verbatim}
   v = mul(A,x)  # Matrix product
+  v = mul([x.T,A,x])  # Matrix product
   v = A*A       # Element-wise product
 \end{verbatim}
 
@@ -80,6 +76,11 @@
   x[0,0]
   x[:,0]
   x[-1,:]
+\end{verbatim}
+
+\paragraph{Calculus}
+\begin{verbatim}
+  jacobian(sin(a)*b + c,vertcat([a,b,c]))
 \end{verbatim}
 
 \paragraph{Function SISO}

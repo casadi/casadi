@@ -93,9 +93,8 @@ int main(){
   vector<double> ubg(ubg_,ubg_+4);
     
   // Create NLP solver
-  SXFunction ffcn(x,f);
-  SXFunction gfcn(x,g);
-  IpoptSolver solver(ffcn,gfcn);
+  SXFunction nlp(nlpIn("x",x),nlpOut("f",f,"g",g));
+  IpoptSolver solver(nlp);
   
   // Mark the parameters amongst the constraints (see sIPOPT documentation)
   Dictionary con_integer_md;
@@ -123,20 +122,20 @@ int main(){
   solver.init();
   
   // Solve NLP
-  solver.setInput( x0, NLP_X_INIT);
-  solver.setInput(lbx, NLP_LBX);
-  solver.setInput(ubx, NLP_UBX);
-  solver.setInput(lbg, NLP_LBG);
-  solver.setInput(ubg, NLP_UBG);
+  solver.setInput( x0, "x0");
+  solver.setInput(lbx, "lbx");
+  solver.setInput(ubx, "ubx");
+  solver.setInput(lbg, "lbg");
+  solver.setInput(ubg, "ubg");
   solver.evaluate();
   
   // Print the solution
   cout << "----" << endl;
-  cout << "Minimal cost " << solver.output(NLP_COST) << endl;
+  cout << "Minimal cost " << solver.output("f") << endl;
   cout << "----" << endl;
 
   cout << "Nominal solution" << endl;
-  cout << "x = " << solver.output(NLP_X_OPT).data() << endl;
+  cout << "x = " << solver.output("x").data() << endl;
   cout << "----" << endl;
   
   cout << "perturbed solution" << endl;

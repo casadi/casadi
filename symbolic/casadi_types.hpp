@@ -36,26 +36,52 @@ namespace CasADi{
   template<class T> class Matrix;
   class FX;
   class CRSSparsity;
+  template<class T> class LPStructIOSchemeVector;
+  typedef LPStructIOSchemeVector<CRSSparsity> LPStructure;
+  template<class T> class QPStructIOSchemeVector;
+  typedef QPStructIOSchemeVector<CRSSparsity> QPStructure;
+  template<class T> class QCQPStructIOSchemeVector;
+  typedef QCQPStructIOSchemeVector<CRSSparsity> QCQPStructure;
+  template<class T> class SDPStructIOSchemeVector;
+  typedef SDPStructIOSchemeVector<CRSSparsity> SDPStructure;
+  template<class T> class SOCPStructIOSchemeVector;
+  typedef SOCPStructIOSchemeVector<CRSSparsity> SOCPStructure;
   class NLPSolver;
   class LinearSolver;
   class Integrator;
   class QPSolver;
+  class QCQPSolver;
+  class LPSolver;
+  class SDPSolver;
+  class SOCPSolver;
   class ImplicitFunction;
   
   /// Function pointer to a nonlinear solver creator function
-  typedef NLPSolver (*NLPSolverCreator)(const FX& F, const FX& G, const FX& H, const FX& J);
+  typedef NLPSolver (*NLPSolverCreator)(const FX& nlp);
 
   /// Function pointer to a linear solver creator function
   typedef LinearSolver (*linearSolverCreator)(const CRSSparsity& sparsity);
+  
+  /// Function pointer to a LP solver creator function
+  typedef LPSolver (*LPSolverCreator)(const LPStructure& st);
 
   /// Function pointer to an integrator creator function
   typedef Integrator (*integratorCreator)(const FX& f, const FX& g);
 
   /// Function pointer to a QP solver creator function
-  typedef QPSolver (*QPSolverCreator)(const CRSSparsity& H, const CRSSparsity& A);
+  typedef QPSolver (*QPSolverCreator)(const QPStructure& st);
 
+  /// Function pointer to a QCQP solver creator function
+  typedef QCQPSolver (*QCQPSolverCreator)(const QCQPStructure& st);
+
+  /// Function pointer to an SDP solver creator function
+  typedef SDPSolver (*SDPSolverCreator)(const SDPStructure& st);
+
+  /// Function pointer to an SOCP solver creator function
+  typedef SOCPSolver (*SOCPSolverCreator)(const SOCPStructure& st);
+  
   /// Function pointer to an implicit function creator
-  typedef ImplicitFunction (*implicitFunctionCreator)(const FX& f);
+  typedef ImplicitFunction (*implicitFunctionCreator)(const FX& f, const FX& jac, const LinearSolver& linsol);
   
   /// Function pointer to a Jacobian generator function
   typedef FX (*JacobianGenerator)(FX& fcn, int iind, int oind, void* user_data);

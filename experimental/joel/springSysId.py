@@ -177,9 +177,9 @@ def idSystem(makePlots=False):
         integrator.setInput(     xNext, C.INTEGRATOR_X0 )
         integrator.evaluate()
     
-        xNext = list(integrator.output())
-        x     = list(integrator.output())
-        y     = list(integrator.output())
+        xNext = list(integrator.getOutput())
+        x     = list(integrator.getOutput())
+        y     = list(integrator.getOutput())
     
         # state record
         w = N.random.multivariate_normal([0,0], Q)
@@ -258,28 +258,28 @@ def idSystem(makePlots=False):
     
     # Bounds on u and initial condition
     kb_min = [1, 0.1] + [-10 for j in range(2*(nu+1))] # lower bound
-    solver.setInput(kb_min, C.NLP_LBX)
+    solver.setInput(kb_min, C.NLP_SOLVER_LBX)
     
     kb_max = [10, 1] + [10 for j in range(2*(nu+1))] # upper bound
-    solver.setInput(kb_max, C.NLP_UBX)
+    solver.setInput(kb_max, C.NLP_SOLVER_UBX)
     
     guess = []
     for y in Y:
         guess.append(y[0])
         guess.append(y[1])
     kb_sol = [5, 0.4] + guess # initial guess
-    solver.setInput(kb_sol, C.NLP_X_INIT)
+    solver.setInput(kb_sol, C.NLP_SOLVER_X0)
     
     # Bounds on g
     #Gmin = Gmax = [] #[10, 0]
-    #solver.setInput(Gmin,C.NLP_LBG)
-    #solver.setInput(Gmax,C.NLP_UBG)
+    #solver.setInput(Gmin,C.NLP_SOLVER_LBG)
+    #solver.setInput(Gmax,C.NLP_SOLVER_UBG)
     
     # Solve the problem
     solver.solve()
     
     # Get the solution
-    xopt = solver.output(C.NLP_X_OPT)
+    xopt = solver.getOutput(C.NLP_SOLVER_X)
     
     # estimated parameters:
     print ""

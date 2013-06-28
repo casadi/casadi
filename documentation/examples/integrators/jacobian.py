@@ -52,4 +52,4 @@ integrator = CVodesIntegrator(f)
 integrator.init()
 
 #! First argument is input index, secpnd argument is output index
-jac = integrator.jacobian(INTEGRATOR_P, INTEGRATOR_XF)
+jac = integrator.jacobian("p", "xf")

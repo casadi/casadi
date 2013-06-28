@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 include_directories(${QPOASES_INCLUDE_DIR})
 
 set(QPOASES_INTERFACE_SRCS
@@ -23,3 +23,6 @@ install(DIRECTORY ./
    FILES_MATCHING PATTERN "*.hpp"
    PATTERN ".svn" EXCLUDE
 )
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+set_target_properties(casadi_qpoases_interface PROPERTIES COMPILE_FLAGS "-Wno-overloaded-virtual")
+endif()

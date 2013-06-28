@@ -25,11 +25,11 @@
 
 #include "direct_collocation.hpp"
 #include "../symbolic/fx/ocp_solver_internal.hpp"
-
 #include "../symbolic/fx/parallelizer.hpp"
 #include "../symbolic/fx/c_function.hpp"
 #include "../symbolic/fx/mx_function.hpp"
 #include "../symbolic/fx/sx_function.hpp"
+#include "integration/integration_tools.hpp"
 
 namespace CasADi{
   
@@ -67,12 +67,8 @@ class DirectCollocationInternal : public OCPSolverInternal{
     // Prints out a human readable report about possible constraint violations - all constraints
     void reportConstraints(std::ostream &stream=std::cout);
     
-  protected:
-    // NLP objective function
-    MXFunction F_;
-    
-    // NLP constraint function
-    MXFunction G_;
+    // NLP
+    MXFunction nlp_;
 
     // NLP solver
     NLPSolver nlp_solver_;

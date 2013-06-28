@@ -43,8 +43,9 @@ public:
 
   /** \brief  Default constructor */
   NLPImplicitSolver();
-  
-  explicit NLPImplicitSolver(const FX& f, int nrhs=1);
+
+  /** \brief Create a new solver instance */  
+  explicit NLPImplicitSolver(const FX& f, const FX& jac=FX(), const LinearSolver& linsol=LinearSolver());
   
   /** \brief  Access functions of the node */
   NLPImplicitInternal* operator->();
@@ -53,11 +54,14 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
+  /// Access NLP solver
+  NLPSolver& getNLPSolver();
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static ImplicitFunction creator(const FX& f){ return NLPImplicitSolver(f);}
+  static ImplicitFunction creator(const FX& f, const FX& jac, const LinearSolver& linsol){ return NLPImplicitSolver(f,jac,linsol);}
   #ifdef SWIG
   %nocallback;
   #endif

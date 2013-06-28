@@ -26,28 +26,32 @@ using namespace std;
 
 namespace CasADi{
 
-SCPgen::SCPgen(){
-}
+  SCPgen::SCPgen(){
+  }
   
-SCPgen::SCPgen(const FX& F, const FX& G, const FX& H, const FX& J){
-  assignNode(new SCPgenInternal(F,G,H,J));
-}
+  SCPgen::SCPgen(const FX& F, const FX& G){
+    assignNode(new SCPgenInternal(joinFG(F,G)));
+  }
 
-SCPgenInternal* SCPgen::operator->(){
-  return static_cast<SCPgenInternal*>(NLPSolver::operator->());
-}
+  SCPgen::SCPgen(const FX& nlp){
+    assignNode(new SCPgenInternal(nlp));
+  }
 
-const SCPgenInternal* SCPgen::operator->() const{
-  return static_cast<const SCPgenInternal*>(NLPSolver::operator->());
-}
+  SCPgenInternal* SCPgen::operator->(){
+    return static_cast<SCPgenInternal*>(NLPSolver::operator->());
+  }
+
+  const SCPgenInternal* SCPgen::operator->() const{
+    return static_cast<const SCPgenInternal*>(NLPSolver::operator->());
+  }
     
-bool SCPgen::checkNode() const{
-  return dynamic_cast<const SCPgenInternal*>(get())!=0;
-}
+  bool SCPgen::checkNode() const{
+    return dynamic_cast<const SCPgenInternal*>(get())!=0;
+  }
 
-const QPSolver SCPgen::getQPSolver() const {
-  return (*this)->getQPSolver();
-}
+  const QPSolver SCPgen::getQPSolver() const {
+    return (*this)->getQPSolver();
+  }
     
 
 } // namespace CasADi

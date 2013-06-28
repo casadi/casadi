@@ -63,26 +63,26 @@ namespace CasADi{
     /// Constructors
     /** \brief Default constructor (not-a-number)
 
-	Object is initialised as not-a-number.
+        Object is initialised as not-a-number.
     */
     SX();
     /** \brief Numerical constant constructor
-	\param val Numerical value
+        \param val Numerical value
     */
     SX(double val);
     
     /** \brief Symbolic constructor
- 	\param name Name of the symbol
+         \param name Name of the symbol
 
-	This is the name that wil be used by the "operator<<" and "toSTring" methods.
-	The name is not used as identifier; you may construct distinct SX objects with non-unique names.
+        This is the name that wil be used by the "operator<<" and "toSTring" methods.
+        The name is not used as identifier; you may construct distinct SX objects with non-unique names.
     */
     explicit SX(const std::string& name); // variable (must be explicit, otherwise 0/NULL would be ambigous)
     /** \brief Symbolic constructor
- 	\param Name of the symbol
+         \param Name of the symbol
 
-	This is the name that wil be used by the "operator<<" and "toSTring" methods.
-	The name is not used as identifier; you may construct distinct SX objects with non-unique names.
+        This is the name that wil be used by the "operator<<" and "toSTring" methods.
+        The name is not used as identifier; you may construct distinct SX objects with non-unique names.
     */
 #ifndef SWIG
 
@@ -117,7 +117,7 @@ namespace CasADi{
     std::string toString() const;
     
     /** \brief  Get a pointer to the node */
-    SXNode* const get() const; // note: constant pointer, not pointer to constant object! (to allow access to the counter)
+    SXNode* get() const; // note: constant pointer, not pointer to constant object! (to allow access to the counter)
 
     /** \brief  Access functions of the node */
     const SXNode* operator->() const;
@@ -174,9 +174,6 @@ namespace CasADi{
     /** \brief Check if the node is the sum of two equal expressions */
     bool isDoubled() const;
     
-    /** \brief Check if the node is an even square */
-    bool isSquared() const;
-    
     /** \brief Get the number of dependencies of a binary SX */
     int getNdeps() const;
     
@@ -213,6 +210,7 @@ namespace CasADi{
     SX exp() const;
     SX log() const;
     SX sqrt() const;
+    SX sq() const;
     SX sin() const;
     SX cos() const;
     SX tan() const;

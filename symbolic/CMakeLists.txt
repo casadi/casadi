@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
+
+include_directories(${CMAKE_BINARY_DIR})
+
+add_subdirectory(runtime)
 
 SET(CASADI_SRCS
   # MISC
@@ -40,22 +44,33 @@ SET(CASADI_SRCS
   sx/sx_tools.cpp            sx/sx_tools.hpp            # Set of functions
 
   # More general graph representation with sparse matrix expressions and function evaluations
-  mx/mx.cpp                  mx/mx.hpp                  # Public, smart pointer class, 
-  mx/mx_node.cpp             mx/mx_node.hpp             # Base class for all the MX nodes
-  mx/constant_mx.cpp         mx/constant_mx.hpp         # A constant MX node
-  mx/symbolic_mx.cpp         mx/symbolic_mx.hpp         # A symbolic MX variable
-  mx/unary_mx.cpp            mx/unary_mx.hpp            # Unary operation
-  mx/binary_mx.cpp           mx/binary_mx.hpp           # Binary operation
-  mx/multiplication.cpp      mx/multiplication.hpp      # Matrix multiplication
-  mx/solve.cpp               mx/solve.hpp               # Solve linear system of equations
-  mx/evaluation_mx.cpp       mx/evaluation_mx.hpp       # FX function evaluation
-  mx/norm.cpp                mx/norm.hpp                # 1-norm, 2-norm and infinity-norm
-  mx/transpose.cpp           mx/transpose.hpp           # Transpose
-  mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
-  mx/densification.cpp       mx/densification.hpp       # Makes a matrix dense
-  mx/multiple_output.cpp     mx/multiple_output.hpp     # Base class for nodes with multiple outputs
-  mx/mx_tools.cpp            mx/mx_tools.hpp
+  mx/mx.hpp                  mx/mx.cpp                  # Public, smart pointer class, 
+  mx/mx_node.hpp             mx/mx_node.cpp             # Base class for all the MX nodes
+  mx/constant_mx.hpp         mx/constant_mx.cpp         # A constant MX node
+  mx/symbolic_mx.hpp         mx/symbolic_mx.cpp         # A symbolic MX variable
+  mx/unary_mx.hpp            mx/unary_mx.cpp            # Unary operation
+  mx/binary_mx.hpp           mx/binary_mx_impl.hpp      # Binary operation
+  mx/multiplication.hpp      mx/multiplication_impl.hpp # Matrix multiplication
+  mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
+  mx/call_fx.hpp             mx/call_fx.cpp             # FX function evaluation
+  mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
+  mx/transpose.hpp           mx/transpose.cpp           # Transpose
+  mx/vertcat.hpp             mx/vertcat.cpp             # Vertical concatenation
+  mx/vertsplit.hpp           mx/vertsplit.cpp           # Vertical split
+  mx/reshape.hpp             mx/reshape.cpp             # Reshape
+  mx/subref.hpp              mx/subref.cpp              # Submatrix reference
+  mx/subassign.hpp           mx/subassign.cpp           # Submatrix assignment
+  mx/getnonzeros.hpp         mx/getnonzeros.cpp         # Get the nonzeros of matrix
+  mx/setnonzeros.hpp         mx/setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
+  mx/set_sparse.hpp          mx/set_sparse.cpp          # Sparse copy
+  mx/determinant.hpp         mx/determinant.cpp         # Determinant
+  mx/inverse.hpp             mx/inverse.cpp             # Matrix inverse
+  mx/inner_prod.hpp          mx/inner_prod.cpp          # Inner product
+  mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
+  mx/mx_tools.hpp            mx/mx_tools.cpp
+
   # A dynamically created function with AD capabilities
+  fx/io_interface.hpp                                   # Input/output interface for FX and FXInternal
   fx/fx.hpp                  fx/fx.cpp                  fx/fx_internal.hpp                  fx/fx_internal.cpp
   fx/x_function_internal.hpp                            # Base class for SXFunction and MXFunction
   fx/sx_function.hpp         fx/sx_function.cpp         fx/sx_function_internal.hpp         fx/sx_function_internal.cpp
@@ -64,6 +79,7 @@ SET(CASADI_SRCS
   fx/external_function.hpp   fx/external_function.cpp   fx/external_function_internal.hpp   fx/external_function_internal.cpp
   fx/derivative.hpp          fx/derivative.cpp          fx/derivative_internal.hpp          fx/derivative_internal.cpp
   fx/linear_solver.hpp       fx/linear_solver.cpp       fx/linear_solver_internal.hpp       fx/linear_solver_internal.cpp
+  fx/symbolic_qr.hpp         fx/symbolic_qr.cpp         fx/symbolic_qr_internal.hpp         fx/symbolic_qr_internal.cpp
   fx/implicit_function.hpp   fx/implicit_function.cpp   fx/implicit_function_internal.hpp   fx/implicit_function_internal.cpp
   fx/integrator.hpp          fx/integrator.cpp          fx/integrator_internal.hpp          fx/integrator_internal.cpp
   fx/nlp_solver.hpp          fx/nlp_solver.cpp          fx/nlp_solver_internal.hpp          fx/nlp_solver_internal.cpp
@@ -73,6 +89,9 @@ SET(CASADI_SRCS
   fx/ocp_solver.hpp          fx/ocp_solver.cpp          fx/ocp_solver_internal.hpp          fx/ocp_solver_internal.cpp
   fx/qp_solver.hpp           fx/qp_solver.cpp           fx/qp_solver_internal.hpp           fx/qp_solver_internal.cpp
   fx/sdp_solver.hpp          fx/sdp_solver.cpp          fx/sdp_solver_internal.hpp          fx/sdp_solver_internal.cpp
+  fx/socp_solver.hpp         fx/socp_solver.cpp         fx/socp_solver_internal.hpp         fx/socp_solver_internal.cpp
+  fx/qcqp_solver.hpp         fx/qcqp_solver.cpp         fx/qcqp_solver_internal.hpp         fx/qcqp_solver_internal.cpp
+  fx/lp_solver.hpp           fx/lp_solver.cpp           fx/lp_internal.hpp                  fx/lp_internal.cpp
   fx/fx_tools.hpp            fx/fx_tools.cpp
   fx/xfunction_tools.hpp     fx/xfunction_tools.cpp
   fx/code_generator.hpp      fx/code_generator.cpp
@@ -80,15 +99,21 @@ SET(CASADI_SRCS
   # User include class with the most essential includes
   casadi.hpp
   
-  autogenerated.hpp autogenerated.cpp
-
+  fx/schemes_metadata.hpp fx/schemes_metadata.cpp fx/schemes_helpers.hpp
+  
 )
+
+set_source_files_properties( ${RUNTIME_EMBEDDED_SRC} PROPERTIES GENERATED TRUE )
+
 if(ENABLE_STATIC)
-add_library(casadi STATIC ${CASADI_SRCS})
+add_library(casadi STATIC ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(casadi SHARED ${CASADI_SRCS})
+add_library(casadi SHARED ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
 endif(ENABLE_SHARED)
+
+add_dependencies(casadi casadi_runtime_embedded)
+
 install(TARGETS casadi
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

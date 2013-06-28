@@ -114,8 +114,8 @@ while True:
   AB.setInput(uk,0)
   AB.setInput(dk,1)
   AB.evaluate()
-  Ak = AB.output(0)
-  Bk = AB.output(1)
+  Ak = AB.getOutput(0)
+  Bk = AB.getOutput(1)
   
   # Get ak and bk
   Z.setInput(uk,0)
@@ -125,8 +125,8 @@ while True:
   Z.evaluate(1,0)
   Z.getOutput(xk,0)
   Z.getOutput(fk,1)
-  ak = -Z.fwdSens(0)
-  bk = fk-Z.fwdSens(1)
+  ak = -Z.getFwdSens(0)
+  bk = fk-Z.getFwdSens(1)
 
   # Solve the condensed Newton system
   du = -solve(Bk,bk)

@@ -31,11 +31,9 @@ namespace CasADi{
 /// Internal class
 class SDPSolverInternal : public FXInternal{
   public:
+
     // Constructor
-    SDPSolverInternal();
-        
-    // Constructor
-    SDPSolverInternal( const CRSSparsity &C, const CRSSparsity &A);
+    SDPSolverInternal(const std::vector<CRSSparsity>& st);
     
     // Destructor
     virtual ~SDPSolverInternal() = 0;
@@ -49,26 +47,35 @@ class SDPSolverInternal : public FXInternal{
     // Solve the system of equations
     virtual void solve();
     
-  protected:
+    /// Set options that make the SDP solver more suitable for solving SOCPs
+    virtual void setSOCPOptions() { };
     
-    /// Size of decision variable matrix
+  protected:
+  
+    /// Problem structure
+    std::vector<CRSSparsity> st_;
+    
+    /// Size of decision variable vector
     int n_;
     
-    /// The number of matrix constraints
+    /// The number of matrices F
     int m_;
     
     /// Number of identified blocks
     int nb_;
     
+    /// Number of linear constraints
+    int nc_;
+    
     /// Block decomposition details
     std::vector<int> block_boundaries_;
     std::vector<int> block_sizes_;
     
-    /** A mapping from (C,A) -> (C[p,p]_j,A_i[p,p]j)
-    *  input(0) = C
-    *  input(1) = A
-    *  output(j) = Cj
-    *  output((1+i)*nb_+j) = Aj
+    /** A mapping from (G,F) -> (G[p,p]_j,F_i[p,p]j)
+    *  input(0) = G
+    *  input(1) = F
+    *  output(j) = Gj
+    *  output((1+i)*nb_+j) = Fj
     */
     FX mapping_;
     

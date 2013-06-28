@@ -27,27 +27,28 @@
 
 namespace CasADi{
   
-class WorhpInternal;
+  class WorhpInternal;
   
-// List from worhp_internal.cpp
-/**
-*
-* \brief interface to WORHP NLP solver
-* @copydoc NLPSolver_doc
+  // List from worhp_internal.cpp
+  /**
+   *
+   * \brief interface to WORHP NLP solver
+   * @copydoc NLPSolver_doc
 
-*/
-class WorhpSolver : public NLPSolver {
+   */
+  class WorhpSolver : public NLPSolver {
   public:
     /// Default constructor
     WorhpSolver();
 
-    /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
-    explicit WorhpSolver(const FX& F,         /**< F objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
-                         const FX& G = FX(),  /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
-                         const FX& H = FX(),  /**< Hessian of the lagrangian function (default: limited memory): \f$ [\mathbf{R}^n, \mathbf{R}^m, \mathbf{R}] \mapsto [\mathbf{R}^{n x n}]\f$ \n The third input argument for H is \f$ \sigma \f$, a scaling factor for F. */
-                         const FX& J = FX(),  /**< Jacobian of G (default -> differentiate): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^{m x n}]\f$ */
-                         const FX& GF = FX()  /**< Gradient of the objective function (default: adjoint mode AD on F): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^n]\f$ */
-                        );
+    /// \brief Create an NLP solver instance (legacy syntax)
+    explicit WorhpSolver(const FX& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
+                         const FX& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
+                         );
+
+    /// \brief Create an NLP solver instance
+    explicit WorhpSolver(const FX& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+                         );
 
     /// Access functions of the node
     WorhpInternal* operator->();
@@ -60,14 +61,14 @@ class WorhpSolver : public NLPSolver {
     virtual bool checkNode() const;
 
     /// Static creator function 
-    #ifdef SWIG
+#ifdef SWIG
     %callback("%s_cb");
-    #endif
-    static NLPSolver creator(const FX& F, const FX& G, const FX& H, const FX& J){ return WorhpSolver(F,G,H,J);}
-    #ifdef SWIG
+#endif
+    static NLPSolver creator(const FX& nlp){ return WorhpSolver(nlp);}
+#ifdef SWIG
     %nocallback;
-    #endif
-};
+#endif
+  };
 
 } // namespace CasADi
 

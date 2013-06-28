@@ -8,25 +8,39 @@ all: unittests
 # These targets must all go on one line
 trunktesterbot: unittests_py unittests_oct examples_indoc_py examples_indoc_oct examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py
 
+trunktesterbot_knownbugs: unittests_py_knownbugs unittests_oct examples_indoc_py examples_indoc_oct examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py
+
 # Set to -memcheck if you want to include a check for memory leaks
 MEMCHECK = 
 
 full: unittests examples tutorials benchmarks
+
+full_knownbugs: unittests_knownbugs examples tutorials benchmarks
 
 benchmarks:
 	cd python && python complexity.py && cd ..
 	
 python: unittests_py examples_indoc_py examples_code_py user_guide_snippets_py tutorials
 
+python_knownbugs: unittests_py_knownbugs examples_indoc_py examples_code_py user_guide_snippets_py tutorials
+
 cpp: examples_indoc_cpp  examples_code_cpp
 
 unittests: unittests_py unittests_oct
 
+unittests_knownbugs: unittests_py_knownbugs unittests_oct
+
 unittests_py:
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" # No memory checks
 ifdef MEMCHECK
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="memcheck$(MEMCHECK)"
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--ignore_memory_light"
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="--ignore_memory_heavy"
+else
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" # No memory checks
 endif
+
+unittests_py_knownbugs:
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--known_bugs"
+
 unittests_oct:
 	python internal/test_oct.py octave
 

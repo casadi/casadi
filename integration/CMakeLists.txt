@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 SET(INTEGRATION_SRCS
   collocation_integrator.hpp
   collocation_integrator.cpp
@@ -8,6 +8,8 @@ SET(INTEGRATION_SRCS
   rk_integrator.cpp
   rk_integrator_internal.hpp
   rk_integrator_internal.cpp
+  integration_tools.cpp
+  integration_tools.hpp
 )
 
 if(ENABLE_STATIC)

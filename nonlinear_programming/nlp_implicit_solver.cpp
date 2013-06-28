@@ -26,24 +26,28 @@
 using namespace std;
 namespace CasADi{
 
-NLPImplicitSolver::NLPImplicitSolver(){ 
-}
+  NLPImplicitSolver::NLPImplicitSolver(){ 
+  }
 
-NLPImplicitSolver::NLPImplicitSolver(const FX& f, int nrhs)  {
-  assignNode(new NLPImplicitInternal(f,nrhs));
-}
+  NLPImplicitSolver::NLPImplicitSolver(const FX& f, const FX& jac, const LinearSolver& linsol)  {
+    assignNode(new NLPImplicitInternal(f,jac,linsol));
+  }
 
-NLPImplicitInternal* NLPImplicitSolver::operator->(){
-  return (NLPImplicitInternal*)(FX::operator->());
-}
+  NLPImplicitInternal* NLPImplicitSolver::operator->(){
+    return (NLPImplicitInternal*)(FX::operator->());
+  }
 
-const NLPImplicitInternal* NLPImplicitSolver::operator->() const{
-  return (const NLPImplicitInternal*)(FX::operator->());
+  const NLPImplicitInternal* NLPImplicitSolver::operator->() const{
+    return (const NLPImplicitInternal*)(FX::operator->());
+  }
 
-}
+  bool NLPImplicitSolver::checkNode() const{
+    return dynamic_cast<const NLPImplicitInternal*>(get());
+  }
 
-bool NLPImplicitSolver::checkNode() const{
-  return dynamic_cast<const NLPImplicitInternal*>(get());
-}
+  NLPSolver& NLPImplicitSolver::getNLPSolver(){
+    casadi_assert(checkNode());
+    return (*this)->nlp_solver_;
+  }
 
 } // namespace CasADi

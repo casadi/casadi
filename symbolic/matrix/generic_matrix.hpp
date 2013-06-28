@@ -68,6 +68,9 @@ class GenericMatrix{
     /** \brief Get get the number of non-zeros in the upper triangular half */
     int sizeU() const;
 
+    /** \brief Get get the number of non-zeros on the diagonal */
+    int sizeD() const;
+    
     /** \brief Get the number of elements */
     int numel() const;
 
@@ -97,7 +100,7 @@ class GenericMatrix{
     bool dense() const;
     
     /** \brief  Check if the matrix expression is scalar */
-    bool scalar() const;
+    bool scalar(bool scalar_and_dense=false) const;
 
     /** \brief Get the sparsity pattern */
     const CRSSparsity& sparsity() const;
@@ -116,19 +119,22 @@ class GenericMatrix{
 
     /** \brief  Get vector element or slice */
     template<typename I>
-    const MatType operator()(const I& i) const{ return static_cast<const MatType*>(this)->getSub(i,0);}
+    const MatType operator()(const I& i) const{ return static_cast<const MatType*>(this)->sub(i,0);}
 
     /** \brief  Get Sparsity slice */
-    const MatType operator()(const CRSSparsity& sp) const{ return static_cast<const MatType*>(this)->getSub(sp); }
+    const MatType operator()(const CRSSparsity& sp) const{ return static_cast<const MatType*>(this)->sub(sp); }
     
     /** \brief  Get Matrix element or slice */
     template<typename I, typename J>
-    const MatType operator()(const I& i, const J& j) const{ return static_cast<const MatType*>(this)->getSub(i,j); }
+    const MatType operator()(const I& i, const J& j) const{ return static_cast<const MatType*>(this)->sub(i,j); }
 
     /** \brief  Access vector element or slice */
     template<typename I>
     SubMatrix<MatType,I,int> operator()(const I& i){ return SubMatrix<MatType,I,int>(static_cast<MatType&>(*this),i,0); }
-       
+
+    /** \brief  Access Sparsity slice */
+    SubMatrix<MatType,CRSSparsity,int> operator()(const CRSSparsity& sp){ return SubMatrix<MatType,CRSSparsity,int>(static_cast<MatType&>(*this),sp,0); }
+      
     /** \brief  Access Matrix element or slice */
     template<typename I, typename J>
     SubMatrix<MatType,I,J> operator()(const I& i, const J& j){ return SubMatrix<MatType,I,J>(static_cast<MatType&>(*this),i,j); }
@@ -182,6 +188,11 @@ int GenericMatrix<MatType>::sizeL() const{
 }
 
 template<typename MatType>
+int GenericMatrix<MatType>::sizeD() const{
+  return sparsity().sizeD();
+}
+
+template<typename MatType>
 int GenericMatrix<MatType>::numel() const{
   return sparsity().numel();
 }
@@ -217,8 +228,8 @@ bool GenericMatrix<MatType>::dense() const{
 }
 
 template<typename MatType>
-bool GenericMatrix<MatType>::scalar() const{
-  return numel()==1;
+bool GenericMatrix<MatType>::scalar(bool scalar_and_dense) const{
+  return sparsity().scalar(scalar_and_dense);
 }
 
 template<typename MatType>
@@ -240,12 +251,6 @@ MatType GenericMatrix<MatType>::mul_smart(const MatType& y) const {
       return MatType::zeros(x.size1(),y.size2());
   } else if(x.scalar() || y.scalar()){
     return x*y;
-  } else if(x.sparsity().diagonal() && y.size2()==1){
-    return diag(x)*y;
-  } else if(y.sparsity().diagonal() && x.size1()==1){
-    return x*trans(diag(y));
-  } else if(x.sparsity().diagonal() && y.sparsity().diagonal()){
-    return diag(diag(x)*diag(y));
   } else {
     casadi_assert_message(size2()==y.size1(),"Matrix product with incompatible dimensions. Lhs is " << dimString() << " and rhs is " << y.dimString() << ".");
     return x.mul_full(y);

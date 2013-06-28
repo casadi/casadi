@@ -32,56 +32,92 @@ namespace CasADi{
 
   @copydoc NLPSolver_doc
   \author Joel Andersson 
-  \date 2010
+  \date 2010-2013
 */
-class NLPSolverInternal : public FXInternal{
+  class NLPSolverInternal : public FXInternal{
 
-public:
-  explicit NLPSolverInternal(const FX& F, const FX& G, const FX& H, const FX& J);
-  virtual ~NLPSolverInternal() = 0;
+  public:
+    /// Constructor
+    NLPSolverInternal(const FX& nlp);
 
-  virtual void init();
+    /// Destructor
+    virtual ~NLPSolverInternal() = 0;
 
-  /// objective function
-  FX F_;
-  /// constraint function
-  FX G_;
-  /// Hessian of the Lagrangian function
-  FX H_;
-  /// Jacobian of the constraint function
-  FX J_; 
+    /// Initialize
+    virtual void init();
 
-  /// use exact hessian
-  bool exact_hessian_; 
+    /// Prints out a human readable report about possible constraint violations - all constraints
+    void reportConstraints(std::ostream &stream=std::cout);
   
-  /// use Gauss-Newton Hessian
-  bool gauss_newton_; 
+    /// Warns the user about inital bounds, if option 'warn_initial_bounds' is true
+    virtual void checkInitialBounds();
   
-  /// use parametric NLP formulation
-  bool parametric_; 
+    /// Set options that make the NLP solver more suitable for solving QPs
+    virtual void setQPOptions() { };
 
-  /// Number of variables and constraints
-  int n_,m_;
+    /// Get or generate a function to calculate the gradient of the objective function
+    virtual FX getGradF();
   
-  /// The sparsity of the parameters 
-  CRSSparsity sp_p;
-  
-  /// callback function, executed at each iteration
-  FX callback_;
-  
-  /// Execute the callback function only after this amount of iterations
-  int callback_step_;
-  
-  /// Prints out a human readable report about possible constraint violations - all constraints
-  void reportConstraints(std::ostream &stream=std::cout);
-  
-  /// Warns the user about inital bounds, if option 'warn_initial_bounds' is true
-  virtual void checkInitialBounds();
-  
-  /// Set options that make the NLP solver more suitable for solving QPs
-  virtual void setQPOptions() { };
+    /// Get or generate a function to calculate the Jacobian of the constraint function
+    virtual FX getJacG();
+
+    /// Get or generate a function to calculate the gradient of the Lagrangian function
+    virtual FX getGradLag();
+
+    /// Get or generate a function to calculate the Hessian of the Lagrangian function
+    virtual FX getHessLag();
+
+    /// Get or generate the sparsity pattern of the Hessian of the Lagrangian
+    virtual CRSSparsity getSpHessLag();
     
-};
+    // Access the objective gradient function
+    FX& gradF();
+
+    /// Access the Jacobian of the constraint function
+    FX& jacG();
+
+    /// Access the Hessian of the Lagrangian function
+    FX& hessLag();
+
+    /// Access the gradient of the Lagrangian function
+    FX& gradLag();
+
+    /// Get the sparsity pattern of the Hessian of the Lagrangian
+    CRSSparsity& spHessLag();
+
+    /// Number of variables
+    int nx_;
+  
+    /// Number of constraints
+    int ng_;
+  
+    /// Number of parameters
+    int np_;
+  
+    /// callback function, executed at each iteration
+    FX callback_;
+  
+    /// Execute the callback function only after this amount of iterations
+    int callback_step_;
+  
+    /// The NLP
+    FX nlp_;
+
+    // Gradient of the objective
+    FX gradF_;
+    
+    // Jacobian of the constraints
+    FX jacG_;
+    
+    // Hessian of the Lagrangian
+    FX hessLag_;
+
+    // Gradient of the Lagrangian
+    FX gradLag_;
+
+    // Sparsity pattern of the Hessian of the Lagrangian
+    CRSSparsity spHessLag_;
+  };
 
 } // namespace CasADi
 

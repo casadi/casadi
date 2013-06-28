@@ -135,17 +135,19 @@ CMake (tested with version 2.8.2).
 \hline
 CasADi core & None \\
 \hline
-CSparse interface & CSparse (comes with CasADi)\\
+CSparse interface & \htmladdnormallink{CSparse}{http://www.cise.ufl.edu/research/sparse/CSparse/} (comes with CasADi)\\
 \hline
-Ipopt interface & Ipopt\\
+qpOASES interface & \htmladdnormallink{qpOASES}{http://www.kuleuven.be/optec/software/qpOASES} (comes with CasADi)\\
 \hline
-KNITRO interface & KNITRO\\
+Ipopt interface & \htmladdnormallink{Ipopt}{http://www.coin-or.org/Ipopt/} (\htmladdnormallink{tutorial}{http://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf}) \\
+\hline
+KNITRO interface & \htmladdnormallink{KNITRO}{http://www.ziena.com/knitro.htm}\\
 \hline
 LAPACK interface & library with LAPACK api\\
 \hline
-LiftOpt interface & LiftOpt\\
+WORHP interface & \htmladdnormallink{WORHP}{http://www.worhp.de/}\\
 \hline
-Sundials interface & SUNDIALS \\
+Sundials interface & \htmladdnormallink{SUNDIALS}{https://computation.llnl.gov/casc/sundials/main.html} \\
 \hline
 CasADi for python & SWIG \\
 \hline
@@ -213,16 +215,30 @@ The backbone of CasADi is centered around some fundamental classes:
  \item \texttt{MX} -- \emph{matrix symbolic type}
 \end{itemize}
 
+\begin{pytexTemplate}{main}
+from casadi import *
+\end{pytexTemplate}
+
+\begin{pytexTemplate}{maintools}
+from casadi import *
+from casadi.tools import *
+\end{pytexTemplate}
+
+\pytexStart{empty}
+
+The following is a listing of available subclasses of FX:
+\begin{pytex}
+import casadi
+import casadi.tools
+casadi.tools.print_subclasses(casadi.FX)
+\end{pytex}
+
 \section{\texttt{SX} and \texttt{SXMatrix}}
 The \texttt{SX} type is used to represent symbolic expressions made up by a sequence of unary and binary operations. It uses a syntax similar to a numeric type such as \texttt{float} in Python or a \texttt{double} in C/C++, but instead of calculating the expressions numerically, the \texttt{SX} will build up an expression. The type overloads most common operations and can also be used instead of container classes such as \texttt{numpy.array} in Python or \texttt{std::vector<>} in C++'s Standard Template Library (STL).
 
 Though it is possible and somtimes benificial, we shall not work with the \texttt{SX} type directly in this tutorial. Instead we shall work with a \emph{sparse matrix type} called \texttt{SXMatrix}, whose elements are \texttt{SX} instances. \texttt{SXMatrix} uses an everything-is-a-matrix type syntax that should be familiar to Matlab users, which means that scalars can be represented as 1-by-1 matrices and vectors as $n$-by-1 matrices. To store its element, it uses a general sparse matrix format comparible to that used for sparse matrices in Matlab\footnote{To be more precise, the storage format used is \emph{compressed row storage}}.
 
 To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) and import CasADi using the command:\footnote{In C++, include the core header files through ''\texttt{\#include "symbolic/casadi.hpp"}''. Classes and functions are defined in the namespace \texttt{CasADi}. In Octave, the CasADi module is imported by simply invoking \texttt{casadi}}
-
-\begin{pytexTemplate}{main}
-from casadi import *
-\end{pytexTemplate}
 
 \pytexStart{empty}
 
@@ -319,7 +335,7 @@ f.setInput(value,input_index)
 f.evaluate()
 
 # Get outputs, forward and adjoint derivative sensitivities
-f.getOutput(value,output_index)
+f.getOutput(output_index)
 \end{verbatim}
 
 In Section \ref{sec:ad_numeric}, we extend this skeleton to also includes derivatives.
@@ -327,6 +343,15 @@ In Section \ref{sec:ad_numeric}, we extend this skeleton to also includes deriva
 As an alternative to calling \texttt{getOutput} etc., you can also directly access the internal matrices (which are of type \texttt{DMatrix}). This can decrease overhead and shorten the code, but must be used with caution, since changing the \emph{structure} of these matrices can cause CasADi to crash.
 \begin{verbatim}
 print "output is ", f.output()
+\end{verbatim}
+
+Evaluating \texttt{f} again, will change the output matrix internal to f and hence the reference \texttt{f.output()}. If you wish to retain the old matrix, make a deep copy first. In fact, \texttt{f.getOutput()} behaves as \texttt{DMatrix(f.output())}.
+\begin{verbatim}
+a = f.output()
+b = DMatrix(a)  # make deepcopy
+f.evaluate()
+# a has changed
+# b has not changed
 \end{verbatim}
 
 Note that all functions are multiple (sparse, matrix-valued) input, multiple (sparse, matrix-valued) output.
@@ -769,14 +794,21 @@ f.setAdjSeed(value,output_index)
 f.evaluate(num_fwd_sensitivities, num_adj_sensitivities)
 
 # Get outputs, forward and adjoint derivative sensitivities
-f.getOutput(value,output_index)
-f.getFwdSens(value,output_index)
-f.getAdjSens(value,input_index)
+f.getOutput(output_index)
+f.getFwdSens(output_index)
+f.getAdjSens(input_index)
 \end{verbatim}
 
 Forward and adjoint seeds are set hence together with the function inputs and forward and adjoint sensitivities are collected together with the the function outputs. Multiple forward and/or adjoint derivative directions can be handled simultaneously, that is you can simultaneously multiply the Jacobian from the left or right with multiple vectors.
 
 The number of directional derivatives that be calculated simultaneously is controlled by setting the options \verb|number_of_fwd_dir| and \verb|number_of_adj_dir| (default is 1). If the function is passed as input to another CasADi function (e.g. an ODE integrator or an NLP solver), the number of directional derivatives is allowed to the value set by the options \verb|max_number_of_fwd_dir| and \verb|max_number_of_adj_dir| respectively (default is 64).
+
+As mentioned before, there are ways to access the internal matrices directly:
+\begin{verbatim}
+print f.output(output_index)
+print f.fwdSens(output_index)
+print f.adjSens(input_index)
+\end{verbatim}
 
 \section{Calculating complete Jacobians and Hessians numerically}
 You can generate a new function for calculating the Jacobian by calling the \texttt{FX::jacobian} member function:
@@ -786,7 +818,14 @@ You can generate a new function for calculating the Jacobian by calling the \tex
 \end{verbatim}
 This will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) Jacobian as well as all the original function outputs as outputs.
 
-Similarily, Hessians of a scalar output can be called by calling the \texttt{FX::hessian} member function:
+Similarily, the gradient of a scalar output can be called by calling the \texttt{FX::gradient} member function:
+\begin{verbatim}
+ G = f.gradient(iind,oind) # function corresponding to the gradient
+                          # of the oind-th output w.r.t. the iind-th input
+\end{verbatim}
+which will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) gradient and all the original function outputs as outputs.
+
+Lastly, Hessians of a scalar output can be called by calling the \texttt{FX::hessian} member function:
 \begin{verbatim}
  H = f.hessian(iind,oind) # function corresponding to the Hessian
                           # of the oind-th output w.r.t. the iind-th input
@@ -860,12 +899,12 @@ A \texttt{Simulator} can be used just like an integrator, and its input scheme i
 
 % \section{Integration of implicit ODEs}
 \chapter{Nonlinear Programming}
-The NLP solvers interfaced with CasADi solves NLP:s of the following form:
+The NLP solvers interfaced with CasADi solves parametric NLPs of the following form:
 \begin{equation}
 \begin{array}{cc}
 \begin{array}{c}
 \text{minimize:} \\
-x \in \mathbb{R}^n
+x \in \mathbb{R}^{nx}, p \in \mathbb{R}^{np}
 \end{array}
 &
 f(x)
@@ -876,20 +915,17 @@ f(x)
 &
 \begin{array}{c}
 x_{\min} \le x \le x_{\max} \\
-g_{\min} \le g(x) \le g_{\max}
+g_{\min} \le g(x,p) \le g_{\max}
 \end{array}
 \end{array}
 \end{equation}
 
-With the functions $f$ and $g$ formulated as the CasADi functions \texttt{f} and \texttt{g}, an NLP solver instance can be allocated by:
+With a function \texttt{nlp}, which given $x$ and $p$, gives $f$ and $g$, an NLP solver instance can be allocated by:
 \begin{verbatim}
- nlp_solver = IpoptSolver(f,g)
+ nlp_solver = IpoptSolver(nlp)
 \end{verbatim}
 
-The interface will then automatically generate the information that it might need to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$. The interface will generate this kind of information automatically and provide to the solver. For the IPOPT interface, if the user wants to use a particular Hessian approximation (for example a Gauss-Newton Hessian), this is possble by simply prividing a third argument to the constructor:
-\begin{verbatim}
- nlp_solver = IpoptSolver(f,g,h)
-\end{verbatim}
+The interface will then automatically generate the information that it might need to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$. The interface will generate this kind of information automatically and provide to the solver.
 
 NLP solvers, like ODE/DAE integrators are functions in CasADi (though taking derivatives of them is currently not supported). You will find the input and output schemes in the CasADi API documentation on the website or by using the question mark in Python.
 
@@ -1092,6 +1128,7 @@ For a more detailed description of this class and its functionalities, we refer 
     Power & \verb|x**y| & \verb|pow(x,y)| & \verb|x^y| or \verb|x.^y| \\ \hline
     Transpose & \verb|trans(A)| or \verb|A.T| & \verb|trans(A)| & \verb|trans(A)| or \verb|A'| or \verb|A.'| \\ \hline
     Creating a dictionary (e.g. for options) & \verb|d = {'opt1':opt1}| or \verb|d = {}; a['opt1'] = opt1| & \verb|a = Dictionary();| \verb|a['opt1'] = opt1;| & \verb|a = Dictionary();| \verb|a('opt1') = opt1;| (?) \\ \hline
+    Getting function output by value & \verb|out = f.getOutput()| & \verb|DMatrix out; f.getOutput(out) | & \verb|out = f.getOutput()| \\ \hline
   \end{tabular}
 \end{center}
 

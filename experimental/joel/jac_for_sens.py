@@ -43,10 +43,10 @@ for jac_for_sens in (True,False):
 
   f.evaluate(1,1)
 
-  print "f.fwdSens(0) = ", f.fwdSens(0).data()
-  print "f.fwdSens(1) = ", f.fwdSens(1).data()
-  print "f.fwdSens(2) = ", f.fwdSens(2).data()
-  print "f.adjSens(0) = ", f.adjSens(0).data()
-  print "f.adjSens(1) = ", f.adjSens(1).data()
+  print "f.getFwdSens(0) = ", f.fwdSens(0).data()
+  print "f.getFwdSens(1) = ", f.fwdSens(1).data()
+  print "f.getFwdSens(2) = ", f.fwdSens(2).data()
+  print "f.getAdjSens(0) = ", f.adjSens(0).data()
+  print "f.getAdjSens(1) = ", f.adjSens(1).data()
 
   print "--"

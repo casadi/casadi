@@ -25,97 +25,86 @@
 
 #include "symbolic/fx/nlp_solver_internal.hpp"
 
+// GCC_VERSION is defined in worhp.h
+#ifdef GCC_VERSION
+#undef GCC_VERSION
+#endif
+
+// Workaround for Clang, but should not be a problem for other compilers, #771
+#define _Bool bool
+
 #include "worhp.h"
 
 namespace CasADi{
 
-/**
-@copydoc NLPSolver_doc
-*/
-class WorhpInternal : public NLPSolverInternal{
+  /**
+     @copydoc NLPSolver_doc
+  */
+  class WorhpInternal : public NLPSolverInternal{
 
-public:
-  explicit WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
-  virtual ~WorhpInternal();
-  virtual WorhpInternal* clone() const{ return new WorhpInternal(*this);}
-  
-virtual void init();
-virtual void evaluate(int nfdir, int nadir);
-virtual void setQPOptions();
+  public:
+    // Constructor
+    explicit WorhpInternal(const FX& nlp);
 
-  
-/// Read options from worhp parameter xml
-void setOptionsFromFile(const std::string & file);
-  
-protected:
+    // Destructor
+    virtual ~WorhpInternal();
 
-  /// H_ transformed such that only lower triangular elements + diagonals are retained
-  FX H_tril_;
+    // Clone function
+    virtual WorhpInternal* clone() const;
 
-  OptVar    worhp_o;
-  Workspace worhp_w;
-  Params    worhp_p;
-  Control   worhp_c;
-  
-  std::map<int,std::string> status_;
-  
-void *userclass;
-std::map<std::string,opt_type> ops_;
+    // Reset solver
+    void reset();
 
-  // The NLP functions
-  /// Gradient of the objective function
-  FX GF_; 
+    // (Re)initialize
+    virtual void init();
+    
+    // Solve the NLP
+    virtual void evaluate(int nfdir, int nadir);
 
-  /// objective function
-  FX Fmod_;
-  /// constraint function
-  FX Gmod_;
-  /// Hessian of the Lagrangian function
-  FX Hmod_;
-  /// Jacobian of the constraint function
-  FX Jmod_; 
-  /// Gradient of the objective function
-  FX GFmod_; 
-  
-  // Worhp callback functions
-  bool eval_f(const double* x, double scale, double& obj_value);
-  bool eval_grad_f(const double* x, double scale , double* grad_f);
-  bool eval_g(const double* x, double* g);
-  bool eval_jac_g(const double* x, double* values);
-  bool eval_h(const double* x, double obj_factor, const double* lambda, double* values);
-  
-  // Accummulated time since last reset:
-  double t_eval_f_; // time spent in eval_f
-  double t_eval_grad_f_; // time spent in eval_grad_f
-  double t_eval_g_; // time spent in eval_g
-  double t_eval_jac_g_; // time spent in eval_jac_g
-  double t_eval_h_; // time spent in eval_h
-  double t_callback_fun_;  // time spent in callback function
-  double t_callback_prepare_; // time spent in callback preparation
-  double t_mainloop_; // time spent in the main loop of the solver
-  
-  std::string formatStatus(int status) const;
-  
-  // Lists the indices into the decision variables for which LBX!=LBU
-  std::vector< int > freeX_; 
-  
-  // The complement of freeX_
-  std::vector< int > nonfreeX_;
-  
-  // Lists the indices into the constraints for which LBG or UBG is different from infinity
-  std::vector< int > freeG_; 
-  
-  // The complement of freeX_
-  std::vector< int > nonfreeG_;
-  
-  /// Will do inspections on bounds and do a reinitialisation if needed
-  void checkinit();
-  
-  /// Pass the supplied options to  Wprhp
-  void passOptions();
+    
+    virtual void setQPOptions();
 
+    /// Read options from worhp parameter xml
+    void setOptionsFromFile(const std::string & file);
   
-};
+    /// Exact Hessian?
+    bool exact_hessian_;
+
+    // Sparsity pattern of the transpose of jacG
+    CRSSparsity spJacG_T_;
+    std::vector<int> jacG_tmp_;
+
+    OptVar    worhp_o_;
+    Workspace worhp_w_;
+    Params    worhp_p_;
+    Control   worhp_c_;
+  
+    std::map<int,std::string> status_;
+    std::map<std::string,opt_type> ops_;
+
+    // Worhp callback functions
+    bool eval_f(const double* x, double scale, double& obj_value);
+    bool eval_grad_f(const double* x, double scale , double* grad_f);
+    bool eval_g(const double* x, double* g);
+    bool eval_jac_g(const double* x, double* values);
+    bool eval_h(const double* x, double obj_factor, const double* lambda, double* values);
+  
+    // Accummulated time since last reset:
+    double t_eval_f_; // time spent in eval_f
+    double t_eval_grad_f_; // time spent in eval_grad_f
+    double t_eval_g_; // time spent in eval_g
+    double t_eval_jac_g_; // time spent in eval_jac_g
+    double t_eval_h_; // time spent in eval_h
+    double t_callback_fun_;  // time spent in callback function
+    double t_callback_prepare_; // time spent in callback preparation
+    double t_mainloop_; // time spent in the main loop of the solver
+  
+    std::string formatStatus(int status) const;
+  
+    /// Pass the supplied options to Worhp
+    void passOptions();
+  
+  };
 
 } // namespace CasADi
 

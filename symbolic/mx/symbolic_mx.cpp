@@ -44,9 +44,11 @@ void SymbolicMX::printPart(std::ostream &stream, int part) const{
 }
 
 void SymbolicMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  clearVector(adjSeed);
 }
 
 void SymbolicMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  clearVector(adjSeed);
 }
 
 void SymbolicMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
@@ -56,15 +58,9 @@ const std::string& SymbolicMX::getName() const{
   return name_;
 }
 
-std::vector<MX> SymbolicMX::partial(const std::vector<MX>& x){
-  return std::vector<MX>(1,MX::eye(sparsity().numel()));
-}
-
 void SymbolicMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-  if(fwd){
-    bvec_t *outputd = get_bvec_t(output[0]->data());
-    fill_n(outputd,output[0]->size(),0);
-  }
+  bvec_t *outputd = get_bvec_t(output[0]->data());
+  fill_n(outputd,output[0]->size(),0);
 }
 
 

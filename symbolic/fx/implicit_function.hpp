@@ -24,61 +24,65 @@
 #define IMPLICIT_FUNCTION_HPP
 
 #include "fx.hpp"
+#include "linear_solver.hpp"
 
 namespace CasADi{
-// Forward declaration of internal class
-class ImplicitFunctionInternal;
+  // Forward declaration of internal class
+  class ImplicitFunctionInternal;
 
-/** 
- \defgroup ImplicitFunction_doc
+  /** 
+      \defgroup ImplicitFunction_doc
 
-  The equation:
+      The equation:
   
-  F(z, x1, x2, ..., xn) == 0
+      F(z, x1, x2, ..., xn) == 0
   
-  where d_F/dz is invertable, implicitly defines the equation:
+      where d_F/dz is invertable, implicitly defines the equation:
   
-  z := G(x1, x2, ..., xn)
+      z := G(x1, x2, ..., xn)
   
   
   
-  F should be an FX mapping from (n+1) inputs to m outputs.
-  The first output is the residual that should be zero.
+      F should be an FX mapping from (n+1) inputs to m outputs.
+      The first output is the residual that should be zero.
   
-  ImplicitFunction (G) is an FX mapping from n inputs to m outputs. 
-  n may be zero.
-  The first output is the solved for z.
+      ImplicitFunction (G) is an FX mapping from n inputs to m outputs. 
+      n may be zero.
+      The first output is the solved for z.
   
-  You can provide an initial guess for z by setting output(0) of ImplicitFunction.
+      You can provide an initial guess for z by setting output(0) of ImplicitFunction.
   
 
-*/
-/**
-Abstract base class for the implicit function classes
+  */
+  /**
+     Abstract base class for the implicit function classes
 
-@copydoc ImplicitFunction_doc
+     @copydoc ImplicitFunction_doc
 
-\author Joel Andersson
-\date 2011
-*/
-class ImplicitFunction : public FX{
-public:
+     \author Joel Andersson
+     \date 2011
+  */
+  class ImplicitFunction : public FX{
+  public:
   
-  /// Access functions of the node
-  ImplicitFunctionInternal* operator->();
+    /// Access functions of the node
+    ImplicitFunctionInternal* operator->();
 
-  /// Const access functions of the node
-  const ImplicitFunctionInternal* operator->() const;
+    /// Const access functions of the node
+    const ImplicitFunctionInternal* operator->() const;
 
-  /// Check if the node is pointing to the right type of object
-  virtual bool checkNode() const;
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
   
-  /// Set the jacobian of F
-  void setJacobian(FX &J);
-  
-  /// Access F
-  FX getF() const;
-};
+    /// Access F
+    FX& getF();
+
+    /// Access Jacobian
+    FX& getJac();
+
+    /// Access linear solver
+    LinearSolver& getLinsol();
+  };
 
 } // namespace CasADi
 

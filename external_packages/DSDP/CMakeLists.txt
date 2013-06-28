@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.0)
+cmake_minimum_required(VERSION 2.6)
 
 include_directories(include src/bounds src/lp src/sdp src/solver src/sys src/vecmat)
 
@@ -21,3 +21,6 @@ install(DIRECTORY include
    FILES_MATCHING PATTERN "*.h"
    PATTERN ".svn" EXCLUDE
 )
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+set_target_properties(casadi_dsdp PROPERTIES COMPILE_FLAGS "-Wno-unused-value")
+endif()

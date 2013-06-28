@@ -21,262 +21,281 @@
  */
 
 #include "implicit_function_internal.hpp"
-#include "symbolic/fx/sx_function.hpp"
-#include "symbolic/sx/sx_tools.hpp"
+#include "../mx/mx_node.hpp"
+#include "../mx/mx_tools.hpp"
+#include <iterator>
 
 using namespace std;
 namespace CasADi{
 
-ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f, int nrhs) : f_(f), nrhs_(nrhs){
-  addOption("linear_solver",    OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
-  addOption("linear_solver_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver.");
-}
-
-void ImplicitFunctionInternal::init(){
-  // Initialize the residual function
-  if(!f_.isInit()) f_.init();
-  
-  // Allocate inputs
-  setNumInputs(f_.getNumInputs()-1);
-  for(int i=0; i<getNumInputs(); ++i){
-    input(i) = f_.input(i+1);
-  }
-  
-  // Allocate outputs
-  setNumOutputs(f_.getNumOutputs());
-  output(0) = f_.input(0);
-  for(int i=1; i<getNumOutputs(); ++i){
-    output(i) = f_.output(i);
+  ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : f_(f), jac_(jac), linsol_(linsol){
+    addOption("linear_solver",            OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
+    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(), "Options to be passed to the linear solver.");
   }
 
-  // Call the base class initializer
-  FXInternal::init();
-
-  // Number of equations
-  N_ = output().size();
-
-  // Generate Jacobian if not provided
-  if(J_.isNull()) J_ = f_.jacobian(0,0);
-  J_.init();
-  
-  casadi_assert_message(J_.output().size1()==J_.output().size2(),"ImplicitFunctionInternal::init: the jacobian must be square but got " << J_.output().dimString());
-  
-  casadi_assert_message(!isSingular(J_.output().sparsity()),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(J_.output()) << " (in stead of "<< J_.output().size1() << ")");
-  
-  // Get the linear solver creator function
-  if(linsol_.isNull() && hasSetOption("linear_solver")){
-    linearSolverCreator linear_solver_creator = getOption("linear_solver");
-  
-    // Allocate an NLP solver
-    linsol_ = linear_solver_creator(CRSSparsity());
-  
-    // Pass options
-    if(hasSetOption("linear_solver_options")){
-      const Dictionary& linear_solver_options = getOption("linear_solver_options");
-      linsol_.setOption(linear_solver_options);
-    }
+  ImplicitFunctionInternal::~ImplicitFunctionInternal(){
   }
-  
-  // Initialize the linear solver, if provided
-  if(!linsol_.isNull()){
-    linsol_.setSparsity(J_.output().sparsity());
-    linsol_.init();
+
+  void ImplicitFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+    FXInternal::deepCopyMembers(already_copied);
+    f_ = deepcopy(f_,already_copied);
+    jac_ = deepcopy(jac_,already_copied);
+    linsol_ = deepcopy(linsol_,already_copied);
   }
-    
-  // Allocate memory for directional derivatives
-  ImplicitFunctionInternal::updateNumSens(false);
 
-}
-
-void ImplicitFunctionInternal::updateNumSens(bool recursive){
-  // Call the base class if needed
-  if(recursive) FXInternal::updateNumSens(recursive);
+  void ImplicitFunctionInternal::init(){
+    // Initialize the residual function
+    f_.init(false);
   
-  // Request more directional derivatives for the residual function
-  f_.requestNumSens(nfdir_,nadir_);
-}
+    // Get the number of equations and check consistency
+    casadi_assert_message(f_.output().dense() && f_.output().size2()==1, "Residual must be a dense vector");
+    casadi_assert_message(f_.input().dense() && f_.input().size2()==1, "Unknown must be a dense vector");
+    n_ = f_.output().size();
+    casadi_assert_message(n_ == f_.input().size(), "Dimension mismatch");
+    casadi_assert_message(f_.getNumOutputs()==1, "Auxiliary outputs of ImplicitFunctions are no longer allowed, cf. #669");
 
-void ImplicitFunctionInternal::evaluate_sens(int nfdir, int nadir, bool linsol_prepared) {
-  // Make sure that a linear solver has been provided
-  casadi_assert_message(!linsol_.isNull(),"Sensitivities of an implicit function requires a provided linear solver");
-  casadi_assert_message(!J_.isNull(),"Sensitivities of an implicit function requires an exact Jacobian");
-  
-  
-  // General scheme:  f(z,x_i) = 0
-  //
-  //  Forward sensitivities:
-  //     dot(f(z,x_i)) = 0
-  //     df/dz dot(z) + Sum_i df/dx_i dot(x_i) = 0
-  //
-  //     dot(z) = [df/dz]^(-1) [ Sum_i df/dx_i dot(x_i) ] 
-  //
-  //     dot(y_i) = dy_i/dz dot(z) + Sum_j dy_i/dx_i dot(x_i)
-  //
-  //  Adjoint sensitivitites:
-
-  if (!linsol_prepared) {
-    // Pass inputs
-    J_.setInput(output(),0);
-    for(int i=0; i<getNumInputs(); ++i)
-      J_.setInput(input(i),i+1);
-
-    // Evaluate jacobian
-    J_.evaluate();
-
-    // Pass non-zero elements, scaled by -gamma, to the linear solver
-    linsol_.setInput(J_.output(),0);
-
-    // Prepare the solution of the linear system (e.g. factorize)
-    linsol_.prepare();
-  }
-  
-  // Pass inputs to function
-  f_.setInput(output(0),0);
-  for(int i=0; i<getNumInputs(); ++i)
-    f_.input(i+1).set(input(i));
-
-  // Pass input seeds to function
-  for(int dir=0; dir<nfdir; ++dir){
-    f_.fwdSeed(0,dir).setZero();
+    // Allocate inputs
+    setNumInputs(f_.getNumInputs()-1);
     for(int i=0; i<getNumInputs(); ++i){
-      f_.fwdSeed(i+1,dir).set(fwdSeed(i,dir));
+      input(i) = f_.input(i+1);
     }
-  }
   
-  // Solve for the adjoint seeds
-  for(int dir=0; dir<nadir; ++dir){
-    // Negate adjoint seed and pass to function
-    Matrix<double>& faseed = f_.adjSeed(0,dir);
-    faseed.set(adjSeed(0,dir));
-    for(vector<double>::iterator it=faseed.begin(); it!=faseed.end(); ++it){
-      *it = -*it;
-    }
-    
-    // Solve the transposed linear system
-    linsol_.solve(&faseed.front(),1,true);
+    // Allocate output
+    setNumOutputs(1);
+    output(0) = f_.input(0);
+  
+    // Call the base class initializer
+    FXInternal::init();
 
-    // Set auxillary adjoint seeds
-    for(int oind=1; oind<getNumOutputs(); ++oind){
-      f_.adjSeed(oind,dir).set(adjSeed(oind,dir));
-    }
-  }
+    // Generate Jacobian if not provided
+    if(jac_.isNull()) jac_ = f_.jacobian(0,0);
+    jac_.init(false);
   
-  // Evaluate
-  f_.evaluate(nfdir,nadir);
+    // Check for structural singularity in the Jacobian
+    casadi_assert_message(!isSingular(jac_.output().sparsity()),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
   
-  // Get the forward sensitivities
-  for(int dir=0; dir<nfdir; ++dir){
-    // Negate intermediate result and copy to output
-    Matrix<double>& fsens = fwdSens(0,dir);
-    fsens.set(f_.fwdSens(0,dir));
-    for(vector<double>::iterator it=fsens.begin(); it!=fsens.end(); ++it){
-      *it = -*it;
+    // Get the linear solver creator function
+    if(linsol_.isNull()){
+      if(hasSetOption("linear_solver")){
+        linearSolverCreator linear_solver_creator = getOption("linear_solver");
+        
+        // Allocate an NLP solver
+        linsol_ = linear_solver_creator(jac_.output().sparsity());
+        
+        // Pass options
+        if(hasSetOption("linear_solver_options")){
+          const Dictionary& linear_solver_options = getOption("linear_solver_options");
+          linsol_.setOption(linear_solver_options);
+        }
+        
+        // Initialize
+        linsol_.init();
+      }
+    } else {
+      // Initialize the linear solver, if provided
+      linsol_.init(false);
+      casadi_assert(linsol_.input().sparsity()==jac_.output().sparsity());
     }
     
-    // Solve the linear system
-    linsol_.solve(&fsens.front());
+    // Allocate memory for directional derivatives
+    ImplicitFunctionInternal::updateNumSens(false);
+    
+    // No factorization yet;
+    fact_up_to_date_ = false;
   }
+
+  void ImplicitFunctionInternal::updateNumSens(bool recursive){
+    // Call the base class if needed
+    if(recursive) FXInternal::updateNumSens(recursive);
   
-  // Get auxillary forward sensitivities
-  if(getNumOutputs()>1){
-    // Pass the seeds to the implicitly defined variables
+    // Request more directional derivatives for the residual function
+    f_.requestNumSens(nfdir_,nadir_);
+  }
+
+  void ImplicitFunctionInternal::evaluate(int nfdir, int nadir){
+    // Mark factorization as out-of-date. TODO: make this conditional
+    fact_up_to_date_ = false;
+
+    // Solve the nonlinear system of equations
+    solveNonLinear();
+
+    // Quick return if no sensitivities
+    if(nfdir==0 && nadir==0) return;
+
+    // Make sure that a linear solver has been provided
+    casadi_assert_message(!linsol_.isNull(),"Sensitivities of an implicit function requires a provided linear solver");
+    casadi_assert_message(!jac_.isNull(),"Sensitivities of an implicit function requires an exact Jacobian");
+  
+    // Evaluate and factorize the Jacobian
+    if (!fact_up_to_date_) {
+      // Pass inputs
+      jac_.setInput(output(),0);
+      for(int i=0; i<getNumInputs(); ++i)
+        jac_.setInput(input(i),i+1);
+
+      // Evaluate jacobian
+      jac_.evaluate();
+
+      // Pass non-zero elements, scaled by -gamma, to the linear solver
+      linsol_.setInput(jac_.output(),0);
+
+      // Prepare the solution of the linear system (e.g. factorize)
+      linsol_.prepare();
+      fact_up_to_date_ = true;
+    }
+
+  
+    // General scheme:  f(z,x_i) = 0
+    //
+    //  Forward sensitivities:
+    //     dot(f(z,x_i)) = 0
+    //     df/dz dot(z) + Sum_i df/dx_i dot(x_i) = 0
+    //
+    //     dot(z) = [df/dz]^(-1) [ Sum_i df/dx_i dot(x_i) ] 
+    //
+    //     dot(y_i) = dy_i/dz dot(z) + Sum_j dy_i/dx_i dot(x_i)
+    //
+    //  Adjoint sensitivitites:
+
+  
+    // Pass inputs to function
+    f_.setInput(output(0),0);
+    for(int i=0; i<getNumInputs(); ++i)
+      f_.input(i+1).set(input(i));
+
+    // Pass input seeds to function
     for(int dir=0; dir<nfdir; ++dir){
-      f_.fwdSeed(0,dir).set(fwdSens(0,dir));
+      f_.fwdSeed(0,dir).setZero();
+      for(int i=0; i<getNumInputs(); ++i){
+        f_.fwdSeed(i+1,dir).set(fwdSeed(i,dir));
+      }
     }
+  
+    // Solve for the adjoint seeds
+    for(int dir=0; dir<nadir; ++dir){
+      // Negate adjoint seed and pass to function
+      Matrix<double>& faseed = f_.adjSeed(0,dir);
+      faseed.set(adjSeed(0,dir));
+      for(vector<double>::iterator it=faseed.begin(); it!=faseed.end(); ++it){
+        *it = -*it;
+      }
     
+      // Solve the transposed linear system
+      linsol_.solve(&faseed.front(),1,false);
+    }
+  
     // Evaluate
-    f_.evaluate(nfdir);
+    f_.evaluate(nfdir,nadir);
   
-    // Get the sensitivities
+    // Get the forward sensitivities
     for(int dir=0; dir<nfdir; ++dir){
-      for(int oind=1; oind<getNumOutputs(); ++oind){
-        fwdSens(oind,dir).set(f_.fwdSens(oind,dir));
+      // Negate intermediate result and copy to output
+      Matrix<double>& fsens = fwdSens(0,dir);
+      fsens.set(f_.fwdSens(0,dir));
+      for(vector<double>::iterator it=fsens.begin(); it!=fsens.end(); ++it){
+        *it = -*it;
+      }
+    
+      // Solve the linear system
+      linsol_.solve(&fsens.front(),1,true);
+    }
+  
+    // Get the adjoint sensitivities
+    for(int dir=0; dir<nadir; ++dir){
+      for(int i=0; i<getNumInputs(); ++i){
+        f_.adjSens(i+1,dir).get(adjSens(i,dir));
       }
     }
   }
-  
-  // Get the adjoint sensitivities
-  for(int dir=0; dir<nadir; ++dir){
-    for(int i=0; i<getNumInputs(); ++i){
-      f_.adjSens(i+1,dir).get(adjSens(i,dir));
+
+  void ImplicitFunctionInternal::evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given){
+    // Evaluate non-differentiated
+    vector<MX> argv = MXNode::getVector(arg);
+    if(!output_given){
+      *res[0] = callSelf(argv).front();
     }
+
+    // Quick return if no derivatives
+    int nfwd = fsens.size();
+    int nadj = aseed.size();
+    if(nfwd==0 && nadj==0) return;
+
+    // Temporaries
+    vector<int> row_offset(1,0);
+    vector<MX> rhs;
+
+    // Arguments when calling f/f_der
+    vector<MX> v;
+    int nf_in = f_.getNumInputs();
+    v.reserve(nf_in*(1+nfwd) + nadj);
+    v.push_back(*res[0]);
+    v.insert(v.end(),argv.begin(),argv.end());
+
+    // Get an expression for the Jacobian
+    MX J = jac_.call(v).front();
+
+    // Directional derivatives of f
+    FX f_der = f_.derivative(nfwd,nadj);
+
+    // Forward sensitivities, collect arguments for calling f_der
+    for(int d=0; d<nfwd; ++d){
+      v.push_back(MX::sparse(output().shape()));
+      argv = MXNode::getVector(fseed[d]);
+      v.insert(v.end(),argv.begin(),argv.end());
+    }
+
+    // Adjoint sensitivities, solve to get arguments for calling f_der
+    if(nadj>0){
+      for(int d=0; d<nadj; ++d){
+        rhs.push_back(trans(*aseed[d][0]));
+        row_offset.push_back(row_offset.back()+1);
+        *aseed[d][0] = MX();
+      }
+      rhs = vertsplit(J->getSolve(vertcat(rhs),false,linsol_),row_offset);
+      for(int d=0; d<nadj; ++d){
+        v.push_back(trans(rhs[d]));
+      }
+      row_offset.resize(1);
+      rhs.clear();
+    }
+  
+    // Propagate through the implicit function
+    v = f_der.call(v);
+    vector<MX>::const_iterator v_it = v.begin();
+
+    // Discard non-differentiated evaluation (change?)
+    v_it++;
+
+    // Solve for the forward sensitivities
+    if(nfwd>0){
+      for(int d=0; d<nfwd; ++d){
+        rhs.push_back(trans(*v_it++));
+        row_offset.push_back(row_offset.back()+1);        
+      }
+      rhs = vertsplit(J->getSolve(vertcat(rhs),true,linsol_),row_offset);
+      for(int d=0; d<nfwd; ++d){
+        if(fsens[d][0]!=0){
+          *fsens[d][0] = -rhs[d];
+        }
+      }
+      row_offset.resize(1);
+      rhs.clear();
+    }
+
+    // Collect adjoint sensitivities
+    for(int d=0; d<nadj; ++d){
+      // Discard adjoint corresponding to z
+      v_it++;
+
+      for(int i=0; i<asens[d].size(); ++i, ++v_it){
+        if(asens[d][i]!=0){
+          *asens[d][i] = - *v_it;
+        }
+      }
+    }
+    casadi_assert(v_it==v.end());
   }
-}
 
-ImplicitFunction ImplicitFunctionInternal::jac(int iind, int oind){
-  return jac(vector<int>(1,iind),oind);
-}
-
-ImplicitFunction ImplicitFunctionInternal::jac(const std::vector<int> iind, int oind){
-  // Single output
-  casadi_assert(oind==0);
-  
-  // Get the function
-  SXFunction f = shared_cast<SXFunction>(f_);
-  casadi_assert(!f.isNull());
-  
-  // Get the jacobians
-  Matrix<SX> Jz = f.jac(0,0);
-
-  // Number of equations
-  int nz = f.input(0).numel();
-
-  // All variables
-  vector<Matrix<SX> > f_in(f.getNumInputs());
-  f_in[0] = f.inputExpr(0);
-  for(int i=1; i<f.getNumInputs(); ++i)
-    f_in[i] = f.inputExpr(i);
-
-  // Augmented nonlinear equation
-  Matrix<SX> F_aug = f.outputExpr(0);
-
-  // Number of right hand sides
-  int nrhs = 1;
-  
-  // Augment variables and equations
-  for(vector<int>::const_iterator it=iind.begin(); it!=iind.end(); ++it){
-
-    // Get the jacobian
-    Matrix<SX> Jx = f.jac(*it+1,0);
-    
-    // Number of variables
-    int nx = f.input(*it+1).numel();
-
-    // Sensitivities
-    Matrix<SX> dz_dx = ssym("dz_dx", nz, nx);
-    
-    // Derivative equation
-    Matrix<SX> f_der = mul(Jz,dz_dx) + Jx;
-
-    // Append variables
-    f_in[0].append(vec(dz_dx));
-      
-    // Augment nonlinear equation
-    F_aug.append(vec(f_der));
-    
-    // Number of right hand sides
-    nrhs += nx;
-  }
-
-  // Augmented nonlinear equation
-  SXFunction f_aug(f_in, F_aug);
-
-  // Create new explciit function
-  ImplicitFunction ret;
-  ret.assignNode(create(f_aug,nrhs));
-  ret.setOption(dictionary());
-  
-  // Return the created solver
-  return ret;
-}
-
-ImplicitFunctionInternal::~ImplicitFunctionInternal(){
-}
-
-void ImplicitFunctionInternal::setJacobian(FX &J) {
-  J_ = J;
-}
- 
  
 } // namespace CasADi
 

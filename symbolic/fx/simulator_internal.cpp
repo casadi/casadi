@@ -35,6 +35,8 @@ namespace CasADi{
 SimulatorInternal::SimulatorInternal(const Integrator& integrator, const FX& output_fcn, const vector<double>& grid) : integrator_(integrator), output_fcn_(output_fcn), grid_(grid){
   setOption("name","unnamed simulator");
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
+  
+  inputScheme_ = SCHEME_IntegratorInput;
 }
   
 SimulatorInternal::~SimulatorInternal(){
@@ -67,6 +69,8 @@ void SimulatorInternal::init(){
 
     // Create the output function
     output_fcn_ = SXFunction(arg,out);
+    
+    outputScheme_ = SCHEME_IntegratorOutput;
   }
 
   // Initialize the output function

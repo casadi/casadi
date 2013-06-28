@@ -1,4 +1,0 @@
-
-matrix([-sin(a)*cos(b)*(-cos(a)*sin(b)*db-sin(a)*cos(b)*da)+sin(a)*sin(b)*(sin(a)*sin(b)*da-cos(a)*cos(b)*db)+cos(a)^2*da],[cos(a)*sin(b)^2*db+cos(a)*cos(b)^2*db],[sin(b)*(sin(a)*sin(b)*db-cos(a)*cos(b)*da)+cos(b)*(sin(a)*cos(b)*db+cos(a)*sin(b)*da)],[0]);
-
-matrix([.5931521815169765],[.5096765276243888],[.4108608376601288],[0]);

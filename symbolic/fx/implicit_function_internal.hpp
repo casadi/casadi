@@ -29,63 +29,62 @@
 
 namespace CasADi{
   
-// Forward declaration of internal class
-class ImplicitFunctionInternal;
+  // Forward declaration of internal class
+  class ImplicitFunctionInternal;
 
-/// Internal class
-class ImplicitFunctionInternal : public FXInternal{
+  /// Internal class
+  class ImplicitFunctionInternal : public FXInternal{
   public:
     /** \brief Constructor
-    *
-    * \param f   FX mapping from (n+1) inputs to 1 output.
-    */
-    ImplicitFunctionInternal(const FX& f, int nrhs);
+     *
+     * \param f   FX mapping from (n+1) inputs to 1 output.
+     */
+    ImplicitFunctionInternal(const FX& f, const FX& J, const LinearSolver& linsol);
         
     /// Destructor
     virtual ~ImplicitFunctionInternal() = 0;
     
+    /** \brief  Clone */
+    virtual ImplicitFunctionInternal* clone() const=0;
+    
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    
+    /** \brief  Create a new ImplicitFunctionInternal */
+    virtual ImplicitFunctionInternal* create(const FX& f, const FX& jac, const LinearSolver& linsol) const = 0;    
+
     /// Initialize
     virtual void init();
     
     /** \brief  Update the number of sensitivity directions during or after initialization */
     virtual void updateNumSens(bool recursive);
 
-    /// Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir) = 0;
-    
-    /// The function F(z, x1, x2, ..., xn) == 0
-    FX f_;
-    
+    /// Solve the system of equations and calculate derivatives
+    virtual void evaluate(int nfdir, int nadir);
+ 
+    /// Solve the nonlinear system of equations
+    virtual void solveNonLinear() = 0;
+
+    // The following functions are called internally from EvaluateMX. For documentation, see the MXNode class
+    //@{
+    virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given);
+    //@}
+
     /// Number of equations
-    int N_;
-    
-    /// Number of right hand sides
-    int nrhs_;
-    
-    /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const FX& f, int nrhs=1) const = 0;
-    
-    /** \brief Generate a linear solver for the sensitivity equations */
-    ImplicitFunction jac(int iind, int oind=0);
-    
-    /** \brief Generate a linear solver for the sensitivity equations */
-    ImplicitFunction jac(const std::vector<int> iind, int oind=0);
-    
-    /// Set the jacobian of F
-    void setJacobian(FX &J);
-    
-    /// Jacobian
-    FX J_;
+    int n_;
+
+    /// The function f(z, x1, x2, ..., xn) == 0
+    FX f_;
+       
+    /// Jacobian of f with respect to z
+    FX jac_;
     
     /// Linear solver
-    LinearSolver linsol_; 
-  protected:
-  
-    /** Calculate sensitivities of implicit solver
-    * \param linsol_prepared may specify that the linear solver is already prepared with the Jacobian
-    */
-    void evaluate_sens(int nfdir, int nadir, bool linsol_prepared=false);
-};
+    LinearSolver linsol_;
+
+    /// Factorization up-to-date?
+    bool fact_up_to_date_;
+  };
 
 
 

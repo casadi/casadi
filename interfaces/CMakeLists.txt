@@ -14,16 +14,12 @@ if(ACADO_FOUND)
   add_subdirectory(acado)
 endif(ACADO_FOUND)
 
-if(WITH_QPOASES)
+if(QPOASES_FOUND)
   add_subdirectory(qpoases)
 endif()
 
 if(KNITRO_FOUND)
   add_subdirectory(knitro)
-endif()
-
-if(LIFTOPT_FOUND)
-  add_subdirectory(liftopt)
 endif()
 
 if(CPLEX_FOUND)
@@ -34,7 +30,7 @@ if(WITH_CSPARSE)
   add_subdirectory(csparse)
 endif()
 
-if(WITH_DSDP)
+if(DSDP_FOUND)
   add_subdirectory(dsdp)
 endif()
 

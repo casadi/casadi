@@ -115,10 +115,9 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   void evaluateGen(T1 nfdir_c, T2 nadir_c);
   
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+  virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                       const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                      const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-                      bool output_given);
+                      const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
                           
   /** \brief  Check if smooth */
   bool isSmooth() const;
@@ -132,7 +131,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /** \brief  DATA MEMBERS */
   
   /** \brief  An elemenent of the algorithm, namely a binary operation */
-  typedef SXAlgEl AlgEl;
+  typedef ScalarAtomic AlgEl;
   
   /** \brief  An elemenent of the tape */
   template<typename T>
@@ -163,8 +162,8 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /** \brief  Update the number of sensitivity directions during or after initialization */
   virtual void updateNumSens(bool recursive);
 
-  /** \brief Generate code for the C functon */
-  virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
+  /** \brief Generate code for the declarations of the C function */
+  virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
 
   /** \brief Generate code for the body of the C function */
   virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;

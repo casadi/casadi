@@ -31,8 +31,7 @@ from numpy import *
 x=SX("x")
 y=SX("y")
 
-f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
-g=SXFunction([vertcat([x,y])],[x+y])
+nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     
 #! Simple callback
 #! ===============
@@ -45,12 +44,12 @@ class MyCallback:
     self.iter = 0 
   def __call__(self,f,*args):
     print "====Hey, I'm an iteration===="
-    print "X_OPT = ", f.input(NLP_X_OPT)
+    print "X_OPT = ", f.getInput("x")
     print f.getStats()
     self.iter = self.iter + 1
     if self.iter > 5:
       print "5 Iterations, that is quite enough!"
-      f.output(0).set(1) # With this statement you can halt the iterations
+      f.setOutput(1,0) # With this statement you can halt the iterations
 
 mycallback = MyCallback()
 
@@ -58,20 +57,21 @@ mycallback = MyCallback()
 #! The sparsities given here as input must match the sparsities of the outputs of our NLP Solver
 nd = 2 # Number of decision variables
 nc = 1 # number of constraints
+np = 0 # number of parameters
 
-c = PyFunction( mycallback, nlpsolverOut(x_opt=sp_dense(nd,1), cost=sp_dense(1,1), lambda_x=sp_dense(nd,1), lambda_g = sp_dense(nc,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
+c = PyFunction( mycallback, nlpSolverOut(x=sp_dense(nd,1), f=sp_dense(1,1), lam_x=sp_dense(nd,1), lam_g = sp_dense(nc,1), lam_p = sp_dense(np,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
 c.init()
 
 
-solver = IpoptSolver(f,g)
+solver = IpoptSolver(nlp)
 solver.setOption("iteration_callback",c)
 solver.setOption("tol",1e-8)
 solver.setOption("max_iter",20)
 solver.init()
-solver.input(NLP_LBX).set([-10]*2)
-solver.input(NLP_UBX).set([10]*2)
-solver.input(NLP_LBG).set([-10])
-solver.input(NLP_UBG).set([10])
+solver.setInput([-10]*2,"lbx")
+solver.setInput([10]*2,"ubx")
+solver.setInput([-10],"lbg")
+solver.setInput([10],"ubg")
 solver.solve()
 
 #! Matplotlib callback
@@ -94,9 +94,9 @@ class MyCallback:
     
     for i in range(x_.shape[0]):
       for j in range(x_.shape[1]):
-        f.input().set([x_[i,j],y_[i,j]])
-        f.evaluate()
-        z_[i,j] = float(f.output())
+        nlp.setInput([x_[i,j],y_[i,j]],"x")
+        nlp.evaluate()
+        z_[i,j] = float(nlp.getOutput("f"))
     contourf(x_,y_,z_)
     colorbar()
     title('Iterations of Rosenbrock')
@@ -106,7 +106,7 @@ class MyCallback:
     self.y_sols = []
     
   def __call__(self,f,*args):
-    sol = f.input(NLP_X_OPT)
+    sol = f.getInput("x")
     self.x_sols.append(float(sol[0]))
     self.y_sols.append(float(sol[1]))
     subplot(111)
@@ -123,19 +123,19 @@ mycallback = MyCallback()
 
 #! We create a casadi function out of this callable object.
 #! The sparsities given here as input must match the sparsities of the outputs of our NLP Solver
-c = PyFunction( mycallback, nlpsolverOut(x_opt=sp_dense(nd,1), cost=sp_dense(1,1), lambda_x=sp_dense(nd,1), lambda_g = sp_dense(nc,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
+c = PyFunction( mycallback, nlpSolverOut(x=sp_dense(nd,1), f=sp_dense(1,1), lam_x=sp_dense(nd,1), lam_g = sp_dense(nc,1), lam_p = sp_dense(np,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
 c.init()
 
 
-solver = IpoptSolver(f,g)
+solver = IpoptSolver(nlp)
 solver.setOption("iteration_callback",c)
 solver.setOption("tol",1e-8)
 solver.setOption("max_iter",50)
 solver.init()
-solver.input(NLP_LBX).set([-10]*2)
-solver.input(NLP_UBX).set([10]*2)
-solver.input(NLP_LBG).set([-10])
-solver.input(NLP_UBG).set([10])
+solver.setInput([-10]*2,"lbx")
+solver.setInput([10]*2,"ubx")
+solver.setInput([-10],"lbg")
+solver.setInput([10],"ubg")
 solver.solve()
 
 #! By setting matplotlib interactivity off, we can inspect the figure at ease

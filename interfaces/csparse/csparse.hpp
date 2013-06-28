@@ -28,54 +28,54 @@
 namespace CasADi{
 
   
-/** \brief  Forward declaration of internal class */
-class CSparseInternal;
+  /** \brief  Forward declaration of internal class */
+  class CSparseInternal;
 
-/** \brief  LinearSolver with CSparse Interface
-*
- @copydoc LinearSolver_doc
-*  
-* CSparse is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
-*
-* The usual procedure to use CSparse is: \n
-*  -# init()
-*  -# set the first input (A)
-*  -# prepare()
-*  -# set the second input (b)
-*  -# solve()
-*  -# Repeat steps 4 and 5 to work with other b vectors.
-*
-* The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
-*
-*/
-class CSparse : public LinearSolver{
-public:
+  /** \brief  LinearSolver with CSparse Interface
+   *
+   @copydoc LinearSolver_doc
+   *  
+   * CSparse is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+   *
+   * The usual procedure to use CSparse is: \n
+   *  -# init()
+   *  -# set the first input (A)
+   *  -# prepare()
+   *  -# set the second input (b)
+   *  -# solve()
+   *  -# Repeat steps 4 and 5 to work with other b vectors.
+   *
+   * The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
+   *
+   */
+  class CSparse : public LinearSolver{
+  public:
 
-  /// Default (empty) constructor
-  CSparse();
+    /// Default (empty) constructor
+    CSparse();
   
-  /// Create a linear solver given a sparsity pattern
-  CSparse(const CRSSparsity& sp);
+    /// Create a linear solver given a sparsity pattern
+    CSparse(const CRSSparsity& sp, int nrhs=1);
   
-  /** \brief  Access internal functions and data members */
-  CSparseInternal* operator->();
+    /** \brief  Access internal functions and data members */
+    CSparseInternal* operator->();
   
-  /** \brief  Access internal functions and data members */
-  const CSparseInternal* operator->() const;
+    /** \brief  Access internal functions and data members */
+    const CSparseInternal* operator->() const;
   
-  /// Check if the node is pointing to the right type of object
-  virtual bool checkNode() const;
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
   
-  /// Static creator function
-  #ifdef SWIG
-  %callback("%s_cb");
-  #endif
-  static LinearSolver creator(const CRSSparsity& sp){ return CSparse(sp);}
-  #ifdef SWIG
-  %nocallback;
-  #endif
+    /// Static creator function
+#ifdef SWIG
+    %callback("%s_cb");
+#endif
+    static LinearSolver creator(const CRSSparsity& sp){ return CSparse(sp);}
+#ifdef SWIG
+    %nocallback;
+#endif
   
-};
+  };
 
 } // namespace CasADi
 

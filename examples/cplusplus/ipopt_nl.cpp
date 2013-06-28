@@ -39,31 +39,20 @@ int main(int argc, char **argv){
   // Get the problem
   std::string problem = (argc==2) ? argv[1] : "../examples/nl_files/hs107.nl";
   
-  // Create an NLP instance
-  SymbolicNLP nlp;
-
   // Parse an NL-file
-  nlp.parseNL(problem);
+  SymbolicNLP nl;
+  nl.parseNL(problem);
   
-  // Objective function
-  SXFunction ffcn(nlp.x,nlp.f);
-
-  // Constraint function (null pointer)
-  SXFunction gfcn;
-
-  // Create constraint function, if there are nonlinear constraints
-  if(nlp.g.size()>0){
-    gfcn = SXFunction(nlp.x,nlp.g);
-  }
+  // NLP
+  SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
 
   // Allocate NLP solver
-  IpoptSolver nlp_solver(ffcn,gfcn);
+  IpoptSolver nlp_solver(nlp);
     
   // Set options
   //  nlp_solver.setOption("max_iter",10);
   //  nlp_solver.setOption("verbose",true);
   //  nlp_solver.setOption("linear_solver","ma57");
-  nlp_solver.setOption("generate_hessian",true);
   //  nlp_solver.setOption("hessian_approximation","limited-memory");
   //  nlp_solver.setOption("derivative_test","second-order");
   
@@ -71,11 +60,11 @@ int main(int argc, char **argv){
   nlp_solver.init();
   
   // Pass the bounds and initial guess
-  nlp_solver.setInput(nlp.x_lb,NLP_LBX);
-  nlp_solver.setInput(nlp.x_ub,NLP_UBX);
-  nlp_solver.setInput(nlp.g_lb,NLP_LBG);
-  nlp_solver.setInput(nlp.g_ub,NLP_UBG);
-  nlp_solver.setInput(nlp.x_init,NLP_X_INIT);
+  nlp_solver.setInput(nl.x_lb,"lbx");
+  nlp_solver.setInput(nl.x_ub,"ubx");
+  nlp_solver.setInput(nl.g_lb,"lbg");
+  nlp_solver.setInput(nl.g_ub,"ubg");
+  nlp_solver.setInput(nl.x_init,"x0");
   
   // Solve NLP
   nlp_solver.solve();

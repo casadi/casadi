@@ -29,46 +29,41 @@
 
 namespace CasADi{
 
-/**
-@copydoc NLPSolver_doc
-*/
-class KnitroInternal : public NLPSolverInternal{
+  /**
+     @copydoc NLPSolver_doc
+  */
+  class KnitroInternal : public NLPSolverInternal{
 
-public:
-  explicit KnitroInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
-  virtual ~KnitroInternal();
-  virtual KnitroInternal* clone() const{ return new KnitroInternal(*this);}
+  public:
+    explicit KnitroInternal(const FX& nlp);
+    virtual ~KnitroInternal();
+    virtual KnitroInternal* clone() const{ return new KnitroInternal(*this);}
 
-  virtual void init();
-  virtual void evaluate(int nfdir, int nadir);
+    virtual void init();
+    virtual void evaluate(int nfdir, int nadir);
 
-  // KNITRO callback functions
-  void evalfc(const double* x, double& obj, double *c);
-  void evalga(const double* x, double* objGrad, double* jac);
-  void evalh(const double* x, const double* lambda, double* hessian);
+    // KNITRO callback functions
+    void evalfc(const double* x, double& obj, double *c);
+    void evalga(const double* x, double* objGrad, double* jac);
+    void evalh(const double* x, const double* lambda, double* hessian);
   
-  // KNITRO callback wrapper
-  static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ, const int nnzH, const double * const x,
-                      const double * const lambda,double * const obj, double * const c, double * const objGrad,
-                      double * const jac, double * const hessian, double * const hessVector, void *userParams);
+    // KNITRO callback wrapper
+    static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ, const int nnzH, const double * const x,
+			const double * const lambda,double * const obj, double * const c, double * const objGrad,
+			double * const jac, double * const hessian, double * const hessVector, void *userParams);
+                        
+    // KNITRO context pointer
+    KTR_context_ptr kc_handle_;
   
-                      
-  /// Gradient of the objective function
-  FX GF_; 
-                      
-  // KNITRO context pointer
-  KTR_context_ptr kc_handle_;
+    // KNITRO double parameter
+    std::map<std::string, double> double_param_;
   
-  // KNITRO double parameter
-  std::map<std::string, double> double_param_;
+    // KNITRO int parameter
+    std::map<std::string, int> int_param_;
   
-  // KNITRO int parameter
-  std::map<std::string, int> int_param_;
-  
-  // KNITRO string parameter
-  std::map<std::string, std::string> string_param_;
-  
-};
+    // KNITRO string parameter
+    std::map<std::string, std::string> string_param_;
+  };
 
 } // namespace CasADi
 

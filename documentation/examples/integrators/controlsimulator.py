@@ -68,10 +68,10 @@ sim.setOption("integrator",CVodesIntegrator)
 #! Each control interval will be subdived in 8
 sim.setOption("nf",8) 
 sim.init()
-sim.input(CONTROLSIMULATOR_X0).set([0,0])
-sim.input(CONTROLSIMULATOR_P).set([1,0.1,1])
+sim.setInput([0,0],"x0")
+sim.setInput([1,0.1,1],"p")
 #! Our 9 control intervals have the following prescribed values for u:
-sim.input(CONTROLSIMULATOR_U).set([0,-0.2,0,0.5,0,0,0,0.2,-0.8]) 
+sim.setInput([0,-0.2,0,0.5,0,0,0,0.2,-0.8],"u") 
 sim.evaluate()
 
 #! Obtain the fine time grid
@@ -79,12 +79,12 @@ tsf = sim.getMinorT()
 
 figure(1)
 #! Plot the default output, i.e. the states
-plot(tsf,array(sim.output())[:,0])
+plot(tsf,sim.getOutput()[:,0])
 xlabel("t")
 ylabel("x")
 
 #! Plot the controls
-plot(ts[:-1],array(sim.input(CONTROLSIMULATOR_U))[:,0],'o') # Sampled on the coarse grid
+plot(ts[:-1],sim.getInput("u")[:,0],'o') # Sampled on the coarse grid
 plot(tsf[:-1],array(sim.getMinorU())[:,0],'.')           # Sampled on the fine grid 
 legend(('x','u (coarse)','u (fine)'))
 
@@ -110,16 +110,16 @@ sim.setOption("integrator",CVodesIntegrator)
 #! Each control interval will be subdived in 8
 sim.setOption("nf",8) 
 sim.init()
-sim.input(CONTROLSIMULATOR_X0).set([0,0])
-sim.input(CONTROLSIMULATOR_P).set([1,0.1,1])
+sim.setInput([0,0],"x0")
+sim.setInput([1,0.1,1],"p")
 #! Our 9 control intervals have the following prescribed values for u:
-sim.input(CONTROLSIMULATOR_U).set([0,-0.2,0,0.5,0,0,0,0.2,-0.8]) 
+sim.setInput([0,-0.2,0,0.5,0,0,0,0.2,-0.8],"u") 
 sim.evaluate()
 
 figure(1)
 
-plot(tsf,array(sim.output(1)),'x') 
-plot(tsf,array(sim.output(0)),'*') 
+plot(tsf,sim.getOutput(1),'x') 
+plot(tsf,sim.getOutput(0),'*') 
 legend(('x','u (coarse)','u (fine)','u (output)','x0 (output)'),loc='lower left')
 show()
 
@@ -158,10 +158,10 @@ sim.setOption("control_interpolation","linear")
 sim.setOption("control_endpoint",True)
 sim.setOption("nf",8) 
 sim.init()
-sim.input(CONTROLSIMULATOR_X0).set([0,0])
-sim.input(CONTROLSIMULATOR_P).set([1,0.1,1])
+sim.setInput([0,0],"x0")
+sim.setInput([1,0.1,1],"p")
 #! CONTROLSIMULATOR_U is larger, it has a value at the end of the last control interval, such that interpolation can happen
-sim.input(CONTROLSIMULATOR_U).set([0,-0.2,0,0.5,0,0,0,0.2,-0.8,0]) 
+sim.setInput([0,-0.2,0,0.5,0,0,0,0.2,-0.8,0],"u") 
 sim.evaluate()
 
 #! Obtain the fine time grid
@@ -169,13 +169,13 @@ tsf = sim.getMinorT()
 
 figure(2)
 #! Plot the default output, i.e. the states
-plot(tsf,array(sim.output())[:,0])
+plot(tsf,sim.getOutput()[:,0])
 xlabel("t")
 ylabel("x")
 
 #! Plot the controls
-plot(ts,array(sim.input(CONTROLSIMULATOR_U))[:,0],'o') # Sampled on the coarse grid
-plot(tsf,sim.output(1),'-')           # Sampled on the fine grid 
+plot(ts,sim.getInput("u")[:,0],'o') # Sampled on the coarse grid
+plot(tsf,sim.getOutput(1),'-')           # Sampled on the fine grid 
 legend(('x','u (coarse)','u (fine)'))
 
 show()

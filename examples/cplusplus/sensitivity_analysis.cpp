@@ -169,30 +169,30 @@ int main(){
       I.init();
       
       // Integrate to get results
-      I.setInput(x0,INTEGRATOR_X0);
-      I.setInput(u0,INTEGRATOR_P);
+      I.setInput(x0,"x0");
+      I.setInput(u0,"p");
       I.evaluate();
-      DMatrix xf = I.output(INTEGRATOR_XF);
-      DMatrix qf = I.output(INTEGRATOR_QF);
+      DMatrix xf = I.output("xf");
+      DMatrix qf = I.output("qf");
       cout << setw(50) << "Unperturbed solution: " << "xf  = " << xf <<  ", qf  = " << qf << endl;
 
       // Perturb solution to get a finite difference approximation
       double h = 0.001;
-      I.setInput(u0+h,INTEGRATOR_P);
+      I.setInput(u0+h,"p");
       I.evaluate();
-      DMatrix xf_pert = I.output(INTEGRATOR_XF);
-      DMatrix qf_pert = I.output(INTEGRATOR_QF);
+      DMatrix xf_pert = I.output("xf");
+      DMatrix qf_pert = I.output("qf");
       cout << setw(50) << "Finite difference approximation: " << "d(xf)/d(p) = " << (xf_pert-xf)/h << ", d(qf)/d(p) = " << (qf_pert-qf)/h << endl;
 
       // Operator overloading approach
-      I.setInput(x0,INTEGRATOR_X0);
-      I.setInput(u0,INTEGRATOR_P);
-      I.setFwdSeed(0.,INTEGRATOR_X0);
-      I.setFwdSeed(1.,INTEGRATOR_P);
+      I.setInput(x0,"x0");
+      I.setInput(u0,"p");
+      I.setFwdSeed(0.,"x0");
+      I.setFwdSeed(1.,"p");
       I.reset(1,0,0);
       I.integrate(tf);
-      DMatrix oo_xf = I.fwdSens(INTEGRATOR_XF);
-      DMatrix oo_qf = I.fwdSens(INTEGRATOR_QF);
+      DMatrix oo_xf = I.fwdSens("xf");
+      DMatrix oo_qf = I.fwdSens("qf");
       cout << setw(50) << "Forward sensitivities via OO: " << "d(xf)/d(p) = " << oo_xf << ", d(qf)/d(p) = " << oo_qf << endl;
 
       // Calculate once, forward

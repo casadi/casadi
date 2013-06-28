@@ -57,13 +57,13 @@ int main() {
   for(int rep=0; rep<2; ++rep){
     OOQPSolver qp_solver(H.sparsity(), A.sparsity());
     qp_solver.init();
-    qp_solver.setInput(A,QP_A);
-    qp_solver.setInput(H,QP_H);
-    qp_solver.setInput(g,QP_G);
-    qp_solver.setInput(lb,QP_LBX);
-    qp_solver.setInput(ub,QP_UBX);
-    qp_solver.setInput(lbA,QP_LBA);
-    qp_solver.setInput(ubA,QP_UBA);
+    qp_solver.setInput(A,"a");
+    qp_solver.setInput(H,"h");
+    qp_solver.setInput(g,"g");
+    qp_solver.setInput(lb,"lbx");
+    qp_solver.setInput(ub,"ubx");
+    qp_solver.setInput(lbA,"lba");
+    qp_solver.setInput(ubA,"uba");
     qp_solver.evaluate();
     qp_solver.evaluate();
     qp_solver.evaluate();
