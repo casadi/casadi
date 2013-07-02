@@ -86,7 +86,7 @@ int main(){
   FX nlp = MXFunction(nlpIn("x",x),nlpOut("f",f,"g",g));
   nlp.init();
 
-  // Gradient of the Lagrangian
+  // Gradient of the objective
   FX grad_f = nlp.gradient("x","f");
   grad_f.init();
 
