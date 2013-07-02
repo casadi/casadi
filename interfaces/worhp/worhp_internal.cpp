@@ -609,6 +609,8 @@ namespace CasADi{
     
     // Prepare the solver
     reset();
+    
+    if (inputs_check_) checkInputs();
     checkInitialBounds();
   
     // Reset the counters

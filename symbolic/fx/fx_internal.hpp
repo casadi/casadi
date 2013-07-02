@@ -187,6 +187,9 @@ namespace CasADi{
     
     /** \brief  Print */
     virtual void repr(std::ostream &stream) const;
+    
+    /** \brief Check if the numerical values of the supplied bounds make sense */
+    virtual void checkInputs() const {};
             
     /** \brief Get the unidirectional or bidirectional partition */
     void getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& D2, bool compact, bool symmetric);
@@ -342,6 +345,9 @@ namespace CasADi{
     
     /// Errors are thrown when NaN is produced
     bool regularity_check_;
+    
+    /// Errors are thrown if numerical values of inputs look bad
+    bool inputs_check_;
     
   };
 

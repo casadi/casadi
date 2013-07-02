@@ -35,6 +35,33 @@ except:
 
 class QCQPSolverTests(casadiTestCase):
 
+  def testboundsviol(self):
+    H = 1e-6*DMatrix([[1,0],[0,1]])
+    G = DMatrix([2,1])
+    A = DMatrix(0,2)
+    P = 2*DMatrix([[1,0],[0,2]])
+    Q = DMatrix([2,3])
+    R = DMatrix([-7])
+    LBX = DMatrix([ -inf,-3 ])
+    UBX = DMatrix([ inf, -inf ])
+    
+    for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
+      solver = qcqpsolver(qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
+      solver.setOption(qcqp_options)
+      solver.init()
+
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(P,"p")
+      solver.setInput(Q,"q")
+      solver.setInput(R,"r")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+
+      with self.assertRaises(Exception):
+        solver.solve()
+      
   def test_bounds(self):
     #  min  1/2 x' H x + 2 x + y
     #   x,y

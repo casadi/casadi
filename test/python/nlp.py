@@ -55,6 +55,39 @@ except:
   
 
 class NLPtests(casadiTestCase):
+
+  def testboundsviol(self):
+    x=SX("x")
+    nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2,g=x))
+    
+    for Solver, solver_options in solvers:
+      solver = Solver(nlp)
+      for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order" }).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+       
+      solver.init()
+      solver.setInput([-10],"lbx")
+      solver.setInput([-20],"ubx")
+      solver.setInput([-10],"lbg")
+      solver.setInput([10],"ubg")
+      with self.assertRaises(Exception):
+        solver.solve()
+
+    for Solver, solver_options in solvers:
+      solver = Solver(nlp)
+      for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order" }).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+       
+      solver.init()
+      solver.setInput([-10],"lbx")
+      solver.setInput([10],"ubx")
+      solver.setInput([-10],"lbg")
+      solver.setInput([-20],"ubg")
+      with self.assertRaises(Exception):
+        solver.solve()
+        
   def testIPOPT(self):
     x=SX("x")
     nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2,g=x))

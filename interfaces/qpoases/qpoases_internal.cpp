@@ -165,6 +165,8 @@ void QPOasesInternal::init(){
 
 void QPOasesInternal::evaluate(int nfdir, int nadir) {
   if (nfdir!=0 || nadir!=0) throw CasadiException("QPOasesInternal::evaluate() not implemented for forward or backward mode");
+  
+  if (inputs_check_) checkInputs();
 
   if(verbose()){
 //     cout << "X_INIT = " << input(QP_SOLVER_X_INIT) << endl;

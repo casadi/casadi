@@ -49,6 +49,8 @@ SOCPQCQPInternal::~SOCPQCQPInternal(){
 void SOCPQCQPInternal::evaluate(int nfdir, int nadir) {
   if (nfdir!=0 || nadir!=0) throw CasadiException("SOCPQCQPInternal::evaluate() not implemented for forward or backward mode");
 
+  if (inputs_check_) checkInputs();
+  
   // Pass inputs of QCQP to SOCP form 
   std::copy(input(QCQP_SOLVER_A).begin(),input(QCQP_SOLVER_A).end(),socpsolver_.input(SOCP_SOLVER_A).begin());
   

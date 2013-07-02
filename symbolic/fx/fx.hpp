@@ -404,6 +404,9 @@ namespace CasADi{
   
     /** \brief Remove modules to be monitored */
     void removeMonitor(const std::string& mon);
+    
+    /** \brief Check if the numerical values of the supplied bounds make sense */
+    void checkInputs() const;
 
   };
 } // namespace CasADi
