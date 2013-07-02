@@ -58,6 +58,7 @@ namespace CasADi{
     addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","inputs|outputs");
     addOption("regularity_check",         OT_BOOLEAN,             true,          "Throw exceptions when NaN or Inf appears during evaluation");
+    addOption("inputs_check",         OT_BOOLEAN,             true,          "Throw exceptions when the numerical values of the inputs don't make sense");
     addOption("gather_stats",             OT_BOOLEAN,             false,         "Flag to indicate wether statistics must be gathered");
   
     verbose_ = false;
@@ -126,6 +127,8 @@ namespace CasADi{
     monitor_outputs_ = monitored("outputs");
   
     gather_stats_ = getOption("gather_stats");
+    
+    inputs_check_ = getOption("inputs_check");
 
     // Mark the function as initialized
     is_init_ = true;

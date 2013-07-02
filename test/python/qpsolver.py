@@ -51,6 +51,74 @@ except:
 
 class QPSolverTests(casadiTestCase):
 
+  def testboundsviol(self):
+  
+    H = DMatrix([[1,-1],[-1,2]])
+    G = DMatrix([-2,-6])
+    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
+    
+    LBA = DMatrix([-inf]*3)
+    UBA = DMatrix([2, 2, 3])
+
+    LBX = DMatrix([0]*2)
+    UBX = DMatrix([inf,-inf])
+
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      self.message("general_convex: " + str(qpsolver))
+
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
+
+      with self.assertRaises(Exception):
+        solver.solve()
+
+    H = DMatrix([[1,-1],[-1,2]])
+    G = DMatrix([-2,-6])
+    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
+    
+    LBA = DMatrix([-inf,5,-inf])
+    UBA = DMatrix([2, 2, 3])
+
+    LBX = DMatrix([0]*2)
+    UBX = DMatrix([inf]*2)
+
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      self.message("general_convex: " + str(qpsolver))
+
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
+
+      with self.assertRaises(Exception):
+        solver.solve()
+        
   def test_scalar(self):
     # 1/2 x H x + G' x
     H = DMatrix([1])

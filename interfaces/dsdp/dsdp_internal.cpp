@@ -192,6 +192,9 @@ void DSDPInternal::init(){
 }
 
 void DSDPInternal::evaluate(int nfdir, int nadir) {
+
+  if (inputs_check_) checkInputs();
+  
   int info;
   
   // Copy bounds

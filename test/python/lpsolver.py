@@ -43,6 +43,57 @@ except:
 
 class LPSolverTests(casadiTestCase):
 
+  def testboundsviol(self):
+    A = DMatrix([[-1,1],[1,1],[1,-2]])
+    LBA = DMatrix([ -inf, 2, -inf ])
+    UBA = DMatrix([ 1, -inf, 4 ])
+    LBX = DMatrix([ -inf, 0 ])
+    UBX = DMatrix([ inf, inf ])
+    c = DMatrix([ 2.0, 1.0 ])
+    
+    for lpsolver, lp_options, re_init in lpsolvers:
+      self.message("lpsolver: " + str(lpsolver))
+
+      solver = lpsolver(lpStruct(a=A.sparsity()))
+      solver.setOption(lp_options)
+      solver.init()
+
+      solver.setInput(c,"c")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
+      
+    
+      with self.assertRaises(Exception):
+        solver.solve()
+
+    A = DMatrix([[-1,1],[1,1],[1,-2]])
+    LBA = DMatrix([ -inf, 2, -inf ])
+    UBA = DMatrix([ 1, inf, 4 ])
+    LBX = DMatrix([ -inf, 0 ])
+    UBX = DMatrix([ inf, -inf ])
+    c = DMatrix([ 2.0, 1.0 ])
+    
+    for lpsolver, lp_options, re_init in lpsolvers:
+      self.message("lpsolver: " + str(lpsolver))
+
+      solver = lpsolver(lpStruct(a=A.sparsity()))
+      solver.setOption(lp_options)
+      solver.init()
+
+      solver.setInput(c,"c")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
+      
+    
+      with self.assertRaises(Exception):
+        solver.solve()
+        
   def test_bounds(self):
     #  min  2 x +y
     #   x,y

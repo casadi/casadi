@@ -345,5 +345,9 @@ namespace CasADi{
     return (*this)->output_struct();
   }  
 
+  void FX::checkInputs() const {
+    return (*this)->checkInputs();
+  }
+
 } // namespace CasADi
 

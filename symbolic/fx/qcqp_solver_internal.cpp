@@ -112,6 +112,15 @@ void QCQPSolverInternal::evaluate(int nfdir, int nadir){
 void QCQPSolverInternal::solve(){
   throw CasadiException("QCQPSolverInternal::solve: Not implemented");
 }
+
+void QCQPSolverInternal::checkInputs() const {
+  for (int i=0;i<input(QCQP_SOLVER_LBX).size();++i) {
+    casadi_assert_message(input(QCQP_SOLVER_LBX).at(i)<=input(QCQP_SOLVER_UBX).at(i),"LBX[i] <= UBX[i] was violated for i=" << i << ". Got LBX[i]=" << input(QCQP_SOLVER_LBX).at(i) << " and UBX[i]=" << input(QCQP_SOLVER_UBX).at(i));
+  }
+  for (int i=0;i<input(QCQP_SOLVER_LBA).size();++i) {
+    casadi_assert_message(input(QCQP_SOLVER_LBA).at(i)<=input(QCQP_SOLVER_UBA).at(i),"LBA[i] <= UBA[i] was violated for i=" << i << ". Got LBA[i]=" << input(QCQP_SOLVER_LBA).at(i) << " and UBA[i]=" << input(QCQP_SOLVER_UBA).at(i));
+  }
+}
  
 } // namespace CasADi
 

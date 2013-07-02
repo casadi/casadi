@@ -295,5 +295,14 @@ namespace CasADi{
     }
     return spHessLag;
   }
+  
+  void NLPSolverInternal::checkInputs() const {
+    for (int i=0;i<input(NLP_SOLVER_LBX).size();++i) {
+      casadi_assert_message(input(NLP_SOLVER_LBX).at(i)<=input(NLP_SOLVER_UBX).at(i),"LBX[i] <= UBX[i] was violated for i=" << i << ". Got LBX[i]=" << input(NLP_SOLVER_LBX).at(i) << " and UBX[i]=" << input(NLP_SOLVER_UBX).at(i));
+    }
+    for (int i=0;i<input(NLP_SOLVER_LBG).size();++i) {
+      casadi_assert_message(input(NLP_SOLVER_LBG).at(i)<=input(NLP_SOLVER_UBG).at(i),"LBG[i] <= UBG[i] was violated for i=" << i << ". Got LBG[i]=" << input(NLP_SOLVER_LBG).at(i) << " and UBG[i]=" << input(NLP_SOLVER_UBG).at(i));
+    }
+  }
 
 } // namespace CasADi

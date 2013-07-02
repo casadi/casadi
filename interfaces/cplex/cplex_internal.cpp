@@ -191,6 +191,7 @@ void CplexInternal::init(){
 
 void CplexInternal::evaluate(int nfdir, int nadir){
 
+  if (inputs_check_) checkInputs();
   casadi_assert(nfdir == 0 && nadir == 0);
 
   int status;

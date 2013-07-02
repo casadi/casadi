@@ -313,6 +313,32 @@ class SDPtests(casadiTestCase):
     self.checkarray(dsp.getOutput("lam_x"),DMatrix([0,-1]),digits=5)
 
   @requires("DSDPSolver")
+  def test_linear_interpolation1_A_boundsviol(self):
+
+    A = DMatrix([[1,1]])
+    c = DMatrix([2,3])
+    
+    dsp = DSDPSolver(sdpStruct(a=A.sparsity(),g=sp_dense(0,0),f=sp_dense(0,0)))
+    dsp.init()
+    dsp.setInput(c,"c")
+    dsp.setInput(A,"a")
+    dsp.setInput([0,0],"lbx")
+    dsp.setInput([inf,-3],"ubx")
+    dsp.setInput([1],"lba")
+    dsp.setInput([inf],"uba")
+    
+    with self.assertRaises(Exception):
+      solver.evaluate()
+      
+    dsp.setInput([0,0],"lbx")
+    dsp.setInput([inf,inf],"ubx")
+    dsp.setInput([9],"lba")
+    dsp.setInput([6],"uba")
+    
+    with self.assertRaises(Exception):
+      solver.evaluate()
+    
+  @requires("DSDPSolver")
   def test_linear_interpolation1_A(self):
     self.message("linear interpolation1")
 

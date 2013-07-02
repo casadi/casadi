@@ -97,6 +97,8 @@ OOQPInternal::~OOQPInternal(){
 void OOQPInternal::evaluate(int nfdir, int nadir) {
   casadi_assert_message(nfdir==0 && nadir==0, "OOQPSolve::evaluate() not implemented for forward or backward mode");
   
+  if (inputs_check_) checkInputs();
+  
   // Copy the bounds on X
   std::copy(input(QP_SOLVER_LBX).data().begin(),input(QP_SOLVER_LBX).data().end(),lbX_.begin());
   std::copy(input(QP_SOLVER_UBX).data().begin(),input(QP_SOLVER_UBX).data().end(),ubX_.begin());

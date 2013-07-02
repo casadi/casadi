@@ -242,6 +242,8 @@ namespace CasADi{
   void IpoptInternal::evaluate(int nfdir, int nadir){
     casadi_assert(nfdir==0 && nadir==0);
 
+    if (inputs_check_) checkInputs();
+    
     checkInitialBounds();
 
     // Reset the counters
