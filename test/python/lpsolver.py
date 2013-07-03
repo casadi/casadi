@@ -37,7 +37,7 @@ try:
   DSDPSolver
   def SDPLPSolver(st):
     return DSDPSolver(sdpStruct(a=st["a"],f=sp_sparse(0,0),g=sp_sparse(0,0)))
-  lpsolvers.append((SDPLPSolver,{},True))
+  lpsolvers.append((SDPLPSolver,{},False))
 except:
   pass
 
