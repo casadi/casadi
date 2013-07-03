@@ -108,7 +108,6 @@ void DSDPInternal::init(){
   DSDPSetPTolerance(dsdp_,getOption("dualTol"));
   DSDPSetRTolerance(dsdp_,getOption("primalTol"));
   DSDPSetStepTolerance(dsdp_,getOption("stepTol"));
-  std::cout << getOption("_printlevel") << std::endl;
   DSDPSetStandardMonitor(dsdp_,getOption("_printlevel"));
   
   info = DSDPCreateSDPCone(dsdp_,nb_,&sdpcone_);
