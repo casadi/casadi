@@ -58,6 +58,7 @@ DSDPInternal::DSDPInternal(const std::vector<CRSSparsity> &st) : SDPSolverIntern
   addOption("_rho", OT_REAL,4.0,"Potential parameter. Must be >=1");
   addOption("_zbar", OT_REAL,1e10,"Initial upper bound on the objective of the dual problem.");
   addOption("_reuse",OT_INTEGER,4,"Maximum on the number of times the Schur complement matrix is reused");
+  addOption("_printlevel",OT_INTEGER,1,"A printlevel of zero will disable all output. Another number indicates how often a line is printed.");
   
   // Set DSDP memory blocks to null
   dsdp_ = 0;
@@ -102,12 +103,13 @@ void DSDPInternal::init(){
 
   // Allocate DSDP solver memory
   info = DSDPCreate(n_, &dsdp_);
-  DSDPSetStandardMonitor(dsdp_, 1);
   DSDPSetGapTolerance(dsdp_, getOption("gapTol"));
   DSDPSetMaxIts(dsdp_, getOption("maxIter"));
   DSDPSetPTolerance(dsdp_,getOption("dualTol"));
   DSDPSetRTolerance(dsdp_,getOption("primalTol"));
   DSDPSetStepTolerance(dsdp_,getOption("stepTol"));
+  std::cout << getOption("_printlevel") << std::endl;
+  DSDPSetStandardMonitor(dsdp_,getOption("_printlevel"));
   
   info = DSDPCreateSDPCone(dsdp_,nb_,&sdpcone_);
   for (int j=0;j<nb_;++j) {
@@ -250,11 +252,11 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   
   DSDPTerminationReason reason;
   DSDPStopReason(dsdp_, &reason);
-  std::cout << "Termination reason: " << (*terminationReason_.find(reason)).second << std::endl;
-  
+  stats_["termination_reason"] = (*terminationReason_.find(reason)).second;
+
   DSDPSolutionType pdfeasible;
   DSDPGetSolutionType(dsdp_,&pdfeasible);
-  std::cout << "Solution type: " << (*solutionType_.find(pdfeasible)).second << std::endl;
+  stats_["solution_type"] =  (*solutionType_.find(pdfeasible)).second;
   
   info = DSDPGetY(dsdp_,&output(SDP_SOLVER_X).at(0),n_);
   
