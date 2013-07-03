@@ -1,13 +1,17 @@
 from casadi import *
 from coptoy import *
+import numpy as np
 
 # Example 1: SDP problem
 x = var()
 y = var()
 
-minimize(2*x+y,[blockcat([[-x,2],[2,-y]])<=0])
+A = blockcat([[-x,2],[2,-y]])
+minimize(2*x+y,[A<=0])
 
 print x.sol, y.sol # sol: sqrt(2) , 2*sqrt(2)
+
+print "eig(A) at optimum: ", np.linalg.eig(value(A))[0]
 
 # Example 2: linear system
 x0 = var(lb=0)

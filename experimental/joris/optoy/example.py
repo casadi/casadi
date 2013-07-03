@@ -36,3 +36,13 @@ p.value = 100
 print "cost = ", minimize((1-x)**2+p*(y-x**2)**2)
 print "sol = ", x.sol, y.sol
 
+# Subexpressions
+x = var()
+y = var()
+
+e = (y-x**2)**2
+
+cost = minimize((1-x)**2+100*e)
+print "cost = ", cost
+print "sol = ", x.sol, y.sol
+print "e = ", value(e)

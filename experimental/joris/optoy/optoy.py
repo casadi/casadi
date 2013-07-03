@@ -10,6 +10,9 @@ class OptimizationObject(MX):
   def __iter__(self):
     while True:
       yield 123
+
+class OptimizationContext:
+  eval_cache = {}
     
 class OptimizationVariable(OptimizationObject):
   mapping = {}
@@ -116,6 +119,9 @@ def minimize(f,gl=[],verbose=False):
   
   """
   
+  if not isinstance(gl,list):
+    raise Exception("Constraints must be given as a list")
+  
   # Determine nature of constraints, either g(x)<=0 or g(x)==0
   gl_pure = []
   gl_equality = []
@@ -208,3 +214,43 @@ def minimize(f,gl=[],verbose=False):
     
   # Return optimal cost
   return float(solver.getOutput("f"))
+  
+def value(e,nums={}):
+  """
+  Evaluates the expression numerically
+  
+   Parameters
+   -------------------
+     e: expression to be evaluated
+     
+     nums: optional dictionary denoting the values of Variables
+       if not supplied, the optimal values are assumed
+     
+  """
+  if e in OptimizationContext.eval_cache:
+    f,xp = OptimizationContext.eval_cache[e]
+  else:
+    # Get an exhausive list of all casadi symbols that make up f and gl
+    vars = nums.keys() if nums else getSymbols(e)
+    
+    # Find out which OptimizationParameter and 
+    # OptimizationVariable objects correspond to those casadi symbols
+    xp = []
+    for v in vars:
+      if hash(v) in OptimizationVariable.mapping:
+        xp.append(OptimizationVariable.mapping[hash(v)])
+      elif hash(v) in OptimizationParameter.mapping:
+        xp.append(OptimizationParameter.mapping[hash(v)])
+      else:
+        raise Exception("Cannot happen")
+        
+    f = MXFunction(xp,[e])
+    f.init()
+    OptimizationContext.eval_cache[e] = (f,xp)
+
+  for i in range(len(xp)):  
+    f.setInput(nums.get(xp[i],xp[i].sol),i)
+
+  f.evaluate()
+  
+  return f.output()

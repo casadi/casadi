@@ -6,7 +6,10 @@ class OptimizationObject(MX):
     if not isinstance(shape,tuple): shape = (shape,) 
     MX.__init__(self,name,sp_dense(*shape))
     self.mapping[hash(self)] = self
-    
+
+class OptimizationContext:
+  eval_cache = {}
+  
 class OptimizationVariable(OptimizationObject):
   mapping = {}
  
@@ -112,6 +115,9 @@ def minimize(f,gl=[],verbose=False):
   
   """
   
+  if not isinstance(gl,list):
+    raise Exception("Constraints must be given as a list")
+  
   # Determine nature of constraints, either g(x)<=0 or g(x)==0
   g_le = []
   g_eq = []
@@ -125,6 +131,7 @@ def minimize(f,gl=[],verbose=False):
     elif g.isOperation(OP_EQ):
       g_eq.append(g.getDep(0)-g.getDep(1))
     else:
+      print g
       raise Exception("Constrained type unknown. Use ==, >= or <= .")
       
   # Get an exhausive list of all casadi symbols that make up f and gl
@@ -198,6 +205,8 @@ def minimize(f,gl=[],verbose=False):
   G = patt
     
   solver = DSDPSolver(sdpStruct(a=A.sparsity(),f=F.sparsity(),g=G.sparsity()))
+  if not verbose:
+    solver.setOption("_printlevel",0)
   solver.init()
   
   # Set parameter values
@@ -238,5 +247,47 @@ def minimize(f,gl=[],verbose=False):
   for i in x:
     i.sol = opt[str(hash(i))]
     
+  OptimizationContext.eval_cache = {}
+    
   # Return optimal cost
   return float(solver.getOutput("cost"))
+  
+def value(e,nums={}):
+  """
+  Evaluates the expression numerically
+  
+   Parameters
+   -------------------
+     e: expression to be evaluated
+     
+     nums: optional dictionary denoting the values of Variables
+       if not supplied, the optimal values are assumed
+     
+  """
+  if e in OptimizationContext.eval_cache:
+    f,xp = OptimizationContext.eval_cache[e]
+  else:
+    # Get an exhausive list of all casadi symbols that make up f and gl
+    vars = nums.keys() if nums else getSymbols(e)
+    
+    # Find out which OptimizationParameter and 
+    # OptimizationVariable objects correspond to those casadi symbols
+    xp = []
+    for v in vars:
+      if hash(v) in OptimizationVariable.mapping:
+        xp.append(OptimizationVariable.mapping[hash(v)])
+      elif hash(v) in OptimizationParameter.mapping:
+        xp.append(OptimizationParameter.mapping[hash(v)])
+      else:
+        raise Exception("Cannot happen")
+        
+    f = MXFunction(xp,[e])
+    f.init()
+    OptimizationContext.eval_cache[e] = (f,xp)
+
+  for i in range(len(xp)):  
+    f.setInput(nums.get(xp[i],xp[i].sol),i)
+
+  f.evaluate()
+  
+  return f.output()
