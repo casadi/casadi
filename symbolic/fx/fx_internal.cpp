@@ -1566,9 +1566,29 @@ namespace CasADi{
       ret.setOption("name",ss.str());
       
       // Name the inputs/outputs
-      //if (!outputScheme_.isNull()) {
-      //  
-      //}
+      if (inputScheme_.known()) {
+        std::vector<std::string> inputs;
+        
+        for (int i=0;i<ret.getNumInputs();++i) {
+          std::stringstream ss;
+          ss << "in" << i; // TODO
+          inputs.push_back(ss.str());
+        }
+        
+        ret.setInputScheme(inputs);
+      }
+      
+      if (outputScheme_.known()) {
+        std::vector<std::string> outputs;
+        
+        for (int i=0;i<ret.getNumOutputs();++i) {
+          std::stringstream ss;
+          ss << "out" << i; // TODO
+          outputs.push_back(ss.str());
+        }
+        
+        ret.setOutputScheme(outputs);
+      }
     
       // Initialize it
       ret.init();
