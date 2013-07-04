@@ -74,6 +74,26 @@
 <tr><td>nstepsB</td><td>CasADi::CVodesInternal</td></tr>
 </table>
 */
+/** \class CasADi::DSDPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>solution_type</td><td>CasADi::DSDPInternal</td></tr>
+<tr><td>termination_reason</td><td>CasADi::DSDPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::DSDPSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>solution_type</td><td>CasADi::DSDPInternal</td></tr>
+<tr><td>termination_reason</td><td>CasADi::DSDPInternal</td></tr>
+</table>
+*/
 /** \class CasADi::SCPgenInternal
 \n
 \par

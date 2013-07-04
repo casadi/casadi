@@ -1282,7 +1282,9 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>_loglevel</td><td>OT_INTEGER</td><td>0</td><td>An integer that specifies how much logging is done on stdout.</td><td>CasADi::DSDPInternal</td></tr>
 <tr><td>_penalty</td><td>OT_REAL</td><td>1e5</td><td>Penality parameter lambda. Must exceed the trace of Y. This parameter heavily influences the ability of DSDP to treat linear equalities. The DSDP standard default (1e8) will make a problem with linear equality return unusable solutions.</td><td>CasADi::DSDPInternal</td></tr>
+<tr><td>_printlevel</td><td>OT_INTEGER</td><td>1</td><td>A printlevel of zero will disable all output. Another number indicates how often a line is printed.</td><td>CasADi::DSDPInternal</td></tr>
 <tr><td>_reuse</td><td>OT_INTEGER</td><td>4</td><td>Maximum on the number of times the Schur complement matrix is reused</td><td>CasADi::DSDPInternal</td></tr>
 <tr><td>_rho</td><td>OT_REAL</td><td>4.0</td><td>Potential parameter. Must be >=1</td><td>CasADi::DSDPInternal</td></tr>
 <tr><td>_use_penalty</td><td>OT_BOOLEAN</td><td>true</td><td>Modifies the algorithm to use a penality gamma on r.</td><td>CasADi::DSDPInternal</td></tr>
@@ -1321,7 +1323,9 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>_loglevel</td><td>OT_INTEGER</td><td>0</td><td>An integer that specifies how much logging is done on stdout.</td><td>CasADi::DSDPInternal</td></tr>
 <tr><td>_penalty</td><td>OT_REAL</td><td>1e5</td><td>Penality parameter lambda. Must exceed the trace of Y. This parameter heavily influences the ability of DSDP to treat linear equalities. The DSDP standard default (1e8) will make a problem with linear equality return unusable solutions.</td><td>CasADi::DSDPInternal</td></tr>
+<tr><td>_printlevel</td><td>OT_INTEGER</td><td>1</td><td>A printlevel of zero will disable all output. Another number indicates how often a line is printed.</td><td>CasADi::DSDPInternal</td></tr>
 <tr><td>_reuse</td><td>OT_INTEGER</td><td>4</td><td>Maximum on the number of times the Schur complement matrix is reused</td><td>CasADi::DSDPInternal</td></tr>
 <tr><td>_rho</td><td>OT_REAL</td><td>4.0</td><td>Potential parameter. Must be >=1</td><td>CasADi::DSDPInternal</td></tr>
 <tr><td>_use_penalty</td><td>OT_BOOLEAN</td><td>true</td><td>Modifies the algorithm to use a penality gamma on r.</td><td>CasADi::DSDPInternal</td></tr>
