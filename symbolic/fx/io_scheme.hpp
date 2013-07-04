@@ -89,6 +89,9 @@ class IOScheme : public SharedObject{
     /// Check wether the scheme is known
     bool known() const;
     
+    /// Check wether this scheme is compatible with the given size
+    int compatibleSize(int size) const;
+    
     #ifndef SWIG
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;

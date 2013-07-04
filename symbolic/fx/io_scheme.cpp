@@ -89,6 +89,11 @@ namespace CasADi{
     return !isNull();
   }
   
+  int compatibleSize(int size) const {
+    if (isNull()) return true;
+    return true;
+  }
+  
   std::string IOScheme::describeInput(int i) const {
     std::stringstream ss;
     ss << "Input argument #" << i;

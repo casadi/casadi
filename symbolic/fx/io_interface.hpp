@@ -237,10 +237,16 @@ namespace CasADi{
     }
 
     /** \brief Set input scheme */
-    void setInputScheme(const CasADi::IOScheme &scheme){ static_cast<Derived*>(this)->inputScheme() = scheme;}
+    void setInputScheme(const CasADi::IOScheme &scheme){
+      casadi_assert(scheme.compatibleSize(getNumInputs()));
+      static_cast<Derived*>(this)->inputScheme() = scheme;
+    }
 
     /** \brief Set output scheme */
-    void setOutputScheme(const CasADi::IOScheme &scheme){ static_cast<Derived*>(this)->outputScheme() = scheme;}
+    void setOutputScheme(const CasADi::IOScheme &scheme){ 
+      casadi_assert(scheme.compatibleSize(getNumOutputs()));
+      static_cast<Derived*>(this)->outputScheme() = scheme;
+    }
 
     /** \brief Get input scheme */
     CasADi::IOScheme getInputScheme() const{ return static_cast<const Derived*>(this)->inputScheme(); }
