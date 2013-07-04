@@ -68,8 +68,6 @@ namespace CasADi{
     monitor_inputs_ = false;
     monitor_outputs_ = false;
   
-    inputScheme_  = SCHEME_unknown;
-    outputScheme_ = SCHEME_unknown;
   }
 
 
@@ -187,7 +185,7 @@ namespace CasADi{
       } else {
         stream << " Inputs (" << inputScheme_.name() << ": " << getNumInputs() << "):" << std::endl;
         for (int i=0;i<getNumInputs();i++) {
-          stream << "  " << i  << ". (" << inputScheme_.entryEnum(i) << " aka " << inputScheme_.entry(i) << ")   " << input(i).dimString() << std::endl;
+          stream << "  " << i  << ". (" << inputScheme_.describe(i) << ")   " << input(i).dimString() << std::endl;
         }
       }
     }
@@ -202,7 +200,7 @@ namespace CasADi{
       } else { 
         stream << " Outputs (" << outputScheme_.name() << ": " << getNumOutputs() << "):" << std::endl;
         for (int i=0;i<getNumOutputs();i++) {
-          stream << "  " << i << ". (" << outputScheme_.entryEnum(i) << " aka " << outputScheme_.entry(i) << ")   " << output(i).dimString() << std::endl;
+          stream << "  " << i << ". (" << outputScheme_.describe(i) << ")   " << output(i).dimString() << std::endl;
         }
       }
     }
@@ -1566,6 +1564,11 @@ namespace CasADi{
       stringstream ss;
       ss << "derivative_" << getOption("name") << "_" << nfwd << "_" << nadj;
       ret.setOption("name",ss.str());
+      
+      // Name the inputs/outputs
+      //if (!outputScheme_.isNull()) {
+      //  
+      //}
     
       // Initialize it
       ret.init();

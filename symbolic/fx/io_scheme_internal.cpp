@@ -44,12 +44,10 @@ namespace CasADi{
       return getSchemeEntryEnumName(scheme_,i);
     }
     
-    std::string IOSchemeBuiltinInternal::describeInput(int i) const {
-      return CasADi::describeInput(scheme_,i);
-    }
-
-    std::string IOSchemeBuiltinInternal::describeOutput(int i) const {
-      return CasADi::describeOutput(scheme_,i);
+    std::string IOSchemeBuiltinInternal::describe(int i) const {
+      std::stringstream ss;
+      ss << entryEnum(i) <<  " aka '" << entry(i) << "'";
+      return ss.str();
     }
 
     int IOSchemeBuiltinInternal::index(const std::string &name) const {
@@ -95,19 +93,9 @@ namespace CasADi{
     std::string IOSchemeCustomInternal::entryEnum(int i) const {
       return "";
     }
-    
-    std::string IOSchemeCustomInternal::describeInput(int i) const {
-      std::stringstream ss;
-      ss << "Input argument #" << i;
-      ss << " (" << entry(i) << "')";
-      return ss.str();
-    }
 
-    std::string IOSchemeCustomInternal::describeOutput(int i) const {
-      std::stringstream ss;
-      ss << "Output argument #" << i;
-      ss << " (" << entry(i) << "')";
-      return ss.str();
+    std::string IOSchemeCustomInternal::describe(int i) const {
+      return entry(i);
     }
 
     int IOSchemeCustomInternal::index(const std::string &name) const {
@@ -127,7 +115,7 @@ namespace CasADi{
     void IOSchemeCustomInternal::repr(std::ostream &stream) const {
       stream << "customIO(" << entryNames() << ")";
     }
-  
+    
 } // namespace CasADi
 
 

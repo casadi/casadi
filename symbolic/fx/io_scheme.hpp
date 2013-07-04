@@ -82,7 +82,12 @@ class IOScheme : public SharedObject{
 
     /// Describe the index as an output
     std::string describeOutput(int i) const;
-
+    
+    /// Describe the index
+    std::string describe(int i) const;
+    
+    /// Check wether the scheme is known
+    bool known() const;
     
     #ifndef SWIG
     /// Print a destription of the object

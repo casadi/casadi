@@ -52,17 +52,14 @@ class IOSchemeInternal : public SharedObjectNode{
     /// Get the entry enum name by index
     virtual std::string entryEnum(int i) const=0;
     
-    /// Describe the index as an input
-    virtual std::string describeInput(int i) const=0;
-
-    /// Describe the index as an output
-    virtual std::string describeOutput(int i) const=0;
-    
     /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const=0;
 
     /// Print a representation of the object
     virtual void repr(std::ostream &stream=std::cout) const=0;
+    
+    /// Describe the index
+    virtual std::string describe(int i) const=0;
     
 };
 
@@ -90,11 +87,8 @@ class IOSchemeBuiltinInternal : public IOSchemeInternal {
     /// Get the entry enum name by index
     virtual std::string entryEnum(int i) const;
     
-    /// Describe the index as an input
-    virtual std::string describeInput(int i) const;
-
-    /// Describe the index as an output
-    virtual std::string describeOutput(int i) const;
+    /// Describe the index
+    virtual std::string describe(int i) const;
     
     /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const;
@@ -134,18 +128,15 @@ class IOSchemeCustomInternal : public IOSchemeInternal {
     /// Get the entry enum name by index
     virtual std::string entryEnum(int i) const;
     
-    /// Describe the index as an input
-    virtual std::string describeInput(int i) const;
-
-    /// Describe the index as an output
-    virtual std::string describeOutput(int i) const;
+    /// Describe the index
+    virtual std::string describe(int i) const;
     
     /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
     /// Print a representation of the object
     virtual void repr(std::ostream &stream=std::cout) const;
-    
+
     /// Clone
     virtual IOSchemeCustomInternal* clone() const{ return new IOSchemeCustomInternal(entries_); }
     

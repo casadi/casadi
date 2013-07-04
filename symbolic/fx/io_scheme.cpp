@@ -78,22 +78,33 @@ namespace CasADi{
     return (*this)->entryEnum(i);
   }
   
-  std::string IOScheme::describeInput(int i) const {
+  std::string IOScheme::describe(int i) const {
     if (isNull()) {
-      std::stringstream ss;
-      ss << "Input argument #" << i;
-      return ss.str(); 
+      return "";
     }
-    return (*this)->describeInput(i);
+    return (*this)->describe(i);
+  }
+  
+  bool IOScheme::known() const {
+    return !isNull();
+  }
+  
+  std::string IOScheme::describeInput(int i) const {
+    std::stringstream ss;
+    ss << "Input argument #" << i;
+    if (known()) {
+      ss << " (" << describe(i) << "')";
+    }
+    return ss.str();
   }
 
   std::string IOScheme::describeOutput(int i) const {
-    if (isNull()) {
-      std::stringstream ss;
-      ss << "Output argument #" << i;
-      return ss.str(); 
+    std::stringstream ss;
+    ss << "Output argument #" << i;
+    if (known()) {
+      ss << " (" << describe(i) << "')";
     }
-    return (*this)->describeOutput(i);
+    return ss.str();
   }
   
   void IOScheme::print(std::ostream &stream) const {
@@ -106,7 +117,7 @@ namespace CasADi{
 
   void IOScheme::repr(std::ostream &stream) const {
     if (isNull()) {
-      stream << "UknownScheme";
+      stream << "UnknownScheme";
       return;
     }
     return (*this)->repr(stream);
