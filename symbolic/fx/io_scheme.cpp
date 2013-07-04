@@ -89,7 +89,7 @@ namespace CasADi{
     return !isNull();
   }
   
-  int compatibleSize(int size) const {
+  int IOScheme::compatibleSize(int size) const {
     if (isNull()) return true;
     return true;
   }
