@@ -24,6 +24,7 @@
 #define IO_SCHEME_VECTOR_HPP
 
 #include "schemes_metadata.hpp"
+#include "io_scheme.hpp"
 #include "../casadi_exception.hpp"
 #include "../printable_object.hpp"
 namespace CasADi{
@@ -32,7 +33,7 @@ template<typename T>
 class IOSchemeVector : public PrintableObject {
     public:
     // Constructor
-    IOSchemeVector(const std::vector<T>& t, InputOutputScheme io_scheme=SCHEME_unknown) : t_(t), io_scheme_(io_scheme){} 
+    IOSchemeVector(const std::vector<T>& t, CasADi::IOScheme io_scheme =  CasADi::IOScheme()) : t_(t), io_scheme_(io_scheme){} 
     
     #ifndef SWIG
     //@{
@@ -41,10 +42,10 @@ class IOSchemeVector : public PrintableObject {
     operator const std::vector<T>&() const{ return t_;}
     //@}
     T operator[](int i) {
-      casadi_assert_message(i>=0 && i<t_.size(),"Index error for " << getSchemeName(io_scheme_) << ": supplied integer must be >=0 and <= " << t_.size() << " but got " << i << ".");
+      casadi_assert_message(i>=0 && i<t_.size(),"Index error for " << io_scheme_.name() << ": supplied integer must be >=0 and <= " << t_.size() << " but got " << i << ".");
       return t_.at(i);
     }
-    T operator[](const std::string& name) { return (*this)[getSchemeEntryEnum(io_scheme_,name)]; }
+    T operator[](const std::string& name) { return (*this)[io_scheme_.index(name)]; }
     #endif // SWIG
     T __getitem__(int i) { if (i<0) i+= t_.size(); return (*this)[i]; }
     T __getitem__(const std::string& name) { return (*this)[name]; }
@@ -57,18 +58,18 @@ class IOSchemeVector : public PrintableObject {
     //@}
     
     /// Access the IOScheme
-    InputOutputScheme io_scheme() const { return io_scheme_; }
+    CasADi::IOScheme io_scheme() const { return io_scheme_; }
     
     #ifndef SWIG
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const { 
       stream << "IOSchemeVector(" ;
       for (int i=0;i<t_.size();++i) {
-        stream << getSchemeEntryName(io_scheme_,i) << "=" << t_[i];
+        stream << io_scheme_.entry(i) << "=" << t_[i];
         if (i<t_.size()-1) stream << ",";
       }
       
-      stream << ";" << getSchemeName(io_scheme_) <<  ")";
+      stream << ";" << io_scheme_.name() <<  ")";
     }
 
     /// Print a representation of the object
@@ -80,7 +81,7 @@ class IOSchemeVector : public PrintableObject {
       /// Vector of data
       std::vector<T> t_;
       /// Scheme
-      InputOutputScheme io_scheme_; 
+      IOScheme io_scheme_; 
     
 };
 

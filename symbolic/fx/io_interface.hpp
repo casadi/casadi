@@ -23,11 +23,11 @@
 #ifndef IO_INTERFACE_HPP
 #define IO_INTERFACE_HPP
 
-#include "../fx/schemes_metadata.hpp"
 #include "../sx/sx.hpp"
 #include "../mx/mx.hpp"
 #include "../options_functionality.hpp"
 #include "../fx/schemes_helpers.hpp"
+#include "../fx/io_scheme.hpp"
 
 namespace CasADi{
   
@@ -237,16 +237,16 @@ namespace CasADi{
     }
 
     /** \brief Set input scheme */
-    void setInputScheme(CasADi::InputOutputScheme scheme){ static_cast<Derived*>(this)->inputScheme() = scheme;}
+    void setInputScheme(const CasADi::IOScheme &scheme){ static_cast<Derived*>(this)->inputScheme() = scheme;}
 
     /** \brief Set output scheme */
-    void setOutputScheme(CasADi::InputOutputScheme scheme){ static_cast<Derived*>(this)->outputScheme() = scheme;}
+    void setOutputScheme(const CasADi::IOScheme &scheme){ static_cast<Derived*>(this)->outputScheme() = scheme;}
 
     /** \brief Get input scheme */
-    CasADi::InputOutputScheme getInputScheme() const{ return static_cast<const Derived*>(this)->inputScheme(); }
+    CasADi::IOScheme getInputScheme() const{ return static_cast<const Derived*>(this)->inputScheme(); }
 
     /** \brief Get output scheme */
-    CasADi::InputOutputScheme getOutputScheme() const{ return static_cast<const Derived*>(this)->outputScheme(); }
+    CasADi::IOScheme getOutputScheme() const{ return static_cast<const Derived*>(this)->outputScheme(); }
 
     /** \brief Find the index for a string describing a particular entry of an input scheme
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FXInternal adheres to SCHEME_NLPINput 
@@ -261,11 +261,11 @@ namespace CasADi{
     /** \brief Find the index for a string describing a particular entry of a scheme
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FXInternal adheres to SCHEME_NLPINput 
      */
-    int schemeEntry(CasADi::InputOutputScheme scheme,const std::string &name,bool input) const{
-      if (scheme==SCHEME_unknown) casadi_error("Unable to look up '" <<  name<< "' in " << (input? "input": "output") << "scheme, as the " <<  (input? "input": "output") << " scheme of this function is unknown. You can only index with integers.");
-      if (name=="") casadi_error("FXInternal::schemeEntry: you supplied an empty string as the name of a entry in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
-      int n = getSchemeEntryEnum(scheme,name);
-      if (n==-1) casadi_error("FXInternal::schemeEntry: could not find entry '" << name << "' in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
+    int schemeEntry(const CasADi::IOScheme &scheme,const std::string &name,bool input) const{
+      if (scheme.isNull()) casadi_error("Unable to look up '" <<  name<< "' in " << (input? "input": "output") << "scheme, as the " <<  (input? "input": "output") << " scheme of this function is unknown. You can only index with integers.");
+      if (name=="") casadi_error("FXInternal::schemeEntry: you supplied an empty string as the name of a entry in " << scheme.name() << ". Available names are: " << scheme.entryNames() << ".");
+      int n = scheme.index(name);
+      if (n==-1) casadi_error("FXInternal::schemeEntry: could not find entry '" << name << "' in " << scheme.name() << ". Available names are: " << scheme.entryNames() << ".");
       return n;
     }
 

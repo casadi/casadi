@@ -195,20 +195,19 @@ namespace CasADi{
     return (*this)->symbolicInputSX();
   }
 
-  void FX::setInputScheme(InputOutputScheme scheme) {
+  void FX::setInputScheme(const IOScheme &scheme) {
     return (*this)->setInputScheme(scheme);
   }
 
-
-  void FX::setOutputScheme(InputOutputScheme scheme) {
+  void FX::setOutputScheme(const IOScheme &scheme) {
     return (*this)->setOutputScheme(scheme);
   }
 
-  InputOutputScheme FX::getInputScheme() const {
+  IOScheme FX::getInputScheme() const {
     return (*this)->getInputScheme();
   }
 
-  InputOutputScheme FX::getOutputScheme() const {
+  IOScheme FX::getOutputScheme() const {
     return (*this)->getOutputScheme();
   }
 
@@ -313,19 +312,19 @@ namespace CasADi{
     (*this)->generateCode(filename);
   }
 
-  const InputOutputScheme& FX::inputScheme() const{
+  const IOScheme& FX::inputScheme() const{
     return (*this)->inputScheme();
   }
   
-  const InputOutputScheme& FX::outputScheme() const{
+  const IOScheme& FX::outputScheme() const{
     return (*this)->outputScheme();
   }
   
-  InputOutputScheme& FX::inputScheme(){
+  IOScheme& FX::inputScheme(){
     return (*this)->inputScheme();
   }
   
-  InputOutputScheme& FX::outputScheme(){
+  IOScheme& FX::outputScheme(){
     return (*this)->outputScheme();
   }
   

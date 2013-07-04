@@ -97,10 +97,10 @@ namespace CasADi{
     
     //@{
     /** \brief Access input/output scheme */
-    const CasADi::InputOutputScheme& inputScheme() const;
-    const CasADi::InputOutputScheme& outputScheme() const;
-    CasADi::InputOutputScheme& inputScheme();
-    CasADi::InputOutputScheme& outputScheme();
+    const CasADi::IOScheme& inputScheme() const;
+    const CasADi::IOScheme& outputScheme() const;
+    CasADi::IOScheme& inputScheme();
+    CasADi::IOScheme& outputScheme();
     //@}
 
     //@{
@@ -118,16 +118,16 @@ namespace CasADi{
     int getNumScalarOutputs() const;
   
     /** \brief Set input scheme */
-    void setInputScheme(CasADi::InputOutputScheme scheme);
+    void setInputScheme(const CasADi::IOScheme &scheme);
 
     /** \brief Set output scheme */
-    void setOutputScheme(CasADi::InputOutputScheme scheme);
+    void setOutputScheme(const CasADi::IOScheme &scheme);
 
     /** \brief Get input scheme */
-    CasADi::InputOutputScheme getInputScheme() const;
+    CasADi::IOScheme getInputScheme() const;
 
     /** \brief Get output scheme */
-    CasADi::InputOutputScheme getOutputScheme() const;
+    CasADi::IOScheme getOutputScheme() const;
     
     /** \brief  Update the number of sensitivity directions during or after initialization (normally invoked internally) */
     void updateNumSens();

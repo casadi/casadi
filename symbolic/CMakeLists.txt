@@ -71,6 +71,7 @@ SET(CASADI_SRCS
 
   # A dynamically created function with AD capabilities
   fx/io_interface.hpp                                   # Input/output interface for FX and FXInternal
+  fx/io_scheme.hpp           fx/io_scheme.cpp           fx/io_scheme_internal.hpp           fx/io_scheme_internal.cpp 
   fx/fx.hpp                  fx/fx.cpp                  fx/fx_internal.hpp                  fx/fx_internal.cpp
   fx/x_function_internal.hpp                            # Base class for SXFunction and MXFunction
   fx/sx_function.hpp         fx/sx_function.cpp         fx/sx_function_internal.hpp         fx/sx_function_internal.cpp

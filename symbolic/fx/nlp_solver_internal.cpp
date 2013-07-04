@@ -141,7 +141,7 @@ namespace CasADi{
           if (!callback_.input(i).empty()) {
             casadi_assert_message(callback_.input(i).sparsity()==output(i).sparsity(),
                                   "Callback function should have the output scheme of NLPSolver as input scheme. " << 
-                                  describeInput(inputScheme_,i) << " was found to be " << callback_.input(i).dimString() << " instead of expected " << output(i).dimString() << "."
+                                  inputScheme_.describeInput(i) << " was found to be " << callback_.input(i).dimString() << " instead of expected " << output(i).dimString() << "."
                                   );
           }
           callback_.input(i).setAll(0);

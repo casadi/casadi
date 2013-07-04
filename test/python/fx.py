@@ -524,6 +524,22 @@ class FXtests(casadiTestCase):
     self.checkarray(br,DMatrix([3,4]))
     self.checkarray(cr,DMatrix([3,4]))
     
+  def test_customIO(self):
+    x = ssym("x")
+    f = SXFunction([x],customIO(foo=x*x,bar=x))
+    f.init()
+    
+    f.setInput(12,0)
+    f.evaluate()
+    self.checkarray(DMatrix([144]),f.output("foo"))
+    self.checkarray(DMatrix([12]),f.output("bar"))
+    
+    with self.assertRaises(Exception):
+      f.output("baz")
+    
+    
+    
+    
 if __name__ == '__main__':
     unittest.main()
 

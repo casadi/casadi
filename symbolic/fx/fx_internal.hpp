@@ -242,10 +242,10 @@ namespace CasADi{
 
     //@{
     /** \brief Access input/output scheme */
-    inline const InputOutputScheme& inputScheme() const{ return inputScheme_;}
-    inline const InputOutputScheme& outputScheme() const{ return outputScheme_;}
-    inline InputOutputScheme& inputScheme(){ return inputScheme_;}
-    inline InputOutputScheme& outputScheme(){ return outputScheme_;}
+    inline const IOScheme& inputScheme() const{ return inputScheme_;}
+    inline const IOScheme& outputScheme() const{ return outputScheme_;}
+    inline IOScheme& inputScheme(){ return inputScheme_;}
+    inline IOScheme& outputScheme(){ return outputScheme_;}
     //@}
 
     //@{
@@ -338,10 +338,10 @@ namespace CasADi{
     bool monitor_inputs_, monitor_outputs_;
     
     /// The name of the input scheme of this function
-    InputOutputScheme inputScheme_;
+    IOScheme inputScheme_;
     
     /// The name of the output scheme of this function
-    InputOutputScheme outputScheme_;
+    IOScheme outputScheme_;
     
     /// Errors are thrown when NaN is produced
     bool regularity_check_;

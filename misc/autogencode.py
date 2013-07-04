@@ -202,7 +202,7 @@ class %sIOSchemeVector : public IOSchemeVector<M> {
       s+="  return IOSchemeVector(["
       for name, doc, enum in self.entries:
         s+=name+","
-      s=s[:-1] + "], SCHEME_%s)\n" % self.enum
+      s=s[:-1] + "], IOScheme(SCHEME_%s))\n" % self.enum
     return s
   
 class Input(Enum):
@@ -328,6 +328,12 @@ def IOSchemeVector(arg,io_scheme):
     return IOSchemeVectorCRSSparsity(arg,io_scheme)
   except:
     pass
+    
+def customIO(**kwargs):
+  items = kwargs.items()
+  
+  return IOSchemeVector(zip(*items)[1], IOScheme(zip(*items)[0]))
+  
 """)
 autogenpy.write("%}\n")
 autogenpy.write("#endif //SWIGPYTHON\n")
@@ -344,6 +350,19 @@ for p in schemes:
   autogenpy.write(p.swigcode())
   autogenpy.write("#endif //SWIGPYTHON\n")
   autogenpy.write(p.pureswigcode())
+
+autogenhelpershpp.write("""
+/// Helper function for 'customIO'
+template<class M>
+IOSchemeVector<M> customIO(""" + ",".join(['const std::string arg_s%d="",M arg_m%d=M()' % (i,i) for i in range(20)]) +"""){
+  std::vector<M> k;
+  std::vector<std::string> v;
+"""+
+  "\n".join(['  if (arg_s%d!="") { k.push_back(arg_s%d);  v.push_back(arg_m%d); }' % (i,i,i) for i in range(20) ])
++"""
+  return IOSchemeVector<M>(v,customIO(k));
+}
+""")
   
 autogencpp.write("std::string getSchemeName(InputOutputScheme scheme) {\n  switch (scheme) {\n")
 for p in schemes:

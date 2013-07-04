@@ -55,6 +55,7 @@
 
 %include "symbolic/fx/io_interface.hpp"
 %template(IOInterfaceFX) CasADi::IOInterface<CasADi::FX>;
+%include "symbolic/fx/io_scheme.hpp"
 %include "symbolic/fx/io_scheme_vector.hpp"
 %template(IOSchemeVectorMX) CasADi::IOSchemeVector< CasADi::MX >;
 %template(IOSchemeVectorSXMatrix) CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SX> >;
