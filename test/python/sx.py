@@ -1034,6 +1034,69 @@ class SXtests(casadiTestCase):
       self.assertTrue(isEqual(w[0],a))
       self.assertTrue(isEqual(w[1],b))
       self.assertTrue(isEqual(w[2],c))
+      
+  def test_poly_coeff(self):
+    x =ssym("x")
+    a= ssym("a")
+    c=ssym("c")
+    p=poly_coeff(12*x**4+x**2+a*x+c,x)
+    self.assertTrue(isEqual(p[0],12))
+    self.assertTrue(isEqual(p[1],0))
+    self.assertTrue(isEqual(p[2],1))
+    self.assertTrue(isEqual(p[3],a))
+    self.assertTrue(isEqual(p[4],c))
+    
+    p=poly_coeff((x-a)*(x+a),x)
+    self.assertTrue(isEqual(p[0],1))
+    self.assertTrue(isEqual(p[1],0))
+    
+  def test_poly_roots(self):
+  
+    p = ssym("[a,b]")
+    r = poly_roots(p)
+    
+    f = SXFunction([p],[r])
+    f.init()
+    f.setInput([2,7])
+    a_,b_ = f.input()
+    f.evaluate()
+    f.output()
+    self.checkarray(f.output(),vertcat([-b_/a_]))
+
+    p = ssym("[a,b]")
+    r = poly_roots(vertcat([p,0]))
+    
+    f = SXFunction([p],[r])
+    f.init()
+    f.setInput([2,7])
+    a_,b_ = f.input()
+    f.evaluate()
+    f.output()
+    self.checkarray(f.output(),vertcat([-b_/a_,0]))
+    
+    p = ssym("[a,b,c]")
+    r = poly_roots(p)
+    
+    f = SXFunction([p],[r])
+    f.init()
+    f.setInput([1.13,7,3])
+    a_,b_,c_ = f.input()
+    d = b_**2-4*a_*c_
+    f.evaluate()
+    x0 = (-b_-sqrt(d))/2/a_
+    x1 = (-b_+sqrt(d))/2/a_
+    f.output()
+    self.checkarray(f.output(),vertcat([x0,x1]))
+    
+    
+  def test_eig_symbolic(self):
+    x = ssym("x",2)
+    f = SXFunction([x],[eig_symbolic(c.diag(x))])
+    f.init()
+    f.setInput([3,7])
+    f.evaluate()
+    self.checkarray(f.output(),f.input())
+    
     
 if __name__ == '__main__':
     unittest.main()

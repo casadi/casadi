@@ -325,7 +325,7 @@ void fill(SXMatrix& mat, const SX& val);
 * \endcode
 * \verbatim >>   x \endverbatim
 */
-SXMatrix taylor(const SXMatrix& ex,const SX& x, const SX& a=casadi_limits<SX>::zero,int order=1);
+SXMatrix taylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a=casadi_limits<SX>::zero,int order=1);
 
 /**
 * \brief multivariate taylor series expansion
@@ -379,7 +379,26 @@ std::string getOperatorRepresentation(const SX& x, const std::vector<std::string
   /** \brief Print compact, introducing new variables for shared subexpressions */
   void printCompact(const SXMatrix& ex, std::ostream &stream=std::cout);
   
-  
+/** \brief extracts polynomial coefficients from an expression
+*
+* \parameter ex Scalar expression that represents a polynomial
+* \paramater x  Scalar symbol that th epolynomial is build up with
+*/  
+SXMatrix poly_coeff(const SXMatrix& ex, const SXMatrix&x);
+
+/** \brief Attempts to find the roots of a polynomial
+*
+*  This will only work for polynomials up to order 3
+*  It is assumed that the roots are real.
+*  
+*/  
+SXMatrix poly_roots(const SXMatrix& p);
+
+/** \brief Attempts to find the eigenvalues of a symbolic matrix
+*  This will only work for up to 3x3 matrices
+*/  
+SXMatrix eig_symbolic(const SXMatrix& m);
+
 } // namespace CasADi
 
 #endif // SX_TOOLS_HPP
