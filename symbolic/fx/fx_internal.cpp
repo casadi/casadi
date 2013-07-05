@@ -221,7 +221,19 @@ namespace CasADi{
     stringstream ss;
     ss << "gradient_" << getOption("name") << "_" << iind << "_" << oind;
     ret.setOption("name",ss.str());
-  
+
+    ret.setInputScheme(inputScheme_);
+    
+    // Output names
+    std::vector<std::string> ionames;
+    ionames.reserve(ret.getNumOutputs());   
+    ionames.push_back("grad");
+    for (int i=0;i<getNumOutputs();++i) {
+      ionames.push_back(outputScheme_.entryLabel(i));
+    }
+    
+    ret.setOutputScheme(ionames);
+    
     return ret;
   }
   
@@ -238,7 +250,20 @@ namespace CasADi{
     stringstream ss;
     ss << "hessian_" << getOption("name") << "_" << iind << "_" << oind;
     ret.setOption("name",ss.str());
-  
+
+    ret.setInputScheme(inputScheme_);
+    
+    // Output names
+    std::vector<std::string> ionames;
+    ionames.reserve(ret.getNumOutputs());   
+    ionames.push_back("hess");
+    ionames.push_back("grad");
+    for (int i=0;i<getNumOutputs();++i) {
+      ionames.push_back(outputScheme_.entryLabel(i));
+    }
+    
+    ret.setOutputScheme(ionames);
+    
     return ret;
   }
   
@@ -1510,6 +1535,17 @@ namespace CasADi{
     ret.setOption("name",ss.str());
     ret.setOption("verbose",getOption("verbose"));
     ret.setInputScheme(inputScheme_);
+    
+    // Output names
+    std::vector<std::string> ionames;
+    ionames.reserve(ret.getNumOutputs());   
+    ionames.push_back("jac");
+    for (int i=0;i<getNumOutputs();++i) {
+      ionames.push_back(outputScheme_.entryLabel(i));
+    }
+    
+    ret.setOutputScheme(ionames);
+    
     return ret;
   }
 
