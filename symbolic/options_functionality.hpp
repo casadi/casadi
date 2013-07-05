@@ -244,7 +244,16 @@ virtual ~OptionsFunctionalityNode();
 
 protected:
 
+
   void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType(), const std::string& desc="n/a", const std::vector<GenericType> &allowed_vals = std::vector<GenericType>(), bool inherit = false, std::vector<int> enum_values= std::vector<int>(), std::vector<std::string> enum_descr= std::vector<std::string>());
+  /** \brief Add an option
+  *
+  *  allowed_vals can taken multiple forms:
+  *    "foo|bar"   ->   specifies that the values "foo" and "bar" are allowed
+  *    "foo:5|bar:6" -> specifies that the values "foo" and "bar" are allowed and map to 5 and 6 respectively
+  *    "foo:5:description_foo|bar:6:description_bar|" -> same as above, but specifies documentation
+  *
+  **/
   void addOption(const std::string &str, const opt_type& type, const GenericType &def_val, const std::string& desc, const std::string &allowed_vals, bool inherit = false);
   
 void assert_exists(const std::string &str) const;
