@@ -79,7 +79,7 @@ def addExtra(metadata):
     #  meta['description'] += "(" + "|".join(i.getOptionAllowed(name))  + ")"
 
   try:
-    i = QPOasesSolver(sp_dense(3,3),sp_dense(1,3))
+    i = QPOasesSolver(qpStruct(h=sp_dense(3,3),a=sp_dense(1,3)))
   except:
     return
     
