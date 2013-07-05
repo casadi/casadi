@@ -36,25 +36,11 @@ using namespace std;
 
 CplexInternal::CplexInternal(const std::vector<CRSSparsity>& st) : QPSolverInternal(st){
   // Options available
-  addOption("qp_method",    OT_INTEGER, 0, "Determines which CPLEX algorithm to use. \
-    0: Automatic, \
-    1: Primal simplex, \
-    2: Dual simplex, \
-    3: Network, \
-    4: Barrier, \
-    5: Sifting, \
-    6: Concurent. \
-    7: Crossover (start with barrier and use simplex later on with warm-start)\
-    Default: 0");
-  addOption("dump_to_file",   OT_BOOLEAN,        false, "Dumps QP to file in CPLEX format. Default: false");
-  addOption("dump_filename",   OT_STRING,     "qp.dat", "The filename to dump to. Default: qp.dat");
+  addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.","automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
+  addOption("dump_to_file",   OT_BOOLEAN,        false, "Dumps QP to file in CPLEX format.");
+  addOption("dump_filename",   OT_STRING,     "qp.dat", "The filename to dump to.");
   addOption("tol",               OT_REAL,         1E-6, "Tolerance of solver");
-  addOption("dep_check",      OT_INTEGER,            0, "Detect redundant constraints. \
-    -1: automatic\
-     0: off\
-     1: at the beginning of preprocessing\
-     2: at the end of preprocessing\
-     3: at the begining and at the end of preprocessing");
+  addOption("dep_check",      OT_STRING,         "off", "Detect redundant constraints.","automatic:-1|off:0|begin:1|end:2|both:3");
   addOption("simplex_maxiter", OT_INTEGER,       2100000000, "Maximum number of simplex iterations.");
   addOption("barrier_maxiter", OT_INTEGER,       2100000000, "Maximum number of barrier iterations.");
   addOption("warm_start",      OT_BOOLEAN,            false, "Use warm start with simplex methods (affects only the simplex methods).");
@@ -82,10 +68,7 @@ void CplexInternal::init(){
   // Call the init method of the base class
   QPSolverInternal::init();
   
-  qp_method_     = getOption("qp_method");
-  if (qp_method_ < 0 || qp_method_ > 7){
-    casadi_error("Invalid QP method given.");
-  }
+  qp_method_     = getOptionEnumValue("qp_method");
   dump_to_file_  = getOption("dump_to_file");
   tol_ = getOption("tol");
   //  dump_filename_ = getOption("dump_filename");
@@ -122,7 +105,7 @@ void CplexInternal::init(){
     status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, qp_method_);
   }
   // Setting dependency check option
-  status = CPXsetintparam(env_, CPX_PARAM_DEPIND, getOption("dep_check"));
+  status = CPXsetintparam(env_, CPX_PARAM_DEPIND, getOptionEnumValue("dep_check"));
   // Setting barrier iteration limit
   status = CPXsetintparam(env_, CPX_PARAM_BARITLIM, getOption("barrier_maxiter"));
   // Setting simplex iteration limit
