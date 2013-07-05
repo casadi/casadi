@@ -111,6 +111,16 @@ namespace CasADi{
     }
     return ss.str();
   }
+
+  std::string IOScheme::entryLabel(int i) const {
+    if (known()) {
+      return entry(i);
+    } else {
+      std::stringstream ss;
+      ss << i;
+      return ss.str();
+    }
+  }
   
   void IOScheme::print(std::ostream &stream) const {
     if (isNull()) {

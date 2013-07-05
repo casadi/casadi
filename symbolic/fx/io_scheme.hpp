@@ -74,6 +74,11 @@ class IOScheme : public SharedObject{
     /// Get the entry name by index
     std::string entry(int i) const;
 
+    /** \brief Get the entry label by index
+    * If scheme is unknown, returns the index as a string
+    */
+    std::string entryLabel(int i) const;
+    
     /// Get the entry enum name by index
     std::string entryEnum(int i) const;
     
