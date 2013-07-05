@@ -232,7 +232,7 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Input scheme: CasADi::InputOutputScheme  ( = 41) </caption>
+<caption>Input scheme: CasADi::InputOutputScheme  ( = 40) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -275,12 +275,11 @@
 <tr><td>SCHEME_SOCPInput</td><td></td></tr>
 <tr><td>SCHEME_SOCPOutput</td><td></td></tr>
 <tr><td>SCHEME_SOCPStruct</td><td></td></tr>
-<tr><td>SCHEME_unknown</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Output scheme: CasADi::InputOutputScheme  ( = 41) </caption>
+<caption>Output scheme: CasADi::InputOutputScheme  ( = 40) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -323,7 +322,6 @@
 <tr><td>SCHEME_SOCPInput</td><td></td></tr>
 <tr><td>SCHEME_SOCPOutput</td><td></td></tr>
 <tr><td>SCHEME_SOCPStruct</td><td></td></tr>
-<tr><td>SCHEME_unknown</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_GradFInput
