@@ -72,7 +72,7 @@ void SOCPQCQPInternal::evaluate(int nfdir, int nadir) {
   int socp_g_offset = 0;    
   for (int i=0;i<nq_+1;++i) {
     cholesky_[i].prepare();
-    DMatrix G = cholesky_[i].getFactorization();
+    DMatrix G = cholesky_[i].getFactorization(true);
     std::copy(G.begin(),G.end(),socpsolver_.input(SOCP_SOLVER_G).begin()+socp_g_offset);
     socp_g_offset += G.size()+1;
   }
@@ -152,7 +152,7 @@ void SOCPQCQPInternal::init(){
     
     // Harvest Cholsesky sparsity patterns
     // Note that we add extra scalar to make room for the epigraph-reformulation variable
-    socp_g.push_back(blkdiag(cholesky_[i].getFactorizationSparsity(),sp_dense(1,1)));
+    socp_g.push_back(blkdiag(cholesky_[i].getFactorizationSparsity(true),sp_dense(1,1)));
   }
 
   // Create an socpsolver instance
