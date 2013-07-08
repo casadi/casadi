@@ -518,7 +518,8 @@ namespace CasADi{
     if(verbose()) std::cout << "XFunctionInternal::jac begin" << std::endl;
   
     // Quick return
-    if(input(iind).empty() || output(oind).empty()) return MatType(0,0);
+    if (input(iind).empty()) return MatType(output(oind).numel(),0);
+    if (output(oind).empty()) return MatType(0,input(iind).numel());
     
     // Create return object
     MatType ret = MatType(jacSparsity(iind,oind,compact,symmetric));

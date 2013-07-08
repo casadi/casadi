@@ -562,6 +562,48 @@ class QPSolverTests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],-34,5,str(qpsolver))
       
+  def test_standard_form(self):
+    H = DMatrix([[1,-1],[-1,2]])
+    G = DMatrix([-2,-6])
+    A =  DMatrix([1,1]).T
+
+    LBA = DMatrix([-inf])
+    UBA = DMatrix([1])
+
+    LBX = DMatrix([-10])
+    UBX = DMatrix([10])
+
+
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+      
+
+
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
+
+      solver.solve()
+
+      self.checkarray(solver.getOutput(),DMatrix([-0.2,1.2]),str(qpsolver),digits=3)
+      
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qpsolver),digits=4)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.4]),str(qpsolver),digits=5)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-5.1,5,str(qpsolver))
+      
   def test_badscaling(self):
     #return
     self.message("Badly scaled problem")

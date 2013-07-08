@@ -2050,5 +2050,16 @@ class MXtests(casadiTestCase):
     self.assertEqual(v.size1(),4)
     self.assertEqual(v.size2(),0)
     
+  def test_jacobian_empty(self):
+    x = msym("x",3)
+
+    s = jacobian(DMatrix(0,0),x).shape
+    self.assertEqual(s[0],0)
+    self.assertEqual(s[1],3)
+
+    s = jacobian(x,msym("x",0,4)).shape
+    self.assertEqual(s[0],3)
+    self.assertEqual(s[1],0)
+    
 if __name__ == '__main__':
     unittest.main()

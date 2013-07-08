@@ -1097,6 +1097,16 @@ class SXtests(casadiTestCase):
     f.evaluate()
     self.checkarray(f.output(),f.input())
     
+  def test_jacobian_empty(self):
+    x = ssym("x",3)
+
+    s = jacobian(DMatrix(0,0),x).shape
+    self.assertEqual(s[0],0)
+    self.assertEqual(s[1],3)
+
+    s = jacobian(x,ssym("x",0,4)).shape
+    self.assertEqual(s[0],3)
+    self.assertEqual(s[1],0)
     
 if __name__ == '__main__':
     unittest.main()
