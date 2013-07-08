@@ -96,7 +96,7 @@ namespace CasADi{
       Li [p] = k ;    
     }
     Lp [n] = S_->cp [n] ; 
-    return trans(CRSSparsity(n, n, rowind, col));
+    return CRSSparsity(n, n, rowind, col);
   
   }
   
@@ -112,7 +112,7 @@ namespace CasADi{
     std::copy(L->i,L->i+nz,col.begin());
     std::vector< double > data(nz);
     std::copy(L->x,L->x+nz,data.begin());
-    return trans(DMatrix(CRSSparsity(m, n, col, rowind),data));
+    return DMatrix(CRSSparsity(m, n, col, rowind),data);
   }
   
   void CSparseCholeskyInternal::prepare(){
@@ -192,7 +192,6 @@ namespace CasADi{
       x += nrow();
     }
   }
-
 
   CSparseCholeskyInternal* CSparseCholeskyInternal::clone() const{
     return new CSparseCholeskyInternal(input(LINSOL_A).sparsity(),input(LINSOL_B).size1());

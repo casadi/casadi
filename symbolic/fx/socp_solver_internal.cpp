@@ -36,7 +36,8 @@ namespace CasADi{
 // Constructor
 SOCPSolverInternal::SOCPSolverInternal(const std::vector<CRSSparsity> &st) : st_(st) {
   addOption("ni",OT_INTEGERVECTOR, GenericType(), "Provide the size of each SOC constraint. Must sum up to N.");
-  
+  addOption("print_problem",OT_BOOLEAN,false,"Print out problem statement for debugging.");
+
   inputScheme_ = SCHEME_SOCPInput;
   outputScheme_ = SCHEME_SOCPOutput;
 
@@ -47,6 +48,8 @@ void SOCPSolverInternal::init() {
   FXInternal::init();
   
   ni_ = getOption("ni");
+  print_problem_ = getOption("print_problem");
+  
   m_ = ni_.size();
   
   const CRSSparsity& A = st_[SOCP_STRUCT_A];
@@ -93,6 +96,24 @@ void SOCPSolverInternal::evaluate(int nfdir, int nadir){
 void SOCPSolverInternal::solve(){
   throw CasadiException("SOCPSolverInternal::solve: Not implemented");
 }
+
+void SOCPSolverInternal::printProblem(std::ostream &stream) const {
+  stream << "SOCP Problem statement -- start" << std::endl;
+  stream << "ni: "<< ni_ << std::endl;
+  stream << "g: "<< std::endl;  input(SOCP_SOLVER_G).printDense(stream);
+  stream << "h: "<< std::endl;  input(SOCP_SOLVER_H).printDense(stream);
+  stream << "e: "<< std::endl;  input(SOCP_SOLVER_E).printDense(stream);
+  stream << "f: "<< std::endl;  input(SOCP_SOLVER_F).printDense(stream);
+  stream << "c: " << input(SOCP_SOLVER_C) << std::endl;
+  stream << "a: " << input(SOCP_SOLVER_A) << std::endl;
+  stream << "lba: " << input(SOCP_SOLVER_LBA) << std::endl;
+  stream << "uba: " << input(SOCP_SOLVER_UBA) << std::endl;
+  stream << "lbx: " << input(SOCP_SOLVER_LBX) << std::endl;
+  stream << "ubx: " << input(SOCP_SOLVER_UBX) << std::endl;
+  
+  stream << "SOCP Problem statement -- end" << std::endl;
+}
+ 
 
 void SOCPSolverInternal::checkInputs() const {
   for (int i=0;i<input(SOCP_SOLVER_LBX).size();++i) {

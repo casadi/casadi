@@ -102,6 +102,47 @@ class QCQPSolverTests(casadiTestCase):
       self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qcqpsolver),digits=5)
       
       self.checkarray(solver.getOutput("cost"),mul(G.T,solver.getOutput()),str(qcqpsolver),digits=4)
+
+  def test_qp(self):
+    #  min  1/2 x' H x + 2 x + y
+    #   x,y
+    #
+    H = DMatrix([[1,0],[0,1]])
+    G = DMatrix([2,1])
+    A = DMatrix(0,2)
+    P = DMatrix(0,2)
+    Q = DMatrix(0,1)
+    R = DMatrix(0,1)
+    LBX = DMatrix([ -inf, -inf ])
+    UBX = DMatrix([ inf, inf ])
+    
+    for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
+      self.message("qcqpsolver: " + str(qcqpsolver))
+
+      solver = qcqpsolver(qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
+      solver.setOption(qcqp_options)
+      solver.init()
+
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(P,"p")
+      solver.setInput(Q,"q")
+      solver.setInput(R,"r")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+
+      solver.solve()
+      
+      socp = solver.getSolver()
+        
+      self.checkarray(solver.getOutput(),DMatrix([-2,-1]),str(qcqpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qcqpsolver),digits=5)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qcqpsolver),digits=5)
+      
+      self.checkarray(solver.getOutput("cost"),-2.5,str(qcqpsolver),digits=4)
+  
       
 if __name__ == '__main__':
     unittest.main()

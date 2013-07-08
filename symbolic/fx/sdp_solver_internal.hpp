@@ -53,6 +53,9 @@ class SDPSolverInternal : public FXInternal{
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
     
+    /// Print out problem statement for debugging
+    void printProblem(std::ostream &stream=std::cout) const;
+    
   protected:
   
     /// Problem structure
@@ -96,6 +99,9 @@ class SDPSolverInternal : public FXInternal{
     * You may want to avoid calculating this variable for problems with n large, as is always dense (n x n).
     */
     bool calc_p_;
+    
+    /// Indicates wether problem is printed before solving
+    bool print_problem_;
 };
 
 

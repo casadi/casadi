@@ -36,6 +36,7 @@ namespace CasADi{
 SDPSolverInternal::SDPSolverInternal(const std::vector<CRSSparsity> &st) : st_(st) {
   addOption("calc_p",OT_BOOLEAN, true, "Indicate if the P-part of primal solution should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (m x m).");
   addOption("calc_dual",OT_BOOLEAN, true, "Indicate if dual should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (m x m).");
+  addOption("print_problem",OT_BOOLEAN,false,"Print out problem statement for debugging.");
 
   casadi_assert_message(st_.size()==SDP_STRUCT_NUM,"Problem structure mismatch");
   
@@ -81,6 +82,7 @@ void SDPSolverInternal::init() {
   
   calc_p_ = getOption("calc_p");
   calc_dual_ = getOption("calc_dual");
+  print_problem_ = getOption("print_problem");
 
   // Find aggregate sparsity pattern
   CRSSparsity aggregate = input(SDP_SOLVER_G).sparsity();
@@ -144,6 +146,21 @@ void SDPSolverInternal::init() {
 }
 
 SDPSolverInternal::~SDPSolverInternal(){
+}
+
+void SDPSolverInternal::printProblem(std::ostream &stream) const {
+  stream << "SDP Problem statement -- start" << std::endl;
+  
+  stream << "f: "<< std::endl;  input(SDP_SOLVER_F).printDense(stream);
+  stream << "c: "<< std::endl;  input(SDP_SOLVER_C).printDense(stream);
+  stream << "g: "<< std::endl;  input(SDP_SOLVER_G).printDense(stream);
+  stream << "a: "<< std::endl;  input(SDP_SOLVER_A).printDense(stream);
+  stream << "lba: " << input(SDP_SOLVER_LBA) << std::endl;
+  stream << "uba: " << input(SDP_SOLVER_UBA) << std::endl;
+  stream << "lbx: " << input(SDP_SOLVER_LBX) << std::endl;
+  stream << "ubx: " << input(SDP_SOLVER_UBX) << std::endl;
+  
+  stream << "SDP Problem statement -- end" << std::endl;
 }
  
 void SDPSolverInternal::evaluate(int nfdir, int nadir){

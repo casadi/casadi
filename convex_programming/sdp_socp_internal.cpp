@@ -51,6 +51,8 @@ SDPSOCPInternal::~SDPSOCPInternal(){
 void SDPSOCPInternal::evaluate(int nfdir, int nadir) {
   if (nfdir!=0 || nadir!=0) throw CasadiException("SDPSOCPInternal::evaluate() not implemented for forward or backward mode");
   
+  if (print_problem_) printProblem();
+    
   mapping_.setInput(input(SOCP_SOLVER_G),0);
   mapping_.setInput(input(SOCP_SOLVER_H),1);
   mapping_.setInput(input(SOCP_SOLVER_E),2);
