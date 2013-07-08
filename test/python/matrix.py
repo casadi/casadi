@@ -847,6 +847,13 @@ class Matrixtests(casadiTestCase):
     
     self.assertEqual(a.size1(),0)
     self.assertEqual(a.size2(),2)
+
+    a = DMatrix(0,0)
+    a.append(DMatrix(2,0))
+    a.append(DMatrix(3,0))
+    
+    self.assertEqual(a.size1(),5)
+    self.assertEqual(a.size2(),0)
     
   def test_vertcat_empty(self):
     a = DMatrix(0,2)
@@ -854,6 +861,12 @@ class Matrixtests(casadiTestCase):
     
     self.assertEqual(v.size1(),0)
     self.assertEqual(v.size2(),2)
+
+    a = DMatrix(2,0)
+    v = vertcat([a,a])
+    
+    self.assertEqual(v.size1(),4)
+    self.assertEqual(v.size2(),0)
     
 if __name__ == '__main__':
     unittest.main()

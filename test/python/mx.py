@@ -2044,7 +2044,11 @@ class MXtests(casadiTestCase):
     self.assertEqual(v.size1(),0)
     self.assertEqual(v.size2(),2)
     
+    a = MX(DMatrix(2,0))
+    v = vertcat([a,a])
     
+    self.assertEqual(v.size1(),4)
+    self.assertEqual(v.size2(),0)
     
 if __name__ == '__main__':
     unittest.main()

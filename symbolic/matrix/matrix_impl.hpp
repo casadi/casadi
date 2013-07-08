@@ -1767,13 +1767,10 @@ template<class T>
 void Matrix<T>::append(const Matrix<T>& y){
 
   // Quick return if expr is empty
-  if(empty()){
+  if(size1()==0 && size2()==0){
     *this=y;
     return;
   }
-  
-  // Quick return if we are adding an empty expression
-  if(y.empty()) return;
   
   // Append the sparsity pattern
   sparsityRef().append(y.sparsity());
