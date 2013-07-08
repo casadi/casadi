@@ -648,6 +648,7 @@ class ADtests(casadiTestCase):
           #(in1,v1,c.det(horzcat([x,DMatrix([1,2])])),DMatrix([-1,2])), not implemented
           (in1,v1,f1.call(in1)[1],y),
           (in1,v1,f1.call([x**2,y])[1],y*2*vertcat([x.T,x.T])),
+          (in1,v1,vertcat([x,DMatrix(0,1)]),DMatrix.eye(2))
      ]:
       print out
       fun = MXFunction(inputs,[out,jac])

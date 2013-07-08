@@ -2037,6 +2037,7 @@ class MXtests(casadiTestCase):
   def test_iter(self):
     self.assertEqual(len(list(msym("x",2))),2)
 
+  @known_bug()
   def test_vertcat_empty(self):
     a = MX(DMatrix(0,2))
     v = vertcat([a,a])

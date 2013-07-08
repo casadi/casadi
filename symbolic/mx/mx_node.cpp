@@ -687,7 +687,7 @@ namespace CasADi{
     vector<MX> c;
     c.reserve(x.size());
     for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it)
-      if(!it->isNull())
+      if(!it->isNull() && !it->empty())
         c.push_back(*it);
   
     if(c.empty()){

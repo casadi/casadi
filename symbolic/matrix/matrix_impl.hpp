@@ -1771,6 +1771,9 @@ void Matrix<T>::append(const Matrix<T>& y){
     *this=y;
     return;
   }
+
+  // Quick return if empty
+  if(y.size1()==0 && y.size2()==0) return;
   
   // Append the sparsity pattern
   sparsityRef().append(y.sparsity());
