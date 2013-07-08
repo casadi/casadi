@@ -49,6 +49,11 @@ try:
 except:
   pass
 
+try:
+  qpsolvers.append((QCQPQPSolver,{"qcqp_solver":SOCPQCQPSolver,"qcqp_solver_options": {"socp_solver": SDPSOCPSolver, "socp_solver_options": {"sdp_solver": DSDPSolver, "sdp_solver_options": {"gapTol":1e-10}} }}))
+except:
+  pass
+
 class QPSolverTests(casadiTestCase):
 
   def testboundsviol(self):
@@ -434,6 +439,7 @@ class QPSolverTests(casadiTestCase):
       
     for qpsolver, qp_options in qpsolvers:
       self.message("degenerate hessian: " + str(qpsolver))
+      if 'QCQP' in str(qpsolver): continue
       solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):
@@ -548,12 +554,9 @@ class QPSolverTests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.getOutput()[0],10,3,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput()[1],8,3,str(qpsolver))
-    
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,5,str(qpsolver))
-
+      self.checkarray(solver.getOutput(),DMatrix([10,8]),str(qpsolver),digits=3)
+      
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qpsolver),digits=4)
 
       self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qpsolver),digits=5)
       
@@ -620,6 +623,7 @@ class QPSolverTests(casadiTestCase):
       options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
         
       for qpsolver, qp_options in qpsolvers:
+        if 'QCQP' in str(qpsolver): continue
         solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
         for key, val in options.iteritems():
           if solver.hasOption(key):
@@ -654,6 +658,7 @@ class QPSolverTests(casadiTestCase):
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
+      if 'QCQP' in str(qpsolver): continue
       solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):

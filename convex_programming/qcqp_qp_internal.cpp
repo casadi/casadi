@@ -38,7 +38,7 @@ QCQPQPInternal* QCQPQPInternal::clone() const{
   
 QCQPQPInternal::QCQPQPInternal(const std::vector<CRSSparsity> &st) : QPSolverInternal(st) {
 
-  addOption("qcqp_solver",       OT_QCQPSOLVER, GenericType(), "The QCQPSOlver used to solve the QPs.");
+  addOption("qcqp_solver",       OT_QCQPSOLVER, GenericType(), "The QCQPSolver used to solve the QPs.");
   addOption("qcqp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the QCQPSOlver");
   
 }
@@ -52,6 +52,7 @@ void QCQPQPInternal::evaluate(int nfdir, int nadir) {
   // Pass inputs of QP to QCQP form 
   qcqpsolver_.input(QCQP_SOLVER_A).set(input(QP_SOLVER_A));
   qcqpsolver_.input(QCQP_SOLVER_G).set(input(QP_SOLVER_G));
+  qcqpsolver_.input(QCQP_SOLVER_H).set(input(QP_SOLVER_H));
   
   qcqpsolver_.input(QCQP_SOLVER_LBX).set(input(QP_SOLVER_LBX));
   qcqpsolver_.input(QCQP_SOLVER_UBX).set(input(QP_SOLVER_UBX));

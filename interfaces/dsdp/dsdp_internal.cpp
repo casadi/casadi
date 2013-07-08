@@ -159,6 +159,7 @@ void DSDPInternal::init(){
 void DSDPInternal::evaluate(int nfdir, int nadir) {
 
   if (inputs_check_) checkInputs();
+  if (print_problem_) printProblem();
   
   int info;
   

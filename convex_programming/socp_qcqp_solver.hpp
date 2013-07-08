@@ -33,7 +33,7 @@ class SOCPQCQPInternal;
 
   /** \brief SOCP QCQP Solver for quadratic programming
    *
-   *  Note: this implementation relies on Cholesky decomposition.
+   *  Note: this implementation relies on Cholesky decomposition:  Chol(H) = L ->  H = LL' with L lower triangular
    *   This requires Pi, H to be positive definite. Positive semi-definite is not sufficient.
    *    Notably, H==0  will not work.
    *
@@ -54,8 +54,8 @@ class SOCPQCQPInternal;
    *
    *  x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0
    *
-   *    where we put e = [0 0 ... 1]  for the qc arising from the epigraph reformulation
-   *    and e==0 for all otyher qc.
+   *    where we put e = [0 0 ... 1]  for the qadratic constraint arising from the epigraph reformulation
+   *    and e==0 for all other qc.
 
    @copydoc QCQPSolver_doc
       

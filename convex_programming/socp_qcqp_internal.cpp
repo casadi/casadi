@@ -81,13 +81,11 @@ void SOCPQCQPInternal::evaluate(int nfdir, int nadir) {
   //   2h'G = Q   -> 2G'h = Q  ->  solve for h
   double *x = &socpsolver_.input(SOCP_SOLVER_H).data().front();
   std::copy(input(QCQP_SOLVER_G).begin(),input(QCQP_SOLVER_G).begin()+n_,x);
-  socpsolver_.input(SOCP_SOLVER_H).printDense();
-  cholesky_[0].solveL(x,1,false);
-  socpsolver_.input(SOCP_SOLVER_H).printDense();
+  cholesky_[0].solveL(x,1,true);
   int x_offset = n_+1;
   for (int i=0;i<nq_;++i) {
     std::copy(input(QCQP_SOLVER_Q).begin()+i*(n_+1),input(QCQP_SOLVER_Q).begin()+(i+1)*(n_+1)-1,x+x_offset);
-    cholesky_[i+1].solveL(x+x_offset,1,false);
+    cholesky_[i+1].solveL(x+x_offset,1,true);
     x_offset += n_+1;
   }
   
