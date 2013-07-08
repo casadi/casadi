@@ -44,12 +44,12 @@ namespace CasADi{
     return dynamic_cast<const CSparseCholeskyInternal*>(get())!=0;
   }
 
-  CRSSparsity CSparseCholesky::getFactorizationSparsity() const {
-    return (*this)->getFactorizationSparsity();
+  CRSSparsity CSparseCholesky::getFactorizationSparsity(bool transpose) const {
+    return (*this)->getFactorizationSparsity(transpose);
   }
   
-  DMatrix CSparseCholesky::getFactorization() const {
-    return (*this)->getFactorization();
+  DMatrix CSparseCholesky::getFactorization(bool transpose) const {
+    return (*this)->getFactorization(transpose);
   }
 
   void CSparseCholesky::solveL(double* x, int nrhs, bool transpose) {
