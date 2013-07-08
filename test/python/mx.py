@@ -2036,6 +2036,15 @@ class MXtests(casadiTestCase):
     
   def test_iter(self):
     self.assertEqual(len(list(msym("x",2))),2)
+
+  def test_vertcat_empty(self):
+    a = MX(DMatrix(0,2))
+    v = vertcat([a,a])
+    
+    self.assertEqual(v.size1(),0)
+    self.assertEqual(v.size2(),2)
+    
+    
     
 if __name__ == '__main__':
     unittest.main()

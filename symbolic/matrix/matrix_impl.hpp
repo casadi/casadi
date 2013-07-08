@@ -1765,14 +1765,15 @@ Matrix<T> Matrix<T>::nan(int n, int m){
 
 template<class T>
 void Matrix<T>::append(const Matrix<T>& y){
-  // Quick return if we are adding an empty expression
-  if(y.empty()) return;
 
-  // Likewise if expr is empty
+  // Quick return if expr is empty
   if(empty()){
     *this=y;
     return;
   }
+  
+  // Quick return if we are adding an empty expression
+  if(y.empty()) return;
   
   // Append the sparsity pattern
   sparsityRef().append(y.sparsity());

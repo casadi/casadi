@@ -840,7 +840,20 @@ class Matrixtests(casadiTestCase):
     
     with self.assertRaises(Exception):
       tril2symm(DMatrix.ones(5,5))
+      
+  def test_append_empty(self):
+    a = DMatrix(0,0)
+    a.append(DMatrix(0,2))
     
+    self.assertEqual(a.size1(),0)
+    self.assertEqual(a.size2(),2)
+    
+  def test_vertcat_empty(self):
+    a = DMatrix(0,2)
+    v = vertcat([a,a])
+    
+    self.assertEqual(v.size1(),0)
+    self.assertEqual(v.size2(),2)
     
 if __name__ == '__main__':
     unittest.main()
