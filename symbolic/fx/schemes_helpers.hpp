@@ -1514,6 +1514,133 @@ std::vector<M> sdpStruct(const std::vector<M>& args,const std::string arg_s0="",
   return ret;
 
 }
+/// Helper function for 'SDQPInput'
+
+template<class M>
+class SDQPInputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit SDQPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPInput){} 
+};
+/// Input arguments of a SDQP problem
+/// 
+/// \copydoc scheme_SDQPInput
+template<class M>
+SDQPInputIOSchemeVector<M> sdqpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M()){
+  std::vector<M> ret(9);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
+  if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
+  if (arg_s7!="") arg.insert(make_pair(arg_s7,arg_m7));
+  if (arg_s8!="") arg.insert(make_pair(arg_s8,arg_m8));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_SDQPInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in SDQPInput: '" << it->first << "' is not recognized. Available keywords are: h, c, f, g, a, lba, uba, lbx, ubx");
+    ret[n] = it->second;
+  }
+  return SDQPInputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> sdqpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s7)));
+  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s8)));
+  return ret;
+
+}
+/// Helper function for 'SDQPOutput'
+
+template<class M>
+class SDQPOutputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit SDQPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPOutput){} 
+};
+/// Output arguments of an SDQP Solver
+/// 
+/// \copydoc scheme_SDQPOutput
+template<class M>
+SDQPOutputIOSchemeVector<M> sdqpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M()){
+  std::vector<M> ret(7);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
+  if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_SDQPOutput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in SDQPOutput: '" << it->first << "' is not recognized. Available keywords are: x, p, dual, cost, dual_cost, lam_a, lam_x");
+    ret[n] = it->second;
+  }
+  return SDQPOutputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> sdqpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s6)));
+  return ret;
+
+}
+/// Helper function for 'SDQPStruct'
+
+template<class M>
+class SDQPStructIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit SDQPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPStruct){} 
+};
+/// Structure specification of an SDQP
+/// 
+/// \copydoc scheme_SDQPStruct
+template<class M>
+SDQPStructIOSchemeVector<M> sdqpStruct(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+  std::vector<M> ret(4);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_SDQPStruct,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in SDQPStruct: '" << it->first << "' is not recognized. Available keywords are: h, f, g, a");
+    ret[n] = it->second;
+  }
+  return SDQPStructIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> sdqpStruct(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct,arg_s3)));
+  return ret;
+
+}
 /// Helper function for 'SOCPInput'
 
 template<class M>

@@ -2122,6 +2122,187 @@ namespace CasADi {
 }
 #ifdef SWIGPYTHON
 %pythoncode %{
+def sdqpIn(*dummy,**kwargs):
+  """
+  Helper function for 'SDQPInput'
+
+  Two use cases:
+     a) arg = sdqpIn(h=my_h, c=my_c, f=my_f, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx) 
+          all arguments optional
+     b) h, c, f, g, a, lba, uba, lbx, ubx = sdqpIn(arg,"h", "c", "f", "g", "a", "lba", "uba", "lbx", "ubx") 
+          all arguments after the first optional
+  Input arguments of a SDQP problem
+  
+  Keyword arguments:
+    h   -- The matrix H: sparse ( n x n) [SDQP_SOLVER_H]
+    c   -- The vector c: ( n x 1) [SDQP_SOLVER_C]
+    f   -- The vertical stack of all matrices F_i: ( nm x m) [SDQP_SOLVER_F]
+    g   -- The matrix G: ( m x m) [SDQP_SOLVER_G]
+    a   -- The matrix A: ( nc x n) [SDQP_SOLVER_A]
+    lba -- Lower bounds on Ax ( nc x 1) [SDQP_SOLVER_LBA]
+    uba -- Upper bounds on Ax  ( nc x 1) [SDQP_SOLVER_UBA]
+    lbx -- Lower bounds on x ( n x 1 ) [SDQP_SOLVER_LBX]
+    ubx -- Upper bounds on x ( n x 1 ) [SDQP_SOLVER_UBX]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPInput,n)] for n in dummy[1:]]
+  h = []
+  if 'h' in kwargs:
+    h = kwargs['h']
+  c = []
+  if 'c' in kwargs:
+    c = kwargs['c']
+  f = []
+  if 'f' in kwargs:
+    f = kwargs['f']
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  lba = []
+  if 'lba' in kwargs:
+    lba = kwargs['lba']
+  uba = []
+  if 'uba' in kwargs:
+    uba = kwargs['uba']
+  lbx = []
+  if 'lbx' in kwargs:
+    lbx = kwargs['lbx']
+  ubx = []
+  if 'ubx' in kwargs:
+    ubx = kwargs['ubx']
+  for k in kwargs.keys():
+    if not(k in ['h','c','f','g','a','lba','uba','lbx','ubx']):
+      raise Exception("Keyword error in sdqpIn: '%s' is not recognized. Available keywords are: h, c, f, g, a, lba, uba, lbx, ubx" % k )
+  return IOSchemeVector([h,c,f,g,a,lba,uba,lbx,ubx], IOScheme(SCHEME_SDQPInput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(sdqpIn) sdqpIn<SXMatrix>;
+%template(sdqpIn) sdqpIn<MX>;
+%template(sdqpIn) sdqpIn<CRSSparsity>;
+%template(IOSchemeVectorSDQPInput) SDQPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSDQPInput) SDQPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorSDQPInput) SDQPInputIOSchemeVector<CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def sdqpOut(*dummy,**kwargs):
+  """
+  Helper function for 'SDQPOutput'
+
+  Two use cases:
+     a) arg = sdqpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
+          all arguments optional
+     b) x, p, dual, cost, dual_cost, lam_a, lam_x = sdqpOut(arg,"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x") 
+          all arguments after the first optional
+  Output arguments of an SDQP Solver
+  
+  Keyword arguments:
+    x         -- The primal solution (n x 1) - may be used as initial guess [SDQP_SOLVER_X]
+    p         -- The solution P (m x m) - may be used as initial guess [SDQP_SOLVER_P]
+    dual      -- The dual solution (m x m) - may be used as initial guess [SDQP_SOLVER_DUAL]
+    cost      -- The primal optimal cost (1 x 1) [SDQP_SOLVER_COST]
+    dual_cost -- The dual optimal cost (1 x 1) [SDQP_SOLVER_DUAL_COST]
+    lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDQP_SOLVER_LAM_A]
+    lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDQP_SOLVER_LAM_X]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPOutput,n)] for n in dummy[1:]]
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
+  p = []
+  if 'p' in kwargs:
+    p = kwargs['p']
+  dual = []
+  if 'dual' in kwargs:
+    dual = kwargs['dual']
+  cost = []
+  if 'cost' in kwargs:
+    cost = kwargs['cost']
+  dual_cost = []
+  if 'dual_cost' in kwargs:
+    dual_cost = kwargs['dual_cost']
+  lam_a = []
+  if 'lam_a' in kwargs:
+    lam_a = kwargs['lam_a']
+  lam_x = []
+  if 'lam_x' in kwargs:
+    lam_x = kwargs['lam_x']
+  for k in kwargs.keys():
+    if not(k in ['x','p','dual','cost','dual_cost','lam_a','lam_x']):
+      raise Exception("Keyword error in sdqpOut: '%s' is not recognized. Available keywords are: x, p, dual, cost, dual_cost, lam_a, lam_x" % k )
+  return IOSchemeVector([x,p,dual,cost,dual_cost,lam_a,lam_x], IOScheme(SCHEME_SDQPOutput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(sdqpOut) sdqpOut<SXMatrix>;
+%template(sdqpOut) sdqpOut<MX>;
+%template(sdqpOut) sdqpOut<CRSSparsity>;
+%template(IOSchemeVectorSDQPOutput) SDQPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSDQPOutput) SDQPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorSDQPOutput) SDQPOutputIOSchemeVector<CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def sdqpStruct(*dummy,**kwargs):
+  """
+  Helper function for 'SDQPStruct'
+
+  Two use cases:
+     a) arg = sdqpStruct(h=my_h, f=my_f, g=my_g, a=my_a) 
+          all arguments optional
+     b) h, f, g, a = sdqpStruct(arg,"h", "f", "g", "a") 
+          all arguments after the first optional
+  Structure specification of an SDQP
+  
+  Keyword arguments:
+    h -- The matrix H: sparse ( n x n) [SDQP_STRUCT_H]
+    f -- The vertical stack of all matrices F_i: ( nm x m) [SDQP_STRUCT_F]
+    g -- The matrix G: ( m x m) [SDQP_STRUCT_G]
+    a -- The matrix A: ( nc x n) [SDQP_STRUCT_A]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpStruct. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPStruct,n)] for n in dummy[1:]]
+  h = []
+  if 'h' in kwargs:
+    h = kwargs['h']
+  f = []
+  if 'f' in kwargs:
+    f = kwargs['f']
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  for k in kwargs.keys():
+    if not(k in ['h','f','g','a']):
+      raise Exception("Keyword error in sdqpStruct: '%s' is not recognized. Available keywords are: h, f, g, a" % k )
+  return SDQPStructure([h,f,g,a])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(sdqpStruct) sdqpStruct<CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+%template(SDQPStructure) SDQPStructIOSchemeVector<CRSSparsity>;
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
 def socpIn(*dummy,**kwargs):
   """
   Helper function for 'SOCPInput'

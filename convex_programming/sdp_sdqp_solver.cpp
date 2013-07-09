@@ -20,21 +20,35 @@
  *
  */
 
-%{
-#include "convex_programming/qp_lp_solver.hpp"
-#include "convex_programming/qcqp_qp_solver.hpp"
-#include "convex_programming/sdp_socp_solver.hpp"
-%}
+#include "sdp_sdqp_internal.hpp"
+#include "sdp_sdqp_solver.hpp"
 
-%include "convex_programming/qp_lp_solver.hpp"
-%include "convex_programming/qcqp_qp_solver.hpp"
-%include "convex_programming/sdp_socp_solver.hpp"
+using namespace std;
+namespace CasADi{
 
-#ifdef WITH_CSPARSE
-%{
-#include "convex_programming/socp_qcqp_solver.hpp"
-#include "convex_programming/sdp_sdqp_solver.hpp"
-%}
-%include "convex_programming/socp_qcqp_solver.hpp"
-%include "convex_programming/sdp_sdqp_solver.hpp"
-#endif // WITH_CSPARSE
+SDPSDQPSolver::SDPSDQPSolver(){ 
+}
+
+
+SDPSDQPSolver::SDPSDQPSolver(const SDQPStructure & st)  {
+  assignNode(new SDPSDQPInternal(st));
+}
+
+SDPSDQPInternal* SDPSDQPSolver::operator->(){
+  return (SDPSDQPInternal*)(FX::operator->());
+}
+
+const SDPSDQPInternal* SDPSDQPSolver::operator->() const{
+  return (const SDPSDQPInternal*)(FX::operator->());
+
+}
+
+bool SDPSDQPSolver::checkNode() const{
+  return dynamic_cast<const SDPSDQPInternal*>(get());
+}
+
+SDPSolver & SDPSDQPSolver::getSolver() {
+  return (*this)->sdpsolver_;
+}
+
+} // namespace CasADi

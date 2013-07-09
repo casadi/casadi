@@ -115,6 +115,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_SOCPSOLVER";
       case OT_SDPSOLVER:
               return "OT_SDPSOLVER";
+      case OT_SDQPSOLVER:
+              return "OT_SDQPSOLVER";
       case OT_IMPLICITFUNCTION:
               return "OT_IMPLICITFUNCTION";
       case OT_JACOBIANGENERATOR:
@@ -373,6 +375,10 @@ GenericType::GenericType(SDPSolverCreator ptr) : type_(OT_SDPSOLVER) {
   assignNode(new GenericTypeInternal<SDPSolverCreator>(ptr));
 }
 
+GenericType::GenericType(SDQPSolverCreator ptr) : type_(OT_SDQPSOLVER) {
+  assignNode(new GenericTypeInternal<SDQPSolverCreator>(ptr));
+}
+
 GenericType::GenericType(SOCPSolverCreator ptr) : type_(OT_SOCPSOLVER) {
   assignNode(new GenericTypeInternal<SOCPSolverCreator>(ptr));
 }
@@ -406,6 +412,11 @@ GenericType::operator LPSolverCreator() const{
 GenericType::operator SDPSolverCreator() const{
   casadi_assert_message(is_a<SDPSolverCreator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<SDPSolverCreator>*>(get())->d_;
+}
+
+GenericType::operator SDQPSolverCreator() const{
+  casadi_assert_message(is_a<SDQPSolverCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<SDQPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator SOCPSolverCreator() const{

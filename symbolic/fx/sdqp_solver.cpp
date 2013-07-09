@@ -20,21 +20,33 @@
  *
  */
 
-%{
-#include "convex_programming/qp_lp_solver.hpp"
-#include "convex_programming/qcqp_qp_solver.hpp"
-#include "convex_programming/sdp_socp_solver.hpp"
-%}
+#include "sdqp_solver_internal.hpp"
 
-%include "convex_programming/qp_lp_solver.hpp"
-%include "convex_programming/qcqp_qp_solver.hpp"
-%include "convex_programming/sdp_socp_solver.hpp"
+using namespace std;
+namespace CasADi{
 
-#ifdef WITH_CSPARSE
-%{
-#include "convex_programming/socp_qcqp_solver.hpp"
-#include "convex_programming/sdp_sdqp_solver.hpp"
-%}
-%include "convex_programming/socp_qcqp_solver.hpp"
-%include "convex_programming/sdp_sdqp_solver.hpp"
-#endif // WITH_CSPARSE
+
+SDQPSolver::SDQPSolver() {
+}
+
+SDQPSolverInternal* SDQPSolver::operator->(){
+  return static_cast<SDQPSolverInternal*>(FX::operator->());
+}
+
+const SDQPSolverInternal* SDQPSolver::operator->() const{
+    return static_cast<const SDQPSolverInternal*>(FX::operator->());
+}
+
+bool SDQPSolver::checkNode() const{
+  return dynamic_cast<const SDQPSolverInternal*>(get())!=0;
+}
+
+void SDQPSolver::setSOCQPOptions() {
+  (*this)->setSOCQPOptions();
+}
+
+} // namespace CasADi
+
+  
+
+

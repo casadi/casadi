@@ -8,6 +8,7 @@ SET(CONVEX_PROGRAMMING_SRCS
 if(WITH_CSPARSE)
 list(APPEND CONVEX_PROGRAMMING_SRCS
  socp_qcqp_solver.cpp socp_qcqp_solver.hpp socp_qcqp_internal.cpp socp_qcqp_internal.hpp
+ sdp_sdqp_solver.cpp  sdp_sdqp_solver.hpp  sdp_sdqp_internal.cpp  sdp_sdqp_internal.hpp
 )
 endif(WITH_CSPARSE)
 
