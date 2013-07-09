@@ -660,7 +660,7 @@ class SDPtests(casadiTestCase):
       
       self.checkarray(sdqp.getOutput("x"),DMatrix([1.50958,2.64975]),digits=5)
       self.checkarray(sdqp.getOutput("cost"),DMatrix([21.52654031]),digits=5)
-      self.checkarray(sdqp.getOutput("dual"),DMatrix([[12.38233609,9.346044429],[9.346044429,7.054286514]]),digits=5)
+      self.checkarray(sdqp.getOutput("dual"),DMatrix([[12.38233609,9.346044429],[9.346044429,7.054286514]]),digits=3)
       
   def test_simple_sdqp_inactive(self):
     self.message("scalar")
