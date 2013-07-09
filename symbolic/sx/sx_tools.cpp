@@ -1299,8 +1299,26 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
   
   SXMatrix eig_symbolic(const SXMatrix& m) {
     casadi_assert_message(m.size1()==m.size2(),"eig(): supplied matrix must be square");
+    
+    SXMatrix ret;
+    
+    /// Bring m in block diagonal form, calculating eigenvalues of each block seperately
+    std::vector<int> offset;
+    std::vector<int> index;
+    int nb = m.sparsity().stronglyConnectedComponents(offset,index);
+    
+    SXMatrix m_perm = m(offset,offset);
+    
     SXMatrix l = ssym("l");
-    return poly_roots(poly_coeff(det(SXMatrix::eye(m.size1())*l-m),l));
+    
+    for (int k=0;k<nb;++k) {
+      std::vector<int> r = range(index.at(k),index.at(k+1));
+      // det(lambda*I-m) = 0
+      std::cout << r << std::endl;
+      ret.append(poly_roots(poly_coeff(det(SXMatrix::eye(r.size())*l-m_perm(r,r)),l)));
+    }
+		
+    return ret;
   }
   
 } // namespace CasADi

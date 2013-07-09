@@ -1090,12 +1090,38 @@ class SXtests(casadiTestCase):
     
     
   def test_eig_symbolic(self):
+    x = ssym("x",2,2)
+    f = SXFunction([x],[eig_symbolic(x)])
+    f.init()
+    f.setInput(DMatrix([[2,0.1],[0.3,0.7]]))
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([0.67732,2.02268]),digits=5)
+    
+    
     x = ssym("x",2)
     f = SXFunction([x],[eig_symbolic(c.diag(x))])
     f.init()
     f.setInput([3,7])
     f.evaluate()
     self.checkarray(f.output(),f.input())
+
+    
+    x = ssym("x",5)
+    f = SXFunction([x],[eig_symbolic(c.diag(x))])
+    f.init()
+    f.setInput([3,7,2,1,6])
+    f.evaluate()
+    self.checkarray(f.output(),f.input())
+    
+    x = ssym("x",2,2)
+    y = ssym("y",2)
+    f = SXFunction([x,y],[eig_symbolic(blkdiag([x,c.diag(y)]))])
+    f.init()
+    f.setInput(DMatrix([[2,0.1],[0.3,0.7]]),0)
+    f.setInput([3,7],1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([0.67732,2.02268,3,7]),digits=5)
+
     
   def test_jacobian_empty(self):
     x = ssym("x",3)
