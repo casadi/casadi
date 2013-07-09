@@ -33,6 +33,14 @@ try:
 except:
   pass
   
+
+sdqpsolvers = []
+try:
+  sdqpsolvers.append((SDPSDQPSolver,{"sdp_solver": DSDPSolver}))
+except:
+  pass
+  
+  
 class SDPtests(casadiTestCase):
 
   def test_memleak1(self):
@@ -608,8 +616,98 @@ class SDPtests(casadiTestCase):
       self.checkarray(sdp.getOutput("dual")[permi,permi],DMatrix(sp,[2.640261206,0.5605636589,0.5605636589,3.717637107,0.7615505416,-1.513524657,1.139370202,-1.513524657,3.008016978,-2.264413045,1.139370202,-2.264413045,1.704633559,0,0]),digits=5)
       self.checkarray(sdp.getOutput("p")[permi,permi],DMatrix(sp,[0,0,0,0,7.119155551,5.024671489,1.916294752,5.024671489,4.414745792,2.506021978,1.916294752,2.506021978,2.048124139,0.3432465654,4.391169489]),digits=5)
 
+  def test_simple_sdqp(self):
+    self.message("scalar")
     
+    A = DMatrix(0,2)
+     
+    #  active
+    #
+    # min  3*x**2+1*y**2+0.5*xy+2*x+y
+    #  x,y
+    #      |-x   2| <=0
+    #      |2   -y|
+    #   x,y>=0
+    #
+    #
+    #   shur: -x < 0
+    #         -y - 4/(-x) < 0
+    #         xy - 4 > 0
+    #         xy > 4
+    #  
+    #     <=>    border: xy - 4 == 0
+    # Max(Eigenvalues({-x,2},{2,-y}))    
+    #     <=>    xy >= 4
+    #
+    #  [-1 0;0 0] x + [0 0;0 -1] y - [0 -2; -2 0]
+    h = DMatrix([[3,0.25],[0.25,1]])*2
+    c = DMatrix([2,1])
+    Fi = [DMatrix([[-1,0],[0,0]]),DMatrix([[0,0],[0,-1]])]
+    F = vertcat(Fi)
+    G = DMatrix([[0,-2],[-2,0]])
+    for sdqpsolver, sdqp_options in sdqpsolvers:
+      sdqp = sdqpsolver(sdqpStruct(h=h.sparsity(),a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdqp.setOption(sdqp_options)
+      sdqp.init()
+      sdqp.setInput(G,"g")
+      sdqp.setInput(c,"c")
+      sdqp.setInput(h,"h")
+      sdqp.setInput(F,"f")
+      sdqp.setInput(0,"lbx")
+      sdqp.setInput(10,"ubx")
+
+      sdqp.evaluate()
+      
+      self.checkarray(sdqp.getOutput("x"),DMatrix([1.50958,2.64975]),digits=5)
+      self.checkarray(sdqp.getOutput("cost"),DMatrix([21.52654031]),digits=5)
+      self.checkarray(sdqp.getOutput("dual"),DMatrix([[12.38233609,9.346044429],[9.346044429,7.054286514]]),digits=5)
+      
+  def test_simple_sdqp_inactive(self):
+    self.message("scalar")
     
+    A = DMatrix(0,2)
+     
+    #  inactive
+    #
+    # min  3*x**2+1*y**2+0.5*xy-8*x-10y
+    #  x,y
+    #      |-x   2| <=0
+    #      |2   -y|
+    #   x,y>=0
+    #
+    #
+    #   shur: -x < 0
+    #         -y - 4/(-x) < 0
+    #         xy - 4 > 0
+    #         xy > 4
+    #  
+    #     <=>    border: xy - 4 == 0
+    # Max(Eigenvalues({-x,2},{2,-y}))    
+    #     <=>    xy >= 4
+    #
+    #  [-1 0;0 0] x + [0 0;0 -1] y - [0 -2; -2 0]
+    h = DMatrix([[3,0.25],[0.25,1]])*2
+    c = DMatrix([-8,-10])
+    Fi = [DMatrix([[-1,0],[0,0]]),DMatrix([[0,0],[0,-1]])]
+    F = vertcat(Fi)
+    G = DMatrix([[0,-2],[-2,0]])
+    for sdqpsolver, sdqp_options in sdqpsolvers:
+      sdqp = sdqpsolver(sdqpStruct(h=h.sparsity(),a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdqp.setOption(sdqp_options)
+      sdqp.init()
+      sdqp.setInput(G,"g")
+      sdqp.setInput(c,"c")
+      sdqp.setInput(h,"h")
+      sdqp.setInput(F,"f")
+      sdqp.setInput(0,"lbx")
+      sdqp.setInput(10,"ubx")
+
+      sdqp.evaluate()
+      
+      self.checkarray(sdqp.getOutput("x"),DMatrix([0.9361702353,4.765957454]),digits=5)
+      self.checkarray(sdqp.getOutput("cost"),DMatrix([-27.57446808]),digits=5)
+      self.checkarray(sdqp.getOutput("dual"),DMatrix([[0,0],[0,0]]),digits=5)
+      
 if __name__ == '__main__':
     unittest.main()
 
