@@ -614,412 +614,60 @@
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
-/** \class CasADi::WorhpInternal
+/** \class CasADi::SDPSDQPInternal
 \n
 \par
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable feasibility</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable optimality</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>False</td><td>Use a constant lower bound on Armijo stepsize in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>(42, 41, 42, 45, 43, 46, 44)</td><td>Armijo recovery strategies. Vector of size 7</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoBeta</td><td>OT_REAL</td><td>0.712</td><td>Trial stepsize decrease factor for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>1.0</td><td>Initial alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMinAlphaRec</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule during recovery</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoSigma</td><td>OT_REAL</td><td>0.005</td><td>Scale factor for linearised descent check in Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AutoQPRecovery</td><td>OT_BOOLEAN</td><td>True</td><td>Enable automatic QP recovery</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSmaxblockSize</td><td>OT_INTEGER</td><td>300</td><td>Maximum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSmethod</td><td>OT_INTEGER</td><td>0</td><td>Choose BFGS method (dense, block, sparse)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSminblockSize</td><td>OT_INTEGER</td><td>300</td><td>Minimum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSrestart</td><td>OT_INTEGER</td><td>50</td><td>Restart BFGS update after this many iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BettsFactor</td><td>OT_REAL</td><td>2.1</td><td>Update factor for Betts' Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BettsPoint</td><td>OT_REAL</td><td>1.0</td><td>Smallest eigenvalue of the regularised Hessian</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BoundTolFac</td><td>OT_REAL</td><td>1000.0</td><td>Factor in determining active constraints by KKT</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckFJ</td><td>OT_REAL</td><td>1e+12</td><td>Upper bound used by Fritz-John heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureDF</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DF</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureDG</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DG</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureHM</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepBettsSum</td><td>OT_REAL</td><td>0.5</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepConStop</td><td>OT_REAL</td><td>1e-06</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepConvio</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMaxIter</td><td>OT_INTEGER</td><td>50</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMethod</td><td>OT_INTEGER</td><td>0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMode</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepPFactor</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepPMax</td><td>OT_REAL</td><td>1000000.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepRecoveryDX</td><td>OT_BOOLEAN</td><td>False</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvBCond</td><td>OT_REAL</td><td>0.02</td><td>Block BFGS curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvBFac</td><td>OT_REAL</td><td>0.3</td><td>Block BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvCond</td><td>OT_REAL</td><td>0.02</td><td>BFGS Curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvFac</td><td>OT_REAL</td><td>0.3</td><td>BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CutLength</td><td>OT_REAL</td><td>0.001</td><td>Scaling factor for Cut recovery strategy</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>DebugMarker06</td><td>OT_INTEGER</td><td>42</td><td>Debug marker, only needed for ASTOS integration</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FGtogether</td><td>OT_BOOLEAN</td><td>False</td><td>F and G cannot be evaluated separately</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FJandND</td><td>OT_BOOLEAN</td><td>False</td><td>Enable Fritz-John and non-differentiable check heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleDual</td><td>OT_BOOLEAN</td><td>False</td><td>Activate dual feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleInit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate initial feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleInitTol</td><td>OT_REAL</td><td>0.001</td><td>Feasibility tolerance for no-objective feasible mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleOnly</td><td>OT_BOOLEAN</td><td>False</td><td>Activate feasible-only mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FidifEps</td><td>OT_REAL</td><td>1e-05</td><td>Finite difference perturbation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FidifHM</td><td>OT_BOOLEAN</td><td>False</td><td>Approximate Hessian by finite differences (otherwise BFGS)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterBisecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterGammaCV</td><td>OT_REAL</td><td>7.5e-06</td><td>Constraint violation decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterGammaF</td><td>OT_REAL</td><td>1.1e-05</td><td>Objective decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterIntersecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FirstDifCentral</td><td>OT_BOOLEAN</td><td>True</td><td>Use central finite difference quotient for first derivatives</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FocusOnFeas</td><td>OT_BOOLEAN</td><td>True</td><td>Enable Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FocusOnFeasFactor</td><td>OT_REAL</td><td>1.36</td><td>Factor in Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>GammaAlpha</td><td>OT_REAL</td><td>0.05</td><td>Safety factor for alphamin calculation by Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>GroupMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring groups</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IgnoreFilterCrit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate accelerating heuristics for Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncBettsTau</td><td>OT_REAL</td><td>2.0</td><td>Increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncBettsTauMore</td><td>OT_REAL</td><td>100.0</td><td>Larger increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncreaseIWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated integer workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncreaseRWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated real workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Infty</td><td>OT_REAL</td><td>1e+20</td><td>Upper bound for numbers to be regarded as finite</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>InftyUnbounded</td><td>OT_REAL</td><td>1e+20</td><td>Tolerance for unboundedness detection heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>InitialLMest</td><td>OT_BOOLEAN</td><td>True</td><td>Enable initial Lagrange multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>KeepAcceptableSol</td><td>OT_BOOLEAN</td><td>True</td><td>Save acceptable solutions as fallback</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LMestQPipComTol</td><td>OT_REAL</td><td>0.003</td><td>IP complementarity tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LMestQPipResTol</td><td>OT_REAL</td><td>1.0</td><td>IP residual tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LinMult</td><td>OT_BOOLEAN</td><td>False</td><td>Control Lagrange multiplier update</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LogLevel</td><td>OT_INTEGER</td><td>0</td><td>Enable XML logfiles and writing interval</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LogResult</td><td>OT_INTEGER</td><td>0</td><td>Enable XML result logging and detail level</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaF</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for objective values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for constraint values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>0.1</td><td>Lowpass-filter update factor for merit function values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>True</td><td>Enable lowpass-filter termination criterion</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Ma57PivotThresh</td><td>OT_REAL</td><td>1e-06</td><td>Pivoting tolerance for MA57 = CNTL(1)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxCalls</td><td>OT_INTEGER</td><td>2147483647</td><td>Upper bound to Reverse Communication calls</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxForce</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Force recovery strategy steps</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxGPart</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxIter</td><td>OT_INTEGER</td><td>500</td><td>Upper bound on major iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxLScounter</td><td>OT_INTEGER</td><td>3</td><td>Control activation of Filter acceleration heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxNorm</td><td>OT_BOOLEAN</td><td>True</td><td>Select max-norm instead of 1-norm in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MeritFunction</td><td>OT_INTEGER</td><td>4</td><td>Select merit function and penalty update [0, 3..5]</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MeritGradTol</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Threshold of meritfunction gradient for increasing Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MinBettsTau</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Lower bound for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MoreRelax</td><td>OT_BOOLEAN</td><td>False</td><td>Introduce one relaxation variable for every constraint</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>NLPmethod</td><td>OT_INTEGER</td><td>1</td><td>Select (1) Meritfunction or (3) Filter globalisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>NLPprint</td><td>OT_INTEGER</td><td>2</td><td>NLP print level [-1..4]</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PairMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring pairgroups</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsBar</td><td>OT_REAL</td><td>0.9</td><td>Penalty update parameter factor for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsKFac</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter factor for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsKSequence</td><td>OT_INTEGER</td><td>2</td><td>Penalty update parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdMaxDeltaK</td><td>OT_REAL</td><td>11.0</td><td>Max penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdMaxFac</td><td>OT_REAL</td><td>100000000.0</td><td>Max factor for increasing penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdRBar</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PrecisionF</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of objective</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PrecisionG</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of constraints</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>QPscaleParam</td><td>OT_REAL</td><td>0.0</td><td>(currently unused)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>0.3</td><td>Decrease factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RegStrategy</td><td>OT_INTEGER</td><td>1</td><td>Select Hessian regularisation strategy in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>False</td><td>Enables Filter-reinitialisation accelerating heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>0.92</td><td>Upper bound for accepting the constraint relaxation variable</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxMaxPen</td><td>OT_REAL</td><td>50000000.0</td><td>Upper bound on the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxRho</td><td>OT_REAL</td><td>6.0</td><td>Update factor for the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxStart</td><td>OT_REAL</td><td>1.0</td><td>Initial value of the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RestUntilFeas</td><td>OT_BOOLEAN</td><td>False</td><td>Do restoration until a feasible solution is found</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleConIter</td><td>OT_BOOLEAN</td><td>False</td><td>Scale constraints in every iteration</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleFacObj</td><td>OT_REAL</td><td>10.0</td><td>Value to scale large objective functions to</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleFacQP</td><td>OT_REAL</td><td>10.0</td><td>Upper bound on resulting matrix norm for QP scaling</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledFD</td><td>OT_BOOLEAN</td><td>True</td><td>Use a scaled perturbation for finite differences</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledKKT</td><td>OT_BOOLEAN</td><td>True</td><td>Scale KKT conditions</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>True</td><td>Scale the objective function</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>True</td><td>Scale some matrices handed to the QP</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>StartBettsTau</td><td>OT_REAL</td><td>0.1</td><td>Initial value for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingDelta</td><td>OT_REAL</td><td>0.01</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingSCV</td><td>OT_REAL</td><td>1.1</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingSF</td><td>OT_REAL</td><td>2.3</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TakeQPSol</td><td>OT_BOOLEAN</td><td>False</td><td>Evaluate QP search direction regardless of convergence</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Timeout</td><td>OT_REAL</td><td>300.0</td><td>Timeout in seconds</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolComp</td><td>OT_REAL</td><td>0.001</td><td>Complementarity tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolFeas</td><td>OT_REAL</td><td>1e-06</td><td>Feasibility tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolOpti</td><td>OT_REAL</td><td>1e-06</td><td>Optimality tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolWeakActive</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBig</td><td>OT_BOOLEAN</td><td>True</td><td>Enable too-big termination heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBigCV</td><td>OT_REAL</td><td>1e+25</td><td>Upper bound on constraint violation for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBigKKT</td><td>OT_REAL</td><td>1e+30</td><td>Upper bound on KKT values for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserDF</td><td>OT_BOOLEAN</td><td>True</td><td>Objective gradient values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserDG</td><td>OT_BOOLEAN</td><td>True</td><td>Jacobian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserHM</td><td>OT_BOOLEAN</td><td>True</td><td>Hessian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>2</td><td>Enable automatic Hessian structure generation or checking</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX. Deprecated, use \"expand\" instead.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX. Deprecated, use \"expand\" instead.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>grad_f</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>grad_lag</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>hess_lag</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>initialised</td><td>OT_BOOLEAN</td><td>True</td><td>Automatically added initialisation flag. </td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
-<tr><td>iteration_callback</td><td>OT_FX</td><td>GenericType()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>jac_g</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />Monitor functions (eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>CasADi::FXInternal<br />CasADi::WorhpInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>Print information about execution time</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipBarrier</td><td>OT_REAL</td><td>7.8</td><td>IP barrier parameter.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipComTol</td><td>OT_REAL</td><td>2e-07</td><td>IP complementarity tolerance.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipFracBound</td><td>OT_REAL</td><td>0.88</td><td>IP fraction-to-the-boundary parameter.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the IP method.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipMinAlpha</td><td>OT_REAL</td><td>1e-12</td><td>IP line search minimum step size.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipRelaxDiv</td><td>OT_REAL</td><td>2.0</td><td>The relaxation term is divided by this value if successful.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipRelaxMax</td><td>OT_REAL</td><td>1e-07</td><td>Maximum relaxation value.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipRelaxMin</td><td>OT_REAL</td><td>1e-07</td><td>Mimimum relaxation value.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipRelaxMult</td><td>OT_REAL</td><td>10.0</td><td>The relaxation term is multiplied by this value if unsuccessful.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipResTol</td><td>OT_REAL</td><td>5e-08</td><td>IP residuals tolerance.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipTryRelax</td><td>OT_BOOLEAN</td><td>True</td><td>Enable relaxation strategy when encountering an error.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsItMaxIter</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of iterations of the iterative linear solvers.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsItMethod</td><td>OT_STRING</td><td>None</td><td>Select the iterative linear solver.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsItPrecondMethod</td><td>OT_STRING</td><td>None</td><td>Select preconditioner for the iterative linear solver.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsRefineMaxIter</td><td>OT_INTEGER</td><td>10</td><td>Maximum number of iterative refinement steps of the direct linear solvers.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsScale</td><td>OT_BOOLEAN</td><td>True</td><td>Enables scaling on linear solver level.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsTol</td><td>OT_REAL</td><td>1e-12</td><td>Tolerance for the linear solver.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsTrySimple</td><td>OT_BOOLEAN</td><td>False</td><td>Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported. Non-diagonal matrices will besolved with the chosen linear equation solver.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>80</td><td>Imposes an upper limit on the number of minor solver iterations, i.e. for thequadratic subproblem solver. If the limit is reached before convergence,WORHP will activate QP recovery strategies to prevent a solver breakdown.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_method</td><td>OT_STRING</td><td>None</td><td>Select the solution method used by the QP solver.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnBeta</td><td>OT_REAL</td><td>0.9</td><td>NSN stepsize decrease factor.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnGradStep</td><td>OT_BOOLEAN</td><td>True</td><td>Enable gradient steps in the NSN method.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnKKT</td><td>OT_REAL</td><td>1e-06</td><td>NSN KKT tolerance.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the NSN method.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnMinAlpha</td><td>OT_REAL</td><td>1e-11</td><td>NSN line search minimum step size.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnSigma</td><td>OT_REAL</td><td>0.01</td><td>NSN line search slope parameter.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_printLevel</td><td>OT_STRING</td><td>None</td><td>Controls the amount of QP solver output.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>False</td><td>Enable scaling on QP level.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>True</td><td>Use strict termination criteria in IP method.</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sdp_solver</td><td>OT_SDPSOLVER</td><td>GenericType()</td><td>The SDPSolver used to solve the SDQPs.</td><td>CasADi::SDPSDQPInternal</td></tr>
+<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>CasADi::SDPSDQPInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
-<tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::NLPSolverInternal</td></tr>
 </table>
 */
-/** \class CasADi::WorhpSolver
+/** \class CasADi::SDPSDQPSolver
 \n
 \par
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable feasibility</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable optimality</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>False</td><td>Use a constant lower bound on Armijo stepsize in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>(42, 41, 42, 45, 43, 46, 44)</td><td>Armijo recovery strategies. Vector of size 7</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoBeta</td><td>OT_REAL</td><td>0.712</td><td>Trial stepsize decrease factor for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>1.0</td><td>Initial alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMinAlphaRec</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule during recovery</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoSigma</td><td>OT_REAL</td><td>0.005</td><td>Scale factor for linearised descent check in Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AutoQPRecovery</td><td>OT_BOOLEAN</td><td>True</td><td>Enable automatic QP recovery</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSmaxblockSize</td><td>OT_INTEGER</td><td>300</td><td>Maximum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSmethod</td><td>OT_INTEGER</td><td>0</td><td>Choose BFGS method (dense, block, sparse)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSminblockSize</td><td>OT_INTEGER</td><td>300</td><td>Minimum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSrestart</td><td>OT_INTEGER</td><td>50</td><td>Restart BFGS update after this many iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BettsFactor</td><td>OT_REAL</td><td>2.1</td><td>Update factor for Betts' Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BettsPoint</td><td>OT_REAL</td><td>1.0</td><td>Smallest eigenvalue of the regularised Hessian</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BoundTolFac</td><td>OT_REAL</td><td>1000.0</td><td>Factor in determining active constraints by KKT</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckFJ</td><td>OT_REAL</td><td>1e+12</td><td>Upper bound used by Fritz-John heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureDF</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DF</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureDG</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DG</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureHM</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepBettsSum</td><td>OT_REAL</td><td>0.5</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepConStop</td><td>OT_REAL</td><td>1e-06</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepConvio</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMaxIter</td><td>OT_INTEGER</td><td>50</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMethod</td><td>OT_INTEGER</td><td>0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMode</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepPFactor</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepPMax</td><td>OT_REAL</td><td>1000000.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepRecoveryDX</td><td>OT_BOOLEAN</td><td>False</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvBCond</td><td>OT_REAL</td><td>0.02</td><td>Block BFGS curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvBFac</td><td>OT_REAL</td><td>0.3</td><td>Block BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvCond</td><td>OT_REAL</td><td>0.02</td><td>BFGS Curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvFac</td><td>OT_REAL</td><td>0.3</td><td>BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CutLength</td><td>OT_REAL</td><td>0.001</td><td>Scaling factor for Cut recovery strategy</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>DebugMarker06</td><td>OT_INTEGER</td><td>42</td><td>Debug marker, only needed for ASTOS integration</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FGtogether</td><td>OT_BOOLEAN</td><td>False</td><td>F and G cannot be evaluated separately</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FJandND</td><td>OT_BOOLEAN</td><td>False</td><td>Enable Fritz-John and non-differentiable check heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleDual</td><td>OT_BOOLEAN</td><td>False</td><td>Activate dual feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleInit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate initial feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleInitTol</td><td>OT_REAL</td><td>0.001</td><td>Feasibility tolerance for no-objective feasible mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleOnly</td><td>OT_BOOLEAN</td><td>False</td><td>Activate feasible-only mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FidifEps</td><td>OT_REAL</td><td>1e-05</td><td>Finite difference perturbation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FidifHM</td><td>OT_BOOLEAN</td><td>False</td><td>Approximate Hessian by finite differences (otherwise BFGS)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterBisecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterGammaCV</td><td>OT_REAL</td><td>7.5e-06</td><td>Constraint violation decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterGammaF</td><td>OT_REAL</td><td>1.1e-05</td><td>Objective decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterIntersecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FirstDifCentral</td><td>OT_BOOLEAN</td><td>True</td><td>Use central finite difference quotient for first derivatives</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FocusOnFeas</td><td>OT_BOOLEAN</td><td>True</td><td>Enable Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FocusOnFeasFactor</td><td>OT_REAL</td><td>1.36</td><td>Factor in Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>GammaAlpha</td><td>OT_REAL</td><td>0.05</td><td>Safety factor for alphamin calculation by Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>GroupMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring groups</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IgnoreFilterCrit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate accelerating heuristics for Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncBettsTau</td><td>OT_REAL</td><td>2.0</td><td>Increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncBettsTauMore</td><td>OT_REAL</td><td>100.0</td><td>Larger increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncreaseIWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated integer workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncreaseRWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated real workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Infty</td><td>OT_REAL</td><td>1e+20</td><td>Upper bound for numbers to be regarded as finite</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>InftyUnbounded</td><td>OT_REAL</td><td>1e+20</td><td>Tolerance for unboundedness detection heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>InitialLMest</td><td>OT_BOOLEAN</td><td>True</td><td>Enable initial Lagrange multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>KeepAcceptableSol</td><td>OT_BOOLEAN</td><td>True</td><td>Save acceptable solutions as fallback</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LMestQPipComTol</td><td>OT_REAL</td><td>0.003</td><td>IP complementarity tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LMestQPipResTol</td><td>OT_REAL</td><td>1.0</td><td>IP residual tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LinMult</td><td>OT_BOOLEAN</td><td>False</td><td>Control Lagrange multiplier update</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LogLevel</td><td>OT_INTEGER</td><td>0</td><td>Enable XML logfiles and writing interval</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LogResult</td><td>OT_INTEGER</td><td>0</td><td>Enable XML result logging and detail level</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaF</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for objective values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for constraint values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>0.1</td><td>Lowpass-filter update factor for merit function values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>True</td><td>Enable lowpass-filter termination criterion</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Ma57PivotThresh</td><td>OT_REAL</td><td>1e-06</td><td>Pivoting tolerance for MA57 = CNTL(1)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxCalls</td><td>OT_INTEGER</td><td>2147483647</td><td>Upper bound to Reverse Communication calls</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxForce</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Force recovery strategy steps</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxGPart</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxIter</td><td>OT_INTEGER</td><td>500</td><td>Upper bound on major iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxLScounter</td><td>OT_INTEGER</td><td>3</td><td>Control activation of Filter acceleration heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxNorm</td><td>OT_BOOLEAN</td><td>True</td><td>Select max-norm instead of 1-norm in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MeritFunction</td><td>OT_INTEGER</td><td>4</td><td>Select merit function and penalty update [0, 3..5]</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MeritGradTol</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Threshold of meritfunction gradient for increasing Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MinBettsTau</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Lower bound for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MoreRelax</td><td>OT_BOOLEAN</td><td>False</td><td>Introduce one relaxation variable for every constraint</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>NLPmethod</td><td>OT_INTEGER</td><td>1</td><td>Select (1) Meritfunction or (3) Filter globalisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>NLPprint</td><td>OT_INTEGER</td><td>2</td><td>NLP print level [-1..4]</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PairMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring pairgroups</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsBar</td><td>OT_REAL</td><td>0.9</td><td>Penalty update parameter factor for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsKFac</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter factor for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsKSequence</td><td>OT_INTEGER</td><td>2</td><td>Penalty update parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdMaxDeltaK</td><td>OT_REAL</td><td>11.0</td><td>Max penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdMaxFac</td><td>OT_REAL</td><td>100000000.0</td><td>Max factor for increasing penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdRBar</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PrecisionF</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of objective</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PrecisionG</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of constraints</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>QPscaleParam</td><td>OT_REAL</td><td>0.0</td><td>(currently unused)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>0.3</td><td>Decrease factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RegStrategy</td><td>OT_INTEGER</td><td>1</td><td>Select Hessian regularisation strategy in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>False</td><td>Enables Filter-reinitialisation accelerating heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>0.92</td><td>Upper bound for accepting the constraint relaxation variable</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxMaxPen</td><td>OT_REAL</td><td>50000000.0</td><td>Upper bound on the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxRho</td><td>OT_REAL</td><td>6.0</td><td>Update factor for the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxStart</td><td>OT_REAL</td><td>1.0</td><td>Initial value of the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RestUntilFeas</td><td>OT_BOOLEAN</td><td>False</td><td>Do restoration until a feasible solution is found</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleConIter</td><td>OT_BOOLEAN</td><td>False</td><td>Scale constraints in every iteration</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleFacObj</td><td>OT_REAL</td><td>10.0</td><td>Value to scale large objective functions to</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleFacQP</td><td>OT_REAL</td><td>10.0</td><td>Upper bound on resulting matrix norm for QP scaling</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledFD</td><td>OT_BOOLEAN</td><td>True</td><td>Use a scaled perturbation for finite differences</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledKKT</td><td>OT_BOOLEAN</td><td>True</td><td>Scale KKT conditions</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>True</td><td>Scale the objective function</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>True</td><td>Scale some matrices handed to the QP</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>StartBettsTau</td><td>OT_REAL</td><td>0.1</td><td>Initial value for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingDelta</td><td>OT_REAL</td><td>0.01</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingSCV</td><td>OT_REAL</td><td>1.1</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingSF</td><td>OT_REAL</td><td>2.3</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TakeQPSol</td><td>OT_BOOLEAN</td><td>False</td><td>Evaluate QP search direction regardless of convergence</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Timeout</td><td>OT_REAL</td><td>300.0</td><td>Timeout in seconds</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolComp</td><td>OT_REAL</td><td>0.001</td><td>Complementarity tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolFeas</td><td>OT_REAL</td><td>1e-06</td><td>Feasibility tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolOpti</td><td>OT_REAL</td><td>1e-06</td><td>Optimality tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolWeakActive</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBig</td><td>OT_BOOLEAN</td><td>True</td><td>Enable too-big termination heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBigCV</td><td>OT_REAL</td><td>1e+25</td><td>Upper bound on constraint violation for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBigKKT</td><td>OT_REAL</td><td>1e+30</td><td>Upper bound on KKT values for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserDF</td><td>OT_BOOLEAN</td><td>True</td><td>Objective gradient values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserDG</td><td>OT_BOOLEAN</td><td>True</td><td>Jacobian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserHM</td><td>OT_BOOLEAN</td><td>True</td><td>Hessian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>2</td><td>Enable automatic Hessian structure generation or checking</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX. Deprecated, use \"expand\" instead.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX. Deprecated, use \"expand\" instead.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>grad_f</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>grad_lag</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>hess_lag</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>initialised</td><td>OT_BOOLEAN</td><td>True</td><td>Automatically added initialisation flag. </td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
-<tr><td>iteration_callback</td><td>OT_FX</td><td>GenericType()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>jac_g</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />Monitor functions (eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>CasADi::FXInternal<br />CasADi::WorhpInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
-<tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>Print information about execution time</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipBarrier</td><td>OT_REAL</td><td>7.8</td><td>IP barrier parameter.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipComTol</td><td>OT_REAL</td><td>2e-07</td><td>IP complementarity tolerance.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipFracBound</td><td>OT_REAL</td><td>0.88</td><td>IP fraction-to-the-boundary parameter.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the IP method.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipMinAlpha</td><td>OT_REAL</td><td>1e-12</td><td>IP line search minimum step size.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipRelaxDiv</td><td>OT_REAL</td><td>2.0</td><td>The relaxation term is divided by this value if successful.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipRelaxMax</td><td>OT_REAL</td><td>1e-07</td><td>Maximum relaxation value.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipRelaxMin</td><td>OT_REAL</td><td>1e-07</td><td>Mimimum relaxation value.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipRelaxMult</td><td>OT_REAL</td><td>10.0</td><td>The relaxation term is multiplied by this value if unsuccessful.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipResTol</td><td>OT_REAL</td><td>5e-08</td><td>IP residuals tolerance.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_ipTryRelax</td><td>OT_BOOLEAN</td><td>True</td><td>Enable relaxation strategy when encountering an error.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsItMaxIter</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of iterations of the iterative linear solvers.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsItMethod</td><td>OT_STRING</td><td>None</td><td>Select the iterative linear solver.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsItPrecondMethod</td><td>OT_STRING</td><td>None</td><td>Select preconditioner for the iterative linear solver.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsRefineMaxIter</td><td>OT_INTEGER</td><td>10</td><td>Maximum number of iterative refinement steps of the direct linear solvers.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsScale</td><td>OT_BOOLEAN</td><td>True</td><td>Enables scaling on linear solver level.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsTol</td><td>OT_REAL</td><td>1e-12</td><td>Tolerance for the linear solver.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_lsTrySimple</td><td>OT_BOOLEAN</td><td>False</td><td>Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported. Non-diagonal matrices will besolved with the chosen linear equation solver.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>80</td><td>Imposes an upper limit on the number of minor solver iterations, i.e. for thequadratic subproblem solver. If the limit is reached before convergence,WORHP will activate QP recovery strategies to prevent a solver breakdown.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_method</td><td>OT_STRING</td><td>None</td><td>Select the solution method used by the QP solver.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnBeta</td><td>OT_REAL</td><td>0.9</td><td>NSN stepsize decrease factor.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnGradStep</td><td>OT_BOOLEAN</td><td>True</td><td>Enable gradient steps in the NSN method.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnKKT</td><td>OT_REAL</td><td>1e-06</td><td>NSN KKT tolerance.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the NSN method.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnMinAlpha</td><td>OT_REAL</td><td>1e-11</td><td>NSN line search minimum step size.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_nsnSigma</td><td>OT_REAL</td><td>0.01</td><td>NSN line search slope parameter.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_printLevel</td><td>OT_STRING</td><td>None</td><td>Controls the amount of QP solver output.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>False</td><td>Enable scaling on QP level.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>True</td><td>Use strict termination criteria in IP method.</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sdp_solver</td><td>OT_SDPSOLVER</td><td>GenericType()</td><td>The SDPSolver used to solve the SDQPs.</td><td>CasADi::SDPSDQPInternal</td></tr>
+<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>CasADi::SDPSDQPInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
-<tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::NLPSolverInternal</td></tr>
 </table>
 */
 /** \class CasADi::LapackLUDenseInternal
@@ -3668,6 +3316,62 @@
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
+/** \class CasADi::SDQPSolverInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
+<tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sdp_solver</td><td>OT_SDPSOLVER</td><td>GenericType()</td><td>The SDQPSolver used to solve the SDPs.</td><td>CasADi::SDQPSolverInternal</td></tr>
+<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>CasADi::SDQPSolverInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::SDQPSolver
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
+<tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sdp_solver</td><td>OT_SDPSOLVER</td><td>GenericType()</td><td>The SDQPSolver used to solve the SDPs.</td><td>CasADi::SDQPSolverInternal</td></tr>
+<tr><td>sdp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the SDPSOlver</td><td>CasADi::SDQPSolverInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
 /** \class CasADi::MXFunctionInternal
 \n
 \par
@@ -4664,5 +4368,413 @@
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::WorhpInternal
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable feasibility</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable optimality</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>False</td><td>Use a constant lower bound on Armijo stepsize in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>(42, 41, 42, 45, 43, 46, 44)</td><td>Armijo recovery strategies. Vector of size 7</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoBeta</td><td>OT_REAL</td><td>0.712</td><td>Trial stepsize decrease factor for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>1.0</td><td>Initial alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMinAlphaRec</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule during recovery</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoSigma</td><td>OT_REAL</td><td>0.005</td><td>Scale factor for linearised descent check in Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AutoQPRecovery</td><td>OT_BOOLEAN</td><td>True</td><td>Enable automatic QP recovery</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSmaxblockSize</td><td>OT_INTEGER</td><td>300</td><td>Maximum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSmethod</td><td>OT_INTEGER</td><td>0</td><td>Choose BFGS method (dense, block, sparse)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSminblockSize</td><td>OT_INTEGER</td><td>300</td><td>Minimum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSrestart</td><td>OT_INTEGER</td><td>50</td><td>Restart BFGS update after this many iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BettsFactor</td><td>OT_REAL</td><td>2.1</td><td>Update factor for Betts' Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BettsPoint</td><td>OT_REAL</td><td>1.0</td><td>Smallest eigenvalue of the regularised Hessian</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BoundTolFac</td><td>OT_REAL</td><td>1000.0</td><td>Factor in determining active constraints by KKT</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckFJ</td><td>OT_REAL</td><td>1e+12</td><td>Upper bound used by Fritz-John heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureDF</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DF</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureDG</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DG</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureHM</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepBettsSum</td><td>OT_REAL</td><td>0.5</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepConStop</td><td>OT_REAL</td><td>1e-06</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepConvio</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMaxIter</td><td>OT_INTEGER</td><td>50</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMethod</td><td>OT_INTEGER</td><td>0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMode</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepPFactor</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepPMax</td><td>OT_REAL</td><td>1000000.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepRecoveryDX</td><td>OT_BOOLEAN</td><td>False</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvBCond</td><td>OT_REAL</td><td>0.02</td><td>Block BFGS curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvBFac</td><td>OT_REAL</td><td>0.3</td><td>Block BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvCond</td><td>OT_REAL</td><td>0.02</td><td>BFGS Curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvFac</td><td>OT_REAL</td><td>0.3</td><td>BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CutLength</td><td>OT_REAL</td><td>0.001</td><td>Scaling factor for Cut recovery strategy</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>DebugMarker06</td><td>OT_INTEGER</td><td>42</td><td>Debug marker, only needed for ASTOS integration</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FGtogether</td><td>OT_BOOLEAN</td><td>False</td><td>F and G cannot be evaluated separately</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FJandND</td><td>OT_BOOLEAN</td><td>False</td><td>Enable Fritz-John and non-differentiable check heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleDual</td><td>OT_BOOLEAN</td><td>False</td><td>Activate dual feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleInit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate initial feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleInitTol</td><td>OT_REAL</td><td>0.001</td><td>Feasibility tolerance for no-objective feasible mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleOnly</td><td>OT_BOOLEAN</td><td>False</td><td>Activate feasible-only mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FidifEps</td><td>OT_REAL</td><td>1e-05</td><td>Finite difference perturbation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FidifHM</td><td>OT_BOOLEAN</td><td>False</td><td>Approximate Hessian by finite differences (otherwise BFGS)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterBisecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterGammaCV</td><td>OT_REAL</td><td>7.5e-06</td><td>Constraint violation decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterGammaF</td><td>OT_REAL</td><td>1.1e-05</td><td>Objective decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterIntersecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FirstDifCentral</td><td>OT_BOOLEAN</td><td>True</td><td>Use central finite difference quotient for first derivatives</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FocusOnFeas</td><td>OT_BOOLEAN</td><td>True</td><td>Enable Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FocusOnFeasFactor</td><td>OT_REAL</td><td>1.36</td><td>Factor in Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>GammaAlpha</td><td>OT_REAL</td><td>0.05</td><td>Safety factor for alphamin calculation by Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>GroupMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring groups</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IgnoreFilterCrit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate accelerating heuristics for Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncBettsTau</td><td>OT_REAL</td><td>2.0</td><td>Increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncBettsTauMore</td><td>OT_REAL</td><td>100.0</td><td>Larger increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncreaseIWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated integer workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncreaseRWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated real workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Infty</td><td>OT_REAL</td><td>1e+20</td><td>Upper bound for numbers to be regarded as finite</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>InftyUnbounded</td><td>OT_REAL</td><td>1e+20</td><td>Tolerance for unboundedness detection heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>InitialLMest</td><td>OT_BOOLEAN</td><td>True</td><td>Enable initial Lagrange multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>KeepAcceptableSol</td><td>OT_BOOLEAN</td><td>True</td><td>Save acceptable solutions as fallback</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LMestQPipComTol</td><td>OT_REAL</td><td>0.003</td><td>IP complementarity tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LMestQPipResTol</td><td>OT_REAL</td><td>1.0</td><td>IP residual tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LinMult</td><td>OT_BOOLEAN</td><td>False</td><td>Control Lagrange multiplier update</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LogLevel</td><td>OT_INTEGER</td><td>0</td><td>Enable XML logfiles and writing interval</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LogResult</td><td>OT_INTEGER</td><td>0</td><td>Enable XML result logging and detail level</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaF</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for objective values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for constraint values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>0.1</td><td>Lowpass-filter update factor for merit function values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>True</td><td>Enable lowpass-filter termination criterion</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Ma57PivotThresh</td><td>OT_REAL</td><td>1e-06</td><td>Pivoting tolerance for MA57 = CNTL(1)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxCalls</td><td>OT_INTEGER</td><td>2147483647</td><td>Upper bound to Reverse Communication calls</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxForce</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Force recovery strategy steps</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxGPart</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxIter</td><td>OT_INTEGER</td><td>500</td><td>Upper bound on major iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxLScounter</td><td>OT_INTEGER</td><td>3</td><td>Control activation of Filter acceleration heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxNorm</td><td>OT_BOOLEAN</td><td>True</td><td>Select max-norm instead of 1-norm in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MeritFunction</td><td>OT_INTEGER</td><td>4</td><td>Select merit function and penalty update [0, 3..5]</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MeritGradTol</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Threshold of meritfunction gradient for increasing Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MinBettsTau</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Lower bound for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MoreRelax</td><td>OT_BOOLEAN</td><td>False</td><td>Introduce one relaxation variable for every constraint</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>NLPmethod</td><td>OT_INTEGER</td><td>1</td><td>Select (1) Meritfunction or (3) Filter globalisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>NLPprint</td><td>OT_INTEGER</td><td>2</td><td>NLP print level [-1..4]</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PairMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring pairgroups</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsBar</td><td>OT_REAL</td><td>0.9</td><td>Penalty update parameter factor for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsKFac</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter factor for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsKSequence</td><td>OT_INTEGER</td><td>2</td><td>Penalty update parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdMaxDeltaK</td><td>OT_REAL</td><td>11.0</td><td>Max penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdMaxFac</td><td>OT_REAL</td><td>100000000.0</td><td>Max factor for increasing penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdRBar</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PrecisionF</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of objective</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PrecisionG</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of constraints</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>QPscaleParam</td><td>OT_REAL</td><td>0.0</td><td>(currently unused)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>0.3</td><td>Decrease factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RegStrategy</td><td>OT_INTEGER</td><td>1</td><td>Select Hessian regularisation strategy in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>False</td><td>Enables Filter-reinitialisation accelerating heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>0.92</td><td>Upper bound for accepting the constraint relaxation variable</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxMaxPen</td><td>OT_REAL</td><td>50000000.0</td><td>Upper bound on the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxRho</td><td>OT_REAL</td><td>6.0</td><td>Update factor for the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxStart</td><td>OT_REAL</td><td>1.0</td><td>Initial value of the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RestUntilFeas</td><td>OT_BOOLEAN</td><td>False</td><td>Do restoration until a feasible solution is found</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleConIter</td><td>OT_BOOLEAN</td><td>False</td><td>Scale constraints in every iteration</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleFacObj</td><td>OT_REAL</td><td>10.0</td><td>Value to scale large objective functions to</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleFacQP</td><td>OT_REAL</td><td>10.0</td><td>Upper bound on resulting matrix norm for QP scaling</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledFD</td><td>OT_BOOLEAN</td><td>True</td><td>Use a scaled perturbation for finite differences</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledKKT</td><td>OT_BOOLEAN</td><td>True</td><td>Scale KKT conditions</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>True</td><td>Scale the objective function</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>True</td><td>Scale some matrices handed to the QP</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>StartBettsTau</td><td>OT_REAL</td><td>0.1</td><td>Initial value for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingDelta</td><td>OT_REAL</td><td>0.01</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingSCV</td><td>OT_REAL</td><td>1.1</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingSF</td><td>OT_REAL</td><td>2.3</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TakeQPSol</td><td>OT_BOOLEAN</td><td>False</td><td>Evaluate QP search direction regardless of convergence</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Timeout</td><td>OT_REAL</td><td>300.0</td><td>Timeout in seconds</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolComp</td><td>OT_REAL</td><td>0.001</td><td>Complementarity tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolFeas</td><td>OT_REAL</td><td>1e-06</td><td>Feasibility tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolOpti</td><td>OT_REAL</td><td>1e-06</td><td>Optimality tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolWeakActive</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBig</td><td>OT_BOOLEAN</td><td>True</td><td>Enable too-big termination heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBigCV</td><td>OT_REAL</td><td>1e+25</td><td>Upper bound on constraint violation for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBigKKT</td><td>OT_REAL</td><td>1e+30</td><td>Upper bound on KKT values for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserDF</td><td>OT_BOOLEAN</td><td>True</td><td>Objective gradient values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserDG</td><td>OT_BOOLEAN</td><td>True</td><td>Jacobian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserHM</td><td>OT_BOOLEAN</td><td>True</td><td>Hessian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>2</td><td>Enable automatic Hessian structure generation or checking</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX. Deprecated, use \"expand\" instead.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX. Deprecated, use \"expand\" instead.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>grad_f</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>grad_lag</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>hess_lag</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>initialised</td><td>OT_BOOLEAN</td><td>True</td><td>Automatically added initialisation flag. </td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>GenericType()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>jac_g</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
+<tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />Monitor functions (eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>CasADi::FXInternal<br />CasADi::WorhpInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>Print information about execution time</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipBarrier</td><td>OT_REAL</td><td>7.8</td><td>IP barrier parameter.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipComTol</td><td>OT_REAL</td><td>2e-07</td><td>IP complementarity tolerance.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipFracBound</td><td>OT_REAL</td><td>0.88</td><td>IP fraction-to-the-boundary parameter.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the IP method.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipMinAlpha</td><td>OT_REAL</td><td>1e-12</td><td>IP line search minimum step size.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipRelaxDiv</td><td>OT_REAL</td><td>2.0</td><td>The relaxation term is divided by this value if successful.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipRelaxMax</td><td>OT_REAL</td><td>1e-07</td><td>Maximum relaxation value.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipRelaxMin</td><td>OT_REAL</td><td>1e-07</td><td>Mimimum relaxation value.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipRelaxMult</td><td>OT_REAL</td><td>10.0</td><td>The relaxation term is multiplied by this value if unsuccessful.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipResTol</td><td>OT_REAL</td><td>5e-08</td><td>IP residuals tolerance.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipTryRelax</td><td>OT_BOOLEAN</td><td>True</td><td>Enable relaxation strategy when encountering an error.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsItMaxIter</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of iterations of the iterative linear solvers.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsItMethod</td><td>OT_STRING</td><td>None</td><td>Select the iterative linear solver.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsItPrecondMethod</td><td>OT_STRING</td><td>None</td><td>Select preconditioner for the iterative linear solver.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsRefineMaxIter</td><td>OT_INTEGER</td><td>10</td><td>Maximum number of iterative refinement steps of the direct linear solvers.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsScale</td><td>OT_BOOLEAN</td><td>True</td><td>Enables scaling on linear solver level.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsTol</td><td>OT_REAL</td><td>1e-12</td><td>Tolerance for the linear solver.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsTrySimple</td><td>OT_BOOLEAN</td><td>False</td><td>Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported. Non-diagonal matrices will besolved with the chosen linear equation solver.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>80</td><td>Imposes an upper limit on the number of minor solver iterations, i.e. for thequadratic subproblem solver. If the limit is reached before convergence,WORHP will activate QP recovery strategies to prevent a solver breakdown.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_method</td><td>OT_STRING</td><td>None</td><td>Select the solution method used by the QP solver.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnBeta</td><td>OT_REAL</td><td>0.9</td><td>NSN stepsize decrease factor.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnGradStep</td><td>OT_BOOLEAN</td><td>True</td><td>Enable gradient steps in the NSN method.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnKKT</td><td>OT_REAL</td><td>1e-06</td><td>NSN KKT tolerance.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the NSN method.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnMinAlpha</td><td>OT_REAL</td><td>1e-11</td><td>NSN line search minimum step size.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnSigma</td><td>OT_REAL</td><td>0.01</td><td>NSN line search slope parameter.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_printLevel</td><td>OT_STRING</td><td>None</td><td>Controls the amount of QP solver output.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>False</td><td>Enable scaling on QP level.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>True</td><td>Use strict termination criteria in IP method.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::NLPSolverInternal</td></tr>
+</table>
+*/
+/** \class CasADi::WorhpSolver
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable feasibility</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable optimality</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>False</td><td>Use a constant lower bound on Armijo stepsize in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>(42, 41, 42, 45, 43, 46, 44)</td><td>Armijo recovery strategies. Vector of size 7</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoBeta</td><td>OT_REAL</td><td>0.712</td><td>Trial stepsize decrease factor for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>1.0</td><td>Initial alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMinAlphaRec</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule during recovery</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoSigma</td><td>OT_REAL</td><td>0.005</td><td>Scale factor for linearised descent check in Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AutoQPRecovery</td><td>OT_BOOLEAN</td><td>True</td><td>Enable automatic QP recovery</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSmaxblockSize</td><td>OT_INTEGER</td><td>300</td><td>Maximum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSmethod</td><td>OT_INTEGER</td><td>0</td><td>Choose BFGS method (dense, block, sparse)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSminblockSize</td><td>OT_INTEGER</td><td>300</td><td>Minimum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSrestart</td><td>OT_INTEGER</td><td>50</td><td>Restart BFGS update after this many iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BettsFactor</td><td>OT_REAL</td><td>2.1</td><td>Update factor for Betts' Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BettsPoint</td><td>OT_REAL</td><td>1.0</td><td>Smallest eigenvalue of the regularised Hessian</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BoundTolFac</td><td>OT_REAL</td><td>1000.0</td><td>Factor in determining active constraints by KKT</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckFJ</td><td>OT_REAL</td><td>1e+12</td><td>Upper bound used by Fritz-John heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureDF</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DF</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureDG</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DG</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureHM</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepBettsSum</td><td>OT_REAL</td><td>0.5</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepConStop</td><td>OT_REAL</td><td>1e-06</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepConvio</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMaxIter</td><td>OT_INTEGER</td><td>50</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMethod</td><td>OT_INTEGER</td><td>0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMode</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepPFactor</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepPMax</td><td>OT_REAL</td><td>1000000.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepRecoveryDX</td><td>OT_BOOLEAN</td><td>False</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvBCond</td><td>OT_REAL</td><td>0.02</td><td>Block BFGS curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvBFac</td><td>OT_REAL</td><td>0.3</td><td>Block BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvCond</td><td>OT_REAL</td><td>0.02</td><td>BFGS Curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvFac</td><td>OT_REAL</td><td>0.3</td><td>BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CutLength</td><td>OT_REAL</td><td>0.001</td><td>Scaling factor for Cut recovery strategy</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>DebugMarker06</td><td>OT_INTEGER</td><td>42</td><td>Debug marker, only needed for ASTOS integration</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FGtogether</td><td>OT_BOOLEAN</td><td>False</td><td>F and G cannot be evaluated separately</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FJandND</td><td>OT_BOOLEAN</td><td>False</td><td>Enable Fritz-John and non-differentiable check heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleDual</td><td>OT_BOOLEAN</td><td>False</td><td>Activate dual feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleInit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate initial feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleInitTol</td><td>OT_REAL</td><td>0.001</td><td>Feasibility tolerance for no-objective feasible mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleOnly</td><td>OT_BOOLEAN</td><td>False</td><td>Activate feasible-only mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FidifEps</td><td>OT_REAL</td><td>1e-05</td><td>Finite difference perturbation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FidifHM</td><td>OT_BOOLEAN</td><td>False</td><td>Approximate Hessian by finite differences (otherwise BFGS)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterBisecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterGammaCV</td><td>OT_REAL</td><td>7.5e-06</td><td>Constraint violation decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterGammaF</td><td>OT_REAL</td><td>1.1e-05</td><td>Objective decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterIntersecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FirstDifCentral</td><td>OT_BOOLEAN</td><td>True</td><td>Use central finite difference quotient for first derivatives</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FocusOnFeas</td><td>OT_BOOLEAN</td><td>True</td><td>Enable Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FocusOnFeasFactor</td><td>OT_REAL</td><td>1.36</td><td>Factor in Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>GammaAlpha</td><td>OT_REAL</td><td>0.05</td><td>Safety factor for alphamin calculation by Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>GroupMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring groups</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IgnoreFilterCrit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate accelerating heuristics for Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncBettsTau</td><td>OT_REAL</td><td>2.0</td><td>Increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncBettsTauMore</td><td>OT_REAL</td><td>100.0</td><td>Larger increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncreaseIWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated integer workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncreaseRWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated real workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Infty</td><td>OT_REAL</td><td>1e+20</td><td>Upper bound for numbers to be regarded as finite</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>InftyUnbounded</td><td>OT_REAL</td><td>1e+20</td><td>Tolerance for unboundedness detection heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>InitialLMest</td><td>OT_BOOLEAN</td><td>True</td><td>Enable initial Lagrange multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>KeepAcceptableSol</td><td>OT_BOOLEAN</td><td>True</td><td>Save acceptable solutions as fallback</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LMestQPipComTol</td><td>OT_REAL</td><td>0.003</td><td>IP complementarity tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LMestQPipResTol</td><td>OT_REAL</td><td>1.0</td><td>IP residual tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LinMult</td><td>OT_BOOLEAN</td><td>False</td><td>Control Lagrange multiplier update</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LogLevel</td><td>OT_INTEGER</td><td>0</td><td>Enable XML logfiles and writing interval</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LogResult</td><td>OT_INTEGER</td><td>0</td><td>Enable XML result logging and detail level</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaF</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for objective values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for constraint values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>0.1</td><td>Lowpass-filter update factor for merit function values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>True</td><td>Enable lowpass-filter termination criterion</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Ma57PivotThresh</td><td>OT_REAL</td><td>1e-06</td><td>Pivoting tolerance for MA57 = CNTL(1)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxCalls</td><td>OT_INTEGER</td><td>2147483647</td><td>Upper bound to Reverse Communication calls</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxForce</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Force recovery strategy steps</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxGPart</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxIter</td><td>OT_INTEGER</td><td>500</td><td>Upper bound on major iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxLScounter</td><td>OT_INTEGER</td><td>3</td><td>Control activation of Filter acceleration heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxNorm</td><td>OT_BOOLEAN</td><td>True</td><td>Select max-norm instead of 1-norm in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MeritFunction</td><td>OT_INTEGER</td><td>4</td><td>Select merit function and penalty update [0, 3..5]</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MeritGradTol</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Threshold of meritfunction gradient for increasing Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MinBettsTau</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Lower bound for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MoreRelax</td><td>OT_BOOLEAN</td><td>False</td><td>Introduce one relaxation variable for every constraint</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>NLPmethod</td><td>OT_INTEGER</td><td>1</td><td>Select (1) Meritfunction or (3) Filter globalisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>NLPprint</td><td>OT_INTEGER</td><td>2</td><td>NLP print level [-1..4]</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PairMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring pairgroups</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsBar</td><td>OT_REAL</td><td>0.9</td><td>Penalty update parameter factor for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsKFac</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter factor for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsKSequence</td><td>OT_INTEGER</td><td>2</td><td>Penalty update parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdMaxDeltaK</td><td>OT_REAL</td><td>11.0</td><td>Max penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdMaxFac</td><td>OT_REAL</td><td>100000000.0</td><td>Max factor for increasing penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdRBar</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PrecisionF</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of objective</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PrecisionG</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of constraints</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>QPscaleParam</td><td>OT_REAL</td><td>0.0</td><td>(currently unused)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>0.3</td><td>Decrease factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RegStrategy</td><td>OT_INTEGER</td><td>1</td><td>Select Hessian regularisation strategy in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>False</td><td>Enables Filter-reinitialisation accelerating heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>0.92</td><td>Upper bound for accepting the constraint relaxation variable</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxMaxPen</td><td>OT_REAL</td><td>50000000.0</td><td>Upper bound on the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxRho</td><td>OT_REAL</td><td>6.0</td><td>Update factor for the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxStart</td><td>OT_REAL</td><td>1.0</td><td>Initial value of the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RestUntilFeas</td><td>OT_BOOLEAN</td><td>False</td><td>Do restoration until a feasible solution is found</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleConIter</td><td>OT_BOOLEAN</td><td>False</td><td>Scale constraints in every iteration</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleFacObj</td><td>OT_REAL</td><td>10.0</td><td>Value to scale large objective functions to</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleFacQP</td><td>OT_REAL</td><td>10.0</td><td>Upper bound on resulting matrix norm for QP scaling</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledFD</td><td>OT_BOOLEAN</td><td>True</td><td>Use a scaled perturbation for finite differences</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledKKT</td><td>OT_BOOLEAN</td><td>True</td><td>Scale KKT conditions</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>True</td><td>Scale the objective function</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>True</td><td>Scale some matrices handed to the QP</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>StartBettsTau</td><td>OT_REAL</td><td>0.1</td><td>Initial value for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingDelta</td><td>OT_REAL</td><td>0.01</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingSCV</td><td>OT_REAL</td><td>1.1</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingSF</td><td>OT_REAL</td><td>2.3</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TakeQPSol</td><td>OT_BOOLEAN</td><td>False</td><td>Evaluate QP search direction regardless of convergence</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Timeout</td><td>OT_REAL</td><td>300.0</td><td>Timeout in seconds</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolComp</td><td>OT_REAL</td><td>0.001</td><td>Complementarity tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolFeas</td><td>OT_REAL</td><td>1e-06</td><td>Feasibility tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolOpti</td><td>OT_REAL</td><td>1e-06</td><td>Optimality tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolWeakActive</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBig</td><td>OT_BOOLEAN</td><td>True</td><td>Enable too-big termination heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBigCV</td><td>OT_REAL</td><td>1e+25</td><td>Upper bound on constraint violation for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBigKKT</td><td>OT_REAL</td><td>1e+30</td><td>Upper bound on KKT values for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserDF</td><td>OT_BOOLEAN</td><td>True</td><td>Objective gradient values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserDG</td><td>OT_BOOLEAN</td><td>True</td><td>Jacobian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserHM</td><td>OT_BOOLEAN</td><td>True</td><td>Hessian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>2</td><td>Enable automatic Hessian structure generation or checking</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX. Deprecated, use \"expand\" instead.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX. Deprecated, use \"expand\" instead.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>grad_f</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>grad_lag</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>hess_lag</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>initialised</td><td>OT_BOOLEAN</td><td>True</td><td>Automatically added initialisation flag. </td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>GenericType()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>jac_g</td><td>OT_FX</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
+<tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />Monitor functions (eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>CasADi::FXInternal<br />CasADi::WorhpInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>Print information about execution time</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipBarrier</td><td>OT_REAL</td><td>7.8</td><td>IP barrier parameter.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipComTol</td><td>OT_REAL</td><td>2e-07</td><td>IP complementarity tolerance.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipFracBound</td><td>OT_REAL</td><td>0.88</td><td>IP fraction-to-the-boundary parameter.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the IP method.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipMinAlpha</td><td>OT_REAL</td><td>1e-12</td><td>IP line search minimum step size.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipRelaxDiv</td><td>OT_REAL</td><td>2.0</td><td>The relaxation term is divided by this value if successful.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipRelaxMax</td><td>OT_REAL</td><td>1e-07</td><td>Maximum relaxation value.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipRelaxMin</td><td>OT_REAL</td><td>1e-07</td><td>Mimimum relaxation value.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipRelaxMult</td><td>OT_REAL</td><td>10.0</td><td>The relaxation term is multiplied by this value if unsuccessful.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipResTol</td><td>OT_REAL</td><td>5e-08</td><td>IP residuals tolerance.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_ipTryRelax</td><td>OT_BOOLEAN</td><td>True</td><td>Enable relaxation strategy when encountering an error.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsItMaxIter</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of iterations of the iterative linear solvers.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsItMethod</td><td>OT_STRING</td><td>None</td><td>Select the iterative linear solver.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsItPrecondMethod</td><td>OT_STRING</td><td>None</td><td>Select preconditioner for the iterative linear solver.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsRefineMaxIter</td><td>OT_INTEGER</td><td>10</td><td>Maximum number of iterative refinement steps of the direct linear solvers.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsScale</td><td>OT_BOOLEAN</td><td>True</td><td>Enables scaling on linear solver level.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsTol</td><td>OT_REAL</td><td>1e-12</td><td>Tolerance for the linear solver.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_lsTrySimple</td><td>OT_BOOLEAN</td><td>False</td><td>Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported. Non-diagonal matrices will besolved with the chosen linear equation solver.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>80</td><td>Imposes an upper limit on the number of minor solver iterations, i.e. for thequadratic subproblem solver. If the limit is reached before convergence,WORHP will activate QP recovery strategies to prevent a solver breakdown.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_method</td><td>OT_STRING</td><td>None</td><td>Select the solution method used by the QP solver.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnBeta</td><td>OT_REAL</td><td>0.9</td><td>NSN stepsize decrease factor.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnGradStep</td><td>OT_BOOLEAN</td><td>True</td><td>Enable gradient steps in the NSN method.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnKKT</td><td>OT_REAL</td><td>1e-06</td><td>NSN KKT tolerance.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnLsMethod</td><td>OT_STRING</td><td>None</td><td>Select the direct linear solver used by the NSN method.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnMinAlpha</td><td>OT_REAL</td><td>1e-11</td><td>NSN line search minimum step size.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_nsnSigma</td><td>OT_REAL</td><td>0.01</td><td>NSN line search slope parameter.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_printLevel</td><td>OT_STRING</td><td>None</td><td>Controls the amount of QP solver output.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>False</td><td>Enable scaling on QP level.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>True</td><td>Use strict termination criteria in IP method.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::NLPSolverInternal</td></tr>
 </table>
 */

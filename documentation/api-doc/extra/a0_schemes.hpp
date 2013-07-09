@@ -232,7 +232,7 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Input scheme: CasADi::InputOutputScheme  ( = 40) </caption>
+<caption>Input scheme: CasADi::InputOutputScheme  ( = 43) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -272,6 +272,9 @@
 <tr><td>SCHEME_SDPInput</td><td></td></tr>
 <tr><td>SCHEME_SDPOutput</td><td></td></tr>
 <tr><td>SCHEME_SDPStruct</td><td></td></tr>
+<tr><td>SCHEME_SDQPInput</td><td></td></tr>
+<tr><td>SCHEME_SDQPOutput</td><td></td></tr>
+<tr><td>SCHEME_SDQPStruct</td><td></td></tr>
 <tr><td>SCHEME_SOCPInput</td><td></td></tr>
 <tr><td>SCHEME_SOCPOutput</td><td></td></tr>
 <tr><td>SCHEME_SOCPStruct</td><td></td></tr>
@@ -279,7 +282,7 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Output scheme: CasADi::InputOutputScheme  ( = 40) </caption>
+<caption>Output scheme: CasADi::InputOutputScheme  ( = 43) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -319,6 +322,9 @@
 <tr><td>SCHEME_SDPInput</td><td></td></tr>
 <tr><td>SCHEME_SDPOutput</td><td></td></tr>
 <tr><td>SCHEME_SDPStruct</td><td></td></tr>
+<tr><td>SCHEME_SDQPInput</td><td></td></tr>
+<tr><td>SCHEME_SDQPOutput</td><td></td></tr>
+<tr><td>SCHEME_SDQPStruct</td><td></td></tr>
 <tr><td>SCHEME_SOCPInput</td><td></td></tr>
 <tr><td>SCHEME_SOCPOutput</td><td></td></tr>
 <tr><td>SCHEME_SOCPStruct</td><td></td></tr>
@@ -349,6 +355,21 @@
 <tr><td>GRADF_GRAD</td><td>Jacobian of the constraints [grad].</td></tr>
 <tr><td>GRADF_F</td><td>Objective function [f].</td></tr>
 <tr><td>GRADF_G</td><td>Constraint function [g].</td></tr>
+</table>
+*/
+/** \defgroup scheme_SDQPInput
+<a name='schemes'></a><table>
+<caption>Input scheme: CasADi::SDQPInput  (SDQP_SOLVER_NUM_IN = 9) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>SDQP_SOLVER_H</td><td>The matrix H: sparse ( n x n) [h].</td></tr>
+<tr><td>SDQP_SOLVER_C</td><td>The vector c: ( n x 1) [c].</td></tr>
+<tr><td>SDQP_SOLVER_F</td><td>The vertical stack of all matrices F_i: ( nm x m) [f].</td></tr>
+<tr><td>SDQP_SOLVER_G</td><td>The matrix G: ( m x m) [g].</td></tr>
+<tr><td>SDQP_SOLVER_A</td><td>The matrix A: ( nc x n) [a].</td></tr>
+<tr><td>SDQP_SOLVER_LBA</td><td>Lower bounds on Ax ( nc x 1) [lba].</td></tr>
+<tr><td>SDQP_SOLVER_UBA</td><td>Upper bounds on Ax ( nc x 1) [uba].</td></tr>
+<tr><td>SDQP_SOLVER_LBX</td><td>Lower bounds on x ( n x 1 ) [lbx].</td></tr>
+<tr><td>SDQP_SOLVER_UBX</td><td>Upper bounds on x ( n x 1 ) [ubx].</td></tr>
 </table>
 */
 /** \defgroup scheme_OCPInput
@@ -471,6 +492,19 @@
 <tr><td>LINSOL_X</td><td>Solution to the linear system of equations [X].</td></tr>
 </table>
 */
+/** \defgroup scheme_SDQPOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: CasADi::SDQPOutput  (SDQP_SOLVER_NUM_OUT = 7) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>SDQP_SOLVER_X</td><td>The primal solution (n x 1) - may be used as initial guess [x].</td></tr>
+<tr><td>SDQP_SOLVER_P</td><td>The solution P (m x m) - may be used as initial guess [p].</td></tr>
+<tr><td>SDQP_SOLVER_DUAL</td><td>The dual solution (m x m) - may be used as initial guess [dual].</td></tr>
+<tr><td>SDQP_SOLVER_COST</td><td>The primal optimal cost (1 x 1) [cost].</td></tr>
+<tr><td>SDQP_SOLVER_DUAL_COST</td><td>The dual optimal cost (1 x 1) [dual_cost].</td></tr>
+<tr><td>SDQP_SOLVER_LAM_A</td><td>The dual solution corresponding to the linear constraints (nc x 1) [lam_a].</td></tr>
+<tr><td>SDQP_SOLVER_LAM_X</td><td>The dual solution corresponding to simple bounds (n x 1) [lam_x].</td></tr>
+</table>
+*/
 /** \defgroup scheme_ControlSimulatorInput
 <a name='schemes'></a><table>
 <caption>Input scheme: CasADi::ControlSimulatorInput  (CONTROLSIMULATOR_NUM_IN = 3) </caption>
@@ -585,19 +619,19 @@
 <br/>
 @copydoc scheme_QPSolverOutput
 */
-/** \class CasADi::WorhpInternal
+/** \class CasADi::SDPSDQPInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_SDQPInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_SDQPOutput
 */
-/** \class CasADi::WorhpSolver
+/** \class CasADi::SDPSDQPSolver
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_SDQPInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_SDQPOutput
 */
 /** \class CasADi::LapackLUDenseInternal
 \n
@@ -907,6 +941,20 @@
 <br/>
 @copydoc scheme_SOCPOutput
 */
+/** \class CasADi::SDQPSolverInternal
+\n
+\par
+@copydoc scheme_SDQPInput
+<br/>
+@copydoc scheme_SDQPOutput
+*/
+/** \class CasADi::SDQPSolver
+\n
+\par
+@copydoc scheme_SDQPInput
+<br/>
+@copydoc scheme_SDQPOutput
+*/
 /** \class CasADi::RKIntegratorInternal
 \n
 \par
@@ -1056,4 +1104,18 @@
 @copydoc scheme_OCPInput
 <br/>
 @copydoc scheme_OCPOutput
+*/
+/** \class CasADi::WorhpInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/** \class CasADi::WorhpSolver
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
 */
