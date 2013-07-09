@@ -335,12 +335,12 @@ autogenhelpershpp.write("""
 /// Helper function for 'customIO'
 template<class M>
 IOSchemeVector<M> customIO(""" + ",".join(['const std::string arg_s%d="",M arg_m%d=M()' % (i,i) for i in range(20)]) +"""){
-  std::vector<M> k;
-  std::vector<std::string> v;
+  std::vector<std::string> k;
+  std::vector<M> v;
 """+
   "\n".join(['  if (arg_s%d!="") { k.push_back(arg_s%d);  v.push_back(arg_m%d); }' % (i,i,i) for i in range(20) ])
 +"""
-  return IOSchemeVector<M>(v,customIO(k));
+  return IOSchemeVector<M>(v,IOScheme(k));
 }
 """)
   
