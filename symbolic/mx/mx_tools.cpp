@@ -409,6 +409,13 @@ namespace CasADi{
     
     return ret;
   }
+  
+  MX blkdiag(const MX &A, const MX& B) {
+    std::vector<MX> ret;
+    ret.push_back(A);
+    ret.push_back(B);
+    return blkdiag(ret);
+  }
 
   int countNodes(const MX& A){
     MXFunction f(vector<MX>(),A);

@@ -234,8 +234,13 @@ namespace CasADi{
   */
   MX diag(const MX& x);
 
-  /** \brief   Construct a matrix with given block on the diagonal */
+  /** \brief   Construct a matrix with given blocks on the diagonal */
   MX blkdiag(const std::vector<MX> &A);
+
+#ifndef SWIG
+  /** \brief   Construct a matrix with given blocks on the diagonal */
+  MX blkdiag(const MX &A, const MX& B);
+#endif // SWIG
 
   /** \brief Return a row-wise summation of elements */
   MX sumRows(const MX &x);
