@@ -1098,6 +1098,16 @@ class SXtests(casadiTestCase):
     f.output()
     self.checkarray(f.output(),DMatrix([0.298028,-0.479787,0.0635774]),digits=5)
     
+    p = ssym("[a,b,c,d,e]")
+    r = poly_roots(p)
+    
+    f = SXFunction([p],[r])
+    f.init()
+    f.setInput([3,6,-123,  -126,1080])
+    f.evaluate()
+    f.output()
+    self.checkarray(f.output(),DMatrix([5,3,-4,-6]),digits=5)
+    
   def test_eig_symbolic(self):
     x = ssym("x",2,2)
     f = SXFunction([x],[eig_symbolic(x)])

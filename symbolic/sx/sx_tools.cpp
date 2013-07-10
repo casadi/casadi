@@ -1253,45 +1253,81 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     casadi_assert_message(p.size2()==1,"poly_root(): supplied paramter must be column vector but got " << p.dimString() << ".");
     casadi_assert(p.dense());
     if (p.size1()==2) { // a*x + b
-      SX a = p.at(0);
-      SX b = p.at(1);
+      SXMatrix a = p(0);
+      SXMatrix b = p(1);
       return -b/a;
     } else if (p.size1()==3) { // a*x^2 + b*x + c
-      SX a = p.at(0);
-      SX b = p.at(1);
-      SX c = p.at(2);
-      SX ds = sqrt(b*b-4*a*c);
-      SX bm = -b;
-      SX a2 = 2*a;
+      SXMatrix a = p(0);
+      SXMatrix b = p(1);
+      SXMatrix c = p(2);
+      SXMatrix ds = sqrt(b*b-4*a*c);
+      SXMatrix bm = -b;
+      SXMatrix a2 = 2*a;
       SXMatrix ret;
       ret.append((bm-ds)/a2);
       ret.append((bm+ds)/a2);
       return ret;
     } else if (p.size1()==4) {
       // www.cs.iastate.edu/~cs577/handouts/polyroots.pdf
-      SX ai = 1/p.at(0);
+      SXMatrix ai = 1/p(0);
        
-      SX p_ = p.at(1)*ai;
-      SX q  = p.at(2)*ai;
-      SX r  = p.at(3)*ai;
+      SXMatrix p_ = p(1)*ai;
+      SXMatrix q  = p(2)*ai;
+      SXMatrix r  = p(3)*ai;
       
-      SX pp = p_*p_;
+      SXMatrix pp = p_*p_;
       
-      SX a = q - pp/3;
-      SX b = r + 2.0/27*pp*p_-p_*q/3;
+      SXMatrix a = q - pp/3;
+      SXMatrix b = r + 2.0/27*pp*p_-p_*q/3;
       
-      SX a3 = a/3;
+      SXMatrix a3 = a/3;
       
-      SX phi = acos(-b/2/sqrt(-a3*a3*a3));
+      SXMatrix phi = acos(-b/2/sqrt(-a3*a3*a3));
       
-      SXMatrix ret(3,1,2*sqrt(-a3));
-      ret(0)*= cos(phi/3);
-      ret(1)*= cos((phi+2*M_PI)/3);
-      ret(2)*= cos((phi+4*M_PI)/3);
+      SXMatrix ret;
+      ret.append(cos(phi/3));
+      ret.append(cos((phi+2*M_PI)/3));
+      ret.append(cos((phi+4*M_PI)/3));
+      ret*= 2*sqrt(-a3);
       
       ret-= p_/3;
       return ret;
-    } else if (p.at(p.size()-1).isEqual(0)) {
+    } else if (p.size1()==5) {
+      SXMatrix ai = 1/p(0);
+      SXMatrix b = p(1)*ai;
+      SXMatrix c = p(2)*ai;
+      SXMatrix d = p(3)*ai;
+      SXMatrix e = p(4)*ai;
+      
+      SXMatrix bb= b*b;
+      SXMatrix f = c - (3*bb/8);
+      SXMatrix g = d + (bb*b / 8) - b*c/2;
+      SXMatrix h = e - (3*bb*bb/256) + (bb * c/16) - ( b*d/4);
+      SXMatrix poly;
+      poly.append(1);
+      poly.append(f/2);
+      poly.append((f*f -4*h)/16);
+      poly.append(-g*g/64);
+      SXMatrix y = poly_roots(poly);
+      
+      SXMatrix r0 = y(0);
+      SXMatrix r1 = y(2);
+
+      SXMatrix p = sqrt(r0); // two non-zero-roots
+      SXMatrix q = sqrt(r1);
+
+      SXMatrix r = -g/(8*p*q);
+
+      SXMatrix s = b/4;
+      
+      SXMatrix ret;
+      ret.append(p + q + r -s);
+      ret.append(p - q - r -s);
+      ret.append(-p + q - r -s );
+      ret.append(-p - q + r -s);
+
+      return ret;
+    } else if (p(p.size()-1).at(0).isEqual(0)) {
       SXMatrix ret = poly_roots(p(range(p.size()-1)));
       ret.append(0);
       return ret;
