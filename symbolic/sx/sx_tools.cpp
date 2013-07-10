@@ -1354,7 +1354,6 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     for (int k=0;k<nb;++k) {
       std::vector<int> r = range(index.at(k),index.at(k+1));
       // det(lambda*I-m) = 0
-      std::cout << r << std::endl;
       ret.append(poly_roots(poly_coeff(det(SXMatrix::eye(r.size())*l-m_perm(r,r)),l)));
     }
 		
