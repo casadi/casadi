@@ -275,7 +275,7 @@ namespace CasADi{
       rhs = vertsplit(J->getSolve(vertcat(rhs),true,linsol_),row_offset);
       for(int d=0; d<nfwd; ++d){
         if(fsens[d][0]!=0){
-          *fsens[d][0] = -rhs[d];
+          *fsens[d][0] = -trans(rhs[d]);
         }
       }
       row_offset.resize(1);
