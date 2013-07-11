@@ -35,22 +35,27 @@ namespace CasADi{
   }
  
   void LinearSolver::prepare(){
+    assertInit();
     (*this)->prepare();
   }
 
   void LinearSolver::solve(double* x, int nrhs, bool transpose){
+    assertInit();
     (*this)->solve(x,nrhs,transpose);
   }
  
   void LinearSolver::solve(){
+    assertInit();
     (*this)->solve();
   }
 
   MX LinearSolver::solve(const MX& A, const MX& B, bool transpose){
+    assertInit();
     return A->getSolve(B, transpose, *this);
   }
  
   bool LinearSolver::prepared() const{
+    assertInit();
     return (*this)->prepared_;
   }
  
