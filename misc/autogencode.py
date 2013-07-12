@@ -328,6 +328,7 @@ def IOSchemeVector(arg,io_scheme):
     return IOSchemeVectorCRSSparsity(arg,io_scheme)
   except:
     pass
+  raise Exception("IOSchemeVector called with faulty arguments. Individual values must be SXMatrix, MX or CRSSparsity.")
 """)
 autogenpy.write("%}\n")
 autogenpy.write("#endif //SWIGPYTHON\n")
