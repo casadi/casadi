@@ -1193,6 +1193,11 @@ class SXtests(casadiTestCase):
     self.assertEqual(s[0],3)
     self.assertEqual(s[1],0)
     
+  def test_empty_SXMatrix(self):
+    s = SXMatrix([]).shape
+    self.assertEqual(s[0],0)
+    self.assertEqual(s[-1],0)
+    
 if __name__ == '__main__':
     unittest.main()
 

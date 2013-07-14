@@ -45,6 +45,8 @@ namespace CasADi{
   }
 
   void CRSSparsityInternal::sanityCheck(bool complete) const{
+    casadi_assert_message(nrow_>=0 ,"CRSSparsityInternal: number of rows must be positive, but got " << nrow_ << ".");
+    casadi_assert_message(ncol_ >=0,"CRSSparsityInternal: number of cols must be positive, but got " << ncol_ << ".");
     if (rowind_.size() != nrow_+1) {
       std::stringstream s;
       s << "CRSSparsityInternal:Compressed Row Storage is not sane. The following must hold:" << std::endl;
