@@ -1196,7 +1196,9 @@ class SXtests(casadiTestCase):
   def test_empty_SXMatrix(self):
     s = SXMatrix([]).shape
     self.assertEqual(s[0],0)
-    self.assertEqual(s[-1],0)
+    self.assertEqual(s[1],1)
+    x = ssym("x")
+    x.append(SXMatrix([]))
     
 if __name__ == '__main__':
     unittest.main()
