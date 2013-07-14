@@ -641,7 +641,7 @@ class ADtests(casadiTestCase):
           (in1,v1,sin(x**2),c.diag(cos(x**2)*2*x)),
           (in1,v1,x*y[:,0],c.diag(y[:,0])),
           (in1,v1,x*y[[0,1]],c.diag(y[[0,1]])),
-          #(in1,v1,x*y[[1,0]],c.diag(y[[1,0]])),
+          (in1,v1,x*y[[1,0]],c.diag(y[[1,0]])),
           (in1,v1,x*y[[0,1],0],c.diag(y[[0,1],0])),
           (in1,v1,inner_prod(x,x),(2*x).T),
           (in1,v1,inner_prod(x**2,x),(3*x**2).T),
