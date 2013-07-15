@@ -72,13 +72,13 @@ namespace CasADi{
       if(fwdSeed[d][0]!=fwdSens[d][0]){
         copy(fwdSeed[d][0]->begin(),fwdSeed[d][0]->end(),fwdSens[d][0]->begin());
       }
-      for_each(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),std::negate<double>());
+      transform(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),fwdSens[d][0]->begin(),std::negate<double>());
       if(Tr){
         DMatrix::mul_no_alloc_nt(*output[0],*fwdSeed[d][1],*fwdSens[d][0]);
       } else {
         DMatrix::mul_no_alloc_nn(*output[0],*fwdSeed[d][1],*fwdSens[d][0]);
       }
-      for_each(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),std::negate<double>());
+      transform(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),fwdSens[d][0]->begin(),std::negate<double>());
       linear_solver_.solve(getPtr(fwdSens[d][0]->data()),output[0]->size1(),Tr);      
     }
 
@@ -86,7 +86,7 @@ namespace CasADi{
     for(int d=0; d<nadj; ++d){
 
       // Solve transposed
-      for_each(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),std::negate<double>());
+      transform(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),adjSeed[d][0]->begin(),std::negate<double>());
       linear_solver_.solve(getPtr(adjSeed[d][0]->data()),output[0]->size1(),!Tr);
 
       // Propagate to A
@@ -98,7 +98,7 @@ namespace CasADi{
 
       // Propagate to B
       if(adjSeed[d][0]==adjSens[d][0]){
-        for_each(adjSens[d][0]->begin(),adjSens[d][0]->end(),std::negate<double>());
+        transform(adjSens[d][0]->begin(),adjSens[d][0]->end(),adjSens[d][0]->begin(),std::negate<double>());
       } else {
         transform(adjSens[d][0]->begin(),adjSens[d][0]->end(),adjSeed[d][0]->begin(),adjSens[d][0]->begin(),std::minus<double>());
         fill(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),0);
