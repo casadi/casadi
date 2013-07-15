@@ -28,7 +28,7 @@ from helpers import *
 
 solvers= []
 try:
-  solvers.append((KinsolSolver,{"linear_solver": CSparse}))
+  solvers.append((KinsolSolver,{"linear_solver": CSparse,"abstol":1e-10}))
 except:
   pass
 try:
@@ -56,7 +56,7 @@ class NLPtests(casadiTestCase):
       
       refsol = SXFunction([],[2*pi])
       refsol.init()
-      self.checkfx(solver,refsol,digits=5,gradient=False,hessian=False,sens_der=False)         
+      self.checkfx(solver,refsol,digits=5)         
       
   def test_scalar2(self):
     self.message("Scalar implicit problem, n=1")
@@ -79,7 +79,7 @@ class NLPtests(casadiTestCase):
       refsol = SXFunction([x],[sin(x)])
       refsol.init()
       refsol.setInput(n)
-      self.checkfx(solver,refsol,digits=6,gradient=False,hessian=False,sens_der=False,failmessage=message)
+      self.checkfx(solver,refsol,digits=6,sens_der=False,failmessage=message)
       
       
   def test_vector2(self):
@@ -105,7 +105,7 @@ class NLPtests(casadiTestCase):
       refsol = SXFunction([x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
       refsol.init()
       refsol.setInput(n)
-      self.checkfx(solver,refsol,digits=5,gradient=False,hessian=False,sens_der=False,failmessage=message)
+      self.checkfx(solver,refsol,digits=5,sens_der=False,failmessage=message)
       
   def testKINSol1c(self):
     self.message("Scalar KINSol problem, n=0, constraint")
