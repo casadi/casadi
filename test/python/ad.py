@@ -771,7 +771,7 @@ class ADtests(casadiTestCase):
             storagekey = (spmod,spmod2)
             if not(storagekey in storage):
               storage[storagekey] = []
-            storage[storagekey].append([vf.getOutput(i) for i in range(vf.getNumInputs())])
+            storage[storagekey].append([vf.getOutput(i) for i in range(vf.getNumOutputs())])
             
             # Added to make sure that the same seeds are used for SX and MX
             if Function is MXFunction:
@@ -791,7 +791,7 @@ class ADtests(casadiTestCase):
            
               res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
 
-              vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+              vf2 = Function2(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
               vf2.init()
                 
               random.seed(1)
@@ -802,7 +802,7 @@ class ADtests(casadiTestCase):
               storagekey = (spmod,spmod2)
               if not(storagekey in storage2):
                 storage2[storagekey] = []
-              storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.getNumInputs())])
+              storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.getNumOutputs())])
 
       # Remainder of eval testing
       for store,order in [(storage,"first-order"),(storage2,"second-order")]:
