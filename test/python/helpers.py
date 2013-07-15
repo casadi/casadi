@@ -25,6 +25,7 @@ from numpy import *
 import unittest
 import sys
 from math import isnan, isinf
+import itertools
 
 import argparse
 
@@ -249,7 +250,7 @@ class casadiTestCase(unittest.TestCase):
         continue
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 
-  def checkfx(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True):
+  def checkfx(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True):
 
     if digits_sens is None:
       digits_sens = digits
@@ -371,7 +372,7 @@ class casadiTestCase(unittest.TestCase):
           self.assertEqual(solutionjac.getNumOutputs(),solution.getNumOutputs()+1)
           for k in range(solution.getNumInputs()): solutionjac.setInput(solution_inputs[k],k)
           
-          self.checkfx(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+          self.checkfx(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
 
     if gradient:
       for i in range(trial.getNumInputs()):
@@ -388,7 +389,7 @@ class casadiTestCase(unittest.TestCase):
             self.assertEqual(solutiongrad.getNumInputs(),solution.getNumInputs())
             self.assertEqual(solutiongrad.getNumOutputs(),solution.getNumOutputs()+1)
             for k in range(solution.getNumInputs()): solutiongrad.setInput(solution_inputs[k],k)
-            self.checkfx(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+            self.checkfx(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
 
     if hessian:
       for i in range(trial.getNumInputs()):
@@ -405,11 +406,108 @@ class casadiTestCase(unittest.TestCase):
             self.assertEqual(solutionhess.getNumInputs(),solution.getNumInputs())
             self.assertEqual(solutionhess.getNumOutputs(),solution.getNumOutputs()+2)
             for k in range(solution.getNumInputs()): solutionhess.setInput(solution_inputs[k],k)
-            self.checkfx(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
+            self.checkfx(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
 
     for k in range(trial.getNumInputs()):
       trial.setInput(trial_inputs[k],k)
       solution.setInput(solution_inputs[k],k)
+
+    if evals:
+
+      def remove00(x):
+        ret = DMatrix(x)
+        ret[0,0] = DMatrix.sparse(1,1)
+        return ret
+        
+      spmods = [lambda x: x , remove00]
+      spmods = [lambda x: x]
+      
+      sym = msym
+      Function = MXFunction
+      
+      storage2 = {}
+      storage = {}
+      
+      ndir = 2
+      trial.requestNumSens(ndir,ndir)
+      solution.requestNumSens(ndir,ndir)
+      
+      def flatten(l):
+        ret = []
+        for i in l:
+          ret.extend(i)
+        return ret
+        
+      vf_reference = None
+        
+      for f,values in [(solution,solution_inputs),(trial,trial_inputs)]:
+      
+        # dense
+        for spmod,spmod2 in itertools.product(spmods,repeat=2):
+          fseeds = [[sym("f",spmod(f.getInput(i)).sparsity()) for i in range(f.getNumInputs())]  for d in range(ndir)]
+          aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.getNumOutputs())] for d in range(ndir)]
+          inputss = [sym("i",f.input(i).sparsity()) for i in range(f.getNumInputs())]
+      
+          res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
+          
+          fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].size())) for d in range(ndir) ]
+          aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].size())) for d in range(ndir) ]
+          vf = Function(inputss+flatten([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + flatten([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
+          
+          vf.init()
+
+          for i,v in enumerate(values):
+            vf.setInput(v,i)
+        
+          # Complete random seeding
+          random.seed(1)
+          for i in range(vf.getNumInputs()):
+            vf.setInput(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).size())),i)
+          
+          vf.evaluate()
+          storagekey = (spmod,spmod2)
+          if not(storagekey in storage):
+            storage[storagekey] = []
+          storage[storagekey].append([vf.getOutput(i) for i in range(vf.getNumOutputs())])
+          
+          if vf_reference is None:
+            vf_reference = vf
+
+          # Second order sensitivities
+          for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
+            fseeds2 = [[sym("f",vf_reference.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
+            aseeds2 = [[sym("a",vf_reference.output(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
+            inputss2 = [sym("i",vf_reference.input(i).sparsity()) for i in range(vf.getNumInputs())]
+         
+            res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
+
+            vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+            vf2.init()
+              
+            random.seed(1)
+            for i in range(vf2.getNumInputs()):
+              vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())),i)
+            
+            vf2.evaluate()
+            storagekey = (spmod,spmod2)
+            if not(storagekey in storage2):
+              storage2[storagekey] = []
+            storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.getNumOutputs())])
+
+      # Remainder of eval testing
+      for store,order in [(storage,"first-order"),(storage2,"second-order")]:
+        for stk,st in store.items():
+          for i in range(len(st)-1):
+            for k,(a,b) in enumerate(zip(st[0],st[i+1])):
+              if b.numel()==0 and sparse(a).size()==0: continue
+              if a.numel()==0 and sparse(b).size()==0: continue
+              self.checkarray(sparse(a),sparse(b),("%s, output(%d)" % (order,k))+str(vf2.getInput(0)))
+              
+    for k in range(trial.getNumInputs()):
+      trial.setInput(trial_inputs[k],k)
+      solution.setInput(solution_inputs[k],k)
+
+      
 
 class run_only(object):
   def __init__(self, args):

@@ -281,7 +281,7 @@ class Integrationtests(casadiTestCase):
 
               integrator.evaluate(1,0)
               
-              self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
+              self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
               
               
 
@@ -466,7 +466,7 @@ class Integrationtests(casadiTestCase):
                   ff.setInput(v,i)
             integrator.evaluate(1,0)
             
-            self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
+            self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
 
         
   def setUp(self):

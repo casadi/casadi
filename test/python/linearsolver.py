@@ -122,7 +122,7 @@ class LinearSolverTests(casadiTestCase):
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")
       
-      self.checkfx(solver,solution,fwd=False,adj=False,jacobian=False)
+      self.checkfx(solver,solution,fwd=False,adj=False,jacobian=False,evals=False)
        
   def test_simple_fx_indirect(self):
     A_ = DMatrix([[3,7],[1,2]])
@@ -159,7 +159,7 @@ class LinearSolverTests(casadiTestCase):
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")
       
-      self.checkfx(solver,solution,fwd=False,adj=False,jacobian=False)
+      self.checkfx(solver,solution,fwd=False,adj=False,jacobian=False,evals=False)
 
   def test_simple_solve_node(self):
     A_ = DMatrix([[3,7],[1,2]])

@@ -190,7 +190,7 @@ namespace CasADi{
         int d = rhs_ind[i];
 
         // Propagate to A
-        if(Tr){
+        if(!Tr){
           *adjSens[d][1] -= mul(trans(X),rhs[i]);
         } else {
           *adjSens[d][1] -= mul(trans(rhs[i]),X);
