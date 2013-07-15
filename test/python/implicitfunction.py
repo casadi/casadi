@@ -28,15 +28,15 @@ from helpers import *
 
 solvers= []
 try:
-  solver.append((KinsolSolver,{"linear_solver": CSparse}))
+  solvers.append((KinsolSolver,{"linear_solver": CSparse}))
 except:
   pass
 try:
-  solver.append((NLPImplicitSolver,{"linear_solver": CSparse,"nlp_solver": IpoptSolver}))
+  solvers.append((NLPImplicitSolver,{"linear_solver": CSparse,"nlp_solver": IpoptSolver}))
 except:
   pass
 try:
-  solver.append((NewtonImplicitSolver,{"linear_solver": CSparse}))
+  solvers.append((NewtonImplicitSolver,{"linear_solver": CSparse}))
 except:
   pass
 
@@ -89,8 +89,10 @@ class NLPtests(casadiTestCase):
       message = Solver.__name__
       x=SX("x")
       y=ssym("y",2)
+      y0 = DMatrix([0.1,0.4])
+      yy = y + y0
       n=0.2
-      f=SXFunction([y,x],[vertcat([x-arcsin(y[0]),y[1]**2-y[0]])])
+      f=SXFunction([y,x],[vertcat([x-arcsin(yy[0]),yy[1]**2-yy[0]])])
       f.init()
       solver=Solver(f)
       solver.setOption(options)
@@ -98,13 +100,12 @@ class NLPtests(casadiTestCase):
       solver.setFwdSeed(1)
       solver.setAdjSeed(1)
       solver.setInput(n)
-      solver.setOutput([0.1,0.4])
       solver.evaluate(1,1)
       
-      refsol = SXFunction([x],[vertcat([sin(x),sqrt(sin(x))])]) # ,sin(x)**2])
+      refsol = SXFunction([x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
       refsol.init()
       refsol.setInput(n)
-      self.checkfx(solver,refsol,digits=6,gradient=False,hessian=False,sens_der=False,failmessage=message)
+      self.checkfx(solver,refsol,digits=5,gradient=False,hessian=False,sens_der=False,failmessage=message)
       
   def testKINSol1c(self):
     self.message("Scalar KINSol problem, n=0, constraint")
