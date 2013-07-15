@@ -300,7 +300,13 @@ namespace CasADi{
     /// Matrix multiplcation
     virtual MX getMultiplication(const MX& y) const;
 
-    /// Solve a system of linear equations
+    /** \brief Solve a system of linear equations
+    *
+    *      For system Ax = b:
+    *
+    *      A->getSolve(b)         
+    *
+    */
     virtual MX getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const;
 
     /// Get the nonzeros of matrix
