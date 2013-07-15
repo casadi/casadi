@@ -92,7 +92,75 @@ class LinearSolverTests(casadiTestCase):
       res = DMatrix([-1.5,5.5])
       self.checkarray(solver.output("X"),res.T)
       #   result' = A'\b'             Ax = b
+
+  def test_simple_fx_direct(self):
+    A_ = DMatrix([[3,7],[1,2]])
+    A = msym("A",A_.sparsity())
+    b_ = DMatrix([1,0.5]).T
+    b = msym("b",b_.sparsity())
+    
+    for Solver, options in lsolvers:
+      print Solver
+      solver = Solver(A.sparsity())
+      solver.setOption(options)
+      solver.init()
+      solver.setInput(A_,"A")
+      solver.setInput(True,"T")
+      solver.setInput(b_,"B")
       
+      A_0 = A[0,0]
+      A_1 = A[0,1]
+      A_2 = A[1,0]
+      A_3 = A[1,1]
+      
+      b_0 = b[0]
+      b_1 = b[1]
+      
+      solution = MXFunction(linsolIn(A=A,B=b),[horzcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
+      solution.init()
+      
+      solution.setInput(A_,"A")
+      solution.setInput(b_,"B")
+      
+      self.checkfx(solver,solution,fwd=False,adj=False,jacobian=False)
+       
+  def test_simple_fx_indirect(self):
+    A_ = DMatrix([[3,7],[1,2]])
+    A = msym("A",A_.sparsity())
+    b_ = DMatrix([1,0.5]).T
+    b = msym("b",b_.sparsity())
+    
+    for Solver, options in lsolvers:
+      print Solver
+      solver = Solver(A.sparsity())
+      solver.setOption(options)
+      solver.init()
+      solver.setInput(A_,"A")
+      solver.setInput(True,"T")
+      solver.setInput(b_,"B")
+      
+      relay = MXFunction(linsolIn(A=A,B=b),solver.call(linsolIn(A=A,B=b,T=True)))
+      relay.init()
+
+      relay.setInput(A_,"A")
+      relay.setInput(b_,"B")
+      
+      A_0 = A[0,0]
+      A_1 = A[0,1]
+      A_2 = A[1,0]
+      A_3 = A[1,1]
+      
+      b_0 = b[0]
+      b_1 = b[1]
+      
+      solution = MXFunction(linsolIn(A=A,B=b),[horzcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
+      solution.init()
+      
+      solution.setInput(A_,"A")
+      solution.setInput(b_,"B")
+      
+      self.checkfx(solver,solution,fwd=False,adj=False,jacobian=False)
+
       
   @requires("CSparseCholesky")
   def test_cholesky(self):
