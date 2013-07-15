@@ -526,7 +526,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_LinsolInput: 
       if(i==0) return "The square matrix A: sparse, (n x n).";
-      if(i==1) return "The right-hand-side matrix b: dense,  (n x m)";
+      if(i==1) return "The right-hand-side matrix b: dense,  (m x n)";
       if(i==2) return "Transpose A?: dense scalar, value 0 or 1,  (1 x 1)";
       break;
     case SCHEME_LinsolOutput: 

@@ -707,7 +707,7 @@ def linsolIn(*dummy,**kwargs):
   
   Keyword arguments:
     A -- The square matrix A: sparse, (n x n). [LINSOL_A]
-    B -- The right-hand-side matrix b: dense,  (n x m) [LINSOL_B]
+    B -- The right-hand-side matrix b: dense,  (m x n) [LINSOL_B]
     T -- Transpose A?: dense scalar, value 0 or 1,  (1 x 1) [LINSOL_T]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolIn. Either use keywords or non-keywords ")
