@@ -27,8 +27,74 @@ from types import *
 from helpers import *
 import random
 
-class LinearSolverTests(casadiTestCase):
+lsolvers = []
+try:
+  lsolvers.append((CSparse,{}))
+except:
+  pass
+  
+try:
+  lsolvers.append((LapackLUDense,{}))
+except:
+  pass
+  
+try:
+  lsolvers.append((LapackQRDense,{}))
+except:
+  pass
+  
+#try:
+#  lsolvers.append((SymbolicQR,{}))
+#except:
+#  pass
+  
+print lsolvers
 
+class LinearSolverTests(casadiTestCase):
+  
+  def test_simple_trans(self):
+    A = DMatrix([[3,7],[1,2]])
+    for Solver, options in lsolvers:
+      solver = Solver(A.sparsity())
+      solver.setOption(options)
+      solver.init()
+      solver.setInput(A,"A")
+
+      solver.setInput(True,"T")
+      solver.prepare()
+      
+      b = DMatrix([1,0.5])
+      solver.setInput(b.T,"B")
+      
+      solver.solve()
+      
+      res = DMatrix([1.5,-0.5])
+      self.checkarray(solver.output("X"),res.T)
+      #   result' = A\b'               Ax = b
+
+  def test_simple(self):
+    A = DMatrix([[3,7],[1,2]])
+    for Solver, options in lsolvers:
+      print Solver
+      solver = Solver(A.sparsity())
+      solver.setOption(options)
+      solver.init()
+      solver.setInput(A,"A")
+
+      solver.setInput(False,"T")
+      solver.prepare()
+      
+      b = DMatrix([1,0.5])
+      solver.setInput(b.T,"B")
+      
+      solver.solve()
+      
+      res = DMatrix([-1.5,5.5])
+      self.checkarray(solver.output("X"),res.T)
+      #   result' = A'\b'             Ax = b
+      
+      
+  @requires("CSparseCholesky")
   def test_cholesky(self):
     random.seed(1)
     n = 10
@@ -42,6 +108,7 @@ class LinearSolverTests(casadiTestCase):
 
     S.setInput(M,0)
 
+  @requires("CSparseCholesky")
   def test_cholesky2(self):
     random.seed(0)
     n = 10
