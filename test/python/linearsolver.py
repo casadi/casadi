@@ -161,6 +161,45 @@ class LinearSolverTests(casadiTestCase):
       
       self.checkfx(solver,solution,fwd=False,adj=False,jacobian=False)
 
+  def test_simple_solve_node(self):
+    A_ = DMatrix([[3,7],[1,2]])
+    A = msym("A",A_.sparsity())
+    b_ = DMatrix([1,0.5]).T
+    b = msym("b",b_.sparsity())
+    for Solver, options in lsolvers:
+      print Solver
+      solver = Solver(A.sparsity())
+      solver.setOption(options)
+      solver.init()
+      for tr in [True, False]:
+        x = solver.solve(A,b,tr)
+        f = MXFunction([A,b],[x])
+        f.init()
+        f.setInput(A_,0)
+        f.setInput(b_,1)
+        f.evaluate()
+
+        if tr:
+          A_0 = A[0,0]
+          A_1 = A[0,1]
+          A_2 = A[1,0]
+          A_3 = A[1,1]
+        else:
+          A_0 = A[0,0]
+          A_1 = A[1,0]
+          A_2 = A[0,1]
+          A_3 = A[1,1]
+          
+        b_0 = b[0]
+        b_1 = b[1]
+        
+        solution = MXFunction([A,b],[horzcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
+        solution.init()
+        
+        solution.setInput(A_,0)
+        solution.setInput(b_,1)
+        
+        self.checkfx(f,solution,jacobian=False)
       
   @requires("CSparseCholesky")
   def test_cholesky(self):

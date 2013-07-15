@@ -90,7 +90,7 @@ namespace CasADi{
       linear_solver_.solve(getPtr(adjSeed[d][0]->data()),output[0]->size1(),!Tr);
 
       // Propagate to A
-      if(Tr){
+      if(!Tr){
         DMatrix::mul_no_alloc_tn(*output[0],*adjSeed[d][0],*adjSens[d][1]);
       } else {
         DMatrix::mul_no_alloc_tn(*adjSeed[d][0],*output[0],*adjSens[d][1]);
