@@ -283,8 +283,8 @@ class LinearSolverTests(casadiTestCase):
         solution.setInput(A_,0)
         solution.setInput(b_,1)
         
-        self.checkfx(f,solution,sens_der=False,digits_sens=7)
-             
+        self.checkfx(f,solution,digits_sens=7)
+
   @requires("CSparseCholesky")
   def test_cholesky(self):
     random.seed(1)
