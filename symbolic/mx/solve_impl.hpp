@@ -224,7 +224,7 @@ namespace CasADi{
       // Get dependencies of all A elements
       bvec_t A_dep = 0;
       for(int i=0; i<nnz; ++i){
-        A_dep |= *A_ptr;
+        A_dep |= *A_ptr++;
       }
 
       // One right hand side at a time

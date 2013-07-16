@@ -199,7 +199,7 @@ class LinearSolverTests(casadiTestCase):
         solution.setInput(A_,0)
         solution.setInput(b_,1)
         
-        self.checkfx(f,solution,jacobian=False)
+        self.checkfx(f,solution)
       
   @requires("CSparseCholesky")
   def test_cholesky(self):
