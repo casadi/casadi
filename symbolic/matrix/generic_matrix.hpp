@@ -156,7 +156,8 @@ class GenericMatrix{
     * Attempts to identify quick returns on matrix-level and 
     * delegates to MatType::mul_full if no such quick returns are found.
     */
-    MatType mul_smart(const MatType& y) const;
+    MatType mul_smart(const MatType& y, const CRSSparsity& sp_z) const;
+    
 };
 
 #ifndef SWIG
@@ -233,7 +234,7 @@ bool GenericMatrix<MatType>::scalar(bool scalar_and_dense) const{
 }
 
 template<typename MatType>
-MatType GenericMatrix<MatType>::mul_smart(const MatType& y) const {
+MatType GenericMatrix<MatType>::mul_smart(const MatType& y, const CRSSparsity &sp_z) const {
   const MatType& x = *static_cast<const MatType*>(this);
 
   // Check if we can simplify the product
@@ -253,7 +254,7 @@ MatType GenericMatrix<MatType>::mul_smart(const MatType& y) const {
     return x*y;
   } else {
     casadi_assert_message(size2()==y.size1(),"Matrix product with incompatible dimensions. Lhs is " << dimString() << " and rhs is " << y.dimString() << ".");
-    return x.mul_full(y);
+    return x.mul_full(y,sp_z);
   }
 }
 

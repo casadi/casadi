@@ -191,9 +191,10 @@ namespace CasADi{
 
         // Propagate to A
         if(!Tr){
-          *adjSens[d][1] -= mul(trans(X),rhs[i]);
+          
+          *adjSens[d][1] -= mul(trans(X),rhs[i],A.sparsity());
         } else {
-          *adjSens[d][1] -= mul(trans(rhs[i]),X);
+          *adjSens[d][1] -= mul(trans(rhs[i]),X,A.sparsity());
         }
 
         // Propagate to B
