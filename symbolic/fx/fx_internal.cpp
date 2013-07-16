@@ -1401,8 +1401,14 @@ namespace CasADi{
 
   void FXInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
                           const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
-                          const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){
-    casadi_error("FXInternal::evalMX not defined for class " << typeid(*this).name());
+                          const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){                
+    // Wrap in an MXFunction
+    vector<MX> in = symbolicInput();
+    vector<MX> out = shared_from_this<FX>().call(in);
+    MXFunction f = MXFunction(in,out);
+    f.setInputScheme(getInputScheme());
+    f.init();
+    f.evalMX(arg,res,fseed,fsens,aseed,asens);
   }
 
   void FXInternal::spEvaluate(bool fwd){
