@@ -455,8 +455,6 @@ class casadiTestCase(unittest.TestCase):
       
           res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
           
-          fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].size())) for d in range(ndir) ]
-          aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].size())) for d in range(ndir) ]
           vf = Function(inputss+flatten([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + flatten([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
           
           vf.init()
