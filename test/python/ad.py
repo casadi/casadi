@@ -830,7 +830,10 @@ class ADtests(casadiTestCase):
             self.checkarray(DMatrix(f.jacSparsity(),1),DMatrix(J_.sparsity(),1))
                 
       # Scalarized
-      fun = MXFunction(inputs,[out[0],jac[0,:].T])
+      s_i  = out.sparsity().getRow()[0]
+      s_j  = out.sparsity().col()[0]
+      s_k = s_i*out.size2()+s_j
+      fun = MXFunction(inputs,[out[s_i,s_j],jac[s_k,:].T])
       fun.init()
       
       for i,v in enumerate(values):
@@ -852,9 +855,27 @@ class ADtests(casadiTestCase):
             for i,v in enumerate(values):
               Gf.setInput(v,i)
             Gf.evaluate()
-            self.checkarray(Gf.getOutput(),J_)
+            self.checkarray(Gf.getOutput(),J_,failmessage=("mode: %s, numeric: %d" % (mode,numeric)))
             #self.checkarray(DMatrix(Gf.output().sparsity(),1),DMatrix(J_.sparsity(),1),str(mode)+str(numeric)+str(out)+str(type(fun)))
-    
+
+      H_ = None
+      
+      for f in [fun,fun.expand()]:
+        #  hessian()
+        for mode in ["forward","reverse"]:
+          for numeric in [True,False]:
+            f.setOption("ad_mode",mode)
+            f.setOption("numeric_jacobian",numeric)
+            f.init()
+            Hf=f.hessian(0,0)
+            Hf.init()
+            for i,v in enumerate(values):
+              Hf.setInput(v,i)
+            Hf.evaluate()
+            if H_ is None:
+              H_ = Hf.getOutput()
+            self.checkarray(Hf.getOutput(),H_,failmessage=("mode: %s, numeric: %d" % (mode,numeric)))
+            #self.checkarray(DMatrix(Gf.output().sparsity(),1),DMatrix(J_.sparsity(),1),str(mode)+str(numeric)+str(out)+str(type(fun)))
     
 if __name__ == '__main__':
     unittest.main()
