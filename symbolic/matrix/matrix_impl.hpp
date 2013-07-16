@@ -1256,9 +1256,9 @@ Matrix<T> Matrix<T>::mul_full(const Matrix<T> &y) const{
 template<class T>
 void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& z){
   // Assert dimensions
-  casadi_assert(x.size1()==z.size1());
-  casadi_assert(y.size2()==z.size2());
-  casadi_assert(x.size2()==y.size1());
+  casadi_assert_message(x.size1()==z.size1(),"Dimension error. Got x=" << x.dimString() << " and z=" << z.dimString() << ".");
+  casadi_assert_message(y.size2()==z.size2(),"Dimension error. Got y=" << y.dimString() << " and z=" << z.dimString() << ".");
+  casadi_assert_message(x.size2()==y.size1(),"Dimension error. Got x=" << x.dimString() << " and y=" << y.dimString() << ".");
   
   // Direct access to the arrays
   const std::vector<int> &x_rowind = x.rowind();
@@ -1295,8 +1295,8 @@ void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const Matrix<T> &y, Matrix<T
   template<class T>
   void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const std::vector<T> &y, std::vector<T>& z){
     // Assert dimensions
-    casadi_assert(x.size1()==z.size());
-    casadi_assert(x.size2()==y.size());
+    casadi_assert_message(x.size1()==z.size(),"Dimension error. Got x=" << x.dimString() << " and z=" << z.size() << ".");
+    casadi_assert_message(x.size2()==y.size(),"Dimension error. Got x=" << x.dimString() << " and y=" << y.size() << ".");
     
     // Direct access to the arrays
     const std::vector<int> &x_rowind = x.rowind();
@@ -1317,8 +1317,8 @@ void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const Matrix<T> &y, Matrix<T
   template<class T>
   void Matrix<T>::mul_no_alloc_tn(const Matrix<T>& x_trans, const std::vector<T> &y, std::vector<T> &z){
     // Assert dimensions
-    casadi_assert(x_trans.size2()==z.size());
-    casadi_assert(x_trans.size1()==y.size());
+    casadi_assert_message(x_trans.size2()==z.size(),"Dimension error. Got x_trans=" << x_trans.dimString() << " and z=" << z.size() << ".");
+    casadi_assert_message(x_trans.size1()==y.size(),"Dimension error. Got x_trans=" << x_trans.dimString() << " and y=" << y.size() << ".");
     
     // Direct access to the arrays
     const std::vector<int> &x_colind = x_trans.rowind();
@@ -1337,9 +1337,9 @@ void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const Matrix<T> &y, Matrix<T
 template<class T>
 void Matrix<T>::mul_no_alloc_tn(const Matrix<T>& x_trans, const Matrix<T> &y, Matrix<T> &z){
   // Assert dimensions
-  casadi_assert(x_trans.size2()==z.size1());
-  casadi_assert(y.size2()==z.size2());
-  casadi_assert(x_trans.size1()==y.size1());
+  casadi_assert_message(x_trans.size2()==z.size1(),"Dimension error. Got x_trans=" << x_trans.dimString() << " and z=" << z.dimString() << ".");
+  casadi_assert_message(y.size2()==z.size2(),"Dimension error. Got y=" << y.dimString() << " and z=" << z.dimString() << ".");
+  casadi_assert_message(x_trans.size1()==y.size1(),"Dimension error. Got x_trans=" << x_trans.dimString() << " and y=" << y.dimString() << ".");
   
   // Direct access to the arrays
   const std::vector<int> &x_colind = x_trans.rowind();
@@ -1376,9 +1376,9 @@ void Matrix<T>::mul_no_alloc_tn(const Matrix<T>& x_trans, const Matrix<T> &y, Ma
 template<class T>
 void Matrix<T>::mul_no_alloc_nt(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z){
   // Assert dimensions
-  casadi_assert(x.size1()==z.size1());
-  casadi_assert(y_trans.size1()==z.size2());
-  casadi_assert(x.size2()==y_trans.size2());
+  casadi_assert_message(x.size1()==z.size1(),"Dimension error. Got x=" << x.dimString() << " and z=" << z.dimString() << ".");
+  casadi_assert_message(y_trans.size1()==z.size2(),"Dimension error. Got y_trans=" << y_trans.dimString() << " and z=" << z.dimString() << ".");
+  casadi_assert_message(x.size2()==y_trans.size2(),"Dimension error. Got x=" << x.dimString() << " and y_trans=" << y_trans.dimString() << ".");
   
   // Direct access to the arrays
   const std::vector<int> &x_rowind = x.rowind();
@@ -1471,7 +1471,7 @@ void Matrix<T>::mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z){
 template<class T>
 T Matrix<T>::quad_form(const Matrix<T>& A, const std::vector<T>& x){
   // Assert dimensions
-  casadi_assert(x.size()==A.size1() && x.size()==A.size2());
+  casadi_assert_message(x.size()==A.size1() && x.size()==A.size2(),"Dimension mismatch. Got x=" << x.size() << " and A=" << A.dimString());
   
   // Access the internal data of A
   const std::vector<int> &A_rowind = A.rowind();
