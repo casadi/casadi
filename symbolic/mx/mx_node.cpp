@@ -362,11 +362,20 @@ namespace CasADi{
     return MX::create(new Reshape(shared_from_this<MX>(),sp));
   }
   
-  MX MXNode::getMultiplication(const MX& y) const{
+  
+  MX MXNode::getMultiplication(const MX& y,const CRSSparsity& sp_z) const{
     // Transpose the second argument
     MX trans_y = trans(y);
-    CRSSparsity sp_z = sparsity().patternProduct(trans_y.sparsity());
-    MX z = MX::zeros(sp_z);
+    MX z;
+    if (sp_z.isNull()) {
+      CRSSparsity sp_z_ = sparsity().patternProduct(trans_y.sparsity());
+      z = MX::zeros(sp_z_);
+    } else {
+      casadi_assert_message(size1()==sp_z.size1(),"Dimension error. Got lhs=" << size1() << " and sp_z=" << sp_z.dimString() << ".");
+      casadi_assert_message(trans_y.size1()==sp_z.size2(),"Dimension error. Got trans_y=" << trans_y.dimString() << " and sp_z=" << sp_z.dimString() << ".");
+      casadi_assert_message(size2()==trans_y.size2(),"Dimension error. Got lhs=" << size2() << " and trans_y" << trans_y.dimString() << ".");
+      z = MX::zeros(sp_z);
+    }
     if(sparsity().dense() && y.dense()){
       return MX::create(new DenseMultiplication<false,true>(z,shared_from_this<MX>(),trans_y));
     } else {

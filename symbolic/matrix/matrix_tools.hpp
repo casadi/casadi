@@ -34,9 +34,14 @@ namespace CasADi{
 template<class T>
 Matrix<T> trans(const Matrix<T> &x);
 
-/// Matrix product of two matrices
+/** \brief  Matrix product of two matrices
+*
+* With optional sp_z you can specify the sparsity of the result
+* A typical use case might be where the product is only constructed to 
+* inspect the trace of it. sp_z diagonal will be more efficient then. 
+*/
 template<class T>
-Matrix<T> mul(const Matrix<T> &x, const Matrix<T> &y);
+Matrix<T> mul(const Matrix<T> &x, const Matrix<T> &y, const CRSSparsity& sp_z=CRSSparsity());
 
 /// Matrix product of n matrices
 template<class T>
@@ -397,8 +402,8 @@ Matrix<T> trans(const Matrix<T> &x){
 }
 
 template<class T>
-Matrix<T> mul(const Matrix<T> &x, const Matrix<T> &y){
-  return x.mul(y);
+Matrix<T> mul(const Matrix<T> &x, const Matrix<T> &y, const CRSSparsity &sp_z){
+  return x.mul(y,sp_z);
 }
 
 template<class T>

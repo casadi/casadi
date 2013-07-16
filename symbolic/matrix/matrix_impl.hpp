@@ -1224,12 +1224,12 @@ void Matrix<T>::sanityCheck(bool complete) const {
 }
 
 template<class T>
-Matrix<T> Matrix<T>::mul(const Matrix<T> &y) const {
-  return this->mul_smart(y);
+Matrix<T> Matrix<T>::mul(const Matrix<T> &y, const CRSSparsity& sp_z) const {
+  return this->mul_smart(y, sp_z);
 }
 
 template<class T>
-Matrix<T> Matrix<T>::mul_full(const Matrix<T> &y) const{
+Matrix<T> Matrix<T>::mul_full(const Matrix<T> &y, const CRSSparsity& sp_z) const{
   // First factor
   const Matrix<T>& x = *this;
   
@@ -1240,12 +1240,16 @@ Matrix<T> Matrix<T>::mul_full(const Matrix<T> &y) const{
 
   // Form the transpose of y
   Matrix<T> y_trans = y.trans();
+  
+  if (sp_z.isNull()) {
+    // Create the sparsity pattern for the matrix-matrix product
+    CRSSparsity spres = x.sparsity().patternProduct(y_trans.sparsity());
 
-  // Create the sparsity pattern for the matrix-matrix product
-  CRSSparsity spres = x.sparsity().patternProduct(y_trans.sparsity());
-
-  // Create the return object
-  ret = Matrix<T>(spres, 0);
+    // Create the return object
+    ret = Matrix<T>(spres, 0);
+  } else {
+    ret = Matrix<T>(sp_z, 0);
+  }
 
   // Carry out the matrix product
   mul_no_alloc_nt(x,y_trans,ret);

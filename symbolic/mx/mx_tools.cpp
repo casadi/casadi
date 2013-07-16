@@ -96,8 +96,8 @@ namespace CasADi{
     return x->getNormInf();
   }
 
-  MX mul(const MX &x, const MX &y){
-    return x.mul(y);
+  MX mul(const MX &x, const MX &y, const CRSSparsity& sp_z){
+    return x.mul(y,sp_z);
   }
 
   MX mul(const std::vector< MX > &args){

@@ -1200,6 +1200,33 @@ class SXtests(casadiTestCase):
     x = ssym("x")
     x.append(SXMatrix([]))
     
+  def test_mul_sparsity(self):
+
+    N = 10
+    x = ssym("x",N,N)
+    y = ssym("y",N,N)
+
+    x_ = self.randDMatrix(N,N)
+    y_ = self.randDMatrix(N,N)
+
+    filt = sp_diag(N)+sp_triplet(N,N,[1],[3])
+
+    f = SXFunction([x,y],[mul(x,y)])
+    f.init()
+    f.setInput(x_,0)
+    f.setInput(y_,1)
+    g = SXFunction([x,y],[mul(x,y,filt)])
+    g.init()
+    g.setInput(x_,0)
+    g.setInput(y_,1)
+    
+    f.evaluate()
+    g.evaluate()
+    
+    self.checkarray(IMatrix(filt,1),IMatrix(g.output().sparsity(),1))
+    
+    self.checkarray(f.output()[filt],g.output())
+    
 if __name__ == '__main__':
     unittest.main()
 
