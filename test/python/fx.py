@@ -308,7 +308,7 @@ class FXtests(casadiTestCase):
     F.setInput([0.1,0.7,1.3],0)
     F.setInput([7.1,2.9],1)
     
-    self.checkfx(f,F,sens_der=False)
+    self.checkfx(f,F,sens_der=False,evals=False)
     
   
   @memory_heavy()
