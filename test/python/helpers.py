@@ -504,7 +504,8 @@ class casadiTestCase(unittest.TestCase):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
               if b.numel()==0 and sparse(a).size()==0: continue
               if a.numel()==0 and sparse(b).size()==0: continue
-              self.checkarray(sparse(a),sparse(b),("%s, output(%d)" % (order,k))+str(vf2.getInput(0)),digits=digits_sens)
+              self.checkarray(IMatrix(a.sparsity(),1),IMatrix(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf2.getInput(0)),digits=digits_sens)
+              self.checkarray(a,b,("%s, output(%d)" % (order,k))+str(vf2.getInput(0)),digits=digits_sens)
               
     for k in range(trial.getNumInputs()):
       trial.setInput(trial_inputs[k],k)
