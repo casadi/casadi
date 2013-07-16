@@ -42,7 +42,7 @@
 <caption>Input scheme: CasADi::LinsolInput  (LINSOL_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>LINSOL_A</td><td>The square matrix A: sparse, (n x n). [A].</td></tr>
-<tr><td>LINSOL_B</td><td>The right-hand-side matrix b: dense, (n x m) [B].</td></tr>
+<tr><td>LINSOL_B</td><td>The right-hand-side matrix b: dense, (m x n) [B].</td></tr>
 <tr><td>LINSOL_T</td><td></td></tr>
 </table>
 */
