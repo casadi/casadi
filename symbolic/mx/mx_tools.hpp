@@ -77,8 +77,14 @@ namespace CasADi{
   /** \brief Transpose an expression */
   MX trans(const MX &x);
 
-  /** \brief  Take the matrix product of 2 MX objects */
-  MX mul(const MX &x, const MX &y);
+  /** \brief  Take the matrix product of 2 MX objects
+  *
+  * With optional sp_z you can specify the sparsity of the result
+  * A typical use case might be where the product is only constructed to 
+  * inspect the trace of it. sp_z diagonal will be more efficient then.
+  *
+  */
+  MX mul(const MX &x, const MX &y, const CRSSparsity& sp_z=CRSSparsity());
 
   /** \brief  Take the matrix product of n MX objects */
   MX mul(const std::vector< MX > &x);

@@ -362,11 +362,17 @@ namespace CasADi{
     return MX::create(new Reshape(shared_from_this<MX>(),sp));
   }
   
-  MX MXNode::getMultiplication(const MX& y) const{
+  
+  MX MXNode::getMultiplication(const MX& y,const CRSSparsity& sp_z) const{
     // Transpose the second argument
     MX trans_y = trans(y);
-    CRSSparsity sp_z = sparsity().patternProduct(trans_y.sparsity());
-    MX z = MX::zeros(sp_z);
+    MX z;
+    if (sp_z.isNull()) {
+      CRSSparsity sp_z_ = sparsity().patternProduct(trans_y.sparsity());
+      z = MX::zeros(sp_z_);
+    } else {
+      z = MX::zeros(sp_z);
+    }
     if(sparsity().dense() && y.dense()){
       return MX::create(new DenseMultiplication<false,true>(z,shared_from_this<MX>(),trans_y));
     } else {
