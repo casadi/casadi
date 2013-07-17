@@ -42,7 +42,6 @@ namespace CasADi{
     addOption("u_scale",                  OT_REALVECTOR);
     addOption("pretype",                  OT_STRING, "none","","none|left|right|both");
     addOption("use_preconditioner",       OT_BOOLEAN, false); // precondition an iterative solver
-    addOption("constraints",              OT_INTEGERVECTOR,GenericType(),"Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.");
     addOption("strategy",                 OT_STRING, "none", "Globalization strategy","none|linesearch");
     addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable KINSOL internal warning messages");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_djac", true);
@@ -139,13 +138,9 @@ namespace CasADi{
 
     // Set constraints
     if(hasSetOption("constraints")){
-      // Get the user-set constraints
-      const vector<int>& u_c = getOption("constraints");
-      casadi_assert(u_c.size()==n_);
-    
       // Copy to a temporary N_Vector
       N_Vector constraints = N_VNew_Serial(n_);
-      copy(u_c.begin(),u_c.end(),NV_DATA_S(constraints));
+      copy(u_c_.begin(),u_c_.end(),NV_DATA_S(constraints));
     
       // Pass to KINSOL
       flag = KINSetConstraints(mem_, constraints);

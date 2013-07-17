@@ -120,6 +120,34 @@ class NLPtests(casadiTestCase):
     solver.evaluate()
     self.assertAlmostEqual(solver.getOutput()[0],-2*pi,5)
     
+  def test_constraints(self):
+    for Solver, options in solvers:
+      if 'Kinsol' in str(Solver): continue
+      if 'Newton' in str(Solver): continue
+      x=ssym("x",2)
+      f=SXFunction([x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
+      f.init()
+      
+      solver=Solver(f)
+      solver.setOption(options)
+      solver.setOption("constraints",[-1,0])
+      solver.init()
+      solver.evaluate()
+      
+      self.checkarray(solver.output(),DMatrix([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
+
+      f=SXFunction([x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
+      f.init()
+      
+      solver=Solver(f)
+      solver.setOption(options)
+      solver.setOption("constraints",[1,0])
+      solver.init()
+      solver.evaluate()
+      
+      self.checkarray(solver.output(),DMatrix([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
+
+
 if __name__ == '__main__':
     unittest.main()
 

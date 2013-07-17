@@ -31,6 +31,7 @@ namespace CasADi{
   ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : f_(f), jac_(jac), linsol_(linsol){
     addOption("linear_solver",            OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(), "Options to be passed to the linear solver.");
+    addOption("constraints",              OT_INTEGERVECTOR,GenericType(),"Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.");
   }
 
   ImplicitFunctionInternal::~ImplicitFunctionInternal(){
@@ -51,7 +52,7 @@ namespace CasADi{
     casadi_assert_message(f_.output().dense() && f_.output().size2()==1, "Residual must be a dense vector");
     casadi_assert_message(f_.input().dense() && f_.input().size2()==1, "Unknown must be a dense vector");
     n_ = f_.output().size();
-    casadi_assert_message(n_ == f_.input().size(), "Dimension mismatch");
+    casadi_assert_message(n_ == f_.input().size(), "Dimension mismatch. Input size is " << f_.input().size() << ", while output size is " << f_.output().size());
     casadi_assert_message(f_.getNumOutputs()==1, "Auxiliary outputs of ImplicitFunctions are no longer allowed, cf. #669");
 
     // Allocate inputs
@@ -102,6 +103,11 @@ namespace CasADi{
     
     // No factorization yet;
     fact_up_to_date_ = false;
+    
+    // Constraints
+    if (hasSetOption("constraints")) u_c_ = getOption("constraints");
+    
+    casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),"Constraint vector if supplied, must be of length n, but got " << u_c_.size() << " and n = " << n_);
   }
 
   void ImplicitFunctionInternal::updateNumSens(bool recursive){

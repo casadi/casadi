@@ -105,6 +105,16 @@ namespace CasADi {
   
     nlp_solver_.input(NLP_SOLVER_LBG).setAll(0);
     nlp_solver_.input(NLP_SOLVER_UBG).setAll(0);
+    
+    for (int k=0;k<u_c_.size();++k) {
+       if (u_c_[k] < 0) {
+         nlp_solver_.input(NLP_SOLVER_LBX)[k] = -std::numeric_limits<double>::infinity();
+         nlp_solver_.input(NLP_SOLVER_UBX)[k] = 0;
+       } else if (u_c_[k] > 0) {
+         nlp_solver_.input(NLP_SOLVER_LBX)[k] = 0;
+         nlp_solver_.input(NLP_SOLVER_UBX)[k] = std::numeric_limits<double>::infinity();
+       }
+    }
   
   }
 

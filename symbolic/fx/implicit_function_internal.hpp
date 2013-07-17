@@ -84,6 +84,9 @@ namespace CasADi{
 
     /// Factorization up-to-date?
     bool fact_up_to_date_;
+    
+    /// Constraints on decision variables
+    std::vector<int> u_c_;
   };
 
 
