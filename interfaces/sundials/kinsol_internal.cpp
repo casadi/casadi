@@ -42,8 +42,8 @@ namespace CasADi{
     addOption("u_scale",                  OT_REALVECTOR);
     addOption("pretype",                  OT_STRING, "none","","none|left|right|both");
     addOption("use_preconditioner",       OT_BOOLEAN, false); // precondition an iterative solver
-    addOption("constraints",              OT_INTEGERVECTOR);
-    addOption("strategy",                 OT_STRING, "none", "Globalization strateg","none|linesearch");
+    addOption("constraints",              OT_INTEGERVECTOR,GenericType(),"Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.");
+    addOption("strategy",                 OT_STRING, "none", "Globalization strategy","none|linesearch");
     addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable KINSOL internal warning messages");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_djac", true);
     
