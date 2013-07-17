@@ -416,6 +416,9 @@ class casadiTestCase(unittest.TestCase):
     for k in range(trial.getNumInputs()):
       trial.setInput(trial_inputs[k],k)
       solution.setInput(solution_inputs[k],k)
+      
+    if evals is True:
+      evals = 2
 
     if evals:
 
@@ -498,7 +501,7 @@ class casadiTestCase(unittest.TestCase):
             storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.getNumOutputs())])
 
       # Remainder of eval testing
-      for store,order in [(storage,"first-order"),(storage2,"second-order")]:
+      for store,order in [(storage,"first-order"),(storage2,"second-order")][:evals]:
         for stk,st in store.items():
           for i in range(len(st)-1):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):

@@ -71,16 +71,80 @@ class NLPtests(casadiTestCase):
       solver=Solver(f)
       solver.setOption(options)
       solver.init()
-      solver.setFwdSeed(1)
-      solver.setAdjSeed(1)
       solver.setInput(n)
-      solver.evaluate(1,1)
       
       refsol = SXFunction([x],[sin(x)])
       refsol.init()
       refsol.setInput(n)
       self.checkfx(solver,refsol,digits=6,sens_der=False,failmessage=message)
+
+  def test_scalar2_indirect(self):
+    for Solver, options in solvers:
+      self.message(Solver.__name__)
+      message = Solver.__name__
+      x=SX("x")
+      y=SX("y")
+      n=0.2
+      f=SXFunction([y,x],[x-arcsin(y)])
+      f.init()
+      solver=Solver(f)
+      solver.setOption(options)
+      solver.init()
       
+      X = msym("X")
+      [R] = solver.call([X])
+      
+      trial = MXFunction([X],[R])
+      trial.init()
+      trial.setInput(n)
+      
+      refsol = SXFunction([x],[sin(x)])
+      refsol.init()
+      refsol.setInput(n)
+      self.checkfx(trial,refsol,digits=6,sens_der=False,failmessage=message)
+      
+  def test_large(self):
+    for Solver, options in solvers:
+      if 'Kinsol' in str(Solver): continue
+      if 'Newton' in str(Solver): continue
+      
+      message = Solver.__name__
+      N = 5
+      s = sp_tril(N)
+      x=ssym("x",s)
+
+      y=ssym("y",s)
+      y0 = DMatrix(sp_diag(N),0.1)
+
+      f=SXFunction([vecNZ(y),vecNZ(x)],[vecNZ((mul((x+y0),(x+y0).T)-mul((y+y0),(y+y0).T))[s])])
+      f.init()
+      solver=Solver(f)
+      solver.setOption(options)
+      # Cholesky is only unique for positive diagonal entries
+      solver.setOption("constraints",[1]*s.size())
+      solver.init()
+      
+      X = msym("X",x.sparsity())
+      [R] = solver.call([vecNZ(X)])
+      
+      trial = MXFunction([X],[R])
+      trial.init()
+      trial.setInput([abs(cos(i)) for i in range(x.size())])
+      trial.evaluate()
+
+      f.setInput(trial.output(),0)
+      f.setInput(vecNZ(trial.input()),1)
+      f.evaluate()
+
+      f.setInput(vecNZ(trial.input()),0)
+      f.setInput(vecNZ(trial.input()),1)
+      f.evaluate()
+      
+      refsol = MXFunction([X],[vecNZ(X)])
+      refsol.init()
+      refsol.setInput(trial.input())
+
+      self.checkfx(trial,refsol,digits=6,sens_der=False,evals=1,failmessage=message)
       
   def test_vector2(self):
     self.message("Scalar implicit problem, n=1")
