@@ -65,7 +65,42 @@ class Simulatortests(casadiTestCase):
     self.f = f
     self.num={'tend':2.3,'q0':7.1,'p':2}
     pass
+
+  def test_sim_full(self):
+    self.message("Simulator inputs")
+    num = self.num
+    N = 4
+    tc = DMatrix(n.linspace(0,num['tend'],N))
     
+    t=ssym("t")
+    q=ssym("q")
+    p=ssym("p")
+    
+    out = SXFunction(daeIn(t=t, x=q, p=p),[q])
+    out.init()
+        
+    f=SXFunction(daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
+    f.init()
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-15)
+    integrator.setOption("abstol",1e-15)
+    integrator.setOption("fsens_err_con", True)
+    #integrator.setOption("verbose",True)
+    integrator.setOption("t0",0)
+    integrator.setOption("tf",2.3)
+    integrator.init()
+    sim = Simulator(integrator,out,tc)
+    sim.init()
+    
+    solution = SXFunction(integratorIn(x0=q, p=p),[vertcat([q*exp(t**3/(3*p)) for t in tc])])
+    solution.init()
+    
+    for f in [sim,solution]:
+      f.setInput(0.3,"x0")
+      f.setInput(0.7,"p")
+    
+    self.checkfx(sim,solution,adj=False,sens_der=False,evals=False,digits=6)
+
   def test_sim_inputs(self):
     self.message("Simulator inputs")
     num = self.num
