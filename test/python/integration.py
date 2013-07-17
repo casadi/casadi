@@ -57,6 +57,40 @@ for cl, t, options in integrators:
   
 class Integrationtests(casadiTestCase):
 
+
+  def test_full(self):
+    num = self.num
+    tc = DMatrix(n.linspace(0,num['tend'],100))
+    
+    t=ssym("t")
+    q=ssym("q")
+    p=ssym("p")
+    
+    out = SXFunction(daeIn(t=t, x=q, p=p),[q,t,p])
+    out.init()
+        
+    f=SXFunction(daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
+    f.init()
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-15)
+    integrator.setOption("abstol",1e-15)
+    integrator.setOption("fsens_err_con", True)
+    #integrator.setOption("verbose",True)
+    integrator.setOption("t0",0)
+    integrator.setOption("tf",2.3)
+    integrator.init()
+    tf = 2.3
+    
+    solution = SXFunction(integratorIn(x0=q, p=p),integratorOut(xf=q*exp(tf**3/(3*p))))
+    solution.init()
+    
+    for f in [solution,integrator]:
+      f.setInput(0.3,"x0")
+      f.setInput(0.7,"p")
+    
+    self.checkfx(integrator,solution,digits=6)
+    
+
   @memory_heavy()
   def test_jac(self):
     self.message("Test exact jacobian #536")
