@@ -101,6 +101,58 @@ class Simulatortests(casadiTestCase):
     
     self.checkfx(sim,solution,adj=False,sens_der=False,evals=False,digits=6)
 
+  def test_controlsim_full(self):
+    self.message("ControlSimulator inputs")
+    num = self.num
+    N = 4
+    tc = DMatrix(n.linspace(0,num['tend'],N))
+    
+    t=ssym("t")
+    q=ssym("q")
+    p=ssym("p")
+    u=ssym("u")
+    out = SXFunction(controldaeIn(t=t, x=q, p=p),[q])
+    out.init()
+        
+    f=SXFunction(daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
+    f.init()
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-15)
+    integrator.setOption("abstol",1e-15)
+    integrator.setOption("fsens_err_con", True)
+    #integrator.setOption("verbose",True)
+    integrator.setOption("t0",0)
+    integrator.setOption("tf",2.3)
+    integrator.init()
+    
+    cdae = SXFunction(controldaeIn(t=t,x=q,p=p,u=u),daeOut(ode=u*q/p*t**2))
+    cdae.init()
+    
+    sim = ControlSimulator(cdae,out,tc)
+    sim.setOption("integrator",CVodesIntegrator)
+    sim.setOption("integrator_options",{"reltol": 1e-15, "abstol": 1e-15, "fsens_err_con": True})
+    sim.init()
+    
+    U = ssym("U",N-1)
+    
+    result = SXMatrix(q)
+    for i in range(N-1):
+      tf = tc[i+1]
+      t0 = tc[i]
+      xf = lambda t,t0: exp((t**3-t0**3)/3/p*U[i])
+      result.append(result[-1]*xf(tf,t0))
+    
+    solution = SXFunction(controlsimulatorIn(x0=q, p=p,u=U),[result])
+    solution.init()
+    
+    for f in [sim,solution]:
+      f.setInput(0.3,"x0")
+      f.setInput(0.7,"p")
+      f.setInput(2,"u")
+      f.setInput(DMatrix(range(1,N))/10,"u")
+    
+    self.checkfx(sim,solution,adj=False,sens_der=False,evals=False,digits=6)
+    
   def test_sim_inputs(self):
     self.message("Simulator inputs")
     num = self.num
