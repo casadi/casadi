@@ -361,6 +361,54 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
       return int(self.__int__())
   %}
 } // extend Matrix<int>
+
+
+// Logic for pickling
+%extend CRSSparsity {
+
+  %pythoncode %{
+    def __setstate__(self, state):
+        if state:
+          self.__init__(state["nrow"],state["ncol"],state["col"],state["rowind"])
+        else:
+          self.__init__()
+
+    def __getstate__(self):
+        if self.isNull(): return {}
+        return {"nrow": self.size1(), "ncol": self.size2(), "col": numpy.array(self.col()), "rowind": numpy.array(self.rowind())}
+  %}
+  
+}
+
+%extend Matrix<int> {
+
+  %pythoncode %{
+    def __setstate__(self, state):
+        sp = CRSSparsity.__new__(CRSSparsity)
+        sp.__setstate__(state["sparsity"])
+        self.__init__(sp,state["data"])
+
+    def __getstate__(self):
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data())}
+  %}
+  
+}
+
+%extend Matrix<double> {
+
+  %pythoncode %{
+    def __setstate__(self, state):
+        sp = CRSSparsity.__new__(CRSSparsity)
+        sp.__setstate__(state["sparsity"])
+        self.__init__(sp,state["data"])
+
+    def __getstate__(self):
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data())}
+  %}
+  
+}
+
+
 } // namespace CasADi
 #endif // SWIGPYTHON
 
