@@ -949,6 +949,22 @@ class Toolstests(casadiTestCase):
     b["P",0,:] = sparse(DMatrix([11,12,0])).T
     self.checkarray(b["P"],DMatrix([[11,12,0],[12,4,5],[0,5,8]]))
     
+  def test_callableExtraIndex(self):
+    a = struct_ssym([entry("a",shape=(5,3)),entry("b",shape=(4,3))])
+    b = a()
+    
+    b["a",flatten] = range(15)
+    self.checkarray(b.cat,DMatrix(range(15)+[0]*12))
+    
+    self.checkarray(b["a",flatten],DMatrix(range(15)))
+    
+    b["a",vec] = range(15)
+
+    self.checkarray(b["a",vec],DMatrix(range(15)))
+    
+    
+    
+    
 if __name__ == '__main__':
     unittest.main()
 
