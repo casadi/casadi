@@ -526,7 +526,11 @@ def delegation(extraIndex,entry,i):
     return extraIndex
     
 def performExtraIndex(i,extraIndex=None,entry=None,flip=False):
-  if extraIndex is not None and not(isinstance(extraIndex[0],NestedDictLiteral)):
+  if extraIndex is None or len(extraIndex)==0:
+    return i
+  if callable(extraIndex[0]) and not isinstance(extraIndex[0],Delegater):
+    return extraIndex[0](performExtraIndex(i,extraIndex=extraIndex[1:],entry=entry,flip=flip))
+  if not(isinstance(extraIndex[0],NestedDictLiteral)):
     if len(extraIndex)>2 or len(extraIndex)==0:
       raise Exception("Powerindex exhausted. Remaining %s is interpreted as extraIndex, but length must be 1 or 2." % str(extraIndex))
     try:
