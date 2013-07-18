@@ -461,7 +461,41 @@ class Sparsitytests(casadiTestCase):
       self.assertTrue(n>=len(truth))
       self.assertTrue(n>=len(tryme))
     
-      
+  def test_jacsparsityHierarchical(self):
+
+    X = ssym("X",100)
+    P = ssym("P",1000)
+
+    optvar = vertcat([X,P])
+
+    p = ssym("p")
+
+    g = SXFunction([optvar,p],[X*p])
+    g.setOption("verbose",True)
+    g.init()
+
+    J = g.jacobian()
+    J.setOption("verbose",True)
+    J.init()
+    
+    self.assertTrue(J.output()[:,:X.size()].sparsity()==sp_diag(100))
+
+    X = ssym("X",100)
+    P = ssym("P",1000)
+
+    p = ssym("p")
+
+    g = SXFunction([X,p],[vertcat([X*p,P])])
+    g.setOption("verbose",True)
+    g.init()
+
+    J = g.jacobian()
+    J.setOption("verbose",True)
+    J.init()
+    
+    self.assertTrue(J.output()[:X.size(),:].sparsity()==sp_diag(100))
+
+
 if __name__ == '__main__':
     unittest.main()
 
