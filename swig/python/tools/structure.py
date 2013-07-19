@@ -229,7 +229,7 @@ class StructEntry:
       new_exc = Exception("Error occured in entry context with powerIndex %s, at canonicalIndex %s:\n%s" % (str(powerIndex),str(canonicalIndex),str(e)))
       raise new_exc.__class__, new_exc, tb
   
-class Structure:
+class Structure(object):
   def __init__(self,entries,order=None):
     self.entries = entries
     
@@ -609,6 +609,10 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     size
     map
   """
+  
+  def save(self,filename):
+    import pickle
+    pickle.dump(self,file(filename,"wb"),2)
 
   class FlatIndexDispatcher(Dispatcher):
     def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
@@ -623,8 +627,15 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
         return performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
       else:
         raise Exception("Canonical index %s not found." % str(canonicalIndex))
+
+  def __setstate__(self,state):
+    self.__init__(*state["args"],**state["kwargs"])
+        
+  def __getstate__(self):
+    return self.initializer
         
   def __init__(self,*args,**kwargs):
+    self.initializer = {"args": args, "kwargs": kwargs}
     Structure.__init__(self,*args,**kwargs)
     
     self.map = {}
@@ -697,8 +708,9 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
   def labels(self,extraMode=1):
     return [self.getLabel(i,extraMode=extraMode) for i in range(self.size)]
     
-class Structured:
+class Structured(object):
   description = "Generic Structured object"
+  
   def __init__(self,structure):
     self.struct = structure.struct
     self.i = self.struct.i
@@ -726,7 +738,18 @@ class Structured:
 class CasadiStructured(Structured,CasadiStructureDerivable):
   description = "Generic Structured object"
   
+  def __setstate__(self,state):
+    cs = CasadiStructure.__new__(CasadiStructure)
+    cs.__setstate__({"args": state["args"],"kwargs": state["kwargs"]})
+    self.__init__(cs,order=state["order"])
+        
+  def __getstate__(self):
+    d = self.struct.__getstate__()
+    d["order"] = self.order
+    return d
+    
   def __init__(self,struct,order=None):
+    self.order = order
     if hasattr(struct,"struct"):
       Structured.__init__(self,struct.struct)
       self.entries = []
@@ -794,14 +817,13 @@ class msymStruct(CasadiStructured,MasterGettable):
 
 
 class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
-
+    
   @property
   def description(self):
     return "Mutable " + self.mtype.__name__
     
   def __init__(self,struct,mtype,data=None,order=None,dataVectorCheck=True):
     CasadiStructured.__init__(self,struct,order=None)
-    
     if any(e.expr is None for e in self.entries):
       raise Exception("struct_SX does only accept entries with an 'expr' argument.")
 
@@ -825,6 +847,21 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
       self[e.name] = e.expr
       
 class DMatrixStruct(MatrixStruct):
+
+  def save(self,filename):
+    import pickle
+    pickle.dump(self,file(filename,"wb"),2)
+
+  def __setstate__(self,state):
+    cs = CasadiStructure.__new__(CasadiStructure)
+    cs.__setstate__({"args": state["args"],"kwargs": state["kwargs"]})
+    self.__init__(cs,data=state["master"],dataVectorCheck=False)
+        
+  def __getstate__(self):
+    d = self.struct.__getstate__()
+    d["master"] = self.master
+    return d
+    
   def __init__(self,struct,data=None,dataVectorCheck=True):
     MatrixStruct.__init__(self,struct,DMatrix,data=data,dataVectorCheck=dataVectorCheck)
     
@@ -1133,3 +1170,8 @@ class DelegaterConstructor:
     
 index  = DelegaterConstructor(IndexDelegater)
 indexf = DelegaterConstructor(FlatIndexDelegater)
+
+
+def struct_load(filename):
+    import pickle
+    return pickle.load(file(filename,"rb"))

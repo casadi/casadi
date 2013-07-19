@@ -368,3 +368,14 @@ P[:,"y","x"] = 3
 
 print P0
 
+#! Saving and loading
+#! -------------------
+
+#! It is possible to save and load some types of structures.
+#! Supported types are pure structures (the ones created with 'struct') and numeric structures.
+#! 
+#!  Saving:
+#!     mystructure.save("myfilename")
+#!  Loading:
+#!     struct_load("myfilename")
+

@@ -962,6 +962,26 @@ class Toolstests(casadiTestCase):
 
     self.checkarray(b["a",vec],DMatrix(range(15)))
     
+  def test_pickling(self):
+    import pickle
+
+    x = struct([entry("a",shape=(2,3)),entry("b",shape=(2,3))])
+
+    s = pickle.dumps(x)
+
+    w = pickle.loads(s)
+
+    self.assertEqual(x.size,w.size)
+    x = struct([entry("a",shape=(2,3)),entry("b",shape=(2,3))])
+
+    y = x()
+
+    y["b",:,2] = 12
+
+    s = pickle.dumps(y)
+    w = pickle.loads(s)
+
+    self.checkarray(w["b",:,2],DMatrix([12,12]))
     
     
     
