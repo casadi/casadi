@@ -2088,6 +2088,10 @@ class MXtests(casadiTestCase):
     self.checkarray(IMatrix(filt,1),IMatrix(g.output().sparsity(),1))
     
     self.checkarray(f.output()[filt],g.output())
+    
+  def test_mul_zero_wrong(self):
+    with self.assertRaises(RuntimeError):
+      mul(msym("X",4,5),MX.zeros(3,2))
 
     
 if __name__ == '__main__':

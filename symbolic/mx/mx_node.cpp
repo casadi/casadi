@@ -371,11 +371,11 @@ namespace CasADi{
       CRSSparsity sp_z_ = sparsity().patternProduct(trans_y.sparsity());
       z = MX::zeros(sp_z_);
     } else {
-      casadi_assert_message(size1()==sp_z.size1(),"Dimension error. Got lhs=" << size1() << " and sp_z=" << sp_z.dimString() << ".");
-      casadi_assert_message(trans_y.size1()==sp_z.size2(),"Dimension error. Got trans_y=" << trans_y.dimString() << " and sp_z=" << sp_z.dimString() << ".");
-      casadi_assert_message(size2()==trans_y.size2(),"Dimension error. Got lhs=" << size2() << " and trans_y" << trans_y.dimString() << ".");
       z = MX::zeros(sp_z);
     }
+    casadi_assert_message(size1()==z.size1(),"Dimension error. Got lhs=" << size1() << " and z=" << z.dimString() << ".");
+    casadi_assert_message(trans_y.size1()==z.size2(),"Dimension error. Got trans_y=" << trans_y.dimString() << " and z=" << z.dimString() << ".");
+    casadi_assert_message(size2()==trans_y.size2(),"Dimension error. Got lhs=" << size2() << " and trans_y" << trans_y.dimString() << ".");
     if(sparsity().dense() && y.dense()){
       return MX::create(new DenseMultiplication<false,true>(z,shared_from_this<MX>(),trans_y));
     } else {
