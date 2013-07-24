@@ -446,7 +446,18 @@ class GetterDispatcher(Dispatcher):
   def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
     type = None if entry is None else entry.type
     if canonicalIndex in self.struct.map:
+
+      if canonicalIndex in self.priority_object_map and (extraIndex is None or len(extraIndex)==0): 
+        r = self.priority_object_map[canonicalIndex]
+        if type is None:
+          return r
+        elif type=="symm":
+          return tril2symm(r)
+        else:
+          raise Exception("Cannot handle type '%s'." % entry.type)
+       
       i = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
+      
       try:
         if type is None:
           return self.master[i]
@@ -507,7 +518,7 @@ class SetterDispatcher(Dispatcher):
 class MasterGettable:
   @properGetitem
   def __getitem__(self,powerIndex):
-    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=GetterDispatcher(struct=self.struct,master=self.master))
+    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=GetterDispatcher(struct=self.struct,master=self.master,priority_object_map=self.priority_object_map))
 
 class MasterSettable:
   @properGetitem
@@ -762,6 +773,7 @@ class CasadiStructured(Structured,CasadiStructureDerivable):
     self.canonicalIndices = self.struct.canonicalIndices
     self.getLabel = self.struct.getLabel
     self.labels = self.struct.labels
+    self.priority_object_map = {}
       
   @property
   def shape(self):
@@ -809,6 +821,28 @@ class msymStruct(CasadiStructured,MasterGettable):
       raise Exception("struct_msym does not accept entries with an 'sym' argument.")
 
     self.master = msym("V",self.size,1)
+    
+ 
+    ks = []
+    its = []
+    sps = []
+    k = 0 # Global index counter
+    for i in self.struct.traverseCanonicalIndex(limit=1):
+      e = self.struct.getStructEntryByCanonicalIndex(i)
+      sp = None
+      if e.isPrimitive():
+        sp = sp_dense(1,1) if e.sparsity is None else e.sparsity
+      else:
+        sp = sp_dense(e.struct.size,1)
+      ks.append(k)
+      it = tuple(i)
+      its.append(it)
+      sps.append(sp)
+      k += sp.size()
+      
+    for it, k, sp in zip(its,vertsplit(self.master,ks),sps):
+      self.priority_object_map[it] = k.reshape(sp)
+      
 
   def __MX__(self):
     return self.cat
