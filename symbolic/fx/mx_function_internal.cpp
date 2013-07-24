@@ -39,6 +39,7 @@ namespace CasADi{
     XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>(inputv,outputv) {
   
     setOption("name", "unnamed_mx_function");
+    addOption("alloc_tape",OP_BOOLEAN,true, "Allocate a tape (required for adjoint derivatives).");
   
     // Check for inputs that are not are symbolic primitives
     int ind=0;
@@ -345,8 +346,9 @@ namespace CasADi{
     }
   
     // Allocate tape
-    allocTape();
-  
+    if(getOption("alloc_tape")==true){
+      allocTape();
+    }
   
     // Allocate memory for directional derivatives
     MXFunctionInternal::updateNumSens(false);
