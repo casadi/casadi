@@ -324,7 +324,7 @@ namespace CasADi{
       } else if(sparsity().diagonal()){
         stream << "diagonal";
       } else {
-        stream << double(size())/sparsity().numel() << " %";
+        stream << double(size())/sparsity().numel()*100 << " %";
       }        
     }
     stream << ")";
