@@ -346,7 +346,7 @@ namespace CasADi{
     }
   
     // Allocate tape
-    if(getOption("alloc_tape")==true){
+    if(bool(getOption("alloc_tape"))){
       allocTape();
     }
   
