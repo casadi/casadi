@@ -364,6 +364,7 @@ class MXSetNonzerosArtist(DotArtist):
         k = entry.sparsity().getNZ_const(i,j)
         if k==-1 or Mk>= len(M) or k != M[Mk]:
           label+="<TD>.</TD>"
+          if Mk< len(M)-1 and M[Mk]==-1 and k!=-1: Mk+=1
         else:
           label+="<TD PORT='f%d' BGCOLOR='#eeeeff'> %s </TD>" % (Mk,Mk)
           Mk+=1 
@@ -404,6 +405,7 @@ class MXAddNonzerosArtist(DotArtist):
         k = sp.getNZ_const(i,j)
         if k==-1 or Mk>= len(M) or k != M[Mk]:
           label+="<TD>.</TD>"
+          if Mk< len(M)-1 and M[Mk]==-1 and k!=-1: Mk+=1
         else:
           label+="<TD PORT='f%d' BGCOLOR='#eeeeff'> %s </TD>" % (Mk,Mk)
           Mk+=1 
