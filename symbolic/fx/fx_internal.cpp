@@ -781,6 +781,13 @@ namespace CasADi{
     
     bool hasrun = false;
     
+    // Lookup table for bvec_t
+    std::vector<bvec_t> bvec_lookup;
+    bvec_lookup.reserve(bvec_size);
+    for (int i=0;i<bvec_size;++i) {
+      bvec_lookup.push_back(bvec_t(1) << i);
+    }
+    
     while (!hasrun || coarse_row.size()!=nz_out+1 || coarse_col.size()!=nz_in+1) {
       casadi_log("Block size: " << granularity_row << " x " << granularity_col);
     
@@ -796,7 +803,10 @@ namespace CasADi{
       CRSSparsity rT = r.transpose();
       
       /**       Decide which ad_mode to take           */
+      
+      // Forward mode
       CRSSparsity D1 = rT.unidirectionalColoring(r);
+      // Adjoint mode
       CRSSparsity D2 = r.unidirectionalColoring(rT);
       
       casadi_log("Coloring on " << r.dimString() << " (fwd seeps: " << D1.size1() << " , adj sweeps: " << D2.size2() << ")");
@@ -955,10 +965,13 @@ namespace CasADi{
               for (int fri=fine_row_lookup[coarse_row[cri]];fri<fine_row_lookup[coarse_row[cri+1]];++fri) {
                 // Lump individual sensitivities together into fine block
                 bvec_or(sens_v,spsens,fine_row[fri],fine_row[fri+1]);
+                
+                // Next iteration if no sparsity
+                if (!spsens) continue;
   
                 // Loop over all bvec_bits
                 for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
-                  if (spsens & (bvec_t(1) << bvec_i)) {
+                  if (spsens & bvec_lookup[bvec_i]) {
                     // if dependency is found, add it to the new sparsity pattern
                     jcol.push_back(bvec_i+lookup.elem(cri,bvec_i));
                     jrow.push_back(fri);
