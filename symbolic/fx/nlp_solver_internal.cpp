@@ -219,6 +219,8 @@ namespace CasADi{
     } else {
       log("Generating constraint Jacobian");
       jacG = nlp_.jacobian(NL_X,NL_G);
+      jacG.setOption("number_of_fwd_dir",0);
+      jacG.setOption("number_of_adj_dir",0);
       log("Jacobian function generated");
     }
     jacG.setOption("name","jac_g");
@@ -266,6 +268,8 @@ namespace CasADi{
       FX& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian");
       hessLag = gradLag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
+      hessLag.setOption("number_of_fwd_dir",0);
+      hessLag.setOption("number_of_adj_dir",0);
       log("Hessian function generated");
     }
     hessLag.setOption("name","hess_lag");
