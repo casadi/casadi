@@ -461,6 +461,70 @@ class Sparsitytests(casadiTestCase):
       self.assertTrue(n>=len(truth))
       self.assertTrue(n>=len(tryme))
     
+  def test_dm(self):
+  
+    A = DMatrix(6,4)
+    A[0,0] = 1
+    A[1,2] = 1
+    A[2,2] = 1
+    A[5,3] = 1
+
+    ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().dulmageMendelsohn()
+
+    # Checked with CSparse
+    self.checkarray(DMatrix([ret]),DMatrix([4]))
+    self.checkarray(rowperm,DMatrix([2, 3, 4, 1, 0, 5]).T)
+    self.checkarray(colperm,DMatrix([ 2,0,3,1]).T)
+    self.checkarray(rowblock,DMatrix([ 0, 4,5,6,6]).T)
+    self.checkarray(colblock,DMatrix([ 0, 1,2,3,4]).T)
+    self.checkarray(coarse_rowblock,DMatrix([ 0, 3,4,6,6]).T)
+    self.checkarray(coarse_colblock,DMatrix([ 0, 1,3,3,4]).T)
+    
+    
+    A = DMatrix(6,4)
+    A[0,0] = 1
+    A[1,2] = 1
+    A[2,2] = 1
+    A[5,3] = 1
+    A[4,1] = 1
+    A[3,0] = 1
+
+    A.sparsity().spy()
+
+    ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().dulmageMendelsohn()
+
+    # Checked with CSparse
+    self.checkarray(DMatrix([ret]),DMatrix([3]))
+    self.checkarray(rowperm,DMatrix([2,3,0,1,4,5]).T)
+    self.checkarray(colperm,DMatrix([ 0, 2, 1, 3]).T)
+    self.checkarray(rowblock,DMatrix([ 0, 4,5,6]).T)
+    self.checkarray(colblock,DMatrix([ 0, 2,3,4]).T)
+    self.checkarray(coarse_rowblock,DMatrix([ 0, 2, 4,6,6]).T)
+    self.checkarray(coarse_colblock,DMatrix([ 0, 2,4,4,4]).T)
+    
+    A = DMatrix(6,4)
+    A[0,0] = 1
+    A[1,2] = 1
+    A[2,2] = 1
+    A[5,3] = 1
+    A[4,1] = 1
+    A[3,0] = 1
+    A = A + DMatrix.eye(6)[:,:4]
+
+    A.sparsity().spy()
+
+    ret, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = A.sparsity().dulmageMendelsohn()
+
+    # Checked with CSparse
+    self.checkarray(DMatrix([ret]),DMatrix([1]))
+    self.checkarray(rowperm,DMatrix([4, 5, 0, 1, 2, 3]).T)
+    self.checkarray(colperm,DMatrix([ 0, 1, 2, 3]).T)
+    self.checkarray(rowblock,DMatrix([ 0, 6]).T)
+    self.checkarray(colblock,DMatrix([ 0, 4]).T)
+    self.checkarray(coarse_rowblock,DMatrix([ 0, 2, 6,6,6]).T)
+    self.checkarray(coarse_colblock,DMatrix([ 0, 4,4,4,4]).T)
+
+    
   def test_jacsparsityHierarchical(self):
 
     X = ssym("X",100)

@@ -794,6 +794,14 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(sprank(DMatrix.ones(3,3)),3)
     self.assertEqual(sprank(DMatrix.ones(3,3)),3)
     
+    A = DMatrix(6,4)
+    A[0,0] = 1
+    A[1,2] = 1
+    A[2,2] = 1
+    A[5,3] = 1
+
+    self.assertEqual(sprank(A),3)
+    
   def test_cross(self):
     self.message("cross products")
     
