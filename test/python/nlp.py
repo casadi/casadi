@@ -41,7 +41,7 @@ except:
   pass
 
 try:
-  qpsolver_options = {"nlp_solver": IpoptSolver, "nlp_solver_options": {"tol": 1e-12} }
+  qp_solver_options = {"nlp_solver": IpoptSolver, "nlp_solver_options": {"tol": 1e-12} }
   solvers.append((SQPMethod,{"qp_solver": NLPQPSolver,"qp_solver_options": qp_solver_options}))
   print "Will test SQPMethod"
 except:
@@ -62,6 +62,7 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       solver = Solver(nlp)
+      solver.setOption(solver_options)
       for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order" }).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -76,6 +77,7 @@ class NLPtests(casadiTestCase):
 
     for Solver, solver_options in solvers:
       solver = Solver(nlp)
+      solver.setOption(solver_options)
       for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order" }).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
@@ -306,34 +308,59 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
       
-    self.message(":warmstart")
-    oldsolver=solver
-    try:
-      solver = IpoptSolver(nlp)
-    except:
-      return # No IPOPT available
-    solver.setOption(solver_options)
-    solver.setOption("hess_lag",h)
-    solver.setOption("tol",1e-10)
-    solver.setOption("max_iter",100)
-    solver.setOption("hessian_approximation", "exact")
-    #solver.setOption("print_level",0)
-    solver.setOption("warm_start_init_point","yes")
-    solver.setOption("warm_start_bound_push",1e-6)
-    solver.setOption("warm_start_slack_bound_push",1e-6)
-    solver.setOption("warm_start_mult_bound_push",1e-6)
-    solver.setOption("mu_init",1e-6)
-    solver.init()
-    solver.setInput([-10]*2,"lbx")
-    solver.setInput([10]*2,"ubx")
-    solver.setInput([0],"lbg")
-    solver.setInput([1],"ubg")
-    solver.setInput(oldsolver.getOutput("x"),"x0")
-    solver.setInput(oldsolver.getOutput("lam_g"),"lam_g0")
-    solver.setOutput(oldsolver.getOutput("lam_x"),"lam_x")
+  def test_warmstart(self):
+  
+    x=SX("x")
+    y=SX("y")
     
+    obj = (1-x)**2+100*(y-x**2)**2
+    nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=x**2+y**2))
     
-    solver.solve()
+    c_r = 4.56748075136258e-02;
+    x_r = [7.86415156987791e-01,6.17698316967954e-01]
+    
+    for Solver, solver_options in solvers:
+      self.message(str(Solver))
+      solver = Solver(nlp)
+      solver.setOption(solver_options)
+      solver.init()
+      solver.setInput([0.5,0.5],"x0")
+      solver.setInput([-10]*2,"lbx")
+      solver.setInput([10]*2,"ubx")
+      solver.setInput([0],"lbg")
+      solver.setInput([1],"ubg")
+      solver.solve()
+      
+      digits = 5
+        
+      self.assertAlmostEqual(solver.getOutput("f")[0],c_r,digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],x_r[0],digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],x_r[1],digits,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
+
+      self.message(":warmstart")
+      if "Ipopt" in str(Solver):
+        oldsolver=solver
+        solver = Solver(nlp)
+        solver.setOption(solver_options)
+        solver.setOption("warm_start_init_point","yes")
+        solver.setOption("warm_start_bound_push",1e-6)
+        solver.setOption("warm_start_slack_bound_push",1e-6)
+        solver.setOption("warm_start_mult_bound_push",1e-6)
+        solver.setOption("mu_init",1e-6)
+        solver.init()
+        solver.setInput([-10]*2,"lbx")
+        solver.setInput([10]*2,"ubx")
+        solver.setInput([0],"lbg")
+        solver.setInput([1],"ubg")
+        solver.setInput(oldsolver.getOutput("x"),"x0")
+        solver.setInput(oldsolver.getOutput("lam_g"),"lam_g0")
+        solver.setOutput(oldsolver.getOutput("lam_x"),"lam_x")
+        
+        
+        solver.solve()
 
   def testIPOPTrhb2_gen(self):
     self.message("rosenbrock, exact hessian generated, constrained")
@@ -374,6 +401,33 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
       
+      
+  def test_jacG_empty(self):
+    x=SX("x")
+    y=SX("y")
+    
+    obj = (1-x)**2+100*(y-x**2)**2
+    nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=1))
+    
+    for Solver, solver_options in solvers:
+      self.message(str(Solver))
+      solver = Solver(nlp)
+      solver.setOption(solver_options)
+      solver.init()
+      solver.setInput([0.5,0.5],"x0")
+      solver.setInput([-10]*2,"lbx")
+      solver.setInput([10]*2,"ubx")
+      solver.setInput([0],"lbg")
+      solver.setInput([2],"ubg")
+      solver.solve()
+      
+      digits = 5
+        
+      self.checkarray(solver.getOutput("f"),DMatrix([0]),str(Solver),digits=digits)
+      self.checkarray(solver.getOutput("x"),DMatrix([1,1]),str(Solver),digits=digits)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(Solver),digits=digits)
+      self.checkarray(solver.getOutput("lam_g"),DMatrix([0]),str(Solver),digits=digits)
+
   def testIPOPTrhb2_par(self):
     self.message("rosenbrock, exact hessian, constrained, ")
     x=SX("x")
@@ -1049,6 +1103,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("f")[0],-7.4375,6,str(Solver))
       
       solver = Solver(nlp)
+      solver.setOption(solver_options)
       for k,v in ({"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"exact","UserHM":True,"max_iter":100,"MaxIter": 100,"print_level":0, "fixed_variable_treatment": "make_constraint"}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
