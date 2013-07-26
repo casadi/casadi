@@ -618,14 +618,10 @@ namespace CasADi{
     if(coarse_rowblock[2] > 0){
       for(int j = coarse_rowblock[2]; j <= coarse_rowblock[3]; ++j)
         rowind_C[j-coarse_rowblock[2]] = rowind_C[j];
-      for(int j=1; j < coarse_rowblock[3]-coarse_rowblock[2]; ++j)
-        rowind_C[j] -= rowind_C[0];
-      rowind_C[0] = 0;
     }
     C->nrow_ = nc;
-    C->rowind_.resize(nc+1);
-    C->col_.resize(C->rowind_.back());
 
+    C->rowind_.resize(nc+1);
     // delete rows R0, R1, and R3 from C
     if(coarse_colblock[2] - coarse_colblock[1] < ncol_){
       C->drop(rprune, &coarse_colblock);
@@ -635,6 +631,7 @@ namespace CasADi{
         for(int k=0; k<cnz; ++k)
           col_C[k] -= coarse_colblock[1];
     }
+    C->col_.resize(C->rowind_.back());
     C->ncol_ = nc ;
 
     // find strongly connected components of C
