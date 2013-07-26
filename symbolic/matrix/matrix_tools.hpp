@@ -1302,6 +1302,7 @@ MTT_INST(T,horzcat) \
 MTT_INST(T,vertcat) \
 MTT_INST(T,inner_prod) \
 MTT_INST(T,outer_prod) \
+MTT_INST(T,norm_1) \
 MTT_INST(T,norm_2) \
 MTT_INST(T,qr) \
 MTT_INST(T,solve) \
