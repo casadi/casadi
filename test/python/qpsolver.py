@@ -224,6 +224,8 @@ class QPSolverTests(casadiTestCase):
       self.checkarray(solver.getOutput("lam_a"),DMatrix([2,0,0]),str(qpsolver),digits=2)
       
       solver.setInput(0,"h")
+      
+      if 'QCQP' in str(qpsolver): continue # Singular hessian
 
       solver.evaluate()
       self.assertAlmostEqual(solver.getOutput()[0],2.0/3,6,str(qpsolver))
