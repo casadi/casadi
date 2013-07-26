@@ -197,6 +197,8 @@ namespace CasADi{
     gradF.init(false);
     casadi_assert_message(gradF.getNumInputs()==GRADF_NUM_IN, "Wrong number of inputs to the gradient function. Note: The gradient signature was changed in #544");
     casadi_assert_message(gradF.getNumOutputs()==GRADF_NUM_OUT, "Wrong number of outputs to the gradient function. Note: The gradient signature was changed in #544");
+    gradF.setInputScheme(SCHEME_GradFInput);
+    gradF.setOutputScheme(SCHEME_GradFOutput);
     log("Objective gradient function initialized");
     return gradF;
   }
@@ -227,6 +229,8 @@ namespace CasADi{
     jacG.init(false);
     casadi_assert_message(jacG.getNumInputs()==JACG_NUM_IN, "Wrong number of inputs to the Jacobian function. Note: The Jacobian signature was changed in #544");
     casadi_assert_message(jacG.getNumOutputs()==JACG_NUM_OUT, "Wrong number of outputs to the Jacobian function. Note: The Jacobian signature was changed in #544");
+    jacG.setInputScheme(SCHEME_JacGInput);
+    jacG.setOutputScheme(SCHEME_JacGOutput);
     log("Jacobian function initialized");
     return jacG;
   }
@@ -276,6 +280,8 @@ namespace CasADi{
     hessLag.init(false);
     casadi_assert_message(hessLag.getNumInputs()==HESSLAG_NUM_IN, "Wrong number of inputs to the Hessian function. Note: The Lagrangian Hessian signature was changed in #544");
     casadi_assert_message(hessLag.getNumOutputs()==HESSLAG_NUM_OUT, "Wrong number of outputs to the Hessian function. Note: The Lagrangian Hessian signature was changed in #544");
+    hessLag.setInputScheme(SCHEME_HessLagInput);
+    hessLag.setOutputScheme(SCHEME_HessLagOutput);
     log("Hessian function initialized");
     return hessLag;
   }
