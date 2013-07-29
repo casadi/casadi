@@ -51,7 +51,7 @@ namespace CasADi{
     addOption("lbfgs_memory",      OT_INTEGER,     10,              "Size of L-BFGS memory.");
     addOption("regularize",        OT_BOOLEAN,  false,              "Automatic regularization of Lagrange Hessian.");
     addOption("print_header",      OT_BOOLEAN,   true,              "Print the header with problem statistics");
-    addOption("min_step_size",     OT_REAL,   1e-10,                "The size (1-norm) of the step size should not become smaller than this.");
+    addOption("min_step_size",     OT_REAL,   1e-10,                "The size (inf-norm) of the step size should not become smaller than this.");
   
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
@@ -256,17 +256,17 @@ namespace CasADi{
       // Primal infeasability
       double pr_inf = primalInfeasibility(x_, lbx, ubx, gk_, lbg, ubg);
     
-      // 1-norm of lagrange gradient
-      double gLag_norm1 = norm_1(gLag_);
+      // inf-norm of lagrange gradient
+      double gLag_norminf = norm_inf(gLag_);
     
-      // 1-norm of step
-      double dx_norm1 = norm_1(dx_);
+      // inf-norm of step
+      double dx_norminf = norm_inf(dx_);
     
       // Print header occasionally
       if(iter % 10 == 0) printIteration(cout);
     
       // Printing information about the actual iterate
-      printIteration(cout,iter,fk_,pr_inf,gLag_norm1,dx_norm1,reg_,ls_iter,ls_success);
+      printIteration(cout,iter,fk_,pr_inf,gLag_norminf,dx_norminf,reg_,ls_iter,ls_success);
     
       // Call callback function if present
       if (!callback_.isNull()) {
@@ -286,7 +286,7 @@ namespace CasADi{
       }
     
       // Checking convergence criteria
-      if (pr_inf < tol_pr_ && gLag_norm1 < tol_du_){
+      if (pr_inf < tol_pr_ && gLag_norminf < tol_du_){
         cout << endl;
         cout << "CasADi::SQPMethod: Convergence achieved after " << iter << " iterations." << endl;
         stats_["return_status"] = "Solve_Succeeded";
@@ -300,7 +300,7 @@ namespace CasADi{
         break;
       }
       
-      if (iter > 0 && dx_norm1 <= min_step_size_) {
+      if (iter > 0 && dx_norminf <= min_step_size_) {
         cout << endl;
         cout << "CasADi::SQPMethod: Search direction becomes too small without convergence criteria being met." << endl;
         stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
@@ -784,19 +784,19 @@ namespace CasADi{
   
   double SQPInternal::primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,
                                           const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg){
-    // L1-norm of the primal infeasibility
+    // Linf-norm of the primal infeasibility
     double pr_inf = 0;
   
     // Bound constraints
     for(int j=0; j<x.size(); ++j){
-      pr_inf += max(0., lbx[j] - x[j]);
-      pr_inf += max(0., x[j] - ubx[j]);
+      pr_inf = max(pr_inf, lbx[j] - x[j]);
+      pr_inf = max(pr_inf, x[j] - ubx[j]);
     }
   
     // Nonlinear constraints
     for(int j=0; j<g.size(); ++j){
-      pr_inf += max(0., lbg[j] - g[j]);
-      pr_inf += max(0., g[j] - ubg[j]);
+      pr_inf = max(pr_inf, lbg[j] - g[j]);
+      pr_inf = max(pr_inf, g[j] - ubg[j]);
     }
   
     return pr_inf;
