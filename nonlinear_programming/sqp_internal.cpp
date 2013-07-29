@@ -388,11 +388,24 @@ namespace CasADi{
           // Backtracking
           t = beta_ * t;
         }
+        
+        // Candidate accepted, update dual variables
+        for(int i=0; i<ng_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
+        for(int i=0; i<nx_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
+            
+        // Candidate accepted, update the primal variable
+        copy(x_.begin(),x_.end(),x_old_.begin());
+        copy(x_cand_.begin(),x_cand_.end(),x_.begin());
+        
+      } else {
+        // Full step
+        copy(qp_DUAL_A_.begin(),qp_DUAL_A_.end(),mu_.begin());
+        copy(qp_DUAL_X_.begin(),qp_DUAL_X_.end(),mu_x_.begin());
+        
+        copy(x_.begin(),x_.end(),x_old_.begin());
+        // x+=dx
+        transform(x_.begin(),x_.end(),dx_.begin(),x_.begin(),plus<double>());
       }
-
-      // Candidate accepted, update dual variables
-      for(int i=0; i<ng_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
-      for(int i=0; i<nx_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
     
       if(!exact_hessian_){
         // Evaluate the gradient of the Lagrangian with the old x but new mu (for BFGS)
@@ -401,10 +414,6 @@ namespace CasADi{
         // gLag_old += mu_x_;
         transform(gLag_old_.begin(),gLag_old_.end(),mu_x_.begin(),gLag_old_.begin(),plus<double>());
       }
-    
-      // Candidate accepted, update the primal variable
-      copy(x_.begin(),x_.end(),x_old_.begin());
-      copy(x_cand_.begin(),x_cand_.end(),x_.begin());
 
       // Evaluate the constraint Jacobian
       log("Evaluating jac_g");
