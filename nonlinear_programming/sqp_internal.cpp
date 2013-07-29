@@ -280,6 +280,7 @@ namespace CasADi{
         if (callback_.output(0).at(0)) {
           cout << endl;
           cout << "CasADi::SQPMethod: aborted by callback..." << endl;
+          stats_["return_status"] = "User_Requested_Stop";
           break;
         }
       }
@@ -288,12 +289,14 @@ namespace CasADi{
       if (pr_inf < tol_pr_ && gLag_norm1 < tol_du_){
         cout << endl;
         cout << "CasADi::SQPMethod: Convergence achieved after " << iter << " iterations." << endl;
+        stats_["return_status"] = "Solve_Succeeded";
         break;
       }
     
       if (iter >= max_iter_){
         cout << endl;
         cout << "CasADi::SQPMethod: Maximum number of iterations reached." << endl;
+        stats_["return_status"] = "Maximum_Iterations_Exceeded";
         break;
       }
       
