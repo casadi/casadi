@@ -51,6 +51,7 @@ namespace CasADi{
     addOption("lbfgs_memory",      OT_INTEGER,     10,              "Size of L-BFGS memory.");
     addOption("regularize",        OT_BOOLEAN,  false,              "Automatic regularization of Lagrange Hessian.");
     addOption("print_header",      OT_BOOLEAN,   true,              "Print the header with problem statistics");
+    addOption("min_step_size",     OT_REAL,   1e-10,                "The size (1-norm) of the step size should not become smaller than this.");
   
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
@@ -75,7 +76,8 @@ namespace CasADi{
     tol_du_ = getOption("tol_du");
     regularize_ = getOption("regularize");
     exact_hessian_ = getOption("hessian_approximation")=="exact";
-  
+    min_step_size_ = getOption("min_step_size");
+    
     // Get/generate required functions
     gradF();
     jacG();
@@ -292,6 +294,13 @@ namespace CasADi{
       if (iter >= max_iter_){
         cout << endl;
         cout << "CasADi::SQPMethod: Maximum number of iterations reached." << endl;
+        break;
+      }
+      
+      if (iter > 0 && dx_norm1 <= min_step_size_) {
+        cout << endl;
+        cout << "CasADi::SQPMethod: Search direction becomes too small without convergence criteria being met." << endl;
+        stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
         break;
       }
     

@@ -55,6 +55,9 @@ public:
   double tol_pr_;
   /// Tolerance of dual infeasibility
   double tol_du_;
+  
+  /// Minimum step size allowed
+  double min_step_size_;
 
   /// Linesearch parameters
   //@{
