@@ -217,6 +217,7 @@
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>iter_count</td><td>CasADi::SQPInternal</td></tr>
+<tr><td>return_status</td><td>CasADi::SQPInternal</td></tr>
 </table>
 */
 /** \class CasADi::SQPMethod
@@ -226,6 +227,7 @@
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>iter_count</td><td>CasADi::SQPInternal</td></tr>
+<tr><td>return_status</td><td>CasADi::SQPInternal</td></tr>
 </table>
 */
 /** \class CasADi::ParallelizerInternal
