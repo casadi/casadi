@@ -414,11 +414,10 @@ class NLPtests(casadiTestCase):
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
+      if "Worhp" in str(Solver):
+        continue
       solver = Solver(nlp)
       solver.setOption(solver_options)
-      for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"derivative_test":"second-order"}).iteritems():
-        if solver.hasOption(k):
-          solver.setOption(k,v)
       solver.init()
       solver.setInput([0.5,0.5],"x0")
       solver.setInput([-10]*2,"lbx")
