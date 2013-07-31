@@ -267,7 +267,10 @@ namespace CasADi{
     
       // Printing information about the actual iterate
       printIteration(cout,iter,fk_,pr_inf,gLag_norminf,dx_norminf,reg_,ls_iter,ls_success);
-    
+	  
+	  // This log entry is here to avoid #822
+      log("Checking Stopping criteria");
+	  
       // Call callback function if present
       if (!callback_.isNull()) {
         if (!callback_.input(NLP_SOLVER_F).empty()) callback_.input(NLP_SOLVER_F).set(fk_);
@@ -310,6 +313,7 @@ namespace CasADi{
       // Start a new iteration
       iter++;
     
+      log("Formulating QP");
       // Formulate the QP
       transform(lbx.begin(),lbx.end(),x_.begin(),qp_LBX_.begin(),minus<double>());
       transform(ubx.begin(),ubx.end(),x_.begin(),qp_UBX_.begin(),minus<double>());
@@ -477,10 +481,10 @@ namespace CasADi{
   
   void SQPInternal::printIteration(std::ostream &stream){
     stream << setw(4)  << "iter";
-    stream << setw(14) << "objective";
-    stream << setw(9) << "inf_pr";
-    stream << setw(9) << "inf_du";
-    stream << setw(9) << "||d||";
+    stream << setw(15) << "objective";
+    stream << setw(10) << "inf_pr";
+    stream << setw(10) << "inf_du";
+    stream << setw(10) << "||d||";
     stream << setw(7) << "lg(rg)";
     stream << setw(3) << "ls";
     stream << ' ';
@@ -491,10 +495,10 @@ namespace CasADi{
                                    double dx_norm, double rg, int ls_trials, bool ls_success){
     stream << setw(4) << iter;
     stream << scientific;
-    stream << setw(14) << setprecision(6) << obj;
-    stream << setw(9) << setprecision(2) << pr_inf;
-    stream << setw(9) << setprecision(2) << du_inf;
-    stream << setw(9) << setprecision(2) << dx_norm;
+    stream << setw(15) << setprecision(6) << obj;
+    stream << setw(10) << setprecision(2) << pr_inf;
+    stream << setw(10) << setprecision(2) << du_inf;
+    stream << setw(10) << setprecision(2) << dx_norm;
     stream << fixed;
     if(rg>0){
       stream << setw(7) << setprecision(2) << log10(rg);
