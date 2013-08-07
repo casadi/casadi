@@ -1126,6 +1126,10 @@ class CasadiStructEntry(StructEntry):
       return self.sparsity.dimString()
     elif self.type=="symm":
       return "symm(" +  self.sparsity.dimString() + ")"
+      
+  def __getstate__(self):
+    return dict((k,getattr(self,k)) for k in ["name", "struct", "sparsity","type","repeat","shapestruct","dims"])
+ 
  
 def entry(*args,**kwargs):
   if len(args)==1 and isinstance(args[0],CasadiStructEntry):
