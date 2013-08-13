@@ -2258,6 +2258,57 @@ namespace CasADi{
     // Evaluate symbolically
     vector<MX> res;
     vector<vector<MX> > fsens, asens;
+    
+    // Remove directions with all-zero seeds
+    std::vector<int> d_fwdSens2fsens;
+    for(int d=0; d<fseed.size();){
+      // Looping over fseed, removing all-zero entries
+      
+      d_fwdSens2fsens.push_back(d);
+      if (fseed[d].size()==0) { d++;continue; }
+      
+      bool empty = true; // Flag indicating if direction is all-zero
+      for(int i=0; i<fseed[d].size(); ++i){
+        if (!fseed[d][i].isNull() && !fseed[d][i]->isZero()) {
+          empty = false;
+          break;
+        }
+      }
+      if (empty) {
+        // All-zero; remove element from fseed
+        d_fwdSens2fsens.back()= -1;
+        fseed.erase(fseed.begin()+d);
+      } else {
+        // Has non-zeros; proceed to next fseed entry
+        d++;
+      }
+    }
+    
+    // Remove directions with all-zero seeds
+    std::vector<int> d_adjSens2asens;
+    for(int d=0; d<aseed.size();){
+      // Looping over fseed, removing all-zero entries
+      
+      d_adjSens2asens.push_back(d);
+      if (aseed[d].size()==0) { d++;continue; }
+      
+      bool empty = true; // Flag indicating if direction is all-zero
+      for(int i=0; i<aseed[d].size(); ++i){
+        if (!aseed[d][i].isNull() && !aseed[d][i]->isZero()) {
+          empty = false;
+          break;
+        }
+      }
+      if (empty) {
+        // All-zero; remove element from aseed
+        d_adjSens2asens.back()= -1;
+        aseed.erase(aseed.begin()+d);
+      } else {
+        // Has non-zeros; proceed to next fseed entry
+        d++;
+      }
+    }
+    
     createCallDerivative(arg,res,fseed,fsens,aseed,asens,true);
 
     // Store the non-differentiated results
@@ -2271,18 +2322,21 @@ namespace CasADi{
 
     // Store the forward sensitivities
     for(int d=0; d<fwdSens.size(); ++d){
+      int d_fsens = d_fwdSens2fsens[d];
       for(int i=0; i<fwdSens[d].size(); ++i){
         if(fwdSens[d][i]!=0){
-          *fwdSens[d][i] = fsens[d][i];
+          *fwdSens[d][i] = (d_fsens==-1) ? DMatrix(this->output(i).sparsity()): fsens[d_fsens][i];
         }
       }
     }
 
     // Store the adjoint sensitivities
     for(int d=0; d<adjSens.size(); ++d){
+      int d_asens = d_adjSens2asens[d];
+      if (d_asens==-1) continue;
       for(int i=0; i<adjSens[d].size(); ++i){
-        if(adjSens[d][i]!=0 && !asens[d][i].isNull()){
-          *adjSens[d][i] += asens[d][i];
+        if(adjSens[d][i]!=0 && !asens[d_asens][i].isNull()){
+          *adjSens[d][i] += asens[d_asens][i];
         }
       }
     }
