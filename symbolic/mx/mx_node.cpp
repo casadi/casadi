@@ -439,7 +439,7 @@ namespace CasADi{
 
 
   MX MXNode::getAddNonzeros(const MX& y, const std::vector<int>& nz) const{
-    if(nz.size()==0){
+    if(nz.size()==0 || isZero()) {
       return y;
     } else {
       MX ret;
