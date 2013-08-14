@@ -401,8 +401,8 @@ void OptionsFunctionality::setOption(const string &str, const GenericType& op){
   (*this)->setOption(str,op);
 }
 
-void OptionsFunctionality::setOption(const Dictionary& dict){
-  (*this)->setOption(dict);
+void OptionsFunctionality::setOption(const Dictionary& dict, bool skipUnknown){
+  (*this)->setOption(dict,skipUnknown);
 }
 
 std::vector<std::string> OptionsFunctionality::getOptionNames() const {
@@ -448,8 +448,8 @@ bool OptionsFunctionality::checkNode() const{
   return dynamic_cast<const OptionsFunctionalityNode*>(get())!=0;
 }
 
-void OptionsFunctionality::copyOptions(const OptionsFunctionality& obj){
-  (*this)->copyOptions(obj);
+void OptionsFunctionality::copyOptions(const OptionsFunctionality& obj, bool skipUnknown){
+  (*this)->copyOptions(obj,skipUnknown);
 }
 
 const Dictionary& OptionsFunctionality::dictionary() const{
@@ -476,14 +476,16 @@ const Dictionary& OptionsFunctionalityNode::dictionary() const{
   return dictionary_;
 }
 
-void OptionsFunctionalityNode::setOption(const Dictionary& dict){
+void OptionsFunctionalityNode::setOption(const Dictionary& dict, bool skipUnknown){
   for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it){
-    setOption(it->first,it->second);
+    if (!skipUnknown || hasOption(it->first)) {
+      setOption(it->first,it->second);
+    }
   }
 }
 
-void OptionsFunctionalityNode::copyOptions(const OptionsFunctionality& obj){
-  setOption(obj.dictionary());
+void OptionsFunctionalityNode::copyOptions(const OptionsFunctionality& obj, bool skipUnknown){
+  setOption(obj.dictionary(),skipUnknown);
 }
 
 void OptionsFunctionalityNode::repr(ostream &stream) const{

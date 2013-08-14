@@ -536,8 +536,21 @@ class FXtests(casadiTestCase):
     
     with self.assertRaises(Exception):
       f.output("baz")
+      
+  def test_unknown_options(self):
+    x = ssym("x")
+    f = SXFunction([x],[x])
+    f.init()
     
+    with self.assertRaises(Exception):
+      f.setOption({"fooo": False},False)
     
+    f.setOption({"fooo": False},True)
+    
+    f.setOption({"name": "abc"},False)
+    self.assertTrue(f.getOption("name")=="abc")
+    f.setOption({"name": "def"},True)
+    self.assertTrue(f.getOption("name")=="def")
     
     
 if __name__ == '__main__':

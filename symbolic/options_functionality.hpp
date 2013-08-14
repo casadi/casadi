@@ -78,7 +78,7 @@ class OptionsFunctionality : public SharedObject{
     The setOptions are only considered before the init function.
     If properties changes, the init function should be called again.
     */
-    void setOption(const Dictionary& dict);
+    void setOption(const Dictionary& dict, bool skipUnknown = false);
 
     /** \brief  get an option value */
     GenericType getOption(const std::string &str) const;
@@ -93,7 +93,7 @@ class OptionsFunctionality : public SharedObject{
     void printOptions(std::ostream &stream=std::cout) const;
 
     /** \brief  Copy all options from another object*/
-    void copyOptions(const OptionsFunctionality& obj);
+    void copyOptions(const OptionsFunctionality& obj, bool skipUnknown = false);
     
     /** \brief  Get the dictionary */
     const Dictionary& dictionary() const;
@@ -162,7 +162,7 @@ virtual ~OptionsFunctionalityNode();
   If properties changes, the init function should be called again.
   (Ticket #54)
   */
-  void setOption(const Dictionary& dict);
+  void setOption(const Dictionary& dict, bool skipUnknown = false);
   
   /** \brief Get a list of all option names */
   std::vector<std::string> getOptionNames() const;
@@ -218,7 +218,7 @@ virtual ~OptionsFunctionalityNode();
   virtual void repr(std::ostream &stream) const;
 
   /** \brief  Copy all options from another object*/
-  void copyOptions(const OptionsFunctionality& obj);
+  void copyOptions(const OptionsFunctionality& obj, bool skipUnknown = false);
 
   /** \brief  Get the dictionary */
   const Dictionary& dictionary() const;
