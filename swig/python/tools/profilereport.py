@@ -52,17 +52,19 @@ for l in f:
     idn, = r
     if idn in functiondict:
       functiondict[idn]["ncalls"]+=1
-      functiondict[idn]["localtimes"].append([])
     else:
-      functiondict[idn] = {"sourcecode": [], "ncalls": 1, "localtimes": [[]], "idnlinks": [] }
+      functiondict[idn] = {"sourcecode" : [], "ncalls": 1, "localtimes": [], "idnlinks": [] }
   else:
     local , cumul, idn, loc, idnlink ,code = r
+    if loc >= len(functiondict[idn]["sourcecode"]):
+      n = loc - len(functiondict[idn]["sourcecode"])+1
+      functiondict[idn]["sourcecode"].extend([""]*n)
+      functiondict[idn]["localtimes"].extend([[] for i in range(n)])
+      functiondict[idn]["idnlinks"].extend([None]*n)
+      functiondict[idn]["sourcecode"][loc] = code
+      functiondict[idn]["idnlinks"][loc] = idnlink
     
-    if functiondict[idn]["ncalls"]==1:
-      functiondict[idn]["sourcecode"].append(code)
-      functiondict[idn]["idnlinks"].append(idnlink)
-    functiondict[idn]["localtimes"][-1].append(local)
-
+    functiondict[idn]["localtimes"][loc].append(local)
 
 out.write("""
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -72,36 +74,41 @@ out.write("""
 """)
 
 for k,v in functiondict.iteritems():
-  v["localtime_internal"] = [sum(b if a is None else 0 for a,b in zip(v["idnlinks"],l)) for l in v["localtimes"]]
-  v["localtime_external"] = [sum(0 if a is None else b for a,b in zip(v["idnlinks"],l)) for l in v["localtimes"]]
-  v["localtime_total"] = [sum(l) for l in v["localtimes"]]
+  v["localtimes_sum"] = [sum(i) for i  in v["localtimes"]]
+  assert(len(v["sourcecode"])==len(v["localtimes"]))
+  assert(len(v["sourcecode"])==len(v["idnlinks"]))
+  
+
+for k,v in functiondict.iteritems():
+  v["localtime_sum_internal"] = sum([localtime for idnlink, localtime  in zip(v["idnlinks"],v["localtimes_sum"]) if idnlink is None] )
+  v["localtime_sum_external"] = sum([localtime for idnlink, localtime  in zip(v["idnlinks"],v["localtimes_sum"]) if idnlink is not None])
+  v["localtime_sum_total"] = sum(v["localtimes_sum"])
   v["calls"] = set(filter(lambda x: x is not None,v["idnlinks"]))
   
   
 graph = pydot.Dot('G', graph_type='digraph',rankdir="LR")
 for k,v in functiondict.iteritems():
-  graph.add_node(pydot.Node("node" + k.replace(':','_'),label=" %s | %d -- %.5f s | %.5f s -- %.5f s " % (k,v["ncalls"],sum(v["localtime_total"]),sum(v["localtime_internal"]),sum(v["localtime_external"])) ,shape="record"))
+  graph.add_node(pydot.Node("node" + k.replace(':','_'),label=" %s | %d -- %.5f s | %.5f s -- %.5f s " % (k,v["ncalls"],v["localtime_sum_total"],v["localtime_sum_internal"],v["localtime_sum_external"]) ,shape="record"))
   for c in v["calls"]:
-    s = sum([1 if i==c else 0 for i in v["idnlinks"] ])
-    graph.add_edge(pydot.Edge("node" + k.replace(':','_'),"node" + c.replace(':','_'),label="%d x %d = %d" % (v["ncalls"],s,v["ncalls"]*s)))
+    s = sum([len(localtimes) for idnlink, localtimes  in zip(v["idnlinks"],v["localtimes"]) if idnlink==c])
+    graph.add_edge(pydot.Edge("node" + k.replace(':','_'),"node" + c.replace(':','_'),label="%d" % s))
 graph.write_png("callgraph.png")
   
-localtime_internal_total = sum(sum(v["localtime_internal"]) for k,v in functiondict.iteritems())
+localtime_internal_total = sum(v["localtime_sum_internal"] for k,v in functiondict.iteritems())
 
 out.write("<table><thead><tr><th>Id</th><th>#calls</th><th>Total (s)</th><th>Internal (s)</th><th>External (s)</th></tr></thead>\n")
 for k,v in functiondict.iteritems():
-  out.write("<tr><td><a href='#%s'>%s</a></td><td>%d</td><td>%.5f</td><td>%.5f</td><td>%.5f</td></tr>\n" % (k,k,v["ncalls"],sum(v["localtime_total"]),sum(v["localtime_internal"]),sum(v["localtime_external"])))
+  out.write("<tr><td><a href='#%s'>%s</a></td><td>%d</td><td>%.5f</td><td>%.5f</td><td>%.5f</td></tr>\n" % (k,k,v["ncalls"],v["localtime_sum_total"],v["localtime_sum_internal"],v["localtime_sum_external"]))
 out.write("<tr><th>Sum MX</th><th>/</th><th>/</th><th>%.5f</th><th>/</th></tr>\n" % (localtime_internal_total))
 out.write("</table>\n")
   
 for k,v in functiondict.iteritems():
-  out.write("<a name='%s'><h2>%s #calls: %d</h2></a>\n" % (k,k,v["ncalls"]))
+  out.write("<a name='%s'><h2>%s</h2></a><dl><dt>#calls</dt><dd>%d</dd><dt>Total (s)</dt><dd>%.5f</dd><dt>Internal (s)</dt><dd>%.5f</dd><dt>External (s)</dt><dd>%.5f</dd></dl>\n" % (k,k,v["ncalls"],v["localtime_sum_total"],v["localtime_sum_internal"],v["localtime_sum_external"]))
   out.write("<table><thead><tr><th>Codeline</th><th>total (ms)</th><th>ncalls</th><th>souce</th></tr></thead>\n")
   for i,s in enumerate(v["sourcecode"]):
-    times = [lt[i] for lt in v["localtimes"]]
     if v["idnlinks"][i] is not None:
       s = "<a href='#%s'>%s</a>" % (v["idnlinks"][i],s)
-    out.write("<tr><td>%d</td><td>%.5f</td><td>%d</td><td>%s</td></tr>\n" % (i,sum(times)*1e3,len(times),s))
+    out.write("<tr><td>%d</td><td>%.5f</td><td>%d</td><td>%s</td></tr>\n" % (i,sum(v["localtimes"][i])*1e3,len(v["localtimes"][i]),s))
   out.write("</table>\n")
     
 out.write("""

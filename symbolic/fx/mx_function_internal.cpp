@@ -550,7 +550,24 @@ namespace CasADi{
           }
         } else {        
           // Evaluate
+          if (CasadiOptions::profiling) {
+            time_start = getRealTime(); // Start timer
+          }
+        
           it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
+          
+          // Write out profiling information
+          if (CasadiOptions::profiling) {
+            time_stop = getRealTime(); // Stop timer
+            CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|"; 
+            if (it->op == OP_CALL) {
+              FX f = it->data->getFunction();
+              CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
+            }
+            CasadiOptions::profilingLog << "|";
+            print(CasadiOptions::profilingLog,*it);
+          }
+          
         }
 
         // Recover the spilled elements to the work vector for later access (delayed for inplace operations)
