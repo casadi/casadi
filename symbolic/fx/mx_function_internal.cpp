@@ -440,6 +440,7 @@ namespace CasADi{
     double time_stop;
     if (CasadiOptions::profiling) {
       time_zero = getRealTime();
+      CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl; 
     }
     
     // Make sure that there are no free variables

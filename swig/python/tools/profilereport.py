@@ -21,6 +21,9 @@ functiondict = {}
 
 linereg = re.compile("^([\d\.]+) ns \| ([\d\.]+) ms \| (0x[\w\d]+:[\w_]+):(\d+)\|(0x[\w\d]+:[\w_]+)?\|(.*)$")
 
+startreg = re.compile("^start (0x[\w\d]+:[\w_]+)$")
+
+
 def parseline(line):
   m = re.match(linereg,line)
   if m:
@@ -28,20 +31,32 @@ def parseline(line):
   else:
     return None
     
+def parsestart(line):
+  m = re.match(startreg,line)
+  if m:
+    return m.group(1),
+  else:
+    return None
+    
 for l in f:
   r = parseline(l)
-  if r is None: continue
-  local , cumul, idn, loc, idnlink ,code = r
-  if idn in functiondict:
-    if loc==1:
+  if r is None:
+    r = parsestart(l)
+    if r is None: continue
+    idn, = r
+    if idn in functiondict:
       functiondict[idn]["ncalls"]+=1
       functiondict[idn]["localtimes"].append([])
+    else:
+      functiondict[idn] = {"sourcecode": [], "ncalls": 1, "localtimes": [[]], "idnlinks": [] }
+  else:
+    local , cumul, idn, loc, idnlink ,code = r
+    
     if functiondict[idn]["ncalls"]==1:
       functiondict[idn]["sourcecode"].append(code)
       functiondict[idn]["idnlinks"].append(idnlink)
     functiondict[idn]["localtimes"][-1].append(local)
-  else:
-    functiondict[idn] = {"sourcecode": [code], "ncalls": 1, "localtimes": [[local]], "idnlinks": [None] }
+
 
 out.write("""
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
