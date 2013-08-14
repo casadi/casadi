@@ -30,6 +30,8 @@
 
 #include <stack>
 #include <typeinfo>
+#include "../profiling.hpp"
+#include "../casadi_options.hpp"
 
 using namespace std;
 
@@ -432,6 +434,14 @@ namespace CasADi{
   void MXFunctionInternal::evaluate(int nfdir, int nadir){
     casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):begin "  << getOption("name"));
 
+    // Set up timers for profiling
+    double time_zero;
+    double time_start;
+    double time_stop;
+    if (CasadiOptions::profiling) {
+      time_zero = getRealTime();
+    }
+    
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
       std::stringstream ss;
@@ -472,11 +482,28 @@ namespace CasADi{
         // Point pointers to the data corresponding to the element
         updatePointers(*it,nfdir,0);
 
+        if (CasadiOptions::profiling) {
+          time_start = getRealTime(); // Start timer
+        }
+        
         // Evaluate
         it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
+        
+        // Write out profiling information
+        if (CasadiOptions::profiling) {
+          time_stop = getRealTime(); // Stop timer
+          CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|"; 
+          if (it->op == OP_CALL) {
+            FX f = it->data->getFunction();
+            CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
+          }
+          CasadiOptions::profilingLog << "|";
+          print(CasadiOptions::profilingLog,*it);
+        }
+        
       }
     }
-  
+
     casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):evaluated forward "  << getOption("name"));
           
     if(nadir>0){
@@ -538,51 +565,56 @@ namespace CasADi{
     
       casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):adjoints:end"  << getOption("name"));
     }
+   
     casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):end "  << getOption("name"));
   }
 
+  void MXFunctionInternal::print(ostream &stream, const AlgEl& el) const {
+    if(el.op==OP_OUTPUT){
+      stream << "output[" << el.res.front() << "] = @" << el.arg.at(0);
+    } else if(el.op==OP_SETNONZEROS || el.op==OP_ADDNONZEROS){
+      if(el.res.front()!=el.arg.at(0)){
+        stream << "@" << el.res.front() << " = @" << el.arg.at(0) << "; ";
+      }
+      stream << "@" << el.res.front();
+      el.data->printPart(stream,1);
+      stream << "@" << el.arg.at(1);
+    } else {
+      if(el.res.size()==1){
+        stream << "@" << el.res.front() << " = ";
+      } else {
+        stream << "{";
+        for(int i=0; i<el.res.size(); ++i){
+          if(i!=0) stream << ",";
+          if(el.res[i]>=0){
+            stream << "@" << el.res[i];
+          } else {
+            stream << "NULL";
+          }
+        }
+        stream << "} = ";
+      }
+      if(el.op==OP_INPUT){
+        stream << "input[" << el.arg.front() << "]";
+      } else {
+        el.data->printPart(stream,0);
+        for(int i=0; i<el.arg.size(); ++i){
+          if(el.arg[i]>=0){
+            stream << "@" << el.arg[i];
+          } else {
+            stream << "NULL";
+          }
+          el.data->printPart(stream,i+1);
+        }
+      }
+    }
+    stream << endl;
+  }
+  
   void MXFunctionInternal::print(ostream &stream) const{
     FXInternal::print(stream);
     for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-      if(it->op==OP_OUTPUT){
-        stream << "output[" << it->res.front() << "] = @" << it->arg.at(0);
-      } else if(it->op==OP_SETNONZEROS || it->op==OP_ADDNONZEROS){
-        if(it->res.front()!=it->arg.at(0)){
-          stream << "@" << it->res.front() << " = @" << it->arg.at(0) << "; ";
-        }
-        stream << "@" << it->res.front();
-        it->data->printPart(stream,1);
-        stream << "@" << it->arg.at(1);
-      } else {
-        if(it->res.size()==1){
-          stream << "@" << it->res.front() << " = ";
-        } else {
-          stream << "{";
-          for(int i=0; i<it->res.size(); ++i){
-            if(i!=0) stream << ",";
-            if(it->res[i]>=0){
-              stream << "@" << it->res[i];
-            } else {
-              stream << "NULL";
-            }
-          }
-          stream << "} = ";
-        }
-        if(it->op==OP_INPUT){
-          stream << "input[" << it->arg.front() << "]";
-        } else {
-          it->data->printPart(stream,0);
-          for(int i=0; i<it->arg.size(); ++i){
-            if(it->arg[i]>=0){
-              stream << "@" << it->arg[i];
-            } else {
-              stream << "NULL";
-            }
-            it->data->printPart(stream,i+1);
-          }
-        }
-      }
-      stream << endl;
+      print(stream,*it);
     }
   }
 

@@ -145,6 +145,9 @@ namespace CasADi{
     /// Allocate tape
     void allocTape();
     
+    // print an element of an algorithm
+    void print(std::ostream &stream, const AlgEl& el) const;
+    
   };
 
 } // namespace CasADi

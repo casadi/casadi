@@ -33,6 +33,7 @@
 #include "../sx/sx_node.hpp"
 #include "../casadi_types.hpp"
 #include "../matrix/crs_sparsity_internal.hpp"
+#include "../profiling.hpp"
 
 #ifdef WITH_LLVM
 #include "llvm/DerivedTypes.h"
