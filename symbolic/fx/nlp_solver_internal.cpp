@@ -125,8 +125,9 @@ namespace CasADi{
       if(nlp_mx.isNull()){
 	casadi_warning("Cannot expand NLP as it is not an MXFunction");
       } else {
-	nlp_ = SXFunction(nlp_mx);
-	nlp_.init();
+        nlp_ = SXFunction(nlp_mx);
+        nlp_.copyOptions(nlp_mx, true);
+        nlp_.init();
       }
     }
   
