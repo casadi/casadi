@@ -3,6 +3,12 @@ import re
 
 import argparse
 
+try:
+  import pydot
+except:
+  raise Exception("To use the functionality of casadi.tools.graph, you need to have pydot Installed. Try `easy_install pydot`.")  
+      
+
 descr = """
 This tool reads raw profile_log data (recorded in casadi with `CasadiOptions.startProfiling()`)
 and creates an interactive webpage with the results.
@@ -62,6 +68,7 @@ out.write("""
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <body>
+   <img src="callgraph.png"/>
 """)
 
 for k,v in functiondict.iteritems():
@@ -69,6 +76,15 @@ for k,v in functiondict.iteritems():
   v["localtime_external"] = [sum(0 if a is None else b for a,b in zip(v["idnlinks"],l)) for l in v["localtimes"]]
   v["localtime_total"] = [sum(l) for l in v["localtimes"]]
   v["calls"] = set(filter(lambda x: x is not None,v["idnlinks"]))
+  
+  
+graph = pydot.Dot('G', graph_type='digraph',rankdir="LR")
+for k,v in functiondict.iteritems():
+  graph.add_node(pydot.Node("node" + k.replace(':','_'),label=" %s | %d -- %.5f s | %.5f s -- %.5f s " % (k,v["ncalls"],sum(v["localtime_total"]),sum(v["localtime_internal"]),sum(v["localtime_external"])) ,shape="record"))
+  for c in v["calls"]:
+    s = sum([1 if i==c else 0 for i in v["idnlinks"] ])
+    graph.add_edge(pydot.Edge("node" + k.replace(':','_'),"node" + c.replace(':','_'),label="%d x %d = %d" % (v["ncalls"],s,v["ncalls"]*s)))
+graph.write_png("callgraph.png")
   
 localtime_internal_total = sum(sum(v["localtime_internal"]) for k,v in functiondict.iteritems())
 
