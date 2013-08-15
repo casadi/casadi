@@ -96,7 +96,7 @@ P  = msym("P",np)
 V = msym("V",d*nx)
 
 # Get the state at each collocation point
-X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
+X = [X0] + list(vertsplit(V,[r*nx for r in range(d+1)]))
 
 # Get the collocation quations (that define V)
 V_eq = []
