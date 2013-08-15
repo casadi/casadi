@@ -26,6 +26,7 @@
 #include <vector>
 #include <algorithm>
 #include "symbolic/casadi_exception.hpp"
+#include "symbolic/mx/mx.hpp"
 
 namespace CasADi{
 
@@ -63,6 +64,17 @@ namespace CasADi{
 
   // Type of collocation points
   enum CollocationPoints{LEGENDRE,RADAU};
+  
+  /** \brief Construct an explicit Runge-Kutta integrator
+  * \param f dynamical system
+  * \copydoc scheme_DAEInput
+  * \copydoc scheme_DAEOutput
+  * \param tf    Integration end time
+  * \param order Order of integration
+  * \param ne    Number of times the RK primitive is repeated over the integration interval
+  */
+  FX explicitRKIntegrator(FX& f, const MX &tf, int order=4, int ne = 1);
+  
     
 } // namespace CasADi
 

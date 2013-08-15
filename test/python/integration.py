@@ -54,7 +54,7 @@ integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":Kinso
 print "Will test these integrators:"
 for cl, t, options in integrators:
   print cl.__name__, " : ", t
-  
+
 class Integrationtests(casadiTestCase):
 
 
@@ -89,8 +89,56 @@ class Integrationtests(casadiTestCase):
       f.setInput(0.7,"p")
     
     self.checkfx(integrator,solution,digits=6)
-    
 
+  def test_rk_trivial(self):
+    num = self.num
+
+    t=ssym("t")
+    q=ssym("q")
+    p=ssym("p")
+    
+    f=SXFunction(daeIn(x=q),daeOut(ode=q))
+    f.init()
+    tf = 1
+    integrator = explicitRKIntegrator(f,tf,4,10)
+    integrator.init()
+    
+    solution = SXFunction(integratorIn(x0=q),integratorOut(xf=q*exp(tf)))
+    solution.init()
+    
+    for f in [solution,integrator]:
+      f.setInput(1,"x0")
+      
+    integrator.evaluate()
+    
+    self.checkfx(integrator,solution,digits=5)
+    
+ 
+  def test_rk(self):
+    num = self.num
+
+    t=ssym("t")
+    q=ssym("q")
+    p=ssym("p")
+    
+    out = SXFunction(daeIn(t=t, x=q, p=p),[q,t,p])
+    out.init()
+
+    f=SXFunction(daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
+    f.init()
+    tf = 1
+    integrator = explicitRKIntegrator(f,tf,4,500)
+    integrator.init()
+    
+    solution = SXFunction(integratorIn(x0=q, p=p),integratorOut(xf=q*exp(tf**3/(3*p))))
+    solution.init()
+    
+    for f in [solution,integrator]:
+      f.setInput(0.3,"x0")
+      f.setInput(0.7,"p")
+    
+    self.checkfx(integrator,solution,digits=4)
+    
   @memory_heavy()
   def test_jac(self):
     self.message("Test exact jacobian #536")
