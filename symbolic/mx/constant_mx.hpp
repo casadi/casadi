@@ -208,10 +208,18 @@ namespace CasADi{
 
     /// Get a binary operation operation
     virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
+    
+    /// Reshape
+    virtual MX getReshape(const CRSSparsity& sp) const;
 
     /** \brief The actual numerical value */
     Value v_;
   };
+  
+  template<typename Value>
+  MX Constant<Value>::getReshape(const CRSSparsity& sp) const{
+    return MX::create(new Constant<Value>(sp,v_)); 
+  }
 
   template<typename Value>
   MX Constant<Value>::getTranspose() const{
