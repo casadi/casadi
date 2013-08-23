@@ -86,7 +86,7 @@ option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
-option(WITH_PROFILING "Enable a built-in profiler to be switched used" ON)
+option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
