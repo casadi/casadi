@@ -287,6 +287,9 @@ endif()
 add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP (requires BLAS and LAPACK).")
 
 if(WITH_PROFILING)
+  find_library(RT rt)
+  list(APPEND CASADI_DEPENDENCIES ${RT})
+  message("RT LIBRARY: ${RT}")
   add_definitions(-DWITH_PROFILING)
 endif(WITH_PROFILING)
 
