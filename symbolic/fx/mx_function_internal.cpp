@@ -456,7 +456,12 @@ namespace CasADi{
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     int alg_counter = 0;
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter){
-  
+
+
+      if (CasadiOptions::profiling) {
+        time_start = getRealTime(); // Start timer
+      }
+        
       // Spill existing work elements if needed
       if(nadir>0 && it->op!=OP_OUTPUT){
         for(vector<int>::const_iterator c=it->res.begin(); c!=it->res.end(); ++c){
@@ -482,27 +487,27 @@ namespace CasADi{
 
         // Point pointers to the data corresponding to the element
         updatePointers(*it,nfdir,0);
-
-        if (CasadiOptions::profiling) {
-          time_start = getRealTime(); // Start timer
-        }
         
         // Evaluate
         it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
         
-        // Write out profiling information
-        if (CasadiOptions::profiling) {
-          time_stop = getRealTime(); // Stop timer
-          CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|"; 
-          if (it->op == OP_CALL) {
-            FX f = it->data->getFunction();
-            CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
-          }
-          CasadiOptions::profilingLog << "|";
-          print(CasadiOptions::profilingLog,*it);
-        }
+
         
       }
+      
+      // Write out profiling information
+      if (CasadiOptions::profiling) {
+        time_stop = getRealTime(); // Stop timer
+        CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|"; 
+        if (it->op == OP_CALL) {
+          FX f = it->data->getFunction();
+          CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
+        }
+        CasadiOptions::profilingLog << "|";
+        print(CasadiOptions::profilingLog,*it);
+        
+      }
+      
     }
 
     casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):evaluated forward "  << getOption("name"));
@@ -521,6 +526,10 @@ namespace CasADi{
       int alg_counter = algorithm_.size()-1;
       tt--;
       for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it, --alg_counter){
+        // Evaluate
+        if (CasadiOptions::profiling) {
+          time_start = getRealTime(); // Start timer
+        }
       
         // Mark spilled work vector elements to be recovered to allow the operator input to be updated but not the operator output 
         // (important for inplace operations)
@@ -549,24 +558,8 @@ namespace CasADi{
             transform(aseed_dest.begin(),aseed_dest.end(),aseed.begin(),aseed_dest.begin(),std::plus<double>());
           }
         } else {        
-          // Evaluate
-          if (CasadiOptions::profiling) {
-            time_start = getRealTime(); // Start timer
-          }
         
           it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
-          
-          // Write out profiling information
-          if (CasadiOptions::profiling) {
-            time_stop = getRealTime(); // Stop timer
-            CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|"; 
-            if (it->op == OP_CALL) {
-              FX f = it->data->getFunction();
-              CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
-            }
-            CasadiOptions::profilingLog << "|";
-            print(CasadiOptions::profilingLog,*it);
-          }
           
         }
 
@@ -579,9 +572,28 @@ namespace CasADi{
             }
           }
         }
+        // Write out profiling information
+        if (CasadiOptions::profiling) {
+          time_stop = getRealTime(); // Stop timer
+          CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|"; 
+          if (it->op == OP_CALL) {
+            FX f = it->data->getFunction();
+            CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
+            CasadiOptions::profilingLog << "|>" << typeid(it->data).name();
+            print(CasadiOptions::profilingLog,*it);
+          } else {
+            CasadiOptions::profilingLog << "|";
+            print(CasadiOptions::profilingLog,*it);
+          }
+        }
       }
-    
+  
       casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):adjoints:end"  << getOption("name"));
+    }
+    
+    if (CasadiOptions::profiling) {
+      time_stop = getRealTime();
+      CasadiOptions::profilingLog  << "stop " << this << ":" <<getOption("name") << double(time_stop-time_zero)*1e3 << " ms" << std::endl; 
     }
    
     casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):end "  << getOption("name"));

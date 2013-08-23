@@ -32,6 +32,9 @@
 #include "external_function.hpp"
 #include "derivative.hpp"
 
+#include "../casadi_options.hpp"
+#include "../profiling.hpp"
+
 #ifdef WITH_DL 
 #include <cstdlib>
 #include <ctime>
@@ -2437,6 +2440,16 @@ namespace CasADi{
   void FXInternal::evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res,
                              const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens,
                              const DMatrixPtrVV& aseed, DMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<double>& rtmp) {
+                             
+    // Set up timers for profiling
+    double time_zero;
+    double time_start;
+    double time_stop;
+    double time_offset=0;
+    
+    if (CasadiOptions::profiling) {
+      time_start = getRealTime(); // Start timer
+    }
   
     // Number of inputs and outputs
     int num_in = getNumInputs();
@@ -2496,10 +2509,16 @@ namespace CasADi{
           }
         }
       }
-
+      
+      if (CasadiOptions::profiling) {
+        time_zero = getRealTime();
+      }
       // Evaluate
       evaluate(nfdir_f_batch, nadir_f_batch);
-    
+      if (CasadiOptions::profiling) {
+        time_offset += getRealTime() - time_zero;
+      }
+      
       // Get the outputs if first evaluation
       if(!fcn_evaluated){
         for(int i = 0; i < num_out; ++i) {
@@ -2535,6 +2554,13 @@ namespace CasADi{
 
     // Clear adjoint seeds
     MXNode::clearVector(aseed);
+    
+    // Write out profiling information
+    if (CasadiOptions::profiling) {
+      time_stop = getRealTime();
+      CasadiOptions::profilingLog  << "overhead " << this << ":" <<getOption("name") << "|" << double(time_stop-time_start-time_offset)*1e6 << " ns" << std::endl; 
+    }
+    
   }
 
   void FXInternal::printPart(const MXNode* node, std::ostream &stream, int part) const {
