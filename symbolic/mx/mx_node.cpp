@@ -704,6 +704,14 @@ namespace CasADi{
     } else if(c.size()==1){
       return c[0];
     } else {
+      // If dependents are all-zero, produce a new constant
+      bool zero = true;
+      for (int i=0;i<c.size();++i) {
+        if (!c[i]->isZero()) { zero = false; break; }
+      }
+      if (zero) {
+        return MX::zeros(Vertcat(c).sparsity());
+      }
       // Split up existing vertcats
       vector<MX> c_split;
       c_split.reserve(c.size());
@@ -719,6 +727,13 @@ namespace CasADi{
   }
 
   std::vector<MX> MXNode::getVertsplit(const std::vector<int>& output_offset) const{
+    if (isZero()) {
+      std::vector<MX> ret = MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
+      for (int i=0;i<ret.size();++i) {
+        ret[i]=MX::zeros(ret[i].sparsity());
+      }
+      return ret;
+    }
     return MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
   }
 
