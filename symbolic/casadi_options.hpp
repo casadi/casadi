@@ -23,6 +23,9 @@
 #ifndef CASADI_OPTIONS_HPP
 #define CASADI_OPTIONS_HPP
 
+#include <iostream>
+#include <fstream>
+
 namespace CasADi {
   /**
   * \brief Collects global CasADi options
@@ -57,6 +60,12 @@ namespace CasADi {
       * Default: true
       */
       static bool simplification_on_the_fly;
+      
+      /** \brief Stream on which profiling log should be written */
+      static std::ofstream profilingLog;
+      
+      /** \brief flag to indicate if profiling is active */
+      static bool profiling;
 #endif //SWIG
       // Setter and getter for catch_errors_python
       static void setCatchErrorsPython(bool flag) { catch_errors_python = flag; }
@@ -66,6 +75,14 @@ namespace CasADi {
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
       static bool getSimplificationOnTheFly() { return simplification_on_the_fly; }
       
+      /** \brief Start virtual machine profiling
+      *
+      *  When profiling is active, each primitive of an MX algorithm is profiling and dumped into the supplied file _filename_
+      *  After the profiling is done, convert the supplied file to a viewable webpage with:
+      * `python -mcasadi.tools.profilereport -o profiling.html _filename_`
+      */
+      static void startProfiling(const std::string &filename);
+      static void stopProfiling();
   };
 
 }

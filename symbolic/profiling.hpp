@@ -20,30 +20,23 @@
  *
  */
 
-#include "casadi_options.hpp"
-#include "casadi_exception.hpp"
+#ifndef PROFILING_HPP
+#define PROFILING_HPP
 
-namespace CasADi {
+/*
+ * Author:  David Robert Nadeau
+ * Site:    http://NadeauSoftware.com/
+ * License: Creative Commons Attribution 3.0 Unported License
+ *          http://creativecommons.org/licenses/by/3.0/deed.en_US
+ */
 
-  bool CasadiOptions::catch_errors_python = true;
-  bool CasadiOptions::simplification_on_the_fly = true;
-  bool CasadiOptions::profiling = false;
-  std::ofstream CasadiOptions::profilingLog;
+/**
+ * Returns the real time, in seconds, or -1.0 if an error occurred.
+ *
+ * Time is measured since an arbitrary and OS-dependent start time.
+ * The returned real time is only useful for computing an elapsed time
+ * between two calls to this function.
+ */
+double getRealTime( );
 
-  void CasadiOptions::startProfiling(const std::string &filename) {
-    profilingLog.open (filename.c_str(),std::ofstream::out);
-    if (profilingLog.is_open()) {
-      profiling = true;
-    } else {
-      casadi_error("Did not manage to open file " << filename << " for logging.");
-    }
-  }
-  
-  void CasadiOptions::stopProfiling() {
-    if (profiling) {
-      profilingLog.close();
-    }
-    profiling = false;
-  }
-  
-}
+#endif //PROFILING_HPP

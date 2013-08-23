@@ -25,6 +25,9 @@
 #include "../mx/mx_tools.hpp"
 #include <iterator>
 
+#include "../casadi_options.hpp"
+#include "../profiling.hpp"
+
 using namespace std;
 namespace CasADi{
 
@@ -119,6 +122,14 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::evaluate(int nfdir, int nadir){
+    // Set up timers for profiling
+    double time_zero;
+    double time_start;
+    double time_stop;
+    if (CasadiOptions::profiling) {
+      time_zero = getRealTime();
+    }
+    
     // Mark factorization as out-of-date. TODO: make this conditional
     fact_up_to_date_ = false;
 
@@ -132,6 +143,10 @@ namespace CasADi{
     casadi_assert_message(!linsol_.isNull(),"Sensitivities of an implicit function requires a provided linear solver");
     casadi_assert_message(!jac_.isNull(),"Sensitivities of an implicit function requires an exact Jacobian");
   
+    if (CasadiOptions::profiling) {
+       time_start = getRealTime(); // Start timer
+    }
+    
     // Evaluate and factorize the Jacobian
     if (!fact_up_to_date_) {
       // Pass inputs
@@ -211,6 +226,13 @@ namespace CasADi{
       for(int i=0; i<getNumInputs(); ++i){
         f_.adjSens(i+1,dir).get(adjSens(i,dir));
       }
+    }
+    
+
+
+    if (CasadiOptions::profiling) {
+      time_stop = getRealTime(); // Stop timer
+      CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":3||stuff" << std::endl;
     }
   }
 
