@@ -86,6 +86,7 @@ option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
+option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
@@ -284,6 +285,14 @@ if(WITH_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
   set(DSDP_FOUND true)
 endif()
 add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP (requires BLAS and LAPACK).")
+
+if(WITH_PROFILING)
+  find_library(RT rt)
+  if(RT)
+    list(APPEND CASADI_DEPENDENCIES ${RT})
+  endif()
+  add_definitions(-DWITH_PROFILING)
+endif(WITH_PROFILING)
 
 add_subdirectory(symbolic)
 add_subdirectory(optimal_control)

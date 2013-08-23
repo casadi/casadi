@@ -28,6 +28,9 @@
 #include "symbolic/fx/sx_function.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 
+#include "symbolic/profiling.hpp"
+#include "symbolic/casadi_options.hpp"
+
 using namespace std;
 namespace CasADi{
 
@@ -326,9 +329,13 @@ namespace CasADi{
     ifcn_in[1+INTEGRATOR_RX0] = RX0;
     ifcn_in[1+INTEGRATOR_RP] = RP;
     FX ifcn = MXFunction(ifcn_in,gv);
+    std::stringstream ss_ifcn;
+    ss_ifcn << "collocation_implicit_residual_" << getOption("name");
+    ifcn.setOption("name",ss_ifcn.str());
     ifcn.init(); 
     if(expand_f){
       ifcn = SXFunction(shared_cast<MXFunction>(ifcn));
+      ifcn.setOption("name",ss_ifcn.str());
       ifcn.init();
     }
   
@@ -340,9 +347,13 @@ namespace CasADi{
     afcn_out[1+INTEGRATOR_RXF] = RX[0][0];
     afcn_out[1+INTEGRATOR_RQF] = RQF;
     FX afcn = MXFunction(ifcn_in,afcn_out);
+    std::stringstream ss_afcn;
+    ss_afcn << "collocation_output_" << getOption("name");
+    afcn.setOption("name",ss_afcn.str());
     afcn.init();
     if(expand_f){
       afcn = SXFunction(shared_cast<MXFunction>(afcn));
+      afcn.setOption("name",ss_afcn.str());
       afcn.init();
     }
   
@@ -351,7 +362,10 @@ namespace CasADi{
   
     // Allocate an NLP solver
     implicit_solver_ = implicit_function_creator(ifcn,FX(),LinearSolver());
-  
+    std::stringstream ss_implicit_solver;
+    ss_implicit_solver << "collocation_implicitsolver_" << getOption("name");
+    implicit_solver_.setOption("name",ss_implicit_solver.str());
+    
     // Pass options
     if(hasSetOption("implicit_solver_options")){
       const Dictionary& implicit_solver_options = getOption("implicit_solver_options");
@@ -369,6 +383,9 @@ namespace CasADi{
     gfcn_in[INTEGRATOR_RP] = RP;
     ifcn_in[0] = implicit_solver_.call(gfcn_in).front();
     explicit_fcn_ = MXFunction(gfcn_in,afcn.call(ifcn_in));
+    std::stringstream ss_explicit_fcn;
+    ss_explicit_fcn << "collocation_explicit_" << getOption("name");
+    explicit_fcn_.setOption("name",ss_explicit_fcn.str());
     explicit_fcn_.init();
   
     if(hasSetOption("startup_integrator")){
@@ -384,6 +401,11 @@ namespace CasADi{
       startup_integrator_.setOption("number_of_adj_dir",0); // not needed
       startup_integrator_.setOption("t0",coll_time_.front().front());
       startup_integrator_.setOption("tf",coll_time_.back().back());
+      
+      std::stringstream ss_startup_integrator;
+      ss_startup_integrator << "collocation_startup_" << getOption("name");
+      startup_integrator_.setOption("name", ss_startup_integrator.str());
+      
       if(hasSetOption("startup_integrator_options")){
         const Dictionary& startup_integrator_options = getOption("startup_integrator_options");
         startup_integrator_.setOption(startup_integrator_options);
@@ -401,6 +423,15 @@ namespace CasADi{
   }
 
   void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
+    // Set up timers for profiling
+    double time_zero;
+    double time_start;
+    double time_stop;
+    if (CasadiOptions::profiling) {
+      time_zero = getRealTime();
+      CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl; 
+    }
+    
     // Call the base class method
     IntegratorInternal::reset(nsens,nsensB,nsensB_store);
   
@@ -415,7 +446,7 @@ namespace CasADi{
         explicit_fcn_.fwdSeed(iind,dir).set(fwdSeed(iind,dir));
       }
     }
-
+    
     // Pass solution guess (if this is the first integration or if hotstart is disabled)
     if(hotstart_==false || integrated_once_==false){
       vector<double>& v = implicit_solver_.output().data();
@@ -479,10 +510,21 @@ namespace CasADi{
         cout << "startup trajectory generated, statistics:" << endl;
         startup_integrator_.printStats();
       }
+
+    }
+    
+    if (CasadiOptions::profiling) {
+      time_start = getRealTime(); // Start timer
     }
     
     // Solve the system of equations
     explicit_fcn_.evaluate(nsens);
+    
+    // Write out profiling information
+    if (CasadiOptions::profiling) {
+      time_stop = getRealTime(); // Stop timer
+      CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":0|" << explicit_fcn_.get() << ":" << explicit_fcn_.getOption("name") << "|solve system" << std::endl;
+    }
   
     // Mark the system integrated at least once
     integrated_once_ = true;

@@ -33,6 +33,8 @@
 #include "../sx/sx_node.hpp"
 #include "../casadi_types.hpp"
 #include "../matrix/crs_sparsity_internal.hpp"
+#include "../profiling.hpp"
+#include "../casadi_options.hpp"
 
 #ifdef WITH_LLVM
 #include "llvm/DerivedTypes.h"
@@ -111,6 +113,14 @@ namespace CasADi{
   }
 
   void SXFunctionInternal::evaluate(int nfdir, int nadir){
+  
+    double time_start;
+    double time_stop;
+    if (CasadiOptions::profiling) {
+      time_start = getRealTime();
+      CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl; 
+    }
+    
     casadi_log("SXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):begin  " << getOption("name"));
     // Compiletime optimization for certain common cases
     switch(nfdir){
@@ -124,6 +134,11 @@ namespace CasADi{
       evaluateGen1(int_runtime(nfdir),nadir); break;
     }
     casadi_log("SXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):end " << getOption("name"));
+    
+    if (CasadiOptions::profiling) {
+      time_stop = getRealTime();
+      CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_start)*1e3 << " ms | " << this << ":" <<getOption("name") << ":0||SX algorithm size: " << algorithm_.size() << std::endl; 
+    }
   }
 
   template<typename T1>
