@@ -351,9 +351,7 @@ namespace CasADi{
   }
 
   MX MXNode::getTranspose() const{
-    if (isZero()) {
-      return MX::zeros(sparsity().transpose());
-    } else if(sparsity().dense()){
+    if(sparsity().dense()){
       return MX::create(new DenseTranspose(shared_from_this<MX>()));
     } else {
       return MX::create(new Transpose(shared_from_this<MX>()));
@@ -361,9 +359,6 @@ namespace CasADi{
   }
 
   MX MXNode::getReshape(const CRSSparsity& sp) const{
-    if (isZero()) {
-      return MX::zeros(sp);
-    }
     return MX::create(new Reshape(shared_from_this<MX>(),sp));
   }
   
