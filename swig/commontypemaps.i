@@ -59,6 +59,8 @@
 #define PRECEDENCE_MXVector 105
 #define PRECEDENCE_MXVectorVector 106
 
+#define PRECEDENCE_CREATOR 150
+
 #define PRECEDENCE_GENERICTYPE 22
 #define PRECEDENCE_DICTIONARY 21
 
@@ -135,6 +137,8 @@ if (!ret) {
 #ifdef SWIGPYTHON
 %my_generic_const_typemap(PRECEDENCE_DICTIONARY ,CasADi::GenericType::Dictionary)
 #endif
+
+%my_creator_typemap(PRECEDENCE_CREATOR, CasADi::implicitFunctionCreator);
 
 #ifdef SWIGPYTHON
 %my_generic_const_typemap(SWIG_TYPECHECK_DOUBLE,double);

@@ -26,14 +26,32 @@
 #include <vector>
 #include <algorithm>
 #include "symbolic/casadi_exception.hpp"
+#include "symbolic/options_functionality.hpp"
 #include "symbolic/mx/mx.hpp"
 
 namespace CasADi{
 
-  /** Obtain collocation points of specific order and scheme
+  /** \brief Obtain collocation points of specific order and scheme
   \param scheme  'radau' or 'legendre'
   **/
   std::vector<double> collocationPoints(int order, const std::string& scheme="radau");
+  
+  
+  /** \brief Obtain collocation interpolating matrices
+  \param tau_root  location of collocation points, as obtained from collocationPoints
+  \param[out] C interpolating coefficients to obtain derivatives
+      Length: order+1, order + 1
+      
+      dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
+      
+  \param[out] D interpolating coefficients to obtain end state
+      Length: order+1
+  */
+#ifndef SWIG
+  void collocationInterpolators(const std::vector<double> & tau_root, std::vector< std::vector<double> > &C, std::vector< double > &D);
+#else // SWIG
+  void collocationInterpolators(const std::vector<double> & tau_root, std::vector< std::vector<double> > &OUTPUT, std::vector< double > &OUTPUT);
+#endif // SWIG
   
 #ifndef SWIG
   static double legendre_points1[] = { 0.00000000000000000000, 0.50000000000000000000 };
@@ -73,8 +91,18 @@ namespace CasADi{
   * \param order Order of integration
   * \param ne    Number of times the RK primitive is repeated over the integration interval
   */
-  FX explicitRKIntegrator(FX& f, const MX &tf, int order=4, int ne = 1);
+  FX explicitRK(FX& f, const MX &tf=1, int order=4, int ne = 1);
   
+  /** \brief Construct an implicit Runge-Kutta integrator
+  * \param f dynamical system
+  * \copydoc scheme_DAEInput
+  * \copydoc scheme_DAEOutput
+  * \param tf    Integration end time
+  * \param order Order of integration
+  * \param scheme Collocation scheme, as excepted by collocationPoints function.
+  * \param ne    Number of times the RK primitive is repeated over the integration interval
+  */
+  FX implicitRK(FX& f, implicitFunctionCreator impl, const Dictionary& dict = Dictionary(), const MX &tf=1, int order=4, const std::string& scheme="radau", int ne = 1);
     
 } // namespace CasADi
 

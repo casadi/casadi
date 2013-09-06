@@ -90,7 +90,7 @@ class Integrationtests(casadiTestCase):
     
     self.checkfx(integrator,solution,digits=6)
 
-  def test_rk_trivial(self):
+  def test_tools_trivial(self):
     num = self.num
 
     t=ssym("t")
@@ -100,21 +100,26 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(x=q),daeOut(ode=q))
     f.init()
     tf = 1
-    integrator = explicitRKIntegrator(f,tf,4,10)
-    integrator.init()
     
-    solution = SXFunction(integratorIn(x0=q),integratorOut(xf=q*exp(tf)))
-    solution.init()
-    
-    for f in [solution,integrator]:
-      f.setInput(1,"x0")
+    for integrator in [
+         explicitRK(f,tf,4,10),
+         implicitRK(f,NewtonImplicitSolver,{"linear_solver": CSparse},tf,4,"radau",10)
+       ]:
+      integrator.init()
       
-    integrator.evaluate()
-    
-    self.checkfx(integrator,solution,digits=5)
-    
+      solution = SXFunction(integratorIn(x0=q),integratorOut(xf=q*exp(tf)))
+      solution.init()
+      
+      for f in [solution,integrator]:
+        f.setInput(1,"x0")
+        
+      integrator.evaluate()
+      
+
+      self.checkfx(integrator,solution,digits=5)
+
  
-  def test_rk(self):
+  def test_tools(self):
     num = self.num
 
     t=ssym("t")
@@ -127,17 +132,20 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
     f.init()
     tf = 1
-    integrator = explicitRKIntegrator(f,tf,4,500)
-    integrator.init()
-    
-    solution = SXFunction(integratorIn(x0=q, p=p),integratorOut(xf=q*exp(tf**3/(3*p))))
-    solution.init()
-    
-    for f in [solution,integrator]:
-      f.setInput(0.3,"x0")
-      f.setInput(0.7,"p")
-    
-    self.checkfx(integrator,solution,digits=4)
+    for integrator in [
+         explicitRK(f,tf,4,500),
+         implicitRK(f,NewtonImplicitSolver,{"linear_solver": CSparse},tf,4,"radau",50)
+       ]:
+      integrator.init()
+      
+      solution = SXFunction(integratorIn(x0=q, p=p),integratorOut(xf=q*exp(tf**3/(3*p))))
+      solution.init()
+      
+      for f in [solution,integrator]:
+        f.setInput(0.3,"x0")
+        f.setInput(0.7,"p")
+      
+      self.checkfx(integrator,solution,digits=4)
     
   @memory_heavy()
   def test_jac(self):
