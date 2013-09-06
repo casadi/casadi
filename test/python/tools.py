@@ -983,7 +983,20 @@ class Toolstests(casadiTestCase):
 
     self.checkarray(w["b",:,2],DMatrix([12,12]))
     
+  def test_numpyint(self):
+    state = struct_ssym(['x', 'y'])
+    x = struct_ssym([entry('states', struct=state, repeat=10)])
+    x_init = x()
+    x_init['states', 0, 'x'] # OK
+    a = [1,2,3]
+    x_init['states', int32(0), 'x'] 
+    x_init['states', int64(0), 'x']
     
+  def test_numpyint(self):
+    s = struct_ssym(map(entry, 'xyz')) # OK 
+    print s['x']
+    s = struct_ssym(map(entry, u'xyz')) # IndexError: list index out of range
+    print s[u'x']
     
 if __name__ == '__main__':
     unittest.main()

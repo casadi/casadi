@@ -1,8 +1,17 @@
 from casadi import *
 
+
+import numpy as np
 import operator
 import sys
 
+def isInteger(a):
+  return isinstance(a,int) or isinstance(a,np.integer)
+  
+def isString(a):
+  return isinstance(a,str) or isinstance(a,unicode)
+  
+  
 # StructIndex :tuple/list of strings
 # canonicalIndex : tuple/list of string or numbers
 # powerIndex: tuple/list of string, numbers, lists, slices, dicts
@@ -47,8 +56,7 @@ def intersperse(*args):
    
 def canonicalIndexAncestors(ind):
   if len(ind)==0: return []
-  isstring = lambda x: isinstance(x,str)
-  return [ind] + canonicalIndexAncestors(ind[:-(map(isstring,ind[::-1]).index(True)+1)])
+  return [ind] + canonicalIndexAncestors(ind[:-(map(isString,ind[::-1]).index(True)+1)])
 
 def canonical(ind,s):
   if ind < 0:
@@ -105,7 +113,7 @@ nesteddict = NestedDictLiteral()
 # Casadi-independant Structure framework
 
 def payloadUnpack(payload,i):
-  if isinstance(i,str):
+  if isString(i):
     raise Exception("Got string %s where number expected."% i)
   if isinstance(payload,list):
     if i>=len(payload):
@@ -183,7 +191,7 @@ class StructEntry:
         s = dims[0]
         if isinstance(p,slice): # Expand slice
           p = range(*p.indices(s))
-        if isinstance(p,int):
+        if isInteger(p):
           return self.traverseByPowerIndex(
                    powerIndex[1:],
                    dims=dims[1:],
@@ -239,7 +247,7 @@ class Structure(object):
     self.dict = SafeDict([(e.name,e) for e in self.entries])
     
     for e in self.order:
-      if isinstance(e,str):
+      if isString(e):
         if e not in self.dict:
           raise Exception("Order '%s' is invalid." % e)
       elif isinstance(e,tuple):
@@ -281,7 +289,7 @@ class Structure(object):
       return e
       
   def getStructEntryByCanonicalIndex(self,indices):
-    return self.getStructEntryByStructIndex(filter(lambda x: isinstance(x,str),indices))
+    return self.getStructEntryByStructIndex(filter(lambda x: isString(x),indices))
 
   def getStruct(self,name):
     if name not in self.struct.dict:
@@ -296,7 +304,7 @@ class Structure(object):
       try:
         if len(powerIndex)==0: return dispatcher(payload,canonicalIndex)
         p = powerIndex[0]
-        if isinstance(p,str):
+        if isString(p):
           return self.dict[p].traverseByPowerIndex(
             powerIndex[1:],
             canonicalIndex=canonicalIndex+(p,),
@@ -526,7 +534,7 @@ class MasterSettable:
     return self.struct.traverseByPowerIndex(powerIndex,dispatcher=SetterDispatcher(struct=self.struct,master=self.master),payload=value)
     
 def delegation(extraIndex,entry,i):
-  if isinstance(extraIndex,str) or (isinstance(extraIndex,list) and len(extraIndex)>0 and all([isinstance(e,str) for e in extraIndex])):
+  if isString(extraIndex) or (isinstance(extraIndex,list) and len(extraIndex)>0 and all([isString(e) for e in extraIndex])):
     extraIndex = FlatIndexDelegater(extraIndex)
   if isinstance(extraIndex,Delegater):
     if entry is None: raise Exception("Cannot use delayed index without supplied entry.")
@@ -840,8 +848,8 @@ class msymStruct(CasadiStructured,MasterGettable):
       sps.append(sp)
       k += sp.size()
       
-    for it, k, sp in zip(its,vertsplit(self.master,ks),sps):
-      self.priority_object_map[it] = k.reshape(sp)
+    #for it, k, sp in zip(its,vertsplit(self.master,ks),sps):
+    #  self.priority_object_map[it] = k.reshape(sp)
       
 
   def __MX__(self):
@@ -1019,7 +1027,7 @@ class CasadiStructEntry(StructEntry):
     if 'repeat' in kwargs:
       self.repeat = kwargs["repeat"] if isinstance(kwargs["repeat"],list) else [kwargs["repeat"]]
     
-    if not all(map(lambda x: isinstance(x,int),self.repeat)):
+    if not all(map(lambda x: isInteger(x),self.repeat)):
       raise Exception("The 'repeat' argument, if present, must be a list of integers, but got %s" % str(self.repeat))
 
       
@@ -1037,7 +1045,7 @@ class CasadiStructEntry(StructEntry):
     #     shape   argument
     if 'shape' in kwargs:
       shape = kwargs["shape"]
-      if isinstance(shape,int):
+      if isInteger(shape) :
         self.sparsity = sp_dense(shape,1)
       elif isinstance(shape,list) or isinstance(shape,tuple):
         if len(shape)==0 or len(shape)>2:
@@ -1058,14 +1066,14 @@ class CasadiStructEntry(StructEntry):
       if isinstance(shapestruct,Structured) or isinstance(shapestruct,Structure):
         self.shapestruct = (shapestruct.struct,1)
       elif isinstance(shapestruct,tuple):
-        if not(all([isinstance(e,Structured) or isinstance(e,Structure) or isinstance(e,int) for e in shapestruct])) or len(shapestruct)==0 or len(shapestruct)>2:
+        if not(all([isinstance(e,Structured) or isinstance(e,Structure) or isInteger(e) for e in shapestruct])) or len(shapestruct)==0 or len(shapestruct)>2:
           raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of structures or numbers")
-        self.shapestruct = tuple([e if isinstance(e,int) else e.struct for e in shapestruct])
+        self.shapestruct = tuple([e if isInteger(e) else e.struct for e in shapestruct])
       else:
         raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of at most structures")
       
       if 'shape' not in kwargs:
-        self.sparsity = sp_dense(*[e if isinstance(e,int) else e.size for e in self.shapestruct])
+        self.sparsity = sp_dense(*[e if isInteger(e) else e.size for e in self.shapestruct])
         
     #     sym    argument
     self.sym = None
