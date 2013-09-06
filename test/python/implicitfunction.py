@@ -211,7 +211,59 @@ class NLPtests(casadiTestCase):
       
       self.checkarray(solver.output(),DMatrix([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
 
+  def test_implicitbug(self):
+    # Total number of variables for one finite element
+    X0 = msym("X0")
+    V = msym("V")
 
+    V_eq = vertcat([V[0]-X0])
+
+    # Root-finding function, implicitly defines V as a function of X0 and P
+    vfcn = MXFunction([V,X0],[V_eq])
+    vfcn.init()
+
+    # Convert to SXFunction to decrease overhead
+    vfcn_sx = SXFunction(vfcn)
+    vfcn_sx.setOption("name","S")
+    vfcn_sx.setOption("ad_mode","forward")
+
+    # Create a implicit function instance to solve the system of equations
+    ifcn = NewtonImplicitSolver(vfcn_sx)
+    ifcn.setOption("linear_solver",CSparse)
+    ifcn.init()
+
+    #ifcn = MXFunction([X0],[vertcat([X0])])
+    #ifcn.setOption("name","I")
+    #ifcn.init()
+    [V] = ifcn.eval([X0])
+
+    f = 1  # fails
+
+    F = MXFunction([X0],[f*X0+V])
+    F.setOption("name","F")
+    F.setOption("ad_mode","forward")
+    F.init()
+
+    # Test values
+    x0_val  = 1
+
+    G = F.gradient(0,0)
+    G.init()
+    G.setInput(x0_val)
+    G.evaluate()
+    print G.output()
+    print G
+
+    J = F.jacobian(0,0)
+    J.init()
+    J.setInput(x0_val)
+    J.evaluate()
+    print J.output()
+    print J
+    
+    self.checkarray(G.output(),DMatrix([2]))
+    self.checkarray(J.output(),DMatrix([2]))
+    
 if __name__ == '__main__':
     unittest.main()
 

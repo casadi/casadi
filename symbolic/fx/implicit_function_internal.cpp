@@ -316,8 +316,8 @@ namespace CasADi{
       v_it++;
 
       for(int i=0; i<asens[d].size(); ++i, ++v_it){
-        if(asens[d][i]!=0){
-          *asens[d][i] = - *v_it;
+        if(asens[d][i]!=0 && !(*v_it).isNull()){
+          *asens[d][i] += - *v_it;
         }
       }
     }
