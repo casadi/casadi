@@ -63,6 +63,10 @@ public:
     /// Error message map
     static std::map<int,std::string> flagmap;
   protected:
+  
+    /// Flag: is already initialized
+    bool is_init_;
+  
     /// Storage space for sqic bl variable
     std::vector<double> bl_;
     /// Storage space for sqic bu variable

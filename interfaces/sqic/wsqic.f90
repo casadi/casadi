@@ -1,12 +1,16 @@
-!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-! Example problem  HS118
-!   The Hessian is given in a user-defined subroutine, which computes H*x
-!   for a given vector x.
-!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+module SQICModule 
+ use snModulePrecision, only : ip, rp                            
+ use SQIC,              only : qpProb 
+ type(qpProb)              :: QP
+ 
+ character(8), allocatable :: Names(:)
+ real(rp),     allocatable :: cObj(:)
+ 
+end module
 
-subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, nnzH, indH, locH, valH, Obj) bind ( C, name="sqic" )
-  use snModulePrecision, only : ip, rp
-  use SQIC,              only : qpProb                     
+subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, nnzH, indH, locH, valH) bind ( C, name="sqic" )
+
+  use SQICModule                    
 
   implicit none
 
@@ -14,16 +18,14 @@ subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, n
   integer(ip)               :: Errors, iObj, iPrint, iSumm, ncObj, &
                                m, n, nInf, nnH, nnzH, nNames, nnzA, nS
 
-  real(rp)                  :: Obj, ObjAdd, sInf
+  real(rp)                  :: ObjAdd, sInf
 
-  real(rp),     allocatable :: cObj(:)
+  
   real(rp):: bl(n+m), bu(n+m), x(n+m), valA(nnzA), valH(nnzH) ,pi(m), rc(n+m)
   integer(ip):: indA(nnzA), locA(n+1), indH(nnzH), locH(n+1), hEtype(n+m), hs(n+m)
 
-  character(8), allocatable :: Names(:)
   character(8)              :: probName
 
-  type(qpProb)              :: QP
 
   Errors   = 0
 
@@ -53,16 +55,34 @@ subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, n
   call QP%set   ( 'Print frequency    1', iPrint, iSumm, Errors )
   call QP%set   ( 'Summary frequency  1', iPrint, iSumm, Errors )
 
+end subroutine wsqic
 
+subroutine sqicSolve (Obj)  bind ( C, name="sqicSolve" )
+  use snModulePrecision, only : ip, rp
+  use SQICModule 
+  
+  implicit none
+
+  integer                   :: INFO
+  integer(ip)               :: nS, nInf
+
+  real(rp)                  :: Obj, sInf
+  
   ! Solve the QP.
   call QP%solve ( 'Cold', INFO, nS, nInf, sInf, Obj )
   
-  ! Finish up and deallocate.
+end subroutine sqicSolve
+
+subroutine sqicDestroy ()  bind ( C, name="sqicDestroy" )
+  use SQICModule 
+  
+  implicit none
+    
   call QP%end
 
   if ( allocated(cObj) )   deallocate ( cObj )
   if ( allocated(Names) )  deallocate ( Names )
 
-  close       ( iPrint )
-
-end subroutine wsqic
+  !close       ( iPrint )
+  
+end subroutine sqicDestroy

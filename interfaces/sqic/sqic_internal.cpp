@@ -44,20 +44,17 @@ SQICInternal* SQICInternal::clone() const{
 }
   
 SQICInternal::SQICInternal(const std::vector<CRSSparsity>& st) : QPSolverInternal(st){
-
+  is_init_ = false;
 }
 
 SQICInternal::~SQICInternal(){ 
-
+  sqicDestroy();
 }
 
 void SQICInternal::evaluate(int nfdir, int nadir) {
   casadi_assert_message(nfdir==0 && nadir==0, "SQIC::evaluate() not implemented for forward or backward mode");
   if (inputs_check_) checkInputs();
-  
-  int n = n_;
-  int m = nc_+1;
-  
+
   std::copy(input(QP_SOLVER_X0).begin(),input(QP_SOLVER_X0).end(),x_.begin());
   
   std::transform(input(QP_SOLVER_LAM_X0).begin(),input(QP_SOLVER_LAM_X0).begin(),rc_.begin(),negate<double>());
@@ -77,24 +74,20 @@ void SQICInternal::evaluate(int nfdir, int nadir) {
   formatA_.setInput(input(QP_SOLVER_G),1);
   formatA_.evaluate();
   
-  int nnzA=formatA_.output().size();
-  int nnzH=input(QP_SOLVER_H).size();
-  
-  std::fill(hEtype_.begin()+n_,hEtype_.end(),3);
-  
-  double ObjH = 0;
-  sqic(&m , &n, &nnzA, &indA_[0], &locA_[0], &formatA_.output().data()[0], &bl_[0], &bu_[0], &hEtype_[0], &hs_[0], &x_[0], &pi_[0], &rc_[0], &nnzH, &indH_[0], &locH_[0], &input(QP_SOLVER_H).data()[0],&ObjH);
+  sqicSolve(&output(QP_SOLVER_COST).data()[0]);
 
   std::copy(x_.begin(),x_.begin()+n_,output(QP_SOLVER_X).begin());
   std::transform(rc_.begin(),rc_.begin()+n_,output(QP_SOLVER_LAM_X).begin(),negate<double>());
   std::transform(rc_.begin()+n_,rc_.begin()+n_+nc_,output(QP_SOLVER_LAM_A).begin(),negate<double>());
   
-  output(QP_SOLVER_COST).set(ObjH+x_[n_+nc_]);
+  output(QP_SOLVER_COST)[0]+= x_[n_+nc_];
 }
 
 void SQICInternal::init(){
    // Call the init method of the base class
   QPSolverInternal::init();
+  
+  if (is_init_) sqicDestroy();
   
   inf_ = 1.0e+20;
   
@@ -135,6 +128,18 @@ void SQICInternal::init(){
   // Set objective row of augmented linear constraints
   bu_[n_+nc_] = inf_;
   bl_[n_+nc_] = -inf_;
+  
+  is_init_ = true;
+  
+  int n = n_;
+  int m = nc_+1;
+  
+  int nnzA=formatA_.output().size();
+  int nnzH=input(QP_SOLVER_H).size();
+  
+  std::fill(hEtype_.begin()+n_,hEtype_.end(),3);
+    
+  sqic(&m , &n, &nnzA, &indA_[0], &locA_[0], &formatA_.output().data()[0], &bl_[0], &bu_[0], &hEtype_[0], &hs_[0], &x_[0], &pi_[0], &rc_[0], &nnzH, &indH_[0], &locH_[0], &input(QP_SOLVER_H).data()[0]);
   
 }
 

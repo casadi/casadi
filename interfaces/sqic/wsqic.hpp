@@ -17,7 +17,12 @@ extern "C" {
    const int* nnzH, // Number of nonzeros in full hessian H
    const int* indH, // colind of Compressed Column Storage H , length: nnzH
    const int* locH, // row of  Compressed Column Storage H, length n + 1
-   double* valH,
-   double* Obj // Output: hessian part of the resulting objective
+   double* valH
    );
+   
+  extern void sqicSolve(
+   double* Obj // Output: hessian part of the resulting objective
+  );
+ 
+  extern void sqicDestroy();
 }
