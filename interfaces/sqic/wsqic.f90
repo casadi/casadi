@@ -16,7 +16,7 @@ subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, n
 
   integer                   :: INFO
   integer(ip)               :: Errors, iObj, iPrint, iSumm, ncObj, &
-                               m, n, nInf, nnH, nnzH, nNames, nnzA, nS
+                               m, n, nInf, nnH, nnzH, nNames, nnzA, nS, iSpecs
 
   real(rp)                  :: ObjAdd, sInf
 
@@ -34,8 +34,7 @@ subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, n
   nNames   =  1
   ObjAdd = 0.0
 
-  iSumm    = 6;  iPrint = 9;
-  open ( iPrint, file='hs118.out', status='unknown' )
+  iSumm    = 0;  iPrint = 6;
 
   ! Allocate space for problem.
   allocate ( cObj(ncObj) )
@@ -48,6 +47,13 @@ subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, n
 
   ! Initialize SQIC.
   call QP%begin ( iPrint, iSumm )
+  
+  print *, 'Reading params.spc'
+  iSpecs = 4
+  open ( iSpecs, file='params.spc',   status='unknown'     )
+
+  ! Read in options from a file.
+  call QP%specs ( iSpecs, INFO )
 
   ! Set options.
   call qp%set   ( 'Print level        1', iPrint, iSumm, Errors )
