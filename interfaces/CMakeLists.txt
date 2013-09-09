@@ -45,3 +45,7 @@ endif()
 if(WORHP_FOUND)
   add_subdirectory(worhp)
 endif()
+
+if(SQIC_FOUND)
+  add_subdirectory(sqic)
+endif()

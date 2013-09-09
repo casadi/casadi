@@ -48,6 +48,10 @@ try:
   qpsolvers.append((CplexSolver,{}))
 except:
   pass
+try:
+  qpsolvers.append((SQICSolver,{}))
+except:
+  pass
 
 try:
   qpsolvers.append((QCQPQPSolver,{"qcqp_solver":SOCPQCQPSolver,"qcqp_solver_options": {"socp_solver": SDPSOCPSolver, "socp_solver_options": {"sdp_solver": DSDPSolver, "sdp_solver_options": {"gapTol":1e-10}} }}))

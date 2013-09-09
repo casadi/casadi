@@ -28,6 +28,13 @@
 %include "interfaces/ooqp/ooqp_solver.hpp"
 #endif
 
+#ifdef WITH_SQIC
+%{
+#include "interfaces/sqic/sqic_solver.hpp"
+%}
+%include "interfaces/sqic/sqic_solver.hpp"
+#endif
+
 // IPOPT
 #ifdef WITH_IPOPT
 %include "ipopt_interface.i"
