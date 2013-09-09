@@ -458,6 +458,10 @@ namespace CasADi{
     return (*this)->starColoring(ordering,cutoff);
   }
 
+  CRSSparsity CRSSparsity::starColoring2(int ordering, int cutoff) const{
+    return (*this)->starColoring2(ordering,cutoff);
+  }
+
   std::vector<int> CRSSparsity::largestFirstOrdering() const{
     return (*this)->largestFirstOrdering();
   }

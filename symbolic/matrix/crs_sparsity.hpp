@@ -440,6 +440,12 @@ namespace CasADi{
         Ordering options: None (0), largest first (1)
     */
     CRSSparsity starColoring(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
+
+    /** \brief Perform a star coloring of a symmetric matrix:
+        A new greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN) 
+        Ordering options: None (0), largest first (1)
+    */
+    CRSSparsity starColoring2(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
     
     /** \brief Order the rows by decreasing degree */
     std::vector<int> largestFirstOrdering() const;

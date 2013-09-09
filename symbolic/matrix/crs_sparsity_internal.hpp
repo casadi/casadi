@@ -262,6 +262,9 @@ namespace CasADi{
 
     /// Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
     CRSSparsity starColoring(int ordering, int cutoff) const;
+    
+    /// Perform a star coloring of a symmetric matrix: An improved distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
+    CRSSparsity starColoring2(int ordering, int cutoff) const;
 
     /// Order the rows by decreasing degree
     std::vector<int> largestFirstOrdering() const;

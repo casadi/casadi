@@ -28,6 +28,8 @@
 #include <cmath>
 #include "matrix.hpp"
 
+//#include "../external_packages/ColPack/ReducedHeader.h"
+
 using namespace std;
 
 namespace CasADi{
@@ -2870,6 +2872,220 @@ namespace CasADi{
     // Return the coloring
     return ret;
   }
+  
+  CRSSparsity CRSSparsityInternal::starColoring2(int ordering, int cutoff) const{
+    
+    
+    // Allocate temporary vectors
+    vector<int> forbiddenColors;
+    forbiddenColors.reserve(nrow_);
+    vector<int> color(nrow_,-1);
+    
+    vector<int> firstNeighborP(nrow_,-1);
+    vector<int> firstNeighborQ(nrow_,-1);
+    
+    vector<bool> treated(nrow_,false);
+    vector<int> hub(size()/2,-1);
+    
+    IMatrix star(shared_from_this<CRSSparsity>(),0);
+    int k = 0;
+    for(int i=0; i<nrow_; ++i){ 
+      for(int j_el=rowind_[i]; j_el<rowind_[i+1]; ++j_el){ 
+        int j = col_[j_el];
+        if (i<j) star.data()[j_el] = k;
+        k++;
+      }
+    }
+    
+    int starID = 0;
+
+    // 3: for each v \in V do
+    for(int v=0; v<nrow_; ++v){ 
+      
+      // 4: for each colored w \in N1(v) do
+      for(int w_el=rowind_[v]; w_el<rowind_[v+1]; ++w_el){ 
+          int w = col_[w_el];
+          int colorW = color[w];
+          if(colorW==-1) continue;
+          
+          // 5: forbiddenColors[color[w]] <- v
+          forbiddenColors[colorW] = v;
+          
+          // 6: (p, q) <- firstNeighbor[color[w]]
+          int p = firstNeighborP[colorW]; 
+          int q = firstNeighborQ[colorW];
+          
+          // 7: if p = v then    <   Case 1
+          if (v==p) { 
+          
+            // 8: if treated[q] = v then
+            if (treated[q]!=v) {
+              
+              // 9: treat(v, q)  < forbid colors of neighbors of q
+              
+                // treat@2: for each colored x \in N1 (q) do
+                for(int x_el=rowind_[q]; x_el<rowind_[q+1]; ++x_el){
+                  int x = col_[x_el];
+                  if(color[x]==-1) continue;
+                  
+                  // treat@3: forbiddenColors[color[x]] <- v
+                  forbiddenColors[color[x]] = v;
+                }
+                
+                // treat@4: treated[q] <- v
+                treated[q] = v;
+
+            }
+            // 10: treat(v, w) < forbid colors of neighbors of w
+            
+              // treat@2: for each colored x \in N1 (w) do
+              for(int x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
+                int x = col_[x_el];
+                if(color[x]==-1) continue;
+                
+                // treat@3: forbiddenColors[color[x]] <- v
+                forbiddenColors[color[x]] = v;
+              }
+              
+              // treat@4: treated[q] <- v
+              treated[w] = v;
+          
+          // 11: else
+          } else {
+            
+            // 12: firstNeighbor[color[w]] <- (v, w)
+            firstNeighborP[colorW] = v;
+            firstNeighborQ[colorW] = w;
+            
+            // 13: for each colored vertex x \in N1 (w) do
+            for(int x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
+              int x = col_[x_el];
+              if(color[x]==-1 or x==v) continue;
+              
+              // 14: if x = hub[star[wx]] then potential Case 2
+              if (hub[star.elem(w,x)]==x) {
+
+                // 15: forbiddenColors[color[w]] <- v
+                forbiddenColors[color[x]] = v;
+          
+              }
+            }
+          }
+          
+      }
+      
+      // 16: color[v] <- min{c > 0 : forbiddenColors[c] != v}
+      bool new_color = true;
+      for(int color_i=0; color_i<forbiddenColors.size(); ++color_i){
+        // Break if color is ok
+        if(forbiddenColors[color_i]!=v){
+          color[v] = color_i;
+          new_color = false;
+          break;
+        }
+      }
+      
+      // New color if reached end
+      if(new_color){
+        color[v] = forbiddenColors.size();
+        forbiddenColors.push_back(-1);
+
+        // Cutoff if too many colors
+        if(forbiddenColors.size()>cutoff){
+          return CRSSparsity();
+        }
+      }
+      
+      // 17: updateStars(v)
+      
+        // updateStars@2: for each colored w \in N1 (v) do
+        for(int w_el=rowind_[v]; w_el<rowind_[v+1]; ++w_el){ 
+            int w = col_[w_el];
+            int colorW = color[w];
+            if(colorW==-1) continue;
+            
+            // updateStars@3: if exits x \in N1 (w) where x = v and color[x] = color[v] then
+            bool check = false;
+            int x;
+            for(int x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
+              x = col_[x_el];
+              if(x==v or color[x]!=color[v]) continue;
+              check = true;
+              break;
+            }
+            if (check) {
+            
+              // updateStars@4: hub[star[wx]] <- w
+              hub[star.elem(w,x)] = w;
+              
+              // updateStars@5: star[vw] <- star[wx]
+              star(v,w) = star.elem(w,x);
+              
+            // updateStars@6: else
+            } else {
+              
+              // updateStars@7: (p, q) <- firstNeighbor[color[w]]
+              int p = firstNeighborP[colorW]; 
+              int q = firstNeighborQ[colorW];
+              
+              // updateStars@8: if (p = v) and (q = w) then
+              if (p==v and q!=w) {
+
+                // updateStars@9: hub[star[vq]] <- v
+                hub[star.elem(v,q)] = v;
+                
+                // updateStars@10: star[vw] <- star[vq]
+                star(v,w) = star.elem(v,q);
+              
+              // updateStars@11: else
+              } else {
+                
+                // updateStars@12: starID <- starID + 1
+                starID+= 1;
+                
+                // updateStars@13: star[vw] <- starID
+                star(v,w) = starID;
+
+              }
+              
+            }
+            
+         }
+      
+    }
+    
+    // Create return sparsity containing the coloring
+    CRSSparsity ret(forbiddenColors.size(),nrow_);
+    vector<int>& rowind = ret.rowindRef();
+    vector<int>& col = ret.colRef();
+  
+    // Get the number of columns for each row
+    for(int i=0; i<color.size(); ++i){
+      rowind[color[i]+1]++;
+    }
+  
+    // Cumsum
+    for(int j=0; j<forbiddenColors.size(); ++j){
+      rowind[j+1] += rowind[j];
+    }
+  
+    // Get column for each row
+    col.resize(color.size());
+    for(int j=0; j<col.size(); ++j){
+      col[rowind[color[j]]++] = j;
+    }
+  
+    // Swap index back one step
+    for(int j=rowind.size()-2; j>=0; --j){
+      rowind[j+1] = rowind[j];
+    }
+    rowind[0] = 0;
+  
+    // Return the coloring
+    return ret;
+    
+  }
+  
 
   CRSSparsity CRSSparsityInternal::starColoring(int ordering, int cutoff) const{
     // Reorder, if necessary
