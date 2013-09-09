@@ -152,6 +152,7 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   message(STATUS "x86_64 architecture detected - setting flag -fPIC")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 
 # Use the included Sundials
@@ -274,7 +275,7 @@ if(WITH_OOQP AND BLAS_FOUND)
 endif()
 add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP (requires BLAS).")
 
-if(WITH_SQIC)
+if(Fortran_language_works AND WITH_SQIC)
   find_package (SQIC)
   set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} ${SQIC_LIBRARIES})
 endif()
