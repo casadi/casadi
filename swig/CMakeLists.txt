@@ -88,7 +88,7 @@ endif()
 
 if(SQIC_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SQIC")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_sqic_interface ${SQIC_LIBRARIES} ${CMAKE_SOURCE_DIR}/interfaces/sqic/libwsqic.a)
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_sqic_interface sqic_fortran_c_bridge ${SQIC_LIBRARIES})
 endif()
 
 
