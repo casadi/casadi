@@ -2875,6 +2875,23 @@ namespace CasADi{
   
   CRSSparsity CRSSparsityInternal::starColoring2(int ordering, int cutoff) const{
     
+    // TODO What we need here, is a distance-2 smallest last ordering
+    // Reorder, if necessary
+    if(ordering!=0){
+      casadi_assert(ordering==1);
+    
+      // Ordering
+      vector<int> ord = largestFirstOrdering();
+
+      // Create a new sparsity pattern 
+      CRSSparsity sp_permuted = pmult(ord,true,true,true);
+    
+      // Star coloring for the permuted matrix
+      CRSSparsity ret_permuted = sp_permuted.starColoring2(0);
+        
+      // Permute result back
+      return ret_permuted.pmult(ord,false,true,false);
+    }
     
     // Allocate temporary vectors
     vector<int> forbiddenColors;
