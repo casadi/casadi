@@ -2985,15 +2985,18 @@ namespace CasADi{
             firstNeighborQ_el[colorW] = w_el;
             
             // 13: for each colored vertex x \in N1 (w) do
-            for(int x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
-              int x = col_[x_el];
-              if(color[x]==-1 || x==v) continue;
+            int x_el_end = rowind_[w+1]; 
+            int x, colorx;
+            for(int x_el=rowind_[w]; x_el < x_el_end; ++x_el){
+              x = col_[x_el];
+              colorx = color[x];
+              if(colorx==-1 || x==v) continue;
               
               // 14: if x = hub[star[wx]] then potential Case 2
               if (hub[star[x_el]]==x) {
 
                 // 15: forbiddenColors[color[x]] <- v
-                forbiddenColors[color[x]] = v;
+                forbiddenColors[colorx] = v;
           
               }
             }
