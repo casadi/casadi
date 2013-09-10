@@ -2883,19 +2883,28 @@ namespace CasADi{
     
     vector<int> firstNeighborP(nrow_,-1);
     vector<int> firstNeighborQ(nrow_,-1);
+    vector<int> firstNeighborQ_el(nrow_,-1);
     
-    vector<bool> treated(nrow_,false);
-    vector<int> hub(size()/2,-1);
+    vector<int> treated(nrow_,-1);
+    vector<int> hub(sizeL(),-1);
+
+    vector<int> Tmapping;
+    transpose(Tmapping);
     
-    IMatrix star(shared_from_this<CRSSparsity>(),0);
+    vector<int> star(size());
     int k = 0;
     for(int i=0; i<nrow_; ++i){ 
       for(int j_el=rowind_[i]; j_el<rowind_[i+1]; ++j_el){ 
         int j = col_[j_el];
-        if (i<j) star.data()[j_el] = k;
-        k++;
+        if (i<j) {
+          star[j_el] = k;
+          star[Tmapping[j]] = k;         
+          k++;
+        }
       }
     }
+    
+
     
     int starID = 0;
 
@@ -2918,7 +2927,7 @@ namespace CasADi{
           // 7: if p = v then    <   Case 1
           if (v==p) { 
           
-            // 8: if treated[q] = v then
+            // 8: if treated[q] != v then
             if (treated[q]!=v) {
               
               // 9: treat(v, q)  < forbid colors of neighbors of q
@@ -2947,7 +2956,7 @@ namespace CasADi{
                 forbiddenColors[color[x]] = v;
               }
               
-              // treat@4: treated[q] <- v
+              // treat@4: treated[w] <- v
               treated[w] = v;
           
           // 11: else
@@ -2956,6 +2965,7 @@ namespace CasADi{
             // 12: firstNeighbor[color[w]] <- (v, w)
             firstNeighborP[colorW] = v;
             firstNeighborQ[colorW] = w;
+            firstNeighborQ_el[colorW] = w_el;
             
             // 13: for each colored vertex x \in N1 (w) do
             for(int x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
@@ -2963,9 +2973,9 @@ namespace CasADi{
               if(color[x]==-1 || x==v) continue;
               
               // 14: if x = hub[star[wx]] then potential Case 2
-              if (hub[star.elem(w,x)]==x) {
+              if (hub[star[x_el]]==x) {
 
-                // 15: forbiddenColors[color[w]] <- v
+                // 15: forbiddenColors[color[x]] <- v
                 forbiddenColors[color[x]] = v;
           
               }
@@ -3007,7 +3017,8 @@ namespace CasADi{
             // updateStars@3: if exits x \in N1 (w) where x = v and color[x] = color[v] then
             bool check = false;
             int x;
-            for(int x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
+            int x_el;
+            for(x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
               x = col_[x_el];
               if(x==v || color[x]!=color[v]) continue;
               check = true;
@@ -3016,10 +3027,12 @@ namespace CasADi{
             if (check) {
             
               // updateStars@4: hub[star[wx]] <- w
-              hub[star.elem(w,x)] = w;
+              int starwx = star[x_el];
+              hub[starwx] = w;
               
               // updateStars@5: star[vw] <- star[wx]
-              star(v,w) = star.elem(w,x);
+              star[w_el]  = starwx;
+              star[Tmapping[w_el]] = starwx;
               
             // updateStars@6: else
             } else {
@@ -3027,15 +3040,18 @@ namespace CasADi{
               // updateStars@7: (p, q) <- firstNeighbor[color[w]]
               int p = firstNeighborP[colorW]; 
               int q = firstNeighborQ[colorW];
+              int q_el = firstNeighborQ_el[colorW];
               
               // updateStars@8: if (p = v) and (q = w) then
               if (p==v && q!=w) {
 
                 // updateStars@9: hub[star[vq]] <- v
-                hub[star.elem(v,q)] = v;
+                int starvq = star[q_el];
+                hub[starvq] = v;
                 
                 // updateStars@10: star[vw] <- star[vq]
-                star(v,w) = star.elem(v,q);
+                star[w_el]  = starvq;
+                star[Tmapping[w_el]] = starvq;
               
               // updateStars@11: else
               } else {
@@ -3044,7 +3060,8 @@ namespace CasADi{
                 starID+= 1;
                 
                 // updateStars@13: star[vw] <- starID
-                star(v,w) = starID;
+                star[w_el] = starID;
+                star[Tmapping[w_el]]= starID;
 
               }
               
