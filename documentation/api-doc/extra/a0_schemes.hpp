@@ -621,6 +621,20 @@
 <br/>
 @copydoc scheme_NLPSolverOutput
 */
+/** \class CasADi::SQICInternal
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/** \class CasADi::SQICSolver
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
 /** \class CasADi::IpoptInternal
 \n
 \par
