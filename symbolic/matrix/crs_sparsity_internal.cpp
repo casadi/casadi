@@ -2960,7 +2960,7 @@ namespace CasADi{
             // 13: for each colored vertex x \in N1 (w) do
             for(int x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
               int x = col_[x_el];
-              if(color[x]==-1 or x==v) continue;
+              if(color[x]==-1 || x==v) continue;
               
               // 14: if x = hub[star[wx]] then potential Case 2
               if (hub[star.elem(w,x)]==x) {
@@ -3009,7 +3009,7 @@ namespace CasADi{
             int x;
             for(int x_el=rowind_[w]; x_el<rowind_[w+1]; ++x_el){
               x = col_[x_el];
-              if(x==v or color[x]!=color[v]) continue;
+              if(x==v || color[x]!=color[v]) continue;
               check = true;
               break;
             }
@@ -3029,7 +3029,7 @@ namespace CasADi{
               int q = firstNeighborQ[colorW];
               
               // updateStars@8: if (p = v) and (q = w) then
-              if (p==v and q!=w) {
+              if (p==v && q!=w) {
 
                 // updateStars@9: hub[star[vq]] <- v
                 hub[star.elem(v,q)] = v;
