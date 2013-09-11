@@ -28,6 +28,9 @@ from math import isnan, isinf
 import itertools
 
 import argparse
+import struct
+
+platform_arch = 8 * struct.calcsize("P")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--known_bugs', help='Run with known bugs', action='store_true')

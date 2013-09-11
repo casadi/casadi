@@ -32,6 +32,7 @@ try:
 except:
 	scipy_available = False
 	
+@run_only(['large_hessian'])
 class SXtests(casadiTestCase):
 
   def setUp(self):
@@ -1227,6 +1228,7 @@ class SXtests(casadiTestCase):
     
     self.checkarray(f.output()[filt],g.output())
     
+  @skip(platform_arch==32)
   @memory_heavy()
   def test_large_hessian(self):
     import pickle
