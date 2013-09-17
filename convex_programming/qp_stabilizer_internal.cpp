@@ -20,7 +20,7 @@
  *
  */
 
-#include "qp_stabilized_qp_internal.hpp"
+#include "qp_stabilizer_internal.hpp"
 
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/fx/sx_function.hpp"
@@ -28,26 +28,26 @@
 using namespace std;
 namespace CasADi {
 
-QPStabilizedQPInternal* QPStabilizedQPInternal::clone() const{
+QPStabilizerInternal* QPStabilizerInternal::clone() const{
   // Return a deep copy
-  QPStabilizedQPInternal* node = new QPStabilizedQPInternal(st_);
+  QPStabilizerInternal* node = new QPStabilizerInternal(st_);
   if(!node->is_init_)
     node->init();
   return node;
 }
   
-QPStabilizedQPInternal::QPStabilizedQPInternal(const std::vector<CRSSparsity> &st) : StabilizedQPSolverInternal(st) {
+QPStabilizerInternal::QPStabilizerInternal(const std::vector<CRSSparsity> &st) : StabilizedQPSolverInternal(st) {
 
   addOption("qp_solver",       OT_QPSOLVER, GenericType(), "The QPSOlver used to solve the Stabilized QPs.");
   addOption("qp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the QPSOlver");
   
 }
 
-QPStabilizedQPInternal::~QPStabilizedQPInternal(){ 
+QPStabilizerInternal::~QPStabilizerInternal(){ 
 }
 
-void QPStabilizedQPInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("QPStabilizedQPInternal::evaluate() not implemented for forward or backward mode");
+void QPStabilizerInternal::evaluate(int nfdir, int nadir) {
+  if (nfdir!=0 || nadir!=0) throw CasadiException("QPStabilizerInternal::evaluate() not implemented for forward or backward mode");
 
     double muR = input(STABILIZED_QP_SOLVER_MUR).at(0);
     std::vector<double> & muE = input(STABILIZED_QP_SOLVER_MUE).data();
@@ -108,7 +108,7 @@ void QPStabilizedQPInternal::evaluate(int nfdir, int nadir) {
     
 }
 
-void QPStabilizedQPInternal::init(){
+void QPStabilizerInternal::init(){
 
   StabilizedQPSolverInternal::init();
 

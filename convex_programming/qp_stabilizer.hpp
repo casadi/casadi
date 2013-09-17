@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef QP_STABILIZED_QP_SOLVER_HPP
-#define QP_STABILIZED_QP_SOLVER_HPP
+#ifndef QP_STABILIZER_HPP
+#define QP_STABILIZER_HPP
 
 #include "symbolic/fx/stabilized_qp_solver.hpp"
 
@@ -29,7 +29,7 @@ namespace CasADi {
   
   
 // Forward declaration of internal class 
-class QPStabilizedQPInternal;
+class QPStabilizerInternal;
 
   /** \brief IPOPT QP Solver for quadratic programming
 
@@ -38,22 +38,22 @@ class QPStabilizedQPInternal;
    \author Joris Gillis
    \date 2013
   */
-class QPStabilizedQPSolver : public StabilizedQPSolver {
+class QPStabilizer : public StabilizedQPSolver {
 public:
 
   /** \brief  Default constructor */
-  QPStabilizedQPSolver();
+  QPStabilizer();
   
   
   /** \brief Constructor
   *  \param st Problem structure
   *  \copydoc scheme_QPStruct
   */
-  explicit QPStabilizedQPSolver(const QPStructure & st);
+  explicit QPStabilizer(const QPStructure & st);
   
   /** \brief  Access functions of the node */
-  QPStabilizedQPInternal* operator->();
-  const QPStabilizedQPInternal* operator->() const;
+  QPStabilizerInternal* operator->();
+  const QPStabilizerInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
@@ -62,7 +62,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static StabilizedQPSolver creator(const QPStructure & st){ return QPStabilizedQPSolver(st);}
+  static StabilizedQPSolver creator(const QPStructure & st){ return QPStabilizer(st);}
   #ifdef SWIG
   %nocallback;
   #endif
@@ -75,5 +75,5 @@ public:
 
 } // namespace CasADi
 
-#endif //QP_STABILIZED_QP_SOLVER_HPP
+#endif //QP_STABILIZER_HPP
 

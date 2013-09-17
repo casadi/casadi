@@ -20,42 +20,35 @@
  *
  */
 
-#ifndef QP_STABILIZED_QP_INTERNAL_HPP
-#define QP_STABILIZED_QP_INTERNAL_HPP
+#include "qp_stabilizer_internal.hpp"
+#include "qp_stabilizer.hpp"
 
-#include "symbolic/fx/stabilized_qp_solver_internal.hpp"
-#include "symbolic/fx/stabilized_qp_solver.hpp"
-
+using namespace std;
 namespace CasADi{
 
-  /** \brief Internal class for QPStabilizedQPInternal
-   * 
-      @copydoc StabilizedQPSolver_doc
-   * */
-class QPStabilizedQPInternal : public StabilizedQPSolverInternal {
-  friend class QPStabilizedQPSolver;
-public:
+QPStabilizer::QPStabilizer(){ 
+}
 
-  /** \brief  Clone */
-  virtual QPStabilizedQPInternal* clone() const;
-  
-  /** \brief  Create a new Solver */
-  explicit QPStabilizedQPInternal(const std::vector<CRSSparsity> &st);
 
-  /** \brief  Destructor */
-  virtual ~QPStabilizedQPInternal();
+QPStabilizer::QPStabilizer(const QPStructure & st)  {
+  assignNode(new QPStabilizerInternal(st));
+}
 
-  /** \brief  Initialize */
-  virtual void init();
-  
-  virtual void evaluate(int nfdir, int nadir);
-  
-  protected:
-    QPSolver qp_solver_;
+QPStabilizerInternal* QPStabilizer::operator->(){
+  return (QPStabilizerInternal*)(FX::operator->());
+}
 
-};
+const QPStabilizerInternal* QPStabilizer::operator->() const{
+  return (const QPStabilizerInternal*)(FX::operator->());
+
+}
+
+bool QPStabilizer::checkNode() const{
+  return dynamic_cast<const QPStabilizerInternal*>(get());
+}
+
+QPSolver & QPStabilizer::getSolver() {
+  return (*this)->qp_solver_;
+}
 
 } // namespace CasADi
-
-#endif //QP_STABILIZED_QP_INTERNAL_HPP
-

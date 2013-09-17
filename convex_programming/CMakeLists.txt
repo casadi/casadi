@@ -3,7 +3,7 @@ SET(CONVEX_PROGRAMMING_SRCS
  qp_lp_solver.cpp     qp_lp_solver.hpp     qp_lp_internal.cpp     qp_lp_internal.hpp
  qcqp_qp_solver.cpp   qcqp_qp_solver.hpp   qcqp_qp_internal.cpp   qcqp_qp_internal.hpp
  sdp_socp_solver.cpp  sdp_socp_solver.hpp  sdp_socp_internal.cpp  sdp_socp_internal.hpp
- qp_stabilized_qp_solver.cpp     qp_stabilized_qp_solver.hpp     qp_stabilized_qp_internal.cpp     qp_stabilized_qp_internal.hpp
+ qp_stabilizer.cpp    qp_stabilizer.hpp    qp_stabilizer_internal.cpp      qp_stabilizer_internal.hpp
 )
 
 if(WITH_CSPARSE)

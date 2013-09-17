@@ -24,7 +24,7 @@
 #include <interfaces/sqic/stabilized_sqic_solver.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include <nonlinear_programming/stabilized_sqp_method.hpp>
-#include <convex_programming/qp_stabilized_qp_solver.hpp>
+#include <convex_programming/qp_stabilizer.hpp>
 #include <nonlinear_programming/nlp_qp_solver.hpp>
 #include <nonlinear_programming/symbolic_nlp.hpp>
  
@@ -64,7 +64,7 @@ int main(int argc, char **argv){
 
   /// Unstabilized SQIC Solver
   
-  nlp_solver.setOption("stabilized_qp_solver",QPStabilizedQPSolver::creator);
+  nlp_solver.setOption("stabilized_qp_solver",QPStabilizer::creator);
   Dictionary stabilized_qp_solver_options;
   stabilized_qp_solver_options["qp_solver"] = SQICSolver::creator;
   nlp_solver.setOption("stabilized_qp_solver_options",stabilized_qp_solver_options);
@@ -75,9 +75,10 @@ int main(int argc, char **argv){
   
   /// Ipopt QP Solver 
   
-  
-  /**   
-  
+    
+  /**
+  nlp_solver.setOption("stabilized_qp_solver",QPStabilizer::creator);
+  Dictionary stabilized_qp_solver_options;
   stabilized_qp_solver_options["qp_solver"] = NLPQPSolver::creator;
   Dictionary qp_solver_options;
   qp_solver_options["nlp_solver"]= IpoptSolver::creator;
@@ -92,7 +93,7 @@ int main(int argc, char **argv){
   stabilized_qp_solver_options["qp_solver_options"] = qp_solver_options;
   nlp_solver.setOption("stabilized_qp_solver_options",stabilized_qp_solver_options);
   */
- 
+  
   // Initialize NLP solver
   nlp_solver.init();
 
