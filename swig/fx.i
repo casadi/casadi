@@ -112,7 +112,7 @@
 %include "symbolic/fx/control_simulator.hpp"
 %include "symbolic/fx/nlp_solver.hpp"
 %include "symbolic/fx/qp_solver.hpp"
-%include "symbolic/fx/stabilzed_qp_solver.hpp"
+%include "symbolic/fx/stabilized_qp_solver.hpp"
 %include "symbolic/fx/lp_solver.hpp"
 %include "symbolic/fx/ocp_solver.hpp"
 %include "symbolic/fx/sdp_solver.hpp"
