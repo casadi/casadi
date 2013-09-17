@@ -41,8 +41,8 @@ namespace CasADi{
     addOption("stabilized_qp_solver",         OT_STABILIZEDQPSOLVER,   GenericType(),    "The Stabilized QP solver to be used by the SQP method");
     addOption("stabilized_qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the Stabilized QP solver");
     addOption("hessian_approximation", OT_STRING, "exact",          "limited-memory|exact");
-    addOption("max_iter",           OT_INTEGER,      50,            "Maximum number of SQP iterations");
-    addOption("max_iter_ls",        OT_INTEGER,       3,            "Maximum number of linesearch iterations");
+    addOption("max_iter",           OT_INTEGER,     100,            "Maximum number of SQP iterations");
+    addOption("max_iter_ls",        OT_INTEGER,      20,            "Maximum number of linesearch iterations");
     addOption("tol_pr",            OT_REAL,       1e-5,             "Stopping criterion for primal infeasibility");
     addOption("tol_du",            OT_REAL,       1e-5,             "Stopping criterion for dual infeasability");
     addOption("c1",                OT_REAL,       0.001,             "Armijo condition, coefficient of decrease in merit");
