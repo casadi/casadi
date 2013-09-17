@@ -8,6 +8,10 @@ set(SQIC_INTERFACE_SRCS
   sqic_internal.cpp
   sqic_solver.hpp
   sqic_solver.cpp
+  stabilized_sqic_internal.hpp
+  stabilized_sqic_internal.cpp
+  stabilized_sqic_solver.hpp
+  stabilized_sqic_solver.cpp
 )
 
 set(CASADI_DEPENDENCIES ${CMAKE_DL_LIBS})

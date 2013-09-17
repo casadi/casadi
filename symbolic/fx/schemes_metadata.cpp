@@ -70,6 +70,7 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_SOCPInput: return "SOCPInput";
     case SCHEME_SOCPOutput: return "SOCPOutput";
     case SCHEME_SOCPStruct: return "SOCPStruct";
+    case SCHEME_StabilizedQPSolverInput: return "StabilizedQPSolverInput";
   }
 }
 std::string getSchemeEntryNames(InputOutputScheme scheme) {
@@ -118,6 +119,7 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_SOCPInput: return "g, h, e, f, c, a, lba, uba, lbx, ubx";
     case SCHEME_SOCPOutput: return "x, cost, lam_a, lam_x";
     case SCHEME_SOCPStruct: return "g, a";
+    case SCHEME_StabilizedQPSolverInput: return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu";
   }
 }
 std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
@@ -432,6 +434,20 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
     case SCHEME_SOCPStruct: 
       if(i==0) return "g";
       if(i==1) return "a";
+      break;
+    case SCHEME_StabilizedQPSolverInput: 
+      if(i==0) return "h";
+      if(i==1) return "g";
+      if(i==2) return "a";
+      if(i==3) return "lba";
+      if(i==4) return "uba";
+      if(i==5) return "lbx";
+      if(i==6) return "ubx";
+      if(i==7) return "x0";
+      if(i==8) return "lam_x0";
+      if(i==9) return "muR";
+      if(i==10) return "muE";
+      if(i==11) return "mu";
       break;
   }
   casadi_error("getSchemeEntryName: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");
@@ -749,6 +765,20 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==0) return "The vertical stack of all matrices Gi: ( N x n)";
       if(i==1) return "The matrix A: ( nc x n)";
       break;
+    case SCHEME_StabilizedQPSolverInput: 
+      if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
+      if(i==1) return "The vector g: dense,  (n x 1)";
+      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
+      if(i==3) return "dense, (nc x 1)";
+      if(i==4) return "dense, (nc x 1)";
+      if(i==5) return "dense, (n x 1)";
+      if(i==6) return "dense, (n x 1)";
+      if(i==7) return "dense, (n x 1)";
+      if(i==8) return "dense";
+      if(i==9) return "dense (1 x 1)";
+      if(i==10) return "dense (nc x 1)";
+      if(i==11) return "dense (nc x 1)";
+      break;
   }
   casadi_error("getSchemeEntryDoc: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");
 }
@@ -1065,6 +1095,20 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==0) return "SOCP_STRUCT_G";
       if(i==1) return "SOCP_STRUCT_A";
       break;
+    case SCHEME_StabilizedQPSolverInput: 
+      if(i==0) return "STABILIZED_QP_SOLVER_H";
+      if(i==1) return "STABILIZED_QP_SOLVER_G";
+      if(i==2) return "STABILIZED_QP_SOLVER_A";
+      if(i==3) return "STABILIZED_QP_SOLVER_LBA";
+      if(i==4) return "STABILIZED_QP_SOLVER_UBA";
+      if(i==5) return "STABILIZED_QP_SOLVER_LBX";
+      if(i==6) return "STABILIZED_QP_SOLVER_UBX";
+      if(i==7) return "STABILIZED_QP_SOLVER_X0";
+      if(i==8) return "STABILIZED_QP_SOLVER_LAM_X0";
+      if(i==9) return "STABILIZED_QP_SOLVER_MUR";
+      if(i==10) return "STABILIZED_QP_SOLVER_MUE";
+      if(i==11) return "STABILIZED_QP_SOLVER_MU";
+      break;
   }
   casadi_error("getSchemeEntryEnumName: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");
 }
@@ -1201,6 +1245,9 @@ int getSchemeSize(InputOutputScheme scheme) {
       break;
     case SCHEME_SOCPStruct: 
       return 2;
+      break;
+    case SCHEME_StabilizedQPSolverInput: 
+      return 12;
       break;
   }
 }
@@ -1516,6 +1563,20 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
     case SCHEME_SOCPStruct: 
       if(name=="g") return 0;
       if(name=="a") return 1;
+      break;
+    case SCHEME_StabilizedQPSolverInput: 
+      if(name=="h") return 0;
+      if(name=="g") return 1;
+      if(name=="a") return 2;
+      if(name=="lba") return 3;
+      if(name=="uba") return 4;
+      if(name=="lbx") return 5;
+      if(name=="ubx") return 6;
+      if(name=="x0") return 7;
+      if(name=="lam_x0") return 8;
+      if(name=="muR") return 9;
+      if(name=="muE") return 10;
+      if(name=="mu") return 11;
       break;
   }
   casadi_error("getSchemeEntryEnum: Scheme '" << getSchemeName(scheme) <<  "' has no entry named '" << name <<  "'. Available entries are: " << getSchemeEntryNames(scheme) << ".");

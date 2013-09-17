@@ -23,6 +23,13 @@ extern "C" {
   extern void sqicSolve(
    double* Obj // Output: hessian part of the resulting objective
   );
- 
+  
+  extern void sqicSolveStabilized(
+   double* Obj, // Output: hessian part of the resulting objective
+   double *mu,
+   int *lenpi,
+   double* piE
+  );
+  
   extern void sqicDestroy();
 }

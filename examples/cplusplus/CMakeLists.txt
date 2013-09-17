@@ -52,6 +52,14 @@ if(IPOPT_FOUND)
 
 endif()
 
+if(SQIC_FOUND)
+  add_executable(stabilized_sqpmethod_nl stabilized_sqpmethod_nl.cpp)
+  target_link_libraries(stabilized_sqpmethod_nl 
+    casadi_ipopt_interface casadi_nonlinear_programming casadi 
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES} casadi_sqic_interface sqic_fortran_c_bridge ${SQIC_LIBRARIES} casadi_convex_programming
+  )
+endif()
+
 # Parse AMPL models and solve with Worhp
 if(WORHP_FOUND AND IPOPT_FOUND)
   add_executable(worhp_nl worhp_nl.cpp)

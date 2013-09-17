@@ -52,6 +52,7 @@ namespace CasADi{
   class LinearSolver;
   class Integrator;
   class QPSolver;
+  class StabilizedQPSolver;
   class QCQPSolver;
   class LPSolver;
   class SDPSolver;
@@ -73,6 +74,9 @@ namespace CasADi{
 
   /// Function pointer to a QP solver creator function
   typedef QPSolver (*QPSolverCreator)(const QPStructure& st);
+  
+  /// Function pointer to a Stabilized QP solver creator function
+  typedef StabilizedQPSolver (*StabilizedQPSolverCreator)(const QPStructure& st);
 
   /// Function pointer to a QCQP solver creator function
   typedef QCQPSolver (*QCQPSolverCreator)(const QCQPStructure& st);

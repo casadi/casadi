@@ -1760,6 +1760,59 @@ std::vector<M> socpStruct(const std::vector<M>& args,const std::string arg_s0=""
   return ret;
 
 }
+/// Helper function for 'StabilizedQPSolverInput'
+
+template<class M>
+class StabilizedQPSolverInputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit StabilizedQPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_StabilizedQPSolverInput){} 
+};
+/// Input arguments of a QP problem
+/// 
+/// \copydoc scheme_StabilizedQPSolverInput
+template<class M>
+StabilizedQPSolverInputIOSchemeVector<M> stabilizedQpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M()){
+  std::vector<M> ret(12);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
+  if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
+  if (arg_s7!="") arg.insert(make_pair(arg_s7,arg_m7));
+  if (arg_s8!="") arg.insert(make_pair(arg_s8,arg_m8));
+  if (arg_s9!="") arg.insert(make_pair(arg_s9,arg_m9));
+  if (arg_s10!="") arg.insert(make_pair(arg_s10,arg_m10));
+  if (arg_s11!="") arg.insert(make_pair(arg_s11,arg_m11));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in StabilizedQPSolverInput: '" << it->first << "' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu");
+    ret[n] = it->second;
+  }
+  return StabilizedQPSolverInputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> stabilizedQpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8="",const std::string arg_s9="",const std::string arg_s10="",const std::string arg_s11=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s7)));
+  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s8)));
+  if (arg_s9!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s9)));
+  if (arg_s10!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s10)));
+  if (arg_s11!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s11)));
+  return ret;
+
+}
 
 /// Helper function for 'customIO'
 template<class M>

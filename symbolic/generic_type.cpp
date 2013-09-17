@@ -109,6 +109,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_INTEGRATOR";
       case OT_QPSOLVER:
               return "OT_QPSOLVER";
+      case OT_STABILIZEDQPSOLVER:
+              return "OT_STABILIZEDQPSOLVER";
       case OT_QCQPSOLVER:
               return "OT_QCQPSOLVER";
       case OT_SOCPSOLVER:
@@ -367,6 +369,10 @@ GenericType::GenericType(QPSolverCreator ptr) : type_(OT_QPSOLVER) {
   assignNode(new GenericTypeInternal<QPSolverCreator>(ptr));
 }
 
+GenericType::GenericType(StabilizedQPSolverCreator ptr) : type_(OT_STABILIZEDQPSOLVER) {
+  assignNode(new GenericTypeInternal<StabilizedQPSolverCreator>(ptr));
+}
+
 GenericType::GenericType(LPSolverCreator ptr) : type_(OT_LPSOLVER) {
   assignNode(new GenericTypeInternal<LPSolverCreator>(ptr));
 }
@@ -441,6 +447,11 @@ GenericType::operator integratorCreator() const{
 GenericType::operator QPSolverCreator() const{
   casadi_assert_message(is_a<QPSolverCreator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<QPSolverCreator>*>(get())->d_;
+}
+
+GenericType::operator StabilizedQPSolverCreator() const{
+  casadi_assert_message(is_a<StabilizedQPSolverCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<StabilizedQPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator implicitFunctionCreator() const{

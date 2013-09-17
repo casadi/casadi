@@ -20,20 +20,31 @@
  *
  */
 
-%{
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/stabilized_sqp_method.hpp"
-#include "nonlinear_programming/scpgen.hpp"
-#include "nonlinear_programming/nlp_qp_solver.hpp"
-#include "nonlinear_programming/nlp_implicit_solver.hpp"
-#include "nonlinear_programming/newton_implicit_solver.hpp"
-%}
+#include "stabilized_sqic_internal.hpp"
+#include "stabilized_sqic_solver.hpp"
 
-%include "nonlinear_programming/symbolic_nlp.hpp"
-%include "nonlinear_programming/sqp_method.hpp"
-%include "nonlinear_programming/stabilized_sqp_method.hpp"
-%include "nonlinear_programming/scpgen.hpp"
-%include "nonlinear_programming/nlp_qp_solver.hpp"
-%include "nonlinear_programming/nlp_implicit_solver.hpp"
-%include "nonlinear_programming/newton_implicit_solver.hpp"
+using namespace std;
+namespace CasADi{
+
+StabilizedSQICSolver::StabilizedSQICSolver(){ 
+}
+
+
+StabilizedSQICSolver::StabilizedSQICSolver(const QPStructure& st)  {
+  assignNode(new StabilizedSQICInternal(st));
+}
+
+StabilizedSQICInternal* StabilizedSQICSolver::operator->(){
+  return (StabilizedSQICInternal*)(FX::operator->());
+}
+
+const StabilizedSQICInternal* StabilizedSQICSolver::operator->() const{
+  return (const StabilizedSQICInternal*)(FX::operator->());
+
+}
+
+bool StabilizedSQICSolver::checkNode() const{
+  return dynamic_cast<const StabilizedSQICInternal*>(get());
+}
+
+} // namespace CasADi

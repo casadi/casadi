@@ -20,20 +20,37 @@
  *
  */
 
-%{
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/stabilized_sqp_method.hpp"
-#include "nonlinear_programming/scpgen.hpp"
-#include "nonlinear_programming/nlp_qp_solver.hpp"
-#include "nonlinear_programming/nlp_implicit_solver.hpp"
-#include "nonlinear_programming/newton_implicit_solver.hpp"
-%}
+#include "stabilized_sqp_internal.hpp"
 
-%include "nonlinear_programming/symbolic_nlp.hpp"
-%include "nonlinear_programming/sqp_method.hpp"
-%include "nonlinear_programming/stabilized_sqp_method.hpp"
-%include "nonlinear_programming/scpgen.hpp"
-%include "nonlinear_programming/nlp_qp_solver.hpp"
-%include "nonlinear_programming/nlp_implicit_solver.hpp"
-%include "nonlinear_programming/newton_implicit_solver.hpp"
+using namespace std;
+
+namespace CasADi{
+
+  StabilizedSQPMethod::StabilizedSQPMethod(){
+  }
+  
+  StabilizedSQPMethod::StabilizedSQPMethod(const FX& F, const FX& G){
+    assignNode(new StabilizedSQPInternal(joinFG(F,G)));
+  }
+
+  StabilizedSQPMethod::StabilizedSQPMethod(const FX& nlp){
+    assignNode(new StabilizedSQPInternal(nlp));
+  }
+
+  StabilizedSQPInternal* StabilizedSQPMethod::operator->(){
+    return static_cast<StabilizedSQPInternal*>(NLPSolver::operator->());
+  }
+
+  const StabilizedSQPInternal* StabilizedSQPMethod::operator->() const{
+    return static_cast<const StabilizedSQPInternal*>(NLPSolver::operator->());
+  }
+    
+  bool StabilizedSQPMethod::checkNode() const{
+    return dynamic_cast<const StabilizedSQPInternal*>(get())!=0;
+  }
+
+  const StabilizedQPSolver StabilizedSQPMethod::getStabilizedQPSolver() const {
+    return (*this)->getStabilizedQPSolver();
+  }
+
+} // namespace CasADi

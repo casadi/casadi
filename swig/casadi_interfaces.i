@@ -31,8 +31,10 @@
 #ifdef WITH_SQIC
 %{
 #include "interfaces/sqic/sqic_solver.hpp"
+#include "interfaces/sqic/stabilized_sqic_solver.hpp"
 %}
 %include "interfaces/sqic/sqic_solver.hpp"
+%include "interfaces/sqic/stabilized_sqic_solver.hpp"
 #endif
 
 // IPOPT

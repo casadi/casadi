@@ -74,10 +74,29 @@ subroutine sqicSolve (Obj)  bind ( C, name="sqicSolve" )
 
   real(rp)                  :: Obj, sInf
   
+  
   ! Solve the QP.
   call QP%solve ( 'Cold', INFO, nS, nInf, sInf, Obj )
   
 end subroutine sqicSolve
+
+
+subroutine sqicSolveStabilized (Obj,mu,lenpi,piE)  bind ( C, name="sqicSolveStabilized" )
+  use snModulePrecision, only : ip, rp
+  use SQICModule 
+  
+  implicit none
+
+  integer                   :: INFO
+  integer(ip)               :: nS, nInf, lenpi
+
+  real(rp)                  :: Obj, sInf, mu, piE(lenpi)
+  
+  ! Solve the QP.
+  call QP%solveR ( 'Cold', mu, lenpi, piE, INFO, nS, nInf, sInf, Obj )
+  
+end subroutine sqicSolveStabilized
+
 
 subroutine sqicDestroy ()  bind ( C, name="sqicDestroy" )
   use SQICModule 
