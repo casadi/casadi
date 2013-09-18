@@ -49,3 +49,7 @@ endif()
 if(SQIC_FOUND)
   add_subdirectory(sqic)
 endif()
+
+if(SNOPT_FOUND)
+  add_subdirectory(snopt)
+endif()

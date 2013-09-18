@@ -119,3 +119,11 @@
 %}
 %include "interfaces/worhp/worhp_solver.hpp"
 #endif
+
+
+#ifdef WITH_SNOPT
+%{
+#include "interfaces/snopt/snopt_solver.hpp"
+%}
+%include "interfaces/snopt/snopt_solver.hpp"
+#endif
