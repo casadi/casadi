@@ -653,6 +653,20 @@
 <br/>
 @copydoc scheme_QPSolverOutput
 */
+/** \class CasADi::SnoptInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/** \class CasADi::SnoptSolver
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
 /** \class CasADi::IpoptInternal
 \n
 \par
