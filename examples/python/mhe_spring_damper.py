@@ -30,6 +30,8 @@ from casadi.tools import *
 from scipy import linalg, matrix
 plt.interactive(True)
 
+NP.random.seed(0)
+
 # Settings of the filter
 N = 10 # Horizon length
 dt = 0.05; # Time step
@@ -175,7 +177,7 @@ nlp_solver.setInput(initialisation_state,"x0")
 
 nlp_solver.solve()
 # Get the solution
-solution = shooting(nlp_solver.getOutput("x"))
+solution = shooting(nlp_solver.output("x"))
 estimated_X[:,0:N] = solution["X",horzcat]
 estimated_W[:,0:N-1] = solution["W",horzcat]
 
@@ -247,3 +249,4 @@ plt.show()
 
 error = estimated_X[0,:]-simulated_X[0,:]
 print mul(error,error.T)
+assert(mul(error,error.T)<0.01)
