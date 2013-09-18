@@ -229,14 +229,32 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Input scheme: CasADi::InputOutputScheme  ( = 44) []</caption>
+<caption>Input scheme: CasADi::InputOutputScheme  ( = 45) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Output scheme: CasADi::InputOutputScheme  ( = 44) []</caption>
+<caption>Output scheme: CasADi::InputOutputScheme  ( = 45) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+</table>
+*/
+/** \defgroup scheme_StabilizedQPSolverInput
+<a name='schemes'></a><table>
+<caption>Input scheme: CasADi::StabilizedQPSolverInput  (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>STABILIZED_QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. .</td></tr>
+<tr><td>STABILIZED_QP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
+<tr><td>STABILIZED_QP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
+<tr><td>STABILIZED_QP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_UBA</td><td>uba</td><td>dense, (nc x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_LBX</td><td>lbx</td><td>dense, (n x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_X0</td><td>x0</td><td>dense, (n x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_MUR</td><td>muR</td><td>dense (1 x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_MUE</td><td>muE</td><td>dense (nc x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_MU</td><td>mu</td><td>dense (nc x 1) </td></tr>
 </table>
 */
 /** \defgroup scheme_GradFInput
@@ -649,6 +667,20 @@
 <br/>
 @copydoc scheme_NLPSolverOutput
 */
+/** \class CasADi::QPStabilizerInternal
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/** \class CasADi::QPStabilizer
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
 /** \class CasADi::SDPSolverInternal
 \n
 \par
@@ -676,6 +708,20 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::StabilizedSQPInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/** \class CasADi::StabilizedSQPMethod
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
 */
 /** \class CasADi::AcadoIntegratorInternal
 \n
@@ -788,6 +834,20 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::StabilizedSQICInternal
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/** \class CasADi::StabilizedSQICSolver
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
 */
 /** \class CasADi::SQPInternal
 \n
@@ -956,6 +1016,20 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::StabilizedQPSolverInternal
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/** \class CasADi::StabilizedQPSolver
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
 */
 /** \class CasADi::ControlSimulatorInternal
 \n

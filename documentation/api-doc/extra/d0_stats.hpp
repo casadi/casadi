@@ -192,6 +192,26 @@
 <tr><td>return_status</td><td>CasADi::NewtonImplicitInternal</td></tr>
 </table>
 */
+/** \class CasADi::StabilizedSQPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iter_count</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>return_status</td><td>CasADi::StabilizedSQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::StabilizedSQPMethod
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iter_count</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>return_status</td><td>CasADi::StabilizedSQPInternal</td></tr>
+</table>
+*/
 /** \class CasADi::IntegratorInternal
 \n
 \par
