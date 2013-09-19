@@ -2212,6 +2212,22 @@ class MXtests(casadiTestCase):
     self.checkarray(V[1],DMatrix([[0,0,0],[1,2,0],[3,4,5],[6,7,8],[10,11,12]]))
     self.checkarray(V[2],DMatrix([[0,0],[0,0],[0,0],[9,0],[13,14]]))
     
+  def test_blocksplit(self):
+    a = msym("X",sp_tril(5))
+    v = blocksplit(a,[0,2,4],[0,1,3])
+    
+    fs = [MXFunction([a],vr) for vr in v]
+    for f in fs:
+      f.init()
+      f.setInput(range(5*6/2))
+
+      f.evaluate()
+    v = [[fs[i].output(j) for j in range(3)] for i in range(3)]
+    
+    self.checkarray(v[0][0],DMatrix([0,1]))
+    self.checkarray(v[0][1],DMatrix([[0,0],[2,0]]))
+    self.checkarray(v[1][0],DMatrix([3,6]))
+    self.checkarray(blockcat(v),f.input())
     
 if __name__ == '__main__':
     unittest.main()

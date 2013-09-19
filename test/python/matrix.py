@@ -936,6 +936,16 @@ class Matrixtests(casadiTestCase):
     self.checkarray(v[1],DMatrix([[0,0,0],[1,2,0],[3,4,5],[6,7,8],[10,11,12]]))
     self.checkarray(v[2],DMatrix([[0,0],[0,0],[0,0],[9,0],[13,14]]))
     
+  def test_blocksplit(self):
+    a = DMatrix(sp_tril(5),range(5*6/2))
+    v = blocksplit(a,[0,2,4],[0,1,3])
+    
+    self.checkarray(v[0][0],DMatrix([0,1]))
+    self.checkarray(v[0][1],DMatrix([[0,0],[2,0]]))
+    self.checkarray(v[1][0],DMatrix([3,6]))
+    self.checkarray(blockcat(v),a)
+    
+   
 if __name__ == '__main__':
     unittest.main()
 

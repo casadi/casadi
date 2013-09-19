@@ -212,6 +212,25 @@ std::vector<Matrix<T> > horzsplit(const Matrix<T> &v, const std::vector<int>& of
 template<class T>
 std::vector<Matrix<T> > horzsplit(const Matrix<T> &v, int incr=1);
 
+
+/** \brief  chop up into blocks
+* \brief vert_offset Defines the boundaries of the block rows
+* \brief horz_offset Defines the boundaries of the block columns
+*
+*   blockcat(blocksplit(x,...,...)) = x
+*/
+template<class T>
+std::vector< std::vector< Matrix<T> > > blocksplit(const Matrix<T>& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
+
+/** \brief  chop up into blocks
+* \brief vert_incr Defines the increment for block boundaries in row dimension
+* \brief horz_incr Defines the increment for block boundaries in column dimension
+*
+*   blockcat(blocksplit(x,...,...)) = x
+*/
+template<class T>
+std::vector< std::vector< Matrix<T> > > blocksplit(const Matrix<T>& x, int vert_incr = 1, int horz_incr = 1);
+
 #ifndef SWIG
 template<class T>
 Matrix<T> vertcat(const Matrix<T> &x, const Matrix<T> &y);
@@ -800,6 +819,23 @@ template<class T>
 std::vector< Matrix<T> > horzsplit(const Matrix<T>& x, int incr){
     casadi_assert(incr>=1);
     return horzsplit(x,range(0,x.size2(),incr));
+}
+
+template<class T>
+std::vector< std::vector< Matrix<T> > > blocksplit(const Matrix<T>& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) {
+  std::vector< Matrix<T> > rows = vertsplit(x,vert_offset);
+  std::vector< std::vector< Matrix<T> > > ret;
+  for (int i=0;i<rows.size();++i) {
+    ret.push_back(horzsplit(rows[i],horz_offset));
+  }
+  return ret;
+}
+
+template<class T>
+std::vector< std::vector< Matrix<T> > > blocksplit(const Matrix<T>& x, int vert_incr, int horz_incr) {
+  casadi_assert(horz_incr>=1);
+  casadi_assert(vert_incr>=1);
+  return blocksplit(x,range(0,x.size1(),vert_incr),range(0,x.size2(),horz_incr));
 }
 
 template<class T>
@@ -1396,6 +1432,7 @@ MTT_INST(T,vec) \
 MTT_INST(T,flatten) \
 MTT_INST(T,vecNZ) \
 MTT_INST(T,blockcat) \
+MTT_INST(T,blocksplit) \
 MTT_INST(T,horzcat) \
 MTT_INST(T,horzsplit) \
 MTT_INST(T,vertcat) \

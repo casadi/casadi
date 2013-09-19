@@ -73,8 +73,27 @@ namespace CasADi{
   */
   std::vector<MX> horzsplit(const MX& x, int incr=1);
   
-  /** \brief Construct a matrix from a list of list of blocks.*/
+  /** \brief Construct a matrix from a list of list of blocks.
+  *
+  *   blockcat(blocksplit(x,...,...)) = x
+  */
   MX blockcat(const std::vector< std::vector<MX > > &v);
+  
+  /** \brief  chop up into blocks
+  * \brief vert_offset Defines the boundaries of the block rows
+  * \brief horz_offset Defines the boundaries of the block columns
+  *
+  *   blockcat(blocksplit(x,...,...)) = x
+  */
+  std::vector< std::vector<MX > > blocksplit(const MX& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
+
+  /** \brief  chop up into blocks
+  * \brief vert_incr Defines the increment for block boundaries in row dimension
+  * \brief horz_incr Defines the increment for block boundaries in column dimension
+  *
+  *   blockcat(blocksplit(x,...,...)) = x
+  */
+  std::vector< std::vector<MX > > blocksplit(const MX& x, int vert_incr = 1, int horz_incr = 1);
 
 #ifndef SWIG
   /** \brief Construct a matrix from a list of list of blocks.*/

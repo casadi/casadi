@@ -72,6 +72,21 @@ namespace CasADi{
     casadi_assert(incr>=1);
     return horzsplit(x,range(0,x.size2(),incr));
   }
+  
+  std::vector< std::vector<MX > > blocksplit(const MX& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) {
+    std::vector<MX > rows = vertsplit(x,vert_offset);
+    std::vector< std::vector<MX > > ret;
+    for (int i=0;i<rows.size();++i) {
+      ret.push_back(horzsplit(rows[i],horz_offset));
+    }
+    return ret;
+  }
+  
+  std::vector< std::vector<MX > > blocksplit(const MX& x, int vert_incr, int horz_incr) {
+    casadi_assert(horz_incr>=1);
+    casadi_assert(vert_incr>=1);
+    return blocksplit(x,range(0,x.size1(),vert_incr),range(0,x.size2(),horz_incr));
+  }
 
   MX vertcat(const MX& a, const MX& b){
     vector<MX> ab;
