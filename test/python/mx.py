@@ -2092,7 +2092,68 @@ class MXtests(casadiTestCase):
   def test_mul_zero_wrong(self):
     with self.assertRaises(RuntimeError):
       mul(msym("X",4,5),MX.zeros(3,2))
+      
+  def test_vertsplit(self):
+    a = msym("X",sp_tril(5))
+    v = vertsplit(a,[0,2,4])
+    
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
 
+    f.evaluate()
+    v = [f.output(i) for i in range(len(v))]
+    
+    self.assertEqual(len(v),3)
+    self.checkarray(v[0],DMatrix([[0,0,0,0,0],[1,2,0,0,0]]))
+    self.checkarray(v[1],DMatrix([[3,4,5,0,0],[6,7,8,9,0]]))
+    self.checkarray(v[2],DMatrix([[10,11,12,13,14]]))
+    
+    v = vertsplit(a)
+    
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
+
+    f.evaluate()
+    v = [f.output(i) for i in range(len(v))]
+    
+    self.assertEqual(len(v),a.size1())
+    self.checkarray(v[0],DMatrix([[0,0,0,0,0]]))
+    self.checkarray(v[1],DMatrix([[1,2,0,0,0]]))
+    self.checkarray(v[2],DMatrix([[3,4,5,0,0]]))
+    self.checkarray(v[3],DMatrix([[6,7,8,9,0]]))
+    self.checkarray(v[4],DMatrix([[10,11,12,13,14]]))
+    
+    v = vertsplit(a,2)
+    
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
+
+    f.evaluate()
+    v = [f.output(i) for i in range(len(v))]
+    
+    self.assertEqual(len(v),3)
+    self.checkarray(v[0],DMatrix([[0,0,0,0,0],[1,2,0,0,0]]))
+    self.checkarray(v[1],DMatrix([[3,4,5,0,0],[6,7,8,9,0]]))
+    self.checkarray(v[2],DMatrix([[10,11,12,13,14]]))
+    
+    v = vertsplit(a,[0,0,3])
+    
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
+
+    f.evaluate()
+    V = [f.output(i) for i in range(len(v))]
+    
+    self.assertEqual(len(v),3)
+    self.assertTrue(v[0].isNull())
+    #self.assertEqual(v[0].size1(),0)
+    #self.assertEqual(v[0].size2(),0)  # why not 5?
+    self.checkarray(V[1],DMatrix([[0,0,0,0,0],[1,2,0,0,0],[3,4,5,0,0]]))
+    self.checkarray(V[2],DMatrix([[6,7,8,9,0],[10,11,12,13,14]]))
     
 if __name__ == '__main__':
     unittest.main()

@@ -48,6 +48,11 @@ namespace CasADi{
       return x->getVertsplit(offset);
     }
   }
+  
+  std::vector<MX> vertsplit(const MX& x, int incr){
+    casadi_assert(incr>=1);
+    return vertsplit(x,range(0,x.size1(),incr));
+  }
 
   MX horzcat(const vector<MX>& comp){
     vector<MX> v(comp.size());

@@ -31,12 +31,27 @@
 
 namespace CasADi{
 
-  /** \brief  concatenate vertically */
+  /** \brief  concatenate vertically
+  *
+  *  vertcat(vertsplit(x,...)) = x
+  */
   MX vertcat(const std::vector<MX>& x);
 
-  /** \brief  concatenate vertically */
+  /** \brief  split vertically, retaining groups of rows
+  * \param output_offset List of all start rows for each group
+  *      the last row group will run to the end.
+  * 
+  *   vertcat(vertsplit(x,...)) = x
+  */
   std::vector<MX> vertsplit(const MX& x, const std::vector<int>& output_offset);
 
+  /** \brief  split vertically, retaining fixed-sized groups of rows
+  * \param incr Size of each group of rows
+  *
+  *  vertcat(vertsplit(x,...)) = x
+  */
+  std::vector<MX> vertsplit(const MX& x, int incr=1);
+  
   /** \brief  concatenate horizontally */
   MX horzcat(const std::vector<MX>& comp);
   
