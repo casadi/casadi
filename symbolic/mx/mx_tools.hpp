@@ -52,8 +52,26 @@ namespace CasADi{
   */
   std::vector<MX> vertsplit(const MX& x, int incr=1);
   
-  /** \brief  concatenate horizontally */
+  /** \brief  concatenate horizontally 
+  *
+  *   horzcat(horzsplit(x,...)) = x
+  */
   MX horzcat(const std::vector<MX>& comp);
+  
+  /** \brief  split horizontally, retaining groups of columns
+  * \param output_offset List of all start columns for each group
+  *      the last column group will run to the end.
+  *
+  *   horzcat(horzsplit(x,...)) = x
+  */
+  std::vector<MX> horzsplit(const MX& x, const std::vector<int>& output_offset);
+
+  /** \brief  split horizontally, retaining fixed-sized groups of columns
+  * \param incr Size of each group of columns
+  *
+  *   horzcat(horzsplit(x,...)) = x
+  */
+  std::vector<MX> horzsplit(const MX& x, int incr=1);
   
   /** \brief Construct a matrix from a list of list of blocks.*/
   MX blockcat(const std::vector< std::vector<MX > > &v);

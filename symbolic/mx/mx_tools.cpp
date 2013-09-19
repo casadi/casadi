@@ -60,6 +60,18 @@ namespace CasADi{
       v[i] = trans(comp[i]);
     return trans(vertcat(v));
   }
+  
+  std::vector<MX> horzsplit(const MX& x, const std::vector<int>& offset){
+    std::vector<MX> ret = vertsplit(trans(x),offset);
+    MX (*transMX)(const MX& x) = trans; 
+    std::transform(ret.begin(),ret.end(),ret.begin(),transMX);
+    return ret;
+  }
+  
+  std::vector<MX> horzsplit(const MX& x, int incr){
+    casadi_assert(incr>=1);
+    return horzsplit(x,range(0,x.size2(),incr));
+  }
 
   MX vertcat(const MX& a, const MX& b){
     vector<MX> ab;

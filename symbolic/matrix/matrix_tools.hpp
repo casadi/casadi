@@ -189,9 +189,28 @@ std::vector<Matrix<T> > vertsplit(const Matrix<T> &v, int incr=1);
 
 /** \brief Concatenate a list of matrices horizontally
 * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
+*
+*   horzcat(horzsplit(x,...)) = x
 */
 template<class T>
 Matrix<T> horzcat(const std::vector<Matrix<T> > &v);
+
+/** \brief  split horizontally, retaining groups of columns
+* \param output_offset List of all start columns for each group
+*      the last column group will run to the end.
+*
+*   horzcat(horzsplit(x,...)) = x
+*/
+template<class T>
+std::vector<Matrix<T> > horzsplit(const Matrix<T> &v, const std::vector<int>& offset);
+
+/** \brief  split horizontally, retaining fixed-sized groups of columns
+* \param incr Size of each group of columns
+*
+*   horzcat(horzsplit(x,...)) = x
+*/
+template<class T>
+std::vector<Matrix<T> > horzsplit(const Matrix<T> &v, int incr=1);
 
 #ifndef SWIG
 template<class T>
@@ -767,6 +786,20 @@ Matrix<T> horzcat(const std::vector<Matrix<T> > &v){
   for(int i=0; i<v.size(); ++i)
     ret.append(trans(v[i]));
   return trans(ret);  
+}
+
+template<class T>
+std::vector< Matrix<T> > horzsplit(const Matrix<T>& x, const std::vector<int>& offset){
+  std::vector< Matrix<T> > ret = vertsplit(trans(x),offset);
+  Matrix<T> (*transT)(const Matrix<T>& x) = trans;
+  std::transform(ret.begin(),ret.end(),ret.begin(),transT);
+  return ret;
+}
+  
+template<class T>
+std::vector< Matrix<T> > horzsplit(const Matrix<T>& x, int incr){
+    casadi_assert(incr>=1);
+    return horzsplit(x,range(0,x.size2(),incr));
 }
 
 template<class T>
@@ -1364,6 +1397,7 @@ MTT_INST(T,flatten) \
 MTT_INST(T,vecNZ) \
 MTT_INST(T,blockcat) \
 MTT_INST(T,horzcat) \
+MTT_INST(T,horzsplit) \
 MTT_INST(T,vertcat) \
 MTT_INST(T,vertsplit) \
 MTT_INST(T,inner_prod) \
