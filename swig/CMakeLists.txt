@@ -222,9 +222,11 @@ make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 if(WITH_SWIG_SPLIT)
   add_custom_target(_python_modules DEPENDS _casadi_main _casadi_primitive _casadi_primitive_tools _casadi_noncore) # the python interface is created with the command "make python"
   add_custom_target(_octave_modules DEPENDS casadi_main_octave casadi_primitive_octave casadi_primitive_tools_octave casadi_noncore_octave) # the octave interface is created with the command "make octave"
+  add_custom_target(_haskell_modules DEPENDS casadi_main_octave casadi_primitive_octave casadi_primitive_tools_octave casadi_noncore_octave casadiTree.hs) # the haskell interface is created with the command "make octave"
 else(WITH_SWIG_SPLIT)
   add_custom_target(_python_modules DEPENDS _casadi ) # the python interface is created with the command "make python"
   add_custom_target(_octave_modules DEPENDS casadi_octave ) # the octave interface is created with the command "make octave"
+  add_custom_target(_haskell_modules DEPENDS casadi_haskell casadiTree.hs) # the haskell interface is created with the command "make haskell"
 endif(WITH_SWIG_SPLIT)
   
 add_custom_command(
@@ -365,6 +367,22 @@ else()
   set_target_properties(casadi_octave PROPERTIES SUFFIX ".oct")
   set_target_properties(casadi_octave PROPERTIES OUTPUT_NAME "casadi_interface")
 endif()
+
+# haskell interface
+if(WITH_SWIG_SPLIT)
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  SWIG_ADD_MODULE_XML (${my_module}_haskell casadi.i)
+endforeach()
+else()
+  SWIG_ADD_MODULE_XML (casadi_haskell casadi.i) # -xmllang python)
+  #SET_SOURCE_FILES_PROPERTIES( ${swig_generated_file_fullname}   PROPERTIES COMPILE_FLAGS "-bla")
+endif()
+
+ADD_CUSTOM_COMMAND(
+   OUTPUT casadiTree.hs 
+   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml
+   DEPENDS ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py
+)
 
 # begin Patch swig to get concat functionality
 find_package(OCTAVE)

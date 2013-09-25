@@ -33,8 +33,9 @@
 #include "symbolic/mx/mx.hpp"
 %}
 
-
+#ifndef SWIGXML
 %include "typemaps.i"
+#endif
 
 /// Generic typemap structure
 %inline %{

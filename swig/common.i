@@ -60,10 +60,24 @@ _object = _copyableObject
 %copyctor;
 
 // STL
+#ifdef SWIGXML
+//%include <typemaps/std_string.swg>
+//%include <std/std_vector.i>
+//%include <std/std_pair.i>
+namespace std {
+
+template<class T>
+class vector {};
+
+template<class A,class B>
+class pair {};
+
+}
+#else
 %include "std_string.i"
 %include "std_vector.i"
 %include "std_pair.i"
-
+#endif
 
 
 #ifdef SWIG_MAIN_MODULE

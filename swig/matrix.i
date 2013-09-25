@@ -211,7 +211,7 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 } // namespace CasADi
 #endif // SWIGOCTAVE
 
-
+#ifdef SWIGPYTHON
 namespace CasADi{
 %extend Matrix<double> {
 
@@ -228,6 +228,7 @@ void assign(const CasADi::Matrix<int>&rhs) { (*$self)=rhs; }
 
 }
 }
+#endif //SWIGPYTHON
 
 #ifdef SWIGPYTHON
 namespace CasADi{
