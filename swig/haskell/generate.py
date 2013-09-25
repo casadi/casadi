@@ -210,7 +210,7 @@ ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule CasadiTree ( %s, classes, tools
 
 
 fclasses  = file('CasadiClasses.hs','w')
-fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule CasadiClasses where\n\n")
+fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule CasadiClasses ( CasadiClass(..), cppTypeCasadiPrim ) where\n\n")
 
 
 
