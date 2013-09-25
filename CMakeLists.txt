@@ -285,14 +285,16 @@ if(WITH_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
 endif()
 add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP (requires BLAS and LAPACK).")
 
-add_subdirectory(symbolic)
-add_subdirectory(optimal_control)
-add_subdirectory(nonlinear_programming)
-add_subdirectory(convex_programming)
-add_subdirectory(integration)
-add_subdirectory(examples)
+
+add_subdirectory(symbolic)  # needed by all except external_packages
 add_subdirectory(external_packages)
-add_subdirectory(interfaces)
+
+add_subdirectory(interfaces)             # needs external_packages
+add_subdirectory(nonlinear_programming)  # needs interfaces
+add_subdirectory(convex_programming)     # needs interfaces
+add_subdirectory(integration)
+add_subdirectory(optimal_control)        # needs integration, external_packages
+add_subdirectory(examples)
 add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
 add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
 #add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
