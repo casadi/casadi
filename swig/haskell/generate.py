@@ -156,6 +156,8 @@ for c in r.findall('*//class'):
 
   for d in c.findall('cdecl'):
      dname = d.find('attributelist/attribute[@name="name"]').attrib["value"]
+     if (d.find('attributelist/attribute[@name="kind"]').attrib["value"]!="function"): continue
+
      if d.find('attributelist/parmlist') is None:
        params = []
      else:
@@ -191,6 +193,7 @@ for c in r.findall('*//class'):
 functions = []
 for d in r.findall('*//namespace/cdecl'):
   if d.find('attributelist/attribute[@name="sym_name"]') is None: continue
+  if d.find('attributelist/attribute[@name="kind"]').attrib["value"]!="function": continue
   
   dname = d.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
   if d.find('attributelist/parmlist') is None:
