@@ -17,6 +17,7 @@ add_library(casadi_integration STATIC ${INTEGRATION_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_integration SHARED ${INTEGRATION_SRCS})
+target_link_libraries(casadi_integration casadi)
 endif(ENABLE_SHARED)
 install(TARGETS casadi_integration
   LIBRARY DESTINATION lib

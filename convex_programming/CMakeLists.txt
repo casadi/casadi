@@ -18,6 +18,10 @@ add_library(casadi_convex_programming STATIC ${CONVEX_PROGRAMMING_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_convex_programming SHARED ${CONVEX_PROGRAMMING_SRCS})
+target_link_libraries(casadi_convex_programming casadi)
+if(WITH_CSPARSE)
+  target_link_libraries(casadi_convex_programming casadi_csparse_interface)
+endif(WITH_CSPARSE)
 endif(ENABLE_SHARED)
 install(TARGETS casadi_convex_programming
   LIBRARY DESTINATION lib

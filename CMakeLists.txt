@@ -303,14 +303,15 @@ if(WITH_PROFILING)
   add_definitions(-DWITH_PROFILING)
 endif(WITH_PROFILING)
 
-add_subdirectory(symbolic)
-add_subdirectory(optimal_control)
-add_subdirectory(nonlinear_programming)
-add_subdirectory(convex_programming)
-add_subdirectory(integration)
-add_subdirectory(examples)
+add_subdirectory(symbolic)  # needed by all except external_packages
 add_subdirectory(external_packages)
-add_subdirectory(interfaces)
+
+add_subdirectory(interfaces)             # needs external_packages
+add_subdirectory(nonlinear_programming)  # needs interfaces
+add_subdirectory(convex_programming)     # needs interfaces
+add_subdirectory(integration)
+add_subdirectory(optimal_control)        # needs integration, external_packages
+add_subdirectory(examples)
 add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
 add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
 #add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
