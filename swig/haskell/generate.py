@@ -153,6 +153,7 @@ for c in r.findall('*//class'):
 for c in r.findall('*//class'):
   name = c.find('attributelist/attribute[@name="name"]').attrib["value"]
   data = classes[name] = {'methods': [],"constructors":[]}
+  
 
   for d in c.findall('cdecl'):
      dname = d.find('attributelist/attribute[@name="name"]').attrib["value"]
@@ -164,10 +165,15 @@ for c in r.findall('*//class'):
        params = [ x.attrib["value"] for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]') ]
        for p in params:
          update_types_table(p)
-         
+
      rettype = d.find('attributelist/attribute[@name="type"]').attrib["value"]
+     update_types_table(rettype)
+     if d.find('attributelist/attribute[@name="storage"]') is None:
+       storage = ""
+     else:
+       storage = d.find('attributelist/attribute[@name="storage"]').attrib["value"]
        
-     data["methods"].append((dname,params,rettype,False))
+     data["methods"].append((dname,params,rettype,"Static" if storage=="static" else "Normal"))
 
   for d in c.findall('constructor'):
      dname = symbol_table[name]
@@ -180,7 +186,7 @@ for c in r.findall('*//class'):
          
      rettype = name
        
-     data["methods"].append((dname,params,rettype,True))
+     data["methods"].append((dname,params,rettype,"Constructor"))
     
   data["bases"] = [] 
   for d in c.findall('attributelist/baselist/base'):
@@ -236,7 +242,7 @@ for k,v in classes.items():
   methods = []
   if "methods" in v:
     counter = {}
-    for (name,pars,rettype,isconstr) in getAllMethods(k): # v["methods"]:
+    for (name,pars,rettype,mtype) in getAllMethods(k): # v["methods"]:
       params = [types_table[p][1] for p in pars]
       if rettype not in types_table: continue
       t = types_table[rettype][1]
@@ -248,7 +254,7 @@ for k,v in classes.items():
         counter[name]+=1
       else:
         counter[name]=0
-      methods.append("""        Method (Name "%s") %s [%s] %s""" % (name+"'"*counter[name],t,",".join(params),"Constructor" if isconstr else "Normal"))
+      methods.append("""        Method (Name "%s") %s [%s] %s""" % (name+"'"*counter[name],t,",".join(params),mtype))
 
   myclasses.append(symbol_table[k].lower())
   ftree.write("""%s :: Class
