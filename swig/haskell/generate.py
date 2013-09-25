@@ -291,5 +291,10 @@ for a,t in aliases.items():
   if t is None or a is None or not a in tainted_types: continue
   ftree.write("%s :: Type\n%s = %s\n" % (a,a,t))
   
-fclasses.write("data CasadiClass = %s \n  deriving (Show, Eq, Ord)\n" % ( "\n  | ".join([symbol_table[k] for k,v in classes.items() if "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]])))
+fclasses.write("data CasadiClass = %s \n  deriving (Show, Eq, Ord)\n\n\n" % ( "\n  | ".join([symbol_table[k] for k,v in classes.items() if "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]])))
+
+fclasses.write('cppTypeCasadiPrim :: CasadiClass -> String\n');
+for k,v in classes.items():
+  if "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]:
+    fclasses.write('cppTypeCasadiPrim %s = "%s"\n' % (symbol_table[k],k.replace("("," ").replace(")"," ")))
 
