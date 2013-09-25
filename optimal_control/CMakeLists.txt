@@ -16,6 +16,11 @@ add_library(casadi_optimal_control STATIC ${OPTIMAL_CONTROL})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_optimal_control SHARED ${OPTIMAL_CONTROL})
+target_link_libraries(casadi_optimal_control
+  casadi
+  casadi_integration
+  ${TINYXML_LIBRARIES}
+)
 endif(ENABLE_SHARED)
 install(TARGETS casadi_optimal_control
   LIBRARY DESTINATION lib
