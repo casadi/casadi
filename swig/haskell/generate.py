@@ -108,7 +108,7 @@ def tohaskelltype(s,alias=False,level=0):
   elif s == "bool":
     return ("" if alias else "NonVec ")+ "CBool"
   elif s == "std::size_t":
-    return ("" if alias else "NonVec ")+ "CSizet"
+    return ("" if alias else "NonVec ")+ "CSize"
   elif s == "int":
     return ("" if alias else "NonVec ")+ "CInt"
   elif s == "long":
@@ -210,7 +210,7 @@ ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule CasadiTree ( %s, classes, tools
 
 
 fclasses  = file('CasadiClasses.hs','w')
-fclasses.write("{-# OPTIONS_GHC -Wall#-}\n\nmodule CasadiClasses where\n\n")
+fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule CasadiClasses where\n\n")
 
 
 
