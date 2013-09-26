@@ -1,5 +1,6 @@
 from lxml import etree
 import sys
+import re
 
 # Parse the input XML
 e = etree.parse(sys.argv[1])
@@ -222,7 +223,9 @@ fclasses  = file('CasadiClasses.hs','w')
 fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule CasadiClasses ( CasadiClass(..), cppTypeCasadiPrim ) where\n\n")
 
 
-
+finclude  = file('swiginclude.hpp','w')
+code = sum([filter(lambda i: len(i.rstrip())> 0 ,x.attrib["value"].split("\n")) for x in r.findall("*//insert/attributelist/attribute[@name='code']")],[])
+finclude.write("\n".join(filter(lambda y: re.search("^\s*#include ",y),code)))
 
 def getAllMethods(name):
   if name not in classes: return []
