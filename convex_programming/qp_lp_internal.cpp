@@ -62,6 +62,9 @@ void QPLPInternal::evaluate(int nfdir, int nadir) {
   // Delegate computation to NLP Solver
   qpsolver_.evaluate();
   
+  // Pass the stats
+  stats_["qp_solver_stats"] = qpsolver_.getStats();
+  
   // Read the outputs from Ipopt
   output(QP_SOLVER_X).set(qpsolver_.output(LP_SOLVER_X));
   output(QP_SOLVER_COST).set(qpsolver_.output(LP_SOLVER_COST));

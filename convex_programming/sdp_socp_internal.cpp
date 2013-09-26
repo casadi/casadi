@@ -70,6 +70,9 @@ void SDPSOCPInternal::evaluate(int nfdir, int nadir) {
   sdpsolver_.setInput(input(SOCP_SOLVER_UBA),SDP_SOLVER_UBA);
   
   sdpsolver_.evaluate();
+
+  // Pass the stats
+  stats_["sdp_solver_stats"] = sdpsolver_.getStats();
   
   setOutput(sdpsolver_.output(SDP_SOLVER_X),SOCP_SOLVER_X);
   setOutput(sdpsolver_.output(SDP_SOLVER_COST),SOCP_SOLVER_COST);
