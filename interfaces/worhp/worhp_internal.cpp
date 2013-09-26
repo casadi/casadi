@@ -752,6 +752,8 @@ namespace CasADi{
     stats_["t_mainloop"] = t_mainloop_;
     stats_["t_callback_fun"] = t_callback_fun_;
     stats_["t_callback_prepare"] = t_callback_prepare_;
+    stats_["return_code"] = worhp_c_.status;
+    stats_["return_status"] = flagmap[worhp_c_.status];
     
   }
 
@@ -1165,6 +1167,48 @@ namespace CasADi{
       
     std::cout << "readparams status: " << status << std::endl;
   }
+  
+  map<int,string> WorhpInternal::calc_flagmap(){
+  map<int,string> f;
+  f[TerminateSuccess] = "TerminateSuccess";
+  f[OptimalSolution] = "OptimalSolution";
+  f[SearchDirectionZero] = "SearchDirectionZero";
+  f[SearchDirectionSmall] = "SearchDirectionSmall";
+  f[StationaryPointFound] = "StationaryPointFound";
+  f[StationaryPointFound] = "StationaryPointFound";
+  f[AcceptablePrevious] = "AcceptablePrevious";
+  f[FritzJohn] = "FritzJohn";
+  f[NotDiffable] = "NotDiffable";
+  f[Unbounded] = "Unbounded";
+  f[FeasibleSolution] = "FeasibleSolution";
+  f[LowPassFilterOptimal] = "LowPassFilterOptimal";
+  f[LowPassFilterAcceptable] = "LowPassFilterAcceptable";
+
+  f[TerminateError] = "TerminateError";
+  f[InitError] = "InitError";
+  f[DataError] = "DataError";
+  f[MaxCalls] = "MaxCalls";
+  f[MaxIter] = "MaxIter";
+  f[MinimumStepsize] = "MinimumStepsize";
+  f[QPerror] = "QPerror";
+  f[ProblemInfeasible] = "ProblemInfeasible";
+  f[GroupsComposition] = "GroupsComposition";
+  f[TooBig] = "TooBig";
+  f[Timeout] = "Timeout";
+  f[FDError] = "FDError";
+  f[LocalInfeas] = "LocalInfeas";
+  f[LicenseError] = "LicenseError";
+  f[TerminatedByUser] = "TerminatedByUser";
+  f[FunctionErrorF] = "FunctionErrorF";
+  f[FunctionErrorG] = "FunctionErrorG";
+  f[FunctionErrorDF] = "FunctionErrorDF";
+  f[FunctionErrorDG] = "FunctionErrorDG";
+  f[FunctionErrorHM] = "FunctionErrorHM";
+  return f;
+}
+  
+map<int,string> WorhpInternal::flagmap = WorhpInternal::calc_flagmap();
+
 
 
 } // namespace CasADi
