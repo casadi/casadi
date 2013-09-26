@@ -578,6 +578,12 @@ class Prefixer:
     for m in methods:
       if hasattr(self.struct,m):
         setattr(self,m,self.cast)
+        
+  def __setstate__(self,state):
+    self.__init__(state["struct"],state["prefix"],state["castmaster"])
+        
+  def __getstate__(self):
+    return {"struct": self.struct, "prefix": self.prefix,"castmaster": self.castmaster}
 
   def __getattr__(self,name):
     # When attributes are not found, delegate to self()
