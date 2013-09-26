@@ -227,14 +227,20 @@ finclude  = file('swiginclude.hpp','w')
 code = sum([filter(lambda i: len(i.rstrip())> 0 ,x.attrib["value"].split("\n")) for x in r.findall("*//insert/attributelist/attribute[@name='code']")],[])
 finclude.write("\n".join(filter(lambda y: re.search("^\s*#include ",y),code)))
 
-def getAllMethods(name):
+def getAllMethods(name,base=None):
+  if base is None:
+    base = name
   if name not in classes: return []
   c = classes[name]
   
   ret = c["methods"]
+  if name!=base:
+    #ret = [(dname,params,base if mtype=="Constructor" else rettype,mtype) for (dname,params,rettype,mtype) in ret]
+    # Omit baseclass constructors
+    ret = filter(lambda x: x[3]!="Constructor", ret)
   
   for b in c["bases"]:
-    ret = ret + getAllMethods(b)
+    ret = ret + getAllMethods(b,base)
     
   return ret
   
@@ -250,6 +256,7 @@ for k,v in classes.items():
       if rettype not in types_table: continue
       t = types_table[rettype][1]
       if t is None or len(filter(lambda x : x is None, params))>0: continue
+      if "VoidPointer" in name or "ptr" in name or "dummy" in name: continue
       for p in params:
         tainted_types[p] = True
       tainted_types[t] = True
@@ -279,6 +286,7 @@ for (name,pars,rettype) in functions:
   if rettype not in types_table: continue
   t = types_table[rettype][1]
   if t is None or len(filter(lambda x : x is None, params))>0: continue
+  if "VoidPointer" in name or "ptr" in name or "dummy" in name: continue
   if name[0].isupper(): continue
   for p in params:
     tainted_types[p] = True
