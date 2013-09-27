@@ -1991,6 +1991,14 @@ namespace CasADi{
   bool CRSSparsityInternal::dense() const{
     return size() == numel();
   }
+  
+  bool CRSSparsityInternal::empty() const{
+    return numel()==0;
+  }
+  
+  bool CRSSparsityInternal::null() const{
+    return nrow_==0 && ncol_==0;
+  }
 
   bool CRSSparsityInternal::diagonal() const{
     // Check if matrix is square

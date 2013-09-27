@@ -93,8 +93,11 @@ class GenericMatrix{
     std::pair<int,int> shape() const;
     #endif
 
-    /** \brief  Check if the matrix expression is empty */
+    /** \brief  Check if the matrix expression is empty, i.e. one of its dimensions is 0 */
     bool empty() const;
+    
+    /** \brief  Check if the matrix expression is null, i.e. its dimensios are 0-by-0 */
+    bool null() const;
     
     /** \brief  Check if the matrix expression is dense */
     bool dense() const;
@@ -221,6 +224,11 @@ std::string GenericMatrix<MatType>::dimString() const {
 template<typename MatType>
 bool GenericMatrix<MatType>::empty() const{
   return numel()==0;
+}
+
+template<typename MatType>
+bool GenericMatrix<MatType>::null() const{
+  return size1()==0 && size2()==0;
 }
 
 template<typename MatType>
