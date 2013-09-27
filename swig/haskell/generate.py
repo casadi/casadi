@@ -216,11 +216,11 @@ for d in r.findall('*//namespace/cdecl'):
      
 
 ftree  = file('CasadiTree.hs','w')
-ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule CasadiTree ( %s, classes, tools ) where\n\n\nimport Types\n\n\n" % ",\n  ".join([symbol_table[k].lower() for k,v in classes.items() if "IOSchemeVector" not in k and "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]]))
+ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiTree ( %s, classes, tools ) where\n\n\nimport WriteCasadiBindings.Types\n\n\n" % ",\n  ".join([symbol_table[k].lower() for k,v in classes.items() if "IOSchemeVector" not in k and "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]]))
 
 
 fclasses  = file('CasadiClasses.hs','w')
-fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule CasadiClasses ( CasadiClass(..), cppTypeCasadiPrim ) where\n\n")
+fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiClasses ( CasadiClass(..), cppTypeCasadiPrim ) where\n\n")
 
 
 finclude  = file('swiginclude.hpp','w')
