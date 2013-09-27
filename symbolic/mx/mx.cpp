@@ -95,8 +95,8 @@ namespace CasADi{
     std::vector<MX> ret(x->getNumOutputs());
     for(int i=0; i<ret.size(); ++i){
       ret[i] = MX::create(new OutputNode(x, i));
-      if(ret[i].numel()==0){
-        ret[i] = MX();
+      if(ret[i].null()){
+        ret[i] = MX(0,0);
       } else if(ret[i].size()==0){
         ret[i] = MX::sparse(ret[i].shape());
       }

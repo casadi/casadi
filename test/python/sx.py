@@ -1253,6 +1253,39 @@ class SXtests(casadiTestCase):
     self.assertTrue(h.output().sparsity()==H.sparsity())
     
     self.checkarray(h.output().data(),H.data())
+
+  def test_mxnulloutput(self):
+     a = SXMatrix(5,0)
+     b = ssym("x",2)
+     bm = msym("x",2)
+     
+     f = SXFunction([b],[a])
+     f.init()
+     c = f.call([bm])[0]
+
+     self.assertEqual(c.size1(),5)
+     self.assertEqual(c.size2(),0)
+     
+     c = f.eval([b])[0]
+
+     self.assertEqual(c.size1(),5)
+     self.assertEqual(c.size2(),0)
+     
+     a = SXMatrix(0,0)
+     
+     f = SXFunction([b],[a])
+     f.init()
+     
+     c = f.call([bm])[0]
+
+     self.assertEqual(c.size1(),0)
+     self.assertEqual(c.size2(),0)
+     
+     c = f.eval([b])[0]
+
+     self.assertEqual(c.size1(),0)
+     self.assertEqual(c.size2(),0)
+     
   def test_mxnull(self):
      a = SXMatrix(5,0)
      b = SXMatrix(0,3)
