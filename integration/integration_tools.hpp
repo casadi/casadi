@@ -53,6 +53,7 @@ namespace CasADi{
   void collocationInterpolators(const std::vector<double> & tau_root, std::vector< std::vector<double> > &OUTPUT, std::vector< double > &OUTPUT);
 #endif // SWIG
 
+#ifndef SWIG
 extern const double legendre_points1[2];
 extern const double legendre_points2[3];
 extern const double legendre_points3[4];
@@ -77,6 +78,7 @@ extern const double radau_points9[10];
 extern const double* radau_points[10];
 
 extern const double** collocation_points[2];
+#endif // SWIG
 
   // Type of collocation points
   enum CollocationPoints{LEGENDRE,RADAU};
