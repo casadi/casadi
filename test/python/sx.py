@@ -32,7 +32,6 @@ try:
 except:
 	scipy_available = False
 	
-@run_only(['large_hessian'])
 class SXtests(casadiTestCase):
 
   def setUp(self):
