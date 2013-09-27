@@ -375,7 +375,7 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 
     def __getstate__(self):
         if self.isNull(): return {}
-        return {"nrow": self.size1(), "ncol": self.size2(), "col": numpy.array(self.col()), "rowind": numpy.array(self.rowind())}
+        return {"nrow": self.size1(), "ncol": self.size2(), "col": numpy.array(self.col(),dtype=int), "rowind": numpy.array(self.rowind(),dtype=int)}
   %}
   
 }
@@ -389,7 +389,7 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
         self.__init__(sp,state["data"])
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data())}
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data(),dtype=int)}
   %}
   
 }
@@ -403,7 +403,7 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
         self.__init__(sp,state["data"])
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data())}
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data(),dtype=float)}
   %}
   
 }
