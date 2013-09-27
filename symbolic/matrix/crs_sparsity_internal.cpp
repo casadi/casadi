@@ -1858,7 +1858,7 @@ namespace CasADi{
 
     // Quick return if both are dense
     if(dense() && y_trans.dense()){
-      return CRSSparsity(x_nrow,y_ncol,true);
+      return CRSSparsity(x_nrow,y_ncol,!empty() and !y_trans.empty());
     }
   
     // return object

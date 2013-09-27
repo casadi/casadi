@@ -2228,6 +2228,21 @@ class MXtests(casadiTestCase):
     self.checkarray(v[0][1],DMatrix([[0,0],[2,0]]))
     self.checkarray(v[1][0],DMatrix([3,6]))
     self.checkarray(blockcat(v),f.input())
+  def test_mxnull(self):
+     a = MX(5,0)
+     b = MX(0,3)
+     
+     c = mul(a,b)
+     
+     self.assertEqual(c.size(),0)
+     
+     a = MX(5,3)
+     b = MX(3,4)
+     
+     c = mul(a,b)
+     
+     self.assertEqual(c.size(),0)
+     
     
 if __name__ == '__main__':
     unittest.main()

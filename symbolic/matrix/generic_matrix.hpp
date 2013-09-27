@@ -256,12 +256,17 @@ MatType GenericMatrix<MatType>::mul_smart(const MatType& y, const CRSSparsity &s
     return x;
   } else if(isZero(x) || isZero(y)){
     // See if one of the arguments can be used as result
-    if(x.size()==0 && y.size1()==y.size2())
+    if(x.size()==0 && y.size1()==y.size2()) {
       return x;
-    else if(y.size()==0 && x.size1()==x.size2())
+    } else if(y.size()==0 && x.size1()==x.size2()) {
       return y;
-    else
-      return MatType::zeros(x.size1(),y.size2());
+    } else {
+      if (x.size()==0 || y.size()==0 || y.empty() || x.empty()) {
+        return MatType::sparse(x.size1(),y.size2());
+      } else {
+        return MatType::zeros(x.size1(),y.size2());
+      }
+    }
   } else if(x.scalar() || y.scalar()){
     return x*y;
   } else {
