@@ -23,8 +23,7 @@
 #ifndef INTEGRATOR_HPP
 #define INTEGRATOR_HPP
 
-#include "fx.hpp"
-#include "linear_solver.hpp"
+#include "generic_integrator.hpp"
 
 /** \defgroup DAE_doc
     Solves an initial value problem (IVP) coupled to a terminal value problem
@@ -160,7 +159,7 @@ namespace CasADi{
 
   // grep "addOption" integrator_internal.cpp | perl -pe 's/addOption\((.*?),(.*?),(.*?)\);(.*\/\/ (.*))?/* \1 \2 \3 ...  \5\\n/'
 
-  class Integrator : public FX{
+  class Integrator : public GenericIntegrator{
   public:
     /// Default constructor
     Integrator();
