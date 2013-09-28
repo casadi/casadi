@@ -318,3 +318,12 @@ for k,v in classes.items():
   if "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]:
     fclasses.write('cppTypeCasadiPrim %s = "%s"\n' % (symbol_table[k],k.replace("("," ").replace(")"," ")))
 
+fclasses.write("inheritance :: [(CasadiClass,[CasadiClass])]\n")
+fclasses.write(
+     "inheritance = [ %s ]\n\n\n\n" % ( 
+       "\n  , ".join(
+           [ 
+            "(%s,[%s])" % (
+                    symbol_table[k],
+                    ",".join([symbol_table[i] for i in v["bases"]])
+              ) for k,v in classes.items() if "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]])))
