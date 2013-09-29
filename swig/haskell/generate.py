@@ -220,7 +220,7 @@ ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiTree 
 
 
 fclasses  = file('CasadiClasses.hs','w')
-fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiClasses ( CasadiClass(..), cppTypeCasadiPrim ) where\n\n")
+fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiClasses ( CasadiClass(..), cppTypeCasadiPrim, inheritance ) where\n\n")
 
 
 finclude  = file('swiginclude.hpp','w')
@@ -234,6 +234,7 @@ def getAllMethods(name,base=None):
   c = classes[name]
   
   ret = c["methods"]
+  return ret
   if name!=base:
     #ret = [(dname,params,base if mtype=="Constructor" else rettype,mtype) for (dname,params,rettype,mtype) in ret]
     # Omit baseclass constructors
@@ -318,7 +319,7 @@ for k,v in classes.items():
   if "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]:
     fclasses.write('cppTypeCasadiPrim %s = "%s"\n' % (symbol_table[k],k.replace("("," ").replace(")"," ")))
 
-fclasses.write("inheritance :: [(CasadiClass,[CasadiClass])]\n")
+fclasses.write("\ninheritance :: [(CasadiClass,[CasadiClass])]\n")
 fclasses.write(
      "inheritance = [ %s ]\n\n\n\n" % ( 
        "\n  , ".join(
