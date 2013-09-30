@@ -198,6 +198,7 @@ for c in r.findall('*//class'):
   data["bases"] = [] 
   for d in c.findall('attributelist/baselist/base'):
     base = d.attrib["name"]
+    if "IOSchemeVector" in base: continue
     if base in symbol_table_reverse:
       base = symbol_table_reverse[base]
       data["bases"].append(base)
