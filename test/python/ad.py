@@ -556,6 +556,12 @@ class ADtests(casadiTestCase):
     f1 = MXFunction([x,y],[x+y[0],mul(y,x)])
     f1.init()
     
+    f2 = MXFunction([x,y],[mul(MX.zeros(0,2),x)])
+    f2.init()
+
+    f3 = MXFunction([x,y],[MX.zeros(0,0),mul(y,x)])
+    f3.init()
+    
     ndir = 2
     
     in1 = [x,y]
@@ -595,7 +601,8 @@ class ADtests(casadiTestCase):
 
     def remove00(x):
       ret = DMatrix(x)
-      ret[0,0] = DMatrix.sparse(1,1)
+      if ret.numel()>0:
+        ret[0,0] = DMatrix.sparse(1,1)
       return ret
       
     spmods = [lambda x: x , remove00]
@@ -655,6 +662,10 @@ class ADtests(casadiTestCase):
           #(in1,v1,c.det(horzcat([x,DMatrix([1,2])])),DMatrix([-1,2])), not implemented
           (in1,v1,f1.call(in1)[1],y),
           (in1,v1,f1.call([x**2,y])[1],y*2*vertcat([x.T,x.T])),
+          (in1,v1,f2.call(in1)[0],DMatrix.zeros(0,2)),
+          (in1,v1,f2.call([x**2,y])[0],DMatrix.zeros(0,2)),
+          (in1,v1,f3.call(in1)[0],DMatrix.zeros(0,2)),
+          (in1,v1,f3.call([x**2,y])[0],DMatrix.zeros(0,2)),
           (in1,v1,vertcat([x,DMatrix(0,1)]),DMatrix.eye(2)),
           (in1,v1,(x**2).setSparse(sparse(DMatrix([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
      ]:
@@ -838,12 +849,13 @@ class ADtests(casadiTestCase):
             self.checkarray(DMatrix(f.jacSparsity(),1),DMatrix(J_.sparsity(),1))
                 
       # Scalarized
+      if out.empty(): continue
       s_i  = out.sparsity().getRow()[0]
       s_j  = out.sparsity().col()[0]
       s_k = s_i*out.size2()+s_j
       fun = MXFunction(inputs,[out[s_i,s_j],jac[s_k,:].T])
       fun.init()
-      
+        
       for i,v in enumerate(values):
         fun.setInput(v,i)
         

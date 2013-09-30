@@ -998,6 +998,17 @@ class Toolstests(casadiTestCase):
     s = struct_ssym(map(entry, u'xyz')) # IndexError: list index out of range
     print s[u'x']
     
+  def test_pickling_null(self):
+    import pickle
+    s = struct_msym([
+      entry("a",shape=(2,3)),
+      entry("b",shape=(0,0))
+    ])
+
+    tt = pickle.dumps(s)
+
+    print pickle.loads(tt)
+    
 if __name__ == '__main__':
     unittest.main()
 

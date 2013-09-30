@@ -32,7 +32,6 @@ try:
 except:
 	scipy_available = False
 	
-@run_only(['large_hessian'])
 class SXtests(casadiTestCase):
 
   def setUp(self):
@@ -1254,6 +1253,63 @@ class SXtests(casadiTestCase):
     self.assertTrue(h.output().sparsity()==H.sparsity())
     
     self.checkarray(h.output().data(),H.data())
+
+  def test_mxnulloutput(self):
+     a = SXMatrix(5,0)
+     b = ssym("x",2)
+     bm = msym("x",2)
+     
+     f = SXFunction([b],[a])
+     f.init()
+     c = f.call([bm])[0]
+
+     self.assertEqual(c.size1(),5)
+     self.assertEqual(c.size2(),0)
+     
+     c = f.eval([b])[0]
+
+     self.assertEqual(c.size1(),5)
+     self.assertEqual(c.size2(),0)
+     
+     a = SXMatrix(0,0)
+     
+     f = SXFunction([b],[a])
+     f.init()
+     
+     c = f.call([bm])[0]
+
+     self.assertEqual(c.size1(),0)
+     self.assertEqual(c.size2(),0)
+     
+     c = f.eval([b])[0]
+
+     self.assertEqual(c.size1(),0)
+     self.assertEqual(c.size2(),0)
+     
+  def test_mxnull(self):
+     a = SXMatrix(5,0)
+     b = SXMatrix(0,3)
+     
+     c = mul(a,b)
+     
+     self.assertEqual(c.size(),0)
+     
+     a = SXMatrix(5,3)
+     b = SXMatrix(3,4)
+     
+     c = mul(a,b)
+     
+     self.assertEqual(c.size(),0)
+     
+  def  test_mxnullop(self):
+    c = SXMatrix(0,0)
+    x = ssym("x",2,3)
+    
+    d = x + c
+    self.assertTrue(isEqual(d,x))
+    
+    d = x / c
+    self.assertTrue(isEqual(d,x))
     
 if __name__ == '__main__':
     unittest.main()

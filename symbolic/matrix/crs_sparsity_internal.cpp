@@ -1858,7 +1858,7 @@ namespace CasADi{
 
     // Quick return if both are dense
     if(dense() && y_trans.dense()){
-      return CRSSparsity(x_nrow,y_ncol,true);
+      return CRSSparsity(x_nrow,y_ncol,!empty() && !y_trans.empty());
     }
   
     // return object
@@ -1990,6 +1990,14 @@ namespace CasADi{
 
   bool CRSSparsityInternal::dense() const{
     return size() == numel();
+  }
+  
+  bool CRSSparsityInternal::empty() const{
+    return numel()==0;
+  }
+  
+  bool CRSSparsityInternal::null() const{
+    return nrow_==0 && ncol_==0;
   }
 
   bool CRSSparsityInternal::diagonal() const{

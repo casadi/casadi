@@ -126,6 +126,9 @@ void SOCPQCQPInternal::evaluate(int nfdir, int nadir) {
   // Delegate computation to SOCP Solver
   socpsolver_.evaluate();
   
+  // Pass the stats
+  stats_["socp_solver_stats"] = socpsolver_.getStats();
+  
   // Read the outputs from SOCP Solver
   output(SOCP_SOLVER_COST).set(socpsolver_.output(QCQP_SOLVER_COST));
   output(SOCP_SOLVER_LAM_A).set(socpsolver_.output(QCQP_SOLVER_LAM_A));
