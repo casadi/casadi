@@ -232,7 +232,7 @@ ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiTree 
 
 
 fclasses  = file('CasadiClasses.hs','w')
-fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiClasses ( CasadiClass(..), cppTypeCasadiPrim,casadiClassDocs, inheritance ) where\n\n")
+fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiClasses ( CasadiClass(..), cppTypeCasadiPrim,inheritance ) where\n\n")
 
 
 finclude  = file('swiginclude.hpp','w')
@@ -281,13 +281,14 @@ for k,v in classes.items():
 
   myclasses.append(symbol_table[k].lower())
   ftree.write("""%s :: Class
-%s = Class %s methods
+%s = Class %s methods docs
   where
     methods =
       [ 
 %s
       ]
-      \n""" % (symbol_table[k].lower(),symbol_table[k].lower(),symbol_table[k], ",\n".join(methods)))
+    docs = Doc "%s"
+      \n""" % (symbol_table[k].lower(),symbol_table[k].lower(),symbol_table[k], ",\n".join(methods),haskellstring(v["docs"])))
   
 ftree.write("classes :: [Class]\nclasses =\n  [\n  %s\n  ]\n" % ",\n  ".join(myclasses))
   
@@ -332,10 +333,6 @@ fclasses.write('cppTypeCasadiPrim :: CasadiClass -> String\n');
 for k,v in exportclasses.items():
   fclasses.write('cppTypeCasadiPrim %s = "%s"\n' % (symbol_table[k],k.replace("("," ").replace(")"," ")))
 
-fclasses.write('casadiClassDocs :: CasadiClass -> String\n');
-for k,v in exportclasses.items():
-  fclasses.write('casadiClassDocs %s = "%s"\n' % (symbol_table[k],haskellstring(v["docs"])))
-    
 fclasses.write("\ninheritance :: [(CasadiClass,[CasadiClass])]\n")
 fclasses.write(
      "inheritance = [ %s ]\n\n\n\n" % ( 
