@@ -79,6 +79,9 @@ void SDPSDQPInternal::evaluate(int nfdir, int nadir) {
   
   sdpsolver_.evaluate();
   
+  // Pass the stats
+  stats_["sdp_solver_stats"] = sdpsolver_.getStats();
+  
   std::copy(sdpsolver_.output(SDP_SOLVER_X).begin(),sdpsolver_.output(SDP_SOLVER_X).begin()+n_,output(SDQP_SOLVER_X).begin());
   setOutput(sdpsolver_.output(SDP_SOLVER_COST),SDQP_SOLVER_COST);
   setOutput(sdpsolver_.output(SDP_SOLVER_DUAL_COST),SDQP_SOLVER_DUAL_COST);

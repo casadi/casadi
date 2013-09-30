@@ -103,6 +103,12 @@ namespace CasADi{
   
     /// Pass the supplied options to Worhp
     void passOptions();
+
+    // Calculate the status message map
+    static std::map<int,std::string> calc_flagmap();
+
+    // Error status map
+    static std::map<int,std::string> flagmap;
   
   };
 

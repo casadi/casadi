@@ -1538,6 +1538,11 @@ const T Matrix<T>::toScalar() const{
 
 template<class T>
 Matrix<T> Matrix<T>::binary(int op, const Matrix<T> &x, const Matrix<T> &y){
+  // Binary operation with a 0-by-0 cancels that operation
+  //  X + SXMatrix(0,0) = X
+  if (x.null()) return y;
+  if (y.null()) return x;
+    
   if(x.numel()==1)
     return scalar_matrix(op,x,y);
   else if(y.numel()==1)  

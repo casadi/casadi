@@ -153,6 +153,7 @@ class %sIOSchemeVector : public IOSchemeVector<M> {
     
   def swigcode(self):
     s="namespace CasADi {\n"
+    #s+= "%warnfilter(302) " + self.name+ ";\n" -- does not seem to work
     if self.enum.endswith('Struct'):
       s+="%template(" + self.name + ") " + self.name + "<CRSSparsity>;\n"
     else:

@@ -100,6 +100,8 @@ void QPStabilizerInternal::evaluate(int nfdir, int nadir) {
     // Solve the QP
     qp_solver_.evaluate();
 
+    // Pass the stats
+    stats_["qp_solver_stats"] = qp_solver_.getStats();
   
     // Get the optimal solution
     std::copy(qp_solver_.output(QP_SOLVER_X).begin(),qp_solver_.output(QP_SOLVER_X).begin()+n_,output(QP_SOLVER_X).begin());

@@ -63,6 +63,9 @@ void QCQPQPInternal::evaluate(int nfdir, int nadir) {
   // Delegate computation to QCQP Solver
   qcqpsolver_.evaluate();
   
+  // Pass the stats
+  stats_["qcqp_solver_stats"] = qcqpsolver_.getStats();
+  
   // Read the outputs from Ipopt
   output(QCQP_SOLVER_X).set(qcqpsolver_.output(QP_SOLVER_X));
   output(QCQP_SOLVER_COST).set(qcqpsolver_.output(QP_SOLVER_COST));
