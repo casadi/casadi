@@ -1593,10 +1593,10 @@ class MXtests(casadiTestCase):
     self.assertEqual(f.adjSeed(1).shape[1],0)
     
     r = f.call([x,MX()])
-    self.assertTrue(r[1].isNull())
+    self.assertTrue(r[1].null())
 
     r = f.call([MX(),MX()])
-    self.assertTrue(r[1].isNull())
+    self.assertTrue(r[1].null())
     
     #self.assertRaises(Exception,lambda : f.eval([x,x]))
     #self.assertRaises(Exception,lambda : f.eval([[],[]]))
@@ -2149,9 +2149,8 @@ class MXtests(casadiTestCase):
     V = [f.output(i) for i in range(len(v))]
     
     self.assertEqual(len(v),3)
-    self.assertTrue(v[0].isNull())
-    #self.assertEqual(v[0].size1(),0)
-    #self.assertEqual(v[0].size2(),0)  # why not 5?
+    self.assertEqual(v[0].size1(),0)
+    self.assertEqual(v[0].size2(),5)  # why not 5?
     self.checkarray(V[1],DMatrix([[0,0,0,0,0],[1,2,0,0,0],[3,4,5,0,0]]))
     self.checkarray(V[2],DMatrix([[6,7,8,9,0],[10,11,12,13,14]]))
  
@@ -2208,7 +2207,8 @@ class MXtests(casadiTestCase):
     V = [f.output(i) for i in range(len(v))]
     
     self.assertEqual(len(v),3)
-    self.assertTrue(v[0].isNull())
+    self.assertEqual(v[0].size1(),5)
+    self.assertEqual(v[0].size2(),0)
     self.checkarray(V[1],DMatrix([[0,0,0],[1,2,0],[3,4,5],[6,7,8],[10,11,12]]))
     self.checkarray(V[2],DMatrix([[0,0],[0,0],[0,0],[9,0],[13,14]]))
     
@@ -2228,6 +2228,62 @@ class MXtests(casadiTestCase):
     self.checkarray(v[0][1],DMatrix([[0,0],[2,0]]))
     self.checkarray(v[1][0],DMatrix([3,6]))
     self.checkarray(blockcat(v),f.input())
+
+  def test_mxnulloutput(self):
+     a = MX(5,0)
+     b = msym("x",2)
+     
+     f = MXFunction([b],[a])
+     f.init()
+     c = f.call([b])[0]
+
+     self.assertEqual(c.size1(),5)
+     self.assertEqual(c.size2(),0)
+
+     c = f.eval([b])[0]
+
+     self.assertEqual(c.size1(),5)
+     self.assertEqual(c.size2(),0)
+     
+     a = MX(0,0)
+     b = msym("x",2)
+     
+     f = MXFunction([b],[a])
+     f.init()
+     c = f.call([b])[0]
+
+     self.assertEqual(c.size1(),0)
+     self.assertEqual(c.size2(),0)
+
+     c = f.eval([b])[0]
+
+     self.assertEqual(c.size1(),0)
+     self.assertEqual(c.size2(),0)
+     
+  def test_mxnull(self):
+     a = MX(5,0)
+     b = MX(0,3)
+     
+     c = mul(a,b)
+     
+     self.assertEqual(c.size(),0)
+     
+     a = MX(5,3)
+     b = MX(3,4)
+     
+     c = mul(a,b)
+     
+     self.assertEqual(c.size(),0)
+     
+  def  test_mxnullop(self):
+    c = MX(0,0)
+    x = msym("x",2,3)
+    
+    d = x + c
+    self.assertTrue(isEqual(d,x))
+    
+    d = x / c
+    self.assertTrue(isEqual(d,x))
     
 if __name__ == '__main__':
     unittest.main()

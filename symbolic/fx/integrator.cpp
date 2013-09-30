@@ -27,54 +27,54 @@
 using namespace std;
 namespace CasADi{
 
-Integrator::Integrator(){
-}
+  Integrator::Integrator(){
+  }
 
-Integrator  Integrator::clone() const{
-  Integrator ret;
-  if(!isNull()) ret.assignNode((*this)->clone());
-  return ret;
-}
+  Integrator  Integrator::clone() const{
+    Integrator ret;
+    if(!isNull()) ret.assignNode((*this)->clone());
+    return ret;
+  }
 
-void Integrator::printStats(ostream &stream) const{
-  (*this)->printStats(stream);
-}
+  void Integrator::printStats(ostream &stream) const{
+    (*this)->printStats(stream);
+  }
   
-IntegratorInternal* Integrator::operator->(){
-  return (IntegratorInternal*)(FX::operator->());
-}
+  IntegratorInternal* Integrator::operator->(){
+    return static_cast<IntegratorInternal*>(GenericIntegrator::operator->());
+  }
 
-const IntegratorInternal* Integrator::operator->() const{
-   return (const IntegratorInternal*)(FX::operator->()); 
-}
+  const IntegratorInternal* Integrator::operator->() const{
+    return static_cast<const IntegratorInternal*>(GenericIntegrator::operator->()); 
+  }
   
-void Integrator::reset(int nsens, int nsensB, int nsensB_store){
-  (*this)->reset(nsens, nsensB, nsensB_store);
-}
+  void Integrator::reset(int nsens, int nsensB, int nsensB_store){
+    (*this)->reset(nsens, nsensB, nsensB_store);
+  }
 
-void Integrator::integrate(double t_out){
-  (*this)->integrate(t_out);
-}
+  void Integrator::integrate(double t_out){
+    (*this)->integrate(t_out);
+  }
     
-bool Integrator::checkNode() const{
-  return dynamic_cast<const IntegratorInternal*>(get())!=0;
-}
+  bool Integrator::checkNode() const{
+    return dynamic_cast<const IntegratorInternal*>(get())!=0;
+  }
 
-void Integrator::resetB(){
-  (*this)->resetB();
-}
+  void Integrator::resetB(){
+    (*this)->resetB();
+  }
 
-void Integrator::integrateB(double t_out){
-  (*this)->integrateB(t_out);
-}
+  void Integrator::integrateB(double t_out){
+    (*this)->integrateB(t_out);
+  }
 
-FX Integrator::getDAE(){
-  return (*this)->f_;
-}
+  FX Integrator::getDAE(){
+    return (*this)->f_;
+  }
 
-std::pair<FX,FX> Integrator::getAugmented(int nfwd, int nadj){
-  return (*this)->getAugmented(nfwd,nadj);
-}
+  std::pair<FX,FX> Integrator::getAugmented(int nfwd, int nadj){
+    return (*this)->getAugmented(nfwd,nadj);
+  }
  
 } // namespace CasADi
 

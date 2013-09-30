@@ -89,7 +89,11 @@ namespace CasADi{
   }
 
   bool CRSSparsity::empty() const{
-    return numel()==0;
+    return (*this)->empty();
+  }
+  
+  bool CRSSparsity::null() const{
+    return (*this)->null();
   }
     
   int CRSSparsity::size() const{

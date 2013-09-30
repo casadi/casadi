@@ -123,7 +123,7 @@ struct casadi_math<int>{
 
   /** \brief Evaluate a built in function */
   static inline void fun(unsigned char op, const int& x, const int& y, int& f){
-    double ff;
+    double ff(0);
     casadi_math<double>::fun(op,double(x),double(y),ff);
     f = int(ff);
   }

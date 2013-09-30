@@ -93,8 +93,11 @@ class GenericMatrix{
     std::pair<int,int> shape() const;
     #endif
 
-    /** \brief  Check if the matrix expression is empty */
+    /** \brief  Check if the matrix expression is empty, i.e. one of its dimensions is 0 */
     bool empty() const;
+    
+    /** \brief  Check if the matrix expression is null, i.e. its dimensios are 0-by-0 */
+    bool null() const;
     
     /** \brief  Check if the matrix expression is dense */
     bool dense() const;
@@ -224,6 +227,11 @@ bool GenericMatrix<MatType>::empty() const{
 }
 
 template<typename MatType>
+bool GenericMatrix<MatType>::null() const{
+  return size1()==0 && size2()==0;
+}
+
+template<typename MatType>
 bool GenericMatrix<MatType>::dense() const{
   return numel()==size();
 }
@@ -248,12 +256,17 @@ MatType GenericMatrix<MatType>::mul_smart(const MatType& y, const CRSSparsity &s
     return x;
   } else if(isZero(x) || isZero(y)){
     // See if one of the arguments can be used as result
-    if(x.size()==0 && y.size1()==y.size2())
+    if(x.size()==0 && y.size1()==y.size2()) {
       return x;
-    else if(y.size()==0 && x.size1()==x.size2())
+    } else if(y.size()==0 && x.size1()==x.size2()) {
       return y;
-    else
-      return MatType::zeros(x.size1(),y.size2());
+    } else {
+      if (x.size()==0 || y.size()==0 || y.empty() || x.empty()) {
+        return MatType::sparse(x.size1(),y.size2());
+      } else {
+        return MatType::zeros(x.size1(),y.size2());
+      }
+    }
   } else if(x.scalar() || y.scalar()){
     return x*y;
   } else {

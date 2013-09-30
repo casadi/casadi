@@ -16,6 +16,42 @@
 <tr><td>nlp_solver_stats</td><td>CasADi::NLPImplicitInternal</td></tr>
 </table>
 */
+/** \class CasADi::QCQPQPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::QCQPQPSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::SDPSDQPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>sdp_solver_stats</td><td>CasADi::SDPSDQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::SDPSDQPSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>sdp_solver_stats</td><td>CasADi::SDPSDQPInternal</td></tr>
+</table>
+*/
 /** \class CasADi::CVodesInternal
 \n
 \par
@@ -146,6 +182,24 @@
 <tr><td>var_string_md</td><td>CasADi::IpoptInternal</td></tr>
 </table>
 */
+/** \class CasADi::QPStabilizerInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qp_solver_stats</td><td>CasADi::QPStabilizerInternal</td></tr>
+</table>
+*/
+/** \class CasADi::QPStabilizer
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qp_solver_stats</td><td>CasADi::QPStabilizerInternal</td></tr>
+</table>
+*/
 /** \class CasADi::IdasInternal
 \n
 \par
@@ -212,6 +266,24 @@
 <tr><td>return_status</td><td>CasADi::StabilizedSQPInternal</td></tr>
 </table>
 */
+/** \class CasADi::QPLPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qp_solver_stats</td><td>CasADi::QPLPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::QPLPSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qp_solver_stats</td><td>CasADi::QPLPInternal</td></tr>
+</table>
+*/
 /** \class CasADi::IntegratorInternal
 \n
 \par
@@ -250,6 +322,42 @@
 <tr><td>return_status</td><td>CasADi::SQPInternal</td></tr>
 </table>
 */
+/** \class CasADi::SOCPQCQPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>socp_solver_stats</td><td>CasADi::SOCPQCQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::SOCPQCQPSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>socp_solver_stats</td><td>CasADi::SOCPQCQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::NLPQPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>nlp_solver_stats</td><td>CasADi::NLPQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::NLPQPSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>nlp_solver_stats</td><td>CasADi::NLPQPInternal</td></tr>
+</table>
+*/
 /** \class CasADi::ParallelizerInternal
 \n
 \par
@@ -280,12 +388,32 @@
 <tr><td>task_starttime</td><td>CasADi::ParallelizerInternal</td></tr>
 </table>
 */
+/** \class CasADi::SDPSOCPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>sdp_solver_stats</td><td>CasADi::SDPSOCPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::SDPSOCPSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>sdp_solver_stats</td><td>CasADi::SDPSOCPInternal</td></tr>
+</table>
+*/
 /** \class CasADi::WorhpInternal
 \n
 \par
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>return_code</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>return_status</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>t_callback_fun</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>t_callback_prepare</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>t_eval_f</td><td>CasADi::WorhpInternal</td></tr>
@@ -302,6 +430,8 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>return_code</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>return_status</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>t_callback_fun</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>t_callback_prepare</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>t_eval_f</td><td>CasADi::WorhpInternal</td></tr>

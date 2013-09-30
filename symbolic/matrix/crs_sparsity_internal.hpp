@@ -142,6 +142,12 @@ namespace CasADi{
 
     /// Number of elements
     int numel() const;
+    
+    /// Check if the sparsity is empty, i.e. one of its dimensions is 0 
+    bool empty() const;
+    
+    /// Check if the sparsity is null, i.e. dimension is 0-by-0
+    bool null() const;
 
     /// Number of non-zeros in the upper triangular half
     int sizeU() const;
