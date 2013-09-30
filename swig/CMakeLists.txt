@@ -384,7 +384,7 @@ ADD_CUSTOM_COMMAND(
    DEPENDS ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py
 )
 
-set(LINK_LIBRARIES_ALL ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
+set(LINK_LIBRARIES_ALL ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
 
 # Pass meta information
 CONFIGURE_FILE(

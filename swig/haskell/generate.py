@@ -127,21 +127,23 @@ def tohaskelltype(s,alias=False,level=0):
   else:
     raise Exception("What is '" + s + "'")
     
-
+def getAttribute(e,name,default=""):
+  d = e.find('attributelist/attribute[@name="' + name + '"]')
+  if d is None:
+    return default
+  return d.attrib["value"]
 
 # Build up symbol_table
 for c in r.findall('*//class'):
-  name = c.find('attributelist/attribute[@name="name"]').attrib["value"]
-  if c.find('attributelist/attribute[@name="sym_name"]') is None:
-    symbol_table[name] = name
-  else:
-    sym_name = c.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
-    symbol_table[name] = sym_name
+  name = getAttribute(c,"name")
+  symbol_table[name] = getAttribute(c,"sym_name",default=name)
+    
+def removens(s):
+  return s.replace('CasADi::','')
     
 symbol_table_reverse = dict([(v,k) for k,v in symbol_table.items()])
+symbol_table_nonamespace = dict([(removens(k),k) for k,v in symbol_table.items()])
 
-
-    
 classes = {}
 
 for c in r.findall('*//class'):
@@ -149,11 +151,15 @@ for c in r.findall('*//class'):
   t = classes[name] = {}
   t["haskell"] = tohaskelltype(name)
   
+def haskellstring(s):
+  return s.replace('"','\\"').replace('\\\\"','\\"').replace("\n",'\\n')
   
 
 for c in r.findall('*//class'):
   name = c.find('attributelist/attribute[@name="name"]').attrib["value"]
-  data = classes[name] = {'methods': [],"constructors":[]}
+  docs = getAttribute(c,"feature_docstring")
+  data = classes[name] = {'methods': [],"constructors":[],"docs": haskellstring(docs)}
+
   
 
   for d in c.findall('cdecl'):
@@ -169,12 +175,11 @@ for c in r.findall('*//class'):
 
      rettype = d.find('attributelist/attribute[@name="type"]').attrib["value"]
      update_types_table(rettype)
-     if d.find('attributelist/attribute[@name="storage"]') is None:
-       storage = ""
-     else:
-       storage = d.find('attributelist/attribute[@name="storage"]').attrib["value"]
+     storage = getAttribute(d,"storage")
        
-     data["methods"].append((dname,params,rettype,"Static" if storage=="static" else "Normal"))
+     docs = getAttribute(d,"feature_docstring")
+       
+     data["methods"].append((dname,params,rettype,"Static" if storage=="static" else "Normal",docs))
 
   for d in c.findall('constructor'):
      dname = symbol_table[name]
@@ -187,7 +192,8 @@ for c in r.findall('*//class'):
          
      rettype = name
        
-     data["methods"].append((dname,params,rettype,"Constructor"))
+     docs = getAttribute(d,"feature_docstring")
+     data["methods"].append((dname,params,rettype,"Constructor",docs))
     
   data["bases"] = [] 
   for d in c.findall('attributelist/baselist/base'):
@@ -195,7 +201,11 @@ for c in r.findall('*//class'):
     if base in symbol_table_reverse:
       base = symbol_table_reverse[base]
       data["bases"].append(base)
-    
+    elif removens(base) in symbol_table_nonamespace:
+      base = symbol_table_nonamespace[removens(base)]
+      data["bases"].append(base)
+    else:
+      raise Exception("ouch:" + base + str(symbol_table))  
      
 functions = []
 for d in r.findall('*//namespace/cdecl'):
@@ -210,9 +220,10 @@ for d in r.findall('*//namespace/cdecl'):
     for p in params:
       update_types_table(p)
      
-  rettype = d.find('attributelist/attribute[@name="type"]').attrib["value"]
+  rettype = getAttribute(d,"type")
+  docs = getAttribute(d,"feature_docstring")
    
-  functions.append((dname,params,rettype))
+  functions.append((dname,params,rettype,docs))
      
 
 ftree  = file('CasadiTree.hs','w')
@@ -220,7 +231,7 @@ ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiTree 
 
 
 fclasses  = file('CasadiClasses.hs','w')
-fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiClasses ( CasadiClass(..), cppTypeCasadiPrim, inheritance ) where\n\n")
+fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiClasses ( CasadiClass(..), cppTypeCasadiPrim,casadiClassDocs, inheritance ) where\n\n")
 
 
 finclude  = file('swiginclude.hpp','w')
@@ -252,7 +263,7 @@ for k,v in classes.items():
   methods = []
   if "methods" in v:
     counter = {}
-    for (name,pars,rettype,mtype) in getAllMethods(k): # v["methods"]:
+    for (name,pars,rettype,mtype,docs) in getAllMethods(k): # v["methods"]:
       params = [types_table[p][1] for p in pars]
       if rettype not in types_table: continue
       t = types_table[rettype][1]
@@ -265,7 +276,7 @@ for k,v in classes.items():
         counter[name]+=1
       else:
         counter[name]=0
-      methods.append("""        Method (Name "%s") %s [%s] %s""" % (name+"'"*counter[name],t,",".join(params),mtype))
+      methods.append("""        Method (Name "%s") %s [%s] %s Doc "%s" """ % (name+"'"*counter[name],t,",".join(params),mtype,haskellstring(docs)))
 
   myclasses.append(symbol_table[k].lower())
   ftree.write("""%s :: Class
@@ -282,7 +293,7 @@ ftree.write("classes :: [Class]\nclasses =\n  [\n  %s\n  ]\n" % ",\n  ".join(myc
 tools = []
 
 counter = {}
-for (name,pars,rettype) in functions:
+for (name,pars,rettype,docs) in functions:
   params = [types_table[p][1] for p in pars]
   if rettype not in types_table: continue
   t = types_table[rettype][1]
@@ -296,7 +307,7 @@ for (name,pars,rettype) in functions:
     counter[name]+=1
   else:
     counter[name]=0
-  tools.append("""  Function (Name "%s") %s [%s]""" % (name+"'"*counter[name],t,",".join(params)))
+  tools.append("""  Function (Name "%s") %s [%s] Doc "%s" """ % (name+"'"*counter[name],t,",".join(params),haskellstring(docs)))
   
 ftree.write("""
 tools :: [Function]
@@ -312,13 +323,18 @@ for a,t in aliases.items():
   if t is None or a is None or not a in tainted_types: continue
   ftree.write("%s :: Type\n%s = %s\n" % (a,a,t))
   
-fclasses.write("data CasadiClass = %s \n  deriving (Show, Eq, Ord)\n\n\n" % ( "\n  | ".join([symbol_table[k] for k,v in classes.items() if "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]])))
+exportclasses = dict([(k,v) for k,v in classes.items() if "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]])
+  
+fclasses.write("data CasadiClass = %s \n  deriving (Show, Eq, Ord)\n\n\n" % ( "\n  | ".join([symbol_table[k] for k,v in exportclasses.items()])))
 
 fclasses.write('cppTypeCasadiPrim :: CasadiClass -> String\n');
-for k,v in classes.items():
-  if "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]:
-    fclasses.write('cppTypeCasadiPrim %s = "%s"\n' % (symbol_table[k],k.replace("("," ").replace(")"," ")))
+for k,v in exportclasses.items():
+  fclasses.write('cppTypeCasadiPrim %s = "%s"\n' % (symbol_table[k],k.replace("("," ").replace(")"," ")))
 
+fclasses.write('casadiClassDocs :: CasadiClass -> String\n');
+for k,v in exportclasses.items():
+  fclasses.write('casadiClassDocs %s = "%s"\n' % (symbol_table[k],haskellstring(v["docs"])))
+    
 fclasses.write("\ninheritance :: [(CasadiClass,[CasadiClass])]\n")
 fclasses.write(
      "inheritance = [ %s ]\n\n\n\n" % ( 
@@ -327,4 +343,4 @@ fclasses.write(
             "(%s,[%s])" % (
                     symbol_table[k],
                     ",".join([symbol_table[i] for i in v["bases"]])
-              ) for k,v in classes.items() if "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]])))
+              ) for k,v in exportclasses.items()])))
