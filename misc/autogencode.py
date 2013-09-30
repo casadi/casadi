@@ -116,7 +116,7 @@ class %sIOSchemeVector : public IOSchemeVector<M> {
     s+= "template<class M>" + "\n"
     s+= self.enum + "IOSchemeVector<M> " + self.name + "("
     for i, (name, doc, enum) in enumerate(self.entries):
-      s+="""const std::string arg_s%d="",M arg_m%d=M()""" % (i,i) + ","
+      s+="""const std::string &arg_s%d ="",M &arg_m%d =M()""" % (i,i) + ","
     s=s[:-1] + "){" + "\n"
     s+= "  std::vector<M> ret(%d);\n" % len(self.entries)
     
@@ -137,7 +137,7 @@ class %sIOSchemeVector : public IOSchemeVector<M> {
     s+= "template<class M>" + "\n"
     s+= "std::vector<M> " + self.name + "(const std::vector<M>& args,"
     for i, (name, doc, enum) in enumerate(self.entries):
-      s+='const std::string arg_s%d=""' % i + ","
+      s+='const std::string &arg_s%d=""' % i + ","
     s=s[:-1] + "){" + "\n"
     s+= "  std::vector<M> ret;\n"
     for i,_ in enumerate(self.entries):
@@ -157,12 +157,18 @@ class %sIOSchemeVector : public IOSchemeVector<M> {
     if self.enum.endswith('Struct'):
       s+="%template(" + self.name + ") " + self.name + "<CRSSparsity>;\n"
     else:
-      s+="%template(" + self.name + ") " + self.name + "<SXMatrix>;\n"
-      s+="%template(" + self.name + ") " + self.name + "<MX>;\n"
-      s+="%template(" + self.name + ") " + self.name + "<CRSSparsity>;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + ") " + self.enum + "IOSchemeVector<SXMatrix>;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + ") " + self.enum + "IOSchemeVector<MX>;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + ") " + self.enum + "IOSchemeVector<CRSSparsity>;\n"
+      s+="%template(" + self.name + "SXMatrix) " + self.name + "<SXMatrix>;\n"
+      s+="%template(" + self.name + "MX) " + self.name + "<MX>;\n"
+      s+="%template(" + self.name + "CRSSparsity) " + self.name + "<CRSSparsity>;\n"
+      s+="%template(" +  "IOSchemeVector" + self.enum + "SXMatrix) " + self.enum + "IOSchemeVector<SXMatrix>;\n"
+      s+="%template(" +  "IOSchemeVector" + self.enum + "MX) " + self.enum + "IOSchemeVector<MX>;\n"
+      s+="%template(" +  "IOSchemeVector" + self.enum + "CRSSparsity) " + self.enum + "IOSchemeVector<CRSSparsity>;\n"
+      s+="%rename(" + self.name + ") " + self.name + "SXMatrix;\n"
+      s+="%rename(" + self.name + ") " + self.name + "MX;\n"
+      s+="%rename(" + self.name + ") " + self.name + "CRSSparsity;\n"
+      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "SXMatrix;\n"
+      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "MX;\n"
+      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum+ "CRSSparsity;\n"
     s+="}\n"
     return s
 

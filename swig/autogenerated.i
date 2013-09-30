@@ -144,12 +144,18 @@ def acadoIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(acadoIn) acadoIn<SXMatrix>;
-%template(acadoIn) acadoIn<MX>;
-%template(acadoIn) acadoIn<CRSSparsity>;
-%template(IOSchemeVectorACADO_Input) ACADO_InputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorACADO_Input) ACADO_InputIOSchemeVector<MX>;
-%template(IOSchemeVectorACADO_Input) ACADO_InputIOSchemeVector<CRSSparsity>;
+%template(acadoInSXMatrix) acadoIn<SXMatrix>;
+%template(acadoInMX) acadoIn<MX>;
+%template(acadoInCRSSparsity) acadoIn<CRSSparsity>;
+%template(IOSchemeVectorACADO_InputSXMatrix) ACADO_InputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorACADO_InputMX) ACADO_InputIOSchemeVector<MX>;
+%template(IOSchemeVectorACADO_InputCRSSparsity) ACADO_InputIOSchemeVector<CRSSparsity>;
+%rename(acadoIn) acadoInSXMatrix;
+%rename(acadoIn) acadoInMX;
+%rename(acadoIn) acadoInCRSSparsity;
+%rename(IOSchemeVectorACADO_Input) IOSchemeVectorACADO_InputSXMatrix;
+%rename(IOSchemeVectorACADO_Input) IOSchemeVectorACADO_InputMX;
+%rename(IOSchemeVectorACADO_Input) IOSchemeVectorACADO_InputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -195,12 +201,18 @@ def acadoOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(acadoOut) acadoOut<SXMatrix>;
-%template(acadoOut) acadoOut<MX>;
-%template(acadoOut) acadoOut<CRSSparsity>;
-%template(IOSchemeVectorACADO_Output) ACADO_OutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorACADO_Output) ACADO_OutputIOSchemeVector<MX>;
-%template(IOSchemeVectorACADO_Output) ACADO_OutputIOSchemeVector<CRSSparsity>;
+%template(acadoOutSXMatrix) acadoOut<SXMatrix>;
+%template(acadoOutMX) acadoOut<MX>;
+%template(acadoOutCRSSparsity) acadoOut<CRSSparsity>;
+%template(IOSchemeVectorACADO_OutputSXMatrix) ACADO_OutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorACADO_OutputMX) ACADO_OutputIOSchemeVector<MX>;
+%template(IOSchemeVectorACADO_OutputCRSSparsity) ACADO_OutputIOSchemeVector<CRSSparsity>;
+%rename(acadoOut) acadoOutSXMatrix;
+%rename(acadoOut) acadoOutMX;
+%rename(acadoOut) acadoOutCRSSparsity;
+%rename(IOSchemeVectorACADO_Output) IOSchemeVectorACADO_OutputSXMatrix;
+%rename(IOSchemeVectorACADO_Output) IOSchemeVectorACADO_OutputMX;
+%rename(IOSchemeVectorACADO_Output) IOSchemeVectorACADO_OutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -254,12 +266,18 @@ def acadofcnIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(acadofcnIn) acadofcnIn<SXMatrix>;
-%template(acadofcnIn) acadofcnIn<MX>;
-%template(acadofcnIn) acadofcnIn<CRSSparsity>;
-%template(IOSchemeVectorACADO_FCN_Input) ACADO_FCN_InputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorACADO_FCN_Input) ACADO_FCN_InputIOSchemeVector<MX>;
-%template(IOSchemeVectorACADO_FCN_Input) ACADO_FCN_InputIOSchemeVector<CRSSparsity>;
+%template(acadofcnInSXMatrix) acadofcnIn<SXMatrix>;
+%template(acadofcnInMX) acadofcnIn<MX>;
+%template(acadofcnInCRSSparsity) acadofcnIn<CRSSparsity>;
+%template(IOSchemeVectorACADO_FCN_InputSXMatrix) ACADO_FCN_InputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorACADO_FCN_InputMX) ACADO_FCN_InputIOSchemeVector<MX>;
+%template(IOSchemeVectorACADO_FCN_InputCRSSparsity) ACADO_FCN_InputIOSchemeVector<CRSSparsity>;
+%rename(acadofcnIn) acadofcnInSXMatrix;
+%rename(acadofcnIn) acadofcnInMX;
+%rename(acadofcnIn) acadofcnInCRSSparsity;
+%rename(IOSchemeVectorACADO_FCN_Input) IOSchemeVectorACADO_FCN_InputSXMatrix;
+%rename(IOSchemeVectorACADO_FCN_Input) IOSchemeVectorACADO_FCN_InputMX;
+%rename(IOSchemeVectorACADO_FCN_Input) IOSchemeVectorACADO_FCN_InputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -325,12 +343,18 @@ def controldaeIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(controldaeIn) controldaeIn<SXMatrix>;
-%template(controldaeIn) controldaeIn<MX>;
-%template(controldaeIn) controldaeIn<CRSSparsity>;
-%template(IOSchemeVectorControlledDAEInput) ControlledDAEInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorControlledDAEInput) ControlledDAEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorControlledDAEInput) ControlledDAEInputIOSchemeVector<CRSSparsity>;
+%template(controldaeInSXMatrix) controldaeIn<SXMatrix>;
+%template(controldaeInMX) controldaeIn<MX>;
+%template(controldaeInCRSSparsity) controldaeIn<CRSSparsity>;
+%template(IOSchemeVectorControlledDAEInputSXMatrix) ControlledDAEInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorControlledDAEInputMX) ControlledDAEInputIOSchemeVector<MX>;
+%template(IOSchemeVectorControlledDAEInputCRSSparsity) ControlledDAEInputIOSchemeVector<CRSSparsity>;
+%rename(controldaeIn) controldaeInSXMatrix;
+%rename(controldaeIn) controldaeInMX;
+%rename(controldaeIn) controldaeInCRSSparsity;
+%rename(IOSchemeVectorControlledDAEInput) IOSchemeVectorControlledDAEInputSXMatrix;
+%rename(IOSchemeVectorControlledDAEInput) IOSchemeVectorControlledDAEInputMX;
+%rename(IOSchemeVectorControlledDAEInput) IOSchemeVectorControlledDAEInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -372,12 +396,18 @@ def controlsimulatorIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(controlsimulatorIn) controlsimulatorIn<SXMatrix>;
-%template(controlsimulatorIn) controlsimulatorIn<MX>;
-%template(controlsimulatorIn) controlsimulatorIn<CRSSparsity>;
-%template(IOSchemeVectorControlSimulatorInput) ControlSimulatorInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorControlSimulatorInput) ControlSimulatorInputIOSchemeVector<MX>;
-%template(IOSchemeVectorControlSimulatorInput) ControlSimulatorInputIOSchemeVector<CRSSparsity>;
+%template(controlsimulatorInSXMatrix) controlsimulatorIn<SXMatrix>;
+%template(controlsimulatorInMX) controlsimulatorIn<MX>;
+%template(controlsimulatorInCRSSparsity) controlsimulatorIn<CRSSparsity>;
+%template(IOSchemeVectorControlSimulatorInputSXMatrix) ControlSimulatorInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorControlSimulatorInputMX) ControlSimulatorInputIOSchemeVector<MX>;
+%template(IOSchemeVectorControlSimulatorInputCRSSparsity) ControlSimulatorInputIOSchemeVector<CRSSparsity>;
+%rename(controlsimulatorIn) controlsimulatorInSXMatrix;
+%rename(controlsimulatorIn) controlsimulatorInMX;
+%rename(controlsimulatorIn) controlsimulatorInCRSSparsity;
+%rename(IOSchemeVectorControlSimulatorInput) IOSchemeVectorControlSimulatorInputSXMatrix;
+%rename(IOSchemeVectorControlSimulatorInput) IOSchemeVectorControlSimulatorInputMX;
+%rename(IOSchemeVectorControlSimulatorInput) IOSchemeVectorControlSimulatorInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -423,12 +453,18 @@ def daeIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(daeIn) daeIn<SXMatrix>;
-%template(daeIn) daeIn<MX>;
-%template(daeIn) daeIn<CRSSparsity>;
-%template(IOSchemeVectorDAEInput) DAEInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorDAEInput) DAEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorDAEInput) DAEInputIOSchemeVector<CRSSparsity>;
+%template(daeInSXMatrix) daeIn<SXMatrix>;
+%template(daeInMX) daeIn<MX>;
+%template(daeInCRSSparsity) daeIn<CRSSparsity>;
+%template(IOSchemeVectorDAEInputSXMatrix) DAEInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorDAEInputMX) DAEInputIOSchemeVector<MX>;
+%template(IOSchemeVectorDAEInputCRSSparsity) DAEInputIOSchemeVector<CRSSparsity>;
+%rename(daeIn) daeInSXMatrix;
+%rename(daeIn) daeInMX;
+%rename(daeIn) daeInCRSSparsity;
+%rename(IOSchemeVectorDAEInput) IOSchemeVectorDAEInputSXMatrix;
+%rename(IOSchemeVectorDAEInput) IOSchemeVectorDAEInputMX;
+%rename(IOSchemeVectorDAEInput) IOSchemeVectorDAEInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -470,12 +506,18 @@ def daeOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(daeOut) daeOut<SXMatrix>;
-%template(daeOut) daeOut<MX>;
-%template(daeOut) daeOut<CRSSparsity>;
-%template(IOSchemeVectorDAEOutput) DAEOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorDAEOutput) DAEOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorDAEOutput) DAEOutputIOSchemeVector<CRSSparsity>;
+%template(daeOutSXMatrix) daeOut<SXMatrix>;
+%template(daeOutMX) daeOut<MX>;
+%template(daeOutCRSSparsity) daeOut<CRSSparsity>;
+%template(IOSchemeVectorDAEOutputSXMatrix) DAEOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorDAEOutputMX) DAEOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorDAEOutputCRSSparsity) DAEOutputIOSchemeVector<CRSSparsity>;
+%rename(daeOut) daeOutSXMatrix;
+%rename(daeOut) daeOutMX;
+%rename(daeOut) daeOutCRSSparsity;
+%rename(IOSchemeVectorDAEOutput) IOSchemeVectorDAEOutputSXMatrix;
+%rename(IOSchemeVectorDAEOutput) IOSchemeVectorDAEOutputMX;
+%rename(IOSchemeVectorDAEOutput) IOSchemeVectorDAEOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -533,12 +575,18 @@ def rdaeIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(rdaeIn) rdaeIn<SXMatrix>;
-%template(rdaeIn) rdaeIn<MX>;
-%template(rdaeIn) rdaeIn<CRSSparsity>;
-%template(IOSchemeVectorRDAEInput) RDAEInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorRDAEInput) RDAEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorRDAEInput) RDAEInputIOSchemeVector<CRSSparsity>;
+%template(rdaeInSXMatrix) rdaeIn<SXMatrix>;
+%template(rdaeInMX) rdaeIn<MX>;
+%template(rdaeInCRSSparsity) rdaeIn<CRSSparsity>;
+%template(IOSchemeVectorRDAEInputSXMatrix) RDAEInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorRDAEInputMX) RDAEInputIOSchemeVector<MX>;
+%template(IOSchemeVectorRDAEInputCRSSparsity) RDAEInputIOSchemeVector<CRSSparsity>;
+%rename(rdaeIn) rdaeInSXMatrix;
+%rename(rdaeIn) rdaeInMX;
+%rename(rdaeIn) rdaeInCRSSparsity;
+%rename(IOSchemeVectorRDAEInput) IOSchemeVectorRDAEInputSXMatrix;
+%rename(IOSchemeVectorRDAEInput) IOSchemeVectorRDAEInputMX;
+%rename(IOSchemeVectorRDAEInput) IOSchemeVectorRDAEInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -580,12 +628,18 @@ def rdaeOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(rdaeOut) rdaeOut<SXMatrix>;
-%template(rdaeOut) rdaeOut<MX>;
-%template(rdaeOut) rdaeOut<CRSSparsity>;
-%template(IOSchemeVectorRDAEOutput) RDAEOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorRDAEOutput) RDAEOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorRDAEOutput) RDAEOutputIOSchemeVector<CRSSparsity>;
+%template(rdaeOutSXMatrix) rdaeOut<SXMatrix>;
+%template(rdaeOutMX) rdaeOut<MX>;
+%template(rdaeOutCRSSparsity) rdaeOut<CRSSparsity>;
+%template(IOSchemeVectorRDAEOutputSXMatrix) RDAEOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorRDAEOutputMX) RDAEOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorRDAEOutputCRSSparsity) RDAEOutputIOSchemeVector<CRSSparsity>;
+%rename(rdaeOut) rdaeOutSXMatrix;
+%rename(rdaeOut) rdaeOutMX;
+%rename(rdaeOut) rdaeOutCRSSparsity;
+%rename(IOSchemeVectorRDAEOutput) IOSchemeVectorRDAEOutputSXMatrix;
+%rename(IOSchemeVectorRDAEOutput) IOSchemeVectorRDAEOutputMX;
+%rename(IOSchemeVectorRDAEOutput) IOSchemeVectorRDAEOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -631,12 +685,18 @@ def integratorIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(integratorIn) integratorIn<SXMatrix>;
-%template(integratorIn) integratorIn<MX>;
-%template(integratorIn) integratorIn<CRSSparsity>;
-%template(IOSchemeVectorIntegratorInput) IntegratorInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorIntegratorInput) IntegratorInputIOSchemeVector<MX>;
-%template(IOSchemeVectorIntegratorInput) IntegratorInputIOSchemeVector<CRSSparsity>;
+%template(integratorInSXMatrix) integratorIn<SXMatrix>;
+%template(integratorInMX) integratorIn<MX>;
+%template(integratorInCRSSparsity) integratorIn<CRSSparsity>;
+%template(IOSchemeVectorIntegratorInputSXMatrix) IntegratorInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorIntegratorInputMX) IntegratorInputIOSchemeVector<MX>;
+%template(IOSchemeVectorIntegratorInputCRSSparsity) IntegratorInputIOSchemeVector<CRSSparsity>;
+%rename(integratorIn) integratorInSXMatrix;
+%rename(integratorIn) integratorInMX;
+%rename(integratorIn) integratorInCRSSparsity;
+%rename(IOSchemeVectorIntegratorInput) IOSchemeVectorIntegratorInputSXMatrix;
+%rename(IOSchemeVectorIntegratorInput) IOSchemeVectorIntegratorInputMX;
+%rename(IOSchemeVectorIntegratorInput) IOSchemeVectorIntegratorInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -682,12 +742,18 @@ def integratorOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(integratorOut) integratorOut<SXMatrix>;
-%template(integratorOut) integratorOut<MX>;
-%template(integratorOut) integratorOut<CRSSparsity>;
-%template(IOSchemeVectorIntegratorOutput) IntegratorOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorIntegratorOutput) IntegratorOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorIntegratorOutput) IntegratorOutputIOSchemeVector<CRSSparsity>;
+%template(integratorOutSXMatrix) integratorOut<SXMatrix>;
+%template(integratorOutMX) integratorOut<MX>;
+%template(integratorOutCRSSparsity) integratorOut<CRSSparsity>;
+%template(IOSchemeVectorIntegratorOutputSXMatrix) IntegratorOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorIntegratorOutputMX) IntegratorOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorIntegratorOutputCRSSparsity) IntegratorOutputIOSchemeVector<CRSSparsity>;
+%rename(integratorOut) integratorOutSXMatrix;
+%rename(integratorOut) integratorOutMX;
+%rename(integratorOut) integratorOutCRSSparsity;
+%rename(IOSchemeVectorIntegratorOutput) IOSchemeVectorIntegratorOutputSXMatrix;
+%rename(IOSchemeVectorIntegratorOutput) IOSchemeVectorIntegratorOutputMX;
+%rename(IOSchemeVectorIntegratorOutput) IOSchemeVectorIntegratorOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -729,12 +795,18 @@ def linsolIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(linsolIn) linsolIn<SXMatrix>;
-%template(linsolIn) linsolIn<MX>;
-%template(linsolIn) linsolIn<CRSSparsity>;
-%template(IOSchemeVectorLinsolInput) LinsolInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorLinsolInput) LinsolInputIOSchemeVector<MX>;
-%template(IOSchemeVectorLinsolInput) LinsolInputIOSchemeVector<CRSSparsity>;
+%template(linsolInSXMatrix) linsolIn<SXMatrix>;
+%template(linsolInMX) linsolIn<MX>;
+%template(linsolInCRSSparsity) linsolIn<CRSSparsity>;
+%template(IOSchemeVectorLinsolInputSXMatrix) LinsolInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorLinsolInputMX) LinsolInputIOSchemeVector<MX>;
+%template(IOSchemeVectorLinsolInputCRSSparsity) LinsolInputIOSchemeVector<CRSSparsity>;
+%rename(linsolIn) linsolInSXMatrix;
+%rename(linsolIn) linsolInMX;
+%rename(linsolIn) linsolInCRSSparsity;
+%rename(IOSchemeVectorLinsolInput) IOSchemeVectorLinsolInputSXMatrix;
+%rename(IOSchemeVectorLinsolInput) IOSchemeVectorLinsolInputMX;
+%rename(IOSchemeVectorLinsolInput) IOSchemeVectorLinsolInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -768,12 +840,18 @@ def linsolOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(linsolOut) linsolOut<SXMatrix>;
-%template(linsolOut) linsolOut<MX>;
-%template(linsolOut) linsolOut<CRSSparsity>;
-%template(IOSchemeVectorLinsolOutput) LinsolOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorLinsolOutput) LinsolOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorLinsolOutput) LinsolOutputIOSchemeVector<CRSSparsity>;
+%template(linsolOutSXMatrix) linsolOut<SXMatrix>;
+%template(linsolOutMX) linsolOut<MX>;
+%template(linsolOutCRSSparsity) linsolOut<CRSSparsity>;
+%template(IOSchemeVectorLinsolOutputSXMatrix) LinsolOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorLinsolOutputMX) LinsolOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorLinsolOutputCRSSparsity) LinsolOutputIOSchemeVector<CRSSparsity>;
+%rename(linsolOut) linsolOutSXMatrix;
+%rename(linsolOut) linsolOutMX;
+%rename(linsolOut) linsolOutCRSSparsity;
+%rename(IOSchemeVectorLinsolOutput) IOSchemeVectorLinsolOutputSXMatrix;
+%rename(IOSchemeVectorLinsolOutput) IOSchemeVectorLinsolOutputMX;
+%rename(IOSchemeVectorLinsolOutput) IOSchemeVectorLinsolOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -827,12 +905,18 @@ def lpIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(lpIn) lpIn<SXMatrix>;
-%template(lpIn) lpIn<MX>;
-%template(lpIn) lpIn<CRSSparsity>;
-%template(IOSchemeVectorLPSolverInput) LPSolverInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorLPSolverInput) LPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorLPSolverInput) LPSolverInputIOSchemeVector<CRSSparsity>;
+%template(lpInSXMatrix) lpIn<SXMatrix>;
+%template(lpInMX) lpIn<MX>;
+%template(lpInCRSSparsity) lpIn<CRSSparsity>;
+%template(IOSchemeVectorLPSolverInputSXMatrix) LPSolverInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorLPSolverInputMX) LPSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorLPSolverInputCRSSparsity) LPSolverInputIOSchemeVector<CRSSparsity>;
+%rename(lpIn) lpInSXMatrix;
+%rename(lpIn) lpInMX;
+%rename(lpIn) lpInCRSSparsity;
+%rename(IOSchemeVectorLPSolverInput) IOSchemeVectorLPSolverInputSXMatrix;
+%rename(IOSchemeVectorLPSolverInput) IOSchemeVectorLPSolverInputMX;
+%rename(IOSchemeVectorLPSolverInput) IOSchemeVectorLPSolverInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -878,12 +962,18 @@ def lpOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(lpOut) lpOut<SXMatrix>;
-%template(lpOut) lpOut<MX>;
-%template(lpOut) lpOut<CRSSparsity>;
-%template(IOSchemeVectorLPSolverOutput) LPSolverOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorLPSolverOutput) LPSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorLPSolverOutput) LPSolverOutputIOSchemeVector<CRSSparsity>;
+%template(lpOutSXMatrix) lpOut<SXMatrix>;
+%template(lpOutMX) lpOut<MX>;
+%template(lpOutCRSSparsity) lpOut<CRSSparsity>;
+%template(IOSchemeVectorLPSolverOutputSXMatrix) LPSolverOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorLPSolverOutputMX) LPSolverOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorLPSolverOutputCRSSparsity) LPSolverOutputIOSchemeVector<CRSSparsity>;
+%rename(lpOut) lpOutSXMatrix;
+%rename(lpOut) lpOutMX;
+%rename(lpOut) lpOutCRSSparsity;
+%rename(IOSchemeVectorLPSolverOutput) IOSchemeVectorLPSolverOutputSXMatrix;
+%rename(IOSchemeVectorLPSolverOutput) IOSchemeVectorLPSolverOutputMX;
+%rename(IOSchemeVectorLPSolverOutput) IOSchemeVectorLPSolverOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -956,12 +1046,18 @@ def nlpIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(nlpIn) nlpIn<SXMatrix>;
-%template(nlpIn) nlpIn<MX>;
-%template(nlpIn) nlpIn<CRSSparsity>;
-%template(IOSchemeVectorNLPInput) NLPInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorNLPInput) NLPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPInput) NLPInputIOSchemeVector<CRSSparsity>;
+%template(nlpInSXMatrix) nlpIn<SXMatrix>;
+%template(nlpInMX) nlpIn<MX>;
+%template(nlpInCRSSparsity) nlpIn<CRSSparsity>;
+%template(IOSchemeVectorNLPInputSXMatrix) NLPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorNLPInputMX) NLPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorNLPInputCRSSparsity) NLPInputIOSchemeVector<CRSSparsity>;
+%rename(nlpIn) nlpInSXMatrix;
+%rename(nlpIn) nlpInMX;
+%rename(nlpIn) nlpInCRSSparsity;
+%rename(IOSchemeVectorNLPInput) IOSchemeVectorNLPInputSXMatrix;
+%rename(IOSchemeVectorNLPInput) IOSchemeVectorNLPInputMX;
+%rename(IOSchemeVectorNLPInput) IOSchemeVectorNLPInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -999,12 +1095,18 @@ def nlpOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(nlpOut) nlpOut<SXMatrix>;
-%template(nlpOut) nlpOut<MX>;
-%template(nlpOut) nlpOut<CRSSparsity>;
-%template(IOSchemeVectorNLPOutput) NLPOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorNLPOutput) NLPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPOutput) NLPOutputIOSchemeVector<CRSSparsity>;
+%template(nlpOutSXMatrix) nlpOut<SXMatrix>;
+%template(nlpOutMX) nlpOut<MX>;
+%template(nlpOutCRSSparsity) nlpOut<CRSSparsity>;
+%template(IOSchemeVectorNLPOutputSXMatrix) NLPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorNLPOutputMX) NLPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorNLPOutputCRSSparsity) NLPOutputIOSchemeVector<CRSSparsity>;
+%rename(nlpOut) nlpOutSXMatrix;
+%rename(nlpOut) nlpOutMX;
+%rename(nlpOut) nlpOutCRSSparsity;
+%rename(IOSchemeVectorNLPOutput) IOSchemeVectorNLPOutputSXMatrix;
+%rename(IOSchemeVectorNLPOutput) IOSchemeVectorNLPOutputMX;
+%rename(IOSchemeVectorNLPOutput) IOSchemeVectorNLPOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1042,12 +1144,18 @@ def gradFIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(gradFIn) gradFIn<SXMatrix>;
-%template(gradFIn) gradFIn<MX>;
-%template(gradFIn) gradFIn<CRSSparsity>;
-%template(IOSchemeVectorGradFInput) GradFInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorGradFInput) GradFInputIOSchemeVector<MX>;
-%template(IOSchemeVectorGradFInput) GradFInputIOSchemeVector<CRSSparsity>;
+%template(gradFInSXMatrix) gradFIn<SXMatrix>;
+%template(gradFInMX) gradFIn<MX>;
+%template(gradFInCRSSparsity) gradFIn<CRSSparsity>;
+%template(IOSchemeVectorGradFInputSXMatrix) GradFInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorGradFInputMX) GradFInputIOSchemeVector<MX>;
+%template(IOSchemeVectorGradFInputCRSSparsity) GradFInputIOSchemeVector<CRSSparsity>;
+%rename(gradFIn) gradFInSXMatrix;
+%rename(gradFIn) gradFInMX;
+%rename(gradFIn) gradFInCRSSparsity;
+%rename(IOSchemeVectorGradFInput) IOSchemeVectorGradFInputSXMatrix;
+%rename(IOSchemeVectorGradFInput) IOSchemeVectorGradFInputMX;
+%rename(IOSchemeVectorGradFInput) IOSchemeVectorGradFInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1089,12 +1197,18 @@ def gradFOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(gradFOut) gradFOut<SXMatrix>;
-%template(gradFOut) gradFOut<MX>;
-%template(gradFOut) gradFOut<CRSSparsity>;
-%template(IOSchemeVectorGradFOutput) GradFOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorGradFOutput) GradFOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorGradFOutput) GradFOutputIOSchemeVector<CRSSparsity>;
+%template(gradFOutSXMatrix) gradFOut<SXMatrix>;
+%template(gradFOutMX) gradFOut<MX>;
+%template(gradFOutCRSSparsity) gradFOut<CRSSparsity>;
+%template(IOSchemeVectorGradFOutputSXMatrix) GradFOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorGradFOutputMX) GradFOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorGradFOutputCRSSparsity) GradFOutputIOSchemeVector<CRSSparsity>;
+%rename(gradFOut) gradFOutSXMatrix;
+%rename(gradFOut) gradFOutMX;
+%rename(gradFOut) gradFOutCRSSparsity;
+%rename(IOSchemeVectorGradFOutput) IOSchemeVectorGradFOutputSXMatrix;
+%rename(IOSchemeVectorGradFOutput) IOSchemeVectorGradFOutputMX;
+%rename(IOSchemeVectorGradFOutput) IOSchemeVectorGradFOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1132,12 +1246,18 @@ def jacGIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(jacGIn) jacGIn<SXMatrix>;
-%template(jacGIn) jacGIn<MX>;
-%template(jacGIn) jacGIn<CRSSparsity>;
-%template(IOSchemeVectorJacGInput) JacGInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorJacGInput) JacGInputIOSchemeVector<MX>;
-%template(IOSchemeVectorJacGInput) JacGInputIOSchemeVector<CRSSparsity>;
+%template(jacGInSXMatrix) jacGIn<SXMatrix>;
+%template(jacGInMX) jacGIn<MX>;
+%template(jacGInCRSSparsity) jacGIn<CRSSparsity>;
+%template(IOSchemeVectorJacGInputSXMatrix) JacGInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorJacGInputMX) JacGInputIOSchemeVector<MX>;
+%template(IOSchemeVectorJacGInputCRSSparsity) JacGInputIOSchemeVector<CRSSparsity>;
+%rename(jacGIn) jacGInSXMatrix;
+%rename(jacGIn) jacGInMX;
+%rename(jacGIn) jacGInCRSSparsity;
+%rename(IOSchemeVectorJacGInput) IOSchemeVectorJacGInputSXMatrix;
+%rename(IOSchemeVectorJacGInput) IOSchemeVectorJacGInputMX;
+%rename(IOSchemeVectorJacGInput) IOSchemeVectorJacGInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1179,12 +1299,18 @@ def jacGOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(jacGOut) jacGOut<SXMatrix>;
-%template(jacGOut) jacGOut<MX>;
-%template(jacGOut) jacGOut<CRSSparsity>;
-%template(IOSchemeVectorJacGOutput) JacGOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorJacGOutput) JacGOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorJacGOutput) JacGOutputIOSchemeVector<CRSSparsity>;
+%template(jacGOutSXMatrix) jacGOut<SXMatrix>;
+%template(jacGOutMX) jacGOut<MX>;
+%template(jacGOutCRSSparsity) jacGOut<CRSSparsity>;
+%template(IOSchemeVectorJacGOutputSXMatrix) JacGOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorJacGOutputMX) JacGOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorJacGOutputCRSSparsity) JacGOutputIOSchemeVector<CRSSparsity>;
+%rename(jacGOut) jacGOutSXMatrix;
+%rename(jacGOut) jacGOutMX;
+%rename(jacGOut) jacGOutCRSSparsity;
+%rename(IOSchemeVectorJacGOutput) IOSchemeVectorJacGOutputSXMatrix;
+%rename(IOSchemeVectorJacGOutput) IOSchemeVectorJacGOutputMX;
+%rename(IOSchemeVectorJacGOutput) IOSchemeVectorJacGOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1230,12 +1356,18 @@ def hessLagIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(hessLagIn) hessLagIn<SXMatrix>;
-%template(hessLagIn) hessLagIn<MX>;
-%template(hessLagIn) hessLagIn<CRSSparsity>;
-%template(IOSchemeVectorHessLagInput) HessLagInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorHessLagInput) HessLagInputIOSchemeVector<MX>;
-%template(IOSchemeVectorHessLagInput) HessLagInputIOSchemeVector<CRSSparsity>;
+%template(hessLagInSXMatrix) hessLagIn<SXMatrix>;
+%template(hessLagInMX) hessLagIn<MX>;
+%template(hessLagInCRSSparsity) hessLagIn<CRSSparsity>;
+%template(IOSchemeVectorHessLagInputSXMatrix) HessLagInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorHessLagInputMX) HessLagInputIOSchemeVector<MX>;
+%template(IOSchemeVectorHessLagInputCRSSparsity) HessLagInputIOSchemeVector<CRSSparsity>;
+%rename(hessLagIn) hessLagInSXMatrix;
+%rename(hessLagIn) hessLagInMX;
+%rename(hessLagIn) hessLagInCRSSparsity;
+%rename(IOSchemeVectorHessLagInput) IOSchemeVectorHessLagInputSXMatrix;
+%rename(IOSchemeVectorHessLagInput) IOSchemeVectorHessLagInputMX;
+%rename(IOSchemeVectorHessLagInput) IOSchemeVectorHessLagInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1285,12 +1417,18 @@ def hessLagOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(hessLagOut) hessLagOut<SXMatrix>;
-%template(hessLagOut) hessLagOut<MX>;
-%template(hessLagOut) hessLagOut<CRSSparsity>;
-%template(IOSchemeVectorHessLagOutput) HessLagOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorHessLagOutput) HessLagOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorHessLagOutput) HessLagOutputIOSchemeVector<CRSSparsity>;
+%template(hessLagOutSXMatrix) hessLagOut<SXMatrix>;
+%template(hessLagOutMX) hessLagOut<MX>;
+%template(hessLagOutCRSSparsity) hessLagOut<CRSSparsity>;
+%template(IOSchemeVectorHessLagOutputSXMatrix) HessLagOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorHessLagOutputMX) HessLagOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorHessLagOutputCRSSparsity) HessLagOutputIOSchemeVector<CRSSparsity>;
+%rename(hessLagOut) hessLagOutSXMatrix;
+%rename(hessLagOut) hessLagOutMX;
+%rename(hessLagOut) hessLagOutCRSSparsity;
+%rename(IOSchemeVectorHessLagOutput) IOSchemeVectorHessLagOutputSXMatrix;
+%rename(IOSchemeVectorHessLagOutput) IOSchemeVectorHessLagOutputMX;
+%rename(IOSchemeVectorHessLagOutput) IOSchemeVectorHessLagOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1352,12 +1490,18 @@ def nlpSolverIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(nlpSolverIn) nlpSolverIn<SXMatrix>;
-%template(nlpSolverIn) nlpSolverIn<MX>;
-%template(nlpSolverIn) nlpSolverIn<CRSSparsity>;
-%template(IOSchemeVectorNLPSolverInput) NLPSolverInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorNLPSolverInput) NLPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPSolverInput) NLPSolverInputIOSchemeVector<CRSSparsity>;
+%template(nlpSolverInSXMatrix) nlpSolverIn<SXMatrix>;
+%template(nlpSolverInMX) nlpSolverIn<MX>;
+%template(nlpSolverInCRSSparsity) nlpSolverIn<CRSSparsity>;
+%template(IOSchemeVectorNLPSolverInputSXMatrix) NLPSolverInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorNLPSolverInputMX) NLPSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorNLPSolverInputCRSSparsity) NLPSolverInputIOSchemeVector<CRSSparsity>;
+%rename(nlpSolverIn) nlpSolverInSXMatrix;
+%rename(nlpSolverIn) nlpSolverInMX;
+%rename(nlpSolverIn) nlpSolverInCRSSparsity;
+%rename(IOSchemeVectorNLPSolverInput) IOSchemeVectorNLPSolverInputSXMatrix;
+%rename(IOSchemeVectorNLPSolverInput) IOSchemeVectorNLPSolverInputMX;
+%rename(IOSchemeVectorNLPSolverInput) IOSchemeVectorNLPSolverInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1411,12 +1555,18 @@ def nlpSolverOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(nlpSolverOut) nlpSolverOut<SXMatrix>;
-%template(nlpSolverOut) nlpSolverOut<MX>;
-%template(nlpSolverOut) nlpSolverOut<CRSSparsity>;
-%template(IOSchemeVectorNLPSolverOutput) NLPSolverOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorNLPSolverOutput) NLPSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPSolverOutput) NLPSolverOutputIOSchemeVector<CRSSparsity>;
+%template(nlpSolverOutSXMatrix) nlpSolverOut<SXMatrix>;
+%template(nlpSolverOutMX) nlpSolverOut<MX>;
+%template(nlpSolverOutCRSSparsity) nlpSolverOut<CRSSparsity>;
+%template(IOSchemeVectorNLPSolverOutputSXMatrix) NLPSolverOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorNLPSolverOutputMX) NLPSolverOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorNLPSolverOutputCRSSparsity) NLPSolverOutputIOSchemeVector<CRSSparsity>;
+%rename(nlpSolverOut) nlpSolverOutSXMatrix;
+%rename(nlpSolverOut) nlpSolverOutMX;
+%rename(nlpSolverOut) nlpSolverOutCRSSparsity;
+%rename(IOSchemeVectorNLPSolverOutput) IOSchemeVectorNLPSolverOutputSXMatrix;
+%rename(IOSchemeVectorNLPSolverOutput) IOSchemeVectorNLPSolverOutputMX;
+%rename(IOSchemeVectorNLPSolverOutput) IOSchemeVectorNLPSolverOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1456,12 +1606,18 @@ def mayerIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(mayerIn) mayerIn<SXMatrix>;
-%template(mayerIn) mayerIn<MX>;
-%template(mayerIn) mayerIn<CRSSparsity>;
-%template(IOSchemeVectorMayerInput) MayerInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorMayerInput) MayerInputIOSchemeVector<MX>;
-%template(IOSchemeVectorMayerInput) MayerInputIOSchemeVector<CRSSparsity>;
+%template(mayerInSXMatrix) mayerIn<SXMatrix>;
+%template(mayerInMX) mayerIn<MX>;
+%template(mayerInCRSSparsity) mayerIn<CRSSparsity>;
+%template(IOSchemeVectorMayerInputSXMatrix) MayerInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorMayerInputMX) MayerInputIOSchemeVector<MX>;
+%template(IOSchemeVectorMayerInputCRSSparsity) MayerInputIOSchemeVector<CRSSparsity>;
+%rename(mayerIn) mayerInSXMatrix;
+%rename(mayerIn) mayerInMX;
+%rename(mayerIn) mayerInCRSSparsity;
+%rename(IOSchemeVectorMayerInput) IOSchemeVectorMayerInputSXMatrix;
+%rename(IOSchemeVectorMayerInput) IOSchemeVectorMayerInputMX;
+%rename(IOSchemeVectorMayerInput) IOSchemeVectorMayerInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1549,12 +1705,18 @@ def ocpIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(ocpIn) ocpIn<SXMatrix>;
-%template(ocpIn) ocpIn<MX>;
-%template(ocpIn) ocpIn<CRSSparsity>;
-%template(IOSchemeVectorOCPInput) OCPInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorOCPInput) OCPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorOCPInput) OCPInputIOSchemeVector<CRSSparsity>;
+%template(ocpInSXMatrix) ocpIn<SXMatrix>;
+%template(ocpInMX) ocpIn<MX>;
+%template(ocpInCRSSparsity) ocpIn<CRSSparsity>;
+%template(IOSchemeVectorOCPInputSXMatrix) OCPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorOCPInputMX) OCPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorOCPInputCRSSparsity) OCPInputIOSchemeVector<CRSSparsity>;
+%rename(ocpIn) ocpInSXMatrix;
+%rename(ocpIn) ocpInMX;
+%rename(ocpIn) ocpInCRSSparsity;
+%rename(IOSchemeVectorOCPInput) IOSchemeVectorOCPInputSXMatrix;
+%rename(IOSchemeVectorOCPInput) IOSchemeVectorOCPInputMX;
+%rename(IOSchemeVectorOCPInput) IOSchemeVectorOCPInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1600,12 +1762,18 @@ def ocpOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(ocpOut) ocpOut<SXMatrix>;
-%template(ocpOut) ocpOut<MX>;
-%template(ocpOut) ocpOut<CRSSparsity>;
-%template(IOSchemeVectorOCPOutput) OCPOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorOCPOutput) OCPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorOCPOutput) OCPOutputIOSchemeVector<CRSSparsity>;
+%template(ocpOutSXMatrix) ocpOut<SXMatrix>;
+%template(ocpOutMX) ocpOut<MX>;
+%template(ocpOutCRSSparsity) ocpOut<CRSSparsity>;
+%template(IOSchemeVectorOCPOutputSXMatrix) OCPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorOCPOutputMX) OCPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorOCPOutputCRSSparsity) OCPOutputIOSchemeVector<CRSSparsity>;
+%rename(ocpOut) ocpOutSXMatrix;
+%rename(ocpOut) ocpOutMX;
+%rename(ocpOut) ocpOutCRSSparsity;
+%rename(IOSchemeVectorOCPOutput) IOSchemeVectorOCPOutputSXMatrix;
+%rename(IOSchemeVectorOCPOutput) IOSchemeVectorOCPOutputMX;
+%rename(IOSchemeVectorOCPOutput) IOSchemeVectorOCPOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1683,12 +1851,18 @@ def qcqpIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qcqpIn) qcqpIn<SXMatrix>;
-%template(qcqpIn) qcqpIn<MX>;
-%template(qcqpIn) qcqpIn<CRSSparsity>;
-%template(IOSchemeVectorQCQPSolverInput) QCQPSolverInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorQCQPSolverInput) QCQPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorQCQPSolverInput) QCQPSolverInputIOSchemeVector<CRSSparsity>;
+%template(qcqpInSXMatrix) qcqpIn<SXMatrix>;
+%template(qcqpInMX) qcqpIn<MX>;
+%template(qcqpInCRSSparsity) qcqpIn<CRSSparsity>;
+%template(IOSchemeVectorQCQPSolverInputSXMatrix) QCQPSolverInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorQCQPSolverInputMX) QCQPSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorQCQPSolverInputCRSSparsity) QCQPSolverInputIOSchemeVector<CRSSparsity>;
+%rename(qcqpIn) qcqpInSXMatrix;
+%rename(qcqpIn) qcqpInMX;
+%rename(qcqpIn) qcqpInCRSSparsity;
+%rename(IOSchemeVectorQCQPSolverInput) IOSchemeVectorQCQPSolverInputSXMatrix;
+%rename(IOSchemeVectorQCQPSolverInput) IOSchemeVectorQCQPSolverInputMX;
+%rename(IOSchemeVectorQCQPSolverInput) IOSchemeVectorQCQPSolverInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1734,12 +1908,18 @@ def qcqpOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qcqpOut) qcqpOut<SXMatrix>;
-%template(qcqpOut) qcqpOut<MX>;
-%template(qcqpOut) qcqpOut<CRSSparsity>;
-%template(IOSchemeVectorQCQPSolverOutput) QCQPSolverOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorQCQPSolverOutput) QCQPSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorQCQPSolverOutput) QCQPSolverOutputIOSchemeVector<CRSSparsity>;
+%template(qcqpOutSXMatrix) qcqpOut<SXMatrix>;
+%template(qcqpOutMX) qcqpOut<MX>;
+%template(qcqpOutCRSSparsity) qcqpOut<CRSSparsity>;
+%template(IOSchemeVectorQCQPSolverOutputSXMatrix) QCQPSolverOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorQCQPSolverOutputMX) QCQPSolverOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorQCQPSolverOutputCRSSparsity) QCQPSolverOutputIOSchemeVector<CRSSparsity>;
+%rename(qcqpOut) qcqpOutSXMatrix;
+%rename(qcqpOut) qcqpOutMX;
+%rename(qcqpOut) qcqpOutCRSSparsity;
+%rename(IOSchemeVectorQCQPSolverOutput) IOSchemeVectorQCQPSolverOutputSXMatrix;
+%rename(IOSchemeVectorQCQPSolverOutput) IOSchemeVectorQCQPSolverOutputMX;
+%rename(IOSchemeVectorQCQPSolverOutput) IOSchemeVectorQCQPSolverOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1848,12 +2028,18 @@ def qpIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qpIn) qpIn<SXMatrix>;
-%template(qpIn) qpIn<MX>;
-%template(qpIn) qpIn<CRSSparsity>;
-%template(IOSchemeVectorQPSolverInput) QPSolverInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorQPSolverInput) QPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorQPSolverInput) QPSolverInputIOSchemeVector<CRSSparsity>;
+%template(qpInSXMatrix) qpIn<SXMatrix>;
+%template(qpInMX) qpIn<MX>;
+%template(qpInCRSSparsity) qpIn<CRSSparsity>;
+%template(IOSchemeVectorQPSolverInputSXMatrix) QPSolverInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorQPSolverInputMX) QPSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorQPSolverInputCRSSparsity) QPSolverInputIOSchemeVector<CRSSparsity>;
+%rename(qpIn) qpInSXMatrix;
+%rename(qpIn) qpInMX;
+%rename(qpIn) qpInCRSSparsity;
+%rename(IOSchemeVectorQPSolverInput) IOSchemeVectorQPSolverInputSXMatrix;
+%rename(IOSchemeVectorQPSolverInput) IOSchemeVectorQPSolverInputMX;
+%rename(IOSchemeVectorQPSolverInput) IOSchemeVectorQPSolverInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1899,12 +2085,18 @@ def qpOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qpOut) qpOut<SXMatrix>;
-%template(qpOut) qpOut<MX>;
-%template(qpOut) qpOut<CRSSparsity>;
-%template(IOSchemeVectorQPSolverOutput) QPSolverOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorQPSolverOutput) QPSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorQPSolverOutput) QPSolverOutputIOSchemeVector<CRSSparsity>;
+%template(qpOutSXMatrix) qpOut<SXMatrix>;
+%template(qpOutMX) qpOut<MX>;
+%template(qpOutCRSSparsity) qpOut<CRSSparsity>;
+%template(IOSchemeVectorQPSolverOutputSXMatrix) QPSolverOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorQPSolverOutputMX) QPSolverOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorQPSolverOutputCRSSparsity) QPSolverOutputIOSchemeVector<CRSSparsity>;
+%rename(qpOut) qpOutSXMatrix;
+%rename(qpOut) qpOutMX;
+%rename(qpOut) qpOutCRSSparsity;
+%rename(IOSchemeVectorQPSolverOutput) IOSchemeVectorQPSolverOutputSXMatrix;
+%rename(IOSchemeVectorQPSolverOutput) IOSchemeVectorQPSolverOutputMX;
+%rename(IOSchemeVectorQPSolverOutput) IOSchemeVectorQPSolverOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -2005,12 +2197,18 @@ def sdpIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(sdpIn) sdpIn<SXMatrix>;
-%template(sdpIn) sdpIn<MX>;
-%template(sdpIn) sdpIn<CRSSparsity>;
-%template(IOSchemeVectorSDPInput) SDPInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorSDPInput) SDPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorSDPInput) SDPInputIOSchemeVector<CRSSparsity>;
+%template(sdpInSXMatrix) sdpIn<SXMatrix>;
+%template(sdpInMX) sdpIn<MX>;
+%template(sdpInCRSSparsity) sdpIn<CRSSparsity>;
+%template(IOSchemeVectorSDPInputSXMatrix) SDPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSDPInputMX) SDPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorSDPInputCRSSparsity) SDPInputIOSchemeVector<CRSSparsity>;
+%rename(sdpIn) sdpInSXMatrix;
+%rename(sdpIn) sdpInMX;
+%rename(sdpIn) sdpInCRSSparsity;
+%rename(IOSchemeVectorSDPInput) IOSchemeVectorSDPInputSXMatrix;
+%rename(IOSchemeVectorSDPInput) IOSchemeVectorSDPInputMX;
+%rename(IOSchemeVectorSDPInput) IOSchemeVectorSDPInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -2068,12 +2266,18 @@ def sdpOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(sdpOut) sdpOut<SXMatrix>;
-%template(sdpOut) sdpOut<MX>;
-%template(sdpOut) sdpOut<CRSSparsity>;
-%template(IOSchemeVectorSDPOutput) SDPOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorSDPOutput) SDPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorSDPOutput) SDPOutputIOSchemeVector<CRSSparsity>;
+%template(sdpOutSXMatrix) sdpOut<SXMatrix>;
+%template(sdpOutMX) sdpOut<MX>;
+%template(sdpOutCRSSparsity) sdpOut<CRSSparsity>;
+%template(IOSchemeVectorSDPOutputSXMatrix) SDPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSDPOutputMX) SDPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorSDPOutputCRSSparsity) SDPOutputIOSchemeVector<CRSSparsity>;
+%rename(sdpOut) sdpOutSXMatrix;
+%rename(sdpOut) sdpOutMX;
+%rename(sdpOut) sdpOutCRSSparsity;
+%rename(IOSchemeVectorSDPOutput) IOSchemeVectorSDPOutputSXMatrix;
+%rename(IOSchemeVectorSDPOutput) IOSchemeVectorSDPOutputMX;
+%rename(IOSchemeVectorSDPOutput) IOSchemeVectorSDPOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -2182,12 +2386,18 @@ def sdqpIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(sdqpIn) sdqpIn<SXMatrix>;
-%template(sdqpIn) sdqpIn<MX>;
-%template(sdqpIn) sdqpIn<CRSSparsity>;
-%template(IOSchemeVectorSDQPInput) SDQPInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorSDQPInput) SDQPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorSDQPInput) SDQPInputIOSchemeVector<CRSSparsity>;
+%template(sdqpInSXMatrix) sdqpIn<SXMatrix>;
+%template(sdqpInMX) sdqpIn<MX>;
+%template(sdqpInCRSSparsity) sdqpIn<CRSSparsity>;
+%template(IOSchemeVectorSDQPInputSXMatrix) SDQPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSDQPInputMX) SDQPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorSDQPInputCRSSparsity) SDQPInputIOSchemeVector<CRSSparsity>;
+%rename(sdqpIn) sdqpInSXMatrix;
+%rename(sdqpIn) sdqpInMX;
+%rename(sdqpIn) sdqpInCRSSparsity;
+%rename(IOSchemeVectorSDQPInput) IOSchemeVectorSDQPInputSXMatrix;
+%rename(IOSchemeVectorSDQPInput) IOSchemeVectorSDQPInputMX;
+%rename(IOSchemeVectorSDQPInput) IOSchemeVectorSDQPInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -2245,12 +2455,18 @@ def sdqpOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(sdqpOut) sdqpOut<SXMatrix>;
-%template(sdqpOut) sdqpOut<MX>;
-%template(sdqpOut) sdqpOut<CRSSparsity>;
-%template(IOSchemeVectorSDQPOutput) SDQPOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorSDQPOutput) SDQPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorSDQPOutput) SDQPOutputIOSchemeVector<CRSSparsity>;
+%template(sdqpOutSXMatrix) sdqpOut<SXMatrix>;
+%template(sdqpOutMX) sdqpOut<MX>;
+%template(sdqpOutCRSSparsity) sdqpOut<CRSSparsity>;
+%template(IOSchemeVectorSDQPOutputSXMatrix) SDQPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSDQPOutputMX) SDQPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorSDQPOutputCRSSparsity) SDQPOutputIOSchemeVector<CRSSparsity>;
+%rename(sdqpOut) sdqpOutSXMatrix;
+%rename(sdqpOut) sdqpOutMX;
+%rename(sdqpOut) sdqpOutCRSSparsity;
+%rename(IOSchemeVectorSDQPOutput) IOSchemeVectorSDQPOutputSXMatrix;
+%rename(IOSchemeVectorSDQPOutput) IOSchemeVectorSDQPOutputMX;
+%rename(IOSchemeVectorSDQPOutput) IOSchemeVectorSDQPOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -2367,12 +2583,18 @@ def socpIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(socpIn) socpIn<SXMatrix>;
-%template(socpIn) socpIn<MX>;
-%template(socpIn) socpIn<CRSSparsity>;
-%template(IOSchemeVectorSOCPInput) SOCPInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorSOCPInput) SOCPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorSOCPInput) SOCPInputIOSchemeVector<CRSSparsity>;
+%template(socpInSXMatrix) socpIn<SXMatrix>;
+%template(socpInMX) socpIn<MX>;
+%template(socpInCRSSparsity) socpIn<CRSSparsity>;
+%template(IOSchemeVectorSOCPInputSXMatrix) SOCPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSOCPInputMX) SOCPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorSOCPInputCRSSparsity) SOCPInputIOSchemeVector<CRSSparsity>;
+%rename(socpIn) socpInSXMatrix;
+%rename(socpIn) socpInMX;
+%rename(socpIn) socpInCRSSparsity;
+%rename(IOSchemeVectorSOCPInput) IOSchemeVectorSOCPInputSXMatrix;
+%rename(IOSchemeVectorSOCPInput) IOSchemeVectorSOCPInputMX;
+%rename(IOSchemeVectorSOCPInput) IOSchemeVectorSOCPInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -2418,12 +2640,18 @@ def socpOut(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(socpOut) socpOut<SXMatrix>;
-%template(socpOut) socpOut<MX>;
-%template(socpOut) socpOut<CRSSparsity>;
-%template(IOSchemeVectorSOCPOutput) SOCPOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorSOCPOutput) SOCPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorSOCPOutput) SOCPOutputIOSchemeVector<CRSSparsity>;
+%template(socpOutSXMatrix) socpOut<SXMatrix>;
+%template(socpOutMX) socpOut<MX>;
+%template(socpOutCRSSparsity) socpOut<CRSSparsity>;
+%template(IOSchemeVectorSOCPOutputSXMatrix) SOCPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSOCPOutputMX) SOCPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorSOCPOutputCRSSparsity) SOCPOutputIOSchemeVector<CRSSparsity>;
+%rename(socpOut) socpOutSXMatrix;
+%rename(socpOut) socpOutMX;
+%rename(socpOut) socpOutCRSSparsity;
+%rename(IOSchemeVectorSOCPOutput) IOSchemeVectorSOCPOutputSXMatrix;
+%rename(IOSchemeVectorSOCPOutput) IOSchemeVectorSOCPOutputMX;
+%rename(IOSchemeVectorSOCPOutput) IOSchemeVectorSOCPOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -2540,12 +2768,18 @@ def stabilizedQpIn(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(stabilizedQpIn) stabilizedQpIn<SXMatrix>;
-%template(stabilizedQpIn) stabilizedQpIn<MX>;
-%template(stabilizedQpIn) stabilizedQpIn<CRSSparsity>;
-%template(IOSchemeVectorStabilizedQPSolverInput) StabilizedQPSolverInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorStabilizedQPSolverInput) StabilizedQPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorStabilizedQPSolverInput) StabilizedQPSolverInputIOSchemeVector<CRSSparsity>;
+%template(stabilizedQpInSXMatrix) stabilizedQpIn<SXMatrix>;
+%template(stabilizedQpInMX) stabilizedQpIn<MX>;
+%template(stabilizedQpInCRSSparsity) stabilizedQpIn<CRSSparsity>;
+%template(IOSchemeVectorStabilizedQPSolverInputSXMatrix) StabilizedQPSolverInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorStabilizedQPSolverInputMX) StabilizedQPSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorStabilizedQPSolverInputCRSSparsity) StabilizedQPSolverInputIOSchemeVector<CRSSparsity>;
+%rename(stabilizedQpIn) stabilizedQpInSXMatrix;
+%rename(stabilizedQpIn) stabilizedQpInMX;
+%rename(stabilizedQpIn) stabilizedQpInCRSSparsity;
+%rename(IOSchemeVectorStabilizedQPSolverInput) IOSchemeVectorStabilizedQPSolverInputSXMatrix;
+%rename(IOSchemeVectorStabilizedQPSolverInput) IOSchemeVectorStabilizedQPSolverInputMX;
+%rename(IOSchemeVectorStabilizedQPSolverInput) IOSchemeVectorStabilizedQPSolverInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
