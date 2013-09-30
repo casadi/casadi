@@ -277,7 +277,7 @@ for k,v in classes.items():
         counter[name]+=1
       else:
         counter[name]=0
-      methods.append("""        Method (Name "%s") %s [%s] %s Doc "%s" """ % (name+"'"*counter[name],t,",".join(params),mtype,haskellstring(docs)))
+      methods.append("""        Method (Name "%s") %s [%s] %s (Doc "%s") """ % (name+"'"*counter[name],t,",".join(params),mtype,haskellstring(docs)))
 
   myclasses.append(symbol_table[k].lower())
   ftree.write("""%s :: Class
@@ -308,7 +308,7 @@ for (name,pars,rettype,docs) in functions:
     counter[name]+=1
   else:
     counter[name]=0
-  tools.append("""  Function (Name "%s") %s [%s] Doc "%s" """ % (name+"'"*counter[name],t,",".join(params),haskellstring(docs)))
+  tools.append("""  Function (Name "%s") %s [%s] (Doc "%s") """ % (name+"'"*counter[name],t,",".join(params),haskellstring(docs)))
   
 ftree.write("""
 tools :: [Function]
