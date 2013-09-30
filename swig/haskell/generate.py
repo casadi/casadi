@@ -225,7 +225,7 @@ fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiCl
 
 finclude  = file('swiginclude.hpp','w')
 code = sum([filter(lambda i: len(i.rstrip())> 0 ,x.attrib["value"].split("\n")) for x in r.findall("*//insert/attributelist/attribute[@name='code']")],[])
-finclude.write("\n".join(filter(lambda y: re.search("^\s*#include ",y),code)))
+finclude.write("\n".join(sorted(set(map(lambda x: x.rstrip(), filter(lambda y: re.search("^\s*#include ",y),code))))))
 
 def getAllMethods(name,base=None):
   if base is None:
