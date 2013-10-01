@@ -25,7 +25,6 @@ def tohaskelltype(s,alias=False,level=0):
   
   Vec (CasadiClass FX)
   """
-  if 'IOSchemeVector' in s: return None
   if level==0:
     if s.startswith("r.q(const)."):
       r = tohaskelltype(s[len("r.q(const)."):],alias,level=1)
@@ -90,18 +89,6 @@ def tohaskelltype(s,alias=False,level=0):
       return r + "Vec"
     else:
       return "Vec (" + r + ")"     
-  elif s.startswith("CasADi::"):
-    if s in  symbol_table:
-      sym = symbol_table[s]
-    elif  s[len("CasADi::"):] in symbol_table_reverse:
-      return tohaskelltype(symbol_table_reverse[s[len("CasADi::"):]],alias,level=2)
-    else:
-      return None
-    
-    if alias:
-      return sym
-    else:
-      return "NonVec (CasadiClass " + sym + ")"
   elif s == "std::string":
     return ("" if alias else "NonVec ")+ "StdString"
   elif s == "std::ostream":
@@ -122,10 +109,30 @@ def tohaskelltype(s,alias=False,level=0):
     return ("" if alias else "NonVec ")+ "CVoid"
   elif s.startswith("std::pair"):
     return None
-  elif 'IOSchemeVector' in s:
-    return None
+  elif s.startswith("CasADi::"):
+    if s in  symbol_table:
+      sym = symbol_table[s]
+    elif  s[len("CasADi::"):] in symbol_table_reverse:
+      return tohaskelltype(symbol_table_reverse[s[len("CasADi::"):]],alias,level=2)
+    else:
+      return None
+    
+    if alias:
+      return sym
+    else:
+      return "NonVec (CasadiClass " + sym + ")"
   else:
-    raise Exception("What is '" + s + "'")
+    if s in  symbol_table:
+      sym = symbol_table[s]
+    elif  s in symbol_table_reverse:
+      return tohaskelltype(symbol_table_reverse[s],alias,level=2)
+    else:
+      raise Exception("What is '" + s + "'")
+    
+    if alias:
+      return sym
+    else:
+      return "NonVec (CasadiClass " + sym + ")"
     
 def getAttribute(e,name,default=""):
   d = e.find('attributelist/attribute[@name="' + name + '"]')
@@ -150,6 +157,8 @@ for c in r.findall('*//class'):
   name = c.find('attributelist/attribute[@name="name"]').attrib["value"]
   t = classes[name] = {}
   t["haskell"] = tohaskelltype(name)
+  
+  
   
 def haskellstring(s):
   return s.replace('"','\\"').replace('\\\\"','\\"').replace("\n",'\\n')
@@ -198,7 +207,6 @@ for c in r.findall('*//class'):
   data["bases"] = [] 
   for d in c.findall('attributelist/baselist/base'):
     base = d.attrib["name"]
-    if "IOSchemeVector" in base: continue
     if base in symbol_table_reverse:
       base = symbol_table_reverse[base]
       data["bases"].append(base)
@@ -222,13 +230,14 @@ for d in r.findall('*//namespace/cdecl'):
       update_types_table(p)
      
   rettype = getAttribute(d,"type")
+  update_types_table(rettype)
   docs = getAttribute(d,"feature_docstring")
    
   functions.append((dname,params,rettype,docs))
      
 
 ftree  = file('CasadiTree.hs','w')
-ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiTree ( %s, classes, tools ) where\n\n\nimport WriteCasadiBindings.Types\n\n\n" % ",\n  ".join([symbol_table[k].lower() for k,v in classes.items() if "IOSchemeVector" not in k and "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]]))
+ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiTree ( %s, classes, tools ) where\n\n\nimport WriteCasadiBindings.Types\n\n\n" % ",\n  ".join([symbol_table[k].lower() for k,v in classes.items() if ("Vector" not in symbol_table[k] or "IOScheme" in symbol_table[k]) and "Pair" not in symbol_table[k]]))
 
 
 fclasses  = file('CasadiClasses.hs','w')
@@ -259,8 +268,7 @@ def getAllMethods(name,base=None):
   
 myclasses = []
 for k,v in classes.items():
-  if "IOSchemeVector" in k: continue
-  if "Vector" in symbol_table[k] or "Pair" in symbol_table[k]: continue
+  if ("Vector" in symbol_table[k] and "IOScheme" not in symbol_table[k]) or "Pair" in symbol_table[k]: continue
   methods = []
   if "methods" in v:
     counter = {}
@@ -305,6 +313,12 @@ for (name,pars,rettype,docs) in functions:
   for p in params:
     tainted_types[p] = True
   tainted_types[t] = True
+  if "valIOSchemeVector" in t and name.endswith("CRSSparsity"):
+    name = name[:-len("CRSSparsity")]
+  elif "valIOSchemeVector" in t and name.endswith("MX"):
+    name = name[:-len("MX")]
+  elif "valIOSchemeVector" in t and name.endswith("SXMatrix"):
+    name = name[:-len("SXMatrix")]
   if name in counter:
     counter[name]+=1
   else:
@@ -325,7 +339,7 @@ for a,t in aliases.items():
   if t is None or a is None or not a in tainted_types: continue
   ftree.write("%s :: Type\n%s = %s\n" % (a,a,t))
   
-exportclasses = dict([(k,v) for k,v in classes.items() if "Vector" not in symbol_table[k] and "Pair" not in symbol_table[k]])
+exportclasses = dict([(k,v) for k,v in classes.items() if ("Vector" not in symbol_table[k] or "IOScheme" in symbol_table[k]) and "Pair" not in symbol_table[k]])
   
 fclasses.write("data CasadiClass = %s \n  deriving (Show, Eq, Ord)\n\n\n" % ( "\n  | ".join([symbol_table[k] for k,v in exportclasses.items()])))
 
