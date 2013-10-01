@@ -116,7 +116,7 @@ class %sIOSchemeVector : public IOSchemeVector<M> {
     s+= "template<class M>" + "\n"
     s+= self.enum + "IOSchemeVector<M> " + self.name + "("
     for i, (name, doc, enum) in enumerate(self.entries):
-      s+="""const std::string &arg_s%d ="",M &arg_m%d =M()""" % (i,i) + ","
+      s+="""const std::string &arg_s%d ="",const M &arg_m%d =M()""" % (i,i) + ","
     s=s[:-1] + "){" + "\n"
     s+= "  std::vector<M> ret(%d);\n" % len(self.entries)
     
