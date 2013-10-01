@@ -313,11 +313,11 @@ for (name,pars,rettype,docs) in functions:
   for p in params:
     tainted_types[p] = True
   tainted_types[t] = True
-  if "valIOSchemeVector" in t and name.endswith("CRSSparsity"):
+  if "Vec" in t and name.endswith("CRSSparsity"):
     name = name[:-len("CRSSparsity")]
-  elif "valIOSchemeVector" in t and name.endswith("MX"):
+  elif "Vec" in t and name.endswith("MX"):
     name = name[:-len("MX")]
-  elif "valIOSchemeVector" in t and name.endswith("SXMatrix"):
+  elif "Vec" in t and name.endswith("SXMatrix"):
     name = name[:-len("SXMatrix")]
   if name in counter:
     counter[name]+=1
