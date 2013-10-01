@@ -237,7 +237,7 @@ for d in r.findall('*//namespace/cdecl'):
      
 
 ftree  = file('CasadiTree.hs','w')
-ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiTree ( %s, classes, tools ) where\n\n\nimport WriteCasadiBindings.Types\n\n\n" % ",\n  ".join([symbol_table[k].lower() for k,v in classes.items() if ("Vector" not in symbol_table[k] or "IOScheme" in symbol_table[k]) and "Pair" not in symbol_table[k]]))
+ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiTree ( %s, classes, tools, ioschemehelpers ) where\n\n\nimport WriteCasadiBindings.Types\n\n\n" % ",\n  ".join([symbol_table[k].lower() for k,v in classes.items() if ("Vector" not in symbol_table[k] or "IOScheme" in symbol_table[k]) and "Pair" not in symbol_table[k]]))
 
 
 fclasses  = file('CasadiClasses.hs','w')
@@ -301,6 +301,7 @@ for k,v in classes.items():
 ftree.write("classes :: [Class]\nclasses =\n  [\n  %s\n  ]\n" % ",\n  ".join(myclasses))
   
 tools = []
+ioschemehelpers = []
 
 counter = {}
 for (name,pars,rettype,docs) in functions:
@@ -313,18 +314,24 @@ for (name,pars,rettype,docs) in functions:
   for p in params:
     tainted_types[p] = True
   tainted_types[t] = True
-  if "valIOSchemeVector" in t and name.endswith("CRSSparsity"):
+  target = tools
+  if "Vec" in t and name.endswith("CRSSparsity"):
     name = name[:-len("CRSSparsity")]
-  elif "valIOSchemeVector" in t and name.endswith("MX"):
+    target = ioschemehelpers
+  elif "Vec" in t and name.endswith("MX"):
     name = name[:-len("MX")]
-  elif "valIOSchemeVector" in t and name.endswith("SXMatrix"):
+    target = ioschemehelpers
+  elif "Vec" in t and name.endswith("SXMatrix"):
     name = name[:-len("SXMatrix")]
+    target = ioschemehelpers
+  if name.endswith("Struct"):
+    target = ioschemehelpers
   if name in counter:
     counter[name]+=1
   else:
     counter[name]=0
-  tools.append("""  Function (Name "%s") %s [%s] (Doc "%s") """ % (name+"'"*counter[name],t,",".join(params),haskellstring(docs)))
-  
+  target.append("""  Function (Name "%s") %s [%s] (Doc "%s") """ % (name+"'"*counter[name],t,",".join(params),haskellstring(docs)))
+
 ftree.write("""
 tools :: [Function]
 tools =
@@ -332,6 +339,14 @@ tools =
 %s
   ]
 \n""" % ",\n".join(tools))
+
+ftree.write("""
+ioschemehelpers :: [Function]
+ioschemehelpers =
+  [ 
+%s
+  ]
+\n""" % ",\n".join(ioschemehelpers))
 
   
 aliases = dict([(a,t) for k,(t,a) in types_table.items()])
