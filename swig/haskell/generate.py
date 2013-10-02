@@ -235,9 +235,24 @@ for d in r.findall('*//namespace/cdecl'):
    
   functions.append((dname,params,rettype,docs))
      
+enums = {}
+for d in r.findall('*//enum'):
+  name = getAttribute(d,"name")
+  sym_name = getAttribute(d,"sym_name")
+  docs = getAttribute(d,"feature_docstring")
+  dt = enums[sym_name] = {"sym_name": sym_name, "docs": docs,"entries":{}}
+
+  for e in d.findall('enumitem'):
+    name = getAttribute(e,"name")
+    ev = getAttribute(e,"enumvalueex")
+    docs = getAttribute(d,"feature_docstring")
+    ev = eval(ev,dict((k,v["ev"]) for k,v in dt["entries"].items()))
+
+    dt["entries"][name] = {"docs": docs, "ev": ev}
+
 
 ftree  = file('CasadiTree.hs','w')
-ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiTree ( %s, classes, tools, ioschemehelpers ) where\n\n\nimport WriteCasadiBindings.Types\n\n\n" % ",\n  ".join([symbol_table[k].lower() for k,v in classes.items() if ("Vector" not in symbol_table[k] or "IOScheme" in symbol_table[k]) and "Pair" not in symbol_table[k]]))
+ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.CasadiTree ( %s, classes, tools, ioschemehelpers, enums ) where\n\n\nimport WriteCasadiBindings.Types\n\n\n" % ",\n  ".join([symbol_table[k].lower() for k,v in classes.items() if ("Vector" not in symbol_table[k] or "IOScheme" in symbol_table[k]) and "Pair" not in symbol_table[k]]))
 
 
 fclasses  = file('CasadiClasses.hs','w')
@@ -348,7 +363,14 @@ ioschemehelpers =
   ]
 \n""" % ",\n".join(ioschemehelpers))
 
-  
+enumslist = []
+
+for k,v in enums.items():
+  entrieslist = ["""("%s",Doc "%s",%d)\n""" % (kk,vv["docs"],vv["ev"]) for kk,vv in v["entries"].items()]
+  enumslist.append( """CEnum "%s" (Doc "%s") EnumInt [\n    %s    ]\n""" % (k,haskellstring(v['docs']),"    ,".join(entrieslist)))
+ftree.write("enums :: [CEnum]\nenums = [%s  ]\n" % "  ,".join(enumslist))
+
+
 aliases = dict([(a,t) for k,(t,a) in types_table.items()])
 for a,t in aliases.items():
   if t is None or a is None or not a in tainted_types: continue
