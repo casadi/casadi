@@ -208,11 +208,11 @@ namespace CasADi {
 
 
 %extend Matrix<SX>{
-    #ifdef SWIGPYTHON
-    %python_matrix_convertors
-    %python_matrix_helpers(CasADi::Matrix<CasADi::SX>)
+    
+    %matrix_convertors
+    %matrix_helpers(CasADi::Matrix<CasADi::SX>)
        
-
+    #ifdef SWIGPYTHON
     %pythoncode %{
     def toArray(self):
       import numpy as n
