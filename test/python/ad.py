@@ -562,6 +562,9 @@ class ADtests(casadiTestCase):
     f3 = MXFunction([x,y],[MX.zeros(0,0),mul(y,x)])
     f3.init()
     
+    f4 = MXFunction([x,y],[MX.zeros(0,2),mul(y,x)])
+    f4.init()
+    
     ndir = 2
     
     in1 = [x,y]
@@ -666,6 +669,10 @@ class ADtests(casadiTestCase):
           (in1,v1,f2.call([x**2,y])[0],DMatrix.zeros(0,2)),
           (in1,v1,f3.call(in1)[0],DMatrix.zeros(0,2)),
           (in1,v1,f3.call([x**2,y])[0],DMatrix.zeros(0,2)),
+          (in1,v1,f4.call(in1)[0],DMatrix.zeros(0,2)),
+          (in1,v1,f4.call([x**2,y])[0],DMatrix.zeros(0,2)),
+          #(in1,v1,f1.call([x**2,[]])[1],DMatrix.zeros(2,2)),
+          #(in1,v1,f1.call([[],y])[1],DMatrix.zeros(2,2)),
           (in1,v1,vertcat([x,DMatrix(0,1)]),DMatrix.eye(2)),
           (in1,v1,(x**2).setSparse(sparse(DMatrix([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
      ]:

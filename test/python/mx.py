@@ -2279,11 +2279,11 @@ class MXtests(casadiTestCase):
     c = MX(0,0)
     x = msym("x",2,3)
     
-    d = x + c
-    self.assertTrue(isEqual(d,x))
-    
-    d = x / c
-    self.assertTrue(isEqual(d,x))
+    with self.assertRaises(RuntimeError):
+      d = x + c
+ 
+    with self.assertRaises(RuntimeError):
+      d = x / c
     
 if __name__ == '__main__':
     unittest.main()
