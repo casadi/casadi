@@ -53,6 +53,9 @@ class QPSolverInternal : public FXInternal{
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
     
+    /** Generate native code in the interfaced language for debugging */
+    virtual void generateNativeCode(std::ostream& file) const {};
+    
   protected:
 
     /// Problem structure

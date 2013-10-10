@@ -50,6 +50,9 @@ public:
   
   virtual void evaluate(int nfdir, int nadir);
   
+  /** \brief Generate native code for debugging */
+  virtual void generateNativeCode(std::ostream &file) const;
+  
   protected:
     QPSolver qp_solver_;
 
