@@ -7,7 +7,7 @@ file(WRITE ${OUTPUT}.cpp "#include \"resource_${SYMBOL}.hpp\"\n namespace CasADi
 
 foreach(line ${FILE_CONTENTS})
   string(REGEX REPLACE "\"" "\\\\\"" line "${line}")
-  file(APPEND ${OUTPUT}.cpp "\n  \"${line}\"" )
+  file(APPEND ${OUTPUT}.cpp "\n  \"${line}\\n\"" )
 endforeach()
 
 file(APPEND ${OUTPUT}.cpp ";\n}\n" )
