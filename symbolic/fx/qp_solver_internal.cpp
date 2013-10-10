@@ -69,6 +69,8 @@ QPSolverInternal::QPSolverInternal(const std::vector<CRSSparsity> &st) : st_(st)
   input(QP_SOLVER_UBA) = DMatrix(bounds_sparsity,  std::numeric_limits<double>::infinity());
   input(QP_SOLVER_LBX) = DMatrix(x_sparsity,      -std::numeric_limits<double>::infinity());
   input(QP_SOLVER_UBX) = DMatrix(x_sparsity,       std::numeric_limits<double>::infinity());
+  input(QP_SOLVER_LAM_X0) = DMatrix(x_sparsity,0);
+  //input(QP_SOLVER_LAM_A0) = DMatrix(x_sparsity,   0);
   
   // Output arguments
   setNumOutputs(QP_SOLVER_NUM_OUT);
