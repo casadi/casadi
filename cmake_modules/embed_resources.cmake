@@ -6,14 +6,15 @@
 # that contains the content of "wsqic.f90" by generating resource_file (a header)
 macro (embed_resource symbol inputfile resultfile)
   include_directories(${CMAKE_BINARY_DIR})
-  set(${resultfile} "${CMAKE_CURRENT_BINARY_DIR}/resource_${symbol}.hpp")
+  set(${resultfile} "${CMAKE_CURRENT_BINARY_DIR}/resource_${symbol}.hpp" "${CMAKE_CURRENT_BINARY_DIR}/resource_${symbol}.cpp")
   add_custom_command(
-      OUTPUT "${${resultfile}}"
-      COMMAND ${CMAKE_COMMAND} -D "OUTPUT=${${resultfile}}" -D "INPUT=${CMAKE_CURRENT_SOURCE_DIR}/${inputfile}" -D "SYMBOL=${symbol}" -P ${CMAKE_SOURCE_DIR}/cmake_modules/embed_resource.cmake 
+      OUTPUT ${${resultfile}}
+      COMMAND ${CMAKE_COMMAND} -D "OUTPUT=${CMAKE_CURRENT_BINARY_DIR}/resource_${symbol}" -D "INPUT=${CMAKE_CURRENT_SOURCE_DIR}/${inputfile}" -D "SYMBOL=${symbol}" -P ${CMAKE_SOURCE_DIR}/cmake_modules/embed_resource.cmake 
       DEPENDS
         ${CMAKE_SOURCE_DIR}/cmake_modules/embed_resource.cmake
         ${CMAKE_CURRENT_SOURCE_DIR}/${inputfile}
       VERBATIM
     )
-set_source_files_properties( ${${resultfile}} PROPERTIES GENERATED TRUE )
+set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/resource_${symbol}.hpp PROPERTIES GENERATED TRUE )
+set_source_files_properties( ${CMAKE_CURRENT_BINARY_DIR}/resource_${symbol}.cpp PROPERTIES GENERATED TRUE )
 endmacro (embed_resource)
