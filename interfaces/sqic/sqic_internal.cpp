@@ -31,6 +31,7 @@
 #include "symbolic/stl_vector_tools.hpp"
 
 #include "wsqic.hpp"
+#include "interfaces/sqic/resource_sqic.hpp"
 
 using namespace std;
 namespace CasADi {

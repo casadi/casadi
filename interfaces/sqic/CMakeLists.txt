@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 2.6)
 include_directories(../)
 include_directories(${SQIC_INCLUDE_DIR})
 
+embed_resource("sqic" "wsqic.f90" resource_file)
+
+message("including: ${resource_file}")
+
 set(SQIC_INTERFACE_SRCS
   sqic_internal.hpp
   sqic_internal.cpp
@@ -12,6 +16,7 @@ set(SQIC_INTERFACE_SRCS
   stabilized_sqic_internal.cpp
   stabilized_sqic_solver.hpp
   stabilized_sqic_solver.cpp
+  ${resource_file}
 )
 
 set(CASADI_DEPENDENCIES ${CMAKE_DL_LIBS})

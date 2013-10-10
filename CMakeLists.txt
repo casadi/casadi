@@ -26,6 +26,8 @@ if(Fortran_language_works)
 endif()
 #end workaround
 
+include(embed_resources)
+
 # find the macports python libs if they exist
 if(APPLE)
   set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
