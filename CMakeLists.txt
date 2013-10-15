@@ -355,3 +355,28 @@ CONFIGURE_FILE(
   ${CMAKE_SOURCE_DIR}/symbolic/casadi_meta.cpp
   ESCAPE_QUOTES
 )
+
+# Optional additions to install target
+# e.g.
+# EXTRA_INSTALL="myfile1;mytarget1;myfile2;mytarget2"
+#
+#  Will trigger:
+#
+#   install(FILES myfile1  DESTINATION mytarget1)
+#   install(FILES myfile2  DESTINATION mytarget2)
+#
+set(EXTRA_INSTALL_LIST ${EXTRA_INSTALL})
+if(EXTRA_INSTALL)
+  list(LENGTH EXTRA_INSTALL EXTRA_INSTALL_LENGTH)
+  math(EXPR EXTRA_INSTALL_LENGTH "${EXTRA_INSTALL_LENGTH}/2-1")
+  foreach(EXTRA_INSTALL_I RANGE ${EXTRA_INSTALL_LENGTH})
+    math(EXPR GET_FILE "${EXTRA_INSTALL_I}*2")
+    math(EXPR GET_DEST "${EXTRA_INSTALL_I}*2+1")
+    list(GET EXTRA_INSTALL ${GET_FILE} V_FILE)
+    list(GET EXTRA_INSTALL ${GET_DEST} V_DEST)
+    install(FILES ${V_FILE}
+      DESTINATION ${V_DEST}
+    )
+  endforeach()
+endif()
+
