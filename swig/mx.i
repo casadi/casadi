@@ -35,9 +35,10 @@
 
 
 %extend CasADi::MX{
-  #ifdef SWIGPYTHON
-  %python_matrix_helpers(CasADi::MX)
   
+  %matrix_helpers(CasADi::MX)
+  
+  #ifdef SWIGPYTHON
   %python_array_wrappers(1002.0)
   
   %pythoncode %{

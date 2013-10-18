@@ -18,6 +18,50 @@ endif()
 find_package(PythonLibs)
 find_package(NUMPY)
 
+include(InstallRequiredSystemLibraries)
+
+set(CPACK_PACKAGE_CONTACT "${PACKAGE_MAINTAINER} <contact@casadi.org>")
+set(CPACK_PACKAGE_NAME "libcasadi")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PACKAGE_DESCRIPTION}")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt")
+SET(CPACK_DEBIAN_PACKAGE_LICENSE "LGPL")
+
+set(THREE_PART_VERSION_REGEX "[0-9]+\\.[0-9]+\\.[0-9]+")
+
+# Breaks up a string in the form n1.n2.n3 into three parts and stores
+# them in major, minor, and patch.  version should be a value, not a
+# variable, while major, minor and patch should be variables.
+MACRO(THREE_PART_VERSION_TO_VARS version major minor patch)
+  IF(${version} MATCHES ${THREE_PART_VERSION_REGEX})
+    STRING(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+\\+?" "\\1" ${major} "${version}")
+    STRING(REGEX REPLACE "^[0-9]+\\.([0-9])+\\.[0-9]+\\+?" "\\1" ${minor} "${version}")
+    STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+)\\+?" "\\1" ${patch} "${version}")
+  ELSE(${version} MATCHES ${THREE_PART_VERSION_REGEX})
+    MESSAGE("MACRO(THREE_PART_VERSION_TO_VARS ${version} ${major} ${minor} ${patch}")
+    MESSAGE(FATAL_ERROR "Problem parsing version string, I can't parse it properly.")
+  ENDIF(${version} MATCHES ${THREE_PART_VERSION_REGEX})
+ENDMACRO(THREE_PART_VERSION_TO_VARS)
+
+THREE_PART_VERSION_TO_VARS(${PACKAGE_VERSION} CPACK_PACKAGE_VERSION_MAJOR CPACK_PACKAGE_VERSION_MINOR CPACK_PACKAGE_VERSION_PATCH)
+
+set(PACKAGE_VERSION_FULL "${git_describe}")
+if ((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
+  set(PACKAGE_VERSION_FULL "${PACKAGE_VERSION}")
+endif()
+
+if(ENABLE_STATIC)
+  set(CPACK_PACKAGE_FILE_NAME "libcasadi-static-${PACKAGE_VERSION_FULL}-${CMAKE_SYSTEM_PROCESSOR}")
+else()
+  set(CPACK_PACKAGE_FILE_NAME "libcasadi-shared-${PACKAGE_VERSION_FULL}-${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
+# if version end on a plus, it is a late build
+if(${PACKAGE_VERSION} MATCHES "\\+$")
+set(CPACK_PACKAGE_VERSION_PATCH "99")
+endif()
+
+include(CPack)
+
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
 
 set(CASADI_SWIG_FLAGS "")

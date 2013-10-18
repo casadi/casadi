@@ -1,4 +1,9 @@
-from lxml import etree
+
+try:
+  from lxml import etree
+except:
+  raise Exception("This functional relies on lxml.\nInstall it with apt-get install python-lxml.")
+
 import sys
 import re
 

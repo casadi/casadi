@@ -31,6 +31,7 @@
 #include "symbolic/stl_vector_tools.hpp"
 
 #include "wsqic.hpp"
+#include "interfaces/sqic/resource_sqic.hpp"
 
 using namespace std;
 namespace CasADi {
@@ -56,8 +57,10 @@ void StabilizedSQICInternal::evaluate(int nfdir, int nadir) {
   if (inputs_check_) checkInputs();
 
   std::copy(input(STABILIZED_QP_SOLVER_X0).begin(),input(STABILIZED_QP_SOLVER_X0).end(),x_.begin());
+  std::fill(x_.begin()+n_,x_.end(),0);
   
-  std::transform(input(STABILIZED_QP_SOLVER_LAM_X0).begin(),input(STABILIZED_QP_SOLVER_LAM_X0).begin(),rc_.begin(),negate<double>());
+  std::transform(input(STABILIZED_QP_SOLVER_LAM_X0).begin(),input(STABILIZED_QP_SOLVER_LAM_X0).end(),rc_.begin(),negate<double>());
+  std::fill(rc_.begin()+n_,rc_.end(),0);
 
   std::copy(input(STABILIZED_QP_SOLVER_LBX).begin(),input(STABILIZED_QP_SOLVER_LBX).end(),bl_.begin());
   std::copy(input(STABILIZED_QP_SOLVER_UBX).begin(),input(STABILIZED_QP_SOLVER_UBX).end(),bu_.begin());
@@ -169,6 +172,127 @@ void StabilizedSQICInternal::sqic_error(const string& module, int flag){
   }
   ss << " Consult SQIC documentation.";
   casadi_error(ss.str());
+}
+
+void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
+  
+  // Dump the contents of resource_sqic, but filter out the C bind stuff
+  std::string resource_sqic_input(resource_sqic);
+  std::istringstream stream(resource_sqic_input);
+  std::string line;
+  while (std::getline(stream, line)) {
+    size_t b_i = line.find("bind ( C,");
+    if (b_i!=std::string::npos) {
+      file << line.substr(0,b_i) << std::endl;
+    } else {
+      file << line << std::endl;
+    }
+  }
+  
+  file.precision(std::numeric_limits<double>::digits10+2);
+  file << std::scientific; // This is really only to force a decimal dot, would be better if it can be avoided
+
+  file << "program exported" << std::endl;
+  file << "  use SQICModule" << std::endl;
+  file << "  implicit none" << std::endl;
+  file << "  integer(ip)               :: m, n, nInf, nnH, nnzH, nnzA, nS, lenpi" << std::endl;
+  
+  
+  file << "  real(rp)                  :: Obj, mu" << std::endl;
+  
+  file << "  real(rp), allocatable:: bl(:), bu(:), x(:), valA(:), valH(:) ,pi(:), piE(:), rc(:)" << std::endl;
+  file << "  integer(ip), allocatable:: indA(:), locA(:), indH(:), locH(:), hEtype(:), hs(:)" << std::endl;
+  
+  int n = n_;
+  int m = nc_+1;
+  int nnzA=formatA_.output().size();
+  int nnzH=input(STABILIZED_QP_SOLVER_H).size();
+  
+  file << "  n = " << n << std::endl;
+  file << "  m = " << m << std::endl;
+  file << "  nnzA = " << nnzA << std::endl;
+  file << "  nnzH = " << nnzH << std::endl;
+  
+  file << "  allocate ( bl(n+m), bu(n+m) )" << std::endl;
+  file << "  allocate ( hEtype(n+m) )" << std::endl;
+  file << "  allocate ( locA(n+1), valA(nnzA), indA(nnzA) )" << std::endl;
+  file << "  allocate ( pi(m), piE(m), rc(n+m), x(n+m) )" << std::endl;
+  file << "  allocate ( hs(n+m) )" << std::endl;
+  file << "  allocate ( valH(nnzH), locH(n+1), indH(nnzH) )" << std::endl;
+  
+  for (int i=0;i<indA_.size();++i) {
+    file << "  indA(" << i +1 << ") = " << indA_[i] << std::endl;
+  }
+  for (int i=0;i<locA_.size();++i) {
+    file << "  locA(" << i +1 << ") = " << locA_[i] << std::endl;
+  }
+  for (int i=0;i<formatA_.output().size();++i) {
+    file << "  valA(" << i +1 << ") = " << formatA_.output().at(i) << std::endl;
+  }
+  for (int i=0;i<bl_.size();++i) {
+    file << "  bl(" << i +1 << ") = " << bl_[i] << std::endl;
+    file << "  bu(" << i +1 << ") = " << bu_[i] << std::endl;
+  }
+  for (int i=0;i<hEtype_.size();++i) {
+    file << "  hEtype(" << i +1 << ") = " << hEtype_[i] << std::endl;
+  }
+  for (int i=0;i<hs_.size();++i) {
+    file << "  hs(" << i +1 << ") = " << hs_[i] << std::endl;
+  }
+  for (int i=0;i<indH_.size();++i) {
+    file << "  indH(" << i +1 << ") = " << indH_[i] << std::endl;
+  }
+  for (int i=0;i<locH_.size();++i) {
+    file << "  locH(" << i +1 << ") = " << locH_[i] << std::endl;
+  }
+  for (int i=0;i<input(STABILIZED_QP_SOLVER_H).size();++i) {
+    file << "  valH(" << i +1 << ") = " << input(STABILIZED_QP_SOLVER_H).at(i) << std::endl;
+  }
+  for (int i=0;i<input(QP_SOLVER_X0).size();++i) {
+    file << "  x(" << i +1 << ") = " << input(QP_SOLVER_X0).at(i) << std::endl;
+  }
+  for (int i=0;i<pi_.size();++i) {
+    file << "  pi(" << i +1 << ") = " <<  0 << std::endl; //pi_[i] << std::endl;
+  }
+  for (int i=0;i<rc_.size();++i) {
+    file << "  rc(" << i +1 << ") = " << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0) << std::endl;
+  }
+  file << "  lenpi = " << m << std::endl;
+  file << "  mu = " << input(STABILIZED_QP_SOLVER_MUR).at(0) << std::endl;
+  for (int i=0;i<piE_.size();++i) {
+    file << "  piE(" << i +1 << ") = " << piE_[i] << std::endl;
+  }
+  
+  file << "  call wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, nnzH, indH, locH, valH)" << std::endl;
+  /**for (int i=0;i<input(QP_SOLVER_X0).size();++i) {
+    file << "  x(" << i +1 << ") = " << input(QP_SOLVER_X0).at(i) << std::endl;
+  }
+  for (int i=0;i<pi_.size();++i) {
+    file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
+  }
+  for (int i=0;i<rc_.size();++i) {
+    file << "  rc(" << i +1 << ") = " << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0) << std::endl;
+  }*/
+  file << "  call sqicSolveStabilized (Obj,mu,lenpi,piE)" << std::endl;
+  /**for (int i=0;i<input(QP_SOLVER_X0).size();++i) {
+    file << "  x(" << i +1 << ") = " << input(QP_SOLVER_X0).at(i) << std::endl;
+  }
+  for (int i=0;i<pi_.size();++i) {
+    file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
+  }
+  for (int i=0;i<rc_.size();++i) {
+    file << "  rc(" << i +1 << ") = " << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0) << std::endl;
+  }
+  file << "  call sqicSolveStabilized (Obj,mu,lenpi,piE)" << std::endl;**/
+  file << "  deallocate ( bl, bu )" << std::endl;
+  file << "  deallocate ( hEtype )" << std::endl;
+  file << "  deallocate ( locA, valA, indA )" << std::endl;
+  file << "  deallocate ( pi, piE, rc, x )" << std::endl;
+  file << "  deallocate ( valH, locH, indH )" << std::endl;
+  file << "  call sqicDestroy()" << std::endl;
+  file << "end program exported" << std::endl;
+  
+  
 }
 
 } // namespace CasADi

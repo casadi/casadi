@@ -136,5 +136,9 @@ void QPStabilizerInternal::init(){
  
 }
 
+void QPStabilizerInternal::generateNativeCode(std::ostream &file) const {
+  qp_solver_.generateNativeCode(file);
+}
+
 } // namespace CasADi
 

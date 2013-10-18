@@ -58,7 +58,8 @@ def prod(self,*args):
 def dot(self,*args):
     raise Exception("'dot' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
 %}
-%define %python_matrix_convertors
+
+%define %matrix_convertors
 %pythoncode %{
         
     def toMatrix(self):
@@ -70,7 +71,7 @@ def dot(self,*args):
         
 %}
 %enddef 
-%define %python_matrix_helpers(Type)
+%define %matrix_helpers(Type)
 %pythoncode %{
     @property
     def shape(self):
@@ -144,11 +145,8 @@ def dot(self,*args):
 %enddef
 #endif // SWIGPYTHON
 
-
 #ifdef SWIGOCTAVE
-%define %python_matrix_convertors
-%enddef 
-%define %python_matrix_helpers(Type)
+%define %matrix_helpers(Type)
 
   Type __hermitian__() const { return trans((*$self)); }
   
@@ -159,9 +157,18 @@ def dot(self,*args):
     return ret;
   }
   
-%enddef 
-#endif // SWIGOCTAVE
+%enddef
+#endif //SWIGOCTAVE
 
+#ifdef SWIGXML
+%define %matrix_helpers(Type)
+%enddef
+#endif
+
+#ifndef SWIGPYTHON
+%define %matrix_convertors
+%enddef
+#endif
 
 #ifdef SWIGOCTAVE
 %rename(__paren__) indexed_one_based;
@@ -211,24 +218,22 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 } // namespace CasADi
 #endif // SWIGOCTAVE
 
-#ifdef SWIGPYTHON
 namespace CasADi{
-%extend Matrix<double> {
+  %extend Matrix<double> {
 
-void assign(const CasADi::Matrix<double>&rhs) { (*$self)=rhs; }
-%python_matrix_convertors
-%python_matrix_helpers(CasADi::Matrix<double>)
+    void assign(const CasADi::Matrix<double>&rhs) { (*$self)=rhs; }
+    %matrix_convertors
+    %matrix_helpers(CasADi::Matrix<double>)
 
+  }
+  %extend Matrix<int> {
+
+    void assign(const CasADi::Matrix<int>&rhs) { (*$self)=rhs; }
+    %matrix_convertors
+    %matrix_helpers(CasADi::Matrix<int>)
+
+  }
 }
-%extend Matrix<int> {
-
-void assign(const CasADi::Matrix<int>&rhs) { (*$self)=rhs; }
-%python_matrix_convertors
-%python_matrix_helpers(CasADi::Matrix<int>)
-
-}
-}
-#endif //SWIGPYTHON
 
 #ifdef SWIGPYTHON
 namespace CasADi{

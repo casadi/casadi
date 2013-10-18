@@ -1305,11 +1305,11 @@ class SXtests(casadiTestCase):
     c = SXMatrix(0,0)
     x = ssym("x",2,3)
     
-    d = x + c
-    self.assertTrue(isEqual(d,x))
-    
-    d = x / c
-    self.assertTrue(isEqual(d,x))
+    with self.assertRaises(RuntimeError):
+      d = x + c
+
+    with self.assertRaises(RuntimeError):
+      d = x / c
     
 if __name__ == '__main__':
     unittest.main()

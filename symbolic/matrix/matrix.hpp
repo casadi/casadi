@@ -700,7 +700,7 @@ namespace CasADi{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
     static void setPrecision(int precision) { stream_precision_ = precision; }
     static void setWidth(int width) { stream_width_ = width; }
-    static void setScientific(bool scientific) { stream_width_ = scientific; }
+    static void setScientific(bool scientific) { stream_scientific_ = scientific; }
     // @}
     
   private:

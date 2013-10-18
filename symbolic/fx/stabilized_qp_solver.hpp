@@ -110,6 +110,9 @@ class StabilizedQPSolver : public FX{
   
   /// Set options that make the QP solver more suitable for solving LPs
   void setLPOptions();
+  
+  /** Generate native code in the interfaced language for debugging */
+  virtual void generateNativeCode(const std::string &filename) const;
 };
 
 } // namespace CasADi

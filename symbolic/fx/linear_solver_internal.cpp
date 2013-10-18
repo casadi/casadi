@@ -104,7 +104,7 @@ namespace CasADi{
     const vector<double>& b = input(LINSOL_B).data();
     vector<double>& x = output(LINSOL_X).data();
     bool transpose = input(LINSOL_T).toScalar()!=0.;
-    int nrhs = x.size()/input(LINSOL_B).size();
+    int nrhs = input(LINSOL_B).size1();
 
     // Copy input to output
     copy(b.begin(),b.end(),x.begin());
