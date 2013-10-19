@@ -18,49 +18,7 @@ endif()
 find_package(PythonLibs)
 find_package(NUMPY)
 
-include(InstallRequiredSystemLibraries)
 
-set(CPACK_PACKAGE_CONTACT "${PACKAGE_MAINTAINER} <contact@casadi.org>")
-set(CPACK_PACKAGE_NAME "libcasadi")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PACKAGE_DESCRIPTION}")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt")
-SET(CPACK_DEBIAN_PACKAGE_LICENSE "LGPL")
-
-set(THREE_PART_VERSION_REGEX "[0-9]+\\.[0-9]+\\.[0-9]+")
-
-# Breaks up a string in the form n1.n2.n3 into three parts and stores
-# them in major, minor, and patch.  version should be a value, not a
-# variable, while major, minor and patch should be variables.
-MACRO(THREE_PART_VERSION_TO_VARS version major minor patch)
-  IF(${version} MATCHES ${THREE_PART_VERSION_REGEX})
-    STRING(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+\\+?" "\\1" ${major} "${version}")
-    STRING(REGEX REPLACE "^[0-9]+\\.([0-9])+\\.[0-9]+\\+?" "\\1" ${minor} "${version}")
-    STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+)\\+?" "\\1" ${patch} "${version}")
-  ELSE(${version} MATCHES ${THREE_PART_VERSION_REGEX})
-    MESSAGE("MACRO(THREE_PART_VERSION_TO_VARS ${version} ${major} ${minor} ${patch}")
-    MESSAGE(FATAL_ERROR "Problem parsing version string, I can't parse it properly.")
-  ENDIF(${version} MATCHES ${THREE_PART_VERSION_REGEX})
-ENDMACRO(THREE_PART_VERSION_TO_VARS)
-
-THREE_PART_VERSION_TO_VARS(${PACKAGE_VERSION} CPACK_PACKAGE_VERSION_MAJOR CPACK_PACKAGE_VERSION_MINOR CPACK_PACKAGE_VERSION_PATCH)
-
-set(PACKAGE_VERSION_FULL "${git_describe}")
-if ((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
-  set(PACKAGE_VERSION_FULL "${PACKAGE_VERSION}")
-endif()
-
-if(ENABLE_STATIC)
-  set(CPACK_PACKAGE_FILE_NAME "libcasadi-static-${PACKAGE_VERSION_FULL}-${CMAKE_SYSTEM_PROCESSOR}")
-else()
-  set(CPACK_PACKAGE_FILE_NAME "libcasadi-shared-${PACKAGE_VERSION_FULL}-${CMAKE_SYSTEM_PROCESSOR}")
-endif()
-
-# if version end on a plus, it is a late build
-if(${PACKAGE_VERSION} MATCHES "\\+$")
-set(CPACK_PACKAGE_VERSION_PATCH "99")
-endif()
-
-include(CPack)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
 
@@ -428,6 +386,23 @@ ADD_CUSTOM_COMMAND(
    DEPENDS ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py
 )
 
+install(FILES ${PROJECT_BINARY_DIR}/swig/CasadiTree.hs ${PROJECT_BINARY_DIR}/swig/CasadiClasses.hs ${PROJECT_BINARY_DIR}/swig/swiginclude.hpp
+  DESTINATION share/casadi
+  COMPONENT componenthaskell
+)
+
+#SET(CPACK_MONOLITHIC_INSTALL FALSE)
+SET(CPACK_TGZ_COMPONENT_INSTALL TRUE)
+
+set(CPACK_COMPONENT_COMPONENTHASKELL_DISPLAY_NAME "Haskell headers")
+set(CPACK_COMPONENT_COMPONENTHASKELL_DESCRIPTION 
+   "Necessary headers to install a Haskell interface to CasADi")
+   
+set(CPACK_COMPONENTS_GROUPING "ALL_COMPONENTS_IN_ONE")
+set(CPACK_COMPONENTS_ALL Unspecified componenthaskell)
+# This will not actually work since we are in a EXCLUDE_FROM_ALL
+# http://cmake.3232098.n2.nabble.com/Yet-another-install-vs-exclude-from-all-thread-td4967491.html
+
 set(LINK_LIBRARIES_ALL ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
 
 # Pass meta information
@@ -503,5 +478,50 @@ ADD_CUSTOM_COMMAND(
  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi_helpers.m ${LIBRARY_OUTPUT_PATH}/casadi_helpers.m
 )
 endif(WITH_SWIG_SPLIT)
+
+
+include(InstallRequiredSystemLibraries)
+
+set(CPACK_PACKAGE_CONTACT "${PACKAGE_MAINTAINER} <contact@casadi.org>")
+set(CPACK_PACKAGE_NAME "libcasadi")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PACKAGE_DESCRIPTION}")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt")
+SET(CPACK_DEBIAN_PACKAGE_LICENSE "LGPL")
+
+set(THREE_PART_VERSION_REGEX "[0-9]+\\.[0-9]+\\.[0-9]+")
+
+# Breaks up a string in the form n1.n2.n3 into three parts and stores
+# them in major, minor, and patch.  version should be a value, not a
+# variable, while major, minor and patch should be variables.
+MACRO(THREE_PART_VERSION_TO_VARS version major minor patch)
+  IF(${version} MATCHES ${THREE_PART_VERSION_REGEX})
+    STRING(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+\\+?" "\\1" ${major} "${version}")
+    STRING(REGEX REPLACE "^[0-9]+\\.([0-9])+\\.[0-9]+\\+?" "\\1" ${minor} "${version}")
+    STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+)\\+?" "\\1" ${patch} "${version}")
+  ELSE(${version} MATCHES ${THREE_PART_VERSION_REGEX})
+    MESSAGE("MACRO(THREE_PART_VERSION_TO_VARS ${version} ${major} ${minor} ${patch}")
+    MESSAGE(FATAL_ERROR "Problem parsing version string, I can't parse it properly.")
+  ENDIF(${version} MATCHES ${THREE_PART_VERSION_REGEX})
+ENDMACRO(THREE_PART_VERSION_TO_VARS)
+
+THREE_PART_VERSION_TO_VARS(${PACKAGE_VERSION} CPACK_PACKAGE_VERSION_MAJOR CPACK_PACKAGE_VERSION_MINOR CPACK_PACKAGE_VERSION_PATCH)
+
+set(PACKAGE_VERSION_FULL "${git_describe}")
+if ((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
+  set(PACKAGE_VERSION_FULL "${PACKAGE_VERSION}")
+endif()
+
+if(ENABLE_STATIC)
+  set(CPACK_PACKAGE_FILE_NAME "libcasadi-static-${PACKAGE_VERSION_FULL}-${CMAKE_SYSTEM_PROCESSOR}")
+else()
+  set(CPACK_PACKAGE_FILE_NAME "libcasadi-shared-${PACKAGE_VERSION_FULL}-${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
+# if version end on a plus, it is a late build
+if(${PACKAGE_VERSION} MATCHES "\\+$")
+set(CPACK_PACKAGE_VERSION_PATCH "99")
+endif()
+
+include(CPack)
 
 
