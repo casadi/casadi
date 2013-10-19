@@ -19,6 +19,9 @@ OUTPUT_STRIP_TRAILING_WHITESPACE
 ERROR_QUIET
 )
 
+STRING(REPLACE "+-" "+" git_describe "${git_describe}")
+STRING(REPLACE "-g" "." git_describe "${git_describe}")
+
 #begin workaround for http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
 include(language_support)
@@ -346,8 +349,6 @@ feature_summary(WHAT ALL)
 feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
 
 STRING(REPLACE "\n" "\\n" feature_list "${feature_list}")
-STRING(REPLACE "+-" "+" git_describe "${git_describe}")
-STRING(REPLACE "-g" "." git_describe "${git_describe}")
 
 # Pass meta information
 CONFIGURE_FILE(
