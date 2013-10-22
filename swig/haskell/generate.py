@@ -205,7 +205,8 @@ for c in r.findall('*//class'):
          update_types_table(p)
 
      rettype = name
-
+     update_types_table(rettype)
+     
      docs = getAttribute(d,"feature_docstring")
      data["methods"].append((dname,params,rettype,"Constructor",docs))
 
