@@ -320,10 +320,10 @@ namespace CasADi{
 
   template<typename Value>
   void Constant<Value>::printPart(std::ostream &stream, int part) const{
-    stream << "Const<" << v_.value << ">(";
     if(sparsity().scalar(true)){
-      stream << "scalar";
+      stream << v_.value;
     } else {
+      stream << "Const<" << v_.value << ">(";
       stream << size1() << "x" << size2() << ": ";
       if(sparsity().dense()){
         stream << "dense";
@@ -334,8 +334,8 @@ namespace CasADi{
       } else {
         stream << double(size())/sparsity().numel()*100 << " %";
       }        
+      stream << ")";
     }
-    stream << ")";
   }
 
 } // namespace CasADi
