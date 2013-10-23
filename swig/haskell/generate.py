@@ -1,4 +1,5 @@
 
+
 try:
   from lxml import etree
 except:
@@ -15,8 +16,15 @@ classes = {}
 types_table = {}
 symbol_table = {}
 symbol_table_reverse = {}
+enums = {}
 
 tainted_types = {}
+
+def ucfirst(s):
+  if len(s)==0: return s
+  return s[0].upper()+s[1:]
+
+
 
 def update_types_table(p):
   if p not in types_table:
@@ -119,6 +127,11 @@ def tohaskelltype(s,alias=False,level=0):
       sym = symbol_table[s]
     elif  s[len("CasADi::"):] in symbol_table_reverse:
       return tohaskelltype(symbol_table_reverse[s[len("CasADi::"):]],alias,level=2)
+    elif s[len("CasADi::"):] in enums:
+      if alias:
+        return "enum"+s[len("CasADi::"):]
+      else:
+        return "NonVec (CasadiEnum %s)" % ucfirst(s[len("CasADi::"):])
     else:
       return None
 
@@ -131,6 +144,11 @@ def tohaskelltype(s,alias=False,level=0):
       sym = symbol_table[s]
     elif  s in symbol_table_reverse:
       return tohaskelltype(symbol_table_reverse[s],alias,level=2)
+    elif s in enums:
+      if alias:
+        return "enum" +s
+      else:
+        return "NonVec (CasadiEnum %s)" % ucfirst(s)
     else:
       raise Exception("What is '" + s + "'")
 
@@ -168,6 +186,19 @@ for c in r.findall('*//class'):
 def haskellstring(s):
   return s.replace('"','\\"').replace('\\\\"','\\"').replace("\n",'\\n')
 
+for d in r.findall('*//enum'):
+  name = getAttribute(d,"name")
+  sym_name = getAttribute(d,"sym_name")
+  docs = getAttribute(d,"feature_docstring")
+  dt = enums[sym_name] = {"sym_name": sym_name, "docs": docs,"entries":{}}
+  update_types_table(sym_name)
+  for e in d.findall('enumitem'):
+    name = getAttribute(e,"name")
+    ev = getAttribute(e,"enumvalueex")
+    docs = getAttribute(d,"feature_docstring")
+    ev = eval(ev,dict((k,v["ev"]) for k,v in dt["entries"].items()))
+
+    dt["entries"][name] = {"docs": docs, "ev": ev}
 
 for c in r.findall('*//class'):
   name = c.find('attributelist/attribute[@name="name"]').attrib["value"]
@@ -246,20 +277,6 @@ for d in r.findall('*//namespace/cdecl'):
 
   functions.append((dname,params,rettype,docs))
 
-enums = {}
-for d in r.findall('*//enum'):
-  name = getAttribute(d,"name")
-  sym_name = getAttribute(d,"sym_name")
-  docs = getAttribute(d,"feature_docstring")
-  dt = enums[sym_name] = {"sym_name": sym_name, "docs": docs,"entries":{}}
-
-  for e in d.findall('enumitem'):
-    name = getAttribute(e,"name")
-    ev = getAttribute(e,"enumvalueex")
-    docs = getAttribute(d,"feature_docstring")
-    ev = eval(ev,dict((k,v["ev"]) for k,v in dt["entries"].items()))
-
-    dt["entries"][name] = {"docs": docs, "ev": ev}
 
 
 ftree  = file('CasadiTree.hs','w')
@@ -267,7 +284,7 @@ ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.Buildbot.Ca
 
 
 fclasses  = file('CasadiClasses.hs','w')
-fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.Buildbot.CasadiClasses ( CasadiClass(..), cppTypeCasadiPrim,inheritance ) where\n\n")
+fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.Buildbot.CasadiClasses ( CasadiEnum(..), CasadiClass(..), cppTypeCasadiPrimClass,cppTypeCasadiPrimEnum,inheritance ) where\n\n")
 
 
 finclude  = file('swiginclude.hpp','w')
@@ -301,14 +318,19 @@ for k,v in classes.items():
   if "methods" in v:
     counter = {}
     for (name,pars,rettype,mtype,docs) in getAllMethods(k): # v["methods"]:
+      #print ":"+name+":",pars
       params = [types_table[p][1] for p in pars]
       if rettype not in types_table: continue
+      #print ":"+name+":",pars,2,params
       t = types_table[rettype][1]
       if t is None or len(filter(lambda x : x is None, params))>0: continue
+      #print ":"+name+":",pars,3
       if "VoidPointer" in name or "ptr" in name or "dummy" in name: continue
+      #print ":"+name+":",pars,4
       for p in params:
         tainted_types[p] = True
       tainted_types[t] = True
+      #print ":"+name+":",pars,5
       if name in counter:
         counter[name]+=1
       else:
@@ -393,7 +415,7 @@ enumslist = []
 
 for k,v in enums.items():
   entrieslist = ["""("%s",Doc "%s",%d)\n""" % (kk,vv["docs"],vv["ev"]) for kk,vv in v["entries"].items()]
-  enumslist.append( """CEnum "%s" (Doc "%s") EnumInt [\n    %s    ]\n""" % (k,haskellstring(v['docs']),"    ,".join(entrieslist)))
+  enumslist.append( """CEnum %s (Doc "%s") EnumInt [\n    %s    ]\n""" % (ucfirst(k),haskellstring(v['docs']),"    ,".join(entrieslist)))
 ftree.write("enums :: [CEnum]\nenums = [%s  ]\n" % "  ,".join(enumslist))
 
 
@@ -405,10 +427,15 @@ for a,t in aliases.items():
 exportclasses = dict([(k,v) for k,v in classes.items() if ("Vector" not in symbol_table[k] or "IOScheme" in symbol_table[k]) and "Pair" not in symbol_table[k]])
 
 fclasses.write("data CasadiClass = %s \n  deriving (Show, Eq, Ord)\n\n\n" % ( "\n  | ".join([symbol_table[k] for k,v in exportclasses.items()])))
+fclasses.write("data CasadiEnum = %s \n  deriving (Show, Eq, Ord)\n\n\n" % ( "\n  | ".join(map(lambda x: ucfirst(x),enums.keys()))))
 
-fclasses.write('cppTypeCasadiPrim :: CasadiClass -> String\n');
+fclasses.write('cppTypeCasadiPrimClass :: CasadiClass -> String\n');
 for k,v in exportclasses.items():
-  fclasses.write('cppTypeCasadiPrim %s = "%s"\n' % (symbol_table[k],k.replace("("," ").replace(")"," ")))
+  fclasses.write('cppTypeCasadiPrimClass %s = "%s"\n' % (symbol_table[k],k.replace("("," ").replace(")"," ")))
+
+fclasses.write('cppTypeCasadiPrimEnum :: CasadiEnum -> String\n');
+for k,v in enums.items():
+  fclasses.write('cppTypeCasadiPrimEnum %s = "CasADi::%s"\n' % (ucfirst(k),k))
 
 fclasses.write("\ninheritance :: [(CasadiClass,[CasadiClass])]\n")
 fclasses.write(
