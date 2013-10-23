@@ -137,6 +137,7 @@ include_directories (${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories (${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
 
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_lib")
+set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DCASADI_MODULE")
   
 # set the global swig flags to empty
 # set(CMAKE_SWIG_FLAGS "-outdir ${PROJECT_BINARY_DIR}")
