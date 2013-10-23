@@ -190,6 +190,9 @@ for c in r.findall('*//class'):
      rettype = d.find('attributelist/attribute[@name="type"]').attrib["value"]
      update_types_table(rettype)
      storage = getAttribute(d,"storage")
+     
+     access = getAttribute(d,"access")
+     if access=="private": continue
 
      docs = getAttribute(d,"feature_docstring")
 
@@ -206,6 +209,8 @@ for c in r.findall('*//class'):
 
      rettype = name
      update_types_table(rettype)
+     access = getAttribute(d,"access")
+     if access=="private": continue
      
      docs = getAttribute(d,"feature_docstring")
      data["methods"].append((dname,params,rettype,"Constructor",docs))
@@ -258,7 +263,7 @@ for d in r.findall('*//enum'):
 
 
 ftree  = file('CasadiTree.hs','w')
-ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.Buildbot.CasadiTree ( classes, tools, ioschemehelpers, enums ) where\n\n\nimport WriteCasadiBindings.Types\n\n\n")
+ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.Buildbot.CasadiTree ( classes, ioschemeclasses, tools, ioschemehelpers, enums ) where\n\n\nimport WriteCasadiBindings.Types\n\n\n")
 
 
 fclasses  = file('CasadiClasses.hs','w')
@@ -268,6 +273,8 @@ fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.Buildbot
 finclude  = file('swiginclude.hpp','w')
 code = sum([filter(lambda i: len(i.rstrip())> 0 ,x.attrib["value"].split("\n")) for x in r.findall("*//insert/attributelist/attribute[@name='code']")],[])
 finclude.write("\n".join(sorted(set(map(lambda x: x.rstrip(), filter(lambda y: re.search("^\s*#include ",y),code))))))
+
+ioschemeclasses = []
 
 def getAllMethods(name,base=None):
   if base is None:
@@ -308,7 +315,12 @@ for k,v in classes.items():
         counter[name]=0
       methods.append("""        Method (Name "%s") %s [%s] %s (Doc "%s") """ % (name+"'"*counter[name],t,",".join(params),mtype,haskellstring(docs)))
 
-  myclasses.append(symbol_table[k].lower())
+  if name.startswith("IOScheme"):
+    target = ioschemeclasses
+  else:
+    target = myclasses
+
+  target.append(symbol_table[k].lower())
   ftree.write("""%s :: Class
 %s = Class %s methods docs
   where
@@ -368,6 +380,14 @@ ioschemehelpers =
 %s
   ]
 \n""" % ",\n".join(ioschemehelpers))
+
+ftree.write("""
+ioschemeclasses :: [Class]
+ioschemeclasses =
+  [
+%s
+  ]
+\n""" % ",\n".join(ioschemeclasses))
 
 enumslist = []
 
