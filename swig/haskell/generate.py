@@ -385,9 +385,9 @@ ftree.write("""
 ioschemeclasses :: [Class]
 ioschemeclasses =
   [
-%s
+  %s
   ]
-\n""" % ",\n".join(ioschemeclasses))
+\n""" % ",\n  ".join(ioschemeclasses))
 
 enumslist = []
 
