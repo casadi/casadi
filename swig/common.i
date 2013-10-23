@@ -207,6 +207,7 @@ class pair {};
 %include "symbolic/casadi_options.hpp"
 %include "symbolic/casadi_meta.hpp"
 
+#ifdef CASADI_MODULE
 %{
 #define START \
   if (CasADi::CasadiOptions::catch_errors_python){ \
@@ -251,6 +252,7 @@ class pair {};
     SWIG_exception(SWIG_TypeError, e); \
   }
 }
+#endif // CASADI_MODULE
 
 #ifdef SWIGPYTHON
 #ifndef WITH_NUMPY
