@@ -669,6 +669,11 @@ namespace CasADi{
   MX MX::printme(const MX& b) const{ 
     return binary(OP_PRINTME,*this,b);
   }
+  
+  MX MX::attachAssert(const MX& y,const std::string &fail_message) const{
+    casadi_assert_message(y.scalar(),"Error in attachAssert: assertion expression y must be scalar, but got " << y.dimString());
+    return(*this)->getAssertion(y, fail_message);
+  }
 
   MX MX::exp() const{ 
     return (*this)->getUnary(OP_EXP);

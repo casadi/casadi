@@ -43,6 +43,7 @@
 #include "norm.hpp"
 #include "vertcat.hpp"
 #include "vertsplit.hpp"
+#include "assertion.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -647,6 +648,10 @@ namespace CasADi{
     return true;
   }
 
+  MX MXNode::getAssertion(const MX& y, const std::string &fail_message) const {
+    return MX::create(new Assertion(shared_from_this<MX>(),y,fail_message));
+  }
+    
   MX MXNode::getDeterminant() const{
     return MX::create(new Determinant(shared_from_this<MX>()));
   }

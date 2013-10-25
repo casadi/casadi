@@ -68,6 +68,7 @@ SET(CASADI_SRCS
   mx/inverse.hpp             mx/inverse.cpp             # Matrix inverse
   mx/inner_prod.hpp          mx/inner_prod.cpp          # Inner product
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
+  mx/assertion.hpp           mx/assertion.cpp           # Assertion
   mx/mx_tools.hpp            mx/mx_tools.cpp
 
   # A dynamically created function with AD capabilities

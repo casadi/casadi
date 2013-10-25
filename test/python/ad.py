@@ -616,6 +616,7 @@ class ADtests(casadiTestCase):
           (in1,v1,x,DMatrix.eye(2)),
           (in1,v1,x.T,DMatrix.eye(2)),
           (in1,v1,x**2,2*c.diag(x)),
+          (in1,v1,(x**2).attachAssert(True),2*c.diag(x)),
           (in1,v1,(x**2).T,2*c.diag(x)),
           (in1,v1,c.reshape(x,(1,2)),DMatrix.eye(2)),
           (in1,v1,c.reshape(x**2,(1,2)),2*c.diag(x)),
