@@ -552,6 +552,70 @@ class FXtests(casadiTestCase):
     f.setOption({"name": "def"},True)
     self.assertTrue(f.getOption("name")=="def")
     
+  def test_PyFunction(self):
+
+    x = msym("x")
+    y = msym("y")
+
+    def fun(f,nfwd,nadj,userdata):
+      # sin(x+3*y)
+      
+      assert nfwd<=1
+      assert nadj<=1
+      
+      print (nfwd,nadj)
+      
+      x = f.input(0)
+      y = f.input(1)
+      
+      dx = f.fwdSeed(0)
+      dy = f.fwdSeed(1)
+      
+      z0 = 3*y
+      dz0 = 3*dy
+      
+      z1 = x+z0
+      dz1 = dx+dz0
+      
+      z2 = sin(z1)
+      dz2 = cos(z1)*dz1
+      
+      # Backwards sweep
+      bx = 0
+      by = 0
+      bz1 = 0
+      bz0 = 0
+      
+      bz2 = f.adjSeed(0)
+      bz1 += bz2*cos(z1)
+      bx+= bz1;bz0+= bz1
+      by+= 3*bz0
+      
+      f.setOutput(z2)
+      f.setFwdSens(dz2)
+      f.setAdjSens(bx,0)
+      f.setAdjSens(by,1)
+
+    Fun = PyFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
+    Fun.setOption("name","Fun")
+    Fun.setOption("max_number_of_fwd_dir",1)
+    Fun.setOption("max_number_of_adj_dir",1)
+    Fun.init()
+
+    f = MXFunction([x,y],Fun.call([x,y]))
+    f.init()
+    
+    g = MXFunction([x,y],[sin(x+3*y)])
+    g.init()
+    
+    f.setInput(0.2,0)
+    f.setInput(0.7,1)
+
+    g.setInput(0.2,0)
+    g.setInput(0.7,1)
+        
+    self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
+    
     
 if __name__ == '__main__':
     unittest.main()

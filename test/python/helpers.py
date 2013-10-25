@@ -481,27 +481,29 @@ class casadiTestCase(unittest.TestCase):
           
           if vf_reference is None:
             vf_reference = vf
-
-          # Second order sensitivities
-          for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-            fseeds2 = [[sym("f",vf_reference.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
-            aseeds2 = [[sym("a",vf_reference.output(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
-            inputss2 = [sym("i",vf_reference.input(i).sparsity()) for i in range(vf.getNumInputs())]
-         
-            res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
-
-            vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
-            vf2.init()
-              
-            random.seed(1)
-            for i in range(vf2.getNumInputs()):
-              vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())),i)
             
-            vf2.evaluate()
-            storagekey = (spmod,spmod2)
-            if not(storagekey in storage2):
-              storage2[storagekey] = []
-            storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.getNumOutputs())])
+          if evals>1:
+
+            # Second order sensitivities
+            for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
+              fseeds2 = [[sym("f",vf_reference.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
+              aseeds2 = [[sym("a",vf_reference.output(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
+              inputss2 = [sym("i",vf_reference.input(i).sparsity()) for i in range(vf.getNumInputs())]
+           
+              res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
+
+              vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+              vf2.init()
+                
+              random.seed(1)
+              for i in range(vf2.getNumInputs()):
+                vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())),i)
+              
+              vf2.evaluate()
+              storagekey = (spmod,spmod2)
+              if not(storagekey in storage2):
+                storage2[storagekey] = []
+              storage2[storagekey].append([vf2.getOutput(i) for i in range(vf2.getNumOutputs())])
 
       # Remainder of eval testing
       for store,order in [(storage,"first-order"),(storage2,"second-order")][:evals]:
@@ -510,8 +512,8 @@ class casadiTestCase(unittest.TestCase):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
               if b.numel()==0 and sparse(a).size()==0: continue
               if a.numel()==0 and sparse(b).size()==0: continue
-              self.checkarray(IMatrix(a.sparsity(),1),IMatrix(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf2.getInput(0)),digits=digits_sens)
-              self.checkarray(a,b,("%s, output(%d)" % (order,k))+str(vf2.getInput(0)),digits=digits_sens)
+              self.checkarray(IMatrix(a.sparsity(),1),IMatrix(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0)),digits=digits_sens)
+              self.checkarray(a,b,("%s, output(%d)" % (order,k))+str(vf.getInput(0)),digits=digits_sens)
               
     for k in range(trial.getNumInputs()):
       trial.setInput(trial_inputs[k],k)

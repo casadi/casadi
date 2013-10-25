@@ -1711,7 +1711,8 @@ namespace CasADi{
   }
 
   FX FXInternal::getDerivative(int nfwd, int nadj){
-    casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
+    return Derivative(shared_from_this<FX>(),nfwd,nadj);
+    //casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
   }
 
   FX FXInternal::getDerivativeViaJac(int nfwd, int nadj){
@@ -2261,8 +2262,13 @@ namespace CasADi{
     // Evaluate symbolically
     vector<MX> res;
     vector<vector<MX> > fsens, asens;
-    createCallDerivative(arg,res,fseed,fsens,aseed,asens,true);
-
+    
+    if (fwdSens.size()==0 && adjSens.size()==0) {
+      res = callSelf(arg);
+    } else {
+      createCallDerivative(arg,res,fseed,fsens,aseed,asens,true);
+    }
+    
     // Store the non-differentiated results
     if(!output_given){
       for(int i=0; i<res.size(); ++i){
