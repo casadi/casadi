@@ -40,7 +40,7 @@ namespace CasADi{
   class GenericType : public SharedObject{
     public:
     GenericType();
-    #ifndef SWIG
+    #if !((defined SWIG) && ((defined SWIGPYTHON) || (defined SWIGOCTAVE)))
     GenericType(bool b);
     GenericType(int i);
     GenericType(double d);
