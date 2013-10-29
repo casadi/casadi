@@ -112,6 +112,9 @@ namespace CasADi{
 
     // Set sparse
     OP_SET_SPARSE,
+    
+    // Assertion
+    OP_ASSERTION,
   
     // Norms
     OP_NORM2, OP_NORM1, OP_NORMINF, OP_NORMF,

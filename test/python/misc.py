@@ -355,6 +355,32 @@ class Misctests(casadiTestCase):
     b = pickle.loads(s)
     self.checkarray(a,b)
 
+  def test_assertions(self):
+    
+    x = msym("x") 
+    
+    z = x**2
+    
+    z = z.attachAssert(z>3,"x must be larger than 3")
+    
+    v = sin(z)
+    
+    f = MXFunction([x],[v])
+    f.init()
+    
+    print f
+    
+    f.setInput(-6)
+    f.evaluate()
+    
+    f.setInput(1)
+    
+    try :
+      f.evaluate()
+    except Exception as e:
+      print str(e)
+      self.assertTrue("x must be larger than 3" in str(e))
+    
 
     
 pickle.dump(CRSSparsity(),file("temp.txt","w"))

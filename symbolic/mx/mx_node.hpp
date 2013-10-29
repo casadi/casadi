@@ -359,6 +359,9 @@ namespace CasADi{
 
     /// 1-norm
     virtual MX getNorm1() const;
+    
+    /// Assertion
+    MX getAssertion(const MX& y, const std::string & fail_message="") const;
 
     /** Temporary variables to be used in user algorithms like sorting, 
         the user is resposible of making sure that use is thread-safe

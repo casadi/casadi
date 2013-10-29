@@ -443,6 +443,12 @@ namespace CasADi{
     MX arccosh() const;
     MX arctanh() const;
     MX logic_not() const;
+    
+    /** \brief returns itself, but with an assertion attached
+    *
+    *  If y does not evaluate to 1, a runtime error is raised
+    */
+    MX attachAssert(const MX& y,const std::string &fail_message="") const;
 
     /** \brief Set sparse */
     MX setSparse(const CRSSparsity& sp, bool intersect=false) const;
