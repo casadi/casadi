@@ -361,7 +361,7 @@ One of the \texttt{FX} derived classes is \texttt{SXFunction}, which defines a f
  f = SXFunction(list_of_inputs,list_of_outputs)
 \end{verbatim}
 
-There is no mechanism to distinguish the nature of \texttt{FX} functions. For example, any \texttt{FX} with \texttt{DAE\_NUM\_IN} inputs and \texttt{DAE\_NUM\_OUT} outputs can be cosidered to represent a dae function. The CasADi used to generate this documentation has:
+There is no mechanism to distinguish the nature of \texttt{FX} functions. For example, any \texttt{FX} with \texttt{DAE\_NUM\_IN} inputs and \texttt{DAE\_NUM\_OUT} outputs can be considered to represent a dae function. The CasADi used to generate this documentation has:
 \begin{pytexoutput}
 print "DAE_NUM_IN = ", DAE_NUM_IN
 print "DAE_NUM_OUT = ", DAE_NUM_OUT
@@ -853,7 +853,20 @@ Solvers for \emph{ordinary} differential equations will make the additional assu
 \end{equation}
 the explicit equation for $\dot{x}$ can thus be retrieved by simply evaluating the DAE function with $\dot{x} = 0$.
 
-It is important that the arguments of the function uses the order above, and for this reason, we strongly recommend users to work with a set of constants defining the required input and output schemes of the function. For the DAE residual function, these constants are \texttt{DAE\_NUM\_IN=4}, \texttt{DAE\_T=0}, \texttt{DAE\_Y=1}, \texttt{DAE\_P=2} and \texttt{DAE\_YDOT=3} for the inputs and \texttt{DAE\_NUM\_OUT=1} and \texttt{DAE\_RES=0} for the outputs.
+An example dae construction is:
+
+\begin{pytex}
+states = ssym("x")
+z = ssym("z")
+rhs = -z*states
+C = z*z-2
+
+dae = SXFunction(daeIn(x=states,z=z),daeOut(ode=rhs,alg=C))
+print dae
+\end{pytex}
+
+This particular problem is actually troublesome. During integration, the rootfinding problem $C(z) = 0$ will be solved, and the initial guess is $z=0$. Since $\frac{dC}{dz}(z=0)=0$, the rootfinding will fail. You cannot force a different inital guess directly, but you can transform the $z$ variable:
+$z \rightarrow z + 1$ -- $C=z^2+2z-1$, which will work fine.
 
 An integrator in CasADi is a function that take the state at the initial time, guesses for the algebraic states and state derivatives (only important for DAEs) and evaluates the state vector at the final time. The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be set with the option:
 \begin{verbatim}
