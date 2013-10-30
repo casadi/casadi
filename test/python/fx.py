@@ -616,6 +616,32 @@ class FXtests(casadiTestCase):
         
     self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
     
+  def test_derivatiev_simplifications(self):
+  
+    n = 1
+    x = ssym("x",n)
+
+    M = SXFunction([x],[mul((x-DMatrix(range(n))),x.T)])
+    M.setOption("name","M")
+    M.init()
+    M.evaluate()
+
+
+    P = msym("P",n,n)
+    X = msym("X",n)
+
+    MX= M.call([X])[0]
+
+    Pf = MXFunction([X,P],[mul(MX,P)])
+    Pf.setOption("name","P")
+    Pf.init()
+
+    P_P = Pf.jacobian(1)
+    P_P.init()
+
+    
+    self.assertFalse("derivative" in str(P_P))
+    
     
 if __name__ == '__main__':
     unittest.main()
