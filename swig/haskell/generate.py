@@ -149,6 +149,8 @@ def tohaskelltype(s,alias=False,level=0):
         return "enum" +s
       else:
         return "NonVec (CasadiEnum %s)" % ucfirst(s)
+    elif s=='a().q(const).char':
+      return None
     else:
       raise Exception("What is '" + s + "'")
 

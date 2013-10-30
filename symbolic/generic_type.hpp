@@ -40,7 +40,6 @@ namespace CasADi{
   class GenericType : public SharedObject{
     public:
     GenericType();
-    #ifndef SWIG
     GenericType(bool b);
     GenericType(int i);
     GenericType(double d);
@@ -51,7 +50,6 @@ namespace CasADi{
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
     GenericType(const FX& f);
-    #endif // SWIG
     GenericType(const SharedObject& obj);
     //GenericType(const GenericType& obj);    
     
