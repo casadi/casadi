@@ -1,1 +1,1 @@
-/usr/local/bin/swig -matlab example.i
+/usr/local/bin/swig -matlab -c++ example.i
