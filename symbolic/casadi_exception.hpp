@@ -143,6 +143,12 @@ if((x)==false){ \
 #define casadi_warning(msg) \
 std::cerr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE ". " << std::endl;
 
+// http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
+#define STRING(ITEMS)                                             \
+  ( ( dynamic_cast<ostringstream &> (                             \
+         ostringstream() . seekp( 0, ios_base::cur ) << ITEMS )   \
+    ) . str() )
+
 #endif // CASADI_NDEBUG
   
 } // namespace CasADi
