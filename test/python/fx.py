@@ -616,6 +616,65 @@ class FXtests(casadiTestCase):
         
     self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
     
+  def test_derivative_simplifications(self):
+  
+    n = 1
+    x = ssym("x",n)
+
+    M = SXFunction([x],[mul((x-DMatrix(range(n))),x.T)])
+    M.setOption("name","M")
+    M.init()
+    M.evaluate()
+
+
+    P = msym("P",n,n)
+    X = msym("X",n)
+
+    MX= M.call([X])[0]
+
+    Pf = MXFunction([X,P],[mul(MX,P)])
+    Pf.setOption("name","P")
+    Pf.init()
+
+    P_P = Pf.jacobian(1)
+    P_P.init()
+
+    
+    self.assertFalse("derivative" in str(P_P))
+    
+  def test_assert_derivatives(self):
+    x = msym("x")
+    
+    def dummy(f,nfwd,nadj,userdata):
+      print f
+      f.setOutput(1)
+
+    foo = PyFunction(dummy, [x.sparsity()], [sp_dense(1,1)] )
+    foo.setOption("name","foo")
+    foo.setOption("verbose",True)
+    foo.init()
+
+    y = x**2
+
+    y = y.attachAssert(foo.call([x])[0],"P is not positive definite")
+
+    f = MXFunction([x],[y])
+    f.setOption("verbose",True)
+    f.init()
+
+    J = f.gradient()
+    J.init()
+
+    J.setInput([0.1])
+    J.evaluate()
+
+    self.assertFalse("derivative" in str(J))
+    
+    H = f.hessian()
+    H.init()
+    
+    H.setInput([0.1])
+    H.evaluate()
     
 if __name__ == '__main__':
     unittest.main()

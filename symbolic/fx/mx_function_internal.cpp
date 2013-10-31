@@ -866,6 +866,8 @@ namespace CasADi{
     MXPtrV input_p, output_p;
     MXPtrVV fseed_p(nfdir), fsens_p(nfdir);
     MXPtrVV aseed_p(nadir), asens_p(nadir);
+    MXPtrVV fseed_purged(nfdir), fsens_purged(nfdir);
+    MXPtrVV aseed_purged(nadir), asens_purged(nadir);
     MXPtrVV dummy_p;
 
     // Work vector, forward derivatives
@@ -961,7 +963,16 @@ namespace CasADi{
 
         // Call the evaluation function
         if(!output_given || nfdir>0){
-          it->data->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
+          if (it->data->getOp()==OP_CALL) {
+            // Purge the directions that have all-zero seeds
+            // We do this only for OP_CALL since some operations might have a substancial effect on the sensitivities even though all seeds are zero: the sparisty might be changed e.g. in OP_SETSPARSE
+            purgeSeeds(fseed_p,fsens_p,fseed_purged,fsens_purged, true);
+            // Call the evaluation function
+            it->data->evaluateMX(input_p,output_p,fseed_purged,fsens_purged,dummy_p,dummy_p,output_given);      
+          } else {
+            // Call the evaluation function
+            it->data->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
+          }
         }
 
         // Save results of the operation to work vector, if known (not earlier to allow inplace operations)
@@ -1054,8 +1065,17 @@ namespace CasADi{
             }
           }
 
-          // Call the evaluation function
-          it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
+
+          if (it->data->getOp()==OP_CALL) {
+            // Purge the directions that have all-zero seeds
+            // We do this only for OP_CALL since some operations might have a substancial effect on the sensitivities even though all seeds are zero: the sparisty might be changed e.g. in OP_SETSPARSE
+            purgeSeeds(aseed_p,asens_p,aseed_purged,asens_purged, false);
+            // Call the evaluation function
+            it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_purged,asens_purged,true);      
+          } else {
+            // Call the evaluation function
+            it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
+          }
         }
       
         // Recover the spilled elements to the work vector for later access (delayed for inplace operations)
