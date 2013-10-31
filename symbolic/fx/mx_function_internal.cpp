@@ -958,9 +958,6 @@ namespace CasADi{
           for(int oind=0; oind<it->res.size(); ++oind){
             int el = it->res[oind];
             fsens_p[d][oind] = el<0 ? 0 : &dwork[el][d];
-            if (el>=0 && dwork[el][d].isNull() && !output_p[oind]->isNull()) {
-              dwork[el][d] = MX::sparse(output_p[oind]->size1(),output_p[oind]->size2());
-            }
           }
         }
 
