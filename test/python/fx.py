@@ -553,69 +553,254 @@ class FXtests(casadiTestCase):
     self.assertTrue(f.getOption("name")=="def")
     
   def test_PyFunction(self):
-
+  
     x = msym("x")
     y = msym("y")
-
-    def fun(f,nfwd,nadj,userdata):
-      # sin(x+3*y)
-      
-      assert nfwd<=1
-      assert nadj<=1
-      
-      print (nfwd,nadj)
-      
-      x = f.input(0)
-      y = f.input(1)
-      
-      dx = f.fwdSeed(0)
-      dy = f.fwdSeed(1)
-      
-      z0 = 3*y
-      dz0 = 3*dy
-      
-      z1 = x+z0
-      dz1 = dx+dz0
-      
-      z2 = sin(z1)
-      dz2 = cos(z1)*dz1
-      
-      # Backwards sweep
-      bx = 0
-      by = 0
-      bz1 = 0
-      bz0 = 0
-      
-      bz2 = f.adjSeed(0)
-      bz1 += bz2*cos(z1)
-      bx+= bz1;bz0+= bz1
-      by+= 3*bz0
-      
-      f.setOutput(z2)
-      f.setFwdSens(dz2)
-      f.setAdjSens(bx,0)
-      f.setAdjSens(by,1)
-
-    Fun = PyFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
-    Fun.setOption("name","Fun")
-    Fun.setOption("max_number_of_fwd_dir",1)
-    Fun.setOption("max_number_of_adj_dir",1)
-    Fun.init()
-
-    f = MXFunction([x,y],Fun.call([x,y]))
-    f.init()
     
+        
     g = MXFunction([x,y],[sin(x+3*y)])
     g.init()
     
-    f.setInput(0.2,0)
-    f.setInput(0.7,1)
 
     g.setInput(0.2,0)
     g.setInput(0.7,1)
-        
-    self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
     
+    def getP(max_fwd=1,max_adj=1,indirect=True):
+
+      def fun(f,nfwd,nadj,userdata):
+        # sin(x+3*y)
+        
+        assert nfwd<=max_fwd
+        assert nadj<=max_adj
+        
+        print (nfwd,nadj)
+        
+        x = f.input(0)
+        y = f.input(1)
+        
+        if max_fwd>0:
+          dx = f.fwdSeed(0)
+          dy = f.fwdSeed(1)
+        
+        z0 = 3*y
+        if max_fwd>0: dz0 = 3*dy
+        
+        z1 = x+z0
+        if max_fwd>0: dz1 = dx+dz0
+        
+        z2 = sin(z1)
+        if max_fwd>0: dz2 = cos(z1)*dz1
+        
+        if max_adj>0:
+          # Backwards sweep
+          bx = 0
+          by = 0
+          bz1 = 0
+          bz0 = 0
+          
+          bz2 = f.adjSeed(0)
+          bz1 += bz2*cos(z1)
+          bx+= bz1;bz0+= bz1
+          by+= 3*bz0
+          f.setAdjSens(bx,0)
+          f.setAdjSens(by,1)
+        
+        f.setOutput(z2)
+        if max_fwd>0: f.setFwdSens(dz2)
+
+
+      Fun = PyFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
+      Fun.setOption("name","Fun")
+      Fun.setOption("max_number_of_fwd_dir",max_fwd)
+      Fun.setOption("max_number_of_adj_dir",max_adj)
+      Fun.init()
+      
+      if not indirect: 
+        Fun.setInput(0.2,0)
+        Fun.setInput(0.7,1)
+        return Fun
+
+      f = MXFunction([x,y],Fun.call([x,y]))
+      f.init()
+
+      f.setInput(0.2,0)
+      f.setInput(0.7,1)
+      
+      return f
+      
+    for indirect in [True,False]:
+      f = getP(max_fwd=1,max_adj=1,indirect=indirect)
+                
+      self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
+
+      f = getP(max_fwd=1,max_adj=0,indirect=indirect)
+                
+      self.checkfx(f,g,sens_der=False,hessian=False,adj=False,evals=1)
+
+      f = getP(max_fwd=0,max_adj=1,indirect=indirect)
+                
+      self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
+      
+    # vector input
+    
+    x = msym("x",2)
+    y = msym("y")
+        
+    g = MXFunction([x,y],[sin(x[0]+3*y)*x[1]])
+    g.init()
+    
+
+    g.setInput([0.2,0.6],0)
+    g.setInput(0.7,1)
+    
+    def getP(max_fwd=1,max_adj=1,indirect=True):
+
+      def fun(f,nfwd,nadj,userdata):
+        # sin(x0+3*y)*x1
+        
+        assert nfwd<=max_fwd
+        assert nadj<=max_adj
+        
+        print (nfwd,nadj)
+        
+        x0 = f.input(0)[0]
+        x1 = f.input(0)[1]
+        y = f.input(1)
+        
+        if max_fwd>0:
+          dx0 = f.fwdSeed(0)[0]
+          dx1 = f.fwdSeed(0)[1]
+          dy = f.fwdSeed(1)
+        
+        z0 = 3*y
+        if max_fwd>0: dz0 = 3*dy
+        
+        z1 = x0+z0
+        if max_fwd>0: dz1 = dx0+dz0
+        
+        z2 = sin(z1)
+        if max_fwd>0: dz2 = cos(z1)*dz1
+        
+        z3 = z2*x1
+        if max_fwd>0: dz3 = x1*dz2 + dx1*z2
+        
+        if max_adj>0:
+          # Backwards sweep
+          bx0 = 0
+          bx1 = 0
+          by = 0
+          
+          bz2 = 0
+          bz1 = 0
+          bz0 = 0
+          
+          bz3 = f.adjSeed(0)
+          bz2 += bz3*x1
+          bx1 += bz3*z2
+          bz1 += bz2*cos(z1)
+          bx0+= bz1;bz0+= bz1
+          by+= 3*bz0
+          f.setAdjSens([bx0,bx1],0)
+          f.setAdjSens(by,1)
+        
+        f.setOutput(z3)
+        if max_fwd>0: f.setFwdSens(dz3)
+
+
+      Fun = PyFunction(fun, [sp_dense(2,1),sp_dense(1,1)], [sp_dense(1,1)] )
+      Fun.setOption("name","Fun")
+      Fun.setOption("max_number_of_fwd_dir",max_fwd)
+      Fun.setOption("max_number_of_adj_dir",max_adj)
+      Fun.init()
+
+      if not indirect: 
+        Fun.setInput([0.2,0.6],0)
+        Fun.setInput(0.7,1)
+        return Fun
+        
+      f = MXFunction([x,y],Fun.call([x,y]))
+      f.init()
+
+      f.setInput([0.2,0.6],0)
+      f.setInput(0.7,1)
+      
+      return f
+    
+    for indirect in [True,False]:
+      f = getP(max_fwd=1,max_adj=1,indirect=indirect)
+                
+      self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
+
+      f = getP(max_fwd=1,max_adj=0,indirect=indirect)
+                
+      self.checkfx(f,g,sens_der=False,hessian=False,adj=False,evals=1)
+
+      f = getP(max_fwd=0,max_adj=1,indirect=indirect)
+                
+      self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
+      
+      
+    # vector input, vector output
+    
+    x = msym("x",2)
+        
+    g = MXFunction([x],[vertcat([x[0]**2,x[1]**2])])
+    g.init()
+    
+
+    g.setInput([0.2,0.6],0)
+ 
+    def getP(max_fwd=1,max_adj=1,indirect=True):
+
+      def squares(f,nfwd,nadj,userdata):
+        print "Called squares with :", (nfwd,nadj)
+        x = f.getInput(0)[0]
+        y = f.getInput(0)[1]
+
+        f.setOutput(f.getInput(0)**2,0)
+        f.setOutput(f.getInput(0)**2,0)
+        
+        for i in range(nfwd):
+          xdot = f.getFwdSeed(0,i)[0]
+          ydot = f.getFwdSeed(0,i)[1]
+          f.setFwdSens([2*x*xdot+ydot,y*xdot+x*ydot],0,i)
+          
+        for i in range(nadj):
+          xb = f.getAdjSeed(0,i)[0]
+          yb = f.getAdjSeed(0,i)[1]
+          f.setAdjSens([2*x*xb+y*yb,xb+x*yb],0,i)
+          
+      c = PyFunction( squares, [sp_dense(2,1)], [sp_dense(2,1)] )
+      c.init()
+
+      if not indirect: 
+        c.setInput([0.2,0.6],0)
+        return c
+        
+      f = MXFunction([x],Fun.call([x]))
+      f.init()
+
+      f.setInput([0.2,0.6],0)
+      
+      return f
+    
+    return
+    
+    for indirect in [True,False]:
+      f = getP(max_fwd=1,max_adj=1,indirect=indirect)
+                
+      self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
+
+      f = getP(max_fwd=1,max_adj=0,indirect=indirect)
+                
+      self.checkfx(f,g,sens_der=False,hessian=False,adj=False,evals=1)
+
+      f = getP(max_fwd=0,max_adj=1,indirect=indirect)
+                
+      self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
+      #self.assertFalse(True)
+      
+      
   def test_derivative_simplifications(self):
   
     n = 1

@@ -110,7 +110,6 @@ c = PyFunction( squares, [sp_dense(2,1)], [sp_dense(2,1)] )
 c.init()
 
 #! Let's calculate the jacobian:
-
 J = c.jacobian()
 J.init()
 J.setInput([3,5])
@@ -118,7 +117,7 @@ J.evaluate()
 
 print J.getOutput()
 
-#! Forcing ad_mode is currently non-functional. See https://github.com/casadi/casadi/issues/614
+#! Forcing reverse mode:
 c.setOption("ad_mode","reverse")
 c.init()
 J = c.jacobian()

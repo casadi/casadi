@@ -96,6 +96,17 @@ namespace CasADi{
     // Warn for functions with too many inputs or outputs
     casadi_assert_warning(getNumInputs()<10000, "Function " << getOption("name") << " has a large number of inputs. Changing the problem formulation is strongly encouraged.");
     casadi_assert_warning(getNumOutputs()<10000, "Function " << getOption("name") << " has a large number of outputs. Changing the problem formulation is strongly encouraged.");  
+
+    // If max_number of sensitivities is zero, disable these sensitivities
+    if (int(getOption("max_number_of_fwd_dir"))==0) {
+      setOption("number_of_fwd_dir",0);
+      setOption("ad_mode","reverse");
+    }
+    if (int(getOption("max_number_of_adj_dir"))==0) {
+      setOption("number_of_adj_dir",0);
+      setOption("ad_mode","forward");
+    }
+    
     // Allocate data for sensitivities (only the method in this class)
     FXInternal::updateNumSens(false);
   
@@ -271,13 +282,28 @@ namespace CasADi{
   }
   
   FX FXInternal::getGradient(int iind, int oind){
-    // Wrap in an MXFunction
-    vector<MX> arg = symbolicInput();
-    vector<MX> res = shared_from_this<FX>().call(arg);
-    FX f = MXFunction(arg,res);
-    f.setInputScheme(getInputScheme());
+    FX f = wrapMXFunction();
     f.init();
     return f.gradient(iind,oind);
+  }
+  
+  MXFunction FXInternal::wrapMXFunction() {
+    vector<MX> arg = symbolicInput();
+    vector<MX> res = shared_from_this<FX>().call(arg);
+    
+    MXFunction f = MXFunction(arg,res);
+    std::stringstream ss;
+    ss << "wrap_" << getOption("name");
+    f.setOption("name",ss.str());
+    f.setInputScheme(getInputScheme());
+    f.setOutputScheme(getOutputScheme());
+    f.setOption("ad_mode",getOption("ad_mode"));
+    f.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
+    f.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
+    f.setOption("max_number_of_fwd_dir",getOption("max_number_of_fwd_dir"));
+    f.setOption("max_number_of_adj_dir",getOption("max_number_of_adj_dir"));
+
+    return f;
   }
   
   FX FXInternal::getHessian(int iind, int oind){
@@ -1437,11 +1463,7 @@ namespace CasADi{
   void FXInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
                           const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
                           const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){                
-    // Wrap in an MXFunction
-    vector<MX> in = symbolicInput();
-    vector<MX> out = shared_from_this<FX>().call(in);
-    MXFunction f = MXFunction(in,out);
-    f.setInputScheme(getInputScheme());
+    MXFunction f = wrapMXFunction();
     f.init();
     f.evalMX(arg,res,fseed,fsens,aseed,asens);
   }
@@ -1711,16 +1733,16 @@ namespace CasADi{
   }
 
   FX FXInternal::getDerivative(int nfwd, int nadj){
+    if (nadj>0 && nadir_==0) {
+      return getDerivativeViaJac(nfwd,nadj);
+    } else if (nfwd>0 && nfdir_==0) {
+      return getDerivativeViaJac(nfwd,nadj);
+    }
     return Derivative(shared_from_this<FX>(),nfwd,nadj);
-    //casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
   }
 
   FX FXInternal::getDerivativeViaJac(int nfwd, int nadj){
-    // Wrap in an MXFunction
-    vector<MX> arg = symbolicInput();
-    vector<MX> res = shared_from_this<FX>().call(arg);
-    FX f = MXFunction(arg,res);
-    f.setInputScheme(getInputScheme());
+    FX f = wrapMXFunction();
     f.init();
     return f->getDerivativeViaJac(nfwd,nadj);
   }
@@ -1789,11 +1811,8 @@ namespace CasADi{
   }
 
   FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric){
-    vector<MX> arg = symbolicInput();
-    vector<MX> res = shared_from_this<FX>().call(arg);
-    FX f = MXFunction(arg,res);
+    FX f = wrapMXFunction();
     f.setOption("numeric_jacobian", false); // BUG ?
-    f.setInputScheme(getInputScheme());
     f.init();
     return f->getNumericJacobian(iind,oind,compact,symmetric);
   }

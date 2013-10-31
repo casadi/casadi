@@ -35,6 +35,8 @@
 #define OUTPUTSCHEME(name)
 
 namespace CasADi{
+
+  class MXFunction;
   
   /** \brief Internal class for FX
       \author Joel Andersson 
@@ -166,6 +168,23 @@ namespace CasADi{
     virtual FX getDerivativeViaOO(int nfwd, int nadj);
 
     //@}
+    
+    
+    /** \brief Create a helper MXFunction with some properties copied
+    *
+    * Copied properties: 
+    *
+    *    input/outputscheme
+    *
+    *   ad_mode
+    *   number_of_fwd_dir
+    *   number_of_adj_dir
+    *   max_number_of_fwd_dir
+    *   max_number_of_adj_dir
+    *   
+    *  The function is not initialized
+    */
+    MXFunction wrapMXFunction();
 
     /** \brief  Print to a c file */
     virtual void generateCode(const std::string& filename);
