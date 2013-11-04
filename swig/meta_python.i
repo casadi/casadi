@@ -19,6 +19,12 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+ 
+%ignore CasADi::SparsityGeneratorPythonInternal;
+%ignore CasADi::JacobianGeneratorPythonInternal;
+%ignore CasADi::CallbackPythonInternal;
+%ignore CasADi::SparsityGeneratorPython;
+%ignore CasADi::JacobianGeneratorPython;
 
 %inline %{
 /// int
@@ -220,6 +226,136 @@ template<> bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::
 /// CasADi::GenericType
 template<> char meta< CasADi::GenericType >::expected_message[] = "Expecting any type (None might be an exception)";
 
+#include "symbolic/callback_internal.hpp"
+
+namespace CasADi {
+  //using namespace CasADi;
+
+  class SparsityGeneratorPython : public SparsityGenerator {
+    public:
+      SparsityGeneratorPython(PyObject *p);
+  };
+  
+  class JacobianGeneratorPython : public JacobianGenerator {
+    public:
+      JacobianGeneratorPython(PyObject *p);
+  };
+  
+  class CallbackPythonInternal {
+    public:
+      CallbackPythonInternal(PyObject *p);
+      ~CallbackPythonInternal();
+    protected:
+      PyObject *p_;
+  };
+
+  class SparsityGeneratorPythonInternal : public SparsityGeneratorInternal, CallbackPythonInternal {
+    friend class SparsityGeneratorPython;
+    
+    SparsityGeneratorPythonInternal(PyObject *p);
+    virtual CRSSparsity call(FX& fcn, int iind, int oind, void* user_data);
+    virtual SparsityGeneratorPythonInternal* clone() const;
+
+  };
+  
+  class JacobianGeneratorPythonInternal : public JacobianGeneratorInternal, CallbackPythonInternal {
+    friend class JacobianGeneratorPython;
+    
+    JacobianGeneratorPythonInternal(PyObject *p);
+    virtual FX call(FX& fcn, int iind, int oind, void* user_data);
+    virtual JacobianGeneratorPythonInternal* clone() const;
+  };
+  
+  SparsityGeneratorPython::SparsityGeneratorPython(PyObject *p) {
+    assignNode(new SparsityGeneratorPythonInternal(p));
+  }
+    
+  JacobianGeneratorPython::JacobianGeneratorPython(PyObject *p) {
+    assignNode(new JacobianGeneratorPythonInternal(p));
+  }
+  
+  CallbackPythonInternal::CallbackPythonInternal(PyObject *p): p_(p) {
+    Py_INCREF(p_);
+  }
+  
+  CallbackPythonInternal::~CallbackPythonInternal() {
+    Py_DECREF(p_);
+  }
+  
+  SparsityGeneratorPythonInternal::SparsityGeneratorPythonInternal(PyObject *p)  : CallbackPythonInternal(p) {
+  }
+  
+  SparsityGeneratorPythonInternal* SparsityGeneratorPythonInternal::clone() const {
+    return new SparsityGeneratorPythonInternal(p_);
+  }
+  
+  CRSSparsity SparsityGeneratorPythonInternal::call(FX& fcn, int iind, int oind, void* user_data) {
+    casadi_assert(p_!=0);
+    PyObject * iind_py = PyInt_FromLong(iind);
+    PyObject * oind_py = PyInt_FromLong(oind);
+    PyObject * fcn_py = SWIG_NewPointerObj((new FX(static_cast< const FX& >(fcn))), SWIGTYPE_p_CasADi__FX, SWIG_POINTER_OWN |  0 );
+    if(!fcn_py) {
+      Py_DECREF(iind_py);
+      Py_DECREF(oind_py);
+      throw CasadiException("SparsityGeneratorPythonInternal: failed to convert FX to python");
+    }
+    
+    PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, iind_py, oind_py, NULL);
+    Py_DECREF(iind_py);
+    Py_DECREF(oind_py);
+    Py_DECREF(fcn_py);
+    if (!r) {
+     PyErr_Print();
+     throw CasadiException("SparsityGeneratorPythonInternal: python method execution raised an Error.");
+    }
+    
+    if (r) {
+      CRSSparsity ret;  
+      int result = meta< CRSSparsity >::as(r,ret);
+      if(!result) { Py_DECREF(r); throw CasadiException("SparsityGeneratorPythonInternal: return type was not CRSSparsity."); }
+      Py_DECREF(r);
+      return ret;
+    }
+  }
+  
+  
+  JacobianGeneratorPythonInternal::JacobianGeneratorPythonInternal(PyObject *p)  : CallbackPythonInternal(p) {
+  }
+  
+  JacobianGeneratorPythonInternal* JacobianGeneratorPythonInternal::clone() const {
+    return new JacobianGeneratorPythonInternal(p_);
+  }
+
+  FX JacobianGeneratorPythonInternal::call(FX& fcn, int iind, int oind, void* user_data) {
+    casadi_assert(p_!=0);
+    PyObject * iind_py = PyInt_FromLong(iind);
+    PyObject * oind_py = PyInt_FromLong(oind);
+    PyObject * fcn_py = SWIG_NewPointerObj((new FX(static_cast< const FX& >(fcn))), SWIGTYPE_p_CasADi__FX, SWIG_POINTER_OWN |  0 );
+    if(!fcn_py) {
+      Py_DECREF(iind_py);
+      Py_DECREF(oind_py);
+      throw CasadiException("JacobianGeneratorPythonInternal: failed to convert FX to python");
+    }
+    
+    PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, iind_py, oind_py, NULL);
+    Py_DECREF(iind_py);
+    Py_DECREF(oind_py);
+    Py_DECREF(fcn_py);
+    if (!r) {
+     PyErr_Print();
+     throw CasadiException("JacobianGeneratorPythonInternal: python method execution raised an Error.");
+    }
+    
+    if (r) {
+      FX ret;  
+      int result = meta< FX >::as(r,ret);
+      if(!result) { Py_DECREF(r); throw CasadiException("JacobianGeneratorPythonInternal: return type was not FX."); }
+      Py_DECREF(r);
+      return ret;
+    }
+  }
+}
+
 template <>
 int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
   NATIVERETURN(CasADi::GenericType, s)
@@ -261,6 +397,50 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     int ret = meta< CasADi::FX >::as(p,temp); 
     if (!ret) return false;
     s = CasADi::GenericType(temp);
+  } else if (PyCallable_Check(p)) {
+    int ret = PyObject_HasAttrString( p, "func_annotations");
+    if (!ret) return false;
+    PyObject * func_annotations = PyObject_GetAttrString(p,"func_annotations");
+    if (!PyDict_Check(func_annotations)) {
+      Py_DECREF(func_annotations);
+      return false;
+    }
+    PyObject * return_type = PyDict_GetItemString(func_annotations, "return");
+    Py_DECREF(func_annotations);
+    if (return_type==0) {
+      return false;
+    }
+    if (!PyType_Check(return_type)) {
+      Py_DECREF(return_type);
+      return false;
+    }
+    PyObject* pPyObjectModuleName = PyString_FromString("casadi");
+    if (!pPyObjectModuleName) { Py_DECREF(return_type);PyErr_Clear(); return false; }
+    PyObject* pObjectModule = PyImport_Import(pPyObjectModuleName);
+    Py_DECREF(pPyObjectModuleName);
+    if (!pObjectModule) { Py_DECREF(return_type);PyErr_Clear(); return false; }
+    PyObject* pObjectDict = PyModule_GetDict(pObjectModule);
+    Py_DECREF(pObjectModule);
+    if (!pObjectDict) { Py_DECREF(return_type);PyErr_Clear(); return false; }
+    PyObject* pClassCRSSparsity = PyDict_GetItemString(pObjectDict,  "CRSSparsity");
+    if (!pClassCRSSparsity) { Py_DECREF(pObjectDict); Py_DECREF(return_type);PyErr_Clear(); return false; }
+    PyObject* pClassFX = PyDict_GetItemString(pObjectDict,  "FX");
+    if (!pClassFX) { Py_DECREF(pObjectDict); Py_DECREF(return_type);PyErr_Clear(); return false; }
+    Py_DECREF(pObjectDict);
+    
+    if (PyClass_IsSubclass(return_type,pClassCRSSparsity)) {
+      // CRSSparsity
+      CasADi::SparsityGeneratorPython temp(p);
+      s = CasADi::GenericType(temp);
+      Py_DECREF(return_type);Py_DECREF(pClassCRSSparsity);Py_DECREF(pClassFX);
+      PyErr_Clear(); return true;
+    } else if (PyClass_IsSubclass(return_type,pClassFX)) {
+      // FX
+      CasADi::JacobianGeneratorPython temp(p);
+      s = CasADi::GenericType(temp);
+      Py_DECREF(return_type);Py_DECREF(pClassCRSSparsity);Py_DECREF(pClassFX);
+      PyErr_Clear(); return true;
+    }
   } else {
     PyObject* pPyObjectModuleName = PyString_FromString("casadi");
     if (!pPyObjectModuleName) { PyErr_Clear(); return false; }
@@ -295,7 +475,7 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
 
 template <>
 bool meta< CasADi::GenericType >::couldbe(PyObject * p) {
-  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p) || meta< CasADi::FX >::couldbe(p) || meta< std::vector<std::string> >::couldbe(p) || PyType_Check(p) || meta< CasADi::GenericType::Dictionary >::couldbe(p);
+  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p) || meta< CasADi::FX >::couldbe(p) || meta< std::vector<std::string> >::couldbe(p) || PyType_Check(p) || meta< CasADi::GenericType::Dictionary >::couldbe(p) || PyCallable_Check(p);
 
   
   }

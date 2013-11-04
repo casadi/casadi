@@ -126,6 +126,7 @@
 %include "symbolic/fx/c_function.hpp"
 %include "symbolic/fx/fx_tools.hpp"
 %include "symbolic/fx/xfunction_tools.hpp"
+%include "symbolic/callback.hpp"
 
 %template(IntegratorVector) std::vector<CasADi::Integrator>;
 %template(Pair_FX_FX) std::pair<CasADi::FX,CasADi::FX>;

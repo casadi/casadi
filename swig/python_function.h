@@ -30,9 +30,6 @@ void py_c_wrapper(CFunction &f, int nfwd, int nadj, void* user_data){
 #endif
 
 
-
-
-
 CFunction PyFunction_helper(PyObject * fun) {
   if (!PyObject_GetAttrString( fun, "__call__")) {
     throw CasADi::CasadiException("Supplied python method must be callable.");

@@ -26,6 +26,7 @@
 #include "symbolic/printable_object.hpp"
 #include "symbolic/shared_object.hpp"
 #include "symbolic/generic_type.hpp"
+#include "symbolic/casadi_types.hpp"
 #include "symbolic/options_functionality.hpp"
 #include "symbolic/matrix/crs_sparsity.hpp"
 #include "symbolic/matrix/slice.hpp"

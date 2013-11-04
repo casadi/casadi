@@ -21,6 +21,8 @@ SET(CASADI_SRCS
   options_functionality.cpp   options_functionality.hpp # Functionality for getting and setting options of a derived class
   stl_vector_tools.hpp        stl_vector_tools.cpp      # Set of useful functions for the vector template class in STL
   profiling.cpp               profiling.hpp
+  callback.cpp                callback.hpp              # Classes for callbacks
+  callback_internal.cpp       callback_internal.hpp     
 
   # Template class Matrix<>, implements a sparse Matrix with row compressed storage, designed to work well with symbolic data types (SX)
   matrix/generic_expression.hpp                         # Base class for SX MX and Matrix<>

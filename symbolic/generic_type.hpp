@@ -81,8 +81,8 @@ namespace CasADi{
     GenericType(SDQPSolverCreator ptr);
     GenericType(QCQPSolverCreator ptr);
     GenericType(implicitFunctionCreator ptr);
-    GenericType(JacobianGenerator ptr);
-    GenericType(SparsityGenerator ptr);
+    GenericType(const JacobianGenerator& c);
+    GenericType(const SparsityGenerator& c);
     
     /// Implicit typecasting
     #ifndef SWIG
@@ -108,8 +108,8 @@ namespace CasADi{
     operator SOCPSolverCreator() const;
     operator QCQPSolverCreator() const;
     operator implicitFunctionCreator() const;
-    operator JacobianGenerator() const;
-    operator SparsityGenerator() const;
+    operator const JacobianGenerator& () const;
+    operator const SparsityGenerator& () const;
     #endif // SWIG
     
     opt_type getType() const;
