@@ -45,6 +45,6 @@
 // Misc functions
 #include "fx/sx_function.hpp"
 #include "fx/mx_function.hpp"
-#include "fx/external_function.hpp"
+#include "fx/compiled_function.hpp"
 
 #endif //CASADI_HPP

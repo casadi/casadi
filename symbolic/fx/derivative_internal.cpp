@@ -30,6 +30,10 @@ using namespace std;
 namespace CasADi{
   
 DerivativeInternal::DerivativeInternal(const FX& fcn, int nfwd, int nadj) : fcn_(fcn), nfwd_(nfwd), nadj_(nadj){
+    
+  casadi_assert_message(nfwd==0 || int(fcn.getOption("max_number_of_fwd_dir")) > 0, "DerivativeInternal::DerivativeInternal: unable to request any forward sensitivities.");
+  casadi_assert_message(nadj==0 || int(fcn.getOption("max_number_of_adj_dir")) > 0, "FXInternal::requestNumSens: unable to request any adjoint sensitivities.");
+    
   casadi_assert(nfwd>0 || nadj>0);
 }
   

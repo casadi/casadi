@@ -24,7 +24,7 @@
 #define FX_INTERNAL_HPP
 
 #include "fx.hpp"
-#include "../callback.hpp"
+#include "../functor.hpp"
 #include "../weak_ref.hpp"
 #include <set>
 #include "code_generator.hpp"

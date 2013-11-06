@@ -26,7 +26,7 @@
 #include <cmath>
 
 #include "fx/fx.hpp"
-#include "callback.hpp"
+#include "functor.hpp"
 
 using namespace std;
 
@@ -126,6 +126,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_JACOBIANGENERATOR";
       case OT_SPARSITYGENERATOR:
               return "OT_SPARSITYGENERATOR";
+      case OT_CALLBACK:
+              return "OT_CALLBACK";
       case OT_FX:
               return "OT_FX";
       case OT_VOIDPTR:
@@ -254,6 +256,9 @@ GenericType::GenericType(const SparsityGenerator& f) : type_(OT_SPARSITYGENERATO
   assignNode(new GenericTypeInternal<SparsityGenerator>(f));
 }
 
+GenericType::GenericType(const Callback& f) : type_(OT_CALLBACK) {
+  assignNode(new GenericTypeInternal<Callback>(f));
+}
 
 bool GenericType::toBool() const{
   if (isBool()) {
@@ -468,6 +473,11 @@ GenericType::operator const JacobianGenerator &() const{
 GenericType::operator const SparsityGenerator &() const{
   casadi_assert_message(is_a<SparsityGenerator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<SparsityGenerator>*>(get())->d_;
+}
+
+GenericType::operator const Callback &() const{
+  casadi_assert_message(is_a<Callback>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<Callback>*>(get())->d_;
 }
 
 GenericType::GenericType(const Dictionary& dict) : type_(OT_DICTIONARY) {

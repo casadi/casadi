@@ -29,7 +29,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
-#include "external_function.hpp"
+#include "compiled_function.hpp"
 #include "derivative.hpp"
 
 #include "../casadi_options.hpp"
@@ -298,7 +298,9 @@ namespace CasADi{
     f.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
     f.setOption("max_number_of_fwd_dir",getOption("max_number_of_fwd_dir"));
     f.setOption("max_number_of_adj_dir",getOption("max_number_of_adj_dir"));
-
+    if (hasSetOption("jacobian_generator")) f.setOption("jacobian_generator",getOption("jacobian_generator"));
+    if (hasSetOption("sparsity_generator")) f.setOption("sparsity_generator",getOption("sparsity_generator"));
+    
     return f;
   }
   
@@ -2164,7 +2166,7 @@ namespace CasADi{
     }
 
     // Load it
-    ExternalFunction f_gen("./" + dlname);
+    CompiledFunction f_gen("./" + dlname);
     f_gen.setOption("number_of_fwd_dir",0);
     f_gen.setOption("number_of_adj_dir",0);
     f_gen.setOption("name",fname + "_gen");
@@ -2488,6 +2490,9 @@ namespace CasADi{
     // Number of derivative directions supported by the function
     int max_nfdir = nfdir_;
     int max_nadir = nadir_;
+    
+    casadi_assert_message(nfdir==0 || max_nfdir>0,"FXInternal::evaluateD: function " << getOption("name") << " has no forward derivatives");
+    casadi_assert_message(nadir==0 || max_nadir>0,"FXInternal::evaluateD: function " << getOption("name") << " has no adjoint derivatives");
 
     // Current forward and adjoint direction
     int offset_nfdir = 0, offset_nadir = 0;

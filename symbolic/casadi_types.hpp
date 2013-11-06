@@ -60,8 +60,12 @@ namespace CasADi{
   class SDQPSolver;
   class ImplicitFunction;
   
-  class SparsityGenerator;
+  
   class JacobianGenerator;
+  class SparsityGenerator;
+  class Callback;
+  class CustomEvaluate;
+  class CustomFunction;
   
   /// Function pointer to a nonlinear solver creator function
   typedef NLPSolver (*NLPSolverCreator)(const FX& nlp);

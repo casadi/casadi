@@ -20,7 +20,7 @@
  *
  */
 
-#include "c_function_internal.hpp"
+#include "custom_function_internal.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -30,7 +30,7 @@ namespace CasADi{
 
 using namespace std;
 
-CFunctionInternal::CFunctionInternal(CFunctionWrapper c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme) : evaluate_(c_fcn){
+CustomFunctionInternal::CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme) : evaluate_(c_fcn){
   setNumInputs(inputscheme.size());
   setNumOutputs(outputscheme.size());
   
@@ -44,19 +44,23 @@ CFunctionInternal::CFunctionInternal(CFunctionWrapper c_fcn, const std::vector<C
   
   // Make the ref object a non-refence counted pointer to this (as reference counting would prevent deletion of the object)
   ref_.assignNodeNoCount(this);
+  
+  setOption("max_number_of_fwd_dir",0);
+  setOption("max_number_of_adj_dir",0);
+  
 }
 
-CFunctionInternal::~CFunctionInternal(){
+CustomFunctionInternal::~CustomFunctionInternal(){
   // Explicitly remove the pointer to this (as the counter would otherwise be decreased)
   ref_.assignNodeNoCount(0);
 }
 
-void CFunctionInternal::evaluate(int nfdir, int nadir){
-  casadi_assert_message(evaluate_!=0, "CFunctionInternal::evaluate: pointer is null");
+void CustomFunctionInternal::evaluate(int nfdir, int nadir){
+  casadi_assert_message(!evaluate_.isNull(), "CustomFunctionInternal::evaluate: pointer is null");
   evaluate_(ref_,nfdir,nadir,user_data_);  
 }
 
-void CFunctionInternal::init(){
+void CustomFunctionInternal::init(){
   FXInternal::init();
 }
 

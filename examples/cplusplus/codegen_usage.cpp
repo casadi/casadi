@@ -29,7 +29,7 @@
  *
  *  We show three ways of calling generated code. First from C with the signature
  *  of the generated file known, secondly from C with the signature unknwon
- *  and thirdly from C++ using the CasADi function ExternalFunction.
+ *  and thirdly from C++ using the CasADi function CompiledFunction.
  *
  *  Joel Andersson, K.U. Leuven 2013
  */
@@ -194,8 +194,8 @@ void usage_cplusplus(){
   cout << "Usage from C++" << endl;
   cout << endl;
 
-  // Use CasADi's "ExternalFunction" to load the compiled function
-  ExternalFunction ff("./f.so");
+  // Use CasADi's "CompiledFunction" to load the compiled function
+  CompiledFunction ff("./f.so");
   ff.init();
 
   // Use like any other CasADi function (note that derivatives are not supported)

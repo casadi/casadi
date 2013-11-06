@@ -20,7 +20,7 @@
  *
  */
 
-#include "external_function_internal.hpp"
+#include "compiled_function_internal.hpp"
 #include "../stl_vector_tools.hpp"
 
 #include <iostream>
@@ -31,41 +31,41 @@ namespace CasADi{
 
 using namespace std;
 
-ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) : bin_name_(bin_name){
+CompiledFunctionInternal::CompiledFunctionInternal(const std::string& bin_name) : bin_name_(bin_name){
 #ifdef WITH_DL 
 
   // Load the dll
 #ifdef _WIN32
   handle_ = LoadLibrary(TEXT(bin_name_.c_str()));  
-  casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: " << bin_name_ << ". error code (WIN32): "<< GetLastError());
+  casadi_assert_message(handle_!=0,"CompiledFunctionInternal: Cannot open function: " << bin_name_ << ". error code (WIN32): "<< GetLastError());
 
   initPtr init = (initPtr)GetProcAddress(handle_,TEXT("init"));
-  if(init==0) throw CasadiException("ExternalFunctionInternal: no \"init\" found");
+  if(init==0) throw CasadiException("CompiledFunctionInternal: no \"init\" found");
   getSparsityPtr getSparsity = (getSparsityPtr)GetProcAddress(handle_, TEXT("getSparsity"));
-  if(getSparsity==0) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
+  if(getSparsity==0) throw CasadiException("CompiledFunctionInternal: no \"getSparsity\" found");
   evaluate_ = (evaluatePtr) GetProcAddress(handle_, TEXT("evaluateWrap"));
-  if(evaluate_==0) throw CasadiException("ExternalFunctionInternal: no \"evaluateWrap\" found");
+  if(evaluate_==0) throw CasadiException("CompiledFunctionInternal: no \"evaluateWrap\" found");
 
 #else // _WIN32
   handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);  
-  casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: " << bin_name_ << ". error code: "<< dlerror());
+  casadi_assert_message(handle_!=0,"CompiledFunctionInternal: Cannot open function: " << bin_name_ << ". error code: "<< dlerror());
 
   // reset error
   dlerror(); 
 
   // Load symbols
   initPtr init = (initPtr)dlsym(handle_, "init");
-  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"init\" found");
+  if(dlerror()) throw CasadiException("CompiledFunctionInternal: no \"init\" found");
   getSparsityPtr getSparsity = (getSparsityPtr)dlsym(handle_, "getSparsity");
-  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
+  if(dlerror()) throw CasadiException("CompiledFunctionInternal: no \"getSparsity\" found");
   evaluate_ = (evaluatePtr) dlsym(handle_, "evaluateWrap");
-  if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"evaluateWrap\" found");
+  if(dlerror()) throw CasadiException("CompiledFunctionInternal: no \"evaluateWrap\" found");
 #endif // _WIN32
 
   // Initialize and get the number of inputs and outputs
   int n_in=-1, n_out=-1;
   int flag = init(&n_in, &n_out);
-  if(flag) throw CasadiException("ExternalFunctionInternal: \"init\" failed");
+  if(flag) throw CasadiException("CompiledFunctionInternal: \"init\" failed");
   
   // Pass to casadi
   input_.resize(n_in);
@@ -76,7 +76,7 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
     // Get sparsity from file
     int nrow, ncol, *rowind, *col;
     flag = getSparsity(i,&nrow,&ncol,&rowind,&col);
-    if(flag) throw CasadiException("ExternalFunctionInternal: \"getSparsity\" failed");
+    if(flag) throw CasadiException("CompiledFunctionInternal: \"getSparsity\" failed");
 
     // Row offsets
     vector<int> rowindv(rowind,rowind+nrow+1);
@@ -104,11 +104,11 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   
 }
     
-ExternalFunctionInternal* ExternalFunctionInternal::clone() const{
-  throw CasadiException("Error ExternalFunctionInternal cannot be cloned");
+CompiledFunctionInternal* CompiledFunctionInternal::clone() const{
+  throw CasadiException("Error CompiledFunctionInternal cannot be cloned");
 }
 
-ExternalFunctionInternal::~ExternalFunctionInternal(){
+CompiledFunctionInternal::~CompiledFunctionInternal(){
 #ifdef WITH_DL 
   // close the dll
 #ifdef _WIN32
@@ -119,14 +119,14 @@ ExternalFunctionInternal::~ExternalFunctionInternal(){
 #endif // WITH_DL 
 }
 
-void ExternalFunctionInternal::evaluate(int nfdir, int nadir){
+void CompiledFunctionInternal::evaluate(int nfdir, int nadir){
 #ifdef WITH_DL 
   int flag = evaluate_(getPtr(input_array_),getPtr(output_array_));
-  if(flag) throw CasadiException("ExternalFunctionInternal: \"evaluate\" failed");
+  if(flag) throw CasadiException("CompiledFunctionInternal: \"evaluate\" failed");
 #endif // WITH_DL 
 }
   
-void ExternalFunctionInternal::init(){
+void CompiledFunctionInternal::init(){
   // Call the init function of the base class
   FXInternal::init();
 
