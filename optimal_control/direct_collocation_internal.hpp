@@ -26,7 +26,6 @@
 #include "direct_collocation.hpp"
 #include "../symbolic/fx/ocp_solver_internal.hpp"
 #include "../symbolic/fx/parallelizer.hpp"
-#include "../symbolic/fx/c_function.hpp"
 #include "../symbolic/fx/mx_function.hpp"
 #include "../symbolic/fx/sx_function.hpp"
 #include "integration/integration_tools.hpp"

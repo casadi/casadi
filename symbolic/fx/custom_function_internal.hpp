@@ -20,32 +20,33 @@
  *
  */
 
-#ifndef C_FUNCTION_INTERNAL_HPP
-#define C_FUNCTION_INTERNAL_HPP
+#ifndef CUSTOM_FUNCTION_INTERNAL_HPP
+#define CUSTOM_FUNCTION_INTERNAL_HPP
 
-#include "c_function.hpp"
+#include "custom_function.hpp"
 #include "fx_internal.hpp"
+#include "../functor.hpp"
 #include <string>
 
 namespace CasADi{
   
-  /** \brief  Internal class for CFunction
+  /** \brief  Internal class for CustomFunction
   \author Joel Andersson 
   \date 2010
-  A regular user should never work with any Node class. Use CFunction directly.
+  A regular user should never work with any Node class. Use CustomFunction directly.
   */
-class CFunctionInternal : public FXInternal{
-  friend class CFunction;
+class CustomFunctionInternal : public FXInternal{
+  friend class CustomFunction;
   public:
     
     /** \brief  Create a function */
-    explicit CFunctionInternal(CFunctionWrapper c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme);
+    explicit CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme);
     
     /** \brief  Destructor */
-    virtual ~CFunctionInternal();
+    virtual ~CustomFunctionInternal();
 
     /** \brief  Cloning */
-    virtual CFunctionInternal* clone() const{ return new CFunctionInternal(*this);}
+    virtual CustomFunctionInternal* clone() const{ return new CustomFunctionInternal(*this);}
 
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir);
@@ -53,16 +54,16 @@ class CFunctionInternal : public FXInternal{
     /** \brief  Initialize */
     virtual void init();
   
-    CFunctionWrapper evaluate_;
+    CustomEvaluate evaluate_;
   
     /// A reference to this object to be passed to the user functions
-    CFunction ref_;
+    CustomFunction ref_;
     
-}; // class CFunctionInternal 
+}; // class CustomFunctionInternal 
   
 
 
 } // namespace CasADi
 
 
-#endif // C_FUNCTION_INTERNAL_HPP
+#endif // CUSTOM_FUNCTION_INTERNAL_HPP

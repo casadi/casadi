@@ -29,7 +29,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
-#include "external_function.hpp"
+#include "compiled_function.hpp"
 #include "derivative.hpp"
 
 #include "../casadi_options.hpp"
@@ -56,7 +56,7 @@ namespace CasADi{
     addOption("numeric_jacobian",         OT_BOOLEAN,             false,          "Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method");
     addOption("numeric_hessian",          OT_BOOLEAN,             false,          "Calculate Hessians numerically (using directional derivatives) rather than with the built-in method");
     addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians.","forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate");
-    addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines");
+    addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines");
     addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
     addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","inputs|outputs");
@@ -65,8 +65,6 @@ namespace CasADi{
     addOption("gather_stats",             OT_BOOLEAN,             false,         "Flag to indicate wether statistics must be gathered");
   
     verbose_ = false;
-    jacgen_ = 0;
-    spgen_ = 0;
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
@@ -300,7 +298,9 @@ namespace CasADi{
     f.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
     f.setOption("max_number_of_fwd_dir",getOption("max_number_of_fwd_dir"));
     f.setOption("max_number_of_adj_dir",getOption("max_number_of_adj_dir"));
-
+    if (hasSetOption("jacobian_generator")) f.setOption("jacobian_generator",getOption("jacobian_generator"));
+    if (hasSetOption("sparsity_generator")) f.setOption("sparsity_generator",getOption("sparsity_generator"));
+    
     return f;
   }
   
@@ -1095,7 +1095,7 @@ namespace CasADi{
     // Generate, if null
     if(jsp.isNull()){
       if(compact){
-        if(spgen_==0){
+        if(spgen_.isNull()){
           // Use internal routine to determine sparsity
           jsp = getJacSparsity(iind,oind,symmetric);
         } else {
@@ -1104,6 +1104,8 @@ namespace CasADi{
 
           // Use user-provided routine to determine sparsity
           jsp = spgen_(tmp,iind,oind,user_data_);
+          
+          casadi_assert_message(jsp.size1()==output(oind).size() && jsp.size2()==input(iind).size(),"FXInternal::setJacSparsity: User supplied sparsityGenerator("<< iind << "," << oind <<") returned " << jsp.dimString() << ", while shape " <<  output(oind).size() << "-by-" << input(iind).size() << " was expected.");
         }
       } else {
       
@@ -1579,10 +1581,13 @@ namespace CasADi{
     FX ret;
   
     // Generate Jacobian
-    if(jacgen_!=0){
+    if(!jacgen_.isNull()){
       // Use user-provided routine to calculate Jacobian
       FX fcn = shared_from_this<FX>();
       ret = jacgen_(fcn,iind,oind,user_data_);
+      
+      casadi_assert_message(ret.output().size1()==output(oind).size() && ret.output().size2()==input(iind).size(),"FXInternal::jacobian: User supplied jacobianGenerator("<< iind << "," << oind <<") returned " << ret.output().dimString() << ", while shape " <<  output(oind).size() << "-by-" << input(iind).size() << " was expected.");
+      
     } else if(bool(getOption("numeric_jacobian"))){
       ret = getNumericJacobian(iind,oind,compact,symmetric);
     } else {
@@ -2161,7 +2166,7 @@ namespace CasADi{
     }
 
     // Load it
-    ExternalFunction f_gen("./" + dlname);
+    CompiledFunction f_gen("./" + dlname);
     f_gen.setOption("number_of_fwd_dir",0);
     f_gen.setOption("number_of_adj_dir",0);
     f_gen.setOption("name",fname + "_gen");
@@ -2485,6 +2490,9 @@ namespace CasADi{
     // Number of derivative directions supported by the function
     int max_nfdir = nfdir_;
     int max_nadir = nadir_;
+    
+    casadi_assert_message(nfdir==0 || max_nfdir>0,"FXInternal::evaluateD: function " << getOption("name") << " has no forward derivatives");
+    casadi_assert_message(nadir==0 || max_nadir>0,"FXInternal::evaluateD: function " << getOption("name") << " has no adjoint derivatives");
 
     // Current forward and adjoint direction
     int offset_nfdir = 0, offset_nadir = 0;

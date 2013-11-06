@@ -26,6 +26,7 @@
 #include "symbolic/printable_object.hpp"
 #include "symbolic/shared_object.hpp"
 #include "symbolic/generic_type.hpp"
+#include "symbolic/casadi_types.hpp"
 #include "symbolic/options_functionality.hpp"
 #include "symbolic/matrix/crs_sparsity.hpp"
 #include "symbolic/matrix/slice.hpp"
@@ -86,6 +87,12 @@ template<> swig_type_info** meta< CasADi::MX >::name = &SWIGTYPE_p_CasADi__MX;
 template<> swig_type_info** meta< std::vector< CasADi::MX> >::name = &SWIGTYPE_p_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t;
 	template<> swig_type_info** meta< std::vector< std::vector< CasADi::MX> > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__MX_p_std__allocatorT_CasADi__MX_p_t_t_std__allocatorT_std__vectorT_CasADi__MX_p_std__allocatorT_CasADi__MX_p_t_t_t_t;
 template<> swig_type_info** meta< std::vector<std::string> >::name = &SWIGTYPE_p_std__vectorT_std__string_std__allocatorT_std__string_t_t;
+template<> swig_type_info** meta< CasADi::SparsityGenerator >::name = & SWIGTYPE_p_CasADi__SparsityGenerator;
+template<> swig_type_info** meta< CasADi::JacobianGenerator >::name = & SWIGTYPE_p_CasADi__JacobianGenerator;
+template<> swig_type_info** meta< CasADi::CustomEvaluate >::name = & SWIGTYPE_p_CasADi__CustomEvaluate;
+template<> swig_type_info** meta< CasADi::Callback >::name = & SWIGTYPE_p_CasADi__Callback;
+//template<> swig_type_info** meta< CasADi::SparsityGeneratorPython >::name = & SWIGTYPE_p_CasADi__SparsityGeneratorPython;
+//template<> swig_type_info** meta< CasADi::JacobianGeneratorPython >::name = & SWIGTYPE_p_CasADi__JacobianGeneratorPython;
 %}
 
 
