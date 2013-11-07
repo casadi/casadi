@@ -36,7 +36,7 @@
    fun:_4d2ac877ba09cac66b36bc7c5f27a638
 }
 
-[
+{
    some mystery
    Memcheck:Addr4
    fun:PyObject_GC_Del
