@@ -5,6 +5,41 @@
    fun:DTPUMatInvert
 }
 
+# Error in MA57
+{
+   ma57od_
+   Memcheck:Cond
+   fun:ma57od_
+}
+
+#Error in cplex
+{
+   cplex1
+   Memcheck:Value8
+   fun:_f48900ce40e1adc4a63fb41dbac2fe81
+}
+
+{
+   cplex2
+   Memcheck:Value8
+   fun:__intel_new_memcpy
+   fun:_intel_fast_memcpy.J
+   fun:_4d2ac877ba09cac66b36bc7c5f27a638
+}
+
+{
+   mystery1
+   Memcheck:Value4
+   fun:PyObject_GC_Del
+   fun:collect.48998
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   fun:tp_new_wrapper.25464
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+
 #Error in swig 
 {
    swigerror1

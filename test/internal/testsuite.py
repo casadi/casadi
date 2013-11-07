@@ -270,8 +270,8 @@ class TestSuite:
       suppressions = ["internal/valgrind-python.supp","internal/valgrind-casadi.supp"]
       supps = ['--suppressions='+os.path.join(os.getcwd(),s) for s in suppressions]
       stdoutfile = tempfile.TemporaryFile()
-      p=Popen(['valgrind','--leak-check=full']+supps+['--show-possibly-lost=no','--error-limit=no',"--gen-suppressions=no"]+self.command(dir,fn,self.passoptions),cwd=self.workingdir(dir),stdout=stdoutfile, stderr=PIPE, stdin=PIPE)
-      f=Popen(['grep','-E','-C','30', "definitely lost|leaks|ERROR SUMMARY|Invalid write|casadi"],stdin=p.stderr,stdout=PIPE)
+      p=Popen(['valgrind','--leak-check=full']+supps+['--show-possibly-lost=no','--error-limit=no',"--gen-suppressions=all"]+self.command(dir,fn,self.passoptions),cwd=self.workingdir(dir),stdout=stdoutfile, stderr=PIPE, stdin=PIPE)
+      f=Popen(['grep','-E','-C','50', "definitely lost|leaks|ERROR SUMMARY|Invalid write|casadi"],stdin=p.stderr,stdout=PIPE)
       p.stderr.close()
       alarm(60*60) # 1 hour
       try:
