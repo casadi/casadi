@@ -59,7 +59,7 @@ namespace CasADi{
 
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir) = 0;
-  
+
     /** \brief  Evaluate with directional derivative compression */
     void evaluateCompressed(int nfdir, int nadir);
 

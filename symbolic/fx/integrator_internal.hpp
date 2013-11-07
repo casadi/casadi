@@ -110,7 +110,7 @@ namespace CasADi{
     int nsensB_store_;
   
     /// Generate new functions for calculating forward/adjoint directional derivatives
-    bool fwd_via_sct_, adj_via_sct_;
+    bool fwd_via_sct_;
   
   };
   

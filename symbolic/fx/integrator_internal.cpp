@@ -44,7 +44,6 @@ namespace CasADi{
     addOption("t0",                       OT_REAL,        0.0, "Beginning of the time horizon"); 
     addOption("tf",                       OT_REAL,        1.0, "End of the time horizon");
     addOption("fwd_via_sct",              OT_BOOLEAN,     true, "Generate new functions for calculating forward directional derivatives");
-    addOption("adj_via_sct",              OT_BOOLEAN,     true, "Generate new functions for calculating adjoint directional derivatives");
     addOption("augmented_options",        OT_DICTIONARY,  GenericType(), "Options to be passed down to the augmented integrator, if one is constructed.");
   
     // Negative number of parameters for consistancy checking
@@ -58,7 +57,6 @@ namespace CasADi{
   }
 
   void IntegratorInternal::evaluate(int nfdir, int nadir){
-    casadi_assert_message(adj_via_sct_,"Not implemented."); // NOTE: Currently not supported by any derived class
   
     // What needs to be calculated
     bool need_nondiff = true;
@@ -227,7 +225,6 @@ namespace CasADi{
     t0_ = getOption("t0");
     tf_ = getOption("tf");
     fwd_via_sct_ = getOption("fwd_via_sct");
-    adj_via_sct_ = getOption("adj_via_sct");
   }
 
   void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
