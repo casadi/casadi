@@ -36,6 +36,18 @@
    fun:_4d2ac877ba09cac66b36bc7c5f27a638
 }
 
+[
+   some mystery
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
 {
    mystery1
    Memcheck:Addr4
