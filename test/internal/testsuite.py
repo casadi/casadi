@@ -300,6 +300,7 @@ class TestSuite:
         print stdoutdata
         raise Exception("valgrind output is not like expected: %s")
 
+      error_casadi = False
       # Filter out stuff after address header
       diagnose_lines = []
       error_log = True
@@ -314,11 +315,13 @@ class TestSuite:
           
         if error_log:
           diagnose_lines.append(l)
+          if l.startswith("==") and re.search('casadi', l):
+            error_casadi = True
            
       diagnosis = "\n".join(diagnose_lines)
 
       errors = "0"  # disabling valgrind error-checking for now: samples are flooded with errors
-      if not(lost=="0" and errors=="0") or re.search('casadi', diagnosis):
+      if not(lost=="0" and errors=="0") or error_casadi:
         if not(lost=="0"):
           print "Memory leak: lost %s bytes" % (lost)
         if not(errors=="0"):
