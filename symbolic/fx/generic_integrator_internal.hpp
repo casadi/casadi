@@ -52,6 +52,15 @@ namespace CasADi{
   
     /** \brief  Initialize */
     virtual void init();
+
+    /// Number of states for the forward integration
+    int nx_, nz_, nq_;
+  
+    /// Number of states for the backward integration
+    int nrx_, nrz_, nrq_;
+
+    /// Number of forward and backward parameters
+    int np_, nrp_;
   
   };
   
