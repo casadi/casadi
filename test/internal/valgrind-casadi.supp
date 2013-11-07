@@ -1,0 +1,58 @@
+# Error in DSDP
+{
+   DSDP/Conditional jump or move depends on uninitialised value
+   Memcheck:Cond
+   fun:DTPUMatInvert
+}
+
+#Error in swig 
+{
+   swigerror1
+   Memcheck:Cond
+   fun:PyObject_GC_Del
+   fun:collect.48998
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   fun:tp_new_wrapper.25464
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance
+   fun:SWIG_Python_NewPointerObj
+   fun:_ZN4swig15traits_from_ptrIN6CasADi2MXEE4fromEPS2_i
+   fun:_ZN4swig11traits_fromIN6CasADi2MXEE4fromERKS2_
+   fun:_ZN4swig4fromIN6CasADi2MXEEEP7_objectRKT_
+   fun:_ZN4swig18traits_from_stdseqISt6vectorIN6CasADi2MXESaIS3_EES3_E4fromERKS5_
+}
+
+{
+   swigerror2
+   Memcheck:Value8
+   fun:PyObject_GC_Del
+   fun:collect.48998
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   fun:tp_new_wrapper.25464
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance
+   fun:SWIG_Python_NewPointerObj
+   fun:_ZN4swig15traits_from_ptrIN6CasADi2MXEE4fromEPS2_i
+   fun:_ZN4swig11traits_fromIN6CasADi2MXEE4fromERKS2_
+   fun:_ZN4swig4fromIN6CasADi2MXEEEP7_objectRKT_
+   fun:_ZN4swig18traits_from_stdseqISt6vectorIN6CasADi2MXESaIS3_EES3_E4fromERKS5_
+}
+
+{
+   swigerror3
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   fun:collect.48998
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   fun:tp_new_wrapper.25464
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance
+   fun:SWIG_Python_NewPointerObj
+   fun:_ZN4swig15traits_from_ptrIN6CasADi2MXEE4fromEPS2_i
+   fun:_ZN4swig11traits_fromIN6CasADi2MXEE4fromERKS2_
+   fun:_ZN4swig4fromIN6CasADi2MXEEEP7_objectRKT_
+   fun:_ZN4swig18traits_from_stdseqISt6vectorIN6CasADi2MXESaIS3_EES3_E4fromERKS5_
+}
