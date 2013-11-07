@@ -12,6 +12,15 @@
    fun:ma57od_
 }
 
+#Error in lapack
+{
+   lapack
+   Memcheck:Cond
+   fun:dstemr_
+   fun:dsyevr_
+   fun:DSDPGetEigs
+}
+
 #Error in cplex
 {
    cplex1
