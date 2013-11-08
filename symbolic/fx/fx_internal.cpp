@@ -1104,6 +1104,8 @@ namespace CasADi{
 
           // Use user-provided routine to determine sparsity
           jsp = spgen_(tmp,iind,oind,user_data_);
+          
+          casadi_assert_message(jsp.size1()==output(oind).size() && jsp.size2()==input(iind).size(),"FXInternal::setJacSparsity: User supplied sparsityGenerator("<< iind << "," << oind <<") returned " << jsp.dimString() << ", while shape " <<  output(oind).size() << "-by-" << input(iind).size() << " was expected.");
         }
       } else {
       
@@ -1583,6 +1585,9 @@ namespace CasADi{
       // Use user-provided routine to calculate Jacobian
       FX fcn = shared_from_this<FX>();
       ret = jacgen_(fcn,iind,oind,user_data_);
+      
+      casadi_assert_message(ret.output().size1()==output(oind).size() && ret.output().size2()==input(iind).size(),"FXInternal::jacobian: User supplied jacobianGenerator("<< iind << "," << oind <<") returned " << ret.output().dimString() << ", while shape " <<  output(oind).size() << "-by-" << input(iind).size() << " was expected.");
+      
     } else if(bool(getOption("numeric_jacobian"))){
       ret = getNumericJacobian(iind,oind,compact,symmetric);
     } else {
@@ -2485,6 +2490,9 @@ namespace CasADi{
     // Number of derivative directions supported by the function
     int max_nfdir = nfdir_;
     int max_nadir = nadir_;
+    
+    casadi_assert_message(nfdir==0 || max_nfdir>0,"FXInternal::evaluateD: function " << getOption("name") << " has no forward derivatives");
+    casadi_assert_message(nadir==0 || max_nadir>0,"FXInternal::evaluateD: function " << getOption("name") << " has no adjoint derivatives");
 
     // Current forward and adjoint direction
     int offset_nfdir = 0, offset_nadir = 0;
