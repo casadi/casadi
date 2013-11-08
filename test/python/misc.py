@@ -356,7 +356,9 @@ class Misctests(casadiTestCase):
     self.checkarray(a,b)
 
   def test_assertions(self):
-    
+    # Commented out: #885
+    return
+
     x = msym("x") 
     
     z = x**2

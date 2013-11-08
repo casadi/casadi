@@ -553,6 +553,8 @@ class FXtests(casadiTestCase):
     self.assertTrue(f.getOption("name")=="def")
     
   def test_PyFunction(self):
+    # Commented out: #885
+    return
   
     x = msym("x")
     y = msym("y")
@@ -828,6 +830,9 @@ class FXtests(casadiTestCase):
     self.assertFalse("derivative" in str(P_P))
     
   def test_assert_derivatives(self):
+    # Commented out: #885
+    return
+
     x = msym("x")
     
     def dummy(f,nfwd,nadj,userdata):
