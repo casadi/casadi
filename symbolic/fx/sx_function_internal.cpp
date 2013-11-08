@@ -540,9 +540,9 @@ namespace CasADi{
       int ndeps = casadi_math<double>::ndeps(ae.op);
     
       // Increase count of dependencies
-      for(int c=0; c<ndeps; ++c)
-        refcount[c==0 ? ae.i1 : ae.i2]++;
-    
+      for(int c=0; c<ndeps; ++c) {
+        refcount.at(c==0 ? ae.i1 : ae.i2)++;
+      }
       // Add to algorithm
       algorithm_.push_back(ae);
     }
@@ -565,7 +565,7 @@ namespace CasADi{
       // decrease reference count of children
       for(int c=ndeps-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
         int ch_ind = c==0 ? it->i1 : it->i2;
-        int remaining = --refcount[ch_ind];
+        int remaining = --refcount.at(ch_ind);
         if(remaining==0) unused.push(place[ch_ind]);
       }
     
