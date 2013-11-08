@@ -220,9 +220,9 @@ void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>&
   linsol_ = deepcopy(linsol_,already_copied);
 }
 
-void SundialsInternal::reset(int nsens, int nsensB, int nsensB_store){
+void SundialsInternal::reset(){
   // Reset the base classes
-  IntegratorInternal::reset(nsens,nsensB,nsensB_store);
+  IntegratorInternal::reset();
   
   // Go to the start time
   t_ = t0_;

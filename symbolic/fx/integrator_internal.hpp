@@ -55,7 +55,7 @@ namespace CasADi{
     virtual void printStats(std::ostream &stream) const{}
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset(int nsens, int nsensB, int nsensB_store) = 0;
+    virtual void reset() = 0;
 
     /** \brief  Reset the backward problem and take time to tf */
     virtual void resetB() = 0;
@@ -99,19 +99,7 @@ namespace CasADi{
   
     /// ODE/DAE backward integration function, if any
     FX g_;
-  
-    /// Number of sensitivities to be propagated along with the integration forward in time
-    int nsens_;
-  
-    /// Number of sensitivities to be propagated along with the integration backward in time
-    int nsensB_;
-  
-    /// Number of sensitivities to be propagated along with the integration backward in time  that depend on sensitivities propagated along with the integration forward in time
-    int nsensB_store_;
-  
-    /// Generate new functions for calculating forward/adjoint directional derivatives
-    bool fwd_via_sct_;
-  
+    
   };
   
 } // namespace CasADi

@@ -731,11 +731,11 @@ int IdasInternal::resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_
   }
 }
 
-void IdasInternal::reset(int nsens, int nsensB, int nsensB_store){
+void IdasInternal::reset(){
   log("IdasInternal::reset","begin");
   
   // Reset the base classes
-  SundialsInternal::reset(nsens,nsensB,nsensB_store);
+  SundialsInternal::reset();
   
   if(nrx_>0 && !isInitTaping_)
     initTaping();
@@ -770,30 +770,30 @@ void IdasInternal::reset(int nsens, int nsensB, int nsensB_store){
     log("IdasInternal::reset","re-initialized quadratures");
   }
   
-  if(nsens>0){
-    // Get the forward seeds
-    for(int i=0; i<nfdir_; ++i){
-      const Matrix<double>& x0_seed = fwdSeed(INTEGRATOR_X0,i);
-      copy(x0_seed.begin(), x0_seed.begin()+nx_, NV_DATA_S(xzF_[i]));
-      N_VConst(0.0,xzdotF_[i]);
-    }
+  // if(nsens>0){
+  //   // Get the forward seeds
+  //   for(int i=0; i<nfdir_; ++i){
+  //     const Matrix<double>& x0_seed = fwdSeed(INTEGRATOR_X0,i);
+  //     copy(x0_seed.begin(), x0_seed.begin()+nx_, NV_DATA_S(xzF_[i]));
+  //     N_VConst(0.0,xzdotF_[i]);
+  //   }
     
-    // Re-initialize sensitivities
-    flag = IDASensReInit(mem_,ism_,getPtr(xzF_),getPtr(xzdotF_));
-    if(flag != IDA_SUCCESS) idas_error("IDASensReInit",flag);
-    log("IdasInternal::reset","re-initialized forward sensitivity solution");
+  //   // Re-initialize sensitivities
+  //   flag = IDASensReInit(mem_,ism_,getPtr(xzF_),getPtr(xzdotF_));
+  //   if(flag != IDA_SUCCESS) idas_error("IDASensReInit",flag);
+  //   log("IdasInternal::reset","re-initialized forward sensitivity solution");
 
-    if(nq_>0){
-      for(vector<N_Vector>::iterator it=qF_.begin(); it!=qF_.end(); ++it) N_VConst(0.0,*it);
-      flag = IDAQuadSensReInit(mem_, getPtr(qF_));
-      if(flag != IDA_SUCCESS) idas_error("IDAQuadSensReInit",flag);
-      log("IdasInternal::reset","re-initialized forward sensitivity dependent quadratures");
-    }
-  } else {
+  //   if(nq_>0){
+  //     for(vector<N_Vector>::iterator it=qF_.begin(); it!=qF_.end(); ++it) N_VConst(0.0,*it);
+  //     flag = IDAQuadSensReInit(mem_, getPtr(qF_));
+  //     if(flag != IDA_SUCCESS) idas_error("IDAQuadSensReInit",flag);
+  //     log("IdasInternal::reset","re-initialized forward sensitivity dependent quadratures");
+  //   }
+  // } else {
     // Turn of sensitivities
     flag = IDASensToggleOff(mem_);
     if(flag != IDA_SUCCESS) idas_error("IDASensToggleOff",flag);
-  }
+  // }
 
   // Correct initial conditions, if necessary
   int calc_ic = getOption("calc_ic");
@@ -820,13 +820,13 @@ void IdasInternal::correctInitialConditions(){
     cout << "initial guess: " << endl;
     cout << "p = " << input(INTEGRATOR_P) << endl;
     cout << "x0 = " << input(INTEGRATOR_X0) << endl;
-    if(nsens_>0){
-      for(int dir=0; dir<nfdir_; ++dir){
-        cout << "forward seed guess, direction " << dir << ": " << endl;
-        cout << "p_seed = " << fwdSeed(INTEGRATOR_P,dir) << endl;
-        cout << "x0_seed = " << fwdSeed(INTEGRATOR_X0,dir) << endl;
-      }
-    }
+    // if(nsens_>0){
+    //   for(int dir=0; dir<nfdir_; ++dir){
+    //     cout << "forward seed guess, direction " << dir << ": " << endl;
+    //     cout << "p_seed = " << fwdSeed(INTEGRATOR_P,dir) << endl;
+    //     cout << "x0_seed = " << fwdSeed(INTEGRATOR_X0,dir) << endl;
+    //   }
+    // }
   }
 
   int icopt = IDA_YA_YDP_INIT; // calculate z and xdot given x
@@ -845,13 +845,13 @@ void IdasInternal::correctInitialConditions(){
   if(monitored("correctInitialConditions")){
     cout << "p = " << input(INTEGRATOR_P) << endl;
     cout << "x0 = " << input(INTEGRATOR_X0) << endl;
-    if(nsens_>0){
-      for(int dir=0; dir<nfdir_; ++dir){
-        cout << "forward seed, direction " << dir << ": " << endl;
-        cout << "p_seed = " << fwdSeed(INTEGRATOR_P,dir) << endl;
-        cout << "x0_seed = " << fwdSeed(INTEGRATOR_X0,dir) << endl;
-      }
-    }
+    // if(nsens_>0){
+    //   for(int dir=0; dir<nfdir_; ++dir){
+    //     cout << "forward seed, direction " << dir << ": " << endl;
+    //     cout << "p_seed = " << fwdSeed(INTEGRATOR_P,dir) << endl;
+    //     cout << "x0_seed = " << fwdSeed(INTEGRATOR_X0,dir) << endl;
+    //   }
+    // }
   }
   log("IdasInternal::correctInitialConditions","end");
 }
@@ -892,26 +892,26 @@ void IdasInternal::integrate(double t_out){
       if(flag != IDA_SUCCESS) idas_error("IDAGetQuad",flag);
     }
     
-    if(nsens_>0){
-      // Get the sensitivities
-      flag = IDAGetSens(mem_,&t_, getPtr(xzF_));
-      if(flag != IDA_SUCCESS) idas_error("IDAGetSens",flag);
+    // if(nsens_>0){
+    //   // Get the sensitivities
+    //   flag = IDAGetSens(mem_,&t_, getPtr(xzF_));
+    //   if(flag != IDA_SUCCESS) idas_error("IDAGetSens",flag);
     
-      if(nq_>0){
-        double tret;
-        flag = IDAGetQuadSens(mem_, &tret, getPtr(qF_));
-        if(flag != IDA_SUCCESS) idas_error("IDAGetQuadSens",flag);
-      }
-    }
+    //   if(nq_>0){
+    //     double tret;
+    //     flag = IDAGetQuadSens(mem_, &tret, getPtr(qF_));
+    //     if(flag != IDA_SUCCESS) idas_error("IDAGetQuadSens",flag);
+    //   }
+    // }
   }
   
   // Save the final state
   copy(NV_DATA_S(xz_),NV_DATA_S(xz_)+nx_,output(INTEGRATOR_XF).begin());
-  if(nsens_>0){
-    for(int i=0; i<nfdir_; ++i){
-      copy(NV_DATA_S(xzF_[i]),NV_DATA_S(xzF_[i])+nx_,fwdSens(INTEGRATOR_XF,i).begin());
-    }
-  }
+  // if(nsens_>0){
+  //   for(int i=0; i<nfdir_; ++i){
+  //     copy(NV_DATA_S(xzF_[i]),NV_DATA_S(xzF_[i])+nx_,fwdSens(INTEGRATOR_XF,i).begin());
+  //   }
+  // }
     
   // Print statistics
   if(getOption("print_stats")) printStats(std::cout);

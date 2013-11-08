@@ -48,8 +48,8 @@ namespace CasADi{
     return static_cast<const IntegratorInternal*>(GenericIntegrator::operator->()); 
   }
   
-  void Integrator::reset(int nsens, int nsensB, int nsensB_store){
-    (*this)->reset(nsens, nsensB, nsensB_store);
+  void Integrator::reset(){
+    (*this)->reset();
   }
 
   void Integrator::integrate(double t_out){

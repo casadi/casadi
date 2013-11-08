@@ -390,10 +390,10 @@ try{
   }
 }
   
-void CVodesInternal::reset(int nsens, int nsensB, int nsensB_store){
+void CVodesInternal::reset(){
   casadi_log("CVodesInternal::reset begin");
   // Reset the base classes
-  SundialsInternal::reset(nsens,nsensB,nsensB_store);
+  SundialsInternal::reset();
   
   if(monitored("reset")){
     cout << "initial state: " << endl;
@@ -416,20 +416,20 @@ void CVodesInternal::reset(int nsens, int nsensB, int nsensB_store){
   }
   
   // Re-initialize sensitivities
-  if(nsens>0){
-    flag = CVodeSensReInit(mem_,ism_,getPtr(xF0_));
-    if(flag != CV_SUCCESS) cvodes_error("CVodeSensReInit",flag);
+  // if(nsens>0){
+  //   flag = CVodeSensReInit(mem_,ism_,getPtr(xF0_));
+  //   if(flag != CV_SUCCESS) cvodes_error("CVodeSensReInit",flag);
     
-    if(nq_>0){
-      for(vector<N_Vector>::iterator it=qF_.begin(); it!=qF_.end(); ++it) N_VConst(0.0,*it);
-      flag = CVodeQuadSensReInit(mem_, getPtr(qF_));
-      if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSensReInit",flag);
-    }
-  } else {
+  //   if(nq_>0){
+  //     for(vector<N_Vector>::iterator it=qF_.begin(); it!=qF_.end(); ++it) N_VConst(0.0,*it);
+  //     flag = CVodeQuadSensReInit(mem_, getPtr(qF_));
+  //     if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSensReInit",flag);
+  //   }
+  // } else {
     // Turn of sensitivities
     flag = CVodeSensToggleOff(mem_);
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensToggleOff",flag);
-  }
+  // }
   
   // Re-initialize backward integration
   if(nrx_>0){
@@ -470,17 +470,17 @@ void CVodesInternal::integrate(double t_out){
     if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad",flag);
   }
   
-  if(nsens_>0){
-    // Get the sensitivities
-    flag = CVodeGetSens(mem_, &t_, getPtr(xF_));
-    if(flag != CV_SUCCESS) cvodes_error("CVodeGetSens",flag);
+  // if(nsens_>0){
+  //   // Get the sensitivities
+  //   flag = CVodeGetSens(mem_, &t_, getPtr(xF_));
+  //   if(flag != CV_SUCCESS) cvodes_error("CVodeGetSens",flag);
     
-    if(nq_>0){
-      double tret;
-      flag = CVodeGetQuadSens(mem_, &tret, getPtr(qF_));
-      if(flag != CV_SUCCESS) cvodes_error("CVodeGetQuadSens",flag);
-    }
-  }
+  //   if(nq_>0){
+  //     double tret;
+  //     flag = CVodeGetQuadSens(mem_, &tret, getPtr(qF_));
+  //     if(flag != CV_SUCCESS) cvodes_error("CVodeGetQuadSens",flag);
+  //   }
+  // }
 
   
   // Print statistics

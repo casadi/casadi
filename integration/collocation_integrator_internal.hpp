@@ -57,7 +57,7 @@ public:
   virtual void initAdj();
 
   /// Reset the forward problem and bring the time back to t0
-  virtual void reset(int nsens, int nsensB, int nsensB_store);
+  virtual void reset();
 
   /// Reset the backward problem and take time to tf
   virtual void resetB();

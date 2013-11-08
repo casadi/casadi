@@ -45,7 +45,7 @@ public:
   virtual void init();
 
   /** \brief  Reset the forward problem and bring the time back to t0 */
-  virtual void reset(int nsens, int nsensB, int nsensB_store) = 0;
+  virtual void reset() = 0;
   
   /** \brief  Deep copy data members */
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

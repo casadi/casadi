@@ -422,7 +422,7 @@ namespace CasADi{
   void CollocationIntegratorInternal::initAdj(){
   }
 
-  void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
+  void CollocationIntegratorInternal::reset(){
     // Set up timers for profiling
     double time_zero;
     double time_start;
@@ -433,19 +433,19 @@ namespace CasADi{
     }
     
     // Call the base class method
-    IntegratorInternal::reset(nsens,nsensB,nsensB_store);
+    IntegratorInternal::reset();
   
     // Pass the inputs
     for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
       explicit_fcn_.input(iind).set(input(iind));
     }
   
-    // Pass the forward seeds
-    for(int dir=0; dir<nsens; ++dir){
-      for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
-        explicit_fcn_.fwdSeed(iind,dir).set(fwdSeed(iind,dir));
-      }
-    }
+    // // Pass the forward seeds
+    // for(int dir=0; dir<nsens; ++dir){
+    //   for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
+    //     explicit_fcn_.fwdSeed(iind,dir).set(fwdSeed(iind,dir));
+    //   }
+    // }
     
     // Pass solution guess (if this is the first integration or if hotstart is disabled)
     if(hotstart_==false || integrated_once_==false){
@@ -518,7 +518,7 @@ namespace CasADi{
     }
     
     // Solve the system of equations
-    explicit_fcn_.evaluate(nsens);
+    explicit_fcn_.evaluate();
     
     // Write out profiling information
     if (CasadiOptions::profiling) {
@@ -536,9 +536,6 @@ namespace CasADi{
   void CollocationIntegratorInternal::integrate(double t_out){
     for(int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind){
       output(oind).set(explicit_fcn_.output(1+oind));
-      for(int dir=0; dir<nsens_; ++dir){
-        fwdSens(oind,dir).set(explicit_fcn_.fwdSens(1+oind,dir));
-      }
     }
   }
 

@@ -129,7 +129,8 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
   }
     
   // Reset the integrator_
-  integrator_.reset(nfdir);
+  casadi_assert(nfdir==0);
+  integrator_.reset();
   
   // Advance solution in time
   for(int k=0; k<grid_.size(); ++k){

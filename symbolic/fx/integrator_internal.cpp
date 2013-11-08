@@ -43,7 +43,6 @@ namespace CasADi{
     addOption("print_stats",              OT_BOOLEAN,     false, "Print out statistics after integration");
     addOption("t0",                       OT_REAL,        0.0, "Beginning of the time horizon"); 
     addOption("tf",                       OT_REAL,        1.0, "End of the time horizon");
-    addOption("fwd_via_sct",              OT_BOOLEAN,     true, "Generate new functions for calculating forward directional derivatives");
     addOption("augmented_options",        OT_DICTIONARY,  GenericType(), "Options to be passed down to the augmented integrator, if one is constructed.");
   
     // Negative number of parameters for consistancy checking
@@ -57,104 +56,27 @@ namespace CasADi{
   }
 
   void IntegratorInternal::evaluate(int nfdir, int nadir){
+    casadi_assert(nfdir==0);
+    casadi_assert(nadir==0);
   
-    // What needs to be calculated
-    bool need_nondiff = true;
-    bool need_fwd = nfdir!=0;
-    bool need_adj = nadir!=0;
-    
-    // No sensitivity analysis
-    bool no_sens = !need_fwd && !need_adj;
-  
-    // Calculate without source code transformation
-    if(no_sens || (need_fwd && !fwd_via_sct_)){
-  
-      // Number of sensitivities integrating forward
-      int nsens = fwd_via_sct_ ? 0 : nfdir; // NOTE: Can be overly pessimistic e.g. if there are no seeds at all in some directions
-    
-      // Number of sensitivities integrate_backward 
-      int nsensB = nrx_>0 ? nsens : 0; // NOTE: Can be overly pessimistic e.g. if there are no seeds at all in some directions
-    
-      // Number of sensitivities in the forward integration to be used in the backward integration
-      int nsensB_store = nsensB; // NOTE: Can be overly pessimistic e.g. if some sensitivities do not depend on the forward sensitivities
-    
-      // Reset solver
-      reset(nsens,nsensB,nsensB_store);
+    // Reset solver
+    reset();
 
-      // Integrate forward to the end of the time horizon
-      integrate(tf_);
+    // Integrate forward to the end of the time horizon
+    integrate(tf_);
 
-      // If backwards integration is needed
-      if(nrx_>0){
+    // If backwards integration is needed
+    if(nrx_>0){
       
-        // Re-initialize backward problem
-        resetB();
-
-        // Integrate backwards to the beginning
-        integrateB(t0_);
-      }
-    
-      // Mark to avoid overwriting
-      need_nondiff = false;
-      if(!fwd_via_sct_) need_fwd = false;
+      // Re-initialize backward problem
+      resetB();
+      
+      // Integrate backwards to the beginning
+      integrateB(t0_);
     }
-  
-    // Quick return if done
-    if(!need_fwd && !need_adj) return;
-  
-    // Correct nfdir if needed
-    if(!need_fwd) nfdir = 0;
-  
-    // Get derivative function
-    FX dfcn = derivative(nfdir, nadir);
-
-    // Pass function values
-    int input_index = 0;
-    for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
-      dfcn.setInput(input(i),input_index++);
-    }
-  
-    // Pass forward seeds
-    for(int dir=0; dir<nfdir; ++dir){
-      for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
-        dfcn.setInput(fwdSeed(i,dir),input_index++);
-      }
-    }
-    
-    // Pass adjoint seeds
-    for(int dir=0; dir<nadir; ++dir){
-      for(int i=0; i<INTEGRATOR_NUM_OUT; ++i){
-        dfcn.setInput(adjSeed(i,dir),input_index++);
-      }
-    }
-  
-    // Evaluate to get function values and adjoint sensitivities
-    dfcn.evaluate();
-  
-    // Get nondifferentiated results
-    int output_index = 0;
-    for(int i=0; i<INTEGRATOR_NUM_OUT; ++i){
-      dfcn.getOutput(output(i),output_index++);
-    }
-  
-    // Get forward sensitivities 
-    for(int dir=0; dir<nfdir; ++dir){
-      for(int i=0; i<INTEGRATOR_NUM_OUT; ++i){
-        dfcn.getOutput(fwdSens(i,dir),output_index++);
-      }
-    }
-  
-    // Get adjoint sensitivities 
-    for(int dir=0; dir<nadir; ++dir){
-      for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
-        dfcn.getOutput(adjSens(i,dir),output_index++);
-      }
-    }
-  
+      
     // Print statistics
     if(getOption("print_stats")) printStats(std::cout);
-  
-    //if (!integrator.isNull()) stats_["augmented_stats"] =  integrator.getStats();
   }
 
   void IntegratorInternal::init(){
@@ -224,7 +146,6 @@ namespace CasADi{
     // read options
     t0_ = getOption("t0");
     tf_ = getOption("tf");
-    fwd_via_sct_ = getOption("fwd_via_sct");
   }
 
   void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
@@ -696,22 +617,12 @@ namespace CasADi{
     return f.jacobian(iind,oind,compact,symmetric);
   }
 
-  void IntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
+  void IntegratorInternal::reset(){
     log("IntegratorInternal::reset","begin");
-    // Make sure that the numbers are consistent
-    casadi_assert_message(nsens<=nfdir_,"Too many sensitivities going forward");
-    casadi_assert_message(nsensB<=nfdir_,"Too many sensitivities going backward");
-    casadi_assert_message(nsensB_store<=nsens,"Too many sensitivities stored going forward");
-    casadi_assert_message(nsensB_store<=nsensB,"Too many sensitivities stored going backward");
-  
-    nsens_ = nsens;
-    nsensB_ = nsensB;
-    nsensB_store_ = nsensB_store;
-  
+    
     // Initialize output (relevant for integration with a zero advance time )
     copy(input(INTEGRATOR_X0).begin(),input(INTEGRATOR_X0).end(),output(INTEGRATOR_XF).begin());
-    for(int i=0; i<nfdir_; ++i)
-      copy(fwdSeed(INTEGRATOR_X0,i).begin(),fwdSeed(INTEGRATOR_X0,i).end(),fwdSens(INTEGRATOR_XF,i).begin());
+    
     log("IntegratorInternal::reset","end");
   }
 

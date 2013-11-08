@@ -178,12 +178,8 @@ namespace CasADi{
   
     /** \brief Reset the forward problem
      * Time will be set to t0 and state to input(INTEGRATOR_X0)
-     * \param nsens        Number of sensitivities to be propagated along with the integration forward in time
-     * \param nsensB       Number of sensitivities to be propagated along with the integration backward in time
-     * \param nsensB_store Number of sensitivities to be propagated along with the integration backward in time 
-     *                     that depend on sensitivities propagated along with the integration forward in time
      */
-    void reset(int nsens=0, int nsensB=0, int nsensB_store=0);
+    void reset();
 
     /// Integrate forward until a specified time point 
     void integrate(double t_out);
