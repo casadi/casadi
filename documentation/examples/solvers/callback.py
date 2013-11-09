@@ -37,34 +37,23 @@ nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
 #! ===============
 #! First we demonstrate a callback that does nothing more than printing some information on the screen
 
-#! We create a callable python class, i.e. oen that has a __call__ member:
+it = 0
 
-class MyCallback:
-  def __init__(self):
-    self.iter = 0 
-  def __call__(self,f,*args):
-    print "====Hey, I'm an iteration===="
-    print "X_OPT = ", f.getInput("x")
-    print f.getStats()
-    self.iter = self.iter + 1
-    if self.iter > 5:
-      print "5 Iterations, that is quite enough!"
-      f.setOutput(1,0) # With this statement you can halt the iterations
-
-mycallback = MyCallback()
-
-#! We create a casadi function out of this callable object.
-#! The sparsities given here as input must match the sparsities of the outputs of our NLP Solver
-nd = 2 # Number of decision variables
-nc = 1 # number of constraints
-np = 0 # number of parameters
-
-c = PyFunction( mycallback, nlpSolverOut(x=sp_dense(nd,1), f=sp_dense(1,1), lam_x=sp_dense(nd,1), lam_g = sp_dense(nc,1), lam_p = sp_dense(np,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
-c.init()
-
+@pycallback
+def simplecallback(f):
+  global it
+  print "====Hey, I'm an iteration===="
+  print "X_OPT = ", f.getOutput("x")
+  print f.getStat("iteration")
+  it = it + 1
+  if it > 5:
+    print "5 Iterations, that is quite enough!"
+    return 1 # With this statement you can halt the iterations
+  else:
+    return 0
 
 solver = IpoptSolver(nlp)
-solver.setOption("iteration_callback",c)
+solver.setOption("iteration_callback",simplecallback)
 solver.setOption("tol",1e-8)
 solver.setOption("max_iter",20)
 solver.init()
@@ -77,6 +66,7 @@ solver.solve()
 #! Matplotlib callback
 #! ===================
 #! Now let's do some useful visualisations
+#! We create a callable python class, i.e. one that has a __call__ member
 
 from pylab import figure, subplot, contourf, colorbar, draw, show, plot, title
 
@@ -84,6 +74,7 @@ import time
 import matplotlib
 matplotlib.interactive(True)
   
+@pycallback
 class MyCallback:
   def __init__(self):
     figure(1)
@@ -106,7 +97,7 @@ class MyCallback:
     self.y_sols = []
     
   def __call__(self,f,*args):
-    sol = f.getInput("x")
+    sol = f.getOutput("x")
     self.x_sols.append(float(sol[0]))
     self.y_sols.append(float(sol[1]))
     subplot(111)
@@ -118,17 +109,10 @@ class MyCallback:
 
     draw()
     time.sleep(0.25)
-    
-mycallback = MyCallback()
-
-#! We create a casadi function out of this callable object.
-#! The sparsities given here as input must match the sparsities of the outputs of our NLP Solver
-c = PyFunction( mycallback, nlpSolverOut(x=sp_dense(nd,1), f=sp_dense(1,1), lam_x=sp_dense(nd,1), lam_g = sp_dense(nc,1), lam_p = sp_dense(np,1), g = sp_dense(nc,1) ), [sp_dense(1,1)] )
-c.init()
 
 
 solver = IpoptSolver(nlp)
-solver.setOption("iteration_callback",c)
+solver.setOption("iteration_callback",MyCallback())
 solver.setOption("tol",1e-8)
 solver.setOption("max_iter",50)
 solver.init()

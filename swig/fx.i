@@ -41,9 +41,9 @@
 #include "symbolic/fx/socp_solver.hpp"
 #include "symbolic/fx/qcqp_solver.hpp"
 #include "symbolic/fx/sdqp_solver.hpp"
-#include "symbolic/fx/external_function.hpp"
+#include "symbolic/fx/compiled_function.hpp"
 #include "symbolic/fx/parallelizer.hpp"
-#include "symbolic/fx/c_function.hpp"
+#include "symbolic/fx/custom_function.hpp"
 #include "symbolic/fx/fx_tools.hpp"
 #include "symbolic/fx/xfunction_tools.hpp"
 %}
@@ -121,11 +121,12 @@
 %include "symbolic/fx/socp_solver.hpp"
 %include "symbolic/fx/qcqp_solver.hpp"
 %include "symbolic/fx/sdqp_solver.hpp"
-%include "symbolic/fx/external_function.hpp"
+%include "symbolic/fx/compiled_function.hpp"
 %include "symbolic/fx/parallelizer.hpp"
-%include "symbolic/fx/c_function.hpp"
+%include "symbolic/fx/custom_function.hpp"
 %include "symbolic/fx/fx_tools.hpp"
 %include "symbolic/fx/xfunction_tools.hpp"
+%include "symbolic/functor.hpp"
 
 %template(IntegratorVector) std::vector<CasADi::Integrator>;
 %template(Pair_FX_FX) std::pair<CasADi::FX,CasADi::FX>;

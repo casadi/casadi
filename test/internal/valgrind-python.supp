@@ -413,4 +413,99 @@
    fun:SHA1_Update
 }
 
+# Extra
 
+{
+   extra1
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+}
+
+{
+   extra2
+   Memcheck:Addr4
+   fun:PyGrammar_RemoveAccelerators
+   fun:Py_Finalize
+}
+
+{
+   extra3
+   Memcheck:Addr4
+   fun:_PyString_Resize
+   fun:PyString_Format
+   fun:PyEval_EvalFrameEx
+}
+
+{
+   extra4
+   Memcheck:Addr4
+   obj:/usr/bin/python2.7
+   fun:PyString_Format
+   fun:PyEval_EvalFrameEx
+}
+
+{
+   extra5
+   Memcheck:Value8
+   fun:PyObject_GC_Del
+   fun:PyDict_Fini
+}
+
+{
+   extra6
+   Memcheck:Cond
+   fun:PyObject_GC_Del
+   fun:PyDict_Fini
+}
+
+{
+   extra7
+   Memcheck:Cond
+   fun:_PyString_Resize
+   fun:PyString_Format
+   fun:PyEval_EvalFrameEx
+}
+
+{
+   extra8
+   Memcheck:Addr4
+   obj:/usr/bin/python2.7
+   fun:PyUnicodeUCS4_Join
+   obj:/usr/bin/python2.7
+}
+
+{
+   extra9
+   Memcheck:Cond
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+}
+
+{
+   extra10
+   Memcheck:Value8
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+}
+
+{
+   extra11
+   Memcheck:Cond
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+}
+
+{
+   extra12
+   Memcheck:Cond
+   fun:PyGrammar_RemoveAccelerators
+   fun:Py_Finalize
+}
+
+{
+   extra13
+   Memcheck:Value8
+   fun:PyGrammar_RemoveAccelerators
+   fun:Py_Finalize
+}

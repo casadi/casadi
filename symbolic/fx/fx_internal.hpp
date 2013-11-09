@@ -24,6 +24,7 @@
 #define FX_INTERNAL_HPP
 
 #include "fx.hpp"
+#include "../functor.hpp"
 #include "../weak_ref.hpp"
 #include <set>
 #include "code_generator.hpp"
@@ -334,7 +335,7 @@ namespace CasADi{
     bool gather_stats_;
 
     /// Cache for functions to evaluate directional derivatives
-    std::vector<std::vector<FX> > derivative_fcn_; // NOTE: This can result in circular dependencies!
+    std::vector<std::vector<WeakRef> > derivative_fcn_;
 
     /// Cache for full Jacobian
     WeakRef full_jacobian_;

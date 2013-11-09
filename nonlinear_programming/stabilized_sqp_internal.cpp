@@ -348,14 +348,14 @@ namespace CasADi{
     
       // Call callback function if present
       if (!callback_.isNull()) {
-        if (!callback_.input(NLP_SOLVER_F).empty()) callback_.input(NLP_SOLVER_F).set(fk_);
-        if (!callback_.input(NLP_SOLVER_X).empty()) callback_.input(NLP_SOLVER_X).set(x_);
-        if (!callback_.input(NLP_SOLVER_LAM_G).empty()) callback_.input(NLP_SOLVER_LAM_G).set(mu_);
-        if (!callback_.input(NLP_SOLVER_LAM_X).empty()) callback_.input(NLP_SOLVER_LAM_X).set(mu_x_);
-        if (!callback_.input(NLP_SOLVER_G).empty()) callback_.input(NLP_SOLVER_G).set(gk_);
-        callback_.evaluate();
+        if (!output(NLP_SOLVER_F).empty()) output(NLP_SOLVER_F).set(fk_);
+        if (!output(NLP_SOLVER_X).empty()) output(NLP_SOLVER_X).set(x_);
+        if (!output(NLP_SOLVER_LAM_G).empty()) output(NLP_SOLVER_LAM_G).set(mu_);
+        if (!output(NLP_SOLVER_LAM_X).empty()) output(NLP_SOLVER_LAM_X).set(mu_x_);
+        if (!output(NLP_SOLVER_G).empty()) output(NLP_SOLVER_G).set(gk_);
+        int ret = callback_(ref_,user_data_);
       
-        if (callback_.output(0).at(0)) {
+        if (!ret) {
           cout << endl;
           cout << "CasADi::StabilizedSQPMethod: aborted by callback..." << endl;
           stats_["return_status"] = "User_Requested_Stop";

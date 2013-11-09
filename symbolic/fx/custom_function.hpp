@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef C_FUNCTION_HPP
-#define C_FUNCTION_HPP
+#ifndef CUSTOM_FUNCTION_HPP
+#define CUSTOM_FUNCTION_HPP
 
 #include "fx.hpp"
 #include <string>
@@ -29,58 +29,54 @@
 namespace CasADi{
   
 /** \brief  Forward declaration of internal class */
-class CFunctionInternal;
+class CustomFunctionInternal;
 
 // Forward declaration
-class CFunction;
+class CustomFunction;
 
-//#ifndef SWIG
-/** \brief  Wrapper around functions
- *
- * For wrappers around Python functions, see the PyFunction example at the bottom.
- */
-typedef void (*CFunctionWrapper)(CFunction &f, int nfdir, int nadir, void* user_data);
-//#endif // SWIG
-
-/** \brief  Interface to function implemented as plain code 
+/** \brief  Interface to a custom function
+  
+  Note: max_number_of_fwd_dir and max_number_of_adj_dir will be default zero
+  
+  
   \author Joel Andersson 
   \date 2010
 */
-class CFunction : public FX{
+class CustomFunction : public FX{
 
 public:
 
 /** \brief  default constructor */
-  CFunction();
+  CustomFunction();
 
   //@{
   /** \brief  Create a function with input/output schemes given */
-  explicit CFunction(CFunctionWrapper c_fcn, const std::vector<CRSSparsity> &inputscheme, const std::vector<CRSSparsity> &outputscheme);
+  explicit CustomFunction(const CustomEvaluate &c_fcn, const std::vector<CRSSparsity> &inputscheme, const std::vector<CRSSparsity> &outputscheme);
   
-  explicit CFunction(CFunctionWrapper c_fcn, const IOSchemeVector< CRSSparsity > &inputscheme, const std::vector<CRSSparsity> &outputscheme);
+  explicit CustomFunction(const CustomEvaluate &c_fcn, const IOSchemeVector< CRSSparsity > &inputscheme, const std::vector<CRSSparsity> &outputscheme);
   
-  explicit CFunction(CFunctionWrapper c_fcn, const std::vector<CRSSparsity> &inputscheme, const IOSchemeVector< CRSSparsity > &outputscheme);
+  explicit CustomFunction(const CustomEvaluate &c_fcn, const std::vector<CRSSparsity> &inputscheme, const IOSchemeVector< CRSSparsity > &outputscheme);
   
-  explicit CFunction(CFunctionWrapper c_fcn, const IOSchemeVector< CRSSparsity > &inputscheme, const IOSchemeVector< CRSSparsity > &outputscheme);
+  explicit CustomFunction(const CustomEvaluate &c_fcn, const IOSchemeVector< CRSSparsity > &inputscheme, const IOSchemeVector< CRSSparsity > &outputscheme);
   //@}
   
   /** \brief  Create a function, user sets inputs outputs manually */
-  explicit CFunction(CFunctionWrapper c_fcn);
+  explicit CustomFunction(const CustomEvaluate &c_fcn);
 
   /** \brief  Access functions of the node */
-  CFunctionInternal* operator->();
+  CustomFunctionInternal* operator->();
   
   /** \brief  Const access functions of the node */
-  const CFunctionInternal* operator->() const;
+  const CustomFunctionInternal* operator->() const;
   
   /** \brief  Check if the pointer points towards a valid object */
   virtual bool checkNode() const;
 
-}; // class CFunction
+}; // class CustomFunction
   
 
 
 } // namespace CasADi
 
 
-#endif // C_FUNCTION_HPP
+#endif // CUSTOM_FUNCTION_HPP

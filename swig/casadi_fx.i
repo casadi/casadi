@@ -25,7 +25,3 @@
 
 %include "symbolic/fx/qp_solver.hpp"
 
-#ifdef SWIGPYTHON
-%include "python_function.i"
-#endif
-

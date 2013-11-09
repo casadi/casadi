@@ -29,7 +29,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
-#include "external_function.hpp"
+#include "compiled_function.hpp"
 #include "derivative.hpp"
 
 #include "../casadi_options.hpp"
@@ -56,8 +56,8 @@ namespace CasADi{
     addOption("numeric_jacobian",         OT_BOOLEAN,             false,          "Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method");
     addOption("numeric_hessian",          OT_BOOLEAN,             false,          "Calculate Hessians numerically (using directional derivatives) rather than with the built-in method");
     addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians.","forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate");
-    addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines");
-    addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
+    addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines. Check documentation of JacobianGenerator.");
+    addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines. Check documentation of SparsityGenerator.");
     addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","inputs|outputs");
     addOption("regularity_check",         OT_BOOLEAN,             true,          "Throw exceptions when NaN or Inf appears during evaluation");
@@ -65,8 +65,6 @@ namespace CasADi{
     addOption("gather_stats",             OT_BOOLEAN,             false,         "Flag to indicate wether statistics must be gathered");
   
     verbose_ = false;
-    jacgen_ = 0;
-    spgen_ = 0;
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
@@ -80,9 +78,10 @@ namespace CasADi{
 
   void FXInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     OptionsFunctionalityNode::deepCopyMembers(already_copied);
-    for(vector<vector<FX> >::iterator i=derivative_fcn_.begin(); i!=derivative_fcn_.end(); ++i){
-      for(vector<FX>::iterator j=i->begin(); j!=i->end(); ++j){
-        *j = deepcopy(*j,already_copied);        
+    for(vector<vector<WeakRef> >::iterator i=derivative_fcn_.begin(); i!=derivative_fcn_.end(); ++i){
+      for(vector<WeakRef>::iterator j=i->begin(); j!=i->end(); ++j){
+        FX temp = deepcopy(shared_cast<FX>((*j).shared()),already_copied);
+        *j = temp;        
       }
     }
   }
@@ -300,7 +299,9 @@ namespace CasADi{
     f.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
     f.setOption("max_number_of_fwd_dir",getOption("max_number_of_fwd_dir"));
     f.setOption("max_number_of_adj_dir",getOption("max_number_of_adj_dir"));
-
+    if (hasSetOption("jacobian_generator")) f.setOption("jacobian_generator",getOption("jacobian_generator"));
+    if (hasSetOption("sparsity_generator")) f.setOption("sparsity_generator",getOption("sparsity_generator"));
+    
     return f;
   }
   
@@ -1095,7 +1096,7 @@ namespace CasADi{
     // Generate, if null
     if(jsp.isNull()){
       if(compact){
-        if(spgen_==0){
+        if(spgen_.isNull()){
           // Use internal routine to determine sparsity
           jsp = getJacSparsity(iind,oind,symmetric);
         } else {
@@ -1581,7 +1582,7 @@ namespace CasADi{
     FX ret;
   
     // Generate Jacobian
-    if(jacgen_!=0){
+    if(!jacgen_.isNull()){
       // Use user-provided routine to calculate Jacobian
       FX fcn = shared_from_this<FX>();
       ret = jacgen_(fcn,iind,oind,user_data_);
@@ -1632,104 +1633,107 @@ namespace CasADi{
     if(nadj>=derivative_fcn_[nfwd].size()){
       derivative_fcn_[nfwd].resize(nadj+1);
     }
-
-    // Return value
-    FX& ret = derivative_fcn_[nfwd][nadj];
-
-    // Generate if not already cached
-    if(ret.isNull()){
-
-      // Get the number of scalar inputs and outputs
-      int num_in_scalar = getNumScalarInputs();
-      int num_out_scalar = getNumScalarOutputs();
-  
-      // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
-      int adj_penalty = 2;
     
-      // Crude estimate of the cost of calculating the full Jacobian
-      int full_jac_cost = std::min(num_in_scalar, adj_penalty*num_out_scalar);
-    
-      // Crude estimate of the cost of calculating the directional derivatives
-      int der_dir_cost = nfwd + adj_penalty*nadj;
-    
-      // Check if it is cheaper to calculate the full Jacobian and then multiply
-      if(2*full_jac_cost < der_dir_cost){
-        // Generate the Jacobian and then multiply to get the derivative
-        //ret = getDerivativeViaJac(nfwd,nadj); // NOTE: Uncomment this line (and remove the next line) to enable this feature
-        ret = getDerivative(nfwd,nadj);    
-      } else {
-        // Generate a new function
-        ret = getDerivative(nfwd,nadj);    
-      }
-    
-      // Give it a suitable name
-      stringstream ss;
-      ss << "derivative_" << getOption("name") << "_" << nfwd << "_" << nadj;
-      ret.setOption("name",ss.str());
-      
-      // Names of inputs
-      std::vector<std::string> io_names;
-      io_names.reserve(getNumInputs()*(1+nfwd)+getNumOutputs()*nadj);
-
-      // Nondifferentiated inputs
-      for(int i=0; i<getNumInputs(); ++i){
-        io_names.push_back(inputScheme_.entryLabel(i));
-      }
-
-      // Forward seeds
-      for(int d=0; d<nfwd; ++d){
-        for(int i=0; i<getNumInputs(); ++i){
-          ss.str(string());
-          ss << "fwd" << d << "_" << inputScheme_.entryLabel(i);
-          io_names.push_back(ss.str());
-        }
-      }
-      
-      // Adjoint seeds
-      for(int d=0; d<nadj; ++d){
-        for(int i=0; i<getNumOutputs(); ++i){
-          ss.str(string());
-          ss << "adj" << d << "_" << outputScheme_.entryLabel(i);
-          io_names.push_back(ss.str());
-        }
-      }
-      
-      // Pass to return object
-      ret.setInputScheme(io_names);
-    
-      // Names of outputs
-      io_names.clear();
-      io_names.reserve(getNumOutputs()*(1+nfwd)+getNumInputs()*nadj);
-      
-      // Nondifferentiated inputs
-      for(int i=0; i<getNumOutputs(); ++i){
-        io_names.push_back(outputScheme_.entryLabel(i));
-      }
-      
-      // Forward sensitivities
-      for(int d=0; d<nfwd; ++d){
-        for(int i=0; i<getNumOutputs(); ++i){
-          ss.str(string());
-          ss << "fwd" << d << "_" << outputScheme_.entryLabel(i);
-          io_names.push_back(ss.str());
-        }
-      }
-      
-      // Adjoint sensitivities
-      for(int d=0; d<nadj; ++d){
-        for(int i=0; i<getNumInputs(); ++i){
-          ss.str(string());
-          ss << "adj" << d << "_" << inputScheme_.entryLabel(i);
-          io_names.push_back(ss.str());
-        }
-      }
-      
-      // Pass to return object
-      ret.setOutputScheme(io_names);
-      
-      // Initialize it
-      ret.init();
+    if (derivative_fcn_[nfwd][nadj].alive()) {
+      // Quick return if already cached
+      return shared_cast<FX>(derivative_fcn_[nfwd][nadj].shared());
     }
+ 
+    // Return value
+    FX ret;
+    
+    // Generate if not already cached
+
+    // Get the number of scalar inputs and outputs
+    int num_in_scalar = getNumScalarInputs();
+    int num_out_scalar = getNumScalarOutputs();
+
+    // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
+    int adj_penalty = 2;
+  
+    // Crude estimate of the cost of calculating the full Jacobian
+    int full_jac_cost = std::min(num_in_scalar, adj_penalty*num_out_scalar);
+  
+    // Crude estimate of the cost of calculating the directional derivatives
+    int der_dir_cost = nfwd + adj_penalty*nadj;
+
+    // Check if it is cheaper to calculate the full Jacobian and then multiply
+    if(2*full_jac_cost < der_dir_cost){
+      // Generate the Jacobian and then multiply to get the derivative
+      //ret = getDerivativeViaJac(nfwd,nadj); // NOTE: Uncomment this line (and remove the next line) to enable this feature
+      ret = getDerivative(nfwd,nadj);    
+    } else {
+      // Generate a new function
+      ret = getDerivative(nfwd,nadj);    
+    }
+    
+    // Give it a suitable name
+    stringstream ss;
+    ss << "derivative_" << getOption("name") << "_" << nfwd << "_" << nadj;
+    ret.setOption("name",ss.str());
+    
+    // Names of inputs
+    std::vector<std::string> io_names;
+    io_names.reserve(getNumInputs()*(1+nfwd)+getNumOutputs()*nadj);
+
+    // Nondifferentiated inputs
+    for(int i=0; i<getNumInputs(); ++i){
+      io_names.push_back(inputScheme_.entryLabel(i));
+    }
+
+    // Forward seeds
+    for(int d=0; d<nfwd; ++d){
+      for(int i=0; i<getNumInputs(); ++i){
+        ss.str(string());
+        ss << "fwd" << d << "_" << inputScheme_.entryLabel(i);
+        io_names.push_back(ss.str());
+      }
+    }
+    
+    // Adjoint seeds
+    for(int d=0; d<nadj; ++d){
+      for(int i=0; i<getNumOutputs(); ++i){
+        ss.str(string());
+        ss << "adj" << d << "_" << outputScheme_.entryLabel(i);
+        io_names.push_back(ss.str());
+      }
+    }
+    
+    // Pass to return object
+    ret.setInputScheme(io_names);
+  
+    // Names of outputs
+    io_names.clear();
+    io_names.reserve(getNumOutputs()*(1+nfwd)+getNumInputs()*nadj);
+    
+    // Nondifferentiated inputs
+    for(int i=0; i<getNumOutputs(); ++i){
+      io_names.push_back(outputScheme_.entryLabel(i));
+    }
+    
+    // Forward sensitivities
+    for(int d=0; d<nfwd; ++d){
+      for(int i=0; i<getNumOutputs(); ++i){
+        ss.str(string());
+        ss << "fwd" << d << "_" << outputScheme_.entryLabel(i);
+        io_names.push_back(ss.str());
+      }
+    }
+    
+    // Adjoint sensitivities
+    for(int d=0; d<nadj; ++d){
+      for(int i=0; i<getNumInputs(); ++i){
+        ss.str(string());
+        ss << "adj" << d << "_" << inputScheme_.entryLabel(i);
+        io_names.push_back(ss.str());
+      }
+    }
+    
+    // Pass to return object
+    ret.setOutputScheme(io_names);
+    
+    // Initialize it
+    ret.init();
 
     // Return cached or generated function
     return ret;
@@ -1737,11 +1741,16 @@ namespace CasADi{
 
   FX FXInternal::getDerivative(int nfwd, int nadj){
     if (nadj>0 && nadir_==0) {
+      std::cout << "bounty" << std::endl;
       return getDerivativeViaJac(nfwd,nadj);
     } else if (nfwd>0 && nfdir_==0) {
+    std::cout << "milky" << std::endl;
       return getDerivativeViaJac(nfwd,nadj);
     }
-    return Derivative(shared_from_this<FX>(),nfwd,nadj);
+    std::cout << "mars" << std::endl;
+    Derivative d(shared_from_this<FX>(),nfwd,nadj);
+    
+    return d;
   }
 
   FX FXInternal::getDerivativeViaJac(int nfwd, int nadj){
@@ -2166,7 +2175,7 @@ namespace CasADi{
     }
 
     // Load it
-    ExternalFunction f_gen("./" + dlname);
+    CompiledFunction f_gen("./" + dlname);
     f_gen.setOption("number_of_fwd_dir",0);
     f_gen.setOption("number_of_adj_dir",0);
     f_gen.setOption("name",fname + "_gen");
@@ -2206,7 +2215,8 @@ namespace CasADi{
   void FXInternal::createCallDerivative(const std::vector<MX>& arg, std::vector<MX>& res, 
                                         const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens,
                                         const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens, bool cached) {
-
+                                        
+    
     // Number of directional derivatives
     int nfdir = fseed.size();
     int nadir = aseed.size();
@@ -2270,6 +2280,7 @@ namespace CasADi{
         asens[dir][i] = *x_it++;
       }
     }
+    
   }
 
   void FXInternal::evaluateMX(MXNode* node, const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given) {
