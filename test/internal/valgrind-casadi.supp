@@ -60,6 +60,55 @@
    fun:SWIG_Python_NewShadowInstance.isra.12
 }
 
+{
+   mystery2
+   Memcheck:Value8
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   mystery3
+   Memcheck:Cond
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   mystery4
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   mystery5
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance
+   fun:SWIG_Python_NewPointerObj
+   fun:_wrap_DMatrix___radd____SWIG_0
+}
 
 #Error in swig 
 {
@@ -111,4 +160,45 @@
    fun:_ZN4swig11traits_fromIN6CasADi2MXEE4fromERKS2_
    fun:_ZN4swig4fromIN6CasADi2MXEEEP7_objectRKT_
    fun:_ZN4swig18traits_from_stdseqISt6vectorIN6CasADi2MXESaIS3_EES3_E4fromERKS5_
+}
+
+{  
+   swigerror4
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance
+   fun:SWIG_Python_NewPointerObj
+}
+
+{
+   swigerror5
+   Memcheck:Value8
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_New
+   fun:PyDict_New
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   swigerror6
+   Memcheck:Cond
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_New
+   fun:PyDict_New
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   dsdp2
+   Memcheck:Cond
+   fun:dstemr_
+   fun:dsyevr_
+   fun:DSDPGetEigs
 }

@@ -98,7 +98,7 @@ namespace CasADi{
     int np_;
   
     /// callback function, executed at each iteration
-    FX callback_;
+    Callback callback_;
   
     /// Execute the callback function only after this amount of iterations
     int callback_step_;
@@ -120,6 +120,10 @@ namespace CasADi{
 
     // Sparsity pattern of the Hessian of the Lagrangian
     CRSSparsity spHessLag_;
+    
+    /// A reference to this object to be passed to the user functions
+    FX ref_;
+    
   };
 
 } // namespace CasADi

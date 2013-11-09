@@ -529,6 +529,21 @@ namespace CasADi{
   MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline){
     using namespace std;
     if(verbose()) std::cout << "XFunctionInternal::jac begin" << std::endl;
+    
+    if (!jacgen_.isNull()) {
+       // Use user-provided routine to calculate Jacobian
+       FX fcn = shared_from_this<FX>();
+       FX jac = jacgen_(fcn,iind,oind,user_data_);
+       
+       casadi_assert_message(jac.output().size1()==output(oind).size() && jac.output().size2()==input(iind).size(),"FXInternal::jacobian: User supplied jacobianGenerator("<< iind << "," << oind <<") returned " << jac.output().dimString() << ", while shape " <<  output(oind).size() << "-by-" << input(iind).size() << " was expected.");
+       
+       std::vector< MatType > j = jac.eval(inputv_);
+       
+       return j[0];
+    
+    }
+    
+    casadi_assert_message(nfdir_>0 || nadir_>0,"XFunctionInternal::jac - no sensitivities or jacobiangenerator available for function " << getOption("name"));
   
     // Quick return
     if (input(iind).empty()) return MatType(output(oind).numel(),0);

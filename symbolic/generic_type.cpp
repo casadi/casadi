@@ -26,6 +26,7 @@
 #include <cmath>
 
 #include "fx/fx.hpp"
+#include "functor.hpp"
 
 using namespace std;
 
@@ -125,6 +126,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_JACOBIANGENERATOR";
       case OT_SPARSITYGENERATOR:
               return "OT_SPARSITYGENERATOR";
+      case OT_CALLBACK:
+              return "OT_CALLBACK";
       case OT_FX:
               return "OT_FX";
       case OT_VOIDPTR:
@@ -245,6 +248,17 @@ GenericType::GenericType(const FX& f) : type_(OT_FX) {
   assignNode(new FXType(f));
 }
 
+GenericType::GenericType(const JacobianGenerator& f) : type_(OT_JACOBIANGENERATOR) {
+  assignNode(new GenericTypeInternal<JacobianGenerator>(f));
+}
+
+GenericType::GenericType(const SparsityGenerator& f) : type_(OT_SPARSITYGENERATOR) {
+  assignNode(new GenericTypeInternal<SparsityGenerator>(f));
+}
+
+GenericType::GenericType(const Callback& f) : type_(OT_CALLBACK) {
+  assignNode(new GenericTypeInternal<Callback>(f));
+}
 
 bool GenericType::toBool() const{
   if (isBool()) {
@@ -397,14 +411,6 @@ GenericType::GenericType(implicitFunctionCreator ptr) : type_(OT_IMPLICITFUNCTIO
   assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));
 }
 
-GenericType::GenericType(JacobianGenerator ptr) : type_(OT_JACOBIANGENERATOR) {
-  assignNode(new GenericTypeInternal<JacobianGenerator>(ptr));
-}
-
-GenericType::GenericType(SparsityGenerator ptr) : type_(OT_SPARSITYGENERATOR) {
-  assignNode(new GenericTypeInternal<SparsityGenerator>(ptr));
-}
-
 GenericType::operator NLPSolverCreator() const{
   casadi_assert_message(is_a<NLPSolverCreator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<NLPSolverCreator>*>(get())->d_;
@@ -459,14 +465,19 @@ GenericType::operator implicitFunctionCreator() const{
   return static_cast<const GenericTypeInternal<implicitFunctionCreator>*>(get())->d_;
 }
 
-GenericType::operator JacobianGenerator() const{
+GenericType::operator const JacobianGenerator &() const{
   casadi_assert_message(is_a<JacobianGenerator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<JacobianGenerator>*>(get())->d_;
 }
 
-GenericType::operator SparsityGenerator() const{
+GenericType::operator const SparsityGenerator &() const{
   casadi_assert_message(is_a<SparsityGenerator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<SparsityGenerator>*>(get())->d_;
+}
+
+GenericType::operator const Callback &() const{
+  casadi_assert_message(is_a<Callback>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<Callback>*>(get())->d_;
 }
 
 GenericType::GenericType(const Dictionary& dict) : type_(OT_DICTIONARY) {

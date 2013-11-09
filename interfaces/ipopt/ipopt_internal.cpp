@@ -346,34 +346,39 @@ namespace CasADi{
       double time1 = clock();
       if (!callback_.isNull()) {
         if(full_callback) {
-          if (!callback_.input(NLP_SOLVER_X).empty()) copy(x,x+nx_,callback_.input(NLP_SOLVER_X).begin());
+          if (!output(NLP_SOLVER_X).empty()) copy(x,x+nx_,output(NLP_SOLVER_X).begin());
         
-          vector<double>& lambda_x = callback_.input(NLP_SOLVER_LAM_X).data();
+          vector<double>& lambda_x = output(NLP_SOLVER_LAM_X).data();
           for(int i=0; i<lambda_x.size(); ++i){
             lambda_x[i] = z_U[i]-z_L[i];
           }
-          if (!callback_.input(NLP_SOLVER_LAM_G).empty()) copy(lambda,lambda+ng_,callback_.input(NLP_SOLVER_LAM_G).begin());
-          if (!callback_.input(NLP_SOLVER_G).empty()) copy(g,g+ng_,callback_.input(NLP_SOLVER_G).begin());
+          if (!output(NLP_SOLVER_LAM_G).empty()) copy(lambda,lambda+ng_,output(NLP_SOLVER_LAM_G).begin());
+          if (!output(NLP_SOLVER_G).empty()) copy(g,g+ng_,output(NLP_SOLVER_G).begin());
         } else {
           if (iter==0) {
             cerr << "Warning: intermediate_callback is disfunctional in your installation. You will only be able to use getStats(). See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it." << endl;
           }
         }
+        
+        Dictionary iteration;
+        iteration["iter"] = iter;
+        iteration["inf_pr"] = inf_pr;
+        iteration["inf_du"] = inf_du;
+        iteration["mu"] = mu;
+        iteration["d_norm"] = d_norm;
+        iteration["regularization_size"] = regularization_size;
+        iteration["alpha_pr"] = alpha_pr;
+        iteration["alpha_du"] = alpha_du;
+        iteration["ls_trials"] = ls_trials;
+        stats_["iteration"] = iteration;
 
-        callback_.input(NLP_SOLVER_F).at(0) = obj_value;
-        callback_->stats_["iter"] = iter;
-        callback_->stats_["inf_pr"] = inf_pr;
-        callback_->stats_["inf_du"] = inf_du;
-        callback_->stats_["mu"] = mu;
-        callback_->stats_["d_norm"] = d_norm;
-        callback_->stats_["regularization_size"] = regularization_size;
-        callback_->stats_["alpha_pr"] = alpha_pr;
-        callback_->stats_["alpha_du"] = alpha_du;
-        callback_->stats_["ls_trials"] = ls_trials;
-        callback_.evaluate();
+        output(NLP_SOLVER_F).at(0) = obj_value;
+
+        int ret = callback_(ref_,user_data_);
+        
         double time2 = clock();
         t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
-        return  !callback_.output(0).at(0);
+        return  !ret;
       } else {
         return 1;
       }

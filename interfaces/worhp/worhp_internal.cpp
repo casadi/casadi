@@ -667,21 +667,21 @@ namespace CasADi{
         if (!callback_.isNull()) {
           double time1 = clock();
           // Copy outputs
-          if (!callback_.input(NLP_SOLVER_X).empty())
-            callback_.input(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n);
-          if (!callback_.input(NLP_SOLVER_F).empty())
-            callback_.input(NLP_SOLVER_F).set(worhp_o_.F);
-          if (!callback_.input(NLP_SOLVER_G).empty())
-            callback_.input(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
-          if (!callback_.input(NLP_SOLVER_LAM_X).empty()) 
-            callback_.input(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
-          if (!callback_.input(NLP_SOLVER_LAM_G).empty())
-            callback_.input(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
+          if (!output(NLP_SOLVER_X).empty())
+            output(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n);
+          if (!output(NLP_SOLVER_F).empty())
+            output(NLP_SOLVER_F).set(worhp_o_.F);
+          if (!output(NLP_SOLVER_G).empty())
+            output(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
+          if (!output(NLP_SOLVER_LAM_X).empty()) 
+            output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
+          if (!output(NLP_SOLVER_LAM_G).empty())
+            output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
 
           double time2 = clock();
           t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
           time1 = clock();
-          callback_.evaluate();
+          callback_(ref_,user_data_);
           time2 = clock();
           t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
         }
