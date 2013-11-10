@@ -737,7 +737,6 @@
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>Absolute tolerence  for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable CVodes internal warning messages</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
@@ -810,7 +809,6 @@
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>Absolute tolerence  for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable CVodes internal warning messages</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
@@ -2204,7 +2202,6 @@
 <tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::IdasInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions.</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Use IDACalcIC to get consistent initial conditions for backwards system [default: equal to calc_ic].</td><td>CasADi::IdasInternal</td></tr>
@@ -2285,7 +2282,6 @@
 <tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::IdasInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions.</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Use IDACalcIC to get consistent initial conditions for backwards system [default: equal to calc_ic].</td><td>CasADi::IdasInternal</td></tr>
@@ -2567,7 +2563,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
@@ -2602,7 +2597,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
@@ -3119,7 +3113,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>"radau"</td><td>Collocation scheme (radau|legendre)</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::CollocationIntegratorInternal</td></tr>
@@ -3163,7 +3156,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>"radau"</td><td>Collocation scheme (radau|legendre)</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::CollocationIntegratorInternal</td></tr>
@@ -3259,7 +3251,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
@@ -3291,7 +3282,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
@@ -3963,7 +3953,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
 <tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
@@ -3999,7 +3988,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
 <tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
@@ -4371,7 +4359,6 @@
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>Absolute tolerence  for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Use exact Jacobian information for the backward integration [default: equal to exact_jacobian]</td><td>CasADi::SundialsInternal</td></tr>
@@ -4440,7 +4427,6 @@
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>Absolute tolerence  for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Use exact Jacobian information for the backward integration [default: equal to exact_jacobian]</td><td>CasADi::SundialsInternal</td></tr>
