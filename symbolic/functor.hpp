@@ -70,19 +70,13 @@ namespace CasADi{
   */
   class SparsityGenerator : public Functor {
     public:
+      /// Default constructor
+      SparsityGenerator() {};
+      /// Construct from C pointer
+      SparsityGenerator(SparsityGeneratorCPtr ptr);
       /// Call
       virtual CRSSparsity operator() (FX& fcn, int iind, int oind, void* user_data);
   };
-
-  /** \brief Sparsity Generator Functor C Implementation */
-  class SparsityGeneratorC : public SparsityGenerator {
-    /// Default constructor
-    //SparsityGeneratorC();
-    public:
-      /// Construct from C pointer
-      SparsityGeneratorC(SparsityGeneratorCPtr ptr);
-  };
-  
 
   /** \brief Jacobian Generator Functor
   *
@@ -103,18 +97,13 @@ namespace CasADi{
   */
   class JacobianGenerator : public Functor {
     public:
+      /// Default constructor
+      JacobianGenerator() {};
+      /// Construct from C pointer
+      JacobianGenerator(JacobianGeneratorCPtr ptr);
       /// Call
       virtual FX operator() (FX& fcn, int iind, int oind, void* user_data);
-  };
-
-  /** \brief Sparsity Generator Functor C Implementation */
-  class JacobianGeneratorC : public JacobianGenerator {
-    public:
-      /// Construct from C pointer
-      JacobianGeneratorC(JacobianGeneratorCPtr ptr);
-  };
-  
-  
+  };  
     
   /** \brief CustomEvaluate
   *
@@ -133,15 +122,12 @@ namespace CasADi{
   */
   class CustomEvaluate : public Functor {
     public:
+      /// Default constructor
+      CustomEvaluate() {};
+      /// Construct from C pointer
+      CustomEvaluate(CustomEvaluateCPtr ptr);
       /// Call
       virtual void operator() (CustomFunction& fcn, int nfdir, int nadir, void* user_data);
-  };
-
-  /** \brief CustomEvaluate C Implementation */
-  class CustomEvaluateC : public CustomEvaluate {
-    public:
-      /// Construct from C pointer
-      CustomEvaluateC(CustomEvaluateCPtr ptr);
   };
 
   /** \brief Callback
@@ -161,15 +147,12 @@ namespace CasADi{
   */
   class Callback : public Functor {
     public:
+      /// Default constructor
+      Callback() {};
+      /// Construct from C pointer
+      Callback(CallbackCPtr ptr);
       /// Call
       virtual int operator() (FX& fcn, void* user_data);
-  };
-
-  /** \brief Callback C Implementation */
-  class CallbackC : public Callback {
-    public:
-      /// Construct from C pointer
-      CallbackC(CallbackCPtr ptr);
   };
 
 } // namespace CasADi

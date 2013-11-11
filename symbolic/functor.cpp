@@ -51,19 +51,19 @@ int Callback::operator()(FX& fcn, void* user_data) {
   return static_cast<CallbackInternal*>(SharedObject::operator->())->call(fcn, user_data);
 }
   
-SparsityGeneratorC::SparsityGeneratorC(SparsityGeneratorCPtr ptr) {
+SparsityGenerator::SparsityGenerator(SparsityGeneratorCPtr ptr) {
   assignNode(new SparsityGeneratorCInternal(ptr));
 }
   
-JacobianGeneratorC::JacobianGeneratorC(JacobianGeneratorCPtr ptr) {
+JacobianGenerator::JacobianGenerator(JacobianGeneratorCPtr ptr) {
   assignNode(new JacobianGeneratorCInternal(ptr));
 }  
 
-CustomEvaluateC::CustomEvaluateC(CustomEvaluateCPtr ptr) {
+CustomEvaluate::CustomEvaluate(CustomEvaluateCPtr ptr) {
   assignNode(new CustomEvaluateCInternal(ptr));
 }
 
-CallbackC::CallbackC(CallbackCPtr ptr) {
+Callback::Callback(CallbackCPtr ptr) {
   assignNode(new CallbackCInternal(ptr));
 }
   

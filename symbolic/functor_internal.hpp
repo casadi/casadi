@@ -51,7 +51,7 @@ namespace CasADi{
   };
 
   class SparsityGeneratorCInternal : public SparsityGeneratorInternal, FunctorCInternal<SparsityGeneratorCPtr> {
-    friend class SparsityGeneratorC;
+    friend class SparsityGenerator;
     
     SparsityGeneratorCInternal(SparsityGeneratorCPtr ptr);
     virtual CRSSparsity call(FX& fcn, int iind, int oind, void* user_data);
@@ -65,7 +65,7 @@ namespace CasADi{
   };
 
   class JacobianGeneratorCInternal : public JacobianGeneratorInternal, FunctorCInternal<JacobianGeneratorCPtr> {
-    friend class JacobianGeneratorC;
+    friend class JacobianGenerator;
     
     JacobianGeneratorCInternal(JacobianGeneratorCPtr ptr);
     virtual FX call(FX& fcn, int iind, int oind, void* user_data);
@@ -78,7 +78,7 @@ namespace CasADi{
   };
 
   class CustomEvaluateCInternal : public CustomEvaluateInternal, FunctorCInternal<CustomEvaluateCPtr> {
-    friend class CustomEvaluateC;
+    friend class CustomEvaluate;
     
     CustomEvaluateCInternal(CustomEvaluateCPtr ptr);
     virtual void call(CustomFunction& fcn, int nfdir, int nadir, void* user_data);
@@ -91,7 +91,7 @@ namespace CasADi{
   };
 
   class CallbackCInternal : public CallbackInternal, FunctorCInternal<CallbackCPtr> {
-    friend class CallbackC;
+    friend class Callback;
     
     CallbackCInternal(CallbackCPtr ptr);
     virtual int call(FX& fcn, void* user_data);
