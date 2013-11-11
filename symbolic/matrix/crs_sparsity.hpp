@@ -89,11 +89,6 @@ namespace CasADi{
    * \date 2010
    */
   class CRSSparsity : public SharedObject{
-  private:
-    /// Multimap holding all cached sparsity patterns (put first to ensure that it is initialized before being used)
-    typedef CACHING_MULTIMAP<std::size_t,WeakRef> CachingMap;
-    static CachingMap cached_;
-
   public:
   
     /// Default constructor
@@ -369,14 +364,20 @@ namespace CasADi{
     void removeDuplicates(std::vector<int>& mapping);
     
 #ifndef SWIG
+    typedef CACHING_MULTIMAP<std::size_t,WeakRef> CachingMap;
+
+    /// Cached sparsity patterns
+    static CachingMap& getCache();
+
     /// (Dense) scalar
-    static CRSSparsity scalarSparsity;
+    static const CRSSparsity& getScalar();
 
     /// (Sparse) scalar
-    static CRSSparsity scalarSparsitySparse;
+    static const CRSSparsity& getScalarSparse();
     
     /// Empty zero-by-zero
-    static CRSSparsity emptySparsity;
+    static const CRSSparsity& getEmpty();
+
 #endif //SWIG
     
     /** \brief Calculate the elimination tree

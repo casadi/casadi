@@ -354,11 +354,25 @@ namespace CasADi{
     (*this)->append(sp);
   }
 
-  CRSSparsity CRSSparsity::scalarSparsity(1,1,true);
+  CRSSparsity::CachingMap& CRSSparsity::getCache(){
+    static CachingMap ret;
+    return ret;
+  }
 
-  CRSSparsity CRSSparsity::scalarSparsitySparse(1,1,false);
+  const CRSSparsity& CRSSparsity::getScalar(){
+    static CRSSparsity ret(1,1,true);
+    return ret;
+  }
 
-  CRSSparsity CRSSparsity::emptySparsity(0,0,true);
+  const CRSSparsity& CRSSparsity::getScalarSparse(){
+    static CRSSparsity ret(1,1,false);
+    return ret;
+  }
+
+  const CRSSparsity& CRSSparsity::getEmpty(){
+    static CRSSparsity ret(0,0,true);
+    return ret;
+  }
 
   void CRSSparsity::enlarge(int nrow, int ncol, const vector<int>& ii, const vector<int>& jj){
     enlargeRows(nrow,ii);
@@ -504,10 +518,13 @@ namespace CasADi{
       assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
       return;
     }
+
+    // Get a reference to the cache
+    CachingMap& cache = getCache();
     
     // Record the current number of buckets (for garbage collection below)
 #ifdef USE_CXX11
-    int bucket_count_before = cached_.bucket_count();
+    int bucket_count_before = cache.bucket_count();
 #endif // USE_CXX11
 
     // WORKAROUND, functions do not appear to work when bucket_count==0
@@ -516,7 +533,7 @@ namespace CasADi{
 #endif // USE_CXX11
 
       // Find the range of patterns equal to the key (normally only zero or one)
-      pair<CachingMap::iterator,CachingMap::iterator> eq = cached_.equal_range(h);
+      pair<CachingMap::iterator,CachingMap::iterator> eq = cache.equal_range(h);
 
       // Loop over maching patterns
       for(CachingMap::iterator i=eq.first; i!=eq.second; ++i){
@@ -596,19 +613,19 @@ namespace CasADi{
     assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
 
     // Cache this pattern
-    //cached_.insert(eq.second,std::pair<std::size_t,WeakRef>(h,ret));
-    cached_.insert(std::pair<std::size_t,WeakRef>(h,*this));
+    //cache.insert(eq.second,std::pair<std::size_t,WeakRef>(h,ret));
+    cache.insert(std::pair<std::size_t,WeakRef>(h,*this));
 
     // Garbage collection (currently only supported for unordered_multimap)
 #ifdef USE_CXX11
-    int bucket_count_after = cached_.bucket_count();
+    int bucket_count_after = cache.bucket_count();
     
     // We we increased the number of buckets, take time to garbage-collect deleted references
     if(bucket_count_before!=bucket_count_after){
-      CachingMap::const_iterator i=cached_.begin();
-      while(i!=cached_.end()){
+      CachingMap::const_iterator i=cache.begin();
+      while(i!=cache.end()){
         if(!i->second.alive()){
-          i = cached_.erase(i);
+          i = cache.erase(i);
         } else {
           i++;
         }
@@ -617,10 +634,8 @@ namespace CasADi{
 #endif // USE_CXX11    
   }
 
-  CRSSparsity::CachingMap CRSSparsity::cached_;
-
   void CRSSparsity::clearCache(){
-    cached_.clear();
+    getCache().clear();
   }
 
 
