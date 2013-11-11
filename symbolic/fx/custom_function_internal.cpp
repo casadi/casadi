@@ -48,13 +48,10 @@ CustomFunctionInternal::CustomFunctionInternal(const CustomEvaluate &c_fcn, cons
   setOption("max_number_of_fwd_dir",0);
   setOption("max_number_of_adj_dir",0);
   
-  std::cout << std::endl << "XX create" << std::endl;
-  
 }
 
 CustomFunctionInternal::~CustomFunctionInternal(){
   // Explicitly remove the pointer to this (as the counter would otherwise be decreased)
-  std::cout << std::endl << "XX destroy" << std::endl;
   ref_.assignNodeNoCount(0);
 }
 

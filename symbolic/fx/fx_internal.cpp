@@ -1741,13 +1741,10 @@ namespace CasADi{
 
   FX FXInternal::getDerivative(int nfwd, int nadj){
     if (nadj>0 && nadir_==0) {
-      std::cout << "bounty" << std::endl;
       return getDerivativeViaJac(nfwd,nadj);
     } else if (nfwd>0 && nfdir_==0) {
-    std::cout << "milky" << std::endl;
       return getDerivativeViaJac(nfwd,nadj);
     }
-    std::cout << "mars" << std::endl;
     Derivative d(shared_from_this<FX>(),nfwd,nadj);
     
     return d;
