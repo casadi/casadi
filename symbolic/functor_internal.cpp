@@ -37,7 +37,7 @@ namespace CasADi{
   
   CRSSparsity SparsityGeneratorCInternal::call(FX& fcn, int iind, int oind, void* user_data) {
     casadi_assert(ptr_!=0);
-    ptr_(fcn, iind, oind, user_data);
+    return ptr_(fcn, iind, oind, user_data);
   }
   
   SparsityGeneratorCInternal* SparsityGeneratorCInternal::clone() const {
@@ -49,7 +49,7 @@ namespace CasADi{
   
   FX JacobianGeneratorCInternal::call(FX& fcn, int iind, int oind, void* user_data) {
     casadi_assert(ptr_!=0);
-    ptr_(fcn, iind, oind, user_data);
+    return ptr_(fcn, iind, oind, user_data);
   }
   
   JacobianGeneratorCInternal* JacobianGeneratorCInternal::clone() const {
@@ -73,7 +73,7 @@ namespace CasADi{
   
   int CallbackCInternal::call(FX& fcn, void* user_data) {
     casadi_assert(ptr_!=0);
-    ptr_(fcn, user_data);
+    return ptr_(fcn, user_data);
   }
   
   CallbackCInternal* CallbackCInternal::clone() const {
