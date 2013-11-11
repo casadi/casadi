@@ -30,6 +30,33 @@ using namespace std;
 
 namespace CasADi{
 
+  // Singletons
+  class EmptySparsity : public CRSSparsity{  
+  public:
+    EmptySparsity(){
+      vector<int> col,rowind(1,0);
+      assignNode(new CRSSparsityInternal(0,0,col,rowind));
+    }
+  };
+
+  class ScalarSparsity : public CRSSparsity{  
+  public:
+    ScalarSparsity(){
+      vector<int> col(1,0),rowind(2);
+      rowind[0] = 0;
+      rowind[1] = 1;
+      assignNode(new CRSSparsityInternal(1,1,col,rowind));
+    }
+  };
+
+  class ScalarSparseSparsity : public CRSSparsity{  
+  public:
+    ScalarSparseSparsity(){
+      vector<int> col,rowind(2,0);
+      assignNode(new CRSSparsityInternal(1,1,col,rowind));
+    }
+  };
+  
   CRSSparsity::CRSSparsity(int dummy){
     casadi_assert(dummy==0);
   }
@@ -65,11 +92,11 @@ namespace CasADi{
  
   CRSSparsityInternal* CRSSparsity::operator->(){
     makeUnique();
-    return (CRSSparsityInternal*)(SharedObject::operator->());
+    return static_cast<CRSSparsityInternal*>(SharedObject::operator->());
   }
 
   const CRSSparsityInternal* CRSSparsity::operator->() const{
-    return (const CRSSparsityInternal*)(SharedObject::operator->());
+    return static_cast<const CRSSparsityInternal*>(SharedObject::operator->());
   }
   
   bool CRSSparsity::checkNode() const{
@@ -360,17 +387,17 @@ namespace CasADi{
   }
 
   const CRSSparsity& CRSSparsity::getScalar(){
-    static CRSSparsity ret(1,1,true);
+    static ScalarSparsity ret;
     return ret;
   }
 
   const CRSSparsity& CRSSparsity::getScalarSparse(){
-    static CRSSparsity ret(1,1,false);
+    static ScalarSparseSparsity ret;
     return ret;
   }
 
   const CRSSparsity& CRSSparsity::getEmpty(){
-    static CRSSparsity ret(0,0,true);
+    static EmptySparsity ret;
     return ret;
   }
 
@@ -510,14 +537,26 @@ namespace CasADi{
   }
 
   void CRSSparsity::assignCached(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind){
+
+    // Scalars and empty patterns are handled separately
+    if(nrow==0 && ncol==0){
+      // If empty    
+      *this = getEmpty();
+      return;
+    } else if(nrow==1 && ncol==1){
+      if(col.empty()){        
+        // If sparse scalar
+        *this = getScalarSparse();
+        return;
+      } else {
+        // If dense scalar
+        *this = getScalar();
+        return;
+      }
+    }
+
     // Hash the pattern
     std::size_t h = hash_sparsity(nrow,ncol,col,rowind);
-
-    // Workaround: Disable caching for scalars and small empty matrices
-    if(nrow<=1 && ncol<=1){
-      assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
-      return;
-    }
 
     // Get a reference to the cache
     CachingMap& cache = getCache();
