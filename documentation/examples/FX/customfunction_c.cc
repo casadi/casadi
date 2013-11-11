@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
   std::vector<CRSSparsity> outs;
   outs.push_back(sp_dense(1,1));
   
-  CustomFunction f(CustomEvaluateC(myEvaluate),ins,outs);
+  CustomFunction f(myEvaluate,ins,outs);
   f.init();
   
   f.setInput(2);
