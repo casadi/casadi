@@ -23,8 +23,5 @@ install(DIRECTORY ./
    PATTERN ".svn" EXCLUDE
 )
 
-add_executable(xmltest xmltest.cpp)
-target_link_libraries(xmltest ${TINYXML_LIBRARIES})
-
 add_executable(test_dump test_dump.cpp)
 target_link_libraries(test_dump ${TINYXML_LIBRARIES})
