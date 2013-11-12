@@ -249,7 +249,7 @@ if(WITH_BUILD_IPOPT)
     BUILD_COMMAND make -j4
   )
   set(BUILD_IPOPT_LIB_DIR ${CMAKE_BINARY_DIR}/CoinIpopt/src/build_ipopt-build)
-  message(STATUS "BUILD_IPOPT_LIB_DIR: "${BUILD_IPOPT_LIB_DIR})
+  message(STATUS "BUILD_IPOPT_LIB_DIR: ${BUILD_IPOPT_LIB_DIR}")
 endif(WITH_BUILD_IPOPT)
 add_feature_info(get-ipopt WITH_BUILD_IPOPT "Download and build Ipopt.")
 
