@@ -282,7 +282,8 @@ namespace CasADi{
     // Initialize or reset the Hessian or Hessian approximation
     reg_ = 0;
     if(exact_hessian_){
-      eval_h(x_,mu_,1.0,Bk_);
+      // eval_h(x_,mu_,1.0,Bk_);
+      // For first iteration, do not use
     } else {
       reset_h();
     }
@@ -373,6 +374,11 @@ namespace CasADi{
 
       scaleg_ = 1+normc_*normJ_;
       scaleglag_ = std::max(1., std::max(normgf_,(std::max(1.,norm_2(mu_)) * normJ_)));
+   
+      if (exact_hessian_ && iter==0) {
+        Bk_.setAll(0);
+        Bk_(sp_diag(nx_)) = 0.01 *scaleglag_; 
+      }
    
       // Checking convergence criteria
       if (pr_inf/scaleglag_ < tol_pr_ && gLag_norminf/scaleglag_ < tol_du_){

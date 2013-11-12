@@ -46,6 +46,14 @@ try:
   print "Will test SQPMethod"
 except:
   pass
+  
+try:
+  qp_solver_options = {"nlp_solver": IpoptSolver, "nlp_solver_options": {"tol": 1e-12, "print_level": 0, "print_time": False} }
+  solvers.append((StabilizedSQPMethod,{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": QPStabilizer, "stabilized_qp_solver_options": {"qp_solver": NLPQPSolver, "qp_solver_options": qp_solver_options}}))
+  print "Will test SQPMethod"
+except:
+  pass
+
 
 #try:
 #  solvers.append(KnitroSolver)
@@ -53,7 +61,6 @@ except:
 #except:
 #  pass
   
-
 class NLPtests(casadiTestCase):
 
   def testboundsviol(self):
@@ -189,10 +196,10 @@ class NLPtests(casadiTestCase):
       solver.setInput([10]*2,"ubx")
       solver.solve()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[0],1,7,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("x")[1],1,7,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,9,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[0],1,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("x")[1],1,6,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,5,str(Solver))
     
   def testIPOPTrb2(self):
     self.message("rosenbrock, limited-memory hessian approx")
@@ -219,9 +226,9 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("f")[0],0,digits,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,digits,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1,digits,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,9,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,9,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,9,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,5,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,5,str(Solver))
       
   def testIPOPTrbf(self):
     self.message("rosenbrock fixed, limited-memory hessian approx")
@@ -255,9 +262,10 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,7,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1,7,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,6,str(Solver))
+      if "Stabilized" not in str(Solver):
+        self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,6,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
+        self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,6,str(Solver))
       
   def testIPOPTrhb2(self):
     self.message("rosenbrock, exact hessian, constrained")
