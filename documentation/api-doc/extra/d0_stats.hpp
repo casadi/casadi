@@ -16,24 +16,6 @@
 <tr><td>nlp_solver_stats</td><td>CasADi::NLPImplicitInternal</td></tr>
 </table>
 */
-/** \class CasADi::QCQPQPInternal
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
-</table>
-*/
-/** \class CasADi::QCQPQPSolver
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
-</table>
-*/
 /** \class CasADi::SDPSDQPInternal
 \n
 \par
@@ -122,19 +104,11 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>alpha_du</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>alpha_pr</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>con_integer_md</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>con_numeric_md</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>con_string_md</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>d_norm</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>inf_du</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>inf_pr</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>iter</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>iter_count</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>ls_trials</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>mu</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>regularization_size</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>iteration</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>return_status</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>t_callback_fun</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>t_callback_prepare</td><td>CasADi::IpoptInternal</td></tr>
@@ -155,19 +129,11 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>alpha_du</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>alpha_pr</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>con_integer_md</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>con_numeric_md</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>con_string_md</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>d_norm</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>inf_du</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>inf_pr</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>iter</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>iter_count</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>ls_trials</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>mu</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>regularization_size</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>iteration</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>return_status</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>t_callback_fun</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>t_callback_prepare</td><td>CasADi::IpoptInternal</td></tr>
@@ -338,6 +304,24 @@
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>socp_solver_stats</td><td>CasADi::SOCPQCQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::QCQPQPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::QCQPQPSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
 </table>
 */
 /** \class CasADi::NLPQPInternal
