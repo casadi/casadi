@@ -268,9 +268,6 @@ namespace CasADi{
       // Printing information about the actual iterate
       printIteration(cout,iter,fk_,pr_inf,gLag_norminf,dx_norminf,reg_,ls_iter,ls_success);
 	  
-	  // This log entry is here to avoid #822
-      log("Checking Stopping criteria");
-	  
       // Call callback function if present
       if (!callback_.isNull()) {
         if (!output(NLP_SOLVER_F).empty()) output(NLP_SOLVER_F).set(fk_);
