@@ -648,7 +648,6 @@ class MXtests(casadiTestCase):
 
     def fmod(f,x):
       #f.setOption("ad_mode","forward")
-      f.setOption("numeric_jacobian",True)
       f.init()
       J=f.jacobian()
       J.init()
@@ -658,7 +657,6 @@ class MXtests(casadiTestCase):
     
     def fmod(f,x):
       #f.setOption("ad_mode","reverse")
-      f.setOption("numeric_jacobian",True)
       f.init()
       J=f.jacobian()
       J.init()
@@ -674,7 +672,6 @@ class MXtests(casadiTestCase):
 
       def fmod(f,x):
         #f.setOption("ad_mode","forward")
-        f.setOption("numeric_jacobian",True)
         f.init()
         J=f.jacobian()
         J.init()
@@ -684,7 +681,6 @@ class MXtests(casadiTestCase):
       
       def fmod(f,x):
         #f.setOption("ad_mode","reverse")
-        f.setOption("numeric_jacobian",True)
         f.init()
         J=f.jacobian()
         J.init()
@@ -1815,7 +1811,7 @@ class MXtests(casadiTestCase):
     X = F.call([U,U])[0]
     G = F.call([U,X])[0]
 
-    for kk in range(3):
+    for kk in range(2):
       gfcn = 0
       if kk==0:
         tmp = MXFunction([U],[G])
@@ -1823,7 +1819,6 @@ class MXtests(casadiTestCase):
         gfcn = tmp.expand()
       else:
         gfcn = MXFunction([U],[G])
-        gfcn.setOption("numeric_jacobian",kk==1)
       gfcn.setOption("ad_mode","reverse")
       gfcn.init()
       J = gfcn.jacobian()

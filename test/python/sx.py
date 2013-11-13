@@ -136,7 +136,6 @@ class SXtests(casadiTestCase):
 
       def fmod(f,x):
         #f.setOption("ad_mode","forward")
-        f.setOption("numeric_jacobian",True)
         f.init();
         J=f.jacobian()
         J.init()
@@ -146,7 +145,6 @@ class SXtests(casadiTestCase):
       
       def fmod(f,x):
         #f.setOption("ad_mode","reverse")
-        f.setOption("numeric_jacobian",True)
         f.init();
         J=f.jacobian()
         J.init()

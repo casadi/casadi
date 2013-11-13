@@ -612,7 +612,6 @@ namespace CasADi{
     vector<MX> res = shared_from_this<FX>().call(arg);
     MXFunction f(arg,res);
     f.setOption("ad_mode","forward");
-    f.setOption("numeric_jacobian", false);
     f.init();
     return f.jacobian(iind,oind,compact,symmetric);
   }

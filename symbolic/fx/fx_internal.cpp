@@ -53,7 +53,6 @@ namespace CasADi{
     addOption("max_number_of_adj_dir",    OT_INTEGER,             optimized_num_dir,  "Allow \"number_of_adj_dir\" to grow until it reaches this number");
     addOption("verbose",                  OT_BOOLEAN,             false,          "verbose evaluation -- for debugging");
     addOption("store_jacobians",          OT_BOOLEAN,             false,          "keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times");
-    addOption("numeric_jacobian",         OT_BOOLEAN,             false,          "Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method");
     addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians.","forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate");
     addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines. Check documentation of JacobianGenerator.");
     addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines. Check documentation of SparsityGenerator.");
@@ -1587,8 +1586,6 @@ namespace CasADi{
       
       casadi_assert_message(ret.output().size1()==output(oind).size() && ret.output().size2()==input(iind).size(),"FXInternal::jacobian: User supplied jacobianGenerator("<< iind << "," << oind <<") returned " << ret.output().dimString() << ", while shape " <<  output(oind).size() << "-by-" << input(iind).size() << " was expected.");
       
-    } else if(bool(getOption("numeric_jacobian"))){
-      ret = getNumericJacobian(iind,oind,compact,symmetric);
     } else {
       // Use internal routine to calculate Jacobian
       ret = getJacobian(iind,oind,compact, symmetric);
@@ -1819,7 +1816,6 @@ namespace CasADi{
 
   FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric){
     FX f = wrapMXFunction();
-    f.setOption("numeric_jacobian", false); // BUG ?
     f.init();
     return f->getNumericJacobian(iind,oind,compact,symmetric);
   }
