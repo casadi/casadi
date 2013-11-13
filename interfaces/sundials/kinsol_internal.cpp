@@ -457,7 +457,7 @@ namespace CasADi{
       f_.fwdSeed(i+1).setZero();
   
     // Evaluate
-    f_.evaluate(1,0);
+    f_.evaluateOld(1,0);
 
     // Get the output seeds
     f_.getFwdSens(NV_DATA_S(Jv));

@@ -191,7 +191,7 @@ namespace CasADi{
     }
 
     // Evaluate
-    fcn.evaluate(nfdir, nadir);
+    fcn.evaluateOld(nfdir, nadir);
     
     // Get the results
     for(int j=outind_[task]; j<outind_[task+1]; ++j){

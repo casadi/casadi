@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
   F.fwdSeed("A")(2,3)   = 1;
   F.fwdSeed("B")(0,2)   = 2;
   F.adjSeed("X")(0,3)   = 1;
-  F.evaluate(1,1);
+  F.evaluateOld(1,1);
   
   // Print the solution
   cout << "solution (embedded) = " << F.output("X") << endl;

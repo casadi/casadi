@@ -113,7 +113,7 @@ namespace CasADi{
     return ret;
   }
 
-  void FX::evaluate(int nfdir, int nadir){
+  void FX::evaluateOld(int nfdir, int nadir){
     assertInit();
     casadi_assert(nfdir<=(*this)->nfdir_);
     casadi_assert(nadir<=(*this)->nadir_);
@@ -128,7 +128,7 @@ namespace CasADi{
   }
 
   void FX::solve(){
-    evaluate(0,0);
+    evaluate();
   }
 
   int FX::getNumScalarInputs() const{

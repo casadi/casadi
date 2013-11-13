@@ -559,7 +559,7 @@ void IdasInternal::jtimes(double t, const double *xz, const double *xzdot, const
   f_.setFwdSeed(v+nx_,DAE_Z);
   
   // Evaluate the AD forward algorithm
-  f_.evaluate(1,0);
+  f_.evaluateOld(1,0);
   
   // Get the output seeds
   f_.getFwdSens(Jv,DAE_ODE);
@@ -634,7 +634,7 @@ void IdasInternal::jtimesB(double t, const double *xz, const double *xzdot, cons
   }
   
   // Evaluate the AD forward algorithm
-  g_.evaluate(1,0);
+  g_.evaluateOld(1,0);
 
   if(monitored("jtimesB")){
     cout << "fwdSens(RDAE_ODE) = " << g_.fwdSens(RDAE_ODE) << endl;
@@ -700,7 +700,7 @@ void IdasInternal::resS(int Ns, double t, const double* xz, const double* xzdot,
     }
     
     // Evaluate the AD forward algorithm
-    f_.evaluate(nfdir_batch,0);
+    f_.evaluateOld(nfdir_batch,0);
     
     // Get the output seeds
     for(int dir=0; dir<nfdir_batch; ++dir){
@@ -1136,7 +1136,7 @@ void IdasInternal::rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector
     f_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
    
     // Evaluate the AD forward algorithm
-    f_.evaluate(1,0);
+    f_.evaluateOld(1,0);
       
     // Get the output seeds
     f_.getFwdSens(NV_DATA_S(qdotF[i]),DAE_QUAD);

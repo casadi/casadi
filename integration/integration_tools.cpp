@@ -157,7 +157,7 @@ const double** collocation_points[] = {legendre_points,radau_points};
         
         lfcn.setInput(tau_root[j2]);
         lfcn.setFwdSeed(1.0);
-        lfcn.evaluate(1,0);
+        lfcn.evaluateOld(1,0);
         C[j2][j] = lfcn.fwdSens().at(0);
       }
     }

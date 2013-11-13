@@ -708,7 +708,7 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector 
      }
 
      // Evaluate the AD forward algorithm
-     f_.evaluate(nfdir_f_,0);
+     f_.evaluateOld(nfdir_f_,0);
       
      // Get the output seeds
      for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
@@ -747,7 +747,7 @@ void CVodesInternal::rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, 
   f_.setFwdSeed(fwdSeed(INTEGRATOR_P,iS),DAE_P);
     
   // Evaluate the AD forward algorithm
-  f_.evaluate(1,0);
+  f_.evaluateOld(1,0);
   
   // Get the fwd sensitivities
   f_.getFwdSens(NV_DATA_S(xdotF));
@@ -805,7 +805,7 @@ void CVodesInternal::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector 
     f_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
 
     // Evaluate the AD forward algorithm
-    f_.evaluate(1,0);
+    f_.evaluateOld(1,0);
       
     // Get the forward sensitivities
     f_.getFwdSens(NV_DATA_S(qdotF[i]),DAE_QUAD);
@@ -888,7 +888,7 @@ void CVodesInternal::rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector rx, N_Ve
   }
 
   // Evaluate the AD forward algorithm
-  g_.evaluate(nfdir_,0);
+  g_.evaluateOld(nfdir_,0);
     
   // Right hand side
   double *rxdot_data = NV_DATA_S(rxdot);
@@ -1017,7 +1017,7 @@ void CVodesInternal::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vec
   f_.setFwdSeed(0.0,DAE_P);
   
   // Evaluate
-  f_.evaluate(1,0);
+  f_.evaluateOld(1,0);
 
   // Get the output seeds
   f_.getFwdSens(NV_DATA_S(Jv),DAE_ODE);
@@ -1049,7 +1049,7 @@ void CVodesInternal::jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_
   g_.fwdSeed(RDAE_RP).setZero();
   
   // Evaluate
-  g_.evaluate(1,0);
+  g_.evaluateOld(1,0);
 
   // Get the output seeds
   g_.getFwdSens(NV_DATA_S(JvB),DAE_ODE);
