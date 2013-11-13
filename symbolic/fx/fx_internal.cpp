@@ -291,7 +291,7 @@ namespace CasADi{
     vector<MX> res = shared_from_this<FX>().call(arg);
     
     MXFunction f = MXFunction(arg,res);
-    f.setOption("name",STRING("wrap_" << getOption("name")));
+    f.setOption("name","wrap_" + string(getOption("name")));
     f.setInputScheme(getInputScheme());
     f.setOutputScheme(getOutputScheme());
     f.setOption("ad_mode",getOption("ad_mode"));
