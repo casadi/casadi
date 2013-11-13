@@ -136,17 +136,6 @@ for Integrators in (ODE_integrators,DAE_integrators):
     qf_pert = deepcopy(I.getOutput("qf"))
     print "%50s" % "Finite difference approximation:", "d(xf)/d(p) = ", (xf_pert-xf)/h, ", d(qf)/d(p) = ", (qf_pert-qf)/h
 
-    # Operator overloading approach
-    I.setInput(x0,"x0")
-    I.setInput(u0,"p")
-    I.setFwdSeed(DMatrix.zeros(x.shape),"x0")
-    I.setFwdSeed(1.0,"p")
-    I.reset(1,0,0)
-    I.integrate(tf)
-    oo_xf = deepcopy(I.getFwdSens("xf"))
-    oo_qf = deepcopy(I.getFwdSens("qf"))
-    print "%50s" % "Forward sensitivities via OO:", "d(xf)/d(p) = ", oo_xf, ", d(qf)/d(p) = ", oo_qf
-
     # Calculate once, forward
     I_fwd = I.derivative(1,0)
     
@@ -179,6 +168,9 @@ for Integrators in (ODE_integrators,DAE_integrators):
     adj_x0_pert = deepcopy(I_adj.getOutput(INTEGRATOR_NUM_OUT+INTEGRATOR_X0))
     adj_p_pert = deepcopy(I_adj.getOutput(INTEGRATOR_NUM_OUT+INTEGRATOR_P))
     print "%50s" % "FD of adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", (adj_x0_pert-adj_x0)/h, ", d2(qf)/d(p)d(p) = ", (adj_p_pert-adj_p)/h
+
+    # TODO: Change to AD by SCT, #884
+    continue
 
     # Forward over adjoint to get the second order sensitivities
     I_adj.setInput(x0,INTEGRATOR_X0)

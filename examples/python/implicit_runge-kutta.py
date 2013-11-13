@@ -84,11 +84,12 @@ for j in range(d+1):
   D[j] = lfcn.getOutput()
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+  tfcn = lfcn.tangent()
+  tfcn.init()
   for r in range(d+1):
-    lfcn.setInput(tau_root[r])
-    lfcn.setFwdSeed(1.0)
-    lfcn.evaluate(1,0)
-    C[j,r] = lfcn.getFwdSens()
+    tfcn.setInput(tau_root[r])
+    tfcn.evaluate()
+    C[j,r] = tfcn.getOutput()
 
 # Total number of variables for one finite element
 X0 = msym("X0",nx)
@@ -164,32 +165,36 @@ for integrator in (irk_integrator,ref_integrator):
   print "Testing ", integrator.getOption("name")
   print "-------"
 
+
+  # Generate new functions that calculates two forward directions and one adjoint direction
+  dintegrator = integrator.derivative(2,1)
+
   # Pass arguments
-  integrator.setInput(x0_val,"x0")
-  integrator.setInput(p_val,"p")
+  dintegrator.setInput(x0_val,"x0")
+  dintegrator.setInput(p_val,"p")
   
   # Forward sensitivity analysis, first direction: seed p
-  integrator.setFwdSeed(0.0,"x0",0)
-  integrator.setFwdSeed(1.0,"p",0)
+  dintegrator.setInput(0.0,"fwd0_x0")
+  dintegrator.setInput(1.0,"fwd0_p")
   
   # Forward sensitivity analysis, second direction: seed x0[0]
-  integrator.setFwdSeed([1,0,0],"x0",1)
-  integrator.setFwdSeed(0.0,"p",1)
+  dintegrator.setInput([1,0,0],"fwd1_x0")
+  dintegrator.setInput(0.0,"fwd1_p")
   
   # Adjoint sensitivity analysis, seed xf[2]
-  integrator.setAdjSeed([0,0,1],"xf")
+  dintegrator.setInput([0,0,1],"adj0_xf")
 
   # Integrate
-  integrator.evaluate(2,1)
+  dintegrator.evaluate()
 
   # Get the nondifferentiated results
-  print "%15s = " % "xf", integrator.getOutput("xf")
+  print "%15s = " % "xf", dintegrator.getOutput("xf")
 
   # Get the forward sensitivities
-  print "%15s = " % "d(xf)/d(p)", integrator.getFwdSens("xf",0)
-  print "%15s = " % "d(xf)/d(x0[0])", integrator.getFwdSens("xf",1)
+  print "%15s = " % "d(xf)/d(p)", dintegrator.getOutput("fwd0_xf")
+  print "%15s = " % "d(xf)/d(x0[0])", dintegrator.getOutput("fwd1_xf")
 
   # Get the adjoint sensitivities
-  print "%15s = " % "d(xf[2])/d(x0)", integrator.getAdjSens("x0")
-  print "%15s = " % "d(xf[2])/d(p)", integrator.getAdjSens("p")
+  print "%15s = " % "d(xf[2])/d(x0)", dintegrator.getOutput("adj0_x0")
+  print "%15s = " % "d(xf[2])/d(p)", dintegrator.getOutput("adj0_p")
 
