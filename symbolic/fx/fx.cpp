@@ -149,6 +149,11 @@ namespace CasADi{
     return (*this)->gradient(iind,oind);
   }
 
+  FX FX::tangent(int iind, int oind){
+    assertInit();
+    return (*this)->tangent(iind,oind);
+  }
+
   FX FX::hessian(int iind, int oind){
     assertInit();
     return (*this)->hessian(iind,oind);  

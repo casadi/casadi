@@ -112,6 +112,10 @@ SXMatrix SXFunction::grad(int iind, int oind){
   return (*this)->grad(iind,oind);
 }
 
+SXMatrix SXFunction::tang(int iind, int oind){
+  return (*this)->tang(iind,oind);
+}
+
 SXMatrix SXFunction::hess(int iind, int oind){
   return (*this)->hess(iind,oind);
 }

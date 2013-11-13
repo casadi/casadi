@@ -246,6 +246,33 @@ namespace CasADi{
     
     return ret;
   }
+
+  FX FXInternal::tangent(int iind, int oind){
+    // Assert scalar
+    casadi_assert_message(input(iind).scalar(),"Only tangent of scalar input functions allowed. Use jacobian instead.");
+  
+    // Generate gradient function
+    FX ret = getTangent(iind,oind);
+  
+    // Give it a suitable name
+    stringstream ss;
+    ss << "tangent_" << getOption("name") << "_" << iind << "_" << oind;
+    ret.setOption("name",ss.str());
+
+    ret.setInputScheme(inputScheme_);
+    
+    // Output names
+    std::vector<std::string> ionames;
+    ionames.reserve(ret.getNumOutputs());   
+    ionames.push_back("tangent");
+    for (int i=0;i<getNumOutputs();++i) {
+      ionames.push_back(outputScheme_.entryLabel(i));
+    }
+    
+    ret.setOutputScheme(ionames);
+    
+    return ret;
+  }
   
   FX FXInternal::hessian(int iind, int oind){
     log("FXInternal::hessian");
@@ -281,6 +308,12 @@ namespace CasADi{
     FX f = wrapMXFunction();
     f.init();
     return f.gradient(iind,oind);
+  }
+
+  FX FXInternal::getTangent(int iind, int oind){
+    FX f = wrapMXFunction();
+    f.init();
+    return f.tangent(iind,oind);
   }
   
   MXFunction FXInternal::wrapMXFunction() {

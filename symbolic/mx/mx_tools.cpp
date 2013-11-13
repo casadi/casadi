@@ -805,6 +805,12 @@ namespace CasADi{
     return temp.grad();
   }
 
+  MX tangent(const MX& ex, const MX &arg) {
+    MXFunction temp(arg,ex); // make a runtime
+    temp.init();
+    return temp.tang();
+  }
+
   MX blockcat(const std::vector< std::vector<MX > > &v) {
     std::vector< MX > ret;
     for(int i=0; i<v.size(); ++i)

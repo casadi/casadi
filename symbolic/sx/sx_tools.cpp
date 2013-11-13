@@ -418,6 +418,12 @@ SXMatrix gradient(const SXMatrix& ex, const SXMatrix &arg) {
   temp.init();
   return temp.grad();
 }
+
+SXMatrix tangent(const SXMatrix& ex, const SXMatrix &arg) {
+  SXFunction temp(arg,ex); // make a runtime
+  temp.init();
+  return temp.tang();
+}
   
 SXMatrix jacobian(const SXMatrix& ex, const SXMatrix &arg) {
   SXFunction temp(arg,ex); // make a runtime

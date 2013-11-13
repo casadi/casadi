@@ -141,6 +141,12 @@ namespace CasADi{
     //@}
 
     //@{
+    /** \brief Return tangent function */
+    FX tangent(int iind, int oind);
+    virtual FX getTangent(int iind, int oind);
+    //@}
+
+    //@{
     /** \brief Return Jacobian function */
     FX jacobian(int iind, int oind, bool compact, bool symmetric);
     virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);

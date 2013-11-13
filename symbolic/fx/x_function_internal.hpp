@@ -72,12 +72,18 @@ namespace CasADi{
              
     /** \brief Gradient via source code transformation */
     MatType grad(int iind=0, int oind=0);
+
+    /** \brief Tangent via source code transformation */
+    MatType tang(int iind=0, int oind=0);
   
     /** \brief  Construct a complete Jacobian by compression */
     MatType jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false, bool always_inline=true, bool never_inline=false);
 
     /** \brief Return gradient function  */
     virtual FX getGradient(int iind, int oind);
+
+    /** \brief Return tangent function  */
+    virtual FX getTangent(int iind, int oind);
 
     /** \brief Return Jacobian function  */
     virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
@@ -524,6 +530,32 @@ namespace CasADi{
     return asens[0].at(iind);
   }
 
+  template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+  MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::tang(int iind, int oind){
+    casadi_assert_message(input(iind).scalar(),"Only tangent of scalar input functions allowed. Use jacobian instead.");
+  
+    // Forward seeds
+    typename std::vector<std::vector<MatType> > fseed(1,std::vector<MatType>(inputv_.size()));
+    for(int i=0; i<inputv_.size(); ++i){
+      fseed[0][i] = MatType(inputv_[i].sparsity(),i==iind ? 1 : 0);
+    }
+
+    // Dummy adjoint seeds and sensitivities
+    typename std::vector<std::vector<MatType> > aseed, asens;
+    
+    // Forward sensitivities
+    std::vector<std::vector<MatType> > fsens(1,std::vector<MatType>(outputv_.size()));
+    for(int i=0; i<outputv_.size(); ++i){
+      fsens[0][i] = MatType(outputv_[i].sparsity());
+    }
+  
+    // Calculate with adjoint mode AD
+    std::vector<MatType> res(outputv_);
+    call(inputv_,res,fseed,fsens,aseed,asens,true,false);
+  
+    // Return adjoint directional derivative
+    return fsens[0].at(oind);
+  }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline){
@@ -845,6 +877,18 @@ namespace CasADi{
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
     ret_out.push_back(grad(iind,oind));
+    ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
+  
+    // Return function
+    return PublicType(inputv_,ret_out);  
+  }
+
+  template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+  FX XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getTangent(int iind, int oind){
+    // Create expressions for the gradient
+    std::vector<MatType> ret_out;
+    ret_out.reserve(1+outputv_.size());
+    ret_out.push_back(tang(iind,oind));
     ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
   
     // Return function

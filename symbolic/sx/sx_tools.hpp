@@ -291,6 +291,7 @@ Uses CasADi::SXFunction::jac
  */
 SXMatrix jacobian(const SXMatrix &ex, const SXMatrix &arg);
 SXMatrix gradient(const SXMatrix &ex, const SXMatrix &arg);
+SXMatrix tangent(const SXMatrix &ex, const SXMatrix &arg);
 SXMatrix hessian(const SXMatrix &ex, const SXMatrix &arg);
 void hessian(const SXMatrix &ex, const SXMatrix &arg, SXMatrix &H, SXMatrix &g); // hessian and gradient
 //@}

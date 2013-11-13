@@ -128,6 +128,10 @@ MX MXFunction::grad(int iind, int oind){
   return (*this)->grad(iind,oind);
 }
 
+MX MXFunction::tang(int iind, int oind){
+  return (*this)->tang(iind,oind);
+}
+
 SXFunction MXFunction::expand(const std::vector<SXMatrix>& inputv){
   return (*this)->expand(inputv);
 }

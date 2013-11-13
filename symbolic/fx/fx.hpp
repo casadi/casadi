@@ -193,6 +193,21 @@ namespace CasADi{
     FX gradient(int iind, const std::string& oname) { return gradient(iind,outputSchemeEntry(oname)); }
     FX gradient(const std::string& iname, const std::string& oname) { return gradient(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
+
+    //@{
+    /** \brief Generate a tangent function of output oind with respect to input iind
+     * \param iind The index of the input
+     * \param oind The index of the output
+     *
+     * The default behavior of this class is defined by the derived class.
+     * Note that the input must be scalar. In other cases, use the Jacobian instead.
+     * 
+     */
+    FX tangent(int iind=0, int oind=0);
+    FX tangent(const std::string& iname, int oind=0) { return tangent(inputSchemeEntry(iname),oind); }
+    FX tangent(int iind, const std::string& oname) { return tangent(iind,outputSchemeEntry(oname)); }
+    FX tangent(const std::string& iname, const std::string& oname) { return tangent(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    //@}
     
     //@{
     /** \brief Generate a Hessian function of output oind with respect to input iind 

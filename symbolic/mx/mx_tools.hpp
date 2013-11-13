@@ -395,6 +395,7 @@ namespace CasADi{
   */
   MX jacobian(const MX &ex, const MX &arg);
   MX gradient(const MX &ex, const MX &arg);
+  MX tangent(const MX &ex, const MX &arg);
   //@}
 
   /** \brief Matrix determinant (experimental) */
