@@ -1051,7 +1051,7 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
     } else if(A.size1()<=3){
       
       // Form inverse by minor expansion and multiply if very small (up to 3-by-3)
-      xperm = mul(inv(A),bperm);
+      xperm = mul(inv(Aperm),bperm);
 
     } else {
       
