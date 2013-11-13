@@ -82,7 +82,6 @@ SET(CASADI_SRCS
   fx/mx_function.hpp         fx/mx_function.cpp         fx/mx_function_internal.hpp         fx/mx_function_internal.cpp
   fx/custom_function.hpp     fx/custom_function.cpp     fx/custom_function_internal.hpp     fx/custom_function_internal.cpp
   fx/compiled_function.hpp   fx/compiled_function.cpp   fx/compiled_function_internal.hpp   fx/compiled_function_internal.cpp
-  fx/derivative.hpp          fx/derivative.cpp          fx/derivative_internal.hpp          fx/derivative_internal.cpp
   fx/linear_solver.hpp       fx/linear_solver.cpp       fx/linear_solver_internal.hpp       fx/linear_solver_internal.cpp
   fx/symbolic_qr.hpp         fx/symbolic_qr.cpp         fx/symbolic_qr_internal.hpp         fx/symbolic_qr_internal.cpp
   fx/implicit_function.hpp   fx/implicit_function.cpp   fx/implicit_function_internal.hpp   fx/implicit_function_internal.cpp

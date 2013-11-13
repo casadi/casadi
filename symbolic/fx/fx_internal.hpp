@@ -111,7 +111,7 @@ namespace CasADi{
     /** \brief  Create derivative node */
     virtual void createCallDerivative(const std::vector<MX> &arg, std::vector<MX> &res, 
                                       const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
-                                      const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens, bool cached);
+                                      const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens);
 
     /** \brief  Create a call to this */
     std::vector<MX> callSelf(const std::vector<MX> &arg);
@@ -164,9 +164,6 @@ namespace CasADi{
 
     /** \brief Constructs and returns a function that calculates forward derivatives by creating the Jacobian then multiplying */
     virtual FX getDerivativeViaJac(int nfwd, int nadj);
-
-    /** \brief Constructs and returns a function for calculating derivatives via operator overloading */
-    virtual FX getDerivativeViaOO(int nfwd, int nadj);
 
     //@}
     

@@ -30,7 +30,6 @@
 #include "../mx/mx_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
 #include "compiled_function.hpp"
-#include "derivative.hpp"
 
 #include "../casadi_options.hpp"
 #include "../profiling.hpp"
@@ -1740,21 +1739,13 @@ namespace CasADi{
     } else if (nfwd>0 && nfdir_==0) {
       return getDerivativeViaJac(nfwd,nadj);
     }
-    Derivative d(shared_from_this<FX>(),nfwd,nadj);
-    
-    return d;
+    casadi_error("getDerivative failed");
   }
 
   FX FXInternal::getDerivativeViaJac(int nfwd, int nadj){
     FX f = wrapMXFunction();
     f.init();
     return f->getDerivativeViaJac(nfwd,nadj);
-  }
-
-  FX FXInternal::getDerivativeViaOO(int nfwd, int nadj){
-    Derivative ret(shared_from_this<FX>(),nfwd,nadj);
-    ret.init();
-    return ret;
   }
 
   int FXInternal::getNumScalarInputs() const{
@@ -2195,7 +2186,7 @@ namespace CasADi{
       res = callSelf(arg);
     } else {
       // Create derivative node
-      createCallDerivative(arg,res,fseed,fsens,aseed,asens,false);
+      createCallDerivative(arg,res,fseed,fsens,aseed,asens);
     }
   }
 
@@ -2205,7 +2196,7 @@ namespace CasADi{
 
   void FXInternal::createCallDerivative(const std::vector<MX>& arg, std::vector<MX>& res, 
                                         const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens,
-                                        const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens, bool cached) {
+                                        const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens) {
                                         
     
     // Number of directional derivatives
@@ -2217,17 +2208,7 @@ namespace CasADi{
     int num_out = getNumOutputs();
 
     // Create derivative function
-    FX dfcn;
-    if(cached){
-      dfcn = derivative(nfdir,nadir);
-    } else {
-      dfcn = getDerivativeViaOO(nfdir,nadir);
-      stringstream ss;
-      ss << "der_" << getOption("name") << "_" << nfdir << "_" << nadir;
-      dfcn.setOption("verbose",getOption("verbose"));
-      dfcn.setOption("name",ss.str());
-      dfcn.init();
-    }
+    FX dfcn = derivative(nfdir,nadir);
     
     // All inputs
     vector<MX> darg;
@@ -2290,7 +2271,7 @@ namespace CasADi{
     if (fwdSens.size()==0 && adjSens.size()==0) {
       res = callSelf(arg);
     } else {
-      createCallDerivative(arg,res,fseed,fsens,aseed,asens,true);
+      createCallDerivative(arg,res,fseed,fsens,aseed,asens);
     }
     
     // Store the non-differentiated results
