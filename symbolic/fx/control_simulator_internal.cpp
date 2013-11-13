@@ -400,7 +400,7 @@ void ControlSimulatorInternal::evaluate(int nfdir, int nadir){
     }
   }
   
-  all_output_.evaluate(nfdir,nadir);
+  all_output_.evaluateOld(nfdir,nadir);
   
   // Copy all outputs
   for (int i=0;i<output_.size();++i) {

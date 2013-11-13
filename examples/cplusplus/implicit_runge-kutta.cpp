@@ -98,7 +98,7 @@ int main(){
     for(int r=0; r<d+1; ++r){
       lfcn.setInput(tau_root[r]);
       lfcn.setFwdSeed(1.0);
-      lfcn.evaluate(1,0);
+      lfcn.evaluateOld(1,0);
       lfcn.getFwdSens(C[j][r]);
     }
   }
@@ -212,7 +212,7 @@ int main(){
     integrator.setAdjSeed(xf_seed,"xf");
 
     // Integrate
-    integrator.evaluate(2,1);
+    integrator.evaluateOld(2,1);
 
     // Get the nondifferentiated results
     cout << setw(15) << "xf = " << integrator.output("xf") << endl;

@@ -167,7 +167,7 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     }
 
     // Evaluate output function
-    output_fcn_.evaluate(nfdir);
+    output_fcn_.evaluateOld(nfdir);
 
     // Save the output of the function
     for(int i=0; i<output_.size(); ++i){

@@ -206,7 +206,7 @@ namespace CasADi{
     }
   
     // Evaluate
-    f_.evaluate(nfdir,nadir);
+    f_.evaluateOld(nfdir,nadir);
   
     // Get the forward sensitivities
     for(int dir=0; dir<nfdir; ++dir){

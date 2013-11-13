@@ -124,7 +124,7 @@ namespace CasADi{
       for(int j2=0; j2<deg+1; ++j2){
         lfcn.setInput(tau_root[j2]);
         lfcn.setFwdSeed(1.0);
-        lfcn.evaluate(1,0);
+        lfcn.evaluateOld(1,0);
         C[j][j2] = lfcn.fwdSens();
         C_num(j,j2) = lfcn.fwdSens();
       }

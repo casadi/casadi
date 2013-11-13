@@ -159,7 +159,7 @@ int main() {
   detFun.setAdjSeed(1.);
 
   time1 = clock();
-  detFun.evaluate(0,1);
+  detFun.evaluateOld(0,1);
   time2 = clock();
   cout << "evaluated adj: "<< (double(time2 - time1)/CLOCKS_PER_SEC*1000) << " ms" << endl;
   
