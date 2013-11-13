@@ -136,48 +136,7 @@ class ADtests(casadiTestCase):
         "sparse" : lambda x,y,z,w:  array([[1,0,0,0,0,0],[0,0,0,0,0,0],[1,0,4*y,0,0,0],[0,0,0,0,0,0],[1,0,6*y**2,0,12*z**3,0],[0,0,0,0,0,1]])
       }
     }
-  
-  
-  def test_fwd(self):
-    n=array([1.2,2.3,7,1.4])
-    for inputshape in ["column","row","matrix"]:
-      for outputshape in ["column","row","matrix"]:
-        for inputtype in ["sparse","dense"]:
-          for outputtype in ["sparse","dense"]:
-            self.message("fwd AD on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
-            f.init()
-            f.setInput(n)
-            self.assertEqual(f.fwdSeed().shape,f.input().shape,"fwdSeed shape")
-            self.assertEqual(f.fwdSeed().size(),f.input().size(),"fwdSeed shape")
-            J = self.jacobians[inputtype][outputtype](*n)
-            for d in [array([1,0,0,0]),array([0,2,0,0]),array([1.2,4.8,7.9,4.6])]:
-              f.setFwdSeed(d)
-              f.evaluate(1,0)
-              seed = array(f.getFwdSeed()).ravel()
-              sens = array(f.getFwdSens()).ravel()
-              self.checkarray(sens,dot(J,seed),"AD")
-
-  def test_adj(self):
-    n=array([1.2,2.3,7,1.4])
-    for inputshape in ["column","row","matrix"]:
-      for outputshape in ["column","row","matrix"]:
-        for inputtype in ["sparse","dense"]:
-          for outputtype in ["sparse","dense"]:
-            self.message("adj AD on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
-            f.init()
-            f.setInput(n)
-            self.assertEqual(f.adjSeed().shape,f.output().shape,"adjSeed shape")
-            self.assertEqual(f.adjSeed().size(),f.output().size(),"adjSeed shape")
-            J = self.jacobians[inputtype][outputtype](*n)
-            for d in [array([1,0,0,0]),array([0,2,0,0]),array([1.2,4.8,7.9,4.7])]:
-              f.setAdjSeed(d)
-              f.evaluate(0,1)
-              seed = array(f.getAdjSeed()).ravel()
-              sens = array(f.getAdjSens()).ravel()
-              self.checkarray(sens,dot(J.T,seed),"AD")
-              
+                
   def test_SXevalSX(self):
     n=array([1.2,2.3,7,1.4])
     for inputshape in ["column","row","matrix"]:
@@ -223,46 +182,6 @@ class ADtests(casadiTestCase):
               fe.setInput(n)
               fe.evaluate()
               self.checkarray(c.flatten(fe.getOutput()),mul(J.T,c.flatten(seed)),"AD") 
-
-  def test_fwdMX(self):
-    n=array([1.2,2.3,7,1.4])
-    for inputshape in ["column","row","matrix"]:
-      for outputshape in ["column","row","matrix"]:
-        for inputtype in ["dense","sparse"]:
-          for outputtype in ["dense","sparse"]:
-            self.message("fwd AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-            f.init()
-            f.setInput(n)
-            self.assertEqual(f.fwdSeed().shape,f.input().shape,"fwdSeed shape")
-            self.assertEqual(f.fwdSeed().size(),f.input().size(),"fwdSeed shape")
-            J = self.jacobians[inputtype][outputtype](*n)
-            for d in [array([1,0,0,0]),array([0,2,0,0]),array([1.2,4.8,7.9,4.6])]:
-              f.setFwdSeed(d)
-              f.evaluate(1,0)
-              seed = array(f.getFwdSeed()).ravel()
-              sens = array(f.getFwdSens()).ravel()
-              self.checkarray(sens,dot(J,seed),"AD")    
-
-  def test_adjMX(self):
-    n=array([1.2,2.3,7,1.4])
-    for inputshape in ["column","row","matrix"]:
-      for outputshape in ["column","row","matrix"]:
-        for inputtype in ["dense","sparse"]:
-          for outputtype in ["dense","sparse"]:
-            self.message("adj AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
-            f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
-            f.init()
-            f.setInput(n)
-            self.assertEqual(f.adjSeed().shape,f.output().shape,"adjSeed shape")
-            self.assertEqual(f.adjSeed().size(),f.output().size(),"adjSeed shape")
-            J = self.jacobians[inputtype][outputtype](*n)
-            for d in [array([1,0,0,0]),array([0,2,0,0]),array([1.2,4.8,7.9,4.3])]:
-              f.setAdjSeed(d)
-              f.evaluate(0,1)
-              seed = array(f.getAdjSeed()).ravel()
-              sens = array(f.getAdjSens()).ravel()
-              self.checkarray(sens,dot(J.T,seed),"AD")
               
   def test_MXevalMX(self):
     n=array([1.2,2.3,7,1.4])
@@ -543,6 +462,9 @@ class ADtests(casadiTestCase):
     
     
   def test_MX(self):
+    # commented out, uses directional derivatives #884
+    return
+
     x = msym("x",2)
     y = msym("y",2,2)
     

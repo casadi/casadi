@@ -37,14 +37,14 @@ class FXtests(casadiTestCase):
     
     for f in [fsx,fmx1,fmx2]:
       f.init()
-      f.evaluate(1,1)
+      f.evaluate()
 
       X = msym("X",2)
       F = f.call([X,X])[0]
       g = MXFunction([X],[F])
       g.init()
 
-      g.evaluate(1,1)
+      g.evaluate()
     
     x = ssym("x",2)
     fsx = SXFunction([x],[x,[]])
@@ -54,14 +54,14 @@ class FXtests(casadiTestCase):
     
     for f in [fsx,fmx1,]:
       f.init()
-      f.evaluate(1,1)
+      f.evaluate()
 
       X = msym("X",2)
       F = f.call([X])[0]
       g = MXFunction([X],[F])
       g.init()
 
-      g.evaluate(1,1)
+      g.evaluate()
   
   def test_Parallelizer(self):
     self.message("Parallelizer")
@@ -88,26 +88,11 @@ class FXtests(casadiTestCase):
       p.setInput(n2,2)
       p.setInput(N2,3)
       
-      p.setFwdSeed(0,0)
-      p.setFwdSeed(1,1)
-      p.setFwdSeed([1,0],2)
-      p.setFwdSeed(0,3)
-      
-      p.setAdjSeed([1,0],0)
-      p.setAdjSeed([0,1],1)
-      
-      p.evaluate(1,1)
+      p.evaluate()
 
       self.checkarray(sin(n1)+N1,p.getOutput(0),"output")
       self.checkarray(sin(n2)+N2,p.getOutput(1),"output")
-      self.checkarray(array([1,1]),p.getFwdSens(0),"fwdSens")
-      self.checkarray(array([cos(n2[0]),0]),p.getFwdSens(1),"fwdSens")
       
-      self.checkarray(array([cos(n1[0]),0]),p.getAdjSens(0),"adjSens")
-      self.checkarray(1,p.getAdjSens(1),"adjSens")
-      self.checkarray(array([0,cos(n2[1])]),p.getAdjSens(2),"adjSens")
-      self.checkarray(1,p.getAdjSens(3),"adjSens")
-
   def test_MXFunctionSeed(self):
     self.message("MXFunctionSeed")
     x1 = MX("x",2)
@@ -126,27 +111,12 @@ class FXtests(casadiTestCase):
     p.setInput(N1,1)
     p.setInput(n2,2)
     p.setInput(N2,3)
-    
-    p.setFwdSeed(0,0)
-    p.setFwdSeed(1,1)
-    p.setFwdSeed([1,0],2)
-    p.setFwdSeed(0,3)
-    
-    p.setAdjSeed([1,0],0)
-    p.setAdjSeed([0,1],1)
-    
-    p.evaluate(1,1)
+        
+    p.evaluate()
 
     self.checkarray(sin(n1)+N1,p.getOutput(0),"output")
     self.checkarray(sin(n2)+N2,p.getOutput(1),"output")
-    self.checkarray(array([1,1]),p.getFwdSens(0),"fwdSens")
-    self.checkarray(array([cos(n2[0]),0]),p.getFwdSens(1),"fwdSens")
-    
-    self.checkarray(array([cos(n1[0]),0]),p.getAdjSens(0),"adjSens")
-    self.checkarray(1,p.getAdjSens(1),"adjSens")
-    self.checkarray(array([0,cos(n2[1])]),p.getAdjSens(2),"adjSens")
-    self.checkarray(1,p.getAdjSens(3),"adjSens")
-    
+        
   def test_Parallelizer2(self):
     self.message("Parallelizer")
     x = MX("x",2)
@@ -178,30 +148,11 @@ class FXtests(casadiTestCase):
       p.setInput(n2,2)
       p.setInput(N2,3)
       
-      p.setFwdSeed(0,0)
-      p.setFwdSeed(1,1)
-      p.setFwdSeed([1,0],2)
-      p.setFwdSeed(0,3)
-      
-      p.setAdjSeed([1,0],0)
-      p.setAdjSeed([0,1],1)
-      
-      for i in range(4):
-        p.setAdjSens(0,i)
-
-      
-      p.evaluate(1,1)
+      p.evaluate()
 
       self.checkarray(sin(n1)+N1,p.getOutput(0),"output")
       self.checkarray(sin(n2)+N2,p.getOutput(1),"output")
-      self.checkarray(array([1,1]),p.getFwdSens(0),"fwdSens")
-      self.checkarray(array([cos(n2[0]),0]),p.getFwdSens(1),"fwdSens")
-      
-      self.checkarray(array([cos(n1[0]),0]),p.getAdjSens(0),"adjSens")
-      self.checkarray(1,p.getAdjSens(1),"adjSens")
-      self.checkarray(array([0,cos(n2[1])]),p.getAdjSens(2),"adjSens")
-      self.checkarray(1,p.getAdjSens(3),"adjSens")
-    
+          
   def test_ParallelizerMXCall(self):
     self.message("MX parallel call")
     x = MX("x",2)
@@ -229,26 +180,10 @@ class FXtests(casadiTestCase):
     p.setInput(n2,2)
     p.setInput(N2,3)
     
-    p.setFwdSeed(0,0)
-    p.setFwdSeed(1,1)
-    p.setFwdSeed([1,0],2)
-    p.setFwdSeed(0,3)
-    
-    p.setAdjSeed([1,0],0)
-    p.setAdjSeed([0,1],1)
-    
-    p.evaluate(1,1)
+    p.evaluate()
 
     self.checkarray(sin(n1)+N1,p.getOutput(0),"output")
     self.checkarray(sin(n2)+N2,p.getOutput(1),"output")
-    self.checkarray(array([1,1]),p.getFwdSens(0),"fwdSens")
-    self.checkarray(array([cos(n2[0]),0]),p.getFwdSens(1),"fwdSens")
-
-
-    self.checkarray(array([cos(n1[0]),0]),p.getAdjSens(0),"adjSens")
-    self.checkarray(1,p.getAdjSens(1),"adjSens")
-    self.checkarray(array([0,cos(n2[1])]),p.getAdjSens(2),"adjSens")
-    self.checkarray(1,p.getAdjSens(3),"adjSens")
 
   def test_set_wrong(self):
     self.message("setter, wrong sparsity")

@@ -283,8 +283,8 @@ class casadiTestCase(unittest.TestCase):
     solution_inputs = [ DMatrix(solution.getInput(k)) for k in range(solution.getNumInputs())] 
 
     try:
-      trial.evaluate(0,0)
-      solution.evaluate(0,0)
+      trial.evaluate()
+      solution.evaluate()
     except Exception as e:
       raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for: %s" % (0,0,failmessage) )
 
@@ -303,8 +303,8 @@ class casadiTestCase(unittest.TestCase):
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
       
     try:
-      trial.evaluate(0,0)
-      solution.evaluate(0,0)
+      trial.evaluate()
+      solution.evaluate()
     except Exception as e:
       raise Exception(str(e) + "\nThis occured for repeated evaluate(%d,%d) for: %s" % (0,0,failmessage) )
 
@@ -322,54 +322,6 @@ class casadiTestCase(unittest.TestCase):
       if (allow_empty and (trial.output(i).empty() or solution.output(i).empty() )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
     
-    if fwd:
-      fsm = 1.7
-      for i in range(trial.getNumInputs()):
-        for j in range(min(trial.input(i).size(),solution.input(i).size())):
-          trial.setFwdSeed(0,i)
-          solution.setFwdSeed(0,i)
-          trial.fwdSeed(i)[j]=fsm
-          solution.fwdSeed(i)[j]=fsm
-          
-          try:
-            trial.evaluate(fwd,0)
-            solution.evaluate(fwd,0)
-          except Exception as e:
-            raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for fwdSeed(%d)[%d]=1 for: %s" % (fwd,0,i,j,failmessage) )
-          
-          for k in range(trial.getNumOutputs()):
-            if (allow_empty and (trial.output(k).empty() or solution.output(k).empty() )): continue
-            message="fwdSeed(%d)[%d]=1 => fwdSens(%d)" % (i,j,k)
-            if verbose: print message + ": " + str(trial.getFwdSens(k))
-            self.checkarray(trial.getFwdSens(k),solution.getFwdSens(k),"",digits=digits_sens,failmessage=failmessage+": "+message)
-            
-          trial.setFwdSeed(0,i)
-          solution.setFwdSeed(0,i)
-        
-    if adj:
-      asm = 1.7
-      for i in range(trial.getNumOutputs()):
-        for j in range(min(trial.output(i).size(),solution.output(i).size())):
-          trial.setAdjSeed(0,i)
-          solution.setAdjSeed(0,i)
-          trial.adjSeed(i)[j]=asm
-          solution.adjSeed(i)[j]=asm
-          
-          try:
-            trial.evaluate(0,adj)
-            solution.evaluate(0,adj)
-          except Exception as e:
-            raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for adjSeed(%d)[%d]=1 for: %s" % (0,adj,i,j,failmessage) )
-
-          for k in range(trial.getNumInputs()):
-            if (allow_empty and (trial.input(k).empty() or solution.input(k).empty() )): continue
-            message="adjSeed(%d)[%d]=1 => adjSens(%d)" % (i,j,k)
-            if verbose: print message + ": " + str(trial.getAdjSens(k))
-            self.checkarray(trial.getAdjSens(k),solution.getAdjSens(k),"",digits=digits_sens,failmessage=failmessage+": "+message)
-            
-          trial.setAdjSeed(0,i)
-          solution.setAdjSeed(0,i)
-
     for i in range(trial.getNumInputs()):
       message = "input(%d) modified by evaluate" % i
       self.checkarray(trial.getInput(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)

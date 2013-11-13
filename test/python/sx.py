@@ -327,7 +327,7 @@ class SXtests(casadiTestCase):
     self.checkarray(J.getOutput(0),Jr,"SXfunction jacobian evaluates incorrectly")
           
   def test_SX2(self):
-    self.message("SXFunction evalution + forward and adjoint seeds")
+    self.message("SXFunction evalution 2")
     fun = lambda x,y: [3-sin(x*x)-y, sqrt(y)*x]
     # variables
     x = SX("x")
@@ -352,47 +352,13 @@ class SXtests(casadiTestCase):
     L=[2,3]
     fcn.setInput(L)
 
-    # Pass forward seed
-    sF=[1,0]
-    fcn.setFwdSeed(sF);
-
-    sA=[1,0]
-    # Pass adjoint seed
-    fcn.setAdjSeed(sA)
-
     # Evaluate numerically
-    fcn.evaluate(1,1)
+    fcn.evaluate()
 
     # Get the results
     res = tuple(fcn.output().data())
     self.assertAlmostEqual(res[0], fun(*L)[0],10,'SXfunction evaluation wrong')
     self.assertAlmostEqual(res[1], fun(*L)[1],10,'SXfunction evaluation wrong')
-
-    fsens = tuple(fcn.fwdSens().data())
-    e=1e-8
-    p=fun((L[0]+e*sF[0]),(L[1]+e*sF[1]))
-    fsensn=[(p[0]-res[0])/e,(p[1]-res[1])/e]
-    self.assertAlmostEqual(fsensn[0], fsens[0],6,'SXfunction forward mode evaluation wrong')
-    self.assertAlmostEqual(fsensn[1], fsens[1],6,'SXfunction forward mode evaluation wrong')
-    
-    J=fcn.jacobian()
-    J.init()
-    J.setInput(L)
-    J.evaluate()
-    J=J.output(0).toArray()
-    
-    fsensJ=dot(J,array(sF))
-    self.assertAlmostEqual(fsensJ[0], fsens[0],10,'SXfunction forward mode evaluation wrong')
-    self.assertAlmostEqual(fsensJ[1], fsens[1],10,'SXfunction forward mode evaluation wrong')
-    
-    asens = tuple(fcn.adjSens().data())
-    asensJ=dot(J.T,array(sA))
-    self.assertAlmostEqual(asensJ[0], asens[0],10,'SXfunction adjoint mode evaluation wrong')
-    self.assertAlmostEqual(asensJ[1], asens[1],10,'SXfunction adjoint mode evaluation wrong')
-
-    # evaluate symbolically
-    fsubst = fcn.eval([vertcat([1-y,1-x])])
-    #print "fsubst = ", fsubst
     
   def test_SXFunctionc(self):
     self.message("SXFunction constructors")
@@ -648,19 +614,13 @@ class SXtests(casadiTestCase):
     f = SXFunction([x],[x**2,[]])
     f.init()
 
-
     self.assertTrue(f.output(1).empty())
-    f.evaluate(1,1)
-    self.assertTrue(f.fwdSens(1).empty())
-    self.assertTrue(f.adjSeed(1).empty())
     
     f = SXFunction([x,[]],[x**2,[]])
     f.init()
 
     self.assertTrue(f.output(1).empty())
-    f.evaluate(1,1)
-    self.assertTrue(f.fwdSens(1).empty())
-    self.assertTrue(f.adjSeed(1).empty())
+    f.evaluate()
     
     r = f.eval([x,[]])
     self.assertTrue(r[1].empty())
@@ -718,47 +678,6 @@ class SXtests(casadiTestCase):
     
     test(mtaylor(sin(x+y),vertcat([x,y]),vertcat([0,0]),4,[1,2]),(-3*x_**2*y_-x_**3)/6+y_+x_)
     
-  def test_issue104(self):
-    self.message("regression test #104")
-    x = SX("x")
-
-    F = x**2
-
-    f = SXFunction([x],[F])
-    f.init()
-    f.setInput([-1])
-    f.setFwdSeed([1])
-    f.setAdjSeed([1])
-    f.evaluate(1,1)
-    self.checkarray(f.getFwdSens(),-2,"regression")
-    self.checkarray(f.getAdjSens(),-2,"regression")
-    
-    
-    y=SX("y")
-    
-    F=x**y
-    f = SXFunction([vertcat([x,y])],[F])
-    f.init()
-    f.setInput([-1,2])
-    f.setFwdSeed([1,0])
-    f.setAdjSeed([1])
-    f.evaluate(1,1)
-
-    self.assertTrue(isnan(f.getFwdSens()[0]))
-    self.assertTrue(isnan(f.getAdjSens()[1]))
-
-    y=SX("y")
-    
-    F=constpow(x,y)
-    f = SXFunction([vertcat([x,y])],[F])
-    f.init()
-    f.setInput([-1,2])
-    f.setFwdSeed([1,0])
-    f.setAdjSeed([1])
-    f.evaluate(1,1)
-    self.checkarray(f.getFwdSens(),-2,"regression")
-    self.checkarray(f.getAdjSens()[0],-2,"regression")
-
   def test_issue107(self):
     self.message("Regression test for issue 107: +=")
     x=SX("x")
@@ -973,31 +892,19 @@ class SXtests(casadiTestCase):
     f.evaluate()
     self.assertTrue(f.getOutput()==2,"if_else")
     
-    # Check sensitivities
-    
     x0 = 2.1
-    dx = 0.3
     y = if_else(x>1,x**2,x**3)
     f = SXFunction([x],[y])
     f.init()
     f.setInput(x0)
-    f.setFwdSeed(dx)
-    f.setAdjSeed(dx)
-    f.evaluate(1,1)
+    f.evaluate()
     self.checkarray(f.getOutput(),x0**2,"if_else sens")
-    self.checkarray(f.getFwdSens(),2*x0*dx,"if_else sens")
-    self.checkarray(f.getAdjSens(),2*x0*dx,"if_else sens")
     
     x0 = -2.1
-    dx = 0.3
-    
     f.setInput(x0)
-    f.setFwdSeed(dx)
-    f.setAdjSeed(dx)
-    f.evaluate(1,1)
+    f.evaluate()
     self.checkarray(f.getOutput(),x0**3,"if_else sens")
-    self.checkarray(f.getFwdSens(),3*(-x0)**2*dx,"if_else sens")
-    self.checkarray(f.getAdjSens(),3*(-x0)**2*dx,"if_else sens")
+
     
   def test_issue548(self):
     x = ssym('x',100)

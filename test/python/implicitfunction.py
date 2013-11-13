@@ -161,10 +161,8 @@ class NLPtests(casadiTestCase):
       solver=Solver(f)
       solver.setOption(options)
       solver.init()
-      solver.setFwdSeed(1)
-      solver.setAdjSeed(1)
       solver.setInput(n)
-      solver.evaluate(1,1)
+      solver.evaluate()
       
       refsol = SXFunction([x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
       refsol.init()
