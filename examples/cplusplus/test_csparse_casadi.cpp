@@ -84,19 +84,13 @@ int main(int argc, char *argv[])
   MXFunction F(linsolIn("A",A,"B",B),linsolOut("X",X));
   F.init();
 
-  // Solve nondifferentiated
+  // Solve
   F.setInput(val,"A");
   F.setInput(rhs,"B");
-  F.fwdSeed("A")(2,3)   = 1;
-  F.fwdSeed("B")(0,2)   = 2;
-  F.adjSeed("X")(0,3)   = 1;
-  F.evaluateOld(1,1);
+  F.evaluate();
   
   // Print the solution
   cout << "solution (embedded) = " << F.output("X") << endl;
-  cout << "forward sensitivities = " << F.fwdSens("X") << endl;
-  cout << "adjoint sensitivities (A) = " << F.adjSens("A") << endl;
-  cout << "adjoint sensitivities (B) = " << F.adjSens("B") << endl;
   
   // Preturb the linear solver
   double t = 0.01;
