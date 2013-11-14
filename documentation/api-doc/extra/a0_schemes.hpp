@@ -667,20 +667,6 @@
 <br/>
 @copydoc scheme_QPSolverOutput
 */
-/** \class CasADi::SDPSolverInternal
-\n
-\par
-@copydoc scheme_SDPInput
-<br/>
-@copydoc scheme_SDPOutput
-*/
-/** \class CasADi::SDPSolver
-\n
-\par
-@copydoc scheme_SDPInput
-<br/>
-@copydoc scheme_SDPOutput
-*/
 /** \class CasADi::IdasInternal
 \n
 \par
@@ -694,6 +680,20 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::SDPSolverInternal
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
+*/
+/** \class CasADi::SDPSolver
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
 */
 /** \class CasADi::KnitroInternal
 \n
