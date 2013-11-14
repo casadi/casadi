@@ -952,7 +952,7 @@ class Matrixtests(casadiTestCase):
       sp_dense(1,1)
     ]
     
-    for n in range(2,6):
+    for n in range(2,5):
       spA+= [
         sp_diag(n),
         sp_dense(n,n),
@@ -974,27 +974,40 @@ class Matrixtests(casadiTestCase):
       random.seed(1)
       a = DMatrix(sA,[random.random() for i in range(sA.size())])
       A = ssym("a",a.sparsity())
-      sB = sp_dense(a.size1(),1)
-      b = DMatrix(sB,[random.random() for i in range(sB.size())])
-      B = ssym("B",b.sparsity())
-      C = solve(A,B)
-      
-      f = SXFunction([A,B],[C])
-      f.init()
-      
-      f.setInput(a,0)
-      f.setInput(b,1)
-     
-      f.evaluate()
-          
-      c_ref = linalg.solve(a,b)
-      try:
-        self.checkarray(f.output(),c_ref)
-      except Exception as e:
-        print a
-        a.sparsity().sanityCheck()
-        a.printDense()
-        raise e
+      for sB in [ sp_dense(a.size1(),1), vertcat([sp_dense(1,1),sp_sparse(a.size1()-1,1)]),sp_tril(a.size1()),sp_tril(a.size1()).T]:
+
+        b = DMatrix(sB,[random.random() for i in range(sB.size())])
+        B = ssym("B",b.sparsity())
+        C = solve(A,B)
+        
+        f = SXFunction([A,B],[C])
+        f.init()
+        
+        f.setInput(a,0)
+        f.setInput(b,1)
+       
+        f.evaluate()
+            
+        c_ref = DMatrix(linalg.solve(a,b))
+        makeSparse(c_ref)
+        
+        c = f.getOutput()
+        
+        print sA.dimString(), sB.dimString()
+
+        try:
+          self.checkarray(c,c_ref)
+          self.assertTrue(min(IMatrix(c_ref.sparsity(),1)-IMatrix(c.sparsity(),1))==0)
+        except Exception as e:
+          c.printDense()
+          print "sol:"
+          c.sparsity().spy()
+          print "ref:"
+          c_ref.sparsity().spy()
+          c_ref.printDense()
+          a.sparsity().sanityCheck()
+          a.printDense()
+          raise e
         
 if __name__ == '__main__':
     unittest.main()
