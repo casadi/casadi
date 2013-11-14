@@ -109,6 +109,9 @@ namespace CasADi{
     // Should KINSOL internal warning messages be ignored
     bool disable_internal_warnings_;
   
+    // Jacobian times vector function
+    FX f_fwd_;
+
     // Calculate the error message map
     static std::map<int, Message > calc_flagmap();
   
