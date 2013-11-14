@@ -165,8 +165,7 @@ for integrator in (irk_integrator,ref_integrator):
   print "Testing ", integrator.getOption("name")
   print "-------"
 
-
-  # Generate new functions that calculates two forward directions and one adjoint direction
+  # Generate a new function that calculates two forward directions and one adjoint direction
   dintegrator = integrator.derivative(2,1)
 
   # Pass arguments
