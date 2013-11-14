@@ -232,10 +232,7 @@ public:
   bool monitor_rhsQB_;
   
   bool disable_internal_warnings_;
-  
-  // Jacobian times vector functions
-  FX f_fwd_, g_fwd_;
-  
+    
 };
 
 } // namespace CasADi

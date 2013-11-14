@@ -99,6 +99,9 @@ public:
   
   // Jacobian of the DAE with respect to the state and state derivatives
   FX jac_, jacB_;
+
+  // Jacobian times vector functions
+  FX f_fwd_, g_fwd_;
   
   /** \brief  Get the integrator Jacobian for the forward problem */
   virtual FX getJacobian()=0;

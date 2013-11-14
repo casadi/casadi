@@ -549,21 +549,21 @@ void IdasInternal::jtimes(double t, const double *xz, const double *xzdot, const
   time1 = clock();
   
   // Pass input
-  f_.setInput(&t,DAE_T);
-  f_.setInput(xz,DAE_X);
-  f_.setInput(xz+nx_,DAE_Z);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  f_fwd_.setInput(&t,                  DAE_T);
+  f_fwd_.setInput(xz,                  DAE_X);
+  f_fwd_.setInput(xz+nx_,              DAE_Z);
+  f_fwd_.setInput(input(INTEGRATOR_P), DAE_P);
     
   // Pass seeds of the state vectors
-  f_.setFwdSeed(v,DAE_X);
-  f_.setFwdSeed(v+nx_,DAE_Z);
+  f_fwd_.setInput(v,      DAE_NUM_IN + DAE_X);
+  f_fwd_.setInput(v+nx_,  DAE_NUM_IN + DAE_Z);
   
   // Evaluate the AD forward algorithm
-  f_.evaluateOld(1,0);
+  f_fwd_.evaluate();
   
   // Get the output seeds
-  f_.getFwdSens(Jv,DAE_ODE);
-  f_.getFwdSens(Jv+nx_,DAE_ALG);
+  f_fwd_.getOutput(Jv,    DAE_NUM_OUT + DAE_ODE);
+  f_fwd_.getOutput(Jv+nx_,DAE_NUM_OUT + DAE_ALG);
 
   // Subtract state derivative to get residual
   for(int i=0; i<nx_; ++i){
@@ -593,57 +593,57 @@ void IdasInternal::jtimesB(double t, const double *xz, const double *xzdot, cons
   time1 = clock();
   
   // Pass input
-  g_.setInput(&t,RDAE_T);
-  g_.setInput(xz,RDAE_X);
-  g_.setInput(xz+nx_,RDAE_Z);
-  g_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_fwd_.setInput(&t,                  RDAE_T);
+  g_fwd_.setInput(xz,                  RDAE_X);
+  g_fwd_.setInput(xz+nx_,              RDAE_Z);
+  g_fwd_.setInput(input(INTEGRATOR_P), RDAE_P);
 
-  g_.setInput(xzB,RDAE_RX);
-  g_.setInput(xzB+nrx_,RDAE_RZ);
-  g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
+  g_fwd_.setInput(xzB,                 RDAE_RX);
+  g_fwd_.setInput(xzB+nrx_,            RDAE_RZ);
+  g_fwd_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   
   // Pass seeds of the state vectors
-  g_.fwdSeed(RDAE_T).setZero();
-  g_.fwdSeed(RDAE_X).setZero();
-  g_.fwdSeed(RDAE_Z).setZero();
-  g_.fwdSeed(RDAE_P).setZero();
-  g_.setFwdSeed(vB,RDAE_RX);
-  g_.setFwdSeed(vB+nx_,RDAE_RZ);
-  g_.fwdSeed(RDAE_RP).setZero();
+  g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_T);
+  g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_X);
+  g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_Z);
+  g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_P);
+  g_fwd_.setInput(vB,     RDAE_NUM_IN + RDAE_RX);
+  g_fwd_.setInput(vB+nx_, RDAE_NUM_IN + RDAE_RZ);
+  g_fwd_.setInput(0.0,    RDAE_NUM_IN + RDAE_RP);
   
   if(monitored("jtimesB")){
     cout << "RDAE_T    = " << t << endl;
-    cout << "RDAE_X    = " << g_.input(RDAE_X) << endl;
-    cout << "RDAE_Z    = " << g_.input(RDAE_Z) << endl;
-    cout << "RDAE_P    = " << g_.input(RDAE_P) << endl;
+    cout << "RDAE_X    = " << g_fwd_.input(RDAE_X) << endl;
+    cout << "RDAE_Z    = " << g_fwd_.input(RDAE_Z) << endl;
+    cout << "RDAE_P    = " << g_fwd_.input(RDAE_P) << endl;
     cout << "RDAE_XDOT  = ";
     for (int k=0;k<nx_;++k) {
       cout << xzdot[k] << " " ;
     }
     cout << endl;
-    cout << "RDAE_RX    = " << g_.input(RDAE_RX) << endl;
-    cout << "RDAE_RZ    = " << g_.input(RDAE_RZ) << endl;
-    cout << "RDAE_RP    = " << g_.input(RDAE_RP) << endl;
+    cout << "RDAE_RX    = " << g_fwd_.input(RDAE_RX) << endl;
+    cout << "RDAE_RZ    = " << g_fwd_.input(RDAE_RZ) << endl;
+    cout << "RDAE_RP    = " << g_fwd_.input(RDAE_RP) << endl;
     cout << "RDAE_RXDOT  = ";
     for (int k=0;k<nrx_;++k) {
       cout << xzdotB[k] << " " ;
     }
     cout << endl;
-    cout << "fwdSeed(RDAE_RX) = " << g_.fwdSeed(RDAE_RX) << endl;
-    cout << "fwdSeed(RDAE_RZ) = " << g_.fwdSeed(RDAE_RZ) << endl;
+    cout << "fwdSeed(RDAE_RX) = " << g_fwd_.input(RDAE_NUM_IN + RDAE_RX) << endl;
+    cout << "fwdSeed(RDAE_RZ) = " << g_fwd_.input(RDAE_NUM_IN + RDAE_RZ) << endl;
   }
   
   // Evaluate the AD forward algorithm
-  g_.evaluateOld(1,0);
+  g_fwd_.evaluate();
 
   if(monitored("jtimesB")){
-    cout << "fwdSens(RDAE_ODE) = " << g_.fwdSens(RDAE_ODE) << endl;
-    cout << "fwdSens(RDAE_ALG) = " << g_.fwdSens(RDAE_ALG) << endl;
+    cout << "fwdSens(RDAE_ODE) = " << g_fwd_.output(RDAE_NUM_OUT + RDAE_ODE) << endl;
+    cout << "fwdSens(RDAE_ALG) = " << g_fwd_.output(RDAE_NUM_OUT + RDAE_ALG) << endl;
   }
   
   // Get the output seeds
-  g_.getFwdSens(JvB,RDAE_ODE);
-  g_.getFwdSens(JvB+nx_,RDAE_ALG);
+  g_fwd_.getOutput(JvB,     RDAE_NUM_OUT + RDAE_ODE);
+  g_fwd_.getOutput(JvB+nx_, RDAE_NUM_OUT + RDAE_ALG);
 
   // Subtract state derivative to get residual
   for(int i=0; i<nrx_; ++i){
@@ -651,10 +651,10 @@ void IdasInternal::jtimesB(double t, const double *xz, const double *xzdot, cons
   }
 
   if(monitored("jtimesB")){
-    g_.setFwdSens(JvB,RDAE_ODE);
-    g_.setFwdSens(JvB+nx_,RDAE_ALG);
-    cout << "res fwdSens(RDAE_ODE)    = " << g_.output(RDAE_ODE) << endl;
-    cout << "res fwdSens(RDAE_ALG)    = " << g_.output(RDAE_ALG) << endl;
+    g_fwd_.setOutput(JvB,     RDAE_NUM_OUT + RDAE_ODE);
+    g_fwd_.setOutput(JvB+nx_, RDAE_NUM_OUT + RDAE_ALG);
+    cout << "res fwdSens(RDAE_ODE)    = " << g_fwd_.output(RDAE_NUM_OUT + RDAE_ODE) << endl;
+    cout << "res fwdSens(RDAE_ALG)    = " << g_fwd_.output(RDAE_NUM_OUT + RDAE_ALG) << endl;
   }
   
   // Log time duration
@@ -680,39 +680,42 @@ void IdasInternal::resS(int Ns, double t, const double* xz, const double* xzdot,
 
   // Record the current cpu time
   time1 = clock();
+
+  // Commented out since a new implementation currently cannot be tested
+  casadi_error("Commented out, #884, #794.");
   
-  // Pass input
-  f_.setInput(&t,DAE_T);
-  f_.setInput(xz,DAE_X);
-  f_.setInput(xz+nx_,DAE_Z);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  // // Pass input
+  // f_.setInput(&t,DAE_T);
+  // f_.setInput(xz,DAE_X);
+  // f_.setInput(xz+nx_,DAE_Z);
+  // f_.setInput(input(INTEGRATOR_P),DAE_P);
   
-  // Calculate the forward sensitivities, nfdir_f_ directions at a time
-  for(int offset=0; offset<nfdir_; offset += nfdir_f_){
-    // Number of directions in this batch
-    int nfdir_batch = std::min(nfdir_-offset, nfdir_f_);
-    for(int dir=0; dir<nfdir_batch; ++dir){
-      // Pass forward seeds
-      f_.fwdSeed(DAE_T,dir).setZero();
-      f_.setFwdSeed(NV_DATA_S(xzF[offset+dir]),DAE_X,dir);
-      f_.setFwdSeed(NV_DATA_S(xzF[offset+dir])+nx_,DAE_Z,dir);
-      f_.setFwdSeed(fwdSeed(INTEGRATOR_P,offset+dir),DAE_P,dir);
-    }
+  // // Calculate the forward sensitivities, nfdir_f_ directions at a time
+  // for(int offset=0; offset<nfdir_; offset += nfdir_f_){
+  //   // Number of directions in this batch
+  //   int nfdir_batch = std::min(nfdir_-offset, nfdir_f_);
+  //   for(int dir=0; dir<nfdir_batch; ++dir){
+  //     // Pass forward seeds
+  //     f_.fwdSeed(DAE_T,dir).setZero();
+  //     f_.setFwdSeed(NV_DATA_S(xzF[offset+dir]),DAE_X,dir);
+  //     f_.setFwdSeed(NV_DATA_S(xzF[offset+dir])+nx_,DAE_Z,dir);
+  //     f_.setFwdSeed(fwdSeed(INTEGRATOR_P,offset+dir),DAE_P,dir);
+  //   }
     
-    // Evaluate the AD forward algorithm
-    f_.evaluateOld(nfdir_batch,0);
+  //   // Evaluate the AD forward algorithm
+  //   f_.evaluateOld(nfdir_batch,0);
     
-    // Get the output seeds
-    for(int dir=0; dir<nfdir_batch; ++dir){
-      f_.getFwdSens(NV_DATA_S(rrF[offset+dir]),DAE_ODE,dir);
-      f_.getFwdSens(NV_DATA_S(rrF[offset+dir])+nx_,DAE_ALG,dir);
+  //   // Get the output seeds
+  //   for(int dir=0; dir<nfdir_batch; ++dir){
+  //     f_.getFwdSens(NV_DATA_S(rrF[offset+dir]),DAE_ODE,dir);
+  //     f_.getFwdSens(NV_DATA_S(rrF[offset+dir])+nx_,DAE_ALG,dir);
       
-      // Subtract state derivative to get residual
-      for(int i=0; i<nx_; ++i){
-        NV_DATA_S(rrF[offset+dir])[i] -= NV_DATA_S(xzdotF[offset+dir])[i];
-      }
-    }
-  }
+  //     // Subtract state derivative to get residual
+  //     for(int i=0; i<nx_; ++i){
+  //       NV_DATA_S(rrF[offset+dir])[i] -= NV_DATA_S(xzdotF[offset+dir])[i];
+  //     }
+  //   }
+  // }
   
   // Record timings
   time2 = clock();
@@ -1122,25 +1125,29 @@ void IdasInternal::rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector
 
   log("IdasInternal::rhsQS","enter");
   casadi_assert(Ns==nfdir_);
-  // Pass input
-   f_.setInput(&t,DAE_T);
-   f_.setInput(NV_DATA_S(xz),DAE_X);
-   f_.setInput(NV_DATA_S(xz)+nx_,DAE_Z);
-   f_.setInput(input(INTEGRATOR_P),DAE_P);
+
+  // Commented out since a new implementation currently cannot be tested
+  casadi_error("Commented out, #884, #794.");
+
+  // // Pass input
+  //  f_.setInput(&t,DAE_T);
+  //  f_.setInput(NV_DATA_S(xz),DAE_X);
+  //  f_.setInput(NV_DATA_S(xz)+nx_,DAE_Z);
+  //  f_.setInput(input(INTEGRATOR_P),DAE_P);
      
-   // Pass forward seeds
-  for(int i=0; i<nfdir_; ++i){
-    f_.fwdSeed(DAE_T).setZero();
-    f_.setFwdSeed(NV_DATA_S(xzF[i]),DAE_X);
-    f_.setFwdSeed(NV_DATA_S(xzF[i])+nx_,DAE_Z);
-    f_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
+  //  // Pass forward seeds
+  // for(int i=0; i<nfdir_; ++i){
+  //   f_.fwdSeed(DAE_T).setZero();
+  //   f_.setFwdSeed(NV_DATA_S(xzF[i]),DAE_X);
+  //   f_.setFwdSeed(NV_DATA_S(xzF[i])+nx_,DAE_Z);
+  //   f_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
    
-    // Evaluate the AD forward algorithm
-    f_.evaluateOld(1,0);
+  //   // Evaluate the AD forward algorithm
+  //   f_.evaluateOld(1,0);
       
-    // Get the output seeds
-    f_.getFwdSens(NV_DATA_S(qdotF[i]),DAE_QUAD);
-  }
+  //   // Get the output seeds
+  //   f_.getFwdSens(NV_DATA_S(qdotF[i]),DAE_QUAD);
+  //  }
   log("IdasInternal::rhsQS","end");
 }
 
@@ -1964,6 +1971,9 @@ void IdasInternal::initIterativeLinearSolver(){
         
   // Attach functions for jacobian information
   if(exact_jacobian_){
+    // Form the Jacobian-times-vector function
+    f_fwd_ = f_.derivative(1,0);
+
     flag = IDASpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
     if(flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFn",flag);
   }
@@ -2038,6 +2048,9 @@ void IdasInternal::initIterativeLinearSolverB(){
   
   // Attach functions for jacobian information
   if(exact_jacobianB_){ 
+    // Form the Jacobian-times-vector function
+    g_fwd_ = g_.derivative(1,0);
+
     flag = IDASpilsSetJacTimesVecFnB(mem_, whichB_, jtimesB_wrapper);
     if(flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFnB",flag);
   }
