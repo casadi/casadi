@@ -2172,7 +2172,7 @@ namespace CasADi{
     }
 
     // Load it
-    CompiledFunction f_gen("./" + dlname);
+    ExternalFunction f_gen("./" + dlname);
     f_gen.setOption("number_of_fwd_dir",0);
     f_gen.setOption("number_of_adj_dir",0);
     f_gen.setOption("name",fname + "_gen");

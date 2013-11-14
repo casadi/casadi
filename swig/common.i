@@ -392,7 +392,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "symbolic/fx/ocp_solver.hpp"
 #include "symbolic/fx/simulator.hpp"
 #include "symbolic/fx/parallelizer.hpp"
-#include "symbolic/fx/compiled_function.hpp"
+#include "symbolic/fx/external_function.hpp"
 
 
 #include "optimal_control/ocp_tools.hpp"
