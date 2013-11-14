@@ -692,29 +692,32 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector 
 
   // Record the current cpu time
   time1 = clock();
+
+  // Commented out since a new implementation currently cannot be tested
+  casadi_error("Commented out, #884, #794.");
   
-    // Pass input
-  f_.setInput(&t,DAE_T);
-  f_.setInput(NV_DATA_S(x),DAE_X);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  //   // Pass input
+  // f_.setInput(&t,DAE_T);
+  // f_.setInput(NV_DATA_S(x),DAE_X);
+  // f_.setInput(input(INTEGRATOR_P),DAE_P);
 
-   // Calculate the forward sensitivities, nfdir_f_ directions at a time
-   for(int j=0; j<nfdir_; j += nfdir_f_){
-     for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
-       // Pass forward seeds 
-       f_.fwdSeed(DAE_T,dir).setZero();
-       f_.setFwdSeed(NV_DATA_S(xF[j+dir]),DAE_X,dir);
-       f_.setFwdSeed(fwdSeed(INTEGRATOR_P,j+dir),DAE_P,dir);
-     }
+  //  // Calculate the forward sensitivities, nfdir_f_ directions at a time
+  //  for(int j=0; j<nfdir_; j += nfdir_f_){
+  //    for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
+  //      // Pass forward seeds 
+  //      f_.fwdSeed(DAE_T,dir).setZero();
+  //      f_.setFwdSeed(NV_DATA_S(xF[j+dir]),DAE_X,dir);
+  //      f_.setFwdSeed(fwdSeed(INTEGRATOR_P,j+dir),DAE_P,dir);
+  //    }
 
-     // Evaluate the AD forward algorithm
-     f_.evaluateOld(nfdir_f_,0);
+  //    // Evaluate the AD forward algorithm
+  //    f_.evaluateOld(nfdir_f_,0);
       
-     // Get the output seeds
-     for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
-       f_.getFwdSens(NV_DATA_S(xdotF[j+dir]),DAE_ODE,dir);
-     }
-   }
+  //    // Get the output seeds
+  //    for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
+  //      f_.getFwdSens(NV_DATA_S(xdotF[j+dir]),DAE_ODE,dir);
+  //    }
+  //  }
   
   // Record timings
   time2 = clock();
@@ -735,22 +738,25 @@ try{
 
 void CVodesInternal::rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF, N_Vector tmp1, N_Vector tmp2){
   casadi_assert(Ns==nfdir_);
-  
-    // Pass input
-  f_.setInput(&t,DAE_T);
-  f_.setInput(NV_DATA_S(x),DAE_X);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
 
-  // Pass forward seeds
-  f_.fwdSeed(DAE_T).setZero();
-  f_.setFwdSeed(NV_DATA_S(xF),DAE_X);
-  f_.setFwdSeed(fwdSeed(INTEGRATOR_P,iS),DAE_P);
+  // Commented out since a new implementation currently cannot be tested
+  casadi_error("Commented out, #884, #794.");
+
+  // // Pass input
+  // f_.setInput(&t,DAE_T);
+  // f_.setInput(NV_DATA_S(x),DAE_X);
+  // f_.setInput(input(INTEGRATOR_P),DAE_P);
+
+  // // Pass forward seeds
+  // f_.fwdSeed(DAE_T).setZero();
+  // f_.setFwdSeed(NV_DATA_S(xF),DAE_X);
+  // f_.setFwdSeed(fwdSeed(INTEGRATOR_P,iS),DAE_P);
     
-  // Evaluate the AD forward algorithm
-  f_.evaluateOld(1,0);
+  // // Evaluate the AD forward algorithm
+  // f_.evaluateOld(1,0);
   
-  // Get the fwd sensitivities
-  f_.getFwdSens(NV_DATA_S(xdotF));
+  // // Get the fwd sensitivities
+  // f_.getFwdSens(NV_DATA_S(xdotF));
 }
 
 int CVodesInternal::rhsS1_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2){
@@ -793,23 +799,26 @@ void CVodesInternal::rhsQ(double t, const double* x, double* qdot){
 void CVodesInternal::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2){
   casadi_assert(Ns==nfdir_);
   
-  // Pass input
-  f_.setInput(&t,DAE_T);
-  f_.setInput(NV_DATA_S(x),DAE_X);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  // Commented out since a new implementation currently cannot be tested
+  casadi_error("Commented out, #884, #794.");
 
-  for(int i=0; i<nfdir_; ++i){
-    // Pass forward seeds
-    f_.fwdSeed(DAE_T).setZero();
-    f_.setFwdSeed(NV_DATA_S(xF[i]),DAE_X);
-    f_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
+  // // Pass input
+  // f_.setInput(&t,DAE_T);
+  // f_.setInput(NV_DATA_S(x),DAE_X);
+  // f_.setInput(input(INTEGRATOR_P),DAE_P);
 
-    // Evaluate the AD forward algorithm
-    f_.evaluateOld(1,0);
+  // for(int i=0; i<nfdir_; ++i){
+  //   // Pass forward seeds
+  //   f_.fwdSeed(DAE_T).setZero();
+  //   f_.setFwdSeed(NV_DATA_S(xF[i]),DAE_X);
+  //   f_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
+
+  //   // Evaluate the AD forward algorithm
+  //   f_.evaluateOld(1,0);
       
-    // Get the forward sensitivities
-    f_.getFwdSens(NV_DATA_S(qdotF[i]),DAE_QUAD);
-  }
+  //   // Get the forward sensitivities
+  //   f_.getFwdSens(NV_DATA_S(qdotF[i]),DAE_QUAD);
+  // }
 }
 
 int CVodesInternal::rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qdotF, void *user_data, N_Vector tmp1, N_Vector tmp2){
@@ -866,40 +875,43 @@ void CVodesInternal::rhsB(double t, const double* x, const double *rx, double* r
 
 void CVodesInternal::rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector rx, N_Vector rxdot){
   
-  // Pass input
-  g_.setInput(&t,RDAE_T);
-  g_.setInput(NV_DATA_S(x),RDAE_X);
-  g_.setInput(input(INTEGRATOR_P),RDAE_P);
-  g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
-  
-  // Pass backward state
-  const double *rx_data = NV_DATA_S(rx);
-  
-  // Pass backward state
-  g_.setInput(rx_data,RDAE_RX); rx_data += nrx_;
-  
-  // Pass forward seeds 
-  for(int dir=0; dir<nfdir_; ++dir){
-    g_.fwdSeed(RDAE_T,dir).setZero();
-    g_.setFwdSeed(rx_data,RDAE_RX,dir); rx_data += nrx_;
-    g_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),RDAE_P,dir);
-    g_.setFwdSeed(fwdSeed(INTEGRATOR_RP,dir),RDAE_RP,dir);
-    g_.setFwdSeed(NV_DATA_S(xF[dir]),RDAE_X,dir);
-  }
+  // Commented out since a new implementation currently cannot be tested
+  casadi_error("Commented out, #884, #794.");
 
-  // Evaluate the AD forward algorithm
-  g_.evaluateOld(nfdir_,0);
+  // // Pass input
+  // g_.setInput(&t,RDAE_T);
+  // g_.setInput(NV_DATA_S(x),RDAE_X);
+  // g_.setInput(input(INTEGRATOR_P),RDAE_P);
+  // g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
+  
+  // // Pass backward state
+  // const double *rx_data = NV_DATA_S(rx);
+  
+  // // Pass backward state
+  // g_.setInput(rx_data,RDAE_RX); rx_data += nrx_;
+  
+  // // Pass forward seeds 
+  // for(int dir=0; dir<nfdir_; ++dir){
+  //   g_.fwdSeed(RDAE_T,dir).setZero();
+  //   g_.setFwdSeed(rx_data,RDAE_RX,dir); rx_data += nrx_;
+  //   g_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),RDAE_P,dir);
+  //   g_.setFwdSeed(fwdSeed(INTEGRATOR_RP,dir),RDAE_RP,dir);
+  //   g_.setFwdSeed(NV_DATA_S(xF[dir]),RDAE_X,dir);
+  // }
+
+  // // Evaluate the AD forward algorithm
+  // g_.evaluateOld(nfdir_,0);
     
-  // Right hand side
-  double *rxdot_data = NV_DATA_S(rxdot);
+  // // Right hand side
+  // double *rxdot_data = NV_DATA_S(rxdot);
 
-  // Get the backward right hand side
-  g_.getOutput(rxdot_data,RDAE_ODE); rxdot_data += nrx_;
+  // // Get the backward right hand side
+  // g_.getOutput(rxdot_data,RDAE_ODE); rxdot_data += nrx_;
   
-  // Get forward sensitivities
-  for(int dir=0; dir<nfdir_; ++dir){
-    g_.getFwdSens(rxdot_data,RDAE_ODE,dir); rxdot_data += nrx_;
-  }
+  // // Get forward sensitivities
+  // for(int dir=0; dir<nfdir_; ++dir){
+  //   g_.getFwdSens(rxdot_data,RDAE_ODE,dir); rxdot_data += nrx_;
+  // }
 }
   
 int CVodesInternal::rhsB_wrapper(double t, N_Vector x, N_Vector rx, N_Vector rxdot, void *user_data){
@@ -1007,20 +1019,20 @@ void CVodesInternal::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vec
   time1 = clock();
 
   // Pass input
-  f_.setInput(&t,DAE_T);
-  f_.setInput(NV_DATA_S(x),DAE_X);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  f_fwd_.setInput(&t,                 DAE_T);
+  f_fwd_.setInput(NV_DATA_S(x),       DAE_X);
+  f_fwd_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass input seeds
-  f_.fwdSeed(DAE_T).setZero();
-  f_.setFwdSeed(NV_DATA_S(v),DAE_X);
-  f_.setFwdSeed(0.0,DAE_P);
+  f_fwd_.setInput(0.0,          DAE_NUM_IN + DAE_T);
+  f_fwd_.setInput(NV_DATA_S(v), DAE_NUM_IN + DAE_X);
+  f_fwd_.setInput(0.0,          DAE_NUM_IN + DAE_P);
   
   // Evaluate
-  f_.evaluateOld(1,0);
+  f_fwd_.evaluate();
 
   // Get the output seeds
-  f_.getFwdSens(NV_DATA_S(Jv),DAE_ODE);
+  f_fwd_.getOutput(NV_DATA_S(Jv),DAE_NUM_OUT + DAE_ODE);
   
   // Log time duration
   time2 = clock();
@@ -1033,26 +1045,26 @@ void CVodesInternal::jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_
   log("CVodesInternal::jtimesB","begin");
   // Get time
   time1 = clock();
-
+  
   // Pass input
-  g_.setInput(&t,RDAE_T);
-  g_.setInput(NV_DATA_S(x),RDAE_X);
-  g_.setInput(input(INTEGRATOR_P),RDAE_P);
-  g_.setInput(NV_DATA_S(xB),RDAE_RX);
-  g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
+  g_fwd_.setInput(&t,                  RDAE_T);
+  g_fwd_.setInput(NV_DATA_S(x),        RDAE_X);
+  g_fwd_.setInput(input(INTEGRATOR_P), RDAE_P);
+  g_fwd_.setInput(NV_DATA_S(xB),       RDAE_RX);
+  g_fwd_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   
   // Pass input seeds
-  g_.fwdSeed(RDAE_T).setZero();
-  g_.fwdSeed(RDAE_X).setZero();
-  g_.fwdSeed(RDAE_P).setZero();
-  g_.setFwdSeed(NV_DATA_S(vB),RDAE_RX);
-  g_.fwdSeed(RDAE_RP).setZero();
+  g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_T);
+  g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_X);
+  g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_P);
+  g_fwd_.setInput(NV_DATA_S(vB), RDAE_NUM_IN + RDAE_RX);
+  g_fwd_.setInput(0.0,           RDAE_NUM_IN + RDAE_RP);
   
   // Evaluate
-  g_.evaluateOld(1,0);
+  g_fwd_.evaluate();
 
   // Get the output seeds
-  g_.getFwdSens(NV_DATA_S(JvB),DAE_ODE);
+  g_fwd_.getOutput(NV_DATA_S(JvB),RDAE_NUM_OUT + RDAE_ODE);
   
   // Log time duration
   time2 = clock();
@@ -1656,6 +1668,9 @@ void CVodesInternal::initIterativeLinearSolver(){
   
   // Attach functions for jacobian information
   if(exact_jacobian_){
+    // Form the Jacobian-times-vector function
+    f_fwd_ = f_.derivative(1,0);
+
     flag = CVSpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
     if(flag!=CV_SUCCESS) cvodes_error("CVSpilsSetJacTimesVecFn",flag);      
   }
@@ -1732,6 +1747,9 @@ void CVodesInternal::initIterativeLinearSolverB(){
   
   // Attach functions for jacobian information
   if(exact_jacobianB_){
+    // Form the Jacobian-times-vector function
+    g_fwd_ = g_.derivative(1,0);
+
     flag = CVSpilsSetJacTimesVecFnB(mem_, whichB_, jtimesB_wrapper);
     if(flag!=CV_SUCCESS) cvodes_error("CVSpilsSetJacTimesVecFnB",flag);      
   }
