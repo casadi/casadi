@@ -1705,7 +1705,7 @@ namespace CasADi{
 
     // Nondifferentiated inputs
     for(int i=0; i<getNumInputs(); ++i){
-      io_names.push_back(inputScheme_.entryLabel(i));
+      io_names.push_back("der_" + inputScheme_.entryLabel(i));
     }
 
     // Forward seeds
@@ -1735,7 +1735,7 @@ namespace CasADi{
     
     // Nondifferentiated inputs
     for(int i=0; i<getNumOutputs(); ++i){
-      io_names.push_back(outputScheme_.entryLabel(i));
+      io_names.push_back("der_" + outputScheme_.entryLabel(i));
     }
     
     // Forward sensitivities
