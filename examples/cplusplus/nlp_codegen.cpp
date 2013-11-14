@@ -55,7 +55,7 @@ FX generateCodeAndCompile(FX fcn, const std::string& name, bool expand){
   casadi_assert_message(flag==0, "Compilation failed");
 
   // Load the generated function for evaluation
-  CompiledFunction fcn_e("./" + name + ".so");
+  ExternalFunction fcn_e("./" + name + ".so");
   return fcn_e;
 }
 

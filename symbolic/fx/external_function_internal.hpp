@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef COMPILED_FUNCTION_INTERNAL_HPP
-#define COMPILED_FUNCTION_INTERNAL_HPP
+#ifndef EXTERNAL_FUNCTION_INTERNAL_HPP
+#define EXTERNAL_FUNCTION_INTERNAL_HPP
 
-#include "compiled_function.hpp"
+#include "external_function.hpp"
 #include "fx_internal.hpp"
 
 #ifdef WITH_DL 
@@ -36,18 +36,18 @@
 
 namespace CasADi{
   
-class CompiledFunctionInternal : public FXInternal{
-  friend class CompiledFunction;
+class ExternalFunctionInternal : public FXInternal{
+  friend class ExternalFunction;
   public:
 
     /** \brief  constructor */
-    explicit CompiledFunctionInternal(const std::string& bin_name);
+    explicit ExternalFunctionInternal(const std::string& bin_name);
 
     /** \brief  clone function */
-    virtual CompiledFunctionInternal* clone() const;
+    virtual ExternalFunctionInternal* clone() const;
 
     /** \brief  Destructor */
-    virtual ~CompiledFunctionInternal();
+    virtual ~ExternalFunctionInternal();
 
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir);
@@ -90,4 +90,4 @@ class CompiledFunctionInternal : public FXInternal{
 } // namespace CasADi
 
 
-#endif // COMPILED_FUNCTION_INTERNAL_HPP
+#endif // EXTERNAL_FUNCTION_INTERNAL_HPP

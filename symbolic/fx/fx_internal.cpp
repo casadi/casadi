@@ -29,7 +29,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
-#include "compiled_function.hpp"
+#include "external_function.hpp"
 #include "derivative.hpp"
 
 #include "../casadi_options.hpp"
