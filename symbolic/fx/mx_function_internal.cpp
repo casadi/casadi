@@ -382,23 +382,9 @@ namespace CasADi{
     }
   }
 
-  void MXFunctionInternal::updatePointers(const AlgEl& el, int nfdir, int nadir){
+  void MXFunctionInternal::updatePointers(const AlgEl& el){
     mx_input_.resize(el.arg.size());
     mx_output_.resize(el.res.size());
-
-    mx_fwdSeed_.resize(nfdir);
-    mx_fwdSens_.resize(nfdir);
-    for(int d=0; d<nfdir; ++d){
-      mx_fwdSeed_[d].resize(mx_input_.size());
-      mx_fwdSens_[d].resize(mx_output_.size());
-    }
-
-    mx_adjSens_.resize(nadir);
-    mx_adjSeed_.resize(nadir);
-    for(int d=0; d<nadir; ++d){
-      mx_adjSens_[d].resize(mx_input_.size());
-      mx_adjSeed_[d].resize(mx_output_.size());
-    }
   
     if(el.op!=OP_INPUT){
       for(int i=0; i<mx_input_.size(); ++i){
@@ -406,12 +392,8 @@ namespace CasADi{
           int k = el.arg[i];
           int tmp = work_[k].tmp; // Positive if the data should be retrieved from the tape instead of the work vector
           mx_input_[i] = tmp==0 ? &work_[k].data : &tape_[tmp-1].second;
-          for(int d=0; d<nfdir; ++d) mx_fwdSeed_[d][i] = &work_[k].dataF[d];
-          for(int d=0; d<nadir; ++d) mx_adjSens_[d][i] = &work_[k].dataA[d];
         } else {
           mx_input_[i] = 0;
-          for(int d=0; d<nfdir; ++d) mx_fwdSeed_[d][i] = 0;
-          for(int d=0; d<nadir; ++d) mx_adjSens_[d][i] = 0;
         }
       }
     }
@@ -420,19 +402,17 @@ namespace CasADi{
       for(int i=0; i<mx_output_.size(); ++i){
         if(el.res[i]>=0){
           mx_output_[i] = &work_[el.res[i]].data;
-          for(int d=0; d<nfdir; ++d) mx_fwdSens_[d][i] = &work_[el.res[i]].dataF[d];
-          for(int d=0; d<nadir; ++d) mx_adjSeed_[d][i] = &work_[el.res[i]].dataA[d];
         } else {
           mx_output_[i] = 0;
-          for(int d=0; d<nfdir; ++d) mx_fwdSens_[d][i] = 0;
-          for(int d=0; d<nadir; ++d) mx_adjSeed_[d][i] = 0;
         }
       }
     }
   }
 
-  void MXFunctionInternal::evaluate(int nfdir, int nadir){
-    casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):begin "  << getOption("name"));
+  void MXFunctionInternal::evaluate(int nfdir, int nadir){    
+    casadi_log("MXFunctionInternal::evaluate():begin "  << getOption("name"));
+    casadi_assert_message(nfdir==0, "Not implemented");
+    casadi_assert_message(nadir==0, "Not implemented");
 
     // Set up timers for profiling
     double time_zero;
@@ -456,42 +436,23 @@ namespace CasADi{
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     int alg_counter = 0;
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter){
-
-
-      if (CasadiOptions::profiling) {
+      if(CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
       }
-        
-      // Spill existing work elements if needed
-      if(nadir>0 && it->op!=OP_OUTPUT){
-        for(vector<int>::const_iterator c=it->res.begin(); c!=it->res.end(); ++c){
-          if(*c >=0 && tt<tape_.size() && tape_[tt].first == make_pair(alg_counter,*c)){
-            tape_[tt++].second.set(work_[*c].data);
-          }
-        }
-      }
-    
+      
       if(it->op==OP_INPUT){
-        // Pass the input and forward seeeds
+        // Pass an input
         work_[it->res.front()].data.set(input(it->arg.front()));
-        for(int dir=0; dir<nfdir; ++dir){
-          work_[it->res.front()].dataF.at(dir).set(fwdSeed(it->arg.front(),dir));
-        }
       } else if(it->op==OP_OUTPUT){
-        // Get the outputs and forward sensitivities
+        // Get an output
         work_[it->arg.front()].data.get(output(it->res.front()));
-        for(int dir=0; dir<nfdir; ++dir){
-          work_[it->arg.front()].dataF.at(dir).get(fwdSens(it->res.front(),dir));
-        }
       } else {
 
         // Point pointers to the data corresponding to the element
-        updatePointers(*it,nfdir,0);
+        updatePointers(*it);
         
         // Evaluate
         it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
-        
-
         
       }
       
@@ -506,97 +467,15 @@ namespace CasADi{
         CasadiOptions::profilingLog << "|";
         print(CasadiOptions::profilingLog,*it);
         
-      }
-      
+      }      
     }
 
-    casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):evaluated forward "  << getOption("name"));
-          
-    if(nadir>0){
-      casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):adjoints:begin "  << getOption("name"));
-    
-      // Clear the adjoint seeds
-      for(vector<FunctionIO>::iterator it=work_.begin(); it!=work_.end(); it++){
-        for(int dir=0; dir<nadir; ++dir){
-          fill(it->dataA.at(dir).begin(),it->dataA.at(dir).end(),0.0);
-        }
-      }
-
-      // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
-      int alg_counter = algorithm_.size()-1;
-      tt--;
-      for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it, --alg_counter){
-        // Evaluate
-        if (CasadiOptions::profiling) {
-          time_start = getRealTime(); // Start timer
-        }
-      
-        // Mark spilled work vector elements to be recovered to allow the operator input to be updated but not the operator output 
-        // (important for inplace operations)
-        if(it->op!=OP_OUTPUT){
-          for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){
-            if(*c >=0 && tt>=0 && tape_[tt].first==make_pair(alg_counter,*c)){
-              work_[*c].tmp = 1 + tt--;
-            }
-          }
-        }
-
-        // Point pointers to the data corresponding to the element
-        updatePointers(*it,0,nadir);
-      
-        if(it->op==OP_INPUT){
-          // Get the adjoint sensitivity
-          for(int dir=0; dir<nadir; ++dir){
-            mx_adjSeed_[dir].front()->get(adjSens(it->arg.front(),dir));
-            mx_adjSeed_[dir].front()->setZero();
-          }
-        } else if(it->op==OP_OUTPUT){
-          // Pass the adjoint seeds
-          for(int dir=0; dir<nadir; ++dir){
-            const DMatrix& aseed = adjSeed(it->res.front(),dir);
-            DMatrix& aseed_dest = *mx_adjSens_[dir].front();
-            transform(aseed_dest.begin(),aseed_dest.end(),aseed.begin(),aseed_dest.begin(),std::plus<double>());
-          }
-        } else {        
-        
-          it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
-          
-        }
-
-        // Recover the spilled elements to the work vector for later access (delayed for inplace operations)
-        if(it->op!=OP_OUTPUT){
-          for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){          
-            if(*c >=0 && work_[*c].tmp > 0){
-              tape_[work_[*c].tmp-1].second.get(work_[*c].data);
-              work_[*c].tmp = 0;
-            }
-          }
-        }
-        // Write out profiling information
-        if (CasadiOptions::profiling) {
-          time_stop = getRealTime(); // Stop timer
-          CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|"; 
-          if (it->op == OP_CALL) {
-            FX f = it->data->getFunction();
-            CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
-            CasadiOptions::profilingLog << "|>" << typeid(it->data).name();
-            print(CasadiOptions::profilingLog,*it);
-          } else {
-            CasadiOptions::profilingLog << "|";
-            print(CasadiOptions::profilingLog,*it);
-          }
-        }
-      }
-  
-      casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):adjoints:end"  << getOption("name"));
-    }
-    
     if (CasadiOptions::profiling) {
       time_stop = getRealTime();
       CasadiOptions::profilingLog  << "stop " << this << ":" <<getOption("name") << double(time_stop-time_zero)*1e3 << " ms" << std::endl; 
     }
    
-    casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):end "  << getOption("name"));
+    casadi_log("MXFunctionInternal::evaluate():end "  << getOption("name"));
   }
 
   void MXFunctionInternal::print(ostream &stream, const AlgEl& el) const {
@@ -695,7 +574,7 @@ namespace CasADi{
           copy(iwork,iwork+w.size(),swork);
         } else {
           // Point pointers to the data corresponding to the element
-          updatePointers(*it,0,0);
+          updatePointers(*it);
 
           // Propagate sparsity forwards
           it->data->propagateSparsity(mx_input_, mx_output_, itmp_, rtmp_, true);
@@ -725,7 +604,7 @@ namespace CasADi{
           }
         } else {
           // Point pointers to the data corresponding to the element
-          updatePointers(*it,0,0);
+          updatePointers(*it);
         
           // Propagate sparsity backwards
           it->data->propagateSparsity(mx_input_, mx_output_, itmp_, rtmp_, false);

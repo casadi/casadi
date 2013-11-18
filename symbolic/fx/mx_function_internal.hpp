@@ -114,7 +114,7 @@ namespace CasADi{
     SXFunction expand(const std::vector<SXMatrix>& inputv );
     
     // Update pointers to a particular element
-    void updatePointers(const AlgEl& el, int nfdir, int nadir);
+    void updatePointers(const AlgEl& el);
     
     // Vectors to hold pointers during evaluation
     DMatrixPtrV mx_input_;
