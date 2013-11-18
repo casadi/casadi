@@ -2481,9 +2481,7 @@ namespace CasADi{
     }
   }
 
-  void FXInternal::evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res,
-                             const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens,
-                             const DMatrixPtrVV& aseed, DMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<double>& rtmp) {
+  void FXInternal::evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp) {
                              
     // Set up timers for profiling
     double time_zero;
@@ -2499,23 +2497,6 @@ namespace CasADi{
     int num_in = getNumInputs();
     int num_out = getNumOutputs();
 
-    // Number of derivative directions to calculate
-    int nfdir = fsens.size();
-    int nadir = aseed.size();
-
-    // Number of derivative directions supported by the function
-    int max_nfdir = nfdir_;
-    int max_nadir = nadir_;
-    
-    casadi_assert_message(nfdir==0 || max_nfdir>0,"FXInternal::evaluateD: function " << getOption("name") << " has no forward derivatives");
-    casadi_assert_message(nadir==0 || max_nadir>0,"FXInternal::evaluateD: function " << getOption("name") << " has no adjoint derivatives");
-
-    // Current forward and adjoint direction
-    int offset_nfdir = 0, offset_nadir = 0;
-
-    // Has the function been evaluated once
-    bool fcn_evaluated = false;
-
     // Pass the inputs to the function
     for (int i = 0; i < num_in; ++i) {
       DMatrix *a = arg[i];
@@ -2526,88 +2507,26 @@ namespace CasADi{
       }
     }
   
-    // Evaluate until everything has been determinated
-    while (!fcn_evaluated || offset_nfdir < nfdir || offset_nadir < nadir) {
-
-      // Number of forward and adjoint directions in the current "batch"
-      int nfdir_f_batch = std::min(nfdir - offset_nfdir, max_nfdir);
-      int nadir_f_batch = std::min(nadir - offset_nadir, max_nadir);
-
-      // Pass the forward seeds to the function
-      for(int d = 0; d < nfdir_f_batch; ++d){
-        for(int i = 0; i < num_in; ++i){
-          DMatrix *a = fseed[offset_nfdir + d][i];
-          if(a != 0){
-            setFwdSeed(*a, i, d);
-          } else {
-            setFwdSeed(0., i, d);
-          }
-        }
-      }
-
-      // Pass the adjoint seed to the function
-      for(int d = 0; d < nadir_f_batch; ++d){
-        for(int i = 0; i < num_out; ++i) {
-          DMatrix *a = aseed[offset_nadir + d][i];
-          if(a != 0){
-            setAdjSeed(*a, i, d);
-          } else {
-            setAdjSeed(0., i, d);
-          }
-        }
-      }
-      
-      if (CasadiOptions::profiling) {
-        time_zero = getRealTime();
-      }
-      // Evaluate
-      evaluate(nfdir_f_batch, nadir_f_batch);
-      if (CasadiOptions::profiling) {
-        time_offset += getRealTime() - time_zero;
-      }
-      
-      // Get the outputs if first evaluation
-      if(!fcn_evaluated){
-        for(int i = 0; i < num_out; ++i) {
-          if(res[i] != 0) getOutput(*res[i], i);
-        }
-      }
-
-      // Marked as evaluated
-      fcn_evaluated = true;
-
-      // Get the forward sensitivities
-      for(int d = 0; d < nfdir_f_batch; ++d){
-        for(int i = 0; i < num_out; ++i) {
-          DMatrix *a = fsens[offset_nfdir + d][i];
-          if(a != 0) getFwdSens(*a, i, d);
-        }
-      }
-
-      // Get the adjoint sensitivities
-      for (int d = 0; d < nadir_f_batch; ++d) {
-        for (int i = 0; i < num_in; ++i) {
-          DMatrix *a = asens[offset_nadir + d][i];
-          if(a != 0){
-            a->sparsity().add(a->ptr(),adjSens(i,d).ptr(),adjSens(i,d).sparsity());
-          }
-        }
-      }
-
-      // Update direction offsets
-      offset_nfdir += nfdir_f_batch;
-      offset_nadir += nadir_f_batch;
+    if (CasadiOptions::profiling) {
+      time_zero = getRealTime();
     }
-
-    // Clear adjoint seeds
-    MXNode::clearVector(aseed);
+    
+    // Evaluate
+    evaluate(0,0);
+    if (CasadiOptions::profiling) {
+      time_offset += getRealTime() - time_zero;
+    }
+    
+    // Get the outputs
+    for(int i = 0; i < num_out; ++i) {
+      if(res[i] != 0) getOutput(*res[i], i);
+    }
     
     // Write out profiling information
     if (CasadiOptions::profiling) {
       time_stop = getRealTime();
       CasadiOptions::profilingLog  << "overhead " << this << ":" <<getOption("name") << "|" << double(time_stop-time_start-time_offset)*1e6 << " ns" << std::endl; 
-    }
-    
+    }    
   }
 
   void FXInternal::printPart(const MXNode* node, std::ostream &stream, int part) const {

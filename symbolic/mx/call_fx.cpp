@@ -56,10 +56,8 @@ namespace CasADi {
     fcn_->printPart(this,stream,part);
   }
 
-  void CallFX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
-                               const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens,
-                               const DMatrixPtrVV& aseed, DMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<double>& rtmp) {
-    fcn_->evaluateD(this,arg,res,fseed,fsens,aseed,asens,itmp,rtmp);
+  void CallFX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp) {
+    fcn_->evaluateD(this,arg,res,itmp,rtmp);
   }
 
   int CallFX::getNumOutputs() const {

@@ -119,10 +119,6 @@ namespace CasADi{
     // Vectors to hold pointers during evaluation
     DMatrixPtrV mx_input_;
     DMatrixPtrV mx_output_;
-    DMatrixPtrVV mx_fwdSeed_;
-    DMatrixPtrVV mx_fwdSens_;
-    DMatrixPtrVV mx_adjSeed_;
-    DMatrixPtrVV mx_adjSens_;
 
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const{ return inputv_;}

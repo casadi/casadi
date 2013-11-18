@@ -133,7 +133,7 @@ namespace CasADi{
                            std::vector<int>& itmp, std::vector<double>& rtmp){evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);}
 
     /** \brief  Evaluate the function, no derivatives*/
-    void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate symbolically (SX) */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
@@ -142,8 +142,7 @@ namespace CasADi{
                             std::vector<int>& itmp, std::vector<SX>& rtmp){ evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);}
 
     /** \brief  Evaluate symbolically (SX), no derivatives */
-    void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
-                    std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, 

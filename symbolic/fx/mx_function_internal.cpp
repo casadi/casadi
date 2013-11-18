@@ -452,7 +452,7 @@ namespace CasADi{
         updatePointers(*it);
         
         // Evaluate
-        it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_, itmp_, rtmp_);
+        it->data->evaluateD(mx_input_, mx_output_, itmp_, rtmp_);
         
       }
       
