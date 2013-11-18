@@ -110,10 +110,13 @@ namespace CasADi{
   }
 
   void ParallelizerInternal::evaluate(int nfdir, int nadir){
+    casadi_assert_message(nfdir==0, "Not implemented");
+    casadi_assert_message(nadir==0, "Not implemented");
+
     // Let the first call (which may contain memory allocations) be serial when using OpenMP
     if(mode_== SERIAL){
       for(int task=0; task<funcs_.size(); ++task){
-        evaluateTask(task,nfdir,nadir);
+        evaluateTask(task);
       }
     } else if(mode_== OPENMP) {
 #ifdef WITH_OPENMP
@@ -135,7 +138,7 @@ namespace CasADi{
         task_starttime[task] = omp_get_wtime();
       
         // Do the actual work
-        evaluateTask(task,nfdir,nadir);
+        evaluateTask(task);
       
         task_endtime[task] = omp_get_wtime();
         task_cputime[task] =  task_endtime[task] - task_starttime[task];
@@ -166,7 +169,7 @@ namespace CasADi{
     }
   }
 
-  void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){
+  void ParallelizerInternal::evaluateTask(int task){
   
     // Get a reference to the function
     FX& fcn = funcs_[task];
@@ -176,40 +179,12 @@ namespace CasADi{
       fcn.input(j-inind_[task]).set(input(j));
     }
   
-    // Copy forward seeds
-    for(int dir=0; dir<nfdir; ++dir){
-      for(int j=inind_[task]; j<inind_[task+1]; ++j){
-        fcn.fwdSeed(j-inind_[task],dir).set(fwdSeed(j,dir));
-      }
-    }
-  
-    // Copy adjoint seeds
-    for(int dir=0; dir<nadir; ++dir){
-      for(int j=outind_[task]; j<outind_[task+1]; ++j){
-        fcn.adjSeed(j-outind_[task],dir).set(adjSeed(j,dir));
-      }
-    }
-
     // Evaluate
-    fcn.evaluateOld(nfdir, nadir);
+    fcn.evaluate();
     
     // Get the results
     for(int j=outind_[task]; j<outind_[task+1]; ++j){
       fcn.output(j-outind_[task]).get(output(j));
-    }
-  
-    // Get the forward sensitivities
-    for(int dir=0; dir<nfdir; ++dir){
-      for(int j=outind_[task]; j<outind_[task+1]; ++j){
-        fcn.fwdSens(j-outind_[task],dir).get(fwdSens(j,dir));
-      }
-    }
-
-    // Get the adjoint sensitivities
-    for(int dir=0; dir<nadir; ++dir){
-      for(int j=inind_[task]; j<inind_[task+1]; ++j){
-        fcn.adjSens(j-inind_[task],dir).get(adjSens(j,dir));
-      }
     }
   }
 

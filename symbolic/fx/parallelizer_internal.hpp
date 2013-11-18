@@ -57,7 +57,7 @@ namespace CasADi{
     virtual void evaluate(int nfdir, int nadir);
 
     /// Evaluate a single task
-    virtual void evaluateTask(int task, int nfdir, int nadir);
+    virtual void evaluateTask(int task);
 
     /// Reset the sparsity propagation
     virtual void spInit(bool use_fwd);
