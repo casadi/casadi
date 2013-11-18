@@ -153,12 +153,12 @@ const double** collocation_points[] = {legendre_points,radau_points};
       D[j] = lfcn.output().at(0);
 
       // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+      FX tfcn = lfcn.tangent();
+      tfcn.init();
       for(int j2=0; j2<deg+1; ++j2){
-        
-        lfcn.setInput(tau_root[j2]);
-        lfcn.setFwdSeed(1.0);
-        lfcn.evaluateOld(1,0);
-        C[j2][j] = lfcn.fwdSens().at(0);
+        tfcn.setInput(tau_root[j2]);        
+        tfcn.evaluate();
+        C[j2][j] = tfcn.output().at(0);
       }
     }
 
