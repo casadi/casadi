@@ -147,58 +147,29 @@ namespace CasADi{
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX,ScY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void BinaryMX<ScX,ScY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX,ScY>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void BinaryMX<ScX,ScY>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool ScX, bool ScY>
   template<typename T, typename MatV, typename MatVV>
-  void BinaryMX<ScX,ScY>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
+  void BinaryMX<ScX,ScY>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
     // Get data
     vector<T>& output0 = output[0]->data();
     const vector<T> &input0 = input[0]->data();
     const vector<T> &input1 = input[1]->data();
   
-    if(nfwd==0 && nadj==0){
-      if(!ScX && !ScY){
-        casadi_math<T>::fun(op_, getPtr(input0), getPtr(input1), getPtr(output0), output0.size());
-      } else if(ScX){
-        casadi_math<T>::fun(op_, input0[0],      getPtr(input1), getPtr(output0), output0.size());
-      } else {
-        casadi_math<T>::fun(op_, getPtr(input0), input1[0],      getPtr(output0), output0.size());
-      }
-
+    if(!ScX && !ScY){
+      casadi_math<T>::fun(op_, getPtr(input0), getPtr(input1), getPtr(output0), output0.size());
+    } else if(ScX){
+      casadi_math<T>::fun(op_, input0[0],      getPtr(input1), getPtr(output0), output0.size());
     } else {
-
-      // Function and partial derivatives
-      T f,pd[2];
-
-      for(int el=0; el<output0.size(); ++el){
-        casadi_math<T>::fun(op_,input0[ScX ? 0 : el],input1[ScY ? 0 : el],f);
-        casadi_math<T>::der(op_,input0[ScX ? 0 : el],input1[ScY ? 0 : el],f,pd);
-        output0[el] = f;
-
-        // Propagate forward seeds
-        for(int d=0; d<nfwd; ++d){
-          fwdSens[d][0]->data()[el] = pd[0]*fwdSeed[d][0]->data()[ScX ? 0 : el] + pd[1]*fwdSeed[d][1]->data()[ScY ? 0 : el];
-        }
-    
-        // Propagate adjoint seeds
-        for(int d=0; d<nadj; ++d){
-          T s = adjSeed[d][0]->data()[el];
-          adjSeed[d][0]->data()[el] = 0;
-          adjSens[d][0]->data()[ScX ? 0 : el] += s*pd[0];
-          adjSens[d][1]->data()[ScY ? 0 : el] += s*pd[1];
-        }
-      }
+      casadi_math<T>::fun(op_, getPtr(input0), input1[0],      getPtr(output0), output0.size());
     }
   }
 
