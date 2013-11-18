@@ -575,8 +575,6 @@ namespace CasADi{
     
     }
     
-    casadi_assert_message(nfdir_>0 || nadir_>0,"XFunctionInternal::jac - no sensitivities or jacobiangenerator available for function " << getOption("name"));
-  
     // Quick return
     if (input(iind).empty()) return MatType(output(oind).numel(),0);
     if (output(oind).empty()) return MatType(0,input(iind).numel());
