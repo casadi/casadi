@@ -126,22 +126,10 @@ namespace CasADi{
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
     
-    /** \brief  Evaluate the function */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 
-                           const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
-                           const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, 
-                           std::vector<int>& itmp, std::vector<double>& rtmp){evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);}
-
-    /** \brief  Evaluate the function, no derivatives*/
+    /** \brief  Evaluate numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
-                            const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
-                            const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens, 
-                            std::vector<int>& itmp, std::vector<SX>& rtmp){ evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);}
-
-    /** \brief  Evaluate symbolically (SX), no derivatives */
     virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
@@ -374,22 +362,8 @@ namespace CasADi{
     /** \brief  The sparsity pattern */
     CRSSparsity sparsity_;
 
-    /** \brief  Evaluate the function (no work)*/
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 
-                           const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
-                           const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
-
-    /** \brief  Evaluate symbolically (SX), no work */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
-                            const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
-                            const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
-
     /** \brief  Propagate sparsity, no work */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
-
-    /** \brief Free adjoint memory */
-    template<typename T> 
-    static void clearVector(const std::vector<std::vector<T*> > v);
 
     /** \brief Free adjoint memory (MX) */
     static void clearVector(const std::vector<std::vector<MX*> > v);
@@ -416,18 +390,6 @@ namespace CasADi{
     }
     return ret;
   }
-
-  template<typename T>
-  void MXNode::clearVector(const std::vector<std::vector<T*> > v){
-    for(int i=0; i<v.size(); ++i){
-      for(int j=0; j<v[i].size(); ++j){
-        if(v[i][j]!= 0){
-          v[i][j]->setZero();
-        }
-      }
-    }
-  }
-
 
 } // namespace CasADi
 

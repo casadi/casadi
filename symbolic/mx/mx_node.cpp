@@ -251,27 +251,13 @@ namespace CasADi{
   }
 
   void MXNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
-    DMatrixPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
-    evaluateD(input,output,fwdSeed, fwdSens, adjSeed, adjSens, itmp, rtmp);
-  }
-  
-  void MXNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 
-                         const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
-                         const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     throw CasadiException(string("MXNode::evaluateD not defined for class ") + typeid(*this).name());
   }
-
-  void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    SXMatrixPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
-    evaluateSX(input,output,fwdSeed, fwdSens, adjSeed, adjSens, itmp, rtmp);
-  }
   
-  void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
-                          const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
-                          const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
     throw CasadiException(string("MXNode::evaluateSX not defined for class ") + typeid(*this).name());
   }
-
+  
   void MXNode::evaluateMX(const MXPtrV& input, MXPtrV& output){
     MXPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
     evaluateMX(input,output,fwdSeed, fwdSens, adjSeed, adjSens,false);
