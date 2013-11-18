@@ -510,9 +510,6 @@ namespace CasADi{
     work_.resize(worksize,numeric_limits<double>::quiet_NaN());
     s_work_.resize(worksize);
       
-    // Work vector for partial derivatives
-    pdwork_.resize(operations_.size());
-  
     // Reset the temporary variables
     for(int i=0; i<nodes.size(); ++i){
       if(nodes[i]){
