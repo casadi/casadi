@@ -42,37 +42,22 @@ namespace CasADi{
     return new Reshape(*this);
   }
 
-  void Reshape::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void Reshape::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void Reshape::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void Reshape::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void Reshape::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void Reshape::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
     // Quick return if inplace
     if(input[0]==output[0]) return;
 
-    // Number of derivatives
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    // Nondifferentiated outputs and forward sensitivities
-    for(int d=-1; d<nfwd; ++d){
-      vector<T>& res = d==-1 ? output[0]->data() : fwdSens[d][0]->data();
-      const vector<T>& arg = d==-1 ? input[0]->data() : fwdSeed[d][0]->data();
-      copy(arg.begin(),arg.end(),res.begin());
-    }
-    
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      vector<T>& aseed = adjSeed[d][0]->data();
-      vector<T>& asens = adjSens[d][0]->data();
-      transform(asens.begin(),asens.end(),aseed.begin(),asens.begin(),std::plus<T>());
-      fill(aseed.begin(),aseed.end(),0);
-    }
+    vector<T>& res = output[0]->data();
+    const vector<T>& arg = input[0]->data();
+    copy(arg.begin(),arg.end(),res.begin());
   }
 
   void Reshape::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
