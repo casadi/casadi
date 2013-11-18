@@ -113,6 +113,8 @@ namespace CasADi{
   }
 
   void SXFunctionInternal::evaluate(int nfdir, int nadir){
+    casadi_assert_message(nfdir==0, "Not implemented");
+    casadi_assert_message(nadir==0, "Not implemented");
   
     double time_start;
     double time_stop;
@@ -121,47 +123,8 @@ namespace CasADi{
       CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl; 
     }
     
-    casadi_log("SXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):begin  " << getOption("name"));
-    // Compiletime optimization for certain common cases
-    switch(nfdir){
-    case 0:
-      evaluateGen1(int_compiletime<0>(),nadir); break;
-    case 1:
-      evaluateGen1(int_compiletime<1>(),nadir); break;
-    case optimized_num_dir:
-      evaluateGen1(int_compiletime<optimized_num_dir>(),nadir); break;
-    default:
-      evaluateGen1(int_runtime(nfdir),nadir); break;
-    }
-    casadi_log("SXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):end " << getOption("name"));
-    
-    if (CasadiOptions::profiling) {
-      time_stop = getRealTime();
-      CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_start)*1e3 << " ms | " << this << ":" <<getOption("name") << ":0||SX algorithm size: " << algorithm_.size() << std::endl; 
-    }
-  }
+    casadi_log("SXFunctionInternal::evaluate():begin  " << getOption("name"));
 
-  template<typename T1>
-  void SXFunctionInternal::evaluateGen1(T1 nfdir_c, int nadir){
-    // Compiletime optimization for certain common cases
-    switch(nadir){
-    case 0:
-      evaluateGen(nfdir_c,int_compiletime<0>()); break;
-    case 1:
-      evaluateGen(nfdir_c,int_compiletime<1>()); break;
-    case optimized_num_dir:
-      evaluateGen(nfdir_c,int_compiletime<optimized_num_dir>()); break;
-    default:
-      evaluateGen(nfdir_c,int_runtime(nadir)); break;
-    }
-  }
-
-  template<typename T1, typename T2>
-  void SXFunctionInternal::evaluateGen(T1 nfdir_c, T2 nadir_c){
-    // The following parameters are known either at runtime or at compiletime
-    const int nfdir = nfdir_c.value;
-    const int nadir = nadir_c.value;
-  
     // NOTE: The implementation of this function is very delicate. Small changes in the class structure
     // can cause large performance losses. For this reason, the preprocessor macros are used below
     if (!free_vars_.empty()) {
@@ -171,7 +134,7 @@ namespace CasADi{
     }
   
 #ifdef WITH_LLVM
-    if(just_in_time_ && nfdir==0 && nadir==0){
+    if(just_in_time_){
       // Evaluate the jitted function
       jitfcn_(getPtr(input_ref_),getPtr(output_ref_));
       return;
@@ -179,100 +142,39 @@ namespace CasADi{
 #endif // WITH_LLVM
   
 #ifdef WITH_OPENCL
-    if(just_in_time_opencl_ && nfdir==0 && nadir==0){
+    if(just_in_time_opencl_){
       // Evaluate with OpenCL
       evaluateOpenCL();
       return; // Quick return
     }
 #endif // WITH_OPENCL
 
-    // Do we need taping?
-    const bool taping = nfdir>0 || nadir>0;
-
     // Evaluate the algorithm
-    if(!taping){
-      for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-        switch(it->op){
-          // Start by adding all of the built operations
-          CASADI_MATH_FUN_BUILTIN(work_[it->i1],work_[it->i2],work_[it->i0])
+    for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+      switch(it->op){
+        // Start by adding all of the built operations
+        CASADI_MATH_FUN_BUILTIN(work_[it->i1],work_[it->i2],work_[it->i0])
         
-            // Constant
+        // Constant
         case OP_CONST: work_[it->i0] = it->d; break;
         
-          // Load function input to work vector
+        // Load function input to work vector
         case OP_INPUT: work_[it->i0] = inputNoCheck(it->i1).data()[it->i2]; break;
         
-          // Get function output from work vector
+        // Get function output from work vector
         case OP_OUTPUT: outputNoCheck(it->i0).data()[it->i2] = work_[it->i1]; break;
-        }
-      }
-    } else {
-      vector<TapeEl<double> >::iterator it1 = pdwork_.begin();
-      for(vector<AlgEl>::iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-        switch(it->op){
-          // Start by adding all of the built operations
-          CASADI_MATH_DERF_BUILTIN(work_[it->i1],work_[it->i2],work_[it->i0],it1++->d)
-
-            // Constant
-        case OP_CONST: work_[it->i0] = it->d; break;
-
-          // Load function input to work vector
-        case OP_INPUT: work_[it->i0] = inputNoCheck(it->i1).data()[it->i2]; break;
-        
-          // Get function output from work vector
-        case OP_OUTPUT: outputNoCheck(it->i0).data()[it->i2] = work_[it->i1]; break;
-        }
       }
     }
-  
-    // Quick return if no sensitivities
-    if(!taping) return;
 
-    // Calculate forward sensitivities
-    for(int dir=0; dir<nfdir; ++dir){
-      vector<TapeEl<double> >::const_iterator it2 = pdwork_.begin();
-      for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-        switch(it->op){
-        case OP_CONST:
-          work_[it->i0] = 0; break;
-        case OP_INPUT: 
-          work_[it->i0] = fwdSeedNoCheck(it->i1,dir).data()[it->i2]; break;
-        case OP_OUTPUT: 
-          fwdSensNoCheck(it->i0,dir).data()[it->i2] = work_[it->i1]; break;
-        default: // Unary or binary operation
-          work_[it->i0] = it2->d[0] * work_[it->i1] + it2->d[1] * work_[it->i2]; ++it2; break;
-        }
-      }
-    }
+    casadi_log("SXFunctionInternal::evaluate():end " << getOption("name"));
     
-    // Calculate adjoint sensitivities
-    if(nadir>0) fill(work_.begin(),work_.end(),0);
-    for(int dir=0; dir<nadir; ++dir){
-      vector<TapeEl<double> >::const_reverse_iterator it2 = pdwork_.rbegin();
-      for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
-        double seed;
-        switch(it->op){
-        case OP_CONST:
-          work_[it->i0] = 0;
-          break;
-        case OP_INPUT:
-          adjSensNoCheck(it->i1,dir).data()[it->i2] = work_[it->i0];
-          work_[it->i0] = 0;
-          break;
-        case OP_OUTPUT:
-          work_[it->i1] += adjSeedNoCheck(it->i0,dir).data()[it->i2];
-          break;
-        default: // Unary or binary operation
-          seed = work_[it->i0];
-          work_[it->i0] = 0;
-          work_[it->i1] += it2->d[0] * seed;
-          work_[it->i2] += it2->d[1] * seed;
-          ++it2;
-        }
-      }
+    if (CasadiOptions::profiling) {
+      time_stop = getRealTime();
+      CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_start)*1e3 << " ms | " << this << ":" <<getOption("name") << ":0||SX algorithm size: " << algorithm_.size() << std::endl; 
     }
   }
 
+  
   SXMatrix SXFunctionInternal::hess(int iind, int oind){
     casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
     SXMatrix g = grad(iind,oind);

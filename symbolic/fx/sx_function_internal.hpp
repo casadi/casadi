@@ -105,15 +105,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   struct int_compiletime{
     static const int value = v;
   };
-  
-  /** \brief  Evaluate the function numerically, first argument generic */
-  template<typename T1>
-  void evaluateGen1(T1 nfdir_c, int nadir);
-  
-  /** \brief  Evaluate the function numerically, both arguments generic */
-  template<typename T1, typename T2>
-  void evaluateGen(T1 nfdir_c, T2 nadir_c);
-  
+    
   /** \brief  evaluate symbolically while also propagating directional derivatives */
   virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                       const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
