@@ -129,12 +129,6 @@ namespace CasADi{
     /** \brief Get output scheme */
     CasADi::IOScheme getOutputScheme() const;
     
-    /** \brief Get the number of allocated forward directional derivatives */
-    int numAllocFwd() const;
-
-    /** \brief Get the number of allocated adjoint directional derivatives */
-    int numAllocAdj() const;
-
     /** \brief  Evaluate */
     void evaluate();
   

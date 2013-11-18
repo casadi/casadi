@@ -288,14 +288,6 @@ namespace CasADi{
     return (*this)->derivative(nfwd,nadj);
   }
 
-  int FX::numAllocFwd() const{
-    return (*this)->nfdir_;
-  }
-
-  int FX::numAllocAdj() const{
-    return (*this)->nadir_;
-  }
-
   void FX::generateCode(const string& filename){
     (*this)->generateCode(filename);
   }

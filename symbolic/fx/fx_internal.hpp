@@ -312,9 +312,6 @@ namespace CasADi{
     /** \brief  Output of the function */
     std::vector<FunctionIO> output_;
 
-    /** \brief  Number of forward and adjoint derivatives */
-    int nfdir_, nadir_;
-
     /** \brief  Verbose -- for debugging purposes */
     bool verbose_;
     

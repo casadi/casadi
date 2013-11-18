@@ -65,8 +65,6 @@ namespace CasADi{
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
-    nfdir_ = 0;
-    nadir_ = 0;  
   }
 
 
@@ -1622,12 +1620,7 @@ namespace CasADi{
   }
 
   FX FXInternal::getDerivative(int nfwd, int nadj){
-    if (nadj>0 && nadir_==0) {
-      return getDerivativeViaJac(nfwd,nadj);
-    } else if (nfwd>0 && nfdir_==0) {
-      return getDerivativeViaJac(nfwd,nadj);
-    }
-    casadi_error("getDerivative failed");
+    return getDerivativeViaJac(nfwd,nadj);
   }
 
   FX FXInternal::getDerivativeViaJac(int nfwd, int nadj){
