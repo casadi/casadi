@@ -61,9 +61,6 @@ namespace CasADi{
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir) = 0;
 
-    /** \brief  Evaluate with directional derivative compression */
-    void evaluateCompressed(int nfdir, int nadir);
-
     /** \brief Initialize
         Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
         If passed to another class (in the constructor), this class should invoke this function when initialized. */
@@ -345,9 +342,6 @@ namespace CasADi{
 
     /// Cache for sparsities of the Jacobian blocks
     Matrix<CRSSparsity> jac_sparsity_, jac_sparsity_compact_;
-
-    /// Which derivative directions are currently being compressed
-    std::vector<bool> compressed_fwd_, compressed_adj_;
 
     /// User-provided Jacobian generator function
     JacobianGenerator jacgen_;

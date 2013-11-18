@@ -151,9 +151,6 @@ namespace CasADi{
     /** \brief  Evaluate */
     void evaluate();
   
-    /** \brief  Evaluate with directional derivative compression */
-    void evaluateCompressed(int nfdir=0, int nadir=0);
-  
     /// the same as evaluate()
     void solve();
     

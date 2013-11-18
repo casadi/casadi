@@ -118,13 +118,6 @@ namespace CasADi{
     (*this)->evaluate(0,0);
   }
 
-  void FX::evaluateCompressed(int nfdir, int nadir){
-    assertInit();
-    casadi_assert(nfdir<=(*this)->nfdir_);
-    casadi_assert(nadir<=(*this)->nadir_);
-    (*this)->evaluateCompressed(nfdir,nadir);
-  }
-
   void FX::solve(){
     evaluate();
   }
