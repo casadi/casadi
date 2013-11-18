@@ -106,10 +106,6 @@ void RKIntegratorInternal::init(){
     yf_fun_ = yf_fun;
   }
   
-  // Set number of derivative directions
-  yf_fun_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
-  yf_fun_.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
-  
   // Initialize function
   yf_fun_.init();
 }

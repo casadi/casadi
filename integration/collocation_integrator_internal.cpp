@@ -398,8 +398,6 @@ namespace CasADi{
       startup_integrator_ = startup_integrator_creator(f_,g_);
     
       // Pass options
-      startup_integrator_.setOption("number_of_fwd_dir",0); // not needed
-      startup_integrator_.setOption("number_of_adj_dir",0); // not needed
       startup_integrator_.setOption("t0",coll_time_.front().front());
       startup_integrator_.setOption("tf",coll_time_.back().back());
       

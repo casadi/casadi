@@ -46,10 +46,6 @@ namespace CasADi{
   FXInternal::FXInternal(){
     setOption("name","unnamed_function"); // name of the function
     addOption("sparse",                   OT_BOOLEAN,             true,           "function is sparse");
-    addOption("number_of_fwd_dir",        OT_INTEGER,             1,              "number of forward derivatives to be calculated simultanously");
-    addOption("number_of_adj_dir",        OT_INTEGER,             1,              "number of adjoint derivatives to be calculated simultanously");
-    addOption("max_number_of_fwd_dir",    OT_INTEGER,             optimized_num_dir,  "Allow \"number_of_fwd_dir\" to grow until it reaches this number");
-    addOption("max_number_of_adj_dir",    OT_INTEGER,             optimized_num_dir,  "Allow \"number_of_adj_dir\" to grow until it reaches this number");
     addOption("verbose",                  OT_BOOLEAN,             false,          "verbose evaluation -- for debugging");
     addOption("store_jacobians",          OT_BOOLEAN,             false,          "keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times");
     addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians.","forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate");
@@ -91,16 +87,6 @@ namespace CasADi{
     casadi_assert_warning(getNumInputs()<10000, "Function " << getOption("name") << " has a large number of inputs. Changing the problem formulation is strongly encouraged.");
     casadi_assert_warning(getNumOutputs()<10000, "Function " << getOption("name") << " has a large number of outputs. Changing the problem formulation is strongly encouraged.");  
 
-    // If max_number of sensitivities is zero, disable these sensitivities
-    if (int(getOption("max_number_of_fwd_dir"))==0) {
-      setOption("number_of_fwd_dir",0);
-      setOption("ad_mode","reverse");
-    }
-    if (int(getOption("max_number_of_adj_dir"))==0) {
-      setOption("number_of_adj_dir",0);
-      setOption("ad_mode","forward");
-    }
-    
     // Resize the matrix that holds the sparsity of the Jacobian blocks
     jac_sparsity_ = jac_sparsity_compact_ = Matrix<CRSSparsity>(getNumInputs(),getNumOutputs());
 
@@ -279,10 +265,6 @@ namespace CasADi{
     f.setInputScheme(getInputScheme());
     f.setOutputScheme(getOutputScheme());
     f.setOption("ad_mode",getOption("ad_mode"));
-    f.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
-    f.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
-    f.setOption("max_number_of_fwd_dir",getOption("max_number_of_fwd_dir"));
-    f.setOption("max_number_of_adj_dir",getOption("max_number_of_adj_dir"));
     if (hasSetOption("jacobian_generator")) f.setOption("jacobian_generator",getOption("jacobian_generator"));
     if (hasSetOption("sparsity_generator")) f.setOption("sparsity_generator",getOption("sparsity_generator"));
     
@@ -2039,8 +2021,6 @@ namespace CasADi{
 
     // Load it
     CompiledFunction f_gen("./" + dlname);
-    f_gen.setOption("number_of_fwd_dir",0);
-    f_gen.setOption("number_of_adj_dir",0);
     f_gen.setOption("name",fname + "_gen");
 
     // Initialize it if f was initialized

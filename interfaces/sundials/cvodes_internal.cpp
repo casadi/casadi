@@ -92,9 +92,6 @@ namespace CasADi{
     monitor_rhs_   = monitored("res");
     monitor_rhsQB_ = monitored("resQB");
   
-    // Get the number of forward and adjoint directions
-    nfdir_f_ = f_.getOption("number_of_fwd_dir");
-
     // Sundials return flag
     int flag;
 

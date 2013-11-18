@@ -36,9 +36,6 @@ class CustomFunction;
 
 /** \brief  Interface to a custom function
   
-  Note: max_number_of_fwd_dir and max_number_of_adj_dir will be default zero
-  
-  
   \author Joel Andersson 
   \date 2010
 */

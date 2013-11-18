@@ -30,12 +30,6 @@ using namespace std;
 namespace CasADi{
 
   LinearSolverInternal::LinearSolverInternal(const CRSSparsity& sparsity, int nrhs){
-    // No OO derivatives supported/needed
-    setOption("number_of_fwd_dir",0);
-    setOption("number_of_adj_dir",0);
-    setOption("max_number_of_fwd_dir",0);
-    setOption("max_number_of_adj_dir",0);
-
     // Make sure arguments are consistent
     casadi_assert(!sparsity.isNull());
     casadi_assert_message(sparsity.size1()==sparsity.size2(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity.dimString());  

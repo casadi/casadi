@@ -169,12 +169,7 @@ namespace CasADi{
     * Copied properties: 
     *
     *    input/outputscheme
-    *
-    *   ad_mode
-    *   number_of_fwd_dir
-    *   number_of_adj_dir
-    *   max_number_of_fwd_dir
-    *   max_number_of_adj_dir
+    *    ad_mode
     *   
     *  The function is not initialized
     */

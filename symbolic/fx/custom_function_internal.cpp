@@ -45,9 +45,6 @@ CustomFunctionInternal::CustomFunctionInternal(const CustomEvaluate &c_fcn, cons
   // Make the ref object a non-refence counted pointer to this (as reference counting would prevent deletion of the object)
   ref_.assignNodeNoCount(this);
   
-  setOption("max_number_of_fwd_dir",0);
-  setOption("max_number_of_adj_dir",0);
-  
 }
 
 CustomFunctionInternal::~CustomFunctionInternal(){

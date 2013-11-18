@@ -194,9 +194,6 @@ public:
   // Ids of backward problem
   int whichB_;
 
-  // Number of forward directions for the functions f and g
-  int nfdir_f_, nfdir_g_;
-
   // Initialize the dense linear solver
   void initDenseLinearSolver();
   

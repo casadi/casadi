@@ -125,9 +125,6 @@ namespace CasADi{
       fill(init_z_.begin(),init_z_.end(),0);
     }
 
-    // Get the number of forward and adjoint directions
-    nfdir_f_ = f_.getOption("number_of_fwd_dir");
-
     cj_scaling_ = getOption("cj_scaling");
   
     // Sundials return flag

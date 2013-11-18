@@ -225,9 +225,6 @@ class IdasInternal : public SundialsInternal{
   bool isInitAdj_;
   bool isInitTaping_;
   
-  // Number of forward seeds for the function f
-  int nfdir_f_;
-  
   // Scaling of cj
   bool cj_scaling_;
 
