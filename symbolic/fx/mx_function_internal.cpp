@@ -1043,18 +1043,6 @@ namespace CasADi{
     for(int k=0; k<work_.size(); ++k){
       stream << "work[" << k << "] = " << work_[k].data.data() << endl;
     }
-  
-    for(int d=0; d<nfdir; ++d){
-      for(int k=0; k<work_.size(); ++k){
-        stream << "fwork[" << d << "][" << k << "] = " << work_[k].dataF[d].data() << endl;
-      }
-    }
-  
-    for(int d=0; d<nadir; ++d){
-      for(int k=0; k<work_.size(); ++k){
-        stream << "awork[" << d << "][" << k << "] = " << work_[k].dataA[d].data() << endl;
-      }
-    }
   }
 
   void MXFunctionInternal::allocTape(){

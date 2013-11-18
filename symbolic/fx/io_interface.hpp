@@ -39,12 +39,6 @@ namespace CasADi{
     /// Input/output data
     Matrix<double> data;
   
-    /// Forward derivative data
-    std::vector< Matrix<double> > dataF;
-    
-    /// Adjoint derivative data
-    std::vector< Matrix<double> > dataA;
-
     /// Temporary marker (initialized to zero)
     int tmp;
 
@@ -80,102 +74,6 @@ namespace CasADi{
 #endif
     inline Matrix<double>& output(int oind=0){ return outputS<true>(oind).data;}
     inline Matrix<double>& output(const std::string &oname){ return output(outputSchemeEntry(oname));}
-    //@}
-
-    //@{
-    /// Access forward seed
-    const Matrix<double>& fwdSeed(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSeed(iind,dir); }
-    const Matrix<double>& fwdSeed(const std::string &iname, int dir=0) const{ return fwdSeed(inputSchemeEntry(iname),dir); }
-#ifdef SWIG
-    %rename(fwdSeedRef) fwdSeed;
-#endif
-    Matrix<double>& fwdSeed(int iind=0, int dir=0){
-      try{
-        return inputS<true>(iind).dataF.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(inputS<true>(iind).dataF.empty()){
-          ss << "No forward directions ";
-        } else {
-          ss << "Forward direction " << dir << " is out of range [0," << inputS<true>(iind).dataF.size() << ") ";
-        }
-        ss << "for function " << static_cast<const Derived*>(this)->getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& fwdSeed(const std::string &iname, int dir=0) { return fwdSeed(inputSchemeEntry(iname),dir); }
-    //@}
-
-    //@{
-    /// Access forward sensitivity
-    const Matrix<double>& fwdSens(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->fwdSens(oind,dir);}
-    const Matrix<double>& fwdSens(const std::string &oname, int dir=0) const{ return fwdSens(outputSchemeEntry(oname),dir);}
-#ifdef SWIG
-    %rename(fwdSensRef) fwdSens;
-#endif
-    Matrix<double>& fwdSens(int oind=0, int dir=0){
-      try{
-        return outputS<true>(oind).dataF.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(outputS<true>(oind).dataF.empty()){
-          ss << "No forward directions ";
-        } else {
-          ss << "Forward direction " << dir << " is out of range [0," << outputS<true>(oind).dataF.size() << ") ";
-        }
-        ss << "for function " << static_cast<const Derived*>(this)->getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& fwdSens(const std::string &oname, int dir=0){ return fwdSens(outputSchemeEntry(oname),dir); }
-    //@}
-
-    //@{
-    /// Access adjoint seed
-    const Matrix<double>& adjSeed(int oind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSeed(oind,dir);}
-    const Matrix<double>& adjSeed(const std::string &oname, int dir=0) const{ return adjSeed(outputSchemeEntry(oname),dir); }
-#ifdef SWIG
-    %rename(adjSeedRef) adjSeed;
-#endif
-    Matrix<double>& adjSeed(int oind=0, int dir=0){
-      try{
-        return outputS<true>(oind).dataA.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(outputS<true>(oind).dataA.empty()){
-          ss << "No adjoint directions ";
-        } else {
-          ss << "Adjoint direction " << dir << " is out of range [0," << outputS<true>(oind).dataA.size() << ") ";
-        }
-        ss << "for function " << static_cast<const Derived*>(this)->getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& adjSeed(const std::string &oname, int dir=0){ return adjSeed(outputSchemeEntry(oname),dir); }
-    //@}
-
-    //@{
-    /// Access forward sensitivity
-    const Matrix<double>& adjSens(int iind=0, int dir=0) const{ return const_cast<IOInterface<Derived>*>(this)->adjSens(iind,dir);}
-    const Matrix<double>& adjSens(const std::string &iname, int dir=0) const{ return adjSens(inputSchemeEntry(iname),dir); }
-#ifdef SWIG
-    %rename(adjSensRef) adjSens;
-#endif
-    Matrix<double>& adjSens(int iind=0, int dir=0){
-      try{
-        return inputS<true>(iind).dataA.at(dir);
-      } catch(std::out_of_range&){
-        std::stringstream ss;
-        if(inputS<true>(iind).dataA.empty()){
-          ss << "No adjoint directions ";
-        } else {
-          ss << "Adjoint direction " << dir << " is out of range [0," << inputS<true>(iind).dataA.size() << ") ";
-        }
-        ss << "for function " << static_cast<const Derived*>(this)->getOption("name");
-        throw CasadiException(ss.str());
-      }
-    }
-    Matrix<double>& adjSens(const std::string &iname, int dir=0) { return adjSens(inputSchemeEntry(iname),dir); }
     //@}
 
     /// Get the number of function inputs
@@ -294,28 +192,6 @@ namespace CasADi{
         Assumes a properly allocated val.\n
     */
     void setOutput(T val, int oind=0) const;
-    /** 
-        \brief Reads in the forward seed from val.
-        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-        Assumes a properly allocated val.\n
-    */
-    void setFwdSeed(T val,  int iind=0, int dir=0) const;
-    /** 
-        \brief Reads in the forward sensitivity from val.
-    */
-    void setFwdSens(T val, int oind=0, int dir=0) const ;
-    /** 
-        \brief Reads in the adjoint seed from val.
-        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-        Assumes a properly allocated val.\n
-    */
-    void setAdjSeed(T val,  int oind=0, int dir=0) const;
-    /** 
-        \brief Reads in the adjoint sensitivity from val.
-        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-        Assumes a properly allocated val.\n
-    */
-    void setAdjSens(T val, int iind=0, int dir=0) const ;
     /// @}
 
 #endif
@@ -323,16 +199,8 @@ namespace CasADi{
 #define SETTERS(T)                                                        \
     void setInput(T val, int iind=0)             { static_cast<const Derived*>(this)->assertInit(); input(iind).set(val);  } \
     void setOutput(T val, int oind=0)            { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
-    void setFwdSeed(T val, int iind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); fwdSeed(iind,dir).set(val); } \
-    void setFwdSens(T val, int oind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); fwdSens(oind,dir).set(val); } \
-    void setAdjSeed(T val, int oind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); adjSeed(oind,dir).set(val); } \
-    void setAdjSens(T val, int iind=0, int dir=0){ static_cast<const Derived*>(this)->assertInit(); adjSens(iind,dir).set(val); } \
     void setInput(T val, const std::string &iname)             { setInput(val,inputSchemeEntry(iname));  } \
     void setOutput(T val, const std::string &oname)            { setOutput(val,outputSchemeEntry(oname)); } \
-    void setFwdSeed(T val, const std::string &iname, int dir=0){ setFwdSeed(val,inputSchemeEntry(iname),dir); } \
-    void setFwdSens(T val, const std::string &oname, int dir=0){ setFwdSens(val,outputSchemeEntry(oname),dir); } \
-    void setAdjSeed(T val, const std::string &oname, int dir=0){ setAdjSeed(val,outputSchemeEntry(oname),dir); } \
-    void setAdjSens(T val, const std::string &iname, int dir=0){ setAdjSens(val,inputSchemeEntry(iname),dir); }
 
 #ifndef DOXYGENPROC
     SETTERS(double);
@@ -348,16 +216,8 @@ namespace CasADi{
 #define GETTERS(T)                                                        \
     void getInput(T val, int iind=0) const             { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);} \
     void getOutput(T val, int oind=0) const            { static_cast<const Derived*>(this)->assertInit(); output(oind).get(val);} \
-    void getFwdSeed(T val, int iind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); fwdSeed(iind,dir).get(val);} \
-    void getFwdSens(T val, int oind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); fwdSens(oind,dir).get(val);} \
-    void getAdjSeed(T val, int oind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); adjSeed(oind,dir).get(val);} \
-    void getAdjSens(T val, int iind=0, int dir=0) const{ static_cast<const Derived*>(this)->assertInit(); adjSens(iind,dir).get(val);} \
     void getInput(T val, const std::string &iname) const             { getInput(val,inputSchemeEntry(iname)); } \
     void getOutput(T val, const std::string &oname) const            { getOutput(val,outputSchemeEntry(oname)); } \
-    void getFwdSeed(T val, const std::string &iname, int dir=0) const{ getFwdSeed(val,inputSchemeEntry(iname),dir); } \
-    void getFwdSens(T val, const std::string &oname, int dir=0) const{ getFwdSens(val,outputSchemeEntry(oname),dir); } \
-    void getAdjSeed(T val, const std::string &oname, int dir=0) const{ getAdjSeed(val,outputSchemeEntry(oname),dir); } \
-    void getAdjSens(T val, const std::string &iname, int dir=0) const{ getAdjSens(val,inputSchemeEntry(iname),dir); }
     
 #ifndef DOXYGENPROC
 #ifndef SWIG
@@ -389,33 +249,6 @@ GETTERS(Matrix<double>&);
         Assumes a properly allocated val.\n
     */
     void getOutput(T val, int oind=0) const;
-
-    /** 
-        \brief Writes out the forward seed into val. \noswig
-        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-        Assumes a properly allocated val.\n
-    */
-    void getFwdSeed(T val,  int iind=0, int dir=0) const;
-
-    /**  
-         \brief Writes out the forward sensitivity into val. \noswig
-         T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-        Assumes a properly allocated val.\n
-    */
-    void getFwdSens(T val, int oind=0, int dir=0) const;
-    /** 
-        \brief Writes out the adjoint seed into val. \noswig
-        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-        Assumes a properly allocated val.\n
-    */
-    void getAdjSeed(T val,  int oind=0, int dir=0) const ;
-
-    /** 
-        \brief Writes out the adjoint sensitivity into val. \noswig
-        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-        Assumes a properly allocated val.\n
-    */
-    void getAdjSens(T val, int iind=0, int dir=0) const;
     /// @}
     
  
@@ -428,22 +261,6 @@ GETTERS(Matrix<double>&);
   Matrix<double> getOutput(int oind=0) const ;
   /// Get the output as a new Matrix \nocpp
   Matrix<double> getOutput(const std::string &oname) const ;
-  /// Get the forward seed as a new Matrix \nocpp
-  Matrix<double> getFwdSeed(int iind=0, int dir=0) const;
-  /// Get the forward seed as a new Matrix \nocpp
-  Matrix<double> getFwdSeed(const std::string &iname, int dir=0) const;
-  /// Get the forward sensitivity as a new Matrix \nocpp
-  Matrix<double> getFwdSens(int oind=0, int dir=0) const;
-  /// Get the forward sensitivity as a new Matrix \nocpp
-  Matrix<double> getFwdSens(const std::string &oname, int dir=0) const;
-  /// Get the adjoint seed as a new Matrix \nocpp
-  Matrix<double> getAdjSeed(int oind=0, int dir=0) const;
-  /// Get the adjoint seed as a new Matrix \nocpp
-  Matrix<double> getAdjSeed(const std::string &oname, int dir=0) const;
-  /// Get the adjoint sensitivity as a new Matrix \nocpp
-  Matrix<double> getAdjSens(int iind=0, int dir=0) const;
-  /// Get the adjoint sensitivity as a new Matrix \nocpp
-  Matrix<double> getAdjSens(const std::string &iname, int dir=0) const;
   ///@}
 #endif
 
