@@ -72,10 +72,8 @@ namespace CasADi {
     return fcn_;
   }
 
-  void CallFX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
-                                const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens,
-                                const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<SX>& rtmp) {
-    fcn_->evaluateSX(this,arg,res,fseed,fsens,aseed,asens,itmp,rtmp);
+  void CallFX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res, std::vector<int>& itmp, std::vector<SX>& rtmp) {
+    fcn_->evaluateSX(this,arg,res,itmp,rtmp);
   }
 
   void CallFX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given) {

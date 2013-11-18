@@ -2457,9 +2457,7 @@ namespace CasADi{
     }
   }
 
-  void FXInternal::evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res,
-                              const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens,
-                              const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<SX>& rtmp) {
+  void FXInternal::evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res, std::vector<int>& itmp, std::vector<SX>& rtmp) {
   
     // Create input arguments
     vector<SXMatrix> argv(arg.size());
