@@ -48,32 +48,16 @@ namespace CasADi{
   }
 
   template<typename T, typename MatV, typename MatVV> 
-  void SetSparse::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
-
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    // Propate values
+  void SetSparse::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
     output[0]->set(*input[0]);
-    
-    // Propagate forward seeds
-    for(int d=0; d<nfwd; ++d){
-      fwdSens[d][0]->set(*fwdSeed[d][0]);
-    }
-
-    // Propagate adjoint seeds
-    for(int d=0; d<nadj; ++d){      
-      adjSens[d][0]->sparsity().add(adjSens[d][0]->ptr(),adjSeed[d][0]->ptr(),adjSeed[d][0]->sparsity());
-      adjSeed[d][0]->setZero();
-    }
   }
 
-  void SetSparse::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void SetSparse::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void SetSparse::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void SetSparse::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   void SetSparse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
