@@ -383,41 +383,20 @@ void ControlSimulatorInternal::init(){
 }
 
 void ControlSimulatorInternal::evaluate(int nfdir, int nadir){
+  casadi_assert(nfdir==0);
+  casadi_assert(nadir==0);
 
   // Copy all inputs
   for (int i=0;i<input_.size();++i) {
     all_output_.input(i).set(input(i));
-    // Pass forward seeds
-    for(int dir=0; dir<nfdir; ++dir){
-      all_output_.fwdSeed(i,dir).set(fwdSeed(i,dir));
-    }
   }
   
-  for (int i=0;i<output_.size();++i) {
-    // Pass adjoint seeds
-    for(int dir=0; dir<nadir; ++dir){
-      all_output_.adjSeed(i,dir).set(adjSeed(i,dir));
-    }
-  }
-  
-  all_output_.evaluateOld(nfdir,nadir);
+  all_output_.evaluate();
   
   // Copy all outputs
   for (int i=0;i<output_.size();++i) {
     output(i).set(all_output_.output(i));
-    // Copy all forward sensitivities
-    for(int dir=0; dir<nfdir; ++dir){
-      fwdSens(i,dir).set(all_output_.fwdSens(i,dir));
-    }
   }
-  
-  for (int i=0;i<input_.size();++i) {
-    // Copy all adjoint sensitivities
-    for(int dir=0; dir<nadir; ++dir){
-      adjSens(i,dir).set(all_output_.adjSens(i,dir));
-    }
-  }
-  
   
 }
 
