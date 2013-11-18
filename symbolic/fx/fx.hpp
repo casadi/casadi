@@ -148,11 +148,8 @@ namespace CasADi{
     /** \brief Get the number of allocated adjoint directional derivatives */
     int numAllocAdj() const;
 
-    /** \brief  Evaluate (legacy) */
-    void evaluateOld(int nfdir=0, int nadir=0);
-
     /** \brief  Evaluate */
-    void evaluate(){ evaluateOld(0,0);}
+    void evaluate();
   
     /** \brief  Evaluate with directional derivative compression */
     void evaluateCompressed(int nfdir=0, int nadir=0);
