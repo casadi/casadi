@@ -49,18 +49,6 @@ OutputNode::OutputNode(const MX& parent, int oind) : oind_(oind){
 OutputNode::~OutputNode(){
 }
 
-void OutputNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-}
-
-void OutputNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-}
-
-void OutputNode::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-}
-
-void OutputNode::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){ 
-}
-
 void OutputNode::printPart(std::ostream &stream, int part) const{
   if(part==0){
     if(ndep()>1)
