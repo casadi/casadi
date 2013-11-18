@@ -34,30 +34,17 @@ namespace CasADi{
     return new SubRef(*this);
   }
 
-  void SubRef::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void SubRef::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void SubRef::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void SubRef::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void SubRef::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
-
-    // Nondifferentiated outputs
+  void SubRef::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
     input[0]->getSub(*output[0],i_,j_);
-    
-    // Forward sensitivities
-    for(int d=0; d<fwdSens.size(); ++d){
-      fwdSeed[d][0]->getSub(*fwdSens[d][0],i_,j_);
-    }
-    
-    // Adjoint sensitivities
-    for(int d=0; d<adjSeed.size(); ++d){
-      adjSens[d][0]->addSub(*adjSeed[d][0],i_,j_);
-      adjSeed[d][0]->setZero();
-    }
   }
 
   void SubRef::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
