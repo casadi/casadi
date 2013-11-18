@@ -117,7 +117,7 @@ namespace CasADi{
     HESSLAG_X,
     /// Fixed parameter [p]
     HESSLAG_P, 
-    /// Multiplier for f [lam_f]
+    /// Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective. [lam_f]
     HESSLAG_LAM_F,
     /// Multiplier for g [lam_g]
     HESSLAG_LAM_G,
@@ -209,16 +209,28 @@ namespace CasADi{
     /// Set options that make the NLP solver more suitable for solving QPs
     void setQPOptions();
   
-    /// Access the NLP
+    /** \brief Access the NLP
+    *  \copydoc scheme_NLPSolverInput
+    *  \copydoc scheme_NLPSolverOutput
+    */
     FX nlp();
 
-    // Access the objective gradient function
+    /** Access the objective gradient function
+    *  \copydoc scheme_GradFInput
+    *  \copydoc scheme_GradFIOutput
+    */
     FX gradF();
 
-    /// Access the Jacobian of the constraint function
+    /** \brief Access the Jacobian of the constraint function
+    *  \copydoc scheme_HessLagInput
+    *  \copydoc scheme_HessLagOutput
+    */
     FX jacG();
 
-    /// Access the Hessian of the Lagrangian function
+    /** \brief Access the Hessian of the Lagrangian function
+    *  \copydoc scheme_JacGInput
+    *  \copydoc scheme_JacGOutput
+    */
     FX hessLag();
 
     /// Join F and G in old signature style to a common NLP function

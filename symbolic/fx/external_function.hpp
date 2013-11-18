@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef COMPILED_FUNCTION_HPP
-#define COMPILED_FUNCTION_HPP
+#ifndef EXTERNAL_FUNCTION_HPP
+#define EXTERNAL_FUNCTION_HPP
 
 #include "fx.hpp"
 #include <string>
@@ -30,28 +30,28 @@ namespace CasADi{
 
   
 /** \brief  Forward declaration of internal class */
-class CompiledFunctionInternal;
+class ExternalFunctionInternal;
 
 /** \brief  Interface for a function that is not implemented by CasADi symbolics
   \author Joel Andersson 
   \date 2011
   */
-class CompiledFunction : public FX{
+class ExternalFunction : public FX{
 
 public:
 
 /** \brief  CONSTRUCTORS: */
 /** \brief  default constructor */
-  CompiledFunction();
+  ExternalFunction();
 
   /** \brief  Create an empty function */
-  explicit CompiledFunction(const std::string& bin_name);
+  explicit ExternalFunction(const std::string& bin_name);
 
   /** \brief  Access functions of the node */
-  CompiledFunctionInternal* operator->();
+  ExternalFunctionInternal* operator->();
   
   /** \brief  Const access functions of the node */
-  const CompiledFunctionInternal* operator->() const;
+  const ExternalFunctionInternal* operator->() const;
     
   /** \brief  Check if the pointer points towards a valid object */
   virtual bool checkNode() const;
@@ -61,4 +61,4 @@ public:
 } // namespace CasADi
 
 
-#endif // COMPILED_FUNCTION_HPP
+#endif // EXTERNAL_FUNCTION_HPP

@@ -558,6 +558,13 @@ class Sparsitytests(casadiTestCase):
     J.init()
     
     self.assertTrue(J.output()[:X.size(),:].sparsity()==sp_diag(100))
+    
+  def test_sp_rowcol(self):
+    n = 3
+    
+    s = sp_rowcol([0,n-1],[n-1,0],n,n)
+    self.checkarray(IMatrix(s.rowind()),IMatrix([0,2,2,4]))
+    self.checkarray(IMatrix(s.col()),IMatrix([0,2,0,2]))
 
 
 if __name__ == '__main__':

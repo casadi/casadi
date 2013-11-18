@@ -23,7 +23,7 @@
 #include <iostream>
 #include <symbolic/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/fx/compiled_function.hpp>
+#include <symbolic/fx/external_function.hpp>
 
 using namespace CasADi;
 using namespace std;

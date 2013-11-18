@@ -20,7 +20,7 @@
  *
  */
 
-#include "compiled_function_internal.hpp"
+#include "external_function_internal.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -32,23 +32,23 @@ namespace CasADi{
 
 using namespace std;
 
-CompiledFunction::CompiledFunction(){
+ExternalFunction::ExternalFunction(){
 }
 
-CompiledFunction::CompiledFunction(const std::string& bin_name){
-  assignNode(new CompiledFunctionInternal(bin_name));
+ExternalFunction::ExternalFunction(const std::string& bin_name){
+  assignNode(new ExternalFunctionInternal(bin_name));
 }
 
-CompiledFunctionInternal* CompiledFunction::operator->(){
-  return (CompiledFunctionInternal*)(FX::operator->());
+ExternalFunctionInternal* ExternalFunction::operator->(){
+  return (ExternalFunctionInternal*)(FX::operator->());
 }
 
-const CompiledFunctionInternal* CompiledFunction::operator->() const{
-   return (const CompiledFunctionInternal*)(FX::operator->()); 
+const ExternalFunctionInternal* ExternalFunction::operator->() const{
+   return (const ExternalFunctionInternal*)(FX::operator->()); 
 }
   
-bool CompiledFunction::checkNode() const{
-  return dynamic_cast<const CompiledFunctionInternal*>(get())!=0;
+bool ExternalFunction::checkNode() const{
+  return dynamic_cast<const ExternalFunctionInternal*>(get())!=0;
 }
 
 

@@ -29,7 +29,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
-#include "compiled_function.hpp"
+#include "external_function.hpp"
 
 #include "../casadi_options.hpp"
 #include "../profiling.hpp"
@@ -261,7 +261,7 @@ namespace CasADi{
     vector<MX> res = shared_from_this<FX>().call(arg);
     
     MXFunction f = MXFunction(arg,res);
-    f.setOption("name",STRING("wrap_" << getOption("name")));
+    f.setOption("name","wrap_" + string(getOption("name")));
     f.setInputScheme(getInputScheme());
     f.setOutputScheme(getOutputScheme());
     f.setOption("ad_mode",getOption("ad_mode"));
@@ -2020,7 +2020,7 @@ namespace CasADi{
     }
 
     // Load it
-    CompiledFunction f_gen("./" + dlname);
+    ExternalFunction f_gen("./" + dlname);
     f_gen.setOption("name",fname + "_gen");
 
     // Initialize it if f was initialized

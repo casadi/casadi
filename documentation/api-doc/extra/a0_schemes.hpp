@@ -503,6 +503,20 @@
 <br/>
 @copydoc scheme_QPSolverOutput
 */
+/** \class CasADi::CSparseInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/** \class CasADi::CSparse
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
 /** \class CasADi::SimulatorInternal
 \n
 \par
@@ -1077,20 +1091,6 @@
 @copydoc scheme_LinsolOutput
 */
 /** \class CasADi::LinearSolver
-\n
-\par
-@copydoc scheme_LinsolInput
-<br/>
-@copydoc scheme_LinsolOutput
-*/
-/** \class CasADi::CSparseInternal
-\n
-\par
-@copydoc scheme_LinsolInput
-<br/>
-@copydoc scheme_LinsolOutput
-*/
-/** \class CasADi::CSparse
 \n
 \par
 @copydoc scheme_LinsolInput

@@ -343,7 +343,7 @@ Matrix<T> norm_22(const Matrix<T>& x);
 
 /// Return summation of all elements
 template<class T>
-T sumAll(const Matrix<T> &x); 
+Matrix<T> sumAll(const Matrix<T> &x); 
 
 /** \brief Return a row-wise summation of elements */
 template<class T>
@@ -865,7 +865,7 @@ Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp) {
 template<class T>
 Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y){
   casadi_assert_message(x.shape()==y.shape(), "inner_prod: Dimension mismatch");
-  return Matrix<T>(sumAll(x*y));
+  return sumAll(x*y);
 }
 
 template<class T>
@@ -875,7 +875,9 @@ Matrix<T> outer_prod(const Matrix<T> &x, const Matrix<T> &y){
 }
 
 template<class T>
-T sumAll(const Matrix<T> &x) {
+Matrix<T> sumAll(const Matrix<T> &x) {
+  // Quick return if empty
+  if (x.empty()) return Matrix<T>(1,1);
   // Sum non-zero elements
   T res=0;
   for(int k=0; k<x.size(); k++){
@@ -956,7 +958,8 @@ void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
       // ri[j] = inner_prod(qj,ai); // Classical Gram-Schmidt
      
       // Remove projection in direction j
-      qi -= ri(0,j) * qj;
+      if (ri.hasNZ(0,j))
+        qi -= ri(0,j) * qj;
     }
 
     // Normalize qi
@@ -982,24 +985,36 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
   if(isTril(A)){
     // forward substitution if lower triangular
     Matrix<T> x = b;
+    const std::vector<int> & Acol = A.col();
+    const std::vector<int> & Arowind = A.rowind();
+    const std::vector<T> & Adata = A.data();
     for(int i=0; i<A.size1(); ++i){ // loop over rows
       for(int k=0; k<b.size2(); ++k){ // for every right hand side
-        for(int j=0; j<i; ++j){
-          x(i,k) -= A(i,j)*x(j,k);
+        for(int kk=Arowind[i]; kk<Arowind[i+1] && Acol[kk]<i; ++kk){ 
+          int j = Acol[kk];
+          if (x.hasNZ(j,k))
+            x(i,k) -= Adata[kk]*x(j,k);
         }
-        x(i,k) /= A(i,i);
+        if (x.hasNZ(i,k))
+          x(i,k) /= A(i,i);
       }
     }
     return x;
   } else if(isTriu(A)){
     // backward substitution if upper triangular
     Matrix<T> x = b;
+    const std::vector<int> & Acol = A.col();
+    const std::vector<int> & Arowind = A.rowind();
+    const std::vector<T> & Adata = A.data();
     for(int i=A.size1()-1; i>=0; --i){ // loop over rows from the back
       for(int k=0; k<b.size2(); ++k){ // for every right hand side
-        for(int j=A.size1()-1; j>i; --j){
-          x(i,k) -= A(i,j)*x(j,k);
+        for(int kk=Arowind[i+1]-1; kk>=Arowind[i] && Acol[kk]>i; --kk){
+          int j = Acol[kk]; 
+          if (x.hasNZ(j,k))
+            x(i,k) -= Adata[kk]*x(j,k);
         }
-        x(i,k) /= A(i,i);
+        if (x.hasNZ(i,k))
+          x(i,k) /= A(i,i);
       }
     }
     return x;
@@ -1051,7 +1066,7 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
     } else if(A.size1()<=3){
       
       // Form inverse by minor expansion and multiply if very small (up to 3-by-3)
-      xperm = mul(inv(A),bperm);
+      xperm = mul(inv(Aperm),bperm);
 
     } else {
       

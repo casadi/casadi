@@ -175,18 +175,17 @@ namespace CasADi {
     Py_DECREF(iind_py);
     Py_DECREF(oind_py);
     Py_DECREF(fcn_py);
-    if (!r) {
-     PyErr_Print();
-     throw CasadiException("SparsityGeneratorPythonInternal: python method execution raised an Error.");
-    }
-    
     if (r) {
       CRSSparsity ret;  
       int result = meta< CRSSparsity >::as(r,ret);
       if(!result) { Py_DECREF(r); throw CasadiException("SparsityGeneratorPythonInternal: return type was not CRSSparsity."); }
       Py_DECREF(r);
       return ret;
+    } else {
+     PyErr_Print();
+     throw CasadiException("SparsityGeneratorPythonInternal: python method execution raised an Error.");
     }
+   
   }
   
 
@@ -205,10 +204,6 @@ namespace CasADi {
     Py_DECREF(iind_py);
     Py_DECREF(oind_py);
     Py_DECREF(fcn_py);
-    if (!r) {
-     PyErr_Print();
-     throw CasadiException("JacobianGeneratorPythonInternal: python method execution raised an Error.");
-    }
     
     if (r) {
       FX ret;  
@@ -216,6 +211,9 @@ namespace CasADi {
       if(!result) { Py_DECREF(r); throw CasadiException("JacobianGeneratorPythonInternal: return type was not FX."); }
       Py_DECREF(r);
       return ret;
+    } else {
+      PyErr_Print();
+      throw CasadiException("JacobianGeneratorPythonInternal: python method execution raised an Error.");
     }
   }
 
