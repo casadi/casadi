@@ -53,10 +53,7 @@ namespace CasADi{
   }
 
   template<bool Tr>
-  void Solve<Tr>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-    
+  void Solve<Tr>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
     // Factorize the matrix
     linear_solver_.setInput(*input[1],LINSOL_A);
     linear_solver_.prepare();
@@ -66,44 +63,6 @@ namespace CasADi{
       copy(input[0]->begin(),input[0]->end(),output[0]->begin());
     }
     linear_solver_.solve(getPtr(output[0]->data()),output[0]->size1(),Tr);
-
-    // Forward sensitivities
-    for(int d=0; d<nfwd; ++d){
-      if(fwdSeed[d][0]!=fwdSens[d][0]){
-        copy(fwdSeed[d][0]->begin(),fwdSeed[d][0]->end(),fwdSens[d][0]->begin());
-      }
-      transform(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),fwdSens[d][0]->begin(),std::negate<double>());
-      if(Tr){
-        DMatrix::mul_no_alloc_nt(*output[0],*fwdSeed[d][1],*fwdSens[d][0]);
-      } else {
-        DMatrix::mul_no_alloc_nn(*output[0],*fwdSeed[d][1],*fwdSens[d][0]);
-      }
-      transform(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),fwdSens[d][0]->begin(),std::negate<double>());
-      linear_solver_.solve(getPtr(fwdSens[d][0]->data()),output[0]->size1(),Tr);      
-    }
-
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-
-      // Solve transposed
-      transform(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),adjSeed[d][0]->begin(),std::negate<double>());
-      linear_solver_.solve(getPtr(adjSeed[d][0]->data()),output[0]->size1(),!Tr);
-
-      // Propagate to A
-      if(!Tr){
-        DMatrix::mul_no_alloc_tn(*output[0],*adjSeed[d][0],*adjSens[d][1]);
-      } else {
-        DMatrix::mul_no_alloc_tn(*adjSeed[d][0],*output[0],*adjSens[d][1]);
-      }
-
-      // Propagate to B
-      if(adjSeed[d][0]==adjSens[d][0]){
-        transform(adjSens[d][0]->begin(),adjSens[d][0]->end(),adjSens[d][0]->begin(),std::negate<double>());
-      } else {
-        transform(adjSens[d][0]->begin(),adjSens[d][0]->end(),adjSeed[d][0]->begin(),adjSens[d][0]->begin(),std::minus<double>());
-        fill(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),0);
-      }
-    }
   }
 
   template<bool Tr>
