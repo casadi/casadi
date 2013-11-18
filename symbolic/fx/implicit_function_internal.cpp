@@ -122,6 +122,9 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::evaluate(int nfdir, int nadir){
+    casadi_assert_message(nadir==0, "Not implemented");
+    casadi_assert_message(nfdir==0, "Not implemented");
+
     // Set up timers for profiling
     double time_zero;
     double time_start;
@@ -135,105 +138,6 @@ namespace CasADi{
 
     // Solve the nonlinear system of equations
     solveNonLinear();
-
-    // Quick return if no sensitivities
-    if(nfdir==0 && nadir==0) return;
-
-    // Make sure that a linear solver has been provided
-    casadi_assert_message(!linsol_.isNull(),"Sensitivities of an implicit function requires a provided linear solver");
-    casadi_assert_message(!jac_.isNull(),"Sensitivities of an implicit function requires an exact Jacobian");
-  
-    if (CasadiOptions::profiling) {
-       time_start = getRealTime(); // Start timer
-    }
-    
-    // Evaluate and factorize the Jacobian
-    if (!fact_up_to_date_) {
-      // Pass inputs
-      jac_.setInput(output(),0);
-      for(int i=0; i<getNumInputs(); ++i)
-        jac_.setInput(input(i),i+1);
-
-      // Evaluate jacobian
-      jac_.evaluate();
-
-      // Pass non-zero elements, scaled by -gamma, to the linear solver
-      linsol_.setInput(jac_.output(),0);
-
-      // Prepare the solution of the linear system (e.g. factorize)
-      linsol_.prepare();
-      fact_up_to_date_ = true;
-    }
-
-  
-    // General scheme:  f(z,x_i) = 0
-    //
-    //  Forward sensitivities:
-    //     dot(f(z,x_i)) = 0
-    //     df/dz dot(z) + Sum_i df/dx_i dot(x_i) = 0
-    //
-    //     dot(z) = [df/dz]^(-1) [ Sum_i df/dx_i dot(x_i) ] 
-    //
-    //     dot(y_i) = dy_i/dz dot(z) + Sum_j dy_i/dx_i dot(x_i)
-    //
-    //  Adjoint sensitivitites:
-
-  
-    // Pass inputs to function
-    f_.setInput(output(0),0);
-    for(int i=0; i<getNumInputs(); ++i)
-      f_.input(i+1).set(input(i));
-
-    // Pass input seeds to function
-    for(int dir=0; dir<nfdir; ++dir){
-      f_.fwdSeed(0,dir).setZero();
-      for(int i=0; i<getNumInputs(); ++i){
-        f_.fwdSeed(i+1,dir).set(fwdSeed(i,dir));
-      }
-    }
-  
-    // Solve for the adjoint seeds
-    for(int dir=0; dir<nadir; ++dir){
-      // Negate adjoint seed and pass to function
-      Matrix<double>& faseed = f_.adjSeed(0,dir);
-      faseed.set(adjSeed(0,dir));
-      for(vector<double>::iterator it=faseed.begin(); it!=faseed.end(); ++it){
-        *it = -*it;
-      }
-    
-      // Solve the transposed linear system
-      linsol_.solve(&faseed.front(),1,false);
-    }
-  
-    // Evaluate
-    f_.evaluateOld(nfdir,nadir);
-  
-    // Get the forward sensitivities
-    for(int dir=0; dir<nfdir; ++dir){
-      // Negate intermediate result and copy to output
-      Matrix<double>& fsens = fwdSens(0,dir);
-      fsens.set(f_.fwdSens(0,dir));
-      for(vector<double>::iterator it=fsens.begin(); it!=fsens.end(); ++it){
-        *it = -*it;
-      }
-    
-      // Solve the linear system
-      linsol_.solve(&fsens.front(),1,true);
-    }
-  
-    // Get the adjoint sensitivities
-    for(int dir=0; dir<nadir; ++dir){
-      for(int i=0; i<getNumInputs(); ++i){
-        f_.adjSens(i+1,dir).get(adjSens(i,dir));
-      }
-    }
-    
-
-
-    if (CasadiOptions::profiling) {
-      time_stop = getRealTime(); // Stop timer
-      CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":3||stuff" << std::endl;
-    }
   }
 
   void ImplicitFunctionInternal::evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given){
