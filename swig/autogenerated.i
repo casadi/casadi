@@ -1268,7 +1268,7 @@ def hessLagIn(*dummy,**kwargs):
   Keyword arguments:
     x     -- Decision variable [HESSLAG_X]
     p     -- Fixed parameter [HESSLAG_P]
-    lam_f -- Multiplier for f [HESSLAG_LAM_F]
+    lam_f -- Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective. [HESSLAG_LAM_F]
     lam_g -- Multiplier for g [HESSLAG_LAM_G]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagIn. Either use keywords or non-keywords ")

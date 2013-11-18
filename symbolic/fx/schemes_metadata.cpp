@@ -594,7 +594,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_HessLagInput: 
       if(i==0) return "Decision variable";
       if(i==1) return "Fixed parameter";
-      if(i==2) return "Multiplier for f";
+      if(i==2) return "Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective.";
       if(i==3) return "Multiplier for g";
       break;
     case SCHEME_HessLagOutput: 
