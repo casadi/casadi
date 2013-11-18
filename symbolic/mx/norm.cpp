@@ -40,16 +40,16 @@ namespace CasADi{
     }
   }
 
-  void NormF::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void NormF::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void NormF::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void NormF::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void NormF::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void NormF::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
     // Get data
     T& res = output[0]->data().front();
     const vector<T> &arg = input[0]->data();
@@ -57,23 +57,6 @@ namespace CasADi{
 
     // Perform the inner product
     res = sqrt(casadi_dot(n,getPtr(arg),1,getPtr(arg),1));
-
-    // Forward sensitivities
-    int nfwd = fwdSens.size();
-    for(int d=0; d<nfwd; ++d){
-      T& fsens = fwdSens[d][0]->data().front();
-      const vector<T> &fseed = fwdSeed[d][0]->data();
-      fsens = casadi_dot(n,getPtr(fseed),1,getPtr(arg),1) / res;
-    }
-
-    // Adjoint sensitivities
-    int nadj = adjSeed.size();
-    for(int d=0; d<nadj; ++d){
-      T& aseed = adjSeed[d][0]->data().front();
-      vector<T> &asens = adjSens[d][0]->data();
-      casadi_axpy(n,aseed / res,getPtr(arg),1,getPtr(asens),1);
-      aseed = 0;
-    }
   }
 
   void NormF::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
