@@ -76,47 +76,27 @@ namespace CasADi{
     return new Vertsplit(*this);
   }
 
-  void Vertsplit::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void Vertsplit::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void Vertsplit::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void Vertsplit::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void Vertsplit::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void Vertsplit::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
     // Number of derivatives
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
     int nx = offset_.size()-1;
     const vector<int>& x_rowind = dep().sparsity().rowind();
 
-    // Nondifferentiated outputs and forward sensitivities
-    for(int d=-1; d<nfwd; ++d){
-      const MatV& arg = d<0 ? input : fwdSeed[d];
-      MatV& res = d<0 ? output : fwdSens[d];
-      for(int i=0; i<nx; ++i){
-        int nz_first = x_rowind[offset_[i]];
-        int nz_last = x_rowind[offset_[i+1]];
-        if(res[i]!=0){
-          copy(arg[0]->begin()+nz_first, arg[0]->begin()+nz_last, res[i]->begin());
-        }
-      }
-    }
-    
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      typename vector<T>::iterator asens_it = adjSens[d][0]->begin();
-      for(int i=0; i<nx; ++i){
-        int nz_first = x_rowind[offset_[i]];
-        int nz_last = x_rowind[offset_[i+1]];
-
-        if(adjSeed[d][i]!=0){
-          vector<T>& aseed_i = adjSeed[d][i]->data();
-          transform(aseed_i.begin(),aseed_i.end(),asens_it+nz_first,asens_it+nz_first,std::plus<T>());
-          fill(aseed_i.begin(), aseed_i.end(), 0);
-        }
+    const MatV& arg = input;
+    MatV& res = output;
+    for(int i=0; i<nx; ++i){
+      int nz_first = x_rowind[offset_[i]];
+      int nz_last = x_rowind[offset_[i+1]];
+      if(res[i]!=0){
+        copy(arg[0]->begin()+nz_first, arg[0]->begin()+nz_last, res[i]->begin());
       }
     }
   }
