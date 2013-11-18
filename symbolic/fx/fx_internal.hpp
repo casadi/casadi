@@ -66,13 +66,6 @@ namespace CasADi{
         If passed to another class (in the constructor), this class should invoke this function when initialized. */
     virtual void init();
 
-    /** \brief  Update the number of sensitivity directions during or after initialization, 
-        if recursive==true, updateNumSens is also invoked for the baseclass. */
-    virtual void updateNumSens(bool recursive);
-    
-    /** \brief Request a number of forward/adjoint derivative directions */
-    void requestNumSens(int nfwd, int nadj);
-  
     /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 

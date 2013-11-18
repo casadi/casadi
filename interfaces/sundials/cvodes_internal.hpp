@@ -64,9 +64,6 @@ public:
   /** \brief  Initialize stage */
   virtual void init();
 
-  /** \brief  Update the number of sensitivity directions during or after initialization */
-  virtual void updateNumSens(bool recursive);
-
   /** \brief Initialize the adjoint problem (can only be called after the first integration) */
   virtual void initAdj();
 

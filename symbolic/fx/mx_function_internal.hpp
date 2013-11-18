@@ -64,9 +64,6 @@ namespace CasADi{
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief  Update the number of sensitivity directions during or after initialization */
-    virtual void updateNumSens(bool recursive);
-
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
     

@@ -76,8 +76,6 @@ void SimulatorInternal::init(){
   // Initialize the output function
   output_fcn_.init();
   
-  SimulatorInternal::updateNumSens(false);
-  
   // Allocate inputs
   input_.resize(INTEGRATOR_NUM_IN);
   for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
@@ -164,25 +162,6 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
         ores(k,j) = res(j); // NOTE: inefficient implementation
       }
     }
-  }
-}
-
-void SimulatorInternal::updateNumSens(bool recursive){
-
-  if (recursive) {
-    FXInternal::updateNumSens(recursive);
-  }
-  
-  if (!output_fcn_.isNull()) {
-    output_fcn_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
-    output_fcn_.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
-    output_fcn_.updateNumSens();
-  }
-    
-  if (!integrator_.isNull()) {
-    integrator_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
-    integrator_.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
-    integrator_.updateNumSens();
   }
 }
 

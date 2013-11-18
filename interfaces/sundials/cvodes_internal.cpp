@@ -78,11 +78,6 @@ CVodesInternal::~CVodesInternal(){
   freeCVodes();
 }
 
-void CVodesInternal::updateNumSens(bool recursive){
-  // Not supported re-initalization needed
-  init();
-}
-
 void CVodesInternal::init(){
   log("CVodesInternal::init","begin");
   

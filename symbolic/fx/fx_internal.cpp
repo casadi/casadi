@@ -65,9 +65,9 @@ namespace CasADi{
     user_data_ = 0;
     monitor_inputs_ = false;
     monitor_outputs_ = false;
-  
+    nfdir_ = 0;
+    nadir_ = 0;  
   }
-
 
 
   FXInternal::~FXInternal(){
@@ -103,9 +103,6 @@ namespace CasADi{
       setOption("ad_mode","forward");
     }
     
-    // Allocate data for sensitivities (only the method in this class)
-    FXInternal::updateNumSens(false);
-  
     // Resize the matrix that holds the sparsity of the Jacobian blocks
     jac_sparsity_ = jac_sparsity_compact_ = Matrix<CRSSparsity>(getNumInputs(),getNumOutputs());
 
@@ -140,43 +137,6 @@ namespace CasADi{
 
     // Mark the function as initialized
     is_init_ = true;
-  }
-
-  void FXInternal::updateNumSens(bool recursive){
-    // Get the new number
-    nfdir_ = getOption("number_of_fwd_dir");
-    nadir_ = getOption("number_of_adj_dir");
-  
-    // Warn if the number exceeds the maximum
-    casadi_assert_warning(nfdir_ <= int(getOption("max_number_of_fwd_dir")), "The number of forward directions exceeds the maximum number. Decrease \"number_of_fwd_dir\" or increase \"max_number_of_fwd_dir\"");
-    casadi_assert_warning(nadir_ <= int(getOption("max_number_of_adj_dir")), "The number of adjoint directions exceeds the maximum number. Decrease \"number_of_adj_dir\" or increase \"max_number_of_adj_dir\"");
-  
-    // Allocate memory for the seeds and sensitivities
-    for(vector<FunctionIO>::iterator it=input_.begin(); it!=input_.end(); ++it){
-      it->dataF.resize(nfdir_,it->data);
-      it->dataA.resize(nadir_,it->data);
-    }
-    for(vector<FunctionIO>::iterator it=output_.begin(); it!=output_.end(); ++it){
-      it->dataF.resize(nfdir_,it->data);
-      it->dataA.resize(nadir_,it->data);
-    }
-  }
-
-  void FXInternal::requestNumSens(int nfwd, int nadj){
-    // Request the number of directions to the number that we would ideally have
-    int nfwd_new = std::max(nfwd,std::max(nfdir_,int(getOption("number_of_fwd_dir"))));
-    int nadj_new = std::max(nadj,std::max(nadir_,int(getOption("number_of_adj_dir"))));
-  
-    // Cap at the maximum
-    nfwd_new = std::min(nfwd_new,int(getOption("max_number_of_fwd_dir")));
-    nadj_new = std::min(nadj_new,int(getOption("max_number_of_adj_dir")));
-  
-    // Update the number of directions, if needed
-    if(nfwd_new>nfdir_ || nadj_new>nadir_){
-      setOption("number_of_fwd_dir",nfwd_new);
-      setOption("number_of_adj_dir",nadj_new);
-      updateNumSens(true);
-    }
   }
 
   void FXInternal::print(ostream &stream) const{

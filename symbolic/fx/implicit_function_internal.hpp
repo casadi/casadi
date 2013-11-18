@@ -56,9 +56,6 @@ namespace CasADi{
     /// Initialize
     virtual void init();
     
-    /** \brief  Update the number of sensitivity directions during or after initialization */
-    virtual void updateNumSens(bool recursive);
-
     /// Solve the system of equations and calculate derivatives
     virtual void evaluate(int nfdir, int nadir);
  

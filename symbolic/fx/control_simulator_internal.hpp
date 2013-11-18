@@ -51,9 +51,6 @@ namespace CasADi{
     /** \brief  Integrate */
     virtual void evaluate(int nfdir, int nadir);
   
-    /** \brief  Update the number of sensitivity directions during or after initialization */
-    virtual void updateNumSens(bool recursive);
-  
     /// Get the parameters that change on a coarse time scale, sampled on the fine timescale
     Matrix<double> getVFine() const; 
          

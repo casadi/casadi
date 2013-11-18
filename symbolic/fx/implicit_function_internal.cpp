@@ -101,9 +101,6 @@ namespace CasADi{
       casadi_assert(linsol_.input().sparsity()==jac_.output().sparsity());
     }
     
-    // Allocate memory for directional derivatives
-    ImplicitFunctionInternal::updateNumSens(false);
-    
     // No factorization yet;
     fact_up_to_date_ = false;
     
@@ -111,14 +108,6 @@ namespace CasADi{
     if (hasSetOption("constraints")) u_c_ = getOption("constraints");
     
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),"Constraint vector if supplied, must be of length n, but got " << u_c_.size() << " and n = " << n_);
-  }
-
-  void ImplicitFunctionInternal::updateNumSens(bool recursive){
-    // Call the base class if needed
-    if(recursive) FXInternal::updateNumSens(recursive);
-  
-    // Request more directional derivatives for the residual function
-    f_.requestNumSens(nfdir_,nadir_);
   }
 
   void ImplicitFunctionInternal::evaluate(int nfdir, int nadir){

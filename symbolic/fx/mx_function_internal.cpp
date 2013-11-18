@@ -349,37 +349,7 @@ namespace CasADi{
     // Clear any existing tape
     tape_.clear();
   
-    // Allocate memory for directional derivatives
-    MXFunctionInternal::updateNumSens(false);
-
     log("MXFunctionInternal::init end");
-  }
-
-  void MXFunctionInternal::updateNumSens(bool recursive){
-    // Call the base class if needed
-    if(recursive) XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>::updateNumSens(recursive);
-  
-    // Allocate work for directional derivatives
-    for(vector<FunctionIO>::iterator it=work_.begin(); it!=work_.end(); it++){
-      it->dataF.resize(nfdir_,it->data);
-      it->dataA.resize(nadir_,it->data);
-    }
-
-    // Allocate tape if needed
-    if(tape_.empty() && nadir_>0){
-      allocTape();
-    } 
-
-    // Request more derivative from the embedded functions
-    for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-      switch(it->op){
-      case OP_CALL:
-        it->data->getFunction().requestNumSens(nfdir_,nadir_);
-        break;
-      default:
-        break;
-      }
-    }
   }
 
   void MXFunctionInternal::updatePointers(const AlgEl& el){

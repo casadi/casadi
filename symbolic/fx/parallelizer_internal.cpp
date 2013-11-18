@@ -104,9 +104,6 @@ namespace CasADi{
   
     // Call the init function of the base class
     FXInternal::init();
-
-    // Allocate memory for directional derivatives
-    ParallelizerInternal::updateNumSens(false);
   }
 
   void ParallelizerInternal::evaluate(int nfdir, int nadir){
@@ -349,16 +346,6 @@ namespace CasADi{
   
     // Assemble the return function
     return MXFunction(ret_arg,ret_res);
-  }
-
-  void ParallelizerInternal::updateNumSens(bool recursive){
-    // Call the base class if needed
-    if(recursive) FXInternal::updateNumSens(recursive);
-
-    // Request more derivative from the parallelized functions
-    for(vector<FX>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it){
-      it->requestNumSens(nfdir_,nadir_);
-    }
   }
 
 

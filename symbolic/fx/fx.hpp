@@ -129,19 +129,6 @@ namespace CasADi{
     /** \brief Get output scheme */
     CasADi::IOScheme getOutputScheme() const;
     
-    /** \brief  Update the number of sensitivity directions during or after initialization (normally invoked internally) */
-    void updateNumSens();
-  
-    /** \brief Request a number of forward/adjoint derivative directions 
-        This function tries to increase the number of directional derivatives allocated for the function
-        so that the the number at least amounts to "nfwd" and "nadj" for forward and adjoint mode derivatives
-        respectively. The allocated number is never decreased and never increased beyond the number set by 
-        the option "max_number_of_fwd_dir" and "max_number_of_adj_dir".
-      
-        If the number was changed during the call, updateNumSens() is automatically invoked.
-    */
-    void requestNumSens(int nfwd, int nadj);
-  
     /** \brief Get the number of allocated forward directional derivatives */
     int numAllocFwd() const;
 

@@ -98,11 +98,6 @@ void IdasInternal::freeIDAS(){
   for(vector<N_Vector>::iterator it=qF_.begin(); it != qF_.end(); ++it)   if(*it) { N_VDestroy_Serial(*it); *it = 0; }
 }
 
-void IdasInternal::updateNumSens(bool recursive){
-  // Not supported re-initalization needed
-  init();
-}
-
 void IdasInternal::init(){
   log("IdasInternal::init","begin");
 

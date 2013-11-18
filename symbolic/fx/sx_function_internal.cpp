@@ -556,9 +556,6 @@ namespace CasADi{
       }
     }
   
-    // Allocate memory for directional derivatives
-    SXFunctionInternal::updateNumSens(false);
-  
     // Initialize just-in-time compilation
     just_in_time_ = getOption("just_in_time");
     if(just_in_time_){
@@ -780,11 +777,6 @@ namespace CasADi{
     if(verbose()){
       cout << "SXFunctionInternal::init Initialized " << getOption("name") << " (" << algorithm_.size() << " elementary operations)" << endl;
     }
-  }
-
-  void SXFunctionInternal::updateNumSens(bool recursive){
-    // Call the base class if needed
-    if(recursive) XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>::updateNumSens(recursive);
   }
 
   void SXFunctionInternal::evalSXsparse(const vector<SXMatrix>& arg1, vector<SXMatrix>& res1, 
