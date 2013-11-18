@@ -58,10 +58,10 @@ namespace CasADi{
     virtual ConstantMX* clone() const = 0;
 
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
@@ -106,15 +106,15 @@ namespace CasADi{
     }
     
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){ 
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){ 
       output[0]->set(x_);
-      ConstantMX::evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+      ConstantMX::evaluateD(input,output,itmp,rtmp);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
       output[0]->set(SXMatrix(x_));
-      ConstantMX::evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+      ConstantMX::evaluateSX(input,output,itmp,rtmp);
     }
 
     /** \brief Generate code for the operation */
@@ -170,10 +170,10 @@ namespace CasADi{
     virtual void printPart(std::ostream &stream, int part) const;
     
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
@@ -273,15 +273,15 @@ namespace CasADi{
   }
 
   template<typename Value>
-  void Constant<Value>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  void Constant<Value>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
     output[0]->set(double(v_.value));
-    ConstantMX::evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+    ConstantMX::evaluateD(input,output,itmp,rtmp);
   }
 
   template<typename Value>
-  void Constant<Value>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  void Constant<Value>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
     output[0]->set(SX(v_.value));
-    ConstantMX::evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+    ConstantMX::evaluateSX(input,output,itmp,rtmp);
   }
 
   template<typename Value>
