@@ -30,11 +30,11 @@
 namespace CasADi{
  
   /** \brief  Internal node class for Parallelizer
-  \author Joel Andersson 
-  \date 2010
-*/
-class ParallelizerInternal : public FXInternal{
-  friend class Parallelizer;
+      \author Joel Andersson 
+      \date 2010
+  */
+  class ParallelizerInternal : public FXInternal{
+    friend class Parallelizer;
   
   protected:
     /// Constructor
@@ -106,7 +106,7 @@ class ParallelizerInternal : public FXInternal{
     
     /// Mode
     Mode mode_;
-};
+  };
 
 
 
