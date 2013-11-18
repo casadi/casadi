@@ -65,44 +65,16 @@ namespace CasADi{
     }
   }
   
-  void Assertion::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    int nfwd = fwdSens.size();    
-    int nadj = adjSeed.size();
-    
-    // Non-differentiated output
+  void Assertion::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
     *output[0] = *input[0];
-    
-    // Forward sensitivities
-    for(int d=0; d<nfwd; ++d){
-      *fwdSens[d][0] = *fwdSeed[d][0];
-    }
-
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] +=  *adjSeed[d][0];
-    }
   }
   
-  void Assertion::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    int nfwd = fwdSens.size();    
-    int nadj = adjSeed.size();
-
+  void Assertion::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
     if ((*input[1]).at(0)!=1) {
       casadi_error("Assertion error: " << fail_message_);
     }
 
-    // Non-differentiated output
     *output[0] = *input[0];
-
-    // Forward sensitivities
-    for(int d=0; d<nfwd; ++d){
-      *fwdSens[d][0] = *fwdSeed[d][0];
-    }
-
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] +=  *adjSeed[d][0];
-    }
   }
   
   void Assertion::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
