@@ -26,53 +26,53 @@
 using namespace std;
 namespace CasADi{
 
-ControlSimulator::ControlSimulator(){
-}
+  ControlSimulator::ControlSimulator(){
+  }
 
-ControlSimulator::ControlSimulator(const FX& dae, const FX& output_fcn, const vector<double>& grid){
-  assignNode(new ControlSimulatorInternal(dae,output_fcn,grid));
-}
+  ControlSimulator::ControlSimulator(const FX& dae, const FX& output_fcn, const vector<double>& grid){
+    assignNode(new ControlSimulatorInternal(dae,output_fcn,grid));
+  }
 
-ControlSimulator::ControlSimulator(const FX& dae, const FX& output_fcn, const Matrix<double>& grid){
-  casadi_assert_message(grid.size2()==1,"ControlSimulator::ControlSimulator: grid must be of a column matrix shape, but got " << grid.dimString());
-  casadi_assert_message(grid.dense(),"ControlSimulator::ControlSimulator: grid must be dense, but got " << grid.dimString());
-  assignNode(new ControlSimulatorInternal(dae,output_fcn,grid.data()));
-}
+  ControlSimulator::ControlSimulator(const FX& dae, const FX& output_fcn, const Matrix<double>& grid){
+    casadi_assert_message(grid.size2()==1,"ControlSimulator::ControlSimulator: grid must be of a column matrix shape, but got " << grid.dimString());
+    casadi_assert_message(grid.dense(),"ControlSimulator::ControlSimulator: grid must be dense, but got " << grid.dimString());
+    assignNode(new ControlSimulatorInternal(dae,output_fcn,grid.data()));
+  }
 
-ControlSimulator::ControlSimulator(const FX& dae, const vector<double>& grid){
-  assignNode(new ControlSimulatorInternal(dae,FX(),grid));
-}
+  ControlSimulator::ControlSimulator(const FX& dae, const vector<double>& grid){
+    assignNode(new ControlSimulatorInternal(dae,FX(),grid));
+  }
 
-ControlSimulator::ControlSimulator(const FX& dae, const Matrix<double>& grid){
-  casadi_assert_message(grid.size2()==1,"ControlSimulator::ControlSimulator: grid must be of a column matrix shape, but got " << grid.dimString());
-  casadi_assert_message(grid.dense(),"ControlSimulator::ControlSimulator: grid must be dense, but got " << grid.dimString());
-  assignNode(new ControlSimulatorInternal(dae,FX(),grid.data()));
-}
+  ControlSimulator::ControlSimulator(const FX& dae, const Matrix<double>& grid){
+    casadi_assert_message(grid.size2()==1,"ControlSimulator::ControlSimulator: grid must be of a column matrix shape, but got " << grid.dimString());
+    casadi_assert_message(grid.dense(),"ControlSimulator::ControlSimulator: grid must be dense, but got " << grid.dimString());
+    assignNode(new ControlSimulatorInternal(dae,FX(),grid.data()));
+  }
 
-ControlSimulatorInternal* ControlSimulator::operator->(){
-  return (ControlSimulatorInternal*)(FX::operator->());
-}
+  ControlSimulatorInternal* ControlSimulator::operator->(){
+    return (ControlSimulatorInternal*)(FX::operator->());
+  }
 
-const ControlSimulatorInternal* ControlSimulator::operator->() const{
-   return (const ControlSimulatorInternal*)(FX::operator->()); 
-}
+  const ControlSimulatorInternal* ControlSimulator::operator->() const{
+    return (const ControlSimulatorInternal*)(FX::operator->()); 
+  }
 
-bool ControlSimulator::checkNode() const{
-  return dynamic_cast<const ControlSimulatorInternal*>(get())!=0;
-}
+  bool ControlSimulator::checkNode() const{
+    return dynamic_cast<const ControlSimulatorInternal*>(get())!=0;
+  }
 
-std::vector<double> ControlSimulator::getMinorT() const { 
-           casadi_assert(checkNode()); 
-           return dynamic_cast<const ControlSimulatorInternal*>(get())->grid_; 
-} 
+  std::vector<double> ControlSimulator::getMinorT() const { 
+    casadi_assert(checkNode()); 
+    return dynamic_cast<const ControlSimulatorInternal*>(get())->grid_; 
+  } 
 
-Matrix<double> ControlSimulator::getMinorU() const {
-           return dynamic_cast<const ControlSimulatorInternal*>(get())->getVFine(); 
-}
+  Matrix<double> ControlSimulator::getMinorU() const {
+    return dynamic_cast<const ControlSimulatorInternal*>(get())->getVFine(); 
+  }
 
-std::vector<int> ControlSimulator::getMajorIndex() const {
-           return dynamic_cast<const ControlSimulatorInternal*>(get())->getCoarseIndex(); 
-}
+  std::vector<int> ControlSimulator::getMajorIndex() const {
+    return dynamic_cast<const ControlSimulatorInternal*>(get())->getCoarseIndex(); 
+  }
 
 } // namespace CasADi
 
