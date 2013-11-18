@@ -132,11 +132,8 @@ namespace CasADi{
     /// Print work vector
     void printWork(int nfdir=0, int nadir=0, std::ostream &stream=std::cout);
     
-    /// Print tape
-    void printTape(std::ostream &stream=std::cout);
-    
     /// Allocate tape
-    void allocTape();
+    void allocTape(std::vector<std::pair<std::pair<int,int>,MX> >& tape);
     
     // print an element of an algorithm
     void print(std::ostream &stream, const AlgEl& el) const;

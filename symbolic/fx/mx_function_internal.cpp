@@ -346,9 +346,6 @@ namespace CasADi{
       }
     }
 
-    // Clear any existing tape
-    tape_.clear();
-  
     log("MXFunctionInternal::init end");
   }
 
@@ -360,8 +357,7 @@ namespace CasADi{
       for(int i=0; i<mx_input_.size(); ++i){
         if(el.arg[i]>=0){
           int k = el.arg[i];
-          int tmp = work_[k].tmp; // Positive if the data should be retrieved from the tape instead of the work vector
-          mx_input_[i] = tmp==0 ? &work_[k].data : &tape_[tmp-1].second;
+          mx_input_[i] = &work_[k].data;
         } else {
           mx_input_[i] = 0;
         }
@@ -696,18 +692,7 @@ namespace CasADi{
 
     // "Tape" with spilled variables
     vector<pair<pair<int,int>,MX> > tape;
-    if(nadir>0){
-      // Allocate numeric tape if needed
-      if(tape_.empty()){
-        allocTape();
-      }
-
-      // Allocate symbolic tape
-      tape.resize(tape_.size());
-      for(int k=0; k<tape.size(); ++k){
-        tape[k].first = tape_[k].first;
-      }
-    }
+    allocTape(tape);
 
     // Tape counter
     int tt = 0;  
@@ -1033,24 +1018,18 @@ namespace CasADi{
     return f;
   }
 
-  void MXFunctionInternal::printTape(ostream &stream){
-    for(int k=0; k<tape_.size(); ++k){
-      stream << "tape( algorithm index = " << tape_[k].first.first << ", work index = " << tape_[k].first.second << ") = " << tape_[k].second.data() << endl;
-    }
-  }
-
   void MXFunctionInternal::printWork(int nfdir, int nadir, ostream &stream){
     for(int k=0; k<work_.size(); ++k){
       stream << "work[" << k << "] = " << work_[k].data.data() << endl;
     }
   }
 
-  void MXFunctionInternal::allocTape(){
+  void MXFunctionInternal::allocTape(std::vector<std::pair<std::pair<int,int>,MX> >& tape){
     // Marker of elements in the work vector still in use when being overwritten
     vector<bool> in_use(work_.size(),false);
-  
+
     // Remove existing entries in the tape
-    tape_.clear();
+    tape.clear();
   
     // Evaluate the algorithm, keeping track of variables that are in use
     int alg_counter = 0;
@@ -1062,7 +1041,7 @@ namespace CasADi{
           if(ind>=0){
             if(in_use[ind]){
               // Spill
-              tape_.push_back(make_pair(make_pair(alg_counter,ind),DMatrix(it->data->sparsity(c))));
+              tape.push_back(make_pair(make_pair(alg_counter,ind),MX()));
             } else {
               // Mark in use
               in_use[ind] = true;
