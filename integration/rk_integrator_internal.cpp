@@ -113,15 +113,6 @@ void RKIntegratorInternal::init(){
 void RKIntegratorInternal::initAdj(){
 }
 
-void RKIntegratorInternal::evaluate(int nfdir, int nadir){
-  // Store the sensitivity directions
-  nfdir_ = nfdir;
-  nadir_ = nadir;
-  
-  // Call the base class method
-  IntegratorInternal::evaluate(nfdir,nadir);
-}
-
 void RKIntegratorInternal::reset(){
   // Call the base class method
   IntegratorInternal::reset();

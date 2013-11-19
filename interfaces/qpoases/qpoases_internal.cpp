@@ -161,9 +161,7 @@ void QPOasesInternal::init(){
   #endif // ALLOW_ALL_OPTIONS
 }
 
-void QPOasesInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("QPOasesInternal::evaluate() not implemented for forward or backward mode");
-  
+void QPOasesInternal::evaluate() {
   if (inputs_check_) checkInputs();
 
   if(verbose()){

@@ -112,10 +112,7 @@ namespace CasADi{
 #endif // WITH_OPENCL
   }
 
-  void SXFunctionInternal::evaluate(int nfdir, int nadir){
-    casadi_assert_message(nfdir==0, "Not implemented");
-    casadi_assert_message(nadir==0, "Not implemented");
-  
+  void SXFunctionInternal::evaluate(){
     double time_start;
     double time_stop;
     if (CasadiOptions::profiling) {

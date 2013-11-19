@@ -106,7 +106,7 @@ void SDQPSolverInternal::printProblem(std::ostream &stream) const {
   stream << "SDQP Problem statement -- end" << std::endl;
 }
  
-void SDQPSolverInternal::evaluate(int nfdir, int nadir){
+void SDQPSolverInternal::evaluate(){
   throw CasadiException("SDQPSolverInternal::evaluate: Not implemented");
 }
  

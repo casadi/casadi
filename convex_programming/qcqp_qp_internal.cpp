@@ -46,8 +46,7 @@ QCQPQPInternal::QCQPQPInternal(const std::vector<CRSSparsity> &st) : QPSolverInt
 QCQPQPInternal::~QCQPQPInternal(){ 
 }
 
-void QCQPQPInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("QCQPQPInternal::evaluate() not implemented for forward or backward mode");
+void QCQPQPInternal::evaluate() {
 
   // Pass inputs of QP to QCQP form 
   qcqpsolver_.input(QCQP_SOLVER_A).set(input(QP_SOLVER_A));

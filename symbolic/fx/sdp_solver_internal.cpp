@@ -163,7 +163,7 @@ void SDPSolverInternal::printProblem(std::ostream &stream) const {
   stream << "SDP Problem statement -- end" << std::endl;
 }
  
-void SDPSolverInternal::evaluate(int nfdir, int nadir){
+void SDPSolverInternal::evaluate(){
   throw CasadiException("SDPSolverInternal::evaluate: Not implemented");
 }
  

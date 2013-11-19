@@ -56,7 +56,7 @@ namespace CasADi{
     virtual ~MXFunctionInternal();
 
     /** \brief  Evaluate the algorithm */
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
 
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;

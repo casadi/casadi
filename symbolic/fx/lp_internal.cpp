@@ -68,7 +68,7 @@ void LPSolverInternal::init() {
 LPSolverInternal::~LPSolverInternal(){
 }
  
-void LPSolverInternal::evaluate(int nfdir, int nadir){
+void LPSolverInternal::evaluate(){
   throw CasadiException("LPSolverInternal::evaluate: Not implemented");
 }
  

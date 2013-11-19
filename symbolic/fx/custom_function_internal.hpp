@@ -49,7 +49,7 @@ class CustomFunctionInternal : public FXInternal{
     virtual CustomFunctionInternal* clone() const{ return new CustomFunctionInternal(*this);}
 
     /** \brief  Evaluate */
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
   
     /** \brief  Initialize */
     virtual void init();

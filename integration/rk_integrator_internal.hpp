@@ -61,9 +61,6 @@ public:
   /// Reset the backward problem and take time to tf
   virtual void resetB();
 
-  /// Overload this method, since the number of derivative directions currently aren't passed
-  virtual void evaluate(int nfdir, int nadir);
-
   ///  Integrate until a specified time point
   virtual void integrate(double t_out);
 
@@ -77,11 +74,7 @@ public:
   virtual CRSSparsity getJacSparsity(int iind, int oind);
 
   // Function which returns the state at the final time
-  FX yf_fun_;
-
-  // Number of sensitivity directions
-  int nfdir_, nadir_;
-  
+  FX yf_fun_;  
 };
 
 } // namespace CasADi

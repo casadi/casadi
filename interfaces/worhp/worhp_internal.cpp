@@ -603,10 +603,9 @@ namespace CasADi{
     }
   }
 
-  void WorhpInternal::evaluate(int nfdir, int nadir){
+  void WorhpInternal::evaluate(){
     log("WorhpInternal::evaluate");
-    casadi_assert(nfdir==0 && nadir==0);
-    
+
     // Prepare the solver
     reset();
     

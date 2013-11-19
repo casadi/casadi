@@ -52,8 +52,7 @@ StabilizedSQICInternal::~StabilizedSQICInternal(){
   sqicDestroy();
 }
 
-void StabilizedSQICInternal::evaluate(int nfdir, int nadir) {
-  casadi_assert_message(nfdir==0 && nadir==0, "SQIC::evaluate() not implemented for forward or backward mode");
+void StabilizedSQICInternal::evaluate() {
   if (inputs_check_) checkInputs();
 
   std::copy(input(STABILIZED_QP_SOLVER_X0).begin(),input(STABILIZED_QP_SOLVER_X0).end(),x_.begin());

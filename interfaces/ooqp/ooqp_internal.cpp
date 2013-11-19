@@ -94,9 +94,7 @@ OOQPInternal::~OOQPInternal(){
   }
 }
 
-void OOQPInternal::evaluate(int nfdir, int nadir) {
-  casadi_assert_message(nfdir==0 && nadir==0, "OOQPSolve::evaluate() not implemented for forward or backward mode");
-  
+void OOQPInternal::evaluate() {
   if (inputs_check_) checkInputs();
   
   // Copy the bounds on X

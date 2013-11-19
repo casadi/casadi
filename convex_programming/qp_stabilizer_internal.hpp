@@ -48,7 +48,7 @@ public:
   /** \brief  Initialize */
   virtual void init();
   
-  virtual void evaluate(int nfdir, int nadir);
+  virtual void evaluate();
   
   /** \brief Generate native code for debugging */
   virtual void generateNativeCode(std::ostream &file) const;

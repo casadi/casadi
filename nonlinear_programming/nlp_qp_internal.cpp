@@ -46,9 +46,7 @@ NLPQPInternal::NLPQPInternal(const std::vector<CRSSparsity> &st) : QPSolverInter
 NLPQPInternal::~NLPQPInternal(){ 
 }
 
-void NLPQPInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("NLPQPInternal::evaluate() not implemented for forward or backward mode");
-
+void NLPQPInternal::evaluate() {
   if (inputs_check_) checkInputs();
 
   int k = 0;

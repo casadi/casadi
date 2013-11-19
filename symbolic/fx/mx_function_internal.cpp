@@ -375,11 +375,8 @@ namespace CasADi{
     }
   }
 
-  void MXFunctionInternal::evaluate(int nfdir, int nadir){    
+  void MXFunctionInternal::evaluate(){    
     casadi_log("MXFunctionInternal::evaluate():begin "  << getOption("name"));
-    casadi_assert_message(nfdir==0, "Not implemented");
-    casadi_assert_message(nadir==0, "Not implemented");
-
     // Set up timers for profiling
     double time_zero;
     double time_start;

@@ -605,9 +605,7 @@ namespace CasADi{
     }
   }
 
-  void SCPgenInternal::evaluate(int nfdir, int nadir){
-    casadi_assert(nfdir==0 && nadir==0);
-
+  void SCPgenInternal::evaluate(){
     if (inputs_check_) checkInputs();
     checkInitialBounds();
   

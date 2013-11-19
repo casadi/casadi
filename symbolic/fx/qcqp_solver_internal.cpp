@@ -105,7 +105,7 @@ void QCQPSolverInternal::init() {
 QCQPSolverInternal::~QCQPSolverInternal(){
 }
  
-void QCQPSolverInternal::evaluate(int nfdir, int nadir){
+void QCQPSolverInternal::evaluate(){
   throw CasadiException("QCQPSolverInternal::evaluate: Not implemented");
 }
  

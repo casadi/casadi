@@ -115,7 +115,7 @@ namespace CasADi{
 
   void FX::evaluate(){
     assertInit();
-    (*this)->evaluate(0,0);
+    (*this)->evaluate();
   }
 
   void FX::solve(){

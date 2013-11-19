@@ -38,7 +38,7 @@ public:
   virtual SQPInternal* clone() const{ return new SQPInternal(*this);}
   
   virtual void init();
-  virtual void evaluate(int nfdir, int nadir);
+  virtual void evaluate();
   
   /// QP solver for the subproblems
   QPSolver qp_solver_;

@@ -58,11 +58,11 @@ CustomFunction::CustomFunction(const CustomEvaluate &c_fcn) {
 }
 
 CustomFunctionInternal* CustomFunction::operator->(){
-  return (CustomFunctionInternal*)(FX::operator->());
+  return static_cast<CustomFunctionInternal*>(FX::operator->());
 }
 
 const CustomFunctionInternal* CustomFunction::operator->() const{
-   return (const CustomFunctionInternal*)(FX::operator->()); 
+   return static_cast<const CustomFunctionInternal*>(FX::operator->()); 
 }
   
 bool CustomFunction::checkNode() const{

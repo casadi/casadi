@@ -92,7 +92,7 @@ void StabilizedQPSolverInternal::init() {
 StabilizedQPSolverInternal::~StabilizedQPSolverInternal(){
 }
  
-void StabilizedQPSolverInternal::evaluate(int nfdir, int nadir){
+void StabilizedQPSolverInternal::evaluate(){
   throw CasadiException("StabilizedQPSolverInternal::evaluate: Not implemented");
 }
  

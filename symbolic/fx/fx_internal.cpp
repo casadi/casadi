@@ -2338,7 +2338,7 @@ namespace CasADi{
     }
     
     // Evaluate
-    evaluate(0,0);
+    evaluate();
     if (CasadiOptions::profiling) {
       time_offset += getRealTime() - time_zero;
     }

@@ -49,7 +49,7 @@ class DirectSingleShootingInternal : public OCPSolverInternal{
     virtual void init();
 
     // Solve the OCP
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
    
     // Get the variables
     void getGuess(std::vector<double>& V_init) const;

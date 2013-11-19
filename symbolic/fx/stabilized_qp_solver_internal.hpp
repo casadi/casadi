@@ -42,7 +42,7 @@ class StabilizedQPSolverInternal : public FXInternal{
     virtual void init();
     
     // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
     
     // Solve the system of equations
     virtual void solve();

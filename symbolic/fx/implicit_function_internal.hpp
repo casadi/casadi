@@ -57,7 +57,7 @@ namespace CasADi{
     virtual void init();
     
     /// Solve the system of equations and calculate derivatives
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
  
     /// Solve the nonlinear system of equations
     virtual void solveNonLinear() = 0;

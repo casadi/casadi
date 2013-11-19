@@ -380,9 +380,7 @@ namespace CasADi{
   
   }
 
-  void ControlSimulatorInternal::evaluate(int nfdir, int nadir){
-    casadi_assert(nfdir==0);
-    casadi_assert(nadir==0);
+  void ControlSimulatorInternal::evaluate(){
 
     // Copy all inputs
     for (int i=0;i<input_.size();++i) {

@@ -119,7 +119,7 @@ ExternalFunctionInternal::~ExternalFunctionInternal(){
 #endif // WITH_DL 
 }
 
-void ExternalFunctionInternal::evaluate(int nfdir, int nadir){
+void ExternalFunctionInternal::evaluate(){
 #ifdef WITH_DL 
   int flag = evaluate_(getPtr(input_array_),getPtr(output_array_));
   if(flag) throw CasadiException("ExternalFunctionInternal: \"evaluate\" failed");

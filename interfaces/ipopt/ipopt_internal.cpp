@@ -239,9 +239,7 @@ namespace CasADi{
 #endif // WITH_SIPOPT
   }
 
-  void IpoptInternal::evaluate(int nfdir, int nadir){
-    casadi_assert(nfdir==0 && nadir==0);
-
+  void IpoptInternal::evaluate(){
     if (inputs_check_) checkInputs();
     
     checkInitialBounds();

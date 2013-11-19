@@ -107,9 +107,7 @@ void SimulatorInternal::init(){
     
 }
 
-void SimulatorInternal::evaluate(int nfdir, int nadir){
-  casadi_assert_message(nfdir==0, "Not implemented");
-  casadi_assert_message(nadir==0, "Not implemented");
+void SimulatorInternal::evaluate(){
   
   // Pass the parameters and initial state
   integrator_.setInput(input(INTEGRATOR_X0),INTEGRATOR_X0);

@@ -49,9 +49,7 @@ SDPSDQPInternal::SDPSDQPInternal(const std::vector<CRSSparsity> &st) : SDQPSolve
 SDPSDQPInternal::~SDPSDQPInternal(){
 }
 
-void SDPSDQPInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("SDPSDQPInternal::evaluate() not implemented for forward or backward mode");
-  
+void SDPSDQPInternal::evaluate() {
   cholesky_.setInput(input(SDQP_SOLVER_H));
   for (int k=0;k<cholesky_.input(0).size();++k) {
     cholesky_.input().at(k)*=0.5;

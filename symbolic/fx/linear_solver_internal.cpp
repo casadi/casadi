@@ -60,9 +60,7 @@ namespace CasADi{
   LinearSolverInternal::~LinearSolverInternal(){
   }
  
-  void LinearSolverInternal::evaluate(int nfdir, int nadir){
-    casadi_assert_message(nfdir==0 && nadir==0,"Directional derivatives for LinearSolver not supported. Reformulate or wrap in an MXFunction instance.");
-
+  void LinearSolverInternal::evaluate(){
     /*  Factorization fact;
         if(called_once){
         // Check if any element has changed

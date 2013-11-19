@@ -46,8 +46,7 @@ QPLPInternal::QPLPInternal(const std::vector<CRSSparsity> &st) : LPSolverInterna
 QPLPInternal::~QPLPInternal(){ 
 }
 
-void QPLPInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("QPLPInternal::evaluate() not implemented for forward or backward mode");
+void QPLPInternal::evaluate(){
 
   // Pass inputs of LP to QP form 
   qpsolver_.input(QP_SOLVER_A).set(input(LP_SOLVER_A));

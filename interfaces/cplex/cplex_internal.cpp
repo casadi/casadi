@@ -172,10 +172,9 @@ void CplexInternal::init(){
   lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
 }
 
-void CplexInternal::evaluate(int nfdir, int nadir){
+void CplexInternal::evaluate(){
 
   if (inputs_check_) checkInputs();
-  casadi_assert(nfdir == 0 && nadir == 0);
 
   int status;
 

@@ -55,10 +55,7 @@ namespace CasADi{
   IntegratorInternal::~IntegratorInternal(){ 
   }
 
-  void IntegratorInternal::evaluate(int nfdir, int nadir){
-    casadi_assert(nfdir==0);
-    casadi_assert(nadir==0);
-  
+  void IntegratorInternal::evaluate(){
     // Reset solver
     reset();
 

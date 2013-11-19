@@ -249,9 +249,7 @@ namespace CasADi{
     }
   }
 
-  void StabilizedSQPInternal::evaluate(int nfdir, int nadir){
-    casadi_assert(nfdir==0 && nadir==0);
-  
+  void StabilizedSQPInternal::evaluate(){
     if (inputs_check_) checkInputs();
     checkInitialBounds();
   

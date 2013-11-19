@@ -89,7 +89,7 @@ void SOCPSolverInternal::init() {
 SOCPSolverInternal::~SOCPSolverInternal(){
 }
  
-void SOCPSolverInternal::evaluate(int nfdir, int nadir){
+void SOCPSolverInternal::evaluate(){
   throw CasadiException("SOCPSolverInternal::evaluate: Not implemented");
 }
  

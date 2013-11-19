@@ -52,9 +52,9 @@ CustomFunctionInternal::~CustomFunctionInternal(){
   ref_.assignNodeNoCount(0);
 }
 
-void CustomFunctionInternal::evaluate(int nfdir, int nadir){
+void CustomFunctionInternal::evaluate(){
   casadi_assert_message(!evaluate_.isNull(), "CustomFunctionInternal::evaluate: pointer is null");
-  evaluate_(ref_,nfdir,nadir,user_data_);  
+  evaluate_(ref_,0,0,user_data_);  
 }
 
 void CustomFunctionInternal::init(){

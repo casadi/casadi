@@ -54,7 +54,7 @@ namespace CasADi{
     virtual ~ParallelizerInternal();
     
     /// Evaluate the all the tasks
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
 
     /// Evaluate a single task
     virtual void evaluateTask(int task);

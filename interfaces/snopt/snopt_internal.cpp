@@ -78,12 +78,9 @@ namespace CasADi{
     }
   }
 
-  void SnoptInternal::evaluate(int nfdir, int nadir){
-    log("SnoptInternal::evaluate");
-    casadi_assert(nfdir==0 && nadir==0);
-    
-    snopt();
-    
+  void SnoptInternal::evaluate(){
+    log("SnoptInternal::evaluate");    
+    snopt();    
   }
 
   bool SnoptInternal::eval_h(const double* x, double obj_factor, const double* lambda, double* values){

@@ -46,9 +46,7 @@ QPStabilizerInternal::QPStabilizerInternal(const std::vector<CRSSparsity> &st) :
 QPStabilizerInternal::~QPStabilizerInternal(){ 
 }
 
-void QPStabilizerInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("QPStabilizerInternal::evaluate() not implemented for forward or backward mode");
-
+void QPStabilizerInternal::evaluate() {
     double muR = input(STABILIZED_QP_SOLVER_MUR).at(0);
     std::vector<double> & muE = input(STABILIZED_QP_SOLVER_MUE).data();
     std::vector<double> & mu = input(STABILIZED_QP_SOLVER_MU).data();

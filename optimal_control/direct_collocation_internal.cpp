@@ -361,7 +361,7 @@ void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt 
   casadi_assert(el==V_opt.size());
 }
 
-void DirectCollocationInternal::evaluate(int nfdir, int nadir){
+void DirectCollocationInternal::evaluate(){
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_SOLVER_X0).data());
   getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),nlp_solver_.input(NLP_SOLVER_UBX).data());

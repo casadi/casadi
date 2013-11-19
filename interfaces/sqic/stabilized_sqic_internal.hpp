@@ -55,7 +55,7 @@ public:
   
 
   
-  virtual void evaluate(int nfdir, int nadir);
+  virtual void evaluate();
   
     /// Throw error
     static void sqic_error(const std::string& module, int flag);

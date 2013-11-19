@@ -110,9 +110,7 @@ namespace CasADi{
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),"Constraint vector if supplied, must be of length n, but got " << u_c_.size() << " and n = " << n_);
   }
 
-  void ImplicitFunctionInternal::evaluate(int nfdir, int nadir){
-    casadi_assert_message(nadir==0, "Not implemented");
-    casadi_assert_message(nfdir==0, "Not implemented");
+  void ImplicitFunctionInternal::evaluate(){
 
     // Set up timers for profiling
     double time_zero;

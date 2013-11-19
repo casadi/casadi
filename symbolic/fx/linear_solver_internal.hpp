@@ -44,7 +44,7 @@ namespace CasADi{
     virtual void init();
     
     // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
 
     // Prepare the factorization
     virtual void prepare() = 0;

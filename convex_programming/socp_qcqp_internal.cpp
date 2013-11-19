@@ -46,9 +46,7 @@ SOCPQCQPInternal::SOCPQCQPInternal(const std::vector<CRSSparsity> &st) : QCQPSol
 SOCPQCQPInternal::~SOCPQCQPInternal(){
 }
 
-void SOCPQCQPInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("SOCPQCQPInternal::evaluate() not implemented for forward or backward mode");
-
+void SOCPQCQPInternal::evaluate() {
   if (inputs_check_) checkInputs();
   
   // Pass inputs of QCQP to SOCP form 

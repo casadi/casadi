@@ -92,7 +92,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   virtual ~SXFunctionInternal();
 
   /** \brief  Evaluate the function numerically */
-  virtual void evaluate(int nfdir, int nadir);
+  virtual void evaluate();
 
   /** \brief  Helper class to be plugged into evaluateGen when working with a value known only at runtime */
   struct int_runtime{

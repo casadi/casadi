@@ -59,7 +59,7 @@ namespace CasADi{
     virtual void init();
     
     // Solve the NLP
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
 
     
     virtual void setQPOptions();

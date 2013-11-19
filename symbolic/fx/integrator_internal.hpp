@@ -67,7 +67,7 @@ namespace CasADi{
     virtual void integrateB(double t_out) = 0;
 
     /** \brief  evaluate */
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
 
     /** \brief  Initialize */
     virtual void init();

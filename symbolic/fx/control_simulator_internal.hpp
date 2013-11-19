@@ -49,7 +49,7 @@ namespace CasADi{
     virtual void init();
 
     /** \brief  Integrate */
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
   
     /// Get the parameters that change on a coarse time scale, sampled on the fine timescale
     Matrix<double> getVFine() const; 

@@ -91,7 +91,7 @@ void QPSolverInternal::init() {
 QPSolverInternal::~QPSolverInternal(){
 }
  
-void QPSolverInternal::evaluate(int nfdir, int nadir){
+void QPSolverInternal::evaluate(){
   throw CasadiException("QPSolverInternal::evaluate: Not implemented");
 }
  

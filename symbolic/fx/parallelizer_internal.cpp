@@ -106,9 +106,7 @@ namespace CasADi{
     FXInternal::init();
   }
 
-  void ParallelizerInternal::evaluate(int nfdir, int nadir){
-    casadi_assert_message(nfdir==0, "Not implemented");
-    casadi_assert_message(nadir==0, "Not implemented");
+  void ParallelizerInternal::evaluate(){
 
     // Let the first call (which may contain memory allocations) be serial when using OpenMP
     if(mode_== SERIAL){

@@ -59,7 +59,7 @@ namespace CasADi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /** \brief  Evaluate */
-    virtual void evaluate(int nfdir, int nadir) = 0;
+    virtual void evaluate() = 0;
 
     /** \brief Initialize
         Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
