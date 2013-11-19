@@ -499,36 +499,12 @@ class FXtests(casadiTestCase):
       
       x = f.input(0)
       y = f.input(1)
-      
-      if max_fwd>0:
-        dx = f.fwdSeed(0)
-        dy = f.fwdSeed(1)
-      
+            
       z0 = 3*y
-      if max_fwd>0: dz0 = 3*dy
-      
       z1 = x+z0
-      if max_fwd>0: dz1 = dx+dz0
-      
       z2 = sin(z1)
-      if max_fwd>0: dz2 = cos(z1)*dz1
-      
-      if max_adj>0:
-        # Backwards sweep
-        bx = 0
-        by = 0
-        bz1 = 0
-        bz0 = 0
-        
-        bz2 = f.adjSeed(0)
-        bz1 += bz2*cos(z1)
-        bx+= bz1;bz0+= bz1
-        by+= 3*bz0
-        f.setAdjSens(bx,0)
-        f.setAdjSens(by,1)
-      
+            
       f.setOutput(z2)
-      if max_fwd>0: f.setFwdSens(dz2)
       
     Fun = CustomFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
     Fun.init()
@@ -548,7 +524,7 @@ class FXtests(casadiTestCase):
     g.setInput(0.2,0)
     g.setInput(0.7,1)
     
-    def getP(max_fwd=1,max_adj=1,indirect=True):
+    def getP(max_fwd=0,max_adj=0,indirect=True):
 
       @pyevaluate
       def fun(f,nfwd,nadj):
@@ -561,42 +537,16 @@ class FXtests(casadiTestCase):
         
         x = f.input(0)
         y = f.input(1)
-        
-        if max_fwd>0:
-          dx = f.fwdSeed(0)
-          dy = f.fwdSeed(1)
-        
+                
         z0 = 3*y
-        if max_fwd>0: dz0 = 3*dy
-        
         z1 = x+z0
-        if max_fwd>0: dz1 = dx+dz0
-        
         z2 = sin(z1)
-        if max_fwd>0: dz2 = cos(z1)*dz1
-        
-        if max_adj>0:
-          # Backwards sweep
-          bx = 0
-          by = 0
-          bz1 = 0
-          bz0 = 0
-          
-          bz2 = f.adjSeed(0)
-          bz1 += bz2*cos(z1)
-          bx+= bz1;bz0+= bz1
-          by+= 3*bz0
-          f.setAdjSens(bx,0)
-          f.setAdjSens(by,1)
-        
+                
         f.setOutput(z2)
-        if max_fwd>0: f.setFwdSens(dz2)
 
 
       Fun = CustomFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
       Fun.setOption("name","Fun")
-      Fun.setOption("max_number_of_fwd_dir",max_fwd)
-      Fun.setOption("max_number_of_adj_dir",max_adj)
       Fun.init()
       
       if not indirect: 
@@ -613,15 +563,15 @@ class FXtests(casadiTestCase):
       return f
       
     for indirect in [True,False]:
-      f = getP(max_fwd=1,max_adj=1,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
 
-      f = getP(max_fwd=1,max_adj=0,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,adj=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=1,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
       
@@ -637,7 +587,7 @@ class FXtests(casadiTestCase):
     g.setInput([0.2,0.6],0)
     g.setInput(0.7,1)
     
-    def getP(max_fwd=1,max_adj=1,indirect=True):
+    def getP(max_fwd=0,max_adj=0,indirect=True):
 
       @pyevaluate
       def fun(f,nfwd,nadj):
@@ -651,51 +601,16 @@ class FXtests(casadiTestCase):
         x0 = f.input(0)[0]
         x1 = f.input(0)[1]
         y = f.input(1)
-        
-        if max_fwd>0:
-          dx0 = f.fwdSeed(0)[0]
-          dx1 = f.fwdSeed(0)[1]
-          dy = f.fwdSeed(1)
-        
+                
         z0 = 3*y
-        if max_fwd>0: dz0 = 3*dy
-        
         z1 = x0+z0
-        if max_fwd>0: dz1 = dx0+dz0
-        
         z2 = sin(z1)
-        if max_fwd>0: dz2 = cos(z1)*dz1
-        
         z3 = z2*x1
-        if max_fwd>0: dz3 = x1*dz2 + dx1*z2
-        
-        if max_adj>0:
-          # Backwards sweep
-          bx0 = 0
-          bx1 = 0
-          by = 0
-          
-          bz2 = 0
-          bz1 = 0
-          bz0 = 0
-          
-          bz3 = f.adjSeed(0)
-          bz2 += bz3*x1
-          bx1 += bz3*z2
-          bz1 += bz2*cos(z1)
-          bx0+= bz1;bz0+= bz1
-          by+= 3*bz0
-          f.setAdjSens([bx0,bx1],0)
-          f.setAdjSens(by,1)
-        
         f.setOutput(z3)
-        if max_fwd>0: f.setFwdSens(dz3)
 
 
       Fun = CustomFunction(fun, [sp_dense(2,1),sp_dense(1,1)], [sp_dense(1,1)] )
       Fun.setOption("name","Fun")
-      Fun.setOption("max_number_of_fwd_dir",max_fwd)
-      Fun.setOption("max_number_of_adj_dir",max_adj)
       Fun.init()
 
       if not indirect: 
@@ -712,15 +627,15 @@ class FXtests(casadiTestCase):
       return f
     
     for indirect in [True,False]:
-      f = getP(max_fwd=1,max_adj=1,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
 
-      f = getP(max_fwd=1,max_adj=0,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,adj=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=1,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
       
@@ -734,7 +649,7 @@ class FXtests(casadiTestCase):
 
     g.setInput([0.2,0.6],0)
  
-    def getP(max_fwd=1,max_adj=1,indirect=True):
+    def getP(max_fwd=0,max_adj=0,indirect=True):
 
       @pyevaluate
       def squares(f,nfwd,nadj):
@@ -744,17 +659,7 @@ class FXtests(casadiTestCase):
 
         f.setOutput(f.getInput(0)**2,0)
         f.setOutput(f.getInput(0)**2,0)
-        
-        for i in range(nfwd):
-          xdot = f.getFwdSeed(0,i)[0]
-          ydot = f.getFwdSeed(0,i)[1]
-          f.setFwdSens([2*x*xdot+ydot,y*xdot+x*ydot],0,i)
-          
-        for i in range(nadj):
-          xb = f.getAdjSeed(0,i)[0]
-          yb = f.getAdjSeed(0,i)[1]
-          f.setAdjSens([2*x*xb+y*yb,xb+x*yb],0,i)
-          
+                  
       c = CustomFunction( squares, [sp_dense(2,1)], [sp_dense(2,1)] )
       c.init()
 
@@ -770,17 +675,17 @@ class FXtests(casadiTestCase):
       return f
     
     for indirect in [True,False]:
-      f = getP(max_fwd=1,max_adj=1,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
       
       with self.assertRaises(Exception):          
         self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
 
-      f = getP(max_fwd=1,max_adj=0,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
         
       with self.assertRaises(Exception): 
         self.checkfx(f,g,sens_der=False,hessian=False,adj=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=1,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
                 
       with self.assertRaises(Exception):
         self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
@@ -795,7 +700,7 @@ class FXtests(casadiTestCase):
 
     g.setInput([0.2,0.6],0)
  
-    def getP(max_fwd=1,max_adj=1,indirect=True):
+    def getP(max_fwd=0,max_adj=0,indirect=True):
 
       @pyevaluate
       def squares(f,nfwd,nadj):
@@ -804,20 +709,8 @@ class FXtests(casadiTestCase):
         y = f.getInput(0)[1]
 
         f.setOutput([x**2+y,x*y],0)
-        
-        for i in range(nfwd):
-          xdot = f.getFwdSeed(0,i)[0]
-          ydot = f.getFwdSeed(0,i)[1]
-          f.setFwdSens([2*x*xdot+ydot,y*xdot+x*ydot],0,i)
-          
-        for i in range(nadj):
-          xb = f.getAdjSeed(0,i)[0]
-          yb = f.getAdjSeed(0,i)[1]
-          f.setAdjSens([2*x*xb+y*yb,xb+x*yb],0,i)
-          
+                  
       c = CustomFunction( squares, [sp_dense(2,1)], [sp_dense(2,1)] )
-      c.setOption("max_number_of_fwd_dir",1)
-      c.setOption("max_number_of_adj_dir",1)
       c.init()
 
       if not indirect: 
@@ -832,15 +725,15 @@ class FXtests(casadiTestCase):
       return f
     
     for indirect in [True,False]:
-      f = getP(max_fwd=1,max_adj=1,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
 
-      f = getP(max_fwd=1,max_adj=0,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,adj=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=1,indirect=indirect)
+      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
       
@@ -964,7 +857,6 @@ class FXtests(casadiTestCase):
     foo = CustomFunction(dummy, [x.sparsity()], [sp_dense(1,1)] )
     foo.setOption("name","foo")
     foo.setOption("verbose",True)
-    foo.setOption("max_number_of_fwd_dir",1)
     foo.init()
 
     y = x**2
