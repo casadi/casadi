@@ -190,6 +190,9 @@ namespace CasADi{
     template<bool with_mapping, bool f0x_is_zero, bool fx0_is_zero>
     CRSSparsity patternCombineGen(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;
     //@}
+    
+    /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
+    CRSSparsity patternInverse() const;
 
     /// Check if two sparsity patterns are the same
     bool isEqual(const CRSSparsity& y) const;

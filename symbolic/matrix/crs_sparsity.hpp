@@ -314,6 +314,9 @@ namespace CasADi{
     CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
     CRSSparsity patternProduct(const CRSSparsity& y_trans) const;
     /// @}
+
+    /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
+    CRSSparsity patternInverse() const;
     
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros 

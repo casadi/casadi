@@ -2432,6 +2432,45 @@ namespace CasADi{
     // Otherwise, compare the patterns
     return isEqual(y.size1(),y.size2(),y.col(),y.rowind());
   }
+  
+  CRSSparsity CRSSparsityInternal::patternInverse() const {
+    // Quick return clauses
+    if (empty()) return CRSSparsity(nrow_,ncol_,true);
+    if (dense()) return CRSSparsity(nrow_,ncol_,false);
+    
+    // Sparsity of the result
+    std::vector<int> col_ret;
+    std::vector<int> rowind_ret=rowind_;
+    
+    // Loop over rows
+    for (int i=0;i<nrow_;++i) {
+      // Update rowind vector of the result
+      rowind_ret[i+1]=rowind_ret[i]+ncol_-(rowind_[i+1]-rowind_[i]);
+      
+      // Counter of new column indices
+      int j=0;
+      
+      // Loop over all nonzeros
+      for (int k=rowind_[i];k<rowind_[i+1];++k) {
+      
+        // Try to reach current nonzero
+        while(j<col_[k])  {
+          // And meanwhile, add nonzeros to the result
+          col_ret.push_back(j);
+          j++;
+        }
+        j++;
+      } 
+      // Process the remainder up to the column size
+      while(j < ncol_)  {
+        col_ret.push_back(j);
+        j++;
+      }
+    }
+    
+    // Return result
+    return CRSSparsity(nrow_,ncol_,col_ret,rowind_ret);    
+  }
 
 
   bool CRSSparsityInternal::isEqual(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) const{
