@@ -88,6 +88,8 @@ class FunctionPool:
     self.numpyoperators.append(num)
     self.names.append(name)
     self.flags.append(flags)
+  def zip(self):
+    return zip(self.casadioperators,self.numpyoperators,self.names,self.flags)
 
 class casadiTestCase(unittest.TestCase):
 

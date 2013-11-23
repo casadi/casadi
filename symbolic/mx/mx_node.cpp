@@ -488,15 +488,43 @@ namespace CasADi{
     // Create binary node
     if(sparsity().scalar(false)){
       if(size()==0){
-        return toMatrix(MX(0)->getBinary(op,y,true,false),y.sparsity());
+        if (operation_checker<F0XChecker>(op)) {
+          return MX(y.size1(),y.size2());
+        } else if (operation_checker<FX0Checker>(op)) {
+          return toMatrix(MX(0)->getBinary(op,y,true,false),y.sparsity());
+        } else {
+          CRSSparsity f = sp_dense(y.size1(),y.size2());
+          MX yy = y.setSparse(f);
+          return MX::zeros(f)->getBinary(op,yy,false,false);
+        }
       } else {
-        return toMatrix(getBinary(op,y,true,false),y.sparsity());
+        if (operation_checker<FX0Checker>(op)) {
+          return toMatrix(getBinary(op,y,true,false),y.sparsity());
+        } else {
+          CRSSparsity f = sp_dense(y.size1(),y.size2());
+          MX yy = y.setSparse(f);
+          return MX(f,shared_from_this<MX>())->getBinary(op,yy,false,false);
+        }
       }
     } else if(y.scalar()){
       if(y.size()==0){
-        return toMatrix(getBinary(op,MX(0),false,true),sparsity());
+        if (operation_checker<F0XChecker>(op)) {
+          return MX(size1(),size2());
+        } else if (operation_checker<F0XChecker>(op)) {
+          return toMatrix(getBinary(op,MX(0),false,true),sparsity());
+        } else {
+          CRSSparsity f = sp_dense(size1(),size2());
+          MX xx = shared_from_this<MX>().setSparse(f);
+          return xx->getBinary(op,MX::zeros(f),false,false);
+        }
       } else {
-        return toMatrix(getBinary(op,y,false,true),sparsity());
+        if (operation_checker<F0XChecker>(op)) {
+          return toMatrix(getBinary(op,y,false,true),sparsity());
+        } else {
+          CRSSparsity f = sp_dense(size1(),size2());
+          MX xx = shared_from_this<MX>().setSparse(f);
+          return xx->getBinary(op,MX(f,y),false,false);
+        }
       }
     } else {
       casadi_assert_message(sparsity().shape() == y.sparsity().shape(), "Dimension mismatch.");
