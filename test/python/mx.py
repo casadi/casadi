@@ -2290,7 +2290,6 @@ class MXtests(casadiTestCase):
     with self.assertRaises(RuntimeError):
       d = x / c
       
-  @known_bug()
   @memory_heavy()
   def test_MX_shapes(self):
       self.message("MX unary operations")
@@ -2365,7 +2364,6 @@ class MXtests(casadiTestCase):
                 if sp.size()>0 and sp2.size()>0 and v1!=0 and v2!=0:
                   self.checkfx(f,g,hessian=False,failmessage=str([sp,sp2,v1,v2,x1_,x2_,name]))
 
-  @known_bug()
   @memory_heavy()
   def test_MXConstant(self):
       self.message("MX unary operations, constant")

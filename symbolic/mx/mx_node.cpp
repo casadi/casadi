@@ -518,7 +518,8 @@ namespace CasADi{
   }
 
   MX MXNode::getBinary(int op, const MX& y, bool scX, bool scY) const{
-  
+    casadi_assert(sparsity()==y.sparsity() || scX || scY);
+    
     if (CasadiOptions::simplification_on_the_fly) {
     
       // If identically zero due to one argumebt being zero
@@ -565,7 +566,7 @@ namespace CasADi{
             break;
           case OP_ADD:
           case OP_SUB:
-            if(y->isZero()) return shared_from_this<MX>();
+            if(y->isZero()) return scX ? MX(y.size1(),y.size2(),shared_from_this<MX>()) : shared_from_this<MX>();
             break;
           case OP_MUL:
             if(y->isValue(1)) return shared_from_this<MX>();
