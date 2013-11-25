@@ -2420,6 +2420,77 @@ class MXtests(casadiTestCase):
                     # At least as sparse as DMatrix calculus
                     self.assertTrue(min(c)>=0,str([sp,sp2,v1,v2,name]))
                     
-                    
+  def test_MX_extractNodes(self):
+    x=msym("X",4,4)
+    y=msym("Y",4,4)
+    b=msym("B",4,4)
+
+    c = x*y
+    f = c+b
+
+    F = MXFunction([x,y,b],[f])
+    F.init()
+
+    r = F.extractNodes([c])
+    r.init()
+    
+    r.setInput(1,0)
+    r.setInput(2,1)
+    r.setInput(3,2)
+    r.setInput(4,3)
+    
+    r.evaluate()
+    
+    self.checkarray(r.output(),7*DMatrix.ones(4,4)) 
+
+    r = F.extractNodes([x])
+    r.init()
+    
+    r.setInput(1,0)
+    r.setInput(2,1)
+    r.setInput(3,2)
+    r.setInput(4,3)
+    
+    r.evaluate()
+    
+    print r
+    
+    self.checkarray(r.output(),11*DMatrix.ones(4,4)) 
+
+  def test_matrix_expand(self):
+    n = 2
+    a = msym("a",n,n)
+    b = msym("b",n,n)
+    c = msym("c",n,n)
+
+    d = a+b
+    e = d*c
+
+    self.assertEqual(countNodes(e),6)
+
+    t0 = matrix_expand(e)
+
+    self.assertEqual(countNodes(t0),5)
+    
+    t1 = matrix_expand(e,[d])
+    self.assertEqual(countNodes(t1),6)
+    
+    
+    outs = []
+    for x in [e,t0,t1]:
+      f = MXFunction([a,b,c],[x])
+      f.init()
+      
+      f.setInput(1.1,0)
+      f.setInput(2.2,1)
+      f.setInput(3.3,2)
+      
+      f.evaluate()
+      
+      outs.append(f.getOutput())
+      if outs>1:
+        self.checkarray(outs[0],outs[-1])
+
+    
 if __name__ == '__main__':
     unittest.main()

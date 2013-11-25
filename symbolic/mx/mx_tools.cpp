@@ -838,6 +838,46 @@ namespace CasADi{
     return f.getFree();
   }
 
+  std::vector<MX> getSymbols(const std::vector<MX>& e) {
+    MXFunction f(std::vector<MX>(),e);
+    f.init();
+    return f.getFree();
+  }
+  
+  MX matrix_expand(const MX& e, const std::vector<MX> &boundary) {
+    std::vector<MX> e_v(1,e);
+    return matrix_expand(e_v,boundary).at(0);
+  }
+  
+  std::vector<MX> matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary) {
+  
+    // Obtain list of dependants
+    std::vector<MX> v = getSymbols(e);
+    
+    // Construct an MXFunction with it
+    MXFunction f(v,e);
+    f.init();
+  
+    // Extract boundary nodes
+    MXFunction g = f.extractNodes(boundary);
+    
+    // Get symbols for extracted nodes
+    std::vector<MX> syms(boundary.size());
+    for (int i=0;i<syms.size();++i) {
+      syms[i] = g.inputExpr(f.getNumInputs()+i);
+    }
+    
+    // Remove unused inputs
+    v = getSymbols(g.outputExpr());
+    g = MXFunction(v,g.outputExpr());
+    
+    // Expand to SXFunction
+    g.init();
+    SXFunction s = g.expand();
+    s.init();
 
+    return s.eval(substitute(v,syms,boundary));
+  }
+  
 } // namespace CasADi
 

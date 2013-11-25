@@ -153,8 +153,25 @@ public:
   /** \brief Get all the free variables of the function */
   std::vector<MX> getFree() const;
   
+#ifndef SWIG
   /** \brief Extract the functions needed for the Lifted Newton method */
   void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
+#else
+  /** \brief Extract the functions needed for the Lifted Newton method */
+  void generateLiftingFunctions(MXFunction& OUTPUT, MXFunction& OUTPUT);
+#endif
+
+  
+  /** \brief Extract the expressions from the algorithm
+  *
+  * Creates an MXFunction with additional input arguments:
+  *  A,B,C -> A*B+C 
+  *    extractNodes([A*B])
+  *
+  *  A,B,C,AB -> AB + C
+  *  
+  */
+  MXFunction extractNodes(const std::vector<MX>& expr); 
 
   /** \brief Get the corresponding matrix type */
   typedef MX MatType;  

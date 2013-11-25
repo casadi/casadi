@@ -144,6 +144,9 @@ int MXFunction::getWorkSize() const{
     (*this)->generateLiftingFunctions(vdef_fcn,vinit_fcn);
   }
 
+MXFunction MXFunction::extractNodes(const std::vector<MX>& expr) {
+  return  (*this)->extractNodes(expr);
+}
 
 } // namespace CasADi
 

@@ -408,6 +408,29 @@ namespace CasADi{
   * \see MXFunction::getFree()
   */
   std::vector<MX> getSymbols(const MX& e);
+  
+  /** \brief Get all symbols contained in the supplied expression
+  * Get all symbols on which the supplied expression depends
+  * \see MXFunction::getFree()
+  */
+  std::vector<MX> getSymbols(const std::vector<MX>& e);
+  
+  /** \brief Expand MX graph to SXFunction call
+  *
+  *  Expand the given expression e, optionally
+  *  supplying expressions contained in it at which expansion should stop.
+  *
+  */
+  MX matrix_expand(const MX& e, const std::vector<MX> &boundary = std::vector<MX>());
+
+  /** \brief Expand MX graph to SXFunction call
+  *
+  *  Expand the given expression e, optionally
+  *  supplying expressions contained in it at which expansion should stop.
+  *
+  */
+  std::vector<MX> matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary = std::vector<MX>());
+
 
 } // namespace CasADi
 

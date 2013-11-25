@@ -1339,6 +1339,91 @@ namespace CasADi{
       }
     }
   }
+
+  MXFunction MXFunctionInternal::extractNodes(const std::vector<MX>& expr) {
+    assertInit();
+    
+    vector<MX> swork(work_.size());
+    
+    // Temporary stringstream
+    stringstream ss;
+    
+    // Construct symbolic counterparts for expressions
+    std::vector<MX> exprs;
+    exprs.reserve(expr.size());
+
+    for (int i=0;i<expr.size();++i) {
+      ss.str(string());
+      ss << "y" << i;
+      exprs.push_back(msym(ss.str(),expr[i].sparsity()));
+    }
+    
+    // Construct lookup table for expressions
+    std::map<const MXNode*,int> expr_lookup;
+    for (int i=0;i<expr.size();++i) {
+      expr_lookup[expr[i].operator->()] = i;
+    }
+    
+    // Allocate output vector
+    vector<MX> f_out(getNumOutputs());
+
+    MXPtrV input_p, output_p;
+    MXPtrVV dummy_p;
+    
+    // expr_lookup iterator
+    std::map<const MXNode*,int>::const_iterator it_lookup;
+
+    for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+
+      if (!(it->data).isNull()) {
+        // Check if it->data points to a supplied expr
+        it_lookup = expr_lookup.find((it->data).operator->());
+        
+        if (it->res.front()>=0 && it_lookup!=expr_lookup.end()) {
+          // Fill in that expression in-place
+          swork[it->res.front()] = exprs[it_lookup->second];
+          continue;
+        }
+      }
+      
+      switch(it->op){
+      case OP_INPUT:
+      case OP_PARAMETER:
+        swork[it->res.front()] = it->data;
+        break;
+      case OP_OUTPUT:
+        f_out[it->res.front()] = swork[it->arg.front()];
+        break;
+      default:
+        {
+          input_p.resize(it->arg.size());
+          for(int i=0; i<input_p.size(); ++i){
+            int el = it->arg[i];
+            input_p[i] = el<0 ? 0 : &swork[el];
+          }
+          
+          output_p.resize(it->res.size());
+          for(int i=0; i<output_p.size(); ++i){
+            int el = it->res[i];
+            output_p[i] = el<0 ? 0 : &swork[el];
+          }
+          
+          it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
+        }
+      }
+    }
+    
+    // New inputs
+    vector<MX> f_in = inputv_;
+    f_in.insert(f_in.end(),exprs.begin(),exprs.end());
+
+    MXFunction f(f_in,f_out);
+    f.setOption("name","extracted_" + string(getOption("name")));
+    f.setOutputScheme(getOutputScheme());
+    
+    return f;
+    
+  } 
   
   void MXFunctionInternal::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn){
     assertInit();
