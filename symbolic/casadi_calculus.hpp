@@ -476,6 +476,7 @@ namespace CasADi{
   template<>      struct F0XChecker<OP_TWICE>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SIN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_TAN>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_ATAN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_ASIN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_FLOOR>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_CEIL>{ static const bool check=true;};
