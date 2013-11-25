@@ -2,7 +2,7 @@
 * This example looks at matrix_expand
 *
 *
-* \pythonexample{misc/matrix_expand}
+* \pythonexample{MX/matrix_expand}
 *
 * \sa
 * \code
