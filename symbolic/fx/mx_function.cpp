@@ -140,13 +140,10 @@ int MXFunction::getWorkSize() const{
   return (*this)->work_.size();
 }
 
-  void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn){
-    (*this)->generateLiftingFunctions(vdef_fcn,vinit_fcn);
-  }
-
-MXFunction MXFunction::extractNodes(const std::vector<MX>& expr) {
-  return  (*this)->extractNodes(expr);
+void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn){
+  (*this)->generateLiftingFunctions(vdef_fcn,vinit_fcn);
 }
+
 
 } // namespace CasADi
 

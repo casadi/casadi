@@ -82,7 +82,7 @@ def checkMXoperations3(self,ztf,zrf,name):
     zr = array([[L[0]*i,L[1]*i,L[2]*i] for i in range(8)])
     checkarray(self,zrf(zr),zt,name)
     return (zt,zrf(zr))
-    
+  
 class MXtests(casadiTestCase):
 
   def setUp(self):
@@ -2417,43 +2417,44 @@ class MXtests(casadiTestCase):
                   if c.size()>0:
                     # At least as sparse as DMatrix calculus
                     self.assertTrue(min(c)>=0,str([sp,sp2,v1,v2,name]))
-                    
-  def test_MX_extractNodes(self):
+
+  def test_graph_substitute(self):
     x=msym("X",4,4)
     y=msym("Y",4,4)
     b=msym("B",4,4)
 
     c = x*y
-    f = c+b
-
-    F = MXFunction([x,y,b],[f])
+    d = b*y
+    f = c+d
+    
+    
+    C = msym("C",4,4)
+    f = graph_substitute(f,[c],[C])
+    
+    F = MXFunction([y,b,C],[f])
     F.init()
-
-    r = F.extractNodes([c])
-    r.init()
     
-    r.setInput(1,0)
-    r.setInput(2,1)
-    r.setInput(3,2)
-    r.setInput(4,3)
+    F.setInput(1,0)
+    F.setInput(2,1)
+    F.setInput(3,2)
     
-    r.evaluate()
+    F.evaluate()
     
-    self.checkarray(r.output(),7*DMatrix.ones(4,4)) 
-
-    r = F.extractNodes([x])
-    r.init()
+    self.checkarray(F.output(),5*DMatrix.ones(4,4))
     
-    r.setInput(1,0)
-    r.setInput(2,1)
-    r.setInput(3,2)
-    r.setInput(4,3)
+    D = msym("D",4,4)
+    f = graph_substitute(f,[d],[D])
     
-    r.evaluate()
+    F = MXFunction([D,C],[f])
+    F.init()
     
-    print r
+    F.setInput(4,0)
+    F.setInput(5,1)
     
-    self.checkarray(r.output(),11*DMatrix.ones(4,4)) 
+    F.evaluate()
+    
+    self.checkarray(F.output(),9*DMatrix.ones(4,4))
+                 
 
   def test_matrix_expand(self):
     n = 2
@@ -2473,6 +2474,8 @@ class MXtests(casadiTestCase):
     t1 = matrix_expand(e,[d])
     self.assertEqual(countNodes(t1),6)
     
+    print e,t0,t1
+    
     
     outs = []
     for x in [e,t0,t1]:
@@ -2488,7 +2491,8 @@ class MXtests(casadiTestCase):
       outs.append(f.getOutput())
       if outs>1:
         self.checkarray(outs[0],outs[-1])
-
+      
+    print outs
     
 if __name__ == '__main__':
     unittest.main()

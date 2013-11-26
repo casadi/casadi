@@ -161,18 +161,6 @@ public:
   void generateLiftingFunctions(MXFunction& OUTPUT, MXFunction& OUTPUT);
 #endif
 
-  
-  /** \brief Extract the expressions from the algorithm
-  *
-  * Creates an MXFunction with additional input arguments:
-  *  A,B,C -> A*B+C 
-  *    extractNodes([A*B])
-  *
-  *  A,B,C,AB -> AB + C
-  *  
-  */
-  MXFunction extractNodes(const std::vector<MX>& expr); 
-
   /** \brief Get the corresponding matrix type */
   typedef MX MatType;  
 };

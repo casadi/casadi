@@ -76,9 +76,6 @@ namespace CasADi{
     /** \brief Extract the residual function G and the modified function Z out of an expression (see Albersmeyer2010 paper) */
     void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
 
-    /** \brief Extract the expressions from the algorithm */
-    MXFunction extractNodes(const std::vector<MX>& expr); 
-
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
     virtual FX getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
     

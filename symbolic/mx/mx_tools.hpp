@@ -359,6 +359,12 @@ namespace CasADi{
 
   /** \brief  Substitute variable var with expression expr in multiple expressions */
   std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
+  
+  /** \brief  Substitute variable v with expression vdef in an expression ex, preserving nodes */
+  MX graph_substitute(const MX &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
+
+  /** \brief  Substitute variable var with expression expr in multiple expressions, preserving nodes  */
+  std::vector<MX> graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
 
   /** \brief Inplace substitution
    * Substitute variables v out of the expressions vdef sequentially 
