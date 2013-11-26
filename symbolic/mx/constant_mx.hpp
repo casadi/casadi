@@ -199,6 +199,9 @@ namespace CasADi{
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
+    
+    /// Assign the nonzeros of a matrix to another matrix
+    virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
 
     /// Transpose
     virtual MX getTranspose() const;
@@ -347,6 +350,16 @@ namespace CasADi{
     }
     return MX::create(new Constant<Value>(sp,v_));
   }  
+  
+  template<typename Value>
+  MX Constant<Value>::getSetNonzeros(const MX& y, const std::vector<int>& nz) const {
+    if (y.isConstant() && y->isZero() && v_.value==0) {
+      return y;
+    }
+    
+    // Fall-back
+    return MXNode::getSetNonzeros(y,nz);
+  }
 
   template<typename Value>
   MX Constant<Value>::getSetSparse(const CRSSparsity& sp) const{
