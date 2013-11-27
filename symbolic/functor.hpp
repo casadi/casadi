@@ -133,6 +133,8 @@ namespace CasADi{
   /** \brief Callback
   * 
   * In C++, supply a CallbackCPtr function pointer
+  * When the callback function returns a non-zero integer, the host is signalled of a problem.
+  * E.g. an NLPSolver may halt iterations if the Callback is something else than 0
   *
   * In python, supply a callable, annotated with pycallback decorator
   * \code
@@ -140,6 +142,7 @@ namespace CasADi{
   *   @pycallback
   *   def c(f):
   *     print f
+  *     return 0
   *
   *   solver.setOption("iteration_callback",c)
   * \endcode
