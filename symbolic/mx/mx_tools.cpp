@@ -652,6 +652,8 @@ namespace CasADi{
   }
   
   std::vector<MX> graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &expr, const std::vector<MX> &exprs) {
+    casadi_assert_message(expr.size()==exprs.size(),"Mismatch in the number of expression to substitute: " << expr.size() << " <-> " << exprs.size() << ".");
+  
     // Sort the expression
     MXFunction f(vector<MX>(),ex);
     f.init();
