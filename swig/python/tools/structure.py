@@ -211,6 +211,8 @@ class StructEntry:
                  for i in p]
         elif isinstance(p,dict):
           raise Exception("powerIndex entry {} cannot be used in list context.")
+        elif isinstance(p,set):
+          raise Exception("""powerIndex entry {"foo","bar"} cannot be used in list context.""")
         elif isinstance(p,NestedDictLiteral):
           return [
                     self.traverseByPowerIndex(
@@ -347,6 +349,29 @@ class Structure(object):
                         payload=payload
                       )
                     ) for k,v in self.dict.iteritems()
+                   ])
+        elif isinstance(p,set):
+          if isinstance(payload,dict):
+            return dict([
+                    ( k,
+                      self.dict[k].traverseByPowerIndex(
+                        powerIndex[1:],
+                        canonicalIndex=canonicalIndex+(k,),
+                        dispatcher=dispatcher,
+                        payload=v
+                      )
+                    ) for k,v in payload.iteritems() if k in p
+                   ])
+          else:
+            return dict([
+                    ( k,
+                      self.dict[k].traverseByPowerIndex(
+                        powerIndex[1:],
+                        canonicalIndex=canonicalIndex+(k,),
+                        dispatcher=dispatcher,
+                        payload=payload
+                      )
+                    ) for k in p
                    ])
         elif isinstance(p,list):
           return [
