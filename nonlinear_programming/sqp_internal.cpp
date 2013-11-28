@@ -362,9 +362,18 @@ namespace CasADi{
         while (true){
           for(int i=0; i<nx_; ++i) x_cand_[i] = x_[i] + t * dx_[i];
       
-          // Evaluating objective and constraints
-          eval_f(x_cand_,fk_cand);
-          eval_g(x_cand_,gk_cand_);
+          try {
+            // Evaluating objective and constraints
+            eval_f(x_cand_,fk_cand);
+            eval_g(x_cand_,gk_cand_);
+          } catch (const CasadiException& ex) {
+            // Silent ignore; line-search failed
+            ls_iter++;
+            // Backtracking
+            t = beta_ * t;
+            continue;
+          }
+          
           ls_iter++;
 
           // Calculating merit-function in candidate
