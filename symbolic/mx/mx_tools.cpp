@@ -646,6 +646,109 @@ namespace CasADi{
     F.init();
     return F.evalMX(vdef);
   }
+  
+  MX graph_substitute(const MX &ex, const std::vector<MX> &v, const std::vector<MX> &vdef) {
+    return graph_substitute(std::vector<MX>(1,ex),v,vdef).at(0);
+  }
+  
+  std::vector<MX> graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &expr, const std::vector<MX> &exprs) {
+    casadi_assert_message(expr.size()==exprs.size(),"Mismatch in the number of expression to substitute: " << expr.size() << " <-> " << exprs.size() << ".");
+  
+    // Sort the expression
+    MXFunction f(vector<MX>(),ex);
+    f.init();
+    
+    // Get references to the internal data structures
+    const vector<MXAlgEl>& algorithm = f.algorithm();
+    vector<MX> swork(f.getWorkSize());
+    
+    // A boolean vector indicated whoch nodes are tainted by substitutions
+    vector<bool> tainted(swork.size());
+    
+    // Temporary stringstream
+    stringstream ss;
+    
+    // Construct lookup table for expressions
+    std::map<const MXNode*,int> expr_lookup;
+    for (int i=0;i<expr.size();++i) {
+      expr_lookup[expr[i].operator->()] = i;
+    }
+    
+    // Construct found map
+    std::vector<bool> expr_found(expr.size());
+    
+    // Allocate output vector
+    vector<MX> f_out(f.getNumOutputs());
+
+    MXPtrV input_p, output_p;
+    MXPtrVV dummy_p;
+    
+    // expr_lookup iterator
+    std::map<const MXNode*,int>::const_iterator it_lookup;
+
+    for(vector<MXAlgEl>::const_iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
+
+      if (!(it->data).isNull()) {
+        // Check if it->data points to a supplied expr
+        it_lookup = expr_lookup.find((it->data).operator->());
+        
+        if (it->res.front()>=0 && it_lookup!=expr_lookup.end()) {
+          // Fill in that expression in-place
+          swork[it->res.front()] = exprs[it_lookup->second];
+          tainted[it->res.front()] = true;
+          expr_found[it_lookup->second] = true;
+          continue;
+        }
+      }
+      
+      switch(it->op){
+      case OP_INPUT:
+        tainted[it->res.front()] = false;
+      case OP_PARAMETER:
+        swork[it->res.front()] = it->data;
+        tainted[it->res.front()] = false;
+        break;
+      case OP_OUTPUT:
+        f_out[it->res.front()] = swork[it->arg.front()];
+        break;
+      default:
+        {
+          bool node_tainted = false;
+          
+          input_p.resize(it->arg.size());
+          for(int i=0; i<input_p.size(); ++i){
+            int el = it->arg[i];
+            if (el>=0) node_tainted =  node_tainted || tainted[el];
+            input_p[i] = el<0 ? 0 : &swork[el];
+          }
+          
+          output_p.resize(it->res.size());
+          for(int i=0; i<output_p.size(); ++i){
+            int el = it->res[i];
+            output_p[i] = el<0 ? 0 : &swork[el];
+            if (el>=0) tainted[el] = node_tainted;
+          }
+          
+          if (it->res.size()==1 && it->res[0]>=0 && !node_tainted) {
+            int el = it->res[0];
+            swork[el] = it->data;
+          } else {
+            const_cast<MX&>(it->data)->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
+          }
+        }
+      }
+    }
+    
+    bool all_found=true;
+    for (int i=0;i<expr.size();++i) {
+      all_found = all_found && expr_found[i];
+    }
+    
+    //casadi_assert_message(all_found,"MXFunctionInternal::extractNodes(const std::vector<MX>& expr): failed to locate all input expr." << std::endl << "Here's a boolean list showing which ones where found: " << expr_found);
+    
+    return f_out;
+    
+  }
 
   void extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef, const std::string& v_prefix, const std::string& v_suffix){
   
@@ -844,6 +947,42 @@ namespace CasADi{
     return f.getFree();
   }
 
+  std::vector<MX> getSymbols(const std::vector<MX>& e) {
+    MXFunction f(std::vector<MX>(),e);
+    f.init();
+    return f.getFree();
+  }
+  
+  MX matrix_expand(const MX& e, const std::vector<MX> &boundary) {
+    std::vector<MX> e_v(1,e);
+    return matrix_expand(e_v,boundary).at(0);
+  }
+  
+  std::vector<MX> matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary) {
+    
+    // Create symbols for boundary nodes
+    std::vector<MX> syms(boundary.size());
+    
+    for (int i=0;i<syms.size();++i) {
+      syms[i] = msym("x",boundary[i].sparsity());
+    }
+    
+    // Substitute symbols for boundary nodes
+    std::vector<MX> ret = graph_substitute(e,boundary,syms);
+    
+    // Obtain list of dependants
+    std::vector<MX> v = getSymbols(ret);
+    
+    // Construct an MXFunction with it
+    MXFunction f(v,ret);
+    f.init();
+    
+    // Expand to SXFunction
+    SXFunction s = f.expand();
+    s.init();
 
+    return s.eval(graph_substitute(v,syms,boundary));
+  }
+  
 } // namespace CasADi
 

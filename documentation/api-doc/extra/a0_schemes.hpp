@@ -455,7 +455,7 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>HESSLAG_X</td><td>x</td><td>Decision variable .</td></tr>
 <tr><td>HESSLAG_P</td><td>p</td><td>Fixed parameter .</td></tr>
-<tr><td>HESSLAG_LAM_F</td><td>lam_f</td><td>Multiplier for f .</td></tr>
+<tr><td>HESSLAG_LAM_F</td><td>lam_f</td><td>Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective. .</td></tr>
 <tr><td>HESSLAG_LAM_G</td><td>lam_g</td><td>Multiplier for g .</td></tr>
 </table>
 */

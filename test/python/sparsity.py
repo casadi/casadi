@@ -566,6 +566,27 @@ class Sparsitytests(casadiTestCase):
     self.checkarray(IMatrix(s.rowind()),IMatrix([0,2,2,4]))
     self.checkarray(IMatrix(s.col()),IMatrix([0,2,0,2]))
 
+  def test_inverse(self):
+    numpy.random.seed(0)
+    d = self.randDMatrix(20,20,0.6,symm=True)
+    sp = d.sparsity()
+    
+    for sp in [sp,sp_dense(4,4),sp_sparse(4,4),sp_tril(4),sp_tril(4).T]:
+    
+      d = IMatrix(sp,1)
+      
+      dt = 1-d
+      makeSparse(dt)
+      dt = IMatrix(dt.sparsity(),1)
+      
+      trial = IMatrix(sp.patternInverse(),1)
+      
+      d.printDense()
+      dt.printDense()
+      trial.printDense()
+      
+      self.checkarray(trial,dt)
+    
 
 if __name__ == '__main__':
     unittest.main()

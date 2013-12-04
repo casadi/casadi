@@ -144,9 +144,9 @@ int MXFunction::getWorkSize() const{
   return (*this)->work_.size();
 }
 
-  void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn){
-    (*this)->generateLiftingFunctions(vdef_fcn,vinit_fcn);
-  }
+void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn){
+  (*this)->generateLiftingFunctions(vdef_fcn,vinit_fcn);
+}
 
 
 } // namespace CasADi

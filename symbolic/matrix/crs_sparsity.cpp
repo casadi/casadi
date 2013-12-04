@@ -369,6 +369,10 @@ namespace CasADi{
     std::vector< unsigned char > mapping;
     return patternIntersection(b, mapping);
   }
+  
+  CRSSparsity CRSSparsity::patternInverse() const {
+    return (*this)->patternInverse();
+  }
 
   void CRSSparsity::reserve(int nnz, int nrow){
     makeUnique();

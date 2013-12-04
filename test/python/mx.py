@@ -82,7 +82,7 @@ def checkMXoperations3(self,ztf,zrf,name):
     zr = array([[L[0]*i,L[1]*i,L[2]*i] for i in range(8)])
     checkarray(self,zrf(zr),zt,name)
     return (zt,zrf(zr))
-    
+  
 class MXtests(casadiTestCase):
 
   def setUp(self):
@@ -95,7 +95,7 @@ class MXtests(casadiTestCase):
     self.pool.append(lambda x: arcsin(x[0]),arcsin,"arcsin")
     self.pool.append(lambda x: arccos(x[0]),arccos,"arccos")
     self.pool.append(lambda x: exp(x[0]),exp,"exp")
-    self.pool.append(lambda x: log(x[0]),log,"log")
+    self.pool.append(lambda x: log(x[0]),log,"log",flags={'nozero'})
     self.pool.append(lambda x: x[0]**0,lambda x : x**0,"x^0",flags={'nozero'})
     self.pool.append(lambda x: x[0]**1,lambda x : x**1,"^1")
     self.pool.append(lambda x: x[0]**(-2),lambda x : x**(-2),"^-2",flags={'nozero'})
@@ -124,6 +124,11 @@ class MXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: a[0]+a[1],lambda a: a[0]+a[1],"Matrix+Matrix")
     self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
     self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
+    self.matrixbinarypool.append(lambda a: fmax(a[0],a[1]),lambda a: fmax(a[0],a[1]),"fmin")
+
+    self.matrixbinarypool.append(lambda a: fmin(a[0],a[1]),lambda a: fmin(a[0],a[1]),"fmax")
+    self.matrixbinarypool.append(lambda a: mul(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"mul(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: arctan2(a[0],a[1]),lambda a: arctan2(a[0],a[1]),"arctan2")
     #self.matrixbinarypool.append(lambda a: inner_mul(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_mul(Matrix,Matrix)") 
     self.matrixbinarypool.append(lambda a: mul(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"mul(Matrix,Matrix.T)")
     
@@ -2030,6 +2035,210 @@ class MXtests(casadiTestCase):
  
     with self.assertRaises(RuntimeError):
       d = x / c
+      
+  @memory_heavy()
+  def test_MX_shapes(self):
+      self.message("MX unary operations")
+      
+      #self.checkarray(DMatrix(sp_tril(4),1),DMatrix(sp_dense(4,4),1))
+      
+      for sp in [sp_dense(0,0),sp_dense(0,2),sp_dense(2,0),sp_dense(1,1),sp_dense(2,2), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+        for v in [0,1,0.2]:
+          x_ = DMatrix(sp,v)
+          
+          xx = msym("x",sp.size1(),sp.size2())
+          x=xx[sp]
+          
+          for (casadiop, numpyop,name, flags) in self.pool.zip():
+            if 'nozero' in flags and v==0: continue
+            r = casadiop([x])
+            f = MXFunction([xx],[r])
+            f.init()
+            f.setInput(v,0)
+            f.evaluate()
+            
+            self.checkarray(f.output(),numpyop(x_))
+            
+            a = IMatrix(f.output().sparsity(),1)
+            b = IMatrix(DMatrix(numpyop(x_)).sparsity(),1)
+            
+            c = b-a
+            if c.size()>0:
+              # At least as sparse as DMatrix calculus
+              self.assertTrue(min(c)>=0,str([sp,v,name]))
+
+      for sp in [sp_sparse(1,1),sp_dense(1,1),sp_sparse(3,4),sp_dense(3,4), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+        for v1 in [0,1,0.2,-0.2]:
+          x1_ = DMatrix(sp,v1)
+          xx1 = msym("x",sp.size1(),sp.size2())
+          x1=xx1[sp]
+          xx1s = ssym("x",sp.size1(),sp.size2())
+          x1s=xx1s[sp]
+          for sp2 in [sp_sparse(1,1),sp_dense(1,1),sp_sparse(3,4),sp_dense(3,4), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+            for v2 in [0,1,0.2,-0.2]:
+              x2_ = DMatrix(sp2,v2)
+              xx2 = msym("x",sp2.size1(),sp2.size2())
+              x2=xx2[sp2]
+              xx2s = ssym("x",sp2.size1(),sp2.size2())
+              x2s=xx2s[sp2]
+              for (casadiop, numpyop,name, flags) in self.matrixbinarypool.zip():
+                if "mul" in name and (sp.numel()==1 or sp2.numel()==1): continue
+                r = casadiop([x1,x2])
+                f = MXFunction([xx1,xx2],[r])
+                f.init()
+                f.setInput(v1,0)
+                f.setInput(v2,1)
+                f.evaluate()
+                g = MXFunction([xx1,xx2],[r])
+                g.init()
+                g.setInput(v1,0)
+                g.setInput(v2,1)
+                g.evaluate()
+                
+                self.checkarray(f.output(),numpyop([x1_,x2_]),str([sp,sp2,v1,v2,x1_,x2_,name]))
+                
+                
+                if "mul" not in name:
+                  a = IMatrix(f.output().sparsity(),1)
+                  b = IMatrix(g.output().sparsity(),1)
+                  
+                  c = b-a
+                  if c.size()>0:
+                    # At least as sparse as DMatrix calculus
+                    self.assertTrue(min(c)>=0,str([sp,sp2,v1,v2,name,a,b]))
+                
+                if sp.size()>0 and sp2.size()>0 and v1!=0 and v2!=0:
+                  self.checkfx(f,g,hessian=False,failmessage=str([sp,sp2,v1,v2,x1_,x2_,name]))
+
+  @memory_heavy()
+  def test_MXConstant(self):
+      self.message("MX unary operations, constant")
+      
+      #self.checkarray(DMatrix(sp_tril(4),1),DMatrix(sp_dense(4,4),1))
+      
+      for sp in [sp_dense(0,0),sp_dense(0,2),sp_dense(2,0),sp_dense(1,1),sp_dense(2,2), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+        for v in [0,1,0.2]:
+          x_ = DMatrix(sp,v)
+          
+          x=MX(sp,v)
+          
+          for (casadiop, numpyop,name, flags) in self.pool.zip():
+            if 'nozero' in flags and (v==0 or not sp.dense()): continue
+            r = casadiop([x])
+            print r
+            self.assertTrue(r.isConstant())
+            
+            self.checkarray(r.getMatrixValue(),numpyop(x_),str([x_,name]))
+            
+            a = IMatrix(r.getMatrixValue().sparsity(),1)
+            b = IMatrix(DMatrix(numpyop(x_)).sparsity(),1)
+            
+            c = b-a
+            if c.size()>0:
+              # At least as sparse as DMatrix calculus
+              self.assertTrue(min(c)>=0,str([sp,v,name]))
+        
+      for sp in [sp_dense(1,1),sp_sparse(1,1),sp_sparse(3,4),sp_dense(3,4), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+        for v1 in [0,1,0.2,-0.2]:
+          x1_ = DMatrix(sp,v1)
+          x1=MX(sp,v1)
+          for sp2 in [sp_dense(1,1),sp_sparse(1,1),sp_sparse(3,4),sp_dense(3,4), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+            for v2 in [0,1,0.2,-0.2]:
+              x2_ = DMatrix(sp2,v2)
+              x2=MX(sp2,v2)
+              for (casadiop, numpyop,name, flags) in self.matrixbinarypool.zip():
+                if "mul" in name and (sp.numel()==1 or sp2.numel()==1): continue
+                r = casadiop([x1,x2])
+                f = MXFunction([],[r]) # Should not be needed -> constant folding
+                f.init()
+                f.evaluate()
+               
+                
+                self.checkarray(f.output(),numpyop([x1_,x2_]),str([sp,sp2,v1,v2,name]))
+                if "mul" not in name:
+                  a = IMatrix(f.output().sparsity(),1)
+                  b = IMatrix(DMatrix(numpyop([x1_,x2_])).sparsity(),1)
+                  
+                  c = b-a
+                  if c.size()>0:
+                    # At least as sparse as DMatrix calculus
+                    self.assertTrue(min(c)>=0,str([sp,sp2,v1,v2,name]))
+
+  def test_graph_substitute(self):
+    x=msym("X",4,4)
+    y=msym("Y",4,4)
+    b=msym("B",4,4)
+
+    c = x*y
+    d = b*y
+    f = c+d
+    
+    
+    C = msym("C",4,4)
+    f = graph_substitute(f,[c],[C])
+    
+    F = MXFunction([y,b,C],[f])
+    F.init()
+    
+    F.setInput(1,0)
+    F.setInput(2,1)
+    F.setInput(3,2)
+    
+    F.evaluate()
+    
+    self.checkarray(F.output(),5*DMatrix.ones(4,4))
+    
+    D = msym("D",4,4)
+    f = graph_substitute(f,[d],[D])
+    
+    F = MXFunction([D,C],[f])
+    F.init()
+    
+    F.setInput(4,0)
+    F.setInput(5,1)
+    
+    F.evaluate()
+    
+    self.checkarray(F.output(),9*DMatrix.ones(4,4))
+                 
+
+  def test_matrix_expand(self):
+    n = 2
+    a = msym("a",n,n)
+    b = msym("b",n,n)
+    c = msym("c",n,n)
+
+    d = a+b
+    e = d*c
+
+    self.assertEqual(countNodes(e),6)
+
+    t0 = matrix_expand(e)
+
+    self.assertEqual(countNodes(t0),5)
+    
+    t1 = matrix_expand(e,[d])
+    self.assertEqual(countNodes(t1),6)
+    
+    print e,t0,t1
+    
+    
+    outs = []
+    for x in [e,t0,t1]:
+      f = MXFunction([a,b,c],[x])
+      f.init()
+      
+      f.setInput(1.1,0)
+      f.setInput(2.2,1)
+      f.setInput(3.3,2)
+      
+      f.evaluate()
+      
+      outs.append(f.getOutput())
+      if outs>1:
+        self.checkarray(outs[0],outs[-1])
+      
+    print outs
     
 if __name__ == '__main__':
     unittest.main()

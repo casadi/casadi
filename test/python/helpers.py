@@ -88,6 +88,8 @@ class FunctionPool:
     self.numpyoperators.append(num)
     self.names.append(name)
     self.flags.append(flags)
+  def zip(self):
+    return zip(self.casadioperators,self.numpyoperators,self.names,self.flags)
 
 class casadiTestCase(unittest.TestCase):
 
@@ -128,6 +130,7 @@ class casadiTestCase(unittest.TestCase):
       sys.stdout.flush()
 
   def assertAlmostEqual(self,first, second, places=7, msg=""):
+      if isnan(first ) and isnan(second): return
       msg+= " %.16e <-> %.16e"  % (first, second)
       n =  max(abs(first),abs(second))
       if n>1e3:
@@ -276,7 +279,6 @@ class casadiTestCase(unittest.TestCase):
     for i in range(trial.getNumInputs()):
       if (allow_empty and (trial.input(i).empty() or solution.input(i).empty() )): continue
       message = "input(%d)" % i
-      if verbose: print message + ": " + str(trial.getInput(i))
       self.checkarray(trial.getInput(i),solution.getInput(i),"",digits=digits,failmessage=failmessage+": "+ message)
 
     trial_inputs    = [ DMatrix(trial.getInput(k)) for k in range(trial.getNumInputs())]
@@ -298,7 +300,6 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.getNumOutputs()):
       message = "output(%d)" % i
-      if verbose: print message + ": " + str(trial.getOutput(i))
       if (allow_empty and (trial.output(i).empty() or solution.output(i).empty() )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
       
@@ -318,7 +319,6 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.getNumOutputs()):
       message = "output(%d)" % i
-      if verbose: print message + ": " + str(trial.getOutput(i))
       if (allow_empty and (trial.output(i).empty() or solution.output(i).empty() )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
     
@@ -474,8 +474,8 @@ class casadiTestCase(unittest.TestCase):
             for k,(a,b) in enumerate(zip(st[0],st[i+1])):
               if b.numel()==0 and sparse(a).size()==0: continue
               if a.numel()==0 and sparse(b).size()==0: continue
-              self.checkarray(IMatrix(a.sparsity(),1),IMatrix(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0)),digits=digits_sens)
-              self.checkarray(a,b,("%s, output(%d)" % (order,k))+str(vf.getInput(0)),digits=digits_sens)
+              self.checkarray(IMatrix(a.sparsity(),1),IMatrix(b.sparsity(),1),("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
+              self.checkarray(a,b,("%s, output(%d)" % (order,k))+str(vf.getInput(0))+failmessage,digits=digits_sens)
               
     for k in range(trial.getNumInputs()):
       trial.setInput(trial_inputs[k],k)

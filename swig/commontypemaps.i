@@ -204,6 +204,7 @@ if (!ret) {
 %my_value_output_typemaps(CasADi::Matrix< int >);
 %my_value_output_typemaps(CasADi::MX);
 %my_value_output_typemaps(CasADi::CRSSparsity);
+//%my_value_output_typemaps(CasADi::MXFunction);
 
 #ifdef SWIGPYTHON
 %outputRefOwn(CasADi::CRSSparsity)

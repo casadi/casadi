@@ -199,6 +199,9 @@ namespace CasADi{
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
+    
+    /// Assign the nonzeros of a matrix to another matrix
+    virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
 
     /// Transpose
     virtual MX getTranspose() const;
@@ -231,17 +234,55 @@ namespace CasADi{
     // Constant folding
     double ret;
     casadi_math<double>::fun(op,v_.value,0.0,ret);
-    return ret;
+    if (operation_checker<F0XChecker>(op) || sparsity().dense()) {
+      return MX(sparsity(),ret);
+    } else {
+      if (v_.value==0) {
+        if (isZero() && operation_checker<F0XChecker>(op)) {
+          return MX(sparsity(),ret);
+        } else {
+          return MX(size1(),size2(),ret);
+        }
+      }
+      double ret2;
+      casadi_math<double>::fun(op,0,0.0,ret2);
+      return DMatrix(sparsity(),ret)+DMatrix(sparsity().patternInverse(),ret2);
+    }
   }
 
   template<typename Value>
   MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
+    casadi_assert(sparsity()==y.sparsity() || ScX || ScY);
+    
+    if (ScX && !operation_checker<FX0Checker>(op)) {
+      double ret;
+      casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,0,ret);
+      
+      if (ret!=0) {
+        CRSSparsity f = sp_dense(y.size1(),y.size2());
+        MX yy = y.setSparse(f);
+        return MX(f,shared_from_this<MX>())->getBinary(op,yy,false,false);
+      }
+    } else if (ScY && !operation_checker<F0XChecker>(op)) {
+      bool grow = true;
+      if (y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
+        double ret;
+        casadi_math<double>::fun(op, 0,y.size()>0 ? y->getValue() : 0,ret);
+        grow = ret!=0;
+      }
+      if (grow) {
+        CRSSparsity f = sp_dense(size1(),size2());
+        MX xx = shared_from_this<MX>().setSparse(f);
+        return xx->getBinary(op,MX(f,y),false,false);
+      }
+    }
+    
     switch(op){
     case OP_ADD:
-      if(v_.value==0) return y;
+      if(v_.value==0) return ScY && !y->isZero() ? MX(size1(),size2(),y) : y;
       break;
     case OP_SUB:
-      if(v_.value==0) return -y;
+      if(v_.value==0) return ScY && !y->isZero() ? MX(size1(),size2(),-y) : -y;
       break;
     case OP_MUL:
       if(v_.value==1) return y;
@@ -262,9 +303,10 @@ namespace CasADi{
 
     // Constant folding
     if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0){ // NOTE: ugly, should use a function instead of a cast
-      double y_value = y->getValue();
+      double y_value = y.size()>0 ? y->getValue() : 0;
       double ret;
-      casadi_math<double>::fun(op,v_.value,y_value,ret);
+      casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,y_value,ret);
+      
       return MX(y.sparsity(),ret);
     }
 
@@ -308,11 +350,25 @@ namespace CasADi{
     }
     return MX::create(new Constant<Value>(sp,v_));
   }  
+  
+  template<typename Value>
+  MX Constant<Value>::getSetNonzeros(const MX& y, const std::vector<int>& nz) const {
+    if (y.isConstant() && y->isZero() && v_.value==0) {
+      return y;
+    }
+    
+    // Fall-back
+    return MXNode::getSetNonzeros(y,nz);
+  }
 
   template<typename Value>
   MX Constant<Value>::getSetSparse(const CRSSparsity& sp) const{
     if(isZero()){
       return MX::create(new Constant<Value>(sp,v_));
+    } else if (sp.dense()) {
+      DMatrix v = getMatrixValue();
+      makeDense(v);
+      return v;
     } else {
       return MXNode::getSetSparse(sp);
     }
