@@ -370,6 +370,7 @@ namespace CasADi{
         iteration["alpha_pr"] = alpha_pr;
         iteration["alpha_du"] = alpha_du;
         iteration["ls_trials"] = ls_trials;
+        iteration["obj"] = obj_value;
         stats_["iteration"] = iteration;
 
         output(NLP_SOLVER_F).at(0) = obj_value;

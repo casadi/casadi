@@ -275,9 +275,18 @@ namespace CasADi{
         if (!output(NLP_SOLVER_LAM_G).empty()) output(NLP_SOLVER_LAM_G).set(mu_);
         if (!output(NLP_SOLVER_LAM_X).empty()) output(NLP_SOLVER_LAM_X).set(mu_x_);
         if (!output(NLP_SOLVER_G).empty()) output(NLP_SOLVER_G).set(gk_);
+        
+        Dictionary iteration;
+        iteration["iter"] = iter;
+        iteration["inf_pr"] = pr_inf;
+        iteration["inf_du"] = gLag_norminf;
+        iteration["ls_trials"] = ls_iter;
+        iteration["obj"] = fk_;
+        stats_["iteration"] = iteration;
+        
         int ret = callback_(ref_,user_data_);
         
-        if (!ret) {
+        if (ret) {
           cout << endl;
           cout << "CasADi::SQPMethod: aborted by callback..." << endl;
           stats_["return_status"] = "User_Requested_Stop";

@@ -677,14 +677,29 @@ namespace CasADi{
             output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
           if (!output(NLP_SOLVER_LAM_G).empty())
             output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
+            
+          Dictionary iteration;
+          iteration["iter"] = worhp_w_.MajorIter;
+          iteration["iter_sqp"] = worhp_w_.MinorIter;
+          iteration["inf_pr"] = worhp_w_.NormMax_CV;
+          iteration["inf_du"] = worhp_w_.ScaledKKT;
+          iteration["obj"] = worhp_o_.F;
+          //iteration["ls_trials"] = worhp_w_.LScounter;
+          iteration["alpha_pr"] = worhp_w_.ArmijoAlpha;
+          stats_["iteration"] = iteration;
 
           double time2 = clock();
           t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
           time1 = clock();
-          callback_(ref_,user_data_);
+          int ret = callback_(ref_,user_data_);
           time2 = clock();
           t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
+          
+          if(ret) worhp_c_.status = TerminatedByUser;
+          
         }
+        
+
     
         IterationOutput(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
         DoneUserAction(&worhp_c_, iterOutput);
