@@ -74,14 +74,14 @@ namespace CasADi{
   
   class CustomEvaluateInternal : public FunctorInternal {
     friend class CustomEvaluate;
-    virtual void call(CustomFunction& fcn, int nfdir, int nadir, void* user_data)=0;
+    virtual void call(CustomFunction& fcn, void* user_data)=0;
   };
 
   class CustomEvaluateCInternal : public CustomEvaluateInternal, FunctorCInternal<CustomEvaluateCPtr> {
     friend class CustomEvaluate;
     
     CustomEvaluateCInternal(CustomEvaluateCPtr ptr);
-    virtual void call(CustomFunction& fcn, int nfdir, int nadir, void* user_data);
+    virtual void call(CustomFunction& fcn, void* user_data);
     virtual CustomEvaluateCInternal* clone() const;
   };
   

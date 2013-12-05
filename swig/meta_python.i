@@ -122,7 +122,7 @@ namespace CasADi {
     friend class CustomEvaluatePython;
     
     CustomEvaluatePythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-    virtual void call(CustomFunction& fcn, int nfdir, int nadir, void* user_data);
+    virtual void call(CustomFunction& fcn, void* user_data);
     virtual CustomEvaluatePythonInternal* clone() const { return new CustomEvaluatePythonInternal(p_); }
   };
   
@@ -217,20 +217,14 @@ namespace CasADi {
     }
   }
 
-  void CustomEvaluatePythonInternal::call(CustomFunction& fcn, int nfdir, int nadir, void* user_data) {
+  void CustomEvaluatePythonInternal::call(CustomFunction& fcn, void* user_data) {
     casadi_assert(p_!=0);
-    PyObject * nfdir_py = PyInt_FromLong(nfdir);
-    PyObject * nadir_py = PyInt_FromLong(nadir);
     PyObject * fcn_py = SWIG_NewPointerObj((new CustomFunction(static_cast< const CustomFunction& >(fcn))), SWIGTYPE_p_CasADi__CustomFunction, SWIG_POINTER_OWN |  0 );
     if(!fcn_py) {
-      Py_DECREF(nfdir_py);
-      Py_DECREF(nadir_py);
       throw CasadiException("CustomEvaluatePythonInternal: failed to convert CustomFunction to python");
     }
     
-    PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, nfdir_py, nadir_py, NULL);
-    Py_DECREF(nfdir_py);
-    Py_DECREF(nadir_py);
+    PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
     Py_DECREF(fcn_py);
     if (!r) {
      PyErr_Print();

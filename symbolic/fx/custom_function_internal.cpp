@@ -54,7 +54,7 @@ CustomFunctionInternal::~CustomFunctionInternal(){
 
 void CustomFunctionInternal::evaluate(){
   casadi_assert_message(!evaluate_.isNull(), "CustomFunctionInternal::evaluate: pointer is null");
-  evaluate_(ref_,0,0,user_data_);  
+  evaluate_(ref_,user_data_);  
 }
 
 void CustomFunctionInternal::init(){

@@ -36,7 +36,7 @@ namespace CasADi{
   typedef CRSSparsity (*SparsityGeneratorCPtr)(FX& fcn, int iind, int oind, void* user_data);
   
   /// Wrapper around functions
-  typedef void (*CustomEvaluateCPtr)(CustomFunction &f, int nfdir, int nadir, void* user_data);
+  typedef void (*CustomEvaluateCPtr)(CustomFunction &f, void* user_data);
 
   /// Wrapper around callback
   typedef int (*CallbackCPtr)(FX &f, void* user_data);
@@ -127,7 +127,7 @@ namespace CasADi{
       /// Construct from C pointer
       CustomEvaluate(CustomEvaluateCPtr ptr);
       /// Call
-      virtual void operator() (CustomFunction& fcn, int nfdir, int nadir, void* user_data);
+      virtual void operator() (CustomFunction& fcn, void* user_data);
   };
 
   /** \brief Callback

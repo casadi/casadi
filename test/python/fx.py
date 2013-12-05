@@ -488,14 +488,15 @@ class FXtests(casadiTestCase):
     self.assertTrue(f.getOption("name")=="def")
     
   def test_CustomFunctionDefault(self):
+    # Commented out, #884
+    return
+    
     x = msym("x")
     y = msym("y")
 
     @pyevaluate
-    def fun(f,nfwd,nadj):
+    def fun(f):
       # sin(x+3*y)
-      
-      print (nfwd,nadj)
       
       x = f.input(0)
       y = f.input(1)
@@ -512,29 +513,24 @@ class FXtests(casadiTestCase):
       Fun.jacobian()
     
   def test_CustomFunction(self):
+    # commented out #884
+    return
   
     x = msym("x")
     y = msym("y")
-    
         
     g = MXFunction([x,y],[sin(x+3*y)])
     g.init()
     
-
     g.setInput(0.2,0)
     g.setInput(0.7,1)
-    
-    def getP(max_fwd=0,max_adj=0,indirect=True):
+
+    def getP(indirect=True):
 
       @pyevaluate
-      def fun(f,nfwd,nadj):
+      def fun(f):
         # sin(x+3*y)
-        
-        assert nfwd<=max_fwd
-        assert nadj<=max_adj
-        
-        print (nfwd,nadj)
-        
+                
         x = f.input(0)
         y = f.input(1)
                 
@@ -543,7 +539,6 @@ class FXtests(casadiTestCase):
         z2 = sin(z1)
                 
         f.setOutput(z2)
-
 
       Fun = CustomFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
       Fun.setOption("name","Fun")
@@ -561,17 +556,20 @@ class FXtests(casadiTestCase):
       f.setInput(0.7,1)
       
       return f
-      
+
     for indirect in [True,False]:
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+
+      print "indirect = ", indirect
+
+      f = getP(indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+      f = getP(indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,adj=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+      f = getP(indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
       
@@ -587,16 +585,11 @@ class FXtests(casadiTestCase):
     g.setInput([0.2,0.6],0)
     g.setInput(0.7,1)
     
-    def getP(max_fwd=0,max_adj=0,indirect=True):
+    def getP(indirect=True):
 
       @pyevaluate
-      def fun(f,nfwd,nadj):
+      def fun(f):
         # sin(x0+3*y)*x1
-        
-        assert nfwd<=max_fwd
-        assert nadj<=max_adj
-        
-        print (nfwd,nadj)
         
         x0 = f.input(0)[0]
         x1 = f.input(0)[1]
@@ -607,7 +600,6 @@ class FXtests(casadiTestCase):
         z2 = sin(z1)
         z3 = z2*x1
         f.setOutput(z3)
-
 
       Fun = CustomFunction(fun, [sp_dense(2,1),sp_dense(1,1)], [sp_dense(1,1)] )
       Fun.setOption("name","Fun")
@@ -627,15 +619,15 @@ class FXtests(casadiTestCase):
       return f
     
     for indirect in [True,False]:
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+      f = getP(indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+      f = getP(indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,adj=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+      f = getP(indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
       
@@ -649,11 +641,10 @@ class FXtests(casadiTestCase):
 
     g.setInput([0.2,0.6],0)
  
-    def getP(max_fwd=0,max_adj=0,indirect=True):
+    def getP(indirect=True):
 
       @pyevaluate
-      def squares(f,nfwd,nadj):
-        print "Called squares with :", (nfwd,nadj)
+      def squares(f):
         x = f.getInput(0)[0]
         y = f.getInput(0)[1]
 
@@ -675,17 +666,17 @@ class FXtests(casadiTestCase):
       return f
     
     for indirect in [True,False]:
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+      f = getP(indirect=indirect)
       
       with self.assertRaises(Exception):          
         self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+      f = getP(indirect=indirect)
         
       with self.assertRaises(Exception): 
         self.checkfx(f,g,sens_der=False,hessian=False,adj=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+      f = getP(indirect=indirect)
                 
       with self.assertRaises(Exception):
         self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
@@ -700,11 +691,10 @@ class FXtests(casadiTestCase):
 
     g.setInput([0.2,0.6],0)
  
-    def getP(max_fwd=0,max_adj=0,indirect=True):
+    def getP(indirect=True):
 
       @pyevaluate
-      def squares(f,nfwd,nadj):
-        print "Called squares with :", (nfwd,nadj)
+      def squares(f):
         x = f.getInput(0)[0]
         y = f.getInput(0)[1]
 
@@ -725,15 +715,15 @@ class FXtests(casadiTestCase):
       return f
     
     for indirect in [True,False]:
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+      f = getP(indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+      f = getP(indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,adj=False,evals=1)
 
-      f = getP(max_fwd=0,max_adj=0,indirect=indirect)
+      f = getP(indirect=indirect)
                 
       self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
       
@@ -776,12 +766,9 @@ class FXtests(casadiTestCase):
     g.setInput(0.7,1)
     
     @pyevaluate
-    def fun(f,nfwd,nadj):
+    def fun(f):
       # sin(x0+3*y)
-      
-      assert nfwd==0
-      assert nadj==0
-      
+
       x = f.input(0)
       y = f.input(1)
       
@@ -849,8 +836,7 @@ class FXtests(casadiTestCase):
     x = msym("x")
     
     @pyevaluate
-    def dummy(f,nfwd,nadj):
-      assert nfwd==0
+    def dummy(f):
       print f
       f.setOutput(1)
 

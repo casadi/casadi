@@ -59,9 +59,9 @@ namespace CasADi{
   CustomEvaluateCInternal::CustomEvaluateCInternal(CustomEvaluateCPtr ptr)  : FunctorCInternal(ptr) {
   }
   
-  void CustomEvaluateCInternal::call(CustomFunction& fcn, int iind, int oind, void* user_data) {
+  void CustomEvaluateCInternal::call(CustomFunction& fcn, void* user_data) {
     casadi_assert(ptr_!=0);
-    ptr_(fcn, iind, oind, user_data);
+    ptr_(fcn, user_data);
   }
   
   CustomEvaluateCInternal* CustomEvaluateCInternal::clone() const {
