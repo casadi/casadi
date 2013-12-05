@@ -265,6 +265,8 @@ namespace CasADi{
 
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
+    
+    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
   
     // Get back the smart pointers
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass = static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(userclass_);
@@ -303,11 +305,26 @@ namespace CasADi{
   
     if (hasOption("print_time") && bool(getOption("print_time"))) {
       // Write timings
-      cout << "time spent in eval_f: " << t_eval_f_ << " s." << endl;
-      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s." << endl;
-      cout << "time spent in eval_g: " << t_eval_g_ << " s." << endl;
-      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s." << endl;
-      cout << "time spent in eval_h: " << t_eval_h_ << " s." << endl;
+      cout << "time spent in eval_f: " << t_eval_f_ << " s.";
+      if (n_eval_f_>0)
+        cout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
+      if (n_eval_grad_f_>0)
+        cout << " (" << n_eval_grad_f_ << " calls, " << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_g: " << t_eval_g_ << " s.";
+      if (n_eval_g_>0)
+        cout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
+      if (n_eval_jac_g_>0)
+        cout << " (" << n_eval_jac_g_ << " calls, " << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_h: " << t_eval_h_ << " s.";
+      if (n_eval_h_>1)
+        cout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
+      cout << endl;
       cout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
       cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
       cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
@@ -354,6 +371,11 @@ namespace CasADi{
     stats_["t_mainloop"] = t_mainloop_;
     stats_["t_callback_fun"] = t_callback_fun_;
     stats_["t_callback_prepare"] = t_callback_prepare_;
+    stats_["n_eval_f"] = n_eval_f_;
+    stats_["n_eval_grad_f"] = n_eval_grad_f_;
+    stats_["n_eval_g"] = n_eval_g_;
+    stats_["n_eval_jac_g"] = n_eval_jac_g_;
+    stats_["n_eval_h"] = n_eval_h_;
   
   }
 
@@ -484,6 +506,7 @@ namespace CasADi{
       }
       double time2 = clock();
       t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
+      n_eval_h_ += 1;
       log("eval_h ok");
       return true;
     } catch (exception& ex){
@@ -537,7 +560,7 @@ namespace CasADi{
     
       double time2 = clock();
       t_eval_jac_g_ += double(time2-time1)/CLOCKS_PER_SEC;
-
+      n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
       return true;
     } catch (exception& ex){
@@ -575,7 +598,7 @@ namespace CasADi{
     
       double time2 = clock();
       t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
-
+      n_eval_f_ += 1;
       log("eval_f ok");
       return true;
     } catch (exception& ex){
@@ -613,7 +636,7 @@ namespace CasADi{
           
       double time2 = clock();
       t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
-
+      n_eval_g_ += 1;
       log("eval_g ok");
       return true;
     } catch (exception& ex){
@@ -649,7 +672,7 @@ namespace CasADi{
     
       double time2 = clock();
       t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
-
+      n_eval_grad_f_ += 1;
       log("eval_grad_f ok");
       return true;
     } catch (exception& ex){
