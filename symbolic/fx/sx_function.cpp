@@ -56,18 +56,18 @@ SXFunction::SXFunction(const vector< SXMatrix>& arg, const vector<SXMatrix>& res
 
 SXFunction::SXFunction(const vector< SXMatrix>& arg, const IOSchemeVector< SXMatrix >& res){
   assignNode(new SXFunctionInternal(arg,res));
-  setOutputScheme(res.io_scheme());
+  setOutputScheme(res.scheme);
 }
 
 SXFunction::SXFunction(const IOSchemeVector< SXMatrix >& arg, const vector< SXMatrix>& res){
   assignNode(new SXFunctionInternal(arg,res));
-  setInputScheme(arg.io_scheme());
+  setInputScheme(arg.scheme);
 }
 
 SXFunction::SXFunction(const IOSchemeVector< SXMatrix >& arg, const IOSchemeVector< SXMatrix >& res){
   assignNode(new SXFunctionInternal(arg,res));
-  setInputScheme(arg.io_scheme());
-  setOutputScheme(res.io_scheme());
+  setInputScheme(arg.scheme);
+  setOutputScheme(res.scheme);
 }
 
 SXFunction::SXFunction(const vector< vector<SX> >& arg, const SXMatrix& res){

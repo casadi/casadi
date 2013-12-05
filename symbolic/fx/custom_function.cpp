@@ -39,18 +39,18 @@ CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,const vector<CRSSpars
 
 CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,const IOSchemeVector< CRSSparsity > &inputscheme,const  vector<CRSSparsity> &outputscheme) {
   assignNode(new CustomFunctionInternal(c_fcn,inputscheme,outputscheme));
-  setInputScheme(inputscheme.io_scheme());
+  setInputScheme(inputscheme.scheme);
 }
 
 CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,const vector<CRSSparsity> &inputscheme,const  IOSchemeVector< CRSSparsity > &outputscheme) {
   assignNode(new CustomFunctionInternal(c_fcn,inputscheme,outputscheme));
-  setOutputScheme(outputscheme.io_scheme());
+  setOutputScheme(outputscheme.scheme);
 }
 
 CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,const IOSchemeVector< CRSSparsity > &inputscheme,const  IOSchemeVector< CRSSparsity > &outputscheme) {
   assignNode(new CustomFunctionInternal(c_fcn,inputscheme,outputscheme));
-  setInputScheme(inputscheme.io_scheme());
-  setOutputScheme(outputscheme.io_scheme());
+  setInputScheme(inputscheme.scheme);
+  setOutputScheme(outputscheme.scheme);
 }
 
 CustomFunction::CustomFunction(const CustomEvaluate &c_fcn) {

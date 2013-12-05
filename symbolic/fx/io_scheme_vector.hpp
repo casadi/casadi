@@ -29,61 +29,54 @@
 #include "../printable_object.hpp"
 namespace CasADi{
   
-template<typename T>
-class IOSchemeVector : public PrintableObject {
-    public:
+  template<typename T>
+  class IOSchemeVector : public PrintableObject {    
+    // Data members (all public)
+  public:
+    /// Vector of data
+    std::vector<T> data;
+
+    /// Scheme
+    IOScheme scheme; 
+
+  public:
     // Constructor
-    IOSchemeVector(const std::vector<T>& t, CasADi::IOScheme io_scheme =  CasADi::IOScheme()) : t_(t), io_scheme_(io_scheme){} 
+    IOSchemeVector(const std::vector<T>& d = std::vector<T>(), const IOScheme& s = IOScheme()) : data(d), scheme(s){} 
     
-    #ifndef SWIG
+#ifndef SWIG
     //@{
     // Automatic type conversion
-    operator std::vector<T>&(){ return t_;}
-    operator const std::vector<T>&() const{ return t_;}
+    operator std::vector<T>&(){ return this->data;}
+    operator const std::vector<T>&() const{ return this->data;}
     //@}
     T operator[](int i) {
-      casadi_assert_message(i>=0 && i<t_.size(),"Index error for " << io_scheme_.name() << ": supplied integer must be >=0 and <= " << t_.size() << " but got " << i << ".");
-      return t_.at(i);
+      casadi_assert_message(i>=0 && i<this->data.size(),"Index error for " << this->scheme.name() << ": supplied integer must be >=0 and <= " << this->data.size() << " but got " << i << ".");
+      return this->data.at(i);
     }
-    T operator[](const std::string& name) { return (*this)[io_scheme_.index(name)]; }
-    #endif // SWIG
-    T __getitem__(int i) { if (i<0) i+= t_.size(); return (*this)[i]; }
+    T operator[](const std::string& name) { return (*this)[this->scheme.index(name)]; }
+#endif // SWIG
+    T __getitem__(int i) { if (i<0) i+= this->data.size(); return (*this)[i]; }
     T __getitem__(const std::string& name) { return (*this)[name]; }
-    int __len__() { return t_.size(); }
-    
-    //@{
-    /// Get access to the data
-    std::vector<T> & data() { return t_; }
-    const std::vector<T> & data() const { return t_; }
-    //@}
-    
-    /// Access the IOScheme
-    CasADi::IOScheme io_scheme() const { return io_scheme_; }
-    
-    #ifndef SWIG
+    int __len__() { return this->data.size(); }
+        
+#ifndef SWIG
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const { 
       stream << "IOSchemeVector(" ;
-      for (int i=0;i<t_.size();++i) {
-        stream << io_scheme_.entry(i) << "=" << t_[i];
-        if (i<t_.size()-1) stream << ",";
+      for (int i=0;i<this->data.size();++i) {
+        stream << this->scheme.entry(i) << "=" << this->data[i];
+        if (i<this->data.size()-1) stream << ",";
       }
       
-      stream << ";" << io_scheme_.name() <<  ")";
+      stream << ";" << this->scheme.name() <<  ")";
     }
 
     /// Print a representation of the object
     virtual void repr(std::ostream &stream=std::cout) const { print(stream); }
 
-    #endif // SWIG  
-
-    private:
-      /// Vector of data
-      std::vector<T> t_;
-      /// Scheme
-      IOScheme io_scheme_; 
+#endif // SWIG  
     
-};
+  };
 
 
 } // namespace CasADi
