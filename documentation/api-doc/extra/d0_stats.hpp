@@ -275,6 +275,7 @@
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>iter_count</td><td>CasADi::SQPInternal</td></tr>
+<tr><td>iteration</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>return_status</td><td>CasADi::SQPInternal</td></tr>
 </table>
 */
@@ -285,6 +286,7 @@
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>iter_count</td><td>CasADi::SQPInternal</td></tr>
+<tr><td>iteration</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>return_status</td><td>CasADi::SQPInternal</td></tr>
 </table>
 */
@@ -396,6 +398,7 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iteration</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>return_code</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>return_status</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>t_callback_fun</td><td>CasADi::WorhpInternal</td></tr>
@@ -414,6 +417,7 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iteration</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>return_code</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>return_status</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>t_callback_fun</td><td>CasADi::WorhpInternal</td></tr>
