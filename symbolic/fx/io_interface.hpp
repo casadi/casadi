@@ -31,21 +31,6 @@
 
 namespace CasADi{
   
-  /** \brief  Structure that contains the numerical values for the inputs or outputs of a function
-      \author Joel Andersson 
-      \date 2010-2011
-  */
-  struct FunctionIO{    
-    /// Input/output data
-    Matrix<double> data;
-  
-    /// Temporary marker (initialized to zero)
-    int tmp;
-
-    // Constructor
-    FunctionIO() : tmp(0){}
-  };
-
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
       \date 2013
@@ -56,23 +41,23 @@ namespace CasADi{
     
     //@{
     /// Access input argument
-    inline const Matrix<double>& input(int iind=0) const{ return inputS<true>(iind).data;}
+    inline const Matrix<double>& input(int iind=0) const{ return inputS<true>(iind);}
     inline const Matrix<double>& input(const std::string &iname) const{  return input(inputSchemeEntry(iname)); }
 #ifdef SWIG
     %rename(inputRef) input;
 #endif
-    inline Matrix<double>& input(int iind=0){ return inputS<true>(iind).data;}
+    inline Matrix<double>& input(int iind=0){ return inputS<true>(iind);}
     inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
     //@}
     
     //@{
     /// Access output argument
-    inline const Matrix<double>& output(int oind=0) const{ return outputS<true>(oind).data;}
+    inline const Matrix<double>& output(int oind=0) const{ return outputS<true>(oind);}
     inline const Matrix<double>& output(const std::string &oname) const{ return output(outputSchemeEntry(oname));}
 #ifdef SWIG
     %rename(outputRef) output;
 #endif
-    inline Matrix<double>& output(int oind=0){ return outputS<true>(oind).data;}
+    inline Matrix<double>& output(int oind=0){ return outputS<true>(oind);}
     inline Matrix<double>& output(const std::string &oname){ return output(outputSchemeEntry(oname));}
     //@}
 
@@ -90,7 +75,7 @@ namespace CasADi{
 
     /** \brief  Access an input */
     template<bool check>
-    FunctionIO& inputS(int i){
+    DMatrix& inputS(int i){
       if(check){
         try{
           return static_cast<Derived*>(this)->input_struct().at(i);
@@ -107,13 +92,13 @@ namespace CasADi{
 
     /** \brief  Const access an input */
     template<bool check>
-    inline const FunctionIO& inputS(int i) const{
+    inline const DMatrix& inputS(int i) const{
       return const_cast<IOInterface<Derived>*>(this)->inputS<check>(i);
     }
     
     /** \brief  Access an output*/
     template<bool check>
-    FunctionIO& outputS(int i){
+    DMatrix& outputS(int i){
       if(check){
         try{
           return static_cast<Derived*>(this)->output_struct().at(i);
@@ -130,7 +115,7 @@ namespace CasADi{
 
     /** \brief  Const access an output*/
     template<bool check>
-    inline const FunctionIO& outputS(int i) const{
+    inline const DMatrix& outputS(int i) const{
       return const_cast<IOInterface<Derived>*>(this)->outputS<check>(i);
     }
 

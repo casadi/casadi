@@ -258,19 +258,19 @@ namespace CasADi{
 
     //@{
     /// Input/output structures of the function */
-    inline const std::vector<FunctionIO>& input_struct() const{ return input_;}
-    inline const std::vector<FunctionIO>& output_struct() const{ return output_;}
-    inline std::vector<FunctionIO>& input_struct(){ return input_;}
-    inline std::vector<FunctionIO>& output_struct(){ return output_;}
+    inline const std::vector<DMatrix>& input_struct() const{ return input_;}
+    inline const std::vector<DMatrix>& output_struct() const{ return output_;}
+    inline std::vector<DMatrix>& input_struct(){ return input_;}
+    inline std::vector<DMatrix>& output_struct(){ return output_;}
     //@}
 
     //@{
     /// Input/output access without checking (faster, but unsafe)
-    inline const Matrix<double>& inputNoCheck(int iind=0) const{ return inputS<false>(iind).data;}
-    inline const Matrix<double>& outputNoCheck(int oind=0) const{ return outputS<false>(oind).data;}
+    inline const Matrix<double>& inputNoCheck(int iind=0) const{ return inputS<false>(iind);}
+    inline const Matrix<double>& outputNoCheck(int oind=0) const{ return outputS<false>(oind);}
 
-    inline Matrix<double>& inputNoCheck(int iind=0){ return inputS<false>(iind).data;}
-    inline Matrix<double>& outputNoCheck(int oind=0){ return outputS<false>(oind).data;}
+    inline Matrix<double>& inputNoCheck(int iind=0){ return inputS<false>(iind);}
+    inline Matrix<double>& outputNoCheck(int oind=0){ return outputS<false>(oind);}
     //@}
 
     /** \brief  Log the status of the solver */
@@ -294,10 +294,16 @@ namespace CasADi{
     //@}
 
     /** \brief  Inputs of the function */
-    std::vector<FunctionIO> input_;
+    std::vector<DMatrix> input_;
+
+    /// The name of the input scheme of this function
+    IOScheme inputScheme_;
 
     /** \brief  Output of the function */
-    std::vector<FunctionIO> output_;
+    std::vector<DMatrix> output_;
+
+    /// The name of the output scheme of this function
+    IOScheme outputScheme_;
 
     /** \brief  Verbose -- for debugging purposes */
     bool verbose_;
@@ -330,13 +336,7 @@ namespace CasADi{
     void* user_data_;
     
     bool monitor_inputs_, monitor_outputs_;
-    
-    /// The name of the input scheme of this function
-    IOScheme inputScheme_;
-    
-    /// The name of the output scheme of this function
-    IOScheme outputScheme_;
-    
+        
     /// Errors are thrown when NaN is produced
     bool regularity_check_;
     

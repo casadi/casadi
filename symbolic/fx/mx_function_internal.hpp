@@ -83,7 +83,7 @@ namespace CasADi{
     std::vector<AlgEl> algorithm_;
 
     /** \brief  Working vector for numeric calculation */
-    std::vector<FunctionIO> work_;
+    std::vector<std::pair<DMatrix,int> > work_;
   
     /** \brief  Temporary vectors needed for the evaluation (integer) */
     std::vector<int> itmp_;
