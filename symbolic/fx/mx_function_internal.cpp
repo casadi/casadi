@@ -1015,7 +1015,7 @@ namespace CasADi{
     return f;
   }
 
-  void MXFunctionInternal::printWork(int nfdir, int nadir, ostream &stream){
+  void MXFunctionInternal::printWork(ostream &stream){
     for(int k=0; k<work_.size(); ++k){
       stream << "work[" << k << "] = " << work_[k].data.data() << endl;
     }
