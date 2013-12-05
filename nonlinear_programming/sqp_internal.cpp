@@ -199,6 +199,16 @@ namespace CasADi{
   
     if (inputs_check_) checkInputs();
     checkInitialBounds();
+    
+    if (gather_stats_) {
+      Dictionary iterations;
+      iterations["inf_pr"] = std::vector<double>();
+      iterations["inf_du"] = std::vector<double>();
+      iterations["ls_trials"] = std::vector<double>();
+      iterations["d_norm"] = std::vector<double>();
+      iterations["obj"] = std::vector<double>();
+      stats_["iterations"] = iterations;
+    }
   
     // Get problem data
     const vector<double>& x_init = input(NLP_SOLVER_X0).data();
@@ -268,6 +278,15 @@ namespace CasADi{
       // Printing information about the actual iterate
       printIteration(cout,iter,fk_,pr_inf,gLag_norminf,dx_norminf,reg_,ls_iter,ls_success);
 	  
+	    if (gather_stats_) {
+        Dictionary & iterations = stats_["iterations"];
+        static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(pr_inf);
+        static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(gLag_norminf);
+        static_cast<std::vector<double> &>(iterations["d_norm"]).push_back(dx_norminf);
+        static_cast<std::vector<double> &>(iterations["ls_trials"]).push_back(ls_iter);
+        static_cast<std::vector<double> &>(iterations["obj"]).push_back(fk_);
+      }
+      
       // Call callback function if present
       if (!callback_.isNull()) {
         if (!output(NLP_SOLVER_F).empty()) output(NLP_SOLVER_F).set(fk_);
@@ -280,6 +299,7 @@ namespace CasADi{
         iteration["iter"] = iter;
         iteration["inf_pr"] = pr_inf;
         iteration["inf_du"] = gLag_norminf;
+        iteration["d_norm"] = dx_norminf;
         iteration["ls_trials"] = ls_iter;
         iteration["obj"] = fk_;
         stats_["iteration"] = iteration;

@@ -98,6 +98,10 @@ namespace CasADi{
     //operator void*() const;
     operator const std::map<std::string, GenericType>& () const;
     
+    operator std::vector<int>& () { return toIntVector();}
+    operator std::vector<double>& () { return toDoubleVector();}
+    operator std::map<std::string, GenericType>& ();
+    
     operator NLPSolverCreator() const;
     operator linearSolverCreator() const;
     operator LPSolverCreator() const;
@@ -170,6 +174,14 @@ namespace CasADi{
     //! \brief Convert to vector of doubles
     const std::vector<double>& toDoubleVector() const;
     
+    #ifndef SWIG
+    //! \brief Convert to vector of ints
+    std::vector<int>& toIntVector();
+    
+    //! \brief Convert to vector of doubles
+    std::vector<double>& toDoubleVector();
+    #endif
+    
     //! \brief Convert to vector of strings
     const std::vector<std::string>& toStringVector() const;
 
@@ -179,6 +191,11 @@ namespace CasADi{
     //! \brief Convert to Dictionary
     const Dictionary& toDictionary() const;
 
+    #ifndef SWIG
+    //! \brief Convert to Dictionary
+    Dictionary& toDictionary();
+    #endif
+    
     //! \brief Convert to shared object
     const FX& toFX() const;
     

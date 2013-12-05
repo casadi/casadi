@@ -245,6 +245,23 @@ namespace CasADi{
     if (inputs_check_) checkInputs();
     
     checkInitialBounds();
+    
+
+        
+    if (gather_stats_) {
+      Dictionary iterations;
+      iterations["inf_pr"] = std::vector<double>();
+      iterations["inf_du"] = std::vector<double>();
+      iterations["mu"] = std::vector<double>();
+      iterations["d_norm"] = std::vector<double>();
+      iterations["regularization_size"] = std::vector<double>();
+      iterations["obj"] = std::vector<double>();
+      iterations["ls_trials"] = std::vector<int>();
+      iterations["alpha_pr"] = std::vector<double>();
+      iterations["alpha_du"] = std::vector<double>();
+      iterations["obj"] = std::vector<double>();
+      stats_["iterations"] = iterations;
+    }
 
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
@@ -343,6 +360,18 @@ namespace CasADi{
   bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials,bool full_callback) {
     try {
       log("intermediate_callback started");
+      if (gather_stats_) {
+        Dictionary & iterations = stats_["iterations"];
+        static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(inf_pr);
+        static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(inf_du);
+        static_cast<std::vector<double> &>(iterations["mu"]).push_back(mu);
+        static_cast<std::vector<double> &>(iterations["d_norm"]).push_back(d_norm);
+        static_cast<std::vector<double> &>(iterations["regularization_size"]).push_back(regularization_size);
+        static_cast<std::vector<double> &>(iterations["alpha_pr"]).push_back(alpha_pr);
+        static_cast<std::vector<double> &>(iterations["alpha_du"]).push_back(alpha_du);
+        static_cast<std::vector<int> &>(iterations["ls_trials"]).push_back(ls_trials);
+        static_cast<std::vector<double> &>(iterations["obj"]).push_back(obj_value);
+      }
       double time1 = clock();
       if (!callback_.isNull()) {
         if(full_callback) {

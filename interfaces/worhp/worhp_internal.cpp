@@ -607,6 +607,16 @@ namespace CasADi{
     log("WorhpInternal::evaluate");
     casadi_assert(nfdir==0 && nadir==0);
     
+    if (gather_stats_) {
+      Dictionary iterations;
+      iterations["iter_sqp"] = std::vector<int>();
+      iterations["inf_pr"] = std::vector<double>();
+      iterations["inf_du"] = std::vector<double>();
+      iterations["obj"] = std::vector<double>();
+      iterations["alpha_pr"] = std::vector<double>();
+      stats_["iterations"] = iterations;
+    }
+    
     // Prepare the solver
     reset();
     
@@ -663,42 +673,53 @@ namespace CasADi{
         Worhp(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
       }
 
-      if (GetUserAction(&worhp_c_, iterOutput)) {
-        if (!callback_.isNull()) {
-          double time1 = clock();
-          // Copy outputs
-          if (!output(NLP_SOLVER_X).empty())
-            output(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n);
-          if (!output(NLP_SOLVER_F).empty())
-            output(NLP_SOLVER_F).set(worhp_o_.F);
-          if (!output(NLP_SOLVER_G).empty())
-            output(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
-          if (!output(NLP_SOLVER_LAM_X).empty()) 
-            output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
-          if (!output(NLP_SOLVER_LAM_G).empty())
-            output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
-            
-          Dictionary iteration;
-          iteration["iter"] = worhp_w_.MajorIter;
-          iteration["iter_sqp"] = worhp_w_.MinorIter;
-          iteration["inf_pr"] = worhp_w_.NormMax_CV;
-          iteration["inf_du"] = worhp_w_.ScaledKKT;
-          iteration["obj"] = worhp_o_.F;
-          //iteration["ls_trials"] = worhp_w_.LScounter;
-          iteration["alpha_pr"] = worhp_w_.ArmijoAlpha;
-          stats_["iteration"] = iteration;
 
-          double time2 = clock();
-          t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
-          time1 = clock();
-          int ret = callback_(ref_,user_data_);
-          time2 = clock();
-          t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
-          
-          if(ret) worhp_c_.status = TerminatedByUser;
-          
-        }
+      if (GetUserAction(&worhp_c_, iterOutput)) {
+            
+        if (!worhp_w_.FirstIteration) {
+          if (gather_stats_) {
+            Dictionary & iterations = stats_["iterations"];
+            static_cast<std::vector<int> &>(iterations["iter_sqp"]).push_back(worhp_w_.MinorIter);
+            static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(worhp_w_.NormMax_CV);
+            static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(worhp_w_.ScaledKKT);
+            static_cast<std::vector<double> &>(iterations["obj"]).push_back(worhp_o_.F);
+            static_cast<std::vector<double> &>(iterations["alpha_pr"]).push_back(worhp_w_.ArmijoAlpha);
+          }
         
+          if (!callback_.isNull()) {
+            double time1 = clock();
+            // Copy outputs
+            if (!output(NLP_SOLVER_X).empty())
+              output(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n);
+            if (!output(NLP_SOLVER_F).empty())
+              output(NLP_SOLVER_F).set(worhp_o_.F);
+            if (!output(NLP_SOLVER_G).empty())
+              output(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
+            if (!output(NLP_SOLVER_LAM_X).empty()) 
+              output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
+            if (!output(NLP_SOLVER_LAM_G).empty())
+              output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
+              
+            Dictionary iteration;
+            iteration["iter"] = worhp_w_.MajorIter;
+            iteration["iter_sqp"] = worhp_w_.MinorIter;
+            iteration["inf_pr"] = worhp_w_.NormMax_CV;
+            iteration["inf_du"] = worhp_w_.ScaledKKT;
+            iteration["obj"] = worhp_o_.F;
+            iteration["alpha_pr"] = worhp_w_.ArmijoAlpha;
+            stats_["iteration"] = iteration;
+
+            double time2 = clock();
+            t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
+            time1 = clock();
+            int ret = callback_(ref_,user_data_);
+            time2 = clock();
+            t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
+            
+            if(ret) worhp_c_.status = TerminatedByUser;
+            
+          }
+        }
 
     
         IterationOutput(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
