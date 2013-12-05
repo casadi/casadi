@@ -556,6 +556,20 @@ namespace CasADi{
   
     // Save statistics
     stats_["iter_count"] = iter;
+    
+    stats_["t_eval_f"] = t_eval_f_;
+    stats_["t_eval_grad_f"] = t_eval_grad_f_;
+    stats_["t_eval_g"] = t_eval_g_;
+    stats_["t_eval_jac_g"] = t_eval_jac_g_;
+    stats_["t_eval_h"] = t_eval_h_;
+    stats_["t_mainloop"] = t_mainloop_;
+    stats_["t_callback_fun"] = t_callback_fun_;
+    stats_["t_callback_prepare"] = t_callback_prepare_;
+    stats_["n_eval_f"] = n_eval_f_;
+    stats_["n_eval_grad_f"] = n_eval_grad_f_;
+    stats_["n_eval_g"] = n_eval_g_;
+    stats_["n_eval_jac_g"] = n_eval_jac_g_;
+    stats_["n_eval_h"] = n_eval_h_;
   }
   
   void SQPInternal::printIteration(std::ostream &stream){
