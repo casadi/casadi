@@ -36,17 +36,17 @@ namespace CasADi{
     casadi_assert_message(!isSingular(sparsity),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity) << " (in stead of "<< sparsity.size1() << ")");
 
     // Allocate inputs
-    input_.resize(LINSOL_NUM_IN);
+    setNumInputs(LINSOL_NUM_IN);
     input(LINSOL_A) = DMatrix(sparsity);
     input(LINSOL_B) = DMatrix(nrhs,sparsity.size1(),0);
     input(LINSOL_T) = 0.;
   
     // Allocate outputs
-    output_.resize(LINSOL_NUM_OUT);
+    setNumOutputs(LINSOL_NUM_OUT);
     output(LINSOL_X) = input(LINSOL_B);
 
-    inputScheme_ = SCHEME_LinsolInput;
-    outputScheme_ = SCHEME_LinsolOutput;
+    input_.scheme = SCHEME_LinsolInput;
+    output_.scheme = SCHEME_LinsolOutput;
   }
 
   void LinearSolverInternal::init(){

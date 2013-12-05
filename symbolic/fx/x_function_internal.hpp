@@ -149,7 +149,7 @@ namespace CasADi{
       
     // Allocate space for inputs
     setNumInputs(inputv_.size());
-    for(int i=0; i<input_.size(); ++i)
+    for(int i=0; i<inputv_.size(); ++i)
       input(i) = DMatrix(inputv_[i].sparsity());
   
     // Null output arguments become empty
@@ -161,7 +161,7 @@ namespace CasADi{
 
     // Allocate space for outputs
     setNumOutputs(outputv_.size());
-    for(int i=0; i<output_.size(); ++i)
+    for(int i=0; i<outputv_.size(); ++i)
       output(i) = DMatrix(outputv_[i].sparsity());
   }
 

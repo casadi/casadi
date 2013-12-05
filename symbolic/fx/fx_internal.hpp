@@ -250,18 +250,18 @@ namespace CasADi{
 
     //@{
     /** \brief Access input/output scheme */
-    inline const IOScheme& inputScheme() const{ return inputScheme_;}
-    inline const IOScheme& outputScheme() const{ return outputScheme_;}
-    inline IOScheme& inputScheme(){ return inputScheme_;}
-    inline IOScheme& outputScheme(){ return outputScheme_;}
+    inline const IOScheme& inputScheme() const{ return input_.scheme;}
+    inline const IOScheme& outputScheme() const{ return output_.scheme;}
+    inline IOScheme& inputScheme(){ return input_.scheme;}
+    inline IOScheme& outputScheme(){ return output_.scheme;}
     //@}
 
     //@{
     /// Input/output structures of the function */
-    inline const std::vector<DMatrix>& input_struct() const{ return input_;}
-    inline const std::vector<DMatrix>& output_struct() const{ return output_;}
-    inline std::vector<DMatrix>& input_struct(){ return input_;}
-    inline std::vector<DMatrix>& output_struct(){ return output_;}
+    inline const IOSchemeVector<DMatrix>& input_struct() const{ return input_;}
+    inline const IOSchemeVector<DMatrix>& output_struct() const{ return output_;}
+    inline IOSchemeVector<DMatrix>& input_struct(){ return input_;}
+    inline IOSchemeVector<DMatrix>& output_struct(){ return output_;}
     //@}
 
     //@{
@@ -294,16 +294,10 @@ namespace CasADi{
     //@}
 
     /** \brief  Inputs of the function */
-    std::vector<DMatrix> input_;
-
-    /// The name of the input scheme of this function
-    IOScheme inputScheme_;
+    IOSchemeVector<DMatrix> input_;
 
     /** \brief  Output of the function */
-    std::vector<DMatrix> output_;
-
-    /// The name of the output scheme of this function
-    IOScheme outputScheme_;
+    IOSchemeVector<DMatrix> output_;
 
     /** \brief  Verbose -- for debugging purposes */
     bool verbose_;

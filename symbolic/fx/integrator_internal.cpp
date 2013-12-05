@@ -48,8 +48,8 @@ namespace CasADi{
     // Negative number of parameters for consistancy checking
     np_ = -1;
   
-    inputScheme_ = SCHEME_IntegratorInput;
-    outputScheme_ = SCHEME_IntegratorOutput;
+    input_.scheme = SCHEME_IntegratorInput;
+    output_.scheme = SCHEME_IntegratorOutput;
   }
 
   IntegratorInternal::~IntegratorInternal(){ 
@@ -114,7 +114,7 @@ namespace CasADi{
     }
   
     // Allocate space for inputs
-    input_.resize(INTEGRATOR_NUM_IN);
+    setNumInputs(INTEGRATOR_NUM_IN);
     input(INTEGRATOR_X0)  = DMatrix(f_.input(DAE_X).sparsity(),0);
     input(INTEGRATOR_P)   = DMatrix(f_.input(DAE_P).sparsity(),0);
     if(!g_.isNull()){
@@ -123,7 +123,7 @@ namespace CasADi{
     }
   
     // Allocate space for outputs
-    output_.resize(INTEGRATOR_NUM_OUT);
+    setNumOutputs(INTEGRATOR_NUM_OUT);
     output(INTEGRATOR_XF) = DMatrix(f_.output(DAE_ODE).sparsity(),0);
     output(INTEGRATOR_QF) = DMatrix(f_.output(DAE_QUAD).sparsity(),0);
     if(!g_.isNull()){

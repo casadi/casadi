@@ -79,8 +79,8 @@ QPSolverInternal::QPSolverInternal(const std::vector<CRSSparsity> &st) : st_(st)
   output(QP_SOLVER_LAM_X) = DMatrix(x_sparsity);
   output(QP_SOLVER_LAM_A) = DMatrix(bounds_sparsity);
   
-  inputScheme_ = SCHEME_QPSolverInput;
-  outputScheme_ = SCHEME_QPSolverOutput;
+  input_.scheme = SCHEME_QPSolverInput;
+  output_.scheme = SCHEME_QPSolverOutput;
 }
     
 void QPSolverInternal::init() {

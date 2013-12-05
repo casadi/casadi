@@ -105,10 +105,10 @@ namespace CasADi{
 
     //@{
     /// Input/output structures of the function */
-    const std::vector<DMatrix>& input_struct() const;
-    const std::vector<DMatrix>& output_struct() const;
-    std::vector<DMatrix>& input_struct();
-    std::vector<DMatrix>& output_struct();
+    const IOSchemeVector<DMatrix>& input_struct() const;
+    const IOSchemeVector<DMatrix>& output_struct() const;
+    IOSchemeVector<DMatrix>& input_struct();
+    IOSchemeVector<DMatrix>& output_struct();
     //@}
   
     /** \brief  Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs) */

@@ -76,8 +76,8 @@ SDQPSolverInternal::SDQPSolverInternal(const std::vector<CRSSparsity> &st) : st_
     casadi_assert_message(s==s.transpose(),"SDQPSolverInternal: Each supplied Fi must be symmetric. But got " << s.dimString() <<  " for i = " << i << ".");
   }
   
-  inputScheme_ = SCHEME_SDQPInput;
-  outputScheme_ = SCHEME_SDQPOutput;
+  input_.scheme = SCHEME_SDQPInput;
+  output_.scheme = SCHEME_SDQPOutput;
 
 }
     

@@ -584,7 +584,7 @@ namespace CasADi{
     ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
   
     MXFunction ret(inputv_,ret_out);
-    ret.setInputScheme(inputScheme_);
+    ret.setInputScheme(inputScheme());
     // Return function
     return ret;  
   }

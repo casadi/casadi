@@ -46,7 +46,7 @@ namespace CasADi{
     addOption("control_interpolation",   OT_STRING,     "none", "none|nearest|linear");
     addOption("control_endpoint",        OT_BOOLEAN,       false, "Include a control value at the end of the simulation domain. Used for interpolation.");
   
-    inputScheme_ = SCHEME_ControlSimulatorInput;
+    input_.scheme = SCHEME_ControlSimulatorInput;
   }
   
   ControlSimulatorInternal::~ControlSimulatorInternal(){
@@ -224,7 +224,7 @@ namespace CasADi{
       // Create the output function
       output_fcn_ = SXFunction(arg,out);
       output_fcn_.setOption("name","output");
-      outputScheme_ = SCHEME_IntegratorOutput;
+      output_.scheme = SCHEME_IntegratorOutput;
     } else {
       output_fcn_ = orig_output_fcn_;
     }
@@ -295,14 +295,14 @@ namespace CasADi{
     simulator_.init();
   
     // Allocate inputs
-    input_.resize(CONTROLSIMULATOR_NUM_IN);
+    setNumInputs(CONTROLSIMULATOR_NUM_IN);
     input(CONTROLSIMULATOR_X0)  = DMatrix(dae_.input(DAE_X));
     input(CONTROLSIMULATOR_P)   = control_dae_.input(CONTROL_DAE_P);
     input(CONTROLSIMULATOR_U)   = DMatrix(ns_ - 1 + (control_endpoint ? 1 : 0) ,nu_,0);
 
     // Allocate outputs
-    output_.resize(output_fcn_->output_.size()-2);
-    for(int i=0; i<output_.size(); ++i)
+    setNumOutputs(output_fcn_.getNumOutputs()-2);
+    for(int i=0; i<getNumOutputs(); ++i)
       output(i) = Matrix<double>((ns_-1)*nf_+1,output_fcn_.output(i+2).numel(),0);
 
     // Call base class method
@@ -383,14 +383,14 @@ namespace CasADi{
   void ControlSimulatorInternal::evaluate(){
 
     // Copy all inputs
-    for (int i=0;i<input_.size();++i) {
+    for (int i=0;i<getNumInputs();++i) {
       all_output_.input(i).set(input(i));
     }
   
     all_output_.evaluate();
   
     // Copy all outputs
-    for (int i=0;i<output_.size();++i) {
+    for (int i=0;i<getNumOutputs();++i) {
       output(i).set(all_output_.output(i));
     }
   

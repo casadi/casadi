@@ -36,7 +36,7 @@ SimulatorInternal::SimulatorInternal(const Integrator& integrator, const FX& out
   setOption("name","unnamed simulator");
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
   
-  inputScheme_ = SCHEME_IntegratorInput;
+  input_.scheme = SCHEME_IntegratorInput;
 }
   
 SimulatorInternal::~SimulatorInternal(){
@@ -70,21 +70,21 @@ void SimulatorInternal::init(){
     // Create the output function
     output_fcn_ = SXFunction(arg,out);
     
-    outputScheme_ = SCHEME_IntegratorOutput;
+    output_.scheme = SCHEME_IntegratorOutput;
   }
 
   // Initialize the output function
   output_fcn_.init();
   
   // Allocate inputs
-  input_.resize(INTEGRATOR_NUM_IN);
+  setNumInputs(INTEGRATOR_NUM_IN);
   for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
     input(i) = integrator_.input(i);
   }
 
   // Allocate outputs
-  output_.resize(output_fcn_->output_.size());
-  for(int i=0; i<output_.size(); ++i) {
+  setNumOutputs(output_fcn_->getNumOutputs());
+  for(int i=0; i<getNumOutputs(); ++i) {
     output(i) = Matrix<double>(grid_.size(),output_fcn_.output(i).numel(),0);
     if (!output_fcn_.output(i).empty()) {
       casadi_assert_message(output_fcn_.output(i).size2()==1,"SimulatorInternal::init: Output function output #" << i << " has shape " << output_fcn_.output(i).dimString() << ", while a column-matrix shape is expected.");
@@ -153,7 +153,7 @@ void SimulatorInternal::evaluate(){
     output_fcn_.evaluate();
 
     // Save the output of the function
-    for(int i=0; i<output_.size(); ++i){
+    for(int i=0; i<getNumOutputs(); ++i){
       const Matrix<double> &res = output_fcn_.output(i);
       Matrix<double> &ores = output(i);
       for(int j=0; j<res.numel(); ++j){

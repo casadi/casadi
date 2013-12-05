@@ -62,23 +62,23 @@ namespace CasADi{
     //@}
 
     /// Get the number of function inputs
-    inline int getNumInputs() const{ return static_cast<const Derived*>(this)->input_struct().size();}
+    inline int getNumInputs() const{ return static_cast<const Derived*>(this)->input_struct().data.size();}
 
     /// Get the number of function outputs
-    inline int getNumOutputs() const{ return static_cast<const Derived*>(this)->output_struct().size();}
+    inline int getNumOutputs() const{ return static_cast<const Derived*>(this)->output_struct().data.size();}
 
     /// Set the number of function inputs
-    inline void setNumInputs(int num_in){ static_cast<Derived*>(this)->input_struct().resize(num_in); }
+    inline void setNumInputs(int num_in){ static_cast<Derived*>(this)->input_struct().data.resize(num_in); }
     
     /// Set the number of function outputs
-    inline void setNumOutputs(int num_out){ static_cast<Derived*>(this)->output_struct().resize(num_out); }
+    inline void setNumOutputs(int num_out){ static_cast<Derived*>(this)->output_struct().data.resize(num_out); }
 
     /** \brief  Access an input */
     template<bool check>
     DMatrix& inputS(int i){
       if(check){
         try{
-          return static_cast<Derived*>(this)->input_struct().at(i);
+          return static_cast<Derived*>(this)->input_struct().data.at(i);
         } catch(std::out_of_range&){
           std::stringstream ss;
           ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
@@ -86,7 +86,7 @@ namespace CasADi{
           throw CasadiException(ss.str());
         }
       } else {
-        return static_cast<Derived*>(this)->input_struct()[i];        
+        return static_cast<Derived*>(this)->input_struct().data[i];        
       }
     }
 
@@ -101,7 +101,7 @@ namespace CasADi{
     DMatrix& outputS(int i){
       if(check){
         try{
-          return static_cast<Derived*>(this)->output_struct().at(i);
+          return static_cast<Derived*>(this)->output_struct().data.at(i);
         } catch(std::out_of_range&){
           std::stringstream ss;
           ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
@@ -109,7 +109,7 @@ namespace CasADi{
           throw CasadiException(ss.str());
         }
       } else {
-        return static_cast<Derived*>(this)->output_struct()[i];        
+        return static_cast<Derived*>(this)->output_struct().data[i];        
       }
     }
 

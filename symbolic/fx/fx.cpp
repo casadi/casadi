@@ -308,19 +308,19 @@ namespace CasADi{
     return (*this)->outputScheme();
   }
   
-  const std::vector<DMatrix>& FX::input_struct() const{
+  const IOSchemeVector<DMatrix>& FX::input_struct() const{
     return (*this)->input_struct();
   }
   
-  const std::vector<DMatrix>& FX::output_struct() const{
+  const IOSchemeVector<DMatrix>& FX::output_struct() const{
     return (*this)->output_struct();
   }
   
-  std::vector<DMatrix>& FX::input_struct(){
+  IOSchemeVector<DMatrix>& FX::input_struct(){
     return (*this)->input_struct();
   }
   
-  std::vector<DMatrix>& FX::output_struct(){
+  IOSchemeVector<DMatrix>& FX::output_struct(){
     return (*this)->output_struct();
   }  
 

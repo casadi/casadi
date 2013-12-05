@@ -71,8 +71,8 @@ SDPSolverInternal::SDPSolverInternal(const std::vector<CRSSparsity> &st) : st_(s
     casadi_assert_message(s==s.transpose(),"SDPSolverInternal: Each supplied Fi must be symmetric. But got " << s.dimString() <<  " for i = " << i << ".");
   }
   
-  inputScheme_ = SCHEME_SDPInput;
-  outputScheme_ = SCHEME_SDPOutput;
+  input_.scheme = SCHEME_SDPInput;
+  output_.scheme = SCHEME_SDPOutput;
 
 }
     

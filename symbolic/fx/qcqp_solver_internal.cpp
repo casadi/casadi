@@ -93,8 +93,8 @@ QCQPSolverInternal::QCQPSolverInternal(const std::vector<CRSSparsity> &st) : st_
   output(QCQP_SOLVER_LAM_X) = DMatrix(x_sparsity);
   output(QCQP_SOLVER_LAM_A) = DMatrix(bounds_sparsity);
   
-  inputScheme_ = SCHEME_QCQPSolverInput;
-  outputScheme_ = SCHEME_QCQPSolverOutput;
+  input_.scheme = SCHEME_QCQPSolverInput;
+  output_.scheme = SCHEME_QCQPSolverOutput;
 }
     
 void QCQPSolverInternal::init() {
