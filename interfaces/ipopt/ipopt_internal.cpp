@@ -266,7 +266,7 @@ namespace CasADi{
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
     
-    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
+    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = n_iter_ = 0;
   
     // Get back the smart pointers
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass = static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(userclass_);
@@ -376,10 +376,13 @@ namespace CasADi{
     stats_["n_eval_g"] = n_eval_g_;
     stats_["n_eval_jac_g"] = n_eval_jac_g_;
     stats_["n_eval_h"] = n_eval_h_;
+    
+    stats_["iter_count"] = n_iter_-1;
   
   }
 
   bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials,bool full_callback) {
+    n_iter_ += 1;
     try {
       log("intermediate_callback started");
       if (gather_stats_) {

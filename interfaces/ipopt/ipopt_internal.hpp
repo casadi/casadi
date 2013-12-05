@@ -115,6 +115,7 @@ public:
   int n_eval_g_; // number of calls to eval_g
   int n_eval_jac_g_; // number of calls to eval_jac_g
   int n_eval_h_; // number of calls to eval_h
+  int n_iter_; // number of iterations
     
   // For parametric sensitivities with sIPOPT
   #ifdef WITH_SIPOPT

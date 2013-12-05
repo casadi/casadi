@@ -810,6 +810,8 @@ namespace CasADi{
     stats_["n_eval_g"] = n_eval_g_;
     stats_["n_eval_jac_g"] = n_eval_jac_g_;
     stats_["n_eval_h"] = n_eval_h_;
+    stats_["iter_count"] = worhp_w_.MajorIter;
+    
     stats_["return_code"] = worhp_c_.status;
     stats_["return_status"] = flagmap[worhp_c_.status];
     
