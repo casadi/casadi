@@ -402,8 +402,6 @@ class casadiTestCase(unittest.TestCase):
       storage = {}
       
       ndir = 2
-      trial.requestNumSens(ndir,ndir)
-      solution.requestNumSens(ndir,ndir)
       
       def flatten(l):
         ret = []

@@ -441,16 +441,11 @@ class typemaptests(casadiTestCase):
     self.assertTrue(f.getOption("verbose"))
     f.setOption("verbose",False)
     self.assertTrue(not(f.getOption("verbose")))
-    f.setOption("number_of_adj_dir",3)
-    self.assertTrue(isinstance(f.getOption("number_of_adj_dir"),int))
-    self.assertEquals(f.getOption("number_of_adj_dir"),3)
     d=f.dictionary()
     self.assertTrue(isinstance(d,dict))
     d["verbose"]=True
-    d["number_of_adj_dir"]=7
     f.setOption(d)
     self.assertTrue(f.getOption("verbose"))
-    self.assertEquals(f.getOption("number_of_adj_dir"),7)
 
   def testGenericType2(self):
     self.message("Generic type 2")
