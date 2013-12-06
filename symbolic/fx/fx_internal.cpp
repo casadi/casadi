@@ -52,9 +52,9 @@ namespace CasADi{
     addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines. Check documentation of JacobianGenerator.");
     addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines. Check documentation of SparsityGenerator.");
     addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
-    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","inputs|outputs");
+    addOption("monitor",                  OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","inputs|outputs");
     addOption("regularity_check",         OT_BOOLEAN,             true,          "Throw exceptions when NaN or Inf appears during evaluation");
-    addOption("inputs_check",         OT_BOOLEAN,             true,          "Throw exceptions when the numerical values of the inputs don't make sense");
+    addOption("inputs_check",             OT_BOOLEAN,             true,          "Throw exceptions when the numerical values of the inputs don't make sense");
     addOption("gather_stats",             OT_BOOLEAN,             false,         "Flag to indicate wether statistics must be gathered");
   
     verbose_ = false;
@@ -89,11 +89,6 @@ namespace CasADi{
 
     // Resize the matrix that holds the sparsity of the Jacobian blocks
     jac_sparsity_ = jac_sparsity_compact_ = Matrix<CRSSparsity>(getNumInputs(),getNumOutputs());
-
-    // Get the Jacobian generator function, if any
-    if(hasSetOption("jacobian_generator")){
-      jacgen_ = getOption("jacobian_generator");
-    }
   
     // Get the sparsity detector function, if any
     if(hasSetOption("sparsity_generator")){
@@ -1446,11 +1441,15 @@ namespace CasADi{
     FX ret;
   
     // Generate Jacobian
-    if(!jacgen_.isNull()){
+    if(hasSetOption("jacobian_generator")){
+      /// User-provided Jacobian generator function
+      JacobianGenerator jacgen = getOption("jacobian_generator");
+
       // Use user-provided routine to calculate Jacobian
       FX fcn = shared_from_this<FX>();
-      ret = jacgen_(fcn,iind,oind,user_data_);
-      
+      ret = jacgen(fcn,iind,oind,user_data_);
+
+      // Consistency check
       casadi_assert_message(ret.output().size1()==output(oind).size() && ret.output().size2()==input(iind).size(),"FXInternal::jacobian: User supplied jacobianGenerator("<< iind << "," << oind <<") returned " << ret.output().dimString() << ", while shape " <<  output(oind).size() << "-by-" << input(iind).size() << " was expected.");
       
     } else {
@@ -1602,7 +1601,7 @@ namespace CasADi{
   }
 
   FX FXInternal::getDerivative(int nfwd, int nadj){
-    return getDerivativeViaJac(nfwd,nadj);
+    casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
   }
 
   FX FXInternal::getDerivativeViaJac(int nfwd, int nadj){
@@ -1694,6 +1693,8 @@ namespace CasADi{
   }
 
   FX FXInternal::getFullJacobian(){
+    // TODO: Rewrite using vertsplit, #908
+
     // Count the total number of inputs and outputs
     int num_in_scalar = getNumScalarInputs();
     int num_out_scalar = getNumScalarOutputs();

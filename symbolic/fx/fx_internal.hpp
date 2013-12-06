@@ -320,9 +320,6 @@ namespace CasADi{
     /// Cache for sparsities of the Jacobian blocks
     Matrix<CRSSparsity> jac_sparsity_, jac_sparsity_compact_;
 
-    /// User-provided Jacobian generator function
-    JacobianGenerator jacgen_;
-
     /// User-provided sparsity generator function
     SparsityGenerator spgen_;
 
