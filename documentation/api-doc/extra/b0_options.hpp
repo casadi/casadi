@@ -3397,6 +3397,7 @@
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>CasADi::SQPInternal</td></tr>
+<tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>qp_solver</td><td>OT_QPSOLVER</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
@@ -3454,6 +3455,7 @@
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>CasADi::SQPInternal</td></tr>
+<tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>qp_solver</td><td>OT_QPSOLVER</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
