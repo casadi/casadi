@@ -755,9 +755,6 @@ class FXtests(casadiTestCase):
     self.assertEqual(J.output().size(),16)
       
   def test_jacobiangenerator(self):
-    # Commented out, #884
-    return
-
     x = msym("x")
     y = msym("y")
         
@@ -836,9 +833,6 @@ class FXtests(casadiTestCase):
     self.assertFalse("derivative" in str(P_P))
     
   def test_assert_derivatives(self):
-    # Commented out, #884
-    return
-
     x = msym("x")
     
     @pyevaluate
