@@ -45,17 +45,16 @@ namespace CasADi{
   
   FXInternal::FXInternal(){
     setOption("name","unnamed_function"); // name of the function
-    addOption("sparse",                   OT_BOOLEAN,             true,           "function is sparse");
-    addOption("verbose",                  OT_BOOLEAN,             false,          "verbose evaluation -- for debugging");
+    addOption("verbose",                  OT_BOOLEAN,             false,          "Verbose evaluation -- for debugging");
     addOption("store_jacobians",          OT_BOOLEAN,             false,          "keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times");
     addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians.","forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate");
     addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines. Check documentation of JacobianGenerator.");
     addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines. Check documentation of SparsityGenerator.");
     addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
-    addOption("monitor",                  OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","inputs|outputs");
-    addOption("regularity_check",         OT_BOOLEAN,             true,          "Throw exceptions when NaN or Inf appears during evaluation");
-    addOption("inputs_check",             OT_BOOLEAN,             true,          "Throw exceptions when the numerical values of the inputs don't make sense");
-    addOption("gather_stats",             OT_BOOLEAN,             false,         "Flag to indicate wether statistics must be gathered");
+    addOption("monitor",                  OT_STRINGVECTOR,        GenericType(),  "Monitors to be activated","inputs|outputs");
+    addOption("regularity_check",         OT_BOOLEAN,             true,           "Throw exceptions when NaN or Inf appears during evaluation");
+    addOption("inputs_check",             OT_BOOLEAN,             true,           "Throw exceptions when the numerical values of the inputs don't make sense");
+    addOption("gather_stats",             OT_BOOLEAN,             false,          "Flag to indicate wether statistics must be gathered");
   
     verbose_ = false;
     user_data_ = 0;
