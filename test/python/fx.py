@@ -727,14 +727,9 @@ class FXtests(casadiTestCase):
                 
       self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
       
-  def test_sparsitygenerator(self):
+  def test_setjacsparsity(self):
     x = msym("x",4)
           
-      
-    @sparsitygenerator
-    def sp(f,iind,oind):
-      return sp_dense(4,4)
-      
     f = MXFunction([x],[x])
     f.init()
     
@@ -745,8 +740,8 @@ class FXtests(casadiTestCase):
     self.assertEqual(J.output().size(),4)
     
     f = MXFunction([x],[x])
-    f.setOption("sparsity_generator",sp)
     f.init()
+    f.setJacSparsity(sp_dense(4,4),0,0,True)
     
     J = f.jacobian()
     J.init()

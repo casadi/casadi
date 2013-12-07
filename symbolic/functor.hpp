@@ -32,9 +32,6 @@ namespace CasADi{
   /// Function pointer to a Jacobian generator function
   typedef FX (*JacobianGeneratorCPtr)(FX& fcn, int iind, int oind, void* user_data);
   
-  /// Function pointer to a sparsity generator function
-  typedef CRSSparsity (*SparsityGeneratorCPtr)(FX& fcn, int iind, int oind, void* user_data);
-  
   /// Wrapper around functions
   typedef void (*CustomEvaluateCPtr)(CustomFunction &f, void* user_data);
 
@@ -50,33 +47,7 @@ namespace CasADi{
   class Functor : public SharedObject {
     //Callback();
     
-  };
-  
-  
-  /** \brief Sparsity Generator Functor
-  *
-  * In C++, supply a SparsityGeneratorCPtr function pointer
-  *
-  * In python, supply a callable, annotated with sparsitygenerator decorator
-  * \code
-  *  
-  *   @sparsitygenerator
-  *   def c(f,nfdir,nadir):
-  *     print f
-  *
-  *   ff.setOption("sparsity_generator",c)
-  * \endcode
-  *
-  */
-  class SparsityGenerator : public Functor {
-    public:
-      /// Default constructor
-      SparsityGenerator() {};
-      /// Construct from C pointer
-      SparsityGenerator(SparsityGeneratorCPtr ptr);
-      /// Call
-      virtual CRSSparsity operator() (FX& fcn, int iind, int oind, void* user_data);
-  };
+  };    
 
   /** \brief Jacobian Generator Functor
   *

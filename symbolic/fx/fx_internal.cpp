@@ -48,7 +48,6 @@ namespace CasADi{
     addOption("verbose",                  OT_BOOLEAN,             false,          "Verbose evaluation -- for debugging");
     addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians.","forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate");
     addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines. Check documentation of JacobianGenerator.");
-    addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines. Check documentation of SparsityGenerator.");
     addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
     addOption("monitor",                  OT_STRINGVECTOR,        GenericType(),  "Monitors to be activated","inputs|outputs");
     addOption("regularity_check",         OT_BOOLEAN,             true,           "Throw exceptions when NaN or Inf appears during evaluation");
@@ -86,11 +85,6 @@ namespace CasADi{
     // Resize the matrix that holds the sparsity of the Jacobian blocks
     jac_sparsity_ = jac_sparsity_compact_ = Matrix<CRSSparsity>(getNumInputs(),getNumOutputs());
   
-    // Get the sparsity detector function, if any
-    if(hasSetOption("sparsity_generator")){
-      spgen_ = getOption("sparsity_generator");
-    }
-
     if(hasSetOption("user_data")){
       user_data_ = getOption("user_data").toVoidPointer();
     }
@@ -257,7 +251,6 @@ namespace CasADi{
     f.setOutputScheme(getOutputScheme());
     f.setOption("ad_mode",getOption("ad_mode"));
     if (hasSetOption("jacobian_generator")) f.setOption("jacobian_generator",getOption("jacobian_generator"));
-    if (hasSetOption("sparsity_generator")) f.setOption("sparsity_generator",getOption("sparsity_generator"));
     
     return f;
   }
@@ -1052,18 +1045,10 @@ namespace CasADi{
     // Generate, if null
     if(jsp.isNull()){
       if(compact){
-        if(spgen_.isNull()){
-          // Use internal routine to determine sparsity
-          jsp = getJacSparsity(iind,oind,symmetric);
-        } else {
-          // Create a temporary FX instance
-          FX tmp = shared_from_this<FX>();
+        
+        // Use internal routine to determine sparsity
+        jsp = getJacSparsity(iind,oind,symmetric);
 
-          // Use user-provided routine to determine sparsity
-          jsp = spgen_(tmp,iind,oind,user_data_);
-          
-          casadi_assert_message(jsp.size1()==output(oind).size() && jsp.size2()==input(iind).size(),"FXInternal::setJacSparsity: User supplied sparsityGenerator("<< iind << "," << oind <<") returned " << jsp.dimString() << ", while shape " <<  output(oind).size() << "-by-" << input(iind).size() << " was expected.");
-        }
       } else {
       
         // Get the compact sparsity pattern

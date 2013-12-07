@@ -31,7 +31,7 @@
 namespace CasADi{
 
   /** \brief  Types of options */
-  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_BOOLVECTOR, OT_REALVECTOR, OT_STRINGVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_STABILIZEDQPSOLVER, OT_SOCPSOLVER, OT_QCQPSOLVER, OT_SDPSOLVER,  OT_SDQPSOLVER, OT_IMPLICITFUNCTION, OT_JACOBIANGENERATOR, OT_SPARSITYGENERATOR, OT_FX, OT_CALLBACK, OT_VOIDPTR, OT_UNKNOWN};
+  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_BOOLVECTOR, OT_REALVECTOR, OT_STRINGVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_STABILIZEDQPSOLVER, OT_SOCPSOLVER, OT_QCQPSOLVER, OT_SDPSOLVER,  OT_SDQPSOLVER, OT_IMPLICITFUNCTION, OT_JACOBIANGENERATOR, OT_FX, OT_CALLBACK, OT_VOIDPTR, OT_UNKNOWN};
   
   /** \brief Generic data type
   \author Joel Andersson 
@@ -82,7 +82,6 @@ namespace CasADi{
     GenericType(QCQPSolverCreator ptr);
     GenericType(implicitFunctionCreator ptr);
     GenericType(const JacobianGenerator& c);
-    GenericType(const SparsityGenerator& c);
     GenericType(const Callback& c);
     
     /// Implicit typecasting
@@ -110,7 +109,6 @@ namespace CasADi{
     operator QCQPSolverCreator() const;
     operator implicitFunctionCreator() const;
     operator const JacobianGenerator& () const;
-    operator const SparsityGenerator& () const;
     operator const Callback& () const;
     #endif // SWIG
     

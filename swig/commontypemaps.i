@@ -60,7 +60,6 @@
 #define PRECEDENCE_MXVectorVector 106
 
 #define PRECEDENCE_CREATOR 150
-#define PRECEDENCE_SPARSITYGENERATOR 21
 #define PRECEDENCE_JACOBIANGENERATOR 21
 #define PRECEDENCE_CUSTOMEVALUATE 21
 #define PRECEDENCE_CALLBACK 21
@@ -148,7 +147,6 @@ if (!ret) {
 
 #ifdef SWIGPYTHON
 %my_generic_const_typemap(PRECEDENCE_JACOBIANGENERATOR,CasADi::JacobianGenerator);
-%my_generic_const_typemap(PRECEDENCE_SPARSITYGENERATOR,CasADi::SparsityGenerator);
 %my_generic_const_typemap(PRECEDENCE_CUSTOMEVALUATE,CasADi::CustomEvaluate);
 %my_generic_const_typemap(PRECEDENCE_CALLBACK,CasADi::Callback);
 #endif

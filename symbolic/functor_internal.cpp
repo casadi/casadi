@@ -32,18 +32,6 @@ namespace CasADi{
 
   //Call
 
-  SparsityGeneratorCInternal::SparsityGeneratorCInternal(SparsityGeneratorCPtr ptr)  : FunctorCInternal(ptr) {
-  }
-  
-  CRSSparsity SparsityGeneratorCInternal::call(FX& fcn, int iind, int oind, void* user_data) {
-    casadi_assert(ptr_!=0);
-    return ptr_(fcn, iind, oind, user_data);
-  }
-  
-  SparsityGeneratorCInternal* SparsityGeneratorCInternal::clone() const {
-    return new SparsityGeneratorCInternal(ptr_);
-  }
-  
   JacobianGeneratorCInternal::JacobianGeneratorCInternal(JacobianGeneratorCPtr ptr)  : FunctorCInternal(ptr) {
   }
   

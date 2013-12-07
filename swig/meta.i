@@ -97,7 +97,6 @@ template<> swig_type_info** meta< std::vector<std::string> >::name = &SWIGTYPE_p
 
 #ifdef SWIGPYTHON
 %inline %{
-template<> swig_type_info** meta< CasADi::SparsityGenerator >::name = & SWIGTYPE_p_CasADi__SparsityGenerator;
 template<> swig_type_info** meta< CasADi::JacobianGenerator >::name = & SWIGTYPE_p_CasADi__JacobianGenerator;
 template<> swig_type_info** meta< CasADi::CustomEvaluate >::name = & SWIGTYPE_p_CasADi__CustomEvaluate;
 template<> swig_type_info** meta< CasADi::Callback >::name = & SWIGTYPE_p_CasADi__Callback;

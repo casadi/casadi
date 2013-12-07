@@ -37,26 +37,12 @@ namespace CasADi{
     
   };
   
-  class SparsityGeneratorInternal : public FunctorInternal {
-    friend class SparsityGenerator;
-    virtual CRSSparsity call(FX& fcn, int iind, int oind, void* user_data)=0;
-  };
-  
   template<typename P>
   class FunctorCInternal {
     public:
       FunctorCInternal(P ptr) : ptr_(ptr) {};
     protected:
       P ptr_;
-  };
-
-  class SparsityGeneratorCInternal : public SparsityGeneratorInternal, FunctorCInternal<SparsityGeneratorCPtr> {
-    friend class SparsityGenerator;
-    
-    SparsityGeneratorCInternal(SparsityGeneratorCPtr ptr);
-    virtual CRSSparsity call(FX& fcn, int iind, int oind, void* user_data);
-    virtual SparsityGeneratorCInternal* clone() const;
-
   };
 
   class JacobianGeneratorInternal : public FunctorInternal {
