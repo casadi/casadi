@@ -46,7 +46,6 @@ namespace CasADi{
   FXInternal::FXInternal(){
     setOption("name","unnamed_function"); // name of the function
     addOption("verbose",                  OT_BOOLEAN,             false,          "Verbose evaluation -- for debugging");
-    addOption("store_jacobians",          OT_BOOLEAN,             false,          "keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times");
     addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians.","forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate");
     addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines. Check documentation of JacobianGenerator.");
     addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines. Check documentation of SparsityGenerator.");
@@ -79,8 +78,6 @@ namespace CasADi{
   void FXInternal::init(){
     verbose_ = getOption("verbose");
     regularity_check_ = getOption("regularity_check");
-    bool store_jacobians = getOption("store_jacobians");
-    casadi_assert_warning(!store_jacobians,"Option \"store_jacobians\" has been deprecated. Jacobians are now always cached.");
   
     // Warn for functions with too many inputs or outputs
     casadi_assert_warning(getNumInputs()<10000, "Function " << getOption("name") << " has a large number of inputs. Changing the problem formulation is strongly encouraged.");
