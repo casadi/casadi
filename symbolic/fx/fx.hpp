@@ -153,6 +153,10 @@ namespace CasADi{
     FX jacobian(int iind, const std::string& oname, bool compact=false, bool symmetric=false) { return jacobian(iind,outputSchemeEntry(oname),compact,symmetric); }
     FX jacobian(const std::string& iname, const std::string& oname, bool compact=false, bool symmetric=false) { return jacobian(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
     //@}
+
+    /** Set the Jacobian function of output oind with respect to input iind
+     NOTE: Does _not_ take ownership, only weak references to the Jacobians are kept internally */
+    void setJacobian(const FX& jac, int iind=0, int oind=0, bool compact=false);
     
     //@{
     /** \brief Generate a gradient function of output oind with respect to input iind
@@ -205,7 +209,7 @@ namespace CasADi{
 
     /** Set the Jacobian of all the input nonzeros with respect to all output nonzeros
      NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
-    void setFullJacobian(FX jac);
+    void setFullJacobian(const FX& jac);
 
 #ifndef SWIG
     /** \brief  Create a function call (single input) */

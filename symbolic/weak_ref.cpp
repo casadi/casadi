@@ -26,7 +26,8 @@ using namespace std;
 
 namespace CasADi{
   
-  WeakRef::WeakRef(){
+  WeakRef::WeakRef(int dummy){
+    casadi_assert(dummy==0);
   }
     
   bool WeakRef::alive() const{
@@ -49,7 +50,7 @@ namespace CasADi{
     return static_cast<WeakRefInternal*>(SharedObject::operator->());
   }
 
-  WeakRef::WeakRef(SharedObject& shared){
+  WeakRef::WeakRef(SharedObject shared){
     assignNode(shared.weak()->get());
   }
 

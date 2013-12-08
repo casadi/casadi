@@ -139,6 +139,7 @@ namespace CasADi{
     //@{
     /** \brief Return Jacobian function */
     FX jacobian(int iind, int oind, bool compact, bool symmetric);
+    void setJacobian(const FX& jac, int iind, int oind, bool compact);
     virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
     virtual FX getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
     //@}
@@ -319,6 +320,9 @@ namespace CasADi{
 
     /// Cache for sparsities of the Jacobian blocks
     Matrix<CRSSparsity> jac_sparsity_, jac_sparsity_compact_;
+
+    /// Cache for Jacobians
+    Matrix<WeakRef> jac_, jac_compact_;
 
     /// User-set field
     void* user_data_;

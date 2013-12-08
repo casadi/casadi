@@ -41,10 +41,10 @@ namespace CasADi{
     friend class SharedObjectNode;
     
     /** \brief Default constructor */
-    WeakRef();
+    WeakRef(int dummy=0);
     
     /** \brief Construct from a shared object (also implicit type conversion) */
-    WeakRef(SharedObject& shared);
+    WeakRef(SharedObject shared);
     
     /** \brief Get a shared (owning) reference */
     SharedObject shared();

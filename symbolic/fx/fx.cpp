@@ -135,6 +135,10 @@ namespace CasADi{
     return (*this)->jacobian(iind,oind,compact,symmetric);
   }
 
+  void FX::setJacobian(const FX& jac, int iind, int oind, bool compact){
+    (*this)->setJacobian(jac,iind,oind,compact);
+  }
+
   FX FX::gradient(int iind, int oind){
     assertInit();
     return (*this)->gradient(iind,oind);
@@ -155,7 +159,7 @@ namespace CasADi{
     return (*this)->fullJacobian();
   }
 
-  void FX::setFullJacobian(FX jac){
+  void FX::setFullJacobian(const FX& jac){
     (*this)->full_jacobian_ = jac;
   }
 

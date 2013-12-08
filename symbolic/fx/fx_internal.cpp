@@ -84,6 +84,7 @@ namespace CasADi{
 
     // Resize the matrix that holds the sparsity of the Jacobian blocks
     jac_sparsity_ = jac_sparsity_compact_ = Matrix<CRSSparsity>(getNumInputs(),getNumOutputs());
+    jac_ = jac_compact_ = Matrix<WeakRef>(getNumInputs(),getNumOutputs());
   
     if(hasSetOption("user_data")){
       user_data_ = getOption("user_data").toVoidPointer();
@@ -1418,44 +1419,63 @@ namespace CasADi{
   }
 
   FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
+
     // Return value
-    FX ret;
-  
-    // Generate Jacobian
-    if(hasSetOption("jacobian_generator")){
-      /// User-provided Jacobian generator function
-      JacobianGenerator jacgen = getOption("jacobian_generator");
+    WeakRef cached = compact ? jac_compact_.elem(iind,oind) : jac_.elem(iind,oind);
+    
+    // Check if cached
+    if(cached.alive()){
+      // Return an owning reference
+      return shared_cast<FX>(cached.shared());
 
-      // Use user-provided routine to calculate Jacobian
-      FX fcn = shared_from_this<FX>();
-      ret = jacgen(fcn,iind,oind,user_data_);
-
-      // Consistency check
-      casadi_assert_message(ret.output().size1()==output(oind).size() && ret.output().size2()==input(iind).size(),"FXInternal::jacobian: User supplied jacobianGenerator("<< iind << "," << oind <<") returned " << ret.output().dimString() << ", while shape " <<  output(oind).size() << "-by-" << input(iind).size() << " was expected.");
-      
     } else {
-      // Use internal routine to calculate Jacobian
-      ret = getJacobian(iind,oind,compact, symmetric);
+      // Generate a Jacobian      
+      FX ret;
+
+      if(hasSetOption("jacobian_generator")){
+        /// User-provided Jacobian generator function
+        JacobianGenerator jacgen = getOption("jacobian_generator");
+        
+        // Use user-provided routine to calculate Jacobian
+        FX fcn = shared_from_this<FX>();
+        ret = jacgen(fcn,iind,oind,user_data_);
+        
+        // Consistency check
+        casadi_assert_message(ret.output().size1()==output(oind).size() && ret.output().size2()==input(iind).size(),"FXInternal::jacobian: User supplied jacobianGenerator("<< iind << "," << oind <<") returned " << ret.output().dimString() << ", while shape " <<  output(oind).size() << "-by-" << input(iind).size() << " was expected.");
+        
+      } else {
+        // Use internal routine to calculate Jacobian
+        ret = getJacobian(iind,oind,compact,symmetric);
+      }
+      
+      // Give it a suitable name
+      stringstream ss;
+      ss << "jacobian_" << getOption("name") << "_" << iind << "_" << oind;
+      ret.setOption("name",ss.str());
+      ret.setOption("verbose",getOption("verbose"));
+      ret.setInputScheme(input_.scheme);
+      
+      // Output names
+      std::vector<std::string> ionames;
+      ionames.reserve(ret.getNumOutputs());   
+      ionames.push_back("jac");
+      for(int i=0; i<getNumOutputs(); ++i){
+        ionames.push_back(output_.scheme.entryLabel(i));
+      }      
+      ret.setOutputScheme(ionames);
+      
+      // Save in cache
+      compact ? jac_compact_.elem(iind,oind) : jac_.elem(iind,oind) = ret;
+      return ret;
     }
-  
-    // Give it a suitable name
-    stringstream ss;
-    ss << "jacobian_" << getOption("name") << "_" << iind << "_" << oind;
-    ret.setOption("name",ss.str());
-    ret.setOption("verbose",getOption("verbose"));
-    ret.setInputScheme(input_.scheme);
-    
-    // Output names
-    std::vector<std::string> ionames;
-    ionames.reserve(ret.getNumOutputs());   
-    ionames.push_back("jac");
-    for (int i=0;i<getNumOutputs();++i) {
-      ionames.push_back(output_.scheme.entryLabel(i));
+  }
+
+  void FXInternal::setJacobian(const FX& jac, int iind, int oind, bool compact){
+    if(compact){
+      jac_compact_.elem(iind,oind) = jac;
+    } else {
+      jac_.elem(iind,oind) = jac;
     }
-    
-    ret.setOutputScheme(ionames);
-    
-    return ret;
   }
 
   FX FXInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
