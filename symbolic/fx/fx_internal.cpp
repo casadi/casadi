@@ -1600,6 +1600,10 @@ namespace CasADi{
   }
 
   FX FXInternal::getDerivative(int nfwd, int nadj){
+    if(full_jacobian_.alive()){
+      return getDerivativeViaJac(nfwd,nadj);
+    }
+
     casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
   }
 
