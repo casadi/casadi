@@ -32,18 +32,6 @@ namespace CasADi{
 
   //Call
 
-  JacobianGeneratorCInternal::JacobianGeneratorCInternal(JacobianGeneratorCPtr ptr)  : FunctorCInternal(ptr) {
-  }
-  
-  FX JacobianGeneratorCInternal::call(FX& fcn, int iind, int oind, void* user_data) {
-    casadi_assert(ptr_!=0);
-    return ptr_(fcn, iind, oind, user_data);
-  }
-  
-  JacobianGeneratorCInternal* JacobianGeneratorCInternal::clone() const {
-    return new JacobianGeneratorCInternal(ptr_);
-  }
-  
   CustomEvaluateCInternal::CustomEvaluateCInternal(CustomEvaluateCPtr ptr)  : FunctorCInternal(ptr) {
   }
   

@@ -749,7 +749,7 @@ class FXtests(casadiTestCase):
     
     self.assertEqual(J.output().size(),16)
       
-  def test_jacobiangenerator(self):
+  def test_setjacobian(self):
     x = msym("x")
     y = msym("y")
         
@@ -769,27 +769,17 @@ class FXtests(casadiTestCase):
       
       f.setOutput(sin(x+3*y))
       
-    @jacobiangenerator
-    def funjac(f,iind,oind):
-      # sin(x0+3*y)*x1
-      print "Called jacobian with :", (iind,oind)
-      
-      x = ssym("x")
-      y = ssym("y")
-      
-      if iind==0:
-        f = SXFunction([x,y],[cos(x+3*y),sin(x+3*y)])
-        f.init()
-      elif iind==1:
-        f = SXFunction([x,y],[3*cos(x+3*y),sin(x+3*y)])
-        f.init()
-      
-      return f
+    # Form Jacobians: sin(x0+3*y)*x1
+    x = ssym("x")
+    y = ssym("y")
+    J_00 = SXFunction([x,y],[cos(x+3*y),sin(x+3*y)])
+    J_10 = SXFunction([x,y],[3*cos(x+3*y),sin(x+3*y)])
 
     Fun = CustomFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
     Fun.setOption("name","Fun")
-    Fun.setOption("jacobian_generator",funjac)
     Fun.init()
+    Fun.setJacobian(J_00,0,0)
+    Fun.setJacobian(J_10,1,0)
 
     Fun.setInput(0.2,0)
     Fun.setInput(0.7,1)
@@ -798,7 +788,7 @@ class FXtests(casadiTestCase):
     
     print g.input(0),g.input(1)
     
-    self.checkfx(Fun,g,fwd=False,adj=False,indirect=True)
+    self.checkfx(Fun,g,fwd=False,adj=False,indirect=False)
 
     
   def test_derivative_simplifications(self):

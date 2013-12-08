@@ -29,9 +29,6 @@
 
 namespace CasADi{
 
-  /// Function pointer to a Jacobian generator function
-  typedef FX (*JacobianGeneratorCPtr)(FX& fcn, int iind, int oind, void* user_data);
-  
   /// Wrapper around functions
   typedef void (*CustomEvaluateCPtr)(CustomFunction &f, void* user_data);
 
@@ -48,33 +45,6 @@ namespace CasADi{
     //Callback();
     
   };    
-
-  /** \brief Jacobian Generator Functor
-  *
-  *
-  * In C++, supply a JacobianGeneratorCPtr function pointer
-  *
-  * In python, supply a callable, annotated with jacobiangenerator decorator
-  * \code
-  *  
-  *   @jacobiangenerator
-  *   def c(f,nfdir,nadir):
-  *     print f
-  *
-  *   ff.setOption("jacobian_generator",c)
-  * \endcode
-  *
-  *
-  */
-  class JacobianGenerator : public Functor {
-    public:
-      /// Default constructor
-      JacobianGenerator() {};
-      /// Construct from C pointer
-      JacobianGenerator(JacobianGeneratorCPtr ptr);
-      /// Call
-      virtual FX operator() (FX& fcn, int iind, int oind, void* user_data);
-  };  
     
   /** \brief CustomEvaluate
   *

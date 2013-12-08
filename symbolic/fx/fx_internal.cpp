@@ -47,7 +47,6 @@ namespace CasADi{
     setOption("name","unnamed_function"); // name of the function
     addOption("verbose",                  OT_BOOLEAN,             false,          "Verbose evaluation -- for debugging");
     addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians.","forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate");
-    addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines. Check documentation of JacobianGenerator.");
     addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
     addOption("monitor",                  OT_STRINGVECTOR,        GenericType(),  "Monitors to be activated","inputs|outputs");
     addOption("regularity_check",         OT_BOOLEAN,             true,           "Throw exceptions when NaN or Inf appears during evaluation");
@@ -250,8 +249,7 @@ namespace CasADi{
     f.setOption("name","wrap_" + string(getOption("name")));
     f.setInputScheme(getInputScheme());
     f.setOutputScheme(getOutputScheme());
-    f.setOption("ad_mode",getOption("ad_mode"));
-    if (hasSetOption("jacobian_generator")) f.setOption("jacobian_generator",getOption("jacobian_generator"));
+    f.setOption("ad_mode",getOption("ad_mode")); // Why?
     
     return f;
   }
@@ -1429,24 +1427,8 @@ namespace CasADi{
       return shared_cast<FX>(cached.shared());
 
     } else {
-      // Generate a Jacobian      
-      FX ret;
-
-      if(hasSetOption("jacobian_generator")){
-        /// User-provided Jacobian generator function
-        JacobianGenerator jacgen = getOption("jacobian_generator");
-        
-        // Use user-provided routine to calculate Jacobian
-        FX fcn = shared_from_this<FX>();
-        ret = jacgen(fcn,iind,oind,user_data_);
-        
-        // Consistency check
-        casadi_assert_message(ret.output().size1()==output(oind).size() && ret.output().size2()==input(iind).size(),"FXInternal::jacobian: User supplied jacobianGenerator("<< iind << "," << oind <<") returned " << ret.output().dimString() << ", while shape " <<  output(oind).size() << "-by-" << input(iind).size() << " was expected.");
-        
-      } else {
-        // Use internal routine to calculate Jacobian
-        ret = getJacobian(iind,oind,compact,symmetric);
-      }
+      // Generate a Jacobian
+      FX ret = getJacobian(iind,oind,compact,symmetric);
       
       // Give it a suitable name
       stringstream ss;

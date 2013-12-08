@@ -44,19 +44,6 @@ namespace CasADi{
     protected:
       P ptr_;
   };
-
-  class JacobianGeneratorInternal : public FunctorInternal {
-    friend class JacobianGenerator;
-    virtual FX call(FX& fcn, int iind, int oind, void* user_data)=0;
-  };
-
-  class JacobianGeneratorCInternal : public JacobianGeneratorInternal, FunctorCInternal<JacobianGeneratorCPtr> {
-    friend class JacobianGenerator;
-    
-    JacobianGeneratorCInternal(JacobianGeneratorCPtr ptr);
-    virtual FX call(FX& fcn, int iind, int oind, void* user_data);
-    virtual JacobianGeneratorCInternal* clone() const;
-  };
   
   class CustomEvaluateInternal : public FunctorInternal {
     friend class CustomEvaluate;
