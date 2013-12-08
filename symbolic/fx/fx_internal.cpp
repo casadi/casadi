@@ -1489,8 +1489,8 @@ namespace CasADi{
     // Generate if not already cached
 
     // Get the number of scalar inputs and outputs
-    int num_in_scalar = getNumScalarInputs();
-    int num_out_scalar = getNumScalarOutputs();
+    int num_in_scalar = getNumInputNonzeros();
+    int num_out_scalar = getNumOutputNonzeros();
 
     // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
     int adj_penalty = 2;
@@ -1613,7 +1613,7 @@ namespace CasADi{
     return f->getDerivativeViaJac(nfwd,nadj);
   }
 
-  int FXInternal::getNumScalarInputs() const{
+  int FXInternal::getNumInputNonzeros() const{
     int ret=0;
     for(int iind=0; iind<getNumInputs(); ++iind){
       ret += input(iind).size();
@@ -1621,7 +1621,7 @@ namespace CasADi{
     return ret;
   }
 
-  int FXInternal::getNumScalarOutputs() const{
+  int FXInternal::getNumOutputNonzeros() const{
     int ret=0;
     for(int oind=0; oind<getNumOutputs(); ++oind){
       ret += output(oind).size();
@@ -1699,8 +1699,8 @@ namespace CasADi{
     // TODO: Rewrite using vertsplit, #908
 
     // Count the total number of inputs and outputs
-    int num_in_scalar = getNumScalarInputs();
-    int num_out_scalar = getNumScalarOutputs();
+    int num_in_scalar = getNumInputNonzeros();
+    int num_out_scalar = getNumOutputNonzeros();
 
     // Generate a function from all input nonzeros to all output nonzeros
     MX arg = msym("arg",num_in_scalar);

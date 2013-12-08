@@ -213,10 +213,10 @@ namespace CasADi{
     bool monitored(const std::string& mod) const;
         
     /// Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs)
-    int getNumScalarInputs() const;
+    int getNumInputNonzeros() const;
 
     /// Get total number of scalar outputs (i.e. the number of nonzeros in all of the matrix-valued outputs)
-    int getNumScalarOutputs() const;
+    int getNumOutputNonzeros() const;
     
     /// Get all statistics obtained at the end of the last evaluate call
     const Dictionary & getStats() const;

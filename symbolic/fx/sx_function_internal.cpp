@@ -1025,7 +1025,7 @@ namespace CasADi{
 
     // Concatenate to get all output nonzeros
     SXMatrix arg = vertcat(argv);
-    casadi_assert(arg.size() == getNumScalarInputs());
+    casadi_assert(arg.size() == getNumInputNonzeros());
 
     // Get the nonzeros of each output
     vector<SXMatrix> resv = outputv_;
@@ -1037,7 +1037,7 @@ namespace CasADi{
 
     // Concatenate to get all output nonzeros
     SXMatrix res = vertcat(resv);
-    casadi_assert(res.size() == getNumScalarOutputs());
+    casadi_assert(res.size() == getNumOutputNonzeros());
 
     // Form function of all inputs nonzeros to all output nonzeros and return Jacobian of this
     FX f = SXFunction(arg,res);

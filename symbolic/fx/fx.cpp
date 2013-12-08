@@ -122,12 +122,12 @@ namespace CasADi{
     evaluate();
   }
 
-  int FX::getNumScalarInputs() const{
-    return (*this)->getNumScalarInputs();
+  int FX::getNumInputNonzeros() const{
+    return (*this)->getNumInputNonzeros();
   }
 
-  int FX::getNumScalarOutputs() const{
-    return (*this)->getNumScalarOutputs();
+  int FX::getNumOutputNonzeros() const{
+    return (*this)->getNumOutputNonzeros();
   }
 
   FX FX::jacobian(int iind, int oind, bool compact, bool symmetric){

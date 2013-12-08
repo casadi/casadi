@@ -142,7 +142,7 @@ const vector<ScalarAtomic>& SXFunction::algorithm() const{
 
 int SXFunction::countNodes() const{
   assertInit();
-  return algorithm().size() - getNumScalarOutputs();
+  return algorithm().size() - getNumOutputNonzeros();
 }
 
 void SXFunction::clearSymbolic(){

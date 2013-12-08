@@ -111,11 +111,11 @@ namespace CasADi{
     IOSchemeVector<DMatrix>& output_struct();
     //@}
   
-    /** \brief  Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs) */
-    int getNumScalarInputs() const;
+    /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
+    int getNumInputNonzeros() const;
 
-    /** \brief  Get total number of scalar outputs (i.e. the number of nonzeros in all of the matrix-valued outputs) */
-    int getNumScalarOutputs() const;
+    /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
+    int getNumOutputNonzeros() const;
   
     /** \brief Set input scheme */
     void setInputScheme(const CasADi::IOScheme &scheme);
@@ -203,7 +203,7 @@ namespace CasADi{
     FX hessian(const std::string& iname, const std::string& oname) { return hessian(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
 
-    /** \brief Generate a Jacobian function of all the inputs nonzeros (getNumScalarInputs()) with respect to all the output nonzeros (getNumScalarOutputs()).
+    /** \brief Generate a Jacobian function of all the scalar inputs with respect to all the scalar output).
      */
     FX fullJacobian();
 
