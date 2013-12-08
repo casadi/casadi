@@ -1583,6 +1583,22 @@ namespace CasADi{
     return ret;
   }
 
+  void FXInternal::setDerivative(const FX& fcn, int nfwd, int nadj){
+
+    // Check if there are enough forward directions allocated
+    if(nfwd>=derivative_fcn_.size()){
+      derivative_fcn_.resize(nfwd+1);
+    }
+
+    // Check if there are enough adjoint directions allocated
+    if(nadj>=derivative_fcn_[nfwd].size()){
+      derivative_fcn_[nfwd].resize(nadj+1);
+    }
+    
+    // Save to cache
+    derivative_fcn_[nfwd][nadj] = fcn;
+  }
+
   FX FXInternal::getDerivative(int nfwd, int nadj){
     casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
   }

@@ -339,6 +339,10 @@ namespace CasADi{
      */
     FX derivative(int nfwd, int nadj);
 
+    /** Set a function that calculates nfwd forward dedrivatives and nadj adjoint derivatives
+     NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
+    void setDerivative(const FX& fcn, int nfwd, int nadj);
+
     //@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
     CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);

@@ -296,6 +296,10 @@ namespace CasADi{
     return (*this)->derivative(nfwd,nadj);
   }
 
+  void FX::setDerivative(const FX& fcn, int nfwd, int nadj){
+    (*this)->setDerivative(fcn,nfwd,nadj);
+  }
+
   void FX::generateCode(const string& filename){
     (*this)->generateCode(filename);
   }
