@@ -1629,6 +1629,22 @@ namespace CasADi{
     return ret;
   }
 
+  int FXInternal::getNumInputElements() const{
+    int ret=0;
+    for(int iind=0; iind<getNumInputs(); ++iind){
+      ret += input(iind).numel();
+    }
+    return ret;
+  }
+
+  int FXInternal::getNumOutputElements() const{
+    int ret=0;
+    for(int oind=0; oind<getNumOutputs(); ++oind){
+      ret += output(oind).numel();
+    }
+    return ret;
+  }
+
   void FXInternal::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, MXVectorVector& fsens, 
                         const MXVectorVector& aseed, MXVectorVector& asens, 
                         bool always_inline, bool never_inline){

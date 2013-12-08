@@ -130,6 +130,14 @@ namespace CasADi{
     return (*this)->getNumOutputNonzeros();
   }
 
+  int FX::getNumInputElements() const{
+    return (*this)->getNumInputElements();
+  }
+
+  int FX::getNumOutputElements() const{
+    return (*this)->getNumOutputElements();
+  }
+
   FX FX::jacobian(int iind, int oind, bool compact, bool symmetric){
     assertInit();
     return (*this)->jacobian(iind,oind,compact,symmetric);

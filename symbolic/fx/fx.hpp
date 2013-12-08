@@ -116,6 +116,12 @@ namespace CasADi{
 
     /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
     int getNumOutputNonzeros() const;
+
+    /** \brief  Get total number of elements in all of the matrix-valued inputs */
+    int getNumInputElements() const;
+
+    /** \brief  Get total number of elements in all of the matrix-valued outputs */
+    int getNumOutputElements() const;
   
     /** \brief Set input scheme */
     void setInputScheme(const CasADi::IOScheme &scheme);

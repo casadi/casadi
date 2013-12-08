@@ -212,11 +212,17 @@ namespace CasADi{
     /// Is function fcn being monitored
     bool monitored(const std::string& mod) const;
         
-    /// Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs)
+    /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
     int getNumInputNonzeros() const;
 
-    /// Get total number of scalar outputs (i.e. the number of nonzeros in all of the matrix-valued outputs)
+    /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
     int getNumOutputNonzeros() const;
+
+    /** \brief  Get total number of elements in all of the matrix-valued inputs */
+    int getNumInputElements() const;
+
+    /** \brief  Get total number of elements in all of the matrix-valued outputs */
+    int getNumOutputElements() const;
     
     /// Get all statistics obtained at the end of the last evaluate call
     const Dictionary & getStats() const;
