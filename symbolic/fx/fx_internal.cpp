@@ -1702,7 +1702,7 @@ namespace CasADi{
       if(getNumInputs()==1 && getNumOutputs()==1){
         ret = jacobian(0,0,true,false);
       } else {
-        getFullJacobian();
+        ret = getFullJacobian();
       }
 
       // Return and cache it for reuse
