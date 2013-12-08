@@ -1014,36 +1014,36 @@ namespace CasADi{
     }
   }
 
-  FX SXFunctionInternal::getFullJacobian(){
-    // Get the nonzeros of each input
-    vector<SXMatrix> argv = inputv_;
-    for(int ind=0; ind<argv.size(); ++ind){
-      if(argv[ind].size2()!=1 || !argv[ind].dense()){
-        argv[ind] = argv[ind][Slice()];
-      }
-    }
+  // FX SXFunctionInternal::getFullJacobian(){
+  //   // Get the nonzeros of each input
+  //   vector<SXMatrix> argv = inputv_;
+  //   for(int ind=0; ind<argv.size(); ++ind){
+  //     if(argv[ind].size2()!=1 || !argv[ind].dense()){
+  //       argv[ind] = argv[ind][Slice()];
+  //     }
+  //   }
 
-    // Concatenate to get all output nonzeros
-    SXMatrix arg = vertcat(argv);
-    casadi_assert(arg.size() == getNumInputNonzeros());
+  //   // Concatenate to get all output nonzeros
+  //   SXMatrix arg = vertcat(argv);
+  //   casadi_assert(arg.size() == getNumInputNonzeros());
 
-    // Get the nonzeros of each output
-    vector<SXMatrix> resv = outputv_;
-    for(int ind=0; ind<resv.size(); ++ind){
-      if(resv[ind].size2()!=1 || !resv[ind].dense()){
-        resv[ind] = resv[ind][Slice()];
-      }
-    }
+  //   // Get the nonzeros of each output
+  //   vector<SXMatrix> resv = outputv_;
+  //   for(int ind=0; ind<resv.size(); ++ind){
+  //     if(resv[ind].size2()!=1 || !resv[ind].dense()){
+  //       resv[ind] = resv[ind][Slice()];
+  //     }
+  //   }
 
-    // Concatenate to get all output nonzeros
-    SXMatrix res = vertcat(resv);
-    casadi_assert(res.size() == getNumOutputNonzeros());
+  //   // Concatenate to get all output nonzeros
+  //   SXMatrix res = vertcat(resv);
+  //   casadi_assert(res.size() == getNumOutputNonzeros());
 
-    // Form function of all inputs nonzeros to all output nonzeros and return Jacobian of this
-    FX f = SXFunction(arg,res);
-    f.init();
-    return f.jacobian(0,0,false,false);
-  }
+  //   // Form function of all inputs nonzeros to all output nonzeros and return Jacobian of this
+  //   FX f = SXFunction(arg,res);
+  //   f.init();
+  //   return f.jacobian(0,0,false,false);
+  // }
 
 #ifdef WITH_OPENCL
 
