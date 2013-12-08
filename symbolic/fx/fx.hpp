@@ -203,6 +203,10 @@ namespace CasADi{
      */
     FX fullJacobian();
 
+    /** Set the Jacobian of all the input nonzeros with respect to all output nonzeros
+     NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
+    void setFullJacobian(FX jac);
+
 #ifndef SWIG
     /** \brief  Create a function call (single input) */
     std::vector<MX> call(const MX &arg);

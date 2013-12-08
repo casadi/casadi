@@ -155,6 +155,10 @@ namespace CasADi{
     return (*this)->fullJacobian();
   }
 
+  void FX::setFullJacobian(FX jac){
+    (*this)->full_jacobian_ = jac;
+  }
+
   bool FX::checkNode() const{
     return dynamic_cast<const FXInternal*>(get())!=0;
   }
