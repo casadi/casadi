@@ -120,6 +120,9 @@ namespace CasADi{
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const{ return inputv_;}
 
+    /// Get a vector of symbolic variables corresponding to the outputs
+    virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
+
     /// Propagate a sparsity pattern through the algorithm
     virtual void spEvaluate(bool fwd);
 

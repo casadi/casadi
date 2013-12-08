@@ -250,6 +250,9 @@ namespace CasADi{
     
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const;
+
+    /// Get a vector of symbolic variables corresponding to the outputs
+    virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
   
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<SXMatrix> symbolicInputSX() const;

@@ -589,6 +589,24 @@ namespace CasADi{
     return ret;  
   }
 
+  std::vector<MX> MXFunctionInternal::symbolicOutput(const std::vector<MX>& arg){
+    // Check if input is given
+    const int checking_depth = 2;
+    bool input_given = true;
+    for(int i=0; i<arg.size() && input_given; ++i){
+      if(!arg[i].isEqual(inputv_[i],checking_depth)){
+        input_given = false;
+      }
+    }
+
+    // Return output if possible, else fall back to base class
+    if(input_given){
+      return outputv_;
+    } else {
+      return FXInternal::symbolicOutput(arg);
+    }
+  }
+
   void MXFunctionInternal::evalMX(const std::vector<MX>& arg1, std::vector<MX>& res1, 
                                   const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
                                   const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){

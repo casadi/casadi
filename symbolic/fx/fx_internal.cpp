@@ -316,6 +316,10 @@ namespace CasADi{
     return ret;
   }
 
+  std::vector<MX> FXInternal::symbolicOutput(const std::vector<MX>& arg){
+    return shared_from_this<FX>().call(arg);
+  }
+
   std::vector<SXMatrix> FXInternal::symbolicInputSX() const{
     vector<SXMatrix> ret(getNumInputs());
     assertInit();
