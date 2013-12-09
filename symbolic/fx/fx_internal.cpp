@@ -157,6 +157,7 @@ namespace CasADi{
     ss << "gradient_" << getOption("name") << "_" << iind << "_" << oind;
     ret.setOption("name",ss.str());
 
+    // Same input scheme
     ret.setInputScheme(input_.scheme);
     
     // Output names
@@ -184,6 +185,7 @@ namespace CasADi{
     ss << "tangent_" << getOption("name") << "_" << iind << "_" << oind;
     ret.setOption("name",ss.str());
 
+    // Same input scheme
     ret.setInputScheme(input_.scheme);
     
     // Output names
@@ -213,6 +215,7 @@ namespace CasADi{
     ss << "hessian_" << getOption("name") << "_" << iind << "_" << oind;
     ret.setOption("name",ss.str());
 
+    // Same input scheme
     ret.setInputScheme(input_.scheme);
     
     // Output names
@@ -1439,6 +1442,8 @@ namespace CasADi{
       ss << "jacobian_" << getOption("name") << "_" << iind << "_" << oind;
       ret.setOption("name",ss.str());
       ret.setOption("verbose",getOption("verbose"));
+
+      // Same input scheme
       ret.setInputScheme(input_.scheme);
       
       // Output names
@@ -1612,11 +1617,101 @@ namespace CasADi{
   }
 
   FX FXInternal::getDerivativeViaJac(int nfwd, int nadj){
-    casadi_error("FXInternal::getDerivativeViaJac not defined for class " << typeid(*this).name());
+    // Get, possibly generate, a full Jacobian function
+    FX jfcn = fullJacobian();
 
-    // FX f = wrapMXFunction();
-    // f.init();
-    // return f->getDerivativeViaJac(nfwd,nadj);
+    // Number of inputs and outputs
+    const int n_in = getNumInputs();
+    const int n_out = getNumOutputs();
+
+    // Get an expression for the full Jacobian
+    vector<MX> arg = symbolicInput();
+    vector<MX> res = jfcn.call(arg);
+    MX J = res.front();
+    res.erase(res.begin());
+
+    // Make room for the derivatives
+    arg.reserve(n_in*(1+nfwd)+n_out*nadj);
+    res.reserve(n_out*(1+nfwd)+n_in*nadj);
+    
+    // Temporary string
+    stringstream ss;
+    vector<MX> d;
+
+    // Forward derivatives
+    if(nfwd>0){
+      // Get row offsets for the vertsplit
+      vector<int> offset(1,0);
+      for(int i=0; i<n_out; ++i){
+        offset.push_back(offset.back()+res[i].numel());
+      }
+      
+      // Calculate one derivative at a time (alternative: all at once using vertcat/vertsplit)
+      for(int dir=0; dir<nfwd; ++dir){        
+        // Assemble the right hand side
+        d.clear();
+        for(int i=0; i<n_in; ++i){
+          // Create a forward seed with a suitable name and add to list of inputs
+          ss.str("fwd");
+          ss << dir << "_" << arg[i];
+          arg.push_back(msym(ss.str(),arg[i].sparsity()));
+
+          // Add to the right-hand-side under construction
+          d.push_back(flatten(arg.back()));
+        }
+        MX d_all = vertcat(d);
+        
+        // Calculate the derivatives using a matrix multiplication with the Jacobian
+        d_all = mul(J,d_all);
+        
+        // Split up the left hand sides
+        d = vertsplit(d_all,offset);
+        for(int i=0; i<n_out; ++i){
+          res.push_back(reshape(d[i],res[i].size1(),res[i].size2()));
+        }
+      }
+    }
+
+    // Adjoint derivatives
+    if(nadj>0){
+      // Transpose of J
+      MX JT = trans(J);
+
+      // Get row offsets for the vertsplit
+      vector<int> offset(1,0);
+      for(int i=0; i<n_in; ++i){
+        offset.push_back(offset.back()+arg[i].numel());
+      }
+      
+      // Calculate one derivative at a time (alternative: all at once using vertcat/vertsplit)
+      for(int dir=0; dir<nadj; ++dir){        
+        // Assemble the right hand side
+        d.clear();
+        for(int i=0; i<n_out; ++i){
+          // Create a forward seed with a suitable name and add to list of inputs
+          ss.str("adj");
+          ss << dir << "_" << res[i];
+          arg.push_back(msym(ss.str(),res[i].sparsity()));
+
+          // Add to the right-hand-side under construction
+          d.push_back(flatten(arg.back()));
+        }
+        MX d_all = vertcat(d);
+        
+        // Calculate the derivatives using a matrix multiplication with the Jacobian
+        d_all = mul(JT,d_all);
+        
+        // Split up the left hand sides
+        d = vertsplit(d_all,offset);
+        for(int i=0; i<n_in; ++i){
+          res.push_back(reshape(d[i],arg[i].size1(),arg[i].size2()));
+        }
+      }
+    }
+    
+    // Assemble the derivative function
+    MXFunction ret(arg,res);
+    return ret;
   }
 
   int FXInternal::getNumInputNonzeros() const{
@@ -1709,6 +1804,27 @@ namespace CasADi{
         ret = jacobian(0,0,true,false);
       } else {
         ret = getFullJacobian();
+
+        // Give it a suitable name
+        stringstream ss;
+        ss << "jacobian_" << getOption("name");
+        ret.setOption("name",ss.str());
+        ret.setOption("verbose",getOption("verbose"));
+
+        // Same input scheme
+        ret.setInputScheme(input_.scheme);
+        
+        // Construct output scheme
+        std::vector<std::string> oscheme;
+        oscheme.reserve(ret.getNumOutputs());   
+        oscheme.push_back("jac");
+        for(int i=0; i<getNumOutputs(); ++i){
+          oscheme.push_back(output_.scheme.entryLabel(i));
+        }      
+        ret.setOutputScheme(oscheme);
+
+        // Initialize
+        ret.init();
       }
 
       // Return and cache it for reuse

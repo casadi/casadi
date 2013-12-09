@@ -772,14 +772,14 @@ class FXtests(casadiTestCase):
     # Form Jacobians: sin(x0+3*y)*x1
     x = ssym("x")
     y = ssym("y")
-    J_00 = SXFunction([x,y],[cos(x+3*y),sin(x+3*y)])
-    J_10 = SXFunction([x,y],[3*cos(x+3*y),sin(x+3*y)])
-
+    J = SXFunction([x,y],[horzcat((cos(x+3*y),3*cos(x+3*y))),sin(x+3*y)])
+    J.setOption("name","my_J")
+    J.init()
+    
     Fun = CustomFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
     Fun.setOption("name","Fun")
     Fun.init()
-    Fun.setJacobian(J_00,0,0)
-    Fun.setJacobian(J_10,1,0)
+    Fun.setFullJacobian(J)
 
     Fun.setInput(0.2,0)
     Fun.setInput(0.7,1)
