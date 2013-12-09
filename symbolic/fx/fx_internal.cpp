@@ -1612,9 +1612,11 @@ namespace CasADi{
   }
 
   FX FXInternal::getDerivativeViaJac(int nfwd, int nadj){
-    FX f = wrapMXFunction();
-    f.init();
-    return f->getDerivativeViaJac(nfwd,nadj);
+    casadi_error("FXInternal::getDerivativeViaJac not defined for class " << typeid(*this).name());
+
+    // FX f = wrapMXFunction();
+    // f.init();
+    // return f->getDerivativeViaJac(nfwd,nadj);
   }
 
   int FXInternal::getNumInputNonzeros() const{
