@@ -168,8 +168,8 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /// Reset the sparsity propagation
   virtual void spInit(bool fwd);
   
-  /// Get jacobian of all nonzero outputs with respect to all nonzero inputs
-  //  virtual FX getFullJacobian();
+  /** \brief Return Jacobian of all input elements with respect to all output elements */
+  virtual FX getFullJacobian();
 
   /// With just-in-time compilation
   bool just_in_time_;

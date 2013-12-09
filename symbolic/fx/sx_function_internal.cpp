@@ -1014,36 +1014,29 @@ namespace CasADi{
     }
   }
 
-  // FX SXFunctionInternal::getFullJacobian(){
-  //   // Get the nonzeros of each input
-  //   vector<SXMatrix> argv = inputv_;
-  //   for(int ind=0; ind<argv.size(); ++ind){
-  //     if(argv[ind].size2()!=1 || !argv[ind].dense()){
-  //       argv[ind] = argv[ind][Slice()];
-  //     }
-  //   }
+  FX SXFunctionInternal::getFullJacobian(){
+    // Get all the inputs
+    SXMatrix arg(0,1); 
+    for(vector<SXMatrix>::const_iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
+      arg.append(flatten(*i));
+    }
+ 
+    // Get all the outputs
+    SXMatrix res(0,1); 
+    for(vector<SXMatrix>::const_iterator i=outputv_.begin(); i!=outputv_.end(); ++i){
+      res.append(flatten(*i));
+    }
+    
+    // Generate an expression for the Jacobian
+    SXMatrix J = CasADi::jacobian(res,arg);
+   
+    // Generate a function for the full Jacobian
+    vector<SXMatrix> ret_res(1,J);
+    ret_res.insert(ret_res.end(),outputv_.begin(),outputv_.end());
+    SXFunction ret(inputv_,ret_res);
+    return ret;
+  }
 
-  //   // Concatenate to get all output nonzeros
-  //   SXMatrix arg = vertcat(argv);
-  //   casadi_assert(arg.size() == getNumInputNonzeros());
-
-  //   // Get the nonzeros of each output
-  //   vector<SXMatrix> resv = outputv_;
-  //   for(int ind=0; ind<resv.size(); ++ind){
-  //     if(resv[ind].size2()!=1 || !resv[ind].dense()){
-  //       resv[ind] = resv[ind][Slice()];
-  //     }
-  //   }
-
-  //   // Concatenate to get all output nonzeros
-  //   SXMatrix res = vertcat(resv);
-  //   casadi_assert(res.size() == getNumOutputNonzeros());
-
-  //   // Form function of all inputs nonzeros to all output nonzeros and return Jacobian of this
-  //   FX f = SXFunction(arg,res);
-  //   f.init();
-  //   return f.jacobian(0,0,false,false);
-  // }
 
 #ifdef WITH_OPENCL
 
