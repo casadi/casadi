@@ -830,6 +830,15 @@ class FXtests(casadiTestCase):
     foo.setOption("verbose",True)
     foo.init()
 
+    # Jacobian for derivative information
+    def dummy_jac(f):
+      f.setOutput(1,1)
+
+    foo_jac = CustomFunction(dummy_jac, [x.sparsity()], [sp_sparse(1,1),sp_dense(1,1)] )
+    foo_jac.setOption("name","foo_jac")
+    foo_jac.init()
+    foo.setFullJacobian(foo_jac)
+
     y = x**2
 
     y = y.attachAssert(foo.call([x])[0],"P is not positive definite")
@@ -847,6 +856,7 @@ class FXtests(casadiTestCase):
     print J
 
     self.assertFalse("derivative" in str(J))
+
 
     J = f.jacobian()
     J.init()
