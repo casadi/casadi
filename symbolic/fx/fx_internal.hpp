@@ -145,7 +145,7 @@ namespace CasADi{
     //@}
     
     //@{
-    /** \brief Return Jacobian of all input nonzeros with respect to all output nonzeros */
+    /** \brief Return Jacobian of all input elements with respect to all output elements */
     FX fullJacobian();
     virtual FX getFullJacobian();
     //@}

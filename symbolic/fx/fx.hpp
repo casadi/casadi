@@ -209,7 +209,7 @@ namespace CasADi{
     FX hessian(const std::string& iname, const std::string& oname) { return hessian(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
 
-    /** \brief Generate a Jacobian function of all the scalar inputs with respect to all the scalar output).
+    /** \brief Generate a Jacobian function of all the inputs elements with respect to all the output elements).
      */
     FX fullJacobian();
 

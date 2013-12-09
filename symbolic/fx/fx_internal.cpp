@@ -1716,43 +1716,95 @@ namespace CasADi{
   }
 
   FX FXInternal::getFullJacobian(){
-    // TODO: Rewrite using vertsplit, #908
+    // Symbolic inputs and outputs of the full Jacobian function under construction
+    vector<MX> jac_argv = symbolicInput(), jac_resv;
 
-    // Count the total number of inputs and outputs
-    int num_in_scalar = getNumInputNonzeros();
-    int num_out_scalar = getNumOutputNonzeros();
+    // Symbolic inputs and outputs of the SISO function formed for generating the Jacobian
+    MX arg, res;
 
-    // Generate a function from all input nonzeros to all output nonzeros
-    MX arg = msym("arg",num_in_scalar);
-    
-    // Assemble vector inputs
-    int nz_offset = 0; // Current nonzero offset
-    vector<MX> argv(getNumInputs());
-    for(int ind=0; ind<argv.size(); ++ind){
-      const CRSSparsity& sp = input(ind).sparsity();
-      argv[ind] = reshape(arg[Slice(nz_offset,nz_offset+sp.size())],sp);
-      nz_offset += sp.size();
-    }
-    casadi_assert(nz_offset == num_in_scalar);
+    // Arguments and results when calling "this" with the SISO inputs
+    vector<MX> argv, resv;
 
-    // Call function to get vector outputs
-    vector<MX> resv = shared_from_this<FX>().call(argv);
+    // Check if the function is already single input
+    if(getNumInputs()==1){
+      // Reuse the same symbolic primitives
+      argv = jac_argv;
+      arg = argv.front();
+      resv = symbolicOutput(argv);
+    } else {
+      // Need to create a new symbolic primitive
 
-    // Get the nonzeros of each output
-    for(int ind=0; ind<resv.size(); ++ind){
-      if(resv[ind].size2()!=1 || !resv[ind].dense()){
-        resv[ind] = resv[ind][Slice()];
+      // Sparsity pattern for the symbolic input
+      CRSSparsity sp_arg(0,1);
+
+      // Append the sparsity patterns, keep track of row offsets
+      vector<int> row_offset(1,0);
+      for(int i=0; i<getNumInputs(); ++i){
+        sp_arg.append(input(i).sparsity().reshape(input(i).numel(),1));
+        row_offset.push_back(sp_arg.numel());
       }
+      
+      // Create symbolic primitive
+      arg = msym("x",sp_arg);
+
+      // Split up and fix shape
+      argv = vertsplit(arg,row_offset);
+      for(int i=0; i<getNumInputs(); ++i){
+        argv[i] = reshape(argv[i],input(i).sparsity());
+      }
+      
+      // Evaluate symbolically
+      resv = shared_from_this<FX>().call(argv);
     }
 
-    // Concatenate to get all output nonzeros
-    MX res = vertcat(resv);
-    casadi_assert(res.size() == num_out_scalar);
-
-    // Form function of all inputs nonzeros to all output nonzeros and return Jacobian of this
-    FX f = MXFunction(arg,res);
+    // Check if the function is already single output
+    if(getNumOutputs()==1){
+      // Reuse the same output
+      res = resv.front();
+    } else {
+      // Concatenate the outputs
+      vector<MX> tmp = resv;
+      for(vector<MX>::iterator i=tmp.begin(); i!=tmp.end(); ++i){
+        *i = reshape(*i,i->numel(),1);
+      }
+      res = vertcat(tmp);
+    }
+    
+    // Create a SISO function
+    MXFunction f(arg,res);
     f.init();
-    return f.jacobian(0,0,false,false);
+
+    // Form an expression for the full Jacobian
+    MX J = f.jac();
+    
+    // Append to list of outputs
+    resv.insert(resv.begin(),J);
+
+    // Wrap in an MXFunction to get the correct input, if necessary
+    if(getNumInputs()==1){
+      // No need to wrap
+      jac_resv = resv;
+    } else {
+      // Form a SIMO function
+      MXFunction J_simo(arg,resv);
+      J_simo.setOption("name","J_simo");
+      J_simo.init();
+
+      // The inputs of J_simo in terms of jac_argv
+      vector<MX> tmp = jac_argv;
+      for(vector<MX>::iterator i=tmp.begin(); i!=tmp.end(); ++i){
+        *i = reshape(*i,i->numel(),1);
+      }
+      MX J_simo_arg = vertcat(tmp);
+
+      // Evaluate symbolically
+      jac_resv = J_simo.call(J_simo_arg);
+    }
+
+    // We are now ready to form the full Jacobian
+    MXFunction ret(jac_argv,jac_resv);
+    return ret;
+
   }
     
   void FXInternal::generateCode(const string& src_name){
