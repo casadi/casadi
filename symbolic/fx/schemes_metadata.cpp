@@ -26,9 +26,6 @@
 namespace CasADi{
 std::string getSchemeName(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_ACADO_Input: return "ACADO_Input";
-    case SCHEME_ACADO_Output: return "ACADO_Output";
-    case SCHEME_ACADO_FCN_Input: return "ACADO_FCN_Input";
     case SCHEME_ControlledDAEInput: return "ControlledDAEInput";
     case SCHEME_ControlSimulatorInput: return "ControlSimulatorInput";
     case SCHEME_DAEInput: return "DAEInput";
@@ -75,9 +72,6 @@ std::string getSchemeName(InputOutputScheme scheme) {
 }
 std::string getSchemeEntryNames(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_ACADO_Input: return "x_guess, u_guess, p_guess, lbx, ubx, lbx0, ubx0, lbxf, ubxf, lbu, ubu, lbp, ubp, lbc, ubc, lbr, ubr";
-    case SCHEME_ACADO_Output: return "x_opt, u_opt, p_opt, cost";
-    case SCHEME_ACADO_FCN_Input: return "t, xd, xa, u, p, xdot";
     case SCHEME_ControlledDAEInput: return "t, x, z, p, u, u_interp, x_major, t0, tf";
     case SCHEME_ControlSimulatorInput: return "x0, p, u";
     case SCHEME_DAEInput: return "x, z, p, t";
@@ -124,39 +118,6 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
 }
 std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_ACADO_Input: 
-      if(i==0) return "x_guess";
-      if(i==1) return "u_guess";
-      if(i==2) return "p_guess";
-      if(i==3) return "lbx";
-      if(i==4) return "ubx";
-      if(i==5) return "lbx0";
-      if(i==6) return "ubx0";
-      if(i==7) return "lbxf";
-      if(i==8) return "ubxf";
-      if(i==9) return "lbu";
-      if(i==10) return "ubu";
-      if(i==11) return "lbp";
-      if(i==12) return "ubp";
-      if(i==13) return "lbc";
-      if(i==14) return "ubc";
-      if(i==15) return "lbr";
-      if(i==16) return "ubr";
-      break;
-    case SCHEME_ACADO_Output: 
-      if(i==0) return "x_opt";
-      if(i==1) return "u_opt";
-      if(i==2) return "p_opt";
-      if(i==3) return "cost";
-      break;
-    case SCHEME_ACADO_FCN_Input: 
-      if(i==0) return "t";
-      if(i==1) return "xd";
-      if(i==2) return "xa";
-      if(i==3) return "u";
-      if(i==4) return "p";
-      if(i==5) return "xdot";
-      break;
     case SCHEME_ControlledDAEInput: 
       if(i==0) return "t";
       if(i==1) return "x";
@@ -454,39 +415,6 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_ACADO_Input: 
-      if(i==0) return "Initial guess for x (default: 0)";
-      if(i==1) return "Initial guess for u (default: 0)";
-      if(i==2) return "Initial guess for p (default: 0)";
-      if(i==3) return "Lower bound on x (default:  -infinity)";
-      if(i==4) return "Upper bound on x (default:  infinity)";
-      if(i==5) return "Lower bound on x0 (default:  -infinity)";
-      if(i==6) return "Upper bound on x0 (default:  infinity)";
-      if(i==7) return "Lower bound on xf (default:  -infinity)";
-      if(i==8) return "Upper bound on xf (default:  infinity)";
-      if(i==9) return "Lower bound on u (default:  -infinity)";
-      if(i==10) return "Upper bound on u (default:  infinity)";
-      if(i==11) return "Lower bound on p (default:  -infinity)";
-      if(i==12) return "Upper bound on p (default:  infinity)";
-      if(i==13) return "Lower bound on the path constraint function (default:  -infinity)";
-      if(i==14) return "Upper bound on the path constraint function (default:  infinity)";
-      if(i==15) return "Lower bound on the initial constraint function (default:  0)";
-      if(i==16) return "Upper bound on the initial constraint function (default:  0)";
-      break;
-    case SCHEME_ACADO_Output: 
-      if(i==0) return "Optimal states";
-      if(i==1) return "Optimal control inputs";
-      if(i==2) return "Optimal parameters";
-      if(i==3) return "Optimal cost";
-      break;
-    case SCHEME_ACADO_FCN_Input: 
-      if(i==0) return "Time";
-      if(i==1) return "Differential state";
-      if(i==2) return "Algebraic state";
-      if(i==3) return "Control input";
-      if(i==4) return "Parameter";
-      if(i==5) return "Differential state derivative";
-      break;
     case SCHEME_ControlledDAEInput: 
       if(i==0) return "Global physical time. (1-by-1)";
       if(i==1) return "State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES";
@@ -784,39 +712,6 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
 }
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
   switch (scheme) {
-    case SCHEME_ACADO_Input: 
-      if(i==0) return "ACADO_X_GUESS";
-      if(i==1) return "ACADO_U_GUESS";
-      if(i==2) return "ACADO_P_GUESS";
-      if(i==3) return "ACADO_LBX";
-      if(i==4) return "ACADO_UBX";
-      if(i==5) return "ACADO_LBX0";
-      if(i==6) return "ACADO_UBX0";
-      if(i==7) return "ACADO_LBXF";
-      if(i==8) return "ACADO_UBXF";
-      if(i==9) return "ACADO_LBU";
-      if(i==10) return "ACADO_UBU";
-      if(i==11) return "ACADO_LBP";
-      if(i==12) return "ACADO_UBP";
-      if(i==13) return "ACADO_LBC";
-      if(i==14) return "ACADO_UBC";
-      if(i==15) return "ACADO_LBR";
-      if(i==16) return "ACADO_UBR";
-      break;
-    case SCHEME_ACADO_Output: 
-      if(i==0) return "ACADO_X_OPT";
-      if(i==1) return "ACADO_U_OPT";
-      if(i==2) return "ACADO_P_OPT";
-      if(i==3) return "ACADO_COST";
-      break;
-    case SCHEME_ACADO_FCN_Input: 
-      if(i==0) return "ACADO_FCN_T";
-      if(i==1) return "ACADO_FCN_XD";
-      if(i==2) return "ACADO_FCN_XA";
-      if(i==3) return "ACADO_FCN_U";
-      if(i==4) return "ACADO_FCN_P";
-      if(i==5) return "ACADO_FCN_XDOT";
-      break;
     case SCHEME_ControlledDAEInput: 
       if(i==0) return "CONTROL_DAE_T";
       if(i==1) return "CONTROL_DAE_X";
@@ -1114,15 +1009,6 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
 }
 int getSchemeSize(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_ACADO_Input: 
-      return 17;
-      break;
-    case SCHEME_ACADO_Output: 
-      return 4;
-      break;
-    case SCHEME_ACADO_FCN_Input: 
-      return 6;
-      break;
     case SCHEME_ControlledDAEInput: 
       return 9;
       break;
@@ -1253,39 +1139,6 @@ int getSchemeSize(InputOutputScheme scheme) {
 }
 int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
   switch (scheme) {
-    case SCHEME_ACADO_Input: 
-      if(name=="x_guess") return 0;
-      if(name=="u_guess") return 1;
-      if(name=="p_guess") return 2;
-      if(name=="lbx") return 3;
-      if(name=="ubx") return 4;
-      if(name=="lbx0") return 5;
-      if(name=="ubx0") return 6;
-      if(name=="lbxf") return 7;
-      if(name=="ubxf") return 8;
-      if(name=="lbu") return 9;
-      if(name=="ubu") return 10;
-      if(name=="lbp") return 11;
-      if(name=="ubp") return 12;
-      if(name=="lbc") return 13;
-      if(name=="ubc") return 14;
-      if(name=="lbr") return 15;
-      if(name=="ubr") return 16;
-      break;
-    case SCHEME_ACADO_Output: 
-      if(name=="x_opt") return 0;
-      if(name=="u_opt") return 1;
-      if(name=="p_opt") return 2;
-      if(name=="cost") return 3;
-      break;
-    case SCHEME_ACADO_FCN_Input: 
-      if(name=="t") return 0;
-      if(name=="xd") return 1;
-      if(name=="xa") return 2;
-      if(name=="u") return 3;
-      if(name=="p") return 4;
-      if(name=="xdot") return 5;
-      break;
     case SCHEME_ControlledDAEInput: 
       if(name=="t") return 0;
       if(name=="x") return 1;
