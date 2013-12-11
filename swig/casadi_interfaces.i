@@ -42,15 +42,6 @@
 %include "ipopt_interface.i"
 #endif
 
-// ACADO
-#ifdef WITH_ACADO
-%include "acado_interface.i"
-%{
-#include "interfaces/qpoases/qpoases_solver.hpp"
-%}
-%include "interfaces/qpoases/qpoases_solver.hpp"
-#endif
-
 // QPOASES
 #ifdef WITH_QPOASES
 %include "qpoases_interface.i"

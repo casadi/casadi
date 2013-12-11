@@ -68,7 +68,6 @@ endif()
 # Options:
 option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
 option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
-option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 if (WIN32)
  option(WITH_DL "Enable dynamic loading of functions" OFF)
 else (WIN32)
@@ -257,10 +256,6 @@ if(WITH_IPOPT)
   find_package(IPOPT)
 endif()
 add_feature_info(ipopt-interface IPOPT_FOUND "Interface to the NLP solver Ipopt.")
-
-if(WITH_ACADO)
-  find_package(ACADO)
-endif()
 
 if(WITH_KNITRO)
   find_package(KNITRO)
