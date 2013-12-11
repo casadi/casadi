@@ -117,22 +117,6 @@
   print g.output(0), g.output(1), g.output(2)
 \end{verbatim}
 
-\paragraph{Forward sensitivities}
-
-\begin{verbatim}
-  g.fwdSeed(1).set([1] + [0]*19)
-  g.evaluate(1,0)
-  print g.fwdSens(1)
-\end{verbatim}
-
-\paragraph{Adjoint sensitivities}
-
-\begin{verbatim}
-  g.adjSeed(2).set([0,1])
-  g.evaluate(0,1)
-  print g.adjSens(0)
-\end{verbatim}
-
 \paragraph{Caveats in Python}
 \begin{verbatim}
   1/2 # integer division => 0

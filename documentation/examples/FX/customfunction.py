@@ -30,7 +30,7 @@ from casadi import *
 #! We annotate the function with the pyevaluate decorator
 
 @pyevaluate
-def fac(f,nfwd,nadj):
+def fac(f):
   x = f.getInput()[0,0]
   y = 1
   for i in range(x):
@@ -47,7 +47,7 @@ c.init()
 c.setInput(4)
 
 #! Evaluate
-c.evaluate(0,0)
+c.evaluate()
 
 print "4! = ", c.output().toScalar()
 
@@ -62,7 +62,7 @@ f.init()
 
 
 c.setInput(5)
-c.evaluate(0,0)
+c.evaluate()
 
 print "5! = ", c.output().toScalar()
 
@@ -76,16 +76,14 @@ print "5! = ", c.output().toScalar()
 class Dummy:
   def __init__(self,user_data):
     self.userdata = user_data
-  def __call__(self,f,nfwd,nadj):
+  def __call__(self,f):
     print "userdata: " , self.userdata
-    if nfwd>0:
-      print f.getFwdSeed()
   
 c = CustomFunction(Dummy(12345), [sp_dense(3,1)], [sp_dense(3,1)] )
 c.init()
 
 
-c.evaluate(0,0)
+c.evaluate()
 
 #! Of course, since we don't alter f.output, the result is meaningless
 print c.getOutput()
@@ -93,8 +91,8 @@ print c.getOutput()
 #! Providing sensitivities
 #!==============================
 #! 
-#! The arguments nfwd and nadj stand for number of forward derivatives and number of adjoint derivatives respectively.
-#! By default, they will always be zero. Indeed, doing an action that would result in CasADi requesting non-zero nfwd, nadj results in an error:
+#! By default, there is no way to calculate derivatives from a function given as a CustomFunction
+#! Operations requiring derivative information therefore result in an error:
 
 try:
   J = c.jacobian()
@@ -102,79 +100,10 @@ try:
 except Exception as e:
   print e
   
-#! We can provide forward senitivities as follows:
-#! This function calculates (x,y) -> sin(x+3*y)
-
+#! We can provide forward sensitivities by providing the full Jacobian, i.e. the Jacobian of all inputs with respect to all outputs.
 @pyevaluate
-def fun(f,nfwd,nadj):
+def fun(f):
   # sin(x+3*y)
-  print "Called fun with :", (nfwd,nadj)
-  
-  x = f.input(0)
-  y = f.input(1)
-  
-  dx = f.fwdSeed(0)
-  dy = f.fwdSeed(1)
-  
-  z0 = 3*y
-  dz0 = 3*dy
-  
-  z1 = x+z0
-  dz1 = dx+dz0
-  
-  z2 = sin(z1)
-  dz2 = cos(z1)*dz1
-
-  # Backwards sweep
-  bx = 0
-  by = 0
-  bz1 = 0
-  bz0 = 0
-  
-  bz2 = f.adjSeed(0)
-  bz1 += bz2*cos(z1)
-  bx+= bz1;bz0+= bz1
-  by+= 3*bz0
-  f.setAdjSens(bx,0)
-  f.setAdjSens(by,1)
-  
-  f.setOutput(z2)
-  f.setFwdSens(dz2)
-
-c = CustomFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
-c.setOption("max_number_of_fwd_dir",1)
-c.setOption("max_number_of_adj_dir",1)
-c.init()
-
-#! Now this function is capable of delivering numeric sensitivity info.
-#! It can be used to calculate a gradient for example:
-
-J = c.jacobian()
-J.init()
-
-J.setInput(0.3,0)
-J.setInput(0.7,0)
-J.evaluate()
-
-print J.output()
-      
-#! Forcing reverse mode:
-c.setOption("ad_mode","reverse")
-c.init()
-J = c.jacobian()
-J.init()
-J.setInput(0.3,0)
-J.setInput(0.7,0)
-J.evaluate()
-
-print J.getOutput()
-
-#! We can also provide a function that returns the jacobian, instead of specifying the seeds
-
-@pyevaluate
-def fun(f,nfwd,nadj):
-  # sin(x+3*y)
-  print "Called fun with :", (nfwd,nadj)
   
   x = f.input(0)
   y = f.input(1)
@@ -185,27 +114,27 @@ def fun(f,nfwd,nadj):
 
   f.setOutput(z2)
 
-@jacobiangenerator
-def funjac(f,iind,oind):
-  # sin(x+3*y)
-  print "Called jacobian with :", (iind,oind)
-  
-  x = ssym("x")
-  y = ssym("y")
-  
-  if iind == 0:
-    J = cos(x+3*y)
-  elif iind==1:
-    J = 3*cos(x+3*y)
-    
-  f = SXFunction([x,y],[J])
-  f.init()
-  
-  return f
-  
-c = CustomFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
-c.setOption("jacobian_generator",funjac)
+c = CustomFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)])
 c.init()
+
+def funjac(f):
+  x = f.input(0)
+  y = f.input(1)
+
+  # First output, the full Jacobian
+  J = horzcat((cos(x+3*y),3*cos(x+3*y)))
+  f.setOutput(J,0)
+
+  # Remaining outputs, the original function outputs
+  z0 = 3*y
+  z1 = x+z0
+  z2 = sin(z1)
+
+  f.setOutput(z2,1)
+
+jc = CustomFunction(funjac, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,2),sp_dense(1,1)])
+jc.init()
+c.setFullJacobian(jc)
 
 J = c.jacobian()
 J.init()
