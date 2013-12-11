@@ -26,14 +26,6 @@
 #include "sx_function.hpp"
 #include "x_function_internal.hpp"
 
-#ifdef WITH_LLVM
-// Some forward declarations
-namespace llvm{
-  class Module;
-  class Function;
-} // namespace llvm
-#endif // WITH_LLVM
-
 #ifdef WITH_OPENCL
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -171,28 +163,11 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /** \brief Return Jacobian of all input elements with respect to all output elements */
   virtual FX getFullJacobian();
 
-  /// With just-in-time compilation
-  bool just_in_time_;
-
   /// With just-in-time compilation using OpenCL
   bool just_in_time_opencl_;
 
   /// With just-in-time compilation for the sparsity propagation
   bool just_in_time_sparsity_;
-  
-#ifdef WITH_LLVM
-  llvm::Module *jit_module_;
-  llvm::Function *jit_function_;
-
-  // Function pointer type to the JIT evaluate function
-  typedef void (*evaluateFcn)(double**,double**);
-  
-  // JIT function
-  evaluateFcn jitfcn_;
-
-  // References to input and output nonzeros
-  std::vector<double*> input_ref_, output_ref_;
-#endif // WITH_LLVM
   
 #ifdef WITH_OPENCL
   // Initialize sparsity propagation using OpenCL

@@ -36,22 +36,6 @@
 #include "../profiling.hpp"
 #include "../casadi_options.hpp"
 
-#ifdef WITH_LLVM
-#include "llvm/DerivedTypes.h"
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
-#include "llvm/ExecutionEngine/JIT.h"
-#include "llvm/LLVMContext.h"
-#include "llvm/Module.h"
-#include "llvm/PassManager.h"
-#include "llvm/Analysis/Verifier.h"
-#include "llvm/Target/TargetData.h"
-#include "llvm/Support/TargetSelect.h"
-#include "llvm/Transforms/Scalar.h"
-#include "llvm/Support/IRBuilder.h"
-
-llvm::IRBuilder<> builder(llvm::getGlobalContext());
-#endif // WITH_LLVM
-
 namespace CasADi{
 
   using namespace std;
@@ -60,7 +44,6 @@ namespace CasADi{
   SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const vector<SXMatrix >& outputv) : 
     XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>(inputv,outputv) {
     setOption("name","unnamed_sx_function");
-    addOption("just_in_time", OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation (experimental)");
     addOption("just_in_time_sparsity", OT_BOOLEAN,false,"Propagate sparsity patterns using just-in-time compilation to a CPU or GPU using OpenCL");
     addOption("just_in_time_opencl", OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation using OpenCL (experimental)");
 
@@ -129,14 +112,6 @@ namespace CasADi{
       repr(ss);
       casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
     }
-  
-#ifdef WITH_LLVM
-    if(just_in_time_){
-      // Evaluate the jitted function
-      jitfcn_(getPtr(input_ref_),getPtr(output_ref_));
-      return;
-    }
-#endif // WITH_LLVM
   
 #ifdef WITH_OPENCL
     if(just_in_time_opencl_){
@@ -217,14 +192,6 @@ namespace CasADi{
       return;
     }
  
-    // If JIT, dump LLVM IR
-#ifdef WITH_LLVM
-    if(just_in_time_){
-      jit_module_->dump();
-      return;
-    }
-#endif // WITH_LLVM
-  
     // Iterator to free variables
     vector<SX>::const_iterator p_it = free_vars_.begin();
   
@@ -550,201 +517,6 @@ namespace CasADi{
       }
     }
   
-    // Initialize just-in-time compilation
-    just_in_time_ = getOption("just_in_time");
-    if(just_in_time_){
-    
-      // Make sure that there are no parameters
-      if (!free_vars_.empty()) {
-        std::stringstream ss;
-        repr(ss);
-        casadi_error("Cannot just-in-time compile \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
-      }
-    
-#ifdef WITH_LLVM
-      llvm::InitializeNativeTarget();
-
-      // Function name
-      stringstream ss;
-      ss << "SXFunction: " << this;
-    
-      // Make the module, which holds all the code.
-      jit_module_ = new llvm::Module(ss.str(), llvm::getGlobalContext());
-
-      // Create the JIT.  This takes ownership of the module.
-      std::string ErrStr;
-      llvm::ExecutionEngine *TheExecutionEngine = llvm::EngineBuilder(jit_module_).setErrorStr(&ErrStr).create();
-      casadi_assert(TheExecutionEngine!=0);
-      llvm::FunctionPassManager OurFPM(jit_module_);
-
-      // Set up the optimizer pipeline.  Start with registering info about how the
-      // target lays out data structures.
-      OurFPM.add(new llvm::TargetData(*TheExecutionEngine->getTargetData()));
-    
-      // Do simple "peephole" optimizations and bit-twiddling optzns.
-      OurFPM.add(llvm::createInstructionCombiningPass());
-    
-      // Reassociate expressions.
-      OurFPM.add(llvm::createReassociatePass());
-    
-      // Eliminate Common SubExpressions.
-      OurFPM.add(llvm::createGVNPass());
-    
-      // Simplify the control flow graph (deleting unreachable blocks, etc).
-      OurFPM.add(llvm::createCFGSimplificationPass());
-      OurFPM.doInitialization();
-
-      // Single argument
-      vector<llvm::Type*> unaryArg(1,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
-
-      // Two arguments
-      vector<llvm::Type*> binaryArg(2,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
-    
-      // Unary operation
-      llvm::FunctionType *unaryFun = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm::getGlobalContext()),unaryArg, false);
-
-      // Binary operation
-      llvm::FunctionType *binaryFun = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm::getGlobalContext()),binaryArg, false);
-
-      // Declare all the CasADi built-in functions
-      vector<llvm::Function*> builtins(NUM_BUILT_IN_OPS,0);
-      builtins[OP_POW] = builtins[OP_CONSTPOW] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "pow", jit_module_);
-      builtins[OP_SQRT] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sqrt", jit_module_);
-      builtins[OP_SIN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sin", jit_module_);
-      builtins[OP_COS] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "cos", jit_module_);
-      builtins[OP_TAN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tan", jit_module_);
-      builtins[OP_ASIN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "asin", jit_module_);
-      builtins[OP_ACOS] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "acos", jit_module_);
-      builtins[OP_ATAN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "atan", jit_module_);
-      builtins[OP_FLOOR] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "floor", jit_module_);
-      builtins[OP_CEIL] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "ceil", jit_module_);
-      builtins[OP_FMIN] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "fmin", jit_module_);
-      builtins[OP_FMAX] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "fmax", jit_module_);
-      builtins[OP_SINH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sinh", jit_module_);
-      builtins[OP_COSH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "cosh", jit_module_);
-      builtins[OP_TANH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tanh", jit_module_);
-      builtins[OP_ASINH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "asinh", jit_module_);
-      builtins[OP_ACOSH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "acosh", jit_module_);
-      builtins[OP_ATANH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "atanh", jit_module_);
-
-      // Void type
-      llvm::Type* void_t = llvm::Type::getVoidTy(llvm::getGlobalContext());
-
-      // Double type
-      llvm::Type* double_t = llvm::Type::getDoubleTy(llvm::getGlobalContext());
-    
-      // Double pointer type
-      llvm::Type* double_ptr_t = llvm::Type::getDoublePtrTy(llvm::getGlobalContext());
-
-      // Double pointer pointer type
-      llvm::Type* double_ptr_ptr_t = llvm::PointerType::getUnqual(double_ptr_t);
-
-      // A normal 32-bit integer
-      llvm::IntegerType *int32Ty = llvm::IntegerType::get(llvm::getGlobalContext(), 32);
-    
-      // Two arguments in and two references
-      vector<llvm::Type*> genArg(2);
-      genArg[0] = double_ptr_ptr_t;
-      genArg[1] = double_ptr_ptr_t;
-    
-      // More generic operation, return by reference
-      llvm::FunctionType *genFun = llvm::FunctionType::get(void_t,genArg, false);
-
-      // Declare my function
-      jit_function_ = llvm::Function::Create(genFun, llvm::Function::ExternalLinkage, ss.str(), jit_module_);
-
-      // Create a new basic block to start insertion into.
-      llvm::BasicBlock *BB = llvm::BasicBlock::Create(llvm::getGlobalContext(), "entry", jit_function_);
-      builder.SetInsertPoint(BB);
-
-      // Set names for all arguments.
-      llvm::Function::arg_iterator AI = jit_function_->arg_begin();
-      AI->setName("x");  llvm::Value *x_ptr = AI++;
-      AI->setName("r");  llvm::Value *r_ptr = AI++;
-
-      // Allocate work vector
-      vector<llvm::Value*> jwork(work_.size());
-
-      // Input vectors
-      vector<llvm::Value*> input_v(getNumInputs());
-      for(int ind=0; ind<input_v.size(); ++ind){
-        llvm::Value *ind_v = llvm::ConstantInt::get(int32Ty, ind);
-        input_v[ind] = builder.CreateLoad(builder.CreateGEP(x_ptr,ind_v));
-      }
-    
-      // Output vectors
-      vector<llvm::Value*> output_v(getNumOutputs());
-      for(int ind=0; ind<output_v.size(); ++ind){
-        llvm::Value *ind_v = llvm::ConstantInt::get(int32Ty, ind);
-        output_v[ind] = builder.CreateLoad(builder.CreateGEP(r_ptr,ind_v));
-      }
-        
-      // Build up the LLVM expression graphs
-      for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-        // Argument of the operation
-        vector<llvm::Value*> oarg(casadi_math<double>::ndeps(it->op));
-        for(int d=0; d<oarg.size(); ++d){
-          oarg[d] = jwork[d==0 ? it->i1 : it->i2];
-        }
-      
-        if(it->op==OP_INPUT){
-          llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, it->i2);
-          jwork[it->i0] = builder.CreateLoad(builder.CreateGEP(input_v[it->i1],k_v));
-        } else if(it->op==OP_OUTPUT){
-          llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, it->i2);
-          builder.CreateStore(oarg[0],builder.CreateGEP(output_v[it->i0],k_v));
-        } else {
-          // Result
-          llvm::Value* res = 0;
-        
-          switch(it->op){
-          case OP_ADD:         res = builder.CreateFAdd(oarg[0],oarg[1]); break;
-          case OP_SUB:         res = builder.CreateFSub(oarg[0],oarg[1]); break;
-          case OP_MUL:         res = builder.CreateFMul(oarg[0],oarg[1]); break;
-          case OP_DIV:         res = builder.CreateFDiv(oarg[0],oarg[1]); break;
-          case OP_NEG:         res = builder.CreateFNeg(oarg[0]);         break;
-          case OP_CONST:
-            res = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(it->d));
-            break;
-          default:
-            casadi_assert_message(builtins[it->op]!=0, "No way to treat: " << it->op);
-            res = builder.CreateCall(builtins[it->op], oarg);
-          }
-        
-          // Save to work vector
-          jwork[it->i0] = res;
-        }
-      }
-    
-      // Finish off the function.
-      builder.CreateRetVoid();
-
-      // Validate the generated code, checking for consistency.
-      verifyFunction(*jit_function_);
-
-      // Optimize the function.
-      OurFPM.run(*jit_function_);
-
-      // JIT the function
-      jitfcn_ = evaluateFcn(intptr_t(TheExecutionEngine->getPointerToFunction(jit_function_)));
-
-      // Allocate references to input nonzeros
-      input_ref_.resize(getNumInputs());
-      for(int ind=0; ind<input_ref_.size(); ++ind){
-        input_ref_[ind] = getPtr(input(ind).data());
-      }
-        
-      // Allocate references to output nonzeros
-      output_ref_.resize(getNumOutputs());
-      for(int ind=0; ind<output_ref_.size(); ++ind){
-        output_ref_[ind] = getPtr(output(ind).data());
-      }
-    
-#else // WITH_LLVM
-      casadi_error("Option \"just_in_time\" true requires CasADi to have been compiled with WITH_LLVM=ON");
-#endif //WITH_LLVM
-    }
-
     // Initialize just-in-time compilation for numeric evaluation using OpenCL
     just_in_time_opencl_ = getOption("just_in_time_opencl");
     if(just_in_time_opencl_){
