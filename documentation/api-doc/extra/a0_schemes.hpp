@@ -67,29 +67,6 @@
 <tr><td>NLP_SOLVER_LAM_P</td><td>lam_p</td><td>Lagrange multipliers for bounds on P at the solution (np x 1) .</td></tr>
 </table>
 */
-/** \defgroup scheme_ACADO_Input
-<a name='schemes'></a><table>
-<caption>Input scheme: CasADi::ACADO_Input  (ACADO_NUM_IN = 18) [acadoIn]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>ACADO_X_GUESS</td><td>x_guess</td><td>Initial guess for x (default: 0) .</td></tr>
-<tr><td>ACADO_U_GUESS</td><td>u_guess</td><td>Initial guess for u (default: 0) .</td></tr>
-<tr><td>ACADO_P_GUESS</td><td>p_guess</td><td>Initial guess for p (default: 0) .</td></tr>
-<tr><td>ACADO_LBX</td><td>lbx</td><td>Lower bound on x (default: -infinity) .</td></tr>
-<tr><td>ACADO_UBX</td><td>ubx</td><td>Upper bound on x (default: infinity) .</td></tr>
-<tr><td>ACADO_LBX0</td><td>lbx0</td><td>Lower bound on x0 (default: -infinity) .</td></tr>
-<tr><td>ACADO_UBX0</td><td>ubx0</td><td>Upper bound on x0 (default: infinity) .</td></tr>
-<tr><td>ACADO_LBXF</td><td>lbxf</td><td>Lower bound on xf (default: -infinity) .</td></tr>
-<tr><td>ACADO_UBXF</td><td>ubxf</td><td>Upper bound on xf (default: infinity) .</td></tr>
-<tr><td>ACADO_LBU</td><td>lbu</td><td>Lower bound on u (default: -infinity) .</td></tr>
-<tr><td>ACADO_UBU</td><td>ubu</td><td>Upper bound on u (default: infinity) .</td></tr>
-<tr><td>ACADO_LBP</td><td>lbp</td><td>Lower bound on p (default: -infinity) .</td></tr>
-<tr><td>ACADO_UBP</td><td>ubp</td><td>Upper bound on p (default: infinity) .</td></tr>
-<tr><td>ACADO_LBC</td><td>lbc</td><td>Lower bound on the path constraint function (default: -infinity) .</td></tr>
-<tr><td>ACADO_UBC</td><td>ubc</td><td>Upper bound on the path constraint function (default: infinity) .</td></tr>
-<tr><td>ACADO_LBR</td><td>lbr</td><td>Lower bound on the initial constraint function (default: 0) .</td></tr>
-<tr><td>ACADO_UBR</td><td>ubr</td><td>Upper bound on the initial constraint function (default: 0) .</td></tr>
-</table>
-*/
 /** \defgroup scheme_SDPInput
 <a name='schemes'></a><table>
 <caption>Input scheme: CasADi::SDPInput  (SDP_SOLVER_NUM_IN = 9) [sdpIn]</caption>
@@ -116,18 +93,6 @@
 <tr><td>LP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
 </table>
 */
-/** \defgroup scheme_ACADO_FCN_Input
-<a name='schemes'></a><table>
-<caption>Input scheme: CasADi::ACADO_FCN_Input  (ACADO_FCN_NUM_IN = 7) [acadofcnIn]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>ACADO_FCN_T</td><td>t</td><td>Time .</td></tr>
-<tr><td>ACADO_FCN_XD</td><td>xd</td><td>Differential state .</td></tr>
-<tr><td>ACADO_FCN_XA</td><td>xa</td><td>Algebraic state .</td></tr>
-<tr><td>ACADO_FCN_U</td><td>u</td><td>Control input .</td></tr>
-<tr><td>ACADO_FCN_P</td><td>p</td><td>Parameter .</td></tr>
-<tr><td>ACADO_FCN_XDOT</td><td>xdot</td><td>Differential state derivative .</td></tr>
-</table>
-*/
 /** \defgroup scheme_RDAEInput
 <a name='schemes'></a><table>
 <caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 8) [rdaeIn]</caption>
@@ -139,12 +104,6 @@
 <tr><td>RDAE_Z</td><td>z</td><td>Forward algebraic state .</td></tr>
 <tr><td>RDAE_P</td><td>p</td><td>Parameter vector .</td></tr>
 <tr><td>RDAE_T</td><td>t</td><td>Explicit time dependence .</td></tr>
-</table>
-*/
-/** \defgroup scheme_MUSCOD_FCN_Output
-<a name='schemes'></a><table>
-<caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 3) []</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
 /** \defgroup scheme_NLPOutput
@@ -208,16 +167,6 @@
 <tr><td>DAE_T</td><td>t</td><td>Explicit time dependence .</td></tr>
 </table>
 */
-/** \defgroup scheme_ACADO_Output
-<a name='schemes'></a><table>
-<caption>Output scheme: CasADi::ACADO_Output  (ACADO_NUM_OUT = 5) [acadoOut]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>ACADO_X_OPT</td><td>x_opt</td><td>Optimal states .</td></tr>
-<tr><td>ACADO_U_OPT</td><td>u_opt</td><td>Optimal control inputs .</td></tr>
-<tr><td>ACADO_P_OPT</td><td>p_opt</td><td>Optimal parameters .</td></tr>
-<tr><td>ACADO_COST</td><td>cost</td><td>Optimal cost .</td></tr>
-</table>
-*/
 /** \defgroup scheme_DAEOutput
 <a name='schemes'></a><table>
 <caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 4) [daeOut]</caption>
@@ -229,13 +178,13 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Input scheme: CasADi::InputOutputScheme  ( = 45) []</caption>
+<caption>Input scheme: CasADi::InputOutputScheme  ( = 42) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
-<caption>Output scheme: CasADi::InputOutputScheme  ( = 45) []</caption>
+<caption>Output scheme: CasADi::InputOutputScheme  ( = 42) []</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
@@ -459,12 +408,6 @@
 <tr><td>HESSLAG_LAM_G</td><td>lam_g</td><td>Multiplier for g .</td></tr>
 </table>
 */
-/** \defgroup scheme_MUSCOD_FCN_Input
-<a name='schemes'></a><table>
-<caption>Input scheme: CasADi::MUSCOD_FCN_Input  (MUSCOD_FCN_NUM_IN = 6) []</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-</table>
-*/
 /** \defgroup scheme_QPSolverOutput
 <a name='schemes'></a><table>
 <caption>Output scheme: CasADi::QPSolverOutput  (QP_SOLVER_NUM_OUT = 5) [qpOut]</caption>
@@ -526,6 +469,20 @@
 \n
 \par
 @copydoc scheme_IntegratorInput
+*/
+/** \class CasADi::CollocationIntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::CollocationIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
 */
 /** \class CasADi::SDPSDQPInternal
 \n
@@ -737,20 +694,6 @@
 <br/>
 @copydoc scheme_NLPSolverOutput
 */
-/** \class CasADi::AcadoIntegratorInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::AcadoIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
 /** \class CasADi::QCQPSolverInternal
 \n
 \par
@@ -764,6 +707,20 @@
 @copydoc scheme_QCQPSolverInput
 <br/>
 @copydoc scheme_QCQPSolverOutput
+*/
+/** \class CasADi::SOCPSolverInternal
+\n
+\par
+@copydoc scheme_SOCPInput
+<br/>
+@copydoc scheme_SOCPOutput
+*/
+/** \class CasADi::SOCPSolver
+\n
+\par
+@copydoc scheme_SOCPInput
+<br/>
+@copydoc scheme_SOCPOutput
 */
 /** \class CasADi::CSparseCholeskyInternal
 \n
@@ -820,20 +777,6 @@
 @copydoc scheme_LPSolverInput
 <br/>
 @copydoc scheme_LPSolverOutput
-*/
-/** \class CasADi::CollocationIntegratorInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::CollocationIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
 */
 /** \class CasADi::GenericIntegratorInternal
 \n
@@ -932,20 +875,6 @@
 @copydoc scheme_LinsolInput
 <br/>
 @copydoc scheme_LinsolOutput
-*/
-/** \class CasADi::SOCPSolverInternal
-\n
-\par
-@copydoc scheme_SOCPInput
-<br/>
-@copydoc scheme_SOCPOutput
-*/
-/** \class CasADi::SOCPSolver
-\n
-\par
-@copydoc scheme_SOCPInput
-<br/>
-@copydoc scheme_SOCPOutput
 */
 /** \class CasADi::SDQPSolverInternal
 \n
