@@ -62,8 +62,8 @@ namespace CasADi{
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
-    
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
+
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_SOLVE;}
 
@@ -75,6 +75,9 @@ namespace CasADi{
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+
+    /// Get number of temporary variables needed
+    virtual void nTmp(size_t& ni, size_t& nr){ ni=0; nr=sparsity().size2();}
 
     /// Linear Solver (may be shared between multiple nodes)
     LinearSolver linear_solver_;
