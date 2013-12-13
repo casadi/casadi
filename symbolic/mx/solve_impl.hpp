@@ -226,18 +226,17 @@ namespace CasADi{
 
     if(fwd){
     
+      // For all right-hand-sides
+      for(int r=0; r<nrhs; ++r){ 
 
-      // Add A_hat contribution to B_hat
-      for(int r=0; r<nrhs; ++r){ // For all right-hand-sides
-
-        // Copy to a temporary vector
+        // Copy B_ptr to a temporary vector and clear X_ptr (NOTE: normally, B_ptr == X_ptr)
         copy(B_ptr,B_ptr+n,tmp_ptr);
+        std::fill(X_ptr,X_ptr+n,0);
 
+        // Add A_hat contribution to tmp
         for(int i=0; i<n; ++i){ // Loop over the rows of A
           for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
             int j = A_col[k]; // get the column
-            
-            // Add contribution to B_hat
             if(Tr){
               tmp_ptr[i] |= A_ptr[k];
             } else {
@@ -245,16 +244,11 @@ namespace CasADi{
             }
           }
         }
-        
-        // Clear the result
-        std::fill(X_ptr,X_ptr+n,0);
-        
-        // Propagate right-hand-side dependency
+                
+        // Propagate dependencies to X_hat
         for(int i=0; i<n; ++i){ // Loop over the rows of A
           for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
-            int j = A_col[k]; // get the column
-            
-            // Add contribution to X_hat
+            int j = A_col[k]; // get the column            
             if(Tr){
               X_ptr[i] |= tmp_ptr[j];
             } else {
@@ -263,19 +257,13 @@ namespace CasADi{
           }
         }
         
-        // Propagate interdependencies
+        // Propagate interdependencies in X_hat
         std::fill(tmp_ptr,tmp_ptr+n,0);
         for(int iter=0; iter<n; ++iter){ // n represents the worst case
-
-          // Check if there is any change at all in this iteration
-          bool no_change = true;
-          
-          // Propagate interdependencies
+          bool no_change = true; // is there any change at all in this iteration
           for(int i=0; i<n; ++i){ // Loop over the rows of A
             for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
               int j = A_col[k]; // get the column
-              
-              // Add contribution to X_hat
               if(Tr){
                 no_change &= X_ptr[i] == tmp_ptr[i];
                 X_ptr[i] |= tmp_ptr[i];
@@ -288,7 +276,7 @@ namespace CasADi{
             }
           }
 
-          // Done if nothing changes
+          // Stop iterating if reached a steady state
           if(no_change) break;
         }
 
