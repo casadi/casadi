@@ -184,9 +184,18 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
     const DenseVector* dy_c = static_cast<const DenseVector*>(&y_c);
     const Number* values = dy_c->Values();
     Index n_c_no_fixed = y_c.Dim() - tnlp_adapter->n_x_fixed_;
-    for (Index i=0; i<tnlp_adapter->n_x_fixed_; i++) {
-      z_L_[tnlp_adapter->x_fixed_map_[i]] = Max(0., -values[n_c_no_fixed+i]);
-      z_U_[tnlp_adapter->x_fixed_map_[i]] = Max(0., values[n_c_no_fixed+i]);
+    if (!dy_c->IsHomogeneous()) {
+      const Number* values = dy_c->Values();
+      for (Index i=0; i<tnlp_adapter->n_x_fixed_; i++) {
+        z_L_[tnlp_adapter->x_fixed_map_[i]] = Max(0., -values[n_c_no_fixed+i]);
+        z_U_[tnlp_adapter->x_fixed_map_[i]] = Max(0., values[n_c_no_fixed+i]);
+      }
+    } else {
+      double value = dy_c->Scalar();
+      for (Index i=0; i<tnlp_adapter->n_x_fixed_; i++) {
+        z_L_[tnlp_adapter->x_fixed_map_[i]] = Max(0., -value);
+        z_U_[tnlp_adapter->x_fixed_map_[i]] = Max(0.,  value);
+      }
     }
   }
   double time2 = clock();
