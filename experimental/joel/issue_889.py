@@ -7,18 +7,28 @@ print "A = "
 A.printDense()
 
 print "MX"
+AA = msym("A",A.sparsity())
+
 r = msym("r",3)
-sol = CSparse(A.sparsity())
+sol = CSparse(AA.sparsity())
 sol.init()
-x = sol.solve(A,r.T,True).T
-f = MXFunction([r],[x])
+x = sol.solve(AA,r.T,True).T
+f = MXFunction([r,AA],[x])
 f.init()
-DMatrix.ones(f.jacSparsity()).printDense()
+DMatrix.ones(f.jacSparsity(0,0)).printDense()
+DMatrix.ones(f.jacSparsity(1,0)).printDense()
+
+
+
+
 
 print "SX"
+AA = ssym("A",A.sparsity())
+
 r = ssym("r",3)
-x = solve(A,r)
-f = SXFunction([r],[x])
+x = solve(AA,r)
+f = SXFunction([r,AA],[x])
 f.init()
-DMatrix.ones(f.jacSparsity()).printDense()
+DMatrix.ones(f.jacSparsity(0,0)).printDense()
+DMatrix.ones(f.jacSparsity(1,0)).printDense()
 

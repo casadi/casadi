@@ -191,7 +191,6 @@ namespace CasADi{
 
         // Propagate to A
         if(!Tr){
-          
           *adjSens[d][1] -= mul(trans(X),rhs[i],A.sparsity());
         } else {
           *adjSens[d][1] -= mul(trans(rhs[i]),X,A.sparsity());
@@ -224,10 +223,10 @@ namespace CasADi{
     bvec_t* X_ptr = reinterpret_cast<bvec_t*>(output[0]->ptr());
     bvec_t* tmp_ptr = reinterpret_cast<bvec_t*>(getPtr(rtmp));
 
-    if(fwd){
-    
-      // For all right-hand-sides
-      for(int r=0; r<nrhs; ++r){ 
+    // For all right-hand-sides
+    for(int r=0; r<nrhs; ++r){ 
+
+      if(fwd){
 
         // Copy B_ptr to a temporary vector and clear X_ptr (NOTE: normally, B_ptr == X_ptr)
         copy(B_ptr,B_ptr+n,tmp_ptr);
@@ -279,40 +278,69 @@ namespace CasADi{
           // Stop iterating if reached a steady state
           if(no_change) break;
         }
-
-        // Continue to the next right-hand-side
-        B_ptr += n;
-        X_ptr += n;
-      }
       
-    } else {
+      } else { // adjoint
 
-      // Dependencies of all X
-      bvec_t X_dep_all = 0;
-
-      // One right hand side at a time
-      for(int i=0; i<nrhs; ++i){
-
-        // Everything that depends on X
-        bvec_t X_dep = 0;
-        for(int k=0; k<n; ++k){
-          X_dep |= *X_ptr;
-          *X_ptr++ = 0;
+        // Propagate dependencies from X_ptr
+        std::fill(tmp_ptr,tmp_ptr+n,0);
+        for(int i=0; i<n; ++i){ // Loop over the rows of A
+          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
+            int j = A_col[k]; // get the column            
+            if(Tr){
+              tmp_ptr[j] |= X_ptr[i];
+            } else {
+              tmp_ptr[i] |= X_ptr[j];
+            }
+          }
         }
 
-        // Propagate to B
-        for(int k=0; k<n; ++k){
-          *B_ptr++ |= X_dep;
+        // Propagate interdependencies, use X_ptr as temporary
+        std::fill(X_ptr,X_ptr+n,0);
+        for(int iter=0; iter<n; ++iter){ // n represents the worst case
+          bool no_change = true; // is there any change at all in this iteration
+          for(int i=0; i<n; ++i){ // Loop over the rows of A
+            for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
+              int j = A_col[k]; // get the column
+              if(Tr){
+                no_change &= tmp_ptr[i] == X_ptr[i];
+                tmp_ptr[i] |= X_ptr[i];
+                X_ptr[i] |= tmp_ptr[i];
+              } else {
+                no_change &= tmp_ptr[j] == X_ptr[j];
+                tmp_ptr[j] |= X_ptr[j];
+                X_ptr[j] |= tmp_ptr[j];
+              }
+            }
+          }
+
+          // Stop iterating if reached a steady state
+          if(no_change) break;
         }
 
-        // Collect dependencies on all X
-        X_dep_all |= X_dep;
+        // Clear seeds (again)
+        std::fill(X_ptr,X_ptr+n,0);
+
+        // Propagate to A_ptr
+        for(int i=0; i<n; ++i){ // Loop over the rows of A
+          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
+            int j = A_col[k]; // get the column
+            if(Tr){
+              A_ptr[k] |= tmp_ptr[i];
+            } else {
+              A_ptr[k] |= tmp_ptr[j];
+            }
+          }
+        }
+
+        // Propagate to B_ptr
+        for(int i=0; i<n; ++i){ // Loop over the rows of A
+          B_ptr[i] |= tmp_ptr[i];
+        }
       }
 
-      // Propagate to A
-      for(int i=0; i<nnz; ++i){
-        *A_ptr++ |= X_dep_all;
-      }
+      // Continue to the next right-hand-side
+      B_ptr += n;
+      X_ptr += n;      
     }
   }
 
