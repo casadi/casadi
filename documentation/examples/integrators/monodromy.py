@@ -57,7 +57,6 @@ integrator.setOption("tf",tf)
 integrator.setOption("reltol",1e-10)
 integrator.setOption("abstol",1e-10)
 integrator.setOption("fsens_err_con",True)
-integrator.setOption("numeric_jacobian",True)
 integrator.init()
 
 N = 500
@@ -102,125 +101,125 @@ Ji = jac.getOutput()
 
 print Ji
 
-#! Monodromy matrix at various instances - Jacobian of Simulator
-#! =============================================================
+# #! Monodromy matrix at various instances - Jacobian of Simulator
+# #! =============================================================
 
-jacsim = sim.jacobian(INTEGRATOR_X0,0)
-jacsim.init()
+# jacsim = sim.jacobian(INTEGRATOR_X0,0)
+# jacsim.init()
 
-jacsim.setInput(x0,"x0")
-jacsim.setInput(params_,"p")
-jacsim.evaluate()
+# jacsim.setInput(x0,"x0")
+# jacsim.setInput(params_,"p")
+# jacsim.evaluate()
 
-#! For each of the 500 intervals, we have a 2-by-2 matrix as output
-print "jacsim.output().shape = ", jacsim.output().shape
+# #! For each of the 500 intervals, we have a 2-by-2 matrix as output
+# print "jacsim.output().shape = ", jacsim.output().shape
 
-#! Show only the last 3 intervals.
-print jacsim.getOutput()[-3*2:,:]
+# #! Show only the last 3 intervals.
+# print jacsim.getOutput()[-3*2:,:]
 
-Js = jacsim.getOutput()[-2:,:]
-
-
-e = max(fabs(Js - Ji))/max(fabs(Js))
-
-# Assert that the two methods yield identical results
-assert(e < 1e-6)
-
-#! Monodromy matrix at various instances - Jacobian of ControlSimulator
-#! ====================================================================
-
-csim = ControlSimulator(cf,linspace(0,tf,50))
-csim.setOption("nf",10)
-csim.setOption("integrator",CVodesIntegrator)
-csim.setOption("integrator_options",{"reltol":1e-11,"abstol":1e-11, "fsens_err_con": True})
-csim.init()
-
-jaccsim = csim.jacobian(CONTROLSIMULATOR_X0,0)
-jaccsim.init()
-jaccsim.setInput(params_[:-1],"p")
-jaccsim.setInput(x0,"x0")
-jaccsim.setInput(0,"u")
-jaccsim.evaluate()
-
-#! For each of the 500 intervals, we have a 2-by-2 matrix as output
-print "jaccsim.output().shape = ", jaccsim.output().shape
-
-#! Show only the last 3 intervals.
-print jaccsim.getOutput()[-3*2:,:]
-Jcs = jaccsim.getOutput()[-2:,:]
-
-e = max(fabs(Jcs - Js))/max(fabs(Js))
-
-# Assert that the two methods yield identical results
-assert(e < 1e-5)
-
-#! Intuitive interpretation
-#! ========================
-
-sim.setInput(x0,"x0")
-sim.setInput(params_,"p")
-sim.evaluate()
-unperturbed_output = sim.getOutput()
-
-circle = array([[sin(x),cos(x)] for x in numpy.linspace(-pi/2,3/2.0*pi,100)]).T
-circle = hstack((circle,circle[:,50:51]))
+# Js = jacsim.getOutput()[-2:,:]
 
 
+# e = max(fabs(Js - Ji))/max(fabs(Js))
 
-for t in range(0,N/5,2):
-  J = jacsim.getOutput()[t*2:(t+1)*2,:]
-  if t < 10:
-    scale = 0.1
-  else:
-    scale = 0.01
-  e=scale*mul(J,circle).T
-  e[:,0] += sim.getOutput()[t,0]
-  e[:,1] += sim.getOutput()[t,1]
-  if t < 10 :
-    plot(e[:,0],e[:,1],color='red')
-  else:
-    plot(e[:,0],e[:,1],color='blue')
+# # Assert that the two methods yield identical results
+# assert(e < 1e-6)
+
+# #! Monodromy matrix at various instances - Jacobian of ControlSimulator
+# #! ====================================================================
+
+# csim = ControlSimulator(cf,linspace(0,tf,50))
+# csim.setOption("nf",10)
+# csim.setOption("integrator",CVodesIntegrator)
+# csim.setOption("integrator_options",{"reltol":1e-11,"abstol":1e-11, "fsens_err_con": True})
+# csim.init()
+
+# jaccsim = csim.jacobian(CONTROLSIMULATOR_X0,0)
+# jaccsim.init()
+# jaccsim.setInput(params_[:-1],"p")
+# jaccsim.setInput(x0,"x0")
+# jaccsim.setInput(0,"u")
+# jaccsim.evaluate()
+
+# #! For each of the 500 intervals, we have a 2-by-2 matrix as output
+# print "jaccsim.output().shape = ", jaccsim.output().shape
+
+# #! Show only the last 3 intervals.
+# print jaccsim.getOutput()[-3*2:,:]
+# Jcs = jaccsim.getOutput()[-2:,:]
+
+# e = max(fabs(Jcs - Js))/max(fabs(Js))
+
+# # Assert that the two methods yield identical results
+# assert(e < 1e-5)
+
+# #! Intuitive interpretation
+# #! ========================
+
+# sim.setInput(x0,"x0")
+# sim.setInput(params_,"p")
+# sim.evaluate()
+# unperturbed_output = sim.getOutput()
+
+# circle = array([[sin(x),cos(x)] for x in numpy.linspace(-pi/2,3/2.0*pi,100)]).T
+# circle = hstack((circle,circle[:,50:51]))
+
+
+
+# for t in range(0,N/5,2):
+#   J = jacsim.getOutput()[t*2:(t+1)*2,:]
+#   if t < 10:
+#     scale = 0.1
+#   else:
+#     scale = 0.01
+#   e=scale*mul(J,circle).T
+#   e[:,0] += sim.getOutput()[t,0]
+#   e[:,1] += sim.getOutput()[t,1]
+#   if t < 10 :
+#     plot(e[:,0],e[:,1],color='red')
+#   else:
+#     plot(e[:,0],e[:,1],color='blue')
     
-show()
-#! Consider the case of perturbation simulation with a slightly perturbed initial condition
+# show()
+# #! Consider the case of perturbation simulation with a slightly perturbed initial condition
 
-sim.setInput(x0,"x0")
-sim.setInput(params_,"p")
-sim.evaluate()
-unperturbed_output = sim.getOutput()
+# sim.setInput(x0,"x0")
+# sim.setInput(params_,"p")
+# sim.evaluate()
+# unperturbed_output = sim.getOutput()
 
-perturb = DMatrix([1e-2,0])
-sim.setInput(x0+perturb,"x0")
-sim.setInput(params_,"p")
-sim.evaluate()
-perturbed_output = sim.getOutput()
+# perturb = DMatrix([1e-2,0])
+# sim.setInput(x0+perturb,"x0")
+# sim.setInput(params_,"p")
+# sim.evaluate()
+# perturbed_output = sim.getOutput()
 
-figure(2)
+# figure(2)
 
-title('Evolution of a perturbation')
-plot(ts,perturbed_output-unperturbed_output)
+# title('Evolution of a perturbation')
+# plot(ts,perturbed_output-unperturbed_output)
 
-effects = DMatrix.zeros(N,2)
+# effects = DMatrix.zeros(N,2)
 
-for t in range(N):
-  effects[t,:] = mul(jacsim.getOutput()[t*2:(t+1)*2,:],perturb).T
+# for t in range(N):
+#   effects[t,:] = mul(jacsim.getOutput()[t*2:(t+1)*2,:],perturb).T
   
-plot(ts,effects)
+# plot(ts,effects)
 
-legend(('x_1','x_2','perturbed(x_1)','preturbed(y_2)'))
-xlabel('t')
+# legend(('x_1','x_2','perturbed(x_1)','preturbed(y_2)'))
+# xlabel('t')
 
-show()
+# show()
 
-figure(3)
-linear_perturbed = unperturbed_output.reshape((2*N,1)) + mul(jacsim.getOutput(),perturb)
+# figure(3)
+# linear_perturbed = unperturbed_output.reshape((2*N,1)) + mul(jacsim.getOutput(),perturb)
 
-title('phase portrait perturbation')
-plot(unperturbed_output[:,0],unperturbed_output[:,1])
-plot(perturbed_output[:,0],perturbed_output[:,1])
-plot(linear_perturbed[0:N/2:2],linear_perturbed[1:N/2:2])
+# title('phase portrait perturbation')
+# plot(unperturbed_output[:,0],unperturbed_output[:,1])
+# plot(perturbed_output[:,0],perturbed_output[:,1])
+# plot(linear_perturbed[0:N/2:2],linear_perturbed[1:N/2:2])
 
-legend(('nominal','pertubed','monodromy prediction'))
+# legend(('nominal','pertubed','monodromy prediction'))
 
 
 show()
