@@ -6,6 +6,16 @@ A = 2*DMatrix.ones(sp_diag(3)); A[1,0] = 1; A[2,0] = 1; A[2,1] = 1 # lower trian
 print "A = "
 A.printDense()
 
+print "SX"
+AA = ssym("A",A.sparsity())
+
+r = ssym("r",3)
+x = solve(AA,r)
+f = SXFunction([r,AA],[x])
+f.init()
+DMatrix.ones(f.jacSparsity(0,0)).printDense()
+DMatrix.ones(f.jacSparsity(1,0)).printDense()
+
 print "MX"
 AA = msym("A",A.sparsity())
 
@@ -18,17 +28,13 @@ f.init()
 DMatrix.ones(f.jacSparsity(0,0)).printDense()
 DMatrix.ones(f.jacSparsity(1,0)).printDense()
 
-
-
-
-
-print "SX"
-AA = ssym("A",A.sparsity())
-
-r = ssym("r",3)
-x = solve(AA,r)
-f = SXFunction([r,AA],[x])
+print "implicit function"
+x = msym("x",3)
+res = MXFunction([x,r,AA],[mul(AA,x)-r])
+f = NewtonImplicitSolver(res)
+f.setOption("linear_solver",CSparse)
 f.init()
 DMatrix.ones(f.jacSparsity(0,0)).printDense()
 DMatrix.ones(f.jacSparsity(1,0)).printDense()
+
 
