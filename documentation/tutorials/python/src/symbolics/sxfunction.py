@@ -134,10 +134,12 @@ print G
 #$ Let's define $ \vec{v} = {\buildrel\leftrightarrow\over{G}} . \vec{p} $
 #! The evaluation of v can be efficiently achieved by automatic differentiation as follows:
 f.init()
-f.setInput([2,3])
-f.setFwdSeed([7,6]) # p
-f.evaluate(1,0) # evaluate(int fsens_order=0, int asens_order=0)
-print f.getFwdSens() # v
+df = f.derivative(1,0)
+df.setInput([2,3],0)
+df.setInput([7,6],1)
+df.evaluate()
+print df.output(1) # v
+
 #! Functions with matrix valued input
 #! ----------------------------------
 x = ssym("x",2,2)
