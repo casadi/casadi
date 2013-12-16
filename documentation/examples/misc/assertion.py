@@ -57,8 +57,7 @@ except Exception as e:
 
 #! You can combine this with CustomFunction to do powerful assertions
 @pyevaluate
-def dummy(f,nfwd,nadj):
-  assert nfwd==0
+def dummy(f):
   import numpy
   x = f.getInput()
   m = max(numpy.real(numpy.linalg.eig(blockcat([[x,-1],[-1,2]]))[0]))
@@ -67,7 +66,6 @@ def dummy(f,nfwd,nadj):
 
 
 foo = CustomFunction(dummy, [x.sparsity()], [sp_dense(1,1)] )
-foo.setOption("max_number_of_fwd_dir",1)  # Sensitivities may be requested and never used
 foo.init()
 
 y = sin(x)
