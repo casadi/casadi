@@ -325,38 +325,43 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::spEvaluate(bool fwd){
-    if(fwd){
+    // Get sparsity pattern of the Jacobian
+    const CRSSparsity J = f_.jacSparsity(0,0);
+    const vector<int>& J_rowind = J.rowind();
+    const vector<int>& J_col = J.col();
 
-      // Get sparsity pattern of the Jacobian
-      const CRSSparsity J = f_.jacSparsity(0,0);
-      const vector<int>& J_rowind = J.rowind();
-      const vector<int>& J_col = J.col();
+    // Get arrays
+    bvec_t* z = reinterpret_cast<bvec_t*>(output(0).ptr());
+    bvec_t* zf = reinterpret_cast<bvec_t*>(f_.input(0).ptr());
+    bvec_t* rf = reinterpret_cast<bvec_t*>(f_.output(0).ptr());
+
+    // Temporary
+    vector<bvec_t> tmp(n_,0);
+
+    if(fwd){
+      //      casadi_error("fwd");
 
       // Pass inputs to function
-      bvec_t* z = reinterpret_cast<bvec_t*>(f_.input(0).ptr());
-      fill(z,z+n_,0);
+      fill(zf,zf+n_,0);
       for(int i=0; i<getNumInputs(); ++i){
         f_.input(i+1).set(input(i));
       }
 
       // Propagate dependencies through the function to get the influenced equations
       f_.spEvaluate(true);
-      bvec_t* eq = reinterpret_cast<bvec_t*>(f_.output(0).ptr());
 
       // Clear the pattern being calculated
-      z = reinterpret_cast<bvec_t*>(output(0).ptr());
       fill(z,z+n_,0);
 
       // Propagate dependencies to the variables
       for(int i=0; i<n_; ++i){ // Loop over the rows of A
         for(int k=J_rowind[i]; k<J_rowind[i+1]; ++k){ // loop over the nonzeros
           int j = J_col[k]; // get the column
-          z[i] |= eq[j];
+          z[i] |= rf[j];
         }
       }
 
       // Propagate interdependencies in z
-      vector<bvec_t> tmp(n_,0);
       for(int iter=0; iter<n_; ++iter){ // n represents the worst case
         bool no_change = true; // is there any change at all in this iteration
         for(int i=0; i<n_; ++i){ // Loop over the rows of A
@@ -371,10 +376,42 @@ namespace CasADi{
         // Stop iterating if reached a steady state
         if(no_change) break;
       }
-
     
     } else { 
+#if 0
+      
+      // Propagate dependencies to rf
+      fill(rf,rf+n_,0);
+      for(int i=0; i<n_; ++i){ // Loop over the rows of A
+        for(int k=J_rowind[i]; k<J_rowind[i+1]; ++k){ // loop over the nonzeros
+          int j = J_col[k]; // get the column            
+          rf[j] |= z[i];
+        }
+      }
 
+      // Add interdependencies
+      for(int iter=0; iter<n_; ++iter){ // n represents the worst case
+        bool no_change = true; // is there any change at all in this iteration
+        for(int i=0; i<n_; ++i){ // Loop over the rows of A
+          for(int k=J_rowind[i]; k<J_rowind[i+1]; ++k){ // loop over the nonzeros
+            int j = J_col[k]; // get the column
+            no_change &= rf[j] == tmp[j];
+            rf[j] |= tmp[j];
+            tmp[j] |= rf[j];
+          }
+        }
+
+        // Stop iterating if reached a steady state
+        if(no_change) break;
+      }
+      
+      // Propagate to the arguments
+      f_.spEvaluate(false);
+      for(int i=0; i<getNumInputs(); ++i){
+        f_.input(i+1).get(input(i));
+      }
+
+#else
       bvec_t all_depend(0);
 
       for(int oind=0; oind<getNumOutputs(); ++oind){
@@ -391,6 +428,8 @@ namespace CasADi{
           v[i] = all_depend;
         }
       }
+#endif
+
     }
   }
 
