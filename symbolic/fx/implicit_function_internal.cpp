@@ -324,6 +324,49 @@ namespace CasADi{
     casadi_assert(v_it==v.end());
   }
 
+  void ImplicitFunctionInternal::spEvaluate(bool fwd){
+
+    bvec_t all_depend(0);
+  
+    if(fwd){
+      //      casadi_error("fwd");
+    
+      for(int iind=0; iind<getNumInputs(); ++iind){
+        const DMatrix& m = inputNoCheck(iind);
+        const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
+        for(int i=0; i<m.size(); ++i){
+          all_depend |= v[i];
+        }
+      }
+    
+      for(int oind=0; oind<getNumOutputs(); ++oind){
+        DMatrix& m = outputNoCheck(oind);
+        bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
+        for(int i=0; i<m.size(); ++i){
+          v[i] = all_depend;
+        }
+      }
+    
+    } else {
+      //      casadi_error("adj");
+    
+      for(int oind=0; oind<getNumOutputs(); ++oind){
+        const DMatrix& m = outputNoCheck(oind);
+        const bvec_t* v = get_bvec_t(m.data());
+        for(int i=0; i<m.size(); ++i){
+          all_depend |= v[i];
+        }
+      }
+      for(int iind=0; iind<getNumInputs(); ++iind){
+        DMatrix& m = inputNoCheck(iind);
+        bvec_t* v = get_bvec_t(m.data());
+        for(int i=0; i<m.size(); ++i){
+          v[i] = all_depend;
+        }
+      }
+    }
+  }
+
  
 } // namespace CasADi
 
