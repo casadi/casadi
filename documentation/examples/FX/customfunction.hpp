@@ -7,7 +7,6 @@
 * \sa
 * \code
 * CasADi::CustomFunction();
-* CasADi::JacobianGenerator();
 * \endcode
 *
 */

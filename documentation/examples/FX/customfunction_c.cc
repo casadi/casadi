@@ -4,10 +4,10 @@
 using namespace CasADi;
 
   /// Wrapper around functions
-  typedef void (*CustomEvaluateCPtr)(CustomFunction &f, int nfdir, int nadir, void* user_data);
+  typedef void (*CustomEvaluateCPtr)(CustomFunction &f, void* user_data);
 
 
-void myEvaluate(CustomFunction &f, int nfdir, int nadir, void* user_data) {
+void myEvaluate(CustomFunction &f, void* user_data) {
   DMatrix x = f.input(0);
   f.setOutput(sin(x));
 }
