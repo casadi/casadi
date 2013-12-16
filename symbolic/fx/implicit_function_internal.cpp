@@ -325,31 +325,58 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::spEvaluate(bool fwd){
-
-    bvec_t all_depend(0);
-  
     if(fwd){
-      //      casadi_error("fwd");
-    
-      for(int iind=0; iind<getNumInputs(); ++iind){
-        const DMatrix& m = inputNoCheck(iind);
-        const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
-        for(int i=0; i<m.size(); ++i){
-          all_depend |= v[i];
+
+      // Get sparsity pattern of the Jacobian
+      const CRSSparsity J = f_.jacSparsity(0,0);
+      const vector<int>& J_rowind = J.rowind();
+      const vector<int>& J_col = J.col();
+
+      // Pass inputs to function
+      bvec_t* z = reinterpret_cast<bvec_t*>(f_.input(0).ptr());
+      fill(z,z+n_,0);
+      for(int i=0; i<getNumInputs(); ++i){
+        f_.input(i+1).set(input(i));
+      }
+
+      // Propagate dependencies through the function to get the influenced equations
+      f_.spEvaluate(true);
+      bvec_t* eq = reinterpret_cast<bvec_t*>(f_.output(0).ptr());
+
+      // Clear the pattern being calculated
+      z = reinterpret_cast<bvec_t*>(output(0).ptr());
+      fill(z,z+n_,0);
+
+      // Propagate dependencies to the variables
+      for(int i=0; i<n_; ++i){ // Loop over the rows of A
+        for(int k=J_rowind[i]; k<J_rowind[i+1]; ++k){ // loop over the nonzeros
+          int j = J_col[k]; // get the column
+          z[i] |= eq[j];
         }
       }
-    
-      for(int oind=0; oind<getNumOutputs(); ++oind){
-        DMatrix& m = outputNoCheck(oind);
-        bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
-        for(int i=0; i<m.size(); ++i){
-          v[i] = all_depend;
+
+      // Propagate interdependencies in z
+      vector<bvec_t> tmp(n_,0);
+      for(int iter=0; iter<n_; ++iter){ // n represents the worst case
+        bool no_change = true; // is there any change at all in this iteration
+        for(int i=0; i<n_; ++i){ // Loop over the rows of A
+          for(int k=J_rowind[i]; k<J_rowind[i+1]; ++k){ // loop over the nonzeros
+            int j = J_col[k]; // get the column
+            no_change &= z[i] == tmp[i];
+            z[i] |= tmp[i];
+            tmp[i] |= z[i];
+          }
         }
+
+        // Stop iterating if reached a steady state
+        if(no_change) break;
       }
+
     
-    } else {
-      //      casadi_error("adj");
-    
+    } else { 
+
+      bvec_t all_depend(0);
+
       for(int oind=0; oind<getNumOutputs(); ++oind){
         const DMatrix& m = outputNoCheck(oind);
         const bvec_t* v = get_bvec_t(m.data());
