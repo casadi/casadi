@@ -116,11 +116,12 @@ for j in range(d+1):
   D[j] = lfcn.getOutput()
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+  tfcn = lfcn.tangent()
+  tfcn.init()
   for r in range(d+1):
-    lfcn.setInput(tau_root[r])
-    lfcn.setFwdSeed(1.0)
-    lfcn.evaluate(1,0)
-    C[j,r] = lfcn.getFwdSens()
+    tfcn.setInput(tau_root[r])
+    tfcn.evaluate()
+    C[j,r] = tfcn.getOutput()
 
 # Structure holding NLP variables
 V = struct_msym([
