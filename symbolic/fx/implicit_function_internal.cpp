@@ -325,6 +325,11 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::spEvaluate(bool fwd){
+    // Not working properly, fallback to base class
+    FXInternal::spEvaluate(fwd);
+    return;
+
+
     // Get sparsity pattern of the Jacobian
     const CRSSparsity J = f_.jacSparsity(0,0);
     const vector<int>& J_rowind = J.rowind();
