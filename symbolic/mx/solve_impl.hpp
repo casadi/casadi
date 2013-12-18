@@ -208,6 +208,74 @@ namespace CasADi{
   
   template<bool Tr>
   void Solve<Tr>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd){
+#if 1
+
+    // Sparsity of the rhs
+    const CRSSparsity& sp = input[0]->sparsity();
+    const vector<int>& rowind = sp.rowind();
+    int nrhs = sp.size1();
+    int nnz = input[1]->size();
+
+    // Get pointers to data
+    bvec_t* B_ptr = reinterpret_cast<bvec_t*>(input[0]->ptr());
+    bvec_t* A_ptr = reinterpret_cast<bvec_t*>(input[1]->ptr());
+    bvec_t* X_ptr = reinterpret_cast<bvec_t*>(output[0]->ptr());
+
+    if(fwd){
+    
+      // Get dependencies of all A elements
+      bvec_t A_dep = 0;
+      for(int i=0; i<nnz; ++i){
+        A_dep |= *A_ptr++;
+      }
+
+      // One right hand side at a time
+      for(int i=0; i<nrhs; ++i){
+
+        // Add dependencies on B
+        bvec_t AB_dep = A_dep;
+        for(int k=rowind[i]; k<rowind[i+1]; ++k){
+          AB_dep |= *B_ptr++;
+        }
+
+        // Propagate to X
+        for(int k=rowind[i]; k<rowind[i+1]; ++k){
+          *X_ptr++ = AB_dep;
+        }
+      }
+    } else {
+
+      // Dependencies of all X
+      bvec_t X_dep_all = 0;
+
+      // One right hand side at a time
+      for(int i=0; i<nrhs; ++i){
+
+        // Everything that depends on X
+        bvec_t X_dep = 0;
+        for(int k=rowind[i]; k<rowind[i+1]; ++k){
+          X_dep |= *X_ptr;
+          *X_ptr++ = 0;
+        }
+
+        // Propagate to B
+        for(int k=rowind[i]; k<rowind[i+1]; ++k){
+          *B_ptr++ |= X_dep;
+        }
+
+        // Collect dependencies on all X
+        X_dep_all |= X_dep;
+      }
+
+      // Propagate to A
+      for(int i=0; i<nnz; ++i){
+        *A_ptr++ |= X_dep_all;
+      }
+    }
+
+
+#else
+
     // Sparsities
     const CRSSparsity& r_sp = input[0]->sparsity();
     const CRSSparsity& A_sp = input[1]->sparsity();
@@ -342,6 +410,8 @@ namespace CasADi{
       B_ptr += n;
       X_ptr += n;      
     }
+
+#endif
   }
 
   template<bool Tr>
