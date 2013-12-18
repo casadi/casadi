@@ -212,8 +212,7 @@ show()
 #! - a fixed initial condition (1,0)
 #! - a free symbolic input, held constant during integration interval
 u=msym("u")
-tmp = integratorIn(x0=MX([1,0]),p=u) # workaround for #924
-w, = integratorOut(integrator.call(tmp.data),"xf")
+w, = integratorOut(integrator.call(integratorIn(x0=MX([1,0]),p=u)),"xf")
 
 #! We construct an MXfunction and a python help function 'out'
 f=MXFunction([u],[w])
