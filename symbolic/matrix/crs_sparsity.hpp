@@ -411,7 +411,7 @@ namespace CasADi{
       
     */
 #ifndef SWIG
-    int stronglyConnectedComponents(std::vector<int>& offset, std::vector<int>& index) const;
+    int stronglyConnectedComponents(std::vector<int>& index, std::vector<int>& offset) const;
 #else // SWIG
     int stronglyConnectedComponents(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
 #endif // SWIG
