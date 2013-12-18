@@ -55,6 +55,9 @@ namespace CasADi{
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose) = 0;
 
+    // Strongly connected components in the bigraph defined by the sparsity pattern
+    CRSSparsity scc_;
+
     // Is prepared
     bool prepared_;
 
