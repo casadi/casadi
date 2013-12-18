@@ -24,6 +24,7 @@
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../mx/mx_tools.hpp"
+#include "../mx/mx_node.hpp"
 
 INPUTSCHEME(LinsolInput)
 OUTPUTSCHEME(LinsolOutput)
@@ -125,7 +126,7 @@ namespace CasADi{
       if(CasADi::isZero(B)){
         X = MX::sparse(B.shape());
       } else {
-        X = shared_from_this<LinearSolver>().solve(A,B,tr);
+        X = solve(A,B,tr);
       }
     }
 
@@ -157,7 +158,7 @@ namespace CasADi{
     
     if(!rhs.empty()){
       // Solve for all directions at once
-      rhs = vertsplit(shared_from_this<LinearSolver>().solve(A,vertcat(rhs),tr),row_offset);
+      rhs = vertsplit(solve(A,vertcat(rhs),tr),row_offset);
     
       // Save result
       for(int i=0; i<rhs.size(); ++i){
@@ -190,7 +191,7 @@ namespace CasADi{
 
     if(!rhs.empty()){
       // Solve for all directions at once
-      rhs = vertsplit(shared_from_this<LinearSolver>().solve(A,vertcat(rhs),!tr),row_offset);
+      rhs = vertsplit(solve(A,vertcat(rhs),!tr),row_offset);
     
       for(int i=0; i<rhs.size(); ++i){
         int d = rhs_ind[i];
@@ -472,6 +473,9 @@ namespace CasADi{
     }
   }
 
+  MX LinearSolverInternal::solve(const MX& A, const MX& B, bool transpose){
+    return A->getSolve(B, transpose, shared_from_this<LinearSolver>());
+  }
  
 } // namespace CasADi
  

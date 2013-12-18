@@ -21,7 +21,6 @@
  */
 
 #include "linear_solver_internal.hpp"
-#include "../mx/mx_node.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -51,7 +50,7 @@ namespace CasADi{
 
   MX LinearSolver::solve(const MX& A, const MX& B, bool transpose){
     assertInit();
-    return A->getSolve(B, transpose, *this);
+    return (*this)->solve(A,B,transpose);
   }
  
   bool LinearSolver::prepared() const{

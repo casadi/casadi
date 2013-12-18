@@ -55,6 +55,9 @@ namespace CasADi{
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose) = 0;
 
+    /// Create a solve node
+    MX solve(const MX& A, const MX& B, bool transpose);
+
     // Evaluate numerically, possibly transposed
     void evaluateDGen(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, bool tr);
 
