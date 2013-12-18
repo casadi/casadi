@@ -50,7 +50,7 @@ namespace CasADi{
     virtual void prepare() = 0;
 
     // Solve the system of equations, using internal vector
-    virtual void solve();
+    virtual void solve(bool transpose);
 
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose) = 0;

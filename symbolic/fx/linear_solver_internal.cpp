@@ -47,7 +47,6 @@ namespace CasADi{
     input_.resize(LINSOL_NUM_IN);
     input(LINSOL_A) = DMatrix(sparsity);
     input(LINSOL_B) = DMatrix(nrhs,sparsity.size1(),0);
-    input(LINSOL_T) = 0.;
   
     // Allocate outputs
     output_.resize(LINSOL_NUM_OUT);
@@ -98,14 +97,13 @@ namespace CasADi{
       throw CasadiException("LinearSolverInternal::evaluate: Preparation failed");
   
     // Solve the factorized system
-    solve();
+    solve(false);
   }
  
-  void LinearSolverInternal::solve(){
+  void LinearSolverInternal::solve(bool transpose){
     // Get input and output vector
     const vector<double>& b = input(LINSOL_B).data();
     vector<double>& x = output(LINSOL_X).data();
-    bool transpose = input(LINSOL_T).toScalar()!=0.;
     int nrhs = input(LINSOL_B).size1();
 
     // Copy input to output

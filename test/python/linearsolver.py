@@ -60,13 +60,12 @@ class LinearSolverTests(casadiTestCase):
       solver.init()
       solver.setInput(A,"A")
 
-      solver.setInput(True,"T")
       solver.prepare()
       
       b = DMatrix([1,0.5])
       solver.setInput(b.T,"B")
       
-      solver.solve()
+      solver.solve(True)
       
       res = DMatrix([1.5,-0.5])
       self.checkarray(solver.output("X"),res.T)
@@ -81,7 +80,6 @@ class LinearSolverTests(casadiTestCase):
       solver.init()
       solver.setInput(A,"A")
 
-      solver.setInput(False,"T")
       solver.prepare()
       
       b = DMatrix([1,0.5])
@@ -105,12 +103,11 @@ class LinearSolverTests(casadiTestCase):
       solver.setOption(options)
       solver.init()
       solver.setInput(A_,"A")
-      solver.setInput(True,"T")
       solver.setInput(b_,"B")
       
       A_0 = A[0,0]
-      A_1 = A[0,1]
-      A_2 = A[1,0]
+      A_2 = A[0,1]
+      A_1 = A[1,0]
       A_3 = A[1,1]
       
       b_0 = b[0]
@@ -136,18 +133,17 @@ class LinearSolverTests(casadiTestCase):
       solver.setOption(options)
       solver.init()
       solver.setInput(A_,"A")
-      solver.setInput(True,"T")
       solver.setInput(b_,"B")
       
-      relay = MXFunction(linsolIn(A=A,B=b),solver.call(linsolIn(A=A,B=b,T=True)))
+      relay = MXFunction(linsolIn(A=A,B=b),solver.call(linsolIn(A=A,B=b)))
       relay.init()
 
       relay.setInput(A_,"A")
       relay.setInput(b_,"B")
       
       A_0 = A[0,0]
-      A_1 = A[0,1]
-      A_2 = A[1,0]
+      A_2 = A[0,1]
+      A_1 = A[1,0]
       A_3 = A[1,1]
       
       b_0 = b[0]

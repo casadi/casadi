@@ -510,16 +510,15 @@ def linsolIn(*dummy,**kwargs):
   Helper function for 'LinsolInput'
 
   Two use cases:
-     a) arg = linsolIn(A=my_A, B=my_B, T=my_T) 
+     a) arg = linsolIn(A=my_A, B=my_B) 
           all arguments optional
-     b) A, B, T = linsolIn(arg,"A", "B", "T") 
+     b) A, B = linsolIn(arg,"A", "B") 
           all arguments after the first optional
   Input arguments of a linear solver
   
   Keyword arguments:
     A -- The square matrix A: sparse, (n x n). [LINSOL_A]
     B -- The right-hand-side matrix b: dense,  (m x n) [LINSOL_B]
-    T -- Transpose A?: dense scalar, value 0 or 1,  (1 x 1) [LINSOL_T]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LinsolInput,n)] for n in dummy[1:]]
@@ -529,13 +528,10 @@ def linsolIn(*dummy,**kwargs):
   B = []
   if 'B' in kwargs:
     B = kwargs['B']
-  T = []
-  if 'T' in kwargs:
-    T = kwargs['T']
   for k in kwargs.keys():
-    if not(k in ['A','B','T']):
-      raise Exception("Keyword error in linsolIn: '%s' is not recognized. Available keywords are: A, B, T" % k )
-  return IOSchemeVector([A,B,T], IOScheme(SCHEME_LinsolInput))
+    if not(k in ['A','B']):
+      raise Exception("Keyword error in linsolIn: '%s' is not recognized. Available keywords are: A, B" % k )
+  return IOSchemeVector([A,B], IOScheme(SCHEME_LinsolInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON

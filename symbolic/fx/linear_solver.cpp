@@ -44,9 +44,9 @@ namespace CasADi{
     (*this)->solve(x,nrhs,transpose);
   }
  
-  void LinearSolver::solve(){
+  void LinearSolver::solve(bool transpose){
     assertInit();
-    (*this)->solve();
+    (*this)->solve(transpose);
   }
 
   MX LinearSolver::solve(const MX& A, const MX& B, bool transpose){
