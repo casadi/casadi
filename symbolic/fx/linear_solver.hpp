@@ -90,9 +90,6 @@ enum LinsolOutput{
     /// Check if prepared
     bool prepared() const;
   
-    /// Get the strongly connected components
-    const CRSSparsity& stronglyConnectedComponents() const;
-
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
   };

@@ -63,11 +63,6 @@ namespace CasADi{
     return dynamic_cast<const LinearSolverInternal*>(get())!=0;
   }
 
-  const CRSSparsity& LinearSolver::stronglyConnectedComponents() const{
-    assertInit();
-    return (*this)->scc_;
-  }
-
 } // namespace CasADi
 
   

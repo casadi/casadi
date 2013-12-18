@@ -41,11 +41,6 @@ namespace CasADi{
     casadi_assert_message(sparsity.size1()==sparsity.size2(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity.dimString());  
     casadi_assert_message(!isSingular(sparsity),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity) << " (in stead of "<< sparsity.size1() << ")");
 
-    // Calculate strongly connected components
-    std::vector<int> offset, index;
-    int nc = sparsity.stronglyConnectedComponents(index,offset);
-    scc_ = CRSSparsity(nc,sparsity.size1(),index,offset);
-
     // Allocate inputs
     input_.resize(LINSOL_NUM_IN);
     input(LINSOL_A) = DMatrix(sparsity);
