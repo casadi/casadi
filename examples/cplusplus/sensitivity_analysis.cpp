@@ -186,57 +186,59 @@ int main(){
 
       // Calculate once, forward
       FX I_fwd = I.derivative(1,0);
-      I_fwd.setInput(x0,INTEGRATOR_X0);
-      I_fwd.setInput(u0,INTEGRATOR_P);
-      I_fwd.setInput(0.,INTEGRATOR_NUM_IN+INTEGRATOR_X0);
-      I_fwd.setInput(1.,INTEGRATOR_NUM_IN+INTEGRATOR_P);
+      I_fwd.setInput(x0,"der_x0");
+      I_fwd.setInput(u0,"der_p");
+      I_fwd.setInput(0.0,"fwd0_x0");
+      I_fwd.setInput(1.0,"fwd0_p");
       I_fwd.evaluate();
-      DMatrix fwd_xf = I_fwd.output(INTEGRATOR_NUM_OUT+INTEGRATOR_XF);
-      DMatrix fwd_qf = I_fwd.output(INTEGRATOR_NUM_OUT+INTEGRATOR_QF);
+      DMatrix fwd_xf = I_fwd.output("fwd0_xf");
+      DMatrix fwd_qf = I_fwd.output("fwd0_qf");
       cout << setw(50) << "Forward sensitivities: " << "d(xf)/d(p) = " << fwd_xf << ", d(qf)/d(p) = " << fwd_qf << endl;
 
       // Calculate once, adjoint
       FX I_adj = I.derivative(0,1);
-      I_adj.setInput(x0,INTEGRATOR_X0);
-      I_adj.setInput(u0,INTEGRATOR_P);
-      I_adj.setInput(0.,INTEGRATOR_NUM_IN+INTEGRATOR_XF);
-      I_adj.setInput(1.,INTEGRATOR_NUM_IN+INTEGRATOR_QF);
+      I_adj.setInput(x0,"der_x0");
+      I_adj.setInput(u0,"der_p");
+      I_adj.setInput(0.0,"adj0_xf");
+      I_adj.setInput(1.0,"adj0_qf");
       I_adj.evaluate();
-      DMatrix adj_x0 = I_adj.output(INTEGRATOR_NUM_OUT+INTEGRATOR_X0);
-      DMatrix adj_p = I_adj.output(INTEGRATOR_NUM_OUT+INTEGRATOR_P);
+      DMatrix adj_x0 = I_adj.output("adj0_x0");
+      DMatrix adj_p = I_adj.output("adj0_p");
       cout << setw(50) << "Adjoint sensitivities: " << "d(qf)/d(x0) = " << adj_x0 << ", d(qf)/d(p) = " << adj_p << endl;
 
       // Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
-      I_adj.setInput(x0,INTEGRATOR_X0);
-      I_adj.setInput(u0+h,INTEGRATOR_P);
-      I_adj.setInput(0.,INTEGRATOR_NUM_IN+INTEGRATOR_XF);
-      I_adj.setInput(1.,INTEGRATOR_NUM_IN+INTEGRATOR_QF);
+      I_adj.setInput(x0,"der_x0");
+      I_adj.setInput(u0+h,"der_p");
+      I_adj.setInput(0.0,"adj0_xf");
+      I_adj.setInput(1.0,"adj0_qf");
       I_adj.evaluate();
-      DMatrix adj_x0_pert = I_adj.output(INTEGRATOR_NUM_OUT+INTEGRATOR_X0);
-      DMatrix adj_p_pert = I_adj.output(INTEGRATOR_NUM_OUT+INTEGRATOR_P);
+      DMatrix adj_x0_pert = I_adj.output("adj0_x0");
+      DMatrix adj_p_pert = I_adj.output("adj0_p");
       cout << setw(50) << "FD of adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << (adj_x0_pert-adj_x0)/h << ", d2(qf)/d(p)d(p) = " << (adj_p_pert-adj_p)/h << endl;
       
-      // // Forward over adjoint to get the second order sensitivities
-      // I_adj.setInput(x0,INTEGRATOR_X0);
-      // I_adj.setInput(u0,INTEGRATOR_P);
-      // I_adj.setFwdSeed(1.,INTEGRATOR_P);
-      // I_adj.setInput(0.,INTEGRATOR_NUM_IN+INTEGRATOR_XF);
-      // I_adj.setInput(1.,INTEGRATOR_NUM_IN+INTEGRATOR_QF);
-      // I_adj.evaluate(1,0);
-      // DMatrix fwd_adj_x0 = I_adj.fwdSens(INTEGRATOR_NUM_OUT+INTEGRATOR_X0);
-      // DMatrix fwd_adj_p = I_adj.fwdSens(INTEGRATOR_NUM_OUT+INTEGRATOR_P);
-      // cout << setw(50) << "Forward over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fwd_adj_x0 << ", d2(qf)/d(p)d(p) = " << fwd_adj_p << endl;
+      // Forward over adjoint to get the second order sensitivities
+      FX I_foa = I_adj.derivative(1,0);
+      I_foa.setInput(x0,"der_der_x0");
+      I_foa.setInput(u0,"der_der_p");
+      I_foa.setInput(1.0,"fwd0_der_p");
+      I_foa.setInput(0.0,"der_adj0_xf");
+      I_foa.setInput(1.0,"der_adj0_qf");
+      I_foa.evaluate();
+      DMatrix fwd_adj_x0 = I_foa.output("fwd0_adj0_x0");
+      DMatrix fwd_adj_p = I_foa.output("fwd0_adj0_p");
+      cout << setw(50) << "Forward over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fwd_adj_x0 << ", d2(qf)/d(p)d(p) = " << fwd_adj_p << endl;
 
-      // // Adjoint over adjoint to get the second order sensitivities
-      // I_adj.setInput(x0,INTEGRATOR_X0);
-      // I_adj.setInput(u0,INTEGRATOR_P);
-      // I_adj.setInput(0.,INTEGRATOR_NUM_IN+INTEGRATOR_XF);
-      // I_adj.setInput(1.,INTEGRATOR_NUM_IN+INTEGRATOR_QF);
-      // I_adj.setAdjSeed(1.,INTEGRATOR_NUM_OUT+INTEGRATOR_P);
-      // I_adj.evaluate(0,1);
-      // DMatrix adj_adj_x0 = I_adj.adjSens(INTEGRATOR_X0);
-      // DMatrix adj_adj_p = I_adj.adjSens(INTEGRATOR_P);
-      // cout << setw(50) << "Adjoint over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << adj_adj_x0 << ", d2(qf)/d(p)d(p) = " << adj_adj_p << endl;
+      // Adjoint over adjoint to get the second order sensitivities
+      FX I_aoa = I_adj.derivative(0,1);
+      I_aoa.setInput(x0,"der_der_x0");
+      I_aoa.setInput(u0,"der_der_p");
+      I_aoa.setInput(0.0,"der_adj0_xf");
+      I_aoa.setInput(1.0,"der_adj0_qf");
+      I_aoa.setInput(1.0,"adj0_adj0_p");
+      I_aoa.evaluate();
+      DMatrix adj_adj_x0 = I_aoa.output("adj0_der_x0");
+      DMatrix adj_adj_p = I_aoa.output("adj0_der_p");
+      cout << setw(50) << "Adjoint over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << adj_adj_x0 << ", d2(qf)/d(p)d(p) = " << adj_adj_p << endl;
     }
   }
   return 0;
