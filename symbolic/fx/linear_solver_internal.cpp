@@ -44,6 +44,10 @@ namespace CasADi{
     casadi_assert_message(sparsity.size1()==sparsity.size2(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity.dimString());  
     casadi_assert_message(!isSingular(sparsity),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity) << " (in stead of "<< sparsity.size1() << ")");
 
+    // Calculate the Dulmage-Mendelsohn decomposition
+    std::vector<int> coarse_rowblock, coarse_colblock;
+    sparsity.dulmageMendelsohn(rowperm_, colperm_, rowblock_, colblock_, coarse_rowblock, coarse_colblock);
+
     // Allocate inputs
     input_.resize(LINSOL_NUM_IN);
     input(LINSOL_A) = DMatrix(sparsity);
