@@ -82,6 +82,7 @@ P0 = states.squared()
 P0[:,:] = 0.01*DMatrix.eye(states.size)
 P0["x","dy"] = P0["dy","x"] = 0.002
 
+# Not supported in current revision, cf. #929
 # J = csim.jacobian("x0","xf")
 # J.init()
 # J.setInput(x0,"x0")
