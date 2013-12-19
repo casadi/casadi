@@ -167,8 +167,8 @@ for integrator in (irk_integrator,ref_integrator):
   dintegrator = integrator.derivative(2,1)
 
   # Pass arguments
-  dintegrator.setInput(x0_val,"x0")
-  dintegrator.setInput(p_val,"p")
+  dintegrator.setInput(x0_val,"der_x0")
+  dintegrator.setInput(p_val,"der_p")
   
   # Forward sensitivity analysis, first direction: seed p
   dintegrator.setInput(0.0,"fwd0_x0")
@@ -185,7 +185,7 @@ for integrator in (irk_integrator,ref_integrator):
   dintegrator.evaluate()
 
   # Get the nondifferentiated results
-  print "%15s = " % "xf", dintegrator.getOutput("xf")
+  print "%15s = " % "xf", dintegrator.getOutput("der_xf")
 
   # Get the forward sensitivities
   print "%15s = " % "d(xf)/d(p)", dintegrator.getOutput("fwd0_xf")
