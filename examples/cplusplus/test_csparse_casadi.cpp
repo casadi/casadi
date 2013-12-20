@@ -71,7 +71,6 @@ int main(int argc, char *argv[])
   // Solve
   linear_solver.setInput(val,"A");
   linear_solver.setInput(rhs,"B");
-  linear_solver.setInput(double(tr),"T");
   linear_solver.evaluate();
   
   // Print the solution
