@@ -32,8 +32,33 @@ namespace CasADi{
     assignNode(new IOSchemeBuiltinInternal(scheme));
   }
   
-  IOScheme::IOScheme(const std::vector<std::string> &entries) {
-    assignNode(new IOSchemeCustomInternal(entries));
+  IOScheme::IOScheme(const std::vector<std::string> &entries,const std::vector<std::string> &descriptions) {
+    assignNode(new IOSchemeCustomInternal(entries,descriptions));
+  }
+  
+  IOScheme::IOScheme(const std::string &arg_s0,const std::string &arg_s1,const std::string &arg_s2,const std::string &arg_s3,const std::string &arg_s4,const std::string &arg_s5,const std::string &arg_s6,const std::string &arg_s7,const std::string &arg_s8,const std::string &arg_s9,const std::string &arg_s10,const std::string &arg_s11,const std::string &arg_s12,const std::string &arg_s13,const std::string &arg_s14,const std::string &arg_s15,const std::string &arg_s16,const std::string &arg_s17,const std::string &arg_s18,const std::string &arg_s19) {
+    std::vector<std::string> k;
+    if (arg_s0!="") { k.push_back(arg_s0);}
+    if (arg_s1!="") { k.push_back(arg_s1);}
+    if (arg_s2!="") { k.push_back(arg_s2);}
+    if (arg_s3!="") { k.push_back(arg_s3);}
+    if (arg_s4!="") { k.push_back(arg_s4);}
+    if (arg_s5!="") { k.push_back(arg_s5);}
+    if (arg_s6!="") { k.push_back(arg_s6);}
+    if (arg_s7!="") { k.push_back(arg_s7);}
+    if (arg_s8!="") { k.push_back(arg_s8);}
+    if (arg_s9!="") { k.push_back(arg_s9);}
+    if (arg_s10!="") { k.push_back(arg_s10);}
+    if (arg_s11!="") { k.push_back(arg_s11);}
+    if (arg_s12!="") { k.push_back(arg_s12);}
+    if (arg_s13!="") { k.push_back(arg_s13);}
+    if (arg_s14!="") { k.push_back(arg_s14);}
+    if (arg_s15!="") { k.push_back(arg_s15);}
+    if (arg_s16!="") { k.push_back(arg_s16);}
+    if (arg_s17!="") { k.push_back(arg_s17);}
+    if (arg_s18!="") { k.push_back(arg_s18);}
+    if (arg_s19!="") { k.push_back(arg_s19);}
+    assignNode(new IOSchemeCustomInternal(k));
   }
  
   IOSchemeInternal* IOScheme::operator->(){

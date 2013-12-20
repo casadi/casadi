@@ -108,7 +108,7 @@ class IOSchemeCustomInternal : public IOSchemeInternal {
   public:    
   
     /// Default constructor
-    IOSchemeCustomInternal(const std::vector<std::string> &entries);
+    IOSchemeCustomInternal(const std::vector<std::string> &entries, const std::vector<std::string> &descriptions=std::vector<std::string>());
     
     /// Name of the scheme
     virtual std::string name() const;
@@ -138,10 +138,11 @@ class IOSchemeCustomInternal : public IOSchemeInternal {
     virtual void repr(std::ostream &stream=std::cout) const;
 
     /// Clone
-    virtual IOSchemeCustomInternal* clone() const{ return new IOSchemeCustomInternal(entries_); }
+    virtual IOSchemeCustomInternal* clone() const{ return new IOSchemeCustomInternal(entries_,descriptions_); }
     
   private:
     std::vector<std::string> entries_;
+    std::vector<std::string> descriptions_;
     std::map<std::string,int> entrymap_;
 };
 

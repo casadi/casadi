@@ -525,17 +525,32 @@ class FXtests(casadiTestCase):
     self.checkarray(cr,DMatrix([3,4]))
     
   def test_customIO(self):
+    
+    myOut = IOScheme(["foo","bar"])
+
     x = ssym("x")
-    f = SXFunction([x],customIO(foo=x*x,bar=x))
+    
+    with self.assertRaises(Exception):
+      myOut(baz=x)
+    
+    f = SXFunction([x],myOut(foo=x*x,bar=x))
     f.init()
     
     f.setInput(12,0)
     f.evaluate()
     self.checkarray(DMatrix([144]),f.output("foo"))
     self.checkarray(DMatrix([12]),f.output("bar"))
+
     
     with self.assertRaises(Exception):
       f.output("baz")
+      
+    ret = f.eval([12])
+    self.checkarray(myOut(ret,"foo")[0],DMatrix([144]))
+    self.checkarray(myOut(ret,"bar")[0],DMatrix([12]))
+    with self.assertRaises(Exception):
+      self.checkarray(myOut(ret,"baz")[0],DMatrix([12]))
+     
       
   def test_unknown_options(self):
     x = ssym("x")

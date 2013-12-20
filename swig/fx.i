@@ -58,7 +58,26 @@
 
 %include "symbolic/fx/io_interface.hpp"
 %template(IOInterfaceFX) CasADi::IOInterface<CasADi::FX>;
+
+%rename(__call__original__) CasADi::IOScheme::operator();
 %include "symbolic/fx/io_scheme.hpp"
+#ifdef SWIGPYTHON
+%extend CasADi::IOScheme {
+%template(__call__) operator()< CasADi::CRSSparsity >;
+%template(__call__) operator()< CasADi::MX> ;
+%template(__call__) operator()< CasADi::Matrix<CasADi::SX> >;
+
+%pythoncode %{
+  def __call__(self,*dummy,**kwargs):
+    if len(dummy)>1: return self.__call__original__(dummy[0],dummy[1:])
+    return self.__call__original__(kwargs.keys(),kwargs.values())
+
+%}
+
+
+}
+#endif
+
 %include "symbolic/fx/io_scheme_vector.hpp"
 %template(IOSchemeVectorMX) CasADi::IOSchemeVector< CasADi::MX >;
 %template(IOSchemeVectorSXMatrix) CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SX> >;

@@ -66,10 +66,12 @@ namespace CasADi{
       stream << "builtinIO(" << name() << ")";
     }
     
-    IOSchemeCustomInternal::IOSchemeCustomInternal(const std::vector<std::string> &entries) : entries_(entries) {
+    IOSchemeCustomInternal::IOSchemeCustomInternal(const std::vector<std::string> &entries,const std::vector<std::string> &descriptions) : entries_(entries), descriptions_(descriptions)  {
       for (int i=0;i<entries.size();++i) {
         entrymap_[entries[i]] = i;
       }
+      if (descriptions_.empty())  descriptions_.resize(entries.size());
+      casadi_assert(descriptions_.size()==entries.size());
     }
     
     std::string IOSchemeCustomInternal::name() const {
@@ -95,7 +97,13 @@ namespace CasADi{
     }
 
     std::string IOSchemeCustomInternal::describe(int i) const {
-      return entry(i);
+      if (descriptions_[i].empty()) {
+        return entry(i);
+      }  else {
+        std::stringstream ss;
+        ss << entry(i) <<  " '" << descriptions_[i] << "'";
+        return ss.str();
+      }
     }
 
     int IOSchemeCustomInternal::index(const std::string &name) const {

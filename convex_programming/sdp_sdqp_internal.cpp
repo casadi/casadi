@@ -126,7 +126,10 @@ void SDPSDQPInternal::init(){
   
   g = blkdiag(g_sdqp,g);
   
-  mapping_ = MXFunction(customIO("g_socp",g_socp,"h_socp",h_socp,"f_sdqp",f_sdqp,"g_sdqp",g_sdqp),customIO("f",vertcat(fi),"g",g));
+  IOScheme mappingIn("g_socp","h_socp","f_sdqp","g_sdqp");
+  IOScheme mappingOut("f","g");
+  
+  mapping_ = MXFunction(mappingIn("g_socp",g_socp,"h_socp",h_socp,"f_sdqp",f_sdqp,"g_sdqp",g_sdqp),mappingOut("f",vertcat(fi),"g",g));
   mapping_.init();
 
   // Create an sdpsolver instance
