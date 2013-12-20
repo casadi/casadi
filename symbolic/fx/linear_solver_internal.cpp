@@ -239,23 +239,19 @@ namespace CasADi{
 
       if(fwd){
 
-        // Copy B_ptr to a temporary vector and clear X_ptr (NOTE: normally, B_ptr == X_ptr)
+        // Copy B_ptr to a temporary vector
         copy(B_ptr,B_ptr+n,tmp_ptr);
-        std::fill(X_ptr,X_ptr+n,0);
 
         // Add A_hat contribution to tmp
-        for(int i=0; i<n; ++i){ // Loop over the rows of A
-          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
-            int j = A_col[k]; // get the column
-            if(tr){
-              tmp_ptr[i] |= A_ptr[k];
-            } else {
-              tmp_ptr[j] |= A_ptr[k];
-            }
+        for(int i=0; i<n; ++i){
+          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
+            int j = A_col[k];
+            tmp_ptr[tr ? i : j] |= A_ptr[k];
           }
         }
 
         // Propagate to X_ptr
+        std::fill(X_ptr,X_ptr+n,0);
         solveProp(X_ptr,tmp_ptr,tr);
       
       } else { // adjoint
@@ -276,11 +272,7 @@ namespace CasADi{
         for(int i=0; i<n; ++i){
           for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
             int j = A_col[k];
-            if(tr){
-              A_ptr[k] |= tmp_ptr[i];
-            } else {
-              A_ptr[k] |= tmp_ptr[j];
-            }
+            A_ptr[k] |= tmp_ptr[tr ? i : j];
           }
         }
       }
@@ -288,76 +280,6 @@ namespace CasADi{
       // Continue to the next right-hand-side
       B_ptr += n;
       X_ptr += n;      
-    }
-
-    return;
-    
-
-    // Old implementation, to be removed
-    {
-
-      // Sparsity of the rhs
-      const CRSSparsity& sp = input[0]->sparsity();
-      const std::vector<int>& rowind = sp.rowind();
-      int nrhs = sp.size1();
-      int nnz = input[1]->size();
-
-      // Get pointers to data
-      bvec_t* B_ptr = reinterpret_cast<bvec_t*>(input[0]->ptr());
-      bvec_t* A_ptr = reinterpret_cast<bvec_t*>(input[1]->ptr());
-      bvec_t* X_ptr = reinterpret_cast<bvec_t*>(output[0]->ptr());
-
-      if(fwd){
-    
-        // Get dependencies of all A elements
-        bvec_t A_dep = 0;
-        for(int i=0; i<nnz; ++i){
-          A_dep |= *A_ptr++;
-        }
-
-        // One right hand side at a time
-        for(int i=0; i<nrhs; ++i){
-
-          // Add dependencies on B
-          bvec_t AB_dep = A_dep;
-          for(int k=rowind[i]; k<rowind[i+1]; ++k){
-            AB_dep |= *B_ptr++;
-          }
-
-          // Propagate to X
-          for(int k=rowind[i]; k<rowind[i+1]; ++k){
-            *X_ptr++ = AB_dep;
-          }
-        }
-      } else {
-
-        // Dependencies of all X
-        bvec_t X_dep_all = 0;
-
-        // One right hand side at a time
-        for(int i=0; i<nrhs; ++i){
-
-          // Everything that depends on X
-          bvec_t X_dep = 0;
-          for(int k=rowind[i]; k<rowind[i+1]; ++k){
-            X_dep |= *X_ptr;
-            *X_ptr++ = 0;
-          }
-
-          // Propagate to B
-          for(int k=rowind[i]; k<rowind[i+1]; ++k){
-            *B_ptr++ |= X_dep;
-          }
-
-          // Collect dependencies on all X
-          X_dep_all |= X_dep;
-        }
-
-        // Propagate to A
-        for(int i=0; i<nnz; ++i){
-          *A_ptr++ |= X_dep_all;
-        }
-      }
     }
   }
 
