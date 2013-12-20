@@ -39,7 +39,7 @@
 */
 /** \defgroup scheme_LinsolInput
 <a name='schemes'></a><table>
-<caption>Input scheme: CasADi::LinsolInput  (LINSOL_NUM_IN = 4) [linsolIn]</caption>
+<caption>Input scheme: CasADi::LinsolInput  (LINSOL_NUM_IN = 3) [linsolIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>LINSOL_A</td><td>A</td><td>The square matrix A: sparse, (n x n). .</td></tr>
 <tr><td>LINSOL_B</td><td>B</td><td>The right-hand-side matrix b: dense, (m x n) .</td></tr>
