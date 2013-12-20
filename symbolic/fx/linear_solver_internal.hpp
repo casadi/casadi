@@ -65,10 +65,10 @@ namespace CasADi{
     void evaluateMXGen(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given, bool tr);
 
     // Propagate sparsity, possibly transposed
-    void propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd, bool tr);
+    void propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd, bool transpose);
 
-    // Helper function: Propagate sparsity through a linear solve
-    void solveProp(bvec_t* X_ptr, bvec_t* tmp_ptr, bool tr) const;
+    // Propagate sparsity through a linear solve
+    void spSolve(bvec_t* X, bvec_t* B, bool transpose) const;
 
     // Dulmage-Mendelsohn decomposition
     std::vector<int> rowperm_, colperm_, rowblock_, colblock_;

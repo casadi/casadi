@@ -62,6 +62,11 @@ namespace CasADi{
     return dynamic_cast<const LinearSolverInternal*>(get())!=0;
   }
 
+  void LinearSolver::spSolve(bvec_t* X, bvec_t* B, bool transpose) const{
+    (*this)->spSolve(X,B,transpose);
+  }
+
+
 } // namespace CasADi
 
   

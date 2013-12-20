@@ -217,7 +217,7 @@ namespace CasADi{
     }
   }
 
-  void LinearSolverInternal::propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd, bool tr){
+  void LinearSolverInternal::propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd, bool transpose){
 
     // Sparsities
     const CRSSparsity& r_sp = input[0]->sparsity();
@@ -246,19 +246,19 @@ namespace CasADi{
         for(int i=0; i<n; ++i){
           for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
             int j = A_col[k];
-            tmp_ptr[tr ? i : j] |= A_ptr[k];
+            tmp_ptr[transpose ? i : j] |= A_ptr[k];
           }
         }
 
         // Propagate to X_ptr
         std::fill(X_ptr,X_ptr+n,0);
-        solveProp(X_ptr,tmp_ptr,tr);
+        spSolve(X_ptr,tmp_ptr,transpose);
       
       } else { // adjoint
         
         // Solve transposed
         std::fill(tmp_ptr,tmp_ptr+n,0);
-        solveProp(tmp_ptr,B_ptr,!tr);
+        spSolve(tmp_ptr,B_ptr,!transpose);
         
         // Clear seeds
         std::fill(B_ptr,B_ptr+n,0);
@@ -272,7 +272,7 @@ namespace CasADi{
         for(int i=0; i<n; ++i){
           for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
             int j = A_col[k];
-            A_ptr[k] |= tmp_ptr[tr ? i : j];
+            A_ptr[k] |= tmp_ptr[transpose ? i : j];
           }
         }
       }
@@ -283,12 +283,12 @@ namespace CasADi{
     }
   }
 
-  void LinearSolverInternal::solveProp(bvec_t* X, bvec_t* B, bool tr) const{
+  void LinearSolverInternal::spSolve(bvec_t* X, bvec_t* B, bool transpose) const{
     const CRSSparsity& A_sp = input(LINSOL_A).sparsity();
     const std::vector<int>& A_rowind = A_sp.rowind();
     const std::vector<int>& A_col = A_sp.col();
 
-    if(tr){
+    if(transpose){
       int nb = colblock_.size()-1; // number of blocks
       for(int b=0; b<nb; ++b){ // loop over the blocks
 
