@@ -218,73 +218,6 @@ namespace CasADi{
   }
 
   void LinearSolverInternal::propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd, bool tr){
-#if 1
-
-    // Sparsity of the rhs
-    const CRSSparsity& sp = input[0]->sparsity();
-    const std::vector<int>& rowind = sp.rowind();
-    int nrhs = sp.size1();
-    int nnz = input[1]->size();
-
-    // Get pointers to data
-    bvec_t* B_ptr = reinterpret_cast<bvec_t*>(input[0]->ptr());
-    bvec_t* A_ptr = reinterpret_cast<bvec_t*>(input[1]->ptr());
-    bvec_t* X_ptr = reinterpret_cast<bvec_t*>(output[0]->ptr());
-
-    if(fwd){
-    
-      // Get dependencies of all A elements
-      bvec_t A_dep = 0;
-      for(int i=0; i<nnz; ++i){
-        A_dep |= *A_ptr++;
-      }
-
-      // One right hand side at a time
-      for(int i=0; i<nrhs; ++i){
-
-        // Add dependencies on B
-        bvec_t AB_dep = A_dep;
-        for(int k=rowind[i]; k<rowind[i+1]; ++k){
-          AB_dep |= *B_ptr++;
-        }
-
-        // Propagate to X
-        for(int k=rowind[i]; k<rowind[i+1]; ++k){
-          *X_ptr++ = AB_dep;
-        }
-      }
-    } else {
-
-      // Dependencies of all X
-      bvec_t X_dep_all = 0;
-
-      // One right hand side at a time
-      for(int i=0; i<nrhs; ++i){
-
-        // Everything that depends on X
-        bvec_t X_dep = 0;
-        for(int k=rowind[i]; k<rowind[i+1]; ++k){
-          X_dep |= *X_ptr;
-          *X_ptr++ = 0;
-        }
-
-        // Propagate to B
-        for(int k=rowind[i]; k<rowind[i+1]; ++k){
-          *B_ptr++ |= X_dep;
-        }
-
-        // Collect dependencies on all X
-        X_dep_all |= X_dep;
-      }
-
-      // Propagate to A
-      for(int i=0; i<nnz; ++i){
-        *A_ptr++ |= X_dep_all;
-      }
-    }
-
-
-#else
 
     // Sparsities
     const CRSSparsity& r_sp = input[0]->sparsity();
@@ -302,7 +235,7 @@ namespace CasADi{
     bvec_t* tmp_ptr = reinterpret_cast<bvec_t*>(getPtr(rtmp));
 
     // For all right-hand-sides
-    for(int r=0; r<nrhs; ++r){ 
+    for(int r=0; r<nrhs; ++r){
 
       if(fwd){
 
@@ -321,99 +254,61 @@ namespace CasADi{
             }
           }
         }
-                
-        // Propagate dependencies to X_hat
-        for(int i=0; i<n; ++i){ // Loop over the rows of A
-          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
-            int j = A_col[k]; // get the column            
-            if(tr){
-              X_ptr[i] |= tmp_ptr[j];
-            } else {
-              X_ptr[j] |= tmp_ptr[i];
+
+        if(tr){
+          int nb = colblock_.size()-1; // number of blocks
+          for(int b=0; b<nb; ++b){ // loop over the blocks
+
+            // Get dependencies ...
+            bvec_t block_dep = 0;
+            for(int el=rowblock_[b]; el<rowblock_[b+1]; ++el){
+              // ... from all right-hand-sides in the block ...
+              int i = rowperm_[el];
+              block_dep |= tmp_ptr[i];
+
+              // ... as well as from all dependent variables
+              for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
+                int j=A_col[k];
+                block_dep |= X_ptr[j];
+              }
+            }
+
+            // Propagate to all variables in the block
+            for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
+              int j = colperm_[el];
+              X_ptr[j] = block_dep;
             }
           }
-        }
-        
-        // Propagate interdependencies in X_hat
-        std::fill(tmp_ptr,tmp_ptr+n,0);
-        for(int iter=0; iter<n; ++iter){ // n represents the worst case
-          bool no_change = true; // is there any change at all in this iteration
-          for(int i=0; i<n; ++i){ // Loop over the rows of A
-            for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
-              int j = A_col[k]; // get the column
-              if(tr){
-                no_change &= X_ptr[i] == tmp_ptr[i];
-                X_ptr[i] |= tmp_ptr[i];
-                tmp_ptr[i] |= X_ptr[i];
-              } else {
-                no_change &= X_ptr[j] == tmp_ptr[j];
-                X_ptr[j] |= tmp_ptr[j];
-                tmp_ptr[j] |= X_ptr[j];
+        } else {
+          int nb = colblock_.size()-1; // number of blocks
+          for(int b=nb-1; b>=0; --b){ // loop over the blocks
+            
+            // Get dependencies from all right-hand-sides
+            bvec_t block_dep = 0;
+            for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
+              int j = colperm_[el];
+              block_dep |= tmp_ptr[j];
+            }
+
+            // Propagate ...
+            for(int el=rowblock_[b]; el<rowblock_[b+1]; ++el){
+              // ... to all variables in the block
+              int i = rowperm_[el];
+              X_ptr[i] = block_dep;
+
+              // ... as well as to all other right-hand-sides
+              for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
+                int j=A_col[k];
+                tmp_ptr[j] |= block_dep;
               }
             }
           }
-
-          // Stop iterating if reached a steady state
-          if(no_change) break;
         }
       
       } else { // adjoint
 
-        // Propagate dependencies from X_ptr
-        std::fill(tmp_ptr,tmp_ptr+n,0);
-        for(int i=0; i<n; ++i){ // Loop over the rows of A
-          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
-            int j = A_col[k]; // get the column            
-            if(tr){
-              tmp_ptr[j] |= X_ptr[i];
-            } else {
-              tmp_ptr[i] |= X_ptr[j];
-            }
-          }
-        }
+        // Not yet ready, use fallback below
 
-        // Propagate interdependencies, use X_ptr as temporary
-        std::fill(X_ptr,X_ptr+n,0);
-        for(int iter=0; iter<n; ++iter){ // n represents the worst case
-          bool no_change = true; // is there any change at all in this iteration
-          for(int i=0; i<n; ++i){ // Loop over the rows of A
-            for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
-              int j = A_col[k]; // get the column
-              if(tr){
-                no_change &= tmp_ptr[i] == X_ptr[i];
-                tmp_ptr[i] |= X_ptr[i];
-                X_ptr[i] |= tmp_ptr[i];
-              } else {
-                no_change &= tmp_ptr[j] == X_ptr[j];
-                tmp_ptr[j] |= X_ptr[j];
-                X_ptr[j] |= tmp_ptr[j];
-              }
-            }
-          }
-
-          // Stop iterating if reached a steady state
-          if(no_change) break;
-        }
-
-        // Clear seeds (again)
-        std::fill(X_ptr,X_ptr+n,0);
-
-        // Propagate to A_ptr
-        for(int i=0; i<n; ++i){ // Loop over the rows of A
-          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){ // loop over the nonzeros
-            int j = A_col[k]; // get the column
-            if(tr){
-              A_ptr[k] |= tmp_ptr[i];
-            } else {
-              A_ptr[k] |= tmp_ptr[j];
-            }
-          }
-        }
-
-        // Propagate to B_ptr
-        for(int i=0; i<n; ++i){ // Loop over the rows of A
-          B_ptr[i] |= tmp_ptr[i];
-        }
       }
 
       // Continue to the next right-hand-side
@@ -421,7 +316,76 @@ namespace CasADi{
       X_ptr += n;      
     }
 
-#endif
+    // Only forward mode is ready
+    if(fwd) return;
+    
+
+    // Old implementation, to be removed
+    {
+
+      // Sparsity of the rhs
+      const CRSSparsity& sp = input[0]->sparsity();
+      const std::vector<int>& rowind = sp.rowind();
+      int nrhs = sp.size1();
+      int nnz = input[1]->size();
+
+      // Get pointers to data
+      bvec_t* B_ptr = reinterpret_cast<bvec_t*>(input[0]->ptr());
+      bvec_t* A_ptr = reinterpret_cast<bvec_t*>(input[1]->ptr());
+      bvec_t* X_ptr = reinterpret_cast<bvec_t*>(output[0]->ptr());
+
+      if(fwd){
+    
+        // Get dependencies of all A elements
+        bvec_t A_dep = 0;
+        for(int i=0; i<nnz; ++i){
+          A_dep |= *A_ptr++;
+        }
+
+        // One right hand side at a time
+        for(int i=0; i<nrhs; ++i){
+
+          // Add dependencies on B
+          bvec_t AB_dep = A_dep;
+          for(int k=rowind[i]; k<rowind[i+1]; ++k){
+            AB_dep |= *B_ptr++;
+          }
+
+          // Propagate to X
+          for(int k=rowind[i]; k<rowind[i+1]; ++k){
+            *X_ptr++ = AB_dep;
+          }
+        }
+      } else {
+
+        // Dependencies of all X
+        bvec_t X_dep_all = 0;
+
+        // One right hand side at a time
+        for(int i=0; i<nrhs; ++i){
+
+          // Everything that depends on X
+          bvec_t X_dep = 0;
+          for(int k=rowind[i]; k<rowind[i+1]; ++k){
+            X_dep |= *X_ptr;
+            *X_ptr++ = 0;
+          }
+
+          // Propagate to B
+          for(int k=rowind[i]; k<rowind[i+1]; ++k){
+            *B_ptr++ |= X_dep;
+          }
+
+          // Collect dependencies on all X
+          X_dep_all |= X_dep;
+        }
+
+        // Propagate to A
+        for(int i=0; i<nnz; ++i){
+          *A_ptr++ |= X_dep_all;
+        }
+      }
+    }
   }
 
   void LinearSolverInternal::evaluateDGen(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, bool tr){
