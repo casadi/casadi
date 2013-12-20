@@ -255,60 +255,34 @@ namespace CasADi{
           }
         }
 
-        if(tr){
-          int nb = colblock_.size()-1; // number of blocks
-          for(int b=0; b<nb; ++b){ // loop over the blocks
+        // Propagate to X_ptr
+        solveProp(X_ptr,tmp_ptr,tr);
+      
+      } else { // adjoint
+        
+        // Solve transposed
+        std::fill(tmp_ptr,tmp_ptr+n,0);
+        solveProp(tmp_ptr,B_ptr,!tr);
+        
+        // Clear seeds
+        std::fill(B_ptr,B_ptr+n,0);
 
-            // Get dependencies ...
-            bvec_t block_dep = 0;
-            for(int el=rowblock_[b]; el<rowblock_[b+1]; ++el){
-              // ... from all right-hand-sides in the block ...
-              int i = rowperm_[el];
-              block_dep |= tmp_ptr[i];
+        // Propagate to X_ptr
+        for(int i=0; i<n; ++i){
+          X_ptr[i] |= tmp_ptr[i];
+        }
 
-              // ... as well as from all dependent variables
-              for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
-                int j=A_col[k];
-                block_dep |= X_ptr[j];
-              }
-            }
-
-            // Propagate to all variables in the block
-            for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
-              int j = colperm_[el];
-              X_ptr[j] = block_dep;
-            }
-          }
-        } else {
-          int nb = colblock_.size()-1; // number of blocks
-          for(int b=nb-1; b>=0; --b){ // loop over the blocks
-            
-            // Get dependencies from all right-hand-sides
-            bvec_t block_dep = 0;
-            for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
-              int j = colperm_[el];
-              block_dep |= tmp_ptr[j];
-            }
-
-            // Propagate ...
-            for(int el=rowblock_[b]; el<rowblock_[b+1]; ++el){
-              // ... to all variables in the block
-              int i = rowperm_[el];
-              X_ptr[i] = block_dep;
-
-              // ... as well as to all other right-hand-sides
-              for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
-                int j=A_col[k];
-                tmp_ptr[j] |= block_dep;
-              }
+        // Propagate to A_ptr
+        for(int i=0; i<n; ++i){
+          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
+            int j = A_col[k];
+            if(tr){
+              A_ptr[k] |= tmp_ptr[i];
+            } else {
+              A_ptr[k] |= tmp_ptr[j];
             }
           }
         }
-      
-      } else { // adjoint
-
-        // Not yet ready, use fallback below
-
       }
 
       // Continue to the next right-hand-side
@@ -316,8 +290,7 @@ namespace CasADi{
       X_ptr += n;      
     }
 
-    // Only forward mode is ready
-    if(fwd) return;
+    return;
     
 
     // Old implementation, to be removed
@@ -383,6 +356,62 @@ namespace CasADi{
         // Propagate to A
         for(int i=0; i<nnz; ++i){
           *A_ptr++ |= X_dep_all;
+        }
+      }
+    }
+  }
+
+  void LinearSolverInternal::solveProp(bvec_t* X, bvec_t* B, bool tr) const{
+    const CRSSparsity& A_sp = input(LINSOL_A).sparsity();
+    const std::vector<int>& A_rowind = A_sp.rowind();
+    const std::vector<int>& A_col = A_sp.col();
+
+    if(tr){
+      int nb = colblock_.size()-1; // number of blocks
+      for(int b=0; b<nb; ++b){ // loop over the blocks
+
+        // Get dependencies ...
+        bvec_t block_dep = 0;
+        for(int el=rowblock_[b]; el<rowblock_[b+1]; ++el){
+          // ... from all right-hand-sides in the block ...
+          int i = rowperm_[el];
+          block_dep |= B[i];
+
+          // ... as well as from all dependent variables
+          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
+            int j=A_col[k];
+            block_dep |= X[j];
+          }
+        }
+
+        // Propagate to all variables in the block
+        for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
+          int j = colperm_[el];
+          X[j] = block_dep;
+        }
+      }
+    } else {
+      int nb = colblock_.size()-1; // number of blocks
+      for(int b=nb-1; b>=0; --b){ // loop over the blocks
+            
+        // Get dependencies from all right-hand-sides
+        bvec_t block_dep = 0;
+        for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
+          int j = colperm_[el];
+          block_dep |= B[j];
+        }
+
+        // Propagate ...
+        for(int el=rowblock_[b]; el<rowblock_[b+1]; ++el){
+          // ... to all variables in the block
+          int i = rowperm_[el];
+          X[i] = block_dep;
+
+          // ... as well as to all other right-hand-sides
+          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
+            int j=A_col[k];
+            B[j] |= block_dep;
+          }
         }
       }
     }

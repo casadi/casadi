@@ -67,6 +67,9 @@ namespace CasADi{
     // Propagate sparsity, possibly transposed
     void propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd, bool tr);
 
+    // Helper function: Propagate sparsity through a linear solve
+    void solveProp(bvec_t* X_ptr, bvec_t* tmp_ptr, bool tr) const;
+
     // Dulmage-Mendelsohn decomposition
     std::vector<int> rowperm_, colperm_, rowblock_, colblock_;
 

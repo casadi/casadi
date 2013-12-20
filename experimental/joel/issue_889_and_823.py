@@ -27,7 +27,7 @@ sol = CSparse(AA.sparsity())
 sol.init()
 x = sol.solve(AA,r.T,True).T
 f = MXFunction([r,AA],[x])
-#f.setOption("ad_mode","reverse")
+f.setOption("ad_mode","reverse")
 f.init()
 DMatrix.ones(f.jacSparsity(0,0)).printDense()
 DMatrix.ones(f.jacSparsity(1,0)).printDense()
