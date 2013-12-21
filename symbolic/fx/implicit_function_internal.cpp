@@ -325,24 +325,11 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::spEvaluate(bool fwd){
-    if(!fwd){
-      // Not working properly, fallback to base class
-      FXInternal::spEvaluate(fwd);
-      return;
-    }
-
-    // Get sparsity pattern of the Jacobian
-    const CRSSparsity J = f_.jacSparsity(0,0);
-    const vector<int>& J_rowind = J.rowind();
-    const vector<int>& J_col = J.col();
 
     // Get arrays
     bvec_t* z = reinterpret_cast<bvec_t*>(output(0).ptr());
     bvec_t* zf = reinterpret_cast<bvec_t*>(f_.input(0).ptr());
     bvec_t* rf = reinterpret_cast<bvec_t*>(f_.output(0).ptr());
-
-    // Temporary
-    vector<bvec_t> tmp(n_,0);
 
     if(fwd){
 
@@ -352,7 +339,7 @@ namespace CasADi{
         f_.input(i+1).set(input(i));
       }
 
-      // Propagate dependencies through the function to get the influenced equations
+      // Propagate dependencies through the function
       f_.spEvaluate(true);
       
       // "Solve" in order to propagate to z
@@ -361,60 +348,17 @@ namespace CasADi{
 
     } else { 
 
-      casadi_error("a");
-
-#if 0
-      
-      // Propagate dependencies to rf
+      // "Solve" in order to get seed
       fill(rf,rf+n_,0);
-      for(int i=0; i<n_; ++i){ // Loop over the rows of A
-        for(int k=J_rowind[i]; k<J_rowind[i+1]; ++k){ // loop over the nonzeros
-          int j = J_col[k]; // get the column            
-          rf[j] |= z[i];
-        }
-      }
-
-      // Add interdependencies
-      for(int iter=0; iter<n_; ++iter){ // n represents the worst case
-        bool no_change = true; // is there any change at all in this iteration
-        for(int i=0; i<n_; ++i){ // Loop over the rows of A
-          for(int k=J_rowind[i]; k<J_rowind[i+1]; ++k){ // loop over the nonzeros
-            int j = J_col[k]; // get the column
-            no_change &= rf[j] == tmp[j];
-            rf[j] |= tmp[j];
-            tmp[j] |= rf[j];
-          }
-        }
-
-        // Stop iterating if reached a steady state
-        if(no_change) break;
-      }
+      linsol_.spSolve(rf,z,false);
       
-      // Propagate to the arguments
+      // Propagate dependencies through the function
       f_.spEvaluate(false);
+
+      // Collect influence on inputs
       for(int i=0; i<getNumInputs(); ++i){
         f_.input(i+1).get(input(i));
       }
-
-#else
-      bvec_t all_depend(0);
-
-      for(int oind=0; oind<getNumOutputs(); ++oind){
-        const DMatrix& m = outputNoCheck(oind);
-        const bvec_t* v = get_bvec_t(m.data());
-        for(int i=0; i<m.size(); ++i){
-          all_depend |= v[i];
-        }
-      }
-      for(int iind=0; iind<getNumInputs(); ++iind){
-        DMatrix& m = inputNoCheck(iind);
-        bvec_t* v = get_bvec_t(m.data());
-        for(int i=0; i<m.size(); ++i){
-          v[i] = all_depend;
-        }
-      }
-#endif
-
     }
   }
 
