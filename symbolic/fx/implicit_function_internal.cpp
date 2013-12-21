@@ -325,10 +325,11 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::spEvaluate(bool fwd){
-    // Not working properly, fallback to base class
-    FXInternal::spEvaluate(fwd);
-    return;
-
+    if(!fwd){
+      // Not working properly, fallback to base class
+      FXInternal::spEvaluate(fwd);
+      return;
+    }
 
     // Get sparsity pattern of the Jacobian
     const CRSSparsity J = f_.jacSparsity(0,0);
@@ -344,7 +345,6 @@ namespace CasADi{
     vector<bvec_t> tmp(n_,0);
 
     if(fwd){
-      //      casadi_error("fwd");
 
       // Pass inputs to function
       fill(zf,zf+n_,0);
@@ -354,35 +354,15 @@ namespace CasADi{
 
       // Propagate dependencies through the function to get the influenced equations
       f_.spEvaluate(true);
-
-      // Clear the pattern being calculated
+      
+      // "Solve" in order to propagate to z
       fill(z,z+n_,0);
+      linsol_.spSolve(z,rf,true);
 
-      // Propagate dependencies to the variables
-      for(int i=0; i<n_; ++i){ // Loop over the rows of A
-        for(int k=J_rowind[i]; k<J_rowind[i+1]; ++k){ // loop over the nonzeros
-          int j = J_col[k]; // get the column
-          z[i] |= rf[j];
-        }
-      }
-
-      // Propagate interdependencies in z
-      for(int iter=0; iter<n_; ++iter){ // n represents the worst case
-        bool no_change = true; // is there any change at all in this iteration
-        for(int i=0; i<n_; ++i){ // Loop over the rows of A
-          for(int k=J_rowind[i]; k<J_rowind[i+1]; ++k){ // loop over the nonzeros
-            int j = J_col[k]; // get the column
-            no_change &= z[i] == tmp[i];
-            z[i] |= tmp[i];
-            tmp[i] |= z[i];
-          }
-        }
-
-        // Stop iterating if reached a steady state
-        if(no_change) break;
-      }
-    
     } else { 
+
+      casadi_error("a");
+
 #if 0
       
       // Propagate dependencies to rf

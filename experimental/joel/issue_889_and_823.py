@@ -4,7 +4,7 @@ from casadi import *
 A = 2*DMatrix.ones(sp_diag(3)); A[1,0] = 1; A[2,0] = 1; A[2,1] = 1 # lower triangular
 
 # Permute
-A = vertcat((A[1,:],A[2,:],A[0,:]))
+#A = vertcat((A[1,:],A[2,:],A[0,:]))
 
 print "A = "
 A.printDense()
@@ -27,7 +27,7 @@ sol = CSparse(AA.sparsity())
 sol.init()
 x = sol.solve(AA,r.T,True).T
 f = MXFunction([r,AA],[x])
-f.setOption("ad_mode","reverse")
+#f.setOption("ad_mode","reverse")
 f.init()
 DMatrix.ones(f.jacSparsity(0,0)).printDense()
 DMatrix.ones(f.jacSparsity(1,0)).printDense()
