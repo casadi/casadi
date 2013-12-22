@@ -44,11 +44,6 @@ def IOSchemeVector(arg,io_scheme):
     pass
   raise Exception("IOSchemeVector called with faulty arguments. Individual values must be SXMatrix, MX or CRSSparsity.")
     
-def customIO(**kwargs):
-  items = kwargs.items()
-  
-  return IOSchemeVector(zip(*items)[1], IOScheme(zip(*items)[0]))
-  
 %}
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
