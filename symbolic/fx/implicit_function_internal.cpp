@@ -340,6 +340,7 @@ namespace CasADi{
       }
 
       // Propagate dependencies through the function
+      f_.spInit(true);
       f_.spEvaluate(true);
       
       // "Solve" in order to propagate to z
@@ -353,6 +354,7 @@ namespace CasADi{
       linsol_.spSolve(rf,z,false);
       
       // Propagate dependencies through the function
+      f_.spInit(false);
       f_.spEvaluate(false);
 
       // Collect influence on inputs

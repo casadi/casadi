@@ -49,6 +49,7 @@ void test(const CRSSparsity& sp){
     fill(vv,vv+v.size(),0);
   }
   
+  res.spInit(false);
   res.spEvaluate(false);
 
   for(int i=0; i<3; ++i){
