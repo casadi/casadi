@@ -46,8 +46,6 @@ enum LinsolInput{
   LINSOL_A,
   /// The right-hand-side matrix b: dense,  (m x n) [B]
   LINSOL_B,
-  /// Transpose A?: dense scalar, value 0 or 1,  (1 x 1) [T]
-  LINSOL_T,
   LINSOL_NUM_IN};
 
 /// Output arguments of a linear solver [linsolOut]
@@ -77,11 +75,15 @@ enum LinsolOutput{
     void prepare();
 
     /// Solve the system of equations, internal vector
-    void solve();
+    void solve(bool transpose=false);
 
 #ifndef SWIG
     /// Solve the factorized system of equations
     void solve(double* x, int nrhs=1, bool transpose=false);
+
+    /// Propagate sparsity through a linear solve
+    void spSolve(bvec_t* X, bvec_t* B, bool transpose=false) const;
+
 #endif // SWIG
 
     /// Create a solve node

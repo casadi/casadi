@@ -48,9 +48,6 @@ s.prepare()
 #! Give it the matrix b
 s.setInput(b,"B")
 
-#! Transpose A
-s.setInput(False,"T")
-
 #! And we are off to find x...
 s.solve()
 

@@ -24,10 +24,7 @@
 #define SOLVE_IMPL_HPP
 
 #include "solve.hpp"
-#include "../matrix/matrix_tools.hpp"
-#include "mx_tools.hpp"
-#include "../stl_vector_tools.hpp"
-#include "../fx/fx_internal.hpp"
+#include "../fx/linear_solver_internal.hpp"
 
 using namespace std;
 
@@ -54,182 +51,17 @@ namespace CasADi{
 
   template<bool Tr>
   void Solve<Tr>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
-    // Factorize the matrix
-    linear_solver_.setInput(*input[1],LINSOL_A);
-    linear_solver_.prepare();
-    
-    // Solve for nondifferentiated output
-    if(input[0]!=output[0]){
-      copy(input[0]->begin(),input[0]->end(),output[0]->begin());
-    }
-    linear_solver_.solve(getPtr(output[0]->data()),output[0]->size1(),Tr);
+    linear_solver_->evaluateDGen(input,output,Tr);
   }
 
   template<bool Tr>
   void Solve<Tr>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-    const MX& B = *input[0];
-    const MX& A = *input[1];
-    MX& X = *output[0];
-
-    // Nondifferentiated output
-    if(!output_given){
-      if(CasADi::isZero(B)){
-        X = MX::sparse(B.shape());
-      } else {
-        X = A->getSolve(B,Tr,linear_solver_);
-      }
-    }
-
-    // Forward sensitivities, collect the right hand sides
-    vector<int> rhs_ind;
-    vector<MX> rhs;
-    vector<int> row_offset(1,0);
-    for(int d=0; d<nfwd; ++d){
-      const MX& B_hat = *fwdSeed[d][0];
-      const MX& A_hat = *fwdSeed[d][1];
-      
-      // Get right hand side
-      MX rhs_d;
-      if(Tr){
-        rhs_d = B_hat - mul(X,trans(A_hat));
-      } else {
-        rhs_d = B_hat - mul(X,A_hat);
-      }
-      
-      // Simplifiy if zero
-      if(CasADi::isZero(rhs_d)){
-        *fwdSens[d][0] = MX::sparse(rhs_d.shape());
-      } else {
-        rhs.push_back(rhs_d);
-        rhs_ind.push_back(d);
-        row_offset.push_back(row_offset.back()+rhs_d.size1());
-      }
-    }
-    
-    if(!rhs.empty()){
-      // Solve for all directions at once
-      rhs = vertsplit(A->getSolve(vertcat(rhs),Tr,linear_solver_),row_offset);
-    
-      // Save result
-      for(int i=0; i<rhs.size(); ++i){
-        *fwdSens[rhs_ind[i]][0] = rhs[i];
-      }
-    }
-
-    // Adjoint sensitivities, collect right hand sides
-    rhs.resize(0);
-    rhs_ind.resize(0);
-    row_offset.resize(1);
-    for(int d=0; d<nadj; ++d){
-      MX& X_bar = *adjSeed[d][0];
-      
-      // Simplifiy if zero
-      if(CasADi::isZero(X_bar)){
-        if(adjSeed[d][0]!=adjSens[d][0]){
-          *adjSens[d][0] = X_bar;
-          X_bar = MX();
-        }
-      } else {
-        rhs.push_back(X_bar);
-        rhs_ind.push_back(d);
-        row_offset.push_back(row_offset.back()+X_bar.size1());
-
-        // Delete seed
-        X_bar = MX();
-      }
-    }
-
-    if(!rhs.empty()){
-      // Solve for all directions at once
-      rhs = vertsplit(A->getSolve(vertcat(rhs),!Tr,linear_solver_),row_offset);
-    
-      for(int i=0; i<rhs.size(); ++i){
-        int d = rhs_ind[i];
-
-        // Propagate to A
-        if(!Tr){
-          
-          *adjSens[d][1] -= mul(trans(X),rhs[i],A.sparsity());
-        } else {
-          *adjSens[d][1] -= mul(trans(rhs[i]),X,A.sparsity());
-        }
-
-        // Propagate to B
-        if(adjSeed[d][0]==adjSens[d][0]){
-          *adjSens[d][0] = rhs[i];
-        } else {
-          *adjSens[d][0] += rhs[i];
-        }
-      }
-    }
+    linear_solver_->evaluateMXGen(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,Tr);
   }
   
   template<bool Tr>
-  void Solve<Tr>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-    // Sparsity of the rhs
-    const CRSSparsity& sp = input[0]->sparsity();
-    const vector<int>& rowind = sp.rowind();
-    int nrhs = sp.size1();
-    int nnz = input[1]->size();
-
-    // Get pointers to data
-    bvec_t* B_ptr = reinterpret_cast<bvec_t*>(input[0]->ptr());
-    bvec_t* A_ptr = reinterpret_cast<bvec_t*>(input[1]->ptr());
-    bvec_t* X_ptr = reinterpret_cast<bvec_t*>(output[0]->ptr());
-
-    if(fwd){
-    
-      // Get dependencies of all A elements
-      bvec_t A_dep = 0;
-      for(int i=0; i<nnz; ++i){
-        A_dep |= *A_ptr++;
-      }
-
-      // One right hand side at a time
-      for(int i=0; i<nrhs; ++i){
-
-        // Add dependencies on B
-        bvec_t AB_dep = A_dep;
-        for(int k=rowind[i]; k<rowind[i+1]; ++k){
-          AB_dep |= *B_ptr++;
-        }
-
-        // Propagate to X
-        for(int k=rowind[i]; k<rowind[i+1]; ++k){
-          *X_ptr++ = AB_dep;
-        }
-      }
-    } else {
-
-      // Dependencies of all X
-      bvec_t X_dep_all = 0;
-
-      // One right hand side at a time
-      for(int i=0; i<nrhs; ++i){
-
-        // Everything that depends on X
-        bvec_t X_dep = 0;
-        for(int k=rowind[i]; k<rowind[i+1]; ++k){
-          X_dep |= *X_ptr;
-          *X_ptr++ = 0;
-        }
-
-        // Propagate to B
-        for(int k=rowind[i]; k<rowind[i+1]; ++k){
-          *B_ptr++ |= X_dep;
-        }
-
-        // Collect dependencies on all X
-        X_dep_all |= X_dep;
-      }
-
-      // Propagate to A
-      for(int i=0; i<nnz; ++i){
-        *A_ptr++ |= X_dep_all;
-      }
-    }
+  void Solve<Tr>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd){
+    linear_solver_->propagateSparsityGen(input,output,itmp,rtmp,fwd,Tr);
   }
 
   template<bool Tr>

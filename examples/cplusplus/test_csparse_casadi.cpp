@@ -71,8 +71,8 @@ int main(int argc, char *argv[])
   // Solve
   linear_solver.setInput(val,"A");
   linear_solver.setInput(rhs,"B");
-  linear_solver.setInput(double(tr),"T");
-  linear_solver.evaluate();
+  linear_solver.prepare();
+  linear_solver.solve(tr);
   
   // Print the solution
   cout << "solution = " << linear_solver.output("X") << endl;

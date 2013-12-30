@@ -215,6 +215,46 @@ namespace CasADi{
     casadi_assert(v_it==v.end());
   }
 
+  void ImplicitFunctionInternal::spEvaluate(bool fwd){
+
+    // Get arrays
+    bvec_t* z = reinterpret_cast<bvec_t*>(output(0).ptr());
+    bvec_t* zf = reinterpret_cast<bvec_t*>(f_.input(0).ptr());
+    bvec_t* rf = reinterpret_cast<bvec_t*>(f_.output(0).ptr());
+
+    if(fwd){
+
+      // Pass inputs to function
+      fill(zf,zf+n_,0);
+      for(int i=0; i<getNumInputs(); ++i){
+        f_.input(i+1).set(input(i));
+      }
+
+      // Propagate dependencies through the function
+      f_.spInit(true);
+      f_.spEvaluate(true);
+      
+      // "Solve" in order to propagate to z
+      fill(z,z+n_,0);
+      linsol_.spSolve(z,rf,true);
+
+    } else { 
+
+      // "Solve" in order to get seed
+      fill(rf,rf+n_,0);
+      linsol_.spSolve(rf,z,false);
+      
+      // Propagate dependencies through the function
+      f_.spInit(false);
+      f_.spEvaluate(false);
+
+      // Collect influence on inputs
+      for(int i=0; i<getNumInputs(); ++i){
+        f_.input(i+1).get(input(i));
+      }
+    }
+  }
+
  
 } // namespace CasADi
 

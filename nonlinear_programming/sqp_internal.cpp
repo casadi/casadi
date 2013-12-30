@@ -55,6 +55,7 @@ namespace CasADi{
   
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
+    addOption("print_time",         OT_BOOLEAN,       true,           "Print information about execution time");
   }
 
 
@@ -195,6 +196,17 @@ namespace CasADi{
   void SQPInternal::evaluate(){
     if (inputs_check_) checkInputs();
     checkInitialBounds();
+    
+    if (gather_stats_) {
+      Dictionary iterations;
+      iterations["inf_pr"] = std::vector<double>();
+      iterations["inf_du"] = std::vector<double>();
+      iterations["ls_trials"] = std::vector<double>();
+      iterations["d_norm"] = std::vector<double>();
+      iterations["obj"] = std::vector<double>();
+      stats_["iterations"] = iterations;
+    }
+    
   
     // Get problem data
     const vector<double>& x_init = input(NLP_SOLVER_X0).data();
@@ -209,6 +221,12 @@ namespace CasADi{
     // Initialize Lagrange multipliers of the NLP
     copy(input(NLP_SOLVER_LAM_G0).begin(),input(NLP_SOLVER_LAM_G0).end(),mu_.begin());
     copy(input(NLP_SOLVER_LAM_X0).begin(),input(NLP_SOLVER_LAM_X0).end(),mu_x_.begin());
+    
+    t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
+    
+    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
+    
+    double time1 = clock();
 
     // Initial constraint Jacobian
     eval_jac_g(x_,gk_,Jk_);
@@ -264,16 +282,41 @@ namespace CasADi{
       // Printing information about the actual iterate
       printIteration(cout,iter,fk_,pr_inf,gLag_norminf,dx_norminf,reg_,ls_iter,ls_success);
 	  
+	    if (gather_stats_) {
+        Dictionary & iterations = stats_["iterations"];
+        static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(pr_inf);
+        static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(gLag_norminf);
+        static_cast<std::vector<double> &>(iterations["d_norm"]).push_back(dx_norminf);
+        static_cast<std::vector<double> &>(iterations["ls_trials"]).push_back(ls_iter);
+        static_cast<std::vector<double> &>(iterations["obj"]).push_back(fk_);
+      }
+      
       // Call callback function if present
       if (!callback_.isNull()) {
+        double time1 = clock();
+        
         if (!output(NLP_SOLVER_F).empty()) output(NLP_SOLVER_F).set(fk_);
         if (!output(NLP_SOLVER_X).empty()) output(NLP_SOLVER_X).set(x_);
         if (!output(NLP_SOLVER_LAM_G).empty()) output(NLP_SOLVER_LAM_G).set(mu_);
         if (!output(NLP_SOLVER_LAM_X).empty()) output(NLP_SOLVER_LAM_X).set(mu_x_);
         if (!output(NLP_SOLVER_G).empty()) output(NLP_SOLVER_G).set(gk_);
-        int ret = callback_(ref_,user_data_);
         
-        if (!ret) {
+        Dictionary iteration;
+        iteration["iter"] = iter;
+        iteration["inf_pr"] = pr_inf;
+        iteration["inf_du"] = gLag_norminf;
+        iteration["d_norm"] = dx_norminf;
+        iteration["ls_trials"] = ls_iter;
+        iteration["obj"] = fk_;
+        stats_["iteration"] = iteration;
+        
+        double time2 = clock();
+        t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
+        time1 = clock();
+        int ret = callback_(ref_,user_data_);
+        time2 = clock();
+        t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
+        if (ret) {
           cout << endl;
           cout << "CasADi::SQPMethod: aborted by callback..." << endl;
           stats_["return_status"] = "User_Requested_Stop";
@@ -469,6 +512,9 @@ namespace CasADi{
         eval_h(x_,mu_,1.0,Bk_);
       }
     }
+    
+    double time2 = clock();
+    t_mainloop_ = double(time2-time1)/CLOCKS_PER_SEC;
   
     // Save results to outputs
     output(NLP_SOLVER_F).set(fk_);
@@ -476,9 +522,50 @@ namespace CasADi{
     output(NLP_SOLVER_LAM_G).set(mu_);
     output(NLP_SOLVER_LAM_X).set(mu_x_);
     output(NLP_SOLVER_G).set(gk_);
+    
+    if (hasOption("print_time") && bool(getOption("print_time"))) {
+      // Write timings
+      cout << "time spent in eval_f: " << t_eval_f_ << " s.";
+      if (n_eval_f_>0)
+        cout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
+      if (n_eval_grad_f_>0)
+        cout << " (" << n_eval_grad_f_ << " calls, " << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_g: " << t_eval_g_ << " s.";
+      if (n_eval_g_>0)
+        cout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
+      if (n_eval_jac_g_>0)
+        cout << " (" << n_eval_jac_g_ << " calls, " << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_h: " << t_eval_h_ << " s.";
+      if (n_eval_h_>1)
+        cout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
+      cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
+      cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
+    }
   
     // Save statistics
     stats_["iter_count"] = iter;
+    
+    stats_["t_eval_f"] = t_eval_f_;
+    stats_["t_eval_grad_f"] = t_eval_grad_f_;
+    stats_["t_eval_g"] = t_eval_g_;
+    stats_["t_eval_jac_g"] = t_eval_jac_g_;
+    stats_["t_eval_h"] = t_eval_h_;
+    stats_["t_mainloop"] = t_mainloop_;
+    stats_["t_callback_fun"] = t_callback_fun_;
+    stats_["t_callback_prepare"] = t_callback_prepare_;
+    stats_["n_eval_f"] = n_eval_f_;
+    stats_["n_eval_grad_f"] = n_eval_grad_f_;
+    stats_["n_eval_g"] = n_eval_g_;
+    stats_["n_eval_jac_g"] = n_eval_jac_g_;
+    stats_["n_eval_h"] = n_eval_h_;
   }
   
   void SQPInternal::printIteration(std::ostream &stream){
@@ -627,6 +714,7 @@ namespace CasADi{
 
   void SQPInternal::eval_g(const std::vector<double>& x, std::vector<double>& g){
     try {
+      double time1 = clock();
       
       // Quick return if no constraints
       if(ng_==0) return;
@@ -646,6 +734,10 @@ namespace CasADi{
         cout << "x = " << nlp_.input(NL_X) << endl;
         cout << "g = " << nlp_.output(NL_G) << endl;
       }
+      
+      double time2 = clock();
+      t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+      n_eval_g_ += 1;
     } catch (exception& ex){
       cerr << "eval_g failed: " << ex.what() << endl;
       throw;
@@ -654,6 +746,8 @@ namespace CasADi{
 
   void SQPInternal::eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J){
     try{
+      double time1 = clock();
+      
       // Quich finish if no constraints
       if(ng_==0) return;
     
@@ -677,6 +771,11 @@ namespace CasADi{
         cout << "J = " << endl;
         J.printSparse();
       }
+      
+      double time2 = clock();
+      t_eval_jac_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+      n_eval_jac_g_ += 1;
+      
     } catch (exception& ex){
       cerr << "eval_jac_g failed: " << ex.what() << endl;
       throw;
@@ -685,6 +784,8 @@ namespace CasADi{
 
   void SQPInternal::eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f){
     try {
+      double time1 = clock();
+       
       // Get function
       FX& gradF = this->gradF();
 
@@ -709,6 +810,10 @@ namespace CasADi{
         cout << "x      = " << x << endl;
         cout << "grad_f = " << grad_f << endl;
       }
+      double time2 = clock();
+      t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+      n_eval_grad_f_ += 1;
+      
     } catch (exception& ex){
       cerr << "eval_grad_f failed: " << ex.what() << endl;
       throw;
@@ -717,6 +822,9 @@ namespace CasADi{
   
   void SQPInternal::eval_f(const std::vector<double>& x, double& f){
     try {
+       // Log time
+      double time1 = clock();
+      
       // Pass the argument to the function
       nlp_.setInput(x,NL_X);
       nlp_.setInput(input(NLP_SOLVER_P),NL_P);
@@ -732,6 +840,10 @@ namespace CasADi{
         cout << "x = " << nlp_.input(NL_X) << endl;
         cout << "f = " << f << endl;
       }
+      double time2 = clock();
+      t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+      n_eval_f_ += 1;
+      
     } catch (exception& ex){
       cerr << "eval_f failed: " << ex.what() << endl;
       throw;

@@ -296,6 +296,16 @@ const vector<double>& GenericType::toDoubleVector() const{
   return static_cast<const DoubleVectorType*>(get())->d_;
 }
 
+vector<int>& GenericType::toIntVector() {
+  casadi_assert_message(isIntVector(),"type mismatch");
+  return static_cast<IntVectorType*>(get())->d_;
+}
+
+vector<double>& GenericType::toDoubleVector() {
+  casadi_assert_message(isDoubleVector(),"type mismatch");
+  return static_cast<DoubleVectorType*>(get())->d_;
+}
+
 const vector<string>& GenericType::toStringVector() const{
   casadi_assert_message(isStringVector(),"type mismatch");
   return static_cast<const StringVectorType*>(get())->d_;
@@ -309,6 +319,11 @@ const SharedObject& GenericType::toSharedObject() const{
 const Dictionary& GenericType::toDictionary() const{
   casadi_assert_message(isDictionary(),"type mismatch");
   return static_cast<const DictionaryType*>(get())->d_;
+}
+
+Dictionary& GenericType::toDictionary() {
+  casadi_assert_message(isDictionary(),"type mismatch");
+  return static_cast<DictionaryType*>(get())->d_;
 }
 
 const FX& GenericType::toFX() const{
@@ -465,6 +480,11 @@ GenericType::GenericType(const Dictionary& dict) : type_(OT_DICTIONARY) {
 GenericType::operator const GenericType::Dictionary& () const{
   casadi_assert_message(is_a<Dictionary>(),"type mismatch");
   return static_cast<const GenericTypeInternal<Dictionary>*>(get())->d_;
+}
+
+GenericType::operator GenericType::Dictionary& () {
+  casadi_assert_message(is_a<Dictionary>(),"type mismatch");
+  return static_cast<GenericTypeInternal<Dictionary>*>(get())->d_;
 }
 
 //GenericType::operator void*() const{

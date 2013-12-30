@@ -21,7 +21,6 @@
  */
 
 #include "linear_solver_internal.hpp"
-#include "../mx/mx_node.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -44,14 +43,14 @@ namespace CasADi{
     (*this)->solve(x,nrhs,transpose);
   }
  
-  void LinearSolver::solve(){
+  void LinearSolver::solve(bool transpose){
     assertInit();
-    (*this)->solve();
+    (*this)->solve(transpose);
   }
 
   MX LinearSolver::solve(const MX& A, const MX& B, bool transpose){
     assertInit();
-    return A->getSolve(B, transpose, *this);
+    return (*this)->solve(A,B,transpose);
   }
  
   bool LinearSolver::prepared() const{
@@ -62,6 +61,11 @@ namespace CasADi{
   bool LinearSolver::checkNode() const{
     return dynamic_cast<const LinearSolverInternal*>(get())!=0;
   }
+
+  void LinearSolver::spSolve(bvec_t* X, bvec_t* B, bool transpose) const{
+    (*this)->spSolve(X,B,transpose);
+  }
+
 
 } // namespace CasADi
 
