@@ -21,7 +21,7 @@ DMatrix.ones(f.jacSparsity(1,0)).printDense()
 
 print "SX, implicit function"
 x = ssym("x",3)
-res = SXFunction([r,x,AA],[mul(AA,x)-r])
+res = SXFunction([x,r,AA],[mul(AA,x)-r])
 f = NewtonImplicitSolver(res)
 f.setOption("linear_solver",CSparse)
 f.setOption("ad_mode","reverse")
@@ -44,7 +44,7 @@ DMatrix.ones(f.jacSparsity(1,0)).printDense()
 
 print "MX, implicit function"
 x = msym("x",3)
-res = MXFunction([r,x,AA],[mul(AA,x)-r])
+res = MXFunction([x,r,AA],[mul(AA,x)-r])
 f = NewtonImplicitSolver(res)
 f.setOption("linear_solver",CSparse)
 f.setOption("ad_mode","reverse")
