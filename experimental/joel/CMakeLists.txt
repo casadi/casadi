@@ -105,12 +105,3 @@ if(WITH_QPOASES AND WITH_IPOPT)
   target_link_libraries(nmpc_example casadi_qpoases_interface casadi_nonlinear_programming casadi_ipopt_interface casadi ${QPOASES_LIBRARIES} ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES})
 endif()
 
-if(WITH_CSPARSE)
-  add_executable(issue_933 issue_933.cpp)
-  target_link_libraries(issue_933
-    casadi_nonlinear_programming casadi_csparse_interface casadi
-    ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES}
-  )
-endif()
-
-
