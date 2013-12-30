@@ -6,6 +6,18 @@
 using namespace CasADi;
 using namespace std;
 
+void printBinary(bvec_t v){
+  for(int k=0; k<bvec_size; ++k){
+    if(k%4==0) cout << " ";
+    if(v & (bvec_t(1)<<k)){
+      cout << 1;
+    } else {
+      cout << 0;
+    }
+  }
+  cout << endl;
+}
+
 template<typename M, typename F>
 void test(const CRSSparsity& sp){
   M A = M::sym("A",sp);    
@@ -17,6 +29,38 @@ void test(const CRSSparsity& sp){
   res_in.push_back(A);
 
   F res(res_in,mul(A,x)-r);
+  res.init();
+
+  bvec_t* i0 = reinterpret_cast<bvec_t*>(res.input(0).ptr());
+  bvec_t* i1 = reinterpret_cast<bvec_t*>(res.input(1).ptr());
+  bvec_t* i2 = reinterpret_cast<bvec_t*>(res.input(2).ptr());
+  bvec_t* o0 = reinterpret_cast<bvec_t*>(res.output(0).ptr());
+  
+  fill(o0,o0+3,0);
+  o0[2] = 1;
+  cout << "o0: " << endl;
+  printBinary(o0[0]);
+  printBinary(o0[1]);
+  printBinary(o0[2]);
+
+  for(int i=0; i<3; ++i){
+    DMatrix& v = res.input(i);
+    bvec_t* vv = reinterpret_cast<bvec_t*>(v.ptr());
+    fill(vv,vv+v.size(),0);
+  }
+  
+  res.spEvaluate(false);
+
+  for(int i=0; i<3; ++i){
+    DMatrix& v = res.input(i);
+    bvec_t* vv = reinterpret_cast<bvec_t*>(v.ptr());
+    cout << "input " << i << endl;
+    for(int ii=0; ii<v.size(); ++ii){
+      printBinary(vv[ii]);
+    }
+  }
+
+
   NewtonImplicitSolver f(res);
   f.setOption("linear_solver",CSparse::creator);
   f.setOption("ad_mode","reverse");
