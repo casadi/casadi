@@ -75,6 +75,15 @@ namespace CasADi{
   std::pair<FX,FX> Integrator::getAugmented(int nfwd, int nadj){
     return (*this)->getAugmented(nfwd,nadj);
   }
+
+  DMatrix& Integrator::z(){
+    return (*this)->z_;
+  }
+
+  const DMatrix& Integrator::z() const{
+    return (*this)->z_;
+  }
+
  
 } // namespace CasADi
 

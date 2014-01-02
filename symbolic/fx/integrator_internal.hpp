@@ -100,6 +100,8 @@ namespace CasADi{
     /// ODE/DAE backward integration function, if any
     FX g_;
     
+    /// Algebraic variable
+    DMatrix z_;
   };
   
 } // namespace CasADi
