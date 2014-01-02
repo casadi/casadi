@@ -1,3 +1,21 @@
+/** \class CasADi::QPLPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qp_solver_stats</td><td>CasADi::QPLPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::QPLPSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qp_solver_stats</td><td>CasADi::QPLPInternal</td></tr>
+</table>
+*/
 /** \class CasADi::NLPImplicitInternal
 \n
 \par
@@ -238,24 +256,6 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>iter_count</td><td>CasADi::StabilizedSQPInternal</td></tr>
 <tr><td>return_status</td><td>CasADi::StabilizedSQPInternal</td></tr>
-</table>
-*/
-/** \class CasADi::QPLPInternal
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>qp_solver_stats</td><td>CasADi::QPLPInternal</td></tr>
-</table>
-*/
-/** \class CasADi::QPLPSolver
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>qp_solver_stats</td><td>CasADi::QPLPInternal</td></tr>
 </table>
 */
 /** \class CasADi::SQPInternal
