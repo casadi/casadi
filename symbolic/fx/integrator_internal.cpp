@@ -164,23 +164,29 @@ namespace CasADi{
     g_ = deepcopy(g_,already_copied);
   }
 
-  std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj){
+  std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj, vector<int>& xf_offset, vector<int>& qf_offset, vector<int>& rxf_offset, vector<int>& rqf_offset){
     log("IntegratorInternal::getAugmented","call");
     if(is_a<SXFunction>(f_)){
       casadi_assert_message(g_.isNull() || is_a<SXFunction>(g_), "Currently, g_ must be of the same type as f_");
-      return getAugmentedGen<SXMatrix,SXFunction>(nfwd,nadj);
+      return getAugmentedGen<SXMatrix,SXFunction>(nfwd,nadj,xf_offset,qf_offset,rxf_offset,rqf_offset);
     } else if(is_a<MXFunction>(f_)){
       casadi_assert_message(g_.isNull() || is_a<MXFunction>(g_), "Currently, g_ must be of the same type as f_");
-      return getAugmentedGen<MX,MXFunction>(nfwd,nadj);
+      return getAugmentedGen<MX,MXFunction>(nfwd,nadj,xf_offset,qf_offset,rxf_offset,rqf_offset);
     } else {
       throw CasadiException("Currently, f_ must be either SXFunction or MXFunction");
     }
   }
   
   template<class Mat,class XFunc>
-  std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
+  std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj, vector<int>& xf_offset, vector<int>& qf_offset, vector<int>& rxf_offset, vector<int>& rqf_offset){
   
     log("IntegratorInternal::getAugmentedGen","begin");
+
+    // Reset the offset
+    xf_offset.clear();    xf_offset.push_back(0);
+    qf_offset.clear();    qf_offset.push_back(0);
+    rxf_offset.clear();   rxf_offset.push_back(0);
+    rqf_offset.clear();   rqf_offset.push_back(0);
   
     // Get derivatived type
     XFunc f = shared_cast<XFunc>(f_);
@@ -198,7 +204,7 @@ namespace CasADi{
     Mat ode = dae_out[DAE_ODE];
     Mat alg = dae_out[DAE_ALG];
     Mat quad = dae_out[DAE_QUAD];
-  
+
     // Take apart the backwards problem
     vector<Mat> rdae_in(RDAE_NUM_IN), rdae_out(RDAE_NUM_OUT);
     if(!g.isNull()){
@@ -217,7 +223,13 @@ namespace CasADi{
     Mat rode = rdae_out[RDAE_ODE];
     Mat ralg = rdae_out[RDAE_ALG];
     Mat rquad = rdae_out[RDAE_QUAD];
-  
+
+    // Get offset for nondifferentiated problem
+    if( nx_>0) xf_offset.push_back(x.size1());
+    if( nq_>0) qf_offset.push_back(quad.size1());
+    if(nrx_>0) rxf_offset.push_back(rx.size1());
+    if(nrq_>0) rqf_offset.push_back(rquad.size1());
+
     // Function evaluating f and g
     vector<Mat> fg_out(DAE_NUM_OUT+RDAE_NUM_OUT);
     copy(dae_out.begin(),dae_out.end(),fg_out.begin());
@@ -251,6 +263,12 @@ namespace CasADi{
       fseed[dir][RDAE_RX] = fwd_rx[dir];
       fseed[dir][RDAE_RZ] = fwd_rz[dir];
       fseed[dir][RDAE_RP] = fwd_rp[dir];
+
+      // Save number of rows
+      if( nx_>0) xf_offset.push_back(x.size1());
+      if( nq_>0) qf_offset.push_back(quad.size1());
+      if(nrx_>0) rxf_offset.push_back(rx.size1());
+      if(nrq_>0) rqf_offset.push_back(rquad.size1());
     }
 
     // Adjoint seeds
@@ -263,7 +281,19 @@ namespace CasADi{
       aseed[dir][DAE_NUM_OUT+RDAE_ODE] = adj_rode[dir];
       aseed[dir][DAE_NUM_OUT+RDAE_ALG] = adj_ralg[dir];
       aseed[dir][DAE_NUM_OUT+RDAE_QUAD] = adj_rquad[dir];
+
+      // Save number of rows
+      if( nx_>0) rxf_offset.push_back(x.size1());
+      if( np_>0) rqf_offset.push_back(p.size1());
+      if(nrx_>0) xf_offset.push_back(rx.size1());
+      if(nrp_>0) qf_offset.push_back(rp.size1());
     }
+
+    // Get cummulative offsets
+    for(int i=1; i<xf_offset.size(); ++i) xf_offset[i] += xf_offset[i-1];
+    for(int i=1; i<qf_offset.size(); ++i) qf_offset[i] += qf_offset[i-1];
+    for(int i=1; i<rxf_offset.size(); ++i) rxf_offset[i] += rxf_offset[i-1];
+    for(int i=1; i<rqf_offset.size(); ++i) rqf_offset[i] += rqf_offset[i-1];
   
     // Calculate forward and adjoint sensitivities
     vector<vector<Mat> > fsens(fseed.size(),fg_out);
@@ -471,8 +501,10 @@ namespace CasADi{
 
   FX IntegratorInternal::getDerivative(int nfwd, int nadj){
     log("IntegratorInternal::getDerivative","begin");
+
     // Generate augmented DAE
-    std::pair<FX,FX> aug_dae = getAugmented(nfwd,nadj);
+    vector<int> xf_offset, qf_offset, rxf_offset, rqf_offset;
+    std::pair<FX,FX> aug_dae = getAugmented(nfwd,nadj,xf_offset,qf_offset,rxf_offset,rqf_offset);
   
     // Create integrator for augmented DAE
     Integrator integrator;
@@ -578,26 +610,27 @@ namespace CasADi{
     vector<MX> integrator_out = integrator.call(integrator_in);
   
     // Augmented results
-    MX xf_aug = integrator_out[INTEGRATOR_XF];
-    MX rxf_aug = integrator_out[INTEGRATOR_RXF];
-    MX qf_aug = integrator_out[INTEGRATOR_QF];
-    MX rqf_aug = integrator_out[INTEGRATOR_RQF];
-  
-    // Offset in each of the above vectors
-    int xf_offset = 0, rxf_offset = 0, qf_offset = 0, rqf_offset = 0;
-  
+    vector<MX> xf_aug = vertsplit(integrator_out[INTEGRATOR_XF],xf_offset);
+    vector<MX> rxf_aug = vertsplit(integrator_out[INTEGRATOR_RXF],rxf_offset);
+    vector<MX> qf_aug = vertsplit(integrator_out[INTEGRATOR_QF],qf_offset);
+    vector<MX> rqf_aug = vertsplit(integrator_out[INTEGRATOR_RQF],rqf_offset);
+    vector<MX>::const_iterator xf_aug_it = xf_aug.begin();
+    vector<MX>::const_iterator rxf_aug_it = rxf_aug.begin();
+    vector<MX>::const_iterator qf_aug_it = qf_aug.begin();
+    vector<MX>::const_iterator rqf_aug_it = rqf_aug.begin();
+
     // All outputs of the return function
     vector<MX> ret_out;
     ret_out.reserve(INTEGRATOR_NUM_OUT*(1+nfwd) + INTEGRATOR_NUM_IN*nadj);
-  
+
     // Collect the nondifferentiated results and forward sensitivities
     dd.resize(INTEGRATOR_NUM_OUT);
     fill(dd.begin(),dd.end(),MX());
     for(int dir=-1; dir<nfwd; ++dir){
-      if( nx_>0){ dd[INTEGRATOR_XF]  =  xf_aug[Slice(  xf_offset, xf_offset +  nx_)];  xf_offset +=  nx_;}
-      if( nq_>0){ dd[INTEGRATOR_QF]  =  qf_aug[Slice(  qf_offset, qf_offset +  nq_)];  qf_offset +=  nq_; }
-      if(nrx_>0){ dd[INTEGRATOR_RXF] = rxf_aug[Slice( rxf_offset,rxf_offset + nrx_)]; rxf_offset += nrx_; }
-      if(nrq_>0){ dd[INTEGRATOR_RQF] = rqf_aug[Slice( rqf_offset,rqf_offset + nrq_)]; rqf_offset += nrq_; }
+      if( nx_>0) dd[INTEGRATOR_XF]  = *xf_aug_it++;
+      if( nq_>0) dd[INTEGRATOR_QF]  = *qf_aug_it++;
+      if(nrx_>0) dd[INTEGRATOR_RXF] = *rxf_aug_it++;
+      if(nrq_>0) dd[INTEGRATOR_RQF] = *rqf_aug_it++;
       ret_out.insert(ret_out.end(),dd.begin(),dd.end());
     }
   
@@ -605,10 +638,10 @@ namespace CasADi{
     dd.resize(INTEGRATOR_NUM_IN);
     fill(dd.begin(),dd.end(),MX());
     for(int dir=0; dir<nadj; ++dir){
-      if(  nx_>0){ dd[INTEGRATOR_X0]  = rxf_aug[Slice(rxf_offset, rxf_offset + nx_ )]; rxf_offset += nx_;  }
-      if(  np_>0){ dd[INTEGRATOR_P]   = rqf_aug[Slice(rqf_offset, rqf_offset + np_ )]; rqf_offset += np_;  }
-      if( nrx_>0){ dd[INTEGRATOR_RX0] =  xf_aug[Slice(xf_offset,   xf_offset + nrx_)];  xf_offset += nrx_; }
-      if( nrp_>0){ dd[INTEGRATOR_RP]  =  qf_aug[Slice(qf_offset,   qf_offset + nrp_)];  qf_offset += nrp_; }
+      if( nx_>0) dd[INTEGRATOR_X0]  = *rxf_aug_it++;
+      if( np_>0) dd[INTEGRATOR_P]   = *rqf_aug_it++;
+      if(nrx_>0) dd[INTEGRATOR_RX0] = *xf_aug_it++;
+      if(nrp_>0) dd[INTEGRATOR_RP]  = *qf_aug_it++;
       ret_out.insert(ret_out.end(),dd.begin(),dd.end());
     }
     log("IntegratorInternal::getDerivative","end");

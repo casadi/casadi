@@ -85,11 +85,11 @@ namespace CasADi{
     virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 
     /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
-    virtual std::pair<FX,FX> getAugmented(int nfwd, int nadj);
+    virtual std::pair<FX,FX> getAugmented(int nfwd, int nadj, std::vector<int>& xf_offset, std::vector<int>& qf_offset, std::vector<int>& rxf_offset, std::vector<int>& rqf_offset);
   
     /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities (generic)
     template<class Mat,class XFunc>
-    std::pair<FX,FX> getAugmentedGen(int nfwd, int nadj);
+    std::pair<FX,FX> getAugmentedGen(int nfwd, int nadj, std::vector<int>& xf_offset, std::vector<int>& qf_offset, std::vector<int>& rxf_offset, std::vector<int>& rqf_offset);
   
     /// Integration horizon
     double t0_, tf_;
