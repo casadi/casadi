@@ -105,6 +105,9 @@ class GenericMatrix{
     /** \brief  Check if the matrix expression is scalar */
     bool scalar(bool scalar_and_dense=false) const;
 
+    /** \brief  Check if the matrix expression is square */
+    bool square() const;
+
     /** \brief Get the sparsity pattern */
     const CRSSparsity& sparsity() const;
 
@@ -239,6 +242,11 @@ bool GenericMatrix<MatType>::dense() const{
 template<typename MatType>
 bool GenericMatrix<MatType>::scalar(bool scalar_and_dense) const{
   return sparsity().scalar(scalar_and_dense);
+}
+
+template<typename MatType>
+bool GenericMatrix<MatType>::square() const{
+  return sparsity().square();
 }
 
 template<typename MatType>
