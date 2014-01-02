@@ -1292,40 +1292,6 @@ class MXtests(casadiTestCase):
     
     #self.checkarray(J.getOutput(),nums.T/linalg.norm(nums),"Norm_2")
     
-  # Removed since a normed squared is not a norm
-  #def test_Norm22(self):
-    #self.message("Norm_22")
-    #X=MX("x",5,1)
-    
-    #nums = matrix([1,2,3,0,-1]).T
-
-    #F =MXFunction([X],[norm_22(X)])
-
-    #J = Jacobian(F,0,0)
-    #J.setOption("ad_mode","forward")
-    #J.init()
-
-    #J.setInput(nums)
-    #J.evaluate()
-    #self.checkarray(J.getOutput(),2*nums.T,"Norm_22 fwd")
-
-    #J = Jacobian(F,0,0)
-    #J.setOption("ad_mode","reverse")
-    #J.init()
-
-    #J.setInput(nums)
-    #J.evaluate()
-    
-    #self.checkarray(J.getOutput(),2*nums.T,"Norm_22 adj")
-        
-    #J = MXFunction([X],[F.jac(0)[0]])
-    #J.init()
-
-    #J.setInput(nums)
-    #J.evaluate()
-    
-    #self.checkarray(J.getOutput(),2*nums.T,"Norm_22 jac")
-
   # 1-norms currently not supported
   #def test_Norm1(self):
     #self.message("Norm_1")

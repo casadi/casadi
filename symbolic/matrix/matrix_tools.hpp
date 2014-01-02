@@ -329,17 +329,21 @@ namespace CasADi{
   template<class T>
   bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2);
 
-  /// Make the vector 1-norm of an Matrix<T>
+  /** \brief  Frobenius norm  */
   template<class T>
-  Matrix<T> norm_1(const Matrix<T>& x);
-  
-  /// Make the vector 2-norm (Frobenius Norm) of an Matrix<T>
-  template<class T>
-  Matrix<T> norm_2(const Matrix<T>& x);
+  Matrix<T> norm_F(const Matrix<T> &x);
 
-  /// Make the vector 2-norm (Frobenius Norm) squared of an Matrix<T>
+  /** \brief  2-norm  */
   template<class T>
-  Matrix<T> norm_22(const Matrix<T>& x);
+  Matrix<T> norm_2(const Matrix<T> &x);
+
+  /** \brief 1-norm  */
+  template<class T>
+  Matrix<T> norm_1(const Matrix<T> &x);
+
+  /** \brief Infinity-norm */
+  template<class T>
+  Matrix<T> norm_inf(const Matrix<T> &x);
 
   /// Return summation of all elements
   template<class T>
@@ -924,7 +928,27 @@ namespace CasADi{
 
   template<class T>
   Matrix<T> norm_2(const Matrix<T>& x){
+    if(x.vector()){
+      return norm_F(x);
+    } else {
+      casadi_error("2-norms currently only supported for vectors. Did you intent to calculate a Frobenius norms (norm_F)?");
+    }
+  }
+
+  template<class T>
+  Matrix<T> norm_F(const Matrix<T>& x){
     return sqrt(1.0*sumAll(x*x));
+  }
+
+  template<class T>
+  Matrix<T> norm_inf(const Matrix<T>& x){
+    // Get largest element by absolute value
+    T s = 0;
+    for(typename std::vector<T>::const_iterator i=x.begin(); i!=x.end(); ++i){
+      s = fmax(s,T(abs(*i)));
+    }
+    
+    return s;
   }
 
   template<class T>
@@ -1456,6 +1480,8 @@ namespace CasADi{
   MTT_INST(T,outer_prod)                        \
   MTT_INST(T,norm_1)                            \
   MTT_INST(T,norm_2)                            \
+  MTT_INST(T,norm_inf)                          \
+  MTT_INST(T,norm_F)                            \
   MTT_INST(T,qr)                                \
   MTT_INST(T,solve)                             \
   MTT_INST(T,isZero)                            \

@@ -252,11 +252,13 @@ namespace CasADi{
   template<class T> T fmin(const T &x,   double n){ return x.fmin(n);}
   template<class T> T fmin(double   x, const T &n){ return T(x).fmin(n);}
   inline double fmin(double x, double y) throw(){ return std::min(x,y);}
+  inline int fmin(int x, int y) throw(){ return std::min(x,y);}
 
   template<class T> T fmax(const T &x, const T &n){ return x.fmax(n);}
   template<class T> T fmax(const T &x,   double n){ return x.fmax(n);}
   template<class T> T fmax(double   x, const T &n){ return T(x).fmax(n);}
   inline double fmax(double x, double y) throw(){ return std::max(x,y);}
+  inline int fmax(int x, int y) throw(){ return std::max(x,y);}
 
   inline int isnan(double x) throw(){ return x!=x;}
   inline int isinf(double x) throw(){ return isnan(x-x);}
