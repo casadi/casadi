@@ -360,6 +360,9 @@ namespace CasADi{
     /// Is diagonal?
     bool diagonal() const;
     
+    /// Is square?
+    bool square() const;
+
     /// Does the columns appear sequentially on each row (if strictly==true, then do not allow multiple entries)
     bool columnsSequential(bool strictly=true) const;
 

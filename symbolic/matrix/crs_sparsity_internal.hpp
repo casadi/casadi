@@ -170,6 +170,9 @@ namespace CasADi{
     /// Is diagonal?
     bool diagonal() const;
 
+    /// Is square?
+    bool square() const;
+
     /// Get the dimension as a string
     std::string dimString() const;
 

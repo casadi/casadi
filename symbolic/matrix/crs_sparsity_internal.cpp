@@ -2023,6 +2023,10 @@ namespace CasADi{
     return true;
   }
 
+  bool CRSSparsityInternal::square() const{
+    return nrow_ == ncol_;
+  }
+
   int CRSSparsityInternal::sizeU() const{
     int nnz = 0;
     for(int r=0; r<nrow_; ++r){

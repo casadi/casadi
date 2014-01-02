@@ -273,6 +273,10 @@ namespace CasADi{
     return (*this)->diagonal();
   }
 
+  bool CRSSparsity::square() const{
+    return (*this)->square();
+  }
+
   CRSSparsity CRSSparsity::sub(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
     return (*this)->sub(ii,jj,mapping);
   }
