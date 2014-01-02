@@ -81,20 +81,16 @@ namespace CasADi{
     // Initialize the functions
     casadi_assert(!f_.isNull());
   
-    // Initialize, get and assert dimensions of the forward integration
+    // Initialize and get dimensions for the forward integration
     if(!f_.isInit()) f_.init();
     casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN,"Wrong number of inputs for the DAE callback function");
     casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT,"Wrong number of outputs for the DAE callback function");
-    casadi_assert_message(f_.input(DAE_X).dense(),"State vector must be dense in the DAE callback function");
-    casadi_assert_message(f_.output(DAE_ODE).dense(),"Right hand side vector must be dense in the DAE callback function");
-    nx_ = f_.input(DAE_X).numel();
-    nz_ = f_.input(DAE_Z).numel();
-    nq_ = f_.output(DAE_QUAD).numel();
-    np_  = f_.input(DAE_P).numel();
-    casadi_assert_message(f_.output(DAE_ODE).numel()==nx_,"Inconsistent dimensions. Expecting DAE_ODE output of size " << nx_ << ", but got " << f_.output(DAE_ODE).numel() << " instead.");
-    casadi_assert_message(f_.output(DAE_ALG).numel()==nz_,"Inconsistent dimensions. Expecting DAE_ALG output of size " << nz_ << ", but got " << f_.output(DAE_ALG).numel() << " instead.");
-  
-    // Initialize, get and assert dimensions of the backwards integration
+    nx_ = f_.input(DAE_X).size();
+    nz_ = f_.input(DAE_Z).size();
+    nq_ = f_.output(DAE_QUAD).size();
+    np_  = f_.input(DAE_P).size();
+
+    // Initialize and get dimensions for the backward integration
     if(g_.isNull()){
       // No backwards integration
       nrx_ = nrz_ = nrq_ = nrp_ = 0;
@@ -102,33 +98,50 @@ namespace CasADi{
       if(!g_.isInit()) g_.init();
       casadi_assert_message(g_.getNumInputs()==RDAE_NUM_IN,"Wrong number of inputs for the backwards DAE callback function");
       casadi_assert_message(g_.getNumOutputs()==RDAE_NUM_OUT,"Wrong number of outputs for the backwards DAE callback function");
-      nrx_ = g_.input(RDAE_RX).numel();
-      nrz_ = g_.input(RDAE_RZ).numel();
-      nrp_ = g_.input(RDAE_RP).numel();
-      nrq_ = g_.output(RDAE_QUAD).numel();
-      casadi_assert_message(g_.input(RDAE_P).numel()==np_,"Inconsistent dimensions. Expecting RDAE_P input of size " << np_ << ", but got " << g_.input(RDAE_P).numel() << " instead.");
-      casadi_assert_message(g_.input(RDAE_X).numel()==nx_,"Inconsistent dimensions. Expecting RDAE_X input of size " << nx_ << ", but got " << g_.input(RDAE_X).numel() << " instead.");
-      casadi_assert_message(g_.input(RDAE_Z).numel()==nz_,"Inconsistent dimensions. Expecting RDAE_Z input of size " << nz_ << ", but got " << g_.input(RDAE_Z).numel() << " instead.");
-      casadi_assert_message(g_.output(RDAE_ODE).numel()==nrx_,"Inconsistent dimensions. Expecting RDAE_ODE output of size " << nrx_ << ", but got " << g_.output(RDAE_ODE).numel() << " instead.");
-      casadi_assert_message(g_.output(RDAE_ALG).numel()==nrz_,"Inconsistent dimensions. Expecting RDAE_ALG input of size " << nrz_ << ", but got " << g_.output(RDAE_ALG).numel() << " instead.");
+      nrx_ = g_.input(RDAE_RX).size();
+      nrz_ = g_.input(RDAE_RZ).size();
+      nrp_ = g_.input(RDAE_RP).size();
+      nrq_ = g_.output(RDAE_QUAD).size();
     }
-  
+
     // Allocate space for inputs
     setNumInputs(INTEGRATOR_NUM_IN);
-    input(INTEGRATOR_X0)  = DMatrix(f_.input(DAE_X).sparsity(),0);
-    input(INTEGRATOR_P)   = DMatrix(f_.input(DAE_P).sparsity(),0);
+    input(INTEGRATOR_X0)  = DMatrix::zeros(f_.input(DAE_X).sparsity());
+    input(INTEGRATOR_P)   = DMatrix::zeros(f_.input(DAE_P).sparsity());
     if(!g_.isNull()){
-      input(INTEGRATOR_RX0)  = DMatrix(g_.input(RDAE_RX).sparsity(),0);
-      input(INTEGRATOR_RP)  = DMatrix(g_.input(RDAE_RP).sparsity(),0);
+      input(INTEGRATOR_RX0)  = DMatrix::zeros(g_.input(RDAE_RX).sparsity());
+      input(INTEGRATOR_RP)  = DMatrix::zeros(g_.input(RDAE_RP).sparsity());
     }
   
     // Allocate space for outputs
     setNumOutputs(INTEGRATOR_NUM_OUT);
-    output(INTEGRATOR_XF) = DMatrix(f_.output(DAE_ODE).sparsity(),0);
-    output(INTEGRATOR_QF) = DMatrix(f_.output(DAE_QUAD).sparsity(),0);
+    output(INTEGRATOR_XF) = input(INTEGRATOR_X0);
+    output(INTEGRATOR_QF) = DMatrix::zeros(f_.output(DAE_QUAD).sparsity());
     if(!g_.isNull()){
-      output(INTEGRATOR_RXF)  = DMatrix(g_.output(RDAE_ODE).sparsity(),0);
-      output(INTEGRATOR_RQF)  = DMatrix(g_.output(RDAE_QUAD).sparsity(),0);
+      output(INTEGRATOR_RXF)  = input(INTEGRATOR_RX0);
+      output(INTEGRATOR_RQF)  = DMatrix::zeros(g_.output(RDAE_QUAD).sparsity());
+    }
+
+    // Allocate space for algebraic variable
+    z_ = DMatrix::zeros(f_.input(DAE_Z).sparsity());
+    if(!g_.isNull()){
+      rz_ = DMatrix::zeros(g_.input(RDAE_RZ).sparsity());
+    }
+
+    // Warn if sparse inputs (was previously an error)
+    casadi_assert_warning(f_.input(DAE_X).dense(),"Sparse states in integrators are experimental");
+
+    // Consistency checks
+    casadi_assert_message(f_.output(DAE_ODE).shape()==input(INTEGRATOR_X0).shape(),"Inconsistent dimensions. Expecting DAE_ODE output of shape " << input(INTEGRATOR_X0) << ", but got " << f_.output(DAE_ODE).shape() << " instead.");
+    casadi_assert(f_.output(DAE_ODE).sparsity()==input(INTEGRATOR_X0).sparsity());
+    casadi_assert_message(f_.output(DAE_ALG).shape()==z_.shape(),"Inconsistent dimensions. Expecting DAE_ALG output of shape " << z_.shape() << ", but got " << f_.output(DAE_ALG).shape() << " instead.");
+    casadi_assert(f_.output(DAE_ALG).sparsity()==z_.sparsity());
+    if(!g_.isNull()){
+      casadi_assert(g_.input(RDAE_P).sparsity()==input(INTEGRATOR_P).sparsity());
+      casadi_assert(g_.input(RDAE_X).sparsity()==input(INTEGRATOR_X0).sparsity());
+      casadi_assert(g_.input(RDAE_Z).sparsity()==z_.sparsity());
+      casadi_assert(g_.output(RDAE_ODE).sparsity()==input(INTEGRATOR_RX0).sparsity());
+      casadi_assert(g_.output(RDAE_ALG).sparsity()==rz_.sparsity());
     }
   
     // Call the base class method

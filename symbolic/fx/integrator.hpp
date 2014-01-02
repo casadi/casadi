@@ -193,11 +193,19 @@ namespace CasADi{
     void integrateB(double t_out);
 
     //@{
-    /** \brief Access the current value of the algebraic variable
+    /** \brief Access the current value of the algebraic variable for the forward integration
      * DAE integrators typically (but not necessarily) calculate the states sequentially, reusing the last value of the algebraic variable.
      */
     DMatrix& z();
     const DMatrix& z() const;
+    //@}
+
+    //@{
+    /** \brief Access the current value of the algebraic variable for the backward integration
+     * DAE integrators typically (but not necessarily) calculate the states sequentially, reusing the last value of the algebraic variable.
+     */
+    DMatrix& rz();
+    const DMatrix& rz() const;
     //@}
 
     /// Check if the node is pointing to the right type of object

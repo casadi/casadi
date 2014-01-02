@@ -101,7 +101,7 @@ namespace CasADi{
     FX g_;
     
     /// Algebraic variable
-    DMatrix z_;
+    DMatrix z_, rz_;
   };
   
 } // namespace CasADi

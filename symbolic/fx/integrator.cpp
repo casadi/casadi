@@ -84,6 +84,13 @@ namespace CasADi{
     return (*this)->z_;
   }
 
+  DMatrix& Integrator::rz(){
+    return (*this)->rz_;
+  }
+
+  const DMatrix& Integrator::rz() const{
+    return (*this)->rz_;
+  }
  
 } // namespace CasADi
 
