@@ -422,6 +422,10 @@ namespace CasADi{
   bool SX::isZero() const{
     return node->isZero();
   }
+  
+  bool SX::isAlmostZero(double tol) const{
+    return node->isAlmostZero(tol);
+  }
 
   bool SX::isOne() const{
     return node->isOne();
@@ -509,6 +513,10 @@ namespace CasADi{
 
   bool casadi_limits<SX>::isZero(const SX& val){ 
     return val.isZero();
+  }
+  
+  bool casadi_limits<SX>::isAlmostZero(const SX& val, double tol){ 
+    return val.isAlmostZero(tol);
   }
 
   bool casadi_limits<SX>::isOne(const SX& val){ 

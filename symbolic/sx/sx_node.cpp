@@ -52,6 +52,10 @@ bool SXNode::isZero() const{
   return false;
 }
 
+bool SXNode::isAlmostZero(double tol) const{
+  return false;
+}
+
 bool SXNode::isOne() const{
   return false;
 }

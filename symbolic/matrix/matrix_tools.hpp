@@ -420,14 +420,14 @@ namespace CasADi{
   Matrix<T> full(const Matrix<T>& A);
 #endif // SWIGOCTAVE
 
-  /** \brief  Make a matrix sparse by removing numerical */
+  /** \brief  Make a matrix sparse by removing numerical zeros */
   template<class T>
-  void makeSparse(Matrix<T>& A);
+  void makeSparse(Matrix<T>& A, double tol=0);
 
 #ifndef SWIGOCTAVE
-  /** \brief  Make a matrix sparse by removing numerical */
+  /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<class T>
-  Matrix<T> sparse(const Matrix<T>& A);
+  Matrix<T> sparse(const Matrix<T>& A, double tol=0);
 #endif // SWIGOCTAVE
 
   /** \brief  Check if the matrix has any zero entries which are not structural zeros */
@@ -1313,9 +1313,9 @@ namespace CasADi{
   }
 
   template<class T>
-  void makeSparse(Matrix<T>& A){
+  void makeSparse(Matrix<T>& A, double tol){
     // Quick return if there are no structurally zero entries
-    if(!hasNonStructuralZeros(A))
+    if(!hasNonStructuralZeros(A) && tol==0)
       return;
   
     // Start with a matrix with no rows
@@ -1330,7 +1330,7 @@ namespace CasADi{
       for(int el=A.rowind(i); el<A.rowind(i+1); ++el){
       
         // If it is not known to be a zero
-        if(!casadi_limits<T>::isZero(A.at(el))){
+        if(!casadi_limits<T>::isAlmostZero(A.at(el),tol)){
         
           // Get the column
           int j=A.col(el);
@@ -1346,9 +1346,9 @@ namespace CasADi{
   }
 
   template<class T>
-  Matrix<T> sparse(const Matrix<T>& A){
+  Matrix<T> sparse(const Matrix<T>& A, double tol){
     Matrix<T> ret(A);
-    makeSparse(ret);
+    makeSparse(ret,tol);
     return ret;
   }
 
