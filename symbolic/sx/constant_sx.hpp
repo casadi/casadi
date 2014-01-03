@@ -123,6 +123,8 @@ class RealtypeSX : public ConstantSX{
     virtual int getIntValue() const{ return int(value);}
     //@}
     
+    virtual bool isAlmostZero(double tol) const{ return fabs(value)<=tol; }
+    
   protected:
     /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx.cpp) */
     static CACHING_MAP<double,RealtypeSX*> cached_constants_;
@@ -207,6 +209,7 @@ public:
   /** \brief  Properties */
   virtual bool isInteger() const{ return true; }
   virtual bool isZero() const{ return true; }
+  virtual bool isAlmostZero(double tol) const{ return true; }
   //@}
 };
 

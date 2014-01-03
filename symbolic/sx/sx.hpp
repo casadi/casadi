@@ -145,6 +145,7 @@ namespace CasADi{
     /** \brief Check wether a binary SX is commutative*/
     bool isCommutative() const;
     bool isZero() const;
+    bool isAlmostZero(double tol) const;
     bool isOne() const;
     bool isMinusOne() const;
     bool isNan() const;
@@ -315,6 +316,7 @@ namespace CasADi{
   class casadi_limits<SX>{
   public:
     static bool isZero(const SX& val);
+    static bool isAlmostZero(const SX& val, double tol);
     static bool isOne(const SX& val);
     static bool isMinusOne(const SX& val);
     static bool isConstant(const SX& val);
