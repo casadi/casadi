@@ -348,7 +348,7 @@ print "feedback matrix= ", K
 print "Open-loop eigenvalues: ", D
 
 # Check what happens if we integrate the Riccati equation forward in time
-dae = SXFunction(daeIn(x = flatten(P)),daeOut(ode=-ric))
+dae = SXFunction(daeIn(x = flatten(P)),daeOut(ode=flatten(-ric)))
 dae.init()
 
 integrator = CVodesIntegrator(dae)
