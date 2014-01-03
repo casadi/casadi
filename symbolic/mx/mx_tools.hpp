@@ -444,6 +444,10 @@ namespace CasADi{
   */
   MX kron(const MX& a, const MX& b);
 
+  /** \brief Solve a system of equations: A*x = b 
+  */
+  MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+
 
 } // namespace CasADi
 

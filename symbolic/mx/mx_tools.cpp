@@ -998,6 +998,13 @@ namespace CasADi{
     }
     return blockcat(blocks);
   }
+
+  MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict) {
+    LinearSolver mysolver = lsolver(A.sparsity());
+    mysolver.setOption(dict);
+    mysolver.init();
+    return trans(mysolver.solve(A,trans(b),true));
+  }
   
 } // namespace CasADi
 

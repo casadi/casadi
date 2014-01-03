@@ -52,6 +52,28 @@ print lsolvers
 
 class LinearSolverTests(casadiTestCase):
   
+  
+  def test_simple_solve(self):
+    A_ = DMatrix([[3,7],[1,2]])
+    b_ = DMatrix([1,0.5])
+    
+    A = msym("A",A_.sparsity())
+    b = msym("b",b_.sparsity())
+    
+    for Solver, options in lsolvers:
+      if 'CSparse' not in str(Solver): continue
+      print Solver.creator
+      C = solve(A,b,Solver,options)
+      
+      f = MXFunction([A,b],[C])
+      f.init()
+      f.setInput(A_,0)
+      f.setInput(b_,1)
+      f.evaluate()
+      
+      self.checkarray(f.output(),DMatrix([1.5,-0.5]))
+      
+    
   def test_simple_trans(self):
     A = DMatrix([[3,7],[1,2]])
     for Solver, options in lsolvers:
