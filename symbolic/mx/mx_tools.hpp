@@ -438,6 +438,12 @@ namespace CasADi{
   */
   std::vector<MX> matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary = std::vector<MX>());
 
+  /** \brief Kronecker tensor product
+  *
+  * Creates a block matrix in which each element (i,j) is a_ij*b 
+  */
+  MX kron(const MX& a, const MX& b);
+
 
 } // namespace CasADi
 

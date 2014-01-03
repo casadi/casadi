@@ -297,6 +297,13 @@ namespace CasADi{
   */
   template<class T>
   Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b);
+  
+  /** \brief Kronecker tensor product
+  *
+  * Creates a block matrix in which each element (i,j) is a_ij*b 
+  */
+  template<class T>
+  Matrix<T> kron(const Matrix<T>& a, const Matrix<T>& b);
 
   /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
   template<class T>
@@ -413,14 +420,14 @@ namespace CasADi{
   Matrix<T> full(const Matrix<T>& A);
 #endif // SWIGOCTAVE
 
-  /** \brief  Make a matrix sparse by removing numerical */
+  /** \brief  Make a matrix sparse by removing numerical zeros */
   template<class T>
-  void makeSparse(Matrix<T>& A);
+  void makeSparse(Matrix<T>& A, double tol=0);
 
 #ifndef SWIGOCTAVE
-  /** \brief  Make a matrix sparse by removing numerical */
+  /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<class T>
-  Matrix<T> sparse(const Matrix<T>& A);
+  Matrix<T> sparse(const Matrix<T>& A, double tol=0);
 #endif // SWIGOCTAVE
 
   /** \brief  Check if the matrix has any zero entries which are not structural zeros */
@@ -1113,6 +1120,22 @@ namespace CasADi{
       return x;
     }
   }
+  
+  template<class T>
+  Matrix<T> kron(const Matrix<T>& a, const Matrix<T>& b) {
+    const CRSSparsity &a_sp = a.sparsity();
+    Matrix<T> filler(b.size1(),b.size2());
+    std::vector< std::vector< Matrix<T> > > blocks(a.size1(),std::vector< Matrix<T> >(a.size2(),filler));
+    for (int i=0;i<a.size1();++i) {
+      for (int j=0;j<a.size2();++j) {
+        int k = a_sp.getNZ(i,j);
+        if (k!=-1) {
+          blocks[i][j] = a[k]*b;
+        }
+      }
+    }
+    return blockcat(blocks);
+  }
 
   template<class T>
   bool isOne(const Matrix<T>& ex){  
@@ -1290,9 +1313,9 @@ namespace CasADi{
   }
 
   template<class T>
-  void makeSparse(Matrix<T>& A){
+  void makeSparse(Matrix<T>& A, double tol){
     // Quick return if there are no structurally zero entries
-    if(!hasNonStructuralZeros(A))
+    if(!hasNonStructuralZeros(A) && tol==0)
       return;
   
     // Start with a matrix with no rows
@@ -1307,7 +1330,7 @@ namespace CasADi{
       for(int el=A.rowind(i); el<A.rowind(i+1); ++el){
       
         // If it is not known to be a zero
-        if(!casadi_limits<T>::isZero(A.at(el))){
+        if(!casadi_limits<T>::isAlmostZero(A.at(el),tol)){
         
           // Get the column
           int j=A.col(el);
@@ -1323,9 +1346,9 @@ namespace CasADi{
   }
 
   template<class T>
-  Matrix<T> sparse(const Matrix<T>& A){
+  Matrix<T> sparse(const Matrix<T>& A, double tol){
     Matrix<T> ret(A);
-    makeSparse(ret);
+    makeSparse(ret,tol);
     return ret;
   }
 
@@ -1509,7 +1532,8 @@ namespace CasADi{
   MTT_INST(T,veccat)                            \
   MTT_INST(T,vecNZcat)                          \
   MTT_INST(T,project)                           \
-  MTT_INST(T,sprank) 
+  MTT_INST(T,sprank)                            \
+  MTT_INST(T,kron) 
 #endif //SWIG
 
 #ifdef SWIGOCTAVE

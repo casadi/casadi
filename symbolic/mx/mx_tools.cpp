@@ -984,5 +984,20 @@ namespace CasADi{
     return s.eval(graph_substitute(v,syms,boundary));
   }
   
+  MX kron(const MX& a, const MX& b) {
+    const CRSSparsity &a_sp = a.sparsity();
+    MX filler(b.size1(),b.size2());
+    std::vector< std::vector< MX > > blocks(a.size1(),std::vector< MX >(a.size2(),filler));
+    for (int i=0;i<a.size1();++i) {
+      for (int j=0;j<a.size2();++j) {
+        int k = a_sp.getNZ(i,j);
+        if (k!=-1) {
+          blocks[i][j] = a[k]*b;
+        }
+      }
+    }
+    return blockcat(blocks);
+  }
+  
 } // namespace CasADi
 

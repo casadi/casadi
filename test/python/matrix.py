@@ -1008,6 +1008,18 @@ class Matrixtests(casadiTestCase):
           a.sparsity().sanityCheck()
           a.printDense()
           raise e
+          
+  def test_kron(self):
+    a = sparse(DMatrix([[1,0,6],[2,7,0]]))
+    b = sparse(DMatrix([[1,0,0],[2,3,7],[0,0,9],[1,12,13]]))
+    
+    c_ = c.kron(a,b)
+    
+    self.assertEqual(c_.size1(),a.size1()*b.size1())
+    self.assertEqual(c_.size2(),a.size2()*b.size2())
+    self.assertEqual(c_.size(),a.size()*b.size())
+    
+    self.checkarray(c_,numpy.kron(a,b))
         
 if __name__ == '__main__':
     unittest.main()

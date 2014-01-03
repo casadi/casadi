@@ -2206,5 +2206,27 @@ class MXtests(casadiTestCase):
       
     print outs
     
+  def test_kron(self):
+    a = sparse(DMatrix([[1,0,6],[2,7,0]]))
+    b = sparse(DMatrix([[1,0,0],[2,3,7],[0,0,9],[1,12,13]]))
+    
+    A = msym("A",a.sparsity())
+    B = msym("B",b.sparsity())
+    C = c.kron(A,B)
+    
+    f = MXFunction([A,B],[C])
+    f.init()
+    f.setInput(a,0)
+    f.setInput(b,1)
+    f.evaluate()
+    
+    c_ = f.output()
+    
+    self.assertEqual(c_.size1(),a.size1()*b.size1())
+    self.assertEqual(c_.size2(),a.size2()*b.size2())
+    self.assertEqual(c_.size(),a.size()*b.size())
+    
+    self.checkarray(c_,numpy.kron(a,b))
+    
 if __name__ == '__main__':
     unittest.main()
