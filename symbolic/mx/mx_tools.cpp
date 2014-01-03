@@ -1002,7 +1002,7 @@ namespace CasADi{
   }
 
   MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict) {
-    LinearSolver mysolver = lsolver(A.sparsity());
+    LinearSolver mysolver = lsolver(A.sparsity(),1);
     mysolver.setOption(dict);
     mysolver.init();
     return trans(mysolver.solve(A,trans(b),true));

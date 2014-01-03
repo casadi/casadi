@@ -84,7 +84,7 @@ namespace CasADi{
         linearSolverCreator linear_solver_creator = getOption("linear_solver");
         
         // Allocate an NLP solver
-        linsol_ = linear_solver_creator(jac_.output().sparsity());
+        linsol_ = linear_solver_creator(jac_.output().sparsity(),1);
         
         // Pass options
         if(hasSetOption("linear_solver_options")){

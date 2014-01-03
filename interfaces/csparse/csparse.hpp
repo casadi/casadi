@@ -70,7 +70,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const CRSSparsity& sp){ return CSparse(sp);}
+    static LinearSolver creator(const CRSSparsity& sp, int nrhs){ return CSparse(sp,nrhs);}
 #ifdef SWIG
     %nocallback;
 #endif

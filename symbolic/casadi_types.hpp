@@ -69,7 +69,7 @@ namespace CasADi{
   typedef NLPSolver (*NLPSolverCreator)(const FX& nlp);
 
   /// Function pointer to a linear solver creator function
-  typedef LinearSolver (*linearSolverCreator)(const CRSSparsity& sparsity);
+  typedef LinearSolver (*linearSolverCreator)(const CRSSparsity& sparsity, int nrhs);
   
   /// Function pointer to a LP solver creator function
   typedef LPSolver (*LPSolverCreator)(const LPStructure& st);
