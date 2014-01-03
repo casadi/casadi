@@ -74,7 +74,7 @@ namespace CasADi{
 
   std::pair<FX,FX> Integrator::getAugmented(int nfwd, int nadj){
     vector<int> xf_offset,qf_offset,rxf_offset,rqf_offset;
-    return (*this)->getAugmented(nfwd,nadj,xf_offset,qf_offset,rxf_offset,rqf_offset);
+    return (*this)->getAugmented(nfwd,nadj);
   }
 
   DMatrix& Integrator::z(){

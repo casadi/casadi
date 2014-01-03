@@ -164,30 +164,24 @@ namespace CasADi{
     g_ = deepcopy(g_,already_copied);
   }
 
-  std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj, vector<int>& xf_offset, vector<int>& qf_offset, vector<int>& rxf_offset, vector<int>& rqf_offset){
+  std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj){
     log("IntegratorInternal::getAugmented","call");
     if(is_a<SXFunction>(f_)){
       casadi_assert_message(g_.isNull() || is_a<SXFunction>(g_), "Currently, g_ must be of the same type as f_");
-      return getAugmentedGen<SXMatrix,SXFunction>(nfwd,nadj,xf_offset,qf_offset,rxf_offset,rqf_offset);
+      return getAugmentedGen<SXMatrix,SXFunction>(nfwd,nadj);
     } else if(is_a<MXFunction>(f_)){
       casadi_assert_message(g_.isNull() || is_a<MXFunction>(g_), "Currently, g_ must be of the same type as f_");
-      return getAugmentedGen<MX,MXFunction>(nfwd,nadj,xf_offset,qf_offset,rxf_offset,rqf_offset);
+      return getAugmentedGen<MX,MXFunction>(nfwd,nadj);
     } else {
       throw CasadiException("Currently, f_ must be either SXFunction or MXFunction");
     }
   }
   
   template<class Mat,class XFunc>
-  std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj, vector<int>& xf_offset, vector<int>& qf_offset, vector<int>& rxf_offset, vector<int>& rqf_offset){
+  std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   
     log("IntegratorInternal::getAugmentedGen","begin");
 
-    // Reset the offset
-    xf_offset.clear();    xf_offset.push_back(0);
-    qf_offset.clear();    qf_offset.push_back(0);
-    rxf_offset.clear();   rxf_offset.push_back(0);
-    rqf_offset.clear();   rqf_offset.push_back(0);
-  
     // Get derivatived type
     XFunc f = shared_cast<XFunc>(f_);
     XFunc g = shared_cast<XFunc>(g_);
@@ -224,19 +218,13 @@ namespace CasADi{
     Mat ralg = rdae_out[RDAE_ALG];
     Mat rquad = rdae_out[RDAE_QUAD];
 
-    // Get offset for nondifferentiated problem
-    if( nx_>0) xf_offset.push_back(x.size1());
-    if( nq_>0) qf_offset.push_back(quad.size1());
-    if(nrx_>0) rxf_offset.push_back(rx.size1());
-    if(nrq_>0) rqf_offset.push_back(rquad.size1());
-
     // Function evaluating f and g
     vector<Mat> fg_out(DAE_NUM_OUT+RDAE_NUM_OUT);
     copy(dae_out.begin(),dae_out.end(),fg_out.begin());
     copy(rdae_out.begin(),rdae_out.end(),fg_out.begin()+DAE_NUM_OUT);
     XFunc fg(rdae_in,fg_out);
     fg.init();
-  
+
     // Allocate forward sensitivities
     vector<Mat> fwd_x = Mat::sym("fwd_x",x.sparsity(),nfwd);
     vector<Mat> fwd_z = Mat::sym("fwd_z",z.sparsity(),nfwd);
@@ -263,12 +251,6 @@ namespace CasADi{
       fseed[dir][RDAE_RX] = fwd_rx[dir];
       fseed[dir][RDAE_RZ] = fwd_rz[dir];
       fseed[dir][RDAE_RP] = fwd_rp[dir];
-
-      // Save number of rows
-      if( nx_>0) xf_offset.push_back(x.size1());
-      if( nq_>0) qf_offset.push_back(quad.size1());
-      if(nrx_>0) rxf_offset.push_back(rx.size1());
-      if(nrq_>0) rqf_offset.push_back(rquad.size1());
     }
 
     // Adjoint seeds
@@ -281,19 +263,7 @@ namespace CasADi{
       aseed[dir][DAE_NUM_OUT+RDAE_ODE] = adj_rode[dir];
       aseed[dir][DAE_NUM_OUT+RDAE_ALG] = adj_ralg[dir];
       aseed[dir][DAE_NUM_OUT+RDAE_QUAD] = adj_rquad[dir];
-
-      // Save number of rows
-      if( nx_>0) rxf_offset.push_back(x.size1());
-      if( np_>0) rqf_offset.push_back(p.size1());
-      if(nrx_>0) xf_offset.push_back(rx.size1());
-      if(nrp_>0) qf_offset.push_back(rp.size1());
     }
-
-    // Get cummulative offsets
-    for(int i=1; i<xf_offset.size(); ++i) xf_offset[i] += xf_offset[i-1];
-    for(int i=1; i<qf_offset.size(); ++i) qf_offset[i] += qf_offset[i-1];
-    for(int i=1; i<rxf_offset.size(); ++i) rxf_offset[i] += rxf_offset[i-1];
-    for(int i=1; i<rqf_offset.size(); ++i) rqf_offset[i] += rqf_offset[i-1];
   
     // Calculate forward and adjoint sensitivities
     vector<vector<Mat> > fsens(fseed.size(),fg_out);
@@ -352,7 +322,7 @@ namespace CasADi{
     makeDense(rode);
     makeDense(ralg);
     makeDense(rquad);
-  
+
     // Update the forward problem inputs ...
     dae_in[DAE_X] = x;
     dae_in[DAE_Z] = z;
@@ -499,16 +469,282 @@ namespace CasADi{
     log("IntegratorInternal::spEvaluate","end");
   }
 
+
   FX IntegratorInternal::getDerivative(int nfwd, int nadj){
     log("IntegratorInternal::getDerivative","begin");
 
-    // Generate augmented DAE
-    vector<int> xf_offset, qf_offset, rxf_offset, rqf_offset;
-    std::pair<FX,FX> aug_dae = getAugmented(nfwd,nadj,xf_offset,qf_offset,rxf_offset,rqf_offset);
+    // Offsets for augmented problem
+    vector<int> x_offset(1,0), z_offset(1,0), q_offset(1,0), p_offset(1,0), rx_offset(1,0), rz_offset(1,0), rq_offset(1,0), rp_offset(1,0);
+
+    // Count nondifferentiated and forward sensitivities 
+    for(int dir=-1; dir<nfwd; ++dir){
+      if( nx_>0) x_offset.push_back(input(INTEGRATOR_X0).size1());
+      if( nz_>0) z_offset.push_back(z_.size1());
+      if( nq_>0) q_offset.push_back(output(INTEGRATOR_QF).size1());
+      if( np_>0) p_offset.push_back(input(INTEGRATOR_P).size1());
+      if(nrx_>0) rx_offset.push_back(input(INTEGRATOR_RX0).size1());
+      if(nrz_>0) rz_offset.push_back(rz_.size1());
+      if(nrq_>0) rq_offset.push_back(output(INTEGRATOR_RQF).size1());
+      if(nrp_>0) rp_offset.push_back(input(INTEGRATOR_RP).size1());
+    }
+
+    // Count adjoint sensitivities
+    for(int dir=0; dir<nadj; ++dir){
+      if( nx_>0) rx_offset.push_back(input(INTEGRATOR_X0).size1());
+      if( nz_>0) rz_offset.push_back(z_.size1());
+      if( np_>0) rq_offset.push_back(input(INTEGRATOR_P).size1());
+      if( nq_>0) rp_offset.push_back(output(INTEGRATOR_QF).size1());
+      if(nrx_>0) x_offset.push_back(input(INTEGRATOR_RX0).size1());
+      if(nrz_>0) z_offset.push_back(rz_.size1());
+      if(nrp_>0) q_offset.push_back(input(INTEGRATOR_RP).size1());
+      if(nrq_>0) p_offset.push_back(output(INTEGRATOR_RQF).size1());
+    }
+    
+    // Get cummulative offsets
+    for(int i=1; i<x_offset.size(); ++i) x_offset[i] += x_offset[i-1];
+    for(int i=1; i<z_offset.size(); ++i) z_offset[i] += z_offset[i-1];
+    for(int i=1; i<q_offset.size(); ++i) q_offset[i] += q_offset[i-1];
+    for(int i=1; i<p_offset.size(); ++i) p_offset[i] += p_offset[i-1];
+    for(int i=1; i<rx_offset.size(); ++i) rx_offset[i] += rx_offset[i-1];
+    for(int i=1; i<rz_offset.size(); ++i) rz_offset[i] += rz_offset[i-1];
+    for(int i=1; i<rq_offset.size(); ++i) rq_offset[i] += rq_offset[i-1];
+    for(int i=1; i<rp_offset.size(); ++i) rp_offset[i] += rp_offset[i-1];
+
+#if 0
+    // Create augmented problem
+    MX aug_t = msym("aug_t",f_.input(DAE_T).sparsity());
+    MX aug_x = msym("aug_x",x_offset.back(),f_.input(DAE_X).size2());
+    MX aug_z = msym("aug_z",z_offset.back(),f_.input(DAE_Z).size2());
+    MX aug_p = msym("aug_p",p_offset.back(),f_.input(DAE_P).size2());
+    MX aug_rx = msym("aug_rx",rx_offset.back(),f_.input(DAE_X).size2());
+    MX aug_rz = msym("aug_rz",rz_offset.back(),f_.input(DAE_Z).size2());
+    MX aug_rp = msym("aug_rp",rp_offset.back(),f_.output(DAE_QUAD).size2());
+
+    // Split up the augmented vectors
+    vector<MX> aug_x_split = vertsplit(aug_x,x_offset);     vector<MX>::const_iterator aug_x_split_it = aug_x_split.begin();
+    vector<MX> aug_z_split = vertsplit(aug_z,z_offset);     vector<MX>::const_iterator aug_z_split_it = aug_z_split.begin();
+    vector<MX> aug_p_split = vertsplit(aug_p,p_offset);     vector<MX>::const_iterator aug_p_split_it = aug_p_split.begin();
+    vector<MX> aug_rx_split = vertsplit(aug_rx,rx_offset);  vector<MX>::const_iterator aug_rx_split_it = aug_rx_split.begin();
+    vector<MX> aug_rz_split = vertsplit(aug_rz,rz_offset);  vector<MX>::const_iterator aug_rz_split_it = aug_rz_split.begin();
+    vector<MX> aug_rp_split = vertsplit(aug_rp,rp_offset);  vector<MX>::const_iterator aug_rp_split_it = aug_rp_split.begin();
+
+    // Temporary vector
+    vector<MX> tmp;
+
+    // Zero with the dimension of t
+    MX zero_t = DMatrix::zeros(aug_t.sparsity());
+
+    // The DAE being constructed
+    vector<MX> f_ode, f_alg, f_quad, g_ode, g_alg, g_quad;
+
+    // Forward derivatives of f
+    FX d = f_.derivative(nfwd,0);
+    vector<MX> f_arg;
+    f_arg.reserve(d.getNumInputs());
+    tmp.resize(DAE_NUM_IN);
+    fill(tmp.begin(),tmp.end(),MX());
+
+    // Collect arguments for calling d
+    for(int dir=-1; dir<nfwd; ++dir){
+      tmp[DAE_T] = dir<0 ? aug_t : zero_t;
+      if( nx_>0) tmp[DAE_X] = *aug_x_split_it++;
+      if( nz_>0) tmp[DAE_Z] = *aug_z_split_it++;
+      if( np_>0) tmp[DAE_P] = *aug_p_split_it++;
+      f_arg.insert(f_arg.end(),tmp.begin(),tmp.end());
+    }
+
+    // Call d
+    vector<MX> res = d.call(f_arg);
+    vector<MX>::const_iterator res_it = res.begin();
+    
+    // Collect right-hand-sides
+    tmp.resize(DAE_NUM_OUT);
+    fill(tmp.begin(),tmp.end(),MX());
+    for(int dir=-1; dir<nfwd; ++dir){
+      copy(res_it,res_it+tmp.size(),tmp.begin());
+      res_it += tmp.size();
+      if( nx_>0) f_ode.push_back(tmp[DAE_ODE]);
+      if( nz_>0) f_alg.push_back(tmp[DAE_ALG]);
+      if( nq_>0) f_quad.push_back(tmp[DAE_QUAD]);
+    }
+
+    vector<MX> g_arg;    
+    if(!g_.isNull()){
+
+      // Forward derivatives of g
+      d = g_.derivative(nfwd,0);
+      g_arg.reserve(d.getNumInputs());
+      tmp.resize(RDAE_NUM_IN);
+      fill(tmp.begin(),tmp.end(),MX());
+      
+      // Reset iterators
+      aug_x_split_it = aug_x_split.begin();
+      aug_z_split_it = aug_z_split.begin();
+      aug_p_split_it = aug_p_split.begin();
+      
+      // Collect arguments for calling d
+      for(int dir=-1; dir<nfwd; ++dir){
+        tmp[RDAE_T] = dir<0 ? aug_t : zero_t;
+        if( nx_>0) tmp[RDAE_X] = *aug_x_split_it++;
+        if( nz_>0) tmp[RDAE_Z] = *aug_z_split_it++;
+        if( np_>0) tmp[RDAE_P] = *aug_p_split_it++;
+        if(nrx_>0) tmp[RDAE_RX] = *aug_rx_split_it++;
+        if(nrz_>0) tmp[RDAE_RZ] = *aug_rz_split_it++;
+        if(nrp_>0) tmp[RDAE_RP] = *aug_rp_split_it++;
+        g_arg.insert(g_arg.end(),tmp.begin(),tmp.end());
+      }
+      
+      // Call d
+      res = d.call(g_arg);
+      res_it = res.begin();
+
+      // Collect right-hand-sides
+      tmp.resize(RDAE_NUM_OUT);
+      fill(tmp.begin(),tmp.end(),MX());
+      for(int dir=-1; dir<nfwd; ++dir){
+        copy(res_it,res_it+tmp.size(),tmp.begin());
+        res_it += tmp.size();
+        if(nrx_>0) g_ode.push_back(tmp[RDAE_ODE]);
+        if(nrz_>0) g_alg.push_back(tmp[RDAE_ALG]);
+        if(nrq_>0) g_quad.push_back(tmp[RDAE_QUAD]);
+      }
+    }
+
+    if(nadj>0){
+
+      // Adjoint derivatives of f
+      d = f_.derivative(0,nadj);
+      f_arg.resize(DAE_NUM_IN);
+      f_arg.reserve(d.getNumInputs());
+
+      // Collect arguments for calling d
+      tmp.resize(DAE_NUM_OUT);
+      fill(tmp.begin(),tmp.end(),MX());
+      for(int dir=0; dir<nadj; ++dir){
+        if( nx_>0) tmp[DAE_ODE] = *aug_rx_split_it++;
+        if( nz_>0) tmp[DAE_ALG] = *aug_rz_split_it++;
+        if( nq_>0) tmp[DAE_QUAD] = *aug_rp_split_it++;
+        f_arg.insert(f_arg.end(),tmp.begin(),tmp.end());
+      }
+      
+      // Call der
+      res = d.call(f_arg);
+      res_it = res.begin();
+
+      // Record locations in augg for later
+      int g_ode_ind = g_ode.size();
+      int g_alg_ind = g_ode.size();
+      int g_quad_ind = g_quad.size();
+    
+      // Collect right-hand-sides
+      tmp.resize(DAE_NUM_IN);
+      for(int dir=0; dir<nadj; ++dir){
+        copy(res_it,res_it+tmp.size(),tmp.begin());
+        res_it += tmp.size();
+        if( nx_>0) g_ode.push_back(tmp[DAE_X]);
+        if( nz_>0) g_alg.push_back(tmp[DAE_Z]);
+        if( np_>0) g_quad.push_back(tmp[DAE_P]);
+      }
+
+      if(!g_.isNull()){
+        // Adjoint derivatives of g
+        d = g_.derivative(0,nadj);
+        g_arg.resize(RDAE_NUM_IN);
+        g_arg.reserve(d.getNumInputs());
+
+        // Collect arguments for calling der
+        tmp.resize(RDAE_NUM_OUT);
+        fill(tmp.begin(),tmp.end(),MX());
+        for(int dir=0; dir<nadj; ++dir){
+          if(nrx_>0) tmp[RDAE_ODE] = *aug_x_split_it++;
+          if(nrz_>0) tmp[RDAE_ALG] = *aug_z_split_it++;
+          if(nrq_>0) tmp[RDAE_QUAD] = *aug_p_split_it++;
+          g_arg.insert(g_arg.end(),tmp.begin(),tmp.end());
+        }
+        
+        // Call der
+        res = d.call(g_arg);
+        res_it = res.begin();
+    
+        // Collect right-hand-sides
+        tmp.resize(RDAE_NUM_IN);
+        for(int dir=0; dir<nadj; ++dir){
+          copy(res_it,res_it+tmp.size(),tmp.begin());
+          res_it += tmp.size();
+          if( nx_>0) g_ode[g_ode_ind++] += tmp[RDAE_X];
+          if( nz_>0) g_alg[g_alg_ind++] += tmp[RDAE_Z];
+          if( np_>0) g_quad[g_quad_ind++] += tmp[RDAE_P];
+        }
+
+        // Remove the dependency of rx,rz,rp in the forward integration (see Joel's thesis)
+        if(nrx_>0) g_arg[RDAE_RX] = MX::zeros(g_arg[RDAE_RX].sparsity());
+        if(nrz_>0) g_arg[RDAE_RZ] = MX::zeros(g_arg[RDAE_RZ].sparsity());
+        if(nrp_>0) g_arg[RDAE_RP] = MX::zeros(g_arg[RDAE_RP].sparsity());
+
+        // Call der again
+        res = d.call(g_arg);
+        res_it = res.begin();
+        
+        // Collect right-hand-sides and add contribution to the forward integration
+        tmp.resize(RDAE_NUM_IN);
+        for(int dir=0; dir<nadj; ++dir){
+          copy(res_it,res_it+tmp.size(),tmp.begin());
+          res_it += tmp.size();
+          if(nrx_>0) f_ode.push_back(tmp[RDAE_RX]);
+          if(nrz_>0) f_alg.push_back(tmp[RDAE_RZ]);
+          if(nrp_>0) f_quad.push_back(tmp[RDAE_RP]);
+        }
+      }
+    }
+    
+    // Form the augmented forward integration function
+    vector<MX> f_in(DAE_NUM_IN), f_out(DAE_NUM_OUT);
+    f_in[DAE_T] = aug_t;
+    f_in[DAE_X] = aug_x;
+    f_in[DAE_Z] = aug_z;
+    f_in[DAE_P] = aug_p;
+    if(!f_ode.empty()) f_out[DAE_ODE] = densify(vertcat(f_ode));
+    if(!f_alg.empty()) f_out[DAE_ALG] = densify(vertcat(f_alg));
+    if(!f_quad.empty()) f_out[DAE_QUAD] = densify(vertcat(f_quad));
+    MXFunction f(f_in,f_out);
+
+    // Form the augmented backward integration function
+    MXFunction g;
+    if(!g_ode.empty()){
+      vector<MX> g_in(RDAE_NUM_IN), g_out(RDAE_NUM_OUT);
+      g_in[RDAE_T] = aug_t;
+      g_in[RDAE_X] = aug_x;
+      g_in[RDAE_Z] = aug_z;
+      g_in[RDAE_P] = aug_p;
+      g_in[RDAE_RX] = aug_rx;
+      g_in[RDAE_RZ] = aug_rz;
+      g_in[RDAE_RP] = aug_rp;
+      if(!g_ode.empty()) g_out[RDAE_ODE] = densify(vertcat(g_ode));
+      if(!g_alg.empty()) g_out[RDAE_ALG] = densify(vertcat(g_alg));
+      if(!g_quad.empty()) g_out[RDAE_QUAD] = densify(vertcat(g_quad));
+      g = MXFunction(g_in,g_out);
+    }
+
+    // Consistency check
+    casadi_assert(aug_x_split_it == aug_x_split.end());
+    casadi_assert(aug_z_split_it == aug_z_split.end());
+    casadi_assert(aug_p_split_it == aug_p_split.end());
+    casadi_assert(aug_rx_split_it == aug_rx_split.end());
+    casadi_assert(aug_rz_split_it == aug_rz_split.end());
+    casadi_assert(aug_rp_split_it == aug_rp_split.end());
+
+    // Create integrator for augmented DAE
+    Integrator integrator;
+    integrator.assignNode(create(f,g));
+    
+#else
+    std::pair<FX,FX> aug_dae_old = getAugmented(nfwd,nadj);
   
     // Create integrator for augmented DAE
     Integrator integrator;
-    integrator.assignNode(create(aug_dae.first,aug_dae.second));
+    integrator.assignNode(create(aug_dae_old.first,aug_dae_old.second));
+
+#endif
   
     // Copy options
     integrator.setOption(dictionary());
@@ -610,10 +846,10 @@ namespace CasADi{
     vector<MX> integrator_out = integrator.call(integrator_in);
   
     // Augmented results
-    vector<MX> xf_aug = vertsplit(integrator_out[INTEGRATOR_XF],xf_offset);
-    vector<MX> rxf_aug = vertsplit(integrator_out[INTEGRATOR_RXF],rxf_offset);
-    vector<MX> qf_aug = vertsplit(integrator_out[INTEGRATOR_QF],qf_offset);
-    vector<MX> rqf_aug = vertsplit(integrator_out[INTEGRATOR_RQF],rqf_offset);
+    vector<MX> xf_aug = vertsplit(integrator_out[INTEGRATOR_XF],x_offset);
+    vector<MX> rxf_aug = vertsplit(integrator_out[INTEGRATOR_RXF],rx_offset);
+    vector<MX> qf_aug = vertsplit(integrator_out[INTEGRATOR_QF],q_offset);
+    vector<MX> rqf_aug = vertsplit(integrator_out[INTEGRATOR_RQF],rq_offset);
     vector<MX>::const_iterator xf_aug_it = xf_aug.begin();
     vector<MX>::const_iterator rxf_aug_it = rxf_aug.begin();
     vector<MX>::const_iterator qf_aug_it = qf_aug.begin();

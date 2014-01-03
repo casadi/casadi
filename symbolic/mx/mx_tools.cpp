@@ -42,7 +42,9 @@ namespace CasADi{
     casadi_assert(isMonotone(offset));
     
     // Trivial return if possible
-    if(offset.size()==1 || (offset.size()==2 && offset.back()==x.size1())){
+    if(offset.size()==1 && offset.back()==x.size1()){
+      return vector<MX>(0);
+    } else if(offset.size()==1 || (offset.size()==2 && offset.back()==x.size1())){
       return vector<MX>(1,x);
     } else {
       return x->getVertsplit(offset);
