@@ -510,7 +510,6 @@ namespace CasADi{
     for(int i=1; i<rq_offset.size(); ++i) rq_offset[i] += rq_offset[i-1];
     for(int i=1; i<rp_offset.size(); ++i) rp_offset[i] += rp_offset[i-1];
 
-#if 0
     // Create augmented problem
     MX aug_t = msym("aug_t",f_.input(DAE_T).sparsity());
     MX aug_x = msym("aug_x",x_offset.back(),f_.input(DAE_X).size2());
@@ -568,6 +567,9 @@ namespace CasADi{
       if( nq_>0) f_quad.push_back(tmp[DAE_QUAD]);
     }
 
+    // Consistency check
+    casadi_assert(res_it==res.end());
+
     vector<MX> g_arg;    
     if(!g_.isNull()){
 
@@ -608,6 +610,9 @@ namespace CasADi{
         if(nrz_>0) g_alg.push_back(tmp[RDAE_ALG]);
         if(nrq_>0) g_quad.push_back(tmp[RDAE_QUAD]);
       }
+      
+      // Consistency check
+      casadi_assert(res_it==res.end());
     }
 
     if(nadj>0){
@@ -626,10 +631,10 @@ namespace CasADi{
         if( nq_>0) tmp[DAE_QUAD] = *aug_rp_split_it++;
         f_arg.insert(f_arg.end(),tmp.begin(),tmp.end());
       }
-      
+
       // Call der
       res = d.call(f_arg);
-      res_it = res.begin();
+      res_it = res.begin() + DAE_NUM_OUT;
 
       // Record locations in augg for later
       int g_ode_ind = g_ode.size();
@@ -646,7 +651,12 @@ namespace CasADi{
         if( np_>0) g_quad.push_back(tmp[DAE_P]);
       }
 
+      // Consistency check
+      casadi_assert(res_it==res.end());
+
       if(!g_.isNull()){
+        casadi_error("not tested");
+
         // Adjoint derivatives of g
         d = g_.derivative(0,nadj);
         g_arg.resize(RDAE_NUM_IN);
@@ -664,7 +674,7 @@ namespace CasADi{
         
         // Call der
         res = d.call(g_arg);
-        res_it = res.begin();
+        res_it = res.begin() + RDAE_NUM_OUT;
     
         // Collect right-hand-sides
         tmp.resize(RDAE_NUM_IN);
@@ -683,7 +693,7 @@ namespace CasADi{
 
         // Call der again
         res = d.call(g_arg);
-        res_it = res.begin();
+        res_it = res.begin() + RDAE_NUM_OUT;
         
         // Collect right-hand-sides and add contribution to the forward integration
         tmp.resize(RDAE_NUM_IN);
@@ -694,6 +704,9 @@ namespace CasADi{
           if(nrz_>0) f_alg.push_back(tmp[RDAE_RZ]);
           if(nrp_>0) f_quad.push_back(tmp[RDAE_RP]);
         }
+
+        // Consistency check
+        casadi_assert(res_it==res.end());
       }
     }
     
@@ -733,18 +746,13 @@ namespace CasADi{
     casadi_assert(aug_rz_split_it == aug_rz_split.end());
     casadi_assert(aug_rp_split_it == aug_rp_split.end());
 
-    // Create integrator for augmented DAE
-    Integrator integrator;
-    integrator.assignNode(create(f,g));
-    
-#else
-    std::pair<FX,FX> aug_dae_old = getAugmented(nfwd,nadj);
-  
-    // Create integrator for augmented DAE
-    Integrator integrator;
-    integrator.assignNode(create(aug_dae_old.first,aug_dae_old.second));
 
-#endif
+    // Create integrator for augmented DAE
+    Integrator integrator;
+
+    //integrator.assignNode(create(f,g));
+    std::pair<FX,FX> aug_dae_old = getAugmented(nfwd,nadj);
+    integrator.assignNode(create(aug_dae_old.first,aug_dae_old.second));
   
     // Copy options
     integrator.setOption(dictionary());
