@@ -55,7 +55,7 @@ namespace CasADi{
     CSparse();
   
     /// Create a linear solver given a sparsity pattern
-    CSparse(const CRSSparsity& sp, int nrhs=1);
+    explicit CSparse(const CRSSparsity& sp, int nrhs=1);
   
     /** \brief  Access internal functions and data members */
     CSparseInternal* operator->();
