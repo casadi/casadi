@@ -217,7 +217,6 @@ namespace CasADi{
     
   template<class T> T fabs(const T &x){return x.fabs();}
   using std::fabs;
-  double fabs(int x) { return abs(x); } // To keep the compiler happy (VS)
   
   template<class T> T floor(const T &x){return x.floor();}
   using std::floor;

@@ -41,7 +41,7 @@ template<class T>
 class casadi_limits{
   public:
     static bool isZero(const T& val){ return val==0; }
-    static bool isAlmostZero(const T& val, double tol){ return fabs(val)<=tol; }
+    static bool isAlmostZero(const T& val, double tol){ return val<=tol && val>=-tol; }
     static bool isOne(const T& val){ return val==1;}
     static bool isMinusOne(const T& val){ return val==-1;}
     static bool isConstant(const T& val){ return true;}
