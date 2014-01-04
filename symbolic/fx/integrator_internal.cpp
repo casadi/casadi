@@ -711,15 +711,20 @@ namespace CasADi{
     }
     
     // Form the augmented forward integration function
-    vector<MX> f_in(DAE_NUM_IN), f_out(DAE_NUM_OUT);
-    f_in[DAE_T] = aug_t;
-    f_in[DAE_X] = aug_x;
-    f_in[DAE_Z] = aug_z;
-    f_in[DAE_P] = aug_p;
-    if(!f_ode.empty()) f_out[DAE_ODE] = densify(vertcat(f_ode));
-    if(!f_alg.empty()) f_out[DAE_ALG] = densify(vertcat(f_alg));
-    if(!f_quad.empty()) f_out[DAE_QUAD] = densify(vertcat(f_quad));
-    MXFunction f(f_in,f_out);
+    FX f;
+    if(g_.isNull() && nfwd==0){
+      f = f_; // reuse the existing one
+    } else {
+      vector<MX> f_in(DAE_NUM_IN), f_out(DAE_NUM_OUT);
+      f_in[DAE_T] = aug_t;
+      f_in[DAE_X] = aug_x;
+      f_in[DAE_Z] = aug_z;
+      f_in[DAE_P] = aug_p;
+      if(!f_ode.empty()) f_out[DAE_ODE] = densify(vertcat(f_ode));
+      if(!f_alg.empty()) f_out[DAE_ALG] = densify(vertcat(f_alg));
+      if(!f_quad.empty()) f_out[DAE_QUAD] = densify(vertcat(f_quad));
+      f = MXFunction(f_in,f_out);
+    }
 
     // Form the augmented backward integration function
     MXFunction g;
@@ -745,7 +750,6 @@ namespace CasADi{
     casadi_assert(aug_rx_split_it == aug_rx_split.end());
     casadi_assert(aug_rz_split_it == aug_rz_split.end());
     casadi_assert(aug_rp_split_it == aug_rp_split.end());
-
 
     // Create integrator for augmented DAE
     Integrator integrator;
