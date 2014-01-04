@@ -44,6 +44,7 @@ namespace CasADi{
     addOption("t0",                       OT_REAL,        0.0, "Beginning of the time horizon"); 
     addOption("tf",                       OT_REAL,        1.0, "End of the time horizon");
     addOption("augmented_options",        OT_DICTIONARY,  GenericType(), "Options to be passed down to the augmented integrator, if one is constructed.");
+    addOption("expand_augmented",         OT_BOOLEAN,     true, "If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.");
   
     // Negative number of parameters for consistancy checking
     np_ = -1;
@@ -710,6 +711,12 @@ namespace CasADi{
       }
     }
     
+    // Do we want to expand MXFunction->SXFunction?
+    bool expand = getOption("expand_augmented");
+
+    // Can we expand?
+    expand = expand && is_a<SXFunction>(f_) && (g_.isNull() || is_a<SXFunction>(g_));
+
     // Form the augmented forward integration function
     FX f;
     if(g_.isNull() && nfwd==0){
@@ -723,11 +730,19 @@ namespace CasADi{
       if(!f_ode.empty()) f_out[DAE_ODE] = densify(vertcat(f_ode));
       if(!f_alg.empty()) f_out[DAE_ALG] = densify(vertcat(f_alg));
       if(!f_quad.empty()) f_out[DAE_QUAD] = densify(vertcat(f_quad));
-      f = MXFunction(f_in,f_out);
+      MXFunction f_mx(f_in,f_out);
+      
+      // Expand to SXFuncion?
+      if(expand){
+        f_mx.init();
+        f = SXFunction(f_mx);
+      } else {
+        f = f_mx;
+      }
     }
 
     // Form the augmented backward integration function
-    MXFunction g;
+    FX g;
     if(!g_ode.empty()){
       vector<MX> g_in(RDAE_NUM_IN), g_out(RDAE_NUM_OUT);
       g_in[RDAE_T] = aug_t;
@@ -740,7 +755,15 @@ namespace CasADi{
       if(!g_ode.empty()) g_out[RDAE_ODE] = densify(vertcat(g_ode));
       if(!g_alg.empty()) g_out[RDAE_ALG] = densify(vertcat(g_alg));
       if(!g_quad.empty()) g_out[RDAE_QUAD] = densify(vertcat(g_quad));
-      g = MXFunction(g_in,g_out);
+      MXFunction g_mx(g_in,g_out);
+
+      // Expand to SXFuncion?
+      if(expand){
+        g_mx.init();
+        g = SXFunction(g_mx);
+      } else {
+        g = g_mx;
+      }
     }
 
     // Consistency check
@@ -754,9 +777,12 @@ namespace CasADi{
     // Create integrator for augmented DAE
     Integrator integrator;
 
-    //integrator.assignNode(create(f,g));
-    std::pair<FX,FX> aug_dae_old = getAugmented(nfwd,nadj);
-    integrator.assignNode(create(aug_dae_old.first,aug_dae_old.second));
+    if(0){
+      integrator.assignNode(create(f,g));
+    } else {
+      std::pair<FX,FX> aug_dae_old = getAugmented(nfwd,nadj);
+      integrator.assignNode(create(aug_dae_old.first,aug_dae_old.second));
+    }
   
     // Copy options
     integrator.setOption(dictionary());
