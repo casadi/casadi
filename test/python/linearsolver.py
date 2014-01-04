@@ -61,7 +61,6 @@ class LinearSolverTests(casadiTestCase):
     b = msym("b",b_.sparsity())
     
     for Solver, options in lsolvers:
-      if 'CSparse' not in str(Solver): continue
       print Solver.creator
       C = solve(A,b,Solver,options)
       

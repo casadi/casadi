@@ -142,6 +142,7 @@ if (!ret) {
 #endif
 
 %my_creator_typemap(PRECEDENCE_CREATOR, CasADi::implicitFunctionCreator);
+%my_creator_typemap(PRECEDENCE_CREATOR, CasADi::linearSolverCreator);
 
 #ifdef SWIGPYTHON
 %my_generic_const_typemap(PRECEDENCE_CUSTOMEVALUATE,CasADi::CustomEvaluate);
