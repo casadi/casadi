@@ -84,12 +84,16 @@ namespace CasADi{
     /** \brief Calculate the jacobian of output oind with respect to input iind */
     virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 
+    // Helper structure
+    struct AugOffset{
+      std::vector<int> x,z,q,p,rx,rz,rq,rp;
+    };
+
     /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
-    virtual std::pair<FX,FX> getAugmented(int nfwd, int nadj);
+    virtual std::pair<FX,FX> getAugmented(int nfwd, int nadj, AugOffset& offset);
   
-    /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities (generic)
-    template<class Mat,class XFunc>
-    std::pair<FX,FX> getAugmentedGen(int nfwd, int nadj);
+    // Get offsets in augmented problem
+    AugOffset getAugOffset(int nfwd, int nadj);
   
     /// Integration horizon
     double t0_, tf_;
