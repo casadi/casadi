@@ -656,7 +656,6 @@ namespace CasADi{
       casadi_assert(res_it==res.end());
 
       if(!g_.isNull()){
-        casadi_error("not tested");
 
         // Adjoint derivatives of g
         d = g_.derivative(0,nadj);
