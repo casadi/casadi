@@ -781,7 +781,7 @@ namespace CasADi{
     // Create integrator for augmented DAE
     Integrator integrator;
 
-    if(0){
+    if(1){
       integrator.assignNode(create(f,g));
     } else {
       std::pair<FX,FX> aug_dae_old = getAugmented(nfwd,nadj);
