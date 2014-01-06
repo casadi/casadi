@@ -513,12 +513,12 @@ namespace CasADi{
 
     // Create augmented problem
     MX aug_t = msym("aug_t",f_.input(DAE_T).sparsity());
-    MX aug_x = msym("aug_x",x_offset.back(),f_.input(DAE_X).size2());
-    MX aug_z = msym("aug_z",z_offset.back(),f_.input(DAE_Z).size2());
-    MX aug_p = msym("aug_p",p_offset.back(),f_.input(DAE_P).size2());
-    MX aug_rx = msym("aug_rx",rx_offset.back(),f_.input(DAE_X).size2());
-    MX aug_rz = msym("aug_rz",rz_offset.back(),f_.input(DAE_Z).size2());
-    MX aug_rp = msym("aug_rp",rp_offset.back(),f_.output(DAE_QUAD).size2());
+    MX aug_x = msym("aug_x",x_offset.back(),input(INTEGRATOR_X0).size2());
+    MX aug_z = msym("aug_z",z_offset.back(),std::max(z_.size2(),rz_.size2()));
+    MX aug_p = msym("aug_p",p_offset.back(),std::max(input(INTEGRATOR_P).size2(),input(INTEGRATOR_RP).size2()));
+    MX aug_rx = msym("aug_rx",rx_offset.back(),input(INTEGRATOR_X0).size2());
+    MX aug_rz = msym("aug_rz",rz_offset.back(),std::max(z_.size2(),rz_.size2()));
+    MX aug_rp = msym("aug_rp",rp_offset.back(),std::max(output(INTEGRATOR_QF).size2(),input(INTEGRATOR_RP).size2()));
 
     // Split up the augmented vectors
     vector<MX> aug_x_split = vertsplit(aug_x,x_offset);     vector<MX>::const_iterator aug_x_split_it = aug_x_split.begin();
