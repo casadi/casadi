@@ -302,7 +302,7 @@ namespace CasADi{
 
       // Record locations in augg for later
       int g_ode_ind = g_ode.size();
-      int g_alg_ind = g_ode.size();
+      int g_alg_ind = g_alg.size();
       int g_quad_ind = g_quad.size();
     
       // Collect right-hand-sides
@@ -348,6 +348,11 @@ namespace CasADi{
           if( nz_>0) g_alg[g_alg_ind++] += tmp[RDAE_Z];
           if( np_>0) g_quad[g_quad_ind++] += tmp[RDAE_P];
         }
+
+        // Consistency check
+        casadi_assert(g_ode_ind == g_ode.size());
+        casadi_assert(g_alg_ind == g_alg.size());
+        casadi_assert(g_quad_ind == g_quad.size());
 
         // Remove the dependency of rx,rz,rp in the forward integration (see Joel's thesis)
         if(nrx_>0) g_arg[RDAE_RX] = MX::zeros(g_arg[RDAE_RX].sparsity());
