@@ -944,7 +944,7 @@ namespace CasADi{
     if(x.vector()){
       return norm_F(x);
     } else {
-      casadi_error("2-norms currently only supported for vectors. Did you intent to calculate a Frobenius norms (norm_F)?");
+      casadi_error("2-norms currently only supported for vectors. Did you intend to calculate a Frobenius norms (norm_F)?");
     }
   }
 
