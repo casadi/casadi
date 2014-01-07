@@ -72,6 +72,15 @@ class LinearSolverTests(casadiTestCase):
       
       self.checkarray(f.output(),DMatrix([1.5,-0.5]))
       
+  def test_simple_solve_dmatrix(self):
+    A = DMatrix([[3,7],[1,2]])
+    b = DMatrix([1,0.5])
+    for Solver, options in lsolvers:
+      print Solver.creator
+      C = solve(A,b,Solver,options)
+      
+      self.checkarray(C,DMatrix([1.5,-0.5]))
+      
     
   def test_simple_trans(self):
     A = DMatrix([[3,7],[1,2]])

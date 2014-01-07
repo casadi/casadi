@@ -22,6 +22,8 @@
 
 #include "matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
+#include "../fx/linear_solver.hpp"
+
 using namespace std;
 
 namespace CasADi{
@@ -32,6 +34,17 @@ namespace CasADi{
   
   bool isRegular(const Matrix<int>& ex) {
     return isRegular(ex.data());
+  }
+  
+  Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b, linearSolverCreator lsolver, const Dictionary& dict) {
+    LinearSolver mysolver = lsolver(A.sparsity(),1);
+    mysolver.setOption(dict);
+    mysolver.init();
+    mysolver.setInput(A,LINSOL_A);
+    mysolver.setInput(trans(b),LINSOL_B);
+    mysolver.prepare();
+    mysolver.solve(true);
+    return trans(mysolver.output(LINSOL_X));
   }
   
 } // namespace CasADi

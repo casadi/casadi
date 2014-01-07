@@ -26,6 +26,8 @@
 #include "matrix.hpp"
 #include <algorithm>
 
+#include "../options_functionality.hpp"
+
 #include "sparsity_tools.hpp"
 
 namespace CasADi{
@@ -297,6 +299,10 @@ namespace CasADi{
   */
   template<class T>
   Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b);
+  
+  /** \brief Solve a system of equations: A*x = b 
+  */
+  Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
   
   /** \brief Kronecker tensor product
   *
