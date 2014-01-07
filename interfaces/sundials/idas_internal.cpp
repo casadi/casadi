@@ -907,6 +907,9 @@ namespace CasADi{
     //     copy(NV_DATA_S(xzF_[i]),NV_DATA_S(xzF_[i])+nx_,fwdSens(INTEGRATOR_XF,i).begin());
     //   }
     // }
+
+    // Save the final algebraic variable
+    copy(NV_DATA_S(xz_)+nx_,NV_DATA_S(xz_)+nx_+nz_,z_.begin());
     
     // Print statistics
     if(getOption("print_stats")) printStats(std::cout);
@@ -935,11 +938,10 @@ namespace CasADi{
     // Reset adjoint sensitivities for the parameters
     N_VConst(0.0, rq_);
   
-    // Get the adjoint seeds
-    const Matrix<double> &xf_aseed = input(INTEGRATOR_RX0);
-    copy(xf_aseed.begin(),xf_aseed.end(),NV_DATA_S(rxz_));
-  
-  
+    // Get the backward state
+    const Matrix<double> &rx0 = input(INTEGRATOR_RX0);
+    copy(rx0.begin(),rx0.end(),NV_DATA_S(rxz_));
+    
     if(isInitAdj_){
       flag = IDAReInitB(mem_, whichB_, tf_, rxz_, rxzdot_);
       if(flag != IDA_SUCCESS) idas_error("IDAReInitB",flag);
@@ -990,10 +992,11 @@ namespace CasADi{
       if(flag!=IDA_SUCCESS) idas_error("IDAGetQuadB",flag);
     }
   
-    // Save the adjoint sensitivities
+    // Save the backward state and algebraic variable
     const double *rxz = NV_DATA_S(rxz_);
     copy(rxz,rxz+nrx_,output(INTEGRATOR_RXF).begin());
-  
+    copy(rxz+nrx_,rxz+nrx_+nrz_,rz_.begin());
+
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;
       int qlast, qcur;
