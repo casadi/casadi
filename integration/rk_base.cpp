@@ -20,12 +20,25 @@
  *
  */
 
-%{
-#include "integration/rk_base.hpp"
-#include "integration/collocation_integrator.hpp"
-#include "integration/integration_tools.hpp"
-%}
+#include "rk_base_internal.hpp"
 
-%include "integration/rk_base.hpp"
-%include "integration/collocation_integrator.hpp"
-%include "integration/integration_tools.hpp"
+using namespace std;
+
+namespace CasADi{
+
+  RKBase::RKBase(){
+  }
+  
+  RKBaseInternal* RKBase::operator->(){
+    return static_cast<RKBaseInternal*>(Integrator::operator->());
+  }
+
+  const RKBaseInternal* RKBase::operator->() const{
+    return static_cast<const RKBaseInternal*>(Integrator::operator->());
+  }
+    
+  bool RKBase::checkNode() const{
+    return dynamic_cast<const RKBaseInternal*>(get())!=0;
+  }
+
+} // namespace CasADi

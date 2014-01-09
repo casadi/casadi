@@ -20,12 +20,37 @@
  *
  */
 
-%{
-#include "integration/rk_base.hpp"
-#include "integration/collocation_integrator.hpp"
-#include "integration/integration_tools.hpp"
-%}
+#ifndef RK_BASE_HPP
+#define RK_BASE_HPP
 
-%include "integration/rk_base.hpp"
-%include "integration/collocation_integrator.hpp"
-%include "integration/integration_tools.hpp"
+#include "symbolic/fx/integrator.hpp"
+
+namespace CasADi{
+  
+  class RKBaseInternal;
+  
+  /**
+     \brief Base class for fixed step Runge-Kutta integrators
+  
+     \author Joel Andersson
+     \date 2014
+  */
+  class RKBase : public Integrator {
+  public:
+    /** \brief  Default constructor */
+    RKBase();
+    
+    /// Access functions of the node
+    RKBaseInternal* operator->();
+
+    /// Access functions of the node
+    const RKBaseInternal* operator->() const;
+
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
+    
+  };
+
+} // namespace CasADi
+
+#endif //RK_BASE_HPP

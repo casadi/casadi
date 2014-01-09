@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.6)
 SET(INTEGRATION_SRCS
+  rk_base.hpp
+  rk_base.cpp
+  rk_base_internal.hpp
+  rk_base_internal.cpp
   collocation_integrator.hpp
   collocation_integrator.cpp
   collocation_integrator_internal.hpp
