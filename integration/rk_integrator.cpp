@@ -26,23 +26,23 @@ using namespace std;
 
 namespace CasADi{
 
-RKIntegrator::RKIntegrator(){
-}
+  RKIntegrator::RKIntegrator(){
+  }
   
-RKIntegrator::RKIntegrator(const FX& f, const FX& g){
-  assignNode(new RKIntegratorInternal(f,g));
-}
+  RKIntegrator::RKIntegrator(const FX& f, const FX& g){
+    assignNode(new RKIntegratorInternal(f,g));
+  }
 
-RKIntegratorInternal* RKIntegrator::operator->(){
-  return (RKIntegratorInternal*)(Integrator::operator->());
-}
+  RKIntegratorInternal* RKIntegrator::operator->(){
+    return static_cast<RKIntegratorInternal*>(Integrator::operator->());
+  }
 
-const RKIntegratorInternal* RKIntegrator::operator->() const{
-  return (const RKIntegratorInternal*)(Integrator::operator->());
-}
+  const RKIntegratorInternal* RKIntegrator::operator->() const{
+    return static_cast<const RKIntegratorInternal*>(Integrator::operator->());
+  }
     
-bool RKIntegrator::checkNode() const{
-  return dynamic_cast<const RKIntegratorInternal*>(get())!=0;
-}
+  bool RKIntegrator::checkNode() const{
+    return dynamic_cast<const RKIntegratorInternal*>(get())!=0;
+  }
 
 } // namespace CasADi

@@ -22,10 +22,12 @@
 
 %{
 #include "integration/rk_base.hpp"
+#include "integration/rk_integrator.hpp"
 #include "integration/collocation_integrator.hpp"
 #include "integration/integration_tools.hpp"
 %}
 
 %include "integration/rk_base.hpp"
+%include "integration/rk_integrator.hpp"
 %include "integration/collocation_integrator.hpp"
 %include "integration/integration_tools.hpp"
