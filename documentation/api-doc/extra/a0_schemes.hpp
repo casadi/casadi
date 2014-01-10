@@ -498,6 +498,20 @@
 <br/>
 @copydoc scheme_LPSolverOutput
 */
+/** \class CasADi::RKBaseInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::RKBase
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
 /** \class CasADi::SDPSDQPInternal
 \n
 \par
