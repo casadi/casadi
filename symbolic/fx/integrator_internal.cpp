@@ -760,6 +760,9 @@ namespace CasADi{
 
   void IntegratorInternal::reset(){
     log("IntegratorInternal::reset","begin");
+
+    // Go to the start time
+    t_ = t0_;
     
     // Initialize output
     output(INTEGRATOR_XF).set(input(INTEGRATOR_X0));
@@ -768,6 +771,21 @@ namespace CasADi{
     output(INTEGRATOR_QF).set(0.0);
 
     log("IntegratorInternal::reset","end");
+  }
+
+  void IntegratorInternal::resetB(){
+    log("IntegratorInternal::resetB","begin");
+
+    // Go to the end time
+    t_ = tf_;
+
+    // Initialize output
+    output(INTEGRATOR_RXF).set(input(INTEGRATOR_RX0));
+    
+    // Reset summation states
+    output(INTEGRATOR_RQF).set(0.0);
+    
+    log("IntegratorInternal::resetB","end");
   }
 
 

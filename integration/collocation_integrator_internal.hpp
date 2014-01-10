@@ -53,14 +53,11 @@ public:
   /// Initialize stage
   virtual void init();
   
-  /// Initialize the adjoint problem (can only be called after the first integration)
-  virtual void initAdj();
-
   /// Reset the forward problem and bring the time back to t0
   virtual void reset();
 
   /// Reset the backward problem and take time to tf
-  virtual void resetB();
+  virtual void resetB(){}
 
   ///  Integrate until a specified time point
   virtual void integrate(double t_out);

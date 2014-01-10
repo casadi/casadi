@@ -50,18 +50,6 @@ namespace CasADi{
     nk_ = getOption("number_of_finite_elements");
     h_ = (tf_ - t0_)/nk_;
   }
-  
-  void RKBaseInternal::reset(){
-    // Call the base class method
-    IntegratorInternal::reset();
-  
-    // Reset time 
-    t_ = t0_;
-  }
-
-  void RKBaseInternal::resetB(){
-    casadi_error("Not implemented");
-  }
 
   void RKBaseInternal::integrate(double t_out){
     // Take time steps until end time has been reached

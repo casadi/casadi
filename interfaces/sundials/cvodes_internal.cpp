@@ -384,6 +384,7 @@ namespace CasADi{
   
   void CVodesInternal::reset(){
     casadi_log("CVodesInternal::reset begin");
+
     // Reset the base classes
     SundialsInternal::reset();
   
@@ -495,11 +496,12 @@ namespace CasADi{
 
   void CVodesInternal::resetB(){
     casadi_log("CVodesInternal::resetB begin");
+
+    // Reset the base classes
+    SundialsInternal::resetB();
+
     int flag;
-  
     if(isInitAdj_){
-    
-    
     
       flag = CVodeReInitB(mem_, whichB_, tf_, rx0_);
       if(flag != CV_SUCCESS) cvodes_error("CVodeReInitB",flag);

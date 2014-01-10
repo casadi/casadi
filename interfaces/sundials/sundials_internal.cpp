@@ -223,9 +223,6 @@ void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>&
 void SundialsInternal::reset(){
   // Reset the base classes
   IntegratorInternal::reset();
-  
-  // Go to the start time
-  t_ = t0_;
 }
 
 } // namespace CasADi

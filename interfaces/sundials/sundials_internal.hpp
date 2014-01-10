@@ -67,9 +67,6 @@ public:
   bool stop_at_end_;
   //@}
   
-  /// Current time (to be removed)
-  double t_;
-  
   /// number of checkpoints stored so far
   int ncheck_; 
   

@@ -55,10 +55,10 @@ namespace CasADi{
     virtual void printStats(std::ostream &stream) const{}
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    virtual void reset() = 0;
+    virtual void reset();
 
     /** \brief  Reset the backward problem and take time to tf */
-    virtual void resetB() = 0;
+    virtual void resetB();
 
     /** \brief  Integrate forward until a specified time point */
     virtual void integrate(double t_out) = 0;
@@ -97,6 +97,9 @@ namespace CasADi{
   
     /// Integration horizon
     double t0_, tf_;
+
+    // Current time
+    double t_;
   
     /// ODE/DAE forward integration function
     FX f_;
@@ -106,7 +109,6 @@ namespace CasADi{
 
     /// Algebraic variable
     DMatrix z_, rz_;
-
   };
   
 } // namespace CasADi

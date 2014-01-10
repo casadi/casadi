@@ -52,12 +52,6 @@ namespace CasADi{
     /// Initialize stage
     virtual void init();
   
-    /// Reset the forward problem and bring the time back to t0
-    virtual void reset();
-
-    /// Reset the backward problem and take time to tf
-    virtual void resetB();
-
     ///  Integrate until a specified time point
     virtual void integrate(double t_out);
 
@@ -72,9 +66,6 @@ namespace CasADi{
 
     // Time step size
     double h_;
-
-    // Current time
-    double t_;
   };
 
 } // namespace CasADi

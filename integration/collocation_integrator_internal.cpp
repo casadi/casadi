@@ -418,9 +418,6 @@ namespace CasADi{
     integrated_once_ = false;
   }
   
-  void CollocationIntegratorInternal::initAdj(){
-  }
-
   void CollocationIntegratorInternal::reset(){
     // Set up timers for profiling
     double time_zero;
@@ -527,9 +524,6 @@ namespace CasADi{
   
     // Mark the system integrated at least once
     integrated_once_ = true;
-  }
-
-  void CollocationIntegratorInternal::resetB(){
   }
 
   void CollocationIntegratorInternal::integrate(double t_out){
