@@ -46,17 +46,17 @@ namespace CasADi{
     // Call the base class init
     IntegratorInternal::init();
   
-    // Number of finite elements
-    int nk = getOption("number_of_finite_elements");
-  
-    casadi_error("Not implemented");
+    // Number of finite elements and time steps
+    nk_ = getOption("number_of_finite_elements");
+    h_ = (tf_ - t0_)/nk_;
   }
   
   void RKBaseInternal::reset(){
     // Call the base class method
     IntegratorInternal::reset();
   
-    casadi_error("Not implemented");
+    // Reset time 
+    t_ = t0_;
   }
 
   void RKBaseInternal::resetB(){
@@ -64,7 +64,18 @@ namespace CasADi{
   }
 
   void RKBaseInternal::integrate(double t_out){
-    casadi_error("Not implemented");
+    // Take time steps until end time has been reached
+    while(t_<t_out){
+      F_.input(DAE_T).set(t_);
+      F_.input(DAE_X).set(output(INTEGRATOR_XF));
+      F_.input(DAE_Z).set(z_);
+      F_.input(DAE_P).set(input(INTEGRATOR_P));
+      F_.evaluate();
+      F_.output(DAE_ODE).get(output(INTEGRATOR_XF));
+      F_.output(DAE_ALG).get(z_);
+      transform(F_.output(DAE_QUAD).begin(),F_.output(DAE_QUAD).end(),output(INTEGRATOR_QF).begin(),output(INTEGRATOR_QF).begin(),std::plus<double>());
+      t_ += h_;
+    }
   }
 
   void RKBaseInternal::integrateB(double t_out){

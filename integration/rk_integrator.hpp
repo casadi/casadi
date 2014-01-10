@@ -30,6 +30,8 @@ namespace CasADi{
   class RKIntegratorInternal;
   
   /** \brief Fixed-step Explicit Runge-Kutta integrator for ODEs
+      Currently implements RK4.
+
       The method is still under development
   
       \author Joel Andersson

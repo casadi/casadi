@@ -761,9 +761,12 @@ namespace CasADi{
   void IntegratorInternal::reset(){
     log("IntegratorInternal::reset","begin");
     
-    // Initialize output (relevant for integration with a zero advance time )
-    copy(input(INTEGRATOR_X0).begin(),input(INTEGRATOR_X0).end(),output(INTEGRATOR_XF).begin());
+    // Initialize output
+    output(INTEGRATOR_XF).set(input(INTEGRATOR_X0));
     
+    // Reset summation states
+    output(INTEGRATOR_QF).set(0.0);
+
     log("IntegratorInternal::reset","end");
   }
 

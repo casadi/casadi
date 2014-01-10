@@ -64,6 +64,17 @@ namespace CasADi{
     /// Integrate backward in time until a specified time point
     virtual void integrateB(double t_out);
 
+    // Discrete time dynamics
+    FX F_, G_;
+
+    // Number of finite elements 
+    int nk_;
+
+    // Time step size
+    double h_;
+
+    // Current time
+    double t_;
   };
 
 } // namespace CasADi
