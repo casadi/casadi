@@ -48,13 +48,22 @@ namespace CasADi{
   
     // Number of finite elements and time steps
     nk_ = getOption("number_of_finite_elements");
+    casadi_assert(nk_>0);
+    
     h_ = (tf_ - t0_)/nk_;
+
+    // Allocate tape if backward states are present
+    if(nrx_>0){
+      x_tape_.resize(nk_+1,vector<double>(nx_));
+      z_tape_.resize(nk_+1,vector<double>(nz_));
+    }
   }
 
   void RKBaseInternal::integrate(double t_out){
     // Get discrete time sought
     int k_out = std::ceil((t_out-t0_)/h_);
     k_out = std::min(k_out,nk_); //  make sure that rounding errors does not result in k_out>nk_
+    casadi_assert(k_out>=0);
 
     // Take time steps until end time has been reached
     while(k_<k_out){
@@ -68,6 +77,12 @@ namespace CasADi{
       transform(F_.output(DAE_QUAD).begin(),F_.output(DAE_QUAD).end(),output(INTEGRATOR_QF).begin(),output(INTEGRATOR_QF).begin(),std::plus<double>());
       k_++;
       t_ = t0_ + k_*h_;
+
+      // Tape
+      if(nrx_>0){
+        output(INTEGRATOR_XF).get(x_tape_[k_]);
+        z_.get(z_tape_[k_]);
+      }
     }
   }
 
@@ -81,6 +96,12 @@ namespace CasADi{
 
     // Bring discrete time to the beginning
     k_ = 0;
+
+    // Add the first element in the tape
+    if(nrx_>0){
+      output(INTEGRATOR_XF).get(x_tape_[k_]);
+      z_.get(z_tape_[k_]);
+    }
   }
 
   void RKBaseInternal::resetB(){

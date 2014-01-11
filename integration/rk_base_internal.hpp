@@ -75,6 +75,9 @@ namespace CasADi{
 
     // Time step size
     double h_;
+
+    // Tape
+    std::vector<std::vector<double> > x_tape_, z_tape_;
   };
 
 } // namespace CasADi
