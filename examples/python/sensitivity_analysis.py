@@ -27,7 +27,7 @@ print "Testing sensitivity analysis in CasADi"
 
 # All ODE and DAE integrators to be tested
 DAE_integrators = [CollocationIntegrator,IdasIntegrator]
-ODE_integrators = DAE_integrators + [CVodesIntegrator]
+ODE_integrators = DAE_integrators + [CVodesIntegrator,RKIntegrator]
 
 for Integrators in (ODE_integrators,DAE_integrators):    
   if Integrators==ODE_integrators: # rocket example

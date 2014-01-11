@@ -21,6 +21,7 @@
  */
 
 #include <symbolic/casadi.hpp>
+#include <integration/rk_integrator.hpp>
 #include <integration/collocation_integrator.hpp>
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/idas_integrator.hpp>
@@ -134,32 +135,37 @@ int main(){
     }
     
     // For all integrators
-    enum Integrators{CVODES,IDAS,COLLOCATION,NUM_INTEGRATORS};
+    enum Integrators{CVODES,IDAS,COLLOCATION,RUNGEKUTTA,NUM_INTEGRATORS};
     for(int integrator=0; integrator<NUM_INTEGRATORS; ++integrator){
 
       // Get integrator
       Integrator I;
       switch(integrator){
-        case CVODES:
-          if(problem==DAE) continue; // Skip if DAE
-          cout << endl << "== CVodesIntegrator == " << endl;
-          I = CVodesIntegrator(ffcn);
-          break;
-        case IDAS:
-          cout << endl << "== IdasIntegrator == " << endl;
-          I = IdasIntegrator(ffcn);
-          break;
-        case COLLOCATION:
-          cout << endl << "== CollocationIntegrator == " << endl;
-          I = CollocationIntegrator(ffcn);
+      case CVODES:
+        if(problem==DAE) continue; // Skip if DAE
+        cout << endl << "== CVodesIntegrator == " << endl;
+        I = CVodesIntegrator(ffcn);
+        break;
+      case IDAS:
+        cout << endl << "== IdasIntegrator == " << endl;
+        I = IdasIntegrator(ffcn);
+        break;
+      case RUNGEKUTTA:
+        if(problem==DAE) continue; // Skip if DAE
+        cout << endl << "== RKIntegrator == " << endl;
+        I = RKIntegrator(ffcn);
+        break;
+      case COLLOCATION:
+        cout << endl << "== CollocationIntegrator == " << endl;
+        I = CollocationIntegrator(ffcn);
           
-          // Set collocation integrator specific options
-          I.setOption("expand_f",true);
-          I.setOption("implicit_solver",KinsolSolver::creator);
-          Dictionary kinsol_options;
-          kinsol_options["linear_solver"] = CSparse::creator;
-          I.setOption("implicit_solver_options",kinsol_options);
-          break;
+        // Set collocation integrator specific options
+        I.setOption("expand_f",true);
+        I.setOption("implicit_solver",KinsolSolver::creator);
+        Dictionary kinsol_options;
+        kinsol_options["linear_solver"] = CSparse::creator;
+        I.setOption("implicit_solver_options",kinsol_options);
+        break;
       }
       
       // Set common options
