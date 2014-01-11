@@ -114,7 +114,6 @@ namespace CasADi{
       g_arg[RDAE_RP] = rp;
 
       // Adj of "take step"
-      MX x0_adj = rx0;
       MX k1_adj = (h_/6)*rx0;
       MX k2_adj = 2*(h_/6)*rx0;
       MX k3_adj = 2*(h_/6)*rx0;
@@ -130,35 +129,48 @@ namespace CasADi{
       g_arg[RDAE_X] = x_k4;
       g_arg[RDAE_RX] = k4_adj;
       g_res = g_.call(g_arg);
-      k3_adj += h_ * g_res[RDAE_ODE];
-      x0_adj += g_res[RDAE_ODE];
-      MX p_adj = g_res[RDAE_QUAD];
+      MX rk4 = g_res[RDAE_ODE];
+      MX rk4q = g_res[RDAE_QUAD];
+
+      k3_adj += h_ * rk4;
+      MX rxf = rx0;
+      rxf += rk4;
       
       // Adjoint of k3
       g_arg[RDAE_T] = t_k3;
       g_arg[RDAE_X] = x_k3;
       g_arg[RDAE_RX] = k3_adj;
       g_res = g_.call(g_arg);
-      k2_adj += (h_/2) * g_res[RDAE_ODE];
-      x0_adj += g_res[RDAE_ODE];
-      p_adj += g_res[RDAE_QUAD];
+      MX rk3 = g_res[RDAE_ODE];
+      MX rk3q = g_res[RDAE_QUAD];
+      
+      k2_adj += (h_/2) * rk3;
+      rxf += rk3;
 
       // Adjoint of k2
       g_arg[RDAE_T] = t_k2;
       g_arg[RDAE_X] = x_k2;
       g_arg[RDAE_RX] = k2_adj;
       g_res = g_.call(g_arg);
-      k1_adj += (h_/2) * g_res[RDAE_ODE];
-      x0_adj += g_res[RDAE_ODE];
-      p_adj += g_res[RDAE_QUAD];
+      MX rk2 = g_res[RDAE_ODE];
+      MX rk2q = g_res[RDAE_QUAD];
+
+      k1_adj += (h_/2) * rk2;
+      rxf += rk2;
       
       // Adjoint of k1
       g_arg[RDAE_T] = t_k1;
       g_arg[RDAE_X] = x_k1;
       g_arg[RDAE_RX] = k1_adj;
       g_res = g_.call(g_arg);
-      x0_adj += g_res[RDAE_ODE];
-      p_adj += g_res[RDAE_QUAD];
+      MX rk1 = g_res[RDAE_ODE];
+      MX rk1q = g_res[RDAE_QUAD];
+
+      rxf += rk1;
+
+
+      // Take step
+      MX rqf = rk4q + rk3q + rk2q + rk1q;
 
       // Define discrete time dynamics
       g_arg[RDAE_T] = t;
@@ -168,8 +180,8 @@ namespace CasADi{
       g_arg[RDAE_RX] = rx0;
       g_arg[RDAE_RP] = rp;
       g_arg[RDAE_RZ] = rz0;
-      g_res[RDAE_ODE] = x0_adj;
-      g_res[RDAE_QUAD] = p_adj;
+      g_res[RDAE_ODE] = rxf;
+      g_res[RDAE_QUAD] = rqf;
       g_res[RDAE_ALG] = MX();
       G_ = MXFunction(g_arg,g_res);
       G_.init();
