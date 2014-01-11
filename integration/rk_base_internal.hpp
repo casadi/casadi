@@ -58,11 +58,20 @@ namespace CasADi{
     /// Integrate backward in time until a specified time point
     virtual void integrateB(double t_out);
 
+    /// Reset the forward problem and bring the time back to t0
+    virtual void reset();
+
+    /// Reset the backward problem and take time to tf 
+    virtual void resetB();
+
     // Discrete time dynamics
     FX F_, G_;
 
     // Number of finite elements 
     int nk_;
+
+    // Discrete time
+    int k_;
 
     // Time step size
     double h_;

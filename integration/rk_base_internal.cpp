@@ -52,8 +52,12 @@ namespace CasADi{
   }
 
   void RKBaseInternal::integrate(double t_out){
+    // Get discrete time sought
+    int k_out = std::ceil((t_out-t0_)/h_);
+    k_out = std::min(k_out,nk_); //  make sure that rounding errors does not result in k_out>nk_
+
     // Take time steps until end time has been reached
-    while(t_<t_out){
+    while(k_<k_out){
       F_.input(DAE_T).set(t_);
       F_.input(DAE_X).set(output(INTEGRATOR_XF));
       F_.input(DAE_Z).set(z_);
@@ -62,12 +66,30 @@ namespace CasADi{
       F_.output(DAE_ODE).get(output(INTEGRATOR_XF));
       F_.output(DAE_ALG).get(z_);
       transform(F_.output(DAE_QUAD).begin(),F_.output(DAE_QUAD).end(),output(INTEGRATOR_QF).begin(),output(INTEGRATOR_QF).begin(),std::plus<double>());
-      t_ += h_;
+      k_++;
+      t_ = t0_ + k_*h_;
     }
   }
 
   void RKBaseInternal::integrateB(double t_out){
     casadi_error("Not implemented");
   }
+
+  void RKBaseInternal::reset(){
+    // Reset the base classes
+    IntegratorInternal::reset();
+
+    // Bring discrete time to the beginning
+    k_ = 0;
+  }
+
+  void RKBaseInternal::resetB(){
+    // Reset the base classes
+    IntegratorInternal::resetB();
+
+    // Bring discrete time to the end
+    k_ = nk_;
+  }
+
 
 } // namespace CasADi
