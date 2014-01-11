@@ -111,13 +111,12 @@ namespace CasADi{
       g_arg[RDAE_P] = p;
       g_arg[RDAE_Z] = z0;
       g_arg[RDAE_RZ] = rz0;
-      //g_arg[RDAE_RP] = rp;
+      g_arg[RDAE_RP] = rp;
 
       // Adjoint of k4
       g_arg[RDAE_T] = t_k4;
       g_arg[RDAE_X] = x_k4;
-      g_arg[RDAE_RX] = (h_/6)*rx0;
-      g_arg[RDAE_RP] = (h_/6)*rp;
+      g_arg[RDAE_RX] = rx0;
       g_res = g_.call(g_arg);
       MX rk4 = g_res[RDAE_ODE];
       MX rk4q = g_res[RDAE_QUAD];
@@ -125,8 +124,7 @@ namespace CasADi{
       // Adjoint of k3
       g_arg[RDAE_T] = t_k3;
       g_arg[RDAE_X] = x_k3;
-      g_arg[RDAE_RX] = 2*(h_/6)*rx0 + h_ * rk4;
-      g_arg[RDAE_RP] = 2*(h_/6)*rp;
+      g_arg[RDAE_RX] = rx0 + (h_/2)*rk4;
       g_res = g_.call(g_arg);
       MX rk3 = g_res[RDAE_ODE];
       MX rk3q = g_res[RDAE_QUAD];
@@ -134,8 +132,7 @@ namespace CasADi{
       // Adjoint of k2
       g_arg[RDAE_T] = t_k2;
       g_arg[RDAE_X] = x_k2;
-      g_arg[RDAE_RX] = 2*(h_/6)*rx0 + (h_/2) * rk3;
-      g_arg[RDAE_RP] = 2*(h_/6)*rp;
+      g_arg[RDAE_RX] = rx0 + (h_/2) * rk3;
       g_res = g_.call(g_arg);
       MX rk2 = g_res[RDAE_ODE];
       MX rk2q = g_res[RDAE_QUAD];
@@ -143,15 +140,15 @@ namespace CasADi{
       // Adjoint of k1
       g_arg[RDAE_T] = t_k1;
       g_arg[RDAE_X] = x_k1;
-      g_arg[RDAE_RX] = (h_/6)*rx0 + (h_/2) * rk2;
-      g_arg[RDAE_RP] = (h_/6)*rp;
+      g_arg[RDAE_RX] = rx0 + h_ * rk2;
+      g_arg[RDAE_RP] = rp;
       g_res = g_.call(g_arg);
       MX rk1 = g_res[RDAE_ODE];
       MX rk1q = g_res[RDAE_QUAD];
 
       // Take step
-      MX rxf = rx0 + rk4 + rk3 + rk2 + rk1;
-      MX rqf = rk4q + rk3q + rk2q + rk1q;
+      MX rxf = rx0 + (h_/6)*rk4 + (h_/3)*rk3 + (h_/3)*rk2 + (h_/6)*rk1;
+      MX rqf = (h_/6)*rk4q + (h_/3)*rk3q + (h_/3)*rk2q + (h_/6)*rk1q;
 
       // Define discrete time dynamics
       g_arg[RDAE_T] = t;
