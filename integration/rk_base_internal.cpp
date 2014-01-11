@@ -67,6 +67,7 @@ namespace CasADi{
 
     // Take time steps until end time has been reached
     while(k_<k_out){
+      // Take step
       F_.input(DAE_T).set(t_);
       F_.input(DAE_X).set(output(INTEGRATOR_XF));
       F_.input(DAE_Z).set(z_);
@@ -75,6 +76,8 @@ namespace CasADi{
       F_.output(DAE_ODE).get(output(INTEGRATOR_XF));
       F_.output(DAE_ALG).get(z_);
       transform(F_.output(DAE_QUAD).begin(),F_.output(DAE_QUAD).end(),output(INTEGRATOR_QF).begin(),output(INTEGRATOR_QF).begin(),std::plus<double>());
+
+      // Advance time
       k_++;
       t_ = t0_ + k_*h_;
 
@@ -87,7 +90,31 @@ namespace CasADi{
   }
 
   void RKBaseInternal::integrateB(double t_out){
-    casadi_error("Not implemented");
+
+    // Get discrete time sought
+    int k_out = std::floor((t_out-t0_)/h_);
+    k_out = std::max(k_out,0); //  make sure that rounding errors does not result in k_out>nk_
+    casadi_assert(k_out<=nk_);
+
+    // Take time steps until end time has been reached
+    while(k_>k_out){
+      // Advance time
+      k_--;
+      t_ = t0_ + k_*h_;
+
+      // Take step
+      G_.input(RDAE_T).set(t_);
+      G_.input(RDAE_X).set(x_tape_[k_]);
+      G_.input(RDAE_Z).set(z_tape_[k_]);
+      G_.input(RDAE_P).set(input(INTEGRATOR_P));
+      G_.input(RDAE_RX).set(output(INTEGRATOR_RX0));
+      G_.input(RDAE_RZ).set(rz_);
+      G_.input(RDAE_RP).set(input(INTEGRATOR_RP));
+      G_.evaluate();
+      G_.output(RDAE_ODE).get(output(INTEGRATOR_RXF));
+      G_.output(RDAE_ALG).get(rz_);
+      transform(G_.output(RDAE_QUAD).begin(),G_.output(RDAE_QUAD).end(),output(INTEGRATOR_RQF).begin(),output(INTEGRATOR_RQF).begin(),std::plus<double>());
+    }
   }
 
   void RKBaseInternal::reset(){

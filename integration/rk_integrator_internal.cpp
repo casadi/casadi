@@ -56,49 +56,124 @@ namespace CasADi{
     f_arg[DAE_Z] = z0;
 
     // k1
-    f_arg[DAE_T] = t;
-    f_arg[DAE_X] = x0;
+    MX t_k1 = f_arg[DAE_T] = t;
+    MX x_k1 = f_arg[DAE_X] = x0;
     f_res = f_.call(f_arg);
     MX k1 = f_res[DAE_ODE];
-    MX k1_quad = f_res[DAE_QUAD];
+    MX k1q = f_res[DAE_QUAD];
 
     // k2
-    f_arg[DAE_T] = t + h_/2;
-    f_arg[DAE_X] = x0 + (h_/2) * k1;
+    MX t_k2 = f_arg[DAE_T] = t + h_/2;
+    MX x_k2 = f_arg[DAE_X] = x0 + (h_/2) * k1;
     f_res = f_.call(f_arg);
     MX k2 = f_res[DAE_ODE];
-    MX k2_quad = f_res[DAE_QUAD];
+    MX k2q = f_res[DAE_QUAD];
     
     // k3
-    f_arg[DAE_X] = x0 + (h_/2) * k2;
+    MX t_k3 = t_k2;
+    MX x_k3 = f_arg[DAE_X] = x0 + (h_/2) * k2;
     f_res = f_.call(f_arg);
     MX k3 = f_res[DAE_ODE];
-    MX k3_quad = f_res[DAE_QUAD];
+    MX k3q = f_res[DAE_QUAD];
     
     // k4
-    f_arg[DAE_T] = t + h_;
-    f_arg[DAE_X] = x0 + h_ * k3;
+    MX t_k4 = f_arg[DAE_T] = t + h_;
+    MX x_k4 = f_arg[DAE_X] = x0 + h_ * k3;
     f_res = f_.call(f_arg);
     MX k4 = f_res[DAE_ODE];
-    MX k4_quad = f_res[DAE_QUAD];
+    MX k4q = f_res[DAE_QUAD];
     
     // Take step
     MX xf = x0 + (h_/6)*(k1 + 2*k2 + 2*k3 + k4);
-    MX qf = (h_/6)*(k1_quad + 2*k2_quad + 2*k3_quad + k4_quad);
+    MX qf = (h_/6)*(k1q + 2*k2q + 2*k3q + k4q);
 
     // Define discrete time dynamics
     f_arg[DAE_T] = t;
     f_arg[DAE_X] = x0;
     f_arg[DAE_P] = p;
-    f_arg[DAE_Z] = z0;;
+    f_arg[DAE_Z] = z0;
     f_res[DAE_ODE] = xf;
     f_res[DAE_QUAD] = qf;
     f_res[DAE_ALG] = MX();
     F_ = MXFunction(f_arg,f_res);
     F_.init();
 
-    // Algebraic variables not (yet?) supported
-    casadi_assert_message(g_.isNull(), "Not implemented");
+    // Backward integration
+    if(!g_.isNull()){
+      // Symbolic inputs
+      MX rx0 = msym("x0",g_.input(RDAE_RX).sparsity());
+      MX rz0 = msym("z0",g_.input(RDAE_RZ).sparsity());
+      MX rp = msym("p",g_.input(RDAE_RP).sparsity());
+
+      // Arguments when calling g
+      vector<MX> g_arg(RDAE_NUM_IN);
+      vector<MX> g_res;
+      g_arg[RDAE_P] = p;
+      g_arg[RDAE_Z] = z0;
+      g_arg[RDAE_RZ] = rz0;
+      g_arg[RDAE_RP] = rp;
+
+      // Adj of "take step"
+      MX x0_adj = rx0;
+      MX k1_adj = (h_/6)*rx0;
+      MX k2_adj = 2*(h_/6)*rx0;
+      MX k3_adj = 2*(h_/6)*rx0;
+      MX k4_adj = (h_/6)*rx0;
+      
+      MX k1q_adj = (h_/6)*rp;
+      MX k2q_adj = 2*(h_/6)*rp;
+      MX k3q_adj = 2*(h_/6)*rp;
+      MX k4q_adj = (h_/6)*rp;
+
+      // Adjoint of k4
+      g_arg[RDAE_T] = t_k4;
+      g_arg[RDAE_X] = x_k4;
+      g_arg[RDAE_RX] = k4_adj;
+      g_res = g_.call(g_arg);
+      k3_adj += h_ * g_res[RDAE_ODE];
+      x0_adj += g_res[RDAE_ODE];
+      MX p_adj = g_res[RDAE_QUAD];
+      
+      // Adjoint of k3
+      g_arg[RDAE_T] = t_k3;
+      g_arg[RDAE_X] = x_k3;
+      g_arg[RDAE_RX] = k3_adj;
+      g_res = g_.call(g_arg);
+      k2_adj += (h_/2) * g_res[RDAE_ODE];
+      x0_adj += g_res[RDAE_ODE];
+      p_adj += g_res[RDAE_QUAD];
+
+      // Adjoint of k2
+      g_arg[RDAE_T] = t_k2;
+      g_arg[RDAE_X] = x_k2;
+      g_arg[RDAE_RX] = k2_adj;
+      g_res = g_.call(g_arg);
+      k1_adj += (h_/2) * g_res[RDAE_ODE];
+      x0_adj += g_res[RDAE_ODE];
+      p_adj += g_res[RDAE_QUAD];
+      
+      // Adjoint of k1
+      g_arg[RDAE_T] = t_k1;
+      g_arg[RDAE_X] = x_k1;
+      g_arg[RDAE_RX] = k1_adj;
+      g_res = g_.call(g_arg);
+      x0_adj += g_res[RDAE_ODE];
+      p_adj += g_res[RDAE_QUAD];
+
+      // Define discrete time dynamics
+      g_arg[RDAE_T] = t;
+      g_arg[RDAE_X] = x0;
+      g_arg[RDAE_P] = p;
+      g_arg[RDAE_Z] = z0;
+      g_arg[RDAE_RX] = rx0;
+      g_arg[RDAE_RP] = rp;
+      g_arg[RDAE_RZ] = rz0;
+      g_res[RDAE_ODE] = x0_adj;
+      g_res[RDAE_QUAD] = p_adj;
+      g_res[RDAE_ALG] = MX();
+      G_ = MXFunction(g_arg,g_res);
+      G_.init();
+    }
   }
   
 } // namespace CasADi
