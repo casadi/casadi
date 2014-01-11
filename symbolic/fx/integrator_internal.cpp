@@ -165,7 +165,7 @@ namespace CasADi{
     g_ = deepcopy(g_,already_copied);
   }
 
-  std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj, IntegratorInternal::AugOffset& offset){
+  std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj, AugOffset& offset){
     log("IntegratorInternal::getAugmented","call");
 
     // Return object
@@ -608,10 +608,10 @@ namespace CasADi{
     // Create integrator for augmented DAE
     Integrator integrator;
     integrator.assignNode(create(aug_dae.first,aug_dae.second));
-  
-    // Copy options
-    integrator.setOption(dictionary());
-  
+
+    // Set solver specific options
+    setDerivativeOptions(integrator,offset);
+    
     // Pass down specific options if provided
     if (hasSetOption("augmented_options"))
       integrator.setOption(getOption("augmented_options"));
@@ -788,6 +788,10 @@ namespace CasADi{
     log("IntegratorInternal::resetB","end");
   }
 
+  void IntegratorInternal::setDerivativeOptions(Integrator& integrator, const AugOffset& offset){
+    // Copy all options
+    integrator.setOption(dictionary());
+  }
 
 } // namespace CasADi
 

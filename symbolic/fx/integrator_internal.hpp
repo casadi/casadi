@@ -89,6 +89,9 @@ namespace CasADi{
       std::vector<int> x,z,q,p,rx,rz,rq,rp;
     };
 
+    /** \brief Set solver specific options to generated augmented integrators */
+    virtual void setDerivativeOptions(Integrator& integrator, const AugOffset& offset);
+
     /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
     virtual std::pair<FX,FX> getAugmented(int nfwd, int nadj, AugOffset& offset);
   
