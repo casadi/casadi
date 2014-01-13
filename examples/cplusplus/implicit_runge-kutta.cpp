@@ -74,33 +74,24 @@ int main(){
   // Coefficients of the continuity equation
   vector<double> D(d+1,0);
 
-  // Dimensionless time inside one control interval
-  SXMatrix tau = ssym("tau");
-  
   // For all collocation points
   for(int j=0; j<d+1; ++j){
+
     // Construct Lagrange polynomials to get the polynomial basis at the collocation point
-    SXMatrix L = 1;
+    Polynomial p = 1;
     for(int r=0; r<d+1; ++r){
       if(r!=j){
-        L *= (tau-tau_root[r])/(tau_root[j]-tau_root[r]);
+        p *= Polynomial(-tau_root[r],1)/(tau_root[j]-tau_root[r]);
       }
     }
-    SXFunction lfcn(tau,L);
-    lfcn.init();
-  
+    
     // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-    lfcn.setInput(1.0);
-    lfcn.evaluate();
-    lfcn.getOutput(D[j]);
-
+    D[j] = p(1.0);
+    
     // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-    FX tfcn = lfcn.tangent();
-    tfcn.init();
+    Polynomial dp = p.derivative();
     for(int r=0; r<d+1; ++r){
-      tfcn.setInput(tau_root[r]);
-      tfcn.evaluate();
-      tfcn.getOutput(C[j][r]);
+      C[j][r] = dp(tau_root[r]);
     }
   }
 
