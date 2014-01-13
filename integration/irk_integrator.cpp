@@ -20,16 +20,29 @@
  *
  */
 
-%{
-#include "integration/rk_base.hpp"
-#include "integration/rk_integrator.hpp"
-#include "integration/irk_integrator.hpp"
-#include "integration/collocation_integrator.hpp"
-#include "integration/integration_tools.hpp"
-%}
+#include "irk_integrator_internal.hpp"
 
-%include "integration/rk_base.hpp"
-%include "integration/rk_integrator.hpp"
-%include "integration/irk_integrator.hpp"
-%include "integration/collocation_integrator.hpp"
-%include "integration/integration_tools.hpp"
+using namespace std;
+
+namespace CasADi{
+
+  IRKIntegrator::IRKIntegrator(){
+  }
+  
+  IRKIntegrator::IRKIntegrator(const FX& f, const FX& g){
+    assignNode(new IRKIntegratorInternal(f,g));
+  }
+
+  IRKIntegratorInternal* IRKIntegrator::operator->(){
+    return static_cast<IRKIntegratorInternal*>(Integrator::operator->());
+  }
+
+  const IRKIntegratorInternal* IRKIntegrator::operator->() const{
+    return static_cast<const IRKIntegratorInternal*>(Integrator::operator->());
+  }
+    
+  bool IRKIntegrator::checkNode() const{
+    return dynamic_cast<const IRKIntegratorInternal*>(get())!=0;
+  }
+
+} // namespace CasADi

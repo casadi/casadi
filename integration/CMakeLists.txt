@@ -12,6 +12,10 @@ SET(INTEGRATION_SRCS
   rk_integrator.cpp
   rk_integrator_internal.hpp
   rk_integrator_internal.cpp
+  irk_integrator.hpp
+  irk_integrator.cpp
+  irk_integrator_internal.hpp
+  irk_integrator_internal.cpp
   integration_tools.cpp
   integration_tools.hpp
 )
