@@ -43,13 +43,14 @@ namespace CasADi {
 
   void NLPImplicitInternal::solveNonLinear() {
     // Obtain initial guess
-    nlp_solver_.input(NLP_SOLVER_X0).set(output(0));
+    nlp_solver_.input(NLP_SOLVER_X0).set(output(iout_));
   
     // Add other arguments
-    int k = 0;
-  
-    for (int i=1;i<f_.getNumInputs();++i) {
-      std::copy(input(i-1).data().begin(),input(i-1).data().end(),nlp_solver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(i-1).size();
+    for(int i=0, k=0; i<getNumInputs(); ++i){
+      if(i!=iin_){
+        std::copy(input(i).begin(),input(i).end(),nlp_solver_.input(NLP_SOLVER_P).begin()+k);
+        k += input(i).size();
+      }
     }
   
     // Solve NLP
@@ -58,23 +59,24 @@ namespace CasADi {
     stats_["nlp_solver_stats"] = nlp_solver_.getStats();
 
     // Copy the outputs
-    output(0).set(nlp_solver_.output(NLP_SOLVER_X));
+    output(iout_).set(nlp_solver_.output(NLP_SOLVER_X));
   }
 
   void NLPImplicitInternal::init(){
 
+    // Call the base class initializer
     ImplicitFunctionInternal::init();
 
     casadi_assert_message(f_.getNumInputs()>0,"NLPImplicitInternal: the supplied f must have at least one input.");
   
-    MX V = msym("V",f_.input().sparsity());
+    MX V = msym("V",input(iin_).sparsity());
   
-    std::vector< CRSSparsity > sps;
-    for (int k=1;k<f_.getNumInputs();++k)
-      sps.push_back(f_.input(k).sparsity());
+    std::vector<CRSSparsity> sps;
+    for(int i=0; i<getNumInputs(); ++i)
+      if(i!=iin_) sps.push_back(input(i).sparsity());
   
     // So that we can pass it on to createParent
-    std::pair< MX, std::vector< MX > > mypair = createParent(sps);
+    std::pair<MX,std::vector<MX> > mypair = createParent(sps);
 
     // V groups all parameters in an MX
     MX P(mypair.first);
