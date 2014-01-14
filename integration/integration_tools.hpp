@@ -30,12 +30,14 @@
 #include "symbolic/mx/mx.hpp"
 
 namespace CasADi{
-
+  
+  //@{
   /** \brief Obtain collocation points of specific order and scheme
   \param scheme  'radau' or 'legendre'
   **/
   std::vector<double> collocationPoints(int order, const std::string& scheme="radau");
-  
+  std::vector<long double> collocationPointsL(int order, const std::string& scheme="radau");
+  //@}
   
   /** \brief Obtain collocation interpolating matrices
   \param tau_root  location of collocation points, as obtained from collocationPoints
@@ -54,30 +56,30 @@ namespace CasADi{
 #endif // SWIG
 
 #ifndef SWIG
-extern const double legendre_points1[2];
-extern const double legendre_points2[3];
-extern const double legendre_points3[4];
-extern const double legendre_points4[5];
-extern const double legendre_points5[6];
-extern const double legendre_points6[7];
-extern const double legendre_points7[8];
-extern const double legendre_points8[9];
-extern const double legendre_points9[10];
-extern const double* legendre_points[10];
+extern const long double legendre_points1[2];
+extern const long double legendre_points2[3];
+extern const long double legendre_points3[4];
+extern const long double legendre_points4[5];
+extern const long double legendre_points5[6];
+extern const long double legendre_points6[7];
+extern const long double legendre_points7[8];
+extern const long double legendre_points8[9];
+extern const long double legendre_points9[10];
+extern const long double* legendre_points[10];
 
 // Radau collocation points
-extern const double radau_points1[2];
-extern const double radau_points2[3];
-extern const double radau_points3[4];
-extern const double radau_points4[5];
-extern const double radau_points5[6];
-extern const double radau_points6[7];
-extern const double radau_points7[8];
-extern const double radau_points8[9];
-extern const double radau_points9[10];
-extern const double* radau_points[10];
+extern const long double radau_points1[2];
+extern const long double radau_points2[3];
+extern const long double radau_points3[4];
+extern const long double radau_points4[5];
+extern const long double radau_points5[6];
+extern const long double radau_points6[7];
+extern const long double radau_points7[8];
+extern const long double radau_points8[9];
+extern const long double radau_points9[10];
+extern const long double* radau_points[10];
 
-extern const double** collocation_points[2];
+extern const long double** collocation_points[2];
 #endif // SWIG
 
   // Type of collocation points

@@ -33,26 +33,29 @@ namespace CasADi{
   */
   class Polynomial : public PrintableObject{
   public:
+    /// Floating point type
+    typedef long double real_t;
     
     /// Construct a constant polynomial
-    Polynomial(double scalar=1);
+    Polynomial(real_t scalar=1);
 
     /// Construct a linear polynomial
-    Polynomial(double p0, double p1);
+    Polynomial(real_t p0, real_t p1);
 
     /// Construct a quadratic polynomial
-    Polynomial(double p0, double p1, double p2);
+    Polynomial(real_t p0, real_t p1, real_t p2);
 
     /// Construct a cubic polynomial
-    Polynomial(double p0, double p1, double p2, double p3);
+    Polynomial(real_t p0, real_t p1, real_t p2, real_t p3);
 
     /// Construct from a vector of polynomial coefficients
-    Polynomial(const std::vector<double>& coeff);
+    template<typename T>
+    Polynomial(const std::vector<T>& coeff) : p_(coeff.begin(),coeff.end()){}
 
     /// Evaluate numerically
     template<typename T>
     T operator()(const T& x) const{
-      std::vector<double>::const_reverse_iterator it = p_.rbegin();
+      std::vector<real_t>::const_reverse_iterator it = p_.rbegin();
       T ret = *it++;
       while(it!=p_.rend()){
         ret *= x;
@@ -65,7 +68,7 @@ namespace CasADi{
     int degree() const;
 
     /// Get scalar value (error if degree()!=0)
-    double toScalar() const;
+    real_t toScalar() const;
 
     /// Create a new polynomial for the derivative
     Polynomial derivative() const;
@@ -103,14 +106,14 @@ namespace CasADi{
     Polynomial& operator*=(const Polynomial& b);
 
     // Divide by constant
-    Polynomial operator/(double b) const;
+    Polynomial operator/(real_t b) const;
 
     // Divide by constant (in-place)
-    Polynomial& operator/=(double b);
+    Polynomial& operator/=(real_t b);
 
 
   protected:
-    std::vector<double> p_;
+    std::vector<real_t> p_;
   };
 
 } // namespace CasADi
