@@ -272,9 +272,9 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass input
-    f_.setInput(NV_DATA_S(u),0);
+    f_.setInput(NV_DATA_S(u),iin_);
     for(int i=0; i<getNumInputs(); ++i)
-      f_.setInput(input(i),i+1);
+      if(i!=iin_) f_.setInput(input(i),i);
   
     // Evaluate
     f_.evaluate();
@@ -299,7 +299,7 @@ namespace CasADi{
         stringstream ss;
         ss << ex.what() << endl;
         if(verbose()){
-          ss << "u = " << f_.input() << endl;
+          ss << "u = " << f_.input(iin_) << endl;
                 
           // Print the expression for f[Jrow] if f is an SXFunction instance
           SXFunction f_sx = shared_cast<SXFunction>(f_);
@@ -348,9 +348,10 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass inputs to the jacobian function
-    jac_.setInput(NV_DATA_S(u),0);
-    for(int i=0; i<getNumInputs(); ++i)
-      jac_.setInput(input(i),i+1);
+    jac_.setInput(NV_DATA_S(u),iin_);
+    for(int i=0; i<getNumInputs(); ++i){
+      if(i!=iin_) jac_.setInput(input(i),i);
+    }
 
     // Evaluate
     jac_.evaluate();
@@ -403,9 +404,9 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass inputs to the jacobian function
-    jac_.setInput(NV_DATA_S(u),0);
+    jac_.setInput(NV_DATA_S(u),iin_);
     for(int i=0; i<getNumInputs(); ++i)
-      jac_.setInput(input(i),i+1);
+      if(i!=iin_) jac_.setInput(input(i),i);
 
     // Evaluate
     jac_.evaluate();
@@ -450,20 +451,20 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass inputs
-    f_fwd_.setInput(NV_DATA_S(u),0);
+    f_fwd_.setInput(NV_DATA_S(u),iin_);
     for(int i=0; i<getNumInputs(); ++i)
-      f_fwd_.setInput(input(i),i+1);
+      if(i!=iin_) f_fwd_.setInput(input(i),i);
 
     // Pass input seeds
-    f_fwd_.setInput(NV_DATA_S(v),f_.getNumInputs());
+    f_fwd_.setInput(NV_DATA_S(v),getNumInputs()+iin_);
     for(int i=0; i<getNumInputs(); ++i)
-      f_fwd_.setInput(0.0, f_.getNumInputs()+i+1);
+      if(i!=iin_) f_fwd_.setInput(0.0, getNumInputs()+i);
   
     // Evaluate
     f_fwd_.evaluate();
 
     // Get the output seeds
-    f_fwd_.getOutput(NV_DATA_S(Jv),f_.getNumOutputs());
+    f_fwd_.getOutput(NV_DATA_S(Jv),getNumOutputs());
   
     // Log time duration
     time2_ = clock();
@@ -487,9 +488,9 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass inputs
-    jac_.setInput(NV_DATA_S(u),0);
+    jac_.setInput(NV_DATA_S(u),iin_);
     for(int i=0; i<getNumInputs(); ++i)
-      jac_.setInput(input(i),i+1);
+      if(i!=iin_) jac_.setInput(input(i),i);
 
     // Evaluate jacobian
     jac_.evaluate();
@@ -543,7 +544,7 @@ namespace CasADi{
     t_lsetup_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
 
     // Pass non-zero elements, scaled by -gamma, to the linear solver
-    linsol_.setInput(jac_.output(),0);
+    linsol_.setInput(jac_.output(),LINSOL_A);
 
     // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
     linsol_.prepare();
