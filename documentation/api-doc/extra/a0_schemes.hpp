@@ -806,6 +806,20 @@
 <br/>
 @copydoc scheme_IntegratorOutput
 */
+/** \class CasADi::IRKIntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::IRKIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
 /** \class CasADi::IntegratorInternal
 \n
 \par
