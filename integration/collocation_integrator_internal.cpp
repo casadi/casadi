@@ -22,6 +22,7 @@
 
 #include "collocation_integrator_internal.hpp"
 #include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/polynomial.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
@@ -98,46 +99,39 @@ namespace CasADi{
     // Coefficients of the collocation equation as DMatrix
     DMatrix D_num = DMatrix(deg+1,1,0);
 
-    // Collocation point
-    SXMatrix tau = ssym("tau");
+    // Coefficients of the quadratures
+    DMatrix Q = DMatrix(deg+1,1,0);
 
     // For all collocation points
     for(int j=0; j<deg+1; ++j){
+
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
-      SXMatrix L = 1;
-      for(int j2=0; j2<deg+1; ++j2){
-        if(j2 != j){
-          L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
+      Polynomial p = 1;
+      for(int r=0; r<deg+1; ++r){
+        if(r!=j){
+          p *= Polynomial(-tau_root[r],1)/(tau_root[j]-tau_root[r]);
         }
       }
     
-      SXFunction lfcn(tau,L);
-      lfcn.init();
-  
       // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-      lfcn.setInput(1.0);
-      lfcn.evaluate();
-      D[j] = lfcn.output();
-      D_num(j) = lfcn.output();
-
+      D_num(j) = p(1.0);
+      D[j] = D_num(j);
+    
       // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-      FX tfcn = lfcn.tangent();
-      tfcn.init();
-      for(int j2=0; j2<deg+1; ++j2){
-        tfcn.setInput(tau_root[j2]);        
-        tfcn.evaluate();
-        C[j][j2] = tfcn.output();
-        C_num(j,j2) = tfcn.output();
+      Polynomial dp = p.derivative();
+      for(int r=0; r<deg+1; ++r){
+        C_num(j,r) = dp(tau_root[r]);
+        C[j][r] = C_num(j,r);
       }
+        
+      // Integrate polynomial to get the coefficients of the quadratures
+      Polynomial ip = p.anti_derivative();
+      Q(j) = ip(1.0);
     }
-
 
     C_num(std::vector<int>(1,0),ALL) = 0;
     C_num(0,0)   = 1;
-  
-    // Coefficients of the quadrature
-    DMatrix Q = solve(C_num,D_num);
-  
+    
     casadi_assert_message(fabs(sumAll(Q)-1).at(0)<1e-9,"Check on quadrature coefficients");
     casadi_assert_message(fabs(sumAll(D_num)-1).at(0)<1e-9,"Check on collocation coefficients");
   
