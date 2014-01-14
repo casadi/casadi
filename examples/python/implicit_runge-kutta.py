@@ -125,7 +125,7 @@ vfcn_sx = SXFunction(vfcn)
 ifcn = NewtonImplicitSolver(vfcn_sx)
 ifcn.setOption("linear_solver",CSparse)
 ifcn.init()
-[V] = ifcn.call([X0,P])
+[V] = ifcn.call([MX(),X0,P])
 X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
 
 # Get an expression for the state at the end of the finie element

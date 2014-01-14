@@ -136,6 +136,7 @@ int main(){
   ifcn.setOption("linear_solver",CSparse::creator);
   ifcn.init();
   vector<MX> ifcn_arg;
+  ifcn_arg.push_back(MX());
   ifcn_arg.push_back(X0);
   ifcn_arg.push_back(P);
   V = ifcn.call(ifcn_arg).front();
@@ -144,7 +145,7 @@ int main(){
     X.push_back(V[Slice(r*nx,(r+1)*nx)]);
   }
 
-  // Get an expression for the state at the end of the finie element
+  // Get an expression for the state at the end of the finite element
   MX XF = 0;
   for(int r=0; r<d+1; ++r){
     XF += D[r]*X[r];
