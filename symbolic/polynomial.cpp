@@ -151,8 +151,8 @@ namespace CasADi{
   Polynomial Polynomial::anti_derivative() const{
     vector<double> ret_p(p_.size()+1);
     ret_p[0] = 0;
-    for(int k=1; k<p_.size(); ++k){
-      ret_p[k+1] = p_[k]/k;
+    for(int k=0; k<p_.size(); ++k){
+      ret_p[k+1] = p_[k]/(k+1);
     }
     return Polynomial(ret_p);
   }
