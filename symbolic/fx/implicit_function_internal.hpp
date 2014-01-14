@@ -90,6 +90,9 @@ namespace CasADi{
     
     /// Constraints on decision variables
     std::vector<int> u_c_;
+    
+    /// Indices of the input and output that correspond to the actual root-finding
+    int iin_, iout_;
   };
 
 

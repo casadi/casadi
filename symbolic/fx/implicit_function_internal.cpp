@@ -35,6 +35,8 @@ namespace CasADi{
     addOption("linear_solver",            OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(), "Options to be passed to the linear solver.");
     addOption("constraints",              OT_INTEGERVECTOR,GenericType(),"Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.");
+    addOption("implicit_input",           OT_INTEGER,      0, "Index of the input that corresponds to the actual root-finding");
+    addOption("implicit_output",          OT_INTEGER,      0, "Index of the output that corresponds to the actual root-finding");
   }
 
   ImplicitFunctionInternal::~ImplicitFunctionInternal(){
@@ -48,31 +50,37 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::init(){
+
+    // Call the base class initializer
+    FXInternal::init();
+
+    // Which input/output correspond to the root-finding problem?
+    iin_ = getOption("implicit_input");
+    iout_ = getOption("implicit_output");
+
     // Initialize the residual function
     f_.init(false);
   
     // Get the number of equations and check consistency
-    casadi_assert_message(f_.output().dense() && f_.output().size2()==1, "Residual must be a dense vector");
-    casadi_assert_message(f_.input().dense() && f_.input().size2()==1, "Unknown must be a dense vector");
-    n_ = f_.output().size();
-    casadi_assert_message(n_ == f_.input().size(), "Dimension mismatch. Input size is " << f_.input().size() << ", while output size is " << f_.output().size());
-    casadi_assert_message(f_.getNumOutputs()==1, "Auxiliary outputs of ImplicitFunctions are no longer allowed, cf. #669");
+    casadi_assert_message(f_.output(iout_).dense() && f_.output(iout_).size2()==1, "Residual must be a dense vector");
+    casadi_assert_message(f_.input(iin_).dense() && f_.input(iin_).size2()==1, "Unknown must be a dense vector");
+    n_ = f_.output(iout_).size();
+    casadi_assert_message(n_ == f_.input(iin_).size(), "Dimension mismatch. Input size is " << f_.input(iin_).size() << ", while output size is " << f_.output(iout_).size());
 
     // Allocate inputs
-    setNumInputs(f_.getNumInputs()-1);
+    setNumInputs(f_.getNumInputs());
     for(int i=0; i<getNumInputs(); ++i){
-      input(i) = f_.input(i+1);
+      input(i) = f_.input(i);
     }
   
     // Allocate output
-    setNumOutputs(1);
-    output(0) = f_.input(0);
+    setNumOutputs(f_.getNumOutputs());
+    for(int i=0; i<getNumOutputs(); ++i){
+      output(i) = f_.output(i);
+    }
   
-    // Call the base class initializer
-    FXInternal::init();
-
     // Generate Jacobian if not provided
-    if(jac_.isNull()) jac_ = f_.jacobian(0,0);
+    if(jac_.isNull()) jac_ = f_.jacobian(iin_,iout_);
     jac_.init(false);
   
     // Check for structural singularity in the Jacobian
@@ -119,9 +127,12 @@ namespace CasADi{
     if (CasadiOptions::profiling) {
       time_zero = getRealTime();
     }
-    
+
     // Mark factorization as out-of-date. TODO: make this conditional
     fact_up_to_date_ = false;
+
+    // Get initial guess
+    //output(iout_).set(input(iin_));
 
     // Solve the nonlinear system of equations
     solveNonLinear();
@@ -131,7 +142,10 @@ namespace CasADi{
     // Evaluate non-differentiated
     vector<MX> argv = MXNode::getVector(arg);
     if(!output_given){
-      *res[0] = callSelf(argv).front();
+      vector<MX> resv = callSelf(argv);
+      for(int i=0; i<resv.size(); ++i){
+        if(res[i]==0) *res[i] = resv[i];
+      }
     }
 
     // Quick return if no derivatives
@@ -145,11 +159,10 @@ namespace CasADi{
 
     // Arguments when calling f/f_der
     vector<MX> v;
-    int nf_in = f_.getNumInputs();
-    v.reserve(nf_in*(1+nfwd) + nadj);
-    v.push_back(*res[0]);
+    v.reserve(getNumInputs()*(1+nfwd) + nadj);
     v.insert(v.end(),argv.begin(),argv.end());
-
+    v[iin_] = *res[iout_];
+    
     // Get an expression for the Jacobian
     MX J = jac_.call(v).front();
 
@@ -158,17 +171,17 @@ namespace CasADi{
 
     // Forward sensitivities, collect arguments for calling f_der
     for(int d=0; d<nfwd; ++d){
-      v.push_back(MX::sparse(output().shape()));
       argv = MXNode::getVector(fseed[d]);
+      argv[iin_] = MX::sparse(input(iin_).shape());
       v.insert(v.end(),argv.begin(),argv.end());
     }
 
     // Adjoint sensitivities, solve to get arguments for calling f_der
     if(nadj>0){
       for(int d=0; d<nadj; ++d){
-        rhs.push_back(trans(*aseed[d][0]));
+        rhs.push_back(trans(*aseed[d][iout_]));
         row_offset.push_back(row_offset.back()+1);
-        *aseed[d][0] = MX();
+        *aseed[d][iout_] = MX();
       }
       rhs = vertsplit(J->getSolve(vertcat(rhs),false,linsol_),row_offset);
       for(int d=0; d<nadj; ++d){
@@ -183,7 +196,7 @@ namespace CasADi{
     vector<MX>::const_iterator v_it = v.begin();
 
     // Discard non-differentiated evaluation (change?)
-    v_it++;
+    v_it += getNumOutputs();
 
     // Solve for the forward sensitivities
     if(nfwd>0){
@@ -193,8 +206,8 @@ namespace CasADi{
       }
       rhs = vertsplit(J->getSolve(vertcat(rhs),true,linsol_),row_offset);
       for(int d=0; d<nfwd; ++d){
-        if(fsens[d][0]!=0){
-          *fsens[d][0] = -trans(rhs[d]);
+        if(fsens[d][iout_]!=0){
+          *fsens[d][iout_] = -trans(rhs[d]);
         }
       }
       row_offset.resize(1);
@@ -203,11 +216,8 @@ namespace CasADi{
 
     // Collect adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      // Discard adjoint corresponding to z
-      v_it++;
-
       for(int i=0; i<asens[d].size(); ++i, ++v_it){
-        if(asens[d][i]!=0 && !(*v_it).isNull()){
+        if(i!=iin_ && asens[d][i]!=0 && !v_it->isNull()){
           *asens[d][i] += - *v_it;
         }
       }
@@ -218,16 +228,17 @@ namespace CasADi{
   void ImplicitFunctionInternal::spEvaluate(bool fwd){
 
     // Get arrays
-    bvec_t* z = reinterpret_cast<bvec_t*>(output(0).ptr());
-    bvec_t* zf = reinterpret_cast<bvec_t*>(f_.input(0).ptr());
-    bvec_t* rf = reinterpret_cast<bvec_t*>(f_.output(0).ptr());
+    bvec_t* z0 = reinterpret_cast<bvec_t*>(input(iin_).ptr());
+    bvec_t* z = reinterpret_cast<bvec_t*>(output(iout_).ptr());
+    bvec_t* zf = reinterpret_cast<bvec_t*>(f_.input(iin_).ptr());
+    bvec_t* rf = reinterpret_cast<bvec_t*>(f_.output(iout_).ptr());
 
     if(fwd){
 
       // Pass inputs to function
       fill(zf,zf+n_,0);
       for(int i=0; i<getNumInputs(); ++i){
-        f_.input(i+1).set(input(i));
+        if(i!=iin_) f_.input(i).set(input(i));
       }
 
       // Propagate dependencies through the function
@@ -249,8 +260,9 @@ namespace CasADi{
       f_.spEvaluate(false);
 
       // Collect influence on inputs
+      fill(z0,z0+n_,0);
       for(int i=0; i<getNumInputs(); ++i){
-        f_.input(i+1).get(input(i));
+        if(i!=iin_) f_.input(i).get(input(i));
       }
     }
   }
