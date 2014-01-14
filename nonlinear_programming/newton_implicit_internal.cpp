@@ -57,14 +57,14 @@ namespace CasADi {
     }
     
     // Pass the inputs to J
-    for (int i=1;i<jac_.getNumInputs();++i) {
-      std::copy(input(i-1).data().begin(),input(i-1).data().end(),jac_.input(i).data().begin());
+    for(int i=0; i<getNumInputs(); ++i){
+      if(i!=iin_) jac_.setInput(input(i),i);
     }
 
     // Aliases
-    DMatrix &Xk = output(0);
+    DMatrix &Xk = output(iout_);
     DMatrix &J = jac_.output(0);
-    DMatrix &F = jac_.output(1);
+    DMatrix &F = jac_.output(1+iout_);
   
     // Perform the Newton iterations
     int iter=0;
@@ -93,7 +93,7 @@ namespace CasADi {
       }
     
       // Use Xk to evaluate J
-      std::copy(Xk.data().begin(),Xk.data().end(),jac_.input().data().begin());
+      jac_.setInput(Xk,iin_);
       
       if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
@@ -120,7 +120,7 @@ namespace CasADi {
       } 
     
       // Prepare the linear solver with J
-      linsol_.setInput(J,0);
+      linsol_.setInput(J,LINSOL_A);
       
       if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
@@ -174,11 +174,11 @@ namespace CasADi {
   }
 
   void NewtonImplicitInternal::init(){
-
+    
+    // Call the base class initializer
     ImplicitFunctionInternal::init();
 
-    casadi_assert_message(f_.getNumInputs()>0,"NewtonImplicitInternal: the supplied f must have at least one input.");
-  
+    casadi_assert_message(f_.getNumInputs()>0,"NewtonImplicitInternal: the supplied f must have at least one input.");  
     casadi_assert_message(!linsol_.isNull(),"NewtonImplicitInternal::init: linear_solver must be supplied");
   
     if (hasSetOption("max_iter"))
