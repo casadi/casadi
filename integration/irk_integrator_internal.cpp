@@ -35,14 +35,11 @@ namespace CasADi{
   IRKIntegratorInternal::IRKIntegratorInternal(const FX& f, const FX& g) : RKBaseInternal(f,g){
     addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
-    addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(), "An implicit function solver");
-    addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
     setOption("name","unnamed_irk_integrator");
   }
 
   void IRKIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     RKBaseInternal::deepCopyMembers(already_copied);
-    implicit_solver_ = deepcopy(implicit_solver_,already_copied);
     explicit_fcn_ = deepcopy(explicit_fcn_,already_copied);
   }
 
@@ -58,126 +55,7 @@ namespace CasADi{
     int deg = getOption("interpolation_order");
 
     // All collocation time points
-    std::vector<long double> tau_root = collocationPointsL(deg,getOption("collocation_scheme"));
-
-    // Coefficients of the collocation equation
-    vector<vector<double> > C(deg+1,vector<double>(deg+1,0));
-      
-    // Coefficients of the continuity equation
-    vector<double> D(deg+1,0);
-      
-    // Coefficients of the quadratures
-    vector<double> B(deg+1,0);
-
-    // For all collocation points
-    for(int j=0; j<deg+1; ++j){
-
-      // Construct Lagrange polynomials to get the polynomial basis at the collocation point
-      Polynomial p = 1;
-      for(int r=0; r<deg+1; ++r){
-        if(r!=j){
-          p *= Polynomial(-tau_root[r],1)/(tau_root[j]-tau_root[r]);
-        }
-      }
-    
-      // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-      D[j] = zeroIfSmall(p(1.0L));
-    
-      // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-      Polynomial dp = p.derivative();
-      for(int r=0; r<deg+1; ++r){
-        C[j][r] = zeroIfSmall(dp(tau_root[r]));
-      }
-        
-      // Integrate polynomial to get the coefficients of the quadratures
-      Polynomial ip = p.anti_derivative();
-      B[j] = zeroIfSmall(ip(1.0L));
-    }
-
-    // Symbolic inputs
-    MX x0 = msym("x0",f_.input(DAE_X).sparsity());
-    MX p = msym("p",f_.input(DAE_P).sparsity());
-    MX t = msym("t",f_.input(DAE_T).sparsity());
-
-    // Implicitly defined variables (z and x)
-    MX v = msym("v",deg*(nx_+nz_));
-    vector<int> v_offset(1,0);
-    for(int d=0; d<deg; ++d){
-      v_offset.push_back(v_offset.back()+nx_);
-      v_offset.push_back(v_offset.back()+nz_);
-    }
-    vector<MX> vv = vertsplit(v,v_offset);
-    vector<MX>::const_iterator vv_it = vv.begin();
-
-    // Collocated states
-    vector<MX> x(deg+1), z(deg+1);
-    x[0] = x0;
-    for(int d=1; d<=deg; ++d){
-      x[d] = *vv_it++;
-      z[d] = *vv_it++;
-    }
-
-    // Collocation time points
-    vector<MX> tt(deg+1);
-    for(int d=0; d<=deg; ++d){
-      tt[d] = t + h_*tau_root[d];
-    }
-
-    // Equations that implicitly define v
-    vector<MX> eq;
-
-    // Quadratures
-    MX qf = MX::zeros(f_.output(DAE_QUAD).sparsity());
-
-    // End state
-    MX xf = D[0]*x0;
-
-    // For all collocation points
-    for(int j=1; j<deg+1; ++j){
-
-      // Get an expression for the state derivative at the collocation point
-      MX xp_j = 0;
-      for(int r=0; r<deg+1; ++r){
-        xp_j += (C[r][j]/h_) * x[r];
-      }
-
-      // Evaluate the DAE
-      vector<MX> f_in(DAE_NUM_IN);
-      f_in[DAE_T] = tt[j];
-      f_in[DAE_P] = p;
-      f_in[DAE_X] = x[j];
-      f_in[DAE_Z] = z[j];
-      vector<MX> f_out = f_.call(f_in);
-      
-      // Add collocation equation
-      eq.push_back(f_out[DAE_ODE] - xp_j);
-        
-      // Add the algebraic conditions
-      eq.push_back(f_out[DAE_ALG]);
-
-      // Add contribution to the final state
-      xf += D[j]*x[j];
-        
-      // Add contribution to quadratures
-      qf += (B[j]*h_)*f_out[DAE_QUAD];
-    }
-
-    // Form forward discrete time dynamics
-    vector<MX> F_in(DAE_NUM_IN);
-    F_in[DAE_T] = t;
-    F_in[DAE_X] = x0;
-    F_in[DAE_P] = p;
-    F_in[DAE_Z] = v;
-    vector<MX> F_out(DAE_NUM_OUT);
-    F_out[DAE_ODE] = xf;
-    F_out[DAE_ALG] = vertcat(eq);
-    F_out[DAE_QUAD] = qf;
-    F_ = MXFunction(F_in,F_out);
-    F_.init();
-    
-    
-
-    {
+    std::vector<double> tau_root = collocationPoints(deg,getOption("collocation_scheme"));
 
     // MX version of the same
     MX h_mx = h_;
@@ -194,49 +72,38 @@ namespace CasADi{
     // Coefficients of the collocation equation as DMatrix
     DMatrix D_num = DMatrix(deg+1,1,0);
 
-    // Collocation point
-    SXMatrix tau = ssym("tau");
+    // Coefficients of the quadratures
+    DMatrix Q = DMatrix(deg+1,1,0);
 
     // For all collocation points
     for(int j=0; j<deg+1; ++j){
+
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
-      SXMatrix L = 1;
-      for(int j2=0; j2<deg+1; ++j2){
-        if(j2 != j){
-          L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
+      Polynomial p = 1;
+      for(int r=0; r<deg+1; ++r){
+        if(r!=j){
+          p *= Polynomial(-tau_root[r],1)/(tau_root[j]-tau_root[r]);
         }
       }
     
-      SXFunction lfcn(tau,L);
-      lfcn.init();
-  
       // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
-      lfcn.setInput(1.0);
-      lfcn.evaluate();
-      D[j] = lfcn.output();
-      D_num(j) = lfcn.output();
-
+      D_num(j) = p(1.0);
+      D[j] = D_num(j);
+    
       // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-      FX tfcn = lfcn.tangent();
-      tfcn.init();
-      for(int j2=0; j2<deg+1; ++j2){
-        tfcn.setInput(tau_root[j2]);        
-        tfcn.evaluate();
-        C[j][j2] = tfcn.output();
-        C_num(j,j2) = tfcn.output();
+      Polynomial dp = p.derivative();
+      for(int r=0; r<deg+1; ++r){
+        C_num(j,r) = dp(tau_root[r]);
+        C[j][r] = C_num(j,r);
       }
+        
+      // Integrate polynomial to get the coefficients of the quadratures
+      Polynomial ip = p.anti_derivative();
+      Q(j) = ip(1.0);
     }
-
 
     C_num(std::vector<int>(1,0),ALL) = 0;
     C_num(0,0)   = 1;
-  
-    // Coefficients of the quadrature
-    DMatrix Q = solve(C_num,D_num);
-    
-    Q = B;
-    //   cout << "Q = " << Q << endl;
-  
 
     casadi_assert_message(fabs(sumAll(Q)-1).at(0)<1e-9,"Check on quadrature coefficients");
     casadi_assert_message(fabs(sumAll(D_num)-1).at(0)<1e-9,"Check on collocation coefficients");
@@ -478,8 +345,130 @@ namespace CasADi{
     ss_explicit_fcn << "collocation_explicit_" << getOption("name");
     explicit_fcn_.setOption("name",ss_explicit_fcn.str());
     explicit_fcn_.init();
+  }
 
+  void IRKIntegratorInternal::setupFG(){
+
+    // Interpolation order
+    int deg = getOption("interpolation_order");
+
+    // All collocation time points
+    std::vector<long double> tau_root = collocationPointsL(deg,getOption("collocation_scheme"));
+
+    // Coefficients of the collocation equation
+    vector<vector<double> > C(deg+1,vector<double>(deg+1,0));
+      
+    // Coefficients of the continuity equation
+    vector<double> D(deg+1,0);
+      
+    // Coefficients of the quadratures
+    vector<double> B(deg+1,0);
+
+    // For all collocation points
+    for(int j=0; j<deg+1; ++j){
+
+      // Construct Lagrange polynomials to get the polynomial basis at the collocation point
+      Polynomial p = 1;
+      for(int r=0; r<deg+1; ++r){
+        if(r!=j){
+          p *= Polynomial(-tau_root[r],1)/(tau_root[j]-tau_root[r]);
+        }
+      }
+    
+      // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
+      D[j] = zeroIfSmall(p(1.0L));
+    
+      // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+      Polynomial dp = p.derivative();
+      for(int r=0; r<deg+1; ++r){
+        C[j][r] = zeroIfSmall(dp(tau_root[r]));
+      }
+        
+      // Integrate polynomial to get the coefficients of the quadratures
+      Polynomial ip = p.anti_derivative();
+      B[j] = zeroIfSmall(ip(1.0L));
     }
+
+    // Symbolic inputs
+    MX x0 = msym("x0",f_.input(DAE_X).sparsity());
+    MX p = msym("p",f_.input(DAE_P).sparsity());
+    MX t = msym("t",f_.input(DAE_T).sparsity());
+
+    // Implicitly defined variables (z and x)
+    MX v = msym("v",deg*(nx_+nz_));
+    vector<int> v_offset(1,0);
+    for(int d=0; d<deg; ++d){
+      v_offset.push_back(v_offset.back()+nx_);
+      v_offset.push_back(v_offset.back()+nz_);
+    }
+    vector<MX> vv = vertsplit(v,v_offset);
+    vector<MX>::const_iterator vv_it = vv.begin();
+
+    // Collocated states
+    vector<MX> x(deg+1), z(deg+1);
+    x[0] = x0;
+    for(int d=1; d<=deg; ++d){
+      x[d] = *vv_it++;
+      z[d] = *vv_it++;
+    }
+
+    // Collocation time points
+    vector<MX> tt(deg+1);
+    for(int d=0; d<=deg; ++d){
+      tt[d] = t + h_*tau_root[d];
+    }
+
+    // Equations that implicitly define v
+    vector<MX> eq;
+
+    // Quadratures
+    MX qf = MX::zeros(f_.output(DAE_QUAD).sparsity());
+
+    // End state
+    MX xf = D[0]*x0;
+
+    // For all collocation points
+    for(int j=1; j<deg+1; ++j){
+
+      // Get an expression for the state derivative at the collocation point
+      MX xp_j = 0;
+      for(int r=0; r<deg+1; ++r){
+        xp_j += (C[r][j]/h_) * x[r];
+      }
+
+      // Evaluate the DAE
+      vector<MX> f_in(DAE_NUM_IN);
+      f_in[DAE_T] = tt[j];
+      f_in[DAE_P] = p;
+      f_in[DAE_X] = x[j];
+      f_in[DAE_Z] = z[j];
+      vector<MX> f_out = f_.call(f_in);
+      
+      // Add collocation equation
+      eq.push_back(f_out[DAE_ODE] - xp_j);
+        
+      // Add the algebraic conditions
+      eq.push_back(f_out[DAE_ALG]);
+
+      // Add contribution to the final state
+      xf += D[j]*x[j];
+        
+      // Add contribution to quadratures
+      qf += (B[j]*h_)*f_out[DAE_QUAD];
+    }
+
+    // Form forward discrete time dynamics
+    vector<MX> F_in(DAE_NUM_IN);
+    F_in[DAE_T] = t;
+    F_in[DAE_X] = x0;
+    F_in[DAE_P] = p;
+    F_in[DAE_Z] = v;
+    vector<MX> F_out(DAE_NUM_OUT);
+    F_out[DAE_ODE] = xf;
+    F_out[DAE_ALG] = vertcat(eq);
+    F_out[DAE_QUAD] = qf;
+    F_ = MXFunction(F_in,F_out);
+    F_.init();
   }
   
   void IRKIntegratorInternal::reset(){

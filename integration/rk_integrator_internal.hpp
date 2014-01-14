@@ -49,6 +49,9 @@ namespace CasADi{
     /// Initialize stage
     virtual void init();
 
+    /// Setup F and G
+    virtual void setupFG();
+
   };
 
 } // namespace CasADi

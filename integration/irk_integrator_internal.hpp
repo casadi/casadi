@@ -51,6 +51,9 @@ namespace CasADi{
 
     /// Initialize stage
     virtual void init();
+
+    /// Setup F and G
+    virtual void setupFG();
   
     /// Reset the forward problem and bring the time back to t0
     virtual void reset();
@@ -66,9 +69,6 @@ namespace CasADi{
 
     // Return zero if smaller than machine epsilon
     static double zeroIfSmall(double x);
-
-    // Implicit function solver
-    ImplicitFunction implicit_solver_;
   
     // Explicit function
     FX explicit_fcn_;

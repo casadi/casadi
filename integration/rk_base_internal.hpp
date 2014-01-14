@@ -52,6 +52,9 @@ namespace CasADi{
     /// Initialize stage
     virtual void init();
   
+    /// Setup F and G
+    virtual void setupFG() = 0;
+
     ///  Integrate until a specified time point
     virtual void integrate(double t_out);
 
@@ -63,6 +66,9 @@ namespace CasADi{
 
     /// Reset the backward problem and take time to tf 
     virtual void resetB();
+
+    // Implicit function solver
+    ImplicitFunction implicit_solver_;
 
     // Discrete time dynamics
     FX F_, G_;
