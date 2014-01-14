@@ -64,21 +64,15 @@ namespace CasADi{
     /// Integrate backwards in time until a specified time point
     virtual void integrateB(double t_out);
 
-    // Startup integrator (generates an initial trajectory guess)
-    Integrator startup_integrator_;
-  
+    // Return zero if smaller than machine epsilon
+    static double zeroIfSmall(double x);
+
     // Implicit function solver
     ImplicitFunction implicit_solver_;
   
     // Explicit function
     FX explicit_fcn_;
 
-    // With hotstart
-    bool hotstart_;
-  
-    // Has the system been integrated once
-    bool integrated_once_;
-  
     // Collocated times
     std::vector<std::vector<double> > coll_time_;
   

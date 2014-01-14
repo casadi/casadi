@@ -21,15 +21,13 @@
  */
 
 #include "irk_integrator_internal.hpp"
+#include "symbolic/polynomial.hpp"
 #include "symbolic/stl_vector_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/fx/sx_function.hpp"
 #include "symbolic/mx/mx_tools.hpp"
-
-#include "symbolic/profiling.hpp"
-#include "symbolic/casadi_options.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -39,19 +37,11 @@ namespace CasADi{
     addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
     addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(), "An implicit function solver");
     addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
-    addOption("expand_f",                      OT_BOOLEAN,  false, "Expand the ODE/DAE residual function in an SX graph");
-    addOption("expand_q",                      OT_BOOLEAN,  false, "Expand the quadrature function in an SX graph");
-    addOption("hotstart",                      OT_BOOLEAN,  true, "Initialize the trajectory at the previous solution");
-    addOption("quadrature_solver",             OT_LINEARSOLVER,  GenericType(), "An linear solver to solver the quadrature equations");
-    addOption("quadrature_solver_options",     OT_DICTIONARY, GenericType(), "Options to be passed to the quadrature solver");
-    addOption("startup_integrator",            OT_INTEGRATOR,  GenericType(), "An ODE/DAE integrator that can be used to generate a startup trajectory");
-    addOption("startup_integrator_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the startup integrator");
     setOption("name","unnamed_irk_integrator");
   }
 
   void IRKIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     RKBaseInternal::deepCopyMembers(already_copied);
-    startup_integrator_ = deepcopy(startup_integrator_,already_copied);
     implicit_solver_ = deepcopy(implicit_solver_,already_copied);
     explicit_fcn_ = deepcopy(explicit_fcn_,already_copied);
   }
@@ -64,17 +54,130 @@ namespace CasADi{
     // Call the base class init
     RKBaseInternal::init();
   
-    // Read options
-    bool expand_f = getOption("expand_f");
-  
-    // Hotstart?
-    hotstart_ = getOption("hotstart");
-  
     // Interpolation order
     int deg = getOption("interpolation_order");
 
     // All collocation time points
-    std::vector<double> tau_root = collocationPoints(deg,getOption("collocation_scheme"));
+    std::vector<long double> tau_root = collocationPointsL(deg,getOption("collocation_scheme"));
+
+    // Coefficients of the collocation equation
+    vector<vector<double> > C(deg+1,vector<double>(deg+1,0));
+      
+    // Coefficients of the continuity equation
+    vector<double> D(deg+1,0);
+      
+    // Coefficients of the quadratures
+    vector<double> B(deg+1,0);
+
+    // For all collocation points
+    for(int j=0; j<deg+1; ++j){
+
+      // Construct Lagrange polynomials to get the polynomial basis at the collocation point
+      Polynomial p = 1;
+      for(int r=0; r<deg+1; ++r){
+        if(r!=j){
+          p *= Polynomial(-tau_root[r],1)/(tau_root[j]-tau_root[r]);
+        }
+      }
+    
+      // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
+      D[j] = zeroIfSmall(p(1.0L));
+    
+      // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+      Polynomial dp = p.derivative();
+      for(int r=0; r<deg+1; ++r){
+        C[j][r] = zeroIfSmall(dp(tau_root[r]));
+      }
+        
+      // Integrate polynomial to get the coefficients of the quadratures
+      Polynomial ip = p.anti_derivative();
+      B[j] = zeroIfSmall(ip(1.0L));
+    }
+
+    // Symbolic inputs
+    MX x0 = msym("x0",f_.input(DAE_X).sparsity());
+    MX p = msym("p",f_.input(DAE_P).sparsity());
+    MX t = msym("t",f_.input(DAE_T).sparsity());
+
+    // Implicitly defined variables (z and x)
+    MX v = msym("v",deg*(nx_+nz_));
+    vector<int> v_offset(1,0);
+    for(int d=0; d<deg; ++d){
+      v_offset.push_back(v_offset.back()+nx_);
+      v_offset.push_back(v_offset.back()+nz_);
+    }
+    vector<MX> vv = vertsplit(v,v_offset);
+    vector<MX>::const_iterator vv_it = vv.begin();
+
+    // Collocated states
+    vector<MX> x(deg+1), z(deg+1);
+    x[0] = x0;
+    for(int d=1; d<=deg; ++d){
+      x[d] = *vv_it++;
+      z[d] = *vv_it++;
+    }
+
+    // Collocation time points
+    vector<MX> tt(deg+1);
+    for(int d=0; d<=deg; ++d){
+      tt[d] = t + h_*tau_root[d];
+    }
+
+    // Equations that implicitly define v
+    vector<MX> eq;
+
+    // Quadratures
+    MX qf = MX::zeros(f_.output(DAE_QUAD).sparsity());
+
+    // End state
+    MX xf = D[0]*x0;
+
+    // For all collocation points
+    for(int j=1; j<deg+1; ++j){
+
+      // Get an expression for the state derivative at the collocation point
+      MX xp_j = 0;
+      for(int r=0; r<deg+1; ++r){
+        xp_j += (C[r][j]/h_) * x[r];
+      }
+
+      // Evaluate the DAE
+      vector<MX> f_in(DAE_NUM_IN);
+      f_in[DAE_T] = tt[j];
+      f_in[DAE_P] = p;
+      f_in[DAE_X] = x[j];
+      f_in[DAE_Z] = z[j];
+      vector<MX> f_out = f_.call(f_in);
+      
+      // Add collocation equation
+      eq.push_back(f_out[DAE_ODE] - xp_j);
+        
+      // Add the algebraic conditions
+      eq.push_back(f_out[DAE_ALG]);
+
+      // Add contribution to the final state
+      xf += D[j]*x[j];
+        
+      // Add contribution to quadratures
+      qf += (B[j]*h_)*f_out[DAE_QUAD];
+    }
+
+    // Form forward discrete time dynamics
+    vector<MX> F_in(DAE_NUM_IN);
+    F_in[DAE_T] = t;
+    F_in[DAE_X] = x0;
+    F_in[DAE_P] = p;
+    F_in[DAE_Z] = v;
+    vector<MX> F_out(DAE_NUM_OUT);
+    F_out[DAE_ODE] = xf;
+    F_out[DAE_ALG] = vertcat(eq);
+    F_out[DAE_QUAD] = qf;
+    F_ = MXFunction(F_in,F_out);
+    F_.init();
+    
+    
+
+    {
 
     // MX version of the same
     MX h_mx = h_;
@@ -83,7 +186,7 @@ namespace CasADi{
     vector<vector<MX> > C(deg+1,vector<MX>(deg+1));
   
     // Coefficients of the collocation equation as DMatrix
-    DMatrix C_num = DMatrix(deg+1,deg+1,0);
+    DMatrix C_num = DMatrix::zeros(deg+1,deg+1);
 
     // Coefficients of the continuity equation
     vector<MX> D(deg+1);
@@ -130,7 +233,11 @@ namespace CasADi{
   
     // Coefficients of the quadrature
     DMatrix Q = solve(C_num,D_num);
+    
+    Q = B;
+    //   cout << "Q = " << Q << endl;
   
+
     casadi_assert_message(fabs(sumAll(Q)-1).at(0)<1e-9,"Check on quadrature coefficients");
     casadi_assert_message(fabs(sumAll(D_num)-1).at(0)<1e-9,"Check on collocation coefficients");
   
@@ -327,11 +434,6 @@ namespace CasADi{
     ss_ifcn << "collocation_implicit_residual_" << getOption("name");
     ifcn.setOption("name",ss_ifcn.str());
     ifcn.init(); 
-    if(expand_f){
-      ifcn = SXFunction(shared_cast<MXFunction>(ifcn));
-      ifcn.setOption("name",ss_ifcn.str());
-      ifcn.init();
-    }
   
     // Auxiliary output function
     vector<MX> afcn_out(1+INTEGRATOR_NUM_OUT);
@@ -345,11 +447,6 @@ namespace CasADi{
     ss_afcn << "collocation_output_" << getOption("name");
     afcn.setOption("name",ss_afcn.str());
     afcn.init();
-    if(expand_f){
-      afcn = SXFunction(shared_cast<MXFunction>(afcn));
-      afcn.setOption("name",ss_afcn.str());
-      afcn.init();
-    }
   
     // Get the NLP creator function
     implicitFunctionCreator implicit_function_creator = getOption("implicit_solver");
@@ -381,142 +478,53 @@ namespace CasADi{
     ss_explicit_fcn << "collocation_explicit_" << getOption("name");
     explicit_fcn_.setOption("name",ss_explicit_fcn.str());
     explicit_fcn_.init();
-  
-    if(hasSetOption("startup_integrator")){
-    
-      // Create the linear solver
-      integratorCreator startup_integrator_creator = getOption("startup_integrator");
-    
-      // Allocate an NLP solver
-      startup_integrator_ = startup_integrator_creator(f_,g_);
-    
-      // Pass options
-      startup_integrator_.setOption("t0",coll_time_.front().front());
-      startup_integrator_.setOption("tf",coll_time_.back().back());
-      
-      std::stringstream ss_startup_integrator;
-      ss_startup_integrator << "collocation_startup_" << getOption("name");
-      startup_integrator_.setOption("name", ss_startup_integrator.str());
-      
-      if(hasSetOption("startup_integrator_options")){
-        const Dictionary& startup_integrator_options = getOption("startup_integrator_options");
-        startup_integrator_.setOption(startup_integrator_options);
-      }
-    
-      // Initialize the startup integrator
-      startup_integrator_.init();
-    }
 
-    // Mark the system not yet integrated
-    integrated_once_ = false;
+    }
   }
   
   void IRKIntegratorInternal::reset(){
-    // Set up timers for profiling
-    double time_zero;
-    double time_start;
-    double time_stop;
-    if (CasadiOptions::profiling) {
-      time_zero = getRealTime();
-      CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl; 
-    }
     
     // Call the base class method
-    IntegratorInternal::reset();
-  
+    RKBaseInternal::reset();
+      
     // Pass the inputs
     for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
       explicit_fcn_.input(iind).set(input(iind));
     }
   
-    // // Pass the forward seeds
-    // for(int dir=0; dir<nsens; ++dir){
-    //   for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
-    //     explicit_fcn_.fwdSeed(iind,dir).set(fwdSeed(iind,dir));
-    //   }
-    // }
-    
-    // Pass solution guess (if this is the first integration or if hotstart is disabled)
-    if(hotstart_==false || integrated_once_==false){
-      vector<double>& v = implicit_solver_.output().data();
-      
-      // Check if an integrator for the startup trajectory has been supplied
-      bool has_startup_integrator = !startup_integrator_.isNull();
-    
-      // Use supplied integrator, if any
-      if(has_startup_integrator){
-        for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
-          startup_integrator_.input(iind).set(input(iind));
+    vector<double>& v = implicit_solver_.output().data();
+            
+    // Integrate, stopping at all time points
+    int offs=0;
+    for(int k=0; k<coll_time_.size(); ++k){
+      for(int j=0; j<coll_time_[k].size(); ++j){
+        
+        // Save the differential states
+        const DMatrix& x = input(INTEGRATOR_X0);
+        for(int i=0; i<nx_; ++i){
+          v.at(offs++) = x.at(i);
         }
-      
-        // Reset the integrator
-        startup_integrator_.reset();
-      }
-      
-      // Integrate, stopping at all time points
-      int offs=0;
-      for(int k=0; k<coll_time_.size(); ++k){
-        for(int j=0; j<coll_time_[k].size(); ++j){
-        
-          if(has_startup_integrator){
-            // Integrate to the time point
-            startup_integrator_.integrate(coll_time_[k][j]);
-          }
-          
-          // Save the differential states
-          const DMatrix& x = has_startup_integrator ? startup_integrator_.output(INTEGRATOR_XF) : input(INTEGRATOR_X0);
-          for(int i=0; i<nx_; ++i){
-            v.at(offs++) = x.at(i);
-          }
 
-          // Skip algebraic variables (for now) // FIXME
-          if(j>0){
-            if (has_startup_integrator && startup_integrator_.hasOption("init_z")) {
-              std::vector<double> init_z = startup_integrator_.getOption("init_z");
-              for(int i=0; i<nz_; ++i){
-                v.at(offs++) = init_z.at(i);
-              }
-            } else {
-              offs += nz_;
-            }
-          }
+        // Skip algebraic variables (for now) // FIXME
+        if(j>0){
+          offs += nz_;
+        }
         
-          // Skip backward states // FIXME
-          const DMatrix& rx = input(INTEGRATOR_RX0);
-          for(int i=0; i<nrx_; ++i){
-            v.at(offs++) = rx.at(i);
-          }
+        // Skip backward states // FIXME
+        const DMatrix& rx = input(INTEGRATOR_RX0);
+        for(int i=0; i<nrx_; ++i){
+          v.at(offs++) = rx.at(i);
+        }
         
-          // Skip backward algebraic variables // FIXME
-          if(j>0){
-            offs += nrz_;
-          }
+        // Skip backward algebraic variables // FIXME
+        if(j>0){
+          offs += nrz_;
         }
       }
-      
-      // Print
-      if(has_startup_integrator && verbose()){
-        cout << "startup trajectory generated, statistics:" << endl;
-        startup_integrator_.printStats();
-      }
-
-    }
-    
-    if (CasadiOptions::profiling) {
-      time_start = getRealTime(); // Start timer
     }
     
     // Solve the system of equations
     explicit_fcn_.evaluate();
-    
-    // Write out profiling information
-    if (CasadiOptions::profiling) {
-      time_stop = getRealTime(); // Stop timer
-      CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":0|" << explicit_fcn_.get() << ":" << explicit_fcn_.getOption("name") << "|solve system" << std::endl;
-    }
-  
-    // Mark the system integrated at least once
-    integrated_once_ = true;
   }
 
   void IRKIntegratorInternal::integrate(double t_out){
@@ -526,6 +534,10 @@ namespace CasADi{
   }
 
   void IRKIntegratorInternal::integrateB(double t_out){
+  }
+
+  double IRKIntegratorInternal::zeroIfSmall(double x){
+    return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;
   }
 
 } // namespace CasADi
