@@ -371,12 +371,14 @@ namespace CasADi{
     implicit_solver_.init();
   
     // Nonlinear constraint function input
-    vector<MX> gfcn_in(INTEGRATOR_NUM_IN);
-    gfcn_in[INTEGRATOR_X0] = X0;
-    gfcn_in[INTEGRATOR_P] = P;
-    gfcn_in[INTEGRATOR_RX0] = RX0;
-    gfcn_in[INTEGRATOR_RP] = RP;
+    vector<MX> gfcn_in(1+INTEGRATOR_NUM_IN);
+    gfcn_in[0] = MX();
+    gfcn_in[1+INTEGRATOR_X0] = X0;
+    gfcn_in[1+INTEGRATOR_P] = P;
+    gfcn_in[1+INTEGRATOR_RX0] = RX0;
+    gfcn_in[1+INTEGRATOR_RP] = RP;
     ifcn_in[0] = implicit_solver_.call(gfcn_in).front();
+    gfcn_in.erase(gfcn_in.begin());
     explicit_fcn_ = MXFunction(gfcn_in,afcn.call(ifcn_in));
     std::stringstream ss_explicit_fcn;
     ss_explicit_fcn << "collocation_explicit_" << getOption("name");
