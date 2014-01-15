@@ -144,7 +144,7 @@ namespace CasADi{
     if(!output_given){
       vector<MX> resv = callSelf(argv);
       for(int i=0; i<resv.size(); ++i){
-        if(res[i]==0) *res[i] = resv[i];
+        if(res[i]!=0) *res[i] = resv[i];
       }
     }
 
