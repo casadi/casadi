@@ -561,10 +561,14 @@ namespace CasADi{
   MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline){
     using namespace std;
     if(verbose()) std::cout << "XFunctionInternal::jac begin" << std::endl;
-        
-    // Quick return
-    if (input(iind).empty()) return MatType(output(oind).numel(),0);
-    if (output(oind).empty()) return MatType(0,input(iind).numel());
+    
+    // Quick return if trivially empty
+    if(input(iind).size()==0 || output(oind).size()==0){
+      std::pair<int,int> jac_shape;
+      jac_shape.first = compact ? output(oind).size() : output(oind).numel();
+      jac_shape.second = compact ? input(iind).size() : input(iind).numel();
+      return MatType::sparse(jac_shape);
+    }
     
     // Create return object
     MatType ret = MatType(jacSparsity(iind,oind,compact,symmetric));
