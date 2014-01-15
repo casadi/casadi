@@ -277,8 +277,9 @@ namespace CasADi{
     ifcn.init();
     
     // Get an expression for the state at the end of the finite element
-    std::vector<MX> ifcn_call_in(4);
-    std::copy(vfcn_inputs.begin()+1,vfcn_inputs.end(),ifcn_call_in.begin());
+    std::vector<MX> ifcn_call_in(5);
+    ifcn_call_in[0] = MX::zeros(V.sparsity()); 
+    std::copy(vfcn_inputs.begin()+1,vfcn_inputs.end(),ifcn_call_in.begin()+1);
     std::vector<MX> ifcn_call_out = ifcn.eval(ifcn_call_in);
     Vs = vertsplit(ifcn_call_out[0],splitPositions);
     
@@ -289,6 +290,7 @@ namespace CasADi{
     
     
     // Get the discrete time dynamics
+    ifcn_call_in.erase(ifcn_call_in.begin());
     MXFunction F = MXFunction(ifcn_call_in,XF);
     F.init();
     
