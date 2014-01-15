@@ -51,15 +51,12 @@ namespace CasADi{
 
   void ImplicitFunctionInternal::init(){
 
-    // Call the base class initializer
-    FXInternal::init();
+    // Initialize the residual function
+    f_.init(false);
 
     // Which input/output correspond to the root-finding problem?
     iin_ = getOption("implicit_input");
     iout_ = getOption("implicit_output");
-
-    // Initialize the residual function
-    f_.init(false);
   
     // Get the number of equations and check consistency
     casadi_assert_message(f_.output(iout_).dense() && f_.output(iout_).size2()==1, "Residual must be a dense vector");
@@ -78,6 +75,9 @@ namespace CasADi{
     for(int i=0; i<getNumOutputs(); ++i){
       output(i) = f_.output(i);
     }
+
+    // Call the base class initializer
+    FXInternal::init();
   
     // Generate Jacobian if not provided
     if(jac_.isNull()) jac_ = f_.jacobian(iin_,iout_);
