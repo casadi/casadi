@@ -31,59 +31,59 @@
 
 namespace CasADi{
     
-class CollocationIntegratorInternal : public IntegratorInternal{
-
-public:
+  class CollocationIntegratorInternal : public IntegratorInternal{
   
-  /// Constructor
-  explicit CollocationIntegratorInternal(const FX& f, const FX& g);
-
-  /// Deep copy data members
-  virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
-
-  /// Clone
-  virtual CollocationIntegratorInternal* clone() const{ return new CollocationIntegratorInternal(*this);}
-
-  /// Create a new integrator
-  virtual CollocationIntegratorInternal* create(const FX& f, const FX& g) const{ return new CollocationIntegratorInternal(f,g);}
+  public:
   
-  /// Destructor
-  virtual ~CollocationIntegratorInternal();
+    /// Constructor
+    explicit CollocationIntegratorInternal(const FX& f, const FX& g);
 
-  /// Initialize stage
-  virtual void init();
-  
-  /// Reset the forward problem and bring the time back to t0
-  virtual void reset();
+    /// Deep copy data members
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
-  /// Reset the backward problem and take time to tf
-  virtual void resetB(){}
+    /// Clone
+    virtual CollocationIntegratorInternal* clone() const{ return new CollocationIntegratorInternal(*this);}
 
-  ///  Integrate until a specified time point
-  virtual void integrate(double t_out);
+    /// Create a new integrator
+    virtual CollocationIntegratorInternal* create(const FX& f, const FX& g) const{ return new CollocationIntegratorInternal(f,g);}
+  
+    /// Destructor
+    virtual ~CollocationIntegratorInternal();
 
-  /// Integrate backwards in time until a specified time point
-  virtual void integrateB(double t_out);
+    /// Initialize stage
+    virtual void init();
+  
+    /// Reset the forward problem and bring the time back to t0
+    virtual void reset();
 
-  // Startup integrator (generates an initial trajectory guess)
-  Integrator startup_integrator_;
-  
-  // Implicit function solver
-  ImplicitFunction implicit_solver_;
-  
-  // Explicit function
-  FX explicit_fcn_;
+    /// Reset the backward problem and take time to tf
+    virtual void resetB(){}
 
-  // With hotstart
-  bool hotstart_;
+    ///  Integrate until a specified time point
+    virtual void integrate(double t_out);
+
+    /// Integrate backwards in time until a specified time point
+    virtual void integrateB(double t_out);
+
+    // Startup integrator (generates an initial trajectory guess)
+    Integrator startup_integrator_;
   
-  // Has the system been integrated once
-  bool integrated_once_;
+    // Implicit function solver
+    ImplicitFunction implicit_solver_;
   
-  // Collocated times
-  std::vector<std::vector<double> > coll_time_;
+    // Explicit function
+    FX explicit_fcn_;
+
+    // With hotstart
+    bool hotstart_;
   
-};
+    // Has the system been integrated once
+    bool integrated_once_;
+  
+    // Collocated times
+    std::vector<std::vector<double> > coll_time_;
+  
+  };
 
 } // namespace CasADi
 

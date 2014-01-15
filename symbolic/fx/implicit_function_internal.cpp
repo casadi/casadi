@@ -132,7 +132,7 @@ namespace CasADi{
     fact_up_to_date_ = false;
 
     // Get initial guess
-    //output(iout_).set(input(iin_));
+    output(iout_).set(input(iin_));
 
     // Solve the nonlinear system of equations
     solveNonLinear();
@@ -141,11 +141,15 @@ namespace CasADi{
   void ImplicitFunctionInternal::evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given){
     // Evaluate non-differentiated
     vector<MX> argv = MXNode::getVector(arg);
-    if(!output_given){
+    MX z; // the solution to the system of equations
+    if(output_given){
+      z = *res[iout_];
+    } else {
       vector<MX> resv = callSelf(argv);
       for(int i=0; i<resv.size(); ++i){
         if(res[i]!=0) *res[i] = resv[i];
       }
+      z = resv[iout_];
     }
 
     // Quick return if no derivatives
@@ -161,7 +165,7 @@ namespace CasADi{
     vector<MX> v;
     v.reserve(getNumInputs()*(1+nfwd) + nadj);
     v.insert(v.end(),argv.begin(),argv.end());
-    v[iin_] = *res[iout_];
+    v[iin_] = z;
     
     // Get an expression for the Jacobian
     MX J = jac_.call(v).front();
@@ -172,7 +176,7 @@ namespace CasADi{
     // Forward sensitivities, collect arguments for calling f_der
     for(int d=0; d<nfwd; ++d){
       argv = MXNode::getVector(fseed[d]);
-      argv[iin_] = MX::sparse(input(iin_).shape());
+      argv[iin_] = MX::zeros(input(iin_).sparsity());
       v.insert(v.end(),argv.begin(),argv.end());
     }
 

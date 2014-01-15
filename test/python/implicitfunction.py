@@ -51,11 +51,12 @@ class NLPtests(casadiTestCase):
       solver=Solver(f)
       solver.setOption(options)
       solver.init()
-      solver.setOutput(6)
+      solver.setInput(6)
       solver.evaluate()
       
       refsol = SXFunction([x],[2*pi])
       refsol.init()
+      refsol.setInput(6)
       self.checkfx(solver,refsol,digits=5)         
       
   def test_scalar2(self):
@@ -178,7 +179,7 @@ class NLPtests(casadiTestCase):
     solver.setOption("constraints",[-1])
     print solver.dictionary()
     solver.init()
-    solver.setOutput(-6)
+    solver.setInput(-6)
     solver.evaluate()
     self.assertAlmostEqual(solver.getOutput()[0],-2*pi,5)
     

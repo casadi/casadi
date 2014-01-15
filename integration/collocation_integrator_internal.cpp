@@ -372,13 +372,12 @@ namespace CasADi{
   
     // Nonlinear constraint function input
     vector<MX> gfcn_in(1+INTEGRATOR_NUM_IN);
-    gfcn_in[0] = MX();
+    gfcn_in[0] = V;
     gfcn_in[1+INTEGRATOR_X0] = X0;
     gfcn_in[1+INTEGRATOR_P] = P;
     gfcn_in[1+INTEGRATOR_RX0] = RX0;
     gfcn_in[1+INTEGRATOR_RP] = RP;
     ifcn_in[0] = implicit_solver_.call(gfcn_in).front();
-    gfcn_in.erase(gfcn_in.begin());
     explicit_fcn_ = MXFunction(gfcn_in,afcn.call(ifcn_in));
     std::stringstream ss_explicit_fcn;
     ss_explicit_fcn << "collocation_explicit_" << getOption("name");
@@ -429,19 +428,12 @@ namespace CasADi{
   
     // Pass the inputs
     for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
-      explicit_fcn_.input(iind).set(input(iind));
+      explicit_fcn_.input(1+iind).set(input(iind));
     }
-  
-    // // Pass the forward seeds
-    // for(int dir=0; dir<nsens; ++dir){
-    //   for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
-    //     explicit_fcn_.fwdSeed(iind,dir).set(fwdSeed(iind,dir));
-    //   }
-    // }
-    
+      
     // Pass solution guess (if this is the first integration or if hotstart is disabled)
     if(hotstart_==false || integrated_once_==false){
-      vector<double>& v = implicit_solver_.output().data();
+      vector<double>& v = explicit_fcn_.input().data();
       
       // Check if an integrator for the startup trajectory has been supplied
       bool has_startup_integrator = !startup_integrator_.isNull();
@@ -511,6 +503,9 @@ namespace CasADi{
     
     // Solve the system of equations
     explicit_fcn_.evaluate();
+
+    // Save the result
+    explicit_fcn_.output().set(explicit_fcn_.input());
     
     // Write out profiling information
     if (CasadiOptions::profiling) {
