@@ -45,7 +45,7 @@ class NLPtests(casadiTestCase):
     self.message("Scalar implicit problem, n=0")
     for Solver, options in solvers:
       self.message(Solver.__name__)
-      x=SX("x")
+      x=ssym("x")
       f=SXFunction([x],[sin(x)])
       f.init()
       solver=Solver(f)
@@ -54,7 +54,7 @@ class NLPtests(casadiTestCase):
       solver.setOutput(6)
       solver.evaluate()
       
-      refsol = SXFunction([],[2*pi])
+      refsol = SXFunction([x],[2*pi])
       refsol.init()
       self.checkfx(solver,refsol,digits=5)         
       
@@ -63,19 +63,19 @@ class NLPtests(casadiTestCase):
     for Solver, options in solvers:
       self.message(Solver.__name__)
       message = Solver.__name__
-      x=SX("x")
-      y=SX("y")
+      x=ssym("x")
+      y=ssym("y")
       n=0.2
       f=SXFunction([y,x],[x-arcsin(y)])
       f.init()
       solver=Solver(f)
       solver.setOption(options)
       solver.init()
-      solver.setInput(n)
-      
-      refsol = SXFunction([x],[sin(x)])
+      solver.setInput(n,1)
+
+      refsol = SXFunction([y,x],[sin(x)])
       refsol.init()
-      refsol.setInput(n)
+      refsol.setInput(n,1)
       self.checkfx(solver,refsol,digits=6,sens_der=False,failmessage=message)
 
   def test_scalar2_indirect(self):
@@ -92,7 +92,7 @@ class NLPtests(casadiTestCase):
       solver.init()
       
       X = msym("X")
-      [R] = solver.call([X])
+      [R] = solver.call([MX(),X])
       
       trial = MXFunction([X],[R])
       trial.init()
@@ -125,7 +125,7 @@ class NLPtests(casadiTestCase):
       solver.init()
       
       X = msym("X",x.sparsity())
-      [R] = solver.call([vecNZ(X)])
+      [R] = solver.call([MX(),vecNZ(X)])
       
       trial = MXFunction([X],[R])
       trial.init()
@@ -164,7 +164,7 @@ class NLPtests(casadiTestCase):
       solver.setInput(n)
       solver.evaluate()
       
-      refsol = SXFunction([x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
+      refsol = SXFunction([y,x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
       refsol.init()
       refsol.setInput(n)
       self.checkfx(solver,refsol,digits=5,sens_der=False,failmessage=message)
@@ -233,7 +233,7 @@ class NLPtests(casadiTestCase):
     #ifcn = MXFunction([X0],[vertcat([X0])])
     #ifcn.setOption("name","I")
     #ifcn.init()
-    [V] = ifcn.eval([X0])
+    [V] = ifcn.eval([0,X0])
 
     f = 1  # fails
 
