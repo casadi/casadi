@@ -54,7 +54,7 @@ class NLPtests(casadiTestCase):
       solver.setInput(6)
       solver.evaluate()
       
-      refsol = SXFunction([x],[2*pi])
+      refsol = SXFunction([x],[ceil(x/pi-0.5)*pi])
       refsol.init()
       refsol.setInput(6)
       self.checkfx(solver,refsol,digits=5)         
