@@ -147,6 +147,7 @@ class NLPtests(casadiTestCase):
 
       self.checkfx(trial,refsol,digits=6,sens_der=False,evals=1,failmessage=message)
       
+  @known_bug()  
   def test_vector2(self):
     self.message("Scalar implicit problem, n=1")
     for Solver, options in solvers:
