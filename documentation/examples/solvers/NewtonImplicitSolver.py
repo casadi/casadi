@@ -36,16 +36,16 @@ from pylab import *
 #$ We seek the stationair solution to these modulation equations.
 
 #! Parameters
-eps   = SX("eps")
-mu    = SX("mu")
-alpha = SX("alpha")
-k     = SX("k")
-sigma = SX("sigma")
+eps   = ssym("eps")
+mu    = ssym("mu")
+alpha = ssym("alpha")
+k     = ssym("k")
+sigma = ssym("sigma")
 params = [eps,mu,alpha,k,sigma]
 
 #! Variables
-a     = SX("a")
-gamma = SX("gamma")
+a     = ssym("a")
+gamma = ssym("gamma")
 
 #! Equations
 res0 = mu*a+1.0/2*k*a*sin(gamma)
@@ -63,11 +63,11 @@ s=NewtonImplicitSolver(f)
 s.setOption("abstol",1e-14)
 s.setOption("linear_solver",CSparse)
 s.init()
-s.setInput(params_)
+s.setInput(params_,1)
 
 #$ Initialize [$a$,$\gamma$] with a guess and solve
-s.setOutput([1,-1])
-s.solve()
+s.setInput([1,-1])
+s.evaluate()
 
 #! Our output is:
 x_ = s.getOutput()
