@@ -239,6 +239,8 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::spEvaluate(bool fwd){
+    // Auxiliary outputs not yet supported
+    casadi_assert_message(getNumOutputs()==1, "Not implemented");
 
     // Get arrays
     bvec_t* z0 = reinterpret_cast<bvec_t*>(input(iin_).ptr());
