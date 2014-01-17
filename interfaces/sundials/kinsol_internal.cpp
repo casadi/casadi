@@ -247,7 +247,7 @@ namespace CasADi{
     }
   
     // Get the initial guess
-    output().get(NV_DATA_S(u_));
+    output(iout_).get(NV_DATA_S(u_));
   
     // Solve the nonlinear system of equations
     int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);
@@ -257,13 +257,24 @@ namespace CasADi{
     if(verbose()){
       if(flag!=KIN_SUCCESS) kinsol_error("KINSol",flag,false);
     }
-  
-    // Save the solution
-    output(0).set(NV_DATA_S(u_));
 
+    // Get the solution
+    setOutput(NV_DATA_S(u_),iout_);
+
+    // Evaluate auxilary outputs
+    if(getNumOutputs()>0){
+      f_.setInput(output(iout_),iin_);
+      for(int i=0; i<getNumInputs(); ++i)
+        if(i!=iin_) f_.setInput(input(i),i);
+      f_.evaluate();
+      for(int i=0; i<getNumOutputs(); ++i){
+        if(i!=iout_) f_.getOutput(output(i),i);
+      }
+    }
+    
     // Print solution
     if(verbose()){
-      cout << "KinsolInternal::solveNonLinear: solution = " << output(0).data() << endl;
+      cout << "KinsolInternal::solveNonLinear: solution = " << output(iout_).data() << endl;
     }  
   }
 
@@ -271,22 +282,21 @@ namespace CasADi{
     // Get time
     time1_ = clock();
 
-    // Pass input
+    // Pass inputs
     f_.setInput(NV_DATA_S(u),iin_);
     for(int i=0; i<getNumInputs(); ++i)
       if(i!=iin_) f_.setInput(input(i),i);
-  
+
     // Evaluate
     f_.evaluate();
     
     if(monitored("eval_f")){
-      cout << "f = " << f_.output() << endl;
+      cout << "f = " << f_.output(iout_) << endl;
     }
     
     // Get results
-    f_.getOutput(NV_DATA_S(fval));
+    f_.getOutput(NV_DATA_S(fval),iout_);
 
-  
     // Get a referebce to the nonzeros of the function
     const vector<double>& fdata = f_.output().data();
   
