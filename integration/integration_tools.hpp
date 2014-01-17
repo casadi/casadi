@@ -36,7 +36,9 @@ namespace CasADi{
   \param scheme  'radau' or 'legendre'
   **/
   std::vector<double> collocationPoints(int order, const std::string& scheme="radau");
+#ifndef SWIG
   std::vector<long double> collocationPointsL(int order, const std::string& scheme="radau");
+#endif // SWIG
   //@}
   
   /** \brief Obtain collocation interpolating matrices
