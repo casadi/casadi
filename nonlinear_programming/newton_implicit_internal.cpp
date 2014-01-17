@@ -42,8 +42,6 @@ namespace CasADi {
   NewtonImplicitInternal::~NewtonImplicitInternal(){ 
   }
 
-  double Xk_update (double Xk, double step) { return Xk-step; }
-
   void NewtonImplicitInternal::solveNonLinear() {
     casadi_log("NewtonImplicitInternal::solveNonLinear:begin");
     
@@ -62,7 +60,7 @@ namespace CasADi {
     }
 
     // Aliases
-    DMatrix &Xk = output(iout_);
+    DMatrix &u = output(iout_);
     DMatrix &J = jac_.output(0);
     DMatrix &F = jac_.output(1+iout_);
   
@@ -89,11 +87,13 @@ namespace CasADi {
       }
     
       if (monitored("step")) {
-        std::cout << "  Xk = " << Xk << std::endl;
+        std::cout << "  u = " << u << std::endl;
       }
     
-      // Use Xk to evaluate J
-      jac_.setInput(Xk,iin_);
+      // Use u to evaluate J
+      jac_.setInput(u,iin_);
+      for(int i=0; i<getNumInputs(); ++i)
+        if(i!=iin_) jac_.setInput(input(i),i);
       
       if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
@@ -158,8 +158,12 @@ namespace CasADi {
       } 
     
       // Update Xk+1 = Xk - J^(-1) F
-      std::transform(Xk.begin(), Xk.end(), F.begin(), Xk.begin(), Xk_update);
-  
+      std::transform(u.begin(), u.end(), F.begin(), u.begin(), std::minus<double>());
+
+      // Get auxiliary outputs
+      for(int i=0; i<getNumOutputs(); ++i){
+        if(i!=iout_) jac_.getOutput(output(i),1+i);
+      }
     }
   
     // Store the iteration count
