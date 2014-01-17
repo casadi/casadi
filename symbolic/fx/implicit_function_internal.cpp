@@ -128,7 +128,7 @@ namespace CasADi{
     double time_zero;
     double time_start;
     double time_stop;
-    if (CasadiOptions::profiling) {
+    if(CasadiOptions::profiling) {
       time_zero = getRealTime();
     }
 
@@ -160,6 +160,9 @@ namespace CasADi{
     int nfwd = fsens.size();
     int nadj = aseed.size();
     if(nfwd==0 && nadj==0) return;
+
+    // Auxiliary outputs not yet supported
+    casadi_assert_message(getNumOutputs()==1, "Not implemented");
 
     // Temporaries
     vector<int> row_offset(1,0);
