@@ -55,27 +55,9 @@ namespace CasADi{
     /// Setup F and G
     virtual void setupFG();
   
-    /// Reset the forward problem and bring the time back to t0
-    virtual void reset();
-
-    /// Reset the backward problem and take time to tf
-    virtual void resetB(){}
-
-    ///  Integrate until a specified time point
-    virtual void integrate(double t_out);
-
-    /// Integrate backwards in time until a specified time point
-    virtual void integrateB(double t_out);
-
     // Return zero if smaller than machine epsilon
     static double zeroIfSmall(double x);
-  
-    // Explicit function
-    FX explicit_fcn_;
-
-    // Collocated times
-    std::vector<std::vector<double> > coll_time_;
-  
+    
   };
 
 } // namespace CasADi

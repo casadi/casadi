@@ -82,6 +82,9 @@ namespace CasADi{
     // Time step size
     double h_;
 
+    /// Number of algebraic variables for the discrete time integration
+    int nZ_, nRZ_;
+
     // Tape
     std::vector<std::vector<double> > x_tape_, z_tape_;
   };
