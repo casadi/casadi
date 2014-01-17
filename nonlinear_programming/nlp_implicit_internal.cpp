@@ -67,7 +67,6 @@ namespace CasADi {
     // Call the base class initializer
     ImplicitFunctionInternal::init();
 
-    casadi_assert_message(f_.getNumInputs()>0,"NLPImplicitInternal: the supplied f must have at least one input.");
   
     MX V = msym("V",input(iin_).sparsity());
   

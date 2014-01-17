@@ -359,9 +359,8 @@ namespace CasADi{
 
     // Pass inputs to the jacobian function
     jac_.setInput(NV_DATA_S(u),iin_);
-    for(int i=0; i<getNumInputs(); ++i){
+    for(int i=0; i<getNumInputs(); ++i)
       if(i!=iin_) jac_.setInput(input(i),i);
-    }
 
     // Evaluate
     jac_.evaluate();
@@ -505,7 +504,7 @@ namespace CasADi{
     // Evaluate jacobian
     jac_.evaluate();
 
-    // Get a referebce to the nonzeros of Jacobian
+    // Get a reference to the nonzeros of Jacobian
     const vector<double>& Jdata = jac_.output().data();
   
     // Make sure that all entries of the linear system are valid

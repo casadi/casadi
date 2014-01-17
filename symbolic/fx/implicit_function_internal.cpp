@@ -59,6 +59,8 @@ namespace CasADi{
     iout_ = getOption("implicit_output");
   
     // Get the number of equations and check consistency
+    casadi_assert_message(iin_>=0 && iin_<f_.getNumInputs()>0,"Implicit input not in range");
+    casadi_assert_message(iout_>=0 && iout_<f_.getNumOutputs()>0,"Implicit output not in range");
     casadi_assert_message(f_.output(iout_).dense() && f_.output(iout_).size2()==1, "Residual must be a dense vector");
     casadi_assert_message(f_.input(iin_).dense() && f_.input(iin_).size2()==1, "Unknown must be a dense vector");
     n_ = f_.output(iout_).size();
