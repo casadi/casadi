@@ -71,9 +71,6 @@ namespace CasADi{
     // Implicit function solver
     ImplicitFunction implicit_solver_;
   
-    // Explicit function
-    FX explicit_fcn_;
-
     // With hotstart
     bool hotstart_;
   
