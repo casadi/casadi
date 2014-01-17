@@ -76,6 +76,10 @@ namespace CasADi{
       output(i) = f_.output(i);
     }
 
+    // Same input and output schemes
+    setInputScheme(f_.getInputScheme());
+    setOutputScheme(f_.getOutputScheme());
+
     // Call the base class initializer
     FXInternal::init();
   
