@@ -298,7 +298,7 @@ namespace CasADi{
     f_.getOutput(NV_DATA_S(fval),iout_);
 
     // Get a referebce to the nonzeros of the function
-    const vector<double>& fdata = f_.output().data();
+    const vector<double>& fdata = f_.output(iout_).data();
   
     // Make sure that all entries of the linear system are valid
     for(int k=0; k<fdata.size(); ++k){
