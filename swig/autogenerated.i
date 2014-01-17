@@ -48,6 +48,94 @@ def IOSchemeVector(arg,io_scheme):
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
+def dpleIn(*dummy,**kwargs):
+  """
+  Helper function for 'DPLEInput'
+
+  Two use cases:
+     a) arg = dpleIn(a=my_a, v=my_v) 
+          all arguments optional
+     b) a, v = dpleIn(arg,"a", "v") 
+          all arguments after the first optional
+  Input arguments of a dple solver
+  
+  Keyword arguments:
+    a -- A matrices (vertcat when const_dim, blkdiag otherwise) [DPLE_A]
+    v -- V matrices (vertcat when const_dim, blkdiag otherwise) [DPLE_V]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEInput,n)] for n in dummy[1:]]
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  v = []
+  if 'v' in kwargs:
+    v = kwargs['v']
+  for k in kwargs.keys():
+    if not(k in ['a','v']):
+      raise Exception("Keyword error in dpleIn: '%s' is not recognized. Available keywords are: a, v" % k )
+  return IOSchemeVector([a,v], IOScheme(SCHEME_DPLEInput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(dpleIn) dpleIn<CasADi::SXMatrix>;
+%template(dpleIn) dpleIn<CasADi::MX>;
+%template(dpleIn) dpleIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorDPLEInputSXMatrix) DPLEInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorDPLEInputMX) DPLEInputIOSchemeVector<MX>;
+%template(IOSchemeVectorDPLEInputCRSSparsity) DPLEInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorDPLEInput) IOSchemeVectorDPLEInputSXMatrix;
+%rename(IOSchemeVectorDPLEInput) IOSchemeVectorDPLEInputMX;
+%rename(IOSchemeVectorDPLEInput) IOSchemeVectorDPLEInputCRSSparsity;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def dpleOut(*dummy,**kwargs):
+  """
+  Helper function for 'DPLEOutput'
+
+  Two use cases:
+     a) arg = dpleOut(p=my_p) 
+          all arguments optional
+     b) p = dpleOut(arg,"p") 
+          all arguments after the first optional
+  Output arguments of a dple solver
+  
+  Keyword arguments:
+    p -- Lyapunov matrix (vertcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def) [DPLE_P]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEOutput,n)] for n in dummy[1:]]
+  p = []
+  if 'p' in kwargs:
+    p = kwargs['p']
+  for k in kwargs.keys():
+    if not(k in ['p']):
+      raise Exception("Keyword error in dpleOut: '%s' is not recognized. Available keywords are: p" % k )
+  return IOSchemeVector([p], IOScheme(SCHEME_DPLEOutput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(dpleOut) dpleOut<CasADi::SXMatrix>;
+%template(dpleOut) dpleOut<CasADi::MX>;
+%template(dpleOut) dpleOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorDPLEOutputSXMatrix) DPLEOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorDPLEOutputMX) DPLEOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorDPLEOutputCRSSparsity) DPLEOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorDPLEOutput) IOSchemeVectorDPLEOutputSXMatrix;
+%rename(IOSchemeVectorDPLEOutput) IOSchemeVectorDPLEOutputMX;
+%rename(IOSchemeVectorDPLEOutput) IOSchemeVectorDPLEOutputCRSSparsity;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
 def controldaeIn(*dummy,**kwargs):
   """
   Helper function for 'ControlledDAEInput'

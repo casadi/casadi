@@ -79,6 +79,7 @@ option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" 
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
 option(WITH_SQIC "Enable SQIC interface" OFF)
+option(WITH_SLICOT "Enable SLICOT interface" OFF)
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
 option(WITH_WORHP "Compile the WORHP interface" OFF) 
 option(WITH_SNOPT "Compile the SNOPT interface" OFF) 
@@ -277,6 +278,13 @@ if(Fortran_language_works AND WITH_SQIC)
 endif()
 add_feature_info(sqic-interface SQIC_FOUND "Interface to the QP solver SQIC.")
 
+if(Fortran_language_works AND WITH_SLICOT)
+  find_package (SLICOT)
+  set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} ${SLICOT_LIBRARIES})
+endif()
+add_feature_info(slicot-interface SLICOT_FOUND "Interface to the controls library SLICOT.")
+
+
 if(WITH_WORHP AND LIBXML2_FOUND)
   find_package (WORHP)
 endif()
@@ -310,6 +318,8 @@ add_subdirectory(examples)
 add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
 add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
 #add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
+
+add_subdirectory(control)
 
 find_package(SWIG)
   if(SWIG_FOUND)

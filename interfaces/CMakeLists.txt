@@ -45,3 +45,7 @@ endif()
 if(SNOPT_FOUND)
   add_subdirectory(snopt)
 endif()
+
+if(SLICOT_FOUND)
+  add_subdirectory(slicot)
+endif()

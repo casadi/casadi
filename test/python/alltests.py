@@ -40,6 +40,7 @@ from lpsolver import *
 from tools import *
 from simulator import *
 from vectortools import *
+from control import *
 
 if __name__ == '__main__':
     unittest.main()

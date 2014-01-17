@@ -56,6 +56,11 @@
 %include "sundials_interface.i"
 #endif
 
+// Slicot
+#ifdef WITH_SLICOT
+%include "slicot_interface.i"
+#endif
+
 #ifdef WITH_LAPACK
 %include "lapack_interface.i"
 #endif
