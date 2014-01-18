@@ -20,12 +20,11 @@
  *
  */
 
-#ifndef DPLE_INTERNAL_HPP
-#define DPLE_INTERNAL_HPP
+#ifndef SIMPLE_INDEF_DPLE_INTERNAL_HPP
+#define SIMPLE_INDEF_DPLE_INTERNAL_HPP
 
-#include "dple_solver.hpp"
+#include "simple_indef_dple_solver.hpp"
 #include "dple_internal.hpp"
-#include "../symbolic/fx/fx_internal.hpp"
 
 namespace CasADi{
 
@@ -35,61 +34,47 @@ namespace CasADi{
      \author Joris gillis
       \date 2014
   */
-  class DpleInternal : public FXInternal{
+  class SimpleIndefDpleInternal : public DpleInternal{
   public:
     /** \brief  Constructor
      *  \param[in] A  List of sparsities of A_i 
      *  \param[in] V  List of sparsities of V_i 
      */
-    DpleInternal(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V, int nfwd=0, int nadj=0);
+    SimpleIndefDpleInternal(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V);
     
     /** \brief  Destructor */
-    virtual ~DpleInternal()=0;
+    virtual ~SimpleIndefDpleInternal();
 
     /** \brief  Clone */
-    virtual DpleInternal* clone() const=0;
+    virtual SimpleIndefDpleInternal* clone() const;
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
   
     /** \brief  Create a new solver */
-    virtual DpleInternal* create(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V) const = 0;
-  
+    virtual SimpleIndefDpleInternal* create(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V) const{ return new SimpleIndefDpleInternal(A,V);}
+     
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const{}
 
     /** \brief  evaluate */
-    virtual void evaluate()=0;
+    virtual void evaluate();
 
     /** \brief  Initialize */
     virtual void init();
 
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
-    virtual FX getDerivative(int nfwd, int nadj)=0;
-
-    /// List of sparsities of A_i 
-    std::vector< CRSSparsity > A_;
+    virtual FX getDerivative(int nfwd, int nadj);
     
-    /// List of sparsities of V_i 
-    std::vector< CRSSparsity > V_;
+  private:
+    /// Main implementation as MXFunction
+    FX f_;
     
-    /// Period
-    int K_;
-    
-    /// Constant dimensions
-    bool const_dim_;
-    
-    /// Assume positive definiteness of P_i
-    bool pos_def_;
-
-    /// Number of forward derivatives
-    int nfwd_;
-
-    /// Number of adjoint derivatives
-    int nadj_;
+    /// State space dimension
+    int n_;
     
   };
   
 } // namespace CasADi
 
-#endif // DPLE_INTERNAL_HPP
+#endif // SIMPLE_INDEF_DPLE_INTERNAL_HPP

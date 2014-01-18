@@ -20,11 +20,32 @@
  *
  */
 
-%{
-#include "control/dple_solver.hpp"
-#include "control/simple_indef_dple_solver.hpp"
-%}
+#include "simple_indef_dple_solver.hpp"
+#include "simple_indef_dple_internal.hpp"
+#include <cassert>
 
-%include "control/dple_solver.hpp"
-%include "control/simple_indef_dple_solver.hpp"
+using namespace std;
+namespace CasADi{
+
+  SimpleIndefDpleSolver::SimpleIndefDpleSolver(){
+  
+  }
+  
+  SimpleIndefDpleSolver::SimpleIndefDpleSolver(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V) {
+    assignNode(new SimpleIndefDpleInternal(A,V));
+  }
+
+  SimpleIndefDpleInternal* SimpleIndefDpleSolver::operator->(){
+    return static_cast<SimpleIndefDpleInternal*>(FX::operator->());
+  }
+
+  const SimpleIndefDpleInternal* SimpleIndefDpleSolver::operator->() const{
+    return static_cast<const SimpleIndefDpleInternal*>(FX::operator->()); 
+  }
+  
+  bool SimpleIndefDpleSolver::checkNode() const{
+    return dynamic_cast<const SimpleIndefDpleInternal*>(get())!=0;
+  }
+ 
+} // namespace CasADi
 

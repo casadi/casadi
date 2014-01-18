@@ -33,6 +33,13 @@ try:
 except:
   pass
   
+  
+try:
+  dplesolvers.append((SimpleIndefDpleSolver,{"linear_solver": CSparse}))
+except:
+  pass
+  
+  
 print dplesolvers
 
 class ControlTests(casadiTestCase):
@@ -97,6 +104,7 @@ class ControlTests(casadiTestCase):
   def test_dple_large(self):
     
     for Solver, options in dplesolvers:
+      if "Simple" in str(Solver): continue
       for K in [1,2,3,4,5]:
         for n in [2,3,4,8,16,32]:
           numpy.random.seed(1)

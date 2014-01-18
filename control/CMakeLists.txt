@@ -4,6 +4,10 @@ SET(CONTROL_SRCS
   dple_solver.cpp
   dple_internal.hpp
   dple_internal.cpp
+  simple_indef_dple_solver.hpp
+  simple_indef_dple_solver.cpp
+  simple_indef_dple_internal.hpp
+  simple_indef_dple_internal.cpp
 )
 
 if(ENABLE_STATIC)
