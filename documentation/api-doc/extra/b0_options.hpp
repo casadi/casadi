@@ -334,6 +334,8 @@
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_solver</td><td>OT_IMPLICITFUNCTION</td><td>GenericType()</td><td>An implicit function solver</td><td>CasADi::RKBaseInternal</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::RKBaseInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
@@ -356,6 +358,8 @@
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_solver</td><td>OT_IMPLICITFUNCTION</td><td>GenericType()</td><td>An implicit function solver</td><td>CasADi::RKBaseInternal</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::RKBaseInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
@@ -377,6 +381,8 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
@@ -398,6 +404,8 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
@@ -1967,6 +1975,8 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
@@ -1989,6 +1999,8 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
@@ -2383,6 +2395,8 @@
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>f_scale</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>gmres|bcgstab|tfqmr</td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
@@ -2416,6 +2430,8 @@
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>f_scale</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>gmres|bcgstab|tfqmr</td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
@@ -2478,23 +2494,16 @@
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>"radau"</td><td>Collocation scheme (radau|legendre)</td><td>CasADi::IRKIntegratorInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::IRKIntegratorInternal</td></tr>
-<tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td><td>CasADi::IRKIntegratorInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
-<tr><td>hotstart</td><td>OT_BOOLEAN</td><td>true</td><td>Initialize the trajectory at the previous solution</td><td>CasADi::IRKIntegratorInternal</td></tr>
-<tr><td>implicit_solver</td><td>OT_IMPLICITFUNCTION</td><td>GenericType()</td><td>An implicit function solver</td><td>CasADi::IRKIntegratorInternal</td></tr>
-<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::IRKIntegratorInternal</td></tr>
+<tr><td>implicit_solver</td><td>OT_IMPLICITFUNCTION</td><td>GenericType()</td><td>An implicit function solver</td><td>CasADi::RKBaseInternal</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::RKBaseInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td><td>CasADi::IRKIntegratorInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>CasADi::RKBaseInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quadrature_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver to solver the quadrature equations</td><td>CasADi::IRKIntegratorInternal</td></tr>
-<tr><td>quadrature_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the quadrature solver</td><td>CasADi::IRKIntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
-<tr><td>startup_integrator</td><td>OT_INTEGRATOR</td><td>GenericType()</td><td>An ODE/DAE integrator that can be used to generate a startup trajectory</td><td>CasADi::IRKIntegratorInternal</td></tr>
-<tr><td>startup_integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the startup integrator</td><td>CasADi::IRKIntegratorInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
@@ -2511,23 +2520,16 @@
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>"radau"</td><td>Collocation scheme (radau|legendre)</td><td>CasADi::IRKIntegratorInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::IRKIntegratorInternal</td></tr>
-<tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td><td>CasADi::IRKIntegratorInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
-<tr><td>hotstart</td><td>OT_BOOLEAN</td><td>true</td><td>Initialize the trajectory at the previous solution</td><td>CasADi::IRKIntegratorInternal</td></tr>
-<tr><td>implicit_solver</td><td>OT_IMPLICITFUNCTION</td><td>GenericType()</td><td>An implicit function solver</td><td>CasADi::IRKIntegratorInternal</td></tr>
-<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::IRKIntegratorInternal</td></tr>
+<tr><td>implicit_solver</td><td>OT_IMPLICITFUNCTION</td><td>GenericType()</td><td>An implicit function solver</td><td>CasADi::RKBaseInternal</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::RKBaseInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td><td>CasADi::IRKIntegratorInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>CasADi::RKBaseInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quadrature_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver to solver the quadrature equations</td><td>CasADi::IRKIntegratorInternal</td></tr>
-<tr><td>quadrature_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the quadrature solver</td><td>CasADi::IRKIntegratorInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
-<tr><td>startup_integrator</td><td>OT_INTEGRATOR</td><td>GenericType()</td><td>An ODE/DAE integrator that can be used to generate a startup trajectory</td><td>CasADi::IRKIntegratorInternal</td></tr>
-<tr><td>startup_integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the startup integrator</td><td>CasADi::IRKIntegratorInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
@@ -3018,6 +3020,8 @@
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_solver</td><td>OT_IMPLICITFUNCTION</td><td>GenericType()</td><td>An implicit function solver</td><td>CasADi::RKBaseInternal</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::RKBaseInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
@@ -3040,6 +3044,8 @@
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_solver</td><td>OT_IMPLICITFUNCTION</td><td>GenericType()</td><td>An implicit function solver</td><td>CasADi::RKBaseInternal</td></tr>
+<tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::RKBaseInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
@@ -3167,6 +3173,8 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
@@ -3186,6 +3194,8 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate wether statistics must be gathered</td><td>CasADi::FXInternal</td></tr>
+<tr><td>implicit_input</td><td>OT_INTEGER</td><td>0</td><td>Index of the input that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>implicit_output</td><td>OT_INTEGER</td><td>0</td><td>Index of the output that corresponds to the actual root-finding</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
