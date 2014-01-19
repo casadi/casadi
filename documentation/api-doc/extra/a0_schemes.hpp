@@ -106,6 +106,14 @@
 <tr><td>RDAE_T</td><td>t</td><td>Explicit time dependence .</td></tr>
 </table>
 */
+/** \defgroup scheme_DPLEInput
+<a name='schemes'></a><table>
+<caption>Input scheme: CasADi::DPLEInput  (DPLE_NUM_IN = 3) [dpleIn]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>DPLE_A</td><td>a</td><td>A matrices (vertcat when const_dim, blkdiag otherwise) .</td></tr>
+<tr><td>DPLE_V</td><td>v</td><td>V matrices (vertcat when const_dim, blkdiag otherwise) .</td></tr>
+</table>
+*/
 /** \defgroup scheme_NLPOutput
 <a name='schemes'></a><table>
 <caption>Output scheme: CasADi::NLPOutput  (NL_NUM_OUT = 3) [nlpOut]</caption>
@@ -398,6 +406,13 @@
 <tr><td>JACG_P</td><td>p</td><td>Fixed parameter .</td></tr>
 </table>
 */
+/** \defgroup scheme_DPLEOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: CasADi::DPLEOutput  (DPLE_NUM_OUT = 2) [dpleOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>DPLE_P</td><td>p</td><td>Lyapunov matrix (vertcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def) .</td></tr>
+</table>
+*/
 /** \defgroup scheme_HessLagInput
 <a name='schemes'></a><table>
 <caption>Input scheme: CasADi::HessLagInput  (HESSLAG_NUM_IN = 5) [hessLagIn]</caption>
@@ -483,6 +498,20 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::PsdIndefDpleInternal
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
+*/
+/** \class CasADi::PsdIndefDpleSolver
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
 */
 /** \class CasADi::QPLPInternal
 \n
@@ -665,6 +694,20 @@
 @copydoc scheme_StabilizedQPSolverInput
 <br/>
 @copydoc scheme_QPSolverOutput
+*/
+/** \class CasADi::SimpleIndefDpleInternal
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
+*/
+/** \class CasADi::SimpleIndefDpleSolver
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
 */
 /** \class CasADi::SDPSolverInternal
 \n
@@ -945,6 +988,20 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::DpleInternal
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
+*/
+/** \class CasADi::DpleSolver
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
 */
 /** \class CasADi::NLPQPInternal
 \n
