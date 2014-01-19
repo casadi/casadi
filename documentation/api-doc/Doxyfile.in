@@ -587,6 +587,7 @@ WARN_LOGFILE           =
 INPUT                  = ../../symbolic \
                          ../../interfaces \
                          ../../optimal_control \
+                         ../../control \
                          ../../integration \
                          ../../nonlinear_programming \
                          ../../convex_programming \
