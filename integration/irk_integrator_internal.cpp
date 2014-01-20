@@ -111,8 +111,8 @@ namespace CasADi{
 
     // Collocated states
     vector<MX> x(deg_+1), z(deg_+1);
-    x[0] = x0;
     for(int d=1; d<=deg_; ++d){
+      //for(int d=deg_; d>=1; --d){
       x[d] = *vv_it++;
       z[d] = *vv_it++;
     }
@@ -135,6 +135,7 @@ namespace CasADi{
 
     // For all collocation points
     for(int j=1; j<deg_+1; ++j){
+      //for(int j=deg_; j>=1; --j){
 
       // Evaluate the DAE
       vector<MX> f_arg(DAE_NUM_IN);
@@ -145,8 +146,8 @@ namespace CasADi{
       vector<MX> f_res = f_.call(f_arg);
 
       // Get an expression for the state derivative at the collocation point
-      MX xp_j = 0;
-      for(int r=0; r<deg_+1; ++r){
+      MX xp_j = (C[0][j]/h_) * x0;
+      for(int r=1; r<deg_+1; ++r){
         xp_j += (C[r][j]/h_) * x[r];
       }
       
@@ -194,9 +195,8 @@ namespace CasADi{
 
       // Collocated states
       vector<MX> rx(deg_+1), rz(deg_+1);
-      rx[deg_] = rx0;
-      for(int d=deg_; d>=1; --d){
-        rx[d-1] = *rvv_it++;
+      for(int d=1; d<=deg_; ++d){
+        rx[d] = *rvv_it++;
         rz[d] = *rvv_it++;
       }
       casadi_assert(rvv_it==rvv.end());
@@ -211,7 +211,7 @@ namespace CasADi{
       MX rxf = D[0]*rx0;
 
       // For all collocation points
-      for(int j=deg_; j>=1; --j){
+      for(int j=1; j<deg_+1; ++j){
 
         // Evaluate the backward DAE
         vector<MX> g_arg(RDAE_NUM_IN);
@@ -221,15 +221,15 @@ namespace CasADi{
         g_arg[RDAE_Z] = z[j];
         g_arg[RDAE_RX] = rx[j];
         g_arg[RDAE_RZ] = rz[j];
-        g_arg[RDAE_RP] = (B[j]*h_)*rp;
+        g_arg[RDAE_RP] = rp;
         vector<MX> g_res = g_.call(g_arg);
-        
+
         // Get an expression for the state derivative at the collocation point
-        MX rxp_j = 0;
-        for(int r=0; r<deg_+1; ++r){
-          rxp_j += (C[j][r]/h_) * rx[r];
+        MX rxp_j = (C[0][j]/h_) * rx0;
+        for(int r=1; r<deg_+1; ++r){
+          rxp_j += (C[r][j]/h_) * rx[r];
         }
-        
+
         // Add collocation equation
         eq.push_back(g_res[RDAE_ODE] - rxp_j);
         
@@ -238,9 +238,9 @@ namespace CasADi{
 
         // Add contribution to the final state
         rxf += D[j]*rx[j];
-
+        
         // Add contribution to quadratures
-        rqf += g_res[RDAE_QUAD];
+        rqf += (B[j]*h_)*g_res[RDAE_QUAD];
       }
 
       // Form backward discrete time dynamics
