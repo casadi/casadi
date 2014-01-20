@@ -266,7 +266,7 @@ namespace CasADi{
     return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;
   }
 
-  void IRKIntegratorInternal::getAlgebraicGuess(){
+  void IRKIntegratorInternal::calculateInitialConditions(){
     vector<double>::const_iterator x0_it = input(INTEGRATOR_X0).begin();
     vector<double>::const_iterator z_it = z_.begin();
     vector<double>::iterator Z_it = Z_.begin();
@@ -279,7 +279,7 @@ namespace CasADi{
     casadi_assert(Z_it==Z_.end());
   }
 
-  void IRKIntegratorInternal::getBackwardAlgebraicGuess(){
+  void IRKIntegratorInternal::calculateBackwardInitialConditions(){
     vector<double>::const_iterator rx0_it = input(INTEGRATOR_RX0).begin();
     vector<double>::const_iterator rz_it = rz_.begin();
     vector<double>::iterator RZ_it = RZ_.begin();

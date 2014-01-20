@@ -66,7 +66,7 @@ namespace CasADi{
     // Allocate tape if backward states are present
     if(nrx_>0){
       x_tape_.resize(nk_+1,vector<double>(nx_));
-      Z_tape_.resize(nk_+1,vector<double>(nZ_));
+      Z_tape_.resize(nk_,vector<double>(nZ_));
     }
 
     // Allocate a root-finding solver for the forward problem
@@ -135,15 +135,15 @@ namespace CasADi{
       F.output(DAE_ALG).get(Z_);
       transform(F.output(DAE_QUAD).begin(),F.output(DAE_QUAD).end(),output(INTEGRATOR_QF).begin(),output(INTEGRATOR_QF).begin(),std::plus<double>());
 
+      // Tape
+      if(nrx_>0){
+        output(INTEGRATOR_XF).get(x_tape_.at(k_+1));
+        Z_.get(Z_tape_.at(k_));
+      }
+
       // Advance time
       k_++;
       t_ = t0_ + k_*h_;
-
-      // Tape
-      if(nrx_>0){
-        output(INTEGRATOR_XF).get(x_tape_[k_]);
-        Z_.get(Z_tape_[k_]);
-      }
     }
   }
 
@@ -164,8 +164,8 @@ namespace CasADi{
 
       // Take step
       G.input(RDAE_T).set(t_);
-      G.input(RDAE_X).set(x_tape_[k_]);
-      G.input(RDAE_Z).set(Z_tape_[k_]);
+      G.input(RDAE_X).set(x_tape_.at(k_));
+      G.input(RDAE_Z).set(Z_tape_.at(k_));
       G.input(RDAE_P).set(input(INTEGRATOR_P));
       G.input(RDAE_RX).set(output(INTEGRATOR_RX0));
       G.input(RDAE_RZ).set(RZ_);
@@ -185,12 +185,11 @@ namespace CasADi{
     k_ = 0;
 
     // Get consistent initial conditions
-    getAlgebraicGuess();
+    calculateInitialConditions();
 
     // Add the first element in the tape
     if(nrx_>0){
-      output(INTEGRATOR_XF).get(x_tape_[k_]);
-      Z_.get(Z_tape_[k_]);
+      output(INTEGRATOR_XF).get(x_tape_.at(0));
     }
   }
 
@@ -202,15 +201,15 @@ namespace CasADi{
     k_ = nk_;
 
     // Get consistent initial conditions
-    getBackwardAlgebraicGuess();
+    calculateBackwardInitialConditions();
   }
 
-  void RKBaseInternal::getAlgebraicGuess(){
+  void RKBaseInternal::calculateInitialConditions(){
     casadi_assert(Z_.size()==z_.size());
     Z_.set(z_);
   }
 
-  void RKBaseInternal::getBackwardAlgebraicGuess(){
+  void RKBaseInternal::calculateBackwardInitialConditions(){
     casadi_assert(RZ_.size()==rz_.size());
     RZ_.set(rz_);
   }

@@ -68,10 +68,10 @@ namespace CasADi{
     virtual void resetB();
 
     /// Get initial guess for the algebraic variable
-    virtual void getAlgebraicGuess();
+    virtual void calculateInitialConditions();
 
     /// Get initial guess for the algebraic variable (backward problem)
-    virtual void getBackwardAlgebraicGuess();
+    virtual void calculateBackwardInitialConditions();
 
     // Implicit function solver
     ImplicitFunction implicit_solver_, backward_implicit_solver_;

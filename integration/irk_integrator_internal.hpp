@@ -59,10 +59,10 @@ namespace CasADi{
     static double zeroIfSmall(double x);
 
     /// Get initial guess for the algebraic variable
-    virtual void getAlgebraicGuess();
+    virtual void calculateInitialConditions();
 
     /// Get initial guess for the algebraic variable (backward problem)
-    virtual void getBackwardAlgebraicGuess();
+    virtual void calculateBackwardInitialConditions();
 
     // Interpolation order
     int deg_;
