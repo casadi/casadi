@@ -69,7 +69,7 @@ namespace CasADi{
       Z_tape_.resize(nk_+1,vector<double>(nZ_));
     }
 
-    // Allocate a root-finding solver, if needed
+    // Allocate a root-finding solver for the forward problem
     if(nZ_>0){
 
       // Get the NLP creator function
@@ -89,6 +89,28 @@ namespace CasADi{
   
       // Initialize the solver
       implicit_solver_.init();
+    }
+
+    // Allocate a root-finding solver for the backward problem
+    if(nRZ_>0){
+
+      // Get the NLP creator function
+      implicitFunctionCreator backward_implicit_function_creator = getOption("implicit_solver");
+  
+      // Allocate an NLP solver
+      backward_implicit_solver_ = backward_implicit_function_creator(G_,FX(),LinearSolver());
+      backward_implicit_solver_.setOption("name",string(getOption("name")) + "_backward_implicit_solver");
+      backward_implicit_solver_.setOption("implicit_input",RDAE_RZ);
+      backward_implicit_solver_.setOption("implicit_output",RDAE_ALG);
+    
+      // Pass options
+      if(hasSetOption("implicit_solver_options")){
+        const Dictionary& backward_implicit_solver_options = getOption("implicit_solver_options");
+        backward_implicit_solver_.setOption(backward_implicit_solver_options);
+      }
+  
+      // Initialize the solver
+      backward_implicit_solver_.init();
     }
   }
 
@@ -126,11 +148,13 @@ namespace CasADi{
   }
 
   void RKBaseInternal::integrateB(double t_out){
-
     // Get discrete time sought
     int k_out = std::floor((t_out-t0_)/h_);
     k_out = std::max(k_out,0); //  make sure that rounding errors does not result in k_out>nk_
     casadi_assert(k_out<=nk_);
+
+    // Explicit discrete time dynamics
+    FX& G = nRZ_>0 ? backward_implicit_solver_ : G_;
 
     // Take time steps until end time has been reached
     while(k_>k_out){
@@ -139,17 +163,17 @@ namespace CasADi{
       t_ = t0_ + k_*h_;
 
       // Take step
-      G_.input(RDAE_T).set(t_);
-      G_.input(RDAE_X).set(x_tape_[k_]);
-      G_.input(RDAE_Z).set(Z_tape_[k_]);
-      G_.input(RDAE_P).set(input(INTEGRATOR_P));
-      G_.input(RDAE_RX).set(output(INTEGRATOR_RX0));
-      G_.input(RDAE_RZ).set(rz_);
-      G_.input(RDAE_RP).set(input(INTEGRATOR_RP));
-      G_.evaluate();
-      G_.output(RDAE_ODE).get(output(INTEGRATOR_RXF));
-      G_.output(RDAE_ALG).get(rz_);
-      transform(G_.output(RDAE_QUAD).begin(),G_.output(RDAE_QUAD).end(),output(INTEGRATOR_RQF).begin(),output(INTEGRATOR_RQF).begin(),std::plus<double>());
+      G.input(RDAE_T).set(t_);
+      G.input(RDAE_X).set(x_tape_[k_]);
+      G.input(RDAE_Z).set(Z_tape_[k_]);
+      G.input(RDAE_P).set(input(INTEGRATOR_P));
+      G.input(RDAE_RX).set(output(INTEGRATOR_RX0));
+      G.input(RDAE_RZ).set(RZ_);
+      G.input(RDAE_RP).set(input(INTEGRATOR_RP));
+      G.evaluate();
+      G.output(RDAE_ODE).get(output(INTEGRATOR_RXF));
+      G.output(RDAE_ALG).get(RZ_);
+      transform(G.output(RDAE_QUAD).begin(),G.output(RDAE_QUAD).end(),output(INTEGRATOR_RQF).begin(),output(INTEGRATOR_RQF).begin(),std::plus<double>());
     }
   }
 
@@ -176,11 +200,19 @@ namespace CasADi{
 
     // Bring discrete time to the end
     k_ = nk_;
+
+    // Get consistent initial conditions
+    getBackwardAlgebraicGuess();
   }
 
   void RKBaseInternal::getAlgebraicGuess(){
     casadi_assert(Z_.size()==z_.size());
     Z_.set(z_);
+  }
+
+  void RKBaseInternal::getBackwardAlgebraicGuess(){
+    casadi_assert(RZ_.size()==rz_.size());
+    RZ_.set(rz_);
   }
 
 } // namespace CasADi

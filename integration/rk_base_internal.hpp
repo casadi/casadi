@@ -70,8 +70,11 @@ namespace CasADi{
     /// Get initial guess for the algebraic variable
     virtual void getAlgebraicGuess();
 
+    /// Get initial guess for the algebraic variable (backward problem)
+    virtual void getBackwardAlgebraicGuess();
+
     // Implicit function solver
-    ImplicitFunction implicit_solver_;
+    ImplicitFunction implicit_solver_, backward_implicit_solver_;
 
     // Discrete time dynamics
     FX F_, G_;

@@ -116,6 +116,7 @@ namespace CasADi{
       x[d] = *vv_it++;
       z[d] = *vv_it++;
     }
+    casadi_assert(vv_it==vv.end());
 
     // Collocation time points
     vector<MX> tt(deg_+1);
@@ -135,31 +136,31 @@ namespace CasADi{
     // For all collocation points
     for(int j=1; j<deg_+1; ++j){
 
+      // Evaluate the DAE
+      vector<MX> f_arg(DAE_NUM_IN);
+      f_arg[DAE_T] = tt[j];
+      f_arg[DAE_P] = p;
+      f_arg[DAE_X] = x[j];
+      f_arg[DAE_Z] = z[j];
+      vector<MX> f_res = f_.call(f_arg);
+
       // Get an expression for the state derivative at the collocation point
       MX xp_j = 0;
       for(int r=0; r<deg_+1; ++r){
         xp_j += (C[r][j]/h_) * x[r];
       }
-
-      // Evaluate the DAE
-      vector<MX> f_in(DAE_NUM_IN);
-      f_in[DAE_T] = tt[j];
-      f_in[DAE_P] = p;
-      f_in[DAE_X] = x[j];
-      f_in[DAE_Z] = z[j];
-      vector<MX> f_out = f_.call(f_in);
       
       // Add collocation equation
-      eq.push_back(f_out[DAE_ODE] - xp_j);
+      eq.push_back(f_res[DAE_ODE] - xp_j);
         
       // Add the algebraic conditions
-      eq.push_back(f_out[DAE_ALG]);
+      eq.push_back(f_res[DAE_ALG]);
 
       // Add contribution to the final state
       xf += D[j]*x[j];
         
       // Add contribution to quadratures
-      qf += (B[j]*h_)*f_out[DAE_QUAD];
+      qf += (B[j]*h_)*f_res[DAE_QUAD];
     }
 
     // Form forward discrete time dynamics
@@ -174,6 +175,90 @@ namespace CasADi{
     F_out[DAE_QUAD] = qf;
     F_ = MXFunction(F_in,F_out);
     F_.init();
+
+    // Backwards dynamics
+    if(!g_.isNull()){
+      // Symbolic inputs
+      MX rx0 = msym("x0",g_.input(RDAE_RX).sparsity());
+      MX rp = msym("p",g_.input(RDAE_RP).sparsity());
+
+      // Implicitly defined variables (rz and rx)
+      MX rv = msym("v",deg_*(nrx_+nrz_));
+      vector<int> rv_offset(1,0);
+      for(int d=0; d<deg_; ++d){
+        rv_offset.push_back(rv_offset.back()+nrx_);
+        rv_offset.push_back(rv_offset.back()+nrz_);
+      }
+      vector<MX> rvv = vertsplit(rv,rv_offset);
+      vector<MX>::const_iterator rvv_it = rvv.begin();
+
+      // Collocated states
+      vector<MX> rx(deg_+1), rz(deg_+1);
+      rx[deg_] = rx0;
+      for(int d=deg_; d>=1; --d){
+        rx[d-1] = *rvv_it++;
+        rz[d] = *rvv_it++;
+      }
+      casadi_assert(rvv_it==rvv.end());
+           
+      // Equations that implicitly define v
+      eq.clear();
+
+      // Quadratures
+      MX rqf = MX::zeros(g_.output(RDAE_QUAD).sparsity());
+
+      // End state
+      MX rxf = D[0]*rx0;
+
+      // For all collocation points
+      for(int j=deg_; j>=1; --j){
+
+        // Evaluate the backward DAE
+        vector<MX> g_arg(RDAE_NUM_IN);
+        g_arg[RDAE_T] = tt[j];
+        g_arg[RDAE_P] = p;
+        g_arg[RDAE_X] = x[j];
+        g_arg[RDAE_Z] = z[j];
+        g_arg[RDAE_RX] = rx[j];
+        g_arg[RDAE_RZ] = rz[j];
+        g_arg[RDAE_RP] = (B[j]*h_)*rp;
+        vector<MX> g_res = g_.call(g_arg);
+        
+        // Get an expression for the state derivative at the collocation point
+        MX rxp_j = 0;
+        for(int r=0; r<deg_+1; ++r){
+          rxp_j += (C[j][r]/h_) * rx[r];
+        }
+        
+        // Add collocation equation
+        eq.push_back(g_res[RDAE_ODE] - rxp_j);
+        
+        // Add the algebraic conditions
+        eq.push_back(g_res[RDAE_ALG]);
+
+        // Add contribution to the final state
+        rxf += D[j]*rx[j];
+
+        // Add contribution to quadratures
+        rqf += g_res[RDAE_QUAD];
+      }
+
+      // Form backward discrete time dynamics
+      vector<MX> G_in(RDAE_NUM_IN);
+      G_in[RDAE_T] = t;
+      G_in[RDAE_X] = x0;
+      G_in[RDAE_P] = p;
+      G_in[RDAE_Z] = v;
+      G_in[RDAE_RX] = rx0;
+      G_in[RDAE_RP] = rp;
+      G_in[RDAE_RZ] = rv;
+      vector<MX> G_out(RDAE_NUM_OUT);
+      G_out[RDAE_ODE] = rxf;
+      G_out[RDAE_ALG] = vertcat(eq);
+      G_out[RDAE_QUAD] = rqf;
+      G_ = MXFunction(G_in,G_out);
+      G_.init();
+    }
   }
   
 
@@ -192,6 +277,19 @@ namespace CasADi{
       Z_it += nz_;
     }
     casadi_assert(Z_it==Z_.end());
+  }
+
+  void IRKIntegratorInternal::getBackwardAlgebraicGuess(){
+    vector<double>::const_iterator rx0_it = input(INTEGRATOR_RX0).begin();
+    vector<double>::const_iterator rz_it = rz_.begin();
+    vector<double>::iterator RZ_it = RZ_.begin();
+    for(int d=0; d<deg_; ++d){
+      copy(rx0_it,rx0_it+nrx_,RZ_it);
+      RZ_it += nrx_;
+      copy(rz_it,rz_it+nrz_,RZ_it);
+      RZ_it += nrz_;
+    }
+    casadi_assert(RZ_it==RZ_.end());
   }
 
 } // namespace CasADi

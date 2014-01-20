@@ -61,6 +61,9 @@ namespace CasADi{
     /// Get initial guess for the algebraic variable
     virtual void getAlgebraicGuess();
 
+    /// Get initial guess for the algebraic variable (backward problem)
+    virtual void getBackwardAlgebraicGuess();
+
     // Interpolation order
     int deg_;
   };
