@@ -55,26 +55,26 @@ namespace CasADi{
   void IRKIntegratorInternal::setupFG(){
 
     // Interpolation order
-    int deg = getOption("interpolation_order");
+    deg_ = getOption("interpolation_order");
 
     // All collocation time points
-    std::vector<long double> tau_root = collocationPointsL(deg,getOption("collocation_scheme"));
+    std::vector<long double> tau_root = collocationPointsL(deg_,getOption("collocation_scheme"));
 
     // Coefficients of the collocation equation
-    vector<vector<double> > C(deg+1,vector<double>(deg+1,0));
+    vector<vector<double> > C(deg_+1,vector<double>(deg_+1,0));
       
     // Coefficients of the continuity equation
-    vector<double> D(deg+1,0);
+    vector<double> D(deg_+1,0);
       
     // Coefficients of the quadratures
-    vector<double> B(deg+1,0);
+    vector<double> B(deg_+1,0);
 
     // For all collocation points
-    for(int j=0; j<deg+1; ++j){
+    for(int j=0; j<deg_+1; ++j){
 
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
       Polynomial p = 1;
-      for(int r=0; r<deg+1; ++r){
+      for(int r=0; r<deg_+1; ++r){
         if(r!=j){
           p *= Polynomial(-tau_root[r],1)/(tau_root[j]-tau_root[r]);
         }
@@ -85,7 +85,7 @@ namespace CasADi{
     
       // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
       Polynomial dp = p.derivative();
-      for(int r=0; r<deg+1; ++r){
+      for(int r=0; r<deg_+1; ++r){
         C[j][r] = zeroIfSmall(dp(tau_root[r]));
       }
         
@@ -100,9 +100,9 @@ namespace CasADi{
     MX t = msym("t",f_.input(DAE_T).sparsity());
 
     // Implicitly defined variables (z and x)
-    MX v = msym("v",deg*(nx_+nz_));
+    MX v = msym("v",deg_*(nx_+nz_));
     vector<int> v_offset(1,0);
-    for(int d=0; d<deg; ++d){
+    for(int d=0; d<deg_; ++d){
       v_offset.push_back(v_offset.back()+nx_);
       v_offset.push_back(v_offset.back()+nz_);
     }
@@ -110,16 +110,16 @@ namespace CasADi{
     vector<MX>::const_iterator vv_it = vv.begin();
 
     // Collocated states
-    vector<MX> x(deg+1), z(deg+1);
+    vector<MX> x(deg_+1), z(deg_+1);
     x[0] = x0;
-    for(int d=1; d<=deg; ++d){
+    for(int d=1; d<=deg_; ++d){
       x[d] = *vv_it++;
       z[d] = *vv_it++;
     }
 
     // Collocation time points
-    vector<MX> tt(deg+1);
-    for(int d=0; d<=deg; ++d){
+    vector<MX> tt(deg_+1);
+    for(int d=0; d<=deg_; ++d){
       tt[d] = t + h_*tau_root[d];
     }
 
@@ -133,11 +133,11 @@ namespace CasADi{
     MX xf = D[0]*x0;
 
     // For all collocation points
-    for(int j=1; j<deg+1; ++j){
+    for(int j=1; j<deg_+1; ++j){
 
       // Get an expression for the state derivative at the collocation point
       MX xp_j = 0;
-      for(int r=0; r<deg+1; ++r){
+      for(int r=0; r<deg_+1; ++r){
         xp_j += (C[r][j]/h_) * x[r];
       }
 
@@ -179,6 +179,19 @@ namespace CasADi{
 
   double IRKIntegratorInternal::zeroIfSmall(double x){
     return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;
+  }
+
+  void IRKIntegratorInternal::getAlgebraicGuess(){
+    vector<double>::const_iterator x0_it = input(INTEGRATOR_X0).begin();
+    vector<double>::const_iterator z_it = z_.begin();
+    vector<double>::iterator Z_it = Z_.begin();
+    for(int d=0; d<deg_; ++d){
+      copy(x0_it,x0_it+nx_,Z_it);
+      Z_it += nx_;
+      copy(z_it,z_it+nz_,Z_it);
+      Z_it += nz_;
+    }
+    casadi_assert(Z_it==Z_.end());
   }
 
 } // namespace CasADi

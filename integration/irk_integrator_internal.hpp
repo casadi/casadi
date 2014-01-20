@@ -57,7 +57,12 @@ namespace CasADi{
   
     // Return zero if smaller than machine epsilon
     static double zeroIfSmall(double x);
-    
+
+    /// Get initial guess for the algebraic variable
+    virtual void getAlgebraicGuess();
+
+    // Interpolation order
+    int deg_;
   };
 
 } // namespace CasADi

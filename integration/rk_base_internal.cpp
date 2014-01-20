@@ -58,13 +58,15 @@ namespace CasADi{
     setupFG();
 
     // Get discrete time dimensions
-    nZ_ = F_.input(DAE_Z).size();
-    nRZ_ = G_.isNull() ? 0 : G_.input(RDAE_RZ).size();
+    Z_ = F_.input(DAE_Z);
+    nZ_ = Z_.size();
+    RZ_ = G_.isNull() ? DMatrix() : G_.input(RDAE_RZ);
+    nRZ_ =  RZ_.size();
 
     // Allocate tape if backward states are present
     if(nrx_>0){
       x_tape_.resize(nk_+1,vector<double>(nx_));
-      z_tape_.resize(nk_+1,vector<double>(nZ_));
+      Z_tape_.resize(nk_+1,vector<double>(nZ_));
     }
 
     // Allocate a root-finding solver, if needed
@@ -104,11 +106,11 @@ namespace CasADi{
       // Take step
       F.input(DAE_T).set(t_);
       F.input(DAE_X).set(output(INTEGRATOR_XF));
-      F.input(DAE_Z).set(z_);
+      F.input(DAE_Z).set(Z_);
       F.input(DAE_P).set(input(INTEGRATOR_P));
       F.evaluate();
       F.output(DAE_ODE).get(output(INTEGRATOR_XF));
-      F.output(DAE_ALG).get(z_);
+      F.output(DAE_ALG).get(Z_);
       transform(F.output(DAE_QUAD).begin(),F.output(DAE_QUAD).end(),output(INTEGRATOR_QF).begin(),output(INTEGRATOR_QF).begin(),std::plus<double>());
 
       // Advance time
@@ -118,7 +120,7 @@ namespace CasADi{
       // Tape
       if(nrx_>0){
         output(INTEGRATOR_XF).get(x_tape_[k_]);
-        z_.get(z_tape_[k_]);
+        Z_.get(Z_tape_[k_]);
       }
     }
   }
@@ -139,7 +141,7 @@ namespace CasADi{
       // Take step
       G_.input(RDAE_T).set(t_);
       G_.input(RDAE_X).set(x_tape_[k_]);
-      G_.input(RDAE_Z).set(z_tape_[k_]);
+      G_.input(RDAE_Z).set(Z_tape_[k_]);
       G_.input(RDAE_P).set(input(INTEGRATOR_P));
       G_.input(RDAE_RX).set(output(INTEGRATOR_RX0));
       G_.input(RDAE_RZ).set(rz_);
@@ -158,10 +160,13 @@ namespace CasADi{
     // Bring discrete time to the beginning
     k_ = 0;
 
+    // Get consistent initial conditions
+    getAlgebraicGuess();
+
     // Add the first element in the tape
     if(nrx_>0){
       output(INTEGRATOR_XF).get(x_tape_[k_]);
-      z_.get(z_tape_[k_]);
+      Z_.get(Z_tape_[k_]);
     }
   }
 
@@ -173,5 +178,9 @@ namespace CasADi{
     k_ = nk_;
   }
 
+  void RKBaseInternal::getAlgebraicGuess(){
+    casadi_assert(Z_.size()==z_.size());
+    Z_.set(z_);
+  }
 
 } // namespace CasADi
