@@ -90,7 +90,7 @@ namespace CasADi{
     MX xf = x0 + (h_/6)*(k1 + 2*k2 + 2*k3 + k4);
     MX qf = (h_/6)*(k1q + 2*k2q + 2*k3q + k4q);
 
-    // Define discrete time dynamics
+    // Define discrete time dynamics // TODO: Change this and make x_k1, x_k2, x_k3 and x_k4 algebraic outputs
     f_arg[DAE_T] = t;
     f_arg[DAE_X] = x0;
     f_arg[DAE_P] = p;
