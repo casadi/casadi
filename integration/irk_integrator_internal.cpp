@@ -32,14 +32,14 @@
 using namespace std;
 namespace CasADi{
 
-  IRKIntegratorInternal::IRKIntegratorInternal(const FX& f, const FX& g) : FixedStepIntegratorInternal(f,g){
+  IRKIntegratorInternal::IRKIntegratorInternal(const FX& f, const FX& g) : ImplicitFixedStepIntegratorInternal(f,g){
     addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
     setOption("name","unnamed_irk_integrator");
   }
 
   void IRKIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
-    FixedStepIntegratorInternal::deepCopyMembers(already_copied);
+    ImplicitFixedStepIntegratorInternal::deepCopyMembers(already_copied);
   }
 
   IRKIntegratorInternal::~IRKIntegratorInternal(){
@@ -48,7 +48,7 @@ namespace CasADi{
   void IRKIntegratorInternal::init(){
   
     // Call the base class init
-    FixedStepIntegratorInternal::init();
+    ImplicitFixedStepIntegratorInternal::init();
   
   }
 

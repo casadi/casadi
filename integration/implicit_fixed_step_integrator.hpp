@@ -20,18 +20,37 @@
  *
  */
 
-%{
-#include "integration/fixed_step_integrator.hpp"
-#include "integration/implicit_fixed_step_integrator.hpp"
-#include "integration/rk_integrator.hpp"
-#include "integration/irk_integrator.hpp"
-#include "integration/collocation_integrator.hpp"
-#include "integration/integration_tools.hpp"
-%}
+#ifndef IMPLICIT_FIXED_STEP_INTEGRATOR_HPP
+#define IMPLICIT_FIXED_STEP_INTEGRATOR_HPP
 
-%include "integration/fixed_step_integrator.hpp"
-%include "integration/implicit_fixed_step_integrator.hpp"
-%include "integration/rk_integrator.hpp"
-%include "integration/irk_integrator.hpp"
-%include "integration/collocation_integrator.hpp"
-%include "integration/integration_tools.hpp"
+#include "fixed_step_integrator.hpp"
+
+namespace CasADi{
+  
+  class ImplicitFixedStepIntegratorInternal;
+  
+  /**
+     \brief Base class for implicit fixed step integrators
+  
+     \author Joel Andersson
+     \date 2014
+  */
+  class ImplicitFixedStepIntegrator : public FixedStepIntegrator {
+  public:
+    /** \brief  Default constructor */
+    ImplicitFixedStepIntegrator();
+    
+    /// Access functions of the node
+    ImplicitFixedStepIntegratorInternal* operator->();
+
+    /// Access functions of the node
+    const ImplicitFixedStepIntegratorInternal* operator->() const;
+
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
+    
+  };
+
+} // namespace CasADi
+
+#endif //IMPLICIT_FIXED_STEP_INTEGRATOR_HPP

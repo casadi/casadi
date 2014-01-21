@@ -23,7 +23,7 @@
 #ifndef IRK_INTEGRATOR_HPP
 #define IRK_INTEGRATOR_HPP
 
-#include "fixed_step_integrator.hpp"
+#include "implicit_fixed_step_integrator.hpp"
 
 namespace CasADi{
   
@@ -40,7 +40,7 @@ namespace CasADi{
      \author Joel Andersson
      \date 2014
   */
-  class IRKIntegrator : public FixedStepIntegrator{
+  class IRKIntegrator : public ImplicitFixedStepIntegrator{
   public:
     /** \brief  Default constructor */
     IRKIntegrator();

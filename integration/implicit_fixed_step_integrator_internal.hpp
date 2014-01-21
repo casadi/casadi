@@ -20,54 +20,47 @@
  *
  */
 
-#ifndef IRK_INTEGRATOR_INTERNAL_HPP
-#define IRK_INTEGRATOR_INTERNAL_HPP
+#ifndef IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#define IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
 
-#include "irk_integrator.hpp"
-#include "implicit_fixed_step_integrator_internal.hpp"
+#include "implicit_fixed_step_integrator.hpp"
+#include "fixed_step_integrator_internal.hpp"
 #include "symbolic/fx/mx_function.hpp"
 #include "symbolic/fx/implicit_function.hpp"
-#include "integration_tools.hpp"
 
 namespace CasADi{
     
-  class IRKIntegratorInternal : public ImplicitFixedStepIntegratorInternal{
+  class ImplicitFixedStepIntegratorInternal : public FixedStepIntegratorInternal{
   public:
   
     /// Constructor
-    explicit IRKIntegratorInternal(const FX& f, const FX& g);
+    explicit ImplicitFixedStepIntegratorInternal(const FX& f, const FX& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /// Clone
-    virtual IRKIntegratorInternal* clone() const{ return new IRKIntegratorInternal(*this);}
+    virtual ImplicitFixedStepIntegratorInternal* clone() const = 0;
 
     /// Create a new integrator
-    virtual IRKIntegratorInternal* create(const FX& f, const FX& g) const{ return new IRKIntegratorInternal(f,g);}
+    virtual ImplicitFixedStepIntegratorInternal* create(const FX& f, const FX& g) const = 0;
   
     /// Destructor
-    virtual ~IRKIntegratorInternal();
+    virtual ~ImplicitFixedStepIntegratorInternal();
 
     /// Initialize stage
     virtual void init();
 
-    /// Setup F and G
-    virtual void setupFG();
-  
-    // Return zero if smaller than machine epsilon
-    static double zeroIfSmall(double x);
+    /// Get explicit dynamics
+    virtual FX& getExplicit(){ return implicit_solver_;}
 
-    /// Get initial guess for the algebraic variable
-    virtual void calculateInitialConditions();
+    /// Get explicit dynamics (backward problem)
+    virtual FX& getExplicitB(){ return backward_implicit_solver_;}
 
-    /// Get initial guess for the algebraic variable (backward problem)
-    virtual void calculateBackwardInitialConditions();
-
-    // Interpolation order
-    int deg_;
+    // Implicit function solver
+    ImplicitFunction implicit_solver_, backward_implicit_solver_;
   };
 
 } // namespace CasADi
 
-#endif //IRK_INTEGRATOR_INTERNAL_HPP
+#endif //IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP

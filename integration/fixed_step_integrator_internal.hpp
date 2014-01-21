@@ -31,7 +31,6 @@
 namespace CasADi{
     
   class FixedStepIntegratorInternal : public IntegratorInternal{
-
   public:
   
     /// Constructor
@@ -73,8 +72,11 @@ namespace CasADi{
     /// Get initial guess for the algebraic variable (backward problem)
     virtual void calculateBackwardInitialConditions();
 
-    // Implicit function solver
-    ImplicitFunction implicit_solver_, backward_implicit_solver_;
+    /// Get explicit dynamics
+    virtual FX& getExplicit(){ return F_;}
+
+    /// Get explicit dynamics (backward problem)
+    virtual FX& getExplicitB(){ return G_;}
 
     // Discrete time dynamics
     FX F_, G_;

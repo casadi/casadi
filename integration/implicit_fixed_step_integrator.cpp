@@ -20,18 +20,25 @@
  *
  */
 
-%{
-#include "integration/fixed_step_integrator.hpp"
-#include "integration/implicit_fixed_step_integrator.hpp"
-#include "integration/rk_integrator.hpp"
-#include "integration/irk_integrator.hpp"
-#include "integration/collocation_integrator.hpp"
-#include "integration/integration_tools.hpp"
-%}
+#include "implicit_fixed_step_integrator_internal.hpp"
 
-%include "integration/fixed_step_integrator.hpp"
-%include "integration/implicit_fixed_step_integrator.hpp"
-%include "integration/rk_integrator.hpp"
-%include "integration/irk_integrator.hpp"
-%include "integration/collocation_integrator.hpp"
-%include "integration/integration_tools.hpp"
+using namespace std;
+
+namespace CasADi{
+
+  ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(){
+  }
+  
+  ImplicitFixedStepIntegratorInternal* ImplicitFixedStepIntegrator::operator->(){
+    return static_cast<ImplicitFixedStepIntegratorInternal*>(Integrator::operator->());
+  }
+
+  const ImplicitFixedStepIntegratorInternal* ImplicitFixedStepIntegrator::operator->() const{
+    return static_cast<const ImplicitFixedStepIntegratorInternal*>(Integrator::operator->());
+  }
+    
+  bool ImplicitFixedStepIntegrator::checkNode() const{
+    return dynamic_cast<const ImplicitFixedStepIntegratorInternal*>(get())!=0;
+  }
+
+} // namespace CasADi

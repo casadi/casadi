@@ -33,13 +33,10 @@ namespace CasADi{
 
   FixedStepIntegratorInternal::FixedStepIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
-    addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(), "An implicit function solver");
-    addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   }
 
   void FixedStepIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){    
     IntegratorInternal::deepCopyMembers(already_copied);
-    implicit_solver_ = deepcopy(implicit_solver_,already_copied);
   }
 
   FixedStepIntegratorInternal::~FixedStepIntegratorInternal(){
@@ -68,50 +65,6 @@ namespace CasADi{
       x_tape_.resize(nk_+1,vector<double>(nx_));
       Z_tape_.resize(nk_,vector<double>(nZ_));
     }
-
-    // Allocate a root-finding solver for the forward problem
-    if(nZ_>0){
-
-      // Get the NLP creator function
-      implicitFunctionCreator implicit_function_creator = getOption("implicit_solver");
-  
-      // Allocate an NLP solver
-      implicit_solver_ = implicit_function_creator(F_,FX(),LinearSolver());
-      implicit_solver_.setOption("name",string(getOption("name")) + "_implicit_solver");
-      implicit_solver_.setOption("implicit_input",DAE_Z);
-      implicit_solver_.setOption("implicit_output",DAE_ALG);
-    
-      // Pass options
-      if(hasSetOption("implicit_solver_options")){
-        const Dictionary& implicit_solver_options = getOption("implicit_solver_options");
-        implicit_solver_.setOption(implicit_solver_options);
-      }
-  
-      // Initialize the solver
-      implicit_solver_.init();
-    }
-
-    // Allocate a root-finding solver for the backward problem
-    if(nRZ_>0){
-
-      // Get the NLP creator function
-      implicitFunctionCreator backward_implicit_function_creator = getOption("implicit_solver");
-  
-      // Allocate an NLP solver
-      backward_implicit_solver_ = backward_implicit_function_creator(G_,FX(),LinearSolver());
-      backward_implicit_solver_.setOption("name",string(getOption("name")) + "_backward_implicit_solver");
-      backward_implicit_solver_.setOption("implicit_input",RDAE_RZ);
-      backward_implicit_solver_.setOption("implicit_output",RDAE_ALG);
-    
-      // Pass options
-      if(hasSetOption("implicit_solver_options")){
-        const Dictionary& backward_implicit_solver_options = getOption("implicit_solver_options");
-        backward_implicit_solver_.setOption(backward_implicit_solver_options);
-      }
-  
-      // Initialize the solver
-      backward_implicit_solver_.init();
-    }
   }
 
   void FixedStepIntegratorInternal::integrate(double t_out){
@@ -121,7 +74,7 @@ namespace CasADi{
     casadi_assert(k_out>=0);
 
     // Explicit discrete time dynamics
-    FX& F = nZ_>0 ? implicit_solver_ : F_;
+    FX& F = getExplicit();
 
     // Take time steps until end time has been reached
     while(k_<k_out){
@@ -154,7 +107,7 @@ namespace CasADi{
     casadi_assert(k_out<=nk_);
 
     // Explicit discrete time dynamics
-    FX& G = nRZ_>0 ? backward_implicit_solver_ : G_;
+    FX& G = getExplicitB();
 
     // Take time steps until end time has been reached
     while(k_>k_out){
@@ -213,5 +166,6 @@ namespace CasADi{
     casadi_assert(RZ_.size()==rz_.size());
     RZ_.set(rz_);
   }
+
 
 } // namespace CasADi
