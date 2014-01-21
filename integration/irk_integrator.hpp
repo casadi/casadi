@@ -23,14 +23,14 @@
 #ifndef IRK_INTEGRATOR_HPP
 #define IRK_INTEGRATOR_HPP
 
-#include "rk_base.hpp"
+#include "fixed_step_integrator.hpp"
 
 namespace CasADi{
   
   class IRKIntegratorInternal;
   
   /**
-     \brief Implicit Runge-Kutta integrator
+     \brief Fixed-step implicit Runge-Kutta integrator
      ODE/DAE integrator based on collocation schemes
   
      The method is still under development
@@ -40,7 +40,7 @@ namespace CasADi{
      \author Joel Andersson
      \date 2014
   */
-  class IRKIntegrator : public RKBase{
+  class IRKIntegrator : public FixedStepIntegrator{
   public:
     /** \brief  Default constructor */
     IRKIntegrator();

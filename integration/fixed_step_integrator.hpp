@@ -20,25 +20,37 @@
  *
  */
 
-#include "rk_base_internal.hpp"
+#ifndef FIXED_STEP_INTEGRATOR_HPP
+#define FIXED_STEP_INTEGRATOR_HPP
 
-using namespace std;
+#include "symbolic/fx/integrator.hpp"
 
 namespace CasADi{
-
-  RKBase::RKBase(){
-  }
   
-  RKBaseInternal* RKBase::operator->(){
-    return static_cast<RKBaseInternal*>(Integrator::operator->());
-  }
-
-  const RKBaseInternal* RKBase::operator->() const{
-    return static_cast<const RKBaseInternal*>(Integrator::operator->());
-  }
+  class FixedStepIntegratorInternal;
+  
+  /**
+     \brief Base class for fixed step integrators
+  
+     \author Joel Andersson
+     \date 2014
+  */
+  class FixedStepIntegrator : public Integrator {
+  public:
+    /** \brief  Default constructor */
+    FixedStepIntegrator();
     
-  bool RKBase::checkNode() const{
-    return dynamic_cast<const RKBaseInternal*>(get())!=0;
-  }
+    /// Access functions of the node
+    FixedStepIntegratorInternal* operator->();
+
+    /// Access functions of the node
+    const FixedStepIntegratorInternal* operator->() const;
+
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
+    
+  };
 
 } // namespace CasADi
+
+#endif //FIXED_STEP_INTEGRATOR_HPP

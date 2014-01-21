@@ -20,7 +20,7 @@
  *
  */
 
-#include "rk_base_internal.hpp"
+#include "fixed_step_integrator_internal.hpp"
 #include "symbolic/stl_vector_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
@@ -31,21 +31,21 @@
 using namespace std;
 namespace CasADi{
 
-  RKBaseInternal::RKBaseInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
+  FixedStepIntegratorInternal::FixedStepIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
     addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(), "An implicit function solver");
     addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   }
 
-  void RKBaseInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){    
+  void FixedStepIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){    
     IntegratorInternal::deepCopyMembers(already_copied);
     implicit_solver_ = deepcopy(implicit_solver_,already_copied);
   }
 
-  RKBaseInternal::~RKBaseInternal(){
+  FixedStepIntegratorInternal::~FixedStepIntegratorInternal(){
   }
 
-  void RKBaseInternal::init(){
+  void FixedStepIntegratorInternal::init(){
     // Call the base class init
     IntegratorInternal::init();
   
@@ -114,7 +114,7 @@ namespace CasADi{
     }
   }
 
-  void RKBaseInternal::integrate(double t_out){
+  void FixedStepIntegratorInternal::integrate(double t_out){
     // Get discrete time sought
     int k_out = std::ceil((t_out-t0_)/h_);
     k_out = std::min(k_out,nk_); //  make sure that rounding errors does not result in k_out>nk_
@@ -147,7 +147,7 @@ namespace CasADi{
     }
   }
 
-  void RKBaseInternal::integrateB(double t_out){
+  void FixedStepIntegratorInternal::integrateB(double t_out){
     // Get discrete time sought
     int k_out = std::floor((t_out-t0_)/h_);
     k_out = std::max(k_out,0); //  make sure that rounding errors does not result in k_out>nk_
@@ -177,7 +177,7 @@ namespace CasADi{
     }
   }
 
-  void RKBaseInternal::reset(){
+  void FixedStepIntegratorInternal::reset(){
     // Reset the base classes
     IntegratorInternal::reset();
 
@@ -193,7 +193,7 @@ namespace CasADi{
     }
   }
 
-  void RKBaseInternal::resetB(){
+  void FixedStepIntegratorInternal::resetB(){
     // Reset the base classes
     IntegratorInternal::resetB();
 
@@ -204,12 +204,12 @@ namespace CasADi{
     calculateBackwardInitialConditions();
   }
 
-  void RKBaseInternal::calculateInitialConditions(){
+  void FixedStepIntegratorInternal::calculateInitialConditions(){
     casadi_assert(Z_.size()==z_.size());
     Z_.set(z_);
   }
 
-  void RKBaseInternal::calculateBackwardInitialConditions(){
+  void FixedStepIntegratorInternal::calculateBackwardInitialConditions(){
     casadi_assert(RZ_.size()==rz_.size());
     RZ_.set(rz_);
   }

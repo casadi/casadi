@@ -24,14 +24,14 @@
 #define IRK_INTEGRATOR_INTERNAL_HPP
 
 #include "irk_integrator.hpp"
-#include "rk_base_internal.hpp"
+#include "fixed_step_integrator_internal.hpp"
 #include "symbolic/fx/mx_function.hpp"
 #include "symbolic/fx/implicit_function.hpp"
 #include "integration_tools.hpp"
 
 namespace CasADi{
     
-  class IRKIntegratorInternal : public RKBaseInternal{
+  class IRKIntegratorInternal : public FixedStepIntegratorInternal{
   public:
   
     /// Constructor

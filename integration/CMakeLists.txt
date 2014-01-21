@@ -1,23 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
 SET(INTEGRATION_SRCS
-  rk_base.hpp
-  rk_base.cpp
-  rk_base_internal.hpp
-  rk_base_internal.cpp
-  collocation_integrator.hpp
-  collocation_integrator.cpp
-  collocation_integrator_internal.hpp
-  collocation_integrator_internal.cpp
-  rk_integrator.hpp
-  rk_integrator.cpp
-  rk_integrator_internal.hpp
-  rk_integrator_internal.cpp
-  irk_integrator.hpp
-  irk_integrator.cpp
-  irk_integrator_internal.hpp
-  irk_integrator_internal.cpp
-  integration_tools.cpp
-  integration_tools.hpp
+  fixed_step_integrator.hpp     fixed_step_integrator.cpp    fixed_step_integrator_internal.hpp     fixed_step_integrator_internal.cpp
+  collocation_integrator.hpp    collocation_integrator.cpp   collocation_integrator_internal.hpp    collocation_integrator_internal.cpp
+  rk_integrator.hpp             rk_integrator.cpp            rk_integrator_internal.hpp             rk_integrator_internal.cpp
+  irk_integrator.hpp            irk_integrator.cpp           irk_integrator_internal.hpp            irk_integrator_internal.cpp
+  integration_tools.cpp         integration_tools.hpp
 )
 
 if(ENABLE_STATIC)

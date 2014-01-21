@@ -24,11 +24,11 @@
 #define RK_INTEGRATOR_INTERNAL_HPP
 
 #include "rk_integrator.hpp"
-#include "rk_base_internal.hpp"
+#include "fixed_step_integrator_internal.hpp"
 
 namespace CasADi{
     
-  class RKIntegratorInternal : public RKBaseInternal{
+  class RKIntegratorInternal : public FixedStepIntegratorInternal{
   public:
   
     /// Constructor

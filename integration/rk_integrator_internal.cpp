@@ -26,11 +26,11 @@
 using namespace std;
 namespace CasADi{
 
-  RKIntegratorInternal::RKIntegratorInternal(const FX& f, const FX& g) : RKBaseInternal(f,g){
+  RKIntegratorInternal::RKIntegratorInternal(const FX& f, const FX& g) : FixedStepIntegratorInternal(f,g){
   }
 
   void RKIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
-    RKBaseInternal::deepCopyMembers(already_copied);
+    FixedStepIntegratorInternal::deepCopyMembers(already_copied);
   }
 
   RKIntegratorInternal::~RKIntegratorInternal(){
@@ -38,7 +38,7 @@ namespace CasADi{
 
   void RKIntegratorInternal::init(){
     // Call the base class init
-    RKBaseInternal::init();
+    FixedStepIntegratorInternal::init();
 
     // Algebraic variables not (yet?) supported
     casadi_assert_message(nz_==0 && nrz_==0, "Explicit Runge-Kutta integrators do not support algebraic variables");

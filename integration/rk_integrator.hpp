@@ -23,13 +23,13 @@
 #ifndef RK_INTEGRATOR_HPP
 #define RK_INTEGRATOR_HPP
 
-#include "rk_base.hpp"
+#include "fixed_step_integrator.hpp"
 
 namespace CasADi{
   
   class RKIntegratorInternal;
   
-  /** \brief Fixed-step Explicit Runge-Kutta integrator for ODEs
+  /** \brief Fixed-step explicit Runge-Kutta integrator for ODEs
       Currently implements RK4.
 
       The method is still under development
@@ -37,7 +37,7 @@ namespace CasADi{
       \author Joel Andersson
       \date 2011-2014
   */
-  class RKIntegrator : public RKBase {
+  class RKIntegrator : public FixedStepIntegrator {
   public:
     /** \brief  Default constructor */
     RKIntegrator();

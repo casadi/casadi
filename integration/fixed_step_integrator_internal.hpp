@@ -20,34 +20,34 @@
  *
  */
 
-#ifndef RK_BASE_INTERNAL_HPP
-#define RK_BASE_INTERNAL_HPP
+#ifndef FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#define FIXED_STEP_INTEGRATOR_INTERNAL_HPP
 
-#include "rk_base.hpp"
+#include "fixed_step_integrator.hpp"
 #include "symbolic/fx/integrator_internal.hpp"
 #include "symbolic/fx/mx_function.hpp"
 #include "symbolic/fx/implicit_function.hpp"
 
 namespace CasADi{
     
-  class RKBaseInternal : public IntegratorInternal{
+  class FixedStepIntegratorInternal : public IntegratorInternal{
 
   public:
   
     /// Constructor
-    explicit RKBaseInternal(const FX& f, const FX& g);
+    explicit FixedStepIntegratorInternal(const FX& f, const FX& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /// Clone
-    virtual RKBaseInternal* clone() const = 0;
+    virtual FixedStepIntegratorInternal* clone() const = 0;
 
     /// Create a new integrator
-    virtual RKBaseInternal* create(const FX& f, const FX& g) const = 0;
+    virtual FixedStepIntegratorInternal* create(const FX& f, const FX& g) const = 0;
   
     /// Destructor
-    virtual ~RKBaseInternal();
+    virtual ~FixedStepIntegratorInternal();
 
     /// Initialize stage
     virtual void init();
@@ -100,4 +100,4 @@ namespace CasADi{
 
 } // namespace CasADi
 
-#endif //RK_BASE_INTERNAL_HPP
+#endif //FIXED_STEP_INTEGRATOR_INTERNAL_HPP
