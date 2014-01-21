@@ -112,7 +112,6 @@ namespace CasADi{
     // Collocated states
     vector<MX> x(deg_+1), z(deg_+1);
     for(int d=1; d<=deg_; ++d){
-      //for(int d=deg_; d>=1; --d){
       x[d] = *vv_it++;
       z[d] = *vv_it++;
     }
@@ -280,7 +279,7 @@ namespace CasADi{
     casadi_assert(Z_it==Z_.end());
   }
 
-  void IRKIntegratorInternal::calculateBackwardInitialConditions(){
+  void IRKIntegratorInternal::calculateInitialConditionsB(){
     vector<double>::const_iterator rx0_it = input(INTEGRATOR_RX0).begin();
     vector<double>::const_iterator rz_it = rz_.begin();
     vector<double>::iterator RZ_it = RZ_.begin();

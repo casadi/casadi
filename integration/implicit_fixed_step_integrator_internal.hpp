@@ -25,7 +25,6 @@
 
 #include "implicit_fixed_step_integrator.hpp"
 #include "fixed_step_integrator_internal.hpp"
-#include "symbolic/fx/mx_function.hpp"
 #include "symbolic/fx/implicit_function.hpp"
 
 namespace CasADi{

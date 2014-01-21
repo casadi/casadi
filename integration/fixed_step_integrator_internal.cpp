@@ -154,17 +154,15 @@ namespace CasADi{
     k_ = nk_;
 
     // Get consistent initial conditions
-    calculateBackwardInitialConditions();
+    calculateInitialConditionsB();
   }
 
   void FixedStepIntegratorInternal::calculateInitialConditions(){
-    casadi_assert(Z_.size()==z_.size());
-    Z_.set(z_);
+    Z_.set(numeric_limits<double>::quiet_NaN());
   }
 
-  void FixedStepIntegratorInternal::calculateBackwardInitialConditions(){
-    casadi_assert(RZ_.size()==rz_.size());
-    RZ_.set(rz_);
+  void FixedStepIntegratorInternal::calculateInitialConditionsB(){
+    RZ_.set(numeric_limits<double>::quiet_NaN());
   }
 
 

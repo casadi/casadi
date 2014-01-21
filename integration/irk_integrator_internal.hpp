@@ -62,7 +62,7 @@ namespace CasADi{
     virtual void calculateInitialConditions();
 
     /// Get initial guess for the algebraic variable (backward problem)
-    virtual void calculateBackwardInitialConditions();
+    virtual void calculateInitialConditionsB();
 
     // Interpolation order
     int deg_;

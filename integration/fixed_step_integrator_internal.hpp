@@ -26,7 +26,6 @@
 #include "fixed_step_integrator.hpp"
 #include "symbolic/fx/integrator_internal.hpp"
 #include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/implicit_function.hpp"
 
 namespace CasADi{
     
@@ -70,7 +69,7 @@ namespace CasADi{
     virtual void calculateInitialConditions();
 
     /// Get initial guess for the algebraic variable (backward problem)
-    virtual void calculateBackwardInitialConditions();
+    virtual void calculateInitialConditionsB();
 
     /// Get explicit dynamics
     virtual FX& getExplicit(){ return F_;}
