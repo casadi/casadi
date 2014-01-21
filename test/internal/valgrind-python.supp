@@ -509,3 +509,38 @@
    fun:PyGrammar_RemoveAccelerators
    fun:Py_Finalize
 }
+
+{
+   leak in numpy 1:1.7.1-3
+   Memcheck:Leak
+   fun:malloc
+   fun:initialize_builtin_datetime_metadata
+   fun:initmultiarray
+   fun:_PyImport_LoadDynamicModule
+   obj:/usr/bin/python2.7
+   obj:/usr/bin/python2.7
+   obj:/usr/bin/python2.7
+   obj:/usr/bin/python2.7
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+
+{
+   leak2 in numpy 1:1.7.1-3
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/pyshared/python2.7/numpy/lib/_compiled_base.so
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.7
+   obj:/usr/bin/python2.7
+   obj:/usr/bin/python2.7
+   obj:/usr/bin/python2.7
+   obj:/usr/bin/python2.7
+   fun:PyEval_CallObjectWithKeywords
+   fun:PyEval_EvalFrameEx
+}
+
