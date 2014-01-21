@@ -20,14 +20,14 @@
  *
  */
 
-#ifndef COLLOCATION_INTEGRATOR_HPP
-#define COLLOCATION_INTEGRATOR_HPP
+#ifndef OLD_COLLOCATION_INTEGRATOR_HPP
+#define OLD_COLLOCATION_INTEGRATOR_HPP
 
 #include "symbolic/fx/integrator.hpp"
 
 namespace CasADi{
   
-  class CollocationIntegratorInternal;
+  class OldCollocationIntegratorInternal;
   
   /**
      \brief Collocation integrator
@@ -40,10 +40,10 @@ namespace CasADi{
      \author Joel Andersson
      \date 2011
   */
-  class CollocationIntegrator : public Integrator {
+  class OldCollocationIntegrator : public Integrator {
   public:
     /** \brief  Default constructor */
-    CollocationIntegrator();
+    OldCollocationIntegrator();
     
     /** \brief  Create an integrator for explicit ODEs
      *   \param f dynamical system
@@ -53,12 +53,12 @@ namespace CasADi{
      * \copydoc scheme_RDAEInput
      * \copydoc scheme_RDAEOutput
      */
-    explicit CollocationIntegrator(const FX& f, const FX& g=FX());
+    explicit OldCollocationIntegrator(const FX& f, const FX& g=FX());
 
     //@{
     /// Access functions of the node
-    CollocationIntegratorInternal* operator->();
-    const CollocationIntegratorInternal* operator->() const;
+    OldCollocationIntegratorInternal* operator->();
+    const OldCollocationIntegratorInternal* operator->() const;
     //@}
 
     /// Check if the node is pointing to the right type of object
@@ -68,7 +68,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static Integrator creator(const FX& f, const FX& g){ return CollocationIntegrator(f,g);}
+    static Integrator creator(const FX& f, const FX& g){ return OldCollocationIntegrator(f,g);}
 #ifdef SWIG
     %nocallback;
 #endif
@@ -76,4 +76,4 @@ namespace CasADi{
 
 } // namespace CasADi
 
-#endif //COLLOCATION_INTEGRATOR_HPP
+#endif //OLD_COLLOCATION_INTEGRATOR_HPP

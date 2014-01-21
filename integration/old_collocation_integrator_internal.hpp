@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef COLLOCATION_INTEGRATOR_INTERNAL_HPP
-#define COLLOCATION_INTEGRATOR_INTERNAL_HPP
+#ifndef OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP
+#define OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP
 
-#include "collocation_integrator.hpp"
+#include "old_collocation_integrator.hpp"
 #include "symbolic/fx/integrator_internal.hpp"
 #include "symbolic/fx/mx_function.hpp"
 #include "symbolic/fx/implicit_function.hpp"
@@ -31,24 +31,24 @@
 
 namespace CasADi{
     
-  class CollocationIntegratorInternal : public IntegratorInternal{
+  class OldCollocationIntegratorInternal : public IntegratorInternal{
   
   public:
   
     /// Constructor
-    explicit CollocationIntegratorInternal(const FX& f, const FX& g);
+    explicit OldCollocationIntegratorInternal(const FX& f, const FX& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /// Clone
-    virtual CollocationIntegratorInternal* clone() const{ return new CollocationIntegratorInternal(*this);}
+    virtual OldCollocationIntegratorInternal* clone() const{ return new OldCollocationIntegratorInternal(*this);}
 
     /// Create a new integrator
-    virtual CollocationIntegratorInternal* create(const FX& f, const FX& g) const{ return new CollocationIntegratorInternal(f,g);}
+    virtual OldCollocationIntegratorInternal* create(const FX& f, const FX& g) const{ return new OldCollocationIntegratorInternal(f,g);}
   
     /// Destructor
-    virtual ~CollocationIntegratorInternal();
+    virtual ~OldCollocationIntegratorInternal();
 
     /// Initialize stage
     virtual void init();
@@ -84,4 +84,4 @@ namespace CasADi{
 
 } // namespace CasADi
 
-#endif //COLLOCATION_INTEGRATOR_INTERNAL_HPP
+#endif //OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP

@@ -26,7 +26,7 @@ from copy import deepcopy
 print "Testing sensitivity analysis in CasADi"
 
 # All ODE and DAE integrators to be tested
-DAE_integrators = [CollocationIntegrator,IdasIntegrator]
+DAE_integrators = [OldCollocationIntegrator,IdasIntegrator]
 ODE_integrators = DAE_integrators + [CVodesIntegrator,RKIntegrator]
 
 for Integrators in (ODE_integrators,DAE_integrators):    
@@ -114,7 +114,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     
     # Integrator options
     I.setOption("tf",tf)
-    if MyIntegrator==CollocationIntegrator:
+    if MyIntegrator==OldCollocationIntegrator:
       I.setOption("implicit_solver",KinsolSolver)
       I.setOption("implicit_solver_options",{"linear_solver":CSparse})
       I.setOption("expand_f",True)

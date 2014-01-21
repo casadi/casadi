@@ -20,29 +20,29 @@
  *
  */
 
-#include "collocation_integrator_internal.hpp"
+#include "old_collocation_integrator_internal.hpp"
 
 using namespace std;
 
 namespace CasADi{
 
-  CollocationIntegrator::CollocationIntegrator(){
+  OldCollocationIntegrator::OldCollocationIntegrator(){
   }
   
-  CollocationIntegrator::CollocationIntegrator(const FX& f, const FX& g){
-    assignNode(new CollocationIntegratorInternal(f,g));
+  OldCollocationIntegrator::OldCollocationIntegrator(const FX& f, const FX& g){
+    assignNode(new OldCollocationIntegratorInternal(f,g));
   }
 
-  CollocationIntegratorInternal* CollocationIntegrator::operator->(){
-    return static_cast<CollocationIntegratorInternal*>(Integrator::operator->());
+  OldCollocationIntegratorInternal* OldCollocationIntegrator::operator->(){
+    return static_cast<OldCollocationIntegratorInternal*>(Integrator::operator->());
   }
 
-  const CollocationIntegratorInternal* CollocationIntegrator::operator->() const{
-    return static_cast<const CollocationIntegratorInternal*>(Integrator::operator->());
+  const OldCollocationIntegratorInternal* OldCollocationIntegrator::operator->() const{
+    return static_cast<const OldCollocationIntegratorInternal*>(Integrator::operator->());
   }
     
-  bool CollocationIntegrator::checkNode() const{
-    return dynamic_cast<const CollocationIntegratorInternal*>(get())!=0;
+  bool OldCollocationIntegrator::checkNode() const{
+    return dynamic_cast<const OldCollocationIntegratorInternal*>(get())!=0;
   }
 
 } // namespace CasADi

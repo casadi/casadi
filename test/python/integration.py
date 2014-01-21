@@ -47,8 +47,8 @@ try:
 except:
   pass
 
-integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18,"startup_integrator":CVodesIntegrator}))
-#integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":NLPImplicitSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator,"implicit_solver_options": {"nlp_solver": IpoptSolver,"linear_solver_creator": CSparse}}))
+integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18,"startup_integrator":CVodesIntegrator}))
+#integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":NLPImplicitSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator,"implicit_solver_options": {"nlp_solver": IpoptSolver,"linear_solver_creator": CSparse}}))
 #integrators.append((RKIntegrator,["ode"],{"number_of_finite_elements": 1000}))
 
 print "Will test these integrators:"

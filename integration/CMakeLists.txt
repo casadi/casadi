@@ -8,10 +8,10 @@ SET(INTEGRATION_SRCS
   implicit_fixed_step_integrator.cpp
   implicit_fixed_step_integrator_internal.hpp
   implicit_fixed_step_integrator_internal.cpp
-  collocation_integrator.hpp
-  collocation_integrator.cpp
-  collocation_integrator_internal.hpp
-  collocation_integrator_internal.cpp
+  old_collocation_integrator.hpp
+  old_collocation_integrator.cpp
+  old_collocation_integrator_internal.hpp
+  old_collocation_integrator_internal.cpp
   rk_integrator.hpp
   rk_integrator.cpp
   rk_integrator_internal.hpp

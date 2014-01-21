@@ -20,7 +20,7 @@
  *
  */
 
-#include "collocation_integrator_internal.hpp"
+#include "old_collocation_integrator_internal.hpp"
 #include "symbolic/stl_vector_tools.hpp"
 #include "symbolic/polynomial.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
@@ -35,7 +35,7 @@
 using namespace std;
 namespace CasADi{
 
-  CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
+  OldCollocationIntegratorInternal::OldCollocationIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
     addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
@@ -48,19 +48,19 @@ namespace CasADi{
     addOption("quadrature_solver_options",     OT_DICTIONARY, GenericType(), "Options to be passed to the quadrature solver");
     addOption("startup_integrator",            OT_INTEGRATOR,  GenericType(), "An ODE/DAE integrator that can be used to generate a startup trajectory");
     addOption("startup_integrator_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the startup integrator");
-    setOption("name","unnamed_collocation_integrator");
+    setOption("name","unnamed_old_collocation_integrator");
   }
 
-  void CollocationIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void OldCollocationIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     IntegratorInternal::deepCopyMembers(already_copied);
     startup_integrator_ = deepcopy(startup_integrator_,already_copied);
     implicit_solver_ = deepcopy(implicit_solver_,already_copied);
   }
 
-  CollocationIntegratorInternal::~CollocationIntegratorInternal(){
+  OldCollocationIntegratorInternal::~OldCollocationIntegratorInternal(){
   }
 
-  void CollocationIntegratorInternal::init(){
+  void OldCollocationIntegratorInternal::init(){
   
     // Call the base class init
     IntegratorInternal::init();
@@ -386,7 +386,7 @@ namespace CasADi{
     integrated_once_ = false;
   }
   
-  void CollocationIntegratorInternal::reset(){
+  void OldCollocationIntegratorInternal::reset(){
     // Set up timers for profiling
     double time_zero;
     double time_start;
@@ -490,13 +490,13 @@ namespace CasADi{
     integrated_once_ = true;
   }
 
-  void CollocationIntegratorInternal::integrate(double t_out){
+  void OldCollocationIntegratorInternal::integrate(double t_out){
     for(int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind){
       output(oind).set(implicit_solver_.output(1+oind));
     }
   }
 
-  void CollocationIntegratorInternal::integrateB(double t_out){
+  void OldCollocationIntegratorInternal::integrateB(double t_out){
   }
 
 } // namespace CasADi

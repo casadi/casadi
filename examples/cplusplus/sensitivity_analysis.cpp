@@ -23,7 +23,7 @@
 #include <symbolic/casadi.hpp>
 #include <integration/rk_integrator.hpp>
 #include <integration/irk_integrator.hpp>
-#include <integration/collocation_integrator.hpp>
+#include <integration/old_collocation_integrator.hpp>
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/idas_integrator.hpp>
 #include <interfaces/sundials/kinsol_solver.hpp>
@@ -171,8 +171,8 @@ int main(){
         }
         break;
       case COLLOCATION:        
-        cout << endl << "== CollocationIntegrator == " << endl;
-        I = CollocationIntegrator(ffcn);
+        cout << endl << "== OldCollocationIntegrator == " << endl;
+        I = OldCollocationIntegrator(ffcn);
 
         // Set collocation integrator specific options
         I.setOption("expand_f",true);
