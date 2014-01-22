@@ -485,20 +485,6 @@
 \par
 @copydoc scheme_IntegratorInput
 */
-/** \class CasADi::CollocationIntegratorInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::CollocationIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
 /** \class CasADi::PsdIndefDpleInternal
 \n
 \par
@@ -526,20 +512,6 @@
 @copydoc scheme_LPSolverInput
 <br/>
 @copydoc scheme_LPSolverOutput
-*/
-/** \class CasADi::RKBaseInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::RKBase
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
 */
 /** \class CasADi::SDPSDQPInternal
 \n
@@ -695,6 +667,20 @@
 <br/>
 @copydoc scheme_QPSolverOutput
 */
+/** \class CasADi::FixedStepIntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::FixedStepIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
 /** \class CasADi::SimpleIndefDpleInternal
 \n
 \par
@@ -722,6 +708,20 @@
 @copydoc scheme_SDPInput
 <br/>
 @copydoc scheme_SDPOutput
+*/
+/** \class CasADi::StabilizedQPSolverInternal
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/** \class CasADi::StabilizedQPSolver
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
 */
 /** \class CasADi::IdasInternal
 \n
@@ -947,6 +947,20 @@
 <br/>
 @copydoc scheme_LinsolOutput
 */
+/** \class CasADi::OldCollocationIntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::OldCollocationIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
 /** \class CasADi::SDQPSolverInternal
 \n
 \par
@@ -1073,19 +1087,19 @@
 <br/>
 @copydoc scheme_IntegratorOutput
 */
-/** \class CasADi::StabilizedQPSolverInternal
+/** \class CasADi::ImplicitFixedStepIntegratorInternal
 \n
 \par
-@copydoc scheme_StabilizedQPSolverInput
+@copydoc scheme_IntegratorInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_IntegratorOutput
 */
-/** \class CasADi::StabilizedQPSolver
+/** \class CasADi::ImplicitFixedStepIntegrator
 \n
 \par
-@copydoc scheme_StabilizedQPSolverInput
+@copydoc scheme_IntegratorInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_IntegratorOutput
 */
 /** \class CasADi::ControlSimulatorInternal
 \n
