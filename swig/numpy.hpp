@@ -18,8 +18,10 @@
 #define array_data(a)          (((PyArrayObject *)a)->data)
 #define array_is_contiguous(a) (PyArray_ISCONTIGUOUS(a))
 #define array_is_native(a)     (PyArray_ISNOTSWAPPED(a))
+#ifndef PyArray_CHKFLAGS
 #define PyArray_CHKFLAGS(m, FLAGS) \
 	((((PyArrayObject *)(m))->flags & (FLAGS)) == (FLAGS))
+#endif
 	
 /* Support older NumPy data type names
 */
