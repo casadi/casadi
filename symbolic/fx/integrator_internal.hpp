@@ -97,6 +97,12 @@ namespace CasADi{
   
     // Get offsets in augmented problem
     AugOffset getAugOffset(int nfwd, int nadj);
+
+    // Create sparsity pattern of the extended Jacobian (forward problem)
+    CRSSparsity spJacF();
+
+    // Create sparsity pattern of the extended Jacobian (backward problem)
+    CRSSparsity spJacG();
   
     /// Integration horizon
     double t0_, tf_;
@@ -112,6 +118,9 @@ namespace CasADi{
 
     /// Algebraic variable
     DMatrix z_, rz_;
+
+    /// Integrator for sparsity pattern propagation
+    LinearSolver linsol_f_, linsol_g_;
   };
   
 } // namespace CasADi

@@ -157,12 +157,22 @@ namespace CasADi{
     // read options
     t0_ = getOption("t0");
     tf_ = getOption("tf");
+
+    // Form a linear solver for the sparsity propagation
+    linsol_f_ = LinearSolver(spJacF());
+    linsol_f_.init();
+    if(!g_.isNull()){
+      linsol_g_ = LinearSolver(spJacG());
+      linsol_g_.init();
+    }
   }
 
   void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     FXInternal::deepCopyMembers(already_copied);
     f_ = deepcopy(f_,already_copied);
     g_ = deepcopy(g_,already_copied);
+    linsol_f_ = deepcopy(linsol_f_,already_copied);
+    linsol_g_ = deepcopy(linsol_g_,already_copied);
   }
 
   std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj, AugOffset& offset){
@@ -445,6 +455,87 @@ namespace CasADi{
 
   void IntegratorInternal::spEvaluate(bool fwd){
     log("IntegratorInternal::spEvaluate","begin");
+    
+    // Get pointers to integrator data structures
+    bvec_t *x0, *p, *rx0, *rp, *xf, *qf, *rxf, *rqf;
+    x0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_X0).ptr());
+    p = reinterpret_cast<bvec_t*>(input(INTEGRATOR_P).ptr());
+    rx0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_RX0).ptr());
+    rp = reinterpret_cast<bvec_t*>(input(INTEGRATOR_RP).ptr());
+    xf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_XF).ptr());
+    qf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_QF).ptr());
+    rxf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_RXF).ptr());
+    rqf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_RQF).ptr());
+    
+    // Get pointers to DAE callback data structures
+    bvec_t *f_t, *f_x, *f_z, *f_p, *f_ode, *f_alg, *f_quad;
+    f_t = reinterpret_cast<bvec_t*>(f_.input(DAE_T).ptr());
+    f_x = reinterpret_cast<bvec_t*>(f_.input(DAE_X).ptr());
+    f_z = reinterpret_cast<bvec_t*>(f_.input(DAE_Z).ptr());
+    f_p = reinterpret_cast<bvec_t*>(f_.input(DAE_P).ptr());
+    f_ode = reinterpret_cast<bvec_t*>(f_.output(DAE_ODE).ptr());
+    f_alg = reinterpret_cast<bvec_t*>(f_.output(DAE_ALG).ptr());
+    f_quad = reinterpret_cast<bvec_t*>(f_.output(DAE_QUAD).ptr());
+    
+    // Get pointers to DAE callback data structures (backward problem)
+    bvec_t *g_t, *g_x, *g_z, *g_p, *g_rx, *g_rz, *g_rp, *g_ode, *g_alg, *g_quad;
+    if(!g_.isNull()){
+      g_t = reinterpret_cast<bvec_t*>(g_.input(RDAE_T).ptr());
+      g_x = reinterpret_cast<bvec_t*>(g_.input(RDAE_X).ptr());
+      g_z = reinterpret_cast<bvec_t*>(g_.input(RDAE_Z).ptr());
+      g_p = reinterpret_cast<bvec_t*>(g_.input(RDAE_P).ptr());
+      g_rx = reinterpret_cast<bvec_t*>(g_.input(RDAE_RX).ptr());
+      g_rz = reinterpret_cast<bvec_t*>(g_.input(RDAE_RZ).ptr());
+      g_rp = reinterpret_cast<bvec_t*>(g_.input(RDAE_RP).ptr());
+      g_ode = reinterpret_cast<bvec_t*>(g_.output(RDAE_ODE).ptr());
+      g_alg = reinterpret_cast<bvec_t*>(g_.output(RDAE_ALG).ptr());
+      g_quad = reinterpret_cast<bvec_t*>(g_.output(RDAE_QUAD).ptr());
+    }
+
+    // Temporary vectors
+    bvec_t *tmp_f1, *tmp_f2, *tmp_g1, *tmp_g2;
+    tmp_f1 = reinterpret_cast<bvec_t*>(linsol_f_.input(LINSOL_B).ptr());
+    tmp_f2 = reinterpret_cast<bvec_t*>(linsol_f_.output(LINSOL_X).ptr());
+    if(!g_.isNull()){
+      tmp_g1 = reinterpret_cast<bvec_t*>(linsol_g_.input(LINSOL_B).ptr());
+      tmp_g2 = reinterpret_cast<bvec_t*>(linsol_g_.output(LINSOL_X).ptr());
+    }
+
+    if(fwd){
+      // Propagate through the DAE
+      if(f_t!=0) *f_t = 0;
+      std::copy(x0,x0+nx_,f_x);
+      std::copy(p,p+np_,f_p);
+      std::fill(f_z,f_z+nz_,0);
+      f_.spInit(true);
+      f_.spEvaluate(true);
+      
+      // Propagate interdependencies
+      std::copy(f_ode,f_ode+nx_,tmp_f1);
+      std::copy(f_alg,f_alg+nz_,tmp_f1+nx_);
+      std::fill(tmp_f2,tmp_f2+nx_+nz_,0);
+      linsol_f_.spSolve(tmp_f2,tmp_f1,true);
+      std::copy(tmp_f2,tmp_f2+nx_,xf);
+      
+      // Get influence on the quadratures
+      if(nq_>0){
+        std::copy(tmp_f2,tmp_f2+nx_,f_x);
+        std::copy(tmp_f2+nx_,tmp_f2+nx_+nz_,f_z);
+        f_.spEvaluate(true);
+        std::copy(f_quad,f_quad+nq_,qf);
+      }
+      
+      
+    }
+
+
+
+
+
+
+
+
+
     /**  This is a bit better than the FXInternal implementation: XF and QF never depend on RX0 and RP, 
      *   i.e. the worst-case structure of the Jacobian is:
      *        x0  p rx0 rp
@@ -791,6 +882,44 @@ namespace CasADi{
   void IntegratorInternal::setDerivativeOptions(Integrator& integrator, const AugOffset& offset){
     // Copy all options
     integrator.setOption(dictionary());
+  }
+
+  CRSSparsity IntegratorInternal::spJacF(){
+    // Start with the sparsity pattern of the ODE part
+    CRSSparsity ret = f_.jacSparsity(DAE_X,DAE_ODE);
+    
+    // Add diagonal to get interdependencies
+    ret = ret.patternUnion(sp_diag(nx_));
+
+    // Quick return if no algebraic variables
+    if(nz_==0) return ret;
+
+    // Add contribution from algebraic variables and equations
+    CRSSparsity jac_ode_z = f_.jacSparsity(DAE_Z,DAE_ODE);
+    CRSSparsity jac_alg_x = f_.jacSparsity(DAE_X,DAE_ALG);
+    CRSSparsity jac_alg_z = f_.jacSparsity(DAE_Z,DAE_ALG);
+    ret = horzcat(ret,jac_ode_z);
+    ret.append(horzcat(jac_alg_x,jac_alg_z));
+    return ret;
+  }
+
+  CRSSparsity IntegratorInternal::spJacG(){
+    // Start with the sparsity pattern of the ODE part
+    CRSSparsity ret = g_.jacSparsity(RDAE_RX,RDAE_ODE);
+    
+    // Add diagonal to get interdependencies
+    ret = ret.patternUnion(sp_diag(nrx_));
+
+    // Quick return if no algebraic variables
+    if(nrz_==0) return ret;
+
+    // Add contribution from algebraic variables and equations
+    CRSSparsity jac_ode_z = g_.jacSparsity(RDAE_RZ,RDAE_ODE);
+    CRSSparsity jac_alg_x = g_.jacSparsity(RDAE_RX,RDAE_ALG);
+    CRSSparsity jac_alg_z = g_.jacSparsity(RDAE_RZ,RDAE_ALG);
+    ret = horzcat(ret,jac_ode_z);
+    ret.append(horzcat(jac_alg_x,jac_alg_z));
+    return ret;
   }
 
 } // namespace CasADi
