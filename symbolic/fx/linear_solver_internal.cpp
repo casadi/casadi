@@ -25,6 +25,7 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../mx/mx_node.hpp"
+#include <typeinfo> 
 
 INPUTSCHEME(LinsolInput)
 OUTPUTSCHEME(LinsolOutput)
@@ -348,5 +349,9 @@ namespace CasADi{
     return A->getSolve(B, transpose, shared_from_this<LinearSolver>());
   }
  
+  void LinearSolverInternal::solve(double* x, int nrhs, bool transpose){
+    casadi_error("LinearSolverInternal::solve not defined for class " << typeid(*this).name());
+  }
+
 } // namespace CasADi
  

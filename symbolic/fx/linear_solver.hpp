@@ -57,14 +57,20 @@ enum LinsolOutput{
   // Forward declaration of internal class
   class LinearSolverInternal;
 
-  /** Abstract base class for the linear solver classes
+  /** Base class for the linear solver classes
    *  @copydoc LinearSolver_doc
    \author Joel Andersson
    \date 2010-2013
   */
   class LinearSolver : public FX{
   public:
+    
+    /// Default (empty) constructor
+    LinearSolver();
   
+    /// Create a linear solver given a sparsity pattern (creates a dummy solver only)
+    explicit LinearSolver(const CRSSparsity& sp, int nrhs=1);
+
     /// Access functions of the node
     LinearSolverInternal* operator->();
 

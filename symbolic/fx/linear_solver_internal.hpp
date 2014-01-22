@@ -28,7 +28,6 @@
 
 namespace CasADi{
   
-
   /** Internal class
       @copydoc LinearSolver_doc
   */
@@ -38,7 +37,10 @@ namespace CasADi{
     LinearSolverInternal(const CRSSparsity& sparsity, int nrhs);
         
     // Destructor
-    virtual ~LinearSolverInternal() = 0;
+    virtual ~LinearSolverInternal();
+
+    // Clone
+    virtual LinearSolverInternal* clone() const{ return new LinearSolverInternal(*this);}
     
     // Initialize
     virtual void init();
@@ -47,13 +49,13 @@ namespace CasADi{
     virtual void evaluate();
 
     // Prepare the factorization
-    virtual void prepare() = 0;
+    virtual void prepare(){}
 
     // Solve the system of equations, using internal vector
     virtual void solve(bool transpose);
 
     // Solve the system of equations
-    virtual void solve(double* x, int nrhs, bool transpose) = 0;
+    virtual void solve(double* x, int nrhs, bool transpose);
 
     /// Create a solve node
     MX solve(const MX& A, const MX& B, bool transpose);

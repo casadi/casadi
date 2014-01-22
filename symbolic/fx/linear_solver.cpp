@@ -25,6 +25,13 @@
 using namespace std;
 namespace CasADi{
 
+  LinearSolver::LinearSolver(){
+  }
+
+  LinearSolver::LinearSolver(const CRSSparsity& sp, int nrhs){
+    assignNode(new LinearSolverInternal(sp,nrhs));
+  }
+
   LinearSolverInternal* LinearSolver::operator->(){
     return static_cast<LinearSolverInternal*>(FX::operator->());
   }
