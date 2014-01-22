@@ -624,7 +624,7 @@ namespace CasADi{
         DMatrix& m = outputNoCheck(oind);
         bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
         for(int i=0; i<m.size(); ++i){
-          v[i] = all_depend;
+          //v[i] = all_depend;
         }
       }
     
