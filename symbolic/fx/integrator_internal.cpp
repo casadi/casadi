@@ -513,7 +513,8 @@ namespace CasADi{
       // Propagate interdependencies
       std::copy(f_ode,f_ode+nx_,tmp_f1);
       std::copy(f_alg,f_alg+nz_,tmp_f1+nx_);
-      std::fill(tmp_f2,tmp_f2+nx_+nz_,0);
+      std::copy(x0,x0+nx_,tmp_f2);
+      std::fill(tmp_f2+nx_,tmp_f2+nx_+nz_,0);
       linsol_f_.spSolve(tmp_f2,tmp_f1,true);
       std::copy(tmp_f2,tmp_f2+nx_,xf);
       
