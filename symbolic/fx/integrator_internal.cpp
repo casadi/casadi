@@ -457,7 +457,7 @@ namespace CasADi{
     log("IntegratorInternal::spEvaluate","begin");
     
     // Get pointers to integrator data structures
-    bvec_t *x0, *p, *rx0, *rp, *xf, *qf, *rxf, *rqf;
+    bvec_t *x0, *p, *rx0, *rp, *xf, *qf, *rxf, *rqf, *z, *rz;
     x0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_X0).ptr());
     p = reinterpret_cast<bvec_t*>(input(INTEGRATOR_P).ptr());
     rx0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_RX0).ptr());
@@ -466,7 +466,9 @@ namespace CasADi{
     qf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_QF).ptr());
     rxf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_RXF).ptr());
     rqf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_RQF).ptr());
-    
+    z = reinterpret_cast<bvec_t*>(z_.ptr());
+    rz = reinterpret_cast<bvec_t*>(rz_.ptr());
+
     // Get pointers to DAE callback data structures
     bvec_t *f_t, *f_x, *f_z, *f_p, *f_ode, *f_alg, *f_quad;
     f_t = reinterpret_cast<bvec_t*>(f_.input(DAE_T).ptr());
@@ -517,16 +519,47 @@ namespace CasADi{
       std::fill(tmp_f2+nx_,tmp_f2+nx_+nz_,0);
       linsol_f_.spSolve(tmp_f2,tmp_f1,true);
       std::copy(tmp_f2,tmp_f2+nx_,xf);
-      
+      std::copy(tmp_f2+nx_,tmp_f2+nx_+nz_,z);
+
       // Get influence on the quadratures
       if(nq_>0){
         std::copy(tmp_f2,tmp_f2+nx_,f_x);
-        std::copy(tmp_f2+nx_,tmp_f2+nx_+nz_,f_z);
+        std::copy(z,z+nz_,f_z);
         f_.spEvaluate(true);
         std::copy(f_quad,f_quad+nq_,qf);
       }
       
-      
+      // Propagate through g
+      if(!g_.isNull()){
+        
+        // Propagate through the backward DAE
+        if(g_t!=0) *g_t = 0;
+        std::copy(xf,xf+nx_,g_x);
+        std::copy(p,p+np_,g_p);
+        std::copy(z,z+nz_,g_z);
+        std::copy(rx0,rx0+nrx_,g_rx);
+        std::copy(rp,rp+nrp_,g_rp);
+        std::fill(g_rz,g_rz+nrz_,0);
+        g_.spInit(true);
+        g_.spEvaluate(true);
+        
+        // Propagate interdependencies
+        std::copy(g_ode,g_ode+nrx_,tmp_g1);
+        std::copy(g_alg,g_alg+nrz_,tmp_g1+nrx_);
+        std::copy(rx0,rx0+nrx_,tmp_g2);
+        std::fill(tmp_g2+nrx_,tmp_g2+nrx_+nrz_,0);
+        linsol_g_.spSolve(tmp_g2,tmp_g1,true);
+        std::copy(tmp_g2,tmp_g2+nrx_,rxf);
+        std::copy(tmp_g2+nrx_,tmp_g2+nrx_+nrz_,rz);
+
+        // Get influence on the backward quadratures
+        if(nrq_>0){
+          std::copy(tmp_g2,tmp_g2+nrx_,g_rx);
+          std::copy(rz,rz+nrz_,g_rz);
+          g_.spEvaluate(true);
+          std::copy(g_quad,g_quad+nrq_,rqf);
+        }
+      }
     }
 
 
