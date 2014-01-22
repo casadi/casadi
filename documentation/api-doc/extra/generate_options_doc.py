@@ -97,6 +97,8 @@ for v in metadata.values(): # Remove templating if not in index.xml
       
 # Get the parents of a class
 def parents(name):
+  if name not in metadata:
+    return []
   return metadata[name]['parents'] + sum(map(parents,metadata[name]['parents']),[])
 
 # Fill in 'hierarchy'
@@ -280,7 +282,7 @@ for name,meta in metadata.items():
 
   optionproviders = [meta['options']]
   for a in meta['hierarchy']:
-    if 'options' in metadata[a]:
+    if a in metadata and 'options' in metadata[a]:
       optionproviders.append(metadata[a]['options'])
   
   alloptions = {}
@@ -430,14 +432,14 @@ for name,meta in metadata.items():
   outputscheme = None
   if not('inputscheme' in meta):
     for a in meta['hierarchy']:
-      if 'inputscheme' in metadata[a]:
+      if a in metadata and 'inputscheme' in metadata[a]:
         inputscheme = metadata[a]['inputscheme']
   else:
     inputscheme = meta['inputscheme']
 
   if not('outputscheme' in meta):
     for a in meta['hierarchy']:
-      if 'outputscheme' in metadata[a]:
+      if  a in metadata and 'outputscheme' in metadata[a]:
         outputscheme = metadata[a]['outputscheme']
   else:
     outputscheme = meta['outputscheme']
