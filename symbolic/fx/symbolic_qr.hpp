@@ -42,7 +42,7 @@ namespace CasADi{
     SymbolicQR();
   
     /// Create a linear solver given a sparsity pattern
-    SymbolicQR(const CRSSparsity& sp, int nrhs=1);
+    explicit SymbolicQR(const CRSSparsity& sp, int nrhs=1);
 
     /// Access functions of the node
     SymbolicQRInternal* operator->();
