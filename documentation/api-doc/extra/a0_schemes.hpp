@@ -485,6 +485,20 @@
 \par
 @copydoc scheme_IntegratorInput
 */
+/** \class CasADi::CollocationIntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::CollocationIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
 /** \class CasADi::PsdIndefDpleInternal
 \n
 \par
@@ -843,20 +857,6 @@
 @copydoc scheme_IntegratorOutput
 */
 /** \class CasADi::GenericIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::IRKIntegratorInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::IRKIntegrator
 \n
 \par
 @copydoc scheme_IntegratorInput
