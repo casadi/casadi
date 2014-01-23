@@ -325,6 +325,7 @@ if(PYTHONINTERP_FOUND)
     COMPONENT install_python
     USE_SOURCE_PERMISSIONS
     PATTERN .svn EXCLUDE
+    PATTERN ".pyc EXCLUDE
   )
   #creation of a custom installation command
   if(WITH_SWIG_SPLIT)
