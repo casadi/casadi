@@ -22,7 +22,7 @@
 
 #include <symbolic/casadi.hpp>
 #include <integration/rk_integrator.hpp>
-#include <integration/irk_integrator.hpp>
+#include <integration/collocation_integrator.hpp>
 #include <integration/old_collocation_integrator.hpp>
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/idas_integrator.hpp>
@@ -136,7 +136,7 @@ int main(){
     }
     
     // For all integrators
-    enum Integrators{CVODES,IDAS,COLLOCATION,RK,IRK,NUM_INTEGRATORS};
+    enum Integrators{CVODES,IDAS,RK,COLLOCATION,OLD_COLLOCATION,NUM_INTEGRATORS};
     for(int integrator=0; integrator<NUM_INTEGRATORS; ++integrator){
 
       // Get integrator
@@ -156,9 +156,9 @@ int main(){
         cout << endl << "== RKIntegrator == " << endl;
         I = RKIntegrator(ffcn);
         break;
-      case IRK:        
-        cout << endl << "== IRKIntegrator == " << endl;
-        I = IRKIntegrator(ffcn);
+      case COLLOCATION:        
+        cout << endl << "== CollocationIntegrator == " << endl;
+        I = CollocationIntegrator(ffcn);
 
         // Set collocation integrator specific options
         I.setOption("implicit_solver",KinsolSolver::creator);
@@ -170,7 +170,7 @@ int main(){
           I.setOption("implicit_solver_options",kinsol_options);
         }
         break;
-      case COLLOCATION:        
+      case OLD_COLLOCATION:        
         cout << endl << "== OldCollocationIntegrator == " << endl;
         I = OldCollocationIntegrator(ffcn);
 

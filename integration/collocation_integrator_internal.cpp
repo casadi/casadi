@@ -20,7 +20,7 @@
  *
  */
 
-#include "irk_integrator_internal.hpp"
+#include "collocation_integrator_internal.hpp"
 #include "symbolic/polynomial.hpp"
 #include "symbolic/stl_vector_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
@@ -32,27 +32,27 @@
 using namespace std;
 namespace CasADi{
 
-  IRKIntegratorInternal::IRKIntegratorInternal(const FX& f, const FX& g) : ImplicitFixedStepIntegratorInternal(f,g){
+  CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& f, const FX& g) : ImplicitFixedStepIntegratorInternal(f,g){
     addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
-    setOption("name","unnamed_irk_integrator");
+    setOption("name","unnamed_collocation_integrator");
   }
 
-  void IRKIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void CollocationIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     ImplicitFixedStepIntegratorInternal::deepCopyMembers(already_copied);
   }
 
-  IRKIntegratorInternal::~IRKIntegratorInternal(){
+  CollocationIntegratorInternal::~CollocationIntegratorInternal(){
   }
 
-  void IRKIntegratorInternal::init(){
+  void CollocationIntegratorInternal::init(){
   
     // Call the base class init
     ImplicitFixedStepIntegratorInternal::init();
   
   }
 
-  void IRKIntegratorInternal::setupFG(){
+  void CollocationIntegratorInternal::setupFG(){
 
     // Interpolation order
     deg_ = getOption("interpolation_order");
@@ -262,11 +262,11 @@ namespace CasADi{
   }
   
 
-  double IRKIntegratorInternal::zeroIfSmall(double x){
+  double CollocationIntegratorInternal::zeroIfSmall(double x){
     return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;
   }
 
-  void IRKIntegratorInternal::calculateInitialConditions(){
+  void CollocationIntegratorInternal::calculateInitialConditions(){
     vector<double>::const_iterator x0_it = input(INTEGRATOR_X0).begin();
     vector<double>::const_iterator z_it = z_.begin();
     vector<double>::iterator Z_it = Z_.begin();
@@ -279,7 +279,7 @@ namespace CasADi{
     casadi_assert(Z_it==Z_.end());
   }
 
-  void IRKIntegratorInternal::calculateInitialConditionsB(){
+  void CollocationIntegratorInternal::calculateInitialConditionsB(){
     vector<double>::const_iterator rx0_it = input(INTEGRATOR_RX0).begin();
     vector<double>::const_iterator rz_it = rz_.begin();
     vector<double>::iterator RZ_it = RZ_.begin();

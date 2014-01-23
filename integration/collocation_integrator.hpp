@@ -20,14 +20,14 @@
  *
  */
 
-#ifndef IRK_INTEGRATOR_HPP
-#define IRK_INTEGRATOR_HPP
+#ifndef COLLOCATION_INTEGRATOR_HPP
+#define COLLOCATION_INTEGRATOR_HPP
 
 #include "implicit_fixed_step_integrator.hpp"
 
 namespace CasADi{
   
-  class IRKIntegratorInternal;
+  class CollocationIntegratorInternal;
   
   /**
      \brief Fixed-step implicit Runge-Kutta integrator
@@ -40,10 +40,10 @@ namespace CasADi{
      \author Joel Andersson
      \date 2014
   */
-  class IRKIntegrator : public ImplicitFixedStepIntegrator{
+  class CollocationIntegrator : public ImplicitFixedStepIntegrator{
   public:
     /** \brief  Default constructor */
-    IRKIntegrator();
+    CollocationIntegrator();
     
     /** \brief  Create an integrator for explicit ODEs
      *   \param f dynamical system
@@ -53,12 +53,12 @@ namespace CasADi{
      * \copydoc scheme_RDAEInput
      * \copydoc scheme_RDAEOutput
      */
-    explicit IRKIntegrator(const FX& f, const FX& g=FX());
+    explicit CollocationIntegrator(const FX& f, const FX& g=FX());
 
     //@{
     /// Access functions of the node
-    IRKIntegratorInternal* operator->();
-    const IRKIntegratorInternal* operator->() const;
+    CollocationIntegratorInternal* operator->();
+    const CollocationIntegratorInternal* operator->() const;
     //@}
 
     /// Check if the node is pointing to the right type of object
@@ -68,7 +68,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static Integrator creator(const FX& f, const FX& g){ return IRKIntegrator(f,g);}
+    static Integrator creator(const FX& f, const FX& g){ return CollocationIntegrator(f,g);}
 #ifdef SWIG
     %nocallback;
 #endif
@@ -77,4 +77,4 @@ namespace CasADi{
 
 } // namespace CasADi
 
-#endif //IRK_INTEGRATOR_HPP
+#endif //COLLOCATION_INTEGRATOR_HPP

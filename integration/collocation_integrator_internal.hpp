@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef IRK_INTEGRATOR_INTERNAL_HPP
-#define IRK_INTEGRATOR_INTERNAL_HPP
+#ifndef COLLOCATION_INTEGRATOR_INTERNAL_HPP
+#define COLLOCATION_INTEGRATOR_INTERNAL_HPP
 
-#include "irk_integrator.hpp"
+#include "collocation_integrator.hpp"
 #include "implicit_fixed_step_integrator_internal.hpp"
 #include "symbolic/fx/mx_function.hpp"
 #include "symbolic/fx/implicit_function.hpp"
@@ -31,23 +31,23 @@
 
 namespace CasADi{
     
-  class IRKIntegratorInternal : public ImplicitFixedStepIntegratorInternal{
+  class CollocationIntegratorInternal : public ImplicitFixedStepIntegratorInternal{
   public:
   
     /// Constructor
-    explicit IRKIntegratorInternal(const FX& f, const FX& g);
+    explicit CollocationIntegratorInternal(const FX& f, const FX& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /// Clone
-    virtual IRKIntegratorInternal* clone() const{ return new IRKIntegratorInternal(*this);}
+    virtual CollocationIntegratorInternal* clone() const{ return new CollocationIntegratorInternal(*this);}
 
     /// Create a new integrator
-    virtual IRKIntegratorInternal* create(const FX& f, const FX& g) const{ return new IRKIntegratorInternal(f,g);}
+    virtual CollocationIntegratorInternal* create(const FX& f, const FX& g) const{ return new CollocationIntegratorInternal(f,g);}
   
     /// Destructor
-    virtual ~IRKIntegratorInternal();
+    virtual ~CollocationIntegratorInternal();
 
     /// Initialize stage
     virtual void init();
@@ -70,4 +70,4 @@ namespace CasADi{
 
 } // namespace CasADi
 
-#endif //IRK_INTEGRATOR_INTERNAL_HPP
+#endif //COLLOCATION_INTEGRATOR_INTERNAL_HPP

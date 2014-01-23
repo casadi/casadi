@@ -20,29 +20,29 @@
  *
  */
 
-#include "irk_integrator_internal.hpp"
+#include "collocation_integrator_internal.hpp"
 
 using namespace std;
 
 namespace CasADi{
 
-  IRKIntegrator::IRKIntegrator(){
+  CollocationIntegrator::CollocationIntegrator(){
   }
   
-  IRKIntegrator::IRKIntegrator(const FX& f, const FX& g){
-    assignNode(new IRKIntegratorInternal(f,g));
+  CollocationIntegrator::CollocationIntegrator(const FX& f, const FX& g){
+    assignNode(new CollocationIntegratorInternal(f,g));
   }
 
-  IRKIntegratorInternal* IRKIntegrator::operator->(){
-    return static_cast<IRKIntegratorInternal*>(Integrator::operator->());
+  CollocationIntegratorInternal* CollocationIntegrator::operator->(){
+    return static_cast<CollocationIntegratorInternal*>(Integrator::operator->());
   }
 
-  const IRKIntegratorInternal* IRKIntegrator::operator->() const{
-    return static_cast<const IRKIntegratorInternal*>(Integrator::operator->());
+  const CollocationIntegratorInternal* CollocationIntegrator::operator->() const{
+    return static_cast<const CollocationIntegratorInternal*>(Integrator::operator->());
   }
     
-  bool IRKIntegrator::checkNode() const{
-    return dynamic_cast<const IRKIntegratorInternal*>(get())!=0;
+  bool CollocationIntegrator::checkNode() const{
+    return dynamic_cast<const CollocationIntegratorInternal*>(get())!=0;
   }
 
 } // namespace CasADi
