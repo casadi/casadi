@@ -224,14 +224,6 @@ else(WITH_SWIG_SPLIT)
   add_custom_target(_octave_modules DEPENDS casadi_octave ) # the octave interface is created with the command "make octave"
   add_custom_target(_haskell_modules DEPENDS casadi_haskell casadiTree.hs) # the haskell interface is created with the command "make haskell"
 endif(WITH_SWIG_SPLIT)
-  
-add_custom_command(
-  TARGET _python_modules
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py ${PROJECT_BINARY_DIR}/python/casadi/__init__.py
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/python/tools ${PROJECT_BINARY_DIR}/python/casadi/tools
-)
 
 if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
@@ -324,9 +316,19 @@ if(PYTHONINTERP_FOUND)
     DESTINATION ${PYTHON_PREFIX}
     COMPONENT install_python
     USE_SOURCE_PERMISSIONS
-    PATTERN .svn EXCLUDE
     PATTERN .pyc EXCLUDE
   )
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
+    DESTINATION ${PYTHON_PREFIX}/casadi
+    COMPONENT install_python
+    USE_SOURCE_PERMISSIONS
+    PATTERN .pyc EXCLUDE
+  )
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
+    DESTINATION ${PYTHON_PREFIX}/casadi
+    COMPONENT install_python
+  )
+  
   #creation of a custom installation command
   if(WITH_SWIG_SPLIT)
     add_custom_target(install_python
