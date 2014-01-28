@@ -20,12 +20,30 @@
  *
  */
 
-%{
-#include "interfaces/lapack/lapack_lu_dense.hpp"
-#include "interfaces/lapack/lapack_qr_dense.hpp"
-#include "interfaces/lapack/lapack_qr_nullspace.hpp"
-%}
+#include "lapack_qr_nullspace.hpp"
+#include "lapack_qr_nullspace_internal.hpp"
 
-%include "interfaces/lapack/lapack_lu_dense.hpp"
-%include "interfaces/lapack/lapack_qr_dense.hpp"
-%include "interfaces/lapack/lapack_qr_nullspace.hpp"
+using namespace std;
+namespace CasADi{
+
+  LapackQRNullspace::LapackQRNullspace(){
+  }
+
+  LapackQRNullspace::LapackQRNullspace(const CRSSparsity& A_sp) {
+    assignNode(new LapackQRNullspaceInternal(A_sp));
+  }
+  
+  LapackQRNullspaceInternal* LapackQRNullspace::operator->(){
+    return (LapackQRNullspaceInternal*)(FX::operator->());
+  }
+
+  const LapackQRNullspaceInternal* LapackQRNullspace::operator->() const{
+    return (const LapackQRNullspaceInternal*)(FX::operator->()); 
+  }
+
+  bool LapackQRNullspace::checkNode() const{
+    return dynamic_cast<const LapackQRNullspaceInternal*>(get())!=0;
+  }
+
+} // namespace CasADi
+

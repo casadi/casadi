@@ -6,6 +6,10 @@ set(LAPACK_INTERFACE_SRCS
   lapack_lu_dense.cpp
   lapack_qr_dense.hpp
   lapack_qr_dense.cpp
+  lapack_qr_nullspace.cpp
+  lapack_qr_nullspace.hpp
+  lapack_qr_nullspace_internal.cpp
+  lapack_qr_nullspace_internal.hpp
 )
 
 if(ENABLE_STATIC)

@@ -20,12 +20,52 @@
  *
  */
 
-%{
-#include "interfaces/lapack/lapack_lu_dense.hpp"
-#include "interfaces/lapack/lapack_qr_dense.hpp"
-#include "interfaces/lapack/lapack_qr_nullspace.hpp"
-%}
+#ifndef NULLSPACE_INTERNAL_HPP
+#define NULLSPACE_INTERNAL_HPP
 
-%include "interfaces/lapack/lapack_lu_dense.hpp"
-%include "interfaces/lapack/lapack_qr_dense.hpp"
-%include "interfaces/lapack/lapack_qr_nullspace.hpp"
+#include "nullspace.hpp"
+#include "fx_internal.hpp"
+
+namespace CasADi{
+
+  /** @copydoc Nullspace_doc
+      \author Joris Gillis 
+      \date 2014
+  */
+  class NullspaceInternal : public FXInternal{
+  public:
+  
+    /** \brief  Constructor */
+    NullspaceInternal(const CRSSparsity & A_sp);
+  
+    /** \brief  Destructor */
+    virtual ~NullspaceInternal();
+  
+    /** \brief  Clone */
+    virtual NullspaceInternal* clone() const{ return new NullspaceInternal(A_sp_);}
+
+    /** \brief  initialize */
+    virtual void init();
+
+    /** \brief  Integrate */
+    virtual void evaluate();
+    
+  protected:
+  
+    /// Should the suspace be dense?
+    bool dense_;
+    
+    /// Storage for input structure
+    CRSSparsity A_sp_;
+
+    /// number of rows
+    int m_;
+    
+    /// number of columns
+    int n_;
+  
+  };
+  
+} // namespace CasADi
+
+#endif // NULLSPACE_INTERNAL_HPP

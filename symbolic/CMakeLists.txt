@@ -103,6 +103,7 @@ SET(CASADI_SRCS
   fx/fx_tools.hpp            fx/fx_tools.cpp
   fx/xfunction_tools.hpp     fx/xfunction_tools.cpp
   fx/code_generator.hpp      fx/code_generator.cpp
+  fx/nullspace.hpp           fx/nullspace.cpp           fx/nullspace_internal.hpp           fx/nullspace_internal.cpp
 
   # User include class with the most essential includes
   casadi.hpp

@@ -20,12 +20,41 @@
  *
  */
 
-%{
-#include "interfaces/lapack/lapack_lu_dense.hpp"
-#include "interfaces/lapack/lapack_qr_dense.hpp"
-#include "interfaces/lapack/lapack_qr_nullspace.hpp"
-%}
+#ifndef LAPACK_QR_NULLSPACE_HPP
+#define LAPACK_QR_NULLSPACE_HPP
 
-%include "interfaces/lapack/lapack_lu_dense.hpp"
-%include "interfaces/lapack/lapack_qr_dense.hpp"
-%include "interfaces/lapack/lapack_qr_nullspace.hpp"
+#include "../../symbolic/fx/nullspace.hpp"
+
+namespace CasADi{
+
+  // Forward declaration of internal class
+  class LapackQRNullspaceInternal;
+
+  /** @copydoc Nullspace_doc
+      \author Joris Gillis 
+      \date 2014
+  */
+
+  class LapackQRNullspace : public Nullspace{
+  public:
+
+    /// Default constructor 
+    LapackQRNullspace();
+
+    /// Default constructor 
+    LapackQRNullspace(const CRSSparsity& A_sp);
+    
+    /// Access functions of the node.
+    LapackQRNullspaceInternal* operator->();
+
+    /// Const access functions of the node.
+    const LapackQRNullspaceInternal* operator->() const;
+
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
+         
+  };
+  
+} // namespace CasADi
+
+#endif //LAPACK_NULLSPACE_HPP
