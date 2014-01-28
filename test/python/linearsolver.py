@@ -71,6 +71,61 @@ class LinearSolverTests(casadiTestCase):
       f.evaluate()
       
       self.checkarray(f.output(),DMatrix([1.5,-0.5]))
+
+  def test_pseudo_inverse(self):
+    numpy.random.seed(0)
+    A_ = DMatrix(numpy.random.rand(4,6))
+    
+    A = msym("A",A_.sparsity())
+    As = ssym("A",A_.sparsity())
+    
+    for Solver, options in lsolvers:
+      print Solver.creator
+      B = pinv(A,Solver,options)
+      
+      f = MXFunction([A],[B])
+      f.init()
+      f.setInput(A_,0)
+      f.evaluate()
+      
+      self.checkarray(mul(A_,f.output()),DMatrix.eye(4))
+      
+      f = SXFunction([As],[pinv(As)])
+      f.init()
+      f.setInput(A_,0)
+      f.evaluate()
+      
+      self.checkarray(mul(A_,f.output()),DMatrix.eye(4))
+      
+      trans(solve(mul(A,trans(A)),A,Solver,options))
+      pinv(A_,Solver,options)
+      
+      #self.checkarray(mul(A_,pinv(A_,Solver,options)),DMatrix.eye(4))
+      
+    A_ = DMatrix(numpy.random.rand(3,5))
+    
+    A = msym("A",A_.sparsity())
+    As = ssym("A",A_.sparsity())
+    
+    for Solver, options in lsolvers:
+      print Solver.creator
+      B = pinv(A,Solver,options)
+      
+      f = MXFunction([A],[B])
+      f.init()
+      f.setInput(A_,0)
+      f.evaluate()
+      
+      self.checkarray(mul(A_,f.output()),DMatrix.eye(3)) 
+      
+      f = SXFunction([As],[pinv(As)])
+      f.init()
+      f.setInput(A_,0)
+      f.evaluate()
+      
+      self.checkarray(mul(A_,f.output()),DMatrix.eye(3))
+      
+      #self.checkarray(mul(pinv(A_,Solver,options),A_),DMatrix.eye(3))
       
   def test_simple_solve_dmatrix(self):
     A = DMatrix([[3,7],[1,2]])

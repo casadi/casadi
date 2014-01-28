@@ -448,6 +448,13 @@ namespace CasADi{
   */
   MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
 
+  /** \brief Computes the Moore-Penrose pseudo-inverse
+  * 
+  * If the matrix A is fat (size2>size1), mul(A,pinv(A)) is unity.
+  * If the matrix A is slender (size1<size2), mul(pinv(A),A) is unity.
+  *
+  */
+  MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
 
 } // namespace CasADi
 

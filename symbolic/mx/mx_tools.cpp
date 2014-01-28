@@ -1008,5 +1008,14 @@ namespace CasADi{
     return trans(mysolver.solve(A,trans(b),true));
   }
   
+  MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict) {
+    if (A.size2()>=A.size1()) {
+      return trans(solve(mul(A,trans(A)),A,lsolver,dict));
+    } else {
+      return solve(mul(trans(A),A),trans(A),lsolver,dict);
+    }
+  }
+
+  
 } // namespace CasADi
 
