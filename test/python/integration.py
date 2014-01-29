@@ -702,7 +702,7 @@ class Integrationtests(casadiTestCase):
     integrator.setOption("tf",1)
     integrator.init()
 
-    qend,_,_,_ = integrator.call(integratorIn(x0=var))
+    qend, = integratorOut(integrator.call(integratorIn(x0=var)),"xf")
 
     f = MXFunction([var],[qend[0]])
     f.init()

@@ -485,17 +485,19 @@ def integratorIn(*dummy,**kwargs):
   Helper function for 'IntegratorInput'
 
   Two use cases:
-     a) arg = integratorIn(x0=my_x0, p=my_p, rx0=my_rx0, rp=my_rp) 
+     a) arg = integratorIn(x0=my_x0, p=my_p, z0=my_z0, rx0=my_rx0, rp=my_rp, rz0=my_rz0) 
           all arguments optional
-     b) x0, p, rx0, rp = integratorIn(arg,"x0", "p", "rx0", "rp") 
+     b) x0, p, z0, rx0, rp, rz0 = integratorIn(arg,"x0", "p", "z0", "rx0", "rp", "rz0") 
           all arguments after the first optional
   Input arguments of an integrator
   
   Keyword arguments:
     x0  -- Differential state at the initial time [INTEGRATOR_X0]
     p   -- Parameters [INTEGRATOR_P]
+    z0  -- Initial guess for the algebraic variable [INTEGRATOR_Z0]
     rx0 -- Backward differential state at the final time [INTEGRATOR_RX0]
     rp  -- Backward parameter vector [INTEGRATOR_RP]
+    rz0 -- Initial guess for the backwards algebraic variable [INTEGRATOR_RZ0]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorInput,n)] for n in dummy[1:]]
@@ -505,16 +507,22 @@ def integratorIn(*dummy,**kwargs):
   p = []
   if 'p' in kwargs:
     p = kwargs['p']
+  z0 = []
+  if 'z0' in kwargs:
+    z0 = kwargs['z0']
   rx0 = []
   if 'rx0' in kwargs:
     rx0 = kwargs['rx0']
   rp = []
   if 'rp' in kwargs:
     rp = kwargs['rp']
+  rz0 = []
+  if 'rz0' in kwargs:
+    rz0 = kwargs['rz0']
   for k in kwargs.keys():
-    if not(k in ['x0','p','rx0','rp']):
-      raise Exception("Keyword error in integratorIn: '%s' is not recognized. Available keywords are: x0, p, rx0, rp" % k )
-  return IOSchemeVector([x0,p,rx0,rp], IOScheme(SCHEME_IntegratorInput))
+    if not(k in ['x0','p','z0','rx0','rp','rz0']):
+      raise Exception("Keyword error in integratorIn: '%s' is not recognized. Available keywords are: x0, p, z0, rx0, rp, rz0" % k )
+  return IOSchemeVector([x0,p,z0,rx0,rp,rz0], IOScheme(SCHEME_IntegratorInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -539,17 +547,19 @@ def integratorOut(*dummy,**kwargs):
   Helper function for 'IntegratorOutput'
 
   Two use cases:
-     a) arg = integratorOut(xf=my_xf, qf=my_qf, rxf=my_rxf, rqf=my_rqf) 
+     a) arg = integratorOut(xf=my_xf, qf=my_qf, zf=my_zf, rxf=my_rxf, rqf=my_rqf, rzf=my_rzf) 
           all arguments optional
-     b) xf, qf, rxf, rqf = integratorOut(arg,"xf", "qf", "rxf", "rqf") 
+     b) xf, qf, zf, rxf, rqf, rzf = integratorOut(arg,"xf", "qf", "zf", "rxf", "rqf", "rzf") 
           all arguments after the first optional
   Output arguments of an integrator
   
   Keyword arguments:
     xf  -- Differential state at the final time [INTEGRATOR_XF]
     qf  -- Quadrature state at the final time [INTEGRATOR_QF]
+    zf  -- Algebraic variable at the final time [INTEGRATOR_ZF]
     rxf -- Backward differential state at the initial time [INTEGRATOR_RXF]
     rqf -- Backward quadrature state at the initial time [INTEGRATOR_RQF]
+    rzf -- Backward algebraic variable at the initial time [INTEGRATOR_RZF]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorOutput,n)] for n in dummy[1:]]
@@ -559,16 +569,22 @@ def integratorOut(*dummy,**kwargs):
   qf = []
   if 'qf' in kwargs:
     qf = kwargs['qf']
+  zf = []
+  if 'zf' in kwargs:
+    zf = kwargs['zf']
   rxf = []
   if 'rxf' in kwargs:
     rxf = kwargs['rxf']
   rqf = []
   if 'rqf' in kwargs:
     rqf = kwargs['rqf']
+  rzf = []
+  if 'rzf' in kwargs:
+    rzf = kwargs['rzf']
   for k in kwargs.keys():
-    if not(k in ['xf','qf','rxf','rqf']):
-      raise Exception("Keyword error in integratorOut: '%s' is not recognized. Available keywords are: xf, qf, rxf, rqf" % k )
-  return IOSchemeVector([xf,qf,rxf,rqf], IOScheme(SCHEME_IntegratorOutput))
+    if not(k in ['xf','qf','zf','rxf','rqf','rzf']):
+      raise Exception("Keyword error in integratorOut: '%s' is not recognized. Available keywords are: xf, qf, zf, rxf, rqf, rzf" % k )
+  return IOSchemeVector([xf,qf,zf,rxf,rqf,rzf], IOScheme(SCHEME_IntegratorOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON

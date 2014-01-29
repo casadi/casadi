@@ -120,24 +120,32 @@ namespace CasADi{
     INTEGRATOR_X0, 
     /// Parameters [p]
     INTEGRATOR_P,
+    /// Initial guess for the algebraic variable [z0]
+    INTEGRATOR_Z0,
     /// Backward differential state at the final time [rx0]
     INTEGRATOR_RX0, 
     /// Backward parameter vector [rp]
     INTEGRATOR_RP, 
+    /// Initial guess for the backwards algebraic variable [rz0]
+    INTEGRATOR_RZ0,
     /// Number of input arguments of an integrator
     INTEGRATOR_NUM_IN
   };
 
   /// Output arguments of an integrator [integratorOut]
   enum IntegratorOutput{
-    ///  Differential state at the final time [xf]
+    /// Differential state at the final time [xf]
     INTEGRATOR_XF,
-    ///  Quadrature state at the final time [qf]
+    /// Quadrature state at the final time [qf]
     INTEGRATOR_QF,
-    ///  Backward differential state at the initial time [rxf]
+    /// Algebraic variable at the final time [zf]
+    INTEGRATOR_ZF,
+    /// Backward differential state at the initial time [rxf]
     INTEGRATOR_RXF,
-    ///  Backward quadrature state at the initial time [rqf]
+    /// Backward quadrature state at the initial time [rqf]
     INTEGRATOR_RQF,
+    /// Backward algebraic variable at the initial time [rzf]
+    INTEGRATOR_RZF,
     /// Number of output arguments of an integrator
     INTEGRATOR_NUM_OUT
   };

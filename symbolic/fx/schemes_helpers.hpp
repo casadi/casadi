@@ -337,29 +337,33 @@ class IntegratorInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_IntegratorInput
 template<class M>
-IntegratorInputIOSchemeVector<M> integratorIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
-  std::vector<M> ret(4);
+IntegratorInputIOSchemeVector<M> integratorIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M()){
+  std::vector<M> ret(6);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_IntegratorInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in IntegratorInput: '" << it->first << "' is not recognized. Available keywords are: x0, p, rx0, rp");
+      casadi_error("Keyword error in IntegratorInput: '" << it->first << "' is not recognized. Available keywords are: x0, p, z0, rx0, rp, rz0");
     ret[n] = it->second;
   }
   return IntegratorInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> integratorIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3=""){
+std::vector<M> integratorIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s1)));
   if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s2)));
   if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s5)));
   return ret;
 
 }
@@ -374,29 +378,33 @@ class IntegratorOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_IntegratorOutput
 template<class M>
-IntegratorOutputIOSchemeVector<M> integratorOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
-  std::vector<M> ret(4);
+IntegratorOutputIOSchemeVector<M> integratorOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M()){
+  std::vector<M> ret(6);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_IntegratorOutput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in IntegratorOutput: '" << it->first << "' is not recognized. Available keywords are: xf, qf, rxf, rqf");
+      casadi_error("Keyword error in IntegratorOutput: '" << it->first << "' is not recognized. Available keywords are: xf, qf, zf, rxf, rqf, rzf");
     ret[n] = it->second;
   }
   return IntegratorOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> integratorOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3=""){
+std::vector<M> integratorOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s1)));
   if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s2)));
   if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s5)));
   return ret;
 
 }

@@ -82,8 +82,8 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_DAEOutput: return "ode, alg, quad";
     case SCHEME_RDAEInput: return "rx, rz, rp, x, z, p, t";
     case SCHEME_RDAEOutput: return "ode, alg, quad";
-    case SCHEME_IntegratorInput: return "x0, p, rx0, rp";
-    case SCHEME_IntegratorOutput: return "xf, qf, rxf, rqf";
+    case SCHEME_IntegratorInput: return "x0, p, z0, rx0, rp, rz0";
+    case SCHEME_IntegratorOutput: return "xf, qf, zf, rxf, rqf, rzf";
     case SCHEME_LinsolInput: return "A, B";
     case SCHEME_LinsolOutput: return "X";
     case SCHEME_LPSolverInput: return "c, a, lba, uba, lbx, ubx";
@@ -173,14 +173,18 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
     case SCHEME_IntegratorInput: 
       if(i==0) return "x0";
       if(i==1) return "p";
-      if(i==2) return "rx0";
-      if(i==3) return "rp";
+      if(i==2) return "z0";
+      if(i==3) return "rx0";
+      if(i==4) return "rp";
+      if(i==5) return "rz0";
       break;
     case SCHEME_IntegratorOutput: 
       if(i==0) return "xf";
       if(i==1) return "qf";
-      if(i==2) return "rxf";
-      if(i==3) return "rqf";
+      if(i==2) return "zf";
+      if(i==3) return "rxf";
+      if(i==4) return "rqf";
+      if(i==5) return "rzf";
       break;
     case SCHEME_LinsolInput: 
       if(i==0) return "A";
@@ -476,14 +480,18 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_IntegratorInput: 
       if(i==0) return "Differential state at the initial time";
       if(i==1) return "Parameters";
-      if(i==2) return "Backward differential state at the final time";
-      if(i==3) return "Backward parameter vector";
+      if(i==2) return "Initial guess for the algebraic variable";
+      if(i==3) return "Backward differential state at the final time";
+      if(i==4) return "Backward parameter vector";
+      if(i==5) return "Initial guess for the backwards algebraic variable";
       break;
     case SCHEME_IntegratorOutput: 
       if(i==0) return "Differential state at the final time";
       if(i==1) return "Quadrature state at the final time";
-      if(i==2) return "Backward differential state at the initial time";
-      if(i==3) return "Backward quadrature state at the initial time";
+      if(i==2) return "Algebraic variable at the final time";
+      if(i==3) return "Backward differential state at the initial time";
+      if(i==4) return "Backward quadrature state at the initial time";
+      if(i==5) return "Backward algebraic variable at the initial time";
       break;
     case SCHEME_LinsolInput: 
       if(i==0) return "The square matrix A: sparse, (n x n).";
@@ -779,14 +787,18 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
     case SCHEME_IntegratorInput: 
       if(i==0) return "INTEGRATOR_X0";
       if(i==1) return "INTEGRATOR_P";
-      if(i==2) return "INTEGRATOR_RX0";
-      if(i==3) return "INTEGRATOR_RP";
+      if(i==2) return "INTEGRATOR_Z0";
+      if(i==3) return "INTEGRATOR_RX0";
+      if(i==4) return "INTEGRATOR_RP";
+      if(i==5) return "INTEGRATOR_RZ0";
       break;
     case SCHEME_IntegratorOutput: 
       if(i==0) return "INTEGRATOR_XF";
       if(i==1) return "INTEGRATOR_QF";
-      if(i==2) return "INTEGRATOR_RXF";
-      if(i==3) return "INTEGRATOR_RQF";
+      if(i==2) return "INTEGRATOR_ZF";
+      if(i==3) return "INTEGRATOR_RXF";
+      if(i==4) return "INTEGRATOR_RQF";
+      if(i==5) return "INTEGRATOR_RZF";
       break;
     case SCHEME_LinsolInput: 
       if(i==0) return "LINSOL_A";
@@ -1056,10 +1068,10 @@ int getSchemeSize(InputOutputScheme scheme) {
       return 3;
       break;
     case SCHEME_IntegratorInput: 
-      return 4;
+      return 6;
       break;
     case SCHEME_IntegratorOutput: 
-      return 4;
+      return 6;
       break;
     case SCHEME_LinsolInput: 
       return 2;
@@ -1218,14 +1230,18 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
     case SCHEME_IntegratorInput: 
       if(name=="x0") return 0;
       if(name=="p") return 1;
-      if(name=="rx0") return 2;
-      if(name=="rp") return 3;
+      if(name=="z0") return 2;
+      if(name=="rx0") return 3;
+      if(name=="rp") return 4;
+      if(name=="rz0") return 5;
       break;
     case SCHEME_IntegratorOutput: 
       if(name=="xf") return 0;
       if(name=="qf") return 1;
-      if(name=="rxf") return 2;
-      if(name=="rqf") return 3;
+      if(name=="zf") return 2;
+      if(name=="rxf") return 3;
+      if(name=="rqf") return 4;
+      if(name=="rzf") return 5;
       break;
     case SCHEME_LinsolInput: 
       if(name=="A") return 0;
