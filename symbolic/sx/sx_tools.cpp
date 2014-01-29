@@ -1101,6 +1101,9 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
   for(int i=0; i<vdef.size(); ++i){
     vdef[i].setTemp(i+1);
   }
+
+  // Save the marked nodes for later cleanup
+  vector<SX> marked = vdef;
   
   // Reset iterator
   b_it=f->operations_.begin();
@@ -1129,8 +1132,8 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
   }
 
   // Unmark the expressions
-  for(int i=0; i<vdef.size(); ++i){
-    vdef[i].setTemp(0);
+  for(vector<SX>::iterator it=marked.begin(); it!=marked.end(); ++it){
+    it->setTemp(0);
   }
 }
 
