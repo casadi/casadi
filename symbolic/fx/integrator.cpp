@@ -76,22 +76,6 @@ namespace CasADi{
     IntegratorInternal::AugOffset offset;
     return (*this)->getAugmented(nfwd,nadj,offset);
   }
-
-  DMatrix& Integrator::z(){
-    return (*this)->z_;
-  }
-
-  const DMatrix& Integrator::z() const{
-    return (*this)->z_;
-  }
-
-  DMatrix& Integrator::rz(){
-    return (*this)->rz_;
-  }
-
-  const DMatrix& Integrator::rz() const{
-    return (*this)->rz_;
-  }
  
 } // namespace CasADi
 

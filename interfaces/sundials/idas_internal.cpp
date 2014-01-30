@@ -909,7 +909,7 @@ namespace CasADi{
     // }
 
     // Save the final algebraic variable
-    copy(NV_DATA_S(xz_)+nx_,NV_DATA_S(xz_)+nx_+nz_,z_.begin());
+    copy(NV_DATA_S(xz_)+nx_,NV_DATA_S(xz_)+nx_+nz_,output(INTEGRATOR_ZF).begin());
     
     // Print statistics
     if(getOption("print_stats")) printStats(std::cout);
@@ -995,7 +995,7 @@ namespace CasADi{
     // Save the backward state and algebraic variable
     const double *rxz = NV_DATA_S(rxz_);
     copy(rxz,rxz+nrx_,output(INTEGRATOR_RXF).begin());
-    copy(rxz+nrx_,rxz+nrx_+nrz_,rz_.begin());
+    copy(rxz+nrx_,rxz+nrx_+nrz_,output(INTEGRATOR_RZF).begin());
 
     if (gather_stats_) {
       long nsteps, nfevals, nlinsetups, netfails;

@@ -127,26 +127,20 @@ namespace CasADi{
       output(INTEGRATOR_RZF)  = input(INTEGRATOR_RZ0);
     }
 
-    // Allocate space for algebraic variable
-    z_ = DMatrix::zeros(f_.input(DAE_Z).sparsity());
-    if(!g_.isNull()){
-      rz_ = DMatrix::zeros(g_.input(RDAE_RZ).sparsity());
-    }
-
     // Warn if sparse inputs (was previously an error)
     casadi_assert_warning(f_.input(DAE_X).dense(),"Sparse states in integrators are experimental");
 
     // Consistency checks
     casadi_assert_message(f_.output(DAE_ODE).shape()==input(INTEGRATOR_X0).shape(),"Inconsistent dimensions. Expecting DAE_ODE output of shape " << input(INTEGRATOR_X0).shape() << ", but got " << f_.output(DAE_ODE).shape() << " instead.");
     casadi_assert(f_.output(DAE_ODE).sparsity()==input(INTEGRATOR_X0).sparsity());
-    casadi_assert_message(f_.output(DAE_ALG).shape()==z_.shape(),"Inconsistent dimensions. Expecting DAE_ALG output of shape " << z_.shape() << ", but got " << f_.output(DAE_ALG).shape() << " instead.");
-    casadi_assert(f_.output(DAE_ALG).sparsity()==z_.sparsity());
+    casadi_assert_message(f_.output(DAE_ALG).shape()==input(INTEGRATOR_Z0).shape(),"Inconsistent dimensions. Expecting DAE_ALG output of shape " << input(INTEGRATOR_Z0).shape() << ", but got " << f_.output(DAE_ALG).shape() << " instead.");
+    casadi_assert(f_.output(DAE_ALG).sparsity()==input(INTEGRATOR_Z0).sparsity());
     if(!g_.isNull()){
       casadi_assert(g_.input(RDAE_P).sparsity()==input(INTEGRATOR_P).sparsity());
       casadi_assert(g_.input(RDAE_X).sparsity()==input(INTEGRATOR_X0).sparsity());
-      casadi_assert(g_.input(RDAE_Z).sparsity()==z_.sparsity());
+      casadi_assert(g_.input(RDAE_Z).sparsity()==input(INTEGRATOR_Z0).sparsity());
       casadi_assert(g_.output(RDAE_ODE).sparsity()==input(INTEGRATOR_RX0).sparsity());
-      casadi_assert(g_.output(RDAE_ALG).sparsity()==rz_.sparsity());
+      casadi_assert(g_.output(RDAE_ALG).sparsity()==input(INTEGRATOR_RZ0).sparsity());
     }
   
     // Call the base class method
@@ -193,10 +187,10 @@ namespace CasADi{
     // Create augmented problem
     MX aug_t = msym("aug_t",f_.input(DAE_T).sparsity());
     MX aug_x = msym("aug_x",offset.x.back(),input(INTEGRATOR_X0).size2());
-    MX aug_z = msym("aug_z",offset.z.back(),std::max(z_.size2(),rz_.size2()));
+    MX aug_z = msym("aug_z",offset.z.back(),std::max(input(INTEGRATOR_Z0).size2(),input(INTEGRATOR_RZ0).size2()));
     MX aug_p = msym("aug_p",offset.p.back(),std::max(input(INTEGRATOR_P).size2(),input(INTEGRATOR_RP).size2()));
     MX aug_rx = msym("aug_rx",offset.rx.back(),input(INTEGRATOR_X0).size2());
-    MX aug_rz = msym("aug_rz",offset.rz.back(),std::max(z_.size2(),rz_.size2()));
+    MX aug_rz = msym("aug_rz",offset.rz.back(),std::max(input(INTEGRATOR_Z0).size2(),input(INTEGRATOR_RZ0).size2()));
     MX aug_rp = msym("aug_rp",offset.rp.back(),std::max(output(INTEGRATOR_QF).size2(),input(INTEGRATOR_RP).size2()));
 
     // Split up the augmented vectors
@@ -700,11 +694,11 @@ namespace CasADi{
     // Count nondifferentiated and forward sensitivities 
     for(int dir=-1; dir<nfwd; ++dir){
       if( nx_>0) ret.x.push_back(input(INTEGRATOR_X0).size1());
-      if( nz_>0) ret.z.push_back(z_.size1());
+      if( nz_>0) ret.z.push_back(input(INTEGRATOR_Z0).size1());
       if( nq_>0) ret.q.push_back(output(INTEGRATOR_QF).size1());
       if( np_>0) ret.p.push_back(input(INTEGRATOR_P).size1());
       if(nrx_>0) ret.rx.push_back(input(INTEGRATOR_RX0).size1());
-      if(nrz_>0) ret.rz.push_back(rz_.size1());
+      if(nrz_>0) ret.rz.push_back(input(INTEGRATOR_RZ0).size1());
       if(nrq_>0) ret.rq.push_back(output(INTEGRATOR_RQF).size1());
       if(nrp_>0) ret.rp.push_back(input(INTEGRATOR_RP).size1());
     }
@@ -712,11 +706,11 @@ namespace CasADi{
     // Count adjoint sensitivities
     for(int dir=0; dir<nadj; ++dir){
       if( nx_>0) ret.rx.push_back(input(INTEGRATOR_X0).size1());
-      if( nz_>0) ret.rz.push_back(z_.size1());
+      if( nz_>0) ret.rz.push_back(input(INTEGRATOR_Z0).size1());
       if( np_>0) ret.rq.push_back(input(INTEGRATOR_P).size1());
       if( nq_>0) ret.rp.push_back(output(INTEGRATOR_QF).size1());
       if(nrx_>0) ret.x.push_back(input(INTEGRATOR_RX0).size1());
-      if(nrz_>0) ret.z.push_back(rz_.size1());
+      if(nrz_>0) ret.z.push_back(input(INTEGRATOR_RZ0).size1());
       if(nrp_>0) ret.q.push_back(input(INTEGRATOR_RP).size1());
       if(nrq_>0) ret.p.push_back(output(INTEGRATOR_RQF).size1());
     }

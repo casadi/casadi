@@ -116,9 +116,6 @@ namespace CasADi{
     /// ODE/DAE backward integration function, if any
     FX g_;
 
-    /// Algebraic variable
-    DMatrix z_, rz_;
-
     /// Integrator for sparsity pattern propagation
     LinearSolver linsol_f_, linsol_g_;
   };
