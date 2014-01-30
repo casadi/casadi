@@ -109,18 +109,22 @@ namespace CasADi{
     setNumInputs(INTEGRATOR_NUM_IN);
     input(INTEGRATOR_X0)  = DMatrix::zeros(f_.input(DAE_X).sparsity());
     input(INTEGRATOR_P)   = DMatrix::zeros(f_.input(DAE_P).sparsity());
+    input(INTEGRATOR_Z0)   = DMatrix::zeros(f_.input(DAE_Z).sparsity());
     if(!g_.isNull()){
       input(INTEGRATOR_RX0)  = DMatrix::zeros(g_.input(RDAE_RX).sparsity());
       input(INTEGRATOR_RP)  = DMatrix::zeros(g_.input(RDAE_RP).sparsity());
+      input(INTEGRATOR_RZ0)  = DMatrix::zeros(g_.input(RDAE_RZ).sparsity());
     }
   
     // Allocate space for outputs
     setNumOutputs(INTEGRATOR_NUM_OUT);
     output(INTEGRATOR_XF) = input(INTEGRATOR_X0);
     output(INTEGRATOR_QF) = DMatrix::zeros(f_.output(DAE_QUAD).sparsity());
+    output(INTEGRATOR_ZF) = input(INTEGRATOR_Z0);
     if(!g_.isNull()){
       output(INTEGRATOR_RXF)  = input(INTEGRATOR_RX0);
       output(INTEGRATOR_RQF)  = DMatrix::zeros(g_.output(RDAE_QUAD).sparsity());
+      output(INTEGRATOR_RZF)  = input(INTEGRATOR_RZ0);
     }
 
     // Allocate space for algebraic variable
@@ -177,6 +181,8 @@ namespace CasADi{
 
   std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj, AugOffset& offset){
     log("IntegratorInternal::getAugmented","call");
+
+    //    cout << "here" << endl;
 
     // Return object
     std::pair<FX,FX> ret;
@@ -457,17 +463,19 @@ namespace CasADi{
     log("IntegratorInternal::spEvaluate","begin");
     
     // Get pointers to integrator data structures
-    bvec_t *x0, *p, *rx0, *rp, *xf, *qf, *rxf, *rqf, *z, *rz;
+    bvec_t *x0, *p, *rx0, *rp, *xf, *qf, *rxf, *rqf, *z0, *rz0, *zf, *rzf;
     x0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_X0).ptr());
     p = reinterpret_cast<bvec_t*>(input(INTEGRATOR_P).ptr());
+    z0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_Z0).ptr());
     rx0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_RX0).ptr());
     rp = reinterpret_cast<bvec_t*>(input(INTEGRATOR_RP).ptr());
-    xf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_XF).ptr());
+    rz0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_RZ0).ptr());
+    xf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_XF).ptr());    
     qf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_QF).ptr());
+    zf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_ZF).ptr());    
     rxf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_RXF).ptr());
     rqf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_RQF).ptr());
-    z = reinterpret_cast<bvec_t*>(z_.ptr());
-    rz = reinterpret_cast<bvec_t*>(rz_.ptr());
+    rzf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_RZF).ptr());
 
     // Get pointers to DAE callback data structures
     bvec_t *f_t, *f_x, *f_z, *f_p, *f_ode, *f_alg, *f_quad;
@@ -519,12 +527,12 @@ namespace CasADi{
       std::fill(tmp_f2+nx_,tmp_f2+nx_+nz_,0);
       linsol_f_.spSolve(tmp_f2,tmp_f1,true);
       std::copy(tmp_f2,tmp_f2+nx_,xf);
-      std::copy(tmp_f2+nx_,tmp_f2+nx_+nz_,z);
+      std::copy(tmp_f2+nx_,tmp_f2+nx_+nz_,zf);
 
       // Get influence on the quadratures
       if(nq_>0){
         std::copy(tmp_f2,tmp_f2+nx_,f_x);
-        std::copy(z,z+nz_,f_z);
+        std::copy(zf,zf+nz_,f_z);
         f_.spEvaluate(true);
         std::copy(f_quad,f_quad+nq_,qf);
       }
@@ -536,7 +544,7 @@ namespace CasADi{
         if(g_t!=0) *g_t = 0;
         std::copy(xf,xf+nx_,g_x);
         std::copy(p,p+np_,g_p);
-        std::copy(z,z+nz_,g_z);
+        std::copy(zf,zf+nz_,g_z);
         std::copy(rx0,rx0+nrx_,g_rx);
         std::copy(rp,rp+nrp_,g_rp);
         std::fill(g_rz,g_rz+nrz_,0);
@@ -550,16 +558,20 @@ namespace CasADi{
         std::fill(tmp_g2+nrx_,tmp_g2+nrx_+nrz_,0);
         linsol_g_.spSolve(tmp_g2,tmp_g1,true);
         std::copy(tmp_g2,tmp_g2+nrx_,rxf);
-        std::copy(tmp_g2+nrx_,tmp_g2+nrx_+nrz_,rz);
+        std::copy(tmp_g2+nrx_,tmp_g2+nrx_+nrz_,rzf);
 
         // Get influence on the backward quadratures
         if(nrq_>0){
           std::copy(tmp_g2,tmp_g2+nrx_,g_rx);
-          std::copy(rz,rz+nrz_,g_rz);
+          std::copy(rzf,rzf+nrz_,g_rz);
           g_.spEvaluate(true);
           std::copy(g_quad,g_quad+nrq_,rqf);
         }
       }
+    } else {
+      // No dependency on initial guess
+      std::fill(z0,z0+nz_,0);
+      std::fill(rz0,rz0+nrz_,0);
     }
 
 
@@ -749,7 +761,7 @@ namespace CasADi{
     ret_in.reserve(INTEGRATOR_NUM_IN*(1+nfwd) + INTEGRATOR_NUM_OUT*nadj);
   
     // Augmented state
-    MX x0_aug, p_aug, rx0_aug, rp_aug;
+    MX x0_aug, p_aug, z0_aug, rx0_aug, rp_aug, rz0_aug;
   
     // Temp stringstream
     stringstream ss;
@@ -774,6 +786,13 @@ namespace CasADi{
       if(dir>=0) ss << "_" << dir;
       dd[INTEGRATOR_P] = msym(ss.str(),input(INTEGRATOR_P).sparsity());
       p_aug.append(dd[INTEGRATOR_P]);
+
+      // Initial guess for algebraic variable
+      ss.clear();
+      ss << "r0";
+      if(dir>=0) ss << "_" << dir;
+      dd[INTEGRATOR_Z0] = msym(ss.str(),input(INTEGRATOR_Z0).sparsity());
+      z0_aug.append(dd[INTEGRATOR_Z0]);
     
       // Backward state
       ss.clear();
@@ -788,6 +807,13 @@ namespace CasADi{
       if(dir>=0) ss << "_" << dir;
       dd[INTEGRATOR_RP] = msym(ss.str(),input(INTEGRATOR_RP).sparsity());
       rp_aug.append(dd[INTEGRATOR_RP]);
+
+      // Initial guess for backward algebraic variable
+      ss.clear();
+      ss << "rz0";
+      if(dir>=0) ss << "_" << dir;
+      dd[INTEGRATOR_RZ0] = msym(ss.str(),input(INTEGRATOR_RZ0).sparsity());
+      rz0_aug.append(dd[INTEGRATOR_RZ0]);
     
       // Add to input vector
       ret_in.insert(ret_in.end(),dd.begin(),dd.end());
@@ -809,6 +835,12 @@ namespace CasADi{
       dd[INTEGRATOR_QF] = msym(ss.str(),output(INTEGRATOR_QF).sparsity());
       rp_aug.append(dd[INTEGRATOR_QF]);
 
+      // Algebraic variables become backward algebraic variables
+      ss.clear();
+      ss << "zf" << "_" << dir;
+      dd[INTEGRATOR_ZF] = msym(ss.str(),output(INTEGRATOR_ZF).sparsity());
+      rz0_aug.append(dd[INTEGRATOR_ZF]);
+
       // Backward differential states becomes forward differential states
       ss.clear();
       ss << "rxf" << "_" << dir;
@@ -820,6 +852,12 @@ namespace CasADi{
       ss << "rqf" << "_" << dir;
       dd[INTEGRATOR_RQF] = msym(ss.str(),output(INTEGRATOR_RQF).sparsity());
       p_aug.append(dd[INTEGRATOR_RQF]);
+
+      // Backward differential states becomes forward differential states
+      ss.clear();
+      ss << "rzf" << "_" << dir;
+      dd[INTEGRATOR_RZF] = msym(ss.str(),output(INTEGRATOR_RZF).sparsity());
+      z0_aug.append(dd[INTEGRATOR_RZF]);
     
       // Add to input vector
       ret_in.insert(ret_in.end(),dd.begin(),dd.end());
@@ -829,19 +867,25 @@ namespace CasADi{
     vector<MX> integrator_in(INTEGRATOR_NUM_IN);
     integrator_in[INTEGRATOR_X0] = x0_aug;
     integrator_in[INTEGRATOR_P] = p_aug;
+    integrator_in[INTEGRATOR_Z0] = z0_aug;
     integrator_in[INTEGRATOR_RX0] = rx0_aug;
     integrator_in[INTEGRATOR_RP] = rp_aug;
+    integrator_in[INTEGRATOR_RZ0] = rz0_aug;
     vector<MX> integrator_out = integrator.call(integrator_in);
   
     // Augmented results
     vector<MX> xf_aug = vertsplit(integrator_out[INTEGRATOR_XF],offset.x);
-    vector<MX> rxf_aug = vertsplit(integrator_out[INTEGRATOR_RXF],offset.rx);
     vector<MX> qf_aug = vertsplit(integrator_out[INTEGRATOR_QF],offset.q);
+    vector<MX> zf_aug = vertsplit(integrator_out[INTEGRATOR_ZF],offset.z);
+    vector<MX> rxf_aug = vertsplit(integrator_out[INTEGRATOR_RXF],offset.rx);
     vector<MX> rqf_aug = vertsplit(integrator_out[INTEGRATOR_RQF],offset.rq);
+    vector<MX> rzf_aug = vertsplit(integrator_out[INTEGRATOR_RZF],offset.rz);
     vector<MX>::const_iterator xf_aug_it = xf_aug.begin();
-    vector<MX>::const_iterator rxf_aug_it = rxf_aug.begin();
     vector<MX>::const_iterator qf_aug_it = qf_aug.begin();
+    vector<MX>::const_iterator zf_aug_it = zf_aug.begin();
+    vector<MX>::const_iterator rxf_aug_it = rxf_aug.begin();
     vector<MX>::const_iterator rqf_aug_it = rqf_aug.begin();
+    vector<MX>::const_iterator rzf_aug_it = rzf_aug.begin();
 
     // All outputs of the return function
     vector<MX> ret_out;
@@ -853,8 +897,10 @@ namespace CasADi{
     for(int dir=-1; dir<nfwd; ++dir){
       if( nx_>0) dd[INTEGRATOR_XF]  = *xf_aug_it++;
       if( nq_>0) dd[INTEGRATOR_QF]  = *qf_aug_it++;
+      if( nz_>0) dd[INTEGRATOR_ZF]  = *zf_aug_it++;
       if(nrx_>0) dd[INTEGRATOR_RXF] = *rxf_aug_it++;
       if(nrq_>0) dd[INTEGRATOR_RQF] = *rqf_aug_it++;
+      if(nrz_>0) dd[INTEGRATOR_RZF] = *rzf_aug_it++;
       ret_out.insert(ret_out.end(),dd.begin(),dd.end());
     }
   
@@ -864,8 +910,10 @@ namespace CasADi{
     for(int dir=0; dir<nadj; ++dir){
       if( nx_>0) dd[INTEGRATOR_X0]  = *rxf_aug_it++;
       if( np_>0) dd[INTEGRATOR_P]   = *rqf_aug_it++;
+      if( nz_>0) dd[INTEGRATOR_Z0]  = *rzf_aug_it++;
       if(nrx_>0) dd[INTEGRATOR_RX0] = *xf_aug_it++;
       if(nrp_>0) dd[INTEGRATOR_RP]  = *qf_aug_it++;
+      if(nrz_>0) dd[INTEGRATOR_RZ0] = *zf_aug_it++;
       ret_out.insert(ret_out.end(),dd.begin(),dd.end());
     }
     log("IntegratorInternal::getDerivative","end");
@@ -891,6 +939,7 @@ namespace CasADi{
     
     // Initialize output
     output(INTEGRATOR_XF).set(input(INTEGRATOR_X0));
+    output(INTEGRATOR_ZF).set(input(INTEGRATOR_Z0));
     
     // Reset summation states
     output(INTEGRATOR_QF).set(0.0);
@@ -906,6 +955,7 @@ namespace CasADi{
 
     // Initialize output
     output(INTEGRATOR_RXF).set(input(INTEGRATOR_RX0));
+    output(INTEGRATOR_RZF).set(input(INTEGRATOR_RZ0));
     
     // Reset summation states
     output(INTEGRATOR_RQF).set(0.0);
