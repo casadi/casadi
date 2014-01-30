@@ -508,10 +508,9 @@ class Integrationtests(casadiTestCase):
             if integrator.hasOption("reltol"):
               integrator.setOption("reltol",1e-9)
             integrator.setOption("tf",tend_)
-            if integrator.hasOption("init_xdot"):
-              integrator.setOption("init_xdot",list(DMatrix(point["x0"])))
+            if Integrator==IdasIntegrator:
               integrator.setOption("calc_icB",True)
-              integrator.setOption("augmented_options", {"init_xdot":None, "abstol":1e-9,"reltol":1e-9})
+              integrator.setOption("augmented_options", {"abstol":1e-9,"reltol":1e-9})
             #if "dae" in p_features and integrator.hasOption("init_z"):
             #  integrator.setOption("init_z",[0.1])
             #  integrator.setOption("augmented_options", {"init_z":GenericType(),"init_xdot":GenericType()})

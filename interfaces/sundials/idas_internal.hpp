@@ -229,11 +229,7 @@ class IdasInternal : public SundialsInternal{
   bool cj_scaling_;
 
   // Disable IDAS internal warning messages
-  bool disable_internal_warnings_;
-  
-  //  Initial values for xdot and z
-  std::vector<double> init_z_, init_xdot_;
-  
+  bool disable_internal_warnings_;  
 };
 
 } // namespace CasADi
