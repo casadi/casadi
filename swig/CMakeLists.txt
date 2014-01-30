@@ -317,7 +317,13 @@ if(PYTHONINTERP_FOUND)
     COMPONENT install_python
     USE_SOURCE_PERMISSIONS
     PATTERN .pyc EXCLUDE
+    PATTERN .svn EXCLUDE
   )
+  install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.py 
+    DESTINATION ${PYTHON_PREFIX}/casadi
+    COMPONENT install_python
+  )
+  
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
     DESTINATION ${PYTHON_PREFIX}/casadi
     COMPONENT install_python
