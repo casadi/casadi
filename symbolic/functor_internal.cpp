@@ -32,7 +32,7 @@ namespace CasADi{
 
   //Call
 
-  CustomEvaluateCInternal::CustomEvaluateCInternal(CustomEvaluateCPtr ptr)  : FunctorCInternal(ptr) {
+  CustomEvaluateCInternal::CustomEvaluateCInternal(CustomEvaluateCPtr ptr)  : FunctorCInternal<CustomEvaluateCPtr>(ptr) {
   }
   
   void CustomEvaluateCInternal::call(CustomFunction& fcn, void* user_data) {
@@ -44,7 +44,7 @@ namespace CasADi{
     return new CustomEvaluateCInternal(ptr_);
   }
 
-  CallbackCInternal::CallbackCInternal(CallbackCPtr ptr)  : FunctorCInternal(ptr) {
+  CallbackCInternal::CallbackCInternal(CallbackCPtr ptr)  : FunctorCInternal<CallbackCPtr>(ptr) {
   }
   
   int CallbackCInternal::call(FX& fcn, void* user_data) {
