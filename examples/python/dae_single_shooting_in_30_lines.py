@@ -61,7 +61,8 @@ U = msym("U",20)
 X  = msym([0,1])
 J = 0
 for k in range(20):
-  (X,Q,_,_) = I.call( integratorIn(x0=X,p=U[k]) )   # Call the integrator
+  tmp = I.call( integratorIn(x0=X,p=U[k]) )   # Call the integrator
+  X,Q = integratorOut(tmp,"xf","qf")
   J += Q                           # Sum up quadratures
   
 # NLP callback functions
