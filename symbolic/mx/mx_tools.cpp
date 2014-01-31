@@ -371,6 +371,10 @@ namespace CasADi{
     return ret;
   }
 
+  MX full(const MX& x) {
+    return densify(x);
+  }
+
   void makeDense(MX& x){
     // Quick return if already dense
     if(x.dense()) return;
