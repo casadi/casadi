@@ -239,14 +239,15 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::spEvaluate(bool fwd){
-    // Auxiliary outputs not yet supported
-    casadi_assert_message(getNumOutputs()==1, "Not implemented");
 
     // Get arrays
     bvec_t* z0 = reinterpret_cast<bvec_t*>(input(iin_).ptr());
     bvec_t* z = reinterpret_cast<bvec_t*>(output(iout_).ptr());
     bvec_t* zf = reinterpret_cast<bvec_t*>(f_.input(iin_).ptr());
     bvec_t* rf = reinterpret_cast<bvec_t*>(f_.output(iout_).ptr());
+
+    // Initialize the callback for sparsity propagation
+    f_.spInit(fwd);
 
     if(fwd){
 
@@ -257,21 +258,30 @@ namespace CasADi{
       }
 
       // Propagate dependencies through the function
-      f_.spInit(true);
       f_.spEvaluate(true);
       
       // "Solve" in order to propagate to z
       fill(z,z+n_,0);
       linsol_.spSolve(z,rf,true);
+      
+      // Propagate to auxiliary outputs
+      if(getNumOutputs()>1){
+        copy(z,z+n,zf);
+        f_.spEvaluate(true);
+        for(int i=0; i<getNumOutputs(); ++i){
+          if(i!=iout_) f_.output(i).get(output(i));
+        }
+      }
 
-    } else { 
+    } else {
+      // Auxiliary outputs not yet supported
+      casadi_assert_message(getNumOutputs()==1, "Not implemented");
 
       // "Solve" in order to get seed
       fill(rf,rf+n_,0);
       linsol_.spSolve(rf,z,false);
       
       // Propagate dependencies through the function
-      f_.spInit(false);
       f_.spEvaluate(false);
 
       // Collect influence on inputs
