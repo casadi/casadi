@@ -708,7 +708,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
           hmap[a] = [m]
     self.size = k
     for k,v in hmap.iteritems():
-      hmap[k] = vecNZcat(v)
+      hmap[k] = flattenNZcat(v)
     
     self.map.update(hmap)
     
@@ -840,7 +840,7 @@ class ssymStruct(CasadiStructured,MasterGettable):
       e = self.struct.getStructEntryByCanonicalIndex(i)
       s.append(ssym("_".join(map(str,i)),e.sparsity.size()))
         
-    self.master = vecNZcat(s)
+    self.master = flattenNZcat(s)
 
     for e in self.entries:
       if e.sym is not None:
@@ -955,7 +955,7 @@ class MXStruct(MatrixStruct):
   def __MX__(self):
     return self.cat
 
-class MXVeccatStruct(CasadiStructured,MasterGettable):
+class MXFlattencatStruct(CasadiStructured,MasterGettable):
   description = "Partially mutable MX"
   def __init__(self,arg,order=None):
     CasadiStructured.__init__(self,arg,order=order)
@@ -979,9 +979,9 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
         
     def inject(payload,canonicalIndex,extraIndex=None,entry=None):
       if extraIndex is not None:
-        raise Exception("An MX veccat structure does not accept indexing on MX level for __setitem__.")
+        raise Exception("An MX flattencat structure does not accept indexing on MX level for __setitem__.")
       if not hasattr(self,"sparsity"):
-        raise Exception("An MX veccat structure __setitem__ accepts only objects that have sparsity.")
+        raise Exception("An MX flattencat structure __setitem__ accepts only objects that have sparsity.")
       
       if canonicalIndex in self.mapping:
         if self.struct.map[canonicalIndex].sparsity()!=payload.sparsity():
@@ -1003,7 +1003,7 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
       raise Exception("Problem in MX vecNZcat structure cat: missing expressions. The following entries are missing: %s" % str(missing))
       
     if self.dirty:
-      self.master_cached = vecNZcat(self.storage)
+      self.master_cached = flattenNZcat(self.storage)
 
     return self.master_cached
     
@@ -1012,7 +1012,7 @@ struct_ssym = ssymStruct
 struct_msym = msymStruct
 struct_SX = SXMatrixStruct
 struct_MX_mutable = MXStruct
-struct_MX = MXVeccatStruct
+struct_MX = MXFlattencatStruct
 struct = CasadiStructured
 
 
