@@ -506,7 +506,12 @@ namespace CasADi{
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::grad(int iind, int oind){
     casadi_assert_message(output(oind).scalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
-  
+
+    // Quick return if trivially empty
+    if(input(iind).size()==0 || output(oind).size()==0 || jacSparsity(iind,oind,true,false).size()==0){
+      return MatType::sparse(input(iind).shape());
+    }
+
     // Dummy forward seeds and sensitivities
     typename std::vector<std::vector<MatType> > fseed, fsens;
   
