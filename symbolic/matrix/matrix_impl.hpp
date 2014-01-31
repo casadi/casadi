@@ -866,6 +866,26 @@ namespace CasADi{
   }
 
   template<class T>
+  void Matrix<T>::setBV(const Matrix<T>& val){
+    bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
+    const bvec_t* bw_val = reinterpret_cast<const bvec_t*>(getPtr(val.data()));
+    sparsity().set(bw_this,bw_val,val.sparsity());
+  }
+
+  template<class T>
+  void Matrix<T>::setZeroBV(){
+    bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
+    std::fill(bw_this,bw_this+size(),bvec_t(0));
+  }
+
+  template<class T>
+  void Matrix<T>::borBV(const Matrix<T>& val){
+    bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
+    const bvec_t* bw_val = reinterpret_cast<const bvec_t*>(getPtr(val.data()));
+    sparsity().bor(bw_this,bw_val,val.sparsity());
+  }
+
+  template<class T>
   void Matrix<T>::get(Matrix<T>& val, Sparsity sp) const{
     val.set(*this,sp);
   }

@@ -73,6 +73,10 @@ namespace CasADi{
     (*this)->spSolve(X,B,transpose);
   }
 
+  void LinearSolver::spSolve(DMatrix& X, DMatrix& B, bool transpose) const{
+    (*this)->spSolve(X,B,transpose);
+  }
+
 
 } // namespace CasADi
 

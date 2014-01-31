@@ -87,8 +87,11 @@ enum LinsolOutput{
     /// Solve the factorized system of equations
     void solve(double* x, int nrhs=1, bool transpose=false);
 
+    //@{
     /// Propagate sparsity through a linear solve
     void spSolve(bvec_t* X, bvec_t* B, bool transpose=false) const;
+    void spSolve(DMatrix& X, DMatrix& B, bool transpose=false) const;
+    //@}
 
 #endif // SWIG
 

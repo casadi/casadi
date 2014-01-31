@@ -630,6 +630,15 @@ namespace CasADi{
 
     /** \brief  Legacy - use setArray instead */
     void set(const T* val, Sparsity sp=SPARSE);
+
+    /** Bitwise set, reinterpreting the data as a bvec_t array */
+    void setZeroBV();
+
+    /** Bitwise set, reinterpreting the data as a bvec_t array */
+    void setBV(const Matrix<T>& val);
+
+    /** Bitwise or, reinterpreting the data as a bvec_t array */
+    void borBV(const Matrix<T>& val);
 #endif
 
     /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 

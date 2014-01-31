@@ -276,6 +276,12 @@ namespace CasADi{
     }
   }
 
+  void LinearSolverInternal::spSolve(DMatrix& X, DMatrix& B, bool transpose) const{
+    bvec_t* X_bvec = reinterpret_cast<bvec_t*>(X.ptr());
+    bvec_t* B_bvec = reinterpret_cast<bvec_t*>(B.ptr());
+    spSolve(X_bvec,B_bvec,transpose);
+  }
+
   void LinearSolverInternal::spSolve(bvec_t* X, bvec_t* B, bool transpose) const{
     const CRSSparsity& A_sp = input(LINSOL_A).sparsity();
     const std::vector<int>& A_rowind = A_sp.rowind();
@@ -352,6 +358,7 @@ namespace CasADi{
   void LinearSolverInternal::solve(double* x, int nrhs, bool transpose){
     casadi_error("LinearSolverInternal::solve not defined for class " << typeid(*this).name());
   }
+
 
 } // namespace CasADi
  
