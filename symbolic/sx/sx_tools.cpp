@@ -149,7 +149,7 @@ void compress(SXMatrix &ex, int level){
 
 std::vector<SXMatrix> substitute(const std::vector<SXMatrix> &ex, const std::vector<SXMatrix> &v, const std::vector<SXMatrix> &vdef){
   // Assert consistent dimensions
-  casadi_assert(v.size()==vdef.size());
+  casadi_assert_warning(v.size()==vdef.size(),"subtitute: number of symbols to replace ( " << v.size() << ") must match number of expressions (" << vdef.size() << ") to replace them with.");
 
   // Quick return if all equal
   bool all_equal = true;
