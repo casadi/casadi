@@ -88,13 +88,13 @@ print j
 #! We create a DAE system solver
 I = IdasIntegrator(f)
 I.setOption("calc_ic",False)
-I.setOption("init_z",Z_)
 I.setOption("init_xdot",XDOT_)
   
 I.init()
 
 I.setInput(P_,"p")
 I.setInput(X_,"x0")
+I.setInput(Z_,"z0")
 
 #! This system is not solvable with idas, because it is of DAE-index 3.
 #! It is impossible obtain lambda from the last element of the residual.
@@ -142,12 +142,12 @@ I = IdasIntegrator(f)
 
 I.setOption('t0',0)
 I.setOption('tf',1)
-I.setOption("init_z",Z_)
 I.setOption("init_xdot",XDOT_)
 I.init()
   
 I.setInput(P_,"p")
 I.setInput(X_,"x0")
+I.setInput(Z_,"z0")
 I.evaluate()
 
 print I.getOutput("xf")
@@ -163,6 +163,7 @@ X_ = [5,0]  # states
 #! You will get an error:
 I.setInput(P_,"p")
 I.setInput(X_,"x0")
+I.setInput(Z_,"z0")
 try:
   I.evaluate()
 except Exception as e:

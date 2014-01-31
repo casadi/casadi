@@ -232,7 +232,7 @@ class IdasInternal : public SundialsInternal{
   bool disable_internal_warnings_;
   
   //  Initial values for xdot and z
-  std::vector<double> init_z_, init_xdot_;
+  std::vector<double> init_xdot_;
   
 };
 
