@@ -266,7 +266,7 @@ namespace CasADi{
       
       // Propagate to auxiliary outputs
       if(getNumOutputs()>1){
-        copy(z,z+n,zf);
+        copy(z,z+n_,zf);
         f_.spEvaluate(true);
         for(int i=0; i<getNumOutputs(); ++i){
           if(i!=iout_) f_.output(i).get(output(i));
