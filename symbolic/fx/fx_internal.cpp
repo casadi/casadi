@@ -1526,12 +1526,12 @@ namespace CasADi{
     ret.setOption("name",ss.str());
     
     // Names of inputs
-    std::vector<std::string> io_names;
-    io_names.reserve(getNumInputs()*(1+nfwd)+getNumOutputs()*nadj);
+    std::vector<std::string> i_names;
+    i_names.reserve(getNumInputs()*(1+nfwd)+getNumOutputs()*nadj);
 
     // Nondifferentiated inputs
     for(int i=0; i<getNumInputs(); ++i){
-      io_names.push_back("der_" + input_.scheme.entryLabel(i));
+      i_names.push_back("der_" + input_.scheme.entryLabel(i));
     }
 
     // Forward seeds
@@ -1539,7 +1539,7 @@ namespace CasADi{
       for(int i=0; i<getNumInputs(); ++i){
         ss.str(string());
         ss << "fwd" << d << "_" << input_.scheme.entryLabel(i);
-        io_names.push_back(ss.str());
+        i_names.push_back(ss.str());
       }
     }
     
@@ -1548,20 +1548,20 @@ namespace CasADi{
       for(int i=0; i<getNumOutputs(); ++i){
         ss.str(string());
         ss << "adj" << d << "_" << output_.scheme.entryLabel(i);
-        io_names.push_back(ss.str());
+        i_names.push_back(ss.str());
       }
     }
     
     // Pass to return object
-    ret.setInputScheme(io_names);
+    ret.setInputScheme(i_names);
   
     // Names of outputs
-    io_names.clear();
-    io_names.reserve(getNumOutputs()*(1+nfwd)+getNumInputs()*nadj);
+    std::vector<std::string> o_names;
+    o_names.reserve(getNumOutputs()*(1+nfwd)+getNumInputs()*nadj);
     
     // Nondifferentiated inputs
     for(int i=0; i<getNumOutputs(); ++i){
-      io_names.push_back("der_" + output_.scheme.entryLabel(i));
+      o_names.push_back("der_" + output_.scheme.entryLabel(i));
     }
     
     // Forward sensitivities
@@ -1569,7 +1569,7 @@ namespace CasADi{
       for(int i=0; i<getNumOutputs(); ++i){
         ss.str(string());
         ss << "fwd" << d << "_" << output_.scheme.entryLabel(i);
-        io_names.push_back(ss.str());
+        o_names.push_back(ss.str());
       }
     }
     
@@ -1578,15 +1578,49 @@ namespace CasADi{
       for(int i=0; i<getNumInputs(); ++i){
         ss.str(string());
         ss << "adj" << d << "_" << input_.scheme.entryLabel(i);
-        io_names.push_back(ss.str());
+        o_names.push_back(ss.str());
       }
     }
     
     // Pass to return object
-    ret.setOutputScheme(io_names);
+    ret.setOutputScheme(o_names);
     
     // Initialize it
     ret.init();
+
+    // Consistency check for inputs
+    int ind=0;
+    for(int d=-1; d<nfwd; ++d){
+      for(int i=0; i<getNumInputs(); ++i, ++ind){
+        if(ret.input(ind).shape()!=input(i).shape()){
+          casadi_error("Incorrect shape for " << ret << " input " << ind << " \"" << i_names.at(ind) << "\". Expected " << input(i).shape() << " but got " << ret.input(ind).shape());
+        }
+      }
+    }
+    for(int d=0; d<nadj; ++d){
+      for(int i=0; i<getNumOutputs(); ++i, ++ind){
+        if(ret.input(ind).shape()!=output(i).shape()){
+          casadi_error("Incorrect shape for " << ret << " input " << ind << " \"" << i_names.at(ind) << "\". Expected " << output(i).shape() << " but got " << ret.input(ind).shape());
+        }
+      }
+    }
+
+    // Consistency check for outputs
+    ind=0;
+    for(int d=-1; d<nfwd; ++d){
+      for(int i=0; i<getNumOutputs(); ++i, ++ind){
+        if(ret.output(ind).shape()!=output(i).shape()){
+          casadi_error("Incorrect shape for " << ret << " output " << ind << " \"" <<  o_names.at(ind) << "\". Expected " << output(i).shape() << " but got " << ret.output(ind).shape());
+        }
+      }
+    }
+    for(int d=0; d<nadj; ++d){
+      for(int i=0; i<getNumInputs(); ++i, ++ind){
+        if(ret.output(ind).shape()!=input(i).shape()){
+          casadi_error("Incorrect shape for " << ret << " output " << ind << " \"" << o_names.at(ind) << "\". Expected " << input(i).shape() << " but got " << ret.output(ind).shape());
+        }
+      }
+    }
 
     // Return cached or generated function
     return ret;
