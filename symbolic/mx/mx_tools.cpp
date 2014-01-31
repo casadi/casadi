@@ -113,6 +113,16 @@ namespace CasADi{
     MX (&f)(const MX&) = vecNZ;
     return vertcat(applymap(vecNZ,comp));
   }
+  
+  MX flattencat(const vector<MX>& comp) {
+        MX (&f)(const MX&) = flatten;
+    return vertcat(applymap(f,comp));
+  }
+
+  MX flattenNZcat(const vector<MX>& comp) {
+    MX (&f)(const MX&) = flattenNZ;
+    return vertcat(applymap(flattenNZ,comp));
+  }
 
   MX norm_2(const MX &x){
     return x->getNorm2();
@@ -241,6 +251,14 @@ namespace CasADi{
       return vec(x);
     } else {
       return trans(x)->getGetNonzeros(sp_dense(x.size()),range(x.size()));
+    }
+  }
+  
+  MX flattenNZ(const MX& x) {
+    if(x.dense()){
+      return flatten(x);
+    } else {
+      return x->getGetNonzeros(sp_dense(x.size()),range(x.size()));
     }
   }
 
