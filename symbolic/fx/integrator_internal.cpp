@@ -456,46 +456,6 @@ namespace CasADi{
   void IntegratorInternal::spEvaluate(bool fwd){
     log("IntegratorInternal::spEvaluate","begin");
     
-    // Get pointers to integrator data structures
-    bvec_t *x0, *p, *rx0, *rp, *xf, *qf, *rxf, *rqf, *z0, *rz0, *zf, *rzf;
-    x0 = reinterpret_cast<bvec_t*>(this->x0().ptr());
-    p = reinterpret_cast<bvec_t*>(this->p().ptr());
-    z0 = reinterpret_cast<bvec_t*>(this->z0().ptr());
-    rx0 = reinterpret_cast<bvec_t*>(this->rx0().ptr());
-    rp = reinterpret_cast<bvec_t*>(this->rp().ptr());
-    rz0 = reinterpret_cast<bvec_t*>(this->rz0().ptr());
-    xf = reinterpret_cast<bvec_t*>(this->xf().ptr());    
-    qf = reinterpret_cast<bvec_t*>(this->qf().ptr());
-    zf = reinterpret_cast<bvec_t*>(this->zf().ptr());    
-    rxf = reinterpret_cast<bvec_t*>(this->rxf().ptr());
-    rqf = reinterpret_cast<bvec_t*>(this->rqf().ptr());
-    rzf = reinterpret_cast<bvec_t*>(this->rzf().ptr());
-
-    // Get pointers to DAE callback data structures
-    bvec_t *f_t, *f_x, *f_z, *f_p, *f_ode, *f_alg, *f_quad;
-    f_t = reinterpret_cast<bvec_t*>(f_.input(DAE_T).ptr());
-    f_x = reinterpret_cast<bvec_t*>(f_.input(DAE_X).ptr());
-    f_z = reinterpret_cast<bvec_t*>(f_.input(DAE_Z).ptr());
-    f_p = reinterpret_cast<bvec_t*>(f_.input(DAE_P).ptr());
-    f_ode = reinterpret_cast<bvec_t*>(f_.output(DAE_ODE).ptr());
-    f_alg = reinterpret_cast<bvec_t*>(f_.output(DAE_ALG).ptr());
-    f_quad = reinterpret_cast<bvec_t*>(f_.output(DAE_QUAD).ptr());
-    
-    // Get pointers to DAE callback data structures (backward problem)
-    bvec_t *g_t, *g_x, *g_z, *g_p, *g_rx, *g_rz, *g_rp, *g_ode, *g_alg, *g_quad;
-    if(!g_.isNull()){
-      g_t = reinterpret_cast<bvec_t*>(g_.input(RDAE_T).ptr());
-      g_x = reinterpret_cast<bvec_t*>(g_.input(RDAE_X).ptr());
-      g_z = reinterpret_cast<bvec_t*>(g_.input(RDAE_Z).ptr());
-      g_p = reinterpret_cast<bvec_t*>(g_.input(RDAE_P).ptr());
-      g_rx = reinterpret_cast<bvec_t*>(g_.input(RDAE_RX).ptr());
-      g_rz = reinterpret_cast<bvec_t*>(g_.input(RDAE_RZ).ptr());
-      g_rp = reinterpret_cast<bvec_t*>(g_.input(RDAE_RP).ptr());
-      g_ode = reinterpret_cast<bvec_t*>(g_.output(RDAE_ODE).ptr());
-      g_alg = reinterpret_cast<bvec_t*>(g_.output(RDAE_ALG).ptr());
-      g_quad = reinterpret_cast<bvec_t*>(g_.output(RDAE_QUAD).ptr());
-    }
-
     // Temporary vectors
     bvec_t *tmp_f1, *tmp_f2, *tmp_g1, *tmp_g2;
     tmp_f1 = reinterpret_cast<bvec_t*>(linsol_f_.input(LINSOL_B).ptr());
@@ -506,66 +466,67 @@ namespace CasADi{
     }
 
     if(fwd){
+
       // Propagate through the DAE
-      if(f_t!=0) *f_t = 0;
-      std::copy(x0,x0+nx_,f_x);
-      std::copy(p,p+np_,f_p);
-      std::fill(f_z,f_z+nz_,0);
+      f_.input(DAE_T).setZeroBV();
+      f_.input(DAE_X).setBV(x0());
+      f_.input(DAE_P).setBV(p());
+      f_.input(DAE_Z).setZeroBV();
       f_.spInit(true);
       f_.spEvaluate(true);
-      
+
       // Propagate interdependencies
-      std::copy(f_ode,f_ode+nx_,tmp_f1);
-      std::copy(f_alg,f_alg+nz_,tmp_f1+nx_);
-      std::copy(x0,x0+nx_,tmp_f2);
+      f_.output(DAE_ODE).getArrayBV(tmp_f1,nx_);
+      f_.output(DAE_ALG).getArrayBV(tmp_f1+nx_,nz_);
+      x0().getArrayBV(tmp_f2,nx_);
       std::fill(tmp_f2+nx_,tmp_f2+nx_+nz_,0);
       linsol_f_.spSolve(tmp_f2,tmp_f1,true);
-      std::copy(tmp_f2,tmp_f2+nx_,xf);
-      std::copy(tmp_f2+nx_,tmp_f2+nx_+nz_,zf);
+      xf().setArrayBV(tmp_f2,nx_);
+      zf().setArrayBV(tmp_f2+nx_,nz_);
 
       // Get influence on the quadratures
       if(nq_>0){
-        std::copy(tmp_f2,tmp_f2+nx_,f_x);
-        std::copy(zf,zf+nz_,f_z);
+        f_.input(DAE_X).getArrayBV(tmp_f2,nx_);
+        f_.input(DAE_Z).getBV(zf());
         f_.spEvaluate(true);
-        std::copy(f_quad,f_quad+nq_,qf);
+        qf().setBV(f_.output(DAE_QUAD));
       }
-      
+
       // Propagate through g
       if(!g_.isNull()){
         
         // Propagate through the backward DAE
-        if(g_t!=0) *g_t = 0;
-        std::copy(xf,xf+nx_,g_x);
-        std::copy(p,p+np_,g_p);
-        std::copy(zf,zf+nz_,g_z);
-        std::copy(rx0,rx0+nrx_,g_rx);
-        std::copy(rp,rp+nrp_,g_rp);
-        std::fill(g_rz,g_rz+nrz_,0);
+        g_.input(RDAE_T).setZeroBV();
+        g_.input(RDAE_X).setBV(xf());
+        g_.input(RDAE_P).setBV(p());
+        g_.input(RDAE_Z).setBV(zf());
+        g_.input(RDAE_RX).setBV(rx0());
+        g_.input(RDAE_RP).setBV(rp());
+        g_.input(RDAE_RZ).setZeroBV();
         g_.spInit(true);
         g_.spEvaluate(true);
         
         // Propagate interdependencies
-        std::copy(g_ode,g_ode+nrx_,tmp_g1);
-        std::copy(g_alg,g_alg+nrz_,tmp_g1+nrx_);
-        std::copy(rx0,rx0+nrx_,tmp_g2);
+        g_.output(RDAE_ODE).getArrayBV(tmp_g1,nrx_);
+        g_.output(RDAE_ALG).getArrayBV(tmp_g1+nrx_,nrz_);
+        rx0().getArrayBV(tmp_g2,nrx_);
         std::fill(tmp_g2+nrx_,tmp_g2+nrx_+nrz_,0);
         linsol_g_.spSolve(tmp_g2,tmp_g1,true);
-        std::copy(tmp_g2,tmp_g2+nrx_,rxf);
-        std::copy(tmp_g2+nrx_,tmp_g2+nrx_+nrz_,rzf);
+        rxf().setArrayBV(tmp_g2,nrx_);
+        rzf().setArrayBV(tmp_g2+nrx_,nrz_);
 
         // Get influence on the backward quadratures
         if(nrq_>0){
-          std::copy(tmp_g2,tmp_g2+nrx_,g_rx);
-          std::copy(rzf,rzf+nrz_,g_rz);
+          g_.input(RDAE_RX).setArrayBV(tmp_g2,nrx_);
+          g_.input(RDAE_RZ).setBV(rzf());
           g_.spEvaluate(true);
-          std::copy(g_quad,g_quad+nrq_,rqf);
+          rqf().setBV(g_.output(RDAE_QUAD));
         }
       }
     } else {
       // No dependency on initial guess
-      std::fill(z0,z0+nz_,0);
-      std::fill(rz0,rz0+nrz_,0);
+      z0().setZeroBV();
+      rz0().setZeroBV();
     }
 
 
