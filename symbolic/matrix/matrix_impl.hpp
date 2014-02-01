@@ -886,6 +886,20 @@ namespace CasADi{
   }
 
   template<class T>
+  void Matrix<T>::getArrayBV(bvec_t* val, int len) const{
+    casadi_assert(len==size());
+    const bvec_t* bw_this = reinterpret_cast<const bvec_t*>(getPtr(data()));
+    std::copy(bw_this,bw_this+len,val);
+  }
+
+  template<class T>
+  void Matrix<T>::setArrayBV(const bvec_t* val, int len){
+    casadi_assert(len==size());
+    bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
+    std::copy(val,val+len,bw_this);
+  }
+
+  template<class T>
   void Matrix<T>::get(Matrix<T>& val, Sparsity sp) const{
     val.set(*this,sp);
   }

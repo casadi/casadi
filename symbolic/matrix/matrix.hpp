@@ -637,8 +637,18 @@ namespace CasADi{
     /** Bitwise set, reinterpreting the data as a bvec_t array */
     void setBV(const Matrix<T>& val);
 
+    /** Bitwise set, reinterpreting the data as a bvec_t array */
+    void getBV(Matrix<T>& val) const{ val.setBV(*this);}
+
+    /** \brief Bitwise get the non-zero elements, array */
+    void getArrayBV(bvec_t* val, int len) const;
+
+    /** \brief Bitwise set the non-zero elements, array */
+    void setArrayBV(const bvec_t* val, int len);
+
     /** Bitwise or, reinterpreting the data as a bvec_t array */
     void borBV(const Matrix<T>& val);
+
 #endif
 
     /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 
