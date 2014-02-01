@@ -41,11 +41,11 @@ namespace CasADi{
   }
   
   IntegratorInternal* Integrator::operator->(){
-    return static_cast<IntegratorInternal*>(GenericIntegrator::operator->());
+    return static_cast<IntegratorInternal*>(FX::operator->());
   }
 
   const IntegratorInternal* Integrator::operator->() const{
-    return static_cast<const IntegratorInternal*>(GenericIntegrator::operator->()); 
+    return static_cast<const IntegratorInternal*>(FX::operator->()); 
   }
   
   void Integrator::reset(){

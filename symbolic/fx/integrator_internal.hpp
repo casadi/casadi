@@ -24,7 +24,7 @@
 #define INTEGRATOR_INTERNAL_HPP
 
 #include "integrator.hpp"
-#include "generic_integrator_internal.hpp"
+#include "fx_internal.hpp"
 
 namespace CasADi{
 
@@ -34,7 +34,7 @@ namespace CasADi{
       \author Joel Andersson 
       \date 2010
   */
-  class IntegratorInternal : public GenericIntegratorInternal{
+  class IntegratorInternal : public FXInternal{
   public:
     /** \brief  Constructor */
     IntegratorInternal(const FX& f, const FX& g);
@@ -104,6 +104,15 @@ namespace CasADi{
     // Create sparsity pattern of the extended Jacobian (backward problem)
     CRSSparsity spJacG();
   
+    /// Number of states for the forward integration
+    int nx_, nz_, nq_;
+  
+    /// Number of states for the backward integration
+    int nrx_, nrz_, nrq_;
+
+    /// Number of forward and backward parameters
+    int np_, nrp_;
+
     /// Integration horizon
     double t0_, tf_;
 

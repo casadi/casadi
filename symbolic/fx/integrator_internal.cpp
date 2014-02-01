@@ -35,7 +35,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace CasADi{
 
-  IntegratorInternal::IntegratorInternal(const FX& f, const FX& g) : GenericIntegratorInternal(f,g), f_(f), g_(g){
+  IntegratorInternal::IntegratorInternal(const FX& f, const FX& g) : f_(f), g_(g){
     // set default options
     setOption("name","unnamed_integrator"); // name of the function 
   

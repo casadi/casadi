@@ -87,7 +87,6 @@ SET(CASADI_SRCS
   fx/symbolic_qr.hpp         fx/symbolic_qr.cpp         fx/symbolic_qr_internal.hpp         fx/symbolic_qr_internal.cpp
   fx/implicit_function.hpp   fx/implicit_function.cpp   fx/implicit_function_internal.hpp   fx/implicit_function_internal.cpp
   fx/integrator.hpp          fx/integrator.cpp          fx/integrator_internal.hpp          fx/integrator_internal.cpp
-  fx/generic_integrator.hpp  fx/generic_integrator.cpp  fx/generic_integrator_internal.hpp  fx/generic_integrator_internal.cpp
   fx/nlp_solver.hpp          fx/nlp_solver.cpp          fx/nlp_solver_internal.hpp          fx/nlp_solver_internal.cpp
   fx/simulator.hpp           fx/simulator.cpp           fx/simulator_internal.hpp           fx/simulator_internal.cpp
   fx/control_simulator.hpp   fx/control_simulator.cpp   fx/control_simulator_internal.hpp   fx/control_simulator_internal.cpp
