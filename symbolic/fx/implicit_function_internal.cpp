@@ -268,22 +268,40 @@ namespace CasADi{
       }
 
     } else {
-
-      // Auxiliary outputs not yet supported
-      casadi_assert_message(getNumOutputs()==1, "Not implemented");
+      
+      // Propagate dependencies from auxiliary outputs
+      if(getNumOutputs()>1){
+        f_.output(iout_).setZeroBV();
+        for(int i=0; i<getNumOutputs(); ++i){
+          if(i!=iout_) f_.output(i).setBV(output(i));
+        }
+        f_.spEvaluate(false);
+        for(int i=0; i<getNumInputs(); ++i){
+          input(i).setBV(f_.input(i));
+        }
+      } else {
+        for(int i=0; i<getNumInputs(); ++i){
+          input(i).setZeroBV();
+        }
+      }
+      
+      // Add dependency on implicitly defined variable
+      input(iin_).borBV(output(iout_));      
 
       // "Solve" in order to get seed
       f_.output(iout_).setZeroBV();
-      linsol_.spSolve(f_.output(iout_),output(iout_),false);
+      linsol_.spSolve(f_.output(iout_),input(iin_),false);
       
       // Propagate dependencies through the function
       f_.spEvaluate(false);
 
       // Collect influence on inputs
-      input(iin_).setZeroBV();
       for(int i=0; i<getNumInputs(); ++i){
-        if(i!=iin_) input(i).setBV(f_.input(i));
+        if(i!=iin_) input(i).borBV(f_.input(i));
       }
+      
+      // No dependency on the initial guess
+      input(iin_).setZeroBV();
     }
   }
 
