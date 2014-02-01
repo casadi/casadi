@@ -465,6 +465,12 @@ namespace CasADi{
       tmp_g2 = reinterpret_cast<bvec_t*>(linsol_g_.output(LINSOL_X).ptr());
     }
 
+    // Initialize the callback functions for sparsity propagation
+    f_.spInit(fwd);
+    if(!g_.isNull()){
+      g_.spInit(fwd);
+    }
+
     if(fwd){
 
       // Propagate through the DAE
@@ -472,7 +478,6 @@ namespace CasADi{
       f_.input(DAE_X).setBV(x0());
       f_.input(DAE_P).setBV(p());
       f_.input(DAE_Z).setZeroBV();
-      f_.spInit(true);
       f_.spEvaluate(true);
       f_.output(DAE_ODE).getArrayBV(tmp_f1,nx_);
       f_.output(DAE_ALG).getArrayBV(tmp_f1+nx_,nz_);
@@ -503,7 +508,6 @@ namespace CasADi{
         g_.input(RDAE_RX).setBV(rx0());
         g_.input(RDAE_RP).setBV(rp());
         g_.input(RDAE_RZ).setZeroBV();
-        g_.spInit(true);
         g_.spEvaluate(true);
         g_.output(RDAE_ODE).getArrayBV(tmp_g1,nrx_);
         g_.output(RDAE_ALG).getArrayBV(tmp_g1+nrx_,nrz_);
@@ -523,10 +527,54 @@ namespace CasADi{
           g_.output(RDAE_QUAD).getBV(rqf());
         }
       }
-    } else {
+    } else { // reverse mode
+      
+      // Clear adjoint sensitivities
+      x0().setBV(xf());
+      p().setZeroBV();
+      z0().setBV(zf());
+      rx0().setBV(rxf());
+      rp().setZeroBV();
+      rz0().setBV(rzf());
+      
+      // Propagate through g
+      if(!g_.isNull()){
+
+        // Propagate influence on the backward quadratures
+        if(nrq_>0){
+          g_.output(RDAE_ODE).setZeroBV();
+          g_.output(RDAE_ALG).setZeroBV();
+          g_.output(RDAE_QUAD).setBV(rqf());
+          g_.spEvaluate(false);
+          rx0().borBV(g_.input(RDAE_RX));
+          rz0().borBV(g_.input(RDAE_RZ));
+        }
+
+        // Propagate interdependencies
+        rx0().getArrayBV(tmp_g2,nrx_);
+        rz0().getArrayBV(tmp_g2+nrx_,nrz_);
+        std::fill(tmp_g1,tmp_g1+nrx_+nrz_,0);
+        linsol_g_.spSolve(tmp_g1,tmp_g2,false);
+
+        // Propagate through the backward DAE
+        g_.output(RDAE_ODE).setArrayBV(tmp_g1,nrx_);
+        g_.output(RDAE_ODE).borBV(rx0());
+        g_.output(RDAE_ALG).setArrayBV(tmp_g1+nrx_,nrz_);
+        g_.output(RDAE_ALG).borBV(rz0());
+        g_.spEvaluate(false);
+        x0().borBV(g_.input(RDAE_X));
+        p().borBV(g_.input(RDAE_P));
+        z0().borBV(g_.input(RDAE_Z));
+        rx0().borBV(g_.input(RDAE_RX));
+        rp().borBV(g_.input(RDAE_RP));
+
+        // No dependency on initial guess
+        rz0().setZeroBV();
+      }
+
+        
       // No dependency on initial guess
       z0().setZeroBV();
-      rz0().setZeroBV();
     }
 
 
@@ -613,7 +661,7 @@ namespace CasADi{
         DMatrix& m = inputNoCheck(iind);
         bvec_t* v = get_bvec_t(m.data());
         for(int i=0; i<m.size(); ++i){
-          v[i] = all_depend;
+          //          v[i] = all_depend;
         }
       }
     
