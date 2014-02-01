@@ -540,7 +540,7 @@ namespace CasADi{
       // Propagate through g
       if(!g_.isNull()){
 
-        // Propagate influence on the backward quadratures
+        // Propagate influence from the backward quadratures
         if(nrq_>0){
           g_.output(RDAE_ODE).setZeroBV();
           g_.output(RDAE_ALG).setZeroBV();
@@ -572,18 +572,34 @@ namespace CasADi{
         rz0().setZeroBV();
       }
 
-        
+      // Propagate influence from the quadratures
+      if(nq_>0){
+        f_.output(DAE_ODE).setZeroBV();
+        f_.output(DAE_ALG).setZeroBV();
+        f_.output(DAE_QUAD).setBV(qf());
+        f_.spEvaluate(false);
+        x0().borBV(g_.input(DAE_X));
+        z0().borBV(g_.input(DAE_Z));
+      }
+      
+      // Propagate interdependencies
+      x0().getArrayBV(tmp_f2,nx_);
+      z0().getArrayBV(tmp_f2+nx_,nz_);
+      std::fill(tmp_f1,tmp_f1+nx_+nz_,0);
+      linsol_f_.spSolve(tmp_f1,tmp_f2,false);
+      
+      // Propagate through the DAE
+      f_.output(DAE_ODE).setArrayBV(tmp_f1,nx_);
+      f_.output(DAE_ODE).borBV(x0());
+      f_.output(DAE_ALG).setArrayBV(tmp_f1+nx_,nz_);
+      f_.output(DAE_ALG).borBV(z0());
+      f_.spEvaluate(false);
+      x0().borBV(f_.input(DAE_X));
+      p().borBV(f_.input(DAE_P));
+      
       // No dependency on initial guess
       z0().setZeroBV();
     }
-
-
-
-
-
-
-
-
 
     /**  This is a bit better than the FXInternal implementation: XF and QF never depend on RX0 and RP, 
      *   i.e. the worst-case structure of the Jacobian is:
@@ -681,7 +697,7 @@ namespace CasADi{
         DMatrix& m = inputNoCheck(iind);
         bvec_t* v = get_bvec_t(m.data());
         for(int i=0; i<m.size(); ++i){
-          v[i] = all_depend;
+          //          v[i] = all_depend;
         }
       }
     }
