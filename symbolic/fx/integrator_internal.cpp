@@ -111,7 +111,7 @@ namespace CasADi{
     p()   = DMatrix::zeros(f_.input(DAE_P).sparsity());
     z0()   = DMatrix::zeros(f_.input(DAE_Z).sparsity());
     if(!g_.isNull()){
-      rz0()  = DMatrix::zeros(g_.input(RDAE_RX).sparsity());
+      rx0()  = DMatrix::zeros(g_.input(RDAE_RX).sparsity());
       rp()  = DMatrix::zeros(g_.input(RDAE_RP).sparsity());
       rz0()  = DMatrix::zeros(g_.input(RDAE_RZ).sparsity());
     }
@@ -122,7 +122,7 @@ namespace CasADi{
     qf() = DMatrix::zeros(f_.output(DAE_QUAD).sparsity());
     zf() = z0();
     if(!g_.isNull()){
-      rxf()  = rz0();
+      rxf()  = rx0();
       rqf()  = DMatrix::zeros(g_.output(RDAE_QUAD).sparsity());
       rzf()  = rz0();
     }
@@ -139,7 +139,7 @@ namespace CasADi{
       casadi_assert(g_.input(RDAE_P).sparsity()==p().sparsity());
       casadi_assert(g_.input(RDAE_X).sparsity()==x0().sparsity());
       casadi_assert(g_.input(RDAE_Z).sparsity()==z0().sparsity());
-      casadi_assert(g_.output(RDAE_ODE).sparsity()==rz0().sparsity());
+      casadi_assert(g_.output(RDAE_ODE).sparsity()==rx0().sparsity());
       casadi_assert(g_.output(RDAE_ALG).sparsity()==rz0().sparsity());
     }
   
@@ -461,7 +461,7 @@ namespace CasADi{
     x0 = reinterpret_cast<bvec_t*>(this->x0().ptr());
     p = reinterpret_cast<bvec_t*>(this->p().ptr());
     z0 = reinterpret_cast<bvec_t*>(this->z0().ptr());
-    rx0 = reinterpret_cast<bvec_t*>(this->rz0().ptr());
+    rx0 = reinterpret_cast<bvec_t*>(this->rx0().ptr());
     rp = reinterpret_cast<bvec_t*>(this->rp().ptr());
     rz0 = reinterpret_cast<bvec_t*>(this->rz0().ptr());
     xf = reinterpret_cast<bvec_t*>(this->xf().ptr());    
@@ -697,7 +697,7 @@ namespace CasADi{
       if( nz_>0) ret.z.push_back(z0().size1());
       if( nq_>0) ret.q.push_back(qf().size1());
       if( np_>0) ret.p.push_back(p().size1());
-      if(nrx_>0) ret.rx.push_back(rz0().size1());
+      if(nrx_>0) ret.rx.push_back(rx0().size1());
       if(nrz_>0) ret.rz.push_back(rz0().size1());
       if(nrq_>0) ret.rq.push_back(rqf().size1());
       if(nrp_>0) ret.rp.push_back(rp().size1());
@@ -709,7 +709,7 @@ namespace CasADi{
       if( nz_>0) ret.rz.push_back(z0().size1());
       if( np_>0) ret.rq.push_back(p().size1());
       if( nq_>0) ret.rp.push_back(qf().size1());
-      if(nrx_>0) ret.x.push_back(rz0().size1());
+      if(nrx_>0) ret.x.push_back(rx0().size1());
       if(nrz_>0) ret.z.push_back(rz0().size1());
       if(nrp_>0) ret.q.push_back(rp().size1());
       if(nrq_>0) ret.p.push_back(rqf().size1());
@@ -792,7 +792,7 @@ namespace CasADi{
       ss.clear();
       ss << "rx0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RX0] = msym(ss.str(),rz0().sparsity());
+      dd[INTEGRATOR_RX0] = msym(ss.str(),rx0().sparsity());
       rx0_aug.append(dd[INTEGRATOR_RX0]);
 
       // Backward parameter
@@ -948,7 +948,7 @@ namespace CasADi{
     t_ = tf_;
 
     // Initialize output
-    rxf().set(rz0());
+    rxf().set(rx0());
     rzf().set(rz0());
     
     // Reset summation states
