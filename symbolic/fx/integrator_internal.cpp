@@ -107,40 +107,40 @@ namespace CasADi{
 
     // Allocate space for inputs
     setNumInputs(INTEGRATOR_NUM_IN);
-    input(INTEGRATOR_X0)  = DMatrix::zeros(f_.input(DAE_X).sparsity());
-    input(INTEGRATOR_P)   = DMatrix::zeros(f_.input(DAE_P).sparsity());
-    input(INTEGRATOR_Z0)   = DMatrix::zeros(f_.input(DAE_Z).sparsity());
+    x0()  = DMatrix::zeros(f_.input(DAE_X).sparsity());
+    p()   = DMatrix::zeros(f_.input(DAE_P).sparsity());
+    z0()   = DMatrix::zeros(f_.input(DAE_Z).sparsity());
     if(!g_.isNull()){
-      input(INTEGRATOR_RX0)  = DMatrix::zeros(g_.input(RDAE_RX).sparsity());
-      input(INTEGRATOR_RP)  = DMatrix::zeros(g_.input(RDAE_RP).sparsity());
-      input(INTEGRATOR_RZ0)  = DMatrix::zeros(g_.input(RDAE_RZ).sparsity());
+      rz0()  = DMatrix::zeros(g_.input(RDAE_RX).sparsity());
+      rp()  = DMatrix::zeros(g_.input(RDAE_RP).sparsity());
+      rz0()  = DMatrix::zeros(g_.input(RDAE_RZ).sparsity());
     }
   
     // Allocate space for outputs
     setNumOutputs(INTEGRATOR_NUM_OUT);
-    output(INTEGRATOR_XF) = input(INTEGRATOR_X0);
-    output(INTEGRATOR_QF) = DMatrix::zeros(f_.output(DAE_QUAD).sparsity());
-    output(INTEGRATOR_ZF) = input(INTEGRATOR_Z0);
+    xf() = x0();
+    qf() = DMatrix::zeros(f_.output(DAE_QUAD).sparsity());
+    zf() = z0();
     if(!g_.isNull()){
-      output(INTEGRATOR_RXF)  = input(INTEGRATOR_RX0);
-      output(INTEGRATOR_RQF)  = DMatrix::zeros(g_.output(RDAE_QUAD).sparsity());
-      output(INTEGRATOR_RZF)  = input(INTEGRATOR_RZ0);
+      rxf()  = rz0();
+      rqf()  = DMatrix::zeros(g_.output(RDAE_QUAD).sparsity());
+      rzf()  = rz0();
     }
 
     // Warn if sparse inputs (was previously an error)
     casadi_assert_warning(f_.input(DAE_X).dense(),"Sparse states in integrators are experimental");
 
     // Consistency checks
-    casadi_assert_message(f_.output(DAE_ODE).shape()==input(INTEGRATOR_X0).shape(),"Inconsistent dimensions. Expecting DAE_ODE output of shape " << input(INTEGRATOR_X0).shape() << ", but got " << f_.output(DAE_ODE).shape() << " instead.");
-    casadi_assert(f_.output(DAE_ODE).sparsity()==input(INTEGRATOR_X0).sparsity());
-    casadi_assert_message(f_.output(DAE_ALG).shape()==input(INTEGRATOR_Z0).shape(),"Inconsistent dimensions. Expecting DAE_ALG output of shape " << input(INTEGRATOR_Z0).shape() << ", but got " << f_.output(DAE_ALG).shape() << " instead.");
-    casadi_assert(f_.output(DAE_ALG).sparsity()==input(INTEGRATOR_Z0).sparsity());
+    casadi_assert_message(f_.output(DAE_ODE).shape()==x0().shape(),"Inconsistent dimensions. Expecting DAE_ODE output of shape " << x0().shape() << ", but got " << f_.output(DAE_ODE).shape() << " instead.");
+    casadi_assert(f_.output(DAE_ODE).sparsity()==x0().sparsity());
+    casadi_assert_message(f_.output(DAE_ALG).shape()==z0().shape(),"Inconsistent dimensions. Expecting DAE_ALG output of shape " << z0().shape() << ", but got " << f_.output(DAE_ALG).shape() << " instead.");
+    casadi_assert(f_.output(DAE_ALG).sparsity()==z0().sparsity());
     if(!g_.isNull()){
-      casadi_assert(g_.input(RDAE_P).sparsity()==input(INTEGRATOR_P).sparsity());
-      casadi_assert(g_.input(RDAE_X).sparsity()==input(INTEGRATOR_X0).sparsity());
-      casadi_assert(g_.input(RDAE_Z).sparsity()==input(INTEGRATOR_Z0).sparsity());
-      casadi_assert(g_.output(RDAE_ODE).sparsity()==input(INTEGRATOR_RX0).sparsity());
-      casadi_assert(g_.output(RDAE_ALG).sparsity()==input(INTEGRATOR_RZ0).sparsity());
+      casadi_assert(g_.input(RDAE_P).sparsity()==p().sparsity());
+      casadi_assert(g_.input(RDAE_X).sparsity()==x0().sparsity());
+      casadi_assert(g_.input(RDAE_Z).sparsity()==z0().sparsity());
+      casadi_assert(g_.output(RDAE_ODE).sparsity()==rz0().sparsity());
+      casadi_assert(g_.output(RDAE_ALG).sparsity()==rz0().sparsity());
     }
   
     // Call the base class method
@@ -186,12 +186,12 @@ namespace CasADi{
 
     // Create augmented problem
     MX aug_t = msym("aug_t",f_.input(DAE_T).sparsity());
-    MX aug_x = msym("aug_x",offset.x.back(),input(INTEGRATOR_X0).size2());
-    MX aug_z = msym("aug_z",offset.z.back(),std::max(input(INTEGRATOR_Z0).size2(),input(INTEGRATOR_RZ0).size2()));
-    MX aug_p = msym("aug_p",offset.p.back(),std::max(input(INTEGRATOR_P).size2(),input(INTEGRATOR_RP).size2()));
-    MX aug_rx = msym("aug_rx",offset.rx.back(),input(INTEGRATOR_X0).size2());
-    MX aug_rz = msym("aug_rz",offset.rz.back(),std::max(input(INTEGRATOR_Z0).size2(),input(INTEGRATOR_RZ0).size2()));
-    MX aug_rp = msym("aug_rp",offset.rp.back(),std::max(output(INTEGRATOR_QF).size2(),input(INTEGRATOR_RP).size2()));
+    MX aug_x = msym("aug_x",offset.x.back(),x0().size2());
+    MX aug_z = msym("aug_z",offset.z.back(),std::max(z0().size2(),rz0().size2()));
+    MX aug_p = msym("aug_p",offset.p.back(),std::max(p().size2(),rp().size2()));
+    MX aug_rx = msym("aug_rx",offset.rx.back(),x0().size2());
+    MX aug_rz = msym("aug_rz",offset.rz.back(),std::max(z0().size2(),rz0().size2()));
+    MX aug_rp = msym("aug_rp",offset.rp.back(),std::max(qf().size2(),rp().size2()));
 
     // Split up the augmented vectors
     vector<MX> aug_x_split = vertsplit(aug_x,offset.x);     vector<MX>::const_iterator aug_x_split_it = aug_x_split.begin();
@@ -458,18 +458,18 @@ namespace CasADi{
     
     // Get pointers to integrator data structures
     bvec_t *x0, *p, *rx0, *rp, *xf, *qf, *rxf, *rqf, *z0, *rz0, *zf, *rzf;
-    x0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_X0).ptr());
-    p = reinterpret_cast<bvec_t*>(input(INTEGRATOR_P).ptr());
-    z0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_Z0).ptr());
-    rx0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_RX0).ptr());
-    rp = reinterpret_cast<bvec_t*>(input(INTEGRATOR_RP).ptr());
-    rz0 = reinterpret_cast<bvec_t*>(input(INTEGRATOR_RZ0).ptr());
-    xf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_XF).ptr());    
-    qf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_QF).ptr());
-    zf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_ZF).ptr());    
-    rxf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_RXF).ptr());
-    rqf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_RQF).ptr());
-    rzf = reinterpret_cast<bvec_t*>(output(INTEGRATOR_RZF).ptr());
+    x0 = reinterpret_cast<bvec_t*>(this->x0().ptr());
+    p = reinterpret_cast<bvec_t*>(this->p().ptr());
+    z0 = reinterpret_cast<bvec_t*>(this->z0().ptr());
+    rx0 = reinterpret_cast<bvec_t*>(this->rz0().ptr());
+    rp = reinterpret_cast<bvec_t*>(this->rp().ptr());
+    rz0 = reinterpret_cast<bvec_t*>(this->rz0().ptr());
+    xf = reinterpret_cast<bvec_t*>(this->xf().ptr());    
+    qf = reinterpret_cast<bvec_t*>(this->qf().ptr());
+    zf = reinterpret_cast<bvec_t*>(this->zf().ptr());    
+    rxf = reinterpret_cast<bvec_t*>(this->rxf().ptr());
+    rqf = reinterpret_cast<bvec_t*>(this->rqf().ptr());
+    rzf = reinterpret_cast<bvec_t*>(this->rzf().ptr());
 
     // Get pointers to DAE callback data structures
     bvec_t *f_t, *f_x, *f_z, *f_p, *f_ode, *f_alg, *f_quad;
@@ -693,26 +693,26 @@ namespace CasADi{
 
     // Count nondifferentiated and forward sensitivities 
     for(int dir=-1; dir<nfwd; ++dir){
-      if( nx_>0) ret.x.push_back(input(INTEGRATOR_X0).size1());
-      if( nz_>0) ret.z.push_back(input(INTEGRATOR_Z0).size1());
-      if( nq_>0) ret.q.push_back(output(INTEGRATOR_QF).size1());
-      if( np_>0) ret.p.push_back(input(INTEGRATOR_P).size1());
-      if(nrx_>0) ret.rx.push_back(input(INTEGRATOR_RX0).size1());
-      if(nrz_>0) ret.rz.push_back(input(INTEGRATOR_RZ0).size1());
-      if(nrq_>0) ret.rq.push_back(output(INTEGRATOR_RQF).size1());
-      if(nrp_>0) ret.rp.push_back(input(INTEGRATOR_RP).size1());
+      if( nx_>0) ret.x.push_back(x0().size1());
+      if( nz_>0) ret.z.push_back(z0().size1());
+      if( nq_>0) ret.q.push_back(qf().size1());
+      if( np_>0) ret.p.push_back(p().size1());
+      if(nrx_>0) ret.rx.push_back(rz0().size1());
+      if(nrz_>0) ret.rz.push_back(rz0().size1());
+      if(nrq_>0) ret.rq.push_back(rqf().size1());
+      if(nrp_>0) ret.rp.push_back(rp().size1());
     }
 
     // Count adjoint sensitivities
     for(int dir=0; dir<nadj; ++dir){
-      if( nx_>0) ret.rx.push_back(input(INTEGRATOR_X0).size1());
-      if( nz_>0) ret.rz.push_back(input(INTEGRATOR_Z0).size1());
-      if( np_>0) ret.rq.push_back(input(INTEGRATOR_P).size1());
-      if( nq_>0) ret.rp.push_back(output(INTEGRATOR_QF).size1());
-      if(nrx_>0) ret.x.push_back(input(INTEGRATOR_RX0).size1());
-      if(nrz_>0) ret.z.push_back(input(INTEGRATOR_RZ0).size1());
-      if(nrp_>0) ret.q.push_back(input(INTEGRATOR_RP).size1());
-      if(nrq_>0) ret.p.push_back(output(INTEGRATOR_RQF).size1());
+      if( nx_>0) ret.rx.push_back(x0().size1());
+      if( nz_>0) ret.rz.push_back(z0().size1());
+      if( np_>0) ret.rq.push_back(p().size1());
+      if( nq_>0) ret.rp.push_back(qf().size1());
+      if(nrx_>0) ret.x.push_back(rz0().size1());
+      if(nrz_>0) ret.z.push_back(rz0().size1());
+      if(nrp_>0) ret.q.push_back(rp().size1());
+      if(nrq_>0) ret.p.push_back(rqf().size1());
     }
     
     // Get cummulative offsets
@@ -771,42 +771,42 @@ namespace CasADi{
       ss.clear();
       ss << "x0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_X0] = msym(ss.str(),input(INTEGRATOR_X0).sparsity());
+      dd[INTEGRATOR_X0] = msym(ss.str(),x0().sparsity());
       x0_aug.append(dd[INTEGRATOR_X0]);
 
       // Parameter
       ss.clear();
       ss << "p";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_P] = msym(ss.str(),input(INTEGRATOR_P).sparsity());
+      dd[INTEGRATOR_P] = msym(ss.str(),p().sparsity());
       p_aug.append(dd[INTEGRATOR_P]);
 
       // Initial guess for algebraic variable
       ss.clear();
       ss << "r0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_Z0] = msym(ss.str(),input(INTEGRATOR_Z0).sparsity());
+      dd[INTEGRATOR_Z0] = msym(ss.str(),z0().sparsity());
       z0_aug.append(dd[INTEGRATOR_Z0]);
     
       // Backward state
       ss.clear();
       ss << "rx0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RX0] = msym(ss.str(),input(INTEGRATOR_RX0).sparsity());
+      dd[INTEGRATOR_RX0] = msym(ss.str(),rz0().sparsity());
       rx0_aug.append(dd[INTEGRATOR_RX0]);
 
       // Backward parameter
       ss.clear();
       ss << "rp";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RP] = msym(ss.str(),input(INTEGRATOR_RP).sparsity());
+      dd[INTEGRATOR_RP] = msym(ss.str(),rp().sparsity());
       rp_aug.append(dd[INTEGRATOR_RP]);
 
       // Initial guess for backward algebraic variable
       ss.clear();
       ss << "rz0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RZ0] = msym(ss.str(),input(INTEGRATOR_RZ0).sparsity());
+      dd[INTEGRATOR_RZ0] = msym(ss.str(),rz0().sparsity());
       rz0_aug.append(dd[INTEGRATOR_RZ0]);
     
       // Add to input vector
@@ -820,37 +820,37 @@ namespace CasADi{
       // Differential states become backward differential state
       ss.clear();
       ss << "xf" << "_" << dir;
-      dd[INTEGRATOR_XF] = msym(ss.str(),output(INTEGRATOR_XF).sparsity());
+      dd[INTEGRATOR_XF] = msym(ss.str(),xf().sparsity());
       rx0_aug.append(dd[INTEGRATOR_XF]);
 
       // Quadratures become backward parameters
       ss.clear();
       ss << "qf" << "_" << dir;
-      dd[INTEGRATOR_QF] = msym(ss.str(),output(INTEGRATOR_QF).sparsity());
+      dd[INTEGRATOR_QF] = msym(ss.str(),qf().sparsity());
       rp_aug.append(dd[INTEGRATOR_QF]);
 
       // Algebraic variables become backward algebraic variables
       ss.clear();
       ss << "zf" << "_" << dir;
-      dd[INTEGRATOR_ZF] = msym(ss.str(),output(INTEGRATOR_ZF).sparsity());
+      dd[INTEGRATOR_ZF] = msym(ss.str(),zf().sparsity());
       rz0_aug.append(dd[INTEGRATOR_ZF]);
 
       // Backward differential states becomes forward differential states
       ss.clear();
       ss << "rxf" << "_" << dir;
-      dd[INTEGRATOR_RXF] = msym(ss.str(),output(INTEGRATOR_RXF).sparsity());
+      dd[INTEGRATOR_RXF] = msym(ss.str(),rxf().sparsity());
       x0_aug.append(dd[INTEGRATOR_RXF]);
     
       // Backward quadratures becomes (forward) parameters
       ss.clear();
       ss << "rqf" << "_" << dir;
-      dd[INTEGRATOR_RQF] = msym(ss.str(),output(INTEGRATOR_RQF).sparsity());
+      dd[INTEGRATOR_RQF] = msym(ss.str(),rqf().sparsity());
       p_aug.append(dd[INTEGRATOR_RQF]);
 
       // Backward differential states becomes forward differential states
       ss.clear();
       ss << "rzf" << "_" << dir;
-      dd[INTEGRATOR_RZF] = msym(ss.str(),output(INTEGRATOR_RZF).sparsity());
+      dd[INTEGRATOR_RZF] = msym(ss.str(),rzf().sparsity());
       z0_aug.append(dd[INTEGRATOR_RZF]);
     
       // Add to input vector
@@ -932,11 +932,11 @@ namespace CasADi{
     t_ = t0_;
     
     // Initialize output
-    output(INTEGRATOR_XF).set(input(INTEGRATOR_X0));
-    output(INTEGRATOR_ZF).set(input(INTEGRATOR_Z0));
+    xf().set(x0());
+    zf().set(z0());
     
     // Reset summation states
-    output(INTEGRATOR_QF).set(0.0);
+    qf().set(0.0);
 
     log("IntegratorInternal::reset","end");
   }
@@ -948,11 +948,11 @@ namespace CasADi{
     t_ = tf_;
 
     // Initialize output
-    output(INTEGRATOR_RXF).set(input(INTEGRATOR_RX0));
-    output(INTEGRATOR_RZF).set(input(INTEGRATOR_RZ0));
+    rxf().set(rz0());
+    rzf().set(rz0());
     
     // Reset summation states
-    output(INTEGRATOR_RQF).set(0.0);
+    rqf().set(0.0);
     
     log("IntegratorInternal::resetB","end");
   }
