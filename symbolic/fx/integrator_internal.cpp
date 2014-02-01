@@ -517,7 +517,7 @@ namespace CasADi{
 
         // Get influence on the backward quadratures
         if(nrq_>0){
-          g_.input(RDAE_RX).setArrayBV(tmp_g2,nrx_);
+          g_.input(RDAE_RX).setBV(rxf());
           g_.input(RDAE_RZ).setBV(rzf());
           g_.spEvaluate(true);
           g_.output(RDAE_QUAD).getBV(rqf());
