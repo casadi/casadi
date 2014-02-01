@@ -240,54 +240,49 @@ namespace CasADi{
 
   void ImplicitFunctionInternal::spEvaluate(bool fwd){
 
-    // Get arrays
-    bvec_t* z0 = reinterpret_cast<bvec_t*>(input(iin_).ptr());
-    bvec_t* z = reinterpret_cast<bvec_t*>(output(iout_).ptr());
-    bvec_t* zf = reinterpret_cast<bvec_t*>(f_.input(iin_).ptr());
-    bvec_t* rf = reinterpret_cast<bvec_t*>(f_.output(iout_).ptr());
-
     // Initialize the callback for sparsity propagation
     f_.spInit(fwd);
 
     if(fwd){
 
       // Pass inputs to function
-      fill(zf,zf+n_,0);
+      f_.input(iin_).setZeroBV();
       for(int i=0; i<getNumInputs(); ++i){
-        if(i!=iin_) f_.input(i).set(input(i));
+        if(i!=iin_) f_.input(i).setBV(input(i));
       }
 
       // Propagate dependencies through the function
       f_.spEvaluate(true);
       
       // "Solve" in order to propagate to z
-      fill(z,z+n_,0);
-      linsol_.spSolve(z,rf,true);
+      output(iout_).setZeroBV();
+      linsol_.spSolve(output(iout_),f_.output(iout_),true);
       
       // Propagate to auxiliary outputs
       if(getNumOutputs()>1){
-        copy(z,z+n_,zf);
+        f_.output(iout_).setBV(output(iout_));
         f_.spEvaluate(true);
         for(int i=0; i<getNumOutputs(); ++i){
-          if(i!=iout_) f_.output(i).get(output(i));
+          if(i!=iout_) output(i).setBV(f_.output(i));
         }
       }
 
     } else {
+
       // Auxiliary outputs not yet supported
       casadi_assert_message(getNumOutputs()==1, "Not implemented");
 
       // "Solve" in order to get seed
-      fill(rf,rf+n_,0);
-      linsol_.spSolve(rf,z,false);
+      f_.output(iout_).setZeroBV();
+      linsol_.spSolve(f_.output(iout_),output(iout_),false);
       
       // Propagate dependencies through the function
       f_.spEvaluate(false);
 
       // Collect influence on inputs
-      fill(z0,z0+n_,0);
+      input(iin_).setZeroBV();
       for(int i=0; i<getNumInputs(); ++i){
-        if(i!=iin_) f_.input(i).get(input(i));
+        if(i!=iin_) input(i).setBV(f_.input(i));
       }
     }
   }
