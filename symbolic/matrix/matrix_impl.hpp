@@ -900,6 +900,13 @@ namespace CasADi{
   }
 
   template<class T>
+  void Matrix<T>::borArrayBV(const bvec_t* val, int len){
+    casadi_assert(len==size());
+    bvec_t* bw_this = reinterpret_cast<bvec_t*>(getPtr(data()));
+    for(int i=0; i<len; ++i) *bw_this++ |= *val++;
+  }
+
+  template<class T>
   void Matrix<T>::get(Matrix<T>& val, Sparsity sp) const{
     val.set(*this,sp);
   }
