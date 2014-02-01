@@ -1,11 +1,13 @@
 /** \defgroup scheme_IntegratorOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 5) [integratorOut]</caption>
+<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 7) [integratorOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_XF</td><td>xf</td><td>Differential state at the final time .</td></tr>
 <tr><td>INTEGRATOR_QF</td><td>qf</td><td>Quadrature state at the final time .</td></tr>
+<tr><td>INTEGRATOR_ZF</td><td>zf</td><td>Algebraic variable at the final time .</td></tr>
 <tr><td>INTEGRATOR_RXF</td><td>rxf</td><td>Backward differential state at the initial time .</td></tr>
 <tr><td>INTEGRATOR_RQF</td><td>rqf</td><td>Backward quadrature state at the initial time .</td></tr>
+<tr><td>INTEGRATOR_RZF</td><td>rzf</td><td>Backward algebraic variable at the initial time .</td></tr>
 </table>
 */
 /** \defgroup scheme_QCQPSolverInput
@@ -318,12 +320,14 @@
 */
 /** \defgroup scheme_IntegratorInput
 <a name='schemes'></a><table>
-<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 5) [integratorIn]</caption>
+<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 7) [integratorIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>x0</td><td>Differential state at the initial time .</td></tr>
 <tr><td>INTEGRATOR_P</td><td>p</td><td>Parameters .</td></tr>
+<tr><td>INTEGRATOR_Z0</td><td>z0</td><td>Initial guess for the algebraic variable .</td></tr>
 <tr><td>INTEGRATOR_RX0</td><td>rx0</td><td>Backward differential state at the final time .</td></tr>
 <tr><td>INTEGRATOR_RP</td><td>rp</td><td>Backward parameter vector .</td></tr>
+<tr><td>INTEGRATOR_RZ0</td><td>rz0</td><td>Initial guess for the backwards algebraic variable .</td></tr>
 </table>
 */
 /** \defgroup scheme_QPSolverInput
@@ -849,6 +853,20 @@
 <br/>
 @copydoc scheme_LinsolOutput
 */
+/** \class CasADi::WorhpInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/** \class CasADi::WorhpSolver
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
 /** \class CasADi::GenericIntegratorInternal
 \n
 \par
@@ -1152,18 +1170,4 @@
 @copydoc scheme_OCPInput
 <br/>
 @copydoc scheme_OCPOutput
-*/
-/** \class CasADi::WorhpInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/** \class CasADi::WorhpSolver
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
 */
