@@ -474,10 +474,10 @@ namespace CasADi{
       f_.input(DAE_Z).setZeroBV();
       f_.spInit(true);
       f_.spEvaluate(true);
-
-      // Propagate interdependencies
       f_.output(DAE_ODE).getArrayBV(tmp_f1,nx_);
       f_.output(DAE_ALG).getArrayBV(tmp_f1+nx_,nz_);
+
+      // Propagate interdependencies
       x0().getArrayBV(tmp_f2,nx_);
       std::fill(tmp_f2+nx_,tmp_f2+nx_+nz_,0);
       linsol_f_.spSolve(tmp_f2,tmp_f1,true);
@@ -486,10 +486,10 @@ namespace CasADi{
 
       // Get influence on the quadratures
       if(nq_>0){
-        f_.input(DAE_X).getArrayBV(tmp_f2,nx_);
-        f_.input(DAE_Z).getBV(zf());
+        f_.input(DAE_X).setArrayBV(tmp_f2,nx_);
+        f_.input(DAE_Z).setBV(zf());
         f_.spEvaluate(true);
-        qf().setBV(f_.output(DAE_QUAD));
+        f_.output(DAE_QUAD).getBV(qf());
       }
 
       // Propagate through g
@@ -505,10 +505,10 @@ namespace CasADi{
         g_.input(RDAE_RZ).setZeroBV();
         g_.spInit(true);
         g_.spEvaluate(true);
-        
-        // Propagate interdependencies
         g_.output(RDAE_ODE).getArrayBV(tmp_g1,nrx_);
         g_.output(RDAE_ALG).getArrayBV(tmp_g1+nrx_,nrz_);
+        
+        // Propagate interdependencies
         rx0().getArrayBV(tmp_g2,nrx_);
         std::fill(tmp_g2+nrx_,tmp_g2+nrx_+nrz_,0);
         linsol_g_.spSolve(tmp_g2,tmp_g1,true);
@@ -520,7 +520,7 @@ namespace CasADi{
           g_.input(RDAE_RX).setArrayBV(tmp_g2,nrx_);
           g_.input(RDAE_RZ).setBV(rzf());
           g_.spEvaluate(true);
-          rqf().setBV(g_.output(RDAE_QUAD));
+          g_.output(RDAE_QUAD).getBV(rqf());
         }
       }
     } else {
