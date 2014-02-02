@@ -56,7 +56,6 @@ except:
   
 print lsolvers
 
-@run_only(['nullspace'])
 class LinearSolverTests(casadiTestCase):
 
   def test_nullspace(self):
