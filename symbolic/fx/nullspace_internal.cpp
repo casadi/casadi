@@ -35,7 +35,6 @@ namespace CasADi{
 
   
   NullspaceInternal::NullspaceInternal(const CRSSparsity& A_sp) : A_sp_(A_sp) {
- 
     addOption("dense",        OT_BOOLEAN,       true, "Indicates that dense matrices can be assumed");
   
   }
@@ -73,9 +72,7 @@ namespace CasADi{
   }
 
   void NullspaceInternal::evaluate(){
-
-   
-  
+    throw CasadiException("NullspaceInternal::evaluate: Not implemented");
   }
 
 

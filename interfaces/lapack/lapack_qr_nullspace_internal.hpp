@@ -65,6 +65,8 @@ namespace CasADi{
     int nadj_;
     
     std::vector<double> tempA_;
+    std::vector<double> tempB_;
+    std::vector<double> tempC_;
   
     std::vector<double> tau_;
     
@@ -79,6 +81,8 @@ namespace CasADi{
   extern "C" void dgeqrf_(const int *m,const int *n, double *a,const int *lda, double *tau, double *work,const int *lwork, int *info);
   
   extern "C" void dormqr_(const char *side,const  char*trans,const  int *m,const  int *n,const  int *K,const  double *a,const  int *lda,const  double *tau, double* C,const  int *ldc, double *work,const  int *lwork, int *info);
+  
+  extern "C" void dtrtrs_(const char *uplo, const char* trans, const char* diag, const int *n, const int *nrhs, double *a, const int *lda, const double *b, int *ldb, int *info);
 
   
 } // namespace CasADi

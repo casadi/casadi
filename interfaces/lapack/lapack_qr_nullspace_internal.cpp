@@ -29,7 +29,7 @@ namespace CasADi{
 
   
   LapackQRNullspaceInternal::LapackQRNullspaceInternal(const CRSSparsity& A_sp, int nfwd, int nadj) : NullspaceInternal(A_sp), nfwd_(nfwd), nadj_(nadj) {
- 
+  
     setOption("dense",true);
   
   }
@@ -62,12 +62,16 @@ namespace CasADi{
     }
     
     tempA_.resize(n_*m_);
+    tempB_.resize(n_*n_);
+    tempC_.resize(n_*n_);
     
     tau_.resize(min(n_,m_));
     
     work_.resize(m_*64);
     work2_.resize(n_*64);
   
+    FXInternal::init();
+    
   }
 
   void LapackQRNullspaceInternal::evaluate(){
@@ -81,7 +85,7 @@ namespace CasADi{
     casadi_assert(info==0);
     
     char side = 'R';
-    char trans = 'T';
+    char transp = 'T';
     
     int nm = n_-m_;
     
@@ -94,10 +98,105 @@ namespace CasADi{
     int lwork2 = work2_.size();
     
     // 
-    dormqr_(&side, &trans, &nm, &n_, &m_, &tempA_[0], &n_, &tau_[0], &output(0).data()[0], &nm, &work2_[0], &lwork2, &info);
+    dormqr_(&side, &transp, &nm, &n_, &m_, &tempA_[0], &n_, &tau_[0], &output(0).data()[0], &nm, &work2_[0], &lwork2, &info);
     casadi_assert(info==0);
 
-    std::cout << "out" << output(0) << std::endl;
+    for (int d=0;d<nfwd_;++d) {
+      std::vector<double> &seed = input(1+d).data();
+      std::vector<double> &sens = output(1+d).data();
+      std::fill(tempB_.begin(),tempB_.end(),0);
+      char uplo  = 'U';
+      char transp = 'T';
+      char diag = 'N';
+
+      for (int i=0;i<n_;++i) {
+        for (int j=0;j<m_;++j) {
+          tempB_.at(n_*i+j) = seed.at(n_*j+i);
+        }
+      }
+      
+      dtrtrs_(&uplo, &transp,&diag,&m_,&n_,&tempA_[0],&n_,&tempB_[0],&n_,&info);
+      casadi_assert(info==0);
+      
+      {
+        char side = 'R';
+        char transp = 'N';
+        dormqr_(&side, &transp, &m_, &n_, &m_, &tempA_[0], &n_, &tau_[0], &tempB_[0], &n_, &work2_[0], &lwork2, &info);
+        casadi_assert(info==0);
+     
+      }
+    
+      for (int i=0;i<nm;++i) {
+        for (int j=i;j<nm;++j) {
+          tempB_[n_*i+j] = 0;
+        }
+      }
+
+      { // Q*f.T
+        char side = 'L';
+        char transp = 'N';
+        dormqr_(&side, &transp, &n_, &n_, &m_, &tempA_[0], &n_, &tau_[0], &tempB_[0], &n_, &work2_[0], &lwork2, &info);
+        casadi_assert(info==0);
+          
+      }
+
+      for (int i=0;i<n_;++i) {
+        for (int j=m_;j<n_;++j) {
+          sens[nm*i+j-m_] = -tempB_[n_*j+i];
+        }
+      }
+      
+    }
+    
+    for (int d=0;d<nadj_;++d) {
+      std::vector<double> &seed = input(1+nfwd_+d).data();
+      std::vector<double> &sens = output(1+nfwd_+d).data();
+      
+      std::fill(tempC_.begin(),tempC_.end(),0);
+      std::fill(tempB_.begin(),tempB_.end(),0);
+      
+      std::copy(seed.begin(),seed.end(),tempC_.begin()+m_*n_);
+    
+    
+      {
+        char side = 'R';
+        char transp = 'N';
+        dormqr_(&side, &transp, &nm, &n_, &m_, &tempA_[0], &n_, &tau_[0], &tempC_[m_*n_], &nm, &work2_[0], &lwork2, &info);
+        casadi_assert(info==0);
+     
+      }
+      
+      for (int i=0;i<m_;++i) {
+        for (int j=0;j<nm;++j) {
+          tempB_[n_*m_+j*n_+i]=tempC_[n_*m_+i*nm+j];
+        }
+      }
+      
+      {
+        char uplo  = 'U';
+        char transp = 'N';
+        char diag = 'N';
+      
+        dtrtrs_(&uplo, &transp,&diag,&m_,&nm,&tempA_[0],&n_,&tempB_[m_*n_],&n_,&info);
+      }
+      
+      {
+        char side = 'R';
+        char transp = 'T';
+        dormqr_(&side, &transp, &m_, &n_, &m_, &tempA_[0], &n_, &tau_[0], &tempB_[0], &n_, &work2_[0], &lwork2, &info);
+        casadi_assert(info==0);
+     
+      }
+      
+      for (int i=0;i<n_;++i) {
+        for (int j=0;j<m_;++j) {
+          sens[n_*j+i] -= tempB_[n_*i+j];
+        }
+      }
+      
+      std::fill(seed.begin(),seed.end(),0);
+      
+    }
   
   }
   
@@ -110,7 +209,7 @@ namespace CasADi{
   
   FX LapackQRNullspaceInternal::getDerivative(int nfwd, int nadj) {
     casadi_assert(nfwd_==0 && nadj_==0);
-    
+
     LapackQRNullspaceInternal* node = new LapackQRNullspaceInternal(A_sp_,nfwd, nadj);
     node->setOption(dictionary());
     

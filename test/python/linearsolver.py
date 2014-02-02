@@ -60,32 +60,46 @@ print lsolvers
 class LinearSolverTests(casadiTestCase):
 
   def test_nullspace(self):
-    A = DMatrix([[1,1.3],[2,5],[1,0.5],[1.8,1.7]])
-
-    for Solver, options in nsolvers:
-      solver = Solver(A.T.sparsity())
-      solver.setOption(options)
-      solver.init()
-      solver.setInput(A.T)
-
-      solver.evaluate()
-      
-      self.checkarray(mul(A.T,solver.output()),DMatrix.zeros(2,2))
-      self.checkarray(mul(solver.output().T,solver.output()),DMatrix.eye(2))
   
-    A = DMatrix([[1,1.3],[2,5],[1,0.5]])
+    for A in  [
+                  DMatrix([[1,1.3],[2,5],[1,0.5],[1.8,1.7]]),
+                  DMatrix([[1,1.3],[2,5],[1,0.5]]),
+                  DMatrix([[1,1.3],[2,5],[1,0.5],[0.2,0.3],[-0.3,0.7]])
+              ]:
+      n ,m = A.shape
+      for Solver, options in nsolvers:
+        solver = Solver(A.T.sparsity())
+        solver.setOption(options)
+        solver.init()
+        solver.setInput(A.T)
 
-    for Solver, options in nsolvers:
-      solver = Solver(A.T.sparsity())
-      solver.setOption(options)
-      solver.init()
-      solver.setInput(A.T)
+        solver.evaluate()
+        
+        self.checkarray(mul(A.T,solver.output()),DMatrix.zeros(m,n-m))
+        self.checkarray(mul(solver.output().T,solver.output()),DMatrix.eye(n-m))
+        
+        solver.setOption("ad_mode","forward")
+        solver.init()
+        
+        Jf = solver.jacobian()
+        Jf.init()
 
-      solver.evaluate()
-      
-      self.checkarray(mul(A.T,solver.output()),DMatrix.zeros(2,1))
-      self.checkarray(mul(solver.output().T,solver.output()),DMatrix.eye(1))
-  
+        solver.setOption("ad_mode","reverse")
+        solver.init()
+        
+        Jb = solver.jacobian()
+        Jb.init()
+        
+        Jf.setInput(A.T)
+        Jb.setInput(A.T)
+        
+        Jf.evaluate()
+        Jb.evaluate()
+
+        self.checkarray(Jf.output(),Jb.output())
+        self.checkarray(Jf.output(1),Jb.output(1))
+    
+ 
   
   def test_simple_solve(self):
     A_ = DMatrix([[3,7],[1,2]])
