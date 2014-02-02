@@ -97,6 +97,47 @@ class LinearSolverTests(casadiTestCase):
 
         self.checkarray(Jf.output(),Jb.output())
         self.checkarray(Jf.output(1),Jb.output(1))
+        
+        d = solver.derivative(1,0)
+        d.init()
+        
+        r = numpy.random.rand(*A.shape)
+        
+        d.setInput(A.T,0)
+        d.setInput(r.T,1)
+        
+        d.evaluate()
+        
+        exact = d.getOutput(1)
+        
+        solver.setInput(A.T,0)
+        solver.evaluate()
+        nom = solver.getOutput()
+        
+        eps = 1e-6
+        solver.setInput((A+eps*r).T,0)
+        solver.evaluate()
+        pert = solver.getOutput()
+        
+        fd = (pert-nom)/eps
+        
+        #print exact, fd
+        
+        #print numpy.linalg.svd(horzcat([exact, fd]).T)[1]
+        
+        #print "fd:", mul(fd.T,fd), numpy.linalg.eig(mul(fd.T,fd))[0]
+        #print "exact:", mul(exact.T,exact), numpy.linalg.eig(mul(exact.T,exact))[0]
+        #print "fd:", mul(fd,fd.T), numpy.linalg.eig(mul(fd,fd.T))[0]
+        #print "exact:", mul(exact,exact.T), numpy.linalg.eig(mul(exact,exact.T))[0]
+        
+        #V = numpy.random.rand(A.shape[0]-A.shape[1],A.shape[0]-A.shape[1])
+        #V = V+V.T
+        #print V
+        V = DMatrix.eye(A.shape[0]-A.shape[1])
+        a = mul([nom,V,fd.T])+mul([fd,V,nom.T])
+        b = mul([nom,V,exact.T])+mul([exact,V,nom.T])
+        
+        self.checkarray(a,b,digits=5)
     
  
   
