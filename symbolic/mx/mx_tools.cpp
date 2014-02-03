@@ -21,6 +21,7 @@
  */
 
 #include "mx_tools.hpp"
+#include "../sx/sx_tools.hpp"
 #include "../fx/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
@@ -1037,7 +1038,13 @@ namespace CasADi{
       return solve(mul(trans(A),A),trans(A),lsolver,dict);
     }
   }
-
+  
+  MX nullspace(const MX& A) {
+    SXMatrix n = ssym("A",A.sparsity());
+    SXFunction f(n,nullspace(n));
+    f.init();
+    return f.call(A)[0];
+  }
   
 } // namespace CasADi
 

@@ -54,6 +54,14 @@ try:
 except:
   pass
   
+def nullspacewrapper(sp):
+  a = ssym("a",sp)
+  f = SXFunction([a],[nullspace(a)])
+  f.init()
+  return f
+  
+nsolvers.append((nullspacewrapper,{}))
+  
 print lsolvers
 
 class LinearSolverTests(casadiTestCase):
@@ -63,7 +71,9 @@ class LinearSolverTests(casadiTestCase):
     for A in  [
                   DMatrix([[1,1.3],[2,5],[1,0.5],[1.8,1.7]]),
                   DMatrix([[1,1.3],[2,5],[1,0.5]]),
-                  DMatrix([[1,1.3],[2,5],[1,0.5],[0.2,0.3],[-0.3,0.7]])
+                  DMatrix([[1,1.3],[2,5],[1,0.5],[0.2,0.3],[-0.3,0.7]]),
+                  DMatrix([[1,0],[0,0],[0,1],[0,0]]),
+                  DMatrix([[1.3,0,0.4,1],[0.2,0.1,11,0],[0,1,0,0],[0.7,0.9,0,0],[1.1,0.99,0,0]])
               ]:
       n ,m = A.shape
       for Solver, options in nsolvers:
@@ -130,16 +140,24 @@ class LinearSolverTests(casadiTestCase):
         #print "fd:", mul(fd,fd.T), numpy.linalg.eig(mul(fd,fd.T))[0]
         #print "exact:", mul(exact,exact.T), numpy.linalg.eig(mul(exact,exact.T))[0]
         
-        #V = numpy.random.rand(A.shape[0]-A.shape[1],A.shape[0]-A.shape[1])
-        #V = V+V.T
-        #print V
-        V = DMatrix.eye(A.shape[0]-A.shape[1])
+        V = numpy.random.rand(A.shape[0]-A.shape[1],A.shape[0]-A.shape[1])
+        V = V+V.T
+        print V
+        #V = DMatrix.eye(A.shape[0]-A.shape[1])
         a = mul([nom,V,fd.T])+mul([fd,V,nom.T])
         b = mul([nom,V,exact.T])+mul([exact,V,nom.T])
         
-        self.checkarray(a,b,digits=5)
+        print "here:", a-b
+        
+        #self.checkarray(a,b,digits=5)
     
- 
+        V = numpy.random.rand(A.shape[0],A.shape[0])
+        V = V+V.T
+        V = DMatrix.eye(A.shape[0])
+        a = mul([nom.T,V,fd])+mul([fd.T,V,nom])
+        b = mul([nom.T,V,exact])+mul([exact.T,V,nom])
+        
+        self.checkarray(a,b,digits=5)
   
   def test_simple_solve(self):
     A_ = DMatrix([[3,7],[1,2]])

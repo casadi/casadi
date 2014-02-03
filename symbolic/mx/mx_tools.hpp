@@ -418,6 +418,18 @@ namespace CasADi{
   MX gradient(const MX &ex, const MX &arg);
   MX tangent(const MX &ex, const MX &arg);
   //@}
+  
+  /** \brief Computes the nullspace of a matrix A
+  *
+  * Finds Z m-by-(m-n) such that AZ = 0 
+  * with A n-by-m with m > n
+  *
+  * Assumes A is full rank
+  *
+  * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+  */
+  template<class T>
+  Matrix<T> nullspace(const Matrix<T>& A);
 
   /** \brief Matrix determinant (experimental) */
   MX det(const MX& A);

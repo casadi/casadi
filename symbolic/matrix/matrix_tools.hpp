@@ -294,6 +294,18 @@ namespace CasADi{
   void qr(const Matrix<T>& A, Matrix<T>& OUTPUT, Matrix<T>& OUTPUT);
 #endif
 
+  /** \brief Computes the nullspace of a matrix A
+  *
+  * Finds Z m-by-(m-n) such that AZ = 0 
+  * with A n-by-m with m > n
+  *
+  * Assumes A is full rank
+  *
+  * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+  */
+  template<class T>
+  Matrix<T> nullspace(const Matrix<T>& A);
+
   /** \brief  Solve a system of equations: A*x = b 
       The solve routine works similar to Matlab's backslash when A is square and nonsingular. The algorithm
       used is the following:
@@ -1061,6 +1073,47 @@ namespace CasADi{
     Q = trans(QT);
     R = trans(RT);
   }
+  
+  template<class T>
+  Matrix<T> nullspace(const Matrix<T>& A) {
+    int n = A.size1();
+    int m = A.size2();
+    
+    Matrix<T> X = A;
+    
+    casadi_assert_message(m>=n,"nullspace(A): expecting a flat matrix (more columns than rows), but got " << A.dimString() << ".");
+    
+    Matrix<T> seed = DMatrix::eye(m)(range(m),range(n,m));
+
+    std::vector< Matrix<T> > us;
+    std::vector< Matrix<T> > betas;
+    
+    Matrix<T> beta;
+    
+    for (int i=0;i<n;++i) {
+      Matrix<T> x = X(i,range(i,m));
+      Matrix<T> u = Matrix<T>(x);
+      Matrix<T> sigma = sqrt(sumCols(x*x));
+      const Matrix<T>& x0 = x(0,0);
+      u(0,0) = 1;
+      
+      Matrix<T> b = -copysign(sigma,x0);
+      
+      u(0,range(1,m-i))*= 1/(x0-b);
+      beta = 1-x0/b;
+      
+      X(range(i,n),range(i,m))-= beta*mul(mul(X(range(i,n),range(i,m)),trans(u)),u);
+      us.push_back(u);
+      betas.push_back(beta);
+    }
+    
+    for (int i=n-1;i>=0;--i) {
+      seed(range(i,m),range(m-n)) -= betas[i]*mul(trans(us[i]),mul(us[i],seed(range(i,m),range(m-n))));
+    }
+    
+    return seed;
+
+  }
 
   template<class T>
   Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
@@ -1571,6 +1624,7 @@ namespace CasADi{
   MTT_INST(T,norm_inf)                          \
   MTT_INST(T,norm_F)                            \
   MTT_INST(T,qr)                                \
+  MTT_INST(T,nullspace)                         \
   MTT_INST(T,solve)                             \
   MTT_INST(T,pinv)                              \
   MTT_INST(T,isZero)                            \
