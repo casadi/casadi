@@ -26,7 +26,7 @@
 #include "casadi_exception.hpp"
 #include <algorithm>
 #include <string>
-#include <ctype.h>
+#include <locale>
 
 #include "matrix/matrix.hpp"
 
@@ -51,11 +51,12 @@ double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::st
     
   char s;
   char t;
+  std::locale loc;
   for (int i=0;i<na;i++) {
     v1[0] = i + 1;
     for (int j=0; j<nb; j++) {
-      s = a[i];tolower(s);
-      t = b[j];tolower(t);
+      s = std::tolower(a[i],loc);
+      t = std::tolower(b[j],loc);
       int cost = 0;
       if (s != t)
         cost = 1;
