@@ -41,8 +41,6 @@ namespace CasADi{
 
   void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     SundialsInternal::deepCopyMembers(already_copied);
-    jac_ = deepcopy(jac_,already_copied);
-    jacB_ = deepcopy(jacB_,already_copied);
   }
 
   IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){

@@ -1783,7 +1783,6 @@ namespace CasADi{
 
   void CVodesInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     SundialsInternal::deepCopyMembers(already_copied);
-    jac_ = deepcopy(jac_,already_copied);
   }
 
   template<typename FunctionType>

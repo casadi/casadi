@@ -218,6 +218,11 @@ void SundialsInternal::init(){
 void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   IntegratorInternal::deepCopyMembers(already_copied);
   linsol_ = deepcopy(linsol_,already_copied);
+  linsolB_ = deepcopy(linsolB_,already_copied);
+  jac_ = deepcopy(jac_,already_copied);
+  jacB_ = deepcopy(jacB_,already_copied);  
+  f_fwd_ = deepcopy(f_fwd_,already_copied);
+  g_fwd_ = deepcopy(g_fwd_,already_copied);
 }
 
 void SundialsInternal::reset(){
