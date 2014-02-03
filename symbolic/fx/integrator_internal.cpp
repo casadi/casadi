@@ -458,9 +458,11 @@ namespace CasADi{
     
     // Temporary vectors
     bvec_t *tmp_f1, *tmp_f2, *tmp_g1, *tmp_g2;
+    casadi_assert(!linsol_f_.isNull());
     tmp_f1 = reinterpret_cast<bvec_t*>(linsol_f_.input(LINSOL_B).ptr());
     tmp_f2 = reinterpret_cast<bvec_t*>(linsol_f_.output(LINSOL_X).ptr());
     if(!g_.isNull()){
+      casadi_assert(!linsol_g_.isNull());
       tmp_g1 = reinterpret_cast<bvec_t*>(linsol_g_.input(LINSOL_B).ptr());
       tmp_g2 = reinterpret_cast<bvec_t*>(linsol_g_.output(LINSOL_X).ptr());
     }
@@ -578,8 +580,8 @@ namespace CasADi{
         f_.output(DAE_ALG).setZeroBV();
         f_.output(DAE_QUAD).setBV(qf());
         f_.spEvaluate(false);
-        x0().borBV(g_.input(DAE_X));
-        z0().borBV(g_.input(DAE_Z));
+        x0().borBV(f_.input(DAE_X));
+        z0().borBV(f_.input(DAE_Z));
       }
       
       // Propagate interdependencies
