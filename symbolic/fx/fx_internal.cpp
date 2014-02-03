@@ -1487,8 +1487,8 @@ namespace CasADi{
       derivative_fcn_[nfwd].resize(nadj+1);
     }
     
+    // Quick return if already cached
     if (derivative_fcn_[nfwd][nadj].alive()) {
-      // Quick return if already cached
       return shared_cast<FX>(derivative_fcn_[nfwd][nadj].shared());
     }
  
@@ -1622,7 +1622,10 @@ namespace CasADi{
       }
     }
 
-    // Return cached or generated function
+    // Save to cache
+    derivative_fcn_[nfwd][nadj] = ret;
+
+    // Return generated function
     return ret;
   }
 
