@@ -74,7 +74,7 @@ namespace CasADi{
     }
       
     // Print statistics
-    if(getOption("print_stats")) printStats(std::cout);
+    if(print_stats_) printStats(std::cout);
   }
 
   void IntegratorInternal::init(){
@@ -155,6 +155,7 @@ namespace CasADi{
     // read options
     t0_ = getOption("t0");
     tf_ = getOption("tf");
+    print_stats_ = getOption("print_stats");
 
     // Form a linear solver for the sparsity propagation
     linsol_f_ = LinearSolver(spJacF());

@@ -143,6 +143,10 @@ namespace CasADi{
 
     /// Integrator for sparsity pattern propagation
     LinearSolver linsol_f_, linsol_g_;
+
+    /// Options
+    bool print_stats_;
+
   };
   
 } // namespace CasADi
