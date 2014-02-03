@@ -484,15 +484,15 @@ namespace CasADi{
 #ifndef SWIG
     /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
     template<typename T>
-    void set(T* data, const T* val_data, CRSSparsity val_sp) const;
+    void set(T* data, const T* val_data, const CRSSparsity& val_sp) const;
 
     /** \brief Add the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
     template<typename T>
-    void add(T* data, const T* val_data, CRSSparsity val_sp) const;
+    void add(T* data, const T* val_data, const CRSSparsity& val_sp) const;
 
     /** \brief Bitwise or of the nonzero entries of one sparsity pattern and the nonzero entries of another sparsity pattern */
     template<typename T>
-    void bor(T* data, const T* val_data, CRSSparsity val_sp) const;
+    void bor(T* data, const T* val_data, const CRSSparsity& val_sp) const;
 
 
   private:
@@ -505,7 +505,7 @@ namespace CasADi{
   // Template instantiations
 #ifndef SWIG
   template<typename T>
-  void CRSSparsity::set(T* data, const T* val_data, CRSSparsity val_sp) const{
+  void CRSSparsity::set(T* data, const T* val_data, const CRSSparsity& val_sp) const{
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();
@@ -579,7 +579,7 @@ namespace CasADi{
   }
 
   template<typename T>
-  void CRSSparsity::add(T* data, const T* val_data, CRSSparsity val_sp) const{
+  void CRSSparsity::add(T* data, const T* val_data, const CRSSparsity& val_sp) const{
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();
@@ -657,7 +657,7 @@ namespace CasADi{
   }
 
   template<typename T>
-  void CRSSparsity::bor(T* data, const T* val_data, CRSSparsity val_sp) const{
+  void CRSSparsity::bor(T* data, const T* val_data, const CRSSparsity& val_sp) const{
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();
