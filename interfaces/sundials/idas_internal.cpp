@@ -115,7 +115,10 @@ namespace CasADi{
       fill(init_xdot_.begin(),init_xdot_.end(),0);
     }
   
+    // Read options
     cj_scaling_ = getOption("cj_scaling");
+    calc_ic_ = getOption("calc_ic");
+    calc_icB_ = hasSetOption("calc_icB") ?  getOption("calc_icB") : getOption("calc_ic");
   
     // Sundials return flag
     int flag;
@@ -782,8 +785,7 @@ namespace CasADi{
     // }
 
     // Correct initial conditions, if necessary
-    int calc_ic = getOption("calc_ic");
-    if(calc_ic){
+    if(calc_ic_){
       correctInitialConditions();
     }
 
@@ -949,8 +951,7 @@ namespace CasADi{
     }
   
     // Correct initial values for the integration if necessary
-    bool calc_icB = hasSetOption("calc_icB") ?  getOption("calc_icB") : getOption("calc_ic");
-    if(calc_icB){
+    if(calc_icB_){
       log("IdasInternal::resetB","IDACalcICB begin");
       flag = IDACalcICB(mem_, whichB_, t0_, xz_, xzdot_);
       if(flag != IDA_SUCCESS) idas_error("IDACalcICB",flag);

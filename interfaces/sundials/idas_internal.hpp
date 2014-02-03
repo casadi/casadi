@@ -225,8 +225,10 @@ class IdasInternal : public SundialsInternal{
   bool isInitAdj_;
   bool isInitTaping_;
   
-  // Scaling of cj
+  // Options
   bool cj_scaling_;
+  bool calc_ic_;
+  bool calc_icB_;
 
   // Disable IDAS internal warning messages
   bool disable_internal_warnings_;
