@@ -156,6 +156,10 @@ namespace CasADi{
   SX SX::sign() const{
     return UnarySX::create(OP_SIGN, *this);
   }
+  
+  SX SX::copysign(const SX &y) const{
+    return BinarySX::create(OP_COPYSIGN, *this,y);
+  }
 
   SX SX::erfinv() const{
     return UnarySX::create(OP_ERFINV,*this);
@@ -323,6 +327,9 @@ namespace CasADi{
   }
   Matrix<SX> SX::constpow(const Matrix<SX>& n) const {
     return Matrix<SX>(*this).__constpow__(n);
+  }
+  Matrix<SX> SX::copysign(const Matrix<SX>& n) const {
+    return Matrix<SX>(*this).copysign(n);
   }
 
   Matrix<SX> SX::arctan2(const Matrix<SX>& b) const { 

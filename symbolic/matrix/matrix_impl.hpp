@@ -1159,6 +1159,11 @@ namespace CasADi{
   }
 
   template<class T>
+  Matrix<T> Matrix<T>::copysign(const Matrix<T>& y) const{
+    return binary(OP_COPYSIGN,*this,y);
+  }
+
+  template<class T>
   Matrix<T> Matrix<T>::erfinv() const{
     return unary(OP_ERFINV,*this);
   }

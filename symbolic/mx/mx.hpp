@@ -418,6 +418,7 @@ namespace CasADi{
     MX logic_and(const MX& y) const;
     MX logic_or(const MX& y) const;
     MX if_else_zero(const MX& y) const;
+    MX copysign(const MX& y) const;
 
     // all unary operations
     MX exp() const;

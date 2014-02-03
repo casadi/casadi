@@ -236,6 +236,7 @@ namespace CasADi{
     SX log10() const;
     SX printme(const SX &y) const;
     SX sign() const;
+    SX copysign(const SX &y) const;
     SX constpow(const SX& y) const;
     SX logic_not() const;
     SX logic_and(const SX& y) const;
@@ -245,6 +246,7 @@ namespace CasADi{
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;
     Matrix<SX> constpow(const Matrix<SX>& n) const;
+    Matrix<SX> copysign(const Matrix<SX>& n) const;
     Matrix<SX> arctan2(const Matrix<SX>& b) const;
         
     // Get the temporary variable

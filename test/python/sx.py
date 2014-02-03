@@ -1215,6 +1215,95 @@ class SXtests(casadiTestCase):
 
     with self.assertRaises(RuntimeError):
       d = x / c
+      
+  def test_copysign(self):
+    x = ssym("x")
+    y = ssym("y")
+    z = copysign(x,y)
+    
+    f = SXFunction([x,y],[z])
+    f.init()
+    
+    f.setInput(2,0)
+    f.setInput(0.5,1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([2]))
+
+    f.setInput(2,0)
+    f.setInput(-0.5,1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([-2]))
+    
+    f.setInput(-2,0)
+    f.setInput(0.5,1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([2]))
+
+    f.setInput(-2,0)
+    f.setInput(-0.5,1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([-2]))
+    
+    f.setInput(2,0)
+    f.setInput(0,1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([2]))
+    
+    J = f.jacobian()
+    J.init()
+    
+    J.setInput(2,0)
+    J.setInput(0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([1]))
+
+    J.setInput(2,0)
+    J.setInput(-0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([-1]))
+    
+    J.setInput(-2,0)
+    J.setInput(0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([1]))
+
+    J.setInput(-2,0)
+    J.setInput(-0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([-1]))
+    
+    J.setInput(2,0)
+    J.setInput(0,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([1]))
+
+    J = f.jacobian(1)
+    J.init()
+    
+    J.setInput(2,0)
+    J.setInput(0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([0]))
+
+    J.setInput(2,0)
+    J.setInput(-0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([0]))
+    
+    J.setInput(-2,0)
+    J.setInput(0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([0]))
+
+    J.setInput(-2,0)
+    J.setInput(-0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([0]))
+    
+    J.setInput(2,0)
+    J.setInput(0,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([0]))
     
 if __name__ == '__main__':
     unittest.main()

@@ -257,7 +257,7 @@ class typemaptests(casadiTestCase):
         f_.evaluate()
         
 
-        self.checkarray(fun(f_.getOutput(),DMatrix(s)),f.getOutput(),"operation")
+        self.checkarray(fun(f_.getOutput(),DMatrix(s)),f.getOutput(),"operation",str(f_.getOutput(0))+str(s)+":"+str(fun(f_.getOutput(),DMatrix(s)))+"->"+str(f.getOutput())+":"+str(s)+str(z)+"->"+str(r))
       else:
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
@@ -274,7 +274,7 @@ class typemaptests(casadiTestCase):
         f_.setInput(dummy2[0:f.input(1).size()],1)
         f_.evaluate()
 
-        self.checkarray(fun(f_.getOutput(0),f_.getOutput(1)),f.getOutput(),"operation")
+        self.checkarray(fun(f_.getOutput(0),f_.getOutput(1)),f.getOutput(),"operation"+str(f_.getOutput(0))+","+str(f_.getOutput(1))+":"+str(f.getOutput()))
     
     
     def tests(z,s):
@@ -297,6 +297,8 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: constpow(z,s))
       doit(z,s,lambda z,s: arctan2(s,z))
       doit(z,s,lambda z,s: arctan2(z,s))
+      doit(z,s,lambda z,s: copysign(z,s))
+      doit(z,s,lambda z,s: copysign(s,z))
 
     nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
         

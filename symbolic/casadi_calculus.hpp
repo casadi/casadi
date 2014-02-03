@@ -49,7 +49,7 @@ namespace CasADi{
     OP_SIN,  OP_COS,  OP_TAN,  
     OP_ASIN,  OP_ACOS,  OP_ATAN,  
     OP_LT, OP_LE, OP_EQ, OP_NE, OP_NOT, OP_AND, OP_OR,
-    OP_FLOOR,  OP_CEIL,  OP_FABS, OP_SIGN, OP_IF_ELSE_ZERO,
+    OP_FLOOR,  OP_CEIL,  OP_FABS, OP_SIGN, OP_COPYSIGN, OP_IF_ELSE_ZERO,
     OP_ERF,  OP_FMIN,  OP_FMAX,
     OP_INV,
     OP_SINH,  OP_COSH,  OP_TANH,
@@ -278,6 +278,12 @@ namespace CasADi{
 
   /// Sign function, note that sign(nan) == nan
   inline double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;}
+  
+  /// copysign function
+  template<class T> T copysign(const T &x, const T &y) {return x.copysign(y);}
+
+  /// copysign function
+  inline double copysign(double x, double y){ return y>=0 ? (x>0? x : -x) : (x>0? -x : x);}
 
   /// Conditional assignment
   template<class T> T if_else_zero(const T &x, const T &y){return x.if_else_zero(y);}
@@ -458,6 +464,7 @@ namespace CasADi{
   template<>      struct SmoothChecker<OP_EQ>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_NE>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_SIGN>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_COPYSIGN>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_NOT>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_AND>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_OR>{ static const bool check=false;};
@@ -484,6 +491,7 @@ namespace CasADi{
   template<>      struct F0XChecker<OP_CEIL>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_FABS>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SIGN>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_COPYSIGN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_ERF>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SINH>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_TANH>{ static const bool check=true;};
@@ -511,6 +519,7 @@ namespace CasADi{
   template<>      struct F00Checker<OP_FMAX>{ static const bool check=true;};
   template<>      struct F00Checker<OP_AND>{ static const bool check=true;};
   template<>      struct F00Checker<OP_OR>{ static const bool check=true;};
+  template<>      struct F00Checker<OP_COPYSIGN>{ static const bool check=true;};
   //@}
 
   //@{
@@ -557,6 +566,7 @@ namespace CasADi{
   template<>      struct BinaryChecker<OP_PRINTME>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_ATAN2>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_COPYSIGN>{ static const bool check=true;};
   //@}
 
   /// Simple assignment
@@ -798,6 +808,13 @@ namespace CasADi{
   struct UnaryOperation<OP_SIGN>{
     template<typename T> static inline void fcn(const T& x, T& f){ f = sign(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=0;}
+  };
+  
+  /// Copysign
+  template<>
+  struct BinaryOperation<OP_COPYSIGN>{
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = copysign(x,y);}
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ T e = 1; d[0]=copysign(e,y); d[1]=0;}
   };
 
   /// Minimum
