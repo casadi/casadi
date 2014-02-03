@@ -37,6 +37,8 @@ namespace CasADi{
 
   void FixedStepIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){    
     IntegratorInternal::deepCopyMembers(already_copied);
+    F_ = deepcopy(F_,already_copied);
+    G_ = deepcopy(G_,already_copied);
   }
 
   FixedStepIntegratorInternal::~FixedStepIntegratorInternal(){
