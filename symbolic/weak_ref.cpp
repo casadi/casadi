@@ -36,7 +36,7 @@ namespace CasADi{
     
   SharedObject WeakRef::shared(){
     SharedObject ret;
-    if(!isNull() && (*this)->raw_ !=0){
+    if(alive()){
       ret.assignNode((*this)->raw_);
     }
     return ret;
