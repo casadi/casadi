@@ -286,7 +286,7 @@ namespace CasADi{
   using std::copysign;
   #else
   /// copysign function
-  inline double copysign(double x, double y) { return y>=0 ? (x>0? x : -x) : (x>0? -x : x);}
+  inline double copysign(double x, double y) { return y>=0 ? fabs(x) : -fabs(x);}
   #endif //HAS_COPYSIGN
   
   /// Conditional assignment
