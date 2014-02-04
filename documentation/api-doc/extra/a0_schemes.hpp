@@ -867,20 +867,6 @@
 <br/>
 @copydoc scheme_NLPSolverOutput
 */
-/** \class CasADi::GenericIntegratorInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::GenericIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
 /** \class CasADi::IntegratorInternal
 \n
 \par
