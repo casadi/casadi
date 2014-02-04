@@ -163,12 +163,10 @@ namespace CasADi{
     int nadj = aseed.size();
     if(nfwd==0 && nadj==0) return;
 
-    // Auxiliary outputs not yet supported
-    casadi_assert_message(nadj==0 || getNumOutputs()==1, "Not implemented");
-
     // Temporaries
     vector<int> row_offset(1,0);
     vector<MX> rhs;
+    vector<int> rhs_loc;
 
     // Arguments when calling f/f_der
     vector<MX> v;
@@ -192,13 +190,25 @@ namespace CasADi{
     // Adjoint sensitivities, solve to get arguments for calling f_der
     if(nadj>0){
       for(int d=0; d<nadj; ++d){
-        rhs.push_back(trans(*aseed[d][iout_]));
-        row_offset.push_back(row_offset.back()+1);
-        *aseed[d][iout_] = MX();
+        for(int i=0; i<getNumOutputs(); ++i){
+          if(aseed[d][i]!=0){
+            if(i==iout_){
+              rhs.push_back(trans(*aseed[d][i]));
+              row_offset.push_back(row_offset.back()+1);
+              rhs_loc.push_back(v.size()); // where to store it
+              v.push_back(MX());
+            } else {
+              v.push_back(*aseed[d][i]);
+            }
+          }
+          *aseed[d][i] = MX();
+        }
       }
+
+      // Solve for all right-hand-sides at once
       rhs = vertsplit(J->getSolve(vertcat(rhs),false,linsol_),row_offset);
-      for(int d=0; d<nadj; ++d){
-        v.push_back(trans(rhs[d]));
+      for(int d=0; d<rhs.size(); ++d){
+        v[rhs_loc[d]] = trans(rhs[d]);
       }
       row_offset.resize(1);
       rhs.clear();
