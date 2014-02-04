@@ -86,7 +86,7 @@ void Tester::model(){
   double endtime = 1.0;
     
   // Discretization
-  int ntimesteps = n_euler_*n_meas_;
+  int ntimesteps = n_euler_*n_finite_elements_*n_meas_;
   double dt = endtime/ntimesteps;
   double dx = poolwidth/n_;
   double dy = poolwidth/n_;
