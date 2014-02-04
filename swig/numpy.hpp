@@ -1,4 +1,7 @@
 #include "stdio.h"
+
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+
 #include <arrayobject.h>
 
 /* The following code originally appeared in
@@ -8,19 +11,35 @@
  * versions), add some comments and some functionality.
  */
 
+#ifndef NDARRAY_VERSION
+#define NDARRAY_VERSION NPY_VERSION
+#endif
+
+#ifndef NPY_ALIGNED
+#define NPY_ALIGNED NPY_ARRAY_ALIGNED
+#endif
+
 /* Macros to extract array attributes.
  */
 #define is_array(a)            ((a) && PyArray_Check((PyArrayObject *)a))
-#define array_type(a)          (int)(PyArray_TYPE(a))
+#define array_type(a)          (int)(PyArray_TYPE((PyArrayObject *)a))
+#define array_is_contiguous(a) (PyArray_ISCONTIGUOUS((PyArrayObject *)a))
+#define array_is_native(a)     (PyArray_ISNOTSWAPPED((PyArrayObject *)a))
+
+#if NDARRAY_VERSION < 0x01000009
 #define array_numdims(a)       (((PyArrayObject *)a)->nd)
 #define array_dimensions(a)    (((PyArrayObject *)a)->dimensions)
 #define array_size(a,i)        (((PyArrayObject *)a)->dimensions[i])
 #define array_data(a)          (((PyArrayObject *)a)->data)
-#define array_is_contiguous(a) (PyArray_ISCONTIGUOUS(a))
-#define array_is_native(a)     (PyArray_ISNOTSWAPPED(a))
 #ifndef PyArray_CHKFLAGS
 #define PyArray_CHKFLAGS(m, FLAGS) \
 	((((PyArrayObject *)(m))->flags & (FLAGS)) == (FLAGS))
+#endif
+#else
+#define array_numdims(a)    (PyArray_NDIM(((PyArrayObject *)a)))
+#define array_dimensions(a) (PyArray_DIMS(((PyArrayObject *)a)))
+#define array_size(a,i)     (PyArray_DIM(((PyArrayObject *)a),i))
+#define array_data(a)       (PyArray_DATA(((PyArrayObject *)a)))
 #endif
 	
 /* Support older NumPy data type names

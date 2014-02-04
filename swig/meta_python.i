@@ -240,7 +240,7 @@ int meta< std::vector< double > >::as(PyObject * p,std::vector<double > &m) {
     int array_is_new_object;
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
     if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
-    double* d=(double*) array->data;
+    double* d=(double*) array_data(array);
     
     m.assign( d, d+size );
     
@@ -661,7 +661,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
     if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
     
-    double* d=(double*) array->data;
+    double* d=(double*) array_data(array);
     std::vector<double> v(d,d+size);
     
     m = CasADi::Matrix<double>(v, nrows, ncols);
@@ -677,7 +677,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
     if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
     int size=array_size(array,0); // number on non-zeros
-    double* d=(double*) array->data;
+    double* d=(double*) array_data(array);
     std::vector<double> v(d,d+size);
 
     // Get the dimensions of the csr_matrix

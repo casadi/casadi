@@ -567,9 +567,9 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
 			  SWIG_exception_fail(SWIG_TypeError, "Array should be native & of datatype double");
 			  
 	    if (!(array_is_contiguous(p))) {
-	      if (PyArray_CHKFLAGS(p,NPY_ALIGNED)) {
-	        $3 = PyArray_STRIDE(p,0)/sizeof(double);
-	        $4 = PyArray_STRIDE(p,1)/sizeof(double);
+	      if (PyArray_CHKFLAGS((PyArrayObject *) p,NPY_ALIGNED)) {
+	        $3 = PyArray_STRIDE((PyArrayObject *) p,0)/sizeof(double);
+	        $4 = PyArray_STRIDE((PyArrayObject *) p,1)/sizeof(double);
 	      } else {
 			   SWIG_exception_fail(SWIG_TypeError, "Array should be contiguous or aligned");
 	      }
