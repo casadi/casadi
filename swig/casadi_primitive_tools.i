@@ -36,7 +36,7 @@ except:
   pass
 
 try:
-  from numpy import sin, cos, tan, sqrt, log, exp, floor, ceil, fmin, fmax, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, fabs, sign, arctanh, arcsinh, arccosh, __copysign__
+  from numpy import sin, cos, tan, sqrt, log, exp, floor, ceil, fmin, fmax, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, fabs, sign, arctanh, arcsinh, arccosh, copysign
 except:
   sin = lambda x: x.sin()
   cos = lambda x: x.cos()
@@ -60,7 +60,7 @@ except:
   arctanh = lambda x: x.arctanh()
   arcsinh = lambda x: x.arcsinh()
   arccosh = lambda x: x.arccosh()
-  __copysign__ = lambda x,y: x.__copysign__(y)
+  copysign = lambda x,y: x.copysign(y)
 %}
 #endif // SWIGPYTHON
 
