@@ -164,7 +164,7 @@ namespace CasADi{
     if(nfwd==0 && nadj==0) return;
 
     // Auxiliary outputs not yet supported
-    casadi_assert_message(getNumOutputs()==1, "Not implemented");
+    casadi_assert_message(nadj==0 || getNumOutputs()==1, "Not implemented");
 
     // Temporaries
     vector<int> row_offset(1,0);
@@ -211,18 +211,31 @@ namespace CasADi{
     // Discard non-differentiated evaluation (change?)
     v_it += getNumOutputs();
 
-    // Solve for the forward sensitivities
+    // Forward directional derivatives
     if(nfwd>0){
       for(int d=0; d<nfwd; ++d){
-        rhs.push_back(trans(*v_it++));
-        row_offset.push_back(row_offset.back()+1);        
+        for(int i=0; i<getNumOutputs(); ++i){
+          if(i==iout_){
+            // Collect the arguments
+            rhs.push_back(trans(*v_it++));
+            row_offset.push_back(row_offset.back()+1);        
+          } else {
+            // Auxiliary output
+            if(fsens[d][i]!=0){
+              *fsens[d][i] = *v_it++;
+            }
+          }
+        }
       }
+        
+      // Solve for all the forward derivatives at once
       rhs = vertsplit(J->getSolve(vertcat(rhs),true,linsol_),row_offset);
       for(int d=0; d<nfwd; ++d){
         if(fsens[d][iout_]!=0){
           *fsens[d][iout_] = -trans(rhs[d]);
         }
       }
+      
       row_offset.resize(1);
       rhs.clear();
     }
