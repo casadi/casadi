@@ -428,8 +428,7 @@ namespace CasADi{
   *
   * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
   */
-  template<class T>
-  Matrix<T> nullspace(const Matrix<T>& A);
+  MX nullspace(const MX& A);
 
   /** \brief Matrix determinant (experimental) */
   MX det(const MX& A);
