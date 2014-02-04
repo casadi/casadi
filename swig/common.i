@@ -466,16 +466,3 @@ void dummy(CasADi::SX foo,
 	int &bar,
 	double &baz);
 };
-
-
-#ifdef SWIGPYTHON
-
-%feature("pythonprepend") CasADi::CRSSparsity::spy() %{
-   print "hello"
-%} 
-
-
-%feature("pythonappend") CasADi::CRSSparsity::spy() %{
-   print "bye"
-%} 
-#endif
