@@ -150,6 +150,36 @@ if(USE_CXX11)
 endif()
 add_feature_info(using-c++11 USE_CXX11 "Using C++11 features (improves efficiency and is required for some examples).")
 
+if(CXX11FLAG)
+  try_compile(HAS_COPYSIGN
+    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_SOURCE_DIR}/cmake_modules/check_copysign.cpp
+    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
+    OUTPUT_VARIABLE OUTPUT)
+  if(HAS_COPYSIGN)
+    add_definitions(-DHAS_COPYSIGN)
+  endif()
+
+  try_compile(HAS_ERF
+    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_SOURCE_DIR}/cmake_modules/check_erf.cpp
+    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
+    OUTPUT_VARIABLE OUTPUT)
+  if(HAS_ERF)
+    add_definitions(-DHAS_ERF)
+  endif()
+
+  try_compile(HAS_ERFINV
+    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_SOURCE_DIR}/cmake_modules/check_erfinv.cpp
+    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
+    OUTPUT_VARIABLE OUTPUT)
+  if(HAS_ERFINV)
+    add_definitions(-DHAS_ERFINV)
+  endif()
+endif()
+
+
 # set(CMAKE_VERBOSE_MAKEFILE 0)
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ansi -pedantic -Wall -Wno-sign-compare")
