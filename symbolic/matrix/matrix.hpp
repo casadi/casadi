@@ -513,7 +513,7 @@ namespace CasADi{
     Matrix<T> ceil() const;
     Matrix<T> fabs() const;
     Matrix<T> sign() const;
-    Matrix<T> copysign(const Matrix<T>& y) const;
+    Matrix<T> __copysign__(const Matrix<T>& y) const;
     Matrix<T> erfinv() const;
     Matrix<T> fmin(const Matrix<T>& y) const;
     Matrix<T> fmax(const Matrix<T>& y) const;

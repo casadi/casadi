@@ -463,7 +463,7 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
     case OP_CEIL:      stream << "ceil(";    break;
     case OP_FABS:      stream << "fabs(";    break;
     case OP_SIGN:      stream << "sign(";    break;
-    case OP_COPYSIGN:  stream << "copysign(";break;
+    case OP_COPYSIGN:  stream << "__copysign__(";break;
     case OP_ERF:       stream << "erf(";     break;
     case OP_FMIN:      stream << "fmin(";    break;
     case OP_FMAX:      stream << "fmax(";    break;

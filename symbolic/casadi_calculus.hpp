@@ -279,9 +279,9 @@ namespace CasADi{
   /// Sign function, note that sign(nan) == nan
   inline double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;}
   
-  /// copysign function
-  template<class T> T copysign(const T &x, const T &y) {return x.copysign(y);}
-
+  /// __copysign__ function
+  template<class T> T copysign(const T &x, const T &y) {return x.__copysign__(y);}
+  
   #ifdef HAS_COPYSIGN
   using std::copysign;
   #else
