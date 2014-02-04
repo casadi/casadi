@@ -314,7 +314,7 @@ memberbinopsr_un(Type,fmin) \
 memberbinopsr_un(Type,fmax) \
 memberbinopsr_nn(Type,mul) \
 memberbinopsr_un(Type,arctan2) \
-memberbinopsr_un(Type,__copysign__)
+memberbinopsr(Type,copysign)
 
 #define memberbinops(uname,argtype,argCast,selfCast,returntype) \
 returntype __##uname##__ (argtype) const{ return selfCast(*$self).__##uname##__(argCast(b));} \
@@ -326,11 +326,6 @@ returntype __r##uname##__(argtype) const{ return argCast(b) ##custom## selfCast(
 
 #define memberbinops_un(uname,argtype,argCast,selfCast,returntype) \
 returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*$self));}
-
-#define memberbinops_unn(uname,argtype,argCast,selfCast,returntype) \
-returntype ##uname## (argtype) const{ return selfCast(*$self).##uname##(argCast(b));} \
-returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*$self));}
-
 
 // These methods must be added since the implicit type cast does not work.
 // Consider a+b  with a DMatrix and b SXMatrix
@@ -344,7 +339,7 @@ memberbinops_un(fmin,argtype,argCast,selfCast,returntype) \
 memberbinops_un(fmax,argtype,argCast,selfCast,returntype) \
 memberbinops(constpow,argtype,argCast,selfCast,returntype) \
 memberbinops_un(arctan2,argtype,argCast,selfCast,returntype) \
-memberbinops_unn(__copysign__,argtype,argCast,selfCast,returntype) \
+memberbinops(copysign,argtype,argCast,selfCast,returntype) \
 memberbinops(pow,argtype,argCast,selfCast,returntype) \
 memberbinops(add,argtype,argCast,selfCast,returntype) \
 memberbinops(sub,argtype,argCast,selfCast,returntype) \
