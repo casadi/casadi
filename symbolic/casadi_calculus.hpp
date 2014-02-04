@@ -282,12 +282,12 @@ namespace CasADi{
   /// copysign function
   template<class T> T copysign(const T &x, const T &y) {return x.copysign(y);}
 
-  #ifdef USE_CXX11
+  #ifdef HAS_COPYSIGN
   using std::copysign;
   #else
   /// copysign function
-  inline double copysign(double x, double y)  throw() { return y>=0 ? (x>0? x : -x) : (x>0? -x : x);}
-  #endif
+  inline double copysign(double x, double y) { return y>=0 ? (x>0? x : -x) : (x>0? -x : x);}
+  #endif //HAS_COPYSIGN
   
   /// Conditional assignment
   template<class T> T if_else_zero(const T &x, const T &y){return x.if_else_zero(y);}
