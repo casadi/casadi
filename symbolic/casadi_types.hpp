@@ -60,7 +60,7 @@ namespace CasADi{
   class SDQPSolver;
   class ImplicitFunction;
   
-  
+  class DerivativeGenerator;
   class Callback;
   class CustomEvaluate;
   class CustomFunction;

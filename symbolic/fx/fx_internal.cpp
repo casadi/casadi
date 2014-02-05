@@ -52,6 +52,7 @@ namespace CasADi{
     addOption("regularity_check",         OT_BOOLEAN,             true,           "Throw exceptions when NaN or Inf appears during evaluation");
     addOption("inputs_check",             OT_BOOLEAN,             true,           "Throw exceptions when the numerical values of the inputs don't make sense");
     addOption("gather_stats",             OT_BOOLEAN,             false,          "Flag to indicate wether statistics must be gathered");
+    addOption("derivative_generator",     OT_DERIVATIVEGENERATOR,   GenericType(),  "Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.");
   
     verbose_ = false;
     user_data_ = 0;
@@ -255,6 +256,7 @@ namespace CasADi{
     f.setInputScheme(getInputScheme());
     f.setOutputScheme(getOutputScheme());
     f.setOption("ad_mode",getOption("ad_mode")); // Why?
+    if (hasSetOption("derivative_generator")) f.setOption("derivative_generator",getOption("derivative_generator"));
     
     return f;
   }
@@ -1513,7 +1515,12 @@ namespace CasADi{
     int der_dir_cost = nfwd + adj_penalty*nadj;
 
     // Check if it is cheaper to calculate the full Jacobian and then multiply
-    if(2*full_jac_cost < der_dir_cost){
+    if(hasSetOption("derivative_generator")){
+      /// User-provided derivative generator function
+      DerivativeGenerator dergen = getOption("derivative_generator");
+      FX this_ = shared_from_this<FX>();
+      ret = dergen(this_,nfwd,nadj,user_data_);
+    } else if(2*full_jac_cost < der_dir_cost){
       // Generate the Jacobian and then multiply to get the derivative
       //ret = getDerivativeViaJac(nfwd,nadj); // NOTE: Uncomment this line (and remove the next line) to enable this feature
       ret = getDerivative(nfwd,nadj);    
