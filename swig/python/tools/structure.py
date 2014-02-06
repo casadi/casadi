@@ -11,6 +11,8 @@ def isInteger(a):
 def isString(a):
   return isinstance(a,str) or isinstance(a,unicode)
   
+def isIterable(a):
+  return isinstance(a,list) or isinstance(a,tuple)
   
 # StructIndex :tuple/list of strings
 # canonicalIndex : tuple/list of string or numbers
@@ -115,7 +117,7 @@ nesteddict = NestedDictLiteral()
 def payloadUnpack(payload,i):
   if isString(i):
     raise Exception("Got string %s where number expected."% i)
-  if isinstance(payload,list):
+  if isIterable(payload):
     if i>=len(payload):
       raise Exception("Rhs out of range. Got list index %s but rhs list is only of length %s." % (i,len(payload)))
     return payload[i]
