@@ -93,7 +93,13 @@ namespace CasADi{
     
     /// Temp data  nxn x K
     std::vector< Matrix<double> > nnKb_;
-  
+    
+    /// Real parts of eigenvalues
+    std::vector< double > eig_real_;
+
+    /// Imaginary parts of eigenvalues
+    std::vector< double > eig_imag_;
+      
     /// Solvers for low-order Discrete Periodic Sylvester Equations
     std::vector< std::vector< LinearSolver> > dpse_solvers_;
     

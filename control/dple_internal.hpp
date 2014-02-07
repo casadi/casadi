@@ -81,6 +81,12 @@ namespace CasADi{
     
     /// Assume positive definiteness of P_i
     bool pos_def_;
+    
+    /// Throw an error when system is unstable
+    bool error_unstable_;
+    
+    /// Margin for unstability detection
+    double eps_unstable_;
 
     /// Number of forward derivatives
     int nfwd_;

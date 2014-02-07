@@ -76,6 +76,9 @@ namespace CasADi{
     nnKa_.resize(K_,DMatrix::zeros(n_,n_));
     nnKb_.resize(K_,DMatrix::zeros(n_,n_));
     
+    eig_real_.resize(n_);
+    eig_imag_.resize(n_);
+    
     
     F_.resize(2*2*n_*K_);
     
@@ -187,7 +190,14 @@ namespace CasADi{
   
   void PsdIndefDpleInternal::evaluate(){
     // Obtain a periodic Schur form
-    slicot_periodic_schur(n_,K_,input(DPLE_A).data(),T_,Z_,dwork_);
+    slicot_periodic_schur(n_,K_,input(DPLE_A).data(),T_,Z_,dwork_,eig_real_,eig_imag_);
+    
+    if (error_unstable_) {
+      for (int i=0;i<n_;++i) {
+        double modulus = sqrt(eig_real_[i]*eig_real_[i]+eig_imag_[i]*eig_imag_[i]);
+        casadi_assert_message(modulus+eps_unstable_ <= 1,"PsdIndefDpleInternal: system is unstable. Found an eigenvalue " << eig_real_[i] << " + " << eig_imag_[i] << "j, with modulus " << modulus << " (corresponding eps= " << 1-modulus << ")." << std::endl << "Use options and 'error_unstable' and 'eps_unstable' to influence this message.");
+      }
+    }
     
     // Find a block partition of the T hessenberg form
     partition_.resize(1,0);
