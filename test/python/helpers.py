@@ -430,7 +430,7 @@ class casadiTestCase(unittest.TestCase):
         
           # Complete random seeding
           random.seed(1)
-          for i in range(vf.getNumInputs()):
+          for i in range(f.getNumInputs(),vf.getNumInputs()):
             vf.setInput(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).size())),i)
           
           vf.evaluate()
@@ -455,8 +455,11 @@ class casadiTestCase(unittest.TestCase):
               vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
               vf2.init()
                 
+              for i,v in enumerate(values):
+                vf2.setInput(v,i)
+            
               random.seed(1)
-              for i in range(vf2.getNumInputs()):
+              for i in range(f.getNumInputs(),vf2.getNumInputs()):
                 vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())),i)
               
               vf2.evaluate()
