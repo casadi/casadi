@@ -649,6 +649,7 @@ namespace CasADi{
     
     for (int d=0;d<nadj_;++d) {
     
+      DMatrix &P_bar = input(DPLE_NUM_IN*(nfwd_+1)+DPLE_NUM_OUT*d+DPLE_P);
       std::vector<double> &Vbar = output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*d+DPLE_V).data();
       std::fill(Vbar.begin(),Vbar.end(),0);
       
@@ -663,7 +664,7 @@ namespace CasADi{
         nnKa_[k].set(0.0);
         
         // nnKa[k] <- nnKb*Z[k]
-        dense_mul_nt(n_,n_,n_,&input(DPLE_NUM_IN*(nfwd_+1)+DPLE_NUM_OUT*d+DPLE_P).data()[n_*n_*k],&Z_[k*n_*n_],&nnKa_[k].data()[0]);
+        dense_mul_nt(n_,n_,n_,&P_bar.data()[n_*n_*k],&Z_[k*n_*n_],&nnKa_[k].data()[0]);
         // Xbar <- Z[k]*V[k]*Z[k]'
         dense_mul_nn(n_,n_,n_,&Z_[k*n_*n_],&nnKa_[k].data()[0],&Xbar_[k*n_*n_]);
       }
@@ -759,7 +760,7 @@ namespace CasADi{
                 for (int ii=0;ii<na1;++ii) {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
-                      Xbar_[partindex(i,l,k,kk,jj)] += T_[partindex(r,i,k,ii,kk)]*FF_[k*4+2*ii+kk];
+                      Xbar_[partindex(i,l,k,kk,jj)] += T_[partindex(r,i,k,ii,kk)]*FF_[k*4+2*ii+jj];
                     }
                   }
                 }
@@ -865,7 +866,7 @@ namespace CasADi{
         }
       }
       
-      //  [mul([vb+vb.T,a,x]) for vb,x,a in zip(V_bar,X,As)]
+      // A_bar = [mul([vb+vb.T,a,x]) for vb,x,a in zip(V_bar,X,As)]
       for(int k=0;k<K_;++k) {
         std::fill(nnKa_[k].begin(),nnKa_[k].end(),0);
         dense_mul_nn(n_,n_,n_,&input(DPLE_A).data()[n_*n_*k],&output(DPLE_P).data()[n_*n_*k],&nnKa_[k].data()[0]);
@@ -874,6 +875,7 @@ namespace CasADi{
         dense_mul_tn(n_,n_,n_,&Vbar[n_*n_*k],&nnKa_[k].data()[0],&Abar[n_*n_*k]);
       }
       
+      std::fill(P_bar.data().begin(),P_bar.data().end(),0);
  
     }
     
