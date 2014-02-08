@@ -1207,6 +1207,11 @@ namespace CasADi{
   Matrix<T> Matrix<T>::if_else_zero(const Matrix<T>& y) const{
     return binary(OP_IF_ELSE_ZERO,*this,y);
   }
+  
+  template<class T>
+  Matrix<T> Matrix<T>::relay() const{
+    return unary(OP_RELAY,*this);
+  }
 
   template<class T>
   std::vector<T>& Matrix<T>::data(){

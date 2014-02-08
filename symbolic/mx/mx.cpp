@@ -775,6 +775,10 @@ namespace CasADi{
     casadi_assert(sparsity()==x_guess.sparsity());
     *this = (*this)->getBinary(OP_LIFT,x_guess,false,false);
   }
+  
+  MX MX::relay() const{ 
+    return (*this)->getUnary(OP_RELAY);
+  }
 
   MX MX::__add__(const MX& y) const{
     return MX::binary(OP_ADD,*this,y);

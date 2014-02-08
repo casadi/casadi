@@ -85,6 +85,29 @@ namespace CasADi{
   template<class T>
   T det(const Matrix<T>& a);
 
+  /** \brief Create a relay (schmitt-trigger) operation
+  *
+  * A relay will introduce memory into an algorithm.
+  * The output of the relay (1 or -1) depends on the history (state) and the current input.
+  *
+  * If state==true:  output = state = (input>-1)
+  * If state==false:  output = state = (input<1)
+  *
+  * \verbatim
+  *              ^  output
+  *          ____|___________  1 (true)
+  *         |    |     |
+  * --------+----|-----+------------>  input
+  *  -1 ____|____|_____|
+  * (false) -1         1
+  *
+  * \verbatimend
+  *
+  *  The initial state is always true (high)
+  */
+  template<class T>
+  Matrix<T> relay(const Matrix<T>& a) { return relayblock(a);};
+
   template<class T>
   T getMinor(const Matrix<T> &x, int i, int j);
 
@@ -1655,7 +1678,8 @@ namespace CasADi{
   MTT_INST(T,flattenNZcat)                      \
   MTT_INST(T,project)                           \
   MTT_INST(T,sprank)                            \
-  MTT_INST(T,kron) 
+  MTT_INST(T,kron)                              \
+  MTT_INST(T,relay)
 #endif //SWIG
 
 #ifdef SWIGOCTAVE

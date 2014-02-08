@@ -272,7 +272,8 @@ namespace CasADi{
             // Allocate a new element in the work vector
             it->res[c] = place[it->res[c]] = worksize++;
           }
-        }      
+          it->arg.push_back(worksize++);
+        }
       }
     }
   
@@ -300,6 +301,9 @@ namespace CasADi{
               work_[it->res[c]].first = Matrix<double>(it->data->sparsity(c),0);
             }
           }
+        }
+        if (it->op == OP_RELAY) {
+          work_[it->arg[1]].first = Matrix<double>(it->data->sparsity(0),1);
         }
       }
     }
@@ -414,9 +418,17 @@ namespace CasADi{
         // Point pointers to the data corresponding to the element
         updatePointers(*it);
         
-        // Evaluate
-        it->data->evaluateD(mx_input_, mx_output_, itmp_, rtmp_);
-        
+        if (it->op == OP_RELAY) {
+          for (int i=0;i<(*mx_output_[0]).size();++i) {
+            double & in = (*mx_input_[0]).at(i);
+            double & mem = (*mx_input_[1]).at(i);
+            double & out = (*mx_output_[0]).at(i);
+            mem = mem ? in>-1 : in>=1; out = mem ? 1 : -1;  
+          }
+        } else {
+          // Evaluate
+          it->data->evaluateD(mx_input_, mx_output_, itmp_, rtmp_);
+        } 
       }
       
       // Write out profiling information

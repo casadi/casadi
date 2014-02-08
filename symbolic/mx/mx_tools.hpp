@@ -481,7 +481,28 @@ namespace CasADi{
   *
   */
   MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
-
+  
+  /** \brief Create a relay (schmitt-trigger) operation
+  *
+  * A relay will introduce memory into an algorithm.
+  * The output of the relay (1 or -1) depends on the history (state) and the current input.
+  *
+  * If state==true:  output = state = (input>-1)
+  * If state==false:  output = state = (input<1)
+  *
+  * \verbatim
+  *              ^  output
+  *          ____|___________  1 (true)
+  *         |    |     |
+  * --------+----|-----+------------>  input
+  *  -1 ____|____|_____|
+  * (false) -1         1
+  *
+  * \verbatimend
+  *
+  *  The initial state is always true (high)
+  */
+  MX relay(const MX& A);
 } // namespace CasADi
 
 #ifdef SWIG

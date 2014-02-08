@@ -685,6 +685,10 @@ namespace CasADi{
     return BinarySX::create(OP_PRINTME,*this,b);
   }
 
+  SX SX::relay() const{
+    return UnarySX::create(OP_RELAY,*this);
+  }
+
   SX SX::__pow__(const SX& n) const{
     if(n->isConstant()) {
       if (n->isInteger()){
