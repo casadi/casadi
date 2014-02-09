@@ -272,7 +272,9 @@ namespace CasADi{
             // Allocate a new element in the work vector
             it->res[c] = place[it->res[c]] = worksize++;
           }
-          it->arg.push_back(worksize++);
+          if (it->op == OP_RELAY) {
+            it->arg.push_back(worksize++);
+          }
         }
       }
     }
