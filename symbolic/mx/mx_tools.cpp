@@ -1046,5 +1046,9 @@ namespace CasADi{
     return f.call(A)[0];
   }
   
+  MX relay(const MX& A) {
+    return relayblock(A);
+  }
+  
 } // namespace CasADi
 

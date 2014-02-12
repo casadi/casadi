@@ -122,6 +122,10 @@ namespace CasADi{
     OP_ERFINV,
     OP_PRINTME,
     OP_LIFT,
+    
+    // Unsafe
+    OP_RELAY,
+    
     NUM_BUILT_IN_OPS
   };
 
@@ -294,6 +298,12 @@ namespace CasADi{
 
   /// Conditional assignment
   inline double if_else_zero(double x, double y){ return x ? y : 0;}
+
+  /// Relay
+  template<class T> T relayblock(const T &x){return x.relay();}
+
+  /// Relay
+  inline double relayblock(double x){ return x>=0 ? 1 : -1;}
 
   /// Inverse of the error function
   template<class T> T erfinv(const T &x){return x.erfinv();}
@@ -473,6 +483,7 @@ namespace CasADi{
   template<>      struct SmoothChecker<OP_AND>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_OR>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_IF_ELSE_ZERO>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_RELAY>{ static const bool check=false;};
   //@}
 
   //@{
@@ -919,6 +930,15 @@ namespace CasADi{
   struct BinaryOperation<OP_LIFT>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0] = 1; d[1] = 0; }
+  };
+  
+  
+  /// Relay or Schmitt trigger (unsafe)
+  template<>
+  struct UnaryOperation<OP_RELAY>{
+  public:
+    template<typename T> static inline void fcn(const T& x, T& f){ f = relayblock(x);}
+    template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=0;}
   };
 
 #endif // SWIG

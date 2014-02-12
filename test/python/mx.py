@@ -2228,5 +2228,31 @@ class MXtests(casadiTestCase):
     
     self.checkarray(c_,numpy.kron(a,b))
     
+  def test_relay(self):
+    x=msym("x")
+    y=msym("y")
+
+    z = relay(x)
+    CasadiOptions.setCatchErrorsPython(False)
+    f = MXFunction([x,y],[z,relay(y+x)+x+y])
+    f.init()
+    
+    for f in [f,f.expand()]:
+      f.init()
+
+
+      results = []
+      results1 = []
+      f.setInput(0.5,1)
+      xs = DMatrix([-5,-4,-1,-0.5,0,0.5,1,5,4,1,0.5,0,-0.5,-1,-1.5,-5,5])
+      for x_ in xs:
+        f.setInput(x_,0)
+        f.evaluate()
+        results.append( f.getOutput(0))
+        results1.append( f.getOutput(1))
+        
+      self.checkarray(DMatrix(results),DMatrix([-1,-1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1,-1,-1,1]))
+      self.checkarray(DMatrix(results1),DMatrix([-1,-1,-1,-1,-1,1,1,1,1,1,1,1,1,1,-1,-1,1])+xs+0.5)
+   
 if __name__ == '__main__':
     unittest.main()

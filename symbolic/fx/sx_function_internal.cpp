@@ -125,7 +125,7 @@ namespace CasADi{
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
       switch(it->op){
         // Start by adding all of the built operations
-        CASADI_MATH_FUN_BUILTIN(work_[it->i1],work_[it->i2],work_[it->i0])
+        CASADI_MATH_FUN_BUILTIN_SIMPLE(work_[it->i1],work_[it->i2],work_[it->i0])
         
         // Constant
         case OP_CONST: work_[it->i0] = it->d; break;
@@ -135,6 +135,9 @@ namespace CasADi{
         
         // Get function output from work vector
         case OP_OUTPUT: outputNoCheck(it->i0).data()[it->i2] = work_[it->i1]; break;
+        
+        // Special: relay node
+        case OP_RELAY: work_[it->i2] = work_[it->i2] ? work_[it->i1]>-1 : work_[it->i1]>=1; work_[it->i0] = work_[it->i2] ? 1 : -1; break;
       }
     }
 
@@ -458,8 +461,13 @@ namespace CasADi{
     
       // If binary, make sure that the second argument is the same as the first one (in order to treat all operations as binary) NOTE: ugly
       if(ndeps==1 && it->op!=OP_OUTPUT){
-        it->i2 = it->i1;
+        if (it->op==OP_RELAY) {
+          it->i2 = worksize++;
+        } else {
+          it->i2 = it->i1;
+        }
       }
+      
     }
   
     if(verbose()){

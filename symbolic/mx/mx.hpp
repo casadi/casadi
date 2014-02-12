@@ -444,6 +444,7 @@ namespace CasADi{
     MX arccosh() const;
     MX arctanh() const;
     MX logic_not() const;
+    MX relay() const;
     
     /** \brief returns itself, but with an assertion attached
     *

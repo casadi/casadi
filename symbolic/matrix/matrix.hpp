@@ -531,6 +531,7 @@ namespace CasADi{
     Matrix<T> logic_and(const Matrix<T>& y) const;
     Matrix<T> logic_or(const Matrix<T>& y) const;
     Matrix<T> if_else_zero(const Matrix<T>& y) const;
+    Matrix<T> relay() const;
     //@}
     
     //@{
