@@ -581,7 +581,7 @@ namespace CasADi{
   
     // Get a bidirectional partition
     CRSSparsity D1, D2;
-    getPartition(iind,oind,D1,D2,true,symmetric);
+    getPartition(iind,oind,D1,D2,compact,symmetric);
     if(verbose()) std::cout << "XFunctionInternal::jac graph coloring completed" << std::endl;
 
     // Get the number of forward and adjoint sweeps
@@ -602,7 +602,7 @@ namespace CasADi{
     std::vector<std::vector<MatType> > fseed, aseed, fsens, asens;
   
     // Get the sparsity of the Jacobian block
-    const CRSSparsity& jsp = jacSparsity(iind,oind,true,symmetric);
+    const CRSSparsity& jsp = jacSparsity(iind,oind,compact,symmetric);
     const std::vector<int>& jsp_rowind = jsp.rowind();
     const std::vector<int>& jsp_col = jsp.col();
   
