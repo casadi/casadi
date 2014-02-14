@@ -27,66 +27,73 @@ from casadi import *
 
 #! We start with a python function with evaluate-like arguments
 #! The function calculates the factorial of its input
-#! We annotate the function with the pyevaluate decorator
+#! We annotate the function with the pyfunction decorator
 
-@pyevaluate
-def fac(f):
-  x = f.getInput()[0,0]
+@pyfunction([sp_dense(1,1)], [sp_dense(1,1)])
+def fac(inputs):
+  x = inputs[0]
   y = 1
   for i in range(x):
     y*=(i+1)
-  f.setOutput(y)
-
-
-#! Construct a CustomFunction from it
-c = CustomFunction( fac, [sp_dense(1,1)], [sp_dense(1,1)] )
-c.init()
-
+  return [y]
+  
+#! Just as other CasADi function, we have to initialize
+fac.init()
 
 #! Set the input
-c.setInput(4)
+fac.setInput(4)
 
 #! Evaluate
-c.evaluate()
+fac.evaluate()
 
-print "4! = ", c.output().toScalar()
+print "4! = ", fac.output().toScalar()
 
 #! Using the function in a graph
 #!==============================
 
 x = MX("x")
-[y] = c.call([x])
+[y] = fac.call([x])
 
 f = MXFunction([x],[y])
 f.init()
 
 
-c.setInput(5)
-c.evaluate()
+f.setInput(5)
+f.evaluate()
 
-print "5! = ", c.output().toScalar()
+print "5! = ", f.output().toScalar()
 
 
 #! Passing userdata
 #!==============================
-#! A clean way to pass around user data is to use a class
-#! and make it callable py implementing __call__
+#! A clean way to pass around user data is to use a class instead of a function
+#!
+#! The class-approach is a bit more advanced in the following points:
+#! - There is no decorator upfront, you have to make a call to PyFunction.
+#! - The output of evaluation is not returned. Rather, you are given the outputs as mutable DMatrices that you should 'set'.
+#!   This is so to make a very efficient allocation-free implementation possible.
 
-@pyevaluate
-class Dummy:
-  def __init__(self,user_data):
-    self.userdata = user_data
-  def __call__(self,f):
+class Fun:
+  def __init__(self,userdata):
+    self.userdata = userdata
+    # sin(x+3*y)
+        
+  def evaluate(self,(x,y),(z,)):
     print "userdata: " , self.userdata
-  
-c = CustomFunction(Dummy(12345), [sp_dense(3,1)], [sp_dense(3,1)] )
+    
+    z0 = 3*y
+    z1 = x+z0
+    z2 = sin(z1)
+    z.set(z2)
+            
+c = PyFunction(Fun(12345), [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
 c.init()
 
-
+c.setInput(1.2,0)
+c.setInput(1.5,1)
 c.evaluate()
 
-#! Of course, since we don't alter f.output, the result is meaningless
-print c.getOutput()
+print c.getOutput(), sin(1.2+3*1.5)
 
 #! Providing sensitivities
 #!==============================
@@ -100,46 +107,171 @@ try:
 except Exception as e:
   print e
   
-#! We can provide forward sensitivities by providing the full Jacobian, i.e. the Jacobian of all inputs with respect to all outputs.
-@pyevaluate
-def fun(f):
+#! There are several ways to provide sensitivities.
+#! The easiest way is using the class-approach and providing a 'fwd' and/or 'adj' method:
+
+class Fun:
   # sin(x+3*y)
+        
+  def evaluate(self,(x,y),(z,)):
+    z0 = 3*y
+    z1 = x+z0
+    z2 = sin(z1)
+    z.set(z2)
+
+  def fwd(self,(x,y),(z,),seeds,sens):
+    z0 = 3*y
+    z1 = x+z0
+    z2 = sin(z1)
+    z.set(z2)
+    
+    for ((dx,dy),(dz,)) in zip(seeds,sens):
+      dz0 = 3*dy
+      dz1 = dx+dz0
+      dz2 = cos(z1)*dz1
+      dz.set(dz2)
   
-  x = f.input(0)
-  y = f.input(1)
+  def adj(self,(x,y),(z,),seeds,sens):
+    z0 = 3*y
+    z1 = x+z0
+    z2 = sin(z1)
+    z.set(z2)
+    
+    for ((z_bar,),(x_bar,y_bar)) in zip(seeds,sens):
+      bx = 0
+      by = 0
+      bz1 = 0
+      bz0 = 0
+      
+      bz2 = z_bar
+      bz1 += bz2*cos(z1)
+      bx+= bz1;bz0+= bz1
+      by+= 3*bz0
+      x_bar.set(bx)
+      y_bar.set(by)
+
+c = PyFunction(Fun(), [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
+c.init()
+
+J = c.jacobian(1) # jacobian w.r.t second argument
+J.init()
+J.setInput(1.2,0)
+J.setInput(1.5,1)
+J.init()
+J.evaluate()
+
+print J.getOutput(), cos(1.2+3*1.5)*3
+
   
+#! Another way to provide sensitivities is by providing the full Jacobian, i.e. the Jacobian of all inputs strung together with respect to all outputs strung together.
+@pyfunction([sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)])
+def fun((x,y)):
+  # sin(x+3*y)
+
   z0 = 3*y
   z1 = x+z0
   z2 = sin(z1)
 
-  f.setOutput(z2)
+  return [z2]
 
-c = CustomFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)])
-c.init()
+fun.init()
 
-def funjac(f):
-  x = f.input(0)
-  y = f.input(1)
+@pyfunction([sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,2),sp_dense(1,1)])
+def funjac((x,y)):
 
   # First output, the full Jacobian
   J = horzcat((cos(x+3*y),3*cos(x+3*y)))
-  f.setOutput(J,0)
 
   # Remaining outputs, the original function outputs
   z0 = 3*y
   z1 = x+z0
   z2 = sin(z1)
 
-  f.setOutput(z2,1)
+  return [J,z2]
 
-jc = CustomFunction(funjac, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,2),sp_dense(1,1)])
-jc.init()
-c.setFullJacobian(jc)
+funjac.init()
+fun.setFullJacobian(funjac)
 
-J = c.jacobian()
+J = fun.jacobian(1)
 J.init()
-J.setInput(0.3,0)
-J.setInput(0.7,0)
+J.setInput(1.2,0)
+J.setInput(1.5,1)
 J.evaluate()
 
-print J.getOutput()
+print J.getOutput(0), cos(1.2+3*1.5)*3
+
+
+#! The most advanced way is to provide a 'getDerivative' method in the class-approach that takes the number of fwd seeds and adjoint seeds and returns an FX.
+
+class Fun:
+  # sin(x+3*y)
+  
+  def evaluate(self,(x,y),(z,)):
+    z0 = 3*y
+    z1 = x+z0
+    z2 = sin(z1)
+    z.set(z2)
+    
+  def getDerivative(self,f,nfwd,nadj):
+    inputs = [f.input(i).sparsity() for i in range(f.getNumInputs())]
+    outputs = [f.output(i).sparsity() for i in range(f.getNumOutputs())]
+    
+    sself = self
+
+    class Der:
+       def evaluate(self,xy_andseeds,z_andseeds):  sself.evaluateDer(xy_andseeds,z_andseeds,nfwd,nadj)
+
+    FunDer = PyFunction(Der(),inputs+inputs*nfwd+outputs*nadj,outputs*(nfwd+1)+inputs*nadj)
+    return FunDer
+    
+  def evaluateDer(self,inputs,outputs,nfwd,nadj):
+    # sin(x+3*y)
+    
+    num_in  =  2
+    num_out =  1
+    
+    x = inputs[0]
+    y = inputs[1]
+    
+    z0 = 3*y
+    z1 = x+z0
+    z2 = sin(z1)
+    outputs[0].set(z2)
+    
+    for i in range(nfwd):
+      dx = inputs[num_in + i*num_in+0]
+      dy = inputs[num_in + i*num_in+1]
+      
+      dz0 = 3*dy
+      dz1 = dx+dz0
+      dz2 = cos(z1)*dz1
+      
+      outputs[num_out + i].set(dz2)
+    
+    for i in range(nadj):
+      # Backwards sweep
+      bx = 0
+      by = 0
+      bz1 = 0
+      bz0 = 0
+      
+      bz2 = inputs[num_in + nfwd*num_in+i*num_out+0]
+      bz1 += bz2*cos(z1)
+      bx+= bz1;bz0+= bz1
+      by+= 3*bz0
+      outputs[num_out + nfwd*num_out + num_in*i+0].set(bx)
+      outputs[num_out + nfwd*num_out + num_in*i+1].set(by)
+    
+
+Fun = PyFunction(Fun(),[sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)])
+Fun.init()
+J = Fun.jacobian(1)
+J.init()
+J.setInput(1.2,0)
+J.setInput(1.5,1)
+J.evaluate()
+
+print J.getOutput(0), cos(1.2+3*1.5)*3
+
+#! Note that this last approach allows to make return 'getDerivative' another PyFunction which in turn implements its own 'getDerivative' in order to provide higher prder sensitivities.
+
