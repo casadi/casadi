@@ -43,6 +43,9 @@ namespace CasADi{
     addOption("const_dim",OT_BOOLEAN,true,"Assume constant dimension of P");
     addOption("pos_def",OT_BOOLEAN,false,"Assume P positive definite");
     
+    addOption("error_unstable",OT_BOOLEAN,false,"Throw an exception when it is detected that Product(A_i,i=N..1) has eigenvalues greater than 1-eps_unstable");
+    addOption("eps_unstable",OT_REAL,1e-4,"A margin for unstability detection");
+    
     if (nfwd_==0 && nadj_==0) {
       input_.scheme = SCHEME_DPLEInput;
       output_.scheme = SCHEME_DPLEOutput;
@@ -58,6 +61,8 @@ namespace CasADi{
     
     const_dim_ = getOption("const_dim");
     pos_def_ = getOption("pos_def");
+    error_unstable_ = getOption("error_unstable");
+    eps_unstable_ = getOption("eps_unstable");
     
     // Dimension sanity checks
     casadi_assert_message(A_.size()==V_.size(),"A and V arguments must be of same length, but got " << A_.size() << " and " << V_.size() << ".");

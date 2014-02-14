@@ -120,6 +120,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_SDPSOLVER";
       case OT_SDQPSOLVER:
               return "OT_SDQPSOLVER";
+    case OT_DERIVATIVEGENERATOR:
+              return "OT_DERIVATIVEGENERATOR";
       case OT_IMPLICITFUNCTION:
               return "OT_IMPLICITFUNCTION";
       case OT_CALLBACK:
@@ -244,6 +246,10 @@ GenericType::GenericType(const FX& f) : type_(OT_FX) {
   assignNode(new FXType(f));
 }
 
+  GenericType::GenericType(const DerivativeGenerator& f) : type_(OT_DERIVATIVEGENERATOR) {
+    assignNode(new GenericTypeInternal<DerivativeGenerator>(f));
+  }
+ 
 GenericType::GenericType(const Callback& f) : type_(OT_CALLBACK) {
   assignNode(new GenericTypeInternal<Callback>(f));
 }
@@ -467,6 +473,11 @@ GenericType::operator implicitFunctionCreator() const{
   casadi_assert_message(is_a<implicitFunctionCreator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<implicitFunctionCreator>*>(get())->d_;
 }
+
+  GenericType::operator const DerivativeGenerator &() const{
+    casadi_assert_message(is_a<DerivativeGenerator>(),"type mismatch");
+    return static_cast<const GenericTypeInternal<DerivativeGenerator>*>(get())->d_;
+  }
 
 GenericType::operator const Callback &() const{
   casadi_assert_message(is_a<Callback>(),"type mismatch");

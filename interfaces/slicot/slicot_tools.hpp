@@ -36,9 +36,9 @@ namespace CasADi{
   void slicot_mb03wd(char job, char compz, int n, int p, int ilo, int ihi, int iloz, int ihiz, double *h, int ldh1, int ldh2, double* z, int ldz1, int ldz2, double* wr, double *wi, double * dwork=0, int ldwork=0);
 
 
- void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t, std::vector< double > & z);
+ void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t, std::vector< double > & z, std::vector<double> &eig_real, std::vector<double> &eig_imag);
   
- void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t, std::vector< double > & z, std::vector<double> &dwork);
+ void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t, std::vector< double > & z, std::vector<double> &dwork, std::vector<double> &eig_real, std::vector<double> &eig_imag);
 #endif // SWIG
   
 #ifndef SWIG
@@ -57,9 +57,9 @@ namespace CasADi{
 *   and T_2..T_K  upper diagonal
 *
 */
-void slicot_periodic_schur(const std::vector< Matrix<double> > & A, std::vector< Matrix<double> > & T,  std::vector< Matrix<double> > & Z);
+void slicot_periodic_schur(const std::vector< Matrix<double> > & A, std::vector< Matrix<double> > & T,  std::vector< Matrix<double> > & Z, std::vector<double> &eig_real, std::vector<double> &eig_imag);
 #else
-void slicot_periodic_schur(const std::vector< Matrix<double> > & a, std::vector< Matrix<double> > & OUTPUT,  std::vector< Matrix<double> > & OUTPUT);
+void slicot_periodic_schur(const std::vector< Matrix<double> > & a, std::vector< Matrix<double> > & OUTPUT,  std::vector< Matrix<double> > & OUTPUT, std::vector<double> &OUTPUT, std::vector<double> &OUTPUT);
 #endif // SWIGPYTHON
   
 } // namespace CasADi

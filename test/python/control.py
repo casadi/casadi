@@ -97,8 +97,7 @@ class ControlTests(casadiTestCase):
 
           self.checkarray(a0,a1)
 
-          
-          self.checkfx(solver,refsol,sens_der=False,hessian=False,evals=False)
+          self.checkfx(solver,refsol,sens_der=False,hessian=False,evals=1)
   
   @memory_heavy()
   def test_dple_large(self):

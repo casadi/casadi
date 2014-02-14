@@ -34,7 +34,7 @@ namespace CasADi {
 
     // Number inputs and outputs
     int num_in = fcn.getNumInputs();
-    casadi_assert(arg.size()<=num_in);
+    casadi_assert_message(arg.size()<=num_in,"Argument list length (" << arg.size() << ") exceeds number of inputs (" << num_in << ")");
 
     // Add arguments if needed
     arg.resize(num_in);

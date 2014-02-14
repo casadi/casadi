@@ -60,6 +60,7 @@
 #define PRECEDENCE_MXVectorVector 106
 
 #define PRECEDENCE_CREATOR 150
+#define PRECEDENCE_DERIVATIVEGENERATOR 21
 #define PRECEDENCE_CUSTOMEVALUATE 21
 #define PRECEDENCE_CALLBACK 21
 
@@ -145,6 +146,7 @@ if (!ret) {
 %my_creator_typemap(PRECEDENCE_CREATOR, CasADi::linearSolverCreator);
 
 #ifdef SWIGPYTHON
+%my_generic_const_typemap(PRECEDENCE_DERIVATIVEGENERATOR,CasADi::DerivativeGenerator);
 %my_generic_const_typemap(PRECEDENCE_CUSTOMEVALUATE,CasADi::CustomEvaluate);
 %my_generic_const_typemap(PRECEDENCE_CALLBACK,CasADi::Callback);
 #endif

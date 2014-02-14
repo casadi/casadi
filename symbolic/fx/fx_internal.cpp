@@ -52,6 +52,7 @@ namespace CasADi{
     addOption("regularity_check",         OT_BOOLEAN,             true,           "Throw exceptions when NaN or Inf appears during evaluation");
     addOption("inputs_check",             OT_BOOLEAN,             true,           "Throw exceptions when the numerical values of the inputs don't make sense");
     addOption("gather_stats",             OT_BOOLEAN,             false,          "Flag to indicate wether statistics must be gathered");
+    addOption("derivative_generator",     OT_DERIVATIVEGENERATOR,   GenericType(),  "Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.");
   
     verbose_ = false;
     user_data_ = 0;
@@ -255,6 +256,7 @@ namespace CasADi{
     f.setInputScheme(getInputScheme());
     f.setOutputScheme(getOutputScheme());
     f.setOption("ad_mode",getOption("ad_mode")); // Why?
+    if (hasSetOption("derivative_generator")) f.setOption("derivative_generator",getOption("derivative_generator"));
     
     return f;
   }
@@ -1512,8 +1514,18 @@ namespace CasADi{
     // Crude estimate of the cost of calculating the directional derivatives
     int der_dir_cost = nfwd + adj_penalty*nadj;
 
-    // Check if it is cheaper to calculate the full Jacobian and then multiply
-    if(2*full_jac_cost < der_dir_cost){
+    if (getOption("ad_mode")=="forward" && nadj>0) {
+      ret = getDerivativeViaJac(nfwd,nadj);
+    } else if (getOption("ad_mode")=="reverse" && nfwd>0) {
+      ret = getDerivativeViaJac(nfwd,nadj);
+    } else if (hasSetOption("derivative_generator")){ // Check if it is cheaper to calculate the full Jacobian and then multiply
+      /// User-provided derivative generator function
+      DerivativeGenerator dergen = getOption("derivative_generator");
+      FX this_ = shared_from_this<FX>();
+      ret = dergen(this_,nfwd,nadj,user_data_); 
+    } else if ((getOption("ad_mode")=="forward" && nadj>0) || (getOption("ad_mode")=="reverse" && nfwd>0)) {
+      ret = getDerivativeViaJac(nfwd,nadj);
+    } else if(2*full_jac_cost < der_dir_cost){
       // Generate the Jacobian and then multiply to get the derivative
       //ret = getDerivativeViaJac(nfwd,nadj); // NOTE: Uncomment this line (and remove the next line) to enable this feature
       ret = getDerivative(nfwd,nadj);    
@@ -1594,15 +1606,15 @@ namespace CasADi{
     int ind=0;
     for(int d=-1; d<nfwd; ++d){
       for(int i=0; i<getNumInputs(); ++i, ++ind){
-        if(ret.input(ind).shape()!=input(i).shape()){
-          casadi_error("Incorrect shape for " << ret << " input " << ind << " \"" << i_names.at(ind) << "\". Expected " << input(i).shape() << " but got " << ret.input(ind).shape());
+        if(ret.input(ind).sparsity()!=input(i).sparsity()){
+          casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \"" << i_names.at(ind) << "\". Expected " << input(i).dimString() << " but got " << ret.input(ind).dimString());
         }
       }
     }
     for(int d=0; d<nadj; ++d){
       for(int i=0; i<getNumOutputs(); ++i, ++ind){
-        if(ret.input(ind).shape()!=output(i).shape()){
-          casadi_error("Incorrect shape for " << ret << " input " << ind << " \"" << i_names.at(ind) << "\". Expected " << output(i).shape() << " but got " << ret.input(ind).shape());
+        if(ret.input(ind).sparsity()!=output(i).sparsity()){
+          casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \"" << i_names.at(ind) << "\". Expected " << output(i).dimString() << " but got " << ret.input(ind).dimString());
         }
       }
     }
@@ -1611,15 +1623,15 @@ namespace CasADi{
     ind=0;
     for(int d=-1; d<nfwd; ++d){
       for(int i=0; i<getNumOutputs(); ++i, ++ind){
-        if(ret.output(ind).shape()!=output(i).shape()){
-          casadi_error("Incorrect shape for " << ret << " output " << ind << " \"" <<  o_names.at(ind) << "\". Expected " << output(i).shape() << " but got " << ret.output(ind).shape());
+        if(ret.output(ind).sparsity()!=output(i).sparsity()){
+          casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \"" <<  o_names.at(ind) << "\". Expected " << output(i).dimString() << " but got " << ret.output(ind).dimString());
         }
       }
     }
     for(int d=0; d<nadj; ++d){
       for(int i=0; i<getNumInputs(); ++i, ++ind){
-        if(ret.output(ind).shape()!=input(i).shape()){
-          casadi_error("Incorrect shape for " << ret << " output " << ind << " \"" << o_names.at(ind) << "\". Expected " << input(i).shape() << " but got " << ret.output(ind).shape());
+        if(ret.output(ind).sparsity()!=input(i).sparsity()){
+          casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \"" << o_names.at(ind) << "\". Expected " << input(i).dimString() << " but got " << ret.output(ind).dimString());
         }
       }
     }
@@ -1706,7 +1718,7 @@ namespace CasADi{
         // Split up the left hand sides
         d = vertsplit(d_all,offset);
         for(int i=0; i<n_out; ++i){
-          res.push_back(reshape(d[i],res[i].size1(),res[i].size2()));
+          res.push_back(reshape(d[i],res[i].size1(),res[i].size2())+DMatrix::zeros(res[i].sparsity()));
         }
       }
     }
@@ -1743,7 +1755,7 @@ namespace CasADi{
         // Split up the left hand sides
         d = vertsplit(d_all,offset);
         for(int i=0; i<n_in; ++i){
-          res.push_back(reshape(d[i],arg[i].size1(),arg[i].size2()));
+          res.push_back(reshape(d[i],arg[i].size1(),arg[i].size2())+DMatrix::zeros(arg[i].sparsity()));
         }
       }
     }
@@ -1861,10 +1873,11 @@ namespace CasADi{
           oscheme.push_back(output_.scheme.entryLabel(i));
         }      
         ret.setOutputScheme(oscheme);
-
-        // Initialize
-        ret.init();
       }
+      
+      
+      // Initialize
+      ret.init();
 
       // Return and cache it for reuse
       full_jacobian_ = ret;
@@ -1929,6 +1942,7 @@ namespace CasADi{
     
     // Create a SISO function
     MXFunction f(arg,res);
+    f.setOption("ad_mode",getOption("ad_mode"));
     f.init();
 
     // Form an expression for the full Jacobian

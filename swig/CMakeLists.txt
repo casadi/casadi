@@ -346,6 +346,7 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
     COMPONENT install_python
     USE_SOURCE_PERMISSIONS
     PATTERN .pyc EXCLUDE
+    PATTERN .svn EXCLUDE
   )
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
     DESTINATION ${PYTHON_PREFIX}/casadi

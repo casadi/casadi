@@ -685,6 +685,20 @@
 <br/>
 @copydoc scheme_QPSolverOutput
 */
+/** \class CasADi::IdasInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::IdasIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
 /** \class CasADi::FixedStepIntegratorInternal
 \n
 \par
@@ -740,20 +754,6 @@
 @copydoc scheme_StabilizedQPSolverInput
 <br/>
 @copydoc scheme_QPSolverOutput
-*/
-/** \class CasADi::IdasInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::IdasIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
 */
 /** \class CasADi::KnitroInternal
 \n

@@ -32,6 +32,18 @@ namespace CasADi{
 
   //Call
 
+  DerivativeGeneratorCInternal::DerivativeGeneratorCInternal(DerivativeGeneratorCPtr ptr)  : FunctorCInternal(ptr) {
+  }
+  
+  FX DerivativeGeneratorCInternal::call(FX& fcn, int nfwd, int nadj, void* user_data) {
+    casadi_assert(ptr_!=0);
+    return ptr_(fcn, nfwd, nadj, user_data);
+  }
+  
+  DerivativeGeneratorCInternal* DerivativeGeneratorCInternal::clone() const {
+    return new DerivativeGeneratorCInternal(ptr_);
+  }  
+
   CustomEvaluateCInternal::CustomEvaluateCInternal(CustomEvaluateCPtr ptr)  : FunctorCInternal<CustomEvaluateCPtr>(ptr) {
   }
   

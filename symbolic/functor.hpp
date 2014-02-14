@@ -29,6 +29,9 @@
 
 namespace CasADi{
 
+  /// Function pointer to a derivative generator function
+  typedef FX (*DerivativeGeneratorCPtr)(FX& fcn, int nfwd, int nadj, void* user_data);
+
   /// Wrapper around functions
   typedef void (*CustomEvaluateCPtr)(CustomFunction &f, void* user_data);
 
@@ -45,6 +48,32 @@ namespace CasADi{
     //Callback();
     
   };    
+
+
+  /** \brief Derivative Generator Functor
+  *
+  * In C++, supply a DerivativeGeneratorCPtr function pointer
+  *
+  * In python, supply a callable, annotated with derivativegenerator decorator
+  * \code
+  *  
+  *   @derivativegenerator
+  *   def c(f,nadj,nadir):
+  *     print f
+  *
+  *   ff.setOption("derivative_generator",c)
+  * \endcode
+  *
+  */
+  class DerivativeGenerator : public Functor {
+    public:
+      /// Default constructor
+      DerivativeGenerator() {};
+      /// Construct from C pointer
+      DerivativeGenerator(DerivativeGeneratorCPtr ptr);
+      /// Call
+      virtual FX operator() (FX& fcn, int nfwd, int nadj, void* user_data);
+  }; 
     
   /** \brief CustomEvaluate
   *

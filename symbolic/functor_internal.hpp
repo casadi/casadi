@@ -45,6 +45,19 @@ namespace CasADi{
       P ptr_;
   };
   
+  class DerivativeGeneratorInternal : public FunctorInternal {
+    friend class DerivativeGenerator;
+    virtual FX call(FX& fcn, int nfwd, int nadj, void* user_data)=0;
+  };
+
+  class DerivativeGeneratorCInternal : public DerivativeGeneratorInternal, FunctorCInternal<DerivativeGeneratorCPtr> {
+    friend class DerivativeGenerator;
+    
+    DerivativeGeneratorCInternal(DerivativeGeneratorCPtr ptr);
+    virtual FX call(FX& fcn, int nfwd, int nadj, void* user_data);
+    virtual DerivativeGeneratorCInternal* clone() const;
+  };
+
   class CustomEvaluateInternal : public FunctorInternal {
     friend class CustomEvaluate;
     virtual void call(CustomFunction& fcn, void* user_data)=0;
