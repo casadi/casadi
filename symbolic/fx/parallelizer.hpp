@@ -29,29 +29,29 @@
 
 namespace CasADi{
 
-// Forward declaration of internal class
-class ParallelizerInternal;
+  // Forward declaration of internal class
+  class ParallelizerInternal;
 
-/** \brief Parallelizer execution of functions
-  \author Joel Andersson
-  \date 2011
-*/ 
-class Parallelizer : public FX{
-public:
+  /** \brief Parallelizer execution of functions
+      \author Joel Andersson
+      \date 2011
+  */ 
+  class Parallelizer : public FX{
+  public:
 
-  /// Default constructor
-  Parallelizer();
+    /// Default constructor
+    Parallelizer();
 
-  /// Create a Parallelizer
-  explicit Parallelizer(const std::vector<FX>& funcs);
+    /// Create a Parallelizer
+    explicit Parallelizer(const std::vector<FX>& funcs);
 
-  /// Access functions of the node
-  ParallelizerInternal* operator->();
+    /// Access functions of the node
+    ParallelizerInternal* operator->();
 
-  /// Const access functions of the node
-  const ParallelizerInternal* operator->() const;
+    /// Const access functions of the node
+    const ParallelizerInternal* operator->() const;
   
-};
+  };
 
 } // namespace CasADi
 

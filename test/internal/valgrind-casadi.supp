@@ -1,0 +1,204 @@
+# Error in DSDP
+{
+   DSDP/Conditional jump or move depends on uninitialised value
+   Memcheck:Cond
+   fun:DTPUMatInvert
+}
+
+# Error in MA57
+{
+   ma57od_
+   Memcheck:Cond
+   fun:ma57od_
+}
+
+#Error in lapack
+{
+   lapack
+   Memcheck:Cond
+   fun:dstemr_
+   fun:dsyevr_
+   fun:DSDPGetEigs
+}
+
+#Error in cplex
+{
+   cplex1
+   Memcheck:Addr8
+   fun:_f48900ce40e1adc4a63fb41dbac2fe81
+}
+
+{
+   cplex2
+   Memcheck:Addr8
+   fun:__intel_new_memcpy
+   fun:_intel_fast_memcpy.J
+   fun:_4d2ac877ba09cac66b36bc7c5f27a638
+}
+
+{
+   some mystery
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   mystery1
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   fun:collect.48998
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   fun:tp_new_wrapper.25464
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   mystery2
+   Memcheck:Value8
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   mystery3
+   Memcheck:Cond
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   mystery4
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   mystery5
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance
+   fun:SWIG_Python_NewPointerObj
+   fun:_wrap_DMatrix___radd____SWIG_0
+}
+
+#Error in swig 
+{
+   swigerror1
+   Memcheck:Cond
+   fun:PyObject_GC_Del
+   fun:collect.48998
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   fun:tp_new_wrapper.25464
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance
+   fun:SWIG_Python_NewPointerObj
+   fun:_ZN4swig15traits_from_ptrIN6CasADi2MXEE4fromEPS2_i
+   fun:_ZN4swig11traits_fromIN6CasADi2MXEE4fromERKS2_
+   fun:_ZN4swig4fromIN6CasADi2MXEEEP7_objectRKT_
+   fun:_ZN4swig18traits_from_stdseqISt6vectorIN6CasADi2MXESaIS3_EES3_E4fromERKS5_
+}
+
+{
+   swigerror2
+   Memcheck:Value8
+   fun:PyObject_GC_Del
+   fun:collect.48998
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   fun:tp_new_wrapper.25464
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance
+   fun:SWIG_Python_NewPointerObj
+   fun:_ZN4swig15traits_from_ptrIN6CasADi2MXEE4fromEPS2_i
+   fun:_ZN4swig11traits_fromIN6CasADi2MXEE4fromERKS2_
+   fun:_ZN4swig4fromIN6CasADi2MXEEEP7_objectRKT_
+   fun:_ZN4swig18traits_from_stdseqISt6vectorIN6CasADi2MXESaIS3_EES3_E4fromERKS5_
+}
+
+{
+   swigerror3
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   fun:collect.48998
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   fun:tp_new_wrapper.25464
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance
+   fun:SWIG_Python_NewPointerObj
+   fun:_ZN4swig15traits_from_ptrIN6CasADi2MXEE4fromEPS2_i
+   fun:_ZN4swig11traits_fromIN6CasADi2MXEE4fromERKS2_
+   fun:_ZN4swig4fromIN6CasADi2MXEEEP7_objectRKT_
+   fun:_ZN4swig18traits_from_stdseqISt6vectorIN6CasADi2MXESaIS3_EES3_E4fromERKS5_
+}
+
+{  
+   swigerror4
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_Malloc
+   fun:PyType_GenericAlloc
+   obj:/usr/bin/python2.7
+   fun:PyObject_Call
+   fun:SWIG_Python_NewShadowInstance
+   fun:SWIG_Python_NewPointerObj
+}
+
+{
+   swigerror5
+   Memcheck:Value8
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_New
+   fun:PyDict_New
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   swigerror6
+   Memcheck:Cond
+   fun:PyObject_GC_Del
+   obj:/usr/bin/python2.7
+   fun:_PyObject_GC_New
+   fun:PyDict_New
+   fun:SWIG_Python_NewShadowInstance.isra.12
+}
+
+{
+   dsdp2
+   Memcheck:Cond
+   fun:dstemr_
+   fun:dsyevr_
+   fun:DSDPGetEigs
+}

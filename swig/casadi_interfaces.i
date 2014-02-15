@@ -28,18 +28,18 @@
 %include "interfaces/ooqp/ooqp_solver.hpp"
 #endif
 
+#ifdef WITH_SQIC
+%{
+#include "interfaces/sqic/sqic_solver.hpp"
+#include "interfaces/sqic/stabilized_sqic_solver.hpp"
+%}
+%include "interfaces/sqic/sqic_solver.hpp"
+%include "interfaces/sqic/stabilized_sqic_solver.hpp"
+#endif
+
 // IPOPT
 #ifdef WITH_IPOPT
 %include "ipopt_interface.i"
-#endif
-
-// ACADO
-#ifdef WITH_ACADO
-%include "acado_interface.i"
-%{
-#include "interfaces/qpoases/qpoases_solver.hpp"
-%}
-%include "interfaces/qpoases/qpoases_solver.hpp"
 #endif
 
 // QPOASES
@@ -54,6 +54,11 @@
 // Sundials
 #ifdef WITH_SUNDIALS
 %include "sundials_interface.i"
+#endif
+
+// Slicot
+#ifdef WITH_SLICOT
+%include "slicot_interface.i"
 #endif
 
 #ifdef WITH_LAPACK
@@ -109,4 +114,12 @@
 #include "interfaces/worhp/worhp_solver.hpp"
 %}
 %include "interfaces/worhp/worhp_solver.hpp"
+#endif
+
+
+#ifdef WITH_SNOPT
+%{
+#include "interfaces/snopt/snopt_solver.hpp"
+%}
+%include "interfaces/snopt/snopt_solver.hpp"
 #endif

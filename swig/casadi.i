@@ -59,6 +59,9 @@
 // nonlinear programming
 %include "casadi_nonlinear_programming.i"
 
+// Control
+%include "casadi_control.i"
+
 // interfaces
 %include "casadi_interfaces.i"
 

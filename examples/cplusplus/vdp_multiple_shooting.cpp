@@ -23,7 +23,7 @@
 #include <symbolic/casadi.hpp>
                                    
 // Solvers
-#include <integration/collocation_integrator.hpp>
+#include <integration/old_collocation_integrator.hpp>
 #include <nonlinear_programming/newton_implicit_solver.hpp>
 #include <optimal_control/direct_multiple_shooting.hpp>
 
@@ -34,7 +34,7 @@
 #include <interfaces/sundials/kinsol_solver.hpp>
 #include <interfaces/csparse/csparse.hpp>
 
-bool use_collocation_integrator = false;
+bool use_old_collocation_integrator = false;
 
 using namespace CasADi;
 using namespace std;
@@ -69,7 +69,7 @@ int main(){
   SXFunction res(daeIn("x",states, "p",u),daeOut("ode",f));
   
   Dictionary integrator_options;
-  if(use_collocation_integrator){
+  if(use_old_collocation_integrator){
     // integrator_options["implicit_solver"] = KinsolSolver::creator;    
     integrator_options["implicit_solver"] = NewtonImplicitSolver::creator;
     Dictionary implicit_solver_options;
@@ -97,8 +97,8 @@ int main(){
 
   // Create a multiple shooting discretization
   DirectMultipleShooting ms(res,mterm);
-  if(use_collocation_integrator){
-    ms.setOption("integrator",CollocationIntegrator::creator);
+  if(use_old_collocation_integrator){
+    ms.setOption("integrator",OldCollocationIntegrator::creator);
   } else {
     ms.setOption("integrator",CVodesIntegrator::creator);
     //ms.setOption("integrator",IdasIntegrator::creator);

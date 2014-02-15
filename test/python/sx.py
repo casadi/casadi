@@ -136,7 +136,6 @@ class SXtests(casadiTestCase):
 
       def fmod(f,x):
         #f.setOption("ad_mode","forward")
-        f.setOption("numeric_jacobian",True)
         f.init();
         J=f.jacobian()
         J.init()
@@ -146,7 +145,6 @@ class SXtests(casadiTestCase):
       
       def fmod(f,x):
         #f.setOption("ad_mode","reverse")
-        f.setOption("numeric_jacobian",True)
         f.init();
         J=f.jacobian()
         J.init()
@@ -329,7 +327,7 @@ class SXtests(casadiTestCase):
     self.checkarray(J.getOutput(0),Jr,"SXfunction jacobian evaluates incorrectly")
           
   def test_SX2(self):
-    self.message("SXFunction evalution + forward and adjoint seeds")
+    self.message("SXFunction evalution 2")
     fun = lambda x,y: [3-sin(x*x)-y, sqrt(y)*x]
     # variables
     x = SX("x")
@@ -354,47 +352,13 @@ class SXtests(casadiTestCase):
     L=[2,3]
     fcn.setInput(L)
 
-    # Pass forward seed
-    sF=[1,0]
-    fcn.setFwdSeed(sF);
-
-    sA=[1,0]
-    # Pass adjoint seed
-    fcn.setAdjSeed(sA)
-
     # Evaluate numerically
-    fcn.evaluate(1,1)
+    fcn.evaluate()
 
     # Get the results
     res = tuple(fcn.output().data())
     self.assertAlmostEqual(res[0], fun(*L)[0],10,'SXfunction evaluation wrong')
     self.assertAlmostEqual(res[1], fun(*L)[1],10,'SXfunction evaluation wrong')
-
-    fsens = tuple(fcn.fwdSens().data())
-    e=1e-8
-    p=fun((L[0]+e*sF[0]),(L[1]+e*sF[1]))
-    fsensn=[(p[0]-res[0])/e,(p[1]-res[1])/e]
-    self.assertAlmostEqual(fsensn[0], fsens[0],6,'SXfunction forward mode evaluation wrong')
-    self.assertAlmostEqual(fsensn[1], fsens[1],6,'SXfunction forward mode evaluation wrong')
-    
-    J=fcn.jacobian()
-    J.init()
-    J.setInput(L)
-    J.evaluate()
-    J=J.output(0).toArray()
-    
-    fsensJ=dot(J,array(sF))
-    self.assertAlmostEqual(fsensJ[0], fsens[0],10,'SXfunction forward mode evaluation wrong')
-    self.assertAlmostEqual(fsensJ[1], fsens[1],10,'SXfunction forward mode evaluation wrong')
-    
-    asens = tuple(fcn.adjSens().data())
-    asensJ=dot(J.T,array(sA))
-    self.assertAlmostEqual(asensJ[0], asens[0],10,'SXfunction adjoint mode evaluation wrong')
-    self.assertAlmostEqual(asensJ[1], asens[1],10,'SXfunction adjoint mode evaluation wrong')
-
-    # evaluate symbolically
-    fsubst = fcn.eval([vertcat([1-y,1-x])])
-    #print "fsubst = ", fsubst
     
   def test_SXFunctionc(self):
     self.message("SXFunction constructors")
@@ -650,19 +614,13 @@ class SXtests(casadiTestCase):
     f = SXFunction([x],[x**2,[]])
     f.init()
 
-
     self.assertTrue(f.output(1).empty())
-    f.evaluate(1,1)
-    self.assertTrue(f.fwdSens(1).empty())
-    self.assertTrue(f.adjSeed(1).empty())
     
     f = SXFunction([x,[]],[x**2,[]])
     f.init()
 
     self.assertTrue(f.output(1).empty())
-    f.evaluate(1,1)
-    self.assertTrue(f.fwdSens(1).empty())
-    self.assertTrue(f.adjSeed(1).empty())
+    f.evaluate()
     
     r = f.eval([x,[]])
     self.assertTrue(r[1].empty())
@@ -720,47 +678,6 @@ class SXtests(casadiTestCase):
     
     test(mtaylor(sin(x+y),vertcat([x,y]),vertcat([0,0]),4,[1,2]),(-3*x_**2*y_-x_**3)/6+y_+x_)
     
-  def test_issue104(self):
-    self.message("regression test #104")
-    x = SX("x")
-
-    F = x**2
-
-    f = SXFunction([x],[F])
-    f.init()
-    f.setInput([-1])
-    f.setFwdSeed([1])
-    f.setAdjSeed([1])
-    f.evaluate(1,1)
-    self.checkarray(f.getFwdSens(),-2,"regression")
-    self.checkarray(f.getAdjSens(),-2,"regression")
-    
-    
-    y=SX("y")
-    
-    F=x**y
-    f = SXFunction([vertcat([x,y])],[F])
-    f.init()
-    f.setInput([-1,2])
-    f.setFwdSeed([1,0])
-    f.setAdjSeed([1])
-    f.evaluate(1,1)
-
-    self.assertTrue(isnan(f.getFwdSens()[0]))
-    self.assertTrue(isnan(f.getAdjSens()[1]))
-
-    y=SX("y")
-    
-    F=constpow(x,y)
-    f = SXFunction([vertcat([x,y])],[F])
-    f.init()
-    f.setInput([-1,2])
-    f.setFwdSeed([1,0])
-    f.setAdjSeed([1])
-    f.evaluate(1,1)
-    self.checkarray(f.getFwdSens(),-2,"regression")
-    self.checkarray(f.getAdjSens()[0],-2,"regression")
-
   def test_issue107(self):
     self.message("Regression test for issue 107: +=")
     x=SX("x")
@@ -975,31 +892,19 @@ class SXtests(casadiTestCase):
     f.evaluate()
     self.assertTrue(f.getOutput()==2,"if_else")
     
-    # Check sensitivities
-    
     x0 = 2.1
-    dx = 0.3
     y = if_else(x>1,x**2,x**3)
     f = SXFunction([x],[y])
     f.init()
     f.setInput(x0)
-    f.setFwdSeed(dx)
-    f.setAdjSeed(dx)
-    f.evaluate(1,1)
+    f.evaluate()
     self.checkarray(f.getOutput(),x0**2,"if_else sens")
-    self.checkarray(f.getFwdSens(),2*x0*dx,"if_else sens")
-    self.checkarray(f.getAdjSens(),2*x0*dx,"if_else sens")
     
     x0 = -2.1
-    dx = 0.3
-    
     f.setInput(x0)
-    f.setFwdSeed(dx)
-    f.setAdjSeed(dx)
-    f.evaluate(1,1)
+    f.evaluate()
     self.checkarray(f.getOutput(),x0**3,"if_else sens")
-    self.checkarray(f.getFwdSens(),3*(-x0)**2*dx,"if_else sens")
-    self.checkarray(f.getAdjSens(),3*(-x0)**2*dx,"if_else sens")
+
     
   def test_issue548(self):
     x = ssym('x',100)
@@ -1034,6 +939,371 @@ class SXtests(casadiTestCase):
       self.assertTrue(isEqual(w[0],a))
       self.assertTrue(isEqual(w[1],b))
       self.assertTrue(isEqual(w[2],c))
+      
+  def test_poly_coeff(self):
+    x =ssym("x")
+    a= ssym("a")
+    c=ssym("c")
+    p=poly_coeff(12*x**4+x**2+a*x+c,x)
+    self.assertTrue(isEqual(p[0],12))
+    self.assertTrue(isEqual(p[1],0))
+    self.assertTrue(isEqual(p[2],1))
+    self.assertTrue(isEqual(p[3],a))
+    self.assertTrue(isEqual(p[4],c))
+    
+    p=poly_coeff((x-a)*(x+a),x)
+    self.assertTrue(isEqual(p[0],1))
+    self.assertTrue(isEqual(p[1],0))
+    
+  def test_poly_roots(self):
+  
+    p = ssym("[a,b]")
+    r = poly_roots(p)
+    
+    f = SXFunction([p],[r])
+    f.init()
+    f.setInput([2,7])
+    a_,b_ = f.input()
+    f.evaluate()
+    f.output()
+    self.checkarray(f.output(),vertcat([-b_/a_]))
+
+    p = ssym("[a,b]")
+    r = poly_roots(vertcat([p,0]))
+    
+    f = SXFunction([p],[r])
+    f.init()
+    f.setInput([2,7])
+    a_,b_ = f.input()
+    f.evaluate()
+    f.output()
+    self.checkarray(f.output(),vertcat([-b_/a_,0]))
+    
+    p = ssym("[a,b,c]")
+    r = poly_roots(p)
+    
+    f = SXFunction([p],[r])
+    f.init()
+    f.setInput([1.13,7,3])
+    a_,b_,c_ = f.input()
+    d = b_**2-4*a_*c_
+    f.evaluate()
+    x0 = (-b_-sqrt(d))/2/a_
+    x1 = (-b_+sqrt(d))/2/a_
+    f.output()
+    self.checkarray(f.output(),vertcat([x0,x1]))
+
+    p = ssym("[a,b,c,d]")
+    r = poly_roots(p)
+    
+    f = SXFunction([p],[r])
+    f.init()
+    f.setInput([11,1.3,-1.7,0.1])
+    f.evaluate()
+    f.output()
+    self.checkarray(f.output(),DMatrix([0.298028,-0.479787,0.0635774]),digits=5)
+    
+    p = ssym("[a,b,c,d,e]")
+    r = poly_roots(p)
+    
+    f = SXFunction([p],[r])
+    f.init()
+    f.setInput([3,6,-123,  -126,1080])
+    f.evaluate()
+    f.output()
+    self.checkarray(f.output(),DMatrix([5,3,-4,-6]),digits=5)
+    
+  def test_eig_symbolic(self):
+    x = ssym("x",2,2)
+    f = SXFunction([x],[eig_symbolic(x)])
+    f.init()
+    f.setInput(DMatrix([[2,0.1],[0.3,0.7]]))
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([0.67732,2.02268]),digits=5)
+    
+    
+    x = ssym("x",2)
+    f = SXFunction([x],[eig_symbolic(c.diag(x))])
+    f.init()
+    f.setInput([3,7])
+    f.evaluate()
+    self.checkarray(f.output(),f.input())
+
+    
+    x = ssym("x",5)
+    f = SXFunction([x],[eig_symbolic(c.diag(x))])
+    f.init()
+    f.setInput([3,7,2,1,6])
+    f.evaluate()
+    self.checkarray(f.output(),f.input())
+    
+    x = ssym("x",2,2)
+    y = ssym("y",2)
+    f = SXFunction([x,y],[eig_symbolic(blkdiag([x,c.diag(y)]))])
+    f.init()
+    f.setInput(DMatrix([[2,0.1],[0.3,0.7]]),0)
+    f.setInput([3,7],1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([0.67732,2.02268,3,7]),digits=5)
+
+    x = ssym("x",3,3)
+    x[0,2] = 0
+    x[0,1] = 0
+
+    makeSparse(x)
+
+    e = eig_symbolic(x)
+    
+    f = SXFunction([x],[e])
+    f.init()
+    f.setInput(range(1,8))
+    f.input().printDense()
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([1,-0.29150,10.29150]),digits=5)
+    
+    
+    x = ssym("x",3,3)
+    x[0,2] = 0
+    x[0,1] = 0
+    x[1,2] = 0
+    
+    makeSparse(x)
+
+    e = eig_symbolic(x)
+    
+    f = SXFunction([x],[e])
+    f.init()
+    f.setInput(range(1,7))
+    f.input().printDense()
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([1,3,6]),digits=5)
+
+    x = ssym("x",sp_tril(5))
+  
+    f = SXFunction([x],[eig_symbolic(x)])
+    f.init()
+    f.setInput(6)
+    f.input()[sp_diag(5)] = c.diag(range(5))
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix(range(5)))
+    
+  def test_jacobian_empty(self):
+    x = ssym("x",3)
+
+    s = jacobian(DMatrix(0,0),x).shape
+    self.assertEqual(s[0],0)
+    self.assertEqual(s[1],3)
+
+    s = jacobian(x,ssym("x",0,4)).shape
+    self.assertEqual(s[0],3)
+    self.assertEqual(s[1],0)
+    
+  def test_empty_SXMatrix(self):
+    s = SXMatrix([]).shape
+    self.assertEqual(s[0],0)
+    self.assertEqual(s[1],1)
+    x = ssym("x")
+    x.append(SXMatrix([]))
+    
+  def test_mul_sparsity(self):
+
+    N = 10
+    x = ssym("x",N,N)
+    y = ssym("y",N,N)
+
+    x_ = self.randDMatrix(N,N)
+    y_ = self.randDMatrix(N,N)
+
+    filt = sp_diag(N)+sp_triplet(N,N,[1],[3])
+
+    f = SXFunction([x,y],[mul(x,y)])
+    f.init()
+    f.setInput(x_,0)
+    f.setInput(y_,1)
+    g = SXFunction([x,y],[mul(x,y,filt)])
+    g.init()
+    g.setInput(x_,0)
+    g.setInput(y_,1)
+    
+    f.evaluate()
+    g.evaluate()
+    
+    self.checkarray(IMatrix(filt,1),IMatrix(g.output().sparsity(),1))
+    
+    self.checkarray(f.output()[filt],g.output())
+    
+  @skip(platform_arch==32)
+  @memory_heavy()
+  def test_large_hessian(self):
+    import pickle
+
+    A = pickle.load(file("../data/apoa1-2.pkl",'r'))
+
+    H = DMatrix(A,range(A.size()))
+    H = H + H.T
+    
+    H = H[:20000,:20000]
+    
+    x = ssym("x",H.size1())
+    
+    f = SXFunction([x],[mul([x.T,H,x])])
+    H *= 2
+    f.setOption("verbose",True)
+    f.init()
+
+    h = f.hessian()
+    h.init()
+    h.evaluate()
+    
+    self.assertTrue(h.output().sparsity()==H.sparsity())
+    
+    self.checkarray(h.output().data(),H.data())
+
+  def test_mxnulloutput(self):
+     a = SXMatrix(5,0)
+     b = ssym("x",2)
+     bm = msym("x",2)
+     
+     f = SXFunction([b],[a])
+     f.init()
+     c = f.call([bm])[0]
+
+     self.assertEqual(c.size1(),5)
+     self.assertEqual(c.size2(),0)
+     
+     c = f.eval([b])[0]
+
+     self.assertEqual(c.size1(),5)
+     self.assertEqual(c.size2(),0)
+     
+     a = SXMatrix(0,0)
+     
+     f = SXFunction([b],[a])
+     f.init()
+     
+     c = f.call([bm])[0]
+
+     self.assertEqual(c.size1(),0)
+     self.assertEqual(c.size2(),0)
+     
+     c = f.eval([b])[0]
+
+     self.assertEqual(c.size1(),0)
+     self.assertEqual(c.size2(),0)
+     
+  def test_mxnull(self):
+     a = SXMatrix(5,0)
+     b = SXMatrix(0,3)
+     
+     c = mul(a,b)
+     
+     self.assertEqual(c.size(),0)
+     
+     a = SXMatrix(5,3)
+     b = SXMatrix(3,4)
+     
+     c = mul(a,b)
+     
+     self.assertEqual(c.size(),0)
+     
+  def  test_mxnullop(self):
+    c = SXMatrix(0,0)
+    x = ssym("x",2,3)
+    
+    with self.assertRaises(RuntimeError):
+      d = x + c
+
+    with self.assertRaises(RuntimeError):
+      d = x / c
+      
+  def test_copysign(self):
+    x = ssym("x")
+    y = ssym("y")
+    z = copysign(x,y)
+    
+    f = SXFunction([x,y],[z])
+    f.init()
+    
+    f.setInput(2,0)
+    f.setInput(0.5,1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([2]))
+
+    f.setInput(2,0)
+    f.setInput(-0.5,1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([-2]))
+    
+    f.setInput(-2,0)
+    f.setInput(0.5,1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([2]))
+
+    f.setInput(-2,0)
+    f.setInput(-0.5,1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([-2]))
+    
+    f.setInput(2,0)
+    f.setInput(0,1)
+    f.evaluate()
+    self.checkarray(f.output(),DMatrix([2]))
+    
+    J = f.jacobian()
+    J.init()
+    
+    J.setInput(2,0)
+    J.setInput(0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([1]))
+
+    J.setInput(2,0)
+    J.setInput(-0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([-1]))
+    
+    J.setInput(-2,0)
+    J.setInput(0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([1]))
+
+    J.setInput(-2,0)
+    J.setInput(-0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([-1]))
+    
+    J.setInput(2,0)
+    J.setInput(0,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([1]))
+
+    J = f.jacobian(1)
+    J.init()
+    
+    J.setInput(2,0)
+    J.setInput(0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([0]))
+
+    J.setInput(2,0)
+    J.setInput(-0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([0]))
+    
+    J.setInput(-2,0)
+    J.setInput(0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([0]))
+
+    J.setInput(-2,0)
+    J.setInput(-0.5,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([0]))
+    
+    J.setInput(2,0)
+    J.setInput(0,1)
+    J.evaluate()
+    self.checkarray(J.output(),DMatrix([0]))
     
 if __name__ == '__main__':
     unittest.main()

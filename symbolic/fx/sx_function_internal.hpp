@@ -26,14 +26,6 @@
 #include "sx_function.hpp"
 #include "x_function_internal.hpp"
 
-#ifdef WITH_LLVM
-// Some forward declarations
-namespace llvm{
-  class Module;
-  class Function;
-} // namespace llvm
-#endif // WITH_LLVM
-
 #ifdef WITH_OPENCL
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -92,7 +84,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   virtual ~SXFunctionInternal();
 
   /** \brief  Evaluate the function numerically */
-  virtual void evaluate(int nfdir, int nadir);
+  virtual void evaluate();
 
   /** \brief  Helper class to be plugged into evaluateGen when working with a value known only at runtime */
   struct int_runtime{
@@ -105,15 +97,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   struct int_compiletime{
     static const int value = v;
   };
-  
-  /** \brief  Evaluate the function numerically, first argument generic */
-  template<typename T1>
-  void evaluateGen1(T1 nfdir_c, int nadir);
-  
-  /** \brief  Evaluate the function numerically, both arguments generic */
-  template<typename T1, typename T2>
-  void evaluateGen(T1 nfdir_c, T2 nadir_c);
-  
+    
   /** \brief  evaluate symbolically while also propagating directional derivatives */
   virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                       const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
@@ -144,7 +128,6 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
 
   /** \brief  Working vector for numeric calculation */
   std::vector<double> work_;
-  std::vector<TapeEl<double> > pdwork_;
 
   /// work vector for symbolic calculations (allocated first time)
   std::vector<SX> s_work_;
@@ -158,9 +141,6 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   
   /** \brief  Initialize */
   virtual void init();
-
-  /** \brief  Update the number of sensitivity directions during or after initialization */
-  virtual void updateNumSens(bool recursive);
 
   /** \brief Generate code for the declarations of the C function */
   virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
@@ -180,31 +160,14 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /// Reset the sparsity propagation
   virtual void spInit(bool fwd);
   
-  /// Get jacobian of all nonzero outputs with respect to all nonzero inputs
+  /** \brief Return Jacobian of all input elements with respect to all output elements */
   virtual FX getFullJacobian();
-
-  /// With just-in-time compilation
-  bool just_in_time_;
 
   /// With just-in-time compilation using OpenCL
   bool just_in_time_opencl_;
 
   /// With just-in-time compilation for the sparsity propagation
   bool just_in_time_sparsity_;
-  
-#ifdef WITH_LLVM
-  llvm::Module *jit_module_;
-  llvm::Function *jit_function_;
-
-  // Function pointer type to the JIT evaluate function
-  typedef void (*evaluateFcn)(double**,double**);
-  
-  // JIT function
-  evaluateFcn jitfcn_;
-
-  // References to input and output nonzeros
-  std::vector<double*> input_ref_, output_ref_;
-#endif // WITH_LLVM
   
 #ifdef WITH_OPENCL
   // Initialize sparsity propagation using OpenCL

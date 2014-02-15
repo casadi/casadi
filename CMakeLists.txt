@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
 project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "1.7.0")
+set(PACKAGE_VERSION "1.8.0")
+set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
+set(PACKAGE_AUTHOR "Joel Andersson")
+set(PACKAGE_MAINTAINER "Joris Gillis")
 
 # For systems with git installed, find out revsion and description.
 execute_process(COMMAND git rev-parse HEAD
@@ -16,6 +19,9 @@ OUTPUT_STRIP_TRAILING_WHITESPACE
 ERROR_QUIET
 )
 
+STRING(REPLACE "+-" "+" git_describe "${git_describe}")
+STRING(REPLACE "-g" "." git_describe "${git_describe}")
+
 #begin workaround for http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
 include(language_support)
@@ -24,6 +30,8 @@ if(Fortran_language_works)
   enable_language(Fortran OPTIONAL)
 endif()
 #end workaround
+
+include(embed_resources)
 
 # find the macports python libs if they exist
 if(APPLE)
@@ -60,20 +68,21 @@ endif()
 # Options:
 option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
 option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
-option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 if (WIN32)
  option(WITH_DL "Enable dynamic loading of functions" OFF)
 else (WIN32)
  option(WITH_DL "Enable dynamic loading of functions" ON)
 endif (WIN32)
-option(WITH_LLVM "Use LLVM for just-in-time compilation" OFF)
 option(WITH_DOC "Enable documentation generation" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
 # option(WITH_GSL "Compile the GSL interface" ON)
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
+option(WITH_SQIC "Enable SQIC interface" OFF)
+option(WITH_SLICOT "Enable SLICOT interface" OFF)
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
 option(WITH_WORHP "Compile the WORHP interface" OFF) 
+option(WITH_SNOPT "Compile the SNOPT interface" OFF) 
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
 option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
@@ -86,6 +95,7 @@ option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
+option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
@@ -132,13 +142,43 @@ endforeach()
 if(USE_CXX11)
   if(CXX11FLAG)
     message(STATUS "Flag needed for enabling C++11 features: ${CXX11FLAG}")
-    set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${CXX11FLAG})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11FLAG}")
   else()
     message(STATUS "No flag needed for enabling C++11 features.")
   endif()
   add_definitions(-DUSE_CXX11)
 endif()
 add_feature_info(using-c++11 USE_CXX11 "Using C++11 features (improves efficiency and is required for some examples).")
+
+if(CXX11FLAG)
+  try_compile(HAS_COPYSIGN
+    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_SOURCE_DIR}/cmake_modules/check_copysign.cpp
+    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
+    OUTPUT_VARIABLE OUTPUT)
+  if(HAS_COPYSIGN)
+    add_definitions(-DHAS_COPYSIGN)
+  endif()
+
+  try_compile(HAS_ERF
+    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_SOURCE_DIR}/cmake_modules/check_erf.cpp
+    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
+    OUTPUT_VARIABLE OUTPUT)
+  if(HAS_ERF)
+    add_definitions(-DHAS_ERF)
+  endif()
+
+  try_compile(HAS_ERFINV
+    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_SOURCE_DIR}/cmake_modules/check_erfinv.cpp
+    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
+    OUTPUT_VARIABLE OUTPUT)
+  if(HAS_ERFINV)
+    add_definitions(-DHAS_ERFINV)
+  endif()
+endif()
+
 
 # set(CMAKE_VERBOSE_MAKEFILE 0)
 
@@ -150,7 +190,13 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   message(STATUS "x86_64 architecture detected - setting flag -fPIC")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+
+if(MINGW)
+  # Circumventing a bug in MinGW g++ v4.7.2, evoked by 752fa89355ffa
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-ipa-cp-clone")
+endif()
 
 # Use the included Sundials
 if(WITH_SUNDIALS)
@@ -182,25 +228,13 @@ endif()
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
-# Optional core dependencies
-if(WITH_LLVM)
-  # Core depends on LLVM for Just-in-time compilation
-  find_package(LLVM REQUIRED)
-  find_package(Threads REQUIRED)
-  set(CASADI_DEPENDENCIES ${LLVM_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
-  add_definitions(-DWITH_LLVM)
-  include_directories( ${LLVM_INCLUDE_DIR} )
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LLVM_CFLAGS}") # Note LLVM_CFLAGS, not LLVM_CXXFLAGS due to -fno_exceptions
-else(WITH_LLVM)
-  if(WITH_DL)
-    # Core needs support for dynamic linking
-    set(CASADI_DEPENDENCIES ${CMAKE_DL_LIBS})
-  else(WITH_DL)
-    # No dependencies
-    set(CASADI_DEPENDENCIES)
-  endif(WITH_DL)
-endif(WITH_LLVM)
-add_feature_info(just-in-time WITH_LLVM "Just-in-time compiliation via the LLVM compiler framework.")
+if(WITH_DL)
+  # Core needs support for dynamic linking
+  set(CASADI_DEPENDENCIES ${CMAKE_DL_LIBS})
+else(WITH_DL)
+  # No dependencies
+  set(CASADI_DEPENDENCIES)
+endif(WITH_DL)
 
 # OpenCL
 if(WITH_OPENCL)
@@ -232,7 +266,7 @@ if(WITH_BUILD_IPOPT)
     BUILD_COMMAND make -j4
   )
   set(BUILD_IPOPT_LIB_DIR ${CMAKE_BINARY_DIR}/CoinIpopt/src/build_ipopt-build)
-  message(STATUS "BUILD_IPOPT_LIB_DIR: "${BUILD_IPOPT_LIB_DIR})
+  message(STATUS "BUILD_IPOPT_LIB_DIR: ${BUILD_IPOPT_LIB_DIR}")
 endif(WITH_BUILD_IPOPT)
 add_feature_info(get-ipopt WITH_BUILD_IPOPT "Download and build Ipopt.")
 
@@ -240,10 +274,6 @@ if(WITH_IPOPT)
   find_package(IPOPT)
 endif()
 add_feature_info(ipopt-interface IPOPT_FOUND "Interface to the NLP solver Ipopt.")
-
-if(WITH_ACADO)
-  find_package(ACADO)
-endif()
 
 if(WITH_KNITRO)
   find_package(KNITRO)
@@ -272,6 +302,19 @@ if(WITH_OOQP AND BLAS_FOUND)
 endif()
 add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP (requires BLAS).")
 
+if(Fortran_language_works AND WITH_SQIC)
+  find_package (SQIC)
+  set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} ${SQIC_LIBRARIES})
+endif()
+add_feature_info(sqic-interface SQIC_FOUND "Interface to the QP solver SQIC.")
+
+if(Fortran_language_works AND WITH_SLICOT)
+  find_package (SLICOT)
+  set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} ${SLICOT_LIBRARIES})
+endif()
+add_feature_info(slicot-interface SLICOT_FOUND "Interface to the controls library SLICOT.")
+
+
 if(WITH_WORHP AND LIBXML2_FOUND)
   find_package (WORHP)
 endif()
@@ -285,23 +328,35 @@ if(WITH_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
 endif()
 add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP solver DSDP (requires BLAS and LAPACK).")
 
-add_subdirectory(symbolic)
-add_subdirectory(optimal_control)
-add_subdirectory(nonlinear_programming)
-add_subdirectory(convex_programming)
-add_subdirectory(integration)
-add_subdirectory(examples)
+if(WITH_PROFILING)
+  find_library(RT rt)
+  if(RT)
+    list(APPEND CASADI_DEPENDENCIES ${RT})
+  endif()
+  add_definitions(-DWITH_PROFILING)
+endif(WITH_PROFILING)
+
+add_subdirectory(symbolic)  # needed by all except external_packages
 add_subdirectory(external_packages)
-add_subdirectory(interfaces)
+
+add_subdirectory(interfaces)             # needs external_packages
+add_subdirectory(nonlinear_programming)  # needs interfaces
+add_subdirectory(convex_programming)     # needs interfaces
+add_subdirectory(integration)
+add_subdirectory(optimal_control)        # needs integration, external_packages
+add_subdirectory(examples)
 add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
 add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
 #add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
+
+add_subdirectory(control)
 
 find_package(SWIG)
   if(SWIG_FOUND)
     add_subdirectory(swig EXCLUDE_FROM_ALL) # the swig interfaces are not compiled when typing "make"
     add_custom_target(python DEPENDS _python_modules )
     add_custom_target(octave DEPENDS _octave_modules )
+    add_custom_target(haskell DEPENDS _haskell_modules )
 endif(SWIG_FOUND)
 
 if(WITH_DOC)
@@ -321,8 +376,6 @@ feature_summary(WHAT ALL)
 feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
 
 STRING(REPLACE "\n" "\\n" feature_list "${feature_list}")
-STRING(REPLACE "+-" "+" git_describe "${git_describe}")
-STRING(REPLACE "-g" "." git_describe "${git_describe}")
 
 # Pass meta information
 CONFIGURE_FILE(
@@ -330,3 +383,8 @@ CONFIGURE_FILE(
   ${CMAKE_SOURCE_DIR}/symbolic/casadi_meta.cpp
   ESCAPE_QUOTES
 )
+
+if(EXTRA_CMAKE)
+  include(${EXTRA_CMAKE})
+endif()
+

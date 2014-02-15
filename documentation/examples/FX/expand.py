@@ -25,8 +25,8 @@ from casadi import *
 import casadi as c
 
 #! We construct a simple MX expression
-x = MX("x",1,2)
-y = MX("y",2,1)
+x = msym("x",2,2)
+y = msym("y",2,1)
 
 z = mul(x,y)
 
@@ -48,18 +48,15 @@ print "Expanded expression = ", fSX.outputExpr(0)
 #! Not all MX graphs can be expanded.
 #! Here is an example of a situation where it will not work.
 #!
-f.setOption("numeric_jacobian",True)
-f.init()
-j = f.jacobian(0,0)
-j.init()
-
-J=MXFunction([x,y],j.call([x,y]))
-J.init()
+linear_solver = CSparse(x.sparsity())
+linear_solver.init()
+g = linear_solver.solve(x,y.T)
+G = MXFunction([x,y],[g])
+G.init()
 
 #! This function cannot be expanded.
 try:
-  J.expand()
+  G.expand()
 except Exception as e:
   print e
-  
-#! Note that we could get the Jacobian of fSX as a workaround here.
+

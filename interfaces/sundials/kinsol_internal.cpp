@@ -42,8 +42,7 @@ namespace CasADi{
     addOption("u_scale",                  OT_REALVECTOR);
     addOption("pretype",                  OT_STRING, "none","","none|left|right|both");
     addOption("use_preconditioner",       OT_BOOLEAN, false); // precondition an iterative solver
-    addOption("constraints",              OT_INTEGERVECTOR);
-    addOption("strategy",                 OT_STRING, "none", "Globalization strateg","none|linesearch");
+    addOption("strategy",                 OT_STRING, "none", "Globalization strategy","none|linesearch");
     addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable KINSOL internal warning messages");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_djac", true);
     
@@ -139,13 +138,9 @@ namespace CasADi{
 
     // Set constraints
     if(hasSetOption("constraints")){
-      // Get the user-set constraints
-      const vector<int>& u_c = getOption("constraints");
-      casadi_assert(u_c.size()==n_);
-    
       // Copy to a temporary N_Vector
       N_Vector constraints = N_VNew_Serial(n_);
-      copy(u_c.begin(),u_c.end(),NV_DATA_S(constraints));
+      copy(u_c_.begin(),u_c_.end(),NV_DATA_S(constraints));
     
       // Pass to KINSOL
       flag = KINSetConstraints(mem_, constraints);
@@ -197,6 +192,9 @@ namespace CasADi{
     
       // Attach functions for jacobian information
       if(exact_jacobian){
+        // Form the Jacobian-times-vector function
+        f_fwd_ = f_.derivative(1,0);
+
         flag = KINSpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
       }
@@ -249,7 +247,7 @@ namespace CasADi{
     }
   
     // Get the initial guess
-    output().get(NV_DATA_S(u_));
+    output(iout_).get(NV_DATA_S(u_));
   
     // Solve the nonlinear system of equations
     int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);
@@ -259,13 +257,24 @@ namespace CasADi{
     if(verbose()){
       if(flag!=KIN_SUCCESS) kinsol_error("KINSol",flag,false);
     }
-  
-    // Save the solution
-    output(0).set(NV_DATA_S(u_));
 
+    // Get the solution
+    setOutput(NV_DATA_S(u_),iout_);
+
+    // Evaluate auxilary outputs
+    if(getNumOutputs()>0){
+      f_.setInput(output(iout_),iin_);
+      for(int i=0; i<getNumInputs(); ++i)
+        if(i!=iin_) f_.setInput(input(i),i);
+      f_.evaluate();
+      for(int i=0; i<getNumOutputs(); ++i){
+        if(i!=iout_) f_.getOutput(output(i),i);
+      }
+    }
+    
     // Print solution
     if(verbose()){
-      cout << "KinsolInternal::solveNonLinear: solution = " << output(0).data() << endl;
+      cout << "KinsolInternal::solveNonLinear: solution = " << output(iout_).data() << endl;
     }  
   }
 
@@ -273,24 +282,23 @@ namespace CasADi{
     // Get time
     time1_ = clock();
 
-    // Pass input
-    f_.setInput(NV_DATA_S(u),0);
+    // Pass inputs
+    f_.setInput(NV_DATA_S(u),iin_);
     for(int i=0; i<getNumInputs(); ++i)
-      f_.setInput(input(i),i+1);
-  
+      if(i!=iin_) f_.setInput(input(i),i);
+
     // Evaluate
     f_.evaluate();
     
     if(monitored("eval_f")){
-      cout << "f = " << f_.output() << endl;
+      cout << "f = " << f_.output(iout_) << endl;
     }
     
     // Get results
-    f_.getOutput(NV_DATA_S(fval));
+    f_.getOutput(NV_DATA_S(fval),iout_);
 
-  
     // Get a referebce to the nonzeros of the function
-    const vector<double>& fdata = f_.output().data();
+    const vector<double>& fdata = f_.output(iout_).data();
   
     // Make sure that all entries of the linear system are valid
     for(int k=0; k<fdata.size(); ++k){
@@ -301,7 +309,7 @@ namespace CasADi{
         stringstream ss;
         ss << ex.what() << endl;
         if(verbose()){
-          ss << "u = " << f_.input() << endl;
+          ss << "u = " << f_.input(iin_) << endl;
                 
           // Print the expression for f[Jrow] if f is an SXFunction instance
           SXFunction f_sx = shared_cast<SXFunction>(f_);
@@ -324,7 +332,7 @@ namespace CasADi{
   int KinsolInternal::func_wrapper(N_Vector u, N_Vector fval, void *user_data){
     try{
       casadi_assert(user_data);
-      KinsolInternal *this_ = (KinsolInternal*)user_data;
+      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
       this_->func(u,fval);
       return 0;
     } catch(exception& e){
@@ -336,7 +344,7 @@ namespace CasADi{
   int KinsolInternal::djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2){
     try{
       casadi_assert(user_data);
-      KinsolInternal *this_ = (KinsolInternal*)user_data;
+      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
       this_->djac(N, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e){
@@ -350,9 +358,9 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass inputs to the jacobian function
-    jac_.setInput(NV_DATA_S(u),0);
+    jac_.setInput(NV_DATA_S(u),iin_);
     for(int i=0; i<getNumInputs(); ++i)
-      jac_.setInput(input(i),i+1);
+      if(i!=iin_) jac_.setInput(input(i),i);
 
     // Evaluate
     jac_.evaluate();
@@ -391,7 +399,7 @@ namespace CasADi{
   int KinsolInternal::bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2){
     try{
       casadi_assert(user_data);
-      KinsolInternal *this_ = (KinsolInternal*)user_data;
+      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
       this_->bjac(N, mupper, mlower, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e){
@@ -405,9 +413,9 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass inputs to the jacobian function
-    jac_.setInput(NV_DATA_S(u),0);
+    jac_.setInput(NV_DATA_S(u),iin_);
     for(int i=0; i<getNumInputs(); ++i)
-      jac_.setInput(input(i),i+1);
+      if(i!=iin_) jac_.setInput(input(i),i);
 
     // Evaluate
     jac_.evaluate();
@@ -438,7 +446,7 @@ namespace CasADi{
   int KinsolInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u, void *user_data){
     try{
       casadi_assert(user_data);
-      KinsolInternal *this_ = (KinsolInternal*)user_data;
+      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
       this_->jtimes(v,Jv,u,new_u);
       return 0;
     } catch(exception& e){
@@ -452,20 +460,20 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass inputs
-    f_.setInput(NV_DATA_S(u),0);
+    f_fwd_.setInput(NV_DATA_S(u),iin_);
     for(int i=0; i<getNumInputs(); ++i)
-      f_.setInput(input(i),i+1);
+      if(i!=iin_) f_fwd_.setInput(input(i),i);
 
     // Pass input seeds
-    f_.setFwdSeed(NV_DATA_S(v),0);
+    f_fwd_.setInput(NV_DATA_S(v),getNumInputs()+iin_);
     for(int i=0; i<getNumInputs(); ++i)
-      f_.fwdSeed(i+1).setZero();
+      if(i!=iin_) f_fwd_.setInput(0.0, getNumInputs()+i);
   
     // Evaluate
-    f_.evaluate(1,0);
+    f_fwd_.evaluate();
 
     // Get the output seeds
-    f_.getFwdSens(NV_DATA_S(Jv));
+    f_fwd_.getOutput(NV_DATA_S(Jv),getNumOutputs());
   
     // Log time duration
     time2_ = clock();
@@ -475,7 +483,7 @@ namespace CasADi{
   int KinsolInternal::psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, void* user_data, N_Vector tmp1, N_Vector tmp2){
     try{
       casadi_assert(user_data);
-      KinsolInternal *this_ = (KinsolInternal*)user_data;
+      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
       this_->psetup(u, uscale, fval, fscale, tmp1, tmp2);
       return 0;
     } catch(exception& e){
@@ -489,14 +497,14 @@ namespace CasADi{
     time1_ = clock();
 
     // Pass inputs
-    jac_.setInput(NV_DATA_S(u),0);
+    jac_.setInput(NV_DATA_S(u),iin_);
     for(int i=0; i<getNumInputs(); ++i)
-      jac_.setInput(input(i),i+1);
+      if(i!=iin_) jac_.setInput(input(i),i);
 
     // Evaluate jacobian
     jac_.evaluate();
 
-    // Get a referebce to the nonzeros of Jacobian
+    // Get a reference to the nonzeros of Jacobian
     const vector<double>& Jdata = jac_.output().data();
   
     // Make sure that all entries of the linear system are valid
@@ -545,7 +553,7 @@ namespace CasADi{
     t_lsetup_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
 
     // Pass non-zero elements, scaled by -gamma, to the linear solver
-    linsol_.setInput(jac_.output(),0);
+    linsol_.setInput(jac_.output(),LINSOL_A);
 
     // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
     linsol_.prepare();
@@ -558,7 +566,7 @@ namespace CasADi{
   int KinsolInternal::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v, void* user_data, N_Vector tmp){
     try{
       casadi_assert(user_data);
-      KinsolInternal *this_ = (KinsolInternal*)user_data;
+      KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
       this_->psolve(u, uscale, fval, fscale, v, tmp);
       return 0;
     } catch(exception& e){

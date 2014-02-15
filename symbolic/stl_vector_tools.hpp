@@ -650,6 +650,15 @@ namespace CasADi{
     }
     return ret;
   }
+
+  template<typename T>
+  T norm_2(const std::vector<T>& x){
+    T ret = 0;
+    for(int k=0; k<x.size(); ++k){
+      ret += x[k]*x[k];
+    }
+    return sqrt(ret);
+  }
   
 } // namespace CasADi
 

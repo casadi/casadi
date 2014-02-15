@@ -48,7 +48,6 @@ QPOasesInternal::QPOasesInternal(const std::vector<CRSSparsity>& st) : QPSolverI
   ops.setToDefault();
 
   addOption("printLevel",             OT_STRING,  PrintLevel_to_string(ops.printLevel), "Defines the amount of text output during QP solution, see Section 5.7","none|low|medium|high");
-  #ifdef ALLOW_ALL_OPTIONS
   addOption("enableRamping",          OT_BOOLEAN, BooleanType_to_bool(ops.enableRamping), "Enables ramping.");
   addOption("enableFarBounds",        OT_BOOLEAN, BooleanType_to_bool(ops.enableFarBounds), "Enables the use of  far bounds.");
   addOption("enableFlippingBounds",   OT_BOOLEAN, BooleanType_to_bool(ops.enableFlippingBounds), "Enables the use of  flipping bounds.");
@@ -69,7 +68,7 @@ QPOasesInternal::QPOasesInternal(const std::vector<CRSSparsity>& st) : QPSolverI
   addOption("finalRamping",           OT_REAL, double(ops.finalRamping), "Final value for ramping strategy.");
   addOption("initialFarBounds",       OT_REAL, double(ops.initialFarBounds), "Initial size for far bounds.");
   addOption("growFarBounds",          OT_REAL, double(ops.growFarBounds), "Factor to grow far bounds.");
-  addOption("initialStatusBounds",    OT_STRING, SubjectToStatus_to_string(ops.initialStatusBounds), "Initial status of bounds at first iteration: \"inactive\": all bounds inactive, \"lower\": all bounds active at their lower bound, \"upper\": all bounds active at their upper bound.");
+  addOption("initialStatusBounds",    OT_STRING, SubjectToStatus_to_string(ops.initialStatusBounds), "Initial status of bounds at first iteration.","inactive::all bounds inactive|lower::all bounds active at their lower bound|upper::all bounds active at their upper bound");
   addOption("epsFlipping",            OT_REAL, double(ops.epsFlipping), "Tolerance of squared Cholesky diagonal factor  which triggers flipping bound.");
   addOption("numRegularisationSteps", OT_INTEGER, int(ops.numRegularisationSteps), "Maximum number of successive regularisation steps.");
   addOption("epsRegularisation",      OT_REAL, double(ops.epsRegularisation), "Scaling factor of identity matrix used for  Hessian regularisation.");
@@ -77,7 +76,6 @@ QPOasesInternal::QPOasesInternal(const std::vector<CRSSparsity>& st) : QPSolverI
   addOption("epsIterRef",             OT_REAL, double(ops.epsIterRef), "Early termination tolerance for iterative  refinement.");
   addOption("epsLITests",             OT_REAL, double(ops.epsLITests), "Tolerance for linear independence tests.");
   addOption("epsNZCTests",            OT_REAL, double(ops.epsNZCTests), "Tolerance for nonzero curvature tests.");
-  #endif // ALLOW_ALL_OPTIONS
   
   called_once_ = false;
   qp_ = 0;
@@ -163,8 +161,8 @@ void QPOasesInternal::init(){
   #endif // ALLOW_ALL_OPTIONS
 }
 
-void QPOasesInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("QPOasesInternal::evaluate() not implemented for forward or backward mode");
+void QPOasesInternal::evaluate() {
+  if (inputs_check_) checkInputs();
 
   if(verbose()){
 //     cout << "X_INIT = " << input(QP_SOLVER_X_INIT) << endl;

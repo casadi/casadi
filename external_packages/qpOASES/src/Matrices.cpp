@@ -1071,11 +1071,15 @@ returnValue SparseMatrix::addToDiag(real_t alpha)
 {
 	long i;
 
-	if (alpha != 0.0)
-		for (i = 0; i < nRows && i < nCols; i++)
-			if (ir[jd[i]] == i) val[jd[i]] += alpha;
-			else return RET_NO_DIAGONAL_AVAILABLE;
-
+	if (alpha != 0.0) {
+		for (i = 0; i < nRows && i < nCols; i++) {
+			if (ir[jd[i]] == i) {
+			  val[jd[i]] += alpha;
+			} else {
+			  return RET_NO_DIAGONAL_AVAILABLE;
+			}
+	  }
+  }
 	return SUCCESSFUL_RETURN;
 }
 
@@ -1677,11 +1681,15 @@ returnValue SparseMatrixRow::addToDiag(real_t alpha)
 {
 	long i;
 
-	if (alpha != 0.0)
-		for (i = 0; i < nRows && i < nCols; i++)
-			if (ic[jd[i]] == i) val[jd[i]] += alpha;
-			else return RET_NO_DIAGONAL_AVAILABLE;
-
+	if (alpha != 0.0) {
+		for (i = 0; i < nRows && i < nCols; i++) {
+			if (ic[jd[i]] == i) {
+			  val[jd[i]] += alpha;
+			} else { 
+			  return RET_NO_DIAGONAL_AVAILABLE;
+			}
+	  }
+  }
 	return SUCCESSFUL_RETURN;
 }
 

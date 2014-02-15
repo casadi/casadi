@@ -40,7 +40,7 @@ dae = SXFunction(daeIn(x=x,p=u,t=t),daeOut(ode=ode))
 
 # Create an integrator
 if coll:
-  integrator = CollocationIntegrator(dae)
+  integrator = OldCollocationIntegrator(dae)
   integrator.setOption("number_of_finite_elements",5)
   integrator.setOption("interpolation_order",5)
   integrator.setOption("collocation_scheme","legendre")

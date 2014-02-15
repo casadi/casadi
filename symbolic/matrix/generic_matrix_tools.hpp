@@ -120,9 +120,13 @@ T tril2symm(const GenericMatrix<T> &a_) {
 
 // Define template instanciations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES(T) \
-GMTT_INST(T,linspace) \
 GMTT_INST(T,cross) \
-GMTT_INST(T,tril2symm) \
+GMTT_INST(T,tril2symm)
+
+// Define template instanciations
+#define GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(T) \
+GMTT_INST(T,linspace)
+
 
 #endif //SWIG
 

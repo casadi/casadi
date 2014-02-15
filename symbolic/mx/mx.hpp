@@ -406,8 +406,8 @@ namespace CasADi{
     MX __constpow__(const MX& b) const;
     MX __mrdivide__  (const MX& b) const;
     MX __mpower__(const MX& b) const;
-    MX mul(const MX& y) const;
-    MX mul_full(const MX& y) const;
+    MX mul(const MX& y, const CRSSparsity &sp_z=CRSSparsity()) const;
+    MX mul_full(const MX& y, const CRSSparsity &sp_z=CRSSparsity()) const;
     MX inner_prod(const MX& y) const;
     MX outer_prod(const MX& y) const;
     MX constpow(const MX& y) const;
@@ -418,6 +418,7 @@ namespace CasADi{
     MX logic_and(const MX& y) const;
     MX logic_or(const MX& y) const;
     MX if_else_zero(const MX& y) const;
+    MX __copysign__(const MX& y) const;
 
     // all unary operations
     MX exp() const;
@@ -443,6 +444,12 @@ namespace CasADi{
     MX arccosh() const;
     MX arctanh() const;
     MX logic_not() const;
+    
+    /** \brief returns itself, but with an assertion attached
+    *
+    *  If y does not evaluate to 1, a runtime error is raised
+    */
+    MX attachAssert(const MX& y,const std::string &fail_message="") const;
 
     /** \brief Set sparse */
     MX setSparse(const CRSSparsity& sp, bool intersect=false) const;

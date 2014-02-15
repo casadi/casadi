@@ -20,6 +20,268 @@
  *
  */
 
+%pythoncode %{
+def attach_return_type(f,t):
+  if not(hasattr(f,'func_annotations')):
+    f.func_annotations = {}
+  if not(isinstance(getattr(f,'func_annotations'),dict)):
+    raise Exception("Cannot annotate this python Method to be a sparsitygenerator. Method has func_annotations attribute with unknown type.")
+  f.func_annotations["return"] = t
+  return f
+
+def pyderivativegenerator(f):
+  return attach_return_type(f,FX)
+
+def pyevaluate(f):
+  return attach_return_type(f,None)
+  
+def pycallback(f):
+  return attach_return_type(f,int)
+  
+
+def pyfunction(inputs,outputs):
+  def wrap(f):
+    
+    @pyevaluate
+    def fcustom(f2):
+      res = f([f2.getInput(i) for i in range(f2.getNumInputs())])
+      if not isinstance(res,list):
+        res = [res]
+      for i in range(f2.getNumOutputs()):
+        f2.setOutput(res[i],i)
+    Fun = CustomFunction(fcustom,inputs,outputs)
+    Fun.setOption("name","CustomFunction")
+    return Fun
+  return wrap
+  
+def PyFunction(obj,inputs,outputs):
+    @pyevaluate
+    def fcustom(f):
+      obj.evaluate([f.input(i) for i in range(f.getNumInputs())],[f.output(i) for i in range(f.getNumOutputs())])
+      
+    Fun = CustomFunction(fcustom,inputs,outputs)
+    Fun.setOption("name","CustomFunction")
+    if hasattr(obj,'getDerivative'):
+      @pyderivativegenerator
+      def derivativewrap(f,nfwd,nadj):
+        return obj.getDerivative(f,nfwd,nadj)
+      Fun.setOption("derivative_generator",derivativewrap)
+      
+    elif hasattr(obj,'fwd') or hasattr(obj,'adj'):
+      @pyderivativegenerator
+      def derivativewrap(f,nfwd,nadj):
+        num_in = f.getNumInputs()
+        num_out = f.getNumOutputs()
+        
+        @pyevaluate
+        def der(f2):
+          all_inputs = [f2.input(i) for i in range(f2.getNumInputs())]
+          all_outputs = [f2.output(i) for i in range(f2.getNumOutputs())]
+          inputs=all_inputs[:num_in]
+          outputs=all_outputs[:num_out]
+          fwd_seeds=zip(*[iter(all_inputs[num_in:num_in*(nfwd+1)])]*num_in)
+          fwd_sens=zip(*[iter(all_outputs[num_out:num_out*(nfwd+1)])]*num_out)
+          adj_seeds=zip(*[iter(all_inputs[num_in*(nfwd+1):])]*num_out)
+          adj_sens=zip(*[iter(all_outputs[num_out*(nfwd+1):])]*num_in)
+          if hasattr(obj,'fwd') and nfwd>0:
+            obj.fwd(inputs,outputs,fwd_seeds,fwd_sens)
+          if hasattr(obj,'adj') and nadj>0:
+            obj.adj(inputs,outputs,adj_seeds,adj_sens)
+          
+        DerFun = CustomFunction(der,inputs+nfwd*inputs+nadj*outputs,outputs+nfwd*outputs+nadj*inputs)
+        DerFun.setOption("name","CustomFunction_derivative")
+        DerFun.init()
+        return DerFun
+ 
+      Fun.setOption("derivative_generator",derivativewrap)
+    
+    if not(hasattr(obj,'getDerivative')) and hasattr(obj,'fwd') and not hasattr(obj,'adj'):
+      Fun.setOption("ad_mode","forward")
+    if not(hasattr(obj,'getDerivative')) and not hasattr(obj,'fwd') and hasattr(obj,'adj'):
+      Fun.setOption("ad_mode","reverse")
+    return Fun
+  
+%}
+
+
+%{
+
+
+// Returns a new reference
+PyObject * getReturnType(PyObject* p) {
+  if (!p) return 0;
+  if (!PyCallable_Check(p)) return 0;
+  int ret = PyObject_HasAttrString( p, "func_annotations");
+  if (!ret) return 0;
+  PyObject * func_annotations = PyObject_GetAttrString(p,"func_annotations");
+  if (!PyDict_Check(func_annotations)) {
+    Py_DECREF(func_annotations);
+    return 0;
+  }
+  PyObject * return_type = PyDict_GetItemString(func_annotations, "return"); // Borrowed
+  Py_INCREF(return_type); // Make a new reference
+  Py_DECREF(func_annotations);
+  if (return_type==0) {
+    return 0;
+  }
+  if (!PyType_Check(return_type) && return_type!=Py_None) {
+    Py_DECREF(return_type);
+    return 0;
+  }
+  return return_type;
+}
+
+// Returns a new reference
+PyObject * getCasadiObject(const std::string &s) {
+  PyObject* pPyObjectModuleName = PyString_FromString("casadi");
+  if (!pPyObjectModuleName) { PyErr_Clear(); return 0; }
+  PyObject* pObjectModule = PyImport_Import(pPyObjectModuleName);
+  Py_DECREF(pPyObjectModuleName);
+  if (!pObjectModule) { PyErr_Clear(); return 0; }
+  PyObject* pObjectDict = PyModule_GetDict(pObjectModule); // Borrowed
+  Py_DECREF(pObjectModule);
+  if (!pObjectDict) { PyErr_Clear(); return 0; }
+  PyObject* ret = PyDict_GetItemString(pObjectDict,  s.c_str()); // Borrowed
+  if (!ret) { PyErr_Clear(); return 0; }
+  Py_INCREF(ret); // New reference
+  return ret;
+}
+
+#include "symbolic/functor_internal.hpp"
+#include "symbolic/fx/custom_function.hpp"
+
+namespace CasADi {
+  //using namespace CasADi;
+
+  class FunctorPythonInternal {
+    public:
+      FunctorPythonInternal(PyObject *p) : p_(p) { Py_INCREF(p_); }
+      ~FunctorPythonInternal() { Py_DECREF(p_); }
+    protected:
+      PyObject *p_;
+  };
+  
+  class DerivativeGeneratorPythonInternal : public DerivativeGeneratorInternal, FunctorPythonInternal {
+    friend class DerivativeGeneratorPython;
+    
+  DerivativeGeneratorPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
+    virtual FX call(FX& fcn, int nfwd, int nadj, void* user_data);
+    virtual DerivativeGeneratorPythonInternal* clone() const { return new DerivativeGeneratorPythonInternal(p_); }
+  };
+   
+  class CustomEvaluatePythonInternal : public CustomEvaluateInternal, FunctorPythonInternal {
+    friend class CustomEvaluatePython;
+    
+    CustomEvaluatePythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
+    virtual void call(CustomFunction& fcn, void* user_data);
+    virtual CustomEvaluatePythonInternal* clone() const { return new CustomEvaluatePythonInternal(p_); }
+  };
+  
+  class DerivativeGeneratorPython : public DerivativeGenerator {
+  public:
+    DerivativeGeneratorPython(PyObject *p) { assignNode(new DerivativeGeneratorPythonInternal(p)); }
+  };
+  
+  class CallbackPythonInternal : public CallbackInternal, FunctorPythonInternal {
+    friend class CallbackPython;
+    
+    CallbackPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
+    virtual int call(FX& fcn, void* user_data);
+    virtual CallbackPythonInternal* clone() const { return new CallbackPythonInternal(p_); }
+  };
+  
+  class CustomEvaluatePython : public CustomEvaluate {
+    public:
+      CustomEvaluatePython(PyObject *p) { assignNode(new CustomEvaluatePythonInternal(p)); }
+  };
+
+  class CallbackPython : public Callback {
+    public:
+      CallbackPython(PyObject *p) { assignNode(new CallbackPythonInternal(p)); }
+  };
+  
+}
+%}
+
+%wrapper %{  
+
+namespace CasADi {
+
+  FX DerivativeGeneratorPythonInternal::call(FX& fcn, int nfwd, int nadj, void* user_data) {
+    casadi_assert(p_!=0);
+    PyObject * nfwd_py = PyInt_FromLong(nfwd);
+    PyObject * nadj_py = PyInt_FromLong(nadj);
+    PyObject * fcn_py = SWIG_NewPointerObj((new FX(static_cast< const FX& >(fcn))), SWIGTYPE_p_CasADi__FX, SWIG_POINTER_OWN |  0 );
+    if(!fcn_py) {
+      Py_DECREF(nfwd_py);
+      Py_DECREF(nadj_py);
+      throw CasadiException("DerivativeGeneratorPythonInternal: failed to convert FX to python");
+    }
+    
+    PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, nfwd_py, nadj_py, NULL);
+    Py_DECREF(nfwd_py);
+    Py_DECREF(nadj_py);
+    Py_DECREF(fcn_py);
+    
+    if (r) {
+      FX ret;  
+      int result = meta< FX >::as(r,ret);
+      if(!result) { Py_DECREF(r); throw CasadiException("DerivativeGeneratorPythonInternal: return type was not FX."); }
+      Py_DECREF(r);
+      return ret;
+    } else {
+      PyErr_Print();
+      throw CasadiException("DerivativeGeneratorPythonInternal: python method execution raised an Error.");
+    }
+  }
+
+  void CustomEvaluatePythonInternal::call(CustomFunction& fcn, void* user_data) {
+    casadi_assert(p_!=0);
+    PyObject * fcn_py = SWIG_NewPointerObj((new CustomFunction(static_cast< const CustomFunction& >(fcn))), SWIGTYPE_p_CasADi__CustomFunction, SWIG_POINTER_OWN |  0 );
+    if(!fcn_py) {
+      throw CasadiException("CustomEvaluatePythonInternal: failed to convert CustomFunction to python");
+    }
+    
+    PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
+    Py_DECREF(fcn_py);
+    if (!r) {
+     PyErr_Print();
+     throw CasadiException("CustomEvaluatePythonInternal: python method execution raised an Error.");
+    }
+    
+    Py_DECREF(r);
+
+  }
+  
+  int CallbackPythonInternal::call(FX& fcn, void* user_data) {
+    casadi_assert(p_!=0);
+
+    PyObject * fcn_py = SWIG_NewPointerObj((new FX(static_cast< const FX& >(fcn))), SWIGTYPE_p_CasADi__CustomFunction, SWIG_POINTER_OWN |  0 );
+    if(!fcn_py) {
+      throw CasadiException("CallbackPythonInternal: failed to convert CustomFunction to python");
+    }
+    
+    PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, NULL);
+
+    Py_DECREF(fcn_py);
+    if (!r) {
+     PyErr_Print();
+     throw CasadiException("CallbackPythonInternal: python method execution raised an Error.");
+    }
+    int ret = 0;
+    if ( meta< int >::couldbe(r)) {
+      int res = meta< int >::as(r,ret);    
+    }
+    
+    Py_DECREF(r);
+    return ret;
+
+  }
+  
+}
+
+%}
+
 %inline %{
 /// int
 template<> char meta< int >::expected_message[] = "Expecting integer";
@@ -85,7 +347,7 @@ int meta< std::vector< double > >::as(PyObject * p,std::vector<double > &m) {
     int array_is_new_object;
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
     if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
-    double* d=(double*) array->data;
+    double* d=(double*) array_data(array);
     
     m.assign( d, d+size );
     
@@ -216,6 +478,63 @@ template<> int meta< CasADi::GenericType::Dictionary >::as(PyObject * p,CasADi::
 template<> bool meta< CasADi::GenericType::Dictionary >::couldbe(PyObject * p);
 template<> bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::GenericType::Dictionary &a, PyObject *&p);
 
+/// CasADi::DerivativeGenerator
+ template<> char meta< CasADi::DerivativeGenerator >::expected_message[] = "Expecting sparsity generator";
+
+ template <>
+   int meta< CasADi::DerivativeGenerator >::as(PyObject * p, CasADi::DerivativeGenerator &s) {
+   NATIVERETURN(CasADi::DerivativeGenerator, s)
+     s = CasADi::DerivativeGeneratorPython(p);
+   return true;
+ }
+
+ template<> bool meta< CasADi::DerivativeGenerator >::couldbe(PyObject * p) {
+   PyObject* return_type = getReturnType(p);
+   if (!return_type) return false;
+   PyObject* fx = getCasadiObject("FX");
+   if (!fx) { Py_DECREF(return_type); return false; }
+   bool res = PyClass_IsSubclass(return_type,fx);
+   Py_DECREF(return_type);Py_DECREF(fx);
+   return res;
+ }
+
+
+/// CasADi::CustomEvaluate
+template<> char meta< CasADi::CustomEvaluate >::expected_message[] = "Expecting CustomFunction wrapper generator";
+
+template <>
+int meta< CasADi::CustomEvaluate >::as(PyObject * p, CasADi::CustomEvaluate &s) {
+  NATIVERETURN(CasADi::CustomEvaluate, s)
+  s = CasADi::CustomEvaluatePython(p);
+  return true;
+}
+
+template<> bool meta< CasADi::CustomEvaluate >::couldbe(PyObject * p) {
+  PyObject* return_type = getReturnType(p);
+  if (!return_type) return true;
+  bool res = return_type==Py_None;
+  Py_DECREF(return_type);
+  return res;
+}
+
+/// CasADi::Callback
+template<> char meta< CasADi::Callback >::expected_message[] = "Expecting Callback";
+
+template <>
+int meta< CasADi::Callback >::as(PyObject * p, CasADi::Callback &s) {
+  NATIVERETURN(CasADi::Callback, s)
+  s = CasADi::CallbackPython(p);
+  return true;
+}
+
+template<> bool meta< CasADi::Callback >::couldbe(PyObject * p) {
+  PyObject* return_type = getReturnType(p);
+  if (!return_type) return false;
+  bool res = PyType_IsSubtype((PyTypeObject *)return_type,&PyInt_Type) || PyType_IsSubtype((PyTypeObject *)return_type,&PyLong_Type);
+  Py_DECREF(return_type);
+  return res;
+}
+
 
 /// CasADi::GenericType
 template<> char meta< CasADi::GenericType >::expected_message[] = "Expecting any type (None might be an exception)";
@@ -262,24 +581,17 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     if (!ret) return false;
     s = CasADi::GenericType(temp);
   } else {
-    PyObject* pPyObjectModuleName = PyString_FromString("casadi");
-    if (!pPyObjectModuleName) { PyErr_Clear(); return false; }
-    PyObject* pObjectModule = PyImport_Import(pPyObjectModuleName);
-    if (!pObjectModule) { PyErr_Clear(); Py_DECREF(pPyObjectModuleName); return false; }
-    PyObject* pObjectDict = PyModule_GetDict(pObjectModule);
-    if (!pObjectDict) { PyErr_Clear(); Py_DECREF(pObjectModule); Py_DECREF(pPyObjectModuleName); return false; }
-    PyObject* pClass = PyDict_GetItemString(pObjectDict,  "GenericType");
-    if (!pClass) { PyErr_Clear(); Py_DECREF(pObjectModule); Py_DECREF(pPyObjectModuleName); return false; }
-    
+    PyObject* gt = getCasadiObject("GenericType");
+    if (!gt) return false;
+
     PyObject* args = PyTuple_New(1);
     Py_INCREF(p); // Needed because PyTuple_SetItem steals the reference
     PyTuple_SetItem(args,0,p);
     
-    PyObject* g = PyObject_CallObject(pClass,args);
+    PyObject* g = PyObject_CallObject(gt,args);
     
     Py_DECREF(args);
-    Py_DECREF(pObjectModule);
-    Py_DECREF(pPyObjectModuleName);
+    Py_DECREF(gt);
     
     if (g) {
       int result = meta< CasADi::GenericType >::as(g,s);
@@ -289,13 +601,13 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     if (!g) { PyErr_Clear();  return false;}
 
     
-    }
-    return true;
+  }
+  return true;
 }
 
 template <>
 bool meta< CasADi::GenericType >::couldbe(PyObject * p) {
-  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p) || meta< CasADi::FX >::couldbe(p) || meta< std::vector<std::string> >::couldbe(p) || PyType_Check(p) || meta< CasADi::GenericType::Dictionary >::couldbe(p);
+  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p) || meta< CasADi::FX >::couldbe(p) || meta< std::vector<std::string> >::couldbe(p) || PyType_Check(p) || meta< CasADi::GenericType::Dictionary >::couldbe(p) || meta< CasADi::DerivativeGenerator >::couldbe(p) || meta< CasADi::Callback >::couldbe(p);
 
   
   }
@@ -477,7 +789,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
     if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
     
-    double* d=(double*) array->data;
+    double* d=(double*) array_data(array);
     std::vector<double> v(d,d+size);
     
     m = CasADi::Matrix<double>(v, nrows, ncols);
@@ -493,7 +805,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
     if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
     int size=array_size(array,0); // number on non-zeros
-    double* d=(double*) array->data;
+    double* d=(double*) array_data(array);
     std::vector<double> v(d,d+size);
 
     // Get the dimensions of the csr_matrix

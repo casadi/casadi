@@ -21,6 +21,7 @@
  */
 
 #include "mx_tools.hpp"
+#include "../sx/sx_tools.hpp"
 #include "../fx/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
@@ -42,11 +43,18 @@ namespace CasADi{
     casadi_assert(isMonotone(offset));
     
     // Trivial return if possible
-    if(offset.size()==1 || (offset.size()==2 && offset.back()==x.size1())){
+    if(offset.size()==1 && offset.back()==x.size1()){
+      return vector<MX>(0);
+    } else if(offset.size()==1 || (offset.size()==2 && offset.back()==x.size1())){
       return vector<MX>(1,x);
     } else {
       return x->getVertsplit(offset);
     }
+  }
+  
+  std::vector<MX> vertsplit(const MX& x, int incr){
+    casadi_assert(incr>=1);
+    return vertsplit(x,range(0,x.size1(),incr));
   }
 
   MX horzcat(const vector<MX>& comp){
@@ -54,6 +62,33 @@ namespace CasADi{
     for(int i=0; i<v.size(); ++i)
       v[i] = trans(comp[i]);
     return trans(vertcat(v));
+  }
+  
+  std::vector<MX> horzsplit(const MX& x, const std::vector<int>& offset){
+    std::vector<MX> ret = vertsplit(trans(x),offset);
+    MX (*transMX)(const MX& x) = trans; 
+    std::transform(ret.begin(),ret.end(),ret.begin(),transMX);
+    return ret;
+  }
+  
+  std::vector<MX> horzsplit(const MX& x, int incr){
+    casadi_assert(incr>=1);
+    return horzsplit(x,range(0,x.size2(),incr));
+  }
+  
+  std::vector< std::vector<MX > > blocksplit(const MX& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) {
+    std::vector<MX > rows = vertsplit(x,vert_offset);
+    std::vector< std::vector<MX > > ret;
+    for (int i=0;i<rows.size();++i) {
+      ret.push_back(horzsplit(rows[i],horz_offset));
+    }
+    return ret;
+  }
+  
+  std::vector< std::vector<MX > > blocksplit(const MX& x, int vert_incr, int horz_incr) {
+    casadi_assert(horz_incr>=1);
+    casadi_assert(vert_incr>=1);
+    return blocksplit(x,range(0,x.size1(),vert_incr),range(0,x.size2(),horz_incr));
   }
 
   MX vertcat(const MX& a, const MX& b){
@@ -79,6 +114,16 @@ namespace CasADi{
     MX (&f)(const MX&) = vecNZ;
     return vertcat(applymap(vecNZ,comp));
   }
+  
+  MX flattencat(const vector<MX>& comp) {
+        MX (&f)(const MX&) = flatten;
+    return vertcat(applymap(f,comp));
+  }
+
+  MX flattenNZcat(const vector<MX>& comp) {
+    MX (&f)(const MX&) = flattenNZ;
+    return vertcat(applymap(flattenNZ,comp));
+  }
 
   MX norm_2(const MX &x){
     return x->getNorm2();
@@ -96,8 +141,8 @@ namespace CasADi{
     return x->getNormInf();
   }
 
-  MX mul(const MX &x, const MX &y){
-    return x.mul(y);
+  MX mul(const MX &x, const MX &y, const CRSSparsity& sp_z){
+    return x.mul(y,sp_z);
   }
 
   MX mul(const std::vector< MX > &args){
@@ -207,6 +252,14 @@ namespace CasADi{
       return vec(x);
     } else {
       return trans(x)->getGetNonzeros(sp_dense(x.size()),range(x.size()));
+    }
+  }
+  
+  MX flattenNZ(const MX& x) {
+    if(x.dense()){
+      return flatten(x);
+    } else {
+      return x->getGetNonzeros(sp_dense(x.size()),range(x.size()));
     }
   }
 
@@ -319,6 +372,10 @@ namespace CasADi{
     return ret;
   }
 
+  MX full(const MX& x) {
+    return densify(x);
+  }
+
   void makeDense(MX& x){
     // Quick return if already dense
     if(x.dense()) return;
@@ -408,6 +465,13 @@ namespace CasADi{
     }
     
     return ret;
+  }
+  
+  MX blkdiag(const MX &A, const MX& B) {
+    std::vector<MX> ret;
+    ret.push_back(A);
+    ret.push_back(B);
+    return blkdiag(ret);
   }
 
   int countNodes(const MX& A){
@@ -607,6 +671,109 @@ namespace CasADi{
     F.init();
     return F.evalMX(vdef);
   }
+  
+  MX graph_substitute(const MX &ex, const std::vector<MX> &v, const std::vector<MX> &vdef) {
+    return graph_substitute(std::vector<MX>(1,ex),v,vdef).at(0);
+  }
+  
+  std::vector<MX> graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &expr, const std::vector<MX> &exprs) {
+    casadi_assert_message(expr.size()==exprs.size(),"Mismatch in the number of expression to substitute: " << expr.size() << " <-> " << exprs.size() << ".");
+  
+    // Sort the expression
+    MXFunction f(vector<MX>(),ex);
+    f.init();
+    
+    // Get references to the internal data structures
+    const vector<MXAlgEl>& algorithm = f.algorithm();
+    vector<MX> swork(f.getWorkSize());
+    
+    // A boolean vector indicated whoch nodes are tainted by substitutions
+    vector<bool> tainted(swork.size());
+    
+    // Temporary stringstream
+    stringstream ss;
+    
+    // Construct lookup table for expressions
+    std::map<const MXNode*,int> expr_lookup;
+    for (int i=0;i<expr.size();++i) {
+      expr_lookup[expr[i].operator->()] = i;
+    }
+    
+    // Construct found map
+    std::vector<bool> expr_found(expr.size());
+    
+    // Allocate output vector
+    vector<MX> f_out(f.getNumOutputs());
+
+    MXPtrV input_p, output_p;
+    MXPtrVV dummy_p;
+    
+    // expr_lookup iterator
+    std::map<const MXNode*,int>::const_iterator it_lookup;
+
+    for(vector<MXAlgEl>::const_iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
+
+      if (!(it->data).isNull()) {
+        // Check if it->data points to a supplied expr
+        it_lookup = expr_lookup.find((it->data).operator->());
+        
+        if (it->res.front()>=0 && it_lookup!=expr_lookup.end()) {
+          // Fill in that expression in-place
+          swork[it->res.front()] = exprs[it_lookup->second];
+          tainted[it->res.front()] = true;
+          expr_found[it_lookup->second] = true;
+          continue;
+        }
+      }
+      
+      switch(it->op){
+      case OP_INPUT:
+        tainted[it->res.front()] = false;
+      case OP_PARAMETER:
+        swork[it->res.front()] = it->data;
+        tainted[it->res.front()] = false;
+        break;
+      case OP_OUTPUT:
+        f_out[it->res.front()] = swork[it->arg.front()];
+        break;
+      default:
+        {
+          bool node_tainted = false;
+          
+          input_p.resize(it->arg.size());
+          for(int i=0; i<input_p.size(); ++i){
+            int el = it->arg[i];
+            if (el>=0) node_tainted =  node_tainted || tainted[el];
+            input_p[i] = el<0 ? 0 : &swork[el];
+          }
+          
+          output_p.resize(it->res.size());
+          for(int i=0; i<output_p.size(); ++i){
+            int el = it->res[i];
+            output_p[i] = el<0 ? 0 : &swork[el];
+            if (el>=0) tainted[el] = node_tainted;
+          }
+          
+          if (it->res.size()==1 && it->res[0]>=0 && !node_tainted) {
+            int el = it->res[0];
+            swork[el] = it->data;
+          } else {
+            const_cast<MX&>(it->data)->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
+          }
+        }
+      }
+    }
+    
+    bool all_found=true;
+    for (int i=0;i<expr.size();++i) {
+      all_found = all_found && expr_found[i];
+    }
+    
+    //casadi_assert_message(all_found,"MXFunctionInternal::extractNodes(const std::vector<MX>& expr): failed to locate all input expr." << std::endl << "Here's a boolean list showing which ones where found: " << expr_found);
+    
+    return f_out;
+    
+  }
 
   void extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef, const std::string& v_prefix, const std::string& v_suffix){
   
@@ -766,6 +933,12 @@ namespace CasADi{
     return temp.grad();
   }
 
+  MX tangent(const MX& ex, const MX &arg) {
+    MXFunction temp(arg,ex); // make a runtime
+    temp.init();
+    return temp.tang();
+  }
+
   MX blockcat(const std::vector< std::vector<MX > > &v) {
     std::vector< MX > ret;
     for(int i=0; i<v.size(); ++i)
@@ -799,6 +972,79 @@ namespace CasADi{
     return f.getFree();
   }
 
+  std::vector<MX> getSymbols(const std::vector<MX>& e) {
+    MXFunction f(std::vector<MX>(),e);
+    f.init();
+    return f.getFree();
+  }
+  
+  MX matrix_expand(const MX& e, const std::vector<MX> &boundary) {
+    std::vector<MX> e_v(1,e);
+    return matrix_expand(e_v,boundary).at(0);
+  }
+  
+  std::vector<MX> matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary) {
+    
+    // Create symbols for boundary nodes
+    std::vector<MX> syms(boundary.size());
+    
+    for (int i=0;i<syms.size();++i) {
+      syms[i] = msym("x",boundary[i].sparsity());
+    }
+    
+    // Substitute symbols for boundary nodes
+    std::vector<MX> ret = graph_substitute(e,boundary,syms);
+    
+    // Obtain list of dependants
+    std::vector<MX> v = getSymbols(ret);
+    
+    // Construct an MXFunction with it
+    MXFunction f(v,ret);
+    f.init();
+    
+    // Expand to SXFunction
+    SXFunction s = f.expand();
+    s.init();
 
+    return s.eval(graph_substitute(v,syms,boundary));
+  }
+  
+  MX kron(const MX& a, const MX& b) {
+    const CRSSparsity &a_sp = a.sparsity();
+    MX filler(b.size1(),b.size2());
+    std::vector< std::vector< MX > > blocks(a.size1(),std::vector< MX >(a.size2(),filler));
+    for (int i=0;i<a.size1();++i) {
+      for (int j=0;j<a.size2();++j) {
+        int k = a_sp.getNZ(i,j);
+        if (k!=-1) {
+          blocks[i][j] = a[k]*b;
+        }
+      }
+    }
+    return blockcat(blocks);
+  }
+
+  MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict) {
+    LinearSolver mysolver = lsolver(A.sparsity(),1);
+    mysolver.setOption(dict);
+    mysolver.init();
+    return trans(mysolver.solve(A,trans(b),true));
+  }
+  
+  MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict) {
+    if (A.size2()>=A.size1()) {
+      return trans(solve(mul(A,trans(A)),A,lsolver,dict));
+    } else {
+      return solve(mul(trans(A),A),trans(A),lsolver,dict);
+    }
+  }
+  
+  MX nullspace(const MX& A) {
+    SXMatrix n = ssym("A",A.sparsity());
+    SXFunction f(n,nullspace(n));
+    f.init();
+    return f.call(A)[0];
+  }
+  
 } // namespace CasADi
 

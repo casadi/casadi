@@ -89,11 +89,6 @@ namespace CasADi{
    * \date 2010
    */
   class CRSSparsity : public SharedObject{
-  private:
-    /// Multimap holding all cached sparsity patterns (put first to ensure that it is initialized before being used)
-    typedef CACHING_MULTIMAP<std::size_t,WeakRef> CachingMap;
-    static CachingMap cached_;
-
   public:
   
     /// Default constructor
@@ -174,8 +169,11 @@ namespace CasADi{
         \see size()  */
     int numel() const;
     
-    /// Check if the sparsity is empty. 
+    /// Check if the sparsity is empty, i.e. one of its dimensions is 0 
     bool empty() const;
+    
+    /// Check if the sparsity is null, i.e. dimension is 0-by-0
+    bool null() const;
     
     /** \brief Get the number of (structural) non-zeros
         \see numel() */
@@ -316,6 +314,9 @@ namespace CasADi{
     CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
     CRSSparsity patternProduct(const CRSSparsity& y_trans) const;
     /// @}
+
+    /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
+    CRSSparsity patternInverse() const;
     
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros 
@@ -359,6 +360,9 @@ namespace CasADi{
     /// Is diagonal?
     bool diagonal() const;
     
+    /// Is square?
+    bool square() const;
+
     /// Does the columns appear sequentially on each row (if strictly==true, then do not allow multiple entries)
     bool columnsSequential(bool strictly=true) const;
 
@@ -366,14 +370,20 @@ namespace CasADi{
     void removeDuplicates(std::vector<int>& mapping);
     
 #ifndef SWIG
+    typedef CACHING_MULTIMAP<std::size_t,WeakRef> CachingMap;
+
+    /// Cached sparsity patterns
+    static CachingMap& getCache();
+
     /// (Dense) scalar
-    static CRSSparsity scalarSparsity;
+    static const CRSSparsity& getScalar();
 
     /// (Sparse) scalar
-    static CRSSparsity scalarSparsitySparse;
+    static const CRSSparsity& getScalarSparse();
     
     /// Empty zero-by-zero
-    static CRSSparsity emptySparsity;
+    static const CRSSparsity& getEmpty();
+
 #endif //SWIG
     
     /** \brief Calculate the elimination tree
@@ -404,7 +414,7 @@ namespace CasADi{
       
     */
 #ifndef SWIG
-    int stronglyConnectedComponents(std::vector<int>& offset, std::vector<int>& index) const;
+    int stronglyConnectedComponents(std::vector<int>& index, std::vector<int>& offset) const;
 #else // SWIG
     int stronglyConnectedComponents(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
 #endif // SWIG
@@ -440,6 +450,12 @@ namespace CasADi{
         Ordering options: None (0), largest first (1)
     */
     CRSSparsity starColoring(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
+
+    /** \brief Perform a star coloring of a symmetric matrix:
+        A new greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN) 
+        Ordering options: None (0), largest first (1)
+    */
+    CRSSparsity starColoring2(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
     
     /** \brief Order the rows by decreasing degree */
     std::vector<int> largestFirstOrdering() const;
@@ -468,15 +484,15 @@ namespace CasADi{
 #ifndef SWIG
     /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
     template<typename T>
-    void set(T* data, const T* val_data, CRSSparsity val_sp) const;
+    void set(T* data, const T* val_data, const CRSSparsity& val_sp) const;
 
     /** \brief Add the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
     template<typename T>
-    void add(T* data, const T* val_data, CRSSparsity val_sp) const;
+    void add(T* data, const T* val_data, const CRSSparsity& val_sp) const;
 
     /** \brief Bitwise or of the nonzero entries of one sparsity pattern and the nonzero entries of another sparsity pattern */
     template<typename T>
-    void bor(T* data, const T* val_data, CRSSparsity val_sp) const;
+    void bor(T* data, const T* val_data, const CRSSparsity& val_sp) const;
 
 
   private:
@@ -489,7 +505,7 @@ namespace CasADi{
   // Template instantiations
 #ifndef SWIG
   template<typename T>
-  void CRSSparsity::set(T* data, const T* val_data, CRSSparsity val_sp) const{
+  void CRSSparsity::set(T* data, const T* val_data, const CRSSparsity& val_sp) const{
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();
@@ -563,7 +579,7 @@ namespace CasADi{
   }
 
   template<typename T>
-  void CRSSparsity::add(T* data, const T* val_data, CRSSparsity val_sp) const{
+  void CRSSparsity::add(T* data, const T* val_data, const CRSSparsity& val_sp) const{
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();
@@ -641,7 +657,7 @@ namespace CasADi{
   }
 
   template<typename T>
-  void CRSSparsity::bor(T* data, const T* val_data, CRSSparsity val_sp) const{
+  void CRSSparsity::bor(T* data, const T* val_data, const CRSSparsity& val_sp) const{
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();

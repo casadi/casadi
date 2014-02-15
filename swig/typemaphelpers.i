@@ -33,8 +33,9 @@
 #include "symbolic/mx/mx.hpp"
 %}
 
-
+#ifndef SWIGXML
 %include "typemaps.i"
+#endif
 
 /// Generic typemap structure
 %inline %{
@@ -119,7 +120,7 @@ class meta {
     
     #ifdef SWIGPYTHON
     static bool couldbe_sequence(PyObject * p) {
-      if(PySequence_Check(p) && !meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SXMatrix__") && !PyObject_HasAttrString(p,"__MX__")) {
+      if(PySequence_Check(p) && !PyString_Check(p) && !meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SXMatrix__") && !PyObject_HasAttrString(p,"__MX__")) {
         PyObject *it = PyObject_GetIter(p);
         if (!it) return false;
         PyObject *pe;
@@ -226,6 +227,46 @@ class meta {
 %typemap(freearg) const Type  & {}
 
 %enddef
+
+
+
+#ifdef SWIGPYTHON
+
+%define %my_creator_typemap(Precedence,Type...)
+
+%typemap(in) Type {
+  int res = SWIG_ConvertFunctionPtr($input, (void**)(&$1), $descriptor);
+  if (!SWIG_IsOK(res)) {
+    if (PyType_Check($input) && PyObject_HasAttrString($input,"creator")) {
+      PyObject *c = PyObject_GetAttrString($input,"creator");
+      res = SWIG_ConvertFunctionPtr(c, (void**)(&$1), $descriptor);
+      Py_DECREF(c);
+    }
+    if (!SWIG_IsOK(res)) {
+      %argument_fail(res,"$type",$symname, $argnum); 
+    }
+  }
+}
+
+%typemap(typecheck,precedence=Precedence) Type { 
+  void *ptr = 0;
+  int res = SWIG_ConvertFunctionPtr($input, &ptr, $descriptor);
+  $1 = SWIG_CheckState(res);
+  if (!$1 && PyType_Check($input) && PyObject_HasAttrString($input,"creator")) {
+    PyObject *c = PyObject_GetAttrString($input,"creator");
+    res = SWIG_ConvertFunctionPtr(c, &ptr, $descriptor);
+    $1 = SWIG_CheckState(res);
+    Py_DECREF(c);
+  };
+}
+%enddef
+
+#else // SWIGPYTHON
+%define %my_creator_typemap(Precedence,Type...)
+%enddef
+#endif // SWIGPYTHON
+
+
 
 // Create an output typemap for a const ref such that a copy is made
 %define %outputConstRefCopy(Type)

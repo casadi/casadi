@@ -3,7 +3,7 @@ REVISION=$(shell git rev-parse HEAD)
 default: html pdf
 
 html: pdf
-	latex2html -local_icons -info "" -bottom_navigation -no_math -show_section_numbers -scalable_fonts -split 3 casadi-users_guide.tex
+	latex2html -local_icons -info "" -init_file customlatex2html.perl -bottom_navigation -no_math -show_section_numbers -scalable_fonts -split 3 casadi-users_guide.tex
 	
 snippets:
 	rm -f pytex_*

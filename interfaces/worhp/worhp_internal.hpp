@@ -59,7 +59,7 @@ namespace CasADi{
     virtual void init();
     
     // Solve the NLP
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
 
     
     virtual void setQPOptions();
@@ -99,10 +99,23 @@ namespace CasADi{
     double t_callback_prepare_; // time spent in callback preparation
     double t_mainloop_; // time spent in the main loop of the solver
   
+    // Accummulated counts since last reset:
+    int n_eval_f_; // number of calls to eval_f
+    int n_eval_grad_f_; // number of calls to eval_grad_f
+    int n_eval_g_; // number of calls to eval_g
+    int n_eval_jac_g_; // number of calls to eval_jac_g
+    int n_eval_h_; // number of calls to eval_h
+    
     std::string formatStatus(int status) const;
   
     /// Pass the supplied options to Worhp
     void passOptions();
+
+    // Calculate the status message map
+    static std::map<int,std::string> calc_flagmap();
+
+    // Error status map
+    static std::map<int,std::string> flagmap;
   
   };
 

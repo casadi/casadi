@@ -118,30 +118,31 @@ figure(2)
 title('Deviation from reference simulation, with perturbed initial condition')
 plot(tf,sim.getOutput()-out,linewidth=3)
 
-jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
-jacsim.init()
-jacsim.setInput(x0,"x0")
-jacsim.setInput(u_,"u")
+# Not supported in current revision, cf. #929
+# jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
+# jacsim.init()
+# jacsim.setInput(x0,"x0")
+# jacsim.setInput(u_,"u")
 
-jacsim.evaluate()
+# jacsim.evaluate()
 
-dev_est = []
-for i in range(len(tf)):
-  dev_est.append(mul(jacsim.getOutput()[i*ns:(i+1)*ns,:],x0_pert))
+# dev_est = []
+# for i in range(len(tf)):
+#   dev_est.append(mul(jacsim.getOutput()[i*ns:(i+1)*ns,:],x0_pert))
 
-dev_est = horzcat(dev_est).T
-plot(tf,dev_est,'+k')
-legend(('s1 dev', 's2 dev','s3 dev','s1 dev (est.)', 's2 dev (est.)','s3 dev (est.)'),loc='upper left')
+# dev_est = horzcat(dev_est).T
+# plot(tf,dev_est,'+k')
+# legend(('s1 dev', 's2 dev','s3 dev','s1 dev (est.)', 's2 dev (est.)','s3 dev (est.)'),loc='upper left')
 
 
-M = jacsim.getOutput()[-ns:,:]
-# In the case of zero input, we could also use the matrix exponential to obtain sensitivity
-Mref = scipy.linalg.expm(A*te)
+# M = jacsim.getOutput()[-ns:,:]
+# # In the case of zero input, we could also use the matrix exponential to obtain sensitivity
+# Mref = scipy.linalg.expm(A*te)
 
-e = fabs(M - Mref)
-e = max(e)/max(fabs(M))
-print e
-assert(e<1e-6)
+# e = fabs(M - Mref)
+# e = max(e)/max(fabs(M))
+# print e
+# assert(e<1e-6)
 
 
 # Simulation of the open-loop system
@@ -160,21 +161,21 @@ title('Deviation from reference simulation, with perturbed controls')
 plot(tf,sim.getOutput()-out,linewidth=3)
 
 
+# Not supported in current revision, cf. #929
+# jacsim = sim.jacobian(CONTROLSIMULATOR_U,0)
+# jacsim.init()
+# jacsim.setInput(x0,"x0")
+# jacsim.setInput(u_,"u")
 
-jacsim = sim.jacobian(CONTROLSIMULATOR_U,0)
-jacsim.init()
-jacsim.setInput(x0,"x0")
-jacsim.setInput(u_,"u")
+# jacsim.evaluate()
 
-jacsim.evaluate()
+# dev_est = []
+# for i in range(len(tf)):
+#   dev_est.append(mul(jacsim.getOutput()[i*ns:(i+1)*ns,:],flatten(u_perturb)))
 
-dev_est = []
-for i in range(len(tf)):
-  dev_est.append(mul(jacsim.getOutput()[i*ns:(i+1)*ns,:],flatten(u_perturb)))
-
-dev_est = horzcat(dev_est).T
-plot(tf,dev_est,'+k')
-legend(('s1 dev', 's2 dev','s3 dev','s1 dev (est.)', 's2 dev (est.)','s3 dev (est.)'),loc='upper left')
+# dev_est = horzcat(dev_est).T
+# plot(tf,dev_est,'+k')
+# legend(('s1 dev', 's2 dev','s3 dev','s1 dev (est.)', 's2 dev (est.)','s3 dev (est.)'),loc='upper left')
 
 
 # Find feedforward controls
@@ -308,7 +309,7 @@ integrator.init()
 # Start from P = identity matrix
 u = DMatrix.eye(ns)
 makeDense(u)
-integrator.reset(0,0)
+integrator.reset()
 integrator.setInput(flatten(u),"x0")
 integrator.integrate(0)
 
@@ -347,7 +348,7 @@ print "feedback matrix= ", K
 print "Open-loop eigenvalues: ", D
 
 # Check what happens if we integrate the Riccati equation forward in time
-dae = SXFunction(daeIn(x = flatten(P)),daeOut(ode=-ric))
+dae = SXFunction(daeIn(x = flatten(P)),daeOut(ode=flatten(-ric)))
 dae.init()
 
 integrator = CVodesIntegrator(dae)
@@ -356,7 +357,7 @@ integrator.setOption("stop_at_end",False)
 integrator.init()
 integrator.setInput(flatten(P_),"x0")
 integrator.input("x0")[0] += 1e-9 # Put a tiny perturbation
-integrator.reset(0,0)
+integrator.reset()
 integrator.integrate(0)
 
 for i in range(1,10):
@@ -481,8 +482,9 @@ sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
 sim.setOption("nf",20)
 sim.init()
 
-jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
-jacsim.init()
+# Not supported in current revision, cf. #929
+# jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
+# jacsim.init()
 
 figure(7)
   
@@ -507,17 +509,18 @@ for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)
     plot(tf,sim.getOutput(2)[:,i],c+'--')
   title('controls (%s)' % caption)
 
-  # Calculate monodromy matrix
-  jacsim.setInput(states_,"x0")
-  jacsim.setInput(param_,"p")
-  jacsim.evaluate()
-  M = jacsim.getOutput()[-states.size:,:][list(states.i["y"]),list(states.i["y"])]
+  # Not supported in current revision, cf. #929
+  # # Calculate monodromy matrix
+  # jacsim.setInput(states_,"x0")
+  # jacsim.setInput(param_,"p")
+  # jacsim.evaluate()
+  # M = jacsim.getOutput()[-states.size:,:][list(states.i["y"]),list(states.i["y"])]
   
-  # Inspect the eigenvalues of M
-  [D,V] = linalg.eig(M)
-  print "Spectral radius of monodromy (%s): " % caption
+  # # Inspect the eigenvalues of M
+  # [D,V] = linalg.eig(M)
+  # print "Spectral radius of monodromy (%s): " % caption
   
-  print max(abs(D))
+  # print max(abs(D))
 
 print "Spectral radius of exp((A-BK)*te): "
 
@@ -577,22 +580,23 @@ for i,c in enumerate(['b','g']):
   plot(tf,sim.getOutput(1)[:,i],c,linewidth=2)
   plot(tf,sim.getOutput(2)[:,i],c+'--')
 title('controls (%s)' % caption)
-  
-jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
-jacsim.init()
 
-# Calculate monodromy matrix
-jacsim.setInput(x0,"x0")
-jacsim.setInput(param_,"p")
-jacsim.setInput(u_,"u")
-jacsim.evaluate()
-M = jacsim.getOutput()[-ns:,:]
+# Not supported in current revision, cf. #929  
+# jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
+# jacsim.init()
 
-# Inspect the eigenvalues of M
-[D,V] = linalg.eig(M)
-print "Spectral radius of monodromy, discrete reference, continous control"
+# # Calculate monodromy matrix
+# jacsim.setInput(x0,"x0")
+# jacsim.setInput(param_,"p")
+# jacsim.setInput(u_,"u")
+# jacsim.evaluate()
+# M = jacsim.getOutput()[-ns:,:]
 
-print max(abs(D))
+# # Inspect the eigenvalues of M
+# [D,V] = linalg.eig(M)
+# print "Spectral radius of monodromy, discrete reference, continous control"
+
+# print max(abs(D))
   
 # Simulation of the controller:
 # discrete reference, discrete control action
@@ -633,20 +637,21 @@ for i,c in enumerate(['b','g']):
   plot(tf,sim.getOutput(2)[:,i],c+'--')
 title('controls (%s)' % caption)
 
-jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
-jacsim.init()
+# Not supported in current revision, cf. #929  
+# jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
+# jacsim.init()
 
-# Calculate monodromy matrix
-jacsim.setInput(x0,"x0")
-jacsim.setInput(param_,"p")
-jacsim.setInput(u_,"u")
-jacsim.evaluate()
-M = jacsim.getOutput()[-ns:,:]
+# # Calculate monodromy matrix
+# jacsim.setInput(x0,"x0")
+# jacsim.setInput(param_,"p")
+# jacsim.setInput(u_,"u")
+# jacsim.evaluate()
+# M = jacsim.getOutput()[-ns:,:]
 
-# Inspect the eigenvalues of M
-[D,V] = linalg.eig(M)
-print "Spectral radius of monodromy, discrete reference, discrete control"
+# # Inspect the eigenvalues of M
+# [D,V] = linalg.eig(M)
+# print "Spectral radius of monodromy, discrete reference, discrete control"
 
-print max(abs(D))
+# print max(abs(D))
 
 show()

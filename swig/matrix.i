@@ -58,7 +58,8 @@ def prod(self,*args):
 def dot(self,*args):
     raise Exception("'dot' is not supported anymore in CasADi. Use 'mul' to do matrix multiplication.")
 %}
-%define %python_matrix_convertors
+
+%define %matrix_convertors
 %pythoncode %{
         
     def toMatrix(self):
@@ -70,7 +71,7 @@ def dot(self,*args):
         
 %}
 %enddef 
-%define %python_matrix_helpers(Type)
+%define %matrix_helpers(Type)
 %pythoncode %{
     @property
     def shape(self):
@@ -144,11 +145,8 @@ def dot(self,*args):
 %enddef
 #endif // SWIGPYTHON
 
-
 #ifdef SWIGOCTAVE
-%define %python_matrix_convertors
-%enddef 
-%define %python_matrix_helpers(Type)
+%define %matrix_helpers(Type)
 
   Type __hermitian__() const { return trans((*$self)); }
   
@@ -159,9 +157,18 @@ def dot(self,*args):
     return ret;
   }
   
-%enddef 
-#endif // SWIGOCTAVE
+%enddef
+#endif //SWIGOCTAVE
 
+#ifdef SWIGXML
+%define %matrix_helpers(Type)
+%enddef
+#endif
+
+#ifndef SWIGPYTHON
+%define %matrix_convertors
+%enddef
+#endif
 
 #ifdef SWIGOCTAVE
 %rename(__paren__) indexed_one_based;
@@ -211,22 +218,21 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 } // namespace CasADi
 #endif // SWIGOCTAVE
 
-
 namespace CasADi{
-%extend Matrix<double> {
+  %extend Matrix<double> {
 
-void assign(const CasADi::Matrix<double>&rhs) { (*$self)=rhs; }
-%python_matrix_convertors
-%python_matrix_helpers(CasADi::Matrix<double>)
+    void assign(const CasADi::Matrix<double>&rhs) { (*$self)=rhs; }
+    %matrix_convertors
+    %matrix_helpers(CasADi::Matrix<double>)
 
-}
-%extend Matrix<int> {
+  }
+  %extend Matrix<int> {
 
-void assign(const CasADi::Matrix<int>&rhs) { (*$self)=rhs; }
-%python_matrix_convertors
-%python_matrix_helpers(CasADi::Matrix<int>)
+    void assign(const CasADi::Matrix<int>&rhs) { (*$self)=rhs; }
+    %matrix_convertors
+    %matrix_helpers(CasADi::Matrix<int>)
 
-}
+  }
 }
 
 #ifdef SWIGPYTHON
@@ -361,6 +367,54 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
       return int(self.__int__())
   %}
 } // extend Matrix<int>
+
+
+// Logic for pickling
+%extend CRSSparsity {
+
+  %pythoncode %{
+    def __setstate__(self, state):
+        if state:
+          self.__init__(state["nrow"],state["ncol"],state["col"],state["rowind"])
+        else:
+          self.__init__()
+
+    def __getstate__(self):
+        if self.isNull(): return {}
+        return {"nrow": self.size1(), "ncol": self.size2(), "col": numpy.array(self.col(),dtype=int), "rowind": numpy.array(self.rowind(),dtype=int)}
+  %}
+  
+}
+
+%extend Matrix<int> {
+
+  %pythoncode %{
+    def __setstate__(self, state):
+        sp = CRSSparsity.__new__(CRSSparsity)
+        sp.__setstate__(state["sparsity"])
+        self.__init__(sp,state["data"])
+
+    def __getstate__(self):
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data(),dtype=int)}
+  %}
+  
+}
+
+%extend Matrix<double> {
+
+  %pythoncode %{
+    def __setstate__(self, state):
+        sp = CRSSparsity.__new__(CRSSparsity)
+        sp.__setstate__(state["sparsity"])
+        self.__init__(sp,state["data"])
+
+    def __getstate__(self):
+        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.data(),dtype=float)}
+  %}
+  
+}
+
+
 } // namespace CasADi
 #endif // SWIGPYTHON
 
@@ -513,9 +567,9 @@ Accepts: 2D numpy.ndarray, numpy.matrix (contiguous, native byte order, datatype
 			  SWIG_exception_fail(SWIG_TypeError, "Array should be native & of datatype double");
 			  
 	    if (!(array_is_contiguous(p))) {
-	      if (PyArray_CHKFLAGS(p,NPY_ALIGNED)) {
-	        $3 = PyArray_STRIDE(p,0)/sizeof(double);
-	        $4 = PyArray_STRIDE(p,1)/sizeof(double);
+	      if (PyArray_CHKFLAGS((PyArrayObject *) p,NPY_ALIGNED)) {
+	        $3 = PyArray_STRIDE((PyArrayObject *) p,0)/sizeof(double);
+	        $4 = PyArray_STRIDE((PyArrayObject *) p,1)/sizeof(double);
 	      } else {
 			   SWIG_exception_fail(SWIG_TypeError, "Array should be contiguous or aligned");
 	      }

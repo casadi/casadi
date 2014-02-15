@@ -145,6 +145,7 @@ namespace CasADi{
     /** \brief Check wether a binary SX is commutative*/
     bool isCommutative() const;
     bool isZero() const;
+    bool isAlmostZero(double tol) const;
     bool isOne() const;
     bool isMinusOne() const;
     bool isNan() const;
@@ -235,6 +236,7 @@ namespace CasADi{
     SX log10() const;
     SX printme(const SX &y) const;
     SX sign() const;
+    SX __copysign__(const SX &y) const;
     SX constpow(const SX& y) const;
     SX logic_not() const;
     SX logic_and(const SX& y) const;
@@ -244,6 +246,7 @@ namespace CasADi{
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;
     Matrix<SX> constpow(const Matrix<SX>& n) const;
+    Matrix<SX> __copysign__(const Matrix<SX>& n) const;
     Matrix<SX> arctan2(const Matrix<SX>& b) const;
         
     // Get the temporary variable
@@ -315,6 +318,7 @@ namespace CasADi{
   class casadi_limits<SX>{
   public:
     static bool isZero(const SX& val);
+    static bool isAlmostZero(const SX& val, double tol);
     static bool isOne(const SX& val);
     static bool isMinusOne(const SX& val);
     static bool isConstant(const SX& val);

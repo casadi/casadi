@@ -58,10 +58,10 @@ namespace CasADi{
     virtual ConstantMX* clone() const = 0;
 
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
@@ -106,15 +106,15 @@ namespace CasADi{
     }
     
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){ 
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){ 
       output[0]->set(x_);
-      ConstantMX::evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+      ConstantMX::evaluateD(input,output,itmp,rtmp);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
       output[0]->set(SXMatrix(x_));
-      ConstantMX::evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+      ConstantMX::evaluateSX(input,output,itmp,rtmp);
     }
 
     /** \brief Generate code for the operation */
@@ -170,10 +170,10 @@ namespace CasADi{
     virtual void printPart(std::ostream &stream, int part) const;
     
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens);
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
@@ -199,6 +199,9 @@ namespace CasADi{
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
+    
+    /// Assign the nonzeros of a matrix to another matrix
+    virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
 
     /// Transpose
     virtual MX getTranspose() const;
@@ -208,10 +211,18 @@ namespace CasADi{
 
     /// Get a binary operation operation
     virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
+    
+    /// Reshape
+    virtual MX getReshape(const CRSSparsity& sp) const;
 
     /** \brief The actual numerical value */
     Value v_;
   };
+  
+  template<typename Value>
+  MX Constant<Value>::getReshape(const CRSSparsity& sp) const{
+    return MX::create(new Constant<Value>(sp,v_)); 
+  }
 
   template<typename Value>
   MX Constant<Value>::getTranspose() const{
@@ -223,17 +234,55 @@ namespace CasADi{
     // Constant folding
     double ret;
     casadi_math<double>::fun(op,v_.value,0.0,ret);
-    return ret;
+    if (operation_checker<F0XChecker>(op) || sparsity().dense()) {
+      return MX(sparsity(),ret);
+    } else {
+      if (v_.value==0) {
+        if (isZero() && operation_checker<F0XChecker>(op)) {
+          return MX(sparsity(),ret);
+        } else {
+          return MX(size1(),size2(),ret);
+        }
+      }
+      double ret2;
+      casadi_math<double>::fun(op,0,0.0,ret2);
+      return DMatrix(sparsity(),ret)+DMatrix(sparsity().patternInverse(),ret2);
+    }
   }
 
   template<typename Value>
   MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
+    casadi_assert(sparsity()==y.sparsity() || ScX || ScY);
+    
+    if (ScX && !operation_checker<FX0Checker>(op)) {
+      double ret;
+      casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,0,ret);
+      
+      if (ret!=0) {
+        CRSSparsity f = sp_dense(y.size1(),y.size2());
+        MX yy = y.setSparse(f);
+        return MX(f,shared_from_this<MX>())->getBinary(op,yy,false,false);
+      }
+    } else if (ScY && !operation_checker<F0XChecker>(op)) {
+      bool grow = true;
+      if (y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
+        double ret;
+        casadi_math<double>::fun(op, 0,y.size()>0 ? y->getValue() : 0,ret);
+        grow = ret!=0;
+      }
+      if (grow) {
+        CRSSparsity f = sp_dense(size1(),size2());
+        MX xx = shared_from_this<MX>().setSparse(f);
+        return xx->getBinary(op,MX(f,y),false,false);
+      }
+    }
+    
     switch(op){
     case OP_ADD:
-      if(v_.value==0) return y;
+      if(v_.value==0) return ScY && !y->isZero() ? MX(size1(),size2(),y) : y;
       break;
     case OP_SUB:
-      if(v_.value==0) return -y;
+      if(v_.value==0) return ScY && !y->isZero() ? MX(size1(),size2(),-y) : -y;
       break;
     case OP_MUL:
       if(v_.value==1) return y;
@@ -254,9 +303,10 @@ namespace CasADi{
 
     // Constant folding
     if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0){ // NOTE: ugly, should use a function instead of a cast
-      double y_value = y->getValue();
+      double y_value = y.size()>0 ? y->getValue() : 0;
       double ret;
-      casadi_math<double>::fun(op,v_.value,y_value,ret);
+      casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,y_value,ret);
+      
       return MX(y.sparsity(),ret);
     }
 
@@ -265,15 +315,15 @@ namespace CasADi{
   }
 
   template<typename Value>
-  void Constant<Value>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+  void Constant<Value>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
     output[0]->set(double(v_.value));
-    ConstantMX::evaluateD(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+    ConstantMX::evaluateD(input,output,itmp,rtmp);
   }
 
   template<typename Value>
-  void Constant<Value>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  void Constant<Value>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
     output[0]->set(SX(v_.value));
-    ConstantMX::evaluateSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+    ConstantMX::evaluateSX(input,output,itmp,rtmp);
   }
 
   template<typename Value>
@@ -300,11 +350,25 @@ namespace CasADi{
     }
     return MX::create(new Constant<Value>(sp,v_));
   }  
+  
+  template<typename Value>
+  MX Constant<Value>::getSetNonzeros(const MX& y, const std::vector<int>& nz) const {
+    if (y.isConstant() && y->isZero() && v_.value==0) {
+      return y;
+    }
+    
+    // Fall-back
+    return MXNode::getSetNonzeros(y,nz);
+  }
 
   template<typename Value>
   MX Constant<Value>::getSetSparse(const CRSSparsity& sp) const{
     if(isZero()){
       return MX::create(new Constant<Value>(sp,v_));
+    } else if (sp.dense()) {
+      DMatrix v = getMatrixValue();
+      makeDense(v);
+      return v;
     } else {
       return MXNode::getSetSparse(sp);
     }
@@ -312,10 +376,10 @@ namespace CasADi{
 
   template<typename Value>
   void Constant<Value>::printPart(std::ostream &stream, int part) const{
-    stream << "Const<" << v_.value << ">(";
     if(sparsity().scalar(true)){
-      stream << "scalar";
+      stream << v_.value;
     } else {
+      stream << "Const<" << v_.value << ">(";
       stream << size1() << "x" << size2() << ": ";
       if(sparsity().dense()){
         stream << "dense";
@@ -324,10 +388,10 @@ namespace CasADi{
       } else if(sparsity().diagonal()){
         stream << "diagonal";
       } else {
-        stream << double(size())/sparsity().numel() << " %";
+        stream << double(size())/sparsity().numel()*100 << " %";
       }        
+      stream << ")";
     }
-    stream << ")";
   }
 
 } // namespace CasADi

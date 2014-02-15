@@ -4,6 +4,7 @@ PATHS "C:/Octave/*/bin"
 )
 
 FILE(GLOB OCTAVE_INCLUDE_PATHS 
+  "/usr/local/include/octave-*/"
   "/usr/include/octave-*/"
   "/opt/local/include/octave-*/"
 )

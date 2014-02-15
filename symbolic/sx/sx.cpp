@@ -156,6 +156,10 @@ namespace CasADi{
   SX SX::sign() const{
     return UnarySX::create(OP_SIGN, *this);
   }
+  
+  SX SX::__copysign__(const SX &y) const{
+    return BinarySX::create(OP_COPYSIGN, *this,y);
+  }
 
   SX SX::erfinv() const{
     return UnarySX::create(OP_ERFINV,*this);
@@ -324,6 +328,9 @@ namespace CasADi{
   Matrix<SX> SX::constpow(const Matrix<SX>& n) const {
     return Matrix<SX>(*this).__constpow__(n);
   }
+  Matrix<SX> SX::__copysign__(const Matrix<SX>& n) const {
+    return Matrix<SX>(*this).__copysign__(n);
+  }
 
   Matrix<SX> SX::arctan2(const Matrix<SX>& b) const { 
     return Matrix<SX>(*this).arctan2(b);
@@ -422,6 +429,10 @@ namespace CasADi{
   bool SX::isZero() const{
     return node->isZero();
   }
+  
+  bool SX::isAlmostZero(double tol) const{
+    return node->isAlmostZero(tol);
+  }
 
   bool SX::isOne() const{
     return node->isOne();
@@ -509,6 +520,10 @@ namespace CasADi{
 
   bool casadi_limits<SX>::isZero(const SX& val){ 
     return val.isZero();
+  }
+  
+  bool casadi_limits<SX>::isAlmostZero(const SX& val, double tol){ 
+    return val.isAlmostZero(tol);
   }
 
   bool casadi_limits<SX>::isOne(const SX& val){ 

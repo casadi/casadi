@@ -97,64 +97,48 @@ namespace CasADi{
     
     //@{
     /** \brief Access input/output scheme */
-    const CasADi::InputOutputScheme& inputScheme() const;
-    const CasADi::InputOutputScheme& outputScheme() const;
-    CasADi::InputOutputScheme& inputScheme();
-    CasADi::InputOutputScheme& outputScheme();
+    const CasADi::IOScheme& inputScheme() const;
+    const CasADi::IOScheme& outputScheme() const;
+    CasADi::IOScheme& inputScheme();
+    CasADi::IOScheme& outputScheme();
     //@}
 
     //@{
     /// Input/output structures of the function */
-    const std::vector<FunctionIO>& input_struct() const;
-    const std::vector<FunctionIO>& output_struct() const;
-    std::vector<FunctionIO>& input_struct();
-    std::vector<FunctionIO>& output_struct();
+    const IOSchemeVector<DMatrix>& input_struct() const;
+    const IOSchemeVector<DMatrix>& output_struct() const;
+    IOSchemeVector<DMatrix>& input_struct();
+    IOSchemeVector<DMatrix>& output_struct();
     //@}
   
-    /** \brief  Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs) */
-    int getNumScalarInputs() const;
+    /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
+    int getNumInputNonzeros() const;
 
-    /** \brief  Get total number of scalar outputs (i.e. the number of nonzeros in all of the matrix-valued outputs) */
-    int getNumScalarOutputs() const;
+    /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
+    int getNumOutputNonzeros() const;
+
+    /** \brief  Get total number of elements in all of the matrix-valued inputs */
+    int getNumInputElements() const;
+
+    /** \brief  Get total number of elements in all of the matrix-valued outputs */
+    int getNumOutputElements() const;
   
     /** \brief Set input scheme */
-    void setInputScheme(CasADi::InputOutputScheme scheme);
+    void setInputScheme(const CasADi::IOScheme &scheme);
 
     /** \brief Set output scheme */
-    void setOutputScheme(CasADi::InputOutputScheme scheme);
+    void setOutputScheme(const CasADi::IOScheme &scheme);
 
     /** \brief Get input scheme */
-    CasADi::InputOutputScheme getInputScheme() const;
+    CasADi::IOScheme getInputScheme() const;
 
     /** \brief Get output scheme */
-    CasADi::InputOutputScheme getOutputScheme() const;
+    CasADi::IOScheme getOutputScheme() const;
     
-    /** \brief  Update the number of sensitivity directions during or after initialization (normally invoked internally) */
-    void updateNumSens();
-  
-    /** \brief Request a number of forward/adjoint derivative directions 
-        This function tries to increase the number of directional derivatives allocated for the function
-        so that the the number at least amounts to "nfwd" and "nadj" for forward and adjoint mode derivatives
-        respectively. The allocated number is never decreased and never increased beyond the number set by 
-        the option "max_number_of_fwd_dir" and "max_number_of_adj_dir".
-      
-        If the number was changed during the call, updateNumSens() is automatically invoked.
-    */
-    void requestNumSens(int nfwd, int nadj);
-  
-    /** \brief Get the number of allocated forward directional derivatives */
-    int numAllocFwd() const;
-
-    /** \brief Get the number of allocated adjoint directional derivatives */
-    int numAllocAdj() const;
-
     /** \brief  Evaluate */
-    void evaluate(int nfdir=0, int nadir=0);
+    void evaluate();
   
-    /** \brief  Evaluate with directional derivative compression */
-    void evaluateCompressed(int nfdir=0, int nadir=0);
-  
-    /// the same as evaluate(0,0)
+    /// the same as evaluate()
     void solve();
     
     //@{
@@ -171,10 +155,14 @@ namespace CasADi{
      * 
      */
     FX jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    FX jacobian(const std::string& iname,  int oind=0, bool compact=false, bool symmetric=false) { return jacobian(inputSchemeEntry(iname),oind,compact,symmetric); }
-    FX jacobian(int iind, const std::string& oname, bool compact=false, bool symmetric=false) { return jacobian(iind,outputSchemeEntry(oname),compact,symmetric); }
-    FX jacobian(const std::string& iname, const std::string& oname, bool compact=false, bool symmetric=false) { return jacobian(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
+    FX jacobian(const std::string& iind,  int oind=0, bool compact=false, bool symmetric=false) { return jacobian(inputSchemeEntry(iind),oind,compact,symmetric); }
+    FX jacobian(int iind, const std::string& oind, bool compact=false, bool symmetric=false) { return jacobian(iind,outputSchemeEntry(oind),compact,symmetric); }
+    FX jacobian(const std::string& iind, const std::string& oind, bool compact=false, bool symmetric=false) { return jacobian(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric); }
     //@}
+
+    /** Set the Jacobian function of output oind with respect to input iind
+     NOTE: Does _not_ take ownership, only weak references to the Jacobians are kept internally */
+    void setJacobian(const FX& jac, int iind=0, int oind=0, bool compact=false);
     
     //@{
     /** \brief Generate a gradient function of output oind with respect to input iind
@@ -186,9 +174,24 @@ namespace CasADi{
      * 
      */
     FX gradient(int iind=0, int oind=0);
-    FX gradient(const std::string& iname, int oind=0) { return gradient(inputSchemeEntry(iname),oind); }
-    FX gradient(int iind, const std::string& oname) { return gradient(iind,outputSchemeEntry(oname)); }
-    FX gradient(const std::string& iname, const std::string& oname) { return gradient(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    FX gradient(const std::string& iind, int oind=0) { return gradient(inputSchemeEntry(iind),oind); }
+    FX gradient(int iind, const std::string& oind) { return gradient(iind,outputSchemeEntry(oind)); }
+    FX gradient(const std::string& iind, const std::string& oind) { return gradient(inputSchemeEntry(iind),outputSchemeEntry(oind)); }
+    //@}
+
+    //@{
+    /** \brief Generate a tangent function of output oind with respect to input iind
+     * \param iind The index of the input
+     * \param oind The index of the output
+     *
+     * The default behavior of this class is defined by the derived class.
+     * Note that the input must be scalar. In other cases, use the Jacobian instead.
+     * 
+     */
+    FX tangent(int iind=0, int oind=0);
+    FX tangent(const std::string& iind, int oind=0) { return tangent(inputSchemeEntry(iind),oind); }
+    FX tangent(int iind, const std::string& oind) { return tangent(iind,outputSchemeEntry(oind)); }
+    FX tangent(const std::string& iind, const std::string& oind) { return tangent(inputSchemeEntry(iind),outputSchemeEntry(oind)); }
     //@}
     
     //@{
@@ -201,14 +204,18 @@ namespace CasADi{
      * 
      */
     FX hessian(int iind=0, int oind=0);
-    FX hessian(const std::string& iname, int oind=0) { return hessian(inputSchemeEntry(iname),oind); }
-    FX hessian(int iind, const std::string& oname) { return hessian(iind,outputSchemeEntry(oname)); }
-    FX hessian(const std::string& iname, const std::string& oname) { return hessian(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    FX hessian(const std::string& iind, int oind=0) { return hessian(inputSchemeEntry(iind),oind); }
+    FX hessian(int iind, const std::string& oind) { return hessian(iind,outputSchemeEntry(oind)); }
+    FX hessian(const std::string& iind, const std::string& oind) { return hessian(inputSchemeEntry(iind),outputSchemeEntry(oind)); }
     //@}
 
-    /** \brief Generate a Jacobian function of all the inputs nonzeros (getNumScalarInputs()) with respect to all the output nonzeros (getNumScalarOutputs()).
+    /** \brief Generate a Jacobian function of all the inputs elements with respect to all the output elements).
      */
     FX fullJacobian();
+
+    /** Set the Jacobian of all the input nonzeros with respect to all output nonzeros
+     NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
+    void setFullJacobian(const FX& jac);
 
 #ifndef SWIG
     /** \brief  Create a function call (single input) */
@@ -338,20 +345,24 @@ namespace CasADi{
      */
     FX derivative(int nfwd, int nadj);
 
+    /** Set a function that calculates nfwd forward dedrivatives and nadj adjoint derivatives
+     NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
+    void setDerivative(const FX& fcn, int nfwd, int nadj);
+
     //@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
     CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    CRSSparsity& jacSparsity(const std::string &iname, int oind=0, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iname),oind,compact,symmetric); }
-    CRSSparsity& jacSparsity(int iind, const std::string &oname, bool compact=false, bool symmetric=false) { return jacSparsity(iind,outputSchemeEntry(oname),compact,symmetric); }
-    CRSSparsity& jacSparsity(const std::string &iname, const std::string &oname, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
+    CRSSparsity& jacSparsity(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),oind,compact,symmetric); }
+    CRSSparsity& jacSparsity(int iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(iind,outputSchemeEntry(oind),compact,symmetric); }
+    CRSSparsity& jacSparsity(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric); }
     //@}
     
     //@{
     /// Generate the sparsity of a Jacobian block
     void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact=false);
-    void setJacSparsity(const CRSSparsity& sp, const std::string &iname, int oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iname),oind,compact); }
-    void setJacSparsity(const CRSSparsity& sp, int iind, const std::string &oname, bool compact=false) { setJacSparsity(sp,iind,outputSchemeEntry(oname),compact); }
-    void setJacSparsity(const CRSSparsity& sp, const std::string &iname, const std::string &oname, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iname),outputSchemeEntry(oname),compact); }
+    void setJacSparsity(const CRSSparsity& sp, const std::string &iind, int oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),oind,compact); }
+    void setJacSparsity(const CRSSparsity& sp, int iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,iind,outputSchemeEntry(oind),compact); }
+    void setJacSparsity(const CRSSparsity& sp, const std::string &iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),outputSchemeEntry(oind),compact); }
     //@}
     
     /** \brief Export / Generate C code for the function */
@@ -404,6 +415,9 @@ namespace CasADi{
   
     /** \brief Remove modules to be monitored */
     void removeMonitor(const std::string& mon);
+    
+    /** \brief Check if the numerical values of the supplied bounds make sense */
+    void checkInputs() const;
 
   };
 } // namespace CasADi

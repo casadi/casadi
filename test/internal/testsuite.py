@@ -267,11 +267,11 @@ class TestSuite:
       
     if self.memcheck:
       # --suppressions=../internal/valgrind-python.supp
-      suppressions = ["internal/valgrind-python.supp"]
-      supps = ":".join([os.path.join(os.getcwd(),s) for s in suppressions])
+      suppressions = ["internal/valgrind-python.supp","internal/valgrind-casadi.supp"]
+      supps = ['--suppressions='+os.path.join(os.getcwd(),s) for s in suppressions]
       stdoutfile = tempfile.TemporaryFile()
-      p=Popen(['valgrind','--leak-check=full','--suppressions='+supps]+self.command(dir,fn,self.passoptions),cwd=self.workingdir(dir),stdout=stdoutfile, stderr=PIPE, stdin=PIPE)
-      f=Popen(['grep','-E','-A','10', "definitely lost|leaks|ERROR SUMMARY|Invalid read"],stdin=p.stderr,stdout=PIPE)
+      p=Popen(['valgrind','--leak-check=full']+supps+['--show-possibly-lost=no','--error-limit=no',"--gen-suppressions=all"]+self.command(dir,fn,self.passoptions),cwd=self.workingdir(dir),stdout=stdoutfile, stderr=PIPE, stdin=PIPE)
+      f=Popen(['grep','-E','-C','50', "definitely lost|leaks|ERROR SUMMARY|Invalid write|casadi"],stdin=p.stderr,stdout=PIPE)
       p.stderr.close()
       alarm(60*60) # 1 hour
       try:
@@ -299,9 +299,29 @@ class TestSuite:
       else:
         print stdoutdata
         raise Exception("valgrind output is not like expected: %s")
-        
+
+      error_casadi = False
+      # Filter out stuff after address header
+      diagnose_lines = []
+      error_log = True
+      for l in stdoutdata.split("\n"):
+        if l.startswith("=="):
+          if "  Address" in l:
+            error_log = False
+          elif "  at" in l or "  by" in l:
+            pass
+          else:
+            error_log = True
+          
+        if error_log:
+          diagnose_lines.append(l)
+          if l.startswith("==") and re.search('casadi', l):
+            error_casadi = True
+           
+      diagnosis = "\n".join(diagnose_lines)
+
       errors = "0"  # disabling valgrind error-checking for now: samples are flooded with errors
-      if not(lost=="0" and errors=="0"):
+      if not(lost=="0" and errors=="0") or error_casadi:
         if not(lost=="0"):
           print "Memory leak: lost %s bytes" % (lost)
         if not(errors=="0"):

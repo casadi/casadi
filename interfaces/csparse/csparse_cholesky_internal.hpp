@@ -59,10 +59,10 @@ namespace CasADi{
     void solveL(double* x, int nrhs, bool transpose);
     
     /// Obtain a symbolic Cholesky factorization
-    CRSSparsity getFactorizationSparsity() const;
+    CRSSparsity getFactorizationSparsity(bool transpose=false) const;
     
     /// Obtain a numeric Cholesky factorization
-    DMatrix getFactorization() const;
+    DMatrix getFactorization(bool transpose=false) const;
     
     // Clone
     virtual CSparseCholeskyInternal* clone() const;

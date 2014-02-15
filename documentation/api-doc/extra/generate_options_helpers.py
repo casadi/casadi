@@ -22,7 +22,7 @@
 from casadi import *
 
 def optionDocumented(name,cl,metadata):
-  acl = [cl]
+  acl = []
   if 'hierarchy' in metadata[cl]:
     acl += metadata[cl]['hierarchy']
   for c in acl:
@@ -32,7 +32,7 @@ def optionDocumented(name,cl,metadata):
 def addExtra(metadata):
 
   x=SX("x")
-  f = SXFunction([x],[x**2])
+  f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
   i = IpoptSolver(f)
   
@@ -55,7 +55,7 @@ def addExtra(metadata):
 
   
   x=SX("x")
-  f = SXFunction([x],[x**2])
+  f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
   try:
     i = WorhpSolver(f)
@@ -79,7 +79,7 @@ def addExtra(metadata):
     #  meta['description'] += "(" + "|".join(i.getOptionAllowed(name))  + ")"
 
   try:
-    i = QPOasesSolver(sp_dense(3,3),sp_dense(1,3))
+    i = QPOasesSolver(qpStruct(h=sp_dense(3,3),a=sp_dense(1,3)))
   except:
     return
     

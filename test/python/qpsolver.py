@@ -48,9 +48,86 @@ try:
   qpsolvers.append((CplexSolver,{}))
 except:
   pass
+try:
+  qpsolvers.append((SQICSolver,{}))
+except:
+  pass
+
+try:
+  qpsolvers.append((QCQPQPSolver,{"qcqp_solver":SOCPQCQPSolver,"qcqp_solver_options": {"socp_solver": SDPSOCPSolver, "socp_solver_options": {"sdp_solver": DSDPSolver, "sdp_solver_options": {"gapTol":1e-10}} }}))
+except:
+  pass
 
 class QPSolverTests(casadiTestCase):
 
+  def testboundsviol(self):
+  
+    H = DMatrix([[1,-1],[-1,2]])
+    G = DMatrix([-2,-6])
+    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
+    
+    LBA = DMatrix([-inf]*3)
+    UBA = DMatrix([2, 2, 3])
+
+    LBX = DMatrix([0]*2)
+    UBX = DMatrix([inf,-inf])
+
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      self.message("general_convex: " + str(qpsolver))
+
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
+
+      with self.assertRaises(Exception):
+        solver.solve()
+
+    H = DMatrix([[1,-1],[-1,2]])
+    G = DMatrix([-2,-6])
+    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
+    
+    LBA = DMatrix([-inf,5,-inf])
+    UBA = DMatrix([2, 2, 3])
+
+    LBX = DMatrix([0]*2)
+    UBX = DMatrix([inf]*2)
+
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      self.message("general_convex: " + str(qpsolver))
+
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
+
+      with self.assertRaises(Exception):
+        solver.solve()
+        
   def test_scalar(self):
     # 1/2 x H x + G' x
     H = DMatrix([1])
@@ -151,6 +228,8 @@ class QPSolverTests(casadiTestCase):
       self.checkarray(solver.getOutput("lam_a"),DMatrix([2,0,0]),str(qpsolver),digits=2)
       
       solver.setInput(0,"h")
+      
+      if 'QCQP' in str(qpsolver): continue # Singular hessian
 
       solver.evaluate()
       self.assertAlmostEqual(solver.getOutput()[0],2.0/3,6,str(qpsolver))
@@ -366,6 +445,7 @@ class QPSolverTests(casadiTestCase):
       
     for qpsolver, qp_options in qpsolvers:
       self.message("degenerate hessian: " + str(qpsolver))
+      if 'QCQP' in str(qpsolver): continue
       solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):
@@ -480,16 +560,55 @@ class QPSolverTests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.getOutput()[0],10,3,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput()[1],8,3,str(qpsolver))
-    
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5,str(qpsolver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,5,str(qpsolver))
-
+      self.checkarray(solver.getOutput(),DMatrix([10,8]),str(qpsolver),digits=3)
+      
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qpsolver),digits=4)
 
       self.checkarray(solver.getOutput("lam_a"),DMatrix([]),str(qpsolver),digits=5)
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],-34,5,str(qpsolver))
+      
+  def test_standard_form(self):
+    H = DMatrix([[1,-1],[-1,2]])
+    G = DMatrix([-2,-6])
+    A =  DMatrix([1,1]).T
+
+    LBA = DMatrix([-inf])
+    UBA = DMatrix([1])
+
+    LBX = DMatrix([-10])
+    UBX = DMatrix([10])
+
+
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+      
+
+
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
+
+      solver.solve()
+
+      self.checkarray(solver.getOutput(),DMatrix([-0.2,1.2]),str(qpsolver),digits=3)
+      
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qpsolver),digits=4)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([3.4]),str(qpsolver),digits=5)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],-5.1,5,str(qpsolver))
       
   def test_badscaling(self):
     #return
@@ -552,6 +671,7 @@ class QPSolverTests(casadiTestCase):
       options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
         
       for qpsolver, qp_options in qpsolvers:
+        if 'QCQP' in str(qpsolver): continue
         solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
         for key, val in options.iteritems():
           if solver.hasOption(key):
@@ -586,6 +706,7 @@ class QPSolverTests(casadiTestCase):
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
+      if 'QCQP' in str(qpsolver): continue
       solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
       for key, val in options.iteritems():
         if solver.hasOption(key):

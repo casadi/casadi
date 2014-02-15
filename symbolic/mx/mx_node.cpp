@@ -43,6 +43,7 @@
 #include "norm.hpp"
 #include "vertcat.hpp"
 #include "vertsplit.hpp"
+#include "assertion.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -250,27 +251,13 @@ namespace CasADi{
   }
 
   void MXNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
-    DMatrixPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
-    evaluateD(input,output,fwdSeed, fwdSens, adjSeed, adjSens, itmp, rtmp);
-  }
-  
-  void MXNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, 
-                         const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, 
-                         const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
     throw CasadiException(string("MXNode::evaluateD not defined for class ") + typeid(*this).name());
   }
-
-  void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    SXMatrixPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
-    evaluateSX(input,output,fwdSeed, fwdSens, adjSeed, adjSens, itmp, rtmp);
-  }
   
-  void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, 
-                          const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, 
-                          const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+  void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
     throw CasadiException(string("MXNode::evaluateSX not defined for class ") + typeid(*this).name());
   }
-
+  
   void MXNode::evaluateMX(const MXPtrV& input, MXPtrV& output){
     MXPtrVV fwdSeed, fwdSens, adjSeed, adjSens;
     evaluateMX(input,output,fwdSeed, fwdSens, adjSeed, adjSens,false);
@@ -362,11 +349,20 @@ namespace CasADi{
     return MX::create(new Reshape(shared_from_this<MX>(),sp));
   }
   
-  MX MXNode::getMultiplication(const MX& y) const{
+  
+  MX MXNode::getMultiplication(const MX& y,const CRSSparsity& sp_z) const{
     // Transpose the second argument
     MX trans_y = trans(y);
-    CRSSparsity sp_z = sparsity().patternProduct(trans_y.sparsity());
-    MX z = MX::zeros(sp_z);
+    MX z;
+    if (sp_z.isNull()) {
+      CRSSparsity sp_z_ = sparsity().patternProduct(trans_y.sparsity());
+      z = MX::zeros(sp_z_);
+    } else {
+      z = MX::zeros(sp_z);
+    }
+    casadi_assert_message(size1()==z.size1(),"Dimension error. Got lhs=" << size1() << " and z=" << z.dimString() << ".");
+    casadi_assert_message(trans_y.size1()==z.size2(),"Dimension error. Got trans_y=" << trans_y.dimString() << " and z=" << z.dimString() << ".");
+    casadi_assert_message(size2()==trans_y.size2(),"Dimension error. Got lhs=" << size2() << " and trans_y" << trans_y.dimString() << ".");
     if(sparsity().dense() && y.dense()){
       return MX::create(new DenseMultiplication<false,true>(z,shared_from_this<MX>(),trans_y));
     } else {
@@ -430,7 +426,7 @@ namespace CasADi{
 
 
   MX MXNode::getAddNonzeros(const MX& y, const std::vector<int>& nz) const{
-    if(nz.size()==0){
+    if(nz.size()==0 || isZero()) {
       return y;
     } else {
       MX ret;
@@ -508,7 +504,8 @@ namespace CasADi{
   }
 
   MX MXNode::getBinary(int op, const MX& y, bool scX, bool scY) const{
-  
+    casadi_assert(sparsity()==y.sparsity() || scX || scY);
+    
     if (CasadiOptions::simplification_on_the_fly) {
     
       // If identically zero due to one argumebt being zero
@@ -555,7 +552,7 @@ namespace CasADi{
             break;
           case OP_ADD:
           case OP_SUB:
-            if(y->isZero()) return shared_from_this<MX>();
+            if(y->isZero()) return scX ? MX(y.size1(),y.size2(),shared_from_this<MX>()) : shared_from_this<MX>();
             break;
           case OP_MUL:
             if(y->isValue(1)) return shared_from_this<MX>();
@@ -638,6 +635,10 @@ namespace CasADi{
     return true;
   }
 
+  MX MXNode::getAssertion(const MX& y, const std::string &fail_message) const {
+    return MX::create(new Assertion(shared_from_this<MX>(),y,fail_message));
+  }
+    
   MX MXNode::getDeterminant() const{
     return MX::create(new Determinant(shared_from_this<MX>()));
   }
@@ -695,6 +696,14 @@ namespace CasADi{
     } else if(c.size()==1){
       return c[0];
     } else {
+      // If dependents are all-zero, produce a new constant
+      bool zero = true;
+      for (int i=0;i<c.size();++i) {
+        if (!c[i]->isZero()) { zero = false; break; }
+      }
+      if (zero) {
+        return MX::zeros(Vertcat(c).sparsity());
+      }
       // Split up existing vertcats
       vector<MX> c_split;
       c_split.reserve(c.size());
@@ -710,6 +719,13 @@ namespace CasADi{
   }
 
   std::vector<MX> MXNode::getVertsplit(const std::vector<int>& output_offset) const{
+    if (isZero()) {
+      std::vector<MX> ret = MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
+      for (int i=0;i<ret.size();++i) {
+        ret[i]=MX::zeros(ret[i].sparsity());
+      }
+      return ret;
+    }
     return MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
   }
 

@@ -38,7 +38,10 @@
 // "dispatch binary operator" can be found in octrun.swg: look for dispatch_binary_op in swig generated
 
 
+#ifndef SWIGXML
 %include "typemaps.i"
+#endif
+
 %include "symbolic/matrix/crs_sparsity.hpp"
 %include "symbolic/matrix/slice.hpp"
 
@@ -202,13 +205,14 @@ namespace CasADi {
 
 };
 
+
+
 %extend Matrix<SX>{
-    %python_matrix_convertors
-    %python_matrix_helpers(CasADi::Matrix<CasADi::SX>)
+    
+    %matrix_convertors
+    %matrix_helpers(CasADi::Matrix<CasADi::SX>)
        
     #ifdef SWIGPYTHON
-
-    
     %pythoncode %{
     def toArray(self):
       import numpy as n
@@ -223,11 +227,11 @@ namespace CasADi {
     %}
     
   %python_array_wrappers(1001.0)
+  #endif // SWIGPYTHON 
   
-  #endif // SWIGPYTHON  
   binopsrFull(CasADi::Matrix<CasADi::SX>)  
 };
-
+ 
 
 
 } // namespace CasADi

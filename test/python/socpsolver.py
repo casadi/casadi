@@ -79,6 +79,41 @@ class SOCPSolverTests(casadiTestCase):
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(socpsolver),digits=5)
       self.assertAlmostEqual(solver.getOutput("cost")[0],10-16/sqrt(5)+7-4/sqrt(5),5,str(socpsolver))
       
+  def testboundsviol(self):
+
+    a = 1.3
+    
+    c = DMatrix([2,1])
+    G = DMatrix([[1,0],[0,1]])
+    H = DMatrix([0,0])
+    E = DMatrix([a,0])
+    F = DMatrix([4])
+
+    A = DMatrix.sparse(0,2)
+    LBA = DMatrix()
+    UBA = DMatrix()
+    
+    for socpsolver, socp_options, re_init in socpsolvers:
+      self.message("socpsolver: " + str(socpsolver))
+
+      solver = socpsolver(socpStruct(g=G.sparsity(),a=A.sparsity()))
+      solver.setOption(socp_options)
+      solver.setOption("ni",[2])
+      solver.init()
+
+      solver.setInput(c,"c")
+      solver.setInput(A,"a")
+      solver.setInput(G,"g")
+      solver.setInput(H,"h")
+      solver.setInput(E,"e")
+      solver.setInput(F,"f")
+      
+      solver.setInput([0,0],"lbx")
+      solver.setInput([0,-3],"ubx")
+
+      with self.assertRaises(Exception):
+        solver.solve()
+      
   def test_simple2(self):
     #  min  2 x + y
     #

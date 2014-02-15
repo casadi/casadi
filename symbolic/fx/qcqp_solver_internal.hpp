@@ -42,13 +42,16 @@ class QCQPSolverInternal : public FXInternal{
     virtual void init();
     
     // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
     
     // Solve the system of equations
     virtual void solve();
     
     /// Set options that make the QP solver more suitable for solving LPs
     virtual void setQPOptions() { };
+    
+    /// \brief Check if the numerical values of the supplied bounds make sense
+    virtual void checkInputs() const;
     
   protected:
 

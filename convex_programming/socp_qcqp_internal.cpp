@@ -46,9 +46,9 @@ SOCPQCQPInternal::SOCPQCQPInternal(const std::vector<CRSSparsity> &st) : QCQPSol
 SOCPQCQPInternal::~SOCPQCQPInternal(){
 }
 
-void SOCPQCQPInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("SOCPQCQPInternal::evaluate() not implemented for forward or backward mode");
-
+void SOCPQCQPInternal::evaluate() {
+  if (inputs_check_) checkInputs();
+  
   // Pass inputs of QCQP to SOCP form 
   std::copy(input(QCQP_SOLVER_A).begin(),input(QCQP_SOLVER_A).end(),socpsolver_.input(SOCP_SOLVER_A).begin());
   
@@ -70,7 +70,7 @@ void SOCPQCQPInternal::evaluate(int nfdir, int nadir) {
   int socp_g_offset = 0;    
   for (int i=0;i<nq_+1;++i) {
     cholesky_[i].prepare();
-    DMatrix G = cholesky_[i].getFactorization();
+    DMatrix G = cholesky_[i].getFactorization(true);
     std::copy(G.begin(),G.end(),socpsolver_.input(SOCP_SOLVER_G).begin()+socp_g_offset);
     socp_g_offset += G.size()+1;
   }
@@ -79,13 +79,11 @@ void SOCPQCQPInternal::evaluate(int nfdir, int nadir) {
   //   2h'G = Q   -> 2G'h = Q  ->  solve for h
   double *x = &socpsolver_.input(SOCP_SOLVER_H).data().front();
   std::copy(input(QCQP_SOLVER_G).begin(),input(QCQP_SOLVER_G).begin()+n_,x);
-  socpsolver_.input(SOCP_SOLVER_H).printDense();
-  cholesky_[0].solveL(x,1,false);
-  socpsolver_.input(SOCP_SOLVER_H).printDense();
+  cholesky_[0].solveL(x,1,true);
   int x_offset = n_+1;
   for (int i=0;i<nq_;++i) {
     std::copy(input(QCQP_SOLVER_Q).begin()+i*(n_+1),input(QCQP_SOLVER_Q).begin()+(i+1)*(n_+1)-1,x+x_offset);
-    cholesky_[i+1].solveL(x+x_offset,1,false);
+    cholesky_[i+1].solveL(x+x_offset,1,true);
     x_offset += n_+1;
   }
   
@@ -126,6 +124,9 @@ void SOCPQCQPInternal::evaluate(int nfdir, int nadir) {
   // Delegate computation to SOCP Solver
   socpsolver_.evaluate();
   
+  // Pass the stats
+  stats_["socp_solver_stats"] = socpsolver_.getStats();
+  
   // Read the outputs from SOCP Solver
   output(SOCP_SOLVER_COST).set(socpsolver_.output(QCQP_SOLVER_COST));
   output(SOCP_SOLVER_LAM_A).set(socpsolver_.output(QCQP_SOLVER_LAM_A));
@@ -152,7 +153,7 @@ void SOCPQCQPInternal::init(){
     
     // Harvest Cholsesky sparsity patterns
     // Note that we add extra scalar to make room for the epigraph-reformulation variable
-    socp_g.push_back(blkdiag(cholesky_[i].getFactorizationSparsity(),sp_dense(1,1)));
+    socp_g.push_back(blkdiag(cholesky_[i].getFactorizationSparsity(true),sp_dense(1,1)));
   }
 
   // Create an socpsolver instance

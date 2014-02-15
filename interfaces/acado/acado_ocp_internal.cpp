@@ -228,7 +228,7 @@ void AcadoOCPInternal::init(){
   
 }
 
-void AcadoOCPInternal::evaluate(int nfdir, int nadir){ 
+void AcadoOCPInternal::evaluate(){ 
   // Initial constraint function
   if(!rfcn_.f_.isNull()){
     const Matrix<double>& lbr = input(ACADO_LBR);

@@ -42,55 +42,80 @@ namespace CasADi {
   }
 
   void NLPImplicitInternal::solveNonLinear() {
-    // Obtain initial guess
-    nlp_solver_.input(NLP_SOLVER_X0).set(output(0));
+
+    // Equality nonlinear constraints
+    nlp_solver_.input(NLP_SOLVER_LBG).set(0.);
+    nlp_solver_.input(NLP_SOLVER_UBG).set(0.);
+    
+    // Simple constraints
+    vector<double>& lbx = nlp_solver_.input(NLP_SOLVER_LBX).data();
+    vector<double>& ubx = nlp_solver_.input(NLP_SOLVER_UBX).data();
+    for(int k=0; k<u_c_.size(); ++k){
+      lbx[k] = u_c_[k] <= 0 ? -std::numeric_limits<double>::infinity() : 0;
+      ubx[k] = u_c_[k] >= 0 ?  std::numeric_limits<double>::infinity() : 0;
+    }
+    
+    // Pass initial guess
+    nlp_solver_.input(NLP_SOLVER_X0).set(output(iout_));
   
-    // Add other arguments
-    int k = 0;
-  
-    for (int i=1;i<f_.getNumInputs();++i) {
-      std::copy(input(i-1).data().begin(),input(i-1).data().end(),nlp_solver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(i-1).size();
+    // Add auxiliary inputs
+    vector<double>::iterator nlp_p = nlp_solver_.input(NLP_SOLVER_P).begin();
+    for(int i=0, k=0; i<getNumInputs(); ++i){
+      if(i!=iin_){
+        std::copy(input(i).begin(),input(i).end(),nlp_p);
+        nlp_p += input(i).size();
+      }
     }
   
-    // Solve NLP
+    // Solve the NLP
     nlp_solver_.evaluate();
-    
     stats_["nlp_solver_stats"] = nlp_solver_.getStats();
 
-    // Copy the outputs
-    output(0).set(nlp_solver_.output(NLP_SOLVER_X));
+    // Get the implicit variable
+    output(iout_).set(nlp_solver_.output(NLP_SOLVER_X));
+
+    // Evaluate auxilary outputs, if necessary
+    if(getNumOutputs()>0){
+      f_.setInput(output(iout_),iin_);
+      for(int i=0; i<getNumInputs(); ++i)
+        if(i!=iin_) f_.setInput(input(i),i);
+      f_.evaluate();
+      for(int i=0; i<getNumOutputs(); ++i){
+        if(i!=iout_) f_.getOutput(output(i),i);
+      }
+    }
   }
 
   void NLPImplicitInternal::init(){
 
+    // Call the base class initializer
     ImplicitFunctionInternal::init();
 
-    casadi_assert_message(f_.getNumInputs()>0,"NLPImplicitInternal: the supplied f must have at least one input.");
-  
-    MX V = msym("V",f_.input().sparsity());
-  
-    std::vector< CRSSparsity > sps;
-    for (int k=1;k<f_.getNumInputs();++k)
-      sps.push_back(f_.input(k).sparsity());
-  
+    // Free variable in the NLP
+    MX u = msym("u",input(iin_).sparsity());
+    
     // So that we can pass it on to createParent
-    std::pair< MX, std::vector< MX > > mypair = createParent(sps);
+    std::vector<CRSSparsity> sps;
+    for(int i=0; i<getNumInputs(); ++i)
+      if(i!=iin_) sps.push_back(input(i).sparsity());
+    std::pair<MX,std::vector<MX> > mypair = createParent(sps);
 
-    // V groups all parameters in an MX
-    MX P(mypair.first);
+    // u groups all parameters in an MX
+    MX p = mypair.first;
     std::vector< MX > inputs(mypair.second);
     
-    // Dummy objective
-    MX nlp_F = 0;
+    // Dummy NLP objective
+    MX nlp_f = 0;
 
-    // Constraints
-    std::vector< MX > args_call;
-    args_call.push_back(V);
-    args_call.insert(args_call.end(),mypair.second.begin(),mypair.second.end());
-    MX nlp_G = f_.call(args_call).front();
+    // NLP constraints
+    std::vector< MX > args_call(getNumInputs());
+    args_call[iin_] = u;
+    for(int i=0, i2=0; i<getNumInputs(); ++i)
+      if(i!=iin_) args_call[i] = mypair.second[i2++];
+    MX nlp_g = f_.call(args_call).at(iout_);
 
     // We're going to use two-argument objective and constraints to allow the use of parameters
-    MXFunction nlp(nlpIn("x",V,"p",P),nlpOut("f",nlp_F,"g",nlp_G));
+    MXFunction nlp(nlpIn("x",u,"p",p),nlpOut("f",nlp_f,"g",nlp_g));
   
     // Create an nlpsolver instance
     NLPSolverCreator nlp_solvercreator = getOption("nlp_solver");
@@ -101,11 +126,6 @@ namespace CasADi {
   
     // Initialize the NLP solver
     nlp_solver_.init();
-  
-  
-    nlp_solver_.input(NLP_SOLVER_LBG).setAll(0);
-    nlp_solver_.input(NLP_SOLVER_UBG).setAll(0);
-  
   }
 
 } // namespace CasADi

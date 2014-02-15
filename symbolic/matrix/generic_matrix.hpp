@@ -93,14 +93,20 @@ class GenericMatrix{
     std::pair<int,int> shape() const;
     #endif
 
-    /** \brief  Check if the matrix expression is empty */
+    /** \brief  Check if the matrix expression is empty, i.e. one of its dimensions is 0 */
     bool empty() const;
+    
+    /** \brief  Check if the matrix expression is null, i.e. its dimensios are 0-by-0 */
+    bool null() const;
     
     /** \brief  Check if the matrix expression is dense */
     bool dense() const;
     
     /** \brief  Check if the matrix expression is scalar */
     bool scalar(bool scalar_and_dense=false) const;
+
+    /** \brief  Check if the matrix expression is square */
+    bool square() const;
 
     /** \brief Get the sparsity pattern */
     const CRSSparsity& sparsity() const;
@@ -156,7 +162,8 @@ class GenericMatrix{
     * Attempts to identify quick returns on matrix-level and 
     * delegates to MatType::mul_full if no such quick returns are found.
     */
-    MatType mul_smart(const MatType& y) const;
+    MatType mul_smart(const MatType& y, const CRSSparsity& sp_z) const;
+    
 };
 
 #ifndef SWIG
@@ -223,6 +230,11 @@ bool GenericMatrix<MatType>::empty() const{
 }
 
 template<typename MatType>
+bool GenericMatrix<MatType>::null() const{
+  return size1()==0 && size2()==0;
+}
+
+template<typename MatType>
 bool GenericMatrix<MatType>::dense() const{
   return numel()==size();
 }
@@ -233,9 +245,18 @@ bool GenericMatrix<MatType>::scalar(bool scalar_and_dense) const{
 }
 
 template<typename MatType>
-MatType GenericMatrix<MatType>::mul_smart(const MatType& y) const {
-  const MatType& x = *static_cast<const MatType*>(this);
+bool GenericMatrix<MatType>::square() const{
+  return sparsity().square();
+}
 
+template<typename MatType>
+MatType GenericMatrix<MatType>::mul_smart(const MatType& y, const CRSSparsity &sp_z) const {
+  const MatType& x = *static_cast<const MatType*>(this);
+  
+  if (!(x.scalar() || y.scalar())) {
+    casadi_assert_message(size2()==y.size1(),"Matrix product with incompatible dimensions. Lhs is " << dimString() << " and rhs is " << y.dimString() << ".");
+  }
+  
   // Check if we can simplify the product
   if(isIdentity(x)){
     return y;
@@ -243,17 +264,21 @@ MatType GenericMatrix<MatType>::mul_smart(const MatType& y) const {
     return x;
   } else if(isZero(x) || isZero(y)){
     // See if one of the arguments can be used as result
-    if(x.size()==0 && y.size1()==y.size2())
+    if(x.size()==0 && y.size1()==y.size2()) {
       return x;
-    else if(y.size()==0 && x.size1()==x.size2())
+    } else if(y.size()==0 && x.size1()==x.size2()) {
       return y;
-    else
-      return MatType::zeros(x.size1(),y.size2());
+    } else {
+      if (x.size()==0 || y.size()==0 || y.empty() || x.empty()) {
+        return MatType::sparse(x.size1(),y.size2());
+      } else {
+        return MatType::zeros(x.size1(),y.size2());
+      }
+    }
   } else if(x.scalar() || y.scalar()){
     return x*y;
   } else {
-    casadi_assert_message(size2()==y.size1(),"Matrix product with incompatible dimensions. Lhs is " << dimString() << " and rhs is " << y.dimString() << ".");
-    return x.mul_full(y);
+    return x.mul_full(y,sp_z);
   }
 }
 

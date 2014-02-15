@@ -66,6 +66,7 @@ namespace CasADi{
 
   void FX::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, MXVectorVector& fsens, 
                 const MXVectorVector& aseed, MXVectorVector& asens){
+    casadi_assert_message(arg.size()==getNumInputs(),"FX::call: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     (*this)->call(arg,res,fseed,fsens,aseed,asens,false,true);
   }
 
@@ -113,30 +114,29 @@ namespace CasADi{
     return ret;
   }
 
-  void FX::evaluate(int nfdir, int nadir){
+  void FX::evaluate(){
     assertInit();
-    casadi_assert(nfdir<=(*this)->nfdir_);
-    casadi_assert(nadir<=(*this)->nadir_);
-    (*this)->evaluate(nfdir,nadir);
-  }
-
-  void FX::evaluateCompressed(int nfdir, int nadir){
-    assertInit();
-    casadi_assert(nfdir<=(*this)->nfdir_);
-    casadi_assert(nadir<=(*this)->nadir_);
-    (*this)->evaluateCompressed(nfdir,nadir);
+    (*this)->evaluate();
   }
 
   void FX::solve(){
-    evaluate(0,0);
+    evaluate();
   }
 
-  int FX::getNumScalarInputs() const{
-    return (*this)->getNumScalarInputs();
+  int FX::getNumInputNonzeros() const{
+    return (*this)->getNumInputNonzeros();
   }
 
-  int FX::getNumScalarOutputs() const{
-    return (*this)->getNumScalarOutputs();
+  int FX::getNumOutputNonzeros() const{
+    return (*this)->getNumOutputNonzeros();
+  }
+
+  int FX::getNumInputElements() const{
+    return (*this)->getNumInputElements();
+  }
+
+  int FX::getNumOutputElements() const{
+    return (*this)->getNumOutputElements();
   }
 
   FX FX::jacobian(int iind, int oind, bool compact, bool symmetric){
@@ -144,9 +144,18 @@ namespace CasADi{
     return (*this)->jacobian(iind,oind,compact,symmetric);
   }
 
+  void FX::setJacobian(const FX& jac, int iind, int oind, bool compact){
+    (*this)->setJacobian(jac,iind,oind,compact);
+  }
+
   FX FX::gradient(int iind, int oind){
     assertInit();
     return (*this)->gradient(iind,oind);
+  }
+
+  FX FX::tangent(int iind, int oind){
+    assertInit();
+    return (*this)->tangent(iind,oind);
   }
 
   FX FX::hessian(int iind, int oind){
@@ -157,6 +166,10 @@ namespace CasADi{
   FX FX::fullJacobian(){
     assertInit();
     return (*this)->fullJacobian();
+  }
+
+  void FX::setFullJacobian(const FX& jac){
+    (*this)->full_jacobian_ = jac;
   }
 
   bool FX::checkNode() const{
@@ -195,20 +208,19 @@ namespace CasADi{
     return (*this)->symbolicInputSX();
   }
 
-  void FX::setInputScheme(InputOutputScheme scheme) {
+  void FX::setInputScheme(const IOScheme &scheme) {
     return (*this)->setInputScheme(scheme);
   }
 
-
-  void FX::setOutputScheme(InputOutputScheme scheme) {
+  void FX::setOutputScheme(const IOScheme &scheme) {
     return (*this)->setOutputScheme(scheme);
   }
 
-  InputOutputScheme FX::getInputScheme() const {
+  IOScheme FX::getInputScheme() const {
     return (*this)->getInputScheme();
   }
 
-  InputOutputScheme FX::getOutputScheme() const {
+  IOScheme FX::getOutputScheme() const {
     return (*this)->getOutputScheme();
   }
 
@@ -239,15 +251,8 @@ namespace CasADi{
     return ret;
   }
 
-  void FX::updateNumSens(){
-    return (*this)->updateNumSens(true);
-  }
-
-  void FX::requestNumSens(int nfwd, int nadj){
-    (*this)->requestNumSens(nfwd,nadj);
-  }
-
   vector<SXMatrix> FX::evalSX(const vector<SXMatrix>& arg){
+    casadi_assert_message(arg.size()==getNumInputs(),"FX::evalSX: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     vector<SXMatrix> res;
     vector<vector<SXMatrix> > dummy;
     (*this)->evalSX(arg,res,dummy,dummy,dummy,dummy);
@@ -255,6 +260,7 @@ namespace CasADi{
   }
 
   vector<MX> FX::evalMX(const vector<MX>& arg){
+    casadi_assert_message(arg.size()==getNumInputs(),"FX::evalMX: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     vector<MX> res;
     vector<vector<MX> > dummy;
     (*this)->evalMX(arg,res,dummy,dummy,dummy,dummy);
@@ -264,24 +270,28 @@ namespace CasADi{
   void FX::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                   const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
                   const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
+    casadi_assert_message(arg.size()==getNumInputs(),"FX::evalSX: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     (*this)->evalSX(arg,res,fseed,fsens,aseed,asens);
   }
 
   void FX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
                   const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
                   const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){
+    casadi_assert_message(arg.size()==getNumInputs(),"FX::evalMX: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     (*this)->evalMX(arg,res,fseed,fsens,aseed,asens);
   }
                         
   void FX::eval(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                 const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
                 const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
+    casadi_assert_message(arg.size()==getNumInputs(),"FX::eval: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     (*this)->evalSX(arg,res,fseed,fsens,aseed,asens);
   }
 
   void FX::eval(const std::vector<MX>& arg, std::vector<MX>& res, 
                 const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
                 const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){
+    casadi_assert_message(arg.size()==getNumInputs(),"FX::eval: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     (*this)->evalMX(arg,res,fseed,fsens,aseed,asens);
   }
 
@@ -301,49 +311,49 @@ namespace CasADi{
     return (*this)->derivative(nfwd,nadj);
   }
 
-  int FX::numAllocFwd() const{
-    return (*this)->nfdir_;
-  }
-
-  int FX::numAllocAdj() const{
-    return (*this)->nadir_;
+  void FX::setDerivative(const FX& fcn, int nfwd, int nadj){
+    (*this)->setDerivative(fcn,nfwd,nadj);
   }
 
   void FX::generateCode(const string& filename){
     (*this)->generateCode(filename);
   }
 
-  const InputOutputScheme& FX::inputScheme() const{
+  const IOScheme& FX::inputScheme() const{
     return (*this)->inputScheme();
   }
   
-  const InputOutputScheme& FX::outputScheme() const{
+  const IOScheme& FX::outputScheme() const{
     return (*this)->outputScheme();
   }
   
-  InputOutputScheme& FX::inputScheme(){
+  IOScheme& FX::inputScheme(){
     return (*this)->inputScheme();
   }
   
-  InputOutputScheme& FX::outputScheme(){
+  IOScheme& FX::outputScheme(){
     return (*this)->outputScheme();
   }
   
-  const std::vector<FunctionIO>& FX::input_struct() const{
+  const IOSchemeVector<DMatrix>& FX::input_struct() const{
     return (*this)->input_struct();
   }
   
-  const std::vector<FunctionIO>& FX::output_struct() const{
+  const IOSchemeVector<DMatrix>& FX::output_struct() const{
     return (*this)->output_struct();
   }
   
-  std::vector<FunctionIO>& FX::input_struct(){
+  IOSchemeVector<DMatrix>& FX::input_struct(){
     return (*this)->input_struct();
   }
   
-  std::vector<FunctionIO>& FX::output_struct(){
+  IOSchemeVector<DMatrix>& FX::output_struct(){
     return (*this)->output_struct();
   }  
+
+  void FX::checkInputs() const {
+    return (*this)->checkInputs();
+  }
 
 } // namespace CasADi
 

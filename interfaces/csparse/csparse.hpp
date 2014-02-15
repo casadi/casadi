@@ -55,7 +55,7 @@ namespace CasADi{
     CSparse();
   
     /// Create a linear solver given a sparsity pattern
-    CSparse(const CRSSparsity& sp, int nrhs=1);
+    explicit CSparse(const CRSSparsity& sp, int nrhs=1);
   
     /** \brief  Access internal functions and data members */
     CSparseInternal* operator->();
@@ -70,7 +70,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const CRSSparsity& sp){ return CSparse(sp);}
+    static LinearSolver creator(const CRSSparsity& sp, int nrhs){ return CSparse(sp,nrhs);}
 #ifdef SWIG
     %nocallback;
 #endif

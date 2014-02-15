@@ -66,16 +66,16 @@ namespace CasADi{
     }
   }
 
-  void InnerProd::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void InnerProd::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void InnerProd::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void InnerProd::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void InnerProd::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void InnerProd::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
     // Get data
     T& res = output[0]->data().front();
     const vector<T> &arg0 = input[0]->data();
@@ -84,26 +84,6 @@ namespace CasADi{
 
     // Perform the inner product
     res = casadi_dot(n,getPtr(arg0),1,getPtr(arg1),1);
-
-    // Forward sensitivities
-    int nfwd = fwdSens.size();
-    for(int d=0; d<nfwd; ++d){
-      T& fsens = fwdSens[d][0]->data().front();
-      const vector<T> &fseed0 = fwdSeed[d][0]->data();
-      const vector<T> &fseed1 = fwdSeed[d][1]->data();
-      fsens = casadi_dot(n,getPtr(fseed0),1,getPtr(arg1),1) + casadi_dot(n,getPtr(arg0),1,getPtr(fseed1),1);
-    }
-
-    // Adjoint sensitivities
-    int nadj = adjSeed.size();
-    for(int d=0; d<nadj; ++d){
-      T& aseed = adjSeed[d][0]->data().front();
-      vector<T> &asens0 = adjSens[d][0]->data();
-      vector<T> &asens1 = adjSens[d][1]->data();
-      casadi_axpy(n,aseed,getPtr(arg1),1,getPtr(asens0),1);
-      casadi_axpy(n,aseed,getPtr(arg0),1,getPtr(asens1),1);
-      aseed = 0;
-    }
   }
 
   void InnerProd::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){

@@ -21,13 +21,6 @@
 # 
 from casadi import *
 
-
-
-#! Note: the actual printing doesn't show up in this pdf, due to limitations of the reporting software.
-#! Better run this example in a terminal.
-
-
-
 a = SX("a")
 b = SX("b")
 

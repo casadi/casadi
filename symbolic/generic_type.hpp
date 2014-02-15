@@ -31,7 +31,7 @@
 namespace CasADi{
 
   /** \brief  Types of options */
-  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_BOOLVECTOR, OT_REALVECTOR, OT_STRINGVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_SOCPSOLVER, OT_QCQPSOLVER, OT_SDPSOLVER, OT_IMPLICITFUNCTION, OT_JACOBIANGENERATOR, OT_SPARSITYGENERATOR, OT_FX, OT_VOIDPTR, OT_UNKNOWN};
+  enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_BOOLVECTOR, OT_REALVECTOR, OT_STRINGVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_STABILIZEDQPSOLVER, OT_SOCPSOLVER, OT_QCQPSOLVER, OT_SDPSOLVER,  OT_SDQPSOLVER, OT_IMPLICITFUNCTION, OT_DERIVATIVEGENERATOR, OT_FX, OT_CALLBACK, OT_VOIDPTR, OT_UNKNOWN};
   
   /** \brief Generic data type
   \author Joel Andersson 
@@ -40,7 +40,6 @@ namespace CasADi{
   class GenericType : public SharedObject{
     public:
     GenericType();
-    #ifndef SWIG
     GenericType(bool b);
     GenericType(int i);
     GenericType(double d);
@@ -51,7 +50,6 @@ namespace CasADi{
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
     GenericType(const FX& f);
-    #endif // SWIG
     GenericType(const SharedObject& obj);
     //GenericType(const GenericType& obj);    
     
@@ -77,12 +75,14 @@ namespace CasADi{
     GenericType(LPSolverCreator ptr);
     GenericType(integratorCreator ptr);
     GenericType(QPSolverCreator ptr);
+    GenericType(StabilizedQPSolverCreator ptr);
     GenericType(SOCPSolverCreator ptr);
     GenericType(SDPSolverCreator ptr);
+    GenericType(SDQPSolverCreator ptr);
     GenericType(QCQPSolverCreator ptr);
     GenericType(implicitFunctionCreator ptr);
-    GenericType(JacobianGenerator ptr);
-    GenericType(SparsityGenerator ptr);
+    GenericType(const DerivativeGenerator& c);
+    GenericType(const Callback& c);
     
     /// Implicit typecasting
     #ifndef SWIG
@@ -97,17 +97,23 @@ namespace CasADi{
     //operator void*() const;
     operator const std::map<std::string, GenericType>& () const;
     
+    operator std::vector<int>& () { return toIntVector();}
+    operator std::vector<double>& () { return toDoubleVector();}
+    operator std::map<std::string, GenericType>& ();
+    
     operator NLPSolverCreator() const;
     operator linearSolverCreator() const;
     operator LPSolverCreator() const;
     operator integratorCreator() const;
     operator QPSolverCreator() const;
+    operator StabilizedQPSolverCreator() const;
     operator SDPSolverCreator() const;
+    operator SDQPSolverCreator() const;
     operator SOCPSolverCreator() const;
     operator QCQPSolverCreator() const;
     operator implicitFunctionCreator() const;
-    operator JacobianGenerator() const;
-    operator SparsityGenerator() const;
+    operator const DerivativeGenerator& () const;
+    operator const Callback& () const;
     #endif // SWIG
     
     opt_type getType() const;
@@ -166,6 +172,14 @@ namespace CasADi{
     //! \brief Convert to vector of doubles
     const std::vector<double>& toDoubleVector() const;
     
+    #ifndef SWIG
+    //! \brief Convert to vector of ints
+    std::vector<int>& toIntVector();
+    
+    //! \brief Convert to vector of doubles
+    std::vector<double>& toDoubleVector();
+    #endif
+    
     //! \brief Convert to vector of strings
     const std::vector<std::string>& toStringVector() const;
 
@@ -175,6 +189,11 @@ namespace CasADi{
     //! \brief Convert to Dictionary
     const Dictionary& toDictionary() const;
 
+    #ifndef SWIG
+    //! \brief Convert to Dictionary
+    Dictionary& toDictionary();
+    #endif
+    
     //! \brief Convert to shared object
     const FX& toFX() const;
     

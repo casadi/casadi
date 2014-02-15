@@ -239,13 +239,32 @@ namespace CasADi{
 #endif // WITH_SIPOPT
   }
 
-  void IpoptInternal::evaluate(int nfdir, int nadir){
-    casadi_assert(nfdir==0 && nadir==0);
-
+  void IpoptInternal::evaluate(){
+    if (inputs_check_) checkInputs();
+    
     checkInitialBounds();
+    
+
+        
+    if (gather_stats_) {
+      Dictionary iterations;
+      iterations["inf_pr"] = std::vector<double>();
+      iterations["inf_du"] = std::vector<double>();
+      iterations["mu"] = std::vector<double>();
+      iterations["d_norm"] = std::vector<double>();
+      iterations["regularization_size"] = std::vector<double>();
+      iterations["obj"] = std::vector<double>();
+      iterations["ls_trials"] = std::vector<int>();
+      iterations["alpha_pr"] = std::vector<double>();
+      iterations["alpha_du"] = std::vector<double>();
+      iterations["obj"] = std::vector<double>();
+      stats_["iterations"] = iterations;
+    }
 
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
+    
+    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = n_iter_ = 0;
   
     // Get back the smart pointers
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass = static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(userclass_);
@@ -284,11 +303,26 @@ namespace CasADi{
   
     if (hasOption("print_time") && bool(getOption("print_time"))) {
       // Write timings
-      cout << "time spent in eval_f: " << t_eval_f_ << " s." << endl;
-      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s." << endl;
-      cout << "time spent in eval_g: " << t_eval_g_ << " s." << endl;
-      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s." << endl;
-      cout << "time spent in eval_h: " << t_eval_h_ << " s." << endl;
+      cout << "time spent in eval_f: " << t_eval_f_ << " s.";
+      if (n_eval_f_>0)
+        cout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
+      if (n_eval_grad_f_>0)
+        cout << " (" << n_eval_grad_f_ << " calls, " << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_g: " << t_eval_g_ << " s.";
+      if (n_eval_g_>0)
+        cout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
+      if (n_eval_jac_g_>0)
+        cout << " (" << n_eval_jac_g_ << " calls, " << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_h: " << t_eval_h_ << " s.";
+      if (n_eval_h_>1)
+        cout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
+      cout << endl;
       cout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
       cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
       cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
@@ -335,43 +369,69 @@ namespace CasADi{
     stats_["t_mainloop"] = t_mainloop_;
     stats_["t_callback_fun"] = t_callback_fun_;
     stats_["t_callback_prepare"] = t_callback_prepare_;
+    stats_["n_eval_f"] = n_eval_f_;
+    stats_["n_eval_grad_f"] = n_eval_grad_f_;
+    stats_["n_eval_g"] = n_eval_g_;
+    stats_["n_eval_jac_g"] = n_eval_jac_g_;
+    stats_["n_eval_h"] = n_eval_h_;
+    
+    stats_["iter_count"] = n_iter_-1;
   
   }
 
   bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials,bool full_callback) {
+    n_iter_ += 1;
     try {
       log("intermediate_callback started");
+      if (gather_stats_) {
+        Dictionary & iterations = stats_["iterations"];
+        static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(inf_pr);
+        static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(inf_du);
+        static_cast<std::vector<double> &>(iterations["mu"]).push_back(mu);
+        static_cast<std::vector<double> &>(iterations["d_norm"]).push_back(d_norm);
+        static_cast<std::vector<double> &>(iterations["regularization_size"]).push_back(regularization_size);
+        static_cast<std::vector<double> &>(iterations["alpha_pr"]).push_back(alpha_pr);
+        static_cast<std::vector<double> &>(iterations["alpha_du"]).push_back(alpha_du);
+        static_cast<std::vector<int> &>(iterations["ls_trials"]).push_back(ls_trials);
+        static_cast<std::vector<double> &>(iterations["obj"]).push_back(obj_value);
+      }
       double time1 = clock();
       if (!callback_.isNull()) {
         if(full_callback) {
-          if (!callback_.input(NLP_SOLVER_X).empty()) copy(x,x+nx_,callback_.input(NLP_SOLVER_X).begin());
+          if (!output(NLP_SOLVER_X).empty()) copy(x,x+nx_,output(NLP_SOLVER_X).begin());
         
-          vector<double>& lambda_x = callback_.input(NLP_SOLVER_LAM_X).data();
+          vector<double>& lambda_x = output(NLP_SOLVER_LAM_X).data();
           for(int i=0; i<lambda_x.size(); ++i){
             lambda_x[i] = z_U[i]-z_L[i];
           }
-          if (!callback_.input(NLP_SOLVER_LAM_G).empty()) copy(lambda,lambda+ng_,callback_.input(NLP_SOLVER_LAM_G).begin());
-          if (!callback_.input(NLP_SOLVER_G).empty()) copy(g,g+ng_,callback_.input(NLP_SOLVER_G).begin());
+          if (!output(NLP_SOLVER_LAM_G).empty()) copy(lambda,lambda+ng_,output(NLP_SOLVER_LAM_G).begin());
+          if (!output(NLP_SOLVER_G).empty()) copy(g,g+ng_,output(NLP_SOLVER_G).begin());
         } else {
           if (iter==0) {
             cerr << "Warning: intermediate_callback is disfunctional in your installation. You will only be able to use getStats(). See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it." << endl;
           }
         }
+        
+        Dictionary iteration;
+        iteration["iter"] = iter;
+        iteration["inf_pr"] = inf_pr;
+        iteration["inf_du"] = inf_du;
+        iteration["mu"] = mu;
+        iteration["d_norm"] = d_norm;
+        iteration["regularization_size"] = regularization_size;
+        iteration["alpha_pr"] = alpha_pr;
+        iteration["alpha_du"] = alpha_du;
+        iteration["ls_trials"] = ls_trials;
+        iteration["obj"] = obj_value;
+        stats_["iteration"] = iteration;
 
-        callback_.input(NLP_SOLVER_F).at(0) = obj_value;
-        callback_->stats_["iter"] = iter;
-        callback_->stats_["inf_pr"] = inf_pr;
-        callback_->stats_["inf_du"] = inf_du;
-        callback_->stats_["mu"] = mu;
-        callback_->stats_["d_norm"] = d_norm;
-        callback_->stats_["regularization_size"] = regularization_size;
-        callback_->stats_["alpha_pr"] = alpha_pr;
-        callback_->stats_["alpha_du"] = alpha_du;
-        callback_->stats_["ls_trials"] = ls_trials;
-        callback_.evaluate();
+        output(NLP_SOLVER_F).at(0) = obj_value;
+
+        int ret = callback_(ref_,user_data_);
+        
         double time2 = clock();
         t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
-        return  !callback_.output(0).at(0);
+        return  !ret;
       } else {
         return 1;
       }
@@ -447,6 +507,7 @@ namespace CasADi{
       }
       double time2 = clock();
       t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
+      n_eval_h_ += 1;
       log("eval_h ok");
       return true;
     } catch (exception& ex){
@@ -500,7 +561,7 @@ namespace CasADi{
     
       double time2 = clock();
       t_eval_jac_g_ += double(time2-time1)/CLOCKS_PER_SEC;
-
+      n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
       return true;
     } catch (exception& ex){
@@ -538,7 +599,7 @@ namespace CasADi{
     
       double time2 = clock();
       t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
-
+      n_eval_f_ += 1;
       log("eval_f ok");
       return true;
     } catch (exception& ex){
@@ -576,7 +637,7 @@ namespace CasADi{
           
       double time2 = clock();
       t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
-
+      n_eval_g_ += 1;
       log("eval_g ok");
       return true;
     } catch (exception& ex){
@@ -612,7 +673,7 @@ namespace CasADi{
     
       double time2 = clock();
       t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
-
+      n_eval_grad_f_ += 1;
       log("eval_grad_f ok");
       return true;
     } catch (exception& ex){

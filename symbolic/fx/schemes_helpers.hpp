@@ -30,144 +30,67 @@
 #include "io_scheme_vector.hpp"
 namespace CasADi{ 
 
-/// Helper function for 'ACADO_Input'
+/// Helper function for 'DPLEInput'
 
 template<class M>
-class ACADO_InputIOSchemeVector : public IOSchemeVector<M> {
+class DPLEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit ACADO_InputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_ACADO_Input){} 
+    explicit DPLEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DPLEInput){} 
 };
-/// Input arguments of an ACADO OCP solver
+/// Input arguments of a dple solver
 /// 
-/// \copydoc scheme_ACADO_Input
+/// \copydoc scheme_DPLEInput
 template<class M>
-ACADO_InputIOSchemeVector<M> acadoIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M(),const std::string arg_s12="",M arg_m12=M(),const std::string arg_s13="",M arg_m13=M(),const std::string arg_s14="",M arg_m14=M(),const std::string arg_s15="",M arg_m15=M(),const std::string arg_s16="",M arg_m16=M()){
-  std::vector<M> ret(17);
+DPLEInputIOSchemeVector<M> dpleIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
+  std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
-  if (arg_s7!="") arg.insert(make_pair(arg_s7,arg_m7));
-  if (arg_s8!="") arg.insert(make_pair(arg_s8,arg_m8));
-  if (arg_s9!="") arg.insert(make_pair(arg_s9,arg_m9));
-  if (arg_s10!="") arg.insert(make_pair(arg_s10,arg_m10));
-  if (arg_s11!="") arg.insert(make_pair(arg_s11,arg_m11));
-  if (arg_s12!="") arg.insert(make_pair(arg_s12,arg_m12));
-  if (arg_s13!="") arg.insert(make_pair(arg_s13,arg_m13));
-  if (arg_s14!="") arg.insert(make_pair(arg_s14,arg_m14));
-  if (arg_s15!="") arg.insert(make_pair(arg_s15,arg_m15));
-  if (arg_s16!="") arg.insert(make_pair(arg_s16,arg_m16));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_ACADO_Input,it->first);
+    int n = getSchemeEntryEnum(SCHEME_DPLEInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in ACADO_Input: '" << it->first << "' is not recognized. Available keywords are: x_guess, u_guess, p_guess, lbx, ubx, lbx0, ubx0, lbxf, ubxf, lbu, ubu, lbp, ubp, lbc, ubc, lbr, ubr");
+      casadi_error("Keyword error in DPLEInput: '" << it->first << "' is not recognized. Available keywords are: a, v");
     ret[n] = it->second;
   }
-  return ACADO_InputIOSchemeVector<M>(ret);
+  return DPLEInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> acadoIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8="",const std::string arg_s9="",const std::string arg_s10="",const std::string arg_s11="",const std::string arg_s12="",const std::string arg_s13="",const std::string arg_s14="",const std::string arg_s15="",const std::string arg_s16=""){
+std::vector<M> dpleIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1=""){
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s0)));
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s1)));
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s2)));
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s3)));
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s4)));
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s5)));
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s6)));
-  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s7)));
-  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s8)));
-  if (arg_s9!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s9)));
-  if (arg_s10!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s10)));
-  if (arg_s11!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s11)));
-  if (arg_s12!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s12)));
-  if (arg_s13!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s13)));
-  if (arg_s14!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s14)));
-  if (arg_s15!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s15)));
-  if (arg_s16!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Input,arg_s16)));
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEInput,arg_s1)));
   return ret;
 
 }
-/// Helper function for 'ACADO_Output'
+/// Helper function for 'DPLEOutput'
 
 template<class M>
-class ACADO_OutputIOSchemeVector : public IOSchemeVector<M> {
+class DPLEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit ACADO_OutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_ACADO_Output){} 
+    explicit DPLEOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DPLEOutput){} 
 };
-/// Output arguments of an ACADO OCP solver
+/// Output arguments of a dple solver
 /// 
-/// \copydoc scheme_ACADO_Output
+/// \copydoc scheme_DPLEOutput
 template<class M>
-ACADO_OutputIOSchemeVector<M> acadoOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
-  std::vector<M> ret(4);
+DPLEOutputIOSchemeVector<M> dpleOut(const std::string &arg_s0 ="",const M &arg_m0 =M()){
+  std::vector<M> ret(1);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_ACADO_Output,it->first);
+    int n = getSchemeEntryEnum(SCHEME_DPLEOutput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in ACADO_Output: '" << it->first << "' is not recognized. Available keywords are: x_opt, u_opt, p_opt, cost");
+      casadi_error("Keyword error in DPLEOutput: '" << it->first << "' is not recognized. Available keywords are: p");
     ret[n] = it->second;
   }
-  return ACADO_OutputIOSchemeVector<M>(ret);
+  return DPLEOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> acadoOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+std::vector<M> dpleOut(const std::vector<M>& args,const std::string &arg_s0=""){
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Output,arg_s0)));
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Output,arg_s1)));
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Output,arg_s2)));
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_Output,arg_s3)));
-  return ret;
-
-}
-/// Helper function for 'ACADO_FCN_Input'
-
-template<class M>
-class ACADO_FCN_InputIOSchemeVector : public IOSchemeVector<M> {
-  public:
-    explicit ACADO_FCN_InputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_ACADO_FCN_Input){} 
-};
-/// Input arguments of an ACADO function
-/// 
-/// \copydoc scheme_ACADO_FCN_Input
-template<class M>
-ACADO_FCN_InputIOSchemeVector<M> acadofcnIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M()){
-  std::vector<M> ret(6);
-  std::map<std::string,M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
-  typedef typename std::map<std::string,M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,it->first);
-    if (n==-1)
-      casadi_error("Keyword error in ACADO_FCN_Input: '" << it->first << "' is not recognized. Available keywords are: t, xd, xa, u, p, xdot");
-    ret[n] = it->second;
-  }
-  return ACADO_FCN_InputIOSchemeVector<M>(ret);
-}
-template<class M>
-std::vector<M> acadofcnIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5=""){
-  std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s0)));
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s1)));
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s2)));
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s3)));
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s4)));
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,arg_s5)));
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEOutput,arg_s0)));
   return ret;
 
 }
@@ -182,7 +105,7 @@ class ControlledDAEInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_ControlledDAEInput
 template<class M>
-ControlledDAEInputIOSchemeVector<M> controldaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M()){
+ControlledDAEInputIOSchemeVector<M> controldaeIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M()){
   std::vector<M> ret(9);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -204,7 +127,7 @@ ControlledDAEInputIOSchemeVector<M> controldaeIn(const std::string arg_s0="",M a
   return ControlledDAEInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> controldaeIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8=""){
+std::vector<M> controldaeIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7="",const std::string &arg_s8=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput,arg_s1)));
@@ -229,7 +152,7 @@ class ControlSimulatorInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_ControlSimulatorInput
 template<class M>
-ControlSimulatorInputIOSchemeVector<M> controlsimulatorIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+ControlSimulatorInputIOSchemeVector<M> controlsimulatorIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
   std::vector<M> ret(3);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -245,7 +168,7 @@ ControlSimulatorInputIOSchemeVector<M> controlsimulatorIn(const std::string arg_
   return ControlSimulatorInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> controlsimulatorIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+std::vector<M> controlsimulatorIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput,arg_s1)));
@@ -264,7 +187,7 @@ class DAEInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_DAEInput
 template<class M>
-DAEInputIOSchemeVector<M> daeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+DAEInputIOSchemeVector<M> daeIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -281,7 +204,7 @@ DAEInputIOSchemeVector<M> daeIn(const std::string arg_s0="",M arg_m0=M(),const s
   return DAEInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> daeIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+std::vector<M> daeIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput,arg_s1)));
@@ -301,7 +224,7 @@ class DAEOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_DAEOutput
 template<class M>
-DAEOutputIOSchemeVector<M> daeOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+DAEOutputIOSchemeVector<M> daeOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
   std::vector<M> ret(3);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -317,7 +240,7 @@ DAEOutputIOSchemeVector<M> daeOut(const std::string arg_s0="",M arg_m0=M(),const
   return DAEOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> daeOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+std::vector<M> daeOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput,arg_s1)));
@@ -336,7 +259,7 @@ class RDAEInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_RDAEInput
 template<class M>
-RDAEInputIOSchemeVector<M> rdaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M()){
+RDAEInputIOSchemeVector<M> rdaeIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M()){
   std::vector<M> ret(7);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -356,7 +279,7 @@ RDAEInputIOSchemeVector<M> rdaeIn(const std::string arg_s0="",M arg_m0=M(),const
   return RDAEInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> rdaeIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6=""){
+std::vector<M> rdaeIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput,arg_s1)));
@@ -379,7 +302,7 @@ class RDAEOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_RDAEOutput
 template<class M>
-RDAEOutputIOSchemeVector<M> rdaeOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+RDAEOutputIOSchemeVector<M> rdaeOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
   std::vector<M> ret(3);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -395,7 +318,7 @@ RDAEOutputIOSchemeVector<M> rdaeOut(const std::string arg_s0="",M arg_m0=M(),con
   return RDAEOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> rdaeOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+std::vector<M> rdaeOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput,arg_s1)));
@@ -414,29 +337,33 @@ class IntegratorInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_IntegratorInput
 template<class M>
-IntegratorInputIOSchemeVector<M> integratorIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
-  std::vector<M> ret(4);
+IntegratorInputIOSchemeVector<M> integratorIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M()){
+  std::vector<M> ret(6);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_IntegratorInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in IntegratorInput: '" << it->first << "' is not recognized. Available keywords are: x0, p, rx0, rp");
+      casadi_error("Keyword error in IntegratorInput: '" << it->first << "' is not recognized. Available keywords are: x0, p, z0, rx0, rp, rz0");
     ret[n] = it->second;
   }
   return IntegratorInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> integratorIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+std::vector<M> integratorIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s1)));
   if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s2)));
   if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput,arg_s5)));
   return ret;
 
 }
@@ -451,29 +378,33 @@ class IntegratorOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_IntegratorOutput
 template<class M>
-IntegratorOutputIOSchemeVector<M> integratorOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
-  std::vector<M> ret(4);
+IntegratorOutputIOSchemeVector<M> integratorOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M()){
+  std::vector<M> ret(6);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_IntegratorOutput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in IntegratorOutput: '" << it->first << "' is not recognized. Available keywords are: xf, qf, rxf, rqf");
+      casadi_error("Keyword error in IntegratorOutput: '" << it->first << "' is not recognized. Available keywords are: xf, qf, zf, rxf, rqf, rzf");
     ret[n] = it->second;
   }
   return IntegratorOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> integratorOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+std::vector<M> integratorOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s1)));
   if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s2)));
   if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput,arg_s5)));
   return ret;
 
 }
@@ -488,27 +419,25 @@ class LinsolInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_LinsolInput
 template<class M>
-LinsolInputIOSchemeVector<M> linsolIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
-  std::vector<M> ret(3);
+LinsolInputIOSchemeVector<M> linsolIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
+  std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_LinsolInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in LinsolInput: '" << it->first << "' is not recognized. Available keywords are: A, B, T");
+      casadi_error("Keyword error in LinsolInput: '" << it->first << "' is not recognized. Available keywords are: A, B");
     ret[n] = it->second;
   }
   return LinsolInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> linsolIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+std::vector<M> linsolIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput,arg_s1)));
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput,arg_s2)));
   return ret;
 
 }
@@ -523,7 +452,7 @@ class LinsolOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_LinsolOutput
 template<class M>
-LinsolOutputIOSchemeVector<M> linsolOut(const std::string arg_s0="",M arg_m0=M()){
+LinsolOutputIOSchemeVector<M> linsolOut(const std::string &arg_s0 ="",const M &arg_m0 =M()){
   std::vector<M> ret(1);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -537,7 +466,7 @@ LinsolOutputIOSchemeVector<M> linsolOut(const std::string arg_s0="",M arg_m0=M()
   return LinsolOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> linsolOut(const std::vector<M>& args,const std::string arg_s0=""){
+std::vector<M> linsolOut(const std::vector<M>& args,const std::string &arg_s0=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolOutput,arg_s0)));
   return ret;
@@ -554,7 +483,7 @@ class LPSolverInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_LPSolverInput
 template<class M>
-LPSolverInputIOSchemeVector<M> lpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M()){
+LPSolverInputIOSchemeVector<M> lpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M()){
   std::vector<M> ret(6);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -573,7 +502,7 @@ LPSolverInputIOSchemeVector<M> lpIn(const std::string arg_s0="",M arg_m0=M(),con
   return LPSolverInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> lpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5=""){
+std::vector<M> lpIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput,arg_s1)));
@@ -595,7 +524,7 @@ class LPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_LPSolverOutput
 template<class M>
-LPSolverOutputIOSchemeVector<M> lpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+LPSolverOutputIOSchemeVector<M> lpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -612,7 +541,7 @@ LPSolverOutputIOSchemeVector<M> lpOut(const std::string arg_s0="",M arg_m0=M(),c
   return LPSolverOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> lpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+std::vector<M> lpOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput,arg_s1)));
@@ -632,7 +561,7 @@ class LPStructIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_LPStruct
 template<class M>
-LPStructIOSchemeVector<M> lpStruct(const std::string arg_s0="",M arg_m0=M()){
+LPStructIOSchemeVector<M> lpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M()){
   std::vector<M> ret(1);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -646,7 +575,7 @@ LPStructIOSchemeVector<M> lpStruct(const std::string arg_s0="",M arg_m0=M()){
   return LPStructIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> lpStruct(const std::vector<M>& args,const std::string arg_s0=""){
+std::vector<M> lpStruct(const std::vector<M>& args,const std::string &arg_s0=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPStruct,arg_s0)));
   return ret;
@@ -663,7 +592,7 @@ class NLPInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_NLPInput
 template<class M>
-NLPInputIOSchemeVector<M> nlpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+NLPInputIOSchemeVector<M> nlpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
   std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -678,7 +607,7 @@ NLPInputIOSchemeVector<M> nlpIn(const std::string arg_s0="",M arg_m0=M(),const s
   return NLPInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> nlpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+std::vector<M> nlpIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput,arg_s1)));
@@ -696,7 +625,7 @@ class NLPOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_NLPOutput
 template<class M>
-NLPOutputIOSchemeVector<M> nlpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+NLPOutputIOSchemeVector<M> nlpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
   std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -711,7 +640,7 @@ NLPOutputIOSchemeVector<M> nlpOut(const std::string arg_s0="",M arg_m0=M(),const
   return NLPOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> nlpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+std::vector<M> nlpOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput,arg_s1)));
@@ -729,7 +658,7 @@ class GradFInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_GradFInput
 template<class M>
-GradFInputIOSchemeVector<M> gradFIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+GradFInputIOSchemeVector<M> gradFIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
   std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -744,7 +673,7 @@ GradFInputIOSchemeVector<M> gradFIn(const std::string arg_s0="",M arg_m0=M(),con
   return GradFInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> gradFIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+std::vector<M> gradFIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput,arg_s1)));
@@ -762,7 +691,7 @@ class GradFOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_GradFOutput
 template<class M>
-GradFOutputIOSchemeVector<M> gradFOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+GradFOutputIOSchemeVector<M> gradFOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
   std::vector<M> ret(3);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -778,7 +707,7 @@ GradFOutputIOSchemeVector<M> gradFOut(const std::string arg_s0="",M arg_m0=M(),c
   return GradFOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> gradFOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+std::vector<M> gradFOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput,arg_s1)));
@@ -797,7 +726,7 @@ class JacGInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_JacGInput
 template<class M>
-JacGInputIOSchemeVector<M> jacGIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+JacGInputIOSchemeVector<M> jacGIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
   std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -812,7 +741,7 @@ JacGInputIOSchemeVector<M> jacGIn(const std::string arg_s0="",M arg_m0=M(),const
   return JacGInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> jacGIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+std::vector<M> jacGIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput,arg_s1)));
@@ -830,7 +759,7 @@ class JacGOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_JacGOutput
 template<class M>
-JacGOutputIOSchemeVector<M> jacGOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+JacGOutputIOSchemeVector<M> jacGOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
   std::vector<M> ret(3);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -846,7 +775,7 @@ JacGOutputIOSchemeVector<M> jacGOut(const std::string arg_s0="",M arg_m0=M(),con
   return JacGOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> jacGOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+std::vector<M> jacGOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput,arg_s1)));
@@ -865,7 +794,7 @@ class HessLagInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_HessLagInput
 template<class M>
-HessLagInputIOSchemeVector<M> hessLagIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+HessLagInputIOSchemeVector<M> hessLagIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -882,7 +811,7 @@ HessLagInputIOSchemeVector<M> hessLagIn(const std::string arg_s0="",M arg_m0=M()
   return HessLagInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> hessLagIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+std::vector<M> hessLagIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput,arg_s1)));
@@ -902,7 +831,7 @@ class HessLagOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_HessLagOutput
 template<class M>
-HessLagOutputIOSchemeVector<M> hessLagOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M()){
+HessLagOutputIOSchemeVector<M> hessLagOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M()){
   std::vector<M> ret(5);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -920,7 +849,7 @@ HessLagOutputIOSchemeVector<M> hessLagOut(const std::string arg_s0="",M arg_m0=M
   return HessLagOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> hessLagOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4=""){
+std::vector<M> hessLagOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput,arg_s1)));
@@ -941,7 +870,7 @@ class NLPSolverInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_NLPSolverInput
 template<class M>
-NLPSolverInputIOSchemeVector<M> nlpSolverIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M()){
+NLPSolverInputIOSchemeVector<M> nlpSolverIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M()){
   std::vector<M> ret(8);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -962,7 +891,7 @@ NLPSolverInputIOSchemeVector<M> nlpSolverIn(const std::string arg_s0="",M arg_m0
   return NLPSolverInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> nlpSolverIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7=""){
+std::vector<M> nlpSolverIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput,arg_s1)));
@@ -986,7 +915,7 @@ class NLPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_NLPSolverOutput
 template<class M>
-NLPSolverOutputIOSchemeVector<M> nlpSolverOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M()){
+NLPSolverOutputIOSchemeVector<M> nlpSolverOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M()){
   std::vector<M> ret(6);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1005,7 +934,7 @@ NLPSolverOutputIOSchemeVector<M> nlpSolverOut(const std::string arg_s0="",M arg_
   return NLPSolverOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> nlpSolverOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5=""){
+std::vector<M> nlpSolverOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput,arg_s1)));
@@ -1029,7 +958,7 @@ class MayerInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_MayerInput
 template<class M>
-MayerInputIOSchemeVector<M> mayerIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+MayerInputIOSchemeVector<M> mayerIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
   std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1044,7 +973,7 @@ MayerInputIOSchemeVector<M> mayerIn(const std::string arg_s0="",M arg_m0=M(),con
   return MayerInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> mayerIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+std::vector<M> mayerIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_MayerInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_MayerInput,arg_s1)));
@@ -1068,7 +997,7 @@ class OCPInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_OCPInput
 template<class M>
-OCPInputIOSchemeVector<M> ocpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M(),const std::string arg_s12="",M arg_m12=M()){
+OCPInputIOSchemeVector<M> ocpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M(),const std::string &arg_s9 ="",const M &arg_m9 =M(),const std::string &arg_s10 ="",const M &arg_m10 =M(),const std::string &arg_s11 ="",const M &arg_m11 =M(),const std::string &arg_s12 ="",const M &arg_m12 =M()){
   std::vector<M> ret(13);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1094,7 +1023,7 @@ OCPInputIOSchemeVector<M> ocpIn(const std::string arg_s0="",M arg_m0=M(),const s
   return OCPInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> ocpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8="",const std::string arg_s9="",const std::string arg_s10="",const std::string arg_s11="",const std::string arg_s12=""){
+std::vector<M> ocpIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7="",const std::string &arg_s8="",const std::string &arg_s9="",const std::string &arg_s10="",const std::string &arg_s11="",const std::string &arg_s12=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput,arg_s1)));
@@ -1123,7 +1052,7 @@ class OCPOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_OCPOutput
 template<class M>
-OCPOutputIOSchemeVector<M> ocpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+OCPOutputIOSchemeVector<M> ocpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1140,7 +1069,7 @@ OCPOutputIOSchemeVector<M> ocpOut(const std::string arg_s0="",M arg_m0=M(),const
   return OCPOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> ocpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+std::vector<M> ocpOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput,arg_s1)));
@@ -1160,7 +1089,7 @@ class QCQPSolverInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_QCQPSolverInput
 template<class M>
-QCQPSolverInputIOSchemeVector<M> qcqpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M()){
+QCQPSolverInputIOSchemeVector<M> qcqpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M(),const std::string &arg_s9 ="",const M &arg_m9 =M(),const std::string &arg_s10 ="",const M &arg_m10 =M(),const std::string &arg_s11 ="",const M &arg_m11 =M()){
   std::vector<M> ret(12);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1185,7 +1114,7 @@ QCQPSolverInputIOSchemeVector<M> qcqpIn(const std::string arg_s0="",M arg_m0=M()
   return QCQPSolverInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> qcqpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8="",const std::string arg_s9="",const std::string arg_s10="",const std::string arg_s11=""){
+std::vector<M> qcqpIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7="",const std::string &arg_s8="",const std::string &arg_s9="",const std::string &arg_s10="",const std::string &arg_s11=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput,arg_s1)));
@@ -1213,7 +1142,7 @@ class QCQPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_QCQPSolverOutput
 template<class M>
-QCQPSolverOutputIOSchemeVector<M> qcqpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+QCQPSolverOutputIOSchemeVector<M> qcqpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1230,7 +1159,7 @@ QCQPSolverOutputIOSchemeVector<M> qcqpOut(const std::string arg_s0="",M arg_m0=M
   return QCQPSolverOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> qcqpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+std::vector<M> qcqpOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput,arg_s1)));
@@ -1250,7 +1179,7 @@ class QCQPStructIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_QCQPStruct
 template<class M>
-QCQPStructIOSchemeVector<M> qcqpStruct(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+QCQPStructIOSchemeVector<M> qcqpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
   std::vector<M> ret(3);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1266,7 +1195,7 @@ QCQPStructIOSchemeVector<M> qcqpStruct(const std::string arg_s0="",M arg_m0=M(),
   return QCQPStructIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> qcqpStruct(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+std::vector<M> qcqpStruct(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct,arg_s1)));
@@ -1285,7 +1214,7 @@ class QPSolverInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_QPSolverInput
 template<class M>
-QPSolverInputIOSchemeVector<M> qpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M()){
+QPSolverInputIOSchemeVector<M> qpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M()){
   std::vector<M> ret(9);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1307,7 +1236,7 @@ QPSolverInputIOSchemeVector<M> qpIn(const std::string arg_s0="",M arg_m0=M(),con
   return QPSolverInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> qpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8=""){
+std::vector<M> qpIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7="",const std::string &arg_s8=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput,arg_s1)));
@@ -1332,7 +1261,7 @@ class QPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_QPSolverOutput
 template<class M>
-QPSolverOutputIOSchemeVector<M> qpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+QPSolverOutputIOSchemeVector<M> qpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1349,7 +1278,7 @@ QPSolverOutputIOSchemeVector<M> qpOut(const std::string arg_s0="",M arg_m0=M(),c
   return QPSolverOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> qpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+std::vector<M> qpOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput,arg_s1)));
@@ -1369,7 +1298,7 @@ class QPStructIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_QPStruct
 template<class M>
-QPStructIOSchemeVector<M> qpStruct(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+QPStructIOSchemeVector<M> qpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
   std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1384,7 +1313,7 @@ QPStructIOSchemeVector<M> qpStruct(const std::string arg_s0="",M arg_m0=M(),cons
   return QPStructIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> qpStruct(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+std::vector<M> qpStruct(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPStruct,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPStruct,arg_s1)));
@@ -1402,7 +1331,7 @@ class SDPInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_SDPInput
 template<class M>
-SDPInputIOSchemeVector<M> sdpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M()){
+SDPInputIOSchemeVector<M> sdpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M()){
   std::vector<M> ret(8);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1423,7 +1352,7 @@ SDPInputIOSchemeVector<M> sdpIn(const std::string arg_s0="",M arg_m0=M(),const s
   return SDPInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> sdpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7=""){
+std::vector<M> sdpIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput,arg_s1)));
@@ -1447,7 +1376,7 @@ class SDPOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_SDPOutput
 template<class M>
-SDPOutputIOSchemeVector<M> sdpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M()){
+SDPOutputIOSchemeVector<M> sdpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M()){
   std::vector<M> ret(7);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1467,7 +1396,7 @@ SDPOutputIOSchemeVector<M> sdpOut(const std::string arg_s0="",M arg_m0=M(),const
   return SDPOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> sdpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6=""){
+std::vector<M> sdpOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput,arg_s1)));
@@ -1490,7 +1419,7 @@ class SDPStructIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_SDPStruct
 template<class M>
-SDPStructIOSchemeVector<M> sdpStruct(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+SDPStructIOSchemeVector<M> sdpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
   std::vector<M> ret(3);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1506,11 +1435,138 @@ SDPStructIOSchemeVector<M> sdpStruct(const std::string arg_s0="",M arg_m0=M(),co
   return SDPStructIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> sdpStruct(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2=""){
+std::vector<M> sdpStruct(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct,arg_s1)));
   if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct,arg_s2)));
+  return ret;
+
+}
+/// Helper function for 'SDQPInput'
+
+template<class M>
+class SDQPInputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit SDQPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPInput){} 
+};
+/// Input arguments of a SDQP problem
+/// 
+/// \copydoc scheme_SDQPInput
+template<class M>
+SDQPInputIOSchemeVector<M> sdqpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M()){
+  std::vector<M> ret(9);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
+  if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
+  if (arg_s7!="") arg.insert(make_pair(arg_s7,arg_m7));
+  if (arg_s8!="") arg.insert(make_pair(arg_s8,arg_m8));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_SDQPInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in SDQPInput: '" << it->first << "' is not recognized. Available keywords are: h, c, f, g, a, lba, uba, lbx, ubx");
+    ret[n] = it->second;
+  }
+  return SDQPInputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> sdqpIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7="",const std::string &arg_s8=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s7)));
+  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput,arg_s8)));
+  return ret;
+
+}
+/// Helper function for 'SDQPOutput'
+
+template<class M>
+class SDQPOutputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit SDQPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPOutput){} 
+};
+/// Output arguments of an SDQP Solver
+/// 
+/// \copydoc scheme_SDQPOutput
+template<class M>
+SDQPOutputIOSchemeVector<M> sdqpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M()){
+  std::vector<M> ret(7);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
+  if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_SDQPOutput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in SDQPOutput: '" << it->first << "' is not recognized. Available keywords are: x, p, dual, cost, dual_cost, lam_a, lam_x");
+    ret[n] = it->second;
+  }
+  return SDQPOutputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> sdqpOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput,arg_s6)));
+  return ret;
+
+}
+/// Helper function for 'SDQPStruct'
+
+template<class M>
+class SDQPStructIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit SDQPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPStruct){} 
+};
+/// Structure specification of an SDQP
+/// 
+/// \copydoc scheme_SDQPStruct
+template<class M>
+SDQPStructIOSchemeVector<M> sdqpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
+  std::vector<M> ret(4);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_SDQPStruct,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in SDQPStruct: '" << it->first << "' is not recognized. Available keywords are: h, f, g, a");
+    ret[n] = it->second;
+  }
+  return SDQPStructIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> sdqpStruct(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct,arg_s3)));
   return ret;
 
 }
@@ -1525,7 +1581,7 @@ class SOCPInputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_SOCPInput
 template<class M>
-SOCPInputIOSchemeVector<M> socpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M()){
+SOCPInputIOSchemeVector<M> socpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M(),const std::string &arg_s9 ="",const M &arg_m9 =M()){
   std::vector<M> ret(10);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1548,7 +1604,7 @@ SOCPInputIOSchemeVector<M> socpIn(const std::string arg_s0="",M arg_m0=M(),const
   return SOCPInputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> socpIn(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3="",const std::string arg_s4="",const std::string arg_s5="",const std::string arg_s6="",const std::string arg_s7="",const std::string arg_s8="",const std::string arg_s9=""){
+std::vector<M> socpIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7="",const std::string &arg_s8="",const std::string &arg_s9=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput,arg_s1)));
@@ -1574,7 +1630,7 @@ class SOCPOutputIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_SOCPOutput
 template<class M>
-SOCPOutputIOSchemeVector<M> socpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+SOCPOutputIOSchemeVector<M> socpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
   std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1591,7 +1647,7 @@ SOCPOutputIOSchemeVector<M> socpOut(const std::string arg_s0="",M arg_m0=M(),con
   return SOCPOutputIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> socpOut(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1="",const std::string arg_s2="",const std::string arg_s3=""){
+std::vector<M> socpOut(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput,arg_s1)));
@@ -1611,7 +1667,7 @@ class SOCPStructIOSchemeVector : public IOSchemeVector<M> {
 /// 
 /// \copydoc scheme_SOCPStruct
 template<class M>
-SOCPStructIOSchemeVector<M> socpStruct(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M()){
+SOCPStructIOSchemeVector<M> socpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
   std::vector<M> ret(2);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
@@ -1626,10 +1682,63 @@ SOCPStructIOSchemeVector<M> socpStruct(const std::string arg_s0="",M arg_m0=M(),
   return SOCPStructIOSchemeVector<M>(ret);
 }
 template<class M>
-std::vector<M> socpStruct(const std::vector<M>& args,const std::string arg_s0="",const std::string arg_s1=""){
+std::vector<M> socpStruct(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1=""){
   std::vector<M> ret;
   if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct,arg_s0)));
   if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct,arg_s1)));
+  return ret;
+
+}
+/// Helper function for 'StabilizedQPSolverInput'
+
+template<class M>
+class StabilizedQPSolverInputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit StabilizedQPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_StabilizedQPSolverInput){} 
+};
+/// Input arguments of a QP problem
+/// 
+/// \copydoc scheme_StabilizedQPSolverInput
+template<class M>
+StabilizedQPSolverInputIOSchemeVector<M> stabilizedQpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M(),const std::string &arg_s9 ="",const M &arg_m9 =M(),const std::string &arg_s10 ="",const M &arg_m10 =M(),const std::string &arg_s11 ="",const M &arg_m11 =M()){
+  std::vector<M> ret(12);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
+  if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
+  if (arg_s7!="") arg.insert(make_pair(arg_s7,arg_m7));
+  if (arg_s8!="") arg.insert(make_pair(arg_s8,arg_m8));
+  if (arg_s9!="") arg.insert(make_pair(arg_s9,arg_m9));
+  if (arg_s10!="") arg.insert(make_pair(arg_s10,arg_m10));
+  if (arg_s11!="") arg.insert(make_pair(arg_s11,arg_m11));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in StabilizedQPSolverInput: '" << it->first << "' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu");
+    ret[n] = it->second;
+  }
+  return StabilizedQPSolverInputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> stabilizedQpIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7="",const std::string &arg_s8="",const std::string &arg_s9="",const std::string &arg_s10="",const std::string &arg_s11=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s2)));
+  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s3)));
+  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s4)));
+  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s5)));
+  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s6)));
+  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s7)));
+  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s8)));
+  if (arg_s9!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s9)));
+  if (arg_s10!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s10)));
+  if (arg_s11!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,arg_s11)));
   return ret;
 
 }

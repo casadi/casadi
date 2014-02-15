@@ -121,6 +121,14 @@ namespace CasADi{
     SXMatrix grad(int iind, const std::string& oname) { return grad(iind,outputSchemeEntry(oname)); }
     SXMatrix grad(const std::string& iname, const std::string& oname) { return grad(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
+
+    //@{
+    /// Tangent via source code transformation
+    SXMatrix tang(int iind=0, int oind=0);
+    SXMatrix tang(const std::string& iname, int oind=0) { return tang(inputSchemeEntry(iname),oind); }
+    SXMatrix tang(int iind, const std::string& oname) { return tang(iind,outputSchemeEntry(oname)); }
+    SXMatrix tang(const std::string& iname, const std::string& oname) { return tang(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    //@}
   
     //@{
     /// Hessian (forward over adjoint) via source code transformation

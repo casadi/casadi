@@ -51,7 +51,7 @@ public:
   /** \brief  Initialize */
   virtual void init();
   
-  virtual void evaluate(int nfdir, int nadir);
+  virtual void evaluate();
   
   protected:
     

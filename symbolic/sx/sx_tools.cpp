@@ -23,6 +23,7 @@
 #include "sx_tools.hpp"
 #include "../fx/sx_function_internal.hpp"
 #include "../casadi_math.hpp"
+#include "../casadi_exception.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
 using namespace std;
@@ -148,7 +149,7 @@ void compress(SXMatrix &ex, int level){
 
 std::vector<SXMatrix> substitute(const std::vector<SXMatrix> &ex, const std::vector<SXMatrix> &v, const std::vector<SXMatrix> &vdef){
   // Assert consistent dimensions
-  casadi_assert(v.size()==vdef.size());
+  casadi_assert_warning(v.size()==vdef.size(),"subtitute: number of symbols to replace ( " << v.size() << ") must match number of expressions (" << vdef.size() << ") to replace them with.");
 
   // Quick return if all equal
   bool all_equal = true;
@@ -416,6 +417,12 @@ SXMatrix gradient(const SXMatrix& ex, const SXMatrix &arg) {
   SXFunction temp(arg,ex); // make a runtime
   temp.init();
   return temp.grad();
+}
+
+SXMatrix tangent(const SXMatrix& ex, const SXMatrix &arg) {
+  SXFunction temp(arg,ex); // make a runtime
+  temp.init();
+  return temp.tang();
 }
   
 SXMatrix jacobian(const SXMatrix& ex, const SXMatrix &arg) {
@@ -710,15 +717,16 @@ std::vector<std::vector<SXMatrix> > ssym(const std::string& name, int n, int m, 
   return ssym(name,sp_dense(n,m),p,r);
 }
 
-SXMatrix taylor(const SXMatrix& ex,const SX& x, const SX& a, int order) {
+SXMatrix taylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a, int order) {
+  casadi_assert(x.scalar() && a.scalar());
   if (ex.size()!=ex.numel())
    throw CasadiException("taylor: not implemented for sparse matrices");
   SXMatrix ff = vec(ex);
   
   SXMatrix result = substitute(ff,x,a);
   double nf=1; 
-  SX dx = (x-a);
-  SX dxa = (x-a);
+  SXMatrix dx = (x-a);
+  SXMatrix dxa = (x-a);
   for (int i=1;i<=order;i++) {
     ff = jacobian(ff,x);
     nf*=i;
@@ -1093,6 +1101,9 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
   for(int i=0; i<vdef.size(); ++i){
     vdef[i].setTemp(i+1);
   }
+
+  // Save the marked nodes for later cleanup
+  vector<SX> marked = vdef;
   
   // Reset iterator
   b_it=f->operations_.begin();
@@ -1121,8 +1132,8 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
   }
 
   // Unmark the expressions
-  for(int i=0; i<vdef.size(); ++i){
-    vdef[i].setTemp(0);
+  for(vector<SX>::iterator it=marked.begin(); it!=marked.end(); ++it){
+    it->setTemp(0);
   }
 }
 
@@ -1213,6 +1224,149 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     SXFunction f(std::vector<SXMatrix>(),e);
     f.init();
     return f.getFree();
+  }
+  
+  SXMatrix poly_coeff(const SXMatrix& ex, const SXMatrix&x) {
+    casadi_assert(ex.scalar());
+    casadi_assert(x.scalar());
+    casadi_assert(isSymbolic(x));
+    
+    SXMatrix ret;
+    
+    SXFunction f(x,ex);
+    f.init();
+    int mult = 1;
+    bool success = false;
+    for (int i=0;i<1000;++i) {
+      ret.append(f.eval(casadi_limits<SX>::zero)/mult);
+      SXMatrix j = f.jac();
+      if (j.size()==0) {
+        success = true;
+        break;
+      }
+      f = SXFunction(x,j);
+      f.init();
+      mult*=i+1;
+    }
+    
+    if (!success) casadi_error("poly: suplied expression does not appear to be polynomial.");
+
+    std::reverse( ret.data().begin(), ret.data().end() );
+    
+    return ret;
+    
+
+  }
+  
+  SXMatrix poly_roots(const SXMatrix& p) {
+    casadi_assert_message(p.size2()==1,"poly_root(): supplied paramter must be column vector but got " << p.dimString() << ".");
+    casadi_assert(p.dense());
+    if (p.size1()==2) { // a*x + b
+      SXMatrix a = p(0);
+      SXMatrix b = p(1);
+      return -b/a;
+    } else if (p.size1()==3) { // a*x^2 + b*x + c
+      SXMatrix a = p(0);
+      SXMatrix b = p(1);
+      SXMatrix c = p(2);
+      SXMatrix ds = sqrt(b*b-4*a*c);
+      SXMatrix bm = -b;
+      SXMatrix a2 = 2*a;
+      SXMatrix ret;
+      ret.append((bm-ds)/a2);
+      ret.append((bm+ds)/a2);
+      return ret;
+    } else if (p.size1()==4) {
+      // www.cs.iastate.edu/~cs577/handouts/polyroots.pdf
+      SXMatrix ai = 1/p(0);
+       
+      SXMatrix p_ = p(1)*ai;
+      SXMatrix q  = p(2)*ai;
+      SXMatrix r  = p(3)*ai;
+      
+      SXMatrix pp = p_*p_;
+      
+      SXMatrix a = q - pp/3;
+      SXMatrix b = r + 2.0/27*pp*p_-p_*q/3;
+      
+      SXMatrix a3 = a/3;
+      
+      SXMatrix phi = acos(-b/2/sqrt(-a3*a3*a3));
+      
+      SXMatrix ret;
+      ret.append(cos(phi/3));
+      ret.append(cos((phi+2*M_PI)/3));
+      ret.append(cos((phi+4*M_PI)/3));
+      ret*= 2*sqrt(-a3);
+      
+      ret-= p_/3;
+      return ret;
+    } else if (p.size1()==5) {
+      SXMatrix ai = 1/p(0);
+      SXMatrix b = p(1)*ai;
+      SXMatrix c = p(2)*ai;
+      SXMatrix d = p(3)*ai;
+      SXMatrix e = p(4)*ai;
+      
+      SXMatrix bb= b*b;
+      SXMatrix f = c - (3*bb/8);
+      SXMatrix g = d + (bb*b / 8) - b*c/2;
+      SXMatrix h = e - (3*bb*bb/256) + (bb * c/16) - ( b*d/4);
+      SXMatrix poly;
+      poly.append(1);
+      poly.append(f/2);
+      poly.append((f*f -4*h)/16);
+      poly.append(-g*g/64);
+      SXMatrix y = poly_roots(poly);
+      
+      SXMatrix r0 = y(0);
+      SXMatrix r1 = y(2);
+
+      SXMatrix p = sqrt(r0); // two non-zero-roots
+      SXMatrix q = sqrt(r1);
+
+      SXMatrix r = -g/(8*p*q);
+
+      SXMatrix s = b/4;
+      
+      SXMatrix ret;
+      ret.append(p + q + r -s);
+      ret.append(p - q - r -s);
+      ret.append(-p + q - r -s );
+      ret.append(-p - q + r -s);
+
+      return ret;
+    } else if (p(p.size()-1).at(0).isEqual(0)) {
+      SXMatrix ret = poly_roots(p(range(p.size()-1)));
+      ret.append(0);
+      return ret;
+    } else {
+      casadi_error("poly_root(): can only solve cases for first or second order polynomial. Got order " << p.size1()-1 << ".");
+    }
+    
+  }
+  
+  SXMatrix eig_symbolic(const SXMatrix& m) {
+    casadi_assert_message(m.size1()==m.size2(),"eig(): supplied matrix must be square");
+    
+    SXMatrix ret;
+    
+    /// Bring m in block diagonal form, calculating eigenvalues of each block seperately
+    std::vector<int> offset;
+    std::vector<int> index;
+    int nb = m.sparsity().stronglyConnectedComponents(offset,index);
+    
+    SXMatrix m_perm = m(offset,offset);
+    
+    SXMatrix l = ssym("l");
+    
+    for (int k=0;k<nb;++k) {
+      std::vector<int> r = range(index.at(k),index.at(k+1));
+      // det(lambda*I-m) = 0
+      ret.append(poly_roots(poly_coeff(det(SXMatrix::eye(r.size())*l-m_perm(r,r)),l)));
+    }
+		
+    return ret;
   }
   
 } // namespace CasADi

@@ -93,12 +93,13 @@ void DirectCollocationInternal::init(){
     D_num(j) = lfcn.output();
 
     // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+    FX tfcn = lfcn.tangent();
+    tfcn.init();
     for(int j2=0; j2<deg_+1; ++j2){
-      lfcn.setInput(tau_root[j2]);
-      lfcn.setFwdSeed(1.0);
-      lfcn.evaluate(1,0);
-      C[j][j2] = lfcn.fwdSens();
-      C_num(j,j2) = lfcn.fwdSens();
+      tfcn.setInput(tau_root[j2]);
+      tfcn.evaluate();
+      C[j][j2] = tfcn.output();
+      C_num(j,j2) = tfcn.output();
     }
   }
 
@@ -360,7 +361,7 @@ void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt 
   casadi_assert(el==V_opt.size());
 }
 
-void DirectCollocationInternal::evaluate(int nfdir, int nadir){
+void DirectCollocationInternal::evaluate(){
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_SOLVER_X0).data());
   getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),nlp_solver_.input(NLP_SOLVER_UBX).data());

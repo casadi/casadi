@@ -59,7 +59,7 @@ namespace CasADi{
     LapackQRDense();
   
     /// Create a linear solver given a sparsity pattern
-    LapackQRDense(const CRSSparsity& sparsity, int nrhs=1);
+    explicit LapackQRDense(const CRSSparsity& sparsity, int nrhs=1);
     
     /// Access functions of the node
     LapackQRDenseInternal* operator->();

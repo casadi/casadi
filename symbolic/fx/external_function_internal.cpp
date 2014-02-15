@@ -68,8 +68,8 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   if(flag) throw CasadiException("ExternalFunctionInternal: \"init\" failed");
   
   // Pass to casadi
-  input_.resize(n_in);
-  output_.resize(n_out);
+  setNumInputs(n_in);
+  setNumOutputs(n_out);
   
   // Get the sparsity pattern
   for(int i=0; i<n_in+n_out; ++i){
@@ -119,7 +119,7 @@ ExternalFunctionInternal::~ExternalFunctionInternal(){
 #endif // WITH_DL 
 }
 
-void ExternalFunctionInternal::evaluate(int nfdir, int nadir){
+void ExternalFunctionInternal::evaluate(){
 #ifdef WITH_DL 
   int flag = evaluate_(getPtr(input_array_),getPtr(output_array_));
   if(flag) throw CasadiException("ExternalFunctionInternal: \"evaluate\" failed");
@@ -131,12 +131,12 @@ void ExternalFunctionInternal::init(){
   FXInternal::init();
 
   // Get pointers to the inputs
-  input_array_.resize(input_.size());
+  input_array_.resize(getNumInputs());
   for(int i=0; i<input_array_.size(); ++i)
     input_array_[i] = input(i).ptr();
 
   // Get pointers to the outputs
-  output_array_.resize(output_.size());
+  output_array_.resize(getNumOutputs());
   for(int i=0; i<output_array_.size(); ++i)
     output_array_[i] = output(i).ptr();
 }

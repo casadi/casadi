@@ -97,6 +97,8 @@ for v in metadata.values(): # Remove templating if not in index.xml
       
 # Get the parents of a class
 def parents(name):
+  if name not in metadata:
+    return []
   return metadata[name]['parents'] + sum(map(parents,metadata[name]['parents']),[])
 
 # Fill in 'hierarchy'
@@ -139,6 +141,14 @@ enums = {}
 for enum in xmlNS.findall("//memberdef[@kind='enum']"):
   name=enum.findtext("name")
   enums[name]=[]
+  description = ""
+  
+  if enum.findtext("briefdescription/para"):
+    description+="".join(list(enum.find("briefdescription/para").itertext())).strip()
+  if enum.findtext("detaileddescription/para"):
+    description+= "\n" + "".join(list(enum.find("detaileddescription/para").itertext())).strip()
+  enums[name].append(description)
+  
   for enumvalue in enum.findall("enumvalue"):
     name_=enumvalue.findtext("name")
     description = ""
@@ -272,7 +282,7 @@ for name,meta in metadata.items():
 
   optionproviders = [meta['options']]
   for a in meta['hierarchy']:
-    if 'options' in metadata[a]:
+    if a in metadata and 'options' in metadata[a]:
       optionproviders.append(metadata[a]['options'])
   
   alloptions = {}
@@ -371,27 +381,38 @@ f.close()
 
 f = file(out+'a0_schemes.hpp','w')
 
+def extract_shorthand(d):
+  m = re.search('\[(\w+)\]',d)
+  if not(m):
+    #raise Exception("No shorthand found in '%s'" % d)
+    return "", d
+  short = m.group(1)
+  return short, d.replace("[%s]" % short,"")
+
 def enumsashtml(n,title):
   s=""
   if (n in enums):
     s+= "<a name='schemes'></a><table>\n"
     
     num = ""
-    for i in range(len(enums[n])):
-      m = enums[n][i]
+    
+    for i in range(len(enums[n])-1):
+      m = enums[n][1+i]
       if re.search(r'_NUM_IN$',m['name']):
         num = m['name']
       if re.search(r'_NUM_OUT$',m['name']):
         num = m['name']
-    s+= "<caption>%s  (%s = %d) </caption>\n" % (title,num,len(enums[n])-1)
-    s+= "<tr><th>Name</th><th>Description</th></tr>\n"
-    for i in range(len(enums[n])):
-      m = enums[n][i]
+    s+= "<caption>%s  (%s = %d) [%s]</caption>\n" % (title,num,len(enums[n])-1,extract_shorthand(enums[n][0])[0])
+    s+= "<tr><th>Full name</th><th>Short</th><th>Description</th></tr>\n"
+    for i in range(len(enums[n])-1):
+      m = enums[n][1+i]
       if re.search(r'_NUM_IN$',m['name']):
         continue
       if re.search(r'_NUM_OUT$',m['name']):
         continue
-      s+="<tr><td>%s</td><td>%s</td></tr>\n" % (m['name'],m['description'])
+      if m['description']=='': continue
+      shorthand, description = extract_shorthand(m['description'])
+      s+="<tr><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (m['name'],shorthand,description)
     s+="</table>\n"
   return s
 
@@ -411,14 +432,14 @@ for name,meta in metadata.items():
   outputscheme = None
   if not('inputscheme' in meta):
     for a in meta['hierarchy']:
-      if 'inputscheme' in metadata[a]:
+      if a in metadata and 'inputscheme' in metadata[a]:
         inputscheme = metadata[a]['inputscheme']
   else:
     inputscheme = meta['inputscheme']
 
   if not('outputscheme' in meta):
     for a in meta['hierarchy']:
-      if 'outputscheme' in metadata[a]:
+      if  a in metadata and 'outputscheme' in metadata[a]:
         outputscheme = metadata[a]['outputscheme']
   else:
     outputscheme = meta['outputscheme']

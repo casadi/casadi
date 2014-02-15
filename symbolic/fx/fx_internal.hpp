@@ -24,6 +24,7 @@
 #define FX_INTERNAL_HPP
 
 #include "fx.hpp"
+#include "../functor.hpp"
 #include "../weak_ref.hpp"
 #include <set>
 #include "code_generator.hpp"
@@ -35,6 +36,8 @@
 #define OUTPUTSCHEME(name)
 
 namespace CasADi{
+
+  class MXFunction;
   
   /** \brief Internal class for FX
       \author Joel Andersson 
@@ -56,23 +59,13 @@ namespace CasADi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /** \brief  Evaluate */
-    virtual void evaluate(int nfdir, int nadir) = 0;
-  
-    /** \brief  Evaluate with directional derivative compression */
-    void evaluateCompressed(int nfdir, int nadir);
+    virtual void evaluate() = 0;
 
     /** \brief Initialize
         Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
         If passed to another class (in the constructor), this class should invoke this function when initialized. */
     virtual void init();
 
-    /** \brief  Update the number of sensitivity directions during or after initialization, 
-        if recursive==true, updateNumSens is also invoked for the baseclass. */
-    virtual void updateNumSens(bool recursive);
-    
-    /** \brief Request a number of forward/adjoint derivative directions */
-    void requestNumSens(int nfwd, int nadj);
-  
     /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 
@@ -108,7 +101,7 @@ namespace CasADi{
     /** \brief  Create derivative node */
     virtual void createCallDerivative(const std::vector<MX> &arg, std::vector<MX> &res, 
                                       const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
-                                      const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens, bool cached);
+                                      const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens);
 
     /** \brief  Create a call to this */
     std::vector<MX> callSelf(const std::vector<MX> &arg);
@@ -138,14 +131,21 @@ namespace CasADi{
     //@}
 
     //@{
+    /** \brief Return tangent function */
+    FX tangent(int iind, int oind);
+    virtual FX getTangent(int iind, int oind);
+    //@}
+
+    //@{
     /** \brief Return Jacobian function */
     FX jacobian(int iind, int oind, bool compact, bool symmetric);
+    void setJacobian(const FX& jac, int iind, int oind, bool compact);
     virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
     virtual FX getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
     //@}
     
     //@{
-    /** \brief Return Jacobian of all input nonzeros with respect to all output nonzeros */
+    /** \brief Return Jacobian of all input elements with respect to all output elements */
     FX fullJacobian();
     virtual FX getFullJacobian();
     //@}
@@ -156,16 +156,28 @@ namespace CasADi{
      */
     FX derivative(int nfwd, int nadj);
 
+    /** Set a function that calculates nfwd forward dedrivatives and nadj adjoint derivatives */
+    void setDerivative(const FX& fcn, int nfwd, int nadj);
+
     /** \brief Constructs and returns a function that calculates forward derivatives */
     virtual FX getDerivative(int nfwd, int nadj);
 
     /** \brief Constructs and returns a function that calculates forward derivatives by creating the Jacobian then multiplying */
     virtual FX getDerivativeViaJac(int nfwd, int nadj);
 
-    /** \brief Constructs and returns a function for calculating derivatives via operator overloading */
-    virtual FX getDerivativeViaOO(int nfwd, int nadj);
-
     //@}
+    
+    
+    /** \brief Create a helper MXFunction with some properties copied
+    *
+    * Copied properties: 
+    *
+    *    input/outputscheme
+    *    ad_mode
+    *   
+    *  The function is not initialized
+    */
+    MXFunction wrapMXFunction();
 
     /** \brief  Print to a c file */
     virtual void generateCode(const std::string& filename);
@@ -187,6 +199,9 @@ namespace CasADi{
     
     /** \brief  Print */
     virtual void repr(std::ostream &stream) const;
+    
+    /** \brief Check if the numerical values of the supplied bounds make sense */
+    virtual void checkInputs() const {};
             
     /** \brief Get the unidirectional or bidirectional partition */
     void getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& D2, bool compact, bool symmetric);
@@ -197,11 +212,17 @@ namespace CasADi{
     /// Is function fcn being monitored
     bool monitored(const std::string& mod) const;
         
-    /// Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs)
-    int getNumScalarInputs() const;
+    /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
+    int getNumInputNonzeros() const;
 
-    /// Get total number of scalar outputs (i.e. the number of nonzeros in all of the matrix-valued outputs)
-    int getNumScalarOutputs() const;
+    /** \brief  Get total number of nonzeros in all of the matrix-valued outputs */
+    int getNumOutputNonzeros() const;
+
+    /** \brief  Get total number of elements in all of the matrix-valued inputs */
+    int getNumInputElements() const;
+
+    /** \brief  Get total number of elements in all of the matrix-valued outputs */
+    int getNumOutputElements() const;
     
     /// Get all statistics obtained at the end of the last evaluate call
     const Dictionary & getStats() const;
@@ -229,6 +250,9 @@ namespace CasADi{
     
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const;
+
+    /// Get a vector of symbolic variables corresponding to the outputs
+    virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
   
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<SXMatrix> symbolicInputSX() const;
@@ -239,35 +263,27 @@ namespace CasADi{
 
     //@{
     /** \brief Access input/output scheme */
-    inline const InputOutputScheme& inputScheme() const{ return inputScheme_;}
-    inline const InputOutputScheme& outputScheme() const{ return outputScheme_;}
-    inline InputOutputScheme& inputScheme(){ return inputScheme_;}
-    inline InputOutputScheme& outputScheme(){ return outputScheme_;}
+    inline const IOScheme& inputScheme() const{ return input_.scheme;}
+    inline const IOScheme& outputScheme() const{ return output_.scheme;}
+    inline IOScheme& inputScheme(){ return input_.scheme;}
+    inline IOScheme& outputScheme(){ return output_.scheme;}
     //@}
 
     //@{
     /// Input/output structures of the function */
-    inline const std::vector<FunctionIO>& input_struct() const{ return input_;}
-    inline const std::vector<FunctionIO>& output_struct() const{ return output_;}
-    inline std::vector<FunctionIO>& input_struct(){ return input_;}
-    inline std::vector<FunctionIO>& output_struct(){ return output_;}
+    inline const IOSchemeVector<DMatrix>& input_struct() const{ return input_;}
+    inline const IOSchemeVector<DMatrix>& output_struct() const{ return output_;}
+    inline IOSchemeVector<DMatrix>& input_struct(){ return input_;}
+    inline IOSchemeVector<DMatrix>& output_struct(){ return output_;}
     //@}
 
     //@{
     /// Input/output access without checking (faster, but unsafe)
-    inline const Matrix<double>& inputNoCheck(int iind=0) const{ return inputS<false>(iind).data;}
-    inline const Matrix<double>& outputNoCheck(int oind=0) const{ return outputS<false>(oind).data;}
-    inline const Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSeedNoCheck(iind,dir); }
-    inline const Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->fwdSensNoCheck(oind,dir);}    
-    inline const Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSeedNoCheck(oind,dir);}
-    inline const Matrix<double>& adjSensNoCheck(int iind=0, int dir=0) const{ return const_cast<FXInternal*>(this)->adjSensNoCheck(iind,dir);}
+    inline const Matrix<double>& inputNoCheck(int iind=0) const{ return inputS<false>(iind);}
+    inline const Matrix<double>& outputNoCheck(int oind=0) const{ return outputS<false>(oind);}
 
-    inline Matrix<double>& inputNoCheck(int iind=0){ return inputS<false>(iind).data;}
-    inline Matrix<double>& outputNoCheck(int oind=0){ return outputS<false>(oind).data;}
-    inline Matrix<double>& fwdSeedNoCheck(int iind=0, int dir=0){ return inputS<false>(iind).dataF[dir]; }
-    inline Matrix<double>& fwdSensNoCheck(int oind=0, int dir=0){ return outputS<false>(oind).dataF[dir]; }
-    inline Matrix<double>& adjSeedNoCheck(int oind=0, int dir=0){ return outputS<false>(oind).dataA[dir];}
-    inline Matrix<double>& adjSensNoCheck(int iind=0, int dir=0){ return inputS<false>(iind).dataA[dir];}
+    inline Matrix<double>& inputNoCheck(int iind=0){ return inputS<false>(iind);}
+    inline Matrix<double>& outputNoCheck(int oind=0){ return outputS<false>(oind);}
     //@}
 
     /** \brief  Log the status of the solver */
@@ -281,8 +297,8 @@ namespace CasADi{
 
     // The following functions are called internally from EvaluateMX. For documentation, see the MXNode class
     //@{
-    virtual void evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res, const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens, const DMatrixPtrVV& aseed, DMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<double>& rtmp);
-    virtual void evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res, const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens, const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res, std::vector<int>& itmp, std::vector<SX>& rtmp);
     virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given);
     virtual void propagateSparsity(MXNode* node, DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
     virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);
@@ -291,13 +307,10 @@ namespace CasADi{
     //@}
 
     /** \brief  Inputs of the function */
-    std::vector<FunctionIO> input_;
+    IOSchemeVector<DMatrix> input_;
 
     /** \brief  Output of the function */
-    std::vector<FunctionIO> output_;
-
-    /** \brief  Number of forward and adjoint derivatives */
-    int nfdir_, nadir_;
+    IOSchemeVector<DMatrix> output_;
 
     /** \brief  Verbose -- for debugging purposes */
     bool verbose_;
@@ -312,7 +325,7 @@ namespace CasADi{
     bool gather_stats_;
 
     /// Cache for functions to evaluate directional derivatives
-    std::vector<std::vector<FX> > derivative_fcn_; // NOTE: This can result in circular dependencies!
+    std::vector<std::vector<WeakRef> > derivative_fcn_;
 
     /// Cache for full Jacobian
     WeakRef full_jacobian_;
@@ -320,28 +333,19 @@ namespace CasADi{
     /// Cache for sparsities of the Jacobian blocks
     Matrix<CRSSparsity> jac_sparsity_, jac_sparsity_compact_;
 
-    /// Which derivative directions are currently being compressed
-    std::vector<bool> compressed_fwd_, compressed_adj_;
-
-    /// User-provided Jacobian generator function
-    JacobianGenerator jacgen_;
-
-    /// User-provided sparsity generator function
-    SparsityGenerator spgen_;
+    /// Cache for Jacobians
+    Matrix<WeakRef> jac_, jac_compact_;
 
     /// User-set field
     void* user_data_;
     
     bool monitor_inputs_, monitor_outputs_;
-    
-    /// The name of the input scheme of this function
-    InputOutputScheme inputScheme_;
-    
-    /// The name of the output scheme of this function
-    InputOutputScheme outputScheme_;
-    
+        
     /// Errors are thrown when NaN is produced
     bool regularity_check_;
+    
+    /// Errors are thrown if numerical values of inputs look bad
+    bool inputs_check_;
     
   };
 

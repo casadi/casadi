@@ -49,39 +49,21 @@ namespace CasADi{
     return new Vertcat(*this);
   }
 
-  void Vertcat::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void Vertcat::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void Vertcat::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void Vertcat::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void Vertcat::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
-    // Number of derivatives
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    // Nondifferentiated outputs and forward sensitivities
-    for(int d=-1; d<nfwd; ++d){
-      typename vector<T>::iterator res_it = d==-1 ? output[0]->data().begin() : fwdSens[d][0]->data().begin();
-      for(int i=0; i<input.size(); ++i){
-        const vector<T>& arg_i = d==-1 ? input[i]->data() : fwdSeed[d][i]->data();
-        copy(arg_i.begin(),arg_i.end(),res_it);
-        res_it += arg_i.size();
-      }
-    }
-    
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      typename vector<T>::iterator arg_it = adjSeed[d][0]->data().begin();
-      for(int i=0; i<input.size(); ++i){
-        vector<T>& res_i = adjSens[d][i]->data();
-        transform(res_i.begin(),res_i.end(),arg_it,res_i.begin(),std::plus<T>());
-        fill_n(arg_it, res_i.size(), 0);
-        arg_it += res_i.size();
-      }
+  void Vertcat::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+    typename vector<T>::iterator res_it = output[0]->data().begin();
+    for(int i=0; i<input.size(); ++i){
+      const vector<T>& arg_i = input[i]->data();
+      copy(arg_i.begin(),arg_i.end(),res_it);
+      res_it += arg_i.size();
     }
   }
 

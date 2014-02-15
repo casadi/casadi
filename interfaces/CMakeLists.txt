@@ -10,10 +10,6 @@ if(IPOPT_FOUND)
   add_subdirectory(ipopt)
 endif()
 
-if(ACADO_FOUND)
-  add_subdirectory(acado)
-endif(ACADO_FOUND)
-
 if(QPOASES_FOUND)
   add_subdirectory(qpoases)
 endif()
@@ -34,14 +30,22 @@ if(DSDP_FOUND)
   add_subdirectory(dsdp)
 endif()
 
-# if(GSL_FOUND)
-#   add_subdirectory(gsl)
-# endif()
-
 if(OOQP_FOUND)
   add_subdirectory(ooqp)
 endif()
 
 if(WORHP_FOUND)
   add_subdirectory(worhp)
+endif()
+
+if(SQIC_FOUND)
+  add_subdirectory(sqic)
+endif()
+
+if(SNOPT_FOUND)
+  add_subdirectory(snopt)
+endif()
+
+if(SLICOT_FOUND)
+  add_subdirectory(slicot)
 endif()

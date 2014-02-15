@@ -794,6 +794,14 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(sprank(DMatrix.ones(3,3)),3)
     self.assertEqual(sprank(DMatrix.ones(3,3)),3)
     
+    A = DMatrix(6,4)
+    A[0,0] = 1
+    A[1,2] = 1
+    A[2,2] = 1
+    A[5,3] = 1
+
+    self.assertEqual(sprank(A),3)
+    
   def test_cross(self):
     self.message("cross products")
     
@@ -840,8 +848,179 @@ class Matrixtests(casadiTestCase):
     
     with self.assertRaises(Exception):
       tril2symm(DMatrix.ones(5,5))
+      
+  def test_append_empty(self):
+    a = DMatrix(0,0)
+    a.append(DMatrix(0,2))
     
+    self.assertEqual(a.size1(),0)
+    self.assertEqual(a.size2(),2)
+
+    a = DMatrix(0,0)
+    a.append(DMatrix(2,0))
+    a.append(DMatrix(3,0))
     
+    self.assertEqual(a.size1(),5)
+    self.assertEqual(a.size2(),0)
+    
+  def test_vertcat_empty(self):
+    a = DMatrix(0,2)
+    v = vertcat([a,a])
+    
+    self.assertEqual(v.size1(),0)
+    self.assertEqual(v.size2(),2)
+
+    a = DMatrix(2,0)
+    v = vertcat([a,a])
+    
+    self.assertEqual(v.size1(),4)
+    self.assertEqual(v.size2(),0)
+  
+  def test_vertsplit(self):
+    a = DMatrix(sp_tril(5),range(5*6/2))
+    v = vertsplit(a,[0,2,4])
+    
+    self.assertEqual(len(v),3)
+    self.checkarray(v[0],DMatrix([[0,0,0,0,0],[1,2,0,0,0]]))
+    self.checkarray(v[1],DMatrix([[3,4,5,0,0],[6,7,8,9,0]]))
+    self.checkarray(v[2],DMatrix([[10,11,12,13,14]]))
+    
+    v = vertsplit(a)
+    self.assertEqual(len(v),a.size1())
+    self.checkarray(v[0],DMatrix([[0,0,0,0,0]]))
+    self.checkarray(v[1],DMatrix([[1,2,0,0,0]]))
+    self.checkarray(v[2],DMatrix([[3,4,5,0,0]]))
+    self.checkarray(v[3],DMatrix([[6,7,8,9,0]]))
+    self.checkarray(v[4],DMatrix([[10,11,12,13,14]]))
+    
+    v = vertsplit(a,2)
+    self.assertEqual(len(v),3)
+    self.checkarray(v[0],DMatrix([[0,0,0,0,0],[1,2,0,0,0]]))
+    self.checkarray(v[1],DMatrix([[3,4,5,0,0],[6,7,8,9,0]]))
+    self.checkarray(v[2],DMatrix([[10,11,12,13,14]]))
+    
+    v = vertsplit(a,[0,0,3])
+    self.assertEqual(len(v),3)
+    self.assertEqual(v[0].size1(),0)
+    self.assertEqual(v[0].size2(),5)
+    self.checkarray(v[1],DMatrix([[0,0,0,0,0],[1,2,0,0,0],[3,4,5,0,0]]))
+    self.checkarray(v[2],DMatrix([[6,7,8,9,0],[10,11,12,13,14]]))
+    
+  def test_horzsplit(self):
+    a = DMatrix(sp_tril(5),range(5*6/2))
+    v = horzsplit(a,[0,2,4])
+    
+    self.assertEqual(len(v),3)
+    self.checkarray(v[0],DMatrix([[0,0],[1,2],[3,4],[6,7],[10,11]]))
+    self.checkarray(v[1],DMatrix([[0,0],[0,0],[5,0],[8,9],[12,13]]))
+    self.checkarray(v[2],DMatrix([[0],[0],[0],[0],[14]]))
+    
+    v = horzsplit(a)
+    self.assertEqual(len(v),a.size1())
+    self.checkarray(v[0],DMatrix([0,1,3,6,10]))
+    self.checkarray(v[1],DMatrix([0,2,4,7,11]))
+    self.checkarray(v[2],DMatrix([0,0,5,8,12]))
+    self.checkarray(v[3],DMatrix([0,0,0,9,13]))
+    self.checkarray(v[4],DMatrix([0,0,0,0,14]))
+    
+    v = horzsplit(a,2)
+    self.assertEqual(len(v),3)
+    self.checkarray(v[0],DMatrix([[0,0],[1,2],[3,4],[6,7],[10,11]]))
+    self.checkarray(v[1],DMatrix([[0,0],[0,0],[5,0],[8,9],[12,13]]))
+    self.checkarray(v[2],DMatrix([[0],[0],[0],[0],[14]]))
+    
+    v = horzsplit(a,[0,0,3])
+    self.assertEqual(len(v),3)
+    self.assertEqual(v[0].size1(),5)
+    self.assertEqual(v[0].size2(),0)
+    self.checkarray(v[1],DMatrix([[0,0,0],[1,2,0],[3,4,5],[6,7,8],[10,11,12]]))
+    self.checkarray(v[2],DMatrix([[0,0],[0,0],[0,0],[9,0],[13,14]]))
+    
+  def test_blocksplit(self):
+    a = DMatrix(sp_tril(5),range(5*6/2))
+    v = blocksplit(a,[0,2,4],[0,1,3])
+    
+    self.checkarray(v[0][0],DMatrix([0,1]))
+    self.checkarray(v[0][1],DMatrix([[0,0],[2,0]]))
+    self.checkarray(v[1][0],DMatrix([3,6]))
+    self.checkarray(blockcat(v),a)
+    
+  def test_solve(self):
+    import random
+    
+    spA = [
+      sp_dense(1,1)
+    ]
+    
+    for n in range(2,5):
+      spA+= [
+        sp_diag(n),
+        sp_dense(n,n),
+        sp_tril(n),
+        sp_tril(n).T,
+        sp_banded(n,1),
+        blkdiag([sp_diag(n),sp_dense(n,n)]),
+        blkdiag([sp_diag(n),sp_tril(n)]),
+        blkdiag([sp_diag(n),sp_tril(n).T]),
+        blkdiag([sp_tril(n),sp_tril(n).T]),
+        sp_diag(n)+sp_rowcol([0],[n-1],n,n),
+        sp_diag(n)+sp_rowcol([0,n-1],[n-1,0],n,n),
+        sp_diag(n)+sp_triplet(n,n,[0],[n-1]),
+        sp_diag(n)+sp_triplet(n,n,[0,n-1],[n-1,0]),
+      ]
+    
+    for sA in spA:
+
+      random.seed(1)
+      a = DMatrix(sA,[random.random() for i in range(sA.size())])
+      A = ssym("a",a.sparsity())
+      for sB in [ sp_dense(a.size1(),1), vertcat([sp_dense(1,1),sp_sparse(a.size1()-1,1)]),sp_tril(a.size1()),sp_tril(a.size1()).T]:
+
+        b = DMatrix(sB,[random.random() for i in range(sB.size())])
+        B = ssym("B",b.sparsity())
+        C = solve(A,B)
+        
+        f = SXFunction([A,B],[C])
+        f.init()
+        
+        f.setInput(a,0)
+        f.setInput(b,1)
+       
+        f.evaluate()
+            
+        c_ref = DMatrix(linalg.solve(a,b))
+        makeSparse(c_ref)
+        
+        c = f.getOutput()
+        
+        print sA.dimString(), sB.dimString()
+
+        try:
+          self.checkarray(c,c_ref)
+          self.assertTrue(min(IMatrix(c_ref.sparsity(),1)-IMatrix(c.sparsity(),1))==0)
+        except Exception as e:
+          c.printDense()
+          print "sol:"
+          c.sparsity().spy()
+          print "ref:"
+          c_ref.sparsity().spy()
+          c_ref.printDense()
+          a.sparsity().sanityCheck()
+          a.printDense()
+          raise e
+          
+  def test_kron(self):
+    a = sparse(DMatrix([[1,0,6],[2,7,0]]))
+    b = sparse(DMatrix([[1,0,0],[2,3,7],[0,0,9],[1,12,13]]))
+    
+    c_ = c.kron(a,b)
+    
+    self.assertEqual(c_.size1(),a.size1()*b.size1())
+    self.assertEqual(c_.size2(),a.size2()*b.size2())
+    self.assertEqual(c_.size(),a.size()*b.size())
+    
+    self.checkarray(c_,numpy.kron(a,b))
+        
 if __name__ == '__main__':
     unittest.main()
 

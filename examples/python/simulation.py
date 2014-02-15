@@ -82,19 +82,20 @@ P0 = states.squared()
 P0[:,:] = 0.01*DMatrix.eye(states.size)
 P0["x","dy"] = P0["dy","x"] = 0.002
 
-J = csim.jacobian("x0","xf")
-J.init()
-J.setInput(x0,"x0")
-J.setInput(parameters_,"p")
-J.setInput(controls_,"u")
-J.evaluate()
+# Not supported in current revision, cf. #929
+# J = csim.jacobian("x0","xf")
+# J.init()
+# J.setInput(x0,"x0")
+# J.setInput(parameters_,"p")
+# J.setInput(controls_,"u")
+# J.evaluate()
 
-Jk = states.squared_repeated(J.getOutput())
-F = Jk[-1]
+# Jk = states.squared_repeated(J.getOutput())
+# F = Jk[-1]
 
-PF_method1 = mul([F,P0,F.T])
+# PF_method1 = mul([F,P0,F.T])
 
-print "State cov (method 1) = ", PF_method1
+# print "State cov (method 1) = ", PF_method1
 
 # === Method 2: Lyapunov equations ===
 #  P' = A.P + P.A^T

@@ -30,6 +30,8 @@ from casadi.tools import *
 from scipy import linalg, matrix
 plt.interactive(True)
 
+NP.random.seed(0)
+
 # Settings of the filter
 N = 10 # Horizon length
 dt = 0.05; # Time step
@@ -150,7 +152,6 @@ x0 = simulated_X[:,0] + sigma_x0*NP.random.randn(Nstates,1)
 # Create the solver
 nlp_solver = IpoptSolver(nlp)
 nlp_solver.setOption({"print_level":0, "print_time": False})
-nlp_solver.setOption('linear_solver','MA57')
 nlp_solver.setOption('max_iter',100)
 nlp_solver.init()
 
@@ -175,7 +176,7 @@ nlp_solver.setInput(initialisation_state,"x0")
 
 nlp_solver.solve()
 # Get the solution
-solution = shooting(nlp_solver.getOutput("x"))
+solution = shooting(nlp_solver.output("x"))
 estimated_X[:,0:N] = solution["X",horzcat]
 estimated_W[:,0:N-1] = solution["W",horzcat]
 
@@ -247,3 +248,4 @@ plt.show()
 
 error = estimated_X[0,:]-simulated_X[0,:]
 print mul(error,error.T)
+assert(mul(error,error.T)<0.01)

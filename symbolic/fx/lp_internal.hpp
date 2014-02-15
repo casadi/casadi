@@ -42,10 +42,13 @@ class LPSolverInternal : public FXInternal{
     virtual void init();
     
     // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
     
     // Solve the system of equations
     virtual void solve();
+    
+    /// \brief Check if the numerical values of the supplied bounds make sense
+    virtual void checkInputs() const;
     
   protected:
   

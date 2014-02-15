@@ -45,6 +45,17 @@ void QPSolver::setLPOptions() {
   (*this)->setLPOptions();
 }
 
+void QPSolver::generateNativeCode(const std::string &filename) const {
+  std::ofstream file;
+  file.open (filename.c_str());
+  
+  (*this)->generateNativeCode(file);
+}
+
+void QPSolver::generateNativeCode(std::ostream &file) const {
+  (*this)->generateNativeCode(file);
+}
+
 } // namespace CasADi
 
   

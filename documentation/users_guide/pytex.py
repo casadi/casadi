@@ -20,9 +20,9 @@ for f in glob.glob("pytex_*.py"):
       num=l[len('pytex snippet::'):].rstrip()
       
       # Remove logfiles that are empty
-      if outfile and not(contents):
-        outfile.close()
-        os.remove(outfile.name)
+      #if outfile and not(contents):
+      #  outfile.close()
+      #  os.remove(outfile.name)
     
       outfile = file(f[:-3]+'_' + num + '.log','w')
       contents = False
@@ -32,6 +32,6 @@ for f in glob.glob("pytex_*.py"):
         outfile.write(l)
   os.remove(logfilename)
   # Remove logfiles that are empty
-  if outfile and not(contents):
-    outfile.close()
-    os.remove(outfile.name)
+  #if outfile and not(contents):
+  #  outfile.close()
+  #  os.remove(outfile.name)

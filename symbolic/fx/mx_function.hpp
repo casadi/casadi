@@ -146,6 +146,14 @@ public:
   MX grad(int iind, const std::string & oname) { return grad(iind,outputSchemeEntry(oname)); }
   MX grad(const std::string & iname, const std::string & oname) { return grad(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
   //@}
+
+  //@{
+  /** \brief Tangent via source code transformation */
+  MX tang(int iind=0, int oind=0);
+  MX tang(const std::string & iname, int oind=0) { return tang(inputSchemeEntry(iname),oind); }
+  MX tang(int iind, const std::string & oname) { return tang(iind,outputSchemeEntry(oname)); }
+  MX tang(const std::string & iname, const std::string & oname) { return tang(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+  //@}
   
   /** \brief Expand the matrix valued graph into a scalar valued graph */
   SXFunction expand(const std::vector<SXMatrix>& inputv = std::vector<SXMatrix>());
@@ -153,8 +161,13 @@ public:
   /** \brief Get all the free variables of the function */
   std::vector<MX> getFree() const;
   
+#ifndef SWIG
   /** \brief Extract the functions needed for the Lifted Newton method */
   void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
+#else
+  /** \brief Extract the functions needed for the Lifted Newton method */
+  void generateLiftingFunctions(MXFunction& OUTPUT, MXFunction& OUTPUT);
+#endif
 
   /** \brief Get the corresponding matrix type */
   typedef MX MatType;  

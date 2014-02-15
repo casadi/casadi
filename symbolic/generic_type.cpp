@@ -26,6 +26,7 @@
 #include <cmath>
 
 #include "fx/fx.hpp"
+#include "functor.hpp"
 
 using namespace std;
 
@@ -109,18 +110,22 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_INTEGRATOR";
       case OT_QPSOLVER:
               return "OT_QPSOLVER";
+      case OT_STABILIZEDQPSOLVER:
+              return "OT_STABILIZEDQPSOLVER";
       case OT_QCQPSOLVER:
               return "OT_QCQPSOLVER";
       case OT_SOCPSOLVER:
               return "OT_SOCPSOLVER";
       case OT_SDPSOLVER:
               return "OT_SDPSOLVER";
+      case OT_SDQPSOLVER:
+              return "OT_SDQPSOLVER";
+    case OT_DERIVATIVEGENERATOR:
+              return "OT_DERIVATIVEGENERATOR";
       case OT_IMPLICITFUNCTION:
               return "OT_IMPLICITFUNCTION";
-      case OT_JACOBIANGENERATOR:
-              return "OT_JACOBIANGENERATOR";
-      case OT_SPARSITYGENERATOR:
-              return "OT_SPARSITYGENERATOR";
+      case OT_CALLBACK:
+              return "OT_CALLBACK";
       case OT_FX:
               return "OT_FX";
       case OT_VOIDPTR:
@@ -241,6 +246,13 @@ GenericType::GenericType(const FX& f) : type_(OT_FX) {
   assignNode(new FXType(f));
 }
 
+  GenericType::GenericType(const DerivativeGenerator& f) : type_(OT_DERIVATIVEGENERATOR) {
+    assignNode(new GenericTypeInternal<DerivativeGenerator>(f));
+  }
+ 
+GenericType::GenericType(const Callback& f) : type_(OT_CALLBACK) {
+  assignNode(new GenericTypeInternal<Callback>(f));
+}
 
 bool GenericType::toBool() const{
   if (isBool()) {
@@ -290,6 +302,16 @@ const vector<double>& GenericType::toDoubleVector() const{
   return static_cast<const DoubleVectorType*>(get())->d_;
 }
 
+vector<int>& GenericType::toIntVector() {
+  casadi_assert_message(isIntVector(),"type mismatch");
+  return static_cast<IntVectorType*>(get())->d_;
+}
+
+vector<double>& GenericType::toDoubleVector() {
+  casadi_assert_message(isDoubleVector(),"type mismatch");
+  return static_cast<DoubleVectorType*>(get())->d_;
+}
+
 const vector<string>& GenericType::toStringVector() const{
   casadi_assert_message(isStringVector(),"type mismatch");
   return static_cast<const StringVectorType*>(get())->d_;
@@ -303,6 +325,11 @@ const SharedObject& GenericType::toSharedObject() const{
 const Dictionary& GenericType::toDictionary() const{
   casadi_assert_message(isDictionary(),"type mismatch");
   return static_cast<const DictionaryType*>(get())->d_;
+}
+
+Dictionary& GenericType::toDictionary() {
+  casadi_assert_message(isDictionary(),"type mismatch");
+  return static_cast<DictionaryType*>(get())->d_;
 }
 
 const FX& GenericType::toFX() const{
@@ -365,12 +392,20 @@ GenericType::GenericType(QPSolverCreator ptr) : type_(OT_QPSOLVER) {
   assignNode(new GenericTypeInternal<QPSolverCreator>(ptr));
 }
 
+GenericType::GenericType(StabilizedQPSolverCreator ptr) : type_(OT_STABILIZEDQPSOLVER) {
+  assignNode(new GenericTypeInternal<StabilizedQPSolverCreator>(ptr));
+}
+
 GenericType::GenericType(LPSolverCreator ptr) : type_(OT_LPSOLVER) {
   assignNode(new GenericTypeInternal<LPSolverCreator>(ptr));
 }
 
 GenericType::GenericType(SDPSolverCreator ptr) : type_(OT_SDPSOLVER) {
   assignNode(new GenericTypeInternal<SDPSolverCreator>(ptr));
+}
+
+GenericType::GenericType(SDQPSolverCreator ptr) : type_(OT_SDQPSOLVER) {
+  assignNode(new GenericTypeInternal<SDQPSolverCreator>(ptr));
 }
 
 GenericType::GenericType(SOCPSolverCreator ptr) : type_(OT_SOCPSOLVER) {
@@ -383,14 +418,6 @@ GenericType::GenericType(QCQPSolverCreator ptr) : type_(OT_QCQPSOLVER) {
 
 GenericType::GenericType(implicitFunctionCreator ptr) : type_(OT_IMPLICITFUNCTION) {
   assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));
-}
-
-GenericType::GenericType(JacobianGenerator ptr) : type_(OT_JACOBIANGENERATOR) {
-  assignNode(new GenericTypeInternal<JacobianGenerator>(ptr));
-}
-
-GenericType::GenericType(SparsityGenerator ptr) : type_(OT_SPARSITYGENERATOR) {
-  assignNode(new GenericTypeInternal<SparsityGenerator>(ptr));
 }
 
 GenericType::operator NLPSolverCreator() const{
@@ -406,6 +433,11 @@ GenericType::operator LPSolverCreator() const{
 GenericType::operator SDPSolverCreator() const{
   casadi_assert_message(is_a<SDPSolverCreator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<SDPSolverCreator>*>(get())->d_;
+}
+
+GenericType::operator SDQPSolverCreator() const{
+  casadi_assert_message(is_a<SDQPSolverCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<SDQPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator SOCPSolverCreator() const{
@@ -432,19 +464,24 @@ GenericType::operator QPSolverCreator() const{
   return static_cast<const GenericTypeInternal<QPSolverCreator>*>(get())->d_;
 }
 
+GenericType::operator StabilizedQPSolverCreator() const{
+  casadi_assert_message(is_a<StabilizedQPSolverCreator>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<StabilizedQPSolverCreator>*>(get())->d_;
+}
+
 GenericType::operator implicitFunctionCreator() const{
   casadi_assert_message(is_a<implicitFunctionCreator>(),"type mismatch");
   return static_cast<const GenericTypeInternal<implicitFunctionCreator>*>(get())->d_;
 }
 
-GenericType::operator JacobianGenerator() const{
-  casadi_assert_message(is_a<JacobianGenerator>(),"type mismatch");
-  return static_cast<const GenericTypeInternal<JacobianGenerator>*>(get())->d_;
-}
+  GenericType::operator const DerivativeGenerator &() const{
+    casadi_assert_message(is_a<DerivativeGenerator>(),"type mismatch");
+    return static_cast<const GenericTypeInternal<DerivativeGenerator>*>(get())->d_;
+  }
 
-GenericType::operator SparsityGenerator() const{
-  casadi_assert_message(is_a<SparsityGenerator>(),"type mismatch");
-  return static_cast<const GenericTypeInternal<SparsityGenerator>*>(get())->d_;
+GenericType::operator const Callback &() const{
+  casadi_assert_message(is_a<Callback>(),"type mismatch");
+  return static_cast<const GenericTypeInternal<Callback>*>(get())->d_;
 }
 
 GenericType::GenericType(const Dictionary& dict) : type_(OT_DICTIONARY) {
@@ -454,6 +491,11 @@ GenericType::GenericType(const Dictionary& dict) : type_(OT_DICTIONARY) {
 GenericType::operator const GenericType::Dictionary& () const{
   casadi_assert_message(is_a<Dictionary>(),"type mismatch");
   return static_cast<const GenericTypeInternal<Dictionary>*>(get())->d_;
+}
+
+GenericType::operator GenericType::Dictionary& () {
+  casadi_assert_message(is_a<Dictionary>(),"type mismatch");
+  return static_cast<GenericTypeInternal<Dictionary>*>(get())->d_;
 }
 
 //GenericType::operator void*() const{

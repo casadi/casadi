@@ -466,10 +466,10 @@ namespace CasADi{
     //@}
     
     /// Matrix-matrix product
-    Matrix<T> mul_full(const Matrix<T> &y) const;
+    Matrix<T> mul_full(const Matrix<T> &y, const CRSSparsity & sp_z=CRSSparsity()) const;
 
     /// Matrix-matrix product
-    Matrix<T> mul(const Matrix<T> &y) const;
+    Matrix<T> mul(const Matrix<T> &y, const CRSSparsity & sp_z=CRSSparsity()) const;
     
     /// Matrix-matrix product, no memory allocation: z += mul(x,y)
     static void mul_no_alloc_nn(const Matrix<T>& x, const Matrix<T> &y, Matrix<T>& z);
@@ -513,6 +513,7 @@ namespace CasADi{
     Matrix<T> ceil() const;
     Matrix<T> fabs() const;
     Matrix<T> sign() const;
+    Matrix<T> __copysign__(const Matrix<T>& y) const;
     Matrix<T> erfinv() const;
     Matrix<T> fmin(const Matrix<T>& y) const;
     Matrix<T> fmax(const Matrix<T>& y) const;
@@ -630,6 +631,28 @@ namespace CasADi{
 
     /** \brief  Legacy - use setArray instead */
     void set(const T* val, Sparsity sp=SPARSE);
+
+    /** Bitwise set, reinterpreting the data as a bvec_t array */
+    void setZeroBV();
+
+    /** Bitwise set, reinterpreting the data as a bvec_t array */
+    void setBV(const Matrix<T>& val);
+
+    /** Bitwise set, reinterpreting the data as a bvec_t array */
+    void getBV(Matrix<T>& val) const{ val.setBV(*this);}
+
+    /** Bitwise or, reinterpreting the data as a bvec_t array */
+    void borBV(const Matrix<T>& val);
+
+    /** \brief Bitwise get the non-zero elements, array */
+    void getArrayBV(bvec_t* val, int len) const;
+
+    /** \brief Bitwise set the non-zero elements, array */
+    void setArrayBV(const bvec_t* val, int len);
+
+    /** \brief Bitwise or the non-zero elements, array */
+    void borArrayBV(const bvec_t* val, int len);
+
 #endif
 
     /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 
@@ -700,7 +723,7 @@ namespace CasADi{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
     static void setPrecision(int precision) { stream_precision_ = precision; }
     static void setWidth(int width) { stream_width_ = width; }
-    static void setScientific(bool scientific) { stream_width_ = scientific; }
+    static void setScientific(bool scientific) { stream_scientific_ = scientific; }
     // @}
     
   private:

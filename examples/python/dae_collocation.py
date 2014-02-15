@@ -75,18 +75,21 @@ for j in range(deg+1):
     for j2 in range(deg+1):
         if j2 != j:
             L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2])
+
     lfcn = SXFunction([tau],[L])
     lfcn.init()
     # Evaluate the polynomial at the final time to get the coefficients of the continuity equation
     lfcn.setInput(1.0)
     lfcn.evaluate()
     D[j] = lfcn.getOutput()
+
     # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+    tfcn = lfcn.tangent()
+    tfcn.init()
     for j2 in range(deg+1):
-        lfcn.setInput(tau_root[j2])
-        lfcn.setFwdSeed(1.0)
-        lfcn.evaluate(1,0)
-        C[j][j2] = lfcn.getFwdSens()
+        tfcn.setInput(tau_root[j2])
+        tfcn.evaluate()
+        C[j][j2] = tfcn.getOutput()
 
 
 

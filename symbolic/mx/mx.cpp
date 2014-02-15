@@ -95,8 +95,8 @@ namespace CasADi{
     std::vector<MX> ret(x->getNumOutputs());
     for(int i=0; i<ret.size(); ++i){
       ret[i] = MX::create(new OutputNode(x, i));
-      if(ret[i].numel()==0){
-        ret[i] = MX();
+      if(ret[i].null()){
+        ret[i] = MX(0,0);
       } else if(ret[i].size()==0){
         ret[i] = MX::sparse(ret[i].shape());
       }
@@ -140,9 +140,9 @@ namespace CasADi{
   const MX MX::sub(int i, int j) const{
     int ind = sparsity().getNZ(i,j);
     if (ind>=0) {
-      return (*this)->getGetNonzeros(CRSSparsity::scalarSparsity,vector<int>(1,ind));
+      return (*this)->getGetNonzeros(CRSSparsity::getScalar(),vector<int>(1,ind));
     } else {
-      return (*this)->getGetNonzeros(CRSSparsity::scalarSparsitySparse,vector<int>(0));
+      return (*this)->getGetNonzeros(CRSSparsity::getScalarSparse(),vector<int>(0));
     }
   }
 
@@ -625,13 +625,13 @@ namespace CasADi{
     *this = val->getGetNonzeros(sp,vector<int>(sp.size(),0));
   }
 
-  MX MX::mul_full(const MX& y) const{
+  MX MX::mul_full(const MX& y, const CRSSparsity &z) const{
     const MX& x = *this;
-    return x->getMultiplication(y);
+    return x->getMultiplication(y,z);
   }
-
-  MX MX::mul(const MX& y) const{
-    return mul_smart(y);
+  
+  MX MX::mul(const MX& y, const CRSSparsity &z) const {
+    return mul_smart(y, z);
   }
 
   MX MX::inner_prod(const MX& y) const{
@@ -668,6 +668,11 @@ namespace CasADi{
 
   MX MX::printme(const MX& b) const{ 
     return binary(OP_PRINTME,*this,b);
+  }
+  
+  MX MX::attachAssert(const MX& y,const std::string &fail_message) const{
+    casadi_assert_message(y.scalar(),"Error in attachAssert: assertion expression y must be scalar, but got " << y.dimString());
+    return(*this)->getAssertion(y, fail_message);
   }
 
   MX MX::exp() const{ 
@@ -748,6 +753,10 @@ namespace CasADi{
 
   MX MX::sign() const{ 
     return (*this)->getUnary(OP_SIGN);
+  }
+  
+  MX MX::__copysign__(const MX& y) const{ 
+    return MX::binary(OP_COPYSIGN,*this,y);
   }
 
   MX MX::erfinv() const{ 

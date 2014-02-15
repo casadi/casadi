@@ -46,8 +46,7 @@ QPLPInternal::QPLPInternal(const std::vector<CRSSparsity> &st) : LPSolverInterna
 QPLPInternal::~QPLPInternal(){ 
 }
 
-void QPLPInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("QPLPInternal::evaluate() not implemented for forward or backward mode");
+void QPLPInternal::evaluate(){
 
   // Pass inputs of LP to QP form 
   qpsolver_.input(QP_SOLVER_A).set(input(LP_SOLVER_A));
@@ -61,6 +60,9 @@ void QPLPInternal::evaluate(int nfdir, int nadir) {
   
   // Delegate computation to NLP Solver
   qpsolver_.evaluate();
+  
+  // Pass the stats
+  stats_["qp_solver_stats"] = qpsolver_.getStats();
   
   // Read the outputs from Ipopt
   output(QP_SOLVER_X).set(qpsolver_.output(LP_SOLVER_X));

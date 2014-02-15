@@ -26,23 +26,23 @@ using namespace std;
 
 namespace CasADi{
 
-CollocationIntegrator::CollocationIntegrator(){
-}
+  CollocationIntegrator::CollocationIntegrator(){
+  }
   
-CollocationIntegrator::CollocationIntegrator(const FX& f, const FX& g){
-  assignNode(new CollocationIntegratorInternal(f,g));
-}
+  CollocationIntegrator::CollocationIntegrator(const FX& f, const FX& g){
+    assignNode(new CollocationIntegratorInternal(f,g));
+  }
 
-CollocationIntegratorInternal* CollocationIntegrator::operator->(){
-  return (CollocationIntegratorInternal*)(Integrator::operator->());
-}
+  CollocationIntegratorInternal* CollocationIntegrator::operator->(){
+    return static_cast<CollocationIntegratorInternal*>(Integrator::operator->());
+  }
 
-const CollocationIntegratorInternal* CollocationIntegrator::operator->() const{
-  return (const CollocationIntegratorInternal*)(Integrator::operator->());
-}
+  const CollocationIntegratorInternal* CollocationIntegrator::operator->() const{
+    return static_cast<const CollocationIntegratorInternal*>(Integrator::operator->());
+  }
     
-bool CollocationIntegrator::checkNode() const{
-  return dynamic_cast<const CollocationIntegratorInternal*>(get())!=0;
-}
+  bool CollocationIntegrator::checkNode() const{
+    return dynamic_cast<const CollocationIntegratorInternal*>(get())!=0;
+  }
 
 } // namespace CasADi

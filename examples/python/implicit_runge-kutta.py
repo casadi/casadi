@@ -84,11 +84,12 @@ for j in range(d+1):
   D[j] = lfcn.getOutput()
 
   # Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+  tfcn = lfcn.tangent()
+  tfcn.init()
   for r in range(d+1):
-    lfcn.setInput(tau_root[r])
-    lfcn.setFwdSeed(1.0)
-    lfcn.evaluate(1,0)
-    C[j,r] = lfcn.getFwdSens()
+    tfcn.setInput(tau_root[r])
+    tfcn.evaluate()
+    C[j,r] = tfcn.getOutput()
 
 # Total number of variables for one finite element
 X0 = msym("X0",nx)
@@ -96,7 +97,7 @@ P  = msym("P",np)
 V = msym("V",d*nx)
 
 # Get the state at each collocation point
-X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
+X = [X0] + list(vertsplit(V,[r*nx for r in range(d+1)]))
 
 # Get the collocation quations (that define V)
 V_eq = []
@@ -124,7 +125,7 @@ vfcn_sx = SXFunction(vfcn)
 ifcn = NewtonImplicitSolver(vfcn_sx)
 ifcn.setOption("linear_solver",CSparse)
 ifcn.init()
-[V] = ifcn.call([X0,P])
+[V] = ifcn.call([MX(),X0,P])
 X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
 
 # Get an expression for the state at the end of the finie element
@@ -144,13 +145,11 @@ for i in range(n):
 # Fixed-step integrator
 irk_integrator = MXFunction(integratorIn(x0=X0,p=P),integratorOut(xf=X))
 irk_integrator.setOption("name","irk_integrator")
-irk_integrator.setOption("number_of_fwd_dir",2)
 irk_integrator.init()
 
 # Create a convensional integrator for reference
 ref_integrator = CVodesIntegrator(f)
 ref_integrator.setOption("name","ref_integrator")
-ref_integrator.setOption("number_of_fwd_dir",2)
 ref_integrator.setOption("tf",tf)
 ref_integrator.init()
 
@@ -164,32 +163,35 @@ for integrator in (irk_integrator,ref_integrator):
   print "Testing ", integrator.getOption("name")
   print "-------"
 
+  # Generate a new function that calculates two forward directions and one adjoint direction
+  dintegrator = integrator.derivative(2,1)
+
   # Pass arguments
-  integrator.setInput(x0_val,"x0")
-  integrator.setInput(p_val,"p")
+  dintegrator.setInput(x0_val,"der_x0")
+  dintegrator.setInput(p_val,"der_p")
   
   # Forward sensitivity analysis, first direction: seed p
-  integrator.setFwdSeed(0.0,"x0",0)
-  integrator.setFwdSeed(1.0,"p",0)
+  dintegrator.setInput(0.0,"fwd0_x0")
+  dintegrator.setInput(1.0,"fwd0_p")
   
   # Forward sensitivity analysis, second direction: seed x0[0]
-  integrator.setFwdSeed([1,0,0],"x0",1)
-  integrator.setFwdSeed(0.0,"p",1)
+  dintegrator.setInput([1,0,0],"fwd1_x0")
+  dintegrator.setInput(0.0,"fwd1_p")
   
   # Adjoint sensitivity analysis, seed xf[2]
-  integrator.setAdjSeed([0,0,1],"xf")
+  dintegrator.setInput([0,0,1],"adj0_xf")
 
   # Integrate
-  integrator.evaluate(2,1)
+  dintegrator.evaluate()
 
   # Get the nondifferentiated results
-  print "%15s = " % "xf", integrator.getOutput("xf")
+  print "%15s = " % "xf", dintegrator.getOutput("der_xf")
 
   # Get the forward sensitivities
-  print "%15s = " % "d(xf)/d(p)", integrator.getFwdSens("xf",0)
-  print "%15s = " % "d(xf)/d(x0[0])", integrator.getFwdSens("xf",1)
+  print "%15s = " % "d(xf)/d(p)", dintegrator.getOutput("fwd0_xf")
+  print "%15s = " % "d(xf)/d(x0[0])", dintegrator.getOutput("fwd1_xf")
 
   # Get the adjoint sensitivities
-  print "%15s = " % "d(xf[2])/d(x0)", integrator.getAdjSens("x0")
-  print "%15s = " % "d(xf[2])/d(p)", integrator.getAdjSens("p")
+  print "%15s = " % "d(xf[2])/d(x0)", dintegrator.getOutput("adj0_x0")
+  print "%15s = " % "d(xf[2])/d(p)", dintegrator.getOutput("adj0_p")
 

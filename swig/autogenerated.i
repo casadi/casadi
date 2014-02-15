@@ -42,217 +42,94 @@ def IOSchemeVector(arg,io_scheme):
     return IOSchemeVectorCRSSparsity(arg,io_scheme)
   except:
     pass
+  raise Exception("IOSchemeVector called with faulty arguments. Individual values must be SXMatrix, MX or CRSSparsity.")
+    
 %}
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
 %pythoncode %{
-def acadoIn(*dummy,**kwargs):
+def dpleIn(*dummy,**kwargs):
   """
-  Helper function for 'ACADO_Input'
+  Helper function for 'DPLEInput'
 
   Two use cases:
-     a) arg = acadoIn(x_guess=my_x_guess, u_guess=my_u_guess, p_guess=my_p_guess, lbx=my_lbx, ubx=my_ubx, lbx0=my_lbx0, ubx0=my_ubx0, lbxf=my_lbxf, ubxf=my_ubxf, lbu=my_lbu, ubu=my_ubu, lbp=my_lbp, ubp=my_ubp, lbc=my_lbc, ubc=my_ubc, lbr=my_lbr, ubr=my_ubr) 
+     a) arg = dpleIn(a=my_a, v=my_v) 
           all arguments optional
-     b) x_guess, u_guess, p_guess, lbx, ubx, lbx0, ubx0, lbxf, ubxf, lbu, ubu, lbp, ubp, lbc, ubc, lbr, ubr = acadoIn(arg,"x_guess", "u_guess", "p_guess", "lbx", "ubx", "lbx0", "ubx0", "lbxf", "ubxf", "lbu", "ubu", "lbp", "ubp", "lbc", "ubc", "lbr", "ubr") 
+     b) a, v = dpleIn(arg,"a", "v") 
           all arguments after the first optional
-  Input arguments of an ACADO OCP solver
+  Input arguments of a dple solver
   
   Keyword arguments:
-    x_guess -- Initial guess for x (default: 0) [ACADO_X_GUESS]
-    u_guess -- Initial guess for u (default: 0) [ACADO_U_GUESS]
-    p_guess -- Initial guess for p (default: 0) [ACADO_P_GUESS]
-    lbx     -- Lower bound on x (default:  -infinity) [ACADO_LBX]
-    ubx     -- Upper bound on x (default:  infinity) [ACADO_UBX]
-    lbx0    -- Lower bound on x0 (default:  -infinity) [ACADO_LBX0]
-    ubx0    -- Upper bound on x0 (default:  infinity) [ACADO_UBX0]
-    lbxf    -- Lower bound on xf (default:  -infinity) [ACADO_LBXF]
-    ubxf    -- Upper bound on xf (default:  infinity) [ACADO_UBXF]
-    lbu     -- Lower bound on u (default:  -infinity) [ACADO_LBU]
-    ubu     -- Upper bound on u (default:  infinity) [ACADO_UBU]
-    lbp     -- Lower bound on p (default:  -infinity) [ACADO_LBP]
-    ubp     -- Upper bound on p (default:  infinity) [ACADO_UBP]
-    lbc     -- Lower bound on the path constraint function (default:  -infinity) [ACADO_LBC]
-    ubc     -- Upper bound on the path constraint function (default:  infinity) [ACADO_UBC]
-    lbr     -- Lower bound on the initial constraint function (default:  0) [ACADO_LBR]
-    ubr     -- Upper bound on the initial constraint function (default:  0) [ACADO_UBR]
+    a -- A matrices (vertcat when const_dim, blkdiag otherwise) [DPLE_A]
+    v -- V matrices (vertcat when const_dim, blkdiag otherwise) [DPLE_V]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of acadoIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ACADO_Input,n)] for n in dummy[1:]]
-  x_guess = []
-  if 'x_guess' in kwargs:
-    x_guess = kwargs['x_guess']
-  u_guess = []
-  if 'u_guess' in kwargs:
-    u_guess = kwargs['u_guess']
-  p_guess = []
-  if 'p_guess' in kwargs:
-    p_guess = kwargs['p_guess']
-  lbx = []
-  if 'lbx' in kwargs:
-    lbx = kwargs['lbx']
-  ubx = []
-  if 'ubx' in kwargs:
-    ubx = kwargs['ubx']
-  lbx0 = []
-  if 'lbx0' in kwargs:
-    lbx0 = kwargs['lbx0']
-  ubx0 = []
-  if 'ubx0' in kwargs:
-    ubx0 = kwargs['ubx0']
-  lbxf = []
-  if 'lbxf' in kwargs:
-    lbxf = kwargs['lbxf']
-  ubxf = []
-  if 'ubxf' in kwargs:
-    ubxf = kwargs['ubxf']
-  lbu = []
-  if 'lbu' in kwargs:
-    lbu = kwargs['lbu']
-  ubu = []
-  if 'ubu' in kwargs:
-    ubu = kwargs['ubu']
-  lbp = []
-  if 'lbp' in kwargs:
-    lbp = kwargs['lbp']
-  ubp = []
-  if 'ubp' in kwargs:
-    ubp = kwargs['ubp']
-  lbc = []
-  if 'lbc' in kwargs:
-    lbc = kwargs['lbc']
-  ubc = []
-  if 'ubc' in kwargs:
-    ubc = kwargs['ubc']
-  lbr = []
-  if 'lbr' in kwargs:
-    lbr = kwargs['lbr']
-  ubr = []
-  if 'ubr' in kwargs:
-    ubr = kwargs['ubr']
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEInput,n)] for n in dummy[1:]]
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  v = []
+  if 'v' in kwargs:
+    v = kwargs['v']
   for k in kwargs.keys():
-    if not(k in ['x_guess','u_guess','p_guess','lbx','ubx','lbx0','ubx0','lbxf','ubxf','lbu','ubu','lbp','ubp','lbc','ubc','lbr','ubr']):
-      raise Exception("Keyword error in acadoIn: '%s' is not recognized. Available keywords are: x_guess, u_guess, p_guess, lbx, ubx, lbx0, ubx0, lbxf, ubxf, lbu, ubu, lbp, ubp, lbc, ubc, lbr, ubr" % k )
-  return IOSchemeVector([x_guess,u_guess,p_guess,lbx,ubx,lbx0,ubx0,lbxf,ubxf,lbu,ubu,lbp,ubp,lbc,ubc,lbr,ubr], SCHEME_ACADO_Input)
+    if not(k in ['a','v']):
+      raise Exception("Keyword error in dpleIn: '%s' is not recognized. Available keywords are: a, v" % k )
+  return IOSchemeVector([a,v], IOScheme(SCHEME_DPLEInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(acadoIn) acadoIn<SXMatrix>;
-%template(acadoIn) acadoIn<MX>;
-%template(acadoIn) acadoIn<CRSSparsity>;
-%template(IOSchemeVectorACADO_Input) ACADO_InputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorACADO_Input) ACADO_InputIOSchemeVector<MX>;
-%template(IOSchemeVectorACADO_Input) ACADO_InputIOSchemeVector<CRSSparsity>;
+%template(dpleIn) dpleIn<CasADi::SXMatrix>;
+%template(dpleIn) dpleIn<CasADi::MX>;
+%template(dpleIn) dpleIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorDPLEInputSXMatrix) DPLEInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorDPLEInputMX) DPLEInputIOSchemeVector<MX>;
+%template(IOSchemeVectorDPLEInputCRSSparsity) DPLEInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorDPLEInput) IOSchemeVectorDPLEInputSXMatrix;
+%rename(IOSchemeVectorDPLEInput) IOSchemeVectorDPLEInputMX;
+%rename(IOSchemeVectorDPLEInput) IOSchemeVectorDPLEInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
 }
 #ifdef SWIGPYTHON
 %pythoncode %{
-def acadoOut(*dummy,**kwargs):
+def dpleOut(*dummy,**kwargs):
   """
-  Helper function for 'ACADO_Output'
+  Helper function for 'DPLEOutput'
 
   Two use cases:
-     a) arg = acadoOut(x_opt=my_x_opt, u_opt=my_u_opt, p_opt=my_p_opt, cost=my_cost) 
+     a) arg = dpleOut(p=my_p) 
           all arguments optional
-     b) x_opt, u_opt, p_opt, cost = acadoOut(arg,"x_opt", "u_opt", "p_opt", "cost") 
+     b) p = dpleOut(arg,"p") 
           all arguments after the first optional
-  Output arguments of an ACADO OCP solver
+  Output arguments of a dple solver
   
   Keyword arguments:
-    x_opt -- Optimal states [ACADO_X_OPT]
-    u_opt -- Optimal control inputs [ACADO_U_OPT]
-    p_opt -- Optimal parameters [ACADO_P_OPT]
-    cost  -- Optimal cost [ACADO_COST]
+    p -- Lyapunov matrix (vertcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def) [DPLE_P]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of acadoOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ACADO_Output,n)] for n in dummy[1:]]
-  x_opt = []
-  if 'x_opt' in kwargs:
-    x_opt = kwargs['x_opt']
-  u_opt = []
-  if 'u_opt' in kwargs:
-    u_opt = kwargs['u_opt']
-  p_opt = []
-  if 'p_opt' in kwargs:
-    p_opt = kwargs['p_opt']
-  cost = []
-  if 'cost' in kwargs:
-    cost = kwargs['cost']
-  for k in kwargs.keys():
-    if not(k in ['x_opt','u_opt','p_opt','cost']):
-      raise Exception("Keyword error in acadoOut: '%s' is not recognized. Available keywords are: x_opt, u_opt, p_opt, cost" % k )
-  return IOSchemeVector([x_opt,u_opt,p_opt,cost], SCHEME_ACADO_Output)
-%}
-#endif //SWIGPYTHON
-#ifndef SWIGPYTHON
-namespace CasADi {
-%template(acadoOut) acadoOut<SXMatrix>;
-%template(acadoOut) acadoOut<MX>;
-%template(acadoOut) acadoOut<CRSSparsity>;
-%template(IOSchemeVectorACADO_Output) ACADO_OutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorACADO_Output) ACADO_OutputIOSchemeVector<MX>;
-%template(IOSchemeVectorACADO_Output) ACADO_OutputIOSchemeVector<CRSSparsity>;
-}
-#endif //SWIGPYTHON
-namespace CasADi {
-}
-#ifdef SWIGPYTHON
-%pythoncode %{
-def acadofcnIn(*dummy,**kwargs):
-  """
-  Helper function for 'ACADO_FCN_Input'
-
-  Two use cases:
-     a) arg = acadofcnIn(t=my_t, xd=my_xd, xa=my_xa, u=my_u, p=my_p, xdot=my_xdot) 
-          all arguments optional
-     b) t, xd, xa, u, p, xdot = acadofcnIn(arg,"t", "xd", "xa", "u", "p", "xdot") 
-          all arguments after the first optional
-  Input arguments of an ACADO function
-  
-  Keyword arguments:
-    t    -- Time [ACADO_FCN_T]
-    xd   -- Differential state [ACADO_FCN_XD]
-    xa   -- Algebraic state [ACADO_FCN_XA]
-    u    -- Control input [ACADO_FCN_U]
-    p    -- Parameter [ACADO_FCN_P]
-    xdot -- Differential state derivative [ACADO_FCN_XDOT]
-  """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of acadofcnIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ACADO_FCN_Input,n)] for n in dummy[1:]]
-  t = []
-  if 't' in kwargs:
-    t = kwargs['t']
-  xd = []
-  if 'xd' in kwargs:
-    xd = kwargs['xd']
-  xa = []
-  if 'xa' in kwargs:
-    xa = kwargs['xa']
-  u = []
-  if 'u' in kwargs:
-    u = kwargs['u']
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEOutput,n)] for n in dummy[1:]]
   p = []
   if 'p' in kwargs:
     p = kwargs['p']
-  xdot = []
-  if 'xdot' in kwargs:
-    xdot = kwargs['xdot']
   for k in kwargs.keys():
-    if not(k in ['t','xd','xa','u','p','xdot']):
-      raise Exception("Keyword error in acadofcnIn: '%s' is not recognized. Available keywords are: t, xd, xa, u, p, xdot" % k )
-  return IOSchemeVector([t,xd,xa,u,p,xdot], SCHEME_ACADO_FCN_Input)
+    if not(k in ['p']):
+      raise Exception("Keyword error in dpleOut: '%s' is not recognized. Available keywords are: p" % k )
+  return IOSchemeVector([p], IOScheme(SCHEME_DPLEOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(acadofcnIn) acadofcnIn<SXMatrix>;
-%template(acadofcnIn) acadofcnIn<MX>;
-%template(acadofcnIn) acadofcnIn<CRSSparsity>;
-%template(IOSchemeVectorACADO_FCN_Input) ACADO_FCN_InputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorACADO_FCN_Input) ACADO_FCN_InputIOSchemeVector<MX>;
-%template(IOSchemeVectorACADO_FCN_Input) ACADO_FCN_InputIOSchemeVector<CRSSparsity>;
+%template(dpleOut) dpleOut<CasADi::SXMatrix>;
+%template(dpleOut) dpleOut<CasADi::MX>;
+%template(dpleOut) dpleOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorDPLEOutputSXMatrix) DPLEOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorDPLEOutputMX) DPLEOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorDPLEOutputCRSSparsity) DPLEOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorDPLEOutput) IOSchemeVectorDPLEOutputSXMatrix;
+%rename(IOSchemeVectorDPLEOutput) IOSchemeVectorDPLEOutputMX;
+%rename(IOSchemeVectorDPLEOutput) IOSchemeVectorDPLEOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -313,17 +190,20 @@ def controldaeIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['t','x','z','p','u','u_interp','x_major','t0','tf']):
       raise Exception("Keyword error in controldaeIn: '%s' is not recognized. Available keywords are: t, x, z, p, u, u_interp, x_major, t0, tf" % k )
-  return IOSchemeVector([t,x,z,p,u,u_interp,x_major,t0,tf], SCHEME_ControlledDAEInput)
+  return IOSchemeVector([t,x,z,p,u,u_interp,x_major,t0,tf], IOScheme(SCHEME_ControlledDAEInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(controldaeIn) controldaeIn<SXMatrix>;
-%template(controldaeIn) controldaeIn<MX>;
-%template(controldaeIn) controldaeIn<CRSSparsity>;
-%template(IOSchemeVectorControlledDAEInput) ControlledDAEInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorControlledDAEInput) ControlledDAEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorControlledDAEInput) ControlledDAEInputIOSchemeVector<CRSSparsity>;
+%template(controldaeIn) controldaeIn<CasADi::SXMatrix>;
+%template(controldaeIn) controldaeIn<CasADi::MX>;
+%template(controldaeIn) controldaeIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorControlledDAEInputSXMatrix) ControlledDAEInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorControlledDAEInputMX) ControlledDAEInputIOSchemeVector<MX>;
+%template(IOSchemeVectorControlledDAEInputCRSSparsity) ControlledDAEInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorControlledDAEInput) IOSchemeVectorControlledDAEInputSXMatrix;
+%rename(IOSchemeVectorControlledDAEInput) IOSchemeVectorControlledDAEInputMX;
+%rename(IOSchemeVectorControlledDAEInput) IOSchemeVectorControlledDAEInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -360,17 +240,20 @@ def controlsimulatorIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x0','p','u']):
       raise Exception("Keyword error in controlsimulatorIn: '%s' is not recognized. Available keywords are: x0, p, u" % k )
-  return IOSchemeVector([x0,p,u], SCHEME_ControlSimulatorInput)
+  return IOSchemeVector([x0,p,u], IOScheme(SCHEME_ControlSimulatorInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(controlsimulatorIn) controlsimulatorIn<SXMatrix>;
-%template(controlsimulatorIn) controlsimulatorIn<MX>;
-%template(controlsimulatorIn) controlsimulatorIn<CRSSparsity>;
-%template(IOSchemeVectorControlSimulatorInput) ControlSimulatorInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorControlSimulatorInput) ControlSimulatorInputIOSchemeVector<MX>;
-%template(IOSchemeVectorControlSimulatorInput) ControlSimulatorInputIOSchemeVector<CRSSparsity>;
+%template(controlsimulatorIn) controlsimulatorIn<CasADi::SXMatrix>;
+%template(controlsimulatorIn) controlsimulatorIn<CasADi::MX>;
+%template(controlsimulatorIn) controlsimulatorIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorControlSimulatorInputSXMatrix) ControlSimulatorInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorControlSimulatorInputMX) ControlSimulatorInputIOSchemeVector<MX>;
+%template(IOSchemeVectorControlSimulatorInputCRSSparsity) ControlSimulatorInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorControlSimulatorInput) IOSchemeVectorControlSimulatorInputSXMatrix;
+%rename(IOSchemeVectorControlSimulatorInput) IOSchemeVectorControlSimulatorInputMX;
+%rename(IOSchemeVectorControlSimulatorInput) IOSchemeVectorControlSimulatorInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -411,17 +294,20 @@ def daeIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','z','p','t']):
       raise Exception("Keyword error in daeIn: '%s' is not recognized. Available keywords are: x, z, p, t" % k )
-  return IOSchemeVector([x,z,p,t], SCHEME_DAEInput)
+  return IOSchemeVector([x,z,p,t], IOScheme(SCHEME_DAEInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(daeIn) daeIn<SXMatrix>;
-%template(daeIn) daeIn<MX>;
-%template(daeIn) daeIn<CRSSparsity>;
-%template(IOSchemeVectorDAEInput) DAEInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorDAEInput) DAEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorDAEInput) DAEInputIOSchemeVector<CRSSparsity>;
+%template(daeIn) daeIn<CasADi::SXMatrix>;
+%template(daeIn) daeIn<CasADi::MX>;
+%template(daeIn) daeIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorDAEInputSXMatrix) DAEInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorDAEInputMX) DAEInputIOSchemeVector<MX>;
+%template(IOSchemeVectorDAEInputCRSSparsity) DAEInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorDAEInput) IOSchemeVectorDAEInputSXMatrix;
+%rename(IOSchemeVectorDAEInput) IOSchemeVectorDAEInputMX;
+%rename(IOSchemeVectorDAEInput) IOSchemeVectorDAEInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -458,17 +344,20 @@ def daeOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['ode','alg','quad']):
       raise Exception("Keyword error in daeOut: '%s' is not recognized. Available keywords are: ode, alg, quad" % k )
-  return IOSchemeVector([ode,alg,quad], SCHEME_DAEOutput)
+  return IOSchemeVector([ode,alg,quad], IOScheme(SCHEME_DAEOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(daeOut) daeOut<SXMatrix>;
-%template(daeOut) daeOut<MX>;
-%template(daeOut) daeOut<CRSSparsity>;
-%template(IOSchemeVectorDAEOutput) DAEOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorDAEOutput) DAEOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorDAEOutput) DAEOutputIOSchemeVector<CRSSparsity>;
+%template(daeOut) daeOut<CasADi::SXMatrix>;
+%template(daeOut) daeOut<CasADi::MX>;
+%template(daeOut) daeOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorDAEOutputSXMatrix) DAEOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorDAEOutputMX) DAEOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorDAEOutputCRSSparsity) DAEOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorDAEOutput) IOSchemeVectorDAEOutputSXMatrix;
+%rename(IOSchemeVectorDAEOutput) IOSchemeVectorDAEOutputMX;
+%rename(IOSchemeVectorDAEOutput) IOSchemeVectorDAEOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -521,17 +410,20 @@ def rdaeIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['rx','rz','rp','x','z','p','t']):
       raise Exception("Keyword error in rdaeIn: '%s' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t" % k )
-  return IOSchemeVector([rx,rz,rp,x,z,p,t], SCHEME_RDAEInput)
+  return IOSchemeVector([rx,rz,rp,x,z,p,t], IOScheme(SCHEME_RDAEInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(rdaeIn) rdaeIn<SXMatrix>;
-%template(rdaeIn) rdaeIn<MX>;
-%template(rdaeIn) rdaeIn<CRSSparsity>;
-%template(IOSchemeVectorRDAEInput) RDAEInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorRDAEInput) RDAEInputIOSchemeVector<MX>;
-%template(IOSchemeVectorRDAEInput) RDAEInputIOSchemeVector<CRSSparsity>;
+%template(rdaeIn) rdaeIn<CasADi::SXMatrix>;
+%template(rdaeIn) rdaeIn<CasADi::MX>;
+%template(rdaeIn) rdaeIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorRDAEInputSXMatrix) RDAEInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorRDAEInputMX) RDAEInputIOSchemeVector<MX>;
+%template(IOSchemeVectorRDAEInputCRSSparsity) RDAEInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorRDAEInput) IOSchemeVectorRDAEInputSXMatrix;
+%rename(IOSchemeVectorRDAEInput) IOSchemeVectorRDAEInputMX;
+%rename(IOSchemeVectorRDAEInput) IOSchemeVectorRDAEInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -568,17 +460,20 @@ def rdaeOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['ode','alg','quad']):
       raise Exception("Keyword error in rdaeOut: '%s' is not recognized. Available keywords are: ode, alg, quad" % k )
-  return IOSchemeVector([ode,alg,quad], SCHEME_RDAEOutput)
+  return IOSchemeVector([ode,alg,quad], IOScheme(SCHEME_RDAEOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(rdaeOut) rdaeOut<SXMatrix>;
-%template(rdaeOut) rdaeOut<MX>;
-%template(rdaeOut) rdaeOut<CRSSparsity>;
-%template(IOSchemeVectorRDAEOutput) RDAEOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorRDAEOutput) RDAEOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorRDAEOutput) RDAEOutputIOSchemeVector<CRSSparsity>;
+%template(rdaeOut) rdaeOut<CasADi::SXMatrix>;
+%template(rdaeOut) rdaeOut<CasADi::MX>;
+%template(rdaeOut) rdaeOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorRDAEOutputSXMatrix) RDAEOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorRDAEOutputMX) RDAEOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorRDAEOutputCRSSparsity) RDAEOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorRDAEOutput) IOSchemeVectorRDAEOutputSXMatrix;
+%rename(IOSchemeVectorRDAEOutput) IOSchemeVectorRDAEOutputMX;
+%rename(IOSchemeVectorRDAEOutput) IOSchemeVectorRDAEOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -590,17 +485,19 @@ def integratorIn(*dummy,**kwargs):
   Helper function for 'IntegratorInput'
 
   Two use cases:
-     a) arg = integratorIn(x0=my_x0, p=my_p, rx0=my_rx0, rp=my_rp) 
+     a) arg = integratorIn(x0=my_x0, p=my_p, z0=my_z0, rx0=my_rx0, rp=my_rp, rz0=my_rz0) 
           all arguments optional
-     b) x0, p, rx0, rp = integratorIn(arg,"x0", "p", "rx0", "rp") 
+     b) x0, p, z0, rx0, rp, rz0 = integratorIn(arg,"x0", "p", "z0", "rx0", "rp", "rz0") 
           all arguments after the first optional
   Input arguments of an integrator
   
   Keyword arguments:
     x0  -- Differential state at the initial time [INTEGRATOR_X0]
     p   -- Parameters [INTEGRATOR_P]
+    z0  -- Initial guess for the algebraic variable [INTEGRATOR_Z0]
     rx0 -- Backward differential state at the final time [INTEGRATOR_RX0]
     rp  -- Backward parameter vector [INTEGRATOR_RP]
+    rz0 -- Initial guess for the backwards algebraic variable [INTEGRATOR_RZ0]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorInput,n)] for n in dummy[1:]]
@@ -610,26 +507,35 @@ def integratorIn(*dummy,**kwargs):
   p = []
   if 'p' in kwargs:
     p = kwargs['p']
+  z0 = []
+  if 'z0' in kwargs:
+    z0 = kwargs['z0']
   rx0 = []
   if 'rx0' in kwargs:
     rx0 = kwargs['rx0']
   rp = []
   if 'rp' in kwargs:
     rp = kwargs['rp']
+  rz0 = []
+  if 'rz0' in kwargs:
+    rz0 = kwargs['rz0']
   for k in kwargs.keys():
-    if not(k in ['x0','p','rx0','rp']):
-      raise Exception("Keyword error in integratorIn: '%s' is not recognized. Available keywords are: x0, p, rx0, rp" % k )
-  return IOSchemeVector([x0,p,rx0,rp], SCHEME_IntegratorInput)
+    if not(k in ['x0','p','z0','rx0','rp','rz0']):
+      raise Exception("Keyword error in integratorIn: '%s' is not recognized. Available keywords are: x0, p, z0, rx0, rp, rz0" % k )
+  return IOSchemeVector([x0,p,z0,rx0,rp,rz0], IOScheme(SCHEME_IntegratorInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(integratorIn) integratorIn<SXMatrix>;
-%template(integratorIn) integratorIn<MX>;
-%template(integratorIn) integratorIn<CRSSparsity>;
-%template(IOSchemeVectorIntegratorInput) IntegratorInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorIntegratorInput) IntegratorInputIOSchemeVector<MX>;
-%template(IOSchemeVectorIntegratorInput) IntegratorInputIOSchemeVector<CRSSparsity>;
+%template(integratorIn) integratorIn<CasADi::SXMatrix>;
+%template(integratorIn) integratorIn<CasADi::MX>;
+%template(integratorIn) integratorIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorIntegratorInputSXMatrix) IntegratorInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorIntegratorInputMX) IntegratorInputIOSchemeVector<MX>;
+%template(IOSchemeVectorIntegratorInputCRSSparsity) IntegratorInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorIntegratorInput) IOSchemeVectorIntegratorInputSXMatrix;
+%rename(IOSchemeVectorIntegratorInput) IOSchemeVectorIntegratorInputMX;
+%rename(IOSchemeVectorIntegratorInput) IOSchemeVectorIntegratorInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -641,17 +547,19 @@ def integratorOut(*dummy,**kwargs):
   Helper function for 'IntegratorOutput'
 
   Two use cases:
-     a) arg = integratorOut(xf=my_xf, qf=my_qf, rxf=my_rxf, rqf=my_rqf) 
+     a) arg = integratorOut(xf=my_xf, qf=my_qf, zf=my_zf, rxf=my_rxf, rqf=my_rqf, rzf=my_rzf) 
           all arguments optional
-     b) xf, qf, rxf, rqf = integratorOut(arg,"xf", "qf", "rxf", "rqf") 
+     b) xf, qf, zf, rxf, rqf, rzf = integratorOut(arg,"xf", "qf", "zf", "rxf", "rqf", "rzf") 
           all arguments after the first optional
   Output arguments of an integrator
   
   Keyword arguments:
     xf  -- Differential state at the final time [INTEGRATOR_XF]
     qf  -- Quadrature state at the final time [INTEGRATOR_QF]
+    zf  -- Algebraic variable at the final time [INTEGRATOR_ZF]
     rxf -- Backward differential state at the initial time [INTEGRATOR_RXF]
     rqf -- Backward quadrature state at the initial time [INTEGRATOR_RQF]
+    rzf -- Backward algebraic variable at the initial time [INTEGRATOR_RZF]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorOutput,n)] for n in dummy[1:]]
@@ -661,26 +569,35 @@ def integratorOut(*dummy,**kwargs):
   qf = []
   if 'qf' in kwargs:
     qf = kwargs['qf']
+  zf = []
+  if 'zf' in kwargs:
+    zf = kwargs['zf']
   rxf = []
   if 'rxf' in kwargs:
     rxf = kwargs['rxf']
   rqf = []
   if 'rqf' in kwargs:
     rqf = kwargs['rqf']
+  rzf = []
+  if 'rzf' in kwargs:
+    rzf = kwargs['rzf']
   for k in kwargs.keys():
-    if not(k in ['xf','qf','rxf','rqf']):
-      raise Exception("Keyword error in integratorOut: '%s' is not recognized. Available keywords are: xf, qf, rxf, rqf" % k )
-  return IOSchemeVector([xf,qf,rxf,rqf], SCHEME_IntegratorOutput)
+    if not(k in ['xf','qf','zf','rxf','rqf','rzf']):
+      raise Exception("Keyword error in integratorOut: '%s' is not recognized. Available keywords are: xf, qf, zf, rxf, rqf, rzf" % k )
+  return IOSchemeVector([xf,qf,zf,rxf,rqf,rzf], IOScheme(SCHEME_IntegratorOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(integratorOut) integratorOut<SXMatrix>;
-%template(integratorOut) integratorOut<MX>;
-%template(integratorOut) integratorOut<CRSSparsity>;
-%template(IOSchemeVectorIntegratorOutput) IntegratorOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorIntegratorOutput) IntegratorOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorIntegratorOutput) IntegratorOutputIOSchemeVector<CRSSparsity>;
+%template(integratorOut) integratorOut<CasADi::SXMatrix>;
+%template(integratorOut) integratorOut<CasADi::MX>;
+%template(integratorOut) integratorOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorIntegratorOutputSXMatrix) IntegratorOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorIntegratorOutputMX) IntegratorOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorIntegratorOutputCRSSparsity) IntegratorOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorIntegratorOutput) IOSchemeVectorIntegratorOutputSXMatrix;
+%rename(IOSchemeVectorIntegratorOutput) IOSchemeVectorIntegratorOutputMX;
+%rename(IOSchemeVectorIntegratorOutput) IOSchemeVectorIntegratorOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -692,16 +609,15 @@ def linsolIn(*dummy,**kwargs):
   Helper function for 'LinsolInput'
 
   Two use cases:
-     a) arg = linsolIn(A=my_A, B=my_B, T=my_T) 
+     a) arg = linsolIn(A=my_A, B=my_B) 
           all arguments optional
-     b) A, B, T = linsolIn(arg,"A", "B", "T") 
+     b) A, B = linsolIn(arg,"A", "B") 
           all arguments after the first optional
   Input arguments of a linear solver
   
   Keyword arguments:
     A -- The square matrix A: sparse, (n x n). [LINSOL_A]
-    B -- The right-hand-side matrix b: dense,  (n x m) [LINSOL_B]
-    T -- Transpose A?: dense scalar, value 0 or 1,  (1 x 1) [LINSOL_T]
+    B -- The right-hand-side matrix b: dense,  (m x n) [LINSOL_B]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LinsolInput,n)] for n in dummy[1:]]
@@ -711,23 +627,23 @@ def linsolIn(*dummy,**kwargs):
   B = []
   if 'B' in kwargs:
     B = kwargs['B']
-  T = []
-  if 'T' in kwargs:
-    T = kwargs['T']
   for k in kwargs.keys():
-    if not(k in ['A','B','T']):
-      raise Exception("Keyword error in linsolIn: '%s' is not recognized. Available keywords are: A, B, T" % k )
-  return IOSchemeVector([A,B,T], SCHEME_LinsolInput)
+    if not(k in ['A','B']):
+      raise Exception("Keyword error in linsolIn: '%s' is not recognized. Available keywords are: A, B" % k )
+  return IOSchemeVector([A,B], IOScheme(SCHEME_LinsolInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(linsolIn) linsolIn<SXMatrix>;
-%template(linsolIn) linsolIn<MX>;
-%template(linsolIn) linsolIn<CRSSparsity>;
-%template(IOSchemeVectorLinsolInput) LinsolInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorLinsolInput) LinsolInputIOSchemeVector<MX>;
-%template(IOSchemeVectorLinsolInput) LinsolInputIOSchemeVector<CRSSparsity>;
+%template(linsolIn) linsolIn<CasADi::SXMatrix>;
+%template(linsolIn) linsolIn<CasADi::MX>;
+%template(linsolIn) linsolIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorLinsolInputSXMatrix) LinsolInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorLinsolInputMX) LinsolInputIOSchemeVector<MX>;
+%template(IOSchemeVectorLinsolInputCRSSparsity) LinsolInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorLinsolInput) IOSchemeVectorLinsolInputSXMatrix;
+%rename(IOSchemeVectorLinsolInput) IOSchemeVectorLinsolInputMX;
+%rename(IOSchemeVectorLinsolInput) IOSchemeVectorLinsolInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -756,17 +672,20 @@ def linsolOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['X']):
       raise Exception("Keyword error in linsolOut: '%s' is not recognized. Available keywords are: X" % k )
-  return IOSchemeVector([X], SCHEME_LinsolOutput)
+  return IOSchemeVector([X], IOScheme(SCHEME_LinsolOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(linsolOut) linsolOut<SXMatrix>;
-%template(linsolOut) linsolOut<MX>;
-%template(linsolOut) linsolOut<CRSSparsity>;
-%template(IOSchemeVectorLinsolOutput) LinsolOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorLinsolOutput) LinsolOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorLinsolOutput) LinsolOutputIOSchemeVector<CRSSparsity>;
+%template(linsolOut) linsolOut<CasADi::SXMatrix>;
+%template(linsolOut) linsolOut<CasADi::MX>;
+%template(linsolOut) linsolOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorLinsolOutputSXMatrix) LinsolOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorLinsolOutputMX) LinsolOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorLinsolOutputCRSSparsity) LinsolOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorLinsolOutput) IOSchemeVectorLinsolOutputSXMatrix;
+%rename(IOSchemeVectorLinsolOutput) IOSchemeVectorLinsolOutputMX;
+%rename(IOSchemeVectorLinsolOutput) IOSchemeVectorLinsolOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -815,17 +734,20 @@ def lpIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['c','a','lba','uba','lbx','ubx']):
       raise Exception("Keyword error in lpIn: '%s' is not recognized. Available keywords are: c, a, lba, uba, lbx, ubx" % k )
-  return IOSchemeVector([c,a,lba,uba,lbx,ubx], SCHEME_LPSolverInput)
+  return IOSchemeVector([c,a,lba,uba,lbx,ubx], IOScheme(SCHEME_LPSolverInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(lpIn) lpIn<SXMatrix>;
-%template(lpIn) lpIn<MX>;
-%template(lpIn) lpIn<CRSSparsity>;
-%template(IOSchemeVectorLPSolverInput) LPSolverInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorLPSolverInput) LPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorLPSolverInput) LPSolverInputIOSchemeVector<CRSSparsity>;
+%template(lpIn) lpIn<CasADi::SXMatrix>;
+%template(lpIn) lpIn<CasADi::MX>;
+%template(lpIn) lpIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorLPSolverInputSXMatrix) LPSolverInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorLPSolverInputMX) LPSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorLPSolverInputCRSSparsity) LPSolverInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorLPSolverInput) IOSchemeVectorLPSolverInputSXMatrix;
+%rename(IOSchemeVectorLPSolverInput) IOSchemeVectorLPSolverInputMX;
+%rename(IOSchemeVectorLPSolverInput) IOSchemeVectorLPSolverInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -866,17 +788,20 @@ def lpOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','cost','lam_a','lam_x']):
       raise Exception("Keyword error in lpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], SCHEME_LPSolverOutput)
+  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_LPSolverOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(lpOut) lpOut<SXMatrix>;
-%template(lpOut) lpOut<MX>;
-%template(lpOut) lpOut<CRSSparsity>;
-%template(IOSchemeVectorLPSolverOutput) LPSolverOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorLPSolverOutput) LPSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorLPSolverOutput) LPSolverOutputIOSchemeVector<CRSSparsity>;
+%template(lpOut) lpOut<CasADi::SXMatrix>;
+%template(lpOut) lpOut<CasADi::MX>;
+%template(lpOut) lpOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorLPSolverOutputSXMatrix) LPSolverOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorLPSolverOutputMX) LPSolverOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorLPSolverOutputCRSSparsity) LPSolverOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorLPSolverOutput) IOSchemeVectorLPSolverOutputSXMatrix;
+%rename(IOSchemeVectorLPSolverOutput) IOSchemeVectorLPSolverOutputMX;
+%rename(IOSchemeVectorLPSolverOutput) IOSchemeVectorLPSolverOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -910,7 +835,7 @@ def lpStruct(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(lpStruct) lpStruct<CRSSparsity>;
+%template(lpStruct) lpStruct<CasADi::CRSSparsity>;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -944,17 +869,20 @@ def nlpIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','p']):
       raise Exception("Keyword error in nlpIn: '%s' is not recognized. Available keywords are: x, p" % k )
-  return IOSchemeVector([x,p], SCHEME_NLPInput)
+  return IOSchemeVector([x,p], IOScheme(SCHEME_NLPInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(nlpIn) nlpIn<SXMatrix>;
-%template(nlpIn) nlpIn<MX>;
-%template(nlpIn) nlpIn<CRSSparsity>;
-%template(IOSchemeVectorNLPInput) NLPInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorNLPInput) NLPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPInput) NLPInputIOSchemeVector<CRSSparsity>;
+%template(nlpIn) nlpIn<CasADi::SXMatrix>;
+%template(nlpIn) nlpIn<CasADi::MX>;
+%template(nlpIn) nlpIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorNLPInputSXMatrix) NLPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorNLPInputMX) NLPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorNLPInputCRSSparsity) NLPInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorNLPInput) IOSchemeVectorNLPInputSXMatrix;
+%rename(IOSchemeVectorNLPInput) IOSchemeVectorNLPInputMX;
+%rename(IOSchemeVectorNLPInput) IOSchemeVectorNLPInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -987,17 +915,20 @@ def nlpOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['f','g']):
       raise Exception("Keyword error in nlpOut: '%s' is not recognized. Available keywords are: f, g" % k )
-  return IOSchemeVector([f,g], SCHEME_NLPOutput)
+  return IOSchemeVector([f,g], IOScheme(SCHEME_NLPOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(nlpOut) nlpOut<SXMatrix>;
-%template(nlpOut) nlpOut<MX>;
-%template(nlpOut) nlpOut<CRSSparsity>;
-%template(IOSchemeVectorNLPOutput) NLPOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorNLPOutput) NLPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPOutput) NLPOutputIOSchemeVector<CRSSparsity>;
+%template(nlpOut) nlpOut<CasADi::SXMatrix>;
+%template(nlpOut) nlpOut<CasADi::MX>;
+%template(nlpOut) nlpOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorNLPOutputSXMatrix) NLPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorNLPOutputMX) NLPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorNLPOutputCRSSparsity) NLPOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorNLPOutput) IOSchemeVectorNLPOutputSXMatrix;
+%rename(IOSchemeVectorNLPOutput) IOSchemeVectorNLPOutputMX;
+%rename(IOSchemeVectorNLPOutput) IOSchemeVectorNLPOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1030,17 +961,20 @@ def gradFIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','p']):
       raise Exception("Keyword error in gradFIn: '%s' is not recognized. Available keywords are: x, p" % k )
-  return IOSchemeVector([x,p], SCHEME_GradFInput)
+  return IOSchemeVector([x,p], IOScheme(SCHEME_GradFInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(gradFIn) gradFIn<SXMatrix>;
-%template(gradFIn) gradFIn<MX>;
-%template(gradFIn) gradFIn<CRSSparsity>;
-%template(IOSchemeVectorGradFInput) GradFInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorGradFInput) GradFInputIOSchemeVector<MX>;
-%template(IOSchemeVectorGradFInput) GradFInputIOSchemeVector<CRSSparsity>;
+%template(gradFIn) gradFIn<CasADi::SXMatrix>;
+%template(gradFIn) gradFIn<CasADi::MX>;
+%template(gradFIn) gradFIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorGradFInputSXMatrix) GradFInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorGradFInputMX) GradFInputIOSchemeVector<MX>;
+%template(IOSchemeVectorGradFInputCRSSparsity) GradFInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorGradFInput) IOSchemeVectorGradFInputSXMatrix;
+%rename(IOSchemeVectorGradFInput) IOSchemeVectorGradFInputMX;
+%rename(IOSchemeVectorGradFInput) IOSchemeVectorGradFInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1077,17 +1011,20 @@ def gradFOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['grad','f','g']):
       raise Exception("Keyword error in gradFOut: '%s' is not recognized. Available keywords are: grad, f, g" % k )
-  return IOSchemeVector([grad,f,g], SCHEME_GradFOutput)
+  return IOSchemeVector([grad,f,g], IOScheme(SCHEME_GradFOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(gradFOut) gradFOut<SXMatrix>;
-%template(gradFOut) gradFOut<MX>;
-%template(gradFOut) gradFOut<CRSSparsity>;
-%template(IOSchemeVectorGradFOutput) GradFOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorGradFOutput) GradFOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorGradFOutput) GradFOutputIOSchemeVector<CRSSparsity>;
+%template(gradFOut) gradFOut<CasADi::SXMatrix>;
+%template(gradFOut) gradFOut<CasADi::MX>;
+%template(gradFOut) gradFOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorGradFOutputSXMatrix) GradFOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorGradFOutputMX) GradFOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorGradFOutputCRSSparsity) GradFOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorGradFOutput) IOSchemeVectorGradFOutputSXMatrix;
+%rename(IOSchemeVectorGradFOutput) IOSchemeVectorGradFOutputMX;
+%rename(IOSchemeVectorGradFOutput) IOSchemeVectorGradFOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1120,17 +1057,20 @@ def jacGIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','p']):
       raise Exception("Keyword error in jacGIn: '%s' is not recognized. Available keywords are: x, p" % k )
-  return IOSchemeVector([x,p], SCHEME_JacGInput)
+  return IOSchemeVector([x,p], IOScheme(SCHEME_JacGInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(jacGIn) jacGIn<SXMatrix>;
-%template(jacGIn) jacGIn<MX>;
-%template(jacGIn) jacGIn<CRSSparsity>;
-%template(IOSchemeVectorJacGInput) JacGInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorJacGInput) JacGInputIOSchemeVector<MX>;
-%template(IOSchemeVectorJacGInput) JacGInputIOSchemeVector<CRSSparsity>;
+%template(jacGIn) jacGIn<CasADi::SXMatrix>;
+%template(jacGIn) jacGIn<CasADi::MX>;
+%template(jacGIn) jacGIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorJacGInputSXMatrix) JacGInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorJacGInputMX) JacGInputIOSchemeVector<MX>;
+%template(IOSchemeVectorJacGInputCRSSparsity) JacGInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorJacGInput) IOSchemeVectorJacGInputSXMatrix;
+%rename(IOSchemeVectorJacGInput) IOSchemeVectorJacGInputMX;
+%rename(IOSchemeVectorJacGInput) IOSchemeVectorJacGInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1167,17 +1107,20 @@ def jacGOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['jac','f','g']):
       raise Exception("Keyword error in jacGOut: '%s' is not recognized. Available keywords are: jac, f, g" % k )
-  return IOSchemeVector([jac,f,g], SCHEME_JacGOutput)
+  return IOSchemeVector([jac,f,g], IOScheme(SCHEME_JacGOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(jacGOut) jacGOut<SXMatrix>;
-%template(jacGOut) jacGOut<MX>;
-%template(jacGOut) jacGOut<CRSSparsity>;
-%template(IOSchemeVectorJacGOutput) JacGOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorJacGOutput) JacGOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorJacGOutput) JacGOutputIOSchemeVector<CRSSparsity>;
+%template(jacGOut) jacGOut<CasADi::SXMatrix>;
+%template(jacGOut) jacGOut<CasADi::MX>;
+%template(jacGOut) jacGOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorJacGOutputSXMatrix) JacGOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorJacGOutputMX) JacGOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorJacGOutputCRSSparsity) JacGOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorJacGOutput) IOSchemeVectorJacGOutputSXMatrix;
+%rename(IOSchemeVectorJacGOutput) IOSchemeVectorJacGOutputMX;
+%rename(IOSchemeVectorJacGOutput) IOSchemeVectorJacGOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1198,7 +1141,7 @@ def hessLagIn(*dummy,**kwargs):
   Keyword arguments:
     x     -- Decision variable [HESSLAG_X]
     p     -- Fixed parameter [HESSLAG_P]
-    lam_f -- Multiplier for f [HESSLAG_LAM_F]
+    lam_f -- Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective. [HESSLAG_LAM_F]
     lam_g -- Multiplier for g [HESSLAG_LAM_G]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagIn. Either use keywords or non-keywords ")
@@ -1218,17 +1161,20 @@ def hessLagIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','p','lam_f','lam_g']):
       raise Exception("Keyword error in hessLagIn: '%s' is not recognized. Available keywords are: x, p, lam_f, lam_g" % k )
-  return IOSchemeVector([x,p,lam_f,lam_g], SCHEME_HessLagInput)
+  return IOSchemeVector([x,p,lam_f,lam_g], IOScheme(SCHEME_HessLagInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(hessLagIn) hessLagIn<SXMatrix>;
-%template(hessLagIn) hessLagIn<MX>;
-%template(hessLagIn) hessLagIn<CRSSparsity>;
-%template(IOSchemeVectorHessLagInput) HessLagInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorHessLagInput) HessLagInputIOSchemeVector<MX>;
-%template(IOSchemeVectorHessLagInput) HessLagInputIOSchemeVector<CRSSparsity>;
+%template(hessLagIn) hessLagIn<CasADi::SXMatrix>;
+%template(hessLagIn) hessLagIn<CasADi::MX>;
+%template(hessLagIn) hessLagIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorHessLagInputSXMatrix) HessLagInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorHessLagInputMX) HessLagInputIOSchemeVector<MX>;
+%template(IOSchemeVectorHessLagInputCRSSparsity) HessLagInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorHessLagInput) IOSchemeVectorHessLagInputSXMatrix;
+%rename(IOSchemeVectorHessLagInput) IOSchemeVectorHessLagInputMX;
+%rename(IOSchemeVectorHessLagInput) IOSchemeVectorHessLagInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1273,17 +1219,20 @@ def hessLagOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['hess','f','g','grad_x','grad_p']):
       raise Exception("Keyword error in hessLagOut: '%s' is not recognized. Available keywords are: hess, f, g, grad_x, grad_p" % k )
-  return IOSchemeVector([hess,f,g,grad_x,grad_p], SCHEME_HessLagOutput)
+  return IOSchemeVector([hess,f,g,grad_x,grad_p], IOScheme(SCHEME_HessLagOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(hessLagOut) hessLagOut<SXMatrix>;
-%template(hessLagOut) hessLagOut<MX>;
-%template(hessLagOut) hessLagOut<CRSSparsity>;
-%template(IOSchemeVectorHessLagOutput) HessLagOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorHessLagOutput) HessLagOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorHessLagOutput) HessLagOutputIOSchemeVector<CRSSparsity>;
+%template(hessLagOut) hessLagOut<CasADi::SXMatrix>;
+%template(hessLagOut) hessLagOut<CasADi::MX>;
+%template(hessLagOut) hessLagOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorHessLagOutputSXMatrix) HessLagOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorHessLagOutputMX) HessLagOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorHessLagOutputCRSSparsity) HessLagOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorHessLagOutput) IOSchemeVectorHessLagOutputSXMatrix;
+%rename(IOSchemeVectorHessLagOutput) IOSchemeVectorHessLagOutputMX;
+%rename(IOSchemeVectorHessLagOutput) IOSchemeVectorHessLagOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1340,17 +1289,20 @@ def nlpSolverIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x0','p','lbx','ubx','lbg','ubg','lam_x0','lam_g0']):
       raise Exception("Keyword error in nlpSolverIn: '%s' is not recognized. Available keywords are: x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0" % k )
-  return IOSchemeVector([x0,p,lbx,ubx,lbg,ubg,lam_x0,lam_g0], SCHEME_NLPSolverInput)
+  return IOSchemeVector([x0,p,lbx,ubx,lbg,ubg,lam_x0,lam_g0], IOScheme(SCHEME_NLPSolverInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(nlpSolverIn) nlpSolverIn<SXMatrix>;
-%template(nlpSolverIn) nlpSolverIn<MX>;
-%template(nlpSolverIn) nlpSolverIn<CRSSparsity>;
-%template(IOSchemeVectorNLPSolverInput) NLPSolverInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorNLPSolverInput) NLPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPSolverInput) NLPSolverInputIOSchemeVector<CRSSparsity>;
+%template(nlpSolverIn) nlpSolverIn<CasADi::SXMatrix>;
+%template(nlpSolverIn) nlpSolverIn<CasADi::MX>;
+%template(nlpSolverIn) nlpSolverIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorNLPSolverInputSXMatrix) NLPSolverInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorNLPSolverInputMX) NLPSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorNLPSolverInputCRSSparsity) NLPSolverInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorNLPSolverInput) IOSchemeVectorNLPSolverInputSXMatrix;
+%rename(IOSchemeVectorNLPSolverInput) IOSchemeVectorNLPSolverInputMX;
+%rename(IOSchemeVectorNLPSolverInput) IOSchemeVectorNLPSolverInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1399,17 +1351,20 @@ def nlpSolverOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','f','g','lam_x','lam_g','lam_p']):
       raise Exception("Keyword error in nlpSolverOut: '%s' is not recognized. Available keywords are: x, f, g, lam_x, lam_g, lam_p" % k )
-  return IOSchemeVector([x,f,g,lam_x,lam_g,lam_p], SCHEME_NLPSolverOutput)
+  return IOSchemeVector([x,f,g,lam_x,lam_g,lam_p], IOScheme(SCHEME_NLPSolverOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(nlpSolverOut) nlpSolverOut<SXMatrix>;
-%template(nlpSolverOut) nlpSolverOut<MX>;
-%template(nlpSolverOut) nlpSolverOut<CRSSparsity>;
-%template(IOSchemeVectorNLPSolverOutput) NLPSolverOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorNLPSolverOutput) NLPSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPSolverOutput) NLPSolverOutputIOSchemeVector<CRSSparsity>;
+%template(nlpSolverOut) nlpSolverOut<CasADi::SXMatrix>;
+%template(nlpSolverOut) nlpSolverOut<CasADi::MX>;
+%template(nlpSolverOut) nlpSolverOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorNLPSolverOutputSXMatrix) NLPSolverOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorNLPSolverOutputMX) NLPSolverOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorNLPSolverOutputCRSSparsity) NLPSolverOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorNLPSolverOutput) IOSchemeVectorNLPSolverOutputSXMatrix;
+%rename(IOSchemeVectorNLPSolverOutput) IOSchemeVectorNLPSolverOutputMX;
+%rename(IOSchemeVectorNLPSolverOutput) IOSchemeVectorNLPSolverOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1444,17 +1399,20 @@ def mayerIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','p']):
       raise Exception("Keyword error in mayerIn: '%s' is not recognized. Available keywords are: x, p" % k )
-  return IOSchemeVector([x,p], SCHEME_MayerInput)
+  return IOSchemeVector([x,p], IOScheme(SCHEME_MayerInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(mayerIn) mayerIn<SXMatrix>;
-%template(mayerIn) mayerIn<MX>;
-%template(mayerIn) mayerIn<CRSSparsity>;
-%template(IOSchemeVectorMayerInput) MayerInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorMayerInput) MayerInputIOSchemeVector<MX>;
-%template(IOSchemeVectorMayerInput) MayerInputIOSchemeVector<CRSSparsity>;
+%template(mayerIn) mayerIn<CasADi::SXMatrix>;
+%template(mayerIn) mayerIn<CasADi::MX>;
+%template(mayerIn) mayerIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorMayerInputSXMatrix) MayerInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorMayerInputMX) MayerInputIOSchemeVector<MX>;
+%template(IOSchemeVectorMayerInputCRSSparsity) MayerInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorMayerInput) IOSchemeVectorMayerInputSXMatrix;
+%rename(IOSchemeVectorMayerInput) IOSchemeVectorMayerInputMX;
+%rename(IOSchemeVectorMayerInput) IOSchemeVectorMayerInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1537,17 +1495,20 @@ def ocpIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['lbx','ubx','x_init','lbu','ubu','u_init','lbp','ubp','p_init','lbh','ubh','lbg','ubg']):
       raise Exception("Keyword error in ocpIn: '%s' is not recognized. Available keywords are: lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg" % k )
-  return IOSchemeVector([lbx,ubx,x_init,lbu,ubu,u_init,lbp,ubp,p_init,lbh,ubh,lbg,ubg], SCHEME_OCPInput)
+  return IOSchemeVector([lbx,ubx,x_init,lbu,ubu,u_init,lbp,ubp,p_init,lbh,ubh,lbg,ubg], IOScheme(SCHEME_OCPInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(ocpIn) ocpIn<SXMatrix>;
-%template(ocpIn) ocpIn<MX>;
-%template(ocpIn) ocpIn<CRSSparsity>;
-%template(IOSchemeVectorOCPInput) OCPInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorOCPInput) OCPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorOCPInput) OCPInputIOSchemeVector<CRSSparsity>;
+%template(ocpIn) ocpIn<CasADi::SXMatrix>;
+%template(ocpIn) ocpIn<CasADi::MX>;
+%template(ocpIn) ocpIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorOCPInputSXMatrix) OCPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorOCPInputMX) OCPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorOCPInputCRSSparsity) OCPInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorOCPInput) IOSchemeVectorOCPInputSXMatrix;
+%rename(IOSchemeVectorOCPInput) IOSchemeVectorOCPInputMX;
+%rename(IOSchemeVectorOCPInput) IOSchemeVectorOCPInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1588,17 +1549,20 @@ def ocpOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x_opt','u_opt','p_opt','cost']):
       raise Exception("Keyword error in ocpOut: '%s' is not recognized. Available keywords are: x_opt, u_opt, p_opt, cost" % k )
-  return IOSchemeVector([x_opt,u_opt,p_opt,cost], SCHEME_OCPOutput)
+  return IOSchemeVector([x_opt,u_opt,p_opt,cost], IOScheme(SCHEME_OCPOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(ocpOut) ocpOut<SXMatrix>;
-%template(ocpOut) ocpOut<MX>;
-%template(ocpOut) ocpOut<CRSSparsity>;
-%template(IOSchemeVectorOCPOutput) OCPOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorOCPOutput) OCPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorOCPOutput) OCPOutputIOSchemeVector<CRSSparsity>;
+%template(ocpOut) ocpOut<CasADi::SXMatrix>;
+%template(ocpOut) ocpOut<CasADi::MX>;
+%template(ocpOut) ocpOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorOCPOutputSXMatrix) OCPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorOCPOutputMX) OCPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorOCPOutputCRSSparsity) OCPOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorOCPOutput) IOSchemeVectorOCPOutputSXMatrix;
+%rename(IOSchemeVectorOCPOutput) IOSchemeVectorOCPOutputMX;
+%rename(IOSchemeVectorOCPOutput) IOSchemeVectorOCPOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1671,17 +1635,20 @@ def qcqpIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['h','g','p','q','r','a','lba','uba','lbx','ubx','x0','lam_x0']):
       raise Exception("Keyword error in qcqpIn: '%s' is not recognized. Available keywords are: h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0" % k )
-  return IOSchemeVector([h,g,p,q,r,a,lba,uba,lbx,ubx,x0,lam_x0], SCHEME_QCQPSolverInput)
+  return IOSchemeVector([h,g,p,q,r,a,lba,uba,lbx,ubx,x0,lam_x0], IOScheme(SCHEME_QCQPSolverInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qcqpIn) qcqpIn<SXMatrix>;
-%template(qcqpIn) qcqpIn<MX>;
-%template(qcqpIn) qcqpIn<CRSSparsity>;
-%template(IOSchemeVectorQCQPSolverInput) QCQPSolverInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorQCQPSolverInput) QCQPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorQCQPSolverInput) QCQPSolverInputIOSchemeVector<CRSSparsity>;
+%template(qcqpIn) qcqpIn<CasADi::SXMatrix>;
+%template(qcqpIn) qcqpIn<CasADi::MX>;
+%template(qcqpIn) qcqpIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorQCQPSolverInputSXMatrix) QCQPSolverInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorQCQPSolverInputMX) QCQPSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorQCQPSolverInputCRSSparsity) QCQPSolverInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorQCQPSolverInput) IOSchemeVectorQCQPSolverInputSXMatrix;
+%rename(IOSchemeVectorQCQPSolverInput) IOSchemeVectorQCQPSolverInputMX;
+%rename(IOSchemeVectorQCQPSolverInput) IOSchemeVectorQCQPSolverInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1722,17 +1689,20 @@ def qcqpOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','cost','lam_a','lam_x']):
       raise Exception("Keyword error in qcqpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], SCHEME_QCQPSolverOutput)
+  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_QCQPSolverOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qcqpOut) qcqpOut<SXMatrix>;
-%template(qcqpOut) qcqpOut<MX>;
-%template(qcqpOut) qcqpOut<CRSSparsity>;
-%template(IOSchemeVectorQCQPSolverOutput) QCQPSolverOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorQCQPSolverOutput) QCQPSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorQCQPSolverOutput) QCQPSolverOutputIOSchemeVector<CRSSparsity>;
+%template(qcqpOut) qcqpOut<CasADi::SXMatrix>;
+%template(qcqpOut) qcqpOut<CasADi::MX>;
+%template(qcqpOut) qcqpOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorQCQPSolverOutputSXMatrix) QCQPSolverOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorQCQPSolverOutputMX) QCQPSolverOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorQCQPSolverOutputCRSSparsity) QCQPSolverOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorQCQPSolverOutput) IOSchemeVectorQCQPSolverOutputSXMatrix;
+%rename(IOSchemeVectorQCQPSolverOutput) IOSchemeVectorQCQPSolverOutputMX;
+%rename(IOSchemeVectorQCQPSolverOutput) IOSchemeVectorQCQPSolverOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1774,7 +1744,7 @@ def qcqpStruct(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qcqpStruct) qcqpStruct<CRSSparsity>;
+%template(qcqpStruct) qcqpStruct<CasADi::CRSSparsity>;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1836,17 +1806,20 @@ def qpIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['h','g','a','lba','uba','lbx','ubx','x0','lam_x0']):
       raise Exception("Keyword error in qpIn: '%s' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0" % k )
-  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0], SCHEME_QPSolverInput)
+  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0], IOScheme(SCHEME_QPSolverInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qpIn) qpIn<SXMatrix>;
-%template(qpIn) qpIn<MX>;
-%template(qpIn) qpIn<CRSSparsity>;
-%template(IOSchemeVectorQPSolverInput) QPSolverInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorQPSolverInput) QPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorQPSolverInput) QPSolverInputIOSchemeVector<CRSSparsity>;
+%template(qpIn) qpIn<CasADi::SXMatrix>;
+%template(qpIn) qpIn<CasADi::MX>;
+%template(qpIn) qpIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorQPSolverInputSXMatrix) QPSolverInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorQPSolverInputMX) QPSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorQPSolverInputCRSSparsity) QPSolverInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorQPSolverInput) IOSchemeVectorQPSolverInputSXMatrix;
+%rename(IOSchemeVectorQPSolverInput) IOSchemeVectorQPSolverInputMX;
+%rename(IOSchemeVectorQPSolverInput) IOSchemeVectorQPSolverInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1887,17 +1860,20 @@ def qpOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','cost','lam_a','lam_x']):
       raise Exception("Keyword error in qpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], SCHEME_QPSolverOutput)
+  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_QPSolverOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qpOut) qpOut<SXMatrix>;
-%template(qpOut) qpOut<MX>;
-%template(qpOut) qpOut<CRSSparsity>;
-%template(IOSchemeVectorQPSolverOutput) QPSolverOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorQPSolverOutput) QPSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorQPSolverOutput) QPSolverOutputIOSchemeVector<CRSSparsity>;
+%template(qpOut) qpOut<CasADi::SXMatrix>;
+%template(qpOut) qpOut<CasADi::MX>;
+%template(qpOut) qpOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorQPSolverOutputSXMatrix) QPSolverOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorQPSolverOutputMX) QPSolverOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorQPSolverOutputCRSSparsity) QPSolverOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorQPSolverOutput) IOSchemeVectorQPSolverOutputSXMatrix;
+%rename(IOSchemeVectorQPSolverOutput) IOSchemeVectorQPSolverOutputMX;
+%rename(IOSchemeVectorQPSolverOutput) IOSchemeVectorQPSolverOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1935,7 +1911,7 @@ def qpStruct(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qpStruct) qpStruct<CRSSparsity>;
+%template(qpStruct) qpStruct<CasADi::CRSSparsity>;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -1993,17 +1969,20 @@ def sdpIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['f','c','g','a','lba','uba','lbx','ubx']):
       raise Exception("Keyword error in sdpIn: '%s' is not recognized. Available keywords are: f, c, g, a, lba, uba, lbx, ubx" % k )
-  return IOSchemeVector([f,c,g,a,lba,uba,lbx,ubx], SCHEME_SDPInput)
+  return IOSchemeVector([f,c,g,a,lba,uba,lbx,ubx], IOScheme(SCHEME_SDPInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(sdpIn) sdpIn<SXMatrix>;
-%template(sdpIn) sdpIn<MX>;
-%template(sdpIn) sdpIn<CRSSparsity>;
-%template(IOSchemeVectorSDPInput) SDPInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorSDPInput) SDPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorSDPInput) SDPInputIOSchemeVector<CRSSparsity>;
+%template(sdpIn) sdpIn<CasADi::SXMatrix>;
+%template(sdpIn) sdpIn<CasADi::MX>;
+%template(sdpIn) sdpIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorSDPInputSXMatrix) SDPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSDPInputMX) SDPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorSDPInputCRSSparsity) SDPInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorSDPInput) IOSchemeVectorSDPInputSXMatrix;
+%rename(IOSchemeVectorSDPInput) IOSchemeVectorSDPInputMX;
+%rename(IOSchemeVectorSDPInput) IOSchemeVectorSDPInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -2056,17 +2035,20 @@ def sdpOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','p','dual','cost','dual_cost','lam_a','lam_x']):
       raise Exception("Keyword error in sdpOut: '%s' is not recognized. Available keywords are: x, p, dual, cost, dual_cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,p,dual,cost,dual_cost,lam_a,lam_x], SCHEME_SDPOutput)
+  return IOSchemeVector([x,p,dual,cost,dual_cost,lam_a,lam_x], IOScheme(SCHEME_SDPOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(sdpOut) sdpOut<SXMatrix>;
-%template(sdpOut) sdpOut<MX>;
-%template(sdpOut) sdpOut<CRSSparsity>;
-%template(IOSchemeVectorSDPOutput) SDPOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorSDPOutput) SDPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorSDPOutput) SDPOutputIOSchemeVector<CRSSparsity>;
+%template(sdpOut) sdpOut<CasADi::SXMatrix>;
+%template(sdpOut) sdpOut<CasADi::MX>;
+%template(sdpOut) sdpOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorSDPOutputSXMatrix) SDPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSDPOutputMX) SDPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorSDPOutputCRSSparsity) SDPOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorSDPOutput) IOSchemeVectorSDPOutputSXMatrix;
+%rename(IOSchemeVectorSDPOutput) IOSchemeVectorSDPOutputMX;
+%rename(IOSchemeVectorSDPOutput) IOSchemeVectorSDPOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -2108,11 +2090,198 @@ def sdpStruct(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(sdpStruct) sdpStruct<CRSSparsity>;
+%template(sdpStruct) sdpStruct<CasADi::CRSSparsity>;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
 %template(SDPStructure) SDPStructIOSchemeVector<CRSSparsity>;
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def sdqpIn(*dummy,**kwargs):
+  """
+  Helper function for 'SDQPInput'
+
+  Two use cases:
+     a) arg = sdqpIn(h=my_h, c=my_c, f=my_f, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx) 
+          all arguments optional
+     b) h, c, f, g, a, lba, uba, lbx, ubx = sdqpIn(arg,"h", "c", "f", "g", "a", "lba", "uba", "lbx", "ubx") 
+          all arguments after the first optional
+  Input arguments of a SDQP problem
+  
+  Keyword arguments:
+    h   -- The matrix H: sparse ( n x n) [SDQP_SOLVER_H]
+    c   -- The vector c: ( n x 1) [SDQP_SOLVER_C]
+    f   -- The vertical stack of all matrices F_i: ( nm x m) [SDQP_SOLVER_F]
+    g   -- The matrix G: ( m x m) [SDQP_SOLVER_G]
+    a   -- The matrix A: ( nc x n) [SDQP_SOLVER_A]
+    lba -- Lower bounds on Ax ( nc x 1) [SDQP_SOLVER_LBA]
+    uba -- Upper bounds on Ax  ( nc x 1) [SDQP_SOLVER_UBA]
+    lbx -- Lower bounds on x ( n x 1 ) [SDQP_SOLVER_LBX]
+    ubx -- Upper bounds on x ( n x 1 ) [SDQP_SOLVER_UBX]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPInput,n)] for n in dummy[1:]]
+  h = []
+  if 'h' in kwargs:
+    h = kwargs['h']
+  c = []
+  if 'c' in kwargs:
+    c = kwargs['c']
+  f = []
+  if 'f' in kwargs:
+    f = kwargs['f']
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  lba = []
+  if 'lba' in kwargs:
+    lba = kwargs['lba']
+  uba = []
+  if 'uba' in kwargs:
+    uba = kwargs['uba']
+  lbx = []
+  if 'lbx' in kwargs:
+    lbx = kwargs['lbx']
+  ubx = []
+  if 'ubx' in kwargs:
+    ubx = kwargs['ubx']
+  for k in kwargs.keys():
+    if not(k in ['h','c','f','g','a','lba','uba','lbx','ubx']):
+      raise Exception("Keyword error in sdqpIn: '%s' is not recognized. Available keywords are: h, c, f, g, a, lba, uba, lbx, ubx" % k )
+  return IOSchemeVector([h,c,f,g,a,lba,uba,lbx,ubx], IOScheme(SCHEME_SDQPInput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(sdqpIn) sdqpIn<CasADi::SXMatrix>;
+%template(sdqpIn) sdqpIn<CasADi::MX>;
+%template(sdqpIn) sdqpIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorSDQPInputSXMatrix) SDQPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSDQPInputMX) SDQPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorSDQPInputCRSSparsity) SDQPInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorSDQPInput) IOSchemeVectorSDQPInputSXMatrix;
+%rename(IOSchemeVectorSDQPInput) IOSchemeVectorSDQPInputMX;
+%rename(IOSchemeVectorSDQPInput) IOSchemeVectorSDQPInputCRSSparsity;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def sdqpOut(*dummy,**kwargs):
+  """
+  Helper function for 'SDQPOutput'
+
+  Two use cases:
+     a) arg = sdqpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
+          all arguments optional
+     b) x, p, dual, cost, dual_cost, lam_a, lam_x = sdqpOut(arg,"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x") 
+          all arguments after the first optional
+  Output arguments of an SDQP Solver
+  
+  Keyword arguments:
+    x         -- The primal solution (n x 1) - may be used as initial guess [SDQP_SOLVER_X]
+    p         -- The solution P (m x m) - may be used as initial guess [SDQP_SOLVER_P]
+    dual      -- The dual solution (m x m) - may be used as initial guess [SDQP_SOLVER_DUAL]
+    cost      -- The primal optimal cost (1 x 1) [SDQP_SOLVER_COST]
+    dual_cost -- The dual optimal cost (1 x 1) [SDQP_SOLVER_DUAL_COST]
+    lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDQP_SOLVER_LAM_A]
+    lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDQP_SOLVER_LAM_X]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpOut. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPOutput,n)] for n in dummy[1:]]
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
+  p = []
+  if 'p' in kwargs:
+    p = kwargs['p']
+  dual = []
+  if 'dual' in kwargs:
+    dual = kwargs['dual']
+  cost = []
+  if 'cost' in kwargs:
+    cost = kwargs['cost']
+  dual_cost = []
+  if 'dual_cost' in kwargs:
+    dual_cost = kwargs['dual_cost']
+  lam_a = []
+  if 'lam_a' in kwargs:
+    lam_a = kwargs['lam_a']
+  lam_x = []
+  if 'lam_x' in kwargs:
+    lam_x = kwargs['lam_x']
+  for k in kwargs.keys():
+    if not(k in ['x','p','dual','cost','dual_cost','lam_a','lam_x']):
+      raise Exception("Keyword error in sdqpOut: '%s' is not recognized. Available keywords are: x, p, dual, cost, dual_cost, lam_a, lam_x" % k )
+  return IOSchemeVector([x,p,dual,cost,dual_cost,lam_a,lam_x], IOScheme(SCHEME_SDQPOutput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(sdqpOut) sdqpOut<CasADi::SXMatrix>;
+%template(sdqpOut) sdqpOut<CasADi::MX>;
+%template(sdqpOut) sdqpOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorSDQPOutputSXMatrix) SDQPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSDQPOutputMX) SDQPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorSDQPOutputCRSSparsity) SDQPOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorSDQPOutput) IOSchemeVectorSDQPOutputSXMatrix;
+%rename(IOSchemeVectorSDQPOutput) IOSchemeVectorSDQPOutputMX;
+%rename(IOSchemeVectorSDQPOutput) IOSchemeVectorSDQPOutputCRSSparsity;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def sdqpStruct(*dummy,**kwargs):
+  """
+  Helper function for 'SDQPStruct'
+
+  Two use cases:
+     a) arg = sdqpStruct(h=my_h, f=my_f, g=my_g, a=my_a) 
+          all arguments optional
+     b) h, f, g, a = sdqpStruct(arg,"h", "f", "g", "a") 
+          all arguments after the first optional
+  Structure specification of an SDQP
+  
+  Keyword arguments:
+    h -- The matrix H: sparse ( n x n) [SDQP_STRUCT_H]
+    f -- The vertical stack of all matrices F_i: ( nm x m) [SDQP_STRUCT_F]
+    g -- The matrix G: ( m x m) [SDQP_STRUCT_G]
+    a -- The matrix A: ( nc x n) [SDQP_STRUCT_A]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpStruct. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPStruct,n)] for n in dummy[1:]]
+  h = []
+  if 'h' in kwargs:
+    h = kwargs['h']
+  f = []
+  if 'f' in kwargs:
+    f = kwargs['f']
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  for k in kwargs.keys():
+    if not(k in ['h','f','g','a']):
+      raise Exception("Keyword error in sdqpStruct: '%s' is not recognized. Available keywords are: h, f, g, a" % k )
+  return SDQPStructure([h,f,g,a])
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(sdqpStruct) sdqpStruct<CasADi::CRSSparsity>;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+%template(SDQPStructure) SDQPStructIOSchemeVector<CRSSparsity>;
 }
 #ifdef SWIGPYTHON
 %pythoncode %{
@@ -2174,17 +2343,20 @@ def socpIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['g','h','e','f','c','a','lba','uba','lbx','ubx']):
       raise Exception("Keyword error in socpIn: '%s' is not recognized. Available keywords are: g, h, e, f, c, a, lba, uba, lbx, ubx" % k )
-  return IOSchemeVector([g,h,e,f,c,a,lba,uba,lbx,ubx], SCHEME_SOCPInput)
+  return IOSchemeVector([g,h,e,f,c,a,lba,uba,lbx,ubx], IOScheme(SCHEME_SOCPInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(socpIn) socpIn<SXMatrix>;
-%template(socpIn) socpIn<MX>;
-%template(socpIn) socpIn<CRSSparsity>;
-%template(IOSchemeVectorSOCPInput) SOCPInputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorSOCPInput) SOCPInputIOSchemeVector<MX>;
-%template(IOSchemeVectorSOCPInput) SOCPInputIOSchemeVector<CRSSparsity>;
+%template(socpIn) socpIn<CasADi::SXMatrix>;
+%template(socpIn) socpIn<CasADi::MX>;
+%template(socpIn) socpIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorSOCPInputSXMatrix) SOCPInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSOCPInputMX) SOCPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorSOCPInputCRSSparsity) SOCPInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorSOCPInput) IOSchemeVectorSOCPInputSXMatrix;
+%rename(IOSchemeVectorSOCPInput) IOSchemeVectorSOCPInputMX;
+%rename(IOSchemeVectorSOCPInput) IOSchemeVectorSOCPInputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -2225,17 +2397,20 @@ def socpOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','cost','lam_a','lam_x']):
       raise Exception("Keyword error in socpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], SCHEME_SOCPOutput)
+  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_SOCPOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(socpOut) socpOut<SXMatrix>;
-%template(socpOut) socpOut<MX>;
-%template(socpOut) socpOut<CRSSparsity>;
-%template(IOSchemeVectorSOCPOutput) SOCPOutputIOSchemeVector<SXMatrix>;
-%template(IOSchemeVectorSOCPOutput) SOCPOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorSOCPOutput) SOCPOutputIOSchemeVector<CRSSparsity>;
+%template(socpOut) socpOut<CasADi::SXMatrix>;
+%template(socpOut) socpOut<CasADi::MX>;
+%template(socpOut) socpOut<CasADi::CRSSparsity>;
+%template(IOSchemeVectorSOCPOutputSXMatrix) SOCPOutputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorSOCPOutputMX) SOCPOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorSOCPOutputCRSSparsity) SOCPOutputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorSOCPOutput) IOSchemeVectorSOCPOutputSXMatrix;
+%rename(IOSchemeVectorSOCPOutput) IOSchemeVectorSOCPOutputMX;
+%rename(IOSchemeVectorSOCPOutput) IOSchemeVectorSOCPOutputCRSSparsity;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
@@ -2273,11 +2448,97 @@ def socpStruct(*dummy,**kwargs):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(socpStruct) socpStruct<CRSSparsity>;
+%template(socpStruct) socpStruct<CasADi::CRSSparsity>;
 }
 #endif //SWIGPYTHON
 namespace CasADi {
 %template(SOCPStructure) SOCPStructIOSchemeVector<CRSSparsity>;
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
+def stabilizedQpIn(*dummy,**kwargs):
+  """
+  Helper function for 'StabilizedQPSolverInput'
+
+  Two use cases:
+     a) arg = stabilizedQpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0, muR=my_muR, muE=my_muE, mu=my_mu) 
+          all arguments optional
+     b) h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu = stabilizedQpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0", "muR", "muE", "mu") 
+          all arguments after the first optional
+  Input arguments of a QP problem
+  
+  Keyword arguments:
+    h      -- The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [STABILIZED_QP_SOLVER_H]
+    g      -- The vector g: dense,  (n x 1) [STABILIZED_QP_SOLVER_G]
+    a      -- The matrix A: sparse, (nc x n) - product with x must be dense. [STABILIZED_QP_SOLVER_A]
+    lba    -- dense, (nc x 1) [STABILIZED_QP_SOLVER_LBA]
+    uba    -- dense, (nc x 1) [STABILIZED_QP_SOLVER_UBA]
+    lbx    -- dense, (n x 1) [STABILIZED_QP_SOLVER_LBX]
+    ubx    -- dense, (n x 1) [STABILIZED_QP_SOLVER_UBX]
+    x0     -- dense, (n x 1) [STABILIZED_QP_SOLVER_X0]
+    lam_x0 -- dense [STABILIZED_QP_SOLVER_LAM_X0]
+    muR    -- dense (1 x 1) [STABILIZED_QP_SOLVER_MUR]
+    muE    -- dense (nc x 1) [STABILIZED_QP_SOLVER_MUE]
+    mu     -- dense (nc x 1) [STABILIZED_QP_SOLVER_MU]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of stabilizedQpIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,n)] for n in dummy[1:]]
+  h = []
+  if 'h' in kwargs:
+    h = kwargs['h']
+  g = []
+  if 'g' in kwargs:
+    g = kwargs['g']
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  lba = []
+  if 'lba' in kwargs:
+    lba = kwargs['lba']
+  uba = []
+  if 'uba' in kwargs:
+    uba = kwargs['uba']
+  lbx = []
+  if 'lbx' in kwargs:
+    lbx = kwargs['lbx']
+  ubx = []
+  if 'ubx' in kwargs:
+    ubx = kwargs['ubx']
+  x0 = []
+  if 'x0' in kwargs:
+    x0 = kwargs['x0']
+  lam_x0 = []
+  if 'lam_x0' in kwargs:
+    lam_x0 = kwargs['lam_x0']
+  muR = []
+  if 'muR' in kwargs:
+    muR = kwargs['muR']
+  muE = []
+  if 'muE' in kwargs:
+    muE = kwargs['muE']
+  mu = []
+  if 'mu' in kwargs:
+    mu = kwargs['mu']
+  for k in kwargs.keys():
+    if not(k in ['h','g','a','lba','uba','lbx','ubx','x0','lam_x0','muR','muE','mu']):
+      raise Exception("Keyword error in stabilizedQpIn: '%s' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu" % k )
+  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0,muR,muE,mu], IOScheme(SCHEME_StabilizedQPSolverInput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(stabilizedQpIn) stabilizedQpIn<CasADi::SXMatrix>;
+%template(stabilizedQpIn) stabilizedQpIn<CasADi::MX>;
+%template(stabilizedQpIn) stabilizedQpIn<CasADi::CRSSparsity>;
+%template(IOSchemeVectorStabilizedQPSolverInputSXMatrix) StabilizedQPSolverInputIOSchemeVector<SXMatrix>;
+%template(IOSchemeVectorStabilizedQPSolverInputMX) StabilizedQPSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorStabilizedQPSolverInputCRSSparsity) StabilizedQPSolverInputIOSchemeVector<CRSSparsity>;
+%rename(IOSchemeVectorStabilizedQPSolverInput) IOSchemeVectorStabilizedQPSolverInputSXMatrix;
+%rename(IOSchemeVectorStabilizedQPSolverInput) IOSchemeVectorStabilizedQPSolverInputMX;
+%rename(IOSchemeVectorStabilizedQPSolverInput) IOSchemeVectorStabilizedQPSolverInputCRSSparsity;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
 }
 #endif //AUTOGENERATED_I
 

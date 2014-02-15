@@ -25,12 +25,18 @@
 #include "../mx/mx_tools.hpp"
 #include <iterator>
 
+#include "../casadi_options.hpp"
+#include "../profiling.hpp"
+
 using namespace std;
 namespace CasADi{
 
   ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : f_(f), jac_(jac), linsol_(linsol){
     addOption("linear_solver",            OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(), "Options to be passed to the linear solver.");
+    addOption("constraints",              OT_INTEGERVECTOR,GenericType(),"Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.");
+    addOption("implicit_input",           OT_INTEGER,      0, "Index of the input that corresponds to the actual root-finding");
+    addOption("implicit_output",          OT_INTEGER,      0, "Index of the output that corresponds to the actual root-finding");
   }
 
   ImplicitFunctionInternal::~ImplicitFunctionInternal(){
@@ -44,31 +50,43 @@ namespace CasADi{
   }
 
   void ImplicitFunctionInternal::init(){
+
     // Initialize the residual function
     f_.init(false);
+
+    // Which input/output correspond to the root-finding problem?
+    iin_ = getOption("implicit_input");
+    iout_ = getOption("implicit_output");
   
     // Get the number of equations and check consistency
-    casadi_assert_message(f_.output().dense() && f_.output().size2()==1, "Residual must be a dense vector");
-    casadi_assert_message(f_.input().dense() && f_.input().size2()==1, "Unknown must be a dense vector");
-    n_ = f_.output().size();
-    casadi_assert_message(n_ == f_.input().size(), "Dimension mismatch");
-    casadi_assert_message(f_.getNumOutputs()==1, "Auxiliary outputs of ImplicitFunctions are no longer allowed, cf. #669");
+    casadi_assert_message(iin_>=0 && iin_<f_.getNumInputs()>0,"Implicit input not in range");
+    casadi_assert_message(iout_>=0 && iout_<f_.getNumOutputs()>0,"Implicit output not in range");
+    casadi_assert_message(f_.output(iout_).dense() && f_.output(iout_).size2()==1, "Residual must be a dense vector");
+    casadi_assert_message(f_.input(iin_).dense() && f_.input(iin_).size2()==1, "Unknown must be a dense vector");
+    n_ = f_.output(iout_).size();
+    casadi_assert_message(n_ == f_.input(iin_).size(), "Dimension mismatch. Input size is " << f_.input(iin_).size() << ", while output size is " << f_.output(iout_).size());
 
     // Allocate inputs
-    setNumInputs(f_.getNumInputs()-1);
+    setNumInputs(f_.getNumInputs());
     for(int i=0; i<getNumInputs(); ++i){
-      input(i) = f_.input(i+1);
+      input(i) = f_.input(i);
     }
   
     // Allocate output
-    setNumOutputs(1);
-    output(0) = f_.input(0);
-  
+    setNumOutputs(f_.getNumOutputs());
+    for(int i=0; i<getNumOutputs(); ++i){
+      output(i) = f_.output(i);
+    }
+
+    // Same input and output schemes
+    setInputScheme(f_.getInputScheme());
+    setOutputScheme(f_.getOutputScheme());
+
     // Call the base class initializer
     FXInternal::init();
-
+  
     // Generate Jacobian if not provided
-    if(jac_.isNull()) jac_ = f_.jacobian(0,0);
+    if(jac_.isNull()) jac_ = f_.jacobian(iin_,iout_);
     jac_.init(false);
   
     // Check for structural singularity in the Jacobian
@@ -80,7 +98,7 @@ namespace CasADi{
         linearSolverCreator linear_solver_creator = getOption("linear_solver");
         
         // Allocate an NLP solver
-        linsol_ = linear_solver_creator(jac_.output().sparsity());
+        linsol_ = linear_solver_creator(jac_.output().sparsity(),1);
         
         // Pass options
         if(hasSetOption("linear_solver_options")){
@@ -97,122 +115,47 @@ namespace CasADi{
       casadi_assert(linsol_.input().sparsity()==jac_.output().sparsity());
     }
     
-    // Allocate memory for directional derivatives
-    ImplicitFunctionInternal::updateNumSens(false);
-    
     // No factorization yet;
     fact_up_to_date_ = false;
+    
+    // Constraints
+    if (hasSetOption("constraints")) u_c_ = getOption("constraints");
+    
+    casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),"Constraint vector if supplied, must be of length n, but got " << u_c_.size() << " and n = " << n_);
   }
 
-  void ImplicitFunctionInternal::updateNumSens(bool recursive){
-    // Call the base class if needed
-    if(recursive) FXInternal::updateNumSens(recursive);
-  
-    // Request more directional derivatives for the residual function
-    f_.requestNumSens(nfdir_,nadir_);
-  }
+  void ImplicitFunctionInternal::evaluate(){
 
-  void ImplicitFunctionInternal::evaluate(int nfdir, int nadir){
+    // Set up timers for profiling
+    double time_zero;
+    double time_start;
+    double time_stop;
+    if(CasadiOptions::profiling) {
+      time_zero = getRealTime();
+    }
+
     // Mark factorization as out-of-date. TODO: make this conditional
     fact_up_to_date_ = false;
 
+    // Get initial guess
+    output(iout_).set(input(iin_));
+
     // Solve the nonlinear system of equations
     solveNonLinear();
-
-    // Quick return if no sensitivities
-    if(nfdir==0 && nadir==0) return;
-
-    // Make sure that a linear solver has been provided
-    casadi_assert_message(!linsol_.isNull(),"Sensitivities of an implicit function requires a provided linear solver");
-    casadi_assert_message(!jac_.isNull(),"Sensitivities of an implicit function requires an exact Jacobian");
-  
-    // Evaluate and factorize the Jacobian
-    if (!fact_up_to_date_) {
-      // Pass inputs
-      jac_.setInput(output(),0);
-      for(int i=0; i<getNumInputs(); ++i)
-        jac_.setInput(input(i),i+1);
-
-      // Evaluate jacobian
-      jac_.evaluate();
-
-      // Pass non-zero elements, scaled by -gamma, to the linear solver
-      linsol_.setInput(jac_.output(),0);
-
-      // Prepare the solution of the linear system (e.g. factorize)
-      linsol_.prepare();
-      fact_up_to_date_ = true;
-    }
-
-  
-    // General scheme:  f(z,x_i) = 0
-    //
-    //  Forward sensitivities:
-    //     dot(f(z,x_i)) = 0
-    //     df/dz dot(z) + Sum_i df/dx_i dot(x_i) = 0
-    //
-    //     dot(z) = [df/dz]^(-1) [ Sum_i df/dx_i dot(x_i) ] 
-    //
-    //     dot(y_i) = dy_i/dz dot(z) + Sum_j dy_i/dx_i dot(x_i)
-    //
-    //  Adjoint sensitivitites:
-
-  
-    // Pass inputs to function
-    f_.setInput(output(0),0);
-    for(int i=0; i<getNumInputs(); ++i)
-      f_.input(i+1).set(input(i));
-
-    // Pass input seeds to function
-    for(int dir=0; dir<nfdir; ++dir){
-      f_.fwdSeed(0,dir).setZero();
-      for(int i=0; i<getNumInputs(); ++i){
-        f_.fwdSeed(i+1,dir).set(fwdSeed(i,dir));
-      }
-    }
-  
-    // Solve for the adjoint seeds
-    for(int dir=0; dir<nadir; ++dir){
-      // Negate adjoint seed and pass to function
-      Matrix<double>& faseed = f_.adjSeed(0,dir);
-      faseed.set(adjSeed(0,dir));
-      for(vector<double>::iterator it=faseed.begin(); it!=faseed.end(); ++it){
-        *it = -*it;
-      }
-    
-      // Solve the transposed linear system
-      linsol_.solve(&faseed.front(),1,false);
-    }
-  
-    // Evaluate
-    f_.evaluate(nfdir,nadir);
-  
-    // Get the forward sensitivities
-    for(int dir=0; dir<nfdir; ++dir){
-      // Negate intermediate result and copy to output
-      Matrix<double>& fsens = fwdSens(0,dir);
-      fsens.set(f_.fwdSens(0,dir));
-      for(vector<double>::iterator it=fsens.begin(); it!=fsens.end(); ++it){
-        *it = -*it;
-      }
-    
-      // Solve the linear system
-      linsol_.solve(&fsens.front(),1,true);
-    }
-  
-    // Get the adjoint sensitivities
-    for(int dir=0; dir<nadir; ++dir){
-      for(int i=0; i<getNumInputs(); ++i){
-        f_.adjSens(i+1,dir).get(adjSens(i,dir));
-      }
-    }
   }
 
   void ImplicitFunctionInternal::evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given){
     // Evaluate non-differentiated
     vector<MX> argv = MXNode::getVector(arg);
-    if(!output_given){
-      *res[0] = callSelf(argv).front();
+    MX z; // the solution to the system of equations
+    if(output_given){
+      z = *res[iout_];
+    } else {
+      vector<MX> resv = callSelf(argv);
+      for(int i=0; i<resv.size(); ++i){
+        if(res[i]!=0) *res[i] = resv[i];
+      }
+      z = resv[iout_];
     }
 
     // Quick return if no derivatives
@@ -223,14 +166,14 @@ namespace CasADi{
     // Temporaries
     vector<int> row_offset(1,0);
     vector<MX> rhs;
+    vector<int> rhs_loc;
 
     // Arguments when calling f/f_der
     vector<MX> v;
-    int nf_in = f_.getNumInputs();
-    v.reserve(nf_in*(1+nfwd) + nadj);
-    v.push_back(*res[0]);
+    v.reserve(getNumInputs()*(1+nfwd) + nadj);
     v.insert(v.end(),argv.begin(),argv.end());
-
+    v[iin_] = z;
+    
     // Get an expression for the Jacobian
     MX J = jac_.call(v).front();
 
@@ -239,21 +182,33 @@ namespace CasADi{
 
     // Forward sensitivities, collect arguments for calling f_der
     for(int d=0; d<nfwd; ++d){
-      v.push_back(MX::sparse(output().shape()));
       argv = MXNode::getVector(fseed[d]);
+      argv[iin_] = MX::zeros(input(iin_).sparsity());
       v.insert(v.end(),argv.begin(),argv.end());
     }
 
     // Adjoint sensitivities, solve to get arguments for calling f_der
     if(nadj>0){
       for(int d=0; d<nadj; ++d){
-        rhs.push_back(trans(*aseed[d][0]));
-        row_offset.push_back(row_offset.back()+1);
-        *aseed[d][0] = MX();
+        for(int i=0; i<getNumOutputs(); ++i){
+          if(aseed[d][i]!=0){
+            if(i==iout_){
+              rhs.push_back(trans(*aseed[d][i]));
+              row_offset.push_back(row_offset.back()+1);
+              rhs_loc.push_back(v.size()); // where to store it
+              v.push_back(MX());
+            } else {
+              v.push_back(*aseed[d][i]);
+            }
+          }
+          *aseed[d][i] = MX();
+        }
       }
+
+      // Solve for all right-hand-sides at once
       rhs = vertsplit(J->getSolve(vertcat(rhs),false,linsol_),row_offset);
-      for(int d=0; d<nadj; ++d){
-        v.push_back(trans(rhs[d]));
+      for(int d=0; d<rhs.size(); ++d){
+        v[rhs_loc[d]] = trans(rhs[d]);
       }
       row_offset.resize(1);
       rhs.clear();
@@ -264,36 +219,113 @@ namespace CasADi{
     vector<MX>::const_iterator v_it = v.begin();
 
     // Discard non-differentiated evaluation (change?)
-    v_it++;
+    v_it += getNumOutputs();
 
-    // Solve for the forward sensitivities
+    // Forward directional derivatives
     if(nfwd>0){
       for(int d=0; d<nfwd; ++d){
-        rhs.push_back(trans(*v_it++));
-        row_offset.push_back(row_offset.back()+1);        
-      }
-      rhs = vertsplit(J->getSolve(vertcat(rhs),true,linsol_),row_offset);
-      for(int d=0; d<nfwd; ++d){
-        if(fsens[d][0]!=0){
-          *fsens[d][0] = -rhs[d];
+        for(int i=0; i<getNumOutputs(); ++i){
+          if(i==iout_){
+            // Collect the arguments
+            rhs.push_back(trans(*v_it++));
+            row_offset.push_back(row_offset.back()+1);        
+          } else {
+            // Auxiliary output
+            if(fsens[d][i]!=0){
+              *fsens[d][i] = *v_it++;
+            }
+          }
         }
       }
+        
+      // Solve for all the forward derivatives at once
+      rhs = vertsplit(J->getSolve(vertcat(rhs),true,linsol_),row_offset);
+      for(int d=0; d<nfwd; ++d){
+        if(fsens[d][iout_]!=0){
+          *fsens[d][iout_] = -trans(rhs[d]);
+        }
+      }
+      
       row_offset.resize(1);
       rhs.clear();
     }
 
     // Collect adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      // Discard adjoint corresponding to z
-      v_it++;
-
       for(int i=0; i<asens[d].size(); ++i, ++v_it){
-        if(asens[d][i]!=0){
-          *asens[d][i] = - *v_it;
+        if(i!=iin_ && asens[d][i]!=0 && !v_it->isNull()){
+          *asens[d][i] += - *v_it;
         }
       }
     }
     casadi_assert(v_it==v.end());
+  }
+
+  void ImplicitFunctionInternal::spEvaluate(bool fwd){
+
+    // Initialize the callback for sparsity propagation
+    f_.spInit(fwd);
+
+    if(fwd){
+
+      // Pass inputs to function
+      f_.input(iin_).setZeroBV();
+      for(int i=0; i<getNumInputs(); ++i){
+        if(i!=iin_) f_.input(i).setBV(input(i));
+      }
+
+      // Propagate dependencies through the function
+      f_.spEvaluate(true);
+      
+      // "Solve" in order to propagate to z
+      output(iout_).setZeroBV();
+      linsol_.spSolve(output(iout_),f_.output(iout_),true);
+      
+      // Propagate to auxiliary outputs
+      if(getNumOutputs()>1){
+        f_.output(iout_).setBV(output(iout_));
+        f_.spEvaluate(true);
+        for(int i=0; i<getNumOutputs(); ++i){
+          if(i!=iout_) output(i).setBV(f_.output(i));
+        }
+      }
+
+    } else {
+      
+      // Propagate dependencies from auxiliary outputs
+      if(getNumOutputs()>1){
+        f_.output(iout_).setZeroBV();
+        for(int i=0; i<getNumOutputs(); ++i){
+          if(i!=iout_) f_.output(i).setBV(output(i));
+        }
+        f_.spEvaluate(false);
+        for(int i=0; i<getNumInputs(); ++i){
+          input(i).setBV(f_.input(i));
+        }
+      } else {
+        for(int i=0; i<getNumInputs(); ++i){
+          input(i).setZeroBV();
+        }
+      }
+      
+      // Add dependency on implicitly defined variable
+      input(iin_).borBV(output(iout_));      
+
+      // "Solve" in order to get seed
+      f_.output(iout_).setZeroBV();
+      linsol_.spSolve(f_.output(iout_),input(iin_),false);
+      
+      // Propagate dependencies through the function
+      f_.spEvaluate(false);
+
+      // Collect influence on inputs
+      for(int i=0; i<getNumInputs(); ++i){
+        if(i!=iin_) input(i).borBV(f_.input(i));
+      }
+      
+      // No dependency on the initial guess
+      input(iin_).setZeroBV();
+    }
   }
 
  

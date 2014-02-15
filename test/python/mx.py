@@ -82,7 +82,7 @@ def checkMXoperations3(self,ztf,zrf,name):
     zr = array([[L[0]*i,L[1]*i,L[2]*i] for i in range(8)])
     checkarray(self,zrf(zr),zt,name)
     return (zt,zrf(zr))
-    
+  
 class MXtests(casadiTestCase):
 
   def setUp(self):
@@ -95,7 +95,7 @@ class MXtests(casadiTestCase):
     self.pool.append(lambda x: arcsin(x[0]),arcsin,"arcsin")
     self.pool.append(lambda x: arccos(x[0]),arccos,"arccos")
     self.pool.append(lambda x: exp(x[0]),exp,"exp")
-    self.pool.append(lambda x: log(x[0]),log,"log")
+    self.pool.append(lambda x: log(x[0]),log,"log",flags={'nozero'})
     self.pool.append(lambda x: x[0]**0,lambda x : x**0,"x^0",flags={'nozero'})
     self.pool.append(lambda x: x[0]**1,lambda x : x**1,"^1")
     self.pool.append(lambda x: x[0]**(-2),lambda x : x**(-2),"^-2",flags={'nozero'})
@@ -124,93 +124,13 @@ class MXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: a[0]+a[1],lambda a: a[0]+a[1],"Matrix+Matrix")
     self.matrixbinarypool.append(lambda a: a[0]-a[1],lambda a: a[0]-a[1],"Matrix-Matrix")
     self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
+    self.matrixbinarypool.append(lambda a: fmax(a[0],a[1]),lambda a: fmax(a[0],a[1]),"fmin")
+
+    self.matrixbinarypool.append(lambda a: fmin(a[0],a[1]),lambda a: fmin(a[0],a[1]),"fmax")
+    self.matrixbinarypool.append(lambda a: mul(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"mul(Matrix,Matrix.T)")
+    self.matrixbinarypool.append(lambda a: arctan2(a[0],a[1]),lambda a: arctan2(a[0],a[1]),"arctan2")
     #self.matrixbinarypool.append(lambda a: inner_mul(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="inner_mul(Matrix,Matrix)") 
     self.matrixbinarypool.append(lambda a: mul(a[0],trans(a[1])),lambda a: dot(a[0],a[1].T),"mul(Matrix,Matrix.T)")
-
-  def test_indirection(self):
-    self.message("MXFunction indirection")
-    x=MX("x",2,1)
-    y=MX("y",2,1)
-    z=MX("z",2,1)
-    
-    xn = array([2.3,1.3])
-    yn = array([7.3,4.6])
-    zn = array([12,7.4])
-    
-    f=MXFunction([x,y,z],[x+2*y+3*z])
-    f.init()
-    self.message(":simple indirection")
-    g=MXFunction([x,y,z],f.call([x,y,z]))
-    g.init()
-    g.setInput(xn,0)
-    g.setInput(yn,1)
-    g.setInput(zn,2)
-    g.setFwdSeed(xn,0) # okay, I'm just lazy comming up with more numbers
-    g.setFwdSeed(yn,1)
-    g.setFwdSeed(zn,2)
-    g.evaluate(1,0)
-    self.checkarray(g.getOutput(),xn+2*yn+3*zn,"MXFunction indirection");
-    self.checkarray(g.getFwdSens(),array([52.9,32.7]),"MXFunction indirection");
-    
-    g=MXFunction([x,y,z],f.call([vertcat([x[0],x[1]]),y,z]))
-    g.init()
-    g.setInput(xn,0)
-    g.setInput(yn,1)
-    g.setInput(zn,2)
-    g.setFwdSeed(xn,0)
-    g.setFwdSeed(yn,1)
-    g.setFwdSeed(zn,2)
-    g.evaluate(1,0)
-
-    self.checkarray(g.getOutput(),xn+2*yn+3*zn,"MXFunction indirection");
-    self.checkarray(g.getFwdSens(),array([52.9,32.7]),"MXFunction indirection");
-    
-    self.message(":double output flipover")
-    h=MXFunction([x,y,z],f.call([vertcat([y[0],x[1]]),vertcat([x[0],y[1]]),z]))
-    h.init()
-    h=MXFunction([x,y,z],h.call([vertcat([y[0],x[1]]),vertcat([x[0],y[1]]),z]))
-    # h should be identical to g now
-    h.init()
-    h.setInput(xn,0)
-    h.setInput(yn,1)
-    h.setInput(zn,2)
-    h.setFwdSeed(xn,0)
-    h.setFwdSeed(yn,1)
-    h.setFwdSeed(zn,2)
-    h.evaluate(1,0)
-    self.checkarray(h.getOutput(),xn+2*yn+3*zn,"MXFunction indirection");
-    self.checkarray(h.getFwdSens(),array([52.9,32.7]),"MXFunction indirection");
-    
-    self.message(":double input flipover")
-    h=MXFunction([x,y,z],f.call([y,x,z]))
-    h.init()
-    h=MXFunction([x,y,z],h.call([y,x,z]))
-    h.init()
-    h.setInput(xn,0)
-    h.setInput(yn,1)
-    h.setInput(zn,2)
-    h.setFwdSeed(xn,0)
-    h.setFwdSeed(yn,1)
-    h.setFwdSeed(zn,2)
-    h.evaluate(1,0)
-    self.checkarray(h.getOutput(),xn+2*yn+3*zn,"MXFunction indirection");
-    self.checkarray(h.getFwdSens(),array([52.9,32.7]),"MXFunction indirection");
-    
-    return # uncomplete calls are not supported
-    self.message(":uncomplete call")
-    h=MXFunction([x,z],f.call([x,y,z]))
-    h.init()
-    h=MXFunction([x,y,z],h.call([x,z]))
-    h.init()
-    h.setInput(xn,0)
-    h.setInput(yn,1)
-    h.setInput(zn,2)
-    h.setFwdSeed(xn,0)
-    h.setFwdSeed(yn,1)
-    h.setFwdSeed(zn,2)
-    h.evaluate(1,0)
-    self.checkarray(h.getOutput(),xn+2*yn+3*zn,"MXFunction indirection");
-    self.checkarray(h.getFwdSens(),array([52.9,32.7]),"MXFunction indirection");
     
   def test_MX1(self):
     self.message("MX constructor")
@@ -648,7 +568,6 @@ class MXtests(casadiTestCase):
 
     def fmod(f,x):
       #f.setOption("ad_mode","forward")
-      f.setOption("numeric_jacobian",True)
       f.init()
       J=f.jacobian()
       J.init()
@@ -658,7 +577,6 @@ class MXtests(casadiTestCase):
     
     def fmod(f,x):
       #f.setOption("ad_mode","reverse")
-      f.setOption("numeric_jacobian",True)
       f.init()
       J=f.jacobian()
       J.init()
@@ -674,7 +592,6 @@ class MXtests(casadiTestCase):
 
       def fmod(f,x):
         #f.setOption("ad_mode","forward")
-        f.setOption("numeric_jacobian",True)
         f.init()
         J=f.jacobian()
         J.init()
@@ -684,7 +601,6 @@ class MXtests(casadiTestCase):
       
       def fmod(f,x):
         #f.setOption("ad_mode","reverse")
-        f.setOption("numeric_jacobian",True)
         f.init()
         J=f.jacobian()
         J.init()
@@ -951,21 +867,7 @@ class MXtests(casadiTestCase):
      fy.setInput(xn)
      fy.evaluate()
      self.checkarray(fy.getOutput(),r,"subscripted assigment")
-     
-     self.message(":fwdSeed")
-     
-     x=MX("X",3,1)
-     xn = numpy.random.random((3,1))
-     y=x**3
-     y[1]=x[0]**4
-     fy = MXFunction([x],[y])
-     fy.init()
-     fy.setInput(xn)
-     fy.setFwdSeed([1,0,0])
-     fy.evaluate(1,0)
-     self.checkarray(fy.getOutput(),matrix([xn[0,0]**3,xn[0,0]**4,xn[2,0]**3]).T,"subscripted assigment")
-     self.checkarray(fy.getFwdSens(),matrix([3*xn[0,0]**2,4*xn[0,0]**3,0]).T,"subscripted assigment")
-     
+          
   def test_erase(self):
     self.message("Erase function")
     self.message(":dense")
@@ -1203,83 +1105,8 @@ class MXtests(casadiTestCase):
     
     x_=1.7
     F.setInput([x_])
-    F.setFwdSeed(1)
-    F.setAdjSeed(1)
-    F.evaluate(1,1)
+    F.evaluate()
     self.checkarray(F.getOutput(),3*x_**2,"Chaining eval")
-    self.checkarray(F.getFwdSens(),6*x_,"Chaining fwd")
-    self.checkarray(F.getAdjSens(),6*x_,"Chaining adj")
-    
-  def test_issue104(self):
-    self.message("regression test #104")
-    x = MX("x")
-
-    F = x**2
-
-    f = MXFunction([x],[F])
-    f.init()
-    f.setInput([-1])
-    f.setFwdSeed([1])
-    f.setAdjSeed([1])
-    f.evaluate(1,1)
-    self.checkarray(f.getFwdSens(),-2,"regression")
-    self.checkarray(f.getAdjSens(),-2,"regression")
-
-    f.init()
-    f.setInput([0])
-    f.setFwdSeed([1])
-    f.setAdjSeed([1])
-    f.evaluate(1,1)
-    self.checkarray(f.getFwdSens(),0,"regression")
-    self.checkarray(f.getAdjSens(),0,"regression")
-    
-    
-    x = MX("x",2,1)
-    F = x**2
-    f = MXFunction([x],[F])
-    f.init()
-    f.setInput([-1,-1])
-    f.setFwdSeed([1,0])
-    f.setAdjSeed([1,0])
-    f.evaluate(1,1)
-    print f.getFwdSens()
-    self.checkarray(f.getFwdSens(),matrix([-2,0]).T,"regression")
-    self.checkarray(f.getAdjSens(),matrix([-2,0]).T,"regression")
-
-    f.init()
-    f.setInput([0,0])
-    f.setFwdSeed([1,0])
-    f.setAdjSeed([1,0])
-    f.evaluate(1,1)
-    self.checkarray(f.getFwdSens(),matrix([0,0]).T,"regression")
-    self.checkarray(f.getAdjSens(),matrix([0,0]).T,"regression")
-    
-    x = MX("x")
-    y = MX("y")
-
-    F = x**y
-
-    f = MXFunction([x,y],[F])
-    f.init()
-    f.setInput([-1],0)
-    f.setInput([2],1)
-    f.setFwdSeed([1])
-    f.setAdjSeed([1])
-    f.evaluate(1,1)
-    self.assertTrue(isnan(f.getFwdSens()[0]))
-    self.assertTrue(isnan(f.getAdjSens(1)[0]))
-    
-    F = constpow(x,y)
-
-    f = MXFunction([x,y],[F])
-    f.init()
-    f.setInput([-1],0)
-    f.setInput([2],1)
-    f.setFwdSeed([1])
-    f.setAdjSeed([1])
-    f.evaluate(1,1)
-    self.checkarray(f.getFwdSens(),-2,"regression")
-    self.checkarray(f.getAdjSens(),-2,"regression")
     
   def test_issue107(self):
     self.message("Regression test for issue 107: +=")
@@ -1430,48 +1257,7 @@ class MXtests(casadiTestCase):
       g.evaluate()
       self.checkarray(f.getOutput(),g.getOutput(),"#%d" % cnt )
       cnt+=1
-    
-  def test_issue134(self):
-    self.message("Test issue #134")
-
-    x = MX("x",2,2)
-    y = MX(2,2)
-    
-    x_ = DMatrix([[1,2],[3,4]])
-
-    f = MXFunction([x],[x+y])
-    f.init()
-    f.setInput(x_,0)
-    f.evaluate(0,0) # this should not throw a segfault
-    self.checkarray(f.getOutput(),x_,"issue 134")
-    f.evaluate(1,1) # this should not throw a segfault
-
-    f = MXFunction([x],[y+x])
-    f.init()
-    f.setInput(x_,0)
-    f.evaluate(0,0) # this should not throw a segfault
-    self.checkarray(f.getOutput(),x_,"issue 134")
-    f.evaluate(1,1) # this should not throw a segfault
-    
-    x = MX("x",1,1)
-    y = MX(1,1)
-
-    x_ = 7.1
-    
-    f = MXFunction([x],[x+y])
-    f.init()
-    f.setInput(x_,0)
-    f.evaluate(0,0) # this should not throw a segfault
-    self.checkarray(f.getOutput(),x_,"issue 134")
-    f.evaluate(1,1) # this should not throw a segfault
-    
-    f = MXFunction([x],[y+x])
-    f.init()
-    f.setInput(x_,0)
-    f.evaluate(0,0) # this should not throw a segfault
-    self.checkarray(f.getOutput(),x_,"issue 134")
-    f.evaluate(1,1) # this should not throw a segfault
-        
+            
   # 2-norms currently not supported
   #def test_Norm2(self):
     #self.message("Norm_2")
@@ -1506,40 +1292,6 @@ class MXtests(casadiTestCase):
     
     #self.checkarray(J.getOutput(),nums.T/linalg.norm(nums),"Norm_2")
     
-  # Removed since a normed squared is not a norm
-  #def test_Norm22(self):
-    #self.message("Norm_22")
-    #X=MX("x",5,1)
-    
-    #nums = matrix([1,2,3,0,-1]).T
-
-    #F =MXFunction([X],[norm_22(X)])
-
-    #J = Jacobian(F,0,0)
-    #J.setOption("ad_mode","forward")
-    #J.init()
-
-    #J.setInput(nums)
-    #J.evaluate()
-    #self.checkarray(J.getOutput(),2*nums.T,"Norm_22 fwd")
-
-    #J = Jacobian(F,0,0)
-    #J.setOption("ad_mode","reverse")
-    #J.init()
-
-    #J.setInput(nums)
-    #J.evaluate()
-    
-    #self.checkarray(J.getOutput(),2*nums.T,"Norm_22 adj")
-        
-    #J = MXFunction([X],[F.jac(0)[0]])
-    #J.init()
-
-    #J.setInput(nums)
-    #J.evaluate()
-    
-    #self.checkarray(J.getOutput(),2*nums.T,"Norm_22 jac")
-
   # 1-norms currently not supported
   #def test_Norm1(self):
     #self.message("Norm_1")
@@ -1575,28 +1327,20 @@ class MXtests(casadiTestCase):
 
     self.assertEqual(f.output(1).shape[0],0)
     self.assertEqual(f.output(1).shape[1],0)
-    f.evaluate(1,1)
-    self.assertEqual(f.fwdSens(1).shape[0],0)
-    self.assertEqual(f.fwdSens(1).shape[1],0)
-    self.assertEqual(f.adjSeed(1).shape[0],0)
-    self.assertEqual(f.adjSeed(1).shape[1],0)
+    f.evaluate()
     
     f = MXFunction([x,MX()],[x**2,MX()])
     f.init()
 
     self.assertEqual(f.output(1).shape[0],0)
     self.assertEqual(f.output(1).shape[1],0)
-    f.evaluate(1,1)
-    self.assertEqual(f.fwdSens(1).shape[0],0)
-    self.assertEqual(f.fwdSens(1).shape[1],0)
-    self.assertEqual(f.adjSeed(1).shape[0],0)
-    self.assertEqual(f.adjSeed(1).shape[1],0)
+    f.evaluate()
     
     r = f.call([x,MX()])
-    self.assertTrue(r[1].isNull())
+    self.assertTrue(r[1].null())
 
     r = f.call([MX(),MX()])
-    self.assertTrue(r[1].isNull())
+    self.assertTrue(r[1].null())
     
     #self.assertRaises(Exception,lambda : f.eval([x,x]))
     #self.assertRaises(Exception,lambda : f.eval([[],[]]))
@@ -1775,33 +1519,7 @@ class MXtests(casadiTestCase):
     f.setInput(0)
     f.evaluate()
     self.assertTrue(f.getOutput()==2,"if_else")
-    
-    # Check sensitivities
-    
-    x0 = 2.1
-    dx = 0.3
-    y = if_else(x>1,x**2,x**3)
-    f = MXFunction([x],[y])
-    f.init()
-    f.setInput(x0)
-    f.setFwdSeed(dx)
-    f.setAdjSeed(dx)
-    f.evaluate(1,1)
-    self.checkarray(f.getOutput(),x0**2,"if_else sens")
-    self.checkarray(f.getFwdSens(),2*x0*dx,"if_else sens")
-    self.checkarray(f.getAdjSens(),2*x0*dx,"if_else sens")
-    
-    x0 = -2.1
-    dx = 0.3
-    
-    f.setInput(x0)
-    f.setFwdSeed(dx)
-    f.setAdjSeed(dx)
-    f.evaluate(1,1)
-    self.checkarray(f.getOutput(),x0**3,"if_else sens")
-    self.checkarray(f.getFwdSens(),3*(-x0)**2*dx,"if_else sens")
-    self.checkarray(f.getAdjSens(),3*(-x0)**2*dx,"if_else sens")
-    
+        
   def test_regression491(self):
     self.message("regression #491")
     u = ssym("u")
@@ -1815,7 +1533,7 @@ class MXtests(casadiTestCase):
     X = F.call([U,U])[0]
     G = F.call([U,X])[0]
 
-    for kk in range(3):
+    for kk in range(2):
       gfcn = 0
       if kk==0:
         tmp = MXFunction([U],[G])
@@ -1823,7 +1541,6 @@ class MXtests(casadiTestCase):
         gfcn = tmp.expand()
       else:
         gfcn = MXFunction([U],[G])
-        gfcn.setOption("numeric_jacobian",kk==1)
       gfcn.setOption("ad_mode","reverse")
       gfcn.init()
       J = gfcn.jacobian()
@@ -2036,6 +1753,480 @@ class MXtests(casadiTestCase):
     
   def test_iter(self):
     self.assertEqual(len(list(msym("x",2))),2)
+
+  @known_bug()
+  def test_vertcat_empty(self):
+    a = MX(DMatrix(0,2))
+    v = vertcat([a,a])
+    
+    self.assertEqual(v.size1(),0)
+    self.assertEqual(v.size2(),2)
+    
+    a = MX(DMatrix(2,0))
+    v = vertcat([a,a])
+    
+    self.assertEqual(v.size1(),4)
+    self.assertEqual(v.size2(),0)
+    
+  def test_jacobian_empty(self):
+    x = msym("x",3)
+
+    s = jacobian(DMatrix(0,0),x).shape
+    self.assertEqual(s[0],0)
+    self.assertEqual(s[1],3)
+
+    s = jacobian(x,msym("x",0,4)).shape
+    self.assertEqual(s[0],3)
+    self.assertEqual(s[1],0)
+    
+  def test_mul_sparsity(self):
+
+    N = 10
+    x = msym("x",N,N)
+    y = msym("y",N,N)
+
+    x_ = self.randDMatrix(N,N)
+    y_ = self.randDMatrix(N,N)
+
+    filt = sp_diag(N)+sp_triplet(N,N,[1],[3])
+
+    f = MXFunction([x,y],[mul(x,y)])
+    f.init()
+    f.setInput(x_,0)
+    f.setInput(y_,1)
+    g = MXFunction([x,y],[mul(x,y,filt)])
+    g.init()
+    g.setInput(x_,0)
+    g.setInput(y_,1)
+    
+    f.evaluate()
+    g.evaluate()
+    
+    self.checkarray(IMatrix(filt,1),IMatrix(g.output().sparsity(),1))
+    
+    self.checkarray(f.output()[filt],g.output())
+    
+  def test_mul_zero_wrong(self):
+    with self.assertRaises(RuntimeError):
+      mul(msym("X",4,5),MX.zeros(3,2))
+      
+  def test_vertsplit(self):
+    a = msym("X",sp_tril(5))
+    v = vertsplit(a,[0,2,4])
+    
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
+
+    f.evaluate()
+    v = [f.output(i) for i in range(len(v))]
+    
+    self.assertEqual(len(v),3)
+    self.checkarray(v[0],DMatrix([[0,0,0,0,0],[1,2,0,0,0]]))
+    self.checkarray(v[1],DMatrix([[3,4,5,0,0],[6,7,8,9,0]]))
+    self.checkarray(v[2],DMatrix([[10,11,12,13,14]]))
+    
+    v = vertsplit(a)
+    
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
+
+    f.evaluate()
+    v = [f.output(i) for i in range(len(v))]
+    
+    self.assertEqual(len(v),a.size1())
+    self.checkarray(v[0],DMatrix([[0,0,0,0,0]]))
+    self.checkarray(v[1],DMatrix([[1,2,0,0,0]]))
+    self.checkarray(v[2],DMatrix([[3,4,5,0,0]]))
+    self.checkarray(v[3],DMatrix([[6,7,8,9,0]]))
+    self.checkarray(v[4],DMatrix([[10,11,12,13,14]]))
+    
+    v = vertsplit(a,2)
+    
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
+
+    f.evaluate()
+    v = [f.output(i) for i in range(len(v))]
+    
+    self.assertEqual(len(v),3)
+    self.checkarray(v[0],DMatrix([[0,0,0,0,0],[1,2,0,0,0]]))
+    self.checkarray(v[1],DMatrix([[3,4,5,0,0],[6,7,8,9,0]]))
+    self.checkarray(v[2],DMatrix([[10,11,12,13,14]]))
+    
+    v = vertsplit(a,[0,0,3])
+    
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
+
+    f.evaluate()
+    V = [f.output(i) for i in range(len(v))]
+    
+    self.assertEqual(len(v),3)
+    self.assertEqual(v[0].size1(),0)
+    self.assertEqual(v[0].size2(),5)  # why not 5?
+    self.checkarray(V[1],DMatrix([[0,0,0,0,0],[1,2,0,0,0],[3,4,5,0,0]]))
+    self.checkarray(V[2],DMatrix([[6,7,8,9,0],[10,11,12,13,14]]))
+ 
+  def test_horzsplit(self):
+    a = msym("X",sp_tril(5))
+    v = horzsplit(a,[0,2,4])
+    
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
+
+    f.evaluate()
+    v = [f.output(i) for i in range(len(v))]
+    self.assertEqual(len(v),3)
+    self.checkarray(v[0],DMatrix([[0,0],[1,2],[3,4],[6,7],[10,11]]))
+    self.checkarray(v[1],DMatrix([[0,0],[0,0],[5,0],[8,9],[12,13]]))
+    self.checkarray(v[2],DMatrix([[0],[0],[0],[0],[14]]))
+    
+    v = horzsplit(a)
+    
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
+
+    f.evaluate()
+    v = [f.output(i) for i in range(len(v))]
+    self.assertEqual(len(v),a.size1())
+    self.checkarray(v[0],DMatrix([0,1,3,6,10]))
+    self.checkarray(v[1],DMatrix([0,2,4,7,11]))
+    self.checkarray(v[2],DMatrix([0,0,5,8,12]))
+    self.checkarray(v[3],DMatrix([0,0,0,9,13]))
+    self.checkarray(v[4],DMatrix([0,0,0,0,14]))
+    
+    v = horzsplit(a,2)
+
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
+
+    f.evaluate()
+    v = [f.output(i) for i in range(len(v))]
+    
+    self.assertEqual(len(v),3)
+    self.checkarray(v[0],DMatrix([[0,0],[1,2],[3,4],[6,7],[10,11]]))
+    self.checkarray(v[1],DMatrix([[0,0],[0,0],[5,0],[8,9],[12,13]]))
+    self.checkarray(v[2],DMatrix([[0],[0],[0],[0],[14]]))
+    
+    v = horzsplit(a,[0,0,3])
+    f = MXFunction([a],v)
+    f.init()
+    f.setInput(range(5*6/2))
+
+    f.evaluate()
+    V = [f.output(i) for i in range(len(v))]
+    
+    self.assertEqual(len(v),3)
+    self.assertEqual(v[0].size1(),5)
+    self.assertEqual(v[0].size2(),0)
+    self.checkarray(V[1],DMatrix([[0,0,0],[1,2,0],[3,4,5],[6,7,8],[10,11,12]]))
+    self.checkarray(V[2],DMatrix([[0,0],[0,0],[0,0],[9,0],[13,14]]))
+    
+  def test_blocksplit(self):
+    a = msym("X",sp_tril(5))
+    v = blocksplit(a,[0,2,4],[0,1,3])
+    
+    fs = [MXFunction([a],vr) for vr in v]
+    for f in fs:
+      f.init()
+      f.setInput(range(5*6/2))
+
+      f.evaluate()
+    v = [[fs[i].output(j) for j in range(3)] for i in range(3)]
+    
+    self.checkarray(v[0][0],DMatrix([0,1]))
+    self.checkarray(v[0][1],DMatrix([[0,0],[2,0]]))
+    self.checkarray(v[1][0],DMatrix([3,6]))
+    self.checkarray(blockcat(v),f.input())
+
+  def test_mxnulloutput(self):
+     a = MX(5,0)
+     b = msym("x",2)
+     
+     f = MXFunction([b],[a])
+     f.init()
+     c = f.call([b])[0]
+
+     self.assertEqual(c.size1(),5)
+     self.assertEqual(c.size2(),0)
+
+     c = f.eval([b])[0]
+
+     self.assertEqual(c.size1(),5)
+     self.assertEqual(c.size2(),0)
+     
+     a = MX(0,0)
+     b = msym("x",2)
+     
+     f = MXFunction([b],[a])
+     f.init()
+     c = f.call([b])[0]
+
+     self.assertEqual(c.size1(),0)
+     self.assertEqual(c.size2(),0)
+
+     c = f.eval([b])[0]
+
+     self.assertEqual(c.size1(),0)
+     self.assertEqual(c.size2(),0)
+     
+  def test_mxnull(self):
+     a = MX(5,0)
+     b = MX(0,3)
+     
+     c = mul(a,b)
+     
+     self.assertEqual(c.size(),0)
+     
+     a = MX(5,3)
+     b = MX(3,4)
+     
+     c = mul(a,b)
+     
+     self.assertEqual(c.size(),0)
+     
+  def  test_mxnullop(self):
+    c = MX(0,0)
+    x = msym("x",2,3)
+    
+    with self.assertRaises(RuntimeError):
+      d = x + c
+ 
+    with self.assertRaises(RuntimeError):
+      d = x / c
+      
+  @memory_heavy()
+  def test_MX_shapes(self):
+      self.message("MX unary operations")
+      
+      #self.checkarray(DMatrix(sp_tril(4),1),DMatrix(sp_dense(4,4),1))
+      
+      for sp in [sp_dense(0,0),sp_dense(0,2),sp_dense(2,0),sp_dense(1,1),sp_dense(2,2), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+        for v in [0,1,0.2]:
+          x_ = DMatrix(sp,v)
+          
+          xx = msym("x",sp.size1(),sp.size2())
+          x=xx[sp]
+          
+          for (casadiop, numpyop,name, flags) in self.pool.zip():
+            if 'nozero' in flags and v==0: continue
+            r = casadiop([x])
+            f = MXFunction([xx],[r])
+            f.init()
+            f.setInput(v,0)
+            f.evaluate()
+            
+            self.checkarray(f.output(),numpyop(x_))
+            
+            a = IMatrix(f.output().sparsity(),1)
+            b = IMatrix(DMatrix(numpyop(x_)).sparsity(),1)
+            
+            c = b-a
+            if c.size()>0:
+              # At least as sparse as DMatrix calculus
+              self.assertTrue(min(c)>=0,str([sp,v,name]))
+
+      for sp in [sp_sparse(1,1),sp_dense(1,1),sp_sparse(3,4),sp_dense(3,4), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+        for v1 in [0,1,0.2,-0.2]:
+          x1_ = DMatrix(sp,v1)
+          xx1 = msym("x",sp.size1(),sp.size2())
+          x1=xx1[sp]
+          xx1s = ssym("x",sp.size1(),sp.size2())
+          x1s=xx1s[sp]
+          for sp2 in [sp_sparse(1,1),sp_dense(1,1),sp_sparse(3,4),sp_dense(3,4), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+            for v2 in [0,1,0.2,-0.2]:
+              x2_ = DMatrix(sp2,v2)
+              xx2 = msym("x",sp2.size1(),sp2.size2())
+              x2=xx2[sp2]
+              xx2s = ssym("x",sp2.size1(),sp2.size2())
+              x2s=xx2s[sp2]
+              for (casadiop, numpyop,name, flags) in self.matrixbinarypool.zip():
+                if "mul" in name and (sp.numel()==1 or sp2.numel()==1): continue
+                r = casadiop([x1,x2])
+                f = MXFunction([xx1,xx2],[r])
+                f.init()
+                f.setInput(v1,0)
+                f.setInput(v2,1)
+                f.evaluate()
+                g = MXFunction([xx1,xx2],[r])
+                g.init()
+                g.setInput(v1,0)
+                g.setInput(v2,1)
+                g.evaluate()
+                
+                self.checkarray(f.output(),numpyop([x1_,x2_]),str([sp,sp2,v1,v2,x1_,x2_,name]))
+                
+                
+                if "mul" not in name:
+                  a = IMatrix(f.output().sparsity(),1)
+                  b = IMatrix(g.output().sparsity(),1)
+                  
+                  c = b-a
+                  if c.size()>0:
+                    # At least as sparse as DMatrix calculus
+                    self.assertTrue(min(c)>=0,str([sp,sp2,v1,v2,name,a,b]))
+                
+                if sp.size()>0 and sp2.size()>0 and v1!=0 and v2!=0:
+                  self.checkfx(f,g,hessian=False,failmessage=str([sp,sp2,v1,v2,x1_,x2_,name]))
+
+  @memory_heavy()
+  def test_MXConstant(self):
+      self.message("MX unary operations, constant")
+      
+      #self.checkarray(DMatrix(sp_tril(4),1),DMatrix(sp_dense(4,4),1))
+      
+      for sp in [sp_dense(0,0),sp_dense(0,2),sp_dense(2,0),sp_dense(1,1),sp_dense(2,2), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+        for v in [0,1,0.2]:
+          x_ = DMatrix(sp,v)
+          
+          x=MX(sp,v)
+          
+          for (casadiop, numpyop,name, flags) in self.pool.zip():
+            if 'nozero' in flags and (v==0 or not sp.dense()): continue
+            r = casadiop([x])
+            print r
+            self.assertTrue(r.isConstant())
+            
+            self.checkarray(r.getMatrixValue(),numpyop(x_),str([x_,name]))
+            
+            a = IMatrix(r.getMatrixValue().sparsity(),1)
+            b = IMatrix(DMatrix(numpyop(x_)).sparsity(),1)
+            
+            c = b-a
+            if c.size()>0:
+              # At least as sparse as DMatrix calculus
+              self.assertTrue(min(c)>=0,str([sp,v,name]))
+        
+      for sp in [sp_dense(1,1),sp_sparse(1,1),sp_sparse(3,4),sp_dense(3,4), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+        for v1 in [0,1,0.2,-0.2]:
+          x1_ = DMatrix(sp,v1)
+          x1=MX(sp,v1)
+          for sp2 in [sp_dense(1,1),sp_sparse(1,1),sp_sparse(3,4),sp_dense(3,4), CRSSparsity(3,4,[1,2,1],[0,2,2,3])]:
+            for v2 in [0,1,0.2,-0.2]:
+              x2_ = DMatrix(sp2,v2)
+              x2=MX(sp2,v2)
+              for (casadiop, numpyop,name, flags) in self.matrixbinarypool.zip():
+                if "mul" in name and (sp.numel()==1 or sp2.numel()==1): continue
+                r = casadiop([x1,x2])
+                f = MXFunction([],[r]) # Should not be needed -> constant folding
+                f.init()
+                f.evaluate()
+               
+                
+                self.checkarray(f.output(),numpyop([x1_,x2_]),str([sp,sp2,v1,v2,name]))
+                if "mul" not in name:
+                  a = IMatrix(f.output().sparsity(),1)
+                  b = IMatrix(DMatrix(numpyop([x1_,x2_])).sparsity(),1)
+                  
+                  c = b-a
+                  if c.size()>0:
+                    # At least as sparse as DMatrix calculus
+                    self.assertTrue(min(c)>=0,str([sp,sp2,v1,v2,name]))
+
+  def test_graph_substitute(self):
+    x=msym("X",4,4)
+    y=msym("Y",4,4)
+    b=msym("B",4,4)
+
+    c = x*y
+    d = b*y
+    f = c+d
+    
+    
+    C = msym("C",4,4)
+    f = graph_substitute(f,[c],[C])
+    
+    F = MXFunction([y,b,C],[f])
+    F.init()
+    
+    F.setInput(1,0)
+    F.setInput(2,1)
+    F.setInput(3,2)
+    
+    F.evaluate()
+    
+    self.checkarray(F.output(),5*DMatrix.ones(4,4))
+    
+    D = msym("D",4,4)
+    f = graph_substitute(f,[d],[D])
+    
+    F = MXFunction([D,C],[f])
+    F.init()
+    
+    F.setInput(4,0)
+    F.setInput(5,1)
+    
+    F.evaluate()
+    
+    self.checkarray(F.output(),9*DMatrix.ones(4,4))
+                 
+
+  def test_matrix_expand(self):
+    n = 2
+    a = msym("a",n,n)
+    b = msym("b",n,n)
+    c = msym("c",n,n)
+
+    d = a+b
+    e = d*c
+
+    self.assertEqual(countNodes(e),6)
+
+    t0 = matrix_expand(e)
+
+    self.assertEqual(countNodes(t0),5)
+    
+    t1 = matrix_expand(e,[d])
+    self.assertEqual(countNodes(t1),6)
+    
+    print e,t0,t1
+    
+    
+    outs = []
+    for x in [e,t0,t1]:
+      f = MXFunction([a,b,c],[x])
+      f.init()
+      
+      f.setInput(1.1,0)
+      f.setInput(2.2,1)
+      f.setInput(3.3,2)
+      
+      f.evaluate()
+      
+      outs.append(f.getOutput())
+      if outs>1:
+        self.checkarray(outs[0],outs[-1])
+      
+    print outs
+    
+  def test_kron(self):
+    a = sparse(DMatrix([[1,0,6],[2,7,0]]))
+    b = sparse(DMatrix([[1,0,0],[2,3,7],[0,0,9],[1,12,13]]))
+    
+    A = msym("A",a.sparsity())
+    B = msym("B",b.sparsity())
+    C = c.kron(A,B)
+    
+    f = MXFunction([A,B],[C])
+    f.init()
+    f.setInput(a,0)
+    f.setInput(b,1)
+    f.evaluate()
+    
+    c_ = f.output()
+    
+    self.assertEqual(c_.size1(),a.size1()*b.size1())
+    self.assertEqual(c_.size2(),a.size2()*b.size2())
+    self.assertEqual(c_.size(),a.size()*b.size())
+    
+    self.checkarray(c_,numpy.kron(a,b))
     
 if __name__ == '__main__':
     unittest.main()

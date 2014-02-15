@@ -25,7 +25,8 @@ from graph import *
 from variables import Variables, Numbers
 from collection import Collection 
 from bounds import *
-from structure import repeated, entry, struct_ssym, struct_msym, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct
+from structure import repeated, entry, struct_ssym, struct_msym, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct, struct_load
+from io import nice_stdout, capture_stdout
 
 def print_subclasses(myclass, depth=0):
   print ("  " * depth) + " - " + myclass.__name__

@@ -55,6 +55,7 @@ virtual bool isInteger() const; // check if integer
 virtual bool isSymbolic() const; // check if symbolic
 virtual bool hasDep() const; // check if binary
 virtual bool isZero() const; // check if zero
+virtual bool isAlmostZero(double tol) const; // check if almost zero
 virtual bool isOne() const; // check if one
 virtual bool isMinusOne() const; // check if minus one
 virtual bool isNan() const; // check if not a number

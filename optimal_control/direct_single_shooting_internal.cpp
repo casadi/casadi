@@ -283,7 +283,7 @@ void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_op
   casadi_assert(el==g_opt.size());
 }
 
-void DirectSingleShootingInternal::evaluate(int nfdir, int nadir){
+void DirectSingleShootingInternal::evaluate(){
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_SOLVER_X0).data());
   getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),nlp_solver_.input(NLP_SOLVER_UBX).data());

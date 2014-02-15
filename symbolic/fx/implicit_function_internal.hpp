@@ -56,11 +56,14 @@ namespace CasADi{
     /// Initialize
     virtual void init();
     
-    /** \brief  Update the number of sensitivity directions during or after initialization */
-    virtual void updateNumSens(bool recursive);
+    /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
+    virtual void spEvaluate(bool fwd);
+
+    /// Is the class able to propate seeds through the algorithm?
+    virtual bool spCanEvaluate(bool fwd){ return true;}
 
     /// Solve the system of equations and calculate derivatives
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
  
     /// Solve the nonlinear system of equations
     virtual void solveNonLinear() = 0;
@@ -84,6 +87,12 @@ namespace CasADi{
 
     /// Factorization up-to-date?
     bool fact_up_to_date_;
+    
+    /// Constraints on decision variables
+    std::vector<int> u_c_;
+    
+    /// Indices of the input and output that correspond to the actual root-finding
+    int iin_, iout_;
   };
 
 

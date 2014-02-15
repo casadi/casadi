@@ -23,54 +23,54 @@
 #ifndef RK_INTEGRATOR_HPP
 #define RK_INTEGRATOR_HPP
 
-#include "symbolic/fx/integrator.hpp"
+#include "fixed_step_integrator.hpp"
 
 namespace CasADi{
   
-class RKIntegratorInternal;
+  class RKIntegratorInternal;
   
-/**
-  \brief Fixed step Runge-Kutta integrator
-  ODE integrator based on explicit Runge-Kutta methods
+  /** \brief Fixed-step explicit Runge-Kutta integrator for ODEs
+      Currently implements RK4.
+
+      The method is still under development
   
-  The method is still under development
-  
-  \author Joel Andersson
-  \date 2011
-*/
-class RKIntegrator : public Integrator {
+      \author Joel Andersson
+      \date 2011-2014
+  */
+  class RKIntegrator : public FixedStepIntegrator {
   public:
     /** \brief  Default constructor */
     RKIntegrator();
     
     /** \brief  Create an integrator for explicit ODEs
-    *   \param f dynamical system
-    * \copydoc scheme_DAEInput
-    * \copydoc scheme_DAEOutput
-    *
-    */
+     *   \param f dynamical system
+     * \copydoc scheme_DAEInput
+     * \copydoc scheme_DAEOutput
+     *   \param g backwards system
+     * \copydoc scheme_RDAEInput
+     * \copydoc scheme_RDAEOutput
+     */
     explicit RKIntegrator(const FX& f, const FX& g=FX());
 
+    //@{
     /// Access functions of the node
     RKIntegratorInternal* operator->();
     const RKIntegratorInternal* operator->() const;
+    //@}
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
     /// Static creator function
-    #ifdef SWIG
+#ifdef SWIG
     %callback("%s_cb");
-    #endif
+#endif
     static Integrator creator(const FX& f, const FX& g){ return RKIntegrator(f,g);}
-    #ifdef SWIG
+#ifdef SWIG
     %nocallback;
-    #endif
+#endif
 
-    /// @Joris: This would be an alternative
-    static integratorCreator getCreator(){return creator;}
-    
-};
+  };
 
 } // namespace CasADi
 

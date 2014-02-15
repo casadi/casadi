@@ -34,92 +34,52 @@ namespace CasADi{
     setSparsity(x.sparsity().transpose());
   }
 
-  void Transpose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, std::vector<int>& itmp, std::vector<double>& rtmp){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens,itmp,rtmp);
+  void Transpose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
- void DenseTranspose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens, std::vector<int>& itmp, std::vector<double>& rtmp){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens,itmp,rtmp);
+ void DenseTranspose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void Transpose::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens,itmp,rtmp);
+  void Transpose::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void DenseTranspose::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens,itmp,rtmp);
+  void DenseTranspose::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void Transpose::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void Transpose::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
 
     // Get sparsity patterns
     //const vector<int>& x_rowind = input[0]->rowind();
     const vector<int>& x_col = input[0]->col();
     const vector<int>& xT_rowind = output[0]->rowind();
     
-    // Number of derivatives
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
+    const vector<T>& x = input[0]->data();
+    vector<T>& xT = output[0]->data();
 
-    // Nondifferentiated outputs and forward sensitivities
-    for(int d=-1; d<nfwd; ++d){
-      const vector<T>& x = d==-1 ? input[0]->data() : fwdSeed[d][0]->data();
-      vector<T>& xT = d==-1 ? output[0]->data() : fwdSens[d][0]->data();
-
-      // Transpose
-      copy(xT_rowind.begin(),xT_rowind.end(),itmp.begin());
-      for(int el=0; el<x_col.size(); ++el){
-        xT[itmp[x_col[el]]++] = x[el];
-      }
-    }
-    
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      vector<T>& x = adjSens[d][0]->data();
-      vector<T>& xT = adjSeed[d][0]->data();
-      
-      // Transpose
-      copy(xT_rowind.begin(),xT_rowind.end(),itmp.begin());
-      for(int el=0; el<x_col.size(); ++el){
-        int elT = itmp[x_col[el]]++;
-        x[el] += xT[elT];
-        xT[elT] = 0;
-      }
+    // Transpose
+    copy(xT_rowind.begin(),xT_rowind.end(),itmp.begin());
+    for(int el=0; el<x_col.size(); ++el){
+      xT[itmp[x_col[el]]++] = x[el];
     }
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void DenseTranspose::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void DenseTranspose::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
 
     // Get sparsity patterns
     int x_nrow = input[0]->size1();
     int x_ncol = input[0]->size2();
     
-    // Number of derivatives
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
-    // Nondifferentiated outputs and forward sensitivities
-    for(int d=-1; d<nfwd; ++d){
-      const vector<T>& x = d==-1 ? input[0]->data() : fwdSeed[d][0]->data();
-      vector<T>& xT = d==-1 ? output[0]->data() : fwdSens[d][0]->data();
-      for(int i=0; i<x_nrow; ++i){
-        for(int j=0; j<x_ncol; ++j){
-          xT[i+j*x_nrow] = x[j+i*x_ncol];
-        }
-      }
-    }
-    
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      vector<T>& x = adjSens[d][0]->data();
-      vector<T>& xT = adjSeed[d][0]->data();
-      for(int i=0; i<x_nrow; ++i){
-        for(int j=0; j<x_ncol; ++j){
-          x[j+i*x_ncol] += xT[i+j*x_nrow];
-          xT[i+j*x_nrow] = 0;          
-        }
+    const vector<T>& x = input[0]->data();
+    vector<T>& xT = output[0]->data();
+    for(int i=0; i<x_nrow; ++i){
+      for(int j=0; j<x_ncol; ++j){
+        xT[i+j*x_nrow] = x[j+i*x_ncol];
       }
     }
   }

@@ -29,81 +29,78 @@
 
 namespace CasADi{
 
-/** \brief ControlSimulator data storage classs
-  \author Joel Andersson 
-  \date 2010
-*/
-class ControlSimulatorInternal : public FXInternal{
-public:
-  
-  /** \brief  Constructor */
-  ControlSimulatorInternal(const FX& dae, const FX& output_fcn, const std::vector<double>& gridc);
-  
-  /** \brief  Destructor */
-  virtual ~ControlSimulatorInternal();
-  
-  /** \brief  Clone */
-  virtual ControlSimulatorInternal* clone() const{ return new ControlSimulatorInternal(deepcopy(dae_),deepcopy(output_fcn_),gridc_);}
-
-  /** \brief  initialize */
-  virtual void init();
-
-  /** \brief  Integrate */
-  virtual void evaluate(int nfdir, int nadir);
-  
-  /** \brief  Update the number of sensitivity directions during or after initialization */
-  virtual void updateNumSens(bool recursive);
-  
-  /// Get the parameters that change on a coarse time scale, sampled on the fine timescale
-         Matrix<double> getVFine() const; 
-         
-         /** \brief Get the index i such that gridfine[i] == gridcoarse 
+  /** \brief ControlSimulator data storage classs
+      \author Joel Andersson 
+      \date 2010
   */
-         std::vector< int > getCoarseIndex() const; 
+  class ControlSimulatorInternal : public FXInternal{
+  public:
+  
+    /** \brief  Constructor */
+    ControlSimulatorInternal(const FX& dae, const FX& output_fcn, const std::vector<double>& gridc);
+  
+    /** \brief  Destructor */
+    virtual ~ControlSimulatorInternal();
+  
+    /** \brief  Clone */
+    virtual ControlSimulatorInternal* clone() const{ return new ControlSimulatorInternal(deepcopy(dae_),deepcopy(output_fcn_),gridc_);}
+
+    /** \brief  initialize */
+    virtual void init();
+
+    /** \brief  Integrate */
+    virtual void evaluate();
+  
+    /// Get the parameters that change on a coarse time scale, sampled on the fine timescale
+    Matrix<double> getVFine() const; 
+         
+    /** \brief Get the index i such that gridfine[i] == gridcoarse 
+     */
+    std::vector< int > getCoarseIndex() const; 
          
 
-  Integrator integrator_;
-  FX dae_;
-  FX control_dae_;
-  Simulator simulator_;
+    Integrator integrator_;
+    FX dae_;
+    FX control_dae_;
+    Simulator simulator_;
   
-  // original output function
-  FX orig_output_fcn_;
+    // original output function
+    FX orig_output_fcn_;
   
-  // adapted output function
-  FX output_fcn_;
+    // adapted output function
+    FX output_fcn_;
   
-  /** \brief The hart of this class, a casadi of simulator calls */
-  FX all_output_;
+    /** \brief The hart of this class, a casadi of simulator calls */
+    FX all_output_;
   
-  /** grid */
-  std::vector<double> grid_;
+    /** grid */
+    std::vector<double> grid_;
   
-  /** Coarse grid */
-  std::vector<double> gridc_;
+    /** Coarse grid */
+    std::vector<double> gridc_;
   
-  /** The local non-dimensional time grid */
-  std::vector<double> gridlocal_;
+    /** The local non-dimensional time grid */
+    std::vector<double> gridlocal_;
 
-  /** \brief Number of states */
-  int ny_;
+    /** \brief Number of states */
+    int ny_;
   
-  /** \brief Number of static parameters */
-  int np_;
+    /** \brief Number of static parameters */
+    int np_;
   
-  /** \brief Number of controls */
-  int nu_;
+    /** \brief Number of controls */
+    int nu_;
   
-  /** \brief Number of interpolated controls */
-  int nu_interp_;
+    /** \brief Number of interpolated controls */
+    int nu_interp_;
   
-  /** \brief Number of coarse time steps */
-  int ns_;
+    /** \brief Number of coarse time steps */
+    int ns_;
   
-  /** \brief Number of fine-grained time steps */
-  int nf_;
+    /** \brief Number of fine-grained time steps */
+    int nf_;
   
-};
+  };
   
 } // namespace CasADi
 

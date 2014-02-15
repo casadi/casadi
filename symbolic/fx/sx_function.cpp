@@ -56,18 +56,18 @@ SXFunction::SXFunction(const vector< SXMatrix>& arg, const vector<SXMatrix>& res
 
 SXFunction::SXFunction(const vector< SXMatrix>& arg, const IOSchemeVector< SXMatrix >& res){
   assignNode(new SXFunctionInternal(arg,res));
-  setOutputScheme(res.io_scheme());
+  setOutputScheme(res.scheme);
 }
 
 SXFunction::SXFunction(const IOSchemeVector< SXMatrix >& arg, const vector< SXMatrix>& res){
   assignNode(new SXFunctionInternal(arg,res));
-  setInputScheme(arg.io_scheme());
+  setInputScheme(arg.scheme);
 }
 
 SXFunction::SXFunction(const IOSchemeVector< SXMatrix >& arg, const IOSchemeVector< SXMatrix >& res){
   assignNode(new SXFunctionInternal(arg,res));
-  setInputScheme(arg.io_scheme());
-  setOutputScheme(res.io_scheme());
+  setInputScheme(arg.scheme);
+  setOutputScheme(res.scheme);
 }
 
 SXFunction::SXFunction(const vector< vector<SX> >& arg, const SXMatrix& res){
@@ -112,6 +112,10 @@ SXMatrix SXFunction::grad(int iind, int oind){
   return (*this)->grad(iind,oind);
 }
 
+SXMatrix SXFunction::tang(int iind, int oind){
+  return (*this)->tang(iind,oind);
+}
+
 SXMatrix SXFunction::hess(int iind, int oind){
   return (*this)->hess(iind,oind);
 }
@@ -138,7 +142,7 @@ const vector<ScalarAtomic>& SXFunction::algorithm() const{
 
 int SXFunction::countNodes() const{
   assertInit();
-  return algorithm().size() - getNumScalarOutputs();
+  return algorithm().size() - getNumOutputNonzeros();
 }
 
 void SXFunction::clearSymbolic(){

@@ -30,6 +30,7 @@ using namespace std;
 namespace CasADi{
 
   Inverse::Inverse(const MX& x){
+    casadi_assert_message(x.size1()==x.size2(),"Inverse: matrix must be square, but you supllied " << x.dimString());
     setDependencies(x);
     setSparsity(sp_dense(x.size1(),x.size2()));
   }

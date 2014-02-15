@@ -32,6 +32,10 @@
  *
  *  If A is structurally singular, an error will be thrown during init.
  *  If A is numerically singular, the prepare step will fail.
+ *
+ *
+ * Note: the transposed form is equivalent to A X^T = B^T
+ *       which is the same as A x = b  with x = X^T, b = B^T
  */
 
 namespace CasADi{
@@ -40,10 +44,8 @@ namespace CasADi{
 enum LinsolInput{
   /// The square matrix A: sparse, (n x n). [A]
   LINSOL_A,
-  /// The right-hand-side matrix b: dense,  (n x m) [B]
+  /// The right-hand-side matrix b: dense,  (m x n) [B]
   LINSOL_B,
-  /// Transpose A?: dense scalar, value 0 or 1,  (1 x 1) [T]
-  LINSOL_T,
   LINSOL_NUM_IN};
 
 /// Output arguments of a linear solver [linsolOut]
@@ -55,14 +57,20 @@ enum LinsolOutput{
   // Forward declaration of internal class
   class LinearSolverInternal;
 
-  /** Abstract base class for the linear solver classes
+  /** Base class for the linear solver classes
    *  @copydoc LinearSolver_doc
    \author Joel Andersson
    \date 2010-2013
   */
   class LinearSolver : public FX{
   public:
+    
+    /// Default (empty) constructor
+    LinearSolver();
   
+    /// Create a linear solver given a sparsity pattern (creates a dummy solver only)
+    explicit LinearSolver(const CRSSparsity& sp, int nrhs=1);
+
     /// Access functions of the node
     LinearSolverInternal* operator->();
 
@@ -73,11 +81,18 @@ enum LinsolOutput{
     void prepare();
 
     /// Solve the system of equations, internal vector
-    void solve();
+    void solve(bool transpose=false);
 
 #ifndef SWIG
     /// Solve the factorized system of equations
     void solve(double* x, int nrhs=1, bool transpose=false);
+
+    //@{
+    /// Propagate sparsity through a linear solve
+    void spSolve(bvec_t* X, bvec_t* B, bool transpose=false) const;
+    void spSolve(DMatrix& X, DMatrix& B, bool transpose=false) const;
+    //@}
+
 #endif // SWIG
 
     /// Create a solve node

@@ -26,20 +26,20 @@ using namespace std;
 
 namespace CasADi{
 
-Parallelizer::Parallelizer(){
-}
+  Parallelizer::Parallelizer(){
+  }
 
-Parallelizer::Parallelizer(const std::vector<FX>& funcs){
-  assignNode(new ParallelizerInternal(funcs));
-}
+  Parallelizer::Parallelizer(const std::vector<FX>& funcs){
+    assignNode(new ParallelizerInternal(funcs));
+  }
   
-const ParallelizerInternal* Parallelizer::operator->() const{
-  return (const ParallelizerInternal*)FX::operator->();
-}
+  const ParallelizerInternal* Parallelizer::operator->() const{
+    return (const ParallelizerInternal*)FX::operator->();
+  }
 
-ParallelizerInternal* Parallelizer::operator->(){
-  return (ParallelizerInternal*)FX::operator->();
-}
+  ParallelizerInternal* Parallelizer::operator->(){
+    return (ParallelizerInternal*)FX::operator->();
+  }
 
 } // namespace CasADi
 

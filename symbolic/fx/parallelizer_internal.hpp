@@ -30,11 +30,11 @@
 namespace CasADi{
  
   /** \brief  Internal node class for Parallelizer
-  \author Joel Andersson 
-  \date 2010
-*/
-class ParallelizerInternal : public FXInternal{
-  friend class Parallelizer;
+      \author Joel Andersson 
+      \date 2010
+  */
+  class ParallelizerInternal : public FXInternal{
+    friend class Parallelizer;
   
   protected:
     /// Constructor
@@ -54,10 +54,10 @@ class ParallelizerInternal : public FXInternal{
     virtual ~ParallelizerInternal();
     
     /// Evaluate the all the tasks
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
 
     /// Evaluate a single task
-    virtual void evaluateTask(int task, int nfdir, int nadir);
+    virtual void evaluateTask(int task);
 
     /// Reset the sparsity propagation
     virtual void spInit(bool use_fwd);
@@ -86,9 +86,6 @@ class ParallelizerInternal : public FXInternal{
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
-    /** \brief  Update the number of sensitivity directions during or after initialization */
-    virtual void updateNumSens(bool recursive);
-    
     /// Functions
     std::vector<FX> funcs_;
     
@@ -106,7 +103,7 @@ class ParallelizerInternal : public FXInternal{
     
     /// Mode
     Mode mode_;
-};
+  };
 
 
 

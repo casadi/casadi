@@ -64,14 +64,11 @@ public:
   /** \brief  Initialize stage */
   virtual void init();
 
-  /** \brief  Update the number of sensitivity directions during or after initialization */
-  virtual void updateNumSens(bool recursive);
-
   /** \brief Initialize the adjoint problem (can only be called after the first integration) */
   virtual void initAdj();
 
   /** \brief  Reset the forward problem and bring the time back to t0 */
-  virtual void reset(int nsens, int nsensB, int nsensB_store);
+  virtual void reset();
 
   /** \brief  Reset the backward problem and take time to tf */
   virtual void resetB();
@@ -197,9 +194,6 @@ public:
   // Ids of backward problem
   int whichB_;
 
-  // Number of forward directions for the functions f and g
-  int nfdir_f_, nfdir_g_;
-
   // Initialize the dense linear solver
   void initDenseLinearSolver();
   
@@ -232,7 +226,7 @@ public:
   bool monitor_rhsQB_;
   
   bool disable_internal_warnings_;
-  
+    
 };
 
 } // namespace CasADi

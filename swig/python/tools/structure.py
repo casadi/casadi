@@ -1,8 +1,19 @@
 from casadi import *
 
+
+import numpy as np
 import operator
 import sys
 
+def isInteger(a):
+  return isinstance(a,int) or isinstance(a,np.integer)
+  
+def isString(a):
+  return isinstance(a,str) or isinstance(a,unicode)
+  
+def isIterable(a):
+  return isinstance(a,list) or isinstance(a,tuple)
+  
 # StructIndex :tuple/list of strings
 # canonicalIndex : tuple/list of string or numbers
 # powerIndex: tuple/list of string, numbers, lists, slices, dicts
@@ -47,8 +58,7 @@ def intersperse(*args):
    
 def canonicalIndexAncestors(ind):
   if len(ind)==0: return []
-  isstring = lambda x: isinstance(x,str)
-  return [ind] + canonicalIndexAncestors(ind[:-(map(isstring,ind[::-1]).index(True)+1)])
+  return [ind] + canonicalIndexAncestors(ind[:-(map(isString,ind[::-1]).index(True)+1)])
 
 def canonical(ind,s):
   if ind < 0:
@@ -105,9 +115,9 @@ nesteddict = NestedDictLiteral()
 # Casadi-independant Structure framework
 
 def payloadUnpack(payload,i):
-  if isinstance(i,str):
+  if isString(i):
     raise Exception("Got string %s where number expected."% i)
-  if isinstance(payload,list):
+  if isIterable(payload):
     if i>=len(payload):
       raise Exception("Rhs out of range. Got list index %s but rhs list is only of length %s." % (i,len(payload)))
     return payload[i]
@@ -183,7 +193,7 @@ class StructEntry:
         s = dims[0]
         if isinstance(p,slice): # Expand slice
           p = range(*p.indices(s))
-        if isinstance(p,int):
+        if isInteger(p):
           return self.traverseByPowerIndex(
                    powerIndex[1:],
                    dims=dims[1:],
@@ -203,6 +213,8 @@ class StructEntry:
                  for i in p]
         elif isinstance(p,dict):
           raise Exception("powerIndex entry {} cannot be used in list context.")
+        elif isinstance(p,set):
+          raise Exception("""powerIndex entry {"foo","bar"} cannot be used in list context.""")
         elif isinstance(p,NestedDictLiteral):
           return [
                     self.traverseByPowerIndex(
@@ -229,7 +241,7 @@ class StructEntry:
       new_exc = Exception("Error occured in entry context with powerIndex %s, at canonicalIndex %s:\n%s" % (str(powerIndex),str(canonicalIndex),str(e)))
       raise new_exc.__class__, new_exc, tb
   
-class Structure:
+class Structure(object):
   def __init__(self,entries,order=None):
     self.entries = entries
     
@@ -239,7 +251,7 @@ class Structure:
     self.dict = SafeDict([(e.name,e) for e in self.entries])
     
     for e in self.order:
-      if isinstance(e,str):
+      if isString(e):
         if e not in self.dict:
           raise Exception("Order '%s' is invalid." % e)
       elif isinstance(e,tuple):
@@ -281,7 +293,7 @@ class Structure:
       return e
       
   def getStructEntryByCanonicalIndex(self,indices):
-    return self.getStructEntryByStructIndex(filter(lambda x: isinstance(x,str),indices))
+    return self.getStructEntryByStructIndex(filter(lambda x: isString(x),indices))
 
   def getStruct(self,name):
     if name not in self.struct.dict:
@@ -296,7 +308,7 @@ class Structure:
       try:
         if len(powerIndex)==0: return dispatcher(payload,canonicalIndex)
         p = powerIndex[0]
-        if isinstance(p,str):
+        if isString(p):
           return self.dict[p].traverseByPowerIndex(
             powerIndex[1:],
             canonicalIndex=canonicalIndex+(p,),
@@ -339,6 +351,29 @@ class Structure:
                         payload=payload
                       )
                     ) for k,v in self.dict.iteritems()
+                   ])
+        elif isinstance(p,set):
+          if isinstance(payload,dict):
+            return dict([
+                    ( k,
+                      self.dict[k].traverseByPowerIndex(
+                        powerIndex[1:],
+                        canonicalIndex=canonicalIndex+(k,),
+                        dispatcher=dispatcher,
+                        payload=v
+                      )
+                    ) for k,v in payload.iteritems() if k in p
+                   ])
+          else:
+            return dict([
+                    ( k,
+                      self.dict[k].traverseByPowerIndex(
+                        powerIndex[1:],
+                        canonicalIndex=canonicalIndex+(k,),
+                        dispatcher=dispatcher,
+                        payload=payload
+                      )
+                    ) for k in p
                    ])
         elif isinstance(p,list):
           return [
@@ -446,7 +481,18 @@ class GetterDispatcher(Dispatcher):
   def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
     type = None if entry is None else entry.type
     if canonicalIndex in self.struct.map:
+
+      if canonicalIndex in self.priority_object_map and (extraIndex is None or len(extraIndex)==0): 
+        r = self.priority_object_map[canonicalIndex]
+        if type is None:
+          return r
+        elif type=="symm":
+          return tril2symm(r)
+        else:
+          raise Exception("Cannot handle type '%s'." % entry.type)
+       
       i = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
+      
       try:
         if type is None:
           return self.master[i]
@@ -507,7 +553,7 @@ class SetterDispatcher(Dispatcher):
 class MasterGettable:
   @properGetitem
   def __getitem__(self,powerIndex):
-    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=GetterDispatcher(struct=self.struct,master=self.master))
+    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=GetterDispatcher(struct=self.struct,master=self.master,priority_object_map=self.priority_object_map))
 
 class MasterSettable:
   @properGetitem
@@ -515,7 +561,7 @@ class MasterSettable:
     return self.struct.traverseByPowerIndex(powerIndex,dispatcher=SetterDispatcher(struct=self.struct,master=self.master),payload=value)
     
 def delegation(extraIndex,entry,i):
-  if isinstance(extraIndex,str) or (isinstance(extraIndex,list) and len(extraIndex)>0 and all([isinstance(e,str) for e in extraIndex])):
+  if isString(extraIndex) or (isinstance(extraIndex,list) and len(extraIndex)>0 and all([isString(e) for e in extraIndex])):
     extraIndex = FlatIndexDelegater(extraIndex)
   if isinstance(extraIndex,Delegater):
     if entry is None: raise Exception("Cannot use delayed index without supplied entry.")
@@ -526,7 +572,11 @@ def delegation(extraIndex,entry,i):
     return extraIndex
     
 def performExtraIndex(i,extraIndex=None,entry=None,flip=False):
-  if extraIndex is not None and not(isinstance(extraIndex[0],NestedDictLiteral)):
+  if extraIndex is None or len(extraIndex)==0:
+    return i
+  if callable(extraIndex[0]) and not isinstance(extraIndex[0],Delegater):
+    return extraIndex[0](performExtraIndex(i,extraIndex=extraIndex[1:],entry=entry,flip=flip))
+  if not(isinstance(extraIndex[0],NestedDictLiteral)):
     if len(extraIndex)>2 or len(extraIndex)==0:
       raise Exception("Powerindex exhausted. Remaining %s is interpreted as extraIndex, but length must be 1 or 2." % str(extraIndex))
     try:
@@ -555,6 +605,12 @@ class Prefixer:
     for m in methods:
       if hasattr(self.struct,m):
         setattr(self,m,self.cast)
+        
+  def __setstate__(self,state):
+    self.__init__(state["struct"],state["prefix"],state["castmaster"])
+        
+  def __getstate__(self):
+    return {"struct": self.struct, "prefix": self.prefix,"castmaster": self.castmaster}
 
   def __getattr__(self,name):
     # When attributes are not found, delegate to self()
@@ -605,6 +661,10 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     size
     map
   """
+  
+  def save(self,filename):
+    import pickle
+    pickle.dump(self,file(filename,"wb"),2)
 
   class FlatIndexDispatcher(Dispatcher):
     def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
@@ -619,8 +679,15 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
         return performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
       else:
         raise Exception("Canonical index %s not found." % str(canonicalIndex))
+
+  def __setstate__(self,state):
+    self.__init__(*state["args"],**state["kwargs"])
+        
+  def __getstate__(self):
+    return self.initializer
         
   def __init__(self,*args,**kwargs):
+    self.initializer = {"args": args, "kwargs": kwargs}
     Structure.__init__(self,*args,**kwargs)
     
     self.map = {}
@@ -643,7 +710,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
           hmap[a] = [m]
     self.size = k
     for k,v in hmap.iteritems():
-      hmap[k] = vecNZcat(v)
+      hmap[k] = flattenNZcat(v)
     
     self.map.update(hmap)
     
@@ -693,8 +760,9 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
   def labels(self,extraMode=1):
     return [self.getLabel(i,extraMode=extraMode) for i in range(self.size)]
     
-class Structured:
+class Structured(object):
   description = "Generic Structured object"
+  
   def __init__(self,structure):
     self.struct = structure.struct
     self.i = self.struct.i
@@ -722,7 +790,18 @@ class Structured:
 class CasadiStructured(Structured,CasadiStructureDerivable):
   description = "Generic Structured object"
   
+  def __setstate__(self,state):
+    cs = CasadiStructure.__new__(CasadiStructure)
+    cs.__setstate__({"args": state["args"],"kwargs": state["kwargs"]})
+    self.__init__(cs,order=state["order"])
+        
+  def __getstate__(self):
+    d = self.struct.__getstate__()
+    d["order"] = self.order
+    return d
+    
   def __init__(self,struct,order=None):
+    self.order = order
     if hasattr(struct,"struct"):
       Structured.__init__(self,struct.struct)
       self.entries = []
@@ -735,6 +814,7 @@ class CasadiStructured(Structured,CasadiStructureDerivable):
     self.canonicalIndices = self.struct.canonicalIndices
     self.getLabel = self.struct.getLabel
     self.labels = self.struct.labels
+    self.priority_object_map = {}
       
   @property
   def shape(self):
@@ -762,7 +842,7 @@ class ssymStruct(CasadiStructured,MasterGettable):
       e = self.struct.getStructEntryByCanonicalIndex(i)
       s.append(ssym("_".join(map(str,i)),e.sparsity.size()))
         
-    self.master = vecNZcat(s)
+    self.master = flattenNZcat(s)
 
     for e in self.entries:
       if e.sym is not None:
@@ -782,6 +862,28 @@ class msymStruct(CasadiStructured,MasterGettable):
       raise Exception("struct_msym does not accept entries with an 'sym' argument.")
 
     self.master = msym("V",self.size,1)
+    
+ 
+    ks = []
+    its = []
+    sps = []
+    k = 0 # Global index counter
+    for i in self.struct.traverseCanonicalIndex(limit=1):
+      e = self.struct.getStructEntryByCanonicalIndex(i)
+      sp = None
+      if e.isPrimitive():
+        sp = sp_dense(1,1) if e.sparsity is None else e.sparsity
+      else:
+        sp = sp_dense(e.struct.size,1)
+      ks.append(k)
+      it = tuple(i)
+      its.append(it)
+      sps.append(sp)
+      k += sp.size()
+      
+    for it, k, sp in zip(its,vertsplit(self.master,ks),sps):
+      self.priority_object_map[it] = k if k.sparsity()==sp else k[IMatrix(sp,range(sp.size()))] #.reshape(sp)
+      
 
   def __MX__(self):
     return self.cat
@@ -790,14 +892,13 @@ class msymStruct(CasadiStructured,MasterGettable):
 
 
 class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
-
+    
   @property
   def description(self):
     return "Mutable " + self.mtype.__name__
     
   def __init__(self,struct,mtype,data=None,order=None,dataVectorCheck=True):
     CasadiStructured.__init__(self,struct,order=None)
-    
     if any(e.expr is None for e in self.entries):
       raise Exception("struct_SX does only accept entries with an 'expr' argument.")
 
@@ -821,6 +922,21 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
       self[e.name] = e.expr
       
 class DMatrixStruct(MatrixStruct):
+
+  def save(self,filename):
+    import pickle
+    pickle.dump(self,file(filename,"wb"),2)
+
+  def __setstate__(self,state):
+    cs = CasadiStructure.__new__(CasadiStructure)
+    cs.__setstate__({"args": state["args"],"kwargs": state["kwargs"]})
+    self.__init__(cs,data=state["master"],dataVectorCheck=False)
+        
+  def __getstate__(self):
+    d = self.struct.__getstate__()
+    d["master"] = self.master
+    return d
+    
   def __init__(self,struct,data=None,dataVectorCheck=True):
     MatrixStruct.__init__(self,struct,DMatrix,data=data,dataVectorCheck=dataVectorCheck)
     
@@ -841,7 +957,7 @@ class MXStruct(MatrixStruct):
   def __MX__(self):
     return self.cat
 
-class MXVeccatStruct(CasadiStructured,MasterGettable):
+class MXFlattencatStruct(CasadiStructured,MasterGettable):
   description = "Partially mutable MX"
   def __init__(self,arg,order=None):
     CasadiStructured.__init__(self,arg,order=order)
@@ -865,9 +981,9 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
         
     def inject(payload,canonicalIndex,extraIndex=None,entry=None):
       if extraIndex is not None:
-        raise Exception("An MX veccat structure does not accept indexing on MX level for __setitem__.")
+        raise Exception("An MX flattencat structure does not accept indexing on MX level for __setitem__.")
       if not hasattr(self,"sparsity"):
-        raise Exception("An MX veccat structure __setitem__ accepts only objects that have sparsity.")
+        raise Exception("An MX flattencat structure __setitem__ accepts only objects that have sparsity.")
       
       if canonicalIndex in self.mapping:
         if self.struct.map[canonicalIndex].sparsity()!=payload.sparsity():
@@ -889,7 +1005,7 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
       raise Exception("Problem in MX vecNZcat structure cat: missing expressions. The following entries are missing: %s" % str(missing))
       
     if self.dirty:
-      self.master_cached = vecNZcat(self.storage)
+      self.master_cached = flattenNZcat(self.storage)
 
     return self.master_cached
     
@@ -898,7 +1014,7 @@ struct_ssym = ssymStruct
 struct_msym = msymStruct
 struct_SX = SXMatrixStruct
 struct_MX_mutable = MXStruct
-struct_MX = MXVeccatStruct
+struct_MX = MXFlattencatStruct
 struct = CasadiStructured
 
 
@@ -944,7 +1060,7 @@ class CasadiStructEntry(StructEntry):
     if 'repeat' in kwargs:
       self.repeat = kwargs["repeat"] if isinstance(kwargs["repeat"],list) else [kwargs["repeat"]]
     
-    if not all(map(lambda x: isinstance(x,int),self.repeat)):
+    if not all(map(lambda x: isInteger(x),self.repeat)):
       raise Exception("The 'repeat' argument, if present, must be a list of integers, but got %s" % str(self.repeat))
 
       
@@ -962,7 +1078,7 @@ class CasadiStructEntry(StructEntry):
     #     shape   argument
     if 'shape' in kwargs:
       shape = kwargs["shape"]
-      if isinstance(shape,int):
+      if isInteger(shape) :
         self.sparsity = sp_dense(shape,1)
       elif isinstance(shape,list) or isinstance(shape,tuple):
         if len(shape)==0 or len(shape)>2:
@@ -983,14 +1099,14 @@ class CasadiStructEntry(StructEntry):
       if isinstance(shapestruct,Structured) or isinstance(shapestruct,Structure):
         self.shapestruct = (shapestruct.struct,1)
       elif isinstance(shapestruct,tuple):
-        if not(all([isinstance(e,Structured) or isinstance(e,Structure) or isinstance(e,int) for e in shapestruct])) or len(shapestruct)==0 or len(shapestruct)>2:
+        if not(all([isinstance(e,Structured) or isinstance(e,Structure) or isInteger(e) for e in shapestruct])) or len(shapestruct)==0 or len(shapestruct)>2:
           raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of structures or numbers")
-        self.shapestruct = tuple([e if isinstance(e,int) else e.struct for e in shapestruct])
+        self.shapestruct = tuple([e if isInteger(e) else e.struct for e in shapestruct])
       else:
         raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of at most structures")
       
       if 'shape' not in kwargs:
-        self.sparsity = sp_dense(*[e if isinstance(e,int) else e.size for e in self.shapestruct])
+        self.sparsity = sp_dense(*[e if isInteger(e) else e.size for e in self.shapestruct])
         
     #     sym    argument
     self.sym = None
@@ -1051,6 +1167,10 @@ class CasadiStructEntry(StructEntry):
       return self.sparsity.dimString()
     elif self.type=="symm":
       return "symm(" +  self.sparsity.dimString() + ")"
+      
+  def __getstate__(self):
+    return dict((k,getattr(self,k)) for k in ["name", "struct", "sparsity","type","repeat","shapestruct","dims"])
+ 
  
 def entry(*args,**kwargs):
   if len(args)==1 and isinstance(args[0],CasadiStructEntry):
@@ -1129,3 +1249,8 @@ class DelegaterConstructor:
     
 index  = DelegaterConstructor(IndexDelegater)
 indexf = DelegaterConstructor(FlatIndexDelegater)
+
+
+def struct_load(filename):
+    import pickle
+    return pickle.load(file(filename,"rb"))

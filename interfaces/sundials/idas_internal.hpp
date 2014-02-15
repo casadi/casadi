@@ -69,9 +69,6 @@ class IdasInternal : public SundialsInternal{
   /** \brief  Initialize */
   virtual void init();
   
-  /** \brief  Update the number of sensitivity directions during or after initialization */
-  virtual void updateNumSens(bool recursive);
-
   /** \brief Initialize the taping */
   virtual void initTaping();
   
@@ -79,7 +76,7 @@ class IdasInternal : public SundialsInternal{
   virtual void initAdj();
   
   /** \brief  Reset the forward problem and bring the time back to t0 */
-  virtual void reset(int nsens, int nsensB, int nsensB_store);
+  virtual void reset();
 
   /** \brief  Reset the backward problem and take time to tf */
   virtual void resetB();
@@ -228,17 +225,16 @@ class IdasInternal : public SundialsInternal{
   bool isInitAdj_;
   bool isInitTaping_;
   
-  // Number of forward seeds for the function f
-  int nfdir_f_;
-  
-  // Scaling of cj
+  // Options
   bool cj_scaling_;
+  bool calc_ic_;
+  bool calc_icB_;
 
   // Disable IDAS internal warning messages
   bool disable_internal_warnings_;
   
   //  Initial values for xdot and z
-  std::vector<double> init_z_, init_xdot_;
+  std::vector<double> init_xdot_;
   
 };
 

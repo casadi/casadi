@@ -18,6 +18,8 @@ endif()
 find_package(PythonLibs)
 find_package(NUMPY)
 
+
+
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
 
 set(CASADI_SWIG_FLAGS "")
@@ -38,17 +40,6 @@ endif()
 if(WITH_SUNDIALS)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SUNDIALS")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_sundials_interface ${SUNDIALS_LIBRARIES})
-endif()
-
-if(ACADO_FOUND)
-  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_ACADO")
-  if(ACADO_SHARED_LIBRARIES)
-    set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_acado_interface casadi_qpoases_interface ${ACADO_SHARED_LIBRARIES})
-  else(ACADO_SHARED_LIBRARIES)
-    if(ACADO_LIBRARIES)
-      set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_acado_interface casadi_qpoases_interface ${ACADO_LIBRARIES})
-    endif(ACADO_LIBRARIES)
-  endif(ACADO_SHARED_LIBRARIES)
 endif()
 
 if(QPOASES_FOUND)
@@ -86,9 +77,24 @@ if(OOQP_FOUND)
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_ooqp_interface ${OOQP_LIBRARIES})
 endif()
 
+if(SQIC_FOUND)
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SQIC")
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_sqic_interface sqic_fortran_c_bridge ${SQIC_LIBRARIES})
+endif()
+
+if(SLICOT_FOUND)
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SLICOT")
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_slicot_interface  ${SLICOT_LIBRARIES})
+endif()
+
 if(WORHP_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_WORHP")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_worhp_interface ${WORHP_LIBRARIES})
+endif()
+
+if(SNOPT_FOUND)
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SNOPT")
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_snopt_interface snopt_fortran_c_bridge ${SNOPT_LIBRARIES})
 endif()
 
 if(LAPACK_FOUND)
@@ -124,6 +130,7 @@ include_directories (${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories (${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
 
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_lib")
+set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DCASADI_MODULE")
   
 # set the global swig flags to empty
 # set(CMAKE_SWIG_FLAGS "-outdir ${PROJECT_BINARY_DIR}")
@@ -175,10 +182,10 @@ endif(WITH_SWIG_SPLIT)
 
 if(WITH_SWIG_SPLIT)
   foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-    SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming  casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
+    SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming  casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
   endforeach()
   else()
-    SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
+    SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
 endif()
 
 # the name used for the shared module for the python interface is determined
@@ -211,18 +218,12 @@ make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 if(WITH_SWIG_SPLIT)
   add_custom_target(_python_modules DEPENDS _casadi_main _casadi_primitive _casadi_primitive_tools _casadi_noncore) # the python interface is created with the command "make python"
   add_custom_target(_octave_modules DEPENDS casadi_main_octave casadi_primitive_octave casadi_primitive_tools_octave casadi_noncore_octave) # the octave interface is created with the command "make octave"
+  add_custom_target(_haskell_modules DEPENDS casadi_main_octave casadi_primitive_octave casadi_primitive_tools_octave casadi_noncore_octave casadiTree.hs) # the haskell interface is created with the command "make octave"
 else(WITH_SWIG_SPLIT)
   add_custom_target(_python_modules DEPENDS _casadi ) # the python interface is created with the command "make python"
   add_custom_target(_octave_modules DEPENDS casadi_octave ) # the octave interface is created with the command "make octave"
+  add_custom_target(_haskell_modules DEPENDS casadi_haskell casadiTree.hs) # the haskell interface is created with the command "make haskell"
 endif(WITH_SWIG_SPLIT)
-  
-add_custom_command(
-  TARGET _python_modules
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py ${PROJECT_BINARY_DIR}/python/casadi/__init__.py
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/python/tools ${PROJECT_BINARY_DIR}/python/casadi/tools
-)
 
 if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
@@ -295,19 +296,36 @@ endif(WITH_SWIG_SPLIT)
 find_package(PythonInterp)
 if(PYTHONINTERP_FOUND)
 
-  #determining the installation path for python libraries
-  EXEC_PROGRAM( "${PYTHON_EXECUTABLE}"
-    ARGS "${CMAKE_CURRENT_SOURCE_DIR}/python/find_installation_path.py"
-    OUTPUT_VARIABLE PYTHON_INSTALLATION_PATH
-  )
-
-  # Replace backslashes with normal slashes
-  if(MSYS)
-    string(REGEX REPLACE "\\\\" "/" PYTHON_INSTALLATION_PATH ${PYTHON_INSTALLATION_PATH})
-  endif()
-
   if(NOT DEFINED PYTHON_PREFIX )
-    set(PYTHON_PREFIX  ${PYTHON_INSTALLATION_PATH} CACHE INTERNAL "Python installation prefix")
+    #determining the installation path for python libraries
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/python/find_installation_path.py"
+      OUTPUT_VARIABLE PYTHON_INSTALLATION_PATH
+      RESULT_VARIABLE PYTHON_INSTALLATION_PATH_RESULT
+      ERROR_VARIABLE PYTHON_INSTALLATION_PATH_ERROR
+    )
+    
+    if(NOT "${PYTHON_INSTALLATION_PATH_RESULT}" STREQUAL "0")
+message(FATAL_ERROR "Something went wrong detecting your python setup...
+ ${PROJECT_BINARY_DIR} \$ ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/python/find_installation_path.py
+Returned the following error messages:
+${PYTHON_INSTALLATION_PATH_ERROR}
+You may try to fix this problem, or supply PYTHON_PREFIX manually.
+
+e.g.
+ \$ cmake -DPYTHON_PREFIX=\"/usr/lib/python2.7/dist-packages\" ..
+ 
+The idea is to supply a directory that python knows about (included in PYTHONPATH).
+
+")
+    else()
+      # Replace backslashes with normal slashes
+      if(MSYS)
+        string(REGEX REPLACE "\\\\" "/" PYTHON_INSTALLATION_PATH ${PYTHON_INSTALLATION_PATH})
+      endif()
+
+      set(PYTHON_PREFIX  ${PYTHON_INSTALLATION_PATH} CACHE PATH "Python installation prefix")
+    endif()
   endif()
 
   #since in the main CMakeLists.txt we used "add_subdirectory(swig EXCLUDE_FROM_ALL)" the following install command won't add anything to "make install"
@@ -315,8 +333,26 @@ if(PYTHONINTERP_FOUND)
     DESTINATION ${PYTHON_PREFIX}
     COMPONENT install_python
     USE_SOURCE_PERMISSIONS
+    PATTERN .pyc EXCLUDE
     PATTERN .svn EXCLUDE
   )
+  install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.py 
+    DESTINATION ${PYTHON_PREFIX}/casadi
+    COMPONENT install_python
+  )
+  
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
+    DESTINATION ${PYTHON_PREFIX}/casadi
+    COMPONENT install_python
+    USE_SOURCE_PERMISSIONS
+    PATTERN .pyc EXCLUDE
+    PATTERN .svn EXCLUDE
+  )
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
+    DESTINATION ${PYTHON_PREFIX}/casadi
+    COMPONENT install_python
+  )
+  
   #creation of a custom installation command
   if(WITH_SWIG_SPLIT)
     add_custom_target(install_python
@@ -342,18 +378,60 @@ endif()
 if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
   SWIG_ADD_MODULE (${my_module}_octave octave ${my_module}.i octrun.swg)
-  SWIG_LINK_LIBRARIES (${my_module}_octave ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
+  SWIG_LINK_LIBRARIES (${my_module}_octave ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
   set_target_properties(${my_module}_octave PROPERTIES PREFIX "")
   set_target_properties(${my_module}_octave PROPERTIES SUFFIX ".oct")
   set_target_properties(${my_module}_octave PROPERTIES OUTPUT_NAME "${my_module}")
 endforeach()
 else()
   SWIG_ADD_MODULE (casadi_octave octave casadi.i octrun.swg)
-  SWIG_LINK_LIBRARIES (casadi_octave ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
+  SWIG_LINK_LIBRARIES (casadi_octave ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
   set_target_properties(casadi_octave PROPERTIES PREFIX "")
   set_target_properties(casadi_octave PROPERTIES SUFFIX ".oct")
   set_target_properties(casadi_octave PROPERTIES OUTPUT_NAME "casadi_interface")
 endif()
+
+# haskell interface
+if(WITH_SWIG_SPLIT)
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  SWIG_ADD_MODULE_XML (${my_module}_haskell casadi.i)
+endforeach()
+else()
+  SWIG_ADD_MODULE_XML (casadi_haskell casadi.i) # -xmllang python)
+  #SET_SOURCE_FILES_PROPERTIES( ${swig_generated_file_fullname}   PROPERTIES COMPILE_FLAGS "-bla")
+endif()
+
+ADD_CUSTOM_COMMAND(
+   OUTPUT casadiTree.hs 
+   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml
+   DEPENDS ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py
+)
+
+install(FILES ${PROJECT_BINARY_DIR}/swig/CasadiTree.hs ${PROJECT_BINARY_DIR}/swig/CasadiClasses.hs ${PROJECT_BINARY_DIR}/swig/swiginclude.hpp
+  DESTINATION share/casadi
+  COMPONENT componenthaskell
+)
+
+#SET(CPACK_MONOLITHIC_INSTALL FALSE)
+SET(CPACK_TGZ_COMPONENT_INSTALL TRUE)
+
+set(CPACK_COMPONENT_COMPONENTHASKELL_DISPLAY_NAME "Haskell headers")
+set(CPACK_COMPONENT_COMPONENTHASKELL_DESCRIPTION 
+   "Necessary headers to install a Haskell interface to CasADi")
+   
+set(CPACK_COMPONENTS_GROUPING "ALL_COMPONENTS_IN_ONE")
+set(CPACK_COMPONENTS_ALL Unspecified componenthaskell)
+# This will not actually work since we are in a EXCLUDE_FROM_ALL
+# http://cmake.3232098.n2.nabble.com/Yet-another-install-vs-exclude-from-all-thread-td4967491.html
+
+set(LINK_LIBRARIES_ALL ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
+
+# Pass meta information
+CONFIGURE_FILE(
+  ${CMAKE_SOURCE_DIR}/swig/linklist.txt.cmake
+  ${PROJECT_BINARY_DIR}/swig/linklist.txt
+  ESCAPE_QUOTES
+)
 
 # begin Patch swig to get concat functionality
 find_package(OCTAVE)
@@ -421,5 +499,50 @@ ADD_CUSTOM_COMMAND(
  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi_helpers.m ${LIBRARY_OUTPUT_PATH}/casadi_helpers.m
 )
 endif(WITH_SWIG_SPLIT)
+
+
+include(InstallRequiredSystemLibraries)
+
+set(CPACK_PACKAGE_CONTACT "${PACKAGE_MAINTAINER} <contact@casadi.org>")
+set(CPACK_PACKAGE_NAME "libcasadi")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PACKAGE_DESCRIPTION}")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt")
+SET(CPACK_DEBIAN_PACKAGE_LICENSE "LGPL")
+
+set(THREE_PART_VERSION_REGEX "[0-9]+\\.[0-9]+\\.[0-9]+")
+
+# Breaks up a string in the form n1.n2.n3 into three parts and stores
+# them in major, minor, and patch.  version should be a value, not a
+# variable, while major, minor and patch should be variables.
+MACRO(THREE_PART_VERSION_TO_VARS version major minor patch)
+  IF(${version} MATCHES ${THREE_PART_VERSION_REGEX})
+    STRING(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+\\+?" "\\1" ${major} "${version}")
+    STRING(REGEX REPLACE "^[0-9]+\\.([0-9])+\\.[0-9]+\\+?" "\\1" ${minor} "${version}")
+    STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+)\\+?" "\\1" ${patch} "${version}")
+  ELSE(${version} MATCHES ${THREE_PART_VERSION_REGEX})
+    MESSAGE("MACRO(THREE_PART_VERSION_TO_VARS ${version} ${major} ${minor} ${patch}")
+    MESSAGE(FATAL_ERROR "Problem parsing version string, I can't parse it properly.")
+  ENDIF(${version} MATCHES ${THREE_PART_VERSION_REGEX})
+ENDMACRO(THREE_PART_VERSION_TO_VARS)
+
+THREE_PART_VERSION_TO_VARS(${PACKAGE_VERSION} CPACK_PACKAGE_VERSION_MAJOR CPACK_PACKAGE_VERSION_MINOR CPACK_PACKAGE_VERSION_PATCH)
+
+set(PACKAGE_VERSION_FULL "${git_describe}")
+if ((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
+  set(PACKAGE_VERSION_FULL "${PACKAGE_VERSION}")
+endif()
+
+if(ENABLE_STATIC)
+  set(CPACK_PACKAGE_FILE_NAME "libcasadi-static-${PACKAGE_VERSION_FULL}-${CMAKE_SYSTEM_PROCESSOR}")
+else()
+  set(CPACK_PACKAGE_FILE_NAME "libcasadi-shared-${PACKAGE_VERSION_FULL}-${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
+# if version end on a plus, it is a late build
+if(${PACKAGE_VERSION} MATCHES "\\+$")
+set(CPACK_PACKAGE_VERSION_PATCH "99")
+endif()
+
+include(CPack)
 
 

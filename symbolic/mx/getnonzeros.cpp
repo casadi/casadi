@@ -37,64 +37,34 @@ namespace CasADi{
     setDependencies(y);
   }
 
-  void GetNonzerosVector::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void GetNonzerosVector::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void GetNonzerosVector::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void GetNonzerosVector::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void GetNonzerosVector::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
-
-    // Number of sensitivities
-    int nadj = adjSeed.size();
-    int nfwd = fwdSens.size();
-    
-    // Nondifferentiated outputs
+  void GetNonzerosVector::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){    
     const vector<T>& idata = input[0]->data();
     typename vector<T>::iterator odata_it = output[0]->begin();
     for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
       *odata_it++ = *k>=0 ? idata[*k] : 0;
     }
-    
-    // Forward sensitivities
-    for(int d=0; d<nfwd; ++d){
-      const vector<T>& fseed = fwdSeed[d][0]->data();
-      typename vector<T>::iterator fsens_it = fwdSens[d][0]->begin();
-      for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
-        *fsens_it++ = *k>=0 ? fseed[*k] : 0;
-      }
-    }
-      
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      typename vector<T>::iterator aseed_it = adjSeed[d][0]->begin();
-      vector<T>& asens = adjSens[d][0]->data();
-      for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
-        if(*k>=0) asens[*k] += *aseed_it;
-        *aseed_it++ = 0;
-      }
-    }
   }
 
-  void GetNonzerosSlice::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void GetNonzerosSlice::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void GetNonzerosSlice::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void GetNonzerosSlice::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void GetNonzerosSlice::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void GetNonzerosSlice::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
 
-    // Number of sensitivities
-    int nadj = adjSeed.size();
-    int nfwd = fwdSens.size();
-    
-    // Nondifferentiated outputs
     const vector<T>& idata = input[0]->data();
     const T* idata_ptr = getPtr(idata) + s_.start_;
     const T* idata_stop = getPtr(idata) + s_.stop_;
@@ -102,47 +72,19 @@ namespace CasADi{
     for(; idata_ptr != idata_stop; idata_ptr += s_.step_){
       *odata_ptr++ = *idata_ptr;
     }
-    
-    // Forward sensitivities
-    for(int d=0; d<nfwd; ++d){
-      const vector<T>& fseed = fwdSeed[d][0]->data();
-      const T* fseed_ptr = getPtr(fseed) + s_.start_;
-      const T* fseed_stop = getPtr(fseed) + s_.stop_;
-      T* fsens_ptr = getPtr(fwdSens[d][0]->data());
-      for(; fseed_ptr != fseed_stop; fseed_ptr += s_.step_){
-        *fsens_ptr++ = *fseed_ptr;
-      }
-    }
-      
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      vector<T>& asens = adjSens[d][0]->data();
-      T* asens_ptr = getPtr(asens) + s_.start_;
-      T* asens_stop = getPtr(asens) + s_.stop_;
-      T* aseed_ptr = getPtr(adjSeed[d][0]->data());
-      for(; asens_ptr != asens_stop; asens_ptr += s_.step_){
-        *asens_ptr += *aseed_ptr;
-        *aseed_ptr++ = 0;
-      }
-    }
   }
 
-  void GetNonzerosSlice2::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void GetNonzerosSlice2::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void GetNonzerosSlice2::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void GetNonzerosSlice2::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void GetNonzerosSlice2::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
+  void GetNonzerosSlice2::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
 
-    // Number of sensitivities
-    int nadj = adjSeed.size();
-    int nfwd = fwdSens.size();
-    
-    // Nondifferentiated outputs
     const vector<T>& idata = input[0]->data();
     const T* outer_ptr = getPtr(idata) + outer_.start_;
     const T* outer_stop = getPtr(idata) + outer_.stop_;
@@ -150,33 +92,6 @@ namespace CasADi{
     for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
       for(const T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
         *odata_ptr++ = *inner_ptr;
-      }
-    }
-    
-    // Forward sensitivities
-    for(int d=0; d<nfwd; ++d){
-      const vector<T>& fseed = fwdSeed[d][0]->data();
-      const T* outer_ptr = getPtr(fseed) + outer_.start_;
-      const T* outer_stop = getPtr(fseed) + outer_.stop_;
-      T* fsens_ptr = getPtr(fwdSens[d][0]->data());
-      for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
-        for(const T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
-          *fsens_ptr++ = *inner_ptr;
-        }
-      }
-    }
-      
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      vector<T>& asens = adjSens[d][0]->data();
-      T* outer_ptr = getPtr(asens) + outer_.start_;
-      T* outer_stop = getPtr(asens) + outer_.stop_;
-      T* aseed_ptr = getPtr(adjSeed[d][0]->data());
-      for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
-        for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
-          *inner_ptr += *aseed_ptr;
-          *aseed_ptr++ = 0;
-        }
       }
     }
   }

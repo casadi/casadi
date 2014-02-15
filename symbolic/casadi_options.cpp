@@ -21,10 +21,29 @@
  */
 
 #include "casadi_options.hpp"
+#include "casadi_exception.hpp"
 
 namespace CasADi {
 
   bool CasadiOptions::catch_errors_python = true;
   bool CasadiOptions::simplification_on_the_fly = true;
+  bool CasadiOptions::profiling = false;
+  std::ofstream CasadiOptions::profilingLog;
 
+  void CasadiOptions::startProfiling(const std::string &filename) {
+    profilingLog.open (filename.c_str(),std::ofstream::out);
+    if (profilingLog.is_open()) {
+      profiling = true;
+    } else {
+      casadi_error("Did not manage to open file " << filename << " for logging.");
+    }
+  }
+  
+  void CasadiOptions::stopProfiling() {
+    if (profiling) {
+      profilingLog.close();
+    }
+    profiling = false;
+  }
+  
 }

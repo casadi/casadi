@@ -51,9 +51,11 @@ namespace CasADi{
     addOption("lbfgs_memory",      OT_INTEGER,     10,              "Size of L-BFGS memory.");
     addOption("regularize",        OT_BOOLEAN,  false,              "Automatic regularization of Lagrange Hessian.");
     addOption("print_header",      OT_BOOLEAN,   true,              "Print the header with problem statistics");
+    addOption("min_step_size",     OT_REAL,   1e-10,                "The size (inf-norm) of the step size should not become smaller than this.");
   
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
+    addOption("print_time",         OT_BOOLEAN,       true,           "Print information about execution time");
   }
 
 
@@ -75,7 +77,8 @@ namespace CasADi{
     tol_du_ = getOption("tol_du");
     regularize_ = getOption("regularize");
     exact_hessian_ = getOption("hessian_approximation")=="exact";
-  
+    min_step_size_ = getOption("min_step_size");
+    
     // Get/generate required functions
     gradF();
     jacG();
@@ -166,8 +169,6 @@ namespace CasADi{
       bfgs_in[BFGS_GLAG] = gLag;
       bfgs_in[BFGS_GLAG_OLD] = gLag_old;
       bfgs_ = SXFunction(bfgs_in,Bk_new);
-      bfgs_.setOption("number_of_fwd_dir",0);
-      bfgs_.setOption("number_of_adj_dir",0);
       bfgs_.init();
     
       // Initial Hessian approximation
@@ -192,10 +193,20 @@ namespace CasADi{
     }
   }
 
-  void SQPInternal::evaluate(int nfdir, int nadir){
-    casadi_assert(nfdir==0 && nadir==0);
-  
+  void SQPInternal::evaluate(){
+    if (inputs_check_) checkInputs();
     checkInitialBounds();
+    
+    if (gather_stats_) {
+      Dictionary iterations;
+      iterations["inf_pr"] = std::vector<double>();
+      iterations["inf_du"] = std::vector<double>();
+      iterations["ls_trials"] = std::vector<double>();
+      iterations["d_norm"] = std::vector<double>();
+      iterations["obj"] = std::vector<double>();
+      stats_["iterations"] = iterations;
+    }
+    
   
     // Get problem data
     const vector<double>& x_init = input(NLP_SOLVER_X0).data();
@@ -210,6 +221,12 @@ namespace CasADi{
     // Initialize Lagrange multipliers of the NLP
     copy(input(NLP_SOLVER_LAM_G0).begin(),input(NLP_SOLVER_LAM_G0).end(),mu_.begin());
     copy(input(NLP_SOLVER_LAM_X0).begin(),input(NLP_SOLVER_LAM_X0).end(),mu_x_.begin());
+    
+    t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
+    
+    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
+    
+    double time1 = clock();
 
     // Initial constraint Jacobian
     eval_jac_g(x_,gk_,Jk_);
@@ -253,50 +270,86 @@ namespace CasADi{
       // Primal infeasability
       double pr_inf = primalInfeasibility(x_, lbx, ubx, gk_, lbg, ubg);
     
-      // 1-norm of lagrange gradient
-      double gLag_norm1 = norm_1(gLag_);
+      // inf-norm of lagrange gradient
+      double gLag_norminf = norm_inf(gLag_);
     
-      // 1-norm of step
-      double dx_norm1 = norm_1(dx_);
+      // inf-norm of step
+      double dx_norminf = norm_inf(dx_);
     
       // Print header occasionally
       if(iter % 10 == 0) printIteration(cout);
     
       // Printing information about the actual iterate
-      printIteration(cout,iter,fk_,pr_inf,gLag_norm1,dx_norm1,reg_,ls_iter,ls_success);
-    
+      printIteration(cout,iter,fk_,pr_inf,gLag_norminf,dx_norminf,reg_,ls_iter,ls_success);
+	  
+	    if (gather_stats_) {
+        Dictionary & iterations = stats_["iterations"];
+        static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(pr_inf);
+        static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(gLag_norminf);
+        static_cast<std::vector<double> &>(iterations["d_norm"]).push_back(dx_norminf);
+        static_cast<std::vector<double> &>(iterations["ls_trials"]).push_back(ls_iter);
+        static_cast<std::vector<double> &>(iterations["obj"]).push_back(fk_);
+      }
+      
       // Call callback function if present
       if (!callback_.isNull()) {
-        if (!callback_.input(NLP_SOLVER_F).empty()) callback_.input(NLP_SOLVER_F).set(fk_);
-        if (!callback_.input(NLP_SOLVER_X).empty()) callback_.input(NLP_SOLVER_X).set(x_);
-        if (!callback_.input(NLP_SOLVER_LAM_G).empty()) callback_.input(NLP_SOLVER_LAM_G).set(mu_);
-        if (!callback_.input(NLP_SOLVER_LAM_X).empty()) callback_.input(NLP_SOLVER_LAM_X).set(mu_x_);
-        if (!callback_.input(NLP_SOLVER_G).empty()) callback_.input(NLP_SOLVER_G).set(gk_);
-        callback_.evaluate();
-      
-        if (callback_.output(0).at(0)) {
+        double time1 = clock();
+        
+        if (!output(NLP_SOLVER_F).empty()) output(NLP_SOLVER_F).set(fk_);
+        if (!output(NLP_SOLVER_X).empty()) output(NLP_SOLVER_X).set(x_);
+        if (!output(NLP_SOLVER_LAM_G).empty()) output(NLP_SOLVER_LAM_G).set(mu_);
+        if (!output(NLP_SOLVER_LAM_X).empty()) output(NLP_SOLVER_LAM_X).set(mu_x_);
+        if (!output(NLP_SOLVER_G).empty()) output(NLP_SOLVER_G).set(gk_);
+        
+        Dictionary iteration;
+        iteration["iter"] = iter;
+        iteration["inf_pr"] = pr_inf;
+        iteration["inf_du"] = gLag_norminf;
+        iteration["d_norm"] = dx_norminf;
+        iteration["ls_trials"] = ls_iter;
+        iteration["obj"] = fk_;
+        stats_["iteration"] = iteration;
+        
+        double time2 = clock();
+        t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
+        time1 = clock();
+        int ret = callback_(ref_,user_data_);
+        time2 = clock();
+        t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
+        if (ret) {
           cout << endl;
           cout << "CasADi::SQPMethod: aborted by callback..." << endl;
+          stats_["return_status"] = "User_Requested_Stop";
           break;
         }
       }
     
       // Checking convergence criteria
-      if (pr_inf < tol_pr_ && gLag_norm1 < tol_du_){
+      if (pr_inf < tol_pr_ && gLag_norminf < tol_du_){
         cout << endl;
         cout << "CasADi::SQPMethod: Convergence achieved after " << iter << " iterations." << endl;
+        stats_["return_status"] = "Solve_Succeeded";
         break;
       }
     
       if (iter >= max_iter_){
         cout << endl;
         cout << "CasADi::SQPMethod: Maximum number of iterations reached." << endl;
+        stats_["return_status"] = "Maximum_Iterations_Exceeded";
+        break;
+      }
+      
+      if (iter > 0 && dx_norminf <= min_step_size_) {
+        cout << endl;
+        cout << "CasADi::SQPMethod: Search direction becomes too small without convergence criteria being met." << endl;
+        stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
         break;
       }
     
       // Start a new iteration
       iter++;
     
+      log("Formulating QP");
       // Formulate the QP
       transform(lbx.begin(),lbx.end(),x_.begin(),qp_LBX_.begin(),minus<double>());
       transform(ubx.begin(),ubx.end(),x_.begin(),qp_UBX_.begin(),minus<double>());
@@ -348,9 +401,18 @@ namespace CasADi{
         while (true){
           for(int i=0; i<nx_; ++i) x_cand_[i] = x_[i] + t * dx_[i];
       
-          // Evaluating objective and constraints
-          eval_f(x_cand_,fk_cand);
-          eval_g(x_cand_,gk_cand_);
+          try {
+            // Evaluating objective and constraints
+            eval_f(x_cand_,fk_cand);
+            eval_g(x_cand_,gk_cand_);
+          } catch (const CasadiException& ex) {
+            // Silent ignore; line-search failed
+            ls_iter++;
+            // Backtracking
+            t = beta_ * t;
+            continue;
+          }
+          
           ls_iter++;
 
           // Calculating merit-function in candidate
@@ -375,11 +437,24 @@ namespace CasADi{
           // Backtracking
           t = beta_ * t;
         }
+        
+        // Candidate accepted, update dual variables
+        for(int i=0; i<ng_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
+        for(int i=0; i<nx_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
+            
+        // Candidate accepted, update the primal variable
+        copy(x_.begin(),x_.end(),x_old_.begin());
+        copy(x_cand_.begin(),x_cand_.end(),x_.begin());
+        
+      } else {
+        // Full step
+        copy(qp_DUAL_A_.begin(),qp_DUAL_A_.end(),mu_.begin());
+        copy(qp_DUAL_X_.begin(),qp_DUAL_X_.end(),mu_x_.begin());
+        
+        copy(x_.begin(),x_.end(),x_old_.begin());
+        // x+=dx
+        transform(x_.begin(),x_.end(),dx_.begin(),x_.begin(),plus<double>());
       }
-
-      // Candidate accepted, update dual variables
-      for(int i=0; i<ng_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
-      for(int i=0; i<nx_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
     
       if(!exact_hessian_){
         // Evaluate the gradient of the Lagrangian with the old x but new mu (for BFGS)
@@ -388,10 +463,6 @@ namespace CasADi{
         // gLag_old += mu_x_;
         transform(gLag_old_.begin(),gLag_old_.end(),mu_x_.begin(),gLag_old_.begin(),plus<double>());
       }
-    
-      // Candidate accepted, update the primal variable
-      copy(x_.begin(),x_.end(),x_old_.begin());
-      copy(x_cand_.begin(),x_cand_.end(),x_.begin());
 
       // Evaluate the constraint Jacobian
       log("Evaluating jac_g");
@@ -441,6 +512,9 @@ namespace CasADi{
         eval_h(x_,mu_,1.0,Bk_);
       }
     }
+    
+    double time2 = clock();
+    t_mainloop_ = double(time2-time1)/CLOCKS_PER_SEC;
   
     // Save results to outputs
     output(NLP_SOLVER_F).set(fk_);
@@ -448,17 +522,58 @@ namespace CasADi{
     output(NLP_SOLVER_LAM_G).set(mu_);
     output(NLP_SOLVER_LAM_X).set(mu_x_);
     output(NLP_SOLVER_G).set(gk_);
+    
+    if (hasOption("print_time") && bool(getOption("print_time"))) {
+      // Write timings
+      cout << "time spent in eval_f: " << t_eval_f_ << " s.";
+      if (n_eval_f_>0)
+        cout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
+      if (n_eval_grad_f_>0)
+        cout << " (" << n_eval_grad_f_ << " calls, " << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_g: " << t_eval_g_ << " s.";
+      if (n_eval_g_>0)
+        cout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
+      if (n_eval_jac_g_>0)
+        cout << " (" << n_eval_jac_g_ << " calls, " << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_h: " << t_eval_h_ << " s.";
+      if (n_eval_h_>1)
+        cout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
+      cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
+      cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
+    }
   
     // Save statistics
     stats_["iter_count"] = iter;
+    
+    stats_["t_eval_f"] = t_eval_f_;
+    stats_["t_eval_grad_f"] = t_eval_grad_f_;
+    stats_["t_eval_g"] = t_eval_g_;
+    stats_["t_eval_jac_g"] = t_eval_jac_g_;
+    stats_["t_eval_h"] = t_eval_h_;
+    stats_["t_mainloop"] = t_mainloop_;
+    stats_["t_callback_fun"] = t_callback_fun_;
+    stats_["t_callback_prepare"] = t_callback_prepare_;
+    stats_["n_eval_f"] = n_eval_f_;
+    stats_["n_eval_grad_f"] = n_eval_grad_f_;
+    stats_["n_eval_g"] = n_eval_g_;
+    stats_["n_eval_jac_g"] = n_eval_jac_g_;
+    stats_["n_eval_h"] = n_eval_h_;
   }
   
   void SQPInternal::printIteration(std::ostream &stream){
     stream << setw(4)  << "iter";
-    stream << setw(14) << "objective";
-    stream << setw(9) << "inf_pr";
-    stream << setw(9) << "inf_du";
-    stream << setw(9) << "||d||";
+    stream << setw(15) << "objective";
+    stream << setw(10) << "inf_pr";
+    stream << setw(10) << "inf_du";
+    stream << setw(10) << "||d||";
     stream << setw(7) << "lg(rg)";
     stream << setw(3) << "ls";
     stream << ' ';
@@ -469,10 +584,10 @@ namespace CasADi{
                                    double dx_norm, double rg, int ls_trials, bool ls_success){
     stream << setw(4) << iter;
     stream << scientific;
-    stream << setw(14) << setprecision(6) << obj;
-    stream << setw(9) << setprecision(2) << pr_inf;
-    stream << setw(9) << setprecision(2) << du_inf;
-    stream << setw(9) << setprecision(2) << dx_norm;
+    stream << setw(15) << setprecision(6) << obj;
+    stream << setw(10) << setprecision(2) << pr_inf;
+    stream << setw(10) << setprecision(2) << du_inf;
+    stream << setw(10) << setprecision(2) << dx_norm;
     stream << fixed;
     if(rg>0){
       stream << setw(7) << setprecision(2) << log10(rg);
@@ -599,6 +714,7 @@ namespace CasADi{
 
   void SQPInternal::eval_g(const std::vector<double>& x, std::vector<double>& g){
     try {
+      double time1 = clock();
       
       // Quick return if no constraints
       if(ng_==0) return;
@@ -618,6 +734,10 @@ namespace CasADi{
         cout << "x = " << nlp_.input(NL_X) << endl;
         cout << "g = " << nlp_.output(NL_G) << endl;
       }
+      
+      double time2 = clock();
+      t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+      n_eval_g_ += 1;
     } catch (exception& ex){
       cerr << "eval_g failed: " << ex.what() << endl;
       throw;
@@ -626,6 +746,8 @@ namespace CasADi{
 
   void SQPInternal::eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J){
     try{
+      double time1 = clock();
+      
       // Quich finish if no constraints
       if(ng_==0) return;
     
@@ -649,6 +771,11 @@ namespace CasADi{
         cout << "J = " << endl;
         J.printSparse();
       }
+      
+      double time2 = clock();
+      t_eval_jac_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+      n_eval_jac_g_ += 1;
+      
     } catch (exception& ex){
       cerr << "eval_jac_g failed: " << ex.what() << endl;
       throw;
@@ -657,6 +784,8 @@ namespace CasADi{
 
   void SQPInternal::eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f){
     try {
+      double time1 = clock();
+       
       // Get function
       FX& gradF = this->gradF();
 
@@ -681,6 +810,10 @@ namespace CasADi{
         cout << "x      = " << x << endl;
         cout << "grad_f = " << grad_f << endl;
       }
+      double time2 = clock();
+      t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+      n_eval_grad_f_ += 1;
+      
     } catch (exception& ex){
       cerr << "eval_grad_f failed: " << ex.what() << endl;
       throw;
@@ -689,6 +822,9 @@ namespace CasADi{
   
   void SQPInternal::eval_f(const std::vector<double>& x, double& f){
     try {
+       // Log time
+      double time1 = clock();
+      
       // Pass the argument to the function
       nlp_.setInput(x,NL_X);
       nlp_.setInput(input(NLP_SOLVER_P),NL_P);
@@ -704,6 +840,10 @@ namespace CasADi{
         cout << "x = " << nlp_.input(NL_X) << endl;
         cout << "f = " << f << endl;
       }
+      double time2 = clock();
+      t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+      n_eval_f_ += 1;
+      
     } catch (exception& ex){
       cerr << "eval_f failed: " << ex.what() << endl;
       throw;
@@ -762,19 +902,19 @@ namespace CasADi{
   
   double SQPInternal::primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,
                                           const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg){
-    // L1-norm of the primal infeasibility
+    // Linf-norm of the primal infeasibility
     double pr_inf = 0;
   
     // Bound constraints
     for(int j=0; j<x.size(); ++j){
-      pr_inf += max(0., lbx[j] - x[j]);
-      pr_inf += max(0., x[j] - ubx[j]);
+      pr_inf = max(pr_inf, lbx[j] - x[j]);
+      pr_inf = max(pr_inf, x[j] - ubx[j]);
     }
   
     // Nonlinear constraints
     for(int j=0; j<g.size(); ++j){
-      pr_inf += max(0., lbg[j] - g[j]);
-      pr_inf += max(0., g[j] - ubg[j]);
+      pr_inf = max(pr_inf, lbg[j] - g[j]);
+      pr_inf = max(pr_inf, g[j] - ubg[j]);
     }
   
     return pr_inf;

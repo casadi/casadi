@@ -38,7 +38,7 @@ public:
   virtual SCPgenInternal* clone() const{ return new SCPgenInternal(*this);}
   
   virtual void init();
-  virtual void evaluate(int nfdir, int nadir);
+  virtual void evaluate();
 
   // Calculate the L1-norm of the primal infeasibility
   double primalInfeasibility();

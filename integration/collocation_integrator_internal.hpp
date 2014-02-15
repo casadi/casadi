@@ -24,69 +24,49 @@
 #define COLLOCATION_INTEGRATOR_INTERNAL_HPP
 
 #include "collocation_integrator.hpp"
-#include "symbolic/fx/integrator_internal.hpp"
+#include "implicit_fixed_step_integrator_internal.hpp"
 #include "symbolic/fx/mx_function.hpp"
 #include "symbolic/fx/implicit_function.hpp"
 #include "integration_tools.hpp"
 
 namespace CasADi{
     
-class CollocationIntegratorInternal : public IntegratorInternal{
-
-public:
+  class CollocationIntegratorInternal : public ImplicitFixedStepIntegratorInternal{
+  public:
   
-  /// Constructor
-  explicit CollocationIntegratorInternal(const FX& f, const FX& g);
+    /// Constructor
+    explicit CollocationIntegratorInternal(const FX& f, const FX& g);
 
-  /// Deep copy data members
-  virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    /// Deep copy data members
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
-  /// Clone
-  virtual CollocationIntegratorInternal* clone() const{ return new CollocationIntegratorInternal(*this);}
+    /// Clone
+    virtual CollocationIntegratorInternal* clone() const{ return new CollocationIntegratorInternal(*this);}
 
-  /// Create a new integrator
-  virtual CollocationIntegratorInternal* create(const FX& f, const FX& g) const{ return new CollocationIntegratorInternal(f,g);}
+    /// Create a new integrator
+    virtual CollocationIntegratorInternal* create(const FX& f, const FX& g) const{ return new CollocationIntegratorInternal(f,g);}
   
-  /// Destructor
-  virtual ~CollocationIntegratorInternal();
+    /// Destructor
+    virtual ~CollocationIntegratorInternal();
 
-  /// Initialize stage
-  virtual void init();
+    /// Initialize stage
+    virtual void init();
+
+    /// Setup F and G
+    virtual void setupFG();
   
-  /// Initialize the adjoint problem (can only be called after the first integration)
-  virtual void initAdj();
+    // Return zero if smaller than machine epsilon
+    static double zeroIfSmall(double x);
 
-  /// Reset the forward problem and bring the time back to t0
-  virtual void reset(int nsens, int nsensB, int nsensB_store);
+    /// Get initial guess for the algebraic variable
+    virtual void calculateInitialConditions();
 
-  /// Reset the backward problem and take time to tf
-  virtual void resetB();
+    /// Get initial guess for the algebraic variable (backward problem)
+    virtual void calculateInitialConditionsB();
 
-  ///  Integrate until a specified time point
-  virtual void integrate(double t_out);
-
-  /// Integrate backwards in time until a specified time point
-  virtual void integrateB(double t_out);
-
-  // Startup integrator (generates an initial trajectory guess)
-  Integrator startup_integrator_;
-  
-  // Implicit function solver
-  ImplicitFunction implicit_solver_;
-  
-  // Explicit function
-  FX explicit_fcn_;
-
-  // With hotstart
-  bool hotstart_;
-  
-  // Has the system been integrated once
-  bool integrated_once_;
-  
-  // Collocated times
-  std::vector<std::vector<double> > coll_time_;
-  
-};
+    // Interpolation order
+    int deg_;
+  };
 
 } // namespace CasADi
 

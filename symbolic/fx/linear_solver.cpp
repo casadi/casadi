@@ -21,10 +21,16 @@
  */
 
 #include "linear_solver_internal.hpp"
-#include "../mx/mx_node.hpp"
 
 using namespace std;
 namespace CasADi{
+
+  LinearSolver::LinearSolver(){
+  }
+
+  LinearSolver::LinearSolver(const CRSSparsity& sp, int nrhs){
+    assignNode(new LinearSolverInternal(sp,nrhs));
+  }
 
   LinearSolverInternal* LinearSolver::operator->(){
     return static_cast<LinearSolverInternal*>(FX::operator->());
@@ -35,28 +41,42 @@ namespace CasADi{
   }
  
   void LinearSolver::prepare(){
+    assertInit();
     (*this)->prepare();
   }
 
   void LinearSolver::solve(double* x, int nrhs, bool transpose){
+    assertInit();
     (*this)->solve(x,nrhs,transpose);
   }
  
-  void LinearSolver::solve(){
-    (*this)->solve();
+  void LinearSolver::solve(bool transpose){
+    assertInit();
+    (*this)->solve(transpose);
   }
 
   MX LinearSolver::solve(const MX& A, const MX& B, bool transpose){
-    return A->getSolve(B, transpose, *this);
+    assertInit();
+    return (*this)->solve(A,B,transpose);
   }
  
   bool LinearSolver::prepared() const{
+    assertInit();
     return (*this)->prepared_;
   }
  
   bool LinearSolver::checkNode() const{
     return dynamic_cast<const LinearSolverInternal*>(get())!=0;
   }
+
+  void LinearSolver::spSolve(bvec_t* X, bvec_t* B, bool transpose) const{
+    (*this)->spSolve(X,B,transpose);
+  }
+
+  void LinearSolver::spSolve(DMatrix& X, DMatrix& B, bool transpose) const{
+    (*this)->spSolve(X,B,transpose);
+  }
+
 
 } // namespace CasADi
 

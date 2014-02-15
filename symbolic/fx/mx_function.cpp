@@ -72,19 +72,19 @@ MXFunction::MXFunction(const std::vector<MX>& inputv, const std::vector<MX>& out
 
 MXFunction::MXFunction(const std::vector<MX>& inputv, const IOSchemeVector< MX >& outputv){
   assignNode(new MXFunctionInternal(inputv,outputv));
-  setOutputScheme(outputv.io_scheme());
+  setOutputScheme(outputv.scheme);
 }
 
 MXFunction::MXFunction(const IOSchemeVector< MX >& inputv, const std::vector<MX>& outputv){
   assignNode(new MXFunctionInternal(inputv,outputv));
-  setInputScheme(inputv.io_scheme());
+  setInputScheme(inputv.scheme);
 }
 
 
 MXFunction::MXFunction(const IOSchemeVector< MX >& inputv, const IOSchemeVector< MX >& outputv){
   assignNode(new MXFunctionInternal(inputv,outputv));
-  setInputScheme(inputv.io_scheme());
-  setOutputScheme(outputv.io_scheme());
+  setInputScheme(inputv.scheme);
+  setOutputScheme(outputv.scheme);
 }
 
 const MXFunctionInternal* MXFunction::operator->() const{
@@ -128,6 +128,10 @@ MX MXFunction::grad(int iind, int oind){
   return (*this)->grad(iind,oind);
 }
 
+MX MXFunction::tang(int iind, int oind){
+  return (*this)->tang(iind,oind);
+}
+
 SXFunction MXFunction::expand(const std::vector<SXMatrix>& inputv){
   return (*this)->expand(inputv);
 }
@@ -140,9 +144,9 @@ int MXFunction::getWorkSize() const{
   return (*this)->work_.size();
 }
 
-  void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn){
-    (*this)->generateLiftingFunctions(vdef_fcn,vinit_fcn);
-  }
+void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn){
+  (*this)->generateLiftingFunctions(vdef_fcn,vinit_fcn);
+}
 
 
 } // namespace CasADi

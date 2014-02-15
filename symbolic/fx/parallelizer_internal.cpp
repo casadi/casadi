@@ -104,16 +104,14 @@ namespace CasADi{
   
     // Call the init function of the base class
     FXInternal::init();
-
-    // Allocate memory for directional derivatives
-    ParallelizerInternal::updateNumSens(false);
   }
 
-  void ParallelizerInternal::evaluate(int nfdir, int nadir){
+  void ParallelizerInternal::evaluate(){
+
     // Let the first call (which may contain memory allocations) be serial when using OpenMP
     if(mode_== SERIAL){
       for(int task=0; task<funcs_.size(); ++task){
-        evaluateTask(task,nfdir,nadir);
+        evaluateTask(task);
       }
     } else if(mode_== OPENMP) {
 #ifdef WITH_OPENMP
@@ -135,7 +133,7 @@ namespace CasADi{
         task_starttime[task] = omp_get_wtime();
       
         // Do the actual work
-        evaluateTask(task,nfdir,nadir);
+        evaluateTask(task);
       
         task_endtime[task] = omp_get_wtime();
         task_cputime[task] =  task_endtime[task] - task_starttime[task];
@@ -166,7 +164,7 @@ namespace CasADi{
     }
   }
 
-  void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){
+  void ParallelizerInternal::evaluateTask(int task){
   
     // Get a reference to the function
     FX& fcn = funcs_[task];
@@ -176,40 +174,12 @@ namespace CasADi{
       fcn.input(j-inind_[task]).set(input(j));
     }
   
-    // Copy forward seeds
-    for(int dir=0; dir<nfdir; ++dir){
-      for(int j=inind_[task]; j<inind_[task+1]; ++j){
-        fcn.fwdSeed(j-inind_[task],dir).set(fwdSeed(j,dir));
-      }
-    }
-  
-    // Copy adjoint seeds
-    for(int dir=0; dir<nadir; ++dir){
-      for(int j=outind_[task]; j<outind_[task+1]; ++j){
-        fcn.adjSeed(j-outind_[task],dir).set(adjSeed(j,dir));
-      }
-    }
-
     // Evaluate
-    fcn.evaluate(nfdir, nadir);
+    fcn.evaluate();
     
     // Get the results
     for(int j=outind_[task]; j<outind_[task+1]; ++j){
       fcn.output(j-outind_[task]).get(output(j));
-    }
-  
-    // Get the forward sensitivities
-    for(int dir=0; dir<nfdir; ++dir){
-      for(int j=outind_[task]; j<outind_[task+1]; ++j){
-        fcn.fwdSens(j-outind_[task],dir).get(fwdSens(j,dir));
-      }
-    }
-
-    // Get the adjoint sensitivities
-    for(int dir=0; dir<nadir; ++dir){
-      for(int j=inind_[task]; j<inind_[task+1]; ++j){
-        fcn.adjSens(j-inind_[task],dir).get(adjSens(j,dir));
-      }
     }
   }
 
@@ -374,16 +344,6 @@ namespace CasADi{
   
     // Assemble the return function
     return MXFunction(ret_arg,ret_res);
-  }
-
-  void ParallelizerInternal::updateNumSens(bool recursive){
-    // Call the base class if needed
-    if(recursive) FXInternal::updateNumSens(recursive);
-
-    // Request more derivative from the parallelized functions
-    for(vector<FX>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it){
-      it->requestNumSens(nfdir_,nadir_);
-    }
   }
 
 

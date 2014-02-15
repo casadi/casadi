@@ -142,6 +142,12 @@ namespace CasADi{
 
     /// Number of elements
     int numel() const;
+    
+    /// Check if the sparsity is empty, i.e. one of its dimensions is 0 
+    bool empty() const;
+    
+    /// Check if the sparsity is null, i.e. dimension is 0-by-0
+    bool null() const;
 
     /// Number of non-zeros in the upper triangular half
     int sizeU() const;
@@ -164,6 +170,9 @@ namespace CasADi{
     /// Is diagonal?
     bool diagonal() const;
 
+    /// Is square?
+    bool square() const;
+
     /// Get the dimension as a string
     std::string dimString() const;
 
@@ -184,6 +193,9 @@ namespace CasADi{
     template<bool with_mapping, bool f0x_is_zero, bool fx0_is_zero>
     CRSSparsity patternCombineGen(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;
     //@}
+    
+    /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
+    CRSSparsity patternInverse() const;
 
     /// Check if two sparsity patterns are the same
     bool isEqual(const CRSSparsity& y) const;
@@ -262,6 +274,9 @@ namespace CasADi{
 
     /// Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
     CRSSparsity starColoring(int ordering, int cutoff) const;
+    
+    /// Perform a star coloring of a symmetric matrix: An improved distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
+    CRSSparsity starColoring2(int ordering, int cutoff) const;
 
     /// Order the rows by decreasing degree
     std::vector<int> largestFirstOrdering() const;

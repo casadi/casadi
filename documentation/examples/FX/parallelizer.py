@@ -46,7 +46,7 @@ p.init()
 #! Note that the parallelizer MX input/output interface is a repitition of our function's I/O interface
 assert(p.getNumInputs() == n*f.getNumInputs())
 
-p.evaluate(1,1)
+p.evaluate()
 
 print p.getStats()
 

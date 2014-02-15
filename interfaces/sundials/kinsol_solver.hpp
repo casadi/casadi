@@ -40,9 +40,9 @@ namespace CasADi{
    *
    The constraints option expects an integer entry for each variable u:\n
     
-   0 then no constraint is imposed on u. \n
-   1 then ui will be constrained to be u >= 0.0. \n
-   −1 then ui will be constrained to be ui >= 0.0. \n
+   0 then no constraint is imposed on ui. \n
+   1 then ui will be constrained to be ui >= 0.0. \n
+   −1 then ui will be constrained to be ui <= 0.0. \n
    2 then ui will be constrained to be ui > 0.0. \n
    −2 then ui will be constrained to be ui < 0.0. \n
 

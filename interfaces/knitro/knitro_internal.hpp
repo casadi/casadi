@@ -40,7 +40,7 @@ namespace CasADi{
     virtual KnitroInternal* clone() const{ return new KnitroInternal(*this);}
 
     virtual void init();
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
 
     // KNITRO callback functions
     void evalfc(const double* x, double& obj, double *c);

@@ -48,11 +48,8 @@ public:
   virtual void init();
 
   /** \brief  Integrate */
-  virtual void evaluate(int nfdir, int nadir);
+  virtual void evaluate();
   
-  /** \brief  Update the number of sensitivity directions during or after initialization */
-  virtual void updateNumSens(bool recursive);
-
   Integrator integrator_;
   FX output_fcn_;
   

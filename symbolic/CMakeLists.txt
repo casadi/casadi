@@ -20,6 +20,10 @@ SET(CASADI_SRCS
   generic_type_internal.hpp                             # Internal class for the same
   options_functionality.cpp   options_functionality.hpp # Functionality for getting and setting options of a derived class
   stl_vector_tools.hpp        stl_vector_tools.cpp      # Set of useful functions for the vector template class in STL
+  profiling.hpp               profiling.cpp
+  functor.hpp                 functor.cpp              # Classes for callbacks
+  functor_internal.hpp        functor_internal.cpp     
+  polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials
 
   # Template class Matrix<>, implements a sparse Matrix with row compressed storage, designed to work well with symbolic data types (SX)
   matrix/generic_expression.hpp                         # Base class for SX MX and Matrix<>
@@ -67,17 +71,18 @@ SET(CASADI_SRCS
   mx/inverse.hpp             mx/inverse.cpp             # Matrix inverse
   mx/inner_prod.hpp          mx/inner_prod.cpp          # Inner product
   mx/multiple_output.hpp     mx/multiple_output.cpp     # Base class for nodes with multiple outputs
+  mx/assertion.hpp           mx/assertion.cpp           # Assertion
   mx/mx_tools.hpp            mx/mx_tools.cpp
 
   # A dynamically created function with AD capabilities
   fx/io_interface.hpp                                   # Input/output interface for FX and FXInternal
+  fx/io_scheme.hpp           fx/io_scheme.cpp           fx/io_scheme_internal.hpp           fx/io_scheme_internal.cpp 
   fx/fx.hpp                  fx/fx.cpp                  fx/fx_internal.hpp                  fx/fx_internal.cpp
   fx/x_function_internal.hpp                            # Base class for SXFunction and MXFunction
   fx/sx_function.hpp         fx/sx_function.cpp         fx/sx_function_internal.hpp         fx/sx_function_internal.cpp
   fx/mx_function.hpp         fx/mx_function.cpp         fx/mx_function_internal.hpp         fx/mx_function_internal.cpp
-  fx/c_function.hpp          fx/c_function.cpp          fx/c_function_internal.hpp          fx/c_function_internal.cpp
+  fx/custom_function.hpp     fx/custom_function.cpp     fx/custom_function_internal.hpp     fx/custom_function_internal.cpp
   fx/external_function.hpp   fx/external_function.cpp   fx/external_function_internal.hpp   fx/external_function_internal.cpp
-  fx/derivative.hpp          fx/derivative.cpp          fx/derivative_internal.hpp          fx/derivative_internal.cpp
   fx/linear_solver.hpp       fx/linear_solver.cpp       fx/linear_solver_internal.hpp       fx/linear_solver_internal.cpp
   fx/symbolic_qr.hpp         fx/symbolic_qr.cpp         fx/symbolic_qr_internal.hpp         fx/symbolic_qr_internal.cpp
   fx/implicit_function.hpp   fx/implicit_function.cpp   fx/implicit_function_internal.hpp   fx/implicit_function_internal.cpp
@@ -88,13 +93,16 @@ SET(CASADI_SRCS
   fx/parallelizer.hpp        fx/parallelizer.cpp        fx/parallelizer_internal.hpp        fx/parallelizer_internal.cpp
   fx/ocp_solver.hpp          fx/ocp_solver.cpp          fx/ocp_solver_internal.hpp          fx/ocp_solver_internal.cpp
   fx/qp_solver.hpp           fx/qp_solver.cpp           fx/qp_solver_internal.hpp           fx/qp_solver_internal.cpp
+  fx/stabilized_qp_solver.hpp    fx/stabilized_qp_solver.cpp    fx/stabilized_qp_solver_internal.hpp fx/stabilized_qp_solver_internal.cpp
   fx/sdp_solver.hpp          fx/sdp_solver.cpp          fx/sdp_solver_internal.hpp          fx/sdp_solver_internal.cpp
+  fx/sdqp_solver.hpp         fx/sdqp_solver.cpp         fx/sdqp_solver_internal.hpp         fx/sdqp_solver_internal.cpp
   fx/socp_solver.hpp         fx/socp_solver.cpp         fx/socp_solver_internal.hpp         fx/socp_solver_internal.cpp
   fx/qcqp_solver.hpp         fx/qcqp_solver.cpp         fx/qcqp_solver_internal.hpp         fx/qcqp_solver_internal.cpp
   fx/lp_solver.hpp           fx/lp_solver.cpp           fx/lp_internal.hpp                  fx/lp_internal.cpp
   fx/fx_tools.hpp            fx/fx_tools.cpp
   fx/xfunction_tools.hpp     fx/xfunction_tools.cpp
   fx/code_generator.hpp      fx/code_generator.cpp
+  fx/nullspace.hpp           fx/nullspace.cpp           fx/nullspace_internal.hpp           fx/nullspace_internal.cpp
 
   # User include class with the most essential includes
   casadi.hpp

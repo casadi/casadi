@@ -257,7 +257,7 @@ class typemaptests(casadiTestCase):
         f_.evaluate()
         
 
-        self.checkarray(fun(f_.getOutput(),DMatrix(s)),f.getOutput(),"operation")
+        self.checkarray(fun(f_.getOutput(),DMatrix(s)),f.getOutput(),"operation",str(f_.getOutput(0))+str(s)+":"+str(fun(f_.getOutput(),DMatrix(s)))+"->"+str(f.getOutput())+":"+str(s)+str(z)+"->"+str(r))
       else:
         dummy = [1.3,2.7,9.4,1.0]
         dummy2 = [0.3,2.4,1.4,1.7]
@@ -274,7 +274,7 @@ class typemaptests(casadiTestCase):
         f_.setInput(dummy2[0:f.input(1).size()],1)
         f_.evaluate()
 
-        self.checkarray(fun(f_.getOutput(0),f_.getOutput(1)),f.getOutput(),"operation")
+        self.checkarray(fun(f_.getOutput(0),f_.getOutput(1)),f.getOutput(),"operation"+str(f_.getOutput(0))+","+str(f_.getOutput(1))+":"+str(f.getOutput()))
     
     
     def tests(z,s):
@@ -297,6 +297,8 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: constpow(z,s))
       doit(z,s,lambda z,s: arctan2(s,z))
       doit(z,s,lambda z,s: arctan2(z,s))
+      doit(z,s,lambda z,s: copysign(z,s))
+      doit(z,s,lambda z,s: copysign(s,z))
 
     nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
         
@@ -441,16 +443,11 @@ class typemaptests(casadiTestCase):
     self.assertTrue(f.getOption("verbose"))
     f.setOption("verbose",False)
     self.assertTrue(not(f.getOption("verbose")))
-    f.setOption("number_of_adj_dir",3)
-    self.assertTrue(isinstance(f.getOption("number_of_adj_dir"),int))
-    self.assertEquals(f.getOption("number_of_adj_dir"),3)
     d=f.dictionary()
     self.assertTrue(isinstance(d,dict))
     d["verbose"]=True
-    d["number_of_adj_dir"]=7
     f.setOption(d)
     self.assertTrue(f.getOption("verbose"))
-    self.assertEquals(f.getOption("number_of_adj_dir"),7)
 
   def testGenericType2(self):
     self.message("Generic type 2")
@@ -734,78 +731,7 @@ class typemaptests(casadiTestCase):
     m = DMatrix.ones(5,5)
     m.setAll(DMatrix(4))
     m.setAll(IMatrix(4))
-    
-  def test_issue_(self):
-    self.message("Ticket #533")
-
-
-    x=ssym("x")
-    z=ssym("z")
-    p=ssym("p")
-    f = SXFunction(daeIn(x=x,p=p,z=z),daeOut(ode=z/p,alg=z-x))
-    f.init()
-
-    integr = IdasIntegrator(f)
-    integr.setOption("init_xdot",GenericType())
-    integr.setOption("calc_icB",True)
-    integr.setOption("t0",0.2)
-    integr.setOption("tf",2.3)
-    integr.init()
-
-    integr.setInput(7.1,"x0")
-    integr.setInput(2,"p")
-
-    integr.evaluate(1,1)
-
-    print integr.dictionary()
-
-
-    integr = IdasIntegrator(f)
-    integr.setOption("init_xdot",None)
-    integr.setOption("calc_icB",True)
-    integr.setOption("t0",0.2)
-    integr.setOption("tf",2.3)
-    integr.init()
-
-    integr.setInput(7.1,"x0")
-    integr.setInput(2,"p")
-
-    integr.evaluate(1,1)
-
-    print integr.dictionary()
-
-    integr = IdasIntegrator(f)
-    integr.setOption("init_xdot",[7.1])
-    integr.setOption("calc_icB",True)
-    integr.setOption("augmented_options", {"init_xdot":GenericType()})
-
-    integr.setOption("t0",0.2)
-    integr.setOption("tf",2.3)
-    integr.init()
-
-    integr.setInput(7.1,"x0")
-    integr.setInput(2,"p")
-
-    integr.evaluate(1,1)
-
-    print integr.dictionary()
-
-    integr = IdasIntegrator(f)
-    integr.setOption("init_xdot",[7.1])
-    integr.setOption("calc_icB",True)
-    integr.setOption("augmented_options", {"init_xdot":None})
-
-    integr.setOption("t0",0.2)
-    integr.setOption("tf",2.3)
-    integr.init()
-
-    integr.setInput(7.1,"x0")
-    integr.setInput(2,"p")
-
-    integr.evaluate(1,1)
-
-    print integr.dictionary()
-    
+        
   def test_issue570(self):
     self.message("Issue #570: long int")
     longint = 10**50

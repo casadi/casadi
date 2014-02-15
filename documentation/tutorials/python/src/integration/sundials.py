@@ -100,7 +100,7 @@ x0 = 0;y0 = 1
 integrator.setInput([x0,y0],"x0")
 integrator.setInput(0,"p")
 integrator.evaluate()
-integrator.reset(0)
+integrator.reset()
 	
 #! Define a convenience function to acces x(t)
 def out(t):
@@ -154,10 +154,11 @@ show()
 #$ By definition, this mapping goes through the origin. In the limit of $dx0 \to 0$, this map is purely linear. The slope at the origin is exactly what we call 'sensitivity'
 #
 
-integrator.setInput([x0,y0],"x0")
-integrator.setFwdSeed([1,0],"x0")
-integrator.evaluate(1,0)
-A = integrator.getFwdSens()[0]
+dintegrator = integrator.derivative(1,0)
+dintegrator.setInput([x0,y0],"der_x0")
+dintegrator.setInput([1,0],"fwd0_x0")
+dintegrator.evaluate()
+A = dintegrator.getOutput("fwd0_xf")[0]
 plot(dx0,A*dx0)
 legend(('True sensitivity','Linearised sensitivity'))
 plot(0,0,'o')
@@ -166,12 +167,12 @@ show()
 #! The interpetation is that a small initial circular patch of phase space evolves into ellipsoid patches at later stages.
 
 def out(t):
-	integrator.setFwdSeed([1,0],"x0")
-        integrator.evaluate(1,0)
-	A=integrator.fwdSens().toArray()
-	integrator.setFwdSeed([0,1],"x0")
-	integrator.evaluate(1,0)
-	B=integrator.fwdSens().toArray()
+	dintegrator.setInput([1,0],"fwd0_x0")
+        dintegrator.evaluate()
+	A=dintegrator.output("fwd0_xf").toArray()
+	dintegrator.setInput([0,1],"fwd0_x0")
+	dintegrator.evaluate()
+	B=dintegrator.output("fwd0_xf").toArray()
 	return array([A,B]).squeeze().T
 
 circle = array([[sin(x),cos(x)] for x in numpy.linspace(0,2*pi,100)]).T
@@ -210,7 +211,7 @@ show()
 #! - a fixed integration end time, t=10s
 #! - a fixed initial condition (1,0)
 #! - a free symbolic input, held constant during integration interval
-u=MX("u")
+u=msym("u")
 w, = integratorOut(integrator.call(integratorIn(x0=MX([1,0]),p=u)),"xf")
 
 #! We construct an MXfunction and a python help function 'out'

@@ -69,7 +69,7 @@ namespace CasADi{
   }
 
 
-  CRSSparsity CSparseCholeskyInternal::getFactorizationSparsity() const {
+  CRSSparsity CSparseCholeskyInternal::getFactorizationSparsity(bool transpose) const {
     casadi_assert(S_);
     int n = AT_.n;
     int nzmax = S_->cp[n];
@@ -96,11 +96,13 @@ namespace CasADi{
       Li [p] = k ;    
     }
     Lp [n] = S_->cp [n] ; 
-    return trans(CRSSparsity(n, n, rowind, col));
+    CRSSparsity ret(n, n, rowind, col);
+
+    return transpose? ret : trans(ret);
   
   }
   
-  DMatrix CSparseCholeskyInternal::getFactorization() const {
+  DMatrix CSparseCholeskyInternal::getFactorization(bool transpose) const {
     casadi_assert(L_);
     cs *L = L_->L;
     int nz = L->nzmax;
@@ -112,7 +114,9 @@ namespace CasADi{
     std::copy(L->i,L->i+nz,col.begin());
     std::vector< double > data(nz);
     std::copy(L->x,L->x+nz,data.begin());
-    return trans(DMatrix(CRSSparsity(m, n, col, rowind),data));
+    DMatrix ret(CRSSparsity(m, n, col, rowind),data); 
+    
+    return transpose? ret : trans(ret);
   }
   
   void CSparseCholeskyInternal::prepare(){
@@ -192,7 +196,6 @@ namespace CasADi{
       x += nrow();
     }
   }
-
 
   CSparseCholeskyInternal* CSparseCholeskyInternal::clone() const{
     return new CSparseCholeskyInternal(input(LINSOL_A).sparsity(),input(LINSOL_B).size1());

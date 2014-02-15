@@ -22,7 +22,7 @@
 
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
 // for example vertcat(SXMatrixVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
-#pragma SWIG nowarn=509,303
+#pragma SWIG nowarn=509,303,302
 
 // Incude cmath early on, see #622
 %begin %{
@@ -60,10 +60,24 @@ _object = _copyableObject
 %copyctor;
 
 // STL
+#ifdef SWIGXML
+//%include <typemaps/std_string.swg>
+//%include <std/std_vector.i>
+//%include <std/std_pair.i>
+namespace std {
+
+template<class T>
+class vector {};
+
+template<class A,class B>
+class pair {};
+
+}
+#else
 %include "std_string.i"
 %include "std_vector.i"
 %include "std_pair.i"
-
+#endif
 
 
 #ifdef SWIG_MAIN_MODULE
@@ -193,6 +207,7 @@ _object = _copyableObject
 %include "symbolic/casadi_options.hpp"
 %include "symbolic/casadi_meta.hpp"
 
+#ifdef CASADI_MODULE
 %{
 #define START \
   if (CasADi::CasadiOptions::catch_errors_python){ \
@@ -237,6 +252,7 @@ _object = _copyableObject
     SWIG_exception(SWIG_TypeError, e); \
   }
 }
+#endif // CASADI_MODULE
 
 #ifdef SWIGPYTHON
 #ifndef WITH_NUMPY
@@ -297,7 +313,8 @@ memberbinopsr_custom(Type,ne,!=) \
 memberbinopsr_un(Type,fmin) \
 memberbinopsr_un(Type,fmax) \
 memberbinopsr_nn(Type,mul) \
-memberbinopsr_un(Type,arctan2)
+memberbinopsr_un(Type,arctan2) \
+memberbinopsr(Type,copysign)
 
 #define memberbinops(uname,argtype,argCast,selfCast,returntype) \
 returntype __##uname##__ (argtype) const{ return selfCast(*$self).__##uname##__(argCast(b));} \
@@ -322,6 +339,7 @@ memberbinops_un(fmin,argtype,argCast,selfCast,returntype) \
 memberbinops_un(fmax,argtype,argCast,selfCast,returntype) \
 memberbinops(constpow,argtype,argCast,selfCast,returntype) \
 memberbinops_un(arctan2,argtype,argCast,selfCast,returntype) \
+memberbinops(copysign,argtype,argCast,selfCast,returntype) \
 memberbinops(pow,argtype,argCast,selfCast,returntype) \
 memberbinops(add,argtype,argCast,selfCast,returntype) \
 memberbinops(sub,argtype,argCast,selfCast,returntype) \
@@ -372,7 +390,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "symbolic/fx/mx_function.hpp" 
  	
 #include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/c_function.hpp"
+#include "symbolic/fx/custom_function.hpp"
 #include "symbolic/fx/ocp_solver.hpp"
 #include "symbolic/fx/simulator.hpp"
 #include "symbolic/fx/parallelizer.hpp"
@@ -445,4 +463,3 @@ void dummy(CasADi::SX foo,
 	int &bar,
 	double &baz);
 };
-

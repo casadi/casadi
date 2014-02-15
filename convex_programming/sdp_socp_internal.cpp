@@ -48,9 +48,9 @@ SDPSOCPInternal::SDPSOCPInternal(const std::vector<CRSSparsity> &st) : SOCPSolve
 SDPSOCPInternal::~SDPSOCPInternal(){ 
 }
 
-void SDPSOCPInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("SDPSOCPInternal::evaluate() not implemented for forward or backward mode");
-  
+void SDPSOCPInternal::evaluate() {
+  if (print_problem_) printProblem();
+    
   mapping_.setInput(input(SOCP_SOLVER_G),0);
   mapping_.setInput(input(SOCP_SOLVER_H),1);
   mapping_.setInput(input(SOCP_SOLVER_E),2);
@@ -68,6 +68,9 @@ void SDPSOCPInternal::evaluate(int nfdir, int nadir) {
   sdpsolver_.setInput(input(SOCP_SOLVER_UBA),SDP_SOLVER_UBA);
   
   sdpsolver_.evaluate();
+
+  // Pass the stats
+  stats_["sdp_solver_stats"] = sdpsolver_.getStats();
   
   setOutput(sdpsolver_.output(SDP_SOLVER_X),SOCP_SOLVER_X);
   setOutput(sdpsolver_.output(SDP_SOLVER_COST),SOCP_SOLVER_COST);

@@ -30,6 +30,33 @@ using namespace std;
 
 namespace CasADi{
 
+  // Singletons
+  class EmptySparsity : public CRSSparsity{  
+  public:
+    EmptySparsity(){
+      vector<int> col,rowind(1,0);
+      assignNode(new CRSSparsityInternal(0,0,col,rowind));
+    }
+  };
+
+  class ScalarSparsity : public CRSSparsity{  
+  public:
+    ScalarSparsity(){
+      vector<int> col(1,0),rowind(2);
+      rowind[0] = 0;
+      rowind[1] = 1;
+      assignNode(new CRSSparsityInternal(1,1,col,rowind));
+    }
+  };
+
+  class ScalarSparseSparsity : public CRSSparsity{  
+  public:
+    ScalarSparseSparsity(){
+      vector<int> col,rowind(2,0);
+      assignNode(new CRSSparsityInternal(1,1,col,rowind));
+    }
+  };
+  
   CRSSparsity::CRSSparsity(int dummy){
     casadi_assert(dummy==0);
   }
@@ -65,11 +92,11 @@ namespace CasADi{
  
   CRSSparsityInternal* CRSSparsity::operator->(){
     makeUnique();
-    return (CRSSparsityInternal*)(SharedObject::operator->());
+    return static_cast<CRSSparsityInternal*>(SharedObject::operator->());
   }
 
   const CRSSparsityInternal* CRSSparsity::operator->() const{
-    return (const CRSSparsityInternal*)(SharedObject::operator->());
+    return static_cast<const CRSSparsityInternal*>(SharedObject::operator->());
   }
   
   bool CRSSparsity::checkNode() const{
@@ -89,7 +116,11 @@ namespace CasADi{
   }
 
   bool CRSSparsity::empty() const{
-    return numel()==0;
+    return (*this)->empty();
+  }
+  
+  bool CRSSparsity::null() const{
+    return (*this)->null();
   }
     
   int CRSSparsity::size() const{
@@ -242,6 +273,10 @@ namespace CasADi{
     return (*this)->diagonal();
   }
 
+  bool CRSSparsity::square() const{
+    return (*this)->square();
+  }
+
   CRSSparsity CRSSparsity::sub(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
     return (*this)->sub(ii,jj,mapping);
   }
@@ -338,6 +373,10 @@ namespace CasADi{
     std::vector< unsigned char > mapping;
     return patternIntersection(b, mapping);
   }
+  
+  CRSSparsity CRSSparsity::patternInverse() const {
+    return (*this)->patternInverse();
+  }
 
   void CRSSparsity::reserve(int nnz, int nrow){
     makeUnique();
@@ -350,11 +389,25 @@ namespace CasADi{
     (*this)->append(sp);
   }
 
-  CRSSparsity CRSSparsity::scalarSparsity(1,1,true);
+  CRSSparsity::CachingMap& CRSSparsity::getCache(){
+    static CachingMap ret;
+    return ret;
+  }
 
-  CRSSparsity CRSSparsity::scalarSparsitySparse(1,1,false);
+  const CRSSparsity& CRSSparsity::getScalar(){
+    static ScalarSparsity ret;
+    return ret;
+  }
 
-  CRSSparsity CRSSparsity::emptySparsity(0,0,true);
+  const CRSSparsity& CRSSparsity::getScalarSparse(){
+    static ScalarSparseSparsity ret;
+    return ret;
+  }
+
+  const CRSSparsity& CRSSparsity::getEmpty(){
+    static EmptySparsity ret;
+    return ret;
+  }
 
   void CRSSparsity::enlarge(int nrow, int ncol, const vector<int>& ii, const vector<int>& jj){
     enlargeRows(nrow,ii);
@@ -458,6 +511,10 @@ namespace CasADi{
     return (*this)->starColoring(ordering,cutoff);
   }
 
+  CRSSparsity CRSSparsity::starColoring2(int ordering, int cutoff) const{
+    return (*this)->starColoring2(ordering,cutoff);
+  }
+
   std::vector<int> CRSSparsity::largestFirstOrdering() const{
     return (*this)->largestFirstOrdering();
   }
@@ -488,18 +545,33 @@ namespace CasADi{
   }
 
   void CRSSparsity::assignCached(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind){
+
+    // Scalars and empty patterns are handled separately
+    if(nrow==0 && ncol==0){
+      // If empty    
+      *this = getEmpty();
+      return;
+    } else if(nrow==1 && ncol==1){
+      if(col.empty()){        
+        // If sparse scalar
+        *this = getScalarSparse();
+        return;
+      } else {
+        // If dense scalar
+        *this = getScalar();
+        return;
+      }
+    }
+
     // Hash the pattern
     std::size_t h = hash_sparsity(nrow,ncol,col,rowind);
 
-    // Workaround: Disable caching for scalars and small empty matrices
-    if(nrow<=1 && ncol<=1){
-      assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
-      return;
-    }
+    // Get a reference to the cache
+    CachingMap& cache = getCache();
     
     // Record the current number of buckets (for garbage collection below)
 #ifdef USE_CXX11
-    int bucket_count_before = cached_.bucket_count();
+    int bucket_count_before = cache.bucket_count();
 #endif // USE_CXX11
 
     // WORKAROUND, functions do not appear to work when bucket_count==0
@@ -508,7 +580,7 @@ namespace CasADi{
 #endif // USE_CXX11
 
       // Find the range of patterns equal to the key (normally only zero or one)
-      pair<CachingMap::iterator,CachingMap::iterator> eq = cached_.equal_range(h);
+      pair<CachingMap::iterator,CachingMap::iterator> eq = cache.equal_range(h);
 
       // Loop over maching patterns
       for(CachingMap::iterator i=eq.first; i!=eq.second; ++i){
@@ -588,19 +660,19 @@ namespace CasADi{
     assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
 
     // Cache this pattern
-    //cached_.insert(eq.second,std::pair<std::size_t,WeakRef>(h,ret));
-    cached_.insert(std::pair<std::size_t,WeakRef>(h,*this));
+    //cache.insert(eq.second,std::pair<std::size_t,WeakRef>(h,ret));
+    cache.insert(std::pair<std::size_t,WeakRef>(h,*this));
 
     // Garbage collection (currently only supported for unordered_multimap)
 #ifdef USE_CXX11
-    int bucket_count_after = cached_.bucket_count();
+    int bucket_count_after = cache.bucket_count();
     
     // We we increased the number of buckets, take time to garbage-collect deleted references
     if(bucket_count_before!=bucket_count_after){
-      CachingMap::const_iterator i=cached_.begin();
-      while(i!=cached_.end()){
+      CachingMap::const_iterator i=cache.begin();
+      while(i!=cache.end()){
         if(!i->second.alive()){
-          i = cached_.erase(i);
+          i = cache.erase(i);
         } else {
           i++;
         }
@@ -609,10 +681,8 @@ namespace CasADi{
 #endif // USE_CXX11    
   }
 
-  CRSSparsity::CachingMap CRSSparsity::cached_;
-
   void CRSSparsity::clearCache(){
-    cached_.clear();
+    getCache().clear();
   }
 
 

@@ -10,7 +10,7 @@ if(WITH_SUNDIALS)
   add_subdirectory(sundials-2.5mod)
 endif()
 
-if(WITH_QPOASES)
+if(QPOASES_FOUND)
   add_subdirectory(qpOASES)
 endif()
 

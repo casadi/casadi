@@ -23,6 +23,7 @@
 %{
 #include "nonlinear_programming/symbolic_nlp.hpp"
 #include "nonlinear_programming/sqp_method.hpp"
+#include "nonlinear_programming/stabilized_sqp_method.hpp"
 #include "nonlinear_programming/scpgen.hpp"
 #include "nonlinear_programming/nlp_qp_solver.hpp"
 #include "nonlinear_programming/nlp_implicit_solver.hpp"
@@ -31,6 +32,7 @@
 
 %include "nonlinear_programming/symbolic_nlp.hpp"
 %include "nonlinear_programming/sqp_method.hpp"
+%include "nonlinear_programming/stabilized_sqp_method.hpp"
 %include "nonlinear_programming/scpgen.hpp"
 %include "nonlinear_programming/nlp_qp_solver.hpp"
 %include "nonlinear_programming/nlp_implicit_solver.hpp"

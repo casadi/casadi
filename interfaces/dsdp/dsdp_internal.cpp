@@ -24,9 +24,7 @@
 
 #include "../../symbolic/stl_vector_tools.hpp"
 #include "../../symbolic/matrix/matrix_tools.hpp"
-//#include "../../symbolic/sx/sx_tools.hpp"
 #include "../../symbolic/mx/mx_tools.hpp"
-//#include "../../symbolic/fx/sx_function.hpp"
 #include "../../symbolic/fx/mx_function.hpp"
 /**
 Some implementation details
@@ -60,6 +58,8 @@ DSDPInternal::DSDPInternal(const std::vector<CRSSparsity> &st) : SDPSolverIntern
   addOption("_rho", OT_REAL,4.0,"Potential parameter. Must be >=1");
   addOption("_zbar", OT_REAL,1e10,"Initial upper bound on the objective of the dual problem.");
   addOption("_reuse",OT_INTEGER,4,"Maximum on the number of times the Schur complement matrix is reused");
+  addOption("_printlevel",OT_INTEGER,1,"A printlevel of zero will disable all output. Another number indicates how often a line is printed.");
+  addOption("_loglevel",OT_INTEGER,0,"An integer that specifies how much logging is done on stdout.");
   
   // Set DSDP memory blocks to null
   dsdp_ = 0;
@@ -92,37 +92,6 @@ void DSDPInternal::init(){
   solutionType_[DSDP_UNBOUNDED] = "DSDP_UNBOUNDED";
   solutionType_[DSDP_INFEASIBLE] = "DSDP_INFEASIBLE";
   solutionType_[DSDP_PDUNKNOWN] = "DSDP_PDUNKNOWN";
-  
-  // A return flag used by DSDP
-  int info;
-  
-  // Destroy existing DSDP instance if already allocated
-  if(dsdp_!=0){
-    DSDPDestroy(dsdp_);
-    dsdp_ = 0;
-  }
-
-  // Allocate DSDP solver memory
-  info = DSDPCreate(n_, &dsdp_);
-  DSDPSetStandardMonitor(dsdp_, 1);
-  DSDPSetGapTolerance(dsdp_, getOption("gapTol"));
-  DSDPSetMaxIts(dsdp_, getOption("maxIter"));
-  DSDPSetPTolerance(dsdp_,getOption("dualTol"));
-  DSDPSetRTolerance(dsdp_,getOption("primalTol"));
-  DSDPSetStepTolerance(dsdp_,getOption("stepTol"));
-  
-  info = DSDPCreateSDPCone(dsdp_,nb_,&sdpcone_);
-  for (int j=0;j<nb_;++j) {
-    log("DSDPInternal::init","Setting");
-    info = SDPConeSetBlockSize(sdpcone_, j, block_sizes_[j]);
-    info = SDPConeSetSparsity(sdpcone_, j, block_sizes_[j]);
-  }
-  if (nc_>0) {
-    info = DSDPCreateLPCone( dsdp_, &lpcone_);
-  }
-  
-  info = DSDPCreateBCone( dsdp_, &bcone_);
-  info = BConeAllocateBounds( bcone_, n_);
 
   // Fill the data structures that hold DSDP-style sparse symmetric matrix
   pattern_.resize(n_+1);
@@ -169,7 +138,6 @@ void DSDPInternal::init(){
     mappingA_ = MXFunction(syms,horzcat(-lba,uba));
     mappingA_.init();
   
-    info = LPConeSetData(lpcone_, nc_*2, &mappingA_.output(0).rowind()[0], &mappingA_.output(0).col()[0], &mappingA_.output(0).data()[0]);
   }
   
   if (calc_dual_) {
@@ -185,16 +153,53 @@ void DSDPInternal::init(){
     }
   }
   
+
+}
+
+void DSDPInternal::evaluate() {
+
+  if (inputs_check_) checkInputs();
+  if (print_problem_) printProblem();
+  
+  int info;
+  
+  // Seems unavoidable to do DSDPCreate here
+  
+  // Destroy existing DSDP instance if already allocated
+  if(dsdp_!=0){
+    DSDPDestroy(dsdp_);
+    dsdp_ = 0;
+  }
+  
+  // Allocate DSDP solver memory
+  info = DSDPCreate(n_, &dsdp_);
+  DSDPSetGapTolerance(dsdp_, getOption("gapTol"));
+  DSDPSetMaxIts(dsdp_, getOption("maxIter"));
+  DSDPSetPTolerance(dsdp_,getOption("dualTol"));
+  DSDPSetRTolerance(dsdp_,getOption("primalTol"));
+  DSDPSetStepTolerance(dsdp_,getOption("stepTol"));
+  DSDPSetStandardMonitor(dsdp_,getOption("_printlevel"));
+  
+  info = DSDPCreateSDPCone(dsdp_,nb_,&sdpcone_);
+  for (int j=0;j<nb_;++j) {
+    log("DSDPInternal::init","Setting");
+    info = SDPConeSetBlockSize(sdpcone_, j, block_sizes_[j]);
+    info = SDPConeSetSparsity(sdpcone_, j, block_sizes_[j]);
+  }
+  if (nc_>0) {
+    info = DSDPCreateLPCone( dsdp_, &lpcone_);
+    info = LPConeSetData(lpcone_, nc_*2, &mappingA_.output(0).rowind()[0], &mappingA_.output(0).col()[0], &mappingA_.output(0).data()[0]);
+  }
+  
+  info = DSDPCreateBCone( dsdp_, &bcone_);
+  info = BConeAllocateBounds( bcone_, n_);
+  
   info = DSDPUsePenalty(dsdp_,getOption("_use_penalty") ? 1: 0);
   info = DSDPSetPenaltyParameter(dsdp_, getOption("_penalty") );
   info = DSDPSetPotentialParameter(dsdp_, getOption("_rho"));
   info = DSDPSetZBar(dsdp_, getOption("_zbar"));
   info = DSDPReuseMatrix(dsdp_,getOption("_reuse") ? 1: 0);
-
-}
-
-void DSDPInternal::evaluate(int nfdir, int nadir) {
-  int info;
+  DSDPLogInfoAllow(getOption("_loglevel"),0);
   
   // Copy bounds
   for (int i=0;i<n_;++i) {
@@ -219,8 +224,6 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
     
     // TODO: this can be made non-allocating bu hacking into DSDP source code
     info = LPConeSetDataC(lpcone_, nc_*2, &mappingA_.output(0).data()[0]);
-    
-    LPConeView(lpcone_);
 
   }
 
@@ -228,6 +231,16 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   for (int i=0;i<n_;++i) {
     info = DSDPSetDualObjective(dsdp_, i+1, -input(SDP_SOLVER_C).at(i));
   }
+
+  
+  if (nb_>0) {
+    for (int i=0;i<n_+1;++i) {
+      for (int j=0;j<nb_;++j) {
+        info = SDPConeSetASparseVecMat(sdpcone_, j, i, block_sizes_[j], 1, 0, &pattern_[i][j][0], &values_[i][j][0], pattern_[i][j].size() );
+      }
+    }
+  }
+  
   
   if (nb_>0) {
     // Get Ai from supplied A
@@ -238,11 +251,12 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
     for (int i=0;i<n_+1;++i) {
       for (int j=0;j<nb_;++j) {
         mapping_.output(i*nb_+j).get(values_[i][j],SPARSESYM);
-        info = SDPConeSetASparseVecMat(sdpcone_, j, i, block_sizes_[j], 1, 0, &pattern_[i][j][0], &values_[i][j][0], pattern_[i][j].size() );
       }
     }
   }
   
+  // Manual: Do not set data into the cones after calling this routine.
+  // Manual: Should be called only once for each DSDP solver created
   info = DSDPSetup(dsdp_);
   info = DSDPSolve(dsdp_);
 
@@ -251,11 +265,11 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   
   DSDPTerminationReason reason;
   DSDPStopReason(dsdp_, &reason);
-  std::cout << "Termination reason: " << (*terminationReason_.find(reason)).second << std::endl;
-  
+  stats_["termination_reason"] = (*terminationReason_.find(reason)).second;
+
   DSDPSolutionType pdfeasible;
   DSDPGetSolutionType(dsdp_,&pdfeasible);
-  std::cout << "Solution type: " << (*solutionType_.find(pdfeasible)).second << std::endl;
+  stats_["solution_type"] =  (*solutionType_.find(pdfeasible)).second;
   
   info = DSDPGetY(dsdp_,&output(SDP_SOLVER_X).at(0),n_);
   

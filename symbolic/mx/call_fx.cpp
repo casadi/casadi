@@ -34,7 +34,7 @@ namespace CasADi {
 
     // Number inputs and outputs
     int num_in = fcn.getNumInputs();
-    casadi_assert(arg.size()<=num_in);
+    casadi_assert_message(arg.size()<=num_in,"Argument list length (" << arg.size() << ") exceeds number of inputs (" << num_in << ")");
 
     // Add arguments if needed
     arg.resize(num_in);
@@ -56,10 +56,8 @@ namespace CasADi {
     fcn_->printPart(this,stream,part);
   }
 
-  void CallFX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
-                               const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens,
-                               const DMatrixPtrVV& aseed, DMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<double>& rtmp) {
-    fcn_->evaluateD(this,arg,res,fseed,fsens,aseed,asens,itmp,rtmp);
+  void CallFX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp) {
+    fcn_->evaluateD(this,arg,res,itmp,rtmp);
   }
 
   int CallFX::getNumOutputs() const {
@@ -74,10 +72,8 @@ namespace CasADi {
     return fcn_;
   }
 
-  void CallFX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
-                                const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens,
-                                const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens, std::vector<int>& itmp, std::vector<SX>& rtmp) {
-    fcn_->evaluateSX(this,arg,res,fseed,fsens,aseed,asens,itmp,rtmp);
+  void CallFX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res, std::vector<int>& itmp, std::vector<SX>& rtmp) {
+    fcn_->evaluateSX(this,arg,res,itmp,rtmp);
   }
 
   void CallFX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given) {

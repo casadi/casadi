@@ -59,62 +59,40 @@ namespace CasADi{
   }
 
   template<bool TrX, bool TrY>
-  void Multiplication<TrX,TrY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void Multiplication<TrX,TrY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool TrX, bool TrY>
-  void Multiplication<TrX,TrY>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
+  void Multiplication<TrX,TrY>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool TrX, bool TrY>
   template<typename T, typename MatV, typename MatVV>
-  void Multiplication<TrX,TrY>::evaluateGen(const MatV& input, MatV& output, const MatVV& fwdSeed, MatVV& fwdSens, const MatVV& adjSeed, MatVV& adjSens){
-    int nfwd = fwdSens.size();
-    int nadj = adjSeed.size();
-
+  void Multiplication<TrX,TrY>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
     if(input[0]!=output[0]){
       copy(input[0]->begin(),input[0]->end(),output[0]->begin());
     }
     Matrix<T>::mul_no_alloc_nt(*input[1],*input[2],*output[0]);
-
-    // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
-    for(int d=0; d<nfwd; ++d){
-      if(fwdSeed[d][0]!=fwdSens[d][0]){
-        copy(fwdSeed[d][0]->begin(),fwdSeed[d][0]->end(),fwdSens[d][0]->begin());
-      }
-      Matrix<T>::mul_no_alloc_nt(*fwdSeed[d][1],*input[2],*fwdSens[d][0]);
-      Matrix<T>::mul_no_alloc_nt(*input[1],*fwdSeed[d][2],*fwdSens[d][0]);
-    }
-
-    // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      Matrix<T>::mul_no_alloc_nn(*adjSeed[d][0],*input[2],*adjSens[d][1]);
-      Matrix<T>::mul_no_alloc_tn(*adjSeed[d][0],*input[1],*adjSens[d][2]);
-      if(adjSeed[d][0]!=adjSens[d][0]){
-        transform(adjSeed[d][0]->begin(),adjSeed[d][0]->end(),adjSens[d][0]->begin(),adjSens[d][0]->begin(),std::plus<T>());
-        adjSeed[d][0]->setZero();
-      }
-    }
   }
 
   template<bool TrX, bool TrY>
   void Multiplication<TrX,TrY>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     if(!output_given)
-      *output[0] = *input[0] + mul(tr<TrX>(*input[1]),tr<TrY>(*input[2]));
+      *output[0] = *input[0] + mul(tr<TrX>(*input[1]),tr<TrY>(*input[2]),(*input[0]).sparsity());
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for(int d=0; d<nfwd; ++d){
-      *fwdSens[d][0] = *fwdSeed[d][0] + mul(tr<TrX>(*fwdSeed[d][1]),tr<TrY>(*input[2])) + mul(tr<TrX>(*input[1]),tr<TrY>(*fwdSeed[d][2]));
+      *fwdSens[d][0] = *fwdSeed[d][0] + mul(tr<TrX>(*fwdSeed[d][1]),tr<TrY>(*input[2]),(*input[0]).sparsity()) + mul(tr<TrX>(*input[1]),tr<TrY>(*fwdSeed[d][2]),(*input[0]).sparsity());
     }
   
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][1] += tr<TrX>(mul(*adjSeed[d][0],tr<!TrY>(*input[2])));
-      *adjSens[d][2] += tr<TrY>(mul(tr<!TrX>(*input[1]),*adjSeed[d][0]));
+      *adjSens[d][1] += tr<TrX>(mul(*adjSeed[d][0],tr<!TrY>(*input[2]),tr<TrX>(*input[1]).sparsity()));
+      *adjSens[d][2] += tr<TrY>(mul(tr<!TrX>(*input[1]),*adjSeed[d][0],tr<TrY>(*input[2]).sparsity()));
       if(adjSeed[d][0]!=adjSens[d][0]){
         *adjSens[d][0] += *adjSeed[d][0];
         *adjSeed[d][0] = MX();

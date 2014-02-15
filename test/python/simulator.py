@@ -54,7 +54,7 @@ class Simulatortests(casadiTestCase):
     integrator.init()
     q0   = MX("q0")
     par  = MX("p")
-    qend,_,_,_ = integrator.call([q0,par])
+    qend, = integratorOut(integrator.call(integratorIn(x0=q0,p=par)),"xf")
     qe=MXFunction([q0,par],[qend])
     qe.init()
     self.integrator = integrator
@@ -65,6 +65,93 @@ class Simulatortests(casadiTestCase):
     self.f = f
     self.num={'tend':2.3,'q0':7.1,'p':2}
     pass
+
+  def test_sim_full(self):
+    self.message("Simulator inputs")
+    num = self.num
+    N = 4
+    tc = DMatrix(n.linspace(0,num['tend'],N))
+    
+    t=ssym("t")
+    q=ssym("q")
+    p=ssym("p")
+    
+    out = SXFunction(daeIn(t=t, x=q, p=p),[q])
+    out.init()
+        
+    f=SXFunction(daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
+    f.init()
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-15)
+    integrator.setOption("abstol",1e-15)
+    integrator.setOption("fsens_err_con", True)
+    #integrator.setOption("verbose",True)
+    integrator.setOption("t0",0)
+    integrator.setOption("tf",2.3)
+    integrator.init()
+    sim = Simulator(integrator,out,tc)
+    sim.init()
+    
+    solution = SXFunction(integratorIn(x0=q, p=p),[vertcat([q*exp(t**3/(3*p)) for t in tc])])
+    solution.init()
+    
+    for f in [sim,solution]:
+      f.setInput(0.3,"x0")
+      f.setInput(0.7,"p")
+    
+    self.checkfx(sim,solution,adj=False,jacobian=False,sens_der=False,evals=False,digits=6)
+
+  def test_controlsim_full(self):
+    self.message("ControlSimulator inputs")
+    num = self.num
+    N = 4
+    tc = DMatrix(n.linspace(0,num['tend'],N))
+    
+    t=ssym("t")
+    q=ssym("q")
+    p=ssym("p")
+    u=ssym("u")
+    out = SXFunction(controldaeIn(t=t, x=q, p=p),[q])
+    out.init()
+        
+    f=SXFunction(daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
+    f.init()
+    integrator = CVodesIntegrator(f)
+    integrator.setOption("reltol",1e-15)
+    integrator.setOption("abstol",1e-15)
+    integrator.setOption("fsens_err_con", True)
+    #integrator.setOption("verbose",True)
+    integrator.setOption("t0",0)
+    integrator.setOption("tf",2.3)
+    integrator.init()
+    
+    cdae = SXFunction(controldaeIn(t=t,x=q,p=p,u=u),daeOut(ode=u*q/p*t**2))
+    cdae.init()
+    
+    sim = ControlSimulator(cdae,out,tc)
+    sim.setOption("integrator",CVodesIntegrator)
+    sim.setOption("integrator_options",{"reltol": 1e-15, "abstol": 1e-15, "fsens_err_con": True})
+    sim.init()
+    
+    U = ssym("U",N-1)
+    
+    result = SXMatrix(q)
+    for i in range(N-1):
+      tf = tc[i+1]
+      t0 = tc[i]
+      xf = lambda t,t0: exp((t**3-t0**3)/3/p*U[i])
+      result.append(result[-1]*xf(tf,t0))
+    
+    solution = SXFunction(controlsimulatorIn(x0=q, p=p,u=U),[result])
+    solution.init()
+    
+    for f in [sim,solution]:
+      f.setInput(0.3,"x0")
+      f.setInput(0.7,"p")
+      f.setInput(2,"u")
+      f.setInput(DMatrix(range(1,N))/10,"u")
+    
+    self.checkfx(sim,solution,adj=False,jacobian=False,sens_der=False,evals=False,digits=6)
     
   def test_sim_inputs(self):
     self.message("Simulator inputs")
@@ -422,244 +509,7 @@ class Simulatortests(casadiTestCase):
     p=num['p']
 
     self.assertAlmostEqual(sim.getOutput()[-1],q0*exp((tend**3-0.7**3)/(3*p)),9,"Evaluation output mismatch")
-    
-    
-  def test_simulator_sensitivities(self):
-    self.message("Forward sensitivities")
-    t = SX("t")
-
-    x  = SX("x") 
-    v  = SX("v") 
-
-    u = SX("u") 
-
-    b = SX("b")
-    b_ = 0.1
-    k = SX("k")
-    k_ = 1
-    
-
-    rhs = vertcat([v, ( -  b*v - k*x)])
-    f=SXFunction(daeIn(t=t, x=vertcat([x,v]), p=vertcat([b,k])),daeOut(ode=rhs))
-    f.init()
-    
-    cf=SXFunction(controldaeIn(t=t, x=vertcat([x,v]), p=vertcat([b,k])),[rhs])
-    cf.init()
-
-    x0 = SX("x0")
-    dx0 = SX("dx0")
-
-
-    X0 = DMatrix([1,0])
-    p_ = [b_,k_]
-
-    # algebraic solution
-    sole = exp(-(b*t)/2)*((sin((sqrt(4*k-b**2)*t)/2)*(2*(dx0+x0*b)-x0*b))/sqrt(4*k-b**2)+x0*cos((sqrt(4*k-b**2)*t)/2))
-    sol = SXFunction([t,vertcat([x0,dx0]),vertcat([b,k])],[vertcat([sole,jacobian(sole,t)])])
-    sol.init()
-    sol.setInput(50,0)
-    sol.setInput(X0,1)
-    sol.setInput(p_,2)
-
-
-    for Integrator in [CVodesIntegrator, IdasIntegrator]:
-      integrator = Integrator(f)
-      #integrator.setOption("verbose",True)
-      #integrator.setOption("monitor",["integrate"])
-      integrator.setOption("fsens_abstol",1e-12)
-      integrator.setOption("fsens_reltol",1e-12)
-      integrator.setOption("fsens_err_con", True)
-      integrator.setOption("tf",50)
-      integrator.init()
-
-      integrator.setInput(X0,"x0")
-      integrator.setInput(p_,"p")
-      integrator.setFwdSeed([1,0],"x0")
-      integrator.setFwdSeed([0,0],"p")
-      integrator.evaluate(1,0)
-      
-      fwdSens_int = DMatrix(integrator.getFwdSens("xf"))
-
-      ts = linspace(0,50,100)
-
-      sim=Simulator(integrator,ts)
-      sim.init()
-      sim.setInput(X0,"x0")
-      sim.setInput(p_,"p")
-      sim.setFwdSeed([1,0],"x0")
-      sim.setFwdSeed([0,0],"p")
-      sim.evaluate(1,0)
-
-      fwdSens_sim = DMatrix(sim.getFwdSens("xf")[-1,:])
-      
-      csim = ControlSimulator(cf,ts)
-      csim.setOption("integrator",Integrator)
-      csim.setOption("integrator_options",{"fsens_abstol": 1e-12, "fsens_reltol": 1e-12, "fsens_err_con": True})
-      csim.init()
-      csim.setInput(X0,"x0")
-      csim.setInput(p_,"p")
-      csim.setFwdSeed([1,0],"x0")
-      csim.setFwdSeed([0,0],"p")
-      csim.evaluate(1,0)
-      fwdSens_csim = DMatrix(csim.getFwdSens("xf")[-1,:])
-      
-      sol.setFwdSeed([1,0],1)
-      sol.setFwdSeed([0,0],2)
-      sol.evaluate(1,0)
-      fwdSens_exact = sol.getFwdSens()
-      
-      #digits = 6
-      #if (Integrator is IdasIntegrator):
-      digits = 2 # Joel: No reason to treat Idas differently from CVodes
-
-      self.assertAlmostEqual(fwdSens_int[0],fwdSens_exact[0],digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_int[1],fwdSens_exact[1],digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_sim[0],fwdSens_exact[0],digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_sim[1],fwdSens_exact[1],digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_csim[0],fwdSens_exact[0],digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_csim[1],fwdSens_exact[1],digits,"Forward sensitivity")
-      
-      integrator.setFwdSeed([0,0],"x0")
-      integrator.setFwdSeed([1,0],"p")
-      integrator.evaluate(1,0)
-      
-      fwdSens_int = DMatrix(integrator.getFwdSens("xf"))
-      
-      sim.setFwdSeed([0,0],"x0")
-      sim.setFwdSeed([1,0],"p")
-      sim.evaluate(1,0)
-
-      fwdSens_sim = DMatrix(sim.getFwdSens("xf")[-1,:])
-
-      csim.setFwdSeed([0,0],"x0")
-      csim.setFwdSeed([1,0],"p")
-      csim.evaluate(1,0)
-      fwdSens_csim = DMatrix(sim.getFwdSens("xf")[-1,:])
-      
-      sol.setFwdSeed([0,0],1)
-      sol.setFwdSeed([1,0],2)
-      sol.evaluate(1,0)
-      fwdSens_exact = sol.getFwdSens()
-      
-      #digits = 6
-      #if (Integrator is IdasIntegrator):
-      digits = 2 # Joel: No reason to treat Idas differently from CVodes
-
-      self.assertAlmostEqual(fwdSens_int[0],fwdSens_exact[0], digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_int[1],fwdSens_exact[1], digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_sim[0],fwdSens_exact[0], digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_sim[1],fwdSens_exact[1], digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_csim[0],fwdSens_exact[0], digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_csim[1],fwdSens_exact[1], digits,"Forward sensitivity")
-
-  def test_simulator_sensitivities_adj(self):
-    # This test is currently disabled, awaiting support for the feature
-    return
-    
-    self.message("Adjoint sensitivities")
-    t = SX("t")
-
-    x  = SX("x") 
-    v  = SX("v") 
-
-    u = SX("u") 
-
-    b = SX("b")
-    b_ = 0.1
-    k = SX("k")
-    k_ = 1
-    
-
-    rhs = vertcat([v, ( -  b*v - k*x)])
-    f=SXFunction(daeIn(t=t, x=[x,v], p=[b,k]),daeOut(ode=rhs))
-    f.init()
-    
-    cf=SXFunction(controldaeIn(t=t, x=[x,v], p=[b,k]),[rhs])
-    cf.init()
-
-    x0 = SX("x0")
-    dx0 = SX("dx0")
-
-
-    X0 = DMatrix([1,0])
-    p_ = [b_,k_]
-    
-    
-    Te = 50
-
-    # algebraic solution
-    sole = exp(-(b*t)/2)*((sin((sqrt(4*k-b**2)*t)/2)*(2*(dx0+x0*b)-x0*b))/sqrt(4*k-b**2)+x0*cos((sqrt(4*k-b**2)*t)/2))
-    sol = SXFunction([[t],[x0,dx0],[b,k]],[vertcat([sole,jacobian(sole,t)])])
-    sol.init()
-    sol.setInput(Te,0)
-    sol.setInput(X0,1)
-    sol.setInput(p_,2)
-
-    Integrator = CVodesIntegrator
-  
-    integrator = Integrator(f)
-    #integrator.setOption("verbose",True)
-    #integrator.setOption("monitor",["integrate"])
-    integrator.setOption("abstolB",1e-12)
-    integrator.setOption("reltolB",1e-12)
-    integrator.setOption("fsens_err_con", True)
-    integrator.setOption("tf",Te)
-    integrator.init()
-
-    integrator.setInput(X0,"x0")
-    integrator.setInput(p_,"p")
-    integrator.setAdjSeed([1,0],"xf")
-    integrator.evaluate(0,1)
-    
-    adjSens_X0_int = DMatrix(integrator.getAdjSens("x0"))
-    adjSens_P_int = DMatrix(integrator.getAdjSens("p"))
-
-    N = 100
-    ts = linspace(0,Te,N)
-
-    sim=Simulator(integrator,ts)
-    sim.init()
-    sim.setInput(X0,"x0")
-    sim.setInput(p_,"p")
-    sim.setAdjSeed([0,0]*(N-1) + [1,0],0)
-    sim.evaluate(0,1)
-
-    adjSens_X0_sim = DMatrix(sim.getAdjSens("x0"))
-    adjSens_P_sim = DMatrix(sim.getAdjSens("p"))
-
-    
-    csim = ControlSimulator(cf,ts)
-    csim.setOption("integrator",Integrator)
-    csim.setOption("integrator_options",{"abstolB": 1e-12, "reltolB": 1e-12, "fsens_err_con": True, "steps_per_checkpoint":1000})
-    csim.init()
-    csim.setInput(X0,"x0")
-    csim.setInput(p_,"p")
-    csim.setAdjSeed([0,0]*(N-1) + [1,0],0)
-    csim.evaluate(0,1)
-    adjSens_X0_csim = DMatrix(sim.getAdjSens("x0"))
-    adjSens_P_csim = DMatrix(sim.getAdjSens("p"))
-    
-    sol.setAdjSeed([1,0])
-    sol.evaluate(0,1)
-    adjSens_X0_exact = sol.getAdjSens(1)
-    adjSens_P_exact = sol.getAdjSens(2)
-    
-    digits = 3
-
-    self.assertAlmostEqual(adjSens_X0_int[0],adjSens_X0_exact[0],digits,"Adjoint sensitivity")
-    self.assertAlmostEqual(adjSens_X0_int[1],adjSens_X0_exact[1],digits,"Adjoint sensitivity")
-    self.assertAlmostEqual(adjSens_X0_sim[0],adjSens_X0_exact[0],digits,"Adjoint sensitivity")
-    self.assertAlmostEqual(adjSens_X0_sim[1],adjSens_X0_exact[1],digits,"Adjoint sensitivity")
-    self.assertAlmostEqual(adjSens_X0_csim[0],adjSens_X0_exact[0],digits,"Adjoint sensitivity")
-    self.assertAlmostEqual(adjSens_X0_csim[1],adjSens_X0_exact[1],digits,"Adjoint sensitivity")
-
-    self.assertAlmostEqual(adjSens_P_int[0],adjSens_P_exact[0],digits,"Adjoint sensitivity")
-    self.assertAlmostEqual(adjSens_P_int[1],adjSens_P_exact[1],digits,"Adjoint sensitivity")
-    self.assertAlmostEqual(adjSens_P_sim[0],adjSens_P_exact[0],digits,"Adjoint sensitivity")
-    self.assertAlmostEqual(adjSens_P_sim[1],adjSens_P_exact[1],digits,"Adjoint sensitivity")
-    self.assertAlmostEqual(adjSens_P_csim[0],adjSens_P_exact[0],digits,"Adjoint sensitivity")
-    self.assertAlmostEqual(adjSens_P_csim[1],adjSens_P_exact[1],digits,"Adjoint sensitivity")
-    
+            
 if __name__ == '__main__':
     unittest.main()
 

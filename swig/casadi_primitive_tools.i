@@ -36,7 +36,7 @@ except:
   pass
 
 try:
-  from numpy import sin, cos, tan, sqrt, log, exp, floor, ceil, fmin, fmax, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, fabs, sign, arctanh, arcsinh, arccosh
+  from numpy import sin, cos, tan, sqrt, log, exp, floor, ceil, fmin, fmax, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, fabs, sign, arctanh, arcsinh, arccosh, copysign
 except:
   sin = lambda x: x.sin()
   cos = lambda x: x.cos()
@@ -60,6 +60,7 @@ except:
   arctanh = lambda x: x.arctanh()
   arcsinh = lambda x: x.arcsinh()
   arccosh = lambda x: x.arccosh()
+  copysign = lambda x,y: x.copysign(y)
 %}
 #endif // SWIGPYTHON
 
@@ -79,6 +80,11 @@ GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<int>)
 GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<double>)
 GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<CasADi::SX>)
 GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::MX)
+
+GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(CasADi::Matrix<double>)
+GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(CasADi::Matrix<CasADi::SX>)
+GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(CasADi::MX)
+
 
 GENERIC_EXPRESSION_TOOLS_TEMPLATES(int)
 GENERIC_EXPRESSION_TOOLS_TEMPLATES(double)

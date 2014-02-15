@@ -22,60 +22,6 @@
 <tr><td>step</td><td>CasADi::SimulatorInternal</td></tr>
 </table>
 */
-/** \class CasADi::KinsolInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_djac</td><td>CasADi::KinsolInternal</td></tr>
-<tr><td>eval_f</td><td>CasADi::KinsolInternal</td></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::KinsolSolver
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_djac</td><td>CasADi::KinsolInternal</td></tr>
-<tr><td>eval_f</td><td>CasADi::KinsolInternal</td></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::WorhpInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>eval_g</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>eval_grad_f</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>eval_h</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>eval_jac_g</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::WorhpSolver
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>eval_g</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>eval_grad_f</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>eval_h</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>eval_jac_g</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
 /** \class CasADi::CVodesInternal
 \n
 \par
@@ -210,6 +156,36 @@
 <tr><td>rhsQB</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
+/** \class CasADi::KnitroInternal
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_f</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::KnitroSolver
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_f</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
 /** \class CasADi::NewtonImplicitInternal
 \n
 \par
@@ -240,32 +216,90 @@
 <tr><td>stepsize</td><td>CasADi::NewtonImplicitInternal</td></tr>
 </table>
 */
-/** \class CasADi::KnitroInternal
+/** \class CasADi::StabilizedSQPInternal
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>eval_g</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>eval_grad_f</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>eval_h</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>eval_jac_g</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>dx</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>qp</td><td>CasADi::StabilizedSQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::StabilizedSQPMethod
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>dx</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::StabilizedSQPInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>qp</td><td>CasADi::StabilizedSQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::KinsolInternal
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_djac</td><td>CasADi::KinsolInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
-/** \class CasADi::KnitroSolver
+/** \class CasADi::KinsolSolver
 \n
 \par
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>eval_g</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>eval_grad_f</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>eval_h</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>eval_jac_g</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_djac</td><td>CasADi::KinsolInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::KinsolInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::WorhpInternal
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::WorhpSolver
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 </table>

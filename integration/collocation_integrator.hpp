@@ -23,58 +23,57 @@
 #ifndef COLLOCATION_INTEGRATOR_HPP
 #define COLLOCATION_INTEGRATOR_HPP
 
-#include "symbolic/fx/integrator.hpp"
+#include "implicit_fixed_step_integrator.hpp"
 
 namespace CasADi{
   
-class CollocationIntegratorInternal;
+  class CollocationIntegratorInternal;
   
-/**
-  \brief Collocation integrator
-  ODE/DAE integrator based on collocation
+  /**
+     \brief Fixed-step implicit Runge-Kutta integrator
+     ODE/DAE integrator based on collocation schemes
   
-  The method is still under development
+     The method is still under development
   
-  @copydoc DAE_doc
+     @copydoc DAE_doc
   
-  \author Joel Andersson
-  \date 2011
-*/
-class CollocationIntegrator : public Integrator {
+     \author Joel Andersson
+     \date 2014
+  */
+  class CollocationIntegrator : public ImplicitFixedStepIntegrator{
   public:
     /** \brief  Default constructor */
     CollocationIntegrator();
     
     /** \brief  Create an integrator for explicit ODEs
-    *   \param f dynamical system
-    * \copydoc scheme_DAEInput
-    * \copydoc scheme_DAEOutput
-    *   \param g backwards system
-    * \copydoc scheme_RDAEInput
-    * \copydoc scheme_RDAEOutput
-    */
+     *   \param f dynamical system
+     * \copydoc scheme_DAEInput
+     * \copydoc scheme_DAEOutput
+     *   \param g backwards system
+     * \copydoc scheme_RDAEInput
+     * \copydoc scheme_RDAEOutput
+     */
     explicit CollocationIntegrator(const FX& f, const FX& g=FX());
 
+    //@{
     /// Access functions of the node
     CollocationIntegratorInternal* operator->();
     const CollocationIntegratorInternal* operator->() const;
+    //@}
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
     /// Static creator function
-    #ifdef SWIG
+#ifdef SWIG
     %callback("%s_cb");
-    #endif
+#endif
     static Integrator creator(const FX& f, const FX& g){ return CollocationIntegrator(f,g);}
-    #ifdef SWIG
+#ifdef SWIG
     %nocallback;
-    #endif
-
-    /// @Joris: This would be an alternative
-    static integratorCreator getCreator(){return creator;}
+#endif
     
-};
+  };
 
 } // namespace CasADi
 

@@ -149,7 +149,7 @@ ENDMACRO(SWIG_GET_EXTRA_OUTPUT_FILES)
 #
 # Take swig (*.i) file and add proper custom commands for it
 #
-MACRO(SWIG_ADD_SOURCE_TO_MODULE name outfiles infile)
+MACRO(SWIG_ADD_SOURCE_TO_MODULE name xmlmode outfiles infile)
   SET(swig_full_infile ${infile})
   GET_FILENAME_COMPONENT(swig_source_file_path "${infile}" PATH)
   GET_FILENAME_COMPONENT(swig_source_file_name_we "${infile}" NAME_WE)
@@ -207,13 +207,19 @@ MACRO(SWIG_ADD_SOURCE_TO_MODULE name outfiles infile)
   SET(swig_generated_file_fullname
     "${swig_generated_file_fullname}${SWIG_MODULE_${name}_LANGUAGE}_wrap")
 
-  IF(swig_source_file_cplusplus)
+  SET(xmlmode_test ${xmlmode})
+  IF(xmlmode_test)
     SET(swig_generated_file_fullname
-      "${swig_generated_file_fullname}.${SWIG_CXX_EXTENSION}")
-  ELSE(swig_source_file_cplusplus)
-    SET(swig_generated_file_fullname
-      "${swig_generated_file_fullname}.c")
-  ENDIF(swig_source_file_cplusplus)
+      "${swig_generated_file_fullname}.xml")
+  ELSE(xmlmode_test)
+    IF(swig_source_file_cplusplus)
+      SET(swig_generated_file_fullname
+        "${swig_generated_file_fullname}.${SWIG_CXX_EXTENSION}")
+    ELSE(swig_source_file_cplusplus)
+      SET(swig_generated_file_fullname
+        "${swig_generated_file_fullname}.c")
+    ENDIF(swig_source_file_cplusplus)
+  ENDIF(xmlmode_test)
 
   #MESSAGE("Full path to source file: ${swig_source_file_fullname}")
   #MESSAGE("Full path to the output file: ${swig_generated_file_fullname}")
@@ -276,7 +282,7 @@ MACRO(SWIG_ADD_MODULE name language)
   SET(swig_generated_sources)
   SET(swig_extra_generated_files)
   FOREACH(it ${swig_dot_i_sources})
-    SWIG_ADD_SOURCE_TO_MODULE(${name} swig_generated_source ${it})
+    SWIG_ADD_SOURCE_TO_MODULE(${name} FALSE swig_generated_source ${it})
     SET(swig_generated_sources ${swig_generated_sources} "${swig_generated_source}")
   ENDFOREACH(it)
   GET_DIRECTORY_PROPERTY(swig_extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
@@ -314,6 +320,36 @@ MACRO(SWIG_ADD_MODULE name language)
     ENDIF(WIN32 AND NOT CYGWIN)
   ENDIF ("${swig_lowercase_language}" STREQUAL "python")
 ENDMACRO(SWIG_ADD_MODULE)
+
+
+MACRO(SWIG_ADD_MODULE_XML name)
+  SWIG_MODULE_INITIALIZE(${name} xml)
+  SET(swig_dot_i_sources)
+  SET(swig_other_sources)
+  FOREACH(it ${ARGN})
+    IF(${it} MATCHES ".*\\.i$")
+      SET(swig_dot_i_sources ${swig_dot_i_sources} "${it}")
+    ELSE(${it} MATCHES ".*\\.i$")
+      SET(swig_other_sources ${swig_other_sources} "${it}")
+    ENDIF(${it} MATCHES ".*\\.i$")
+  ENDFOREACH(it)
+
+  SET(swig_generated_sources)
+  SET(swig_extra_generated_files)
+  FOREACH(it ${swig_dot_i_sources})
+    SWIG_ADD_SOURCE_TO_MODULE(${name} TRUE swig_generated_source ${it})
+    SET(swig_generated_sources ${swig_generated_sources} "${swig_generated_source}")
+  ENDFOREACH(it)
+  GET_DIRECTORY_PROPERTY(swig_extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES
+    ADDITIONAL_MAKE_CLEAN_FILES "${swig_extra_clean_files};${swig_generated_sources}")
+    
+  ADD_LIBRARY(${SWIG_MODULE_${name}_REAL_NAME}
+    MODULE
+    ${swig_generated_sources}
+    ${swig_other_sources})
+  SET_TARGET_PROPERTIES(${SWIG_MODULE_${name}_REAL_NAME} PROPERTIES LINKER_LANGUAGE C)
+ENDMACRO(SWIG_ADD_MODULE_XML)
 
 #
 # Like TARGET_LINK_LIBRARIES but for swig modules

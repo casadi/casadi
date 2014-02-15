@@ -89,11 +89,12 @@ for N in range(1,11):
   # Get the coefficients of the collocation equation using AD
   C = DMatrix.zeros(K+1,K+1)
   for j in range(K+1):
+    tfcn = l[j].tangent()
+    tfcn.init()
     for k in range(K+1):
-      l[j].setInput(tau_root[k])
-      l[j].setFwdSeed(1.0)
-      l[j].evaluate(1,0)
-      C[j,k] = l[j].getFwdSens()
+      tfcn.setInput(tau_root[k])
+      tfcn.evaluate()
+      C[j,k] = tfcn.getOutput()
   print "C = ", C
   
   # Collocated states

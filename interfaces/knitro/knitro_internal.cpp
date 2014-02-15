@@ -146,12 +146,10 @@ namespace CasADi{
   
   }
 
-  void KnitroInternal::evaluate(int nfdir, int nadir){
+  void KnitroInternal::evaluate(){
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert(kc_handle_==0);
     kc_handle_ = KTR_new();
-  
-    casadi_assert(nfdir==0 && nadir==0);
     casadi_assert(kc_handle_!=0);
     int status;
   

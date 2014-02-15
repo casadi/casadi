@@ -286,8 +286,6 @@ namespace CasADi{
  
     // Generate function
     MXFunction res_fcn(res_fcn_in,res_fcn_out);
-    res_fcn.setOption("number_of_fwd_dir",0);
-    res_fcn.setOption("number_of_adj_dir",0);
     res_fcn.init();
     if(verbose_){
       cout << "Generated residual function ( " << res_fcn.getAlgorithmSize() << " nodes)." << endl;
@@ -459,8 +457,6 @@ namespace CasADi{
   
     MXFunction vec_fcn(mfcn_in,vec_fcn_out);
     vec_fcn.setOption("name","vec_fcn");
-    vec_fcn.setOption("number_of_fwd_dir",0);
-    vec_fcn.setOption("number_of_adj_dir",0);
     vec_fcn.init();
     if(verbose_){
       cout << "Generated linearization function ( " << vec_fcn.getAlgorithmSize() << " nodes)." << endl;
@@ -517,8 +513,6 @@ namespace CasADi{
   
     // Step expansion function
     MXFunction exp_fcn(mfcn_in,exp_fcn_out);
-    exp_fcn.setOption("number_of_fwd_dir",0);
-    exp_fcn.setOption("number_of_adj_dir",0);
     exp_fcn.setOption("name","exp_fcn");
     exp_fcn.init();
     if(verbose_){
@@ -611,9 +605,8 @@ namespace CasADi{
     }
   }
 
-  void SCPgenInternal::evaluate(int nfdir, int nadir){
-    casadi_assert(nfdir==0 && nadir==0);
-
+  void SCPgenInternal::evaluate(){
+    if (inputs_check_) checkInputs();
     checkInitialBounds();
   
     // Get problem data

@@ -118,9 +118,15 @@ namespace CasADi{
     return ret;
   }
 
-  CRSSparsity sp_rowcol(const std::vector<int>& row, const std::vector<int>& col, int nrow, int ncol) {
+  CRSSparsity sp_rowcol(const std::vector<int>& row_, const std::vector<int>& col_, int nrow, int ncol) {
+    std::vector<int> row = row_;
+    std::vector<int> col = col_;
+    
     std::vector<int> rowind(nrow+1);
     std::vector<int> col_new(row.size()*col.size());
+    
+    std::sort(row.begin(),row.end());
+    std::sort(col.begin(),col.end());
   
     // resulting col: the entries of col are repeated row.size() times
     for (int i=0;i<row.size();i++)

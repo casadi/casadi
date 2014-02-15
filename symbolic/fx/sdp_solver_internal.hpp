@@ -42,13 +42,19 @@ class SDPSolverInternal : public FXInternal{
     virtual void init();
     
     // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
     
     // Solve the system of equations
     virtual void solve();
     
     /// Set options that make the SDP solver more suitable for solving SOCPs
     virtual void setSOCPOptions() { };
+    
+    /// \brief Check if the numerical values of the supplied bounds make sense
+    virtual void checkInputs() const;
+    
+    /// Print out problem statement for debugging
+    void printProblem(std::ostream &stream=std::cout) const;
     
   protected:
   
@@ -93,6 +99,9 @@ class SDPSolverInternal : public FXInternal{
     * You may want to avoid calculating this variable for problems with n large, as is always dense (n x n).
     */
     bool calc_p_;
+    
+    /// Indicates wether problem is printed before solving
+    bool print_problem_;
 };
 
 

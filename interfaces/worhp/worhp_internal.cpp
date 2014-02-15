@@ -603,16 +603,29 @@ namespace CasADi{
     }
   }
 
-  void WorhpInternal::evaluate(int nfdir, int nadir){
+  void WorhpInternal::evaluate(){
     log("WorhpInternal::evaluate");
-    casadi_assert(nfdir==0 && nadir==0);
+    
+    if (gather_stats_) {
+      Dictionary iterations;
+      iterations["iter_sqp"] = std::vector<int>();
+      iterations["inf_pr"] = std::vector<double>();
+      iterations["inf_du"] = std::vector<double>();
+      iterations["obj"] = std::vector<double>();
+      iterations["alpha_pr"] = std::vector<double>();
+      stats_["iterations"] = iterations;
+    }
     
     // Prepare the solver
     reset();
+    
+    if (inputs_check_) checkInputs();
     checkInitialBounds();
   
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
+    
+    n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
   
     // Get inputs
     log("WorhpInternal::evaluate: Reading user inputs");
@@ -661,28 +674,54 @@ namespace CasADi{
         Worhp(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
       }
 
-      if (GetUserAction(&worhp_c_, iterOutput)) {
-        if (!callback_.isNull()) {
-          double time1 = clock();
-          // Copy outputs
-          if (!callback_.input(NLP_SOLVER_X).empty())
-            callback_.input(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n);
-          if (!callback_.input(NLP_SOLVER_F).empty())
-            callback_.input(NLP_SOLVER_F).set(worhp_o_.F);
-          if (!callback_.input(NLP_SOLVER_G).empty())
-            callback_.input(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
-          if (!callback_.input(NLP_SOLVER_LAM_X).empty()) 
-            callback_.input(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
-          if (!callback_.input(NLP_SOLVER_LAM_G).empty())
-            callback_.input(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
 
-          double time2 = clock();
-          t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
-          time1 = clock();
-          callback_.evaluate();
-          time2 = clock();
-          t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
+      if (GetUserAction(&worhp_c_, iterOutput)) {
+            
+        if (!worhp_w_.FirstIteration) {
+          if (gather_stats_) {
+            Dictionary & iterations = stats_["iterations"];
+            static_cast<std::vector<int> &>(iterations["iter_sqp"]).push_back(worhp_w_.MinorIter);
+            static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(worhp_w_.NormMax_CV);
+            static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(worhp_w_.ScaledKKT);
+            static_cast<std::vector<double> &>(iterations["obj"]).push_back(worhp_o_.F);
+            static_cast<std::vector<double> &>(iterations["alpha_pr"]).push_back(worhp_w_.ArmijoAlpha);
+          }
+        
+          if (!callback_.isNull()) {
+            double time1 = clock();
+            // Copy outputs
+            if (!output(NLP_SOLVER_X).empty())
+              output(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n);
+            if (!output(NLP_SOLVER_F).empty())
+              output(NLP_SOLVER_F).set(worhp_o_.F);
+            if (!output(NLP_SOLVER_G).empty())
+              output(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
+            if (!output(NLP_SOLVER_LAM_X).empty()) 
+              output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
+            if (!output(NLP_SOLVER_LAM_G).empty())
+              output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
+              
+            Dictionary iteration;
+            iteration["iter"] = worhp_w_.MajorIter;
+            iteration["iter_sqp"] = worhp_w_.MinorIter;
+            iteration["inf_pr"] = worhp_w_.NormMax_CV;
+            iteration["inf_du"] = worhp_w_.ScaledKKT;
+            iteration["obj"] = worhp_o_.F;
+            iteration["alpha_pr"] = worhp_w_.ArmijoAlpha;
+            stats_["iteration"] = iteration;
+
+            double time2 = clock();
+            t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
+            time1 = clock();
+            int ret = callback_(ref_,user_data_);
+            time2 = clock();
+            t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
+            
+            if(ret) worhp_c_.status = TerminatedByUser;
+            
+          }
         }
+
     
         IterationOutput(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
         DoneUserAction(&worhp_c_, iterOutput);
@@ -732,11 +771,26 @@ namespace CasADi{
  
     if (hasOption("print_time") && bool(getOption("print_time"))) {
       // Write timings
-      cout << "time spent in eval_f: " << t_eval_f_ << " s." << endl;
-      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s." << endl;
-      cout << "time spent in eval_g: " << t_eval_g_ << " s." << endl;
-      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s." << endl;
-      cout << "time spent in eval_h: " << t_eval_h_ << " s." << endl;
+      cout << "time spent in eval_f: " << t_eval_f_ << " s.";
+      if (n_eval_f_>0)
+        cout << " (" << n_eval_f_ << " calls, " << (t_eval_f_/n_eval_f_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
+      if (n_eval_grad_f_>0)
+        cout << " (" << n_eval_grad_f_ << " calls, " << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_g: " << t_eval_g_ << " s.";
+      if (n_eval_g_>0)
+        cout << " (" << n_eval_g_ << " calls, " << (t_eval_g_/n_eval_g_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
+      if (n_eval_jac_g_>0)
+        cout << " (" << n_eval_jac_g_ << " calls, " << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
+      cout << endl;
+      cout << "time spent in eval_h: " << t_eval_h_ << " s.";
+      if (n_eval_h_>1)
+        cout << " (" << n_eval_h_ << " calls, " << (t_eval_h_/n_eval_h_)*1000 << " ms. average)";
+      cout << endl;
       cout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
       cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
       cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
@@ -750,6 +804,15 @@ namespace CasADi{
     stats_["t_mainloop"] = t_mainloop_;
     stats_["t_callback_fun"] = t_callback_fun_;
     stats_["t_callback_prepare"] = t_callback_prepare_;
+    stats_["n_eval_f"] = n_eval_f_;
+    stats_["n_eval_grad_f"] = n_eval_grad_f_;
+    stats_["n_eval_g"] = n_eval_g_;
+    stats_["n_eval_jac_g"] = n_eval_jac_g_;
+    stats_["n_eval_h"] = n_eval_h_;
+    stats_["iter_count"] = worhp_w_.MajorIter;
+    
+    stats_["return_code"] = worhp_c_.status;
+    stats_["return_status"] = flagmap[worhp_c_.status];
     
   }
 
@@ -812,6 +875,7 @@ namespace CasADi{
       
       double time2 = clock();
       t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
+      n_eval_h_ += 1;
       log("eval_h ok");
       return true;
     } catch (exception& ex){
@@ -863,7 +927,7 @@ namespace CasADi{
     
       double time2 = clock();
       t_eval_jac_g_ += double(time2-time1)/CLOCKS_PER_SEC;
-    
+      n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
       return true;
     } catch (exception& ex){
@@ -900,7 +964,7 @@ namespace CasADi{
 
       double time2 = clock();
       t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
-
+      n_eval_f_ += 1;
       log("eval_f ok");
       return true;
     } catch (exception& ex){
@@ -937,7 +1001,7 @@ namespace CasADi{
     
       double time2 = clock();
       t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
-    
+      n_eval_g_ += 1;
       log("eval_g ok");
       return true;
     } catch (exception& ex){
@@ -976,7 +1040,7 @@ namespace CasADi{
     
       double time2 = clock();
       t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
-
+      n_eval_grad_f_ += 1;
       // Check the result for regularity
       for(int i=0; i<nx_; ++i){
         if(isnan(grad_f[i]) || isinf(grad_f[i])){
@@ -1163,6 +1227,48 @@ namespace CasADi{
       
     std::cout << "readparams status: " << status << std::endl;
   }
+  
+  map<int,string> WorhpInternal::calc_flagmap(){
+  map<int,string> f;
+  f[TerminateSuccess] = "TerminateSuccess";
+  f[OptimalSolution] = "OptimalSolution";
+  f[SearchDirectionZero] = "SearchDirectionZero";
+  f[SearchDirectionSmall] = "SearchDirectionSmall";
+  f[StationaryPointFound] = "StationaryPointFound";
+  f[StationaryPointFound] = "StationaryPointFound";
+  f[AcceptablePrevious] = "AcceptablePrevious";
+  f[FritzJohn] = "FritzJohn";
+  f[NotDiffable] = "NotDiffable";
+  f[Unbounded] = "Unbounded";
+  f[FeasibleSolution] = "FeasibleSolution";
+  f[LowPassFilterOptimal] = "LowPassFilterOptimal";
+  f[LowPassFilterAcceptable] = "LowPassFilterAcceptable";
+
+  f[TerminateError] = "TerminateError";
+  f[InitError] = "InitError";
+  f[DataError] = "DataError";
+  f[MaxCalls] = "MaxCalls";
+  f[MaxIter] = "MaxIter";
+  f[MinimumStepsize] = "MinimumStepsize";
+  f[QPerror] = "QPerror";
+  f[ProblemInfeasible] = "ProblemInfeasible";
+  f[GroupsComposition] = "GroupsComposition";
+  f[TooBig] = "TooBig";
+  f[Timeout] = "Timeout";
+  f[FDError] = "FDError";
+  f[LocalInfeas] = "LocalInfeas";
+  f[LicenseError] = "LicenseError";
+  f[TerminatedByUser] = "TerminatedByUser";
+  f[FunctionErrorF] = "FunctionErrorF";
+  f[FunctionErrorG] = "FunctionErrorG";
+  f[FunctionErrorDF] = "FunctionErrorDF";
+  f[FunctionErrorDG] = "FunctionErrorDG";
+  f[FunctionErrorHM] = "FunctionErrorHM";
+  return f;
+}
+  
+map<int,string> WorhpInternal::flagmap = WorhpInternal::calc_flagmap();
+
 
 
 } // namespace CasADi

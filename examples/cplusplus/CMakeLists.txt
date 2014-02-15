@@ -9,10 +9,6 @@ endif()
 add_executable(casadi_error_handling casadi_error_handling.cpp)
 target_link_libraries(casadi_error_handling casadi ${CASADI_DEPENDENCIES})
 
-# Determinant by minor expansion using MX
-add_executable(det_minor_mx det_minor_mx.cpp)
-target_link_libraries(det_minor_mx casadi ${CASADI_DEPENDENCIES})
-
 # Small example on how sparsity can be propagated throw a CasADi expression
 add_executable(propagating_sparsity propagating_sparsity.cpp)
 target_link_libraries(propagating_sparsity casadi ${CASADI_DEPENDENCIES})
@@ -50,6 +46,14 @@ if(IPOPT_FOUND)
     ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 
+endif()
+
+if(SQIC_FOUND AND IPOPT_FOUND)
+  add_executable(stabilized_sqpmethod_nl stabilized_sqpmethod_nl.cpp)
+  target_link_libraries(stabilized_sqpmethod_nl 
+    casadi_ipopt_interface casadi_nonlinear_programming casadi 
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES} casadi_sqic_interface sqic_fortran_c_bridge ${SQIC_LIBRARIES} casadi_convex_programming
+  )
 endif()
 
 # Parse AMPL models and solve with Worhp

@@ -949,6 +949,155 @@ class Toolstests(casadiTestCase):
     b["P",0,:] = sparse(DMatrix([11,12,0])).T
     self.checkarray(b["P"],DMatrix([[11,12,0],[12,4,5],[0,5,8]]))
     
+  def test_callableExtraIndex(self):
+    a = struct_ssym([entry("a",shape=(5,3)),entry("b",shape=(4,3))])
+    b = a()
+    
+    b["a",flatten] = range(15)
+    self.checkarray(b.cat,DMatrix(range(15)+[0]*12))
+    
+    self.checkarray(b["a",flatten],DMatrix(range(15)))
+    
+    b["a",vec] = range(15)
+
+    self.checkarray(b["a",vec],DMatrix(range(15)))
+    
+  def test_pickling(self):
+    import pickle
+
+    x = struct([entry("a",shape=(2,3)),entry("b",shape=(2,3))])
+
+    s = pickle.dumps(x)
+
+    w = pickle.loads(s)
+
+    self.assertEqual(x.size,w.size)
+    x = struct([entry("a",shape=(2,3)),entry("b",shape=(2,3))])
+
+    y = x()
+
+    y["b",:,2] = 12
+
+    s = pickle.dumps(y)
+    w = pickle.loads(s)
+
+    self.checkarray(w["b",:,2],DMatrix([12,12]))
+    
+  def test_numpyint(self):
+    state = struct_ssym(['x', 'y'])
+    x = struct_ssym([entry('states', struct=state, repeat=10)])
+    x_init = x()
+    x_init['states', 0, 'x'] # OK
+    a = [1,2,3]
+    x_init['states', int32(0), 'x'] 
+    x_init['states', int64(0), 'x']
+    
+  def test_numpyint(self):
+    s = struct_ssym(map(entry, 'xyz')) # OK 
+    print s['x']
+    s = struct_ssym(map(entry, u'xyz')) # IndexError: list index out of range
+    print s[u'x']
+    
+  def test_pickling_null(self):
+    import pickle
+    s = struct_msym([
+      entry("a",shape=(2,3)),
+      entry("b",shape=(0,0))
+    ])
+
+    tt = pickle.dumps(s)
+
+    print pickle.loads(tt)
+    
+  def test_bug_structSXMX(self):
+    n= 2
+    x_sx = struct_ssym([
+        entry("x",shape=n),
+        entry("S",shape=(n,n))
+    ])
+    
+    x_mx = struct_ssym([
+        entry("x",shape=n),
+        entry("S",shape=(n,n))
+    ])
+    
+    X_sx = struct_SX(x_sx)
+    X_sx["x"] = DMatrix(range(n))
+    X_sx["S"] = DMatrix(range(n,n+n*n),n,n)
+   
+    X_mx = struct_MX(x_sx)
+    X_mx["x"] = DMatrix(range(n))
+    X_mx["S"] = DMatrix(range(n,n+n*n),n,n)
+    
+    self.checkarray(x_sx.struct.map[("S",)],DMatrix(range(n,n+n*n),n,n))
+    self.checkarray(x_mx.struct.map[("S",)],DMatrix(range(n,n+n*n),n,n))
+    self.checkarray(X_sx.cat,DMatrix(range(n+n*n)))
+    self.checkarray(X_mx.cat,DMatrix(range(n+n*n)))
+    
+    for s, S in [(x_sx,struct_ssym),(x_mx,struct_msym)]:
+      h = S([entry("w",struct=s)])
+      hX = struct_SX(h)
+      hX["w","x"] = DMatrix(range(n))
+      hX["w","S"] = DMatrix(range(n,n+n*n),n,n) 
+      
+      self.checkarray(h.struct.map[("w","S",)],DMatrix(range(n,n+n*n),n,n))
+      self.checkarray(hX.cat,DMatrix(range(n+n*n)))
+      
+      self.checkarray(h.struct.map[("w",)],DMatrix(range(n+n*n)))
+      self.checkarray(hX["w"],DMatrix(range(n+n*n)))
+      
+      hX["w"] = DMatrix(range(n+n*n))
+      self.checkarray(hX.cat,DMatrix(range(n+n*n)))
+    
+    n= 2
+    m = 3
+    x_sx = struct_ssym([
+        entry("x",shape=n),
+        entry("S",shape=(n,m))
+    ])
+    
+    x_mx = struct_ssym([
+        entry("x",shape=n),
+        entry("S",shape=(n,m))
+    ])
+    
+    X_sx = struct_SX(x_sx)
+    X_sx["x"] = DMatrix(range(n))
+    X_sx["S"] = DMatrix(range(n,n+n*m),n,m)
+   
+    X_mx = struct_MX(x_sx)
+    X_mx["x"] = DMatrix(range(n))
+    X_mx["S"] = DMatrix(range(n,n+n*m),n,m)
+    
+    self.checkarray(x_sx.struct.map[("S",)],DMatrix(range(n,n+n*m),n,m))
+    self.checkarray(x_mx.struct.map[("S",)],DMatrix(range(n,n+n*m),n,m))
+    self.checkarray(X_sx.cat,DMatrix(range(n+n*m)))
+    self.checkarray(X_mx.cat,DMatrix(range(n+n*m)))
+    
+    n = 3
+    x_sx = struct_ssym([
+        entry("x",shape=n),
+        entry("S",shape=sp_tril(n))
+    ])
+    
+    x_mx = struct_ssym([
+        entry("x",shape=n),
+        entry("S",shape=sp_tril(n))
+    ])
+    
+    X_sx = struct_SX(x_sx)
+    X_sx["x"] = DMatrix(range(n))
+    X_sx["S"] = DMatrix(sp_tril(n),range(n,n+n*(n+1)/2))
+   
+    X_mx = struct_MX(x_sx)
+    X_mx["x"] = DMatrix(range(n))
+    X_mx["S"] = DMatrix(sp_tril(n),range(n,n+n*(n+1)/2))
+    
+    self.checkarray(x_sx.struct.map[("S",)],DMatrix(sp_tril(n),range(n,n+n*(n+1)/2)))
+    self.checkarray(x_mx.struct.map[("S",)],DMatrix(sp_tril(n),range(n,n+n*(n+1)/2)))
+    self.checkarray(X_sx.cat,DMatrix(range(n+n*(n+1)/2)))
+    self.checkarray(X_mx.cat,DMatrix(range(n+n*(n+1)/2)))
+    
 if __name__ == '__main__':
     unittest.main()
 

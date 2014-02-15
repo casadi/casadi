@@ -56,16 +56,13 @@ namespace CasADi{
     virtual ~MXFunctionInternal();
 
     /** \brief  Evaluate the algorithm */
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
 
     /** \brief  Print description */
     virtual void print(std::ostream &stream) const;
 
     /** \brief  Initialize */
     virtual void init();
-
-    /** \brief  Update the number of sensitivity directions during or after initialization */
-    virtual void updateNumSens(bool recursive);
 
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
@@ -86,7 +83,7 @@ namespace CasADi{
     std::vector<AlgEl> algorithm_;
 
     /** \brief  Working vector for numeric calculation */
-    std::vector<FunctionIO> work_;
+    std::vector<std::pair<DMatrix,int> > work_;
   
     /** \brief  Temporary vectors needed for the evaluation (integer) */
     std::vector<int> itmp_;
@@ -114,18 +111,17 @@ namespace CasADi{
     SXFunction expand(const std::vector<SXMatrix>& inputv );
     
     // Update pointers to a particular element
-    void updatePointers(const AlgEl& el, int nfdir, int nadir);
+    void updatePointers(const AlgEl& el);
     
     // Vectors to hold pointers during evaluation
     DMatrixPtrV mx_input_;
     DMatrixPtrV mx_output_;
-    DMatrixPtrVV mx_fwdSeed_;
-    DMatrixPtrVV mx_fwdSens_;
-    DMatrixPtrVV mx_adjSeed_;
-    DMatrixPtrVV mx_adjSens_;
 
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const{ return inputv_;}
+
+    /// Get a vector of symbolic variables corresponding to the outputs
+    virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
 
     /// Propagate a sparsity pattern through the algorithm
     virtual void spEvaluate(bool fwd);
@@ -137,13 +133,13 @@ namespace CasADi{
     virtual void spInit(bool fwd);
     
     /// Print work vector
-    void printWork(int nfdir=0, int nadir=0, std::ostream &stream=std::cout);
-    
-    /// Print tape
-    void printTape(std::ostream &stream=std::cout);
+    void printWork(std::ostream &stream=std::cout);
     
     /// Allocate tape
-    void allocTape();
+    void allocTape(std::vector<std::pair<std::pair<int,int>,MX> >& tape);
+    
+    // print an element of an algorithm
+    void print(std::ostream &stream, const AlgEl& el) const;
     
   };
 

@@ -25,6 +25,7 @@ from numpy import *
 import unittest
 from types import *
 from helpers import *
+import pickle
 
 scipy_available = True
 try:
@@ -330,6 +331,59 @@ class Misctests(casadiTestCase):
     xx,pp = daeIn(s,"x","p")
     self.assertEqual(pp,p)
     self.assertEqual(xx,x)
+    
+  def test_pickling(self):
+
+    a = sp_tril(4)
+    s = pickle.dumps(a)
+    b = pickle.loads(s)
+    self.assertTrue(a==b)
+
+    a = CRSSparsity()
+    s = pickle.dumps(a)
+    b = pickle.loads(s)
+    self.assertTrue(a.isNull())
+    
+    a = IMatrix(sp_tril(4),range(10))
+    s = pickle.dumps(a)
+    b = pickle.loads(s)
+    self.checkarray(a,b)
+
+
+    a = DMatrix(sp_tril(4),range(10))
+    s = pickle.dumps(a)
+    b = pickle.loads(s)
+    self.checkarray(a,b)
+
+  def test_assertions(self):
+    
+    x = msym("x") 
+    
+    z = x**2
+    
+    z = z.attachAssert(z>3,"x must be larger than 3")
+    
+    v = sin(z)
+    
+    f = MXFunction([x],[v])
+    f.init()
+    
+    print f
+    
+    f.setInput(-6)
+    f.evaluate()
+    
+    f.setInput(1)
+    
+    try :
+      f.evaluate()
+    except Exception as e:
+      print str(e)
+      self.assertTrue("x must be larger than 3" in str(e))
+    
+
+    
+pickle.dump(CRSSparsity(),file("temp.txt","w"))
     
 if __name__ == '__main__':
     unittest.main()

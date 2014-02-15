@@ -31,17 +31,69 @@
 
 namespace CasADi{
 
-  /** \brief  concatenate vertically */
+  /** \brief  concatenate vertically
+  *
+  *  vertcat(vertsplit(x,...)) = x
+  */
   MX vertcat(const std::vector<MX>& x);
 
-  /** \brief  concatenate vertically */
+  /** \brief  split vertically, retaining groups of rows
+  * \param output_offset List of all start rows for each group
+  *      the last row group will run to the end.
+  * 
+  *   vertcat(vertsplit(x,...)) = x
+  */
   std::vector<MX> vertsplit(const MX& x, const std::vector<int>& output_offset);
 
-  /** \brief  concatenate horizontally */
+  /** \brief  split vertically, retaining fixed-sized groups of rows
+  * \param incr Size of each group of rows
+  *
+  *  vertcat(vertsplit(x,...)) = x
+  */
+  std::vector<MX> vertsplit(const MX& x, int incr=1);
+  
+  /** \brief  concatenate horizontally 
+  *
+  *   horzcat(horzsplit(x,...)) = x
+  */
   MX horzcat(const std::vector<MX>& comp);
   
-  /** \brief Construct a matrix from a list of list of blocks.*/
+  /** \brief  split horizontally, retaining groups of columns
+  * \param output_offset List of all start columns for each group
+  *      the last column group will run to the end.
+  *
+  *   horzcat(horzsplit(x,...)) = x
+  */
+  std::vector<MX> horzsplit(const MX& x, const std::vector<int>& output_offset);
+
+  /** \brief  split horizontally, retaining fixed-sized groups of columns
+  * \param incr Size of each group of columns
+  *
+  *   horzcat(horzsplit(x,...)) = x
+  */
+  std::vector<MX> horzsplit(const MX& x, int incr=1);
+  
+  /** \brief Construct a matrix from a list of list of blocks.
+  *
+  *   blockcat(blocksplit(x,...,...)) = x
+  */
   MX blockcat(const std::vector< std::vector<MX > > &v);
+  
+  /** \brief  chop up into blocks
+  * \brief vert_offset Defines the boundaries of the block rows
+  * \brief horz_offset Defines the boundaries of the block columns
+  *
+  *   blockcat(blocksplit(x,...,...)) = x
+  */
+  std::vector< std::vector<MX > > blocksplit(const MX& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
+
+  /** \brief  chop up into blocks
+  * \brief vert_incr Defines the increment for block boundaries in row dimension
+  * \brief horz_incr Defines the increment for block boundaries in column dimension
+  *
+  *   blockcat(blocksplit(x,...,...)) = x
+  */
+  std::vector< std::vector<MX > > blocksplit(const MX& x, int vert_incr = 1, int horz_incr = 1);
 
 #ifndef SWIG
   /** \brief Construct a matrix from a list of list of blocks.*/
@@ -50,9 +102,15 @@ namespace CasADi{
 
   /** \brief  concatenate vertically while vectorizing all arguments with vec */
   MX veccat(const std::vector<MX>& comp);
+  
+  /** \brief  concatenate vertically while flattening all arguments with flatten */
+  MX flattencat(const std::vector<MX>& comp);
 
   /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
   MX vecNZcat(const std::vector<MX>& comp);
+  
+  /** \brief  concatenate vertically while flattening all arguments with flattenNZ */
+  MX flattenNZcat(const std::vector<MX>& comp);
 
 #ifndef SWIG
   /** \brief  concatenate vertically, two matrices */
@@ -77,8 +135,14 @@ namespace CasADi{
   /** \brief Transpose an expression */
   MX trans(const MX &x);
 
-  /** \brief  Take the matrix product of 2 MX objects */
-  MX mul(const MX &x, const MX &y);
+  /** \brief  Take the matrix product of 2 MX objects
+  *
+  * With optional sp_z you can specify the sparsity of the result
+  * A typical use case might be where the product is only constructed to 
+  * inspect the trace of it. sp_z diagonal will be more efficient then.
+  *
+  */
+  MX mul(const MX &x, const MX &y, const CRSSparsity& sp_z=CRSSparsity());
 
   /** \brief  Take the matrix product of n MX objects */
   MX mul(const std::vector< MX > &x);
@@ -154,6 +218,10 @@ namespace CasADi{
   /** \brief Returns a flattened version of the MX, preserving only nonzeros
    */
   MX vecNZ(const MX &x);
+  
+  /** \brief Returns a flattened version of the MX, prseverving only nonzeros
+  */
+  MX flattenNZ(const MX &x);
 
   /** \brief  Unite two matrices no overlapping sparsity */
   MX unite(const MX& A, const MX& B);
@@ -206,6 +274,11 @@ namespace CasADi{
 
   /** \brief  Make the matrix dense if not already */
   MX densify(const MX& x);
+  
+#ifndef SWIGOCTAVE
+  /** \brief  Make the matrix dense if not already */
+  MX full(const MX& x);
+#endif // SWIGOCTAVE
 
   /** \brief  Create a parent MX on which all given MX's will depend.
 
@@ -234,8 +307,13 @@ namespace CasADi{
   */
   MX diag(const MX& x);
 
-  /** \brief   Construct a matrix with given block on the diagonal */
+  /** \brief   Construct a matrix with given blocks on the diagonal */
   MX blkdiag(const std::vector<MX> &A);
+
+#ifndef SWIG
+  /** \brief   Construct a matrix with given blocks on the diagonal */
+  MX blkdiag(const MX &A, const MX& B);
+#endif // SWIG
 
   /** \brief Return a row-wise summation of elements */
   MX sumRows(const MX &x);
@@ -296,6 +374,12 @@ namespace CasADi{
 
   /** \brief  Substitute variable var with expression expr in multiple expressions */
   std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
+  
+  /** \brief  Substitute variable v with expression vdef in an expression ex, preserving nodes */
+  MX graph_substitute(const MX &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
+
+  /** \brief  Substitute variable var with expression expr in multiple expressions, preserving nodes  */
+  std::vector<MX> graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
 
   /** \brief Inplace substitution
    * Substitute variables v out of the expressions vdef sequentially 
@@ -332,7 +416,19 @@ namespace CasADi{
   */
   MX jacobian(const MX &ex, const MX &arg);
   MX gradient(const MX &ex, const MX &arg);
+  MX tangent(const MX &ex, const MX &arg);
   //@}
+  
+  /** \brief Computes the nullspace of a matrix A
+  *
+  * Finds Z m-by-(m-n) such that AZ = 0 
+  * with A n-by-m with m > n
+  *
+  * Assumes A is full rank
+  *
+  * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+  */
+  MX nullspace(const MX& A);
 
   /** \brief Matrix determinant (experimental) */
   MX det(const MX& A);
@@ -345,6 +441,46 @@ namespace CasADi{
   * \see MXFunction::getFree()
   */
   std::vector<MX> getSymbols(const MX& e);
+  
+  /** \brief Get all symbols contained in the supplied expression
+  * Get all symbols on which the supplied expression depends
+  * \see MXFunction::getFree()
+  */
+  std::vector<MX> getSymbols(const std::vector<MX>& e);
+  
+  /** \brief Expand MX graph to SXFunction call
+  *
+  *  Expand the given expression e, optionally
+  *  supplying expressions contained in it at which expansion should stop.
+  *
+  */
+  MX matrix_expand(const MX& e, const std::vector<MX> &boundary = std::vector<MX>());
+
+  /** \brief Expand MX graph to SXFunction call
+  *
+  *  Expand the given expression e, optionally
+  *  supplying expressions contained in it at which expansion should stop.
+  *
+  */
+  std::vector<MX> matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary = std::vector<MX>());
+
+  /** \brief Kronecker tensor product
+  *
+  * Creates a block matrix in which each element (i,j) is a_ij*b 
+  */
+  MX kron(const MX& a, const MX& b);
+
+  /** \brief Solve a system of equations: A*x = b 
+  */
+  MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+
+  /** \brief Computes the Moore-Penrose pseudo-inverse
+  * 
+  * If the matrix A is fat (size2>size1), mul(A,pinv(A)) is unity.
+  * If the matrix A is slender (size1<size2), mul(pinv(A),A) is unity.
+  *
+  */
+  MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
 
 } // namespace CasADi
 

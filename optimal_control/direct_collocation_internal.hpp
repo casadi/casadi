@@ -26,7 +26,6 @@
 #include "direct_collocation.hpp"
 #include "../symbolic/fx/ocp_solver_internal.hpp"
 #include "../symbolic/fx/parallelizer.hpp"
-#include "../symbolic/fx/c_function.hpp"
 #include "../symbolic/fx/mx_function.hpp"
 #include "../symbolic/fx/sx_function.hpp"
 #include "integration/integration_tools.hpp"
@@ -50,7 +49,7 @@ class DirectCollocationInternal : public OCPSolverInternal{
     virtual void init();
 
     // Solve the OCP
-    virtual void evaluate(int nfdir, int nadir);
+    virtual void evaluate();
    
     // Get the variables
     void getGuess(std::vector<double>& V_init) const;
