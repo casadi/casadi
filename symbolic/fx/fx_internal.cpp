@@ -1513,18 +1513,15 @@ namespace CasADi{
   
     // Crude estimate of the cost of calculating the directional derivatives
     int der_dir_cost = nfwd + adj_penalty*nadj;
-
-    if (getOption("ad_mode")=="forward" && nadj>0) {
+    
+    // Check if it is cheaper to calculate the full Jacobian and then multiply
+    if ((getOption("ad_mode")=="forward" && nadj>0) || (getOption("ad_mode")=="reverse" && nfwd>0)) {
       ret = getDerivativeViaJac(nfwd,nadj);
-    } else if (getOption("ad_mode")=="reverse" && nfwd>0) {
-      ret = getDerivativeViaJac(nfwd,nadj);
-    } else if (hasSetOption("derivative_generator")){ // Check if it is cheaper to calculate the full Jacobian and then multiply
+    } else if (hasSetOption("derivative_generator")){ 
       /// User-provided derivative generator function
       DerivativeGenerator dergen = getOption("derivative_generator");
       FX this_ = shared_from_this<FX>();
       ret = dergen(this_,nfwd,nadj,user_data_); 
-    } else if ((getOption("ad_mode")=="forward" && nadj>0) || (getOption("ad_mode")=="reverse" && nfwd>0)) {
-      ret = getDerivativeViaJac(nfwd,nadj);
     } else if(2*full_jac_cost < der_dir_cost){
       // Generate the Jacobian and then multiply to get the derivative
       //ret = getDerivativeViaJac(nfwd,nadj); // NOTE: Uncomment this line (and remove the next line) to enable this feature
