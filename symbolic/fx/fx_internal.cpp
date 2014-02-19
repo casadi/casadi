@@ -1606,15 +1606,15 @@ namespace CasADi{
     int ind=0;
     for(int d=-1; d<nfwd; ++d){
       for(int i=0; i<getNumInputs(); ++i, ++ind){
-        if(ret.input(ind).sparsity()!=input(i).sparsity()){
-          casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \"" << i_names.at(ind) << "\". Expected " << input(i).dimString() << " but got " << ret.input(ind).dimString());
+        if(ret.input(ind).shape()!=input(i).shape()){
+          casadi_error("Incorrect shape for " << ret << " input " << ind << " \"" << i_names.at(ind) << "\". Expected " << input(i).shape() << " but got " << ret.input(ind).shape());
         }
       }
     }
     for(int d=0; d<nadj; ++d){
       for(int i=0; i<getNumOutputs(); ++i, ++ind){
-        if(ret.input(ind).sparsity()!=output(i).sparsity()){
-          casadi_error("Incorrect sparsity for " << ret << " input " << ind << " \"" << i_names.at(ind) << "\". Expected " << output(i).dimString() << " but got " << ret.input(ind).dimString());
+        if(ret.input(ind).shape()!=output(i).shape()){
+          casadi_error("Incorrect shape for " << ret << " input " << ind << " \"" << i_names.at(ind) << "\". Expected " << output(i).shape() << " but got " << ret.input(ind).shape());
         }
       }
     }
@@ -1623,15 +1623,15 @@ namespace CasADi{
     ind=0;
     for(int d=-1; d<nfwd; ++d){
       for(int i=0; i<getNumOutputs(); ++i, ++ind){
-        if(ret.output(ind).sparsity()!=output(i).sparsity()){
-          casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \"" <<  o_names.at(ind) << "\". Expected " << output(i).dimString() << " but got " << ret.output(ind).dimString());
+        if(ret.output(ind).shape()!=output(i).shape()){
+          casadi_error("Incorrect shape for " << ret << " output " << ind << " \"" <<  o_names.at(ind) << "\". Expected " << output(i).shape() << " but got " << ret.output(ind).shape());
         }
       }
     }
     for(int d=0; d<nadj; ++d){
       for(int i=0; i<getNumInputs(); ++i, ++ind){
-        if(ret.output(ind).sparsity()!=input(i).sparsity()){
-          casadi_error("Incorrect sparsity for " << ret << " output " << ind << " \"" << o_names.at(ind) << "\". Expected " << input(i).dimString() << " but got " << ret.output(ind).dimString());
+        if(ret.output(ind).shape()!=input(i).shape()){
+          casadi_error("Incorrect shape for " << ret << " output " << ind << " \"" << o_names.at(ind) << "\". Expected " << input(i).shape() << " but got " << ret.output(ind).shape());
         }
       }
     }
@@ -1718,7 +1718,7 @@ namespace CasADi{
         // Split up the left hand sides
         d = vertsplit(d_all,offset);
         for(int i=0; i<n_out; ++i){
-          res.push_back(reshape(d[i],res[i].size1(),res[i].size2())+DMatrix::zeros(res[i].sparsity()));
+          res.push_back(reshape(d[i],res[i].size1(),res[i].size2()));
         }
       }
     }
@@ -1755,7 +1755,7 @@ namespace CasADi{
         // Split up the left hand sides
         d = vertsplit(d_all,offset);
         for(int i=0; i<n_in; ++i){
-          res.push_back(reshape(d[i],arg[i].size1(),arg[i].size2())+DMatrix::zeros(arg[i].sparsity()));
+          res.push_back(reshape(d[i],arg[i].size1(),arg[i].size2()));
         }
       }
     }
