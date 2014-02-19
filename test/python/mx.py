@@ -2228,5 +2228,20 @@ class MXtests(casadiTestCase):
     
     self.checkarray(c_,numpy.kron(a,b))
     
+  def test_setSparse(self):
+    x = msym("x",sp_tril(3))
+    y = x.setSparse(sp_tril(3).T)
+    
+    f = MXFunction([x],[y])
+    f.init()
+    
+    f.setInput(range(1,4*3/2+1))
+    f.evaluate()
+    
+    self.checkarray(f.output(),DMatrix([[1,0,0],[0,3,0],[0,0,6]]))
+    self.checkarray(IMatrix(f.output().sparsity(),1),IMatrix(sp_tril(3).T,1))
+    
+    
+    
 if __name__ == '__main__':
     unittest.main()

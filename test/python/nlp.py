@@ -1203,6 +1203,21 @@ class NLPtests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("f")[0],-10-16.0/9,6,str(solver))
       
+  def test_bug(self):
+    x = msym("x", 3)
+    y = msym("y", 2)
+    f = MXFunction([x, y], [1.])
+    f.init()
+    aa = msym("aa", 5)
+    a = aa[:3]
+    b = aa[3:]
+    [f_call] = f.call([a, b])
+    nlp = MXFunction(nlpIn(x=aa), nlpOut(f=f_call))
+    for Solver, solver_options in solvers:
+      solver = Solver(nlp)
+      solver = IpoptSolver(nlp)
+      solver.init() 
+      
 if __name__ == '__main__':
     unittest.main()
     print solvers
