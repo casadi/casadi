@@ -282,11 +282,11 @@ for d in r.findall('*//namespace/cdecl'):
 
 
 ftree  = file('CasadiTree.hs','w')
-ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.Buildbot.CasadiTree ( classes, ioschemeclasses, tools, ioschemehelpers, enums ) where\n\n\nimport WriteCasadiBindings.Types\n\n\n")
+ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteBindings.Buildbot.CasadiTree ( classes, ioschemeclasses, tools, ioschemehelpers, enums ) where\n\n\nimport WriteBindings.Types\n\n\n")
 
 
 fclasses  = file('CasadiClasses.hs','w')
-fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.Buildbot.CasadiClasses ( CasadiEnum(..), CasadiClass(..), cppTypeCasadiPrimClass,cppTypeCasadiPrimEnum,inheritance ) where\n\n")
+fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteBindings.Buildbot.CasadiClasses ( CasadiEnum(..), CasadiClass(..), cppTypeCasadiPrimClass,cppTypeCasadiPrimEnum,inheritance ) where\n\n")
 
 
 finclude  = file('swiginclude.hpp','w')
