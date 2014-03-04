@@ -600,7 +600,7 @@ void simplify(SX& ex){
   expand(ex,weights,terms);
 
   // Make a scalar product to get the simplified expression
-  SXMatrix s = mul(terms,trans(weights));
+  SXMatrix s = mul(trans(terms),weights);
   ex = s.toScalar();
 }
 
