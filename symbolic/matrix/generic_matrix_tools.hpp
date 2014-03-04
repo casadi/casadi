@@ -66,7 +66,7 @@ T linspace(const GenericMatrix<T> &a_, const GenericMatrix<T> &b_, int nsteps){
     ret[i] = ret[i-1] + step;
   
   ret[nsteps-1] = b;
-  return horzcat(ret);
+  return vertcat(ret);
 }
 #endif // SWIG
 
