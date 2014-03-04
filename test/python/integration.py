@@ -1003,17 +1003,17 @@ class Integrationtests(casadiTestCase):
     qeJ2.init()
     
     qe.setInput(A,0)
-    qe.setInput(B.ravel(),1)
+    qe.setInput(vec(B),1)
     qe.evaluate()
     self.checkarray(dot(Be,A)/1e3,qe.getOutput()/1e3,"jacobian(INTEGRATOR_X0,INTEGRATOR_XF)")
     qeJ.setInput(A,0)
-    qeJ.setInput(B.ravel(),1)
+    qeJ.setInput(vec(B),1)
     qeJ.evaluate()
     self.checkarray(qeJ.getOutput()/1e3,Be/1e3,"jacobian(INTEGRATOR_X0,INTEGRATOR_XF)")
     
     
     qeJ2.setInput(A,0)
-    qeJ2.setInput(B.ravel(),1)
+    qeJ2.setInput(vec(B),1)
     qeJ2.evaluate()
     
     return # this should return identical zero
@@ -1021,7 +1021,7 @@ class Integrationtests(casadiTestCase):
     H.setOption("ad_mode","reverse")
     H.init()
     H.setInput(A,0)
-    H.setInput(B.ravel(),1)
+    H.setInput(vec(B),1)
     H.evaluate()
     print array(H.getOutput())
     

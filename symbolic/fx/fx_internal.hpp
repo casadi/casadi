@@ -204,7 +204,7 @@ namespace CasADi{
     virtual void checkInputs() const {};
             
     /** \brief Get the unidirectional or bidirectional partition */
-    void getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& D2, bool compact, bool symmetric);
+    void getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2, bool compact, bool symmetric);
 
     /// Verbose mode?
     bool verbose() const;
@@ -231,22 +231,22 @@ namespace CasADi{
     GenericType getStat(const std::string & name) const;
     
     /// Generate the sparsity of a Jacobian block
-    virtual CRSSparsity getJacSparsity(int iind, int oind, bool symmetric);
+    virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric);
     
     /// A flavour of getJacSparsity without any magic
-    CRSSparsity getJacSparsityPlain(int iind, int oind);
+    Sparsity getJacSparsityPlain(int iind, int oind);
     
     /// A flavour of getJacSparsity that does hierachical block structure recognition
-    CRSSparsity getJacSparsityHierarchical(int iind, int oind);
+    Sparsity getJacSparsityHierarchical(int iind, int oind);
     
     /// A flavour of getJacSparsity that does hierachical block structure recognition for symmetric jacobians
-    CRSSparsity getJacSparsityHierarchicalSymm(int iind, int oind);
+    Sparsity getJacSparsityHierarchicalSymm(int iind, int oind);
     
     /// Generate the sparsity of a Jacobian block
-    void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact);
+    void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact);
     
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    CRSSparsity& jacSparsity(int iind, int oind, bool compact, bool symmetric);
+    Sparsity& jacSparsity(int iind, int oind, bool compact, bool symmetric);
     
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const;
@@ -331,7 +331,7 @@ namespace CasADi{
     WeakRef full_jacobian_;
 
     /// Cache for sparsities of the Jacobian blocks
-    Matrix<CRSSparsity> jac_sparsity_, jac_sparsity_compact_;
+    Matrix<Sparsity> jac_sparsity_, jac_sparsity_compact_;
 
     /// Cache for Jacobians
     Matrix<WeakRef> jac_, jac_compact_;

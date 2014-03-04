@@ -112,7 +112,7 @@ namespace CasADi{
   
 /// Input arguments of a SDP problem [sdpIn]
 enum SDPInput{
-  /// The vertical stack of all matrices F_i: ( nm x m) [f]
+  /// The horizontal stack of all matrices F_i: ( m x nm) [f]
   SDP_SOLVER_F,
   /// The vector c: ( n x 1) [c]
   SDP_SOLVER_C,
@@ -150,7 +150,7 @@ enum SDPOutput{
   
 /// Structure specification of an SDP [sdpStruct]
 enum SDPStruct{
-  /// The vertical stack of all matrices F_i: ( nm x m) [f]
+  /// The horizontal stack of all matrices F_i: ( m x nm) [f]
   SDP_STRUCT_F,
   /// The matrix G: ( m x m) [g]
   SDP_STRUCT_G,

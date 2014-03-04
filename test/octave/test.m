@@ -132,8 +132,7 @@ s = DMatrix([ 5 6; 4 9])
 full(s)
 
 disp('sparse arrays')
-
-s = DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99])
+s = DMatrix(4,3,[0,2,2,3],[1,2,1],[0.738,0.1,0.99])'
 
 disp('bar')
 
@@ -151,7 +150,7 @@ assert(s(2,2).toScalar()==9)
 
 q = s([1 2])
 assert(q(1).toScalar()==5)
-assert(q(2).toScalar()==6)
+assert(q(2).toScalar()==4)
 
 q = s(1:2,:)
 assert(q(1,1).toScalar()==5)

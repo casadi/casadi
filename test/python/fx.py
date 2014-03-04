@@ -257,8 +257,8 @@ class FXtests(casadiTestCase):
     def test(sp):
       x = ssym("x",sp.size2())
       sp2 = jacobian(mul(DMatrix(sp,1),x),x).sparsity()
-      self.checkarray(sp.col(),sp2.col());
-      self.checkarray(sp.rowind(),sp2.rowind());   
+      self.checkarray(sp.row(),sp2.row());
+      self.checkarray(sp.colind(),sp2.colind());   
 
     for i in range(5):
       test(sp_tril(i))
@@ -352,8 +352,8 @@ class FXtests(casadiTestCase):
       J = f.hessian()
       J.init()
       sp2 = J.output().sparsity()
-      self.checkarray(sp.col(),sp2.col())
-      self.checkarray(sp.rowind(),sp2.rowind())
+      self.checkarray(sp.row(),sp2.row())
+      self.checkarray(sp.colind(),sp2.colind())
       
     A = IMatrix([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
     makeSparse(A)
@@ -756,7 +756,6 @@ class FXtests(casadiTestCase):
           z.set(z2)
           
         if max_fwd:
-          assert(max_fwd)
           def fwd(self,(x,y),(z,),seeds,sens):
             z0 = 3*y
             z1 = x+z0
@@ -770,7 +769,6 @@ class FXtests(casadiTestCase):
               dz.set(dz2)
         
         if max_adj:
-          assert(max_adj)
           def adj(self,(x,y),(z,),seeds,sens):
             z0 = 3*y
             z1 = x+z0

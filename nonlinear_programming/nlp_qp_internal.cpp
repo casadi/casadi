@@ -36,7 +36,7 @@ NLPQPInternal* NLPQPInternal::clone() const{
   return node;
 }
   
-NLPQPInternal::NLPQPInternal(const std::vector<CRSSparsity> &st) : QPSolverInternal(st) {
+NLPQPInternal::NLPQPInternal(const std::vector<Sparsity> &st) : QPSolverInternal(st) {
 
   addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSOlver used to solve the QPs.");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSOlver");

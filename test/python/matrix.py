@@ -765,8 +765,8 @@ class Matrixtests(casadiTestCase):
       M = c.diag(D)
       makeSparse(M)
       
-      self.checkarray(m.sparsity().rowind(),M.sparsity().rowind())
-      self.checkarray(m.sparsity().col(),M.sparsity().col())
+      self.checkarray(m.sparsity().colind(),M.sparsity().colind())
+      self.checkarray(m.sparsity().row(),M.sparsity().row())
 
   def test_sprank(self):
     self.message("sprank")
@@ -837,7 +837,7 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(sparse(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeU(),3)
     
   def test_tril2symm(self):
-    a = DMatrix(sp_tril(3),range(sp_tril(3).size()))
+    a = DMatrix(sp_triu(3),range(sp_triu(3).size())).T
     s = tril2symm(a)
     self.checkarray(s,DMatrix([[0,1,3],[1,2,4],[3,4,5]]))
     
@@ -877,7 +877,7 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(v.size2(),0)
   
   def test_vertsplit(self):
-    a = DMatrix(sp_tril(5),range(5*6/2))
+    a = DMatrix(sp_triu(5),range(5*6/2)).T
     v = vertsplit(a,[0,2,4])
     
     self.assertEqual(len(v),3)
@@ -907,7 +907,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(v[2],DMatrix([[6,7,8,9,0],[10,11,12,13,14]]))
     
   def test_horzsplit(self):
-    a = DMatrix(sp_tril(5),range(5*6/2))
+    a = DMatrix(sp_triu(5),range(5*6/2)).T
     v = horzsplit(a,[0,2,4])
     
     self.assertEqual(len(v),3)
@@ -937,7 +937,7 @@ class Matrixtests(casadiTestCase):
     self.checkarray(v[2],DMatrix([[0,0],[0,0],[0,0],[9,0],[13,14]]))
     
   def test_blocksplit(self):
-    a = DMatrix(sp_tril(5),range(5*6/2))
+    a = DMatrix(sp_triu(5),range(5*6/2)).T
     v = blocksplit(a,[0,2,4],[0,1,3])
     
     self.checkarray(v[0][0],DMatrix([0,1]))
@@ -1020,6 +1020,32 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(c_.size(),a.size()*b.size())
     
     self.checkarray(c_,numpy.kron(a,b))
+    
+  def test_flatten_kron(self):
+    A = ssym("A",2,3)
+    B = ssym("B",4,5)
+    P = ssym("P",A.size2(),B.size1())
+
+    f = SXFunction([flatten(P),A,B],[flatten(mul([A,P,B]))])
+    f.init()
+
+    J = f.jacobian()
+    J.init()
+    J.setInput(numpy.random.rand(*flatten(P).shape),0)
+    J.setInput(numpy.random.rand(*A.shape),1)
+    J.setInput(numpy.random.rand(*B.shape),2)
+
+    J.evaluate()
+
+    res =  J.output()
+
+    ref =  kron(J.input(1),J.input(2).T)
+
+    self.checkarray(res,ref)
+    
+  def test_repmat(self):
+    a = DMatrix([[1,2],[3,4],[5,6]])
+    self.checkarray(repmat(a,2,3),kron(DMatrix.ones(2,3),a))
         
 if __name__ == '__main__':
     unittest.main()

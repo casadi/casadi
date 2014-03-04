@@ -59,14 +59,14 @@ class Misctests(casadiTestCase):
     print_sparsity()
     
   def test_sanity(self):
-    DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.39,0.99])
-    self.assertRaises(RuntimeError,lambda : DMatrix(4,4,[1,2,1],[0,2,2,3],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[1,2,1],[0,2,2,12],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[1,2,1],[-10,2,2,3],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[8,2,1],[0,2,2,3],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[-3,2,1],[0,2,2,3],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[1,2,1,2],[0,2,2,3],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[1,2,1],[0,2,0,3],[0.738,0.39,0.99]))
+    DMatrix(4,3,[0,2,2,3],[1,2,1],[0.738,0.39,0.99])
+    self.assertRaises(RuntimeError,lambda : DMatrix(4,4,[0,2,2,3],[1,2,1],[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(4,3,[0,2,2,12],[1,2,1],[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(4,3,[-10,2,2,3],[1,2,1],[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(4,3,[0,2,2,3],[8,2,1],[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(4,3,[0,2,2,3],[-3,2,1],[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(4,3,[0,2,2,3],[1,2,1,2],[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(4,3,[0,2,0,3],[1,2,1],[0.738,0.39,0.99]))
   
   def test_setoptionerrors(self):
     self.message("option errors")
@@ -108,7 +108,7 @@ class Misctests(casadiTestCase):
     self.message("Copy constructor for refcounted classes")
     x = sp_diag(4)
 
-    y = CRSSparsity(x)
+    y = Sparsity(x)
         
     x.resize(2,8)
     
@@ -339,7 +339,7 @@ class Misctests(casadiTestCase):
     b = pickle.loads(s)
     self.assertTrue(a==b)
 
-    a = CRSSparsity()
+    a = Sparsity()
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.assertTrue(a.isNull())
@@ -383,7 +383,7 @@ class Misctests(casadiTestCase):
     
 
     
-pickle.dump(CRSSparsity(),file("temp.txt","w"))
+pickle.dump(Sparsity(),file("temp.txt","w"))
     
 if __name__ == '__main__':
     unittest.main()

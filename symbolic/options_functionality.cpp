@@ -540,18 +540,18 @@ int OptionsFunctionalityNode::getOptionAllowedIndex(const std::string &name) con
   casadi_assert_message(hasSetOption(name),"Option '" << name << "' has not been set.");
   map<string, std::vector<GenericType> >::const_iterator it = allowed_vals_.find(name);
   casadi_assert_message(it!=allowed_vals_.end(),"Option '" << name << "' has no list of allowed values.");
-  const std::vector<GenericType> &vec = it->second;
-  std::vector<GenericType>::const_iterator it2 = std::find(vec.begin(),vec.end(),getOption(name));
-  return it2-vec.begin();
+  const std::vector<GenericType> &flatten = it->second;
+  std::vector<GenericType>::const_iterator it2 = std::find(flatten.begin(),flatten.end(),getOption(name));
+  return it2-flatten.begin();
 }
 
 void OptionsFunctionalityNode::setOptionByAllowedIndex(const std::string &name, int i) {
   assert_exists(name);
   map<string, std::vector<GenericType> >::const_iterator it = allowed_vals_.find(name);
   casadi_assert_message(it!=allowed_vals_.end(),"Option '" << name << "' has no list of allowed values.");
-  const std::vector<GenericType> &vec = it->second;
-  casadi_assert_message(i>=0 && i<= vec.size()-1,"setOptionAllowedIndex('" << name << "'," << i << "): index out of bounds. There are " << vec.size() << " allowed values.");
-  setOption(name,vec[i]);  
+  const std::vector<GenericType> &flatten = it->second;
+  casadi_assert_message(i>=0 && i<= flatten.size()-1,"setOptionAllowedIndex('" << name << "'," << i << "): index out of bounds. There are " << flatten.size() << " allowed values.");
+  setOption(name,flatten[i]);  
 }
 
 int OptionsFunctionalityNode::getOptionEnumValue(const std::string &name) const {

@@ -28,7 +28,7 @@ namespace CasADi{
   LinearSolver::LinearSolver(){
   }
 
-  LinearSolver::LinearSolver(const CRSSparsity& sp, int nrhs){
+  LinearSolver::LinearSolver(const Sparsity& sp, int nrhs){
     assignNode(new LinearSolverInternal(sp,nrhs));
   }
 
@@ -69,11 +69,11 @@ namespace CasADi{
     return dynamic_cast<const LinearSolverInternal*>(get())!=0;
   }
 
-  void LinearSolver::spSolve(bvec_t* X, bvec_t* B, bool transpose) const{
+  void LinearSolver::spSolve(bvec_t* X, const bvec_t* B, bool transpose) const{
     (*this)->spSolve(X,B,transpose);
   }
 
-  void LinearSolver::spSolve(DMatrix& X, DMatrix& B, bool transpose) const{
+  void LinearSolver::spSolve(DMatrix& X, const DMatrix& B, bool transpose) const{
     (*this)->spSolve(X,B,transpose);
   }
 

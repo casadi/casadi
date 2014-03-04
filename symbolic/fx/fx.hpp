@@ -45,22 +45,22 @@ namespace CasADi{
   
       To calculate jacobians, you need to have \f$(m=1,q=1)\f$.
   
-      Write the jacobian as \f$J_{i,j} = \nabla f_{i,j} = \frac{\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
+      Write the jacobian as \f$J_{i,j} = \nabla f_{i,j} = \frac{\partial f_{i,j}(\flatten{x})}{\partial \flatten{x}}\f$.
   
-      Using \f$\vec{v} \in \mathbf{R}^n\f$ as a forward seed:  setFwdSeed(v,i)\n
-      Retrieving \f$\vec{s}_f \in \mathbf{R}^p\f$ from:        getFwdSens(sf,j)\n
+      Using \f$\flatten{v} \in \mathbf{R}^n\f$ as a forward seed:  setFwdSeed(v,i)\n
+      Retrieving \f$\flatten{s}_f \in \mathbf{R}^p\f$ from:        getFwdSens(sf,j)\n
   
-      Using \f$\vec{w} \in \mathbf{R}^p\f$ as a forward seed:  setAdjSeed(w,j)\n
-      Retrieving \f$\vec{s}_a \in \mathbf{R}^n \f$ from:        getAdjSens(sa,i)\n
+      Using \f$\flatten{w} \in \mathbf{R}^p\f$ as a forward seed:  setAdjSeed(w,j)\n
+      Retrieving \f$\flatten{s}_a \in \mathbf{R}^n \f$ from:        getAdjSens(sa,i)\n
   
-      We have the following relationships for function mapping from a column vector to a column vector:
+      We have the following relationships for function mapping from a row vector to a row vector:
   
-      \f$ \vec{s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
-      \f$ \vec{s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
+      \f$ \flatten{s}_f = \nabla f_{i,j} . \flatten{v}\f$ \n
+      \f$ \flatten{s}_a = (\nabla f_{i,j})^T . \flatten{w}\f$
   
       Some quantities is these formulas must be transposed: \n 
-      input  row: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
-      output row: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
+      input  col: transpose \f$ \flatten{v} \f$ and \f$\flatten{s}_a\f$ \n
+      output col: transpose \f$ \flatten{w} \f$ and \f$\flatten{s}_f\f$ \n
     
       NOTE: FX's are allowed to modify their input arguments when evaluating: implicitFunction, IDAS solver
       Futher releases may disallow this.
@@ -351,18 +351,18 @@ namespace CasADi{
 
     //@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    CRSSparsity& jacSparsity(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),oind,compact,symmetric); }
-    CRSSparsity& jacSparsity(int iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(iind,outputSchemeEntry(oind),compact,symmetric); }
-    CRSSparsity& jacSparsity(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric); }
+    Sparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    Sparsity& jacSparsity(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),oind,compact,symmetric); }
+    Sparsity& jacSparsity(int iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(iind,outputSchemeEntry(oind),compact,symmetric); }
+    Sparsity& jacSparsity(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric); }
     //@}
     
     //@{
     /// Generate the sparsity of a Jacobian block
-    void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact=false);
-    void setJacSparsity(const CRSSparsity& sp, const std::string &iind, int oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),oind,compact); }
-    void setJacSparsity(const CRSSparsity& sp, int iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,iind,outputSchemeEntry(oind),compact); }
-    void setJacSparsity(const CRSSparsity& sp, const std::string &iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),outputSchemeEntry(oind),compact); }
+    void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
+    void setJacSparsity(const Sparsity& sp, const std::string &iind, int oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),oind,compact); }
+    void setJacSparsity(const Sparsity& sp, int iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,iind,outputSchemeEntry(oind),compact); }
+    void setJacSparsity(const Sparsity& sp, const std::string &iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),outputSchemeEntry(oind),compact); }
     //@}
     
     /** \brief Export / Generate C code for the function */

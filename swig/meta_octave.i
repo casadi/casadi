@@ -117,13 +117,12 @@ bool meta< CasADi::GenericType >::couldbe(const octave_value& p) {
 }
 
 /// CasADi::Matrix<double>
-template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix";
+template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csc_matrix, DMatrix";
 
 template <>
 int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<double> &m) {
   NATIVERETURN(CasADi::Matrix<double>,m)
   if((p.is_real_matrix() && p.is_numeric_type() && p.is_sparse_type())){
-    // Note: octave uses column-major storage
     SparseMatrix mat = p.sparse_matrix_value();
     
     int size = mat.nnz();
@@ -136,10 +135,8 @@ int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<doub
     for (int k=0;k<cidx.size();k++) cidx[k]=mat.cidx(k);
     for (int k=0;k<ridx.size();k++) ridx[k]=mat.ridx(k);
     
-    CasADi::CRSSparsity A = CasADi::CRSSparsity(mat.cols(),mat.rows(),ridx,cidx);
-    CasADi::Matrix<double> ret = CasADi::Matrix<double>(A,data);
-    
-    m = ret.trans();
+    CasADi::Sparsity A = CasADi::Sparsity(mat.rows(),mat.cols(),cidx,ridx);
+    m = CasADi::Matrix<double>(A,data);
     
     return true;
   }

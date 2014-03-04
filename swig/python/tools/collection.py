@@ -319,7 +319,7 @@ class FrozenMapping:
     offset = 0
     cnt = 0
     for n in self.tree.traverse():
-      n.index = IMatrix(n.data.sparsity().T,range(offset,offset+getLeafSize(n.data))).T
+      n.index = IMatrix(n.data.sparsity(),range(offset,offset+getLeafSize(n.data)))
       n.offset = offset
       n.count = cnt
       cnt += 1

@@ -50,7 +50,7 @@ print "Expanded expression = ", fSX.outputExpr(0)
 #!
 linear_solver = CSparse(x.sparsity())
 linear_solver.init()
-g = linear_solver.solve(x,y.T)
+g = linear_solver.solve(x,y)
 G = MXFunction([x,y],[g])
 G.init()
 

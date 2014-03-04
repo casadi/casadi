@@ -39,7 +39,7 @@ namespace CasADi{
   public:
     
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseInternal(const CRSSparsity& sp, int nrhs);
+    CSparseInternal(const Sparsity& sp, int nrhs);
 
     // Copy constructor
     CSparseInternal(const CSparseInternal& linsol);
@@ -62,8 +62,8 @@ namespace CasADi{
     // Has the solve function been called once
     bool called_once_;
     
-    // The tranpose of linear system in CSparse form (CCS)
-    cs AT_;
+    // The linear system CSparse form (CCS)
+    cs A_;
 
     // The symbolic factorization
     css *S_;

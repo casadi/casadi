@@ -27,15 +27,12 @@
 
 /** \defgroup LinearSolver_doc 
  * 
- * Solves the linear system X*A = B or X*A^T = B for X
+ * Solves the linear system A*X = B or A^T*X = B for X
  * with A square and non-singular
  *
  *  If A is structurally singular, an error will be thrown during init.
  *  If A is numerically singular, the prepare step will fail.
  *
- *
- * Note: the transposed form is equivalent to A X^T = B^T
- *       which is the same as A x = b  with x = X^T, b = B^T
  */
 
 namespace CasADi{
@@ -44,7 +41,7 @@ namespace CasADi{
 enum LinsolInput{
   /// The square matrix A: sparse, (n x n). [A]
   LINSOL_A,
-  /// The right-hand-side matrix b: dense,  (m x n) [B]
+  /// The right-hand-side matrix b: dense,  (n x m) [B]
   LINSOL_B,
   LINSOL_NUM_IN};
 
@@ -69,7 +66,7 @@ enum LinsolOutput{
     LinearSolver();
   
     /// Create a linear solver given a sparsity pattern (creates a dummy solver only)
-    explicit LinearSolver(const CRSSparsity& sp, int nrhs=1);
+    explicit LinearSolver(const Sparsity& sp, int nrhs=1);
 
     /// Access functions of the node
     LinearSolverInternal* operator->();
@@ -89,8 +86,8 @@ enum LinsolOutput{
 
     //@{
     /// Propagate sparsity through a linear solve
-    void spSolve(bvec_t* X, bvec_t* B, bool transpose=false) const;
-    void spSolve(DMatrix& X, DMatrix& B, bool transpose=false) const;
+    void spSolve(bvec_t* X, const bvec_t* B, bool transpose=false) const;
+    void spSolve(DMatrix& X, const DMatrix& B, bool transpose=false) const;
     //@}
 
 #endif // SWIG

@@ -84,7 +84,7 @@ namespace CasADi{
   
     np_ = control_dae_.input(CONTROL_DAE_P).size();
   
-    CRSSparsity u_sparsity = control_dae_.input(CONTROL_DAE_U).sparsity();
+    Sparsity u_sparsity = control_dae_.input(CONTROL_DAE_U).sparsity();
     if (control_dae_.input(CONTROL_DAE_U_INTERP).size()!=0) {
       u_sparsity = control_dae_.input(CONTROL_DAE_U_INTERP).sparsity();
     }

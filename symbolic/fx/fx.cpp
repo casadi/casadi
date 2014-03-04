@@ -53,8 +53,8 @@ namespace CasADi{
   }
 
   vector<MX> FX::call(const MX &arg){
-    vector<MX> xvec(1,arg);
-    return call(xvec);
+    vector<MX> xflatten(1,arg);
+    return call(xflatten);
   }
 
   vector<MX> FX::call(const vector<MX> &arg){
@@ -192,11 +192,11 @@ namespace CasADi{
     return (*this)->getStat(name);
   }
 
-  CRSSparsity& FX::jacSparsity(int iind, int oind, bool compact, bool symmetric){
+  Sparsity& FX::jacSparsity(int iind, int oind, bool compact, bool symmetric){
     return (*this)->jacSparsity(iind,oind,compact, symmetric);
   }
 
-  void FX::setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact){
+  void FX::setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact){
     (*this)->setJacSparsity(sp,iind,oind,compact);
   }
 

@@ -50,25 +50,25 @@ The SX expression graph has much less overhead, but is also more restricted than
 //@{
 
   /** \brief Create an n-by-m matrix with symbolic variables */
-  SXMatrix ssym(const std::string& name, int n=1, int m=1);
+  SXMatrix ssym(const std::string& name, int nrow=1, int ncol=1);
 
   /** \brief Create an n-by-m matrix with symbolic variables */
-  SXMatrix ssym(const std::string& name, const std::pair<int,int> & nm); 
+  SXMatrix ssym(const std::string& name, const std::pair<int,int> & rc); 
 
   /** \brief Create a vector of length p with with matrices with symbolic variables of given sparsity */
-  std::vector<SXMatrix> ssym(const std::string& name, const CRSSparsity& sp, int p);
+  std::vector<SXMatrix> ssym(const std::string& name, const Sparsity& sp, int p);
 
-  /** \brief Create a vector of length p with n-by-m matrices with symbolic variables */
-  std::vector<SXMatrix> ssym(const std::string& name, int n, int m, int p);
+  /** \brief Create a vector of length p with nrow-by-ncol matrices with symbolic variables */
+  std::vector<SXMatrix> ssym(const std::string& name, int nrow, int ncol, int p);
 
   /** \brief Create a vector of length r of vectors of length p with matrices with symbolic variables with given sparsity */
-  std::vector<std::vector<SXMatrix> > ssym(const std::string& name, const CRSSparsity& sp, int p, int r);
+  std::vector<std::vector<SXMatrix> > ssym(const std::string& name, const Sparsity& sp, int p, int r);
   
-  /** \brief Create a vector of length r of vectors of length p with n-by-m matrices with symbolic variables */
-  std::vector<std::vector<SXMatrix> > ssym(const std::string& name, int n, int m, int p, int r);
+  /** \brief Create a vector of length r of vectors of length p with nrow-by-ncol matrices with symbolic variables */
+  std::vector<std::vector<SXMatrix> > ssym(const std::string& name, int nrow, int ncol, int p, int r);
 
   /** \brief Create an matrix with symbolic variables, given a sparsity pattern */
-  SXMatrix ssym(const std::string& name, const CRSSparsity& sp);
+  SXMatrix ssym(const std::string& name, const Sparsity& sp);
 
   /** \brief Create a symbolic matrix out of a numeric one */
   SXMatrix ssym(const Matrix<double>& x);
@@ -222,18 +222,18 @@ SXMatrix blockmatrix(SXMatrix array[n][m]){
 /** \brief  Return matrix */
   SXMatrix ret;
 
-/** \brief  loop over rows */
+/** \brief  loop over cols */
   for(int i=0; i<n; ++i){
-/** \brief  Create a row */
-    SXMatrix row;
+/** \brief  Create a col */
+    SXMatrix col;
     
-/** \brief  append components to the row */
+/** \brief  append components to the col */
     for(int j=0; j<m; ++j){
-      row.append(array[i][j]);
+      col.appendColumns(array[i][j]);
     }
     
-/** \brief  append row to matrix */
-    ret.append(trans(row));
+/** \brief  append col to matrix */
+    ret.appendColumns(trans(col));
   }
 
   return ret;
@@ -245,17 +245,17 @@ SXMatrix blockmatrix(SXMatrix array[n]){
 /** \brief  Return matrix */
   SXMatrix ret;
 
-/** \brief  loop over rows */
+/** \brief  loop over cols */
   for(int i=0; i<n; ++i){
 /** \brief  append components */
-    ret.append(array[i]);
+    ret.appendColumns(array[i]);
   }
 
   return ret;
 }
 
 template<> inline
-SXMatrix GenericMatrix<SXMatrix>::sym(const std::string& name, const CRSSparsity& sp){ return ssym(name,sp);}
+SXMatrix GenericMatrix<SXMatrix>::sym(const std::string& name, const Sparsity& sp){ return ssym(name,sp);}
 
 #endif
 
@@ -299,7 +299,7 @@ void hessian(const SXMatrix &ex, const SXMatrix &arg, SXMatrix &H, SXMatrix &g);
 /** \brief Calculate the Jacobian and multiply by a vector from the left
     This is equivalent to mul(jacobian(ex,arg),v) or mul(jacobian(ex,arg).T,v) for transpose_jacobian set to false and
     true respectively. If contrast to these expressions, it will use directional derivatives which is typically (but
-    not necessarily) more efficient if the complete Jacobian is not needed and v has few columns.
+    not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
  */
 SXMatrix jacobianTimesVector(const SXMatrix &ex, const SXMatrix &arg, const SXMatrix &v, bool transpose_jacobian=false);
 

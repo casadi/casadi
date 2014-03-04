@@ -28,7 +28,7 @@ b2 = DMatrix([[6,7,8],[9,10,11],[12,13,14]])
 A = blkdiag([1,b1,b2,15])
 
 print "original: "
-A.printMatrix()
+print A
 
 #! Ruin the nice structure
 numpy.random.seed(0)
@@ -39,14 +39,14 @@ S = A[p1,:]
 #S = A[p1,p2]
 
 print "randomly permuted: "
-S.printMatrix()
+print S
 nb, rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock = S.sparsity().dulmageMendelsohn()
 
 print "number of blocks: ", nb
 print "rowperm: ", rowperm
 print "colperm: ", colperm
 print "restored:"
-S[rowperm,colperm].printMatrix()
+print S[rowperm,colperm]
 print "rowblock: ", rowblock
 print "colblock: ", colblock
 print "coarse_rowblock: ", coarse_rowblock

@@ -28,7 +28,7 @@
 #include "symbolic/generic_type.hpp"
 #include "symbolic/casadi_types.hpp"
 #include "symbolic/options_functionality.hpp"
-#include "symbolic/matrix/crs_sparsity.hpp"
+#include "symbolic/matrix/sparsity.hpp"
 #include "symbolic/matrix/slice.hpp"
 #include "symbolic/matrix/matrix.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
@@ -80,7 +80,7 @@ template<> swig_type_info** meta< std::vector< CasADi::Matrix<double> > >::name 
 template<> swig_type_info** meta< std::vector< std::vector< CasADi::Matrix<double> > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__MatrixT_double_t_std__allocatorT_CasADi__MatrixT_double_t_t_t_std__allocatorT_std__vectorT_CasADi__MatrixT_double_t_std__allocatorT_CasADi__MatrixT_double_t_t_t_t_t;
 template<> swig_type_info** meta< std::vector< CasADi::Matrix<int> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_int_t_std__allocatorT_CasADi__MatrixT_int_t_t_t;
 template<> swig_type_info** meta< std::vector< std::vector< CasADi::Matrix<int> > >  >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__MatrixT_int_t_std__allocatorT_CasADi__MatrixT_int_t_t_t_std__allocatorT_std__vectorT_CasADi__MatrixT_int_t_std__allocatorT_CasADi__MatrixT_int_t_t_t_t_t;
-template<> swig_type_info** meta< CasADi::CRSSparsity >::name = &SWIGTYPE_p_CasADi__CRSSparsity;
+template<> swig_type_info** meta< CasADi::Sparsity >::name = &SWIGTYPE_p_CasADi__Sparsity;
 template<> swig_type_info** meta< CasADi::Matrix<double> >::name = &SWIGTYPE_p_CasADi__MatrixT_double_t;
 template<> swig_type_info** meta< CasADi::Matrix<int> >::name = &SWIGTYPE_p_CasADi__MatrixT_int_t;
 template<> swig_type_info** meta< CasADi::MX >::name = &SWIGTYPE_p_CasADi__MX;

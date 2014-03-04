@@ -28,7 +28,7 @@ namespace CasADi{
   CSparseCholesky::CSparseCholesky(){
   }
 
-  CSparseCholesky::CSparseCholesky(const CRSSparsity& sp, int nrhs){
+  CSparseCholesky::CSparseCholesky(const Sparsity& sp, int nrhs){
     assignNode(new CSparseCholeskyInternal(sp,nrhs));
   }
  
@@ -44,7 +44,7 @@ namespace CasADi{
     return dynamic_cast<const CSparseCholeskyInternal*>(get())!=0;
   }
 
-  CRSSparsity CSparseCholesky::getFactorizationSparsity(bool transpose) const {
+  Sparsity CSparseCholesky::getFactorizationSparsity(bool transpose) const {
     return (*this)->getFactorizationSparsity(transpose);
   }
   

@@ -26,7 +26,7 @@
 using namespace std;
 namespace CasADi{
 
-  CSparseCholeskyInternal::CSparseCholeskyInternal(const CRSSparsity& sparsity, int nrhs)  : LinearSolverInternal(sparsity,nrhs){
+  CSparseCholeskyInternal::CSparseCholeskyInternal(const Sparsity& sparsity, int nrhs)  : LinearSolverInternal(sparsity,nrhs){
     L_ = 0;
     S_ = 0;
 
@@ -48,12 +48,12 @@ namespace CasADi{
     LinearSolverInternal::init();
 
     AT_.nzmax = input().size();  // maximum number of entries 
-    AT_.m = input().size2(); // number of rows
-    AT_.n = input().size1(); // number of columns
-    AT_.p = const_cast<int*>(&input().rowind().front()); // column pointers (size n+1) or col indices (size nzmax)
-    AT_.i = const_cast<int*>(&input().col().front()); // row indices, size nzmax
-    AT_.x = &input().front(); // row indices, size nzmax
-    AT_.nz = -1; // of entries in triplet matrix, -1 for compressed-col 
+    AT_.m = input().size1(); // number of cols
+    AT_.n = input().size2(); // number of rows
+    AT_.p = const_cast<int*>(&input().colind().front()); // row pointers (size n+1) or row indices (size nzmax)
+    AT_.i = const_cast<int*>(&input().row().front()); // col indices, size nzmax
+    AT_.x = &input().front(); // col indices, size nzmax
+    AT_.nz = -1; // of entries in triplet matrix, -1 for compressed-row 
 
     // Temporary
     temp_.resize(AT_.n);
@@ -69,15 +69,15 @@ namespace CasADi{
   }
 
 
-  CRSSparsity CSparseCholeskyInternal::getFactorizationSparsity(bool transpose) const {
+  Sparsity CSparseCholeskyInternal::getFactorizationSparsity(bool transpose) const {
     casadi_assert(S_);
     int n = AT_.n;
     int nzmax = S_->cp[n];
-    std::vector< int > col(n+1);
-    std::copy(S_->cp,S_->cp+n+1,col.begin());
-    std::vector< int > rowind(nzmax);
-    int *Li = &rowind.front();
-    int *Lp = &col.front();
+    std::vector< int > row(n+1);
+    std::copy(S_->cp,S_->cp+n+1,row.begin());
+    std::vector< int > colind(nzmax);
+    int *Li = &colind.front();
+    int *Lp = &row.front();
     const cs* C;
     C = S_->pinv ? cs_symperm (&AT_, S_->pinv, 1) : &AT_;
     std::vector< int > temp(2*n);
@@ -90,15 +90,15 @@ namespace CasADi{
         {
           int i = s [top] ;               /* s [top..n-1] is pattern of L(k,:) */
           int p = c [i]++ ;
-          Li [p] = k ;                /* store L(k,i) in column i */
+          Li [p] = k ;                /* store L(k,i) in row i */
         }
       int p = c [k]++ ;
       Li [p] = k ;    
     }
     Lp [n] = S_->cp [n] ; 
-    CRSSparsity ret(n, n, rowind, col);
+    Sparsity ret(n, n, row, colind); // BUG?
 
-    return transpose? ret : trans(ret);
+    return transpose? trans(ret) : ret;
   
   }
   
@@ -106,17 +106,17 @@ namespace CasADi{
     casadi_assert(L_);
     cs *L = L_->L;
     int nz = L->nzmax;
-    int m = L->m; // number of rows
-    int n = L->n; // number of columns
-    std::vector< int > rowind(m+1);
-    std::copy(L->p,L->p+m+1,rowind.begin());
-    std::vector< int > col(nz);
-    std::copy(L->i,L->i+nz,col.begin());
+    int m = L->m; // number of cols
+    int n = L->n; // number of rows
+    std::vector< int > colind(m+1);
+    std::copy(L->p,L->p+m+1,colind.begin());
+    std::vector< int > row(nz);
+    std::copy(L->i,L->i+nz,row.begin());
     std::vector< double > data(nz);
     std::copy(L->x,L->x+nz,data.begin());
-    DMatrix ret(CRSSparsity(m, n, col, rowind),data); 
+    DMatrix ret(Sparsity(n, m, colind, row),data); 
     
-    return transpose? ret : trans(ret);
+    return transpose? trans(ret) : ret;
   }
   
   void CSparseCholeskyInternal::prepare(){
@@ -145,7 +145,7 @@ namespace CasADi{
       makeSparse(temp);
       if (isSingular(temp.sparsity())) {
         stringstream ss;
-        ss << "CSparseCholeskyInternal::prepare: factorization failed due to matrix being singular. Matrix contains numerical zeros which are structurally non-zero. Promoting these zeros to be structural zeros, the matrix was found to be structurally rank deficient. sprank: " << rank(temp.sparsity()) << " <-> " << temp.size1() << endl;
+        ss << "CSparseCholeskyInternal::prepare: factorization failed due to matrix being singular. Matrix contains numerical zeros which are structurally non-zero. Promoting these zeros to be structural zeros, the matrix was found to be structurally rank deficient. sprank: " << rank(temp.sparsity()) << " <-> " << temp.size2() << endl;
         if(verbose()){
           ss << "Sparsity of the linear system: " << endl;
           input(LINSOL_A).sparsity().print(ss); // print detailed
@@ -169,16 +169,21 @@ namespace CasADi{
   void CSparseCholeskyInternal::solve(double* x, int nrhs, bool transpose){
     casadi_assert(prepared_);
     casadi_assert(L_!=0);
-    casadi_assert(transpose);
-  
+
     double *t = &temp_.front();
-  
     for(int k=0; k<nrhs; ++k){
-      cs_ipvec (L_->pinv, x, t, AT_.n) ;   // t = P1\b
-      cs_lsolve (L_->L, t) ;               // t = L\t 
-      cs_ltsolve (L_->L, t) ;              // t = U\t 
-      cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t 
-      x += nrow();
+      if (transpose) {
+        cs_pvec (S_->q, x, t, AT_.n) ;   // t = P1\b
+        cs_ltsolve (L_->L, t) ;               // t = L\t 
+        cs_lsolve (L_->L, t) ;              // t = U\t 
+        cs_pvec (L_->pinv, t, x, AT_.n) ;      // x = P2\t 
+      } else {
+        cs_ipvec (L_->pinv, x, t, AT_.n) ;   // t = P1\b
+        cs_lsolve (L_->L, t) ;               // t = L\t 
+        cs_ltsolve (L_->L, t) ;              // t = U\t 
+        cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t 
+      }
+      x += ncol();
     }
   }
 
@@ -193,12 +198,12 @@ namespace CasADi{
       if (transpose) cs_lsolve (L_->L, t) ; // t = L\t 
       if (!transpose) cs_ltsolve (L_->L, t) ; // t = U\t 
       cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t 
-      x += nrow();
+      x += ncol();
     }
   }
 
   CSparseCholeskyInternal* CSparseCholeskyInternal::clone() const{
-    return new CSparseCholeskyInternal(input(LINSOL_A).sparsity(),input(LINSOL_B).size1());
+    return new CSparseCholeskyInternal(input(LINSOL_A).sparsity(),input(LINSOL_B).size2());
   }
 
 } // namespace CasADi

@@ -124,7 +124,7 @@ class MXSymbolicArtist(DotArtist):
     s = self.s
     graph = self.graph
     sp = s.sparsity()
-    row = sp.getRow()
+    row = sp.row()
     col = "#990000"
     if s.size() == s.numel() and s.size()==1:
       # The Matrix grid is represented by a html table with 'ports'
@@ -150,7 +150,7 @@ class MXSymbolicArtist(DotArtist):
 #     s = self.s
 #     graph = self.graph
 #     sp = s.sparsity()
-#     row = sp.getRow()
+#     row = sp.row()
     
     
 #     # Note: due to Mapping restructuring, this is no longer efficient code
@@ -217,7 +217,7 @@ class MXEvaluationArtist(DotArtist):
     s = self.s
     graph = self.graph
     sp = s.sparsity()
-    row = sp.getRow()
+    row = sp.row()
     
     
     deps = getDeps(s)
@@ -244,7 +244,7 @@ class MXConstantArtist(DotArtist):
     s = self.s
     graph = self.graph
     sp = s.sparsity()
-    row = sp.getRow()
+    row = sp.row()
     M = s.getMatrixValue()
     col = "#009900"
     if s.size() == s.numel() and s.size() == 1:
@@ -311,7 +311,7 @@ class MXGetNonzerosArtist(DotArtist):
       op = ""
       
     sp = s.sparsity()
-    row = sp.getRow()
+    row = sp.row()
     M = s.mapping()
     col = "#333333"
     if s.size() == s.numel() and s.size() == 1:
@@ -350,7 +350,7 @@ class MXSetNonzerosArtist(DotArtist):
       op = ""
       
     sp = target.sparsity()
-    row = sp.getRow()
+    row = sp.row()
     M = list(s.mapping())
     Mk = 0 
     col = "#333333"
@@ -391,7 +391,7 @@ class MXAddNonzerosArtist(DotArtist):
       op = ""
       
     sp = target.sparsity()
-    row = sp.getRow()
+    row = sp.row()
     M = list(s.mapping())
     Mk = 0 
     col = "#333333"
@@ -514,7 +514,7 @@ class SXMatrixArtist(DotArtist):
     s = self.s
     graph = self.graph
     sp = s.sparsity()
-    row = sp.getRow()
+    row = sp.row()
       
     # The Matrix grid is represented by a html table with 'ports'
     label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">'

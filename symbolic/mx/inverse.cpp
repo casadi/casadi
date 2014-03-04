@@ -53,7 +53,7 @@ namespace CasADi{
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for(int d=0; d<nfwd; ++d){
-      *fwdSens[d][0] = -mul(mul(inv_X,*fwdSeed[d][0]),inv_X);
+      *fwdSens[d][0] = -mul(inv_X,mul(*fwdSeed[d][0],inv_X));
     }
   
     // Adjoint sensitivities
@@ -61,7 +61,7 @@ namespace CasADi{
     if(nadj>0){
       MX trans_inv_X = trans(inv_X);
       for(int d=0; d<nadj; ++d){
-        *adjSens[d][0] -= mul(mul(trans_inv_X,*adjSeed[d][0]),trans_inv_X);
+        *adjSens[d][0] -= mul(trans_inv_X,mul(*adjSeed[d][0],trans_inv_X));
         *adjSeed[d][0] = MX();
       }
     }

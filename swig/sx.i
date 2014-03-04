@@ -21,7 +21,7 @@
  */
 
 %{
-#include "symbolic/matrix/crs_sparsity.hpp"
+#include "symbolic/matrix/sparsity.hpp"
 #include "symbolic/matrix/slice.hpp"
 #include "symbolic/matrix/generic_expression.hpp"
 #include "symbolic/matrix/generic_matrix.hpp"
@@ -42,7 +42,7 @@
 %include "typemaps.i"
 #endif
 
-%include "symbolic/matrix/crs_sparsity.hpp"
+%include "symbolic/matrix/sparsity.hpp"
 %include "symbolic/matrix/slice.hpp"
 
 %include "symbolic/matrix/generic_expression.hpp"
@@ -67,7 +67,7 @@
 
 
 #ifdef SWIGPYTHON
-%extend CasADi::CRSSparsity{
+%extend CasADi::Sparsity{
     %pythoncode %{
         @property
         def shape(self):
@@ -218,9 +218,9 @@ namespace CasADi {
       import numpy as n
       r = n.array((),dtype=object)
       r.resize(self.size1(),self.size2())
-      for i in range(self.size1()):  # loop over rows
-        for el in range(self.rowind(i),self.rowind(i+1)): # loop over the non-zero elements
-          j=self.col(el)  # column
+      for j in range(self.size2()):  # loop over columns
+        for el in range(self.colind(j),self.colind(j+1)): # loop over the non-zero elements
+          i=self.row(el)  # column
           r[i,j] = self.at(el) # add the non-zero element
 
       return r

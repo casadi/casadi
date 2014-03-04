@@ -59,7 +59,7 @@ namespace CasADi{
     LapackQRDense();
   
     /// Create a linear solver given a sparsity pattern
-    explicit LapackQRDense(const CRSSparsity& sparsity, int nrhs=1);
+    explicit LapackQRDense(const Sparsity& sparsity, int nrhs=1);
     
     /// Access functions of the node
     LapackQRDenseInternal* operator->();
@@ -69,7 +69,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const CRSSparsity& sp, int nrhs){ return LapackQRDense(sp, nrhs);}
+    static LinearSolver creator(const Sparsity& sp, int nrhs){ return LapackQRDense(sp, nrhs);}
 #ifdef SWIG
     %nocallback;
 #endif
@@ -91,7 +91,7 @@ namespace CasADi{
   class LapackQRDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackQRDenseInternal(const CRSSparsity& sparsity, int nrhs);
+    LapackQRDenseInternal(const Sparsity& sparsity, int nrhs);
 
     // Clone
     virtual LapackQRDenseInternal* clone() const;
@@ -120,7 +120,7 @@ namespace CasADi{
     std::vector<double> work_; 
     
     // Dimensions
-    int nrow_, ncol_;
+    int ncol_, nrow_;
 
   };
 

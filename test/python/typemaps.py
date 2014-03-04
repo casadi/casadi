@@ -50,11 +50,11 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt,"DMatrix(numpy.ndarray)")
       self.checkarray(m,zt.toArray(),"DMatrix(numpy.ndarray).toArray()")
       if scipy_available:
-        self.checkarray(m,zt.toCsr_matrix(),"DMatrix(numpy.ndarray).toCsr_matrix()")
+        self.checkarray(m,zt.toCsc_matrix(),"DMatrix(numpy.ndarray).toCsc_matrix()")
       
   def test_1(self):
     self.message("DMatrix -> DMatrix")
-    arrays = [DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])]
+    arrays = [DMatrix(4,3,[0,2,2,3],[1,2,1],[3,2.3,8])]
     for i in range(len(arrays)):
       m = arrays[i]
       zt=trans(trans(m))
@@ -62,7 +62,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt,"DMatrix(DMatrix)")
       self.checkarray(m,zt.toArray(),"DMatrix(DMatrix).toArray()")
       if scipy_available:
-        self.checkarray(m,zt.toCsr_matrix(),"DMatrix(DMatrix).toCsr_matrix()")
+        self.checkarray(m,zt.toCsc_matrix(),"DMatrix(DMatrix).toCsc_matrix()")
    
   def test_2(self):
     self.message("crs_matrix -> DMatrix")
@@ -78,16 +78,16 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt,"DMatrix(crs_matrix)")
       self.checkarray(m,zt.toArray(),"DMatrix(crs_matrix).toArray()")
       if scipy_available:
-        self.checkarray(m,zt.toCsr_matrix(),"DMatrix(crs_matrix).toCsr_matrix()")
+        self.checkarray(m,zt.toCsc_matrix(),"DMatrix(crs_matrix).toCsc_matrix()")
       
       
   def test_setget(self):
     self.message("DMatrix set/get")
     data = n.array([3,2.3,8])
-    dm=DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])
+    dm=DMatrix(3,4,[0,0,2,3,3],[0,2,0],[3,2.3,8])
     
     if scipy_available:
-      c=dm.toCsr_matrix()
+      c=dm.toCsc_matrix()
     z=n.zeros((3,4))
     dm.get(z)
     self.checkarray(z,dm,"get(2Dndarray)")
@@ -130,7 +130,7 @@ class typemaptests(casadiTestCase):
 
   def test_conversion(self):
     self.message("DMatrix conversions")
-    w = DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])
+    w = DMatrix(4,3,[0,2,2,3],[1,2,1],[3,2.3,8])
     d = array([[1,2,3],[4,5,6]])
     
     list(w.data())
@@ -140,7 +140,7 @@ class typemaptests(casadiTestCase):
     w.toMatrix()
     matrix(w)
     if scipy_available:
-      w.toCsr_matrix()
+      w.toCsc_matrix()
 
     self.checkarray(DMatrix(d),d,"DMatrix(numpy.ndarray)")
     #self.checkarray(DMatrix(array([1,2,3,4,5,6])),d.ravel(),"DMatrix(numpy.ndarray)")
@@ -707,13 +707,13 @@ class typemaptests(casadiTestCase):
     self.message("std::vector<double> typemap.")
     a = array([0,2,2,3])
     b = array([0.738,0.39,0.99])
-    DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.39,0.99])
-    DMatrix(3,4,[1,2,1],(0,2,2,3),[0.738,0.39,0.99])
-    DMatrix(3,4,[1,2,1],list(a),[0.738,0.39,0.99])
-    DMatrix(3,4,[1,2,1],a,[0.738,0.39,0.99])
-    DMatrix(3,4,[1,2,1],[0,2,2,3],(0.738,0.39,0.99))
-    DMatrix(3,4,[1,2,1],[0,2,2,3],list(b))
-    DMatrix(3,4,[1,2,1],[0,2,2,3],b)
+    DMatrix(4,3,[0,2,2,3],[1,2,1],[0.738,0.39,0.99])
+    DMatrix(4,3,(0,2,2,3),[1,2,1],[0.738,0.39,0.99])
+    DMatrix(4,3,list(a),[1,2,1],[0.738,0.39,0.99])
+    DMatrix(4,3,a,[1,2,1],[0.738,0.39,0.99])
+    DMatrix(4,3,[0,2,2,3],[1,2,1],(0.738,0.39,0.99))
+    DMatrix(4,3,[0,2,2,3],[1,2,1],list(b))
+    DMatrix(4,3,[0,2,2,3],[1,2,1],b)
     
   def test_imatrix(self):
     self.message("IMatrix")
@@ -871,6 +871,31 @@ class typemaptests(casadiTestCase):
     self.message("ufunc.add")
     
     self.checkarray(DMatrix(sum(DMatrix([1,2,3]))),DMatrix(6))
+    
+  def test_sxmatrix(self):
+
+    def val(a):
+      f = SXFunction([],[a])
+      f.init()
+      f.evaluate()
+      return f.output()
+      
+    for i in [SX(1),1,1.0]:
+      a = numpy.array([[SX(1),2],[3,4]])
+      print val(SXMatrix(a))
+      print val(SXMatrix(a.T))
+
+      self.checkarray(val(SXMatrix(a)),DMatrix([[1,2],[3,4]]))
+      self.checkarray(val(SXMatrix(a.T).T),DMatrix([[1,2],[3,4]]))
+
+
+      a = numpy.matrix([[SX(1),2],[3,4]])
+      
+      print val(SXMatrix(a))
+      print DMatrix([[1,2],[3,4]])
+
+      self.checkarray(val(SXMatrix(a)),DMatrix([[1,2],[3,4]]))
+      self.checkarray(val(SXMatrix(a.T).T),DMatrix([[1,2],[3,4]]))
     
 if __name__ == '__main__':
     unittest.main()

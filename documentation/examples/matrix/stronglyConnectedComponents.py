@@ -24,7 +24,7 @@ import numpy
 
 # Let's construct a block diagonal structure
 A = blkdiag([1,DMatrix([[2,3],[3,4]]),DMatrix([[5,6,7],[6,8,9],[7,9,10]]),11])
-A.printMatrix()
+print A
 A.sparsity().spy()
 
 numpy.random.seed(2)
@@ -33,7 +33,7 @@ numpy.random.seed(2)
 perm =  list(numpy.random.permutation(range(A.size1())))
 AP = A[perm,perm]
 
-AP.printMatrix()
+print AP
 AP.sparsity().spy()
 
 # And use stronglyConnectedComponents to recover the blocks
@@ -41,7 +41,7 @@ n,p,r = AP.sparsity().stronglyConnectedComponents()
 
 APrestored = AP[p,p]
 
-APrestored.printMatrix()
+print APrestored
 APrestored.sparsity().spy()
 print "# blocks: ", n
 print "block boundaries: ", r[:n]

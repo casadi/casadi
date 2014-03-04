@@ -850,22 +850,24 @@ void SymbolicOCP::scaleEquations(){
   // Get the maximum of every row
   Matrix<double> &J0 = J.output();
   vector<double> scale(J0.size1(),0.0); // scaling factors
-  for(int i=0; i<J0.size1(); ++i){
-    // Loop over non-zero entries of the row
-    for(int el=J0.rowind(i); el<J0.rowind(i+1); ++el){
-      // Column
-      //int j=J0.col(el);
+  for(int cc=0; cc<J0.size2(); ++cc){
+    // Loop over non-zero entries of the column
+    for(int el=J0.colind(cc); el<J0.colind(cc+1); ++el){
+      // Row
+      int rr=J0.row(el);
       
       // The scaling factor is the maximum norm, ignoring not-a-number entries
       if(!isnan(J0.at(el))){
-        scale[i] = max(scale[i],fabs(J0.at(el)));
+        scale[rr] = max(scale[rr],fabs(J0.at(el)));
       }
     }
-    
-    // Make sure 
-    if(scale[i]==0){
-      cout << "Warning: Could not generate a scaling factor for equation " << i << "(0 == " << ode.at(i) << "), selecting 1." << endl;
-      scale[i]=1.;
+  }
+  
+  // Make sure nonzero factor found
+  for(int rr=0; rr<J0.size1(); ++rr){
+    if(scale[rr]==0){
+      cout << "Warning: Could not generate a scaling factor for equation " << rr << "(0 == " << ode.at(rr) << "), selecting 1." << endl;
+      scale[rr]=1.;
     }
   }
   
@@ -886,7 +888,7 @@ void SymbolicOCP::sortODE(){
   // Find out which differential equation depends on which differential state
   SXFunction f(der(x),ode);
   f.init();
-  CRSSparsity sp = f.jacSparsity();
+  Sparsity sp = f.jacSparsity();
   
   // BLT transformation
   vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -914,7 +916,7 @@ void SymbolicOCP::sortALG(){
   // Find out which algebraic equation depends on which algebraic state
   SXFunction f(var(z),alg);
   f.init();
-  CRSSparsity sp = f.jacSparsity();
+  Sparsity sp = f.jacSparsity();
   
   // BLT transformation
   vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -943,7 +945,7 @@ void SymbolicOCP::sortDependentParameters(){
   SXMatrix v = var(pd);
   SXFunction f(v,v-binding(pd));
   f.init();
-  CRSSparsity sp = f.jacSparsity();
+  Sparsity sp = f.jacSparsity();
   
   // BLT transformation
   vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -972,7 +974,7 @@ void SymbolicOCP::makeExplicit(){
   f.init();
 
   // Get the sparsity of the Jacobian which can be used to determine which variable can be calculated from which other
-  CRSSparsity sp = f.jacSparsity();
+  Sparsity sp = f.jacSparsity();
 
   // BLT transformation
   vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -1064,7 +1066,7 @@ void SymbolicOCP::eliminateAlgebraic(){
   f.init();
 
   // Get the sparsity of the Jacobian which can be used to determine which variable can be calculated from which other
-  CRSSparsity sp = f.jacSparsity();
+  Sparsity sp = f.jacSparsity();
 
   // BLT transformation
   vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;

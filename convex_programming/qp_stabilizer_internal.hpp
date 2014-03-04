@@ -30,33 +30,36 @@ namespace CasADi{
 
   /** \brief Internal class for QPStabilizerInternal
    * 
-      @copydoc StabilizedQPSolver_doc
+   @copydoc StabilizedQPSolver_doc
    * */
-class QPStabilizerInternal : public StabilizedQPSolverInternal {
-  friend class QPStabilizer;
-public:
+  class QPStabilizerInternal : public StabilizedQPSolverInternal {
+    friend class QPStabilizer;
+  public:
 
-  /** \brief  Clone */
-  virtual QPStabilizerInternal* clone() const;
-  
-  /** \brief  Create a new Solver */
-  explicit QPStabilizerInternal(const std::vector<CRSSparsity> &st);
+    /** \brief Constructor */
+    explicit QPStabilizerInternal(const std::vector<Sparsity> &st);
 
-  /** \brief  Destructor */
-  virtual ~QPStabilizerInternal();
+    /** \brief Destructor */
+    virtual ~QPStabilizerInternal();
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Clone */
+    virtual QPStabilizerInternal* clone() const{ return new QPStabilizerInternal(*this);}
+
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+
+    /** \brief Initialize */
+    virtual void init();
+
+    /** \brief Solve the QP */
+    virtual void evaluate();
   
-  virtual void evaluate();
+    /** \brief Generate native code for debugging */
+    virtual void generateNativeCode(std::ostream &file) const;
   
-  /** \brief Generate native code for debugging */
-  virtual void generateNativeCode(std::ostream &file) const;
-  
-  protected:
+    /// Data members 
     QPSolver qp_solver_;
-
-};
+  };
 
 } // namespace CasADi
 

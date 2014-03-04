@@ -59,7 +59,7 @@ namespace CasADi{
     LapackLUDense();
   
     /// Create a linear solver given a sparsity pattern
-    explicit LapackLUDense(const CRSSparsity& sparsity, int nrhs=1);
+    explicit LapackLUDense(const Sparsity& sparsity, int nrhs=1);
     
     /// Access functions of the node
     LapackLUDenseInternal* operator->();
@@ -69,7 +69,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const CRSSparsity& sp, int nrhs){ return LapackLUDense(sp,nrhs);}
+    static LinearSolver creator(const Sparsity& sp, int nrhs){ return LapackLUDense(sp,nrhs);}
 #ifdef SWIG
     %nocallback;
 #endif
@@ -84,17 +84,17 @@ namespace CasADi{
   /// Solve a system of equation using an LU-factorized matrix (lapack)
   extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info);
 
-  /// Calculate row and column scalings
-  extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c, double *rowcnd, double *colcnd, double *amax, int *info);
+  /// Calculate col and row scalings
+  extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c, double *colcnd, double *rowcnd, double *amax, int *info);
 
   /// Equilibriate the system
-  extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c, double *rowcnd, double *colcnd, double *amax, char *equed );
+  extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c, double *colcnd, double *rowcnd, double *amax, char *equed );
 
   /// Internal class
   class LapackLUDenseInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LapackLUDenseInternal(const CRSSparsity& sparsity, int nrhs);
+    LapackLUDenseInternal(const Sparsity& sparsity, int nrhs);
 
     // Clone
     virtual LapackLUDenseInternal* clone() const;
@@ -113,11 +113,11 @@ namespace CasADi{
 
   protected:
 
+    // Scale columns
+    void colScaling(double* x, int nrhs);
+    
     // Scale rows
     void rowScaling(double* x, int nrhs);
-    
-    // Scale columns
-    void columnScaling(double* x, int nrhs);
     
     // Matrix
     std::vector<double> mat_;
@@ -125,7 +125,7 @@ namespace CasADi{
     // Pivoting elements
     std::vector<int> ipiv_;
 
-    // Row and column scaling
+    // Col and row scaling
     std::vector<double> r_, c_;
     
     // Type of scaling during the last equilibration
@@ -138,7 +138,7 @@ namespace CasADi{
     bool allow_equilibration_failure_;
         
     // Dimensions
-    int nrow_, ncol_;
+    int ncol_, nrow_;
     
   };
 

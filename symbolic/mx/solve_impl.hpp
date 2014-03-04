@@ -32,7 +32,7 @@ namespace CasADi{
 
   template<bool Tr>
   Solve<Tr>::Solve(const MX& r, const MX& A, const LinearSolver& linear_solver) : linear_solver_(linear_solver){
-    casadi_assert_message(r.size2() == A.size1(),"Solve::Solve: dimension mismatch.");
+    casadi_assert_message(r.size1() == A.size2(),"Solve::Solve: dimension mismatch.");
     setDependencies(r,A);
     setSparsity(r.sparsity());
   }
@@ -42,10 +42,25 @@ namespace CasADi{
     if(part==0){
       stream << "(";
     } else if(part==1){
-      stream << "/";
+      stream << "'/";
     } else {
+      if(!Tr) stream << "'";
+      stream << ")'";
+    }
+  }
+
+  template<bool Tr>
+  void Solve<Tr>::print(std::ostream &stream, long& remaining_calls) const{
+    if(remaining_calls>0){
+      remaining_calls--;
+      stream << "(";
+      dep(1)->print(stream,remaining_calls);
       if(Tr) stream << "'";
+      stream << "\\";
+      dep(0)->print(stream,remaining_calls);
       stream << ")";
+    } else {
+      stream << "...";
     }
   }
 

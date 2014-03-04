@@ -183,7 +183,7 @@ namespace CasADi{
     }
   }
 
-  CRSSparsity ParallelizerInternal::getJacSparsity(int iind, int oind, bool symmetric){
+  Sparsity ParallelizerInternal::getJacSparsity(int iind, int oind, bool symmetric){
     // Number of tasks
     int ntask = inind_.size()-1;
   
@@ -203,7 +203,7 @@ namespace CasADi{
     
     } else {
       // All-zero jacobian
-      return CRSSparsity();
+      return Sparsity();
     }
   }
 

@@ -30,9 +30,9 @@ using namespace std;
 
 namespace CasADi{
 
-  SetSparse::SetSparse(const MX& x, const CRSSparsity& sp){
+  SetSparse::SetSparse(const MX& x, const Sparsity& sp){
     setDependencies(x);
-    setSparsity(CRSSparsity(sp));
+    setSparsity(Sparsity(sp));
   }
 
   SetSparse* SetSparse::clone() const{

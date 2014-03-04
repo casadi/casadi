@@ -36,7 +36,7 @@ namespace CasADi{
   public:
 
     /// Constructor
-    Reshape(const MX& x, CRSSparsity sp);
+    Reshape(const MX& x, Sparsity sp);
 
     /// Clone function
     virtual Reshape* clone() const;
@@ -73,7 +73,7 @@ namespace CasADi{
     virtual int numInplace() const{ return 1;}
     
     /// Reshape
-    virtual MX getReshape(const CRSSparsity& sp) const;
+    virtual MX getReshape(const Sparsity& sp) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const{ return sameOpAndDeps(node,depth) && sparsity()==node->sparsity();}

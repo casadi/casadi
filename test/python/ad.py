@@ -47,8 +47,8 @@ class ADtests(casadiTestCase):
     inp[4,0]=z
     inp[5,0]=w
     
-    sp = CRSSparsity(6,1,[0, 0, 0, 0],[0, 1, 1, 2, 2, 3, 4])
-    spT = CRSSparsity(1,6,[0, 2, 4, 5],[0, 4])
+    sp = Sparsity(1,6,[0, 1, 1, 2, 2, 3, 4],[0, 0, 0, 0]).T
+    spT = Sparsity(6,1,[0, 4],[0, 2, 4, 5]).T
     
     self.sxinputs = {
        "column" : {
@@ -174,14 +174,14 @@ class ADtests(casadiTestCase):
               fe.init()
               fe.setInput(n)
               fe.evaluate()
-              self.checkarray(c.flatten(fe.getOutput()),mul(J,c.flatten(seed)),"AD") 
+              self.checkarray(c.vec(fe.getOutput()),mul(J,c.vec(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = SXFunction([y],[sens])
               fe.init()
               fe.setInput(n)
               fe.evaluate()
-              self.checkarray(c.flatten(fe.getOutput()),mul(J.T,c.flatten(seed)),"AD") 
+              self.checkarray(c.vec(fe.getOutput()),mul(J.T,c.vec(seed)),"AD") 
               
   def test_MXevalMX(self):
     n=array([1.2,2.3,7,1.4])
@@ -220,14 +220,14 @@ class ADtests(casadiTestCase):
               fe.init()
               fe.setInput(n)
               fe.evaluate()
-              self.checkarray(c.flatten(fe.getOutput()),mul(J,c.flatten(seed)),"AD") 
+              self.checkarray(c.vec(fe.getOutput()),mul(J,c.vec(seed)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = MXFunction([y],[sens])
               fe.init()
               fe.setInput(n)
               fe.evaluate()
-              self.checkarray(c.flatten(fe.getOutput()),mul(J.T,c.flatten(seed)),"AD") 
+              self.checkarray(c.vec(fe.getOutput()),mul(J.T,c.vec(seed)),"AD") 
 
   @known_bug()  # Not implemented
   def test_MXevalSX(self):

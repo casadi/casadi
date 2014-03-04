@@ -26,7 +26,7 @@
 #include "mx_node.hpp"
 
 namespace CasADi{
-  /** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
+  /** \brief An MX atomic for matrix-matrix product, note that the first factor must be provided transposed
       \author Joel Andersson 
       \date 2010
   */

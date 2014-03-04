@@ -45,7 +45,7 @@ namespace CasADi {
     }
 
     setDependencies(arg);
-    setSparsity(CRSSparsity(1, 1, true));
+    setSparsity(Sparsity(1, 1, true));
   }
 
   CallFX* CallFX::clone() const {
@@ -64,7 +64,7 @@ namespace CasADi {
     return fcn_.getNumOutputs();
   }
 
-  const CRSSparsity& CallFX::sparsity(int oind) const{
+  const Sparsity& CallFX::sparsity(int oind) const{
     return fcn_.output(oind).sparsity();
   }
 

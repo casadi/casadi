@@ -82,7 +82,7 @@ int main(){
   FX integrator = create_integrator(nj,nu);
 
   // PART 2: CONSTRUCT THE NLP
-  MX U("U",nu); // control for all segments
+  MX U = msym("U",nu); // control for all segments
  
   // Initial position
   vector<double> X0(3);

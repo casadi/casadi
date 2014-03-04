@@ -32,7 +32,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../sx/sx_node.hpp"
 #include "../casadi_types.hpp"
-#include "../matrix/crs_sparsity_internal.hpp"
+#include "../matrix/sparsity_internal.hpp"
 #include "../profiling.hpp"
 #include "../casadi_options.hpp"
 
@@ -788,15 +788,15 @@ namespace CasADi{
 
   FX SXFunctionInternal::getFullJacobian(){
     // Get all the inputs
-    SXMatrix arg(0,1); 
+    SXMatrix arg = SXMatrix::sparse(1,0); 
     for(vector<SXMatrix>::const_iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
-      arg.append(flatten(*i));
+      arg.appendColumns(trans(vec(*i)));
     }
  
     // Get all the outputs
-    SXMatrix res(0,1); 
+    SXMatrix res = SXMatrix::sparse(1,0); 
     for(vector<SXMatrix>::const_iterator i=outputv_.begin(); i!=outputv_.end(); ++i){
-      res.append(flatten(*i));
+      res.appendColumns(trans(vec(*i)));
     }
     
     // Generate an expression for the Jacobian
@@ -1255,7 +1255,7 @@ namespace CasADi{
       case CL_INVALID_KERNEL_ARGS: msg = "The kernel argument values have not been specified."; break;
       case CL_INVALID_WORK_GROUP_SIZE: msg = "A work-group size is specified for kernel using the __attribute__((reqd_work_group_size(X, Y, Z))) qualifier in program source and is not (1, 1, 1)."; break;
       case CL_MISALIGNED_SUB_BUFFER_OFFSET: msg = "A sub-buffer object is specified as the value for an argument that is a buffer object and the offset specified when the sub-buffer object is created is not aligned to CL_DEVICE_MEM_BASE_ADDR_ALIGN value for device associated with queue."; break;
-      case CL_INVALID_IMAGE_SIZE: msg = "n image object is specified as an argument value and the image dimensions (image width, height, specified or compute row and/or slice pitch) are not supported by device associated with queue"; break;
+      case CL_INVALID_IMAGE_SIZE: msg = "n image object is specified as an argument value and the image dimensions (image width, height, specified or compute col and/or slice pitch) are not supported by device associated with queue"; break;
       case CL_OUT_OF_RESOURCES: msg = "(1) There is a failure to queue the execution instance of kernel on the command-queue because of insufficient resources needed to execute the kernel. (2) There is a failure to allocate resources required by the OpenCL implementation on the device."; break;
       case CL_MEM_OBJECT_ALLOCATION_FAILURE: msg = "There is a failure to allocate memory for data store associated with image or buffer objects specified as arguments to kernel."; break;
       case CL_INVALID_EVENT_WAIT_LIST: msg = "Event_wait_list is NULL and num_events_in_wait_list > 0, or event_wait_list is not NULL and num_events_in_wait_list is 0, or if event objects in event_wait_list are not valid events. "; break;

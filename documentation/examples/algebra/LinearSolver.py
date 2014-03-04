@@ -22,7 +22,7 @@
 #! Linear solvers
 #! =================
 #!
-#! We demonstrate solving a dense system x.A=b by using different linear solvers.
+#! We demonstrate solving a dense system A.x=b by using different linear solvers.
 #!
 from casadi import *
 from numpy import *
@@ -31,10 +31,10 @@ import time
 n=100
 #$ We generate $A \in \mathbf{R}^{n \times n}$, $x \in \mathbf{R}^{n}$ with $n=100$
 A=DMatrix([[cos(i*j)-sin(i) for i in range(n)] for j in range(n)])
-x=DMatrix([tan(i) for i in range(n)]).T
+x=DMatrix([tan(i) for i in range(n)])
 
 #! We generate the b vector:
-b=mul(x,A)
+b=mul(A,x)
 
 #! We demonstrate the LinearSolver API with CSparse:
 s = CSparse(A.sparsity())

@@ -71,7 +71,7 @@ namespace CasADi{
     virtual FX getHessLag();
 
     /// Get or generate the sparsity pattern of the Hessian of the Lagrangian
-    virtual CRSSparsity getSpHessLag();
+    virtual Sparsity getSpHessLag();
     
     // Access the objective gradient function
     FX& gradF();
@@ -86,7 +86,7 @@ namespace CasADi{
     FX& gradLag();
 
     /// Get the sparsity pattern of the Hessian of the Lagrangian
-    CRSSparsity& spHessLag();
+    Sparsity& spHessLag();
 
     /// Number of variables
     int nx_;
@@ -119,7 +119,7 @@ namespace CasADi{
     FX gradLag_;
 
     // Sparsity pattern of the Hessian of the Lagrangian
-    CRSSparsity spHessLag_;
+    Sparsity spHessLag_;
     
     /// A reference to this object to be passed to the user functions
     FX ref_;

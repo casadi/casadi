@@ -21,7 +21,7 @@
  */
 
 %{
-#include "symbolic/matrix/crs_sparsity.hpp"
+#include "symbolic/matrix/sparsity.hpp"
 #include "symbolic/matrix/matrix.hpp"
 #include <sstream>
 #include "symbolic/casadi_exception.hpp"

@@ -52,6 +52,9 @@ namespace CasADi{
     /** \brief  Clone function */
     virtual Solve* clone() const{ return new Solve(*this);}
 
+    /** \brief  Print expression (make sure number of calls is not exceeded) */
+    virtual void print(std::ostream &stream, long& remaining_calls) const;
+
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
@@ -77,7 +80,7 @@ namespace CasADi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr){ ni=0; nr=sparsity().size2();}
+    virtual void nTmp(size_t& ni, size_t& nr){ ni=0; nr=sparsity().size1();}
 
     /// Linear Solver (may be shared between multiple nodes)
     LinearSolver linear_solver_;

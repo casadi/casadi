@@ -26,20 +26,20 @@
 #include "mx_node.hpp"
 
 namespace CasADi{
-/** \brief Represents a symbolic MX
-  \author Joel Andersson 
-  \date 2010
-  A regular user is not supposed to work with this Node class.
-  This user can call MX(name,n,m) directly.
-*/
-class SymbolicMX : public MXNode{
+  /** \brief Represents a symbolic MX
+      \author Joel Andersson 
+      \date 2010
+      A regular user is not supposed to work with this Node class.
+      This user can call MX(name,n,m) directly.
+  */
+  class SymbolicMX : public MXNode{
   public:
 
     /** \brief  Constructors */
-    explicit SymbolicMX(const std::string& name, int n=1, int m=1);
+    explicit SymbolicMX(const std::string& name, int nrow=1, int ncol=1);
 
     /** \brief  Constructors */
-    explicit SymbolicMX(const std::string& name, const CRSSparsity & sp);
+    explicit SymbolicMX(const std::string& name, const Sparsity & sp);
 
     /// Destructor
     virtual ~SymbolicMX(){}
@@ -71,7 +71,7 @@ class SymbolicMX : public MXNode{
   protected:
     // Name of the varible
     std::string name_;
-};
+  };
 
 } // namespace CasADi
 

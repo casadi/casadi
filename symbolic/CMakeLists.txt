@@ -25,13 +25,13 @@ SET(CASADI_SRCS
   functor_internal.hpp        functor_internal.cpp     
   polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials
 
-  # Template class Matrix<>, implements a sparse Matrix with row compressed storage, designed to work well with symbolic data types (SX)
+  # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
   matrix/generic_expression.hpp                         # Base class for SX MX and Matrix<>
   matrix/generic_expression_tools.hpp                   # Tools for SX MX and Matrix<>
   matrix/generic_matrix.hpp                             # Base class for Matrix<> and MX
   matrix/generic_matrix_tools.hpp                       # Tools for both Matrix<> and MX
   matrix/matrix.hpp           matrix/matrix_impl.hpp    # The Matrix template class
-  matrix/crs_sparsity.hpp     matrix/crs_sparsity.cpp   matrix/crs_sparsity_internal.hpp   matrix/crs_sparsity_internal.cpp    # reference counted sparsity pattern
+  matrix/sparsity.hpp     matrix/sparsity.cpp   matrix/sparsity_internal.hpp   matrix/sparsity_internal.cpp    # reference counted sparsity pattern
   matrix/slice.hpp            matrix/slice.cpp          # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
   matrix/submatrix.hpp                                  # A reference to a block of the matrix to allow operations such as A(:,3) = ...
   matrix/nonzeros.hpp                                   # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
@@ -59,8 +59,8 @@ SET(CASADI_SRCS
   mx/call_fx.hpp             mx/call_fx.cpp             # FX function evaluation
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
   mx/transpose.hpp           mx/transpose.cpp           # Transpose
-  mx/vertcat.hpp             mx/vertcat.cpp             # Vertical concatenation
-  mx/vertsplit.hpp           mx/vertsplit.cpp           # Vertical split
+  mx/concat.hpp              mx/concat.cpp              # Concatenation
+  mx/split.hpp               mx/split.cpp               # Split (inverse of concatenation)
   mx/reshape.hpp             mx/reshape.cpp             # Reshape
   mx/subref.hpp              mx/subref.cpp              # Submatrix reference
   mx/subassign.hpp           mx/subassign.cpp           # Submatrix assignment

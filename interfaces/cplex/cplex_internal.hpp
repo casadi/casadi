@@ -29,103 +29,85 @@
 
 namespace CasADi{
 
-/** Internal class for CplexSolver
-  @copydoc QPSolver_doc
- */
-class CplexInternal : public QPSolverInternal{
-  friend class CplexSolver;
-public:
-  /** \brief Default constructor */
-  explicit CplexInternal();
+  /** Internal class for CplexSolver
+      @copydoc QPSolver_doc
+  */
+  class CplexInternal : public QPSolverInternal{
+    friend class CplexSolver;
+  public:
+    /** \brief Default constructor */
+    explicit CplexInternal();
   
-  /// Clone
-  virtual CplexInternal* clone() const;
+    /// Clone
+    virtual CplexInternal* clone() const;
   
-  /// Constructor using sparsity patterns
-  explicit CplexInternal(const std::vector<CRSSparsity>& st);
+    /// Constructor using sparsity patterns
+    explicit CplexInternal(const std::vector<Sparsity>& st);
 
-  /// Destructor
-  virtual ~CplexInternal();
+    /// Destructor
+    virtual ~CplexInternal();
   
-  /// Free Cplex memory
-  void freeCplex();
+    /// Free Cplex memory
+    void freeCplex();
 
-  // Initialize the solver
-  virtual void init();
+    // Initialize the solver
+    virtual void init();
 
-  // Solve the QP
-  virtual void evaluate();
+    // Solve the QP
+    virtual void evaluate();
+    
+    // OPTIONS 
+    /** Which algorithm to use
+     * 0 -> Automatic (default)
+     * 1 -> Primal simplex
+     * 2 -> Dual simplex
+     * 3 -> Network optimizer
+     * 4 -> Barrier 
+     * 5 -> Sifting
+     * 6 -> Concurent
+     * 7 -> Crossover
+     */
+    /// Stores which QP algorithm to use
+    int qp_method_;
 
-  /// Converts CasADi sparsity to Cplex sparsity
-  static void toCplexSparsity(const CRSSparsity& sp_trans, std::vector<int> &matbeg, std::vector<int>& matcnt, std::vector<int>& matind);
+    /// Print to file (for later use)
+    bool dump_to_file_;
+
+    /// Indicates if we have to warm-start
+    bool is_warm_;
+
+    /// Accuracy
+    double tol_;
+
+    /// Nature of problem (always minimization)
+    int objsen_;
   
-protected:
+    /// Determines relation >,<,= in the lin. constraints
+    std::vector<char> sense_;
+
+    /// Coefficients of matrix A (constraint Jacobian)
+    std::vector<int> matcnt_;
+
+    /// Right-hand side of constraints
+    std::vector<double> rhs_;
+
+    /// Range of constraints
+    std::vector<double> rngval_;
   
-  // OPTIONS 
-  /** Which algorithm to use
-   * 0 -> Automatic (default)
-   * 1 -> Primal simplex
-   * 2 -> Dual simplex
-   * 3 -> Network optimizer
-   * 4 -> Barrier 
-   * 5 -> Sifting
-   * 6 -> Concurent
-   * 7 -> Crossover
-   */
-  /// Stores which QP algorithm to use
-  int qp_method_;
-  /// Print to file (for later use)
-  bool dump_to_file_;
-  /// Indicates if we have to warm-start
-  bool is_warm_;
-  /// Accuracy
-  double tol_;
-  /// Number of variables
-  int NUMCOLS_;
-  /// Number of constrains (altogether)
-  int NUMROWS_;
-  /// Nature of problem (always minimization)
-  int objsen_;
+    /// Coefficients of matrix H (objective Hessian)
+    std::vector<int> qmatcnt_;
   
-  /// Linear term of objective
-  double* obj_;
+    /// Storage for basis info of primal variables
+    std::vector<int> cstat_;
 
-  /// Determines relation >,<,= in the lin. constraints
-  std::vector<char> sense_;
+    /// Storage for basis info of slack variables
+    std::vector<int> rstat_;
 
-  /// Coefficients of matrix A (constraint Jacobian)
-  std::vector<int> matbeg_;
-  std::vector<int> matcnt_;
-  std::vector<int> matind_;
-  std::vector<double> matval_;
+    /// CPLEX-environment
+    CPXENVptr env_;
+    CPXLPptr lp_;
 
-  /// Transposed sparsity pattern mapping from A to AT
-  std::vector<int> AT_nonzero_mapping_;
-
-  /// Right-hand side of constraints
-  std::vector<double> rhs_;
-  /// Range of constraints
-  std::vector<double> rngval_;
-
-  /// Simple bounds on x
-  double  *lb_;
-  double  *ub_;
-  
-  /// Coefficients of matrix H (objective Hessian)
-  std::vector<int> qmatbeg_;
-  std::vector<int> qmatcnt_;
-  std::vector<int> qmatind_;
-  
-  /// Storage for basis info of primal variables
-  std::vector<int> cstat_;
-  /// Storage for basis info of slack variables
-  std::vector<int> rstat_;
-
-  /// CPLEX-environment
-  CPXENVptr env_;
-  CPXLPptr lp_;
-
-};
+  };
 } // end namespace CasADi
 
 #endif //CPLEX_INTERNAL_HPP
