@@ -13,8 +13,6 @@ OUTPUT_STRIP_TRAILING_WHITESPACE
 ERROR_QUIET
 )
 
-set(PYTHON_PREFIX "/home/jg/programs/casadi/python_install")
-
 execute_process(COMMAND git describe HEAD
 OUTPUT_VARIABLE git_describe
 OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -81,10 +79,10 @@ option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" 
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
 option(WITH_SQIC "Enable SQIC interface" OFF)
-option(WITH_SLICOT "Enable SLICOT interface" ON)
+option(WITH_SLICOT "Enable SLICOT interface" OFF)
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
-option(WITH_WORHP "Compile the WORHP interface" ON) 
-option(WITH_SNOPT "Compile the SNOPT interface" ON) 
+option(WITH_WORHP "Compile the WORHP interface" OFF) 
+option(WITH_SNOPT "Compile the SNOPT interface" OFF) 
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
 option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
@@ -102,8 +100,8 @@ option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 # For code optimization
 if(CMAKE_BUILD_TYPE)
 else(CMAKE_BUILD_TYPE)
- #set(CMAKE_BUILD_TYPE Release)
- set(CMAKE_BUILD_TYPE Debug)
+ set(CMAKE_BUILD_TYPE Release)
+ #set(CMAKE_BUILD_TYPE Debug)
 endif(CMAKE_BUILD_TYPE)
 string (TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
 
@@ -289,7 +287,7 @@ add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX."
 
 if(WITH_SNOPT)
   find_package(SNOPT)
-endif(WITH_SNOPT)
+endif(WITH_CPLEX)
 add_feature_info(snopt-interface SNOPT_FOUND "Interface to SNOPT.")
 
 # if(WITH_GSL)
