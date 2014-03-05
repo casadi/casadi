@@ -59,21 +59,10 @@ namespace CasADi{
   
     /// Exact Hessian?
     bool exact_hessian_;
-
-    // Sparsity pattern of the transpose of jacG
-    CRSSparsity spJacG_T_;
-    std::vector<int> jacG_tmp_;
   
     std::map<int,std::string> status_;
     std::map<std::string,opt_type> ops_;
 
-    // Snopt callback functions
-    bool eval_f(const double* x, double scale, double& obj_value);
-    bool eval_grad_f(const double* x, double scale , double* grad_f);
-    bool eval_g(const double* x, double* g);
-    bool eval_jac_g(const double* x, double* values);
-    bool eval_h(const double* x, double obj_factor, const double* lambda, double* values);
-  
     // Accummulated time since last reset:
     double t_eval_f_; // time spent in eval_f
     double t_eval_grad_f_; // time spent in eval_grad_f
@@ -88,8 +77,51 @@ namespace CasADi{
   
     /// Pass the supplied options to Snopt
     void passOptions();
+    
+    /// Work arrays for SNOPT
+    std::vector<char> snopt_cw_;
+    std::vector<int> snopt_iw_;
+    std::vector<double> snopt_rw_;
+    
+    void userfun(int & mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac, double* x, double &fObj, double*gObj, double* fCon, double* gCon, int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru);
   
+    int nnJac_;
+    int nnObj_;
+    int nnCon_;
+    
+    std::vector<int> order_;
+    std::vector<int> order_g_;
+    
+    IMatrix A_structure_;
+    std::vector<double> A_data_;
+    
+    std::vector<double> bl_;
+    std::vector<double> bu_;
+    std::vector<int> hs_;
+    std::vector<double> x_;
+    std::vector<double> pi_;
+    std::vector<double> rc_;
+    std::vector<int> x_type_g_;
+    std::vector<int> x_type_f_;
+    std::vector<int> g_type_;
+    
+    bool detect_linear_;
+    
+    int m_;
+    int iObj_;
+    
+    static void userfunPtr(int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac, double *x, double *fObj, double *gObj, double * fCon, double* gCon, int* nState, char* cu, int* lencu, int* iu, int* leniu, double* ru, int *lenru);
+    
+    typedef std::map< std::string, std::pair< opt_type, std::string> > OptionsMap;
+    
+    OptionsMap optionsmap_;
+    
+    bool gradF_row_;
+    bool dummyrow_;
+    
   };
+  
+
 
 } // namespace CasADi
 

@@ -25,9 +25,12 @@ from numpy import *
 import unittest
 from types import *
 from helpers import *
+import itertools
+
+#CasadiOptions.setCatchErrorsPython(False)
 
 solvers= []
-  
+"""  
 try:
   solvers.append((WorhpSolver,{}))
   print "Will test WorhpSolver"
@@ -39,7 +42,14 @@ try:
   print "Will test IpoptSolver"
 except:
   pass
+"""
+try:
+  solvers.append((SnoptSolver,{"_verify_level": 3,"detect_linear": True,"_optimality_tolerance":1e-10,"_feasibility_tolerance":1e-10}))
+  print "Will test SnoptSolver"
+except:
+  pass
 
+"""
 try:
   qp_solver_options = {"nlp_solver": IpoptSolver, "nlp_solver_options": {"tol": 1e-12} }
   solvers.append((SQPMethod,{"qp_solver": NLPQPSolver,"qp_solver_options": qp_solver_options}))
@@ -53,7 +63,7 @@ try:
   print "Will test SQPMethod"
 except:
   pass
-
+"""
 
 #try:
 #  solvers.append(KnitroSolver)
@@ -705,6 +715,7 @@ class NLPtests(casadiTestCase):
       solver.solve()
       print "residuals"
       print array(solver.getOutput("x")).squeeze()-x0
+      print "bazmeg", solver.getOutput("f")
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.checkarray(array(solver.getOutput("x")).squeeze(),x0,str(Solver),digits=8)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0]*10),8,str(Solver),digits=8)
@@ -1218,6 +1229,81 @@ class NLPtests(casadiTestCase):
       solver = IpoptSolver(nlp)
       solver.init() 
       
+  @requires("SnoptSolver")
+  def test_permute(self):
+    for permute_g in itertools.permutations(range(3)):
+      for permute_x in itertools.permutations(range(4)):
+        x=ssym("x",4)
+        x1,x2,x3,x4 = x[permute_x]
+        g = [x1**2+x2**2+x3,
+            x2**4+x4,
+            2*x1+4*x2]
+        f= (x1+x2+x3)**2+3*x3+5*x4
+        F= SXFunction(nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
+        F.init()
+        
+        solver = SnoptSolver(F)
+        solver.init()
+
+        solver.input("ubx")[permute_x]= DMatrix([inf,inf,inf,inf])
+        solver.input("lbx")[permute_x]= DMatrix([-inf,-inf,0,0])
+        
+        solver.setInput(DMatrix([2,4,inf])[permute_g],"ubg")
+        solver.setInput(DMatrix([2,4,0])[permute_g],"lbg")
+        
+        solver.input("x0")[permute_x] = DMatrix([-0.070,1.41,0,0.0199])
+        solver.evaluate()
+
+
+        F.setInput(solver.output("x"))
+        F.evaluate()
+
+        self.checkarray(solver.output("f"),DMatrix([1.900124999054007]))
+        self.checkarray(solver.output("x")[permute_x],DMatrix([-7.0622015054877127e-02,1.4124491251009053e+00,0,1.9925001159906402e-02]))
+        self.checkarray(solver.output("lam_x")[permute_x],DMatrix([0,0,-2.4683779217362773e+01,0]),digits=7)
+        self.checkarray(solver.output("lam_g"),DMatrix([1.9000124997270717e+01,-5,0])[permute_g])
+        #self.checkarray(solver.output("g"),DMatrix([2,4,5.50855])[permute_g])
+  
+  @requires("SnoptSolver")
+  def test_classifications(self):      
+    x=SX("x")
+    y=SX("y")
+    nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+7.7*y,g=y**2))
+
+    solver = SnoptSolver(nlp)
+    solver.init()
+        
+    #solver.setOption("detect_linear",False)
+    solver.setOption("verbose",True)
+    solver.setOption("monitor",["setup_nlp","eval_nlp"])
+    solver.setOption("_verify_level",3)
+    #solver.setOption("_optimality_tolerance",1e-8)
+    #solver.setOption("_feasibility_tolerance",1e-8)
+    solver.setOption("_iteration_limit",1000)
+
+    sparsegradF = nlp.jacobian("x","f")
+    sparsegradF.init()
+    ins = nlp.symbolicInput()
+    out = list(sparsegradF.call(ins))
+    sparsegradF = MXFunction(ins,[out[0].T] + out[1:])
+    sparsegradF.init()
+
+    solver.setOption("grad_f",sparsegradF)
+
+    solver.init()
+    solver.setInput([1,1],"x0")
+    solver.setInput([-10,0],"lbx")
+    solver.setInput([10,2],"ubx")
+    solver.setInput([-10],"lbg")
+    solver.setInput([10],"ubg")
+
+    solver.solve()
+    
+    self.checkarray(solver.output("f"),DMatrix([0]))
+    self.checkarray(solver.output("x"),DMatrix([1,0]))
+    self.checkarray(solver.output("lam_x"),DMatrix([0,-7.7]),digits=7)
+    self.checkarray(solver.output("lam_g"),DMatrix([0]))
+    
 if __name__ == '__main__':
     unittest.main()
     print solvers
