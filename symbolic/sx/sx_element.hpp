@@ -57,33 +57,29 @@ namespace CasADi{
   class SXElement : public GenericExpression<SXElement>{
     friend class SXNode;
     friend class BinarySXNode;
-
   public:
     
-    /// Constructors
     /** \brief Default constructor (not-a-number)
-
         Object is initialised as not-a-number.
     */
     SXElement();
+
     /** \brief Numerical constant constructor
         \param val Numerical value
     */
     SXElement(double val);
     
-    /** \brief Symbolic constructor
-         \param name Name of the symbol
+    /// [DEPRECATED] Replaced with SXElement::sym
+    explicit SXElement(const std::string& name);
 
-        This is the name that wil be used by the "operator<<" and "toSTring" methods.
+    /** \brief Create a symbolic primitive
+         \param name Name of the symbolic primitive
+
+        This is the name that will be used by the "operator<<" and "toString" methods.
         The name is not used as identifier; you may construct distinct SXElement objects with non-unique names.
     */
-    explicit SXElement(const std::string& name); // variable (must be explicit, otherwise 0/NULL would be ambigous)
-    /** \brief Symbolic constructor
-         \param Name of the symbol
+    static SXElement sym(const std::string& name);
 
-        This is the name that wil be used by the "operator<<" and "toSTring" methods.
-        The name is not used as identifier; you may construct distinct SXElement objects with non-unique names.
-    */
 #ifndef SWIG
 
     /// Create an expression from a node: extra dummy argument to avoid ambigousity for 0/NULL

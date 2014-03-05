@@ -79,6 +79,10 @@ namespace CasADi{
     node->count++;
   }
 
+  SXElement SXElement::sym(const std::string& name){
+    return create(new SymbolicSX(name));
+  }
+
   SXElement::~SXElement(){
     if(--node->count == 0) delete node;
   }
