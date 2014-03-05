@@ -30,7 +30,7 @@ import itertools
 #CasadiOptions.setCatchErrorsPython(False)
 
 solvers= []
-"""  
+ 
 try:
   solvers.append((WorhpSolver,{}))
   print "Will test WorhpSolver"
@@ -42,14 +42,13 @@ try:
   print "Will test IpoptSolver"
 except:
   pass
-"""
+
 try:
   solvers.append((SnoptSolver,{"_verify_level": 3,"detect_linear": True,"_optimality_tolerance":1e-10,"_feasibility_tolerance":1e-10}))
   print "Will test SnoptSolver"
 except:
   pass
 
-"""
 try:
   qp_solver_options = {"nlp_solver": IpoptSolver, "nlp_solver_options": {"tol": 1e-12} }
   solvers.append((SQPMethod,{"qp_solver": NLPQPSolver,"qp_solver_options": qp_solver_options}))
@@ -63,7 +62,6 @@ try:
   print "Will test SQPMethod"
 except:
   pass
-"""
 
 #try:
 #  solvers.append(KnitroSolver)
