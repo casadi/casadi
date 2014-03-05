@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
   cout << "solution = " << linear_solver.output("X") << endl;
 
   // Embed in an MX graph
-  MX A = msym("A",spA);
-  MX B = msym("B",ncol,1);
+  MX A = MX::sym("A",spA);
+  MX B = MX::sym("B",ncol,1);
   MX X = linear_solver.solve(A,B,tr);
   MXFunction F(linsolIn("A",A,"B",B),linsolOut("X",X));
   F.init();

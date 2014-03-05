@@ -29,7 +29,7 @@
 #! Let's start with creating a simple expression tree z.
 from casadi import *
 from numpy import *
-x = ssym("x")
+x = SX.sym("x")
 y = x**2
 z = sin(y) + y
 print z
@@ -48,9 +48,9 @@ print z
 #! CasADi's SXFunction has powerful input/output behaviour.
 #! The following input/output primitives are supported:
 #$ \begin{description}
-#$ \item[scalar] e.g. 'ssym("x")'
-#$ \item[vector] e.g. 'ssym("x",3)'
-#$ \item[matrix] e.g. 'ssym("x",3,2)'
+#$ \item[scalar] e.g. 'SX.sym("x")'
+#$ \item[vector] e.g. 'SX.sym("x",3)'
+#$ \item[matrix] e.g. 'SX.sym("x",3,2)'
 #$ \end{description}
 #! A function that uses one primitive as input/output is said to be 'single input'/'single output'.
 #!
@@ -82,8 +82,8 @@ print f.eval([2])
 print f.grad()
 #! The following code creates and evaluates a multi input (scalar valued), multi output (scalar valued) function.
 #$ The mathematical notation could be $ f_{i,j} : $\mathbb{R} \mapsto \mathbb{R} \quad  i,j \in [0,1]$
-x = ssym("x") # 1 by 1 matrix serves as scalar
-y = ssym("y") # 1 by 1 matrix serves as scalar
+x = SX.sym("x") # 1 by 1 matrix serves as scalar
+y = SX.sym("y") # 1 by 1 matrix serves as scalar
 f = SXFunction([x , y ], [x*y, x+y])
 print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
 f.init()
@@ -97,30 +97,30 @@ print [[f.grad(i,j) for i in range(2)] for j in range(2)]
 #! Symbolic function manipulation
 #! ------------------------------
 #$ Consider the function $f(x;a;b) = a*x + b$
-x=ssym("x")
-a=ssym("a")
-b=ssym("b")
+x=SX.sym("x")
+a=SX.sym("a")
+b=SX.sym("b")
 f = SXFunction([x,vertcat((a,b))],[a*x + b]) 
 f.init()
 
 print f.eval([x,vertcat([a,b])])
 print f.eval([SXElement(1.0),vertcat((a,b))])
-print f.eval([x,vertcat((ssym("c"),ssym("d")))])
-print f.eval([SXElement(),vertcat([ssym("c"),ssym("d")])])
+print f.eval([x,vertcat((SX.sym("c"),SX.sym("d")))])
+print f.eval([SXElement(),vertcat([SX.sym("c"),SX.sym("d")])])
 
 #$ We can make an accompanying $g(x) = f(x;a;b)$ by making a and b implicity:
 
 k = SX(a)
 print f.eval([x,vertcat((k[0],b))])
-print f.eval([x,vertcat((ssym("c"),ssym("d")))])
+print f.eval([x,vertcat((SX.sym("c"),SX.sym("d")))])
 
 #! Functions with vector valued input
 #! ----------------------------------
 #! The following code creates and evaluates a single input (vector valued), single output (vector valued) function.
 #$ f : $\mathbb{R}^2 \mapsto \mathbb{R}^2$
 
-x = ssym("x")
-y = ssym("y")
+x = SX.sym("x")
+y = SX.sym("y")
 f = SXFunction([vertcat((x , y ))], [vertcat((x*y, x+y))])
 print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
 f.init()
@@ -142,8 +142,8 @@ print df.output(1) # v
 
 #! Functions with matrix valued input
 #! ----------------------------------
-x = ssym("x",2,2)
-y = ssym("y",2,2)
+x = SX.sym("x",2,2)
+y = SX.sym("y",2,2)
 print x*y # Not a dot product
 f = SXFunction([x,y], [x*y])
 f.init()

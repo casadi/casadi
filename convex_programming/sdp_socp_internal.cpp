@@ -101,10 +101,10 @@ void SDPSOCPInternal::init(){
   */
  
   
-  MX G = msym("G",input(SOCP_SOLVER_G).sparsity());
-  MX H = msym("H",input(SOCP_SOLVER_H).sparsity());
-  MX E = msym("E",input(SOCP_SOLVER_E).sparsity());
-  MX F = msym("F",input(SOCP_SOLVER_F).sparsity());
+  MX G = MX::sym("G",input(SOCP_SOLVER_G).sparsity());
+  MX H = MX::sym("H",input(SOCP_SOLVER_H).sparsity());
+  MX E = MX::sym("E",input(SOCP_SOLVER_E).sparsity());
+  MX F = MX::sym("F",input(SOCP_SOLVER_F).sparsity());
   
   
   int i_start;

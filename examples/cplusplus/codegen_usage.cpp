@@ -213,8 +213,8 @@ void usage_cplusplus(){
 int main(){
     
   // Variables
-  SX x = ssym("x",2,2);
-  SX y = ssym("y",1); 
+  SX x = SX::sym("x",2,2);
+  SX y = SX::sym("y",1); 
 
   // Simple function
   vector<SX> f_in;

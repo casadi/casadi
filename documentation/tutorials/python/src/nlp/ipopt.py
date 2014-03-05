@@ -34,9 +34,9 @@ import numpy as n
 from casadi import *
 #! Let's solve a simple scalar non-linear program:
 
-x = ssym("x")
+x = SX.sym("x")
 
-y = ssym("y")
+y = SX.sym("y")
 
 #f  = SXFunction([x,y], tan(x)-1) 
 

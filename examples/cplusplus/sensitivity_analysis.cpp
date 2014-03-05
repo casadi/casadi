@@ -38,13 +38,13 @@ using namespace CasADi;
 /** \brief Generate a simple ODE */
 void simpleODE(FX& ffcn, double& tf, vector<double>& x0, double& u0){
   // Time 
-  SX t = ssym("t");
+  SX t = SX::sym("t");
   
   // Parameter
-  SX u = ssym("u");
+  SX u = SX::sym("u");
   
   // Differential states
-  SX s = ssym("s"), v = ssym("v"), m = ssym("m");
+  SX s = SX::sym("s"), v = SX::sym("v"), m = SX::sym("m");
   SX x;
   x.append(s);
   x.append(v);
@@ -82,13 +82,13 @@ void simpleODE(FX& ffcn, double& tf, vector<double>& x0, double& u0){
 /** \brief Generate a simple DAE */
 void simpleDAE(FX& ffcn, double& tf, vector<double>& x0, double& u0){
   // Parameter
-  SX u = ssym("u");
+  SX u = SX::sym("u");
   
   // Differential state
-  SX x = ssym("x");
+  SX x = SX::sym("x");
 
   // Algebraic variable
-  SX z = ssym("z");
+  SX z = SX::sym("z");
 
   // Differential equation
   SX ode = -x + 0.5*x*x + u + 0.5*z;

@@ -39,7 +39,7 @@ int main(){
   int nj = 100; // Number of integration steps per control segment
 
   // optimization variable
-  SX u = ssym("u",nu); // control
+  SX u = SX::sym("u",nu); // control
 
   SX s_0 = 0; // initial position
   SX v_0 = 0; // initial speed

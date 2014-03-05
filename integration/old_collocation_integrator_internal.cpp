@@ -135,23 +135,23 @@ namespace CasADi{
     casadi_assert_message(fabs(sumAll(D_num)-1).at(0)<1e-9,"Check on collocation coefficients");
   
     // Initial state
-    MX X0 = msym("X0",x0().sparsity());
+    MX X0 = MX::sym("X0",x0().sparsity());
   
     // Parameters
-    MX P = msym("P",p().sparsity());
+    MX P = MX::sym("P",p().sparsity());
   
     // Backward state
-    MX RX0 = msym("RX0",rx0().sparsity());
+    MX RX0 = MX::sym("RX0",rx0().sparsity());
   
     // Backward parameters
-    MX RP = msym("RP",rp().sparsity());
+    MX RP = MX::sym("RP",rp().sparsity());
   
     // Collocated differential states and algebraic variables
     int nX = (nk*(deg+1)+1)*(nx_+nrx_);
     int nZ = nk*deg*(nz_+nrz_);
   
     // Unknowns
-    MX V = msym("V",nX+nZ);
+    MX V = MX::sym("V",nX+nZ);
     int offset = 0;
   
     // Get collocated states, algebraic variables and times

@@ -35,13 +35,13 @@ for Integrators in (ODE_integrators,DAE_integrators):
     print "Testing ODE example"
     
     # Time 
-    t = ssym("t")
+    t = SX.sym("t")
       
     # Parameter
-    u = ssym("u")
+    u = SX.sym("u")
 
     # Differential states
-    s = ssym("s"); v = ssym("v"); m = ssym("m")
+    s = SX.sym("s"); v = SX.sym("v"); m = SX.sym("m")
     x = vertcat([s,v,m])
 
     # Constants
@@ -74,13 +74,13 @@ for Integrators in (ODE_integrators,DAE_integrators):
     print "Testing DAE example"
     
     # Differential state
-    x = ssym("x")
+    x = SX.sym("x")
     
     # Algebraic variable
-    z = ssym("z")
+    z = SX.sym("z")
     
     # Parameter
-    u = ssym("u")
+    u = SX.sym("u")
     
     # Differential equation
     ode = -x + 0.5*x*x + u + 0.5*z

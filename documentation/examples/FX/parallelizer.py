@@ -26,8 +26,8 @@ from casadi import *
 n = 12
 
 #! Construct a functon that is expensive to evaluate
-x = msym("x",100,100)
-y = msym("y",100,1)
+x = MX.sym("x",100,100)
+y = MX.sym("y",100,1)
 z = x
 
 for i in range(20):

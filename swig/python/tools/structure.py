@@ -839,7 +839,7 @@ class CompatibilityException(Exception):
   pass
 
 class ssymStruct(CasadiStructured,MasterGettable):
-  description = "ssym"
+  description = "SX.sym"
   def __init__(self,struct,order=None):
     CasadiStructured.__init__(self,struct,order=order)
     
@@ -849,7 +849,7 @@ class ssymStruct(CasadiStructured,MasterGettable):
     s = []
     for i in self.struct.traverseCanonicalIndex():
       e = self.struct.getStructEntryByCanonicalIndex(i)
-      s.append(ssym("_".join(map(str,i)),e.sparsity.size()))
+      s.append(SX.sym("_".join(map(str,i)),e.sparsity.size()))
         
     self.master = vecNZcat(s)
 
@@ -861,7 +861,7 @@ class ssymStruct(CasadiStructured,MasterGettable):
     return self.cat
     
 class msymStruct(CasadiStructured,MasterGettable):
-  description = "msym"
+  description = "MX.sym"
   def __init__(self,struct,order=None):
     CasadiStructured.__init__(self,struct,order=order)
 
@@ -870,7 +870,7 @@ class msymStruct(CasadiStructured,MasterGettable):
     if any(e.sym is not None for e in self.entries):
       raise Exception("struct_msym does not accept entries with an 'sym' argument.")
 
-    self.master = msym("V",self.size,1)
+    self.master = MX.sym("V",self.size,1)
     
  
     ks = []

@@ -21,10 +21,10 @@
 # 
 from casadi import *
 
-x = msym("x",5)
-y = msym("y")
-x2 = ssym("x",5)
-y2 = ssym("y")
+x = MX.sym("x",5)
+y = MX.sym("y")
+x2 = SX.sym("x",5)
+y2 = SX.sym("y")
 
 fcn = MXFunction([x,y],[4*vertcat((x[2:5],x[0:2])) + y*x])
 fcn.init()

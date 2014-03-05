@@ -47,10 +47,10 @@ int main(){
    */
   
   // Optimization variables
-  SX x = ssym("x",3);
+  SX x = SX::sym("x",3);
   
   // Parameters
-  SX p = ssym("p",2);
+  SX p = SX::sym("p",2);
   
   // Objective
   SX f = x[0]*x[0] + x[1]*x[1] + x[2]*x[2];

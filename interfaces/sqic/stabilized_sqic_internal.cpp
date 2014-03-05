@@ -125,8 +125,8 @@ void StabilizedSQICInternal::init(){
   for (int i=0;i<locA_.size();++i) locA_[i]+=1;
   
   // helper functions for augmented linear constraint matrix
-  MX a = msym("A",st_[QP_STRUCT_A]);
-  MX g = msym("g",n_);
+  MX a = MX::sym("A",st_[QP_STRUCT_A]);
+  MX g = MX::sym("g",n_);
   std::vector<MX> ins;
   ins.push_back(a);
   ins.push_back(g);

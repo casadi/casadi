@@ -36,20 +36,20 @@ from pylab import *
 #!
 #! We retain g and L as parameters
 #! http://en.wikipedia.org/wiki/Differential_algebraic_equation#Examples
-L = ssym("L")
-g = ssym("g")
+L = SX.sym("L")
+g = SX.sym("g")
 
 #! Time
-t=ssym("t")
+t=SX.sym("t")
 
 #! differential states
-x=ssym("x")
-y=ssym("y")
-u=ssym("u")
-v=ssym("v")
+x=SX.sym("x")
+y=SX.sym("y")
+u=SX.sym("u")
+v=SX.sym("v")
 
 #! algebraic states
-lambd=ssym("lambda")
+lambd=SX.sym("lambda")
 
 #! All states and parameters
 x_all = vertcat([x,u,y,v])

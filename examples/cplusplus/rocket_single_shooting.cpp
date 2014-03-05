@@ -55,17 +55,17 @@ int main(){
   X0[2] = 1; // initial mass
 
   // Time 
-  SX t = ssym("t");
+  SX t = SX::sym("t");
 
   // Differential states
-  SX s = ssym("s"), v = ssym("v"), m = ssym("m");
+  SX s = SX::sym("s"), v = SX::sym("v"), m = SX::sym("m");
   SX x = SX::zeros(3);
   x[0] = s;
   x[1] = v;
   x[2] = m;
 
   // Control
-  SX u = ssym("u");
+  SX u = SX::sym("u");
 
   SX alpha = 0.05; // friction
   SX beta = 0.1; // fuel consumption rate
@@ -120,7 +120,7 @@ int main(){
   integrator.init();
 
   // control for all segments
-  MX U = msym("U",nu); 
+  MX U = MX::sym("U",nu); 
 
   // Integrate over all intervals
   MX X=X0;

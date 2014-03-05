@@ -20,7 +20,7 @@ def nice_stdout():
   
   from casadi.tools import *
 
-  x = ssym("x")
+  x = SX.sym("x")
 
   with capture_stdout() as out:
     with nice_stdout():

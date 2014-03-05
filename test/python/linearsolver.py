@@ -51,7 +51,7 @@ except:
 nsolvers = []
   
 def nullspacewrapper(sp):
-  a = ssym("a",sp)
+  a = SX.sym("a",sp)
   f = SXFunction([a],[nullspace(a)])
   f.init()
   return f
@@ -159,8 +159,8 @@ class LinearSolverTests(casadiTestCase):
     A_ = DMatrix([[3,7],[1,2]])
     b_ = DMatrix([1,0.5])
     
-    A = msym("A",A_.sparsity())
-    b = msym("b",b_.sparsity())
+    A = MX.sym("A",A_.sparsity())
+    b = MX.sym("b",b_.sparsity())
     
     for Solver, options in lsolvers:
       print Solver.creator
@@ -179,8 +179,8 @@ class LinearSolverTests(casadiTestCase):
     numpy.random.seed(0)
     A_ = DMatrix(numpy.random.rand(4,6))
     
-    A = msym("A",A_.sparsity())
-    As = ssym("A",A_.sparsity())
+    A = MX.sym("A",A_.sparsity())
+    As = SX.sym("A",A_.sparsity())
     
     for Solver, options in lsolvers:
       print Solver.creator
@@ -207,8 +207,8 @@ class LinearSolverTests(casadiTestCase):
       
     A_ = DMatrix(numpy.random.rand(3,5))
     
-    A = msym("A",A_.sparsity())
-    As = ssym("A",A_.sparsity())
+    A = MX.sym("A",A_.sparsity())
+    As = SX.sym("A",A_.sparsity())
     
     for Solver, options in lsolvers:
       print Solver.creator
@@ -281,9 +281,9 @@ class LinearSolverTests(casadiTestCase):
 
   def test_simple_fx_direct(self):
     A_ = DMatrix([[3,7],[1,2]]).T
-    A = msym("A",A_.sparsity())
+    A = MX.sym("A",A_.sparsity())
     b_ = DMatrix([1,0.5])
-    b = msym("b",b_.sparsity())
+    b = MX.sym("b",b_.sparsity())
     
     for Solver, options in lsolvers:
       print Solver
@@ -311,9 +311,9 @@ class LinearSolverTests(casadiTestCase):
        
   def test_simple_fx_indirect(self):
     A_ = DMatrix([[3,1],[7,2]])
-    A = msym("A",A_.sparsity())
+    A = MX.sym("A",A_.sparsity())
     b_ = DMatrix([1,0.5])
-    b = msym("b",b_.sparsity())
+    b = MX.sym("b",b_.sparsity())
     
     for Solver, options in lsolvers:
       print Solver
@@ -347,9 +347,9 @@ class LinearSolverTests(casadiTestCase):
 
   def test_simple_solve_node(self):
     A_ = DMatrix([[3,1],[7,2]])
-    A = msym("A",A_.sparsity())
+    A = MX.sym("A",A_.sparsity())
     b_ = DMatrix([1,0.5])
-    b = msym("b",b_.sparsity())
+    b = MX.sym("b",b_.sparsity())
     for Solver, options in lsolvers:
       print Solver
       solver = Solver(A.sparsity())
@@ -389,10 +389,10 @@ class LinearSolverTests(casadiTestCase):
   def test_simple_solve_node_sparseA(self):
     A_ = DMatrix([[3,0],[7,2]])
     makeSparse(A_)
-    A = msym("A",A_.sparsity())
+    A = MX.sym("A",A_.sparsity())
     print A.size(), A_.size()
     b_ = DMatrix([1,0.5])
-    b = msym("b",b_.sparsity())
+    b = MX.sym("b",b_.sparsity())
     for Solver, options in lsolvers:
       print Solver
       solver = Solver(A.sparsity())
@@ -430,10 +430,10 @@ class LinearSolverTests(casadiTestCase):
 
   def test_simple_solve_node_sparseB(self):
     A_ = DMatrix([[3,1],[7,2]])
-    A = msym("A",A_.sparsity())
+    A = MX.sym("A",A_.sparsity())
     b_ = DMatrix([1,0])
     makeSparse(b_)
-    b = msym("b",b_.sparsity())
+    b = MX.sym("b",b_.sparsity())
     for Solver, options in lsolvers:
       print Solver
       solver = Solver(A.sparsity())
@@ -525,8 +525,8 @@ class LinearSolverTests(casadiTestCase):
     A = self.randDMatrix(n,n,sparsity=0.5)
     b = self.randDMatrix(n,3,sparsity=0.5)
     
-    As = msym("A",A.sparsity())
-    bs = msym("B",b.sparsity())
+    As = MX.sym("A",A.sparsity())
+    bs = MX.sym("B",b.sparsity())
     for Solver, options in lsolvers:
       print Solver.creator
       C = solve(A,b,Solver,options)
@@ -547,8 +547,8 @@ class LinearSolverTests(casadiTestCase):
     A = self.randDMatrix(n,n,sparsity=0.5)
     b = self.randDMatrix(n,3)
     
-    As = msym("A",A.sparsity())
-    bs = msym("B",b.sparsity())
+    As = MX.sym("A",A.sparsity())
+    bs = MX.sym("B",b.sparsity())
     for Solver, options in lsolvers:
       print Solver.creator
       C = solve(A,b,Solver,options)

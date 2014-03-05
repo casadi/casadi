@@ -24,9 +24,9 @@ import numpy as NP
 import matplotlib.pyplot as plt
 
 # Declare variables
-x = ssym("x")
-y = ssym("y")
-z = ssym("z")
+x = SX.sym("x")
+y = SX.sym("y")
+z = SX.sym("z")
 v = vertcat([x,y,z])
 
 # Form NLP functions

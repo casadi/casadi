@@ -23,7 +23,7 @@
 from casadi import *
 
 # Declare variables
-x = ssym("x",2)
+x = SX.sym("x",2)
 
 # Form the NLP objective
 f = SXFunction([x],[x[0]**2 + x[1]**2])

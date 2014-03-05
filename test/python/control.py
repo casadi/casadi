@@ -64,8 +64,8 @@ class ControlTests(casadiTestCase):
           solver.setInput(horzcat(A_),DPLE_A)
           solver.setInput(horzcat(V_),DPLE_V)
           
-          As = msym("A",n,K*n)
-          Vs = msym("V",n,K*n)
+          As = MX.sym("A",n,K*n)
+          Vs = MX.sym("V",n,K*n)
           
           def sigma(a):
             return a[1:] + [a[0]]

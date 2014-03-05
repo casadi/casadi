@@ -21,8 +21,8 @@
 # 
 from casadi import *
 
-a = ssym("a")
-b = ssym("b")
+a = SX.sym("a")
+b = SX.sym("b")
 
 c = a+b
 c = c.printme(13)

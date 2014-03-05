@@ -22,9 +22,9 @@
 %! Load casadi
 casadi
 
-x = ssym("x");     % A scalar (1-by-1 matrix) symbolic primitive
-y = ssym("y",2);   % A vector (n-by-1 matrix) symbolic primitive
-z = ssym("z",2,3); % An n-by-m matrix symbolic primitive
+x = SX.sym("x");     % A scalar (1-by-1 matrix) symbolic primitive
+y = SX.sym("y",2);   % A vector (n-by-1 matrix) symbolic primitive
+z = SX.sym("z",2,3); % An n-by-m matrix symbolic primitive
 
 in = {x y}; % function inputs
 disp('Function outputs are:')

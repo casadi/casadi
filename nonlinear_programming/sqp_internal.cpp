@@ -141,11 +141,11 @@ namespace CasADi{
     // Create Hessian update function
     if(!exact_hessian_){
       // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
-      SX Bk = ssym("Bk",H_sparsity);
-      SX x = ssym("x",input(NLP_SOLVER_X0).sparsity());
-      SX x_old = ssym("x",x.sparsity());
-      SX gLag = ssym("gLag",x.sparsity());
-      SX gLag_old = ssym("gLag_old",x.sparsity());
+      SX Bk = SX::sym("Bk",H_sparsity);
+      SX x = SX::sym("x",input(NLP_SOLVER_X0).sparsity());
+      SX x_old = SX::sym("x",x.sparsity());
+      SX gLag = SX::sym("gLag",x.sparsity());
+      SX gLag_old = SX::sym("gLag_old",x.sparsity());
     
       SX sk = x - x_old;
       SX yk = gLag - gLag_old;

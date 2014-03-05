@@ -210,11 +210,11 @@ namespace CasADi{
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
         ss.str(string());
         ss << "lam_x" << i++;
-        it->v_lam = msym(ss.str(),it->v.sparsity());
+        it->v_lam = MX::sym(ss.str(),it->v.sparsity());
       }
     
       // Lagrange multipliers for the nonlinear constraints
-      g_lam = msym("g_lam",ng_);
+      g_lam = MX::sym("g_lam",ng_);
 
       if(verbose_){
         cout << "Allocated intermediate variables." << endl;
@@ -304,7 +304,7 @@ namespace CasADi{
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       ss.str(string());
       ss << "d" << i++;
-      it->d = msym(ss.str(),it->v.sparsity());
+      it->d = MX::sym(ss.str(),it->v.sparsity());
       it->d_def = it->v_def - it->d;
     }
 
@@ -314,7 +314,7 @@ namespace CasADi{
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
         ss.str(string());
         ss << "d_lam" << i++;
-        it->d_lam = msym(ss.str(),it->v.sparsity());
+        it->d_lam = MX::sym(ss.str(),it->v.sparsity());
         it->d_defL = it->v_defL - it->d_lam;
       }
     }
@@ -470,10 +470,10 @@ namespace CasADi{
     }
 
     // Expression a + A*du in Lifted Newton (Section 2.1 in Alberspeyer2010)
-    MX du = msym("du",nx_);   // Step in u
+    MX du = MX::sym("du",nx_);   // Step in u
     MX g_dlam;               // Step lambda_g
     if(!gauss_newton_){
-      g_dlam = msym("g_dlam",g_lam.sparsity());
+      g_dlam = MX::sym("g_dlam",g_lam.sparsity());
     }
   
     // Interpret the Jacobian-vector multiplication as a forward directional derivative

@@ -126,9 +126,9 @@ namespace CasADi {
   
     if (nc_>0) {
       // Fill in the linear program structure
-      MX A = msym("A",input(SDP_SOLVER_A).sparsity());
-      MX LBA = msym("LBA",input(SDP_SOLVER_LBA).sparsity());
-      MX UBA = msym("UBA",input(SDP_SOLVER_UBA).sparsity());
+      MX A = MX::sym("A",input(SDP_SOLVER_A).sparsity());
+      MX LBA = MX::sym("LBA",input(SDP_SOLVER_LBA).sparsity());
+      MX UBA = MX::sym("UBA",input(SDP_SOLVER_UBA).sparsity());
     
       std::vector< MX >  syms;
       syms.push_back(A);

@@ -24,11 +24,11 @@ import numpy as NP
 import matplotlib.pyplot as plt
 
 # Declare variables (use simple, efficient DAG)
-x0=ssym("x0"); x1=ssym("x1")
+x0=SX.sym("x0"); x1=SX.sym("x1")
 x = vertcat((x0,x1))
 
 # Control
-u = ssym("u")
+u = SX.sym("u")
 
 # ODE right hand side
 xdot = vertcat([(1 - x1*x1)*x0 - x1 + u, x0])
@@ -37,7 +37,7 @@ xdot = vertcat([(1 - x1*x1)*x0 - x1 + u, x0])
 L = x0*x0 + x1*x1 + u*u
 
 # Costate
-lam = ssym("lam",2)
+lam = SX.sym("lam",2)
 
 # Hamiltonian function
 H = inner_prod(lam,xdot) + L
@@ -87,7 +87,7 @@ I.init()
 
 # Variables in the root finding problem
 NV = nX*(num_nodes+1)
-V = msym("V",NV)
+V = MX.sym("V",NV)
 
 # Get the state at each shooting node
 X = []

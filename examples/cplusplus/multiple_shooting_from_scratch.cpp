@@ -53,8 +53,8 @@ double inf = numeric_limits<double>::infinity();
 int main(){
 
   // Declare variables
-  SX u = ssym("u"); // control
-  SX r = ssym("r"), s = ssym("s"); // states
+  SX u = SX::sym("u"); // control
+  SX r = SX::sym("r"), s = SX::sym("s"); // states
   SX x = vertcat(r,s);
 
   // Number of differential states
@@ -98,7 +98,7 @@ int main(){
   int NV = nx*(ns+1) + nu*ns;
   
   // Declare variable vector for the NLP
-  MX V = msym("V",NV);
+  MX V = MX::sym("V",NV);
 
   // NLP variable bounds and initial guess
   vector<double> v_min,v_max,v_init;

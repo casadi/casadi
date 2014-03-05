@@ -267,7 +267,7 @@ class Sparsitytests(casadiTestCase):
     self.message("vec MXFunction")
     q = DMatrix([[1,2,3,4,9],[5,6,7,8,8],[9,10,11,12,6],[1,2,3,4,5]])
 
-    X = MX("X",4,5)
+    X = MX.sym("X",4,5)
 
     F = MXFunction([X],[X**2])
     F.init()
@@ -286,7 +286,7 @@ class Sparsitytests(casadiTestCase):
     self.message("vec SXFunction")
     q = DMatrix([[1,2,3,4,9],[5,6,7,8,8],[9,10,11,12,6],[1,2,3,4,5]])
 
-    X = ssym("X",4,5)
+    X = SX.sym("X",4,5)
 
     F = SXFunction([X],[X**2])
     F.init()
@@ -316,7 +316,7 @@ class Sparsitytests(casadiTestCase):
     for i in nza:
       a.getNZ(i[0],i[1])
       
-    b = ssym("b",a)
+    b = SX.sym("b",a)
     
     self.assertRaises(Exception,lambda: b[sp_diag(3)])
     
@@ -349,7 +349,7 @@ class Sparsitytests(casadiTestCase):
     for i in nza:
       a.getNZ(i[0],i[1])
       
-    b = msym("b",a)
+    b = MX.sym("b",a)
     
     self.assertRaises(Exception,lambda: b[sp_diag(3)])
     
@@ -527,12 +527,12 @@ class Sparsitytests(casadiTestCase):
     
   def test_jacsparsityHierarchical(self):
 
-    X = ssym("X",100)
-    P = ssym("P",1000)
+    X = SX.sym("X",100)
+    P = SX.sym("P",1000)
 
     optvar = vertcat([X,P])
 
-    p = ssym("p")
+    p = SX.sym("p")
 
     g = SXFunction([optvar,p],[X*p])
     g.setOption("verbose",True)
@@ -544,10 +544,10 @@ class Sparsitytests(casadiTestCase):
     
     self.assertTrue(J.output()[:,:X.size()].sparsity()==sp_diag(100))
 
-    X = ssym("X",100)
-    P = ssym("P",1000)
+    X = SX.sym("X",100)
+    P = SX.sym("P",1000)
 
-    p = ssym("p")
+    p = SX.sym("p")
 
     g = SXFunction([X,p],[vertcat([X*p,P])])
     g.setOption("verbose",True)

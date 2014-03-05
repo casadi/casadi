@@ -45,8 +45,8 @@ int main(){
   int np = 1;
 
   // Declare variables
-  SX x  = ssym("x",nx);  // state
-  SX p  = ssym("u",np);  // control
+  SX x  = SX::sym("x",nx);  // state
+  SX p  = SX::sym("u",np);  // control
 
   // ODE right hand side function
   SX ode;
@@ -96,9 +96,9 @@ int main(){
   }
 
   // Total number of variables for one finite element
-  MX X0 = msym("X0",nx);
-  MX P  = msym("P",np);
-  MX V = msym("V",d*nx);
+  MX X0 = MX::sym("X0",nx);
+  MX P  = MX::sym("P",np);
+  MX V = MX::sym("V",d*nx);
   
   // Get the state at each collocation point
   vector<MX> X(1,X0);

@@ -45,7 +45,7 @@ int main(){
    */
   
   // Optimization variables
-  SX x = ssym("x",3);
+  SX x = SX::sym("x",3);
   
   // Objective
   SX f = pow(x[0]-1,2) + pow(x[1]-2,2) + pow(x[2]-3,2);

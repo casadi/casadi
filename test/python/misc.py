@@ -80,7 +80,7 @@ class Misctests(casadiTestCase):
     
     self.assertRaises(RuntimeError,lambda : f.setOption("ad_mode","foo"))
     
-    x = ssym("x")
+    x = SX.sym("x")
     nlp = SXFunction(nlpIn(x=x),nlpOut(f=x))
 
     try:
@@ -223,7 +223,7 @@ class Misctests(casadiTestCase):
   @requires("IpoptSolver")
   def test_options_introspection(self):
     self.message("options introspection")
-    x=ssym("x")
+    x=SX.sym("x")
     nlp = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
     i = IpoptSolver(nlp)
     
@@ -299,7 +299,7 @@ class Misctests(casadiTestCase):
   
   def test_regression448(self):
     self.message("regression test for segfaukt when printing")
-    x = ssym("x")
+    x = SX.sym("x")
 
     f = SXFunction(controldaeIn(x=x),daeOut(ode=x))
     f.init()
@@ -357,7 +357,7 @@ class Misctests(casadiTestCase):
 
   def test_assertions(self):
     
-    x = msym("x") 
+    x = MX.sym("x") 
     
     z = x**2
     

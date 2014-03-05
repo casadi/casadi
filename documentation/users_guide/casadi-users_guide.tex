@@ -251,16 +251,16 @@ from casadi import *
 Now create the variable \texttt{x} using the syntax (cf. the function \texttt{sym} in Matlab's Symbolic Toolbox)\footnote{In C++, since it is statically typed, you need to specify the return type, here \texttt{SX}. To find the return types for a CasADi function, use the C++ API docs on the website}:
 
 \begin{pytex}
-x = ssym("x")
+x = SX.sym("x")
 \end{pytex}
 
-Note that the string passed is only the display name, not the identifier. Multiple variables can have the same name, but still be different. You can also create vectors or matrices of variables using by supplying additional arguments to \texttt{ssym}:
+Note that the string passed is only the display name, not the identifier. Multiple variables can have the same name, but still be different. You can also create vectors or matrices of variables using by supplying additional arguments to \texttt{SX.sym}:
 \begin{pytex}
-y = ssym("y",5)   # A 5-by-1 matrix, i.e. a vector, with symbolic variables
-Z = ssym("Z",4,2) # A 4-by-2 matrix with symbolic variables
+y = SX.sym("y",5)   # A 5-by-1 matrix, i.e. a vector, with symbolic variables
+Z = SX.sym("Z",4,2) # A 4-by-2 matrix with symbolic variables
 \end{pytex}
 
-Note that \texttt{ssym} is a function which returns an \texttt{SX} instance. When variables have been declared, expressions can now be formed in an intuitive way:
+Note that \texttt{SX.sym} is a function which returns an \texttt{SX} instance. When variables have been declared, expressions can now be formed in an intuitive way:
 \begin{pytex}
 f = x**2 + 10  # "x**y" corresponds to "pow(x,y)" in C++
 f = sqrt(f)
@@ -300,7 +300,7 @@ There is a growing set of operations that can be performed with the \texttt{SX},
 It is typically uncomplicated to add new such functions whenever they appear in applications.
 
 \section{\texttt{DMatrix}}
-\texttt{DMatrix} is very similar to \texttt{SX} (in fact, they are just two template instantiations of the same C++ class \texttt{CasADi::Matrix<\,T\,>}), but with the difference that the nonzero elements are numerical values and not \texttt{SX} expressions. The syntax is also the same, except for functions such as \texttt{ssym} or \texttt{jacobian} which has no equivalent.
+\texttt{DMatrix} is very similar to \texttt{SX} (in fact, they are just two template instantiations of the same C++ class \texttt{CasADi::Matrix<\,T\,>}), but with the difference that the nonzero elements are numerical values and not \texttt{SX} expressions. The syntax is also the same, except for functions such as \texttt{SX.sym} or \texttt{jacobian} which has no equivalent.
 
 \texttt{DMatrix} is mainly used for storing matrices in CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use \texttt{numpy} or \texttt{scipy} matrices in Python or an expression template based library such as \texttt{eigen}, \texttt{ublas} or \texttt{MTL} in C++. Conversion between the types is usually straightforward:
 \begin{verbatim}
@@ -381,8 +381,8 @@ Helper functions are available to construct lists of objects that adhere to a pa
 
 \begin{pytex}
 print daeOut()
-print daeOut(ode=ssym("fx"))
-print daeOut(alg=ssym("fz"),ode=ssym("fx"))
+print daeOut(ode=SX.sym("fx"))
+print daeOut(alg=SX.sym("fz"),ode=SX.sym("fx"))
 \end{pytex}
 
 Consult the python docstrings for more information of how to use these helper functions:
@@ -401,7 +401,7 @@ print "..."
 
 You can also query such a list from any object:
 \begin{pytex}
-x = ssym("x")
+x = SX.sym("x")
 f = SXFunction([x],[x])
 f.init()
 f.printOptions()
@@ -434,8 +434,8 @@ print "..."
 
 Let us perform a simple operation using the \texttt{SX} above:
 \begin{pytex}
-x = ssym("x",2,2)
-y = ssym("y")
+x = SX.sym("x",2,2)
+y = SX.sym("y")
 f = 3*x + y
 print "f = ", f
 \end{pytex}
@@ -448,19 +448,19 @@ We shall now introduce a second, more general \emph{matrix expression} type \tex
 
 The syntax of \texttt{MX} is intended to mirror that of \texttt{SX}:
 \begin{pytex}
-x = msym("x",2,2)
-y = msym("y")
+x = MX.sym("x",2,2)
+y = MX.sym("y")
 f = 3*x + y
 print "f = ", f
 \end{pytex}
 
-where \texttt{msym} has replaced \texttt{ssym}.
+where \texttt{MX.sym} has replaced \texttt{SX.sym}.
 
 Note that this operation required only 2 elementary operations (one multiplication and one addition) using \texttt{MX} symbolics, whereas the \texttt{SX} symbolics required 8 (2 for each element of the resulting matrix). \texttt{MX} is thus more economical when working with operations that are naturally vector or matrix valued. It is also much more general since we allow calls to arbitrary functions that cannot be expanded in terms of elementary operations (like a call to CVodes). %This extra generality, however, comes to the price of more overhead, and we shall 
 
 \texttt{MX} supports getting and setting elements, using the same syntax as \texttt{SX}, but the way it is implemented is very different. Test, for example, to print the first column of a 2-by-2 symbolic variable:
 \begin{pytex}
-x = msym("x",2,2)
+x = MX.sym("x",2,2)
 print x[:,0] 
 \end{pytex}
 
@@ -468,7 +468,7 @@ The output should be understood as a (linear) mapping from nonzeros 0 and 2 of t
 
 Similar outputs can be expected when trying to set elements:
 \begin{pytex}
-x = msym("x",2)
+x = MX.sym("x",2)
 A = MX.sparse(2,2)
 A[0,0] = x[0]
 A[1,1] = x[0]+x[1]
@@ -858,8 +858,8 @@ the explicit equation for $\dot{x}$ can thus be retrieved by simply evaluating t
 An example dae construction is:
 
 \begin{pytex}
-states = ssym("x")
-z = ssym("z")
+states = SX.sym("x")
+z = SX.sym("z")
 rhs = -z*states
 C = z*z-2
 
@@ -1003,7 +1003,7 @@ Note how the symbolic variable in the NLP functions now contains both the contro
 nv = 1*nk + 3*(nk+1)
 
 # Declare variable vector
-V = msym("V", nv)
+V = MX.sym("V", nv)
 \end{verbatim}
 
 Also note how the recursive overwriting of \texttt{X} has been replaced with:

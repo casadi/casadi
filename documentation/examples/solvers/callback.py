@@ -28,8 +28,8 @@ from numpy import *
 #! Note that you need the fix https://github.com/casadi/casadi/wiki/enableIpoptCallback before this works
 #!
 #! We start with constructing the rosenbrock problem
-x=ssym("x")
-y=ssym("y")
+x=SX.sym("x")
+y=SX.sym("y")
 
 nlp=SXFunction(nlpIn(x=vertcat((x,y))),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     

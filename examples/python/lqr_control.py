@@ -72,14 +72,14 @@ assert(rank==ns)
 # Simulation of the open-loop system
 # -----------------------------------
 
-y  = ssym("y",ns)
-u  = ssym("u",nu)
+y  = SX.sym("y",ns)
+u  = SX.sym("u",nu)
 
 x0 = DMatrix([1,0,0])
 # no control
 u_ = DMatrix([[ -1, 1 ],[1,-1]]*((N-1)/2))
 
-p = ssym("p")
+p = SX.sym("p")
 
 tn = np.linspace(0,te,N)
 cdae = SXFunction(controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
@@ -294,7 +294,7 @@ Q = DMatrix.eye(ns)
 R = DMatrix.eye(nu)
 
 # Continuous Riccati equation
-P = ssym("P",ns,ns)
+P = SX.sym("P",ns,ns)
 
 ric = (Q + mul(A.T,P) + mul(P,A) - mul([P,B,inv(R),B.T,P]))
 
@@ -387,7 +387,7 @@ print "Forward riccati eigenvalues = ", D
 
 x0 = DMatrix([1,0,0])
 
-y  = ssym("y",ns)
+y  = SX.sym("y",ns)
 
 C = DMatrix([[1,0,0],[0,1,0]])
 D = DMatrix([[0,0],[0,0]])
@@ -397,7 +397,7 @@ temp = inv(blockcat([[A,B],[C,D]]))
 F = temp[:ns,-ny:]
 Nm = temp[ns:,-ny:]
 
-t = ssym("t")
+t = SX.sym("t")
 
 figure(6)
 
@@ -545,9 +545,9 @@ controls = struct_ssym([
              entry("yref",shape=ns)
            ])
 
-yref  = ssym("yref",ns)
-y     = ssym("y",ns)
-dy    = ssym("dy",ns)
+yref  = SX.sym("yref",ns)
+y     = SX.sym("y",ns)
+dy    = SX.sym("dy",ns)
 u     = controls["uref"]-mul(param["K"],y-controls["yref"])
 rhs   = mul(A,y)+mul(B,u)
 
@@ -602,7 +602,7 @@ title('controls (%s)' % caption)
 # discrete reference, discrete control action
 # -----------------------------------------------------------
 
-y0     = ssym("y0",ns)
+y0     = SX.sym("y0",ns)
 
 u     = controls["uref"]-mul(param["K"],y0-controls["yref"])
 rhs   = mul(A,y)+mul(B,u)

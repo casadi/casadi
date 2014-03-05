@@ -29,7 +29,7 @@ from numpy import *
 #! --------------------------------------
 #! Always provide a name to your symbols.
 #! This name is not used for identification, only for printing.
-a = ssym("z")
+a = SX.sym("z")
 print type(a)
 print a
 #! You can explicitely create constant SX objects as follows
@@ -38,8 +38,8 @@ print c
 #! Scalar algebra
 #! --------------------------
 #! Any operations on SX objects return SX objects.
-x = ssym("x")
-y = ssym("y")
+x = SX.sym("x")
+y = SX.sym("y")
 c = x+y
 print type(c)
 print c
@@ -68,11 +68,11 @@ print f
 print x+y
 #! Expression substitution
 #! ------------------------------------
-x=ssym("x")
+x=SX.sym("x")
 
 y=x*x
 print y
-print substitute(y,x,ssym("w"))
+print substitute(y,x,SX.sym("w"))
 print y
 #! More operators
 #! ------------------------------
@@ -81,7 +81,7 @@ print y
 #! Using these functions require numpy to be imported.
 y = sin(x**x)
 
-x=ssym("x")
+x=SX.sym("x")
 print type(x>0)
 t = if_else(x>0,-10,10)
 print t

@@ -77,7 +77,7 @@ class Matrixtests(casadiTestCase):
     import numpy as NP
     A = NP.zeros((3,4),dtype=SXElement)
     
-    x = ssym("x")
+    x = SX.sym("x")
     A[:,1] = x
     A[1,:] = 5
     #print A  -  printing does not seem to work for numpy 1.8.0dev
@@ -191,7 +191,7 @@ class Matrixtests(casadiTestCase):
 
   def huge_slice(self):
     self.message("huge slice")
-    a = ssym("a",sp_diag(50000))
+    a = SX.sym("a",sp_diag(50000))
 
     a[:,:]
     
@@ -973,11 +973,11 @@ class Matrixtests(casadiTestCase):
 
       random.seed(1)
       a = DMatrix(sA,[random.random() for i in range(sA.size())])
-      A = ssym("a",a.sparsity())
+      A = SX.sym("a",a.sparsity())
       for sB in [ sp_dense(a.size1(),1), vertcat([sp_dense(1,1),sp_sparse(a.size1()-1,1)]),sp_tril(a.size1()),sp_tril(a.size1()).T]:
 
         b = DMatrix(sB,[random.random() for i in range(sB.size())])
-        B = ssym("B",b.sparsity())
+        B = SX.sym("B",b.sparsity())
         C = solve(A,B)
         
         f = SXFunction([A,B],[C])
@@ -1022,9 +1022,9 @@ class Matrixtests(casadiTestCase):
     self.checkarray(c_,numpy.kron(a,b))
     
   def test_flatten_kron(self):
-    A = ssym("A",2,3)
-    B = ssym("B",4,5)
-    P = ssym("P",A.size2(),B.size1())
+    A = SX.sym("A",2,3)
+    B = SX.sym("B",4,5)
+    P = SX.sym("P",A.size2(),B.size1())
 
     f = SXFunction([flatten(P),A,B],[flatten(mul([A,P,B]))])
     f.init()

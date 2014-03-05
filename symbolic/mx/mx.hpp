@@ -54,14 +54,15 @@ namespace CasADi{
     /** \brief  Default constructor */
     MX();
 
-    /** \brief  Construct a symbolic matrix (matrix variable) */
+#ifndef WITHOUT_PRE_1_9_X
+/** \brief [DEPRECATED] Replaced with MX::sym
+*/
+//@{
     explicit MX(const std::string& name, int nrow=1, int ncol=1);
-
-    /** \brief  Construct a symbolic matrix (matrix variable) */
     explicit MX(const std::string& name, const std::pair<int,int> &rc);
-
-    /** \brief  Construct a symbolic matrix (matrix variable) */
     explicit MX(const std::string& name, const Sparsity& sp);
+//@}
+#endif
 
     /** \brief  Construct MX with a given sparsity */
     explicit MX(const Sparsity& sp, const MX& val=0);

@@ -25,8 +25,8 @@ from casadi import *
 import casadi as c
 
 #! We construct a simple MX expression
-x = msym("x",2,2)
-y = msym("y",2,1)
+x = MX.sym("x",2,2)
+y = MX.sym("y",2,1)
 
 z = mul(x,y)
 

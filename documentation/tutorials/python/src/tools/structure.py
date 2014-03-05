@@ -42,7 +42,7 @@ from casadi.tools import *
 #! Introduction
 #! --------------------
 
-#! Create a structured ssym
+#! Create a structured SX.sym
 states = struct_ssym(["x","y","z"])
 
 print states
@@ -201,14 +201,14 @@ print V["X",0,-1,"y"]
 #! Similar to struct_SX, we have struct_MX:
 V = struct_MX([
     (
-    entry("X",expr=[[ msym("x",6)**2 for j in range(3)] for i in range(5)]),
-    entry("U",expr=[ -msym("u") for i in range(4)])
+    entry("X",expr=[[ MX.sym("x",6)**2 for j in range(3)] for i in range(5)]),
+    entry("U",expr=[ -MX.sym("u") for i in range(4)])
     )
   ])
 
-#! By default ssym structure constructor will create new ssyms.
+#! By default SX.sym structure constructor will create new SX.syms.
 #! To recycle one that is already available, use the 'sym' argument: 
-qsym = ssym("quaternion",4)
+qsym = SX.sym("quaternion",4)
 states = struct_ssym(["x","y",entry("q",sym=qsym)])
 print states.cat
 

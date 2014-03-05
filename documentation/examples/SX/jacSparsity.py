@@ -27,7 +27,7 @@ import casadi as c
 from pylab import spy, show
 
 #! We construct a simple SX expression
-x = ssym("x",40)
+x = SX.sym("x",40)
 y = x[:-2]-2*x[1:-1]+x[2:]
 
 #! Let's see what the first 5 entries of y look like

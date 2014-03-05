@@ -54,6 +54,7 @@ namespace CasADi{
     assignNode(ConstantMX::create(DMatrix(x)));
   }
 
+#ifndef WITHOUT_PRE_1_9_X
   MX::MX(const string& name, int nrow, int ncol){
     assignNode(new SymbolicMX(name,nrow,ncol));
   }
@@ -65,6 +66,7 @@ namespace CasADi{
   MX::MX(const string& name, const Sparsity& sp){
     assignNode(new SymbolicMX(name,sp));
   }
+#endif
 
   MX::MX(int nrow, int ncol){
     assignNode(new Constant<CompiletimeConst<0> >(Sparsity(nrow,ncol)));

@@ -65,16 +65,16 @@ class ADtests(casadiTestCase):
 
     self.mxinputs = {
        "column" : {
-            "dense": [MX("xyzw",4,1)],
-            "sparse": [MX("xyzw",sp)]
+            "dense": [MX.sym("xyzw",4,1)],
+            "sparse": [MX.sym("xyzw",sp)]
         },
         "row" : {
-            "dense": [MX("xyzw",1,4)],
-            "sparse": [MX("xyzw",spT)]
+            "dense": [MX.sym("xyzw",1,4)],
+            "sparse": [MX.sym("xyzw",spT)]
         },
         "matrix": {
-            "dense": [MX("xyzw",2,2)],
-            "sparse": [MX("xyzw",c.reshape(inp,3,2).sparsity())]
+            "dense": [MX.sym("xyzw",2,2)],
+            "sparse": [MX.sym("xyzw",c.reshape(inp,3,2).sparsity())]
         }
     }
     
@@ -153,7 +153,7 @@ class ADtests(casadiTestCase):
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
             
-            y = ssym("y",f.input().sparsity())
+            y = SX.sym("y",f.input().sparsity())
             
             fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
             aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
@@ -199,7 +199,7 @@ class ADtests(casadiTestCase):
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
             
-            y = msym("y",f.input().sparsity())
+            y = MX.sym("y",f.input().sparsity())
             
             fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
             aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
@@ -246,7 +246,7 @@ class ADtests(casadiTestCase):
             
             seeds = [[1,0,0,0],[0,2,0,0],[1.2,4.8,7.9,4.6]]
             
-            y = ssym("y",f.input().sparsity())
+            y = SX.sym("y",f.input().sparsity())
             
             fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
             aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
@@ -289,7 +289,7 @@ class ADtests(casadiTestCase):
             f.evaluate()
             r = f.getOutput()
   
-            y = ssym("y",f.input().sparsity())
+            y = SX.sym("y",f.input().sparsity())
             
       
             res,fwdsens,adjsens = f.evalSX([y],[],[])
@@ -395,15 +395,15 @@ class ADtests(casadiTestCase):
               
   def test_hessian(self):
     self.message("Jacobian chaining")
-    x=ssym("x")
-    y=ssym("y")
-    z=ssym("z")
+    x=SX.sym("x")
+    y=SX.sym("y")
+    z=SX.sym("z")
     n=array([1.2,2.3,7])
     f=SXFunction([vertcat([x,y,z])],[vertcat([x+2*y**3+3*z**4])])
     f.init()
     J=f.jacobian(0,0)
     J.init()
-    m=MX("m",3,1)
+    m=MX.sym("m",3,1)
     JT,_ = J.call([m])
     JT = MXFunction([m],[JT.T])
     JT.init()
@@ -419,8 +419,8 @@ class ADtests(casadiTestCase):
     
   def test_bugshape(self):
     self.message("shape bug")
-    x=ssym("x")
-    y=ssym("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
 
     inp=SX(5,1)
     inp[0,0]=x
@@ -465,8 +465,8 @@ class ADtests(casadiTestCase):
     # commented out, uses directional derivatives #884
     return
 
-    x = msym("x",2)
-    y = msym("y",2,2)
+    x = MX.sym("x",2)
+    y = MX.sym("y",2,2)
     
     f1 = MXFunction([x,y],[x+y[0],mul(y,x)])
     f1.init()
@@ -649,7 +649,7 @@ class ADtests(casadiTestCase):
           
         
         # evalThings
-        for sym, Function in [(msym,MXFunction),(ssym,SXFunction)]:
+        for sym, Function in [(MX.sym,MXFunction),(SX.sym,SXFunction)]:
           if isinstance(f, MXFunction) and Function is SXFunction: continue
           if isinstance(f, SXFunction) and Function is MXFunction: continue
           
@@ -720,7 +720,7 @@ class ADtests(casadiTestCase):
               vf_mx = vf
 
           # Second order sensitivities
-          for sym2, Function2 in [(msym,MXFunction),(ssym,SXFunction)]:
+          for sym2, Function2 in [(MX.sym,MXFunction),(SX.sym,SXFunction)]:
           
             if isinstance(vf, MXFunction) and Function2 is SXFunction: continue
             if isinstance(vf, SXFunction) and Function2 is MXFunction: continue

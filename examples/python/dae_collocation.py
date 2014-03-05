@@ -58,7 +58,7 @@ C = np.zeros((deg+1,deg+1))
 D = np.zeros(deg+1)
 
 # Collocation point
-tau = ssym("tau")
+tau = SX.sym("tau")
   
 # All collocation time points
 tau_root = collocationPoints(deg,cp)
@@ -97,20 +97,20 @@ for j in range(deg+1):
 # Model setup
 # -----------------------------------------------------------------------------
 # Declare variables (use scalar graph)
-t  = ssym("t")          # time
-u  = ssym("u")          # control
-xd  = ssym("xd",ndstate)      # differential state
-xa  = ssym("xa",nastate)    # algebraic state
-xddot  = ssym("xdot",ndstate) # differential state time derivative
-p = ssym("p",0,1)      # parameters
+t  = SX.sym("t")          # time
+u  = SX.sym("u")          # control
+xd  = SX.sym("xd",ndstate)      # differential state
+xa  = SX.sym("xa",nastate)    # algebraic state
+xddot  = SX.sym("xdot",ndstate) # differential state time derivative
+p = SX.sym("p",0,1)      # parameters
  
-x = ssym("x")
-y = ssym("y")
-w = ssym("w")
+x = SX.sym("x")
+y = SX.sym("y")
+w = SX.sym("w")
 
-dx = ssym("dx")
-dy = ssym("dy")
-dw = ssym("dw")
+dx = SX.sym("dx")
+dy = SX.sym("dy")
+dw = SX.sym("dw")
 
       
 res = vertcat([xddot[0] - dx,\
@@ -221,7 +221,7 @@ NXF = ndiff                 # Final state (only the differential states)
 NV = NXD+NXA+NU+NXF+NP
 
 # NLP variable vector
-V = msym("V",NV)
+V = MX.sym("V",NV)
   
 # All variables with bounds and initial guess
 vars_lb = np.zeros(NV)

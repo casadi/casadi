@@ -169,8 +169,8 @@ class ComplexityTests(casadiTestCase):
     return
     self.message("SXFunction add column vectors")
     def setupfun(self,N):
-      A = ssym("A",N,1)
-      B = ssym("B",N,1)
+      A = SX.sym("A",N,1)
+      B = SX.sym("B",N,1)
       f = SXFunction([A,B],[A+B])
       f.init()
       return {'f':f}
@@ -183,8 +183,8 @@ class ComplexityTests(casadiTestCase):
     return
     self.message("SXFunction prod column vectors")
     def setupfun(self,N):
-      A = ssym("A",N,1)
-      B = ssym("B",N,1)
+      A = SX.sym("A",N,1)
+      B = SX.sym("B",N,1)
       f = SXFunction([A,B],[c.dot(A.T,B)])
       f.init()
       return {'f':f}
@@ -195,9 +195,9 @@ class ComplexityTests(casadiTestCase):
   def test_SXFunctionprodsparse(self):
     self.message("SXFunction prod sparse")
     def setupfun(self,N):
-      A = ssym("A",sp_diag(N))
+      A = SX.sym("A",sp_diag(N))
       A[-1,0]=SX("off") # Have one of-diagonal element
-      B = ssym("B",N,1)
+      B = SX.sym("B",N,1)
       f = SXFunction([A,B],[c.dot(A,B)])
       f.init()
       return {'f':f}
@@ -210,8 +210,8 @@ class ComplexityTests(casadiTestCase):
   def test_MXFunctionprodvec(self):
     self.message("MXFunction prod")
     def setupfun(self,N):
-      G = MX("G",N,1)
-      X = MX("X",N,1)
+      G = MX.sym("G",N,1)
+      X = MX.sym("X",N,1)
       f = MXFunction([G,X],[c.prod(G.T,X)])
       f.init()
       return {'f':f}
@@ -224,8 +224,8 @@ class ComplexityTests(casadiTestCase):
     def setupfun(self,N):
       s = sp_diag(N)
       s[-1,0]=1
-      H = MX("H",s)
-      X = MX("X",N,1)
+      H = MX.sym("H",s)
+      X = MX.sym("X",N,1)
       f = MXFunction([H,X],[c.prod(H,X)])
       f.init()
       return {'f':f}
@@ -236,10 +236,10 @@ class ComplexityTests(casadiTestCase):
     def setupfun(self,N):
       s = sp_diag(N)
       s[-1,0]=1
-      H = MX("H",s)
+      H = MX.sym("H",s)
       s = sp_diag(N)
       s[-1,0]=1
-      X = MX("X",s)
+      X = MX.sym("X",s)
       f = MXFunction([H,X],[c.prod(H,X)])
       f.init()
       return {'f':f}
