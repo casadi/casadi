@@ -80,9 +80,9 @@ namespace CasADi{
     casadi_assert_message(nlp_.getNumOutputs()==NL_NUM_OUT, "The NLP function must have exactly two outputs");
     
     // Sparsity patterns
-    const CRSSparsity& x_sparsity = nlp_.input(NL_X).sparsity();
-    const CRSSparsity& p_sparsity = nlp_.input(NL_P).sparsity();
-    const CRSSparsity& g_sparsity = nlp_.output(NL_G).sparsity();
+    const Sparsity& x_sparsity = nlp_.input(NL_X).sparsity();
+    const Sparsity& p_sparsity = nlp_.input(NL_P).sparsity();
+    const Sparsity& g_sparsity = nlp_.output(NL_G).sparsity();
 
     // Get dimensions
     nx_ = x_sparsity.size();
@@ -274,16 +274,16 @@ namespace CasADi{
     return hessLag;
   }
 
-  CRSSparsity& NLPSolverInternal::spHessLag(){
+  Sparsity& NLPSolverInternal::spHessLag(){
     if(spHessLag_.isNull()){
       spHessLag_ = getSpHessLag();
     }
     return spHessLag_;
   }
 
-  CRSSparsity NLPSolverInternal::getSpHessLag(){
-    CRSSparsity spHessLag;
-    if(false /*hasSetOption("hess_lag_sparsity")*/){ // NOTE: No such option yet, need support for GenericType(CRSSparsity)
+  Sparsity NLPSolverInternal::getSpHessLag(){
+    Sparsity spHessLag;
+    if(false /*hasSetOption("hess_lag_sparsity")*/){ // NOTE: No such option yet, need support for GenericType(Sparsity)
       //spHessLag = getOption("hess_lag_sparsity");
     } else {
       FX& gradLag = this->gradLag();

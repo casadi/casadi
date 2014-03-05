@@ -22,7 +22,7 @@
 
 #include "functor_internal.hpp"
 
-#include "matrix/crs_sparsity.hpp"
+#include "matrix/sparsity.hpp"
 #include "fx/fx.hpp"
 #include "fx/custom_function.hpp"
 

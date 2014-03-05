@@ -25,13 +25,13 @@ SET(CASADI_SRCS
   functor_internal.hpp        functor_internal.cpp     
   polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials
 
-  # Template class Matrix<>, implements a sparse Matrix with row compressed storage, designed to work well with symbolic data types (SX)
-  matrix/generic_expression.hpp                         # Base class for SX MX and Matrix<>
-  matrix/generic_expression_tools.hpp                   # Tools for SX MX and Matrix<>
+  # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
+  matrix/generic_expression.hpp                         # Base class for SXElement MX and Matrix<>
+  matrix/generic_expression_tools.hpp                   # Tools for SXElement MX and Matrix<>
   matrix/generic_matrix.hpp                             # Base class for Matrix<> and MX
   matrix/generic_matrix_tools.hpp                       # Tools for both Matrix<> and MX
   matrix/matrix.hpp           matrix/matrix_impl.hpp    # The Matrix template class
-  matrix/crs_sparsity.hpp     matrix/crs_sparsity.cpp   matrix/crs_sparsity_internal.hpp   matrix/crs_sparsity_internal.cpp    # reference counted sparsity pattern
+  matrix/sparsity.hpp     matrix/sparsity.cpp   matrix/sparsity_internal.hpp   matrix/sparsity_internal.cpp    # reference counted sparsity pattern
   matrix/slice.hpp            matrix/slice.cpp          # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
   matrix/submatrix.hpp                                  # A reference to a block of the matrix to allow operations such as A(:,3) = ...
   matrix/nonzeros.hpp                                   # A reference to a set of nonzeros of the matrix to allow operations such as A[3] = ...
@@ -39,16 +39,16 @@ SET(CASADI_SRCS
   matrix/sparsity_tools.hpp   matrix/sparsity_tools.cpp # Set of functions for sparsity
 
   # Directed, acyclic graph representation with scalar expressions
-  sx/sx.hpp                  sx/sx.cpp                  # Public, smart pointer class, 
+  sx/sx_element.hpp          sx/sx_element.cpp          # Symbolic expression class (scalar-valued atomics)
   sx/sx_node.hpp             sx/sx_node.cpp             # Base class for all the nodes
-  sx/symbolic_sx.hpp                                    # A symbolic SX variable 
-  sx/constant_sx.hpp                                    # A constant SX node
+  sx/symbolic_sx.hpp                                    # A symbolic SXElement variable 
+  sx/constant_sx.hpp                                    # A constant SXElement node
   sx/unary_sx.hpp                                       # A unary operation
   sx/binary_sx.hpp                                      # A binary operation
   sx/sx_tools.cpp            sx/sx_tools.hpp            # Set of functions
 
   # More general graph representation with sparse matrix expressions and function evaluations
-  mx/mx.hpp                  mx/mx.cpp                  # Public, smart pointer class, 
+  mx/mx.hpp                  mx/mx.cpp                  # Symbolic expression class (matrix-valued atomics)
   mx/mx_node.hpp             mx/mx_node.cpp             # Base class for all the MX nodes
   mx/constant_mx.hpp         mx/constant_mx.cpp         # A constant MX node
   mx/symbolic_mx.hpp         mx/symbolic_mx.cpp         # A symbolic MX variable
@@ -59,8 +59,8 @@ SET(CASADI_SRCS
   mx/call_fx.hpp             mx/call_fx.cpp             # FX function evaluation
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
   mx/transpose.hpp           mx/transpose.cpp           # Transpose
-  mx/vertcat.hpp             mx/vertcat.cpp             # Vertical concatenation
-  mx/vertsplit.hpp           mx/vertsplit.cpp           # Vertical split
+  mx/concat.hpp              mx/concat.cpp              # Concatenation
+  mx/split.hpp               mx/split.cpp               # Split (inverse of concatenation)
   mx/reshape.hpp             mx/reshape.cpp             # Reshape
   mx/subref.hpp              mx/subref.cpp              # Submatrix reference
   mx/subassign.hpp           mx/subassign.cpp           # Submatrix assignment

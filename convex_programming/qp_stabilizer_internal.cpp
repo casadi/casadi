@@ -28,64 +28,76 @@
 using namespace std;
 namespace CasADi {
 
-QPStabilizerInternal* QPStabilizerInternal::clone() const{
-  // Return a deep copy
-  QPStabilizerInternal* node = new QPStabilizerInternal(st_);
-  if(!node->is_init_)
-    node->init();
-  return node;
-}
-  
-QPStabilizerInternal::QPStabilizerInternal(const std::vector<CRSSparsity> &st) : StabilizedQPSolverInternal(st) {
+  QPStabilizerInternal::QPStabilizerInternal(const std::vector<Sparsity> &st) : StabilizedQPSolverInternal(st) {
+    addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver used to solve the stabilized QPs.");
+    addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver instance");
+  }
 
-  addOption("qp_solver",       OT_QPSOLVER, GenericType(), "The QPSOlver used to solve the Stabilized QPs.");
-  addOption("qp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the QPSOlver");
-  
-}
+  QPStabilizerInternal::~QPStabilizerInternal(){ 
+  }
 
-QPStabilizerInternal::~QPStabilizerInternal(){ 
-}
+  void QPStabilizerInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+    StabilizedQPSolverInternal::deepCopyMembers(already_copied);
+    qp_solver_ = deepcopy(qp_solver_,already_copied);
+  }
 
-void QPStabilizerInternal::evaluate() {
-    double muR = input(STABILIZED_QP_SOLVER_MUR).at(0);
-    std::vector<double> & muE = input(STABILIZED_QP_SOLVER_MUE).data();
-    std::vector<double> & mu = input(STABILIZED_QP_SOLVER_MU).data();
+  void QPStabilizerInternal::init(){
+    // Initialize the base classes
+    StabilizedQPSolverInternal::init();
+
+    // Form augmented QP
+    Sparsity H_sparsity_qp = blkdiag(st_[QP_STRUCT_H],sp_diag(nc_));
+    Sparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A],sp_diag(nc_));
+    QPSolverCreator qp_solver_creator = getOption("qp_solver");
+    qp_solver_ = qp_solver_creator(qpStruct("h",H_sparsity_qp,"a",A_sparsity_qp));
+
+    // Pass options if provided
+    if(hasSetOption("qp_solver_options")){
+      Dictionary qp_solver_options = getOption("qp_solver_options");
+      qp_solver_.setOption(qp_solver_options);
+    } 
     
+    // Initialize the QP solver
+    qp_solver_.init();
+  }
+
+  void QPStabilizerInternal::evaluate() {
+    double muR = input(STABILIZED_QP_SOLVER_MUR).at(0);
+    std::vector<double>& muE = input(STABILIZED_QP_SOLVER_MUE).data();
+    std::vector<double>& mu = input(STABILIZED_QP_SOLVER_MU).data();
+
     // Construct stabilized H
-    DMatrix & H_qp = qp_solver_.input(QP_SOLVER_H);
+    DMatrix& H_qp = qp_solver_.input(QP_SOLVER_H);
     std::copy(input(STABILIZED_QP_SOLVER_H).begin(),input(STABILIZED_QP_SOLVER_H).end(),H_qp.begin());
     std::fill(H_qp.begin()+input(STABILIZED_QP_SOLVER_H).size(),H_qp.end(),muR);
 
-    // Pass linear bounds
+    // Linear constraints
     if (nc_>0) {
+      // Upper and lower bounds
       qp_solver_.setInput(input(STABILIZED_QP_SOLVER_LBA),QP_SOLVER_LBA);
       qp_solver_.setInput(input(STABILIZED_QP_SOLVER_UBA),QP_SOLVER_UBA);
       
-
-        
-      DMatrix & A_qp = qp_solver_.input(QP_SOLVER_A);
-      DMatrix & A = input(STABILIZED_QP_SOLVER_A);
-      const std::vector <int> &A_rowind = A.rowind();
-      for (int i=0;i<A_qp.size1();++i) { // Loop over rows
-        int row_start = A_rowind[i];
-        int row_end = A_rowind[i+1];
-        // Copy row contents
-        std::copy(A.begin()+row_start,A.begin()+row_end,A_qp.begin()+row_start+i);
-        A_qp[row_end+i] = -muR;
-      }
-      
+      // Matrix term in the linear constraint
+      DMatrix& A_qp = qp_solver_.input(QP_SOLVER_A);
+      DMatrix& A = input(STABILIZED_QP_SOLVER_A);
+      std::copy(A.begin(),A.end(),A_qp.begin());
+      std::fill(A_qp.begin()+A.size(),A_qp.end(),-muR);
+            
       // Add constant to linear inequality 
-      for (int i=0;i<mu.size();++i) {
+      for(int i=0; i<mu.size(); ++i) {
         double extra = muR*(mu[i]-muE[i]);
-        qp_solver_.input(QP_SOLVER_LBA).at(i)+= extra;
-        qp_solver_.input(QP_SOLVER_UBA).at(i)+= extra;
+        qp_solver_.input(QP_SOLVER_LBA).at(i) += extra;
+        qp_solver_.input(QP_SOLVER_UBA).at(i) += extra;
       }
-
     }
+
+    // Bounds on x
     std::copy(input(STABILIZED_QP_SOLVER_LBX).begin(),input(STABILIZED_QP_SOLVER_LBX).end(),qp_solver_.input(QP_SOLVER_LBX).begin());
     std::copy(input(STABILIZED_QP_SOLVER_UBX).begin(),input(STABILIZED_QP_SOLVER_UBX).end(),qp_solver_.input(QP_SOLVER_UBX).begin());
+    std::fill(qp_solver_.input(QP_SOLVER_LBX).begin()+n_,qp_solver_.input(QP_SOLVER_LBX).end(),-numeric_limits<double>::infinity());
+    std::fill(qp_solver_.input(QP_SOLVER_UBX).begin()+n_,qp_solver_.input(QP_SOLVER_UBX).end(),numeric_limits<double>::infinity());
     
-    // g
+    // Gradient term in the objective
     DMatrix &g = input(STABILIZED_QP_SOLVER_G);
     std::copy(g.begin(),g.end(),qp_solver_.input(QP_SOLVER_G).begin());
     for (int i=0;i<nc_;++i) {
@@ -105,38 +117,11 @@ void QPStabilizerInternal::evaluate() {
     std::copy(qp_solver_.output(QP_SOLVER_X).begin(),qp_solver_.output(QP_SOLVER_X).begin()+n_,output(QP_SOLVER_X).begin());
     std::copy(qp_solver_.output(QP_SOLVER_LAM_X).begin(),qp_solver_.output(QP_SOLVER_LAM_X).begin()+n_,output(QP_SOLVER_LAM_X).begin());
     std::copy(qp_solver_.output(QP_SOLVER_LAM_A).begin(),qp_solver_.output(QP_SOLVER_LAM_A).begin()+nc_,output(QP_SOLVER_LAM_A).begin());
-    
-}
+  }
 
-void QPStabilizerInternal::init(){
-
-  StabilizedQPSolverInternal::init();
-
-  CRSSparsity H_sparsity_qp = blkdiag(st_[QP_STRUCT_H],sp_diag(nc_));
-  CRSSparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A],sp_diag(nc_));
-    
-  QPSolverCreator qp_solver_creator = getOption("qp_solver");
-  qp_solver_ = qp_solver_creator(qpStruct("h",H_sparsity_qp,"a",A_sparsity_qp));
-
-  // Set options if provided
-  if(hasSetOption("qp_solver_options")){
-    Dictionary qp_solver_options = getOption("qp_solver_options");
-    
-    qp_solver_.setOption(qp_solver_options);
-  } 
-
-  //qp_solver_.setOption("optimality",1e-2*tol_pr_);
-  qp_solver_.init();
-  
-  std::fill(qp_solver_.input(QP_SOLVER_LBX).begin()+n_,qp_solver_.input(QP_SOLVER_LBX).end(),-numeric_limits<double>::infinity());
-  std::fill(qp_solver_.input(QP_SOLVER_UBX).begin()+n_,qp_solver_.input(QP_SOLVER_UBX).end(),numeric_limits<double>::infinity());
-    
- 
-}
-
-void QPStabilizerInternal::generateNativeCode(std::ostream &file) const {
-  qp_solver_.generateNativeCode(file);
-}
+  void QPStabilizerInternal::generateNativeCode(std::ostream &file) const {
+    qp_solver_.generateNativeCode(file);
+  }
 
 } // namespace CasADi
 

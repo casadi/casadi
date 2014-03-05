@@ -46,13 +46,13 @@ public:
   void setupIntegrators(void);
   void setupIntegrators(std::map<std::string,double> & params);
 
-     std::map<std::string,CasADi::SX> getOutputFromDxdt( CasADi::SXMatrix x,
-							 CasADi::SXMatrix u,
+     std::map<std::string,CasADi::SX> getOutputFromDxdt( CasADi::SX x,
+							 CasADi::SX u,
 							 std::map<std::string,CasADi::SX> & p,
 							 CasADi::SX t );
 
-     CasADi::SXMatrix dxVectorDt( CasADi::SXMatrix x,
-				  CasADi::SXMatrix u,
+     CasADi::SX dxVectorDt( CasADi::SX x,
+				  CasADi::SX u,
 				  std::map<std::string,CasADi::SX> & p,
 				  CasADi::SX t );
 
@@ -66,23 +66,23 @@ public:
 				double t0,
 				double dt);
 
-     CasADi::SXMatrix rk4Step( CasADi::SXMatrix x0Vec,
-			       CasADi::SXMatrix u0Vec,
-			       CasADi::SXMatrix u1Vec,
+     CasADi::SX rk4Step( CasADi::SX x0Vec,
+			       CasADi::SX u0Vec,
+			       CasADi::SX u1Vec,
 			       std::map<std::string,CasADi::SX> & p,
 			       CasADi::SX t0,
 			       CasADi::SX dt);
 
-     CasADi::SXMatrix eulerStep( CasADi::SXMatrix x0Vec,
-				 CasADi::SXMatrix u0Vec,
+     CasADi::SX eulerStep( CasADi::SX x0Vec,
+				 CasADi::SX u0Vec,
 				 std::map<std::string,CasADi::SX> & p,
 				 CasADi::SX t0,
 				 CasADi::SX dt);
 	
-     CasADi::SXMatrix simpsonsRuleError( CasADi::SXMatrix x0Vec,
-					 CasADi::SXMatrix x1Vec,
-					 CasADi::SXMatrix u0Vec,
-					 CasADi::SXMatrix u1Vec,
+     CasADi::SX simpsonsRuleError( CasADi::SX x0Vec,
+					 CasADi::SX x1Vec,
+					 CasADi::SX u0Vec,
+					 CasADi::SX u1Vec,
 					 std::map<std::string,CasADi::SX> & p,
 					 CasADi::SX t0,
 					 CasADi::SX dt);
@@ -94,8 +94,8 @@ public:
 
      void assertUniqueName(std::string newName);
 
-     std::map<std::string,CasADi::SX> getStateMap( CasADi::SXMatrix & x);
-     std::map<std::string,CasADi::SX> getActionMap( CasADi::SXMatrix & u);
+     std::map<std::string,CasADi::SX> getStateMap( CasADi::SX & x);
+     std::map<std::string,CasADi::SX> getActionMap( CasADi::SX & u);
 
 private:
      int isState(std::string stateName);

@@ -20,23 +20,23 @@
  *
  */
 
-#ifndef CRS_SPARSITY_INTERNAL_HPP
-#define CRS_SPARSITY_INTERNAL_HPP
+#ifndef SPARSITY_INTERNAL_HPP
+#define SPARSITY_INTERNAL_HPP
 
-#include "crs_sparsity.hpp"
+#include "sparsity.hpp"
 
 namespace CasADi{
 
-  class CRSSparsityInternal : public SharedObjectNode{
+  class SparsityInternal : public SharedObjectNode{
   public:    
     /// Construct a sparsity pattern from vectors
-    CRSSparsityInternal(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) : nrow_(nrow), ncol_(ncol), col_(col), rowind_(rowind) { sanityCheck(false); }
+    SparsityInternal(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row) : nrow_(nrow), ncol_(ncol), colind_(colind), row_(row) { sanityCheck(false); }
     
-    /// Check if the dimensions and rowind,col vectors are compatible
+    /// Check if the dimensions and colind,row vectors are compatible
     void sanityCheck(bool complete=false) const;
 
     /// Get the diagonal of the matrix/create a diagonal matrix (mapping will contain the nonzero mapping)
-    CRSSparsity diag(std::vector<int>& mapping) const;
+    Sparsity diag(std::vector<int>& mapping) const;
 
     /// Calculate the elimination tree: See cs_etree in CSparse
     std::vector<int> eliminationTree(bool ata) const;
@@ -48,34 +48,39 @@ namespace CasADi{
     int stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const;
 
     /// Transpose the matrix
-    CRSSparsity transpose() const;
+    Sparsity transpose() const;
 
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
-    CRSSparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
+    Sparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
 
     /// Check if the sparsity is the transpose of another
-    bool isTranspose(const CRSSparsityInternal& y) const;
+    bool isTranspose(const SparsityInternal& y) const;
 
     /// Breadth-first search for coarse decomposition: see cs_bfs in CSparse
     void breadthFirstSearch(int n, std::vector<int>& wi, std::vector<int>& wj, std::vector<int>& queue, const std::vector<int>& imatch, const std::vector<int>& jmatch, int mark) const;
     
-    /// Collect matched rows and columns into p and q: see cs_matched in CSparse
+    /// Collect matched cols and rows into p and q: see cs_matched in CSparse
     static void matched(int n, const std::vector<int>& wj, const std::vector<int>& imatch, std::vector<int>& p, std::vector<int>& q, std::vector<int>& cc, std::vector<int>& rr, int set, int mark);
     
-    /// Collect unmatched rows into the permutation vector p : see cs_unmatched in CSparse
+    /// Collect unmatched cols into the permutation vector p : see cs_unmatched in CSparse
     static void unmatched(int m, const std::vector<int>& wi, std::vector<int>& p, std::vector<int>& rr, int set);
     
-    /// return 1 if row i is in R2 : see cs_rprune in CSparse
+    /// return 1 if col i is in R2 : see cs_rprune in CSparse
     static int rprune (int i, int j, double aij, void *other);
 
     /// drop entries for which fkeep(A(i,j)) is false; return nz if OK, else -1: : see cs_fkeep in CSparse
     int drop(int (*fkeep) (int, int, double, void *), void *other);
 
     /// Compute the Dulmage-Mendelsohn decomposition : see cs_dmperm in CSparse
-    int dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed) const;
+    int dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed) const{
+      return transpose()->dulmageMendelsohnUpper(colperm,rowperm,colblock,rowblock,coarse_colblock,coarse_rowblock,seed);
+    }
+
+    /// Compute the Dulmage-Mendelsohn decomposition -- upper triangular TODO: refactor and merge with the above
+    int dulmageMendelsohnUpper(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed) const;
     
     /// Compute the maximum transversal (maximum matching): see cs_maxtrans in CSparse
-    void maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch, CRSSparsity& trans, int seed) const;
+    void maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch, Sparsity& trans, int seed) const;
     
     /// Find an augmenting path: see cs_augment in CSparse
     void augmentingPath(int k, std::vector<int>& jmatch, int *cheap, std::vector<int>& w, int *js, int *is, int *ps) const;
@@ -87,9 +92,9 @@ namespace CasADi{
     static std::vector<int> invertPermutation(const std::vector<int>& p);
 
     /// C = A(p,q) where p and q are permutations of 0..m-1 and 0..n-1.: see cs_permute in CSparse
-    CRSSparsity permute(const std::vector<int>& pinv, const std::vector<int>& q, int values) const;
+    Sparsity permute(const std::vector<int>& pinv, const std::vector<int>& q, int values) const;
 
-    /// consider A(i,j), node j in ith row subtree and return lca(jprev,j): See cs_leaf in CSparse
+    /// consider A(i,j), node j in ith col subtree and return lca(jprev,j): See cs_leaf in CSparse
     static int leaf (int i, int j, const int *first, int *maxfirst, int *prevleaf, int *ancestor, int *jleaf);
     
     /// compute nnz(V) = S->lnz, S->pinv, S->leftmost, S->m2 from A and S->parent: See cs_vcount in CSparse
@@ -101,10 +106,10 @@ namespace CasADi{
     /// Depth-first search and postorder of a tree rooted at node j: See cs_tdfs in CSparse
     static int depthFirstSearchAndPostorder(int j, int k, int *head, const int *next, int *post, int *stack);
 
-    /// column counts of LL'=A or LL'=A'A, given parent & post ordering: see init_ata in CSparse
+    /// row counts of LL'=A or LL'=A'A, given parent & post ordering: see init_ata in CSparse
     void init_ata(const int *post, int *w, int **head, int **next) const;
     
-    /// Column counts: See cs_counts in CSparse
+    /// Row counts: See cs_counts in CSparse
     std::vector<int> counts(const int *parent, const int *post, int ata) const;
 
     /// Approximate minimal degree, p = amd(A+A') if symmetric is true, or amd(A'A) otherwise. order 0:natural, 1:Chol, 2:LU, 3:QR. See cs_amd in CSparse
@@ -120,22 +125,19 @@ namespace CasADi{
     static int diag(int i, int j, double aij, void *other);
 
     /// C = A*B: See cs_multiply in CSparse
-    CRSSparsity multiply(const CRSSparsity& B) const;
+    Sparsity multiply(const Sparsity& B) const;
 
     /// x = x + beta * A(:,j), where x is a dense vector and A(:,j) is sparse: See cs_scatter in CSparse
-    int scatter(int j, std::vector<int>& w, int mark, CRSSparsity& C, int nz) const;
+    int scatter(int j, std::vector<int>& w, int mark, Sparsity& C, int nz) const;
     
-    /// Get the row for each nonzero
-    std::vector<int> getRow() const;
+    /// Get the column for each nonzero
+    std::vector<int> getCol() const;
 
     /// Resize
     void resize(int nrow, int ncol);
     
     /// Reshape a sparsity, order of nonzeros remains the same
-    CRSSparsity reshape(int n, int m) const;
-
-    /// Pattern union
-    //CRSSparsity patternCombine(const CRSSparsity& y, std::vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const;
+    Sparsity reshape(int nrow, int ncol) const;
 
     /// Number of structural non-zeros
     int size() const;
@@ -149,11 +151,11 @@ namespace CasADi{
     /// Check if the sparsity is null, i.e. dimension is 0-by-0
     bool null() const;
 
-    /// Number of non-zeros in the upper triangular half
-    int sizeU() const;
-
     /// Number of non-zeros in the lower triangular half
     int sizeL() const;
+
+    /// Number of non-zeros in the upper triangular half
+    int sizeU() const;
 
     /// Number of non-zeros on the diagonal
     int sizeD() const;
@@ -173,83 +175,107 @@ namespace CasADi{
     /// Is square?
     bool square() const;
 
+    /// Is symmetric?
+    bool symmetric() const;
+
+    /// Is lower triangular?
+    bool tril() const;
+
+    /// is upper triangular?
+    bool triu() const;
+
+    /// Get lower triangular part
+    Sparsity lower(bool includeDiagonal) const;
+
+    /// Get lower triangular part
+    Sparsity upper(bool includeDiagonal) const;
+
+    /// Get nonzeros in lower triangular part
+    std::vector<int> lowerNZ() const;
+
+    /// Get nonzeros in upper triangular part
+    std::vector<int> upperNZ() const;
+
     /// Get the dimension as a string
     std::string dimString() const;
 
     //@{
     /// Sparsity pattern for a matrix-matrix product (details in public class)
-    CRSSparsity patternProduct(const CRSSparsity& y_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
-    CRSSparsity patternProduct(const CRSSparsity& y_trans) const;
+    Sparsity patternProduct(const Sparsity& y, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
+    Sparsity patternProduct(const Sparsity& y) const;
     //@}
     
     //@{
     /// Union of two sparsity patterns
-    CRSSparsity patternCombine(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
-    CRSSparsity patternCombine(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
+    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
+    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
 
     template<bool with_mapping>
-    CRSSparsity patternCombineGen1(const CRSSparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
+    Sparsity patternCombineGen1(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
 
     template<bool with_mapping, bool f0x_is_zero, bool fx0_is_zero>
-    CRSSparsity patternCombineGen(const CRSSparsity& y, std::vector<unsigned char>& mapping) const;
+    Sparsity patternCombineGen(const Sparsity& y, std::vector<unsigned char>& mapping) const;
     //@}
     
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
-    CRSSparsity patternInverse() const;
+    Sparsity patternInverse() const;
 
     /// Check if two sparsity patterns are the same
-    bool isEqual(const CRSSparsity& y) const;
+    bool isEqual(const Sparsity& y) const;
 
     /// Check if two sparsity patterns are the same
-    bool isEqual(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) const;
+    bool isEqual(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row) const;
 
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
-    void enlargeRows(int nrow, const std::vector<int>& ii);
+    void enlargeRows(int nrow, const std::vector<int>& jj);
 
     /// Enlarge the matrix along the second dimension (i.e. insert columns)
-    void enlargeColumns(int ncol, const std::vector<int>& jj);
+    void enlargeColumns(int ncol, const std::vector<int>& ii);
     
     /// Make a patten dense
-    CRSSparsity makeDense(std::vector<int>& mapping) const;
+    Sparsity makeDense(std::vector<int>& mapping) const;
 
     /// Erase rows and/or columns - does bounds checking
-    std::vector<int> erase(const std::vector<int>& ii, const std::vector<int>& jj);
+    std::vector<int> erase(const std::vector<int>& jj, const std::vector<int>& ii);
 
-    /// Append another sparsity patten vertically
-    void append(const CRSSparsity& sp);
+    /// Append another sparsity patten vertically (vectors only)
+    void append(const SparsityInternal& sp);
+
+    /// Append another sparsity patten horizontally
+    void appendColumns(const SparsityInternal& sp);
 
     /// Reserve space
-    void reserve(int nnz, int nrow);
+    void reserve(int nnz, int ncol);
     
     /** \brief Get a submatrix
     * Does bounds checking
     * ii and jj are not required to be monotonous
     */
-    CRSSparsity sub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+    Sparsity sub(const std::vector<int>& jj, const std::vector<int>& ii, std::vector<int>& mapping) const;
 
     /// Get the index of an existing non-zero element
-    int getNZ(int i, int j) const;
+    int getNZ(int rr, int cc) const;
     
     /// Get a set of non-zero element - does bounds checking
-    std::vector<int> getNZ(const std::vector<int>& ii, const std::vector<int>& jj) const;
+    std::vector<int> getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const;
 
     /// Get the nonzero index for a set of elements (see descripion in public class)
     void getNZInplace(std::vector<int>& indices) const;
     
-    /// Does the columns appear sequentially on each row
-    bool columnsSequential(bool strictly) const;
+    /// Does the rows appear sequentially on each col
+    bool rowsSequential(bool strictly) const;
     
     /// Remove duplicate entries: The same indices will be removed from the mapping vector, which must have the same length as the number of nonzeros
     void removeDuplicates(std::vector<int>& mapping);
   
     /// Get element index for each nonzero
-    void getElements(std::vector<int>& loc, bool row_major) const;
+    void getElements(std::vector<int>& loc, bool col_major) const;
     
     /// Hash the sparsity pattern
     std::size_t hash() const;
 
     /// Clone
-    virtual CRSSparsityInternal* clone() const{ return new CRSSparsityInternal(*this); }
+    virtual SparsityInternal* clone() const{ return new SparsityInternal(*this); }
 
     /// Print representation
     virtual void repr(std::ostream &stream) const;
@@ -259,40 +285,44 @@ namespace CasADi{
 
     /// Number of rows
     int nrow_;
-    
-    /// Number of columns
+
+    /// Number of cols
     int ncol_;
-    
-    /// vector of length nnz containing the columns for all the indices of the non-zero elements
-    std::vector<int> col_;
-    
-    /// vector of length n+1 containing the index of the last non-zero element up till each row 
-    std::vector<int> rowind_;
-    
+
+    /// vector of length n+1 containing the index of the last non-zero element up till each col 
+    std::vector<int> colind_;
+
+    /// vector of length nnz containing the rows for all the indices of the non-zero elements
+    std::vector<int> row_;
+        
     /// Perform a unidirectional coloring: A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) 
-    CRSSparsity unidirectionalColoring(const CRSSparsity& AT, int cutoff) const;
+    Sparsity unidirectionalColoring(const Sparsity& AT, int cutoff) const;
 
     /// Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
-    CRSSparsity starColoring(int ordering, int cutoff) const;
+    Sparsity starColoring(int ordering, int cutoff) const;
     
     /// Perform a star coloring of a symmetric matrix: An improved distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
-    CRSSparsity starColoring2(int ordering, int cutoff) const;
+    Sparsity starColoring2(int ordering, int cutoff) const;
 
-    /// Order the rows by decreasing degree
+    /// Order the columns by decreasing degree
     std::vector<int> largestFirstOrdering() const;
 
     /// Permute rows and/or columns
-    CRSSparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_columns=true, bool invert_permutation=false) const;
+    Sparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_cols=true, bool invert_permutation=false) const;
+
+    /** \brief Print a textual representation of sparsity */
+    void spy(std::ostream &stream) const;
     
     /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
     void spyMatlab(const std::string& mfile) const;
+
  private: 
     /// Time complexity: O(ii.size()*jj.size())
-    CRSSparsity sub1(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
-    /// Time complexity: O(ii.size()*(nnz per row))
-    CRSSparsity sub2(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+    Sparsity sub1(const std::vector<int>& jj, const std::vector<int>& ii, std::vector<int>& mapping) const;
+    /// Time complexity: O(ii.size()*(nnz per column))
+    Sparsity sub2(const std::vector<int>& jj, const std::vector<int>& ii, std::vector<int>& mapping) const;
 };
 
 } // namespace CasADi
 
-#endif // CRS_SPARSITY_INTERNAL_HPP
+#endif // SPARSITY_INTERNAL_HPP

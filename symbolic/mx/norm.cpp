@@ -29,7 +29,7 @@ namespace CasADi{
 
   Norm::Norm(const MX& x){
     setDependencies(x);
-    setSparsity(CRSSparsity(1,1,true));
+    setSparsity(Sparsity(1,1,true));
   }
 
   void NormF::printPart(std::ostream &stream, int part) const{
@@ -44,8 +44,8 @@ namespace CasADi{
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void NormF::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void NormF::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>

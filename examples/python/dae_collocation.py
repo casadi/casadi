@@ -179,19 +179,19 @@ p_init = np.array([])
 # Initial constraint
 ic_min = np.array([])
 ic_max = np.array([])
-ic = SXMatrix()
+ic = SX()
 #ic.append();       ic_min = append(ic_min, 0.);         ic_max = append(ic_max, 0.)
 icfcn = SXFunction([t,xd,xa,u,p],[ic])
 # Path constraint
 pc_min = np.array([])
 pc_max = np.array([])
-pc = SXMatrix()
+pc = SX()
 #pc.append();       pc_min = append(pc_min, 0.);         pc_max = append(pc_max, 0.)
 pcfcn = SXFunction([t,xd,xa,u,p],[pc])
 # Final constraint
 fc_min = np.array([])
 fc_max = np.array([])
-fc = SXMatrix()
+fc = SX()
 #fc.append();       fc_min = append(fc_min, 0.);         fc_max = append(fc_max, 0.)
 fcfcn = SXFunction([t,xd,xa,u,p],[fc])
 

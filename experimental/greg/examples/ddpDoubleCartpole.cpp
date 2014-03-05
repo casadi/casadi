@@ -60,7 +60,7 @@ dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<st
 	// 	     d2*cos(th1),              d4, d5*cos(th1-th2);
 	// 	     d3*cos(th2), d5*cos(th1-th2),              d6;];
 
-	SXMatrix D( zerosSX(3,3) );
+	SX D( zerosSX(3,3) );
 	makeDense(D);
 	D[0,0] =          d1;   D[0,1] =     d2*cos(th1);   D[0,2] =     d3*cos(th2);
 	D[1,0] = d2*cos(th1);   D[1,1] =              d4;   D[1,2] = d5*cos(th1-th2);
@@ -69,21 +69,21 @@ dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<st
 	// C = [0,     -d2*sin(th1)*th1d,    -d3*sin(th2)*th2d;
 	// 	    0,                     0, d5*sin(th1-th2)*th2d;
 	// 	    0, -d5*sin(th1-th2)*th1d,                    0;];
-	SXMatrix C( zerosSX(3,3) );
+	SX C( zerosSX(3,3) );
 	makeDense(C);
 	C[0,0] = 0;   C[0,1] =      -d2*sin(th1)*th1d;   C[0,2] =     -d3*sin(th2)*th2d;
 	C[1,0] = 0;   C[1,1] =                      0;   C[1,2] =  d5*sin(th1-th2)*th2d;
 	C[2,0] = 0;   C[2,1] =  -d5*sin(th1-th2)*th1d;   C[2,2] =                     0;
 
 	// G = [0; -f1*sin(th1); -f2*sin(th2);];
-	SXMatrix G( zerosSX(3,1) );
+	SX G( zerosSX(3,1) );
 	makeDense(G);
 	G.at(0) = 0;
 	G.at(1) = -f1*sin(th1);
 	G.at(2) = -f2*sin(th2);
 
 	// H = [1;0;0;];
-	SXMatrix H( zerosSX(3,1) );
+	SX H( zerosSX(3,1) );
 	makeDense(H);
 	H.at(0) = 1;
 	H.at(1) = 0;
@@ -95,12 +95,12 @@ dxdt(map<string,SX> &xDot, map<string,SX> &outputs, map<string,SX> state, map<st
 	xDot["th2"] = th2d;
 
 	// dy(4:6) = D\( - C*y(4:6) - G + H*u );
-	SXMatrix vel( zerosSX(3,1) );
+	SX vel( zerosSX(3,1) );
 	makeDense(vel);
 	vel.at(0) = th0d;
 	vel.at(1) = th1d;
 	vel.at(2) = th2d;
-	SXMatrix accel = mul( inv(D), - mul( C, vel ) - G + mul( H, SXMatrix(action["u"]) ) );
+	SX accel = mul( inv(D), - mul( C, vel ) - G + mul( H, SX(action["u"]) ) );
 
 	simplify(accel.at(0));
 	simplify(accel.at(1));

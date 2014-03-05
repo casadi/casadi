@@ -49,12 +49,12 @@
 #define PRECEDENCE_DMatrixVector 101
 #define PRECEDENCE_DMatrixVectorVector 101
 
-#define PRECEDENCE_SXMatrix 103
-#define PRECEDENCE_SX 102
-#define PRECEDENCE_SXMatrixVector 103
-#define PRECEDENCE_SXMatrixVectorVector 103
-#define PRECEDENCE_SXVector 102
-#define PRECEDENCE_SXVectorVector 102
+#define PRECEDENCE_SX 103
+#define PRECEDENCE_SXElement 102
+#define PRECEDENCE_SXVector 103
+#define PRECEDENCE_SXVectorVector 103
+#define PRECEDENCE_SXElementVector 102
+#define PRECEDENCE_SXElementVectorVector 102
 #define PRECEDENCE_MX 104
 #define PRECEDENCE_MXVector 105
 #define PRECEDENCE_MXVectorVector 106
@@ -68,30 +68,30 @@
 #define PRECEDENCE_DICTIONARY 21
 
 #ifdef SWIG_MAIN_MODULE
-%template(SXVector) std::vector< CasADi::SX > ;
-%template(SXMatrixVector) std::vector<CasADi::Matrix<CasADi::SX> > ;
-%template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
+%template(SXElementVector) std::vector< CasADi::SXElement > ;
+%template(SXVector) std::vector<CasADi::Matrix<CasADi::SXElement> > ;
+%template(SXVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SXElement> > > ;
 %template(MXVector) std::vector<CasADi::MX>;
 %template(MXVectorVector) std::vector< std::vector<CasADi::MX> >;
 %template(IMatrixVector) std::vector<CasADi::Matrix<int> > ;
 %template(DMatrixVector) std::vector<CasADi::Matrix<double> > ;
 %template(DMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<double> > > ;
 %template(IMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<int> > > ;
-%template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
-%template(SXVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SX> > > ;
+%template(SXElementVectorVector)       std::vector<std::vector<CasADi::SXElement> > ;
+%template(SXElementVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SXElement> > > ;
 #endif //SWIG_MAIN_MODULE
 #ifndef SWIG_MAIN_MODULE
-%template() std::vector<CasADi::Matrix<CasADi::SX> > ;
-%template() std::vector< std::vector<CasADi::Matrix<CasADi::SX> > > ;
+%template() std::vector<CasADi::Matrix<CasADi::SXElement> > ;
+%template() std::vector< std::vector<CasADi::Matrix<CasADi::SXElement> > > ;
 %template() std::vector<CasADi::MX>;
-%template() std::vector<CasADi::SX>;
+%template() std::vector<CasADi::SXElement>;
 %template() std::vector< std::vector<CasADi::MX> >;
 %template() std::vector<CasADi::Matrix<int> > ;
 %template() std::vector<CasADi::Matrix<double> > ;
 %template() std::vector< std::vector<CasADi::Matrix<double> > > ;
 %template() std::vector< std::vector<CasADi::Matrix<int> > > ;
-%template() std::vector<std::vector<CasADi::SX> > ;
-%template() std::vector< std::vector<std::vector<CasADi::SX> > > ;
+%template() std::vector<std::vector<CasADi::SXElement> > ;
+%template() std::vector< std::vector<std::vector<CasADi::SXElement> > > ;
 #endif //SWIG_MAIN_MODULE
 
 #ifdef CASADI_MODULE
@@ -158,15 +158,15 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_DVector,std::vector<double>);
 %my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
 
-%my_generic_const_typemap(PRECEDENCE_SX,CasADi::SX);
-%my_generic_const_typemap(PRECEDENCE_SXVector,std::vector< CasADi::SX >);
-%my_generic_const_typemap(PRECEDENCE_SXVectorVector,std::vector< std::vector< CasADi::SX > >);
+%my_generic_const_typemap(PRECEDENCE_SXElement,CasADi::SXElement);
+%my_generic_const_typemap(PRECEDENCE_SXElementVector,std::vector< CasADi::SXElement >);
+%my_generic_const_typemap(PRECEDENCE_SXElementVectorVector,std::vector< std::vector< CasADi::SXElement > >);
 
-%my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
-%my_genericmatrix_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
+%my_generic_const_typemap(PRECEDENCE_SX,CasADi::Matrix<CasADi::SXElement>);
+%my_genericmatrix_const_typemap(PRECEDENCE_SX,CasADi::Matrix<CasADi::SXElement>);
 
-%my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SX> >);
-%my_generic_const_typemap(PRECEDENCE_SXMatrixVectorVector,std::vector< std::vector< CasADi::Matrix<CasADi::SX> > >);
+%my_generic_const_typemap(PRECEDENCE_SXVector,std::vector< CasADi::Matrix<CasADi::SXElement> >);
+%my_generic_const_typemap(PRECEDENCE_SXVectorVector,std::vector< std::vector< CasADi::Matrix<CasADi::SXElement> > >);
 
 
 %my_generic_const_typemap(PRECEDENCE_MX,CasADi::MX);
@@ -195,21 +195,21 @@ if (!ret) {
 %enddef
 
 // These make OUTPUT behave like expected for non std container types
-%my_value_output_typemaps(CasADi::Matrix< CasADi::SX >);
+%my_value_output_typemaps(CasADi::Matrix< CasADi::SXElement >);
 %my_value_output_typemaps(CasADi::Matrix< double >);
 %my_value_output_typemaps(CasADi::Matrix< int >);
 %my_value_output_typemaps(CasADi::MX);
-%my_value_output_typemaps(CasADi::CRSSparsity);
+%my_value_output_typemaps(CasADi::Sparsity);
 //%my_value_output_typemaps(CasADi::MXFunction);
 
 #ifdef SWIGPYTHON
-%outputRefOwn(CasADi::CRSSparsity)
-%outputRefOwn(std::vector< CasADi::SX >)
+%outputRefOwn(CasADi::Sparsity)
+%outputRefOwn(std::vector< CasADi::SXElement >)
 
 %outputRefOwn(std::vector< int >)
 %outputRefOwn(std::vector< double >)
 
 %outputRefOwn(CasADi::Matrix< double >)
-%outputRefOwn(CasADi::Matrix< CasADi::SX >)
+%outputRefOwn(CasADi::Matrix< CasADi::SXElement >)
 #endif // CASADI_MODULE
 #endif // SWIGPYTHON

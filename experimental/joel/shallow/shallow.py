@@ -78,9 +78,9 @@ m = SXFunction([hk,hmeas],[sumAll((hk-hmeas)**2)])
 m.init()
 
 # Take one step of the integrator
-u = SXMatrix(uk)
-v = SXMatrix(vk)
-h = SXMatrix(hk)
+u = SX(uk)
+v = SX(vk)
+h = SX(hk)
 u[1:-1,:] = u[1:-1,:] + dt*(-g/dx * (h[1:,:]-h[:-1,:]) - u[1:-1,:]*drag)
 v[:,1:-1] = v[:,1:-1] + dt*(-g/dy * (h[:,1:]-h[:,:-1]) - v[:,1:-1]*drag)
 h[:,:] = h[:,:] + (-depth*dt)*(1.0/dx*(u[1:,:]-u[:-1,:]) + 1.0/dy * (v[:,1:]-v[:,:-1]))

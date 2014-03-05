@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SYMBOLIC_SX_HPP
-#define SYMBOLIC_SX_HPP
+#ifndef SYMBOLIC_SXElement_HPP
+#define SYMBOLIC_SXElement_HPP
 
 #include "sx_node.hpp"
 
@@ -58,4 +58,4 @@ protected:
 
 } // namespace CasADi
 
-#endif // SYMBOLIC_SX_HPP
+#endif // SYMBOLIC_SXElement_HPP

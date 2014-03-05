@@ -45,10 +45,10 @@ namespace CasADi{
       const std::string& getName() const;
 
       // Timed variable (never allocate)
-      SX atTime(double t, bool allocate) const;
+      SXElement atTime(double t, bool allocate) const;
 
       // Timed variable (allocate if necessary)
-      SX atTime(double t, bool allocate);
+      SXElement atTime(double t, bool allocate);
 
       // Print
       virtual void repr(std::ostream &stream) const;
@@ -70,19 +70,19 @@ namespace CasADi{
       std::string unit_, displayUnit_;
       
       // variable expression
-      SX var_; 
+      SXElement var_; 
 
       // Derivative expression
-      SX der_;
+      SXElement der_;
           
       // Binding expression
-      SX binding_;
+      SXElement binding_;
           
       // Binding expression for the derivative
-      SX der_binding_;
+      SXElement der_binding_;
           
       // Timed variables
-      std::map<double, SX> timed_sx_;
+      std::map<double,SXElement> timed_sx_;
             
       // Index
       int index_;

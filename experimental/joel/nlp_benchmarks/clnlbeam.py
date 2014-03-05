@@ -64,8 +64,8 @@ v_ub = NP.concatenate([t_ub,x_ub,u_ub])
 v_guess = NP.concatenate([t_guess,x_guess,u_guess])
 
 # Make h, alpha symbolic once
-h = SXMatrix(h)
-alpha = SXMatrix(alpha)
+h = SX(h)
+alpha = SX(alpha)
 
 # Objective function
 f = 0

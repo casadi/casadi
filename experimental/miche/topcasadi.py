@@ -76,7 +76,7 @@ class mbb2d:
 		freedofs = list(set(alldofs) - set(fixeddofs))
 
 		# (reduced) external force vector 
-		F = SXMatrix.sparse(nfreedofs,1)
+		F = SX.sparse(nfreedofs,1)
 		
 		F[0,0] = -1;
 
@@ -116,13 +116,13 @@ class mbb2d:
 		nH = k
 
     
-		self.sH = SXMatrix(sH)
-		self.Hs = SXMatrix(Hs)
-		H = SXMatrix()
+		self.sH = SX(sH)
+		self.Hs = SX(Hs)
+		H = SX()
 		
 	def dfilter(self,x):
 		""" Density Filter """
-		xf = SXMatrix(nelem+nfreedofs,1,0)
+		xf = SX(nelem+nfreedofs,1,0)
 		for ielem in range(self.nelem):
 			for t in range(self.pH[ielem],self.pH[ielem+1]):
 				kelem = self.jH[t]

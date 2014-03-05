@@ -23,8 +23,8 @@ from casadi import *
 from casadi.tools import *
 
 #! An SX graph
-a = SX("a")
-b = SX("b")
+a = SXElement.sym("a")
+b = SXElement.sym("b")
 
 c = sin(a**5 + b)
 
@@ -33,7 +33,7 @@ print c
 
 dotdraw(c)
 
-#! An SX Matrix
+#! An SX
 
 dotdraw(ssym("x",sp_tril(3)))
 

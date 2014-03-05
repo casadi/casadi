@@ -30,7 +30,7 @@ namespace CasADi{
 
 using namespace std;
 
-CustomFunctionInternal::CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme) : evaluate_(c_fcn){
+CustomFunctionInternal::CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<CasADi::Sparsity> &inputscheme, const std::vector<CasADi::Sparsity> &outputscheme) : evaluate_(c_fcn){
   setNumInputs(inputscheme.size());
   setNumOutputs(outputscheme.size());
   

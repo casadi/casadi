@@ -117,13 +117,12 @@ bool meta< CasADi::GenericType >::couldbe(const octave_value& p) {
 }
 
 /// CasADi::Matrix<double>
-template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix";
+template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csc_matrix, DMatrix";
 
 template <>
 int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<double> &m) {
   NATIVERETURN(CasADi::Matrix<double>,m)
   if((p.is_real_matrix() && p.is_numeric_type() && p.is_sparse_type())){
-    // Note: octave uses column-major storage
     SparseMatrix mat = p.sparse_matrix_value();
     
     int size = mat.nnz();
@@ -136,10 +135,8 @@ int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<doub
     for (int k=0;k<cidx.size();k++) cidx[k]=mat.cidx(k);
     for (int k=0;k<ridx.size();k++) ridx[k]=mat.ridx(k);
     
-    CasADi::CRSSparsity A = CasADi::CRSSparsity(mat.cols(),mat.rows(),ridx,cidx);
-    CasADi::Matrix<double> ret = CasADi::Matrix<double>(A,data);
-    
-    m = ret.trans();
+    CasADi::Sparsity A = CasADi::Sparsity(mat.rows(),mat.cols(),cidx,ridx);
+    m = CasADi::Matrix<double>(A,data);
     
     return true;
   }
@@ -165,22 +162,22 @@ template <>
 bool meta< CasADi::Matrix<double> >::couldbe(const octave_value& p) { return meta< CasADi::Matrix<double> >::isa(p) || (p.is_real_matrix() && p.is_numeric_type()) || (p.is_real_scalar() && p.is_numeric_type());}
 
 
-// Explicit intialization of these two member functions, so we can use them in meta< CasADi::SX >
-template<> int meta< CasADi::Matrix<CasADi::SX> >::as(GUESTOBJECT,CasADi::Matrix<CasADi::SX> &);
-template<> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(GUESTOBJECT);
+// Explicit intialization of these two member functions, so we can use them in meta< CasADi::SXElement >
+template<> int meta< CasADi::Matrix<CasADi::SXElement> >::as(GUESTOBJECT,CasADi::Matrix<CasADi::SXElement> &);
+template<> bool meta< CasADi::Matrix<CasADi::SXElement> >::couldbe(GUESTOBJECT);
 
 /// CasADi::SX
-template<> char meta< CasADi::SX >::expected_message[] = "Expecting SX or number";
+template<> char meta< CasADi::SXElement >::expected_message[] = "Expecting SXElement or number";
 
 template <>
-int meta< CasADi::SX >::as(const octave_value& p,CasADi::SX &s) {
-  NATIVERETURN(CasADi::SX, s)
+int meta< CasADi::SXElement >::as(const octave_value& p,CasADi::SXElement &s) {
+  NATIVERETURN(CasADi::SXElement, s)
   if ((p.is_real_scalar() && p.is_numeric_type())) {
-    s=CasADi::SX(p.double_value());
+    s=CasADi::SXElement(p.double_value());
     return true;
-  } else if (meta< CasADi::Matrix< CasADi::SX > >::isa(p)) {
-    CasADi::Matrix< CasADi::SX > m;
-    meta< CasADi::Matrix< CasADi::SX > >::as(p,m);
+  } else if (meta< CasADi::Matrix< CasADi::SXElement > >::isa(p)) {
+    CasADi::Matrix< CasADi::SXElement > m;
+    meta< CasADi::Matrix< CasADi::SXElement > >::as(p,m);
     if (m.numel()==1 && m.size()==1) {
       s = m.at(0);
       return true;
@@ -190,28 +187,28 @@ int meta< CasADi::SX >::as(const octave_value& p,CasADi::SX &s) {
 }
 
 template <>
-bool meta< CasADi::SX >::couldbe(const octave_value& p) {
-  if (meta< CasADi::Matrix< CasADi::SX > >::isa(p)) {
-    CasADi::Matrix< CasADi::SX > m;
-    meta<CasADi::Matrix< CasADi::SX > >::as(p,m);
+bool meta< CasADi::SXElement >::couldbe(const octave_value& p) {
+  if (meta< CasADi::Matrix< CasADi::SXElement > >::isa(p)) {
+    CasADi::Matrix< CasADi::SXElement > m;
+    meta<CasADi::Matrix< CasADi::SXElement > >::as(p,m);
     if (m.numel()==1 && m.size()==1)
       return true;
   }
-  return (meta< CasADi::SX >::isa(p) || (p.is_real_scalar() && p.is_numeric_type()) );
+  return (meta< CasADi::SXElement >::isa(p) || (p.is_real_scalar() && p.is_numeric_type()) );
 }
 
 
-/// CasADi::Matrix<CasADi::SX>
-template<> char meta< CasADi::Matrix<CasADi::SX> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)";
+/// CasADi::Matrix<CasADi::SXElement>
+template<> char meta< CasADi::Matrix<CasADi::SXElement> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SX, SX, number, sequence(SX/number)";
 
 template <>
-int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<CasADi::SX> &m) {
-  NATIVERETURN(CasADi::Matrix<CasADi::SX>, m)
+int meta< CasADi::Matrix<CasADi::SXElement> >::as(const octave_value& p,CasADi::Matrix<CasADi::SXElement> &m) {
+  NATIVERETURN(CasADi::Matrix<CasADi::SXElement>, m)
   NATIVERETURN(CasADi::Matrix<double>, m)
-  NATIVERETURN(CasADi::SX, m)
+  NATIVERETURN(CasADi::SXElement, m)
   if((p.is_real_matrix() && p.is_numeric_type())){
     Matrix mat = p.matrix_value();
-    m = CasADi::SXMatrix(mat.rows(),mat.cols(),0);
+    m = CasADi::SX(mat.rows(),mat.cols(),0);
     for(int i=0; i<mat.rows(); ++i){
       for(int j=0; j<mat.cols(); ++j){
         m(i,j) = mat(i,j);
@@ -220,19 +217,19 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(const octave_value& p,CasADi::Matrix<
     return true;
   } 
   if ((p.is_real_scalar() && p.is_numeric_type())) {
-    m = CasADi::SX(p.double_value());
+    m = CasADi::SXElement(p.double_value());
     return true;
   }
   return false;
 }
 
-template <> bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(const octave_value& p) { return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)  || (p.is_real_matrix() && p.is_numeric_type()) || (p.is_real_scalar() && p.is_numeric_type());}
+template <> bool meta< CasADi::Matrix<CasADi::SXElement> >::couldbe(const octave_value& p) { return meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) || meta< CasADi::SXElement >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)  || (p.is_real_matrix() && p.is_numeric_type()) || (p.is_real_scalar() && p.is_numeric_type());}
 
 
-meta_vector(CasADi::Matrix<CasADi::SX>);
-meta_vector(std::vector< CasADi::Matrix<CasADi::SX> >);
-meta_vector(std::vector<CasADi::SX>);
-meta_vector(CasADi::SX);
+meta_vector(CasADi::Matrix<CasADi::SXElement>);
+meta_vector(std::vector< CasADi::Matrix<CasADi::SXElement> >);
+meta_vector(std::vector<CasADi::SXElement>);
+meta_vector(CasADi::SXElement);
 
 
 /// CasADi::MX

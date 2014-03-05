@@ -36,7 +36,7 @@ z = jacobian(sqrt(x**2+y**2),vertcat([x,y]))
 
 dotsave(z,filename='SX2.pdf')
 
-z = SXMatrix(4,5)
+z = SX(4,5)
 z[:,1] = x
 z[1,:] = x**2+y**2
 z[3,3] = 66.6

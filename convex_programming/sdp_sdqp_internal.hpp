@@ -31,27 +31,30 @@ namespace CasADi{
 
   /** \brief Internal class for SDPSDQPInternal
    * 
-      @copydoc SDQPSolver_doc
+   @copydoc SDQPSolver_doc
    * */
-class SDPSDQPInternal : public SDQPSolverInternal {
-  friend class SDPSDQPSolver;
-public:
+  class SDPSDQPInternal : public SDQPSolverInternal {
+    friend class SDPSDQPSolver;
+  public:
 
-  /** \brief  Clone */
-  virtual SDPSDQPInternal* clone() const;
-  
-  /** \brief  Create a new Solver */
-  explicit SDPSDQPInternal(const std::vector<CRSSparsity> &st);
+    /** \brief Constructor */
+    explicit SDPSDQPInternal(const std::vector<Sparsity> &st);
 
-  /** \brief  Destructor */
-  virtual ~SDPSDQPInternal();
+    /** \brief Clone */
+    virtual SDPSDQPInternal* clone() const{ return new SDPSDQPInternal(*this);}
+  
+    /// Deep copy data members
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief Destructor */
+    virtual ~SDPSDQPInternal();
+
+    /** \brief Initialize */
+    virtual void init();
   
-  virtual void evaluate();
+    /** \brief Solve the SDQP */
+    virtual void evaluate();
   
-  protected:
     /// Underlying SDP solver
     SDPSolver sdpsolver_;
     
@@ -60,7 +63,7 @@ public:
     
     /// Mapping
     FX mapping_;
-};
+  };
 
 } // namespace CasADi
 

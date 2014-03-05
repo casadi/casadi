@@ -40,7 +40,7 @@ enum SDQPInput{
   SDQP_SOLVER_H,
   /// The vector c: ( n x 1) [c]
   SDQP_SOLVER_C,
-  /// The vertical stack of all matrices F_i: ( nm x m) [f]
+  /// The horizontal stack of all matrices F_i: ( m x nm) [f]
   SDQP_SOLVER_F,
   /// The matrix G: ( m x m) [g]
   SDQP_SOLVER_G,
@@ -78,7 +78,7 @@ enum SDQPOutput{
 enum SDQPStruct{
   /// The matrix H: sparse ( n x n) [h]
   SDQP_STRUCT_H,
-  /// The vertical stack of all matrices F_i: ( nm x m) [f]
+  /// The horizontal stack of all matrices F_i: ( m x nm) [f]
   SDQP_STRUCT_F,
   /// The matrix G: ( m x m) [g]
   SDQP_STRUCT_G,

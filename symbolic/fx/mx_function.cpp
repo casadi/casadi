@@ -132,7 +132,7 @@ MX MXFunction::tang(int iind, int oind){
   return (*this)->tang(iind,oind);
 }
 
-SXFunction MXFunction::expand(const std::vector<SXMatrix>& inputv){
+SXFunction MXFunction::expand(const std::vector<SX>& inputv){
   return (*this)->expand(inputv);
 }
 

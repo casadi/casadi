@@ -322,19 +322,13 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
     // Objective function term
     MX H_dev = H-H_meas_[k];
     if(gauss_newton){
-      nlp_f.append(H_dev);
+      nlp_f.append(vec(H_dev));
     } else {
       nlp_f += inner_prod(H_dev,H_dev)/2;
     }
 
     // Add to the constraints
-    nlp_g.append(H);
-  }
-
-  // Reshape to vectors (should not be needed)
-  nlp_g = flatten(nlp_g);
-  if(gauss_newton){
-    nlp_f = flatten(nlp_f);
+    nlp_g.append(vec(H));
   }
 
   MXFunction nlp(nlpIn("x",P),nlpOut("f",nlp_f,"g",nlp_g));

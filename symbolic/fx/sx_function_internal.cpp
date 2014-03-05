@@ -32,7 +32,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../sx/sx_node.hpp"
 #include "../casadi_types.hpp"
-#include "../matrix/crs_sparsity_internal.hpp"
+#include "../matrix/sparsity_internal.hpp"
 #include "../profiling.hpp"
 #include "../casadi_options.hpp"
 
@@ -41,16 +41,16 @@ namespace CasADi{
   using namespace std;
 
 
-  SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const vector<SXMatrix >& outputv) : 
-    XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>(inputv,outputv) {
+  SXFunctionInternal::SXFunctionInternal(const vector<SX >& inputv, const vector<SX >& outputv) : 
+    XFunctionInternal<SXFunction,SXFunctionInternal,SX,SXNode>(inputv,outputv) {
     setOption("name","unnamed_sx_function");
     addOption("just_in_time_sparsity", OT_BOOLEAN,false,"Propagate sparsity patterns using just-in-time compilation to a CPU or GPU using OpenCL");
     addOption("just_in_time_opencl", OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation using OpenCL (experimental)");
 
     // Check for duplicate entries among the input expressions
     bool has_duplicates = false;
-    for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
-      for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
+    for(vector<SX >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+      for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc){
         bool is_duplicate = itc->getTemp()!=0;
         if(is_duplicate){
           cerr << "Duplicate expression: " << *itc << endl;
@@ -61,8 +61,8 @@ namespace CasADi{
     }
   
     // Reset temporaries
-    for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
-      for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
+    for(vector<SX >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+      for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc){
         itc->setTemp(0);
       }
     }
@@ -147,9 +147,9 @@ namespace CasADi{
   }
 
   
-  SXMatrix SXFunctionInternal::hess(int iind, int oind){
+  SX SXFunctionInternal::hess(int iind, int oind){
     casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
-    SXMatrix g = grad(iind,oind);
+    SX g = grad(iind,oind);
     makeDense(g);
     if(verbose())  cout << "SXFunctionInternal::hess: calculating gradient done " << endl;
 
@@ -162,7 +162,7 @@ namespace CasADi{
     if(verbose()){
       cout << "SXFunctionInternal::hess: calculating Jacobian " << endl;
     }
-    SXMatrix ret = gfcn.jac(0,0,false,true);
+    SX ret = gfcn.jac(0,0,false,true);
     if(verbose()){
       cout << "SXFunctionInternal::hess: calculating Jacobian done" << endl;
     }
@@ -193,7 +193,7 @@ namespace CasADi{
     }
  
     // Iterator to free variables
-    vector<SX>::const_iterator p_it = free_vars_.begin();
+    vector<SXElement>::const_iterator p_it = free_vars_.begin();
   
     // Normal, interpreted output
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
@@ -288,7 +288,7 @@ namespace CasADi{
   void SXFunctionInternal::init(){
   
     // Call the init function of the base class
-    XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>::init();
+    XFunctionInternal<SXFunction,SXFunctionInternal,SX,SXNode>::init();
   
     // Stack used to sort the computational graph
     stack<SXNode*> s;
@@ -298,9 +298,9 @@ namespace CasADi{
 
     // Add the list of nodes
     int ind=0;
-    for(vector<SXMatrix >::iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
+    for(vector<SX >::iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
       int nz=0;
-      for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc, ++nz){
+      for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc, ++nz){
         // Add outputs to the list
         s.push(itc->get());
         sort_depth_first(s,nodes);
@@ -311,8 +311,8 @@ namespace CasADi{
     }
   
     // Make sure that all inputs have been added also // TODO REMOVE THIS
-    for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
-      for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
+    for(vector<SX >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+      for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc){
         if(!itc->getTemp()){
           nodes.push_back(itc->get());
         }
@@ -333,9 +333,9 @@ namespace CasADi{
       SXNode* t = *it;
       if(t){
         if(t->isConstant())
-          constants_.push_back(SX::create(t));
+          constants_.push_back(SXElement::create(t));
         else if(!t->isSymbolic())
-          operations_.push_back(SX::create(t));
+          operations_.push_back(SXElement::create(t));
       }
     }
   
@@ -489,7 +489,7 @@ namespace CasADi{
     // Add input instructions
     for(int ind=0; ind<inputv_.size(); ++ind){
       int nz=0;
-      for(vector<SX>::iterator itc = inputv_[ind].begin(); itc != inputv_[ind].end(); ++itc, ++nz){
+      for(vector<SXElement>::iterator itc = inputv_[ind].begin(); itc != inputv_[ind].end(); ++itc, ++nz){
         int i = itc->getTemp()-1;
         if(i>=0){
           // Mark as input
@@ -510,7 +510,7 @@ namespace CasADi{
     for(vector<pair<int,SXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it){
       if(it->second->temp!=0){
         // Save to list of free parameters
-        free_vars_.push_back(SX::create(it->second));
+        free_vars_.push_back(SXElement::create(it->second));
       
         // Remove marker
         it->second->temp=0;
@@ -545,9 +545,9 @@ namespace CasADi{
     }
   }
 
-  void SXFunctionInternal::evalSXsparse(const vector<SXMatrix>& arg1, vector<SXMatrix>& res1, 
-                                  const vector<vector<SXMatrix> >& fseed, vector<vector<SXMatrix> >& fsens, 
-                                  const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens){
+  void SXFunctionInternal::evalSXsparse(const vector<SX>& arg1, vector<SX>& res1, 
+                                  const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens, 
+                                  const vector<vector<SX> >& aseed, vector<vector<SX> >& asens){
     if(verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
 
     // Check if arguments matches the input expressions, in which case the output is known to be the output expressions
@@ -569,8 +569,8 @@ namespace CasADi{
     }
     
     // Use the function arguments if possible to avoid problems involving equivalent but different expressions
-    const vector<SXMatrix>& arg = output_given ? inputv_ : arg1;
-    vector<SXMatrix>& res = output_given ? outputv_ : res1;
+    const vector<SX>& arg = output_given ? inputv_ : arg1;
+    vector<SX>& res = output_given ? outputv_ : res1;
 
     // Number of forward seeds
     int nfdir = fsens.size();
@@ -582,17 +582,17 @@ namespace CasADi{
     bool taping = nfdir>0 || nadir>0;
   
     // Iterator to the binary operations
-    vector<SX>::const_iterator b_it=operations_.begin();
+    vector<SXElement>::const_iterator b_it=operations_.begin();
   
     // Iterator to stack of constants
-    vector<SX>::const_iterator c_it = constants_.begin();
+    vector<SXElement>::const_iterator c_it = constants_.begin();
 
     // Iterator to free variables
-    vector<SX>::const_iterator p_it = free_vars_.begin();
+    vector<SXElement>::const_iterator p_it = free_vars_.begin();
   
     // Tape
-    vector<TapeEl<SX> > s_pdwork;
-    vector<TapeEl<SX> >::iterator it1;
+    vector<TapeEl<SXElement> > s_pdwork;
+    vector<TapeEl<SXElement> >::iterator it1;
     if(taping){
       s_pdwork.resize(operations_.size());
       it1 = s_pdwork.begin();
@@ -615,7 +615,7 @@ namespace CasADi{
       default:
         {
           // Evaluate the function to a temporary value (as it might overwrite the children in the work vector)
-          SX f;
+          SXElement f;
           if(output_given){
             f = *b_it++;
           } else {
@@ -647,7 +647,7 @@ namespace CasADi{
     // Calculate forward sensitivities
     if(verbose()) cout << "SXFunctionInternal::evalSXsparse calculating forward derivatives" << endl;
     for(int dir=0; dir<nfdir; ++dir){
-      vector<TapeEl<SX> >::const_iterator it2 = s_pdwork.begin();
+      vector<TapeEl<SXElement> >::const_iterator it2 = s_pdwork.begin();
       for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
         switch(it->op){
         case OP_INPUT:
@@ -670,9 +670,9 @@ namespace CasADi{
     if(verbose()) cout << "SXFunctionInternal::evalSXsparse calculating adjoint derivatives" << endl;
     if(nadir>0) fill(s_work_.begin(),s_work_.end(),0);
     for(int dir=0; dir<nadir; ++dir){
-      vector<TapeEl<SX> >::const_reverse_iterator it2 = s_pdwork.rbegin();
+      vector<TapeEl<SXElement> >::const_reverse_iterator it2 = s_pdwork.rbegin();
       for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
-        SX seed;
+        SXElement seed;
         switch(it->op){
         case OP_INPUT:
           asens[dir][it->i1].data()[it->i2] = s_work_[it->i0];
@@ -788,22 +788,22 @@ namespace CasADi{
 
   FX SXFunctionInternal::getFullJacobian(){
     // Get all the inputs
-    SXMatrix arg(0,1); 
-    for(vector<SXMatrix>::const_iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
-      arg.append(flatten(*i));
+    SX arg = SX::sparse(1,0); 
+    for(vector<SX>::const_iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
+      arg.appendColumns(trans(vec(*i)));
     }
  
     // Get all the outputs
-    SXMatrix res(0,1); 
-    for(vector<SXMatrix>::const_iterator i=outputv_.begin(); i!=outputv_.end(); ++i){
-      res.append(flatten(*i));
+    SX res = SX::sparse(1,0); 
+    for(vector<SX>::const_iterator i=outputv_.begin(); i!=outputv_.end(); ++i){
+      res.appendColumns(trans(vec(*i)));
     }
     
     // Generate an expression for the Jacobian
-    SXMatrix J = CasADi::jacobian(res,arg);
+    SX J = CasADi::jacobian(res,arg);
    
     // Generate a function for the full Jacobian
-    vector<SXMatrix> ret_res(1,J);
+    vector<SX> ret_res(1,J);
     ret_res.insert(ret_res.end(),outputv_.begin(),outputv_.end());
     SXFunction ret(inputv_,ret_res);
     return ret;
@@ -1255,7 +1255,7 @@ namespace CasADi{
       case CL_INVALID_KERNEL_ARGS: msg = "The kernel argument values have not been specified."; break;
       case CL_INVALID_WORK_GROUP_SIZE: msg = "A work-group size is specified for kernel using the __attribute__((reqd_work_group_size(X, Y, Z))) qualifier in program source and is not (1, 1, 1)."; break;
       case CL_MISALIGNED_SUB_BUFFER_OFFSET: msg = "A sub-buffer object is specified as the value for an argument that is a buffer object and the offset specified when the sub-buffer object is created is not aligned to CL_DEVICE_MEM_BASE_ADDR_ALIGN value for device associated with queue."; break;
-      case CL_INVALID_IMAGE_SIZE: msg = "n image object is specified as an argument value and the image dimensions (image width, height, specified or compute row and/or slice pitch) are not supported by device associated with queue"; break;
+      case CL_INVALID_IMAGE_SIZE: msg = "n image object is specified as an argument value and the image dimensions (image width, height, specified or compute col and/or slice pitch) are not supported by device associated with queue"; break;
       case CL_OUT_OF_RESOURCES: msg = "(1) There is a failure to queue the execution instance of kernel on the command-queue because of insufficient resources needed to execute the kernel. (2) There is a failure to allocate resources required by the OpenCL implementation on the device."; break;
       case CL_MEM_OBJECT_ALLOCATION_FAILURE: msg = "There is a failure to allocate memory for data store associated with image or buffer objects specified as arguments to kernel."; break;
       case CL_INVALID_EVENT_WAIT_LIST: msg = "Event_wait_list is NULL and num_events_in_wait_list > 0, or event_wait_list is not NULL and num_events_in_wait_list is 0, or if event objects in event_wait_list are not valid events. "; break;

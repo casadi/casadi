@@ -33,11 +33,11 @@ OUTPUTSCHEME(LinsolOutput)
 using namespace std;
 namespace CasADi{
 
-  LinearSolverInternal::LinearSolverInternal(const CRSSparsity& sparsity, int nrhs){
+  LinearSolverInternal::LinearSolverInternal(const Sparsity& sparsity, int nrhs){
     // Make sure arguments are consistent
     casadi_assert(!sparsity.isNull());
-    casadi_assert_message(sparsity.size1()==sparsity.size2(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity.dimString());  
-    casadi_assert_message(!isSingular(sparsity),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity) << " (in stead of "<< sparsity.size1() << ")");
+    casadi_assert_message(sparsity.size2()==sparsity.size1(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity.dimString());  
+    casadi_assert_message(!isSingular(sparsity),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity) << " (in stead of "<< sparsity.size2() << ")");
 
     // Calculate the Dulmage-Mendelsohn decomposition
     std::vector<int> coarse_rowblock, coarse_colblock;
@@ -46,7 +46,7 @@ namespace CasADi{
     // Allocate inputs
     setNumInputs(LINSOL_NUM_IN);
     input(LINSOL_A) = DMatrix(sparsity);
-    input(LINSOL_B) = DMatrix(nrhs,sparsity.size1(),0);
+    input(LINSOL_B) = DMatrix::zeros(sparsity.size2(),nrhs);
   
     // Allocate outputs
     setNumOutputs(LINSOL_NUM_OUT);
@@ -102,7 +102,7 @@ namespace CasADi{
     // Get input and output vector
     const vector<double>& b = input(LINSOL_B).data();
     vector<double>& x = output(LINSOL_X).data();
-    int nrhs = input(LINSOL_B).size1();
+    int nrhs = input(LINSOL_B).size2();
 
     // Copy input to output
     copy(b.begin(),b.end(),x.begin());
@@ -130,7 +130,7 @@ namespace CasADi{
     // Forward sensitivities, collect the right hand sides
     std::vector<int> rhs_ind;
     std::vector<MX> rhs;
-    std::vector<int> row_offset(1,0);
+    std::vector<int> col_offset(1,0);
     for(int d=0; d<nfwd; ++d){
       const MX& B_hat = *fwdSeed[d][0];
       const MX& A_hat = *fwdSeed[d][1];
@@ -138,9 +138,9 @@ namespace CasADi{
       // Get right hand side
       MX rhs_d;
       if(tr){
-        rhs_d = B_hat - mul(X,trans(A_hat));
+        rhs_d = B_hat - mul(trans(A_hat),X);
       } else {
-        rhs_d = B_hat - mul(X,A_hat);
+        rhs_d = B_hat - mul(A_hat,X);
       }
       
       // Simplifiy if zero
@@ -149,13 +149,13 @@ namespace CasADi{
       } else {
         rhs.push_back(rhs_d);
         rhs_ind.push_back(d);
-        row_offset.push_back(row_offset.back()+rhs_d.size1());
+        col_offset.push_back(col_offset.back()+rhs_d.size2());
       }
     }
     
     if(!rhs.empty()){
       // Solve for all directions at once
-      rhs = vertsplit(solve(A,vertcat(rhs),tr),row_offset);
+      rhs = horzsplit(solve(A,horzcat(rhs),tr),col_offset);
     
       // Save result
       for(int i=0; i<rhs.size(); ++i){
@@ -166,7 +166,7 @@ namespace CasADi{
     // Adjoint sensitivities, collect right hand sides
     rhs.resize(0);
     rhs_ind.resize(0);
-    row_offset.resize(1);
+    col_offset.resize(1);
     for(int d=0; d<nadj; ++d){
       MX& X_bar = *adjSeed[d][0];
       
@@ -179,7 +179,7 @@ namespace CasADi{
       } else {
         rhs.push_back(X_bar);
         rhs_ind.push_back(d);
-        row_offset.push_back(row_offset.back()+X_bar.size1());
+        col_offset.push_back(col_offset.back()+X_bar.size2());
 
         // Delete seed
         X_bar = MX();
@@ -188,16 +188,16 @@ namespace CasADi{
 
     if(!rhs.empty()){
       // Solve for all directions at once
-      rhs = vertsplit(solve(A,vertcat(rhs),!tr),row_offset);
+      rhs = horzsplit(solve(A,horzcat(rhs),!tr),col_offset);
     
       for(int i=0; i<rhs.size(); ++i){
         int d = rhs_ind[i];
 
         // Propagate to A
         if(!tr){
-          *adjSens[d][1] -= mul(trans(X),rhs[i],A.sparsity());
+          *adjSens[d][1] -= mul(rhs[i],trans(X),A.sparsity());
         } else {
-          *adjSens[d][1] -= mul(trans(rhs[i]),X,A.sparsity());
+          *adjSens[d][1] -= mul(X,trans(rhs[i]),A.sparsity());
         }
 
         // Propagate to B
@@ -213,12 +213,12 @@ namespace CasADi{
   void LinearSolverInternal::propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd, bool transpose){
 
     // Sparsities
-    const CRSSparsity& r_sp = input[0]->sparsity();
-    const CRSSparsity& A_sp = input[1]->sparsity();
-    const std::vector<int>& A_rowind = A_sp.rowind();
-    const std::vector<int>& A_col = A_sp.col();
-    int nrhs = r_sp.size1();
-    int n = r_sp.size2();
+    const Sparsity& r_sp = input[0]->sparsity();
+    const Sparsity& A_sp = input[1]->sparsity();
+    const std::vector<int>& A_colind = A_sp.colind();
+    const std::vector<int>& A_row = A_sp.row();
+    int nrhs = r_sp.size2();
+    int n = r_sp.size1();
     int nnz = A_sp.size();
 
     // Get pointers to data
@@ -236,10 +236,10 @@ namespace CasADi{
         copy(B_ptr,B_ptr+n,tmp_ptr);
 
         // Add A_hat contribution to tmp
-        for(int i=0; i<n; ++i){
-          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
-            int j = A_col[k];
-            tmp_ptr[transpose ? i : j] |= A_ptr[k];
+        for(int cc=0; cc<n; ++cc){
+          for(int k=A_colind[cc]; k<A_colind[cc+1]; ++k){
+            int rr = A_row[k];
+            tmp_ptr[transpose ? cc : rr] |= A_ptr[k];
           }
         }
 
@@ -262,10 +262,10 @@ namespace CasADi{
         }
 
         // Propagate to A_ptr
-        for(int i=0; i<n; ++i){
-          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
-            int j = A_col[k];
-            A_ptr[k] |= tmp_ptr[transpose ? i : j];
+        for(int cc=0; cc<n; ++cc){
+          for(int k=A_colind[cc]; k<A_colind[cc+1]; ++k){
+            int rr = A_row[k];
+            A_ptr[k] |= tmp_ptr[transpose ? cc : rr];
           }
         }
       }
@@ -276,63 +276,72 @@ namespace CasADi{
     }
   }
 
-  void LinearSolverInternal::spSolve(DMatrix& X, DMatrix& B, bool transpose) const{
+  void LinearSolverInternal::spSolve(DMatrix& X, const DMatrix& B, bool transpose) const{
     bvec_t* X_bvec = reinterpret_cast<bvec_t*>(X.ptr());
-    bvec_t* B_bvec = reinterpret_cast<bvec_t*>(B.ptr());
+    const bvec_t* B_bvec = reinterpret_cast<const bvec_t*>(B.ptr());
     spSolve(X_bvec,B_bvec,transpose);
   }
 
-  void LinearSolverInternal::spSolve(bvec_t* X, bvec_t* B, bool transpose) const{
-    const CRSSparsity& A_sp = input(LINSOL_A).sparsity();
-    const std::vector<int>& A_rowind = A_sp.rowind();
-    const std::vector<int>& A_col = A_sp.col();
+  void LinearSolverInternal::spSolve(bvec_t* X, const bvec_t* B, bool transpose) const{
 
-    if(transpose){
-      int nb = colblock_.size()-1; // number of blocks
-      for(int b=0; b<nb; ++b){ // loop over the blocks
+    const Sparsity& A_sp = input(LINSOL_A).sparsity();
+    const std::vector<int>& A_colind = A_sp.colind();
+    const std::vector<int>& A_row = A_sp.row();
+    int nb = rowblock_.size()-1; // number of blocks
+
+    if(!transpose){
+      for(int b=0; b<nb; ++b){ // loop over the blocks forward
+
+        // Get dependencies from all right-hand-sides in the block ...
+        bvec_t block_dep = 0;
+        for(int el=rowblock_[b]; el<rowblock_[b+1]; ++el){
+          int rr = rowperm_[el];
+          block_dep |= B[rr];
+        }
+
+        // ... as well as all other variables in the block
+        for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
+          int cc = colperm_[el];
+          block_dep |= X[cc];
+        }
+        
+        // Propagate ...
+        for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
+          int cc = colperm_[el];
+          
+          // ... to all variables in the block ...
+          X[cc] |= block_dep;
+
+          // ... as well as to other variables which depends on variables in the block
+          for(int k=A_colind[cc]; k<A_colind[cc+1]; ++k){
+            int rr=A_row[k];
+            X[rr] |= block_dep;
+          }
+        }
+      }
+
+    } else { // transpose
+      for(int b=nb-1; b>=0; --b){ // loop over the blocks backward
 
         // Get dependencies ...
         bvec_t block_dep = 0;
-        for(int el=rowblock_[b]; el<rowblock_[b+1]; ++el){
-          // ... from all right-hand-sides in the block ...
-          int i = rowperm_[el];
-          block_dep |= B[i];
+        for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
+          int cc = colperm_[el];
 
-          // ... as well as from all dependent variables
-          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
-            int j=A_col[k];
-            block_dep |= X[j];
+          // .. from all right-hand-sides in the block ...
+          block_dep |= B[cc];
+
+          // ... as well as from all depending variables ...
+          for(int k=A_colind[cc]; k<A_colind[cc+1]; ++k){
+            int rr=A_row[k];
+            block_dep |= X[rr];
           }
         }
 
         // Propagate to all variables in the block
-        for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
-          int j = colperm_[el];
-          X[j] = block_dep;
-        }
-      }
-    } else {
-      int nb = colblock_.size()-1; // number of blocks
-      for(int b=nb-1; b>=0; --b){ // loop over the blocks
-            
-        // Get dependencies from all right-hand-sides
-        bvec_t block_dep = 0;
-        for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
-          int j = colperm_[el];
-          block_dep |= B[j];
-        }
-
-        // Propagate ...
         for(int el=rowblock_[b]; el<rowblock_[b+1]; ++el){
-          // ... to all variables in the block
-          int i = rowperm_[el];
-          X[i] = block_dep;
-
-          // ... as well as to all other right-hand-sides
-          for(int k=A_rowind[i]; k<A_rowind[i+1]; ++k){
-            int j=A_col[k];
-            B[j] |= block_dep;
-          }
+          int rr = rowperm_[el];
+          X[rr] |= block_dep;
         }
       }
     }
@@ -348,7 +357,7 @@ namespace CasADi{
     if(input[0]!=output[0]){
       copy(input[0]->begin(),input[0]->end(),output[0]->begin());
     }
-    solve(getPtr(output[0]->data()),output[0]->size1(),tr);
+    solve(getPtr(output[0]->data()),output[0]->size2(),tr);
   }
 
   MX LinearSolverInternal::solve(const MX& A, const MX& B, bool transpose){

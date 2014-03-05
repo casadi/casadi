@@ -36,7 +36,7 @@ namespace CasADi{
   public:
 
     /// Constructor
-    GetNonzeros(const CRSSparsity& sp, const MX& x);
+    GetNonzeros(const Sparsity& sp, const MX& x);
       
     /// Destructor
     virtual ~GetNonzeros(){}
@@ -54,13 +54,13 @@ namespace CasADi{
     virtual int getOp() const{ return OP_GETNONZEROS;}
 
     /// Get the nonzeros of matrix
-    virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
+    virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
   };
 
   class GetNonzerosVector : public GetNonzeros{
   public:
     /// Constructor
-    GetNonzerosVector(const CRSSparsity& sp, const MX& x, const std::vector<int>& nz) : GetNonzeros(sp,x), nz_(nz){}
+    GetNonzerosVector(const Sparsity& sp, const MX& x, const std::vector<int>& nz) : GetNonzeros(sp,x), nz_(nz){}
     
     /// Clone function
     virtual GetNonzerosVector* clone() const{ return new GetNonzerosVector(*this);}
@@ -82,7 +82,7 @@ namespace CasADi{
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -102,7 +102,7 @@ namespace CasADi{
   public:
 
     /// Constructor
-    GetNonzerosSlice(const CRSSparsity& sp, const MX& x, const Slice& s) : GetNonzeros(sp,x), s_(s){}
+    GetNonzerosSlice(const Sparsity& sp, const MX& x, const Slice& s) : GetNonzeros(sp,x), s_(s){}
 
     /// Clone function
     virtual GetNonzerosSlice* clone() const{ return new GetNonzerosSlice(*this);}
@@ -130,7 +130,7 @@ namespace CasADi{
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -150,7 +150,7 @@ namespace CasADi{
   public:
 
     /// Constructor
-    GetNonzerosSlice2(const CRSSparsity& sp, const MX& x, const Slice& inner, const Slice& outer) : GetNonzeros(sp,x), inner_(inner), outer_(outer){}
+    GetNonzerosSlice2(const Sparsity& sp, const MX& x, const Slice& inner, const Slice& outer) : GetNonzeros(sp,x), inner_(inner), outer_(outer){}
 
     /// Clone function
     virtual GetNonzerosSlice2* clone() const{ return new GetNonzerosSlice2(*this);}
@@ -172,7 +172,7 @@ namespace CasADi{
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;

@@ -29,32 +29,32 @@ from pylab import *
 #! We consider a very system, an excitated linear spring 
 #! m x'' + c x' + k x = u(t) 
 	 
-t = SX("t")
+t = ssym("t")
 
 #! states 
-x  = SX("x") 
-v  = SX("v") 
+x  = ssym("x") 
+v  = ssym("v") 
  
  
-x0 = SX("x0")
-v0 = SX("v0")
+x0 = ssym("x0")
+v0 = ssym("v0")
 
 #! parameters 
-k = SX("k") 
-c = SX("c") 
-m = SX("m") 
+k = ssym("k") 
+c = ssym("c") 
+m = ssym("m") 
  
 #! controls 
-u = SX("u") 
+u = ssym("u") 
 
 #! Create the dae
-rhs = vertcat([v, (u -  c*v - k*x)/m ])
+rhs = vertcat((v, (u -  c*v - k*x)/m ))
 fin = controldaeIn(
     t = t,
-    x = vertcat([x,v]),
-    p = vertcat([k,c,m]),
+    x = vertcat((x,v)),
+    p = vertcat((k,c,m)),
     u = u,
-    x_major = vertcat([x0,v0])
+    x_major = vertcat((x0,v0))
   )
 f=SXFunction(fin,daeOut(ode=rhs))
 f.init()

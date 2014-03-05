@@ -21,13 +21,13 @@
  */
 
 %{
-#include "symbolic/matrix/crs_sparsity.hpp"
+#include "symbolic/matrix/sparsity.hpp"
 #include "symbolic/matrix/slice.hpp"
 #include "symbolic/matrix/generic_expression.hpp"
 #include "symbolic/matrix/generic_matrix.hpp"
 #include "symbolic/matrix/matrix.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/sx/sx.hpp"
+#include "symbolic/sx/sx_element.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/mx/mx.hpp"
 
@@ -42,32 +42,32 @@
 %include "typemaps.i"
 #endif
 
-%include "symbolic/matrix/crs_sparsity.hpp"
+%include "symbolic/matrix/sparsity.hpp"
 %include "symbolic/matrix/slice.hpp"
 
 %include "symbolic/matrix/generic_expression.hpp"
 %template(ExpIMatrix)        CasADi::GenericExpression<CasADi::Matrix<int> >;
 %template(ExpDMatrix)        CasADi::GenericExpression<CasADi::Matrix<double> >;
-%template(ExpSXMatrix)       CasADi::GenericExpression<CasADi::Matrix<CasADi::SX> >;
+%template(ExpSX)       CasADi::GenericExpression<CasADi::Matrix<CasADi::SXElement> >;
 %template(ExpMX)             CasADi::GenericExpression<CasADi::MX>;
-%template(ExpSX)             CasADi::GenericExpression<CasADi::SX>;
+%template(ExpSXElement)             CasADi::GenericExpression<CasADi::SXElement>;
 
 %include "symbolic/matrix/generic_matrix.hpp"
 %template(GenIMatrix)        CasADi::GenericMatrix<CasADi::Matrix<int> >;
 %template(GenDMatrix)        CasADi::GenericMatrix<CasADi::Matrix<double> >;
-%template(GenSXMatrix)       CasADi::GenericMatrix<CasADi::Matrix<CasADi::SX> >;
+%template(GenSX)       CasADi::GenericMatrix<CasADi::Matrix<CasADi::SXElement> >;
 %template(GenMX)             CasADi::GenericMatrix<CasADi::MX>;
 
 %include "symbolic/matrix/matrix.hpp"
 %template(IMatrix)           CasADi::Matrix<int>;
 %template(DMatrix)           CasADi::Matrix<double>;
 
-%include "symbolic/sx/sx.hpp"
+%include "symbolic/sx/sx_element.hpp"
 
 
 
 #ifdef SWIGPYTHON
-%extend CasADi::CRSSparsity{
+%extend CasADi::Sparsity{
     %pythoncode %{
         @property
         def shape(self):
@@ -84,9 +84,9 @@
 
 #endif // SWIGPYTHON
 
-VECTOR_REPR(CasADi::SX)
-VECTOR_REPR(std::vector<CasADi::SX>)
-VECTOR_REPR(CasADi::Matrix<CasADi::SX>)
+VECTOR_REPR(CasADi::SXElement)
+VECTOR_REPR(std::vector<CasADi::SXElement>)
+VECTOR_REPR(CasADi::Matrix<CasADi::SXElement>)
 
 #ifdef SWIGPYTHON
 %pythoncode %{
@@ -170,7 +170,7 @@ except:
 namespace CasADi {
 
 
-%extend SX {
+%extend SXElement {
 #ifdef SWIGPYTHON
 
   %python_array_wrappers(1000.0)
@@ -199,18 +199,18 @@ namespace CasADi {
   
   #endif // SWIGOCTAVE
   
-  binopsrFull(CasADi::SX)
-  // a+b when a is SX, b is numpy.array. __array_priority works, but does not suffice to yield implicit casting
-  binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+  binopsrFull(CasADi::SXElement)
+  // a+b when a is SXElement, b is numpy.array. __array_priority works, but does not suffice to yield implicit casting
+  binopsFull(const CasADi::Matrix<CasADi::SXElement> & b,,CasADi::Matrix<CasADi::SXElement>,CasADi::Matrix<CasADi::SXElement>)
 
 };
 
 
 
-%extend Matrix<SX>{
+%extend Matrix<SXElement>{
     
     %matrix_convertors
-    %matrix_helpers(CasADi::Matrix<CasADi::SX>)
+    %matrix_helpers(CasADi::Matrix<CasADi::SXElement>)
        
     #ifdef SWIGPYTHON
     %pythoncode %{
@@ -218,9 +218,9 @@ namespace CasADi {
       import numpy as n
       r = n.array((),dtype=object)
       r.resize(self.size1(),self.size2())
-      for i in range(self.size1()):  # loop over rows
-        for el in range(self.rowind(i),self.rowind(i+1)): # loop over the non-zero elements
-          j=self.col(el)  # column
+      for j in range(self.size2()):  # loop over columns
+        for el in range(self.colind(j),self.colind(j+1)): # loop over the non-zero elements
+          i=self.row(el)  # column
           r[i,j] = self.at(el) # add the non-zero element
 
       return r
@@ -229,7 +229,7 @@ namespace CasADi {
   %python_array_wrappers(1001.0)
   #endif // SWIGPYTHON 
   
-  binopsrFull(CasADi::Matrix<CasADi::SX>)  
+  binopsrFull(CasADi::Matrix<CasADi::SXElement>)  
 };
  
 
@@ -247,6 +247,6 @@ namespace CasADi {
 
 #endif // SWIGPYTHON
 
-%template(SXMatrix)             CasADi::Matrix<CasADi::SX>;
+%template(SX)             CasADi::Matrix<CasADi::SXElement>;
 
 

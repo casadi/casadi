@@ -41,8 +41,8 @@
 #include "inverse.hpp"
 #include "inner_prod.hpp"
 #include "norm.hpp"
-#include "vertcat.hpp"
-#include "vertsplit.hpp"
+#include "concat.hpp"
+#include "split.hpp"
 #include "assertion.hpp"
 
 // Template implementations
@@ -139,7 +139,7 @@ namespace CasADi{
     return dep_.size();
   }
 
-  void MXNode::setSparsity(const CRSSparsity& sparsity){
+  void MXNode::setSparsity(const Sparsity& sparsity){
     sparsity_ = sparsity;
   }
 
@@ -178,27 +178,7 @@ namespace CasADi{
     dep_ = dep;
   }
 
-  int MXNode::numel() const{
-    return sparsity_.numel();
-  }
-
-  int MXNode::size() const{
-    return sparsity_.size();
-  }
-
-  int MXNode::size1() const{
-    return sparsity_.size1();
-  }
-
-  int MXNode::size2() const{
-    return sparsity_.size2();
-  }
-
-  const CRSSparsity& MXNode::sparsity() const{
-    return sparsity_;
-  }
-
-  const CRSSparsity& MXNode::sparsity(int oind) const{
+  const Sparsity& MXNode::sparsity(int oind) const{
     casadi_assert_message(oind==0, "Index out of bounds");
     return sparsity_;
   }
@@ -254,7 +234,7 @@ namespace CasADi{
     throw CasadiException(string("MXNode::evaluateD not defined for class ") + typeid(*this).name());
   }
   
-  void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+  void MXNode::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
     throw CasadiException(string("MXNode::evaluateSX not defined for class ") + typeid(*this).name());
   }
   
@@ -345,28 +325,30 @@ namespace CasADi{
     }
   }
 
-  MX MXNode::getReshape(const CRSSparsity& sp) const{
+  MX MXNode::getReshape(const Sparsity& sp) const{
     return MX::create(new Reshape(shared_from_this<MX>(),sp));
   }
   
   
-  MX MXNode::getMultiplication(const MX& y,const CRSSparsity& sp_z) const{
-    // Transpose the second argument
-    MX trans_y = trans(y);
+  MX MXNode::getMultiplication(const MX& y,const Sparsity& sp_z) const{
+    // Get reference to transposed first argument
+    MX trans_x = trans(shared_from_this<MX>());
+
+    // Form result of the right sparsity
     MX z;
     if (sp_z.isNull()) {
-      CRSSparsity sp_z_ = sparsity().patternProduct(trans_y.sparsity());
+      Sparsity sp_z_ = y.sparsity().patternProduct(trans_x.sparsity());
       z = MX::zeros(sp_z_);
     } else {
       z = MX::zeros(sp_z);
     }
-    casadi_assert_message(size1()==z.size1(),"Dimension error. Got lhs=" << size1() << " and z=" << z.dimString() << ".");
-    casadi_assert_message(trans_y.size1()==z.size2(),"Dimension error. Got trans_y=" << trans_y.dimString() << " and z=" << z.dimString() << ".");
-    casadi_assert_message(size2()==trans_y.size2(),"Dimension error. Got lhs=" << size2() << " and trans_y" << trans_y.dimString() << ".");
-    if(sparsity().dense() && y.dense()){
-      return MX::create(new DenseMultiplication<false,true>(z,shared_from_this<MX>(),trans_y));
+    casadi_assert_message(y.size2()==z.size2(),"Dimension error. Got y=" << y.size2() << " and z=" << z.dimString() << ".");
+    casadi_assert_message(trans_x.size2()==z.size1(),"Dimension error. Got trans_x=" << trans_x.dimString() << " and z=" << z.dimString() << ".");
+    casadi_assert_message(y.size1()==trans_x.size1(),"Dimension error. Got y=" << y.size1() << " and trans_x" << trans_x.dimString() << ".");
+    if(trans_x.dense() && y.dense()){
+      return MX::create(new DenseMultiplication<true,false>(z,trans_x,y));
     } else {
-      return MX::create(new Multiplication<false,true>(z,shared_from_this<MX>(),trans_y));    
+      return MX::create(new Multiplication<true,false>(z,trans_x,y));    
     }
   }
     
@@ -378,7 +360,7 @@ namespace CasADi{
     }
   }
 
-  MX MXNode::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
+  MX MXNode::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const{
     if(nz.size()==0){
       return MX::zeros(sp);
     } else {
@@ -444,7 +426,7 @@ namespace CasADi{
     }
   }
 
-  MX MXNode::getSetSparse(const CRSSparsity& sp) const{
+  MX MXNode::getSetSparse(const Sparsity& sp) const{
     return MX::create(new SetSparse(shared_from_this<MX>(),sp));
   }
   
@@ -468,7 +450,7 @@ namespace CasADi{
 
   MX MXNode::getBinarySwitch(int op, const MX& y) const{
     // Make sure that dimensions match
-    casadi_assert_message((sparsity().scalar(false) || y.scalar() || (sparsity().size1()==y.size1() && size2()==y.size2())),
+    casadi_assert_message((sparsity().scalar(false) || y.scalar() || (sparsity().size2()==y.size2() && size1()==y.size1())),
                           "Dimension mismatch." << "lhs is " << sparsity().dimString() << ", while rhs is " << y.dimString());
       
     // Create binary node
@@ -491,9 +473,9 @@ namespace CasADi{
         return getBinary(op,y,false,false);
       } else {
         // Get the sparsity pattern of the result (ignoring structural zeros giving rise to nonzero result)
-        const CRSSparsity& x_sp = sparsity();
-        const CRSSparsity& y_sp = y.sparsity();
-        CRSSparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op));
+        const Sparsity& x_sp = sparsity();
+        const Sparsity& y_sp = y.sparsity();
+        Sparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op));
 
         // Project the arguments to this sparsity
         MX xx = shared_from_this<MX>().setSparse(r_sp);
@@ -552,7 +534,7 @@ namespace CasADi{
             break;
           case OP_ADD:
           case OP_SUB:
-            if(y->isZero()) return scX ? MX(y.size1(),y.size2(),shared_from_this<MX>()) : shared_from_this<MX>();
+            if(y->isZero()) return scX ? MX::repmat(shared_from_this<MX>(),y.shape()) : shared_from_this<MX>();
             break;
           case OP_MUL:
             if(y->isValue(1)) return shared_from_this<MX>();
@@ -649,7 +631,7 @@ namespace CasADi{
 
 
   MX MXNode::getInnerProd(const MX& y) const{
-    casadi_assert_message(size1()==y.size1() && size2()==y.size2(),"MXNode::inner_prod: Dimension mismatch. inner_prod requires its two arguments to have equal shapes, but got (" << size1() << "," << size2() << ") and (" << y.size1() << "," << y.size2() << ").");
+    casadi_assert_message(size2()==y.size2() && size1()==y.size1(),"MXNode::inner_prod: Dimension mismatch. inner_prod requires its two arguments to have equal shapes, but got (" << size2() << "," << size1() << ") and (" << y.size2() << "," << y.size1() << ").");
     if(sparsity()==y.sparsity()){
       if(sparsity().size()==0){
         return 0;
@@ -660,7 +642,7 @@ namespace CasADi{
       }
     } else {
       // Project to pattern intersection
-      CRSSparsity sp = sparsity().patternIntersection(y.sparsity());
+      Sparsity sp = sparsity().patternIntersection(y.sparsity());
       MX xx = shared_from_this<MX>().setSparse(sp);
       MX yy = y.setSparse(sp);
       return xx->getInnerProd(yy);
@@ -681,6 +663,41 @@ namespace CasADi{
 
   MX MXNode::getNorm1() const{
     return MX::create(new Norm1(shared_from_this<MX>()));
+  }
+
+  MX MXNode::getHorzcat(const std::vector<MX>& x){
+    // Remove nulls and empty matrices
+    vector<MX> c;
+    c.reserve(x.size());
+    for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it)
+      if(!it->isNull() && !it->empty())
+        c.push_back(*it);
+  
+    if(c.empty()){
+      return MX();
+    } else if(c.size()==1){
+      return c[0];
+    } else {
+      // If dependents are all-zero, produce a new constant
+      bool zero = true;
+      for (int i=0;i<c.size();++i) {
+        if (!c[i]->isZero()) { zero = false; break; }
+      }
+      if (zero) {
+        return MX::zeros(Horzcat(c).sparsity());
+      }
+      // Split up existing horzcats
+      vector<MX> c_split;
+      c_split.reserve(c.size());
+      for(vector<MX>::const_iterator i=c.begin(); i!=c.end(); ++i){
+        if(i->getOp()==OP_HORZCAT){        
+          c_split.insert(c_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
+        } else {
+          c_split.push_back(*i);
+        }
+      }
+      return MX::create(new Horzcat(c_split));
+    }
   }
 
   MX MXNode::getVertcat(const std::vector<MX>& x){
@@ -716,6 +733,17 @@ namespace CasADi{
       }
       return MX::create(new Vertcat(c_split));
     }
+  }
+
+  std::vector<MX> MXNode::getHorzsplit(const std::vector<int>& output_offset) const{
+    if (isZero()) {
+      std::vector<MX> ret = MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(),output_offset));
+      for (int i=0;i<ret.size();++i) {
+        ret[i]=MX::zeros(ret[i].sparsity());
+      }
+      return ret;
+    }
+    return MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(),output_offset));
   }
 
   std::vector<MX> MXNode::getVertsplit(const std::vector<int>& output_offset) const{

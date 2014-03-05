@@ -33,7 +33,7 @@ class StabilizedQPSolverInternal : public FXInternal{
   public:
 
     // Constructor
-    StabilizedQPSolverInternal(const std::vector<CRSSparsity> &st);
+    StabilizedQPSolverInternal(const std::vector<Sparsity> &st);
     
     // Destructor
     virtual ~StabilizedQPSolverInternal() = 0;
@@ -59,7 +59,7 @@ class StabilizedQPSolverInternal : public FXInternal{
   protected:
 
     /// Problem structure
-    std::vector<CRSSparsity> st_;
+    std::vector<Sparsity> st_;
     
     /// Number of decision variables
     int n_;

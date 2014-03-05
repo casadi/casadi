@@ -64,7 +64,7 @@ enum QCQPSolverInput{
   QCQP_SOLVER_H,
   /// The vector g: dense,  (n x 1) [g]
   QCQP_SOLVER_G,
-  /// The vertical stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [p]
+  /// The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [p]
   QCQP_SOLVER_P,
   /// The vertical stack of all qi: dense,  (nq n x 1) [q]
   QCQP_SOLVER_Q,
@@ -103,7 +103,7 @@ enum QCQPSolverOutput{
 enum QCQPStruct{
   /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
   QCQP_STRUCT_H,
-  /// The vertical stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [p]
+  /// The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [p]
   QCQP_STRUCT_P,
   /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
   QCQP_STRUCT_A,

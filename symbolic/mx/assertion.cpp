@@ -66,7 +66,7 @@ namespace CasADi{
     }
   }
   
-  void Assertion::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+  void Assertion::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
     *output[0] = *input[0];
   }
   

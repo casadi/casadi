@@ -25,29 +25,29 @@ using namespace std;
 
 namespace CasADi{
 
-vector<SX> var(const vector<Variable> v){
-  vector<SX> ret(v.size());
+vector<SXElement> var(const vector<Variable> v){
+  vector<SXElement> ret(v.size());
   for(int i=0; i<v.size(); ++i)
     ret[i] = v[i].var();
   return ret;
 }
     
-vector<SX> der(const vector<Variable> v){
-  vector<SX> ret(v.size());
+vector<SXElement> der(const vector<Variable> v){
+  vector<SXElement> ret(v.size());
   for(int i=0; i<v.size(); ++i)
     ret[i] = v[i].der();
   return ret;
 }
     
-vector<SX> highest(const vector<Variable> v){
-  vector<SX> ret(v.size());
+vector<SXElement> highest(const vector<Variable> v){
+  vector<SXElement> ret(v.size());
   for(int i=0; i<v.size(); ++i)
     ret[i] = v[i].highest();
   return ret;
 }
 
-vector<SX> binding(const vector<Variable> v){
-  vector<SX> ret(v.size());
+vector<SXElement> binding(const vector<Variable> v){
+  vector<SXElement> ret(v.size());
   for(int i=0; i<v.size(); ++i)
     ret[i] = v[i].binding();
   return ret;

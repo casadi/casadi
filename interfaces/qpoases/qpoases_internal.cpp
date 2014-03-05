@@ -39,7 +39,7 @@ QPOasesInternal* QPOasesInternal::clone() const{
   return node;
 }
   
-QPOasesInternal::QPOasesInternal(const std::vector<CRSSparsity>& st) : QPSolverInternal(st){
+QPOasesInternal::QPOasesInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st){
   addOption("nWSR",                   OT_INTEGER,     GenericType(), "The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)");
   addOption("CPUtime",                OT_REAL,        GenericType(), "The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.");
 
@@ -106,8 +106,8 @@ void QPOasesInternal::init(){
   // Create data for H if not dense
   if(!input(QP_SOLVER_H).sparsity().dense()) h_data_.resize(n_*n_);
   
-  // Create data for A if not dense
-  if(!input(QP_SOLVER_A).sparsity().dense()) a_data_.resize(n_*nc_);
+  // Create data for A 
+  a_data_.resize(n_*nc_);
   
   // Dual solution vector
   dual_.resize(n_+nc_);
@@ -184,14 +184,10 @@ void QPOasesInternal::evaluate() {
     h = getPtr(h_data_);
   }
   
-  // Get pointer to A
+  // Copy A to a row-major dense vector
   const double* a=0;
-  if(a_data_.empty()){
-    // No copying needed
-    a = getPtr(input(QP_SOLVER_A));
-  } else {
-    // First copy to dense array
-    input(QP_SOLVER_A).get(a_data_,DENSE);
+  if(nc_>0){
+    input(QP_SOLVER_A).get(a_data_,DENSETRANS);
     a = getPtr(a_data_);
   }
   

@@ -50,11 +50,11 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt,"DMatrix(numpy.ndarray)")
       self.checkarray(m,zt.toArray(),"DMatrix(numpy.ndarray).toArray()")
       if scipy_available:
-        self.checkarray(m,zt.toCsr_matrix(),"DMatrix(numpy.ndarray).toCsr_matrix()")
+        self.checkarray(m,zt.toCsc_matrix(),"DMatrix(numpy.ndarray).toCsc_matrix()")
       
   def test_1(self):
     self.message("DMatrix -> DMatrix")
-    arrays = [DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])]
+    arrays = [DMatrix(4,3,[0,2,2,3],[1,2,1],[3,2.3,8])]
     for i in range(len(arrays)):
       m = arrays[i]
       zt=trans(trans(m))
@@ -62,7 +62,7 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt,"DMatrix(DMatrix)")
       self.checkarray(m,zt.toArray(),"DMatrix(DMatrix).toArray()")
       if scipy_available:
-        self.checkarray(m,zt.toCsr_matrix(),"DMatrix(DMatrix).toCsr_matrix()")
+        self.checkarray(m,zt.toCsc_matrix(),"DMatrix(DMatrix).toCsc_matrix()")
    
   def test_2(self):
     self.message("crs_matrix -> DMatrix")
@@ -78,16 +78,16 @@ class typemaptests(casadiTestCase):
       self.checkarray(m,zt,"DMatrix(crs_matrix)")
       self.checkarray(m,zt.toArray(),"DMatrix(crs_matrix).toArray()")
       if scipy_available:
-        self.checkarray(m,zt.toCsr_matrix(),"DMatrix(crs_matrix).toCsr_matrix()")
+        self.checkarray(m,zt.toCsc_matrix(),"DMatrix(crs_matrix).toCsc_matrix()")
       
       
   def test_setget(self):
     self.message("DMatrix set/get")
     data = n.array([3,2.3,8])
-    dm=DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])
+    dm=DMatrix(3,4,[0,0,2,3,3],[0,2,0],[3,2.3,8])
     
     if scipy_available:
-      c=dm.toCsr_matrix()
+      c=dm.toCsc_matrix()
     z=n.zeros((3,4))
     dm.get(z)
     self.checkarray(z,dm,"get(2Dndarray)")
@@ -130,7 +130,7 @@ class typemaptests(casadiTestCase):
 
   def test_conversion(self):
     self.message("DMatrix conversions")
-    w = DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])
+    w = DMatrix(4,3,[0,2,2,3],[1,2,1],[3,2.3,8])
     d = array([[1,2,3],[4,5,6]])
     
     list(w.data())
@@ -140,7 +140,7 @@ class typemaptests(casadiTestCase):
     w.toMatrix()
     matrix(w)
     if scipy_available:
-      w.toCsr_matrix()
+      w.toCsc_matrix()
 
     self.checkarray(DMatrix(d),d,"DMatrix(numpy.ndarray)")
     #self.checkarray(DMatrix(array([1,2,3,4,5,6])),d.ravel(),"DMatrix(numpy.ndarray)")
@@ -217,14 +217,14 @@ class typemaptests(casadiTestCase):
   def test_autoconversionMX(self):
     self.message("Auto conversion MX")
     s = DMatrix([[1,2],[3,4]])
-    x = SX(3)
+    x = SXElement(3)
     y = MX(3)
     
     def doit(z,s,fun):
       function = None
       
-      if type(z) in [type(SX()),type(SXMatrix())]:
-        ztype = [type(SX()),type(SXMatrix())]
+      if type(z) in [type(SXElement()),type(SX())]:
+        ztype = [type(SXElement()),type(SX())]
         function = SXFunction
       
       if type(z) in [type(MX())]:
@@ -233,14 +233,14 @@ class typemaptests(casadiTestCase):
         
       r = fun(z,s)
             
-      if type(z) is type(SX()) and type(s) is type(SX()):
-        self.assertTrue(type(r) is type(SX()))
+      if type(z) is type(SXElement()) and type(s) is type(SXElement()):
+        self.assertTrue(type(r) is type(SXElement()))
         
 
       self.assertTrue(type(r) in ztype,"Expected %s but got %s" % (str(ztype),str(type(r))))
       
       hasNum = True
-      if type(s) in [type(SX()),type(MX()),type(SXMatrix())]:
+      if type(s) in [type(SXElement()),type(MX()),type(SX())]:
         hasNum = False
       
       if hasNum:
@@ -302,9 +302,9 @@ class typemaptests(casadiTestCase):
 
     nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
         
-    ## numeric & SXMatrix
+    ## numeric & SX
     for s in nums:
-      for z in [SX("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SXElement.sym("x"), ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
@@ -316,9 +316,9 @@ class typemaptests(casadiTestCase):
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
         
-    # SX & SX
-    for s in [SX("x"), ssym("x"), ssym("x",2,2)]:
-      for z in [SX("x"),ssym("x"), ssym("x",2,2)]:
+    # SXElement & SX
+    for s in [SXElement.sym("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SXElement.sym("x"),ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
@@ -333,7 +333,7 @@ class typemaptests(casadiTestCase):
     for (s,x,y) in [
                   (matrix([[1,2],[3,4]]),ssym("x",2,2),MX("x",2,2))    
                   ]:
-      for z,ztype in zip([x,y],[[type(SXMatrix()),type(SX())],[type(MX())]]):
+      for z,ztype in zip([x,y],[[type(SX()),type(SXElement())],[type(MX())]]):
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         doit(z,s,lambda z,s: -z)
@@ -354,8 +354,8 @@ class typemaptests(casadiTestCase):
     def doit(z,s,fun):
       function = None
       
-      if type(z) in [type(SX()),type(SXMatrix())]:
-        ztype = [type(SX()),type(SXMatrix())]
+      if type(z) in [type(SXElement()),type(SX())]:
+        ztype = [type(SXElement()),type(SX())]
         function = SXFunction
       
       if type(z) in [type(MX())]:
@@ -364,8 +364,8 @@ class typemaptests(casadiTestCase):
         
       r = fun(z,s)
             
-      if type(z) is type(SX()) and type(s) is type(SX()):
-        self.assertTrue(type(r) is type(SX()))
+      if type(z) is type(SXElement()) and type(s) is type(SXElement()):
+        self.assertTrue(type(r) is type(SXElement()))
         
 
       self.assertTrue(type(r) in ztype,"Expected %s but got %s" % (str(ztype),str(type(r))))
@@ -380,9 +380,9 @@ class typemaptests(casadiTestCase):
       
     nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
         
-    ## numeric & SXMatrix
+    ## numeric & SX
     for s in nums:
-      for z in [SX("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SXElement.sym("x"), ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
@@ -394,9 +394,9 @@ class typemaptests(casadiTestCase):
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
         
-    # SX & SX
-    for s in [SX("x"), ssym("x"), ssym("x",2,2)]:
-      for z in [SX("x"),ssym("x"), ssym("x",2,2)]:
+    # SXElement & SX
+    for s in [SXElement.sym("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SXElement.sym("x"),ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
@@ -434,7 +434,7 @@ class typemaptests(casadiTestCase):
       
   def testGenericType(self):
     self.message("Generic type")
-    x=SX("x")
+    x=SXElement.sym("x")
     f=SXFunction([x],[2*x])
     f.setOption("name","foo")
     self.assertEquals(f.getOption("name"),"foo")
@@ -493,7 +493,7 @@ class typemaptests(casadiTestCase):
 	    
     a = GenericType(["foo","bar"])
     self.assertTrue(a.isStringVector())
-    x = SX("x")
+    x = SXElement.sym("x")
     f = SXFunction([x],[x])
     #f.setOption("monitor",["foo","bar"])
     #self.assertEqual(f.getOption("monitor")[0],"foo")
@@ -502,10 +502,10 @@ class typemaptests(casadiTestCase):
     #self.assertEqual(f.getOption("monitor")[0],"foo")
     #f.setOption("monitor",[])
     
-    t=SX("t")
+    t=SXElement.sym("t")
 
-    x=SX("x") 
-    dx=SX("dx")
+    x=SXElement.sym("x") 
+    dx=SXElement.sym("dx")
 
     f=SXFunction(daeIn(t=t, x=vertcat([x,dx])),[vertcat([dx,-x])])
     f.init()
@@ -526,27 +526,27 @@ class typemaptests(casadiTestCase):
 
   @requires("IpoptSolver")
   def testGenericTypeBoolean(self):
-    x=SX("x")
+    x=SXElement.sym("x")
 
     nlp = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
     nlp.init()
 
     nlp_solver = IpoptSolver(nlp)
     
-    self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SX("x")))
+    self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SXElement.sym("x")))
     nlp_solver.setOption('acceptable_tol',DMatrix(1))
 	    
   def test_operators(self):
     self.message("Test operators on mixed numpy.array/Matrix")
-    self.message(":SXMatrix")
-    x=SX("x")
-    y=SX("y")
+    self.message(":SX")
+    x=SXElement.sym("x")
+    y=SXElement.sym("y")
 
-    C=SXMatrix([x,y])
+    C=SX([x,y])
     N=matrix([x,y]).T
     
-    self.assertTrue(isinstance(N+C,SXMatrix))
-    self.assertTrue(isinstance(C+N,SXMatrix))
+    self.assertTrue(isinstance(N+C,SX))
+    self.assertTrue(isinstance(C+N,SX))
     
     f=SXFunction([vertcat([x,y])],[C+N])
     f.init()
@@ -570,8 +570,8 @@ class typemaptests(casadiTestCase):
     self.checkarray(N+D,matrix([14,26]).T,"addition")
     self.checkarray(D+N,matrix([14,26]).T,"addition")
     
-    self.assertTrue(isinstance(C+D,SXMatrix))
-    self.assertTrue(isinstance(D+C,SXMatrix))
+    self.assertTrue(isinstance(C+D,SX))
+    self.assertTrue(isinstance(D+C,SX))
   
       
     f=SXFunction([vertcat([x,y])],[C+D])
@@ -586,10 +586,10 @@ class typemaptests(casadiTestCase):
     f.evaluate()
     self.checkarray(f.getOutput(),matrix([8,17]).T,"addition")
 
-  def test_DMatrixSXMatrixcast(self):
-    self.message("Casting DMatrix to SXMatrix")
+  def test_DMatrixSXcast(self):
+    self.message("Casting DMatrix to SX")
     
-    W = SXMatrix(DMatrix([[1,2,3],[4,5,6]]))
+    W = SX(DMatrix([[1,2,3],[4,5,6]]))
 
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
@@ -601,11 +601,11 @@ class typemaptests(casadiTestCase):
     self.assertEqual(W.size1(),2)
     self.assertEqual(W.size2(),3)
     
-  def test_DMatrixSXMatrix(self):
-    self.message("Casting DMatrix to SXMatrix")
+  def test_DMatrixSX(self):
+    self.message("Casting DMatrix to SX")
     
     w = DMatrix([[1,2,3],[4,5,6]])
-    x = SX("x")
+    x = SXElement.sym("x")
     
     f = SXFunction([x],[w])
     
@@ -692,7 +692,7 @@ class typemaptests(casadiTestCase):
     
   def test_issue190(self):
     self.message("regression test issue #190")
-    x=SX("x")
+    x=SXElement.sym("x")
     x * numpy.array(1)
     x * numpy.array(1.2)
 
@@ -707,13 +707,13 @@ class typemaptests(casadiTestCase):
     self.message("std::vector<double> typemap.")
     a = array([0,2,2,3])
     b = array([0.738,0.39,0.99])
-    DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.39,0.99])
-    DMatrix(3,4,[1,2,1],(0,2,2,3),[0.738,0.39,0.99])
-    DMatrix(3,4,[1,2,1],list(a),[0.738,0.39,0.99])
-    DMatrix(3,4,[1,2,1],a,[0.738,0.39,0.99])
-    DMatrix(3,4,[1,2,1],[0,2,2,3],(0.738,0.39,0.99))
-    DMatrix(3,4,[1,2,1],[0,2,2,3],list(b))
-    DMatrix(3,4,[1,2,1],[0,2,2,3],b)
+    DMatrix(4,3,[0,2,2,3],[1,2,1],[0.738,0.39,0.99])
+    DMatrix(4,3,(0,2,2,3),[1,2,1],[0.738,0.39,0.99])
+    DMatrix(4,3,list(a),[1,2,1],[0.738,0.39,0.99])
+    DMatrix(4,3,a,[1,2,1],[0.738,0.39,0.99])
+    DMatrix(4,3,[0,2,2,3],[1,2,1],(0.738,0.39,0.99))
+    DMatrix(4,3,[0,2,2,3],[1,2,1],list(b))
+    DMatrix(4,3,[0,2,2,3],[1,2,1],b)
     
   def test_imatrix(self):
     self.message("IMatrix")
@@ -724,8 +724,8 @@ class typemaptests(casadiTestCase):
     self.checkarray(array(B),DMatrix(2,2,2),"Imatrix")
     
   def test_issue314(self):
-    self.message("regression test for #314: SXMatrix sparsity constructor")
-    SXMatrix(sp_diag(3),[1,2,3])
+    self.message("regression test for #314: SX sparsity constructor")
+    SX(sp_diag(3),[1,2,3])
   def test_setAll_365(self):
     self.message("ticket #365: DMAtrix.setAll does not work for 1x1 Matrices as input")
     m = DMatrix.ones(5,5)
@@ -736,8 +736,8 @@ class typemaptests(casadiTestCase):
     self.message("Issue #570: long int")
     longint = 10**50
     print type(longint)
-    print casadi.SX('x') + longint
-    print longint + casadi.SX('x')
+    print casadi.SXElement.sym('x') + longint
+    print longint + casadi.SXElement.sym('x')
     print casadi.ssym('x') + longint
     print longint + casadi.ssym('x')
     
@@ -756,7 +756,7 @@ class typemaptests(casadiTestCase):
 
     class Foo:
       def __DMatrix__(self):
-        return SXMatrix([4])
+        return SX([4])
         
     self.assertRaises(TypeError,lambda :f.setInput(Foo()))
     
@@ -782,7 +782,7 @@ class typemaptests(casadiTestCase):
 
     class Foo:
       def __IMatrix__(self):
-        return SXMatrix([[4,6],[2,4]])
+        return SX([[4,6],[2,4]])
         
     self.assertRaises(TypeError,lambda :det(Foo()))
     
@@ -797,26 +797,26 @@ class typemaptests(casadiTestCase):
         
     self.assertRaises(NotImplementedError,lambda : det(Foo()))
 
-  def test_casting_SXMatrix(self):
-    self.message("casting SXMatrix")
+  def test_casting_SX(self):
+    self.message("casting SX")
     
     
     x = ssym("x")
     
     class Foo:
-      def __SXMatrix__(self):
+      def __SX__(self):
         return x
         
     SXFunction([x],[Foo()])
     
     class Foo:
-      def __SXMatrix__(self):
+      def __SX__(self):
         return MX("x")
         
     self.assertRaises(TypeError,lambda : SXFunction([x],[Foo()]))
     
     class Foo:
-      def __SXMatrix__(self):
+      def __SX__(self):
         raise Exception("15")
         
     self.assertRaises(TypeError,lambda : SXFunction([x],[Foo()]))
@@ -871,6 +871,31 @@ class typemaptests(casadiTestCase):
     self.message("ufunc.add")
     
     self.checkarray(DMatrix(sum(DMatrix([1,2,3]))),DMatrix(6))
+    
+  def test_sxmatrix(self):
+
+    def val(a):
+      f = SXFunction([],[a])
+      f.init()
+      f.evaluate()
+      return f.output()
+      
+    for i in [SXElement(1),1,1.0]:
+      a = numpy.array([[SXElement(1),2],[3,4]])
+      print val(SX(a))
+      print val(SX(a.T))
+
+      self.checkarray(val(SX(a)),DMatrix([[1,2],[3,4]]))
+      self.checkarray(val(SX(a.T).T),DMatrix([[1,2],[3,4]]))
+
+
+      a = numpy.matrix([[SXElement(1),2],[3,4]])
+      
+      print val(SX(a))
+      print DMatrix([[1,2],[3,4]])
+
+      self.checkarray(val(SX(a)),DMatrix([[1,2],[3,4]]))
+      self.checkarray(val(SX(a.T).T),DMatrix([[1,2],[3,4]]))
     
 if __name__ == '__main__':
     unittest.main()

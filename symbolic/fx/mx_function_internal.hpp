@@ -97,10 +97,10 @@ namespace CasADi{
     /// Free variables
     std::vector<MX> free_vars_;
         
-    /** \brief Evaluate symbolically, SX type*/
-    virtual void evalSXsparse(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-                        const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                        const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens);
+    /** \brief Evaluate symbolically, SXElement type*/
+    virtual void evalSXsparse(const std::vector<SX>& input, std::vector<SX>& output, 
+                        const std::vector<std::vector<SX> >& fwdSeed, std::vector<std::vector<SX> >& fwdSens, 
+                        const std::vector<std::vector<SX> >& adjSeed, std::vector<std::vector<SX> >& adjSens);
                         
     /** \brief Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
@@ -108,7 +108,7 @@ namespace CasADi{
                         const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens);
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
-    SXFunction expand(const std::vector<SXMatrix>& inputv );
+    SXFunction expand(const std::vector<SX>& inputv );
     
     // Update pointers to a particular element
     void updatePointers(const AlgEl& el);

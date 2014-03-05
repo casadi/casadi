@@ -1,13 +1,13 @@
 #include "symbolic/stl_vector_tools.hpp"
-#include "symbolic/sx/sx.hpp"
+#include "symbolic/sx/sx_element.hpp"
 
 using namespace CasADi;
 using namespace std;
 
 main(int argc, char *argv[])
 {
-  SX x("x");
-  SX y("y");
+  SXElement x("x");
+  SXElement y("y");
   
   cout << x+y << endl;
 }

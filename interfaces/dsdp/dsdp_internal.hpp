@@ -31,35 +31,39 @@ namespace CasADi{
 
   /** \brief Internal class for DSDPSolver
    * 
-      @copydoc SDPSolver_doc
+   @copydoc SDPSolver_doc
    * */
-class DSDPInternal : public SDPSolverInternal {
-  friend class DSDPSolver;
-public:
+  class DSDPInternal : public SDPSolverInternal {
+    friend class DSDPSolver;
+  public:
 
-  /** \brief  Clone */
-  virtual DSDPInternal* clone() const;
-  
-  /** \brief  Create a new Solver */
-  explicit DSDPInternal(const std::vector<CRSSparsity> &st);
+    /** \brief Constructor */
+    explicit DSDPInternal(const std::vector<Sparsity> &st);
 
-  /** \brief  Destructor */
-  virtual ~DSDPInternal();
+    /** \brief Clone */
+    virtual DSDPInternal* clone() const;
+  
+    /** \brief Destructor */
+    virtual ~DSDPInternal();
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief Initialize */
+    virtual void init();
   
-  virtual void evaluate();
+    /** \brief Solve the SDP */
+    virtual void evaluate();
   
-  protected:
+    // Data members (all public)
     DSDP dsdp_;
-    
     SDPCone sdpcone_;
     LPCone lpcone_;
     BCone bcone_;
     
-    std::map<int,std::string> terminationReason_;
-    std::map<int,std::string> solutionType_;
+    /** Get termination reason from flag */
+    static const char* terminationReason(int flag);
+
+    /** Get solution type from flag */
+    static const char* solutionType(int flag);
+    
     
     std::vector< std::vector< std::vector<int> > > pattern_;
     std::vector< std::vector< std::vector<double> > > values_;
@@ -70,8 +74,7 @@ public:
     
     /// Mapping to get [A LBA]'
     FX mappingA_;
-
-};
+  };
 
 } // namespace CasADi
 

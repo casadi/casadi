@@ -40,7 +40,7 @@ namespace CasADi{
      *  \param[in] A  List of sparsities of A_i 
      *  \param[in] V  List of sparsities of V_i 
      */
-    SimpleIndefDpleInternal(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V);
+    SimpleIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V);
     
     /** \brief  Destructor */
     virtual ~SimpleIndefDpleInternal();
@@ -52,7 +52,7 @@ namespace CasADi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
   
     /** \brief  Create a new solver */
-    virtual SimpleIndefDpleInternal* create(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V) const{ return new SimpleIndefDpleInternal(A,V);}
+    virtual SimpleIndefDpleInternal* create(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) const{ return new SimpleIndefDpleInternal(A,V);}
      
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const{}

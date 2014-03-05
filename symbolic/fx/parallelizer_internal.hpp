@@ -81,7 +81,7 @@ namespace CasADi{
     virtual void init();
 
     /// Generate the sparsity of a Jacobian block
-    virtual CRSSparsity getJacSparsity(int iind, int oind, bool symmetric);
+    virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

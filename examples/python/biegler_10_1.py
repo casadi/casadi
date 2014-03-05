@@ -102,7 +102,7 @@ for N in range(1,11):
     
   # Construct the NLP
   x = vec(Z.T)
-  g = SXMatrix()
+  g = SX()
   for i in range(N):
     for k in range(1,K+1):
       # Add collocation equations to NLP

@@ -24,94 +24,69 @@
 #define OOQP_INTERNAL_HPP
 
 #include "symbolic/fx/qp_solver_internal.hpp"
-#include <QpGenData.h>
-#include <QpGenVars.h>
-#include <QpGenResiduals.h>
-#include <GondzioSolver.h>
-#include <QpGenSparseMa27.h>
-
-// A variable that controls the printlevel of OOQP
-// This is the only possible way to access it using the C++ interface
-extern int gOoqpPrintLevel;
 
 namespace CasADi{
 
-/** \brief Internal class for OOQPSolver
- * 
-    @copydoc QPSolver_doc
- * */
-class OOQPInternal : public QPSolverInternal {
-  friend class OOQPSolver;
+  /** \brief Internal class for OOQPSolver
+   * 
+   @copydoc QPSolver_doc
+   * */
+  class OOQPInternal : public QPSolverInternal {
+    friend class OOQPSolver;
+  public:
 
-public:
-  /** \brief  Constructor */
-  explicit OOQPInternal();
+    /** \brief  Constructor */
+    explicit OOQPInternal();
 
-  /** \brief  Clone */
-  virtual OOQPInternal* clone() const;
+    /** \brief  Clone */
+    virtual OOQPInternal* clone() const{ return new OOQPInternal(*this);}
   
-  /** \brief  Create a new Solver */
-  explicit OOQPInternal(const std::vector<CRSSparsity>& st);
+    /** \brief  Create a new Solver */
+    explicit OOQPInternal(const std::vector<Sparsity>& st);
 
-  /** \brief  Destructor */
-  virtual ~OOQPInternal();
+    /** \brief  Destructor */
+    virtual ~OOQPInternal();
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Initialize */
+    virtual void init();
   
-
-  
-  virtual void evaluate();
-  
-  protected:
-    /** 
-     * OOQP specific pointers.
-     * @ {
-     * */
-    QpGenSparseMa27 * qp_;
-    QpGenData      * prob_;
-    QpGenVars      * vars_; 
-    QpGenResiduals * resid_;
-    GondzioSolver  * s_;
-    /* @} */
-    
-    
-    /// Reformulated A : horzcat([A,-DMatrix.eye(nc_)]) 
-    DMatrix A_;
-    
-    /// Reformulated G : horzcat([G,-DMatrix.zeros(nc_)])
-    DMatrix G_;
-    
-    /// Reformulated H : [tril(H) 0;0 0]
-    DMatrix H_;
-    
-    /// The LBX/UBX with infinities substituted by 0 (needed for OOQP)
-    std::vector<double> lbX_, ubX_;
-    
-    /// Vector with the equalities rhs (identically zero) for the reformulated system
-    std::vector<double> b_;
-    
-    /** 
-     *  In OOQP, infinite bounds need a special treatment. They must be deactivated by setting the i-something std::vector<char>.
-     *  they have to be zero for infinite bounds and 1 otherwise
-     * @{
-     */
-    std::vector<char> ixlow_, ixupp_;
-
-    
-    /// Temporary vector
-    std::vector<double> temp_;
-    
+    /// Solve the QP
+    virtual void evaluate();
+      
     /// Throw error
-    static void ooqp_error(const std::string& module, int flag);
-    
-    /// Calculate the error message map
-    static std::map<int,std::string> calc_flagmap();
-    
-    /// Error message map
-    static std::map<int,std::string> flagmap;
-};
+    static const char* errFlag(int flag);
 
+    /// Print an OOQP bounds vector
+    static std::string printBounds(const std::vector<double>& b, const std::vector<char>& ib, int n, const char *sign);
+
+    /// Problem data (vectors)
+    std::vector<double> c_, bA_, xlow_, xupp_, clow_, cupp_, x_, gamma_, phi_, y_, z_, lambda_, pi_;
+
+    /// Type of bounds
+    std::vector<char> ixlow_, ixupp_, iclow_, icupp_;
+    
+    /// Problem data (matrices)
+    std::vector<double> dQ_, dA_, dC_;
+    
+    /// Sparsities of matrices
+    std::vector<int> irowQ_, jcolQ_, irowA_, jcolA_, irowC_, jcolC_;
+
+    // Variable/constraint index
+    std::vector<int> x_index_, c_index_;
+
+    // Parameters
+    std::vector<double> p_;
+
+    // Transpose of linear constraints
+    DMatrix AT_;
+    std::vector<int> AT_tmp_;
+
+    // Print level
+    int print_level_;
+    
+    // Tolerances
+    double mutol_, artol_;
+  };
 
 } // namespace CasADi
 

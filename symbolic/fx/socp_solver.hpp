@@ -36,14 +36,14 @@
   min          c' x 
    x 
   subject to
-                || Gi x + hi ||_2 <= ei' x + fi  i = 1..m
+                || Gi' x + hi ||_2 <= ei' x + fi  i = 1..m
 
               LBA <= A x <= UBA
               LBX <= x   <= UBX
               
       with x ( n x 1)
            c ( n x 1 )
-           Gi  sparse (ni x n)
+           Gi  sparse (n x ni)
            hi  dense (ni x 1)
            ei  dense (n x 1)
            fi  dense (1 x 1)
@@ -60,7 +60,7 @@ namespace CasADi{
   
 /// Input arguments of a SOCP problem [socpIn]
 enum SOCPInput{
-  /// The vertical stack of all matrices Gi: ( N x n) [g]
+  /// The horizontal stack of all matrices Gi: ( n x N) [g]
   SOCP_SOLVER_G,
   /// The vertical stack of all vectors hi: ( N x 1) [h]
   SOCP_SOLVER_H,
@@ -96,7 +96,7 @@ enum SOCPOutput{
   
 /// Structure specification of an SOCP [socpStruct]
 enum SOCPStruct{
-  /// The vertical stack of all matrices Gi: ( N x n) [g]
+  /// The horizontal stack of all matrices Gi: ( n x N) [g]
   SOCP_STRUCT_G,
   /// The matrix A: ( nc x n) [a]
   SOCP_STRUCT_A,

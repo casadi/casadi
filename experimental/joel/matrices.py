@@ -42,13 +42,13 @@ print "A * A = ", A * A
 # Perform some operations (matrix multiplication)
 print "dot(A,A) = ", dot(A,A)
 
-# Create an SXMatrix sparse symbolic matrix (should be replaced by a typemap!!!)
-B = SXMatrix(size(A,0),size(A,1))
+# Create an SX sparse symbolic matrix (should be replaced by a typemap!!!)
+B = SX(size(A,0),size(A,1))
 for i in range(size(A,0)):
   for j in range(size(A,1)):
     B[i,j] = A[i,j]
 
-# Print the SXMatrix
+# Print the SX
 print "B = ", B
 
 # Create a vector valued function

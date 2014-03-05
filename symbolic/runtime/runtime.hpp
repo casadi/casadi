@@ -64,9 +64,9 @@ namespace CasADi {
   template<typename real_t>
   void casadi_fill(int n, real_t alpha, real_t* x, int inc_x);
   
-  /// Sparse matrix-matrix multiplication, the second argument is transposed: z <- z + x*y'
+  /// Sparse matrix-matrix multiplication, the first argument is transposed: z <- z + x'*y
   template<typename real_t>
-  void casadi_mm_nt_sparse(const real_t* x, const int* sp_x, const real_t* trans_y, const int* sp_trans_y, real_t* z, const int* sp_z);
+  void casadi_mm_tn_sparse(const real_t* trans_x, const int* sp_trans_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z);
   
   /// NRM2: ||x||_2 -> return
   template<typename real_t>
@@ -120,32 +120,32 @@ namespace CasADi {
   void casadi_copy_sparse(const real_t* x, const int* sp_x, real_t* y, const int* sp_y){
     int nrow_x = sp_x[0];
     int ncol_x = sp_x[1];
-    const int* rowind_x = sp_x+2;
-    const int* col_x = sp_x + 2 + nrow_x+1;
-    int nnz_x = rowind_x[nrow_x];
+    const int* colind_x = sp_x+2;
+    const int* row_x = sp_x + 2 + ncol_x+1;
+    int nnz_x = colind_x[ncol_x];
     int nrow_y = sp_y[0];
     int ncol_y = sp_y[1];
-    const int* rowind_y = sp_y+2;
-    const int* col_y = sp_y + 2 + nrow_y+1;
-    int nnz_y = rowind_y[nrow_y];
+    const int* colind_y = sp_y+2;
+    const int* row_y = sp_y + 2 + ncol_y+1;
+    int nnz_y = colind_y[ncol_y];
     if(sp_x==sp_y){
       casadi_copy(nnz_x,x,1,y,1);
     } else {
       int i;
-      for(i=0; i<nrow_x; ++i){
-        int el_x = rowind_x[i];
-        int el_x_end = rowind_x[i+1];
-        int j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;
+      for(i=0; i<ncol_x; ++i){
+        int el_x = colind_x[i];
+        int el_x_end = colind_x[i+1];
+        int j_x = el_x<el_x_end ? row_x[el_x] : nrow_x;
         int el_y;
-        for(el_y=rowind_y[i]; el_y!=rowind_y[i+1]; ++el_y){
-          int j=col_y[el_y];
+        for(el_y=colind_y[i]; el_y!=colind_y[i+1]; ++el_y){
+          int j=row_y[el_y];
           while(j_x<j){
             el_x++;
-            j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;
+            j_x = el_x<el_x_end ? row_x[el_x] : nrow_x;
           }
           if(j_x==j){
             y[el_y] = x[el_x++];
-            j_x = el_x<el_x_end ? col_x[el_x] : ncol_x;
+            j_x = el_x<el_x_end ? row_x[el_x] : nrow_x;
           } else {
             y[el_y] = 0;
           }
@@ -223,38 +223,38 @@ namespace CasADi {
   }
   
   template<typename real_t>
-  void casadi_mm_nt_sparse(const real_t* x, const int* sp_x, const real_t* trans_y, const int* sp_trans_y, real_t* z, const int* sp_z){
+  void casadi_mm_tn_sparse(const real_t* trans_x, const int* sp_trans_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z){
 
-    int nrow_x = sp_x[0];
-    int ncol_x = sp_x[1];
-    const int* rowind_x = sp_x+2;
-    const int* col_x = sp_x + 2 + nrow_x+1;
-    int nnz_x = rowind_x[nrow_x];
-
-    int ncol_y = sp_trans_y[0];
-    int nrow_y = sp_trans_y[1];
-    const int* colind_y = sp_trans_y+2;
-    const int* row_y = sp_trans_y + 2 + ncol_y+1;
+    int nrow_y = sp_y[0];
+    int ncol_y = sp_y[1];
+    const int* colind_y = sp_y+2;
+    const int* row_y = sp_y + 2 + ncol_y+1;
     int nnz_y = colind_y[ncol_y];
+
+    int ncol_x = sp_trans_x[0];
+    int nrow_x = sp_trans_x[1];
+    const int* rowind_x = sp_trans_x+2;
+    const int* col_x = sp_trans_x + 2 + nrow_x+1;
+    int nnz_x = rowind_x[nrow_x];
 
     int nrow_z = sp_z[0];
     int ncol_z = sp_z[1];
-    const int* rowind_z = sp_z+2;
-    const int* col_z = sp_z + 2 + nrow_z+1;
-    int nnz_z = rowind_z[nrow_z];
+    const int* colind_z = sp_z+2;
+    const int* row_z = sp_z + 2 + ncol_z+1;
+    int nnz_z = colind_z[ncol_z];
 
     int i;
-    for(i=0; i<nrow_z; ++i){
+    for(i=0; i<ncol_z; ++i){
       int el;
-      for(el=rowind_z[i]; el<rowind_z[i+1]; ++el){
-        int j = col_z[el];
-        int el1 = rowind_x[i];
-        int el2 = colind_y[j];
-        while(el1 < rowind_x[i+1] && el2 < colind_y[j+1]){ 
-          int j1 = col_x[el1];
-          int i2 = row_y[el2];
+      for(el=colind_z[i]; el<colind_z[i+1]; ++el){
+        int j = row_z[el];
+        int el1 = colind_y[i];
+        int el2 = rowind_x[j];
+        while(el1 < colind_y[i+1] && el2 < rowind_x[j+1]){ 
+          int j1 = row_y[el1];
+          int i2 = col_x[el2];
           if(j1==i2){
-            z[el] += x[el1++] * trans_y[el2++];
+            z[el] += y[el1++] * trans_x[el2++];
           } else if(j1<i2) {
             el1++;
           } else {
@@ -278,15 +278,15 @@ namespace CasADi {
   
   template<typename real_t>
   void casadi_trans(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, int *tmp){
-    int nrow_x = sp_x[0];
-    int nnz_x = sp_x[2 + nrow_x];
-    const int* col_x = sp_x + 2 + nrow_x+1;
-    int nrow_y = sp_y[0];
-    const int* rowind_y = sp_y+2;
+    int ncol_x = sp_x[1];
+    int nnz_x = sp_x[2 + ncol_x];
+    const int* row_x = sp_x + 2 + ncol_x+1;
+    int ncol_y = sp_y[1];
+    const int* colind_y = sp_y+2;
     int k;
-    for(k=0; k<nrow_y; ++k) tmp[k] = rowind_y[k];
+    for(k=0; k<ncol_y; ++k) tmp[k] = colind_y[k];
     for(k=0; k<nnz_x; ++k){
-      y[tmp[col_x[k]]++] = x[k];
+      y[tmp[row_x[k]]++] = x[k];
     }
   }
   

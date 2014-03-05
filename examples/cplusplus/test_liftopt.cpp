@@ -34,17 +34,17 @@ int main(){
   const double stepSize = 3.0 / timeSteps;
 
   // Declare some scalar variables
-  SX t("t"), u("u");
+  SX t = ssym("t"), u = ssym("u");
 
   // Formulate the integrator
-  vector<SXMatrix> F_in(2);
+  vector<SX> F_in(2);
   F_in[0] = t;
   F_in[1] = u;
   SXFunction F(F_in, t + stepSize*(t*(t+1) + u));
   F.init();
   
   // Free variable
-  MX U("U",timeSteps);
+  MX U = msym("U",timeSteps);
 
   // Build up a graph of calls to the function F - this graph will be lifted!
   MX trajectoryVal = 0.08;

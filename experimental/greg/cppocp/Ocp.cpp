@@ -20,7 +20,7 @@ Ocp::~Ocp()
      }
 }
 
-void Ocp::addNonlconIneq( SXMatrix gNew, string name)
+void Ocp::addNonlconIneq( SX gNew, string name)
 {
      if (gNew.size2() != 1){
           cerr << "gNew.size2() != 1" << endl;
@@ -37,12 +37,12 @@ void Ocp::addNonlconIneq( SXMatrix gNew, string name)
           //    -numeric_limits<double>::infinity()
      }
 }
-void Ocp::addNonlconIneq( SXMatrix gNew )
+void Ocp::addNonlconIneq( SX gNew )
 {
      addNonlconIneq(gNew, "");
 }
 
-void Ocp::addNonlconEq( SXMatrix gNew, string name)
+void Ocp::addNonlconEq( SX gNew, string name)
 {
      if (gNew.size2() != 1){
           cerr << "gNew.size2() != 1" << endl;
@@ -58,7 +58,7 @@ void Ocp::addNonlconEq( SXMatrix gNew, string name)
           gMax.push_back(0);
      }
 }
-void Ocp::addNonlconEq( SXMatrix gNew )
+void Ocp::addNonlconEq( SX gNew )
 {
      addNonlconEq(gNew, "");
 }
@@ -143,7 +143,7 @@ SX & Ocp::addParam(string _newParam)
 
      int idx = designVariables.size1();
 
-     SXMatrix newDv = ssym(_newParam, 1);
+     SX newDv = ssym(_newParam, 1);
 //      designVariables = vertcat( designVariables, ssym(_newParam, 1) );
      if (designVariables.size1() == 0)
           designVariables = newDv;

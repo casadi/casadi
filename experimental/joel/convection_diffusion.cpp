@@ -37,7 +37,7 @@ using namespace std;
 // Symbolc representation of the optimal control problem
 struct SymbolicOCP{
   // State variables
-  SXMatrix x;
+  SX x;
   
   // Bounds on the state
   vector<double> x_lb, x_ub;
@@ -46,7 +46,7 @@ struct SymbolicOCP{
   vector<double> x_init;
 
   // Controls
-  SXMatrix u;
+  SX u;
   
   // Parameters
   vector<SX> p;
@@ -90,7 +90,7 @@ void model(SymbolicOCP &ocp){
   int n = 30;
   
   // Temperatures
-  SXMatrix T = ssym("T",n);
+  SX T = ssym("T",n);
   
   ocp.x = T;
   
@@ -111,21 +111,21 @@ void model(SymbolicOCP &ocp){
   SX dz2 = dz*dz;
   
   // Approximation of dT_dz for positive v
-  SXMatrix dT_dz_pos(n,1);
+  SX dT_dz_pos(n,1);
   dT_dz_pos[0] = (2-T[0])/dz;
   for(int i=1; i<n; ++i){
     dT_dz_pos[i] = (T[i-1]-T[i])/dz;
   }
   
   // Approximation of dT_dz for negative v
-  SXMatrix dT_dz_neg(n,1);
+  SX dT_dz_neg(n,1);
   for(int i=0; i<n-1; ++i){
     dT_dz_neg[i] = (T[i]-T[i+1])/dz;
   }
   dT_dz_neg[n-1] = (T[n-1]-0.2)/dz;
   
   // Approximation of d2T_dz2
-  SXMatrix d2T_dz2(n,1);
+  SX d2T_dz2(n,1);
   d2T_dz2[0] = (T[1]-T[0])/dz2;
   for(int i=1; i<n-1; ++i){
     d2T_dz2[i] = (T[i-1]-2*T[i]+T[i+1])/dz2;
@@ -133,10 +133,10 @@ void model(SymbolicOCP &ocp){
   d2T_dz2[n-1] = (T[n-2]-T[n-1])/dz2;
   
   // Convection-diffusion equation
-  SXMatrix Tdot = v*if_else(v>=0, dT_dz_pos, dT_dz_neg) + D*d2T_dz2;
+  SX Tdot = v*if_else(v>=0, dT_dz_pos, dT_dz_neg) + D*d2T_dz2;
     
   // Right hand side of the ODE
-  vector<SXMatrix> y(3);
+  vector<SX> y(3);
   y[0] = t;
   y[1] = T;
 //  y[2] = D;
@@ -244,15 +244,15 @@ int main(){
   }
   
   // Collocated states
-  vector< vector< SXMatrix > > X;
+  vector< vector< SX > > X;
   collocate(ocp.x,X,N,K);
   
   // Collocated control (piecewice constant)
-  vector< SXMatrix > U;  
+  vector< SX > U;  
   collocate(ocp.u,U,N);
 
   // State at end time
-  SXMatrix XF;
+  SX XF;
 
   // 
   bool periodic = true;
@@ -309,18 +309,18 @@ int main(){
   }
   
   // Constraint function for the NLP
-  SXMatrix g;
+  SX g;
   vector<double> lbg,ubg;
   for(int i=0; i<N; ++i){
     for(int k=1; k<=K; ++k){
       // augmented state vector
-      vector<SXMatrix> y_ik(3);
+      vector<SX> y_ik(3);
       y_ik[0] = T[i][k];
       y_ik[1] = X[i][k];
 //       y_ik[2] = U[i];
 
       // Add collocation equations to NLP
-      SXMatrix rhs(ocp.x.numel(),1);
+      SX rhs(ocp.x.numel(),1);
       for(int j=0; j<=K; ++j)
         rhs += X[i][j]*C[j][k];
       g << h*ocp.ffcn.eval(y_ik)[0] - rhs;
@@ -335,7 +335,7 @@ int main(){
     }
 
    // Add continuity equation to NLP
-   SXMatrix rhs(ocp.x.numel(),1);
+   SX rhs(ocp.x.numel(),1);
    for(int j=0; j<=K; ++j)
      rhs += D[j]*X[i][j];
 
@@ -347,27 +347,27 @@ int main(){
    ubg.insert(ubg.end(),ocp.x.numel(),0); // equality constraints
   }
   
-  SXMatrix v = vars;
+  SX v = vars;
   SXFunction gfcn_nlp(v,g);
   
   // Objective function of the NLP
-  vector<SXMatrix> y_f(3);
+  vector<SX> y_f(3);
   y_f[0] = T.back().back();
   y_f[1] = XF;
 /*  y_f[2] = U.back();*/
-  SXMatrix f = ocp.mfcn.eval(y_f)[0];
+  SX f = ocp.mfcn.eval(y_f)[0];
   SXFunction ffcn_nlp(v, f);
 
 #if 0
   // Hessian of the Lagrangian:
   // Lagrange multipliers
-  SXMatrix lambda("lambda",g.size());
+  SX lambda("lambda",g.size());
 
   // Objective function scaling
-  SXMatrix sigma("sigma");
+  SX sigma("sigma");
 
   // Lagrangian function
-  vector<SXMatrix> lfcn_input(3);
+  vector<SX> lfcn_input(3);
   lfcn_input[0] = v;
   lfcn_input[1] = lambda;
   lfcn_input[2] = sigma;

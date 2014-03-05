@@ -98,7 +98,7 @@ class SymbolicOCP : public PrintableObject{
     */
     //@{
     /** \brief Time */
-    SXMatrix t;
+    SX t;
     
     /** \brief Differential states */
     std::vector<Variable> x;
@@ -146,19 +146,19 @@ class SymbolicOCP : public PrintableObject{
     //@{
       
     /// Explicit or implicit ODE
-    SXMatrix ode;
+    SX ode;
     
     /// Algebraic equations
-    SXMatrix alg;
+    SX alg;
     
     /// Quadrature equations
-    SXMatrix quad;
+    SX quad;
     
     /// Dependent equations
-    SXMatrix dep;
+    SX dep;
     
     /// Initial equations (remove?)
-    SXMatrix initial;
+    SX initial;
     //@}
     
     /** @name Time points
@@ -194,10 +194,10 @@ class SymbolicOCP : public PrintableObject{
     //@{
       
     /// Mayer terms in the objective (point terms)
-    SXMatrix mterm;
+    SX mterm;
     
     /// Lagrange terms in the objective (integral terms)
-    SXMatrix lterm;
+    SX lterm;
     //@}
 
     /** @name Path constraints of the optimal control problem
@@ -205,7 +205,7 @@ class SymbolicOCP : public PrintableObject{
     //@{
 
     /// Path constraint functions
-    SXMatrix path;
+    SX path;
     
     /// Path constraint functions bounds
     DMatrix path_min, path_max;
@@ -216,7 +216,7 @@ class SymbolicOCP : public PrintableObject{
     //@{
 
     /// Point constraint functions
-    SXMatrix point;
+    SX point;
     
     /// Path constraint functions bounds
     DMatrix point_min, point_max;
@@ -269,7 +269,7 @@ class SymbolicOCP : public PrintableObject{
     void eliminateAlgebraic();
     
     /// Substitute the dependents from a set of expressions
-    std::vector<SXMatrix> substituteDependents(const std::vector<SXMatrix>& x) const;
+    std::vector<SX> substituteDependents(const std::vector<SX>& x) const;
     
     /// Generate a MUSCOD-II compatible DAT file
     void generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops=Dictionary()) const;
@@ -283,7 +283,7 @@ class SymbolicOCP : public PrintableObject{
     std::map<std::string,Variable> varmap_;
 
     /// Read an equation
-    SX readExpr(const XMLNode& odenode, bool& has_der, bool elim_binding);
+    SXElement readExpr(const XMLNode& odenode, bool& has_der, bool elim_binding);
 
     /// Read a variable
     Variable& readVariable(const XMLNode& node);

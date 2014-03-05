@@ -81,22 +81,22 @@ namespace CasADi{
     virtual ~Variable();
     
     /// Get the variable expression
-    SX var() const;
+    SXElement var() const;
     
     /// Get differential expression
-    SX der() const;
+    SXElement der() const;
     
     /// Get the binding expression for the variable or its derivative
-    SX binding(bool derivative=false) const;
+    SXElement binding(bool derivative=false) const;
     
     /// Get the highest order derivative (i.e. der() or var())
-    SX highest() const;
+    SXElement highest() const;
     
     /// Timed variable (never allocate)
-    SX atTime(double t, bool allocate=false) const;
+    SXElement atTime(double t, bool allocate=false) const;
 
     /// Timed variable (allocate if necessary)
-    SX atTime(double t, bool allocate=false);
+    SXElement atTime(double t, bool allocate=false);
     
     /// Get the variable index
     int index() const;
@@ -222,13 +222,13 @@ namespace CasADi{
     std::string& displayUnit();
     
     /// Set the expression
-    void setExpression(const SX& v);
+    void setExpression(const SXElement& v);
 
     /// Set the derivative expression
-    void setDerivative(const SX& d);
+    void setDerivative(const SXElement& d);
                 
     /// Set the binding expression for the variable or its derivative
-    void setBinding(const SX& binding, bool derivative=false);
+    void setBinding(const SXElement& binding, bool derivative=false);
                 
     /// Set the variable index
     void setIndex(int ind);

@@ -43,13 +43,13 @@ class SymbolicNLP : public PrintableObject{
     //@{
       
       /// Variables
-      SXMatrix x;
+      SX x;
     
       /// Objective functions
-      SXMatrix f;
+      SX f;
     
       /// Constraint functions
-      SXMatrix g;
+      SX g;
       
       /// Bounds on x
       DMatrix x_lb, x_ub;
@@ -78,7 +78,7 @@ class SymbolicNLP : public PrintableObject{
   protected:
     
     /// Read an expression from an NL-file (Polish infix format)
-    static SX readExpressionNL(std::istream &stream, const std::vector<SX>& v);
+    static SXElement readExpressionNL(std::istream &stream, const std::vector<SXElement>& v);
 
 #endif // SWIG 
 

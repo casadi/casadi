@@ -20,8 +20,8 @@ void printBinary(bvec_t v){
 
 int main(){
   // DAE
-  SXMatrix x = ssym("x",3);
-  SXMatrix ode = SXMatrix::zeros(3);
+  SX x = ssym("x",3);
+  SX ode = SX::zeros(3);
   ode[0] = x[0];
   ode[1] = x[0]+x[1];
   ode[2] = x[0]+x[1]+x[2];

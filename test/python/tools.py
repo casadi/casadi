@@ -39,7 +39,7 @@ class Toolstests(casadiTestCase):
 
       p.freeze()
       
-      self.assertTrue(isinstance(p[...],SXMatrix))
+      self.assertTrue(isinstance(p[...],SX))
       self.assertEqual(p.size,16)
       self.assertEqual(p[...].shape[0],16)
       self.assertEqual(p[...].shape[1],1)
@@ -62,7 +62,7 @@ class Toolstests(casadiTestCase):
       p.setOrder(["x","y","z"])
       p.freeze()
       
-      self.assertTrue(isinstance(p[...],SXMatrix))
+      self.assertTrue(isinstance(p[...],SX))
       self.assertEqual(p.size,9)
 
       if CasadiOptions.getSimplificationOnTheFly():
@@ -98,7 +98,7 @@ class Toolstests(casadiTestCase):
       p.setOrder(["x",("y","z")])
       p.freeze()
       
-      self.assertTrue(isinstance(p[...],SXMatrix))
+      self.assertTrue(isinstance(p[...],SX))
       self.assertEqual(p.size,9)
 
       if CasadiOptions.getSimplificationOnTheFly():
@@ -160,7 +160,7 @@ class Toolstests(casadiTestCase):
       p.y = ssym("y",3,2)
 
       xother = Variables()
-      xother.a = SX("x")
+      xother.a = SXElement.sym("x")
       xother.b = diag(ssym("[a,b]"))
       xother.freeze()
       
@@ -213,7 +213,7 @@ class Toolstests(casadiTestCase):
       
       for k in range(p.getSize()):
         roundtrip = p.lookup(p.reverselookup(k))
-        if not(isinstance(roundtrip,SX)):
+        if not(isinstance(roundtrip,SXElement)):
           roundtrip = roundtrip.toScalar()
         self.assertTrue(roundtrip.isEqual(p.vecNZcat()[k].toScalar()))
       
@@ -277,7 +277,7 @@ class Toolstests(casadiTestCase):
             
       for k in range(p.getSize()):
         roundtrip = p.lookup(p.reverselookup(k))
-        if not(isinstance(roundtrip,SX)):
+        if not(isinstance(roundtrip,SXElement)):
           roundtrip = roundtrip.toScalar()
         self.assertTrue(roundtrip.isEqual(p.vecNZcat()[k].toScalar()))
         
@@ -380,7 +380,7 @@ class Toolstests(casadiTestCase):
 
       for k in range(p.getSize()):
         roundtrip = p.lookup(p.reverselookup(k))
-        if not(isinstance(roundtrip,SX)):
+        if not(isinstance(roundtrip,SXElement)):
           roundtrip = roundtrip.toScalar()
         self.assertTrue(roundtrip.isEqual(p.vecNZcat()[k].toScalar()))
         
@@ -403,7 +403,7 @@ class Toolstests(casadiTestCase):
       p.y = ssym("y",3,2)
 
       xother = Variables()
-      xother.a = SX("x")
+      xother.a = SXElement.sym("x")
       xother.b = diag(ssym("[a,b]"))
       xother.freeze()
       
@@ -495,12 +495,12 @@ class Toolstests(casadiTestCase):
     self.assertEqual(len(s["x"]),5)
     self.assertEqual(len(s["y"]),6)
     self.assertTrue(s.cat.at(1).getName().startswith("y"))
-    s = struct_ssym([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=sp_dense(3)),entry("w",shape=sp_tril(5))])
+    s = struct_ssym([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=sp_dense(3)),entry("w",shape=sp_triu(5))])
     self.assertEqual(s.size,6+2+3+15)
     self.assertTrue(s["x"].sparsity()==sp_dense(3,2))
     self.assertTrue(s["y"].sparsity()==sp_dense(2,1))
     self.assertTrue(s["z"].sparsity()==sp_dense(3,1))
-    self.assertTrue(s["w"].sparsity()==sp_tril(5))
+    self.assertTrue(s["w"].sparsity()==sp_triu(5))
     
     x  = ssym("x",2)
     x2 = ssym("x2",2)
@@ -626,12 +626,12 @@ class Toolstests(casadiTestCase):
     self.assertEqual(len(s["y"]),6)
    
     
-    s = struct_msym([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=sp_dense(3)),entry("w",shape=sp_tril(5))])
+    s = struct_msym([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=sp_dense(3)),entry("w",shape=sp_triu(5))])
     self.assertEqual(s.size,6+2+3+15)
     self.assertTrue(s["x"].sparsity()==sp_dense(3,2))
     self.assertTrue(s["y"].sparsity()==sp_dense(2,1))
     self.assertTrue(s["z"].sparsity()==sp_dense(3,1))
-    self.assertTrue(s["w"].sparsity()==sp_tril(5))
+    self.assertTrue(s["w"].sparsity()==sp_triu(5))
     
     x  = msym("x",2)
     x2 = msym("x2",2)
@@ -673,20 +673,35 @@ class Toolstests(casadiTestCase):
       )
     ])
     self.assertEqual(V.size,14)
-    
+
     self.assertTrue(isinstance(V.cat,MX)) 
-    if CasadiOptions.getSimplificationOnTheFly():   
-      self.assertTrue(isEqual(V["x"],x))
-      self.assertTrue(isEqual(V["y",0],y0))
-      self.assertTrue(isEqual(V["y",1],y1))
+    def isEqualV(a,b):
+      ft = MXFunction([x,m],[a-b])
+      ft.init()
+      for i in range(ft.getNumInputs()):
+        ft.setInput(numpy.random.rand(*ft.input(i).shape),i)
+      ft.evaluate()
+      self.checkarray(ft.output(),DMatrix.zeros(*ft.output().shape))
+    
+    isEqualV(V["x"],x)
+    isEqualV(V["y",0],y0)
+    isEqualV(V["y",1],y1)
     self.assertEqual(V["y",0,'a'].shape,(1,1))
     
     with self.assertRaises(Exception):
       V["y",0] = msym("x",4) # shape mismatch
     abc = msym("abc",2)
     V["y",0] = abc
-    if CasadiOptions.getSimplificationOnTheFly():
-      self.assertTrue(isEqual(V["y",0],abc))
+    
+    def isEqualV(a,b):
+      ft = MXFunction([x,m,abc],[a-b])
+      ft.init()
+      for i in range(ft.getNumInputs()):
+        ft.setInput(numpy.random.rand(*ft.input(i).shape),i)
+      ft.evaluate()
+      self.checkarray(ft.output(),DMatrix.zeros(*ft.output().shape))
+      
+    isEqualV(V["y",0],abc)
 
     states = struct_ssym([
                 entry('x'),
@@ -853,11 +868,22 @@ class Toolstests(casadiTestCase):
     a["x","y"] = 2
     a["y","x"] = 1
     
+    self.checkarray(a["x","y"],DMatrix([2]))
+    self.checkarray(a["y","x"],DMatrix([1]))
+    
     self.checkarray(d,DMatrix([[0,2,0],[1,0,0],[0,0,0]]))
 
   def test_structure_squared_repeated_dmatrix(self):
     self.message("squared repeated dmatrix")
     s = struct(["x","y","z"])
+    
+    d = DMatrix([[0,2,0],[1,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,2,0],[1,0,0],[0,0,0]])
+    a = s.squared_repeated(d)
+    self.checkarray(a[0,"x","y"],DMatrix([2]))
+    self.checkarray(a[0,"y","x"],DMatrix([1]))
+    self.checkarray(a[-1,"x","y"],DMatrix([2]))
+    self.checkarray(a[-1,"y","x"],DMatrix([1]))
+    
     d = DMatrix.zeros(9,3)
     a = s.squared_repeated(d)
     
@@ -866,13 +892,14 @@ class Toolstests(casadiTestCase):
     a[-1,"x","y"] = 2
     a[-1,"y","x"] = 1
     self.checkarray(d,DMatrix([[0,2,0],[1,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,2,0],[1,0,0],[0,0,0]]))
-    
+
   def test_typemaps(self):
     self.message("typemaps")
     s = struct(["x","y","z"])
     d = DMatrix.zeros(3,3)
     a = s.squared(d)
     
+    print type(a)
     print sin(a)
     print a+1
     
@@ -887,7 +914,7 @@ class Toolstests(casadiTestCase):
     a = struct_ssym([entry("P",shape=(3,3),type='symm')])
     
     b = a()
-    b["P"] = DMatrix([[0,1,2],[3,4,5],[6,7,8]])
+    b["P"] = DMatrix([[0,3,6],[1,4,7],[2,5,8]])
     
     self.assertEqual(a.size,6)
     self.checkarray(a["P"].shape,(3,3))
@@ -906,7 +933,7 @@ class Toolstests(casadiTestCase):
     a = struct_ssym([entry("P",shapestruct=(states,states),type='symm')])
 
     b = a()
-    b["P"] = DMatrix([[0,1,2],[3,4,5],[6,7,8]])
+    b["P"] = DMatrix([[0,3,6],[1,4,7],[2,5,8]])
 
     self.checkarray(b["P",["x","z"],["x","z"]] ,DMatrix([[0,6],[6,8]]))
 
@@ -953,10 +980,10 @@ class Toolstests(casadiTestCase):
     a = struct_ssym([entry("a",shape=(5,3)),entry("b",shape=(4,3))])
     b = a()
     
-    b["a",flatten] = range(15)
+    b["a",vec] = range(15)
     self.checkarray(b.cat,DMatrix(range(15)+[0]*12))
     
-    self.checkarray(b["a",flatten],DMatrix(range(15)))
+    self.checkarray(b["a",vec],DMatrix(range(15)))
     
     b["a",vec] = range(15)
 
@@ -1077,24 +1104,24 @@ class Toolstests(casadiTestCase):
     n = 3
     x_sx = struct_ssym([
         entry("x",shape=n),
-        entry("S",shape=sp_tril(n))
+        entry("S",shape=sp_triu(n))
     ])
     
     x_mx = struct_ssym([
         entry("x",shape=n),
-        entry("S",shape=sp_tril(n))
+        entry("S",shape=sp_triu(n))
     ])
     
     X_sx = struct_SX(x_sx)
     X_sx["x"] = DMatrix(range(n))
-    X_sx["S"] = DMatrix(sp_tril(n),range(n,n+n*(n+1)/2))
+    X_sx["S"] = DMatrix(sp_triu(n),range(n,n+n*(n+1)/2))
    
     X_mx = struct_MX(x_sx)
     X_mx["x"] = DMatrix(range(n))
-    X_mx["S"] = DMatrix(sp_tril(n),range(n,n+n*(n+1)/2))
+    X_mx["S"] = DMatrix(sp_triu(n),range(n,n+n*(n+1)/2))
     
-    self.checkarray(x_sx.struct.map[("S",)],DMatrix(sp_tril(n),range(n,n+n*(n+1)/2)))
-    self.checkarray(x_mx.struct.map[("S",)],DMatrix(sp_tril(n),range(n,n+n*(n+1)/2)))
+    self.checkarray(x_sx.struct.map[("S",)],DMatrix(sp_triu(n),range(n,n+n*(n+1)/2)))
+    self.checkarray(x_mx.struct.map[("S",)],DMatrix(sp_triu(n),range(n,n+n*(n+1)/2)))
     self.checkarray(X_sx.cat,DMatrix(range(n+n*(n+1)/2)))
     self.checkarray(X_mx.cat,DMatrix(range(n+n*(n+1)/2)))
     

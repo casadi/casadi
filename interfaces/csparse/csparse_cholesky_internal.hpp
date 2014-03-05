@@ -38,7 +38,7 @@ namespace CasADi{
   class CSparseCholeskyInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseCholeskyInternal(const CRSSparsity& sp, int nrhs);
+    CSparseCholeskyInternal(const Sparsity& sp, int nrhs);
 
     // Copy constructor
     CSparseCholeskyInternal(const CSparseCholeskyInternal& linsol);
@@ -59,7 +59,7 @@ namespace CasADi{
     void solveL(double* x, int nrhs, bool transpose);
     
     /// Obtain a symbolic Cholesky factorization
-    CRSSparsity getFactorizationSparsity(bool transpose=false) const;
+    Sparsity getFactorizationSparsity(bool transpose=false) const;
     
     /// Obtain a numeric Cholesky factorization
     DMatrix getFactorization(bool transpose=false) const;

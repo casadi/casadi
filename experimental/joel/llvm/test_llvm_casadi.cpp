@@ -6,18 +6,18 @@ using namespace std;
 int main(){
   
   // Construct a simple function
-  SXMatrix x1 = ssym("x1");
-  SXMatrix x2 = ssym("x2");
-  SXMatrix r1 = sin(x2);
-  SXMatrix r2 = x1+5;
+  SX x1 = ssym("x1");
+  SX x2 = ssym("x2");
+  SX r1 = sin(x2);
+  SX r2 = x1+5;
   
   // Input arguments
-  vector<SXMatrix> F_in(2);
+  vector<SX> F_in(2);
   F_in[0] = x1;
   F_in[1] = x2;
   
   // Output arguments
-  vector<SXMatrix> F_out(2);
+  vector<SX> F_out(2);
   F_out[0] = r1;
   F_out[1] = r2;
   

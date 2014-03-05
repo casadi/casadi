@@ -42,7 +42,7 @@ namespace CasADi{
     SymbolicQR();
   
     /// Create a linear solver given a sparsity pattern
-    explicit SymbolicQR(const CRSSparsity& sp, int nrhs=1);
+    explicit SymbolicQR(const Sparsity& sp, int nrhs=1);
 
     /// Access functions of the node
     SymbolicQRInternal* operator->();
@@ -57,7 +57,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const CRSSparsity& sp){ return SymbolicQR(sp);}
+    static LinearSolver creator(const Sparsity& sp){ return SymbolicQR(sp);}
 #ifdef SWIG
     %nocallback;
 #endif

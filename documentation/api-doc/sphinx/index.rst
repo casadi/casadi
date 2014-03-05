@@ -42,7 +42,7 @@ SX
    :inherited-members:
    :show-inheritance:
    
-.. autoclass:: SXMatrix
+.. autoclass:: SX
    :members:
    :undoc-members:
    :inherited-members:

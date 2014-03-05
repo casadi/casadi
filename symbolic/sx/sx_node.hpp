@@ -29,7 +29,7 @@
 #include <math.h>
 
 /** \brief  Scalar expression (which also works as a smart pointer class to this class) */
-#include "sx.hpp"
+#include "sx_element.hpp"
 
 namespace CasADi{
 
@@ -38,7 +38,7 @@ namespace CasADi{
   \date 2010
 */
 class SXNode{
-friend class SX;
+friend class SXElement;
 
 public:
 
@@ -81,10 +81,10 @@ virtual bool isEqual(const SXNode* node, int depth) const;
 virtual int ndep() const{ return 0;}
 
 /** \brief  get the reference of a child */
-virtual const SX& dep(int i) const;
+virtual const SXElement& dep(int i) const;
 
 /** \brief  get the reference of a child */
-virtual SX& dep(int i);
+virtual SXElement& dep(int i);
 
 /** \brief  Initialize the node (currently used only to give a similar interface to MXNode) */
 void init(){}

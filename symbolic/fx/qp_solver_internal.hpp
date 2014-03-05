@@ -28,12 +28,12 @@
 
 namespace CasADi{
 
-/// Internal class
-class QPSolverInternal : public FXInternal{
+  /// Internal class
+  class QPSolverInternal : public FXInternal{
   public:
 
     // Constructor
-    QPSolverInternal(const std::vector<CRSSparsity> &st);
+    QPSolverInternal(const std::vector<Sparsity> &st);
     
     // Destructor
     virtual ~QPSolverInternal() = 0;
@@ -59,14 +59,14 @@ class QPSolverInternal : public FXInternal{
   protected:
 
     /// Problem structure
-    std::vector<CRSSparsity> st_;
+    std::vector<Sparsity> st_;
     
     /// Number of decision variables
     int n_;
     
     /// The number of constraints (counting both equality and inequality) == A.size1()
     int nc_; 
-};
+  };
 
 
 } // namespace CasADi

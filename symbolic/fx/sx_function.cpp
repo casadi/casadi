@@ -40,54 +40,54 @@ using namespace std;
 SXFunction::SXFunction(){
 }
 
-SXFunction::SXFunction(const SXMatrix& arg, const SXMatrix& res){
-  assignNode(new SXFunctionInternal(vector<SXMatrix>(1,arg),
-                                    vector<SXMatrix>(1,res)));
+SXFunction::SXFunction(const SX& arg, const SX& res){
+  assignNode(new SXFunctionInternal(vector<SX>(1,arg),
+                                    vector<SX>(1,res)));
 }
 
-SXFunction::SXFunction(const vector< vector<SX> >& arg, const vector< vector<SX> >& res){
-  assignNode(new SXFunctionInternal(vector<SXMatrix>(arg.begin(),arg.end()),
-                                    vector<SXMatrix>(res.begin(),res.end())));
+SXFunction::SXFunction(const vector< vector<SXElement> >& arg, const vector< vector<SXElement> >& res){
+  assignNode(new SXFunctionInternal(vector<SX>(arg.begin(),arg.end()),
+                                    vector<SX>(res.begin(),res.end())));
 }
 
-SXFunction::SXFunction(const vector< SXMatrix>& arg, const vector<SXMatrix>& res){
+SXFunction::SXFunction(const vector< SX>& arg, const vector<SX>& res){
   assignNode(new SXFunctionInternal(arg,res));
 }
 
-SXFunction::SXFunction(const vector< SXMatrix>& arg, const IOSchemeVector< SXMatrix >& res){
+SXFunction::SXFunction(const vector< SX>& arg, const IOSchemeVector< SX >& res){
   assignNode(new SXFunctionInternal(arg,res));
   setOutputScheme(res.scheme);
 }
 
-SXFunction::SXFunction(const IOSchemeVector< SXMatrix >& arg, const vector< SXMatrix>& res){
+SXFunction::SXFunction(const IOSchemeVector< SX >& arg, const vector< SX>& res){
   assignNode(new SXFunctionInternal(arg,res));
   setInputScheme(arg.scheme);
 }
 
-SXFunction::SXFunction(const IOSchemeVector< SXMatrix >& arg, const IOSchemeVector< SXMatrix >& res){
+SXFunction::SXFunction(const IOSchemeVector< SX >& arg, const IOSchemeVector< SX >& res){
   assignNode(new SXFunctionInternal(arg,res));
   setInputScheme(arg.scheme);
   setOutputScheme(res.scheme);
 }
 
-SXFunction::SXFunction(const vector< vector<SX> >& arg, const SXMatrix& res){
-  assignNode(new SXFunctionInternal(vector<SXMatrix>(arg.begin(),arg.end()),
-                                    vector<SXMatrix>(1,res)));
+SXFunction::SXFunction(const vector< vector<SXElement> >& arg, const SX& res){
+  assignNode(new SXFunctionInternal(vector<SX>(arg.begin(),arg.end()),
+                                    vector<SX>(1,res)));
 }
 
-SXFunction::SXFunction(const vector< SXMatrix>& arg, const SXMatrix& res){
+SXFunction::SXFunction(const vector< SX>& arg, const SX& res){
   assignNode(new SXFunctionInternal(arg,
-                                    vector<SXMatrix>(1,res)));
+                                    vector<SX>(1,res)));
 }
 
-SXFunction::SXFunction(const SXMatrix& arg, const std::vector< std::vector<SX> >& res){
-  assignNode(new SXFunctionInternal(vector<SXMatrix>(1,arg),
-                                    vector<SXMatrix>(res.begin(),res.end())));
+SXFunction::SXFunction(const SX& arg, const std::vector< std::vector<SXElement> >& res){
+  assignNode(new SXFunctionInternal(vector<SX>(1,arg),
+                                    vector<SX>(res.begin(),res.end())));
   
 }
 
-SXFunction::SXFunction(const SXMatrix& arg, const std::vector< SXMatrix>& res){
-  assignNode(new SXFunctionInternal(vector<SXMatrix>(1,arg),
+SXFunction::SXFunction(const SX& arg, const std::vector< SX>& res){
+  assignNode(new SXFunctionInternal(vector<SX>(1,arg),
                                     res));
 }
 
@@ -104,35 +104,35 @@ bool SXFunction::checkNode() const{
   return dynamic_cast<const SXFunctionInternal*>(get())!=0;
 }
 
-SXMatrix SXFunction::jac(int iind, int oind, bool compact, bool symmetric){
+SX SXFunction::jac(int iind, int oind, bool compact, bool symmetric){
   return (*this)->jac(iind,oind,compact,symmetric);
 }
 
-SXMatrix SXFunction::grad(int iind, int oind){
+SX SXFunction::grad(int iind, int oind){
   return (*this)->grad(iind,oind);
 }
 
-SXMatrix SXFunction::tang(int iind, int oind){
+SX SXFunction::tang(int iind, int oind){
   return (*this)->tang(iind,oind);
 }
 
-SXMatrix SXFunction::hess(int iind, int oind){
+SX SXFunction::hess(int iind, int oind){
   return (*this)->hess(iind,oind);
 }
 
-const SXMatrix& SXFunction::inputExpr(int ind) const{
+const SX& SXFunction::inputExpr(int ind) const{
   return (*this)->inputv_.at(ind);
 }
 
-const SXMatrix& SXFunction::outputExpr(int ind) const{
+const SX& SXFunction::outputExpr(int ind) const{
   return (*this)->outputv_.at(ind);
 }
   
-const std::vector<SXMatrix>& SXFunction::inputExpr() const{
+const std::vector<SX>& SXFunction::inputExpr() const{
   return (*this)->inputv_;
 }
   
-const std::vector<SXMatrix> & SXFunction::outputExpr() const{
+const std::vector<SX> & SXFunction::outputExpr() const{
   return (*this)->outputv_;
 }
 
@@ -181,7 +181,7 @@ SXFunction SXFunction::operator[](int k) const {
   return ret;
 }
 
-std::vector<SX> SXFunction::getFree() const{
+std::vector<SXElement> SXFunction::getFree() const{
   return (*this)->free_vars_;
 }
 

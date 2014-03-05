@@ -22,9 +22,9 @@
 %! Load casadi
 casadi
 
-x = SX("x"); % A scalar symbolic
-y = ssym("y",2,1); % A matrix symbolic
-
+x = ssym("x");     % A scalar (1-by-1 matrix) symbolic primitive
+y = ssym("y",2);   % A vector (n-by-1 matrix) symbolic primitive
+z = ssym("z",2,3); % An n-by-m matrix symbolic primitive
 
 in = {x y}; % function inputs
 disp('Function outputs are:')
@@ -38,7 +38,7 @@ number_in = f.getNumInputs()
 number_out = f.getNumOutputs()
 
 %! The outputs has the following string representation.
-%! Note how all elements of out have been converted to SXMatrix by
+%! Note how all elements of out have been converted to SX by
 %! automatic typecasting functionality
 
 for i = 0:3

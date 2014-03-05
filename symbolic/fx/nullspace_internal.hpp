@@ -36,7 +36,7 @@ namespace CasADi{
   public:
   
     /** \brief  Constructor */
-    NullspaceInternal(const CRSSparsity & A_sp);
+    NullspaceInternal(const Sparsity & A_sp);
   
     /** \brief  Destructor */
     virtual ~NullspaceInternal();
@@ -56,7 +56,7 @@ namespace CasADi{
     bool dense_;
     
     /// Storage for input structure
-    CRSSparsity A_sp_;
+    Sparsity A_sp_;
 
     /// number of rows
     int m_;

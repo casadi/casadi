@@ -37,8 +37,8 @@ ny = 4
 
 mu = 1.0
 
-b = SXMatrix.nan(ny+1,nx+1)
-c = SXMatrix.nan(ny+1,nx+1)
+b = SX.nan(ny+1,nx+1)
+c = SX.nan(ny+1,nx+1)
 for i in range(1,ny+1): 
   for j in range(1,nx+1): 
     b[i,j] = float(i-j)/(nx+ny)

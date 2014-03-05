@@ -48,7 +48,7 @@ namespace CasADi{
      *  \param[in] A  List of sparsities of A_i 
      *  \param[in] V  List of sparsities of V_i 
      */
-    explicit PsdIndefDpleSolver(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V);
+    explicit PsdIndefDpleSolver(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V);
     
     /// Access functions of the node
     PsdIndefDpleInternal* operator->();
@@ -63,7 +63,7 @@ namespace CasADi{
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static DpleSolver creator(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V){ return PsdIndefDpleSolver(A,V);}
+    static DpleSolver creator(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V){ return PsdIndefDpleSolver(A,V);}
     #ifdef SWIG
     %nocallback;
     #endif
