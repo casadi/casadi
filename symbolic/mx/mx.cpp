@@ -963,5 +963,9 @@ namespace CasADi{
     return eq_depth_;
   }
 
+  template<>
+  MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp){ 
+    return MX::create(new SymbolicMX(name,sp));
+  }
           
 } // namespace CasADi

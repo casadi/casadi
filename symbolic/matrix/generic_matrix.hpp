@@ -150,17 +150,33 @@ namespace CasADi{
     SubMatrix<MatType,RR,CC> operator()(const RR& rr, const CC& cc){ return SubMatrix<MatType,RR,CC>(static_cast<MatType&>(*this),rr,cc); }
 #endif // SWIG
 
-    /** \brief Create an n-by-m matrix with symbolic variables */
-    static MatType sym(const std::string& name, int nrow=1, int ncol=1);
+    /** @name Construct symbolic primitives
+        The "sym" function is intended to work in a similar way as "sym" used in the Symbolic Toolbox for Matlab but instead creating a
+        CasADi symbolic primitive.
+    */
+    ///@{
 
-    /** \brief Create a vector of length p with with matrices with symbolic variables of given sparsity */
+    /** \brief Create an nrow-by-ncol symbolic primitive */
+    static MatType sym(const std::string& name, int nrow=1, int ncol=1){ return sym(name,sp_dense(nrow,ncol));}
+
+    /** \brief  Construct a symbolic primitive with given dimensions */
+    static MatType sym(const std::string& name, const std::pair<int,int> &rc){ return sym(name,rc.first,rc.second);}
+
+    /** \brief Create symbolic primitive with a given sparsity pattern */
+    static MatType sym(const std::string& name, const Sparsity& sp);
+
+    /** \brief Create a vector of length p with with matrices with symbolic primitives of given sparsity */
     static std::vector<MatType > sym(const std::string& name, const Sparsity& sp, int p);
 
-    /** \brief Create a vector of length p with nrow-by-ncol matrices with symbolic variables */
-    static std::vector<MatType > sym(const std::string& name, int nrow, int ncol, int p);
+    /** \brief Create a vector of length p with nrow-by-ncol symbolic primitives */
+    static std::vector<MatType > sym(const std::string& name, int nrow, int ncol, int p){ return sym(name,sp_dense(nrow,ncol),p);}
+    
+    /** \brief Create a vector of length r of vectors of length p with symbolic primitives with given sparsity*/
+    static std::vector<std::vector<MatType> > sym(const std::string& name, const Sparsity& sp, int p, int r);
 
-    /** \brief Create an matrix with symbolic variables, given a sparsity pattern */
-    static MatType sym(const std::string& name, const Sparsity& sp);
+    /** \brief Create a vector of length r of vectors of length p with nrow-by-ncol symbolic primitives */
+    static std::vector<std::vector<MatType> > sym(const std::string& name, int nrow, int ncol, int p, int r){ return sym(name,sp_dense(nrow,ncol),p,r);}
+    ///@}
     
     /** \brief Matrix-matrix multiplication.
      * Attempts to identify quick returns on matrix-level and 
@@ -310,9 +326,6 @@ namespace CasADi{
 #endif // SWIG
 
   template<typename MatType>
-  MatType GenericMatrix<MatType>::sym(const std::string& name, int nrow, int ncol){ return sym(name,sp_dense(nrow,ncol));}
-
-  template<typename MatType>
   std::vector<MatType> GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp, int p){
     std::vector<MatType> ret(p);
     std::stringstream ss;
@@ -325,10 +338,20 @@ namespace CasADi{
   }
 
   template<typename MatType>
-  std::vector<MatType > GenericMatrix<MatType>::sym(const std::string& name, int nrow, int ncol, int p){ return sym(name,sp_dense(nrow,ncol),p);}
+  std::vector<std::vector<MatType> > GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp, int p, int r){
+    std::vector<std::vector<MatType> > ret(r);
+    for(int k=0; k<r; ++k){
+      std::stringstream ss;
+      ss << name << "_" << k;
+      ret[k] = sym(ss.str(),sp,p);
+    }
+    return ret;
+  }
 
   template<typename MatType>
-  MatType GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp){ throw CasadiException("\"sym\" not defined for instantiation");}
+  MatType GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp){ 
+    throw CasadiException("\"sym\" not defined for instantiation");
+  }
 
 } // namespace CasADi
 

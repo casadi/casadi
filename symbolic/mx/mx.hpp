@@ -22,7 +22,6 @@
 
 #ifndef MX_HPP
 #define MX_HPP
-
 #include "../shared_object.hpp"
 #include "../matrix/matrix.hpp"
 #include "../matrix/generic_expression.hpp"
@@ -50,7 +49,6 @@ namespace CasADi{
       \date 2010-2011
   */
   class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public SharedObject{
-  
   public:
   
     /** \brief  Default constructor */
@@ -63,7 +61,7 @@ namespace CasADi{
     explicit MX(const std::string& name, const std::pair<int,int> &rc);
 
     /** \brief  Construct a symbolic matrix (matrix variable) */
-    explicit MX(const std::string& name, const Sparsity & sp);
+    explicit MX(const std::string& name, const Sparsity& sp);
 
     /** \brief  Construct MX with a given sparsity */
     explicit MX(const Sparsity& sp, const MX& val=0);
@@ -486,6 +484,10 @@ namespace CasADi{
   
 #endif // SWIG
   };
+
+  // Create symbolic primitive
+  template<>
+  MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp);
 
   //@{
   /// Some typedefs

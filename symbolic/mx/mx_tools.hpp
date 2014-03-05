@@ -398,9 +398,6 @@ namespace CasADi{
   void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, std::vector<MX>& INOUT, bool reverse=false);
 #endif // SWIG
 
-  template<> inline
-  MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp){ return msym(name,sp);}
-
   /** \brief Extract shared subexpressions from an set of expressions */
   void extractShared(std::vector<MX>& ex, 
                      std::vector<MX>& v, std::vector<MX>& vdef, 
