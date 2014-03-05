@@ -285,6 +285,11 @@ if(WITH_CPLEX)
 endif(WITH_CPLEX)
 add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX.")
 
+if(WITH_SNOPT)
+  find_package(SNOPT)
+endif(WITH_CPLEX)
+add_feature_info(snopt-interface SNOPT_FOUND "Interface to SNOPT.")
+
 # if(WITH_GSL)
 #   find_package (GSL)
 # endif()
