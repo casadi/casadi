@@ -69,8 +69,10 @@ namespace CasADi{
     */
     SXElement(double val);
     
+#ifndef WITHOUT_PRE_1_9_X
     /// [DEPRECATED] Replaced with SXElement::sym
     explicit SXElement(const std::string& name);
+#endif
 
     /** \brief Create a symbolic primitive
          \param name Name of the symbolic primitive

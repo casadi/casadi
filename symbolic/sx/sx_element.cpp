@@ -74,10 +74,12 @@ namespace CasADi{
     }
   }
 
+#ifndef WITHOUT_PRE_1_9_X
   SXElement::SXElement(const std::string& name){
     node = new SymbolicSX(name);  
     node->count++;
   }
+#endif
 
   SXElement SXElement::sym(const std::string& name){
     return create(new SymbolicSX(name));

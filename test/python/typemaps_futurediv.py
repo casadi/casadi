@@ -44,7 +44,7 @@ class typemaptests(casadiTestCase):
   
   def test_floordiv(self):
     self.message("make sure that floor_div raises errors")
-    for x in [SXElement("x"),MX("x"),DMatrix([3]),ssym("x")]:
+    for x in [SXElement.sym("x"),MX("x"),DMatrix([3]),ssym("x")]:
       for y in [2,2.0,DMatrix(3),numpy.matrix([2.0])]:
         print (x,y)
         self.assertRaises(Exception,lambda : x//y)
@@ -201,7 +201,7 @@ class typemaptests(casadiTestCase):
         
     ## numeric & SX
     for s in nums:
-      for z in [SXElement("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SXElement.sym("x"), ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
@@ -214,8 +214,8 @@ class typemaptests(casadiTestCase):
         tests(z,s)
         
     # SXElement & SX
-    for s in [SXElement("x"), ssym("x"), ssym("x",2,2)]:
-      for z in [SXElement("x"),ssym("x"), ssym("x",2,2)]:
+    for s in [SXElement.sym("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SXElement.sym("x"),ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)

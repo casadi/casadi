@@ -160,7 +160,7 @@ class Toolstests(casadiTestCase):
       p.y = ssym("y",3,2)
 
       xother = Variables()
-      xother.a = SXElement("x")
+      xother.a = SXElement.sym("x")
       xother.b = diag(ssym("[a,b]"))
       xother.freeze()
       
@@ -403,7 +403,7 @@ class Toolstests(casadiTestCase):
       p.y = ssym("y",3,2)
 
       xother = Variables()
-      xother.a = SXElement("x")
+      xother.a = SXElement.sym("x")
       xother.b = diag(ssym("[a,b]"))
       xother.freeze()
       

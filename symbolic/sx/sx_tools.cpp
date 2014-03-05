@@ -341,7 +341,7 @@ void makeSmooth(SX &ex, SX &bvar, SX &bexpr){
           // Get an approriate name of the switch
           std::stringstream name;
           name << "sw_" << bvar.size2();
-          sw = SXElement(name.str());
+          sw = SXElement::sym(name.str());
   
           // Add to list of switches
           bvar << sw;
@@ -666,17 +666,17 @@ SX ssym(const std::string& name, const Sparsity& sp){
       
       // Append to the return vector
       if(!iss.fail())
-        retv.push_back(SXElement(varname));
+        retv.push_back(SXElement::sym(varname));
     }
   } else if(sp.scalar(true)){
-    retv.push_back(SXElement(name));
+    retv.push_back(SXElement::sym(name));
   } else {
     // Scalar
     std::stringstream ss;
     for(int k=0; k<sp.size(); ++k){
       ss.str("");
       ss << name << "_" << k;
-      retv.push_back(SXElement(ss.str()));
+      retv.push_back(SXElement::sym(ss.str()));
     }
   }
 
@@ -1094,7 +1094,7 @@ void extractShared(std::vector<SXElement>& ex, std::vector<SXElement>& v, std::v
   for(int i=0; i<vdef.size(); ++i){
     v_name.str(string());
     v_name << v_prefix << i << v_suffix;
-    v.push_back(SXElement(v_name.str()));
+    v.push_back(SXElement::sym(v_name.str()));
   }
   
   // Mark the above expressions

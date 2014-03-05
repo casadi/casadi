@@ -30,10 +30,10 @@ import itertools
 class ADtests(casadiTestCase):
 
   def setUp(self):
-    x=SXElement("x")
-    y=SXElement("y")
-    z=SXElement("z")
-    w=SXElement("w")
+    x=SXElement.sym("x")
+    y=SXElement.sym("y")
+    z=SXElement.sym("z")
+    w=SXElement.sym("w")
     
     out=SX(6,1)
     out[0,0]=x
@@ -440,8 +440,8 @@ class ADtests(casadiTestCase):
     
   def test_bugglibc(self):
     self.message("Code that used to throw a glibc error")
-    x=SXElement("x")
-    y=SXElement("y")
+    x=SXElement.sym("x")
+    y=SXElement.sym("y")
 
     inp=SX(5,1)
     inp[0,0]=x

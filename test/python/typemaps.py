@@ -304,7 +304,7 @@ class typemaptests(casadiTestCase):
         
     ## numeric & SX
     for s in nums:
-      for z in [SXElement("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SXElement.sym("x"), ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
@@ -317,8 +317,8 @@ class typemaptests(casadiTestCase):
         tests(z,s)
         
     # SXElement & SX
-    for s in [SXElement("x"), ssym("x"), ssym("x",2,2)]:
-      for z in [SXElement("x"),ssym("x"), ssym("x",2,2)]:
+    for s in [SXElement.sym("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SXElement.sym("x"),ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
@@ -382,7 +382,7 @@ class typemaptests(casadiTestCase):
         
     ## numeric & SX
     for s in nums:
-      for z in [SXElement("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SXElement.sym("x"), ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
@@ -395,8 +395,8 @@ class typemaptests(casadiTestCase):
         tests(z,s)
         
     # SXElement & SX
-    for s in [SXElement("x"), ssym("x"), ssym("x",2,2)]:
-      for z in [SXElement("x"),ssym("x"), ssym("x",2,2)]:
+    for s in [SXElement.sym("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SXElement.sym("x"),ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
@@ -434,7 +434,7 @@ class typemaptests(casadiTestCase):
       
   def testGenericType(self):
     self.message("Generic type")
-    x=SXElement("x")
+    x=SXElement.sym("x")
     f=SXFunction([x],[2*x])
     f.setOption("name","foo")
     self.assertEquals(f.getOption("name"),"foo")
@@ -493,7 +493,7 @@ class typemaptests(casadiTestCase):
 	    
     a = GenericType(["foo","bar"])
     self.assertTrue(a.isStringVector())
-    x = SXElement("x")
+    x = SXElement.sym("x")
     f = SXFunction([x],[x])
     #f.setOption("monitor",["foo","bar"])
     #self.assertEqual(f.getOption("monitor")[0],"foo")
@@ -502,10 +502,10 @@ class typemaptests(casadiTestCase):
     #self.assertEqual(f.getOption("monitor")[0],"foo")
     #f.setOption("monitor",[])
     
-    t=SXElement("t")
+    t=SXElement.sym("t")
 
-    x=SXElement("x") 
-    dx=SXElement("dx")
+    x=SXElement.sym("x") 
+    dx=SXElement.sym("dx")
 
     f=SXFunction(daeIn(t=t, x=vertcat([x,dx])),[vertcat([dx,-x])])
     f.init()
@@ -526,21 +526,21 @@ class typemaptests(casadiTestCase):
 
   @requires("IpoptSolver")
   def testGenericTypeBoolean(self):
-    x=SXElement("x")
+    x=SXElement.sym("x")
 
     nlp = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
     nlp.init()
 
     nlp_solver = IpoptSolver(nlp)
     
-    self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SXElement("x")))
+    self.assertRaises(RuntimeError,lambda : nlp_solver.setOption('acceptable_tol',SXElement.sym("x")))
     nlp_solver.setOption('acceptable_tol',DMatrix(1))
 	    
   def test_operators(self):
     self.message("Test operators on mixed numpy.array/Matrix")
     self.message(":SX")
-    x=SXElement("x")
-    y=SXElement("y")
+    x=SXElement.sym("x")
+    y=SXElement.sym("y")
 
     C=SX([x,y])
     N=matrix([x,y]).T
@@ -605,7 +605,7 @@ class typemaptests(casadiTestCase):
     self.message("Casting DMatrix to SX")
     
     w = DMatrix([[1,2,3],[4,5,6]])
-    x = SXElement("x")
+    x = SXElement.sym("x")
     
     f = SXFunction([x],[w])
     
@@ -692,7 +692,7 @@ class typemaptests(casadiTestCase):
     
   def test_issue190(self):
     self.message("regression test issue #190")
-    x=SXElement("x")
+    x=SXElement.sym("x")
     x * numpy.array(1)
     x * numpy.array(1.2)
 
@@ -736,8 +736,8 @@ class typemaptests(casadiTestCase):
     self.message("Issue #570: long int")
     longint = 10**50
     print type(longint)
-    print casadi.SXElement('x') + longint
-    print longint + casadi.SXElement('x')
+    print casadi.SXElement.sym('x') + longint
+    print longint + casadi.SXElement.sym('x')
     print casadi.ssym('x') + longint
     print longint + casadi.ssym('x')
     

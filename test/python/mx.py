@@ -326,7 +326,7 @@ class MXtests(casadiTestCase):
         
   def test_identitySX(self):
     self.message("identity SXFunction")
-    x = SXElement("x")
+    x = SXElement.sym("x")
     f = SXFunction([x],[x])
     f.init()
     f.setInput([3],0)
@@ -1091,7 +1091,7 @@ class MXtests(casadiTestCase):
       
   def test_chaining(self):
     self.message("Chaining SXElement and MX together")
-    x=SXElement("x")
+    x=SXElement.sym("x")
     y=x**3
     f=SXFunction([x],[y])
     f.init()
