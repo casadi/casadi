@@ -68,12 +68,12 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInternal,Matrix<SX>,SXNode>{
+class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInternal,Matrix<SXElement>,SXNode>{
   friend class SXFunction;
   
   protected:
     /** \brief  Constructor (only to be called from SXFunction, therefore protected) */
-    SXFunctionInternal(const std::vector<Matrix<SX> >& inputv, const std::vector<Matrix<SX> >& outputv);
+    SXFunctionInternal(const std::vector<Matrix<SXElement> >& inputv, const std::vector<Matrix<SXElement> >& outputv);
 
   public:
 
@@ -130,14 +130,14 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   std::vector<double> work_;
 
   /// work vector for symbolic calculations (allocated first time)
-  std::vector<SX> s_work_;
-  std::vector<SX> free_vars_;
+  std::vector<SXElement> s_work_;
+  std::vector<SXElement> free_vars_;
   
   /// The expressions corresponding to each binary operation
-  std::vector<SX> operations_;
+  std::vector<SXElement> operations_;
   
   /// The expressions corresponding to each constant
-  std::vector<SX> constants_;
+  std::vector<SXElement> constants_;
   
   /** \brief  Initialize */
   virtual void init();

@@ -2210,8 +2210,8 @@ namespace CasADi{
   }
 
   void FXInternal::assignIgnore(SXMatrix& y, const SXMatrix& x, const std::vector<int>& nz){
-    vector<SX>& y_data = y.data();
-    const vector<SX>& x_data = x.data();
+    vector<SXElement>& y_data = y.data();
+    const vector<SXElement>& x_data = x.data();
     casadi_assert(nz.size()==x_data.size());
     for(int k=0; k<nz.size(); ++k){
       if(nz[k]>=0){
@@ -2530,7 +2530,7 @@ namespace CasADi{
     }
   }
 
-  void FXInternal::evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res, std::vector<int>& itmp, std::vector<SX>& rtmp) {
+  void FXInternal::evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res, std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
   
     // Create input arguments
     vector<SXMatrix> argv(arg.size());

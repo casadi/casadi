@@ -34,7 +34,7 @@ int main(){
   const double stepSize = 3.0 / timeSteps;
 
   // Declare some scalar variables
-  SX t("t"), u("u");
+  SXElement t("t"), u("u");
 
   // Formulate the integrator
   vector<SXMatrix> F_in(2);

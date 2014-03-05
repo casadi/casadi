@@ -6,8 +6,8 @@
 *
 * \sa
 * \code
-* CasADi::countNodes(const Matrix<SX>& A);
-* CasADi::countNodesFull(const Matrix<SX>& A);
+* CasADi::countNodes(const Matrix<SXElement>& A);
+* CasADi::countNodesFull(const Matrix<SXElement>& A);
 * \endcode
 *
 */

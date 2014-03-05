@@ -79,7 +79,7 @@ x0 = DMatrix([1,0,0])
 # no control
 u_ = DMatrix([[ -1, 1 ],[1,-1]]*((N-1)/2))
 
-p = SX("p")
+p = ssym("p")
 
 tn = np.linspace(0,te,N)
 cdae = SXFunction(controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
@@ -397,7 +397,7 @@ temp = inv(blockcat([[A,B],[C,D]]))
 F = temp[:ns,-ny:]
 Nm = temp[ns:,-ny:]
 
-t = SX("t")
+t = ssym("t")
 
 figure(6)
 

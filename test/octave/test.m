@@ -27,9 +27,9 @@ function [y]=value(x)
   
 end
 
-disp('operators on SX')
+disp('operators on SXElement')
 
-x = SX("x")
+x = SXElement("x")
 x**2
 sin(x)
 acos(x)
@@ -43,7 +43,7 @@ acos(x)
 
 disp('SX typemaps')
 
-x=SX("x")
+x=ssym("x")
 jacobian(x**5,x)
 
 jacobian({x**5},{x})
@@ -84,7 +84,7 @@ MXFunction({x},{x x})
 MXFunction({x},{x 0})
 
 disp('function usage')
-x=SX("x")
+x=ssym("x")
 f = SXFunction({x},{x^2 sin(x)})
 f.init()
 f.input(0)
@@ -204,10 +204,10 @@ assert(all(full(result)==full(eye(2))))
 
 disp('Operator overloading')
 
-S =               { {DMatrix([1 2; 3 4]),SX("x"),MX("x",1,1)},
+S =               { {DMatrix([1 2; 3 4]),SXElement("x"),MX("x",1,1)},
                   {3,ssym("x",2,2),msym("x",2,2)},
                   {DMatrix(3),ssym("x",2,2),msym("y",2,2)},
-		  {[1 2; 3 4],SX("x"),MX("x",1,1)}
+		  {[1 2; 3 4],SXElement("x"),MX("x",1,1)}
                   };
                   
 for i=1:numel(S)
@@ -234,7 +234,7 @@ for i=1:numel(S)
   end
 end
 
-S = {DMatrix(3),ssym("x",2,2),SX("x"),MX("x",1,1)};
+S = {DMatrix(3),ssym("x",2,2),SXElement("x"),MX("x",1,1)};
 num = {6,DMatrix(6)}
 
 for i=1:numel(S)
@@ -250,14 +250,14 @@ for i=1:numel(S)
   end
 end
 
-x = SX("x");
+x = SXElement("x");
 y = ssym("y",2,1);
 
 x*y
 y*x
 
-x = SX("x");
-y = SX("y");
+x = SXElement("x");
+y = SXElement("y");
 
 x*y
 x/y
@@ -317,8 +317,8 @@ x=ssym("x",3,4)
 size(x)
 
 disp("Issue 145")
-t = SX("t")
-T = SX("T")
+t = ssym("t")
+T = ssym("T")
 
 
 ffcn_in = cell(1,DAE_NUM_IN);

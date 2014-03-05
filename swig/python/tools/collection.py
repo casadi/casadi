@@ -339,7 +339,7 @@ class FrozenMapping:
     elif isinstance(data,FrozenMapping):
       parent.add(data.tree.copy())
     else:
-      if isinstance(data,SX):
+      if isinstance(data,SXElement):
         data = SXMatrix(data)
       n = Node()
       n.data = data

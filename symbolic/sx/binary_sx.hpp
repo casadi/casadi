@@ -20,15 +20,15 @@
  *
  */
 
-#ifndef BINARY_SX_HPP
-#define BINARY_SX_HPP
+#ifndef BINARY_SXElement_HPP
+#define BINARY_SXElement_HPP
 
 #include "sx_node.hpp"
 #include <stack>
 
 namespace CasADi{
 
-/** \brief Represents a basic binary operation on two SX nodes
+/** \brief Represents a basic binary operation on two SXElement nodes
   \author Joel Andersson 
   \date 2010
 */
@@ -36,12 +36,12 @@ class BinarySX : public SXNode{
   private:
     
     /** \brief  Constructor is private, use "create" below */
-    BinarySX(unsigned char op, const SX& dep0, const SX& dep1) : op_(op), dep0_(dep0), dep1_(dep1){}
+    BinarySX(unsigned char op, const SXElement& dep0, const SXElement& dep1) : op_(op), dep0_(dep0), dep1_(dep1){}
     
   public:
     
     /** \brief  Create a binary expression */
-    inline static SX create(unsigned char op, const SX& dep0, const SX& dep1){
+    inline static SXElement create(unsigned char op, const SXElement& dep0, const SXElement& dep1){
       if(dep0.isConstant() && dep1.isConstant()){
         // Evaluate constant
         double dep0_val = dep0.getValue();
@@ -51,7 +51,7 @@ class BinarySX : public SXNode{
         return ret_val;
       } else {
         // Expression containing free variables
-        return SX::create(new BinarySX(op,dep0,dep1));
+        return SXElement::create(new BinarySX(op,dep0,dep1));
       }
     }
     
@@ -63,7 +63,7 @@ class BinarySX : public SXNode{
       // Start destruction method if any of the dependencies has dependencies
       for(int c1=0; c1<2; ++c1){
         // Get the node of the dependency and remove it from the smart pointer
-        SXNode* n1 = dep(c1).assignNoDelete(casadi_limits<SX>::nan);
+        SXNode* n1 = dep(c1).assignNoDelete(casadi_limits<SXElement>::nan);
         
         // Check if this was the last reference
         if(n1->count==0){
@@ -92,7 +92,7 @@ class BinarySX : public SXNode{
               for(int c2=0; c2<t->ndep(); ++c2){ // for all dependencies of the dependency
                 
                 // Get the node of the dependency of the top element and remove it from the smart pointer
-                SXNode *n2 = t->dep(c2).assignNoDelete(casadi_limits<SX>::nan);
+                SXNode *n2 = t->dep(c2).assignNoDelete(casadi_limits<SXElement>::nan);
                 
                 // Check if this is the only reference to the element
                 if(n2->count == 0){
@@ -141,8 +141,8 @@ class BinarySX : public SXNode{
     virtual int ndep() const{ return 2;}
     
     /** \brief  get the reference of a dependency */
-    virtual const SX& dep(int i) const{ return i==0 ? dep0_ : dep1_;}
-    virtual SX& dep(int i){ return i==0 ? dep0_ : dep1_;}
+    virtual const SXElement& dep(int i) const{ return i==0 ? dep0_ : dep1_;}
+    virtual SXElement& dep(int i){ return i==0 ? dep0_ : dep1_;}
     
     /** \brief  Get the operation */
     virtual int getOp() const{ return op_;}
@@ -170,10 +170,10 @@ class BinarySX : public SXNode{
     unsigned char op_;
     
     /** \brief  The dependencies of the node */
-    SX dep0_, dep1_;
+    SXElement dep0_, dep1_;
 };
 
 } // namespace CasADi
 
 
-#endif // BINARY_SX_HPP
+#endif // BINARY_SXElement_HPP

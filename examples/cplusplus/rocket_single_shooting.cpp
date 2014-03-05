@@ -55,23 +55,23 @@ int main(){
   X0[2] = 1; // initial mass
 
   // Time 
-  SX t("t");
+  SXElement t("t");
 
   // Differential states
-  SX s("s"), v("v"), m("m");
-  vector<SX> x(3); 
+  SXElement s("s"), v("v"), m("m");
+  vector<SXElement> x(3); 
   x[0] = s;
   x[1] = v;
   x[2] = m;
 
   // Control
-  SX u("u");
+  SXElement u("u");
 
-  SX alpha = 0.05; // friction
-  SX beta = 0.1; // fuel consumption rate
+  SXElement alpha = 0.05; // friction
+  SXElement beta = 0.1; // fuel consumption rate
   
   // Differential equation
-  vector<SX> rhs(3);
+  vector<SXElement> rhs(3);
   rhs[0] = v;
   rhs[1] = (u-alpha*v*v)/m;
   rhs[2] = -beta*u*u;

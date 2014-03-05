@@ -83,8 +83,8 @@ class NLPtests(casadiTestCase):
     for Solver, options in solvers:
       self.message(Solver.__name__)
       message = Solver.__name__
-      x=SX("x")
-      y=SX("y")
+      x=SXElement("x")
+      y=SXElement("y")
       n=0.2
       f=SXFunction([y,x],[x-arcsin(y)])
       f.init()
@@ -153,7 +153,7 @@ class NLPtests(casadiTestCase):
     for Solver, options in solvers:
       self.message(Solver.__name__)
       message = Solver.__name__
-      x=SX("x")
+      x=SXElement("x")
       y=ssym("y",2)
       y0 = DMatrix([0.1,0.4])
       yy = y + y0
@@ -173,7 +173,7 @@ class NLPtests(casadiTestCase):
       
   def testKINSol1c(self):
     self.message("Scalar KINSol problem, n=0, constraint")
-    x=SX("x")
+    x=SXElement("x")
     f=SXFunction([x],[sin(x)])
     f.init()
     solver=KinsolSolver(f)

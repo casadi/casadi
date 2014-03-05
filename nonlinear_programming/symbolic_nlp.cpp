@@ -85,7 +85,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   lambda_init = DMatrix(g.sparsity(), 0.0);
   
   // All variables, including dependent
-  vector<SX> v = x.data();
+  vector<SXElement> v = x.data();
   
   // Process segments
   while(true){
@@ -402,7 +402,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   nlfile.close();
 }
 
-SX SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SX>& v){
+SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SXElement>& v){
   // Read the instruction
   char inst;
   stream >> inst;
@@ -447,7 +447,7 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SX>& v)
         case 43:  case 42:  case 44:  case 45:  case 46:  case 47:  case 49:  case 50:  case 51:  case 52:  case 53:
         {
           // Read dependency
-          SX x = readExpressionNL(stream,v);
+          SXElement x = readExpressionNL(stream,v);
           
           // Perform operation
           switch(i){
@@ -484,8 +484,8 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SX>& v)
         case 23:  case 24:  case 28:  case 29:  case 30:  case 48:  case 55:  case 56:  case 57:  case 58:  case 73:
         {
           // Read dependencies
-          SX x = readExpressionNL(stream,v);
-          SX y = readExpressionNL(stream,v);
+          SXElement x = readExpressionNL(stream,v);
+          SXElement y = readExpressionNL(stream,v);
 
           // Perform operation
           switch(i){
@@ -525,7 +525,7 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SX>& v)
           stream >> n;
           
           // Collect the arguments
-          vector<SX> args(n);
+          vector<SXElement> args(n);
           for(int k=0; k<n; ++k){
             args[k] = readExpressionNL(stream,v);
           }
@@ -543,8 +543,8 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SX>& v)
             // case 74: return alldiff(args).toScalar(); FIXME // rename?
             case 54:
             {
-              SX r = 0;
-              for(vector<SX>::const_iterator it=args.begin(); it!=args.end(); ++it) r += *it;
+              SXElement r = 0;
+              for(vector<SXElement>::const_iterator it=args.begin(); it!=args.end(); ++it) r += *it;
               return r;
             }
             

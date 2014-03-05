@@ -32,8 +32,8 @@ Variable::Variable(){
 Variable::Variable(const string& name, bool create_expression){
   assignNode(new VariableInternal(name));
   if(create_expression){
-    setExpression(SX(name));
-    setDerivative(SX("der_" + name));
+    setExpression(SXElement(name));
+    setDerivative(SXElement("der_" + name));
     setBinding(var(),false);
     setBinding(der(),true);
   }
@@ -51,15 +51,15 @@ const VariableInternal* Variable::operator->() const{
   return (const VariableInternal*)(SharedObject::operator->());
 }
   
-SX Variable::der() const{
+SXElement Variable::der() const{
   return (*this)->der_;
 }
 
-SX Variable::var() const{
+SXElement Variable::var() const{
   return (*this)->var_;
 }
 
-SX Variable::binding(bool derivative) const{
+SXElement Variable::binding(bool derivative) const{
   if(derivative){
     return (*this)->der_binding_;
   } else {
@@ -219,15 +219,15 @@ void Variable::setDisplayUnit(const string& displayUnit){
   (*this)->displayUnit_ = displayUnit;
 }
 
-void Variable::setExpression(const SX& v){
+void Variable::setExpression(const SXElement& v){
   (*this)->var_ = v;
 }
 
-void Variable::setDerivative(const SX& d){
+void Variable::setDerivative(const SXElement& d){
   (*this)->der_ = d;
 }
 
-void Variable::setBinding(const SX& binding, bool derivative){
+void Variable::setBinding(const SXElement& binding, bool derivative){
   if(derivative){
     (*this)->der_binding_ = binding;
   } else {
@@ -239,11 +239,11 @@ bool Variable::checkNode() const{
   return dynamic_cast<const VariableInternal*>(get())!=0;
 }
 
-SX Variable::atTime(double t, bool allocate) const{
+SXElement Variable::atTime(double t, bool allocate) const{
   return (*this)->atTime(t,allocate);
 }
 
-SX Variable::atTime(double t, bool allocate){
+SXElement Variable::atTime(double t, bool allocate){
   return (*this)->atTime(t,allocate);
 }
 
@@ -263,7 +263,7 @@ void Variable::setDifferential(bool is_differential){
   (*this)->is_differential_ = is_differential;
 }
 
-SX Variable::highest() const{
+SXElement Variable::highest() const{
   if(isDifferential()){
     return der();
   } else {

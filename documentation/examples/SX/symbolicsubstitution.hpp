@@ -7,7 +7,7 @@
 * \sa
 * \code
 * CasADi::SXFunction::eval(const vector<SXMatrix>& arg);
-* CasADi::substitute(const Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &expr);
+* CasADi::substitute(const Matrix<SXElement> &ex, const Matrix<SXElement> &var, const Matrix<SXElement> &expr);
 * \endcode
 *
 */

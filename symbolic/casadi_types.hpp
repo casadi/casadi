@@ -31,7 +31,7 @@
 namespace CasADi{
   
   /// Forward declarations
-  class SX;
+  class SXElement;
   class MX;
   template<class T> class Matrix;
   class FX;

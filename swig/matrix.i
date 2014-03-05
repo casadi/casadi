@@ -43,7 +43,7 @@
 #include "symbolic/casadi_exception.hpp"
 
 // to allow for typechecking
-#include "symbolic/sx/sx.hpp"
+#include "symbolic/sx/sx_element.hpp"
 
 // to typecheck for MX
 #include "symbolic/mx/mx.hpp"
@@ -211,7 +211,7 @@ octave_value toSparse() {
 }
 
 binopsrFull(CasADi::Matrix<double>)
-binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+binopsFull(const CasADi::Matrix<CasADi::SXElement> & b,,CasADi::Matrix<CasADi::SXElement>,CasADi::Matrix<CasADi::SXElement>)
 binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 
 }; // extend Matrix<double>
@@ -328,7 +328,7 @@ PyObject* arrayView() {
 %}
 
 binopsrFull(CasADi::Matrix<double>)
-binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+binopsFull(const CasADi::Matrix<CasADi::SXElement> & b,,CasADi::Matrix<CasADi::SXElement>,CasADi::Matrix<CasADi::SXElement>)
 binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
 
 }; // extend Matrix<double>
@@ -366,7 +366,7 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
   %}
 
   binopsrFull(CasADi::Matrix<int>)
-  binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
+  binopsFull(const CasADi::Matrix<CasADi::SXElement> & b,,CasADi::Matrix<CasADi::SXElement>,CasADi::Matrix<CasADi::SXElement>)
   binopsFull(const CasADi::Matrix<double> & b,,CasADi::Matrix<double>,CasADi::Matrix<double>)
   binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
   %pythoncode %{

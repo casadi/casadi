@@ -50,7 +50,7 @@ namespace CasADi{
     // Check for duplicate entries among the input expressions
     bool has_duplicates = false;
     for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
-      for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
+      for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc){
         bool is_duplicate = itc->getTemp()!=0;
         if(is_duplicate){
           cerr << "Duplicate expression: " << *itc << endl;
@@ -62,7 +62,7 @@ namespace CasADi{
   
     // Reset temporaries
     for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
-      for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
+      for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc){
         itc->setTemp(0);
       }
     }
@@ -193,7 +193,7 @@ namespace CasADi{
     }
  
     // Iterator to free variables
-    vector<SX>::const_iterator p_it = free_vars_.begin();
+    vector<SXElement>::const_iterator p_it = free_vars_.begin();
   
     // Normal, interpreted output
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
@@ -300,7 +300,7 @@ namespace CasADi{
     int ind=0;
     for(vector<SXMatrix >::iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
       int nz=0;
-      for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc, ++nz){
+      for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc, ++nz){
         // Add outputs to the list
         s.push(itc->get());
         sort_depth_first(s,nodes);
@@ -312,7 +312,7 @@ namespace CasADi{
   
     // Make sure that all inputs have been added also // TODO REMOVE THIS
     for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
-      for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
+      for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc){
         if(!itc->getTemp()){
           nodes.push_back(itc->get());
         }
@@ -333,9 +333,9 @@ namespace CasADi{
       SXNode* t = *it;
       if(t){
         if(t->isConstant())
-          constants_.push_back(SX::create(t));
+          constants_.push_back(SXElement::create(t));
         else if(!t->isSymbolic())
-          operations_.push_back(SX::create(t));
+          operations_.push_back(SXElement::create(t));
       }
     }
   
@@ -489,7 +489,7 @@ namespace CasADi{
     // Add input instructions
     for(int ind=0; ind<inputv_.size(); ++ind){
       int nz=0;
-      for(vector<SX>::iterator itc = inputv_[ind].begin(); itc != inputv_[ind].end(); ++itc, ++nz){
+      for(vector<SXElement>::iterator itc = inputv_[ind].begin(); itc != inputv_[ind].end(); ++itc, ++nz){
         int i = itc->getTemp()-1;
         if(i>=0){
           // Mark as input
@@ -510,7 +510,7 @@ namespace CasADi{
     for(vector<pair<int,SXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it){
       if(it->second->temp!=0){
         // Save to list of free parameters
-        free_vars_.push_back(SX::create(it->second));
+        free_vars_.push_back(SXElement::create(it->second));
       
         // Remove marker
         it->second->temp=0;
@@ -582,17 +582,17 @@ namespace CasADi{
     bool taping = nfdir>0 || nadir>0;
   
     // Iterator to the binary operations
-    vector<SX>::const_iterator b_it=operations_.begin();
+    vector<SXElement>::const_iterator b_it=operations_.begin();
   
     // Iterator to stack of constants
-    vector<SX>::const_iterator c_it = constants_.begin();
+    vector<SXElement>::const_iterator c_it = constants_.begin();
 
     // Iterator to free variables
-    vector<SX>::const_iterator p_it = free_vars_.begin();
+    vector<SXElement>::const_iterator p_it = free_vars_.begin();
   
     // Tape
-    vector<TapeEl<SX> > s_pdwork;
-    vector<TapeEl<SX> >::iterator it1;
+    vector<TapeEl<SXElement> > s_pdwork;
+    vector<TapeEl<SXElement> >::iterator it1;
     if(taping){
       s_pdwork.resize(operations_.size());
       it1 = s_pdwork.begin();
@@ -615,7 +615,7 @@ namespace CasADi{
       default:
         {
           // Evaluate the function to a temporary value (as it might overwrite the children in the work vector)
-          SX f;
+          SXElement f;
           if(output_given){
             f = *b_it++;
           } else {
@@ -647,7 +647,7 @@ namespace CasADi{
     // Calculate forward sensitivities
     if(verbose()) cout << "SXFunctionInternal::evalSXsparse calculating forward derivatives" << endl;
     for(int dir=0; dir<nfdir; ++dir){
-      vector<TapeEl<SX> >::const_iterator it2 = s_pdwork.begin();
+      vector<TapeEl<SXElement> >::const_iterator it2 = s_pdwork.begin();
       for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
         switch(it->op){
         case OP_INPUT:
@@ -670,9 +670,9 @@ namespace CasADi{
     if(verbose()) cout << "SXFunctionInternal::evalSXsparse calculating adjoint derivatives" << endl;
     if(nadir>0) fill(s_work_.begin(),s_work_.end(),0);
     for(int dir=0; dir<nadir; ++dir){
-      vector<TapeEl<SX> >::const_reverse_iterator it2 = s_pdwork.rbegin();
+      vector<TapeEl<SXElement> >::const_reverse_iterator it2 = s_pdwork.rbegin();
       for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
-        SX seed;
+        SXElement seed;
         switch(it->op){
         case OP_INPUT:
           asens[dir][it->i1].data()[it->i2] = s_work_[it->i0];

@@ -23,7 +23,7 @@
 #ifndef SX_TOOLS_HPP
 #define SX_TOOLS_HPP
 
-#include "sx.hpp"
+#include "sx_element.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../matrix/generic_matrix_tools.hpp"
 
@@ -35,7 +35,7 @@
 namespace ublas = boost::numeric::ublas;
 #endif
 
-/** Functions using SX */
+/** Functions using SXElement */
 
 namespace CasADi{
 
@@ -79,7 +79,7 @@ The SX expression graph has much less overhead, but is also more restricted than
 void expand(const SXMatrix& ex, SXMatrix &weights, SXMatrix& terms);
 
 /** \brief  Simplify the expression: formulates the expression as and eliminates terms */
-void simplify(SX& ex);
+void simplify(SXElement& ex);
 
 /** \brief Create a piecewise constant function 
   Create a piecewise constant function with n=val.size() intervals
@@ -99,7 +99,7 @@ SXMatrix pw_const(const SXMatrix &t, const SXMatrix &tval, const SXMatrix &val);
   \brief tval vector with the the discrete values of t (monotonically increasing)
   \brief val vector with the corresponding function values (same length as tval)
 */
-SXMatrix pw_lin(const SX &t, const SXMatrix &tval, const SXMatrix &val);
+SXMatrix pw_lin(const SXElement &t, const SXMatrix &tval, const SXMatrix &val);
 
 SXMatrix if_else(const SXMatrix &cond, const SXMatrix &if_true, const SXMatrix &if_false);
 /**  \brief Heaviside function
@@ -200,14 +200,14 @@ Matrix<double> evalf(const SXMatrix &ex, const SXMatrix &v, const Matrix<double>
 
 //{@
 /// Checks if expression does not contain NaN or Inf
-bool isRegular(const SX& ex);
+bool isRegular(const SXElement& ex);
 bool isRegular(const SXMatrix& ex);
 //@}
 
 #ifndef SWIG
 // "operator?:" can not be overloaded
 template<typename T>
-T if_else(const SX& cond, const T& if_true, const T &if_false){
+T if_else(const SXElement& cond, const T& if_true, const T &if_false){
   return if_false + (if_true-if_false)*cond;
 }
 #endif
@@ -267,7 +267,7 @@ bool dependsOn(const SXMatrix& f, const SXMatrix &arg);
 * Get all symbols on which the supplied expression depends
 * \see SXFunction::getFree()
 */
-std::vector<SX> getSymbols(const SXMatrix& e);
+std::vector<SXElement> getSymbols(const SXMatrix& e);
 
 /** \brief  check if smooth */
 bool isSmooth(const SXMatrix& ex);
@@ -311,7 +311,7 @@ void getIntValue(const SXMatrix &ex, int *res); // integer version
 const std::string& getName(const SXMatrix &ex); // get the name (only for scalar variables)
 
 /** \brief  Fill the matrix with the value val, make empty sparse if zero */
-void fill(SXMatrix& mat, const SX& val);
+void fill(SXMatrix& mat, const SXElement& val);
 
 /** 
 * \brief univariate taylor series expansion
@@ -326,7 +326,7 @@ void fill(SXMatrix& mat, const SX& val);
 * \endcode
 * \verbatim >>   x \endverbatim
 */
-SXMatrix taylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a=casadi_limits<SX>::zero,int order=1);
+SXMatrix taylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a=casadi_limits<SXElement>::zero,int order=1);
 
 /**
 * \brief multivariate taylor series expansion
@@ -367,14 +367,14 @@ SXMatrix mtaylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a,int ord
 int countNodes(const SXMatrix& A);
 
 /** \brief Get a string representation for a binary SX, using custom arguments */
-std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args);
+std::string getOperatorRepresentation(const SXElement& x, const std::vector<std::string>& args);
 
   /** \brief Get all the free variables in an expression */
   SXMatrix getFree(const SXMatrix& ex);
 
   /** \brief Extract shared subexpressions from an set of expressions */
-  void extractShared(std::vector<SX>& ex, 
-                     std::vector<SX>& v, std::vector<SX>& vdef, 
+  void extractShared(std::vector<SXElement>& ex, 
+                     std::vector<SXElement>& v, std::vector<SXElement>& vdef, 
                      const std::string& v_prefix="v_", const std::string& v_suffix="");
   
   /** \brief Print compact, introducing new variables for shared subexpressions */

@@ -29,7 +29,7 @@ namespace CasADi{
 
 #ifndef SWIG
 
-  /** \brief  An atomic operation for the SX virtual machine */
+  /** \brief  An atomic operation for the SXElement virtual machine */
   struct ScalarAtomic{
     int op;     /// Operator index
     int i0;
@@ -79,19 +79,19 @@ namespace CasADi{
 #ifndef SWIG
 
     /// Multiple (vector valued) input, multiple (vector valued) output 
-    SXFunction(const std::vector< std::vector<SX> >& arg, const std::vector< std::vector<SX> >& res);
+    SXFunction(const std::vector< std::vector<SXElement> >& arg, const std::vector< std::vector<SXElement> >& res);
 
     /// Single (scalar/matrix/vector valued) input, single (scalar/matrix/vector valued) output  
     SXFunction(const SXMatrix& arg, const SXMatrix& res);
 
     /// Multiple (vector valued) input, single (scalar/vector/matrix valued) output 
-    SXFunction(const std::vector< std::vector<SX> >& arg, const SXMatrix& res);
+    SXFunction(const std::vector< std::vector<SXElement> >& arg, const SXMatrix& res);
 
     /// Multiple (matrix valued) input, single (scalar/vector/matrix valued) output 
     SXFunction(const std::vector< SXMatrix>& arg, const SXMatrix& res);
 
     /// Single (scalar/vector/matrix valued) input, multiple (vector valued) output 
-    SXFunction(const SXMatrix& arg, const std::vector< std::vector<SX> >& res);
+    SXFunction(const SXMatrix& arg, const std::vector< std::vector<SXElement> >& res);
 
     /// Single (scalar/vector/matrix valued) input, multiple (matrix valued) output 
     SXFunction(const SXMatrix& arg, const std::vector< SXMatrix>& res);
@@ -187,7 +187,7 @@ namespace CasADi{
     void clearSymbolic();
  
     /** \brief Get all the free variables of the function */
-    std::vector<SX> getFree() const;
+    std::vector<SXElement> getFree() const;
 
     /** \brief Get the corresponding matrix type */
     typedef SXMatrix MatType;  

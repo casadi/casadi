@@ -24,7 +24,7 @@
 #define MX_NODE_HPP
 
 #include "mx.hpp"
-#include "../sx/sx.hpp"
+#include "../sx/sx_element.hpp"
 #include "../casadi_math.hpp"
 #include "../fx/code_generator.hpp"
 #include "../fx/linear_solver.hpp"
@@ -130,7 +130,7 @@ namespace CasADi{
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, 

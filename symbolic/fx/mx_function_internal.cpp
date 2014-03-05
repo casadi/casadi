@@ -966,7 +966,7 @@ namespace CasADi{
     }
 
     // Create a temporary vector
-    vector<SX> rtmp(rtmp_.size());
+    vector<SXElement> rtmp(rtmp_.size());
   
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     vector<SXMatrix*> sxarg;

@@ -45,7 +45,7 @@ SXFunction::SXFunction(const SXMatrix& arg, const SXMatrix& res){
                                     vector<SXMatrix>(1,res)));
 }
 
-SXFunction::SXFunction(const vector< vector<SX> >& arg, const vector< vector<SX> >& res){
+SXFunction::SXFunction(const vector< vector<SXElement> >& arg, const vector< vector<SXElement> >& res){
   assignNode(new SXFunctionInternal(vector<SXMatrix>(arg.begin(),arg.end()),
                                     vector<SXMatrix>(res.begin(),res.end())));
 }
@@ -70,7 +70,7 @@ SXFunction::SXFunction(const IOSchemeVector< SXMatrix >& arg, const IOSchemeVect
   setOutputScheme(res.scheme);
 }
 
-SXFunction::SXFunction(const vector< vector<SX> >& arg, const SXMatrix& res){
+SXFunction::SXFunction(const vector< vector<SXElement> >& arg, const SXMatrix& res){
   assignNode(new SXFunctionInternal(vector<SXMatrix>(arg.begin(),arg.end()),
                                     vector<SXMatrix>(1,res)));
 }
@@ -80,7 +80,7 @@ SXFunction::SXFunction(const vector< SXMatrix>& arg, const SXMatrix& res){
                                     vector<SXMatrix>(1,res)));
 }
 
-SXFunction::SXFunction(const SXMatrix& arg, const std::vector< std::vector<SX> >& res){
+SXFunction::SXFunction(const SXMatrix& arg, const std::vector< std::vector<SXElement> >& res){
   assignNode(new SXFunctionInternal(vector<SXMatrix>(1,arg),
                                     vector<SXMatrix>(res.begin(),res.end())));
   
@@ -181,7 +181,7 @@ SXFunction SXFunction::operator[](int k) const {
   return ret;
 }
 
-std::vector<SX> SXFunction::getFree() const{
+std::vector<SXElement> SXFunction::getFree() const{
   return (*this)->free_vars_;
 }
 

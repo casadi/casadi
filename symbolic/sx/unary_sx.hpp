@@ -20,15 +20,15 @@
  *
  */
 
-#ifndef UNARY_SX_HPP
-#define UNARY_SX_HPP
+#ifndef UNARY_SXElement_HPP
+#define UNARY_SXElement_HPP
 
 #include "sx_node.hpp"
 #include <stack>
 
 namespace CasADi{
 
-/** \brief Represents a basic unary operation on an SX node
+/** \brief Represents a basic unary operation on an SXElement node
   \author Joel Andersson 
   \date 2012
 */
@@ -36,12 +36,12 @@ class UnarySX : public SXNode{
   private:
     
     /** \brief  Constructor is private, use "create" below */
-    UnarySX(unsigned char op, const SX& dep) : op_(op), dep_(dep){}
+    UnarySX(unsigned char op, const SXElement& dep) : op_(op), dep_(dep){}
     
   public:
     
     /** \brief  Create a unary expression */
-    inline static SX create(unsigned char op, const SX& dep){
+    inline static SXElement create(unsigned char op, const SXElement& dep){
       if(dep.isConstant()){
         // Evaluate constant
         double dep_val = dep.getValue();
@@ -50,7 +50,7 @@ class UnarySX : public SXNode{
         return ret_val;
       } else {
         // Expression containing free variables
-        return SX::create(new UnarySX(op,dep));
+        return SXElement::create(new UnarySX(op,dep));
       }
     }
     
@@ -71,8 +71,8 @@ class UnarySX : public SXNode{
     virtual int ndep() const{ return 1;}
     
     /** \brief  get the reference of a dependency */
-    virtual const SX& dep(int i) const{ return dep_; }
-    virtual SX& dep(int i){ return dep_; }
+    virtual const SXElement& dep(int i) const{ return dep_; }
+    virtual SXElement& dep(int i){ return dep_; }
     
     /** \brief  Get the operation */
     virtual int getOp() const{ return op_;}
@@ -94,10 +94,10 @@ class UnarySX : public SXNode{
     unsigned char op_;
     
     /** \brief  The dependencies of the node */
-    SX dep_;
+    SXElement dep_;
 };
 
 } // namespace CasADi
 
 
-#endif // UNARY_SX_HPP
+#endif // UNARY_SXElement_HPP

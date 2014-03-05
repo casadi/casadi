@@ -30,10 +30,10 @@ import itertools
 class ADtests(casadiTestCase):
 
   def setUp(self):
-    x=SX("x")
-    y=SX("y")
-    z=SX("z")
-    w=SX("w")
+    x=SXElement("x")
+    y=SXElement("y")
+    z=SXElement("z")
+    w=SXElement("w")
     
     out=SXMatrix(6,1)
     out[0,0]=x
@@ -326,7 +326,7 @@ class ADtests(casadiTestCase):
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
-            self.message("jacobian on SX (SCT). Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
+            self.message("jacobian on SXElement (SCT). Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             Jf=SXFunction(
               self.sxinputs[inputshape][inputtype],
               [
@@ -440,8 +440,8 @@ class ADtests(casadiTestCase):
     
   def test_bugglibc(self):
     self.message("Code that used to throw a glibc error")
-    x=SX("x")
-    y=SX("y")
+    x=SXElement("x")
+    y=SXElement("y")
 
     inp=SXMatrix(5,1)
     inp[0,0]=x
@@ -715,7 +715,7 @@ class ADtests(casadiTestCase):
               storage[storagekey] = []
             storage[storagekey].append([vf.getOutput(i) for i in range(vf.getNumOutputs())])
             
-            # Added to make sure that the same seeds are used for SX and MX
+            # Added to make sure that the same seeds are used for SXElement and MX
             if Function is MXFunction:
               vf_mx = vf
 

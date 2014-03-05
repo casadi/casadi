@@ -48,7 +48,7 @@ rhs    = vertcat([x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * 
 f=SXFunction(daeIn(x=x,p=params),daeOut(ode=rhs))
 f.init()
 
-t = SX("t")
+t = ssym("t")
 cf=SXFunction(controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), u=ff),[rhs])
 cf.init()
 

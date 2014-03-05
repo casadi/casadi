@@ -244,7 +244,7 @@ namespace CasADi{
     std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
 
   
-    /// evaluate symbolically, SX type (overloaded)
+    /// evaluate symbolically, SXElement type (overloaded)
     std::vector<SXMatrix> eval(const std::vector<SXMatrix>& arg){ return evalSX(arg);}
 
     /// evaluate symbolically, MX type (overloaded)
@@ -253,10 +253,10 @@ namespace CasADi{
     /// evaluate symbolically, MX type (unambiguous)
     std::vector<MX> evalMX(const std::vector<MX>& arg);
 
-    /// evaluate symbolically, SX type (unambiguous)
+    /// evaluate symbolically, SXElement type (unambiguous)
     std::vector<SXMatrix> evalSX(const std::vector<SXMatrix>& arg);
   
-    /** \brief Evaluate symbolically with with directional derivatives, SX type
+    /** \brief Evaluate symbolically with with directional derivatives, SXElement type
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
      * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
      * the length of the vector being the number of forward directions.
@@ -290,7 +290,7 @@ namespace CasADi{
                 const MXVectorVector& aseed, MXVectorVector& OUTPUT);
 #endif // SWIG  
               
-    /** \brief Evaluate symbolically with with directional derivatives, SX type, overloaded
+    /** \brief Evaluate symbolically with with directional derivatives, SXElement type, overloaded
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
      * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
      * the length of the vector being the number of forward directions.

@@ -97,7 +97,7 @@ namespace CasADi{
     /// Free variables
     std::vector<MX> free_vars_;
         
-    /** \brief Evaluate symbolically, SX type*/
+    /** \brief Evaluate symbolically, SXElement type*/
     virtual void evalSXsparse(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
                         const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
                         const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens);

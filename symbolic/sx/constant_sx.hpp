@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CONSTANT_SX_HPP
-#define CONSTANT_SX_HPP
+#ifndef CONSTANT_SXElement_HPP
+#define CONSTANT_SXElement_HPP
 
 #include "sx_node.hpp"
 #include <cassert>
@@ -126,7 +126,7 @@ class RealtypeSX : public ConstantSX{
     virtual bool isAlmostZero(double tol) const{ return fabs(value)<=tol; }
     
   protected:
-    /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx.cpp) */
+    /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx_element.cpp) */
     static CACHING_MAP<double,RealtypeSX*> cached_constants_;
     
     /** \brief  Data members */
@@ -182,7 +182,7 @@ class IntegerSX : public ConstantSX{
   
   protected:
 
-    /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx.cpp) */
+    /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx_element.cpp) */
     static CACHING_MAP<int,IntegerSX*> cached_constants_;
     
     /** \brief  Data members */
@@ -319,4 +319,4 @@ public:
 } // namespace CasADi
 
 
-#endif // CONSTANT_SX_HPP
+#endif // CONSTANT_SXElement_HPP

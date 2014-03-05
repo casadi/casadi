@@ -63,12 +63,12 @@ SXMatrix gauss_quadrature(SXMatrix f, const SXMatrix &x, const SXMatrix &a, cons
   
   // Evaluate at the Gauss points
   SXFunction fcn(x,f);
-  vector<SX> f_val(5);
+  vector<SXElement> f_val(5);
   for(int i=0; i<5; ++i)
     f_val[i] = fcn.eval(xi[i]).toScalar();
 
   // Weighted sum
-  SX sum;
+  SXElement sum;
   for(int i=0; i<5; ++i)
     sum += wi[i]*f_val[i];
 
@@ -90,7 +90,7 @@ SXMatrix pw_const(const SXMatrix &t, const SXMatrix &tval, const SXMatrix &val){
   return ret;
 }
 
-SXMatrix pw_lin(const SX &t, const SXMatrix &tval, const SXMatrix &val){
+SXMatrix pw_lin(const SXElement &t, const SXMatrix &tval, const SXMatrix &val){
   // Number of points
   int N = tval.numel();
   casadi_assert_message(N>=2,"pw_lin: N>=2");
@@ -226,16 +226,16 @@ void substituteInPlace(const SXMatrix &v, SXMatrix &vdef, std::vector<SXMatrix>&
   
   // Get references to the internal data structures
   const vector<ScalarAtomic>& algorithm = f.algorithm();
-  vector<SX> work(f.getWorkSize());
+  vector<SXElement> work(f.getWorkSize());
   
   // Iterator to the binary operations
-  vector<SX>::const_iterator b_it=f->operations_.begin();
+  vector<SXElement>::const_iterator b_it=f->operations_.begin();
   
   // Iterator to stack of constants
-  vector<SX>::const_iterator c_it = f->constants_.begin();
+  vector<SXElement>::const_iterator c_it = f->constants_.begin();
 
   // Iterator to free variables
-  vector<SX>::const_iterator p_it = f->free_vars_.begin();
+  vector<SXElement>::const_iterator p_it = f->free_vars_.begin();
   
   // Evaluate the algorithm
   for(vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
@@ -314,7 +314,7 @@ void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr){
   casadi_assert(bexpr.empty());
 
   // Nodes to be replaced
-  std::map<int,SX> replace;
+  std::map<int,SXElement> replace;
 
   // Go through all nodes and check if any node is non-smooth
   for(int i=0; i<fcn->algorithm.size(); ++i){
@@ -341,7 +341,7 @@ void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr){
           // Get an approriate name of the switch
           std::stringstream name;
           name << "sw_" << bvar.size2();
-          sw = SX(name.str());
+          sw = SXElement(name.str());
   
           // Add to list of switches
           bvar << sw;
@@ -472,7 +472,7 @@ const string& getName(const SXMatrix& ex) {
 
 void expand(const SXMatrix& ex2, SXMatrix &ww, SXMatrix& tt){
   casadi_assert(ex2.scalar());
-  SX ex = ex2.toScalar();
+  SXElement ex = ex2.toScalar();
   
   // Terms, weights and indices of the nodes that are already expanded
   std::vector<std::vector<SXNode*> > terms;
@@ -498,7 +498,7 @@ void expand(const SXMatrix& ex2, SXMatrix &ww, SXMatrix& tt){
 
     if(to_be_expanded.top()->isConstant()){ // constant nodes are seen as multiples of one
       w.push_back(to_be_expanded.top()->getValue());
-      f.push_back(casadi_limits<SX>::one.get());
+      f.push_back(casadi_limits<SXElement>::one.get());
     } else if(to_be_expanded.top()->isSymbolic()){ // symbolic nodes have weight one and itself as factor
       w.push_back(1);
       f.push_back(to_be_expanded.top());
@@ -588,13 +588,13 @@ void expand(const SXMatrix& ex2, SXMatrix &ww, SXMatrix& tt){
   int thisind = indices[ex.get()];
   ww = SXMatrix(weights[thisind]);
 
-  vector<SX> termsv(terms[thisind].size());
+  vector<SXElement> termsv(terms[thisind].size());
   for(int i=0; i<termsv.size(); ++i)
-    termsv[i] = SX::create(terms[thisind][i]);
+    termsv[i] = SXElement::create(terms[thisind][i]);
   tt = SXMatrix(termsv);
 }
 
-void simplify(SX& ex){
+void simplify(SXElement& ex){
   // Start by expanding the node to a weighted sum
   SXMatrix terms, weights;
   expand(ex,weights,terms);
@@ -604,7 +604,7 @@ void simplify(SX& ex){
   ex = s.toScalar();
 }
 
-void fill(SXMatrix& mat, const SX& val){
+void fill(SXMatrix& mat, const SXElement& val){
   if(val->isZero())    mat.makeEmpty(mat.size1(),mat.size2());
   else                 mat.makeDense(mat.size1(),mat.size2(),val);
 }
@@ -615,13 +615,13 @@ void fill(SXMatrix& mat, const SX& val){
 //   return r;
 // }
 // 
-// SXMatrix scalar_matrix(int op, const SX &x, const SXMatrix &y){
+// SXMatrix scalar_matrix(int op, const SXElement &x, const SXMatrix &y){
 //   SXMatrix r;
 //   dynamic_cast<SXMatrix&>(r).scalar_matrix(sfcn[op],x,y);
 //   return r;
 // }
 // 
-// SXMatrix matrix_scalar(int op, const SXMatrix &x, const SX &y){
+// SXMatrix matrix_scalar(int op, const SXMatrix &x, const SXElement &y){
 //   SXMatrix r;
 //   dynamic_cast<SXMatrix&>(r).matrix_scalar(sfcn[op],x,y);
 //   return r;
@@ -643,7 +643,7 @@ SXMatrix ssym(const std::string& name, const std::pair<int,int> & rc) {
 
 SXMatrix ssym(const std::string& name, const Sparsity& sp){
   // Create a dense n-by-m matrix
-  vector<SX> retv;
+  vector<SXElement> retv;
   
   // Check if individial names have been provided
   if(name[0]=='['){
@@ -666,17 +666,17 @@ SXMatrix ssym(const std::string& name, const Sparsity& sp){
       
       // Append to the return vector
       if(!iss.fail())
-        retv.push_back(SX(varname));
+        retv.push_back(SXElement(varname));
     }
   } else if(sp.scalar(true)){
-    retv.push_back(SX(name));
+    retv.push_back(SXElement(name));
   } else {
     // Scalar
     std::stringstream ss;
     for(int k=0; k<sp.size(); ++k){
       ss.str("");
       ss << name << "_" << k;
-      retv.push_back(SX(ss.str()));
+      retv.push_back(SXElement(ss.str()));
     }
   }
 
@@ -741,7 +741,7 @@ SXMatrix mtaylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& around,in
 }
 
 /// \cond
-SXMatrix mtaylor_recursive(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a,int order,const std::vector<int>&order_contributions, const SX & current_dx=casadi_limits<SX>::one, double current_denom=1, int current_order=1) {
+SXMatrix mtaylor_recursive(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a,int order,const std::vector<int>&order_contributions, const SXElement & current_dx=casadi_limits<SXElement>::one, double current_denom=1, int current_order=1) {
   SXMatrix result = substitute(ex,x,a)*current_dx/current_denom;
   for (int i=0;i<x.size();i++) {
     if (order_contributions[i]<=order) {
@@ -775,8 +775,8 @@ int countNodes(const SXMatrix& A){
 }
 
 
-std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args) {
-  if (!x.hasDep()) throw CasadiException("getOperatorRepresentation: SX must be binary operator");
+std::string getOperatorRepresentation(const SXElement& x, const std::vector<std::string>& args) {
+  if (!x.hasDep()) throw CasadiException("getOperatorRepresentation: SXElement must be binary operator");
   if (args.size() == 0 || (casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2)) throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
   std::stringstream s;
   casadi_math<double>::print(x.getOp(),s,args[0],args[1]);
@@ -817,13 +817,13 @@ void makeSemiExplicit(const SXMatrix& f, const SXMatrix& x, SXMatrix& fe, SXMatr
   casadi_assert(coarse_rowblock[3]==coarse_rowblock[4]);
 
   // Permuted equations
-  vector<SX> fp(f.size());
+  vector<SXElement> fp(f.size());
   for(int i=0; i<fp.size(); ++i){
     fp[i] = f.elem(0,colperm[i]);
   }
   
   // Permuted variables
-  vector<SX> xp(x.size());
+  vector<SXElement> xp(x.size());
   for(int i=0; i<xp.size(); ++i){
     xp[i]= x.elem(0,rowperm[i]);
   }
@@ -832,16 +832,16 @@ void makeSemiExplicit(const SXMatrix& f, const SXMatrix& x, SXMatrix& fe, SXMatr
   int nb = colblock.size()-1;
 
   // Block equations
-  vector<SX> fb;
+  vector<SXElement> fb;
 
   // Block variables
-  vector<SX> xb;
+  vector<SXElement> xb;
 
   // Block variables that enter linearly and nonlinearily respectively
-  vector<SX> xb_lin, xb_nonlin;
+  vector<SXElement> xb_lin, xb_nonlin;
   
   // The separated variables and equations
-  vector<SX> fev, fiv, xev, xiv;
+  vector<SXElement> fev, fiv, xev, xiv;
   
   // Loop over blocks
   for(int b=0; b<nb; ++b){
@@ -1021,7 +1021,7 @@ SXMatrix jacobianTimesVector(const SXMatrix &ex, const SXMatrix &arg, const SXMa
   return vertcat(dirder);
 }
 
-void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vdef, const std::string& v_prefix, const std::string& v_suffix){
+void extractShared(std::vector<SXElement>& ex, std::vector<SXElement>& v, std::vector<SXElement>& vdef, const std::string& v_prefix, const std::string& v_suffix){
   
   // Sort the expression
   SXFunction f(vector<SXMatrix>(),vector<SXMatrix>(1,ex));
@@ -1029,17 +1029,17 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
 
   // Get references to the internal data structures
   const vector<ScalarAtomic>& algorithm = f.algorithm();
-  vector<SX> work(f.getWorkSize());
-  vector<SX> work2 = work;
+  vector<SXElement> work(f.getWorkSize());
+  vector<SXElement> work2 = work;
   
   // Iterator to the binary operations
-  vector<SX>::const_iterator b_it=f->operations_.begin();
+  vector<SXElement>::const_iterator b_it=f->operations_.begin();
   
   // Iterator to stack of constants
-  vector<SX>::const_iterator c_it = f->constants_.begin();
+  vector<SXElement>::const_iterator c_it = f->constants_.begin();
 
   // Iterator to free variables
-  vector<SX>::const_iterator p_it = f->free_vars_.begin();
+  vector<SXElement>::const_iterator p_it = f->free_vars_.begin();
 
   // Count how many times an expression has been used
   vector<int> usecount(work.size(),0);
@@ -1094,7 +1094,7 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
   for(int i=0; i<vdef.size(); ++i){
     v_name.str(string());
     v_name << v_prefix << i << v_suffix;
-    v.push_back(SX(v_name.str()));
+    v.push_back(SXElement(v_name.str()));
   }
   
   // Mark the above expressions
@@ -1103,7 +1103,7 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
   }
 
   // Save the marked nodes for later cleanup
-  vector<SX> marked = vdef;
+  vector<SXElement> marked = vdef;
   
   // Reset iterator
   b_it=f->operations_.begin();
@@ -1132,14 +1132,14 @@ void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vde
   }
 
   // Unmark the expressions
-  for(vector<SX>::iterator it=marked.begin(); it!=marked.end(); ++it){
+  for(vector<SXElement>::iterator it=marked.begin(); it!=marked.end(); ++it){
     it->setTemp(0);
   }
 }
 
 void printCompact(const SXMatrix& ex, std::ostream &stream){
   // Extract shared subexpressions from ex
-  vector<SX> v,vdef;
+  vector<SXElement> v,vdef;
   SXMatrix ex_extracted = ex;
   extractShared(ex_extracted.data(),v,vdef,"@","");
   
@@ -1176,8 +1176,8 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     // Gather all variables
     SXMatrix v_all = SXMatrix::zeros(1,n);
     SXMatrix vdef_all = SXMatrix::zeros(1,n);
-    vector<SX>::iterator it_v = v_all.begin();
-    vector<SX>::iterator it_vdef = vdef_all.begin();
+    vector<SXElement>::iterator it_v = v_all.begin();
+    vector<SXElement>::iterator it_vdef = vdef_all.begin();
     for(int i=0; i<v.size(); ++i){
       int nv = v[i].size();
       copy(v[i].begin(),v[i].end(),it_v);
@@ -1197,7 +1197,7 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     }
   }
   
-  bool isRegular(const SX& ex) {
+  bool isRegular(const SXElement& ex) {
     if (ex.isConstant()) {
       return !(ex.isNan() || ex.isInf() || ex.isMinusInf());
     } else {
@@ -1208,7 +1208,7 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
   bool isRegular(const SXMatrix& ex) {
     // First pass: ignore symbolics
     for (int i=0;i<ex.size();++i) {
-      const SX& x = ex.at(i);
+      const SXElement& x = ex.at(i);
       if (x.isConstant()) {
         if (x.isNan() || x.isInf() || x.isMinusInf()) return false;
       }
@@ -1220,7 +1220,7 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     return true;
   }
  
-  std::vector<SX> getSymbols(const SXMatrix& e) {
+  std::vector<SXElement> getSymbols(const SXMatrix& e) {
     SXFunction f(std::vector<SXMatrix>(),e);
     f.init();
     return f.getFree();
@@ -1238,7 +1238,7 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     int mult = 1;
     bool success = false;
     for (int i=0;i<1000;++i) {
-      ret.append(f.eval(casadi_limits<SX>::zero)/mult);
+      ret.append(f.eval(casadi_limits<SXElement>::zero)/mult);
       SXMatrix j = f.jac();
       if (j.size()==0) {
         success = true;

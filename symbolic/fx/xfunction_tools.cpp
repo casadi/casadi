@@ -33,7 +33,7 @@ namespace CasADi{
     // Pass null if input is null
     if (f.isNull()) return SXFunction();
   
-    /// Get the SX input and output vectors
+    /// Get the SXElement input and output vectors
     std::vector<SXMatrix> f_in = f.inputExpr();
     std::vector<SXMatrix> f_out = f.outputExpr();
   

@@ -30,21 +30,21 @@ using namespace std;
 
 // CONSTRUCT THE INTEGRATOR
 FX create_integrator(int nj, int nu){
-  SX u("u"); // control for one segment
+  SXElement u("u"); // control for one segment
 
   // Initial position
-  SX s0("s0"); // initial position
-  SX v0("v0"); // initial speed
-  SX m0("m0"); // initial mass
+  SXElement s0("s0"); // initial position
+  SXElement v0("v0"); // initial speed
+  SXElement m0("m0"); // initial mass
 
-  SX dt = 10.0/(nj*nu); // time step
-  SX alpha = 0.05; // friction
-  SX beta = 0.1; // fuel consumption rate
+  SXElement dt = 10.0/(nj*nu); // time step
+  SXElement alpha = 0.05; // friction
+  SXElement beta = 0.1; // fuel consumption rate
 
   // Integrate over the interval with Euler forward
-  SX s = s0, v = v0, m = m0;
+  SXElement s = s0, v = v0, m = m0;
 
-  SX dm = -dt*beta*u*u;
+  SXElement dm = -dt*beta*u*u;
   for(int j=0; j<nj; ++j){
     s += dt*v;
     v += dt / m * (u - alpha * v*v);

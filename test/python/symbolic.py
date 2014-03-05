@@ -49,7 +49,7 @@ class Symbolictests(casadiTestCase):
       for b1 in nodes():
         yield b1
         
-    for a_s, b_s, xfunction in [(SX("a"),SX("b"),SXFunction),(MX("a"),MX("b"),MXFunction)]:
+    for a_s, b_s, xfunction in [(ssym("a"),ssym("b"),SXFunction),(MX("a"),MX("b"),MXFunction)]:
       print  xfunction
       i=0
       for op1 in operations_node():

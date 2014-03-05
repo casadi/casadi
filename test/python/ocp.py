@@ -303,7 +303,7 @@ class OCPtests(casadiTestCase):
     daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
     mayer = SXFunction([x0],[7*x0[0]])
     
-    t = SX("t")
+    t = SXElement("t")
     cfcn = SXFunction(daeIn(t=t,x=x0, p=p),[x0[:nh,0]])
     cfcn.init()
     
@@ -347,9 +347,9 @@ class OCPtests(casadiTestCase):
     """
     te = 2*pi
     N = 20
-    t=SX("t")
+    t=SXElement("t")
     y=ssym("y",3,1)
-    p=SX("p")
+    p=SXElement("p")
     f=SXFunction(daeIn(t=t, x=y, p=p),daeOut(ode=vertcat([y[1,0],-y[0,0],p*y[0,0]])))
     f.init()
     

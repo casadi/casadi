@@ -136,7 +136,7 @@ namespace CasADi{
 
     /// Construct from a vector
     /**
-     * Thanks to implicit conversion, you can pretend that Matrix(const SX& x); exists.
+     * Thanks to implicit conversion, you can pretend that Matrix(const SXElement& x); exists.
      * Note: above remark applies only to C++, not python or octave interfaces
      */
     Matrix(const std::vector<T>& x);

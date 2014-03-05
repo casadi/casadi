@@ -160,7 +160,7 @@ class Toolstests(casadiTestCase):
       p.y = ssym("y",3,2)
 
       xother = Variables()
-      xother.a = SX("x")
+      xother.a = SXElement("x")
       xother.b = diag(ssym("[a,b]"))
       xother.freeze()
       
@@ -213,7 +213,7 @@ class Toolstests(casadiTestCase):
       
       for k in range(p.getSize()):
         roundtrip = p.lookup(p.reverselookup(k))
-        if not(isinstance(roundtrip,SX)):
+        if not(isinstance(roundtrip,SXElement)):
           roundtrip = roundtrip.toScalar()
         self.assertTrue(roundtrip.isEqual(p.vecNZcat()[k].toScalar()))
       
@@ -277,7 +277,7 @@ class Toolstests(casadiTestCase):
             
       for k in range(p.getSize()):
         roundtrip = p.lookup(p.reverselookup(k))
-        if not(isinstance(roundtrip,SX)):
+        if not(isinstance(roundtrip,SXElement)):
           roundtrip = roundtrip.toScalar()
         self.assertTrue(roundtrip.isEqual(p.vecNZcat()[k].toScalar()))
         
@@ -380,7 +380,7 @@ class Toolstests(casadiTestCase):
 
       for k in range(p.getSize()):
         roundtrip = p.lookup(p.reverselookup(k))
-        if not(isinstance(roundtrip,SX)):
+        if not(isinstance(roundtrip,SXElement)):
           roundtrip = roundtrip.toScalar()
         self.assertTrue(roundtrip.isEqual(p.vecNZcat()[k].toScalar()))
         
@@ -403,7 +403,7 @@ class Toolstests(casadiTestCase):
       p.y = ssym("y",3,2)
 
       xother = Variables()
-      xother.a = SX("x")
+      xother.a = SXElement("x")
       xother.b = diag(ssym("[a,b]"))
       xother.freeze()
       

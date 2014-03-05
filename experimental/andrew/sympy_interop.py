@@ -77,7 +77,7 @@ def traverse(node, casadi_syms, rootnode):
 
 def sympy2casadi(node):
 	sympy_syms = node.free_symbols  # a python set of sympy Symbols
-	# A dictionary matching symbol names to instances of casadi Matrix<SX>
+	# A dictionary matching symbol names to instances of casadi Matrix<SXElement>
 	casadi_syms = {sym.name:casadi.ssym(sym.name) for sym in sympy_syms}
 	return traverse(node, casadi_syms, node)
 

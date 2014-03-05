@@ -28,14 +28,14 @@ namespace CasADi{
   
 VariableInternal::VariableInternal(const string& name) : name_(name){
   // No expression by default
-  var_ = casadi_limits<SX>::nan;
+  var_ = casadi_limits<SXElement>::nan;
   
   // Not differentable by default
-  der_ = casadi_limits<SX>::nan;
+  der_ = casadi_limits<SXElement>::nan;
     
   // Not binding expressions by default
-  binding_ = casadi_limits<SX>::nan;
-  der_binding_ = casadi_limits<SX>::nan;
+  binding_ = casadi_limits<SXElement>::nan;
+  der_binding_ = casadi_limits<SXElement>::nan;
     
   variability_ = CONTINUOUS;
   causality_ = INTERNAL;
@@ -73,14 +73,14 @@ void VariableInternal::print(ostream &stream) const{
   stream << name_;
 }
 
-SX VariableInternal::atTime(double t, bool allocate) const{
+SXElement VariableInternal::atTime(double t, bool allocate) const{
   casadi_assert(!allocate);
   return const_cast<VariableInternal*>(this)->atTime(t,false);
 }
 
-SX VariableInternal::atTime(double t, bool allocate){
+SXElement VariableInternal::atTime(double t, bool allocate){
   // Find an existing element
-  map<double,SX>::const_iterator it = timed_sx_.find(t);
+  map<double,SXElement>::const_iterator it = timed_sx_.find(t);
   
   // If not found
   if(it==timed_sx_.end()){
@@ -88,7 +88,7 @@ SX VariableInternal::atTime(double t, bool allocate){
       // Create a timed variable
       stringstream ss;
       ss << var_ << ".atTime(" << t << ")";
-      SX tvar(ss.str());
+      SXElement tvar(ss.str());
       
       // Save to map
       timed_sx_[t] = tvar;
