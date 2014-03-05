@@ -327,42 +327,24 @@ namespace CasADi{
   /** \brief  Evaluate a polynomial with coefficeints p in x */
   MX polyval(const MX& p, const MX& x);
 
-  /** \brief  Construct symbolic arrays and variables using CasADi's MX expression graph representation
-      The "msym" function is intended to work in a similar way as "sym" used in the Symbolic Toolbox for Matlab but instead creating an MX object.
-      The MX expression graph is more general but also have considerably more overhead than the alternative SX expression graph.
-  */
-  //@{
-  /** \brief Create a matrix symbolic variable of given sparsity */
-  MX msym(const std::string& name, int nrow=1, int ncol=1);
-
-  /** \brief Create a matrix symbolic variable of given sparsity */
-  MX msym(const std::string& name, const std::pair<int,int> & rc);
-
-  /** \brief Create a matrix variable from a constant matrix */
-  MX msym(const Matrix<double>& x);
-
-  /** \brief Create a matrix symbolic variable of given sparsity */
-  MX msym(const std::string& name, const Sparsity& sp);
-
-  /** \brief Create a vector of length p with with matrix symbolic variables of given sparsity */
-  std::vector<MX> msym(const std::string& name, const Sparsity& sp, int p);
-
-  /** \brief Create a vector of length p with nrow-by-ncol matrix symbolic variables */
-  std::vector<MX> msym(const std::string& name, int nrow, int ncol, int p);
-
-  /** \brief Create a vector of length r of vectors of length p with matrix symbolic variables with given sparsity*/
-  std::vector<std::vector<MX> > msym(const std::string& name, const Sparsity& sp, int p, int r);
-
-  /** \brief Create a vector of length r of vectors of length p with nrow-by-ncol matrices with symbolic variables */
-  std::vector<std::vector<MX> > msym(const std::string& name, int nrow, int ncol, int p, int r);
-
-  //@}
+#ifndef WITHOUT_PRE_1_9_X
+/** \brief [DEPRECATED] Replaced with MX::sym
+*/
+//@{
+  inline MX msym(const std::string& name, int nrow=1, int ncol=1){ return MX::sym(name,nrow,ncol); }
+  inline MX msym(const std::string& name, const std::pair<int,int> & rc){ return MX::sym(name,rc);}
+  inline std::vector<MX> msym(const std::string& name, const Sparsity& sp, int p){ return MX::sym(name,sp,p);}
+  inline std::vector<MX> msym(const std::string& name, int nrow, int ncol, int p){ return MX::sym(name,nrow,ncol,p);}
+  inline std::vector<std::vector<MX> > msym(const std::string& name, const Sparsity& sp, int p, int r){ return MX::sym(name,sp,p,r);}
+  inline std::vector<std::vector<MX> > msym(const std::string& name, int nrow, int ncol, int p, int r){ return MX::sym(name,nrow,ncol,p,r);}
+  inline MX msym(const std::string& name, const Sparsity& sp){ return MX::sym(name,sp);}
+  inline MX msym(const Matrix<double>& x){ return MX(x);}
+//@}
+#endif
 
   /** \brief  Check if two expressions are equal
-  *
-  *  Might very well give false negatives
-  *
-  *   Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
+   *  Might very well give false negatives
+   *  Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
    */
   bool isEqual(const MX& ex1,const MX &ex2);
 

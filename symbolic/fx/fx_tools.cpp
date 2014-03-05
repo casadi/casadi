@@ -124,10 +124,10 @@ void reportConstraints(std::ostream &stream,const Matrix<double> &v, const Matri
 FX parameterizeTime(FX dae) {
 
    // dimensionless time
-   MX tau = msym("tau");
+   MX tau = MX::sym("tau");
    
    // The dae parameters augmented with t0 and tf
-   MX P = msym("P",1,2+dae.input(DAE_P).size());
+   MX P = MX::sym("P",1,2+dae.input(DAE_P).size());
    MX t0 = P[0];
    MX tf = P[1];
    
@@ -165,10 +165,10 @@ FX parameterizeTime(FX dae) {
  
 FX parameterizeTimeOutput(FX f) {
   // dimensionless time
-   MX tau = msym("tau");
+   MX tau = MX::sym("tau");
    
    // The f parameters augmented with t0 and tf
-   MX P = msym("P",1,2+f.input(DAE_P).size());
+   MX P = MX::sym("P",1,2+f.input(DAE_P).size());
    MX t0 = P[0];
    MX tf = P[1];
    

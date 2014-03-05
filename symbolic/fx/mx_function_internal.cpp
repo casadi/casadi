@@ -49,7 +49,7 @@ namespace CasADi{
         if(it->empty()){
           stringstream ss;
           ss << "r" << ind;        
-          *it = msym(ss.str(),it->sparsity());
+          *it = MX::sym(ss.str(),it->sparsity());
         } else {
           casadi_error("Failed to create an MXFunction instance since not all input arguments are symbolic primitives. Support for non-symbolic inputs has been dropped. We refer users to the approach demonstrated in http://docs.casadi.org/tutorials/tools/structure.pdf");
         }
@@ -1206,7 +1206,7 @@ namespace CasADi{
             case 0:
               ss.str(string());
               ss << "y" << y.size();
-              y.push_back(msym(ss.str(),arg.sparsity()));
+              y.push_back(MX::sym(ss.str(),arg.sparsity()));
               g.push_back(arg);
               res = y.back();
               break;

@@ -318,7 +318,7 @@ namespace CasADi{
     for(int i=0; i<ret.size(); ++i){
       stringstream name;
       name << "x_" << i;
-      ret[i] = msym(name.str(),input(i).sparsity());
+      ret[i] = MX::sym(name.str(),input(i).sparsity());
     }
     return ret;
   }
@@ -1701,7 +1701,7 @@ namespace CasADi{
           // Create a forward seed with a suitable name and add to list of inputs
           ss.str("fwd");
           ss << dir << "_" << arg[i];
-          arg.push_back(msym(ss.str(),arg[i].sparsity()));
+          arg.push_back(MX::sym(ss.str(),arg[i].sparsity()));
 
           // Add to the right-hand-side under construction
           d.push_back(trans(vec(arg.back())));
@@ -1739,7 +1739,7 @@ namespace CasADi{
           // Create a forward seed with a suitable name and add to list of inputs
           ss.str("adj");
           ss << dir << "_" << res[i];
-          arg.push_back(msym(ss.str(),res[i].sparsity()));
+          arg.push_back(MX::sym(ss.str(),res[i].sparsity()));
 
           // Add to the right-hand-side under construction
           d.push_back(trans(vec(arg.back())));
@@ -1913,7 +1913,7 @@ namespace CasADi{
       }
       
       // Create symbolic primitive
-      arg = msym("x",sp_arg);
+      arg = MX::sym("x",sp_arg);
 
       // Split up and fix shape
       argv = horzsplit(arg,col_offset);

@@ -67,7 +67,7 @@ namespace CasADi{
     for(int i=0; i<f_in.size(); ++i){
       std::stringstream s;
       s << "X_flat_" << i;
-      f_in_vec[i] = msym(s.str(),vec(f_in[i].sparsity()));
+      f_in_vec[i] = MX::sym(s.str(),vec(f_in[i].sparsity()));
       f_in_vec_reshaped[i] = reshape(f_in_vec[i],f_in[i].sparsity());
     }
   

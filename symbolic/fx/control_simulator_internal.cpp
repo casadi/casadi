@@ -263,7 +263,7 @@ namespace CasADi{
    
     output_fcn_in_ = vector<MX>(CONTROL_DAE_NUM_IN);
 
-    dae_in_[DAE_T] = msym("tau");
+    dae_in_[DAE_T] = MX::sym("tau");
     if (!output_fcn_.input(CONTROL_DAE_T).empty()) {
       output_fcn_in_[CONTROL_DAE_T]        = dae_in_[DAE_P](iT0) + (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*dae_in_[DAE_T];
     }

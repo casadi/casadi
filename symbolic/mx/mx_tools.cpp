@@ -422,7 +422,7 @@ namespace CasADi{
     }
   
     // Create the parent
-    MX P = msym("P",1,index[deps.size()]);
+    MX P = MX::sym("P",1,index[deps.size()]);
   
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
@@ -440,7 +440,7 @@ namespace CasADi{
     }
   
     // Create the parent
-    MX P = msym("P",1,index[deps.size()]);
+    MX P = MX::sym("P",1,index[deps.size()]);
   
     std::vector<MX> ret(deps.size());
   
@@ -534,22 +534,6 @@ namespace CasADi{
     return ex.size() == ex.numel();
   }
 
-  MX msym(const std::string& name, int nrow, int ncol){
-    return MX(name,nrow,ncol);
-  }
-
-  MX msym(const std::string& name, const std::pair<int,int> & rc) {
-    return MX(name,rc.first,rc.second);
-  }
-
-  MX msym(const Matrix<double>& x){
-    return MX(x);
-  }
-
-  MX msym(const std::string& name, const Sparsity& sp) {
-    return MX(name,sp);
-  }
-
   bool isEqual(const MX& ex1,const MX &ex2){
     if ((ex1.size()!=0 || ex2.size()!=0) && (ex1.size2()!=ex2.size2() || ex1.size1()!=ex2.size1())) return false;
     MX difference = ex1 - ex2;  
@@ -641,34 +625,6 @@ namespace CasADi{
         }
       }
     }  
-  }
-
-  std::vector<MX> msym(const std::string& name, const Sparsity& sp, int p){
-    std::vector<MX> ret(p);
-    for(int k=0; k<p; ++k){
-      stringstream ss;
-      ss << name << "_" << k;
-      ret[k] = msym(ss.str(),sp);
-    }
-    return ret;
-  }
-
-  std::vector<std::vector<MX> > msym(const std::string& name, const Sparsity& sp, int p, int r){
-    std::vector<std::vector<MX> > ret(r);
-    for(int k=0; k<r; ++k){
-      stringstream ss;
-      ss << name << "_" << k;
-      ret[k] = msym(ss.str(),sp,p);
-    }
-    return ret;
-  }
-
-  std::vector<MX> msym(const std::string& name, int nrow, int ncol, int p){
-    return msym(name,sp_dense(nrow,ncol),p);
-  }
-
-  std::vector<std::vector<MX> > msym(const std::string& name, int nrow, int ncol, int p, int r){
-    return msym(name,sp_dense(nrow,ncol),p,r);
   }
 
   MX substitute(const MX &ex, const MX& v, const MX& vdef){
@@ -912,7 +868,7 @@ namespace CasADi{
               // Create a new variable
               v_name.str(string());
               v_name << v_prefix << v.size() << v_suffix;
-              v.push_back(msym(v_name.str()));
+              v.push_back(MX::sym(v_name.str()));
             
               // Use in calculations
               work[ind] = v.back();
@@ -1026,7 +982,7 @@ namespace CasADi{
     std::vector<MX> syms(boundary.size());
     
     for (int i=0;i<syms.size();++i) {
-      syms[i] = msym("x",boundary[i].sparsity());
+      syms[i] = MX::sym("x",boundary[i].sparsity());
     }
     
     // Substitute symbols for boundary nodes
