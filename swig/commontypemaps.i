@@ -50,7 +50,7 @@
 #define PRECEDENCE_DMatrixVectorVector 101
 
 #define PRECEDENCE_SXMatrix 103
-#define PRECEDENCE_SX 102
+#define PRECEDENCE_SXElement 102
 #define PRECEDENCE_SXMatrixVector 103
 #define PRECEDENCE_SXMatrixVectorVector 103
 #define PRECEDENCE_SXElementVector 102
@@ -158,7 +158,7 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_DVector,std::vector<double>);
 %my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
 
-%my_generic_const_typemap(PRECEDENCE_SX,CasADi::SXElement);
+%my_generic_const_typemap(PRECEDENCE_SXElement,CasADi::SXElement);
 %my_generic_const_typemap(PRECEDENCE_SXElementVector,std::vector< CasADi::SXElement >);
 %my_generic_const_typemap(PRECEDENCE_SXElementVectorVector,std::vector< std::vector< CasADi::SXElement > >);
 
