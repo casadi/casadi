@@ -333,7 +333,7 @@ namespace CasADi{
     for(int i=0; i<ret.size(); ++i){
       stringstream name;
       name << "x_" << i;
-      ret[i] = ssym(name.str(),input(i).sparsity());
+      ret[i] = SX::sym(name.str(),input(i).sparsity());
     }
     return ret;
   }

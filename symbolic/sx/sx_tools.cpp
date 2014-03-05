@@ -633,90 +633,6 @@ void fill(SX& mat, const SXElement& val){
 //   return r;
 // }
 
-SX ssym(const std::string& name, int nrow, int ncol){
-  return ssym(name,sp_dense(nrow,ncol));
-}
-
-SX ssym(const std::string& name, const std::pair<int,int> & rc) {
-  return ssym(name,rc.first,rc.second);
-}
-
-SX ssym(const std::string& name, const Sparsity& sp){
-  // Create a dense n-by-m matrix
-  vector<SXElement> retv;
-  
-  // Check if individial names have been provided
-  if(name[0]=='['){
-
-    // Make a copy of the string and modify it as to remove the special characters
-    string modname = name;
-    for(string::iterator it=modname.begin(); it!=modname.end(); ++it){
-      switch(*it){
-        case '(': case ')': case '[': case ']': case '{': case '}': case ',': case ';': *it = ' ';
-      }
-    }
-    
-    istringstream iss(modname);
-    string varname;
-    
-    // Loop over elements
-    while(!iss.fail()){
-      // Read the name
-      iss >> varname;
-      
-      // Append to the return vector
-      if(!iss.fail())
-        retv.push_back(SXElement::sym(varname));
-    }
-  } else if(sp.scalar(true)){
-    retv.push_back(SXElement::sym(name));
-  } else {
-    // Scalar
-    std::stringstream ss;
-    for(int k=0; k<sp.size(); ++k){
-      ss.str("");
-      ss << name << "_" << k;
-      retv.push_back(SXElement::sym(ss.str()));
-    }
-  }
-
-  // Determine dimensions automatically if empty
-  if(sp.scalar(true)){
-    return SX(retv);
-  } else {
-    return SX(sp,retv);
-  }
-}
-
-std::vector<SX> ssym(const std::string& name, const Sparsity& sp, int p){
-  std::vector<SX> ret(p);
-  stringstream ss;
-  for(int k=0; k<p; ++k){
-    ss.str("");
-    ss << name << "_" << k;
-    ret[k] = ssym(ss.str(),sp);
-  }
-  return ret;
-}
-
-std::vector<std::vector<SX> > ssym(const std::string& name, const Sparsity& sp, int p, int r){
-  std::vector<std::vector<SX> > ret(r);
-  for(int k=0; k<r; ++k){
-    stringstream ss;
-    ss << name << "_" << k;
-    ret[k] = ssym(ss.str(),sp,p);
-  }
-  return ret;
-}
-
-std::vector<SX> ssym(const std::string& name, int nrow, int ncol, int p){
-  return  ssym(name,sp_dense(nrow,ncol),p);
-}
-
-std::vector<std::vector<SX> > ssym(const std::string& name, int nrow, int ncol, int p, int r){
-  return ssym(name,sp_dense(nrow,ncol),p,r);
-}
-
 SX taylor(const SX& ex,const SX& x, const SX& a, int order) {
   casadi_assert(x.scalar() && a.scalar());
   if (ex.size()!=ex.numel())
@@ -781,10 +697,6 @@ std::string getOperatorRepresentation(const SXElement& x, const std::vector<std:
   std::stringstream s;
   casadi_math<double>::print(x.getOp(),s,args[0],args[1]);
   return s.str();
-}
-
-SX ssym(const Matrix<double>& x){
-  return SX(x);
 }
 
 void makeSemiExplicit(const SX& f, const SX& x, SX& fe, SX& fi, SX& xe, SX& xi){
@@ -859,7 +771,7 @@ void makeSemiExplicit(const SX& f, const SX& x, SX& fe, SX& fi, SX& xe, SX& xi){
     }
 
     // We shall find out which variables enter nonlinearily in the equations, for this we need a function that will depend on all the variables
-    SXFunction fcnb_all(xb,inner_prod(SX(fb),ssym("dum1",fb.size())));
+    SXFunction fcnb_all(xb,inner_prod(SX(fb),SX::sym("dum1",fb.size())));
     fcnb_all.init();
     
     // Take the gradient of this function to find out which variables enter in the function (should be all)
@@ -869,7 +781,7 @@ void makeSemiExplicit(const SX& f, const SX& x, SX& fe, SX& fi, SX& xe, SX& xi){
     casadi_assert(fcnb_dep.dense());
     
     // Multiply this expression with a new dummy vector and take the jacobian to find out which variables enter nonlinearily
-    SXFunction fcnb_nonlin(xb,inner_prod(fcnb_dep,ssym("dum2",fcnb_dep.size())));
+    SXFunction fcnb_nonlin(xb,inner_prod(fcnb_dep,SX::sym("dum2",fcnb_dep.size())));
     fcnb_nonlin.init();
     Sparsity sp_nonlin = fcnb_nonlin.jacSparsity().transpose();
     
@@ -1358,7 +1270,7 @@ void printCompact(const SX& ex, std::ostream &stream){
     
     SX m_perm = m(offset,offset);
     
-    SX l = ssym("l");
+    SX l = SX::sym("l");
     
     for (int k=0;k<nb;++k) {
       std::vector<int> r = range(index.at(k),index.at(k+1));

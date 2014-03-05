@@ -1003,7 +1003,7 @@ namespace CasADi{
     vector<SX> arg(inputv_.size());
     if(inputvsx.empty()){ // No symbolic input provided
       for(int i=0; i<arg.size(); ++i){
-        arg[i] = ssym(inputv_[i]->getName(),inputv_[i].sparsity());
+        arg[i] = SX::sym(inputv_[i]->getName(),inputv_[i].sparsity());
       }
     } else { // Use provided symbolic input
       // Make sure number of inputs matches

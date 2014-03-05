@@ -297,7 +297,6 @@ namespace CasADi{
 
   };
 
-
 #ifdef SWIG
   %extend SXElement {
     std::string __str__()  { return $self->toString(); }
@@ -346,6 +345,11 @@ namespace CasADi{
   typedef SX* SXPtr;
   typedef std::vector<SXPtr> SXPtrV;
   typedef std::vector<SXPtrV> SXPtrVV;
+
+  // Create matrix symbolic primitive
+  template<>
+  SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
+
 
 } // namespace CasADi
 

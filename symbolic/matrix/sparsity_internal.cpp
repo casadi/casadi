@@ -2188,7 +2188,7 @@ namespace CasADi{
   
     if (double(ii.size())*double(jj.size()) > size()) {
       // Typical use case:
-      // a = ssym("a",sp_diag(50000))
+      // a = SX::sym("a",sp_diag(50000))
       // a[:,:]
       return sub2(jj,ii,mapping);
     } else {

@@ -132,7 +132,7 @@ namespace CasADi{
         if(G_sx.getNumInputs()>1){
           nlp_in[NL_P] = G_sx.inputExpr(1);
         } else {
-          nlp_in[NL_P] = ssym("p",1,0);
+          nlp_in[NL_P] = SX::sym("p",1,0);
         }
 
         // Expression for f and g

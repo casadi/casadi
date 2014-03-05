@@ -55,9 +55,9 @@ void SimulatorInternal::init(){
   
   // Generate an output function if there is none (returns the whole state)
   if(output_fcn_.isNull()){
-    SX t = ssym("t");
-    SX x = ssym("x",integrator_.input(INTEGRATOR_X0).sparsity());
-    SX p = ssym("p",integrator_.input(INTEGRATOR_P).sparsity());
+    SX t = SX::sym("t");
+    SX x = SX::sym("x",integrator_.input(INTEGRATOR_X0).sparsity());
+    SX p = SX::sym("p",integrator_.input(INTEGRATOR_P).sparsity());
 
     vector<SX> arg(DAE_NUM_IN);
     arg[DAE_T] = t;

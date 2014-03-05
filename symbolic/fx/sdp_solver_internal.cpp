@@ -105,7 +105,7 @@ void SDPSolverInternal::init() {
   // Make a mapping function from dense blocks to inversely-permuted block diagonal P
   std::vector< SX > full_blocks;
   for (int i=0;i<nb_;++i) {
-    full_blocks.push_back(ssym("block",block_sizes_[i],block_sizes_[i]));
+    full_blocks.push_back(SX::sym("block",block_sizes_[i],block_sizes_[i]));
   }
   
   Pmapper_ = SXFunction(full_blocks,blkdiag(full_blocks)(lookupvector(p,p.size()),lookupvector(p,p.size())));
@@ -113,8 +113,8 @@ void SDPSolverInternal::init() {
   
   if (nb_>0) {
     // Make a mapping function from (G,F) -> (G[p,p]_j,F_i[p,p]j)
-    SX G = ssym("G",input(SDP_SOLVER_G).sparsity());
-    SX F = ssym("F",input(SDP_SOLVER_F).sparsity());
+    SX G = SX::sym("G",input(SDP_SOLVER_G).sparsity());
+    SX F = SX::sym("F",input(SDP_SOLVER_F).sparsity());
 
     std::vector<SX> in;
     in.push_back(G);

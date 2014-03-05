@@ -485,7 +485,7 @@ namespace CasADi{
 #endif // SWIG
   };
 
-  // Create symbolic primitive
+  // Create matrix symbolic primitive
   template<>
   MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp);
 

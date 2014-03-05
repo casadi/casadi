@@ -788,6 +788,54 @@ namespace CasADi{
     return eq_depth_;
   }
 
+  template<>
+  SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp){
+    // Create a dense n-by-m matrix
+    std::vector<SXElement> retv;
+  
+    // Check if individial names have been provided
+    if(name[0]=='['){
+
+      // Make a copy of the string and modify it as to remove the special characters
+      string modname = name;
+      for(string::iterator it=modname.begin(); it!=modname.end(); ++it){
+        switch(*it){
+        case '(': case ')': case '[': case ']': case '{': case '}': case ',': case ';': *it = ' ';
+        }
+      }
+    
+      istringstream iss(modname);
+      string varname;
+    
+      // Loop over elements
+      while(!iss.fail()){
+        // Read the name
+        iss >> varname;
+      
+        // Append to the return vector
+        if(!iss.fail())
+          retv.push_back(SXElement::sym(varname));
+      }
+    } else if(sp.scalar(true)){
+      retv.push_back(SXElement::sym(name));
+    } else {
+      // Scalar
+      std::stringstream ss;
+      for(int k=0; k<sp.size(); ++k){
+        ss.str("");
+        ss << name << "_" << k;
+        retv.push_back(SXElement::sym(ss.str()));
+      }
+    }
+
+    // Determine dimensions automatically if empty
+    if(sp.scalar(true)){
+      return SX(retv);
+    } else {
+      return SX(sp,retv);
+    }
+  }
+
 } // namespace CasADi
 
 using namespace CasADi;
@@ -816,7 +864,6 @@ namespace std{
   SXElement numeric_limits<SXElement>::round_error() throw(){
     return SXElement(numeric_limits<double>::round_error());
   }
-
 
 } // namespace std
 
