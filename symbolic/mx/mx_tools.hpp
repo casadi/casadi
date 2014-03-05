@@ -100,15 +100,9 @@ namespace CasADi{
   MX blockcat(const MX &A,const MX &B,const MX &C,const MX &D);
 #endif // SWIG
 
-  /** \brief  concatenate vertically while vectorizing all arguments with flatten */
-  MX flattencat(const std::vector<MX>& comp);
-  
-  /** \brief  concatenate vertically while vecing all arguments with vec */
+  /** \brief Concatenate vertically while vectorizing all arguments */
   MX veccat(const std::vector<MX>& comp);
 
-  /** \brief  concatenate vertically while vectorizing all arguments with flattenNZ */
-  MX flattenNZcat(const std::vector<MX>& comp);
-  
   /** \brief  concatenate vertically while vecing all arguments with vecNZ */
   MX vecNZcat(const std::vector<MX>& comp);
 
@@ -182,28 +176,10 @@ namespace CasADi{
   MX reshape(const MX &x, const Sparsity& sp);
 
   /** \brief Returns a vectorized version of the MX
-      Vectorizing is an expensive operation, unlike vec
-      Same as reshape(trans(x), x.numel(),1)
-    
-      a b
-      c d 
-    
-      turns into
-    
-      a
-      c
-      b
-      d
-    
-  */
-  MX flatten(const MX &x);
-
-  /** \brief Returns a flattened version of the MX
-      Flattening is a cheap (non-copying) operation
       Same as reshape(x, x.numel(),1)
     
-      a b
-      c d 
+      a c
+      b d 
     
       turns into
     
@@ -214,12 +190,8 @@ namespace CasADi{
     
   */
   MX vec(const MX &x);
-
-  /** \brief Returns a flattened version of the MX, preserving only nonzeros
-   */
-  MX flattenNZ(const MX &x);
   
-  /** \brief Returns a flattened version of the MX, prseverving only nonzeros
+  /** \brief Returns a vectorized version of the MX, prseverving only nonzeros
   */
   MX vecNZ(const MX &x);
 

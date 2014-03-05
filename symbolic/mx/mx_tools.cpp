@@ -131,16 +131,6 @@ namespace CasADi{
     ab.push_back(b);
     return vertcat(ab);
   }
-
-  MX flattencat(const vector<MX>& comp) {
-        MX (&f)(const MX&) = flatten;
-    return vertcat(applymap(f,comp));
-  }
-
-  MX flattenNZcat(const vector<MX>& comp) {
-    MX (&f)(const MX&) = flattenNZ;
-    return vertcat(applymap(flattenNZ,comp));
-  }
   
   MX veccat(const vector<MX>& comp) {
         MX (&f)(const MX&) = vec;
@@ -256,27 +246,11 @@ namespace CasADi{
     return x->getReshape(sp);
   }
 
-  MX flatten(const MX &x) {
-    if(x.vector()){
-      return x;
-    } else {
-      return reshape(trans(x),x.numel(),1);
-    }
-  }
-
   MX vec(const MX& x) {
     if(x.vector()){
       return x;
     } else {
       return reshape(x,x.numel(),1);
-    }
-  }
-
-  MX flattenNZ(const MX& x) {
-    if(x.dense()){
-      return flatten(x);
-    } else {
-      return trans(x)->getGetNonzeros(sp_dense(x.size(),1),range(x.size()));
     }
   }
   
@@ -975,7 +949,7 @@ namespace CasADi{
     std::vector<MX> e_v(1,e);
     return matrix_expand(e_v,boundary).at(0);
   }
-  
+ 
   std::vector<MX> matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary) {
     
     // Create symbols for boundary nodes

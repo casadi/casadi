@@ -171,10 +171,6 @@ namespace CasADi{
     return reshape(a,a.numel(),1);
   }
 
-  Sparsity flatten(const Sparsity& a){
-    return reshape(trans(a),a.numel(),1);
-  }
-
   Sparsity trans(const Sparsity& a) {
     return a.transpose();
   }

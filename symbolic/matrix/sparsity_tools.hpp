@@ -128,8 +128,6 @@ namespace CasADi{
   /** \ brief Vectorize the pattern */
   Sparsity vec(const Sparsity& a);
   
-  Sparsity flatten(const Sparsity& a);
-  
   /** \ brief Return the transpose of the sparsity pattern
    */
   Sparsity trans(const Sparsity& a);

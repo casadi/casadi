@@ -40,27 +40,27 @@ namespace CasADi{
       Each such primitive function \f$f_{i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$, 
       in which n,m,p,q can take different values for every (i,j) pair.\n
   
-      When passing input, you specify which partition i is active.     You pass the numbers flattened, as a vector of size \f$(n*m)\f$.\n
-      When requesting output, you specify which partition j is active. You get the numbers flattened, as a vector of size \f$(p*q)\f$.\n
+      When passing input, you specify which partition i is active.     You pass the numbers vectorized, as a vector of size \f$(n*m)\f$.\n
+      When requesting output, you specify which partition j is active. You get the numbers vectorized, as a vector of size \f$(p*q)\f$.\n
   
       To calculate jacobians, you need to have \f$(m=1,q=1)\f$.
   
-      Write the jacobian as \f$J_{i,j} = \nabla f_{i,j} = \frac{\partial f_{i,j}(\flatten{x})}{\partial \flatten{x}}\f$.
+      Write the jacobian as \f$J_{i,j} = \nabla f_{i,j} = \frac{\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
   
-      Using \f$\flatten{v} \in \mathbf{R}^n\f$ as a forward seed:  setFwdSeed(v,i)\n
-      Retrieving \f$\flatten{s}_f \in \mathbf{R}^p\f$ from:        getFwdSens(sf,j)\n
+      Using \f$\vec{v} \in \mathbf{R}^n\f$ as a forward seed:  setFwdSeed(v,i)\n
+      Retrieving \f$\vec{s}_f \in \mathbf{R}^p\f$ from:        getFwdSens(sf,j)\n
   
-      Using \f$\flatten{w} \in \mathbf{R}^p\f$ as a forward seed:  setAdjSeed(w,j)\n
-      Retrieving \f$\flatten{s}_a \in \mathbf{R}^n \f$ from:        getAdjSens(sa,i)\n
+      Using \f$\vec{w} \in \mathbf{R}^p\f$ as a forward seed:  setAdjSeed(w,j)\n
+      Retrieving \f$\vec{s}_a \in \mathbf{R}^n \f$ from:        getAdjSens(sa,i)\n
   
       We have the following relationships for function mapping from a row vector to a row vector:
   
-      \f$ \flatten{s}_f = \nabla f_{i,j} . \flatten{v}\f$ \n
-      \f$ \flatten{s}_a = (\nabla f_{i,j})^T . \flatten{w}\f$
+      \f$ \vec{s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
+      \f$ \vec{s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
   
       Some quantities is these formulas must be transposed: \n 
-      input  col: transpose \f$ \flatten{v} \f$ and \f$\flatten{s}_a\f$ \n
-      output col: transpose \f$ \flatten{w} \f$ and \f$\flatten{s}_f\f$ \n
+      input  col: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
+      output col: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
     
       NOTE: FX's are allowed to modify their input arguments when evaluating: implicitFunction, IDAS solver
       Futher releases may disallow this.

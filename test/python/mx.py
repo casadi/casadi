@@ -373,8 +373,8 @@ class MXtests(casadiTestCase):
     self.message("trans(MX)")
     x = MX.sym("x",2,3)
     z=trans(x)
-    self.assertEqual(z.size1(),3,"Flatten returns MX of wrong dimension")
-    self.assertEqual(z.size2(),2,"Flatten returns MX of wrong dimension")
+    self.assertEqual(z.size1(),3,"Vec returns MX of wrong dimension")
+    self.assertEqual(z.size2(),2,"Vec returns MX of wrong dimension")
     f = MXFunction([x],[z])
     self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
     self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
@@ -425,8 +425,8 @@ class MXtests(casadiTestCase):
     self.message("reshape(MX)")
     x = MX.sym("x",2,3)
     z=c.reshape(x,(1,6))
-    self.assertEqual(z.size1(),1,"Flatten returns MX of wrong dimension")
-    self.assertEqual(z.size2(),6,"Flatten returns MX of wrong dimension")
+    self.assertEqual(z.size1(),1,"Vec returns MX of wrong dimension")
+    self.assertEqual(z.size2(),6,"Vec returns MX of wrong dimension")
     f = MXFunction([x],[z])
     self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
     self.assertEqual(f.getNumOutputs(),1,"MXFunction fails to indicate correct number of outputs")
@@ -439,7 +439,7 @@ class MXtests(casadiTestCase):
       self.assertAlmostEqual(L[i], zt[0,i],10)
   
   def test_MXcompose(self):
-    self.message("compositions of flatten, trans, reshape with vertcat")
+    self.message("compositions of vec, trans, reshape with vertcat")
     checkMXoperations(self,lambda x: x,lambda x: x,'vertcat')
     checkMXoperations(self,lambda x: trans(x),lambda x: x.T,'trans(vertcat)')
     checkMXoperations(self,lambda x: trans(trans(x)),lambda x: x,'trans(trans(vertcat))')
@@ -450,7 +450,7 @@ class MXtests(casadiTestCase):
     checkMXoperations(self,lambda x: c.reshape(x.T,(6,4)),lambda x: reshape(x,(4,6)).T,'trans(reshape(vertcat))') 
 
   def test_MXcompose2(self):
-    self.message("compositions of flatten, trans, reshape with horzcat")
+    self.message("compositions of vec, trans, reshape with horzcat")
     checkMXoperations2(self,lambda x: x,lambda x: x,'horzcat')
     checkMXoperations2(self,lambda x: trans(x),lambda x: x.T,'trans(horzcat)')
     checkMXoperations2(self,lambda x: trans(trans(x)),lambda x: x,'trans(trans(horzcat))')
@@ -461,7 +461,7 @@ class MXtests(casadiTestCase):
     checkMXoperations2(self,lambda x: c.reshape(x.T,(6,4)),lambda x: reshape(x,(4,6)).T,'trans(reshape(horzcat))') 
 
   def test_MXcompose3(self):
-    self.message("compositions of flatten, trans, reshape with vertcat")
+    self.message("compositions of vec, trans, reshape with vertcat")
     checkMXoperations3(self,lambda x: x,lambda x: x,'snippet')
     checkMXoperations3(self,lambda x: trans(x),lambda x: x.T,'trans(snippet)')
     checkMXoperations3(self,lambda x: trans(trans(x)),lambda x: x,'trans(trans(snippet))')

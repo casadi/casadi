@@ -271,7 +271,7 @@ namespace CasADi{
   
   /// Checks if vector does not contain NaN or Inf
   template<typename T>
-  bool isRegular(const std::vector<T> &flatten);
+  bool isRegular(const std::vector<T> &v);
   
 } // namespace CasADi
 
@@ -617,9 +617,9 @@ namespace CasADi{
   
   
   template<typename T>
-  bool isRegular(const std::vector<T> &flatten) {
-    for (int k=0;k<flatten.size();++k) {
-      if (flatten[k]!=flatten[k] || flatten[k]==std::numeric_limits<T>::infinity() || flatten[k]==-std::numeric_limits<T>::infinity() ) return false;
+  bool isRegular(const std::vector<T> &v) {
+    for (int k=0;k<v.size();++k) {
+      if (v[k]!=v[k] || v[k]==std::numeric_limits<T>::infinity() || v[k]==-std::numeric_limits<T>::infinity() ) return false;
     }
     return true;
   }

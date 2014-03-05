@@ -1021,17 +1021,17 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(c_,numpy.kron(a,b))
     
-  def test_flatten_kron(self):
+  def test_vec_kron(self):
     A = SX.sym("A",2,3)
     B = SX.sym("B",4,5)
     P = SX.sym("P",A.size2(),B.size1())
 
-    f = SXFunction([flatten(P),A,B],[flatten(mul([A,P,B]))])
+    f = SXFunction([vec(P.T),A,B],[vec(mul([A,P,B]).T)])
     f.init()
 
     J = f.jacobian()
     J.init()
-    J.setInput(numpy.random.rand(*flatten(P).shape),0)
+    J.setInput(numpy.random.rand(*vec(P.T).shape),0)
     J.setInput(numpy.random.rand(*A.shape),1)
     J.setInput(numpy.random.rand(*B.shape),2)
 

@@ -637,7 +637,7 @@ SX taylor(const SX& ex,const SX& x, const SX& a, int order) {
   casadi_assert(x.scalar() && a.scalar());
   if (ex.size()!=ex.numel())
    throw CasadiException("taylor: not implemented for sparse matrices");
-  SX ff = flatten(ex);
+  SX ff = vec(trans(ex));
   
   SX result = substitute(ff,x,a);
   double nf=1; 

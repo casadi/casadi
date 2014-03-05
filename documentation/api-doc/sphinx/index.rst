@@ -77,7 +77,7 @@ Helper functions
 .. autofunction:: horzcat
 .. autofunction:: vertcat
 .. autofunction:: reshape
-.. autofunction:: flatten
+.. autofunction:: vec
 .. autofunction:: trans
 .. autofunction:: prod
 .. autofunction:: inner_prod

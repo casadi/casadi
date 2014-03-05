@@ -403,7 +403,7 @@ class casadiTestCase(unittest.TestCase):
       
       ndir = 2
       
-      def flatten(l):
+      def vec(l):
         ret = []
         for i in l:
           ret.extend(i)
@@ -421,7 +421,7 @@ class casadiTestCase(unittest.TestCase):
       
           res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
           
-          vf = Function(inputss+flatten([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + flatten([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
+          vf = Function(inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
           
           vf.init()
 
@@ -452,7 +452,7 @@ class casadiTestCase(unittest.TestCase):
            
               res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
 
-              vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+              vf2 = Function(inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
               vf2.init()
                 
               for i,v in enumerate(values):

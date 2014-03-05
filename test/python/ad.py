@@ -267,14 +267,14 @@ class ADtests(casadiTestCase):
               fe.init()
               fe.setInput(n)
               fe.evaluate()
-              self.checkarray(c.flatten(fe.getOutput()),mul(J,c.flatten(seed)),"AD") 
+              self.checkarray(c.vec(fe.getOutput().T),mul(J,c.vec(seed.T)),"AD") 
 
             for sens,seed in zip(adjsens,aseeds):
               fe = SXFunction([y],[sens])
               fe.init()
               fe.setInput(n)
               fe.evaluate()
-              self.checkarray(c.flatten(fe.getOutput()),mul(J.T,c.flatten(seed)),"AD")
+              self.checkarray(c.vec(fe.getOutput().T),mul(J.T,c.vec(seed.T)),"AD")
 
   def test_MXevalSX_reduced(self):
     n=array([1.2,2.3,7,1.4])
@@ -610,7 +610,7 @@ class ADtests(casadiTestCase):
       
       J_ = fun.getOutput(1)
       
-      def flatten(l):
+      def vec(l):
         ret = []
         for i in l:
           ret.extend(i)
@@ -665,7 +665,7 @@ class ADtests(casadiTestCase):
             
             fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].size())) for d in range(ndir) ]
             aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].size())) for d in range(ndir) ]
-            vf = Function(inputss+flatten([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + flatten([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
+            vf = Function(inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
             
             vf.init()
             
@@ -733,7 +733,7 @@ class ADtests(casadiTestCase):
            
               res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
 
-              vf2 = Function2(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+              vf2 = Function2(inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
               vf2.init()
                 
               random.seed(1)

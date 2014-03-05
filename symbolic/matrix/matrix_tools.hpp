@@ -111,30 +111,11 @@ namespace CasADi{
 
   /** \brief  make a vector
       Reshapes/vectorizes the Matrix<T> such that the shape becomes (expr.numel(),1).
-      Rows are stacked on top of each other.
-      Same as reshape(trans(expr), expr.numel(),1)
-  
-      a b \n
-      c d \n
-    
-      turns into
-    
-      a \n
-      c \n
-      b \n
-      d \n
-    
-  */
-  template<class T>
-  Matrix<T> flatten(const Matrix<T>& a);
-
-  /** \brief  make a vector
-      Flattens the Matrix<T> such that the shape becomes (expr.numel(),1).
-      Transposed cols are stacked on top of each other.
+      Columns are stacked on top of each other.
       Same as reshape(expr, expr.numel(),1)
   
-      a b \n
-      c d \n
+      a c \n
+      b d \n
     
       turns into
     
@@ -146,11 +127,6 @@ namespace CasADi{
   */
   template<class T>
   Matrix<T> vec(const Matrix<T>& a);
-
-  /** \brief Returns a flattened version of the Matrix, preserving only nonzeros
-   */
-  template<class T>
-  Matrix<T> flattenNZ(const Matrix<T>& a);
 
   /** \brief Returns a flattened version of the Matrix, preserving only nonzeros
    */
@@ -247,18 +223,9 @@ namespace CasADi{
 #endif // SWIG
 
   template<class T>
-  /** \brief  concatenate vertically while vectorizing all arguments with flatten */
-  Matrix<T> flattencat(const std::vector< Matrix<T> >& comp);
-  
-
-  template<class T>
   /** \brief  concatenate vertically while vectorizing all arguments with vec */
   Matrix<T> veccat(const std::vector< Matrix<T> >& comp);
 
-  template<class T>
-  /** \brief  concatenate vertically while vectorizing all arguments with flattenNZ */
-  Matrix<T> flattenNZcat(const std::vector< Matrix<T> >& comp);
-  
   template<class T>
   /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
   Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp);
@@ -751,12 +718,6 @@ namespace CasADi{
   }
 
   template<class T>
-  Matrix<T> flatten(const Matrix<T>& a){
-    Matrix<T> ret = reshape(trans(a),a.numel(),1);
-    return ret;
-  }
-
-  template<class T>
   Matrix<T> vec(const Matrix<T>& a){
     Matrix<T> ret = reshape(a,a.numel(),1);
     return ret;
@@ -767,11 +728,6 @@ namespace CasADi{
     return Matrix<T>(a.data());
   }
   
-  template<class T>
-  Matrix<T> flattenNZ(const Matrix<T>& a){
-    return Matrix<T>(trans(a).data());
-  }
-
   template<class T>
   Matrix<T> blockcat(const std::vector< std::vector<Matrix<T> > > &v) {
     std::vector< Matrix<T> > ret;
@@ -889,22 +845,10 @@ namespace CasADi{
   Matrix<T> vertcat(const Matrix<T> &x, const Matrix<T> &y){
     return trans(horzcat(trans(x),trans(y)));
   }
-
-  template<class T>
-  Matrix<T> flattencat(const std::vector< Matrix<T> >& comp) {
-    Matrix<T> (&f)(const Matrix<T>&) = flatten;
-    return vertcat(applymap(f,comp));
-  }
   
   template<class T>
   Matrix<T> veccat(const std::vector< Matrix<T> >& comp) {
     Matrix<T> (&f)(const Matrix<T>&) = vec;
-    return vertcat(applymap(f,comp));
-  }
-
-  template<class T>
-  Matrix<T> flattenNZcat(const std::vector< Matrix<T> >& comp) {
-    Matrix<T> (&f)(const Matrix<T>&) = flattenNZ;
     return vertcat(applymap(f,comp));
   }
   
@@ -1549,9 +1493,7 @@ namespace CasADi{
   MTT_INST(T,adj)                               \
   MTT_INST(T,inv)                               \
   MTT_INST(T,reshape)                           \
-  MTT_INST(T,flatten)                               \
   MTT_INST(T,vec)                           \
-  MTT_INST(T,flattenNZ)                             \
   MTT_INST(T,vecNZ)                         \
   MTT_INST(T,blockcat)                          \
   MTT_INST(T,blocksplit)                        \
@@ -1591,8 +1533,6 @@ namespace CasADi{
   MTT_INST(T,blkdiag)                           \
   MTT_INST(T,polyval)                           \
   MTT_INST(T,addMultiple)                       \
-  MTT_INST(T,flattencat)                            \
-  MTT_INST(T,flattenNZcat)                          \
   MTT_INST(T,veccat)                        \
   MTT_INST(T,vecNZcat)                      \
   MTT_INST(T,project)                           \
