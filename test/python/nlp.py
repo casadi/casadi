@@ -1264,8 +1264,8 @@ class NLPtests(casadiTestCase):
   
   @requires("SnoptSolver")
   def test_classifications(self):      
-    x=SX("x")
-    y=SX("y")
+    x=ssym("x")
+    y=ssym("y")
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+7.7*y,g=y**2))
 
     solver = SnoptSolver(nlp)
