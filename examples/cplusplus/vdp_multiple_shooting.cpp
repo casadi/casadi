@@ -92,7 +92,7 @@ int main(){
   int nu = 1;
   
   // Mayer objective function
-  Matrix<SXElement> xf = ssym("xf",nx,1);
+  SX xf = ssym("xf",nx,1);
   SXFunction mterm(xf, xf[nx-1]);
 
   // Create a multiple shooting discretization

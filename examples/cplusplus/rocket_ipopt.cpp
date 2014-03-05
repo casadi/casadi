@@ -121,7 +121,7 @@ int main(){
 
   // Get the state trajectory
   vector<double> sopt(nu), vopt(nu), mopt(nu);
-  vector<Matrix<SXElement> > xfcn_out(3);
+  vector<SX> xfcn_out(3);
   xfcn_out[0] = s_traj;
   xfcn_out[1] = v_traj;
   xfcn_out[2] = m_traj;

@@ -55,23 +55,23 @@ int main(){
   X0[2] = 1; // initial mass
 
   // Time 
-  SXElement t("t");
+  SX t = ssym("t");
 
   // Differential states
-  SXElement s("s"), v("v"), m("m");
-  vector<SXElement> x(3); 
+  SX s = ssym("s"), v = ssym("v"), m = ssym("m");
+  SX x = SX::zeros(3);
   x[0] = s;
   x[1] = v;
   x[2] = m;
 
   // Control
-  SXElement u("u");
+  SX u = ssym("u");
 
-  SXElement alpha = 0.05; // friction
-  SXElement beta = 0.1; // fuel consumption rate
+  SX alpha = 0.05; // friction
+  SX beta = 0.1; // fuel consumption rate
   
   // Differential equation
-  vector<SXElement> rhs(3);
+  SX rhs = SX::zeros(3);
   rhs[0] = v;
   rhs[1] = (u-alpha*v*v)/m;
   rhs[2] = -beta*u*u;
@@ -83,7 +83,7 @@ int main(){
   x0[2] = 1;
 
   // DAE residual function
-  SXFunction daefcn(daeIn<SX>("x",x, "p",u, "t",t),daeOut<SX>("ode",rhs));
+  SXFunction daefcn(daeIn("x",x, "p",u, "t",t),daeOut("ode",rhs));
   daefcn.setOption("name","DAE residual");
 
   // Integrator

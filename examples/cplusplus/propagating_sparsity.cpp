@@ -49,7 +49,7 @@ void printBinary(bvec_t v){
 }
 
 int main(){
-  // Test both SXElement and MX
+  // Test both SX and MX
   for(int test=0; test<2; ++test){
 
     // Create a simple function
