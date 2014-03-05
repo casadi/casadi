@@ -64,9 +64,13 @@ namespace CasADi{
 //@}
 #endif
 
-    /** \brief  Construct MX with a given sparsity */
-    explicit MX(const Sparsity& sp, const MX& val=0);
-    
+    //@{
+    /** \brief Construct constant matrix with a given sparsity */
+    MX(const Sparsity& sp, int val=0);
+    MX(const Sparsity& sp, double val);
+    MX(const Sparsity& sp, const MX& val);
+    //@}
+
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);
 

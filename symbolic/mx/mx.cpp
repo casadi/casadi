@@ -85,6 +85,14 @@ namespace CasADi{
     }
   }
 
+  MX::MX(const Sparsity& sp, int val){
+    assignNode(ConstantMX::create(sp,val));
+  }
+
+  MX::MX(const Sparsity& sp, double val){
+    assignNode(ConstantMX::create(sp,val));
+  }
+
   MX MX::create(MXNode* node){
     MX ret;
     ret.assignNode(node);

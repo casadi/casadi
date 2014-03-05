@@ -117,8 +117,10 @@ namespace CasADi{
     /// Dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<T> >& m);
     
+    //@{
     /// Sparse matrix with a given sparsity
     explicit Matrix(const Sparsity& sparsity, const T& val=0);
+    //@}
     
     /// Sparse matrix with a given sparsity and non-zero elements.
     Matrix(const Sparsity& sparsity, const std::vector<T>& d);
