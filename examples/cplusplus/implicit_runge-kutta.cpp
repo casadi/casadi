@@ -45,11 +45,11 @@ int main(){
   int np = 1;
 
   // Declare variables
-  SXMatrix x  = ssym("x",nx);  // state
-  SXMatrix p  = ssym("u",np);  // control
+  SX x  = ssym("x",nx);  // state
+  SX p  = ssym("u",np);  // control
 
   // ODE right hand side function
-  SXMatrix ode;
+  SX ode;
   ode.append( (1 - x[1]*x[1])*x[0] - x[1] + p );
   ode.append( x[0]                            );
   ode.append( x[0]*x[0] + x[1]*x[1] + p*p     );

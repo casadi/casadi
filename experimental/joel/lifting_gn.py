@@ -80,13 +80,13 @@ for (i,x0) in enumerate([0.08]):
   u_max = u_max*DMatrix.ones(nk)
 
   # Lifted variables
-  L = SXMatrix()
+  L = SX()
 
   # Objective terms
-  F = SXMatrix()
+  F = SX()
 
   # Get an expression for the state that the final time
-  x = SXMatrix(x0)
+  x = SX(x0)
 
   for k in range(nk):
     # Get new value for X
@@ -150,13 +150,13 @@ for (i,x0) in enumerate([0.08]):
   x = ssym("x",xdef.size())
 
   # Substitute in the lifted variables x into the expressions for xdef, F1 and F2
-  ex = SXMatrixVector([f1,f2])
+  ex = SXVector([f1,f2])
   substituteInPlace(x, xdef, ex, True)
   [f1,f2] = ex
   
   if gauss_newton: # if Gauss-Newton no multipliers needed
-    mux = SXMatrix()
-    mug = SXMatrix()
+    mux = SX()
+    mug = SX()
     
   else: # If SQP, get the gradient of the lagrangian now
     
@@ -178,8 +178,8 @@ for (i,x0) in enumerate([0.08]):
     xdotdef = lgrad[u.size1():,0]
     
     # Reverse direction of x
-    xdot[:,0] = SXMatrix(list(reversed(list(xdot))))
-    xdotdef[:,0] = SXMatrix(list(reversed(list(xdotdef))))
+    xdot[:,0] = SX(list(reversed(list(xdot))))
+    xdotdef[:,0] = SX(list(reversed(list(xdotdef))))
     
     # Append to xdef and x
     x.append(xdot)
@@ -194,7 +194,7 @@ for (i,x0) in enumerate([0.08]):
 
   # Substitute out the x from the zdef
   z = xdef-d
-  ex = SXMatrixVector([f1,f2])
+  ex = SXVector([f1,f2])
   substituteInPlace(x, z, ex, False)
   [f1,f2] = ex
 

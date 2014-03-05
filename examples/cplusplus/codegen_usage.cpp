@@ -213,14 +213,14 @@ void usage_cplusplus(){
 int main(){
     
   // Variables
-  SXMatrix x = ssym("x",2,2);
-  SXMatrix y = ssym("y",1); 
+  SX x = ssym("x",2,2);
+  SX y = ssym("y",1); 
 
   // Simple function
-  vector<SXMatrix> f_in;
+  vector<SX> f_in;
   f_in.push_back(x);
   f_in.push_back(y);
-  vector<SXMatrix> f_out;
+  vector<SX> f_out;
   f_out.push_back(sqrt(y)-1);
   f_out.push_back(sin(x)-y);
   SXFunction f(f_in,f_out);

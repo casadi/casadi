@@ -62,7 +62,7 @@ print states.size, "=", states.cat.shape
   
 f = SXFunction([states.cat],[x*y*z])
 
-#! In many cases, states will be auto-cast to SXMatrix:
+#! In many cases, states will be auto-cast to SX:
 f = SXFunction([states],[x*y*z])
 
 #! Expanded structure syntax and ordering 

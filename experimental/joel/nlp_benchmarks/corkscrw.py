@@ -122,9 +122,9 @@ v_ub = NP.concatenate([x_ub,y_ub,z_ub,vx_ub,vy_ub,vz_ub,ux_ub,uy_ub,uz_ub])
 v_guess = NP.concatenate([x_guess,y_guess,z_guess,vx_guess,vy_guess,vz_guess,ux_guess,uy_guess,uz_guess])
 
 # Make xt, h, mass symbolic once
-xt = SXMatrix(xt)
-mass = SXMatrix(mass)
-tol = SXMatrix(tol)
+xt = SX(xt)
+mass = SX(mass)
+tol = SX(tol)
 
 # Objective function
 f = 0
@@ -132,7 +132,7 @@ for i in range(1,t+1):
   f += (i*h/w)*(xe[i] - xt)**2
 
 ffcn = SXFunction([v],[f])
-h = SXMatrix(h)
+h = SX(h)
 
 # Constraint functions
 acx = []

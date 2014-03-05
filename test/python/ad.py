@@ -35,13 +35,13 @@ class ADtests(casadiTestCase):
     z=SXElement("z")
     w=SXElement("w")
     
-    out=SXMatrix(6,1)
+    out=SX(6,1)
     out[0,0]=x
     out[2,0]=x+2*y**2
     out[4,0]=x+2*y**3+3*z**4
     out[5,0]=w
 
-    inp=SXMatrix(6,1)
+    inp=SX(6,1)
     inp[0,0]=x
     inp[2,0]=y
     inp[4,0]=z
@@ -55,10 +55,10 @@ class ADtests(casadiTestCase):
             "dense": [vertcat([x,y,z,w])],
             "sparse": [inp] }
         , "row": {
-            "dense":  [SXMatrix([x,y,z,w]).T],
+            "dense":  [SX([x,y,z,w]).T],
             "sparse": [inp.T]
        }, "matrix": {
-          "dense": [c.reshape(SXMatrix([x,y,z,w]),2,2)],
+          "dense": [c.reshape(SX([x,y,z,w]),2,2)],
           "sparse": [c.reshape(inp,3,2)]
         }
     }
@@ -117,10 +117,10 @@ class ADtests(casadiTestCase):
         "dense": [vertcat([x,x+2*y**2,x+2*y**3+3*z**4,w])],
         "sparse": [out]
         }, "row": {
-          "dense":  [SXMatrix([x,x+2*y**2,x+2*y**3+3*z**4,w]).T],
+          "dense":  [SX([x,x+2*y**2,x+2*y**3+3*z**4,w]).T],
           "sparse": [out.T]
       }, "matrix" : {
-          "dense":  [c.reshape(SXMatrix([x,x+2*y**2,x+2*y**3+3*z**4,w]),2,2)],
+          "dense":  [c.reshape(SX([x,x+2*y**2,x+2*y**3+3*z**4,w]),2,2)],
           "sparse": [c.reshape(out,3,2)]
       }
     }
@@ -331,8 +331,8 @@ class ADtests(casadiTestCase):
               self.sxinputs[inputshape][inputtype],
               [
                   jacobian(
-                    SXMatrix(self.sxoutputs[outputshape][outputtype][0]),
-                    SXMatrix(self.sxinputs[inputshape][inputtype][0])
+                    SX(self.sxoutputs[outputshape][outputtype][0]),
+                    SX(self.sxinputs[inputshape][inputtype][0])
                   )
               ]
             )
@@ -422,7 +422,7 @@ class ADtests(casadiTestCase):
     x=ssym("x")
     y=ssym("y")
 
-    inp=SXMatrix(5,1)
+    inp=SX(5,1)
     inp[0,0]=x
     inp[3,0]=y
 
@@ -443,7 +443,7 @@ class ADtests(casadiTestCase):
     x=SXElement("x")
     y=SXElement("y")
 
-    inp=SXMatrix(5,1)
+    inp=SX(5,1)
     inp[0,0]=x
     inp[3,0]=y
 

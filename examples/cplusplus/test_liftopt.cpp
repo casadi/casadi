@@ -37,7 +37,7 @@ int main(){
   SXElement t("t"), u("u");
 
   // Formulate the integrator
-  vector<SXMatrix> F_in(2);
+  vector<SX> F_in(2);
   F_in[0] = t;
   F_in[1] = u;
   SXFunction F(F_in, t + stepSize*(t*(t+1) + u));

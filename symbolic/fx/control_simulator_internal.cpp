@@ -197,17 +197,17 @@ namespace CasADi{
     // Generate an output function if there is none (returns the whole state)
     if(orig_output_fcn_.isNull()){
     
-      SXMatrix t        = ssym("t",control_dae_.input(CONTROL_DAE_T).sparsity());
-      SXMatrix t0       = ssym("t0",control_dae_.input(CONTROL_DAE_T0).sparsity());
-      SXMatrix tf       = ssym("tf",control_dae_.input(CONTROL_DAE_TF).sparsity());
-      SXMatrix x        = ssym("x",control_dae_.input(CONTROL_DAE_X).sparsity());
-      SXMatrix z        = ssym("z",control_dae_.input(CONTROL_DAE_Z).sparsity());
-      SXMatrix p        = ssym("p",control_dae_.input(CONTROL_DAE_P).sparsity());
-      SXMatrix u        = ssym("u",control_dae_.input(CONTROL_DAE_U).sparsity());
-      SXMatrix u_interp = ssym("u_interp",control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
-      SXMatrix x0       = ssym("x0",control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity());
+      SX t        = ssym("t",control_dae_.input(CONTROL_DAE_T).sparsity());
+      SX t0       = ssym("t0",control_dae_.input(CONTROL_DAE_T0).sparsity());
+      SX tf       = ssym("tf",control_dae_.input(CONTROL_DAE_TF).sparsity());
+      SX x        = ssym("x",control_dae_.input(CONTROL_DAE_X).sparsity());
+      SX z        = ssym("z",control_dae_.input(CONTROL_DAE_Z).sparsity());
+      SX p        = ssym("p",control_dae_.input(CONTROL_DAE_P).sparsity());
+      SX u        = ssym("u",control_dae_.input(CONTROL_DAE_U).sparsity());
+      SX u_interp = ssym("u_interp",control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
+      SX x0       = ssym("x0",control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity());
   
-      vector<SXMatrix> arg(CONTROL_DAE_NUM_IN);
+      vector<SX> arg(CONTROL_DAE_NUM_IN);
       arg[CONTROL_DAE_T]  = t;
       arg[CONTROL_DAE_X]  = x;
       arg[CONTROL_DAE_P]  = p;
@@ -218,7 +218,7 @@ namespace CasADi{
       arg[CONTROL_DAE_T0] = t0;
       arg[CONTROL_DAE_TF] = tf;
     
-      vector<SXMatrix> out(INTEGRATOR_NUM_OUT);
+      vector<SX> out(INTEGRATOR_NUM_OUT);
       out[INTEGRATOR_XF] = x;
 
       // Create the output function

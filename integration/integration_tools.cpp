@@ -141,12 +141,12 @@ namespace CasADi{
     D.resize(deg+1);
 
     // Collocation point
-    SXMatrix tau = ssym("tau");
+    SX tau = ssym("tau");
 
     // For all collocation points
     for(int j=0; j<deg+1; ++j){
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
-      SXMatrix L = 1;
+      SX L = 1;
       for(int j2=0; j2<deg+1; ++j2){
         if(j2 != j){
           L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);

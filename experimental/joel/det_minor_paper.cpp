@@ -135,9 +135,9 @@ void test_sx(){
   int n=8;
   cout << "Testing pure SX only, n = " << n << endl;
   
-  SXMatrix x = ssym("x",n,n);
+  SX x = ssym("x",n,n);
   time1 = clock();
-  SXMatrix detx = det(x);
+  SX detx = det(x);
   time2 = clock();
   double t = double(time2 - time1)/CLOCKS_PER_SEC;
   cout << "time to create graph: " << (t*1e3) << " ms, " << endl;
@@ -163,7 +163,7 @@ void test_sx(){
 
   // Differentiating symbolically
   time1 = clock();
-  SXMatrix grad = f_nolive.grad();
+  SX grad = f_nolive.grad();
   time2 = clock();
   t = double(time2 - time1)/CLOCKS_PER_SEC;
   cout << "time to create gradient: " << (t*1e3) << " ms, " << (t*1e9/nops) << " ns per elementary operation" << endl;
@@ -273,9 +273,9 @@ void test_sx_mx(){
   
   int n=9;
   
-  SXMatrix x = ssym("x",n,n);
+  SX x = ssym("x",n,n);
   time1 = clock();
-  SXMatrix detx = det(x);
+  SX detx = det(x);
   time2 = clock();
   double t = double(time2 - time1)/CLOCKS_PER_SEC;
   cout << "time to create graph: " << (t*1e3) << " ms, " << endl;

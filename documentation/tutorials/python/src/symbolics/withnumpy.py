@@ -38,6 +38,6 @@ c=SXElement("c")
 d=SXElement("d")
 
 A=array([[a,b],[c,d]])
-B= SXMatrix(A)
+B= SX(A)
 
 

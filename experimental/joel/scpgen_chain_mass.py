@@ -59,7 +59,7 @@ pdotInit = DMatrix.zeros(3,N)
 u = ssym("u",3)
 
 # Forces between all the balls
-F = SXMatrix.zeros(3,N+1)
+F = SX.zeros(3,N+1)
 for i in range(N+1):
   # Spring vector
   if i==0:
@@ -80,9 +80,9 @@ a = (F[:,1:]-F[:,0:-1])/m
 a[2,:] -= g
 
 # State vector with initial guess as well as differential equations
-x = SXMatrix.zeros(0,1)
+x = SX.zeros(0,1)
 xInit = DMatrix.zeros(0,1)
-f = SXMatrix.zeros(0,1)
+f = SX.zeros(0,1)
 for i in range(N):
   # Position
   f.append(pdot[:,i])

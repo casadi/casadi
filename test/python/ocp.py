@@ -206,8 +206,8 @@ class OCPtests(casadiTestCase):
     self.assertTrue(ocp.lterm.size()==0)
     self.assertTrue(ocp.mterm.size()==1)
     m = ocp.mterm
-    self.assertTrue(isinstance(m,SXMatrix))
-    self.assertTrue(isinstance(ocp.t,SXMatrix))
+    self.assertTrue(isinstance(m,SX))
+    self.assertTrue(isinstance(ocp.t,SX))
     self.assertEquals(str(m),'cost.atTime(150)')
     print dir(ocp)
     self.assertEquals(ocp.ode.size(),3)

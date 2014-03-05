@@ -51,45 +51,45 @@ void IPInternal::init(){
   SXFunction GG = shared_cast<SXFunction>(G_);
 
   // Split up the problem
-  SXMatrix x = FF.inputExpr(0);
-  SXMatrix f = FF.outputExpr(0);
-  SXMatrix g = GG.outputExpr(0);
+  SX x = FF.inputExpr(0);
+  SX f = FF.outputExpr(0);
+  SX g = GG.outputExpr(0);
 //   cout << "x = " << x << endl;
 //   cout << "f = " << f << endl;
 //   cout << "g = " << g << endl;
   
   // Barrier parameter
-  SXMatrix t = ssym("t");
+  SX t = ssym("t");
   
   // Objective of the equality constraint problem
-  SXMatrix f_eq = t*f - sumAll(CasADi::log(x));
+  SX f_eq = t*f - sumAll(CasADi::log(x));
 //   cout << "f_eq = " << f_eq << endl;
   
   // Hessian of the objective
-  SXMatrix H = CasADi::hessian(f_eq,x);
+  SX H = CasADi::hessian(f_eq,x);
 //  cout << "H = " << H << endl;
   
   // Jacobian of the constraints
-  SXMatrix A = CasADi::jacobian(g,x);
+  SX A = CasADi::jacobian(g,x);
 //  cout << "A = " << A << endl;
   
   // Form the KKT matrix
-  SXMatrix K = vertcat(horzcat(H,trans(A)),horzcat(A,SXMatrix::sparse(ng_,ng_)));
+  SX K = vertcat(horzcat(H,trans(A)),horzcat(A,SX::sparse(ng_,ng_)));
   if(verbose()){
     cout << "K = " << K << endl;
   }
   
   // Form the right hand side of the KKT system
-  SXMatrix k = vertcat(-CasADi::gradient(f_eq,x),SXMatrix::sparse(ng_));
+  SX k = vertcat(-CasADi::gradient(f_eq,x),SX::sparse(ng_));
   makeDense(k);
   if(verbose()){
     cout << "k = " << k << endl;
   }
   
   // Create a function that forms the KKT system
-  SXMatrix kfcn_in[] = {x,t};
-  SXMatrix kfcn_out[] = {K,k};
-  kfcn_ = SXFunction(vector<SXMatrix>(kfcn_in,kfcn_in+2),vector<SXMatrix>(kfcn_out,kfcn_out+2));
+  SX kfcn_in[] = {x,t};
+  SX kfcn_out[] = {K,k};
+  kfcn_ = SXFunction(vector<SX>(kfcn_in,kfcn_in+2),vector<SX>(kfcn_out,kfcn_out+2));
   kfcn_.init();
   
   // Create a linear solver for the KKT system

@@ -378,8 +378,8 @@ for (name,pars,rettype,docs) in functions:
   elif "Vec" in t and t.endswith("MX") :
     #name = name[:-len("MX")]
     target = ioschemehelpers
-  elif "Vec" in t and t.endswith("SXMatrix"):
-    #name = name[:-len("SXMatrix")]
+  elif "Vec" in t and t.endswith("SX"):
+    #name = name[:-len("SX")]
     target = ioschemehelpers
   if name.endswith("Struct"):
     target = ioschemehelpers

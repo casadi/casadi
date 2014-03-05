@@ -56,8 +56,8 @@ namespace CasADi{
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void SetSparse::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
-    evaluateGen<SXElement,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void SetSparse::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   void SetSparse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){

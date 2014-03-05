@@ -56,8 +56,8 @@ int main(){
     FX f;
     if(test==0){
       cout << "SXFunction:" << endl;
-      SXMatrix x = ssym("x",3);
-      SXMatrix z = x[0]*x[0]+x[2] + 3;
+      SX x = ssym("x",3);
+      SX z = x[0]*x[0]+x[2] + 3;
       f = SXFunction(x,z);
     } else {
       cout << "MXFunction:" << endl;

@@ -33,7 +33,7 @@ print c
 
 dotdraw(c)
 
-#! An SXMatrix
+#! An SX
 
 dotdraw(ssym("x",sp_tril(3)))
 

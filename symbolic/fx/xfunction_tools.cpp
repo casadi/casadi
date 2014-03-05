@@ -34,12 +34,12 @@ namespace CasADi{
     if (f.isNull()) return SXFunction();
   
     /// Get the SXElement input and output vectors
-    std::vector<SXMatrix> f_in = f.inputExpr();
-    std::vector<SXMatrix> f_out = f.outputExpr();
+    std::vector<SX> f_in = f.inputExpr();
+    std::vector<SX> f_out = f.outputExpr();
   
     // Apply vec to them
-    for(std::vector<SXMatrix>::iterator it=f_in.begin(); it!=f_in.end(); ++it) *it = vec(*it);
-    for(std::vector<SXMatrix>::iterator it=f_out.begin(); it!=f_out.end(); ++it) *it = vec(*it);
+    for(std::vector<SX>::iterator it=f_in.begin(); it!=f_in.end(); ++it) *it = vec(*it);
+    for(std::vector<SX>::iterator it=f_out.begin(); it!=f_out.end(); ++it) *it = vec(*it);
     
     // Make a new function with the vectorized input/outputs
     SXFunction ret(f_in,f_out);

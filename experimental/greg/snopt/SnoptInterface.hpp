@@ -33,7 +33,7 @@ public:
 	SnoptInterface( Ocp& ocp );
 
 	// objective/constraints
-	CasADi::SXMatrix ftotal;
+	CasADi::SX ftotal;
 
 	// function for nonlinear part of ftotal
 	CasADi::SXFunction Fnonlinear;
@@ -42,7 +42,7 @@ public:
 	CasADi::SXFunction Gfcn;
 
 	// design variables reference
-	const CasADi::SXMatrix & designVariables;
+	const CasADi::SX & designVariables;
 
 	void init(void);
 	void run(void);

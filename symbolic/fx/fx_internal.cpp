@@ -327,8 +327,8 @@ namespace CasADi{
     return shared_from_this<FX>().call(arg);
   }
 
-  std::vector<SXMatrix> FXInternal::symbolicInputSX() const{
-    vector<SXMatrix> ret(getNumInputs());
+  std::vector<SX> FXInternal::symbolicInputSX() const{
+    vector<SX> ret(getNumInputs());
     assertInit();
     for(int i=0; i<ret.size(); ++i){
       stringstream name;
@@ -1177,9 +1177,9 @@ namespace CasADi{
     log("FXInternal::getPartition end");
   }
 
-  void FXInternal::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                          const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                          const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
+  void FXInternal::evalSX(const std::vector<SX>& arg, std::vector<SX>& res, 
+                          const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+                          const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens){
     // Make sure initialized
     assertInit();
     
@@ -1204,10 +1204,10 @@ namespace CasADi{
       sparsity_matches = arg[i].sparsity()==input(i).sparsity();
     }
     if(!sparsity_matches){
-      vector<SXMatrix> arg_new(arg.size());
+      vector<SX> arg_new(arg.size());
       for(int i=0; i<arg.size(); ++i){
         try{
-          arg_new[i] = SXMatrix(input(i).sparsity());
+          arg_new[i] = SX(input(i).sparsity());
           arg_new[i].set(arg[i]);
         } catch(exception& ex){
           stringstream ss;
@@ -1226,12 +1226,12 @@ namespace CasADi{
       }
     }
     if(!sparsity_matches){
-      vector<vector<SXMatrix> > fseed_new(nfdir);
+      vector<vector<SX> > fseed_new(nfdir);
       for(int dir=0; dir<nfdir; ++dir){
         fseed_new[dir].resize(getNumInputs());
         for(int i=0; i<getNumInputs(); ++i){
           try{
-            fseed_new[dir][i] = SXMatrix(input(i).sparsity());
+            fseed_new[dir][i] = SX(input(i).sparsity());
             fseed_new[dir][i].set(fseed[dir][i]);
           } catch(exception& ex){
             stringstream ss;
@@ -1251,12 +1251,12 @@ namespace CasADi{
       }
     }
     if(!sparsity_matches){
-      vector<vector<SXMatrix> > aseed_new(nadir);
+      vector<vector<SX> > aseed_new(nadir);
       for(int dir=0; dir<nadir; ++dir){
         aseed_new[dir].resize(getNumOutputs());
         for(int i=0; i<getNumOutputs(); ++i){
           try{
-            aseed_new[dir][i] = SXMatrix(output(i).sparsity());
+            aseed_new[dir][i] = SX(output(i).sparsity());
             aseed_new[dir][i].set(aseed[dir][i]);
           } catch(exception& ex){
             stringstream ss;
@@ -1273,7 +1273,7 @@ namespace CasADi{
     res.resize(getNumOutputs());
     for(int i=0; i<getNumOutputs(); ++i){
       if(res[i].sparsity()!=output(i).sparsity()){
-        res[i] = SXMatrix(output(i).sparsity());
+        res[i] = SX(output(i).sparsity());
       }
     }
   
@@ -1283,7 +1283,7 @@ namespace CasADi{
       fsens[dir].resize(getNumOutputs());
       for(int i=0; i<getNumOutputs(); ++i){
         if(fsens[dir][i].sparsity()!=output(i).sparsity()){
-          fsens[dir][i] = SXMatrix(output(i).sparsity());
+          fsens[dir][i] = SX(output(i).sparsity());
         }
       }
     }
@@ -1294,7 +1294,7 @@ namespace CasADi{
       asens[dir].resize(getNumInputs());
       for(int i=0; i<getNumInputs(); ++i){
         if(asens[dir][i].sparsity()!=input(i).sparsity()){
-          asens[dir][i] = SXMatrix(input(i).sparsity());
+          asens[dir][i] = SX(input(i).sparsity());
         }
       }
     }
@@ -1303,9 +1303,9 @@ namespace CasADi{
     evalSXsparse(arg,res,fseed,fsens,aseed,asens);
   }
 
-  void FXInternal::evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                                const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                                const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
+  void FXInternal::evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res, 
+                                const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+                                const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens){
     casadi_error("FXInternal::evalSXsparse not defined for class " << typeid(*this).name());
   }
 
@@ -1827,9 +1827,9 @@ namespace CasADi{
     }
   }
 
-  void FXInternal::call(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                        const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                        const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
+  void FXInternal::call(const std::vector<SX>& arg, std::vector<SX>& res, 
+                        const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+                        const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens,
                         bool always_inline, bool never_inline){
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!never_inline, "SX expressions do not support call-nodes");
@@ -2209,7 +2209,7 @@ namespace CasADi{
     y[nz] = x;
   }
 
-  void FXInternal::assignIgnore(SXMatrix& y, const SXMatrix& x, const std::vector<int>& nz){
+  void FXInternal::assignIgnore(SX& y, const SX& x, const std::vector<int>& nz){
     vector<SXElement>& y_data = y.data();
     const vector<SXElement>& x_data = x.data();
     casadi_assert(nz.size()==x_data.size());
@@ -2530,19 +2530,19 @@ namespace CasADi{
     }
   }
 
-  void FXInternal::evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res, std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
+  void FXInternal::evaluateSX(MXNode* node, const SXPtrV& arg, SXPtrV& res, std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
   
     // Create input arguments
-    vector<SXMatrix> argv(arg.size());
+    vector<SX> argv(arg.size());
     for(int i=0; i<arg.size(); ++i){
-      argv[i] = SXMatrix(input(i).sparsity(),0.);
+      argv[i] = SX(input(i).sparsity(),0.);
       if(arg[i] != 0)
         argv[i].set(*arg[i]);
     }
 
     // Evaluate symbolically
-    vector<SXMatrix> resv;
-    vector<vector<SXMatrix> > dummy;
+    vector<SX> resv;
+    vector<vector<SX> > dummy;
     evalSX(argv,resv,dummy,dummy,dummy,dummy);
 
     // Collect the result

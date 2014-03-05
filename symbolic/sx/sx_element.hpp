@@ -341,13 +341,13 @@ namespace CasADi{
   typedef std::vector<SXElement> SXElementVector;
   typedef std::vector<std::vector<SXElement> > SXElementVectorVector;
   typedef std::vector< std::vector<std::vector<SXElement> > > SXElementVectorVectorVector;
-  typedef Matrix<SXElement> SXMatrix;
-  typedef std::vector<Matrix<SXElement> > SXMatrixVector;
-  typedef std::vector< std::vector<Matrix<SXElement> > > SXMatrixVectorVector;
+  typedef Matrix<SXElement> SX;
+  typedef std::vector<Matrix<SXElement> > SXVector;
+  typedef std::vector< std::vector<Matrix<SXElement> > > SXVectorVector;
 
-  typedef SXMatrix* SXMatrixPtr;
-  typedef std::vector<SXMatrixPtr> SXMatrixPtrV;
-  typedef std::vector<SXMatrixPtrV> SXMatrixPtrVV;
+  typedef SX* SXPtr;
+  typedef std::vector<SXPtr> SXPtrV;
+  typedef std::vector<SXPtrV> SXPtrVV;
 
 } // namespace CasADi
 

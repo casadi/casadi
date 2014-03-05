@@ -135,7 +135,7 @@ class Simulatortests(casadiTestCase):
     
     U = ssym("U",N-1)
     
-    result = SXMatrix(q)
+    result = SX(q)
     for i in range(N-1):
       tf = tc[i+1]
       t0 = tc[i]

@@ -72,7 +72,7 @@ namespace CasADi {
     return fcn_;
   }
 
-  void CallFX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res, std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
+  void CallFX::evaluateSX(const SXPtrV& arg, SXPtrV& res, std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
     fcn_->evaluateSX(this,arg,res,itmp,rtmp);
   }
 

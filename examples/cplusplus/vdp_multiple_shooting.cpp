@@ -48,19 +48,19 @@ int main(){
   double inf = numeric_limits<double>::infinity();
 
   // Declare variables (use simple, efficient DAG)
-  SXMatrix x = ssym("x");
-  SXMatrix y = ssym("y");
-  SXMatrix u = ssym("u");
-  SXMatrix L = ssym("cost");
+  SX x = ssym("x");
+  SX y = ssym("y");
+  SX u = ssym("u");
+  SX L = ssym("cost");
   
   // All states
-  SXMatrix states = SXMatrix::zeros(3);
+  SX states = SX::zeros(3);
   states(0) = x;
   states(1) = y;
   states(2) = L;
 
   //ODE right hand side
-  SXMatrix f = SXMatrix::zeros(3);
+  SX f = SX::zeros(3);
   f(0) = (1 - y*y)*x - y + u;
   f(1) = x;
   f(2) = x*x + y*y + u*u;

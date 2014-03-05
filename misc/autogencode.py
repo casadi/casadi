@@ -157,16 +157,16 @@ class %sIOSchemeVector : public IOSchemeVector<M> {
     if self.enum.endswith('Struct'):
       s+="%template(" + self.name + ") " + self.name + "<CasADi::Sparsity>;\n"
     else:
-      s+="%template(" + self.name + ") " + self.name + "<CasADi::SXMatrix>;\n"
+      s+="%template(" + self.name + ") " + self.name + "<CasADi::SX>;\n"
       s+="%template(" + self.name + ") " + self.name + "<CasADi::MX>;\n"
       s+="%template(" + self.name + ") " + self.name + "<CasADi::Sparsity>;\n"
-      s+="%template(" +  "IOSchemeVector" + self.enum + "SXMatrix) " + self.enum + "IOSchemeVector<SXMatrix>;\n"
+      s+="%template(" +  "IOSchemeVector" + self.enum + "SX) " + self.enum + "IOSchemeVector<SX>;\n"
       s+="%template(" +  "IOSchemeVector" + self.enum + "MX) " + self.enum + "IOSchemeVector<MX>;\n"
       s+="%template(" +  "IOSchemeVector" + self.enum + "Sparsity) " + self.enum + "IOSchemeVector<Sparsity>;\n"
-      #s+="%rename(" + self.name + ") " + self.name + "<CasADi::SXMatrix>;\n"
+      #s+="%rename(" + self.name + ") " + self.name + "<CasADi::SX>;\n"
       #s+="%rename(" + self.name + ") " + self.name + "<CasADi::MX>;\n"
       #s+="%rename(" + self.name + ") " + self.name + "<CasADi::Sparsity>;\n"
-      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "SXMatrix;\n"
+      s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "SX;\n"
       s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum + "MX;\n"
       s+="%rename(" + "IOSchemeVector" + self.enum + ") " + "IOSchemeVector" + self.enum+ "Sparsity;\n"
     s+="}\n"
@@ -303,7 +303,7 @@ autogenpy.write("%pythoncode %{\n")
 autogenpy.write("""
 def IOSchemeVector(arg,io_scheme):
   try:
-    return IOSchemeVectorSXMatrix(arg,io_scheme)
+    return IOSchemeVectorSX(arg,io_scheme)
   except:
     pass
   try:
@@ -315,7 +315,7 @@ def IOSchemeVector(arg,io_scheme):
     return IOSchemeVectorSparsity(arg,io_scheme)
   except:
     pass
-  raise Exception("IOSchemeVector called with faulty arguments. Individual values must be SXMatrix, MX or Sparsity.")
+  raise Exception("IOSchemeVector called with faulty arguments. Individual values must be SX, MX or Sparsity.")
 """)
 autogenpy.write("%}\n")
 autogenpy.write("#endif //SWIGPYTHON\n")

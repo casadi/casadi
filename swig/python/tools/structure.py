@@ -601,7 +601,7 @@ class Prefixer:
     self.prefix = prefix
     self.castmaster = castmaster
     
-    methods = [ "__DMatrix__", "__SXMatrix__","__MX__"]
+    methods = [ "__DMatrix__", "__SX__","__MX__"]
     for m in methods:
       if hasattr(self.struct,m):
         setattr(self,m,self.cast)
@@ -857,7 +857,7 @@ class ssymStruct(CasadiStructured,MasterGettable):
       if e.sym is not None:
         self.master[self.i[e.name]] = e.sym
 
-  def __SXMatrix__(self):
+  def __SX__(self):
     return self.cat
     
 class msymStruct(CasadiStructured,MasterGettable):
@@ -950,11 +950,11 @@ class DMatrixStruct(MatrixStruct):
   def __DMatrix__(self):
     return self.cat
 
-class SXMatrixStruct(MatrixStruct):
+class SXStruct(MatrixStruct):
   def __init__(self,struct,data=None):
-    MatrixStruct.__init__(self,struct,SXMatrix,data=data)
+    MatrixStruct.__init__(self,struct,SX,data=data)
 
-  def __SXMatrix__(self):
+  def __SX__(self):
     return self.cat
     
 class MXStruct(MatrixStruct):
@@ -1019,7 +1019,7 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
     
 struct_ssym = ssymStruct
 struct_msym = msymStruct
-struct_SX = SXMatrixStruct
+struct_SX = SXStruct
 struct_MX_mutable = MXStruct
 struct_MX = MXVeccatStruct
 struct = CasadiStructured
@@ -1119,13 +1119,13 @@ class CasadiStructEntry(StructEntry):
     self.sym = None
     if 'sym' in kwargs:
       sym = kwargs["sym"]
-      if isinstance(sym,SXMatrix) and isSymbolicSparse(sym):
+      if isinstance(sym,SX) and isSymbolicSparse(sym):
         self.sym = sym
       elif isinstance(sym,Structured): 
         self.struct = sym.struct
         self.sym = sym.cat
       else:
-        raise Exception("The 'sym' argument must be a purely symbolic SXMatrix or a structured symbolic. Got %s instead." % str(self.sym)) 
+        raise Exception("The 'sym' argument must be a purely symbolic SX or a structured symbolic. Got %s instead." % str(self.sym)) 
       self.sparsity = self.sym.sparsity()
       
     #     expr    argument

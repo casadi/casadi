@@ -110,7 +110,7 @@ print f.eval([SXElement(),vertcat([ssym("c"),ssym("d")])])
 
 #$ We can make an accompanying $g(x) = f(x;a;b)$ by making a and b implicity:
 
-k = SXMatrix(a)
+k = SX(a)
 print f.eval([x,vertcat((k[0],b))])
 print f.eval([x,vertcat((ssym("c"),ssym("d")))])
 

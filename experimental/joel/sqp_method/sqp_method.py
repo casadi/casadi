@@ -57,16 +57,16 @@ umax = 0.5*ones(10)
 f = inner_prod(u,u)/2
 
 # Calculate acceleration for all points
-a = SXMatrix(100,1,0)
+a = SX(100,1,0)
 for i in range(10):
   a[10*i:10*(i+1)] = u[i]
 
 # Loop over all k to get s and v and the endpoints
-s = SXMatrix(101,1,0)
+s = SX(101,1,0)
 s[0] = s1
-v = SXMatrix(101,1,0)
+v = SX(101,1,0)
 v[0] = v1
-m = SXMatrix(101,1,0)
+m = SX(101,1,0)
 m[0] = m1
 
 for k in range(100):

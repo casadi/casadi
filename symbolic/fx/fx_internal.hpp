@@ -79,9 +79,9 @@ namespace CasADi{
     virtual void spInit(bool fwd){}
     
     /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
-    virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                        const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                        const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
+    virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res, 
+                        const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+                        const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens);
 
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
@@ -89,9 +89,9 @@ namespace CasADi{
                         const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens);
 
     /** \brief  Evaluate symbolically, SXElement type, matching sparsity patterns */
-    virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                              const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                              const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
+    virtual void evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res, 
+                              const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+                              const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens);
 
     /** \brief  Create function call node */
     virtual void createCall(const std::vector<MX> &arg, std::vector<MX> &res, 
@@ -113,9 +113,9 @@ namespace CasADi{
               bool always_inline, bool never_inline);
     
     /** \brief Call a function, SXElement type (overloaded) */
-    void call(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-              const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-              const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
+    void call(const std::vector<SX>& arg, std::vector<SX>& res, 
+              const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+              const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens,
               bool always_inline, bool never_inline);
         
     //@{
@@ -255,11 +255,11 @@ namespace CasADi{
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
   
     /// Get a vector of symbolic variables with the same dimensions as the inputs
-    virtual std::vector<SXMatrix> symbolicInputSX() const;
+    virtual std::vector<SX> symbolicInputSX() const;
   
     // Workaround helper functions: assign nonzeros but ignore all -1
     static void assignIgnore(MX& y, const MX& x, const std::vector<int>& nz);
-    static void assignIgnore(SXMatrix& y, const SXMatrix& x, const std::vector<int>& nz);
+    static void assignIgnore(SX& y, const SX& x, const std::vector<int>& nz);
 
     //@{
     /** \brief Access input/output scheme */
@@ -298,7 +298,7 @@ namespace CasADi{
     // The following functions are called internally from EvaluateMX. For documentation, see the MXNode class
     //@{
     virtual void evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp);
-    virtual void evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
+    virtual void evaluateSX(MXNode* node, const SXPtrV& arg, SXPtrV& res, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
     virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given);
     virtual void propagateSparsity(MXNode* node, DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
     virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);

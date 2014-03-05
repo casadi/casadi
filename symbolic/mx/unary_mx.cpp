@@ -63,7 +63,7 @@ namespace CasADi{
     }
   }
 
-  void UnaryMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void UnaryMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
     // Do the operation on all non-zero elements
     const vector<SXElement> &xd = input[0]->data();
     vector<SXElement> &od = output[0]->data();

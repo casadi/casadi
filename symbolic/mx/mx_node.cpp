@@ -234,7 +234,7 @@ namespace CasADi{
     throw CasadiException(string("MXNode::evaluateD not defined for class ") + typeid(*this).name());
   }
   
-  void MXNode::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void MXNode::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
     throw CasadiException(string("MXNode::evaluateSX not defined for class ") + typeid(*this).name());
   }
   

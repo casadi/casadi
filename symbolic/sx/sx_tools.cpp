@@ -30,14 +30,14 @@ using namespace std;
 
 namespace CasADi{
   
-SXMatrix gauss_quadrature(SXMatrix f, const SXMatrix &x, const SXMatrix &a, const SXMatrix &b, int order, const SXMatrix& w){
+SX gauss_quadrature(SX f, const SX &x, const SX &a, const SX &b, int order, const SX& w){
   casadi_assert_message(order == 5, "gauss_quadrature: order must be 5");
   casadi_assert_message(w.empty(),"gauss_quadrature: empty weights");
 
   // Change variables to [-1,1]
   if(!a.toScalar().isEqual(-1) || !b.toScalar().isEqual(1)){
-    SXMatrix q1 = (b-a)/2;
-    SXMatrix q2 = (b+a)/2;
+    SX q1 = (b-a)/2;
+    SX q2 = (b+a)/2;
 
     SXFunction fcn(x,f);
     fcn.init();
@@ -75,14 +75,14 @@ SXMatrix gauss_quadrature(SXMatrix f, const SXMatrix &x, const SXMatrix &a, cons
   return sum;
 }
 
-SXMatrix pw_const(const SXMatrix &t, const SXMatrix &tval, const SXMatrix &val){
+SX pw_const(const SX &t, const SX &tval, const SX &val){
   // number of intervals
   int n = val.numel();
 
   casadi_assert_message(isScalar(t),"t must be a scalar");
   casadi_assert_message(tval.numel() == n-1, "dimensions do not match");
 
-  SXMatrix ret = val.at(0);  
+  SX ret = val.at(0);  
   for(int i=0; i<n-1; ++i){
     ret += (val(0,i+1)-val(0,i)) * (t>=tval(0,i));
   }
@@ -90,64 +90,64 @@ SXMatrix pw_const(const SXMatrix &t, const SXMatrix &tval, const SXMatrix &val){
   return ret;
 }
 
-SXMatrix pw_lin(const SXElement &t, const SXMatrix &tval, const SXMatrix &val){
+SX pw_lin(const SXElement &t, const SX &tval, const SX &val){
   // Number of points
   int N = tval.numel();
   casadi_assert_message(N>=2,"pw_lin: N>=2");
 
   // Gradient for each line segment
-  SXMatrix g = SXMatrix::sparse(1,N-1);
+  SX g = SX::sparse(1,N-1);
   for(int i=0; i<N-1; ++i){
     g(0,i) = (val(0,i+1)- val(0,i))/(tval(0,i+1)-tval(0,i));
   }
 
   // Line segments
-  SXMatrix lseg = SXMatrix::sparse(1,N-1);
+  SX lseg = SX::sparse(1,N-1);
   for(int i=0; i<N-1; ++i)
     lseg(0,i) = val(0,i) + g(0,i)*(t-tval(0,i)); 
 
   // interior time points
-  SXMatrix tint = tval(0,range(N-2));
+  SX tint = tval(0,range(N-2));
 
   // Return piecewise linear function
   return pw_const(t, tint, lseg);
 }
 
-SXMatrix if_else(const SXMatrix &cond, const SXMatrix &if_true, const SXMatrix &if_false){
+SX if_else(const SX &cond, const SX &if_true, const SX &if_false){
   return if_else_zero(cond,if_true) + if_else_zero(!cond,if_false);
 }
 
-SXMatrix heaviside(const SXMatrix& a){
+SX heaviside(const SX& a){
   return (1+sign(a))/2;
 }
 
-SXMatrix ramp(const SXMatrix& a){
+SX ramp(const SX& a){
   return a*heaviside(a);
 }
 
-SXMatrix rectangle(const SXMatrix& a){
+SX rectangle(const SX& a){
   return 0.5*(sign(a+0.5)-sign(a-0.5));
 }
 
-SXMatrix triangle(const SXMatrix& a){
+SX triangle(const SX& a){
   return rectangle(a.toScalar()/2)*(1-abs(a.toScalar()));
 }
 
-void simplify(SXMatrix &ex){
+void simplify(SX &ex){
   // simplify all non-zero elements
   for(int el=0; el<ex.size(); ++el)
     simplify(ex.at(el));
 }
 
-void compress(SXMatrix &ex, int level){
+void compress(SX &ex, int level){
 
-  throw CasadiException("SXMatrix::compress: Not implemented");
+  throw CasadiException("SX::compress: Not implemented");
 
   if(level>0)
     compress(ex,level-1);
 }
 
-std::vector<SXMatrix> substitute(const std::vector<SXMatrix> &ex, const std::vector<SXMatrix> &v, const std::vector<SXMatrix> &vdef){
+std::vector<SX> substitute(const std::vector<SX> &ex, const std::vector<SX> &v, const std::vector<SX> &vdef){
   // Assert consistent dimensions
   casadi_assert_warning(v.size()==vdef.size(),"subtitute: number of symbols to replace ( " << v.size() << ") must match number of expressions (" << vdef.size() << ") to replace them with.");
 
@@ -165,8 +165,8 @@ std::vector<SXMatrix> substitute(const std::vector<SXMatrix> &ex, const std::vec
   for(int k=0; k<v.size(); ++k){
     if(v[k].sparsity()!=vdef[k].sparsity()) {
       if (vdef[k].scalar() && vdef[k].size()==1) { // Expand vdef to sparsity of v if vdef is scalar
-        std::vector<SXMatrix> vdef_mod = vdef;
-        vdef_mod[k] = SXMatrix(v[k].sparsity(),vdef[k].at(0));
+        std::vector<SX> vdef_mod = vdef;
+        vdef_mod[k] = SX(v[k].sparsity(),vdef[k].at(0));
         return substitute(ex,v,vdef_mod);
       } else {
         casadi_error("subsitute(ex,v,vdef): sparsities of v and vdef must match. Got v: " << v[k].dimString() << " and " << "vdef: " << vdef[k].dimString() << ".");
@@ -181,11 +181,11 @@ std::vector<SXMatrix> substitute(const std::vector<SXMatrix> &ex, const std::vec
   return F.eval(vdef);
 }
 
-SXMatrix substitute(const SXMatrix &ex, const SXMatrix &v, const SXMatrix &vdef){
-  return substitute(vector<SXMatrix>(1,ex),vector<SXMatrix>(1,v),vector<SXMatrix>(1,vdef)).front();
+SX substitute(const SX &ex, const SX &v, const SX &vdef){
+  return substitute(vector<SX>(1,ex),vector<SX>(1,v),vector<SX>(1,vdef)).front();
 }
 
-Matrix<double> evalf(const SXMatrix &ex, const SXMatrix &v, const Matrix<double> &vdef) {
+Matrix<double> evalf(const SX &ex, const SX &v, const Matrix<double> &vdef) {
   SXFunction fcn(v,ex);
   fcn.init();
   fcn.input(0).set(vdef);
@@ -193,30 +193,30 @@ Matrix<double> evalf(const SXMatrix &ex, const SXMatrix &v, const Matrix<double>
   return fcn.output();
 }
 
-Matrix<double> evalf(const SXMatrix &ex) {
-  SXFunction fcn(std::vector< SXMatrix >(0),ex);
+Matrix<double> evalf(const SX &ex) {
+  SXFunction fcn(std::vector< SX >(0),ex);
   fcn.init();
   fcn.evaluate();
   return fcn.output();
 }
 
-void substituteInPlace(const SXMatrix &v, SXMatrix &vdef, bool reverse){
+void substituteInPlace(const SX &v, SX &vdef, bool reverse){
   // Empty vector
-  vector<SXMatrix> ex;
+  vector<SX> ex;
   substituteInPlace(v,vdef,ex,reverse);
 }
 
-void substituteInPlace(const SXMatrix &v, SXMatrix &vdef, std::vector<SXMatrix>& ex, bool reverse){
+void substituteInPlace(const SX &v, SX &vdef, std::vector<SX>& ex, bool reverse){
   casadi_assert_message(isSymbolic(v),"the variable is not symbolic");
   casadi_assert_message(v.sparsity() == vdef.sparsity(),"the sparsity patterns of the expression and its defining expression do not match");
   if(v.empty()) return; // quick return if nothing to replace
 
   // Function inputs
-  std::vector<SXMatrix> f_in;
+  std::vector<SX> f_in;
   if(!reverse) f_in.push_back(v);
 
   // Function outputs
-  std::vector<SXMatrix> f_out;
+  std::vector<SX> f_out;
   f_out.push_back(vdef);
   f_out.insert(f_out.end(),ex.begin(),ex.end());
     
@@ -273,7 +273,7 @@ void substituteInPlace(const SXMatrix &v, SXMatrix &vdef, std::vector<SXMatrix>&
 }
 
 #if 0
-void replaceDerivatives(SXMatrix &ex, const SXMatrix &var, const SXMatrix &dvar){
+void replaceDerivatives(SX &ex, const SX &var, const SX &dvar){
   // Initialize with an empty expression
   SXFunction fcn(ex);
 
@@ -296,9 +296,9 @@ void replaceDerivatives(SXMatrix &ex, const SXMatrix &var, const SXMatrix &dvar)
           replace[i] = r->second;
         }
   }
-  SXMatrix res;
-  SXMatrix repres;
-  fcn.eval_symbolic(SXMatrix(),res,replace,repres);
+  SX res;
+  SX repres;
+  fcn.eval_symbolic(SX(),res,replace,repres);
   ex = res;
 
   casadi_assert(0);
@@ -307,9 +307,9 @@ void replaceDerivatives(SXMatrix &ex, const SXMatrix &var, const SXMatrix &dvar)
 #endif
 
 #if 0
-void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr){
+void makeSmooth(SX &ex, SX &bvar, SX &bexpr){
   // Initialize
-  SXFunction fcn(SXMatrix(),ex);
+  SXFunction fcn(SX(),ex);
 
   casadi_assert(bexpr.empty());
 
@@ -326,7 +326,7 @@ void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr){
         int ch0 = fcn->algorithm[i].ch[0];
 
         // Binary variable corresponding to the the switch
-        SXMatrix sw;
+        SX sw;
 
 #if 0 
         // Find out if the switch has already been added
@@ -352,8 +352,8 @@ void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr){
         replace[i] = sw[0];
       }
   }
-  SXMatrix res;
-  fcn->eval(SXMatrix(),res,replace,bexpr);
+  SX res;
+  fcn->eval(SX(),res,replace,bexpr);
 
   for(int i=0; i<bexpr.size(); ++i)
     bexpr[i] = bexpr[i]->dep(0);
@@ -362,16 +362,16 @@ void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr){
 
 #if 0
   // Make sure that the binding expression is smooth
-  bexpr.init(SXMatrix());
-  SXMatrix b;
-  bexpr.eval_symbolic(SXMatrix(),b,replace,bexpr);
+  bexpr.init(SX());
+  SX b;
+  bexpr.eval_symbolic(SX(),b,replace,bexpr);
   bexpr = b;
 #endif
 }
 #endif
 
-SXMatrix spy(const SXMatrix& A){
-  SXMatrix s = SXMatrix::sparse(A.size1(),A.size2());
+SX spy(const SX& A){
+  SX s = SX::sparse(A.size1(),A.size2());
   for(int i=0; i<A.size2(); ++i)
     for(int j=0; j<A.size1(); ++j)
       if(!A(j,i).toScalar()->isZero())
@@ -379,7 +379,7 @@ SXMatrix spy(const SXMatrix& A){
   return s;
 }
 
-bool dependsOn(const SXMatrix& ex, const SXMatrix &arg){
+bool dependsOn(const SX& ex, const SX &arg){
   if(ex.size()==0) return false;
 
   SXFunction temp(arg,ex);
@@ -389,9 +389,9 @@ bool dependsOn(const SXMatrix& ex, const SXMatrix &arg){
 }
 
 
-bool isSmooth(const SXMatrix& ex){
+bool isSmooth(const SX& ex){
  // Make a function
- SXFunction temp(SXMatrix(),ex);
+ SXFunction temp(SX(),ex);
  temp.init();
   
  // Run the function on the temporary variable
@@ -399,13 +399,13 @@ bool isSmooth(const SXMatrix& ex){
 }
 
 
-bool isSymbolic(const SXMatrix& ex){
+bool isSymbolic(const SX& ex){
   if(!isDense(ex)) return false;
   
   return isSymbolicSparse(ex);
 }
 
-bool isSymbolicSparse(const SXMatrix& ex) {
+bool isSymbolicSparse(const SX& ex) {
   for(int k=0; k<ex.size(); ++k) // loop over non-zero elements
     if(!ex.at(k)->isSymbolic()) // if an element is not symbolic
       return false;
@@ -413,25 +413,25 @@ bool isSymbolicSparse(const SXMatrix& ex) {
   return true;
 }
 
-SXMatrix gradient(const SXMatrix& ex, const SXMatrix &arg) {
+SX gradient(const SX& ex, const SX &arg) {
   SXFunction temp(arg,ex); // make a runtime
   temp.init();
   return temp.grad();
 }
 
-SXMatrix tangent(const SXMatrix& ex, const SXMatrix &arg) {
+SX tangent(const SX& ex, const SX &arg) {
   SXFunction temp(arg,ex); // make a runtime
   temp.init();
   return temp.tang();
 }
   
-SXMatrix jacobian(const SXMatrix& ex, const SXMatrix &arg) {
+SX jacobian(const SX& ex, const SX &arg) {
   SXFunction temp(arg,ex); // make a runtime
   temp.init();
   return temp.jac();
 }
 
-void hessian(const SXMatrix& ex, const SXMatrix &arg, SXMatrix &H, SXMatrix &g) {
+void hessian(const SX& ex, const SX &arg, SX &H, SX &g) {
   g = gradient(ex,arg);  
 
   SXFunction temp(arg,g); // make a runtime
@@ -439,38 +439,38 @@ void hessian(const SXMatrix& ex, const SXMatrix &arg, SXMatrix &H, SXMatrix &g) 
   H = temp.jac(0,0,false,true);
 }
 
-SXMatrix hessian(const SXMatrix& ex, const SXMatrix &arg) {
-  SXMatrix H,g;
+SX hessian(const SX& ex, const SX &arg) {
+  SX H,g;
   hessian(ex,arg,H,g);
   return H;
 }
 
-double getValue(const SXMatrix& ex, int i, int j) {
+double getValue(const SX& ex, int i, int j) {
   casadi_assert(i<ex.size2() && j<ex.size1());
   return ex(j,i).toScalar().getValue();
 }
 
-int getIntValue(const SXMatrix& ex, int i, int j) {
+int getIntValue(const SX& ex, int i, int j) {
   casadi_assert(i<ex.size2() && j<ex.size1());
   return ex(j,i).toScalar().getIntValue();
 }
 
-void getValue(const SXMatrix& ex, double *res) {
+void getValue(const SX& ex, double *res) {
   for(int i=0; i<ex.numel(); ++i)
     res[i] = ex(0,i).toScalar()->getValue();
 }
 
-void getIntValue(const SXMatrix& ex, int *res) {
+void getIntValue(const SX& ex, int *res) {
   for(int i=0; i<ex.numel(); ++i)
     res[i] = ex(0,i).toScalar().getIntValue();
 }
 
-const string& getName(const SXMatrix& ex) {
+const string& getName(const SX& ex) {
   casadi_assert_message(isScalar(ex),"the expression must be scalar");
   return ex.at(0)->getName();
 }
 
-void expand(const SXMatrix& ex2, SXMatrix &ww, SXMatrix& tt){
+void expand(const SX& ex2, SX &ww, SX& tt){
   casadi_assert(ex2.scalar());
   SXElement ex = ex2.toScalar();
   
@@ -586,62 +586,62 @@ void expand(const SXMatrix& ex2, SXMatrix &ww, SXMatrix& tt){
 
   // Save expansion to output
   int thisind = indices[ex.get()];
-  ww = SXMatrix(weights[thisind]);
+  ww = SX(weights[thisind]);
 
   vector<SXElement> termsv(terms[thisind].size());
   for(int i=0; i<termsv.size(); ++i)
     termsv[i] = SXElement::create(terms[thisind][i]);
-  tt = SXMatrix(termsv);
+  tt = SX(termsv);
 }
 
 void simplify(SXElement& ex){
   // Start by expanding the node to a weighted sum
-  SXMatrix terms, weights;
+  SX terms, weights;
   expand(ex,weights,terms);
 
   // Make a scalar product to get the simplified expression
-  SXMatrix s = mul(trans(terms),weights);
+  SX s = mul(trans(terms),weights);
   ex = s.toScalar();
 }
 
-void fill(SXMatrix& mat, const SXElement& val){
+void fill(SX& mat, const SXElement& val){
   if(val->isZero())    mat.makeEmpty(mat.size1(),mat.size2());
   else                 mat.makeDense(mat.size1(),mat.size2(),val);
 }
 
-// SXMatrix binary(int op, const SXMatrix &x, const SXMatrix &y){
-//   SXMatrix r;
-//   dynamic_cast<SXMatrix&>(r).binary(sfcn[op],x,y);
+// SX binary(int op, const SX &x, const SX &y){
+//   SX r;
+//   dynamic_cast<SX&>(r).binary(sfcn[op],x,y);
 //   return r;
 // }
 // 
-// SXMatrix scalar_matrix(int op, const SXElement &x, const SXMatrix &y){
-//   SXMatrix r;
-//   dynamic_cast<SXMatrix&>(r).scalar_matrix(sfcn[op],x,y);
+// SX scalar_matrix(int op, const SXElement &x, const SX &y){
+//   SX r;
+//   dynamic_cast<SX&>(r).scalar_matrix(sfcn[op],x,y);
 //   return r;
 // }
 // 
-// SXMatrix matrix_scalar(int op, const SXMatrix &x, const SXElement &y){
-//   SXMatrix r;
-//   dynamic_cast<SXMatrix&>(r).matrix_scalar(sfcn[op],x,y);
+// SX matrix_scalar(int op, const SX &x, const SXElement &y){
+//   SX r;
+//   dynamic_cast<SX&>(r).matrix_scalar(sfcn[op],x,y);
 //   return r;
 // }
 // 
-// SXMatrix matrix_matrix(int op, const SXMatrix &x, const SXMatrix &y){
-//   SXMatrix r;
-//   dynamic_cast<SXMatrix&>(r).matrix_matrix(sfcn[op],x,y);
+// SX matrix_matrix(int op, const SX &x, const SX &y){
+//   SX r;
+//   dynamic_cast<SX&>(r).matrix_matrix(sfcn[op],x,y);
 //   return r;
 // }
 
-SXMatrix ssym(const std::string& name, int nrow, int ncol){
+SX ssym(const std::string& name, int nrow, int ncol){
   return ssym(name,sp_dense(nrow,ncol));
 }
 
-SXMatrix ssym(const std::string& name, const std::pair<int,int> & rc) {
+SX ssym(const std::string& name, const std::pair<int,int> & rc) {
   return ssym(name,rc.first,rc.second);
 }
 
-SXMatrix ssym(const std::string& name, const Sparsity& sp){
+SX ssym(const std::string& name, const Sparsity& sp){
   // Create a dense n-by-m matrix
   vector<SXElement> retv;
   
@@ -682,14 +682,14 @@ SXMatrix ssym(const std::string& name, const Sparsity& sp){
 
   // Determine dimensions automatically if empty
   if(sp.scalar(true)){
-    return SXMatrix(retv);
+    return SX(retv);
   } else {
-    return SXMatrix(sp,retv);
+    return SX(sp,retv);
   }
 }
 
-std::vector<SXMatrix> ssym(const std::string& name, const Sparsity& sp, int p){
-  std::vector<SXMatrix> ret(p);
+std::vector<SX> ssym(const std::string& name, const Sparsity& sp, int p){
+  std::vector<SX> ret(p);
   stringstream ss;
   for(int k=0; k<p; ++k){
     ss.str("");
@@ -699,8 +699,8 @@ std::vector<SXMatrix> ssym(const std::string& name, const Sparsity& sp, int p){
   return ret;
 }
 
-std::vector<std::vector<SXMatrix> > ssym(const std::string& name, const Sparsity& sp, int p, int r){
-  std::vector<std::vector<SXMatrix> > ret(r);
+std::vector<std::vector<SX> > ssym(const std::string& name, const Sparsity& sp, int p, int r){
+  std::vector<std::vector<SX> > ret(r);
   for(int k=0; k<r; ++k){
     stringstream ss;
     ss << name << "_" << k;
@@ -709,24 +709,24 @@ std::vector<std::vector<SXMatrix> > ssym(const std::string& name, const Sparsity
   return ret;
 }
 
-std::vector<SXMatrix> ssym(const std::string& name, int nrow, int ncol, int p){
+std::vector<SX> ssym(const std::string& name, int nrow, int ncol, int p){
   return  ssym(name,sp_dense(nrow,ncol),p);
 }
 
-std::vector<std::vector<SXMatrix> > ssym(const std::string& name, int nrow, int ncol, int p, int r){
+std::vector<std::vector<SX> > ssym(const std::string& name, int nrow, int ncol, int p, int r){
   return ssym(name,sp_dense(nrow,ncol),p,r);
 }
 
-SXMatrix taylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a, int order) {
+SX taylor(const SX& ex,const SX& x, const SX& a, int order) {
   casadi_assert(x.scalar() && a.scalar());
   if (ex.size()!=ex.numel())
    throw CasadiException("taylor: not implemented for sparse matrices");
-  SXMatrix ff = flatten(ex);
+  SX ff = flatten(ex);
   
-  SXMatrix result = substitute(ff,x,a);
+  SX result = substitute(ff,x,a);
   double nf=1; 
-  SXMatrix dx = (x-a);
-  SXMatrix dxa = (x-a);
+  SX dx = (x-a);
+  SX dxa = (x-a);
   for (int i=1;i<=order;i++) {
     ff = jacobian(ff,x);
     nf*=i;
@@ -736,13 +736,13 @@ SXMatrix taylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a, int ord
   return trans(reshape(result,ex.size2(),ex.size1()));
 }
 
-SXMatrix mtaylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& around,int order) {
+SX mtaylor(const SX& ex,const SX& x, const SX& around,int order) {
   return mtaylor(ex,x,around,order,std::vector<int>(x.size(),1));
 }
 
 /// \cond
-SXMatrix mtaylor_recursive(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a,int order,const std::vector<int>&order_contributions, const SXElement & current_dx=casadi_limits<SXElement>::one, double current_denom=1, int current_order=1) {
-  SXMatrix result = substitute(ex,x,a)*current_dx/current_denom;
+SX mtaylor_recursive(const SX& ex,const SX& x, const SX& a,int order,const std::vector<int>&order_contributions, const SXElement & current_dx=casadi_limits<SXElement>::one, double current_denom=1, int current_order=1) {
+  SX result = substitute(ex,x,a)*current_dx/current_denom;
   for (int i=0;i<x.size();i++) {
     if (order_contributions[i]<=order) {
       result += mtaylor_recursive(
@@ -758,7 +758,7 @@ SXMatrix mtaylor_recursive(const SXMatrix& ex,const SXMatrix& x, const SXMatrix&
 }
 /// \endcond
 
-SXMatrix mtaylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a,int order,const std::vector<int>&order_contributions) {
+SX mtaylor(const SX& ex,const SX& x, const SX& a,int order,const std::vector<int>&order_contributions) {
   casadi_assert_message(ex.size()==ex.numel() && x.size()==x.numel(),"mtaylor: not implemented for sparse matrices");
 
   casadi_assert_message(x.size()==order_contributions.size(),
@@ -768,8 +768,8 @@ SXMatrix mtaylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a,int ord
   return trans(reshape(mtaylor_recursive(vec(ex),x,a,order,order_contributions),ex.size2(),ex.size1()));
 }
 
-int countNodes(const SXMatrix& A){
-  SXFunction f(SXMatrix(),A);
+int countNodes(const SX& A){
+  SXFunction f(SX(),A);
   f.init();
   return f.countNodes();
 }
@@ -783,11 +783,11 @@ std::string getOperatorRepresentation(const SXElement& x, const std::vector<std:
   return s.str();
 }
 
-SXMatrix ssym(const Matrix<double>& x){
-  return SXMatrix(x);
+SX ssym(const Matrix<double>& x){
+  return SX(x);
 }
 
-void makeSemiExplicit(const SXMatrix& f, const SXMatrix& x, SXMatrix& fe, SXMatrix& fi, SXMatrix& xe, SXMatrix& xi){
+void makeSemiExplicit(const SX& f, const SX& x, SX& fe, SX& fi, SX& xe, SX& xi){
   casadi_assert(f.dense());
   casadi_assert(x.dense());
   
@@ -859,11 +859,11 @@ void makeSemiExplicit(const SXMatrix& f, const SXMatrix& x, SXMatrix& fe, SXMatr
     }
 
     // We shall find out which variables enter nonlinearily in the equations, for this we need a function that will depend on all the variables
-    SXFunction fcnb_all(xb,inner_prod(SXMatrix(fb),ssym("dum1",fb.size())));
+    SXFunction fcnb_all(xb,inner_prod(SX(fb),ssym("dum1",fb.size())));
     fcnb_all.init();
     
     // Take the gradient of this function to find out which variables enter in the function (should be all)
-    SXMatrix fcnb_dep = fcnb_all.grad();
+    SX fcnb_dep = fcnb_all.grad();
     
     // Make sure that this expression is dense (otherwise, some variables would not enter)
     casadi_assert(fcnb_dep.dense());
@@ -893,7 +893,7 @@ void makeSemiExplicit(const SXMatrix& f, const SXMatrix& x, SXMatrix& fe, SXMatr
     // If there are only nonlinear variables
     if(xb_lin.empty()){
       // Substitute the already determined variables
-      fb = substitute(SXMatrix(fb),SXMatrix(xev),SXMatrix(fev)).data();
+      fb = substitute(SX(fb),SX(xev),SX(fev)).data();
       
       // Add to the implicit variables and equations
       fiv.insert(fiv.end(),fb.begin(),fb.end());
@@ -904,8 +904,8 @@ void makeSemiExplicit(const SXMatrix& f, const SXMatrix& x, SXMatrix& fe, SXMatr
       fcnb.init();
             
       // Write the equation in matrix form
-      SXMatrix Jb = fcnb.jac();
-      SXMatrix rb = -fcnb.eval(SXMatrix::zeros(1,xb_lin.size()));
+      SX Jb = fcnb.jac();
+      SX rb = -fcnb.eval(SX::zeros(1,xb_lin.size()));
       
       // Simple solve if there are no nonlinear variables
       if(xb_nonlin.empty()){
@@ -920,7 +920,7 @@ void makeSemiExplicit(const SXMatrix& f, const SXMatrix& x, SXMatrix& fe, SXMatr
         }
         
         // Substitute the already determined variables
-        rb = substitute(rb,SXMatrix(xev),SXMatrix(fev));
+        rb = substitute(rb,SX(xev),SX(fev));
         
         // Add to the explicit variables and equations
         fev.insert(fev.end(),rb.begin(),rb.end());
@@ -951,7 +951,7 @@ void makeSemiExplicit(const SXMatrix& f, const SXMatrix& x, SXMatrix& fe, SXMatr
         
         
         // Substitute the already determined variables
-        fb = substitute(SXMatrix(fb),SXMatrix(xev),SXMatrix(fev)).data();
+        fb = substitute(SX(fb),SX(xev),SX(fev)).data();
         
         // Add to the implicit variables and equations
         fiv.insert(fiv.end(),fb.begin(),fb.end());
@@ -961,19 +961,19 @@ void makeSemiExplicit(const SXMatrix& f, const SXMatrix& x, SXMatrix& fe, SXMatr
     }
   }
   
-  fi = SXMatrix(fiv);
-  fe = SXMatrix(fev);
-  xi = SXMatrix(xiv);
-  xe = SXMatrix(xev);
+  fi = SX(fiv);
+  fe = SX(fev);
+  xi = SX(xiv);
+  xe = SX(xev);
 }
 
-SXMatrix getFree(const SXMatrix& ex){
-  SXFunction f(vector<SXMatrix>(),ex);
+SX getFree(const SX& ex){
+  SXFunction f(vector<SX>(),ex);
   f.init();
   return f.getFree();
 }
 
-SXMatrix jacobianTimesVector(const SXMatrix &ex, const SXMatrix &arg, const SXMatrix &v, bool transpose_jacobian){
+SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v, bool transpose_jacobian){
   SXFunction f(arg,ex);
   f.init();
   
@@ -995,9 +995,9 @@ SXMatrix jacobianTimesVector(const SXMatrix &ex, const SXMatrix &arg, const SXMa
   int nasens = transpose_jacobian ? v2 : 0;
   
   // Assemble arguments and directional derivatives
-  vector<SXMatrix> argv = f.inputExpr();
-  vector<SXMatrix> resv = f.outputExpr();
-  vector<vector<SXMatrix> > fseed(nfsens,argv), fsens(nfsens,resv), aseed(nasens,resv), asens(nasens,argv);
+  vector<SX> argv = f.inputExpr();
+  vector<SX> resv = f.outputExpr();
+  vector<vector<SX> > fseed(nfsens,argv), fsens(nfsens,resv), aseed(nasens,resv), asens(nasens,argv);
   for(int dir=0; dir<v2; ++dir){
     if(transpose_jacobian){
       aseed[dir][0].set(v(dir,Slice(0,v1)));
@@ -1010,7 +1010,7 @@ SXMatrix jacobianTimesVector(const SXMatrix &ex, const SXMatrix &arg, const SXMa
   f.evalSX(argv,resv,fseed,fsens,aseed,asens);
   
   // Get the results
-  vector<SXMatrix> dirder(v2);
+  vector<SX> dirder(v2);
   for(int dir=0; dir<v2; ++dir){
     if(transpose_jacobian){
       dirder[dir] = asens[dir][0];
@@ -1024,7 +1024,7 @@ SXMatrix jacobianTimesVector(const SXMatrix &ex, const SXMatrix &arg, const SXMa
 void extractShared(std::vector<SXElement>& ex, std::vector<SXElement>& v, std::vector<SXElement>& vdef, const std::string& v_prefix, const std::string& v_suffix){
   
   // Sort the expression
-  SXFunction f(vector<SXMatrix>(),vector<SXMatrix>(1,ex));
+  SXFunction f(vector<SX>(),vector<SX>(1,ex));
   f.init();
 
   // Get references to the internal data structures
@@ -1137,10 +1137,10 @@ void extractShared(std::vector<SXElement>& ex, std::vector<SXElement>& v, std::v
   }
 }
 
-void printCompact(const SXMatrix& ex, std::ostream &stream){
+void printCompact(const SX& ex, std::ostream &stream){
   // Extract shared subexpressions from ex
   vector<SXElement> v,vdef;
-  SXMatrix ex_extracted = ex;
+  SX ex_extracted = ex;
   extractShared(ex_extracted.data(),v,vdef,"@","");
   
   // Print the expression without shared subexpressions
@@ -1155,7 +1155,7 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
   }
 }
 
-  void substituteInPlace(const std::vector<SXMatrix>& v, std::vector<SXMatrix>& vdef, std::vector<SXMatrix>& ex, bool reverse){
+  void substituteInPlace(const std::vector<SX>& v, std::vector<SX>& vdef, std::vector<SX>& ex, bool reverse){
     casadi_assert(v.size()==vdef.size());
     
     // Quick return if empty or single expression
@@ -1174,8 +1174,8 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     }
 
     // Gather all variables
-    SXMatrix v_all = SXMatrix::zeros(1,n);
-    SXMatrix vdef_all = SXMatrix::zeros(1,n);
+    SX v_all = SX::zeros(1,n);
+    SX vdef_all = SX::zeros(1,n);
     vector<SXElement>::iterator it_v = v_all.begin();
     vector<SXElement>::iterator it_vdef = vdef_all.begin();
     for(int i=0; i<v.size(); ++i){
@@ -1205,7 +1205,7 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     }
   }
 
-  bool isRegular(const SXMatrix& ex) {
+  bool isRegular(const SX& ex) {
     // First pass: ignore symbolics
     for (int i=0;i<ex.size();++i) {
       const SXElement& x = ex.at(i);
@@ -1220,18 +1220,18 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     return true;
   }
  
-  std::vector<SXElement> getSymbols(const SXMatrix& e) {
-    SXFunction f(std::vector<SXMatrix>(),e);
+  std::vector<SXElement> getSymbols(const SX& e) {
+    SXFunction f(std::vector<SX>(),e);
     f.init();
     return f.getFree();
   }
   
-  SXMatrix poly_coeff(const SXMatrix& ex, const SXMatrix&x) {
+  SX poly_coeff(const SX& ex, const SX&x) {
     casadi_assert(ex.scalar());
     casadi_assert(x.scalar());
     casadi_assert(isSymbolic(x));
     
-    SXMatrix ret;
+    SX ret;
     
     SXFunction f(x,ex);
     f.init();
@@ -1239,7 +1239,7 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     bool success = false;
     for (int i=0;i<1000;++i) {
       ret.append(f.eval(casadi_limits<SXElement>::zero)/mult);
-      SXMatrix j = f.jac();
+      SX j = f.jac();
       if (j.size()==0) {
         success = true;
         break;
@@ -1258,42 +1258,42 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
 
   }
   
-  SXMatrix poly_roots(const SXMatrix& p) {
+  SX poly_roots(const SX& p) {
     casadi_assert_message(p.size2()==1,"poly_root(): supplied paramter must be column vector but got " << p.dimString() << ".");
     casadi_assert(p.dense());
     if (p.size1()==2) { // a*x + b
-      SXMatrix a = p(0);
-      SXMatrix b = p(1);
+      SX a = p(0);
+      SX b = p(1);
       return -b/a;
     } else if (p.size1()==3) { // a*x^2 + b*x + c
-      SXMatrix a = p(0);
-      SXMatrix b = p(1);
-      SXMatrix c = p(2);
-      SXMatrix ds = sqrt(b*b-4*a*c);
-      SXMatrix bm = -b;
-      SXMatrix a2 = 2*a;
-      SXMatrix ret;
+      SX a = p(0);
+      SX b = p(1);
+      SX c = p(2);
+      SX ds = sqrt(b*b-4*a*c);
+      SX bm = -b;
+      SX a2 = 2*a;
+      SX ret;
       ret.append((bm-ds)/a2);
       ret.append((bm+ds)/a2);
       return ret;
     } else if (p.size1()==4) {
       // www.cs.iastate.edu/~cs577/handouts/polyroots.pdf
-      SXMatrix ai = 1/p(0);
+      SX ai = 1/p(0);
        
-      SXMatrix p_ = p(1)*ai;
-      SXMatrix q  = p(2)*ai;
-      SXMatrix r  = p(3)*ai;
+      SX p_ = p(1)*ai;
+      SX q  = p(2)*ai;
+      SX r  = p(3)*ai;
       
-      SXMatrix pp = p_*p_;
+      SX pp = p_*p_;
       
-      SXMatrix a = q - pp/3;
-      SXMatrix b = r + 2.0/27*pp*p_-p_*q/3;
+      SX a = q - pp/3;
+      SX b = r + 2.0/27*pp*p_-p_*q/3;
       
-      SXMatrix a3 = a/3;
+      SX a3 = a/3;
       
-      SXMatrix phi = acos(-b/2/sqrt(-a3*a3*a3));
+      SX phi = acos(-b/2/sqrt(-a3*a3*a3));
       
-      SXMatrix ret;
+      SX ret;
       ret.append(cos(phi/3));
       ret.append(cos((phi+2*M_PI)/3));
       ret.append(cos((phi+4*M_PI)/3));
@@ -1302,34 +1302,34 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
       ret-= p_/3;
       return ret;
     } else if (p.size1()==5) {
-      SXMatrix ai = 1/p(0);
-      SXMatrix b = p(1)*ai;
-      SXMatrix c = p(2)*ai;
-      SXMatrix d = p(3)*ai;
-      SXMatrix e = p(4)*ai;
+      SX ai = 1/p(0);
+      SX b = p(1)*ai;
+      SX c = p(2)*ai;
+      SX d = p(3)*ai;
+      SX e = p(4)*ai;
       
-      SXMatrix bb= b*b;
-      SXMatrix f = c - (3*bb/8);
-      SXMatrix g = d + (bb*b / 8) - b*c/2;
-      SXMatrix h = e - (3*bb*bb/256) + (bb * c/16) - ( b*d/4);
-      SXMatrix poly;
+      SX bb= b*b;
+      SX f = c - (3*bb/8);
+      SX g = d + (bb*b / 8) - b*c/2;
+      SX h = e - (3*bb*bb/256) + (bb * c/16) - ( b*d/4);
+      SX poly;
       poly.append(1);
       poly.append(f/2);
       poly.append((f*f -4*h)/16);
       poly.append(-g*g/64);
-      SXMatrix y = poly_roots(poly);
+      SX y = poly_roots(poly);
       
-      SXMatrix r0 = y(0);
-      SXMatrix r1 = y(2);
+      SX r0 = y(0);
+      SX r1 = y(2);
 
-      SXMatrix p = sqrt(r0); // two non-zero-roots
-      SXMatrix q = sqrt(r1);
+      SX p = sqrt(r0); // two non-zero-roots
+      SX q = sqrt(r1);
 
-      SXMatrix r = -g/(8*p*q);
+      SX r = -g/(8*p*q);
 
-      SXMatrix s = b/4;
+      SX s = b/4;
       
-      SXMatrix ret;
+      SX ret;
       ret.append(p + q + r -s);
       ret.append(p - q - r -s);
       ret.append(-p + q - r -s );
@@ -1337,7 +1337,7 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
 
       return ret;
     } else if (p(p.size()-1).at(0).isEqual(0)) {
-      SXMatrix ret = poly_roots(p(range(p.size()-1)));
+      SX ret = poly_roots(p(range(p.size()-1)));
       ret.append(0);
       return ret;
     } else {
@@ -1346,24 +1346,24 @@ void printCompact(const SXMatrix& ex, std::ostream &stream){
     
   }
   
-  SXMatrix eig_symbolic(const SXMatrix& m) {
+  SX eig_symbolic(const SX& m) {
     casadi_assert_message(m.size1()==m.size2(),"eig(): supplied matrix must be square");
     
-    SXMatrix ret;
+    SX ret;
     
     /// Bring m in block diagonal form, calculating eigenvalues of each block seperately
     std::vector<int> offset;
     std::vector<int> index;
     int nb = m.sparsity().stronglyConnectedComponents(offset,index);
     
-    SXMatrix m_perm = m(offset,offset);
+    SX m_perm = m(offset,offset);
     
-    SXMatrix l = ssym("l");
+    SX l = ssym("l");
     
     for (int k=0;k<nb;++k) {
       std::vector<int> r = range(index.at(k),index.at(k+1));
       // det(lambda*I-m) = 0
-      ret.append(poly_roots(poly_coeff(det(SXMatrix::eye(r.size())*l-m_perm(r,r)),l)));
+      ret.append(poly_roots(poly_coeff(det(SX::eye(r.size())*l-m_perm(r,r)),l)));
     }
 		
     return ret;

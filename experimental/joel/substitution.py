@@ -26,8 +26,8 @@ x = SX("x")
 y = SX("y")
 z = SX("z")
 
-var = SXMatrix([x,y,z])
-dd = SXMatrix([5,sin(x),x+y])
+var = SX([x,y,z])
+dd = SX([5,sin(x),x+y])
 
 print var
 print dd

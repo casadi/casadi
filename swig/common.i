@@ -21,7 +21,7 @@
  */
 
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
-// for example vertcat(SXMatrixVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
+// for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
 
 // Incude cmath early on, see #622
@@ -328,8 +328,8 @@ returntype __r##uname##__(argtype) const{ return argCast(b) ##custom## selfCast(
 returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*$self));}
 
 // These methods must be added since the implicit type cast does not work.
-// Consider a+b  with a DMatrix and b SXMatrix
-// In C++, operator+(SXMatrix,SXMatrix) will be called (implicit cast)
+// Consider a+b  with a DMatrix and b SX
+// In C++, operator+(SX,SX) will be called (implicit cast)
 // In octave, a.__add__(b) will be called   (no implicit cast)
 // In python, __array_priority__ will be checked and b.__radd__(a) will be called (effectively implicit casting)
 

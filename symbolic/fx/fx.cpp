@@ -204,7 +204,7 @@ namespace CasADi{
     return (*this)->symbolicInput();
   }
 
-  std::vector<SXMatrix> FX::symbolicInputSX() const{
+  std::vector<SX> FX::symbolicInputSX() const{
     return (*this)->symbolicInputSX();
   }
 
@@ -251,10 +251,10 @@ namespace CasADi{
     return ret;
   }
 
-  vector<SXMatrix> FX::evalSX(const vector<SXMatrix>& arg){
+  vector<SX> FX::evalSX(const vector<SX>& arg){
     casadi_assert_message(arg.size()==getNumInputs(),"FX::evalSX: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
-    vector<SXMatrix> res;
-    vector<vector<SXMatrix> > dummy;
+    vector<SX> res;
+    vector<vector<SX> > dummy;
     (*this)->evalSX(arg,res,dummy,dummy,dummy,dummy);
     return res;
   }
@@ -267,9 +267,9 @@ namespace CasADi{
     return res;
   }
 
-  void FX::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                  const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                  const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
+  void FX::evalSX(const std::vector<SX>& arg, std::vector<SX>& res, 
+                  const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+                  const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens){
     casadi_assert_message(arg.size()==getNumInputs(),"FX::evalSX: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     (*this)->evalSX(arg,res,fseed,fsens,aseed,asens);
   }
@@ -281,9 +281,9 @@ namespace CasADi{
     (*this)->evalMX(arg,res,fseed,fsens,aseed,asens);
   }
                         
-  void FX::eval(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens){
+  void FX::eval(const std::vector<SX>& arg, std::vector<SX>& res, 
+                const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+                const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens){
     casadi_assert_message(arg.size()==getNumInputs(),"FX::eval: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     (*this)->evalSX(arg,res,fseed,fsens,aseed,asens);
   }

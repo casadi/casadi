@@ -43,13 +43,13 @@ class SymbolicNLP : public PrintableObject{
     //@{
       
       /// Variables
-      SXMatrix x;
+      SX x;
     
       /// Objective functions
-      SXMatrix f;
+      SX f;
     
       /// Constraint functions
-      SXMatrix g;
+      SX g;
       
       /// Bounds on x
       DMatrix x_lb, x_ub;

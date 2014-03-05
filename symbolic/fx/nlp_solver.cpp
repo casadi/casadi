@@ -73,9 +73,9 @@ namespace CasADi{
       // unconstrained
       if(is_a<SXFunction>(F)){
         SXFunction F_sx = shared_cast<SXFunction>(F);
-        vector<SXMatrix> nlp_in = F_sx.inputExpr();
+        vector<SX> nlp_in = F_sx.inputExpr();
         nlp_in.resize(NL_NUM_IN);
-        vector<SXMatrix> nlp_out(NL_NUM_OUT);
+        vector<SX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_F] = F_sx.outputExpr(0);        
         return SXFunction(nlp_in,nlp_out);
       } else if(is_a<MXFunction>(F)){
@@ -98,9 +98,9 @@ namespace CasADi{
       // feasibility problem
       if(is_a<SXFunction>(G)){
         SXFunction G_sx = shared_cast<SXFunction>(G);
-        vector<SXMatrix> nlp_in = G_sx.inputExpr();
+        vector<SX> nlp_in = G_sx.inputExpr();
         nlp_in.resize(NL_NUM_IN);
-        vector<SXMatrix> nlp_out(NL_NUM_OUT);
+        vector<SX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_G] = G_sx.outputExpr(0);        
         return SXFunction(nlp_in,nlp_out);
       } else if(is_a<MXFunction>(G)){
@@ -125,7 +125,7 @@ namespace CasADi{
       
       // SXFunction if both functions are SXFunction
       if(is_a<SXFunction>(F) && is_a<SXFunction>(G)){
-        vector<SXMatrix> nlp_in(NL_NUM_IN), nlp_out(NL_NUM_OUT);
+        vector<SX> nlp_in(NL_NUM_IN), nlp_out(NL_NUM_OUT);
         SXFunction F_sx = shared_cast<SXFunction>(F);
         SXFunction G_sx = shared_cast<SXFunction>(G);        
         nlp_in[NL_X] = G_sx.inputExpr(0);

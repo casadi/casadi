@@ -340,7 +340,7 @@ class FrozenMapping:
       parent.add(data.tree.copy())
     else:
       if isinstance(data,SXElement):
-        data = SXMatrix(data)
+        data = SX(data)
       n = Node()
       n.data = data
       parent.add(n)

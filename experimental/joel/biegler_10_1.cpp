@@ -120,31 +120,31 @@ int main(){
   cout << "C = " << C << endl;
   
   // Collocated states
-  SXMatrix Z = ssym("Z",N,K+1);
+  SX Z = ssym("Z",N,K+1);
   
   // State at final time
-// SXMatrix ZF("ZF");
+// SX ZF("ZF");
   
   // All variables
-  SXMatrix x;
+  SX x;
   x << vec(trans(Z));
   // x << vec(ZF);  
   cout << "x = " << x << endl;
   
   // Construct the "NLP"
-  SXMatrix g;
+  SX g;
   for(int i=0; i<N; ++i){
     for(int k=1; k<=K; ++k){
       
       // Add collocation equations to NLP
-      SXMatrix rhs = 0;
+      SX rhs = 0;
       for(int j=0; j<=K; ++j)
         rhs += Z(i,j)*C[j][k];
       g << (h*F.eval(SX(Z(i,k))) - rhs);
     }
     
    // Add continuity equation to NLP
-   SXMatrix rhs = 0;
+   SX rhs = 0;
    for(int j=0; j<=K; ++j)
      rhs += D[j]*Z(i,j);
 

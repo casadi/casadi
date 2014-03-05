@@ -878,7 +878,7 @@ meta_vector(CasADi::Matrix<double>)
 meta_vector(std::vector< CasADi::Matrix<double> >)
 
 /// CasADi::Matrix<CasADi::SXElement>
-template<> char meta< CasADi::Matrix<CasADi::SXElement> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)";
+template<> char meta< CasADi::Matrix<CasADi::SXElement> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SX, SX, number, sequence(SX/number)";
 
 template <>
 int meta< CasADi::Matrix<CasADi::SXElement> >::as(PyObject * p,CasADi::Matrix<CasADi::SXElement> &m) {
@@ -889,14 +889,14 @@ int meta< CasADi::Matrix<CasADi::SXElement> >::as(PyObject * p,CasADi::Matrix<Ca
     bool result=meta< CasADi::Matrix<double> >::as(p,mt);
     if (!result)
       return false;
-    m = CasADi::SXMatrix(mt);
+    m = CasADi::SX(mt);
   } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SXElement>
 		if (array_type(p)!=NPY_OBJECT) {
-			SWIG_Error(SWIG_TypeError, "asSXMatrix: numpy.ndarray must be of dtype object");
+			SWIG_Error(SWIG_TypeError, "asSX: numpy.ndarray must be of dtype object");
 			return false;
 		}
 		if (array_numdims(p)>2 || array_numdims(p)<1) {
-			SWIG_Error(SWIG_TypeError, "asSXMatrix: Number of dimensions must be 1 or 2.");
+			SWIG_Error(SWIG_TypeError, "asSX: Number of dimensions must be 1 or 2.");
 			return false;
 		}
 		int nrows = array_size(p,0); // 1D array is cast into column vector
@@ -917,15 +917,15 @@ int meta< CasADi::Matrix<CasADi::SXElement> >::as(PyObject * p,CasADi::Matrix<Ca
 		}
     Py_DECREF(it);
 		m = CasADi::trans(CasADi::Matrix< CasADi::SXElement >(v, ncols, nrows));
-  } else if (PyObject_HasAttrString(p,"__SXMatrix__")) {
-    char name[] = "__SXMatrix__";
+  } else if (PyObject_HasAttrString(p,"__SX__")) {
+    char name[] = "__SX__";
     PyObject *cr = PyObject_CallMethod(p, name,0);
     if (!cr) { return false; }
     int result = meta< CasADi::Matrix<CasADi::SXElement> >::as(cr,m);
     Py_DECREF(cr);
     return result;
 	} else {
-    SWIG_Error(SWIG_TypeError, "asSXMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
+    SWIG_Error(SWIG_TypeError, "asSX: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
   }
 	return true;
@@ -940,7 +940,7 @@ bool meta< CasADi::Matrix<CasADi::SXElement> >::couldbe(PyObject * p) {
     return true;
   }
   
-  return meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) || meta< CasADi::SXElement >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p) || PyObject_HasAttrString(p,"__SXMatrix__");
+  return meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) || meta< CasADi::SXElement >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p) || PyObject_HasAttrString(p,"__SX__");
 }
 
 meta_vector(std::vector<CasADi::SXElement>);

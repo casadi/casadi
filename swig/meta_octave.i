@@ -199,7 +199,7 @@ bool meta< CasADi::SXElement >::couldbe(const octave_value& p) {
 
 
 /// CasADi::Matrix<CasADi::SXElement>
-template<> char meta< CasADi::Matrix<CasADi::SXElement> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)";
+template<> char meta< CasADi::Matrix<CasADi::SXElement> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SX, SX, number, sequence(SX/number)";
 
 template <>
 int meta< CasADi::Matrix<CasADi::SXElement> >::as(const octave_value& p,CasADi::Matrix<CasADi::SXElement> &m) {
@@ -208,7 +208,7 @@ int meta< CasADi::Matrix<CasADi::SXElement> >::as(const octave_value& p,CasADi::
   NATIVERETURN(CasADi::SXElement, m)
   if((p.is_real_matrix() && p.is_numeric_type())){
     Matrix mat = p.matrix_value();
-    m = CasADi::SXMatrix(mat.rows(),mat.cols(),0);
+    m = CasADi::SX(mat.rows(),mat.cols(),0);
     for(int i=0; i<mat.rows(); ++i){
       for(int j=0; j<mat.cols(); ++j){
         m(i,j) = mat(i,j);

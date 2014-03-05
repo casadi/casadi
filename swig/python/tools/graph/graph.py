@@ -19,7 +19,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 # 
-from casadi import SXElement, SXMatrix, MX, getOperatorRepresentation
+from casadi import SXElement, SX, MX, getOperatorRepresentation
 import casadi as C
 
 try:
@@ -64,7 +64,7 @@ def addDependencies(master,slaves,dep={},invdep={}):
     dependencyGraph(slave,dep = dep,invdep = invdep)
 
 def dependencyGraph(s,dep = {},invdep = {}):
-  if isinstance(s,SXMatrix):
+  if isinstance(s,SX):
     addDependencies(s,list(s.data()),dep = dep,invdep = invdep)
   elif isinstance(s,SXElement):
     if not(s.isLeaf()):
@@ -509,7 +509,7 @@ class MXMultiplicationArtist(DotArtist):
     for i,n in enumerate(dep):
       graph.add_edge(pydot.Edge(str(n.__hash__()),str(k.__hash__())+":f%d" % i))
         
-class SXMatrixArtist(DotArtist):
+class SXArtist(DotArtist):
   def draw(self):
     s = self.s
     graph = self.graph
@@ -579,8 +579,8 @@ class SXNonLeafArtist(DotArtist):
         
   
 def createArtist(node,dep={},invdep={},graph=None,artists={}):
-  if isinstance(node,SXMatrix):
-    return SXMatrixArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
+  if isinstance(node,SX):
+    return SXArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
   elif isinstance(node,SXElement):
     if node.isLeaf():
       return SXLeafArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
@@ -612,7 +612,7 @@ def createArtist(node,dep={},invdep={},graph=None,artists={}):
         
 def dotgraph(s,direction="BT"):
   """
-  Creates and returns a pydot graph structure that represents an SXElement or SXMatrix.
+  Creates and returns a pydot graph structure that represents an SXElement or SX.
   
   direction   one of "BT", "LR", "TB", "RL"
   """
@@ -645,7 +645,7 @@ def dotgraph(s,direction="BT"):
 
 def dotsave(s,format='ps',filename="temp",direction="RL"):
   """
-  Make a drawing of an SXElement or SXMatrix and save it.
+  Make a drawing of an SXElement or SX and save it.
   
   format can be one of:
     dot canon cmap cmapx cmapx_np dia dot fig gd gd2 gif hpgl imap imap_np
@@ -669,7 +669,7 @@ def dotsave(s,format='ps',filename="temp",direction="RL"):
   
 def dotdraw(s,direction="RL"):
   """
-  Make a drawing of an SXElement or SXMatrix and display it.
+  Make a drawing of an SXElement or SX and display it.
   
   direction   one of "BT", "LR", "TB", "RL"
   """

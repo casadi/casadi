@@ -122,8 +122,8 @@ class SXtests(casadiTestCase):
       
       self.evaluationCheck([y],dxr,[x,p],[x0,p0],name="jacobian");
       
-  def test_SXMatrixJacobian(self):
-      self.message("SXMatrix(1,1) unary operation, jacobian")
+  def test_SXJacobian(self):
+      self.message("SX(1,1) unary operation, jacobian")
       x=ssym("x")
       x0=array([[0.738]])
 
@@ -132,7 +132,7 @@ class SXtests(casadiTestCase):
         J.init()
         return J
       
-      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jacobian",fmod=fmod)
+      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
 
       def fmod(f,x):
         #f.setOption("ad_mode","forward")
@@ -152,8 +152,8 @@ class SXtests(casadiTestCase):
         
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
       
-  def test_SXMatrixJac(self):
-      self.message("SXMatrix(1,1) unary operation, jac")
+  def test_SXJac(self):
+      self.message("SX(1,1) unary operation, jac")
       x=ssym("x")
       x0=array([[0.738]])
 
@@ -163,10 +163,10 @@ class SXtests(casadiTestCase):
         J.init()
         return J
       
-      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jac",fmod=fmod)
+      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jac",fmod=fmod)
       
-  def test_SXMatrixJacobians(self):
-      self.message("SXMatrix(3,1) unary operation, jacobian")
+  def test_SXJacobians(self):
+      self.message("SX(3,1) unary operation, jacobian")
       x=ssym("x",3)
       x0=array([0.738,0.9,0.3])
 
@@ -175,10 +175,10 @@ class SXtests(casadiTestCase):
         J.init()
         return J
       
-      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jacobian",fmod=fmod)
+      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
       
-  def test_SXMatrixJacobians2(self):
-      self.message("SXMatrix(1,3) unary operation, jacobian")
+  def test_SXJacobians2(self):
+      self.message("SX(1,3) unary operation, jacobian")
       x=ssym("x",1,3)
       
       x0=array([0.738,0.9,0.3])
@@ -188,79 +188,79 @@ class SXtests(casadiTestCase):
         J.init()
         return J
       
-      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jacobian",fmod=fmod)
+      self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
 
-  def test_SXMatrix(self):
-      self.message("SXMatrix unary operations")
+  def test_SX(self):
+      self.message("SX unary operations")
       x=ssym("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       
-      self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix")
+      self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SX")
       
       x=ssym("x",3,3)
       x0=array([[0.738,0.2,0.3],[ 0.1,0.39,-6 ],[0.99,0.999999,-12]])
-      #self.numpyEvaluationCheck(lambda x: c.det(x[0]), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
-      self.numpyEvaluationCheck(lambda x: SXMatrix([c.det(x[0])]), lambda   x: linalg.det(x),[x],x0,name="det(SXMatrix)")
-      self.numpyEvaluationCheck(lambda x: c.inv(x[0]), lambda   x: linalg.inv(x),[x],x0,name="inv(SXMatrix)")
+      #self.numpyEvaluationCheck(lambda x: c.det(x[0]), lambda   x: linalg.det(x),[x],x0,name="det(SX)")
+      self.numpyEvaluationCheck(lambda x: SX([c.det(x[0])]), lambda   x: linalg.det(x),[x],x0,name="det(SX)")
+      self.numpyEvaluationCheck(lambda x: c.inv(x[0]), lambda   x: linalg.inv(x),[x],x0,name="inv(SX)")
         
-  def test_SXMatrixSparse(self):
-      self.message("SXMatrix unary operations, sparse")
+  def test_SXSparse(self):
+      self.message("SX unary operations, sparse")
       x=SXElement("x")
       y=SXElement("y")
       z=SXElement("z")
-      x=SXMatrix(4,3,[0,2,2,3],[1,2,1],[x,y,z])
+      x=SX(4,3,[0,2,2,3],[1,2,1],[x,y,z])
       if scipy_available:
         x0=DMatrix(4,3,[0,2,2,3],[1,2,1],[0.738,0.1,0.99]).toCsc_matrix()
       
-        self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="SXMatrix",setx0=x0,excludeflags={'nozero'})
+        self.numpyEvaluationCheckPool(self.pool,[x],array(x0.todense()),name="SX",setx0=x0,excludeflags={'nozero'})
       else:
         x0=DMatrix(4,3,[0,2,2,3],[1,2,1],[0.738,0.1,0.99]).toArray()
       
-        self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SXMatrix",setx0=x0)
+        self.numpyEvaluationCheckPool(self.pool,[x],x0,name="SX",setx0=x0)
       
-  def test_SXMatrixbinary(self):
-      self.message("SXMatrix binary operations")
+  def test_SXbinary(self):
+      self.message("SX binary operations")
       x=ssym("x",3,2)
       y=ssym("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
       y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6]])
-      self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SXMatrix")
+      self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SX")
       self.assertRaises(RuntimeError, lambda : mul(x,y))
 
-  def test_SXMatrixbinarySparse(self):
-      self.message("SXMatrix binary operations")
+  def test_SXbinarySparse(self):
+      self.message("SX binary operations")
       x=SXElement("x")
       y=SXElement("y")
       z=SXElement("z")
       x2=SXElement("x2")
       y2=SXElement("y2")
       z2=SXElement("z2")
-      xx=SXMatrix(4,3,[0,2,2,3],[1,2,1],[x,y,z])
-      yy=SXMatrix(4,3,[0,2,2,3],[0,2,3],[x2,z2,y2])
+      xx=SX(4,3,[0,2,2,3],[1,2,1],[x,y,z])
+      yy=SX(4,3,[0,2,2,3],[0,2,3],[x2,z2,y2])
       
       if scipy_available:
         x0=DMatrix(4,3,[0,2,2,3],[1,2,1],[0.738,0.1,0.99]).toCsc_matrix()
         y0=DMatrix(4,3,[0,2,2,3],[0,2,3],[1.738,0.7,-6]).toCsc_matrix()
         
-        self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="SXMatrix",setx0=[x0,y0])
+        self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[array(x0.todense()),array(y0.todense())],name="SX",setx0=[x0,y0])
       else:
         x0=DMatrix(4,3,[0,2,2,3],[1,2,1],[0.738,0.1,0.99]).toArray()
         y0=DMatrix(4,3,[0,2,2,3],[0,2,3],[1.738,0.7,-6]).toArray()
         
-        self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[x0,y0],name="SXMatrix",setx0=[x0,y0])
+        self.numpyEvaluationCheckPool(self.matrixbinarypool,[xx,yy],[x0,y0],name="SX",setx0=[x0,y0])
       self.assertRaises(RuntimeError, lambda : mul(xx,yy))
 
 
-  def test_SXMatrixslicing(self):
-      self.message("SXMatrix slicing/indexing")
+  def test_SXslicing(self):
+      self.message("SX slicing/indexing")
       x=ssym("x",3,2)
       x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999]])
 
       self.message(":dense")
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]")
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][1,0]), lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]")
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,1]), lambda x: matrix(x)[0,1],[x],x0,name="x[1,0]")
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,-1]), lambda x: matrix(x)[0,-1],[x],x0,name="x[0,-1]") 
+      self.numpyEvaluationCheck(lambda x: SX(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]")
+      self.numpyEvaluationCheck(lambda x: SX(x[0][1,0]), lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]")
+      self.numpyEvaluationCheck(lambda x: SX(x[0][0,1]), lambda x: matrix(x)[0,1],[x],x0,name="x[1,0]")
+      self.numpyEvaluationCheck(lambda x: SX(x[0][0,-1]), lambda x: matrix(x)[0,-1],[x],x0,name="x[0,-1]") 
       self.numpyEvaluationCheck(lambda x: x[0][:,0], lambda x: matrix(x)[:,0],[x],x0,name="x[:,0]")
       self.numpyEvaluationCheck(lambda x: x[0][:,1], lambda x: matrix(x)[:,1],[x],x0,name="x[:,1]")
       self.numpyEvaluationCheck(lambda x: x[0][1,:], lambda x: matrix(x)[1,:],[x],x0,name="x[1,:]")
@@ -281,14 +281,14 @@ class SXtests(casadiTestCase):
 
       self.message(":sparse")
       
-      x=SXMatrix(4,3,[0,2,2,3],[1,2,1],[SXElement("x"),SXElement("y"),SXElement("z")])
+      x=SX(4,3,[0,2,2,3],[1,2,1],[SXElement("x"),SXElement("y"),SXElement("z")])
       sx0=[0.738,0.39,0.99]
       x0=DMatrix(4,3,[0,2,2,3],[1,2,1],[0.738,0.39,0.99]).toArray()
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]",setx0=[sx0])
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]",setx0=[sx0])
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][1,0]), lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]",setx0=[sx0])
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,1]), lambda x: matrix(x)[0,1],[x],x0,name="x[1,0]",setx0=[sx0])
-      self.numpyEvaluationCheck(lambda x: SXMatrix(x[0][0,-1]), lambda x: matrix(x)[0,-1],[x],x0,name="x[0,-1]",setx0=[sx0])
+      self.numpyEvaluationCheck(lambda x: SX(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]",setx0=[sx0])
+      self.numpyEvaluationCheck(lambda x: SX(x[0][0,0]), lambda x: matrix(x)[0,0],[x],x0,name="x[0,0]",setx0=[sx0])
+      self.numpyEvaluationCheck(lambda x: SX(x[0][1,0]), lambda x: matrix(x)[1,0],[x],x0,name="x[1,0]",setx0=[sx0])
+      self.numpyEvaluationCheck(lambda x: SX(x[0][0,1]), lambda x: matrix(x)[0,1],[x],x0,name="x[1,0]",setx0=[sx0])
+      self.numpyEvaluationCheck(lambda x: SX(x[0][0,-1]), lambda x: matrix(x)[0,-1],[x],x0,name="x[0,-1]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: x[0][:,0], lambda x: matrix(x)[:,0],[x],x0,name="x[:,0]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: x[0][:,1], lambda x: matrix(x)[:,1],[x],x0,name="x[:,1]",setx0=[sx0])
       self.numpyEvaluationCheck(lambda x: x[0][1,:], lambda x: matrix(x)[1,:],[x],x0,name="x[1,:]",setx0=[sx0])
@@ -386,11 +386,11 @@ class SXtests(casadiTestCase):
     self.assertRaises(NotImplementedError,lambda: f.evalSX(x))
 
   def test_SXconversion(self):
-    self.message("Conversions from and to SXMatrix")
+    self.message("Conversions from and to SX")
     y=SXElement("y")
     x=ssym("x",3,3)
-    SXMatrix(y)
-    SXMatrix(x)
+    SX(y)
+    SX(x)
     c.det(x)
     y=array(x)
     c.det(y)
@@ -439,7 +439,7 @@ class SXtests(casadiTestCase):
     isEmpty(array([[SXElement("x")]]))
     list = [ ("SXElement" ,SXElement("x"),(1,1)),
                 ("number",2.3, (1,1)),
-                ("SXMatrix", ssym("x"), (1,1)),
+                ("SX", ssym("x"), (1,1)),
                 ("numpy.ndarray1D(SXElement)", array([SXElement("x"),SXElement("y")]), (2,1)),
                 ("numpy.ndarray(SXElement)", array([[SXElement("x"),SXElement("y")],[SXElement("w"),SXElement("z")]]), (2,2)),
                 ("numpy.ndarray(SX,number)", array([[SXElement("x"),2.3]]), (1,2))
@@ -451,7 +451,7 @@ class SXtests(casadiTestCase):
       self.assertEqual(i.shape[1],shape[1],"shape mismatch")
       isEmpty(arg)
       
-  def test_SXMatrixconstr(self):
+  def test_SXconstr(self):
     self.message("SXmatrix constructors")
     list = [ ("SXElement" ,SXElement("x"),(1,1)),
                 ("number",2.3, (1,1)),
@@ -460,14 +460,14 @@ class SXtests(casadiTestCase):
                 ("list(list(SX,number))", [[SXElement("x"),2.3],[1,SXElement("y")]], (2,2) ),
                 ("tuple(SXElement)", (SXElement("x"),SXElement("y")), (2,1)),
                 ("tuple(SX,number)", (SXElement("x"),2.3), (2,1)),
-                ("SXMatrix", ssym("x"), (1,1)),
+                ("SX", ssym("x"), (1,1)),
                 ("numpy.ndarray1D(SXElement)", array([SXElement("x"),SXElement("y")]), (2,1)),
                 ("numpy.ndarray(SXElement)", array([[SXElement("x"),SXElement("y")],[SXElement("w"),SXElement("z")]]), (2,2)),
                 ("numpy.ndarray(SX,number)", array([[SXElement("x"),2.3]]), (1,2))
     ];
     for name, arg,shape in list:
       self.message(":" + name)
-      i=SXMatrix(arg)
+      i=SX(arg)
       self.assertEqual(i.shape[0],shape[0],"shape mismatch")
       self.assertEqual(i.shape[1],shape[1],"shape mismatch")
       isEmpty(i)
@@ -598,7 +598,7 @@ class SXtests(casadiTestCase):
     test(taylor(sin(x),x,a,2),sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0)
     test(taylor(sin(x),x,a,3),sin(a_)+cos(a_)*(x_-a_)-(sin(a_)*(x_-a_)**2)/2.0-(cos(a_)*(x_-a_)**3)/6.0)
     
-    M=SXMatrix(matrix([[a*sin(x),a*cos(x)],[exp(a*x),a*x**2],[cos(x),0]]))
+    M=SX(matrix([[a*sin(x),a*cos(x)],[exp(a*x),a*x**2],[cos(x),0]]))
     
     f = SXFunction([x,a],[taylor(M,x)])
     f.init()
@@ -628,10 +628,10 @@ class SXtests(casadiTestCase):
     r = f.eval([x,[]])
     self.assertTrue(r[1].empty())
     
-    r = f.eval([x,SXMatrix(0,1)])
+    r = f.eval([x,SX(0,1)])
     self.assertTrue(r[1].empty())
 
-    r = f.eval([x,SXMatrix(1,0)])
+    r = f.eval([x,SX(1,0)])
     self.assertTrue(r[1].empty())
     
     #self.assertRaises(Exception,lambda : f.eval([x,x]))
@@ -727,7 +727,7 @@ class SXtests(casadiTestCase):
   def test_issue181(self):
     self.message("Regression test #181")
     x = SXElement("x")
-    #self.assertRaises(TypeError,lambda : SXMatrix([x,None]))  # FIXME: this is leaking memory
+    #self.assertRaises(TypeError,lambda : SX([x,None]))  # FIXME: this is leaking memory
     self.assertRaises(NotImplementedError,lambda: SXFunction([[x], [None]], [[2 * x]]))
     
   def test_printLimiting(self):
@@ -874,11 +874,11 @@ class SXtests(casadiTestCase):
     self.assertTrue(bool(SXElement(-0.2)))
     self.assertRaises(Exception, lambda : bool(ssym("x")))
     self.assertRaises(Exception, lambda : bool(ssym("x")>0))
-    self.assertTrue(bool(SXMatrix(SXElement(1))))
-    self.assertFalse(bool(SXMatrix(SXElement(0))))
-    self.assertTrue(bool(SXMatrix(SXElement(0.2))))
-    self.assertTrue(bool(SXMatrix(SXElement(-0.2))))
-    self.assertRaises(Exception, lambda : bool(SXMatrix([2.0,3])))
+    self.assertTrue(bool(SX(SXElement(1))))
+    self.assertFalse(bool(SX(SXElement(0))))
+    self.assertTrue(bool(SX(SXElement(0.2))))
+    self.assertTrue(bool(SX(SXElement(-0.2))))
+    self.assertRaises(Exception, lambda : bool(SX([2.0,3])))
     
   def test_if_else(self):
     x = SXElement("x")
@@ -921,8 +921,8 @@ class SXtests(casadiTestCase):
     with self.assertRaises(Exception):
       self.assertTrue(x.at(0))
       
-    self.assertTrue(isRegular(SXMatrix(DMatrix([0,1]))))
-    self.assertFalse(isRegular(SXMatrix(DMatrix([0,Inf]))))
+    self.assertTrue(isRegular(SX(DMatrix([0,1]))))
+    self.assertFalse(isRegular(SX(DMatrix([0,Inf]))))
     self.assertFalse(isRegular(vertcat([x,Inf])))
     with self.assertRaises(Exception):
       self.assertFalse(isRegular(vertcat([x,x])))
@@ -1098,12 +1098,12 @@ class SXtests(casadiTestCase):
     self.assertEqual(s[0],3)
     self.assertEqual(s[1],0)
     
-  def test_empty_SXMatrix(self):
-    s = SXMatrix([]).shape
+  def test_empty_SX(self):
+    s = SX([]).shape
     self.assertEqual(s[0],0)
     self.assertEqual(s[1],1)
     x = ssym("x")
-    x.append(SXMatrix([]))
+    x.append(SX([]))
     
   def test_mul_sparsity(self):
 
@@ -1160,7 +1160,7 @@ class SXtests(casadiTestCase):
     self.checkarray(h.output().data(),H.data())
 
   def test_mxnulloutput(self):
-     a = SXMatrix(5,0)
+     a = SX(5,0)
      b = ssym("x",2)
      bm = msym("x",2)
      
@@ -1176,7 +1176,7 @@ class SXtests(casadiTestCase):
      self.assertEqual(c.size1(),5)
      self.assertEqual(c.size2(),0)
      
-     a = SXMatrix(0,0)
+     a = SX(0,0)
      
      f = SXFunction([b],[a])
      f.init()
@@ -1192,22 +1192,22 @@ class SXtests(casadiTestCase):
      self.assertEqual(c.size2(),0)
      
   def test_mxnull(self):
-     a = SXMatrix(5,0)
-     b = SXMatrix(0,3)
+     a = SX(5,0)
+     b = SX(0,3)
      
      c = mul(a,b)
      
      self.assertEqual(c.size(),0)
      
-     a = SXMatrix(5,3)
-     b = SXMatrix(3,4)
+     a = SX(5,3)
+     b = SX(3,4)
      
      c = mul(a,b)
      
      self.assertEqual(c.size(),0)
      
   def  test_mxnullop(self):
-    c = SXMatrix(0,0)
+    c = SX(0,0)
     x = ssym("x",2,3)
     
     with self.assertRaises(RuntimeError):

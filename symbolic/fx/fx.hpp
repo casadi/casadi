@@ -245,7 +245,7 @@ namespace CasADi{
 
   
     /// evaluate symbolically, SXElement type (overloaded)
-    std::vector<SXMatrix> eval(const std::vector<SXMatrix>& arg){ return evalSX(arg);}
+    std::vector<SX> eval(const std::vector<SX>& arg){ return evalSX(arg);}
 
     /// evaluate symbolically, MX type (overloaded)
     std::vector<MX> eval(const std::vector<MX>& arg){return evalMX(arg);}
@@ -254,7 +254,7 @@ namespace CasADi{
     std::vector<MX> evalMX(const std::vector<MX>& arg);
 
     /// evaluate symbolically, SXElement type (unambiguous)
-    std::vector<SXMatrix> evalSX(const std::vector<SXMatrix>& arg);
+    std::vector<SX> evalSX(const std::vector<SX>& arg);
   
     /** \brief Evaluate symbolically with with directional derivatives, SXElement type
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
@@ -264,13 +264,13 @@ namespace CasADi{
      * the length of the vector being the number of adjoint directions.
      */
 #ifndef SWIG
-    void evalSX(const SXMatrixVector& arg, SXMatrixVector& res, 
-                const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
-                const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens);
+    void evalSX(const SXVector& arg, SXVector& res, 
+                const SXVectorVector& fseed, SXVectorVector& fsens, 
+                const SXVectorVector& aseed, SXVectorVector& asens);
 #else // SWIG
-    void evalSX(const SXMatrixVector& arg, SXMatrixVector& OUTPUT, 
-                const SXMatrixVectorVector& fseed, SXMatrixVectorVector& OUTPUT, 
-                const SXMatrixVectorVector& aseed, SXMatrixVectorVector& OUTPUT);
+    void evalSX(const SXVector& arg, SXVector& OUTPUT, 
+                const SXVectorVector& fseed, SXVectorVector& OUTPUT, 
+                const SXVectorVector& aseed, SXVectorVector& OUTPUT);
 #endif // SWIG
 
     /** \brief Evaluate symbolically with with directional derivatives, MX type
@@ -298,13 +298,13 @@ namespace CasADi{
      * the length of the vector being the number of adjoint directions.
      */
 #ifndef SWIG
-    void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& res, 
-              const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
-              const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens);
+    void eval(const SXVector& arg, std::vector<SX>& res, 
+              const SXVectorVector& fseed, SXVectorVector& fsens, 
+              const SXVectorVector& aseed, SXVectorVector& asens);
 #else // SWIG
-    void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& OUTPUT, 
-              const SXMatrixVectorVector& fseed, SXMatrixVectorVector& OUTPUT, 
-              const SXMatrixVectorVector& aseed, SXMatrixVectorVector& OUTPUT);
+    void eval(const SXVector& arg, std::vector<SX>& OUTPUT, 
+              const SXVectorVector& fseed, SXVectorVector& OUTPUT, 
+              const SXVectorVector& aseed, SXVectorVector& OUTPUT);
 #endif // SWIG 
     /** \brief Evaluate symbolically with with directional derivatives, MX type, overloaded
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
@@ -325,7 +325,7 @@ namespace CasADi{
 
 #ifndef SWIG
     /// evaluate symbolically, single input, single output 
-    SXMatrix eval(const SXMatrix& arg){ return eval(std::vector<SXMatrix>(1,arg)).at(0);}
+    SX eval(const SX& arg){ return eval(std::vector<SX>(1,arg)).at(0);}
 #endif // SWIG
   
     /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
@@ -399,7 +399,7 @@ namespace CasADi{
     /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
      * There is no guarantee that consecutive calls return identical objects
      */
-    std::vector<SXMatrix> symbolicInputSX() const;
+    std::vector<SX> symbolicInputSX() const;
 
     /** \brief Is the class able to propate seeds through the algorithm? (for usage, see the example propagating_sparsity.cpp) */
     bool spCanEvaluate(bool fwd);

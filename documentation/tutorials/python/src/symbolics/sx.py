@@ -32,26 +32,26 @@ from numpy import *
 a = ssym("z")
 print type(a)
 print a
-#! You can explicitely create constant SXMatrix objects as follows
-c = SXMatrix(5)
+#! You can explicitely create constant SX objects as follows
+c = SX(5)
 print c
 #! Scalar algebra
 #! --------------------------
-#! Any operations on SXMatrix objects return SXMatrix objects.
+#! Any operations on SX objects return SX objects.
 x = ssym("x")
 y = ssym("y")
 c = x+y
 print type(c)
 print c
 #! While you construct ever complex expressions, 
-#! a graph of SXMatrix objects is created.
+#! a graph of SX objects is created.
 d = c*2 + x
 print d
 #! Note that, by itself, CasADi does very little expansions or simplifications of expressions.
 #! Only simplifications that do not to introduce new nodes to the graph are allowed.
 print d-x
 print simplify(d-x)
-print SXMatrix(5) + SXMatrix(7)
+print SX(5) + SX(7)
 print 0*x + 0*y
 print 1*x
 #! SXElement objects are immutable entities.

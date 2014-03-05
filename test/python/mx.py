@@ -562,7 +562,7 @@ class MXtests(casadiTestCase):
   def test_MXJacobian(self):
     self.message("MX(1,1) unary operation, jacobian")
     self.Jpool=FunctionPool()
-    self.message("SXMatrix(1,1) unary operation, jacobian")
+    self.message("SX(1,1) unary operation, jacobian")
     x=MX("x")
     x0=array([[0.738]])
 
@@ -633,7 +633,7 @@ class MXtests(casadiTestCase):
         self.numpyEvaluationCheckPool(self.matrixpool,[x],x0,name="MX",setx0=x0)
       
   def test_MXbinarySparse(self):
-      self.message("SXMatrix binary operations")
+      self.message("SX binary operations")
       spx=Sparsity(4,3,[0,2,2,3],[1,2,1])
       spy=Sparsity(4,3,[0,2,2,3],[0,2,3])
       xx=MX("x",spx)

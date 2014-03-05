@@ -37,7 +37,7 @@ f = SXFunction([l],[y])
 f.init()
 print f.eval([ssym("w")])
 #! We expect w^2.
-k=SXMatrix(x)
+k=SX(x)
 l=k[0]
 f = SXFunction([l],[y])
 f.init()

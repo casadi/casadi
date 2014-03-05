@@ -103,7 +103,7 @@ void SDPSolverInternal::init() {
   }
   
   // Make a mapping function from dense blocks to inversely-permuted block diagonal P
-  std::vector< SXMatrix > full_blocks;
+  std::vector< SX > full_blocks;
   for (int i=0;i<nb_;++i) {
     full_blocks.push_back(ssym("block",block_sizes_[i],block_sizes_[i]));
   }
@@ -113,18 +113,18 @@ void SDPSolverInternal::init() {
   
   if (nb_>0) {
     // Make a mapping function from (G,F) -> (G[p,p]_j,F_i[p,p]j)
-    SXMatrix G = ssym("G",input(SDP_SOLVER_G).sparsity());
-    SXMatrix F = ssym("F",input(SDP_SOLVER_F).sparsity());
+    SX G = ssym("G",input(SDP_SOLVER_G).sparsity());
+    SX F = ssym("F",input(SDP_SOLVER_F).sparsity());
 
-    std::vector<SXMatrix> in;
+    std::vector<SX> in;
     in.push_back(G);
     in.push_back(F);
-    std::vector<SXMatrix> out((n_+1)*nb_);
+    std::vector<SX> out((n_+1)*nb_);
     for (int j=0;j<nb_;++j) {
       out[j] = G(p,p)(Slice(r[j],r[j+1]),Slice(r[j],r[j+1]));
     }
     for (int i=0;i<n_;++i) {
-      SXMatrix Fi = F(ALL,Slice(i*m_,(i+1)*m_))(p,p);
+      SX Fi = F(ALL,Slice(i*m_,(i+1)*m_))(p,p);
       for (int j=0;j<nb_;++j) {
         out[(i+1)*nb_+j] = Fi(Slice(r[j],r[j+1]),Slice(r[j],r[j+1]));
       }

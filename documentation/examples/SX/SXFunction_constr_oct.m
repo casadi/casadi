@@ -38,7 +38,7 @@ number_in = f.getNumInputs()
 number_out = f.getNumOutputs()
 
 %! The outputs has the following string representation.
-%! Note how all elements of out have been converted to SXMatrix by
+%! Note how all elements of out have been converted to SX by
 %! automatic typecasting functionality
 
 for i = 0:3

@@ -1077,7 +1077,7 @@ namespace CasADi{
   }
   
   MX nullspace(const MX& A) {
-    SXMatrix n = ssym("A",A.sparsity());
+    SX n = ssym("A",A.sparsity());
     SXFunction f(n,nullspace(n));
     f.init();
     return f.call(A)[0];

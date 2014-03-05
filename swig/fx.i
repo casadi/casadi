@@ -80,7 +80,7 @@
 
 %include "symbolic/fx/io_scheme_vector.hpp"
 %template(IOSchemeVectorMX) CasADi::IOSchemeVector< CasADi::MX >;
-%template(IOSchemeVectorSXMatrix) CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SXElement> >;
+%template(IOSchemeVectorSX) CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SXElement> >;
 %template(IOSchemeVectorSparsity) CasADi::IOSchemeVector< CasADi::Sparsity >;
 #ifdef SWIGPYTHON
 %extend CasADi::IOSchemeVector< CasADi::MX > {

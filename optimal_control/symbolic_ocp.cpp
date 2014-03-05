@@ -679,13 +679,13 @@ void SymbolicOCP::eliminateInterdependencies(){
   casadi_assert(!dependsOn(dep,var(y)));
 }
 
-vector<SXMatrix> SymbolicOCP::substituteDependents(const vector<SXMatrix>& x) const{
-  return substitute(x,vector<SXMatrix>(1,var(y)),vector<SXMatrix>(1,dep));
+vector<SX> SymbolicOCP::substituteDependents(const vector<SX>& x) const{
+  return substitute(x,vector<SX>(1,var(y)),vector<SX>(1,dep));
 }
 
 void SymbolicOCP::eliminateDependent(bool eliminate_dependents_with_bounds){
   // All the functions to be replaced
-  vector<SXMatrix> fcn(7);
+  vector<SX> fcn(7);
   fcn[0] = ode;
   fcn[1] = alg;
   fcn[2] = quad;
@@ -695,7 +695,7 @@ void SymbolicOCP::eliminateDependent(bool eliminate_dependents_with_bounds){
   fcn[6] = lterm;
   
   // Replace all at once
-  vector<SXMatrix> fcn_new = substituteDependents(fcn);
+  vector<SX> fcn_new = substituteDependents(fcn);
   
   // Save the new expressions
   ode = fcn_new[0];
@@ -942,7 +942,7 @@ void SymbolicOCP::sortDependentParameters(){
   if(pd.empty()) return;
   
   // Find out which dependent parameter depends on which binding equation
-  SXMatrix v = var(pd);
+  SX v = var(pd);
   SXFunction f(v,v-binding(pd));
   f.init();
   Sparsity sp = f.jacSparsity();
@@ -1001,7 +1001,7 @@ void SymbolicOCP::makeExplicit(){
   f.init();
 
   // Get the Jacobian
-  SXMatrix J = f.jac();
+  SX J = f.jac();
   
   // Block variables and equations
   vector<Variable> xb, xdb, xab;
@@ -1028,14 +1028,14 @@ void SymbolicOCP::makeExplicit(){
       fb.push_back(ode.at(i));
 
     // Get local Jacobian
-    SXMatrix Jb = J(range(rowblock[b],rowblock[b+1]),range(colblock[b],colblock[b+1]));
+    SX Jb = J(range(rowblock[b],rowblock[b+1]),range(colblock[b],colblock[b+1]));
 
     // If Jb depends on xb, then the state derivative does not enter linearly in the ODE and we cannot solve for the state derivative
     casadi_assert_message(!dependsOn(Jb,der(xb)),"Cannot find an explicit expression for variable(s) " << xb);
       
     // Divide fb into a part which depends on vb and a part which doesn't according to "fb == mul(Jb,vb) + fb_res"
-    SXMatrix fb_res = substitute(fb,der(xb),SXMatrix::zeros(xb.size())).data();
-    SXMatrix fb_exp;
+    SX fb_res = substitute(fb,der(xb),SX::zeros(xb.size())).data();
+    SX fb_exp;
       
     // Solve for vb
     if (bs <= 3){
@@ -1051,7 +1051,7 @@ void SymbolicOCP::makeExplicit(){
   }
   
   // Eliminate inter-dependencies
-  SXMatrix ode_expmat = ode_exp;
+  SX ode_expmat = ode_exp;
   substituteInPlace(der(x),ode_expmat,false);
   ode_exp = ode_expmat.data();
   ode_exp.swap(ode.data());
@@ -1093,7 +1093,7 @@ void SymbolicOCP::eliminateAlgebraic(){
   f.init();
 
   // Get the Jacobian
-  SXMatrix J = f.jac();
+  SX J = f.jac();
   
   // Block variables and equations
   vector<Variable> zb;
@@ -1123,7 +1123,7 @@ void SymbolicOCP::eliminateAlgebraic(){
       fb.push_back(alg.at(i));
 
     // Get local Jacobian
-    SXMatrix Jb = J(range(rowblock[b],rowblock[b+1]),range(colblock[b],colblock[b+1]));
+    SX Jb = J(range(rowblock[b],rowblock[b+1]),range(colblock[b],colblock[b+1]));
 
     // If Jb depends on zb, then we cannot (currently) solve for it explicitly
     if(dependsOn(Jb,var(zb))){
@@ -1137,8 +1137,8 @@ void SymbolicOCP::eliminateAlgebraic(){
     } else { // The variables that we wish to determine enter linearly
       
       // Divide fb into a part which depends on vb and a part which doesn't according to "fb == mul(Jb,vb) + fb_res"
-      SXMatrix fb_res = substitute(fb,var(zb),SXMatrix::zeros(zb.size())).data();
-      SXMatrix fb_exp;
+      SX fb_res = substitute(fb,var(zb),SX::zeros(zb.size())).data();
+      SX fb_exp;
       
       // Solve for vb
       if (bs <= 3){
@@ -1156,13 +1156,13 @@ void SymbolicOCP::eliminateAlgebraic(){
   }
   
   // Eliminate inter-dependencies in fb_exp
-  SXMatrix f_expmat = f_exp;
+  SX f_expmat = f_exp;
   substituteInPlace(var(z_exp),f_expmat,false);
   f_exp = f_expmat.data();
 
   // Add to the beginning of the dependent variables (since the other dependent variable might depend on them)
   y.insert(y.begin(),z_exp.begin(),z_exp.end());
-  dep = vertcat(SXMatrix(f_exp),dep);
+  dep = vertcat(SX(f_exp),dep);
   
   // Save new algebraic equations
   z = z_imp;

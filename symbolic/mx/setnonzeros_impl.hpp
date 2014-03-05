@@ -268,8 +268,8 @@ namespace CasADi{
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
-    evaluateGen<SXElement,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void SetNonzerosVector<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>
@@ -297,8 +297,8 @@ namespace CasADi{
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
-    evaluateGen<SXElement,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void SetNonzerosSlice<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>
@@ -329,8 +329,8 @@ namespace CasADi{
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
-    evaluateGen<SXElement,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void SetNonzerosSlice2<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>

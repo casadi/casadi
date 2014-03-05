@@ -48,14 +48,14 @@
 %include "symbolic/matrix/generic_expression.hpp"
 %template(ExpIMatrix)        CasADi::GenericExpression<CasADi::Matrix<int> >;
 %template(ExpDMatrix)        CasADi::GenericExpression<CasADi::Matrix<double> >;
-%template(ExpSXMatrix)       CasADi::GenericExpression<CasADi::Matrix<CasADi::SXElement> >;
+%template(ExpSX)       CasADi::GenericExpression<CasADi::Matrix<CasADi::SXElement> >;
 %template(ExpMX)             CasADi::GenericExpression<CasADi::MX>;
 %template(ExpSXElement)             CasADi::GenericExpression<CasADi::SXElement>;
 
 %include "symbolic/matrix/generic_matrix.hpp"
 %template(GenIMatrix)        CasADi::GenericMatrix<CasADi::Matrix<int> >;
 %template(GenDMatrix)        CasADi::GenericMatrix<CasADi::Matrix<double> >;
-%template(GenSXMatrix)       CasADi::GenericMatrix<CasADi::Matrix<CasADi::SXElement> >;
+%template(GenSX)       CasADi::GenericMatrix<CasADi::Matrix<CasADi::SXElement> >;
 %template(GenMX)             CasADi::GenericMatrix<CasADi::MX>;
 
 %include "symbolic/matrix/matrix.hpp"
@@ -247,6 +247,6 @@ namespace CasADi {
 
 #endif // SWIGPYTHON
 
-%template(SXMatrix)             CasADi::Matrix<CasADi::SXElement>;
+%template(SX)             CasADi::Matrix<CasADi::SXElement>;
 
 

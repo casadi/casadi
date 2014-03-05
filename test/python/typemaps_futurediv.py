@@ -124,8 +124,8 @@ class typemaptests(casadiTestCase):
     def doit(z,s,fun):
       function = None
       
-      if type(z) in [type(SXElement()),type(SXMatrix())]:
-        ztype = [type(SXElement()),type(SXMatrix())]
+      if type(z) in [type(SXElement()),type(SX())]:
+        ztype = [type(SXElement()),type(SX())]
         function = SXFunction
       
       if type(z) in [type(MX())]:
@@ -141,7 +141,7 @@ class typemaptests(casadiTestCase):
       self.assertTrue(type(r) in ztype)
       
       hasNum = True
-      if type(s) in [type(SXElement()),type(MX()),type(SXMatrix())]:
+      if type(s) in [type(SXElement()),type(MX()),type(SX())]:
         hasNum = False
       
       if hasNum:
@@ -199,7 +199,7 @@ class typemaptests(casadiTestCase):
       
     nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
         
-    ## numeric & SXMatrix
+    ## numeric & SX
     for s in nums:
       for z in [SXElement("x"), ssym("x"), ssym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
@@ -230,7 +230,7 @@ class typemaptests(casadiTestCase):
     for (s,x,y) in [
                   (matrix([[1,2],[3,4]]),ssym("x",2,2),MX("x",2,2))    
                   ]:
-      for z,ztype in zip([x,y],[[type(SXMatrix()),type(SXElement())],[type(MX())]]):
+      for z,ztype in zip([x,y],[[type(SX()),type(SXElement())],[type(MX())]]):
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         doit(z,s,lambda z,s: -z)

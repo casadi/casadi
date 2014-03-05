@@ -948,19 +948,19 @@ namespace CasADi{
     log("MXFunctionInternal::evalMX end");
   }
 
-  void MXFunctionInternal::evalSXsparse(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
-                                  const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                                  const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens){
+  void MXFunctionInternal::evalSXsparse(const std::vector<SX>& input_s, std::vector<SX>& output_s, 
+                                  const std::vector<std::vector<SX> >& fwdSeed, std::vector<std::vector<SX> >& fwdSens, 
+                                  const std::vector<std::vector<SX> >& adjSeed, std::vector<std::vector<SX> >& adjSens){
     casadi_assert_message(fwdSens.empty(),"Not implemented");
     casadi_assert_message(adjSeed.empty(),"Not implemented");
       
     // Create a work array
-    vector<SXMatrix> swork(work_.size());
+    vector<SX> swork(work_.size());
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
       if(it->op!=OP_OUTPUT){
         for(int i=0; i<it->res.size(); ++i){
           if (it->res[i]>=0)
-            swork[it->res[i]] = SXMatrix(it->data->sparsity(i));
+            swork[it->res[i]] = SX(it->data->sparsity(i));
         }
       }
     }
@@ -969,8 +969,8 @@ namespace CasADi{
     vector<SXElement> rtmp(rtmp_.size());
   
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
-    vector<SXMatrix*> sxarg;
-    vector<SXMatrix*> sxres;
+    vector<SX*> sxarg;
+    vector<SX*> sxres;
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
       if(it->op==OP_INPUT){
         // Pass the input
@@ -996,11 +996,11 @@ namespace CasADi{
     }
   }
 
-  SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputvsx ){
+  SXFunction MXFunctionInternal::expand(const std::vector<SX>& inputvsx ){
     assertInit();
   
     // Create inputs with the same name and sparsity as the matrix valued symbolic inputs
-    vector<SXMatrix> arg(inputv_.size());
+    vector<SX> arg(inputv_.size());
     if(inputvsx.empty()){ // No symbolic input provided
       for(int i=0; i<arg.size(); ++i){
         arg[i] = ssym(inputv_[i]->getName(),inputv_[i].sparsity());
@@ -1019,13 +1019,13 @@ namespace CasADi{
     }
 
     // Create output vector with correct sparsity
-    vector<SXMatrix> res(outputv_.size());
+    vector<SX> res(outputv_.size());
     for(int i=0; i<res.size(); ++i){
-      res[i] = SXMatrix(outputv_[i].sparsity());
+      res[i] = SX(outputv_[i].sparsity());
     }
   
     // No sensitivities
-    vector<vector<SXMatrix> > dummy;
+    vector<vector<SX> > dummy;
   
     // Evaluate symbolically
     evalSX(arg,res,dummy,dummy,dummy,dummy);

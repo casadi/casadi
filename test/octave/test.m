@@ -34,7 +34,7 @@ x**2
 sin(x)
 acos(x)
 
-disp('operators on SXMatrix')
+disp('operators on SX')
 
 x = ssym("x")
 x**2

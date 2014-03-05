@@ -49,10 +49,10 @@
 #define PRECEDENCE_DMatrixVector 101
 #define PRECEDENCE_DMatrixVectorVector 101
 
-#define PRECEDENCE_SXMatrix 103
+#define PRECEDENCE_SX 103
 #define PRECEDENCE_SXElement 102
-#define PRECEDENCE_SXMatrixVector 103
-#define PRECEDENCE_SXMatrixVectorVector 103
+#define PRECEDENCE_SXVector 103
+#define PRECEDENCE_SXVectorVector 103
 #define PRECEDENCE_SXElementVector 102
 #define PRECEDENCE_SXElementVectorVector 102
 #define PRECEDENCE_MX 104
@@ -69,8 +69,8 @@
 
 #ifdef SWIG_MAIN_MODULE
 %template(SXElementVector) std::vector< CasADi::SXElement > ;
-%template(SXMatrixVector) std::vector<CasADi::Matrix<CasADi::SXElement> > ;
-%template(SXMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SXElement> > > ;
+%template(SXVector) std::vector<CasADi::Matrix<CasADi::SXElement> > ;
+%template(SXVectorVector) std::vector< std::vector<CasADi::Matrix<CasADi::SXElement> > > ;
 %template(MXVector) std::vector<CasADi::MX>;
 %template(MXVectorVector) std::vector< std::vector<CasADi::MX> >;
 %template(IMatrixVector) std::vector<CasADi::Matrix<int> > ;
@@ -162,11 +162,11 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_SXElementVector,std::vector< CasADi::SXElement >);
 %my_generic_const_typemap(PRECEDENCE_SXElementVectorVector,std::vector< std::vector< CasADi::SXElement > >);
 
-%my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SXElement>);
-%my_genericmatrix_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SXElement>);
+%my_generic_const_typemap(PRECEDENCE_SX,CasADi::Matrix<CasADi::SXElement>);
+%my_genericmatrix_const_typemap(PRECEDENCE_SX,CasADi::Matrix<CasADi::SXElement>);
 
-%my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SXElement> >);
-%my_generic_const_typemap(PRECEDENCE_SXMatrixVectorVector,std::vector< std::vector< CasADi::Matrix<CasADi::SXElement> > >);
+%my_generic_const_typemap(PRECEDENCE_SXVector,std::vector< CasADi::Matrix<CasADi::SXElement> >);
+%my_generic_const_typemap(PRECEDENCE_SXVectorVector,std::vector< std::vector< CasADi::Matrix<CasADi::SXElement> > >);
 
 
 %my_generic_const_typemap(PRECEDENCE_MX,CasADi::MX);

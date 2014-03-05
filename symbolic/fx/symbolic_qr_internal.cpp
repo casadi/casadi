@@ -65,7 +65,7 @@ namespace CasADi{
     }
 
     // Symbolic expression for A
-    SXMatrix A = ssym("A",input(0).sparsity());
+    SX A = ssym("A",input(0).sparsity());
 
     // Make a BLT transformation of A
     std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -82,7 +82,7 @@ namespace CasADi{
       inv_rowperm[rowperm[k]] = k;
     
     // Permute the linear system
-    SXMatrix Aperm = SXMatrix::sparse(A.size1(),0);
+    SX Aperm = SX::sparse(A.size1(),0);
     for(int i=0; i<A.size2(); ++i){
       Aperm.resize(A.size1(),i+1);
       for(int el=A.colind(colperm[i]); el<A.colind(colperm[i]+1); ++el){
@@ -91,7 +91,7 @@ namespace CasADi{
     }
 
     // Generate the QR factorization function
-    vector<SXMatrix> QR(2);
+    vector<SX> QR(2);
     qr(trans(Aperm),QR[0],QR[1]);
     QR[0] = trans(QR[0]);
     QR[1] = trans(QR[1]);
@@ -112,15 +112,15 @@ namespace CasADi{
     fact_fcn_.init();
 
     // Symbolic expressions for solve function
-    SXMatrix Q = ssym("Q",QR[0].sparsity());
-    SXMatrix R = ssym("R",QR[1].sparsity());
-    SXMatrix b = ssym("b",input(1).sparsity());
+    SX Q = ssym("Q",QR[0].sparsity());
+    SX R = ssym("R",QR[1].sparsity());
+    SX b = ssym("b",input(1).sparsity());
     
     // Solve non-transposed
     // We have inv(A) = inv(Px) * inv(R) * Q' * Pb
 
     // Permute the right hand side
-    SXMatrix bperm = SXMatrix::sparse(b.size1(),0);
+    SX bperm = SX::sparse(b.size1(),0);
     for(int i=0; i<b.size2(); ++i){
       bperm.resize(b.size1(),i+1);
       for(int el=b.colind(colperm[i]); el<b.colind(colperm[i]+1); ++el){
@@ -129,10 +129,10 @@ namespace CasADi{
     }
 
     // Solve the factorized system
-    SXMatrix xperm = trans(CasADi::solve(trans(R),mul(Q,trans(bperm))));
+    SX xperm = trans(CasADi::solve(trans(R),mul(Q,trans(bperm))));
 
     // Permute back the solution
-    SXMatrix x = SXMatrix::sparse(xperm.size1(),0);
+    SX x = SX::sparse(xperm.size1(),0);
     for(int i=0; i<xperm.size2(); ++i){
       x.resize(xperm.size1(),i+1);
       for(int el=xperm.colind(inv_rowperm[i]); el<xperm.colind(inv_rowperm[i]+1); ++el){
@@ -141,7 +141,7 @@ namespace CasADi{
     }
 
     // Generate the QR solve function
-    vector<SXMatrix> solv_in(3);
+    vector<SX> solv_in(3);
     solv_in[0] = Q;
     solv_in[1] = R;
     solv_in[2] = b;
@@ -164,7 +164,7 @@ namespace CasADi{
     // We have inv(A)' = inv(Pb) * Q *inv(R') * Px
 
     // Permute the right hand side
-    bperm = SXMatrix::sparse(b.size1(),0);
+    bperm = SX::sparse(b.size1(),0);
     for(int i=0; i<b.size2(); ++i){
       bperm.resize(b.size1(),i+1);
       for(int el=b.colind(rowperm[i]); el<b.colind(rowperm[i]+1); ++el){
@@ -176,7 +176,7 @@ namespace CasADi{
     xperm = mul(trans(CasADi::solve(R,trans(bperm))),Q);
 
     // Permute back the solution
-    x = SXMatrix::sparse(xperm.size1(),0);
+    x = SX::sparse(xperm.size1(),0);
     for(int i=0; i<xperm.size2(); ++i){
       x.resize(xperm.size1(),i+1);
       for(int el=xperm.colind(inv_colperm[i]); el<xperm.colind(inv_colperm[i]+1); ++el){

@@ -39,7 +39,7 @@ class Toolstests(casadiTestCase):
 
       p.freeze()
       
-      self.assertTrue(isinstance(p[...],SXMatrix))
+      self.assertTrue(isinstance(p[...],SX))
       self.assertEqual(p.size,16)
       self.assertEqual(p[...].shape[0],16)
       self.assertEqual(p[...].shape[1],1)
@@ -62,7 +62,7 @@ class Toolstests(casadiTestCase):
       p.setOrder(["x","y","z"])
       p.freeze()
       
-      self.assertTrue(isinstance(p[...],SXMatrix))
+      self.assertTrue(isinstance(p[...],SX))
       self.assertEqual(p.size,9)
 
       if CasadiOptions.getSimplificationOnTheFly():
@@ -98,7 +98,7 @@ class Toolstests(casadiTestCase):
       p.setOrder(["x",("y","z")])
       p.freeze()
       
-      self.assertTrue(isinstance(p[...],SXMatrix))
+      self.assertTrue(isinstance(p[...],SX))
       self.assertEqual(p.size,9)
 
       if CasadiOptions.getSimplificationOnTheFly():

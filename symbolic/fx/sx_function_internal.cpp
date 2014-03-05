@@ -41,15 +41,15 @@ namespace CasADi{
   using namespace std;
 
 
-  SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const vector<SXMatrix >& outputv) : 
-    XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>(inputv,outputv) {
+  SXFunctionInternal::SXFunctionInternal(const vector<SX >& inputv, const vector<SX >& outputv) : 
+    XFunctionInternal<SXFunction,SXFunctionInternal,SX,SXNode>(inputv,outputv) {
     setOption("name","unnamed_sx_function");
     addOption("just_in_time_sparsity", OT_BOOLEAN,false,"Propagate sparsity patterns using just-in-time compilation to a CPU or GPU using OpenCL");
     addOption("just_in_time_opencl", OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation using OpenCL (experimental)");
 
     // Check for duplicate entries among the input expressions
     bool has_duplicates = false;
-    for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    for(vector<SX >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
       for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc){
         bool is_duplicate = itc->getTemp()!=0;
         if(is_duplicate){
@@ -61,7 +61,7 @@ namespace CasADi{
     }
   
     // Reset temporaries
-    for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    for(vector<SX >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
       for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc){
         itc->setTemp(0);
       }
@@ -147,9 +147,9 @@ namespace CasADi{
   }
 
   
-  SXMatrix SXFunctionInternal::hess(int iind, int oind){
+  SX SXFunctionInternal::hess(int iind, int oind){
     casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
-    SXMatrix g = grad(iind,oind);
+    SX g = grad(iind,oind);
     makeDense(g);
     if(verbose())  cout << "SXFunctionInternal::hess: calculating gradient done " << endl;
 
@@ -162,7 +162,7 @@ namespace CasADi{
     if(verbose()){
       cout << "SXFunctionInternal::hess: calculating Jacobian " << endl;
     }
-    SXMatrix ret = gfcn.jac(0,0,false,true);
+    SX ret = gfcn.jac(0,0,false,true);
     if(verbose()){
       cout << "SXFunctionInternal::hess: calculating Jacobian done" << endl;
     }
@@ -288,7 +288,7 @@ namespace CasADi{
   void SXFunctionInternal::init(){
   
     // Call the init function of the base class
-    XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>::init();
+    XFunctionInternal<SXFunction,SXFunctionInternal,SX,SXNode>::init();
   
     // Stack used to sort the computational graph
     stack<SXNode*> s;
@@ -298,7 +298,7 @@ namespace CasADi{
 
     // Add the list of nodes
     int ind=0;
-    for(vector<SXMatrix >::iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
+    for(vector<SX >::iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
       int nz=0;
       for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc, ++nz){
         // Add outputs to the list
@@ -311,7 +311,7 @@ namespace CasADi{
     }
   
     // Make sure that all inputs have been added also // TODO REMOVE THIS
-    for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    for(vector<SX >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
       for(vector<SXElement>::iterator itc = it->begin(); itc != it->end(); ++itc){
         if(!itc->getTemp()){
           nodes.push_back(itc->get());
@@ -545,9 +545,9 @@ namespace CasADi{
     }
   }
 
-  void SXFunctionInternal::evalSXsparse(const vector<SXMatrix>& arg1, vector<SXMatrix>& res1, 
-                                  const vector<vector<SXMatrix> >& fseed, vector<vector<SXMatrix> >& fsens, 
-                                  const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens){
+  void SXFunctionInternal::evalSXsparse(const vector<SX>& arg1, vector<SX>& res1, 
+                                  const vector<vector<SX> >& fseed, vector<vector<SX> >& fsens, 
+                                  const vector<vector<SX> >& aseed, vector<vector<SX> >& asens){
     if(verbose()) cout << "SXFunctionInternal::evalSXsparse begin" << endl;
 
     // Check if arguments matches the input expressions, in which case the output is known to be the output expressions
@@ -569,8 +569,8 @@ namespace CasADi{
     }
     
     // Use the function arguments if possible to avoid problems involving equivalent but different expressions
-    const vector<SXMatrix>& arg = output_given ? inputv_ : arg1;
-    vector<SXMatrix>& res = output_given ? outputv_ : res1;
+    const vector<SX>& arg = output_given ? inputv_ : arg1;
+    vector<SX>& res = output_given ? outputv_ : res1;
 
     // Number of forward seeds
     int nfdir = fsens.size();
@@ -788,22 +788,22 @@ namespace CasADi{
 
   FX SXFunctionInternal::getFullJacobian(){
     // Get all the inputs
-    SXMatrix arg = SXMatrix::sparse(1,0); 
-    for(vector<SXMatrix>::const_iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
+    SX arg = SX::sparse(1,0); 
+    for(vector<SX>::const_iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
       arg.appendColumns(trans(vec(*i)));
     }
  
     // Get all the outputs
-    SXMatrix res = SXMatrix::sparse(1,0); 
-    for(vector<SXMatrix>::const_iterator i=outputv_.begin(); i!=outputv_.end(); ++i){
+    SX res = SX::sparse(1,0); 
+    for(vector<SX>::const_iterator i=outputv_.begin(); i!=outputv_.end(); ++i){
       res.appendColumns(trans(vec(*i)));
     }
     
     // Generate an expression for the Jacobian
-    SXMatrix J = CasADi::jacobian(res,arg);
+    SX J = CasADi::jacobian(res,arg);
    
     // Generate a function for the full Jacobian
-    vector<SXMatrix> ret_res(1,J);
+    vector<SX> ret_res(1,J);
     ret_res.insert(ret_res.end(),outputv_.begin(),outputv_.end());
     SXFunction ret(inputv_,ret_res);
     return ret;

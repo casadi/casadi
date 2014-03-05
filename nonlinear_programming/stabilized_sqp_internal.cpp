@@ -197,28 +197,28 @@ namespace CasADi{
     // Create Hessian update function
     if(!exact_hessian_){
       // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
-      SXMatrix Bk = ssym("Bk",H_sparsity);
-      SXMatrix x = ssym("x",input(NLP_SOLVER_X0).sparsity());
-      SXMatrix x_old = ssym("x",x.sparsity());
-      SXMatrix gLag = ssym("gLag",x.sparsity());
-      SXMatrix gLag_old = ssym("gLag_old",x.sparsity());
+      SX Bk = ssym("Bk",H_sparsity);
+      SX x = ssym("x",input(NLP_SOLVER_X0).sparsity());
+      SX x_old = ssym("x",x.sparsity());
+      SX gLag = ssym("gLag",x.sparsity());
+      SX gLag_old = ssym("gLag_old",x.sparsity());
     
-      SXMatrix sk = x - x_old;
-      SXMatrix yk = gLag - gLag_old;
-      SXMatrix qk = mul(Bk, sk);
+      SX sk = x - x_old;
+      SX yk = gLag - gLag_old;
+      SX qk = mul(Bk, sk);
     
       // Calculating theta
-      SXMatrix skBksk = inner_prod(sk, qk);
-      SXMatrix omega = if_else(inner_prod(yk, sk) < 0.2 * inner_prod(sk, qk),
+      SX skBksk = inner_prod(sk, qk);
+      SX omega = if_else(inner_prod(yk, sk) < 0.2 * inner_prod(sk, qk),
                                0.8 * skBksk / (skBksk - inner_prod(sk, yk)),
                                1);
       yk = omega * yk + (1 - omega) * qk;
-      SXMatrix theta = 1. / inner_prod(sk, yk);
-      SXMatrix phi = 1. / inner_prod(qk, sk);
-      SXMatrix Bk_new = Bk + theta * mul(yk, trans(yk)) - phi * mul(qk, trans(qk));
+      SX theta = 1. / inner_prod(sk, yk);
+      SX phi = 1. / inner_prod(qk, sk);
+      SX Bk_new = Bk + theta * mul(yk, trans(yk)) - phi * mul(qk, trans(qk));
     
       // Inputs of the BFGS update function
-      vector<SXMatrix> bfgs_in(BFGS_NUM_IN);
+      vector<SX> bfgs_in(BFGS_NUM_IN);
       bfgs_in[BFGS_BK] = Bk;
       bfgs_in[BFGS_X] = x;
       bfgs_in[BFGS_X_OLD] = x_old;

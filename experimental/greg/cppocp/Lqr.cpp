@@ -76,10 +76,10 @@ Lqr::~Lqr() {}
 void Lqr::setupCostFunctions()
 {
      // inputs
-     SXMatrix xk( ssym( "xk", ode.nx(), 1 ) );
-     SXMatrix uk( ssym( "uk", ode.nu(), 1 ) );
+     SX xk( ssym( "xk", ode.nx(), 1 ) );
+     SX uk( ssym( "uk", ode.nu(), 1 ) );
 
-     vector<SXMatrix> costInputs(NUM_COST_INPUTS);
+     vector<SX> costInputs(NUM_COST_INPUTS);
      costInputs.at(IDX_COST_INPUTS_X_K) = xk;
      costInputs.at(IDX_COST_INPUTS_U_K) = uk;
 
@@ -89,16 +89,16 @@ void Lqr::setupCostFunctions()
      for (int k=0; k<N; k++){
 
 	  // function
-	  SXMatrix cost_0_k(costFcnExt( xkMap, ukMap, k, N ));
+	  SX cost_0_k(costFcnExt( xkMap, ukMap, k, N ));
 
 	  // jacobian
-	  SXMatrix cost_x_k = gradient( cost_0_k, xk );
-	  SXMatrix cost_u_k = gradient( cost_0_k, uk );
+	  SX cost_x_k = gradient( cost_0_k, xk );
+	  SX cost_u_k = gradient( cost_0_k, uk );
 
 	  // hessian
-	  SXMatrix cost_xx_k = jacobian( cost_x_k, xk );
-	  SXMatrix cost_xu_k = jacobian( cost_x_k, uk ); // == jacobian( cost_u, x ).trans()
-	  SXMatrix cost_uu_k = jacobian( cost_u_k, uk );
+	  SX cost_xx_k = jacobian( cost_x_k, xk );
+	  SX cost_xu_k = jacobian( cost_x_k, uk ); // == jacobian( cost_u, x ).trans()
+	  SX cost_uu_k = jacobian( cost_u_k, uk );
 
 	  simplify(cost_0_k);
 	  simplify(cost_x_k);
@@ -116,7 +116,7 @@ void Lqr::setupCostFunctions()
 	  makeDense(cost_uu_k);
 
 	  // outputs
-	  vector<SXMatrix> costOutputs(NUM_COST_OUTPUTS);
+	  vector<SX> costOutputs(NUM_COST_OUTPUTS);
 	  costOutputs.at(IDX_COST_OUTPUTS_COST_0_K)  = cost_0_k;
 	  costOutputs.at(IDX_COST_OUTPUTS_COST_X_K)  = cost_x_k;
 	  costOutputs.at(IDX_COST_OUTPUTS_COST_U_K)  = cost_u_k;
@@ -134,21 +134,21 @@ void Lqr::setupCostFunctions()
 void Lqr::setupBackwardSweepFunction()
 {
      /*************** inputs **************/
-     SXMatrix xk = ssym("xk", ode.nx());
-     SXMatrix uk = ssym("uk", ode.nu());
+     SX xk = ssym("xk", ode.nx());
+     SX uk = ssym("uk", ode.nu());
 
-     SXMatrix cost_0_k(  ssym(  "cost_0",        1,        1 ) );
-     SXMatrix cost_x_k(  ssym(  "cost_x", ode.nx(),        1 ) );
-     SXMatrix cost_u_k(  ssym(  "cost_u", ode.nu(),        1 ) );
-     SXMatrix cost_xx_k( ssym( "cost_xx", ode.nx(), ode.nx() ) );
-     SXMatrix cost_xu_k( ssym( "cost_xu", ode.nx(), ode.nu() ) );
-     SXMatrix cost_uu_k( ssym( "cost_uu", ode.nu(), ode.nu() ) );
+     SX cost_0_k(  ssym(  "cost_0",        1,        1 ) );
+     SX cost_x_k(  ssym(  "cost_x", ode.nx(),        1 ) );
+     SX cost_u_k(  ssym(  "cost_u", ode.nu(),        1 ) );
+     SX cost_xx_k( ssym( "cost_xx", ode.nx(), ode.nx() ) );
+     SX cost_xu_k( ssym( "cost_xu", ode.nx(), ode.nu() ) );
+     SX cost_uu_k( ssym( "cost_uu", ode.nu(), ode.nu() ) );
 
-     SXMatrix V_0_kp1(  ssym(  "V_0_kp1",        1,        1) );
-     SXMatrix V_x_kp1(  ssym(  "V_x_kp1", ode.nx(),        1) );
-     SXMatrix V_xx_kp1( ssym( "V_xx_kp1", ode.nx(), ode.nx()) );
+     SX V_0_kp1(  ssym(  "V_0_kp1",        1,        1) );
+     SX V_x_kp1(  ssym(  "V_x_kp1", ode.nx(),        1) );
+     SX V_xx_kp1( ssym( "V_xx_kp1", ode.nx(), ode.nx()) );
 
-     vector<SXMatrix> backwardSweepInputs(NUM_BACKWARD_SWEEP_INPUTS);
+     vector<SX> backwardSweepInputs(NUM_BACKWARD_SWEEP_INPUTS);
      backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_X_K)       = xk;
      backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_U_K)       = uk;
      backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_COST_0_K)  = cost_0_k;
@@ -166,42 +166,42 @@ void Lqr::setupBackwardSweepFunction()
      // dummy params for now
      map<string,SX> dummyParams;
      double dt = (tf - t0)/(N - 1);
-     SXMatrix f = ode.rk4Step( xk, uk, uk, dummyParams, t0, dt); // timestep dependent: f(x,u,__t__) - same as cost
-     //SXMatrix f = ode.eulerStep( xk, uk, dummyParams, SX(t0), SX(dt)); // timestep dependent:  f(x,u,__t__) - same as cost
-     SXMatrix f_x = jacobian( f, xk );
-     SXMatrix f_u = jacobian( f, uk );
+     SX f = ode.rk4Step( xk, uk, uk, dummyParams, t0, dt); // timestep dependent: f(x,u,__t__) - same as cost
+     //SX f = ode.eulerStep( xk, uk, dummyParams, SX(t0), SX(dt)); // timestep dependent:  f(x,u,__t__) - same as cost
+     SX f_x = jacobian( f, xk );
+     SX f_u = jacobian( f, uk );
 
 
      /**************** Q function *********************/
      // Q_0 = cost_0 + V_0_kp1
-     SXMatrix Q_0 = cost_0_k + V_0_kp1;
+     SX Q_0 = cost_0_k + V_0_kp1;
 
      // Q_x = cost_x + f_x'*V_x_kp1
-     SXMatrix Q_x = cost_x_k + mul( f_x.trans(), V_x_kp1 );
+     SX Q_x = cost_x_k + mul( f_x.trans(), V_x_kp1 );
 	
      // Q_u = cost_u + f_u'* V_x_kp1
-     SXMatrix Q_u = cost_u_k + mul( f_u.trans(), V_x_kp1 );
+     SX Q_u = cost_u_k + mul( f_u.trans(), V_x_kp1 );
 	
      // Q_xx = cost_xx + f_x'*V_xx_kp1*f_x
-     SXMatrix Q_xx = cost_xx_k + mul( f_x.trans(), mul( V_xx_kp1, f_x ) );
+     SX Q_xx = cost_xx_k + mul( f_x.trans(), mul( V_xx_kp1, f_x ) );
 
      // Q_xu = cost_xu + f_x'*V_xx_kp1*f_u
-     SXMatrix Q_xu = cost_xu_k + mul( f_x.trans(), mul( V_xx_kp1, f_u ) );
+     SX Q_xu = cost_xu_k + mul( f_x.trans(), mul( V_xx_kp1, f_u ) );
 
      // Q_uu = cost_uu + f_u'*V_xx_kp1*f_u
-     SXMatrix Q_uu = cost_uu_k + mul( f_u.trans(), mul( V_xx_kp1, f_u ) );
+     SX Q_uu = cost_uu_k + mul( f_u.trans(), mul( V_xx_kp1, f_u ) );
 
 
      /************** optimal control *******************/
-     SXMatrix Q_uu_inv = inv( Q_uu );
-     SXMatrix u_feedforward_k = -mul( Q_uu_inv, Q_u );
-     SXMatrix feedbackGain_k  = -mul( Q_uu_inv, Q_xu.trans() );
+     SX Q_uu_inv = inv( Q_uu );
+     SX u_feedforward_k = -mul( Q_uu_inv, Q_u );
+     SX feedbackGain_k  = -mul( Q_uu_inv, Q_xu.trans() );
 
 
      /************** value function propogation ********/
-     SXMatrix V_0_k  = Q_0  - mul( Q_u.trans(), mul( Q_uu_inv, Q_u ) );
-     SXMatrix V_x_k  = Q_x  - mul( Q_xu, mul( Q_uu_inv.trans(), Q_u ) );
-     SXMatrix V_xx_k = Q_xx - mul( Q_xu, mul( Q_uu_inv, Q_xu.trans() ) );
+     SX V_0_k  = Q_0  - mul( Q_u.trans(), mul( Q_uu_inv, Q_u ) );
+     SX V_x_k  = Q_x  - mul( Q_xu, mul( Q_uu_inv.trans(), Q_u ) );
+     SX V_xx_k = Q_xx - mul( Q_xu, mul( Q_uu_inv, Q_xu.trans() ) );
 
 
      /*************** backwardSweepFcn ****************/
@@ -212,7 +212,7 @@ void Lqr::setupBackwardSweepFunction()
      makeDense( V_x_k );
      makeDense( V_xx_k );
 
-     vector<SXMatrix> backwardSweepOutputs(NUM_BACKWARD_SWEEP_OUTPUTS);
+     vector<SX> backwardSweepOutputs(NUM_BACKWARD_SWEEP_OUTPUTS);
      backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_U_OPEN_LOOP_K)   = u_feedforward_k + uk;
      backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_FEEDBACK_GAIN_K) = feedbackGain_k;
      backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_V_0_K)           = V_0_k;
@@ -227,7 +227,7 @@ void Lqr::setupBackwardSweepFunction()
      makeDense( f );
      makeDense( f_x );
      makeDense( f_u );
-     vector<SXMatrix> dynamicsOutputs(3);
+     vector<SX> dynamicsOutputs(3);
      dynamicsOutputs.at(0) = f;
      dynamicsOutputs.at(1) = f_x;
      dynamicsOutputs.at(2) = f_u;
@@ -245,7 +245,7 @@ void Lqr::setupBackwardSweepFunction()
      makeDense( Q_uu );
 
      // outputs
-     vector<SXMatrix> qOutputs(NUM_COST_OUTPUTS);
+     vector<SX> qOutputs(NUM_COST_OUTPUTS);
      qOutputs.at(IDX_COST_OUTPUTS_COST_0_K)  = Q_0;
      qOutputs.at(IDX_COST_OUTPUTS_COST_X_K)  = Q_x;
      qOutputs.at(IDX_COST_OUTPUTS_COST_U_K)  = Q_u;

@@ -25,7 +25,7 @@ from casadi import *
 
 #! Construct using a single name
 #! =====================================
-#! The names of the entries of the SXMatrix will be derived from the name provided as argument to ssym.
+#! The names of the entries of the SX will be derived from the name provided as argument to ssym.
 
 #! Without shape arguments, a 1-by-1 matrix is constructed:
 

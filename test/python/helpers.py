@@ -203,7 +203,7 @@ class casadiTestCase(unittest.TestCase):
       sample = x
       
 
-    if isinstance(sample,SXElement) or isinstance(sample,SXMatrix):
+    if isinstance(sample,SXElement) or isinstance(sample,SX):
       f = SXFunction(x,yt)
     else:
       f = MXFunction(x,yt)
@@ -237,7 +237,7 @@ class casadiTestCase(unittest.TestCase):
         Checks if 'fr(x0)' yields the same as S/MXFunction(x,[ft(x)]) , evaluated for x0
     
         x: the symbolic seed for the test. It should be of a form accepted as first argument of SXFunction/MXFunction
-        ft: the test function. This function should operate on the casadi matrix x and return MX or SXMatrix.
+        ft: the test function. This function should operate on the casadi matrix x and return MX or SX.
         fr: the reference function. This function works on the numpy array x0.
         
         name - a descriptor that will be included in error messages
