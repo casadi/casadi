@@ -453,7 +453,7 @@ namespace CasADi{
   }
 
   template<class T>
-  std::string Matrix<T>::className(){ return std::string("Matrix<") + typeName<T>() + std::string(">"); }
+  std::string Matrix<T>::className(){ return matrixName<T>(); }
 
   template<class T>
   void Matrix<T>::printScalar(std::ostream &stream) const {

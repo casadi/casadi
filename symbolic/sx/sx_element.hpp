@@ -49,7 +49,7 @@ namespace CasADi{
 
 #ifdef SWIG
 #ifdef WITH_IMPLICITCONV
-  %implicitconv SX;
+  %implicitconv SXElement;
 #endif // WITH_IMPLICITCONV
 #endif // SWIG
 
@@ -357,7 +357,7 @@ namespace CasADi{
 
 // Template specialization
 namespace CasADi{
-  template<> inline const char* typeName<SXElement>() { return "SX"; }
+  template<> inline std::string matrixName<SXElement>() { return "SX"; }
 } // namespace CasADi
 
 namespace std{

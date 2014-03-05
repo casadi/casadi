@@ -65,11 +65,9 @@ namespace CasADi{
     
   //@{
   /** \brief Get typename */
-  template <typename T> inline const char* typeName() { return typeid(T).name(); }
-  template<> inline const char* typeName<double>() { return "double"; }
-  template<> inline const char* typeName<float>() { return "float"; }
-  template<> inline const char* typeName<int>() { return "int"; }
-  template<> inline const char* typeName<long>() { return "long"; }
+  template <typename T> inline std::string matrixName() { return std::string("Matrix<") + typeid(T).name() + std::string(">");}
+  template<> inline std::string matrixName<double>() { return "DMatrix"; }
+  template<> inline std::string matrixName<int>() { return "IMatrix"; }
   //@}
 
   /** \brief General sparse matrix class
