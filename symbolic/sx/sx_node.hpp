@@ -38,7 +38,7 @@ namespace CasADi{
   \date 2010
 */
 class SXNode{
-friend class SX;
+friend class SXElement;
 
 public:
 
