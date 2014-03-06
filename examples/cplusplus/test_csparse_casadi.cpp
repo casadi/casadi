@@ -35,18 +35,18 @@ int main(int argc, char *argv[])
 {
 
   /* Initialize matrix A. */
-  int nrow = 5, ncol = 5;
+  int ncol = 5, nrow = 5;
   int nnz = 12;
   
-  vector<int> rowind(nrow+1);
-  vector<int> col(nnz);
+  vector<int> colind(ncol+1);
+  vector<int> row(nnz);
   
   // Sparsity pattern
-  col[0] = 0; col[1] = 1; col[2] = 4; col[3] = 1;
-  col[4] = 2; col[5] = 4; col[6] = 0; col[7] = 2;
-  col[8] = 0; col[9] = 3; col[10]= 3; col[11]= 4;
-  rowind[0] = 0; rowind[1] = 3; rowind[2] = 6; rowind[3] = 8; rowind[4] = 10; rowind[5] = 12;
-  CRSSparsity spA(nrow,ncol,col,rowind);
+  row[0] = 0; row[1] = 1; row[2] = 4; row[3] = 1;
+  row[4] = 2; row[5] = 4; row[6] = 0; row[7] = 2;
+  row[8] = 0; row[9] = 3; row[10]= 3; row[11]= 4;
+  colind[0] = 0; colind[1] = 3; colind[2] = 6; colind[3] = 8; colind[4] = 10; colind[5] = 12;
+  Sparsity spA(nrow,ncol,colind,row);
   
   // Create a solver instance
   CSparse linear_solver(spA);
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
   val[6] = u; val[7] = p; val[8] = u; val[9] = e; val[10]= u; val[11]= r;
   
   // Right hand side
-  vector<double> rhs(nrow,1.0);
+  vector<double> rhs(ncol,1.0);
   
   // Transpose?
   bool tr = false;
@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
   cout << "solution = " << linear_solver.output("X") << endl;
 
   // Embed in an MX graph
-  MX A = msym("A",spA);
-  MX B = msym("B",1,nrow);
+  MX A = MX::sym("A",spA);
+  MX B = MX::sym("B",ncol,1);
   MX X = linear_solver.solve(A,B,tr);
   MXFunction F(linsolIn("A",A,"B",B),linsolOut("X",X));
   F.init();
@@ -95,8 +95,8 @@ int main(int argc, char *argv[])
   // Preturb the linear solver
   double t = 0.01;
   DMatrix x_unpreturbed = F.output("X");
-  F.input("A")(2,3)   += 1*t;
-  F.input("B")(0,2)   += 2*t;
+  F.input("A")(3,2)   += 1*t;
+  F.input("B")(2,0)   += 2*t;
   F.evaluate();
   cout << "solution (fd) = " << (F.output("X")-x_unpreturbed)/t << endl;
 
@@ -108,6 +108,6 @@ int main(int argc, char *argv[])
   J.evaluate();
   cout << "solution (dx/db) = " << J.output() << endl;
   DMatrix J_analytic = inv(J.input("A"));
-  if(!tr) J_analytic = trans(J_analytic);
+  if(tr) J_analytic = trans(J_analytic);
   cout << "analytic solution (dx/db) = " << J_analytic << endl;
 }

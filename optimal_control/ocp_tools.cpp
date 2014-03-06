@@ -40,19 +40,19 @@ void updateDependent(SymbolicOCP& ocp){
   if(ocp.pd.empty()) return;
   
   // Get the binding equations
-  SXMatrix pd_def = binding(ocp.pd);
+  SX pd_def = binding(ocp.pd);
   
   // Get expressions for the variables
-  SXMatrix pd = var(ocp.pd);
+  SX pd = var(ocp.pd);
   
   // Sort out interdependencies
   bool reverse=false;
   substituteInPlace(pd, pd_def, reverse);
 
   // Create a function which evaluates the binding equations numerically
-  SXMatrix ci = var(ocp.ci);
-  SXMatrix pi = var(ocp.pi);
-  vector<SXMatrix> f_in(2);
+  SX ci = var(ocp.ci);
+  SX pi = var(ocp.pi);
+  vector<SX> f_in(2);
   f_in[0] = ci;
   f_in[1] = pi;
   SXFunction f(f_in,pd_def);

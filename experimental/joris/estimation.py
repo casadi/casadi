@@ -66,13 +66,13 @@ q0,q1,q2,q3 = states.q
 # Helper variables to get to quaternions
 def skew(vec):
   x,y,z = vec
-  return SXMatrix([[0,-z,y],[z,0,-x],[-y,x,0]])
+  return SX([[0,-z,y],[z,0,-x],[-y,x,0]])
   
 rho = states.q[:3]
 rho_skew = skew(rho)
 
 # Transformation: p_world = R * p_body
-R = (SXMatrix.eye(3)*(mul(rho.T,-rho)+q3*q3)+mul(rho,rho.T)*2.0-q3*rho_skew*2.0).T
+R = (SX.eye(3)*(mul(rho.T,-rho)+q3*q3)+mul(rho,rho.T)*2.0-q3*rho_skew*2.0).T
 
 # Quaternion dynamic matrix
 G = numpy.matrix([[q3,-q2,q1],[q2,q3,-q0],[-q1,q0,q3],[-q0,-q1,-q2]])

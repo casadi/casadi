@@ -131,7 +131,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
     if (op.getType() == OT_BOOLEAN) {
       ss << "You supplied another type, possibly boolean." << endl;
       if (allowed_options[name]==OT_REAL || allowed_options[name]==OT_INTEGER) {
-        ss << "(A common mistake is to use SXMatrix/MX instead of floats/DMatrix in this context)" << endl;
+        ss << "(A common mistake is to use SX/MX instead of floats/DMatrix in this context)" << endl;
       }
     } else {
       ss << "You supplied a type '" << op.get_description() << "' instead." << endl;

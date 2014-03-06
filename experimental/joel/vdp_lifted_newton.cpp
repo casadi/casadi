@@ -42,13 +42,13 @@ int main(){
   int nj = 100; // Number of integration steps per control segment
 
   // Control
-  SXMatrix u = ssym("u",nk); // control
+  SX u = ssym("u",nk); // control
 
   // Number of states
   int nx = 3;
   
   // Intermediate variables with initial values and bounds
-  SXMatrix v, v_def;
+  SX v, v_def;
   DMatrix v_init, v_min, v_max;
   
   // Initial values and bounds for the state at the different stages
@@ -66,8 +66,8 @@ int main(){
   SX dt = tf/(nj*nk); // time step
 
   // For all the shooting intervals
-  SXMatrix x_k = x_0;
-  SXMatrix ode_rhs(x_k.sparsity(),0);
+  SX x_k = x_0;
+  SX ode_rhs(x_k.sparsity(),0);
   for(int k=0; k<nk; ++k){
     // Get control
     SX u_k = u[k].at(0);
@@ -98,10 +98,10 @@ int main(){
   }
 
   // Objective function
-  SXMatrix f = x_k[2] + (tf/nk)*inner_prod(u,u);
+  SX f = x_k[2] + (tf/nk)*inner_prod(u,u);
   
   // Terminal constraints
-  SXMatrix g;
+  SX g;
   g.append(x_k[0]);
   g.append(x_k[1]);
 

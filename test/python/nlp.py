@@ -25,9 +25,12 @@ from numpy import *
 import unittest
 from types import *
 from helpers import *
+import itertools
+
+#CasadiOptions.setCatchErrorsPython(False)
 
 solvers= []
-  
+ 
 try:
   solvers.append((WorhpSolver,{}))
   print "Will test WorhpSolver"
@@ -37,6 +40,12 @@ except:
 try:
   solvers.append((IpoptSolver,{}))
   print "Will test IpoptSolver"
+except:
+  pass
+
+try:
+  solvers.append((SnoptSolver,{"_verify_level": 3,"detect_linear": True,"_optimality_tolerance":1e-10,"_feasibility_tolerance":1e-10}))
+  print "Will test SnoptSolver"
 except:
   pass
 
@@ -54,7 +63,6 @@ try:
 except:
   pass
 
-
 #try:
 #  solvers.append(KnitroSolver)
 #  print "Will test KnitroSolver"
@@ -64,7 +72,7 @@ except:
 class NLPtests(casadiTestCase):
 
   def testboundsviol(self):
-    x=SX("x")
+    x=SX.sym("x")
     nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2,g=x))
     
     for Solver, solver_options in solvers:
@@ -98,7 +106,7 @@ class NLPtests(casadiTestCase):
         solver.solve()
         
   def testIPOPT(self):
-    x=SX("x")
+    x=SX.sym("x")
     nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2,g=x))
     
     for Solver, solver_options in solvers:
@@ -122,8 +130,8 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,9,str(Solver))
       
   def testIPOPT_par(self):
-    x=SX("x")
-    p=SX("p")
+    x=SX.sym("x")
+    p=SX.sym("p")
     nlp=SXFunction(nlpIn(x=x,p=p),nlpOut(f=(x-p)**2,g=x))
     
     for Solver, solver_options in solvers:
@@ -147,7 +155,7 @@ class NLPtests(casadiTestCase):
       
   def testIPOPTinf(self):
     self.message("trivial IPOPT, infinity bounds")
-    x=SX("x")
+    x=SX.sym("x")
     nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2,g=x))
     
     for Solver, solver_options in solvers:
@@ -179,8 +187,8 @@ class NLPtests(casadiTestCase):
       
   def testIPOPTrb(self):
     self.message("rosenbrock, limited-memory hessian approx")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2))
     
@@ -203,8 +211,8 @@ class NLPtests(casadiTestCase):
     
   def testIPOPTrb2(self):
     self.message("rosenbrock, limited-memory hessian approx")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver, solver_options in solvers:
@@ -232,8 +240,8 @@ class NLPtests(casadiTestCase):
       
   def testIPOPTrbf(self):
     self.message("rosenbrock fixed, limited-memory hessian approx")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver, solver_options in solvers:
@@ -269,8 +277,8 @@ class NLPtests(casadiTestCase):
       
   def testIPOPTrhb2(self):
     self.message("rosenbrock, exact hessian, constrained")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     obj = (1-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=x**2+y**2))
@@ -278,8 +286,8 @@ class NLPtests(casadiTestCase):
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
     
-    sigma=SX("sigma")
-    lambd=SX("lambd")
+    sigma=SX.sym("sigma")
+    lambd=SX.sym("lambd")
     h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd),
                  hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(nlp.outputExpr("g"),vertcat([x,y]))))
     h.init()
@@ -318,8 +326,8 @@ class NLPtests(casadiTestCase):
       
   def test_warmstart(self):
   
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     obj = (1-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=x**2+y**2))
@@ -375,8 +383,8 @@ class NLPtests(casadiTestCase):
 
   def testIPOPTrhb2_gen(self):
     self.message("rosenbrock, exact hessian generated, constrained")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     obj = (1-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=x**2+y**2))
@@ -384,8 +392,8 @@ class NLPtests(casadiTestCase):
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
     
-    sigma=SX("sigma")
-    lambd=SX("lambd")
+    sigma=SX.sym("sigma")
+    lambd=SX.sym("lambd")
   
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -414,8 +422,8 @@ class NLPtests(casadiTestCase):
       
       
   def test_jacG_empty(self):
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     obj = (1-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=obj,g=1))
@@ -443,9 +451,9 @@ class NLPtests(casadiTestCase):
 
   def testIPOPTrhb2_par(self):
     self.message("rosenbrock, exact hessian, constrained, ")
-    x=SX("x")
-    y=SX("y")
-    p=SX("p")
+    x=SX.sym("x")
+    y=SX.sym("y")
+    p=SX.sym("p")
     
     obj = (p-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj,g=x**2+y**2))
@@ -453,8 +461,8 @@ class NLPtests(casadiTestCase):
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
     
-    sigma=SX("sigma")
-    lambd=SX("lambd")
+    sigma=SX.sym("sigma")
+    lambd=SX.sym("lambd")
     h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma,lam_g=lambd,p=p),
                  hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(nlp.outputExpr("g"),vertcat([x,y]))))
 
@@ -486,9 +494,9 @@ class NLPtests(casadiTestCase):
 
   def testIPOPTrhb2_gen_par(self):
     self.message("rosenbrock, exact hessian generated, constrained, parametric")
-    x=SX("x")
-    y=SX("y")
-    p=SX("p")
+    x=SX.sym("x")
+    y=SX.sym("y")
+    p=SX.sym("p")
     
     obj = (p-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj,g=x**2+y**2))
@@ -496,8 +504,8 @@ class NLPtests(casadiTestCase):
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
     
-    sigma=SX("sigma")
-    lambd=SX("lambd")
+    sigma=SX.sym("sigma")
+    lambd=SX.sym("lambd")
   
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -527,13 +535,13 @@ class NLPtests(casadiTestCase):
       
   def testIPOPTrhb(self):
     self.message("rosenbrock, exact hessian")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     obj=(1-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=obj))
     
-    sigma=SX("sigma")
+    sigma=SX.sym("sigma")
     
     h=SXFunction(hessLagIn(x=vertcat([x,y]),lam_f=sigma),
                  hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))))
@@ -558,13 +566,13 @@ class NLPtests(casadiTestCase):
 
   def testIPOPTrhb_gen(self):
     self.message("rosenbrock, exact hessian generated")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     obj=(1-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=obj))
     
-    sigma=SX("sigma")
+    sigma=SX.sym("sigma")
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -586,13 +594,13 @@ class NLPtests(casadiTestCase):
 
   def testIPOPTrhb_gen_xnonfree(self):
     self.message("rosenbrock, exact hessian generated, non-free x")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     obj=(1-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=obj))
     
-    sigma=SX("sigma")
+    sigma=SX.sym("sigma")
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -622,14 +630,14 @@ class NLPtests(casadiTestCase):
       
   def testIPOPTrhb_par(self):
     self.message("rosenbrock, exact hessian, parametric")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
-    p=SX("p")
+    p=SX.sym("p")
     obj=(p-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj))
     
-    sigma=SX("sigma")
+    sigma=SX.sym("sigma")
     
     h=SXFunction(hessLagIn(x=vertcat([x,y]),p=p,lam_f=sigma),
                  hessLagOut(hess=sigma*hessian(obj,vertcat([x,y]))))
@@ -655,14 +663,14 @@ class NLPtests(casadiTestCase):
 
   def testIPOPTrhb_gen_par(self):
     self.message("rosenbrock, exact hessian generated, parametric")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
-    p=SX("p")
+    p=SX.sym("p")
     obj=(p-x)**2+100*(y-x**2)**2
     nlp=SXFunction(nlpIn(x=vertcat([x,y]),p=p),nlpOut(f=obj))
     
-    sigma=SX("sigma")
+    sigma=SX.sym("sigma")
     
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -686,7 +694,7 @@ class NLPtests(casadiTestCase):
     def norm_2(mx):
       return inner_prod(mx,mx)
     N=10
-    x=msym("x",N)
+    x=MX.sym("x",N)
     x0=linspace(0,1,N)
     X0=MX(x0)
     nlp=MXFunction(nlpIn(x=x),nlpOut(f=norm_2(x-X0),g=2*x))
@@ -705,6 +713,7 @@ class NLPtests(casadiTestCase):
       solver.solve()
       print "residuals"
       print array(solver.getOutput("x")).squeeze()-x0
+      print "bazmeg", solver.getOutput("f")
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.checkarray(array(solver.getOutput("x")).squeeze(),x0,str(Solver),digits=8)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0]*10),8,str(Solver),digits=8)
@@ -713,7 +722,7 @@ class NLPtests(casadiTestCase):
   def testIPOPTnoc(self):
     self.message("trivial IPOPT, no constraints")
     """ There is an assertion error thrown, but still it works"""
-    x=ssym("x")
+    x=SX.sym("x")
     nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2))
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -732,7 +741,7 @@ class NLPtests(casadiTestCase):
     
   def testIPOPTmx(self):
     self.message("trivial IPOPT, using MX")
-    x=MX("x")
+    x=MX.sym("x")
     nlp=MXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2,g=2*x))
     
     for Solver, solver_options in solvers:
@@ -753,7 +762,7 @@ class NLPtests(casadiTestCase):
     
   def testIPOPTc(self):
     self.message("trivial, overconstrained")
-    x=SX("x")
+    x=SX.sym("x")
     nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2,g=vertcat([x,x,x])))
     
     for Solver, solver_options in solvers:
@@ -774,7 +783,7 @@ class NLPtests(casadiTestCase):
     
   def testIPOPTc2(self):
     self.message("trivial2, overconstrained")
-    x=SX("x")
+    x=SX.sym("x")
     nlp=SXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2,g=vertcat([x,x,x+x])))
     
     for Solver, solver_options in solvers:
@@ -795,7 +804,7 @@ class NLPtests(casadiTestCase):
     
   def testIPOPTcmx(self):
     self.message("trivial , overconstrained, using MX")
-    x=MX("x")
+    x=MX.sym("x")
     nlp=MXFunction(nlpIn(x=x),nlpOut(f=(x-1)**2,g=vertcat([2*x,3*x,4*x])))
     
     for Solver, solver_options in solvers:
@@ -816,8 +825,8 @@ class NLPtests(casadiTestCase):
 
   def testIPOPTdeg(self):
     self.message("degenerate optimization IPOPT")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=0,g=vertcat([x-y,x])))
     for Solver, solver_options in solvers:
       self.message(str(Solver))
@@ -836,8 +845,8 @@ class NLPtests(casadiTestCase):
 
   def testIPOPTdegc(self):
     self.message("degenerate optimization IPOPT, overconstrained")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=0,g=vertcat([x-y,x,x+y])))
     
     for Solver, solver_options in solvers:
@@ -859,8 +868,8 @@ class NLPtests(casadiTestCase):
       
   def testXfreeChange(self):
     self.message("Change in X settings")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver, solver_options in solvers:
@@ -896,8 +905,8 @@ class NLPtests(casadiTestCase):
 
   def testactiveLBX(self):
     self.message("active LBX")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver, solver_options in solvers:
@@ -923,8 +932,8 @@ class NLPtests(casadiTestCase):
 
   def testactiveLBG(self):
     self.message("active LBG")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver, solver_options in solvers:
@@ -950,8 +959,8 @@ class NLPtests(casadiTestCase):
 
   def testactiveUBG(self):
     self.message("active UBG")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver, solver_options in solvers:
@@ -977,8 +986,8 @@ class NLPtests(casadiTestCase):
       
   def testactiveUBX(self):
     self.message("active UBX")
-    x=SX("x")
-    y=SX("y")
+    x=SX.sym("x")
+    y=SX.sym("y")
     
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+100*(y-x**2)**2,g=x+y))
     for Solver, solver_options in solvers:
@@ -1007,7 +1016,7 @@ class NLPtests(casadiTestCase):
 
     N = 50 
 
-    x = ssym("x",N)
+    x = SX.sym("x",N)
     x0 = DMatrix(range(N))
     H = diag(range(1,N+1))
     obj = 0.5*mul([(x-x0).T,H,(x-x0)])
@@ -1042,7 +1051,7 @@ class NLPtests(casadiTestCase):
     LBX = DMatrix([0.5,0])
     UBX = DMatrix([0.5,inf])
 
-    x=ssym("x",2)
+    x=SX.sym("x",2)
     nlp=SXFunction(nlpIn(x=x),nlpOut(f=0.5*mul([x.T,H,x])+mul(G.T,x),g=mul(A,x)))
 
     for Solver, solver_options in solvers:
@@ -1082,7 +1091,7 @@ class NLPtests(casadiTestCase):
     LBX = DMatrix([0.5,0])
     UBX = DMatrix([0.5,inf])
 
-    x=ssym("x",2)
+    x=SX.sym("x",2)
     nlp=SXFunction(nlpIn(x=x),nlpOut(f=0.5*mul([x.T,H,x])+mul(G.T,x),g=mul(A,x)))
 
     for Solver, solver_options in solvers:
@@ -1150,7 +1159,7 @@ class NLPtests(casadiTestCase):
     LBX = DMatrix([0]*2)
     UBX = DMatrix([inf]*2)
 
-    x=ssym("x",2)
+    x=SX.sym("x",2)
     nlp=SXFunction(nlpIn(x=x),nlpOut(f=0.5*mul([x.T,H,x])+mul(G.T,x),g=mul(A,x)))
 
     for Solver, solver_options in solvers:
@@ -1204,11 +1213,11 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("f")[0],-10-16.0/9,6,str(solver))
       
   def test_bug(self):
-    x = msym("x", 3)
-    y = msym("y", 2)
+    x = MX.sym("x", 3)
+    y = MX.sym("y", 2)
     f = MXFunction([x, y], [1.])
     f.init()
-    aa = msym("aa", 5)
+    aa = MX.sym("aa", 5)
     a = aa[:3]
     b = aa[3:]
     [f_call] = f.call([a, b])
@@ -1218,6 +1227,192 @@ class NLPtests(casadiTestCase):
       solver = IpoptSolver(nlp)
       solver.init() 
       
+  @requires("SnoptSolver")
+  def test_permute(self):
+    for permute_g in itertools.permutations(range(3)):
+      for permute_x in itertools.permutations(range(4)):
+        x=SX.sym("x",4)
+        x1,x2,x3,x4 = x[permute_x]
+        g = [x1**2+x2**2+x3,
+            x2**4+x4,
+            2*x1+4*x2]
+        f= (x1+x2+x3)**2+3*x3+5*x4
+        F= SXFunction(nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
+        F.init()
+        
+        solver = SnoptSolver(F)
+        solver.init()
+
+        solver.input("ubx")[permute_x]= DMatrix([inf,inf,inf,inf])
+        solver.input("lbx")[permute_x]= DMatrix([-inf,-inf,0,0])
+        
+        solver.setInput(DMatrix([2,4,inf])[permute_g],"ubg")
+        solver.setInput(DMatrix([2,4,0])[permute_g],"lbg")
+        
+        solver.input("x0")[permute_x] = DMatrix([-0.070,1.41,0,0.0199])
+        solver.evaluate()
+
+
+        F.setInput(solver.output("x"))
+        F.evaluate()
+
+        self.checkarray(solver.output("f"),DMatrix([1.900124999054007]))
+        self.checkarray(solver.output("x")[permute_x],DMatrix([-7.0622015054877127e-02,1.4124491251009053e+00,0,1.9925001159906402e-02]))
+        self.checkarray(solver.output("lam_x")[permute_x],DMatrix([0,0,-2.4683779217362773e+01,0]),digits=7)
+        self.checkarray(solver.output("lam_g"),DMatrix([1.9000124997270717e+01,-5,0])[permute_g])
+        #self.checkarray(solver.output("g"),DMatrix([2,4,5.50855])[permute_g])
+  
+  @requires("SnoptSolver")
+  def test_classifications(self):      
+    x=SX.sym("x")
+    y=SX.sym("y")
+    nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+7.7*y,g=y**2))
+
+    solver = SnoptSolver(nlp)
+    solver.init()
+        
+    #solver.setOption("detect_linear",False)
+    solver.setOption("verbose",True)
+    solver.setOption("monitor",["setup_nlp","eval_nlp"])
+    solver.setOption("_verify_level",3)
+    #solver.setOption("_optimality_tolerance",1e-8)
+    #solver.setOption("_feasibility_tolerance",1e-8)
+    solver.setOption("_iteration_limit",1000)
+
+    sparsegradF = nlp.jacobian("x","f")
+    sparsegradF.init()
+    ins = nlp.symbolicInput()
+    out = list(sparsegradF.call(ins))
+    sparsegradF = MXFunction(ins,[out[0].T] + out[1:])
+    sparsegradF.init()
+
+    solver.setOption("grad_f",sparsegradF)
+
+    solver.init()
+    solver.setInput([1,1],"x0")
+    solver.setInput([-10,0],"lbx")
+    solver.setInput([10,2],"ubx")
+    solver.setInput([-10],"lbg")
+    solver.setInput([10],"ubg")
+
+    solver.solve()
+    
+    self.checkarray(solver.output("f"),DMatrix([0]))
+    self.checkarray(solver.output("x"),DMatrix([1,0]))
+    self.checkarray(solver.output("lam_x"),DMatrix([0,-7.7]),digits=7)
+    self.checkarray(solver.output("lam_g"),DMatrix([0]))
+    
+  @requires("SnoptSolver")
+  def test_pathological(self):      
+    x=SX.sym("x")
+    y=SX.sym("y")
+    nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+y**2))
+
+    solver = SnoptSolver(nlp)
+    solver.init()
+        
+    #solver.setOption("detect_linear",False)
+    solver.setOption("verbose",True)
+    solver.setOption("monitor",["setup_nlp","eval_nlp"])
+    solver.setOption("_verify_level",3)
+    #solver.setOption("_optimality_tolerance",1e-8)
+    #solver.setOption("_feasibility_tolerance",1e-8)
+    solver.setOption("_iteration_limit",1000)
+
+    sparsegradF = nlp.jacobian("x","f")
+    sparsegradF.init()
+    ins = nlp.symbolicInput()
+    out = list(sparsegradF.call(ins))
+    sparsegradF = MXFunction(ins,[out[0].T] + out[1:])
+    sparsegradF.init()
+
+    solver.setOption("grad_f",sparsegradF)
+
+    solver.init()
+    solver.setInput([1,1],"x0")
+    solver.setInput([-10,0],"lbx")
+    solver.setInput([10,2],"ubx")
+
+    solver.solve()
+    
+    self.checkarray(solver.output("f"),DMatrix([0]))
+    self.checkarray(solver.output("x"),DMatrix([1,0]))
+    self.checkarray(solver.output("lam_x"),DMatrix([0,-0]),digits=7)
+
+  @requires("SnoptSolver")
+  def test_pathological2(self):      
+    x=SX.sym("x")
+    y=SX.sym("y")
+    nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+y))
+
+    solver = SnoptSolver(nlp)
+    solver.init()
+        
+    #solver.setOption("detect_linear",False)
+    solver.setOption("verbose",True)
+    solver.setOption("monitor",["setup_nlp","eval_nlp"])
+    solver.setOption("_verify_level",3)
+    #solver.setOption("_optimality_tolerance",1e-8)
+    #solver.setOption("_feasibility_tolerance",1e-8)
+    solver.setOption("_iteration_limit",1000)
+
+    sparsegradF = nlp.jacobian("x","f")
+    sparsegradF.init()
+    ins = nlp.symbolicInput()
+    out = list(sparsegradF.call(ins))
+    sparsegradF = MXFunction(ins,[out[0].T] + out[1:])
+    sparsegradF.init()
+
+    solver.setOption("grad_f",sparsegradF)
+
+    solver.init()
+    solver.setInput([1,1],"x0")
+    solver.setInput([-10,0],"lbx")
+    solver.setInput([10,2],"ubx")
+
+    solver.solve()
+    
+    self.checkarray(solver.output("f"),DMatrix([0]))
+    self.checkarray(solver.output("x"),DMatrix([1,0]))
+    self.checkarray(solver.output("lam_x"),DMatrix([0,-1]),digits=7)
+
+  @requires("SnoptSolver")
+  def test_pathological3(self):      
+    x=SX.sym("x")
+    y=SX.sym("y")
+    nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2,g=x+y))
+
+    solver = SnoptSolver(nlp)
+    solver.init()
+        
+    #solver.setOption("detect_linear",False)
+    solver.setOption("verbose",True)
+    solver.setOption("monitor",["setup_nlp","eval_nlp"])
+    solver.setOption("_verify_level",3)
+    #solver.setOption("_optimality_tolerance",1e-8)
+    #solver.setOption("_feasibility_tolerance",1e-8)
+    solver.setOption("_iteration_limit",1000)
+
+    sparsegradF = nlp.jacobian("x","f")
+    sparsegradF.init()
+    ins = nlp.symbolicInput()
+    out = list(sparsegradF.call(ins))
+    sparsegradF = MXFunction(ins,[out[0].T] + out[1:])
+    sparsegradF.init()
+
+    solver.setOption("grad_f",sparsegradF)
+
+    solver.init()
+    solver.setInput([1,1],"x0")
+    solver.setInput([-10,0],"lbx")
+    solver.setInput([10,2],"ubx")
+
+    solver.solve()
+    
+    self.checkarray(solver.output("f"),DMatrix([0]))
+    self.checkarray(solver.output("x"),DMatrix([1,1]))
+    self.checkarray(solver.output("lam_x"),DMatrix([0,0]),digits=7)
+    
 if __name__ == '__main__':
     unittest.main()
     print solvers

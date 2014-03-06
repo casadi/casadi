@@ -47,16 +47,16 @@ int main(){
    */
   
   // Optimization variables
-  SXMatrix x = ssym("x",3);
+  SX x = SX::sym("x",3);
   
   // Parameters
-  SXMatrix p = ssym("p",2);
+  SX p = SX::sym("p",2);
   
   // Objective
-  SXMatrix f = x[0]*x[0] + x[1]*x[1] + x[2]*x[2];
+  SX f = x[0]*x[0] + x[1]*x[1] + x[2]*x[2];
   
   // Constraints
-  SXMatrix g = vertcat(
+  SX g = vertcat(
        6*x[0] + 3*x[1] + 2*x[2] - p[0],
     p[1]*x[0] +   x[1] -   x[2] -    1
   );

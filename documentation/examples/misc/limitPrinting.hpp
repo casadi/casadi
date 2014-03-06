@@ -7,7 +7,7 @@
 *
 * \sa
 * \code
-* SX.max_num_calls_in_print;
+* SXElement.max_num_calls_in_print;
 * MX.max_num_calls_in_print;
 * \endcode
 */

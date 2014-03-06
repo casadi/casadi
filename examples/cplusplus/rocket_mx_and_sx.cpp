@@ -30,12 +30,12 @@ using namespace std;
 
 // CONSTRUCT THE INTEGRATOR
 FX create_integrator(int nj, int nu){
-  SX u("u"); // control for one segment
+  SX u = SX::sym("u"); // control for one segment
 
   // Initial position
-  SX s0("s0"); // initial position
-  SX v0("v0"); // initial speed
-  SX m0("m0"); // initial mass
+  SX s0 = SX::sym("s0"); // initial position
+  SX v0 = SX::sym("v0"); // initial speed
+  SX m0 = SX::sym("m0"); // initial mass
 
   SX dt = 10.0/(nj*nu); // time step
   SX alpha = 0.05; // friction
@@ -52,7 +52,7 @@ FX create_integrator(int nj, int nu){
   }
 
   // State vector
-  SXMatrix x, x0;
+  SX x, x0;
   x.append(s);
   x.append(v);
   x.append(m);
@@ -61,10 +61,10 @@ FX create_integrator(int nj, int nu){
   x0.append(m0);
 
   // Integrator
-  vector<SXMatrix> input(2);
+  vector<SX> input(2);
   input[0] = u;
   input[1] = x0;
-  SXMatrix output = x;
+  SX output = x;
   SXFunction integrator(input,output);
   integrator.init();
 
@@ -82,7 +82,7 @@ int main(){
   FX integrator = create_integrator(nj,nu);
 
   // PART 2: CONSTRUCT THE NLP
-  MX U("U",nu); // control for all segments
+  MX U = MX::sym("U",nu); // control for all segments
  
   // Initial position
   vector<double> X0(3);

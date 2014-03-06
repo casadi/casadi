@@ -25,7 +25,7 @@ from casadi import *
 #! This can be useful to debug yor code, e.g. debugging why the end-result of a computation yields NaN
 
 #! Consider this example:
-x = msym("x")
+x = MX.sym("x")
 y = sin(x)
 z = sqrt(y)
 

@@ -27,8 +27,8 @@ nk = 20    # Control discretization
 tf = 10.0  # End time
 
 # Declare variables (use scalar graph)
-u  = ssym("u")    # control
-x  = ssym("x",3)  # states
+u  = SX.sym("u")    # control
+x  = SX.sym("x",3)  # states
 
 # ODE right hand side
 xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, \
@@ -46,10 +46,10 @@ integrator.setOption("tf",tf/nk) # final time
 integrator.init()
 
 # All controls (use matrix graph)
-U = msym("U",nk) # nk-by-1 symbolic variable
+U = MX.sym("U",nk) # nk-by-1 symbolic variable
 
 # The initial state (x_0=0, x_1=1, x_2=0)
-X  = msym([0,1,0])
+X  = MX([0,1,0])
 
 # Build a graph of integrator calls
 for k in range(nk):

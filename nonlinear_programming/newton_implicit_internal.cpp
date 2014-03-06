@@ -136,7 +136,7 @@ namespace CasADi {
         time_start = getRealTime(); // Start timer
       }
       // Solve against F
-      linsol_.solve(&F.front(),1,true);
+      linsol_.solve(&F.front(),1,false);
       if (CasadiOptions::profiling) {
         time_stop = getRealTime(); // Stop timer
         CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":2||solve linear system" << std::endl;

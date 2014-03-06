@@ -45,7 +45,7 @@ namespace CasADi {
     }
 
     setDependencies(arg);
-    setSparsity(CRSSparsity(1, 1, true));
+    setSparsity(Sparsity(1, 1, true));
   }
 
   CallFX* CallFX::clone() const {
@@ -64,7 +64,7 @@ namespace CasADi {
     return fcn_.getNumOutputs();
   }
 
-  const CRSSparsity& CallFX::sparsity(int oind) const{
+  const Sparsity& CallFX::sparsity(int oind) const{
     return fcn_.output(oind).sparsity();
   }
 
@@ -72,7 +72,7 @@ namespace CasADi {
     return fcn_;
   }
 
-  void CallFX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res, std::vector<int>& itmp, std::vector<SX>& rtmp) {
+  void CallFX::evaluateSX(const SXPtrV& arg, SXPtrV& res, std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
     fcn_->evaluateSX(this,arg,res,itmp,rtmp);
   }
 

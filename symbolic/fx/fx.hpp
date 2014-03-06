@@ -40,8 +40,8 @@ namespace CasADi{
       Each such primitive function \f$f_{i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$, 
       in which n,m,p,q can take different values for every (i,j) pair.\n
   
-      When passing input, you specify which partition i is active.     You pass the numbers flattened, as a vector of size \f$(n*m)\f$.\n
-      When requesting output, you specify which partition j is active. You get the numbers flattened, as a vector of size \f$(p*q)\f$.\n
+      When passing input, you specify which partition i is active.     You pass the numbers vectorized, as a vector of size \f$(n*m)\f$.\n
+      When requesting output, you specify which partition j is active. You get the numbers vectorized, as a vector of size \f$(p*q)\f$.\n
   
       To calculate jacobians, you need to have \f$(m=1,q=1)\f$.
   
@@ -53,14 +53,14 @@ namespace CasADi{
       Using \f$\vec{w} \in \mathbf{R}^p\f$ as a forward seed:  setAdjSeed(w,j)\n
       Retrieving \f$\vec{s}_a \in \mathbf{R}^n \f$ from:        getAdjSens(sa,i)\n
   
-      We have the following relationships for function mapping from a column vector to a column vector:
+      We have the following relationships for function mapping from a row vector to a row vector:
   
       \f$ \vec{s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
       \f$ \vec{s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
   
       Some quantities is these formulas must be transposed: \n 
-      input  row: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
-      output row: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
+      input  col: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
+      output col: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
     
       NOTE: FX's are allowed to modify their input arguments when evaluating: implicitFunction, IDAS solver
       Futher releases may disallow this.
@@ -244,8 +244,8 @@ namespace CasADi{
     std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
 
   
-    /// evaluate symbolically, SX type (overloaded)
-    std::vector<SXMatrix> eval(const std::vector<SXMatrix>& arg){ return evalSX(arg);}
+    /// evaluate symbolically, SXElement type (overloaded)
+    std::vector<SX> eval(const std::vector<SX>& arg){ return evalSX(arg);}
 
     /// evaluate symbolically, MX type (overloaded)
     std::vector<MX> eval(const std::vector<MX>& arg){return evalMX(arg);}
@@ -253,10 +253,10 @@ namespace CasADi{
     /// evaluate symbolically, MX type (unambiguous)
     std::vector<MX> evalMX(const std::vector<MX>& arg);
 
-    /// evaluate symbolically, SX type (unambiguous)
-    std::vector<SXMatrix> evalSX(const std::vector<SXMatrix>& arg);
+    /// evaluate symbolically, SXElement type (unambiguous)
+    std::vector<SX> evalSX(const std::vector<SX>& arg);
   
-    /** \brief Evaluate symbolically with with directional derivatives, SX type
+    /** \brief Evaluate symbolically with with directional derivatives, SXElement type
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
      * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
      * the length of the vector being the number of forward directions.
@@ -264,13 +264,13 @@ namespace CasADi{
      * the length of the vector being the number of adjoint directions.
      */
 #ifndef SWIG
-    void evalSX(const SXMatrixVector& arg, SXMatrixVector& res, 
-                const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
-                const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens);
+    void evalSX(const SXVector& arg, SXVector& res, 
+                const SXVectorVector& fseed, SXVectorVector& fsens, 
+                const SXVectorVector& aseed, SXVectorVector& asens);
 #else // SWIG
-    void evalSX(const SXMatrixVector& arg, SXMatrixVector& OUTPUT, 
-                const SXMatrixVectorVector& fseed, SXMatrixVectorVector& OUTPUT, 
-                const SXMatrixVectorVector& aseed, SXMatrixVectorVector& OUTPUT);
+    void evalSX(const SXVector& arg, SXVector& OUTPUT, 
+                const SXVectorVector& fseed, SXVectorVector& OUTPUT, 
+                const SXVectorVector& aseed, SXVectorVector& OUTPUT);
 #endif // SWIG
 
     /** \brief Evaluate symbolically with with directional derivatives, MX type
@@ -290,7 +290,7 @@ namespace CasADi{
                 const MXVectorVector& aseed, MXVectorVector& OUTPUT);
 #endif // SWIG  
               
-    /** \brief Evaluate symbolically with with directional derivatives, SX type, overloaded
+    /** \brief Evaluate symbolically with with directional derivatives, SXElement type, overloaded
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
      * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
      * the length of the vector being the number of forward directions.
@@ -298,13 +298,13 @@ namespace CasADi{
      * the length of the vector being the number of adjoint directions.
      */
 #ifndef SWIG
-    void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& res, 
-              const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
-              const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens);
+    void eval(const SXVector& arg, std::vector<SX>& res, 
+              const SXVectorVector& fseed, SXVectorVector& fsens, 
+              const SXVectorVector& aseed, SXVectorVector& asens);
 #else // SWIG
-    void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& OUTPUT, 
-              const SXMatrixVectorVector& fseed, SXMatrixVectorVector& OUTPUT, 
-              const SXMatrixVectorVector& aseed, SXMatrixVectorVector& OUTPUT);
+    void eval(const SXVector& arg, std::vector<SX>& OUTPUT, 
+              const SXVectorVector& fseed, SXVectorVector& OUTPUT, 
+              const SXVectorVector& aseed, SXVectorVector& OUTPUT);
 #endif // SWIG 
     /** \brief Evaluate symbolically with with directional derivatives, MX type, overloaded
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
@@ -325,7 +325,7 @@ namespace CasADi{
 
 #ifndef SWIG
     /// evaluate symbolically, single input, single output 
-    SXMatrix eval(const SXMatrix& arg){ return eval(std::vector<SXMatrix>(1,arg)).at(0);}
+    SX eval(const SX& arg){ return eval(std::vector<SX>(1,arg)).at(0);}
 #endif // SWIG
   
     /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
@@ -351,18 +351,18 @@ namespace CasADi{
 
     //@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    CRSSparsity& jacSparsity(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),oind,compact,symmetric); }
-    CRSSparsity& jacSparsity(int iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(iind,outputSchemeEntry(oind),compact,symmetric); }
-    CRSSparsity& jacSparsity(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric); }
+    Sparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    Sparsity& jacSparsity(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),oind,compact,symmetric); }
+    Sparsity& jacSparsity(int iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(iind,outputSchemeEntry(oind),compact,symmetric); }
+    Sparsity& jacSparsity(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric); }
     //@}
     
     //@{
     /// Generate the sparsity of a Jacobian block
-    void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact=false);
-    void setJacSparsity(const CRSSparsity& sp, const std::string &iind, int oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),oind,compact); }
-    void setJacSparsity(const CRSSparsity& sp, int iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,iind,outputSchemeEntry(oind),compact); }
-    void setJacSparsity(const CRSSparsity& sp, const std::string &iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),outputSchemeEntry(oind),compact); }
+    void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
+    void setJacSparsity(const Sparsity& sp, const std::string &iind, int oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),oind,compact); }
+    void setJacSparsity(const Sparsity& sp, int iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,iind,outputSchemeEntry(oind),compact); }
+    void setJacSparsity(const Sparsity& sp, const std::string &iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),outputSchemeEntry(oind),compact); }
     //@}
     
     /** \brief Export / Generate C code for the function */
@@ -399,7 +399,7 @@ namespace CasADi{
     /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
      * There is no guarantee that consecutive calls return identical objects
      */
-    std::vector<SXMatrix> symbolicInputSX() const;
+    std::vector<SX> symbolicInputSX() const;
 
     /** \brief Is the class able to propate seeds through the algorithm? (for usage, see the example propagating_sparsity.cpp) */
     bool spCanEvaluate(bool fwd);

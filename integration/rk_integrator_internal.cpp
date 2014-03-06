@@ -47,13 +47,13 @@ namespace CasADi{
   void RKIntegratorInternal::setupFG(){
 
     // Symbolic inputs
-    MX x0 = msym("x0",f_.input(DAE_X).sparsity());
-    MX p = msym("p",f_.input(DAE_P).sparsity());
-    MX t = msym("t",f_.input(DAE_T).sparsity());
+    MX x0 = MX::sym("x0",f_.input(DAE_X).sparsity());
+    MX p = MX::sym("p",f_.input(DAE_P).sparsity());
+    MX t = MX::sym("t",f_.input(DAE_T).sparsity());
     
     // Intermediate variables (does not enter in F_, only in G_)
-    MX v = msym("v",3*nx_);
-    vector<MX> x = vertsplit(v,nx_);
+    MX v = MX::sym("v",x0.size1(),x0.size2()*3);
+    vector<MX> x = horzsplit(v,x0.size2());
     casadi_assert(x.size()==3);
     
     // Definitions of x
@@ -108,7 +108,7 @@ namespace CasADi{
       f_arg[DAE_Z] = v;
       f_res[DAE_ODE] = xf;
       f_res[DAE_QUAD] = qf;
-      f_res[DAE_ALG] = vertcat(x_def);
+      f_res[DAE_ALG] = horzcat(x_def);
       F_ = MXFunction(f_arg,f_res);
       F_.init();
     }
@@ -116,11 +116,11 @@ namespace CasADi{
     // Backward integration
     if(!g_.isNull()){
       // Symbolic inputs
-      MX rx0 = msym("x0",g_.input(RDAE_RX).sparsity());
-      MX rp = msym("p",g_.input(RDAE_RP).sparsity());
+      MX rx0 = MX::sym("x0",g_.input(RDAE_RX).sparsity());
+      MX rp = MX::sym("p",g_.input(RDAE_RP).sparsity());
 
-      // Intermediate variables (does not enter in G_)
-      MX rv = msym("rv",3*nrx_);
+      // Intermediate variables (do not enter in G_)
+      MX rv = MX::sym("rv",rx0.size1(),3*rx0.size2());
       vector<MX> rx_def(3);
 
       // Arguments when calling g
@@ -175,7 +175,7 @@ namespace CasADi{
       g_arg[RDAE_RZ] = rv;
       g_res[RDAE_ODE] = rxf;
       g_res[RDAE_QUAD] = rqf;
-      g_res[RDAE_ALG] = vertcat(rx_def);
+      g_res[RDAE_ALG] = horzcat(rx_def);
       G_ = MXFunction(g_arg,g_res);
       G_.init();
     }

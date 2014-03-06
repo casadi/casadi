@@ -37,7 +37,7 @@ OUTPUTSCHEME(DPLEOutput)
 using namespace std;
 namespace CasADi{
 
-  SimpleIndefDpleInternal::SimpleIndefDpleInternal(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V) : DpleInternal(A,V) {
+  SimpleIndefDpleInternal::SimpleIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) : DpleInternal(A,V) {
   
     // set default options
     setOption("name","unnamed_simple_indef_dple_solver"); // name of the function 
@@ -61,11 +61,11 @@ namespace CasADi{
     n_ = A_[0].size1();
     
     
-    MX As = msym("A",K_*n_,n_);
-    MX Vs = msym("V",K_*n_,n_);
+    MX As = MX::sym("A",n_,K_*n_);
+    MX Vs = MX::sym("V",n_,K_*n_);
     
-    std::vector< MX > Vss = vertsplit(Vs,n_);
-    std::vector< MX > Ass = vertsplit(As,n_);
+    std::vector< MX > Vss = horzsplit(Vs,n_);
+    std::vector< MX > Ass = horzsplit(As,n_);
     
     for (int k=0;k<K_;++k) {
       Vss[k]=(Vss[k]+trans(Vss[k]))/2;
@@ -84,9 +84,8 @@ namespace CasADi{
     Vss_shift.push_back(Vss.back());
     Vss_shift.insert(Vss_shift.end(),Vss.begin(),Vss.begin()+K_-1);
     
-    MX Pf = solve(A_total,flatten(vertcat(Vss_shift)),getOption("linear_solver"));
-          
-    MX P = reshape(Pf,K_*n_,n_);
+    MX Pf = solve(A_total,vec(horzcat(Vss_shift)),getOption("linear_solver"));
+    MX P = reshape(Pf,n_,K_*n_);
     
     std::vector<MX> v_in;
     v_in.push_back(As);

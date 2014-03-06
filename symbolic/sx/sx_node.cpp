@@ -100,11 +100,11 @@ const std::string& SXNode::getName() const{
   throw CasadiException("SXNode::getName failed, the node must be symbolic");
 }
 
-const SX& SXNode::dep(int i) const{
+const SXElement& SXNode::dep(int i) const{
   casadi_error("child() not defined for class " << typeid(*this).name());
 }
 
-SX& SXNode::dep(int i){
+SXElement& SXNode::dep(int i){
   casadi_error("child() not defined for class " << typeid(*this).name());
 }
 
@@ -113,7 +113,7 @@ bool SXNode::isSmooth() const{
 }
 
 void SXNode::print(std::ostream &stream) const{
-  long remaining_calls = SX::getMaxNumCallsInPrint();
+  long remaining_calls = SXElement::getMaxNumCallsInPrint();
   print(stream,remaining_calls);
 }
 

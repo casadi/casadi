@@ -23,10 +23,10 @@ from casadi import *
 from pylab import *
 
 # Control
-u = msym("u")
+u = MX.sym("u")
 
 # State
-x = msym("x",3)
+x = MX.sym("x",3)
 s = x[0] # position
 v = x[1] # speed
 m = x[2] # mass
@@ -57,7 +57,7 @@ F.init()
 nu = 50 
 
 # Control for all segments
-U = msym("U",nu) 
+U = MX.sym("U",nu) 
  
 # Initial conditions
 X0 = MX([0,0,1])

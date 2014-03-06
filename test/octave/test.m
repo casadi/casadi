@@ -27,23 +27,23 @@ function [y]=value(x)
   
 end
 
-disp('operators on SX')
+disp('operators on SXElement')
 
-x = SX("x")
+x = SXElement.sym("x")
 x**2
 sin(x)
 acos(x)
 
-disp('operators on SXMatrix')
+disp('operators on SX')
 
-x = ssym("x")
+x = SX.sym("x")
 x**2
 sin(x)
 acos(x)
 
 disp('SX typemaps')
 
-x=SX("x")
+x=SX.sym("x")
 jacobian(x**5,x)
 
 jacobian({x**5},{x})
@@ -52,7 +52,7 @@ jacobian([5],{x})
 
 #jacobian({x**5 x**4},{x})
 
-y=ssym("y",1,1)
+y=SX.sym("y",1,1)
 jacobian(y**5,y)
 
 #SXFunction(x,x) deliberate fail
@@ -76,7 +76,7 @@ SXFunction({y x},{y x})
 
 disp('MX typemaps')
 
-x=msym("x",1,1)
+x=MX.sym("x",1,1)
 
 
 MXFunction({x},{x x})
@@ -84,7 +84,7 @@ MXFunction({x},{x x})
 MXFunction({x},{x 0})
 
 disp('function usage')
-x=SX("x")
+x=SX.sym("x")
 f = SXFunction({x},{x^2 sin(x)})
 f.init()
 f.input(0)
@@ -113,7 +113,7 @@ f.output(0)
 assert(f.output(0)(1).toScalar()==2.3**2)
 assert(f.output(0)(2).toScalar()==sin(2.3))
 
-y = ssym("y",2,2)
+y = SX.sym("y",2,2)
 f = SXFunction({y},{y**2})
 f.init()
 f.input(0)
@@ -132,8 +132,7 @@ s = DMatrix([ 5 6; 4 9])
 full(s)
 
 disp('sparse arrays')
-
-s = DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.1,0.99])
+s = DMatrix(4,3,[0,2,2,3],[1,2,1],[0.738,0.1,0.99])'
 
 disp('bar')
 
@@ -151,7 +150,7 @@ assert(s(2,2).toScalar()==9)
 
 q = s([1 2])
 assert(q(1).toScalar()==5)
-assert(q(2).toScalar()==6)
+assert(q(2).toScalar()==4)
 
 q = s(1:2,:)
 assert(q(1,1).toScalar()==5)
@@ -189,7 +188,7 @@ assert(s(2,1).toScalar()==78)
 
 disp('MX indexing')
 
-x = msym("x",7,8)
+x = MX.sym("x",7,8)
 q = x(1:3,:)
 
 x(1,1) = 6;
@@ -205,10 +204,10 @@ assert(all(full(result)==full(eye(2))))
 
 disp('Operator overloading')
 
-S =               { {DMatrix([1 2; 3 4]),SX("x"),MX("x",1,1)},
-                  {3,ssym("x",2,2),msym("x",2,2)},
-                  {DMatrix(3),ssym("x",2,2),msym("y",2,2)},
-		  {[1 2; 3 4],SX("x"),MX("x",1,1)}
+S =               { {DMatrix([1 2; 3 4]),SXElement.sym("x"),MX.sym("x",1,1)},
+                  {3,SX.sym("x",2,2),MX.sym("x",2,2)},
+                  {DMatrix(3),SX.sym("x",2,2),MX.sym("y",2,2)},
+		  {[1 2; 3 4],SXElement.sym("x"),MX.sym("x",1,1)}
                   };
                   
 for i=1:numel(S)
@@ -235,7 +234,7 @@ for i=1:numel(S)
   end
 end
 
-S = {DMatrix(3),ssym("x",2,2),SX("x"),MX("x",1,1)};
+S = {DMatrix(3),SX.sym("x",2,2),SXElement.sym("x"),MX.sym("x",1,1)};
 num = {6,DMatrix(6)}
 
 for i=1:numel(S)
@@ -251,20 +250,20 @@ for i=1:numel(S)
   end
 end
 
-x = SX("x");
-y = ssym("y",2,1);
+x = SXElement.sym("x");
+y = SX.sym("y",2,1);
 
 x*y
 y*x
 
-x = SX("x");
-y = SX("y");
+x = SXElement.sym("x");
+y = SXElement.sym("y");
 
 x*y
 x/y
 
 num = {DMatrix([1 2; 3 4]),[1 2; 3 4]};
-sym = {ssym("x",2,2),msym("x",2,2)};
+sym = {SX.sym("x",2,2),MX.sym("x",2,2)};
 
 for i=1:2
   for j=1:2
@@ -304,7 +303,7 @@ is_differential_ivec
 is_differential_gentype
 assert(is_differential_gentype.isDoubleVector())
 
-x=ssym("x")
+x=SX.sym("x")
 f = SXFunction(daeIn("x",x),daeOut("ode",x))
 
 integrator = CVodesIntegrator(f)
@@ -314,12 +313,12 @@ integrator = CVodesIntegrator(f)
 %  disp("hier brandt de lamp")
 %  assert(integrator.getOption('is_differential').isDoubleVector())
 
-x=ssym("x",3,4)
+x=SX.sym("x",3,4)
 size(x)
 
 disp("Issue 145")
-t = SX("t")
-T = SX("T")
+t = SX.sym("t")
+T = SX.sym("T")
 
 
 ffcn_in = cell(1,DAE_NUM_IN);
@@ -331,7 +330,7 @@ ffcn_in
 SXFunction(ffcn_in,{t})
 
 
-x=ssym("x",3,4)
+x=SX.sym("x",3,4)
 size(x)
 
 %[x x]
@@ -346,7 +345,7 @@ s = Y.sparsity()
 
 disp("string confusion")
 
-x = MX("x")
+x = MX.sym("x")
 
 disp("sparse array input typemap")
 A=speye(5)

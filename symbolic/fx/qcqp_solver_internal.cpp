@@ -31,13 +31,13 @@ using namespace std;
 namespace CasADi{
 
 // Constructor
-QCQPSolverInternal::QCQPSolverInternal(const std::vector<CRSSparsity> &st) : st_(st) {
+QCQPSolverInternal::QCQPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
 
   casadi_assert_message(st_.size()==QCQP_STRUCT_NUM,"Problem structure mismatch");
   
-  const CRSSparsity& A = st_[QCQP_STRUCT_A];
-  const CRSSparsity& P = st_[QCQP_STRUCT_P];
-  const CRSSparsity& H = st_[QCQP_STRUCT_H];
+  const Sparsity& A = st_[QCQP_STRUCT_A];
+  const Sparsity& P = st_[QCQP_STRUCT_P];
+  const Sparsity& H = st_[QCQP_STRUCT_H];
   
   n_ = H.size2();
   nc_ = A.isNull() ? 0 : A.size1();
@@ -56,16 +56,16 @@ QCQPSolverInternal::QCQPSolverInternal(const std::vector<CRSSparsity> &st) : st_
     "We need H square & symmetric" << std::endl
   );
   
-  casadi_assert_message(P.size2()==n_,"Got incompatible dimensions. Number of colums in P (" << P.size2() << ") must match n (" << n_ << ").");
+  casadi_assert_message(P.size1()==n_,"Got incompatible dimensions. Number of rows in P (" << P.size1() << ") must match n (" << n_ << ").");
 
-  casadi_assert_message(P.size1() % n_ == 0,"Got incompatible dimensions. Number of rows in P (" << P.size1() << ") must be a multiple of n (" << n_ << ").");
+  casadi_assert_message(P.size2() % n_ == 0,"Got incompatible dimensions. Number of cols in P (" << P.size2() << ") must be a multiple of n (" << n_ << ").");
   
   
-  nq_ = P.size1() / n_;
+  nq_ = P.size2() / n_;
 
   // Sparsity
-  CRSSparsity x_sparsity = sp_dense(n_,1);
-  CRSSparsity bounds_sparsity = sp_dense(nc_,1);
+  Sparsity x_sparsity = sp_dense(n_,1);
+  Sparsity bounds_sparsity = sp_dense(nc_,1);
   
   // Input arguments
   setNumInputs(QCQP_SOLVER_NUM_IN);
@@ -82,7 +82,7 @@ QCQPSolverInternal::QCQPSolverInternal(const std::vector<CRSSparsity> &st) : st_
   input(QCQP_SOLVER_UBX) = DMatrix(x_sparsity,       std::numeric_limits<double>::infinity());
 
   for (int i=0;i<nq_;++i) {
-    DMatrix Pi = input(QCQP_SOLVER_P)(range(i*n_,(i+1)*n_),ALL);
+    DMatrix Pi = input(QCQP_SOLVER_P)(ALL,Slice(i*n_,(i+1)*n_));
     casadi_assert_message(Pi.sparsity()==trans(Pi.sparsity()),"We need Pi square & symmetric but got " << Pi.dimString() << " for i = " << i << ".");
   }
   

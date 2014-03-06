@@ -733,5 +733,44 @@ class QPSolverTests(casadiTestCase):
       
       self.assertAlmostEqual(solver.getOutput("cost")[0],2.5,5,str(qpsolver))
       
+  def test_linear2(self):
+    H = DMatrix(2,2)
+    A = DMatrix([[-1,1],[1,1],[1,-2]])
+    LBA = DMatrix([ -inf, 2, -inf ])
+    UBA = DMatrix([ 1, inf, 4 ])
+    LBX = DMatrix([ -inf, 3 ])
+    UBX = DMatrix([ inf, 3 ])
+    G = DMatrix([ 2.0, 1.0 ])
+
+
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      if 'QCQP' in str(qpsolver): continue
+      if 'NLPQP' in str(qpsolver): continue
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+
+      solver.setInput(H,"h")
+      solver.setInput(G,"g")
+      solver.setInput(A,"a")
+      solver.setInput(LBX,"lbx")
+      solver.setInput(UBX,"ubx")
+      solver.setInput(LBA,"lba")
+      solver.setInput(UBA,"uba")
+
+      solver.solve()
+
+      self.checkarray(solver.getOutput(),DMatrix([2,3]),str(qpsolver),digits=5)
+      self.checkarray(solver.getOutput("lam_x"),DMatrix([0,-3]),str(qpsolver),digits=5)
+
+      self.checkarray(solver.getOutput("lam_a"),DMatrix([2,0,0]),str(qpsolver),digits=5)
+      
+      self.assertAlmostEqual(solver.getOutput("cost")[0],7,5,str(qpsolver))
+      
 if __name__ == '__main__':
     unittest.main()

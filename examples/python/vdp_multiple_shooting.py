@@ -28,9 +28,9 @@ tf = 10.0    # End time
 coll = False # Use collocation integrator
 
 # Declare variables (use scalar graph)
-t  = ssym("t")    # time
-u  = ssym("u")    # control
-x  = ssym("x",3)  # state
+t  = SX.sym("t")    # time
+u  = SX.sym("u")    # control
+x  = SX.sym("x",3)  # state
 
 # ODE rhs function
 ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
@@ -61,7 +61,7 @@ integrator.init()
 nv = 1*nk + 3*(nk+1)
 
 # Declare variable vector
-V = msym("V", nv)
+V = MX.sym("V", nv)
 
 # Get the expressions for local variables
 U = V[0:nk]

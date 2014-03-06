@@ -78,13 +78,13 @@ namespace CasADi{
     // Cast control_dae in a form that integrator can manage
     vector<MX> dae_in_(DAE_NUM_IN);
   
-    dae_in_[DAE_T]    = MX("tau",control_dae_.input(CONTROL_DAE_T).sparsity());
-    dae_in_[DAE_X]    = MX("x",control_dae_.input(CONTROL_DAE_X).sparsity());
-    dae_in_[DAE_Z]    = MX("z",control_dae_.input(CONTROL_DAE_Z).sparsity());
+    dae_in_[DAE_T]    = MX::sym("tau",control_dae_.input(CONTROL_DAE_T).sparsity());
+    dae_in_[DAE_X]    = MX::sym("x",control_dae_.input(CONTROL_DAE_X).sparsity());
+    dae_in_[DAE_Z]    = MX::sym("z",control_dae_.input(CONTROL_DAE_Z).sparsity());
   
     np_ = control_dae_.input(CONTROL_DAE_P).size();
   
-    CRSSparsity u_sparsity = control_dae_.input(CONTROL_DAE_U).sparsity();
+    Sparsity u_sparsity = control_dae_.input(CONTROL_DAE_U).sparsity();
     if (control_dae_.input(CONTROL_DAE_U_INTERP).size()!=0) {
       u_sparsity = control_dae_.input(CONTROL_DAE_U_INTERP).sparsity();
     }
@@ -102,7 +102,7 @@ namespace CasADi{
   
     // Structure of DAE_P : T0 TF P Ustart Uend Y_MAJOR 
   
-    dae_in_[DAE_P]    = MX("P",2+np_+nu_+nu_end+ny_,1);
+    dae_in_[DAE_P]    = MX::sym("P",2+np_+nu_+nu_end+ny_,1);
 
     int iT0 = 0;
     int iTF = 1;
@@ -197,17 +197,17 @@ namespace CasADi{
     // Generate an output function if there is none (returns the whole state)
     if(orig_output_fcn_.isNull()){
     
-      SXMatrix t        = ssym("t",control_dae_.input(CONTROL_DAE_T).sparsity());
-      SXMatrix t0       = ssym("t0",control_dae_.input(CONTROL_DAE_T0).sparsity());
-      SXMatrix tf       = ssym("tf",control_dae_.input(CONTROL_DAE_TF).sparsity());
-      SXMatrix x        = ssym("x",control_dae_.input(CONTROL_DAE_X).sparsity());
-      SXMatrix z        = ssym("z",control_dae_.input(CONTROL_DAE_Z).sparsity());
-      SXMatrix p        = ssym("p",control_dae_.input(CONTROL_DAE_P).sparsity());
-      SXMatrix u        = ssym("u",control_dae_.input(CONTROL_DAE_U).sparsity());
-      SXMatrix u_interp = ssym("u_interp",control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
-      SXMatrix x0       = ssym("x0",control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity());
+      SX t        = SX::sym("t",control_dae_.input(CONTROL_DAE_T).sparsity());
+      SX t0       = SX::sym("t0",control_dae_.input(CONTROL_DAE_T0).sparsity());
+      SX tf       = SX::sym("tf",control_dae_.input(CONTROL_DAE_TF).sparsity());
+      SX x        = SX::sym("x",control_dae_.input(CONTROL_DAE_X).sparsity());
+      SX z        = SX::sym("z",control_dae_.input(CONTROL_DAE_Z).sparsity());
+      SX p        = SX::sym("p",control_dae_.input(CONTROL_DAE_P).sparsity());
+      SX u        = SX::sym("u",control_dae_.input(CONTROL_DAE_U).sparsity());
+      SX u_interp = SX::sym("u_interp",control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
+      SX x0       = SX::sym("x0",control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity());
   
-      vector<SXMatrix> arg(CONTROL_DAE_NUM_IN);
+      vector<SX> arg(CONTROL_DAE_NUM_IN);
       arg[CONTROL_DAE_T]  = t;
       arg[CONTROL_DAE_X]  = x;
       arg[CONTROL_DAE_P]  = p;
@@ -218,7 +218,7 @@ namespace CasADi{
       arg[CONTROL_DAE_T0] = t0;
       arg[CONTROL_DAE_TF] = tf;
     
-      vector<SXMatrix> out(INTEGRATOR_NUM_OUT);
+      vector<SX> out(INTEGRATOR_NUM_OUT);
       out[INTEGRATOR_XF] = x;
 
       // Create the output function
@@ -263,7 +263,7 @@ namespace CasADi{
    
     output_fcn_in_ = vector<MX>(CONTROL_DAE_NUM_IN);
 
-    dae_in_[DAE_T] = msym("tau");
+    dae_in_[DAE_T] = MX::sym("tau");
     if (!output_fcn_.input(CONTROL_DAE_T).empty()) {
       output_fcn_in_[CONTROL_DAE_T]        = dae_in_[DAE_P](iT0) + (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*dae_in_[DAE_T];
     }
@@ -309,9 +309,9 @@ namespace CasADi{
     FXInternal::init();
   
     // Variables on which the chain of simulator calls (all_output_) depend
-    MX Xk("Xk", input(CONTROLSIMULATOR_X0).size());
-    MX P("P",input(CONTROLSIMULATOR_P).size());
-    MX U("U",input(CONTROLSIMULATOR_U).sparsity());
+    MX Xk = MX::sym("Xk", input(CONTROLSIMULATOR_X0).size());
+    MX P = MX::sym("P",input(CONTROLSIMULATOR_P).size());
+    MX U = MX::sym("U",input(CONTROLSIMULATOR_U).sparsity());
  
     // Group these variables as an input list for all_output_
     vector<MX> all_output_in(CONTROLSIMULATOR_NUM_IN);

@@ -22,7 +22,6 @@
 
 #ifndef MX_HPP
 #define MX_HPP
-
 #include "../shared_object.hpp"
 #include "../matrix/matrix.hpp"
 #include "../matrix/generic_expression.hpp"
@@ -41,7 +40,7 @@ namespace CasADi{
   
       The MX class is designed to have identical syntax with the Matrix<> template class, and uses Matrix<double> as its internal 
       representation of the values at a node. By keeping the syntaxes identical, it is possible to switch from one class to the other, 
-      as well as inlining MX functions to SX functions.
+      as well as inlining MX functions to SXElement functions.
   
       Note that an operation is always "lazy", making a matrix multiplication will create a matrix multiplication node, not perform
       the actual multiplication.
@@ -50,24 +49,28 @@ namespace CasADi{
       \date 2010-2011
   */
   class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public SharedObject{
-  
   public:
   
     /** \brief  Default constructor */
     MX();
 
-    /** \brief  Construct a symbolic matrix (matrix variable) */
-    explicit MX(const std::string& name, int n=1, int m=1);
+#ifndef WITHOUT_PRE_1_9_X
+/** \brief [DEPRECATED] Replaced with MX::sym
+*/
+//@{
+    explicit MX(const std::string& name, int nrow=1, int ncol=1);
+    explicit MX(const std::string& name, const std::pair<int,int> &rc);
+    explicit MX(const std::string& name, const Sparsity& sp);
+//@}
+#endif
 
-    /** \brief  Construct a symbolic matrix (matrix variable) */
-    explicit MX(const std::string& name, const std::pair<int,int> &nm);
+    //@{
+    /** \brief Construct constant matrix with a given sparsity */
+    MX(const Sparsity& sp, int val=0);
+    MX(const Sparsity& sp, double val);
+    MX(const Sparsity& sp, const MX& val);
+    //@}
 
-    /** \brief  Construct a symbolic matrix (matrix variable) */
-    explicit MX(const std::string& name, const CRSSparsity & sp);
-
-    /** \brief  Construct MX with a given sparsity */
-    explicit MX(const CRSSparsity& sp, const MX& val=0);
-    
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);
 
@@ -122,30 +125,30 @@ namespace CasADi{
     }
     
     /// get a matrix element
-    const MX indexed_one_based(int i, int j) const{ return (*this)(i-1,j-1);}
-    const MX indexed_zero_based(int i, int j) const{ return (*this)(i,j);}
-    const MX indexed(const IndexList &i, const IndexList &j) const{ 
-      return (*this)(i.getAll(size1()),j.getAll(size2()));
+    const MX indexed_one_based(int rr, int cc) const{ return (*this)(rr-1,cc-1);}
+    const MX indexed_zero_based(int rr, int cc) const{ return (*this)(rr,cc);}
+    const MX indexed(const IndexList &rr, const IndexList &cc) const{ 
+      return (*this)(rr.getAll(size1()),cc.getAll(size2()));
     }
-    const MX indexed(const Slice &i, const Slice &j) const{ 
-      return (*this)(i.getAll(size1()),j.getAll(size2()));
+    const MX indexed(const Slice &rr, const Slice &cc) const{ 
+      return (*this)(rr.getAll(size1()),cc.getAll(size2()));
     }
     const MX indexed(const Matrix<int> &k) const{ 
       return (*this)(k);
     }
-    const MX indexed(const CRSSparsity &sp) const{ 
+    const MX indexed(const Sparsity &sp) const{ 
       return (*this)(sp);
     }
-    const MX indexed(const Slice &i, const Matrix<int>& k) const{ return (*this)(i,k); }
-    const MX indexed(const IndexList &i, const Matrix<int>& k) const{ 
-      return (*this)(i.getAll(size1()),k);
+    const MX indexed(const Slice &rr, const Matrix<int>& cc) const{ return (*this)(rr,cc); }
+    const MX indexed(const Matrix<int>& rr, const IndexList& cc) const{ 
+      return (*this)(rr,cc.getAll(size2()));
     }
-    const MX indexed(const Matrix<int>& k, const Slice &j) const{ return (*this)(k,j); }
-    const MX indexed(const Matrix<int>& k, const IndexList &j) const{ 
-      return (*this)(k,j.getAll(size2()));
+    const MX indexed(const Matrix<int>& rr, const Slice& cc) const{ return (*this)(rr,cc); }
+    const MX indexed(const IndexList& rr, const Matrix<int>& cc) const{ 
+      return (*this)(rr.getAll(size1()),cc);
     }
-    const MX indexed(const Matrix<int>& i, const Matrix<int>& j) const{ 
-      return (*this)(i,j);
+    const MX indexed(const Matrix<int>& rr, const Matrix<int>& cc) const{ 
+      return (*this)(rr,cc);
     }
     
     /// set a non-zero
@@ -159,36 +162,36 @@ namespace CasADi{
     }
     
     /// set a matrix element
-    void indexed_one_based_assignment(int i, int j, const MX &m){ (*this)(i-1,j-1) = m;}
-    void indexed_zero_based_assignment(int i, int j, const MX &m){ (*this)(i,j) = m;}
-    void indexed_assignment(const IndexList &i, const IndexList &j, const MX &m){
-      setSub(m,i.getAll(size1()),j.getAll(size2()));
+    void indexed_one_based_assignment(int rr, int cc, const MX &m){ (*this)(rr-1,cc-1) = m;}
+    void indexed_zero_based_assignment(int rr, int cc, const MX &m){ (*this)(rr,cc) = m;}
+    void indexed_assignment(const IndexList &rr, const IndexList &cc, const MX &m){
+      setSub(m,rr.getAll(size1()),cc.getAll(size2()));
     }
     
-    void indexed_assignment(const Slice &i, const Slice &j, const MX &m){
-      (*this)(i.getAll(size1()),j.getAll(size2())) = m;
+    void indexed_assignment(const Slice &rr, const Slice &cc, const MX &m){
+      (*this)(rr.getAll(size1()),cc.getAll(size2())) = m;
     }
     
     void indexed_zero_based_assignment(const Matrix<int>& k, const MX &m){
       (*this)[k] = m;
     }
-    void indexed_assignment(const CRSSparsity& sp, const MX &m){
+    void indexed_assignment(const Sparsity& sp, const MX &m){
       (*this)(sp) = m;
     }
-    void indexed_assignment(const Slice &i, const Matrix<int>& j, const MX& m){
-      (*this)(i.getAll(size1()),j) = m;
+    void indexed_assignment(const Matrix<int> &rr, const Slice& cc, const MX& m){
+      (*this)(rr,cc.getAll(size2())) = m;
     }
-    void indexed_assignment( const Matrix<int>& i, const Slice &j, const MX& m){
-      (*this)(i,j.getAll(size2())) = m;
+    void indexed_assignment( const Slice& rr, const Matrix<int>& cc, const MX& m){
+      (*this)(rr.getAll(size1()),cc) = m;
     }
-    void indexed_assignment(const IndexList &i, const Matrix<int>& j, const MX& m){
-      (*this)(i.getAll(size1()),j) = m;
+    void indexed_assignment(const Matrix<int>& rr, const IndexList& cc, const MX& m){
+      (*this)(rr,cc.getAll(size2())) = m;
     }
-    void indexed_assignment( const Matrix<int>& i, const IndexList &j, const MX& m){
-      (*this)(i,j.getAll(size2())) = m;
+    void indexed_assignment(const IndexList& rr, const Matrix<int>& cc, const MX& m){
+      (*this)(rr.getAll(size1()),cc) = m;
     } 
-    void indexed_assignment( const Matrix<int>& i, const Matrix<int>& j, const MX& m){
-      (*this)(i,j) = m;
+    void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc, const MX& m){
+      (*this)(rr,cc) = m;
     } 
     //@}
     
@@ -196,18 +199,17 @@ namespace CasADi{
     typedef MX ScalarType;
 
     /** \brief Get the sparsity pattern */
-    const CRSSparsity& sparsity() const;
+    const Sparsity& sparsity() const;
 
     /// Access the sparsity, make a copy if there are multiple references to it
-    CRSSparsity& sparsityRef();
+    Sparsity& sparsityRef();
 
     /** \brief Erase a submatrix */
-    void erase(const std::vector<int>& ii, const std::vector<int>& jj);
+    void erase(const std::vector<int>& rr, const std::vector<int>& cc);
 
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
-    void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
-
+    void enlarge(int nrow, int ncol, const std::vector<int>& rr, const std::vector<int>& cc);
 
     MX operator-() const;
   
@@ -228,7 +230,7 @@ namespace CasADi{
     /** \brief  Get an output */
     MX getOutput(int oind=0) const;
 
-    /** \brief Get the number of dependencies of a binary SX */
+    /** \brief Get the number of dependencies of a binary SXElement */
     int getNdeps() const;
     
     /// Get the name.
@@ -310,75 +312,60 @@ namespace CasADi{
     //@}
 
     //@{
-    /** \brief  Sparse matrix of all zeros */
+    /** \brief Sparse matrix of all zeros */
     static MX sparse(int nrow, int ncol=1);
-    static MX sparse(const std::pair<int, int> &nm);
+    static MX sparse(const std::pair<int, int> &rc);
     //@}
   
     //@{
-    /** \brief  Dense matrix of all zeros */
-    static MX zeros(const CRSSparsity& sp);
-    static MX zeros(int nrow, int ncol=1); 
-    static MX zeros(const std::pair<int, int> &nm);
-    //@}
-
-    //@{
-    /** \brief  Matrix of all ones */  
-    static MX ones(const CRSSparsity& sp);
-    static MX ones(int nrow, int ncol=1); 
-    static MX ones(const std::pair<int, int> &nm);
-    //@}
-
-    //@{
     /** \brief  create a matrix with all inf */
-    static MX inf(const CRSSparsity& sp);
+    static MX inf(const Sparsity& sp);
     static MX inf(int nrow=1, int ncol=1);
-    static MX inf(const std::pair<int,int>& nm);
+    static MX inf(const std::pair<int,int>& rc);
     //@}
   
     //@{
     /** \brief  create a matrix with all nan */
-    static MX nan(const CRSSparsity& sp);
+    static MX nan(const Sparsity& sp);
     static MX nan(int nrow=1, int ncol=1);
-    static MX nan(const std::pair<int,int>& nm);
+    static MX nan(const std::pair<int,int>& rc);
     //@}
   
     //@{
     /** \brief  create a matrix by repeating an existing matrix */
+    static MX repmat(const MX& x, const Sparsity& sp);
     static MX repmat(const MX& x, int nrow, int ncol=1);
-    static MX repmat(const MX& x, const std::pair<int, int> &nm);
+    static MX repmat(const MX& x, const std::pair<int, int> &rc);
     //@}
 
     /** \brief  Identity matrix */  
-    static MX eye(int nrow);
+    static MX eye(int ncol);
   
-    const MX sub(int i, int j) const;
-    const MX sub(int i, const std::vector<int>& j) const;
-    const MX sub(const std::vector<int>& i, int j) const;
-    const MX sub(const std::vector<int>& i, const std::vector<int>& j) const;
+    const MX sub(int rr, int cc) const;
+    const MX sub(const std::vector<int>& rr, int cc) const;
+    const MX sub(int rr, const std::vector<int>& cc) const;
+    const MX sub(const std::vector<int>& rr, const std::vector<int>& cc) const;
     const MX sub(const Matrix<int>& k, int dummy=0) const;
-    const MX sub(const CRSSparsity& sp, int dummy=0) const;
-    const MX sub(const std::vector<int>& i, const Matrix<int>& j) const;
-    const MX sub(const Matrix<int>& k, const std::vector<int>& j) const;
-    const MX sub(const Slice& i, int j) const {return sub(i.getAll(size1()),j);}
-    const MX sub(int i, const Slice& j) const {return sub(i,j.getAll(size2()));}
-    const MX sub(const Slice& i, const Slice& j) const {return sub(i.getAll(size1()),j.getAll(size2()));}
-    const MX sub(const Slice& i, const Matrix<int>& j) const {return sub(i.getAll(size1()),j);}
-    const MX sub(const Matrix<int>& i, const Slice& j) const {return sub(i,j.getAll(size2()));}
-    const MX sub(const Matrix<int>& i, const Matrix<int>& j) const;
+    const MX sub(const Sparsity& sp, int dummy=0) const;
+    const MX sub(const Matrix<int>& rr, const std::vector<int>& cc) const;
+    const MX sub(const std::vector<int>& rr, const Matrix<int>& cc) const;
+    const MX sub(int rr, const Slice& cc) const {return sub(rr,cc.getAll(size2()));}
+    const MX sub(const Slice& rr, int cc) const {return sub(rr.getAll(size1()),cc);}
+    const MX sub(const Slice& rr, const Slice& cc) const {return sub(rr.getAll(size1()),cc.getAll(size2()));}
+    const MX sub(const Matrix<int>& rr, const Slice& cc) const {return sub(rr,cc.getAll(size2()));}
+    const MX sub(const Slice& rr, const Matrix<int>& cc) const {return sub(rr.getAll(size1()),cc);}
+    const MX sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
 
-    void setSub(const MX& m, int i, int j);
-    void setSub(const MX& m, int i, const std::vector<int>& j);
-    void setSub(const MX& m, const std::vector<int>& i, int j);
-    void setSub(const MX& m, const std::vector<int>& i, const std::vector<int>& j);
+    void setSub(const MX& m, int rr, int cc);
+    void setSub(const MX& m, const std::vector<int>& rr, int cc);
+    void setSub(const MX& m, int rr, const std::vector<int>& cc);
+    void setSub(const MX& m, const std::vector<int>& rr, const std::vector<int>& cc);
     void setSub(const MX& m, const Matrix<int>& k);
-    void setSub(const MX& m, const std::vector<int>& i, const Matrix<int>& k);
-    void setSub(const MX& m, const Matrix<int>& k, const std::vector<int>& j);
-    void setSub(const MX& m, const Slice& i, const Slice& j);
-    //void setSub(const MX& m, const Slice& i, const Matrix<int>& k) {return setSub(m,i.getAll(size1()),k);}
-    //void setSub(const MX& m, const Matrix<int>& k, const Slice& j) {return setSub(m,k,j.getAll(size2()));}
-    void setSub(const MX& m, const Matrix<int>& i, const Matrix<int>& j);
-    void setSub(const MX& m, const CRSSparsity& sp, int dummy);
+    void setSub(const MX& m, const Matrix<int>& rr, const std::vector<int>& cc);
+    void setSub(const MX& m, const std::vector<int>& rr, const Matrix<int>& cc);
+    void setSub(const MX& m, const Slice& rr, const Slice& cc);
+    void setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc);
+    void setSub(const MX& m, const Sparsity& sp, int dummy);
     
     MX getNZ(int k) const;
     MX getNZ(const std::vector<int>& k) const;
@@ -389,8 +376,11 @@ namespace CasADi{
     void setNZ(const Slice& k, const MX& m){ setNZ(k.getAll(size()),m);}
     void setNZ(const Matrix<int>& k, const MX& m);
 
-    /** \brief Append a matrix to the end. */
+    /** \brief Append a matrix vertically (NOTE: only efficient if vector) */
     void append(const MX& y);
+
+    /** \brief Append a matrix horizontally */
+    void appendColumns(const MX& y);
   
     // all binary operations
     MX __add__(const MX& y) const;
@@ -406,8 +396,8 @@ namespace CasADi{
     MX __constpow__(const MX& b) const;
     MX __mrdivide__  (const MX& b) const;
     MX __mpower__(const MX& b) const;
-    MX mul(const MX& y, const CRSSparsity &sp_z=CRSSparsity()) const;
-    MX mul_full(const MX& y, const CRSSparsity &sp_z=CRSSparsity()) const;
+    MX mul(const MX& y, const Sparsity &sp_z=Sparsity()) const;
+    MX mul_full(const MX& y, const Sparsity &sp_z=Sparsity()) const;
     MX inner_prod(const MX& y) const;
     MX outer_prod(const MX& y) const;
     MX constpow(const MX& y) const;
@@ -452,7 +442,7 @@ namespace CasADi{
     MX attachAssert(const MX& y,const std::string &fail_message="") const;
 
     /** \brief Set sparse */
-    MX setSparse(const CRSSparsity& sp, bool intersect=false) const;
+    MX setSparse(const Sparsity& sp, bool intersect=false) const;
 
     /** \brief Make dense */
     MX makeDense(const MX& val = 0) const;
@@ -485,6 +475,10 @@ namespace CasADi{
   
 #endif // SWIG
   };
+
+  // Create matrix symbolic primitive
+  template<>
+  MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp);
 
   //@{
   /// Some typedefs

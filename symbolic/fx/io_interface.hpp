@@ -23,7 +23,7 @@
 #ifndef IO_INTERFACE_HPP
 #define IO_INTERFACE_HPP
 
-#include "../sx/sx.hpp"
+#include "../sx/sx_element.hpp"
 #include "../mx/mx.hpp"
 #include "../options_functionality.hpp"
 #include "../fx/schemes_helpers.hpp"

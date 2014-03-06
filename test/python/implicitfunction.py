@@ -45,7 +45,7 @@ class NLPtests(casadiTestCase):
     self.message("Scalar implicit problem, n=0")
     for Solver, options in solvers:
       self.message(Solver.__name__)
-      x=ssym("x")
+      x=SX.sym("x")
       f=SXFunction([x],[sin(x)])
       f.init()
       solver=Solver(f)
@@ -64,8 +64,8 @@ class NLPtests(casadiTestCase):
     for Solver, options in solvers:
       self.message(Solver.__name__)
       message = Solver.__name__
-      x=ssym("x")
-      y=ssym("y")
+      x=SX.sym("x")
+      y=SX.sym("y")
       n=0.2
       f=SXFunction([y,x],[x-arcsin(y)])
       f.init()
@@ -83,8 +83,8 @@ class NLPtests(casadiTestCase):
     for Solver, options in solvers:
       self.message(Solver.__name__)
       message = Solver.__name__
-      x=SX("x")
-      y=SX("y")
+      x=SXElement.sym("x")
+      y=SXElement.sym("y")
       n=0.2
       f=SXFunction([y,x],[x-arcsin(y)])
       f.init()
@@ -92,7 +92,7 @@ class NLPtests(casadiTestCase):
       solver.setOption(options)
       solver.init()
       
-      X = msym("X")
+      X = MX.sym("X")
       [R] = solver.call([MX(),X])
       
       trial = MXFunction([X],[R])
@@ -112,9 +112,9 @@ class NLPtests(casadiTestCase):
       message = Solver.__name__
       N = 5
       s = sp_tril(N)
-      x=ssym("x",s)
+      x=SX.sym("x",s)
 
-      y=ssym("y",s)
+      y=SX.sym("y",s)
       y0 = DMatrix(sp_diag(N),0.1)
 
       f=SXFunction([vecNZ(y),vecNZ(x)],[vecNZ((mul((x+y0),(x+y0).T)-mul((y+y0),(y+y0).T))[s])])
@@ -125,7 +125,7 @@ class NLPtests(casadiTestCase):
       solver.setOption("constraints",[1]*s.size())
       solver.init()
       
-      X = msym("X",x.sparsity())
+      X = MX.sym("X",x.sparsity())
       [R] = solver.call([MX(),vecNZ(X)])
       
       trial = MXFunction([X],[R])
@@ -153,8 +153,8 @@ class NLPtests(casadiTestCase):
     for Solver, options in solvers:
       self.message(Solver.__name__)
       message = Solver.__name__
-      x=SX("x")
-      y=ssym("y",2)
+      x=SXElement.sym("x")
+      y=SX.sym("y",2)
       y0 = DMatrix([0.1,0.4])
       yy = y + y0
       n=0.2
@@ -173,7 +173,7 @@ class NLPtests(casadiTestCase):
       
   def testKINSol1c(self):
     self.message("Scalar KINSol problem, n=0, constraint")
-    x=SX("x")
+    x=SXElement.sym("x")
     f=SXFunction([x],[sin(x)])
     f.init()
     solver=KinsolSolver(f)
@@ -188,7 +188,7 @@ class NLPtests(casadiTestCase):
     for Solver, options in solvers:
       if 'Kinsol' in str(Solver): continue
       if 'Newton' in str(Solver): continue
-      x=ssym("x",2)
+      x=SX.sym("x",2)
       f=SXFunction([x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       f.init()
       
@@ -213,8 +213,8 @@ class NLPtests(casadiTestCase):
 
   def test_implicitbug(self):
     # Total number of variables for one finite element
-    X0 = msym("X0")
-    V = msym("V")
+    X0 = MX.sym("X0")
+    V = MX.sym("V")
 
     V_eq = vertcat([V[0]-X0])
 

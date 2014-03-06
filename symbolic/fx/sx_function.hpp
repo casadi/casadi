@@ -29,7 +29,7 @@ namespace CasADi{
 
 #ifndef SWIG
 
-  /** \brief  An atomic operation for the SX virtual machine */
+  /** \brief  An atomic operation for the SXElement virtual machine */
   struct ScalarAtomic{
     int op;     /// Operator index
     int i0;
@@ -65,36 +65,36 @@ namespace CasADi{
     explicit SXFunction(const FX &f);
   
     /// Multiple (matrix valued) input, multiple (matrix valued) output 
-    SXFunction(const std::vector< SXMatrix>& arg, const std::vector<SXMatrix>& res);
+    SXFunction(const std::vector< SX>& arg, const std::vector<SX>& res);
 
     /// Multiple (matrix valued) input, multiple (matrix valued) output 
-    SXFunction(const std::vector< SXMatrix>& arg, const IOSchemeVector< SXMatrix >& res);
+    SXFunction(const std::vector< SX>& arg, const IOSchemeVector< SX >& res);
 
     /// Multiple (matrix valued) input, multiple (matrix valued) output 
-    SXFunction(const IOSchemeVector< SXMatrix >& arg, const std::vector< SXMatrix>& res);
+    SXFunction(const IOSchemeVector< SX >& arg, const std::vector< SX>& res);
   
     /// Multiple (matrix valued) input, multiple (matrix valued) output 
-    SXFunction(const IOSchemeVector< SXMatrix >& arg, const IOSchemeVector< SXMatrix >& res);
+    SXFunction(const IOSchemeVector< SX >& arg, const IOSchemeVector< SX >& res);
   
 #ifndef SWIG
 
     /// Multiple (vector valued) input, multiple (vector valued) output 
-    SXFunction(const std::vector< std::vector<SX> >& arg, const std::vector< std::vector<SX> >& res);
+    SXFunction(const std::vector< std::vector<SXElement> >& arg, const std::vector< std::vector<SXElement> >& res);
 
     /// Single (scalar/matrix/vector valued) input, single (scalar/matrix/vector valued) output  
-    SXFunction(const SXMatrix& arg, const SXMatrix& res);
+    SXFunction(const SX& arg, const SX& res);
 
     /// Multiple (vector valued) input, single (scalar/vector/matrix valued) output 
-    SXFunction(const std::vector< std::vector<SX> >& arg, const SXMatrix& res);
+    SXFunction(const std::vector< std::vector<SXElement> >& arg, const SX& res);
 
     /// Multiple (matrix valued) input, single (scalar/vector/matrix valued) output 
-    SXFunction(const std::vector< SXMatrix>& arg, const SXMatrix& res);
+    SXFunction(const std::vector< SX>& arg, const SX& res);
 
     /// Single (scalar/vector/matrix valued) input, multiple (vector valued) output 
-    SXFunction(const SXMatrix& arg, const std::vector< std::vector<SX> >& res);
+    SXFunction(const SX& arg, const std::vector< std::vector<SXElement> >& res);
 
     /// Single (scalar/vector/matrix valued) input, multiple (matrix valued) output 
-    SXFunction(const SXMatrix& arg, const std::vector< SXMatrix>& res);
+    SXFunction(const SX& arg, const std::vector< SX>& res);
 #endif // SWIG
 
     /// Access functions of the node 
@@ -108,52 +108,52 @@ namespace CasADi{
      *
      * \see CasADi::Jacobian for an AD approach
      */
-    SXMatrix jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    SXMatrix jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),oind,compact,symmetric); } 
-    SXMatrix jac(int iind, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(iind,outputSchemeEntry(oname),compact,symmetric); } 
-    SXMatrix jac(const std::string& iname, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); } 
+    SX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
+    SX jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),oind,compact,symmetric); } 
+    SX jac(int iind, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(iind,outputSchemeEntry(oname),compact,symmetric); } 
+    SX jac(const std::string& iname, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); } 
     //@}
    
     //@{
     /// Gradient via source code transformation
-    SXMatrix grad(int iind=0, int oind=0);
-    SXMatrix grad(const std::string& iname, int oind=0) { return grad(inputSchemeEntry(iname),oind); }
-    SXMatrix grad(int iind, const std::string& oname) { return grad(iind,outputSchemeEntry(oname)); }
-    SXMatrix grad(const std::string& iname, const std::string& oname) { return grad(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    SX grad(int iind=0, int oind=0);
+    SX grad(const std::string& iname, int oind=0) { return grad(inputSchemeEntry(iname),oind); }
+    SX grad(int iind, const std::string& oname) { return grad(iind,outputSchemeEntry(oname)); }
+    SX grad(const std::string& iname, const std::string& oname) { return grad(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
 
     //@{
     /// Tangent via source code transformation
-    SXMatrix tang(int iind=0, int oind=0);
-    SXMatrix tang(const std::string& iname, int oind=0) { return tang(inputSchemeEntry(iname),oind); }
-    SXMatrix tang(int iind, const std::string& oname) { return tang(iind,outputSchemeEntry(oname)); }
-    SXMatrix tang(const std::string& iname, const std::string& oname) { return tang(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    SX tang(int iind=0, int oind=0);
+    SX tang(const std::string& iname, int oind=0) { return tang(inputSchemeEntry(iname),oind); }
+    SX tang(int iind, const std::string& oname) { return tang(iind,outputSchemeEntry(oname)); }
+    SX tang(const std::string& iname, const std::string& oname) { return tang(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
   
     //@{
     /// Hessian (forward over adjoint) via source code transformation
-    SXMatrix hess(int iind=0, int oind=0);
-    SXMatrix hess(const std::string& iname, int oind=0) { return hess(inputSchemeEntry(iname),oind); }
-    SXMatrix hess(int iind, const std::string& oname) { return hess(iind,outputSchemeEntry(oname)); }
-    SXMatrix hess(const std::string& iname, const std::string& oname) { return hess(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    SX hess(int iind=0, int oind=0);
+    SX hess(const std::string& iname, int oind=0) { return hess(inputSchemeEntry(iname),oind); }
+    SX hess(int iind, const std::string& oname) { return hess(iind,outputSchemeEntry(oname)); }
+    SX hess(const std::string& iname, const std::string& oname) { return hess(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
   
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
     
     /** \brief Get function input */
-    const SXMatrix& inputExpr(int iind) const;
-    const SXMatrix& inputExpr(const std::string& iname) const { return inputExpr(inputSchemeEntry(iname)); }
+    const SX& inputExpr(int iind) const;
+    const SX& inputExpr(const std::string& iname) const { return inputExpr(inputSchemeEntry(iname)); }
   
     /** \brief Get function output */
-    const SXMatrix& outputExpr(int oind) const;
-    const SXMatrix& outputExpr(const std::string& oname) const { return outputExpr(outputSchemeEntry(oname)); }
+    const SX& outputExpr(int oind) const;
+    const SX& outputExpr(const std::string& oname) const { return outputExpr(outputSchemeEntry(oname)); }
   
     /** \brief Get all function inputs */
-    const std::vector<SXMatrix>& inputExpr() const;
+    const std::vector<SX>& inputExpr() const;
   
     /** \brief Get all function outputs */
-    const std::vector<SXMatrix> & outputExpr() const;
+    const std::vector<SX> & outputExpr() const;
     
 #ifndef SWIG
     /** \brief Access the algorithm directly */
@@ -187,10 +187,10 @@ namespace CasADi{
     void clearSymbolic();
  
     /** \brief Get all the free variables of the function */
-    std::vector<SX> getFree() const;
+    std::vector<SXElement> getFree() const;
 
     /** \brief Get the corresponding matrix type */
-    typedef SXMatrix MatType;  
+    typedef SX MatType;  
   
 #ifndef SWIG 
     /// Construct a function that has only the k'th output

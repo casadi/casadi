@@ -58,7 +58,7 @@ Index: Ipopt/contrib/sIPOPT/src/SensReducedHessianCalculator.cpp
      S->Print(Jnlst(),J_INSUPPRESSIBLE,J_USER1,"RedHessian unscaled");
 +    
 +    // Save the calculated reduced Hessian
-+    red_hess_.resize((S->NRows())*(S->NCols()));
++    red_hess_.resize((S->NCols())*(S->NRows()));
 +    for (Index k=0; k<red_hess_.size(); ++k) {
 +      red_hess_[k] = s_val[k];
 +    }   

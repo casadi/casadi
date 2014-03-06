@@ -210,11 +210,11 @@ namespace CasADi{
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
         ss.str(string());
         ss << "lam_x" << i++;
-        it->v_lam = msym(ss.str(),it->v.sparsity());
+        it->v_lam = MX::sym(ss.str(),it->v.sparsity());
       }
     
       // Lagrange multipliers for the nonlinear constraints
-      g_lam = msym("g_lam",ng_);
+      g_lam = MX::sym("g_lam",ng_);
 
       if(verbose_){
         cout << "Allocated intermediate variables." << endl;
@@ -304,7 +304,7 @@ namespace CasADi{
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
       ss.str(string());
       ss << "d" << i++;
-      it->d = msym(ss.str(),it->v.sparsity());
+      it->d = MX::sym(ss.str(),it->v.sparsity());
       it->d_def = it->v_def - it->d;
     }
 
@@ -314,7 +314,7 @@ namespace CasADi{
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
         ss.str(string());
         ss << "d_lam" << i++;
-        it->d_lam = msym(ss.str(),it->v.sparsity());
+        it->d_lam = MX::sym(ss.str(),it->v.sparsity());
         it->d_defL = it->v_defL - it->d_lam;
       }
     }
@@ -470,10 +470,10 @@ namespace CasADi{
     }
 
     // Expression a + A*du in Lifted Newton (Section 2.1 in Alberspeyer2010)
-    MX du = msym("du",nx_);   // Step in u
+    MX du = MX::sym("du",nx_);   // Step in u
     MX g_dlam;               // Step lambda_g
     if(!gauss_newton_){
-      g_dlam = msym("g_dlam",g_lam.sparsity());
+      g_dlam = MX::sym("g_dlam",g_lam.sparsity());
     }
   
     // Interpret the Jacobian-vector multiplication as a forward directional derivative
@@ -525,10 +525,10 @@ namespace CasADi{
     } else {
       exp_fcn_ = exp_fcn;
     }  
-  
+
     // Allocate QP data
-    CRSSparsity sp_tr_B_obj = mat_fcn_.output(mat_hes_).sparsity().transpose();
-    qpH_ = DMatrix(sp_tr_B_obj.patternProduct(sp_tr_B_obj));
+    Sparsity sp_B_obj = mat_fcn_.output(mat_hes_).sparsity();
+    qpH_ = DMatrix(sp_B_obj.patternProduct(sp_B_obj));
     qpA_ = mat_fcn_.output(mat_jac_);
     qpB_.resize(ng_);
 
@@ -902,12 +902,13 @@ namespace CasADi{
 
     // Calculate the gradient of the lagrangian
     const vector<double> &qpA_data = qpA_.data();
-    const vector<int> &qpA_rowind = qpA_.rowind();
-    const vector<int> &qpA_col = qpA_.col();
+    const vector<int> &qpA_colind = qpA_.colind();
+    const vector<int> &qpA_row = qpA_.row();
     for(int i=0; i<nx_; ++i)  gL_[i] = gf_[i] + x_lam_[i];
-    for(int i=0; i<ng_; ++i){
-      for(int el=qpA_rowind[i]; el<qpA_rowind[i+1]; ++el){
-        gL_[qpA_col[el]] += qpA_data[el]*g_lam_[i];
+    for(int cc=0; cc<qpA_colind.size()-1; ++cc){
+      for(int el=qpA_colind[cc]; el<qpA_colind[cc+1]; ++el){
+        int rr = qpA_row[el];
+        gL_[cc] += qpA_data[el]*g_lam_[rr];
       }
     }
 

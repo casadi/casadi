@@ -38,7 +38,7 @@ SDPSOCPInternal* SDPSOCPInternal::clone() const{
   return node;
 }
   
-SDPSOCPInternal::SDPSOCPInternal(const std::vector<CRSSparsity> &st) : SOCPSolverInternal(st) {
+SDPSOCPInternal::SDPSOCPInternal(const std::vector<Sparsity> &st) : SOCPSolverInternal(st) {
 
   addOption("sdp_solver",       OT_SDPSOLVER, GenericType(), "The SDPSolver used to solve the SOCPs.");
   addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the SDPSOlver");
@@ -84,27 +84,27 @@ void SDPSOCPInternal::init(){
   
   
   /*
-  *   || Gi x + hi ||_2 <=  ei'x + fi
+  *   || Gi' x + hi ||_2 <=  ei'x + fi
   *
   *        <=>
   *
-  *  | (ei' x + fi) I   Gi x + hi   |   >= 0
-  *  | (Gi x + hi)'     ei' x + fi  |
+  *  | (ei' x + fi) I   Gi' x + hi   |   >= 0
+  *  | (Gi' x + hi)'     ei' x + fi  |
   *  
   *        <=>
   * 
-  *  | ei[k]I     Gi(:,k)  |
-  *  | Gi(:,k)'     ei[k]  |
+  *  | ei[k]I     Gi(:,k)'  |
+  *  | Gi(:,k)     ei[k]  |
   *  
   *      | k  (n)      \   i  (for each cone)
   *      v              \
   */
  
   
-  MX G = msym("G",input(SOCP_SOLVER_G).sparsity());
-  MX H = msym("H",input(SOCP_SOLVER_H).sparsity());
-  MX E = msym("E",input(SOCP_SOLVER_E).sparsity());
-  MX F = msym("F",input(SOCP_SOLVER_F).sparsity());
+  MX G = MX::sym("G",input(SOCP_SOLVER_G).sparsity());
+  MX H = MX::sym("H",input(SOCP_SOLVER_H).sparsity());
+  MX E = MX::sym("E",input(SOCP_SOLVER_E).sparsity());
+  MX F = MX::sym("F",input(SOCP_SOLVER_F).sparsity());
   
   
   int i_start;
@@ -121,7 +121,7 @@ void SDPSOCPInternal::init(){
     i_start = 0;
     // Loop over all SOCP constraints
     for (int i=0;i<ni_.size();++i) {
-      MX Gik = G(range(i_start,i_start+ni_[i]),k);
+      MX Gik = trans(G(Slice(k),Slice(i_start,i_start+ni_[i])));
       MX Eik = E[n_*i+k];
       Fi_d.push_back(blockcat(Eik*MX::eye(ni_[i]),Gik,trans(Gik),Eik));
       i_start += ni_[i];
@@ -141,7 +141,7 @@ void SDPSOCPInternal::init(){
   }
   
   std::vector<MX> out;
-  out.push_back(-vertcat(Fi));
+  out.push_back(-horzcat(Fi));
   out.push_back(blkdiag(G_d));
   
   std::vector<MX> syms;

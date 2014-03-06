@@ -26,8 +26,8 @@ from numpy import *
 import casadi as c
 
 #! We will investigate the use of an exact Hessian with the help of the Rosenbrock function
-x=ssym("x")
-y=ssym("y")
+x=SX.sym("x")
+y=SX.sym("y")
     
 obj = (1-x)**2+100*(y-x**2)**2
 #! We choose to add a single constraint
@@ -39,8 +39,8 @@ solver = IpoptSolver(nlp)
 #! We need the hessian of the lagrangian.
 #! A problem with n decision variables and m constraints gives us a hessian of size n x n
   
-sigma=ssym("sigma")  # A scalar factor
-lambd=ssym("lambd")  # Multipier of the problem, shape m x 1.
+sigma=SX.sym("sigma")  # A scalar factor
+lambd=SX.sym("lambd")  # Multipier of the problem, shape m x 1.
 
 xy = vertcat([x,y])
 

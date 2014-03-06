@@ -28,16 +28,16 @@ from numpy import *
 #!
 #$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$.
 
-t = ssym("t")
+t = SX.sym("t")
 
-u = ssym("u") 
-v = ssym("v") 
+u = SX.sym("u") 
+v = SX.sym("v") 
 
-eps   = ssym("eps")
-mu    = ssym("mu")
-alpha = ssym("alpha")
-k     = ssym("k")
-sigma = ssym("sigma")
+eps   = SX.sym("eps")
+mu    = SX.sym("mu")
+alpha = SX.sym("alpha")
+k     = SX.sym("k")
+sigma = SX.sym("sigma")
 Omega = 2 + eps*sigma
 
 params = vertcat([eps,mu,alpha,k,sigma])

@@ -28,9 +28,9 @@ from pylab import *
 #! ODE integration
 #! -----------------
 #! Let's construct a simple Van der Pol oscillator.
-u = ssym("u")
-x = ssym("x")
-y = ssym("y")
+u = SX.sym("u")
+x = SX.sym("x")
+y = SX.sym("y")
 f  = SXFunction([vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
 #! Manipulate the function to adhere to the integrator's
 #! input/output signature
@@ -211,7 +211,7 @@ show()
 #! - a fixed integration end time, t=10s
 #! - a fixed initial condition (1,0)
 #! - a free symbolic input, held constant during integration interval
-u=msym("u")
+u=MX.sym("u")
 w, = integratorOut(integrator.call(integratorIn(x0=MX([1,0]),p=u)),"xf")
 
 #! We construct an MXfunction and a python help function 'out'

@@ -21,7 +21,7 @@
  */
 
 // Turn off the warnings that certain methods are effectively ignored, this seams to be a false warning, 
-// for example vertcat(SXMatrixVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
+// for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
 
 // Incude cmath early on, see #622
@@ -328,8 +328,8 @@ returntype __r##uname##__(argtype) const{ return argCast(b) ##custom## selfCast(
 returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*$self));}
 
 // These methods must be added since the implicit type cast does not work.
-// Consider a+b  with a DMatrix and b SXMatrix
-// In C++, operator+(SXMatrix,SXMatrix) will be called (implicit cast)
+// Consider a+b  with a DMatrix and b SX
+// In C++, operator+(SX,SX) will be called (implicit cast)
 // In octave, a.__add__(b) will be called   (no implicit cast)
 // In python, __array_priority__ will be checked and b.__radd__(a) will be called (effectively implicit casting)
 
@@ -379,7 +379,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "symbolic/matrix/sparsity_tools.hpp" 
 	 
 // Scalar expressions 
-#include "symbolic/sx/sx.hpp" 
+#include "symbolic/sx/sx_element.hpp" 
 #include "symbolic/sx/sx_tools.hpp" 
 #include "symbolic/fx/sx_function.hpp" 
 	 
@@ -405,23 +405,23 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 %{
 namespace std {
-void dummy(CasADi::SX foo,
+void dummy(CasADi::SXElement foo,
 	std::vector< std::vector<double> > foo1,
 	std::vector<double> &foo2,
 	std::vector<CasADi::MX> &foo3,
 	CasADi::MX foo4,
 	CasADi::Matrix<double> foo5,
-	CasADi::CRSSparsity foo6,
-	std::vector<CasADi::SX> foo7,
-	std::vector< std::vector<CasADi::SX> > foo8,
-	CasADi::Matrix<CasADi::SX> foo9,
+	CasADi::Sparsity foo6,
+	std::vector<CasADi::SXElement> foo7,
+	std::vector< std::vector<CasADi::SXElement> > foo8,
+	CasADi::Matrix<CasADi::SXElement> foo9,
 	CasADi::GenericType foo10,
 	std::vector < CasADi::Matrix<double> > foo11,
   std::vector < std::vector < CasADi::Matrix<double> > > foo12,
   std::vector < CasADi::Matrix<int> > foo13,
   std::vector < std::vector < CasADi::Matrix<int> > > foo14,
-  std::vector < CasADi::Matrix<CasADi::SX> > foo15,
-  std::vector < std::vector < CasADi::Matrix<CasADi::SX> > > foo16,
+  std::vector < CasADi::Matrix<CasADi::SXElement> > foo15,
+  std::vector < std::vector < CasADi::Matrix<CasADi::SXElement> > > foo16,
   std::vector < std::vector < CasADi::MX > > foo17,
 	int &bar,
 	double &baz) {}
@@ -442,23 +442,23 @@ _casadi_main_module = _casadi
 #endif // SWIGPYTHON
 
 namespace std {
-void dummy(CasADi::SX foo,
+void dummy(CasADi::SXElement foo,
 	std::vector< std::vector<double> > foo1,
 	std::vector<double> &foo2,
 	std::vector<CasADi::MX> &foo3,
 	CasADi::MX foo4,
 	CasADi::Matrix<double> foo5,
-	CasADi::CRSSparsity foo6,
-	std::vector<CasADi::SX> foo7,
-	std::vector< std::vector<CasADi::SX> > foo8,
-	CasADi::Matrix<CasADi::SX> foo9,
+	CasADi::Sparsity foo6,
+	std::vector<CasADi::SXElement> foo7,
+	std::vector< std::vector<CasADi::SXElement> > foo8,
+	CasADi::Matrix<CasADi::SXElement> foo9,
   CasADi::GenericType foo10,
   std::vector < CasADi::Matrix<double> > foo11,
   std::vector < std::vector < CasADi::Matrix<double> > > foo12,
   std::vector < CasADi::Matrix<int> > foo13,
   std::vector < std::vector < CasADi::Matrix<int> > > foo14,
-  std::vector < CasADi::Matrix<CasADi::SX> > foo15,
-  std::vector < std::vector < CasADi::Matrix<CasADi::SX> > > foo16,
+  std::vector < CasADi::Matrix<CasADi::SXElement> > foo15,
+  std::vector < std::vector < CasADi::Matrix<CasADi::SXElement> > > foo16,
   std::vector < std::vector < CasADi::MX > > foo17,
 	int &bar,
 	double &baz);

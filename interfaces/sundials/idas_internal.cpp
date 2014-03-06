@@ -1284,17 +1284,17 @@ namespace CasADi{
     jac_.evaluate();
 
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jac_.output().rowind();
-    const vector<int>& col = jac_.output().col();
+    const vector<int>& colind = jac_.output().colind();
+    const vector<int>& row = jac_.output().row();
     const vector<double>& val = jac_.output().data();
 
-    // Loop over rows
-    for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over cols
+    for(int i=0; i<colind.size()-1; ++i){
       // Loop over non-zero entries
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
+      for(int el=colind[i]; el<colind[i+1]; ++el){
       
-        // Get column
-        int j = col[el];
+        // Get row
+        int j = row[el];
       
         // Add to the element
         DENSE_ELEM(Jac,i,j) = val[el];
@@ -1363,17 +1363,17 @@ namespace CasADi{
     }
   
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jacB_.output().rowind();
-    const vector<int>& col = jacB_.output().col();
+    const vector<int>& colind = jacB_.output().colind();
+    const vector<int>& row = jacB_.output().row();
     const vector<double>& val = jacB_.output().data();
 
-    // Loop over rows
-    for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over cols
+    for(int i=0; i<colind.size()-1; ++i){
       // Loop over non-zero entries
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
+      for(int el=colind[i]; el<colind[i+1]; ++el){
       
-        // Get column
-        int j = col[el];
+        // Get row
+        int j = row[el];
       
         // Add to the element
         DENSE_ELEM(JacB,i,j) = val[el];
@@ -1413,16 +1413,16 @@ namespace CasADi{
     jac_.evaluate();
 
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jac_.output().rowind();
-    const vector<int>& col = jac_.output().col();
+    const vector<int>& colind = jac_.output().colind();
+    const vector<int>& row = jac_.output().row();
     const vector<double>& val = jac_.output().data();
 
-    // Loop over rows
-    for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over cols
+    for(int i=0; i<colind.size()-1; ++i){
       // Loop over non-zero entries
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        // Get column
-        int j = col[el];
+      for(int el=colind[i]; el<colind[i+1]; ++el){
+        // Get row
+        int j = row[el];
       
         // Set the element
         if(i-j>=-mupper && i-j<=mlower)
@@ -1492,16 +1492,16 @@ namespace CasADi{
     }
   
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jacB_.output().rowind();
-    const vector<int>& col = jacB_.output().col();
+    const vector<int>& colind = jacB_.output().colind();
+    const vector<int>& row = jacB_.output().row();
     const vector<double>& val = jacB_.output().data();
 
-    // Loop over rows
-    for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over cols
+    for(int i=0; i<colind.size()-1; ++i){
       // Loop over non-zero entries
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        // Get column
-        int j = col[el];
+      for(int el=colind[i]; el<colind[i+1]; ++el){
+        // Get row
+        int j = row[el];
       
         // Set the element
         if(i-j>=-mupperB && i-j<=mlowerB)
@@ -2091,7 +2091,7 @@ namespace CasADi{
     jac_in.push_back(cj);
   
     // Return generated function
-    return FunctionType(jac_in,jac);
+    return FunctionType(jac_in,trans(jac));
   }
 
   template<typename FunctionType>
@@ -2111,7 +2111,7 @@ namespace CasADi{
     jac_in.push_back(cj);
   
     // return generated function
-    return FunctionType(jac_in,jac);
+    return FunctionType(jac_in,trans(jac));
   }
 
   FX IdasInternal::getJacobianB(){

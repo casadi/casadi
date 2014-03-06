@@ -36,7 +36,7 @@ SOCPQCQPInternal* SOCPQCQPInternal::clone() const{
   return node;
 }
   
-SOCPQCQPInternal::SOCPQCQPInternal(const std::vector<CRSSparsity> &st) : QCQPSolverInternal(st) {
+SOCPQCQPInternal::SOCPQCQPInternal(const std::vector<Sparsity> &st) : QCQPSolverInternal(st) {
 
   addOption("socp_solver",       OT_SOCPSOLVER, GenericType(), "The SOCPSolver used to solve the QCQPs.");
   addOption("socp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the SOCPSOlver");
@@ -139,7 +139,7 @@ void SOCPQCQPInternal::init(){
   QCQPSolverInternal::init();
   
   // Collection of sparsities that will make up SOCP_SOLVER_G
-  std::vector<CRSSparsity> socp_g;
+  std::vector<Sparsity> socp_g;
 
   // Allocate Cholesky solvers
   cholesky_.push_back(CSparseCholesky(st_[QCQP_STRUCT_H]));
@@ -153,12 +153,12 @@ void SOCPQCQPInternal::init(){
     
     // Harvest Cholsesky sparsity patterns
     // Note that we add extra scalar to make room for the epigraph-reformulation variable
-    socp_g.push_back(blkdiag(cholesky_[i].getFactorizationSparsity(true),sp_dense(1,1)));
+    socp_g.push_back(blkdiag(cholesky_[i].getFactorizationSparsity(false),sp_dense(1,1)));
   }
 
   // Create an socpsolver instance
   SOCPSolverCreator socpsolver_creator = getOption("socp_solver");
-  socpsolver_ = socpsolver_creator(socpStruct("g",vertcat(socp_g),"a",horzcat(input(QCQP_SOLVER_A).sparsity(),sp_sparse(nc_,1))));
+  socpsolver_ = socpsolver_creator(socpStruct("g",horzcat(socp_g),"a",horzcat(input(QCQP_SOLVER_A).sparsity(),sp_sparse(nc_,1))));
 
   //socpsolver_.setQCQPOptions();
   if(hasSetOption("socp_solver_options")){

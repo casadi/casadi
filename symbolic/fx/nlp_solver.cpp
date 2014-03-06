@@ -73,9 +73,9 @@ namespace CasADi{
       // unconstrained
       if(is_a<SXFunction>(F)){
         SXFunction F_sx = shared_cast<SXFunction>(F);
-        vector<SXMatrix> nlp_in = F_sx.inputExpr();
+        vector<SX> nlp_in = F_sx.inputExpr();
         nlp_in.resize(NL_NUM_IN);
-        vector<SXMatrix> nlp_out(NL_NUM_OUT);
+        vector<SX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_F] = F_sx.outputExpr(0);        
         return SXFunction(nlp_in,nlp_out);
       } else if(is_a<MXFunction>(F)){
@@ -98,9 +98,9 @@ namespace CasADi{
       // feasibility problem
       if(is_a<SXFunction>(G)){
         SXFunction G_sx = shared_cast<SXFunction>(G);
-        vector<SXMatrix> nlp_in = G_sx.inputExpr();
+        vector<SX> nlp_in = G_sx.inputExpr();
         nlp_in.resize(NL_NUM_IN);
-        vector<SXMatrix> nlp_out(NL_NUM_OUT);
+        vector<SX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_G] = G_sx.outputExpr(0);        
         return SXFunction(nlp_in,nlp_out);
       } else if(is_a<MXFunction>(G)){
@@ -125,14 +125,14 @@ namespace CasADi{
       
       // SXFunction if both functions are SXFunction
       if(is_a<SXFunction>(F) && is_a<SXFunction>(G)){
-        vector<SXMatrix> nlp_in(NL_NUM_IN), nlp_out(NL_NUM_OUT);
+        vector<SX> nlp_in(NL_NUM_IN), nlp_out(NL_NUM_OUT);
         SXFunction F_sx = shared_cast<SXFunction>(F);
         SXFunction G_sx = shared_cast<SXFunction>(G);        
         nlp_in[NL_X] = G_sx.inputExpr(0);
         if(G_sx.getNumInputs()>1){
           nlp_in[NL_P] = G_sx.inputExpr(1);
         } else {
-          nlp_in[NL_P] = ssym("p",0,1);
+          nlp_in[NL_P] = SX::sym("p",1,0);
         }
 
         // Expression for f and g
@@ -153,7 +153,7 @@ namespace CasADi{
           if(G_mx.getNumInputs()>1){
             nlp_in[NL_P] = G_mx.inputExpr(1);
           } else {
-            nlp_in[NL_P] = msym("p",0,1);
+            nlp_in[NL_P] = MX::sym("p",1,0);
           }
           nlp_out[NL_G] = G_mx.outputExpr(0);
           if(!F_mx.isNull()){ // Both are MXFunction, make sure they use the same variables
@@ -167,7 +167,7 @@ namespace CasADi{
             if(F_mx.getNumInputs()>1){
               nlp_in[NL_P] = F_mx.inputExpr(1);
             } else {
-              nlp_in[NL_P] = msym("p",0,1);              
+              nlp_in[NL_P] = MX::sym("p",1,0);              
             }
             nlp_out[NL_F] = F_mx.outputExpr(0);
             nlp_out[NL_G] = G.call(F_mx.inputExpr()).front();

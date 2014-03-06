@@ -61,7 +61,7 @@ namespace CasADi{
     * \param fx an initialized function mapping from single p-by-1 to single m-by-n
     * \param a grid of numbers p-by-N
     *
-    *  For each column in the grid, fx is numerically evaluated and the output is put in a resulting matrix of size m-by-n*p
+    *  For each row in the grid, fx is numerically evaluated and the output is put in a resulting matrix of size m-by-n*p
     *
     * If your fx is really multiple output, and you wish to use a particular output, use the slice operator on the fx.
     *
@@ -73,7 +73,7 @@ namespace CasADi{
     * \param fx an initialized function mapping from single p-by-1 to single m-by-n
     * \param a grid of numbers p-by-N
     *
-    *  For each column in the grid, fx is numerically evaluated and the output is put in a resulting matrix of size m*p-by-n
+    *  For each row in the grid, fx is numerically evaluated and the output is put in a resulting matrix of size m*p-by-n
     *
     * If your fx is really multiple output, and you wish to use a particular output, use the slice operator on the fx.
     */

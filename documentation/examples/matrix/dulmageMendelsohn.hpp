@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::CRSSparsity::dulmageMendelsohn();
+* CasADi::Sparsity::dulmageMendelsohn();
 * CasADi::blkdiag();
 * \endcode
 *

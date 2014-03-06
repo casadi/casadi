@@ -42,7 +42,7 @@ SX
    :inherited-members:
    :show-inheritance:
    
-.. autoclass:: SXMatrix
+.. autoclass:: SX
    :members:
    :undoc-members:
    :inherited-members:
@@ -77,7 +77,7 @@ Helper functions
 .. autofunction:: horzcat
 .. autofunction:: vertcat
 .. autofunction:: reshape
-.. autofunction:: flatten
+.. autofunction:: vec
 .. autofunction:: trans
 .. autofunction:: prod
 .. autofunction:: inner_prod

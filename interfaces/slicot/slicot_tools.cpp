@@ -114,7 +114,7 @@ if (dwork==0) {
   }
   
    void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t,  std::vector< double > & z,std::vector<double> &eig_real, std::vector<double> &eig_imag) {
-     std::vector<double> dwork(std::max(n+K-2,4*n));
+     std::vector<double> dwork(std::max(n+K-2,4*n)+(n-1)*K);
      slicot_periodic_schur(n,K,a,t,z,dwork,eig_real,eig_imag);
    }
 
@@ -179,10 +179,8 @@ if (dwork==0) {
     for (int k=0;k<K;++k) {
       t[k] = DMatrix::zeros(n,n);
       std::copy(t_data.begin()+k*n*n,t_data.begin()+(k+1)*n*n,t[k].begin());
-      t[k] = trans(t[k]);
       z[k] = DMatrix::zeros(n,n);
       std::copy(z_data.begin()+k*n*n,z_data.begin()+(k+1)*n*n,z[k].begin());
-      z[k] = trans(z[k]);
     }
   }
  

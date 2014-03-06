@@ -55,16 +55,16 @@ void SimulatorInternal::init(){
   
   // Generate an output function if there is none (returns the whole state)
   if(output_fcn_.isNull()){
-    SXMatrix t = ssym("t");
-    SXMatrix x = ssym("x",integrator_.input(INTEGRATOR_X0).sparsity());
-    SXMatrix p = ssym("p",integrator_.input(INTEGRATOR_P).sparsity());
+    SX t = SX::sym("t");
+    SX x = SX::sym("x",integrator_.input(INTEGRATOR_X0).sparsity());
+    SX p = SX::sym("p",integrator_.input(INTEGRATOR_P).sparsity());
 
-    vector<SXMatrix> arg(DAE_NUM_IN);
+    vector<SX> arg(DAE_NUM_IN);
     arg[DAE_T] = t;
     arg[DAE_X] = x;
     arg[DAE_P] = p;
 
-    vector<SXMatrix> out(INTEGRATOR_NUM_OUT);
+    vector<SX> out(INTEGRATOR_NUM_OUT);
     out[INTEGRATOR_XF] = x;
 
     // Create the output function

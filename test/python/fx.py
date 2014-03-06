@@ -29,9 +29,9 @@ from helpers import *
 class FXtests(casadiTestCase):
 
   def test_call_empty(self):
-    x = ssym("x",2)
+    x = SX.sym("x",2)
     fsx = SXFunction([x,[]],[x])
-    x = msym("x",2)
+    x = MX.sym("x",2)
     fmx1 = MXFunction([x,MX()],[x])
     fmx2 = MXFunction([x,[]],[x])
     
@@ -39,16 +39,16 @@ class FXtests(casadiTestCase):
       f.init()
       f.evaluate()
 
-      X = msym("X",2)
+      X = MX.sym("X",2)
       F = f.call([X,X])[0]
       g = MXFunction([X],[F])
       g.init()
 
       g.evaluate()
     
-    x = ssym("x",2)
+    x = SX.sym("x",2)
     fsx = SXFunction([x],[x,[]])
-    x = msym("x",2)
+    x = MX.sym("x",2)
     fmx1 = MXFunction([x],[x,MX()])
     fmx2 = MXFunction([x],[x,[]])
     
@@ -56,7 +56,7 @@ class FXtests(casadiTestCase):
       f.init()
       f.evaluate()
 
-      X = msym("X",2)
+      X = MX.sym("X",2)
       F = f.call([X])[0]
       g = MXFunction([X],[F])
       g.init()
@@ -65,8 +65,8 @@ class FXtests(casadiTestCase):
   
   def test_Parallelizer(self):
     self.message("Parallelizer")
-    x = MX("x",2)
-    y = MX("y")
+    x = MX.sym("x",2)
+    y = MX.sym("y")
 
     f = MXFunction([x,y],[sin(x) + y])
     f.init()
@@ -95,10 +95,10 @@ class FXtests(casadiTestCase):
       
   def test_MXFunctionSeed(self):
     self.message("MXFunctionSeed")
-    x1 = MX("x",2)
-    y1 = MX("y")
-    x2 = MX("x",2)
-    y2 = MX("y")
+    x1 = MX.sym("x",2)
+    y1 = MX.sym("y")
+    x2 = MX.sym("x",2)
+    y2 = MX.sym("y")
     p= MXFunction([x1,y1,x2,y2],[sin(x1) + y1,sin(x2) + y2])
     p.init()
     
@@ -119,8 +119,8 @@ class FXtests(casadiTestCase):
         
   def test_Parallelizer2(self):
     self.message("Parallelizer")
-    x = MX("x",2)
-    y = MX("y")
+    x = MX.sym("x",2)
+    y = MX.sym("y")
 
     f = MXFunction([x,y],[sin(x) + y])
     f.init()
@@ -131,10 +131,10 @@ class FXtests(casadiTestCase):
       pp.setOption("parallelization",mode)
       pp.init()
       
-      x1 = MX("x",2)
-      y1 = MX("y")
-      x2 = MX("x",2)
-      y2 = MX("y")
+      x1 = MX.sym("x",2)
+      y1 = MX.sym("y")
+      x2 = MX.sym("x",2)
+      y2 = MX.sym("y")
       p = MXFunction([x1,y1,x2,y2], pp.call([x1,y1,x2,y2]) )
       p.init()
       
@@ -155,17 +155,17 @@ class FXtests(casadiTestCase):
           
   def test_ParallelizerMXCall(self):
     self.message("MX parallel call")
-    x = MX("x",2)
-    y = MX("y")
+    x = MX.sym("x",2)
+    y = MX.sym("y")
 
     f = MXFunction([x,y],[sin(x) + y])
     f.init()
 
     #! Evaluate this function ten times in parallel
-    x1 = MX("x",2)
-    y1 = MX("y")
-    x2 = MX("x",2)
-    y2 = MX("y")
+    x1 = MX.sym("x",2)
+    y1 = MX.sym("y")
+    x2 = MX.sym("x",2)
+    y2 = MX.sym("y")
     [[F1],[F2]] = f.call([[x1,y1],[x2,y2]])
     p = MXFunction([x1,y1,x2,y2],[F1,F2])
     p.init()
@@ -187,7 +187,7 @@ class FXtests(casadiTestCase):
 
   def test_set_wrong(self):
     self.message("setter, wrong sparsity")
-    x = SX("x")
+    x = SXElement.sym("x")
 
     f = SXFunction([x],[x])
     f.init()
@@ -198,12 +198,12 @@ class FXtests(casadiTestCase):
     
   def test_issue304(self):
     self.message("regression test for #304") # this code used to segfault
-    x = SX("x")
+    x = SXElement.sym("x")
 
     f = SXFunction([x],[x**2,x**3])
     f.init()
 
-    X = [MX("X")]
+    X = [MX.sym("X")]
 
     z=f.call(X)
 
@@ -213,8 +213,8 @@ class FXtests(casadiTestCase):
     g.expand([x])
   
   def test_jacobian(self):
-    x = ssym("x",3,1)
-    y = ssym("y",2,1)
+    x = SX.sym("x",3,1)
+    y = SX.sym("y",2,1)
 
     f = SXFunction([x,y],[x**2,y,x*y[0]])
     f.init()
@@ -225,8 +225,8 @@ class FXtests(casadiTestCase):
     self.assertEqual(g.getNumOutputs(),f.getNumOutputs()+1)
 
   def test_xfunction(self):
-    x = ssym("x",3,1)
-    y = ssym("y",2,1)
+    x = SX.sym("x",3,1)
+    y = SX.sym("y",2,1)
     
     f = SXFunction([x,y],[x**2,y,x*y[0]])
     f.init()
@@ -234,8 +234,8 @@ class FXtests(casadiTestCase):
     f.setInput([0.1,0.7,1.3],0)
     f.setInput([7.1,2.9],1)
     
-    X = msym("x",3,1)
-    Y = msym("y",2,1)
+    X = MX.sym("x",3,1)
+    Y = MX.sym("y",2,1)
     
     F = MXFunction([X,Y],[X**2,Y,X*Y[0]])
     F.init()
@@ -249,16 +249,16 @@ class FXtests(casadiTestCase):
   @memory_heavy()
   def test_jacobians(self):
   
-    x = ssym("x")
+    x = SX.sym("x")
     
     self.assertEqual(jacobian(5,x).size(),0)
     
     
     def test(sp):
-      x = ssym("x",sp.size2())
+      x = SX.sym("x",sp.size2())
       sp2 = jacobian(mul(DMatrix(sp,1),x),x).sparsity()
-      self.checkarray(sp.col(),sp2.col());
-      self.checkarray(sp.rowind(),sp2.rowind());   
+      self.checkarray(sp.row(),sp2.row());
+      self.checkarray(sp.colind(),sp2.colind());   
 
     for i in range(5):
       test(sp_tril(i))
@@ -345,15 +345,15 @@ class FXtests(casadiTestCase):
   @memory_heavy()
   def test_hessians(self):
     def test(sp):
-      x = ssym("x",sp.size2())
+      x = SX.sym("x",sp.size2())
       self.assertTrue(sp==sp.transpose())
       f = SXFunction([x],[mul([x.T,DMatrix(sp,1),x])])
       f.init()
       J = f.hessian()
       J.init()
       sp2 = J.output().sparsity()
-      self.checkarray(sp.col(),sp2.col())
-      self.checkarray(sp.rowind(),sp2.rowind())
+      self.checkarray(sp.row(),sp2.row())
+      self.checkarray(sp.colind(),sp2.colind())
       
     A = IMatrix([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
     makeSparse(A)
@@ -432,7 +432,7 @@ class FXtests(casadiTestCase):
       test(d.sparsity())
       
   def test_getOutput(self):
-    x = ssym("x",2)
+    x = SX.sym("x",2)
     
     f = SXFunction(daeIn(x=x),daeOut(ode=x))
     f.init()
@@ -463,7 +463,7 @@ class FXtests(casadiTestCase):
     
     myOut = IOScheme(["foo","bar"])
 
-    x = ssym("x")
+    x = SX.sym("x")
     
     with self.assertRaises(Exception):
       myOut(baz=x)
@@ -488,7 +488,7 @@ class FXtests(casadiTestCase):
      
       
   def test_unknown_options(self):
-    x = ssym("x")
+    x = SX.sym("x")
     f = SXFunction([x],[x])
     f.init()
     
@@ -504,8 +504,8 @@ class FXtests(casadiTestCase):
     
   def test_CustomFunctionHard(self):
   
-    x = msym("x")
-    y = msym("y")
+    x = MX.sym("x")
+    y = MX.sym("y")
     
         
     g = MXFunction([x,y],[sin(x+3*y)])
@@ -614,8 +614,8 @@ class FXtests(casadiTestCase):
     
   def test_CustomFunction(self):
   
-    x = msym("x")
-    y = msym("y")
+    x = MX.sym("x")
+    y = MX.sym("y")
     
         
     g = MXFunction([x,y],[sin(x+3*y)])
@@ -756,7 +756,6 @@ class FXtests(casadiTestCase):
           z.set(z2)
           
         if max_fwd:
-          assert(max_fwd)
           def fwd(self,(x,y),(z,),seeds,sens):
             z0 = 3*y
             z1 = x+z0
@@ -770,7 +769,6 @@ class FXtests(casadiTestCase):
               dz.set(dz2)
         
         if max_adj:
-          assert(max_adj)
           def adj(self,(x,y),(z,),seeds,sens):
             z0 = 3*y
             z1 = x+z0
@@ -821,8 +819,8 @@ class FXtests(casadiTestCase):
       
     # vector input
     
-    x = msym("x",2)
-    y = msym("y")
+    x = MX.sym("x",2)
+    y = MX.sym("y")
         
     g = MXFunction([x,y],[sin(x[0]+3*y)*x[1]])
     g.init()
@@ -938,7 +936,7 @@ class FXtests(casadiTestCase):
       
     # vector input, vector output
     
-    x = msym("x",2)
+    x = MX.sym("x",2)
         
     g = MXFunction([x],[vertcat([x[0]**2+x[1],x[0]*x[1]])])
     g.init()
@@ -1011,7 +1009,7 @@ class FXtests(casadiTestCase):
       self.checkfx(f,g,sens_der=False,hessian=False,fwd=False,evals=1)
          
   def test_setjacsparsity(self):
-    x = msym("x",4)
+    x = MX.sym("x",4)
           
     f = MXFunction([x],[x])
     f.init()
@@ -1033,8 +1031,8 @@ class FXtests(casadiTestCase):
     self.assertEqual(J.output().size(),16)
       
   def test_setjacobian(self):
-    x = msym("x")
-    y = msym("y")
+    x = MX.sym("x")
+    y = MX.sym("y")
         
     g = MXFunction([x,y],[sin(x+3*y)])
     g.init()
@@ -1053,8 +1051,8 @@ class FXtests(casadiTestCase):
       f.setOutput(sin(x+3*y))
       
     # Form Jacobians: sin(x0+3*y)*x1
-    x = ssym("x")
-    y = ssym("y")
+    x = SX.sym("x")
+    y = SX.sym("y")
     J = SXFunction([x,y],[horzcat((cos(x+3*y),3*cos(x+3*y))),sin(x+3*y)])
     J.setOption("name","my_J")
     J.init()
@@ -1077,7 +1075,7 @@ class FXtests(casadiTestCase):
   def test_derivative_simplifications(self):
   
     n = 1
-    x = ssym("x",n)
+    x = SX.sym("x",n)
 
     M = SXFunction([x],[mul((x-DMatrix(range(n))),x.T)])
     M.setOption("name","M")
@@ -1085,12 +1083,12 @@ class FXtests(casadiTestCase):
     M.evaluate()
 
 
-    P = msym("P",n,n)
-    X = msym("X",n)
+    P = MX.sym("P",n,n)
+    X = MX.sym("X",n)
 
-    MX= M.call([X])[0]
+    M_X= M.call([X])[0]
 
-    Pf = MXFunction([X,P],[mul(MX,P)])
+    Pf = MXFunction([X,P],[mul(M_X,P)])
     Pf.setOption("name","P")
     Pf.init()
 
@@ -1101,7 +1099,7 @@ class FXtests(casadiTestCase):
     self.assertFalse("derivative" in str(P_P))
     
   def test_assert_derivatives(self):
-    x = msym("x")
+    x = MX.sym("x")
     
     @pyevaluate
     def dummy(f):

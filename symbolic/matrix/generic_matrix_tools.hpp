@@ -26,7 +26,7 @@
 #include "slice.hpp"
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
-#include "crs_sparsity.hpp"
+#include "sparsity.hpp"
 #include "../casadi_math.hpp"
 #include "../casadi_exception.hpp"
 
@@ -47,6 +47,11 @@ T cross(const GenericMatrix<T> &a, const GenericMatrix<T> &b, int dim = -1);
 */
 template<typename T>
 T tril2symm(const GenericMatrix<T> &a);
+
+/** \brief Convert a upper triangular matrix to a symmetric one
+*/
+template<typename T>
+T triu2symm(const GenericMatrix<T> &a);
 
 #ifndef SWIG
 template<typename T>
@@ -101,11 +106,18 @@ T cross(const GenericMatrix<T> &a, const GenericMatrix<T> &b, int dim) {
 template<typename T> 
 T tril2symm(const GenericMatrix<T> &a_) {
   const T& a = static_cast<const T&>(a_);
-  casadi_assert_message(a.size1()==a.size2(),"Shape error in tril2symm. Expecting square shape but got " << a.dimString());
+  casadi_assert_message(a.square(),"Shape error in tril2symm. Expecting square shape but got " << a.dimString());
   casadi_assert_message(a.sizeU()-a.sizeD()==0,"Sparsity error in tril2symm. Found above-diagonal entries in argument: " << a.dimString());
-  T ret = a + trans(a);
-  ret(sp_diag(a.size1()))/=2;
-  return ret;
+  return a + trans(a) - diag(diag(a));
+}
+
+
+template<typename T> 
+T triu2symm(const GenericMatrix<T> &a_) {
+  const T& a = static_cast<const T&>(a_);
+  casadi_assert_message(a.square(),"Shape error in triu2symm. Expecting square shape but got " << a.dimString());
+  casadi_assert_message(a.sizeL()-a.sizeD()==0,"Sparsity error in triu2symm. Found below-diagonal entries in argument: " << a.dimString());
+  return a + trans(a) - diag(diag(a));
 }
 #endif // SWIG
 
@@ -121,7 +133,8 @@ T tril2symm(const GenericMatrix<T> &a_) {
 // Define template instanciations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES(T) \
 GMTT_INST(T,cross) \
-GMTT_INST(T,tril2symm)
+GMTT_INST(T,tril2symm) \
+GMTT_INST(T,triu2symm)
 
 // Define template instanciations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(T) \

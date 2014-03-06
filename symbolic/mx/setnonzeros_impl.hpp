@@ -72,18 +72,18 @@ namespace CasADi{
     int nadj = adjSeed.size();
 
     // Output sparsity
-    const CRSSparsity &osp = sparsity();
-    const vector<int>& ocol = osp.col();
-    vector<int> orow = osp.getRow();
+    const Sparsity &osp = sparsity();
+    const vector<int>& orow = osp.row();
+    vector<int> ocol = osp.getCol();
     
     // Input sparsity (first input same as output)
-    const CRSSparsity &isp = dep(1).sparsity();
-    const vector<int>& icol = isp.col();
-    vector<int> irow = isp.getRow();
+    const Sparsity &isp = dep(1).sparsity();
+    const vector<int>& irow = isp.row();
+    vector<int> icol = isp.getCol();
           
     // We next need to resort the assignment vector by outputs instead of inputs
     // Start by counting the number of output nonzeros corresponding to each input nonzero
-    vector<int> onz_count(ocol.size()+2,0);
+    vector<int> onz_count(orow.size()+2,0);
     for(vector<int>::const_iterator it=nz.begin(); it!=nz.end(); ++it){
       onz_count[*it+2]++;
     }
@@ -109,7 +109,7 @@ namespace CasADi{
       
       // Get element (note: may contain duplicates)
       if(onz_k>=0){
-        with_duplicates[k] = orow[onz_k] + ocol[onz_k]*osp.size1();
+        with_duplicates[k] = ocol[onz_k] + orow[onz_k]*osp.size2();
       } else {
         with_duplicates[k] = -1;
       }
@@ -120,7 +120,7 @@ namespace CasADi{
     osp.getElements(el_output,false);
     
     // Sparsity pattern being formed and corresponding nonzero mapping
-    vector<int> r_rowind, r_col, r_nz, r_ind;
+    vector<int> r_colind, r_row, r_nz, r_ind;
 
     // Nondifferentiated function and forward sensitivities
     int first_d = output_given ? 0 : -1;
@@ -175,7 +175,7 @@ namespace CasADi{
         if(*k>=0 && nz[*k]>=0 && r_ind[nz[*k]]<0){
           
           // Create a new pattern which includes both the the previous seed and the addition/assignment
-          CRSSparsity sp = res.sparsity().patternUnion(osp);
+          Sparsity sp = res.sparsity().patternUnion(osp);
           res = res->getSetSparse(sp);
 
           // Recalculate the nz locations in the arguments corresponding to the inputs
@@ -211,9 +211,9 @@ namespace CasADi{
       aseed.sparsity().getNZInplace(r_ind);
 
       // Sparsity pattern for the result
-      r_rowind.resize(isp.size1()+1); // Row count
-      fill(r_rowind.begin(),r_rowind.end(),0);
-      r_col.clear();
+      r_colind.resize(isp.size2()+1); // Col count
+      fill(r_colind.begin(),r_colind.end(),0);
+      r_row.clear();
 
       // Perform the assignments
       r_nz.clear();
@@ -235,20 +235,20 @@ namespace CasADi{
         r_nz.push_back(el_arg);
 
         // Get the corresponding element
-        int i=irow[k], j=icol[k];
+        int i=icol[k], j=irow[k];
 
         // Add to sparsity pattern
-        r_col.push_back(j);
-        r_rowind[1+i]++;
+        r_row.push_back(j);
+        r_colind[1+i]++;
       }
       
-      // row count -> row offset
-      for(int i=1; i<r_rowind.size(); ++i) r_rowind[i] += r_rowind[i-1]; 
+      // col count -> col offset
+      for(int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1]; 
 
       // If anything to set/add
       if(!r_nz.empty()){
         // Create a sparsity pattern from vectors
-        CRSSparsity f_sp(isp.size1(),isp.size2(),r_col,r_rowind);
+        Sparsity f_sp(isp.size1(),isp.size2(),r_colind,r_row);
         asens += aseed->getGetNonzeros(f_sp,r_nz);
         if(!Add){
           aseed = MX::zeros(f_sp)->getSetNonzeros(aseed,r_nz);
@@ -268,8 +268,8 @@ namespace CasADi{
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void SetNonzerosVector<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>
@@ -297,8 +297,8 @@ namespace CasADi{
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void SetNonzerosSlice<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>
@@ -329,8 +329,8 @@ namespace CasADi{
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void SetNonzerosSlice2<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>

@@ -186,21 +186,21 @@ namespace CasADi{
     offset = getAugOffset(nfwd,nadj);
 
     // Create augmented problem
-    MX aug_t = msym("aug_t",f_.input(DAE_T).sparsity());
-    MX aug_x = msym("aug_x",offset.x.back(),x0().size2());
-    MX aug_z = msym("aug_z",offset.z.back(),std::max(z0().size2(),rz0().size2()));
-    MX aug_p = msym("aug_p",offset.p.back(),std::max(p().size2(),rp().size2()));
-    MX aug_rx = msym("aug_rx",offset.rx.back(),x0().size2());
-    MX aug_rz = msym("aug_rz",offset.rz.back(),std::max(z0().size2(),rz0().size2()));
-    MX aug_rp = msym("aug_rp",offset.rp.back(),std::max(qf().size2(),rp().size2()));
+    MX aug_t = MX::sym("aug_t",f_.input(DAE_T).sparsity());
+    MX aug_x = MX::sym("aug_x",x0().size1(),offset.x.back());
+    MX aug_z = MX::sym("aug_z",std::max(z0().size1(),rz0().size1()),offset.z.back());
+    MX aug_p = MX::sym("aug_p",std::max(p().size1(),rp().size1()),offset.p.back());
+    MX aug_rx = MX::sym("aug_rx",x0().size1(),offset.rx.back());
+    MX aug_rz = MX::sym("aug_rz",std::max(z0().size1(),rz0().size1()),offset.rz.back());
+    MX aug_rp = MX::sym("aug_rp",std::max(qf().size1(),rp().size1()),offset.rp.back());
 
     // Split up the augmented vectors
-    vector<MX> aug_x_split = vertsplit(aug_x,offset.x);     vector<MX>::const_iterator aug_x_split_it = aug_x_split.begin();
-    vector<MX> aug_z_split = vertsplit(aug_z,offset.z);     vector<MX>::const_iterator aug_z_split_it = aug_z_split.begin();
-    vector<MX> aug_p_split = vertsplit(aug_p,offset.p);     vector<MX>::const_iterator aug_p_split_it = aug_p_split.begin();
-    vector<MX> aug_rx_split = vertsplit(aug_rx,offset.rx);  vector<MX>::const_iterator aug_rx_split_it = aug_rx_split.begin();
-    vector<MX> aug_rz_split = vertsplit(aug_rz,offset.rz);  vector<MX>::const_iterator aug_rz_split_it = aug_rz_split.begin();
-    vector<MX> aug_rp_split = vertsplit(aug_rp,offset.rp);  vector<MX>::const_iterator aug_rp_split_it = aug_rp_split.begin();
+    vector<MX> aug_x_split = horzsplit(aug_x,offset.x);     vector<MX>::const_iterator aug_x_split_it = aug_x_split.begin();
+    vector<MX> aug_z_split = horzsplit(aug_z,offset.z);     vector<MX>::const_iterator aug_z_split_it = aug_z_split.begin();
+    vector<MX> aug_p_split = horzsplit(aug_p,offset.p);     vector<MX>::const_iterator aug_p_split_it = aug_p_split.begin();
+    vector<MX> aug_rx_split = horzsplit(aug_rx,offset.rx);  vector<MX>::const_iterator aug_rx_split_it = aug_rx_split.begin();
+    vector<MX> aug_rz_split = horzsplit(aug_rz,offset.rz);  vector<MX>::const_iterator aug_rz_split_it = aug_rz_split.begin();
+    vector<MX> aug_rp_split = horzsplit(aug_rp,offset.rp);  vector<MX>::const_iterator aug_rp_split_it = aug_rp_split.begin();
 
     // Temporary vector
     vector<MX> tmp;
@@ -404,9 +404,9 @@ namespace CasADi{
       f_in[DAE_X] = aug_x;
       f_in[DAE_Z] = aug_z;
       f_in[DAE_P] = aug_p;
-      if(!f_ode.empty()) f_out[DAE_ODE] = densify(vertcat(f_ode));
-      if(!f_alg.empty()) f_out[DAE_ALG] = densify(vertcat(f_alg));
-      if(!f_quad.empty()) f_out[DAE_QUAD] = densify(vertcat(f_quad));
+      if(!f_ode.empty()) f_out[DAE_ODE] = densify(horzcat(f_ode));
+      if(!f_alg.empty()) f_out[DAE_ALG] = densify(horzcat(f_alg));
+      if(!f_quad.empty()) f_out[DAE_QUAD] = densify(horzcat(f_quad));
       MXFunction f_mx(f_in,f_out);
       
       // Expand to SXFuncion?
@@ -428,9 +428,9 @@ namespace CasADi{
       g_in[RDAE_RX] = aug_rx;
       g_in[RDAE_RZ] = aug_rz;
       g_in[RDAE_RP] = aug_rp;
-      if(!g_ode.empty()) g_out[RDAE_ODE] = densify(vertcat(g_ode));
-      if(!g_alg.empty()) g_out[RDAE_ALG] = densify(vertcat(g_alg));
-      if(!g_quad.empty()) g_out[RDAE_QUAD] = densify(vertcat(g_quad));
+      if(!g_ode.empty()) g_out[RDAE_ODE] = densify(horzcat(g_ode));
+      if(!g_alg.empty()) g_out[RDAE_ALG] = densify(horzcat(g_alg));
+      if(!g_quad.empty()) g_out[RDAE_QUAD] = densify(horzcat(g_quad));
       MXFunction g_mx(g_in,g_out);
 
       // Expand to SXFuncion?
@@ -621,26 +621,26 @@ namespace CasADi{
 
     // Count nondifferentiated and forward sensitivities 
     for(int dir=-1; dir<nfwd; ++dir){
-      if( nx_>0) ret.x.push_back(x0().size1());
-      if( nz_>0) ret.z.push_back(z0().size1());
-      if( nq_>0) ret.q.push_back(qf().size1());
-      if( np_>0) ret.p.push_back(p().size1());
-      if(nrx_>0) ret.rx.push_back(rx0().size1());
-      if(nrz_>0) ret.rz.push_back(rz0().size1());
-      if(nrq_>0) ret.rq.push_back(rqf().size1());
-      if(nrp_>0) ret.rp.push_back(rp().size1());
+      if( nx_>0) ret.x.push_back(x0().size2());
+      if( nz_>0) ret.z.push_back(z0().size2());
+      if( nq_>0) ret.q.push_back(qf().size2());
+      if( np_>0) ret.p.push_back(p().size2());
+      if(nrx_>0) ret.rx.push_back(rx0().size2());
+      if(nrz_>0) ret.rz.push_back(rz0().size2());
+      if(nrq_>0) ret.rq.push_back(rqf().size2());
+      if(nrp_>0) ret.rp.push_back(rp().size2());
     }
 
     // Count adjoint sensitivities
     for(int dir=0; dir<nadj; ++dir){
-      if( nx_>0) ret.rx.push_back(x0().size1());
-      if( nz_>0) ret.rz.push_back(z0().size1());
-      if( np_>0) ret.rq.push_back(p().size1());
-      if( nq_>0) ret.rp.push_back(qf().size1());
-      if(nrx_>0) ret.x.push_back(rx0().size1());
-      if(nrz_>0) ret.z.push_back(rz0().size1());
-      if(nrp_>0) ret.q.push_back(rp().size1());
-      if(nrq_>0) ret.p.push_back(rqf().size1());
+      if( nx_>0) ret.rx.push_back(x0().size2());
+      if( nz_>0) ret.rz.push_back(z0().size2());
+      if( np_>0) ret.rq.push_back(p().size2());
+      if( nq_>0) ret.rp.push_back(qf().size2());
+      if(nrx_>0) ret.x.push_back(rx0().size2());
+      if(nrz_>0) ret.z.push_back(rz0().size2());
+      if(nrp_>0) ret.q.push_back(rp().size2());
+      if(nrq_>0) ret.p.push_back(rqf().size2());
     }
     
     // Get cummulative offsets
@@ -699,43 +699,43 @@ namespace CasADi{
       ss.clear();
       ss << "x0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_X0] = msym(ss.str(),x0().sparsity());
-      x0_aug.append(dd[INTEGRATOR_X0]);
+      dd[INTEGRATOR_X0] = MX::sym(ss.str(),x0().sparsity());
+      x0_aug.appendColumns(dd[INTEGRATOR_X0]);
 
       // Parameter
       ss.clear();
       ss << "p";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_P] = msym(ss.str(),p().sparsity());
-      p_aug.append(dd[INTEGRATOR_P]);
+      dd[INTEGRATOR_P] = MX::sym(ss.str(),p().sparsity());
+      p_aug.appendColumns(dd[INTEGRATOR_P]);
 
       // Initial guess for algebraic variable
       ss.clear();
       ss << "r0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_Z0] = msym(ss.str(),z0().sparsity());
-      z0_aug.append(dd[INTEGRATOR_Z0]);
+      dd[INTEGRATOR_Z0] = MX::sym(ss.str(),z0().sparsity());
+      z0_aug.appendColumns(dd[INTEGRATOR_Z0]);
     
       // Backward state
       ss.clear();
       ss << "rx0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RX0] = msym(ss.str(),rx0().sparsity());
-      rx0_aug.append(dd[INTEGRATOR_RX0]);
+      dd[INTEGRATOR_RX0] = MX::sym(ss.str(),rx0().sparsity());
+      rx0_aug.appendColumns(dd[INTEGRATOR_RX0]);
 
       // Backward parameter
       ss.clear();
       ss << "rp";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RP] = msym(ss.str(),rp().sparsity());
-      rp_aug.append(dd[INTEGRATOR_RP]);
+      dd[INTEGRATOR_RP] = MX::sym(ss.str(),rp().sparsity());
+      rp_aug.appendColumns(dd[INTEGRATOR_RP]);
 
       // Initial guess for backward algebraic variable
       ss.clear();
       ss << "rz0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RZ0] = msym(ss.str(),rz0().sparsity());
-      rz0_aug.append(dd[INTEGRATOR_RZ0]);
+      dd[INTEGRATOR_RZ0] = MX::sym(ss.str(),rz0().sparsity());
+      rz0_aug.appendColumns(dd[INTEGRATOR_RZ0]);
     
       // Add to input vector
       ret_in.insert(ret_in.end(),dd.begin(),dd.end());
@@ -748,38 +748,38 @@ namespace CasADi{
       // Differential states become backward differential state
       ss.clear();
       ss << "xf" << "_" << dir;
-      dd[INTEGRATOR_XF] = msym(ss.str(),xf().sparsity());
-      rx0_aug.append(dd[INTEGRATOR_XF]);
+      dd[INTEGRATOR_XF] = MX::sym(ss.str(),xf().sparsity());
+      rx0_aug.appendColumns(dd[INTEGRATOR_XF]);
 
       // Quadratures become backward parameters
       ss.clear();
       ss << "qf" << "_" << dir;
-      dd[INTEGRATOR_QF] = msym(ss.str(),qf().sparsity());
-      rp_aug.append(dd[INTEGRATOR_QF]);
+      dd[INTEGRATOR_QF] = MX::sym(ss.str(),qf().sparsity());
+      rp_aug.appendColumns(dd[INTEGRATOR_QF]);
 
       // Algebraic variables become backward algebraic variables
       ss.clear();
       ss << "zf" << "_" << dir;
-      dd[INTEGRATOR_ZF] = msym(ss.str(),zf().sparsity());
-      rz0_aug.append(dd[INTEGRATOR_ZF]);
+      dd[INTEGRATOR_ZF] = MX::sym(ss.str(),zf().sparsity());
+      rz0_aug.appendColumns(dd[INTEGRATOR_ZF]);
 
       // Backward differential states becomes forward differential states
       ss.clear();
       ss << "rxf" << "_" << dir;
-      dd[INTEGRATOR_RXF] = msym(ss.str(),rxf().sparsity());
-      x0_aug.append(dd[INTEGRATOR_RXF]);
+      dd[INTEGRATOR_RXF] = MX::sym(ss.str(),rxf().sparsity());
+      x0_aug.appendColumns(dd[INTEGRATOR_RXF]);
     
       // Backward quadratures becomes (forward) parameters
       ss.clear();
       ss << "rqf" << "_" << dir;
-      dd[INTEGRATOR_RQF] = msym(ss.str(),rqf().sparsity());
-      p_aug.append(dd[INTEGRATOR_RQF]);
+      dd[INTEGRATOR_RQF] = MX::sym(ss.str(),rqf().sparsity());
+      p_aug.appendColumns(dd[INTEGRATOR_RQF]);
 
       // Backward differential states becomes forward differential states
       ss.clear();
       ss << "rzf" << "_" << dir;
-      dd[INTEGRATOR_RZF] = msym(ss.str(),rzf().sparsity());
-      z0_aug.append(dd[INTEGRATOR_RZF]);
+      dd[INTEGRATOR_RZF] = MX::sym(ss.str(),rzf().sparsity());
+      z0_aug.appendColumns(dd[INTEGRATOR_RZF]);
     
       // Add to input vector
       ret_in.insert(ret_in.end(),dd.begin(),dd.end());
@@ -796,12 +796,12 @@ namespace CasADi{
     vector<MX> integrator_out = integrator.call(integrator_in);
   
     // Augmented results
-    vector<MX> xf_aug = vertsplit(integrator_out[INTEGRATOR_XF],offset.x);
-    vector<MX> qf_aug = vertsplit(integrator_out[INTEGRATOR_QF],offset.q);
-    vector<MX> zf_aug = vertsplit(integrator_out[INTEGRATOR_ZF],offset.z);
-    vector<MX> rxf_aug = vertsplit(integrator_out[INTEGRATOR_RXF],offset.rx);
-    vector<MX> rqf_aug = vertsplit(integrator_out[INTEGRATOR_RQF],offset.rq);
-    vector<MX> rzf_aug = vertsplit(integrator_out[INTEGRATOR_RZF],offset.rz);
+    vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF],offset.x);
+    vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF],offset.q);
+    vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF],offset.z);
+    vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF],offset.rx);
+    vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF],offset.rq);
+    vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF],offset.rz);
     vector<MX>::const_iterator xf_aug_it = xf_aug.begin();
     vector<MX>::const_iterator qf_aug_it = qf_aug.begin();
     vector<MX>::const_iterator zf_aug_it = zf_aug.begin();
@@ -890,9 +890,9 @@ namespace CasADi{
     integrator.setOption(dictionary());
   }
 
-  CRSSparsity IntegratorInternal::spJacF(){
+  Sparsity IntegratorInternal::spJacF(){
     // Start with the sparsity pattern of the ODE part
-    CRSSparsity ret = f_.jacSparsity(DAE_X,DAE_ODE);
+    Sparsity ret = f_.jacSparsity(DAE_X,DAE_ODE).transpose();
     
     // Add diagonal to get interdependencies
     ret = ret.patternUnion(sp_diag(nx_));
@@ -901,17 +901,17 @@ namespace CasADi{
     if(nz_==0) return ret;
 
     // Add contribution from algebraic variables and equations
-    CRSSparsity jac_ode_z = f_.jacSparsity(DAE_Z,DAE_ODE);
-    CRSSparsity jac_alg_x = f_.jacSparsity(DAE_X,DAE_ALG);
-    CRSSparsity jac_alg_z = f_.jacSparsity(DAE_Z,DAE_ALG);
-    ret = horzcat(ret,jac_ode_z);
-    ret.append(horzcat(jac_alg_x,jac_alg_z));
+    Sparsity jac_ode_z = f_.jacSparsity(DAE_Z,DAE_ODE).transpose();
+    Sparsity jac_alg_x = f_.jacSparsity(DAE_X,DAE_ALG).transpose();
+    Sparsity jac_alg_z = f_.jacSparsity(DAE_Z,DAE_ALG).transpose();
+    ret = vertcat(ret,jac_ode_z);
+    ret.appendColumns(vertcat(jac_alg_x,jac_alg_z));
     return ret;
   }
 
-  CRSSparsity IntegratorInternal::spJacG(){
+  Sparsity IntegratorInternal::spJacG(){
     // Start with the sparsity pattern of the ODE part
-    CRSSparsity ret = g_.jacSparsity(RDAE_RX,RDAE_ODE);
+    Sparsity ret = g_.jacSparsity(RDAE_RX,RDAE_ODE).transpose();
     
     // Add diagonal to get interdependencies
     ret = ret.patternUnion(sp_diag(nrx_));
@@ -920,11 +920,11 @@ namespace CasADi{
     if(nrz_==0) return ret;
 
     // Add contribution from algebraic variables and equations
-    CRSSparsity jac_ode_z = g_.jacSparsity(RDAE_RZ,RDAE_ODE);
-    CRSSparsity jac_alg_x = g_.jacSparsity(RDAE_RX,RDAE_ALG);
-    CRSSparsity jac_alg_z = g_.jacSparsity(RDAE_RZ,RDAE_ALG);
-    ret = horzcat(ret,jac_ode_z);
-    ret.append(horzcat(jac_alg_x,jac_alg_z));
+    Sparsity jac_ode_z = g_.jacSparsity(RDAE_RZ,RDAE_ODE).transpose();
+    Sparsity jac_alg_x = g_.jacSparsity(RDAE_RX,RDAE_ALG).transpose();
+    Sparsity jac_alg_z = g_.jacSparsity(RDAE_RZ,RDAE_ALG).transpose();
+    ret = vertcat(ret,jac_ode_z);
+    ret.appendColumns(vertcat(jac_alg_x,jac_alg_z));
     return ret;
   }
 

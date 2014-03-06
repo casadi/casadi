@@ -60,6 +60,9 @@ namespace CasADi{
 
     /// Get or generate a function to calculate the gradient of the objective function
     virtual FX getGradF();
+    
+    /// Get or generate a function to calculate the jacobian of the objective function
+    virtual FX getJacF();
   
     /// Get or generate a function to calculate the Jacobian of the constraint function
     virtual FX getJacG();
@@ -71,10 +74,13 @@ namespace CasADi{
     virtual FX getHessLag();
 
     /// Get or generate the sparsity pattern of the Hessian of the Lagrangian
-    virtual CRSSparsity getSpHessLag();
+    virtual Sparsity getSpHessLag();
     
     // Access the objective gradient function
     FX& gradF();
+    
+    // Access the objective jacobian function (sparse)
+    FX& jacF();
 
     /// Access the Jacobian of the constraint function
     FX& jacG();
@@ -86,7 +92,7 @@ namespace CasADi{
     FX& gradLag();
 
     /// Get the sparsity pattern of the Hessian of the Lagrangian
-    CRSSparsity& spHessLag();
+    Sparsity& spHessLag();
 
     /// Number of variables
     int nx_;
@@ -109,6 +115,9 @@ namespace CasADi{
     // Gradient of the objective
     FX gradF_;
     
+    // Gradient of the objective
+    FX jacF_;
+    
     // Jacobian of the constraints
     FX jacG_;
     
@@ -119,7 +128,7 @@ namespace CasADi{
     FX gradLag_;
 
     // Sparsity pattern of the Hessian of the Lagrangian
-    CRSSparsity spHessLag_;
+    Sparsity spHessLag_;
     
     /// A reference to this object to be passed to the user functions
     FX ref_;

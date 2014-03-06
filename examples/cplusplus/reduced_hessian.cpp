@@ -45,13 +45,13 @@ int main(){
    */
   
   // Optimization variables
-  SXMatrix x = ssym("x",3);
+  SX x = SX::sym("x",3);
   
   // Objective
-  SXMatrix f = pow(x[0]-1,2) + pow(x[1]-2,2) + pow(x[2]-3,2);
+  SX f = pow(x[0]-1,2) + pow(x[1]-2,2) + pow(x[2]-3,2);
   
   // Constraint
-  SXMatrix g = x[0]+2*x[1]+3*x[2];
+  SX g = x[0]+2*x[1]+3*x[2];
   
   // Infinity
   double inf = numeric_limits<double>::infinity();

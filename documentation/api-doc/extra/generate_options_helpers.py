@@ -31,7 +31,7 @@ def optionDocumented(name,cl,metadata):
 
 def addExtra(metadata):
 
-  x=SX("x")
+  x=SX.sym("x")
   f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
   i = IpoptSolver(f)
@@ -54,7 +54,7 @@ def addExtra(metadata):
     #  meta['description'] += "(" + "|".join(i.getOptionAllowed(name))  + ")"
 
   
-  x=SX("x")
+  x=SX.sym("x")
   f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
   try:

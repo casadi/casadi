@@ -41,7 +41,7 @@ namespace CasADi{
      *  \param[in] A  List of sparsities of A_i 
      *  \param[in] V  List of sparsities of V_i 
      */
-    DpleInternal(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V, int nfwd=0, int nadj=0);
+    DpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V, int nfwd=0, int nadj=0);
     
     /** \brief  Destructor */
     virtual ~DpleInternal()=0;
@@ -53,7 +53,7 @@ namespace CasADi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
   
     /** \brief  Create a new solver */
-    virtual DpleInternal* create(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V) const = 0;
+    virtual DpleInternal* create(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) const = 0;
   
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const{}
@@ -68,10 +68,10 @@ namespace CasADi{
     virtual FX getDerivative(int nfwd, int nadj)=0;
 
     /// List of sparsities of A_i 
-    std::vector< CRSSparsity > A_;
+    std::vector< Sparsity > A_;
     
     /// List of sparsities of V_i 
-    std::vector< CRSSparsity > V_;
+    std::vector< Sparsity > V_;
     
     /// Period
     int K_;

@@ -86,8 +86,8 @@ namespace CasADi{
     casadi_assert_message(f.output(DAE_ALG).empty() && f.input(DAE_Z).empty(),"Supplied function cannot have algebraic states.");
     casadi_assert_message(f.output(DAE_QUAD).empty(),"Supplied function cannot have quadrature states.");
 
-    MX X = msym("X",f.input(DAE_X).sparsity());
-    MX P = msym("P",f.input(DAE_P).sparsity());
+    MX X = MX::sym("X",f.input(DAE_X).sparsity());
+    MX P = MX::sym("P",f.input(DAE_P).sparsity());
     MX X0 = X;
     MX t = 0;
     MX dt = tf/ne;
@@ -141,12 +141,12 @@ namespace CasADi{
     D.resize(deg+1);
 
     // Collocation point
-    SXMatrix tau = ssym("tau");
+    SX tau = SX::sym("tau");
 
     // For all collocation points
     for(int j=0; j<deg+1; ++j){
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
-      SXMatrix L = 1;
+      SX L = 1;
       for(int j2=0; j2<deg+1; ++j2){
         if(j2 != j){
           L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
@@ -193,9 +193,9 @@ namespace CasADi{
     int np = f.input(DAE_P).size();
     
     //Variables for one finite element
-    MX X = msym("X",nx);
-    MX P = msym("P",np);
-    MX V = msym("V",order*(nx+nz)); // Unknowns
+    MX X = MX::sym("X",nx);
+    MX P = MX::sym("P",np);
+    MX V = MX::sym("V",order*(nx+nz)); // Unknowns
     
     MX X0 = X;
     
@@ -230,8 +230,8 @@ namespace CasADi{
     std::vector<MX> V_eq;
     
     // Local start time
-    MX t0_l=msym("t0");
-    MX h = msym("h");
+    MX t0_l=MX::sym("t0");
+    MX h = MX::sym("h");
 
     for (int j=1;j<order+1;++j) {
       // Expression for the state derivative at the collocation point

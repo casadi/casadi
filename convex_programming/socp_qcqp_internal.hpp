@@ -41,7 +41,7 @@ public:
   virtual SOCPQCQPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit SOCPQCQPInternal(const std::vector<CRSSparsity> &st);
+  explicit SOCPQCQPInternal(const std::vector<Sparsity> &st);
 
   /** \brief  Destructor */
   virtual ~SOCPQCQPInternal();

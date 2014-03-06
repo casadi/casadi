@@ -31,24 +31,70 @@ using namespace std;
 
 namespace CasADi{
 
-  MX vertcat(const vector<MX>& comp){
-    return MXNode::getVertcat(comp);
+  MX horzcat(const vector<MX>& comp){
+    return MXNode::getHorzcat(comp);
   }
 
-  std::vector<MX> vertsplit(const MX& x, const std::vector<int>& offset){
+  std::vector<MX> horzsplit(const MX& x, const std::vector<int>& offset){
     // Consistency check
     casadi_assert(offset.size()>=1);
     casadi_assert(offset.front()==0);
-    casadi_assert(offset.back()<=x.size1());
+    casadi_assert(offset.back()<=x.size2());
     casadi_assert(isMonotone(offset));
     
     // Trivial return if possible
-    if(offset.size()==1 && offset.back()==x.size1()){
+    if(offset.size()==1 && offset.back()==x.size2()){
       return vector<MX>(0);
-    } else if(offset.size()==1 || (offset.size()==2 && offset.back()==x.size1())){
+    } else if(offset.size()==1 || (offset.size()==2 && offset.back()==x.size2())){
       return vector<MX>(1,x);
     } else {
-      return x->getVertsplit(offset);
+      return x->getHorzsplit(offset);
+    }
+  }
+  
+  std::vector<MX> horzsplit(const MX& x, int incr){
+    casadi_assert(incr>=1);
+    return horzsplit(x,range(0,x.size2(),incr));
+  }
+
+  MX vertcat(const vector<MX>& comp){
+    // Check if vector
+    bool is_vector = true;
+    for(vector<MX>::const_iterator it=comp.begin(); it!=comp.end(); ++it){
+      // Rewrite with horzcat and transpose if not a vector
+      if(!it->isNull() && !(it->size1()==0 && it->size2()==0) && !it->vector()){
+        vector<MX> v(comp.size());
+        for(int i=0; i<v.size(); ++i)
+          v[i] = trans(comp[i]);
+        return trans(horzcat(v));
+      }
+    }
+
+    // Vector if reached this point
+    return MXNode::getVertcat(comp);
+  }
+  
+  std::vector<MX> vertsplit(const MX& x, const std::vector<int>& offset){
+    if(x.vector()){
+      // Consistency check
+      casadi_assert(offset.size()>=1);
+      casadi_assert(offset.front()==0);
+      casadi_assert(offset.back()<=x.size1());
+      casadi_assert(isMonotone(offset));
+    
+      // Trivial return if possible
+      if(offset.size()==1 && offset.back()==x.size1()){
+        return vector<MX>(0);
+      } else if(offset.size()==1 || (offset.size()==2 && offset.back()==x.size1())){
+        return vector<MX>(1,x);
+      } else {
+        return x->getVertsplit(offset);
+      }      
+    } else {
+      std::vector<MX> ret = horzsplit(trans(x),offset);
+      MX (*transMX)(const MX& x) = trans; 
+      std::transform(ret.begin(),ret.end(),ret.begin(),transMX);
+      return ret;
     }
   }
   
@@ -56,29 +102,10 @@ namespace CasADi{
     casadi_assert(incr>=1);
     return vertsplit(x,range(0,x.size1(),incr));
   }
-
-  MX horzcat(const vector<MX>& comp){
-    vector<MX> v(comp.size());
-    for(int i=0; i<v.size(); ++i)
-      v[i] = trans(comp[i]);
-    return trans(vertcat(v));
-  }
   
-  std::vector<MX> horzsplit(const MX& x, const std::vector<int>& offset){
-    std::vector<MX> ret = vertsplit(trans(x),offset);
-    MX (*transMX)(const MX& x) = trans; 
-    std::transform(ret.begin(),ret.end(),ret.begin(),transMX);
-    return ret;
-  }
-  
-  std::vector<MX> horzsplit(const MX& x, int incr){
-    casadi_assert(incr>=1);
-    return horzsplit(x,range(0,x.size2(),incr));
-  }
-  
-  std::vector< std::vector<MX > > blocksplit(const MX& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) {
-    std::vector<MX > rows = vertsplit(x,vert_offset);
-    std::vector< std::vector<MX > > ret;
+  std::vector< std::vector<MX> > blocksplit(const MX& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) {
+    std::vector<MX> rows = vertsplit(x,vert_offset);
+    std::vector< std::vector<MX> > ret;
     for (int i=0;i<rows.size();++i) {
       ret.push_back(horzsplit(rows[i],horz_offset));
     }
@@ -91,13 +118,6 @@ namespace CasADi{
     return blocksplit(x,range(0,x.size1(),vert_incr),range(0,x.size2(),horz_incr));
   }
 
-  MX vertcat(const MX& a, const MX& b){
-    vector<MX> ab;
-    ab.push_back(a);
-    ab.push_back(b);
-    return vertcat(ab);
-  }
-
   MX horzcat(const MX& a, const MX& b){
     vector<MX> ab;
     ab.push_back(a);
@@ -105,6 +125,13 @@ namespace CasADi{
     return horzcat(ab);
   }
 
+  MX vertcat(const MX& a, const MX& b){
+    vector<MX> ab;
+    ab.push_back(a);
+    ab.push_back(b);
+    return vertcat(ab);
+  }
+  
   MX veccat(const vector<MX>& comp) {
         MX (&f)(const MX&) = vec;
     return vertcat(applymap(f,comp));
@@ -113,16 +140,6 @@ namespace CasADi{
   MX vecNZcat(const vector<MX>& comp) {
     MX (&f)(const MX&) = vecNZ;
     return vertcat(applymap(vecNZ,comp));
-  }
-  
-  MX flattencat(const vector<MX>& comp) {
-        MX (&f)(const MX&) = flatten;
-    return vertcat(applymap(f,comp));
-  }
-
-  MX flattenNZcat(const vector<MX>& comp) {
-    MX (&f)(const MX&) = flattenNZ;
-    return vertcat(applymap(flattenNZ,comp));
   }
 
   MX norm_2(const MX &x){
@@ -141,7 +158,7 @@ namespace CasADi{
     return x->getNormInf();
   }
 
-  MX mul(const MX &x, const MX &y, const CRSSparsity& sp_z){
+  MX mul(const MX &x, const MX &y, const Sparsity& sp_z){
     return x.mul(y,sp_z);
   }
 
@@ -206,20 +223,18 @@ namespace CasADi{
       return x->getTranspose();
   }
 
-  MX reshape(const MX &x, const std::vector<int> sz){
-    if(sz.size() != 2)
-      throw CasadiException("MX::reshape: not two dimensions");
-    return reshape(x,sz[0],sz[1]);
+  MX reshape(const MX &x, std::pair<int,int> rc){
+    return reshape(x,rc.first,rc.second);
   }
 
-  MX reshape(const MX &x, int n, int m){
-    if(n==x.size1() && m==x.size2())
+  MX reshape(const MX &x, int nrow, int ncol){
+    if(nrow==x.size1() && ncol==x.size2())
       return x;
     else
-      return reshape(x,x.sparsity().reshape(n,m));
+      return reshape(x,x.sparsity().reshape(nrow,ncol));
   }
 
-  MX reshape(const MX &x, const CRSSparsity& sp){
+  MX reshape(const MX &x, const Sparsity& sp){
     // quick return if already the right shape
     if(sp==x.sparsity())
       return x;
@@ -231,35 +246,19 @@ namespace CasADi{
     return x->getReshape(sp);
   }
 
-  MX vec(const MX &x) {
-    if(x.size2()==1){
-      return x;
-    } else {
-      return reshape(trans(x),x.numel(),1);
-    }
-  }
-
-  MX flatten(const MX& x) {
-    if(x.size2()==1){
+  MX vec(const MX& x) {
+    if(x.vector()){
       return x;
     } else {
       return reshape(x,x.numel(),1);
     }
   }
-
+  
   MX vecNZ(const MX& x) {
     if(x.dense()){
       return vec(x);
     } else {
-      return trans(x)->getGetNonzeros(sp_dense(x.size()),range(x.size()));
-    }
-  }
-  
-  MX flattenNZ(const MX& x) {
-    if(x.dense()){
-      return flatten(x);
-    } else {
-      return x->getGetNonzeros(sp_dense(x.size()),range(x.size()));
+      return x->getGetNonzeros(sp_dense(x.size(),1),range(x.size()));
     }
   }
 
@@ -270,7 +269,7 @@ namespace CasADi{
   MX unite(const MX& A, const MX& B){
     // Join the sparsity patterns
     std::vector<unsigned char> mapping;
-    CRSSparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
+    Sparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
   
     // Split up the mapping
     std::vector<int> nzA,nzB;
@@ -302,8 +301,8 @@ namespace CasADi{
   bool isSymbolicSparse(const MX& ex){
     if(ex.isNull()){
       return false;
-    } else if(ex.getOp()==OP_VERTCAT){
-      // Check if the expression is a vertcat where all components are symbolic primitives
+    } else if(ex.getOp()==OP_HORZCAT){
+      // Check if the expression is a horzcat where all components are symbolic primitives
       for(int d=0; d<ex->ndep(); ++d){
         if(!ex->dep(d).isSymbolic()){
           return false;
@@ -316,9 +315,9 @@ namespace CasADi{
   }
 
   MX trace(const MX& A){
-    casadi_assert_message(A.size1() == A.size2(), "trace: must be square");
+    casadi_assert_message(A.size2() == A.size1(), "trace: must be square");
     MX res(0);
-    for (int i=0; i < A.size1(); i ++) {
+    for (int i=0; i < A.size2(); i ++) {
       res+=A(i,i);
     }
     return res;
@@ -330,17 +329,17 @@ namespace CasADi{
       return A;
   
     // First concatenate horizontally
-    MX row = horzcat(std::vector<MX >(m, A));
+    MX col = horzcat(std::vector<MX >(m, A));
   
     // Then vertically
-    return vertcat(std::vector<MX >(n, row));
+    return vertcat(std::vector<MX >(n, col));
   }
 
   /**
-     MX clip(const MX& A, const CRSSparsity& sp) {
+     MX clip(const MX& A, const Sparsity& sp) {
      // Join the sparsity patterns
      std::vector<int> mapping;
-     CRSSparsity sp = A.sparsity().patternIntersection(sp,mapping);
+     Sparsity sp = A.sparsity().patternIntersection(sp,mapping);
   
      // Split up the mapping
      std::vector<int> nzA,nzB;
@@ -397,17 +396,17 @@ namespace CasADi{
     }
   
     // Create the parent
-    MX P("P",index[deps.size()],1);
+    MX P = MX::sym("P",1,index[deps.size()]);
   
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      deps[k] = reshape(P(range(index[k],index[k+1])),deps[k].sparsity());
+      deps[k] = reshape(P(0,range(index[k],index[k+1])),deps[k].sparsity());
     }
   
     return P;
   }
 
-  std::pair<MX, std::vector<MX> > createParent(const std::vector<CRSSparsity> &deps) {
+  std::pair<MX, std::vector<MX> > createParent(const std::vector<Sparsity> &deps) {
     // Collect the sizes of the depenencies
     std::vector<int> index(deps.size()+1,0);
     for (int k=0;k<deps.size();k++) {
@@ -415,13 +414,13 @@ namespace CasADi{
     }
   
     // Create the parent
-    MX P("P",index[deps.size()],1);
+    MX P = MX::sym("P",1,index[deps.size()]);
   
     std::vector<MX> ret(deps.size());
   
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      ret[k] =  reshape(P(range(index[k],index[k+1])),deps[k]);
+      ret[k] =  reshape(P(0,range(index[k],index[k+1])),deps[k]);
     }
   
     return std::pair< MX, std::vector<MX> > (P,ret);
@@ -438,7 +437,7 @@ namespace CasADi{
     std::vector<int> mapping;
   
     // Get the sparsity
-    CRSSparsity sp = x.sparsity().diag(mapping);
+    Sparsity sp = x.sparsity().diag(mapping);
   
     // Create a reference to the nonzeros
     return x->getGetNonzeros(sp,mapping);
@@ -446,22 +445,20 @@ namespace CasADi{
   
   MX blkdiag(const std::vector<MX> &A) {
     // This implementation does not pretend to be efficient
-    int row=0;
-    int col=0;
+    int nrow=0, ncol=0;
     for (int i=0;i<A.size();++i) {
-      row+=A[i].size1();
-      col+=A[i].size2();
+      nrow += A[i].size1();
+      ncol += A[i].size2();
     }
     
-    MX ret = MX(row,col);
-    
-    row = 0;
-    col = 0;
+    MX ret = MX::sparse(nrow,ncol);
+    nrow = 0;
+    ncol = 0;
     
     for (int i=0;i<A.size();++i) {
-      ret(range(row,row+A[i].size1()),range(col,col+A[i].size2())) = A[i];
-      row+=A[i].size1();
-      col+=A[i].size2();
+      ret(range(nrow,nrow+A[i].size1()),range(ncol,ncol+A[i].size2())) = A[i];
+      nrow += A[i].size1();
+      ncol += A[i].size2();
     }
     
     return ret;
@@ -480,16 +477,16 @@ namespace CasADi{
     return f.countNodes();
   }
 
-  MX sumRows(const MX &x) {
-    return mul(MX::ones(1,x.size1()),x);
-  }
-
   MX sumCols(const MX &x) {
     return mul(x,MX::ones(x.size2(),1));
   }
 
+  MX sumRows(const MX &x) {
+    return mul(MX::ones(1,x.size1()),x);
+  }
+
   MX sumAll(const MX &x) {
-    return sumCols(sumRows(x));
+    return sumRows(sumCols(x));
   }
 
 
@@ -504,31 +501,15 @@ namespace CasADi{
   }
 
   bool isVector(const MX& ex){
-    return ex.size2()==1;
+    return ex.size1()==1;
   }
 
   bool isDense(const MX& ex){
     return ex.size() == ex.numel();
   }
 
-  MX msym(const std::string& name, int n, int m){
-    return MX(name,n,m);
-  }
-
-  MX msym(const std::string& name, const std::pair<int,int> & nm) {
-    return MX(name,nm.first,nm.second);
-  }
-
-  MX msym(const Matrix<double>& x){
-    return MX(x);
-  }
-
-  MX msym(const std::string& name, const CRSSparsity& sp) {
-    return MX(name,sp);
-  }
-
   bool isEqual(const MX& ex1,const MX &ex2){
-    if ((ex1.size()!=0 || ex2.size()!=0) && (ex1.size1()!=ex2.size1() || ex1.size2()!=ex2.size2())) return false;
+    if ((ex1.size()!=0 || ex2.size()!=0) && (ex1.size2()!=ex2.size2() || ex1.size1()!=ex2.size1())) return false;
     MX difference = ex1 - ex2;  
     return isZero(difference);
   }
@@ -618,34 +599,6 @@ namespace CasADi{
         }
       }
     }  
-  }
-
-  std::vector<MX> msym(const std::string& name, const CRSSparsity& sp, int p){
-    std::vector<MX> ret(p);
-    for(int k=0; k<p; ++k){
-      stringstream ss;
-      ss << name << "_" << k;
-      ret[k] = msym(ss.str(),sp);
-    }
-    return ret;
-  }
-
-  std::vector<std::vector<MX> > msym(const std::string& name, const CRSSparsity& sp, int p, int r){
-    std::vector<std::vector<MX> > ret(r);
-    for(int k=0; k<r; ++k){
-      stringstream ss;
-      ss << name << "_" << k;
-      ret[k] = msym(ss.str(),sp,p);
-    }
-    return ret;
-  }
-
-  std::vector<MX> msym(const std::string& name, int n, int m, int p){
-    return msym(name,sp_dense(n,m),p);
-  }
-
-  std::vector<std::vector<MX> > msym(const std::string& name, int n, int m, int p, int r){
-    return msym(name,sp_dense(n,m),p,r);
   }
 
   MX substitute(const MX &ex, const MX& v, const MX& vdef){
@@ -889,7 +842,7 @@ namespace CasADi{
               // Create a new variable
               v_name.str(string());
               v_name << v_prefix << v.size() << v_suffix;
-              v.push_back(MX(v_name.str()));
+              v.push_back(MX::sym(v_name.str()));
             
               // Use in calculations
               work[ind] = v.back();
@@ -940,10 +893,24 @@ namespace CasADi{
   }
 
   MX blockcat(const std::vector< std::vector<MX > > &v) {
-    std::vector< MX > ret;
-    for(int i=0; i<v.size(); ++i)
-      ret.push_back(horzcat(v[i]));
-    return vertcat(ret);
+    // Quick return if no block rows
+    if(v.empty()) return MX::sparse(0,0);
+
+    // Make sure same number of block columns
+    int ncols = v.front().size();
+    for(vector<vector<MX> >::const_iterator it=v.begin(); it!=v.end(); ++it){
+      casadi_assert_message(it->size()==ncols, "blockcat: Inconsistent number of blocl columns");
+    }
+
+    // Quick return if no block columns
+    if(v.front().empty()) return MX::sparse(0,0);
+
+    // Horizontally concatenate all columns for each row, then vertically concatenate rows
+    std::vector<MX> rows;
+    for(vector<vector<MX> >::const_iterator it=v.begin(); it!=v.end(); ++it){
+      rows.push_back(horzcat(*it));
+    }
+    return vertcat(rows);
   }
   
   MX blockcat(const MX &A,const MX &B,const MX &C,const MX &D) {
@@ -982,14 +949,14 @@ namespace CasADi{
     std::vector<MX> e_v(1,e);
     return matrix_expand(e_v,boundary).at(0);
   }
-  
+ 
   std::vector<MX> matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary) {
     
     // Create symbols for boundary nodes
     std::vector<MX> syms(boundary.size());
     
     for (int i=0;i<syms.size();++i) {
-      syms[i] = msym("x",boundary[i].sparsity());
+      syms[i] = MX::sym("x",boundary[i].sparsity());
     }
     
     // Substitute symbols for boundary nodes
@@ -1010,8 +977,8 @@ namespace CasADi{
   }
   
   MX kron(const MX& a, const MX& b) {
-    const CRSSparsity &a_sp = a.sparsity();
-    MX filler(b.size1(),b.size2());
+    const Sparsity &a_sp = a.sparsity();
+    MX filler = MX::sparse(b.shape());
     std::vector< std::vector< MX > > blocks(a.size1(),std::vector< MX >(a.size2(),filler));
     for (int i=0;i<a.size1();++i) {
       for (int j=0;j<a.size2();++j) {
@@ -1025,22 +992,22 @@ namespace CasADi{
   }
 
   MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict) {
-    LinearSolver mysolver = lsolver(A.sparsity(),1);
+    LinearSolver mysolver = lsolver(A.sparsity(),b.size2());
     mysolver.setOption(dict);
     mysolver.init();
-    return trans(mysolver.solve(A,trans(b),true));
+    return mysolver.solve(A,b,false);
   }
   
   MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict) {
-    if (A.size2()>=A.size1()) {
-      return trans(solve(mul(A,trans(A)),A,lsolver,dict));
-    } else {
+    if (A.size1()>=A.size2()) {
       return solve(mul(trans(A),A),trans(A),lsolver,dict);
+    } else {
+      return trans(solve(mul(A,trans(A)),A,lsolver,dict));
     }
   }
   
   MX nullspace(const MX& A) {
-    SXMatrix n = ssym("A",A.sparsity());
+    SX n = SX::sym("A",A.sparsity());
     SXFunction f(n,nullspace(n));
     f.init();
     return f.call(A)[0];

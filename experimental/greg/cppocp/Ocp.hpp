@@ -20,18 +20,18 @@ public:
      Ocp(void);
      ~Ocp(void);
 
-     void addNonlconIneq(CasADi::SXMatrix gNew);
-     void addNonlconIneq(CasADi::SXMatrix gNew, std::string name);      
-     void addNonlconEq(CasADi::SXMatrix gNew);
-     void addNonlconEq(CasADi::SXMatrix gNew, std::string name);
+     void addNonlconIneq(CasADi::SX gNew);
+     void addNonlconIneq(CasADi::SX gNew, std::string name);      
+     void addNonlconEq(CasADi::SX gNew);
+     void addNonlconEq(CasADi::SX gNew, std::string name);
 
-     CasADi::SXMatrix designVariables;
+     CasADi::SX designVariables;
      std::vector<double>lb;
      std::vector<double>ub;
      std::vector<double>guess;
 
      CasADi::SX objFun;
-     CasADi::SXMatrix g;
+     CasADi::SX g;
      std::vector<int> gSizes;
      std::vector<std::string> gLabels;
      std::vector<double> gMin;
@@ -81,7 +81,7 @@ private:
      int isParam(std::string paramName);
 
 
-     CasADi::SXMatrix getParamMat(void);
+     CasADi::SX getParamMat(void);
 
      int getParamIdx(std::string p);
 

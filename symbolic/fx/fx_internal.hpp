@@ -78,20 +78,20 @@ namespace CasADi{
     /** \brief  Reset the sparsity propagation */
     virtual void spInit(bool fwd){}
     
-    /** \brief  Evaluate symbolically, SX type, possibly nonmatching sparsity patterns */
-    virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                        const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                        const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
+    /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
+    virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res, 
+                        const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+                        const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens);
 
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
                         const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
                         const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens);
 
-    /** \brief  Evaluate symbolically, SX type, matching sparsity patterns */
-    virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                              const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                              const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
+    /** \brief  Evaluate symbolically, SXElement type, matching sparsity patterns */
+    virtual void evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res, 
+                              const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+                              const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens);
 
     /** \brief  Create function call node */
     virtual void createCall(const std::vector<MX> &arg, std::vector<MX> &res, 
@@ -112,10 +112,10 @@ namespace CasADi{
               const MXVectorVector& aseed, MXVectorVector& asens,
               bool always_inline, bool never_inline);
     
-    /** \brief Call a function, SX type (overloaded) */
-    void call(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-              const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-              const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
+    /** \brief Call a function, SXElement type (overloaded) */
+    void call(const std::vector<SX>& arg, std::vector<SX>& res, 
+              const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+              const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens,
               bool always_inline, bool never_inline);
         
     //@{
@@ -204,7 +204,7 @@ namespace CasADi{
     virtual void checkInputs() const {};
             
     /** \brief Get the unidirectional or bidirectional partition */
-    void getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& D2, bool compact, bool symmetric);
+    void getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2, bool compact, bool symmetric);
 
     /// Verbose mode?
     bool verbose() const;
@@ -231,22 +231,22 @@ namespace CasADi{
     GenericType getStat(const std::string & name) const;
     
     /// Generate the sparsity of a Jacobian block
-    virtual CRSSparsity getJacSparsity(int iind, int oind, bool symmetric);
+    virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric);
     
     /// A flavour of getJacSparsity without any magic
-    CRSSparsity getJacSparsityPlain(int iind, int oind);
+    Sparsity getJacSparsityPlain(int iind, int oind);
     
     /// A flavour of getJacSparsity that does hierachical block structure recognition
-    CRSSparsity getJacSparsityHierarchical(int iind, int oind);
+    Sparsity getJacSparsityHierarchical(int iind, int oind);
     
     /// A flavour of getJacSparsity that does hierachical block structure recognition for symmetric jacobians
-    CRSSparsity getJacSparsityHierarchicalSymm(int iind, int oind);
+    Sparsity getJacSparsityHierarchicalSymm(int iind, int oind);
     
     /// Generate the sparsity of a Jacobian block
-    void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact);
+    void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact);
     
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    CRSSparsity& jacSparsity(int iind, int oind, bool compact, bool symmetric);
+    Sparsity& jacSparsity(int iind, int oind, bool compact, bool symmetric);
     
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const;
@@ -255,11 +255,11 @@ namespace CasADi{
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
   
     /// Get a vector of symbolic variables with the same dimensions as the inputs
-    virtual std::vector<SXMatrix> symbolicInputSX() const;
+    virtual std::vector<SX> symbolicInputSX() const;
   
     // Workaround helper functions: assign nonzeros but ignore all -1
     static void assignIgnore(MX& y, const MX& x, const std::vector<int>& nz);
-    static void assignIgnore(SXMatrix& y, const SXMatrix& x, const std::vector<int>& nz);
+    static void assignIgnore(SX& y, const SX& x, const std::vector<int>& nz);
 
     //@{
     /** \brief Access input/output scheme */
@@ -298,7 +298,7 @@ namespace CasADi{
     // The following functions are called internally from EvaluateMX. For documentation, see the MXNode class
     //@{
     virtual void evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp);
-    virtual void evaluateSX(MXNode* node, const SXMatrixPtrV& arg, SXMatrixPtrV& res, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(MXNode* node, const SXPtrV& arg, SXPtrV& res, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
     virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given);
     virtual void propagateSparsity(MXNode* node, DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
     virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);
@@ -331,7 +331,7 @@ namespace CasADi{
     WeakRef full_jacobian_;
 
     /// Cache for sparsities of the Jacobian blocks
-    Matrix<CRSSparsity> jac_sparsity_, jac_sparsity_compact_;
+    Matrix<Sparsity> jac_sparsity_, jac_sparsity_compact_;
 
     /// Cache for Jacobians
     Matrix<WeakRef> jac_, jac_compact_;

@@ -26,35 +26,35 @@ using namespace std;
 namespace CasADi{
 
 
-QPSolver::QPSolver() {
-}
+  QPSolver::QPSolver() {
+  }
 
-QPSolverInternal* QPSolver::operator->(){
-  return static_cast<QPSolverInternal*>(FX::operator->());
-}
+  QPSolverInternal* QPSolver::operator->(){
+    return static_cast<QPSolverInternal*>(FX::operator->());
+  }
 
-const QPSolverInternal* QPSolver::operator->() const{
+  const QPSolverInternal* QPSolver::operator->() const{
     return static_cast<const QPSolverInternal*>(FX::operator->());
-}
+  }
 
-bool QPSolver::checkNode() const{
-  return dynamic_cast<const QPSolverInternal*>(get())!=0;
-}
+  bool QPSolver::checkNode() const{
+    return dynamic_cast<const QPSolverInternal*>(get())!=0;
+  }
 
-void QPSolver::setLPOptions() {
-  (*this)->setLPOptions();
-}
+  void QPSolver::setLPOptions() {
+    (*this)->setLPOptions();
+  }
 
-void QPSolver::generateNativeCode(const std::string &filename) const {
-  std::ofstream file;
-  file.open (filename.c_str());
+  void QPSolver::generateNativeCode(const std::string &filename) const {
+    std::ofstream file;
+    file.open (filename.c_str());
   
-  (*this)->generateNativeCode(file);
-}
+    (*this)->generateNativeCode(file);
+  }
 
-void QPSolver::generateNativeCode(std::ostream &file) const {
-  (*this)->generateNativeCode(file);
-}
+  void QPSolver::generateNativeCode(std::ostream &file) const {
+    (*this)->generateNativeCode(file);
+  }
 
 } // namespace CasADi
 

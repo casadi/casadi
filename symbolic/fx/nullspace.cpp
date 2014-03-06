@@ -30,11 +30,11 @@ namespace CasADi{
   }
 
   NullspaceInternal* Nullspace::operator->(){
-    return (NullspaceInternal*)(FX::operator->());
+    return static_cast<NullspaceInternal*>(FX::operator->());
   }
 
   const NullspaceInternal* Nullspace::operator->() const{
-    return (const NullspaceInternal*)(FX::operator->()); 
+    return static_cast<const NullspaceInternal*>(FX::operator->()); 
   }
 
   bool Nullspace::checkNode() const{

@@ -39,23 +39,23 @@ int main(){
   int nj = 100; // Number of integration steps per control segment
 
   // optimization variable
-  SXMatrix u = ssym("u",nu); // control
+  SX u = SX::sym("u",nu); // control
 
-  SXMatrix s_0 = 0; // initial position
-  SXMatrix v_0 = 0; // initial speed
-  SXMatrix m_0 = 1; // initial mass
+  SX s_0 = 0; // initial position
+  SX v_0 = 0; // initial speed
+  SX m_0 = 1; // initial mass
   
-  SXMatrix dt = 10.0/(nj*nu); // time step
-  SXMatrix alpha = 0.05; // friction
-  SXMatrix beta = 0.1; // fuel consumption rate
+  SX dt = 10.0/(nj*nu); // time step
+  SX alpha = 0.05; // friction
+  SX beta = 0.1; // fuel consumption rate
 
   // Trajectory
-  SXMatrix s_traj = SXMatrix::zeros(nu);
-  SXMatrix v_traj = SXMatrix::zeros(nu);
-  SXMatrix m_traj = SXMatrix::zeros(nu);
+  SX s_traj = SX::zeros(nu);
+  SX v_traj = SX::zeros(nu);
+  SX m_traj = SX::zeros(nu);
 
   // Integrate over the interval with Euler forward
-  SXMatrix s = s_0, v = v_0, m = m_0;
+  SX s = s_0, v = v_0, m = m_0;
   for(int k=0; k<nu; ++k){
     for(int j=0; j<nj; ++j){
       s += dt*v;
@@ -68,10 +68,10 @@ int main(){
   }
 
   // Objective function
-  SXMatrix f = inner_prod(u,u);
+  SX f = inner_prod(u,u);
     
   // Terminal constraints
-  SXMatrix g;
+  SX g;
   g.append(s);
   g.append(v);
   g.append(v_traj);
@@ -121,7 +121,7 @@ int main(){
 
   // Get the state trajectory
   vector<double> sopt(nu), vopt(nu), mopt(nu);
-  vector<Matrix<SX> > xfcn_out(3);
+  vector<SX> xfcn_out(3);
   xfcn_out[0] = s_traj;
   xfcn_out[1] = v_traj;
   xfcn_out[2] = m_traj;

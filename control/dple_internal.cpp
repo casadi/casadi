@@ -35,7 +35,7 @@ OUTPUTSCHEME(DPLEOutput)
 using namespace std;
 namespace CasADi{
 
-  DpleInternal::DpleInternal(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V,int nfwd, int nadj) : A_(A), V_(V), nfwd_(nfwd), nadj_(nadj) {
+  DpleInternal::DpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V,int nfwd, int nadj) : A_(A), V_(V), nfwd_(nfwd), nadj_(nadj) {
 
     // set default options
     setOption("name","unnamed_dple_solver"); // name of the function 
@@ -85,8 +85,8 @@ namespace CasADi{
     
     for (int i=0;i<nfwd_+1;++i) {
       if (const_dim_) {
-        input(DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(vertcat(A_));
-        input(DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(vertcat(V_));
+        input(DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(horzcat(A_));
+        input(DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(horzcat(V_));
       } else {
         input(DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(blkdiag(A_));
         input(DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(blkdiag(V_));
@@ -94,29 +94,29 @@ namespace CasADi{
     }
     for (int i=0;i<nadj_;++i) {
       if (const_dim_) {
-        input(DPLE_NUM_IN*(1+nfwd_)+DPLE_NUM_OUT*i+DPLE_P)  = DMatrix::zeros(vertcat(A_));
+        input(DPLE_NUM_IN*(1+nfwd_)+DPLE_NUM_OUT*i+DPLE_P)  = DMatrix::zeros(horzcat(A_));
       } else {
         input(DPLE_NUM_IN*(1+nfwd_)+DPLE_NUM_OUT*i+DPLE_P)  = DMatrix::zeros(blkdiag(A_));
       }
     }
     
     // Allocate outputs
-    std::vector<CRSSparsity> P; 
+    std::vector<Sparsity> P; 
     for (int k=0;k<K_;++k) {
       P.push_back(sp_dense(V_[k].size1(),V_[k].size1()));
     }
     setNumOutputs(DPLE_NUM_OUT*(1+nfwd_) + DPLE_NUM_IN*nadj_);
     for (int i=0;i<nfwd_+1;++i) {
       if (const_dim_) {
-        output(DPLE_NUM_OUT*i+DPLE_P) = DMatrix::zeros(vertcat(P));
+        output(DPLE_NUM_OUT*i+DPLE_P) = DMatrix::zeros(horzcat(P));
       } else {
         output(DPLE_NUM_OUT*i+DPLE_P) = DMatrix::zeros(blkdiag(P));
       }
     }
     for (int i=0;i<nadj_;++i) {
       if (const_dim_) {
-        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(vertcat(A_));
-        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(vertcat(V_));
+        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(horzcat(A_));
+        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(horzcat(V_));
       } else {
         output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(blkdiag(A_));
         output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(blkdiag(V_));

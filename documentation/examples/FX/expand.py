@@ -25,8 +25,8 @@ from casadi import *
 import casadi as c
 
 #! We construct a simple MX expression
-x = msym("x",2,2)
-y = msym("y",2,1)
+x = MX.sym("x",2,2)
+y = MX.sym("y",2,1)
 
 z = mul(x,y)
 
@@ -50,7 +50,7 @@ print "Expanded expression = ", fSX.outputExpr(0)
 #!
 linear_solver = CSparse(x.sparsity())
 linear_solver.init()
-g = linear_solver.solve(x,y.T)
+g = linear_solver.solve(x,y)
 G = MXFunction([x,y],[g])
 G.init()
 

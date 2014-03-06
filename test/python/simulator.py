@@ -39,9 +39,9 @@ class Simulatortests(casadiTestCase):
 
   def setUp(self):
     # Reference solution is q0 e^((t^3-t0^3)/(3 p))
-    t=ssym("t")
-    q=ssym("q")
-    p=ssym("p")
+    t=SX.sym("t")
+    q=SX.sym("q")
+    p=SX.sym("p")
     f=SXFunction(daeIn(t=t,x=q,p=p),daeOut(ode=q/p*t**2))
     f.init()
     integrator = CVodesIntegrator(f)
@@ -52,8 +52,8 @@ class Simulatortests(casadiTestCase):
     integrator.setOption("t0",0)
     integrator.setOption("tf",2.3)
     integrator.init()
-    q0   = MX("q0")
-    par  = MX("p")
+    q0   = MX.sym("q0")
+    par  = MX.sym("p")
     qend, = integratorOut(integrator.call(integratorIn(x0=q0,p=par)),"xf")
     qe=MXFunction([q0,par],[qend])
     qe.init()
@@ -72,9 +72,9 @@ class Simulatortests(casadiTestCase):
     N = 4
     tc = DMatrix(n.linspace(0,num['tend'],N))
     
-    t=ssym("t")
-    q=ssym("q")
-    p=ssym("p")
+    t=SX.sym("t")
+    q=SX.sym("q")
+    p=SX.sym("p")
     
     out = SXFunction(daeIn(t=t, x=q, p=p),[q])
     out.init()
@@ -107,10 +107,10 @@ class Simulatortests(casadiTestCase):
     N = 4
     tc = DMatrix(n.linspace(0,num['tend'],N))
     
-    t=ssym("t")
-    q=ssym("q")
-    p=ssym("p")
-    u=ssym("u")
+    t=SX.sym("t")
+    q=SX.sym("q")
+    p=SX.sym("p")
+    u=SX.sym("u")
     out = SXFunction(controldaeIn(t=t, x=q, p=p),[q])
     out.init()
         
@@ -133,9 +133,9 @@ class Simulatortests(casadiTestCase):
     sim.setOption("integrator_options",{"reltol": 1e-15, "abstol": 1e-15, "fsens_err_con": True})
     sim.init()
     
-    U = ssym("U",N-1)
+    U = SX.sym("U",N-1)
     
-    result = SXMatrix(q)
+    result = SX(q)
     for i in range(N-1):
       tf = tc[i+1]
       t0 = tc[i]
@@ -158,9 +158,9 @@ class Simulatortests(casadiTestCase):
     num = self.num
     tc = DMatrix(n.linspace(0,num['tend'],100))
     
-    t=ssym("t")
-    q=ssym("q")
-    p=ssym("p")
+    t=SX.sym("t")
+    q=SX.sym("q")
+    p=SX.sym("p")
     
     out = SXFunction(daeIn(t=t, x=q, p=p),[q,t,p])
     out.init()
@@ -260,7 +260,7 @@ class Simulatortests(casadiTestCase):
 
     self.checkarray(sim.getOutput(),DMatrix(q0*exp(t**3/(3*p))),"Evaluation output mismatch",digits=9)
 
-    tv = SX("t")
+    tv = SXElement.sym("t")
     out = SXFunction(daeIn(t=tv),[tv])
     
     out.init()
@@ -272,7 +272,7 @@ class Simulatortests(casadiTestCase):
 
     self.checkarray(sim.getOutput(),t,"Evaluation output mismatch")
 
-    pv = SX("p")
+    pv = SXElement.sym("p")
     out = SXFunction(daeIn(p=pv),[pv])
     
     out.init()
@@ -285,7 +285,7 @@ class Simulatortests(casadiTestCase):
     
     self.checkarray(sim.getOutput(),DMatrix.ones(sim.output().shape)*p,"Evaluation output mismatch")
 
-    #yv = SX("y")
+    #yv = SXElement.sym("y")
     #out = SXFunction(daeIn(),[yv])
     
     #out.init()
@@ -302,14 +302,14 @@ class Simulatortests(casadiTestCase):
     self.message("ControlSimulator: inputs")
     num=self.num
     tc = 0.01*DMatrix([0,8,16,24,32])
-    t  = ssym("t")
-    q  = ssym("q")
-    p  = ssym("p")
+    t  = SX.sym("t")
+    q  = SX.sym("q")
+    p  = SX.sym("p")
     
-    t0 = ssym("t0")
-    tf_= ssym("tf")
+    t0 = SX.sym("t0")
+    tf_= SX.sym("tf")
     
-    qm = ssym("qm")
+    qm = SX.sym("qm")
     
     out = SXFunction(controldaeIn(t=t, x=q, p=p, t0=t0, tf=tf_, x_major=qm),[q,t,p,t0,tf_,qm])
     out.init()
@@ -395,9 +395,9 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.getOutput(4),num['q0']*exp(-sim.getOutput(2)),"Evaluation output mismatch",digits=9)
 
   def test_controlsim_interpolation(self):
-    q  = ssym("q")
-    u  = ssym("u")
-    ui = ssym("ui")
+    q  = SX.sym("q")
+    u  = SX.sym("u")
+    ui = SX.sym("ui")
 
 
     
@@ -475,9 +475,9 @@ class Simulatortests(casadiTestCase):
     self.message("CVodes integration: outputs")
     num=self.num
     tc = 0.01*DMatrix([0,8,16,24,32])
-    t=ssym("t")
-    q=ssym("q")
-    p=ssym("p")
+    t=SX.sym("t")
+    q=SX.sym("q")
+    p=SX.sym("p")
     f=SXFunction(controldaeIn(t=t, x=q, p=p),[q/p*t**2])
     f.init()
     sim = ControlSimulator(f,tc)

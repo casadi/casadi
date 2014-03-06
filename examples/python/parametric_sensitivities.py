@@ -38,10 +38,10 @@ Test problem (Ganesh & Biegler, A reduced Hessian strategy for sensitivity analy
 """
 
 # Optimization variables
-x = ssym("x",3)
+x = SX.sym("x",3)
   
  # Parameters
-p = ssym("p",2)
+p = SX.sym("p",2)
   
 # Objective
 f = x[0]*x[0] + x[1]*x[1] + x[2]*x[2]

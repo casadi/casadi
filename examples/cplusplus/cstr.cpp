@@ -61,9 +61,9 @@ int main(){
   ocp.variable("cstr.T").setMax(350);
   
   // Variables
-  SXMatrix t = ocp.t;
-  SXMatrix x = var(ocp.x);
-  SXMatrix u = var(ocp.u);
+  SX t = ocp.t;
+  SX x = var(ocp.x);
+  SX u = var(ocp.u);
     
   // Initial guess and bounds for the state
   vector<double> x0 = getStart(ocp.x,true);
@@ -85,7 +85,7 @@ int main(){
   integrator_options["tf"]=ocp.tf/num_nodes;
 
   // Mayer objective function
-  SXMatrix xf = ssym("xf",x.size(),1);
+  SX xf = SX::sym("xf",x.size(),1);
   SXFunction mterm(xf, xf[0]);
   
   // DAE residual function

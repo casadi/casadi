@@ -87,9 +87,9 @@ namespace CasADi{
     }
 
     // Allocate a QP solver
-    CRSSparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity() : sp_dense(nx_,nx_);
-    H_sparsity = H_sparsity + DMatrix::eye(nx_).sparsity();
-    CRSSparsity A_sparsity = jacG().isNull() ? CRSSparsity(0,nx_,false) : jacG().output().sparsity();
+    Sparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity() : sp_dense(nx_,nx_);
+    H_sparsity = H_sparsity + sp_diag(nx_);
+    Sparsity A_sparsity = jacG().isNull() ? Sparsity(0,nx_,false) : jacG().output().sparsity();
 
     QPSolverCreator qp_solver_creator = getOption("qp_solver");
     qp_solver_ = qp_solver_creator(qpStruct("h",H_sparsity,"a",A_sparsity));
@@ -141,28 +141,28 @@ namespace CasADi{
     // Create Hessian update function
     if(!exact_hessian_){
       // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
-      SXMatrix Bk = ssym("Bk",H_sparsity);
-      SXMatrix x = ssym("x",input(NLP_SOLVER_X0).sparsity());
-      SXMatrix x_old = ssym("x",x.sparsity());
-      SXMatrix gLag = ssym("gLag",x.sparsity());
-      SXMatrix gLag_old = ssym("gLag_old",x.sparsity());
+      SX Bk = SX::sym("Bk",H_sparsity);
+      SX x = SX::sym("x",input(NLP_SOLVER_X0).sparsity());
+      SX x_old = SX::sym("x",x.sparsity());
+      SX gLag = SX::sym("gLag",x.sparsity());
+      SX gLag_old = SX::sym("gLag_old",x.sparsity());
     
-      SXMatrix sk = x - x_old;
-      SXMatrix yk = gLag - gLag_old;
-      SXMatrix qk = mul(Bk, sk);
+      SX sk = x - x_old;
+      SX yk = gLag - gLag_old;
+      SX qk = mul(Bk, sk);
     
       // Calculating theta
-      SXMatrix skBksk = inner_prod(sk, qk);
-      SXMatrix omega = if_else(inner_prod(yk, sk) < 0.2 * inner_prod(sk, qk),
+      SX skBksk = inner_prod(sk, qk);
+      SX omega = if_else(inner_prod(yk, sk) < 0.2 * inner_prod(sk, qk),
                                0.8 * skBksk / (skBksk - inner_prod(sk, yk)),
                                1);
       yk = omega * yk + (1 - omega) * qk;
-      SXMatrix theta = 1. / inner_prod(sk, yk);
-      SXMatrix phi = 1. / inner_prod(qk, sk);
-      SXMatrix Bk_new = Bk + theta * mul(yk, trans(yk)) - phi * mul(qk, trans(qk));
+      SX theta = 1. / inner_prod(sk, yk);
+      SX phi = 1. / inner_prod(qk, sk);
+      SX Bk_new = Bk + theta * mul(yk, trans(yk)) - phi * mul(qk, trans(qk));
     
       // Inputs of the BFGS update function
-      vector<SXMatrix> bfgs_in(BFGS_NUM_IN);
+      vector<SX> bfgs_in(BFGS_NUM_IN);
       bfgs_in[BFGS_BK] = Bk;
       bfgs_in[BFGS_X] = x;
       bfgs_in[BFGS_X_OLD] = x_old;
@@ -484,12 +484,12 @@ namespace CasADi{
         // BFGS with careful updates and restarts
         if (iter % lbfgs_memory_ == 0){
           // Reset Hessian approximation by dropping all off-diagonal entries
-          const vector<int>& rowind = Bk_.rowind();      // Access sparsity (row offset)
-          const vector<int>& col = Bk_.col();            // Access sparsity (column)
+          const vector<int>& colind = Bk_.colind();      // Access sparsity (column offset)
+          const vector<int>& row = Bk_.row();            // Access sparsity (row)
           vector<double>& data = Bk_.data();             // Access nonzero elements
-          for(int i=0; i<rowind.size()-1; ++i){          // Loop over the rows of the Hessian
-            for(int el=rowind[i]; el<rowind[i+1]; ++el){ // Loop over the nonzero elements of the row
-              if(i!=col[el]) data[el] = 0;               // Remove if off-diagonal entries
+          for(int cc=0; cc<colind.size()-1; ++cc){          // Loop over the columns of the Hessian
+            for(int el=colind[cc]; el<colind[cc+1]; ++el){ // Loop over the nonzero elements of the column
+              if(cc!=row[el]) data[el] = 0;               // Remove if off-diagonal entries
             }
           }
         }
@@ -604,22 +604,22 @@ namespace CasADi{
     casadi_assert(x.size()==A.size1() && x.size()==A.size2());
   
     // Access the internal data of A
-    const std::vector<int> &A_rowind = A.rowind();
-    const std::vector<int> &A_col = A.col();
+    const std::vector<int> &A_colind = A.colind();
+    const std::vector<int> &A_row = A.row();
     const std::vector<double> &A_data = A.data();
   
     // Return value
     double ret=0;
 
-    // Loop over the rows of A
-    for(int i=0; i<x.size(); ++i){
+    // Loop over the columns of A
+    for(int cc=0; cc<x.size(); ++cc){
       // Loop over the nonzeros of A
-      for(int el=A_rowind[i]; el<A_rowind[i+1]; ++el){
-        // Get column
-        int j = A_col[el];
+      for(int el=A_colind[cc]; el<A_colind[cc+1]; ++el){
+        // Get row
+        int rr = A_row[el];
       
         // Add contribution
-        ret += x[i]*A_data[el]*x[j];
+        ret += x[cc]*A_data[el]*x[rr];
       }
     }
   
@@ -640,15 +640,15 @@ namespace CasADi{
   }
 
   double SQPInternal::getRegularization(const Matrix<double>& H){
-    const vector<int>& rowind = H.rowind();
-    const vector<int>& col = H.col();
+    const vector<int>& colind = H.colind();
+    const vector<int>& row = H.row();
     const vector<double>& data = H.data();
     double reg_param = 0;
-    for(int i=0; i<rowind.size()-1; ++i){
+    for(int cc=0; cc<colind.size()-1; ++cc){
       double mineig = 0;
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        int j = col[el];
-        if(i == j){
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
+        int rr = row[el];
+        if(rr == cc){
           mineig += data[el];
         } else {
           mineig -= fabs(data[el]);
@@ -660,14 +660,14 @@ namespace CasADi{
   }
   
   void SQPInternal::regularize(Matrix<double>& H, double reg){
-    const vector<int>& rowind = H.rowind();
-    const vector<int>& col = H.col();
+    const vector<int>& colind = H.colind();
+    const vector<int>& row = H.row();
     vector<double>& data = H.data();
     
-    for(int i=0; i<rowind.size()-1; ++i){
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        int j = col[el];
-        if(i==j){
+    for(int cc=0; cc<colind.size()-1; ++cc){
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
+        int rr = row[el];
+        if(rr==cc){
           data[el] += reg;
         }
       }

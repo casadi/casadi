@@ -124,10 +124,10 @@ void reportConstraints(std::ostream &stream,const Matrix<double> &v, const Matri
 FX parameterizeTime(FX dae) {
 
    // dimensionless time
-   MX tau("tau");
+   MX tau = MX::sym("tau");
    
    // The dae parameters augmented with t0 and tf
-   MX P("P",2+dae.input(DAE_P).size());
+   MX P = MX::sym("P",1,2+dae.input(DAE_P).size());
    MX t0 = P[0];
    MX tf = P[1];
    
@@ -138,7 +138,7 @@ FX parameterizeTime(FX dae) {
      dae_in[DAE_T]    = t0 + (tf-t0)*tau;
    }
    
-   dae_in[DAE_P]    = reshape(P[range(2,2+dae.input(DAE_P).size())],dae.input(DAE_P).sparsity());
+   dae_in[DAE_P]    = reshape(trans(P[range(2,2+dae.input(DAE_P).size())]),dae.input(DAE_P).sparsity());
    dae_in[DAE_X]    = dae_input[DAE_X];
 
    std::vector<MX> ret_in(DAE_NUM_IN);
@@ -165,10 +165,10 @@ FX parameterizeTime(FX dae) {
  
 FX parameterizeTimeOutput(FX f) {
   // dimensionless time
-   MX tau("tau");
+   MX tau = MX::sym("tau");
    
    // The f parameters augmented with t0 and tf
-   MX P("P",2+f.input(DAE_P).size());
+   MX P = MX::sym("P",1,2+f.input(DAE_P).size());
    MX t0 = P[0];
    MX tf = P[1];
    
@@ -179,7 +179,7 @@ FX parameterizeTimeOutput(FX f) {
      f_in[DAE_T]    = t0 + (tf-t0)*tau;
    }
    
-   f_in[DAE_P]    = reshape(P[range(2,2+f.input(DAE_P).size())],f.input(DAE_P).sparsity());
+   f_in[DAE_P]    = reshape(trans(P[range(2,2+f.input(DAE_P).size())]),f.input(DAE_P).sparsity());
    f_in[DAE_X]    = f_input[DAE_X];
 
    std::vector<MX> ret_in(DAE_NUM_IN);
@@ -206,16 +206,16 @@ Matrix<double> numSample1D(FX &fx, const Matrix<double> &grid) {
   // Can be parallelized
   casadi_assert_message(fx.isInit(),"numSample1D:: supplied function must be initialized.");
   casadi_assert_message(fx.getNumInputs()>=1,"numSample1D:: supplied function must have at least one input.");
-  casadi_assert_message(fx.input().size2()==1, "numSample1D:: supplied fx must have a column-matrix-like first input, but you supplied a shape " << fx.input().dimString() << ".");
+  casadi_assert_message(fx.input().size1()==1, "numSample1D:: supplied fx must have a row-matrix-like first input, but you supplied a shape " << fx.input().dimString() << ".");
   casadi_assert_message(fx.input().dense()==1, "numSample1D:: supplied fx must have dense input, but you supplied " << fx.input().dimString() << ".");
-  casadi_assert_message(grid.size1()==fx.input().size1(), "numSample1D:: supplied grid has a shape " << grid.dimString() << ", but the column size does not match the column size of the supplied fx first input, which is " << fx.input().dimString() << ".");
-  std::vector< Matrix<double> > ret(grid.size2());
-  for (int j=0;j<grid.size2();++j) {
-    fx.input().set(grid(ALL,j));
+  casadi_assert_message(grid.size2()==fx.input().size2(), "numSample1D:: supplied grid has a shape " << grid.dimString() << ", but the row size does not match the row size of the supplied fx first input, which is " << fx.input().dimString() << ".");
+  std::vector< Matrix<double> > ret(grid.size1());
+  for (int j=0;j<grid.size1();++j) {
+    fx.input().set(grid(j,ALL));
     fx.evaluate();
     ret[j] = Matrix<double>(fx.output());
   }
-  return horzcat(ret);
+  return vertcat(ret);
 }
     
 Matrix<double> numSample1DT(FX &fx, const Matrix<double> &grid) {

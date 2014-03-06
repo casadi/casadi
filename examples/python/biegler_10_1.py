@@ -41,10 +41,10 @@ for N in range(1,11):
   #tau_root = [0, 0.155051, 0.644949, 1]
 
   # Time
-  t = ssym("t")
+  t = SX.sym("t")
   
   # Differential equation
-  z = ssym("z")
+  z = SX.sym("z")
   F = SXFunction([z],[z*z - 2*z + 1])
   F.setOption("name","dz/dt")
   F.init()
@@ -56,7 +56,7 @@ for N in range(1,11):
   z_analytic.setOption("name","analytic solution")
   
   # Collocation point
-  tau = ssym("tau")
+  tau = SX.sym("tau")
 
   # Step size
   h = 1.0/N
@@ -98,11 +98,11 @@ for N in range(1,11):
   print "C = ", C
   
   # Collocated states
-  Z = ssym("Z",N,K+1)
+  Z = SX.sym("Z",N,K+1)
     
   # Construct the NLP
   x = vec(Z.T)
-  g = SXMatrix()
+  g = SX()
   for i in range(N):
     for k in range(1,K+1):
       # Add collocation equations to NLP

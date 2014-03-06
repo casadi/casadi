@@ -156,7 +156,7 @@ public:
   //@}
   
   /** \brief Expand the matrix valued graph into a scalar valued graph */
-  SXFunction expand(const std::vector<SXMatrix>& inputv = std::vector<SXMatrix>());
+  SXFunction expand(const std::vector<SX>& inputv = std::vector<SX>());
   
   /** \brief Get all the free variables of the function */
   std::vector<MX> getFree() const;

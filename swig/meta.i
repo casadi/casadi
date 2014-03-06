@@ -28,11 +28,11 @@
 #include "symbolic/generic_type.hpp"
 #include "symbolic/casadi_types.hpp"
 #include "symbolic/options_functionality.hpp"
-#include "symbolic/matrix/crs_sparsity.hpp"
+#include "symbolic/matrix/sparsity.hpp"
 #include "symbolic/matrix/slice.hpp"
 #include "symbolic/matrix/matrix.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/sx/sx.hpp"
+#include "symbolic/sx/sx_element.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/mx/mx.hpp"
 #include "symbolic/mx/mx_tools.hpp"
@@ -68,19 +68,19 @@ template<> swig_type_info** meta< std::vector<double> >::name = &SWIGTYPE_p_std_
 template<> swig_type_info** meta< std::vector<int> >::name = &SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t;
 template<> swig_type_info** meta< CasADi::GenericType >::name = &SWIGTYPE_p_CasADi__GenericType;
 template<> swig_type_info** meta< CasADi::GenericType::Dictionary >::name = &SWIGTYPE_p_std__mapT_std__string_CasADi__GenericType_t;
-template<> swig_type_info** meta< CasADi::SX >::name = &SWIGTYPE_p_CasADi__SX;
-template<> swig_type_info** meta< CasADi::Matrix<CasADi::SX> >::name = &SWIGTYPE_p_CasADi__MatrixT_CasADi__SX_t;
-template<> swig_type_info** meta< std::vector< CasADi::Matrix<CasADi::SX> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_CasADi__SX_t_std__allocatorT_CasADi__MatrixT_CasADi__SX_t_t_t;
+template<> swig_type_info** meta< CasADi::SXElement >::name = &SWIGTYPE_p_CasADi__SXElement;
+template<> swig_type_info** meta< CasADi::Matrix<CasADi::SXElement> >::name = &SWIGTYPE_p_CasADi__MatrixT_CasADi__SXElement_t;
+template<> swig_type_info** meta< std::vector< CasADi::Matrix<CasADi::SXElement> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_CasADi__SXElement_t_std__allocatorT_CasADi__MatrixT_CasADi__SXElement_t_t_t;
 
-template<> swig_type_info** meta< std::vector< std::vector< CasADi::Matrix<CasADi::SX> > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__MatrixT_CasADi__SX_t_std__allocatorT_CasADi__MatrixT_CasADi__SX_t_t_t_std__allocatorT_std__vectorT_CasADi__MatrixT_CasADi__SX_t_std__allocatorT_CasADi__MatrixT_CasADi__SX_t_t_t_t_t;
-template<> swig_type_info** meta< std::vector< CasADi::SX > >::name = &SWIGTYPE_p_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t;
-template<> swig_type_info** meta< std::vector< std::vector< CasADi::SX > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t_std__allocatorT_std__vectorT_CasADi__SX_std__allocatorT_CasADi__SX_t_t_t_t;
+template<> swig_type_info** meta< std::vector< std::vector< CasADi::Matrix<CasADi::SXElement> > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__MatrixT_CasADi__SXElement_t_std__allocatorT_CasADi__MatrixT_CasADi__SXElement_t_t_t_std__allocatorT_std__vectorT_CasADi__MatrixT_CasADi__SXElement_t_std__allocatorT_CasADi__MatrixT_CasADi__SXElement_t_t_t_t_t;
+template<> swig_type_info** meta< std::vector< CasADi::SXElement > >::name = &SWIGTYPE_p_std__vectorT_CasADi__SXElement_std__allocatorT_CasADi__SXElement_t_t;
+template<> swig_type_info** meta< std::vector< std::vector< CasADi::SXElement > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__SXElement_std__allocatorT_CasADi__SXElement_t_t_std__allocatorT_std__vectorT_CasADi__SXElement_std__allocatorT_CasADi__SXElement_t_t_t_t;
 
 template<> swig_type_info** meta< std::vector< CasADi::Matrix<double> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_double_t_std__allocatorT_CasADi__MatrixT_double_t_t_t;
 template<> swig_type_info** meta< std::vector< std::vector< CasADi::Matrix<double> > > >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__MatrixT_double_t_std__allocatorT_CasADi__MatrixT_double_t_t_t_std__allocatorT_std__vectorT_CasADi__MatrixT_double_t_std__allocatorT_CasADi__MatrixT_double_t_t_t_t_t;
 template<> swig_type_info** meta< std::vector< CasADi::Matrix<int> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_int_t_std__allocatorT_CasADi__MatrixT_int_t_t_t;
 template<> swig_type_info** meta< std::vector< std::vector< CasADi::Matrix<int> > >  >::name = &SWIGTYPE_p_std__vectorT_std__vectorT_CasADi__MatrixT_int_t_std__allocatorT_CasADi__MatrixT_int_t_t_t_std__allocatorT_std__vectorT_CasADi__MatrixT_int_t_std__allocatorT_CasADi__MatrixT_int_t_t_t_t_t;
-template<> swig_type_info** meta< CasADi::CRSSparsity >::name = &SWIGTYPE_p_CasADi__CRSSparsity;
+template<> swig_type_info** meta< CasADi::Sparsity >::name = &SWIGTYPE_p_CasADi__Sparsity;
 template<> swig_type_info** meta< CasADi::Matrix<double> >::name = &SWIGTYPE_p_CasADi__MatrixT_double_t;
 template<> swig_type_info** meta< CasADi::Matrix<int> >::name = &SWIGTYPE_p_CasADi__MatrixT_int_t;
 template<> swig_type_info** meta< CasADi::MX >::name = &SWIGTYPE_p_CasADi__MX;

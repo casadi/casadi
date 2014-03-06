@@ -40,7 +40,7 @@ class CustomFunctionInternal : public FXInternal{
   public:
     
     /** \brief  Create a function */
-    explicit CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<CasADi::CRSSparsity> &inputscheme, const std::vector<CasADi::CRSSparsity> &outputscheme);
+    explicit CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<CasADi::Sparsity> &inputscheme, const std::vector<CasADi::Sparsity> &outputscheme);
     
     /** \brief  Destructor */
     virtual ~CustomFunctionInternal();

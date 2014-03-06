@@ -55,83 +55,83 @@
       
 namespace CasADi{
   
-/// Input arguments of a QP problem [qpIn]
-enum QPSolverInput{
-  /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
-  QP_SOLVER_H,
-  /// The vector g: dense,  (n x 1) [g]
-  QP_SOLVER_G,
-  /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
-  QP_SOLVER_A,
-  /// dense, (nc x 1) [lba]
-  QP_SOLVER_LBA,
-  /// dense, (nc x 1) [uba]
-  QP_SOLVER_UBA,
-  /// dense, (n x 1) [lbx]
-  QP_SOLVER_LBX,
-  /// dense, (n x 1) [ubx]
-  QP_SOLVER_UBX,
-  /// dense, (n x 1) [x0]
-  QP_SOLVER_X0,
-  /// dense [lam_x0]
-  QP_SOLVER_LAM_X0,
-  QP_SOLVER_NUM_IN};
+  /// Input arguments of a QP problem [qpIn]
+  enum QPSolverInput{
+    /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
+    QP_SOLVER_H,
+    /// The vector g: dense,  (n x 1) [g]
+    QP_SOLVER_G,
+    /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
+    QP_SOLVER_A,
+    /// dense, (nc x 1) [lba]
+    QP_SOLVER_LBA,
+    /// dense, (nc x 1) [uba]
+    QP_SOLVER_UBA,
+    /// dense, (n x 1) [lbx]
+    QP_SOLVER_LBX,
+    /// dense, (n x 1) [ubx]
+    QP_SOLVER_UBX,
+    /// dense, (n x 1) [x0]
+    QP_SOLVER_X0,
+    /// dense [lam_x0]
+    QP_SOLVER_LAM_X0,
+    QP_SOLVER_NUM_IN};
 
-/// Output arguments of an QP Solver [qpOut]
-enum QPSolverOutput{
-  /// The primal solution [x]
-  QP_SOLVER_X,
-  /// The optimal cost [cost]
-  QP_SOLVER_COST,
-  /// The dual solution corresponding to linear bounds [lam_a]
-  QP_SOLVER_LAM_A,
-  /// The dual solution corresponding to simple bounds [lam_x]
-  QP_SOLVER_LAM_X,
-  QP_SOLVER_NUM_OUT};
+  /// Output arguments of an QP Solver [qpOut]
+  enum QPSolverOutput{
+    /// The primal solution [x]
+    QP_SOLVER_X,
+    /// The optimal cost [cost]
+    QP_SOLVER_COST,
+    /// The dual solution corresponding to linear bounds [lam_a]
+    QP_SOLVER_LAM_A,
+    /// The dual solution corresponding to simple bounds [lam_x]
+    QP_SOLVER_LAM_X,
+    QP_SOLVER_NUM_OUT};
 
 
-/// Structure specification of a QP [qpStruct]
-enum QPStruct{
-  /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
-  QP_STRUCT_H,
-  /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
-  QP_STRUCT_A,
-  QP_STRUCT_NUM};
+  /// Structure specification of a QP [qpStruct]
+  enum QPStruct{
+    /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
+    QP_STRUCT_H,
+    /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
+    QP_STRUCT_A,
+    QP_STRUCT_NUM};
   
-// Forward declaration of internal class
-class QPSolverInternal;
+  // Forward declaration of internal class
+  class QPSolverInternal;
 
-/** \brief QPSolver
+  /** \brief QPSolver
 
 
-@copydoc QPSolver_doc
+      @copydoc QPSolver_doc
 
-  \author Joel Andersson 
-  \date 2010
-*/
-class QPSolver : public FX{
+      \author Joel Andersson 
+      \date 2010
+  */
+  class QPSolver : public FX{
   public:
 
-  /// Default constructor
-  QPSolver();
+    /// Default constructor
+    QPSolver();
   
-  /// Access functions of the node
-  QPSolverInternal* operator->();
-  const QPSolverInternal* operator->() const;
+    /// Access functions of the node
+    QPSolverInternal* operator->();
+    const QPSolverInternal* operator->() const;
 
-  /// Check if the node is pointing to the right type of object
-  virtual bool checkNode() const;
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
   
-  /// Set options that make the QP solver more suitable for solving LPs
-  void setLPOptions();
+    /// Set options that make the QP solver more suitable for solving LPs
+    void setLPOptions();
   
-  /** Generate native code in the interfaced language for debugging */
-  virtual void generateNativeCode(const std::string &filename) const;
+    /** Generate native code in the interfaced language for debugging */
+    virtual void generateNativeCode(const std::string &filename) const;
   
-  /** Generate native code in the interfaced language for debugging */
-  virtual void generateNativeCode(std::ostream &file) const;
+    /** Generate native code in the interfaced language for debugging */
+    virtual void generateNativeCode(std::ostream &file) const;
   
-};
+  };
 
 } // namespace CasADi
 

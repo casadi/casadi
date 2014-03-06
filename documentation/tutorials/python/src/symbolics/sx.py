@@ -21,7 +21,7 @@
 # 
 #! CasADi tutorial 1
 #! ==================
-#! This tutorial file explains the use of CasADi's SX in a python context.
+#! This tutorial file explains the use of CasADi's SXElement in a python context.
 #! Let's start with the import statements to load CasADi.
 from casadi import *
 from numpy import *
@@ -29,7 +29,7 @@ from numpy import *
 #! --------------------------------------
 #! Always provide a name to your symbols.
 #! This name is not used for identification, only for printing.
-a = SX("z")
+a = SX.sym("z")
 print type(a)
 print a
 #! You can explicitely create constant SX objects as follows
@@ -38,8 +38,8 @@ print c
 #! Scalar algebra
 #! --------------------------
 #! Any operations on SX objects return SX objects.
-x = SX("x")
-y = SX("y")
+x = SX.sym("x")
+y = SX.sym("y")
 c = x+y
 print type(c)
 print c
@@ -54,13 +54,13 @@ print simplify(d-x)
 print SX(5) + SX(7)
 print 0*x + 0*y
 print 1*x
-#! SX objects are immutable entities.
+#! SXElement objects are immutable entities.
 #! The assignment and update operators are really creating new object instead of modifying the old ones.
 print "object address before: %d" % id(d)
 d = d - x
 print d
 print "object address after: %d" % id(d)
-#! Consequently, updates and assignements don't have side effects for other SX objects
+#! Consequently, updates and assignements don't have side effects for other SXElement objects
 f = x + y
 x *= 2
 print x
@@ -68,11 +68,11 @@ print f
 print x+y
 #! Expression substitution
 #! ------------------------------------
-x=ssym("x")
+x=SX.sym("x")
 
 y=x*x
 print y
-print substitute(y,x,ssym("w"))
+print substitute(y,x,SX.sym("w"))
 print y
 #! More operators
 #! ------------------------------
@@ -81,7 +81,7 @@ print y
 #! Using these functions require numpy to be imported.
 y = sin(x**x)
 
-x=SX("x")
+x=SX.sym("x")
 print type(x>0)
 t = if_else(x>0,-10,10)
 print t
@@ -90,7 +90,7 @@ print t
 
 #! Conclusion
 #! -------------------
-#! We have seen how SX objects behave like symbolic objects.
+#! We have seen how SXElement objects behave like symbolic objects.
 #! They can be used to contruct expression trees.
 #! 
 #! To see how we can efficiently evaluate and differentiate these objects, jump on to the sxfunction tutorial...

@@ -20,7 +20,7 @@ MultipleShooting::MultipleShooting(string name_,
 				   vector<double>&lb_,
 				   vector<double>&ub_,
 				   vector<double>&guess_,
-				   SXMatrix & dv_,
+				   SX & dv_,
 				   int idx0_,
 				   map<string,SX> & params_) : ode(_ode), dv(dv_), lb(lb_), ub(ub_),
 							       guess(guess_), params(params_)
@@ -41,9 +41,9 @@ MultipleShooting::MultipleShooting(string name_,
 
 MultipleShooting::~MultipleShooting() {}
 
-SXMatrix MultipleShooting::getOutput(string o)
+SX MultipleShooting::getOutput(string o)
 {
-     SXMatrix ret = ssym(o, N);
+     SX ret = ssym(o, N);
      for (int k=0; k<N; k++)
 	  ret.at(k) = getOutput(o, k);
 	
@@ -61,8 +61,8 @@ SX MultipleShooting::getOutput(string o, int timeStep)
      // dynamics constraint
      SX dt = (tf - t0)/(N - 1);
 
-     SXMatrix xk = getStateMat(timeStep);
-     SXMatrix uk = getActionMat(timeStep);
+     SX xk = getStateMat(timeStep);
+     SX uk = getActionMat(timeStep);
 	
      SX tk = t0 + timeStep*dt;
 	
@@ -79,10 +79,10 @@ SX MultipleShooting::getOutput(string o, int timeStep)
      return output[o];
 }
 
-SXMatrix MultipleShooting::getDynamicsConstraintError(int timeStep)
+SX MultipleShooting::getDynamicsConstraintError(int timeStep)
 {
      if (timeStep > N-2){
-	  cerr << "In SXMatrix MultipleShooting::getDynamicsConstraintError(int timeStep),\n";
+	  cerr << "In SX MultipleShooting::getDynamicsConstraintError(int timeStep),\n";
 	  cerr << "timeStep: " << timeStep << " > N-2   (N==" << N << ")\n";
 	  exit(1);
      }
@@ -90,17 +90,17 @@ SXMatrix MultipleShooting::getDynamicsConstraintError(int timeStep)
      // dynamics constraint
      SX dt = (tf - t0)/(N - 1);
 
-     SXMatrix x0 = getStateMat(timeStep);
-     SXMatrix x1 = getStateMat(timeStep + 1);
+     SX x0 = getStateMat(timeStep);
+     SX x1 = getStateMat(timeStep + 1);
 	
-     SXMatrix u0 = getActionMat(timeStep);
-     SXMatrix u1 = getActionMat(timeStep + 1);
+     SX u0 = getActionMat(timeStep);
+     SX u1 = getActionMat(timeStep + 1);
 	
      SX tk0 = t0 + timeStep*dt;
 	
-     //SXMatrix xErr = x1 - ode.rk4Step( x0, u0, u1, params, tk0, dt);
-     //SXMatrix xErr = x1 - ode.eulerStep( x0, u0, params, tk0, dt);
-     SXMatrix xErr = ode.simpsonsRuleError( x0, x1, u0, u1, params, tk0, dt);
+     //SX xErr = x1 - ode.rk4Step( x0, u0, u1, params, tk0, dt);
+     //SX xErr = x1 - ode.eulerStep( x0, u0, params, tk0, dt);
+     SX xErr = ode.simpsonsRuleError( x0, x1, u0, u1, params, tk0, dt);
 
      return xErr;
 }
@@ -183,10 +183,10 @@ void MultipleShooting::boundStateAction(string xu, double lb_, double ub_)
 }
 
 
-SXMatrix MultipleShooting::getStateMat(int timeStep)
+SX MultipleShooting::getStateMat(int timeStep)
 {
-     SXMatrix ret = ssym("a_state", ode.nx());
-     // SXMatrix ret(ode.nx(), 1);
+     SX ret = ssym("a_state", ode.nx());
+     // SX ret(ode.nx(), 1);
      map<string,int>::const_iterator xIter;
      for (xIter = ode.states.begin(); xIter != ode.states.end(); xIter++)
 	  ret[xIter->second] = getState(xIter->first, timeStep);
@@ -214,10 +214,10 @@ DMatrix MultipleShooting::getAction(int timeStep, vector<double> & xopt)
      return ret;
 }
 
-SXMatrix MultipleShooting::getActionMat(int timeStep)
+SX MultipleShooting::getActionMat(int timeStep)
 {
-     SXMatrix ret = ssym("an_action", ode.nu());
-     //	SXMatrix ret(ode.nu(),1);
+     SX ret = ssym("an_action", ode.nu());
+     //	SX ret(ode.nu(),1);
      map<string,int>::const_iterator uIter;
      for (uIter = ode.actions.begin(); uIter != ode.actions.end(); uIter++)
 	  ret[uIter->second] = getAction(uIter->first, timeStep);
@@ -271,8 +271,8 @@ void MultipleShooting::writeOctaveOutput( ostream & f, vector<double> & xopt )
      f << "multipleShooting.outputs = struct();\n";
      for (iter = ode.outputs.begin(); iter != ode.outputs.end(); iter++){
 
-	  SXMatrix outSXMatrix = getOutput(iter->first);
-	  SXFunction outputFcn(dv, outSXMatrix);
+	  SX outSX = getOutput(iter->first);
+	  SXFunction outputFcn(dv, outSX);
 	  outputFcn.init();
 	  outputFcn.setInput(xopt);
 	  outputFcn.evaluate();
@@ -292,7 +292,7 @@ void MultipleShooting::writeOctaveOutput( ostream & f, vector<double> & xopt )
 
      // start/end times
      f << "% time\n";
-     SXFunction timeFcn( dv, vertcat( SXMatrix(t0), SXMatrix(tf) ) );
+     SXFunction timeFcn( dv, vertcat( SX(t0), SX(tf) ) );
      timeFcn.init();
      timeFcn.setInput( xopt );
      timeFcn.evaluate();

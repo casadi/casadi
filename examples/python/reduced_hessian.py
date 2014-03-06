@@ -36,7 +36,7 @@ Test problem (from sIPOPT example collection)
 """
 
 # Optimization variables
-x = ssym("x",3)
+x = SX.sym("x",3)
 
 # Objective
 f = (x[0]-1)**2 + (x[1]-2)**2 + (x[2]-3)**2

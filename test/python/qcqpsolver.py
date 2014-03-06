@@ -110,7 +110,7 @@ class QCQPSolverTests(casadiTestCase):
     H = DMatrix([[1,0],[0,1]])
     G = DMatrix([2,1])
     A = DMatrix(0,2)
-    P = DMatrix(0,2)
+    P = DMatrix(2,0)
     Q = DMatrix(0,1)
     R = DMatrix(0,1)
     LBX = DMatrix([ -inf, -inf ])

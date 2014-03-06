@@ -32,7 +32,7 @@ using namespace std;
 
 namespace CasADi{
 
-  GetNonzeros::GetNonzeros(const CRSSparsity& sp, const MX& y){
+  GetNonzeros::GetNonzeros(const Sparsity& sp, const MX& y){
     setSparsity(sp);
     setDependencies(y);
   }
@@ -41,8 +41,8 @@ namespace CasADi{
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void GetNonzerosVector::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void GetNonzerosVector::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -58,8 +58,8 @@ namespace CasADi{
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void GetNonzerosSlice::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void GetNonzerosSlice::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -78,8 +78,8 @@ namespace CasADi{
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void GetNonzerosSlice2::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void GetNonzerosSlice2::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -181,21 +181,21 @@ namespace CasADi{
     int nadj = adjSeed.size();
 
     // Output sparsity
-    const CRSSparsity& osp = sparsity();
-    const vector<int>& ocol = osp.col();
-    vector<int> orow = osp.getRow();
+    const Sparsity& osp = sparsity();
+    const vector<int>& orow = osp.row();
+    vector<int> ocol = osp.getCol();
     
     // Input sparsity
-    const CRSSparsity& isp = dep().sparsity();
-    const vector<int>& icol = isp.col();
-    vector<int> irow = isp.getRow();
+    const Sparsity& isp = dep().sparsity();
+    const vector<int>& irow = isp.row();
+    vector<int> icol = isp.getCol();
 
     // Get all input elements
     vector<int> el_input;
     isp.getElements(el_input,false);
     
     // Sparsity pattern being formed and corresponding nonzero mapping
-    vector<int> r_rowind, r_col, r_nz, r_ind;
+    vector<int> r_colind, r_row, r_nz, r_ind;
         
     // Nondifferentiated function and forward sensitivities
     int first_d = output_given ? 0 : -1;
@@ -211,9 +211,9 @@ namespace CasADi{
       arg.sparsity().getNZInplace(r_ind);
 
       // Sparsity pattern for the result
-      r_rowind.resize(osp.size1()+1); // Row count
-      fill(r_rowind.begin(),r_rowind.end(),0);
-      r_col.clear();
+      r_colind.resize(osp.size2()+1); // Col count
+      fill(r_colind.begin(),r_colind.end(),0);
+      r_row.clear();
 
       // Perform the assignments
       r_nz.clear();
@@ -235,21 +235,21 @@ namespace CasADi{
         r_nz.push_back(el_arg);
 
         // Get the corresponding element
-        int i=orow[k], j=ocol[k];
+        int i=ocol[k], j=orow[k];
 
         // Add to sparsity pattern
-        r_col.push_back(j);
-        r_rowind[1+i]++;
+        r_row.push_back(j);
+        r_colind[1+i]++;
       }
       
-      // row count -> row offset
-      for(int i=1; i<r_rowind.size(); ++i) r_rowind[i] += r_rowind[i-1]; 
+      // col count -> col offset
+      for(int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1]; 
 
       // Create a sparsity pattern from vectors
       if(r_nz.size()==0){
         res = MX::sparse(osp.shape());
       } else {
-        CRSSparsity f_sp(osp.size1(),osp.size2(),r_col,r_rowind);
+        Sparsity f_sp(osp.size1(),osp.size2(),r_colind,r_row);
         res = arg->getGetNonzeros(f_sp,r_nz);
       }
     }
@@ -292,7 +292,7 @@ namespace CasADi{
         if(*k>=0 && r_ind[nz[*k]]<0){
           
           // Create a new pattern which includes both the the previous seed and the addition
-          CRSSparsity sp = asens0.sparsity().patternUnion(dep().sparsity());
+          Sparsity sp = asens0.sparsity().patternUnion(dep().sparsity());
           asens0 = asens0->getSetSparse(sp);
 
           // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
@@ -350,7 +350,7 @@ namespace CasADi{
     }
   }
 
-  MX GetNonzeros::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
+  MX GetNonzeros::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const{
     // Get all the nonzeros
     vector<int> nz_all = getAll();
 

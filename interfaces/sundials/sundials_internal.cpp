@@ -174,9 +174,9 @@ void SundialsInternal::init(){
   if(!jac_.isNull() && !jac_.isInit()) jac_.init();
   
   if (!jac_.isNull()) {
-    casadi_assert_message(jac_.output().size1()==jac_.output().size2(),"SundialsInternal::init: the jacobian of the forward problem must be square but got " << jac_.output().dimString());
+    casadi_assert_message(jac_.output().size2()==jac_.output().size1(),"SundialsInternal::init: the jacobian of the forward problem must be square but got " << jac_.output().dimString());
     
-    casadi_assert_message(!isSingular(jac_.output().sparsity()),"SundialsInternal::init: singularity - the jacobian of the forward problem is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (in stead of "<< jac_.output().size1() << ")");
+    casadi_assert_message(!isSingular(jac_.output().sparsity()),"SundialsInternal::init: singularity - the jacobian of the forward problem is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (in stead of "<< jac_.output().size2() << ")");
   }
 
   // Create a backwards Jacobian if requested
@@ -185,9 +185,9 @@ void SundialsInternal::init(){
   if(!jacB_.isNull() && !jacB_.isInit()) jacB_.init();
   
   if (!jacB_.isNull()) {
-    casadi_assert_message(jacB_.output().size1()==jacB_.output().size2(),"SundialsInternal::init: the jacobian of the backward problem must be square but got " << jacB_.output().dimString());
+    casadi_assert_message(jacB_.output().size2()==jacB_.output().size1(),"SundialsInternal::init: the jacobian of the backward problem must be square but got " << jacB_.output().dimString());
     
-    casadi_assert_message(!isSingular(jacB_.output().sparsity()),"SundialsInternal::init: singularity - the jacobian of the backward problem is structurally rank-deficient. sprank(J)=" << sprank(jacB_.output()) << " (in stead of "<< jacB_.output().size1() << ")");
+    casadi_assert_message(!isSingular(jacB_.output().sparsity()),"SundialsInternal::init: singularity - the jacobian of the backward problem is structurally rank-deficient. sprank(J)=" << sprank(jacB_.output()) << " (in stead of "<< jacB_.output().size2() << ")");
   }
   
   if(hasSetOption("linear_solver") && !jac_.isNull()){

@@ -122,7 +122,7 @@ namespace CasADi{
     }
   }
   
-  int CodeGenerator::addSparsity(const CRSSparsity& sp){
+  int CodeGenerator::addSparsity(const Sparsity& sp){
     // Get the current number of patterns before looking for it
     size_t num_patterns_before = added_sparsities_.size();
 
@@ -143,7 +143,7 @@ namespace CasADi{
     return ind;
   }
 
-  int CodeGenerator::getSparsity(const CRSSparsity& sp) const{
+  int CodeGenerator::getSparsity(const Sparsity& sp) const{
     const void* h = static_cast<const void*>(sp.get());
     PointerMap::const_iterator it=added_sparsities_.find(h);
     casadi_assert(it!=added_sparsities_.end());
@@ -257,8 +257,8 @@ namespace CasADi{
     case AUX_FILL: 
       auxiliaries_ << codegen_str_fill << endl; 
       break;
-    case AUX_MM_NT_SPARSE: 
-      auxiliaries_ << codegen_str_mm_nt_sparse << endl; 
+    case AUX_MM_TN_SPARSE: 
+      auxiliaries_ << codegen_str_mm_tn_sparse << endl; 
       break;
     case AUX_SQ: 
       auxSq(); 

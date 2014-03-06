@@ -29,66 +29,61 @@
 
 namespace CasADi{
     
-SXFunction vec (const SXFunction &a) {
-  // Pass null if input is null
-  if (a.isNull()) return SXFunction();
+  SXFunction vec(SXFunction f) {
+    // Pass null if input is null
+    if (f.isNull()) return SXFunction();
   
-  /// Get the SX input and output vectors
-  std::vector<SXMatrix> symbolicInputSX = a.inputExpr();
-  std::vector<SXMatrix> symbolicOutputSX = a.outputExpr();
+    /// Get the SXElement input and output vectors
+    std::vector<SX> f_in = f.inputExpr();
+    std::vector<SX> f_out = f.outputExpr();
   
-  // Apply vec to them
-  for (int i=0;i<symbolicInputSX.size();++i)
-    symbolicInputSX[i] = vec(symbolicInputSX[i]);
-  for (int i=0;i<symbolicOutputSX.size();++i)
-    symbolicOutputSX[i] = vec(symbolicOutputSX[i]);
+    // Apply vec to them
+    for(std::vector<SX>::iterator it=f_in.begin(); it!=f_in.end(); ++it) *it = vec(*it);
+    for(std::vector<SX>::iterator it=f_out.begin(); it!=f_out.end(); ++it) *it = vec(*it);
     
-  // Make a new function with the vecced input/outputs
-  SXFunction ret(symbolicInputSX,symbolicOutputSX);
+    // Make a new function with the vectorized input/outputs
+    SXFunction ret(f_in,f_out);
   
-  // Initialize it if a was
-  if (a.isInit()) ret.init();
-  return ret;
-}
-
-
-MXFunction vec (const FX &a_) {
-  FX a = a_;
-
-  // Pass null if input is null
-  if (a.isNull()) return MXFunction();
-  
-  // Get the MX inputs, only used for shape
-  const std::vector<MX> &symbolicInputMX = a.symbolicInput();
-  // Have a vector with MX that have the shape of vec(symbolicInputMX )
-  std::vector<MX> symbolicInputMX_vec(a.getNumInputs());
-  // Make vector valued MX's out of them
-  std::vector<MX> symbolicInputMX_vec_reshape(a.getNumInputs());
-
-  // Apply the vec-transformation to the inputs
-  for (int i=0;i<symbolicInputMX.size();++i) {
-    std::stringstream s;
-    s << "X_flat_" << i;
-    symbolicInputMX_vec[i] = MX(s.str(),vec(symbolicInputMX[i].sparsity()));
-    symbolicInputMX_vec_reshape[i] = trans(reshape(symbolicInputMX_vec[i],trans(symbolicInputMX[i].sparsity())));
+    // Initialize it if it was initialized
+    if (f.isInit()) ret.init();
+    return ret;
   }
-  
-  // Call the original function with the vecced inputs
-  std::vector<MX> symbolicOutputMX = a.call(symbolicInputMX_vec_reshape);
-  
-  // Apply the vec-transformation to the outputs
-  for (int i=0;i<symbolicOutputMX.size();++i)
-    symbolicOutputMX[i] = vec(symbolicOutputMX[i]);
-    
-  // Make a new function with the vecced input/outputs
-  MXFunction ret(symbolicInputMX_vec,symbolicOutputMX);
-  
-  // Initialize it if a was
-  if (a.isInit()) ret.init();
-  return ret;
 
-}  
+  MXFunction vec(FX f) {
+
+    // Pass null if input is null
+    if (f.isNull()) return MXFunction();
+  
+    // Get the MX inputs, only used for shape
+    const std::vector<MX> &f_in = f.symbolicInput();
+
+    // Have a vector with MX that have the shape of vec(symbolicInput())
+    std::vector<MX> f_in_vec(f_in.size());
+
+    // Make vector valued MX's out of them
+    std::vector<MX> f_in_vec_reshaped(f_in.size());
+
+    // Apply the vec-transformation to the inputs
+    for(int i=0; i<f_in.size(); ++i){
+      std::stringstream s;
+      s << "X_flat_" << i;
+      f_in_vec[i] = MX::sym(s.str(),vec(f_in[i].sparsity()));
+      f_in_vec_reshaped[i] = reshape(f_in_vec[i],f_in[i].sparsity());
+    }
+  
+    // Call the original function with the vectorized inputs
+    std::vector<MX> f_out = f.call(f_in_vec_reshaped);
+  
+    // Apply the vec-transformation to the outputs
+    for(std::vector<MX>::iterator it=f_out.begin(); it!=f_out.end(); ++it) *it = vec(*it);
     
+    // Make a new function with the vectorized input/outputs
+    MXFunction ret(f_in_vec,f_out);
+  
+    // Initialize it if it was initialized
+    if (f.isInit()) ret.init();
+    return ret;
+  }  
     
 } // namespace CasADi
 

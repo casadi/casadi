@@ -430,11 +430,11 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
   switch (scheme) {
     case SCHEME_DPLEInput: 
-      if(i==0) return "A matrices (vertcat when const_dim, blkdiag otherwise)";
-      if(i==1) return "V matrices (vertcat when const_dim, blkdiag otherwise)";
+      if(i==0) return "A matrices (horzcat when const_dim, blkdiag otherwise)";
+      if(i==1) return "V matrices (horzcat when const_dim, blkdiag otherwise)";
       break;
     case SCHEME_DPLEOutput: 
-      if(i==0) return "Lyapunov matrix (vertcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def)";
+      if(i==0) return "Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def)";
       break;
     case SCHEME_ControlledDAEInput: 
       if(i==0) return "Global physical time. (1-by-1)";
@@ -495,7 +495,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_LinsolInput: 
       if(i==0) return "The square matrix A: sparse, (n x n).";
-      if(i==1) return "The right-hand-side matrix b: dense,  (m x n)";
+      if(i==1) return "The right-hand-side matrix b: dense,  (n x m)";
       break;
     case SCHEME_LinsolOutput: 
       if(i==0) return "Solution to the linear system of equations";
@@ -602,7 +602,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_QCQPSolverInput: 
       if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
       if(i==1) return "The vector g: dense,  (n x 1)";
-      if(i==2) return "The vertical stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
+      if(i==2) return "The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
       if(i==3) return "The vertical stack of all qi: dense,  (nq n x 1)";
       if(i==4) return "The vertical stack of all scalars ri (nq x 1) ";
       if(i==5) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
@@ -621,7 +621,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_QCQPStruct: 
       if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
-      if(i==1) return "The vertical stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
+      if(i==1) return "The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
       if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
       break;
     case SCHEME_QPSolverInput: 
@@ -646,7 +646,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
       break;
     case SCHEME_SDPInput: 
-      if(i==0) return "The vertical stack of all matrices F_i: ( nm x m)";
+      if(i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";
       if(i==1) return "The vector c: ( n x 1)";
       if(i==2) return "The matrix G: ( m x m)";
       if(i==3) return "The matrix A: ( nc x n)";
@@ -665,14 +665,14 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==6) return "The dual solution corresponding to simple bounds  (n x 1)";
       break;
     case SCHEME_SDPStruct: 
-      if(i==0) return "The vertical stack of all matrices F_i: ( nm x m)";
+      if(i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";
       if(i==1) return "The matrix G: ( m x m)";
       if(i==2) return "The matrix A: ( nc x n)";
       break;
     case SCHEME_SDQPInput: 
       if(i==0) return "The matrix H: sparse ( n x n)";
       if(i==1) return "The vector c: ( n x 1)";
-      if(i==2) return "The vertical stack of all matrices F_i: ( nm x m)";
+      if(i==2) return "The horizontal stack of all matrices F_i: ( m x nm)";
       if(i==3) return "The matrix G: ( m x m)";
       if(i==4) return "The matrix A: ( nc x n)";
       if(i==5) return "Lower bounds on Ax ( nc x 1)";
@@ -691,12 +691,12 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_SDQPStruct: 
       if(i==0) return "The matrix H: sparse ( n x n)";
-      if(i==1) return "The vertical stack of all matrices F_i: ( nm x m)";
+      if(i==1) return "The horizontal stack of all matrices F_i: ( m x nm)";
       if(i==2) return "The matrix G: ( m x m)";
       if(i==3) return "The matrix A: ( nc x n)";
       break;
     case SCHEME_SOCPInput: 
-      if(i==0) return "The vertical stack of all matrices Gi: ( N x n)";
+      if(i==0) return "The horizontal stack of all matrices Gi: ( n x N)";
       if(i==1) return "The vertical stack of all vectors hi: ( N x 1)";
       if(i==2) return "The vertical stack of all vectors ei: ( nm x 1)";
       if(i==3) return "The vertical stack of all scalars fi: ( m x 1)";
@@ -714,7 +714,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==3) return "The dual solution corresponding to simple bounds  (n x 1)";
       break;
     case SCHEME_SOCPStruct: 
-      if(i==0) return "The vertical stack of all matrices Gi: ( N x n)";
+      if(i==0) return "The horizontal stack of all matrices Gi: ( n x N)";
       if(i==1) return "The matrix A: ( nc x n)";
       break;
     case SCHEME_StabilizedQPSolverInput: 

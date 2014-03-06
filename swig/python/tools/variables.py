@@ -194,7 +194,7 @@ class Variables(object):
         return self.lookup(rest,obj=obj[first]) 
       elif isinstance(obj,Variables):
         return self.lookup(rest,obj=obj.__getattr__(first)) 
-      elif isinstance(obj,SX):
+      elif isinstance(obj,SXElement):
         if len(first)==1 and first[0]==0:
           return obj
         else:
@@ -273,7 +273,7 @@ class Variables(object):
         
             
     def createParent(self):
-        self._V = msym("V[" + ",".join(self._order) + "]",self.getSize())
+        self._V = MX.sym("V[" + ",".join(self._order) + "]",self.getSize())
         for k in self._order:
             obj = self._d[k]
             if isinstance(obj,Variables):

@@ -95,12 +95,12 @@ namespace CasADi{
     }
 
     // Symbolic inputs
-    MX x0 = msym("x0",f_.input(DAE_X).sparsity());
-    MX p = msym("p",f_.input(DAE_P).sparsity());
-    MX t = msym("t",f_.input(DAE_T).sparsity());
+    MX x0 = MX::sym("x0",f_.input(DAE_X).sparsity());
+    MX p = MX::sym("p",f_.input(DAE_P).sparsity());
+    MX t = MX::sym("t",f_.input(DAE_T).sparsity());
 
     // Implicitly defined variables (z and x)
-    MX v = msym("v",deg_*(nx_+nz_));
+    MX v = MX::sym("v",deg_*(nx_+nz_));
     vector<int> v_offset(1,0);
     for(int d=0; d<deg_; ++d){
       v_offset.push_back(v_offset.back()+nx_);
@@ -112,8 +112,8 @@ namespace CasADi{
     // Collocated states
     vector<MX> x(deg_+1), z(deg_+1);
     for(int d=1; d<=deg_; ++d){
-      x[d] = *vv_it++;
-      z[d] = *vv_it++;
+      x[d] = reshape(*vv_it++,this->x0().shape());
+      z[d] = reshape(*vv_it++,this->z0().shape());
     }
     casadi_assert(vv_it==vv.end());
 
@@ -151,10 +151,10 @@ namespace CasADi{
       }
       
       // Add collocation equation
-      eq.push_back(f_res[DAE_ODE] - xp_j);
+      eq.push_back(vec(f_res[DAE_ODE] - xp_j));
         
       // Add the algebraic conditions
-      eq.push_back(f_res[DAE_ALG]);
+      eq.push_back(vec(f_res[DAE_ALG]));
 
       // Add contribution to the final state
       xf += D[j]*x[j];
@@ -179,12 +179,13 @@ namespace CasADi{
     // Backwards dynamics
     // NOTE: The following is derived so that it will give the exact adjoint sensitivities whenever g is the reverse mode derivative of f.
     if(!g_.isNull()){
+
       // Symbolic inputs
-      MX rx0 = msym("x0",g_.input(RDAE_RX).sparsity());
-      MX rp = msym("p",g_.input(RDAE_RP).sparsity());
+      MX rx0 = MX::sym("x0",g_.input(RDAE_RX).sparsity());
+      MX rp = MX::sym("p",g_.input(RDAE_RP).sparsity());
 
       // Implicitly defined variables (rz and rx)
-      MX rv = msym("v",deg_*(nrx_+nrz_));
+      MX rv = MX::sym("v",deg_*(nrx_+nrz_));
       vector<int> rv_offset(1,0);
       for(int d=0; d<deg_; ++d){
         rv_offset.push_back(rv_offset.back()+nrx_);
@@ -196,8 +197,8 @@ namespace CasADi{
       // Collocated states
       vector<MX> rx(deg_+1), rz(deg_+1);
       for(int d=1; d<=deg_; ++d){
-        rx[d] = *rvv_it++;
-        rz[d] = *rvv_it++;
+        rx[d] = reshape(*rvv_it++,this->rx0().shape());
+        rz[d] = reshape(*rvv_it++,this->rz0().shape());
       }
       casadi_assert(rvv_it==rvv.end());
            
@@ -231,10 +232,10 @@ namespace CasADi{
         }
 
         // Add collocation equation
-        eq.push_back(g_res[RDAE_ODE] - rxp_j);
+        eq.push_back(vec(g_res[RDAE_ODE] - rxp_j));
         
         // Add the algebraic conditions
-        eq.push_back(g_res[RDAE_ALG]);
+        eq.push_back(vec(g_res[RDAE_ALG]));
 
         // Add contribution to the final state
         rxf += (C[0][j]/h_)*rx[j];

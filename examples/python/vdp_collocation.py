@@ -28,9 +28,9 @@ nk = 20    # Control discretization
 tf = 10.0  # End time
 
 # Declare variables (use scalar graph)
-t  = ssym("t")    # time
-u  = ssym("u")    # control
-x  = ssym("x",3)  # state
+t  = SX.sym("t")    # time
+u  = SX.sym("u")    # control
+x  = SX.sym("x",3)  # state
 
 # ODE right hand side function
 rhs = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
@@ -83,7 +83,7 @@ C = NP.zeros((d+1,d+1))
 D = NP.zeros(d+1)
 
 # Dimensionless time inside one control interval
-tau = ssym("tau")
+tau = SX.sym("tau")
   
 # All collocation time points
 T = NP.zeros((nk,d+1))
@@ -121,7 +121,7 @@ NXF = nx                # Final state
 NV = NX+NU+NXF
 
 # NLP variable vector
-V = MX("V",NV)
+V = MX.sym("V",NV)
   
 # All variables with bounds and initial guess
 vars_lb = NP.zeros(NV)

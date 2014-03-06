@@ -109,10 +109,10 @@ main()
 	ocp.objFun = -tEnd; // maximum time
 
 	// tie stages together
-	SXMatrix xTakeoffEnd = msTakeoff.getStateMat(msTakeoff.N-1);
-	SXMatrix uTakeoffEnd = msTakeoff.getActionMat(msTakeoff.N-1);
-	SXMatrix xGlideBegin = msGlide.getStateMat(0);
-	SXMatrix uGlideBegin = msGlide.getActionMat(0);
+	SX xTakeoffEnd = msTakeoff.getStateMat(msTakeoff.N-1);
+	SX uTakeoffEnd = msTakeoff.getActionMat(msTakeoff.N-1);
+	SX xGlideBegin = msGlide.getStateMat(0);
+	SX uGlideBegin = msGlide.getActionMat(0);
 
 	ocp.addNonlconEq( xTakeoffEnd - xGlideBegin );
 	ocp.addNonlconEq( uTakeoffEnd - uGlideBegin );

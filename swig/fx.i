@@ -63,9 +63,9 @@
 %include "symbolic/fx/io_scheme.hpp"
 #ifdef SWIGPYTHON
 %extend CasADi::IOScheme {
-%template(__call__) operator()< CasADi::CRSSparsity >;
+%template(__call__) operator()< CasADi::Sparsity >;
 %template(__call__) operator()< CasADi::MX> ;
-%template(__call__) operator()< CasADi::Matrix<CasADi::SX> >;
+%template(__call__) operator()< CasADi::Matrix<CasADi::SXElement> >;
 
 %pythoncode %{
   def __call__(self,*dummy,**kwargs):
@@ -80,8 +80,8 @@
 
 %include "symbolic/fx/io_scheme_vector.hpp"
 %template(IOSchemeVectorMX) CasADi::IOSchemeVector< CasADi::MX >;
-%template(IOSchemeVectorSXMatrix) CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SX> >;
-%template(IOSchemeVectorCRSSparsity) CasADi::IOSchemeVector< CasADi::CRSSparsity >;
+%template(IOSchemeVectorSX) CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SXElement> >;
+%template(IOSchemeVectorSparsity) CasADi::IOSchemeVector< CasADi::Sparsity >;
 #ifdef SWIGPYTHON
 %extend CasADi::IOSchemeVector< CasADi::MX > {
 %pythoncode %{
@@ -89,13 +89,13 @@
     return self.data.__iter__()
 %}
 }
-%extend CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SX> > {
+%extend CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SXElement> > {
 %pythoncode %{
   def __iter__(self):
     return self.data.__iter__()
 %}
 }
-%extend CasADi::IOSchemeVector< CasADi::CRSSparsity > {
+%extend CasADi::IOSchemeVector< CasADi::Sparsity > {
 %pythoncode %{
   def __iter__(self):
     return self.data.__iter__()

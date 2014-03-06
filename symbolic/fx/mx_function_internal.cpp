@@ -49,7 +49,7 @@ namespace CasADi{
         if(it->empty()){
           stringstream ss;
           ss << "r" << ind;        
-          *it = msym(ss.str(),it->sparsity());
+          *it = MX::sym(ss.str(),it->sparsity());
         } else {
           casadi_error("Failed to create an MXFunction instance since not all input arguments are symbolic primitives. Support for non-symbolic inputs has been dropped. We refer users to the approach demonstrated in http://docs.casadi.org/tutorials/tools/structure.pdf");
         }
@@ -673,7 +673,7 @@ namespace CasADi{
       fsens[d].resize(outputv_.size());
       if(skip_fwd){
         for(int i=0; i<fsens[d].size(); ++i){
-          fsens[d][i] = MX::sparse(output(i).size1(),output(i).size2());
+          fsens[d][i] = MX::sparse(output(i).shape());
         }
       }
     }
@@ -687,7 +687,7 @@ namespace CasADi{
       asens[d].resize(inputv_.size());
       if(skip_adj){
         for(int i=0; i<asens[d].size(); ++i){
-          asens[d][i] = MX::sparse(input(i).size1(),input(i).size2());
+          asens[d][i] = MX::sparse(input(i).shape());
         }
       }
     }
@@ -739,7 +739,7 @@ namespace CasADi{
     
       if(it->op == OP_INPUT){
         // Fetch input
-        const CRSSparsity& sp_input = input(it->arg.front()).sparsity();
+        const Sparsity& sp_input = input(it->arg.front()).sparsity();
         swork[it->res.front()] = arg[it->arg.front()].setSparse(sp_input,true);
         for(int d=0; d<nfdir; ++d){
           dwork[it->res.front()][d] = fseed[d][it->arg.front()].setSparse(sp_input,true);
@@ -796,7 +796,7 @@ namespace CasADi{
             // Give zero seed if null
             if(el>=0 && dwork[el][d].isNull()){
               if(d==0){
-                dwork[el][d] = MX::sparse(input_p[iind]->size1(),input_p[iind]->size2());
+                dwork[el][d] = MX::sparse(input_p[iind]->shape());
               } else {
                 dwork[el][d] = dwork[el][0];
               }
@@ -808,7 +808,7 @@ namespace CasADi{
             int el = it->res[oind];
             fsens_p[d][oind] = el<0 ? 0 : &dwork[el][d];
             if (el>=0 && dwork[el][d].isNull() && !output_p[oind]->isNull()) {
-              dwork[el][d] = MX::sparse(output_p[oind]->size1(),output_p[oind]->size2());
+              dwork[el][d] = MX::sparse(output_p[oind]->shape());
             }
           }
         }
@@ -948,29 +948,29 @@ namespace CasADi{
     log("MXFunctionInternal::evalMX end");
   }
 
-  void MXFunctionInternal::evalSXsparse(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
-                                  const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                                  const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens){
+  void MXFunctionInternal::evalSXsparse(const std::vector<SX>& input_s, std::vector<SX>& output_s, 
+                                  const std::vector<std::vector<SX> >& fwdSeed, std::vector<std::vector<SX> >& fwdSens, 
+                                  const std::vector<std::vector<SX> >& adjSeed, std::vector<std::vector<SX> >& adjSens){
     casadi_assert_message(fwdSens.empty(),"Not implemented");
     casadi_assert_message(adjSeed.empty(),"Not implemented");
       
     // Create a work array
-    vector<SXMatrix> swork(work_.size());
+    vector<SX> swork(work_.size());
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
       if(it->op!=OP_OUTPUT){
         for(int i=0; i<it->res.size(); ++i){
           if (it->res[i]>=0)
-            swork[it->res[i]] = SXMatrix(it->data->sparsity(i));
+            swork[it->res[i]] = SX(it->data->sparsity(i));
         }
       }
     }
 
     // Create a temporary vector
-    vector<SX> rtmp(rtmp_.size());
+    vector<SXElement> rtmp(rtmp_.size());
   
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
-    vector<SXMatrix*> sxarg;
-    vector<SXMatrix*> sxres;
+    vector<SX*> sxarg;
+    vector<SX*> sxres;
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
       if(it->op==OP_INPUT){
         // Pass the input
@@ -996,14 +996,14 @@ namespace CasADi{
     }
   }
 
-  SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputvsx ){
+  SXFunction MXFunctionInternal::expand(const std::vector<SX>& inputvsx ){
     assertInit();
   
     // Create inputs with the same name and sparsity as the matrix valued symbolic inputs
-    vector<SXMatrix> arg(inputv_.size());
+    vector<SX> arg(inputv_.size());
     if(inputvsx.empty()){ // No symbolic input provided
       for(int i=0; i<arg.size(); ++i){
-        arg[i] = ssym(inputv_[i]->getName(),inputv_[i].sparsity());
+        arg[i] = SX::sym(inputv_[i]->getName(),inputv_[i].sparsity());
       }
     } else { // Use provided symbolic input
       // Make sure number of inputs matches
@@ -1019,13 +1019,13 @@ namespace CasADi{
     }
 
     // Create output vector with correct sparsity
-    vector<SXMatrix> res(outputv_.size());
+    vector<SX> res(outputv_.size());
     for(int i=0; i<res.size(); ++i){
-      res[i] = SXMatrix(outputv_[i].sparsity());
+      res[i] = SX(outputv_[i].sparsity());
     }
   
     // No sensitivities
-    vector<vector<SXMatrix> > dummy;
+    vector<vector<SX> > dummy;
   
     // Evaluate symbolically
     evalSX(arg,res,dummy,dummy,dummy,dummy);
@@ -1206,7 +1206,7 @@ namespace CasADi{
             case 0:
               ss.str(string());
               ss << "y" << y.size();
-              y.push_back(msym(ss.str(),arg.sparsity()));
+              y.push_back(MX::sym(ss.str(),arg.sparsity()));
               g.push_back(arg);
               res = y.back();
               break;

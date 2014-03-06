@@ -33,7 +33,7 @@ if len(sys.argv)>1 and sys.arg[0]=='nc':
 else:
   print "Info: Use 'python c_code_generation.py nc' to omit compiling"
   
-x = ssym("x",7,7)
+x = SX.sym("x",7,7)
 f = det(x)
 x = vec(x)
 x0 = [random.rand() for xi in x.data()]

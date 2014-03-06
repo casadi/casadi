@@ -33,12 +33,12 @@ a = DMatrix(3,4)
 print a
 #! The string representation shows only the structural non-zero entries. In this case there are none.
 #! Let's make a DMatrix with some structural non-zero entries.
-w = DMatrix(3,4,[1,2,1],[0,2,2,3],[3,2.3,8])
+w = DMatrix(4,3,[0,2,2,3],[1,2,1],[3,2.3,8])
 print w
-#! Internally, the Matrix<> class uses a Compressed Row Format which containts the offset to the first nonzero on each row ...
-print "row offsets: ", w.rowind()
-#! ... the columns for each nonzero ...
-print "columns: ", w.col()
+#! Internally, the Matrix<> class uses a Compressed Column Format which containts the offset to the first nonzero on each column ...
+print "column offsets: ", w.colind()
+#! ... the row for each nonzero ...
+print "row: ", w.row()
 #! ... and the nonzero data entries:
 print "nonzeros: ", w.data()
 #! Conversion
@@ -50,5 +50,5 @@ print w.toArray()
 print array(w)
 print w.toMatrix()
 print matrix(w)
-print w.toCsr_matrix()
+print w.toCsc_matrix()
 

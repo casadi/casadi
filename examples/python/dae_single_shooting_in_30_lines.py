@@ -32,10 +32,10 @@ Joel Andersson, 2012
 """
 
 # Declare variables
-x = ssym("x",2) # Differential states
-z = ssym("z")   # Algebraic variable
-u = ssym("u")   # Control
-t = ssym("t")   # Time
+x = SX.sym("x",2) # Differential states
+z = SX.sym("z")   # Algebraic variable
+u = SX.sym("u")   # Control
+t = SX.sym("t")   # Time
 
 # Differential equation
 f_x = vertcat((z*x[0]-x[1]+u, x[0]))
@@ -55,10 +55,10 @@ I.setOption("tf",0.5) # interval length
 I.init()
 
 # All controls
-U = msym("U",20)
+U = MX.sym("U",20)
 
 # Construct graph of integrator calls
-X  = msym([0,1])
+X  = MX([0,1])
 J = 0
 for k in range(20):
   tmp = I.call( integratorIn(x0=X,p=U[k]) )   # Call the integrator

@@ -61,8 +61,8 @@ namespace CasADi{
     // Get the number of equations and check consistency
     casadi_assert_message(iin_>=0 && iin_<f_.getNumInputs()>0,"Implicit input not in range");
     casadi_assert_message(iout_>=0 && iout_<f_.getNumOutputs()>0,"Implicit output not in range");
-    casadi_assert_message(f_.output(iout_).dense() && f_.output(iout_).size2()==1, "Residual must be a dense vector");
-    casadi_assert_message(f_.input(iin_).dense() && f_.input(iin_).size2()==1, "Unknown must be a dense vector");
+    casadi_assert_message(f_.output(iout_).dense() && f_.output(iout_).vector(), "Residual must be a dense vector");
+    casadi_assert_message(f_.input(iin_).dense() && f_.input(iin_).vector(), "Unknown must be a dense vector");
     n_ = f_.output(iout_).size();
     casadi_assert_message(n_ == f_.input(iin_).size(), "Dimension mismatch. Input size is " << f_.input(iin_).size() << ", while output size is " << f_.output(iout_).size());
 
@@ -164,7 +164,7 @@ namespace CasADi{
     if(nfwd==0 && nadj==0) return;
 
     // Temporaries
-    vector<int> row_offset(1,0);
+    vector<int> col_offset(1,0);
     vector<MX> rhs;
     vector<int> rhs_loc;
 
@@ -193,8 +193,8 @@ namespace CasADi{
         for(int i=0; i<getNumOutputs(); ++i){
           if(aseed[d][i]!=0){
             if(i==iout_){
-              rhs.push_back(trans(*aseed[d][i]));
-              row_offset.push_back(row_offset.back()+1);
+              rhs.push_back(*aseed[d][i]);
+              col_offset.push_back(col_offset.back()+1);
               rhs_loc.push_back(v.size()); // where to store it
               v.push_back(MX());
             } else {
@@ -206,11 +206,11 @@ namespace CasADi{
       }
 
       // Solve for all right-hand-sides at once
-      rhs = vertsplit(J->getSolve(vertcat(rhs),false,linsol_),row_offset);
+      rhs = horzsplit(J->getSolve(horzcat(rhs),true,linsol_),col_offset);
       for(int d=0; d<rhs.size(); ++d){
-        v[rhs_loc[d]] = trans(rhs[d]);
+        v[rhs_loc[d]] = rhs[d];
       }
-      row_offset.resize(1);
+      col_offset.resize(1);
       rhs.clear();
     }
   
@@ -227,8 +227,8 @@ namespace CasADi{
         for(int i=0; i<getNumOutputs(); ++i){
           if(i==iout_){
             // Collect the arguments
-            rhs.push_back(trans(*v_it++));
-            row_offset.push_back(row_offset.back()+1);        
+            rhs.push_back(*v_it++);
+            col_offset.push_back(col_offset.back()+1);        
           } else {
             // Auxiliary output
             if(fsens[d][i]!=0){
@@ -239,14 +239,14 @@ namespace CasADi{
       }
         
       // Solve for all the forward derivatives at once
-      rhs = vertsplit(J->getSolve(vertcat(rhs),true,linsol_),row_offset);
+      rhs = horzsplit(J->getSolve(horzcat(rhs),false,linsol_),col_offset);
       for(int d=0; d<nfwd; ++d){
         if(fsens[d][iout_]!=0){
-          *fsens[d][iout_] = -trans(rhs[d]);
+          *fsens[d][iout_] = -rhs[d];
         }
       }
       
-      row_offset.resize(1);
+      col_offset.resize(1);
       rhs.clear();
     }
 
@@ -279,7 +279,7 @@ namespace CasADi{
       
       // "Solve" in order to propagate to z
       output(iout_).setZeroBV();
-      linsol_.spSolve(output(iout_),f_.output(iout_),true);
+      linsol_.spSolve(output(iout_),f_.output(iout_),false);
       
       // Propagate to auxiliary outputs
       if(getNumOutputs()>1){
@@ -313,7 +313,7 @@ namespace CasADi{
 
       // "Solve" in order to get seed
       f_.output(iout_).setZeroBV();
-      linsol_.spSolve(f_.output(iout_),input(iin_),false);
+      linsol_.spSolve(f_.output(iout_),input(iin_),true);
       
       // Propagate dependencies through the function
       f_.spEvaluate(false);

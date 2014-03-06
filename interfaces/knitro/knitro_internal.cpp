@@ -154,20 +154,20 @@ namespace CasADi{
     int status;
   
     // Jacobian sparsity
-    vector<int> Jcol = jacG_.output().col();
-    vector<int> Jrow = jacG_.output().sparsity().getRow();
+    vector<int> Jcol = jacG_.output().sparsity().getCol();
+    vector<int> Jrow = jacG_.output().row();
 
     // Hessian sparsity
     int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().sizeL();
     vector<int> Hcol(nnzH), Hrow(nnzH);
     if(nnzH>0){
-      const vector<int> &rowind = hessLag_.output().rowind();
-      const vector<int> &col = hessLag_.output().col();
+      const vector<int> &colind = hessLag_.output().colind();
+      const vector<int> &row = hessLag_.output().row();
       int nz=0;
-      for(int r=0; r<rowind.size()-1; ++r){
-	for(int el=rowind[r]; el<rowind[r+1] && col[el]<=r; ++el){
-	  Hcol[nz] = r;
-	  Hrow[nz] = col[el];
+      for(int cc=0; cc<colind.size()-1; ++cc){
+	for(int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el){
+	  Hcol[nz] = cc;
+	  Hrow[nz] = row[el];
 	  nz++;
 	}
       }

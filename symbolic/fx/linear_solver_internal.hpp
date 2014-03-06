@@ -34,7 +34,7 @@ namespace CasADi{
   class LinearSolverInternal : public FXInternal{
   public:
     // Constructor
-    LinearSolverInternal(const CRSSparsity& sparsity, int nrhs);
+    LinearSolverInternal(const Sparsity& sparsity, int nrhs);
         
     // Destructor
     virtual ~LinearSolverInternal();
@@ -71,8 +71,8 @@ namespace CasADi{
 
     //@{
     // Propagate sparsity through a linear solve
-    void spSolve(bvec_t* X, bvec_t* B, bool transpose) const;
-    void spSolve(DMatrix& X, DMatrix& B, bool transpose) const;
+    void spSolve(bvec_t* X, const bvec_t* B, bool transpose) const;
+    void spSolve(DMatrix& X, const DMatrix& B, bool transpose) const;
     //@}
 
     // Dulmage-Mendelsohn decomposition
@@ -85,8 +85,8 @@ namespace CasADi{
     int nrow() const{ return input(LINSOL_A).size1();}
     int ncol() const{ return input(LINSOL_A).size2();}
     int nnz() const{ return input(LINSOL_A).size();}
-    const std::vector<int>& col() const{ return input(LINSOL_A).col();}
-    const std::vector<int>& rowind() const{ return input(LINSOL_A).rowind();}    
+    const std::vector<int>& row() const{ return input(LINSOL_A).row();}
+    const std::vector<int>& colind() const{ return input(LINSOL_A).colind();}    
   };
 
 

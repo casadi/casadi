@@ -203,7 +203,7 @@ class casadiTestCase(unittest.TestCase):
       sample = x
       
 
-    if isinstance(sample,SX) or isinstance(sample,SXMatrix):
+    if isinstance(sample,SXElement) or isinstance(sample,SX):
       f = SXFunction(x,yt)
     else:
       f = MXFunction(x,yt)
@@ -237,7 +237,7 @@ class casadiTestCase(unittest.TestCase):
         Checks if 'fr(x0)' yields the same as S/MXFunction(x,[ft(x)]) , evaluated for x0
     
         x: the symbolic seed for the test. It should be of a form accepted as first argument of SXFunction/MXFunction
-        ft: the test function. This function should operate on the casadi matrix x and return MX or SXMatrix.
+        ft: the test function. This function should operate on the casadi matrix x and return MX or SX.
         fr: the reference function. This function works on the numpy array x0.
         
         name - a descriptor that will be included in error messages
@@ -395,7 +395,7 @@ class casadiTestCase(unittest.TestCase):
       spmods = [lambda x: x , remove00]
       spmods = [lambda x: x]
       
-      sym = msym
+      sym = MX.sym
       Function = MXFunction
       
       storage2 = {}
@@ -403,7 +403,7 @@ class casadiTestCase(unittest.TestCase):
       
       ndir = 2
       
-      def flatten(l):
+      def vec(l):
         ret = []
         for i in l:
           ret.extend(i)
@@ -421,7 +421,7 @@ class casadiTestCase(unittest.TestCase):
       
           res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
           
-          vf = Function(inputss+flatten([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + flatten([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
+          vf = Function(inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
           
           vf.init()
 
@@ -452,7 +452,7 @@ class casadiTestCase(unittest.TestCase):
            
               res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
 
-              vf2 = Function(inputss2+flatten([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + flatten([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+              vf2 = Function(inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
               vf2.init()
                 
               for i,v in enumerate(values):

@@ -38,14 +38,14 @@ using namespace CasADi;
 /** \brief Generate a simple ODE */
 void simpleODE(FX& ffcn, double& tf, vector<double>& x0, double& u0){
   // Time 
-  SXMatrix t = ssym("t");
+  SX t = SX::sym("t");
   
   // Parameter
-  SXMatrix u = ssym("u");
+  SX u = SX::sym("u");
   
   // Differential states
-  SXMatrix s = ssym("s"), v = ssym("v"), m = ssym("m");
-  SXMatrix x;
+  SX s = SX::sym("s"), v = SX::sym("v"), m = SX::sym("m");
+  SX x;
   x.append(s);
   x.append(v);
   x.append(m); 
@@ -55,13 +55,13 @@ void simpleODE(FX& ffcn, double& tf, vector<double>& x0, double& u0){
   double beta = 0.1;   // fuel consumption rate
   
   // Differential equation
-  SXMatrix ode;
+  SX ode;
   ode.append(v);
   ode.append((u-alpha*v*v)/m);
   ode.append(-beta*u*u); 
       
   // Quadrature
-  SXMatrix quad = pow(v,3) + pow((3-sin(t))-u,2);
+  SX quad = pow(v,3) + pow((3-sin(t))-u,2);
 
   // Callback function
   ffcn = SXFunction(daeIn("t",t,"x",x,"p",u),daeOut("ode",ode,"quad",quad));
@@ -82,22 +82,22 @@ void simpleODE(FX& ffcn, double& tf, vector<double>& x0, double& u0){
 /** \brief Generate a simple DAE */
 void simpleDAE(FX& ffcn, double& tf, vector<double>& x0, double& u0){
   // Parameter
-  SXMatrix u = ssym("u");
+  SX u = SX::sym("u");
   
   // Differential state
-  SXMatrix x = ssym("x");
+  SX x = SX::sym("x");
 
   // Algebraic variable
-  SXMatrix z = ssym("z");
+  SX z = SX::sym("z");
 
   // Differential equation
-  SXMatrix ode = -x + 0.5*x*x + u + 0.5*z;
+  SX ode = -x + 0.5*x*x + u + 0.5*z;
 
   // Algebraic constraint
-  SXMatrix alg = z + exp(z) - 1. + x;
+  SX alg = z + exp(z) - 1. + x;
 
   // Quadrature
-  SXMatrix quad = x*x + 3.0*u*u;
+  SX quad = x*x + 3.0*u*u;
   
   // Callback function
   ffcn = SXFunction(daeIn("x",x,"z",z,"p",u),daeOut("ode",ode,"alg",alg,"quad",quad));

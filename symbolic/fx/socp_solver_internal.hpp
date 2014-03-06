@@ -33,7 +33,7 @@ class SOCPSolverInternal : public FXInternal{
   public:
 
     // Constructor
-    SOCPSolverInternal(const std::vector<CRSSparsity>& st);
+    SOCPSolverInternal(const std::vector<Sparsity>& st);
     
     // Destructor
     virtual ~SOCPSolverInternal() = 0;
@@ -56,7 +56,7 @@ class SOCPSolverInternal : public FXInternal{
   protected:
   
     /// Problem structure
-    std::vector<CRSSparsity> st_;
+    std::vector<Sparsity> st_;
     
     /// Sizes of each block
     std::vector<int> ni_;

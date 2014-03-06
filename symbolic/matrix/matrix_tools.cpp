@@ -41,18 +41,18 @@ namespace CasADi{
     mysolver.setOption(dict);
     mysolver.init();
     mysolver.setInput(A,LINSOL_A);
-    mysolver.setInput(trans(b),LINSOL_B);
+    mysolver.setInput(b,LINSOL_B);
     mysolver.prepare();
-    mysolver.solve(true);
-    return trans(mysolver.output(LINSOL_X));
+    mysolver.solve(false);
+    return mysolver.output(LINSOL_X);
   }
 
 
   Matrix<double> pinv(const Matrix<double>& A, linearSolverCreator lsolver, const Dictionary& dict) {
-    if (A.size2()>=A.size1()) {
-      return trans(solve(mul(A,trans(A)),A,lsolver,dict));
-    } else {
+    if (A.size1()>=A.size2()) {
       return solve(mul(trans(A),A),trans(A),lsolver,dict);
+    } else {
+      return trans(solve(mul(A,trans(A)),A,lsolver,dict));
     }
   }
     

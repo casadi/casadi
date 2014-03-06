@@ -58,7 +58,7 @@ C = np.zeros((deg+1,deg+1))
 D = np.zeros(deg+1)
 
 # Collocation point
-tau = ssym("tau")
+tau = SX.sym("tau")
   
 # All collocation time points
 tau_root = collocationPoints(deg,cp)
@@ -97,20 +97,20 @@ for j in range(deg+1):
 # Model setup
 # -----------------------------------------------------------------------------
 # Declare variables (use scalar graph)
-t  = ssym("t")          # time
-u  = ssym("u")          # control
-xd  = ssym("xd",ndstate)      # differential state
-xa  = ssym("xa",nastate)    # algebraic state
-xddot  = ssym("xdot",ndstate) # differential state time derivative
-p = ssym("p",0,1)      # parameters
+t  = SX.sym("t")          # time
+u  = SX.sym("u")          # control
+xd  = SX.sym("xd",ndstate)      # differential state
+xa  = SX.sym("xa",nastate)    # algebraic state
+xddot  = SX.sym("xdot",ndstate) # differential state time derivative
+p = SX.sym("p",0,1)      # parameters
  
-x = ssym("x")
-y = ssym("y")
-w = ssym("w")
+x = SX.sym("x")
+y = SX.sym("y")
+w = SX.sym("w")
 
-dx = ssym("dx")
-dy = ssym("dy")
-dw = ssym("dw")
+dx = SX.sym("dx")
+dy = SX.sym("dy")
+dw = SX.sym("dw")
 
       
 res = vertcat([xddot[0] - dx,\
@@ -179,19 +179,19 @@ p_init = np.array([])
 # Initial constraint
 ic_min = np.array([])
 ic_max = np.array([])
-ic = SXMatrix()
+ic = SX()
 #ic.append();       ic_min = append(ic_min, 0.);         ic_max = append(ic_max, 0.)
 icfcn = SXFunction([t,xd,xa,u,p],[ic])
 # Path constraint
 pc_min = np.array([])
 pc_max = np.array([])
-pc = SXMatrix()
+pc = SX()
 #pc.append();       pc_min = append(pc_min, 0.);         pc_max = append(pc_max, 0.)
 pcfcn = SXFunction([t,xd,xa,u,p],[pc])
 # Final constraint
 fc_min = np.array([])
 fc_max = np.array([])
-fc = SXMatrix()
+fc = SX()
 #fc.append();       fc_min = append(fc_min, 0.);         fc_max = append(fc_max, 0.)
 fcfcn = SXFunction([t,xd,xa,u,p],[fc])
 
@@ -221,7 +221,7 @@ NXF = ndiff                 # Final state (only the differential states)
 NV = NXD+NXA+NU+NXF+NP
 
 # NLP variable vector
-V = msym("V",NV)
+V = MX.sym("V",NV)
   
 # All variables with bounds and initial guess
 vars_lb = np.zeros(NV)

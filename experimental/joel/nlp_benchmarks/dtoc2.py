@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 n = 1000
 nx = 2
 ny = 4
-c = SXMatrix.nan(ny+1,nx+1)
+c = SX.nan(ny+1,nx+1)
 for i in range(1,ny+1): 
   for j in range(1,nx+1): 
     c[i,j] = float(i+j)/(2+ny)

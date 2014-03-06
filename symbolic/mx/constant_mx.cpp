@@ -31,7 +31,7 @@ using namespace std;
 
 namespace CasADi{
 
-  ConstantMX::ConstantMX(const CRSSparsity& sp){
+  ConstantMX::ConstantMX(const Sparsity& sp){
     setSparsity(sp);
   }
 
@@ -41,7 +41,7 @@ namespace CasADi{
   void ConstantMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
   }
 
-  void ConstantMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+  void ConstantMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
   }
 
   void ConstantMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
@@ -91,7 +91,7 @@ namespace CasADi{
     return !isZero();
   }
 
-  ConstantMX* ConstantMX::create(const CRSSparsity& sp, int val){
+  ConstantMX* ConstantMX::create(const Sparsity& sp, int val){
     switch(val){
     case 0: return new Constant<CompiletimeConst<0> >(sp);
     case 1: return new Constant<CompiletimeConst<1> >(sp);
@@ -100,7 +100,7 @@ namespace CasADi{
     }
   }
 
-  ConstantMX* ConstantMX::create(const CRSSparsity& sp, double val){
+  ConstantMX* ConstantMX::create(const Sparsity& sp, double val){
     int intval(val);
     if(intval-val==0){
       return create(sp,intval);

@@ -37,8 +37,8 @@ nx = 3
 np = 1
 
 # Declare variables
-x  = ssym("x",nx)  # state
-p  = ssym("u",np)  # control
+x  = SX.sym("x",nx)  # state
+p  = SX.sym("u",np)  # control
 
 # ODE right hand side function
 ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + p, \
@@ -66,7 +66,7 @@ C = N.zeros((d+1,d+1))
 D = N.zeros(d+1)
 
 # Dimensionless time inside one control interval
-tau = ssym("tau")
+tau = SX.sym("tau")
   
 # For all collocation points
 for j in range(d+1):
@@ -92,9 +92,9 @@ for j in range(d+1):
     C[j,r] = tfcn.getOutput()
 
 # Total number of variables for one finite element
-X0 = msym("X0",nx)
-P  = msym("P",np)
-V = msym("V",d*nx)
+X0 = MX.sym("X0",nx)
+P  = MX.sym("P",np)
+V = MX.sym("V",d*nx)
 
 # Get the state at each collocation point
 X = [X0] + list(vertsplit(V,[r*nx for r in range(d+1)]))

@@ -155,7 +155,7 @@ namespace CasADi{
     // Null output arguments become empty
     for(int i=0; i<outputv_.size(); ++i) {
       if (outputv_[i].isNull()) {
-        outputv_[i] = MatType(0,0);
+        outputv_[i] = MatType::sparse(0,0);
       }
     }
 
@@ -576,17 +576,17 @@ namespace CasADi{
     }
     
     // Create return object
-    MatType ret = MatType(jacSparsity(iind,oind,compact,symmetric));
+    MatType ret = MatType(jacSparsity(iind,oind,compact,symmetric).transpose());
     if(verbose()) std::cout << "XFunctionInternal::jac allocated return value" << std::endl;
   
     // Get a bidirectional partition
-    CRSSparsity D1, D2;
+    Sparsity D1, D2;
     getPartition(iind,oind,D1,D2,true,symmetric);
     if(verbose()) std::cout << "XFunctionInternal::jac graph coloring completed" << std::endl;
 
     // Get the number of forward and adjoint sweeps
-    int nfdir = D1.isNull() ? 0 : D1.size1();
-    int nadir = D2.isNull() ? 0 : D2.size1();
+    int nfdir = D1.isNull() ? 0 : D1.size2();
+    int nadir = D2.isNull() ? 0 : D2.size2();
   
     // Number of derivative directions supported by the function
     int max_nfdir = optimized_num_dir;
@@ -602,22 +602,22 @@ namespace CasADi{
     std::vector<std::vector<MatType> > fseed, aseed, fsens, asens;
   
     // Get the sparsity of the Jacobian block
-    const CRSSparsity& jsp = jacSparsity(iind,oind,true,symmetric);
-    const std::vector<int>& jsp_rowind = jsp.rowind();
-    const std::vector<int>& jsp_col = jsp.col();
+    Sparsity jsp = jacSparsity(iind,oind,true,symmetric).transpose();
+    const std::vector<int>& jsp_colind = jsp.colind();
+    const std::vector<int>& jsp_row = jsp.row();
   
     // Input sparsity
-    std::vector<int> input_row = input(iind).sparsity().getRow();
-    const std::vector<int>& input_col = input(iind).col();
+    std::vector<int> input_col = input(iind).sparsity().getCol();
+    const std::vector<int>& input_row = input(iind).row();
 
     // Output sparsity
-    std::vector<int> output_row = output(oind).sparsity().getRow();
-    const std::vector<int>& output_col = output(oind).col();
+    std::vector<int> output_col = output(oind).sparsity().getCol();
+    const std::vector<int>& output_row = output(oind).row();
 
     // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
     if(verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;
     std::vector<int> mapping;
-    CRSSparsity jsp_trans;
+    Sparsity jsp_trans;
     if(nfdir>0){
       jsp_trans = jsp.transpose(mapping);
     }
@@ -643,7 +643,7 @@ namespace CasADi{
     if(verbose())   std::cout << "XFunctionInternal::jac " << nsweep << " sweeps needed for " << nfdir << " forward and " << nadir << " adjoint directions"  << std::endl;
   
     // Sparsity of the seeds
-    vector<int> seed_row, seed_col;
+    vector<int> seed_col, seed_row;
 
     // Evaluate until everything has been determinated
     for(int s=0; s<nsweep; ++s){
@@ -665,18 +665,18 @@ namespace CasADi{
       fseed.resize(nfdir_batch);
       for(int d=0; d<nfdir_batch; ++d){
         // Nonzeros of the seed matrix
-        seed_row.clear();
         seed_col.clear();
+        seed_row.clear();
 
         // For all the directions
-        for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
+        for(int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el){
         
           // Get the direction
-          int c = D1.col(el);
+          int c = D1.row(el);
 
           // Give a seed in the direction
-          seed_row.push_back(input_row[c]);
           seed_col.push_back(input_col[c]);
+          seed_row.push_back(input_row[c]);
         }
 
         // initialize to zero
@@ -695,18 +695,18 @@ namespace CasADi{
       aseed.resize(nadir_batch);
       for(int d=0; d<nadir_batch; ++d){
         // Nonzeros of the seed matrix
-        seed_row.clear();
         seed_col.clear();
+        seed_row.clear();
 
         // For all the directions
-        for(int el = D2.rowind(offset_nadir+d); el<D2.rowind(offset_nadir+d+1); ++el){
+        for(int el = D2.colind(offset_nadir+d); el<D2.colind(offset_nadir+d+1); ++el){
         
           // Get the direction
-          int c = D2.col(el);
+          int c = D2.row(el);
 
           // Give a seed in the direction
-          seed_row.push_back(output_row[c]);
           seed_col.push_back(output_col[c]);
+          seed_row.push_back(output_row[c]);
         }
 
         //initialize to zero
@@ -755,14 +755,14 @@ namespace CasADi{
           fill(hits.begin(),hits.end(),0);
 
           // "Multiply" Jacobian sparsity by seed vector
-          for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
+          for(int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el){
           
             // Get the input nonzero
-            int c = D1.col(el);
+            int c = D1.row(el);
           
             // Propagate dependencies
-            for(int el_jsp=jsp_rowind[c]; el_jsp<jsp_rowind[c+1]; ++el_jsp){
-              hits[jsp_col[el_jsp]]++;
+            for(int el_jsp=jsp_colind[c]; el_jsp<jsp_colind[c+1]; ++el_jsp){
+              hits[jsp_row[el_jsp]]++;
             }
           }
         }
@@ -785,20 +785,20 @@ namespace CasADi{
         }
       
         // For all the input nonzeros treated in the sweep
-        for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
+        for(int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el){
 
           // Get the input nonzero
-          int c = D1.col(el);
+          int c = D1.row(el);
           int f2_out;
           if(symmetric){
             f2_out = nzmap2[c];
           }
         
           // Loop over the output nonzeros corresponding to this input nonzero
-          for(int el_out = jsp_trans.rowind(c); el_out<jsp_trans.rowind(c+1); ++el_out){
+          for(int el_out = jsp_trans.colind(c); el_out<jsp_trans.colind(c+1); ++el_out){
           
             // Get the output nonzero
-            int r_out = jsp_trans.col(el_out);
+            int r_out = jsp_trans.row(el_out);
           
             // Get the forward sensitivity nonzero
             int f_out = nzmap[r_out];
@@ -834,16 +834,16 @@ namespace CasADi{
         asens[d][iind].sparsity().getNZInplace(nzmap);
       
         // For all the output nonzeros treated in the sweep
-        for(int el = D2.rowind(offset_nadir+d); el<D2.rowind(offset_nadir+d+1); ++el){
+        for(int el = D2.colind(offset_nadir+d); el<D2.colind(offset_nadir+d+1); ++el){
 
           // Get the output nonzero
-          int r = D2.col(el);
+          int r = D2.row(el);
 
           // Loop over the input nonzeros that influences this output nonzero
-          for(int elJ = jsp.rowind(r); elJ<jsp.rowind(r+1); ++elJ){
+          for(int elJ = jsp.colind(r); elJ<jsp.colind(r+1); ++elJ){
           
             // Get the input nonzero
-            int inz = jsp.col(elJ);
+            int inz = jsp.row(elJ);
           
             // Get the corresponding adjoint sensitivity nonzero
             int anz = nzmap[inz];
@@ -862,7 +862,7 @@ namespace CasADi{
   
     // Return
     if(verbose()) std::cout << "XFunctionInternal::jac end" << std::endl;
-    return ret;
+    return trans(ret);
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
@@ -980,94 +980,6 @@ namespace CasADi{
     ret.init();
     return ret;
   }
-
-  // template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  // FX XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getDerivativeViaJac(int nfdir, int nadir){
- 
-  //   // Seeds
-  //   std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfdir);
-  //   std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadir);
-
-  //   // Sensitivities
-  //   std::vector<std::vector<MatType> > fsens(nfdir,std::vector<MatType>(outputv_.size()));
-  //   std::vector<std::vector<MatType> > asens(nadir,std::vector<MatType>(inputv_.size()));
-  
-  //   // Loop over outputs
-  //   for (int oind = 0; oind < outputv_.size(); ++oind) {
-  //     // Output dimensions
-  //     int od1 = outputv_[oind].size1();
-  //     int od2 = outputv_[oind].size2();
-    
-  //     // Loop over inputs
-  //     for (int iind = 0; iind < inputv_.size(); ++iind) {
-  //       // Input dimensions
-  //       int id1 = inputv_[iind].size1();
-  //       int id2 = inputv_[iind].size2();
-
-  //       // Create a Jacobian block
-  //       MatType J = jac(iind,oind);
-  //       if (isZero(J)) continue;
-
-  //       // Forward sensitivities
-  //       for (int d = 0; d < nfdir; ++d) {
-  //         MatType fsens_d = mul(J, flatten(fseed[d][iind]));
-  //         if (!isZero(fsens_d)) {
-  //           // Reshape sensitivity contribution if necessary
-  //           if (od2 > 1)
-  //             fsens_d = reshape(fsens_d, od1, od2);
-
-  //           // Save or add to vector
-  //           if (fsens[d][oind].isNull() || fsens[d][oind].empty()) {
-  //             fsens[d][oind] = fsens_d;
-  //           } else {
-  //             fsens[d][oind] += fsens_d;
-  //           }
-  //         }
-
-  //         // If no contribution added, set to zero
-  //         if (fsens[d][oind].isNull() || fsens[d][oind].empty()) {
-  //           fsens[d][oind] = MatType::sparse(od1, od2);
-  //         }
-  //       }
-
-  //       // Adjoint sensitivities
-  //       for (int d = 0; d < nadir; ++d) {
-  //         MatType asens_d = mul(trans(J), flatten(aseed[d][oind]));
-  //         if (!isZero(asens_d)) {
-  //           // Reshape sensitivity contribution if necessary
-  //           if (id2 > 1)
-  //             asens_d = reshape(asens_d, id1, id2);
-
-  //           // Add to vector
-  //           asens[d][iind] += asens_d;
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   // All inputs of the return function
-  //   std::vector<MatType> ret_in;
-  //   ret_in.reserve(inputv_.size()*(1+nfdir) + outputv_.size()*nadir);
-  //   ret_in.insert(ret_in.end(),inputv_.begin(),inputv_.end());
-  //   for(int dir=0; dir<nfdir; ++dir)
-  //     ret_in.insert(ret_in.end(),fseed[dir].begin(),fseed[dir].end());
-  //   for(int dir=0; dir<nadir; ++dir)
-  //     ret_in.insert(ret_in.end(),aseed[dir].begin(),aseed[dir].end());
-
-  //   // All outputs of the return function
-  //   std::vector<MatType> ret_out;
-  //   ret_out.reserve(outputv_.size()*(1+nfdir) + inputv_.size()*nadir);
-  //   ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
-  //   for(int dir=0; dir<nfdir; ++dir)
-  //     ret_out.insert(ret_out.end(),fsens[dir].begin(),fsens[dir].end());
-  //   for(int dir=0; dir<nadir; ++dir)
-  //     ret_out.insert(ret_out.end(),asens[dir].begin(),asens[dir].end());
-
-  //   // Assemble function and return
-  //   PublicType ret(ret_in,ret_out);
-  //   ret.init();
-  //   return ret;  
-  // }
   
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::purgeSeeds(

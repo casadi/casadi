@@ -37,7 +37,7 @@ p = ssym("p")
 q = ssym("q")
 
 # Differential equation input argument
-ffcn_in = SXMatrixVector(DAE_NUM_IN)
+ffcn_in = SXVector(DAE_NUM_IN)
 ffcn_in[DAE_T] = t
 ffcn_in[DAE_Y] = vertcat((x,z))
 ffcn_in[DAE_P] = vertcat((p,q))

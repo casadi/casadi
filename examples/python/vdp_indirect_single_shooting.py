@@ -25,11 +25,11 @@ import matplotlib.pyplot as plt
 
 
 # Declare variables (use simple, efficient DAG)
-x0=ssym("x0"); x1=ssym("x1")
+x0=SX.sym("x0"); x1=SX.sym("x1")
 x = vertcat((x0,x1))
 
 # Control
-u = ssym("u")
+u = SX.sym("u")
 
 # ODE right hand side
 xdot = vertcat([(1 - x1*x1)*x0 - x1 + u, x0])
@@ -38,7 +38,7 @@ xdot = vertcat([(1 - x1*x1)*x0 - x1 + u, x0])
 L = x0*x0 + x1*x1 + u*u
 
 # Costate
-lam = ssym("lam",2)
+lam = SX.sym("lam",2)
 
 # Hamiltonian function
 H = inner_prod(lam,xdot) + L
@@ -81,7 +81,7 @@ I.init()
 x_init = NP.array([0.,1.])
 
 # The initial costate
-l_init = msym("l_init",2)
+l_init = MX.sym("l_init",2)
 
 # The initial condition for the shooting
 X = vertcat((x_init,l_init))

@@ -71,12 +71,12 @@ void DirectCollocationInternal::init(){
   DMatrix D_num = DMatrix(deg_+1,1,0);
 
   // Collocation point
-  SXMatrix tau = ssym("tau");
+  SX tau = SX::sym("tau");
 
   // For all collocation points
   for(int j=0; j<deg_+1; ++j){
     // Construct Lagrange polynomials to get the polynomial basis at the collocation point
-    SXMatrix L = 1;
+    SX L = 1;
     for(int j2=0; j2<deg_+1; ++j2){
       if(j2 != j){
         L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
@@ -122,7 +122,7 @@ void DirectCollocationInternal::init(){
   nlp_nx += nx_;                       // Final state
 
   // NLP variable vector
-  MX nlp_x = msym("x",nlp_nx);
+  MX nlp_x = MX::sym("x",nlp_nx);
   int offset = 0;
 
   // Get collocated states and parametrized control

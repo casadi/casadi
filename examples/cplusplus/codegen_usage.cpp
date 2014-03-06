@@ -92,7 +92,7 @@ int usage_c_unknown_signature(){
   /* Signature of the entry point */
   typedef int (*evaluateWrapPtr)(const double** x, double** r);
   typedef int (*initPtr)(int *n_in_, int *n_out_);
-  typedef int (*getSparsityPtr)(int n_in, int *n_row, int *n_col, int **rowind, int **col);
+  typedef int (*getSparsityPtr)(int n_in, int *n_col, int *n_row, int **colind, int **row);
   
   /* Handle to the dll */
   void* handle;
@@ -143,22 +143,22 @@ int usage_c_unknown_signature(){
     }
 
     int nrow,ncol;
-    int *rowind, *col;
-    getSparsity(ind,&nrow,&ncol,&rowind,&col);
+    int *colind, *row;
+    getSparsity(ind,&nrow,&ncol,&colind,&row);
 
     printf("  Dimension: %d-by-%d\n",nrow,ncol);
     printf("  Nonzeros: {");
-    int i,j,el;
-    for(i=0; i<nrow; ++i){ /* loop over rows */
-      for(el=rowind[i]; el<rowind[i+1]; ++el){ /* loop over nonzeros */
+    int rr,cc,el;
+    for(cc=0; cc<ncol; ++cc){ /* loop over rows */
+      for(el=colind[cc]; el<colind[cc+1]; ++el){ /* loop over nonzeros */
         /* Separate the entries */
         if(el!=0) printf(", ");
 
         /* Get the column */
-        j = col[el]; 
+        rr = row[el]; 
         
         /* Print the nonzero */
-        printf("{%d,%d}",i,j);
+        printf("{%d,%d}",rr,cc);
       }
     }
 
@@ -213,14 +213,14 @@ void usage_cplusplus(){
 int main(){
     
   // Variables
-  SXMatrix x = ssym("x",2,2);
-  SXMatrix y = ssym("y",1); 
+  SX x = SX::sym("x",2,2);
+  SX y = SX::sym("y",1); 
 
   // Simple function
-  vector<SXMatrix> f_in;
+  vector<SX> f_in;
   f_in.push_back(x);
   f_in.push_back(y);
-  vector<SXMatrix> f_out;
+  vector<SX> f_out;
   f_out.push_back(sqrt(y)-1);
   f_out.push_back(sin(x)-y);
   SXFunction f(f_in,f_out);

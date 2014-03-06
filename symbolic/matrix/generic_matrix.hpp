@@ -26,37 +26,38 @@
 #include "slice.hpp"
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
-#include "crs_sparsity.hpp"
+#include "sparsity.hpp"
 #include "sparsity_tools.hpp"
 #include "../casadi_math.hpp"
 
 namespace CasADi{
 
   /** Sparsity format for getting and setting inputs and outputs */
-  enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
+  enum SparsityType{SPARSE,SPARSESYM,DENSE,DENSESYM,DENSETRANS};
 
   /** \brief Matrix base class
-  This is a common base class for MX and Matrix<>, introducing a uniform syntax and implementing
-  common functionality using the curiously recurring template pattern (CRTP) idiom.\n
+      This is a common base class for MX and Matrix<>, introducing a uniform syntax and implementing
+      common functionality using the curiously recurring template pattern (CRTP) idiom.\n
   
-  The class is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
-  This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n
+      The class is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
+      This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n
   
-  The syntax tries to stay as close as possible to the ublas syntax  when it comes to vector/matrix operations.\n
+      The syntax tries to stay as close as possible to the ublas syntax  when it comes to vector/matrix operations.\n
 
-  Index starts with 0.\n
-  Index flatten happens as follows: (i,j) -> k = j+i*size2()\n
-  Vectors are considered to be column vectors.\n
+      Index starts with 0.\n
+      Index vec happens as follows: (rr,cc) -> k = rr+cc*size1()\n
+      Vectors are column vectors.\n
   
-  The storage format is a (modified) compressed row storage (CRS) format. This way, a vector element can always be accessed in constant time.\n
+      The storage format is Compressed Column Storage (CCS), similar to that used for sparse matrices in Matlab, \n
+      but unlike this format, we do allow for elements to be structurally non-zero but numerically zero.\n
   
-  The sparsity can be accessed with CRSSparsity& sparsity()\n
+      The sparsity pattern, which is reference counted and cached, can be accessed with Sparsity& sparsity()\n
   
-  \author Joel Andersson 
-  \date 2012    
-*/
-template<typename MatType>
-class GenericMatrix{
+      \author Joel Andersson 
+      \date 2012    
+  */
+  template<typename MatType>
+  class GenericMatrix{
   public:
     
     /** \brief Get the number of (structural) non-zero elements */
@@ -65,7 +66,7 @@ class GenericMatrix{
     /** \brief Get the number of non-zeros in the lower triangular half */
     int sizeL() const;
 
-    /** \brief Get get the number of non-zeros in the upper triangular half */
+    /** \brief Get the number of non-zeros in the upper triangular half */
     int sizeU() const;
 
     /** \brief Get get the number of non-zeros on the diagonal */
@@ -74,24 +75,24 @@ class GenericMatrix{
     /** \brief Get the number of elements */
     int numel() const;
 
-    /** \brief Get the first dimension (i.e. n for a n-by-m matrix) */
+    /** \brief Get the first dimension (i.e. number of rows) */
     int size1() const;
-    
-    /** \brief Get the first dimension (i.e. m for a n-by-m matrix) */
+
+    /** \brief Get the second dimension (i.e. number of columns) */
     int size2() const;
 
     /** \brief Get the number if non-zeros for a given sparsity pattern */
-    int size(Sparsity sp) const;
+    int size(SparsityType sp) const;
     
     /** \brief Get string representation of dimensions.
-    The representation is (nrow x ncol = numel | size)
+        The representation is (nrow x ncol = numel | size)
     */
     std::string dimString() const;
     
-    #ifndef SWIG  
+#ifndef SWIG  
     /** \brief  Get the shape */
     std::pair<int,int> shape() const;
-    #endif
+#endif
 
     /** \brief  Check if the matrix expression is empty, i.e. one of its dimensions is 0 */
     bool empty() const;
@@ -108,13 +109,16 @@ class GenericMatrix{
     /** \brief  Check if the matrix expression is square */
     bool square() const;
 
+    /** \brief  Check if the matrix is a vector (i.e. size2()==1) */
+    bool vector() const;
+
     /** \brief Get the sparsity pattern */
-    const CRSSparsity& sparsity() const;
+    const Sparsity& sparsity() const;
 
     /** \brief Access the sparsity, make a copy if there are multiple references to it */
-    CRSSparsity& sparsityRef();
+    Sparsity& sparsityRef();
 
-    #ifndef SWIG
+#ifndef SWIG
     /** \brief  Get vector nonzero or slice of nonzeros */
     template<typename K>
     const MatType operator[](const K& k) const{ return static_cast<const MatType*>(this)->getNZ(k); }
@@ -124,202 +128,244 @@ class GenericMatrix{
     NonZeros<MatType,K> operator[](const K& k){ return NonZeros<MatType,K>(static_cast<MatType&>(*this),k); }
 
     /** \brief  Get vector element or slice */
-    template<typename I>
-    const MatType operator()(const I& i) const{ return static_cast<const MatType*>(this)->sub(i,0);}
+    template<typename RR>
+    const MatType operator()(const RR& rr) const{ return static_cast<const MatType*>(this)->sub(rr,0);}
 
     /** \brief  Get Sparsity slice */
-    const MatType operator()(const CRSSparsity& sp) const{ return static_cast<const MatType*>(this)->sub(sp); }
+    const MatType operator()(const Sparsity& sp) const{ return static_cast<const MatType*>(this)->sub(sp); }
     
     /** \brief  Get Matrix element or slice */
-    template<typename I, typename J>
-    const MatType operator()(const I& i, const J& j) const{ return static_cast<const MatType*>(this)->sub(i,j); }
+    template<typename RR, typename CC>
+    const MatType operator()(const RR& rr, const CC& cc) const{ return static_cast<const MatType*>(this)->sub(rr,cc); }
 
     /** \brief  Access vector element or slice */
-    template<typename I>
-    SubMatrix<MatType,I,int> operator()(const I& i){ return SubMatrix<MatType,I,int>(static_cast<MatType&>(*this),i,0); }
+    template<typename RR>
+    SubMatrix<MatType,RR,int> operator()(const RR& rr){ return SubMatrix<MatType,RR,int>(static_cast<MatType&>(*this),rr,0); }
 
     /** \brief  Access Sparsity slice */
-    SubMatrix<MatType,CRSSparsity,int> operator()(const CRSSparsity& sp){ return SubMatrix<MatType,CRSSparsity,int>(static_cast<MatType&>(*this),sp,0); }
+    SubMatrix<MatType,Sparsity,int> operator()(const Sparsity& sp){ return SubMatrix<MatType,Sparsity,int>(static_cast<MatType&>(*this),sp,0); }
       
     /** \brief  Access Matrix element or slice */
-    template<typename I, typename J>
-    SubMatrix<MatType,I,J> operator()(const I& i, const J& j){ return SubMatrix<MatType,I,J>(static_cast<MatType&>(*this),i,j); }
-    #endif // SWIG
+    template<typename RR, typename CC>
+    SubMatrix<MatType,RR,CC> operator()(const RR& rr, const CC& cc){ return SubMatrix<MatType,RR,CC>(static_cast<MatType&>(*this),rr,cc); }
+#endif // SWIG
 
-    /** \brief Create an n-by-m matrix with symbolic variables */
-    static MatType sym(const std::string& name, int n=1, int m=1);
-
-    /** \brief Create a vector of length p with with matrices with symbolic variables of given sparsity */
-    static std::vector<MatType > sym(const std::string& name, const CRSSparsity& sp, int p);
-
-    /** \brief Create a vector of length p with n-by-m matrices with symbolic variables */
-    static std::vector<MatType > sym(const std::string& name, int n, int m, int p);
-
-    /** \brief Create an matrix with symbolic variables, given a sparsity pattern */
-    static MatType sym(const std::string& name, const CRSSparsity& sp);
-    
-    /** \brief Matrix-matrix multiplication.
-    * Attempts to identify quick returns on matrix-level and 
-    * delegates to MatType::mul_full if no such quick returns are found.
+    /** @name Construct symbolic primitives
+        The "sym" function is intended to work in a similar way as "sym" used in the Symbolic Toolbox for Matlab but instead creating a
+        CasADi symbolic primitive.
     */
-    MatType mul_smart(const MatType& y, const CRSSparsity& sp_z) const;
+    ///@{
+
+    /** \brief Create an nrow-by-ncol symbolic primitive */
+    static MatType sym(const std::string& name, int nrow=1, int ncol=1){ return sym(name,sp_dense(nrow,ncol));}
+
+    /** \brief  Construct a symbolic primitive with given dimensions */
+    static MatType sym(const std::string& name, const std::pair<int,int> &rc){ return sym(name,rc.first,rc.second);}
+
+    /** \brief Create symbolic primitive with a given sparsity pattern */
+    static MatType sym(const std::string& name, const Sparsity& sp);
+
+    /** \brief Create a vector of length p with with matrices with symbolic primitives of given sparsity */
+    static std::vector<MatType > sym(const std::string& name, const Sparsity& sp, int p);
+
+    /** \brief Create a vector of length p with nrow-by-ncol symbolic primitives */
+    static std::vector<MatType > sym(const std::string& name, int nrow, int ncol, int p){ return sym(name,sp_dense(nrow,ncol),p);}
     
-};
+    /** \brief Create a vector of length r of vectors of length p with symbolic primitives with given sparsity*/
+    static std::vector<std::vector<MatType> > sym(const std::string& name, const Sparsity& sp, int p, int r);
+
+    /** \brief Create a vector of length r of vectors of length p with nrow-by-ncol symbolic primitives */
+    static std::vector<std::vector<MatType> > sym(const std::string& name, int nrow, int ncol, int p, int r){ return sym(name,sp_dense(nrow,ncol),p,r);}
+    ///@}
+    
+    //@{
+    /** \brief Create a dense matrix or a matrix with specified sparsity with all entries zero */
+    static MatType zeros(int nrow=1, int ncol=1){ return zeros(sp_dense(nrow,ncol)); }
+    static MatType zeros(const Sparsity& sp){ return MatType(sp,0);}
+    static MatType zeros(const std::pair<int,int>& rc){ return zeros(rc.first,rc.second);}
+    //@}
+
+    //@{
+    /** \brief Create a dense matrix or a matrix with specified sparsity with all entries one */
+    static MatType ones(int nrow=1, int ncol=1){ return ones(sp_dense(nrow,ncol)); }
+    static MatType ones(const Sparsity& sp){ return MatType(sp,1);}
+    static MatType ones(const std::pair<int,int>& rc){ return ones(rc.first,rc.second);}
+    //@}
+
+    /** \brief Matrix-matrix multiplication.
+     * Attempts to identify quick returns on matrix-level and 
+     * delegates to MatType::mul_full if no such quick returns are found.
+     */
+    MatType mul_smart(const MatType& y, const Sparsity& sp_z) const;
+    
+  };
 
 #ifndef SWIG
-// Implementations
+  // Implementations
 
-template<typename MatType>
-const CRSSparsity& GenericMatrix<MatType>::sparsity() const{
-  return static_cast<const MatType*>(this)->sparsity();
-}
-
-template<typename MatType>
-CRSSparsity& GenericMatrix<MatType>::sparsityRef(){
-  return static_cast<MatType*>(this)->sparsityRef();
-}
-
-template<typename MatType>
-int GenericMatrix<MatType>::size() const{
-  return sparsity().size();
-}
-
-template<typename MatType>
-int GenericMatrix<MatType>::sizeU() const{
-  return sparsity().sizeU();
-}
-
-template<typename MatType>
-int GenericMatrix<MatType>::sizeL() const{
-  return sparsity().sizeL();
-}
-
-template<typename MatType>
-int GenericMatrix<MatType>::sizeD() const{
-  return sparsity().sizeD();
-}
-
-template<typename MatType>
-int GenericMatrix<MatType>::numel() const{
-  return sparsity().numel();
-}
-
-template<typename MatType>
-int GenericMatrix<MatType>::size1() const{
-  return sparsity().size1();
-}
-
-template<typename MatType>
-int GenericMatrix<MatType>::size2() const{
-  return sparsity().size2();
-}
-
-template<typename MatType>
-std::pair<int,int> GenericMatrix<MatType>::shape() const{
-  return sparsity().shape();
-}
-
-template<typename MatType>
-std::string GenericMatrix<MatType>::dimString() const {
-  return sparsity().dimString();
-}
-
-template<typename MatType>
-bool GenericMatrix<MatType>::empty() const{
-  return numel()==0;
-}
-
-template<typename MatType>
-bool GenericMatrix<MatType>::null() const{
-  return size1()==0 && size2()==0;
-}
-
-template<typename MatType>
-bool GenericMatrix<MatType>::dense() const{
-  return numel()==size();
-}
-
-template<typename MatType>
-bool GenericMatrix<MatType>::scalar(bool scalar_and_dense) const{
-  return sparsity().scalar(scalar_and_dense);
-}
-
-template<typename MatType>
-bool GenericMatrix<MatType>::square() const{
-  return sparsity().square();
-}
-
-template<typename MatType>
-MatType GenericMatrix<MatType>::mul_smart(const MatType& y, const CRSSparsity &sp_z) const {
-  const MatType& x = *static_cast<const MatType*>(this);
-  
-  if (!(x.scalar() || y.scalar())) {
-    casadi_assert_message(size2()==y.size1(),"Matrix product with incompatible dimensions. Lhs is " << dimString() << " and rhs is " << y.dimString() << ".");
+  template<typename MatType>
+  const Sparsity& GenericMatrix<MatType>::sparsity() const{
+    return static_cast<const MatType*>(this)->sparsity();
   }
+
+  template<typename MatType>
+  Sparsity& GenericMatrix<MatType>::sparsityRef(){
+    return static_cast<MatType*>(this)->sparsityRef();
+  }
+
+  template<typename MatType>
+  int GenericMatrix<MatType>::size() const{
+    return sparsity().size();
+  }
+
+  template<typename MatType>
+  int GenericMatrix<MatType>::sizeL() const{
+    return sparsity().sizeL();
+  }
+
+  template<typename MatType>
+  int GenericMatrix<MatType>::sizeU() const{
+    return sparsity().sizeU();
+  }
+
+  template<typename MatType>
+  int GenericMatrix<MatType>::sizeD() const{
+    return sparsity().sizeD();
+  }
+
+  template<typename MatType>
+  int GenericMatrix<MatType>::numel() const{
+    return sparsity().numel();
+  }
+
+  template<typename MatType>
+  int GenericMatrix<MatType>::size1() const{
+    return sparsity().size1();
+  }
+
+  template<typename MatType>
+  int GenericMatrix<MatType>::size2() const{
+    return sparsity().size2();
+  }
+
+  template<typename MatType>
+  std::pair<int,int> GenericMatrix<MatType>::shape() const{
+    return sparsity().shape();
+  }
+
+  template<typename MatType>
+  std::string GenericMatrix<MatType>::dimString() const {
+    return sparsity().dimString();
+  }
+
+  template<typename MatType>
+  bool GenericMatrix<MatType>::empty() const{
+    return numel()==0;
+  }
+
+  template<typename MatType>
+  bool GenericMatrix<MatType>::null() const{
+    return size2()==0 && size1()==0;
+  }
+
+  template<typename MatType>
+  bool GenericMatrix<MatType>::dense() const{
+    return numel()==size();
+  }
+
+  template<typename MatType>
+  bool GenericMatrix<MatType>::scalar(bool scalar_and_dense) const{
+    return sparsity().scalar(scalar_and_dense);
+  }
+
+  template<typename MatType>
+  bool GenericMatrix<MatType>::square() const{
+    return sparsity().square();
+  }
+
+  template<typename MatType>
+  bool GenericMatrix<MatType>::vector() const{
+    return sparsity().vector();
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::mul_smart(const MatType& y, const Sparsity &sp_z) const {
+    const MatType& x = *static_cast<const MatType*>(this);
   
-  // Check if we can simplify the product
-  if(isIdentity(x)){
-    return y;
-  } else if(isIdentity(y)){
-    return x;
-  } else if(isZero(x) || isZero(y)){
-    // See if one of the arguments can be used as result
-    if(x.size()==0 && y.size1()==y.size2()) {
-      return x;
-    } else if(y.size()==0 && x.size1()==x.size2()) {
-      return y;
-    } else {
-      if (x.size()==0 || y.size()==0 || y.empty() || x.empty()) {
-        return MatType::sparse(x.size1(),y.size2());
-      } else {
-        return MatType::zeros(x.size1(),y.size2());
-      }
+    if (!(x.scalar() || y.scalar())) {
+      casadi_assert_message(size2()==y.size1(),"Matrix product with incompatible dimensions. Lhs is " << dimString() << " and rhs is " << y.dimString() << ".");
     }
-  } else if(x.scalar() || y.scalar()){
-    return x*y;
-  } else {
-    return x.mul_full(y,sp_z);
+  
+    // Check if we can simplify the product
+    if(isIdentity(x)){
+      return y;
+    } else if(isIdentity(y)){
+      return x;
+    } else if(isZero(x) || isZero(y)){
+      // See if one of the arguments can be used as result
+      if(y.size()==0 && x.size2()==x.size1()) {
+        return y;
+      } else if(x.size()==0 && y.size2()==y.size1()) {
+        return x;
+      } else {
+        if (y.size()==0 || x.size()==0 || x.empty() || y.empty()) {
+          return MatType::sparse(x.size1(),y.size2());
+        } else {
+          return MatType::zeros(x.size1(),y.size2());
+        }
+      }
+    } else if(x.scalar() || y.scalar()){
+      return x*y;
+    } else {
+      return x.mul_full(y,sp_z);
+    }
   }
-}
 
-template<typename MatType>
-int GenericMatrix<MatType>::size(Sparsity sp) const{
-  if(sp==SPARSE){
-    return size();
-  } else if(sp==SPARSESYM){
-    return sizeL();
-  } else if(sp==DENSE){
-    return numel();
-  } else if(sp==DENSESYM){
-    return (numel()+size1())/2;
-  } else {
+  template<typename MatType>
+  int GenericMatrix<MatType>::size(SparsityType sp) const{
+    if(sp==SPARSE){
+      return size();
+    } else if(sp==SPARSESYM){
+      return sizeU();
+    } else if(sp==DENSE){
+      return numel();
+    } else if(sp==DENSESYM){
+      return (numel()+size2())/2;
+    } else {
       throw CasadiException("Matrix<T>::size(Sparsity): unknown sparsity");
+    }
   }
-}
 
 
 #endif // SWIG
 
-template<typename MatType>
-MatType GenericMatrix<MatType>::sym(const std::string& name, int n, int m){ return sym(name,sp_dense(n,m));}
-
-template<typename MatType>
-std::vector<MatType> GenericMatrix<MatType>::sym(const std::string& name, const CRSSparsity& sp, int p){
-  std::vector<MatType> ret(p);
-  std::stringstream ss;
-  for(int k=0; k<p; ++k){
-    ss.str("");
-    ss << name << k;
-    ret[k] = sym(ss.str(),sp);
+  template<typename MatType>
+  std::vector<MatType> GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp, int p){
+    std::vector<MatType> ret(p);
+    std::stringstream ss;
+    for(int k=0; k<p; ++k){
+      ss.str("");
+      ss << name << k;
+      ret[k] = sym(ss.str(),sp);
+    }
+    return ret;
   }
-  return ret;
-}
 
-template<typename MatType>
-std::vector<MatType > GenericMatrix<MatType>::sym(const std::string& name, int n, int m, int p){ return sym(name,sp_dense(n,m),p);}
+  template<typename MatType>
+  std::vector<std::vector<MatType> > GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp, int p, int r){
+    std::vector<std::vector<MatType> > ret(r);
+    for(int k=0; k<r; ++k){
+      std::stringstream ss;
+      ss << name << "_" << k;
+      ret[k] = sym(ss.str(),sp,p);
+    }
+    return ret;
+  }
 
-template<typename MatType>
-MatType GenericMatrix<MatType>::sym(const std::string& name, const CRSSparsity& sp){ throw CasadiException("\"sym\" not defined for instantiation");}
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp){ 
+    throw CasadiException("\"sym\" not defined for instantiation");
+  }
 
 } // namespace CasADi
 

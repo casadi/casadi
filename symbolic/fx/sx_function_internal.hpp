@@ -68,12 +68,12 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInternal,Matrix<SX>,SXNode>{
+class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInternal,Matrix<SXElement>,SXNode>{
   friend class SXFunction;
   
   protected:
     /** \brief  Constructor (only to be called from SXFunction, therefore protected) */
-    SXFunctionInternal(const std::vector<Matrix<SX> >& inputv, const std::vector<Matrix<SX> >& outputv);
+    SXFunctionInternal(const std::vector<Matrix<SXElement> >& inputv, const std::vector<Matrix<SXElement> >& outputv);
 
   public:
 
@@ -99,9 +99,9 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   };
     
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  virtual void evalSXsparse(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                      const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                      const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens);
+  virtual void evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res, 
+                      const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+                      const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens);
                           
   /** \brief  Check if smooth */
   bool isSmooth() const;
@@ -110,7 +110,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   virtual void print(std::ostream &stream) const;
 
   /** \brief Hessian (forward over adjoint) via source code transformation */
-  SXMatrix hess(int iind=0, int oind=0);
+  SX hess(int iind=0, int oind=0);
   
   /** \brief  DATA MEMBERS */
   
@@ -130,14 +130,14 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   std::vector<double> work_;
 
   /// work vector for symbolic calculations (allocated first time)
-  std::vector<SX> s_work_;
-  std::vector<SX> free_vars_;
+  std::vector<SXElement> s_work_;
+  std::vector<SXElement> free_vars_;
   
   /// The expressions corresponding to each binary operation
-  std::vector<SX> operations_;
+  std::vector<SXElement> operations_;
   
   /// The expressions corresponding to each constant
-  std::vector<SX> constants_;
+  std::vector<SXElement> constants_;
   
   /** \brief  Initialize */
   virtual void init();

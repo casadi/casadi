@@ -29,16 +29,16 @@ from pylab import *
 #$ $\dot{x_1} = x_2$
 #$ $\dot{x_2} = -(-w_0^2 x_1 + a_3 x_1^3 + a_5 x_1^5) - (2 mu_1 x_2 + mu_3 x_2^3) + f$.
 
-x  = ssym("x",2)
+x  = SX.sym("x",2)
 x1 = x[0]
 x2 = x[1]
 
-w0 = ssym("w0")
-a3 = ssym("a3")
-a5 = ssym("a5")
-mu1 = ssym("mu1")
-mu3 = ssym("mu3")
-ff = ssym("f")
+w0 = SX.sym("w0")
+a3 = SX.sym("a3")
+a5 = SX.sym("a5")
+mu1 = SX.sym("mu1")
+mu3 = SX.sym("mu3")
+ff = SX.sym("f")
 
 tf = 40
 
@@ -48,7 +48,7 @@ rhs    = vertcat([x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * 
 f=SXFunction(daeIn(x=x,p=params),daeOut(ode=rhs))
 f.init()
 
-t = SX("t")
+t = SX.sym("t")
 cf=SXFunction(controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), u=ff),[rhs])
 cf.init()
 

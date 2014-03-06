@@ -28,7 +28,7 @@ namespace CasADi{
   SymbolicQR::SymbolicQR(){
   }
   
-  SymbolicQR::SymbolicQR(const CRSSparsity& sp, int nrhs){
+  SymbolicQR::SymbolicQR(const Sparsity& sp, int nrhs){
     assignNode(new SymbolicQRInternal(sp,nrhs));
   }
 

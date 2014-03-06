@@ -43,7 +43,7 @@ class SOCPSolverTests(casadiTestCase):
     #
     #
     c = DMatrix([2,1])
-    G = DMatrix([[1,0],[0,1]])
+    G = DMatrix([[1,0],[0,1]]).T
     H = DMatrix([-5,-7])
     E = DMatrix([0,0])
     F = DMatrix([4])
@@ -84,7 +84,7 @@ class SOCPSolverTests(casadiTestCase):
     a = 1.3
     
     c = DMatrix([2,1])
-    G = DMatrix([[1,0],[0,1]])
+    G = DMatrix([[1,0],[0,1]]).T
     H = DMatrix([0,0])
     E = DMatrix([a,0])
     F = DMatrix([4])
@@ -124,7 +124,7 @@ class SOCPSolverTests(casadiTestCase):
     a = 1.3
     
     c = DMatrix([2,1])
-    G = DMatrix([[1,0],[0,1]])
+    G = DMatrix([[1,0],[0,1]]).T
     H = DMatrix([0,0])
     E = DMatrix([a,0])
     F = DMatrix([4])
@@ -166,7 +166,7 @@ class SOCPSolverTests(casadiTestCase):
     #
     #  solution is in cornerpoint of intersection
     c = DMatrix([2,1])
-    G = DMatrix([[1,0],[0,1],[1.0/6,0],[0,1.0/5]])
+    G = DMatrix([[1,0],[0,1],[1.0/6,0],[0,1.0/5]]).T
     H = DMatrix([-5,-7,0,0])
     E = DMatrix([0,0,0,0])
     F = DMatrix([4,1])
@@ -207,7 +207,7 @@ class SOCPSolverTests(casadiTestCase):
     #      
     #
     c = DMatrix([-2., 1., 5.])
-    G = DMatrix([[-13,3,5],[-12,12,-6],[-3,6,2],[1,9,2],[-1,-19,3]])
+    G = DMatrix([[-13,3,5],[-12,12,-6],[-3,6,2],[1,9,2],[-1,-19,3]]).T
     H = DMatrix([-3,-2,0,3,-42])
     E = DMatrix([-12,-6,5,-3,6,-10])
     F = DMatrix([-12,27])

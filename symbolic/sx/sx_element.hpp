@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SX_HPP
-#define SX_HPP
+#ifndef SX_ELEMENT_HPP
+#define SX_ELEMENT_HPP
 
 // exception class
 #include "../casadi_exception.hpp"
@@ -49,64 +49,62 @@ namespace CasADi{
 
 #ifdef SWIG
 #ifdef WITH_IMPLICITCONV
-  %implicitconv SX;
+  %implicitconv SXElement;
 #endif // WITH_IMPLICITCONV
 #endif // SWIG
 
 
-  class SX : public GenericExpression<SX>{
+  class SXElement : public GenericExpression<SXElement>{
     friend class SXNode;
     friend class BinarySXNode;
-
   public:
     
-    /// Constructors
     /** \brief Default constructor (not-a-number)
-
         Object is initialised as not-a-number.
     */
-    SX();
+    SXElement();
+
     /** \brief Numerical constant constructor
         \param val Numerical value
     */
-    SX(double val);
+    SXElement(double val);
     
-    /** \brief Symbolic constructor
-         \param name Name of the symbol
+#ifndef WITHOUT_PRE_1_9_X
+    /// [DEPRECATED] Replaced with SXElement::sym
+    explicit SXElement(const std::string& name);
+#endif
 
-        This is the name that wil be used by the "operator<<" and "toSTring" methods.
-        The name is not used as identifier; you may construct distinct SX objects with non-unique names.
-    */
-    explicit SX(const std::string& name); // variable (must be explicit, otherwise 0/NULL would be ambigous)
-    /** \brief Symbolic constructor
-         \param Name of the symbol
+    /** \brief Create a symbolic primitive
+         \param name Name of the symbolic primitive
 
-        This is the name that wil be used by the "operator<<" and "toSTring" methods.
-        The name is not used as identifier; you may construct distinct SX objects with non-unique names.
+        This is the name that will be used by the "operator<<" and "toString" methods.
+        The name is not used as identifier; you may construct distinct SXElement objects with non-unique names.
     */
+    static SXElement sym(const std::string& name);
+
 #ifndef SWIG
 
     /// Create an expression from a node: extra dummy argument to avoid ambigousity for 0/NULL
-    SX(SXNode* node, bool dummy);
+    SXElement(SXNode* node, bool dummy);
     
     /** \brief Copy constructor */
-    SX(const SX& scalar); // copy constructor
+    SXElement(const SXElement& scalar); // copy constructor
 
     /// Destructor
-    ~SX();
+    ~SXElement();
 
     /// Create an object given a node
-    static SX create(SXNode* node);
+    static SXElement create(SXNode* node);
     
     // Assignment
-    SX& operator=(const SX& scalar);
-    SX& operator=(double scalar); // needed since otherwise both a = SX(double) and a = Matrix(double) would be ok
+    SXElement& operator=(const SXElement& scalar);
+    SXElement& operator=(double scalar); // needed since otherwise both a = SXElement(double) and a = Matrix(double) would be ok
 
     // Convert to a 1-by-1 Matrix
-    operator Matrix<SX>() const;
+    operator Matrix<SXElement>() const;
     
     /** \brief  print to stream */
-    friend std::ostream& operator<<(std::ostream &stream, const SX &scalar);
+    friend std::ostream& operator<<(std::ostream &stream, const SXElement &scalar);
 
     /** \brief  print to stream, limited */
 #ifndef SWIG
@@ -125,24 +123,24 @@ namespace CasADi{
 #endif // SWIG
     
     /** \brief  Perform operations by ID */
-    static SX binary(int op, const SX& x, const SX& y);
-    static SX unary(int op, const SX& x);
+    static SXElement binary(int op, const SXElement& x, const SXElement& y);
+    static SXElement unary(int op, const SXElement& x);
     
     /** \brief Check the truth value of this node
      * Introduced to catch bool(x) situations in python
      */
     bool __nonzero__() const;
     
-    /** \brief check if this SX is a leaf of the SX graph
+    /** \brief check if this SXElement is a leaf of the SX graph
      *
-     * An SX qualifies as leaf when it has no dependencies.
+     * An SXElement qualifies as leaf when it has no dependencies.
      */
     bool isLeaf() const;
     bool isConstant() const;
     bool isInteger() const;
     bool isSymbolic() const;
     bool hasDep() const;
-    /** \brief Check wether a binary SX is commutative*/
+    /** \brief Check wether a binary SXElement is commutative*/
     bool isCommutative() const;
     bool isZero() const;
     bool isAlmostZero(double tol) const;
@@ -163,91 +161,91 @@ namespace CasADi{
      *
      *  a.isEqual(b,0)  will return false, but a.isEqual(b,1) will return true
      */
-    bool isEqual(const SX& scalar, int depth=0) const;
+    bool isEqual(const SXElement& scalar, int depth=0) const;
     
     /** \brief Check if a value is always nonnegative (false negatives are allowed) */
     bool isNonNegative() const;
     
     double getValue() const;
     int getIntValue() const;
-    SX getDep(int ch=0) const;
+    SXElement getDep(int ch=0) const;
     
     /** \brief Check if the node is the sum of two equal expressions */
     bool isDoubled() const;
     
-    /** \brief Get the number of dependencies of a binary SX */
+    /** \brief Get the number of dependencies of a binary SXElement */
     int getNdeps() const;
     
     /** \brief Returns a number that is unique for a given SXNode. 
-     * If the SX does not point to any node, 0 is returned.
+     * If the SXElement does not point to any node, 0 is returned.
      */
     long __hash__() const;
 
     /** \brief  Negation */
-    SX operator-() const;
+    SXElement operator-() const;
 
     //  all binary operations
-    SX __add__(const SX& y) const;
-    SX __sub__(const SX& y) const;
-    SX __mul__(const SX& y) const;
-    SX __div__(const SX& y) const;
-    SX __lt__(const SX& y) const;
-    SX __le__(const SX& y) const;
-    SX __eq__(const SX& y) const;
-    SX __ne__(const SX& y) const;
-    using GenericExpression<SX>::__gt__;
-    using GenericExpression<SX>::__ge__;
-    using GenericExpression<SX>::__mldivide__;
-    SX __truediv__(const SX &y) const {return __div__(y);};
-    SX __pow__(const SX& b) const;
-    SX __constpow__(const SX& b) const;
+    SXElement __add__(const SXElement& y) const;
+    SXElement __sub__(const SXElement& y) const;
+    SXElement __mul__(const SXElement& y) const;
+    SXElement __div__(const SXElement& y) const;
+    SXElement __lt__(const SXElement& y) const;
+    SXElement __le__(const SXElement& y) const;
+    SXElement __eq__(const SXElement& y) const;
+    SXElement __ne__(const SXElement& y) const;
+    using GenericExpression<SXElement>::__gt__;
+    using GenericExpression<SXElement>::__ge__;
+    using GenericExpression<SXElement>::__mldivide__;
+    SXElement __truediv__(const SXElement &y) const {return __div__(y);};
+    SXElement __pow__(const SXElement& b) const;
+    SXElement __constpow__(const SXElement& b) const;
     
-    SX __mrdivide__(const SX& b) const{  return *this / b;}
-    SX __mpower__(const SX& b) const {return (*this).__pow__(b);}
-    SX trans() const{ return *this;}
+    SXElement __mrdivide__(const SXElement& b) const{  return *this / b;}
+    SXElement __mpower__(const SXElement& b) const {return (*this).__pow__(b);}
+    SXElement trans() const{ return *this;}
     
     /// The following functions serves two purposes: Numpy compatibility and to allow unambigous access
-    SX mul(const SX& y) const{ return __mul__(y);}
-    SX exp() const;
-    SX log() const;
-    SX sqrt() const;
-    SX sq() const;
-    SX sin() const;
-    SX cos() const;
-    SX tan() const;
-    SX arcsin() const;
-    SX arccos() const;
-    SX arctan() const;
-    SX floor() const;
-    SX ceil() const;
-    SX erf() const;
-    SX erfinv() const;
-    SX fabs() const;
-    SX fmin(const SX &y) const;
-    SX fmax(const SX &y) const;
-    SX inv() const;
-    SX sinh() const;
-    SX cosh() const;
-    SX tanh() const;
-    SX arcsinh() const;
-    SX arccosh() const;
-    SX arctanh() const;
-    SX arctan2(const SX &y) const;
-    SX log10() const;
-    SX printme(const SX &y) const;
-    SX sign() const;
-    SX __copysign__(const SX &y) const;
-    SX constpow(const SX& y) const;
-    SX logic_not() const;
-    SX logic_and(const SX& y) const;
-    SX logic_or(const SX& y) const;
-    SX if_else_zero(const SX& y) const;
+    SXElement mul(const SXElement& y) const{ return __mul__(y);}
+    SXElement exp() const;
+    SXElement log() const;
+    SXElement sqrt() const;
+    SXElement sq() const;
+    SXElement sin() const;
+    SXElement cos() const;
+    SXElement tan() const;
+    SXElement arcsin() const;
+    SXElement arccos() const;
+    SXElement arctan() const;
+    SXElement floor() const;
+    SXElement ceil() const;
+    SXElement erf() const;
+    SXElement erfinv() const;
+    SXElement fabs() const;
+    SXElement fmin(const SXElement &y) const;
+    SXElement fmax(const SXElement &y) const;
+    SXElement inv() const;
+    SXElement sinh() const;
+    SXElement cosh() const;
+    SXElement tanh() const;
+    SXElement arcsinh() const;
+    SXElement arccosh() const;
+    SXElement arctanh() const;
+    SXElement arctan2(const SXElement &y) const;
+    SXElement log10() const;
+    SXElement printme(const SXElement &y) const;
+    SXElement sign() const;
+    SXElement __copysign__(const SXElement &y) const;
+    SXElement constpow(const SXElement& y) const;
+    SXElement logic_not() const;
+    SXElement logic_and(const SXElement& y) const;
+    SXElement logic_or(const SXElement& y) const;
+    SXElement if_else_zero(const SXElement& y) const;
 
-    Matrix<SX> fmin(const Matrix<SX>& b) const;
-    Matrix<SX> fmax(const Matrix<SX>& b) const;
-    Matrix<SX> constpow(const Matrix<SX>& n) const;
-    Matrix<SX> __copysign__(const Matrix<SX>& n) const;
-    Matrix<SX> arctan2(const Matrix<SX>& b) const;
+    Matrix<SXElement> fmin(const Matrix<SXElement>& b) const;
+    Matrix<SXElement> fmax(const Matrix<SXElement>& b) const;
+    Matrix<SXElement> constpow(const Matrix<SXElement>& n) const;
+    Matrix<SXElement> __copysign__(const Matrix<SXElement>& n) const;
+    Matrix<SXElement> arctan2(const Matrix<SXElement>& b) const;
         
     // Get the temporary variable
     int getTemp() const;
@@ -262,7 +260,7 @@ namespace CasADi{
     void mark();
     
     /** \brief Assign to another expression, if a duplicate. Check for equality up to a given depth */
-    void assignIfDuplicate(const SX& scalar, int depth=1);
+    void assignIfDuplicate(const SXElement& scalar, int depth=1);
     
     /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
     static void setMaxNumCallsInPrint(long num=10000);
@@ -277,9 +275,9 @@ namespace CasADi{
     static int getEqualityCheckingDepth();
     
     /** \brief Assign the node to something, without invoking the deletion of the node, if the count reaches 0 */
-    SXNode* assignNoDelete(const SX& scalar);
+    SXNode* assignNoDelete(const SXElement& scalar);
     
-    /** \brief SX nodes are not allowed to be null */
+    /** \brief SXElement nodes are not allowed to be null */
     inline bool isNull(){return false;}
 
 #ifndef SWIG
@@ -290,18 +288,17 @@ namespace CasADi{
     // Depth when checking equalities
     static int eq_depth_;
     
-    // Pointer to node (SX is only a reference class)
+    // Pointer to node (SXElement is only a reference class)
     SXNode* node;
     
     /** \brief inline if-test */
-    friend SX if_else(const SX& cond, const SX& if_true, const SX& if_false); // replaces the ternary conditional operator "?:", which cannot be overloaded
+    friend SXElement if_else(const SXElement& cond, const SXElement& if_true, const SXElement& if_false); // replaces the ternary conditional operator "?:", which cannot be overloaded
 #endif // SWIG
 
   };
 
-
 #ifdef SWIG
-  %extend SX {
+  %extend SXElement {
     std::string __str__()  { return $self->toString(); }
     std::string __repr__() { return $self->toString(); }
     double __float__() { return $self->getValue();}
@@ -312,42 +309,47 @@ namespace CasADi{
 #ifndef SWIG
   // Template specializations
   template<>
-  bool __nonzero__(const SX& val);
+  bool __nonzero__(const SXElement& val);
 
   template<>
-  class casadi_limits<SX>{
+  class casadi_limits<SXElement>{
   public:
-    static bool isZero(const SX& val);
-    static bool isAlmostZero(const SX& val, double tol);
-    static bool isOne(const SX& val);
-    static bool isMinusOne(const SX& val);
-    static bool isConstant(const SX& val);
-    static bool isInteger(const SX& val);
-    static bool isInf(const SX& val);
-    static bool isMinusInf(const SX& val);
-    static bool isNaN(const SX& val);
+    static bool isZero(const SXElement& val);
+    static bool isAlmostZero(const SXElement& val, double tol);
+    static bool isOne(const SXElement& val);
+    static bool isMinusOne(const SXElement& val);
+    static bool isConstant(const SXElement& val);
+    static bool isInteger(const SXElement& val);
+    static bool isInf(const SXElement& val);
+    static bool isMinusInf(const SXElement& val);
+    static bool isNaN(const SXElement& val);
 
-    static const SX zero;
-    static const SX one;
-    static const SX two;
-    static const SX minus_one;
-    static const SX nan;
-    static const SX inf; 
-    static const SX minus_inf;
+    static const SXElement zero;
+    static const SXElement one;
+    static const SXElement two;
+    static const SXElement minus_one;
+    static const SXElement nan;
+    static const SXElement inf; 
+    static const SXElement minus_inf;
   };
 
 #endif // SWIG
 
-  typedef std::vector<SX> SXVector;
-  typedef std::vector<std::vector<SX> > SXVectorVector;
-  typedef std::vector< std::vector<std::vector<SX> > > SXVectorVectorVector;
-  typedef Matrix<SX> SXMatrix;
-  typedef std::vector<Matrix<SX> > SXMatrixVector;
-  typedef std::vector< std::vector<Matrix<SX> > > SXMatrixVectorVector;
+  typedef std::vector<SXElement> SXElementVector;
+  typedef std::vector<std::vector<SXElement> > SXElementVectorVector;
+  typedef std::vector< std::vector<std::vector<SXElement> > > SXElementVectorVectorVector;
+  typedef Matrix<SXElement> SX;
+  typedef std::vector<Matrix<SXElement> > SXVector;
+  typedef std::vector< std::vector<Matrix<SXElement> > > SXVectorVector;
 
-  typedef SXMatrix* SXMatrixPtr;
-  typedef std::vector<SXMatrixPtr> SXMatrixPtrV;
-  typedef std::vector<SXMatrixPtrV> SXMatrixPtrVV;
+  typedef SX* SXPtr;
+  typedef std::vector<SXPtr> SXPtrV;
+  typedef std::vector<SXPtrV> SXPtrVV;
+
+  // Create matrix symbolic primitive
+  template<>
+  SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
+
 
 } // namespace CasADi
 
@@ -357,24 +359,24 @@ namespace CasADi{
 
 // Template specialization
 namespace CasADi{
-  template<> inline const char* typeName<SX>() { return "SX"; }
+  template<> inline std::string matrixName<SXElement>() { return "SX"; }
 } // namespace CasADi
 
 namespace std{
   template<>
-  class numeric_limits<CasADi::SX>{
+  class numeric_limits<CasADi::SXElement>{
   public:
     static const bool is_specialized = true;
-    static CasADi::SX min() throw();
-    static CasADi::SX max() throw();
+    static CasADi::SXElement min() throw();
+    static CasADi::SXElement max() throw();
     static const int  digits = 0;
     static const int  digits10 = 0;
     static const bool is_signed = false;
     static const bool is_integer = false;
     static const bool is_exact = false;
     static const int radix = 0;
-    static CasADi::SX epsilon() throw();
-    static CasADi::SX round_error() throw();
+    static CasADi::SXElement epsilon() throw();
+    static CasADi::SXElement round_error() throw();
     static const int  min_exponent = 0;
     static const int  min_exponent10 = 0;
     static const int  max_exponent = 0;
@@ -385,10 +387,10 @@ namespace std{
     static const bool has_signaling_NaN = false;
     //    static const float_denorm_style has_denorm = denorm absent;
     static const bool has_denorm_loss = false;
-    static CasADi::SX infinity() throw();
-    static CasADi::SX quiet_NaN() throw();
-    //    static SX signaling_NaN() throw();
-    //    static SX denorm_min() throw();
+    static CasADi::SXElement infinity() throw();
+    static CasADi::SXElement quiet_NaN() throw();
+    //    static SXElement signaling_NaN() throw();
+    //    static SXElement denorm_min() throw();
     static const bool is_iec559 = false;
     static const bool is_bounded = false;
     static const bool is_modulo = false;
@@ -405,4 +407,4 @@ namespace std{
 #endif // SWIG
 
 
-#endif // SX_HPP
+#endif // SX_ELEMENT_HPP
