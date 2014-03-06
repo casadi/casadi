@@ -49,7 +49,7 @@ integrator.init()
 U = MX.sym("U",nk) # nk-by-1 symbolic variable
 
 # The initial state (x_0=0, x_1=1, x_2=0)
-X  = MX.sym([0,1,0])
+X  = MX([0,1,0])
 
 # Build a graph of integrator calls
 for k in range(nk):

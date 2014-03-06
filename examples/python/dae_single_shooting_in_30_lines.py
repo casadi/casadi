@@ -58,7 +58,7 @@ I.init()
 U = MX.sym("U",20)
 
 # Construct graph of integrator calls
-X  = MX.sym([0,1])
+X  = MX([0,1])
 J = 0
 for k in range(20):
   tmp = I.call( integratorIn(x0=X,p=U[k]) )   # Call the integrator
