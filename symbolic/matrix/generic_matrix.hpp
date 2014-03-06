@@ -178,6 +178,20 @@ namespace CasADi{
     static std::vector<std::vector<MatType> > sym(const std::string& name, int nrow, int ncol, int p, int r){ return sym(name,sp_dense(nrow,ncol),p,r);}
     ///@}
     
+    //@{
+    /** \brief Create a dense matrix or a matrix with specified sparsity with all entries zero */
+    static MatType zeros(int nrow=1, int ncol=1){ return zeros(sp_dense(nrow,ncol)); }
+    static MatType zeros(const Sparsity& sp){ return MatType(sp,0);}
+    static MatType zeros(const std::pair<int,int>& rc){ return zeros(rc.first,rc.second);}
+    //@}
+
+    //@{
+    /** \brief Create a dense matrix or a matrix with specified sparsity with all entries one */
+    static MatType ones(int nrow=1, int ncol=1){ return ones(sp_dense(nrow,ncol)); }
+    static MatType ones(const Sparsity& sp){ return MatType(sp,1);}
+    static MatType ones(const std::pair<int,int>& rc){ return ones(rc.first,rc.second);}
+    //@}
+
     /** \brief Matrix-matrix multiplication.
      * Attempts to identify quick returns on matrix-level and 
      * delegates to MatType::mul_full if no such quick returns are found.

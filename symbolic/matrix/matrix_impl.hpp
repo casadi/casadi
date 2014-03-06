@@ -1759,36 +1759,6 @@ namespace CasADi{
   }
 
   template<class T>
-  Matrix<T> Matrix<T>::zeros(const Sparsity& sp){
-    return Matrix<T>(sp,0);
-  }
-
-  template<class T>
-  Matrix<T> Matrix<T>::zeros(const std::pair<int,int> &rc){
-    return zeros(rc.first,rc.second);
-  }
-
-  template<class T>
-  Matrix<T> Matrix<T>::zeros(int nrow, int ncol){
-    return zeros(sp_dense(nrow,ncol));
-  }
-
-  template<class T>
-  Matrix<T> Matrix<T>::ones(const Sparsity& sp){
-    return Matrix<T>(sp,1);
-  }
-
-  template<class T>
-  Matrix<T> Matrix<T>::ones(const std::pair<int,int> &rc){
-    return ones(rc.first,rc.second);
-  }
-
-  template<class T>
-  Matrix<T> Matrix<T>::ones(int nrow, int ncol){
-    return ones(sp_dense(nrow,ncol));
-  }
-
-  template<class T>
   Matrix<T> Matrix<T>::repmat(const T& x, const Sparsity& sp){
     return Matrix<T>(sp,x);
   }

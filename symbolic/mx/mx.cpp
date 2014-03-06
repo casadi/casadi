@@ -530,30 +530,6 @@ namespace CasADi{
     return sparse(rc.first,rc.second);
   }
 
-  MX MX::zeros(int nrow, int ncol){
-    return zeros(sp_dense(nrow,ncol));
-  }
-
-  MX MX::zeros(const std::pair<int, int> &rc){
-    return zeros(rc.first,rc.second);
-  }
-
-  MX MX::zeros(const Sparsity& sp){
-    return create(ConstantMX::create(sp,0));
-  }
-
-  MX MX::ones(const Sparsity& sp){
-    return create(ConstantMX::create(sp,1));
-  }
-
-  MX MX::ones(int nrow, int ncol){
-    return ones(sp_dense(nrow,ncol));
-  }
-
-  MX MX::ones(const std::pair<int, int> &rc){
-    return ones(rc.first,rc.second);
-  }
-
   MX MX::inf(int nrow, int ncol){
     return inf(sp_dense(nrow,ncol));
   }

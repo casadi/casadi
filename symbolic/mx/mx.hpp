@@ -318,20 +318,6 @@ namespace CasADi{
     //@}
   
     //@{
-    /** \brief  Dense matrix of all zeros */
-    static MX zeros(const Sparsity& sp);
-    static MX zeros(int nrow, int ncol=1); 
-    static MX zeros(const std::pair<int, int> &rc);
-    //@}
-
-    //@{
-    /** \brief  Matrix of all ones */  
-    static MX ones(const Sparsity& sp);
-    static MX ones(int nrow, int ncol=1); 
-    static MX ones(const std::pair<int, int> &rc);
-    //@}
-
-    //@{
     /** \brief  create a matrix with all inf */
     static MX inf(const Sparsity& sp);
     static MX inf(int nrow=1, int ncol=1);

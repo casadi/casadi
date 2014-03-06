@@ -167,6 +167,9 @@ namespace CasADi{
     using B::dense;
     using B::vector;
     using B::dimString;
+    using B::sym;
+    using B::zeros;
+    using B::ones;
     using B::operator[];
     using B::operator();
 
@@ -677,20 +680,6 @@ namespace CasADi{
     static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& rc);
     //@}
     
-    //@{
-    /** \brief  create a dense matrix with all zeros */
-    static Matrix<T> zeros(const Sparsity& sp);
-    static Matrix<T> zeros(int nrow, int ncol=1);
-    static Matrix<T> zeros(const std::pair<int,int>& rc);
-    //@}
-
-    //@{
-    /** \brief  create a matrix with all ones */
-    static Matrix<T> ones(const Sparsity& sp);
-    static Matrix<T> ones(int nrow, int ncol=1);
-    static Matrix<T> ones(const std::pair<int,int>& rc);
-    //@}
-
     //@{
     /** \brief  create a matrix with all inf */
     static Matrix<T> inf(const Sparsity& sp);
