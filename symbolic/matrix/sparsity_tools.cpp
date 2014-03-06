@@ -346,16 +346,6 @@ namespace CasADi{
   Sparsity mul(const  Sparsity& a, const  Sparsity &b) {
     return (mul(DMatrix(a,1),DMatrix(b,1))).sparsity();
   }
-
-  std::size_t hash_sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row){
-    // Condense the sparsity pattern to a single, deterministric number
-    std::size_t ret=0;
-    hash_combine(ret,nrow);
-    hash_combine(ret,ncol);
-    hash_combine(ret,colind);
-    hash_combine(ret,row);
-    return ret;
-  }
   
   std::vector<int> sp_compress(const Sparsity& a){
     // Get the sparsity pattern
