@@ -1,12 +1,12 @@
 /** 
-* This example looks at the SX.sym method
+* This example looks at the ssym method
 *
 *
-* \pythonexample{SX/SX.sym}
+* \pythonexample{SX/ssym}
 *
 * \sa
 * \code
-* CasADi::SX.sym();
+* CasADi::SX::sym();
 * \endcode
 *
 */
