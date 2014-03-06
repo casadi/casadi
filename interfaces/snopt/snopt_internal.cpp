@@ -78,7 +78,7 @@ namespace CasADi{
     NLPSolverInternal::init();
 
     // Get/generate required functions
-    gradF();
+    jacF();
     jacG();
     
     // A large part of what follows is about classiyning variables
@@ -95,19 +95,19 @@ namespace CasADi{
     if (detect_linear_) { 
       // Detect dependencies w.r.t. gradF
       // Dependency seeds
-      bvec_t* input_v_x =  get_bvec_t(gradF_->inputNoCheck(GRADF_X).data());
-      bvec_t* input_v_p =  get_bvec_t(gradF_->inputNoCheck(GRADF_P).data());
+      bvec_t* input_v_x =  get_bvec_t(jacF_->inputNoCheck(GRADF_X).data());
+      bvec_t* input_v_p =  get_bvec_t(jacF_->inputNoCheck(GRADF_P).data());
       // Make a column with all variables active
       std::fill(input_v_x,input_v_x+nx_,bvec_t(1));
       std::fill(input_v_p,input_v_p+np_,bvec_t(0));
-      bvec_t* output_v = get_bvec_t(gradF_->outputNoCheck().data());
+      bvec_t* output_v = get_bvec_t(jacF_->outputNoCheck().data());
       // Perform a single dependency sweep
-      gradF_.spEvaluate(true);
+      jacF_.spEvaluate(true);
       
       // Harvest the results
       int k=0;
       for (int j=0;j<nx_;++j) {
-        if (!gradF_.output().hasNZ(j,0)) { // Structural zero: category 0
+        if (!jacF_.output().hasNZ(0,j)) { // Structural zero: category 0
           x_type_f_[j] = 0;
         } else { // Dependency present?
           bool linear = true;
@@ -236,7 +236,7 @@ namespace CasADi{
     //  "0" is to be interpreted not as an index but as a literal zero
     
     IMatrix mapping_jacG  = IMatrix(0,nx_);
-    IMatrix mapping_gradF = IMatrix(gradF_.output().sparsity(),range(-1,-1-gradF_.output().size(),-1));
+    IMatrix mapping_gradF = IMatrix(jacF_.output().sparsity(),range(-1,-1-jacF_.output().size(),-1));
     
     if (!jacG_.isNull()) {
       mapping_jacG = IMatrix(jacG_.output().sparsity(),range(1,jacG_.output().size()+1));
@@ -248,7 +248,7 @@ namespace CasADi{
     m_ = ng_;
     
     // Construct the linear objective row
-    IMatrix d=trans(mapping_gradF(x_order_,Slice(0)));
+    IMatrix d=mapping_gradF(Slice(0),x_order_);
     for (int k=0;k<nnObj_;++k) {
       if (x_type_f_[x_order_[k]]==2) {
         d[k] = 0;
@@ -257,12 +257,12 @@ namespace CasADi{
 
     // Make it as sparse as you can
     d = sparse(d);
-    gradF_row_ = d.size()!=0;
-    if (gradF_row_) { // We need an objective gradient row
+    jacF_row_ = d.size()!=0;
+    if (jacF_row_) { // We need an objective gradient row
       A_structure_ = vertcat(A_structure_,d);
       m_ +=1;
     }
-    iObj_ = gradF_row_ ? m_ : 0;
+    iObj_ = jacF_row_ ? m_ : 0;
     
     // Is the A matrix completely empty? 
     dummyrow_ = A_structure_.size()==0; // Then we need a dummy row
@@ -274,10 +274,10 @@ namespace CasADi{
     }
     
     // We don't need a dummy row if a linear objective row is present
-    casadi_assert(!(dummyrow_ && gradF_row_));
+    casadi_assert(!(dummyrow_ && jacF_row_));
         
     if(monitored("setup_nlp")){
-      std::cout << "Objective gradient row presence: " << gradF_row_ << std::endl;
+      std::cout << "Objective gradient row presence: " << jacF_row_ << std::endl;
       std::cout << "Dummy row presence: " << dummyrow_ << std::endl;
       std::cout << "iObj: " << iObj_ << std::endl;
     }
@@ -435,10 +435,10 @@ namespace CasADi{
       jacG_.setInput(input(NLP_SOLVER_P),JACG_P);
       jacG_.evaluate();
     }
-    gradF_.setInput(input(NLP_SOLVER_X0),GRADF_X);
-    gradF_.setInput(input(NLP_SOLVER_P),GRADF_P);
+    jacF_.setInput(input(NLP_SOLVER_X0),GRADF_X);
+    jacF_.setInput(input(NLP_SOLVER_P),GRADF_P);
 
-    gradF_.evaluate();
+    jacF_.evaluate();
     
     // perform the mapping:
     // populate A_data_ (the nonzeros of A)
@@ -450,7 +450,7 @@ namespace CasADi{
       } else if (i>0) {
         A_data_[k] = jacG_.output().data()[i-1];
       } else {
-        A_data_[k] = gradF_.output().data()[-i-1];
+        A_data_[k] = jacF_.output().data()[-i-1];
       }
     }
 
@@ -501,7 +501,7 @@ namespace CasADi{
     }
     
     // Objective row / dummy row should be unbounded
-    if (dummyrow_ || gradF_row_) {
+    if (dummyrow_ || jacF_row_) {
       bl_.back() = -std::numeric_limits<double>::infinity();
       bu_.back() = std::numeric_limits<double>::infinity();
     }
@@ -538,7 +538,7 @@ namespace CasADi{
     SnoptInternal* source = this;
     memcpy(&(iu[0]), &source, sizeof(SnoptInternal*));
 
-    casadi_assert_message(!gradF_.isNull(),"blaasssshc");
+    casadi_assert_message(!jacF_.isNull(),"blaasssshc");
     
     if(monitored("setup_nlp")){
       std::cout << "indA:" << row << std::endl;
@@ -576,7 +576,7 @@ namespace CasADi{
       output(NLP_SOLVER_LAM_X).data()[kk] = -rc_[k];
     }
     
-    setOutput(Obj+ (gradF_row_? x_[nx_+ng_] : 0),NLP_SOLVER_F);
+    setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0),NLP_SOLVER_F);
     for (int k=0;k<ng_;++k) {
       int kk= g_order_[k];
       output(NLP_SOLVER_LAM_G).data()[kk] = -rc_[nx_+k];
@@ -599,34 +599,34 @@ namespace CasADi{
       casadi_assert_message(nnJac_==nnJac,"Jac " << nnJac_ << " <-> " << nnJac);
 
       // Evaluate gradF with the linear variabes put to zero
-      gradF_.setInput(0.0,NL_X);
-      gradF_.setInput(input(NLP_SOLVER_P),NL_P);
+      jacF_.setInput(0.0,NL_X);
+      jacF_.setInput(input(NLP_SOLVER_P),NL_P);
       for (int k=0;k<nnObj;++k) {
         if (x_type_f_[x_order_[k]]==2) {
-          gradF_.input(NL_X)[x_order_[k]] = x[k];
+          jacF_.input(NL_X)[x_order_[k]] = x[k];
         }
       }
       
       if(monitored("eval_nlp")){
         std::cout << "x (obj - sorted indices   - all elements present):" << std::vector<double>(x,x+nnObj) << std::endl;
-        std::cout << "x (obj - original indices - linear elements zero):" << gradF_.input(NL_X) << std::endl;
+        std::cout << "x (obj - original indices - linear elements zero):" << jacF_.input(NL_X) << std::endl;
       }
       
-      gradF_.evaluate();
+      jacF_.evaluate();
       
       // provide objective (without linear contributions) to SNOPT
-      fObj = gradF_.output(1).at(0);
+      fObj = jacF_.output(1).at(0);
           
       // provide nonlinear part of objective gradient to SNOPT  
       for (int k=0;k<nnObj;++k) {
         if (x_type_f_[x_order_[k]]==2) {
-         gObj[k] = gradF_.output().data()[x_order_[k]];
+         gObj[k] = jacF_.output().data()[x_order_[k]];
         }
       }
       
       if(monitored("eval_nlp")){
         std::cout << "fObj:" << fObj << std::endl;
-        std::cout << "gradF:" << gradF_.output() << std::endl;
+        std::cout << "gradF:" << jacF_.output() << std::endl;
         std::cout << "gObj:" << std::vector<double>(gObj,gObj+nnObj) << std::endl;
       }
       
@@ -634,7 +634,7 @@ namespace CasADi{
       for (int k=0;k<A_structure_.size();++k) {
         int i = A_structure_.data()[k];
         if (i<0) {
-          A_data_[k] = gradF_.output().data()[-i-1];
+          A_data_[k] = jacF_.output().data()[-i-1];
         }
       }
       
@@ -698,7 +698,7 @@ namespace CasADi{
         //output(NLP_SOLVER_LAM_X).data()[kk] = -rc_[k];
       }
       
-      //setOutput(Obj+ (gradF_row_? x_[nx_+ng_] : 0),NLP_SOLVER_F);
+      //setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0),NLP_SOLVER_F);
       for (int k=0;k<ng_;++k) {
         int kk= g_order_[k];
         //output(NLP_SOLVER_LAM_G).data()[kk] = -rc_[nx_+k];

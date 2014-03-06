@@ -126,7 +126,7 @@ namespace CasADi{
     OptionsMap optionsmap_;
     
     // Matrix A has a inear objective row
-    bool gradF_row_;
+    bool jacF_row_;
     // Matrix A has a dummy row
     bool dummyrow_;
     

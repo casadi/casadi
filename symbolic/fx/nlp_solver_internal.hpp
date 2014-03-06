@@ -60,6 +60,9 @@ namespace CasADi{
 
     /// Get or generate a function to calculate the gradient of the objective function
     virtual FX getGradF();
+    
+    /// Get or generate a function to calculate the jacobian of the objective function
+    virtual FX getJacF();
   
     /// Get or generate a function to calculate the Jacobian of the constraint function
     virtual FX getJacG();
@@ -75,6 +78,9 @@ namespace CasADi{
     
     // Access the objective gradient function
     FX& gradF();
+    
+    // Access the objective jacobian function (sparse)
+    FX& jacF();
 
     /// Access the Jacobian of the constraint function
     FX& jacG();
@@ -108,6 +114,9 @@ namespace CasADi{
 
     // Gradient of the objective
     FX gradF_;
+    
+    // Gradient of the objective
+    FX jacF_;
     
     // Jacobian of the constraints
     FX jacG_;
