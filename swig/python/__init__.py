@@ -99,7 +99,24 @@ NLP_NUM_IN = deprecated["NLP_NUM_IN"]
 NLP_NUM_OUT = deprecated["NLP_NUM_OUT"]
 
 
+import warnings
 
+def deprecatedfun(func,message):
+
+    def depfun(*args, **kwargs):
+        if not func._fired:
+          warnings.warn(message,SyntaxWarning,stacklevel=2)
+          func._fired = True
+        return func(*args, **kwargs)
+    func._fired = False
+    depfun.__dict__.update(func.__dict__)
+    depfun.__name__ = func.__name__
+    depfun.__doc__ = func.__doc__
+    return depfun
+
+
+ssym = deprecatedfun(ssym,"ssym will soon be replaced by SX.sym")
+msym = deprecatedfun(ssym,"ssym will soon be replaced by MX.sym")
 
 __version__ = CasadiMeta.getVersion()
 if '+' in __version__ and CasadiMeta.getGitDescribe()!='':
