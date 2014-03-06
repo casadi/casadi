@@ -27,72 +27,31 @@
 
 namespace CasADi{
 
-  /**
-     \brief Create a dense rectangular sparsity pattern
-  **/
-  Sparsity sp_dense(int nrow, int ncol=1);
-  
-  /**
-     \brief Create a dense sparsity pattern
-  **/
-  Sparsity sp_dense(const std::pair<int,int> &nm );
 
-  /**
-     \brief Create a sparse sparsity pattern
-  **/
-  Sparsity sp_sparse(int nrow, int ncol=1);
-  
-  /**
-     \brief Create a dense sparsity pattern
-  **/
-  Sparsity sp_sparse(const std::pair<int,int> &nm);
-  
-  /**
-     \brief Create the sparsity pattern for a unit vector of length n and a nonzero on position el
-  **/
-  Sparsity sp_unit(int n, int el);
-
-  /**
-     \brief Create a upper triangular square sparsity pattern
-     
-     \see upperSparsity
-  **/
-  Sparsity sp_triu(int n);
-
-  /**
-     \brief Create a lower triangular square sparsity pattern
-     
-     \see lowerSparsity
-  **/
-  Sparsity sp_tril(int n);
-
-  /**
-     \brief Create diagonal square sparsity pattern
-  **/
-  Sparsity sp_diag(int n);
-  
-  /**
-     \brief Create a single band in a square sparsity pattern
-     *
-     * sp_band(n,0) is equivalent to sp_diag(n) \n
-     * sp_band(n,-1) has a band below the diagonal \n
-     * \param p indicate
-     **/
-  Sparsity sp_band(int n, int p);
-  
-  /**
-     \brief Create banded square sparsity pattern
-     *
-     * sp_band(n,0) is equivalent to sp_diag(n) \n
-     * sp_band(n,1) is tri-diagonal matrix \n
-     **/
-  Sparsity sp_banded(int n, int p);
-  
-  /** \brief Construct a block sparsity pattern from (row,col) vectors
-      
-   */
-  Sparsity sp_rowcol(const std::vector<int>& row, const std::vector<int>& col, int nrow, int ncol);
-  
+#ifndef WITHOUT_PRE_1_9_X
+    /** \brief [DEPRECATED] Replaced with static methods in the Sparsity class
+     */
+    //@{
+  inline Sparsity sp_dense(int nrow, int ncol=1){ return Sparsity::dense(nrow,ncol);}
+  inline Sparsity sp_dense(const std::pair<int,int> &rc ){ return Sparsity::dense(rc);}
+  inline Sparsity sp_sparse(int nrow, int ncol=1){ return Sparsity::sparse(nrow,ncol);}
+  inline Sparsity sp_sparse(const std::pair<int,int> &rc){ return Sparsity::sparse(rc);}
+  inline Sparsity sp_unit(int n, int el){ return Sparsity::unit(n,el);}
+  inline Sparsity sp_triu(int n){ return Sparsity::triu(n);}
+  inline Sparsity sp_tril(int n){ return Sparsity::tril(n);}
+  inline Sparsity sp_diag(int n){ return Sparsity::diagonal(n);}
+  inline Sparsity sp_band(int n, int p){ return Sparsity::band(n,p);}
+  inline Sparsity sp_banded(int n, int p){ return Sparsity::banded(n,p);}
+  inline Sparsity sp_rowcol(const std::vector<int>& row, const std::vector<int>& col, int nrow, int ncol){ return Sparsity::rowcol(row,col,nrow,ncol);}
+  inline Sparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool invert_mapping=false){ return Sparsity::triplet(nrow,ncol,row,col,mapping,invert_mapping);}
+  inline Sparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col){ return Sparsity::triplet(nrow,ncol,row,col);}
+  inline Sparsity trans(const Sparsity& a){ return a.transpose();}
+  inline Sparsity upperSparsity(const Sparsity& a, bool includeDiagonal = true){ return a.upper(includeDiagonal); }
+  inline Sparsity lowerSparsity(const Sparsity& a, bool includeDiagonal = true){ return a.lower(includeDiagonal); }
+  inline std::vector<int> upperNZ(const Sparsity& a) { return a.upperNZ(); }
+  inline std::vector<int> lowerNZ(const Sparsity& a) { return a.lowerNZ(); }
+  //@}
+#endif  
   
   /** \brief Get the indices of all non-zero elements as they would appear in a Dense matrix  
       A : DenseMatrix  4 x 3
@@ -109,42 +68,6 @@ namespace CasADi{
 
   /** \ brief Vectorize the pattern */
   Sparsity vec(const Sparsity& a);
-  
-  /** \ brief Return the transpose of the sparsity pattern
-   */
-  Sparsity trans(const Sparsity& a);
-  
-  /**
-   * \brief Return the upper part of the sparsity pattern
-   * \param includeDiagonal specify wether the diagonal must be part of the result
-   * \see sp_triu
-   */
-  Sparsity upperSparsity(const Sparsity& a, bool includeDiagonal = true);
-
-  /**
-   * \brief Return the lower part of the sparsity pattern
-   * \param includeDiagonal specify wether the diagonal must be part of the result
-   * \see sp_tril
-   */
-  Sparsity lowerSparsity(const Sparsity& a, bool includeDiagonal = true);
-  
-  /** \brief Return the non-zero entries that make up the upper part of the provided matrix */
-  std::vector<int> upperNZ(const Sparsity& a);
-
-  /** \brief Return the non-zero entries that make up the lower part of the provided matrix */
-  std::vector<int> lowerNZ(const Sparsity& a);
-  
-  /**
-     \brief Create a sparsity pattern given the nonzeros in sparse triplet form
-  **/
-  Sparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool invert_mapping=false);
-  
-  /**
-     \brief Create a sparsity pattern given the nonzeros in sparse triplet form (no nonzero mapping)
-     rows_are_sorted==true means that the row entries already in increasing order for each col and without any duplicates
-  **/
-  Sparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col);
-  
   
   /** \brief Get the sparsity resulting from a matrix multiplication
    */

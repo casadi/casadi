@@ -94,16 +94,63 @@ namespace CasADi{
     /// Default constructor
     explicit Sparsity(int dummy=0);
     
-    /// Construct a sparsity pattern (sparse/dense)
-    Sparsity(int nrow, int ncol, bool dense=false);
-
-    /// Construct a sparsity pattern from vectors
-    Sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
-
 #ifndef SWIG
     /** \brief  Create from node */
     static Sparsity create(SparsityInternal *node);
 #endif
+
+    /** \brief Create a dense rectangular sparsity pattern **/
+    //@{
+    static Sparsity dense(int nrow, int ncol=1);
+    static Sparsity dense(const std::pair<int,int> &rc){ return dense(rc.first,rc.second);}
+    //@}
+
+    /** \brief Create a sparse (empty) rectangular sparsity pattern **/
+    //@{
+    static Sparsity sparse(int nrow, int ncol=1);
+    static Sparsity sparse(const std::pair<int,int> &rc){ return sparse(rc.first,rc.second);}
+    //@}
+  
+    /** \brief Create the sparsity pattern for a unit vector of length n and a nonzero on position el **/
+    //@{
+    static Sparsity unit(int n, int el);
+    //@}
+
+    /** \brief Create a upper triangular square sparsity pattern **/
+    static Sparsity triu(int n);
+
+    /** \brief Create a lower triangular square sparsity pattern **/
+    static Sparsity tril(int n);
+
+    /** \brief Create diagonal square sparsity pattern **/
+    static Sparsity diagonal(int n);
+  
+    /** \brief Create a single band in a square sparsity pattern
+     *
+     * sp_band(n,0) is equivalent to sp_diag(n) \n
+     * sp_band(n,-1) has a band below the diagonal \n
+     * \param p indicate
+     **/
+    static Sparsity band(int n, int p);
+  
+    /** \brief Create banded square sparsity pattern
+     *
+     * sp_band(n,0) is equivalent to sp_diag(n) \n
+     * sp_band(n,1) is tri-diagonal matrix \n
+     **/
+    static Sparsity banded(int n, int p);
+
+    /** \brief Construct a block sparsity pattern from (row,col) vectors */
+    static Sparsity rowcol(const std::vector<int>& row, const std::vector<int>& col, int nrow, int ncol);
+
+    /** \brief Create a sparsity pattern given the nonzeros in sparse triplet form
+    **/
+    static Sparsity triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool invert_mapping=false);
+    
+    /** \brief Create a sparsity pattern given the nonzeros in sparse triplet form (no nonzero mapping)
+        rows_are_sorted==true means that the row entries already in increasing order for each col and without any duplicates
+    **/
+    static Sparsity triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col);
 
     /** \brief Check if there is an identical copy of the sparsity pattern in the cache, and if so, make a shallow copy of that one */
     void reCache();
@@ -116,10 +163,7 @@ namespace CasADi{
      * throws an error as possible result
      */
     void sanityCheck(bool complete=false) const;
-    
-    /// Create a diagonal matrix
-    static Sparsity createDiagonal(int n);
-    static Sparsity createDiagonal(int m, int n);
+
     
     /** Get the diagonal of the matrix/create a diagonal matrix (mapping will contain the nonzero mapping)
         When the input is square, the diagonal elements are returned.
@@ -510,6 +554,17 @@ namespace CasADi{
 
     // Hash the sparsity pattern
     std::size_t hash() const;
+
+#ifndef WITHOUT_PRE_1_9_X
+    /** \brief [DEPRECATED]
+     */
+    //@{
+    Sparsity(int nrow, int ncol, bool dense=false);
+    Sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
+    static Sparsity createDiagonal(int n);
+    static Sparsity createDiagonal(int m, int n);
+    //@}
+#endif
   
 #ifndef SWIG
     /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */

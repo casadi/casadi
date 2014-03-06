@@ -736,5 +736,274 @@ namespace CasADi{
     return ret;
   }
 
+  Sparsity Sparsity::dense(int nrow, int ncol) {
+    return Sparsity(nrow,ncol,true);
+  }
+
+  Sparsity Sparsity::sparse(int nrow, int ncol) {
+    return Sparsity(nrow,ncol,false);
+  }
+
+  Sparsity Sparsity::triu(int n) {
+    casadi_assert_message(n>=0,"Sparsity::triu expects a positive integer as argument");
+    int nrow=n, ncol=n;
+    std::vector<int> colind, row;
+    colind.reserve(ncol+1);
+    row.reserve((n*(n+1))/2);
+    
+    // Loop over columns
+    colind.push_back(0);
+    for(int cc=0; cc<ncol; ++cc){
+      // Loop over rows for the upper triangular half
+      for(int rr=0; rr<=cc; ++rr){
+        row.push_back(rr);
+      }
+      colind.push_back(row.size());
+    }
+
+    // Return the pattern
+    return Sparsity(nrow,ncol,colind,row);
+  }
+
+  Sparsity Sparsity::tril(int n) {
+    casadi_assert_message(n>=0,"Sparsity::tril expects a positive integer as argument");
+    int nrow=n, ncol=n;
+    std::vector<int> colind, row;
+    colind.reserve(ncol+1);
+    row.reserve((n*(n+1))/2);
+    
+    // Loop over columns
+    colind.push_back(0);
+    for(int cc=0; cc<ncol; ++cc){
+      // Loop over rows for the lower triangular half
+      for(int rr=cc; rr<nrow; ++rr){
+        row.push_back(rr);
+      }
+      colind.push_back(row.size());
+    }
+
+    // Return the pattern
+    return Sparsity(nrow,ncol,colind,row);
+  }
+
+  Sparsity Sparsity::diagonal(int n){
+    casadi_assert_message(n>=0, "Sparsity::diag expects a positive integer as argument");
+  
+    // Construct sparsity pattern
+    std::vector<int> row(n);
+    std::vector<int> colind(n+1);
+    int el = 0;
+    for(int i=0; i<n; ++i){
+      colind[i] = el;
+      row[el++] = i;
+    }
+    colind.back() = el;
+
+    return Sparsity(n,n,colind,row);
+  }
+
+  Sparsity Sparsity::band(int n, int p) {
+    casadi_assert_message(n>=0, "Sparsity::band expects a positive integer as argument");
+    casadi_assert_message((p<0? -p : p)<n, "Sparsity::band: position of band schould be smaller then size argument");
+  
+    int nc = n-(p<0? -p : p);
+  
+    std::vector< int >          row(nc);
+  
+    int offset = max(p,0);
+    for (int i=0;i<nc;i++) {
+      row[i]=i+offset;
+    }
+  
+    std::vector< int >          colind(n+1);
+  
+    offset = min(p,0);
+    for (int i=0;i<n+1;i++) {
+      colind[i]=max(min(i+offset,nc),0);
+    }
+  
+    return Sparsity(n,n,colind,row);
+  
+  }
+
+  Sparsity Sparsity::banded(int n, int p) {
+    // This is not an efficient implementation
+    Sparsity ret = Sparsity(n,n);
+    for (int i=-p;i<=p;++i) {
+      ret = ret + Sparsity::band(n,i);
+    }
+    return ret;
+  }
+
+  Sparsity Sparsity::unit(int n, int el){
+    Sparsity ret = Sparsity::sparse(1,n);
+    ret.getNZ(0,el);
+    return ret;
+  }
+
+  Sparsity Sparsity::rowcol(const std::vector<int>& row, const std::vector<int>& col, int nrow, int ncol) {
+    std::vector<int> all_rows, all_cols;
+    all_rows.reserve(row.size()*col.size());
+    all_cols.reserve(row.size()*col.size());
+    for(std::vector<int>::const_iterator c_it=col.begin(); c_it!=col.end(); ++c_it){
+      casadi_assert_message(*c_it>=0 && *c_it<ncol, "Sparsity::rowcol: Column index out of bounds");
+      for(std::vector<int>::const_iterator r_it=row.begin(); r_it!=row.end(); ++r_it){
+        casadi_assert_message(*r_it>=0 && *r_it<nrow, "Sparsity::rowcol: Row index out of bounds");
+        all_rows.push_back(*r_it);
+        all_cols.push_back(*c_it);
+      }
+    }
+    return Sparsity::triplet(nrow,ncol,all_rows,all_cols);
+  }
+
+  Sparsity Sparsity::triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool invert_mapping){
+    // Assert dimensions
+    casadi_assert_message(col.size()==row.size(),"inconsistent lengths");
+
+    // Create the return sparsity pattern and access vectors
+    Sparsity ret = Sparsity(nrow,ncol);
+    std::vector<int> &r_colind = ret.colindRef();
+    std::vector<int> &r_row = ret.rowRef();
+    r_row.reserve(row.size());
+
+    // Consistency check and check if elements are already perfectly ordered with no duplicates
+    int last_col=-1, last_row=-1;
+    bool perfectly_ordered=true;
+    for(int k=0; k<col.size(); ++k){
+      // Consistency check
+      casadi_assert_message(col[k]>=0 && col[k]<ncol,"Col index out of bounds");
+      casadi_assert_message(row[k]>=0 && row[k]<nrow,"Row index out of bounds");
+    
+      // Check if ordering is already perfect
+      perfectly_ordered = perfectly_ordered && (col[k]<last_col || (col[k]==last_col && row[k]<=last_row));
+      last_col = col[k];
+      last_row = row[k];
+    }
+  
+    // Quick return if perfectly ordered
+    if(perfectly_ordered){
+      // Save rows
+      r_row.resize(row.size());
+      copy(row.begin(),row.end(),r_row.begin());
+    
+      // Find offset index
+      int el=0;
+      for(int i=0; i<ncol; ++i){
+        while(el<col.size() && col[el]==i) el++; 
+        r_colind[i+1] = el;
+      }
+    
+      // Identity mapping
+      mapping.resize(row.size());
+      for(int k=0; k<row.size(); ++k)
+        mapping[k] = k;
+    
+      // Quick return
+      return ret;
+    }
+    
+    // Reuse data
+    std::vector<int>& mapping1 = invert_mapping ? r_row : mapping;
+    std::vector<int>& mapping2 = invert_mapping ? mapping : r_row;
+  
+    // Make sure that enough memory is allocated to use as a work vector
+    mapping1.reserve(std::max(nrow+1,int(col.size())));
+  
+    // Number of elements in each row
+    std::vector<int>& rowcount = mapping1; // reuse memory
+    rowcount.resize(nrow+1);
+    fill(rowcount.begin(),rowcount.end(),0);
+    for(std::vector<int>::const_iterator it=row.begin(); it!=row.end(); ++it){
+      rowcount[*it+1]++;
+    }
+  
+    // Cumsum to get index offset for each row
+    for(int i=0; i<nrow; ++i){
+      rowcount[i+1] += rowcount[i];
+    }
+  
+    // New row for each old row
+    mapping2.resize(row.size());
+    for(int k=0; k<row.size(); ++k){
+      mapping2[rowcount[row[k]]++] = k;
+    }
+  
+    // Number of elements in each col
+    std::vector<int>& colcount = r_colind; // reuse memory, r_colind is already the right size and is filled with zeros
+    for(std::vector<int>::const_iterator it=mapping2.begin(); it!=mapping2.end(); ++it){
+      colcount[col[*it]+1]++;
+    }
+  
+    // Cumsum to get index offset for each col
+    for(int i=0; i<ncol; ++i){
+      colcount[i+1] += colcount[i];
+    }
+
+    // New col for each old col
+    mapping1.resize(col.size());
+    for(std::vector<int>::const_iterator it=mapping2.begin(); it!=mapping2.end(); ++it){
+      mapping1[colcount[col[*it]]++] = *it;
+    }
+
+    // Current element in the return matrix
+    int r_el = 0;
+    r_row.resize(col.size());
+
+    // Current nonzero
+    std::vector<int>::const_iterator it=mapping1.begin();
+
+    // Loop over cols
+    r_colind[0] = 0;
+    for(int i=0; i<ncol; ++i){
+    
+      // Previous row (to detect duplicates)
+      int j_prev = -1;
+    
+      // Loop over nonzero elements of the col
+      while(it!=mapping1.end() && col[*it]==i){
+
+        // Get the element
+        int el = *it;
+        it++;
+
+        // Get the row
+        int j = row[el];
+      
+        // If not a duplicate, save to return matrix
+        if(j!=j_prev)
+          r_row[r_el++] = j;
+      
+        if(invert_mapping){
+          // Save to the inverse mapping
+          mapping2[el] = r_el-1;        
+        } else {
+          // If not a duplicate, save to the mapping vector
+          if(j!=j_prev)
+            mapping1[r_el-1] = el;
+        }
+      
+        // Save row
+        j_prev = j;
+      }
+    
+      // Update col offset
+      r_colind[i+1] = r_el;
+    }
+
+    // Resize the row vector
+    r_row.resize(r_el);
+
+    // Resize mapping matrix
+    if(!invert_mapping){
+      mapping1.resize(r_el);
+    }
+  
+    return ret;
+  }
+
+  Sparsity Sparsity::triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col){
+    std::vector<int> mapping;
+    return Sparsity::triplet(nrow,ncol,row,col,mapping,false);
+  }
 
 } // namespace CasADi
