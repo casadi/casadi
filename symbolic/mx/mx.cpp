@@ -73,15 +73,17 @@ namespace CasADi{
   }
 
   MX::MX(const Sparsity& sp, const MX& val){
-    // Make sure that val is dense and scalar
-    casadi_assert(val.scalar());
-  
-    // Dense matrix if val dense
-    if(val.dense()){
-      *this = val->getGetNonzeros(sp,std::vector<int>(sp.size(),0));
-     } else {
-      // Empty matrix
-      *this = sparse(sp.size1(),sp.size2());
+    if(val.scalar()){
+      // Dense matrix if val dense
+      if(val.dense()){
+        *this = val->getGetNonzeros(sp,std::vector<int>(sp.size(),0));
+      } else {
+        // Empty matrix
+        *this = sparse(sp.size1(),sp.size2());
+      }
+    } else {
+      casadi_assert(val.vector() && sp.size()==val.size1());
+      *this = full(val)->getGetNonzeros(sp,range(size1()));
     }
   }
 
