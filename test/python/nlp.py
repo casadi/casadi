@@ -1302,6 +1302,80 @@ class NLPtests(casadiTestCase):
     self.checkarray(solver.output("lam_x"),DMatrix([0,-7.7]),digits=7)
     self.checkarray(solver.output("lam_g"),DMatrix([0]))
     
+  @requires("SnoptSolver")
+  def test_pathological(self):      
+    x=SX.sym("x")
+    y=SX.sym("y")
+    nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+y**2))
+
+    solver = SnoptSolver(nlp)
+    solver.init()
+        
+    #solver.setOption("detect_linear",False)
+    solver.setOption("verbose",True)
+    solver.setOption("monitor",["setup_nlp","eval_nlp"])
+    solver.setOption("_verify_level",3)
+    #solver.setOption("_optimality_tolerance",1e-8)
+    #solver.setOption("_feasibility_tolerance",1e-8)
+    solver.setOption("_iteration_limit",1000)
+
+    sparsegradF = nlp.jacobian("x","f")
+    sparsegradF.init()
+    ins = nlp.symbolicInput()
+    out = list(sparsegradF.call(ins))
+    sparsegradF = MXFunction(ins,[out[0].T] + out[1:])
+    sparsegradF.init()
+
+    solver.setOption("grad_f",sparsegradF)
+
+    solver.init()
+    solver.setInput([1,1],"x0")
+    solver.setInput([-10,0],"lbx")
+    solver.setInput([10,2],"ubx")
+
+    solver.solve()
+    
+    self.checkarray(solver.output("f"),DMatrix([0]))
+    self.checkarray(solver.output("x"),DMatrix([1,0]))
+    self.checkarray(solver.output("lam_x"),DMatrix([0,-0]),digits=7)
+
+  @requires("SnoptSolver")
+  def test_pathological2(self):      
+    x=SX.sym("x")
+    y=SX.sym("y")
+    nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+y))
+
+    solver = SnoptSolver(nlp)
+    solver.init()
+        
+    #solver.setOption("detect_linear",False)
+    solver.setOption("verbose",True)
+    solver.setOption("monitor",["setup_nlp","eval_nlp"])
+    solver.setOption("_verify_level",3)
+    #solver.setOption("_optimality_tolerance",1e-8)
+    #solver.setOption("_feasibility_tolerance",1e-8)
+    solver.setOption("_iteration_limit",1000)
+
+    sparsegradF = nlp.jacobian("x","f")
+    sparsegradF.init()
+    ins = nlp.symbolicInput()
+    out = list(sparsegradF.call(ins))
+    sparsegradF = MXFunction(ins,[out[0].T] + out[1:])
+    sparsegradF.init()
+
+    solver.setOption("grad_f",sparsegradF)
+
+    solver.init()
+    solver.setInput([1,1],"x0")
+    solver.setInput([-10,0],"lbx")
+    solver.setInput([10,2],"ubx")
+
+    solver.solve()
+    
+    self.checkarray(solver.output("f"),DMatrix([0]))
+    self.checkarray(solver.output("x"),DMatrix([1,0]))
+    self.checkarray(solver.output("lam_x"),DMatrix([0,-1]),digits=7)
+    
 if __name__ == '__main__':
     unittest.main()
     print solvers
