@@ -665,17 +665,15 @@ namespace CasADi{
     
     //@{
     /** \brief  create a sparse matrix with all zeros */
-    static Matrix<T> sparse(int nrow, int ncol=1);
-    static Matrix<T> sparse(const std::pair<int,int>& rc);
+    static Matrix<T> sparse(int nrow=1, int ncol=1);
+    static Matrix<T> sparse(const std::pair<int,int>& rc){ return sparse(rc.first,rc.second);}
     //@}
     
     /* \brief Construct a sparse matrix from triplet form
-     * Matrix size will be max(col) x max(row)
+     * Default matrix size is max(col) x max(row)
      */
-    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d);
-    
     //@{
-    /// \brief Construct a sparse matrix from triplet form
+    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d);
     static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int nrow, int ncol);
     static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& rc);
     //@}

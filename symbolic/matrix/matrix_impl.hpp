@@ -1728,11 +1728,6 @@ namespace CasADi{
   }
 
   template<class T>
-  Matrix<T> Matrix<T>::sparse(const std::pair<int,int> &rc){
-    return sparse(rc.first,rc.second);
-  }
-
-  template<class T>
   Matrix<T> Matrix<T>::sparse(int nrow, int ncol){
     return Matrix<T>(nrow,ncol);
   }
@@ -1751,11 +1746,10 @@ namespace CasADi{
   Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int nrow, int ncol) {
     casadi_assert_message(col.size()==row.size() && col.size()==d.size(),"Argument error in Matrix<T>::sparse(row,col,d): supplied lists must all be of equal length, but got: " << row.size() << ", " << col.size()  << " and " << d.size());
     std::vector<int> mapping;
-    Matrix<T> ret(sp_triplet(nrow,ncol,row,col,mapping),0);
-  
-    for (int k=0;k<mapping.size();++k) ret.data()[k] = d[mapping[k]];
-  
-    return ret;
+    Sparsity sp = sp_triplet(nrow,ncol,row,col,mapping);
+    std::vector<T> v(mapping.size());
+    for(int k=0; k<v.size(); ++k) v[k] = d[mapping[k]];
+    return Matrix<T>(sp,v);
   }
 
   template<class T>
