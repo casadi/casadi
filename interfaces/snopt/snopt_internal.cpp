@@ -105,13 +105,11 @@ namespace CasADi{
       jacF_.spEvaluate(true);
       
       // Harvest the results
-      int k=0;
       for (int j=0;j<nx_;++j) {
-        if (!jacF_.output().hasNZ(0,j)) { // Structural zero: category 0
+        if (jacF_.output().colind(j)==jacF_.output().colind(j+1)) {
           x_type_f_[j] = 0;
-        } else { // Dependency present?
-          bool linear = true;
-          x_type_f_[j] = output_v[k++]?  2 : 1;
+        } else {
+          x_type_f_[j] = output_v[jacF_.output().colind(j)]?  2 : 1;
         }
       }
       
