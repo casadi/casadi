@@ -16,7 +16,7 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>QCQP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. .</td></tr>
 <tr><td>QCQP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
-<tr><td>QCQP_SOLVER_P</td><td>p</td><td>The vertical stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. .</td></tr>
+<tr><td>QCQP_SOLVER_P</td><td>p</td><td>The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. .</td></tr>
 <tr><td>QCQP_SOLVER_Q</td><td>q</td><td>The vertical stack of all qi: dense, (nq n x 1) .</td></tr>
 <tr><td>QCQP_SOLVER_R</td><td>r</td><td>The vertical stack of all scalars ri (nq x 1) .</td></tr>
 <tr><td>QCQP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
@@ -44,7 +44,7 @@
 <caption>Input scheme: CasADi::LinsolInput  (LINSOL_NUM_IN = 3) [linsolIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>LINSOL_A</td><td>A</td><td>The square matrix A: sparse, (n x n). .</td></tr>
-<tr><td>LINSOL_B</td><td>B</td><td>The right-hand-side matrix b: dense, (m x n) .</td></tr>
+<tr><td>LINSOL_B</td><td>B</td><td>The right-hand-side matrix b: dense, (n x m) .</td></tr>
 </table>
 */
 /** \defgroup scheme_SOCPOutput
@@ -73,7 +73,7 @@
 <a name='schemes'></a><table>
 <caption>Input scheme: CasADi::SDPInput  (SDP_SOLVER_NUM_IN = 9) [sdpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SDP_SOLVER_F</td><td>f</td><td>The vertical stack of all matrices F_i: ( nm x m) .</td></tr>
+<tr><td>SDP_SOLVER_F</td><td>f</td><td>The horizontal stack of all matrices F_i: ( m x nm) .</td></tr>
 <tr><td>SDP_SOLVER_C</td><td>c</td><td>The vector c: ( n x 1) .</td></tr>
 <tr><td>SDP_SOLVER_G</td><td>g</td><td>The matrix G: ( m x m) .</td></tr>
 <tr><td>SDP_SOLVER_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
@@ -112,8 +112,8 @@
 <a name='schemes'></a><table>
 <caption>Input scheme: CasADi::DPLEInput  (DPLE_NUM_IN = 3) [dpleIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DPLE_A</td><td>a</td><td>A matrices (vertcat when const_dim, blkdiag otherwise) .</td></tr>
-<tr><td>DPLE_V</td><td>v</td><td>V matrices (vertcat when const_dim, blkdiag otherwise) .</td></tr>
+<tr><td>DPLE_A</td><td>a</td><td>A matrices (horzcat when const_dim, blkdiag otherwise) .</td></tr>
+<tr><td>DPLE_V</td><td>v</td><td>V matrices (horzcat when const_dim, blkdiag otherwise) .</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPOutput
@@ -128,7 +128,7 @@
 <a name='schemes'></a><table>
 <caption>Input scheme: CasADi::SOCPInput  (SOCP_SOLVER_NUM_IN = 11) [socpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SOCP_SOLVER_G</td><td>g</td><td>The vertical stack of all matrices Gi: ( N x n) .</td></tr>
+<tr><td>SOCP_SOLVER_G</td><td>g</td><td>The horizontal stack of all matrices Gi: ( n x N) .</td></tr>
 <tr><td>SOCP_SOLVER_H</td><td>h</td><td>The vertical stack of all vectors hi: ( N x 1) .</td></tr>
 <tr><td>SOCP_SOLVER_E</td><td>e</td><td>The vertical stack of all vectors ei: ( nm x 1) .</td></tr>
 <tr><td>SOCP_SOLVER_F</td><td>f</td><td>The vertical stack of all scalars fi: ( m x 1) .</td></tr>
@@ -249,7 +249,7 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>SDQP_SOLVER_H</td><td>h</td><td>The matrix H: sparse ( n x n) .</td></tr>
 <tr><td>SDQP_SOLVER_C</td><td>c</td><td>The vector c: ( n x 1) .</td></tr>
-<tr><td>SDQP_SOLVER_F</td><td>f</td><td>The vertical stack of all matrices F_i: ( nm x m) .</td></tr>
+<tr><td>SDQP_SOLVER_F</td><td>f</td><td>The horizontal stack of all matrices F_i: ( m x nm) .</td></tr>
 <tr><td>SDQP_SOLVER_G</td><td>g</td><td>The matrix G: ( m x m) .</td></tr>
 <tr><td>SDQP_SOLVER_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
 <tr><td>SDQP_SOLVER_LBA</td><td>lba</td><td>Lower bounds on Ax ( nc x 1) .</td></tr>
@@ -414,7 +414,7 @@
 <a name='schemes'></a><table>
 <caption>Output scheme: CasADi::DPLEOutput  (DPLE_NUM_OUT = 2) [dpleOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DPLE_P</td><td>p</td><td>Lyapunov matrix (vertcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def) .</td></tr>
+<tr><td>DPLE_P</td><td>p</td><td>Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def) .</td></tr>
 </table>
 */
 /** \defgroup scheme_HessLagInput
@@ -853,6 +853,20 @@
 <br/>
 @copydoc scheme_LinsolOutput
 */
+/** \class CasADi::DirectCollocationInternal
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
+/** \class CasADi::DirectCollocation
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
 /** \class CasADi::WorhpInternal
 \n
 \par
@@ -1142,18 +1156,4 @@
 @copydoc scheme_SOCPInput
 <br/>
 @copydoc scheme_SOCPOutput
-*/
-/** \class CasADi::DirectCollocationInternal
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
-/** \class CasADi::DirectCollocation
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
 */
