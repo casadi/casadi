@@ -44,7 +44,7 @@ except:
   pass
 
 try:
-  solvers.append((SnoptSolver,{"_verify_level": 3,"detect_linear": True,"_optimality_tolerance":1e-10,"_feasibility_tolerance":1e-10}))
+  solvers.append((SnoptSolver,{"_verify_level": 3,"detect_linear": True,"_optimality_tolerance":1e-12,"_feasibility_tolerance":1e-12}))
   print "Will test SnoptSolver"
 except:
   pass
@@ -68,7 +68,7 @@ except:
 #  print "Will test KnitroSolver"
 #except:
 #  pass
-  
+
 class NLPtests(casadiTestCase):
 
   def testboundsviol(self):
@@ -1229,39 +1229,110 @@ class NLPtests(casadiTestCase):
       
   @requires("SnoptSolver")
   def test_permute(self):
-    for permute_g in itertools.permutations(range(3)):
-      for permute_x in itertools.permutations(range(4)):
-        x=SX.sym("x",4)
-        x1,x2,x3,x4 = x[permute_x]
-        g = [x1**2+x2**2+x3,
-            x2**4+x4,
-            2*x1+4*x2]
-        f= (x1+x2+x3)**2+3*x3+5*x4
-        F= SXFunction(nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
-        F.init()
+    for Solver, solver_options in solvers:
+      if "Snopt" not in str(Solver): continue
+      for permute_g in itertools.permutations(range(3)):
+        for permute_x in itertools.permutations(range(4)):
+          x=SX.sym("x",4)
+          x1,x2,x3,x4 = x[permute_x]
+          g = [x1**2+x2**2+x3,
+              x2**4+x4,
+              2*x1+4*x2]
+          f= (x1+x2+x3)**2+3*x3+5*x4
+          F= SXFunction(nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
+          F.init()
+          
+          solver = Solver(F)
+          solver.setOption(solver_options)
+          solver.init()
+
+          solver.input("ubx")[permute_x]= DMatrix([inf,inf,inf,inf])
+          solver.input("lbx")[permute_x]= DMatrix([-inf,-inf,0,0])
+          
+          solver.setInput(DMatrix([2,4,inf])[permute_g],"ubg")
+          solver.setInput(DMatrix([2,4,0])[permute_g],"lbg")
+          
+          solver.input("x0")[permute_x] = DMatrix([-0.070,1.41,0,0.0199])
+          solver.evaluate()
+
+
+          F.setInput(solver.output("x"))
+          F.evaluate()
+
+          self.checkarray(solver.output("f"),DMatrix([1.9001249992187681e+00]),digits=7)
+          self.checkarray(solver.output("x")[permute_x],DMatrix([-7.0622015054877127e-02,1.4124491251068008e+00,0,1.9925001159906402e-02]),failmessage=str(permute_x)+str(permute_g),digits=7)
+          self.checkarray(solver.output("lam_x")[permute_x],DMatrix([0,0,-2.4683779218120115e+01,0]),digits=7)
+          self.checkarray(solver.output("lam_g"),DMatrix([1.9000124997534527e+01,-5,0])[permute_g],digits=7)
+          self.checkarray(solver.output("g"),DMatrix([2,4,5.5085524702939])[permute_g],digits=7)
+
+  @requires("SnoptSolver")
+  def test_permute2(self):
+    for Solver, solver_options in solvers:
+      if "Snopt" not in str(Solver): continue
+      for permute_g in itertools.permutations(range(3)):
+        for permute_x in itertools.permutations(range(4)):
+          x=SX.sym("x",4)
+          x1,x2,x3,x4 = x[permute_x]
+          g = [x1**2+x2+x3,
+              x3**2+x4,
+              2*x1+4*x2]
+          f= x1**2+x3**2
+          F= SXFunction(nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
+          F.init()
+          
+          solver = Solver(F)
+          solver.setOption(solver_options)
+          solver.init()
+
+          solver.input("ubx")[permute_x]= DMatrix([inf,inf,inf,inf])
+          solver.input("lbx")[permute_x]= DMatrix([-inf,-inf,0,0])
+          
+          solver.setInput(DMatrix([2,4,inf])[permute_g],"ubg")
+          solver.setInput(DMatrix([2,4,0])[permute_g],"lbg")
+          
+          solver.input("x0")[permute_x] = DMatrix([-0.070,1.41,0,0.0199])
+          solver.evaluate()
+
+          self.checkarray(solver.output("f"),DMatrix([0]),digits=8)
+          self.checkarray(solver.output("x")[permute_x],DMatrix([0,2,0,4]),digits=4,failmessage=str(permute_x)+str(permute_g))
+          self.checkarray(solver.output("lam_x")[permute_x],DMatrix([0,0,0,0]),digits=3)
+          self.checkarray(solver.output("lam_g"),DMatrix([0,0,0])[permute_g],digits=3)
+          #self.checkarray(solver.output("g"),DMatrix([2,4,5.50855])[permute_g])
+
+  @requires("SnoptSolver")
+  def test_permute3(self):
+    for Solver, solver_options in solvers:
+      if "Snopt" not in str(Solver): continue
+      for permute_g in itertools.permutations(range(3)):
+        for permute_x in itertools.permutations(range(4)):
+          x=SX.sym("x",4)
+          x1,x2,x3,x4 = x[permute_x]
+          g = [x1**2+x2+x3,
+              x3**2+x4,
+              2*x1+4*x2]
+          f= x1**2+x3**2+2*x2
+          F= SXFunction(nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
+          F.init()
+          
+          solver = Solver(F)
+          solver.setOption(solver_options)
+          solver.init()
+
+          solver.input("ubx")[permute_x]= DMatrix([inf,inf,inf,inf])
+          solver.input("lbx")[permute_x]= DMatrix([-inf,-inf,0,0])
+          
+          solver.setInput(DMatrix([2,4,inf])[permute_g],"ubg")
+          solver.setInput(DMatrix([2,4,0])[permute_g],"lbg")
+          
+          solver.input("x0")[permute_x] = DMatrix([1,-0.5,0.5,4])
+          solver.evaluate()
+
+          self.checkarray(solver.output("f"),DMatrix([9.9030108869944522e-01]),failmessage=str(permute_x)+str(permute_g))
+          self.checkarray(solver.output("x")[permute_x],DMatrix([1.53822842722,-0.76911421361,0.402967519303,3.83761717839]),digits=6)
+          self.checkarray(solver.output("lam_x")[permute_x],DMatrix([0,0,0,0]),digits=7)
+          self.checkarray(solver.output("lam_g"),DMatrix([-8.0593503860219973e-01,6.52750754744e-10,-0.298516240384])[permute_g],failmessage=str(permute_x)+str(permute_g),digits=8)
+          #self.checkarray(solver.output("g"),DMatrix([2,4,5.50855])[permute_g])
         
-        solver = SnoptSolver(F)
-        solver.init()
-
-        solver.input("ubx")[permute_x]= DMatrix([inf,inf,inf,inf])
-        solver.input("lbx")[permute_x]= DMatrix([-inf,-inf,0,0])
-        
-        solver.setInput(DMatrix([2,4,inf])[permute_g],"ubg")
-        solver.setInput(DMatrix([2,4,0])[permute_g],"lbg")
-        
-        solver.input("x0")[permute_x] = DMatrix([-0.070,1.41,0,0.0199])
-        solver.evaluate()
-
-
-        F.setInput(solver.output("x"))
-        F.evaluate()
-
-        self.checkarray(solver.output("f"),DMatrix([1.900124999054007]))
-        self.checkarray(solver.output("x")[permute_x],DMatrix([-7.0622015054877127e-02,1.4124491251009053e+00,0,1.9925001159906402e-02]))
-        self.checkarray(solver.output("lam_x")[permute_x],DMatrix([0,0,-2.4683779217362773e+01,0]),digits=7)
-        self.checkarray(solver.output("lam_g"),DMatrix([1.9000124997270717e+01,-5,0])[permute_g])
-        #self.checkarray(solver.output("g"),DMatrix([2,4,5.50855])[permute_g])
-  
   @requires("SnoptSolver")
   def test_classifications(self):      
     x=SX.sym("x")
@@ -1269,7 +1340,6 @@ class NLPtests(casadiTestCase):
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+7.7*y,g=y**2))
 
     solver = SnoptSolver(nlp)
-    solver.init()
         
     #solver.setOption("detect_linear",False)
     solver.setOption("verbose",True)
@@ -1278,15 +1348,6 @@ class NLPtests(casadiTestCase):
     #solver.setOption("_optimality_tolerance",1e-8)
     #solver.setOption("_feasibility_tolerance",1e-8)
     solver.setOption("_iteration_limit",1000)
-
-    sparsegradF = nlp.jacobian("x","f")
-    sparsegradF.init()
-    ins = nlp.symbolicInput()
-    out = list(sparsegradF.call(ins))
-    sparsegradF = MXFunction(ins,[out[0].T] + out[1:])
-    sparsegradF.init()
-
-    solver.setOption("grad_f",sparsegradF)
 
     solver.init()
     solver.setInput([1,1],"x0")
@@ -1302,117 +1363,83 @@ class NLPtests(casadiTestCase):
     self.checkarray(solver.output("lam_x"),DMatrix([0,-7.7]),digits=7)
     self.checkarray(solver.output("lam_g"),DMatrix([0]))
     
-  @requires("SnoptSolver")
   def test_pathological(self):      
     x=SX.sym("x")
     y=SX.sym("y")
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+y**2))
 
-    solver = SnoptSolver(nlp)
-    solver.init()
-        
-    #solver.setOption("detect_linear",False)
-    solver.setOption("verbose",True)
-    solver.setOption("monitor",["setup_nlp","eval_nlp"])
-    solver.setOption("_verify_level",3)
-    #solver.setOption("_optimality_tolerance",1e-8)
-    #solver.setOption("_feasibility_tolerance",1e-8)
-    solver.setOption("_iteration_limit",1000)
+    for Solver, solver_options in solvers:
+      self.message(str(Solver))
+      if "Worhp" in str(Solver) or "Stabilized" in str(Solver) : continue
+      solver = Solver(nlp)
+          
+      #solver.setOption("detect_linear",False)
+      solver.setOption("verbose",True)
+      solver.setOption(solver_options)
+      
+      solver.init()
+      solver.setInput([1,1],"x0")
+      solver.setInput([-10,-1],"lbx")
+      solver.setInput([10,2],"ubx")
 
-    sparsegradF = nlp.jacobian("x","f")
-    sparsegradF.init()
-    ins = nlp.symbolicInput()
-    out = list(sparsegradF.call(ins))
-    sparsegradF = MXFunction(ins,[out[0].T] + out[1:])
-    sparsegradF.init()
+      solver.solve()
+      
+      self.checkarray(solver.output("f"),DMatrix([0]),digits=7)
+      self.checkarray(solver.output("x"),DMatrix([1,0]),digits=7,failmessage=str(Solver))
+      self.checkarray(solver.output("lam_x"),DMatrix([0,-0]),digits=7,failmessage=str(Solver))
 
-    solver.setOption("grad_f",sparsegradF)
-
-    solver.init()
-    solver.setInput([1,1],"x0")
-    solver.setInput([-10,0],"lbx")
-    solver.setInput([10,2],"ubx")
-
-    solver.solve()
-    
-    self.checkarray(solver.output("f"),DMatrix([0]))
-    self.checkarray(solver.output("x"),DMatrix([1,0]))
-    self.checkarray(solver.output("lam_x"),DMatrix([0,-0]),digits=7)
-
-  @requires("SnoptSolver")
   def test_pathological2(self):      
     x=SX.sym("x")
     y=SX.sym("y")
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2+y))
 
-    solver = SnoptSolver(nlp)
-    solver.init()
-        
-    #solver.setOption("detect_linear",False)
-    solver.setOption("verbose",True)
-    solver.setOption("monitor",["setup_nlp","eval_nlp"])
-    solver.setOption("_verify_level",3)
-    #solver.setOption("_optimality_tolerance",1e-8)
-    #solver.setOption("_feasibility_tolerance",1e-8)
-    solver.setOption("_iteration_limit",1000)
+    for Solver, solver_options in solvers:
+      self.message(str(Solver))
+      solver = Solver(nlp)
+          
+      #solver.setOption("detect_linear",False)
+      solver.setOption("verbose",True)
+      solver.setOption(solver_options)
 
-    sparsegradF = nlp.jacobian("x","f")
-    sparsegradF.init()
-    ins = nlp.symbolicInput()
-    out = list(sparsegradF.call(ins))
-    sparsegradF = MXFunction(ins,[out[0].T] + out[1:])
-    sparsegradF.init()
+      solver.init()
+      solver.setInput([1,1],"x0")
+      solver.setInput([-10,0],"lbx")
+      solver.setInput([10,2],"ubx")
 
-    solver.setOption("grad_f",sparsegradF)
+      solver.solve()
+      
+      self.checkarray(solver.output("f"),DMatrix([0]),digits=7)
+      self.checkarray(solver.output("x"),DMatrix([1,0]),digits=7)
+      self.checkarray(solver.output("lam_x"),DMatrix([0,-1]),digits=7)
 
-    solver.init()
-    solver.setInput([1,1],"x0")
-    solver.setInput([-10,0],"lbx")
-    solver.setInput([10,2],"ubx")
-
-    solver.solve()
-    
-    self.checkarray(solver.output("f"),DMatrix([0]))
-    self.checkarray(solver.output("x"),DMatrix([1,0]))
-    self.checkarray(solver.output("lam_x"),DMatrix([0,-1]),digits=7)
-
-  @requires("SnoptSolver")
   def test_pathological3(self):      
     x=SX.sym("x")
     y=SX.sym("y")
     nlp=SXFunction(nlpIn(x=vertcat([x,y])),nlpOut(f=(1-x)**2,g=x+y))
 
-    solver = SnoptSolver(nlp)
-    solver.init()
-        
-    #solver.setOption("detect_linear",False)
-    solver.setOption("verbose",True)
-    solver.setOption("monitor",["setup_nlp","eval_nlp"])
-    solver.setOption("_verify_level",3)
-    #solver.setOption("_optimality_tolerance",1e-8)
-    #solver.setOption("_feasibility_tolerance",1e-8)
-    solver.setOption("_iteration_limit",1000)
+    for Solver, solver_options in solvers:
+      self.message(str(Solver))
+      if "Worhp" in str(Solver): continue
+      solver = Solver(nlp)
+          
+      #solver.setOption("detect_linear",False)
+      solver.setOption("verbose",True)
+      solver.setOption(solver_options)
 
-    sparsegradF = nlp.jacobian("x","f")
-    sparsegradF.init()
-    ins = nlp.symbolicInput()
-    out = list(sparsegradF.call(ins))
-    sparsegradF = MXFunction(ins,[out[0].T] + out[1:])
-    sparsegradF.init()
-
-    solver.setOption("grad_f",sparsegradF)
-
-    solver.init()
-    solver.setInput([1,1],"x0")
-    solver.setInput([-10,0],"lbx")
-    solver.setInput([10,2],"ubx")
-
-    solver.solve()
+      solver.init()
+      solver.setInput([1,1],"x0")
+      solver.setInput([-10,0],"lbx")
+      solver.setInput([10,2],"ubx")
+      solver.setInput([2],"lbg")
+      solver.setInput([2],"ubg")
+      
+      solver.solve()
+      
+      self.checkarray(solver.output("f"),DMatrix([0]),digits=7)
+      self.checkarray(solver.output("x"),DMatrix([1,1]),digits=7)
+      self.checkarray(solver.output("lam_x"),DMatrix([0,0]),digits=7)
     
-    self.checkarray(solver.output("f"),DMatrix([0]))
-    self.checkarray(solver.output("x"),DMatrix([1,1]))
-    self.checkarray(solver.output("lam_x"),DMatrix([0,0]),digits=7)
-    
+
 if __name__ == '__main__':
     unittest.main()
     print solvers
