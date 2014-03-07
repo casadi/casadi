@@ -36,7 +36,7 @@ def tohaskelltype(s,alias=False,level=0):
 
   ->
 
-  Vec (CasadiClass FX)
+  StdVec (CasadiClass FX)
   """
   if level==0:
     if s.startswith("r.q(const)."):
@@ -77,7 +77,7 @@ def tohaskelltype(s,alias=False,level=0):
       if alias:
         return "val"+r
       else:
-        return "Val (" + r + ")"
+        return r
 
   if level==1:
     if s.startswith("std::vector<("):
@@ -86,7 +86,7 @@ def tohaskelltype(s,alias=False,level=0):
       if alias:
         return r + "Vec"
       else:
-        return "Vec (" + r + ")"
+        return "StdVec (" + r + ")"
     else:
       r = tohaskelltype(s,alias,level=2)
       if r is None: return None
@@ -101,25 +101,25 @@ def tohaskelltype(s,alias=False,level=0):
     if alias:
       return r + "Vec"
     else:
-      return "Vec (" + r + ")"
+      return "StdVec (" + r + ")"
   elif s == "std::string":
-    return ("" if alias else "NonVec ")+ "StdString"
+    return "StdString"
   elif s == "std::ostream":
-    return ("" if alias else "NonVec ")+ "StdOstream"
+    return "StdOstream"
   elif s == "bool":
-    return ("" if alias else "NonVec ")+ "CBool"
+    return "CBool"
   elif s == "std::size_t":
-    return ("" if alias else "NonVec ")+ "CSize"
+    return "CSize"
   elif s == "int":
-    return ("" if alias else "NonVec ")+ "CInt"
+    return "CInt"
   elif s == "long":
-    return ("" if alias else "NonVec ")+ "CLong"
+    return "CLong"
   elif s == "double":
-    return ("" if alias else "NonVec ")+ "CDouble"
+    return "CDouble"
   elif s == "unsigned char":
-    return ("" if alias else "NonVec ")+ "CUChar"
+    return "CUChar"
   elif s == "void":
-    return ("" if alias else "NonVec ")+ "CVoid"
+    return "CVoid"
   elif s.startswith("std::pair"):
     return None
   elif s.startswith("CasADi::"):
@@ -131,14 +131,14 @@ def tohaskelltype(s,alias=False,level=0):
       if alias:
         return "enum"+s[len("CasADi::"):]
       else:
-        return "NonVec (CasadiEnum %s)" % ucfirst(s[len("CasADi::"):])
+        return "CasadiEnum %s" % ucfirst(s[len("CasADi::"):])
     else:
       return None
 
     if alias:
       return sym
     else:
-      return "NonVec (CasadiClass " + sym + ")"
+      return "CasadiClass " + sym
   else:
     if s in  symbol_table:
       sym = symbol_table[s]
@@ -148,7 +148,7 @@ def tohaskelltype(s,alias=False,level=0):
       if alias:
         return "enum" +s
       else:
-        return "NonVec (CasadiEnum %s)" % ucfirst(s)
+        return "CasadiEnum %s" % ucfirst(s)
     elif s=='a().q(const).char':
       return None
     else:
@@ -157,7 +157,7 @@ def tohaskelltype(s,alias=False,level=0):
     if alias:
       return sym
     else:
-      return "NonVec (CasadiClass " + sym + ")"
+      return "CasadiClass " + sym
 
 def getAttribute(e,name,default=""):
   d = e.find('attributelist/attribute[@name="' + name + '"]')
