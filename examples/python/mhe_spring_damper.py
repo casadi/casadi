@@ -48,25 +48,25 @@ m = 1 # The weight of the mass
 k = 1 # The spring constant
 c = 0.5 # The damping of the system
 # The state
-states = struct_ssym(["x","dx"]) # Full state vector of the system: position x and velocity dx
+states = struct_symSX(["x","dx"]) # Full state vector of the system: position x and velocity dx
 Nstates = states.size # Number of states
 # Set up some aliases
 x,dx = states[...]
 
 # The control input
-controls = struct_ssym(["F"]) # Full control vector of the system: Input force F
+controls = struct_symSX(["F"]) # Full control vector of the system: Input force F
 Ncontrols = controls.size # Number of control inputs
 # Set up some aliases
 F, = controls[...]
 
 # Disturbances
-disturbances = struct_ssym(["w"]) # Process noise vector
+disturbances = struct_symSX(["w"]) # Process noise vector
 Ndisturbances = disturbances.size # Number of disturbances
 # Set up some aliases
 w, = disturbances[...]
 
 # Measurements
-measurements = struct_ssym(["y"]) # Measurement vector
+measurements = struct_symSX(["y"]) # Measurement vector
 Nmeas = measurements.size # Number of measurements
 # Set up some aliases
 y, = measurements[...]
@@ -74,9 +74,9 @@ y, = measurements[...]
 # Create Structure for the entire horizon
 
 # Structure that will be degrees of freedom for the optimizer
-shooting = struct_ssym([(entry("X",repeat=N,struct=states),entry("W",repeat=N-1,struct=disturbances))])
+shooting = struct_symSX([(entry("X",repeat=N,struct=states),entry("W",repeat=N-1,struct=disturbances))])
 # Structure that will be fixed parameters for the optimizer
-parameters = struct_ssym([(entry("U",repeat=N-1,struct=controls),entry("Y",repeat=N,struct=measurements),entry("S",shape=(Nstates,Nstates)),entry("x0",shape=(Nstates,1)))])
+parameters = struct_symSX([(entry("U",repeat=N-1,struct=controls),entry("Y",repeat=N,struct=measurements),entry("S",shape=(Nstates,Nstates)),entry("x0",shape=(Nstates,1)))])
 S = parameters["S"]
 x0 = parameters["x0"]
 # Define the ODE right hand side

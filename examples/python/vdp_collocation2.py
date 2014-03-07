@@ -33,7 +33,7 @@ tf = 10.0  # End time
 t  = SX.sym("t")    # time
 u  = SX.sym("u")    # control
 
-states = struct_ssym([
+states = struct_symSX([
             entry('x',shape=2),    #  vdp oscillator states
             entry('L')             #  helper state: Langrange integrand
          ])
@@ -124,7 +124,7 @@ for j in range(d+1):
     C[j,r] = tfcn.getOutput()
 
 # Structure holding NLP variables
-V = struct_msym([
+V = struct_symMX([
       (
        entry("X",repeat=[nk+1,d+1],struct=states),
        entry("U",repeat=[nk],shape=nu)

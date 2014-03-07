@@ -5,15 +5,15 @@ from casadi import *
 from casadi.tools import *
 
 # System states
-states = struct_ssym(["x","y","dx","dy"])
+states = struct_symSX(["x","y","dx","dy"])
 x,y,dx,dy = states[...]
     
 # System controls
-controls = struct_ssym(["u","v"])
+controls = struct_symSX(["u","v"])
 u,v = controls[...]
 
 # System parameters
-parameters = struct_ssym(["k","c","beta"])
+parameters = struct_symSX(["k","c","beta"])
 k,c,beta = parameters[...]
 
 # Provide some numerical values
@@ -99,7 +99,7 @@ P0["x","dy"] = P0["dy","x"] = 0.002
 
 # === Method 2: Lyapunov equations ===
 #  P' = A.P + P.A^T
-states_aug = struct_ssym([
+states_aug = struct_symSX([
   entry("orig",sym=states),
   entry("P",shapestruct=(states,states))
 ])

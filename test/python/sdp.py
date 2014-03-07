@@ -507,7 +507,7 @@ class SDPtests(casadiTestCase):
       except:
         return
         
-      V = struct_ssym([
+      V = struct_symSX([
             entry("L",shape=G.shape),
             entry("x",shape=c.size())
           ])

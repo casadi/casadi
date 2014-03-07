@@ -190,7 +190,7 @@ plot(tf,sim.getOutput()-out,linewidth=3)
 x0 = vertcat([1,0,0])
 xref_e = vertcat([1,0,0])
 
-states = struct_ssym([
+states = struct_symSX([
            entry("eAt",shape=(ns,ns)),
            entry("Wt",shape=(ns,ns))
          ])
@@ -234,7 +234,7 @@ assert(e<1e-7)
 # Simulate with feedforward controls
 # -----------------------------------
 
-states = struct_ssym([
+states = struct_symSX([
           entry("y",shape=ns),      # The regular states of the LTI system
           entry("eAt",shape=(ns,ns))  # The matrix exponential exp(A*(t1-t))
          ])
@@ -440,7 +440,7 @@ for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-
 x0 = vertcat([1,0,0])
 
 # Now simulate with open-loop controls
-states = struct_ssym([
+states = struct_symSX([
            entry("y",shape=ns), # The regular states of the LTI system
            entry("yref",shape=ns), # States that constitute a tracking reference for the LTI system
            entry("eAt",shape=(ns,ns)) # The matrix exponential exp(A*(t1-t))
@@ -456,7 +456,7 @@ states_["yref"] = x0
 states_["eAt"]  = eAt_
 
 
-param = struct_ssym([entry("K",shape=(nu,ns))])
+param = struct_symSX([entry("K",shape=(nu,ns))])
 
 param_ = param(0)
 
@@ -539,7 +539,7 @@ u_ = horzcat([controls_,yref_])
 
 x0 = DMatrix([1,0,0])
 
-controls = struct_ssym([
+controls = struct_symSX([
              entry("uref",shape=nu),
              entry("yref",shape=ns)
            ])

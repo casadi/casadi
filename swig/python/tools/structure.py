@@ -99,7 +99,7 @@ def repeated(e):
   """
     From the arguemnt, constructs something that acts like a 'list' with the argument repeated the 'correct' number of times 
     
-    s = struct_ssym([entry("x",repeat=6)])
+    s = struct_symSX([entry("x",repeat=6)])
     s["x"] = repeated(12)
     
   """
@@ -839,12 +839,12 @@ class CompatibilityException(Exception):
   pass
 
 class ssymStruct(CasadiStructured,MasterGettable):
-  description = "SX.sym"
+  description = "symbolic SX"
   def __init__(self,struct,order=None):
     CasadiStructured.__init__(self,struct,order=order)
     
     if any(e.expr is not None for e in self.entries):
-      raise Exception("struct_ssym does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
+      raise Exception("struct_symSX does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
       
     s = []
     for i in self.struct.traverseCanonicalIndex():
@@ -866,9 +866,9 @@ class msymStruct(CasadiStructured,MasterGettable):
     CasadiStructured.__init__(self,struct,order=order)
 
     if any(e.expr is not None for e in self.entries):
-      raise Exception("struct_msym does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
+      raise Exception("struct_symMX does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
     if any(e.sym is not None for e in self.entries):
-      raise Exception("struct_msym does not accept entries with an 'sym' argument.")
+      raise Exception("struct_symMX does not accept entries with an 'sym' argument.")
 
     self.master = MX.sym("V",self.size,1)
     
@@ -1017,8 +1017,8 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
     return self.master_cached
     
     
-struct_ssym = ssymStruct
-struct_msym = msymStruct
+struct_symSX = ssymStruct
+struct_symMX = msymStruct
 struct_SX = SXStruct
 struct_MX_mutable = MXStruct
 struct_MX = MXVeccatStruct
@@ -1241,8 +1241,8 @@ class DelegaterConstructor:
     Creates an object that delegates a slicing operation.
     
     Example usage:
-      s = struct_ssym([])
-      x = struct_ssym(entry("x",sp_diag(4)))
+      s = struct_symSX([])
+      x = struct_symSX(entry("x",sp_diag(4)))
       x["x",0,index[:]]
     
   """
