@@ -101,7 +101,7 @@ init_fcn.init()
 nk = 20
 dt = tf/nk
 #$ The first step of this method is to make a finite-dimensional representation of the control trajectory. 
-#$ In our case, we shall assume that the control remains constant.
+#$ In our case, we shall assume that the control is constant on each interval.
 #$ This allows us to transform the continuous-time optimal control problem into a discrete-time optimal control
 #$ problem. In CasADi, we do this by creating a new function (functor) that given the state at the beginning 
 #$ of the interval and the control gives the state at the end of the interval. This function thus solves an
@@ -137,16 +137,26 @@ for j in range(nj):
    [k2,k2_L] = ode_fcn.call([xkj + h/2*k1,uk]) 
    [k3,k3_L] = ode_fcn.call([xkj + h/2*k2,uk])
    [k4,k4_L] = ode_fcn.call([xkj + h*k3,uk])
-   xkj += h/6 * (k1 + 2*k2 + 2*k3 + k4)
+   xkj   += h/6 * (k1   + 2*k2   + 2*k3   + k4)
    xkj_L += h/6 * (k1_L + 2*k2_L + 2*k3_L + k4_L)
 integrator = MXFunction([xk,uk],[xkj,xkj_L])
 integrator.setOption("name","integrator")
 integrator.init()
-#$ where we have applied the method both the the ODE and to the \emph{quadrature} $\frac{d}{dt}{x_{\text{L}}}(t) = L, \quad x_{\text{L}}(0) = 0$.
-#$ The next step is to formulate a nonlinear program (NLP) for solving the discrete time optimal control problem.
-#$ The degrees of freedom of this NLP are the parametrized controls and the state at the beginning of each interval.
+#$ where we have applied the method both the the ODE and to the \emph{quadrature} $\frac{d}{dt}{x_{\text{L}}}(t) = L, \quad x_{\text{L}}(0) = 0$. The code above include "calls" the previously created ODE right-hand-side function (\verb|ode_fcn|).
 #$
-#$ Since we have one control and two states and we have nk intervals, there are in total 3*nk intervals.
+#$ The next step is to formulate a nonlinear program (NLP) for solving the discrete time optimal control problem. 
+#$ CasADi works with NLPs of the form:
+#$  $$ \begin{array}{cl}   \textbf{minimize}    &  f(x,p) \\
+#$                         \textbf{subject to}  &  g_{\text{lb}} \le g(x,p) \le g_{\text{ub}},  \quad
+#$                                                 \quad x_{\text{lb}} \le x \le x_{\text{ub}}
+#$ \end{array} $$
+#$ where $x$ is the decision variable and $p$ is a set of (known) parameters. In this formulation, a bound can set to
+#$ $\pm \infty$ if absent and equality constraints are imposed by having upper and lower bounds equal to each other.
+#$ 
+#$ For the direct multiple shooting method, the degrees of freedom of the NLP are the parametrized controls and 
+#$ the state at the beginning of each interval.  Since we have one control and two states and we have nk intervals, 
+#$ there are in total 3*nk intervals.
+#$
 #$ Let us declare a vector-valued CasADi symbolic primitive corresponding to these degrees of freedom:
 v = MX.sym("v",3*nk)
 #$ Next, we split up this $3 \, \texttt{nk}$-by-1 matrix vertically into \texttt{nk} vectors of length 3 and 
@@ -154,8 +164,9 @@ v = MX.sym("v",3*nk)
 vk = vertsplit(v,3)
 xk = [i[:2] for i in vk]
 uk = [i[2]  for i in vk]
-#$ We are now ready to construct the NLP. We begin by getting expressions for the upper and lower bounds
-#$ of the decision variable as well as an initial guess:
+#$ We are now ready to construct the NLP. We begin by getting numerical values for the initial guess as well as
+#$ upper and lower bounds on the decision variable. For simplicity, we shall only impose the state bounds
+#$ at the beginning of each interval:
 lbv = (lbx + lbu) * nk
 ubv = (ubx + ubu) * nk
 v0 = (x0 + u0) * nk
@@ -189,25 +200,34 @@ solver.setInput(0,"ubg")
 solver.evaluate()
 #$ After making sure that the solution was successful, we retrieve the solution:
 v_opt  = solver.getOutput("x")
-x0_opt = v_opt[::3]
+x0_opt = v_opt[0::3]
 x1_opt = v_opt[1::3]
 u_opt  = v_opt[2::3]
-#! Finally, we use matplotlib to visualize the solution
+#$ Finally, we use the python package \emph{matplotlib} to visualize the solution. matplotlib uses a syntax
+#$ which should look famliar to MATLAB users:
 from pylab import *
 from numpy import *
 tgrid = linspace(0,tf,nk)
 figure(1)
-clf()
-subplot(1,3,1)
 plot(tgrid,x0_opt)
 title(str(x[0]))
 grid()
-subplot(1,3,2)
+show()
+figure(2)
 plot(tgrid,x1_opt)
 title(str(x[1]))
 grid()
-subplot(1,3,3)
+show()
+figure(3)
 step(tgrid,u_opt)
 title(str(u))
 grid()
 show()
+#$ CasADi is also able to generate self-contained C-code for evaluating the constructed functions.
+#$ This can be useful for increasing execution speed or for evaluating expressions on embedded systems.
+#$ As an example, the following code will generate C-code for the Hessian of the objective function
+#$ with respect to the decision variables:
+hess_f = nlp.hessian("x","f")
+hess_f.init()
+hess_f.generateCode("hess_f.c")
+
