@@ -316,6 +316,9 @@ namespace CasADi{
     snopt_cw_.resize(mincw*8,'a');
     snopt_iw_.resize(miniw,0);
     snopt_rw_.resize(minrw,0);
+    clen = mincw;
+    ilen = miniw;
+    rlen = minrw;
 
     iPrint = 9;
     iSumm = 6;
