@@ -563,6 +563,7 @@ namespace CasADi{
       // Working spaces for SNOPT
       getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
       
+    stats_["return_status"] = info;
 
     // Store results into output
     for (int k=0;k<nx_;++k) {
