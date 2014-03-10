@@ -672,7 +672,7 @@ namespace CasADi{
         // provide nonlinear part of objective to SNOPT 
         DMatrix g=jacG_.output();
         for (int k=0;k<nnCon;++k) {
-          fCon[k] = jacG_.output(GRADF_G).elem(g_order_[k],0);
+          fCon[k] = jacG_.output(GRADF_G).data()[g_order_[k]];
         }
         
         if(monitored("eval_nlp")){
