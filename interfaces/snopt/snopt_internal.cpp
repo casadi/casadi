@@ -596,7 +596,7 @@ namespace CasADi{
       casadi_assert_message(nnObj_==nnObj,"Obj " << nnObj_ << " <-> " << nnObj);
       casadi_assert_message(nnJac_==nnJac,"Jac " << nnJac_ << " <-> " << nnJac);
 
-      // Evaluate gradF with the linear variabes put to zero
+      // Evaluate gradF with the linear variables put to zero
       jacF_.setInput(0.0,NL_X);
       jacF_.setInput(input(NLP_SOLVER_P),NL_P);
       for (int k=0;k<nnObj;++k) {
@@ -627,6 +627,8 @@ namespace CasADi{
           } else {
             gObj[k] = 0;
           }
+        } else {
+          gObj[k] = 0;
         }
       }
       
