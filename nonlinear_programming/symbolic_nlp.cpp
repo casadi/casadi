@@ -68,11 +68,11 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   }
   
   // Allocate variables
-  x = SX::sym("x",1,n_var);
+  x = SX::sym("x",n_var);
   
   // Allocate f and c
-  f = SX::zeros(1,n_obj);
-  g = SX::zeros(1,n_con);
+  f = SX::zeros(n_obj);
+  g = SX::zeros(n_con);
   
   // Allocate bounds for x and primal initial guess
   x_lb = DMatrix(x.sparsity(),-numeric_limits<double>::infinity());
