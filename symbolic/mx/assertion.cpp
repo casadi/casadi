@@ -30,7 +30,7 @@ using namespace std;
 namespace CasADi{
 
   Assertion::Assertion(const MX& x, const MX& y, const std::string & fail_message): fail_message_(fail_message){
-    casadi_assert_message(y.scalar(),"Assertion:: assertion expression y must be scalar, but got " << y.dimString());
+    casadi_assert_message(y.isScalar(),"Assertion:: assertion expression y must be scalar, but got " << y.dimString());
     setDependencies(x,y);
     setSparsity(x.sparsity());
   }

@@ -816,7 +816,7 @@ namespace CasADi{
         if(!iss.fail())
           retv.push_back(SXElement::sym(varname));
       }
-    } else if(sp.scalar(true)){
+    } else if(sp.isScalar(true)){
       retv.push_back(SXElement::sym(name));
     } else {
       // Scalar
@@ -829,7 +829,7 @@ namespace CasADi{
     }
 
     // Determine dimensions automatically if empty
-    if(sp.scalar(true)){
+    if(sp.isScalar(true)){
       return SX(retv);
     } else {
       return SX(sp,retv);

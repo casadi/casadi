@@ -128,7 +128,7 @@ namespace CasADi{
     }
 
     // Warn if sparse inputs (was previously an error)
-    casadi_assert_warning(f_.input(DAE_X).dense(),"Sparse states in integrators are experimental");
+    casadi_assert_warning(f_.input(DAE_X).isDense(),"Sparse states in integrators are experimental");
 
     // Consistency checks
     casadi_assert_message(f_.output(DAE_ODE).shape()==x0().shape(),"Inconsistent dimensions. Expecting DAE_ODE output of shape " << x0().shape() << ", but got " << f_.output(DAE_ODE).shape() << " instead.");

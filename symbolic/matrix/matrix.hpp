@@ -162,10 +162,10 @@ namespace CasADi{
     using B::size1;
     using B::size2;
     using B::shape;
-    using B::empty;
-    using B::scalar;
-    using B::dense;
-    using B::vector;
+    using B::isEmpty;
+    using B::isScalar;
+    using B::isDense;
+    using B::isVector;
     using B::dimString;
     using B::sym;
     using B::sparse;
@@ -578,10 +578,10 @@ namespace CasADi{
     const std::vector<T>& data() const;
     
     /// Get a pointer to the data
-    T* ptr(){ return empty() ? static_cast<T*>(0) : &front();}
+    T* ptr(){ return isEmpty() ? static_cast<T*>(0) : &front();}
     
     /// Get a const pointer to the data
-    const T* ptr() const{ return empty() ? static_cast<const T*>(0) : &front();}
+    const T* ptr() const{ return isEmpty() ? static_cast<const T*>(0) : &front();}
         
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const{ return sparsity_; }

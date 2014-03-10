@@ -32,7 +32,7 @@ namespace CasADi{
   
 SX gauss_quadrature(SX f, const SX &x, const SX &a, const SX &b, int order, const SX& w){
   casadi_assert_message(order == 5, "gauss_quadrature: order must be 5");
-  casadi_assert_message(w.empty(),"gauss_quadrature: empty weights");
+  casadi_assert_message(w.isEmpty(),"gauss_quadrature: empty weights");
 
   // Change variables to [-1,1]
   if(!a.toScalar().isEqual(-1) || !b.toScalar().isEqual(1)){
@@ -164,7 +164,7 @@ std::vector<SX> substitute(const std::vector<SX> &ex, const std::vector<SX> &v, 
   // Check sparsities
   for(int k=0; k<v.size(); ++k){
     if(v[k].sparsity()!=vdef[k].sparsity()) {
-      if (vdef[k].scalar() && vdef[k].size()==1) { // Expand vdef to sparsity of v if vdef is scalar
+      if (vdef[k].isScalar() && vdef[k].size()==1) { // Expand vdef to sparsity of v if vdef is scalar
         std::vector<SX> vdef_mod = vdef;
         vdef_mod[k] = SX(v[k].sparsity(),vdef[k].at(0));
         return substitute(ex,v,vdef_mod);
@@ -209,7 +209,7 @@ void substituteInPlace(const SX &v, SX &vdef, bool reverse){
 void substituteInPlace(const SX &v, SX &vdef, std::vector<SX>& ex, bool reverse){
   casadi_assert_message(isSymbolic(v),"the variable is not symbolic");
   casadi_assert_message(v.sparsity() == vdef.sparsity(),"the sparsity patterns of the expression and its defining expression do not match");
-  if(v.empty()) return; // quick return if nothing to replace
+  if(v.isEmpty()) return; // quick return if nothing to replace
 
   // Function inputs
   std::vector<SX> f_in;
@@ -311,7 +311,7 @@ void makeSmooth(SX &ex, SX &bvar, SX &bexpr){
   // Initialize
   SXFunction fcn(SX(),ex);
 
-  casadi_assert(bexpr.empty());
+  casadi_assert(bexpr.isEmpty());
 
   // Nodes to be replaced
   std::map<int,SXElement> replace;
@@ -337,7 +337,7 @@ void makeSmooth(SX &ex, SX &bvar, SX &bexpr){
           }
 #endif
 
-        if(sw.empty()){ // the switch has not yet been added
+        if(sw.isEmpty()){ // the switch has not yet been added
           // Get an approriate name of the switch
           std::stringstream name;
           name << "sw_" << bvar.size2();
@@ -471,7 +471,7 @@ const string& getName(const SX& ex) {
 }
 
 void expand(const SX& ex2, SX &ww, SX& tt){
-  casadi_assert(ex2.scalar());
+  casadi_assert(ex2.isScalar());
   SXElement ex = ex2.toScalar();
   
   // Terms, weights and indices of the nodes that are already expanded
@@ -634,7 +634,7 @@ void fill(SX& mat, const SXElement& val){
 // }
 
 SX taylor(const SX& ex,const SX& x, const SX& a, int order) {
-  casadi_assert(x.scalar() && a.scalar());
+  casadi_assert(x.isScalar() && a.isScalar());
   if (ex.size()!=ex.numel())
    throw CasadiException("taylor: not implemented for sparse matrices");
   SX ff = vec(trans(ex));
@@ -700,8 +700,8 @@ std::string getOperatorRepresentation(const SXElement& x, const std::vector<std:
 }
 
 void makeSemiExplicit(const SX& f, const SX& x, SX& fe, SX& fi, SX& xe, SX& xi){
-  casadi_assert(f.dense());
-  casadi_assert(x.dense());
+  casadi_assert(f.isDense());
+  casadi_assert(x.isDense());
   
   // Create the implicit function
   SXFunction fcn(x,f);
@@ -778,7 +778,7 @@ void makeSemiExplicit(const SX& f, const SX& x, SX& fe, SX& fi, SX& xe, SX& xi){
     SX fcnb_dep = fcnb_all.grad();
     
     // Make sure that this expression is dense (otherwise, some variables would not enter)
-    casadi_assert(fcnb_dep.dense());
+    casadi_assert(fcnb_dep.isDense());
     
     // Multiply this expression with a new dummy vector and take the jacobian to find out which variables enter nonlinearily
     SXFunction fcnb_nonlin(xb,inner_prod(fcnb_dep,SX::sym("dum2",fcnb_dep.size())));
@@ -1139,8 +1139,8 @@ void printCompact(const SX& ex, std::ostream &stream){
   }
   
   SX poly_coeff(const SX& ex, const SX&x) {
-    casadi_assert(ex.scalar());
-    casadi_assert(x.scalar());
+    casadi_assert(ex.isScalar());
+    casadi_assert(x.isScalar());
     casadi_assert(isSymbolic(x));
     
     SX ret;
@@ -1172,7 +1172,7 @@ void printCompact(const SX& ex, std::ostream &stream){
   
   SX poly_roots(const SX& p) {
     casadi_assert_message(p.size2()==1,"poly_root(): supplied paramter must be column vector but got " << p.dimString() << ".");
-    casadi_assert(p.dense());
+    casadi_assert(p.isDense());
     if (p.size1()==2) { // a*x + b
       SX a = p(0);
       SX b = p(1);

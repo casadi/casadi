@@ -1854,8 +1854,8 @@ namespace CasADi{
     int y_nrow = y.size2();
 
     // Quick return if both are dense
-    if(dense() && y.dense()){
-      return Sparsity(y_nrow,x_ncol,!empty() && !y.empty());
+    if(isDense() && y.isDense()){
+      return Sparsity(y_nrow,x_ncol,!isEmpty() && !y.isEmpty());
     }
   
     // return object
@@ -1981,15 +1981,15 @@ namespace CasADi{
     return ret;
   }
 
-  bool SparsityInternal::scalar(bool scalar_and_dense) const{
+  bool SparsityInternal::isScalar(bool scalar_and_dense) const{
     return ncol_==1 && nrow_==1 && (!scalar_and_dense || size()==1);
   }
 
-  bool SparsityInternal::dense() const{
+  bool SparsityInternal::isDense() const{
     return size() == numel();
   }
   
-  bool SparsityInternal::empty() const{
+  bool SparsityInternal::isEmpty() const{
     return numel()==0;
   }
   
@@ -1997,7 +1997,7 @@ namespace CasADi{
     return ncol_==0 && nrow_==0;
   }
 
-  bool SparsityInternal::diagonal() const{
+  bool SparsityInternal::isDiagonal() const{
     // Check if matrix is square
     if(ncol_ != nrow_) return false;
     
@@ -2020,11 +2020,11 @@ namespace CasADi{
     return true;
   }
 
-  bool SparsityInternal::square() const{
+  bool SparsityInternal::isSquare() const{
     return ncol_ == nrow_;
   }
 
-  bool SparsityInternal::symmetric() const{
+  bool SparsityInternal::isSymmetric() const{
     return isTranspose(*this);
   }
 
@@ -2436,8 +2436,8 @@ namespace CasADi{
   
   Sparsity SparsityInternal::patternInverse() const {
     // Quick return clauses
-    if (empty()) return Sparsity(nrow_,ncol_,true);
-    if (dense()) return Sparsity(nrow_,ncol_,false);
+    if (isEmpty()) return Sparsity(nrow_,ncol_,true);
+    if (isDense()) return Sparsity(nrow_,ncol_,false);
     
     // Sparsity of the result
     std::vector<int> row_ret;
@@ -2606,7 +2606,7 @@ namespace CasADi{
     casadi_assert_message(cc>=0 && cc<ncol_, "Column index " << cc << " out of bounds [0," << ncol_ << ")");
 
     // Quick return if matrix is dense
-    if(dense()) return rr+cc*nrow_;
+    if(isDense()) return rr+cc*nrow_;
 
     // Quick return if past the end
     if(colind_[cc]==size() || (colind_[cc+1]==size() && row_.back()<rr)) return -1;
@@ -3389,7 +3389,7 @@ namespace CasADi{
       return false;
   
     // Quick return if empty or dense
-    if(size()==0 || dense())
+    if(size()==0 || isDense())
       return true;
     
     // Run algorithm on the pattern with the least number of rows
@@ -3499,7 +3499,7 @@ namespace CasADi{
     return hash_sparsity(nrow_,ncol_,colind_,row_);
   }
 
-  bool SparsityInternal::tril() const{
+  bool SparsityInternal::isTril() const{
     // loop over columns
     for(int i=0; i<ncol_; ++i){
       if(colind_[i] != colind_[i+1]){ // if there are any elements of the column
@@ -3514,7 +3514,7 @@ namespace CasADi{
     return true;
   }
 
-  bool SparsityInternal::triu() const{
+  bool SparsityInternal::isTriu() const{
     // loop over columns
     for(int i=0; i<ncol_; ++i){
       if(colind_[i] != colind_[i+1]){ // if there are any elements of the column

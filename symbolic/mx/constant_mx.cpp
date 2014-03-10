@@ -112,7 +112,7 @@ namespace CasADi{
   ConstantMX* ConstantMX::create(const Matrix<double>& val){
     if(val.size()==0){
       return create(val.sparsity(),0);
-    } else if(val.scalar()){
+    } else if(val.isScalar()){
       return create(val.sparsity(),val.toScalar());
     } else {
       // Check if all values are the same

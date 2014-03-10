@@ -83,8 +83,8 @@ namespace CasADi{
     casadi_assert_message(ne>=1,"Parameter ne (number of elements must be at least 1), but got " << ne << ".");
     casadi_assert_message(order==4,"Only RK order 4 is supported now.");
     casadi_assert_message(f.getNumInputs()==DAE_NUM_IN && f.getNumOutputs()==DAE_NUM_OUT,"Supplied function must adhere to dae scheme.");
-    casadi_assert_message(f.output(DAE_ALG).empty() && f.input(DAE_Z).empty(),"Supplied function cannot have algebraic states.");
-    casadi_assert_message(f.output(DAE_QUAD).empty(),"Supplied function cannot have quadrature states.");
+    casadi_assert_message(f.output(DAE_ALG).isEmpty() && f.input(DAE_Z).isEmpty(),"Supplied function cannot have algebraic states.");
+    casadi_assert_message(f.output(DAE_QUAD).isEmpty(),"Supplied function cannot have quadrature states.");
 
     MX X = MX::sym("X",f.input(DAE_X).sparsity());
     MX P = MX::sym("P",f.input(DAE_P).sparsity());
@@ -177,7 +177,7 @@ namespace CasADi{
     casadi_assert_message(ne>=1,"Parameter ne (number of elements must be at least 1), but got " << ne << ".");
     casadi_assert_message(order==4,"Only RK order 4 is supported now.");
     casadi_assert_message(f.getNumInputs()==DAE_NUM_IN && f.getNumOutputs()==DAE_NUM_OUT,"Supplied function must adhere to dae scheme.");
-    casadi_assert_message(f.output(DAE_QUAD).empty(),"Supplied function cannot have quadrature states.");
+    casadi_assert_message(f.output(DAE_QUAD).isEmpty(),"Supplied function cannot have quadrature states.");
     
     // Obtain collocation points
     std::vector<double> tau_root = collocationPoints(order,"legendre");

@@ -140,7 +140,7 @@ namespace CasADi{
     for(int i=0; i<inputv.size(); ++i){
       if (inputv[i].isNull()) {
         inputv_[i] = MatType::sym("empty",0,0);
-      } else if (inputv[i].empty()) {
+      } else if (inputv[i].isEmpty()) {
         // That's okay
       } else if(!isSymbolicSparse(inputv[i])){
         casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
@@ -505,7 +505,7 @@ namespace CasADi{
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::grad(int iind, int oind){
-    casadi_assert_message(output(oind).scalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
+    casadi_assert_message(output(oind).isScalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
 
     // Quick return if trivially empty
     if(input(iind).size()==0 || output(oind).size()==0 || jacSparsity(iind,oind,true,false).size()==0){
@@ -537,7 +537,7 @@ namespace CasADi{
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::tang(int iind, int oind){
-    casadi_assert_message(input(iind).scalar(),"Only tangent of scalar input functions allowed. Use jacobian instead.");
+    casadi_assert_message(input(iind).isScalar(),"Only tangent of scalar input functions allowed. Use jacobian instead.");
   
     // Forward seeds
     typename std::vector<std::vector<MatType> > fseed(1,std::vector<MatType>(inputv_.size()));

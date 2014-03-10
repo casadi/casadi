@@ -127,7 +127,7 @@ namespace CasADi{
   Sparsity vertcat(const std::vector<Sparsity> & sp) {
     if(sp.empty()){
       return Sparsity();
-    } else if(sp[0].vector()){
+    } else if(sp[0].isVector()){
       Sparsity ret = sp[0];
       for(int i=1; i<sp.size(); ++i) {
         ret.append(sp[i]);
@@ -143,7 +143,7 @@ namespace CasADi{
   }
   
   Sparsity vertcat(const Sparsity & a, const Sparsity & b) {
-    if(a.vector()){
+    if(a.isVector()){
       Sparsity ret = a;
       ret.append(b);
       return ret;

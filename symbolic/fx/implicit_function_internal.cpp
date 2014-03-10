@@ -61,8 +61,8 @@ namespace CasADi{
     // Get the number of equations and check consistency
     casadi_assert_message(iin_>=0 && iin_<f_.getNumInputs()>0,"Implicit input not in range");
     casadi_assert_message(iout_>=0 && iout_<f_.getNumOutputs()>0,"Implicit output not in range");
-    casadi_assert_message(f_.output(iout_).dense() && f_.output(iout_).vector(), "Residual must be a dense vector");
-    casadi_assert_message(f_.input(iin_).dense() && f_.input(iin_).vector(), "Unknown must be a dense vector");
+    casadi_assert_message(f_.output(iout_).isDense() && f_.output(iout_).isVector(), "Residual must be a dense vector");
+    casadi_assert_message(f_.input(iin_).isDense() && f_.input(iin_).isVector(), "Unknown must be a dense vector");
     n_ = f_.output(iout_).size();
     casadi_assert_message(n_ == f_.input(iin_).size(), "Dimension mismatch. Input size is " << f_.input(iin_).size() << ", while output size is " << f_.output(iout_).size());
 

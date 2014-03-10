@@ -144,10 +144,7 @@ namespace CasADi{
 
     /// Number of elements
     int numel() const;
-    
-    /// Check if the sparsity is empty, i.e. one of its dimensions is 0 
-    bool empty() const;
-    
+        
     /// Check if the sparsity is null, i.e. dimension is 0-by-0
     bool null() const;
 
@@ -164,25 +161,28 @@ namespace CasADi{
     std::pair<int,int> shape() const;
     
     /// Is scalar?
-    bool scalar(bool scalar_and_dense) const;
+    bool isScalar(bool scalar_and_dense) const;
     
+    /// Check if the sparsity is empty, i.e. one of its dimensions is 0 
+    bool isEmpty() const;
+
     /// Is dense?
-    bool dense() const;
+    bool isDense() const;
     
     /// Is diagonal?
-    bool diagonal() const;
+    bool isDiagonal() const;
 
     /// Is square?
-    bool square() const;
+    bool isSquare() const;
 
     /// Is symmetric?
-    bool symmetric() const;
+    bool isSymmetric() const;
 
     /// Is lower triangular?
-    bool tril() const;
+    bool isTril() const;
 
     /// is upper triangular?
-    bool triu() const;
+    bool isTriu() const;
 
     /// Get lower triangular part
     Sparsity lower(bool includeDiagonal) const;

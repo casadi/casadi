@@ -181,7 +181,7 @@ namespace CasADi{
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const{ return v_.value==0;}
     virtual bool isOne() const{ return v_.value==1;}
-    virtual bool isIdentity() const{ return v_.value==1 && sparsity().diagonal();}
+    virtual bool isIdentity() const{ return v_.value==1 && sparsity().isDiagonal();}
     virtual bool isValue(double val) const{ return v_.value==val;}
 
     /// Get the value (only for scalar constant nodes)
@@ -234,7 +234,7 @@ namespace CasADi{
     // Constant folding
     double ret;
     casadi_math<double>::fun(op,v_.value,0.0,ret);
-    if (operation_checker<F0XChecker>(op) || sparsity().dense()) {
+    if (operation_checker<F0XChecker>(op) || sparsity().isDense()) {
       return MX(sparsity(),ret);
     } else {
       if (v_.value==0) {
@@ -365,7 +365,7 @@ namespace CasADi{
   MX Constant<Value>::getSetSparse(const Sparsity& sp) const{
     if(isZero()){
       return MX::create(new Constant<Value>(sp,v_));
-    } else if (sp.dense()) {
+    } else if (sp.isDense()) {
       DMatrix v = getMatrixValue();
       makeDense(v);
       return v;
@@ -376,16 +376,16 @@ namespace CasADi{
 
   template<typename Value>
   void Constant<Value>::printPart(std::ostream &stream, int part) const{
-    if(sparsity().scalar(true)){
+    if(sparsity().isScalar(true)){
       stream << v_.value;
     } else {
       stream << "Const<" << v_.value << ">(";
       stream << size1() << "x" << size2() << ": ";
-      if(sparsity().dense()){
+      if(sparsity().isDense()){
         stream << "dense";
       } else if(sparsity().size()==0){
         stream << "empty";          
-      } else if(sparsity().diagonal()){
+      } else if(sparsity().isDiagonal()){
         stream << "diagonal";
       } else {
         stream << double(size())/sparsity().numel()*100 << " %";

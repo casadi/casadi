@@ -62,7 +62,7 @@ namespace CasADi{
     bool is_vector = true;
     for(vector<MX>::const_iterator it=comp.begin(); it!=comp.end(); ++it){
       // Rewrite with horzcat and transpose if not a vector
-      if(!it->isNull() && !(it->size1()==0 && it->size2()==0) && !it->vector()){
+      if(!it->isNull() && !(it->size1()==0 && it->size2()==0) && !it->isVector()){
         vector<MX> v(comp.size());
         for(int i=0; i<v.size(); ++i)
           v[i] = trans(comp[i]);
@@ -75,7 +75,7 @@ namespace CasADi{
   }
   
   std::vector<MX> vertsplit(const MX& x, const std::vector<int>& offset){
-    if(x.vector()){
+    if(x.isVector()){
       // Consistency check
       casadi_assert(offset.size()>=1);
       casadi_assert(offset.front()==0);
@@ -247,7 +247,7 @@ namespace CasADi{
   }
 
   MX vec(const MX& x) {
-    if(x.vector()){
+    if(x.isVector()){
       return x;
     } else {
       return reshape(x,x.numel(),1);
@@ -255,7 +255,7 @@ namespace CasADi{
   }
   
   MX vecNZ(const MX& x) {
-    if(x.dense()){
+    if(x.isDense()){
       return vec(x);
     } else {
       return x->getGetNonzeros(sp_dense(x.size(),1),range(x.size()));
@@ -377,7 +377,7 @@ namespace CasADi{
 
   void makeDense(MX& x){
     // Quick return if already dense
-    if(x.dense()) return;
+    if(x.isDense()) return;
   
     // Densify
     x = x.setSparse(sp_dense(x.size1(),x.size2()));

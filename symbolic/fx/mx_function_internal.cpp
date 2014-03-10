@@ -46,7 +46,7 @@ namespace CasADi{
     int ind=0;
     for(vector<MX>::iterator it = inputv_.begin(); it!=inputv_.end(); ++it, ++ind){
       if(!it->isSymbolic()){
-        if(it->empty()){
+        if(it->isEmpty()){
           stringstream ss;
           ss << "r" << ind;        
           *it = MX::sym(ss.str(),it->sparsity());
@@ -296,7 +296,7 @@ namespace CasADi{
             it->data->nTmp(ni,nr);
             nitmp = std::max(nitmp,ni);
             nrtmp = std::max(nrtmp,nr);
-            if(work_[it->res[c]].first.empty()){
+            if(work_[it->res[c]].first.isEmpty()){
               work_[it->res[c]].first = Matrix<double>(it->data->sparsity(c),0);
             }
           }

@@ -318,7 +318,7 @@ namespace CasADi{
   }
 
   MX MXNode::getTranspose() const{
-    if(sparsity().dense()){
+    if(sparsity().isDense()){
       return MX::create(new DenseTranspose(shared_from_this<MX>()));
     } else {
       return MX::create(new Transpose(shared_from_this<MX>()));
@@ -345,7 +345,7 @@ namespace CasADi{
     casadi_assert_message(y.size2()==z.size2(),"Dimension error. Got y=" << y.size2() << " and z=" << z.dimString() << ".");
     casadi_assert_message(trans_x.size2()==z.size1(),"Dimension error. Got trans_x=" << trans_x.dimString() << " and z=" << z.dimString() << ".");
     casadi_assert_message(y.size1()==trans_x.size1(),"Dimension error. Got y=" << y.size1() << " and trans_x" << trans_x.dimString() << ".");
-    if(trans_x.dense() && y.dense()){
+    if(trans_x.isDense() && y.isDense()){
       return MX::create(new DenseMultiplication<true,false>(z,trans_x,y));
     } else {
       return MX::create(new Multiplication<true,false>(z,trans_x,y));    
@@ -450,17 +450,17 @@ namespace CasADi{
 
   MX MXNode::getBinarySwitch(int op, const MX& y) const{
     // Make sure that dimensions match
-    casadi_assert_message((sparsity().scalar(false) || y.scalar() || (sparsity().size2()==y.size2() && size1()==y.size1())),
+    casadi_assert_message((sparsity().isScalar(false) || y.isScalar() || (sparsity().size2()==y.size2() && size1()==y.size1())),
                           "Dimension mismatch." << "lhs is " << sparsity().dimString() << ", while rhs is " << y.dimString());
       
     // Create binary node
-    if(sparsity().scalar(false)){
+    if(sparsity().isScalar(false)){
       if(size()==0){
         return toMatrix(MX(0)->getBinary(op,y,true,false),y.sparsity());
       } else {
         return toMatrix(getBinary(op,y,true,false),y.sparsity());
       }
-    } else if(y.scalar()){
+    } else if(y.isScalar()){
       if(y.size()==0){
         return toMatrix(getBinary(op,MX(0),false,true),sparsity());
       } else {
@@ -572,7 +572,7 @@ namespace CasADi{
 
     if(scX){
       // Check if it is ok to loop over nonzeros only
-      if(y.dense() || operation_checker<FX0Checker>(op)){
+      if(y.isDense() || operation_checker<FX0Checker>(op)){
         // Loop over nonzeros
         return MX::create(new BinaryMX<true,false>(Operation(op),shared_from_this<MX>(),y));
       } else {
@@ -581,7 +581,7 @@ namespace CasADi{
       }
     } else if(scY){
       // Check if it is ok to loop over nonzeros only
-      if(sparsity().dense() || operation_checker<F0XChecker>(op)){
+      if(sparsity().isDense() || operation_checker<F0XChecker>(op)){
         // Loop over nonzeros
         return MX::create(new BinaryMX<false,true>(Operation(op),shared_from_this<MX>(),y));
       } else {
@@ -593,7 +593,7 @@ namespace CasADi{
       MX rr = MX::create(new BinaryMX<false,false>(Operation(op),shared_from_this<MX>(),y)); 
       
       // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
-      if(!rr.dense() && !operation_checker<F00Checker>(op)){
+      if(!rr.isDense() && !operation_checker<F00Checker>(op)){
         // Get the value for the structural zeros
         double fcn_0;
         casadi_math<double>::fun(op,0,0,fcn_0);
@@ -635,7 +635,7 @@ namespace CasADi{
     if(sparsity()==y.sparsity()){
       if(sparsity().size()==0){
         return 0;
-      } else if(sparsity().scalar()){
+      } else if(sparsity().isScalar()){
         return getBinarySwitch(OP_MUL, y);
       } else {
         return MX::create(new InnerProd(shared_from_this<MX>(),y));
@@ -670,7 +670,7 @@ namespace CasADi{
     vector<MX> c;
     c.reserve(x.size());
     for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it)
-      if(!it->isNull() && !it->empty())
+      if(!it->isNull() && !it->isEmpty())
         c.push_back(*it);
   
     if(c.empty()){
@@ -705,7 +705,7 @@ namespace CasADi{
     vector<MX> c;
     c.reserve(x.size());
     for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it)
-      if(!it->isNull() && !it->empty())
+      if(!it->isNull() && !it->isEmpty())
         c.push_back(*it);
   
     if(c.empty()){

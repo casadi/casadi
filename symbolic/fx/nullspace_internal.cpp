@@ -47,7 +47,7 @@ namespace CasADi{
 
     dense_ = getOption("dense");
     
-    casadi_assert(!dense_ || A_sp_.dense());
+    casadi_assert(!dense_ || A_sp_.isDense());
     
     m_ = A_sp_.size1();
     n_ = A_sp_.size2();

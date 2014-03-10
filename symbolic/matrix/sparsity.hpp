@@ -220,7 +220,7 @@ namespace CasADi{
     int numel() const;
     
     /// Check if the sparsity is empty, i.e. one of its dimensions is 0 
-    bool empty() const;
+    bool isEmpty() const;
     
     /// Check if the sparsity is null, i.e. dimension is 0-by-0
     bool null() const;
@@ -402,28 +402,28 @@ namespace CasADi{
     void reserve(int nnz, int ncol);
 
     /// Is scalar?
-    bool scalar(bool scalar_and_dense=false) const;
+    bool isScalar(bool scalar_and_dense=false) const;
     
     /// Is dense?
-    bool dense() const;
+    bool isDense() const;
     
     /// Is vector (i.e. size2()==1)
-    bool vector() const{ return size2()==1; }
+    bool isVector() const{ return size2()==1; }
 
     /// Is diagonal?
-    bool diagonal() const;
+    bool isDiagonal() const;
     
     /// Is square?
-    bool square() const;
+    bool isSquare() const;
 
     /// Is symmetric?
-    bool symmetric() const;
+    bool isSymmetric() const;
 
     /// Is lower triangular?
-    bool tril() const;
+    bool isTril() const;
 
     /// Is upper triangular?
-    bool triu() const;
+    bool isTriu() const;
 
     /// Get lower triangular part
     Sparsity lower(bool includeDiagonal=true) const;
@@ -624,10 +624,10 @@ namespace CasADi{
     // Check if sparsity matches
     if(val_sp==*this){
       std::copy(val_data,val_data+sz,data);
-    } else if (this->empty()) {
+    } else if (this->isEmpty()) {
       // Quick return
       return;
-    } else if (val_sp.empty()) {
+    } else if (val_sp.isEmpty()) {
       // Quick return
       return;
     } else if(val_nel==1){ // if scalar
@@ -700,10 +700,10 @@ namespace CasADi{
       for(int k=0; k<sz; ++k){
         data[k] += val_data[k];
       }
-    } else if (this->empty()) {
+    } else if (this->isEmpty()) {
       // Quick return
       return;
-    } else if (val_sp.empty()) {
+    } else if (val_sp.isEmpty()) {
       // Quick return
       return;
     }  else if(val_nel==1){ // if scalar
@@ -778,10 +778,10 @@ namespace CasADi{
       for(int k=0; k<sz; ++k){
         data[k] |= val_data[k];
       }
-    } else if (this->empty()) {
+    } else if (this->isEmpty()) {
       // Quick return
       return;
-    } else if (val_sp.empty()) {
+    } else if (val_sp.isEmpty()) {
       // Quick return
       return;
     }  else if(val_nel==1){ // if scalar

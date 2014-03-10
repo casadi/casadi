@@ -770,7 +770,7 @@ class ADtests(casadiTestCase):
           self.checkarray(DMatrix(f.jacSparsity(),1),DMatrix(J_.sparsity(),1))
                 
       # Scalarized
-      if out.empty(): continue
+      if out.isEmpty(): continue
       s_i  = out.sparsity().getRow()[0]
       s_j  = out.sparsity().col()[0]
       s_k = s_i*out.size2()+s_j

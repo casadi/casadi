@@ -105,8 +105,8 @@ namespace CasADi {
     output(SDQP_SOLVER_X) = DMatrix::zeros(n_,1);
   
     std::vector<int> r = range(input(SDQP_SOLVER_G).size1());
-    output(SDQP_SOLVER_P) = sdpsolver_.output(SDP_SOLVER_P).empty() ? DMatrix() : sdpsolver_.output(SDP_SOLVER_P)(r,r);
-    output(SDQP_SOLVER_DUAL) = sdpsolver_.output(SDP_SOLVER_DUAL).empty() ? DMatrix() : sdpsolver_.output(SDP_SOLVER_DUAL)(r,r);
+    output(SDQP_SOLVER_P) = sdpsolver_.output(SDP_SOLVER_P).isEmpty() ? DMatrix() : sdpsolver_.output(SDP_SOLVER_P)(r,r);
+    output(SDQP_SOLVER_DUAL) = sdpsolver_.output(SDP_SOLVER_DUAL).isEmpty() ? DMatrix() : sdpsolver_.output(SDP_SOLVER_DUAL)(r,r);
     output(SDQP_SOLVER_COST) = 0.0;
     output(SDQP_SOLVER_DUAL_COST) = 0.0;
     output(SDQP_SOLVER_LAM_X) = DMatrix::zeros(n_,1);
@@ -147,8 +147,8 @@ namespace CasADi {
     std::copy(sdpsolver_.output(SDP_SOLVER_X).begin(),sdpsolver_.output(SDP_SOLVER_X).begin()+n_,output(SDQP_SOLVER_X).begin());
     setOutput(sdpsolver_.output(SDP_SOLVER_COST),SDQP_SOLVER_COST);
     setOutput(sdpsolver_.output(SDP_SOLVER_DUAL_COST),SDQP_SOLVER_DUAL_COST);
-    if (!output(SDQP_SOLVER_DUAL).empty()) std::copy(sdpsolver_.output(SDP_SOLVER_DUAL).begin(),sdpsolver_.output(SDP_SOLVER_DUAL).begin()+output(SDQP_SOLVER_DUAL).size(),output(SDQP_SOLVER_DUAL).begin());
-    if (!output(SDQP_SOLVER_P).empty()) std::copy(sdpsolver_.output(SDP_SOLVER_P).begin(),sdpsolver_.output(SDP_SOLVER_P).begin()+output(SDQP_SOLVER_P).size(),output(SDQP_SOLVER_P).begin());
+    if (!output(SDQP_SOLVER_DUAL).isEmpty()) std::copy(sdpsolver_.output(SDP_SOLVER_DUAL).begin(),sdpsolver_.output(SDP_SOLVER_DUAL).begin()+output(SDQP_SOLVER_DUAL).size(),output(SDQP_SOLVER_DUAL).begin());
+    if (!output(SDQP_SOLVER_P).isEmpty()) std::copy(sdpsolver_.output(SDP_SOLVER_P).begin(),sdpsolver_.output(SDP_SOLVER_P).begin()+output(SDQP_SOLVER_P).size(),output(SDQP_SOLVER_P).begin());
     std::copy(sdpsolver_.output(SDP_SOLVER_X).begin(),sdpsolver_.output(SDP_SOLVER_X).begin()+n_,output(SDQP_SOLVER_X).begin());
     std::copy(sdpsolver_.output(SDP_SOLVER_LAM_A).begin(),sdpsolver_.output(SDP_SOLVER_LAM_A).end(),output(SDQP_SOLVER_LAM_A).begin());
     std::copy(sdpsolver_.output(SDP_SOLVER_LAM_X).begin(),sdpsolver_.output(SDP_SOLVER_LAM_X).begin()+n_,output(SDQP_SOLVER_LAM_X).begin());

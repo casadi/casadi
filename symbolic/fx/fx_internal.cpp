@@ -150,7 +150,7 @@ namespace CasADi{
 
   FX FXInternal::gradient(int iind, int oind){
     // Assert scalar
-    casadi_assert_message(output(oind).scalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
+    casadi_assert_message(output(oind).isScalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
   
     // Generate gradient function
     FX ret = getGradient(iind,oind);
@@ -178,7 +178,7 @@ namespace CasADi{
 
   FX FXInternal::tangent(int iind, int oind){
     // Assert scalar
-    casadi_assert_message(input(iind).scalar(),"Only tangent of scalar input functions allowed. Use jacobian instead.");
+    casadi_assert_message(input(iind).isScalar(),"Only tangent of scalar input functions allowed. Use jacobian instead.");
   
     // Generate gradient function
     FX ret = getTangent(iind,oind);
@@ -208,7 +208,7 @@ namespace CasADi{
     log("FXInternal::hessian");
   
     // Assert scalar
-    casadi_assert_message(output(oind).scalar(),"Only hessians of scalar functions allowed.");
+    casadi_assert_message(output(oind).isScalar(),"Only hessians of scalar functions allowed.");
   
     // Generate gradient function
     FX ret = getHessian(iind,oind);
@@ -1376,7 +1376,7 @@ namespace CasADi{
     // Loop over inputs
     for(int iind = 0; iind < getNumInputs(); ++iind) {
       // Skip if no seeds
-      if(fwd && input(iind).empty())
+      if(fwd && input(iind).isEmpty())
         continue;
       
       // Get data array for input
@@ -1386,7 +1386,7 @@ namespace CasADi{
       for (int oind = 0; oind < getNumOutputs(); ++oind) {
 
         // Skip if no seeds
-        if (!fwd && output(oind).empty())
+        if (!fwd && output(oind).isEmpty())
           continue;
         
         // Get the sparsity of the Jacobian block
@@ -1816,7 +1816,7 @@ namespace CasADi{
 
       // Assumes initialised
       for(int i=0; i<arg.size(); ++i){
-        if(arg[i].isNull() || arg[i].empty() || input(i).isNull() || input(i).empty()) continue;
+        if(arg[i].isNull() || arg[i].isEmpty() || input(i).isNull() || input(i).isEmpty()) continue;
         casadi_assert_message(arg[i].size2()==input(i).size2() && arg[i].size1()==input(i).size1(),
                               "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
                               std::endl << input_.scheme.describeInput(i) <<  " has shape (" << input(i).size2() << 

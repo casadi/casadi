@@ -124,8 +124,8 @@ namespace CasADi{
     return (*this)->numel();
   }
 
-  bool Sparsity::empty() const{
-    return (*this)->empty();
+  bool Sparsity::isEmpty() const{
+    return (*this)->isEmpty();
   }
   
   bool Sparsity::null() const{
@@ -185,7 +185,7 @@ namespace CasADi{
     casadi_assert_message(cc>=0 && cc<size2(), "Column index out of bounds");
 
     // Quick return if matrix is dense
-    if(dense()) return rr+cc*size1();
+    if(isDense()) return rr+cc*size1();
   
     // Quick return if we are adding an element to the end
     if(colind(cc)==size() || (colind(cc+1)==size() && row().back()<rr)){
@@ -236,32 +236,32 @@ namespace CasADi{
     return (*this)->getNZ(rr,cc);
   }
 
-  bool Sparsity::scalar(bool scalar_and_dense) const{
-    return (*this)->scalar(scalar_and_dense);
+  bool Sparsity::isScalar(bool scalar_and_dense) const{
+    return (*this)->isScalar(scalar_and_dense);
   }
 
-  bool Sparsity::dense() const{
-    return (*this)->dense();
+  bool Sparsity::isDense() const{
+    return (*this)->isDense();
   }
 
-  bool Sparsity::diagonal() const{
-    return (*this)->diagonal();
+  bool Sparsity::isDiagonal() const{
+    return (*this)->isDiagonal();
   }
 
-  bool Sparsity::square() const{
-    return (*this)->square();
+  bool Sparsity::isSquare() const{
+    return (*this)->isSquare();
   }
 
-  bool Sparsity::symmetric() const{
-    return (*this)->symmetric();
+  bool Sparsity::isSymmetric() const{
+    return (*this)->isSymmetric();
   }
 
-  bool Sparsity::tril() const{
-    return (*this)->tril();
+  bool Sparsity::isTril() const{
+    return (*this)->isTril();
   }
 
-  bool Sparsity::triu() const{
-    return (*this)->triu();
+  bool Sparsity::isTriu() const{
+    return (*this)->isTriu();
   }
 
   Sparsity Sparsity::sub(const std::vector<int>& jj, const std::vector<int>& ii, std::vector<int>& mapping) const{
@@ -385,7 +385,7 @@ namespace CasADi{
       } else if(size1()==0){
         // No rows before
         *this = sp;
-      } else if(vector()){
+      } else if(isVector()){
         // Append to vector (efficient)
         makeUnique();
         (*this)->append(*sp);

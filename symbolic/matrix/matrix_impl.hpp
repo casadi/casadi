@@ -162,7 +162,7 @@ namespace CasADi{
 
   template<class T>
   void Matrix<T>::setSub(const Matrix<T>& m, int j, int i){
-    if(m.dense()){
+    if(m.isDense()){
       elem(j,i) = m.toScalar();
     } else {
       setSub(m,std::vector<int>(1,j),std::vector<int>(1,i));
@@ -186,7 +186,7 @@ namespace CasADi{
       return;
     }
 
-    if(dense() && m.dense()){
+    if(isDense() && m.isDense()){
       // Dense mode
       for(int i=0; i<cc.size(); ++i) {
         for(int j=0; j<rr.size(); ++j) {
@@ -211,7 +211,7 @@ namespace CasADi{
   template<class T>
   void Matrix<T>::setSub(const Matrix<T>& m, const std::vector<int>& jj, const Matrix<int>& i) {
     // If el is scalar
-    if(m.scalar() && (jj.size() > 1 || i.size() > 1)){
+    if(m.isScalar() && (jj.size() > 1 || i.size() > 1)){
       setSub(repmat(Matrix<T>(i.sparsity(),m.toScalar()),jj.size(),1),jj,i);
       return;
     }
@@ -241,7 +241,7 @@ namespace CasADi{
   void Matrix<T>::setSub(const Matrix<T>& m, const Matrix<int>& j, const std::vector<int>& ii) {
   
     // If el is scalar
-    if(m.scalar() && (ii.size() > 1 || j.size() > 1)){
+    if(m.isScalar() && (ii.size() > 1 || j.size() > 1)){
       setSub(repmat(Matrix<T>(j.sparsity(),m.toScalar()),1,ii.size()),j,ii);
       return;
     }
@@ -272,7 +272,7 @@ namespace CasADi{
     casadi_assert_message(i.sparsity()==j.sparsity(),"setSub(., Imatrix i, Imatrix j): sparsities must match. Got " << i.dimString() << " for i and " << j.dimString() << " for j.");
 
     // If m is scalar
-    if(m.scalar() && i.numel() > 1){
+    if(m.isScalar() && i.numel() > 1){
       setSub(Matrix<T>(i.sparsity(),m.toScalar()),j,i);
       return;
     }
@@ -289,7 +289,7 @@ namespace CasADi{
     casadi_assert_message(size2()==sp.size2() && size1()==sp.size1(),"sub(Sparsity sp): shape mismatch. This matrix has shape " << size2() << " x " << size1() << ", but supplied sparsity index has shape " << sp.size2() << " x " << sp.size1() << "." );
     // TODO: optimize this for speed
     Matrix<T> elm;
-    if (m.scalar()) {
+    if (m.isScalar()) {
       elm = Matrix<T>(sp,m.at(0));
     } else {
       elm = m.sub(sp);
@@ -341,7 +341,7 @@ namespace CasADi{
 
   template<class T>
   void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
-    if (m.scalar()){
+    if (m.isScalar()){
       // Assign all elements with the same scalar
       for(int k=0; k<kk.size(); ++k){
         setNZ(kk[k],m);
@@ -357,12 +357,12 @@ namespace CasADi{
 
   template<class T>
   void Matrix<T>::setNZ(const Matrix<int>& kk, const Matrix<T>& m){
-    if (m.scalar()){
+    if (m.isScalar()){
       // Assign all elements with the same scalar
       for(int k=0; k<kk.size(); ++k){
         setNZ(kk.at(k),m);
       }
-    } else if (kk.dense() && !m.dense() && kk.size2()==m.size2() && kk.size1()==m.size1()) {
+    } else if (kk.isDense() && !m.isDense() && kk.size2()==m.size2() && kk.size1()==m.size1()) {
       const std::vector<int>& row = m.sparsity().row();
       const std::vector<int>& colind = m.sparsity().colind();
       for(int i=0; i<colind.size()-1; ++i){
@@ -485,7 +485,7 @@ namespace CasADi{
   
   template<class T>
   void Matrix<T>::printVector(std::ostream &stream) const {
-    casadi_assert_message(vector(),"Not a vector");
+    casadi_assert_message(isVector(),"Not a vector");
   
     std::streamsize precision = stream.precision();
     std::streamsize width = stream.width();
@@ -602,11 +602,11 @@ namespace CasADi{
 
   template<class T>
   void Matrix<T>::print(std::ostream &stream) const{
-    if(empty()){
+    if(isEmpty()){
       stream << "[]";
     } else if(numel()==1){
       printScalar(stream);
-    } else if(vector()){
+    } else if(isVector()){
       printVector(stream);
     } else if(std::max(size1(),size2())<=10 || double(size())/numel()>=0.5){ // if "small" or "dense"
       printDense(stream);
@@ -735,7 +735,7 @@ namespace CasADi{
     }
 
     // Check the value of the structural zero-entries, if there are any
-    if(!x.dense() && !operation_checker<F0XChecker>(op)){
+    if(!x.isDense() && !operation_checker<F0XChecker>(op)){
       // Get the value for the structural zeros
       T fcn_0;
       casadi_math<T>::fun(op,0,0,fcn_0);
@@ -930,7 +930,7 @@ namespace CasADi{
     const std::vector<int>& colind = this->colind();
     const std::vector<int>& row = this->row();
     
-    if(sp==SPARSE || (sp==DENSE && dense())){
+    if(sp==SPARSE || (sp==DENSE && isDense())){
       casadi_assert_message(len==size(),
                             "Matrix<T>::getArray: Dimension mismatch." << std::endl <<  
                             "Trying to fetch " << len << " elements from a " << dimString() << " matrix with " << size() << " non-zeros.");
@@ -994,14 +994,14 @@ namespace CasADi{
     
     if(sp==SPARSE){
       throw CasadiException("Matrix<T>::getArray: strided SPARSE not implemented");
-    } else if(sp==DENSE && dense()) {
+    } else if(sp==DENSE && isDense()) {
       for(int cc=0; cc<size2; ++cc){ // loop over columns
         for(int el=colind[cc]; el<colind[cc+1]; ++el){ // loop over the non-zero elements
           int rr=row[el];
           val[rr*stride2 + cc*stride1] = data[el];
         }
       }
-    } else if(sp==DENSETRANS && dense()) {
+    } else if(sp==DENSETRANS && isDense()) {
       for(int cc=0; cc<size2; ++cc){ // loop over columns
         for(int el=colind[cc]; el<colind[cc+1]; ++el){ // loop over the non-zero elements
           int rr=row[el];
@@ -1578,7 +1578,7 @@ namespace CasADi{
   template<class T>
   Matrix<T> Matrix<T>::trans() const{
     // quick return if empty or scalar
-    if((size2()==0 && size1()==0) || scalar()) return *this;
+    if((size1()==0 && size2()==0) || isScalar()) return *this;
 
     // Create the new sparsity pattern and the mapping
     std::vector<int> mapping;
@@ -1602,7 +1602,7 @@ namespace CasADi{
   template<class T>
   const T Matrix<T>::toScalar() const{
     // Make sure that the matrix is 1-by-1
-    casadi_assert_message(scalar(),"Can only convert 1-by-1 matrices to scalars");
+    casadi_assert_message(isScalar(),"Can only convert 1-by-1 matrices to scalars");
 
     // return zero or the nonzero element
     if(size()==1)
@@ -1638,7 +1638,7 @@ namespace CasADi{
     }
 
     // Check the value of the structural zero-entries, if there are any
-    if(!y.dense() && !operation_checker<FX0Checker>(op)){
+    if(!y.isDense() && !operation_checker<FX0Checker>(op)){
       // Get the value for the structural zeros
       T fcn_0;
       casadi_math<T>::fun(op,x_val,casadi_limits<T>::zero,fcn_0);
@@ -1667,7 +1667,7 @@ namespace CasADi{
     }
 
     // Check the value of the structural zero-entries, if there are any
-    if(!x.dense() && !operation_checker<F0XChecker>(op)){
+    if(!x.isDense() && !operation_checker<F0XChecker>(op)){
       // Get the value for the structural zeros
       T fcn_0;
       casadi_math<T>::fun(op,casadi_limits<T>::zero,y_val,fcn_0);
@@ -1717,7 +1717,7 @@ namespace CasADi{
     }
 
     // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
-    if(!r.dense() && !operation_checker<F00Checker>(op)){
+    if(!r.isDense() && !operation_checker<F00Checker>(op)){
       // Get the value for the structural zeros
       T fcn_0;
       casadi_math<T>::fun(op,casadi_limits<T>::zero,casadi_limits<T>::zero,fcn_0);
@@ -1754,7 +1754,7 @@ namespace CasADi{
 
   template<class T>
   Matrix<T> Matrix<T>::repmat(const Matrix<T>& x, const Sparsity& sp){
-    casadi_assert_message(x.scalar(),"repmat(Matrix<T> x,Sparsity sp) only defined for scalar x");
+    casadi_assert_message(x.isScalar(),"repmat(Matrix<T> x,Sparsity sp) only defined for scalar x");
     return Matrix<T>(sp,x.toScalar());
   }
 
@@ -1765,8 +1765,8 @@ namespace CasADi{
 
   template<class T>
   Matrix<T> Matrix<T>::repmat(const Matrix<T>& x, int nrow, int ncol){
-    if(x.scalar()){
-      if(x.dense()){
+    if(x.isScalar()){
+      if(x.isDense()){
         return Matrix<T>(nrow,ncol,x.toScalar());
       } else {
         return sparse(nrow,ncol);
@@ -1826,7 +1826,7 @@ namespace CasADi{
     if(y.size2()==0 && y.size1()==0) return;
 
     // Appending can be done efficeintly if vectors
-    if(vector()){
+    if(isVector()){
       // Append the sparsity pattern vertically
       sparsityRef().append(y.sparsity());
   

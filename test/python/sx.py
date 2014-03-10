@@ -614,25 +614,25 @@ class SXtests(casadiTestCase):
     f = SXFunction([x],[x**2,[]])
     f.init()
 
-    self.assertTrue(f.output(1).empty())
+    self.assertTrue(f.output(1).isEmpty())
     
     f = SXFunction([x,[]],[x**2,[]])
     f.init()
 
-    self.assertTrue(f.output(1).empty())
+    self.assertTrue(f.output(1).isEmpty())
     f.evaluate()
     
     r = f.eval([x,[]])
-    self.assertTrue(r[1].empty())
+    self.assertTrue(r[1].isEmpty())
 
     r = f.eval([x,[]])
-    self.assertTrue(r[1].empty())
+    self.assertTrue(r[1].isEmpty())
     
     r = f.eval([x,SX(0,1)])
-    self.assertTrue(r[1].empty())
+    self.assertTrue(r[1].isEmpty())
 
     r = f.eval([x,SX(1,0)])
-    self.assertTrue(r[1].empty())
+    self.assertTrue(r[1].isEmpty())
     
     #self.assertRaises(Exception,lambda : f.eval([x,x]))
     #self.assertRaises(Exception,lambda : f.eval([[],[]]))

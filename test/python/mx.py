@@ -2089,7 +2089,7 @@ class MXtests(casadiTestCase):
           x=MX(sp,v)
           
           for (casadiop, numpyop,name, flags) in self.pool.zip():
-            if 'nozero' in flags and (v==0 or not sp.dense()): continue
+            if 'nozero' in flags and (v==0 or not sp.isDense()): continue
             r = casadiop([x])
             print r
             self.assertTrue(r.isConstant())

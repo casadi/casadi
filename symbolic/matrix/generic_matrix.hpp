@@ -95,22 +95,22 @@ namespace CasADi{
 #endif
 
     /** \brief  Check if the matrix expression is empty, i.e. one of its dimensions is 0 */
-    bool empty() const;
+    bool isEmpty() const;
     
     /** \brief  Check if the matrix expression is null, i.e. its dimensios are 0-by-0 */
     bool null() const;
     
     /** \brief  Check if the matrix expression is dense */
-    bool dense() const;
+    bool isDense() const;
     
     /** \brief  Check if the matrix expression is scalar */
-    bool scalar(bool scalar_and_dense=false) const;
+    bool isScalar(bool scalar_and_dense=false) const;
 
     /** \brief  Check if the matrix expression is square */
-    bool square() const;
+    bool isSquare() const;
 
     /** \brief  Check if the matrix is a vector (i.e. size2()==1) */
-    bool vector() const;
+    bool isVector() const;
 
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
@@ -265,40 +265,40 @@ namespace CasADi{
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::empty() const{
-    return numel()==0;
+  bool GenericMatrix<MatType>::isEmpty() const{
+    return sparsity().isEmpty();
   }
 
   template<typename MatType>
   bool GenericMatrix<MatType>::null() const{
-    return size2()==0 && size1()==0;
+    return sparsity().null();
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::dense() const{
-    return numel()==size();
+  bool GenericMatrix<MatType>::isDense() const{
+    return sparsity().isDense();
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::scalar(bool scalar_and_dense) const{
-    return sparsity().scalar(scalar_and_dense);
+  bool GenericMatrix<MatType>::isScalar(bool scalar_and_dense) const{
+    return sparsity().isScalar(scalar_and_dense);
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::square() const{
-    return sparsity().square();
+  bool GenericMatrix<MatType>::isSquare() const{
+    return sparsity().isSquare();
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::vector() const{
-    return sparsity().vector();
+  bool GenericMatrix<MatType>::isVector() const{
+    return sparsity().isVector();
   }
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::mul_smart(const MatType& y, const Sparsity &sp_z) const {
     const MatType& x = *static_cast<const MatType*>(this);
   
-    if (!(x.scalar() || y.scalar())) {
+    if (!(x.isScalar() || y.isScalar())) {
       casadi_assert_message(size2()==y.size1(),"Matrix product with incompatible dimensions. Lhs is " << dimString() << " and rhs is " << y.dimString() << ".");
     }
   
@@ -314,13 +314,13 @@ namespace CasADi{
       } else if(x.size()==0 && y.size2()==y.size1()) {
         return x;
       } else {
-        if (y.size()==0 || x.size()==0 || x.empty() || y.empty()) {
+        if (y.size()==0 || x.size()==0 || x.isEmpty() || y.isEmpty()) {
           return MatType::sparse(x.size1(),y.size2());
         } else {
           return MatType::zeros(x.size1(),y.size2());
         }
       }
-    } else if(x.scalar() || y.scalar()){
+    } else if(x.isScalar() || y.isScalar()){
       return x*y;
     } else {
       return x.mul_full(y,sp_z);

@@ -106,7 +106,7 @@ T cross(const GenericMatrix<T> &a, const GenericMatrix<T> &b, int dim) {
 template<typename T> 
 T tril2symm(const GenericMatrix<T> &a_) {
   const T& a = static_cast<const T&>(a_);
-  casadi_assert_message(a.square(),"Shape error in tril2symm. Expecting square shape but got " << a.dimString());
+  casadi_assert_message(a.isSquare(),"Shape error in tril2symm. Expecting square shape but got " << a.dimString());
   casadi_assert_message(a.sizeU()-a.sizeD()==0,"Sparsity error in tril2symm. Found above-diagonal entries in argument: " << a.dimString());
   return a + trans(a) - diag(diag(a));
 }
@@ -115,7 +115,7 @@ T tril2symm(const GenericMatrix<T> &a_) {
 template<typename T> 
 T triu2symm(const GenericMatrix<T> &a_) {
   const T& a = static_cast<const T&>(a_);
-  casadi_assert_message(a.square(),"Shape error in triu2symm. Expecting square shape but got " << a.dimString());
+  casadi_assert_message(a.isSquare(),"Shape error in triu2symm. Expecting square shape but got " << a.dimString());
   casadi_assert_message(a.sizeL()-a.sizeD()==0,"Sparsity error in triu2symm. Found below-diagonal entries in argument: " << a.dimString());
   return a + trans(a) - diag(diag(a));
 }

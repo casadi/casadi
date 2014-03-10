@@ -541,17 +541,17 @@ namespace CasADi{
 
   template<class T>
   bool isEmpty(const Matrix<T>& ex){
-    return ex.empty();
+    return ex.isEmpty();
   }
 
   template<class T>
   bool isTril(const Matrix<T> &A){
-    return A.sparsity().tril();
+    return A.sparsity().isTril();
   }
 
   template<class T>
   bool isTriu(const Matrix<T> &A){
-    return A.sparsity().triu();
+    return A.sparsity().isTriu();
   }
 
   template<class T>
@@ -577,13 +577,13 @@ namespace CasADi{
     Matrix<int> row_count = sumCols(sp);
   
     // A blank row? determinant is structurally zero
-    if (!row_count.dense()) return 0;
+    if (!row_count.isDense()) return 0;
 
     // Have a count of the nonzeros for each col
     Matrix<int> col_count = trans(sumRows(sp));
   
     // A blank col? determinant is structurally zero
-    if (!row_count.dense()) return 0;
+    if (!row_count.isDense()) return 0;
   
     int min_row = std::distance(row_count.data().begin(), std::min_element(row_count.data().begin(),row_count.data().end()));
     int min_col = std::distance(col_count.data().begin(), std::min_element(col_count.data().begin(),col_count.data().end()));
@@ -872,7 +872,7 @@ namespace CasADi{
   template<class T>
   Matrix<T> sumAll(const Matrix<T> &x) {
     // Quick return if empty
-    if (x.empty()) return Matrix<T>::sparse(1,1);
+    if (x.isEmpty()) return Matrix<T>::sparse(1,1);
     // Sum non-zero elements
     T res=0;
     for(int k=0; k<x.size(); k++){
@@ -893,7 +893,7 @@ namespace CasADi{
 
   template<class T>
   T all(const Matrix<T> &x) {
-    if (!x.dense()) return false;
+    if (!x.isDense()) return false;
     T ret=1;
     for (int i=0;i<x.size();++i) {
       ret = ret && x.at(i)==1;
@@ -903,7 +903,7 @@ namespace CasADi{
 
   template<class T>
   T any(const Matrix<T> &x) {
-    if (!x.dense()) return false;
+    if (!x.isDense()) return false;
     T ret=0;
     for (int i=0;i<x.size();++i) {
       ret = ret || x.at(i)==1;
@@ -919,7 +919,7 @@ namespace CasADi{
 
   template<class T>
   Matrix<T> norm_2(const Matrix<T>& x){
-    if(x.vector()){
+    if(x.isVector()){
       return norm_F(x);
     } else {
       casadi_error("2-norms currently only supported for vectors. Did you intend to calculate a Frobenius norms (norm_F)?");
@@ -1142,7 +1142,7 @@ namespace CasADi{
 
   template<class T>
   bool isOne(const Matrix<T>& ex){  
-    if(!ex.dense()){
+    if(!ex.isDense()){
       return false;
     }
   
@@ -1156,7 +1156,7 @@ namespace CasADi{
 
   template<class T>
   bool isMinusOne(const Matrix<T>& ex){  
-    if(!ex.dense()){
+    if(!ex.isDense()){
       return false;
     }
   
@@ -1183,7 +1183,7 @@ namespace CasADi{
   bool isIdentity(const Matrix<T>& ex) {
   
     // Make sure that the matrix is diagonal
-    if(!ex.sparsity().diagonal())
+    if(!ex.sparsity().isDiagonal())
       return false;
   
     // Make sure that all entries are one
@@ -1413,7 +1413,7 @@ namespace CasADi{
 
   template<typename T>
   T* getPtr(Matrix<T> &v){
-    if(v.empty())
+    if(v.isEmpty())
       return 0;
     else
       return &v.front();
@@ -1421,7 +1421,7 @@ namespace CasADi{
   
   template<typename T>
   const T* getPtr(const Matrix<T> &v){
-    if(v.empty())
+    if(v.isEmpty())
       return 0;
     else
       return &v.front();
@@ -1430,7 +1430,7 @@ namespace CasADi{
   template<typename T>
   Matrix<T> project(const Matrix<T>& A, const Sparsity& sparsity){
     // Check dimensions
-    if(!(A.empty() && sparsity.numel()==0)){
+    if(!(A.isEmpty() && sparsity.numel()==0)){
       casadi_assert_message(A.size2()==sparsity.size2() && A.size1()==sparsity.size1(),
                             "Shape mismatch. Expecting " << A.dimString() << ", but got " << 
                             sparsity.dimString() << " instead.");
