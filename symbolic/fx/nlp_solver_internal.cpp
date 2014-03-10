@@ -162,12 +162,12 @@ namespace CasADi{
    
 
   void NLPSolverInternal::reportConstraints(std::ostream &stream) { 
-  
+ 
     stream << "Reporting NLP constraints" << endl;
-    CasADi::reportConstraints(stream,output(NLP_SOLVER_X),input(NLP_SOLVER_LBX),input(NLP_SOLVER_UBX), "decision bounds");
+    FXInternal::reportConstraints(stream,output(NLP_SOLVER_X),input(NLP_SOLVER_LBX),input(NLP_SOLVER_UBX), "decision bounds");
     double tol = 1e-8;
     if (hasOption("constr_viol_tol")) tol = getOption("constr_viol_tol");
-    CasADi::reportConstraints(stream,output(NLP_SOLVER_G),input(NLP_SOLVER_LBG),input(NLP_SOLVER_UBG), "constraints",getOption("constr_viol_tol"));
+    FXInternal::reportConstraints(stream,output(NLP_SOLVER_G),input(NLP_SOLVER_LBG),input(NLP_SOLVER_UBG), "constraints",getOption("constr_viol_tol"));
   }
 
   FX& NLPSolverInternal::gradF(){
