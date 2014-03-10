@@ -245,12 +245,12 @@ class QuadcopterModel:
     """
 
     # ----------- system states and their derivatives ----
-    pos = struct_ssym(["x","y","z"])     # rigid body centre of mass position [m]   {0}   
-    v   = struct_ssym(["vx","vy","vz"])  # rigid body centre of mass position velocity [m/s] {0}
+    pos = struct_symSX(["x","y","z"])     # rigid body centre of mass position [m]   {0}   
+    v   = struct_symSX(["vx","vy","vz"])  # rigid body centre of mass position velocity [m/s] {0}
 
     NR = 4                               # Number of rotors
     
-    states = struct_ssym([
+    states = struct_symSX([
       entry("p",struct=pos),
       entry("v",struct=v),
       entry("q",shape=4),                # quaternions  {0} -> {1}
@@ -264,14 +264,14 @@ class QuadcopterModel:
 
     # ------------------------------------------------
 
-    dist = struct_ssym([
+    dist = struct_symSX([
       entry("Faer",shape=NR),             # Disturbance on aerodynamic forcing [N]
       entry("Caer",shape=NR)             # Disturbance on aerodynamic torques [Nm]
     ])
 
 
     # ----------------- Controls ---------------------
-    controls = struct_ssym([
+    controls = struct_symSX([
       entry("CR",shape=NR)              # [Nm]
           # Torques of the motors that drive the rotors, acting from platform on propeller
           # The torque signs are always positive when putting energy in the propellor,
@@ -296,7 +296,7 @@ class QuadcopterModel:
 
     # ----------------- Parameters ---------------------
     
-    rotor_model = struct_ssym([
+    rotor_model = struct_symSX([
          "c",        # c          Cord length [m]
          "R",        # R          Radius of propeller [m]
          "CL_alpha", # CL_alpha   Lift coefficient [-]
@@ -305,7 +305,7 @@ class QuadcopterModel:
          "CD_i",     # CD_i       Induced drag coefficient [-]  
     ])
     
-    p = struct_ssym([
+    p = struct_symSX([
       entry("rotors_model",repeat=NR,struct=rotor_model),    # Parameters that describe the rotor model
       entry("rotors_I",repeat=NR,shape=sp_diag(3)),  # Inertias of rotors [kg.m^2]
       entry("rotors_spin",repeat=NR),    # Direction of spin from each rotor. 1 means rotation around positive z.
@@ -377,7 +377,7 @@ class QuadcopterModel:
     R_01 = R_10.T
     # -------------------------------------
 
-    dstates = struct_ssym(states)
+    dstates = struct_symSX(states)
     
     dp,dv,dq,dw,dr = dstates[...]
     
@@ -551,7 +551,7 @@ L = SX(sp_dense(ns,ns),Lf.data())
 L2P = SXFunction([Lf],[L])
 L2P.init()
 
-optvar = struct_msym([
+optvar = struct_symMX([
   (
     entry("X",repeat=[N,d],struct=states),
     entry("U",repeat=N,struct=controls),
@@ -568,7 +568,7 @@ optvar = struct_msym([
 #print optvar["X",0,0,"p"]
 #raise Exception("0")
 
-par = struct_msym([
+par = struct_symMX([
   entry("Xref",shape=waypoints.shape),
   entry("model",struct=model.p)
 ])

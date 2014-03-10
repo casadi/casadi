@@ -43,7 +43,7 @@ from casadi.tools import *
 #! --------------------
 
 #! Create a structured SX.sym
-states = struct_ssym(["x","y","z"])
+states = struct_symSX(["x","y","z"])
 
 print states
 
@@ -69,7 +69,7 @@ f = SXFunction([states],[x*y*z])
 #! --------------------------------------
 
 #! The structure defnition above can also be written in expanded syntax:
-simplestates = struct_ssym([
+simplestates = struct_symSX([
     entry("x"),
     entry("y"),
     entry("z")
@@ -77,7 +77,7 @@ simplestates = struct_ssym([
 
 #! More information can be attached to the entries
 #!   shape argument  : specify sparsity/shape
-states = struct_ssym([
+states = struct_symSX([
     entry("x",shape=3),
     entry("y",shape=(2,2)),
     entry("z",shape=sp_tril(2))
@@ -91,7 +91,7 @@ print states["z"]
 print states.cat
 
 #!   repeat argument  : specify nested lists
-states = struct_ssym([
+states = struct_symSX([
     entry("w",repeat=2),
     entry("v",repeat=[2,3]),
   ])
@@ -105,7 +105,7 @@ for i,s in enumerate(states.labels()):
   
 #! We can influency this order by introducing a grouping bracket:
 
-states = struct_ssym([
+states = struct_symSX([
     "a",
     ( entry("w",repeat=2),
       entry("v",repeat=[2,3])
@@ -121,9 +121,9 @@ for i,s in enumerate(states.labels()):
 #! -------------------------------
 
 #! Structures can be nested. For example consider a statespace of two cartesian coordinates and a quaternion
-states = struct_ssym(["x","y",entry("q",shape=4)])
+states = struct_symSX(["x","y",entry("q",shape=4)])
 
-shooting = struct_ssym([
+shooting = struct_symSX([
   entry("X",repeat=[5,3],struct=states),
   entry("U",repeat=4,shape=1),
 ])
@@ -189,7 +189,7 @@ print rhs.cat
 
 
 #! One can also construct symbolic MX structures
-V = struct_msym(shooting)
+V = struct_symMX(shooting)
 
 print V
 
@@ -209,7 +209,7 @@ V = struct_MX([
 #! By default SX.sym structure constructor will create new SX.syms.
 #! To recycle one that is already available, use the 'sym' argument: 
 qsym = SX.sym("quaternion",4)
-states = struct_ssym(["x","y",entry("q",sym=qsym)])
+states = struct_symSX(["x","y",entry("q",sym=qsym)])
 print states.cat
 
 #! The 'sym' feature is not available for struct_MX, since it will construct one parent MX.
@@ -264,7 +264,7 @@ print init["X",blockcat,:,:,"q",0,0]
 #! When working with covariance matrices, both the rows and columns relate to states
 
 states = struct(["x","y",entry("q",repeat=2)])
-V = struct_ssym([
+V = struct_symSX([
       entry("X",repeat=5,struct=states),
       entry("P",repeat=5,shapestruct=(states,states))
     ])
@@ -292,7 +292,7 @@ print V["P",0,"q","q"]
 #! The prefix attribute allows you to create shorthands for long powerIndices
 
 states = struct(["x","y","z"])
-V = struct_ssym([
+V = struct_symSX([
       entry("X",repeat=[4,5],struct=states)
 ])
 

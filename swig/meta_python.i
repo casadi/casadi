@@ -760,7 +760,14 @@ template <>
 int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
   NATIVERETURN(CasADi::Matrix<double>,m)
   NATIVERETURN(CasADi::Matrix<int>,m)
-  if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
+  if (PyObject_HasAttrString(p,"__DMatrix__")) {
+    char name[] = "__DMatrix__";
+    PyObject *cr = PyObject_CallMethod(p, name,0);
+    if (!cr) { return false; }
+    int result = meta< CasADi::Matrix<double> >::as(cr,m);
+    Py_DECREF(cr);
+    return result;
+  } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<double>
     if (array_numdims(p)==0) {
       double d;
       int result = meta< double >::as(p,d);
@@ -854,13 +861,6 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
       m = CasADi::Matrix<double>(t,t.size(),0);
     }
     return res;
-  } else if (PyObject_HasAttrString(p,"__DMatrix__")) {
-    char name[] = "__DMatrix__";
-    PyObject *cr = PyObject_CallMethod(p, name,0);
-    if (!cr) { return false; }
-    int result = meta< CasADi::Matrix<double> >::as(cr,m);
-    Py_DECREF(cr);
-    return result;
   } else {
     SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;

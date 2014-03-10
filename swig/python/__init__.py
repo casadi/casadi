@@ -115,8 +115,10 @@ def deprecatedfun(func,message):
     return depfun
 
 
-ssym = deprecatedfun(ssym,"ssym will soon be replaced by SX.sym")
-msym = deprecatedfun(ssym,"ssym will soon be replaced by MX.sym")
+ssym = deprecatedfun(SX.sym,"ssym will soon be replaced by SX.sym")
+msym = deprecatedfun(MX.sym,"ssym will soon be replaced by MX.sym")
+
+
 
 __version__ = CasadiMeta.getVersion()
 if '+' in __version__ and CasadiMeta.getGitDescribe()!='':

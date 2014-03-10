@@ -152,8 +152,8 @@ def minimize(f,gl=[],verbose=False):
       raise Exception("Cannot happen")
   
   # Create structures
-  X = struct_msym([entry(str(hash(i)),shape=i.sparsity()) for i in x])
-  P = struct_msym([entry(str(hash(i)),shape=i.sparsity()) for i in p])
+  X = struct_symMX([entry(str(hash(i)),shape=i.sparsity()) for i in x])
+  P = struct_symMX([entry(str(hash(i)),shape=i.sparsity()) for i in p])
   G_le = struct_MX([entry(str(i),expr=g) for i,g in enumerate(g_le)])
   G_eq = struct_MX([entry(str(i),expr=g) for i,g in enumerate(g_eq)])
   G_nsd = struct_MX([entry(str(i),expr=g) for i,g in enumerate(g_nsd)])
