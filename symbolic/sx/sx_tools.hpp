@@ -167,7 +167,6 @@ Matrix<double> evalf(const SX &ex);
 
 /** \brief Substitute variable v with value vdef in an expression ex, and evaluate numerically
 * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
-* @see numSample1D
 */
 Matrix<double> evalf(const SX &ex, const SX &v, const Matrix<double> &vdef);
 
