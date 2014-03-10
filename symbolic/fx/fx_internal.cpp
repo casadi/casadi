@@ -638,12 +638,12 @@ namespace CasADi{
             nsweeps+=1;
               
             // Construct lookup table
-            IMatrix lookup = IMatrix::sparse(lookup_row,lookup_col,lookup_value,bvec_size,coarse.size());
+            IMatrix lookup = IMatrix::triplet(lookup_row,lookup_col,lookup_value,bvec_size,coarse.size());
 
             std::reverse(lookup_col.begin(),lookup_col.end());
             std::reverse(lookup_row.begin(),lookup_row.end());
             std::reverse(lookup_value.begin(),lookup_value.end());
-            IMatrix duplicates = IMatrix::sparse(lookup_row,lookup_col,lookup_value,bvec_size,coarse.size()) - lookup;
+            IMatrix duplicates = IMatrix::triplet(lookup_row,lookup_col,lookup_value,bvec_size,coarse.size()) - lookup;
             makeSparse(duplicates);
             SubMatrix<Matrix<int>,Sparsity,int> temp(lookup,duplicates.sparsity(),0); // NOTE: Not intended use of SubMatrix
             temp = -bvec_size;
@@ -937,7 +937,7 @@ namespace CasADi{
             nsweeps+=1; 
               
             // Construct lookup table
-            IMatrix lookup = IMatrix::sparse(lookup_row,lookup_col,lookup_value,bvec_size,coarse_col.size());
+            IMatrix lookup = IMatrix::triplet(lookup_row,lookup_col,lookup_value,bvec_size,coarse_col.size());
 
             // Propagate the dependencies
             spEvaluate(use_fwd);

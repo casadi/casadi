@@ -1733,17 +1733,17 @@ namespace CasADi{
   }
 
   template<class T>
-  Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d) {
-    return sparse(row,col,d,*std::max_element(row.begin(),row.end()),*std::max_element(col.begin(),col.end()));
+  Matrix<T> Matrix<T>::triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d) {
+    return triplet(row,col,d,*std::max_element(row.begin(),row.end()),*std::max_element(col.begin(),col.end()));
   }
 
   template<class T>
-  Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& rc) {
-    return sparse(row,col,d,rc.first,rc.second);
+  Matrix<T> Matrix<T>::triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& rc) {
+    return triplet(row,col,d,rc.first,rc.second);
   }
 
   template<class T>
-  Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int nrow, int ncol) {
+  Matrix<T> Matrix<T>::triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int nrow, int ncol) {
     casadi_assert_message(col.size()==row.size() && col.size()==d.size(),"Argument error in Matrix<T>::sparse(row,col,d): supplied lists must all be of equal length, but got: " << row.size() << ", " << col.size()  << " and " << d.size());
     std::vector<int> mapping;
     Sparsity sp = sp_triplet(nrow,ncol,row,col,mapping);

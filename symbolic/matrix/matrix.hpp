@@ -673,9 +673,9 @@ namespace CasADi{
      * Default matrix size is max(col) x max(row)
      */
     //@{
-    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d);
-    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int nrow, int ncol);
-    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& rc);
+    static Matrix<T> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d);
+    static Matrix<T> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int nrow, int ncol);
+    static Matrix<T> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& rc);
     //@}
     
     //@{
