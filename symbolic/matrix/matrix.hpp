@@ -168,6 +168,7 @@ namespace CasADi{
     using B::vector;
     using B::dimString;
     using B::sym;
+    using B::sparse;
     using B::zeros;
     using B::ones;
     using B::operator[];
@@ -662,13 +663,7 @@ namespace CasADi{
         ldres: The leading dimension in res 
         res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, T *res) const;
-    
-    //@{
-    /** \brief  create a sparse matrix with all zeros */
-    static Matrix<T> sparse(int nrow=1, int ncol=1);
-    static Matrix<T> sparse(const std::pair<int,int>& rc){ return sparse(rc.first,rc.second);}
-    //@}
-    
+        
     /* \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)
      */

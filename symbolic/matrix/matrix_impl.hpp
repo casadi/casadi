@@ -1728,11 +1728,6 @@ namespace CasADi{
   }
 
   template<class T>
-  Matrix<T> Matrix<T>::sparse(int nrow, int ncol){
-    return Matrix<T>(nrow,ncol);
-  }
-
-  template<class T>
   Matrix<T> Matrix<T>::triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d) {
     return triplet(row,col,d,*std::max_element(row.begin(),row.end()),*std::max_element(col.begin(),col.end()));
   }

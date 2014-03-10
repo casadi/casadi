@@ -310,12 +310,6 @@ namespace CasADi{
     static MX binary(int op, const MX &x, const MX &y);
     static MX unary(int op, const MX &x);
     //@}
-
-    //@{
-    /** \brief Sparse matrix of all zeros */
-    static MX sparse(int nrow, int ncol=1);
-    static MX sparse(const std::pair<int, int> &rc);
-    //@}
   
     //@{
     /** \brief  create a matrix with all inf */

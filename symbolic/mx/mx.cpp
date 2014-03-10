@@ -524,14 +524,6 @@ namespace CasADi{
     }
   }
 
-  MX MX::sparse(int nrow, int ncol){
-    return MX(nrow,ncol);
-  }
-
-  MX MX::sparse(const std::pair<int, int> &rc){
-    return sparse(rc.first,rc.second);
-  }
-
   MX MX::inf(int nrow, int ncol){
     return inf(sp_dense(nrow,ncol));
   }

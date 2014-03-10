@@ -179,6 +179,12 @@ namespace CasADi{
     ///@}
     
     //@{
+    /** \brief  create a sparse matrix with all zeros */
+    static MatType sparse(int nrow=1, int ncol=1){ return MatType(nrow,ncol);}
+    static MatType sparse(const std::pair<int,int>& rc){ return sparse(rc.first,rc.second);}
+    //@}
+
+    //@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries zero */
     static MatType zeros(int nrow=1, int ncol=1){ return zeros(sp_dense(nrow,ncol)); }
     static MatType zeros(const Sparsity& sp){ return MatType(sp,0);}
