@@ -29,6 +29,12 @@ if(SNOPT_FOUND)
     casadi_snopt_interface snopt_fortran_c_bridge casadi_nonlinear_programming casadi
     ${SNOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
+
+  add_executable(rocket_snopt rocket_snopt.cpp)
+  target_link_libraries(rocket_snopt
+    casadi_snopt_interface snopt_fortran_c_bridge casadi_nonlinear_programming casadi
+    ${SNOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
 endif()
 
 # Rocket solved with MX + SX
