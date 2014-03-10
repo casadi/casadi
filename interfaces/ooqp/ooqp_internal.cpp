@@ -264,15 +264,15 @@ namespace CasADi {
       cout << "   minimize    1/2*x'*Q*x + c'*x" << endl;
       cout << "   subject to  A*x = b,  d <= C*x <= f, l <= x <= u" << endl;
       cout << "with" << endl;
-      cout << "Q = " << tril2symm(DMatrix::sparse(vector<int>(irowQ_.begin(),irowQ_.begin()+nnzQ),
+      cout << "Q = " << tril2symm(DMatrix::triplet(vector<int>(irowQ_.begin(),irowQ_.begin()+nnzQ),
                                                   vector<int>(jcolQ_.begin(),jcolQ_.begin()+nnzQ),
                                                   vector<double>(dQ_.begin(),dQ_.begin()+nnzQ),nx,nx)) << endl;
       cout << "c = " << vector<double>(c_.begin(),c_.begin()+nx) << endl;
-      cout << "A = " << DMatrix::sparse(vector<int>(irowA_.begin(),irowA_.begin()+nnzA),
+      cout << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(),irowA_.begin()+nnzA),
                                         vector<int>(jcolA_.begin(),jcolA_.begin()+nnzA),
                                         vector<double>(dA_.begin(),dA_.begin()+nnzA),nA,nx) << endl;
       cout << "b = " << vector<double>(bA_.begin(),bA_.begin()+nA) << endl;
-      cout << "C = " << DMatrix::sparse(vector<int>(irowC_.begin(),irowC_.begin()+nnzC),
+      cout << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(),irowC_.begin()+nnzC),
                                         vector<int>(jcolC_.begin(),jcolC_.begin()+nnzC),
                                         vector<double>(dC_.begin(),dC_.begin()+nnzC),nC,nx) << endl;
       cout << "d = " << printBounds(clow_,iclow_,nC,"-") << endl;
