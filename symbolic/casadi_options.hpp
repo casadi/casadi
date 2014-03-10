@@ -66,6 +66,9 @@ namespace CasADi {
       
       /** \brief flag to indicate if profiling is active */
       static bool profiling;
+      
+      static bool profilingBinary;
+      
 #endif //SWIG
       // Setter and getter for catch_errors_python
       static void setCatchErrorsPython(bool flag) { catch_errors_python = flag; }
@@ -83,6 +86,10 @@ namespace CasADi {
       */
       static void startProfiling(const std::string &filename);
       static void stopProfiling();
+      
+      static void setProfilingBinary(bool flag) {  profilingBinary = flag; }
+      static bool getProfilingBinary() { return  profilingBinary; }
+      
   };
 
 }

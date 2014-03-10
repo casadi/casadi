@@ -2596,7 +2596,11 @@ namespace CasADi{
     // Write out profiling information
     if (CasadiOptions::profiling) {
       time_stop = getRealTime();
-      CasadiOptions::profilingLog  << "overhead " << this << ":" <<getOption("name") << "|" << double(time_stop-time_start-time_offset)*1e6 << " ns" << std::endl; 
+      if (CasadiOptions::profilingBinary) {
+      
+      } else {
+        CasadiOptions::profilingLog  << "overhead " << this << ":" <<getOption("name") << "|" << double(time_stop-time_start-time_offset)*1e6 << " ns" << std::endl; 
+      }
     }    
   }
 

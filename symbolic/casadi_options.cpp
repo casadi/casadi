@@ -29,7 +29,8 @@ namespace CasADi {
   bool CasadiOptions::simplification_on_the_fly = true;
   bool CasadiOptions::profiling = false;
   std::ofstream CasadiOptions::profilingLog;
-
+  bool CasadiOptions::profilingBinary = true;
+  
   void CasadiOptions::startProfiling(const std::string &filename) {
     profilingLog.open (filename.c_str(),std::ofstream::out);
     if (profilingLog.is_open()) {

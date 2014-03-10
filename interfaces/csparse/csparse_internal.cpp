@@ -23,6 +23,9 @@
 #include "csparse_internal.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 
+#include "../../symbolic/profiling.hpp"
+#include "../../symbolic/casadi_options.hpp"
+
 using namespace std;
 namespace CasADi{
 
@@ -59,9 +62,21 @@ namespace CasADi{
   
     // Has the routine been called once
     called_once_ = false;
+    
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) { 
+      profileWriteName(CasadiOptions::profilingLog,this,"CSparse",ProfilingData_FXType_Other,2);
+      
+      profileWriteSourceLine(CasadiOptions::profilingLog,this,0,"prepare",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog,this,1,"solve",-1);
+    }
   }
 
   void CSparseInternal::prepare(){
+    double time_start;
+    if(CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+      time_start = getRealTime(); // Start timer
+      profileWriteEntry(CasadiOptions::profilingLog,this);
+    }
     if(!called_once_){
       if(verbose()){
         cout << "CSparseInternal::prepare: symbolic factorization" << endl;
@@ -119,9 +134,22 @@ namespace CasADi{
     casadi_assert(N_!=0);
 
     prepared_ = true;
+    
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+      double time_stop = getRealTime(); // Stop timer
+      profileWriteTime(CasadiOptions::profilingLog,this,0,time_stop-time_start,time_stop-time_start);
+      profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_start);
+    }
   }
   
   void CSparseInternal::solve(double* x, int nrhs, bool transpose){
+    double time_start;
+    if(CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
+      time_start = getRealTime(); // Start timer
+      profileWriteEntry(CasadiOptions::profilingLog,this);
+    }
+
+    
     casadi_assert(prepared_);
     casadi_assert(N_!=0);
   
@@ -141,6 +169,12 @@ namespace CasADi{
         cs_ipvec (S_->q, t, x, A_.n) ;      // x = P2\t 
       }
       x += ncol();
+    }
+    
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+      double time_stop = getRealTime(); // Stop timer
+      profileWriteTime(CasadiOptions::profilingLog,this,1,time_stop-time_start,time_stop-time_start);
+      profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_start);
     }
   }
 

@@ -23,6 +23,9 @@
 #ifndef PROFILING_HPP
 #define PROFILING_HPP
 
+#include <fstream>
+#include <cstring>
+#include <iostream>
 /*
  * Author:  David Robert Nadeau
  * Site:    http://NadeauSoftware.com/
@@ -38,5 +41,138 @@
  * between two calls to this function.
  */
 double getRealTime( );
+
+enum ProfilingData_Type { ProfilingData_Type_TIMELINE, ProfilingData_Type_SOURCE, ProfilingData_Type_NAME, ProfilingData_Type_ENTRY, ProfilingData_Type_EXIT };
+
+enum ProfilingData_FXType { ProfilingData_FXType_MXFunction, ProfilingData_FXType_SXFunction, ProfilingData_FXType_Other };
+
+struct ProfilingHeader {
+  ProfilingData_Type type;
+};
+
+struct ProfilingData_TIMELINE {
+  double local;
+  double total;
+  long thisp;
+  int line_number;
+};
+
+struct ProfilingData_SOURCE {
+  long thisp;
+  int line_number;
+  int length;
+  int opcode;
+  long dependency;
+};
+
+struct ProfilingData_NAME {
+  long thisp;
+  int length;
+  ProfilingData_FXType type;
+  int algorithm_size;
+};
+
+struct ProfilingData_ENTRY {
+  long thisp;
+};
+
+struct ProfilingData_EXIT {
+  double total;
+  long thisp;
+};
+
+template<typename T>
+ProfilingData_Type ProfilingType();
+
+template<>
+inline ProfilingData_Type ProfilingType<ProfilingData_TIMELINE>() { return ProfilingData_Type_TIMELINE; }
+template<>
+inline ProfilingData_Type ProfilingType<ProfilingData_SOURCE>() { return ProfilingData_Type_SOURCE; }
+template<>
+inline ProfilingData_Type ProfilingType<ProfilingData_NAME>() { return ProfilingData_Type_NAME; }
+template<>
+inline ProfilingData_Type ProfilingType<ProfilingData_ENTRY>() { return ProfilingData_Type_ENTRY; }
+template<>
+inline ProfilingData_Type ProfilingType<ProfilingData_EXIT>() { return ProfilingData_Type_EXIT; }
+
+template<typename T>
+void profileWrite(std::ofstream &f,const T& s) {
+  ProfilingHeader hd;
+  hd.type   = ProfilingType<T>();
+  f.write(reinterpret_cast<const char*>(&hd), sizeof(hd));
+  f.write(reinterpret_cast<const char*>(&s), sizeof(s));
+}
+
+template<typename T>
+long ptrToLong(T *a) {
+  long r;
+  std::memcpy(&r, &a, sizeof(T*));
+  return r;
+}
+
+template<typename T>
+void profileWriteName(std::ofstream &f,T *a,const std::string &name, ProfilingData_FXType type, int algorithm_size) {
+  ProfilingData_NAME s;
+  s.thisp=ptrToLong(a);
+  s.length=name.size();
+  s.type = type;
+  s.algorithm_size = algorithm_size;
+  //std::cout << name << s.thisp << ":" << s.length << ":" << s.type << ":" << s.algorithm_size << std::endl;
+  profileWrite(f,s);
+  f << name;
+}
+
+template<typename T>
+void profileWriteEntry(std::ofstream &f,T *a) {
+  ProfilingData_ENTRY s;
+  s.thisp=ptrToLong(a);
+  profileWrite(f,s);
+}
+
+template<typename T>
+void profileWriteExit(std::ofstream &f,T *a,double total) {
+  ProfilingData_EXIT s;
+  s.thisp=ptrToLong(a);
+  s.total=total;
+  profileWrite(f,s);
+}
+
+template<typename T>
+void profileWriteTime(std::ofstream &f,T *a,int line_number,double local, double total) {
+  ProfilingData_TIMELINE s;
+  s.local = local;
+  s.total = total;
+  s.thisp = ptrToLong(a);
+  s.line_number = line_number;
+  profileWrite(f,s);
+}
+
+
+template<typename T, typename T2>
+void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::string &sourceline, int opcode, T2 *dependency) {
+  ProfilingData_SOURCE s;
+  s.thisp = ptrToLong(a);
+  s.line_number = line_number;
+  s.length = sourceline.size();
+  s.opcode = opcode;
+  s.dependency = ptrToLong(dependency);
+  profileWrite(f,s); 
+  //std::cout << s.thisp << ":" << s.line_number<< ":" << s.length << ":" << s.opcode << ":" << s.dependency << std::endl;
+  f << sourceline;
+}
+
+template<typename T>
+void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::string &sourceline, int opcode) {
+  ProfilingData_SOURCE s;
+  s.thisp = ptrToLong(a);
+  s.line_number = line_number;
+  s.length = sourceline.size();
+  s.opcode = opcode;
+  s.dependency = 0;
+  //std::cout << s.thisp << ":" << s.line_number<< ":" << s.length << ":" << s.opcode << ":" << s.dependency << std::endl;
+  profileWrite(f,s); 
+  f << sourceline;
+}
+
 
 #endif //PROFILING_HPP
