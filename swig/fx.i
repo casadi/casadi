@@ -43,7 +43,6 @@
 #include "symbolic/fx/external_function.hpp"
 #include "symbolic/fx/parallelizer.hpp"
 #include "symbolic/fx/custom_function.hpp"
-#include "symbolic/fx/xfunction_tools.hpp"
 #include "symbolic/fx/nullspace.hpp"
 %}
 
