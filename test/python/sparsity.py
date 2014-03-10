@@ -262,45 +262,7 @@ class Sparsitytests(casadiTestCase):
     self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"diag(vector)")
     
     self.checkarray(array([0,1,2]),array(list(mapping)),"diag(vector)")
-    
-  def test_vecMX(self):
-    self.message("vec MXFunction")
-    q = DMatrix([[1,2,3,4,9],[5,6,7,8,8],[9,10,11,12,6],[1,2,3,4,5]])
-
-    X = MX.sym("X",4,5)
-
-    F = MXFunction([X],[X**2])
-    F.init()
-    F.setInput(q,0)
-    F.evaluate()
-    F_ = vec(F.getOutput(0))
-
-    G = vec(F)
-    G.setInput(vec(q),0)
-    G.evaluate()
-    G_ = G.getOutput()
-
-    self.checkarray(F_,G_,"vec MX")
-    
-  def test_vecSX(self):
-    self.message("vec SXFunction")
-    q = DMatrix([[1,2,3,4,9],[5,6,7,8,8],[9,10,11,12,6],[1,2,3,4,5]])
-
-    X = SX.sym("X",4,5)
-
-    F = SXFunction([X],[X**2])
-    F.init()
-    F.setInput(q,0)
-    F.evaluate()
-    F_ = vec(F.getOutput(0))
-
-    G = vec(F)
-    G.setInput(vec(q),0)
-    G.evaluate()
-    G_ = G.getOutput()
-
-    self.checkarray(F_,G_,"vec SX")
-    
+            
   def test_sparsityindex(self):
     self.message("sparsity indexing")
     nza = set([  (0,0),

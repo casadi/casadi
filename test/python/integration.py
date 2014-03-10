@@ -590,45 +590,7 @@ class Integrationtests(casadiTestCase):
     self.f = f
     self.num={'tend':2.3,'q0':7.1,'p':2}
     pass
-  
-    
-  def test_parameterize_time(self):
-    self.message("parametrizeTime")
-    num=self.num
-    f = self.f
-    
-    f_ = parameterizeTime(f)
-    for intf in [CVodesIntegrator, IdasIntegrator]:
-      integrator = intf(parameterizeTime(f))
-      integrator.setOption("reltol",1e-15)
-      integrator.setOption("abstol",1e-15)
-      integrator.setOption("fsens_err_con", True)
-      #integrator.setOption("verbose",True)
-      integrator.setOption("t0",0)
-      integrator.setOption("tf",1)
-      integrator.init()
-      
-      tend = num['tend']
-      p = num['p']
-      q0 = num['q0']
-      
-      t0 = 0.7
-      
-      integrator.setInput([0,tend,p],"p")
-      integrator.setInput([q0],"x0")
-      
-      integrator.evaluate()
-      
-      self.assertAlmostEqual(integrator.getOutput()[0],q0*exp(tend**3/(3*p)),9,"Evaluation output mismatch")
-    
-      # Integrate with time offset
-      integrator.setInput([t0,tend,p],"p")
-      integrator.setInput([q0],"x0")
-      
-      integrator.evaluate()
-      
-      self.assertAlmostEqual(integrator.getOutput()[0],q0*exp((tend**3-t0**3)/(3*p)),9,"Evaluation output mismatch")
-          
+            
   def test_eval2(self):
     self.message('CVodes integration: evaluation with MXFunction indirection')
     num=self.num
