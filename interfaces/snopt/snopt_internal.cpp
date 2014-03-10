@@ -482,8 +482,8 @@ namespace CasADi{
       int kk= g_order_[k];
       if (g_type_[kk]<2) {
         //casadi_error("woops");
-        bl_[nx_+k] = input(NLP_SOLVER_LBG).data()[kk]-nlp_.output("g").data()[kk];
-        bu_[nx_+k] = input(NLP_SOLVER_UBG).data()[kk]-nlp_.output("g").data()[kk];
+        bl_[nx_+k] = input(NLP_SOLVER_LBG).data()[kk]-nlp_.output(NL_G).data()[kk];
+        bu_[nx_+k] = input(NLP_SOLVER_UBG).data()[kk]-nlp_.output(NL_G).data()[kk];
       } else {
         bl_[nx_+k] = input(NLP_SOLVER_LBG).data()[kk];
         bu_[nx_+k] = input(NLP_SOLVER_UBG).data()[kk];
