@@ -380,10 +380,45 @@ namespace CasADi{
   }
 
   template<class T>
+  void Matrix<T>::full(){
+    // Quick return if possible
+    if(isDense()) return;
+
+    // Get sparsity pattern
+    int nrow = size1();
+    int ncol = size2();
+    const std::vector<int>& colind = this->colind();
+    const std::vector<int>& row = this->row();
+
+    // Zero
+    const T zero = 0;
+
+    // Resize data and copy
+    data_.resize(nrow*ncol,zero);
+    
+    // Loop over the colums in reverse order
+    for(int cc=ncol-1; cc>=0; --cc){
+      // Loop over nonzero elements of the column in reverse order
+      for(int el=colind[cc+1]-1; el>=colind[cc]; --el){
+        // Get the row
+        int rr = row[el];
+        
+        // Swap the old position with the new position
+        if(el!=cc*nrow + rr){
+          data_[cc*nrow + rr] = data_[el];
+          data_[el] = zero;
+        }
+      }
+    }
+
+    // Update the sparsity pattern
+    sparsity_ = Sparsity::dense(shape());
+  }
+
+  template<class T>
   void Matrix<T>::makeDense(int nrow, int ncol, const T& val){
     // Quick return if already dense
-    if(ncol*nrow == size())
-      return;
+    if(isDense()) return;
   
     if(size2()!=ncol || size1()!=nrow){
       // Also resize

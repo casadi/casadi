@@ -432,11 +432,14 @@ namespace CasADi{
     
     /// Set all elements to a value
     void setAll(const T& val);
-    
-    /** \brief  Make the matrix an dense nrow-by-ncol matrix */
+
+    /// Make the matrix dense
+    void full();
+
+
     void makeDense(int nrow, int ncol, const T& val);
 
-    /** \brief  Make the matrix an empty nrow-by-ncol matrix */
+
     void makeEmpty(int nrow, int ncol);
 
     Matrix<T> operator+() const;

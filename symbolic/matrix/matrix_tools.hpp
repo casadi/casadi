@@ -423,13 +423,18 @@ namespace CasADi{
   template<class T>
   Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
 
-  /** \brief  Make a matrix dense */
+#ifndef WITHOUT_PRE_1_9_X
+  /** \brief [DEPRECATED] Replaced A.full() and full(A)
+   */
+  //@{
   template<class T>
-  void makeDense(Matrix<T>& A);
+  void makeDense(Matrix<T>& A){ A.full();}
 
-  /** \brief  Make a matrix dense */
   template<class T>
-  Matrix<T> densify(const Matrix<T>& A);
+  Matrix<T> densify(const Matrix<T>& A){ return full(A);}  
+  //@}
+#endif
+
 
 #ifndef SWIGOCTAVE
   /** \brief  Make a matrix dense */
@@ -1299,20 +1304,10 @@ namespace CasADi{
   }
 
   template<class T>
-  void makeDense(Matrix<T>& A){
-    A.makeDense(A.size1(),A.size2(),0);
-  }
-
-  template<class T>
-  Matrix<T> densify(const Matrix<T>& A){
-    Matrix<T> ret(A);
-    makeDense(ret);
+  Matrix<T> full(const Matrix<T>& A){    
+    Matrix<T> ret = A;
+    ret.full();
     return ret;
-  }
-
-  template<class T>
-  Matrix<T> full(const Matrix<T>& A){
-    return densify(A);
   }
 
   template<class T>
