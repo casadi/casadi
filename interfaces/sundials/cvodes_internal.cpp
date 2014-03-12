@@ -1124,15 +1124,15 @@ namespace CasADi{
     const vector<int>& row = jac_.output().row();
     const vector<double>& val = jac_.output().data();
 
-    // Loop over cols
-    for(int i=0; i<colind.size()-1; ++i){
+    // Loop over columns
+    for(int cc=0; cc<colind.size()-1; ++cc){
       // Loop over non-zero entries
-      for(int el=colind[i]; el<colind[i+1]; ++el){
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
         // Get row
-        int j = row[el];
+        int rr = row[el];
       
         // Set the element
-        DENSE_ELEM(Jac,i,j) = val[el];
+        DENSE_ELEM(Jac,rr,cc) = val[el];
       }
     }
   
@@ -1180,15 +1180,15 @@ namespace CasADi{
     const vector<int>& row = jacB_.output().row();
     const vector<double>& val = jacB_.output().data();
 
-    // Loop over cols
-    for(int i=0; i<colind.size()-1; ++i){
+    // Loop over columns
+    for(int cc=0; cc<colind.size()-1; ++cc){
       // Loop over non-zero entries
-      for(int el=colind[i]; el<colind[i+1]; ++el){
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
         // Get row
-        int j = row[el];
+        int rr = row[el];
       
         // Set the element
-        DENSE_ELEM(JacB,i,j) = val[el];
+        DENSE_ELEM(JacB,rr,cc) = val[el];
       }
     }
   
@@ -1245,15 +1245,15 @@ namespace CasADi{
     const vector<double>& val = jac_.output().data();
 
     // Loop over cols
-    for(int i=0; i<colind.size()-1; ++i){
+    for(int cc=0; cc<colind.size()-1; ++cc){
       // Loop over non-zero entries
-      for(int el=colind[i]; el<colind[i+1]; ++el){
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
         // Get row
-        int j = row[el];
+        int rr = row[el];
       
         // Set the element
-        if(i-j>=-mupper && i-j<=mlower)
-          BAND_ELEM(Jac,i,j) = val[el];
+        if(cc-rr<=mupper && rr-cc<=mlower)
+          BAND_ELEM(Jac,rr,cc) = val[el];
       }
     }
   
@@ -1301,16 +1301,16 @@ namespace CasADi{
     const vector<int>& row = jacB_.output().row();
     const vector<double>& val = jacB_.output().data();
 
-    // Loop over cols
-    for(int i=0; i<colind.size()-1; ++i){
+    // Loop over columns
+    for(int cc=0; cc<colind.size()-1; ++cc){
       // Loop over non-zero entries
-      for(int el=colind[i]; el<colind[i+1]; ++el){
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
         // Get row
-        int j = row[el];
+        int rr = row[el];
       
         // Set the element
-        if(i-j>=-mupperB && i-j<=mlowerB)
-          BAND_ELEM(JacB,i,j) = val[el];
+        if(cc-rr<=mupperB && rr-cc<=mlowerB)
+          BAND_ELEM(JacB,rr,cc) = val[el];
       }
     }
   
@@ -1386,7 +1386,7 @@ namespace CasADi{
 
     // Solve the (possibly factorized) system 
     casadi_assert(linsol_.output().size() == NV_LENGTH_S(z));
-    linsol_.solve(NV_DATA_S(z),1,true);
+    linsol_.solve(NV_DATA_S(z),1,false);
   
     // Log time duration
     time2 = clock();
@@ -1404,7 +1404,7 @@ namespace CasADi{
 
     // Solve the (possibly factorized) system 
     casadi_assert(linsolB_.output().size() == NV_LENGTH_S(zvecB));
-    linsolB_.solve(NV_DATA_S(zvecB),1,true);
+    linsolB_.solve(NV_DATA_S(zvecB),1,false);
   
     // Log time duration
     time2 = clock();
@@ -1801,7 +1801,7 @@ namespace CasADi{
     jac_in.push_back(c_xdot);
   
     // Return generated function
-    return FunctionType(jac_in,trans(jac));
+    return FunctionType(jac_in,jac);
   }
 
   template<typename FunctionType>
@@ -1820,7 +1820,7 @@ namespace CasADi{
     jac_in.push_back(c_xdot);
   
     // return generated function
-    return FunctionType(jac_in,trans(jac));
+    return FunctionType(jac_in,jac);
   }
 
   FX CVodesInternal::getJacobianB(){
