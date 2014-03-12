@@ -597,7 +597,7 @@ namespace CasADi{
         // Get the value for the structural zeros
         double fcn_0;
         casadi_math<double>::fun(op,0,0,fcn_0);
-        rr = rr.makeDense(fcn_0);
+        rr.densify(fcn_0);
       }
       return rr;
     }

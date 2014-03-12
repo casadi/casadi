@@ -923,13 +923,16 @@ namespace CasADi{
     }
   }
 
- MX MX::makeDense(const MX& val) const{
+  void MX::densify(const MX& val){
+    casadi_assert(val.isScalar());
     if(isDense()){
-      return *this;
+      return; // Already ok
+    } else if(val->isZero()){
+      *this = setSparse(Sparsity::dense(shape()));
     } else {
-      MX ret = repmat(val,size1(),size2());
-      ret(sparsity()) = *this;
-      return ret;
+      MX new_this = repmat(val,shape());
+      new_this(sparsity()) = *this;
+      *this = new_this;
     }
   }
 
@@ -947,5 +950,6 @@ namespace CasADi{
   MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp){ 
     return MX::create(new SymbolicMX(name,sp));
   }
+
           
 } // namespace CasADi

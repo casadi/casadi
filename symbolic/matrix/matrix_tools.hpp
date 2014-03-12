@@ -32,21 +32,6 @@
 
 namespace CasADi{
 
-#ifndef WITHOUT_PRE_1_9_X
-  /** \brief [DEPRECATED]
-   */
-  //@{
-  template<class T> void makeDense(Matrix<T>& A){ A.densify();}
-  template<class T> Matrix<T> densify(const Matrix<T>& A){ return full(A);}
-  template<class T> void makeSparse(Matrix<T>& A, double tol=0){ A.sparsify(tol);}
-  template<class T> bool isDense(const Matrix<T>& ex){ return ex.isDense();}
-  template<class T> bool isEmpty(const Matrix<T>& ex){ return ex.isEmpty(); }
-  template<class T> bool isTril(const Matrix<T> &A){ return A.isTril(); }
-  template<class T> bool isTriu(const Matrix<T> &A){ return A.isTriu(); }
-  //@}
-#endif
-
-
   /// Transpose of a matrix
   template<class T>
   Matrix<T> trans(const Matrix<T> &x);
@@ -458,6 +443,20 @@ namespace CasADi{
   /// Obtain the structural rank of a sparsity-pattern
   template<typename T>
   int sprank(const Matrix<T>& A);
+
+#ifndef WITHOUT_PRE_1_9_X
+  /** \brief [DEPRECATED]
+   */
+  //@{
+  template<class T> void makeDense(Matrix<T>& A){ A.densify();}
+  template<class T> Matrix<T> densify(const Matrix<T>& A){ Matrix<T> ret(A); ret.densify(); return ret;}
+  template<class T> void makeSparse(Matrix<T>& A, double tol=0){ A.sparsify(tol);}
+  template<class T> bool isDense(const Matrix<T>& ex){ return ex.isDense();}
+  template<class T> bool isEmpty(const Matrix<T>& ex){ return ex.isEmpty(); }
+  template<class T> bool isTril(const Matrix<T> &A){ return A.isTril(); }
+  template<class T> bool isTriu(const Matrix<T> &A){ return A.isTriu(); }
+  //@}
+#endif
 
 } // namespace CasADi
 

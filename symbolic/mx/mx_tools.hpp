@@ -31,23 +31,6 @@
 
 namespace CasADi{
 
-#ifndef WITHOUT_PRE_1_9_X
-/** \brief [DEPRECATED]
-*/
-//@{
-  inline MX msym(const std::string& name, int nrow=1, int ncol=1){ return MX::sym(name,nrow,ncol); }
-  inline MX msym(const std::string& name, const std::pair<int,int> & rc){ return MX::sym(name,rc);}
-  inline std::vector<MX> msym(const std::string& name, const Sparsity& sp, int p){ return MX::sym(name,sp,p);}
-  inline std::vector<MX> msym(const std::string& name, int nrow, int ncol, int p){ return MX::sym(name,nrow,ncol,p);}
-  inline std::vector<std::vector<MX> > msym(const std::string& name, const Sparsity& sp, int p, int r){ return MX::sym(name,sp,p,r);}
-  inline std::vector<std::vector<MX> > msym(const std::string& name, int nrow, int ncol, int p, int r){ return MX::sym(name,nrow,ncol,p,r);}
-  inline MX msym(const std::string& name, const Sparsity& sp){ return MX::sym(name,sp);}
-  inline MX msym(const Matrix<double>& x){ return MX(x);}
-  inline bool isVector(const MX& ex){ return ex.isVector();}
-  inline bool isDense(const MX& ex){ return ex.isDense();}  
-//@}
-#endif
-
   /** \brief  concatenate vertically
   *
   *  horzcat(horzsplit(x,...)) = x
@@ -252,12 +235,6 @@ namespace CasADi{
       Create a sparse matrix from a dense matrix A, with sparsity pattern sp
   **/
   //MX clip(const MX& A, const Sparsity& sp);
-
-  /** \brief  Make the matrix dense if not already*/
-  void makeDense(MX& x);
-
-  /** \brief  Make the matrix dense if not already */
-  MX densify(const MX& x);
   
 #ifndef SWIGOCTAVE
   /** \brief  Make the matrix dense if not already */
@@ -429,6 +406,27 @@ namespace CasADi{
   *
   */
   MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+
+#ifndef WITHOUT_PRE_1_9_X
+/** \brief [DEPRECATED]
+*/
+//@{
+  inline MX msym(const std::string& name, int nrow=1, int ncol=1){ return MX::sym(name,nrow,ncol); }
+  inline MX msym(const std::string& name, const std::pair<int,int> & rc){ return MX::sym(name,rc);}
+  inline std::vector<MX> msym(const std::string& name, const Sparsity& sp, int p){ return MX::sym(name,sp,p);}
+  inline std::vector<MX> msym(const std::string& name, int nrow, int ncol, int p){ return MX::sym(name,nrow,ncol,p);}
+  inline std::vector<std::vector<MX> > msym(const std::string& name, const Sparsity& sp, int p, int r){ return MX::sym(name,sp,p,r);}
+  inline std::vector<std::vector<MX> > msym(const std::string& name, int nrow, int ncol, int p, int r){ return MX::sym(name,nrow,ncol,p,r);}
+  inline MX msym(const std::string& name, const Sparsity& sp){ return MX::sym(name,sp);}
+  inline MX msym(const Matrix<double>& x){ return MX(x);}
+  inline bool isVector(const MX& ex){ return ex.isVector();}
+  inline bool isDense(const MX& ex){ return ex.isDense();}  
+  inline void makeDense(MX& x){ return x.densify();}
+  inline MX densify(const MX& x){ MX ret(x); ret.densify(); return ret;}
+//@}
+#endif
+
+
 
 } // namespace CasADi
 

@@ -365,22 +365,10 @@ namespace CasADi{
      }
   */
 
-  MX densify(const MX& x){
+  MX full(const MX& x){
     MX ret = x;
-    makeDense(ret);
+    ret.densify();
     return ret;
-  }
-
-  MX full(const MX& x) {
-    return densify(x);
-  }
-
-  void makeDense(MX& x){
-    // Quick return if already dense
-    if(x.isDense()) return;
-  
-    // Densify
-    x = x.setSparse(sp_dense(x.size1(),x.size2()));
   }
 
   MX createParent(std::vector<MX> &deps) {

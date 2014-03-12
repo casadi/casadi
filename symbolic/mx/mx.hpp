@@ -438,8 +438,8 @@ namespace CasADi{
     /** \brief Set sparse */
     MX setSparse(const Sparsity& sp, bool intersect=false) const;
 
-    /** \brief Make dense */
-    MX makeDense(const MX& val = 0) const;
+    /// Make the matrix dense
+    void densify(const MX& val = 0);
 
     /// Lift an expression
     void lift(const MX& x_guess);
