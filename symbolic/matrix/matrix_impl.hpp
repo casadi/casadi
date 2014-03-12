@@ -380,7 +380,7 @@ namespace CasADi{
   }
 
   template<class T>
-  void Matrix<T>::full(const T& val){
+  void Matrix<T>::densify(const T& val){
     // Quick return if possible
     if(isDense()) return;
 
@@ -728,7 +728,7 @@ namespace CasADi{
       T fcn_0;
       casadi_math<T>::fun(op,0,0,fcn_0);
       if(!casadi_limits<T>::isZero(fcn_0)){ // Remove this if?
-        ret.full(fcn_0);
+        ret.densify(fcn_0);
       }
     }
     
@@ -1631,7 +1631,7 @@ namespace CasADi{
       T fcn_0;
       casadi_math<T>::fun(op,x_val,casadi_limits<T>::zero,fcn_0);
       if(!casadi_limits<T>::isZero(fcn_0)){ // Remove this if?
-        ret.full(fcn_0);
+        ret.densify(fcn_0);
       }
     }
     
@@ -1660,7 +1660,7 @@ namespace CasADi{
       T fcn_0;
       casadi_math<T>::fun(op,casadi_limits<T>::zero,y_val,fcn_0);
       if(!casadi_limits<T>::isZero(fcn_0)){ // Remove this if?
-        ret.full(fcn_0);
+        ret.densify(fcn_0);
       }
     }
     
@@ -1709,7 +1709,7 @@ namespace CasADi{
       // Get the value for the structural zeros
       T fcn_0;
       casadi_math<T>::fun(op,casadi_limits<T>::zero,casadi_limits<T>::zero,fcn_0);
-      r.full(fcn_0);
+      r.densify(fcn_0);
     }
   
     return r;

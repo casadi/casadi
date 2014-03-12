@@ -427,7 +427,7 @@ namespace CasADi{
   /** \brief [DEPRECATED] Replaced A.full() and full(A)
    */
   //@{
-  template<class T>  void makeDense(Matrix<T>& A){ A.full();}
+  template<class T>  void makeDense(Matrix<T>& A){ A.densify();}
   template<class T>  Matrix<T> densify(const Matrix<T>& A){ return full(A);}  
   //@}
 #endif
@@ -1302,7 +1302,7 @@ namespace CasADi{
   template<class T>
   Matrix<T> full(const Matrix<T>& A){    
     Matrix<T> ret = A;
-    ret.full();
+    ret.densify();
     return ret;
   }
 

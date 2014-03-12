@@ -367,7 +367,7 @@ namespace CasADi{
       return MX::create(new Constant<Value>(sp,v_));
     } else if (sp.isDense()) {
       DMatrix v = getMatrixValue();
-      v.full();
+      v.densify();
       return v;
     } else {
       return MXNode::getSetSparse(sp);

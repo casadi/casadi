@@ -419,7 +419,9 @@ namespace CasADi{
     void setAll(const T& val);
 
     /// Make the matrix dense
-    void full(const T& val = 0);
+    void densify(const T& val = 0);
+
+    
 
     Matrix<T> operator+() const;
     Matrix<T> operator-() const;

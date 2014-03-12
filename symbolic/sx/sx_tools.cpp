@@ -606,7 +606,7 @@ namespace CasADi{
 
   void fill(SX& mat, const SXElement& val){
     if(val->isZero())    mat = SX::sparse(mat.shape());
-    else                 mat.full(val);
+    else                 mat.densify(val);
   }
 
   SX taylor(const SX& ex,const SX& x, const SX& a, int order) {
