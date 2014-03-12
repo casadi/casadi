@@ -624,7 +624,7 @@ namespace CasADi{
   }
 
   MX MX::outer_prod(const MX& y) const{
-    return mul(trans(y));
+    return mul(y.T());
   }
 
   MX MX::__pow__(const MX& n) const{
@@ -1002,5 +1002,15 @@ namespace CasADi{
       casadi_error("Cannot check regularity for symbolic MX");
     }
   }
+
+  MX MX::trans() const{
+    // Quick return if null or scalar
+    if(isNull() || isScalar()){
+      return *this;
+    } else {
+      return (*this)->getTranspose();
+    }
+  }
+
           
 } // namespace CasADi

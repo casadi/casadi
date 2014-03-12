@@ -187,11 +187,7 @@ namespace CasADi{
   }
 
   MX trans(const MX &x){
-    // Quick return if null or scalar
-    if(x.isNull() || x.numel()==1)
-      return x;
-    else
-      return x->getTranspose();
+    return x.T();
   }
 
   MX reshape(const MX &x, std::pair<int,int> rc){
