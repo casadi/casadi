@@ -65,11 +65,7 @@ subroutine snopt_geti (buffer, lenbuffer, ivalue, Errors, cw, lencw, iw, leniw, 
     p = transfer(LOC(buffer(1)),p)
     call C_F_POINTER(p,str)
     
-    write (*,*) "Options"
-    write (*,*) str
     call snGeti(str, ivalue, Errors, cw, lencw, iw, leniw, rw, lenrw)
-    write (*,*) ivalue
-    
 end subroutine
 
 subroutine snopt_getr (buffer, lenbuffer, rvalue, Errors, cw, lencw, iw, leniw, rw, lenrw) bind (c)
