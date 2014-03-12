@@ -289,10 +289,6 @@ namespace CasADi{
   template<class T>
   Matrix<T> kron(const Matrix<T>& a, const Matrix<T>& b);
 
-  template<class T>
-  int nnz_sym(const Matrix<T>& ex);
-
-
   /** \brief  Frobenius norm  */
   template<class T>
   Matrix<T> norm_F(const Matrix<T> &x);
@@ -1039,20 +1035,6 @@ namespace CasADi{
   }
 
   template<class T>
-  int nnz_sym(const Matrix<T>& ex) {
-    int nz = 0; // number of non-zeros  
-    for(int col=0; col<ex.size2(); ++col)
-      {
-        // Loop over the elements in the col
-        for(int el=ex.colind(col); el<ex.colind(col+1); ++el){ // loop over the non-zero elements
-          if(ex.row(el) > col) break; // break inner loop (only lower triangular part is used)
-          nz++;
-        }
-      }
-    return nz;
-  }
-
-  template<class T>
   Matrix<T> repmat(const Matrix<T> &A, int n, int m){
     // First concatenate horizontally
     Matrix<T> col = horzcat(std::vector<Matrix<T> >(m, A));
@@ -1303,7 +1285,6 @@ namespace CasADi{
   MTT_INST(T,isMinusOne)                        \
   MTT_INST(T,isIdentity)                        \
   MTT_INST(T,nnz)                               \
-  MTT_INST(T,nnz_sym)                           \
   MTT_INST(T,isEqual)                           \
   MTT_INST(T,repmat)                            \
   MTT_INST(T,getSparseTriplet)                  \
