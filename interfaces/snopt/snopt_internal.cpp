@@ -40,14 +40,18 @@ namespace CasADi{
     addOption("detect_linear",OT_BOOLEAN, true, "Make an effort to treat linear constraints and linear variables specially.");
     
     // Monitors
-    addOption("monitor",                  OT_STRINGVECTOR, GenericType(),  "", "eval_nlp|setup_nlp", true);
+    addOption("monitor", OT_STRINGVECTOR, GenericType(),  "", "eval_nlp|setup_nlp", true);
     
+    addOption("_start",  OT_STRING, "Cold",  "", "Cold|Warm");
+    addOption("_iprint",  OT_INTEGER, 0);
+    addOption("_isumm",   OT_INTEGER, 6);
+
     // Snopt options
 //    optionsmap_["_major_print_level"]     = std::pair<opt_type,std::string>(OT_INTEGER,"Major print level");
 //    optionsmap_["_minor_print_level"]     = std::pair<opt_type,std::string>(OT_INTEGER,"Minor print level");
     optionsmap_["_verify_level"]          = std::pair<opt_type,std::string>(OT_INTEGER,"Verify level");
-    optionsmap_["_iteration_limit"]       = std::pair<opt_type,std::string>(OT_INTEGER,"Iteration limit");
-
+    optionsmap_["_major_iteration_limit"] = std::pair<opt_type,std::string>(OT_INTEGER,"Major iteration limit");
+    optionsmap_["_minor_iteration_limit"] = std::pair<opt_type,std::string>(OT_INTEGER,"Minor iteration limit");
     optionsmap_["_feasibility_tolerance"] = std::pair<opt_type,std::string>(OT_REAL,   "Feasibility tolerance");
     optionsmap_["_optimality_tolerance"]  = std::pair<opt_type,std::string>(OT_REAL,   "Optimality tolerance");
     
@@ -320,8 +324,8 @@ namespace CasADi{
     ilen = miniw;
     rlen = minrw;
 
-    iPrint = 9;
-    iSumm = 6;
+    iPrint = getOption("_iprint");
+    iSumm = getOption("_isumm");;
     snopt_init(&iPrint,&iSumm,getPtr(snopt_cw_),&mincw,getPtr(snopt_iw_),&miniw,getPtr(snopt_rw_),&minrw);
     
     for (OptionsMap::const_iterator it=optionsmap_.begin();it!=optionsmap_.end();it++) {
@@ -416,7 +420,7 @@ namespace CasADi{
     if (inputs_check_) checkInputs();
     checkInitialBounds();
     
-    std::string start = "Cold";
+    std::string start = getOption("_start");
     int lenstart = start.size();
     
     // Evaluate gradF and jacG at initial value
