@@ -198,34 +198,10 @@ namespace CasADi{
   /** \brief  Unite two matrices no overlapping sparsity */
   MX unite(const MX& A, const MX& B);
 
-  /** \brief  check if symbolic */
-  bool isSymbolic(const MX& ex);
-
-  /** \brief  check if all nonzeros are symbolic (this function is currently identical to isSymbolic) */
-  bool isSymbolicSparse(const MX& ex);
-
-  /** \brief  check if identity */
-  bool isIdentity(const MX& ex);
-
-  /** \brief  check if zero (note that false negative answers are possible) */
-  bool isZero(const MX& ex);
-
-  /** \brief  check if zero (note that false negative answers are possible) */
-  bool isOne(const MX& ex);
-
   /** \brief  Simplify an expression */
   void simplify(MX& ex);
 
-  /** \brief  Is the expression a transpose? */
-  bool isTranspose(const MX& ex);
-
-  /** \brief  check if zero (note that false negative answers are possible) */
-  bool isMinusOne(const MX& ex);
-
-  
-  /// Checks if expression does not contain NaN or Inf
-  bool isRegular(const MX& ex);
-
+  /** \brief Matrix trace */
   MX trace(const MX& A);
 
   /** \brief Repeat matrix A n times vertically and m times horizontally */
@@ -287,12 +263,6 @@ namespace CasADi{
 
   /** \brief  Evaluate a polynomial with coefficeints p in x */
   MX polyval(const MX& p, const MX& x);
-
-  /** \brief  Check if two expressions are equal
-   *  Might very well give false negatives
-   *  Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
-   */
-  bool isEqual(const MX& ex1,const MX &ex2);
 
   /** \brief Get a string representation for a binary MX, using custom arguments */
   std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args);
@@ -423,6 +393,15 @@ namespace CasADi{
   inline bool isDense(const MX& ex){ return ex.isDense();}  
   inline void makeDense(MX& x){ return x.densify();}
   inline MX densify(const MX& x){ MX ret(x); ret.densify(); return ret;}
+  inline bool isSymbolic(const MX& ex){ return ex.isSymbolic();}
+  inline bool isSymbolicSparse(const MX& ex){ return ex.isSymbolicSparse();}
+  inline bool isIdentity(const MX& ex){ return ex.isIdentity();}
+  inline bool isZero(const MX& ex){ return ex.isZero();}
+  inline bool isOne(const MX& ex){ return ex.isOne();}
+  inline bool isMinusOne(const MX& ex){ return ex.isMinusOne();}
+  inline bool isTranspose(const MX& ex){ return ex.isTranspose();}
+  inline bool isRegular(const MX& ex){ return ex.isRegular();}
+  bool isEqual(const MX& ex1,const MX &ex2);
 //@}
 #endif
 

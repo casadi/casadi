@@ -172,27 +172,6 @@ namespace CasADi{
     return ret;
   }
 
-
-  bool isZero(const MX& ex){
-    if(ex.size()==0){
-      return true;
-    } else {
-      return ex->isZero();
-    }
-  }
-
-  bool isOne(const MX& ex){
-    return !ex.isNull() && ex->isOne();
-  }
-
-  bool isMinusOne(const MX& ex){
-    return !ex.isNull() && ex->isValue(-1);
-  }
-
-  bool isIdentity(const MX& ex){
-    return !ex.isNull() && ex->isIdentity();
-  }
-
   MX inner_prod(const MX &x, const MX &y){
     return x.inner_prod(y);
   }
@@ -204,14 +183,6 @@ namespace CasADi{
   void simplify(MX& ex){
     if(!ex.isNull()){
       ex->simplifyMe(ex);
-    }
-  }
-
-  bool isTranspose(const MX& ex){
-    if(ex.isNull()){
-      return false;
-    } else {
-      return ex->getOp()==OP_TRANSPOSE;
     }
   }
 
@@ -290,28 +261,6 @@ namespace CasADi{
     ret = A->getSetNonzeros(ret,nzA);
     ret = B->getSetNonzeros(ret,nzB);
     return ret;
-  }
-
-  bool isSymbolic(const MX& ex){
-    if (ex.isNull())
-      return false;
-    return ex->getOp()==OP_PARAMETER;
-  }
-
-  bool isSymbolicSparse(const MX& ex){
-    if(ex.isNull()){
-      return false;
-    } else if(ex.getOp()==OP_HORZCAT){
-      // Check if the expression is a horzcat where all components are symbolic primitives
-      for(int d=0; d<ex->ndep(); ++d){
-        if(!ex->dep(d).isSymbolic()){
-          return false;
-        }
-      }
-      return true;
-    } else {
-      return isSymbolic(ex);
-    }
   }
 
   MX trace(const MX& A){
@@ -904,15 +853,7 @@ namespace CasADi{
   MX inv(const MX& A){
     return A->getInverse();
   }
-  
-  bool isRegular(const MX& ex) {
-    if (ex.isConstant()) {
-      return isRegular(ex.getMatrixValue());
-    } else {
-      casadi_error("Cannot check regularity for symbolic MX");
-    }
-  }
-  
+    
   std::vector<MX> getSymbols(const MX& e) {
     MXFunction f(std::vector<MX>(),e);
     f.init();

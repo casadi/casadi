@@ -951,5 +951,56 @@ namespace CasADi{
     return MX::create(new SymbolicMX(name,sp));
   }
 
+  bool MX::isSymbolicSparse() const{
+    if(isNull()){
+      return false;
+    } else if(getOp()==OP_HORZCAT){
+      // Check if the expression is a horzcat where all components are symbolic primitives
+      for(int d=0; d<getNdeps(); ++d){
+        if(!getDep(d).isSymbolic()){
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return isSymbolic();
+    }
+  }
+
+  bool MX::isIdentity() const{
+    return !isNull() && (*this)->isIdentity();
+  }
+
+  bool MX::isZero() const{
+    if(size()==0){
+      return true;
+    } else {
+      return (*this)->isZero();
+    }
+  }
+
+  bool MX::isOne() const{
+    return !isNull() && (*this)->isOne();
+  }
+
+  bool MX::isMinusOne() const{
+    return !isNull() && (*this)->isValue(-1);
+  }
+
+  bool MX::isTranspose() const{
+    if(isNull()){
+      return false;
+    } else {
+      return getOp()==OP_TRANSPOSE;
+    }
+  }
+
+  bool MX::isRegular() const{
+    if (isConstant()) {
+      return CasADi::isRegular(getMatrixValue());
+    } else {
+      casadi_error("Cannot check regularity for symbolic MX");
+    }
+  }
           
 } // namespace CasADi

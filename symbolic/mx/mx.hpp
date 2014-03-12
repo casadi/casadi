@@ -268,6 +268,27 @@ namespace CasADi{
     
     /// Check if norm
     bool isNorm () const;
+
+    /** \brief  check if all nonzeros are symbolic (this function is currently identical to isSymbolic) */
+    bool isSymbolicSparse() const;
+
+    /** \brief  check if identity */
+    bool isIdentity() const;
+
+    /** \brief  check if zero (note that false negative answers are possible) */
+    bool isZero() const;
+
+    /** \brief  check if zero (note that false negative answers are possible) */
+    bool isOne() const;
+
+    /** \brief  check if zero (note that false negative answers are possible) */
+    bool isMinusOne() const;
+
+    /** \brief  Is the expression a transpose? */
+    bool isTranspose() const;
+  
+    /// Checks if expression does not contain NaN or Inf
+    bool isRegular() const;
   
     /// Get function
     FX getFunction();
