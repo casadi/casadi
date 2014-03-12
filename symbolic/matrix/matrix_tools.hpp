@@ -34,7 +34,7 @@ namespace CasADi{
 
   /// Transpose of a matrix
   template<typename DataType>
-  Matrix<DataType> trans(const Matrix<DataType> &x);
+  Matrix<DataType> transpose(const Matrix<DataType> &x);
 
   /** \brief  Matrix product of two matrices
    *
@@ -401,6 +401,7 @@ namespace CasADi{
   template<typename DataType> bool isEqual(const Matrix<DataType>& ex1,const Matrix<DataType> &ex2){ return ex1.isEqual(ex2);}
   template<typename DataType> int nnz(const Matrix<DataType>& ex) { return ex.size();}
   template<typename DataType> bool hasNonStructuralZeros(const Matrix<DataType>& A){ return A.hasNonStructuralZeros();}
+  template<typename DataType>  Matrix<DataType> trans(const Matrix<DataType> &x){ return transpose(x);}
  //@}
 #endif
 
@@ -415,8 +416,8 @@ namespace CasADi{
   // Implementations
 
   template<typename DataType>
-  Matrix<DataType> trans(const Matrix<DataType> &x){
-    return x.trans();
+  Matrix<DataType> transpose(const Matrix<DataType> &x){
+    return x.T();
   }
 
   template<typename DataType>
@@ -461,7 +462,7 @@ namespace CasADi{
     if (!row_count.isDense()) return 0;
 
     // Have a count of the nonzeros for each col
-    Matrix<int> col_count = trans(sumRows(sp));
+    Matrix<int> col_count = sumRows(sp).T();
   
     // A blank col? determinant is structurally zero
     if (!row_count.isDense()) return 0;
@@ -556,7 +557,7 @@ namespace CasADi{
           C(j,i) = temp;
       }
   
-    return trans(C);
+    return C.T();
   }
 
   template<typename DataType>
@@ -680,15 +681,15 @@ namespace CasADi{
   Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v){
     Matrix<DataType> ret;
     for(int i=0; i<v.size(); ++i)
-      ret.appendColumns(trans(v[i]));
-    return trans(ret);  
+      ret.appendColumns(v[i].T());
+    return ret.T();  
   }
 
   template<typename DataType>
   std::vector< Matrix<DataType> > vertsplit(const Matrix<DataType>& x, const std::vector<int>& offset){
-    std::vector< Matrix<DataType> > ret = horzsplit(trans(x),offset);
-    Matrix<DataType> (*transT)(const Matrix<DataType>& x) = trans;
-    std::transform(ret.begin(),ret.end(),ret.begin(),transT);
+    std::vector< Matrix<DataType> > ret = horzsplit(x.T(),offset);
+    Matrix<DataType> (*transposeT)(const Matrix<DataType>& x) = transpose;
+    std::transform(ret.begin(),ret.end(),ret.begin(),transposeT);
     return ret;
   }
   
@@ -724,7 +725,7 @@ namespace CasADi{
 
   template<typename DataType>
   Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y){
-    return trans(horzcat(trans(x),trans(y)));
+    return horzcat(x.T(),y.T()).T();
   }
   
   template<typename DataType>
@@ -747,7 +748,7 @@ namespace CasADi{
 
   template<typename DataType>
   Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y){
-    return mul(x,trans(y));  
+    return mul(x,y.T());  
   }
 
   template<typename DataType>
@@ -843,7 +844,7 @@ namespace CasADi{
         // Get the j-th column of Q
         Matrix<DataType> qj = Q(ALL,j);
 
-        ri(j,0) = mul(trans(qi),qj); // Modified Gram-Schmidt
+        ri(j,0) = mul(qi.T(),qj); // Modified Gram-Schmidt
         // ri[j] = inner_prod(qj,ai); // Classical Gram-Schmidt
      
         // Remove projection in direction j
@@ -889,13 +890,13 @@ namespace CasADi{
       u(Slice(0),Slice(1,m-i))*= 1/(x0-b);
       beta = 1-x0/b;
       
-      X(Slice(i,n),Slice(i,m))-= beta*mul(mul(X(Slice(i,n),Slice(i,m)),trans(u)),u);
+      X(Slice(i,n),Slice(i,m))-= beta*mul(mul(X(Slice(i,n),Slice(i,m)),u.T()),u);
       us.push_back(u);
       betas.push_back(beta);
     }
     
     for (int i=n-1;i>=0;--i) {
-      seed(Slice(i,m),Slice(0,m-n)) -= betas[i]*mul(trans(us[i]),mul(us[i],seed(Slice(i,m),Slice(0,m-n))));
+      seed(Slice(i,m),Slice(0,m-n)) -= betas[i]*mul(us[i].T(),mul(us[i],seed(Slice(i,m),Slice(0,m-n))));
     }
     
     return seed;
@@ -982,7 +983,7 @@ namespace CasADi{
         qr(Aperm,Q,R);
 
         // Solve the factorized system (note that solve will now be fast since it is triangular)
-        xperm = solve(R,mul(trans(Q),bperm));
+        xperm = solve(R,mul(Q.T(),bperm));
       }
 
       // get the inverted column permutation
@@ -999,9 +1000,9 @@ namespace CasADi{
   template<typename DataType>
   Matrix<DataType> pinv(const Matrix<DataType>& A) {
     if (A.size2()>=A.size1()) {
-      return trans(solve(mul(A,trans(A)),A));
+      return solve(mul(A,A.T()),A).T();
     } else {
-      return solve(mul(trans(A),A),trans(A));
+      return solve(mul(A.T(),A),A.T());
     }
   }
   
@@ -1208,6 +1209,7 @@ namespace CasADi{
 // Define template instanciations
 #define MATRIX_TOOLS_TEMPLATES_COMMON(DataType)        \
   MTT_INST(DataType,trans)                             \
+  MTT_INST(DataType,transpose)                         \
   MTT_INST(DataType,mul)                               \
   MTT_INST(DataType,isConstant)                        \
   MTT_INST(DataType,isDense)                           \
