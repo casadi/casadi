@@ -55,19 +55,11 @@ namespace CasADi{
   inline Sparsity sp_compress(const std::vector<int>& v){ return Sparsity::compressed(v);}
 #ifndef SWIG
   inline Sparsity sp_compress(const int* v){ return Sparsity::compressed(v);}
-#endif // SWIG  
+#endif // SWIG
+  inline std::vector<int> getNZDense(const Sparsity& sp){ return sp.getElements();}
   //@}
 #endif  
-  
-  /** \brief Get the indices of all non-zero elements as they would appear in a Dense matrix  
-      A : DenseMatrix  4 x 3
-      B : SparseMatrix 4 x 3 , 5 structural non-zeros
-      
-      k = getNZDense(A)
-      A[k] will contain the elements of A that are non-zero in B         
-  */
-  std::vector<int> getNZDense(const Sparsity& sp);
-  
+    
   /** \ brief Reshape the sparsity pattern keeping the relative location of the nonzeros
    */
   Sparsity reshape(const Sparsity& a, int nrow, int ncol);

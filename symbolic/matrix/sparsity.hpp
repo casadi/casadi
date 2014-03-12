@@ -540,7 +540,14 @@ namespace CasADi{
 #else // SWIG
     int dulmageMendelsohn(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, int seed=0) const;
 #endif // SWIG
-    /// Get the location of all nonzero elements
+
+    /** \brief Get the location of all non-zero elements as they would appear in a Dense matrix  
+        A : DenseMatrix  4 x 3
+        B : SparseMatrix 4 x 3 , 5 structural non-zeros
+      
+        k = A.getElements()
+        A[k] will contain the elements of A that are non-zero in B         
+    */
     std::vector<int> getElements(bool col_major=true) const;
     
     /// Get the location of all nonzero elements (inplace version)

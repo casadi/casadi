@@ -30,17 +30,6 @@ using namespace std;
 
 namespace CasADi{
   
-  std::vector<int> getNZDense(const Sparsity &sp) {
-    std::vector<int> ret(sp.size());
-    std::vector<int> col = sp.getCol();
-    const std::vector<int> &row = sp.row();
-    int s2 = sp.size1();
-    for(int k=0;k<sp.size();k++) {
-      ret[k] = row[k]+col[k]*s2;
-    }
-    return ret;
-  }
-
   Sparsity reshape(const Sparsity& a, int nrow, int ncol){
     return a.reshape(nrow,ncol);
   }
