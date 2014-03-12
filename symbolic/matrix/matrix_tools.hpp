@@ -428,7 +428,8 @@ namespace CasADi{
    */
   //@{
   template<class T>  void makeDense(Matrix<T>& A){ A.densify();}
-  template<class T>  Matrix<T> densify(const Matrix<T>& A){ return full(A);}  
+  template<class T>  Matrix<T> densify(const Matrix<T>& A){ return full(A);}
+  template<class T>  void makeSparse(Matrix<T>& A, double tol=0){ A.sparsify(tol);}  
   //@}
 #endif
 
@@ -436,13 +437,7 @@ namespace CasADi{
   /** \brief  Make a matrix dense */
   template<class T>
   Matrix<T> full(const Matrix<T>& A);
-#endif // SWIGOCTAVE
 
-  /** \brief  Make a matrix sparse by removing numerical zeros */
-  template<class T>
-  void makeSparse(Matrix<T>& A, double tol=0);
-
-#ifndef SWIGOCTAVE
   /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<class T>
   Matrix<T> sparse(const Matrix<T>& A, double tol=0);
@@ -1066,7 +1061,7 @@ namespace CasADi{
 
       // If there are structurally nonzero entries that are known to be zero, remove these and rerun the algorithm
       Matrix<T> A_sparse = A;
-      makeSparse(A_sparse);
+      A_sparse.sparsify();
       return solve(A_sparse,b);
 
     } else {
@@ -1307,42 +1302,9 @@ namespace CasADi{
   }
 
   template<class T>
-  void makeSparse(Matrix<T>& A, double tol){
-    // Quick return if there are no structurally zero entries
-    if(!hasNonStructuralZeros(A) && tol==0)
-      return;
-  
-    // Start with a matrix with no cols
-    Matrix<T> Asp = Matrix<T>::sparse(A.size1(),0);
-
-    // Loop over the cols
-    for(int i=0; i<A.size2(); ++i){
-      // Resize the matrix to accomodate the col
-      Asp.resize(A.size1(),i+1);
-    
-      // Loop over the existing, possible nonzeros
-      for(int el=A.colind(i); el<A.colind(i+1); ++el){
-      
-        // If it is not known to be a zero
-        if(!casadi_limits<T>::isAlmostZero(A.at(el),tol)){
-        
-          // Get the row
-          int j=A.row(el);
-      
-          // Save to new, sparse matrix
-          Asp(j,i) = A.at(el);
-        }
-      }
-    }
-  
-    // Save to A
-    A = Asp;
-  }
-
-  template<class T>
   Matrix<T> sparse(const Matrix<T>& A, double tol){
     Matrix<T> ret(A);
-    makeSparse(ret,tol);
+    ret.sparsify(tol);
     return ret;
   }
 

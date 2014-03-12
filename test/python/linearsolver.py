@@ -388,7 +388,7 @@ class LinearSolverTests(casadiTestCase):
 
   def test_simple_solve_node_sparseA(self):
     A_ = DMatrix([[3,0],[7,2]])
-    makeSparse(A_)
+    A_ = sparse(A_)
     A = MX.sym("A",A_.sparsity())
     print A.size(), A_.size()
     b_ = DMatrix([1,0.5])
@@ -432,7 +432,7 @@ class LinearSolverTests(casadiTestCase):
     A_ = DMatrix([[3,1],[7,2]])
     A = MX.sym("A",A_.sparsity())
     b_ = DMatrix([1,0])
-    makeSparse(b_)
+    b_ = sparse(b_)
     b = MX.sym("b",b_.sparsity())
     for Solver, options in lsolvers:
       print Solver

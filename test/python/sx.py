@@ -1050,7 +1050,7 @@ class SXtests(casadiTestCase):
     x[2,0] = 0
     x[1,0] = 0
 
-    makeSparse(x)
+    x = sparse(x)
 
     e = eig_symbolic(x)
     
@@ -1067,7 +1067,7 @@ class SXtests(casadiTestCase):
     x[1,0] = 0
     x[2,1] = 0
     
-    makeSparse(x)
+    x = sparse(x)
 
     e = eig_symbolic(x)
     

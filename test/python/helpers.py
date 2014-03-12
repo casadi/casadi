@@ -112,7 +112,7 @@ class casadiTestCase(unittest.TestCase):
     if sparsity < 1:
       spp = self.randDMatrix(n,m,sparsity=1,valuegenerator=lambda : random.uniform(0,1) ,symm=symm)
       spm = (spp < sparsity)
-      makeSparse(spm)
+      spm = sparse(spm)
       ret = DMatrix(spm.sparsity(),[valuegenerator() for i in range(spm.size())])
       if symm:
         return (ret + ret.T)/2

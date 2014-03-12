@@ -421,7 +421,8 @@ namespace CasADi{
     /// Make the matrix dense
     void densify(const T& val = 0);
 
-    
+    /** \brief  Make a matrix sparse by removing numerical zeros smaller in absolute value than a specified tolerance */
+    void sparsify(double tol=0);
 
     Matrix<T> operator+() const;
     Matrix<T> operator-() const;

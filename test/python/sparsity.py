@@ -537,8 +537,7 @@ class Sparsitytests(casadiTestCase):
     
       d = IMatrix(sp,1)
       
-      dt = 1-d
-      makeSparse(dt)
+      dt = sparse(1-d)
       dt = IMatrix(dt.sparsity(),1)
       
       trial = IMatrix(sp.patternInverse(),1)

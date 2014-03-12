@@ -142,7 +142,7 @@ namespace CasADi{
     L_ = cs_chol(&AT_, S_) ;                 // numeric Cholesky factorization 
     if(L_==0){
       DMatrix temp = input();
-      makeSparse(temp);
+      temp.sparsify();
       if (isSingular(temp.sparsity())) {
         stringstream ss;
         ss << "CSparseCholeskyInternal::prepare: factorization failed due to matrix being singular. Matrix contains numerical zeros which are structurally non-zero. Promoting these zeros to be structural zeros, the matrix was found to be structurally rank deficient. sprank: " << rank(temp.sparsity()) << " <-> " << temp.size2() << endl;

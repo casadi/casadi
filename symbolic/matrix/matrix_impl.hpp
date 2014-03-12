@@ -409,6 +409,48 @@ namespace CasADi{
   }
 
   template<class T>
+  void Matrix<T>::sparsify(double tol){
+    // Quick return if there are no entries to be removed
+    bool remove_nothing = true;
+    for(typename std::vector<T>::iterator it=begin(); it!=end() && remove_nothing; ++it){
+      remove_nothing = !casadi_limits<T>::isAlmostZero(*it,tol);
+    }
+    if(remove_nothing) return;
+
+    // Get the current sparsity pattern
+    int size1 = this->size1();
+    int size2 = this->size2();
+    const std::vector<int>& colind = this->colind();
+    const std::vector<int>& row = this->row();
+
+    // Construct the new sparsity pattern
+    std::vector<int> new_colind(1,0), new_row;
+
+    // Loop over the columns
+    for(int cc=0; cc<size2; ++cc){
+      // Loop over existing nonzeros
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
+        // If it is not known to be a zero
+        if(!casadi_limits<T>::isAlmostZero(data_[el],tol)){
+          // Save the nonzero in its new location
+          data_[new_row.size()] = data_[el];
+
+          // Add to pattern
+          new_row.push_back(row[el]);
+        }
+      }
+      // Save the new column offset
+      new_colind.push_back(new_row.size());
+    }
+    
+    // Trim the data vector
+    data_.resize(new_row.size());
+    
+    // Update the sparsity pattern
+    sparsity_ = Sparsity(size1,size2,new_colind,new_row);
+  }
+
+  template<class T>
   Matrix<T>::Matrix() : sparsity_(Sparsity(0,0,false)){
   }
 
