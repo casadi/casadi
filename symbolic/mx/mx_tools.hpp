@@ -127,7 +127,7 @@ namespace CasADi{
   MX norm_inf(const MX &x);
 
   /** \brief Transpose an expression */
-  MX trans(const MX &x);
+  MX transpose(const MX &x);
 
   /** \brief  Take the matrix product of 2 MX objects
   *
@@ -402,6 +402,7 @@ namespace CasADi{
   inline bool isTranspose(const MX& ex){ return ex.isTranspose();}
   inline bool isRegular(const MX& ex){ return ex.isRegular();}
   bool isEqual(const MX& ex1,const MX &ex2);
+  inline MX trans(const MX &x){ return transpose(x);}
 //@}
 #endif
 

@@ -186,7 +186,7 @@ namespace CasADi{
     }
   }
 
-  MX trans(const MX &x){
+  MX transpose(const MX &x){
     return x.T();
   }
 
