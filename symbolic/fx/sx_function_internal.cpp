@@ -158,7 +158,7 @@ namespace CasADi{
   SX SXFunctionInternal::hess(int iind, int oind){
     casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
     SX g = grad(iind,oind);
-    makeDense(g);
+    g.full();
     if(verbose())  cout << "SXFunctionInternal::hess: calculating gradient done " << endl;
 
     // Create function

@@ -544,8 +544,8 @@ class Matrixtests(casadiTestCase):
     
     I_ = DMatrix(inv(x).sparsity(),1)
     
-    makeDense(s_)
-    makeDense(I_)
+    s_ = full(s_)
+    T_ = full(I_)
     # An irreducible matrix does not have to be dense per se
     self.checkarray(s_,I_,"inv")
 

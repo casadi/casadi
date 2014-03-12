@@ -427,14 +427,10 @@ namespace CasADi{
   /** \brief [DEPRECATED] Replaced A.full() and full(A)
    */
   //@{
-  template<class T>
-  void makeDense(Matrix<T>& A){ A.full();}
-
-  template<class T>
-  Matrix<T> densify(const Matrix<T>& A){ return full(A);}  
+  template<class T>  void makeDense(Matrix<T>& A){ A.full();}
+  template<class T>  Matrix<T> densify(const Matrix<T>& A){ return full(A);}  
   //@}
 #endif
-
 
 #ifndef SWIGOCTAVE
   /** \brief  Make a matrix dense */

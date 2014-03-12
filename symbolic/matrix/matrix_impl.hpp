@@ -441,12 +441,6 @@ namespace CasADi{
   }
 
   template<class T>
-  void Matrix<T>::makeEmpty(int nrow, int ncol){
-    sparsity_ = Sparsity(nrow,ncol,false);
-    data().clear();
-  }
-
-  template<class T>
   std::string Matrix<T>::className(){ return matrixName<T>(); }
 
   template<class T>
