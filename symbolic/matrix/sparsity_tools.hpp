@@ -51,6 +51,11 @@ namespace CasADi{
   inline std::vector<int> upperNZ(const Sparsity& a) { return a.upperNZ(); }
   inline std::vector<int> lowerNZ(const Sparsity& a) { return a.lowerNZ(); }
   inline bool isSingular(const Sparsity& a){ return a.isSingular();}
+  inline std::vector<int> sp_compress(const Sparsity& a){ return a.compress();}
+  inline Sparsity sp_compress(const std::vector<int>& v){ return Sparsity::compressed(v);}
+#ifndef SWIG
+  inline Sparsity sp_compress(const int* v){ return Sparsity::compressed(v);}
+#endif // SWIG  
   //@}
 #endif  
   
@@ -104,30 +109,9 @@ namespace CasADi{
   /** \brief Split up a sparsity pattern vertically */
   std::vector<Sparsity> vertsplit(const Sparsity& sp, const std::vector<int>& output_offset);
 
-  /** \brief Represent a sparsity pattern as an array of integers, the most compact way of representing a sparsity pattern
-      The format:
-      * The first two entries are the number of rows (nrow) and columns (ncol)
-      * The next ncol+1 entries are the col offsets (colind). Note that the last element, colind[ncol], gives the number of nonzeros
-      * The last colind[ncol] entries are the row indices
-      **/
-  /// @{
-  
-  /// Compress a sparsity pattern
-  std::vector<int> sp_compress(const Sparsity& a);
-  
-  /// Decompress a sparsity pattern
-  Sparsity sp_compress(const std::vector<int>& v);
-  
-#ifndef SWIG
-  /// Decompress a sparsity pattern (array version)
-  Sparsity sp_compress(const int* v);
-#endif // SWIG  
-
   /// Obtain the structural rank of a sparsity-pattern
   int rank(const Sparsity& a);
   
-  /// @}
-
 
 }
 

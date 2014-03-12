@@ -159,6 +159,19 @@ namespace CasADi{
     **/
     static Sparsity triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col);
 
+    /** Create from a single vector containing the pattern in compressed column storage format: 
+     * The format:
+     * The first two entries are the number of rows (nrow) and columns (ncol)
+     * The next ncol+1 entries are the column offsets (colind). Note that the last element, colind[ncol], gives the number of nonzeros
+     * The last colind[ncol] entries are the row indices
+     **/
+    //@{
+    static Sparsity compressed(const std::vector<int>& v);
+#ifndef SWIG
+    static Sparsity compressed(const int* v);
+#endif // SWIG  
+    //@}
+
     /** \brief Check if there is an identical copy of the sparsity pattern in the cache, and if so, make a shallow copy of that one */
     void reCache();
 
@@ -181,6 +194,9 @@ namespace CasADi{
     Sparsity getDiag(std::vector<int>& OUTPUT) const;
 #endif // SWIG
     
+    /// Compress a sparsity pattern
+    std::vector<int> compress() const;
+  
     /// @{
     /// Access a member function or object
     SparsityInternal* operator->();

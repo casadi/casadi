@@ -52,49 +52,7 @@ namespace CasADi{
   Sparsity mul(const  Sparsity& a, const  Sparsity &b) {
     return (mul(DMatrix(a,1),DMatrix(b,1))).sparsity();
   }
-  
-  std::vector<int> sp_compress(const Sparsity& a){
-    // Get the sparsity pattern
-    int nrow = a.size1();
-    int ncol = a.size2();
-    const vector<int>& colind = a.colind();
-    const vector<int>& row = a.row();
     
-    // Create compressed pattern
-    vector<int> ret;
-    ret.reserve(1 + 1 + colind.size() + row.size());
-    ret.push_back(nrow);
-    ret.push_back(ncol);
-    ret.insert(ret.end(),colind.begin(),colind.end());
-    ret.insert(ret.end(),row.begin(),row.end());
-    return ret;
-  }
-  
-  Sparsity sp_compress(const std::vector<int>& v){
-    // Check consistency
-    casadi_assert(v.size() >= 2);
-    //int nrow = v[0];
-    int ncol = v[1];
-    casadi_assert(v.size() >= 2 + ncol+1);
-    int nnz = v[2 + ncol];
-    casadi_assert(v.size() == 2 + ncol+1 + nnz);
-
-    // Call array version
-    return sp_compress(&v.front());
-  }
-  
-  Sparsity sp_compress(const int* v){
-    // Get sparsity pattern
-    int nrow = v[0];
-    int ncol = v[1];
-    const int *colind = v+2;
-    int nnz = colind[ncol];
-    const int *row = v + 2 + ncol+1;
-    
-    // Construct sparsity pattern
-    return Sparsity(nrow, ncol, vector<int>(colind,colind+ncol+1),vector<int>(row,row+nnz));
-  }
-  
   int rank(const Sparsity& a) {
     std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
     a.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
