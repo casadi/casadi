@@ -290,9 +290,6 @@ namespace CasADi{
   Matrix<T> kron(const Matrix<T>& a, const Matrix<T>& b);
 
   template<class T>
-  int nnz(const Matrix<T>& ex);
-
-  template<class T>
   int nnz_sym(const Matrix<T>& ex);
 
 
@@ -420,6 +417,7 @@ namespace CasADi{
   template<class T> bool isMinusOne(const Matrix<T>& ex){ return ex.isMinusOne();}
   template<class T> bool isIdentity(const Matrix<T>& ex){ return ex.isIdentity();}
   template<class T> bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2){ return ex1.isEqual(ex2);}
+  template<class T> int nnz(const Matrix<T>& ex) { return ex.size();}
  //@}
 #endif
 
@@ -1038,11 +1036,6 @@ namespace CasADi{
       }
     }
     return blockcat(blocks);
-  }
-
-  template<class T>
-  int nnz(const Matrix<T>& ex) {
-    return ex.size();
   }
 
   template<class T>
