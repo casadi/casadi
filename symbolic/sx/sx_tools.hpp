@@ -277,9 +277,6 @@ namespace CasADi{
   void getIntValue(const SX &ex, int *res); // integer version
   const std::string& getName(const SX &ex); // get the name (only for scalar variables)
 
-  /** \brief  Fill the matrix with the value val, make empty sparse if zero */
-  void fill(SX& mat, const SXElement& val);
-
   /** 
    * \brief univariate taylor series expansion
    *

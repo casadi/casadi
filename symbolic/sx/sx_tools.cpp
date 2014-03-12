@@ -604,11 +604,6 @@ namespace CasADi{
     ex = s.toScalar();
   }
 
-  void fill(SX& mat, const SXElement& val){
-    if(val->isZero())    mat = SX::sparse(mat.shape());
-    else                 mat.densify(val);
-  }
-
   SX taylor(const SX& ex,const SX& x, const SX& a, int order) {
     casadi_assert(x.isScalar() && a.isScalar());
     if (ex.size()!=ex.numel())
