@@ -264,10 +264,10 @@ class FXtests(casadiTestCase):
       test(sp_tril(i))
       test(sp_tril(i).T)
       test(Sparsity.dense(i,i))
-      test(sp_diag(i))
+      test(Sparsity.diag(i))
     
     for i in [63,64,65,127,128,129]:
-      d = sp_diag(i)
+      d = Sparsity.diag(i)
       test(d)
       
       test(d + sp_rowcol([0],[5],i,i))
@@ -275,7 +275,7 @@ class FXtests(casadiTestCase):
       b = sp_band(i,-1) + sp_band(i,1)
       test(b + sp_rowcol([0],[5],i,i))
       
-    m = IMatrix(sp_diag(129),1)
+    m = IMatrix(Sparsity.diag(129),1)
     m[:50,0] = 1
     m[60:,0] = 1
     m[6:9,6] = 1
@@ -286,7 +286,7 @@ class FXtests(casadiTestCase):
     test(sp)
     #test(sp.T)
     
-    m = IMatrix(sp_diag(64),1)
+    m = IMatrix(Sparsity.diag(64),1)
     m[:50,0] = 1
     m[60:,0] = 1
 
@@ -387,7 +387,7 @@ class FXtests(casadiTestCase):
     
     
     for i in [63,64,65,100,127,128,129]:
-      d = sp_diag(i)
+      d = Sparsity.diag(i)
       test(d)
       
       test(d + sp_rowcol([0],[5],i,i) + sp_rowcol([5],[0],i,i))
@@ -399,7 +399,7 @@ class FXtests(casadiTestCase):
       d = Sparsity.dense(i,i)
       test(d)
       
-      d = sp_diag(i) + Sparsity.triplet(i,i,[0]*i,range(i))+Sparsity.triplet(i,i,range(i),[0]*i)
+      d = Sparsity.diag(i) + Sparsity.triplet(i,i,[0]*i,range(i))+Sparsity.triplet(i,i,range(i),[0]*i)
       test(d)
 
 

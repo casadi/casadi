@@ -862,7 +862,7 @@ namespace CasADi{
   
     // Return
     if(verbose()) std::cout << "XFunctionInternal::jac end" << std::endl;
-    return trans(ret);
+    return ret.T();
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>

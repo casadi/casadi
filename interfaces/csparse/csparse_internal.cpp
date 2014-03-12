@@ -113,7 +113,7 @@ namespace CasADi{
     if(N_==0){
       DMatrix temp = input();
       temp.sparsify();
-      if (isSingular(temp.sparsity())) {
+      if(temp.sparsity().isSingular()){
         stringstream ss;
         ss << "CSparseInternal::prepare: factorization failed due to matrix being singular. Matrix contains numerical zeros which are structurally non-zero. Promoting these zeros to be structural zeros, the matrix was found to be structurally rank deficient. sprank: " << rank(temp.sparsity()) << " <-> " << temp.size2() << endl;
         if(verbose()){

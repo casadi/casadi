@@ -139,10 +139,10 @@ namespace CasADi {
       // There is a way to deal with this properly, but requires modifying the dsdp source
       // We already did this for the variable bounds
       double dsdp_inf = getOption("infinity");
-      MX lba = trans(horzcat(fmax(fmin(LBA,dsdp_inf),-dsdp_inf),A));
-      MX uba = trans(horzcat(fmax(fmin(UBA,dsdp_inf),-dsdp_inf),A));
+      MX lba = horzcat(fmax(fmin(LBA,dsdp_inf),-dsdp_inf),A).T();
+      MX uba = horzcat(fmax(fmin(UBA,dsdp_inf),-dsdp_inf),A).T();
     
-      mappingA_ = MXFunction(syms,trans(horzcat(-lba,uba)));
+      mappingA_ = MXFunction(syms,horzcat(-lba,uba).T());
       mappingA_.init();
     }
   

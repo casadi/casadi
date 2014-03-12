@@ -106,7 +106,7 @@ class Misctests(casadiTestCase):
     
   def test_copyconstr_refcount(self):
     self.message("Copy constructor for refcounted classes")
-    x = sp_diag(4)
+    x = Sparsity.diag(4)
 
     y = Sparsity(x)
         
@@ -150,7 +150,7 @@ class Misctests(casadiTestCase):
   def test_copy_refcount(self):
     self.message("Shallow copy for refcounted classes")
     import copy
-    x = sp_diag(4)
+    x = Sparsity.diag(4)
 
     y = copy.copy(x)
         
@@ -193,7 +193,7 @@ class Misctests(casadiTestCase):
   def test_deepcopy_refcount(self):
     self.message("Deep copy for refcounted classes")
     import copy
-    x = sp_diag(4)
+    x = Sparsity.diag(4)
 
     y = copy.deepcopy(x)
         

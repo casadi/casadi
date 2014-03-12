@@ -68,7 +68,7 @@ namespace CasADi{
     std::vector< MX > Ass = horzsplit(As,n_);
     
     for (int k=0;k<K_;++k) {
-      Vss[k]=(Vss[k]+trans(Vss[k]))/2;
+      Vss[k]=(Vss[k]+Vss[k].T())/2;
     }
     
     std::vector< MX > AA_list(K_);

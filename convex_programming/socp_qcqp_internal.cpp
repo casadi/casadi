@@ -153,12 +153,12 @@ void SOCPQCQPInternal::init(){
     
     // Harvest Cholsesky sparsity patterns
     // Note that we add extra scalar to make room for the epigraph-reformulation variable
-    socp_g.push_back(blkdiag(cholesky_[i].getFactorizationSparsity(false),sp_dense(1,1)));
+    socp_g.push_back(blkdiag(cholesky_[i].getFactorizationSparsity(false),Sparsity::dense(1,1)));
   }
 
   // Create an socpsolver instance
   SOCPSolverCreator socpsolver_creator = getOption("socp_solver");
-  socpsolver_ = socpsolver_creator(socpStruct("g",horzcat(socp_g),"a",horzcat(input(QCQP_SOLVER_A).sparsity(),sp_sparse(nc_,1))));
+  socpsolver_ = socpsolver_creator(socpStruct("g",horzcat(socp_g),"a",horzcat(input(QCQP_SOLVER_A).sparsity(),Sparsity::sparse(nc_,1))));
 
   //socpsolver_.setQCQPOptions();
   if(hasSetOption("socp_solver_options")){

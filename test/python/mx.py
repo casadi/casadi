@@ -1788,7 +1788,7 @@ class MXtests(casadiTestCase):
     x_ = self.randDMatrix(N,N)
     y_ = self.randDMatrix(N,N)
 
-    filt = sp_diag(N)+Sparsity.triplet(N,N,[1],[3])
+    filt = Sparsity.diag(N)+Sparsity.triplet(N,N,[1],[3])
 
     f = MXFunction([x,y],[mul(x,y)])
     f.init()

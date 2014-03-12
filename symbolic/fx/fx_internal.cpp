@@ -1903,7 +1903,7 @@ namespace CasADi{
       // Need to create a new symbolic primitive
 
       // Sparsity pattern for the symbolic input
-      Sparsity sp_arg = Sparsity(1,0);
+      Sparsity sp_arg = Sparsity::sparse(1,0);
 
       // Append the sparsity patterns, keep track of col offsets
       vector<int> col_offset(1,0);

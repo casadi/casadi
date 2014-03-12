@@ -191,7 +191,7 @@ class Matrixtests(casadiTestCase):
 
   def huge_slice(self):
     self.message("huge slice")
-    a = SX.sym("a",sp_diag(50000))
+    a = SX.sym("a",Sparsity.diag(50000))
 
     a[:,:]
     
@@ -824,9 +824,9 @@ class Matrixtests(casadiTestCase):
     self.assertFalse(isRegular(DMatrix.nan(2)))
     
   def test_sizes(self):
-    self.assertEqual(sp_diag(10).sizeD(),10)
-    self.assertEqual(sp_diag(10).sizeU(),10)
-    self.assertEqual(sp_diag(10).sizeL(),10)
+    self.assertEqual(Sparsity.diag(10).sizeD(),10)
+    self.assertEqual(Sparsity.diag(10).sizeU(),10)
+    self.assertEqual(Sparsity.diag(10).sizeL(),10)
     self.assertEqual(Sparsity.dense(10,10).sizeL(),10*11/2)
     self.assertEqual(Sparsity.dense(10,10).sizeU(),10*11/2)
     self.assertEqual(Sparsity.dense(10,10).sizeD(),10)
@@ -953,19 +953,19 @@ class Matrixtests(casadiTestCase):
     
     for n in range(2,5):
       spA+= [
-        sp_diag(n),
+        Sparsity.diag(n),
         Sparsity.dense(n,n),
         sp_tril(n),
         sp_tril(n).T,
         sp_banded(n,1),
-        blkdiag([sp_diag(n),Sparsity.dense(n,n)]),
-        blkdiag([sp_diag(n),sp_tril(n)]),
-        blkdiag([sp_diag(n),sp_tril(n).T]),
+        blkdiag([Sparsity.diag(n),Sparsity.dense(n,n)]),
+        blkdiag([Sparsity.diag(n),sp_tril(n)]),
+        blkdiag([Sparsity.diag(n),sp_tril(n).T]),
         blkdiag([sp_tril(n),sp_tril(n).T]),
-        sp_diag(n)+sp_rowcol([0],[n-1],n,n),
-        sp_diag(n)+sp_rowcol([0,n-1],[n-1,0],n,n),
-        sp_diag(n)+Sparsity.triplet(n,n,[0],[n-1]),
-        sp_diag(n)+Sparsity.triplet(n,n,[0,n-1],[n-1,0]),
+        Sparsity.diag(n)+sp_rowcol([0],[n-1],n,n),
+        Sparsity.diag(n)+sp_rowcol([0,n-1],[n-1,0],n,n),
+        Sparsity.diag(n)+Sparsity.triplet(n,n,[0],[n-1]),
+        Sparsity.diag(n)+Sparsity.triplet(n,n,[0,n-1],[n-1,0]),
       ]
     
     for sA in spA:

@@ -280,9 +280,9 @@ class Sparsitytests(casadiTestCase):
       
     b = SX.sym("b",a)
     
-    self.assertRaises(Exception,lambda: b[sp_diag(3)])
+    self.assertRaises(Exception,lambda: b[Sparsity.diag(3)])
     
-    d = sp_diag(5)
+    d = Sparsity.diag(5)
     c = b[d]
 
     self.assertTrue(c.sparsity()==d)
@@ -313,9 +313,9 @@ class Sparsitytests(casadiTestCase):
       
     b = MX.sym("b",a)
     
-    self.assertRaises(Exception,lambda: b[sp_diag(3)])
+    self.assertRaises(Exception,lambda: b[Sparsity.diag(3)])
     
-    d = sp_diag(5)
+    d = Sparsity.diag(5)
     c = b[d]
 
     self.assertTrue(c.sparsity()==d)
@@ -504,7 +504,7 @@ class Sparsitytests(casadiTestCase):
     J.setOption("verbose",True)
     J.init()
     
-    self.assertTrue(J.output()[:,:X.size()].sparsity()==sp_diag(100))
+    self.assertTrue(J.output()[:,:X.size()].sparsity()==Sparsity.diag(100))
 
     X = SX.sym("X",100)
     P = SX.sym("P",1000)
@@ -519,7 +519,7 @@ class Sparsitytests(casadiTestCase):
     J.setOption("verbose",True)
     J.init()
     
-    self.assertTrue(J.output()[:X.size(),:].sparsity()==sp_diag(100))
+    self.assertTrue(J.output()[:X.size(),:].sparsity()==Sparsity.diag(100))
     
   def test_sp_rowcol(self):
     n = 3

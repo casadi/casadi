@@ -120,9 +120,9 @@ namespace CasADi{
     }
 
     // Allocate a QP solver
-    Sparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity() : sp_dense(nx_,nx_);
-    H_sparsity = H_sparsity + sp_diag(nx_);
-    Sparsity A_sparsity = jacG().isNull() ? Sparsity(0,nx_,false) : jacG().output().sparsity();
+    Sparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity() : Sparsity::dense(nx_,nx_);
+    H_sparsity = H_sparsity + Sparsity::diag(nx_);
+    Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0,nx_) : jacG().output().sparsity();
 
     StabilizedQPSolverCreator stabilized_qp_solver_creator = getOption("stabilized_qp_solver");
     stabilized_qp_solver_ = stabilized_qp_solver_creator(qpStruct("h",H_sparsity,"a",A_sparsity));
@@ -373,7 +373,7 @@ namespace CasADi{
    
       if (exact_hessian_ && iter==0) {
         Bk_.setAll(0);
-        Bk_(sp_diag(nx_)) = 0.01 *scaleglag_; 
+        Bk_(Sparsity::diag(nx_)) = 0.01 *scaleglag_; 
       }
    
       // Checking convergence criteria

@@ -904,7 +904,7 @@ class Toolstests(casadiTestCase):
     print a+1
     
   def test_sparse(self):
-    a = struct_symSX([entry("a",shape=sp_diag(5))])
+    a = struct_symSX([entry("a",shape=Sparsity.diag(5))])
     b = struct_symMX([(entry("b",struct=a))])
 
     self.checkarray(b["b"].shape,(5,1))

@@ -89,7 +89,7 @@ namespace CasADi {
 
     // Create an sdpsolver instance
     SDPSolverCreator sdpsolver_creator = getOption("sdp_solver");
-    sdpsolver_ = sdpsolver_creator(sdpStruct("g",mapping_.output("g").sparsity(),"f",mapping_.output("f").sparsity(),"a",horzcat(input(SDQP_SOLVER_A).sparsity(),sp_sparse(nc_,1))));
+    sdpsolver_ = sdpsolver_creator(sdpStruct("g",mapping_.output("g").sparsity(),"f",mapping_.output("f").sparsity(),"a",horzcat(input(SDQP_SOLVER_A).sparsity(),Sparsity::sparse(nc_,1))));
 
     if(hasSetOption("sdp_solver_options")){
       sdpsolver_.setOption(getOption("sdp_solver_options"));
