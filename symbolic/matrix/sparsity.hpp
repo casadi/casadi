@@ -65,7 +65,7 @@ namespace CasADi{
    respectively), there are also two vectors of integers:
   
    1. "colind" [length size2()+1], which contains the index to the first non-zero element on or after
-   the corresponding col. All the non-zero elements of a particular i are thus the elements with 
+   the corresponding column. All the non-zero elements of a particular i are thus the elements with 
    index el that fulfils: colind[i] <= el < colind[i+1].
      
    2. "row" [same length as the number of non-zero elements, size()] The rows for each of the
@@ -81,7 +81,7 @@ namespace CasADi{
    to share the same sparsity pattern.
   
    The implementations of some methods of this class has been taken from the CSparse package and modified
-   to use STL and CasADi data structures.
+   to use C++ standard library and CasADi data structures.
   
    * \see Matrix
    *
@@ -93,6 +93,9 @@ namespace CasADi{
   
     /// Default constructor
     explicit Sparsity(int dummy=0);
+
+    /// Construct from sparsity pattern vectors given in compressed column storage format
+    Sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
     
 #ifndef SWIG
     /** \brief  Create from node */
@@ -563,7 +566,6 @@ namespace CasADi{
      */
     //@{
     Sparsity(int nrow, int ncol, bool dense=false);
-    Sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
     static Sparsity createDiagonal(int n);
     static Sparsity createDiagonal(int m, int n);
     //@}
