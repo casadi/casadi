@@ -605,33 +605,9 @@ void simplify(SXElement& ex){
 }
 
 void fill(SX& mat, const SXElement& val){
-  if(val->isZero())    mat.makeEmpty(mat.size1(),mat.size2());
-  else                 mat.makeDense(mat.size1(),mat.size2(),val);
+  if(val->isZero())    mat = SX::sparse(mat.shape());
+  else                 mat.full(val);
 }
-
-// SX binary(int op, const SX &x, const SX &y){
-//   SX r;
-//   dynamic_cast<SX&>(r).binary(sfcn[op],x,y);
-//   return r;
-// }
-// 
-// SX scalar_matrix(int op, const SXElement &x, const SX &y){
-//   SX r;
-//   dynamic_cast<SX&>(r).scalar_matrix(sfcn[op],x,y);
-//   return r;
-// }
-// 
-// SX matrix_scalar(int op, const SX &x, const SXElement &y){
-//   SX r;
-//   dynamic_cast<SX&>(r).matrix_scalar(sfcn[op],x,y);
-//   return r;
-// }
-// 
-// SX matrix_matrix(int op, const SX &x, const SX &y){
-//   SX r;
-//   dynamic_cast<SX&>(r).matrix_matrix(sfcn[op],x,y);
-//   return r;
-// }
 
 SX taylor(const SX& ex,const SX& x, const SX& a, int order) {
   casadi_assert(x.isScalar() && a.isScalar());

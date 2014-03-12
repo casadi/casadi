@@ -397,53 +397,15 @@ namespace CasADi{
     for(int cc=ncol-1; cc>=0; --cc){
       // Loop over nonzero elements of the column in reverse order
       for(int el=colind[cc+1]-1; el>=colind[cc]; --el){
-        // Get the row
         int rr = row[el];
-        
-        // Swap the old position with the new position
-        if(el!=cc*nrow + rr){
-          data_[cc*nrow + rr] = data_[el];
-          data_[el] = val;
-        }
+        int new_el = cc*nrow + rr;
+        if(el==new_el) break; // Already done, the rest of the elements must be in the same place
+        std::swap(data_[new_el],data_[el]);
       }
     }
 
     // Update the sparsity pattern
     sparsity_ = Sparsity::dense(shape());
-  }
-
-  template<class T>
-  void Matrix<T>::makeDense(int nrow, int ncol, const T& val){
-    // Quick return if already dense
-    if(isDense()) return;
-  
-    if(size2()!=ncol || size1()!=nrow){
-      // Also resize
-      sparsity_ = Sparsity(nrow,ncol,true);
-      std::fill(data().begin(),data().end(),val);
-      data().resize(ncol*nrow, val);
-    } else {
-      // Create a new data vector
-      data().resize(ncol*nrow,val);
-    
-      // Loop over the cols in reverse order
-      for(int i=ncol-1; i>=0; --i){
-        // Loop over nonzero elements in reverse order
-        for(int el=colind(i+1)-1; el>=colind(i); --el){
-          // Row
-          int j = row(el);
-        
-          // Swap the old position with the new position
-          if(el!=j+i*nrow){
-            data()[j+i*nrow] = data()[el];
-            data()[el] = val;
-          }
-        }
-      }
-      
-      // Save the new sparsity pattern
-      sparsity_ = Sparsity(nrow,ncol,true);
-    }
   }
 
   template<class T>
@@ -772,7 +734,7 @@ namespace CasADi{
       T fcn_0;
       casadi_math<T>::fun(op,0,0,fcn_0);
       if(!casadi_limits<T>::isZero(fcn_0)){ // Remove this if?
-        ret.makeDense(ret.size1(),ret.size2(),fcn_0);
+        ret.full(fcn_0);
       }
     }
     
@@ -1675,7 +1637,7 @@ namespace CasADi{
       T fcn_0;
       casadi_math<T>::fun(op,x_val,casadi_limits<T>::zero,fcn_0);
       if(!casadi_limits<T>::isZero(fcn_0)){ // Remove this if?
-        ret.makeDense(ret.size1(),ret.size2(),fcn_0);
+        ret.full(fcn_0);
       }
     }
     
@@ -1704,7 +1666,7 @@ namespace CasADi{
       T fcn_0;
       casadi_math<T>::fun(op,casadi_limits<T>::zero,y_val,fcn_0);
       if(!casadi_limits<T>::isZero(fcn_0)){ // Remove this if?
-        ret.makeDense(ret.size1(),ret.size2(),fcn_0);
+        ret.full(fcn_0);
       }
     }
     
@@ -1753,7 +1715,7 @@ namespace CasADi{
       // Get the value for the structural zeros
       T fcn_0;
       casadi_math<T>::fun(op,casadi_limits<T>::zero,casadi_limits<T>::zero,fcn_0);
-      r.makeDense(r.size1(),r.size2(),fcn_0);
+      r.full(fcn_0);
     }
   
     return r;

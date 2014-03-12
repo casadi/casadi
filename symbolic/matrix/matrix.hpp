@@ -436,10 +436,6 @@ namespace CasADi{
     /// Make the matrix dense
     void full(const T& val = 0);
 
-
-    void makeDense(int nrow, int ncol, const T& val);
-
-
     void makeEmpty(int nrow, int ncol);
 
     Matrix<T> operator+() const;
