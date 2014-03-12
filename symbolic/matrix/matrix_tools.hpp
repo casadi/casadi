@@ -345,16 +345,6 @@ namespace CasADi{
   template<class T>
   Matrix<T> blkdiag(const std::vector< Matrix<T> > &A);
 
-#ifndef SWIG
-  /** \brief  Get the sparsity in sparse triplet format */
-  template<class T>
-  void getSparseTriplet(const Matrix<T>& A, std::vector<int>& col, std::vector<int>& row);
-#endif // SWIG
-
-  /** \brief  Get the sparsity in sparse triplet format - Python style: [col,row] =  getSparseTriplet(A) */
-  template<class T>
-  std::vector<std::vector<int> > getSparseTriplet(const Matrix<T>& A);
-
   /** \brief  Unite two matrices no overlapping sparsity */
   template<class T>
   Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
@@ -1069,19 +1059,6 @@ namespace CasADi{
   }
 
   template<class T>
-  void getSparseTriplet(const Matrix<T>& A, std::vector<int>& col, std::vector<int>& row){
-    row = A.sparsity().row();
-    col = A.sparsity().getCol();
-  }
-
-  template<class T>
-  std::vector<std::vector<int> > getSparseTriplet(const Matrix<T>& A){
-    std::vector<std::vector<int> > ret(2);
-    getSparseTriplet(A,ret[0],ret[1]);
-    return ret;
-  }
-
-  template<class T>
   Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B){
     // Join the sparsity patterns
     std::vector<unsigned char> mapping;
@@ -1270,7 +1247,6 @@ namespace CasADi{
   MTT_INST(T,nnz)                               \
   MTT_INST(T,isEqual)                           \
   MTT_INST(T,repmat)                            \
-  MTT_INST(T,getSparseTriplet)                  \
   MTT_INST(T,unite)                             \
   MTT_INST(T,sumRows)                           \
   MTT_INST(T,sumCols)                           \
