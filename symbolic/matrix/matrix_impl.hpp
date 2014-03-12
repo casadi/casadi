@@ -1950,6 +1950,29 @@ namespace CasADi{
     return false;
   }
 
+  template<class T>
+  bool Matrix<T>::isInteger() const{
+    // loop over non-zero elements
+    for(int k=0; k<size(); ++k) 
+      if(!casadi_limits<T>::isInteger(at(k))) // if an element is not integer
+        return false;
+    
+    // Integer if reached this point
+    return true;
+  }
+
+  template<class T>
+  bool Matrix<T>::isConstant() const{
+    // loop over non-zero elements
+    for(int k=0; k<size(); ++k) 
+      if(!casadi_limits<T>::isConstant(at(k))) // if an element is not constant
+        return false;
+    
+    // Constant if we reach this point
+    return true;
+  }
+
+
 } // namespace CasADi
 
 #endif // MATRIX_IMPL_HPP

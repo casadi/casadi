@@ -49,13 +49,6 @@ namespace CasADi{
   template<class T>
   Matrix<T> mul(const std::vector< Matrix<T> > &args);
 
-  /** \brief  check if the matrix is constant (note that false negative answers are possible)*/
-  template<class T>
-  bool isConstant(const Matrix<T>& ex);
-
-  template<class T>
-  bool isInteger(const Matrix<T>& ex);
-
   template<class T>
   T det(const Matrix<T>& a);
 
@@ -444,7 +437,9 @@ namespace CasADi{
   template<class T> bool isTriu(const Matrix<T> &A){ return A.isTriu(); }
   template<class T> bool isScalar(const Matrix<T>& ex){ return ex.isScalar();}
   template<class T> bool isRegular(const Matrix<T>& ex){ return ex.isRegular();}
-  //@}
+  template<class T> bool isConstant(const Matrix<T>& ex){ return ex.isConstant();}
+  template<class T> bool isInteger(const Matrix<T>& ex){ return ex.isInteger();}
+ //@}
 #endif
 
 } // namespace CasADi
@@ -476,28 +471,6 @@ namespace CasADi{
       ret = ret.mul(args[i]);
     }
     return ret;
-  }
-
-  template<class T>
-  bool isInteger(const Matrix<T>& ex){
-    // loop over non-zero elements
-    for(int k=0; k<ex.size(); ++k) 
-      if(!casadi_limits<T>::isInteger(ex.data()[k])) // if an element is not integer
-        return false;
-    
-    // Integer if reached this point
-    return true;
-  }
-
-  template<class T>
-  bool isConstant(const Matrix<T>& ex){
-    // loop over non-zero elements
-    for(int k=0; k<ex.size(); ++k) 
-      if(!casadi_limits<T>::isConstant(ex.data()[k])) // if an element is not constant
-        return false;
-    
-    // Constant if we reach this point
-    return true;
   }
 
   template<class T>

@@ -691,18 +691,24 @@ namespace CasADi{
     /// Checks if expression does not contain NaN or Inf
     bool isRegular() const;
 
-    /** \brief  check if smooth */
+    /** \brief Check if smooth */
     bool isSmooth() const;
 
-    /** \brief  check if symbolic (Dense)
+    /** \brief Check if symbolic (Dense)
         Sparse matrices invariable return false 
     */
     bool isSymbolic() const;
 
-    /** \brief  check if symbolic
+    /** \brief Check if symbolic
         Sparse matrices can return true if all non-zero elements are symbolic
     */
     bool isSymbolicSparse() const;
+
+    /** \brief Check if the matrix is constant (note that false negative answers are possible)*/
+    bool isConstant() const;
+
+    /** \brief Check if the matrix is integer-valued (note that false negative answers are possible)*/
+    bool isInteger() const;
 
     // @{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
