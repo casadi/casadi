@@ -345,11 +345,11 @@ namespace CasADi{
     
       // Call callback function if present
       if (!callback_.isNull()) {
-        if (!output(NLP_SOLVER_F).empty()) output(NLP_SOLVER_F).set(fk_);
-        if (!output(NLP_SOLVER_X).empty()) output(NLP_SOLVER_X).set(x_);
-        if (!output(NLP_SOLVER_LAM_G).empty()) output(NLP_SOLVER_LAM_G).set(mu_);
-        if (!output(NLP_SOLVER_LAM_X).empty()) output(NLP_SOLVER_LAM_X).set(mu_x_);
-        if (!output(NLP_SOLVER_G).empty()) output(NLP_SOLVER_G).set(gk_);
+        if (!output(NLP_SOLVER_F).isEmpty()) output(NLP_SOLVER_F).set(fk_);
+        if (!output(NLP_SOLVER_X).isEmpty()) output(NLP_SOLVER_X).set(x_);
+        if (!output(NLP_SOLVER_LAM_G).isEmpty()) output(NLP_SOLVER_LAM_G).set(mu_);
+        if (!output(NLP_SOLVER_LAM_X).isEmpty()) output(NLP_SOLVER_LAM_X).set(mu_x_);
+        if (!output(NLP_SOLVER_G).isEmpty()) output(NLP_SOLVER_G).set(gk_);
         int ret = callback_(ref_,user_data_);
       
         if (!ret) {

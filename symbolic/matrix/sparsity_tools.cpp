@@ -100,11 +100,6 @@ namespace CasADi{
     a.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
     return coarse_colblock.at(3);
   }
-
-  bool isSingular(const Sparsity& a) {
-    casadi_assert_message(a.size2()==a.size1(),"isSingular: only defined for square matrices, but got " << a.dimString());
-    return rank(a)!=a.size2();
-  }
   
   Sparsity horzcat(const std::vector<Sparsity> & sp) {
     if(sp.empty()){
@@ -127,7 +122,7 @@ namespace CasADi{
   Sparsity vertcat(const std::vector<Sparsity> & sp) {
     if(sp.empty()){
       return Sparsity();
-    } else if(sp[0].vector()){
+    } else if(sp[0].isVector()){
       Sparsity ret = sp[0];
       for(int i=1; i<sp.size(); ++i) {
         ret.append(sp[i]);
@@ -143,7 +138,7 @@ namespace CasADi{
   }
   
   Sparsity vertcat(const Sparsity & a, const Sparsity & b) {
-    if(a.vector()){
+    if(a.isVector()){
       Sparsity ret = a;
       ret.append(b);
       return ret;

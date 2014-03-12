@@ -265,7 +265,7 @@ class Matrixtests(casadiTestCase):
     B = DMatrix([[1,2,3,4,5],[6,7,8,9,10]])
     
     A = IMatrix([[1,1,0,0,0],[0,0,1,0,0]])
-    makeSparse(A)
+    A = sparse(A)
     sp = A.sparsity()
     
     
@@ -544,8 +544,8 @@ class Matrixtests(casadiTestCase):
     
     I_ = DMatrix(inv(x).sparsity(),1)
     
-    makeDense(s_)
-    makeDense(I_)
+    s_ = full(s_)
+    T_ = full(I_)
     # An irreducible matrix does not have to be dense per se
     self.checkarray(s_,I_,"inv")
 
@@ -738,7 +738,7 @@ class Matrixtests(casadiTestCase):
   def test_sparsesym(self):
     self.message("sparsesym")
     D = DMatrix([[1,2,-3],[2,-1,0],[-3,0,5]])
-    makeSparse(D)
+    D = sparse(D)
     i = DVector(5)
     
     D.get(i,SPARSESYM)
@@ -751,7 +751,7 @@ class Matrixtests(casadiTestCase):
     self.message("blkdiag")
     C = blkdiag([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
     r = DMatrix([[-1.4,-3.2,0,0,0,0,0],[-3.2,-28,0,0,0,0,0],[0,0,15,-12,2.1,0,0],[0,0,-12,16,-3.8,0,0],[0,0,2.1,-3.8,15,0,0],[0,0,0,0,0,1.8,0],[0,0,0,0,0,0,-4]])
-    makeSparse(r)
+    r = sparse(r)
     self.checkarray(C,r)
     
   def test_diag_sparse(self):
@@ -760,10 +760,9 @@ class Matrixtests(casadiTestCase):
     for n in [[0,1,0,0,2,3,4,5,6,0],[1,2,3,0],[0,1,2,3]]:
       d = DMatrix(n)
       D = DMatrix(n)
-      makeSparse(d)
+      d = sparse(d)
       m = c.diag(d)
-      M = c.diag(D)
-      makeSparse(M)
+      M = sparse(c.diag(D))
       
       self.checkarray(m.sparsity().colind(),M.sparsity().colind())
       self.checkarray(m.sparsity().row(),M.sparsity().row())
@@ -772,19 +771,19 @@ class Matrixtests(casadiTestCase):
     self.message("sprank")
     
     a = DMatrix([[1,0,0],[0,1,0],[0,0,1]])
-    makeSparse(a)
+    a = sparse(a)
     self.assertEqual(sprank(a),3)
 
     a = DMatrix([[1,0,0],[0,0,0],[0,0,1]])
-    makeSparse(a)
+    a = sparse(a)
     self.assertEqual(sprank(a),2)
 
     a = DMatrix([[0,0,0],[0,0,0],[0,0,1]])
-    makeSparse(a)
+    a = sparse(a)
     self.assertEqual(sprank(a),1)
 
     a = DMatrix([[0,0,0],[0,0,0],[0,0,0]])
-    makeSparse(a)
+    a = sparse(a)
     self.assertEqual(sprank(a),0)
     
     self.assertEqual(sprank(DMatrix.ones(1,3)),1)
@@ -989,7 +988,7 @@ class Matrixtests(casadiTestCase):
         f.evaluate()
             
         c_ref = DMatrix(linalg.solve(a,b))
-        makeSparse(c_ref)
+        c_ref = sparse(c_ref)
         
         c = f.getOutput()
         

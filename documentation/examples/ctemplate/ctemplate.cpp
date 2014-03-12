@@ -1,4 +1,3 @@
-#include <symbolic/fx/fx_tools.hpp>
 #include <symbolic/mx/mx_tools.hpp>
 #include <symbolic/sx/sx_tools.hpp>
 #include <symbolic/matrix/matrix_tools.hpp>

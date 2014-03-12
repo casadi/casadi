@@ -49,39 +49,6 @@ namespace CasADi{
   template<class T>
   Matrix<T> mul(const std::vector< Matrix<T> > &args);
 
-  /** \brief  check if the matrix is constant (note that false negative answers are possible)*/
-  template<class T>
-  bool isConstant(const Matrix<T>& ex);
-
-  template<class T>
-  bool isDense(const Matrix<T>& ex);
-
-  template<class T>
-  bool isEmpty(const Matrix<T>& ex);
-
-  template<class T>
-  bool isInteger(const Matrix<T>& ex);
-
-  template<class T>
-  bool isScalar(const Matrix<T>& ex);
-
-  //{@
-  /// Checks if vector does not contain NaN or Inf
-  bool isRegular(const Matrix<int>& ex);
-  bool isRegular(const Matrix<double>& ex);
-  //@}
-
-  template<class T>
-  bool isVector(const Matrix<T>& ex);
-
-  /** \brief  Check if a matrix is lower triangular (complexity ~ A.size2()) */
-  template<class T>
-  bool isTril(const Matrix<T> &A);
-
-  /** \brief  Check if a matrix is upper triangular (complexity ~ A.size2()) */
-  template<class T>
-  bool isTriu(const Matrix<T> &A);
-
   template<class T>
   T det(const Matrix<T>& a);
 
@@ -322,37 +289,6 @@ namespace CasADi{
   template<class T>
   Matrix<T> kron(const Matrix<T>& a, const Matrix<T>& b);
 
-  /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
-  template<class T>
-  bool isZero(const Matrix<T>& ex);
-
-  /** \brief  check if the matrix is 1 (note that false negative answers are possible)*/
-  template<class T>
-  bool isOne(const Matrix<T>& ex);
-
-  /** \brief  check if the matrix is -1 (note that false negative answers are possible)*/
-  template<class T>
-  bool isMinusOne(const Matrix<T>& ex);
-
-  /** \brief  check if the matrix is an identity matrix (note that false negative answers are possible)*/
-  template<class T>
-  bool isIdentity(const Matrix<T>& ex);
-
-  template<class T>
-  int nnz(const Matrix<T>& ex);
-
-  template<class T>
-  int nnz_sym(const Matrix<T>& ex);
-
-  /** \brief Check if two expressions are equal
-   *
-   *  Might very well give false negatives
-   *
-   *   Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
-   */
-  template<class T>
-  bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2);
-
   /** \brief  Frobenius norm  */
   template<class T>
   Matrix<T> norm_F(const Matrix<T> &x);
@@ -397,7 +333,7 @@ namespace CasADi{
 
   /** \brief  Evaluate a polynomial with coefficeints p in x */
   template<class T>
-  Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x);
+  Matrix<T> polyvalQQQ(const Matrix<T>& p, const Matrix<T>& x);
 
   /** \brief   Get the diagonal of a matrix or construct a diagonal
       When the input is square, the diagonal elements are returned.
@@ -423,33 +359,15 @@ namespace CasADi{
   template<class T>
   Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
 
-  /** \brief  Make a matrix dense */
-  template<class T>
-  void makeDense(Matrix<T>& A);
-
-  /** \brief  Make a matrix dense */
-  template<class T>
-  Matrix<T> densify(const Matrix<T>& A);
-
 #ifndef SWIGOCTAVE
   /** \brief  Make a matrix dense */
   template<class T>
   Matrix<T> full(const Matrix<T>& A);
-#endif // SWIGOCTAVE
 
-  /** \brief  Make a matrix sparse by removing numerical zeros */
-  template<class T>
-  void makeSparse(Matrix<T>& A, double tol=0);
-
-#ifndef SWIGOCTAVE
   /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<class T>
   Matrix<T> sparse(const Matrix<T>& A, double tol=0);
 #endif // SWIGOCTAVE
-
-  /** \brief  Check if the matrix has any zero entries which are not structural zeros */
-  template<class T>
-  bool hasNonStructuralZeros(const Matrix<T>& A);
 
   /// same as: res += mul(A,v)
   template<typename T>
@@ -470,6 +388,31 @@ namespace CasADi{
   /// Obtain the structural rank of a sparsity-pattern
   template<typename T>
   int sprank(const Matrix<T>& A);
+
+#ifndef WITHOUT_PRE_1_9_X
+  /** \brief [DEPRECATED]
+   */
+  //@{
+  template<class T> void makeDense(Matrix<T>& A){ A.densify();}
+  template<class T> Matrix<T> densify(const Matrix<T>& A){ Matrix<T> ret(A); ret.densify(); return ret;}
+  template<class T> void makeSparse(Matrix<T>& A, double tol=0){ A.sparsify(tol);}
+  template<class T> bool isDense(const Matrix<T>& ex){ return ex.isDense();}
+  template<class T> bool isEmpty(const Matrix<T>& ex){ return ex.isEmpty(); }
+  template<class T> bool isTril(const Matrix<T> &A){ return A.isTril(); }
+  template<class T> bool isTriu(const Matrix<T> &A){ return A.isTriu(); }
+  template<class T> bool isScalar(const Matrix<T>& ex){ return ex.isScalar();}
+  template<class T> bool isRegular(const Matrix<T>& ex){ return ex.isRegular();}
+  template<class T> bool isConstant(const Matrix<T>& ex){ return ex.isConstant();}
+  template<class T> bool isInteger(const Matrix<T>& ex){ return ex.isInteger();}
+  template<class T> bool isZero(const Matrix<T>& ex){ return ex.isZero();}
+  template<class T> bool isOne(const Matrix<T>& ex){ return ex.isOne();}
+  template<class T> bool isMinusOne(const Matrix<T>& ex){ return ex.isMinusOne();}
+  template<class T> bool isIdentity(const Matrix<T>& ex){ return ex.isIdentity();}
+  template<class T> bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2){ return ex1.isEqual(ex2);}
+  template<class T> int nnz(const Matrix<T>& ex) { return ex.size();}
+  template<class T> bool hasNonStructuralZeros(const Matrix<T>& A){ return A.hasNonStructuralZeros();}
+ //@}
+#endif
 
 } // namespace CasADi
 
@@ -503,58 +446,6 @@ namespace CasADi{
   }
 
   template<class T>
-  bool isScalar(const Matrix<T>& ex){
-    return ex.size2()==1 && ex.size1()==1;
-  }
-
-  template<class T>
-  bool isVector(const Matrix<T>& ex){
-    return ex.size1()==1;
-  }
-
-  template<class T>
-  bool isInteger(const Matrix<T>& ex){
-    // loop over non-zero elements
-    for(int k=0; k<ex.size(); ++k) 
-      if(!casadi_limits<T>::isInteger(ex.data()[k])) // if an element is not integer
-        return false;
-    
-    // Integer if reached this point
-    return true;
-  }
-
-  template<class T>
-  bool isConstant(const Matrix<T>& ex){
-    // loop over non-zero elements
-    for(int k=0; k<ex.size(); ++k) 
-      if(!casadi_limits<T>::isConstant(ex.data()[k])) // if an element is not constant
-        return false;
-    
-    // Constant if we reach this point
-    return true;
-  }
-
-  template<class T>
-  bool isDense(const Matrix<T>& ex){
-    return ex.size() == ex.numel();
-  }
-
-  template<class T>
-  bool isEmpty(const Matrix<T>& ex){
-    return ex.empty();
-  }
-
-  template<class T>
-  bool isTril(const Matrix<T> &A){
-    return A.sparsity().tril();
-  }
-
-  template<class T>
-  bool isTriu(const Matrix<T> &A){
-    return A.sparsity().triu();
-  }
-
-  template<class T>
   T det(const Matrix<T>& a){
     int n = a.size2();
     casadi_assert_message(n == a.size1(),"matrix must be square");
@@ -577,13 +468,13 @@ namespace CasADi{
     Matrix<int> row_count = sumCols(sp);
   
     // A blank row? determinant is structurally zero
-    if (!row_count.dense()) return 0;
+    if (!row_count.isDense()) return 0;
 
     // Have a count of the nonzeros for each col
     Matrix<int> col_count = trans(sumRows(sp));
   
     // A blank col? determinant is structurally zero
-    if (!row_count.dense()) return 0;
+    if (!row_count.isDense()) return 0;
   
     int min_row = std::distance(row_count.data().begin(), std::min_element(row_count.data().begin(),row_count.data().end()));
     int min_col = std::distance(col_count.data().begin(), std::min_element(col_count.data().begin(),col_count.data().end()));
@@ -872,7 +763,7 @@ namespace CasADi{
   template<class T>
   Matrix<T> sumAll(const Matrix<T> &x) {
     // Quick return if empty
-    if (x.empty()) return Matrix<T>::sparse(1,1);
+    if (x.isEmpty()) return Matrix<T>::sparse(1,1);
     // Sum non-zero elements
     T res=0;
     for(int k=0; k<x.size(); k++){
@@ -893,7 +784,7 @@ namespace CasADi{
 
   template<class T>
   T all(const Matrix<T> &x) {
-    if (!x.dense()) return false;
+    if (!x.isDense()) return false;
     T ret=1;
     for (int i=0;i<x.size();++i) {
       ret = ret && x.at(i)==1;
@@ -903,7 +794,7 @@ namespace CasADi{
 
   template<class T>
   T any(const Matrix<T> &x) {
-    if (!x.dense()) return false;
+    if (!x.isDense()) return false;
     T ret=0;
     for (int i=0;i<x.size();++i) {
       ret = ret || x.at(i)==1;
@@ -919,7 +810,7 @@ namespace CasADi{
 
   template<class T>
   Matrix<T> norm_2(const Matrix<T>& x){
-    if(x.vector()){
+    if(x.isVector()){
       return norm_F(x);
     } else {
       casadi_error("2-norms currently only supported for vectors. Did you intend to calculate a Frobenius norms (norm_F)?");
@@ -1027,7 +918,7 @@ namespace CasADi{
     casadi_assert_message(A.size1() == b.size1(),"solve Ax=b: dimension mismatch: b has " << b.size1() << " rows while A has " << A.size1() << ".");
     casadi_assert_message(A.size1() == A.size2(),"solve: A not square but " << A.dimString());
 
-    if(isTril(A)){
+    if(A.isTril()){
       // forward substitution if lower triangular
       Matrix<T> x = b;
       const std::vector<int> & Arow = A.row();
@@ -1044,7 +935,7 @@ namespace CasADi{
         }
       }
       return x;
-    } else if(isTriu(A)){
+    } else if(A.isTriu()){
       // backward substitution if upper triangular
       Matrix<T> x = b;
       const std::vector<int> & Arow = A.row();
@@ -1065,7 +956,7 @@ namespace CasADi{
 
       // If there are structurally nonzero entries that are known to be zero, remove these and rerun the algorithm
       Matrix<T> A_sparse = A;
-      makeSparse(A_sparse);
+      A_sparse.sparsify();
       return solve(A_sparse,b);
 
     } else {
@@ -1084,7 +975,7 @@ namespace CasADi{
       Matrix<T> xperm;
 
       // Solve permuted system
-      if(isTril(Aperm)){
+      if(Aperm.isTril()){
       
         // Forward substitution if lower triangular
         xperm = solve(Aperm,bperm);
@@ -1138,87 +1029,6 @@ namespace CasADi{
       }
     }
     return blockcat(blocks);
-  }
-
-  template<class T>
-  bool isOne(const Matrix<T>& ex){  
-    if(!ex.dense()){
-      return false;
-    }
-  
-    // loop over non-zero elements
-    for(int el=0; el<ex.size(); ++el)
-      if(!casadi_limits<T>::isOne(ex.at(el)))
-        return false;
-  
-    return true;
-  }
-
-  template<class T>
-  bool isMinusOne(const Matrix<T>& ex){  
-    if(!ex.dense()){
-      return false;
-    }
-  
-    // loop over non-zero elements
-    for(int el=0; el<ex.size(); ++el)
-      if(!casadi_limits<T>::isMinusOne(ex.at(el)))
-        return false;
-  
-    return true;
-  }
-
-  template<class T>
-  bool isZero(const Matrix<T>& ex) {  
-
-    // loop over (potentially) non-zero elements
-    for(int el=0; el<ex.size(); ++el)
-      if(!casadi_limits<T>::isZero(ex.at(el)))
-        return false;
-  
-    return true;
-  }
-
-  template<class T>
-  bool isIdentity(const Matrix<T>& ex) {
-  
-    // Make sure that the matrix is diagonal
-    if(!ex.sparsity().diagonal())
-      return false;
-  
-    // Make sure that all entries are one
-    for(typename Matrix<T>::const_iterator it=ex.begin(); it!=ex.end(); ++it){
-      if(!casadi_limits<T>::isOne(*it))
-        return false;
-    }
-      
-    return true;
-  }
-
-  template<class T>
-  int nnz(const Matrix<T>& ex) {
-    return ex.size();
-  }
-
-  template<class T>
-  int nnz_sym(const Matrix<T>& ex) {
-    int nz = 0; // number of non-zeros  
-    for(int col=0; col<ex.size2(); ++col)
-      {
-        // Loop over the elements in the col
-        for(int el=ex.colind(col); el<ex.colind(col+1); ++el){ // loop over the non-zero elements
-          if(ex.row(el) > col) break; // break inner loop (only lower triangular part is used)
-          nz++;
-        }
-      }
-    return nz;
-  }
-
-  template<class T>
-  bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2){
-    if ((nnz(ex1)!=0 || nnz(ex2)!=0) && (ex1.size2()!=ex2.size2() || ex1.size1()!=ex2.size1())) return false;
-    Matrix<T> difference = ex1 - ex2;  
-    return isZero(difference);
   }
 
   template<class T>
@@ -1299,80 +1109,23 @@ namespace CasADi{
   }
 
   template<class T>
-  void makeDense(Matrix<T>& A){
-    A.makeDense(A.size1(),A.size2(),0);
-  }
-
-  template<class T>
-  Matrix<T> densify(const Matrix<T>& A){
-    Matrix<T> ret(A);
-    makeDense(ret);
+  Matrix<T> full(const Matrix<T>& A){    
+    Matrix<T> ret = A;
+    ret.densify();
     return ret;
-  }
-
-  template<class T>
-  Matrix<T> full(const Matrix<T>& A){
-    return densify(A);
-  }
-
-  template<class T>
-  void makeSparse(Matrix<T>& A, double tol){
-    // Quick return if there are no structurally zero entries
-    if(!hasNonStructuralZeros(A) && tol==0)
-      return;
-  
-    // Start with a matrix with no cols
-    Matrix<T> Asp = Matrix<T>::sparse(A.size1(),0);
-
-    // Loop over the cols
-    for(int i=0; i<A.size2(); ++i){
-      // Resize the matrix to accomodate the col
-      Asp.resize(A.size1(),i+1);
-    
-      // Loop over the existing, possible nonzeros
-      for(int el=A.colind(i); el<A.colind(i+1); ++el){
-      
-        // If it is not known to be a zero
-        if(!casadi_limits<T>::isAlmostZero(A.at(el),tol)){
-        
-          // Get the row
-          int j=A.row(el);
-      
-          // Save to new, sparse matrix
-          Asp(j,i) = A.at(el);
-        }
-      }
-    }
-  
-    // Save to A
-    A = Asp;
   }
 
   template<class T>
   Matrix<T> sparse(const Matrix<T>& A, double tol){
     Matrix<T> ret(A);
-    makeSparse(ret,tol);
+    ret.sparsify(tol);
     return ret;
-  }
-
-  template<class T>
-  bool hasNonStructuralZeros(const Matrix<T>& A){
-    // Loop over the structural nonzeros
-    for(int el=0; el<A.size(); ++el){
-    
-      // Check if the structural nonzero is known to be zero
-      if(casadi_limits<T>::isZero(A.at(el)))
-        return true;
-    }
-  
-    // No known zeros amongst the structurally nonzero entries
-    return false;
   }
   
   template<class T>
   Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x){
-    casadi_assert_message(isDense(p),"polynomial coefficients vector must be a vector");
-    casadi_assert_message(isVector(p) && p.size()>0,"polynomial coefficients must be a vector");
+    casadi_assert_message(p.isDense(),"polynomial coefficients vector must be dense");
+    casadi_assert_message(p.isVector() && p.size()>0,"polynomial coefficients must be a vector");
     Matrix<T> ret = p[0];
     for(int i=1; i<p.size(); ++i){
       ret = ret*x + p[i];
@@ -1413,7 +1166,7 @@ namespace CasADi{
 
   template<typename T>
   T* getPtr(Matrix<T> &v){
-    if(v.empty())
+    if(v.isEmpty())
       return 0;
     else
       return &v.front();
@@ -1421,7 +1174,7 @@ namespace CasADi{
   
   template<typename T>
   const T* getPtr(const Matrix<T> &v){
-    if(v.empty())
+    if(v.isEmpty())
       return 0;
     else
       return &v.front();
@@ -1430,7 +1183,7 @@ namespace CasADi{
   template<typename T>
   Matrix<T> project(const Matrix<T>& A, const Sparsity& sparsity){
     // Check dimensions
-    if(!(A.empty() && sparsity.numel()==0)){
+    if(!(A.isEmpty() && sparsity.numel()==0)){
       casadi_assert_message(A.size2()==sparsity.size2() && A.size1()==sparsity.size1(),
                             "Shape mismatch. Expecting " << A.dimString() << ", but got " << 
                             sparsity.dimString() << " instead.");
@@ -1484,7 +1237,6 @@ namespace CasADi{
   MTT_INST(T,isEmpty)                           \
   MTT_INST(T,isInteger)                         \
   MTT_INST(T,isScalar)                          \
-  MTT_INST(T,isVector)                          \
   MTT_INST(T,isTril)                            \
   MTT_INST(T,isTriu)                            \
   MTT_INST(T,det)                               \
@@ -1516,7 +1268,6 @@ namespace CasADi{
   MTT_INST(T,isMinusOne)                        \
   MTT_INST(T,isIdentity)                        \
   MTT_INST(T,nnz)                               \
-  MTT_INST(T,nnz_sym)                           \
   MTT_INST(T,isEqual)                           \
   MTT_INST(T,repmat)                            \
   MTT_INST(T,getSparseTriplet)                  \

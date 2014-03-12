@@ -50,6 +50,7 @@ namespace CasADi{
   inline Sparsity lowerSparsity(const Sparsity& a, bool includeDiagonal = true){ return a.lower(includeDiagonal); }
   inline std::vector<int> upperNZ(const Sparsity& a) { return a.upperNZ(); }
   inline std::vector<int> lowerNZ(const Sparsity& a) { return a.lowerNZ(); }
+  inline bool isSingular(const Sparsity& a){ return a.isSingular();}
   //@}
 #endif  
   
@@ -122,9 +123,6 @@ namespace CasADi{
   /// Obtain the structural rank of a sparsity-pattern
   int rank(const Sparsity& a);
   
-  /// Check whether the sparsity-pattern inidcates structural singularity
-  bool isSingular(const Sparsity& a);
-
   /// @}
 
 

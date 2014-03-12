@@ -324,7 +324,7 @@ class FXtests(casadiTestCase):
           for j in range(m):
             if random.random()<0.5:
               I[i,j] = 0
-        makeSparse(I)
+        I = sparse(I)
         
         sp_holes = I.sparsity()
         
@@ -356,31 +356,31 @@ class FXtests(casadiTestCase):
       self.checkarray(sp.colind(),sp2.colind())
       
     A = IMatrix([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
-    makeSparse(A)
+    A = sparse(A)
     C = A.sparsity()
     
     test(C)
     
     A = IMatrix([[1,0,0,0,0,0],[0,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
-    makeSparse(A)
+    A = sparse(A)
     C = A.sparsity()
     
     test(C)
     
     A = IMatrix([[1,0,0,0,0,0],[0,1,0,0,1,1],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
-    makeSparse(A)
+    A = sparse(A)
     C = A.sparsity()
       
     test(C)
 
     A = IMatrix([[0,0,0,0,0,0],[0,1,0,0,1,1],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
-    makeSparse(A)
+    A = sparse(A)
     C = A.sparsity()
       
     test(C)
 
     A = IMatrix([[0,0,0,0,0,0],[0,1,0,0,1,0],[0,0,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,0,0,1,0,1]])
-    makeSparse(A)
+    A = sparse(A)
     C = A.sparsity()
       
     test(C)
@@ -413,7 +413,7 @@ class FXtests(casadiTestCase):
           if random.random()<0.5:
             I[ii,jj] = 0
             I[jj,ii] = 0
-      makeSparse(I)
+      I = sparse(I)
       
       sp_holes = I.sparsity()
       

@@ -31,6 +31,7 @@
 #include "unary_sx.hpp"
 #include "binary_sx.hpp"
 #include "../casadi_options.hpp"
+#include "../fx/sx_function_internal.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -816,7 +817,7 @@ namespace CasADi{
         if(!iss.fail())
           retv.push_back(SXElement::sym(varname));
       }
-    } else if(sp.scalar(true)){
+    } else if(sp.isScalar(true)){
       retv.push_back(SXElement::sym(name));
     } else {
       // Scalar
@@ -829,11 +830,63 @@ namespace CasADi{
     }
 
     // Determine dimensions automatically if empty
-    if(sp.scalar(true)){
+    if(sp.isScalar(true)){
       return SX(retv);
     } else {
       return SX(sp,retv);
     }
+  }
+
+  bool SXElement::isRegular() const{
+    if (isConstant()) {
+      return !(isNan() || isInf() || isMinusInf());
+    } else {
+      casadi_error("Cannot check regularity for symbolic SXElement");
+    }
+  }
+
+  template<>
+  bool SX::isRegular() const{
+    // First pass: ignore symbolics
+    for(int i=0; i<size(); ++i){
+      const SXElement& x = at(i);
+      if(x.isConstant()) {
+        if(x.isNan() || x.isInf() || x.isMinusInf()) return false;
+      }
+    }
+    // Second pass: don't ignore symbolics
+    for (int i=0; i<size(); ++i) {
+      if(!at(i).isRegular()) return false;
+    }
+    return true;
+  }
+
+  template<>
+  bool SX::isSmooth() const{
+    // Make a function
+    SXFunction temp(SX(),*this);
+    temp.init();
+  
+    // Run the function on the temporary variable
+    return temp->isSmooth();
+  }
+
+  template<>
+  bool SX::isSymbolic() const{
+    if(isDense()){
+      return isSymbolicSparse();
+    } else {
+      return false;
+    }
+  }
+
+  template<>
+  bool SX::isSymbolicSparse() const{
+    for(int k=0; k<size(); ++k) // loop over non-zero elements
+      if(!at(k)->isSymbolic()) // if an element is not symbolic
+        return false;
+    
+    return true;
   }
 
 } // namespace CasADi

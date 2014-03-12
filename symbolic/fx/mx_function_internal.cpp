@@ -46,7 +46,7 @@ namespace CasADi{
     int ind=0;
     for(vector<MX>::iterator it = inputv_.begin(); it!=inputv_.end(); ++it, ++ind){
       if(!it->isSymbolic()){
-        if(it->empty()){
+        if(it->isEmpty()){
           stringstream ss;
           ss << "r" << ind;        
           *it = MX::sym(ss.str(),it->sparsity());
@@ -296,7 +296,7 @@ namespace CasADi{
             it->data->nTmp(ni,nr);
             nitmp = std::max(nitmp,ni);
             nrtmp = std::max(nrtmp,nr);
-            if(work_[it->res[c]].first.empty()){
+            if(work_[it->res[c]].first.isEmpty()){
               work_[it->res[c]].first = Matrix<double>(it->data->sparsity(c),0);
             }
           }
@@ -345,6 +345,16 @@ namespace CasADi{
         it->second->temp=0;
       }
     }
+    
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) { 
+      profileWriteName(CasadiOptions::profilingLog,this,getOption("name"),ProfilingData_FXType_MXFunction,algorithm_.size());
+      int alg_counter = 0;
+      for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter){
+        std::stringstream ss;
+        print(ss,*it);
+        profileWriteSourceLine(CasadiOptions::profilingLog,this,alg_counter,ss.str(),it->op,(it->op == OP_CALL)? it->data->getFunction().operator->() : 0);
+      }
+    }
 
     log("MXFunctionInternal::init end");
   }
@@ -383,7 +393,11 @@ namespace CasADi{
     double time_stop;
     if (CasadiOptions::profiling) {
       time_zero = getRealTime();
-      CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl; 
+      if (CasadiOptions::profilingBinary) {
+        profileWriteEntry(CasadiOptions::profilingLog,this);
+      } else {
+        CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl; 
+      }
     }
     
     // Make sure that there are no free variables
@@ -422,20 +436,29 @@ namespace CasADi{
       // Write out profiling information
       if (CasadiOptions::profiling) {
         time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|"; 
-        if (it->op == OP_CALL) {
-          FX f = it->data->getFunction();
-          CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
+        
+        if (CasadiOptions::profilingBinary) {
+          profileWriteTime(CasadiOptions::profilingLog,this,alg_counter,time_stop-time_start,time_stop-time_zero);
+        } else {
+          CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|"; 
+          if (it->op == OP_CALL) {
+            FX f = it->data->getFunction();
+            CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
+          }
+          CasadiOptions::profilingLog << "|";
+          print(CasadiOptions::profilingLog,*it);
         }
-        CasadiOptions::profilingLog << "|";
-        print(CasadiOptions::profilingLog,*it);
         
       }      
     }
 
     if (CasadiOptions::profiling) {
       time_stop = getRealTime();
-      CasadiOptions::profilingLog  << "stop " << this << ":" <<getOption("name") << double(time_stop-time_zero)*1e3 << " ms" << std::endl; 
+      if (CasadiOptions::profilingBinary) {
+        profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_zero);
+      } else {
+        CasadiOptions::profilingLog  << "stop " << this << ":" <<getOption("name") << double(time_stop-time_zero)*1e3 << " ms" << std::endl; 
+      }
     }
    
     casadi_log("MXFunctionInternal::evaluate():end "  << getOption("name"));

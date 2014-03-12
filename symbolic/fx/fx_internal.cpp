@@ -150,7 +150,7 @@ namespace CasADi{
 
   FX FXInternal::gradient(int iind, int oind){
     // Assert scalar
-    casadi_assert_message(output(oind).scalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
+    casadi_assert_message(output(oind).isScalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
   
     // Generate gradient function
     FX ret = getGradient(iind,oind);
@@ -178,7 +178,7 @@ namespace CasADi{
 
   FX FXInternal::tangent(int iind, int oind){
     // Assert scalar
-    casadi_assert_message(input(iind).scalar(),"Only tangent of scalar input functions allowed. Use jacobian instead.");
+    casadi_assert_message(input(iind).isScalar(),"Only tangent of scalar input functions allowed. Use jacobian instead.");
   
     // Generate gradient function
     FX ret = getTangent(iind,oind);
@@ -208,7 +208,7 @@ namespace CasADi{
     log("FXInternal::hessian");
   
     // Assert scalar
-    casadi_assert_message(output(oind).scalar(),"Only hessians of scalar functions allowed.");
+    casadi_assert_message(output(oind).isScalar(),"Only hessians of scalar functions allowed.");
   
     // Generate gradient function
     FX ret = getHessian(iind,oind);
@@ -638,13 +638,13 @@ namespace CasADi{
             nsweeps+=1;
               
             // Construct lookup table
-            IMatrix lookup = IMatrix::sparse(lookup_row,lookup_col,lookup_value,bvec_size,coarse.size());
+            IMatrix lookup = IMatrix::triplet(lookup_row,lookup_col,lookup_value,bvec_size,coarse.size());
 
             std::reverse(lookup_col.begin(),lookup_col.end());
             std::reverse(lookup_row.begin(),lookup_row.end());
             std::reverse(lookup_value.begin(),lookup_value.end());
-            IMatrix duplicates = IMatrix::sparse(lookup_row,lookup_col,lookup_value,bvec_size,coarse.size()) - lookup;
-            makeSparse(duplicates);
+            IMatrix duplicates = IMatrix::triplet(lookup_row,lookup_col,lookup_value,bvec_size,coarse.size()) - lookup;
+            duplicates.sparsify();
             SubMatrix<Matrix<int>,Sparsity,int> temp(lookup,duplicates.sparsity(),0); // NOTE: Not intended use of SubMatrix
             temp = -bvec_size;
               
@@ -937,7 +937,7 @@ namespace CasADi{
             nsweeps+=1; 
               
             // Construct lookup table
-            IMatrix lookup = IMatrix::sparse(lookup_row,lookup_col,lookup_value,bvec_size,coarse_col.size());
+            IMatrix lookup = IMatrix::triplet(lookup_row,lookup_col,lookup_value,bvec_size,coarse_col.size());
 
             // Propagate the dependencies
             spEvaluate(use_fwd);
@@ -1376,7 +1376,7 @@ namespace CasADi{
     // Loop over inputs
     for(int iind = 0; iind < getNumInputs(); ++iind) {
       // Skip if no seeds
-      if(fwd && input(iind).empty())
+      if(fwd && input(iind).isEmpty())
         continue;
       
       // Get data array for input
@@ -1386,7 +1386,7 @@ namespace CasADi{
       for (int oind = 0; oind < getNumOutputs(); ++oind) {
 
         // Skip if no seeds
-        if (!fwd && output(oind).empty())
+        if (!fwd && output(oind).isEmpty())
           continue;
         
         // Get the sparsity of the Jacobian block
@@ -1816,7 +1816,7 @@ namespace CasADi{
 
       // Assumes initialised
       for(int i=0; i<arg.size(); ++i){
-        if(arg[i].isNull() || arg[i].empty() || input(i).isNull() || input(i).empty()) continue;
+        if(arg[i].isNull() || arg[i].isEmpty() || input(i).isNull() || input(i).isEmpty()) continue;
         casadi_assert_message(arg[i].size2()==input(i).size2() && arg[i].size1()==input(i).size1(),
                               "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
                               std::endl << input_.scheme.describeInput(i) <<  " has shape (" << input(i).size2() << 
@@ -2596,7 +2596,11 @@ namespace CasADi{
     // Write out profiling information
     if (CasadiOptions::profiling) {
       time_stop = getRealTime();
-      CasadiOptions::profilingLog  << "overhead " << this << ":" <<getOption("name") << "|" << double(time_stop-time_start-time_offset)*1e6 << " ns" << std::endl; 
+      if (CasadiOptions::profilingBinary) {
+      
+      } else {
+        CasadiOptions::profilingLog  << "overhead " << this << ":" <<getOption("name") << "|" << double(time_stop-time_start-time_offset)*1e6 << " ns" << std::endl; 
+      }
     }    
   }
 
@@ -2611,6 +2615,94 @@ namespace CasADi{
     }
   }
 
+  void FXInternal::reportConstraints(std::ostream &stream,const Matrix<double> &v, const Matrix<double> &lb, const Matrix<double> &ub, const std::string &name, double tol) { 
+
+    casadi_assert_message(v.sparsity()==lb.sparsity(),"reportConstraints:: sparsities must match");
+    casadi_assert_message(ub.sparsity()==lb.sparsity(),"reportConstraints:: sparsities must match");
+  
+    // Backup the formatting
+    ios::fmtflags fmtflags_backup = stream.flags();
+    int streamsize_backup = stream.precision();
+  
+    //stream.setf(ios::fixed,ios::floatfield);
+    //stream.precision(8);
+  
+    // Check if any constraint is violated
+    if ( all(v <= ub + tol) && all(v >= lb - tol) ) {
+      stream << "All " << v.size() << " constraints on " << name << " are met: " << endl;
+    } else {
+      stream << "Problem with constraints on " << name << ": " << endl;
+    }
+  
+    // Make a horizontal rule
+    stream.width(60);
+    stream.fill('-');
+    stream  << "-" << endl;
+    stream.fill(' ');
+
+    // The length of the numeric fields
+    int fieldlength = 10;
+    // The length of the constraint visualizer strip
+    int indicator_length = 15;
+      
+    // Loop over the elements of v
+    for (int i=0;i<v.size();i++) {
+  
+      stream.width(5);
+      stream << i << ". |   ";
+         
+      if (fabs(lb.at(i) - ub.at(i))<=tol) {
+        stream.width(fieldlength);
+        stream << lb.at(i) << " ==  ";
+        stream.width(fieldlength);
+        stream << v.at(i) << "      ";
+        stream.width(fieldlength);
+        stream << " ";
+        stream << "  |   ";
+      } else {
+        // BEGIN  - construct the constraint visualizer strip
+        std::string indicator(indicator_length+2,'-');
+        indicator.at(0) = (fabs(v.at(i)-lb.at(i))<=tol)? 'X' : 'o';
+        if (lb.at(i)==-std::numeric_limits<double>::infinity()) indicator.at(0)='8';
+
+        indicator.at(indicator_length+1) = (fabs(v.at(i)-ub.at(i))<=tol)? 'X' : 'o';
+        if (ub.at(i)==std::numeric_limits<double>::infinity()) indicator.at(indicator_length+1)='8';
+            
+        if (v.at(i) <= (ub.at(i) + tol) && v.at(i) >= (lb.at(i) - tol)) {
+          int index = (v.at(i)-lb.at(i))/(ub.at(i)-lb.at(i))*(indicator_length-1);
+          index = min(max(0,index),indicator_length-1);
+          indicator.at(1+index) = '=';
+        }
+        // END - construct the constraint visualizer strip
+      
+        stream.width(fieldlength);
+        stream << lb.at(i) << " <=  ";
+        stream.width(fieldlength);
+        stream << v.at(i) << " <= ";
+        stream.width(fieldlength);
+        stream << ub.at(i) << "    | ";
+        if (v.at(i) <= (ub.at(i) + tol) && v.at(i) >= (lb.at(i) - tol)) {
+          stream  << indicator;
+        }
+      }
+
+      if (v.at(i) <= (ub.at(i) + tol) && v.at(i) >= (lb.at(i) - tol)) {
+      } else {
+        stream  << "  VIOLATED";
+      }
+      stream  << endl;
+    }
+  
+    // Make a horizontal rule
+    stream.width(60);
+    stream.fill('-');
+    stream  << "-" << endl;
+    stream.fill(' ');
+  
+    // Restore the formatting
+    stream.setf(fmtflags_backup);
+    stream.precision(streamsize_backup);
+  }
 
 } // namespace CasADi
 

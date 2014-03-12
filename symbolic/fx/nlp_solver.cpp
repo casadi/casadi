@@ -24,7 +24,8 @@
 #include "nlp_solver_internal.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
-#include "../fx/fx_tools.hpp"
+#include "sx_function.hpp"
+#include "mx_function.hpp"
 
 using namespace std;
 namespace CasADi{

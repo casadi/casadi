@@ -686,15 +686,15 @@ namespace CasADi{
           if (!callback_.isNull()) {
             double time1 = clock();
             // Copy outputs
-            if (!output(NLP_SOLVER_X).empty())
+            if (!output(NLP_SOLVER_X).isEmpty())
               output(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n);
-            if (!output(NLP_SOLVER_F).empty())
+            if (!output(NLP_SOLVER_F).isEmpty())
               output(NLP_SOLVER_F).set(worhp_o_.F);
-            if (!output(NLP_SOLVER_G).empty())
+            if (!output(NLP_SOLVER_G).isEmpty())
               output(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
-            if (!output(NLP_SOLVER_LAM_X).empty()) 
+            if (!output(NLP_SOLVER_LAM_X).isEmpty()) 
               output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
-            if (!output(NLP_SOLVER_LAM_G).empty())
+            if (!output(NLP_SOLVER_LAM_G).isEmpty())
               output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
               
             Dictionary iteration;

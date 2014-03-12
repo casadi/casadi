@@ -104,7 +104,7 @@ void QPOasesInternal::init(){
   }
   
   // Create data for H if not dense
-  if(!input(QP_SOLVER_H).sparsity().dense()) h_data_.resize(n_*n_);
+  if(!input(QP_SOLVER_H).sparsity().isDense()) h_data_.resize(n_*n_);
   
   // Create data for A 
   a_data_.resize(n_*nc_);

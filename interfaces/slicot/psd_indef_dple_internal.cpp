@@ -30,6 +30,9 @@
 #include "../../symbolic/fx/mx_function.hpp"
 #include "../../symbolic/fx/sx_function.hpp"
 
+#include "../../symbolic/profiling.hpp"
+#include "../../symbolic/casadi_options.hpp"
+
 #include <numeric>
 
 INPUTSCHEME(DPLEInput)
@@ -144,6 +147,15 @@ namespace CasADi{
     } else {
       casadi_error("Must set linear_solver option.");
     }
+    
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) { 
+      profileWriteName(CasadiOptions::profilingLog,this,"PsdIndefSolver",ProfilingData_FXType_Other,4);
+      
+      profileWriteSourceLine(CasadiOptions::profilingLog,this,0,"periodic schur form",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog,this,1,"nominal",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog,this,2,"forward",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog,this,3,"adjoint",-1);
+    }
 
   }
   
@@ -191,6 +203,19 @@ namespace CasADi{
   void PsdIndefDpleInternal::evaluate(){
     // Obtain a periodic Schur form
     
+    // Set up timers for profiling
+    double time_zero;
+    double time_start;
+    double time_stop;
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+      time_zero = getRealTime();
+      profileWriteEntry(CasadiOptions::profilingLog,this);
+    }
+    
+    if(CasadiOptions::profiling) {
+      time_start = getRealTime(); // Start timer
+    }
+    
     // Transpose operation (after #554)
     for (int k=0;k<K_;++k) {
       for (int i=0;i<n_;++i) {
@@ -200,7 +225,16 @@ namespace CasADi{
       }
     }
     slicot_periodic_schur(n_,K_,X_,T_,Z_,dwork_,eig_real_,eig_imag_);
+
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+      time_stop = getRealTime(); // Stop timer
+      profileWriteTime(CasadiOptions::profilingLog,this,0,time_stop-time_start,time_stop-time_zero);
+    }
     
+    if(CasadiOptions::profiling) {
+      time_start = getRealTime(); // Start timer
+    }
+
     if (error_unstable_) {
       for (int i=0;i<n_;++i) {
         double modulus = sqrt(eig_real_[i]*eig_real_[i]+eig_imag_[i]*eig_imag_[i]);
@@ -439,12 +473,17 @@ namespace CasADi{
       // output <- Z[k]*V[k]*Z[k]'
       dense_mul_tn(n_,n_,n_,&Z_[k*n_*n_],&nnKa_[k].data()[0],&output(DPLE_P).data()[k*n_*n_]);
     }
-    
-    if (nfwd_==0 && nadj_==0) return;
-    // Forward sensitivitites
-    
+
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+      time_stop = getRealTime(); // Stop timer
+      profileWriteTime(CasadiOptions::profilingLog,this,1,time_stop-time_start,time_stop-time_zero);
+    }
 
     for (int d=0;d<nfwd_;++d) {
+    
+      if(CasadiOptions::profiling) {
+        time_start = getRealTime(); // Start timer
+      }
       
       // dV2 = [dV+mul([a_dot,x,a.T])+mul([a,x,a_dot.T]) for vp,a,a_dot,x in zip(Vp,As,Ap,X) ]  
       for(int k=0;k<K_;++k) {
@@ -664,11 +703,24 @@ namespace CasADi{
           dense_mul_tn(n_,n_,n_,&Z_[k*n_*n_],&nnKa_[k].data()[0],&output(DPLE_NUM_OUT*(d+1)+DPLE_P).data()[k*n_*n_]);
         }
       }
+      
+      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+        time_stop = getRealTime(); // Stop timer
+        profileWriteTime(CasadiOptions::profilingLog,this,2,time_stop-time_start,time_stop-time_zero);
+      }
   
     }
+
+
+    
+
     
     for (int d=0;d<nadj_;++d) {
-    
+
+      if(CasadiOptions::profiling) {
+        time_start = getRealTime(); // Start timer
+      }
+      
       DMatrix &P_bar = input(DPLE_NUM_IN*(nfwd_+1)+DPLE_NUM_OUT*d+DPLE_P);
       std::vector<double> &Vbar = output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*d+DPLE_V).data();
       std::fill(Vbar.begin(),Vbar.end(),0);
@@ -897,6 +949,18 @@ namespace CasADi{
       
       std::fill(P_bar.data().begin(),P_bar.data().end(),0);
  
+     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+        time_stop = getRealTime(); // Stop timer
+        profileWriteTime(CasadiOptions::profilingLog,this,3,time_stop-time_start,time_stop-time_zero);
+     }
+    
+    }
+    
+
+    
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
+      time_stop = getRealTime();
+      profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_zero);
     }
     
   }

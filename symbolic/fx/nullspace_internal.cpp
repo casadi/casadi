@@ -26,7 +26,6 @@
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
-#include "fx_tools.hpp"
 #include <utility>
 #include <string>
 
@@ -47,7 +46,7 @@ namespace CasADi{
 
     dense_ = getOption("dense");
     
-    casadi_assert(!dense_ || A_sp_.dense());
+    casadi_assert(!dense_ || A_sp_.isDense());
     
     m_ = A_sp_.size1();
     n_ = A_sp_.size2();

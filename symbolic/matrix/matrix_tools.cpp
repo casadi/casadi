@@ -27,15 +27,7 @@
 using namespace std;
 
 namespace CasADi{
-    
-  bool isRegular(const Matrix<double>& ex) {
-    return isRegular(ex.data());
-  }
-  
-  bool isRegular(const Matrix<int>& ex) {
-    return isRegular(ex.data());
-  }
-  
+      
   Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b, linearSolverCreator lsolver, const Dictionary& dict) {
     LinearSolver mysolver = lsolver(A.sparsity(),b.size2());
     mysolver.setOption(dict);

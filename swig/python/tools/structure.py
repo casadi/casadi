@@ -517,7 +517,7 @@ class SetterDispatcher(Dispatcher):
           self.master[i] = payload
         elif type=="symm":
           iflip = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry,flip=True)
-          if not(hasattr(payload,"scalar")) or payload.scalar():
+          if not(hasattr(payload,"isScalar")) or payload.isScalar():
             self.master[i] = payload
             self.master[iflip] = payload
           else:
@@ -1264,7 +1264,7 @@ class DataReference:
   
 class DataReferenceRepeated(DataReference):
   def __init__(self,a,n):
-    assert(a.dense())
+    assert(a.isDense())
     self.a = a
     self.n = n
     self.v = a.T.reshape((n*a.size2(),1))
@@ -1278,7 +1278,7 @@ class DataReferenceRepeated(DataReference):
 
 class DataReferenceSquared(DataReference):
   def __init__(self,a,n):
-    assert(a.dense())
+    assert(a.isDense())
     self.a = a
     self.v = a
     self.n = n
@@ -1295,7 +1295,7 @@ class DataReferenceSquared(DataReference):
     
 class DataReferenceSquaredRepeated(DataReference):
   def __init__(self,a,n,N):
-    assert(a.dense())
+    assert(a.isDense())
     self.a = a
     self.n = n
     self.N = N

@@ -157,9 +157,9 @@ if (dwork==0) {
     int K = a.size();
     int n = a[0].size1();
     for (int k=0;k<K;++k) {
-      casadi_assert_message(a[k].size1()==a[k].size2(), "a must be square");
+      casadi_assert_message(a[k].isSquare(), "a must be square");
       casadi_assert_message(a[k].size1()==n, "a must be n-by-n");
-      casadi_assert_message(a[k].dense(), "a must be dense");
+      casadi_assert_message(a[k].isDense(), "a must be dense");
     }
     
 

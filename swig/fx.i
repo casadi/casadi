@@ -43,8 +43,6 @@
 #include "symbolic/fx/external_function.hpp"
 #include "symbolic/fx/parallelizer.hpp"
 #include "symbolic/fx/custom_function.hpp"
-#include "symbolic/fx/fx_tools.hpp"
-#include "symbolic/fx/xfunction_tools.hpp"
 #include "symbolic/fx/nullspace.hpp"
 %}
 
@@ -134,8 +132,6 @@
 %include "symbolic/fx/external_function.hpp"
 %include "symbolic/fx/parallelizer.hpp"
 %include "symbolic/fx/custom_function.hpp"
-%include "symbolic/fx/fx_tools.hpp"
-%include "symbolic/fx/xfunction_tools.hpp"
 %include "symbolic/functor.hpp"
 %include "symbolic/fx/nullspace.hpp"
 

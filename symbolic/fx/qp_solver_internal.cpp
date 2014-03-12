@@ -49,7 +49,7 @@ namespace CasADi{
                             );
     } 
   
-    casadi_assert_message(H.symmetric(),
+    casadi_assert_message(H.isSymmetric(),
                           "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
                           "H: " << H.dimString() <<
                           "We need H square & symmetric" << std::endl

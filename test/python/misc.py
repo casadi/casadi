@@ -228,7 +228,7 @@ class Misctests(casadiTestCase):
     i = IpoptSolver(nlp)
     
     opts = i.getOptionNames()
-    self.assertTrue(isinstance(opts,tuple))
+    self.assertTrue(isinstance(opts,list))
     
     n = opts[0]
     self.assertTrue(type(n)==type(""))

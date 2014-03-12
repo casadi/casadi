@@ -24,7 +24,6 @@
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/sx/sx_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
-#include "../symbolic/fx/fx_tools.hpp"
 #include "../symbolic/stl_vector_tools.hpp"
 #include "../symbolic/fx/integrator.hpp"
 
@@ -383,9 +382,9 @@ void DirectCollocationInternal::evaluate(){
 void DirectCollocationInternal::reportConstraints(std::ostream &stream) { 
   stream << "Reporting Collocation constraints" << endl;
  
-  CasADi::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
-  CasADi::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
-  CasADi::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
+  FXInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
+  FXInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
+  FXInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
  
 }
 

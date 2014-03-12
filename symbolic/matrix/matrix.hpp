@@ -74,8 +74,6 @@ namespace CasADi{
       General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
       This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n
   
-      The syntax tries to stay as close as possible to the ublas syntax  when it comes to vector/matrix operations.\n
-
       Index starts with 0.\n
       Index vec happens as follows: (rr,cc) -> k = rr+cc*size1()\n
       Vectors are column vectors.\n
@@ -87,7 +85,7 @@ namespace CasADi{
       The sparsity can be accessed with Sparsity& sparsity()\n
   
       \author Joel Andersson 
-      \date 2010        
+      \date 2010-2014
   */
   template<class T>
   class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix<T> >, public PrintableObject{
@@ -162,12 +160,15 @@ namespace CasADi{
     using B::size1;
     using B::size2;
     using B::shape;
-    using B::empty;
-    using B::scalar;
-    using B::dense;
-    using B::vector;
+    using B::isEmpty;
+    using B::isScalar;
+    using B::isDense;
+    using B::isVector;
+    using B::isTril;
+    using B::isTriu;
     using B::dimString;
     using B::sym;
+    using B::sparse;
     using B::zeros;
     using B::ones;
     using B::operator[];
@@ -218,19 +219,6 @@ namespace CasADi{
       copy(x.begin(),x.end(),begin());
     }
     
-    /** \brief  ublas vector */
-#ifdef HAVE_UBLAS
-    template<typename T, typename A>
-    explicit Matrix<T>(const ublas::vector<A> &x) : sparsity_(Sparsity(x.size(),1,true)), data_(std::vector<T>(x.size())){
-      copy(x.begin(),x.end(),begin());
-    }
-
-    template<typename T, typename A>
-    explicit Matrix<T>(const ublas::matrix<A> &x) : sparsity_(Sparsity(x.size1(),x.size2(),true)), data_(std::vector<T>(numel())){
-      copy(x.begin(),x.end(),begin());
-      return ret;
-    }
-#endif // HAVE_UBLAS
 #endif // SWIG
 
 
@@ -431,12 +419,12 @@ namespace CasADi{
     
     /// Set all elements to a value
     void setAll(const T& val);
-    
-    /** \brief  Make the matrix an dense nrow-by-ncol matrix */
-    void makeDense(int nrow, int ncol, const T& val);
 
-    /** \brief  Make the matrix an empty nrow-by-ncol matrix */
-    void makeEmpty(int nrow, int ncol);
+    /// Make the matrix dense
+    void densify(const T& val = 0);
+
+    /** \brief  Make a matrix sparse by removing numerical zeros smaller in absolute value than a specified tolerance */
+    void sparsify(double tol=0);
 
     Matrix<T> operator+() const;
     Matrix<T> operator-() const;
@@ -577,10 +565,10 @@ namespace CasADi{
     const std::vector<T>& data() const;
     
     /// Get a pointer to the data
-    T* ptr(){ return empty() ? static_cast<T*>(0) : &front();}
+    T* ptr(){ return isEmpty() ? static_cast<T*>(0) : &front();}
     
     /// Get a const pointer to the data
-    const T* ptr() const{ return empty() ? static_cast<const T*>(0) : &front();}
+    const T* ptr() const{ return isEmpty() ? static_cast<const T*>(0) : &front();}
         
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const{ return sparsity_; }
@@ -662,20 +650,14 @@ namespace CasADi{
         ldres: The leading dimension in res 
         res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, T *res) const;
-    
-    //@{
-    /** \brief  create a sparse matrix with all zeros */
-    static Matrix<T> sparse(int nrow=1, int ncol=1);
-    static Matrix<T> sparse(const std::pair<int,int>& rc){ return sparse(rc.first,rc.second);}
-    //@}
-    
+        
     /* \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)
      */
     //@{
-    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d);
-    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int nrow, int ncol);
-    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& rc);
+    static Matrix<T> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d);
+    static Matrix<T> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int nrow, int ncol);
+    static Matrix<T> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& rc);
     //@}
     
     //@{
@@ -706,6 +688,50 @@ namespace CasADi{
     /** \brief  The following function is used to ensure similarity to MX, which is reference counted */
     bool isNull() const{ return false;}
     
+    /// Checks if expression does not contain NaN or Inf
+    bool isRegular() const;
+
+    /** \brief Check if smooth */
+    bool isSmooth() const;
+
+    /** \brief Check if symbolic (Dense)
+        Sparse matrices invariable return false 
+    */
+    bool isSymbolic() const;
+
+    /** \brief Check if symbolic
+        Sparse matrices can return true if all non-zero elements are symbolic
+    */
+    bool isSymbolicSparse() const;
+
+    /** \brief Check if the matrix is constant (note that false negative answers are possible)*/
+    bool isConstant() const;
+
+    /** \brief Check if the matrix is integer-valued (note that false negative answers are possible)*/
+    bool isInteger() const;
+
+    /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
+    bool isZero() const;
+
+    /** \brief  check if the matrix is 1 (note that false negative answers are possible)*/
+    bool isOne() const;
+
+    /** \brief  check if the matrix is -1 (note that false negative answers are possible)*/
+    bool isMinusOne() const;
+
+    /** \brief  check if the matrix is an identity matrix (note that false negative answers are possible)*/
+    bool isIdentity() const;
+
+    /** \brief Check if two expressions are equal
+     *  May give false negatives
+     *
+     *  Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
+     */
+    bool isEqual(const Matrix<T> &ex2) const;
+
+    /** \brief  Check if the matrix has any zero entries which are not structural zeros */
+    bool hasNonStructuralZeros() const;
+
     // @{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
     static void setPrecision(int precision) { stream_precision_ = precision; }

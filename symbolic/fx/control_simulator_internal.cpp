@@ -26,7 +26,8 @@
 #include "sx_function.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
-#include "fx_tools.hpp"
+#include "sx_function.hpp"
+#include "mx_function.hpp"
 #include <utility>
 #include <string>
 
@@ -91,7 +92,7 @@ namespace CasADi{
   
     nu_ = control_dae_.input(CONTROL_DAE_U).size();
   
-    if (!control_dae_.input(CONTROL_DAE_U_INTERP).empty() && nu_!=0) {
+    if (!control_dae_.input(CONTROL_DAE_U_INTERP).isEmpty() && nu_!=0) {
       casadi_assert_message(control_dae_.input(CONTROL_DAE_U).sparsity()==control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),"You specfified both U and U_INTERP, but the sparsities do not match: " << control_dae_.input(CONTROL_DAE_U).dimString() << "  <-> " << control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
     }
   
@@ -110,29 +111,29 @@ namespace CasADi{
     IMatrix iUstart  = 2+np_ + IMatrix(u_sparsity,range(nu_));
     IMatrix iUend    = 2+np_ + nu_ + IMatrix(control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),range(nu_end));
     IMatrix iYM;
-    if (!control_dae_.input(CONTROL_DAE_X_MAJOR).empty()) {
+    if (!control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty()) {
       iYM = 2+np_ + nu_ + nu_end + IMatrix(control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity(),range(ny_));
     }
   
     vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);
   
-    if (!control_dae_.input(CONTROL_DAE_T).empty())
+    if (!control_dae_.input(CONTROL_DAE_T).isEmpty())
       control_dae_in_[CONTROL_DAE_T]        = dae_in_[DAE_P](iT0) + (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*dae_in_[DAE_T];
-    if (!control_dae_.input(CONTROL_DAE_T0).empty())
+    if (!control_dae_.input(CONTROL_DAE_T0).isEmpty())
       control_dae_in_[CONTROL_DAE_T0]       = dae_in_[DAE_P](iT0);
-    if (!control_dae_.input(CONTROL_DAE_TF).empty())
+    if (!control_dae_.input(CONTROL_DAE_TF).isEmpty())
       control_dae_in_[CONTROL_DAE_TF]       = dae_in_[DAE_P](iTF);
     control_dae_in_[CONTROL_DAE_X]        = dae_in_[DAE_X];
-    if (!control_dae_.input(CONTROL_DAE_Z).empty())
+    if (!control_dae_.input(CONTROL_DAE_Z).isEmpty())
       control_dae_in_[CONTROL_DAE_Z]        = dae_in_[DAE_Z];
     control_dae_in_[CONTROL_DAE_P]        = dae_in_[DAE_P](iP);
-    if (!control_dae_.input(CONTROL_DAE_U).empty())
+    if (!control_dae_.input(CONTROL_DAE_U).isEmpty())
       control_dae_in_[CONTROL_DAE_U]        = dae_in_[DAE_P](iUstart);
-    if (!control_dae_.input(CONTROL_DAE_U_INTERP).empty()) {
+    if (!control_dae_.input(CONTROL_DAE_U_INTERP).isEmpty()) {
       MX tau = (dae_in_[DAE_P](iTF)-dae_in_[DAE_T])/(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0));
       control_dae_in_[CONTROL_DAE_U_INTERP] = dae_in_[DAE_P](iUstart) * (1-tau) + tau* dae_in_[DAE_P](iUend);
     }
-    if (!control_dae_.input(CONTROL_DAE_X_MAJOR).empty())
+    if (!control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty())
       control_dae_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
 
     std::vector<MX> control_dae_call = control_dae_.call(control_dae_in_);
@@ -251,34 +252,34 @@ namespace CasADi{
     // Initialize the output function again
     output_fcn_.init();
   
-    if (!output_fcn_.input(CONTROL_DAE_U).empty() && control_dae_.input(CONTROL_DAE_U).empty()) {
+    if (!output_fcn_.input(CONTROL_DAE_U).isEmpty() && control_dae_.input(CONTROL_DAE_U).isEmpty()) {
       casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_U input. The supplied DAE should have it as well.");
     }
-    if (!output_fcn_.input(CONTROL_DAE_U_INTERP).empty() && control_dae_.input(CONTROL_DAE_U_INTERP).empty()) {
+    if (!output_fcn_.input(CONTROL_DAE_U_INTERP).isEmpty() && control_dae_.input(CONTROL_DAE_U_INTERP).isEmpty()) {
       casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_U_INTERP input. The supplied DAE should have it as well.");
     }
-    if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).empty() && control_dae_.input(CONTROL_DAE_X_MAJOR).empty()) {
+    if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).isEmpty() && control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty()) {
       casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_X_MAJOR input. The supplied DAE should have it as well.");
     }
    
     output_fcn_in_ = vector<MX>(CONTROL_DAE_NUM_IN);
 
     dae_in_[DAE_T] = MX::sym("tau");
-    if (!output_fcn_.input(CONTROL_DAE_T).empty()) {
+    if (!output_fcn_.input(CONTROL_DAE_T).isEmpty()) {
       output_fcn_in_[CONTROL_DAE_T]        = dae_in_[DAE_P](iT0) + (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*dae_in_[DAE_T];
     }
-    if (!output_fcn_.input(CONTROL_DAE_T0).empty())
+    if (!output_fcn_.input(CONTROL_DAE_T0).isEmpty())
       output_fcn_in_[CONTROL_DAE_T0]       = dae_in_[DAE_P](iT0);
-    if (!output_fcn_.input(CONTROL_DAE_TF).empty())
+    if (!output_fcn_.input(CONTROL_DAE_TF).isEmpty())
       output_fcn_in_[CONTROL_DAE_TF]       = dae_in_[DAE_P](iTF);
     output_fcn_in_[CONTROL_DAE_X]        = dae_in_[DAE_X];
     output_fcn_in_[CONTROL_DAE_P]        = dae_in_[DAE_P](iP);
-    if (!output_fcn_.input(CONTROL_DAE_U).empty())
+    if (!output_fcn_.input(CONTROL_DAE_U).isEmpty())
       output_fcn_in_[CONTROL_DAE_U]        = dae_in_[DAE_P](iUstart);
-    if (!output_fcn_.input(CONTROL_DAE_U_INTERP).empty()) {
+    if (!output_fcn_.input(CONTROL_DAE_U_INTERP).isEmpty()) {
       output_fcn_in_[CONTROL_DAE_U_INTERP] = dae_in_[DAE_P](iUstart) * (1-dae_in_[DAE_T]) + dae_in_[DAE_T]* dae_in_[DAE_P](iUend);
     }
-    if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).empty())
+    if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).isEmpty())
       output_fcn_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
 
     // Transform the output_fcn_ with CONTROL_DAE input scheme to a DAE input scheme

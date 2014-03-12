@@ -62,7 +62,7 @@ namespace CasADi{
     bool is_vector = true;
     for(vector<MX>::const_iterator it=comp.begin(); it!=comp.end(); ++it){
       // Rewrite with horzcat and transpose if not a vector
-      if(!it->isNull() && !(it->size1()==0 && it->size2()==0) && !it->vector()){
+      if(!it->isNull() && !(it->size1()==0 && it->size2()==0) && !it->isVector()){
         vector<MX> v(comp.size());
         for(int i=0; i<v.size(); ++i)
           v[i] = trans(comp[i]);
@@ -75,7 +75,7 @@ namespace CasADi{
   }
   
   std::vector<MX> vertsplit(const MX& x, const std::vector<int>& offset){
-    if(x.vector()){
+    if(x.isVector()){
       // Consistency check
       casadi_assert(offset.size()>=1);
       casadi_assert(offset.front()==0);
@@ -172,27 +172,6 @@ namespace CasADi{
     return ret;
   }
 
-
-  bool isZero(const MX& ex){
-    if(ex.size()==0){
-      return true;
-    } else {
-      return ex->isZero();
-    }
-  }
-
-  bool isOne(const MX& ex){
-    return !ex.isNull() && ex->isOne();
-  }
-
-  bool isMinusOne(const MX& ex){
-    return !ex.isNull() && ex->isValue(-1);
-  }
-
-  bool isIdentity(const MX& ex){
-    return !ex.isNull() && ex->isIdentity();
-  }
-
   MX inner_prod(const MX &x, const MX &y){
     return x.inner_prod(y);
   }
@@ -204,14 +183,6 @@ namespace CasADi{
   void simplify(MX& ex){
     if(!ex.isNull()){
       ex->simplifyMe(ex);
-    }
-  }
-
-  bool isTranspose(const MX& ex){
-    if(ex.isNull()){
-      return false;
-    } else {
-      return ex->getOp()==OP_TRANSPOSE;
     }
   }
 
@@ -247,7 +218,7 @@ namespace CasADi{
   }
 
   MX vec(const MX& x) {
-    if(x.vector()){
+    if(x.isVector()){
       return x;
     } else {
       return reshape(x,x.numel(),1);
@@ -255,7 +226,7 @@ namespace CasADi{
   }
   
   MX vecNZ(const MX& x) {
-    if(x.dense()){
+    if(x.isDense()){
       return vec(x);
     } else {
       return x->getGetNonzeros(sp_dense(x.size(),1),range(x.size()));
@@ -290,28 +261,6 @@ namespace CasADi{
     ret = A->getSetNonzeros(ret,nzA);
     ret = B->getSetNonzeros(ret,nzB);
     return ret;
-  }
-
-  bool isSymbolic(const MX& ex){
-    if (ex.isNull())
-      return false;
-    return ex->getOp()==OP_PARAMETER;
-  }
-
-  bool isSymbolicSparse(const MX& ex){
-    if(ex.isNull()){
-      return false;
-    } else if(ex.getOp()==OP_HORZCAT){
-      // Check if the expression is a horzcat where all components are symbolic primitives
-      for(int d=0; d<ex->ndep(); ++d){
-        if(!ex->dep(d).isSymbolic()){
-          return false;
-        }
-      }
-      return true;
-    } else {
-      return isSymbolic(ex);
-    }
   }
 
   MX trace(const MX& A){
@@ -365,22 +314,10 @@ namespace CasADi{
      }
   */
 
-  MX densify(const MX& x){
+  MX full(const MX& x){
     MX ret = x;
-    makeDense(ret);
+    ret.densify();
     return ret;
-  }
-
-  MX full(const MX& x) {
-    return densify(x);
-  }
-
-  void makeDense(MX& x){
-    // Quick return if already dense
-    if(x.dense()) return;
-  
-    // Densify
-    x = x.setSparse(sp_dense(x.size1(),x.size2()));
   }
 
   MX createParent(std::vector<MX> &deps) {
@@ -491,8 +428,8 @@ namespace CasADi{
 
 
   MX polyval(const MX& p, const MX& x){
-    casadi_assert_message(isDense(p),"polynomial coefficients vector must be a vector");
-    casadi_assert_message(isVector(p) && p.size()>0,"polynomial coefficients must be a vector");
+    casadi_assert_message(p.isDense(),"polynomial coefficients vector must be a vector");
+    casadi_assert_message(p.isVector() && p.size()>0,"polynomial coefficients must be a vector");
     MX ret = p[0];
     for(int i=1; i<p.size(); ++i){
       ret = ret*x + p[i];
@@ -500,19 +437,13 @@ namespace CasADi{
     return ret;
   }
 
-  bool isVector(const MX& ex){
-    return ex.size1()==1;
-  }
-
-  bool isDense(const MX& ex){
-    return ex.size() == ex.numel();
-  }
-
+#ifndef WITHOUT_PRE_1_9_X
   bool isEqual(const MX& ex1,const MX &ex2){
     if ((ex1.size()!=0 || ex2.size()!=0) && (ex1.size2()!=ex2.size2() || ex1.size1()!=ex2.size1())) return false;
     MX difference = ex1 - ex2;  
     return isZero(difference);
   }
+#endif
 
   std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args) {
     std::stringstream s;
@@ -924,15 +855,7 @@ namespace CasADi{
   MX inv(const MX& A){
     return A->getInverse();
   }
-  
-  bool isRegular(const MX& ex) {
-    if (ex.isConstant()) {
-      return isRegular(ex.getMatrixValue());
-    } else {
-      casadi_error("Cannot check regularity for symbolic MX");
-    }
-  }
-  
+    
   std::vector<MX> getSymbols(const MX& e) {
     MXFunction f(std::vector<MX>(),e);
     f.init();
