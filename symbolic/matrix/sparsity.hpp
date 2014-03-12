@@ -332,6 +332,11 @@ namespace CasADi{
     /// Transpose the matrix
     Sparsity transpose() const;
 
+#ifndef SWIG
+    /// Transpose the matrix (shorthand)
+    Sparsity T() const{ return transpose();}
+#endif
+
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     Sparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
         
