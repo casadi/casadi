@@ -27,6 +27,7 @@
 #include "matrix.hpp"
 #include "matrix_tools.hpp"
 #include "sparsity_tools.hpp"
+#include "../stl_vector_tools.hpp"
 
 namespace CasADi{
   // Implementations
@@ -1931,7 +1932,7 @@ namespace CasADi{
 
   template<class T>
   bool Matrix<T>::isRegular() const{
-    casadi_error("Not implemented.");
+    return CasADi::isRegular(data_);
   }
 
   template<class T>

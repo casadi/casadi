@@ -53,16 +53,8 @@ namespace CasADi{
   template<class T>
   bool isConstant(const Matrix<T>& ex);
 
-
   template<class T>
   bool isInteger(const Matrix<T>& ex);
-
-
-  //{@
-  /// Checks if vector does not contain NaN or Inf
-  bool isRegular(const Matrix<int>& ex);
-  bool isRegular(const Matrix<double>& ex);
-  //@}
 
   template<class T>
   T det(const Matrix<T>& a);
@@ -451,6 +443,7 @@ namespace CasADi{
   template<class T> bool isTril(const Matrix<T> &A){ return A.isTril(); }
   template<class T> bool isTriu(const Matrix<T> &A){ return A.isTriu(); }
   template<class T> bool isScalar(const Matrix<T>& ex){ return ex.isScalar();}
+  template<class T> bool isRegular(const Matrix<T>& ex){ return ex.isRegular();}
   //@}
 #endif
 
