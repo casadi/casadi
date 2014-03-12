@@ -229,7 +229,7 @@ namespace CasADi{
     if(x.isDense()){
       return vec(x);
     } else {
-      return x->getGetNonzeros(sp_dense(x.size(),1),range(x.size()));
+      return x->getGetNonzeros(Sparsity::dense(x.size(),1),range(x.size()));
     }
   }
 

@@ -64,8 +64,8 @@ QCQPSolverInternal::QCQPSolverInternal(const std::vector<Sparsity> &st) : st_(st
   nq_ = P.size2() / n_;
 
   // Sparsity
-  Sparsity x_sparsity = sp_dense(n_,1);
-  Sparsity bounds_sparsity = sp_dense(nc_,1);
+  Sparsity x_sparsity = Sparsity::dense(n_,1);
+  Sparsity bounds_sparsity = Sparsity::dense(nc_,1);
   
   // Input arguments
   setNumInputs(QCQP_SOLVER_NUM_IN);

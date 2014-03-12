@@ -452,7 +452,7 @@ namespace CasADi{
   }
 
   template<class T>
-  Matrix<T>::Matrix() : sparsity_(Sparsity(0,0,false)){
+  Matrix<T>::Matrix() : sparsity_(Sparsity::sparse(0,0)){
   }
 
   template<class T>
@@ -460,11 +460,11 @@ namespace CasADi{
   }
 
   template<class T>
-  Matrix<T>::Matrix(const std::vector<T>& x) : sparsity_(Sparsity(x.size(),1,true)), data_(x){
+  Matrix<T>::Matrix(const std::vector<T>& x) : sparsity_(Sparsity::dense(x.size(),1)), data_(x){
   }
 
   template<class T>
-  Matrix<T>::Matrix(const std::vector<T>& x, int nrow, int ncol) : sparsity_(Sparsity(nrow,ncol,true)), data_(x){
+  Matrix<T>::Matrix(const std::vector<T>& x, int nrow, int ncol) : sparsity_(Sparsity::dense(nrow,ncol)), data_(x){
     casadi_assert_message(x.size() == nrow*ncol, "Dimension mismatch." << std::endl << "You supplied a vector of length " << x.size() << ", but " << nrow << " x " << ncol << " = " << nrow*ncol);
   }
 
@@ -476,11 +476,11 @@ namespace CasADi{
   }
 
   template<class T>
-  Matrix<T>::Matrix(int nrow, int ncol) : sparsity_(Sparsity(nrow,ncol,false)){
+  Matrix<T>::Matrix(int nrow, int ncol) : sparsity_(Sparsity::sparse(nrow,ncol)){
   }
 
   template<class T>
-  Matrix<T>::Matrix(int nrow, int ncol, const T& val) : sparsity_(Sparsity(nrow,ncol,true)), data_(std::vector<T>(nrow*ncol, val)){
+  Matrix<T>::Matrix(int nrow, int ncol, const T& val) : sparsity_(Sparsity::dense(nrow,ncol)), data_(std::vector<T>(nrow*ncol, val)){
   }
 
   template<class T>
@@ -691,12 +691,12 @@ namespace CasADi{
 
   template<class T>
   void Matrix<T>::clear(){
-    sparsity_ = Sparsity(0,0,false);
+    sparsity_ = Sparsity::sparse(0,0);
     data().clear();
   }
 
   template<class T>
-  Matrix<T>::Matrix(double val) : sparsity_(Sparsity(1,1,true)), data_(std::vector<T>(1,val)) {
+  Matrix<T>::Matrix(double val) : sparsity_(Sparsity::dense(1,1)), data_(std::vector<T>(1,val)) {
   }
 
   template<class T>
@@ -722,7 +722,7 @@ namespace CasADi{
     }
 
     // Form matrix
-    sparsity_ = Sparsity(nrow,ncol,true);
+    sparsity_ = Sparsity::dense(nrow,ncol);
     data().resize(nrow*ncol);
     typename std::vector<T>::iterator it=begin();
     for(int cc=0; cc<ncol; ++cc){
@@ -1772,7 +1772,7 @@ namespace CasADi{
   Matrix<T> Matrix<T>::triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int nrow, int ncol) {
     casadi_assert_message(col.size()==row.size() && col.size()==d.size(),"Argument error in Matrix<T>::sparse(row,col,d): supplied lists must all be of equal length, but got: " << row.size() << ", " << col.size()  << " and " << d.size());
     std::vector<int> mapping;
-    Sparsity sp = sp_triplet(nrow,ncol,row,col,mapping);
+    Sparsity sp = Sparsity::triplet(nrow,ncol,row,col,mapping);
     std::vector<T> v(mapping.size());
     for(int k=0; k<v.size(); ++k) v[k] = d[mapping[k]];
     return Matrix<T>(sp,v);
@@ -1809,7 +1809,7 @@ namespace CasADi{
 
   template<class T>
   Matrix<T> Matrix<T>::eye(int n){
-    return Matrix<T>(Sparsity::createDiagonal(n),1);
+    return Matrix<T>(Sparsity::diag(n),1);
   }
 
   template<class T>
@@ -1826,7 +1826,7 @@ namespace CasADi{
 
   template<class T>
   Matrix<T> Matrix<T>::inf(int nrow, int ncol){
-    return inf(sp_dense(nrow,ncol));
+    return inf(Sparsity::dense(nrow,ncol));
   }
 
   template<class T>
@@ -1842,7 +1842,7 @@ namespace CasADi{
 
   template<class T>
   Matrix<T> Matrix<T>::nan(int nrow, int ncol){
-    return nan(sp_dense(nrow,ncol));
+    return nan(Sparsity::dense(nrow,ncol));
   }
 
   template<class T>

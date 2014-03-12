@@ -684,7 +684,7 @@ namespace CasADi{
         for(int ind=0; ind<fseed[d].size(); ++ind){
           int nrow = input(ind).size1(), ncol = input(ind).size2(); // Input dimensions
           if(ind==iind){
-            fseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
+            fseed[d][ind] = MatType::ones(Sparsity::triplet(nrow,ncol,seed_row,seed_col));
           } else {
             fseed[d][ind] = MatType::sparse(nrow,ncol);
           }
@@ -714,7 +714,7 @@ namespace CasADi{
         for(int ind=0; ind<aseed[d].size(); ++ind){
           int nrow = output(ind).size1(), ncol = output(ind).size2(); // Output dimensions
           if(ind==oind){
-            aseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
+            aseed[d][ind] = MatType::ones(Sparsity::triplet(nrow,ncol,seed_row,seed_col));
           } else {
             aseed[d][ind] = MatType::sparse(nrow,ncol);
           }

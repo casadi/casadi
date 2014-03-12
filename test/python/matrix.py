@@ -281,7 +281,7 @@ class Matrixtests(casadiTestCase):
     
     self.checkarray(B,DMatrix([[2,4,3,4,5],[6,7,16,9,10]]),"Imatrix indexing assignement")
     
-    self.assertRaises(Exception, lambda : B[sp_dense(4,4)])
+    self.assertRaises(Exception, lambda : B[Sparsity.dense(4,4)])
     
   
   
@@ -705,11 +705,11 @@ class Matrixtests(casadiTestCase):
           
     
     # getSub1
-    check(IMatrix(sp_dense(3,3),range(3*3)),[0,1,2],[0,1,2])
-    check(IMatrix(sp_dense(4,4),range(4*4)),[0,1,3],[0,2,3])
-    check(IMatrix(sp_dense(3,3),range(3*3)),[0,0,1],[0,0,1])
-    check(IMatrix(sp_dense(3,3),range(3*3)),[0,0,2],[0,0,2])
-    check(IMatrix(sp_dense(3,3),range(3*3)),[1,1,2],[1,1,2])
+    check(IMatrix(Sparsity.dense(3,3),range(3*3)),[0,1,2],[0,1,2])
+    check(IMatrix(Sparsity.dense(4,4),range(4*4)),[0,1,3],[0,2,3])
+    check(IMatrix(Sparsity.dense(3,3),range(3*3)),[0,0,1],[0,0,1])
+    check(IMatrix(Sparsity.dense(3,3),range(3*3)),[0,0,2],[0,0,2])
+    check(IMatrix(Sparsity.dense(3,3),range(3*3)),[1,1,2],[1,1,2])
 
     sp = sp_tril(4)
     d = IMatrix(sp,range(sp.size()))
@@ -721,10 +721,10 @@ class Matrixtests(casadiTestCase):
     check(d,[0,3],[0,2])
     
     # getSub2
-    check(IMatrix(sp_dense(2,2),range(2*2)),[0,0,0],[0,0,0])
-    check(IMatrix(sp_dense(2,2),range(2*2)),[0,0,1],[0,0,1])
-    check(IMatrix(sp_dense(2,2),range(2*2)),[1,1,0],[1,1,0])
-    check(IMatrix(sp_dense(2,2),range(2*2)),[1,1,1],[1,1,1])
+    check(IMatrix(Sparsity.dense(2,2),range(2*2)),[0,0,0],[0,0,0])
+    check(IMatrix(Sparsity.dense(2,2),range(2*2)),[0,0,1],[0,0,1])
+    check(IMatrix(Sparsity.dense(2,2),range(2*2)),[1,1,0],[1,1,0])
+    check(IMatrix(Sparsity.dense(2,2),range(2*2)),[1,1,1],[1,1,1])
 
     sp = sp_tril(3)
     d = IMatrix(sp,range(sp.size()))
@@ -827,9 +827,9 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(sp_diag(10).sizeD(),10)
     self.assertEqual(sp_diag(10).sizeU(),10)
     self.assertEqual(sp_diag(10).sizeL(),10)
-    self.assertEqual(sp_dense(10,10).sizeL(),10*11/2)
-    self.assertEqual(sp_dense(10,10).sizeU(),10*11/2)
-    self.assertEqual(sp_dense(10,10).sizeD(),10)
+    self.assertEqual(Sparsity.dense(10,10).sizeL(),10*11/2)
+    self.assertEqual(Sparsity.dense(10,10).sizeU(),10*11/2)
+    self.assertEqual(Sparsity.dense(10,10).sizeD(),10)
     
     self.assertEqual(sparse(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeD(),1)
     self.assertEqual(sparse(DMatrix([[1,1,0],[1,0,1],[0,0,0]])).sizeL(),2)
@@ -948,24 +948,24 @@ class Matrixtests(casadiTestCase):
     import random
     
     spA = [
-      sp_dense(1,1)
+      Sparsity.dense(1,1)
     ]
     
     for n in range(2,5):
       spA+= [
         sp_diag(n),
-        sp_dense(n,n),
+        Sparsity.dense(n,n),
         sp_tril(n),
         sp_tril(n).T,
         sp_banded(n,1),
-        blkdiag([sp_diag(n),sp_dense(n,n)]),
+        blkdiag([sp_diag(n),Sparsity.dense(n,n)]),
         blkdiag([sp_diag(n),sp_tril(n)]),
         blkdiag([sp_diag(n),sp_tril(n).T]),
         blkdiag([sp_tril(n),sp_tril(n).T]),
         sp_diag(n)+sp_rowcol([0],[n-1],n,n),
         sp_diag(n)+sp_rowcol([0,n-1],[n-1,0],n,n),
-        sp_diag(n)+sp_triplet(n,n,[0],[n-1]),
-        sp_diag(n)+sp_triplet(n,n,[0,n-1],[n-1,0]),
+        sp_diag(n)+Sparsity.triplet(n,n,[0],[n-1]),
+        sp_diag(n)+Sparsity.triplet(n,n,[0,n-1],[n-1,0]),
       ]
     
     for sA in spA:
@@ -973,7 +973,7 @@ class Matrixtests(casadiTestCase):
       random.seed(1)
       a = DMatrix(sA,[random.random() for i in range(sA.size())])
       A = SX.sym("a",a.sparsity())
-      for sB in [ sp_dense(a.size1(),1), vertcat([sp_dense(1,1),sp_sparse(a.size1()-1,1)]),sp_tril(a.size1()),sp_tril(a.size1()).T]:
+      for sB in [ Sparsity.dense(a.size1(),1), vertcat([Sparsity.dense(1,1),sp_sparse(a.size1()-1,1)]),sp_tril(a.size1()),sp_tril(a.size1()).T]:
 
         b = DMatrix(sB,[random.random() for i in range(sB.size())])
         B = SX.sym("B",b.sparsity())

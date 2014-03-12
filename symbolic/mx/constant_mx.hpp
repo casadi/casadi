@@ -259,7 +259,7 @@ namespace CasADi{
       casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,0,ret);
       
       if (ret!=0) {
-        Sparsity f = sp_dense(y.size1(),y.size2());
+        Sparsity f = Sparsity::dense(y.size1(),y.size2());
         MX yy = y.setSparse(f);
         return MX(f,shared_from_this<MX>())->getBinary(op,yy,false,false);
       }
@@ -271,7 +271,7 @@ namespace CasADi{
         grow = ret!=0;
       }
       if (grow) {
-        Sparsity f = sp_dense(size1(),size2());
+        Sparsity f = Sparsity::dense(size1(),size2());
         MX xx = shared_from_this<MX>().setSparse(f);
         return xx->getBinary(op,MX(f,y),false,false);
       }

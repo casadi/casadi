@@ -91,7 +91,7 @@ class SDPtests(casadiTestCase):
     n1 = 3.1
     c = DMatrix(n1)
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = sdpsolver(sdpStruct(a=sp_dense(0,1),g=sp_dense(0,0),f=sp_dense(0,0)))
+      sdp = sdpsolver(sdpStruct(a=Sparsity.dense(0,1),g=Sparsity.dense(0,0),f=Sparsity.dense(0,0)))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(c,"c")
@@ -335,7 +335,7 @@ class SDPtests(casadiTestCase):
     c = DMatrix([2,3])
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = sdpsolver(sdpStruct(a=A.sparsity(),g=sp_dense(0,0),f=sp_dense(0,0)))
+      sdp = sdpsolver(sdpStruct(a=A.sparsity(),g=Sparsity.dense(0,0),f=Sparsity.dense(0,0)))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(c,"c")
@@ -371,7 +371,7 @@ class SDPtests(casadiTestCase):
     c = DMatrix([2,3])
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = sdpsolver(sdpStruct(a=A.sparsity(),g=sp_dense(0,0),f=sp_dense(0,0)))
+      sdp = sdpsolver(sdpStruct(a=A.sparsity(),g=Sparsity.dense(0,0),f=Sparsity.dense(0,0)))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(c,"c")

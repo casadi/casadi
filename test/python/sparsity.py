@@ -156,7 +156,7 @@ class Sparsitytests(casadiTestCase):
     for i in nza:
       a.getNZ(i[0],i[1])
       
-    b = sp_triplet(4,5,[i[0] for i in nza],[i[1] for i in nza])
+    b = Sparsity.triplet(4,5,[i[0] for i in nza],[i[1] for i in nza])
     self.checkarray(self.tomatrix(a),self.tomatrix(b),"rowcol")
 
   def test_rowcol(self):
@@ -533,7 +533,7 @@ class Sparsitytests(casadiTestCase):
     d = self.randDMatrix(20,20,0.6,symm=True)
     sp = d.sparsity()
     
-    for sp in [sp,sp_dense(4,4),sp_sparse(4,4),sp_tril(4),sp_tril(4).T]:
+    for sp in [sp,Sparsity.dense(4,4),sp_sparse(4,4),sp_tril(4),sp_tril(4).T]:
     
       d = IMatrix(sp,1)
       

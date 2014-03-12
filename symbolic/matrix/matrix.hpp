@@ -208,13 +208,13 @@ namespace CasADi{
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
-    Matrix(const std::vector<A>& x) : sparsity_(Sparsity(x.size(),1,true)), data_(std::vector<T>(x.size())){
+    Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(),1)), data_(std::vector<T>(x.size())){
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create a non-vector expression from an stl vector */
     template<typename A>
-    Matrix(const std::vector<A>& x,  int nrow, int ncol) : sparsity_(Sparsity(nrow,ncol,true)), data_(std::vector<T>(x.size())){
+    Matrix(const std::vector<A>& x,  int nrow, int ncol) : sparsity_(Sparsity::dense(nrow,ncol)), data_(std::vector<T>(x.size())){
       if(x.size() != nrow*ncol) throw CasadiException("Matrix::Matrix(const std::vector<T>& x,  int n, int m): dimension mismatch");
       copy(x.begin(),x.end(),begin());
     }

@@ -67,6 +67,9 @@ namespace CasADi{
    */
   Sparsity reshape(const Sparsity& a, int nrow, int ncol);
 
+  /** \ brief Transpose the pattern */
+  inline Sparsity transpose(const Sparsity& a){ return a.transpose();}
+
   /** \ brief Vectorize the pattern */
   Sparsity vec(const Sparsity& a);
   

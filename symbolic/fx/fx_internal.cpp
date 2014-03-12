@@ -485,7 +485,7 @@ namespace CasADi{
     for(int ind=0; ind<getNumOutputs(); ++ind) output(ind).setZero();
 
     // Construct sparsity pattern
-    Sparsity ret = sp_triplet(nz_out, nz_in, use_fwd ? jcol : jrow, use_fwd ? jrow : jcol);
+    Sparsity ret = Sparsity::triplet(nz_out, nz_in, use_fwd ? jcol : jrow, use_fwd ? jrow : jcol);
     
     casadi_log("Formed Jacobian sparsity pattern (dimension " << ret.shape() << ", " << ret.size() << " nonzeros, " << 100*double(ret.size())/double(ret.size1())/double(ret.size2()) << " \% nonzeros).");
     casadi_log("FXInternal::getJacSparsity end ");
@@ -524,7 +524,7 @@ namespace CasADi{
     // In each iteration, subdivide each coarse block in this many fine blocks
     int subdivision = bvec_size;
 
-    Sparsity r = sp_dense(1,1);
+    Sparsity r = Sparsity::dense(1,1);
     
     // The size of a block
     int granularity = nz;
@@ -709,7 +709,7 @@ namespace CasADi{
       }
 
       // Construct fine sparsity pattern
-      r = sp_triplet(fine.size()-1, fine.size()-1, jrow, jcol);
+      r = Sparsity::triplet(fine.size()-1, fine.size()-1, jrow, jcol);
       coarse = fine;
       hasrun = true;
     }
@@ -756,7 +756,7 @@ namespace CasADi{
     // In each iteration, subdivide each coarse block in this many fine blocks
     int subdivision = bvec_size;
 
-    Sparsity r = sp_dense(1,1);
+    Sparsity r = Sparsity::dense(1,1);
     
     // The size of a block
     int granularity_row = nz_in;
@@ -1000,12 +1000,12 @@ namespace CasADi{
       // Swap results if adjoint mode was used
       if (use_fwd) {
         // Construct fine sparsity pattern
-        r = sp_triplet(fine_row.size()-1, fine_col.size()-1, jrow, jcol);
+        r = Sparsity::triplet(fine_row.size()-1, fine_col.size()-1, jrow, jcol);
         coarse_col = fine_col;
         coarse_row = fine_row;
       } else {
         // Construct fine sparsity pattern
-        r = sp_triplet(fine_col.size()-1, fine_row.size()-1, jcol, jrow);
+        r = Sparsity::triplet(fine_col.size()-1, fine_row.size()-1, jcol, jrow);
         coarse_col = fine_row;
         coarse_row = fine_col;
       }

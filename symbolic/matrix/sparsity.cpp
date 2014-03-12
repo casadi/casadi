@@ -67,6 +67,7 @@ namespace CasADi{
     return ret;
   }
 
+#ifndef WITHOUT_PRE_1_9_X
   Sparsity::Sparsity(int nrow, int ncol, bool dense){
     std::vector<int> row, colind(ncol+1,0);
     if(dense){
@@ -81,6 +82,7 @@ namespace CasADi{
  
     assignCached(nrow, ncol, colind, row);
   }
+#endif
 
   Sparsity::Sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row){
     assignCached(nrow, ncol, colind, row);
@@ -739,12 +741,23 @@ namespace CasADi{
     return ret;
   }
 
-  Sparsity Sparsity::dense(int nrow, int ncol) {
-    return Sparsity(nrow,ncol,true);
+  Sparsity Sparsity::dense(int nrow, int ncol){
+    // Column offset
+    std::vector<int> colind(ncol+1);
+    for(int cc=0; cc<ncol+1; ++cc) colind[cc] = cc*nrow;
+
+    // Row
+    std::vector<int> row(ncol*nrow);
+    for(int cc=0; cc<ncol; ++cc)
+      for(int rr=0; rr<nrow; ++rr)
+        row[rr+cc*nrow] = rr;
+ 
+    return Sparsity(nrow,ncol,colind,row);
   }
 
   Sparsity Sparsity::sparse(int nrow, int ncol) {
-    return Sparsity(nrow,ncol,false);
+    std::vector<int> row, colind(ncol+1,0);    
+    return Sparsity(nrow,ncol,colind,row);
   }
 
   Sparsity Sparsity::triu(int n) {
@@ -815,7 +828,7 @@ namespace CasADi{
 
   Sparsity Sparsity::banded(int n, int p) {
     // This is not an efficient implementation
-    Sparsity ret = Sparsity(n,n);
+    Sparsity ret = Sparsity::sparse(n,n);
     for (int i=-p;i<=p;++i) {
       ret = ret + Sparsity::band(n,i);
     }
@@ -848,7 +861,7 @@ namespace CasADi{
     casadi_assert_message(col.size()==row.size(),"inconsistent lengths");
 
     // Create the return sparsity pattern and access vectors
-    Sparsity ret = Sparsity(nrow,ncol);
+    Sparsity ret = Sparsity::sparse(nrow,ncol);
     std::vector<int> &r_colind = ret.colindRef();
     std::vector<int> &r_row = ret.rowRef();
     r_row.reserve(row.size());

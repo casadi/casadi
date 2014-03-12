@@ -43,7 +43,7 @@ namespace CasADi{
   }
 
   MX::MX(double x){
-    assignNode(ConstantMX::create(sp_dense(1,1),x));
+    assignNode(ConstantMX::create(Sparsity::dense(1,1),x));
   }
 
   MX::MX(const Matrix<double>& x){
@@ -462,7 +462,7 @@ namespace CasADi{
 
     // Project scalars
     if(k.size()!=el.size() && el.isScalar() && el.isDense()){      
-      MX new_el = el->getGetNonzeros(sp_dense(1,k.size()),std::vector<int>(k.size(),0));
+      MX new_el = el->getGetNonzeros(Sparsity::dense(1,k.size()),std::vector<int>(k.size(),0));
       x = new_el->getSetNonzeros(*this,k);
     } else {
       // Create a nonzero assignment node
@@ -525,7 +525,7 @@ namespace CasADi{
   }
 
   MX MX::inf(int nrow, int ncol){
-    return inf(sp_dense(nrow,ncol));
+    return inf(Sparsity::dense(nrow,ncol));
   }
 
   MX MX::inf(const std::pair<int, int> &rc){
@@ -537,7 +537,7 @@ namespace CasADi{
   }
 
   MX MX::nan(int nrow, int ncol){
-    return nan(sp_dense(nrow,ncol));
+    return nan(Sparsity::dense(nrow,ncol));
   }
 
   MX MX::nan(const std::pair<int, int>& rc){
