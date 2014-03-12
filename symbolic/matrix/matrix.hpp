@@ -434,7 +434,7 @@ namespace CasADi{
     void setAll(const T& val);
 
     /// Make the matrix dense
-    void full();
+    void full(const T& val = 0);
 
 
     void makeDense(int nrow, int ncol, const T& val);

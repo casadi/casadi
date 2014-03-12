@@ -380,7 +380,7 @@ namespace CasADi{
   }
 
   template<class T>
-  void Matrix<T>::full(){
+  void Matrix<T>::full(const T& val){
     // Quick return if possible
     if(isDense()) return;
 
@@ -390,11 +390,8 @@ namespace CasADi{
     const std::vector<int>& colind = this->colind();
     const std::vector<int>& row = this->row();
 
-    // Zero
-    const T zero = 0;
-
     // Resize data and copy
-    data_.resize(nrow*ncol,zero);
+    data_.resize(nrow*ncol,val);
     
     // Loop over the colums in reverse order
     for(int cc=ncol-1; cc>=0; --cc){
@@ -406,7 +403,7 @@ namespace CasADi{
         // Swap the old position with the new position
         if(el!=cc*nrow + rr){
           data_[cc*nrow + rr] = data_[el];
-          data_[el] = zero;
+          data_[el] = val;
         }
       }
     }
