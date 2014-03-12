@@ -166,16 +166,15 @@ namespace CasADi{
      * throws an error as possible result
      */
     void sanityCheck(bool complete=false) const;
-
     
     /** Get the diagonal of the matrix/create a diagonal matrix (mapping will contain the nonzero mapping)
         When the input is square, the diagonal elements are returned.
         If the input is vector-like, a diagonal matrix is constructed with it.
     */
 #ifndef SWIG
-    Sparsity diag(std::vector<int>& mapping) const;
+    Sparsity getDiag(std::vector<int>& mapping) const;
 #else // SWIG
-    Sparsity diag(std::vector<int>& OUTPUT) const;
+    Sparsity getDiag(std::vector<int>& OUTPUT) const;
 #endif // SWIG
     
     /// @{
@@ -212,12 +211,12 @@ namespace CasADi{
     /// \name Size and element counting
     /// @{
     
-    /// Get the number of cols
-    int size2() const;
-    
     /// Get the number of rows
     int size1() const;
 
+    /// Get the number of columns
+    int size2() const;
+    
     /** \brief The total number of elements, including structural zeros, i.e. size2()*size1()
         \see size()  */
     int numel() const;
@@ -233,10 +232,10 @@ namespace CasADi{
     int size() const;
 
     /** \brief Number of non-zeros in the upper triangular half, i.e. the number of elements (i,j) with j>=i */
-    int sizeL() const;
+    int sizeU() const;
 
     /** \brief Number of non-zeros in the lower triangular half, i.e. the number of elements (i,j) with j<=i */
-    int sizeU() const;
+    int sizeL() const;
 
     /** \brief Number of non-zeros on the diagonal, i.e. the number of elements (i,j) with j==i */
     int sizeD() const;

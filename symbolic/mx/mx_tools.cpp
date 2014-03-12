@@ -374,7 +374,7 @@ namespace CasADi{
     std::vector<int> mapping;
   
     // Get the sparsity
-    Sparsity sp = x.sparsity().diag(mapping);
+    Sparsity sp = x.sparsity().getDiag(mapping);
   
     // Create a reference to the nonzeros
     return x->getGetNonzeros(sp,mapping);

@@ -1768,7 +1768,7 @@ namespace CasADi{
     }
   }
 
-  Sparsity SparsityInternal::diag(std::vector<int>& mapping) const{
+  Sparsity SparsityInternal::getDiag(std::vector<int>& mapping) const{
     if (ncol_==nrow_) {
       // Return object
       Sparsity ret(0,1);

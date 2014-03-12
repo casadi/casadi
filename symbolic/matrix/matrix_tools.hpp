@@ -1045,7 +1045,7 @@ namespace CasADi{
     // Nonzero mapping
     std::vector<int> mapping;
     // Get the sparsity
-    Sparsity sp = A.sparsity().diag(mapping);
+    Sparsity sp = A.sparsity().getDiag(mapping);
   
     Matrix<T> ret = Matrix<T>(sp);
   

@@ -486,8 +486,8 @@ namespace CasADi{
     return (*this)->dimString();
   }
 
-  Sparsity Sparsity::diag(std::vector<int>& mapping) const{
-    return (*this)->diag(mapping);
+  Sparsity Sparsity::getDiag(std::vector<int>& mapping) const{
+    return (*this)->getDiag(mapping);
   }
 
   std::vector<int> Sparsity::eliminationTree(bool ata) const{
