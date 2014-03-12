@@ -688,6 +688,9 @@ namespace CasADi{
     /** \brief  The following function is used to ensure similarity to MX, which is reference counted */
     bool isNull() const{ return false;}
     
+    /// Checks if expression does not contain NaN or Inf
+    bool isRegular() const;
+
     // @{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
     static void setPrecision(int precision) { stream_precision_ = precision; }

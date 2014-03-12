@@ -31,21 +31,6 @@
 
 namespace CasADi{
 
-#ifndef WITHOUT_PRE_1_9_X
-  /** \brief [DEPRECATED] Replaced with SX::sym
-   */
-  //@{
-  inline SX ssym(const std::string& name, int nrow=1, int ncol=1){ return SX::sym(name,nrow,ncol); }
-  inline SX ssym(const std::string& name, const std::pair<int,int> & rc){ return SX::sym(name,rc);}
-  inline std::vector<SX> ssym(const std::string& name, const Sparsity& sp, int p){ return SX::sym(name,sp,p);}
-  inline std::vector<SX> ssym(const std::string& name, int nrow, int ncol, int p){ return SX::sym(name,nrow,ncol,p);}
-  inline std::vector<std::vector<SX> > ssym(const std::string& name, const Sparsity& sp, int p, int r){ return SX::sym(name,sp,p,r);}
-  inline std::vector<std::vector<SX> > ssym(const std::string& name, int nrow, int ncol, int p, int r){ return SX::sym(name,nrow,ncol,p,r);}
-  inline SX ssym(const std::string& name, const Sparsity& sp){ return SX::sym(name,sp);}
-  inline SX ssym(const Matrix<double>& x){ return SX(x);}
-  //@}
-#endif
-
   /** \brief  Expand the expression as a weighted sum (with constant weights)  */
   void expand(const SX& ex, SX &weights, SX& terms);
 
@@ -161,18 +146,6 @@ namespace CasADi{
    * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
    */
   Matrix<double> evalf(const SX &ex, const SX &v, const Matrix<double> &vdef);
-
-  // /** \brief  Make the expression smooth by replacing non-smooth nodes with binary variables */
-  //void makeSmooth(SX &ex, SX &bvar, SX &bexpr);
-
-  /** \brief  Substitute derivatives with variables */
-  /** \brief void replaceDerivatives(SX &ex, const SX &var, const SX &dvar); */
-
-  //{@
-  /// Checks if expression does not contain NaN or Inf
-  bool isRegular(const SXElement& ex);
-  bool isRegular(const SX& ex);
-  //@}
 
 #ifndef SWIG
   // "operator?:" can not be overloaded
@@ -363,6 +336,23 @@ namespace CasADi{
    *  This will only work for up to 3x3 matrices
    */  
   SX eig_symbolic(const SX& m);
+
+#ifndef WITHOUT_PRE_1_9_X
+  /** \brief [DEPRECATED] Replaced with SX::sym
+   */
+  //@{
+  inline SX ssym(const std::string& name, int nrow=1, int ncol=1){ return SX::sym(name,nrow,ncol); }
+  inline SX ssym(const std::string& name, const std::pair<int,int> & rc){ return SX::sym(name,rc);}
+  inline std::vector<SX> ssym(const std::string& name, const Sparsity& sp, int p){ return SX::sym(name,sp,p);}
+  inline std::vector<SX> ssym(const std::string& name, int nrow, int ncol, int p){ return SX::sym(name,nrow,ncol,p);}
+  inline std::vector<std::vector<SX> > ssym(const std::string& name, const Sparsity& sp, int p, int r){ return SX::sym(name,sp,p,r);}
+  inline std::vector<std::vector<SX> > ssym(const std::string& name, int nrow, int ncol, int p, int r){ return SX::sym(name,nrow,ncol,p,r);}
+  inline SX ssym(const std::string& name, const Sparsity& sp){ return SX::sym(name,sp);}
+  inline SX ssym(const Matrix<double>& x){ return SX(x);}
+  inline bool isRegular(const SXElement& ex){ return ex.isRegular();}
+  inline bool isRegular(const SX& ex){ return ex.isRegular();}
+  //@}
+#endif
 
 } // namespace CasADi
 

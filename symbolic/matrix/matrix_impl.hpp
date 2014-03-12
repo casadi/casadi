@@ -1929,6 +1929,10 @@ namespace CasADi{
     return it;
   }
 
+  template<class T>
+  bool Matrix<T>::isRegular() const{
+    casadi_error("Not implemented.");
+  }
 
 } // namespace CasADi
 

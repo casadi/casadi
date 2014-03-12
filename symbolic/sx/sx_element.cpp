@@ -836,6 +836,30 @@ namespace CasADi{
     }
   }
 
+  bool SXElement::isRegular() const{
+    if (isConstant()) {
+      return !(isNan() || isInf() || isMinusInf());
+    } else {
+      casadi_error("Cannot check regularity for symbolic SXElement");
+    }
+  }
+
+  template<>
+  bool SX::isRegular() const{
+    // First pass: ignore symbolics
+    for(int i=0; i<size(); ++i){
+      const SXElement& x = at(i);
+      if(x.isConstant()) {
+        if(x.isNan() || x.isInf() || x.isMinusInf()) return false;
+      }
+    }
+    // Second pass: don't ignore symbolics
+    for (int i=0; i<size(); ++i) {
+      if(!at(i).isRegular()) return false;
+    }
+    return true;
+  }
+
 } // namespace CasADi
 
 using namespace CasADi;

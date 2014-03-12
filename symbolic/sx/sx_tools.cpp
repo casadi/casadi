@@ -1079,30 +1079,7 @@ namespace CasADi{
       it_vdef += nv;
     }
   }
-  
-  bool isRegular(const SXElement& ex) {
-    if (ex.isConstant()) {
-      return !(ex.isNan() || ex.isInf() || ex.isMinusInf());
-    } else {
-      casadi_error("Cannot check regularity for symbolic SX");
-    }
-  }
-
-  bool isRegular(const SX& ex) {
-    // First pass: ignore symbolics
-    for (int i=0;i<ex.size();++i) {
-      const SXElement& x = ex.at(i);
-      if (x.isConstant()) {
-        if (x.isNan() || x.isInf() || x.isMinusInf()) return false;
-      }
-    }
-    // Second pass: don't ignore symbolics
-    for (int i=0;i<ex.size();++i) {
-      if (!isRegular(ex.at(i))) return false;
-    }
-    return true;
-  }
- 
+   
   std::vector<SXElement> getSymbols(const SX& e) {
     SXFunction f(std::vector<SX>(),e);
     f.init();

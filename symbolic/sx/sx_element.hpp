@@ -152,6 +152,9 @@ namespace CasADi{
     const std::string& getName() const;
     int getOp() const;
     bool isOp(int op) const;
+
+    /// Checks if expression does not contain NaN or Inf
+    bool isRegular() const;
     
     /** \brief Check if two nodes are equivalent up to a given depth. 
      *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
@@ -346,10 +349,12 @@ namespace CasADi{
   typedef std::vector<SXPtr> SXPtrV;
   typedef std::vector<SXPtrV> SXPtrVV;
 
-  // Create matrix symbolic primitive
+  // Specialize functions in GenericMatrix<SX> and MX
   template<>
   SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
-
+  
+  template<>
+  bool SX::isRegular() const;
 
 } // namespace CasADi
 
