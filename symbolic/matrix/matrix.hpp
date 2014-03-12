@@ -34,38 +34,38 @@
 
 namespace CasADi{
 
-  template<class T>
+  template<typename DataType>
   struct NonZero {
     int k; // Non-zero index into matrix
     int i; // Row into matrix
     int j; // Col into matrix
-    T el;  // Element
+    DataType el;  // Element
   };
 
-  template<class T>
-  class NonZeroIterator : public std::iterator< std::forward_iterator_tag, NonZero<T> > {
+  template<typename DataType>
+  class NonZeroIterator : public std::iterator< std::forward_iterator_tag, NonZero<DataType> > {
   public:
-    NonZeroIterator(const Matrix<T> & m);
+    NonZeroIterator(const Matrix<DataType> & m);
 
 #ifndef SWIG
-    NonZeroIterator<T>& operator++();
+    NonZeroIterator<DataType>& operator++();
 #endif // SWIG
 
-    NonZero<T>& operator*();
+    NonZero<DataType>& operator*();
     
-    NonZeroIterator<T> begin();
-    NonZeroIterator<T> end();
-    bool operator==(const NonZeroIterator<T>& rhs);
+    NonZeroIterator<DataType> begin();
+    NonZeroIterator<DataType> end();
+    bool operator==(const NonZeroIterator<DataType>& rhs);
 
   private:
-    Matrix<T> m_;
-    NonZero<T> nz;
+    Matrix<DataType> m_;
+    NonZero<DataType> nz;
   };
 
     
   //@{
   /** \brief Get typename */
-  template <typename T> inline std::string matrixName() { return std::string("Matrix<") + typeid(T).name() + std::string(">");}
+  template <typename DataType> inline std::string matrixName() { return std::string("Matrix<") + typeid(DataType).name() + std::string(">");}
   template<> inline std::string matrixName<double>() { return "DMatrix"; }
   template<> inline std::string matrixName<int>() { return "IMatrix"; }
   //@}
@@ -81,14 +81,14 @@ namespace CasADi{
       The storage format is Compressed Column Storage (CCS), similar to that used for sparse matrices in Matlab, \n
       but unlike this format, we do allow for elements to be structurally non-zero but numerically zero.\n
   
-      Matrix<T> is polymorphic with a std::vector<T> that contain all non-identical-zero elements.\n
+      Matrix<DataType> is polymorphic with a std::vector<DataType> that contain all non-identical-zero elements.\n
       The sparsity can be accessed with Sparsity& sparsity()\n
   
       \author Joel Andersson 
       \date 2010-2014
   */
-  template<class T>
-  class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix<T> >, public PrintableObject{
+  template<typename DataType>
+  class Matrix : public GenericExpression<Matrix<DataType> >, public GenericMatrix<Matrix<DataType> >, public PrintableObject{
   public:
     
     /** \brief  constructors */
@@ -96,32 +96,32 @@ namespace CasADi{
     Matrix();
     
     /// Copy constructor
-    Matrix(const Matrix<T>& m);
+    Matrix(const Matrix<DataType>& m);
     
 #ifndef SWIG
     /// Assignment (normal)
-    Matrix<T>& operator=(const Matrix<T>& m);
+    Matrix<DataType>& operator=(const Matrix<DataType>& m);
 #endif // SWIG
     
     /// Empty n-by-m matrix constructor
     Matrix(int nrow, int ncol);
     
     /// Dense n-by-m matrix filled with val constructor
-    Matrix(int nrow, int ncol, const T& val);
+    Matrix(int nrow, int ncol, const DataType& val);
 
     /// Sparse n-by-m matrix filled with given sparsity
-    Matrix(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row, const std::vector<T>& d=std::vector<T>());
+    Matrix(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row, const std::vector<DataType>& d=std::vector<DataType>());
 
     /// Dense matrix constructor with data given as vector of vectors
-    explicit Matrix(const std::vector< std::vector<T> >& m);
+    explicit Matrix(const std::vector< std::vector<DataType> >& m);
     
     //@{
     /// Sparse matrix with a given sparsity
-    explicit Matrix(const Sparsity& sparsity, const T& val=0);
+    explicit Matrix(const Sparsity& sparsity, const DataType& val=0);
     //@}
     
     /// Sparse matrix with a given sparsity and non-zero elements.
-    Matrix(const Sparsity& sparsity, const std::vector<T>& d);
+    Matrix(const Sparsity& sparsity, const std::vector<DataType>& d);
     
     /** \brief Check if the dimensions and colind,row vectors are compatible.
      * \param complete  set to true to also check elementwise
@@ -137,20 +137,20 @@ namespace CasADi{
      * Thanks to implicit conversion, you can pretend that Matrix(const SXElement& x); exists.
      * Note: above remark applies only to C++, not python or octave interfaces
      */
-    Matrix(const std::vector<T>& x);
+    Matrix(const std::vector<DataType>& x);
     
     /// Construct dense matrix from a vector with the elements in column major ordering
-    Matrix(const std::vector<T>& x, int nrow, int ncol);
+    Matrix(const std::vector<DataType>& x, int nrow, int ncol);
 
     /// Convert to scalar type
-    const T toScalar() const;
+    const DataType toScalar() const;
     
     /// Scalar type
-    typedef T ScalarType;
+    typedef DataType ScalarType;
     
 #ifndef SWIG
     /// Base class
-    typedef GenericMatrix<Matrix<T> > B;
+    typedef GenericMatrix<Matrix<DataType> > B;
 
     /// Expose base class functions
     using B::size;
@@ -175,14 +175,14 @@ namespace CasADi{
     using B::operator();
 
     /// Expose iterators
-    typedef typename std::vector<T>::iterator iterator;
-    typedef typename std::vector<T>::const_iterator const_iterator;
-    typedef typename std::vector<T>::reverse_iterator reverse_iterator;
-    typedef typename std::vector<T>::const_reverse_iterator const_reverse_iterator;
+    typedef typename std::vector<DataType>::iterator iterator;
+    typedef typename std::vector<DataType>::const_iterator const_iterator;
+    typedef typename std::vector<DataType>::reverse_iterator reverse_iterator;
+    typedef typename std::vector<DataType>::const_reverse_iterator const_reverse_iterator;
     
     /// References
-    typedef T& reference;
-    typedef const T& const_reference;
+    typedef DataType& reference;
+    typedef const DataType& const_reference;
     
     /// Get iterators to beginning and end
     iterator begin(){ return data().begin();}
@@ -202,20 +202,20 @@ namespace CasADi{
 
     /** \brief  Create a matrix from a matrix with a different type of matrix entries (assuming that the scalar conversion is valid) */
     template<typename A>
-    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<T>(x.size())){
+    Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<DataType>(x.size())){
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
-    Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(),1)), data_(std::vector<T>(x.size())){
+    Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(),1)), data_(std::vector<DataType>(x.size())){
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create a non-vector expression from an stl vector */
     template<typename A>
-    Matrix(const std::vector<A>& x,  int nrow, int ncol) : sparsity_(Sparsity::dense(nrow,ncol)), data_(std::vector<T>(x.size())){
-      if(x.size() != nrow*ncol) throw CasadiException("Matrix::Matrix(const std::vector<T>& x,  int n, int m): dimension mismatch");
+    Matrix(const std::vector<A>& x,  int nrow, int ncol) : sparsity_(Sparsity::dense(nrow,ncol)), data_(std::vector<DataType>(x.size())){
+      if(x.size() != nrow*ncol) throw CasadiException("Matrix::Matrix(const std::vector<DataType>& x,  int n, int m): dimension mismatch");
       copy(x.begin(),x.end(),begin());
     }
     
@@ -224,12 +224,12 @@ namespace CasADi{
 
 #ifndef SWIG
     /// Get a non-zero element
-    inline const T& at(int k) const{
-      return const_cast<Matrix<T>*>(this)->at(k);
+    inline const DataType& at(int k) const{
+      return const_cast<Matrix<DataType>*>(this)->at(k);
     }
     
     /// Access a non-zero element
-    inline T& at(int k){
+    inline DataType& at(int k){
       try{
         if (k<0) k+=size(); 
         return data().at(k);
@@ -241,7 +241,7 @@ namespace CasADi{
     }
 #else // SWIG
     /// Access a non-zero element
-    T at(int k){
+    DataType at(int k){
       try{
         if (k<0) k+=size(); 
         return data().at(k);
@@ -255,17 +255,17 @@ namespace CasADi{
     
 #ifndef SWIG
     /// get an element
-    const T& elem(int rr, int cc=0) const;
+    const DataType& elem(int rr, int cc=0) const;
     
     /// get a reference to an element
-    T& elem(int rr, int cc=0);
+    DataType& elem(int rr, int cc=0);
 #else // SWIG
     /// Access a non-zero element
-    T elem(int rr, int cc=0) { return elem(rr,cc);}
+    DataType elem(int rr, int cc=0) { return elem(rr,cc);}
 #endif // SWIG
 
     /// get an element, do not allocate
-    const T getElement(int rr, int cc=0) const{ return elem(rr,cc);}
+    const DataType getElement(int rr, int cc=0) const{ return elem(rr,cc);}
     
     /// Returns true if the matrix has a non-zero at location rr,cc
     bool hasNZ(int rr, int cc) const { return sparsity().hasNZ(rr,cc); }
@@ -275,141 +275,141 @@ namespace CasADi{
 
     //@{
     /// Get a submatrix
-    const Matrix<T> sub(int rr, int cc) const;
-    const Matrix<T> sub(const std::vector<int>& rr, int cc) const{ return sub(rr,std::vector<int>(1,cc));}
-    const Matrix<T> sub(int rr, const std::vector<int>& cc) const{ return sub(std::vector<int>(1,rr),cc);}
-    const Matrix<T> sub(const std::vector<int>& rr, const std::vector<int>& cc) const;
-    const Matrix<T> sub(const Slice& rr, const std::vector<int>& cc) const { return sub(rr.getAll(size1()),cc);}
-    const Matrix<T> sub(const std::vector<int>& rr, const Slice& cc) const { return sub(rr,cc.getAll(size2()));}
-    const Matrix<T> sub(const Slice& rr, const Slice& cc) const{ return sub(rr.getAll(size1()),cc.getAll(size2()));}
-    const Matrix<T> sub(const Slice& rr, int cc) const{ return sub(rr.getAll(size1()),std::vector<int>(1,cc));}
-    const Matrix<T> sub(int rr, const Slice& cc) const{ return sub(std::vector<int>(1,rr),cc.getAll(size2()));}
-    const Matrix<T> sub(const Matrix<int>& rr, const std::vector<int>& cc) const;
-    const Matrix<T> sub(const std::vector<int>& rr, const Matrix<int>& cc) const;
-    const Matrix<T> sub(const Matrix<int>& rr, const Slice& cc) const {return sub(rr,cc.getAll(size2()));}
-    const Matrix<T> sub(const Slice& rr, const Matrix<int>& cc) const {return sub(rr.getAll(size1()),cc);}
-    const Matrix<T> sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
-    const Matrix<T> sub(const Sparsity& sp, int dummy = 0) const;
+    const Matrix<DataType> sub(int rr, int cc) const;
+    const Matrix<DataType> sub(const std::vector<int>& rr, int cc) const{ return sub(rr,std::vector<int>(1,cc));}
+    const Matrix<DataType> sub(int rr, const std::vector<int>& cc) const{ return sub(std::vector<int>(1,rr),cc);}
+    const Matrix<DataType> sub(const std::vector<int>& rr, const std::vector<int>& cc) const;
+    const Matrix<DataType> sub(const Slice& rr, const std::vector<int>& cc) const { return sub(rr.getAll(size1()),cc);}
+    const Matrix<DataType> sub(const std::vector<int>& rr, const Slice& cc) const { return sub(rr,cc.getAll(size2()));}
+    const Matrix<DataType> sub(const Slice& rr, const Slice& cc) const{ return sub(rr.getAll(size1()),cc.getAll(size2()));}
+    const Matrix<DataType> sub(const Slice& rr, int cc) const{ return sub(rr.getAll(size1()),std::vector<int>(1,cc));}
+    const Matrix<DataType> sub(int rr, const Slice& cc) const{ return sub(std::vector<int>(1,rr),cc.getAll(size2()));}
+    const Matrix<DataType> sub(const Matrix<int>& rr, const std::vector<int>& cc) const;
+    const Matrix<DataType> sub(const std::vector<int>& rr, const Matrix<int>& cc) const;
+    const Matrix<DataType> sub(const Matrix<int>& rr, const Slice& cc) const {return sub(rr,cc.getAll(size2()));}
+    const Matrix<DataType> sub(const Slice& rr, const Matrix<int>& cc) const {return sub(rr.getAll(size1()),cc);}
+    const Matrix<DataType> sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
+    const Matrix<DataType> sub(const Sparsity& sp, int dummy = 0) const;
     //@}
 
     //@{
     /// Set a submatrix
-    void setSub(const Matrix<T>& m, int rr, int cc);
-    void setSub(const Matrix<T>& m, const std::vector<int>& rr, int cc){ setSub(m,rr,std::vector<int>(1,cc));}
-    void setSub(const Matrix<T>& m, int rr, const std::vector<int>& cc){ setSub(m,std::vector<int>(1,rr),cc);}
-    void setSub(const Matrix<T>& m, const std::vector<int>& rr, const std::vector<int>& cc);
-    void setSub(const Matrix<T>& m, const Slice& rr, const std::vector<int>& cc){ setSub(m,rr.getAll(size1()),cc);}
-    void setSub(const Matrix<T>& m, const std::vector<int>& rr, const Slice& cc){ setSub(m,rr,cc.getAll(size2()));}
-    void setSub(const Matrix<T>& m, const Slice& rr, const Slice& cc){ setSub(m,rr.getAll(size1()),cc.getAll(size2()));}
-    void setSub(const Matrix<T>& m, const Matrix<int>& rr, const std::vector<int>& cc);
-    void setSub(const Matrix<T>& m, const std::vector<int>& rr, const Matrix<int>& cc);
-    void setSub(const Matrix<T>& m, const Matrix<int>& rr, const Slice& cc) {return setSub(m,rr,cc.getAll(size2()));}
-    void setSub(const Matrix<T>& m, const Slice& rr, const Matrix<int>& cc) {return setSub(m,rr.getAll(size1()),cc);}
-    void setSub(const Matrix<T>& m, const Matrix<int>& rr, const Matrix<int>& cc);
-    void setSub(const Matrix<T>& m, const Sparsity& sp, int dummy);
+    void setSub(const Matrix<DataType>& m, int rr, int cc);
+    void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, int cc){ setSub(m,rr,std::vector<int>(1,cc));}
+    void setSub(const Matrix<DataType>& m, int rr, const std::vector<int>& cc){ setSub(m,std::vector<int>(1,rr),cc);}
+    void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const std::vector<int>& cc);
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const std::vector<int>& cc){ setSub(m,rr.getAll(size1()),cc);}
+    void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const Slice& cc){ setSub(m,rr,cc.getAll(size2()));}
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const Slice& cc){ setSub(m,rr.getAll(size1()),cc.getAll(size2()));}
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const std::vector<int>& cc);
+    void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const Matrix<int>& cc);
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc) {return setSub(m,rr,cc.getAll(size2()));}
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc) {return setSub(m,rr.getAll(size1()),cc);}
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Matrix<int>& cc);
+    void setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy);
     //@}
 
     //@{
     /// Add a submatrix to an existing matrix (TODO: remove memory allocation)
     template<typename RR, typename CC>
-    void addSub(const Matrix<T>& m, RR rr, CC cc){ setSub(m+sub(rr,cc),rr,cc);}
+    void addSub(const Matrix<DataType>& m, RR rr, CC cc){ setSub(m+sub(rr,cc),rr,cc);}
     //@}
 
     //@{
     /// Retrieve a submatrix (TODO: remove memory allocation)
     template<typename RR, typename CC>
-    void getSub(Matrix<T>& m, RR rr, CC cc){ m = sub(rr,cc);}
+    void getSub(Matrix<DataType>& m, RR rr, CC cc){ m = sub(rr,cc);}
     //@}
 
     //@{
     /// Get a set of nonzeros
-    const Matrix<T> getNZ(int k) const{ return at(k);}
-    const Matrix<T> getNZ(const std::vector<int>& k) const;
-    const Matrix<T> getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
-    const Matrix<T> getNZ(const Matrix<int>& k) const;
+    const Matrix<DataType> getNZ(int k) const{ return at(k);}
+    const Matrix<DataType> getNZ(const std::vector<int>& k) const;
+    const Matrix<DataType> getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
+    const Matrix<DataType> getNZ(const Matrix<int>& k) const;
     //@}
     
     //@{
     /// Set a set of nonzeros
-    void setNZ(int k, const Matrix<T>& m);
-    void setNZ(const std::vector<int>& k, const Matrix<T>& m);
-    void setNZ(const Slice& k, const Matrix<T>& m){ setNZ(k.getAll(size()),m);}
-    void setNZ(const Matrix<int>& k, const Matrix<T>& m);
+    void setNZ(int k, const Matrix<DataType>& m);
+    void setNZ(const std::vector<int>& k, const Matrix<DataType>& m);
+    void setNZ(const Slice& k, const Matrix<DataType>& m){ setNZ(k.getAll(size()),m);}
+    void setNZ(const Matrix<int>& k, const Matrix<DataType>& m);
     //@}
 
     /// Append a matrix vertically (NOTE: only efficient if vector)
-    void append(const Matrix<T>& y);
+    void append(const Matrix<DataType>& y);
 
     /// Append a matrix horizontally
-    void appendColumns(const Matrix<T>& y);
+    void appendColumns(const Matrix<DataType>& y);
 
     //@{
     /// Indexing for interfaced languages
     /// get a non-zero
-    const Matrix<T> indexed_one_based(int k) const{ return this->operator[](k-1);}
-    const Matrix<T> indexed_zero_based(int k) const{ return this->operator[](k);}
-    const Matrix<T> indexed_one_based(const Matrix<int>& k) const{ return this->operator[](k-1);}
-    const Matrix<T> indexed_zero_based(const Matrix<int>& k) const{ return this->operator[](k);}
-    const Matrix<T> indexed(const Slice &k) const{ return this->operator[](k);}
-    const Matrix<T> indexed(const IndexList &k) const{
+    const Matrix<DataType> indexed_one_based(int k) const{ return this->operator[](k-1);}
+    const Matrix<DataType> indexed_zero_based(int k) const{ return this->operator[](k);}
+    const Matrix<DataType> indexed_one_based(const Matrix<int>& k) const{ return this->operator[](k-1);}
+    const Matrix<DataType> indexed_zero_based(const Matrix<int>& k) const{ return this->operator[](k);}
+    const Matrix<DataType> indexed(const Slice &k) const{ return this->operator[](k);}
+    const Matrix<DataType> indexed(const IndexList &k) const{
       return (*this)[k.getAll(size())];
     }
     
     /// get a matrix element
-    const Matrix<T> indexed_one_based(int rr, int cc) const{ return (*this)(rr-1,cc-1);}
-    const Matrix<T> indexed_zero_based(int rr, int cc) const{ return (*this)(rr,cc);}
-    const Matrix<T> indexed(const Slice &rr, const Slice &cc) const{ return (*this)(rr,cc); }
-    const Matrix<T> indexed(const IndexList &rr, const IndexList &cc) const{ 
+    const Matrix<DataType> indexed_one_based(int rr, int cc) const{ return (*this)(rr-1,cc-1);}
+    const Matrix<DataType> indexed_zero_based(int rr, int cc) const{ return (*this)(rr,cc);}
+    const Matrix<DataType> indexed(const Slice &rr, const Slice &cc) const{ return (*this)(rr,cc); }
+    const Matrix<DataType> indexed(const IndexList &rr, const IndexList &cc) const{ 
       return (*this)(rr.getAll(size1()),cc.getAll(size2()));
     }
-    const Matrix<T> indexed(const Slice &rr, const Matrix<int>& cc) const{ return (*this)(rr,cc); }
-    const Matrix<T> indexed(const Matrix<int>& rr, const IndexList &cc) const{ 
+    const Matrix<DataType> indexed(const Slice &rr, const Matrix<int>& cc) const{ return (*this)(rr,cc); }
+    const Matrix<DataType> indexed(const Matrix<int>& rr, const IndexList &cc) const{ 
       return (*this)(rr,cc.getAll(size2()));
     }
-    const Matrix<T> indexed(const Matrix<int>& rr, const Slice &cc) const{ return (*this)(rr,cc); }
-    const Matrix<T> indexed(const IndexList& rr, const Matrix<int> &cc) const{ 
+    const Matrix<DataType> indexed(const Matrix<int>& rr, const Slice &cc) const{ return (*this)(rr,cc); }
+    const Matrix<DataType> indexed(const IndexList& rr, const Matrix<int> &cc) const{ 
       return (*this)(rr.getAll(size1()),cc);
     }
-    const Matrix<T> indexed(const Matrix<int>& rr, const Matrix<int>& cc) const{ 
+    const Matrix<DataType> indexed(const Matrix<int>& rr, const Matrix<int>& cc) const{ 
       return (*this)(rr,cc);
     }
-    const Matrix<T> indexed(const Sparsity &sp) const{ return (*this)(sp); }
+    const Matrix<DataType> indexed(const Sparsity &sp) const{ return (*this)(sp); }
     
     /// set a non-zero
-    void indexed_one_based_assignment(int k, const T & m){ at(k-1) = m;}
-    void indexed_zero_based_assignment(int k, const T & m){ at(k) = m;}
-    void indexed_assignment(const Slice &k, const Matrix<T>& m){ (*this)[k] = m;}
-    void indexed_one_based_assignment(const Matrix<int> &k, const Matrix<T>& m){ (*this)[k-1] = m;}
-    void indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<T>& m){ (*this)[k] = m;}
-    void indexed_assignment(const IndexList &k, const Matrix<T>& m){
+    void indexed_one_based_assignment(int k, const DataType & m){ at(k-1) = m;}
+    void indexed_zero_based_assignment(int k, const DataType & m){ at(k) = m;}
+    void indexed_assignment(const Slice &k, const Matrix<DataType>& m){ (*this)[k] = m;}
+    void indexed_one_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m){ (*this)[k-1] = m;}
+    void indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m){ (*this)[k] = m;}
+    void indexed_assignment(const IndexList &k, const Matrix<DataType>& m){
       (*this)[k.getAll(size())] = m;
     }
     
     /// set a matrix element
-    void indexed_one_based_assignment(int rr, int cc, const T & m){ elem(rr-1,cc-1) = m;}
-    void indexed_zero_based_assignment(int rr, int cc, const T & m){ elem(rr,cc) = m;}
-    void indexed_assignment(const Slice &rr, const Slice &cc, const Matrix<T>& m){ (*this)(rr,cc) = m; }
-    void indexed_assignment(const IndexList &rr, const IndexList &cc, const Matrix<T>& m){
+    void indexed_one_based_assignment(int rr, int cc, const DataType & m){ elem(rr-1,cc-1) = m;}
+    void indexed_zero_based_assignment(int rr, int cc, const DataType & m){ elem(rr,cc) = m;}
+    void indexed_assignment(const Slice &rr, const Slice &cc, const Matrix<DataType>& m){ (*this)(rr,cc) = m; }
+    void indexed_assignment(const IndexList &rr, const IndexList &cc, const Matrix<DataType>& m){
       (*this)(rr.getAll(size1()),cc.getAll(size2())) = m;
     }
-    void indexed_assignment(const Slice &rr, const Matrix<int>& cc, const Matrix<T>& m){
+    void indexed_assignment(const Slice &rr, const Matrix<int>& cc, const Matrix<DataType>& m){
       (*this)(rr,cc) = m;
     }
-    void indexed_assignment( const Matrix<int>& rr, const Slice &cc, const Matrix<T>& m){
+    void indexed_assignment( const Matrix<int>& rr, const Slice &cc, const Matrix<DataType>& m){
       (*this)(rr,cc) = m;
     }
-    void indexed_assignment(const Matrix<int> &rr, const IndexList& cc, const Matrix<T>& m){
+    void indexed_assignment(const Matrix<int> &rr, const IndexList& cc, const Matrix<DataType>& m){
       (*this)(rr,cc.getAll(size2())) = m;
     }
-    void indexed_assignment( const IndexList& rr, const Matrix<int> &cc, const Matrix<T>& m){
+    void indexed_assignment( const IndexList& rr, const Matrix<int> &cc, const Matrix<DataType>& m){
       (*this)(rr.getAll(size1()),cc) = m;
     } 
-    void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc, const Matrix<T>& m){
+    void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc, const Matrix<DataType>& m){
       (*this)(rr,cc) = m;
     } 
-    void indexed_assignment(const Sparsity &sp,const Matrix<T>& m){
+    void indexed_assignment(const Sparsity &sp,const Matrix<DataType>& m){
       // (*this)(sp) = m;   // VC2010 compiler errors
-          SubMatrix<Matrix<T>,Sparsity,int> temp(*this,sp,0);
+          SubMatrix<Matrix<DataType>,Sparsity,int> temp(*this,sp,0);
           temp = m;
     }
     //@}
@@ -418,109 +418,109 @@ namespace CasADi{
     void setZero();
     
     /// Set all elements to a value
-    void setAll(const T& val);
+    void setAll(const DataType& val);
 
     /// Make the matrix dense
-    void densify(const T& val = 0);
+    void densify(const DataType& val = 0);
 
     /** \brief  Make a matrix sparse by removing numerical zeros smaller in absolute value than a specified tolerance */
     void sparsify(double tol=0);
 
-    Matrix<T> operator+() const;
-    Matrix<T> operator-() const;
+    Matrix<DataType> operator+() const;
+    Matrix<DataType> operator-() const;
 
     //@{
     /** \brief  Create nodes by their ID */
-    static Matrix<T> binary(int op, const Matrix<T> &x, const Matrix<T> &y);
-    static Matrix<T> unary(int op, const Matrix<T> &x);
-    static Matrix<T> scalar_matrix(int op, const Matrix<T> &x, const Matrix<T> &y);
-    static Matrix<T> matrix_scalar(int op, const Matrix<T> &x, const Matrix<T> &y);
-    static Matrix<T> matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &y);
+    static Matrix<DataType> binary(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> unary(int op, const Matrix<DataType> &x);
+    static Matrix<DataType> scalar_matrix(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> matrix_scalar(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> matrix_matrix(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
     //@}
   
     //@{
     /// Elementwise operations -- Octave/Python naming
-    Matrix<T> __add__(const Matrix<T> &y) const;
-    Matrix<T> __sub__(const Matrix<T> &y) const;
-    Matrix<T> __mul__(const Matrix<T> &y) const;
-    Matrix<T> __div__(const Matrix<T> &y) const;
-    Matrix<T> __lt__(const Matrix<T> &y) const;
-    Matrix<T> __le__(const Matrix<T> &y) const;
-    Matrix<T> __eq__(const Matrix<T> &y) const;
-    Matrix<T> __ne__(const Matrix<T> &y) const;
-    Matrix<T> __truediv__(const Matrix<T> &y) const {return __div__(y);};
-    Matrix<T> __pow__(const Matrix<T> &y) const;
-    Matrix<T> __constpow__(const Matrix<T> &y) const;
-    Matrix<T> __mpower__(const Matrix<T> &y) const;
-    Matrix<T> __mrdivide__  (const Matrix<T> &y) const;
+    Matrix<DataType> __add__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __sub__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __mul__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __div__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __lt__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __le__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __eq__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __ne__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __truediv__(const Matrix<DataType> &y) const {return __div__(y);};
+    Matrix<DataType> __pow__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __mpower__(const Matrix<DataType> &y) const;
+    Matrix<DataType> __mrdivide__  (const Matrix<DataType> &y) const;
     //@}
     
     /// Matrix-matrix product
-    Matrix<T> mul_full(const Matrix<T> &y, const Sparsity & sp_z=Sparsity()) const;
+    Matrix<DataType> mul_full(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
 
     /// Matrix-matrix product
-    Matrix<T> mul(const Matrix<T> &y, const Sparsity & sp_z=Sparsity()) const;
+    Matrix<DataType> mul(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
     
     /// Matrix-matrix product, no memory allocation: z += mul(x,y)
-    static void mul_no_alloc_nn(const Matrix<T> &x, const Matrix<T>& y, Matrix<T>& z);
+    static void mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType>& y, Matrix<DataType>& z);
     
     /// Matrix-matrix product, no memory allocation: z += mul(trans(x),y)
-    static void mul_no_alloc_tn(const Matrix<T> &trans_x, const Matrix<T> &y, Matrix<T>& z);
+    static void mul_no_alloc_tn(const Matrix<DataType> &trans_x, const Matrix<DataType> &y, Matrix<DataType>& z);
 
     /// Matrix-matrix product, no memory allocation: z += mul(x,trans(y))
-    static void mul_no_alloc_nt(const Matrix<T>& x, const Matrix<T> &trans_y, Matrix<T>& z);
+    static void mul_no_alloc_nt(const Matrix<DataType>& x, const Matrix<DataType> &trans_y, Matrix<DataType>& z);
   
     /// Matrix-vector product, no memory allocation: z += mul(trans(x),y)
-    static void mul_no_alloc_tn(const Matrix<T>& trans_x, const std::vector<T> &y, std::vector<T>& z);
+    static void mul_no_alloc_tn(const Matrix<DataType>& trans_x, const std::vector<DataType> &y, std::vector<DataType>& z);
 
     /// vector-matrix product, no memory allocation: z += mul(x,y)
-    static void mul_no_alloc_nn(const Matrix<T>& x, const std::vector<T> &y, std::vector<T>& z);
+    static void mul_no_alloc_nn(const Matrix<DataType>& x, const std::vector<DataType> &y, std::vector<DataType>& z);
   
     /// Propagate sparsity using 0-1 logic through a matrix product, no memory allocation: z = mul(trans(x),y)
     template<bool Fwd>
-    static void mul_sparsity(Matrix<T> &x_trans, Matrix<T> &y, Matrix<T>& z);
+    static void mul_sparsity(Matrix<DataType> &x_trans, Matrix<DataType> &y, Matrix<DataType>& z);
   
     /// Calculates inner_prod(x,mul(A,x)) without memory allocation
-    static T quad_form(const Matrix<T>& A, const std::vector<T>& x);
+    static DataType quad_form(const Matrix<DataType>& A, const std::vector<DataType>& x);
   
-    /// Matrix transpose
-    Matrix<T> trans() const;
+    /// Transpose the matrix
+    Matrix<DataType> trans() const;
     
     //@{
     
     //@{
     /// Operations defined in the standard namespace for unambigous access and Numpy compatibility
-    Matrix<T> sin() const;
-    Matrix<T> cos() const;
-    Matrix<T> tan() const;
-    Matrix<T> arcsin() const;
-    Matrix<T> arccos() const;
-    Matrix<T> arctan() const;
-    Matrix<T> exp() const;
-    Matrix<T> log() const;
-    Matrix<T> sqrt() const;
-    Matrix<T> floor() const;
-    Matrix<T> ceil() const;
-    Matrix<T> fabs() const;
-    Matrix<T> sign() const;
-    Matrix<T> __copysign__(const Matrix<T>& y) const;
-    Matrix<T> erfinv() const;
-    Matrix<T> fmin(const Matrix<T>& y) const;
-    Matrix<T> fmax(const Matrix<T>& y) const;
-    Matrix<T> erf() const;
-    Matrix<T> sinh() const;
-    Matrix<T> cosh() const;
-    Matrix<T> tanh() const;
-    Matrix<T> arcsinh() const;
-    Matrix<T> arccosh() const;
-    Matrix<T> arctanh() const;
-    Matrix<T> arctan2(const Matrix<T>& y) const;
-    Matrix<T> log10() const;
-    Matrix<T> printme(const Matrix<T>& y) const;
-    Matrix<T> logic_not() const;
-    Matrix<T> logic_and(const Matrix<T>& y) const;
-    Matrix<T> logic_or(const Matrix<T>& y) const;
-    Matrix<T> if_else_zero(const Matrix<T>& y) const;
+    Matrix<DataType> sin() const;
+    Matrix<DataType> cos() const;
+    Matrix<DataType> tan() const;
+    Matrix<DataType> arcsin() const;
+    Matrix<DataType> arccos() const;
+    Matrix<DataType> arctan() const;
+    Matrix<DataType> exp() const;
+    Matrix<DataType> log() const;
+    Matrix<DataType> sqrt() const;
+    Matrix<DataType> floor() const;
+    Matrix<DataType> ceil() const;
+    Matrix<DataType> fabs() const;
+    Matrix<DataType> sign() const;
+    Matrix<DataType> __copysign__(const Matrix<DataType>& y) const;
+    Matrix<DataType> erfinv() const;
+    Matrix<DataType> fmin(const Matrix<DataType>& y) const;
+    Matrix<DataType> fmax(const Matrix<DataType>& y) const;
+    Matrix<DataType> erf() const;
+    Matrix<DataType> sinh() const;
+    Matrix<DataType> cosh() const;
+    Matrix<DataType> tanh() const;
+    Matrix<DataType> arcsinh() const;
+    Matrix<DataType> arccosh() const;
+    Matrix<DataType> arctanh() const;
+    Matrix<DataType> arctan2(const Matrix<DataType>& y) const;
+    Matrix<DataType> log10() const;
+    Matrix<DataType> printme(const Matrix<DataType>& y) const;
+    Matrix<DataType> logic_not() const;
+    Matrix<DataType> logic_and(const Matrix<DataType>& y) const;
+    Matrix<DataType> logic_or(const Matrix<DataType>& y) const;
+    Matrix<DataType> if_else_zero(const Matrix<DataType>& y) const;
     //@}
     
     //@{
@@ -559,16 +559,16 @@ namespace CasADi{
     void enlarge(int nrow, int ncol, const std::vector<int>& rr, const std::vector<int>& cc);
     
     /// Access the non-zero elements
-    std::vector<T>& data();
+    std::vector<DataType>& data();
     
     /// Const access the non-zero elements
-    const std::vector<T>& data() const;
+    const std::vector<DataType>& data() const;
     
     /// Get a pointer to the data
-    T* ptr(){ return isEmpty() ? static_cast<T*>(0) : &front();}
+    DataType* ptr(){ return isEmpty() ? static_cast<DataType*>(0) : &front();}
     
     /// Get a const pointer to the data
-    const T* ptr() const{ return isEmpty() ? static_cast<const T*>(0) : &front();}
+    const DataType* ptr() const{ return isEmpty() ? static_cast<const DataType*>(0) : &front();}
         
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const{ return sparsity_; }
@@ -577,22 +577,22 @@ namespace CasADi{
     Sparsity& sparsityRef();
     
     /** \brief  Set the non-zero elements, scalar */
-    void set(T val, SparsityType sp=SPARSE);
+    void set(DataType val, SparsityType sp=SPARSE);
     
     /** \brief  Get the non-zero elements, scalar */
-    void get(T& val, SparsityType sp=SPARSE) const;
+    void get(DataType& val, SparsityType sp=SPARSE) const;
 
     /** \brief  Set the non-zero elements, vector */
-    void set(const std::vector<T>& val, SparsityType sp=SPARSE);
+    void set(const std::vector<DataType>& val, SparsityType sp=SPARSE);
 
     /** \brief  Get the non-zero elements, vector */
-    void get(std::vector<T>& val, SparsityType sp=SPARSE) const;
+    void get(std::vector<DataType>& val, SparsityType sp=SPARSE) const;
 
     /** \brief  Set the non-zero elements, Matrix */
-    void set(const Matrix<T>& val, SparsityType sp=SPARSE);
+    void set(const Matrix<DataType>& val, SparsityType sp=SPARSE);
 
     /** \brief  Get the non-zero elements, Matrix */
-    void get(Matrix<T>& val, SparsityType sp=SPARSE) const;
+    void get(Matrix<DataType>& val, SparsityType sp=SPARSE) const;
 
 #ifdef SWIG
     %rename(get) getStridedArray;
@@ -600,38 +600,38 @@ namespace CasADi{
 #endif
 
     /** \brief  Get the non-zero elements, array */
-    void getArray(T* val, int len, SparsityType sp=SPARSE) const;
+    void getArray(DataType* val, int len, SparsityType sp=SPARSE) const;
 
     /** \brief  Set the non-zero elements, array */
-    void setArray(const T* val, int len, SparsityType sp=SPARSE);
+    void setArray(const DataType* val, int len, SparsityType sp=SPARSE);
 
     /** \brief  Get the non-zero elements, array, sparse and correct length */
-    void getArray(T* val) const;
+    void getArray(DataType* val) const;
 
     /** \brief  Set the non-zero elements, array, sparse and correct length */
-    void setArray(const T* val);
+    void setArray(const DataType* val);
     
     /** \brief  Get the non-zero elements, strided array */
-    void getStridedArray(T* val, int len, int stride1, int stride2, SparsityType sp=SPARSE) const;
+    void getStridedArray(DataType* val, int len, int stride1, int stride2, SparsityType sp=SPARSE) const;
     
 #ifndef SWIG
     /** \brief  Legacy - use getArray instead */
-    void get(T* val, SparsityType sp=SPARSE) const;
+    void get(DataType* val, SparsityType sp=SPARSE) const;
 
     /** \brief  Legacy - use setArray instead */
-    void set(const T* val, SparsityType sp=SPARSE);
+    void set(const DataType* val, SparsityType sp=SPARSE);
 
     /** Bitwise set, reinterpreting the data as a bvec_t array */
     void setZeroBV();
 
     /** Bitwise set, reinterpreting the data as a bvec_t array */
-    void setBV(const Matrix<T>& val);
+    void setBV(const Matrix<DataType>& val);
 
     /** Bitwise set, reinterpreting the data as a bvec_t array */
-    void getBV(Matrix<T>& val) const{ val.setBV(*this);}
+    void getBV(Matrix<DataType>& val) const{ val.setBV(*this);}
 
     /** Bitwise or, reinterpreting the data as a bvec_t array */
-    void borBV(const Matrix<T>& val);
+    void borBV(const Matrix<DataType>& val);
 
     /** \brief Bitwise get the non-zero elements, array */
     void getArrayBV(bvec_t* val, int len) const;
@@ -649,41 +649,41 @@ namespace CasADi{
         ku:    The number of superdiagonals in res 
         ldres: The leading dimension in res 
         res:   The number of superdiagonals */
-    void getBand(int kl, int ku, int ldres, T *res) const;
+    void getBand(int kl, int ku, int ldres, DataType *res) const;
         
     /* \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)
      */
     //@{
-    static Matrix<T> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d);
-    static Matrix<T> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int nrow, int ncol);
-    static Matrix<T> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& rc);
+    static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<DataType>& d);
+    static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<DataType>& d, int nrow, int ncol);
+    static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<DataType>& d, const std::pair<int,int>& rc);
     //@}
     
     //@{
     /** \brief  create a matrix with all inf */
-    static Matrix<T> inf(const Sparsity& sp);
-    static Matrix<T> inf(int nrow=1, int ncol=1);
-    static Matrix<T> inf(const std::pair<int,int>& rc);
+    static Matrix<DataType> inf(const Sparsity& sp);
+    static Matrix<DataType> inf(int nrow=1, int ncol=1);
+    static Matrix<DataType> inf(const std::pair<int,int>& rc);
     //@}
     
     //@{
     /** \brief  create a matrix with all nan */
-    static Matrix<T> nan(const Sparsity& sp);
-    static Matrix<T> nan(int nrow=1, int ncol=1);
-    static Matrix<T> nan(const std::pair<int,int>& rc);
+    static Matrix<DataType> nan(const Sparsity& sp);
+    static Matrix<DataType> nan(int nrow=1, int ncol=1);
+    static Matrix<DataType> nan(const std::pair<int,int>& rc);
     //@}
 
     //@{
     /** \brief  create a matrix by repeating an existing matrix */
-    static Matrix<T> repmat(const T& x, const Sparsity& sp);
-    static Matrix<T> repmat(const Matrix<T>& x, const Sparsity& sp);
-    static Matrix<T> repmat(const Matrix<T>& x, int nrow, int ncol=1);
-    static Matrix<T> repmat(const Matrix<T>& x, const std::pair<int,int>& rc);
+    static Matrix<DataType> repmat(const DataType& x, const Sparsity& sp);
+    static Matrix<DataType> repmat(const Matrix<DataType>& x, const Sparsity& sp);
+    static Matrix<DataType> repmat(const Matrix<DataType>& x, int nrow, int ncol=1);
+    static Matrix<DataType> repmat(const Matrix<DataType>& x, const std::pair<int,int>& rc);
     //@}
 
     /** \brief  create an n-by-n identity matrix */
-    static Matrix<T> eye(int ncol);
+    static Matrix<DataType> eye(int ncol);
 
     /** \brief  The following function is used to ensure similarity to MX, which is reference counted */
     bool isNull() const{ return false;}
@@ -727,7 +727,7 @@ namespace CasADi{
      *
      *  Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
      */
-    bool isEqual(const Matrix<T> &ex2) const;
+    bool isEqual(const Matrix<DataType> &ex2) const;
 
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool hasNonStructuralZeros() const;
@@ -744,7 +744,7 @@ namespace CasADi{
     Sparsity sparsity_;
     
     /// Nonzero elements
-    std::vector<T> data_;
+    std::vector<DataType> data_;
     
     /// Precision used in streams
     static int stream_precision_;
