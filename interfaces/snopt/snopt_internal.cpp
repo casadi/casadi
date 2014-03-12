@@ -352,7 +352,7 @@ namespace CasADi{
             casadi_error("Unkown type " << it->second.first);
         }
         casadi_assert_message(Error==0,"snopt error setting option \"" + snopt_name + "\"")
-      } else {
+      } /* else {
         switch (it->second.first) {
           case OT_INTEGER: {
             int value = 0;
@@ -373,7 +373,7 @@ namespace CasADi{
             casadi_error("Unkown type " << it->second.first);
         }
         casadi_assert_message(Error==0,"snopt error getting option \"" + snopt_name + "\"")
-      }
+        }*/
     }
     
     // Allocate data structures needed in evaluate
