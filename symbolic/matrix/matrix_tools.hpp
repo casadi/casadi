@@ -32,6 +32,21 @@
 
 namespace CasADi{
 
+#ifndef WITHOUT_PRE_1_9_X
+  /** \brief [DEPRECATED]
+   */
+  //@{
+  template<class T> void makeDense(Matrix<T>& A){ A.densify();}
+  template<class T> Matrix<T> densify(const Matrix<T>& A){ return full(A);}
+  template<class T> void makeSparse(Matrix<T>& A, double tol=0){ A.sparsify(tol);}
+  template<class T> bool isDense(const Matrix<T>& ex){ return ex.isDense();}
+  template<class T> bool isEmpty(const Matrix<T>& ex){ return ex.isEmpty(); }
+  template<class T> bool isTril(const Matrix<T> &A){ return A.isTril(); }
+  template<class T> bool isTriu(const Matrix<T> &A){ return A.isTriu(); }
+  //@}
+#endif
+
+
   /// Transpose of a matrix
   template<class T>
   Matrix<T> trans(const Matrix<T> &x);
@@ -53,11 +68,6 @@ namespace CasADi{
   template<class T>
   bool isConstant(const Matrix<T>& ex);
 
-  template<class T>
-  bool isDense(const Matrix<T>& ex);
-
-  template<class T>
-  bool isEmpty(const Matrix<T>& ex);
 
   template<class T>
   bool isInteger(const Matrix<T>& ex);
@@ -73,14 +83,6 @@ namespace CasADi{
 
   template<class T>
   bool isVector(const Matrix<T>& ex);
-
-  /** \brief  Check if a matrix is lower triangular (complexity ~ A.size2()) */
-  template<class T>
-  bool isTril(const Matrix<T> &A);
-
-  /** \brief  Check if a matrix is upper triangular (complexity ~ A.size2()) */
-  template<class T>
-  bool isTriu(const Matrix<T> &A);
 
   template<class T>
   T det(const Matrix<T>& a);
@@ -423,16 +425,6 @@ namespace CasADi{
   template<class T>
   Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
 
-#ifndef WITHOUT_PRE_1_9_X
-  /** \brief [DEPRECATED] Replaced A.full() and full(A)
-   */
-  //@{
-  template<class T>  void makeDense(Matrix<T>& A){ A.densify();}
-  template<class T>  Matrix<T> densify(const Matrix<T>& A){ return full(A);}
-  template<class T>  void makeSparse(Matrix<T>& A, double tol=0){ A.sparsify(tol);}  
-  //@}
-#endif
-
 #ifndef SWIGOCTAVE
   /** \brief  Make a matrix dense */
   template<class T>
@@ -528,26 +520,6 @@ namespace CasADi{
     
     // Constant if we reach this point
     return true;
-  }
-
-  template<class T>
-  bool isDense(const Matrix<T>& ex){
-    return ex.size() == ex.numel();
-  }
-
-  template<class T>
-  bool isEmpty(const Matrix<T>& ex){
-    return ex.isEmpty();
-  }
-
-  template<class T>
-  bool isTril(const Matrix<T> &A){
-    return A.sparsity().isTril();
-  }
-
-  template<class T>
-  bool isTriu(const Matrix<T> &A){
-    return A.sparsity().isTriu();
   }
 
   template<class T>
@@ -1023,7 +995,7 @@ namespace CasADi{
     casadi_assert_message(A.size1() == b.size1(),"solve Ax=b: dimension mismatch: b has " << b.size1() << " rows while A has " << A.size1() << ".");
     casadi_assert_message(A.size1() == A.size2(),"solve: A not square but " << A.dimString());
 
-    if(isTril(A)){
+    if(A.isTril()){
       // forward substitution if lower triangular
       Matrix<T> x = b;
       const std::vector<int> & Arow = A.row();
@@ -1040,7 +1012,7 @@ namespace CasADi{
         }
       }
       return x;
-    } else if(isTriu(A)){
+    } else if(A.isTriu()){
       // backward substitution if upper triangular
       Matrix<T> x = b;
       const std::vector<int> & Arow = A.row();
@@ -1080,7 +1052,7 @@ namespace CasADi{
       Matrix<T> xperm;
 
       // Solve permuted system
-      if(isTril(Aperm)){
+      if(Aperm.isTril()){
       
         // Forward substitution if lower triangular
         xperm = solve(Aperm,bperm);

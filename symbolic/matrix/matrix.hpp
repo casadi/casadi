@@ -164,6 +164,8 @@ namespace CasADi{
     using B::isScalar;
     using B::isDense;
     using B::isVector;
+    using B::isTril;
+    using B::isTriu;
     using B::dimString;
     using B::sym;
     using B::sparse;

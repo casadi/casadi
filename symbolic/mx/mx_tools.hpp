@@ -31,6 +31,23 @@
 
 namespace CasADi{
 
+#ifndef WITHOUT_PRE_1_9_X
+/** \brief [DEPRECATED]
+*/
+//@{
+  inline MX msym(const std::string& name, int nrow=1, int ncol=1){ return MX::sym(name,nrow,ncol); }
+  inline MX msym(const std::string& name, const std::pair<int,int> & rc){ return MX::sym(name,rc);}
+  inline std::vector<MX> msym(const std::string& name, const Sparsity& sp, int p){ return MX::sym(name,sp,p);}
+  inline std::vector<MX> msym(const std::string& name, int nrow, int ncol, int p){ return MX::sym(name,nrow,ncol,p);}
+  inline std::vector<std::vector<MX> > msym(const std::string& name, const Sparsity& sp, int p, int r){ return MX::sym(name,sp,p,r);}
+  inline std::vector<std::vector<MX> > msym(const std::string& name, int nrow, int ncol, int p, int r){ return MX::sym(name,nrow,ncol,p,r);}
+  inline MX msym(const std::string& name, const Sparsity& sp){ return MX::sym(name,sp);}
+  inline MX msym(const Matrix<double>& x){ return MX(x);}
+  inline bool isVector(const MX& ex){ return ex.isVector();}
+  inline bool isDense(const MX& ex){ return ex.isDense();}  
+//@}
+#endif
+
   /** \brief  concatenate vertically
   *
   *  horzcat(horzsplit(x,...)) = x
@@ -222,11 +239,6 @@ namespace CasADi{
   /** \brief  check if zero (note that false negative answers are possible) */
   bool isMinusOne(const MX& ex);
 
-  /** \brief  check if vector */
-  bool isVector(const MX& ex);
-
-  /** \brief  check if vector */
-  bool isDense(const MX& ex);
   
   /// Checks if expression does not contain NaN or Inf
   bool isRegular(const MX& ex);
@@ -298,21 +310,6 @@ namespace CasADi{
 
   /** \brief  Evaluate a polynomial with coefficeints p in x */
   MX polyval(const MX& p, const MX& x);
-
-#ifndef WITHOUT_PRE_1_9_X
-/** \brief [DEPRECATED] Replaced with MX::sym
-*/
-//@{
-  inline MX msym(const std::string& name, int nrow=1, int ncol=1){ return MX::sym(name,nrow,ncol); }
-  inline MX msym(const std::string& name, const std::pair<int,int> & rc){ return MX::sym(name,rc);}
-  inline std::vector<MX> msym(const std::string& name, const Sparsity& sp, int p){ return MX::sym(name,sp,p);}
-  inline std::vector<MX> msym(const std::string& name, int nrow, int ncol, int p){ return MX::sym(name,nrow,ncol,p);}
-  inline std::vector<std::vector<MX> > msym(const std::string& name, const Sparsity& sp, int p, int r){ return MX::sym(name,sp,p,r);}
-  inline std::vector<std::vector<MX> > msym(const std::string& name, int nrow, int ncol, int p, int r){ return MX::sym(name,nrow,ncol,p,r);}
-  inline MX msym(const std::string& name, const Sparsity& sp){ return MX::sym(name,sp);}
-  inline MX msym(const Matrix<double>& x){ return MX(x);}
-//@}
-#endif
 
   /** \brief  Check if two expressions are equal
    *  Might very well give false negatives

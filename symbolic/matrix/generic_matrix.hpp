@@ -95,22 +95,28 @@ namespace CasADi{
 #endif
 
     /** \brief  Check if the matrix expression is empty, i.e. one of its dimensions is 0 */
-    bool isEmpty() const;
+    bool isEmpty() const{ return sparsity().isEmpty();}
     
     /** \brief  Check if the matrix expression is null, i.e. its dimensios are 0-by-0 */
     bool null() const;
     
     /** \brief  Check if the matrix expression is dense */
-    bool isDense() const;
-    
+    bool isDense() const{ return sparsity().isDense();}
+ 
     /** \brief  Check if the matrix expression is scalar */
     bool isScalar(bool scalar_and_dense=false) const;
 
     /** \brief  Check if the matrix expression is square */
-    bool isSquare() const;
+    bool isSquare() const{ return sparsity().isSquare();}
 
     /** \brief  Check if the matrix is a vector (i.e. size2()==1) */
-    bool isVector() const;
+    bool isVector() const{ return sparsity().isVector();}
+
+    /** \brief Check if the matrix is upper triangular */
+    bool isTriu() const{ return sparsity().isTriu();}
+
+    /** \brief Check if the matrix is lower triangular */
+    bool isTril() const{ return sparsity().isTril();}
 
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
@@ -265,33 +271,13 @@ namespace CasADi{
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::isEmpty() const{
-    return sparsity().isEmpty();
-  }
-
-  template<typename MatType>
   bool GenericMatrix<MatType>::null() const{
     return sparsity().null();
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::isDense() const{
-    return sparsity().isDense();
-  }
-
-  template<typename MatType>
   bool GenericMatrix<MatType>::isScalar(bool scalar_and_dense) const{
     return sparsity().isScalar(scalar_and_dense);
-  }
-
-  template<typename MatType>
-  bool GenericMatrix<MatType>::isSquare() const{
-    return sparsity().isSquare();
-  }
-
-  template<typename MatType>
-  bool GenericMatrix<MatType>::isVector() const{
-    return sparsity().isVector();
   }
 
   template<typename MatType>
