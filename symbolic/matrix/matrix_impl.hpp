@@ -2027,6 +2027,12 @@ namespace CasADi{
     return true;
   }
 
+  template<class T>
+  bool Matrix<T>::isEqual(const Matrix<T> &ex2) const{
+    if ((nnz(*this)!=0 || nnz(ex2)!=0) && shape()!=ex2.shape()) return false;
+    Matrix<T> difference = *this - ex2;  
+    return difference.isZero();
+  }
 
 } // namespace CasADi
 

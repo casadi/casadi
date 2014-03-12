@@ -722,6 +722,13 @@ namespace CasADi{
     /** \brief  check if the matrix is an identity matrix (note that false negative answers are possible)*/
     bool isIdentity() const;
 
+    /** \brief Check if two expressions are equal
+     *  May give false negatives
+     *
+     *  Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
+     */
+    bool isEqual(const Matrix<T> &ex2) const;
+
     // @{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
     static void setPrecision(int precision) { stream_precision_ = precision; }

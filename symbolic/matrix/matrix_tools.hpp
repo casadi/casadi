@@ -289,15 +289,6 @@ namespace CasADi{
   template<class T>
   Matrix<T> kron(const Matrix<T>& a, const Matrix<T>& b);
 
-  /** \brief Check if two expressions are equal
-   *
-   *  Might very well give false negatives
-   *
-   *   Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
-   */
-  template<class T>
-  bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2);
-
   template<class T>
   int nnz(const Matrix<T>& ex);
 
@@ -428,6 +419,7 @@ namespace CasADi{
   template<class T> bool isOne(const Matrix<T>& ex){ return ex.isOne();}
   template<class T> bool isMinusOne(const Matrix<T>& ex){ return ex.isMinusOne();}
   template<class T> bool isIdentity(const Matrix<T>& ex){ return ex.isIdentity();}
+  template<class T> bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2){ return ex1.isEqual(ex2);}
  //@}
 #endif
 
@@ -1065,13 +1057,6 @@ namespace CasADi{
         }
       }
     return nz;
-  }
-
-  template<class T>
-  bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2){
-    if ((nnz(ex1)!=0 || nnz(ex2)!=0) && (ex1.size2()!=ex2.size2() || ex1.size1()!=ex2.size1())) return false;
-    Matrix<T> difference = ex1 - ex2;  
-    return isZero(difference);
   }
 
   template<class T>
