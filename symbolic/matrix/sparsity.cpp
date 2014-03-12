@@ -1006,4 +1006,10 @@ namespace CasADi{
     return Sparsity::triplet(nrow,ncol,row,col,mapping,false);
   }
 
+  bool Sparsity::isSingular() const{
+    casadi_assert_message(isSquare(),"isSingular: only defined for square matrices, but got " << dimString());
+    return rank(*this)!=size2();
+  }
+
+
 } // namespace CasADi

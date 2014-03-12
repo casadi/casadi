@@ -100,11 +100,6 @@ namespace CasADi{
     a.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
     return coarse_colblock.at(3);
   }
-
-  bool isSingular(const Sparsity& a) {
-    casadi_assert_message(a.size2()==a.size1(),"isSingular: only defined for square matrices, but got " << a.dimString());
-    return rank(a)!=a.size2();
-  }
   
   Sparsity horzcat(const std::vector<Sparsity> & sp) {
     if(sp.empty()){

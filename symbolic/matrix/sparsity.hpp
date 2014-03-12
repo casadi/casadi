@@ -425,6 +425,9 @@ namespace CasADi{
     /// Is upper triangular?
     bool isTriu() const;
 
+    /// Check whether the sparsity-pattern inidcates structural singularity
+    bool isSingular() const;
+
     /// Get lower triangular part
     Sparsity lower(bool includeDiagonal=true) const;
 
