@@ -34,8 +34,7 @@ namespace CasADi{
 
   Split::Split(const MX& x, const std::vector<int>& offset) : offset_(offset){
     setDependencies(x);
-    setSparsity(Sparsity(1, 1, true));
-
+    setSparsity(Sparsity::scalar());
   }
 
   Split::~Split(){

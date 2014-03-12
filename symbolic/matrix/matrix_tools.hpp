@@ -210,7 +210,7 @@ namespace CasADi{
   /** \brief Outer product of two vectors
       Equals
       \code
-      x*trans(y)
+      x*transpose(y)
       \endcode
       with x and y vectors
   */
@@ -442,7 +442,7 @@ namespace CasADi{
     casadi_assert_message(n == a.size1(),"matrix must be square");
 
     // Trivial return if scalar
-    if(isScalar(a)) return a.toScalar();
+    if(a.isScalar()) return a.toScalar();
 
     // Trivial case 2 x 2
     if(n==2) return a.elem(0,0) * a.elem(1,1) - a.elem(0,1) * a.elem(1,0);
@@ -943,7 +943,7 @@ namespace CasADi{
         }
       }
       return x;
-    } else if(hasNonStructuralZeros(A)){
+    } else if(A.hasNonStructuralZeros()){
 
       // If there are structurally nonzero entries that are known to be zero, remove these and rerun the algorithm
       Matrix<DataType> A_sparse = A;

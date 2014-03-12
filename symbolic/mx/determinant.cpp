@@ -57,7 +57,7 @@ namespace CasADi{
     if(nfwd==0 && nadj==0) return;
     
     // Create only once
-    MX trans_inv_X = trans(inv(X));
+    MX trans_inv_X = inv(X).T();
 
     // Forward sensitivities
     for(int d=0; d<nfwd; ++d){

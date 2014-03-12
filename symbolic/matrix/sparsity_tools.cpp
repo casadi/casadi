@@ -76,11 +76,11 @@ namespace CasADi{
       }
       return ret;
     } else {
-      Sparsity ret = trans(sp[0]);
+      Sparsity ret = sp[0].T();
       for(int i=1; i<sp.size(); ++i) {
-        ret.appendColumns(trans(sp[i]));
+        ret.appendColumns(sp[i].T());
       }
-      return trans(ret);
+      return ret.T();
     }
   }
   
@@ -90,9 +90,9 @@ namespace CasADi{
       ret.append(b);
       return ret;
     } else {
-      Sparsity ret = trans(a);
-      ret.appendColumns(trans(b));
-      return trans(ret);
+      Sparsity ret = a.T();
+      ret.appendColumns(b.T());
+      return ret.T();
     }
   }
   

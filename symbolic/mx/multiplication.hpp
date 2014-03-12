@@ -76,7 +76,7 @@ namespace CasADi{
 
     /// Helper class
     template<bool Tr>
-    static MX tr(const MX& x){ return Tr ? trans(x) : x;}
+    static MX tr(const MX& x){ return Tr ? x.T() : x;}
   };
 
 

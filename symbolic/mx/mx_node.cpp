@@ -332,7 +332,7 @@ namespace CasADi{
   
   MX MXNode::getMultiplication(const MX& y,const Sparsity& sp_z) const{
     // Get reference to transposed first argument
-    MX trans_x = trans(shared_from_this<MX>());
+    MX trans_x = shared_from_this<MX>().T();
 
     // Form result of the right sparsity
     MX z;
@@ -354,9 +354,9 @@ namespace CasADi{
     
   MX MXNode::getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const{
     if(tr){
-      return MX::create(new Solve<true>(densify(r),shared_from_this<MX>(),linear_solver));
+      return MX::create(new Solve<true>(full(r),shared_from_this<MX>(),linear_solver));
     } else {
-      return MX::create(new Solve<false>(densify(r),shared_from_this<MX>(),linear_solver));
+      return MX::create(new Solve<false>(full(r),shared_from_this<MX>(),linear_solver));
     }
   }
 
@@ -577,7 +577,7 @@ namespace CasADi{
         return MX::create(new BinaryMX<true,false>(Operation(op),shared_from_this<MX>(),y));
       } else {
         // Put a densification node in between
-        return getBinary(op,densify(y),true,false);
+        return getBinary(op,full(y),true,false);
       }
     } else if(scY){
       // Check if it is ok to loop over nonzeros only
@@ -586,7 +586,7 @@ namespace CasADi{
         return MX::create(new BinaryMX<false,true>(Operation(op),shared_from_this<MX>(),y));
       } else {
         // Put a densification node in between
-        return densify(shared_from_this<MX>())->getBinary(op,y,false,true);
+        return full(shared_from_this<MX>())->getBinary(op,y,false,true);
       }
     } else {
       // Loop over nonzeros only

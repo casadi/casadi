@@ -1038,7 +1038,7 @@ namespace CasADi{
     casadi_assert(v.size() == 2 + ncol+1 + nnz);
 
     // Call array version
-    return sp_compress(&v.front());
+    return compressed(&v.front());
   }
   
   Sparsity Sparsity::compressed(const int* v){

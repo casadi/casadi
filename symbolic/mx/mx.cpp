@@ -69,7 +69,7 @@ namespace CasADi{
 #endif
 
   MX::MX(int nrow, int ncol){
-    assignNode(new Constant<CompiletimeConst<0> >(Sparsity(nrow,ncol)));
+    assignNode(new Constant<CompiletimeConst<0> >(Sparsity::sparse(nrow,ncol)));
   }
 
   MX::MX(const Sparsity& sp, const MX& val){
@@ -414,7 +414,7 @@ namespace CasADi{
   }
 
   MX MX::getNZ(const std::vector<int>& k) const{
-    Sparsity sp(k.size(),1,true);
+    Sparsity sp = Sparsity::dense(k.size());
   
     for (int i=0;i<k.size();i++) {
       casadi_assert_message(k[i] < size(),"Mapping::assign: index vector reaches " << k[i] << ", while dependant is only of size " << size());
@@ -425,7 +425,7 @@ namespace CasADi{
   }
 
   MX MX::getNZ(const Matrix<int>& k) const{
-    Sparsity sp(k.size(),1,true);
+    Sparsity sp = Sparsity::dense(k.size());
     MX ret = (*this)->getGetNonzeros(sp,k.data());
     return ret;
   }
@@ -549,7 +549,7 @@ namespace CasADi{
   }
 
   MX MX::eye(int n){
-    Matrix<double> I(Sparsity::createDiagonal(n),1);
+    Matrix<double> I(Sparsity::diag(n),1);
     return MX(I);
   }
 
@@ -606,7 +606,7 @@ namespace CasADi{
     casadi_assert(val.isScalar());
     casadi_assert(val.isDense());
   
-    Sparsity sp(nrow,ncol,true);
+    Sparsity sp = Sparsity::dense(nrow,ncol);
     *this = val->getGetNonzeros(sp,std::vector<int>(sp.size(),0));
   }
 
@@ -997,7 +997,7 @@ namespace CasADi{
 
   bool MX::isRegular() const{
     if (isConstant()) {
-      return CasADi::isRegular(getMatrixValue());
+      return getMatrixValue().isRegular();
     } else {
       casadi_error("Cannot check regularity for symbolic MX");
     }
