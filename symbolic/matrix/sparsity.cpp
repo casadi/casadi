@@ -836,8 +836,8 @@ namespace CasADi{
   }
 
   Sparsity Sparsity::unit(int n, int el){
-    Sparsity ret = Sparsity::sparse(1,n);
-    ret.getNZ(0,el);
+    Sparsity ret = Sparsity::sparse(n);
+    ret.getNZ(el,0);
     return ret;
   }
 
