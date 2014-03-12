@@ -624,8 +624,8 @@ namespace CasADi{
 
   // Template instantiations
 #ifndef SWIG
-  template<typename T>
-  void Sparsity::set(T* data, const T* val_data, const Sparsity& val_sp) const{
+  template<typename DataType>
+  void Sparsity::set(DataType* data, const DataType* val_data, const Sparsity& val_sp) const{
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();
@@ -648,13 +648,13 @@ namespace CasADi{
       // Quick return
       return;
     } else if(val_nel==1){ // if scalar
-      std::fill(data,data+sz,val_sz==0 ? T(0) : val_data[0]);
+      std::fill(data,data+sz,val_sz==0 ? DataType(0) : val_data[0]);
     } else {
       // Quick return if empty
       if(nel==0 && val_nel==0) return;
     
       // Make sure that dimension matches
-      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,"Sparsity::set<T>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,"Sparsity::set<DataType>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
     
       // Sparsity
       const std::vector<int>& c = row();
@@ -698,8 +698,8 @@ namespace CasADi{
     }
   }
 
-  template<typename T>
-  void Sparsity::add(T* data, const T* val_data, const Sparsity& val_sp) const{
+  template<typename DataType>
+  void Sparsity::add(DataType* data, const DataType* val_data, const Sparsity& val_sp) const{
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();
@@ -734,7 +734,7 @@ namespace CasADi{
       if(nel==0 && val_nel==0) return;
     
       // Make sure that dimension matches
-      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,"Sparsity::add<T>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,"Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
     
       // Sparsity
       const std::vector<int>& c = row();
@@ -776,8 +776,8 @@ namespace CasADi{
     }
   }
 
-  template<typename T>
-  void Sparsity::bor(T* data, const T* val_data, const Sparsity& val_sp) const{
+  template<typename DataType>
+  void Sparsity::bor(DataType* data, const DataType* val_data, const Sparsity& val_sp) const{
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();
@@ -812,7 +812,7 @@ namespace CasADi{
       if(nel==0 && val_nel==0) return;
     
       // Make sure that dimension matches
-      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,"Sparsity::add<T>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,"Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
     
       // Sparsity
       const std::vector<int>& c = row();
