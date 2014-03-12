@@ -130,6 +130,11 @@ namespace CasADi{
     // Matrix A has a dummy row
     bool dummyrow_;
     
+  private:
+      void snInit(int iPrint, int iSumm);
+      void snSeti(const std::string &snopt_name, int value);
+      void snSetr(const std::string &snopt_name, double value);
+      void snSet(const std::string &snopt_name, const std::string &value);
   };
   
 

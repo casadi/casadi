@@ -39,7 +39,30 @@ extern "C" {
   
   extern void snopt_memb (int *INFO, const int* m,const int* n,const int* neA,const int*  negCon, const int* nnCon, const int* nnJac,const int*  nnObj, int* mincw, int* miniw, int* minrw, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
 
+    // direct calls to the fortran library
+  extern void sninit_(const int * iPrint, const int * iSumm,
+                      char* cw, const int* lencw,
+                      int* iw, const int* leniw,
+                      double* rw, const int* lenrw,
+                      const long cw_len8);
+
+  extern void snseti_(const char *buffer, const int *ivalue, int * iPrint, int * iSumm, int* Errors,
+                      char* cw, const int* lencw,
+                      int* iw, const int* leniw,
+                      double* rw, const int* lenrw,
+                      const long buffer_ftn_len, const long cw_len8);
+
+  extern void snsetr_(const char *buffer, const double *ivalue, int * iPrint, int * iSumm, int* Errors,
+                      char* cw, const int* lencw,
+                      int* iw, const int* leniw,
+                      double* rw, const int* lenrw,
+                      const long buffer_ftn_len, const long cw_len8);
+
+  extern void snset_(const char *buffer, int * iPrint, int * iSumm, int* Errors,
+                     char* cw, const int* lencw,
+                     int* iw, const int* leniw,
+                     double* rw, const int* lenrw,
+                     const long buffer_ftn_len, const long cw_len8);
+
+
 }
-
-
-

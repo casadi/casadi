@@ -303,7 +303,7 @@ namespace CasADi{
     snopt_iw_.resize(ilen,0);
     snopt_rw_.resize(rlen,0);
     
-    snopt_init(&iPrint,&iSumm,getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
+    snInit(iPrint, iSumm);
     
     int mincw = 0;
     int miniw = 0;
@@ -326,7 +326,7 @@ namespace CasADi{
 
     iPrint = getOption("_iprint");
     iSumm = getOption("_isumm");;
-    snopt_init(&iPrint,&iSumm,getPtr(snopt_cw_),&mincw,getPtr(snopt_iw_),&miniw,getPtr(snopt_rw_),&minrw);
+    snInit(iPrint, iSumm);
     
     for (OptionsMap::const_iterator it=optionsmap_.begin();it!=optionsmap_.end();it++) {
       int Error = 0;
@@ -336,21 +336,15 @@ namespace CasADi{
         switch (it->second.first) {
           case OT_INTEGER: {
             int value = getOption(it->first);
-            snopt_seti(snopt_name.c_str(),&bufferlen,&value,&iPrint,&iSumm,&Error,getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
+            snSeti(snopt_name, value);
           }; break;
           case OT_REAL: {
             double value = getOption(it->first);
-            snopt_setr(snopt_name.c_str(),&bufferlen,&value,&iPrint,&iSumm,&Error,getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
+            snSetr(snopt_name, value);
           }; break;
           case OT_STRING: {
             std::string value = getOption(it->first);
-            assert(value.size()<=8);
-            value.append(8-value.size(),' ');
-            std::string buffer = snopt_name;
-            buffer.append(" = ");
-            buffer.append(value);
-            int bufferlen2 = buffer.size();
-            snopt_set(buffer.c_str(),&bufferlen2,&iPrint,&iSumm,&Error,getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
+            snSet(snopt_name, value);
             }; break;
           default:
             casadi_error("Unkown type " << it->second.first);
@@ -723,6 +717,86 @@ namespace CasADi{
 
     interface->userfun(*mode, *nnObj, *nnCon, *nJac, *nnL, *neJac, x,*fObj, gObj,fCon,gCon,  *nState,  cu,  *lencu,  iu, *leniu, ru, *lenru);
   }
+
+    void SnoptInternal::snInit(int iPrint, int iSumm){
+        int clen = snopt_cw_.size()/8;
+        int ilen = snopt_iw_.size();
+        int rlen = snopt_rw_.size();
+        //sninit_(&iPrint, &iSumm,
+        //        getPtr(snopt_cw_),&clen,
+        //        getPtr(snopt_iw_),&ilen,
+        //        getPtr(snopt_rw_),&rlen,
+        //        clen*8);
+        snopt_init(&iPrint,&iSumm,getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
+    }
+
+    void SnoptInternal::snSeti(const std::string &snopt_name, int value){
+        int bufferlen = snopt_name.size();
+        int clen = snopt_cw_.size()/8;
+        int ilen = snopt_iw_.size();
+        int rlen = snopt_rw_.size();
+        int iSumm = getOption("_isumm");
+        int iPrint = getOption("_iprint");
+        int Error = 0;
+        //snseti_(snopt_name.c_str(), &value, &iPrint, &iSumm, &Error,
+        //        getPtr(snopt_cw_),&clen,
+        //        getPtr(snopt_iw_),&ilen,
+        //        getPtr(snopt_rw_),&rlen,
+        //        bufferlen,clen*8);
+        snopt_seti(snopt_name.c_str(), &bufferlen, &value, &iPrint, &iSumm, &Error,
+                   getPtr(snopt_cw_), &clen,
+                   getPtr(snopt_iw_), &ilen,
+                   getPtr(snopt_rw_), &rlen);
+        casadi_assert_message(Error==0,"snopt error setting option \"" + snopt_name + "\"")
+    }
+
+    void SnoptInternal::snSetr(const std::string &snopt_name, double value){
+        int bufferlen = snopt_name.size();
+        int clen = snopt_cw_.size()/8;
+        int ilen = snopt_iw_.size();
+        int rlen = snopt_rw_.size();
+        int iSumm = getOption("_isumm");
+        int iPrint = getOption("_iprint");
+        int Error = 0;
+        //snsetr_(snopt_name.c_str(), &value, &iPrint, &iSumm, &Error,
+        //        getPtr(snopt_cw_),&clen,
+        //        getPtr(snopt_iw_),&ilen,
+        //        getPtr(snopt_rw_),&rlen,
+        //        bufferlen,clen*8);
+        snopt_setr(snopt_name.c_str(), &bufferlen, &value, &iPrint, &iSumm, &Error,
+                   getPtr(snopt_cw_), &clen,
+                   getPtr(snopt_iw_), &ilen,
+                   getPtr(snopt_rw_), &rlen);
+        casadi_assert_message(Error==0,"snopt error setting option \"" + snopt_name + "\"")
+    }
+
+    void SnoptInternal::snSet(const std::string &snopt_name, const std::string &value0){
+        std::string value = value0;
+        assert(value.size()<=8);
+        value.append(8-value.size(),' ');
+        std::string buffer = snopt_name;
+        buffer.append(" = ");
+        buffer.append(value);
+        int bufferlen = buffer.size();
+
+        int clen = snopt_cw_.size()/8;
+        int ilen = snopt_iw_.size();
+        int rlen = snopt_rw_.size();
+        int iSumm = getOption("_isumm");
+        int iPrint = getOption("_iprint");
+        int Error = 0;
+        //snset_(buffer.c_str(), &iPrint, &iSumm, &Error,
+        //       getPtr(snopt_cw_), &clen,
+        //       getPtr(snopt_iw_), &ilen,
+        //       getPtr(snopt_rw_), &rlen,
+        //       bufferlen,clen*8);
+        snopt_set(buffer.c_str(), &bufferlen, &iPrint, &iSumm, &Error,
+                  getPtr(snopt_cw_), &clen,
+                  getPtr(snopt_iw_), &ilen,
+                  getPtr(snopt_rw_), &rlen);
+
+        casadi_assert_message(Error==0,"snopt error setting option \"" + snopt_name + "\"")
+    }
 
 } // namespace CasADi
 
