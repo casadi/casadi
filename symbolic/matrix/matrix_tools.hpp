@@ -289,28 +289,6 @@ namespace CasADi{
   template<class T>
   Matrix<T> kron(const Matrix<T>& a, const Matrix<T>& b);
 
-  /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
-  template<class T>
-  bool isZero(const Matrix<T>& ex);
-
-  /** \brief  check if the matrix is 1 (note that false negative answers are possible)*/
-  template<class T>
-  bool isOne(const Matrix<T>& ex);
-
-  /** \brief  check if the matrix is -1 (note that false negative answers are possible)*/
-  template<class T>
-  bool isMinusOne(const Matrix<T>& ex);
-
-  /** \brief  check if the matrix is an identity matrix (note that false negative answers are possible)*/
-  template<class T>
-  bool isIdentity(const Matrix<T>& ex);
-
-  template<class T>
-  int nnz(const Matrix<T>& ex);
-
-  template<class T>
-  int nnz_sym(const Matrix<T>& ex);
-
   /** \brief Check if two expressions are equal
    *
    *  Might very well give false negatives
@@ -319,6 +297,13 @@ namespace CasADi{
    */
   template<class T>
   bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2);
+
+  template<class T>
+  int nnz(const Matrix<T>& ex);
+
+  template<class T>
+  int nnz_sym(const Matrix<T>& ex);
+
 
   /** \brief  Frobenius norm  */
   template<class T>
@@ -439,6 +424,10 @@ namespace CasADi{
   template<class T> bool isRegular(const Matrix<T>& ex){ return ex.isRegular();}
   template<class T> bool isConstant(const Matrix<T>& ex){ return ex.isConstant();}
   template<class T> bool isInteger(const Matrix<T>& ex){ return ex.isInteger();}
+  template<class T> bool isZero(const Matrix<T>& ex){ return ex.isZero();}
+  template<class T> bool isOne(const Matrix<T>& ex){ return ex.isOne();}
+  template<class T> bool isMinusOne(const Matrix<T>& ex){ return ex.isMinusOne();}
+  template<class T> bool isIdentity(const Matrix<T>& ex){ return ex.isIdentity();}
  //@}
 #endif
 
@@ -1057,61 +1046,6 @@ namespace CasADi{
       }
     }
     return blockcat(blocks);
-  }
-
-  template<class T>
-  bool isOne(const Matrix<T>& ex){  
-    if(!ex.isDense()){
-      return false;
-    }
-  
-    // loop over non-zero elements
-    for(int el=0; el<ex.size(); ++el)
-      if(!casadi_limits<T>::isOne(ex.at(el)))
-        return false;
-  
-    return true;
-  }
-
-  template<class T>
-  bool isMinusOne(const Matrix<T>& ex){  
-    if(!ex.isDense()){
-      return false;
-    }
-  
-    // loop over non-zero elements
-    for(int el=0; el<ex.size(); ++el)
-      if(!casadi_limits<T>::isMinusOne(ex.at(el)))
-        return false;
-  
-    return true;
-  }
-
-  template<class T>
-  bool isZero(const Matrix<T>& ex) {  
-
-    // loop over (potentially) non-zero elements
-    for(int el=0; el<ex.size(); ++el)
-      if(!casadi_limits<T>::isZero(ex.at(el)))
-        return false;
-  
-    return true;
-  }
-
-  template<class T>
-  bool isIdentity(const Matrix<T>& ex) {
-  
-    // Make sure that the matrix is diagonal
-    if(!ex.sparsity().isDiagonal())
-      return false;
-  
-    // Make sure that all entries are one
-    for(typename Matrix<T>::const_iterator it=ex.begin(); it!=ex.end(); ++it){
-      if(!casadi_limits<T>::isOne(*it))
-        return false;
-    }
-      
-    return true;
   }
 
   template<class T>

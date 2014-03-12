@@ -1972,6 +1972,61 @@ namespace CasADi{
     return true;
   }
 
+  template<class T>
+  bool Matrix<T>::isOne() const{  
+    if(!isDense()){
+      return false;
+    }
+  
+    // loop over non-zero elements
+    for(int el=0; el<size(); ++el)
+      if(!casadi_limits<T>::isOne(at(el)))
+        return false;
+  
+    return true;
+  }
+
+  template<class T>
+  bool Matrix<T>::isMinusOne() const{  
+    if(!isDense()){
+      return false;
+    }
+  
+    // loop over non-zero elements
+    for(int el=0; el<size(); ++el)
+      if(!casadi_limits<T>::isMinusOne(at(el)))
+        return false;
+  
+    return true;
+  }
+
+  template<class T>
+  bool Matrix<T>::isZero() const{  
+
+    // loop over (potentially) non-zero elements
+    for(int el=0; el<size(); ++el)
+      if(!casadi_limits<T>::isZero(at(el)))
+        return false;
+  
+    return true;
+  }
+
+  template<class T>
+  bool Matrix<T>::isIdentity() const{
+  
+    // Make sure that the matrix is diagonal
+    if(!sparsity().isDiagonal())
+      return false;
+  
+    // Make sure that all entries are one
+    for(typename Matrix<T>::const_iterator it=begin(); it!=end(); ++it){
+      if(!casadi_limits<T>::isOne(*it))
+        return false;
+    }
+      
+    return true;
+  }
+
 
 } // namespace CasADi
 

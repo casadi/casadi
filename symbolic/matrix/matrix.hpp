@@ -710,6 +710,18 @@ namespace CasADi{
     /** \brief Check if the matrix is integer-valued (note that false negative answers are possible)*/
     bool isInteger() const;
 
+    /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
+    bool isZero() const;
+
+    /** \brief  check if the matrix is 1 (note that false negative answers are possible)*/
+    bool isOne() const;
+
+    /** \brief  check if the matrix is -1 (note that false negative answers are possible)*/
+    bool isMinusOne() const;
+
+    /** \brief  check if the matrix is an identity matrix (note that false negative answers are possible)*/
+    bool isIdentity() const;
+
     // @{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
     static void setPrecision(int precision) { stream_precision_ = precision; }
