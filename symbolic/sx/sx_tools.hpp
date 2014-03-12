@@ -27,14 +27,6 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../matrix/generic_matrix_tools.hpp"
 
-#ifdef WITH_UBLAS
-#include <boost/numeric/ublas/matrix_sparse.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/io.hpp>
-namespace ublas = boost::numeric::ublas;
-#endif
-
 /** Functions using SXElement */
 
 namespace CasADi{

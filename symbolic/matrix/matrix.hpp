@@ -74,8 +74,6 @@ namespace CasADi{
       General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
       This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n
   
-      The syntax tries to stay as close as possible to the ublas syntax  when it comes to vector/matrix operations.\n
-
       Index starts with 0.\n
       Index vec happens as follows: (rr,cc) -> k = rr+cc*size1()\n
       Vectors are column vectors.\n
@@ -87,7 +85,7 @@ namespace CasADi{
       The sparsity can be accessed with Sparsity& sparsity()\n
   
       \author Joel Andersson 
-      \date 2010        
+      \date 2010-2014
   */
   template<class T>
   class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix<T> >, public PrintableObject{
@@ -219,19 +217,6 @@ namespace CasADi{
       copy(x.begin(),x.end(),begin());
     }
     
-    /** \brief  ublas vector */
-#ifdef HAVE_UBLAS
-    template<typename T, typename A>
-    explicit Matrix<T>(const ublas::vector<A> &x) : sparsity_(Sparsity(x.size(),1,true)), data_(std::vector<T>(x.size())){
-      copy(x.begin(),x.end(),begin());
-    }
-
-    template<typename T, typename A>
-    explicit Matrix<T>(const ublas::matrix<A> &x) : sparsity_(Sparsity(x.size1(),x.size2(),true)), data_(std::vector<T>(numel())){
-      copy(x.begin(),x.end(),begin());
-      return ret;
-    }
-#endif // HAVE_UBLAS
 #endif // SWIG
 
 
