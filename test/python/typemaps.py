@@ -859,7 +859,7 @@ class typemaptests(casadiTestCase):
   def test_OUTPUT(self):
     self.message("OUTPUT typemap")
     a = SX.sym("A",3,3)
-    self.assertTrue(isinstance(qr(a),list))
+    self.assertTrue(isinstance(qr(a),tuple))
 
   def test_cvar(self):
     self.message("We must not have cvar, to avoid bug #652")
