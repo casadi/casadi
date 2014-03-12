@@ -65,9 +65,6 @@ namespace CasADi{
   //@}
 
   template<class T>
-  bool isVector(const Matrix<T>& ex);
-
-  template<class T>
   T det(const Matrix<T>& a);
 
   template<class T>
@@ -382,7 +379,7 @@ namespace CasADi{
 
   /** \brief  Evaluate a polynomial with coefficeints p in x */
   template<class T>
-  Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x);
+  Matrix<T> polyvalQQQ(const Matrix<T>& p, const Matrix<T>& x);
 
   /** \brief   Get the diagonal of a matrix or construct a diagonal
       When the input is square, the diagonal elements are returned.
@@ -486,11 +483,6 @@ namespace CasADi{
       ret = ret.mul(args[i]);
     }
     return ret;
-  }
-
-  template<class T>
-  bool isVector(const Matrix<T>& ex){
-    return ex.size1()==1;
   }
 
   template<class T>
@@ -1289,8 +1281,8 @@ namespace CasADi{
   
   template<class T>
   Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x){
-    casadi_assert_message(isDense(p),"polynomial coefficients vector must be a vector");
-    casadi_assert_message(isVector(p) && p.size()>0,"polynomial coefficients must be a vector");
+    casadi_assert_message(p.isDense(),"polynomial coefficients vector must be dense");
+    casadi_assert_message(p.isVector() && p.size()>0,"polynomial coefficients must be a vector");
     Matrix<T> ret = p[0];
     for(int i=1; i<p.size(); ++i){
       ret = ret*x + p[i];
@@ -1402,7 +1394,6 @@ namespace CasADi{
   MTT_INST(T,isEmpty)                           \
   MTT_INST(T,isInteger)                         \
   MTT_INST(T,isScalar)                          \
-  MTT_INST(T,isVector)                          \
   MTT_INST(T,isTril)                            \
   MTT_INST(T,isTriu)                            \
   MTT_INST(T,det)                               \
