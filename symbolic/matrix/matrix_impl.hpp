@@ -1934,6 +1934,21 @@ namespace CasADi{
     casadi_error("Not implemented.");
   }
 
+  template<class T>
+  bool Matrix<T>::isSmooth() const{
+    return true;
+  }
+
+  template<class T>
+  bool Matrix<T>::isSymbolic() const{
+    return false;
+  }
+
+  template<class T>
+  bool Matrix<T>::isSymbolicSparse() const{
+    return false;
+  }
+
 } // namespace CasADi
 
 #endif // MATRIX_IMPL_HPP

@@ -349,13 +349,12 @@ namespace CasADi{
   typedef std::vector<SXPtr> SXPtrV;
   typedef std::vector<SXPtrV> SXPtrVV;
 
-  // Specialize functions in GenericMatrix<SX> and MX
-  template<>
-  SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
-  
-  template<>
-  bool SX::isRegular() const;
-
+  // Specialize functions in GenericMatrix<SX> and SX
+  template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
+  template<> bool SX::isRegular() const;
+  template<> bool SX::isSmooth() const;
+  template<> bool SX::isSymbolic() const;
+  template<> bool SX::isSymbolicSparse() const;
 } // namespace CasADi
 
 

@@ -437,11 +437,13 @@ namespace CasADi{
     return ret;
   }
 
+#ifndef WITHOUT_PRE_1_9_X
   bool isEqual(const MX& ex1,const MX &ex2){
     if ((ex1.size()!=0 || ex2.size()!=0) && (ex1.size2()!=ex2.size2() || ex1.size1()!=ex2.size1())) return false;
     MX difference = ex1 - ex2;  
     return isZero(difference);
   }
+#endif
 
   std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args) {
     std::stringstream s;

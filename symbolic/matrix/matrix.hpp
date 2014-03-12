@@ -691,6 +691,19 @@ namespace CasADi{
     /// Checks if expression does not contain NaN or Inf
     bool isRegular() const;
 
+    /** \brief  check if smooth */
+    bool isSmooth() const;
+
+    /** \brief  check if symbolic (Dense)
+        Sparse matrices invariable return false 
+    */
+    bool isSymbolic() const;
+
+    /** \brief  check if symbolic
+        Sparse matrices can return true if all non-zero elements are symbolic
+    */
+    bool isSymbolicSparse() const;
+
     // @{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
     static void setPrecision(int precision) { stream_precision_ = precision; }

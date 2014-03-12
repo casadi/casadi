@@ -388,31 +388,6 @@ namespace CasADi{
     return Jsp.size()!=0;
   }
 
-
-  bool isSmooth(const SX& ex){
-    // Make a function
-    SXFunction temp(SX(),ex);
-    temp.init();
-  
-    // Run the function on the temporary variable
-    return temp->isSmooth();
-  }
-
-
-  bool isSymbolic(const SX& ex){
-    if(!isDense(ex)) return false;
-  
-    return isSymbolicSparse(ex);
-  }
-
-  bool isSymbolicSparse(const SX& ex) {
-    for(int k=0; k<ex.size(); ++k) // loop over non-zero elements
-      if(!ex.at(k)->isSymbolic()) // if an element is not symbolic
-        return false;
-  
-    return true;
-  }
-
   SX gradient(const SX& ex, const SX &arg) {
     SXFunction temp(arg,ex); // make a runtime
     temp.init();

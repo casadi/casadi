@@ -209,21 +209,6 @@ namespace CasADi{
    */
   std::vector<SXElement> getSymbols(const SX& e);
 
-  /** \brief  check if smooth */
-  bool isSmooth(const SX& ex);
-
-  /** \brief  check if symbolic (Dense)
-
-      Sparse matrices invariable return false 
-  */
-  bool isSymbolic(const SX& ex);
-
-  /** \brief  check if symbolic
-
-      Sparse matrices can return true if all non-zero elements are symbolic
-  */
-  bool isSymbolicSparse(const SX& ex);
-
   //@{
   /** \brief Calculate jacobian via source code transformation
 
@@ -338,7 +323,7 @@ namespace CasADi{
   SX eig_symbolic(const SX& m);
 
 #ifndef WITHOUT_PRE_1_9_X
-  /** \brief [DEPRECATED] Replaced with SX::sym
+  /** \brief [DEPRECATED]
    */
   //@{
   inline SX ssym(const std::string& name, int nrow=1, int ncol=1){ return SX::sym(name,nrow,ncol); }
@@ -351,6 +336,9 @@ namespace CasADi{
   inline SX ssym(const Matrix<double>& x){ return SX(x);}
   inline bool isRegular(const SXElement& ex){ return ex.isRegular();}
   inline bool isRegular(const SX& ex){ return ex.isRegular();}
+  inline bool isSmooth(const SX& ex){ return ex.isSmooth();}
+  inline bool isSymbolic(const SX& ex){ return ex.isSymbolic();}
+  inline bool isSymbolicSparse(const SX& ex){ return ex.isSymbolicSparse();}
   //@}
 #endif
 
