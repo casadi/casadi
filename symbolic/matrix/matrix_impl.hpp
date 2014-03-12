@@ -2035,6 +2035,18 @@ namespace CasADi{
     return difference.isZero();
   }
 
+  template<class T>
+  bool Matrix<T>::hasNonStructuralZeros() const{
+    // Check if the structural nonzero is known to be zero
+    for(int el=0; el<size(); ++el){
+      if(casadi_limits<T>::isZero(at(el)))
+        return true;
+    }
+  
+    // No known zeros amongst the structurally nonzero entries
+    return false;
+  }
+
 } // namespace CasADi
 
 #endif // MATRIX_IMPL_HPP

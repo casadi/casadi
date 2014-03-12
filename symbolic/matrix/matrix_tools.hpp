@@ -369,10 +369,6 @@ namespace CasADi{
   Matrix<T> sparse(const Matrix<T>& A, double tol=0);
 #endif // SWIGOCTAVE
 
-  /** \brief  Check if the matrix has any zero entries which are not structural zeros */
-  template<class T>
-  bool hasNonStructuralZeros(const Matrix<T>& A);
-
   /// same as: res += mul(A,v)
   template<typename T>
   void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& res, bool trans_A=false);
@@ -414,6 +410,7 @@ namespace CasADi{
   template<class T> bool isIdentity(const Matrix<T>& ex){ return ex.isIdentity();}
   template<class T> bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2){ return ex1.isEqual(ex2);}
   template<class T> int nnz(const Matrix<T>& ex) { return ex.size();}
+  template<class T> bool hasNonStructuralZeros(const Matrix<T>& A){ return A.hasNonStructuralZeros();}
  //@}
 #endif
 
@@ -1123,20 +1120,6 @@ namespace CasADi{
     Matrix<T> ret(A);
     ret.sparsify(tol);
     return ret;
-  }
-
-  template<class T>
-  bool hasNonStructuralZeros(const Matrix<T>& A){
-    // Loop over the structural nonzeros
-    for(int el=0; el<A.size(); ++el){
-    
-      // Check if the structural nonzero is known to be zero
-      if(casadi_limits<T>::isZero(A.at(el)))
-        return true;
-    }
-  
-    // No known zeros amongst the structurally nonzero entries
-    return false;
   }
   
   template<class T>

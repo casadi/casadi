@@ -729,6 +729,9 @@ namespace CasADi{
      */
     bool isEqual(const Matrix<T> &ex2) const;
 
+    /** \brief  Check if the matrix has any zero entries which are not structural zeros */
+    bool hasNonStructuralZeros() const;
+
     // @{
     /// Set the 'precision, width & scientific' used in printing and serializing to streams
     static void setPrecision(int precision) { stream_precision_ = precision; }
