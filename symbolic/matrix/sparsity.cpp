@@ -466,28 +466,19 @@ namespace CasADi{
     (*this)->enlargeRows(nrow,jj);
   }
 
-  Sparsity Sparsity::createDiagonal(int n){
-    return createDiagonal(n,n);
-  }
+  Sparsity Sparsity::diag(int nrow, int ncol){
+    // Smallest dimension
+    int n = min(nrow,ncol);
 
-  Sparsity Sparsity::createDiagonal(int m, int n){
-    Sparsity ret(m,n);
-  
-    // Set rows
-    std::vector<int> &c = ret.rowRef();
-    c.resize(min(n,m));
-    for(int i=0; i<c.size(); ++i)
-      c[i] = i;
-  
-    // Set col indices
-    std::vector<int> &r = ret.colindRef();
-    for(int i=0; i<n && i<m; ++i)
-      r[i] = i;
-  
-    for(int i=min(n,m); i<n+1; ++i)
-      r[i] = c.size();
-  
-    return ret;
+    // Column offset
+    vector<int> colind(ncol+1,n);    
+    for(int cc=0; cc<n; ++cc) colind[cc] = cc;
+
+    // Row
+    vector<int> row = range(n);
+
+    // Create pattern from vectors
+    return Sparsity(nrow,ncol,colind,row);
   }
 
   Sparsity Sparsity::makeDense(std::vector<int>& mapping) const{
@@ -796,22 +787,6 @@ namespace CasADi{
 
     // Return the pattern
     return Sparsity(nrow,ncol,colind,row);
-  }
-
-  Sparsity Sparsity::diagonal(int n){
-    casadi_assert_message(n>=0, "Sparsity::diag expects a positive integer as argument");
-  
-    // Construct sparsity pattern
-    std::vector<int> row(n);
-    std::vector<int> colind(n+1);
-    int el = 0;
-    for(int i=0; i<n; ++i){
-      colind[i] = el;
-      row[el++] = i;
-    }
-    colind.back() = el;
-
-    return Sparsity(n,n,colind,row);
   }
 
   Sparsity Sparsity::band(int n, int p) {

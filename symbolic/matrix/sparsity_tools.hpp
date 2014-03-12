@@ -39,7 +39,7 @@ namespace CasADi{
   inline Sparsity sp_unit(int n, int el){ return Sparsity::unit(n,el);}
   inline Sparsity sp_triu(int n){ return Sparsity::triu(n);}
   inline Sparsity sp_tril(int n){ return Sparsity::tril(n);}
-  inline Sparsity sp_diag(int n){ return Sparsity::diagonal(n);}
+  inline Sparsity sp_diag(int n){ return Sparsity::diag(n);}
   inline Sparsity sp_band(int n, int p){ return Sparsity::band(n,p);}
   inline Sparsity sp_banded(int n, int p){ return Sparsity::banded(n,p);}
   inline Sparsity sp_rowcol(const std::vector<int>& row, const std::vector<int>& col, int nrow, int ncol){ return Sparsity::rowcol(row,col,nrow,ncol);}

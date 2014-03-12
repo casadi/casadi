@@ -125,8 +125,12 @@ namespace CasADi{
     /** \brief Create a lower triangular square sparsity pattern **/
     static Sparsity tril(int n);
 
-    /** \brief Create diagonal square sparsity pattern **/
-    static Sparsity diagonal(int n);
+    /** \brief Create diagonal sparsity pattern **/
+    //@{
+    static Sparsity diag(int nrow){ return diag(nrow,nrow);}
+    static Sparsity diag(int nrow, int ncol);
+    static Sparsity diag(const std::pair<int,int> &rc){ return diag(rc.first,rc.second);}
+    //@}
   
     /** \brief Create a single band in a square sparsity pattern
      *
@@ -565,9 +569,8 @@ namespace CasADi{
      */
     //@{
     Sparsity(int nrow, int ncol, bool dense=false);
-    static Sparsity createDiagonal(int n);
-    static Sparsity createDiagonal(int m, int n);
-
+    static Sparsity createDiagonal(int nrow){ return diag(nrow);}
+    static Sparsity createDiagonal(int nrow, int ncol){ return diag(nrow,ncol);}
 #ifndef SWIG
     void getSparsityCCS(std::vector<int>& colind, std::vector<int>& row) const;
     void getSparsityCRS(std::vector<int>& rowind, std::vector<int>& col) const;
@@ -577,7 +580,6 @@ namespace CasADi{
     void getSparsityCRS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
     void getSparsity(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
 #endif // SWIG
-
     //@}
 #endif
   
