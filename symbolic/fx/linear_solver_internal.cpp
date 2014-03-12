@@ -37,7 +37,7 @@ namespace CasADi{
     // Make sure arguments are consistent
     casadi_assert(!sparsity.isNull());
     casadi_assert_message(sparsity.size2()==sparsity.size1(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity.dimString());  
-    casadi_assert_message(!isSingular(sparsity),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity) << " (in stead of "<< sparsity.size2() << ")");
+    casadi_assert_message(!sparsity.isSingular(),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity) << " (in stead of "<< sparsity.size2() << ")");
 
     // Calculate the Dulmage-Mendelsohn decomposition
     std::vector<int> coarse_rowblock, coarse_colblock;
@@ -120,7 +120,7 @@ namespace CasADi{
 
     // Nondifferentiated output
     if(!output_given){
-      if(CasADi::isZero(B)){
+      if(B.isZero()){
         X = MX::sparse(B.shape());
       } else {
         X = solve(A,B,tr);
@@ -138,13 +138,13 @@ namespace CasADi{
       // Get right hand side
       MX rhs_d;
       if(tr){
-        rhs_d = B_hat - mul(trans(A_hat),X);
+        rhs_d = B_hat - mul(A_hat.T(),X);
       } else {
         rhs_d = B_hat - mul(A_hat,X);
       }
       
       // Simplifiy if zero
-      if(CasADi::isZero(rhs_d)){
+      if(rhs_d.isZero()){
         *fwdSens[d][0] = MX::sparse(rhs_d.shape());
       } else {
         rhs.push_back(rhs_d);
@@ -171,7 +171,7 @@ namespace CasADi{
       MX& X_bar = *adjSeed[d][0];
       
       // Simplifiy if zero
-      if(CasADi::isZero(X_bar)){
+      if(X_bar.isZero()){
         if(adjSeed[d][0]!=adjSens[d][0]){
           *adjSens[d][0] = X_bar;
           X_bar = MX();
@@ -195,9 +195,9 @@ namespace CasADi{
 
         // Propagate to A
         if(!tr){
-          *adjSens[d][1] -= mul(rhs[i],trans(X),A.sparsity());
+          *adjSens[d][1] -= mul(rhs[i],X.T(),A.sparsity());
         } else {
-          *adjSens[d][1] -= mul(X,trans(rhs[i]),A.sparsity());
+          *adjSens[d][1] -= mul(X,rhs[i].T(),A.sparsity());
         }
 
         // Propagate to B

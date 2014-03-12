@@ -142,7 +142,7 @@ namespace CasADi{
         inputv_[i] = MatType::sym("empty",0,0);
       } else if (inputv[i].isEmpty()) {
         // That's okay
-      } else if(!isSymbolicSparse(inputv[i])){
+      } else if(!inputv[i].isSymbolicSparse()){
         casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
       }
     }

@@ -134,7 +134,7 @@ namespace CasADi{
     if(added_sparsities_.size() > num_patterns_before){
 
       // Compact version of the sparsity pattern
-      std::vector<int> sp_compact = sp_compress(sp);
+      std::vector<int> sp_compact = sp.compress();
 
       // Codegen vector
       ind = getConstant(sp_compact,true);

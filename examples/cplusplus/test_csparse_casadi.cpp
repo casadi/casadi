@@ -108,6 +108,6 @@ int main(int argc, char *argv[])
   J.evaluate();
   cout << "solution (dx/db) = " << J.output() << endl;
   DMatrix J_analytic = inv(J.input("A"));
-  if(tr) J_analytic = trans(J_analytic);
+  if(tr) J_analytic = J_analytic.T();
   cout << "analytic solution (dx/db) = " << J_analytic << endl;
 }

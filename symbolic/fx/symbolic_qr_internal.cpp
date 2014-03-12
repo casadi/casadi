@@ -92,9 +92,9 @@ namespace CasADi{
 
     // Generate the QR factorization function
     vector<SX> QR(2);
-    qr(trans(Aperm),QR[0],QR[1]);
-    QR[0] = trans(QR[0]);
-    QR[1] = trans(QR[1]);
+    qr(Aperm.T(),QR[0],QR[1]);
+    QR[0] = QR[0].T();
+    QR[1] = QR[1].T();
 
     SXFunction fact_fcn(A,QR);
 
@@ -129,7 +129,7 @@ namespace CasADi{
     }
 
     // Solve the factorized system
-    SX xperm = trans(CasADi::solve(trans(R),mul(Q,trans(bperm))));
+    SX xperm = CasADi::solve(R.T(),mul(Q,bperm.T())).T();
 
     // Permute back the solution
     SX x = SX::sparse(xperm.size1(),0);
@@ -173,7 +173,7 @@ namespace CasADi{
     }
 
     // Solve the factorized system
-    xperm = mul(trans(CasADi::solve(R,trans(bperm))),Q);
+    xperm = mul(CasADi::solve(R,bperm.T()).T(),Q);
 
     // Permute back the solution
     x = SX::sparse(xperm.size1(),0);

@@ -404,9 +404,9 @@ namespace CasADi{
       f_in[DAE_X] = aug_x;
       f_in[DAE_Z] = aug_z;
       f_in[DAE_P] = aug_p;
-      if(!f_ode.empty()) f_out[DAE_ODE] = densify(horzcat(f_ode));
-      if(!f_alg.empty()) f_out[DAE_ALG] = densify(horzcat(f_alg));
-      if(!f_quad.empty()) f_out[DAE_QUAD] = densify(horzcat(f_quad));
+      if(!f_ode.empty()) f_out[DAE_ODE] = full(horzcat(f_ode));
+      if(!f_alg.empty()) f_out[DAE_ALG] = full(horzcat(f_alg));
+      if(!f_quad.empty()) f_out[DAE_QUAD] = full(horzcat(f_quad));
       MXFunction f_mx(f_in,f_out);
       
       // Expand to SXFuncion?
@@ -428,9 +428,9 @@ namespace CasADi{
       g_in[RDAE_RX] = aug_rx;
       g_in[RDAE_RZ] = aug_rz;
       g_in[RDAE_RP] = aug_rp;
-      if(!g_ode.empty()) g_out[RDAE_ODE] = densify(horzcat(g_ode));
-      if(!g_alg.empty()) g_out[RDAE_ALG] = densify(horzcat(g_alg));
-      if(!g_quad.empty()) g_out[RDAE_QUAD] = densify(horzcat(g_quad));
+      if(!g_ode.empty()) g_out[RDAE_ODE] = full(horzcat(g_ode));
+      if(!g_alg.empty()) g_out[RDAE_ALG] = full(horzcat(g_alg));
+      if(!g_quad.empty()) g_out[RDAE_QUAD] = full(horzcat(g_quad));
       MXFunction g_mx(g_in,g_out);
 
       // Expand to SXFuncion?
@@ -892,18 +892,18 @@ namespace CasADi{
 
   Sparsity IntegratorInternal::spJacF(){
     // Start with the sparsity pattern of the ODE part
-    Sparsity ret = f_.jacSparsity(DAE_X,DAE_ODE).transpose();
+    Sparsity ret = f_.jacSparsity(DAE_X,DAE_ODE).T();
     
     // Add diagonal to get interdependencies
-    ret = ret.patternUnion(sp_diag(nx_));
+    ret = ret.patternUnion(Sparsity::diag(nx_));
 
     // Quick return if no algebraic variables
     if(nz_==0) return ret;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = f_.jacSparsity(DAE_Z,DAE_ODE).transpose();
-    Sparsity jac_alg_x = f_.jacSparsity(DAE_X,DAE_ALG).transpose();
-    Sparsity jac_alg_z = f_.jacSparsity(DAE_Z,DAE_ALG).transpose();
+    Sparsity jac_ode_z = f_.jacSparsity(DAE_Z,DAE_ODE).T();
+    Sparsity jac_alg_x = f_.jacSparsity(DAE_X,DAE_ALG).T();
+    Sparsity jac_alg_z = f_.jacSparsity(DAE_Z,DAE_ALG).T();
     ret = vertcat(ret,jac_ode_z);
     ret.appendColumns(vertcat(jac_alg_x,jac_alg_z));
     return ret;
@@ -911,18 +911,18 @@ namespace CasADi{
 
   Sparsity IntegratorInternal::spJacG(){
     // Start with the sparsity pattern of the ODE part
-    Sparsity ret = g_.jacSparsity(RDAE_RX,RDAE_ODE).transpose();
+    Sparsity ret = g_.jacSparsity(RDAE_RX,RDAE_ODE).T();
     
     // Add diagonal to get interdependencies
-    ret = ret.patternUnion(sp_diag(nrx_));
+    ret = ret.patternUnion(Sparsity::diag(nrx_));
 
     // Quick return if no algebraic variables
     if(nrz_==0) return ret;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = g_.jacSparsity(RDAE_RZ,RDAE_ODE).transpose();
-    Sparsity jac_alg_x = g_.jacSparsity(RDAE_RX,RDAE_ALG).transpose();
-    Sparsity jac_alg_z = g_.jacSparsity(RDAE_RZ,RDAE_ALG).transpose();
+    Sparsity jac_ode_z = g_.jacSparsity(RDAE_RZ,RDAE_ODE).T();
+    Sparsity jac_alg_x = g_.jacSparsity(RDAE_RX,RDAE_ALG).T();
+    Sparsity jac_alg_z = g_.jacSparsity(RDAE_RZ,RDAE_ALG).T();
     ret = vertcat(ret,jac_ode_z);
     ret.appendColumns(vertcat(jac_alg_x,jac_alg_z));
     return ret;

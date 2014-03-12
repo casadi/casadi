@@ -83,7 +83,7 @@ QCQPSolverInternal::QCQPSolverInternal(const std::vector<Sparsity> &st) : st_(st
 
   for (int i=0;i<nq_;++i) {
     DMatrix Pi = input(QCQP_SOLVER_P)(ALL,Slice(i*n_,(i+1)*n_));
-    casadi_assert_message(Pi.sparsity()==trans(Pi.sparsity()),"We need Pi square & symmetric but got " << Pi.dimString() << " for i = " << i << ".");
+    casadi_assert_message(Pi.sparsity().isSymmetric(),"We need Pi square & symmetric but got " << Pi.dimString() << " for i = " << i << ".");
   }
   
   // Output arguments

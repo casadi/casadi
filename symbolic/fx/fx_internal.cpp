@@ -1034,7 +1034,7 @@ namespace CasADi{
 
     } else {
       // Dense sparsity by default
-      return Sparsity(output(oind).size(),input(iind).size(),true);
+      return Sparsity::dense(output(oind).size(),input(iind).size());
     }
   }
 
@@ -1093,7 +1093,7 @@ namespace CasADi{
   
     // If still null, not dependent
     if(jsp.isNull()){
-      jsp = Sparsity(output(oind).size(),input(iind).size());
+      jsp = Sparsity::sparse(output(oind).size(),input(iind).size());
     }
 
     // Return a reference to the block
