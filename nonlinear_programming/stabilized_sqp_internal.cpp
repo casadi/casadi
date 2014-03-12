@@ -215,7 +215,7 @@ namespace CasADi{
       yk = omega * yk + (1 - omega) * qk;
       SX theta = 1. / inner_prod(sk, yk);
       SX phi = 1. / inner_prod(qk, sk);
-      SX Bk_new = Bk + theta * mul(yk, trans(yk)) - phi * mul(qk, trans(qk));
+      SX Bk_new = Bk + theta * mul(yk, yk.T()) - phi * mul(qk, qk.T());
     
       // Inputs of the BFGS update function
       vector<SX> bfgs_in(BFGS_NUM_IN);

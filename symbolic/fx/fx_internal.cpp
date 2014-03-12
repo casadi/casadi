@@ -717,7 +717,7 @@ namespace CasADi{
     casadi_log("Number of sweeps: " << nsweeps );
     casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() << ", " << r.size() << " nonzeros, " << 100*double(r.size())/double(r.size2())/double(r.size1()) << " \% nonzeros).");
     
-    return r.transpose();
+    return r.T();
   }
 
   Sparsity FXInternal::getJacSparsityHierarchical(int iind, int oind){
@@ -787,7 +787,7 @@ namespace CasADi{
       fine_col.clear();
     
       // r transpose will be needed in the algorithm
-      Sparsity rT = r.transpose();
+      Sparsity rT = r.T();
       
       /**       Decide which ad_mode to take           */
       
@@ -1014,7 +1014,7 @@ namespace CasADi{
     casadi_log("Number of sweeps: " << nsweeps );
     casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() << ", " << r.size() << " nonzeros, " << 100*double(r.size())/double(r.size1())/double(r.size2()) << " \% nonzeros).");
     
-    return r.transpose();
+    return r.T();
   }
 
   Sparsity FXInternal::getJacSparsity(int iind, int oind, bool symmetric){
@@ -1107,7 +1107,7 @@ namespace CasADi{
   
     // Sparsity pattern with transpose
     Sparsity &AT = jacSparsity(iind,oind,compact,symmetric);
-    Sparsity A = symmetric ? AT : AT.transpose();
+    Sparsity A = symmetric ? AT : AT.T();
   
     // Which AD mode?
     bool test_ad_fwd=true, test_ad_adj=true;
@@ -1674,7 +1674,7 @@ namespace CasADi{
     // Get an expression for the full Jacobian
     vector<MX> arg = symbolicInput();
     vector<MX> res = jfcn.call(arg);
-    MX J = trans(res.front());
+    MX J = res.front().T();
     res.erase(res.begin());
 
     // Make room for the derivatives
@@ -1704,7 +1704,7 @@ namespace CasADi{
           arg.push_back(MX::sym(ss.str(),arg[i].sparsity()));
 
           // Add to the right-hand-side under construction
-          d.push_back(trans(vec(arg.back())));
+          d.push_back(transpose(vec(arg.back())));
         }
         MX d_all = horzcat(d);
         
@@ -1723,7 +1723,7 @@ namespace CasADi{
     // Adjoint derivatives
     if(nadj>0){
       // Transpose of J
-      MX JT = trans(J);
+      MX JT = J.T();
 
       // Get col offsets for the horzsplit
       vector<int> offset(1,0);
@@ -1742,7 +1742,7 @@ namespace CasADi{
           arg.push_back(MX::sym(ss.str(),res[i].sparsity()));
 
           // Add to the right-hand-side under construction
-          d.push_back(trans(vec(arg.back())));
+          d.push_back(transpose(vec(arg.back())));
         }
         MX d_all = horzcat(d);
         
