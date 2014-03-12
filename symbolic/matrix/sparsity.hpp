@@ -297,25 +297,25 @@ namespace CasADi{
     */
     void getNZInplace(std::vector<int>& indices) const;
 
-    /// Get the sparsity in CCS format
+    /// Get the sparsity in compressed column storage (CCS) format
 #ifndef SWIG
-    void getSparsityCCS(std::vector<int>& colind, std::vector<int>& row) const;
+    void getCCS(std::vector<int>& colind, std::vector<int>& row) const;
 #else // SWIG
-    void getSparsityCCS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
+    void getCCS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
 #endif // SWIG
 
-    /// Get the sparsity in CCS format
+    /// Get the sparsity in compressed row storage (CRS) format
 #ifndef SWIG
-    void getSparsityCRS(std::vector<int>& rowind, std::vector<int>& col) const;
+    void getCRS(std::vector<int>& rowind, std::vector<int>& col) const;
 #else // SWIG
-    void getSparsityCRS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
+    void getCRS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
 #endif // SWIG
 
     /// Get the sparsity in sparse triplet format
 #ifndef SWIG
-    void getSparsity(std::vector<int>& row, std::vector<int>& col) const;
+    void getTriplet(std::vector<int>& row, std::vector<int>& col) const;
 #else // SWIG
-    void getSparsity(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
+    void getTriplet(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
 #endif // SWIG
 
     /** \brief Get a submatrix
@@ -567,6 +567,17 @@ namespace CasADi{
     Sparsity(int nrow, int ncol, bool dense=false);
     static Sparsity createDiagonal(int n);
     static Sparsity createDiagonal(int m, int n);
+
+#ifndef SWIG
+    void getSparsityCCS(std::vector<int>& colind, std::vector<int>& row) const;
+    void getSparsityCRS(std::vector<int>& rowind, std::vector<int>& col) const;
+    void getSparsity(std::vector<int>& row, std::vector<int>& col) const;
+#else // SWIG
+    void getSparsityCCS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
+    void getSparsityCRS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
+    void getSparsity(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
+#endif // SWIG
+
     //@}
 #endif
   

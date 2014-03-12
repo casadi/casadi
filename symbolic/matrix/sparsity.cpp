@@ -289,17 +289,29 @@ namespace CasADi{
     return (*this)->getCol();
   }
 
+#ifndef WITHOUT_PRE_1_9_X
   void Sparsity::getSparsityCCS(std::vector<int>& colind, std::vector<int>& row) const{
+    getCCS(colind,row);
+  }
+  void Sparsity::getSparsityCRS(std::vector<int>& rowind, std::vector<int>& col) const {
+    getCRS(rowind,col);
+  }
+  void Sparsity::getSparsity(std::vector<int>& row, std::vector<int>& col) const{
+    getTriplet(row,col);
+  }
+#endif
+
+  void Sparsity::getCCS(std::vector<int>& colind, std::vector<int>& row) const{
     colind = this->colind();
     row = this->row();
   }
 
-  void Sparsity::getSparsityCRS(std::vector<int>& rowind, std::vector<int>& col) const {
-    transpose().getSparsityCCS(rowind,col);
+  void Sparsity::getCRS(std::vector<int>& rowind, std::vector<int>& col) const {
+    transpose().getCCS(rowind,col);
   }
     
 
-  void Sparsity::getSparsity(std::vector<int>& row, std::vector<int>& col) const{
+  void Sparsity::getTriplet(std::vector<int>& row, std::vector<int>& col) const{
     row = this->row();
     col = this->getCol();
   }
