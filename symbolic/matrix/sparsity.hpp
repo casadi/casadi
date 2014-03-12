@@ -102,6 +102,11 @@ namespace CasADi{
     static Sparsity create(SparsityInternal *node);
 #endif
 
+    /** \brief Create a scalar sparsity pattern **/
+    //@{
+    static Sparsity scalar(bool dense_scalar=true){ return dense_scalar ? dense(1,1) : sparse(1,1);}
+    //@}
+
     /** \brief Create a dense rectangular sparsity pattern **/
     //@{
     static Sparsity dense(int nrow, int ncol=1);
