@@ -251,7 +251,7 @@ namespace CasADi{
     return ret;
   }
 
-  vector<SX> FX::evalSX(const vector<SX>& arg){
+  vector<SX> FX::eval(const vector<SX>& arg){
     casadi_assert_message(arg.size()==getNumInputs(),"FX::evalSX: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     vector<SX> res;
     vector<vector<SX> > dummy;
@@ -259,7 +259,7 @@ namespace CasADi{
     return res;
   }
 
-  vector<MX> FX::evalMX(const vector<MX>& arg){
+  vector<MX> FX::eval(const vector<MX>& arg){
     casadi_assert_message(arg.size()==getNumInputs(),"FX::evalMX: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     vector<MX> res;
     vector<vector<MX> > dummy;

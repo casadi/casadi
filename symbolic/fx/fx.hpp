@@ -243,19 +243,12 @@ namespace CasADi{
     */
     std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
 
-  
-    /// evaluate symbolically, SXElement type (overloaded)
-    std::vector<SX> eval(const std::vector<SX>& arg){ return evalSX(arg);}
+    /// evaluate symbolically, SX type (overloaded)
+    std::vector<SX> eval(const std::vector<SX>& arg);
 
     /// evaluate symbolically, MX type (overloaded)
-    std::vector<MX> eval(const std::vector<MX>& arg){return evalMX(arg);}
-  
-    /// evaluate symbolically, MX type (unambiguous)
-    std::vector<MX> evalMX(const std::vector<MX>& arg);
-
-    /// evaluate symbolically, SXElement type (unambiguous)
-    std::vector<SX> evalSX(const std::vector<SX>& arg);
-  
+    std::vector<MX> eval(const std::vector<MX>& arg);
+    
     /** \brief Evaluate symbolically with with directional derivatives, SXElement type
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
      * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
@@ -418,6 +411,19 @@ namespace CasADi{
     
     /** \brief Check if the numerical values of the supplied bounds make sense */
     void checkInputs() const;
+
+
+#ifndef WITHOUT_PRE_1_9_X
+    /** \brief [DEPRECATED]
+     */
+    //@{
+    std::vector<MX> evalMX(const std::vector<MX>& arg){ return eval(arg);}
+    std::vector<SX> evalSX(const std::vector<SX>& arg){ return eval(arg);}
+
+    //@}
+#endif
+
+
 
   };
 } // namespace CasADi

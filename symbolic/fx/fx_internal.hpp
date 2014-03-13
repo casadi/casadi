@@ -112,7 +112,7 @@ namespace CasADi{
               const MXVectorVector& aseed, MXVectorVector& asens,
               bool always_inline, bool never_inline);
     
-    /** \brief Call a function, SXElement type (overloaded) */
+    /** \brief Call a function, SX type (overloaded) */
     void call(const std::vector<SX>& arg, std::vector<SX>& res, 
               const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
               const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens,

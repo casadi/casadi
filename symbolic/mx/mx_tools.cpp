@@ -549,7 +549,7 @@ namespace CasADi{
     // Otherwise, evaluate symbolically     
     MXFunction F(v,ex);
     F.init();
-    return F.evalMX(vdef);
+    return F.eval(vdef);
   }
   
   MX graph_substitute(const MX &ex, const std::vector<MX> &v, const std::vector<MX> &vdef) {
