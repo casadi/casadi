@@ -166,7 +166,7 @@ class FXtests(casadiTestCase):
     y1 = MX.sym("y")
     x2 = MX.sym("x",2)
     y2 = MX.sym("y")
-    [[F1],[F2]] = f.call([[x1,y1],[x2,y2]])
+    [[F1],[F2]] = f.callParallel([[x1,y1],[x2,y2]])
     p = MXFunction([x1,y1,x2,y2],[F1,F2])
     p.init()
     

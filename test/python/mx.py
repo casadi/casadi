@@ -1588,7 +1588,7 @@ class MXtests(casadiTestCase):
 
     Y = MX.sym("Y",10)
 
-    ff = MXFunction([Y],f.evalMX([Y]))
+    ff = MXFunction([Y],f.eval([Y]))
     ff.init()
     ff.setInput(range(10))
     ff.evaluate()
@@ -1634,7 +1634,7 @@ class MXtests(casadiTestCase):
 
     Y = MX.sym("Y",10)
 
-    ff = MXFunction([Y],f.evalMX([Y]))
+    ff = MXFunction([Y],f.eval([Y]))
     ff.init()
     ff.setInput(range(10))
     ff.evaluate()

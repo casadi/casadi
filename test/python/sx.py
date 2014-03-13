@@ -383,7 +383,7 @@ class SXtests(casadiTestCase):
     x = SX.sym("x",2,2)
     f = SXFunction([x], [x])
     f.init()
-    self.assertRaises(NotImplementedError,lambda: f.evalSX(x))
+    self.assertRaises(NotImplementedError,lambda: f.eval(x))
 
   def test_SXconversion(self):
     self.message("Conversions from and to SX")
