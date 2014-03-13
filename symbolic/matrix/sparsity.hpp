@@ -24,9 +24,16 @@
 #define SPARSITY_HPP
 
 #include "../shared_object.hpp"
+#include "../casadi_types.hpp"
 #include <vector>
 #include <list>
 #include <limits>
+
+#ifdef SWIG
+#define SWIG_OUTPUT(arg) OUTPUT
+#else
+#define SWIG_OUTPUT(arg) arg
+#endif
 
 // Cashing requires a multimap (preferably a hash map)
 #ifdef USE_CXX11
@@ -323,32 +330,20 @@ namespace CasADi{
     std::vector<int> getUpperNZ() const;
 
     /// Get the sparsity in compressed column storage (CCS) format
-#ifndef SWIG
-    void getCCS(std::vector<int>& colind, std::vector<int>& row) const;
-#else // SWIG
-    void getCCS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
-#endif // SWIG
+    void getCCS(std::vector<int>& SWIG_OUTPUT(colind), std::vector<int>& SWIG_OUTPUT(row)) const;
 
     /// Get the sparsity in compressed row storage (CRS) format
-#ifndef SWIG
-    void getCRS(std::vector<int>& rowind, std::vector<int>& col) const;
-#else // SWIG
-    void getCRS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
-#endif // SWIG
+    void getCRS(std::vector<int>& SWIG_OUTPUT(rowind), std::vector<int>& SWIG_OUTPUT(col)) const;
 
     /// Get the sparsity in sparse triplet format
-#ifndef SWIG
-    void getTriplet(std::vector<int>& row, std::vector<int>& col) const;
-#else // SWIG
-    void getTriplet(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
-#endif // SWIG
+    void getTriplet(std::vector<int>& SWIG_OUTPUT(row), std::vector<int>& SWIG_OUTPUT(col)) const;
 
     /** \brief Get a submatrix
      *
      * Returns the sparsity of the submatrix, with a mapping such that
      *   submatrix[k] = originalmatrix[mapping[k]]
      */
-    Sparsity sub(const std::vector<int>& jj, const std::vector<int>& ii, std::vector<int>& mapping) const;
+    Sparsity sub(const std::vector<int>& jj, const std::vector<int>& ii, std::vector<int>& SWIG_OUTPUT(mapping)) const;
     
     /// Transpose the matrix
     Sparsity transpose() const;
@@ -369,13 +364,13 @@ namespace CasADi{
         Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
         The mapping matrix contains the arguments for each nonzero, the first bit indicates if the first argument is nonzero,
         the second bit indicates if the second argument is nonzero (note that none of, one of or both of the arguments can be nonzero) */
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
+    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
     Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
     /// @}
 
     /// @{
     /** \brief Union of two sparsity patterns */
-    Sparsity patternUnion(const Sparsity& y, std::vector<unsigned char>& mapping) const;
+    Sparsity patternUnion(const Sparsity& y, std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
     Sparsity patternUnion(const Sparsity& y) const;
     Sparsity operator+(const Sparsity& b) const;
     /// @}
@@ -384,7 +379,7 @@ namespace CasADi{
     /** \brief Intersection of two sparsity patterns
         Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
         The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if it is from the second and 3 (i.e. 1 | 2) if from both */
-    Sparsity patternIntersection(const Sparsity& y, std::vector<unsigned char>& mapping) const;
+    Sparsity patternIntersection(const Sparsity& y, std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
     Sparsity patternIntersection(const Sparsity& y) const;
     Sparsity operator*(const Sparsity& b) const;
     /// @}
@@ -394,8 +389,9 @@ namespace CasADi{
         Returns the sparsity pattern resulting from premultiplying the pattern with the transpose of x.
         Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
         The mapping contains a vector of the index pairs that makes up the scalar products for each non-zero */
-    Sparsity patternProduct(const Sparsity& x_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
+    Sparsity patternProduct(const Sparsity& x_trans, std::vector< std::vector< std::pair<int,int> > >& SWIG_OUTPUT(mapping)) const;
     Sparsity patternProduct(const Sparsity& x_trans) const;
+
     /// @}
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
@@ -519,11 +515,7 @@ namespace CasADi{
         with the indices of the block boundaries to be found in r. 
       
     */
-#ifndef SWIG
-    int stronglyConnectedComponents(std::vector<int>& index, std::vector<int>& offset) const;
-#else // SWIG
-    int stronglyConnectedComponents(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
-#endif // SWIG
+    int stronglyConnectedComponents(std::vector<int>& SWIG_OUTPUT(index), std::vector<int>& SWIG_OUTPUT(offset)) const;
     
     /** \brief Compute the Dulmage-Mendelsohn decomposition 
         See Direct Methods for Sparse Linear Systems by Davis (2006).
