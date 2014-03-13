@@ -52,15 +52,24 @@ namespace CasADi{
     return static_cast<FXInternal*>(OptionsFunctionality::operator->());
   }
 
-  vector<MX> FX::call(const MX &arg){
-    vector<MX> xflatten(1,arg);
-    return call(xflatten);
+  vector<DMatrix> FX::call(const vector<DMatrix> &arg, bool always_inline, bool never_inline){
+    DMatrixVectorVector dummy;
+    DMatrixVector res;
+    callDerivative(arg,res,dummy,dummy,dummy,dummy,always_inline,never_inline);
+    return res;
   }
 
-  vector<MX> FX::call(const vector<MX> &arg){
+  vector<SX> FX::call(const vector<SX> &arg, bool always_inline, bool never_inline){
+    SXVectorVector dummy;
+    SXVector res;
+    callDerivative(arg,res,dummy,dummy,dummy,dummy,always_inline,never_inline);
+    return res;
+  }
+
+  vector<MX> FX::call(const vector<MX> &arg, bool always_inline, bool never_inline){
     MXVectorVector dummy;
     MXVector res;
-    callDerivative(arg,res,dummy,dummy,dummy,dummy);
+    callDerivative(arg,res,dummy,dummy,dummy,dummy,always_inline,never_inline);
     return res;
   }
 
@@ -261,13 +270,6 @@ namespace CasADi{
     vector<vector<MX> > dummy;
     (*this)->evalMX(arg,res,dummy,dummy,dummy,dummy);
     return res;
-  }
-                        
-  void FX::eval(const std::vector<MX>& arg, std::vector<MX>& res, 
-                const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
-                const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){
-    casadi_assert_message(arg.size()==getNumInputs(),"FX::eval: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
-    (*this)->evalMX(arg,res,fseed,fsens,aseed,asens);
   }
 
   void FX::spEvaluate(bool fwd){

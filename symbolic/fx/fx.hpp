@@ -217,13 +217,37 @@ namespace CasADi{
      NOTE: Does _not_ take ownership, only weak references to the Jacobian are kept internally */
     void setFullJacobian(const FX& jac);
 
+    //@{
+    /** \brief Call the function (numerically) */
+    std::vector<DMatrix> call(const std::vector<DMatrix> &arg, bool always_inline=false, bool never_inline=false);
+    //@}
+
+    //@{
+    /** \brief Call the function (SX graph) */
+    std::vector<SX> call(const std::vector<SX> &arg, bool always_inline=false, bool never_inline=false);
 #ifndef SWIG
-    /** \brief  Create a function call (single input) */
-    std::vector<MX> call(const MX &arg);
+    std::vector<SX> call(const SX& arg){ return call(std::vector<SX>(1,arg));}
 #endif // SWIG
+    //@}
+
+    //@{
+    /** \brief Call the function (MX graph) */
+    std::vector<MX> call(const std::vector<MX> &arg, bool always_inline=false, bool never_inline=false);
+#ifndef SWIG
+    std::vector<MX> call(const MX &arg){ return call(std::vector<MX>(1,arg));}
+#endif // SWIG
+    //@}
   
-    /** \brief  Create a function call (MX graph) */
-    std::vector<MX> call(const std::vector<MX> &arg);
+    /// evaluate symbolically, SX type (overloaded)
+    std::vector<SX> eval(const std::vector<SX>& arg);
+
+    /// evaluate symbolically, MX type (overloaded)
+    std::vector<MX> eval(const std::vector<MX>& arg);
+                  
+#ifndef SWIG
+    /// evaluate symbolically, single input, single output 
+    SX eval(const SX& arg){ return eval(std::vector<SX>(1,arg)).at(0);}
+#endif // SWIG
 
    /** \brief Evaluate symbolically with with directional derivatives, DMatrix type
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
@@ -265,28 +289,6 @@ namespace CasADi{
         paropt: Set of options to be passed to the Parallelizer
     */
     std::vector<std::vector<MX> > callParallel(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
-
-    /// evaluate symbolically, SX type (overloaded)
-    std::vector<SX> eval(const std::vector<SX>& arg);
-
-    /// evaluate symbolically, MX type (overloaded)
-    std::vector<MX> eval(const std::vector<MX>& arg);
-                  
-    /** \brief Evaluate symbolically with with directional derivatives, MX type, overloaded
-     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
-     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
-     * the length of the vector being the number of forward directions.
-     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
-     * the length of the vector being the number of adjoint directions.
-     */
-    void eval(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
-              const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
-              const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens));
-
-#ifndef SWIG
-    /// evaluate symbolically, single input, single output 
-    SX eval(const SX& arg){ return eval(std::vector<SX>(1,arg)).at(0);}
-#endif // SWIG
   
     /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
      *         Returns a function with (1+nfwd)*n_in+nadj*n_out inputs
@@ -404,6 +406,11 @@ namespace CasADi{
     void eval(const SXVector& arg, std::vector<SX>& SWIG_OUTPUT(res), 
               const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens), 
               const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens)){
+      callDerivative(arg,res,fseed,fsens,aseed,asens,true);
+    }
+    void eval(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
+              const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
+              const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens)){
       callDerivative(arg,res,fseed,fsens,aseed,asens,true);
     }
     //@}

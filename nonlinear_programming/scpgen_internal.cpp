@@ -227,7 +227,7 @@ namespace CasADi{
       for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
         aseed[0].push_back(it->v_lam);
       }
-      vdef_fcn.eval(vdef_in,vdef_out,fseed,fsens,aseed,asens);
+      vdef_fcn.callDerivative(vdef_in,vdef_out,fseed,fsens,aseed,asens,true);
       i=0;
 
       gL_defL = asens[0].at(i++);
@@ -438,7 +438,7 @@ namespace CasADi{
         mfcn_fwdSeed[0][it->mod_lam] = it->d_lam;
       }
     }
-    mfcn.eval(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens);
+    mfcn.callDerivative(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens,true);
   
     // Vector(s) b in Lifted Newton
     MX b_gf = mfcn_fwdSens[0][mod_gl_];
@@ -489,7 +489,7 @@ namespace CasADi{
       }
     }
 
-    mfcn.eval(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens);    
+    mfcn.callDerivative(mfcn_in,mfcn_out,mfcn_fwdSeed,mfcn_fwdSens,mfcn_adjSeed,mfcn_adjSens,true);
   
     // Step expansion function inputs
     n = mfcn_in.size();
