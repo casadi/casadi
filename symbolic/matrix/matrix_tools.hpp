@@ -1204,7 +1204,7 @@ namespace CasADi{
 
 // map the template name to the instantiated name
 #define MTT_INST(DataType,function_name)                       \
-  %template(function_name) CasADi::function_name < DataType >;
+  %template(function_name) CasADi::function_name <DataType >;
 
 // Define template instanciations
 #define MATRIX_TOOLS_TEMPLATES_COMMON(DataType)        \
@@ -1270,7 +1270,7 @@ namespace CasADi{
 #endif //SWIG
 
 #ifdef SWIGOCTAVE
-#define MATRIX_TOOLS_TEMPLATES(DataType) MATRIX_TOOLS_TEMPLATES_COMMON(T)
+#define MATRIX_TOOLS_TEMPLATES(DataType) MATRIX_TOOLS_TEMPLATES_COMMON(DataType)
 #else
 #define MATRIX_TOOLS_TEMPLATES(DataType)               \
   MATRIX_TOOLS_TEMPLATES_COMMON(DataType)              \
