@@ -60,14 +60,8 @@ namespace CasADi{
   vector<MX> FX::call(const vector<MX> &arg){
     MXVectorVector dummy;
     MXVector res;
-    call(arg,res,dummy,dummy,dummy,dummy);
+    callDerivative(arg,res,dummy,dummy,dummy,dummy);
     return res;
-  }
-
-  void FX::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, MXVectorVector& fsens, 
-                const MXVectorVector& aseed, MXVectorVector& asens){
-    casadi_assert_message(arg.size()==getNumInputs(),"FX::call: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
-    (*this)->call(arg,res,fseed,fsens,aseed,asens,false,true);
   }
 
   vector<vector<MX> > FX::callParallel(const vector<vector<MX> > &x, const Dictionary& paropt){
@@ -375,6 +369,7 @@ namespace CasADi{
                           const MXVectorVector& fseed, MXVectorVector& fsens, 
                           const MXVectorVector& aseed, MXVectorVector& asens,
                           bool always_inline, bool never_inline){
+    casadi_assert_message(arg.size()==getNumInputs(),"FX::call: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
   }
 

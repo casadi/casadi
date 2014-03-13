@@ -260,15 +260,7 @@ namespace CasADi{
                         const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
                         const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens),
                         bool always_inline=false, bool never_inline=false);
-    
-
-    /** \brief  Create a function call with directional derivatives 
-     * Note: return by reference with SWIG
-     */
-    void call(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
-              const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
-              const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens));
-  
+      
     /** \brief  Evaluate symbolically in parallel (matrix graph)
         paropt: Set of options to be passed to the Parallelizer
     */
@@ -427,7 +419,11 @@ namespace CasADi{
     std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary()){
       return callParallel(arg,paropt);
     }
-
+    void call(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
+              const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
+              const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens)){
+      callDerivative(arg,res,fseed,fsens,aseed,asens);
+    }
     //@}
 #endif
 
