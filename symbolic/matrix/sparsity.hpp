@@ -226,10 +226,7 @@ namespace CasADi{
     
     /// Check if two sparsity patterns are difference
     bool operator!=(const Sparsity& y) const{return !isEqual(y);}
-    
-    /// Take the intersection of two sparsity patterns
-    Sparsity operator*(const Sparsity& b) const;
-    
+        
     /// \name Size and element counting
     /// @{
     
@@ -380,17 +377,16 @@ namespace CasADi{
     /** \brief Union of two sparsity patterns */
     Sparsity patternUnion(const Sparsity& y, std::vector<unsigned char>& mapping) const;
     Sparsity patternUnion(const Sparsity& y) const;
+    Sparsity operator+(const Sparsity& b) const;
     /// @}
 
-    /// Take the union of two sparsity patterns, shorthand for patternUnion
-    Sparsity operator+(const Sparsity& b) const;
-    
     /// @{
     /** \brief Intersection of two sparsity patterns
         Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
         The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if it is from the second and 3 (i.e. 1 | 2) if from both */
     Sparsity patternIntersection(const Sparsity& y, std::vector<unsigned char>& mapping) const;
     Sparsity patternIntersection(const Sparsity& y) const;
+    Sparsity operator*(const Sparsity& b) const;
     /// @}
 
     /// @{
