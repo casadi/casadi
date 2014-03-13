@@ -36,7 +36,7 @@ namespace CasADi{
     void sanityCheck(bool complete=false) const;
 
     /// Get the diagonal of the matrix/create a diagonal matrix (mapping will contain the nonzero mapping)
-    Sparsity diag(std::vector<int>& mapping) const;
+    Sparsity getDiag(std::vector<int>& mapping) const;
 
     /// Calculate the elimination tree: See cs_etree in CSparse
     std::vector<int> eliminationTree(bool ata) const;

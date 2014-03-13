@@ -1737,7 +1737,7 @@ class MXtests(casadiTestCase):
     
     self.checkarray(meval(Bmod),DMatrix([[2,4,3,4,5],[6,7,16,9,10]]),"Imatrix indexing assignement")
     
-    self.assertRaises(Exception, lambda : B[sp_dense(4,4)])
+    self.assertRaises(Exception, lambda : B[Sparsity.dense(4,4)])
 
   def test_getSymbols(self):
     a = MX.sym("a")
@@ -1788,7 +1788,7 @@ class MXtests(casadiTestCase):
     x_ = self.randDMatrix(N,N)
     y_ = self.randDMatrix(N,N)
 
-    filt = sp_diag(N)+sp_triplet(N,N,[1],[3])
+    filt = Sparsity.diag(N)+Sparsity.triplet(N,N,[1],[3])
 
     f = MXFunction([x,y],[mul(x,y)])
     f.init()
@@ -2006,9 +2006,9 @@ class MXtests(casadiTestCase):
   def test_MX_shapes(self):
       self.message("MX unary operations")
       
-      #self.checkarray(DMatrix(sp_tril(4),1),DMatrix(sp_dense(4,4),1))
+      #self.checkarray(DMatrix(sp_tril(4),1),DMatrix(Sparsity.dense(4,4),1))
       
-      for sp in [sp_dense(0,0),sp_dense(0,2),sp_dense(2,0),sp_dense(1,1),sp_dense(2,2), Sparsity(4,3,[0,2,2,3],[1,2,1])]:
+      for sp in [Sparsity.dense(0,0),Sparsity.dense(0,2),Sparsity.dense(2,0),Sparsity.dense(1,1),Sparsity.dense(2,2), Sparsity(4,3,[0,2,2,3],[1,2,1])]:
         for v in [0,1,0.2]:
           x_ = DMatrix(sp,v)
           
@@ -2033,14 +2033,14 @@ class MXtests(casadiTestCase):
               # At least as sparse as DMatrix calculus
               self.assertTrue(min(c)>=0,str([sp,v,name]))
 
-      for sp in [sp_sparse(1,1),sp_dense(1,1),sp_sparse(3,4),sp_dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
+      for sp in [sp_sparse(1,1),Sparsity.dense(1,1),sp_sparse(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
         for v1 in [0,1,0.2,-0.2]:
           x1_ = DMatrix(sp,v1)
           xx1 = MX.sym("x",sp.size1(),sp.size2())
           x1=xx1[sp]
           xx1s = SX.sym("x",sp.size1(),sp.size2())
           x1s=xx1s[sp]
-          for sp2 in [sp_sparse(1,1),sp_dense(1,1),sp_sparse(3,4),sp_dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
+          for sp2 in [sp_sparse(1,1),Sparsity.dense(1,1),sp_sparse(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
             for v2 in [0,1,0.2,-0.2]:
               x2_ = DMatrix(sp2,v2)
               xx2 = MX.sym("x",sp2.size1(),sp2.size2())
@@ -2080,9 +2080,9 @@ class MXtests(casadiTestCase):
   def test_MXConstant(self):
       self.message("MX unary operations, constant")
       
-      #self.checkarray(DMatrix(sp_tril(4),1),DMatrix(sp_dense(4,4),1))
+      #self.checkarray(DMatrix(sp_tril(4),1),DMatrix(Sparsity.dense(4,4),1))
       
-      for sp in [sp_dense(0,0),sp_dense(0,2),sp_dense(2,0),sp_dense(1,1),sp_dense(2,2), Sparsity(4,3,[0,2,2,3],[1,2,1])]:
+      for sp in [Sparsity.dense(0,0),Sparsity.dense(0,2),Sparsity.dense(2,0),Sparsity.dense(1,1),Sparsity.dense(2,2), Sparsity(4,3,[0,2,2,3],[1,2,1])]:
         for v in [0,1,0.2]:
           x_ = DMatrix(sp,v)
           
@@ -2104,11 +2104,11 @@ class MXtests(casadiTestCase):
               # At least as sparse as DMatrix calculus
               self.assertTrue(min(c)>=0,str([sp,v,name]))
         
-      for sp in [sp_dense(1,1),sp_sparse(1,1),sp_sparse(3,4),sp_dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
+      for sp in [Sparsity.dense(1,1),sp_sparse(1,1),sp_sparse(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
         for v1 in [0,1,0.2,-0.2]:
           x1_ = DMatrix(sp,v1)
           x1=MX(sp,v1)
-          for sp2 in [sp_dense(1,1),sp_sparse(1,1),sp_sparse(3,4),sp_dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
+          for sp2 in [Sparsity.dense(1,1),sp_sparse(1,1),sp_sparse(3,4),Sparsity.dense(3,4), Sparsity(4,3,[0,2,2,3],[1,2,1]).T]:
             for v2 in [0,1,0.2,-0.2]:
               x2_ = DMatrix(sp2,v2)
               x2=MX(sp2,v2)

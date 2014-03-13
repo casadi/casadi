@@ -110,7 +110,7 @@ void SQICInternal::init(){
   for (int i=0;i<locH_.size();++i) locH_[i]+=1;
   
   // Sparsity of augmented linear constraint matrix
-  CRSSparsity A_ = trans(vertcat(st_[QP_STRUCT_A],sp_dense(1,n_)));
+  CRSSparsity A_ = trans(vertcat(st_[QP_STRUCT_A],Sparsity::dense(1,n_)));
   locA_ = A_.rowind();
   indA_ = A_.col();
   

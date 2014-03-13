@@ -295,7 +295,7 @@ namespace CasADi{
         casadi_assert(N*N==red_hess.size());
       
         // Store to statistics
-        red_hess_ = DMatrix(sp_dense(N,N),red_hess);
+        red_hess_ = DMatrix(Sparsity::dense(N,N),red_hess);
       }
 #endif // WITH_CASADI_PATCH
     }

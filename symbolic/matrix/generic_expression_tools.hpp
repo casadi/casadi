@@ -27,31 +27,31 @@
 
 namespace CasADi{
 
-/** \brief  Logical `and`, returns (an expression evaluating to) 1 if both expressions are nonzero and 0 otherwise */
-template<class T>
-T logic_and(const T& x, const T& y){ return x && y; }
+  /** \brief  Logical `and`, returns (an expression evaluating to) 1 if both expressions are nonzero and 0 otherwise */
+  template<typename DataType>
+  DataType logic_and(const DataType& x, const DataType& y){ return x && y; }
 
-/** \brief  Logical `or`, returns (an expression evaluating to) 1 if at least one expression is nonzero and 0 otherwise */
-template<class T>
-T logic_or(const T& x, const T& y){ return x || y; }
+  /** \brief  Logical `or`, returns (an expression evaluating to) 1 if at least one expression is nonzero and 0 otherwise */
+  template<typename DataType>
+  DataType logic_or(const DataType& x, const DataType& y){ return x || y; }
 
-/** \brief  Logical `not`, returns (an expression evaluating to) 1 if expression is zero and 0 otherwise */
-template<class T>
-T logic_not(const T &x){ return !x; }
+  /** \brief  Logical `not`, returns (an expression evaluating to) 1 if expression is zero and 0 otherwise */
+  template<typename DataType>
+  DataType logic_not(const DataType &x){ return !x; }
 
 } // namespace CasADi
 
 #ifdef SWIG
 
 // map the template name to the instantiated name
-#define GET_INST(T,function_name) \
-%template(function_name) CasADi::function_name < T >;
+#define GET_INST(DataType,function_name) \
+%template(function_name) CasADi::function_name< DataType >;
 
 // Define template instanciations
-#define GENERIC_EXPRESSION_TOOLS_TEMPLATES(T) \
-GET_INST(T,logic_and) \
-GET_INST(T,logic_or) \
-GET_INST(T,logic_not) \
+#define GENERIC_EXPRESSION_TOOLS_TEMPLATES(DataType) \
+GET_INST(DataType,logic_and) \
+GET_INST(DataType,logic_or) \
+GET_INST(DataType,logic_not) \
 
 #endif //SWIG
 

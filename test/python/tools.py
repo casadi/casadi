@@ -495,11 +495,11 @@ class Toolstests(casadiTestCase):
     self.assertEqual(len(s["x"]),5)
     self.assertEqual(len(s["y"]),6)
     self.assertTrue(s.cat.at(1).getName().startswith("y"))
-    s = struct_symSX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=sp_dense(3)),entry("w",shape=sp_triu(5))])
+    s = struct_symSX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=Sparsity.dense(3)),entry("w",shape=sp_triu(5))])
     self.assertEqual(s.size,6+2+3+15)
-    self.assertTrue(s["x"].sparsity()==sp_dense(3,2))
-    self.assertTrue(s["y"].sparsity()==sp_dense(2,1))
-    self.assertTrue(s["z"].sparsity()==sp_dense(3,1))
+    self.assertTrue(s["x"].sparsity()==Sparsity.dense(3,2))
+    self.assertTrue(s["y"].sparsity()==Sparsity.dense(2,1))
+    self.assertTrue(s["z"].sparsity()==Sparsity.dense(3,1))
     self.assertTrue(s["w"].sparsity()==sp_triu(5))
     
     x  = SX.sym("x",2)
@@ -626,11 +626,11 @@ class Toolstests(casadiTestCase):
     self.assertEqual(len(s["y"]),6)
    
     
-    s = struct_symMX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=sp_dense(3)),entry("w",shape=sp_triu(5))])
+    s = struct_symMX([entry("x",shape=(3,2)),entry("y",shape=2),entry("z",shape=Sparsity.dense(3)),entry("w",shape=sp_triu(5))])
     self.assertEqual(s.size,6+2+3+15)
-    self.assertTrue(s["x"].sparsity()==sp_dense(3,2))
-    self.assertTrue(s["y"].sparsity()==sp_dense(2,1))
-    self.assertTrue(s["z"].sparsity()==sp_dense(3,1))
+    self.assertTrue(s["x"].sparsity()==Sparsity.dense(3,2))
+    self.assertTrue(s["y"].sparsity()==Sparsity.dense(2,1))
+    self.assertTrue(s["z"].sparsity()==Sparsity.dense(3,1))
     self.assertTrue(s["w"].sparsity()==sp_triu(5))
     
     x  = MX.sym("x",2)
@@ -707,10 +707,10 @@ class Toolstests(casadiTestCase):
                 entry('x'),
                 entry('y'),
                 entry('z'),
-                entry('u',shape=sp_dense(4)),
+                entry('u',shape=Sparsity.dense(4)),
                 entry('v',repeat=[4,2]),
                 entry('w',repeat=[6]),
-                entry('p',repeat=[9],shape=sp_dense(6))
+                entry('p',repeat=[9],shape=Sparsity.dense(6))
              ],order=['x','y','z','u',('v','w'),'p'])
              
     shooting = struct_symSX([entry('X',struct=states,repeat=[4,5]),entry('U',repeat=[3])],order=[('X','U')])
@@ -904,7 +904,7 @@ class Toolstests(casadiTestCase):
     print a+1
     
   def test_sparse(self):
-    a = struct_symSX([entry("a",shape=sp_diag(5))])
+    a = struct_symSX([entry("a",shape=Sparsity.diag(5))])
     b = struct_symMX([(entry("b",struct=a))])
 
     self.checkarray(b["b"].shape,(5,1))

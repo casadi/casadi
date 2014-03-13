@@ -263,11 +263,11 @@ class FXtests(casadiTestCase):
     for i in range(5):
       test(sp_tril(i))
       test(sp_tril(i).T)
-      test(sp_dense(i,i))
-      test(sp_diag(i))
+      test(Sparsity.dense(i,i))
+      test(Sparsity.diag(i))
     
     for i in [63,64,65,127,128,129]:
-      d = sp_diag(i)
+      d = Sparsity.diag(i)
       test(d)
       
       test(d + sp_rowcol([0],[5],i,i))
@@ -275,7 +275,7 @@ class FXtests(casadiTestCase):
       b = sp_band(i,-1) + sp_band(i,1)
       test(b + sp_rowcol([0],[5],i,i))
       
-    m = IMatrix(sp_diag(129),1)
+    m = IMatrix(Sparsity.diag(129),1)
     m[:50,0] = 1
     m[60:,0] = 1
     m[6:9,6] = 1
@@ -286,7 +286,7 @@ class FXtests(casadiTestCase):
     test(sp)
     #test(sp.T)
     
-    m = IMatrix(sp_diag(64),1)
+    m = IMatrix(Sparsity.diag(64),1)
     m[:50,0] = 1
     m[60:,0] = 1
 
@@ -313,7 +313,7 @@ class FXtests(casadiTestCase):
     for n in [63,64,65,127,128,129]:
       for m in [63,64,65,127,128,129]:
         print (n,m)
-        sp = sp_dense(n,m)
+        sp = Sparsity.dense(n,m)
         
         test(sp)
         
@@ -387,7 +387,7 @@ class FXtests(casadiTestCase):
     
     
     for i in [63,64,65,100,127,128,129]:
-      d = sp_diag(i)
+      d = Sparsity.diag(i)
       test(d)
       
       test(d + sp_rowcol([0],[5],i,i) + sp_rowcol([5],[0],i,i))
@@ -396,14 +396,14 @@ class FXtests(casadiTestCase):
       test(b)
       test(b + sp_rowcol([0],[5],i,i) + sp_rowcol([5],[0],i,i))
       
-      d = sp_dense(i,i)
+      d = Sparsity.dense(i,i)
       test(d)
       
-      d = sp_diag(i) + sp_triplet(i,i,[0]*i,range(i))+sp_triplet(i,i,range(i),[0]*i)
+      d = Sparsity.diag(i) + Sparsity.triplet(i,i,[0]*i,range(i))+Sparsity.triplet(i,i,range(i),[0]*i)
       test(d)
 
 
-      sp = sp_dense(i,i)
+      sp = Sparsity.dense(i,i)
         
       random.seed(0)
       
@@ -577,7 +577,7 @@ class FXtests(casadiTestCase):
             outputs[num_out + nfwd*num_out + num_in*i+1].set(by)
           
 
-      Fun = PyFunction(Fun(),[sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)])
+      Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
       if max_fwd and max_adj:
         Fun.setOption("ad_mode","automatic")
       elif max_adj:
@@ -628,7 +628,7 @@ class FXtests(casadiTestCase):
     # Simple syntax
     def getP(indirect=True):
     
-      @pyfunction([sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)])
+      @pyfunction([Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
       def Fun((x,y)):
         # sin(x+3*y)
         
@@ -709,7 +709,7 @@ class FXtests(casadiTestCase):
             x_bar.set(bx)
             y_bar.set(by)
 
-      Fun = PyFunction(Fun(),[sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)])
+      Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
       if max_fwd and max_adj:
         Fun.setOption("ad_mode","automatic")
       elif max_adj:
@@ -788,7 +788,7 @@ class FXtests(casadiTestCase):
               x_bar.set(bx)
               y_bar.set(by)
 
-      Fun = PyFunction(Fun(),[sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)])
+      Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
       Fun.init()
       
       if not indirect: 
@@ -899,7 +899,7 @@ class FXtests(casadiTestCase):
             x_bar.set([bx0,bx1])
             y_bar.set(by)
 
-      Fun = PyFunction(Fun(),[sp_dense(2,1),sp_dense(1,1)], [sp_dense(1,1)])
+      Fun = PyFunction(Fun(),[Sparsity.dense(2,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
       if max_fwd and max_adj:
         Fun.setOption("ad_mode","automatic")
       elif max_adj:
@@ -974,7 +974,7 @@ class FXtests(casadiTestCase):
               yb = Y_bar[1]
               X_bar.set([2*x*xb+y*yb,xb+x*yb])
           
-      c = PyFunction(Squares(),[sp_dense(2,1)], [sp_dense(2,1)])
+      c = PyFunction(Squares(),[Sparsity.dense(2,1)], [Sparsity.dense(2,1)])
       if max_fwd and max_adj:
         c.setOption("ad_mode","automatic")
       elif max_adj:
@@ -1022,7 +1022,7 @@ class FXtests(casadiTestCase):
     
     f = MXFunction([x],[x])
     f.init()
-    f.setJacSparsity(sp_dense(4,4),0,0,True)
+    f.setJacSparsity(Sparsity.dense(4,4),0,0,True)
     
     J = f.jacobian()
     J.init()
@@ -1057,7 +1057,7 @@ class FXtests(casadiTestCase):
     J.setOption("name","my_J")
     J.init()
     
-    Fun = CustomFunction(fun, [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
+    Fun = CustomFunction(fun, [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)] )
     Fun.setOption("name","Fun")
     Fun.init()
     Fun.setFullJacobian(J)
@@ -1106,7 +1106,7 @@ class FXtests(casadiTestCase):
       print f
       f.setOutput(1)
 
-    foo = CustomFunction(dummy, [x.sparsity()], [sp_dense(1,1)] )
+    foo = CustomFunction(dummy, [x.sparsity()], [Sparsity.dense(1,1)] )
     foo.setOption("name","foo")
     foo.setOption("verbose",True)
     foo.init()
@@ -1115,7 +1115,7 @@ class FXtests(casadiTestCase):
     def dummy_jac(f):
       f.setOutput(1,1)
 
-    foo_jac = CustomFunction(dummy_jac, [x.sparsity()], [sp_sparse(1,1),sp_dense(1,1)] )
+    foo_jac = CustomFunction(dummy_jac, [x.sparsity()], [sp_sparse(1,1),Sparsity.dense(1,1)] )
     foo_jac.setOption("name","foo_jac")
     foo_jac.init()
     foo.setFullJacobian(foo_jac)

@@ -79,7 +79,7 @@ namespace CasADi{
     // number of intervals
     int n = val.numel();
 
-    casadi_assert_message(isScalar(t),"t must be a scalar");
+    casadi_assert_message(t.isScalar(),"t must be a scalar");
     casadi_assert_message(tval.numel() == n-1, "dimensions do not match");
 
     SX ret = val.at(0);  
@@ -154,7 +154,7 @@ namespace CasADi{
     // Quick return if all equal
     bool all_equal = true;
     for(int k=0; k<v.size(); ++k){
-      if(!isEqual(v[k],vdef[k])){
+      if(!v[k].isEqual(vdef[k])){
         all_equal = false;
         break;
       }
@@ -207,7 +207,7 @@ namespace CasADi{
   }
 
   void substituteInPlace(const SX &v, SX &vdef, std::vector<SX>& ex, bool reverse){
-    casadi_assert_message(isSymbolic(v),"the variable is not symbolic");
+    casadi_assert_message(v.isSymbolic(),"the variable is not symbolic");
     casadi_assert_message(v.sparsity() == vdef.sparsity(),"the sparsity patterns of the expression and its defining expression do not match");
     if(v.isEmpty()) return; // quick return if nothing to replace
 
@@ -441,7 +441,7 @@ namespace CasADi{
   }
 
   const string& getName(const SX& ex) {
-    casadi_assert_message(isScalar(ex),"the expression must be scalar");
+    casadi_assert_message(ex.isScalar(),"the expression must be scalar");
     return ex.at(0)->getName();
   }
 
@@ -575,7 +575,7 @@ namespace CasADi{
     expand(ex,weights,terms);
 
     // Make a scalar product to get the simplified expression
-    SX s = mul(trans(terms),weights);
+    SX s = mul(terms.T(),weights);
     ex = s.toScalar();
   }
 
@@ -583,7 +583,7 @@ namespace CasADi{
     casadi_assert(x.isScalar() && a.isScalar());
     if (ex.size()!=ex.numel())
       throw CasadiException("taylor: not implemented for sparse matrices");
-    SX ff = vec(trans(ex));
+    SX ff = vec(ex.T());
   
     SX result = substitute(ff,x,a);
     double nf=1; 
@@ -595,7 +595,7 @@ namespace CasADi{
       result+=1/nf * substitute(ff,x,a) * dxa;
       dxa*=dx;
     }
-    return trans(reshape(result,ex.size2(),ex.size1()));
+    return reshape(result,ex.size2(),ex.size1()).T();
   }
 
   SX mtaylor(const SX& ex,const SX& x, const SX& around,int order) {
@@ -627,7 +627,7 @@ namespace CasADi{
                           "mtaylor: number of non-zero elements in x (" <<  x.size() << ") must match size of order_contributions (" << order_contributions.size() << ")"
                           );
 
-    return trans(reshape(mtaylor_recursive(vec(ex),x,a,order,order_contributions),ex.size2(),ex.size1()));
+    return reshape(mtaylor_recursive(vec(ex),x,a,order,order_contributions),ex.size2(),ex.size1()).T();
   }
 
   int countNodes(const SX& A){
@@ -774,7 +774,7 @@ namespace CasADi{
             rb /= Jb;
           } else {
             // Solve system of equations
-            rb = trans(solve(Jb,trans(rb)));
+            rb = solve(Jb,rb.T()).T();
           }
         
           // Substitute the already determined variables
@@ -1064,7 +1064,7 @@ namespace CasADi{
   SX poly_coeff(const SX& ex, const SX&x) {
     casadi_assert(ex.isScalar());
     casadi_assert(x.isScalar());
-    casadi_assert(isSymbolic(x));
+    casadi_assert(x.isSymbolic());
     
     SX ret;
     

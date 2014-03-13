@@ -29,7 +29,7 @@
 %rename(__rel_pow__) __rpow__;
 %rename(__mul__) mul;
 %rename(__rmul__) rmul;
-%rename(__transpose__) trans;
+%rename(__transpose__) transpose;
 %rename(__div__) __mrdivide__;
 %rename(__rdiv__) __rmrdivide__;
 %rename(__pow__) __mpower__;
@@ -82,7 +82,7 @@ def dot(self,*args):
         
     @property
     def T(self):
-        return _casadi_global.trans(self)
+        return _casadi_global.transpose(self)
         
     def __getitem__(self,s):
         if isinstance(s,tuple) and len(s)==2:
@@ -148,7 +148,7 @@ def dot(self,*args):
 #ifdef SWIGOCTAVE
 %define %matrix_helpers(Type)
 
-  Type __hermitian__() const { return trans((*$self)); }
+  Type __hermitian__() const { return transpose((*$self)); }
   
   std::vector<int> __dims__() const {
     std::vector<int> ret(2);

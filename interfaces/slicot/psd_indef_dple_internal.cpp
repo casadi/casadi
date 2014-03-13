@@ -108,7 +108,7 @@ namespace CasADi{
           
         Sparsity sp;
         if (K_==1) {
-          sp = sp_dense(np,np);
+          sp = Sparsity::dense(np,np);
         } else {
           std::vector<int> row_ind = range(0,np*(np+1)*K_+np+1,np+1);
           std::vector<int> col(np*(np+1)*K_);

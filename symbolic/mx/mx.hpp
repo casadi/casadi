@@ -465,6 +465,14 @@ namespace CasADi{
     /// Lift an expression
     void lift(const MX& x_guess);
 
+    /// Transpose the matrix
+    MX trans() const;
+    
+#ifndef SWIG
+    /// Transpose the matrix (shorthand)
+    MX T() const{ return trans();}
+#endif
+
     /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
     Matrix<int> mapping() const;
     

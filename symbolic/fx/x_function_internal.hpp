@@ -142,7 +142,7 @@ namespace CasADi{
         inputv_[i] = MatType::sym("empty",0,0);
       } else if (inputv[i].isEmpty()) {
         // That's okay
-      } else if(!isSymbolicSparse(inputv[i])){
+      } else if(!inputv[i].isSymbolicSparse()){
         casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
       }
     }
@@ -684,7 +684,7 @@ namespace CasADi{
         for(int ind=0; ind<fseed[d].size(); ++ind){
           int nrow = input(ind).size1(), ncol = input(ind).size2(); // Input dimensions
           if(ind==iind){
-            fseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
+            fseed[d][ind] = MatType::ones(Sparsity::triplet(nrow,ncol,seed_row,seed_col));
           } else {
             fseed[d][ind] = MatType::sparse(nrow,ncol);
           }
@@ -714,7 +714,7 @@ namespace CasADi{
         for(int ind=0; ind<aseed[d].size(); ++ind){
           int nrow = output(ind).size1(), ncol = output(ind).size2(); // Output dimensions
           if(ind==oind){
-            aseed[d][ind] = MatType::ones(sp_triplet(nrow,ncol,seed_row,seed_col));
+            aseed[d][ind] = MatType::ones(Sparsity::triplet(nrow,ncol,seed_row,seed_col));
           } else {
             aseed[d][ind] = MatType::sparse(nrow,ncol);
           }
@@ -862,7 +862,7 @@ namespace CasADi{
   
     // Return
     if(verbose()) std::cout << "XFunctionInternal::jac end" << std::endl;
-    return trans(ret);
+    return ret.T();
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>

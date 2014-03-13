@@ -30,17 +30,6 @@ using namespace std;
 
 namespace CasADi{
   
-  std::vector<int> getNZDense(const Sparsity &sp) {
-    std::vector<int> ret(sp.size());
-    std::vector<int> col = sp.getCol();
-    const std::vector<int> &row = sp.row();
-    int s2 = sp.size1();
-    for(int k=0;k<sp.size();k++) {
-      ret[k] = row[k]+col[k]*s2;
-    }
-    return ret;
-  }
-
   Sparsity reshape(const Sparsity& a, int nrow, int ncol){
     return a.reshape(nrow,ncol);
   }
@@ -52,49 +41,7 @@ namespace CasADi{
   Sparsity mul(const  Sparsity& a, const  Sparsity &b) {
     return (mul(DMatrix(a,1),DMatrix(b,1))).sparsity();
   }
-  
-  std::vector<int> sp_compress(const Sparsity& a){
-    // Get the sparsity pattern
-    int nrow = a.size1();
-    int ncol = a.size2();
-    const vector<int>& colind = a.colind();
-    const vector<int>& row = a.row();
     
-    // Create compressed pattern
-    vector<int> ret;
-    ret.reserve(1 + 1 + colind.size() + row.size());
-    ret.push_back(nrow);
-    ret.push_back(ncol);
-    ret.insert(ret.end(),colind.begin(),colind.end());
-    ret.insert(ret.end(),row.begin(),row.end());
-    return ret;
-  }
-  
-  Sparsity sp_compress(const std::vector<int>& v){
-    // Check consistency
-    casadi_assert(v.size() >= 2);
-    //int nrow = v[0];
-    int ncol = v[1];
-    casadi_assert(v.size() >= 2 + ncol+1);
-    int nnz = v[2 + ncol];
-    casadi_assert(v.size() == 2 + ncol+1 + nnz);
-
-    // Call array version
-    return sp_compress(&v.front());
-  }
-  
-  Sparsity sp_compress(const int* v){
-    // Get sparsity pattern
-    int nrow = v[0];
-    int ncol = v[1];
-    const int *colind = v+2;
-    int nnz = colind[ncol];
-    const int *row = v + 2 + ncol+1;
-    
-    // Construct sparsity pattern
-    return Sparsity(nrow, ncol, vector<int>(colind,colind+ncol+1),vector<int>(row,row+nnz));
-  }
-  
   int rank(const Sparsity& a) {
     std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
     a.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
@@ -129,11 +76,11 @@ namespace CasADi{
       }
       return ret;
     } else {
-      Sparsity ret = trans(sp[0]);
+      Sparsity ret = sp[0].T();
       for(int i=1; i<sp.size(); ++i) {
-        ret.appendColumns(trans(sp[i]));
+        ret.appendColumns(sp[i].T());
       }
-      return trans(ret);
+      return ret.T();
     }
   }
   
@@ -143,9 +90,9 @@ namespace CasADi{
       ret.append(b);
       return ret;
     } else {
-      Sparsity ret = trans(a);
-      ret.appendColumns(trans(b));
-      return trans(ret);
+      Sparsity ret = a.T();
+      ret.appendColumns(b.T());
+      return ret.T();
     }
   }
   

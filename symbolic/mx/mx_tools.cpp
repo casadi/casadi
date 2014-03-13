@@ -65,8 +65,8 @@ namespace CasADi{
       if(!it->isNull() && !(it->size1()==0 && it->size2()==0) && !it->isVector()){
         vector<MX> v(comp.size());
         for(int i=0; i<v.size(); ++i)
-          v[i] = trans(comp[i]);
-        return trans(horzcat(v));
+          v[i] = comp[i].T();
+        return horzcat(v).T();
       }
     }
 
@@ -91,9 +91,9 @@ namespace CasADi{
         return x->getVertsplit(offset);
       }      
     } else {
-      std::vector<MX> ret = horzsplit(trans(x),offset);
-      MX (*transMX)(const MX& x) = trans; 
-      std::transform(ret.begin(),ret.end(),ret.begin(),transMX);
+      std::vector<MX> ret = horzsplit(x.T(),offset);
+      MX (*transposeMX)(const MX& x) = transpose; 
+      std::transform(ret.begin(),ret.end(),ret.begin(),transposeMX);
       return ret;
     }
   }
@@ -186,12 +186,8 @@ namespace CasADi{
     }
   }
 
-  MX trans(const MX &x){
-    // Quick return if null or scalar
-    if(x.isNull() || x.numel()==1)
-      return x;
-    else
-      return x->getTranspose();
+  MX transpose(const MX &x){
+    return x.T();
   }
 
   MX reshape(const MX &x, std::pair<int,int> rc){
@@ -229,7 +225,7 @@ namespace CasADi{
     if(x.isDense()){
       return vec(x);
     } else {
-      return x->getGetNonzeros(sp_dense(x.size(),1),range(x.size()));
+      return x->getGetNonzeros(Sparsity::dense(x.size(),1),range(x.size()));
     }
   }
 
@@ -323,7 +319,7 @@ namespace CasADi{
   MX createParent(std::vector<MX> &deps) {
     // First check if arguments are symbolic
     for (int k=0;k<deps.size();k++) {
-      if (!isSymbolic(deps[k])) throw CasadiException("createParent: the argumenst must be pure symbolic");
+      if (!deps[k].isSymbolic()) throw CasadiException("createParent: the argumenst must be pure symbolic");
     }
   
     // Collect the sizes of the depenencies
@@ -374,7 +370,7 @@ namespace CasADi{
     std::vector<int> mapping;
   
     // Get the sparsity
-    Sparsity sp = x.sparsity().diag(mapping);
+    Sparsity sp = x.sparsity().getDiag(mapping);
   
     // Create a reference to the nonzeros
     return x->getGetNonzeros(sp,mapping);
@@ -471,7 +467,7 @@ namespace CasADi{
   void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse){
     casadi_assert_message(v.size()==vdef.size(),"Mismatch in the number of expression to substitute.");
     for(int k=0; k<v.size(); ++k){
-      casadi_assert_message(isSymbolic(v[k]),"Variable " << k << " is not symbolic");
+      casadi_assert_message(v[k].isSymbolic(),"Variable " << k << " is not symbolic");
       casadi_assert_message(v[k].sparsity() == vdef[k].sparsity(), "Inconsistent sparsity for variable " << k << ".");
     }
     casadi_assert_message(reverse==false,"Not implemented");
@@ -543,7 +539,7 @@ namespace CasADi{
     // Quick return if all equal
     bool all_equal = true;
     for(int k=0; k<v.size(); ++k){
-      if(!isEqual(v[k],vdef[k])){
+      if(!v[k].isEqual(vdef[k])){
         all_equal = false;
         break;
       }
@@ -923,9 +919,9 @@ namespace CasADi{
   
   MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict) {
     if (A.size1()>=A.size2()) {
-      return solve(mul(trans(A),A),trans(A),lsolver,dict);
+      return solve(mul(A.T(),A),A.T(),lsolver,dict);
     } else {
-      return trans(solve(mul(A,trans(A)),A,lsolver,dict));
+      return solve(mul(A,A.T()),A,lsolver,dict).T();
     }
   }
   

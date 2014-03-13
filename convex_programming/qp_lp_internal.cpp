@@ -77,7 +77,7 @@ void QPLPInternal::init(){
 
   // Create an qpsolver instance
   QPSolverCreator qpsolver_creator = getOption("qp_solver");
-  qpsolver_ = qpsolver_creator(qpStruct("h",sp_sparse(n_,n_),"a",input(LP_SOLVER_A).sparsity()));
+  qpsolver_ = qpsolver_creator(qpStruct("h",Sparsity::sparse(n_,n_),"a",input(LP_SOLVER_A).sparsity()));
 
   qpsolver_.setLPOptions();
   if(hasSetOption("qp_solver_options")){

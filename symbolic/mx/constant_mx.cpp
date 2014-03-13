@@ -131,19 +131,19 @@ namespace CasADi{
   }
 
   bool ConstantDMatrix::isZero() const{
-    return CasADi::isZero(x_);
+    return x_.isZero();
   }
 
   bool ConstantDMatrix::isOne() const{
-    return CasADi::isOne(x_);
+    return x_.isOne();
   }
 
   bool ConstantDMatrix::isMinusOne() const{
-    return CasADi::isMinusOne(x_);
+    return x_.isMinusOne();
   }
 
   bool ConstantDMatrix::isIdentity() const{
-    return CasADi::isIdentity(x_);
+    return x_.isIdentity();
   }
 
   MX ConstantMX::getMultiplication(const MX& y) const{

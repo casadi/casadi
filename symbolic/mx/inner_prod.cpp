@@ -33,7 +33,7 @@ namespace CasADi{
   InnerProd::InnerProd(const MX& x, const MX& y){
     casadi_assert(x.sparsity()==y.sparsity());
     setDependencies(x,y);
-    setSparsity(sp_dense(1,1));
+    setSparsity(Sparsity::scalar());
   }
   
   void InnerProd::printPart(std::ostream &stream, int part) const{

@@ -485,7 +485,7 @@ namespace CasADi{
     for(int ind=0; ind<getNumOutputs(); ++ind) output(ind).setZero();
 
     // Construct sparsity pattern
-    Sparsity ret = sp_triplet(nz_out, nz_in, use_fwd ? jcol : jrow, use_fwd ? jrow : jcol);
+    Sparsity ret = Sparsity::triplet(nz_out, nz_in, use_fwd ? jcol : jrow, use_fwd ? jrow : jcol);
     
     casadi_log("Formed Jacobian sparsity pattern (dimension " << ret.shape() << ", " << ret.size() << " nonzeros, " << 100*double(ret.size())/double(ret.size1())/double(ret.size2()) << " \% nonzeros).");
     casadi_log("FXInternal::getJacSparsity end ");
@@ -524,7 +524,7 @@ namespace CasADi{
     // In each iteration, subdivide each coarse block in this many fine blocks
     int subdivision = bvec_size;
 
-    Sparsity r = sp_dense(1,1);
+    Sparsity r = Sparsity::dense(1,1);
     
     // The size of a block
     int granularity = nz;
@@ -709,7 +709,7 @@ namespace CasADi{
       }
 
       // Construct fine sparsity pattern
-      r = sp_triplet(fine.size()-1, fine.size()-1, jrow, jcol);
+      r = Sparsity::triplet(fine.size()-1, fine.size()-1, jrow, jcol);
       coarse = fine;
       hasrun = true;
     }
@@ -717,7 +717,7 @@ namespace CasADi{
     casadi_log("Number of sweeps: " << nsweeps );
     casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() << ", " << r.size() << " nonzeros, " << 100*double(r.size())/double(r.size2())/double(r.size1()) << " \% nonzeros).");
     
-    return r.transpose();
+    return r.T();
   }
 
   Sparsity FXInternal::getJacSparsityHierarchical(int iind, int oind){
@@ -756,7 +756,7 @@ namespace CasADi{
     // In each iteration, subdivide each coarse block in this many fine blocks
     int subdivision = bvec_size;
 
-    Sparsity r = sp_dense(1,1);
+    Sparsity r = Sparsity::dense(1,1);
     
     // The size of a block
     int granularity_row = nz_in;
@@ -787,7 +787,7 @@ namespace CasADi{
       fine_col.clear();
     
       // r transpose will be needed in the algorithm
-      Sparsity rT = r.transpose();
+      Sparsity rT = r.T();
       
       /**       Decide which ad_mode to take           */
       
@@ -1000,12 +1000,12 @@ namespace CasADi{
       // Swap results if adjoint mode was used
       if (use_fwd) {
         // Construct fine sparsity pattern
-        r = sp_triplet(fine_row.size()-1, fine_col.size()-1, jrow, jcol);
+        r = Sparsity::triplet(fine_row.size()-1, fine_col.size()-1, jrow, jcol);
         coarse_col = fine_col;
         coarse_row = fine_row;
       } else {
         // Construct fine sparsity pattern
-        r = sp_triplet(fine_col.size()-1, fine_row.size()-1, jcol, jrow);
+        r = Sparsity::triplet(fine_col.size()-1, fine_row.size()-1, jcol, jrow);
         coarse_col = fine_row;
         coarse_row = fine_col;
       }
@@ -1014,7 +1014,7 @@ namespace CasADi{
     casadi_log("Number of sweeps: " << nsweeps );
     casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() << ", " << r.size() << " nonzeros, " << 100*double(r.size())/double(r.size1())/double(r.size2()) << " \% nonzeros).");
     
-    return r.transpose();
+    return r.T();
   }
 
   Sparsity FXInternal::getJacSparsity(int iind, int oind, bool symmetric){
@@ -1034,7 +1034,7 @@ namespace CasADi{
 
     } else {
       // Dense sparsity by default
-      return Sparsity(output(oind).size(),input(iind).size(),true);
+      return Sparsity::dense(output(oind).size(),input(iind).size());
     }
   }
 
@@ -1093,7 +1093,7 @@ namespace CasADi{
   
     // If still null, not dependent
     if(jsp.isNull()){
-      jsp = Sparsity(output(oind).size(),input(iind).size());
+      jsp = Sparsity::sparse(output(oind).size(),input(iind).size());
     }
 
     // Return a reference to the block
@@ -1107,7 +1107,7 @@ namespace CasADi{
   
     // Sparsity pattern with transpose
     Sparsity &AT = jacSparsity(iind,oind,compact,symmetric);
-    Sparsity A = symmetric ? AT : AT.transpose();
+    Sparsity A = symmetric ? AT : AT.T();
   
     // Which AD mode?
     bool test_ad_fwd=true, test_ad_adj=true;
@@ -1674,7 +1674,7 @@ namespace CasADi{
     // Get an expression for the full Jacobian
     vector<MX> arg = symbolicInput();
     vector<MX> res = jfcn.call(arg);
-    MX J = trans(res.front());
+    MX J = res.front().T();
     res.erase(res.begin());
 
     // Make room for the derivatives
@@ -1704,7 +1704,7 @@ namespace CasADi{
           arg.push_back(MX::sym(ss.str(),arg[i].sparsity()));
 
           // Add to the right-hand-side under construction
-          d.push_back(trans(vec(arg.back())));
+          d.push_back(transpose(vec(arg.back())));
         }
         MX d_all = horzcat(d);
         
@@ -1723,7 +1723,7 @@ namespace CasADi{
     // Adjoint derivatives
     if(nadj>0){
       // Transpose of J
-      MX JT = trans(J);
+      MX JT = J.T();
 
       // Get col offsets for the horzsplit
       vector<int> offset(1,0);
@@ -1742,7 +1742,7 @@ namespace CasADi{
           arg.push_back(MX::sym(ss.str(),res[i].sparsity()));
 
           // Add to the right-hand-side under construction
-          d.push_back(trans(vec(arg.back())));
+          d.push_back(transpose(vec(arg.back())));
         }
         MX d_all = horzcat(d);
         
@@ -1903,7 +1903,7 @@ namespace CasADi{
       // Need to create a new symbolic primitive
 
       // Sparsity pattern for the symbolic input
-      Sparsity sp_arg = Sparsity(1,0);
+      Sparsity sp_arg = Sparsity::sparse(1,0);
 
       // Append the sparsity patterns, keep track of col offsets
       vector<int> col_offset(1,0);

@@ -68,7 +68,7 @@ namespace CasADi{
     casadi_assert_message(A_.size()==V_.size(),"A and V arguments must be of same length, but got " << A_.size() << " and " << V_.size() << ".");
     K_ = A_.size();
     for (int k=0;k<K_;++k) {
-      casadi_assert_message(V_[k]==trans(V_[k]),"V_i must be symmetric but got " << V_[k].dimString() << " for i = " << k << ".");
+      casadi_assert_message(V_[k].isSymmetric(),"V_i must be symmetric but got " << V_[k].dimString() << " for i = " << k << ".");
 
       casadi_assert_message(A_[k].size1()==V_[k].size1(),"First dimension of A (" << A_[k].size1() << ") must match dimension of symmetric V_i (" << V_[k].size1() << ")" << " for i = " << k << ".");
     }
@@ -103,7 +103,7 @@ namespace CasADi{
     // Allocate outputs
     std::vector<Sparsity> P; 
     for (int k=0;k<K_;++k) {
-      P.push_back(sp_dense(V_[k].size1(),V_[k].size1()));
+      P.push_back(Sparsity::dense(V_[k].size1(),V_[k].size1()));
     }
     setNumOutputs(DPLE_NUM_OUT*(1+nfwd_) + DPLE_NUM_IN*nadj_);
     for (int i=0;i<nfwd_+1;++i) {

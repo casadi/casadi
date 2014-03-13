@@ -176,7 +176,7 @@ namespace CasADi{
       }
     
       /** \brief  append col to matrix */
-      ret.appendColumns(trans(col));
+      ret.appendColumns(col.T());
     }
 
     return ret;

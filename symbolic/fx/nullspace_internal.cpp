@@ -55,7 +55,7 @@ namespace CasADi{
     
     Sparsity dense;
     if (dense_) {
-      dense = sp_dense(n_,n_-m_);
+      dense = Sparsity::dense(n_,n_-m_);
     }
   
     FXInternal::init();

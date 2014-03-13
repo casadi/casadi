@@ -31,7 +31,7 @@ namespace CasADi{
 
   Determinant::Determinant(const MX& x){
     setDependencies(x);
-    setSparsity(sp_dense(1,1));
+    setSparsity(Sparsity::dense(1,1));
   }
   
   void Determinant::printPart(std::ostream &stream, int part) const{
@@ -57,7 +57,7 @@ namespace CasADi{
     if(nfwd==0 && nadj==0) return;
     
     // Create only once
-    MX trans_inv_X = trans(inv(X));
+    MX trans_inv_X = inv(X).T();
 
     // Forward sensitivities
     for(int d=0; d<nfwd; ++d){

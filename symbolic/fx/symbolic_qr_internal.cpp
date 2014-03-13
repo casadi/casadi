@@ -67,35 +67,22 @@ namespace CasADi{
     // Symbolic expression for A
     SX A = SX::sym("A",input(0).sparsity());
 
-    // Make a BLT transformation of A
-    std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    A.sparsity().dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
-
-    // Get the inverted col permutation
-    std::vector<int> inv_colperm(colperm.size());
-    for(int k=0; k<colperm.size(); ++k)
-      inv_colperm[colperm[k]] = k;
+    // Get the inverted column permutation
+    std::vector<int> inv_colperm(colperm_.size());
+    for(int k=0; k<colperm_.size(); ++k)
+      inv_colperm[colperm_[k]] = k;
 
     // Get the inverted row permutation
-    std::vector<int> inv_rowperm(rowperm.size());
-    for(int k=0; k<rowperm.size(); ++k)
-      inv_rowperm[rowperm[k]] = k;
+    std::vector<int> inv_rowperm(rowperm_.size());
+    for(int k=0; k<rowperm_.size(); ++k)
+      inv_rowperm[rowperm_[k]] = k;
     
     // Permute the linear system
-    SX Aperm = SX::sparse(A.size1(),0);
-    for(int i=0; i<A.size2(); ++i){
-      Aperm.resize(A.size1(),i+1);
-      for(int el=A.colind(colperm[i]); el<A.colind(colperm[i]+1); ++el){
-        Aperm(inv_rowperm[A.row(el)],i) = A(el);
-      }
-    }
+    SX Aperm = A(rowperm_,colperm_);
 
     // Generate the QR factorization function
     vector<SX> QR(2);
-    qr(trans(Aperm),QR[0],QR[1]);
-    QR[0] = trans(QR[0]);
-    QR[1] = trans(QR[1]);
-
+    qr(Aperm,QR[0],QR[1]);
     SXFunction fact_fcn(A,QR);
 
     // Optionally generate c code and load as DLL
@@ -114,31 +101,19 @@ namespace CasADi{
     // Symbolic expressions for solve function
     SX Q = SX::sym("Q",QR[0].sparsity());
     SX R = SX::sym("R",QR[1].sparsity());
-    SX b = SX::sym("b",input(1).sparsity());
+    SX b = SX::sym("b",input(1).size1(),1);
     
     // Solve non-transposed
-    // We have inv(A) = inv(Px) * inv(R) * Q' * Pb
+    // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
 
-    // Permute the right hand side
-    SX bperm = SX::sparse(b.size1(),0);
-    for(int i=0; i<b.size2(); ++i){
-      bperm.resize(b.size1(),i+1);
-      for(int el=b.colind(colperm[i]); el<b.colind(colperm[i]+1); ++el){
-        bperm(b.row(el),i) = b(el);
-      }
-    }
+    // Permute the right hand sides
+    SX bperm = b(rowperm_,ALL);
 
     // Solve the factorized system
-    SX xperm = trans(CasADi::solve(trans(R),mul(Q,trans(bperm))));
+    SX xperm = CasADi::solve(R,mul(Q.T(),bperm));
 
     // Permute back the solution
-    SX x = SX::sparse(xperm.size1(),0);
-    for(int i=0; i<xperm.size2(); ++i){
-      x.resize(xperm.size1(),i+1);
-      for(int el=xperm.colind(inv_rowperm[i]); el<xperm.colind(inv_rowperm[i]+1); ++el){
-        x(xperm.row(el),i) = xperm(el);
-      }
-    }
+    SX x = xperm(inv_colperm,ALL);
 
     // Generate the QR solve function
     vector<SX> solv_in(3);
@@ -150,8 +125,38 @@ namespace CasADi{
     // Optionally generate c code and load as DLL
     if(codegen){
       stringstream ss;
+      ss << "symbolic_qr_solv_fcn_N_" << this;
+      solv_fcn_N_ = dynamicCompilation(solv_fcn,ss.str(),"QR_solv_N",compiler);
+    } else {
+      solv_fcn_N_ = solv_fcn;
+    }
+
+    // Initialize solve function
+    solv_fcn_N_.setOption("name","QR_solv");
+    solv_fcn_N_.init();
+
+    // Solve transposed
+    // We have (Pb' * Q * R * Px)' * x = b
+    // <=> Px' * R' * Q' * Pb * x = b 
+    // <=> x = Pb' * Q * inv(R') * Px * b
+
+    // Permute the right hand side
+    bperm = b(colperm_,ALL);
+
+    // Solve the factorized system
+    xperm = mul(Q,CasADi::solve(R.T(),bperm));
+
+    // Permute back the solution
+    x = xperm(inv_rowperm,ALL);
+
+    // Mofify the QR solve function
+    solv_fcn = SXFunction(solv_in,x);
+
+    // Optionally generate c code and load as DLL
+    if(codegen){
+      stringstream ss;
       ss << "symbolic_qr_solv_fcn_T_" << this;
-      solv_fcn_T_ = dynamicCompilation(solv_fcn,ss.str(),"Symbolic QR solve function",compiler);
+      solv_fcn_T_ = dynamicCompilation(solv_fcn,ss.str(),"QR_solv_T",compiler);
     } else {
       solv_fcn_T_ = solv_fcn;
     }
@@ -160,46 +165,6 @@ namespace CasADi{
     solv_fcn_T_.setOption("name","QR_solv_T");
     solv_fcn_T_.init();
 
-    // Solve transposed
-    // We have inv(A)' = inv(Pb) * Q *inv(R') * Px
-
-    // Permute the right hand side
-    bperm = SX::sparse(b.size1(),0);
-    for(int i=0; i<b.size2(); ++i){
-      bperm.resize(b.size1(),i+1);
-      for(int el=b.colind(rowperm[i]); el<b.colind(rowperm[i]+1); ++el){
-        bperm(b.row(el),i) = b(el);
-      }
-    }
-
-    // Solve the factorized system
-    xperm = mul(trans(CasADi::solve(R,trans(bperm))),Q);
-
-    // Permute back the solution
-    x = SX::sparse(xperm.size1(),0);
-    for(int i=0; i<xperm.size2(); ++i){
-      x.resize(xperm.size1(),i+1);
-      for(int el=xperm.colind(inv_colperm[i]); el<xperm.colind(inv_colperm[i]+1); ++el){
-        x(xperm.row(el),i) = xperm(el);
-      }
-    }
-
-    // Mofify the QR solve function
-    solv_fcn = SXFunction(solv_in,x);
-
-    // Optionally generate c code and load as DLL
-    if(codegen){
-      stringstream ss;
-      ss << "symbolic_qr_solv_fcn_N_" << this;
-      solv_fcn_N_ = dynamicCompilation(solv_fcn,ss.str(),"QR_solv_N",compiler);
-    } else {
-      solv_fcn_N_ = solv_fcn;
-    }
-
-    // Initialize solve function
-    solv_fcn_N_.setOption("name","QR_solvT");
-    solv_fcn_N_.init();
-
     // Allocate storage for QR factorization
     Q_ = DMatrix::zeros(Q.sparsity());
     R_ = DMatrix::zeros(R.sparsity());      
@@ -207,15 +172,16 @@ namespace CasADi{
 
   void SymbolicQRInternal::prepare(){
     // Factorize
-    fact_fcn_.setInput(input(0));
+    fact_fcn_.setInput(input(LINSOL_A));
     fact_fcn_.evaluate();
     fact_fcn_.getOutput(Q_,0);
     fact_fcn_.getOutput(R_,1);
+    prepared_ = true;
   }
 
   void SymbolicQRInternal::solve(double* x, int nrhs, bool transpose){
     // Select solve function
-    FX& solv = transpose ? solv_fcn_N_ : solv_fcn_T_;
+    FX& solv = transpose ? solv_fcn_T_ : solv_fcn_N_;
 
     // Pass QR factorization
     solv.setInput(Q_,0);
@@ -262,12 +228,7 @@ namespace CasADi{
 
     // Solve
     int solv_ind_N = gen.getDependency(solv_fcn_N_);
-    int solv_ind_T = gen.getDependency(solv_fcn_T_);
-    stream << "  if(*x2==0){" << endl;
-    stream << "    f" << solv_ind_N << "(Q,R,x1,r0);" << endl;    
-    stream << "  } else {" << endl;
-    stream << "    f" << solv_ind_T << "(Q,R,x1,r0);" << endl;    
-    stream << "  }" << endl;
+    stream << "  f" << solv_ind_N << "(Q,R,x1,r0);" << endl;    
   }
 
 } // namespace CasADi

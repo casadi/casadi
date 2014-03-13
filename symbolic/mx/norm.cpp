@@ -29,7 +29,7 @@ namespace CasADi{
 
   Norm::Norm(const MX& x){
     setDependencies(x);
-    setSparsity(Sparsity(1,1,true));
+    setSparsity(Sparsity::scalar());
   }
 
   void NormF::printPart(std::ostream &stream, int part) const{

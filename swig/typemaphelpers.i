@@ -74,10 +74,10 @@ bool istype(GUESTOBJECT, swig_type_info *type) {
 }
 #endif // SWIGPYTHON
 
-template<class T>
+template<typename DataType>
 class meta {
   public:
-    /// Check if Python object is of type T
+    /// Check if Python object is of type DataType
     static bool isa(GUESTOBJECT) {
       #ifdef SWIGPYTHON
       if (p == Py_None) return false;
@@ -85,32 +85,32 @@ class meta {
       #ifdef SWIGOCTAVE
       if (p.is_null_value()) return false;
       #endif // SWIGOCTAVE
-      return istype(p,*meta<T>::name);
+      return istype(p,*meta<DataType>::name);
     };
-    /// Convert Python object to pointer of type T
-    static bool get_ptr(GUESTOBJECT,T*& m) {
+    /// Convert Python object to pointer of type DataType
+    static bool get_ptr(GUESTOBJECT,DataType*& m) {
       void *pd = 0 ;
-      int res = SWIG_ConvertPtr(p, &pd,*meta<T>::name, 0 );
+      int res = SWIG_ConvertPtr(p, &pd,*meta<DataType>::name, 0 );
       if (!SWIG_IsOK(res)) {
         return false;
       }
-      m = reinterpret_cast< T*  >(pd);
+      m = reinterpret_cast< DataType*  >(pd);
       return true;
     };
-    /// Convert Guest object to type T
+    /// Convert Guest object to type DataType
     /// This function must work when isa(GUESTOBJECT) too
-    static int as(GUESTOBJECT,T& m) {
-        T *t = (T *)(0);
+    static int as(GUESTOBJECT,DataType& m) {
+        DataType *t = (DataType *)(0);
         int res = swig::asptr(p, &t);
         bool succes = SWIG_CheckState(res) && t;
         if (succes) m=*t;
         if (succes && SWIG_IsNewObj(res)) delete t;
         return succes;
     }
-    /// Check if Guest object could ultimately be converted to type T
+    /// Check if Guest object could ultimately be converted to type DataType
     /// may return true when isa(GUESTOBJECT), but this is not required.
     static bool couldbe(GUESTOBJECT) { 
-        int res = swig::asptr(p, (T**)(0));
+        int res = swig::asptr(p, (DataType**)(0));
         return SWIG_CheckState(res);
     }
     static swig_type_info** name;
@@ -125,7 +125,7 @@ class meta {
         if (!it) return false;
         PyObject *pe;
         while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
-          if (!meta< T >::couldbe(pe)) {
+          if (!meta<DataType>::couldbe(pe)) {
             Py_DECREF(pe);Py_DECREF(it);return false;
           }
           Py_DECREF(pe);
@@ -146,7 +146,7 @@ class meta {
       int ncol = p.columns();
       if (nrow!=1 && ncol!=1) return false;
       for(int i=0; i<p.length(); ++i){
-        if (!meta< T >::couldbe(p.cell_value()(i))) return false;
+        if (!meta<DataType>::couldbe(p.cell_value()(i))) return false;
       }
       return true;
     }
@@ -154,13 +154,13 @@ class meta {
     
     // Assumes that p is a PYTHON sequence
     #ifdef SWIGPYTHON
-    static int as_vector(PyObject * p, std::vector<T> &m) {
+    static int as_vector(PyObject * p, std::vector<DataType> &m) {
       PyObject *it = PyObject_GetIter(p);
       PyObject *pe;
       m.resize(PySequence_Size(p));
       int i=0;
       while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
-        bool result=meta< T >::as(pe,m[i++]);
+        bool result=meta<DataType>::as(pe,m[i++]);
         if (!result) {
           Py_DECREF(pe);Py_DECREF(it);
           return false;
@@ -174,7 +174,7 @@ class meta {
     
     // Assumes that p is an octave cell
     #ifdef SWIGOCTAVE
-    static int as_vector(const octave_value& p , std::vector<T> &m) {
+    static int as_vector(const octave_value& p , std::vector<DataType> &m) {
       if (!p.is_cell()) return false;
       int nrow = p.rows();
       int ncol = p.columns();
@@ -187,7 +187,7 @@ class meta {
         const octave_value& obj_i = c(i);
         
         if (!(obj_i.is_real_matrix() && obj_i.is_empty())) {
-          bool ret = meta< T >::as(obj_i,m[i]);
+          bool ret = meta<DataType>::as(obj_i,m[i]);
           if(!ret) return false;
         }
       }
@@ -198,7 +198,7 @@ class meta {
     
     #ifdef SWIGPYTHON
     // Would love to make this const T&, but looks like not allowed
-    static bool toPython(const T &, PyObject *&p);
+    static bool toPython(const DataType &, PyObject *&p);
     #endif //SWIGPYTHON
 };
 

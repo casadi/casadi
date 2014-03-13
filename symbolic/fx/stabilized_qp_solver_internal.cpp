@@ -54,8 +54,8 @@ namespace CasADi{
                           "We need H square & symmetric" << std::endl);
 
     // IO sparsities
-    Sparsity x_sparsity = sp_dense(n_,1);
-    Sparsity a_sparsity = sp_dense(nc_,1);
+    Sparsity x_sparsity = Sparsity::dense(n_,1);
+    Sparsity a_sparsity = Sparsity::dense(nc_,1);
   
     // Input arguments
     setNumInputs(STABILIZED_QP_SOLVER_NUM_IN);

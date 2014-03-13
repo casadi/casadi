@@ -445,8 +445,8 @@ namespace CasADi{
     MX b_g = mfcn_fwdSens[0][mod_g_];
   
     // Make sure that the vectors are dense
-    makeDense(b_gf);
-    makeDense(b_g);
+    b_gf.densify();
+    b_g.densify();
   
     // Tangent function
     vector<MX> vec_fcn_out;

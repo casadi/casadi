@@ -725,7 +725,7 @@ class typemaptests(casadiTestCase):
     
   def test_issue314(self):
     self.message("regression test for #314: SX sparsity constructor")
-    SX(sp_diag(3),[1,2,3])
+    SX(Sparsity.diag(3),[1,2,3])
   def test_setAll_365(self):
     self.message("ticket #365: DMAtrix.setAll does not work for 1x1 Matrices as input")
     m = DMatrix.ones(5,5)

@@ -355,7 +355,7 @@ class QPSolverTests(casadiTestCase):
       self.message("equality: " + str(qpsolver))
       if "OOQP" in str(qpsolver):
         continue
-      solver = qpsolver(qpStruct(h=H.sparsity(),a=sp_dense(3,2)))
+      solver = qpsolver(qpStruct(h=H.sparsity(),a=Sparsity.dense(3,2)))
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)

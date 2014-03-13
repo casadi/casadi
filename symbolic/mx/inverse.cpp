@@ -32,7 +32,7 @@ namespace CasADi{
   Inverse::Inverse(const MX& x){
     casadi_assert_message(x.size1()==x.size2(),"Inverse: matrix must be square, but you supllied " << x.dimString());
     setDependencies(x);
-    setSparsity(sp_dense(x.size1(),x.size2()));
+    setSparsity(Sparsity::dense(x.size1(),x.size2()));
   }
   
   void Inverse::printPart(std::ostream &stream, int part) const{
@@ -59,7 +59,7 @@ namespace CasADi{
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     if(nadj>0){
-      MX trans_inv_X = trans(inv_X);
+      MX trans_inv_X = inv_X.T();
       for(int d=0; d<nadj; ++d){
         *adjSens[d][0] -= mul(trans_inv_X,mul(*adjSeed[d][0],trans_inv_X));
         *adjSeed[d][0] = MX();

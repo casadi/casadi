@@ -90,7 +90,7 @@ namespace CasADi{
     jac_.init(false);
   
     // Check for structural singularity in the Jacobian
-    casadi_assert_message(!isSingular(jac_.output().sparsity()),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
+    casadi_assert_message(!jac_.output().sparsity().isSingular(),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
   
     // Get the linear solver creator function
     if(linsol_.isNull()){

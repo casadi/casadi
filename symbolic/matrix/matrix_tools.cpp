@@ -42,9 +42,9 @@ namespace CasADi{
 
   Matrix<double> pinv(const Matrix<double>& A, linearSolverCreator lsolver, const Dictionary& dict) {
     if (A.size1()>=A.size2()) {
-      return solve(mul(trans(A),A),trans(A),lsolver,dict);
+      return solve(mul(A.T(),A),A.T(),lsolver,dict);
     } else {
-      return trans(solve(mul(A,trans(A)),A,lsolver,dict));
+      return solve(mul(A,A.T()),A,lsolver,dict).T();
     }
   }
     

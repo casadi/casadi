@@ -123,13 +123,13 @@ namespace CasADi{
   Apply a function f to each element in a vector
   */
   template<class T>
-  std::vector< T > applymap(T (*f)(const T& ),const std::vector< T >&);
+  std::vector<T> applymap(T (*f)(const T& ),const std::vector<T>&);
 
   /**
   Apply a function f to each element in a vector
   */
   template<class T>
-  void applymap(void (*f)(T&), std::vector< T >&);
+  void applymap(void (*f)(T&), std::vector<T>&);
   #endif // SWIG
   
   /// Check if the vector is strictly increasing
@@ -355,14 +355,14 @@ namespace CasADi{
   
   #ifndef SWIG
   template<class T>
-  std::vector< T > applymap(T (*f)(const T&) ,const std::vector< T >& comp) {
-    std::vector< T > ret(comp.size());
+  std::vector<T> applymap(T (*f)(const T&) ,const std::vector<T>& comp) {
+    std::vector<T> ret(comp.size());
     std::transform(comp.begin(),comp.end(),ret.begin(),f);
     return ret;
   }
 
   template<class T>
-  void applymap(void (*f)(T &), std::vector< T >& comp) {
+  void applymap(void (*f)(T &), std::vector<T>& comp) {
     std::for_each(comp.begin(),comp.end(),f);
   }
   #endif //SWIG

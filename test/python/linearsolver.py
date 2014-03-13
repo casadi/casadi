@@ -43,10 +43,10 @@ try:
 except:
   pass
   
-#try:
-#  lsolvers.append((SymbolicQR,{}))
-#except:
-#  pass
+try:
+  lsolvers.append((SymbolicQR,{}))
+except:
+  pass
 
 nsolvers = []
   
@@ -280,7 +280,7 @@ class LinearSolverTests(casadiTestCase):
       #   result' = A'\b'             Ax = b
 
   def test_simple_fx_direct(self):
-    A_ = DMatrix([[3,7],[1,2]]).T
+    A_ = DMatrix([[3,1],[7,2]])
     A = MX.sym("A",A_.sparsity())
     b_ = DMatrix([1,0.5])
     b = MX.sym("b",b_.sparsity())

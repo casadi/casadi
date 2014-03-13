@@ -58,7 +58,7 @@ class ControlTests(casadiTestCase):
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           
           
-          solver = Solver([sp_dense(n,n) for i in range(K)],[sp_dense(n,n) for i in range(K)])
+          solver = Solver([Sparsity.dense(n,n) for i in range(K)],[Sparsity.dense(n,n) for i in range(K)])
           solver.setOption(options)
           solver.init()
           solver.setInput(horzcat(A_),DPLE_A)
@@ -122,7 +122,7 @@ class ControlTests(casadiTestCase):
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           
           
-          solver = Solver([sp_dense(n,n) for i in range(K)],[sp_dense(n,n) for i in range(K)])
+          solver = Solver([Sparsity.dense(n,n) for i in range(K)],[Sparsity.dense(n,n) for i in range(K)])
           solver.setOption(options)
           solver.init()
           solver.setInput(horzcat(A_),DPLE_A)
