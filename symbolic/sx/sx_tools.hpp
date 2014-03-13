@@ -228,13 +228,6 @@ namespace CasADi{
   */
   SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v, bool transpose_jacobian=false);
 
-  /** \brief  Obtain the values of a constant expression */
-  double getValue(const SX &ex, int i=0, int j=0);          // for constant expressions only
-  int getIntValue(const SX &ex, int i=0, int j=0);          // integer version
-  void getValue(const SX &ex, double *res); // for all constant expressions
-  void getIntValue(const SX &ex, int *res); // integer version
-  const std::string& getName(const SX &ex); // get the name (only for scalar variables)
-
   /** 
    * \brief univariate taylor series expansion
    *
@@ -339,6 +332,9 @@ namespace CasADi{
   inline bool isSmooth(const SX& ex){ return ex.isSmooth();}
   inline bool isSymbolic(const SX& ex){ return ex.isSymbolic();}
   inline bool isSymbolicSparse(const SX& ex){ return ex.isSymbolicSparse();}
+  inline double getValue(const SX& ex) { return ex.elem(0,0).getValue(); }
+  inline int getIntValue(const SX& ex) { return ex.elem(0,0).getIntValue(); }
+  inline std::string getName(const SX &ex){ return ex.toScalar().getName();}
   //@}
 #endif
 

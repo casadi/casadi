@@ -889,6 +889,16 @@ namespace CasADi{
     return true;
   }
 
+  template<>
+  double SX::getValue() const{
+    return toScalar().getValue();
+  }
+
+  template<>
+  std::string SX::getName() const{
+    return toScalar().getName();
+  }
+
 } // namespace CasADi
 
 using namespace CasADi;

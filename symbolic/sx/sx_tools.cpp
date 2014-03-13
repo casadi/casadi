@@ -420,31 +420,6 @@ namespace CasADi{
     return H;
   }
 
-  double getValue(const SX& ex, int i, int j) {
-    casadi_assert(i<ex.size2() && j<ex.size1());
-    return ex(j,i).toScalar().getValue();
-  }
-
-  int getIntValue(const SX& ex, int i, int j) {
-    casadi_assert(i<ex.size2() && j<ex.size1());
-    return ex(j,i).toScalar().getIntValue();
-  }
-
-  void getValue(const SX& ex, double *res) {
-    for(int i=0; i<ex.numel(); ++i)
-      res[i] = ex(0,i).toScalar()->getValue();
-  }
-
-  void getIntValue(const SX& ex, int *res) {
-    for(int i=0; i<ex.numel(); ++i)
-      res[i] = ex(0,i).toScalar().getIntValue();
-  }
-
-  const string& getName(const SX& ex) {
-    casadi_assert_message(ex.isScalar(),"the expression must be scalar");
-    return ex.at(0)->getName();
-  }
-
   void expand(const SX& ex2, SX &ww, SX& tt){
     casadi_assert(ex2.isScalar());
     SXElement ex = ex2.toScalar();

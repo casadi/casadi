@@ -2042,6 +2042,16 @@ namespace CasADi{
     return false;
   }
 
+  template<typename DataType>
+  double Matrix<DataType>::getValue() const{
+    return double(toScalar());
+  }
+
+  template<typename DataType>
+  std::string Matrix<DataType>::getName() const{
+    throw CasadiException("\"getName\" not defined for instantiation");
+  }
+
 } // namespace CasADi
 
 #endif // MATRIX_IMPL_HPP

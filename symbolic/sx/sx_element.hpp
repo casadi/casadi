@@ -355,6 +355,8 @@ namespace CasADi{
   template<> bool SX::isSmooth() const;
   template<> bool SX::isSymbolic() const;
   template<> bool SX::isSymbolicSparse() const;
+  template<> double SX::getValue() const;
+  template<> std::string SX::getName() const;
 } // namespace CasADi
 
 

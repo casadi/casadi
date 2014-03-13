@@ -243,16 +243,16 @@ namespace CasADi{
     Matrix<double> getMatrixValue() const;
   
     /// Check if symbolic
-    bool isSymbolic () const;
+    bool isSymbolic() const;
   
     /// Check if constant
-    bool isConstant () const;
+    bool isConstant() const;
   
     /// Check if evaluation
-    bool isEvaluation () const;
+    bool isEvaluation() const;
   
     /// Check if evaluation output
-    bool isEvaluationOutput () const;
+    bool isEvaluationOutput() const;
   
     /// Get the index of evaluation output - only valid when isEvaluationoutput() is true
     int getEvaluationOutput() const;
@@ -267,7 +267,7 @@ namespace CasADi{
     bool isCommutative() const;
     
     /// Check if norm
-    bool isNorm () const;
+    bool isNorm() const;
 
     /** \brief  check if all nonzeros are symbolic (this function is currently identical to isSymbolic) */
     bool isSymbolicSparse() const;
