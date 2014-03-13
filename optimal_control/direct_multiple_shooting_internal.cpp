@@ -129,12 +129,12 @@ void DirectMultipleShootingInternal::init(){
     paropt["parallelization"] = getOption("parallelization");
   
   // Evaluate function in parallel
-  vector<vector<MX> > pI_out = integrator_.call(int_in,paropt);
+  vector<vector<MX> > pI_out = integrator_.callParallel(int_in,paropt);
 
   // Evaluate path constraints in parallel
   vector<vector<MX> > pC_out;
   if(path_constraints)
-    pC_out = cfcn_.call(fcn_in,paropt);
+    pC_out = cfcn_.callParallel(fcn_in,paropt);
   
   //Constraint function
   vector<MX> gg(2*nk_);

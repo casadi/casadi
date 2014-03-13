@@ -225,6 +225,11 @@ namespace CasADi{
     /** \brief  Create a function call (MX graph) */
     std::vector<MX> call(const std::vector<MX> &arg);
 
+
+
+
+
+
     /** \brief  Create a function call with directional derivatives 
      * Note: return by reference with SWIG
      */
@@ -235,7 +240,7 @@ namespace CasADi{
     /** \brief  Evaluate symbolically in parallel (matrix graph)
         paropt: Set of options to be passed to the Parallelizer
     */
-    std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
+    std::vector<std::vector<MX> > callParallel(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
 
     /// evaluate symbolically, SX type (overloaded)
     std::vector<SX> eval(const std::vector<SX>& arg);
@@ -387,6 +392,10 @@ namespace CasADi{
 #endif //SWIG 
     FX indexed_one_based(int k) const{ return operator[](k-1);}
     FX indexed_zero_based(int k) const{ return operator[](k);}
+    std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary()){
+      return callParallel(arg,paropt);
+    }
+
     //@}
 #endif
 

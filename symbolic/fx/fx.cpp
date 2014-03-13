@@ -70,11 +70,11 @@ namespace CasADi{
     (*this)->call(arg,res,fseed,fsens,aseed,asens,false,true);
   }
 
-  vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& paropt){
+  vector<vector<MX> > FX::callParallel(const vector<vector<MX> > &x, const Dictionary& paropt){
     assertInit();
   
     // Make sure not empty
-    casadi_assert_message(x.size()>1,"FX: call(vector<vector<MX> >): argument must be of length > 1. You supplied length " << x.size() << ".");
+    casadi_assert_message(x.size()>1,"FX: callParallel(vector<vector<MX> >): argument must be of length > 1. You supplied length " << x.size() << ".");
   
     // Return object
     vector<vector<MX> > ret(x.size());
