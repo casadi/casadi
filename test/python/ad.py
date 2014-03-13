@@ -157,7 +157,7 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
             aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
-            res,fwdsens,adjsens = f.evalSX([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds))
+            res,fwdsens,adjsens = f.callDerivative([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
@@ -250,7 +250,7 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
             aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
-            res,fwdsens,adjsens = f.evalSX([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds))
+            res,fwdsens,adjsens = f.callDerivative([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
@@ -292,7 +292,7 @@ class ADtests(casadiTestCase):
             y = SX.sym("y",f.input().sparsity())
             
       
-            res,fwdsens,adjsens = f.evalSX([y],[],[])
+            res,fwdsens,adjsens = f.callDerivative([y],[],[])
             
             fe = SXFunction([y],res)
             fe.init()

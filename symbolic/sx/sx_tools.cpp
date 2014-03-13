@@ -840,7 +840,7 @@ namespace CasADi{
     }
   
     // Evaluate with directional derivatives, output is the same as the funciton inputs
-    f.evalSX(argv,resv,fseed,fsens,aseed,asens);
+    f.callDerivative(argv,resv,fseed,fsens,aseed,asens);
   
     // Get the results
     vector<SX> dirder(v2);

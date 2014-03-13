@@ -262,13 +262,6 @@ namespace CasADi{
     (*this)->evalMX(arg,res,dummy,dummy,dummy,dummy);
     return res;
   }
-
-  void FX::evalSX(const std::vector<SX>& arg, std::vector<SX>& res, 
-                  const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
-                  const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens){
-    casadi_assert_message(arg.size()==getNumInputs(),"FX::evalSX: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
-    (*this)->evalSX(arg,res,fseed,fsens,aseed,asens);
-  }
                         
   void FX::eval(const std::vector<SX>& arg, std::vector<SX>& res, 
                 const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
@@ -355,6 +348,7 @@ namespace CasADi{
                           const SXVectorVector& fseed, SXVectorVector& fsens, 
                           const SXVectorVector& aseed, SXVectorVector& asens,
                           bool always_inline, bool never_inline){
+    casadi_assert_message(arg.size()==getNumInputs(),"FX::callDerivative: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
   }
 
@@ -362,7 +356,7 @@ namespace CasADi{
                           const MXVectorVector& fseed, MXVectorVector& fsens, 
                           const MXVectorVector& aseed, MXVectorVector& asens,
                           bool always_inline, bool never_inline){
-    casadi_assert_message(arg.size()==getNumInputs(),"FX::call: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
+    casadi_assert_message(arg.size()==getNumInputs(),"FX::callDerivative: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
     (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
   }
 
