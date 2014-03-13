@@ -85,10 +85,14 @@ namespace CasADi{
     if(val.isScalar()){
       // Dense matrix if val dense
       if(val.isDense()){
-        *this = val->getGetNonzeros(sp,std::vector<int>(sp.size(),0));
+        if(val.isConstant()){
+          assignNode(ConstantMX::create(sp,val.getValue()));
+        } else {
+          *this = val->getGetNonzeros(sp,std::vector<int>(sp.size(),0));
+        }
       } else {
         // Empty matrix
-        *this = sparse(sp.size1(),sp.size2());
+        assignNode(ConstantMX::create(Sparsity::sparse(sp.shape()),0));
       }
     } else {
       casadi_assert(val.isVector() && sp.size()==val.size1());
