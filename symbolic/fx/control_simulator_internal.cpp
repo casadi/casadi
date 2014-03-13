@@ -299,12 +299,12 @@ namespace CasADi{
     setNumInputs(CONTROLSIMULATOR_NUM_IN);
     input(CONTROLSIMULATOR_X0)  = DMatrix(dae_.input(DAE_X));
     input(CONTROLSIMULATOR_P)   = control_dae_.input(CONTROL_DAE_P);
-    input(CONTROLSIMULATOR_U)   = DMatrix(ns_ - 1 + (control_endpoint ? 1 : 0) ,nu_,0);
+    input(CONTROLSIMULATOR_U)   = DMatrix::zeros(ns_-1+(control_endpoint?1:0),nu_);
 
     // Allocate outputs
     setNumOutputs(output_fcn_.getNumOutputs()-2);
     for(int i=0; i<getNumOutputs(); ++i)
-      output(i) = Matrix<double>((ns_-1)*nf_+1,output_fcn_.output(i+2).numel(),0);
+      output(i) = Matrix<double>::zeros((ns_-1)*nf_+1,output_fcn_.output(i+2).numel());
 
     // Call base class method
     FXInternal::init();
@@ -398,7 +398,7 @@ namespace CasADi{
   }
 
   Matrix<double> ControlSimulatorInternal::getVFine() const {
-    Matrix<double> ret(grid_.size()-1,nu_,0);
+    Matrix<double> ret = Matrix<double>::zeros(grid_.size()-1,nu_);
     for (int i=0;i<ns_-1;++i) {
       for (int k=0;k<nf_;++k) {
         copy(input(CONTROLSIMULATOR_U).data().begin()+i*nu_,input(CONTROLSIMULATOR_U).data().begin()+(i+1)*nu_,ret.begin()+i*nu_*nf_+k*nu_);

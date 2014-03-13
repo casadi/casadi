@@ -118,7 +118,7 @@ namespace CasADi{
     
     //@{
     /// Sparse matrix with a given sparsity
-    explicit Matrix(const Sparsity& sparsity, const DataType& val=0);
+    explicit Matrix(const Sparsity& sparsity, const DataType& val=DataType(0));
     //@}
     
     /// Sparse matrix with a given sparsity and non-zero elements.

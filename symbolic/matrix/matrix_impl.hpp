@@ -1795,7 +1795,7 @@ namespace CasADi{
   Matrix<DataType> Matrix<DataType>::repmat(const Matrix<DataType>& x, int nrow, int ncol){
     if(x.isScalar()){
       if(x.isDense()){
-        return Matrix<DataType>(nrow,ncol,x.toScalar());
+        return Matrix<DataType>(Sparsity::dense(nrow,ncol),x.toScalar());
       } else {
         return sparse(nrow,ncol);
       }

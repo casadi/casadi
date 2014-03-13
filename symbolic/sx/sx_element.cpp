@@ -326,21 +326,21 @@ namespace CasADi{
     }
   }
 
-  Matrix<SXElement> SXElement::fmin(const Matrix<SXElement>& b) const { 
-    return Matrix<SXElement>(*this).fmin(b);
+  SX SXElement::fmin(const SX& b) const { 
+    return SX(*this).fmin(b);
   }
-  Matrix<SXElement> SXElement::fmax(const Matrix<SXElement>& b) const {
-    return Matrix<SXElement>(*this).fmax(b);
+  SX SXElement::fmax(const SX& b) const {
+    return SX(*this).fmax(b);
   }
-  Matrix<SXElement> SXElement::constpow(const Matrix<SXElement>& n) const {
-    return Matrix<SXElement>(*this).__constpow__(n);
+  SX SXElement::constpow(const SX& n) const {
+    return SX(*this).__constpow__(n);
   }
-  Matrix<SXElement> SXElement::__copysign__(const Matrix<SXElement>& n) const {
-    return Matrix<SXElement>(*this).__copysign__(n);
+  SX SXElement::__copysign__(const SX& n) const {
+    return SX(*this).__copysign__(n);
   }
 
-  Matrix<SXElement> SXElement::arctan2(const Matrix<SXElement>& b) const { 
-    return Matrix<SXElement>(*this).arctan2(b);
+  SX SXElement::arctan2(const SX& b) const { 
+    return SX(*this).arctan2(b);
   }
 
   SXElement SXElement::__le__(const SXElement& y) const{
@@ -672,8 +672,8 @@ namespace CasADi{
       return UnarySX::create(OP_FABS,*this);
   }
 
-  SXElement::operator Matrix<SXElement>() const{
-    return Matrix<SXElement>(1,1,*this);
+  SXElement::operator SX() const{
+    return SX(Sparsity::scalar(),*this);
   }
 
   SXElement SXElement::fmin(const SXElement &b) const{

@@ -61,13 +61,13 @@ void DirectCollocationInternal::init(){
   vector<vector<MX> > C(deg_+1,vector<MX>(deg_+1));
 
   // Coefficients of the collocation equation as DMatrix
-  DMatrix C_num = DMatrix(deg_+1,deg_+1,0);
+  DMatrix C_num = DMatrix::zeros(deg_+1,deg_+1);
 
   // Coefficients of the continuity equation
   vector<MX> D(deg_+1);
 
   // Coefficients of the collocation equation as DMatrix
-  DMatrix D_num = DMatrix(deg_+1,1,0);
+  DMatrix D_num = DMatrix::zeros(deg_+1);
 
   // Collocation point
   SX tau = SX::sym("tau");

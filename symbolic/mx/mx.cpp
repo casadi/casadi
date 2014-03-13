@@ -530,7 +530,7 @@ namespace CasADi{
 
   MX MX::repmat(const MX& x, int nrow, int ncol){
     if(x.isScalar()){
-      return MX(nrow,ncol,x);
+      return MX(Sparsity::dense(nrow,ncol),x);
     } else {
       casadi_assert_message(0,"not implemented");
       return MX();
