@@ -1347,7 +1347,7 @@ class NLPtests(casadiTestCase):
     solver.setOption("_verify_level",3)
     #solver.setOption("_optimality_tolerance",1e-8)
     #solver.setOption("_feasibility_tolerance",1e-8)
-    solver.setOption("_iteration_limit",1000)
+    #solver.setOption("_iteration_limit",1000)
 
     solver.init()
     solver.setInput([1,1],"x0")
