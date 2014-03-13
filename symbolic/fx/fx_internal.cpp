@@ -1827,13 +1827,20 @@ namespace CasADi{
     }
   }
 
-  void FXInternal::call(const std::vector<SX>& arg, std::vector<SX>& res, 
-                        const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
-                        const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens,
+  void FXInternal::call(const SXVector& arg, SXVector& res, 
+                        const SXVectorVector& fseed, SXVectorVector& fsens, 
+                        const SXVectorVector& aseed, SXVectorVector& asens,
                         bool always_inline, bool never_inline){
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
     casadi_assert_message(!never_inline, "SX expressions do not support call-nodes");
     evalSX(arg,res,fseed,fsens,aseed,asens);
+  }
+
+  void FXInternal::call(const DMatrixVector& arg, DMatrixVector& res, 
+                        const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens, 
+                        const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
+                        bool always_inline, bool never_inline){
+    casadi_error("Not implemented");
   }
 
   FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric){

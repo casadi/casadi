@@ -225,10 +225,42 @@ namespace CasADi{
     /** \brief  Create a function call (MX graph) */
     std::vector<MX> call(const std::vector<MX> &arg);
 
+   /** \brief Evaluate symbolically with with directional derivatives, DMatrix type
+     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
+     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
+     * the length of the vector being the number of forward directions.
+     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
+     * the length of the vector being the number of adjoint directions.
+     */
+    void callDerivative(const DMatrixVector& arg, DMatrixVector& SWIG_OUTPUT(res), 
+                        const DMatrixVectorVector& fseed, DMatrixVectorVector& SWIG_OUTPUT(fsens), 
+                        const DMatrixVectorVector& aseed, DMatrixVectorVector& SWIG_OUTPUT(asens),
+                        bool always_inline=false, bool never_inline=false);
 
+    /** \brief Evaluate symbolically with with directional derivatives, SX type
+     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
+     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
+     * the length of the vector being the number of forward directions.
+     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
+     * the length of the vector being the number of adjoint directions.
+     */
+    void callDerivative(const SXVector& arg, SXVector& SWIG_OUTPUT(res), 
+                        const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens), 
+                        const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens),
+                        bool always_inline=false, bool never_inline=false);
 
-
-
+    /** \brief Evaluate symbolically with with directional derivatives, MX type
+     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
+     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
+     * the length of the vector being the number of forward directions.
+     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
+     * the length of the vector being the number of adjoint directions.
+     */
+    void callDerivative(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
+                        const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
+                        const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens),
+                        bool always_inline=false, bool never_inline=false);
+    
 
     /** \brief  Create a function call with directional derivatives 
      * Note: return by reference with SWIG
@@ -248,7 +280,7 @@ namespace CasADi{
     /// evaluate symbolically, MX type (overloaded)
     std::vector<MX> eval(const std::vector<MX>& arg);
     
-    /** \brief Evaluate symbolically with with directional derivatives, SXElement type
+    /** \brief Evaluate symbolically with with directional derivatives, SX type
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
      * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
      * the length of the vector being the number of forward directions.

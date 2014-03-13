@@ -357,5 +357,26 @@ namespace CasADi{
     return (*this)->checkInputs();
   }
 
+  void FX::callDerivative(const DMatrixVector& arg, DMatrixVector& res, 
+                          const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens, 
+                          const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
+                          bool always_inline, bool never_inline){
+    (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
+  }
+  
+  void FX::callDerivative(const SXVector& arg, SXVector& res, 
+                          const SXVectorVector& fseed, SXVectorVector& fsens, 
+                          const SXVectorVector& aseed, SXVectorVector& asens,
+                          bool always_inline, bool never_inline){
+    (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
+  }
+
+  void FX::callDerivative(const MXVector& arg, MXVector& res, 
+                          const MXVectorVector& fseed, MXVectorVector& fsens, 
+                          const MXVectorVector& aseed, MXVectorVector& asens,
+                          bool always_inline, bool never_inline){
+    (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
+  }
+
 } // namespace CasADi
 

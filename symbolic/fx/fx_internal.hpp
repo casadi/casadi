@@ -105,6 +105,12 @@ namespace CasADi{
 
     /** \brief  Create a call to this */
     std::vector<MX> callSelf(const std::vector<MX> &arg);
+
+    /** \brief Call a function, DMatrix type (overloaded) */
+    void call(const DMatrixVector& arg, DMatrixVector& res, 
+              const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens, 
+              const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
+              bool always_inline, bool never_inline);
     
     /** \brief Call a function, MX type (overloaded) */
     void call(const MXVector& arg, MXVector& res, 
@@ -113,9 +119,9 @@ namespace CasADi{
               bool always_inline, bool never_inline);
     
     /** \brief Call a function, SX type (overloaded) */
-    void call(const std::vector<SX>& arg, std::vector<SX>& res, 
-              const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
-              const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens,
+    void call(const SXVector& arg, SXVector& res, 
+              const SXVectorVector& fseed, SXVectorVector& fsens, 
+              const SXVectorVector& aseed, SXVectorVector& asens,
               bool always_inline, bool never_inline);
         
     //@{
