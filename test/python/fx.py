@@ -191,9 +191,9 @@ class FXtests(casadiTestCase):
 
     f = SXFunction([x],[x])
     f.init()
-    A = DMatrix(1,1)
+    A = DMatrix.sparse(1,1)
     #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
-    B = DMatrix(1,2,2)
+    B = DMatrix.repmat(2,1,2)
     #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
     
   def test_issue304(self):
@@ -261,8 +261,8 @@ class FXtests(casadiTestCase):
       self.checkarray(sp.colind(),sp2.colind());   
 
     for i in range(5):
-      test(sp_tril(i))
-      test(sp_tril(i).T)
+      test(Sparsity.tril(i))
+      test(Sparsity.tril(i).T)
       test(Sparsity.dense(i,i))
       test(Sparsity.diag(i))
     
@@ -270,10 +270,10 @@ class FXtests(casadiTestCase):
       d = Sparsity.diag(i)
       test(d)
       
-      test(d + sp_rowcol([0],[5],i,i))
+      test(d + Sparsity.rowcol([0],[5],i,i))
       
-      b = sp_band(i,-1) + sp_band(i,1)
-      test(b + sp_rowcol([0],[5],i,i))
+      b = Sparsity.band(i,-1) + Sparsity.band(i,1)
+      test(b + Sparsity.rowcol([0],[5],i,i))
       
     m = IMatrix(Sparsity.diag(129),1)
     m[:50,0] = 1
@@ -307,8 +307,8 @@ class FXtests(casadiTestCase):
     test(sp.T)
     
     for i in [63,64,65,127,128,129]:
-      test(sp_tril(i))
-      test(sp_tril(i).T)
+      test(Sparsity.tril(i))
+      test(Sparsity.tril(i).T)
     
     for n in [63,64,65,127,128,129]:
       for m in [63,64,65,127,128,129]:
@@ -330,7 +330,7 @@ class FXtests(casadiTestCase):
         
         test(sp_holes)
         
-        z = IMatrix(sp_holes.shape[0],sp_holes.shape[1])
+        z = IMatrix.sparse(sp_holes.shape)
         
         R = 5
         v = []
@@ -390,11 +390,11 @@ class FXtests(casadiTestCase):
       d = Sparsity.diag(i)
       test(d)
       
-      test(d + sp_rowcol([0],[5],i,i) + sp_rowcol([5],[0],i,i))
+      test(d + Sparsity.rowcol([0],[5],i,i) + Sparsity.rowcol([5],[0],i,i))
       
-      b = sp_band(i,-1) + sp_band(i,1)
+      b = Sparsity.band(i,-1) + Sparsity.band(i,1)
       test(b)
-      test(b + sp_rowcol([0],[5],i,i) + sp_rowcol([5],[0],i,i))
+      test(b + Sparsity.rowcol([0],[5],i,i) + Sparsity.rowcol([5],[0],i,i))
       
       d = Sparsity.dense(i,i)
       test(d)
@@ -419,7 +419,7 @@ class FXtests(casadiTestCase):
       
       test(sp_holes)
       
-      z = IMatrix(sp_holes.shape[0],sp_holes.shape[1])
+      z = IMatrix.sparse(sp_holes.shape)
       
       R = 5
       v = []
@@ -1115,7 +1115,7 @@ class FXtests(casadiTestCase):
     def dummy_jac(f):
       f.setOutput(1,1)
 
-    foo_jac = CustomFunction(dummy_jac, [x.sparsity()], [sp_sparse(1,1),Sparsity.dense(1,1)] )
+    foo_jac = CustomFunction(dummy_jac, [x.sparsity()], [Sparsity.sparse(1,1),Sparsity.dense(1,1)] )
     foo_jac.setOption("name","foo_jac")
     foo_jac.init()
     foo.setFullJacobian(foo_jac)

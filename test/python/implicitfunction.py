@@ -111,7 +111,7 @@ class NLPtests(casadiTestCase):
       
       message = Solver.__name__
       N = 5
-      s = sp_tril(N)
+      s = Sparsity.tril(N)
       x=SX.sym("x",s)
 
       y=SX.sym("y",s)

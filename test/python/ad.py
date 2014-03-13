@@ -35,13 +35,13 @@ class ADtests(casadiTestCase):
     z=SXElement.sym("z")
     w=SXElement.sym("w")
     
-    out=SX(6,1)
+    out=SX.sparse(6,1)
     out[0,0]=x
     out[2,0]=x+2*y**2
     out[4,0]=x+2*y**3+3*z**4
     out[5,0]=w
 
-    inp=SX(6,1)
+    inp=SX.sparse(6,1)
     inp[0,0]=x
     inp[2,0]=y
     inp[4,0]=z
@@ -79,7 +79,7 @@ class ADtests(casadiTestCase):
     }
     
     def temp1(xyz):
-      X=MX(6,1)
+      X=MX.sparse(6,1)
       X[0,0]=xyz[0]
       X[2,0]=xyz[0]+2*xyz[1]**2
       X[4,0]=xyz[0]+2*xyz[1]**3+3*xyz[2]**4
@@ -87,7 +87,7 @@ class ADtests(casadiTestCase):
       return [X]
     
     def temp2(xyz):
-      X=MX(1,6)
+      X=MX.sparse(1,6)
       X[0,0]=xyz[0]
       X[0,2]=xyz[0]+2*xyz[1]**2
       X[0,4]=xyz[0]+2*xyz[1]**3+3*xyz[2]**4
@@ -422,7 +422,7 @@ class ADtests(casadiTestCase):
     x=SX.sym("x")
     y=SX.sym("y")
 
-    inp=SX(5,1)
+    inp=SX.sparse(5,1)
     inp[0,0]=x
     inp[3,0]=y
 
@@ -443,7 +443,7 @@ class ADtests(casadiTestCase):
     x=SXElement.sym("x")
     y=SXElement.sym("y")
 
-    inp=SX(5,1)
+    inp=SX.sparse(5,1)
     inp[0,0]=x
     inp[3,0]=y
 

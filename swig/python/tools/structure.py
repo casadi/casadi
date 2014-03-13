@@ -703,7 +703,7 @@ class CasadiStructure(Structure,CasadiStructureDerivable):
     k = 0 # Global index counter
     for i in self.traverseCanonicalIndex():
       e = self.getStructEntryByCanonicalIndex(i)
-      sp = sp_dense(1,1) if e.sparsity is None else e.sparsity
+      sp = Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
       m = IMatrix(sp,range(k,k+sp.size()))
       k += sp.size()
       it = tuple(i)
@@ -830,7 +830,7 @@ class CasadiStructured(Structured,CasadiStructureDerivable):
     return (self.size,1)
 
   def sparsity(self):
-    return sp_dense(self.size,1)
+    return Sparsity.dense(self.size,1)
     
   def getCanonicalIndex(self,*args,**kwargs):
     return self.struct.lookup(*args,**kwargs)
@@ -881,9 +881,9 @@ class msymStruct(CasadiStructured,MasterGettable):
       e = self.struct.getStructEntryByCanonicalIndex(i)
       sp = None
       if e.isPrimitive():
-        sp = sp_dense(1,1) if e.sparsity is None else e.sparsity
+        sp = Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
       else:
-        sp = sp_dense(e.struct.size,1)
+        sp = Sparsity.dense(e.struct.size,1)
       ks.append(k)
       it = tuple(i)
       its.append(it)
@@ -1086,18 +1086,18 @@ class CasadiStructEntry(StructEntry):
     if 'shape' in kwargs:
       shape = kwargs["shape"]
       if isInteger(shape) :
-        self.sparsity = sp_dense(shape,1)
+        self.sparsity = Sparsity.dense(shape,1)
       elif isinstance(shape,list) or isinstance(shape,tuple):
         if len(shape)==0 or len(shape)>2:
           raise Exception("The 'shape' argument, if present, must be an integer, a tuple of 1 or 2 integers, a sparsity pattern.")
         else:
-          self.sparsity = sp_dense(*shape)
+          self.sparsity = Sparsity.dense(*shape)
       elif isinstance(shape,Sparsity):
         self.sparsity = shape
       else:
         raise Exception("The 'shape' argument, if present, must be an integer, a tuple of 1 or 2 integers, or a sparsity pattern. Got %s " % str(shape))
     else:
-      self.sparsity = sp_dense(1,1)
+      self.sparsity = Sparsity.dense(1,1)
     
     self.shapestruct = None
     #     shapestruct  argument
@@ -1113,13 +1113,13 @@ class CasadiStructEntry(StructEntry):
         raise Exception("The 'shapestruct' argument, if present, must be a structure or a tuple of at most structures")
       
       if 'shape' not in kwargs:
-        self.sparsity = sp_dense(*[e if isInteger(e) else e.size for e in self.shapestruct])
+        self.sparsity = Sparsity.dense(*[e if isInteger(e) else e.size for e in self.shapestruct])
         
     #     sym    argument
     self.sym = None
     if 'sym' in kwargs:
       sym = kwargs["sym"]
-      if isinstance(sym,SX) and isSymbolicSparse(sym):
+      if isinstance(sym,SX) and sym.isSymbolicSparse():
         self.sym = sym
       elif isinstance(sym,Structured): 
         self.struct = sym.struct
@@ -1163,7 +1163,7 @@ class CasadiStructEntry(StructEntry):
         if self.sparsity.size1() != self.sparsity.size2():
           raise Exception("You supplied a type 'symm', but matrix is not square. Got " % self.sparsity.dimString() + ".")
         self.originalsparsity = self.sparsity
-        self.sparsity = self.sparsity*sp_triu(self.sparsity.size1())
+        self.sparsity = self.sparsity*Sparsity.triu(self.sparsity.size1())
         
          
       
@@ -1242,7 +1242,7 @@ class DelegaterConstructor:
     
     Example usage:
       s = struct_symSX([])
-      x = struct_symSX(entry("x",sp_diag(4)))
+      x = struct_symSX(entry("x",Sparsity.diag(4)))
       x["x",0,index[:]]
     
   """

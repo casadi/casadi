@@ -392,7 +392,7 @@ class Variables(object):
         elif hasattr(obj,'sparsity'):
             return obj.sparsity()
         else:
-            return sp_dense(1,1)
+            return Sparsity.dense(1,1)
         
     def veccat(self):
         """

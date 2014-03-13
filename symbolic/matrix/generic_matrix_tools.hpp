@@ -32,7 +32,6 @@
 
 namespace CasADi{
 
-
   /** \brief Matlab's linspace command
    */
   template<typename MatType>
@@ -52,6 +51,12 @@ namespace CasADi{
    */
   template<typename MatType>
   MatType triu2symm(const GenericMatrix<MatType> &a);
+
+  /** \brief Check if two expressions are equal, assuming that they are comparible */
+  template<typename MatType>
+  bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y){ 
+    return static_cast<const MatType&>(x).isEqual(static_cast<const MatType&>(y));
+  }
 
 #ifndef SWIG
   template<typename MatType>
@@ -134,7 +139,8 @@ namespace CasADi{
 #define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType) \
 GMTT_INST(MatType,cross) \
 GMTT_INST(MatType,tril2symm) \
-GMTT_INST(MatType,triu2symm)
+GMTT_INST(MatType,triu2symm) \
+GMTT_INST(MatType,isEqual)
 
 // Define template instanciations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(MatType) \

@@ -200,7 +200,7 @@ class LinearSolverTests(casadiTestCase):
       
       self.checkarray(mul(A_,f.output()),DMatrix.eye(4))
       
-      trans(solve(mul(A,trans(A)),A,Solver,options))
+      solve(mul(A,A.T),A,Solver,options)
       pinv(A_,Solver,options)
       
       #self.checkarray(mul(A_,pinv(A_,Solver,options)),DMatrix.eye(4))
@@ -474,7 +474,7 @@ class LinearSolverTests(casadiTestCase):
     numpy.random.seed(0)
     n = 10
     L = self.randDMatrix(n,n,sparsity=0.2) +  1.5*c.diag(range(1,n+1))
-    L = L[sp_tril(n)]
+    L = L[Sparsity.tril(n)]
     M = mul(L,L.T)
     b = self.randDMatrix(n,1)
     

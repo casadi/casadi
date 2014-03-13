@@ -38,7 +38,7 @@ class QCQPSolverTests(casadiTestCase):
   def testboundsviol(self):
     H = 1e-6*DMatrix([[1,0],[0,1]])
     G = DMatrix([2,1])
-    A = DMatrix(0,2)
+    A = DMatrix.sparse(0,2)
     P = 2*DMatrix([[1,0],[0,2]])
     Q = DMatrix([2,3])
     R = DMatrix([-7])
@@ -69,7 +69,7 @@ class QCQPSolverTests(casadiTestCase):
     #  s.t.  x^2 + 2y^2 + 2*x + 3*y - 7 <= 0
     H = 1e-6*DMatrix([[1,0],[0,1]])
     G = DMatrix([2,1])
-    A = DMatrix(0,2)
+    A = DMatrix.sparse(0,2)
     P = 2*DMatrix([[1,0],[0,2]])
     Q = DMatrix([2,3])
     R = DMatrix([-7])
@@ -109,10 +109,10 @@ class QCQPSolverTests(casadiTestCase):
     #
     H = DMatrix([[1,0],[0,1]])
     G = DMatrix([2,1])
-    A = DMatrix(0,2)
-    P = DMatrix(2,0)
-    Q = DMatrix(0,1)
-    R = DMatrix(0,1)
+    A = DMatrix.sparse(0,2)
+    P = DMatrix.sparse(2,0)
+    Q = DMatrix.sparse(0,1)
+    R = DMatrix.sparse(0,1)
     LBX = DMatrix([ -inf, -inf ])
     UBX = DMatrix([ inf, inf ])
     

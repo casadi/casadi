@@ -398,7 +398,6 @@ namespace CasADi{
   template<typename DataType> bool isOne(const Matrix<DataType>& ex){ return ex.isOne();}
   template<typename DataType> bool isMinusOne(const Matrix<DataType>& ex){ return ex.isMinusOne();}
   template<typename DataType> bool isIdentity(const Matrix<DataType>& ex){ return ex.isIdentity();}
-  template<typename DataType> bool isEqual(const Matrix<DataType>& ex1,const Matrix<DataType> &ex2){ return ex1.isEqual(ex2);}
   template<typename DataType> int nnz(const Matrix<DataType>& ex) { return ex.size();}
   template<typename DataType> bool hasNonStructuralZeros(const Matrix<DataType>& A){ return A.hasNonStructuralZeros();}
   template<typename DataType>  Matrix<DataType> trans(const Matrix<DataType> &x){ return transpose(x);}
@@ -1224,7 +1223,6 @@ namespace CasADi{
   MTT_INST(DataType,isOne)                             \
   MTT_INST(DataType,isMinusOne)                        \
   MTT_INST(DataType,isIdentity)                        \
-  MTT_INST(DataType,isEqual)                           \
   MTT_INST(DataType,nnz)                               
 #else
 #define MATRIX_TOOLS_TEMPLATES_PRE_1_9_X(DataType)

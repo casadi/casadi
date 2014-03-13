@@ -86,6 +86,7 @@ namespace CasADi{
 
   Sparsity::Sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row){
     assignCached(nrow, ncol, colind, row);
+    sanityCheck(true);
   }
 
   void Sparsity::reCache(){
