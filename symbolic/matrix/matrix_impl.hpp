@@ -475,6 +475,7 @@ namespace CasADi{
     return *this;
   }
 
+#ifndef WITHOUT_PRE_1_9_X
   template<typename DataType>
   Matrix<DataType>::Matrix(int nrow, int ncol) : sparsity_(Sparsity::sparse(nrow,ncol)){
   }
@@ -482,6 +483,14 @@ namespace CasADi{
   template<typename DataType>
   Matrix<DataType>::Matrix(int nrow, int ncol, const DataType& val) : sparsity_(Sparsity::dense(nrow,ncol)), data_(std::vector<DataType>(nrow*ncol, val)){
   }
+
+  template<typename DataType>
+  Matrix<DataType>::Matrix(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row, const std::vector<DataType>& d) : sparsity_(Sparsity(nrow,ncol,colind,row)), data_(d){
+    if(data_.size() != sparsity_.size())
+      data_.resize(sparsity_.size()); // Why not throw an error?
+    sanityCheck(true);
+  }
+#endif
 
   template<typename DataType>
   std::string Matrix<DataType>::className(){ return matrixName<DataType>(); }
@@ -700,13 +709,6 @@ namespace CasADi{
   }
 
   template<typename DataType>
-  Matrix<DataType>::Matrix(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row, const std::vector<DataType>& d) : sparsity_(Sparsity(nrow,ncol,colind,row)), data_(d){
-    if(data_.size() != sparsity_.size())
-      data_.resize(sparsity_.size()); // Why not throw an error?
-    sanityCheck(true);
-  }
-
-  template<typename DataType>
   Matrix<DataType>::Matrix(const std::vector< std::vector<DataType> >& d){
     // Get dimensions
     int nrow=d.size();
@@ -733,7 +735,7 @@ namespace CasADi{
   }
 
   template<typename DataType>
-  Matrix<DataType>::Matrix(const Sparsity& sparsity, const DataType& val) : sparsity_(sparsity), data_(std::vector<DataType>(sparsity.size(),val)){
+  Matrix<DataType>::Matrix(const Sparsity& sparsity, const DataType& val) : sparsity_(sparsity), data_(sparsity.size(),val){
   }
 
   template<typename DataType>

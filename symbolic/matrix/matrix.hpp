@@ -103,14 +103,15 @@ namespace CasADi{
     Matrix<DataType>& operator=(const Matrix<DataType>& m);
 #endif // SWIG
     
-    /// Empty n-by-m matrix constructor
+#ifndef WITHOUT_PRE_1_9_X
+/** \brief [DEPRECATED]
+*/
+//@{
     Matrix(int nrow, int ncol);
-    
-    /// Dense n-by-m matrix filled with val constructor
     Matrix(int nrow, int ncol, const DataType& val);
-
-    /// Sparse n-by-m matrix filled with given sparsity
     Matrix(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row, const std::vector<DataType>& d=std::vector<DataType>());
+//@}
+#endif
 
     /// Dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<DataType> >& m);
