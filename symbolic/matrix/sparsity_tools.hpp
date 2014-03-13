@@ -46,8 +46,8 @@ namespace CasADi{
   inline Sparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool invert_mapping=false){ return Sparsity::triplet(nrow,ncol,row,col,mapping,invert_mapping);}
   inline Sparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col){ return Sparsity::triplet(nrow,ncol,row,col);}
   inline Sparsity trans(const Sparsity& a){ return a.transpose();}
-  inline Sparsity upperSparsity(const Sparsity& a, bool includeDiagonal = true){ return a.upper(includeDiagonal); }
-  inline Sparsity lowerSparsity(const Sparsity& a, bool includeDiagonal = true){ return a.lower(includeDiagonal); }
+  inline Sparsity upperSparsity(const Sparsity& a, bool includeDiagonal = true){ return a.getTriu(includeDiagonal); }
+  inline Sparsity lowerSparsity(const Sparsity& a, bool includeDiagonal = true){ return a.getTril(includeDiagonal); }
   inline std::vector<int> upperNZ(const Sparsity& a) { return a.getUpperNZ(); }
   inline std::vector<int> lowerNZ(const Sparsity& a) { return a.getLowerNZ(); }
   inline bool isSingular(const Sparsity& a){ return a.isSingular();}
@@ -104,7 +104,11 @@ namespace CasADi{
   /// Obtain the structural rank of a sparsity-pattern
   int rank(const Sparsity& a);
   
+  /// Get upper triangular part
+  inline Sparsity triu(const Sparsity& sp, bool includeDiagonal=true){ return sp.getTriu(includeDiagonal);}
 
+  /// Get lower triangular part
+  inline Sparsity tril(const Sparsity& sp, bool includeDiagonal=true){ return sp.getTril(includeDiagonal);}
 }
 
 #endif // SPARSITY_TOOLS_HPP

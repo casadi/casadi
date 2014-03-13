@@ -715,12 +715,12 @@ namespace CasADi{
     getCache().clear();
   }
 
-  Sparsity Sparsity::lower(bool includeDiagonal) const{
-    return (*this)->lower(includeDiagonal);
+  Sparsity Sparsity::getTril(bool includeDiagonal) const{
+    return (*this)->getTril(includeDiagonal);
   }
 
-  Sparsity Sparsity::upper(bool includeDiagonal) const{
-    return (*this)->upper(includeDiagonal);
+  Sparsity Sparsity::getTriu(bool includeDiagonal) const{
+    return (*this)->getTriu(includeDiagonal);
   }
 
   std::vector<int> Sparsity::getLowerNZ() const{

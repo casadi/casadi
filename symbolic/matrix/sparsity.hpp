@@ -457,20 +457,20 @@ namespace CasADi{
     /// Is symmetric?
     bool isSymmetric() const;
 
-    /// Is lower triangular?
-    bool isTril() const;
-
     /// Is upper triangular?
     bool isTriu() const;
+
+    /// Is lower triangular?
+    bool isTril() const;
 
     /// Check whether the sparsity-pattern inidcates structural singularity
     bool isSingular() const;
 
-    /// Get lower triangular part
-    Sparsity lower(bool includeDiagonal=true) const;
+    /// Get upper triangular part
+    Sparsity getTriu(bool includeDiagonal=true) const;
 
     /// Get lower triangular part
-    Sparsity upper(bool includeDiagonal=true) const;
+    Sparsity getTril(bool includeDiagonal=true) const;
 
     /// Do the rows appear sequentially on each column (if strictly==true, then do not allow multiple entries)
     bool rowsSequential(bool strictly=true) const;

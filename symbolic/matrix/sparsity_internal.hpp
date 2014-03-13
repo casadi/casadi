@@ -184,11 +184,11 @@ namespace CasADi{
     /// is upper triangular?
     bool isTriu() const;
 
-    /// Get lower triangular part
-    Sparsity lower(bool includeDiagonal) const;
+    /// Get upper triangular part
+    Sparsity getTriu(bool includeDiagonal) const;
 
     /// Get lower triangular part
-    Sparsity upper(bool includeDiagonal) const;
+    Sparsity getTril(bool includeDiagonal) const;
 
     /// Get nonzeros in lower triangular part
     std::vector<int> getLowerNZ() const;

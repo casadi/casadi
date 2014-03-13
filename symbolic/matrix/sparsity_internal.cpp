@@ -3529,7 +3529,7 @@ namespace CasADi{
     return true;
   }
 
-  Sparsity SparsityInternal::lower(bool includeDiagonal) const{
+  Sparsity SparsityInternal::getTril(bool includeDiagonal) const{
     vector<int> colind, row;
     colind.reserve(ncol_+1);
     colind.push_back(0);
@@ -3545,7 +3545,7 @@ namespace CasADi{
     return Sparsity(nrow_,ncol_,colind,row);
   }
 
-  Sparsity SparsityInternal::upper(bool includeDiagonal) const{
+  Sparsity SparsityInternal::getTriu(bool includeDiagonal) const{
     vector<int> colind, row;
     colind.reserve(ncol_+1);
     colind.push_back(0);
