@@ -55,12 +55,14 @@ namespace CasADi{
     MX();
 
 #ifndef WITHOUT_PRE_1_9_X
-/** \brief [DEPRECATED] Replaced with MX::sym
+/** \brief [DEPRECATED]
 */
 //@{
     explicit MX(const std::string& name, int nrow=1, int ncol=1);
     explicit MX(const std::string& name, const std::pair<int,int> &rc);
     explicit MX(const std::string& name, const Sparsity& sp);
+    MX(int nrow, int ncol);
+    MX(int nrow, int ncol, const MX& val);
 //@}
 #endif
 
@@ -82,12 +84,6 @@ namespace CasADi{
     
     /** \brief  Create sparse matrix constant (also implicit type conversion) */
     MX(const Matrix<double> &x);
-
-    /** \brief  Matrix with all zeros */
-    MX(int nrow, int ncol);
-    
-    /** \brief  Dense matrix filled with value val */
-    MX(int nrow, int ncol, const MX& val);
     
     /** \brief  Destructor */
     virtual ~MX();

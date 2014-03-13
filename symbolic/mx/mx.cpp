@@ -66,11 +66,20 @@ namespace CasADi{
   MX::MX(const string& name, const Sparsity& sp){
     assignNode(new SymbolicMX(name,sp));
   }
-#endif
 
   MX::MX(int nrow, int ncol){
     assignNode(new Constant<CompiletimeConst<0> >(Sparsity::sparse(nrow,ncol)));
   }
+
+  MX::MX(int nrow, int ncol, const MX& val){
+    // Make sure that val is scalar
+    casadi_assert(val.isScalar());
+    casadi_assert(val.isDense());
+  
+    Sparsity sp = Sparsity::dense(nrow,ncol);
+    *this = val->getGetNonzeros(sp,std::vector<int>(sp.size(),0));
+  }
+#endif
 
   MX::MX(const Sparsity& sp, const MX& val){
     if(val.isScalar()){
@@ -599,15 +608,6 @@ namespace CasADi{
   
     MX ret = (*this)->getGetNonzeros(sp,range(size()));
     *this = ret;
-  }
-
-  MX::MX(int nrow, int ncol, const MX& val){
-    // Make sure that val is scalar
-    casadi_assert(val.isScalar());
-    casadi_assert(val.isDense());
-  
-    Sparsity sp = Sparsity::dense(nrow,ncol);
-    *this = val->getGetNonzeros(sp,std::vector<int>(sp.size(),0));
   }
 
   MX MX::mul_full(const MX& y, const Sparsity &z) const{
