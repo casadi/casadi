@@ -799,7 +799,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     double* d=(double*) array_data(array);
     std::vector<double> v(d,d+size);
     
-    m = CasADi::Matrix<double>(nrows, ncols,0);
+    m = CasADi::Matrix<double>::zeros(nrows,ncols);
     m.set(d,CasADi::DENSETRANS);
                   
     // Free memory
@@ -834,7 +834,7 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     int* colindd=(int*) array_data(colind);
     std::vector<int> colindv(colindd,colindd+(ncols+1));
     
-    m = CasADi::Matrix<double>(nrows,ncols,colindv,rowv, v);
+    m = CasADi::Matrix<double>(CasADi::Sparsity(nrows,ncols,colindv,rowv), v);
     
     Py_DECREF(narray);Py_DECREF(shape);Py_DECREF(colind);Py_DECREF(row);
     
@@ -916,7 +916,7 @@ int meta< CasADi::Matrix<CasADi::SXElement> >::as(PyObject * p,CasADi::Matrix<Ca
 		  PyArray_ITER_NEXT(it);
 		}
     Py_DECREF(it);
-		m = CasADi::trans(CasADi::Matrix< CasADi::SXElement >(v, ncols, nrows));
+		m = CasADi::transpose(CasADi::Matrix< CasADi::SXElement >(v, ncols, nrows));
   } else if (PyObject_HasAttrString(p,"__SX__")) {
     char name[] = "__SX__";
     PyObject *cr = PyObject_CallMethod(p, name,0);

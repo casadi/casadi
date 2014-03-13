@@ -28,6 +28,10 @@ set(SWIG_LINK_LIBRARIES_LIST "")
 # Include the use swig file
 include (../cmake_modules/UseSWIGMOD.cmake)
 
+if(NOT WITH_DEPRECATED)
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITHOUT_PRE_1_9_X")
+endif()
+
 if(IPOPT_FOUND)
   link_directories(${IPOPT_LIBRARY_DIRS})
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_IPOPT")

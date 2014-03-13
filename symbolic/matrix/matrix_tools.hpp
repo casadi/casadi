@@ -1206,11 +1206,9 @@ namespace CasADi{
 #define MTT_INST(DataType,function_name)                       \
   %template(function_name) CasADi::function_name <DataType >;
 
-// Define template instanciations
-#define MATRIX_TOOLS_TEMPLATES_COMMON(DataType)        \
+#ifndef WITHOUT_PRE_1_9_X
+#define MATRIX_TOOLS_TEMPLATES_PRE_1_9_X(DataType)     \
   MTT_INST(DataType,trans)                             \
-  MTT_INST(DataType,transpose)                         \
-  MTT_INST(DataType,mul)                               \
   MTT_INST(DataType,isConstant)                        \
   MTT_INST(DataType,isDense)                           \
   MTT_INST(DataType,isEmpty)                           \
@@ -1218,14 +1216,33 @@ namespace CasADi{
   MTT_INST(DataType,isScalar)                          \
   MTT_INST(DataType,isTril)                            \
   MTT_INST(DataType,isTriu)                            \
+  MTT_INST(DataType,makeDense)                         \
+  MTT_INST(DataType,densify)                           \
+  MTT_INST(DataType,makeSparse)                        \
+  MTT_INST(DataType,hasNonStructuralZeros)             \
+  MTT_INST(DataType,isZero)                            \
+  MTT_INST(DataType,isOne)                             \
+  MTT_INST(DataType,isMinusOne)                        \
+  MTT_INST(DataType,isIdentity)                        \
+  MTT_INST(DataType,isEqual)                           \
+  MTT_INST(DataType,nnz)                               
+#else
+#define MATRIX_TOOLS_TEMPLATES_PRE_1_9_X(DataType)
+#endif
+
+// Define template instanciations
+#define MATRIX_TOOLS_TEMPLATES_COMMON(DataType)        \
+  MATRIX_TOOLS_TEMPLATES_PRE_1_9_X(DataType)           \
+  MTT_INST(DataType,transpose)                         \
+  MTT_INST(DataType,mul)                               \
   MTT_INST(DataType,det)                               \
   MTT_INST(DataType,getMinor)                          \
   MTT_INST(DataType,cofactor)                          \
   MTT_INST(DataType,adj)                               \
   MTT_INST(DataType,inv)                               \
   MTT_INST(DataType,reshape)                           \
-  MTT_INST(DataType,vec)                           \
-  MTT_INST(DataType,vecNZ)                         \
+  MTT_INST(DataType,vec)                               \
+  MTT_INST(DataType,vecNZ)                             \
   MTT_INST(DataType,blockcat)                          \
   MTT_INST(DataType,blocksplit)                        \
   MTT_INST(DataType,vertcat)                           \
@@ -1242,28 +1259,18 @@ namespace CasADi{
   MTT_INST(DataType,nullspace)                         \
   MTT_INST(DataType,solve)                             \
   MTT_INST(DataType,pinv)                              \
-  MTT_INST(DataType,isZero)                            \
-  MTT_INST(DataType,isOne)                             \
-  MTT_INST(DataType,isMinusOne)                        \
-  MTT_INST(DataType,isIdentity)                        \
-  MTT_INST(DataType,nnz)                               \
-  MTT_INST(DataType,isEqual)                           \
   MTT_INST(DataType,repmat)                            \
   MTT_INST(DataType,unite)                             \
   MTT_INST(DataType,sumRows)                           \
   MTT_INST(DataType,sumCols)                           \
   MTT_INST(DataType,sumAll)                            \
   MTT_INST(DataType,trace)                             \
-  MTT_INST(DataType,makeDense)                         \
-  MTT_INST(DataType,densify)                           \
-  MTT_INST(DataType,makeSparse)                        \
-  MTT_INST(DataType,hasNonStructuralZeros)             \
   MTT_INST(DataType,diag)                              \
   MTT_INST(DataType,blkdiag)                           \
   MTT_INST(DataType,polyval)                           \
   MTT_INST(DataType,addMultiple)                       \
-  MTT_INST(DataType,veccat)                        \
-  MTT_INST(DataType,vecNZcat)                      \
+  MTT_INST(DataType,veccat)                            \
+  MTT_INST(DataType,vecNZcat)                          \
   MTT_INST(DataType,project)                           \
   MTT_INST(DataType,sprank)                            \
   MTT_INST(DataType,kron) 

@@ -108,7 +108,7 @@ namespace CasADi{
     const MatType& a = static_cast<const MatType&>(a_);
     casadi_assert_message(a.isSquare(),"Shape error in tril2symm. Expecting square shape but got " << a.dimString());
     casadi_assert_message(a.sizeU()-a.sizeD()==0,"Sparsity error in tril2symm. Found above-diagonal entries in argument: " << a.dimString());
-    return a + trans(a) - diag(diag(a));
+    return a +  a.T() - diag(diag(a));
   }
 
 
@@ -117,7 +117,7 @@ namespace CasADi{
     const MatType& a = static_cast<const MatType&>(a_);
     casadi_assert_message(a.isSquare(),"Shape error in triu2symm. Expecting square shape but got " << a.dimString());
     casadi_assert_message(a.sizeL()-a.sizeD()==0,"Sparsity error in triu2symm. Found below-diagonal entries in argument: " << a.dimString());
-    return a + trans(a) - diag(diag(a));
+    return a + a.T() - diag(diag(a));
   }
 #endif // SWIG
 
