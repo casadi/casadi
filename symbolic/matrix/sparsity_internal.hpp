@@ -201,8 +201,8 @@ namespace CasADi{
 
     //@{
     /// Sparsity pattern for a matrix-matrix product (details in public class)
-    Sparsity patternProduct(const Sparsity& y, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
-    Sparsity patternProduct(const Sparsity& y) const;
+    Sparsity patternProduct(const Sparsity& x_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
+    Sparsity patternProduct(const Sparsity& x_trans) const;
     //@}
     
     //@{

@@ -38,8 +38,8 @@ namespace CasADi{
     return reshape(a,a.numel(),1);
   }
 
-  Sparsity mul(const  Sparsity& a, const  Sparsity &b) {
-    return (mul(DMatrix(a,1),DMatrix(b,1))).sparsity();
+  Sparsity mul(const Sparsity& a, const Sparsity &b) {
+    return b.patternProduct(a.T());
   }
     
   int rank(const Sparsity& a) {
@@ -169,9 +169,9 @@ namespace CasADi{
   }
 
   std::vector<Sparsity> vertsplit(const Sparsity& sp, const std::vector<int>& output_offset){
-    std::vector<Sparsity> ret = horzsplit(sp.transpose(),output_offset);
+    std::vector<Sparsity> ret = horzsplit(sp.T(),output_offset);
     for(std::vector<Sparsity>::iterator it=ret.begin(); it!=ret.end(); ++it){
-      *it = it->transpose();
+      *it = it->T();
     }
     return ret;
   }

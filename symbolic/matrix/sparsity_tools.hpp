@@ -72,7 +72,7 @@ namespace CasADi{
   
   /** \brief Get the sparsity resulting from a matrix multiplication
    */
-  Sparsity mul(const  Sparsity& a, const  Sparsity &b);
+  Sparsity mul(const Sparsity& a, const Sparsity &b);
   
   /** \brief Concatenate a list of sparsities vertically
   * Alternative terminology: vertical stack, vstack, vertical append, [a;b]

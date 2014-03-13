@@ -1848,28 +1848,28 @@ namespace CasADi{
     return ss.str();
   }
 
-  Sparsity SparsityInternal::patternProduct(const Sparsity& y) const{
+  Sparsity SparsityInternal::patternProduct(const Sparsity& x_trans) const{
     // Dimensions
-    int x_ncol = ncol_;
-    int y_nrow = y.size2();
+    int x_nrow = x_trans.size2();
+    int y_ncol = ncol_;
 
     // Quick return if both are dense
-    if(isDense() && y.isDense()){
-      return !isEmpty() && !y.isEmpty() ? Sparsity::dense(y_nrow,x_ncol) : Sparsity::sparse(y_nrow,x_ncol);
+    if(isDense() && x_trans.isDense()){
+      return !isEmpty() && !x_trans.isEmpty() ? Sparsity::dense(x_nrow,y_ncol) : Sparsity::sparse(x_nrow,y_ncol);
     }
   
     // return object
-    Sparsity ret = Sparsity::sparse(y_nrow,x_ncol);
+    Sparsity ret = Sparsity::sparse(x_nrow,y_ncol);
   
     // Get the vectors for the return pattern
-    vector<int>& c = ret.rowRef();
-    vector<int>& r = ret.colindRef();
+    vector<int>& ret_row = ret.rowRef();
+    vector<int>& ret_colind = ret.colindRef();
   
     // Direct access to the arrays
-    const vector<int> &x_row = row_;
-    const vector<int> &y_col = y.row();
-    const vector<int> &x_colind = colind_;
-    const vector<int> &y_rowind = y.colind();
+    const vector<int> &x_col = x_trans.row();
+    const vector<int> &x_rowind = x_trans.colind();
+    const vector<int> &y_row = row_;
+    const vector<int> &y_colind = colind_;
 
     // If the compiler supports C99, we shall use the long long datatype, which is 64 bit, otherwise long
 #if __STDC_VERSION__ >= 199901L
@@ -1882,72 +1882,72 @@ namespace CasADi{
     int nr = CHAR_BIT*sizeof(int_t); // the size of int_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
 
     // Number of such groups needed
-    int ng = x_ncol/nr;
-    if(ng*nr != x_ncol) ng++;
+    int ng = y_ncol/nr;
+    if(ng*nr != y_ncol) ng++;
   
     // Which rows exist in a col of the first factor
-    vector<int_t> in_x_col(nrow_);
-    vector<int_t> in_res_row(y_nrow);
+    vector<int_t> in_y_col(nrow_);
+    vector<int_t> in_res_row(x_nrow);
 
     // Loop over the cols of the resulting matrix, nr cols at a time
     for(int rr=0; rr<ng; ++rr){
 
       // Mark the elements in the x col
-      fill(in_x_col.begin(),in_x_col.end(),0); // NOTE: expensive?
+      fill(in_y_col.begin(),in_y_col.end(),0); // NOTE: expensive?
       int_t b=1;
-      for(int i=rr*nr; i<rr*nr+nr && i<x_ncol; ++i){
-        for(int el1=x_colind[i]; el1<x_colind[i+1]; ++el1){
-          in_x_col[x_row[el1]] |= b;
+      for(int i=rr*nr; i<rr*nr+nr && i<y_ncol; ++i){
+        for(int el1=y_colind[i]; el1<y_colind[i+1]; ++el1){
+          in_y_col[y_row[el1]] |= b;
         }
         b <<= 1;
       }
 
       // Get the sparsity pattern for the set of cols
       fill(in_res_row.begin(),in_res_row.end(),0); // NOTE: expensive?
-      for(int j=0; j<y_nrow; ++j){
+      for(int j=0; j<x_nrow; ++j){
       
         // Loop over the nonzeros of the row of the second factor
-        for(int el2=y_rowind[j]; el2<y_rowind[j+1]; ++el2){
+        for(int el2=x_rowind[j]; el2<x_rowind[j+1]; ++el2){
         
           // Get the col
-          int i_y = y_col[el2];
+          int i_y = x_col[el2];
         
           // Add nonzero if the element matches an element in the x col
-          in_res_row[j] |= in_x_col[i_y];
+          in_res_row[j] |= in_y_col[i_y];
         }
       }
 
       b = 1;
-      for(int i=rr*nr; i<rr*nr+nr && i<x_ncol; ++i){
+      for(int i=rr*nr; i<rr*nr+nr && i<y_ncol; ++i){
       
         // loop over the rows of the resulting matrix
-        for(int j=0; j<y_nrow; ++j){
+        for(int j=0; j<x_nrow; ++j){
         
           // Save nonzero, if any
           if(in_res_row[j] & b){
-            c.push_back(j);
+            ret_row.push_back(j);
           }
         }
-        r[i+1] = c.size();
+        ret_colind[i+1] = ret_row.size();
         b <<=1;
       }
     }
     return ret;
   }
 
-  Sparsity SparsityInternal::patternProduct(const Sparsity& y, vector< vector< pair<int,int> > >& mapping) const{
+  Sparsity SparsityInternal::patternProduct(const Sparsity& x_trans, vector< vector< pair<int,int> > >& mapping) const{
     // return object
-    Sparsity ret = patternProduct(y);
+    Sparsity ret = patternProduct(x_trans);
   
     // Get the vectors for the return pattern
-    const vector<int>& c = ret.row();
-    const vector<int>& r = ret.colind();
+    const vector<int>& ret_row = ret.row();
+    const vector<int>& ret_colind = ret.colind();
   
     // Direct access to the arrays
-    const vector<int> &x_row = row_;
-    const vector<int> &y_col = y.row();
-    const vector<int> &x_colind = colind_;
-    const vector<int> &y_rowind = y.colind();
+    const vector<int> &x_col = x_trans.row();
+    const vector<int> &y_colind = colind_;
+    const vector<int> &y_row = row_;
+    const vector<int> &x_rowind = x_trans.colind();
 
     // Clear the mapping
     mapping.resize(ret.size());
@@ -1958,14 +1958,14 @@ namespace CasADi{
     // loop over the col of the resulting matrix)
     for(int i=0; i<ncol_; ++i){
       // Loop over nonzeros
-      for(int el=r[i]; el<r[i+1]; ++el){
-        int j = c[el];
-        int el1 = x_colind[i];
-        int el2 = y_rowind[j];
+      for(int el=ret_colind[i]; el<ret_colind[i+1]; ++el){
+        int j = ret_row[el];
+        int el1 = y_colind[i];
+        int el2 = x_rowind[j];
         d.clear();
-        while(el1 < x_colind[i+1] && el2 < y_rowind[j+1]){ // loop over non-zero elements
-          int j1 = x_row[el1];
-          int i2 = y_col[el2];      
+        while(el1 < y_colind[i+1] && el2 < x_rowind[j+1]){ // loop over non-zero elements
+          int j1 = y_row[el1];
+          int i2 = x_col[el2];      
           if(j1==i2){
             d.push_back(pair<int,int>(el1++,el2++));
           } else if(j1<i2) {

@@ -394,11 +394,12 @@ namespace CasADi{
     /// @}
 
     /// @{
-    /** \brief Sparsity pattern for a matrix-matrix product, with the first factor transposed
+    /** \brief Sparsity pattern for a matrix-matrix product
+        Returns the sparsity pattern resulting from premultiplying the pattern with the transpose of x.
         Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
         The mapping contains a vector of the index pairs that makes up the scalar products for each non-zero */
-    Sparsity patternProduct(const Sparsity& y, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
-    Sparsity patternProduct(const Sparsity& y) const;
+    Sparsity patternProduct(const Sparsity& x_trans, std::vector< std::vector< std::pair<int,int> > >& mapping) const;
+    Sparsity patternProduct(const Sparsity& x_trans) const;
     /// @}
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros

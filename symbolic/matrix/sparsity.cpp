@@ -350,12 +350,12 @@ namespace CasADi{
     return (*this)->patternCombine(y, true, true);
   }
 
-  Sparsity Sparsity::patternProduct(const Sparsity& y) const{
-    return (*this)->patternProduct(y);
+  Sparsity Sparsity::patternProduct(const Sparsity& x_trans) const{
+    return (*this)->patternProduct(x_trans);
   }
 
-  Sparsity Sparsity::patternProduct(const Sparsity& y_trans, std::vector< std::vector< pair<int,int> > >& mapping) const{
-    return (*this)->patternProduct(y_trans,mapping);
+  Sparsity Sparsity::patternProduct(const Sparsity& x_trans, std::vector< std::vector< pair<int,int> > >& mapping) const{
+    return (*this)->patternProduct(x_trans,mapping);
   }
 
   bool Sparsity::isEqual(const Sparsity& y) const{
