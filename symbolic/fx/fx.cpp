@@ -224,6 +224,7 @@ namespace CasADi{
     return (*this)->getOutputScheme();
   }
 
+#ifndef WITHOUT_PRE_1_9_X
   FX FX::operator[](int k) const {
 
     // Argument checking
@@ -250,6 +251,7 @@ namespace CasADi{
     // And return it, will automatically cast to FX
     return ret;
   }
+#endif
 
   vector<SX> FX::eval(const vector<SX>& arg){
     casadi_assert_message(arg.size()==getNumInputs(),"FX::evalSX: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");

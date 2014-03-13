@@ -331,15 +331,7 @@ namespace CasADi{
     
     /** \brief Export / Generate C code for the function */
     void generateCode(const std::string& filename);
-  
-#ifndef SWIG 
-    /// Construct a function that has only the k'th output
-    FX operator[](int k) const;
-#endif //SWIG 
-
-    FX indexed_one_based(int k) const{ return operator[](k-1);}
-    FX indexed_zero_based(int k) const{ return operator[](k);}
-  
+    
     /** \brief  Access functions of the node */
     FXInternal* operator->();
 
@@ -390,6 +382,11 @@ namespace CasADi{
     //@{
     std::vector<MX> evalMX(const std::vector<MX>& arg){ return eval(arg);}
     std::vector<SX> evalSX(const std::vector<SX>& arg){ return eval(arg);}
+#ifndef SWIG 
+    FX operator[](int k) const;
+#endif //SWIG 
+    FX indexed_one_based(int k) const{ return operator[](k-1);}
+    FX indexed_zero_based(int k) const{ return operator[](k);}
     //@}
 #endif
 

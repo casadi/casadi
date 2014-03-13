@@ -166,6 +166,7 @@ SXFunction::SXFunction(const FX& f){
   }
 }
 
+#ifndef WITHOUT_PRE_1_9_X
 SXFunction SXFunction::operator[](int k) const {
 
   // Delegate to FX
@@ -180,6 +181,7 @@ SXFunction SXFunction::operator[](int k) const {
 
   return ret;
 }
+#endif
 
 std::vector<SXElement> SXFunction::getFree() const{
   return (*this)->free_vars_;

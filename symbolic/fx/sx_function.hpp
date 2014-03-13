@@ -192,14 +192,16 @@ namespace CasADi{
     /** \brief Get the corresponding matrix type */
     typedef SX MatType;  
   
+#ifndef WITHOUT_PRE_1_9_X
+    /** \brief [DEPRECATED]  */
+    //@{
 #ifndef SWIG 
-    /// Construct a function that has only the k'th output
     SXFunction operator[](int k) const;
 #endif //SWIG 
-
     SXFunction indexed_one_based(int k) const{ return operator[](k-1);}
     SXFunction indexed_zero_based(int k) const{ return operator[](k);}
-
+    //@}
+#endif
   };
 
 } // namespace CasADi
