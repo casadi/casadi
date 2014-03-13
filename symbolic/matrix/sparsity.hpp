@@ -227,9 +227,6 @@ namespace CasADi{
     /// Check if two sparsity patterns are difference
     bool operator!=(const Sparsity& y) const{return !isEqual(y);}
     
-    /// Take the union of two sparsity patterns
-    Sparsity operator+(const Sparsity& b) const;
-
     /// Take the intersection of two sparsity patterns
     Sparsity operator*(const Sparsity& b) const;
     
@@ -384,6 +381,9 @@ namespace CasADi{
     Sparsity patternUnion(const Sparsity& y, std::vector<unsigned char>& mapping) const;
     Sparsity patternUnion(const Sparsity& y) const;
     /// @}
+
+    /// Take the union of two sparsity patterns, shorthand for patternUnion
+    Sparsity operator+(const Sparsity& b) const;
     
     /// @{
     /** \brief Intersection of two sparsity patterns

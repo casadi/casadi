@@ -367,7 +367,7 @@ namespace CasADi{
   }
 
   Sparsity Sparsity::operator+(const Sparsity& b) const {
-    return (DMatrix(*this,1)+DMatrix(b,1)).sparsity();
+    return patternUnion(b);
   }
 
   Sparsity Sparsity::operator*(const Sparsity& b) const {
